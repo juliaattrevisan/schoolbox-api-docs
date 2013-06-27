@@ -32,10 +32,10 @@ class User {
     private $superuser;         //Bool
 private $enabled;               //Bool
 
-	/**
-	 * @var \Schoolbox\External\SubjectCollection
-	 */
-	protected $subject_collection;
+    /**
+     * @var \Schoolbox\External\SubjectCollection
+     */
+    protected $subject_collection;
 
 
     //User config options
@@ -43,6 +43,11 @@ private $enabled;               //Bool
     private $eportfolioEnable; //Controls if user has eportfolio
     private $useInternalMail;  //Controls mailto or internal schoolbox mail sending
     private $calendarView; //Controls default calendar view
+
+    /**
+     * Student's boarding status (only used if boarder leave module is enabled)
+     */
+    protected $boardingStatus;
 
     /**
      * @var IConfigLoader
@@ -107,46 +112,46 @@ private $enabled;               //Bool
         return $this->altEmail;
     }
 
-	public function getFullName() {
-		return $this->formatName();
-	}
+    public function getFullName() {
+        return $this->formatName();
+    }
 
-	/**
-	 * Format a name from a user object
-	 *
-	 * @param  $userInfo
-	 * @param null $format
-	 * @return mixed|null|string
-	 */
-	public function formatName($format = null) {
+    /**
+     * Format a name from a user object
+     *
+     * @param  $userInfo
+     * @param null $format
+     * @return mixed|null|string
+     */
+    public function formatName($format = null) {
 
-		// Check for custom format
-		if (empty($format)) {
-			$format = $this->getConfigLoader()->get('name_format');
-		}
+        // Check for custom format
+        if (empty($format)) {
+            $format = $this->getConfigLoader()->get('name_format');
+        }
 
-		/* Replace tags */
-		preg_match_all('|{\w+}|', $format, $tags);
+        /* Replace tags */
+        preg_match_all('|{\w+}|', $format, $tags);
 
-		foreach ($tags[0] as $tag) {
-			$key = trim($tag, '{}');
-			$func = 'get'.ucfirst($key);
-			if(method_exists($this,$func)) {
-				if (is_string($this->$func())) {
-					$value = $this->$func();
-				} else {
-					$value = '';
-				}
-			}
-			$format = str_replace($tag, $value, $format);
-		}
+        foreach ($tags[0] as $tag) {
+            $key = trim($tag, '{}');
+            $func = 'get'.ucfirst($key);
+            if(method_exists($this,$func)) {
+                if (is_string($this->$func())) {
+                    $value = $this->$func();
+                } else {
+                    $value = '';
+                }
+            }
+            $format = str_replace($tag, $value, $format);
+        }
 
-		if ($format = trim($format)) {
-			return $format;
-		} else {
-			return 'Unknown User';
-		}
-	}
+        if ($format = trim($format)) {
+            return $format;
+        } else {
+            return 'Unknown User';
+        }
+    }
 
     public function setAltEmail($altEmail) {
         $this->altEmail = $altEmail;
@@ -310,19 +315,48 @@ private $enabled;               //Bool
         $this->defaultCampus = $defaultCampus;
     }
 
-	/**
-	 * @param \Schoolbox\External\SubjectCollection $subject_collection
-	 */
-	public function setSubjectCollection($subject_collection) {
-		$this->subject_collection = $subject_collection;
-	}
+    /**
+     * Set boarding status (only if boarder leave is enabled)
+     *
+     * @param  string $boardingStatus
+     * @return $this
+     */
+    public function setBoardingStatus($boardingStatus) {
+        $this->boardingStatus = $boardingStatus;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\External\SubjectCollection
-	 */
-	public function getSubjectCollection() {
-		return $this->subject_collection;
-	}
+    /**
+     * Get boarding status
+     *
+     * @return string
+     */
+    public function getBoardingStatus() {
+        return $this->boardingStatus;
+    }
+
+    /**
+     * Get abbreviated form of boarding status (first letter)
+     *
+     * @return string
+     */
+    public function getAbbreviatedBoardingStatus() {
+        return substr($this->getBoardingStatus(), 0, 1);
+    }
+
+    /**
+     * @param \Schoolbox\External\SubjectCollection $subject_collection
+     */
+    public function setSubjectCollection($subject_collection) {
+        $this->subject_collection = $subject_collection;
+    }
+
+    /**
+     * @return \Schoolbox\External\SubjectCollection
+     */
+    public function getSubjectCollection() {
+        return $this->subject_collection;
+    }
 
 
     /**
