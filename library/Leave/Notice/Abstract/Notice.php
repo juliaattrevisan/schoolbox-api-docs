@@ -31,7 +31,7 @@ abstract class Leave_Notice_Abstract_Notice {
 	/**
 	 * Set request
 	 *
-	 * @param $request
+	 * @param Leave_Request $request
 	 */
 	private function setRequest($request) {
 		$this->request = $request;
@@ -40,7 +40,7 @@ abstract class Leave_Notice_Abstract_Notice {
 	/**
 	 * Get request
 	 *
-	 * @return null
+	 * @return Leave_Request
 	 */
 	protected function getRequest() {
 		return $this->request;

@@ -324,7 +324,7 @@ class Leave_Request extends Model {
     /**
      * Set user
      *
-     * @param User $user
+     * @param \Schoolbox\User $user
      *
      * @return void
      */
@@ -335,7 +335,7 @@ class Leave_Request extends Model {
     /**
      * Get user
      *
-     * @return User
+     * @return \Schoolbox\User
      */
     public function getUser() {
         return $this->user;

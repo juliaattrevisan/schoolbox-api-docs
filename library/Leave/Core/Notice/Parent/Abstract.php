@@ -24,7 +24,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
            */
         $this->setExternalUser(new External_User());
 
-        $subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->getName();
+        $subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
         /* Set destination email address in loop in send()
            */
@@ -37,7 +37,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
 
         $email->setVar(
             array(
-                'LEAVE_USER_NAME' => $this->getRequest()->getUser()->getName(),
+                'LEAVE_USER_NAME' => $this->getRequest()->getUser()->formatName(),
                 'LEAVE_STATUS' => $this->getRequest()->getStatus(true),
                 'LEAVE_START' => $this->getRequest()->getStart()->getLong(),
                 'LEAVE_FINISH' => $this->getRequest()->getFinish()->getLong(),
@@ -56,7 +56,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
      * Send a notification to all parents of the child
      */
     public function send() {
-        $allParents = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getSynergyId());
+        $allParents = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getExternalId());
 
         if (is_array($allParents)) {
             foreach ($allParents as $parent) {

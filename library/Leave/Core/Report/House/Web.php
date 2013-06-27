@@ -74,7 +74,7 @@ class Leave_Core_Report_House_Web {
 			/* Collect general data
 			 */
 			$combined[$key]['user_id'] = $key;
-			$combined[$key]['user_name'] = Scrub::smartQuotes($request->getUser()->getName());
+			$combined[$key]['user_name'] = Scrub::smartQuotes($request->getUser()->formatName());
 			$combined[$key]['user_year'] = $request->getUser()->getYear();
 			$combined[$key]['user_boarding_status'] = $request->getUser()->getAbbreviatedBoardingStatus();
 
