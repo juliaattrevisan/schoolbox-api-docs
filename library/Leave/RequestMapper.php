@@ -6,7 +6,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 	protected function setup() {
 		parent::setup();
-		$this->setUserMapper(NewUserMapper::getInstance());
+		$this->setUserMapper(\Schoolbox\UserMapper::getInstance());
 
 		/* Set the threshold for displaying/using lists of requests.
 		   * Only show the last 14 days' worth of info
