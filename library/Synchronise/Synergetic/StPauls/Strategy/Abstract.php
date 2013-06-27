@@ -13,6 +13,8 @@
 abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract {
 	protected $verboseFilter = null;
 
+	protected $houseMap = array();
+
 	/**
 	 * Identical algorithm used to create/update a user
 	 *
@@ -123,15 +125,19 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
 		}
 	}
 
+
 	/**
 	 * Figure out the House ID based on a Student's synergetic house
 	 *
-	 * @param  $house
+	 * @param  $code
 	 * @return bool|int
 	*/
 
-	protected function getHouseFromCode($house) {
-		return false; // StPauls does not have houses registered
+	protected function getHouseFromCode($code) {
+		if(array_key_exists($code, $this->houseMap)) {
+			return $this->houseMap[$code];
+		}
+		return false;
 	}
 
 	/**
