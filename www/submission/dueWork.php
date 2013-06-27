@@ -367,7 +367,8 @@ foreach ($categoryList as $category) {
     // calculate grade averages and trending
     $this->setFile('subjectTpl', 'activity/subjectlist.html');
     $this->setBlock('subjectTpl', 'teacher', 'teacher_block');
-    $this->setBlock('subjectTpl', 'icon', 'icon_block');
+	$this->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
+//    $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
     $output = array(
         'SUBJ_CAT_ID' => $categoryID,
@@ -384,18 +385,15 @@ foreach ($categoryList as $category) {
     $this->setVar($output);
 
     if ($gradeAvg == -1) {
-        $output = array(
-            'SUBJ_GRADE' => '',
-            'SUBJ_GRADEIANT' => 'na'
-        );
+	    $this->setVar('subject_grade_block', '');
     } else {
-        $output = array(
+	    $this->setVar(array(
             'SUBJ_GRADE' => $returnHandler->percent2letter($gradeAvg),
             'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
-        );
+	    ));
+	    $this->parse('subject_grade_block', 'subject_grade');
     }
 
-    $this->setVar($output);
 
 
     if (Cfg::get('external_enable')) {
@@ -417,7 +415,7 @@ foreach ($categoryList as $category) {
     } else {
         $this->setVar('teacher_block', '');
     }
-    $this->parse('icon_block', 'icon');
+//    $this->parse('icon_block', 'icon');
     $this->parse('SUBJECT_LIST', 'subjectTpl', true);
 }
 
