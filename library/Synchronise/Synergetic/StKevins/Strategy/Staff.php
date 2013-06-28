@@ -11,7 +11,7 @@
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
 class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_Strategy_Staff {
-	protected $strategyTitle = "Update Schoolbox Staff Details Synchronisation";
+	protected $title = "Update Schoolbox Staff Details Synchronisation";
 
 	/**
 	 * Setup verbose output
