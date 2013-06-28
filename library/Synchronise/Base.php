@@ -160,9 +160,19 @@ abstract class Synchronise_Base {
 		return $this->perform_update;
 	}
 
+	/**
+	 * Generates the list of users for sync, and jams them into $this->list.
+	 *
+	 * @return void
+	 */
 	public abstract function generateList();
 
-	public abstract function setupUserDetails();
-
-//	public abstract function createIfExists();
+	/**
+	 * Creates an array for insertion into the Schoolbox users table.
+	 *
+	 * @param  array $external_user
+	 *
+	 * @return array
+	 */
+	public abstract function setupUserDetails($external_user);
 }
