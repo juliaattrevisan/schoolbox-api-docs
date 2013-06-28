@@ -225,6 +225,119 @@ abstract class Synchronise_Base_Strategy {
 	}
 
 	/**
+	 * Gets Schoolbox user's title (Mr., Ms., etc.) from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return string
+	 */
+	public function getTitleFromUser($currentUser) {
+		return '';
+	}
+
+	/**
+	 * Gets Schoolbox user's first name from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return string
+	 */
+	public function getFirstNameFromUser($currentUser) {
+		return '';
+	}
+
+	/**
+	 * Gets Schoolbox user's last name from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return string
+	 */
+	public function getLastNameFromUser($currentUser) {
+		return '';
+	}
+
+	/**
+	 * Gets Schoolbox user's external database ID from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return string
+	 */
+	public function getExternalIdFromUser($currentUser) {
+		return '';
+	}
+
+	/**
+	 * Gets Schoolbox user's alternate email address from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return string
+	 */
+	public function getAltEmailFromUser($currentUser) {
+		return null;
+	}
+
+	/**
+	 * Gets Schoolbox user's local email setting from the external data set.
+	 *
+	 * For most schools, this will be a school-wide setting instead of a
+	 * per-user setting.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getLocalEmailFromUser($currentUser) {
+		return 0;
+	}
+
+	/**
+	 * Gets Schoolbox default campus from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getDefaultCampusFromUser($currentUser) {
+		return 1;
+	}
+
+	/**
+	 * Gets Schoolbox campus list from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return array[int]
+	 */
+	public function getCampusListFromUser($currentUser) {
+		return array($this->getDefaultCampusFromUser($currentUser));
+	}
+
+	/**
+	 * Gets student's year from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getYearFromUser($currentUser) {
+		return null;
+	}
+
+	/**
+	 * Gets Schoolbox group from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getGroupIDFromUser($currentUser) {
+		return 1;
+	}
+
+	/**
 	 * Gets whether user is a superuser from the external data set.
 	 *
 	 * @param  array $currentUser
@@ -254,5 +367,20 @@ abstract class Synchronise_Base_Strategy {
 	 *
 	 * @return array
 	 */
-	public abstract function setupUserDetails($external_user);
+	public function setupUserDetails($external_user) {
+		$newUser = array();
+		$newUser['username']      = $this->getUsernameFromUser($external_user);
+		$newUser['title']         = $this->getTitleFromUser($external_user);
+		$newUser['firstname']     = $this->getFirstNameFromUser($external_user);
+		$newUser['lastname']      = $this->getLastNameFromUser($external_user);
+		$newUser['synergy_id']    = $this->getExternalIdFromUser($external_user);
+		$newUser['alt_email']     = $this->getAltEmailFromUser($external_user);
+		$newUser['local_email']   = $this->getLocalEmailFromUser($external_user);
+		$newUser['year']          = $this->getYearFromUser($external_user);
+		$newUser['defaultCampus'] = $this->getDefaultCampusFromUser($external_user);
+		$newUser['campus']        = $this->getCampusListFromUser($external_user);
+		$newUser['group_id']      = $this->getGroupIDFromUser($external_user);
+		$newUser['su']            = $this->getIsSuperuserFromUser($external_user);
+		return $newUser;
+	}
 }
