@@ -10,7 +10,7 @@
  * @link      http://www.alaress.com.au/
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
-class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_Strategy_Staff {
+class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_Strategy_Student {
 	protected $title = "Update Schoolbox Student Details Synchronisation";
 
 	/**
