@@ -348,18 +348,6 @@ abstract class Synchronise_Base_Strategy {
 		return false;
 	}
 
-
-	/**
-	 * Abstract methods
-	 */
-
-	/**
-	 * Generates the list of users for sync, and jams them into $this->list.
-	 *
-	 * @return void
-	 */
-	public abstract function generateList();
-
 	/**
 	 * Creates an array for insertion into the Schoolbox users table.
 	 *
@@ -383,4 +371,16 @@ abstract class Synchronise_Base_Strategy {
 		$newUser['su']            = $this->getIsSuperuserFromUser($external_user);
 		return $newUser;
 	}
+
+
+	/**
+	 * Abstract methods
+	 */
+
+	/**
+	 * Generates the list of users for sync, and jams them into $this->list.
+	 *
+	 * @return void
+	 */
+	public abstract function generateList();
 }
