@@ -83,7 +83,7 @@ abstract class Synchronise_Base_Strategy {
 	 *
 	 * @return void
 	 */
-	protected function createIfExists() {
+	public function createIfExists() {
 		$this->verbose_filter->intro();
 		foreach($this->list as $user) {
 			$this->executeCreateUpdate($this->setupUserDetails($user));
