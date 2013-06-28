@@ -15,7 +15,7 @@ class Synchronise_Base_Strategy_Staff extends Synchronise_Base_Strategy {
 	 * @return void
 	 */
 	public function generateList() {
-		$this->list = $this->external_user_handler->getParentUserAccountInfo();
+		$this->list = $this->external_user_handler->getStaffUserAccountInfo();
 	}
 
 	/**
