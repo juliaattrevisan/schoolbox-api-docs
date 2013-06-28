@@ -9,9 +9,10 @@
 
 abstract class Synchronise_Base_Strategy {
 
-	const DEFAULT_ADMIN_GROUP  = 1;
-	const DEFAULT_STAFF_GROUP  = 2;
-	const DEFAULT_PARENT_GROUP = 4;
+	const DEFAULT_ADMIN_GROUP   = 1;
+	const DEFAULT_STAFF_GROUP   = 2;
+	const DEFAULT_STUDENT_GROUP = 3;
+	const DEFAULT_PARENT_GROUP  = 4;
 
 	/**
 	 * Are updates performed? If not, then a plan is output instead.

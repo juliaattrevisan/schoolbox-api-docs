@@ -40,15 +40,6 @@ class Synchronise_Base_Strategy_Student extends Synchronise_Base_Strategy {
 		$newUser['su']            = $this->getIsSuperuserFromUser($external_user);
 		// filter out empty fields?
 		return $newUser;
-
-
-
-		$newUser = array();
-		//
-		// No houses have been set up yet, leave alone
-//		$newUser['house']         = $this->getHouseFromCode($currentUser['StudentHouse']);
-		$newUser['su']            = false;
-		return $newUser;
 	}
 
 	/**
@@ -160,7 +151,7 @@ class Synchronise_Base_Strategy_Student extends Synchronise_Base_Strategy {
 	 * @return int
 	 */
 	public function getGroupIDFromUser($currentUser) {
-		return 1;
+		return self::DEFAULT_STUDENT_GROUP;
 	}
 
 	/**
