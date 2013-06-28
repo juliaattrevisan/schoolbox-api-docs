@@ -33,8 +33,8 @@ class Synchronise_Base_Strategy_Staff extends Synchronise_Base_Strategy {
 		$newUser['synergy_id']    = $this->getExternalIdFromUser($external_user);
 		$newUser['alt_email']     = $this->getAltEmailFromUser($external_user);
 		$newUser['local_email']   = $this->getLocalEmailFromUser($external_user);
-		$newUser['defaultCampus'] = $this->getCampusFromUser($external_user);
-		$newUser['campus']        = array($newUser['defaultCampus']);
+		$newUser['defaultCampus'] = $this->getDefaultCampusFromUser($external_user);
+		$newUser['campus']        = $this->getCampusListFromUser($external_user);
 		$newUser['group_id']      = $this->getGroupIDFromUser($external_user);
 		// filter out empty fields?
 		return $newUser;
@@ -140,14 +140,25 @@ class Synchronise_Base_Strategy_Staff extends Synchronise_Base_Strategy {
 	}
 
 	/**
-	 * Gets Schoolbox campus from the external data set.
+	 * Gets Schoolbox default campus from the external data set.
 	 *
 	 * @param  array $currentUser
 	 *
 	 * @return int
 	 */
-	public function getCampusFromUser($currentUser) {
+	public function getDefaultCampusFromUser($currentUser) {
 		return 1;
+	}
+
+	/**
+	 * Gets Schoolbox campus list from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return array[int]
+	 */
+	public function getCampusListFromUser($currentUser) {
+		return array($this->getDefaultCampusFromUser($currentUser));
 	}
 
 	/**
