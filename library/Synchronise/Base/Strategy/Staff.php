@@ -146,7 +146,7 @@ class Synchronise_Base_Strategy_Staff extends Synchronise_Base_Strategy {
 	 * @return int
 	 */
 	public function getGroupIDFromUser($currentUser) {
-		return 1;
+		return self::DEFAULT_STAFF_GROUP;
 	}
 
 	/**
