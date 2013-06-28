@@ -369,7 +369,18 @@ abstract class Synchronise_Base_Strategy {
 		$newUser['campus']        = $this->getCampusListFromUser($external_user);
 		$newUser['group_id']      = $this->getGroupIDFromUser($external_user);
 		$newUser['su']            = $this->getIsSuperuserFromUser($external_user);
-		return $newUser;
+		return $this->clearFields($newUser);
+	}
+
+	/**
+	 * Filters fields with a null value out of user details.
+	 *
+	 * @param  array $new_user
+	 *
+	 * @return array
+	 */
+	protected function clearFields($new_user) {
+		return array_filter($new_user, function($v) { return isset($v); });
 	}
 
 

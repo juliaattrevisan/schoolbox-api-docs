@@ -40,7 +40,7 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 		$newUser['campus']        = $this->getSpouseCampusListFromUser($external_user);
 		$newUser['group_id']      = $this->getSpouseGroupIDFromUser($external_user);
 		$newUser['su']            = $this->getSpouseIsSuperuserFromUser($external_user);
-		return $newUser;
+		return $this->clearFields($newUser);
 	}
 
 
