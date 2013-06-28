@@ -202,6 +202,39 @@ abstract class Synchronise_Base_Strategy {
 		echo "\n------------------------------------------------------------\n";
 	}
 
+
+	/**
+	 * Methods for retrieving Schoolbox fields from an external data set.
+	 * These may be overridden on a per-sync basis.
+	 */
+
+	/**
+	 * Gets Schoolbox username from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return string
+	 */
+	public function getUsernameFromUser($currentUser) {
+		return $currentUser['NetworkLogin'];
+	}
+
+	/**
+	 * Gets whether user is a superuser from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return bool
+	 */
+	public function getIsSuperuserFromUser($currentUser) {
+		return false;
+	}
+
+
+	/**
+	 * Abstract methods
+	 */
+
 	/**
 	 * Generates the list of users for sync, and jams them into $this->list.
 	 *

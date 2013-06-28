@@ -33,42 +33,19 @@ class Synchronise_Base_Strategy_Staff extends Synchronise_Base_Strategy {
 		$newUser['synergy_id']    = $this->getExternalIdFromUser($external_user);
 		$newUser['alt_email']     = $this->getAltEmailFromUser($external_user);
 		$newUser['local_email']   = $this->getLocalEmailFromUser($external_user);
+		$newUser['year']          = $this->getYearFromUser($external_user);
 		$newUser['defaultCampus'] = $this->getDefaultCampusFromUser($external_user);
 		$newUser['campus']        = $this->getCampusListFromUser($external_user);
 		$newUser['group_id']      = $this->getGroupIDFromUser($external_user);
+		$newUser['su']            = $this->getIsSuperuserFromUser($external_user);
 		// filter out empty fields?
 		return $newUser;
-	}
-
-	/**
-	 * If the users exist in Synergy but not in Schoolbox, create an account for
-	 * them
-	 *
-	 * @return void
-	 */
-	public function createIfExists() {
-		$this->verbose_filter->intro();
-		foreach ($this->list as $currentUser) {
-			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
-		}
-		$this->verbose_filter->summary();
 	}
 
 	/**
 	 * Methods for retrieving Schoolbox fields from an external data set.
 	 * These may be overridden on a per-sync basis.
 	 */
-
-	/**
-	 * Gets Schoolbox username from the external data set.
-	 *
-	 * @param  array $currentUser
-	 *
-	 * @return string
-	 */
-	public function getUsernameFromUser($currentUser) {
-		return $currentUser['NetworkLogin'];
-	}
 
 	/**
 	 * Gets Schoolbox user's title (Mr., Ms., etc.) from the external data set.
@@ -170,6 +147,17 @@ class Synchronise_Base_Strategy_Staff extends Synchronise_Base_Strategy {
 	 */
 	public function getGroupIDFromUser($currentUser) {
 		return 1;
+	}
+
+	/**
+	 * Gets this user's year from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getYearFromUser($currentUser) {
+		return null;
 	}
 
 }
