@@ -21,29 +21,6 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	}
 
 	/**
-	 * Set up the new user's details
-	 *
-	 * @param  array $external_user
-	 * @return array
-	 */
-	public function setupUserDetails($external_user) {
-		$newUser = array();
-		$newUser['username']      = $this->getUsernameFromUser($external_user);
-		$newUser['title']         = $this->getTitleFromUser($external_user);
-		$newUser['firstname']     = $this->getFirstNameFromUser($external_user);
-		$newUser['lastname']      = $this->getLastNameFromUser($external_user);
-		$newUser['synergy_id']    = $this->getExternalIdFromUser($external_user);
-		$newUser['alt_email']     = $this->getAltEmailFromUser($external_user);
-		$newUser['local_email']   = $this->getLocalEmailFromUser($external_user);
-		$newUser['year']          = $this->getYearFromUser($external_user);
-		$newUser['defaultCampus'] = $this->getDefaultCampusFromUser($external_user);
-		$newUser['campus']        = $this->getCampusListFromUser($external_user);
-		$newUser['group_id']      = $this->getGroupIDFromUser($external_user);
-		$newUser['su']            = $this->getIsSuperuserFromUser($external_user);
-		return $newUser;
-	}
-
-	/**
 	 * Set up the new user's spouse's details
 	 *
 	 * @param  array $external_user
