@@ -19,4 +19,14 @@ class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_St
 	protected function setup() {
 		$this->verbose_filter = new Synchronise_Synergetic_StKevins_Verbose();
 	}
+
+	/**
+	 * Student's username is always the staff ID.
+	 *
+	 * @param  array  $currentUser
+	 * @return string
+	 */
+	public function getUsernameFromUser($currentUser) {
+		return $currentUser['StaffID'];
+	}
 }

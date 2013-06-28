@@ -19,4 +19,14 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 	protected function setup() {
 		$this->verbose_filter = new Synchronise_Synergetic_StKevins_Verbose();
 	}
+
+	/**
+	 * Student's username is always the student ID.
+	 *
+	 * @param  array  $currentUser
+	 * @return string
+	 */
+	public function getUsernameFromUser($currentUser) {
+		return $currentUser['StudentID'];
+	}
 }
