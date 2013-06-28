@@ -44,6 +44,13 @@ abstract class Synchronise_Base_Strategy {
 	protected $verbose_filter;
 
 	/**
+	 * The title for the synchronisation, output when the sync is run.
+	 *
+	 * @var string
+	 */
+	protected $title = "Update Schoolbox Parent Details Synchronisation";
+
+	/**
 	 * Constructor
 	 * Instantiate Handlers and things
 	 */
@@ -87,7 +94,7 @@ abstract class Synchronise_Base_Strategy {
 	/**
 	 * Identical algorithm used to create/update a user
 	 *
-	 * @param  $newUser
+	 * @param  array $newUser The record that is to be added
 	 * @return void
 	 */
 	protected function executeCreateUpdate($newUser) {
@@ -140,8 +147,32 @@ abstract class Synchronise_Base_Strategy {
 		return strlen(trim($currentUser['username'])) > 0;
 	}
 
+	/**
+	 * Retrieves the user that exists in Schoolbox for this user account, or
+	 * an empty value if they don't.
+	 *
+	 * @param  array c$user
+	 *
+	 * @return array
+	 */
 	protected function userExists($user) {
 		return $this->user_handler->getBySynergy($user['synergy_id']);
+	}
+
+	/**
+	 * @param  \Synchronise_Base_Verbose $verbose_filter
+	 * @return $this
+	 */
+	public function setVerboseFilter($verbose_filter) {
+		$this->verbose_filter = $verbose_filter;
+		return $this;
+	}
+
+	/**
+	 * @return \Synchronise_Base_Verbose
+	 */
+	public function getVerboseFilter() {
+		return $this->verbose_filter;
 	}
 
 	/**
@@ -158,6 +189,17 @@ abstract class Synchronise_Base_Strategy {
 	 */
 	public function getPerformUpdate() {
 		return $this->perform_update;
+	}
+
+	/**
+	 * Print a nice heading before the rest of the confirmation messages
+	 *
+	 * @return void
+	 */
+	public function generateTitle() {
+		echo "\n------------------------------------------------------------\n";
+		echo $this->title;
+		echo "\n------------------------------------------------------------\n";
 	}
 
 	/**
