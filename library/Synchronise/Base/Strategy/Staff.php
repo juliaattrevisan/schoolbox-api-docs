@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-class Synchronise_Base_Staff extends Synchronise_Base {
+class Synchronise_Base_Strategy_Staff extends Synchronise_Base_Strategy {
 
 	/**
 	 * Get a list of users to sync

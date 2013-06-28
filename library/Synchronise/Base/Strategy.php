@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-abstract class Synchronise_Base {
+abstract class Synchronise_Base_Strategy {
 
 	/**
 	 * Are updates performed? If not, then a plan is output instead.
