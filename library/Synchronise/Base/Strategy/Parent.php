@@ -42,6 +42,7 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 		$newUser['su']                   = $this->getSpouseIsSuperuserFromUser($external_user);
 		$newUser['house']                = $this->getSpouseHouseFromUser($external_user);
 		$newUser['residential_house_id'] = $this->getSpouseResidentialHouseFromUser($external_user);
+		$newUser['eportfolio_enabled']   = $this->getSpouseEportfolioEnabledFromUser($external_user);
 		return $this->clearFields($newUser);
 	}
 
@@ -377,5 +378,16 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	 */
 	public function getSpouseResidentialHouseFromUser($currentUser) {
 		return 0;
+	}
+
+	/**
+	 * Gets spouse's eportfolio status from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return bool
+	 */
+	public function getSpouseEportfolioEnabledFromUser($currentUser) {
+		return true;
 	}
 }

@@ -371,6 +371,17 @@ abstract class Synchronise_Base_Strategy {
 	}
 
 	/**
+	 * Gets user's eportfolio status from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return bool
+	 */
+	public function getEportfolioEnabledFromUser($currentUser) {
+		return true;
+	}
+
+	/**
 	 * Creates an array for insertion into the Schoolbox users table.
 	 *
 	 * @param  array $external_user
@@ -393,6 +404,7 @@ abstract class Synchronise_Base_Strategy {
 		$newUser['su']                   = $this->getIsSuperuserFromUser($external_user);
 		$newUser['house']                = $this->getHouseFromUser($external_user);
 		$newUser['residential_house_id'] = $this->getResidentialHouseFromUser($external_user);
+		$newUser['eportfolio_enabled']   = $this->getEportfolioEnabledFromUser($external_user);
 		return $this->clearFields($newUser);
 	}
 
