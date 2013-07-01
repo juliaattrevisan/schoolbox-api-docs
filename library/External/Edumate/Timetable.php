@@ -43,7 +43,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         '5'  => array('12:20', '13:05'),
         'L1' => array('13:05', '13:20'),
         'L2' => array('13:22', '13:40'),
-        '6'  => array('13:40', '12:25'),
+        '6'  => array('13:40', '14:25'),
         '7'  => array('14:25', '15:10'),
         'AS' => array('15:10', '15:55'),
     );
