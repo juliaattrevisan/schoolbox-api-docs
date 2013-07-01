@@ -21,12 +21,13 @@ class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_St
 	}
 
 	/**
-	 * Student's username is always the staff ID.
+	 * Staff member's username is based on their OccupEmail field.
 	 *
 	 * @param  array  $currentUser
 	 * @return string
 	 */
 	public function getUsernameFromUser($currentUser) {
-		return $currentUser['StaffID'];
+		list($username, $domain) = explode('@', $this->getAltEmailFromUser($currentUser));
+		return $username;
 	}
 }
