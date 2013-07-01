@@ -52,8 +52,7 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 	 * * 2 (Waterford):   year 9
 	 * * 3 (Heyington):   years 7-8, 10-12
 	 *
-	 * @param array $currentUser
-	 *
+	 * @param  array $currentUser
 	 * @return int
 	 */
 	public function getDefaultCampusFromUser($currentUser) {
@@ -69,5 +68,48 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 			$campus = 3;
 		}
 		return $campus;
+	}
+
+	/**
+	 * Groups for St. Kevins students:
+	 *
+	 * * 7  (Years 3-6)
+	 * * 8  (Year 7)
+	 * * 9  (Year 8)
+	 * * 10 (Year 9)
+	 * * 11 (Year 10-12)
+	 *
+	 * @param  array $currentUser
+	 * @return int
+	 */
+	public function getGroupIDFromUser($currentUser) {
+		$year  = $this->getYearFromUser($currentUser);
+		$group = 0;
+		if (in_array($year, array(3, 4, 5, 6,))) {
+			$group = 7;
+		}
+		elseif ($year == 7) {
+			$group = 8;
+		}
+		elseif ($year == 8) {
+			$group = 9;
+		}
+		elseif ($year == 9) {
+			$group = 10;
+		}
+		elseif (in_array($year, array(10, 11, 12,))) {
+			$group = 11;
+		}
+		return $group;
+	}
+
+	/**
+	 * St. Kevins doesn't currently enable eportfolio for students.
+	 *
+	 * @param  array $currentUser
+	 * @return bool
+	 */
+	public function getEportfolioEnabledFromUser($currentUser) {
+		return false;
 	}
 }
