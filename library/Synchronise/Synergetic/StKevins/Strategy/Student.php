@@ -46,28 +46,28 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 	}
 
 	/**
-	 * Campuses for St. Kevins students:
+	 * Gets campus according to the following map:
 	 *
-	 * * 1 (Glendalough): years 3-6
-	 * * 2 (Waterford):   year 9
-	 * * 3 (Heyington):   years 7-8, 10-12
+	 * * J (Glendalough) => 1
+	 * * W (Waterford)   => 2
+	 * * S (Heyington)   => 3
 	 *
 	 * @param  array $currentUser
 	 * @return int
 	 */
 	public function getDefaultCampusFromUser($currentUser) {
-		$year   = $this->getYearFromUser($currentUser);
-		$campus = 0;
-		if (in_array($year, array(3, 4, 5, 6,))) {
-			$campus = 1;
+		$campus_code = strtoupper($currentUser['StudentCampus']);
+		switch ($campus_code) {
+			case 'J':
+				return 1;
+			case 'W':
+				return 2;
+			case 'S':
+				return 3;
+			default:
+				break;
 		}
-		elseif ($year == 9) {
-			$campus = 2;
-		}
-		elseif (in_array($year, array(7, 8, 10, 11, 12,))) {
-			$campus = 3;
-		}
-		return $campus;
+		return 0;
 	}
 
 	/**
