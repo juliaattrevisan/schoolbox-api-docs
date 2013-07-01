@@ -84,42 +84,6 @@ class Synchronise_Base_Strategy_Student extends Synchronise_Base_Strategy {
 	}
 
 	/**
-	 * Gets Schoolbox user's local email setting from the external data set.
-	 *
-	 * For most schools, this will be a school-wide setting instead of a
-	 * per-user setting.
-	 *
-	 * @param  array $currentUser
-	 *
-	 * @return int
-	 */
-	public function getLocalEmailFromUser($currentUser) {
-		return 0;
-	}
-
-	/**
-	 * Gets Schoolbox default campus from the external data set.
-	 *
-	 * @param  array $currentUser
-	 *
-	 * @return int
-	 */
-	public function getDefaultCampusFromUser($currentUser) {
-		return 1;
-	}
-
-	/**
-	 * Gets Schoolbox campus list from the external data set.
-	 *
-	 * @param  array $currentUser
-	 *
-	 * @return array[int]
-	 */
-	public function getCampusListFromUser($currentUser) {
-		return array($this->getDefaultCampusFromUser($currentUser));
-	}
-
-	/**
 	 * Gets Schoolbox group from the external data set.
 	 *
 	 * @param  array $currentUser
