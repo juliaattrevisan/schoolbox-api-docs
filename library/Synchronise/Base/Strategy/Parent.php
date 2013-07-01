@@ -28,18 +28,20 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	 */
 	public function setupSpouseDetails($external_user) {
 		$newUser = array();
-		$newUser['username']      = $this->getSpouseUsernameFromUser($external_user);
-		$newUser['title']         = $this->getSpouseTitleFromUser($external_user);
-		$newUser['firstname']     = $this->getSpouseFirstNameFromUser($external_user);
-		$newUser['lastname']      = $this->getSpouseLastNameFromUser($external_user);
-		$newUser['synergy_id']    = $this->getSpouseExternalIdFromUser($external_user);
-		$newUser['alt_email']     = $this->getSpouseAltEmailFromUser($external_user);
-		$newUser['local_email']   = $this->getSpouseLocalEmailFromUser($external_user);
-		$newUser['year']          = $this->getSpouseYearFromUser($external_user);
-		$newUser['defaultCampus'] = $this->getSpouseDefaultCampusFromUser($external_user);
-		$newUser['campus']        = $this->getSpouseCampusListFromUser($external_user);
-		$newUser['group_id']      = $this->getSpouseGroupIDFromUser($external_user);
-		$newUser['su']            = $this->getSpouseIsSuperuserFromUser($external_user);
+		$newUser['username']             = $this->getSpouseUsernameFromUser($external_user);
+		$newUser['title']                = $this->getSpouseTitleFromUser($external_user);
+		$newUser['firstname']            = $this->getSpouseFirstNameFromUser($external_user);
+		$newUser['lastname']             = $this->getSpouseLastNameFromUser($external_user);
+		$newUser['synergy_id']           = $this->getSpouseExternalIdFromUser($external_user);
+		$newUser['alt_email']            = $this->getSpouseAltEmailFromUser($external_user);
+		$newUser['local_email']          = $this->getSpouseLocalEmailFromUser($external_user);
+		$newUser['year']                 = $this->getSpouseYearFromUser($external_user);
+		$newUser['defaultCampus']        = $this->getSpouseDefaultCampusFromUser($external_user);
+		$newUser['campus']               = $this->getSpouseCampusListFromUser($external_user);
+		$newUser['group_id']             = $this->getSpouseGroupIDFromUser($external_user);
+		$newUser['su']                   = $this->getSpouseIsSuperuserFromUser($external_user);
+		$newUser['house']                = $this->getSpouseHouseFromUser($external_user);
+		$newUser['residential_house_id'] = $this->getSpouseResidentialHouseFromUser($external_user);
 		return $this->clearFields($newUser);
 	}
 
@@ -353,5 +355,27 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	 */
 	public function getSpouseIsSuperuserFromUser($currentUser) {
 		return false;
+	}
+
+	/**
+	 * Gets spouse's house ID from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getSpouseHouseFromUser($currentUser) {
+		return 0;
+	}
+
+	/**
+	 * Gets spouse's residential house ID from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getSpouseResidentialHouseFromUser($currentUser) {
+		return 0;
 	}
 }

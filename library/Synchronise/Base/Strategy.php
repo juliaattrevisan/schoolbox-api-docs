@@ -349,6 +349,28 @@ abstract class Synchronise_Base_Strategy {
 	}
 
 	/**
+	 * Gets user's house ID from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getHouseFromUser($currentUser) {
+		return 0;
+	}
+
+	/**
+	 * Gets user's residential house ID from the external data set.
+	 *
+	 * @param  array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getResidentialHouseFromUser($currentUser) {
+		return 0;
+	}
+
+	/**
 	 * Creates an array for insertion into the Schoolbox users table.
 	 *
 	 * @param  array $external_user
@@ -357,18 +379,20 @@ abstract class Synchronise_Base_Strategy {
 	 */
 	public function setupUserDetails($external_user) {
 		$newUser = array();
-		$newUser['username']      = $this->getUsernameFromUser($external_user);
-		$newUser['title']         = $this->getTitleFromUser($external_user);
-		$newUser['firstname']     = $this->getFirstNameFromUser($external_user);
-		$newUser['lastname']      = $this->getLastNameFromUser($external_user);
-		$newUser['synergy_id']    = $this->getExternalIdFromUser($external_user);
-		$newUser['alt_email']     = $this->getAltEmailFromUser($external_user);
-		$newUser['local_email']   = $this->getLocalEmailFromUser($external_user);
-		$newUser['year']          = $this->getYearFromUser($external_user);
-		$newUser['defaultCampus'] = $this->getDefaultCampusFromUser($external_user);
-		$newUser['campus']        = $this->getCampusListFromUser($external_user);
-		$newUser['group_id']      = $this->getGroupIDFromUser($external_user);
-		$newUser['su']            = $this->getIsSuperuserFromUser($external_user);
+		$newUser['username']             = $this->getUsernameFromUser($external_user);
+		$newUser['title']                = $this->getTitleFromUser($external_user);
+		$newUser['firstname']            = $this->getFirstNameFromUser($external_user);
+		$newUser['lastname']             = $this->getLastNameFromUser($external_user);
+		$newUser['synergy_id']           = $this->getExternalIdFromUser($external_user);
+		$newUser['alt_email']            = $this->getAltEmailFromUser($external_user);
+		$newUser['local_email']          = $this->getLocalEmailFromUser($external_user);
+		$newUser['year']                 = $this->getYearFromUser($external_user);
+		$newUser['defaultCampus']        = $this->getDefaultCampusFromUser($external_user);
+		$newUser['campus']               = $this->getCampusListFromUser($external_user);
+		$newUser['group_id']             = $this->getGroupIDFromUser($external_user);
+		$newUser['su']                   = $this->getIsSuperuserFromUser($external_user);
+		$newUser['house']                = $this->getHouseFromUser($external_user);
+		$newUser['residential_house_id'] = $this->getResidentialHouseFromUser($external_user);
 		return $this->clearFields($newUser);
 	}
 
