@@ -19,6 +19,7 @@ $login = file_get_contents($action);
 preg_match('/id="__VIEWSTATE" value="(.*?)"/', $login, $viewState);
 preg_match('/id="__EVENTVALIDATION" value="(.*?)"/', $login, $eventValidation);
 
+$password = isset($_SESSION['password']) ? $_SESSION['password'] : $user['email_pass'];
 $formArray['__VIEWSTATE'] = $viewState[1];
 $formArray['__EVENTVALIDATION'] = $eventValidation[1];
 $formArray['__EVENTARGUMENT'] = '';
@@ -26,10 +27,10 @@ $formArray['__EVENTTARGET'] = '';
 $formArray['__LASTFOCUS'] = '';
 $formArray['ctl00$masterPageContentPlaceHolder$loginButton'] = 'Login';
 $formArray['ctl00$masterPageContentPlaceHolder$textBox1'] = $user['username'];
-$formArray['ctl00$masterPageContentPlaceHolder$textBox2'] = isset($_SESSION['password']) ? $_SESSION['password'] : $user['email_pass'];
+$formArray['ctl00$masterPageContentPlaceHolder$textBox2'] = $password;
 $formArray['loginButton'] = 'Login';
 $formArray['textBox1'] = $user['username'];
-$formArray['textBox2'] = $user['email_pass'];
+$formArray['textBox2'] = $password;
 
 ?>
 
