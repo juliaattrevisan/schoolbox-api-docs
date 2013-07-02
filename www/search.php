@@ -703,6 +703,10 @@ else if ($result[$type] || $type == 'all') {
             $start_window = $current_page - 5;
             $end_window = $current_page + 5;
         }
+        //
+        // Limit start and end (start can't be < 1, end can't be > num pages)
+        $start_window = max($start_window, 1);
+        $end_window   = min($end_window, $number_pages);
 
         $page->setVar(array(
             'PAGE_NAME' => '<',
