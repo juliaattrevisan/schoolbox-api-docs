@@ -145,11 +145,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 						/* Show returned work information (if available)
 						 */
 						if ($currentItem['latestReturn']) {
-							$mark = $currentItem['latestReturn']->getMark();
-
 							$this->getPage()->setVar(array(
-								'SHOWCASED_WORK_RETURNED_MARK' => $mark,
-								'SHOWCASED_WORK_RETURNED_GRADIENT' => (int)($mark / 10),
+								'SHOWCASED_WORK_RETURNED_MARK' => $currentItem['latestReturn']->getMark(),
+								'SHOWCASED_WORK_RETURNED_GRADIENT' => $currentItem['latestReturn']->getGradientFromNormalizedMark(),
 							));
 						}
 						else {
