@@ -21,30 +21,33 @@ function init(){
 	<div id="header">
 		<a href="/" class="logo"><img src="/images/stmichaels/stmichaels-logo.png" width="228" height="67" alt="St Michaels" /></a>
 	</div>
-
+    <div id="schol-gradient"></div>
 <div id="container" class=" login">
 
   <div id="content">
-    <h1>St Michael's Login</h1>
-    <p class="error">{ERROR}</p>
-    <form id="loginForm" method="post" action="/loginForm.php">
-    	<fieldset>
-        <label for="username">Login Name:</label>
-        <input type="text" name="username" id="username" />
-      </fieldset>
-      <fieldset>
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" />
-      </fieldset>
-        <input type="hidden" name="page" value="{HIDDEN}" />
+    <h2 id="schol">Welcome to SchoL</h2>
+    <div id="schol-login">
+        <h1>St Michael's Login</h1>
+        <p class="error">{ERROR}</p>
+        <form id="loginForm" method="post" action="/loginForm.php">
+            <fieldset>
+            <label for="username">Login Name:</label>
+            <input type="text" name="username" id="username" />
+          </fieldset>
+          <fieldset>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" />
+          </fieldset>
+            <input type="hidden" name="page" value="{HIDDEN}" />
 
-      <p><label for="tandc" class="tandc">
-          <input class="required" id="tandc" name="tandc" type="checkbox" title="You must agree to the Terms and Conditions before proceeding" />
-          I agree to be legally bound by the <a href="/policy.php">Terms and Conditions</a> of use for this website.</label>
-          </p>
-        <input class="login submit-btn-plain" type="submit" name="Submit" value="Login" alt="Login" />
-		<div class="float-fix"></div>
-    </form>
+          <p><label for="tandc" class="tandc">
+              <input class="required" id="tandc" name="tandc" type="checkbox" title="You must agree to the Terms and Conditions before proceeding" />
+              I agree to be legally bound by the <a href="/policy.php">Terms and Conditions</a> of use for this website.</label>
+              </p>
+            <input class="login submit-btn-plain" type="submit" name="Submit" value="Login" alt="Login" />
+            <div class="float-fix"></div>
+        </form>
+    </div>
 	 <!-- <p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
   	<div class="float-fix"></div> -->
   </div>

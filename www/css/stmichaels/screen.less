@@ -106,23 +106,24 @@ laber.error,
 #nav h3,
 .box .edit
 {
-    -moz-border-radius: 3px 3px 0 0;
+    /*-moz-border-radius: 3px 3px 0 0;
     -webkit-border-radius: 3px 3px 0 0;
-    border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;*/
 }
 
 #category
 {
-    -moz-border-radius: 6px;
+    /*-moz-border-radius: 6px;
     -webkit-border-radius: 6px;
-    border-radius: 6px;
+    border-radius: 6px;*/
+    background: #00a0dd !important;
 }
 
 .box #category
 {
-    -moz-border-radius: 0 0 6px 6px;
+    /*-moz-border-radius: 0 0 6px 6px;
     -webkit-border-radius: 0 0 6px 6px;
-    border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;*/
 }
 
 #tabs .navthis a,
@@ -133,11 +134,11 @@ laber.error,
     border-radius: 7px 7px 0 0;
 }
 
-#container {
+/*#container {
     -moz-border-radius: 0 7px 7px 7px;
     -webkit-border-radius: 0 7px 7px 7px;
     border-radius: 0 7px 7px 7px;
-}
+}*/
 
 .admin-nav
 {
@@ -171,58 +172,115 @@ laber.error,
 }
 /* Rounded-corners end */
 
-body{background:#fff;
+body{
+  background:#fff;
 }
 
-h2,.calendar-controls{color:#000000; background:#eeeeee;}
+body.login{
+  border-bottom: 20px solid #fdc900;
+}
+
+.login #schol-gradient{
+  background: #cc032c; /* Old browsers */
+  background: -moz-linear-gradient(left,  #cc032c 0%, #cc032c 53%, #ffffff 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%,#cc032c), color-stop(53%,#cc032c), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(left,  #cc032c 0%,#cc032c 53%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(left,  #cc032c 0%,#cc032c 53%,#ffffff 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(left,  #cc032c 0%,#cc032c 53%,#ffffff 100%); /* IE10+ */
+  background: linear-gradient(to right,  #cc032c 0%,#cc032c 53%,#ffffff 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc032c', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
+  width: 100%;
+  height: 5px;
+  margin: 0 0 6px 0;
+}
+
+#schol-gradient{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 5px;
+  background: #cc032c; /* Old browsers */
+  background: -moz-linear-gradient(left,  #cc032c 0%, #cc032c 53%, #ffffff 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%,#cc032c), color-stop(53%,#cc032c), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(left,  #cc032c 0%,#cc032c 53%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(left,  #cc032c 0%,#cc032c 53%,#ffffff 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(left,  #cc032c 0%,#cc032c 53%,#ffffff 100%); /* IE10+ */
+  background: linear-gradient(to right,  #cc032c 0%,#cc032c 53%,#ffffff 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc032c', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
+}
+
+#schol{
+  background: transparent;
+  color: #ffffff;
+  line-height: 20px;
+  padding: 0;
+}
+
+.login #content{
+  width: 485px;
+  min-width: 485px;
+  margin: 0 auto;
+}
+
+#schol-login{
+  margin: 30px 0 0 0;
+  padding: 10px 0 0 0;
+  border-top: 1px solid #d4d9da;
+}
+
+h2,.calendar-controls{color:#ffffff; background:#004d87;}
 .calendar-controls h3{color:#000000;}
-a{color:#0054d3;}
-a:hover{color:#ff5a00}
-#header, .login #header{height:138px;background: #014A7F; /* Old browsers */
-    
-	/*background:#014A7F; solid blue for 2013 smgs website */
-	background: -moz-linear-gradient(left,  #0f2034 0%, #3394ad 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#0f2034), color-stop(100%,#3394ad)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(left,  #0f2034 0%,#3394ad 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(left,  #0f2034 0%,#3394ad 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(left,  #0f2034 0%,#3394ad 100%); /* IE10+ */
-    background: linear-gradient(left,  #0f2034 0%,#3394ad 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0f2034', endColorstr='#3394ad',GradientType=1 ); /* IE6-9 */}
-#header .logo{padding:0; width:228px; height:67px; left:16px; top:35px}
-#tabs{right:1px;}
+a{color:#004e83;}
+a:hover{color:#aa082f;}
+#header, .login #header{
+  background: #FFF;
+  height: 115px;
+}
+.login #header .logo{
+  padding: 0;
+  width: 228px;
+  height: 67px;
+  left: 50%;
+  top: 15px;
+  margin-left: -130px;
+}
+#header .logo{
+  padding: 0;
+  width: 228px;
+  height: 82px;
+  left: 217px;
+  top: 15px;
+}
+#tabs{
+  right:1px;
+  bottom: 5px;
+}
 #tabs li{
     float:right;
     margin: 0 1px;
 }
-#tabs li a{color:#003f77;
+#tabs li a{
+    color:#ffffff;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
-    background:#fff;
-    padding:0 6px;
+    background:#004d87;
+    padding:0 8px;
     font-weight:normal;
-    background: #dcebfd; /* Old browsers */
-    background: -moz-linear-gradient(top,  #dcebfd 0%, #cfe4fd 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dcebfd), color-stop(100%,#cfe4fd)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #dcebfd 0%,#cfe4fd 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #dcebfd 0%,#cfe4fd 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #dcebfd 0%,#cfe4fd 100%); /* IE10+ */
-    background: linear-gradient(top,  #dcebfd 0%,#cfe4fd 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dcebfd', endColorstr='#cfe4fd',GradientType=0 ); /* IE6-9 */
 }
 
 #tabs li.navthis a{
-    color:#054b93;
+    color:#fff;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
     font-weight:bold;
-    background:#fff;
+    background:#cc032c;
     filter:none;
 }
 
 #nav{
-	top:147px; /* 152 in original smgs skin */
+    top: 166px; /* 152 in original smgs skin */
 	left:-15px; /* Change from 15px in the core */
 	padding-left:5px;
 	padding-right:5px;
@@ -236,20 +294,27 @@ a:hover{color:#ff5a00}
 	margin-right:5px;	
 	padding-top:6px;
 	}
+
+    .login #container{
+      background: url('/images/stmichaels/login-gradient.png') top left repeat-x;
+    }
 	
-#nav h3,
-#nav h3.my-links{background: #77b5f9; /* Old browsers */
-    background: -moz-linear-gradient(top,  #77b5f9 0%, #5ca1f8 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#77b5f9), color-stop(100%,#5ca1f8)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #77b5f9 0%,#5ca1f8 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #77b5f9 0%,#5ca1f8 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #77b5f9 0%,#5ca1f8 100%); /* IE10+ */
-    background: linear-gradient(top,  #77b5f9 0%,#5ca1f8 100%); /* W3C */
-    color:#fff;}
+#nav h3, #nav h3.my-links{
+    background: #004d87;
+    color:#fff;
+    padding: 0 0 0 21px;
+}
+#nav h3.my-links a{
+  color: #fff;
+}
+#nav .nav-wrapper, #nav ul ul,.colours-buttons, #nav .nav-wrapper.my-links {background:#e9f7fc;}
 
-#nav .nav-wrapper, #nav ul ul,.colours-buttons, #nav .nav-wrapper.my-links {background:#eeeeee;}
+.nav-wrapper{
+  background: #e9f7fc url('/images/stmichaels/gradient.jpg') 0px bottom no-repeat !important;
+}
 
-#nav ul ul{border-color:#6faff9; left:200px;}
+#nav ul ul{border-color:#6faff9; left:200px; top: -6px;}
+#nav ul ul ul{ left: 190px; top: 0; }
 
 #tabs-homepage li.ui-state-default a {
     background: none repeat scroll 0 0 #eee;
@@ -266,9 +331,9 @@ a:hover{color:#ff5a00}
 #tabs-sub .ui-tabs-nav li a {
     background:#fcfbf2;
 }
-
+#nav li a{ padding: 3px 5px; color: #000; }
 #nav ul li a:hover, #nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
-    background-color: #6faff9;
+    background-color: #cc032c;
     color: #ffffff;
 }
 #nav li.parent {width:200px;} /* attempt to reduce overhang which enables pop-out*/
@@ -285,16 +350,20 @@ a:hover{color:#ff5a00}
 #category,
 #tabs-homepage .customise-components,
 .mark-sheet.assessments .dark td {
-    background: none repeat scroll 0 0 #f0f7fe;
+    background: none repeat scroll 0 0 #fafafa;
 }
 
 .search-item:nth-child(2n){
     background: none repeat scroll 0 0 #f0f7fe;
 }
 
-
-#category li a.selected, #tabs-sub li.ui-tabs-selected a,.topic-list li a.selected
-{background:#6faff9; color:#ffffff;}
+#category li a.selected, #category li a:hover, #tabs-sub li.ui-tabs-selected a,.topic-list li a.selected
+{background:#cc032c; color:#ffffff;}
+.topic-list li a:hover {
+  background: #004d87;
+  color: #fff;
+}
+#category li a{ color: #fff; }
 
 .submit-btn-plain {
     background-color: #e3effe;
@@ -375,17 +444,30 @@ ADMIN!
     -moz-border-radius: 0;
     border-radius: 0;}
 .admin-nav li a.current{background:#F0F7FE;color:#054B93; font-weight:bold;}
-#search, #search-field{background:#ffffff;}
+#search, #search-field{background:#ffffff; }
+#search{ margin: 9px 16px 0 0; }
 .admin-contents .level{background:#eee; border-color:#ddd;}
 .admin-contents h4{border-color:#ddd;}
 
-#search-field{color:#003f77}
+#search-field{color:#003f77; border: 1px solid #b6b6b6; width: 265px; height: 26px; line-height: 25px; }
+#search-button{ right: -2px; top: -2px; }
 #infoPanel {margin-top:15px;}
-#infoPanel li{color:#b2c5d6;}
-#infoPanel li a{color:#ffffff;}
+#infoPanel li{color:#000;}
+#infoPanel li a{color:#000;}
+#infoPanel li.first a{ font-weight: bold; }
 
 #footer ul li {color:#000}
 #footer ul li a{color:#0054D3}
+#footer{
+  padding-left: 260px;
+  margin: 0;
+  border-bottom: 15px solid #fdc900;
+}
+.login #footer{
+  width: 1080px;
+  margin: 0 auto;
+  border: 0;
+}
 
 .standardForm td {
     border-bottom: 1px solid #eee;
