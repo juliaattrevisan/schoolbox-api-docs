@@ -545,24 +545,19 @@ if (is_numeric($this->arg[0])) {
 	                }
 
 		            /* Output emergency contacts */
-		            if($synInfo['StudentEmergencyName'] ) {
-			            for($x = 1; $x <= 3; $x++) {
-				            $index = $x == 1?'':$x;
+		            $this->setVar('emergency_contact_block','');
+		            for($x = 1; $x <= 3; $x++) {
+			            $index = $x == 1?'':$x;
 
-				            if($synInfo['StudentEmergency'.$index.'Name']) {
-					            $this->setVar(array(
-			                          'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergency'.$index.'Name']),
-			                          'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'Phone']),
-			                          'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']),
-					                          ));
-				                $this->parse('emergency_contact_block', 'emergency_contact');
-				            }
+			            if($synInfo['StudentEmergency'.$index.'Name']) {
+				            $this->setVar(array(
+		                          'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergency'.$index.'Name']),
+		                          'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'Phone']),
+		                          'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']),
+				                          ));
+			                $this->parse('emergency_contact_block', 'emergency_contact', true);
 			            }
 		            }
-		            else {
-			            $this->setVar('emergency_contact_block','');
-		            }
-
 
 	                if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild($user['uid']))) {
 	                    if (trim($synInfo['StudentMedicalAlert'])) {
