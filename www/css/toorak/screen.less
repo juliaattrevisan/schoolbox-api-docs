@@ -99,6 +99,7 @@ img.bg{
 }
 
 .login #container {
+  background-color: rgb(0, 38, 100);
   background-color: rgba(0, 38, 100, 0.5);
   padding: 30px;
   width: 335px;
@@ -127,18 +128,23 @@ img.bg{
   width: 310px !important;
   font-weight: bold;
   color: #002664;
+  line-height: 24px;
 }
 
 #loginForm input.login{
   background: #c4262e;
   font-weight: bold;
   font-size: 16px;
-  height: 30px;
+  height: 34px;
   width: 140px;
 }
 
 #loginForm input.login:hover{
   opacity: 0.9;
+}
+
+#loginForm fieldset {
+  padding: 0 0 28px 0;
 }
 
 .login #footer {
@@ -155,6 +161,18 @@ img.bg{
 }
 
 .login ::-webkit-input-placeholder{
+  color: #002664;
+  font-size: 16px;
+}
+login ::-moz-placeholder { /* Firefox 19+ */
+  color: #002664;
+  font-size: 16px;
+}
+login :-ms-input-placeholder {
+  color: #002664;
+  font-size: 16px;
+}
+login :-moz-placeholder { /* Firefox 18- */
   color: #002664;
   font-size: 16px;
 }
