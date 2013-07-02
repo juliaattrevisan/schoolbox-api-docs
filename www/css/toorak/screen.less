@@ -36,7 +36,11 @@
 
 html, body { min-height: 100%; }
 body {
-	background: @background-color url('/images/toorak/ivy-bg.png') -1% 144% no-repeat;
+	background: @background-color url('/images/toorak/ivy-bg.png') bottom left no-repeat;
+}
+
+#wrap{
+  background: url('/images/toorak/ivy-bg-2.png') 100% -6px no-repeat;
 }
 
 #container {
@@ -54,11 +58,131 @@ a, h2 a{color:@link-color;}
 a:hover{color:@link-hover-color;}
 
 /*
+ * Login
+ */
+img.bg{
+  /* Set rules to fill background */
+  min-height: 100%;
+  min-width: 1024px;
+
+  /* Set up proportionate scaling */
+  width: 100%;
+  height: auto;
+
+  /* Set up positioning */
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.login #header{
+  background: transparent;
+}
+
+.login #iVE{
+  position: absolute;
+  left: 50%;
+  top: 61px;
+  margin-left: 274px;
+}
+
+.login #header .logo{
+  left: 50%;
+  top: 2px;
+  margin-left: -555px;
+}
+
+.login #header .logo,
+.login #header .logo img{
+  height: 282px;
+  width: 287px;
+}
+
+.login #container {
+  background-color: rgb(0, 38, 100);
+  background-color: rgba(0, 38, 100, 0.5);
+  padding: 30px;
+  width: 335px;
+  left: 50%;
+  top: 240px;
+  margin: 0 0 0 -195px;
+  position: absolute;
+  min-width: 335px;
+  border: 0;
+}
+
+.login #content {
+  min-width: 335px;
+  color: #fff;
+}
+
+#loginForm label{
+  width: 100%;
+}
+
+#loginForm input[type=text],
+#loginForm input[type=password]{
+  border: 0;
+  height: 28px;
+  padding: 4px 10px;
+  width: 310px !important;
+  font-weight: bold;
+  color: #002664;
+  line-height: 24px;
+}
+
+#loginForm input.login{
+  background: #c4262e;
+  font-weight: bold;
+  font-size: 16px;
+  height: 34px;
+  width: 140px;
+}
+
+#loginForm input.login:hover{
+  opacity: 0.9;
+}
+
+#loginForm fieldset {
+  padding: 0 0 28px 0;
+}
+
+.login #footer {
+  padding-left: 37px;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  margin-left: -525px;
+}
+
+.login .forgotten a{
+  color: #fff;
+  text-decoration: underline;
+}
+
+.login ::-webkit-input-placeholder{
+  color: #002664;
+  font-size: 16px;
+}
+login ::-moz-placeholder { /* Firefox 19+ */
+  color: #002664;
+  font-size: 16px;
+}
+login :-ms-input-placeholder {
+  color: #002664;
+  font-size: 16px;
+}
+login :-moz-placeholder { /* Firefox 18- */
+  color: #002664;
+  font-size: 16px;
+}
+
+/*
  * Header
  */
-#header, .login #header{
-	background: @banner-background;
-	height: auto; min-height: @banner-height;
+#header{
+    background: url('/images/toorak/iVE.png') 200px 8px no-repeat;
+	height: 80px; min-height: @banner-height;
 	width: 100%; min-width: 768px;
 	float: left;
 }
@@ -114,7 +238,7 @@ a:hover{color:@link-hover-color;}
 /*
  * Tabs
  */
-#tabs{		position: static; margin-left: @navigation-width; clear: right;
+#tabs{		position: absolute; clear: right; left: 200px;
 	li { 	margin-right: 1px; margin-top: 1px;
 		a {
 			background: transparent;
@@ -303,10 +427,13 @@ ul.activity-list li,
 /*
  * Footer
  */
+.login #footer ul li {color:#fff;}
+.login #footer ul li a{color:#fff;}
+
 #footer { margin: 0; margin-left: @navigation-width; }
 #footer ul {float:right;padding-right: 16px;}
-#footer ul li {color:@footer-color; margin-right: 4px; padding-right: 8px;}
-#footer ul li a{color:@footer-links; white-space: nowrap;}
+#footer ul li {color:#888; margin-right: 4px; padding-right: 8px;}
+#footer ul li a{color:#888; white-space: nowrap;}
 
 
 .topic-list li a {
