@@ -76,7 +76,7 @@ class LazyModel {
 	}
 
 	/**
-	 * Loads model from mapper.
+	 * Loads model from mapper. If it can't be found, creates a fresh model.
 	 *
 	 * @return void
 	 */
@@ -84,6 +84,10 @@ class LazyModel {
 		$this->loaded_model = isset($this->column) ?
 			$this->mapper->findOneByColumn($this->column, $this->id):
 			$this->mapper->findById($this->id);
+		$class = $this->mapper->getModel();
+		if (!($this->loaded_model instanceof $class)) {
+			$this->loaded_model = $this->mapper->createModel();
+		}
 	}
 
 	/**
