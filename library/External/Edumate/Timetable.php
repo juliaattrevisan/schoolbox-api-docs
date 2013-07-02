@@ -43,10 +43,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         '5'  => array('12:20', '13:05'),
         'L1' => array('13:05', '13:20'),
         'L2' => array('13:22', '13:40'),
-        '6'  => array('13:40', '12:25'),
+        '6'  => array('13:40', '14:25'),
         '7'  => array('14:25', '15:10'),
         'AS' => array('15:10', '15:55'),
     );
+
+    protected $cycleLength = 5;
 
     /**
      * Returns the timetable definition for a particular campus *FOR A PARTICULAR DAY*
@@ -90,15 +92,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @return int
      */
     private function getCycleLength() {
-        // get the largest day number, which if foreseeably the day count
-        $stmt = $this->getDatabase()->query("
-            SELECT MAX(day) AS day
-            FROM db2inst1.schoolbox_timetable
-        ");
-        if($stmt->rowCount()) {
-            return $stmt->fetchColumn();
-        }
-        return 0;
+        return $this->cycleLength;
     }
 
     public function getDayNumber($campusId, $date = 0) {
@@ -108,56 +102,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         // if it's the weekend
-        if(in_array(date('w', $date), array(0, 6))) {
+        if(in_array($day_number = date('w', $date), array(0, 6))) {
             return false;
         }
-
-        // take from the start of the reporting period
-        if(!isset($_SESSION['FileSemester'])) {
-            return false;
-        }
-
-        $stmt = $this->getDatabase()->prepare("
-            SELECT start_date
-            FROM db2inst1.schoolbox_report_periods
-            WHERE report_period = :per
-        ");
-
-        $stmt->execute(array('per' => $_SESSION['FileSemester']));
-
-        if($stmt->rowCount() == 0) {
-            return false;
-        }
-
-        $startDate = strtotime($stmt->fetchColumn());
-
-        // work out today's offset
-
-        $cycleLength = $this->getCycleLength();
-
-        $days = ceil( ($date - $startDate) / (60 * 60 * 24) ) + 1;
-
-        /* Calculate the business days from the even weeks */
-        $businessDays = 5 * floor($days / 7);
-
-        /* Handle the excess days */
-        $excessDays = $days % 7;
-
-        for ( $i = 0; $i < $excessDays; $i++ ) {
-            $currentExcessDay = $date - (60 * 60 * 24 * $i);
-
-            /* If its not Saturday or Sunday then increment the business days */
-            if ( date('N', $currentExcessDay) < 6 ) {
-                ++$businessDays;
-            }
-        }
-
-        $businessDays += $this->offset;
-
-        $currentDay = $businessDays % $cycleLength;
-
-        return $currentDay ? $currentDay : $cycleLength;
-
+        return $day_number;
     }
 
     /**
@@ -250,8 +198,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             // if no class on this period, skip it
             if(isset($classes[$code])) {
                 $timetable[$i]['description'] = $classes[$code]['CLASS'];
-				$timetable[$i]['code'] = $classes[$code]['CODE'];
-				$timetable[$i]['room'] = $classes[$code]['ROOM'];
+                $timetable[$i]['code'] = $classes[$code]['CODE'];
+                $timetable[$i]['room'] = $classes[$code]['ROOM'];
                 $timetable[$i]['staffID'] = $classes[$code]['STAFFID'];
             }
 
