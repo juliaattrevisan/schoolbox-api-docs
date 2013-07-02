@@ -56,7 +56,7 @@ class External_Denbigh_User implements External_UserInterface {
         );
 
         while($parent = $statement->fetch(PDO::FETCH_ASSOC)) {
-	        $emailList = $parent['email'];
+	        $emailList[] = $parent['email'];
         }
 
         return $emailList;
