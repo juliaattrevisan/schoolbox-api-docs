@@ -19,7 +19,7 @@ class Facade_Homepage_API extends Generic_API {
             list($catTitle, $articles) = $this->renderComponents($user, $cat, $components);
             $response->setPage('title', $catTitle);
             $response->setResponse('articles', $articles);
-
+            $this->logVisit($user->get('uid'), $categoryID);
             return $response;
         }
         catch(ErrorException $e) {
@@ -75,6 +75,7 @@ class Facade_Homepage_API extends Generic_API {
             else {
                 $response->setPage('title', '');
             }
+            $this->logVisit($user->get('uid'), $categoryID);
         }
         catch (Exception_Schoolbox $e) {
             //
@@ -211,6 +212,19 @@ class Facade_Homepage_API extends Generic_API {
             'FolderList'  => array('CategoryFolders'),
         );
         return isset($map[$call]) ? $map[$call] : array('UNKN0WN');
+    }
+
+    /**
+     * Log visit to this homepage.
+     *
+     * @param int $user_id
+     * @param int $category_id
+     *
+     * @return void
+     */
+    protected function logVisit($user_id, $category_id) {
+        $cat_handler = new Category();
+        $cat_handler->logPageView($category_id);
     }
 
 }
