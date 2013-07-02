@@ -165,6 +165,8 @@ $output = array(
     'WORK_USER_ID' => $userID,
     'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
     'USER_TOKEN' => ($userID == $_SESSION['id'] ? $_SESSION['key'] : $user['key']),
+	'WORK_SEMESTER' => DueWork_All::getSemester(),
+	'WORK_YEAR' => date('Y')
 );
 
 $this->setVar($output);
@@ -308,7 +310,7 @@ foreach ($categoryList as $category) {
                     $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
                     $teacherOutput[] = array(
-                        'id' => 0,
+                        'id' => $teacher['uid'],
                         'name' => $teacherName,
                         'email' => $_SESSION['mailhandle'] . $emailAddress,
                         'synid' => $teacherSynID,
@@ -365,7 +367,8 @@ foreach ($categoryList as $category) {
     // calculate grade averages and trending
     $this->setFile('subjectTpl', 'activity/subjectlist.html');
     $this->setBlock('subjectTpl', 'teacher', 'teacher_block');
-    $this->setBlock('subjectTpl', 'icon', 'icon_block');
+	$this->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
+//    $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
     $output = array(
         'SUBJ_CAT_ID' => $categoryID,
@@ -382,18 +385,15 @@ foreach ($categoryList as $category) {
     $this->setVar($output);
 
     if ($gradeAvg == -1) {
-        $output = array(
-            'SUBJ_GRADE' => '',
-            'SUBJ_GRADEIANT' => 'na'
-        );
+	    $this->setVar('subject_grade_block', '');
     } else {
-        $output = array(
+	    $this->setVar(array(
             'SUBJ_GRADE' => $returnHandler->percent2letter($gradeAvg),
             'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
-        );
+	    ));
+	    $this->parse('subject_grade_block', 'subject_grade');
     }
 
-    $this->setVar($output);
 
 
     if (Cfg::get('external_enable')) {
@@ -401,6 +401,7 @@ foreach ($categoryList as $category) {
         if (isset($teacherOutput) && count($teacherOutput)) {
             foreach ($teacherOutput as $teacher) {
                 $tOutput = array(
+	                'SUBJ_TEACHER_ID' => $teacher['id'],
                     'SUBJ_TEACHER_NAME' => $teacher['name'],
                     'SUBJ_TEACHER_URL' => $teacher['email'],
                     'SUBJ_TEACHER_ROLE' => 'Teacher',
@@ -414,7 +415,7 @@ foreach ($categoryList as $category) {
     } else {
         $this->setVar('teacher_block', '');
     }
-    $this->parse('icon_block', 'icon');
+//    $this->parse('icon_block', 'icon');
     $this->parse('SUBJECT_LIST', 'subjectTpl', true);
 }
 

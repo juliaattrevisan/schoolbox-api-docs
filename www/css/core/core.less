@@ -1160,7 +1160,7 @@ Notifications
     ul{
       width: 49.99%;
       float: left;
-      li:nth-child(even){ background: #fafafa; }
+      li:nth-child(even){ background: @dark; }
     }
   }
   .contact-info{
@@ -1174,9 +1174,10 @@ Notifications
       border-bottom: 1px solid @border-color;
       padding: 7px 0px;
       height: 32px;
-      color: #000;
+      color: @body-text;
       &:hover{
-        background-color: #e9f6ff;
+        background-color: @button-hov;
+        color: @link;
         text-decoration: none;
       }
     }
@@ -8067,7 +8068,18 @@ ul.submission-list {
 
 .subject-list {
     color: @secondary-text;
+
+    .left-bar .teacher-profile {
+        margin-right: 111px;
+    }
+    .left-bar:last-child {
+        border-bottom: none;
+        a {
+            border-bottom: none;
+        }
+    }
     li {
+        overflow: hidden;
         position: relative;
         padding: 0 !important;
         vertical-align: middle;
@@ -8075,6 +8087,10 @@ ul.submission-list {
         &.grade a {
             margin-right: 60px;
             border-right: 1px solid @border-color;
+        }
+        .to-subject {
+            padding: 1px 49px 4px 52px;
+            background: url('/images/famicons/house.png') 15px 8px no-repeat;
         }
     }
     a {
@@ -8107,13 +8123,16 @@ ul.submission-list {
         }
     }
     img {
-        position: absolute;
-        left: 4px;
-        top: 4px;
+//        position: absolute;
+//        left: 4px;
+//        top: 4px;
         max-width: 32px;
         max-height: 32px;
     }
-    span.grade {
+    span.grade, .grade a.grade {
+        margin-right: 0;
+        border: none;
+        z-index: 2;
         position: absolute;
         top: 0;
         right: 0;
@@ -8123,7 +8142,7 @@ ul.submission-list {
         font-size: 0.8em;
         span {
             display: block;
-            font-size: 1.6em;
+            font-size: 3.5em;
             line-height: 1;
             font-weight: bold;
         }
@@ -8244,17 +8263,28 @@ td.name {
 
 // Brace yourself - loop for the index of colorX, outputting a the class 'gradient-index' each time, adding the rules for 'color'
 .colorX (@index) when (@index > 0) {
-    @i: (@index - 1);
-    (~".gradient-@{i}") { .color(@index); }
+    (~".gradient-@{index}") { .color(@index); }
+    (~".gradient-@{index}-bg") { .colorbg(@index); }
     .colorX(@index - 1);
 }
-.colorX (0) {}
+// final iteration
+.colorX (0) {
+  (~".gradient-0") { .color(0); }
+  (~".gradient-0-bg") { .colorbg(0); }
+}
 
 .color (@index) {
     color: spin(#BB0000, @index * 10);
 }
-.colorX(11);
+.colorbg (@index) {
+    background: spin(#FFEEEE, @index * 10);
+}
 
+.colorX(10);
+
+.no-bg {
+  background: none;
+}
 
 /* WEATHER PAGE */
 .weather {
@@ -9581,9 +9611,7 @@ table img { max-width: none; }
   #subject-main       { clear: both;
                         position: relative;
   }
-  .current-grade-avg  { background: @dark;
-                        padding: 0;
-  }
+  .current-grade-avg  { padding: 0; }
   .grade              { font-size: 64px;
                         font-weight: bold;
   }
@@ -9616,8 +9644,9 @@ table img { max-width: none; }
   }
   .subject-teachers   { width: 40%;
 	  					float: left;
-                        min-height: 75px;
+                        min-height: 80px;
 	  					margin-right: 16px;
+                        background: @white;
   }
   #subject-graph      { height: 250px;
                         margin: 20px 0;
