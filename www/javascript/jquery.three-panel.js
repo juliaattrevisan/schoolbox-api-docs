@@ -318,8 +318,10 @@ ThreePanelView.prototype.actionBind = function(actions) {
         }
 
         // is multifile
-        else if(action == 'delete') {
-            actions.multi[action]()
+        else if(context.hasClass('rmultifile')) {
+            if($j.isFunction(actions.multi[action])) {
+                actions.multi[action]()
+            }
         }
 
     })
