@@ -185,6 +185,7 @@ $startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$fi
 $summary = array();
 
 $event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default(null);
+$event_api->setUserId($user['uid']);
 $event_list = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();
 foreach ($event_list as $event_object) {
