@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="James Leckie, Lektec Consulting"/>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/toorak/screen.css" />
+    <link rel="Shortcut Icon" href="/images/toorak/favicon.ico" type="image/x-icon" />
+<script type="text/javascript">
+window.onload = init;
+function init(){
+	document.getElementById('username').focus();
+}
+</script>
+</head>
+<body class="login">
+    <img class="bg" src="/images/toorak/login-bg.png" />
+	<div id="header">
+		<a href="/" class="logo"><img src="/images/toorak/logo-glow.png" width="287" height="282" alt="Toorak College - Mount Eliza" /></a>
+        <img id="iVE" src="/images/toorak/iVE-glow.png" />
+	</div>
+
+<div id="container" class=" login">
+
+  <div id="content">
+    <p class="error">{ERROR}</p>
+    <form id="loginForm" method="post" action="/loginForm.php">
+    	<fieldset>
+        <!--<label for="username">Login Name:</label>-->
+        <input type="text" name="username" id="username" placeholder="Username" />
+      </fieldset>
+      <fieldset>
+          <!--<label for="password">Password:</label>-->
+          <input type="password" name="password" id="password" placeholder="Password" />
+        </fieldset>
+          <input type="hidden" name="page" value="{HIDDEN}" />
+          <input class="login submit-btn-plain" type="submit" name="Submit" value="Sign in" alt="Login" />
+          <div class="float-fix"></div>
+      </form>
+       <p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
+        <div class="float-fix"></div>
+  </div>
+</div>
+
+<div id="footer" class="login">
+	<ul>
+	<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+	<li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+    <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
+    <!-- BEGIN mobile_switch -->
+<li><a href="/switch.php?v=mobile">Switch to Mobile</a></li>
+<!-- END mobile_switch -->
+    <li><a href="http://alaress.com.au" title="Web Development Melbourne">Web Development</a> by <a href="http://alaress.com.au">Alaress</a></li>
+	<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
+  </ul>
+</div>
+</body>
+</html>
+
+
