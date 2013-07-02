@@ -66,6 +66,9 @@ class FileMapper extends Schoolbox\Mapper {
 				$file_id = $existing_files->current()->getId();
 			}
 			else {
+				//
+				// TODO dependency inject session access
+				$file->setUploadedBy($_SESSION['id'] ?: 0);
 				$file_mapper->create($file);
 				$file_id = $file->getId();
 			}
