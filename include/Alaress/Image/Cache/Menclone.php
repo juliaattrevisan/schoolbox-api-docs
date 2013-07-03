@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Cache_Menclone extends Model {
+class Alaress_Image_Cache_Menclone extends Model implements Alaress_Image_Cache_Interface {
 	public $_table = 'file';
 	public $_index = 'fileID';
 

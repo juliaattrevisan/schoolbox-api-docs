@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Cache_Filesystem {
+class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 
 	/* The image to load
 	 */

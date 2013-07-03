@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Cache_MyImage extends DeprecatedModel {
+class Alaress_Image_Cache_MyImage extends DeprecatedModel implements Alaress_Image_Cache_Interface {
 	public $_table = 'myFile';
 	public $_index = 'id';
 

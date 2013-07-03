@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Cache_Portrait {
+class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
 
     /* The image to load
       */

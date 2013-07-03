@@ -1,7 +1,7 @@
 <?php
 
 
-class Alaress_Image_Cache_Storage {
+class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
 
     /* The image to load
       */
