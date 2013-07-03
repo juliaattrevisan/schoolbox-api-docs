@@ -28,11 +28,11 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 		$groupHandler = new Group();
 
 		if ($groupHandler->getPermission($imageInfo['category']) < READ_ACCESS) {
-			Sitepage::redirectToBrokenImage(403, $_GET['width'], $_GET['height']);
+			SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
 		}
 	}
 	else {
-		Sitepage::redirectToBrokenImage(403, $_GET['width'], $_GET['height']);
+		SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
 	}
 }
 
@@ -49,8 +49,8 @@ try {
 	$imageProcessor->load()->transformAll()->stream();
 }
 catch (Exception_Schoolbox_NotFound $e) {
-	Sitepage::redirectToBrokenImage(404, $_GET['width'], $_GET['height']);
+	SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
 }
 catch (Exception $e) {
-	Sitepage::redirectToBrokenImage(500, $_GET['width'], $_GET['height']);
+	SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
 }

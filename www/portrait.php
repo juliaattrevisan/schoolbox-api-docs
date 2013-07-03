@@ -18,5 +18,5 @@ try {
 	$image->stream();
 }
 catch (Exception $e) {
-	Sitepage::redirectToBrokenImage(404, $_GET['width'], $_GET['height'], true);
+	SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
 }

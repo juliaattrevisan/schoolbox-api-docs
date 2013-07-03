@@ -22,4 +22,4 @@ try {
 	}
 }
 catch (Exception $e) {}
-Sitepage::redirectToBrokenImage(404);
+SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], 404);
