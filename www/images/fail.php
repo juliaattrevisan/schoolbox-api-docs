@@ -33,12 +33,12 @@ if ($_GET['portrait']) {
 else {
 	switch ($code) {
 		case 403:
-			$path = WEB_root . '/images/permission-denied.png';
+			$path = WEB_root . '/images/core/permission-denied.png';
 			break;
 		case 404:
 		case 500:
 		default:
-			$path = WEB_root . '/corrupt-image.png';
+			$path = WEB_root . '/images/core/corrupt-image.png';
 			break;
 	}
 }
