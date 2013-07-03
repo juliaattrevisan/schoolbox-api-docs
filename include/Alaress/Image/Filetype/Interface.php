@@ -8,7 +8,17 @@
  * @version     SVN: $Id$
  */
 interface Alaress_Image_Filetype_Interface {
+
+    /**
+     * Create an image
+     *
+     * @param $filename
+     * @throws Exception_Schoolbox_NotFound if file can't be read
+     * @return resource
+     */
     public function create($filename);
+
+    public function loadImageResource($filename);
 
     public function stream($image);
 
