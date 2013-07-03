@@ -49,6 +49,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	public function __construct($filename, $key) {
 		$this->setFilename($filename);
 		$this->setKey($key);
+		$this->setCacheLocation(Cfg::get('thumbnail_dir'));
 	}
 
 	/**
