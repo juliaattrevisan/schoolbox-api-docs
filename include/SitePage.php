@@ -796,6 +796,17 @@ class SitePage extends Page {
         }
     }
 
+    /**
+     * Redirects to a broken image.
+     *
+     * @param int $code   The HTTP error number
+     * @param int $width  Width of image to show
+     * @param int $height Height of image to show
+     */
+    public static function redirectToBrokenImage($code = 500, $width = null, $height = null) {
+        static::localRedir("/images/fail.php?".http_build_query(array('code' => $code, 'width' => $width, 'height' => $height)));
+    }
+
     function goLoginPage($error = '', $page = '') {
         $this->setSite();
         $this->setFile(TEMPLATE_body, 'common/login.html');
