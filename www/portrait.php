@@ -14,4 +14,9 @@ require_once '../include/Bootstrap.php';
 $sitePage = new SitePage;
 
 $image = new Alaress_Image_Portrait($_GET['userId'], $_GET['size'], new Alaress_Image_Transformation_Portrait());
-$image->stream();
+try {
+	$image->stream();
+}
+catch (Exception $e) {
+	Sitepage::redirectToBrokenImage(404, $_GET['width'], $_GET['height'], true);
+}
