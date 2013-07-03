@@ -797,16 +797,54 @@ class SitePage extends Page {
     }
 
     /**
-     * Redirects to a broken image.
+     * Redirects to a broken image with a given size.
      *
-     * @param int  $code     The HTTP error number
      * @param int  $width    Width of image to show
      * @param int  $height   Height of image to show
+     * @param int  $code     The HTTP error number
      * @param bool $portrait Is this a portrait?
      */
-    public static function redirectToBrokenImage($code = 500, $width = null, $height = null, $portrait = false) {
-        $query = array('code' => $code, 'width' => $width, 'height' => $height, 'portrait' => $portrait);
-        static::localRedir("/images/fail.php?".http_build_query($query));
+    public static function redirectToBrokenImageOfSize($width, $height, $code = 500, $portrait = false) {
+        static::redirectToBrokenImage(
+            $code,
+            array('width' => $width, 'height' => $height, 'portrait' => $portrait)
+        );
+    }
+
+    /**
+     * Redirects to a broken image with a given transform.
+     *
+     * @param string $transform_type Width of image to show
+     * @param string $transform      Height of image to show
+     * @param int    $code           The HTTP error number
+     * @param bool   $portrait       Is this a portrait?
+     */
+    public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500, $portrait = false) {
+        static::redirectToBrokenImage(
+            $code,
+            array('transform_type' => $transform_type, 'transform' => $transform, 'portrait' => $portrait)
+        );
+    }
+
+    /**
+     * Redirects to a broken image.
+     *
+     * @param int   $code    The HTTP error number
+     * @param array $options Options for the size and transformation of the
+     *                       broken image.
+     */
+    public static function redirectToBrokenImage($code = 500, $options = array()) {
+        $query = array(
+            'code'           => true,
+            'width'          => true,
+            'height'         => true,
+            'portrait'       => true,
+            'transform'      => true,
+            'transform_type' => true,
+        );
+        $options['code'] = $code;
+        $options = array_intersect_key($options, $query);
+        static::localRedir("/images/fail.php?".http_build_query($options));
     }
 
     function goLoginPage($error = '', $page = '') {
