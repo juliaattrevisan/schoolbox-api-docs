@@ -27,15 +27,20 @@ switch ($_GET['code']) {
 }
 
 $path = null;
-switch ($code) {
-	case 403:
-		$path = __DIR__.'/permission-denied.png';
-		break;
-	case 404:
-	case 500:
-	default:
-		$path = __DIR__.'/corrupt-image.png';
-		break;
+if ($_GET['portrait']) {
+	$path = WEB_root . '/images/core/placeholder.png';
+}
+else {
+	switch ($code) {
+		case 403:
+			$path = WEB_root . '/images/permission-denied.png';
+			break;
+		case 404:
+		case 500:
+		default:
+			$path = WEB_root . '/corrupt-image.png';
+			break;
+	}
 }
 
 $imageProcessor = new Alaress_Image_Processor_Freeform(

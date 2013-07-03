@@ -799,12 +799,14 @@ class SitePage extends Page {
     /**
      * Redirects to a broken image.
      *
-     * @param int $code   The HTTP error number
-     * @param int $width  Width of image to show
-     * @param int $height Height of image to show
+     * @param int  $code     The HTTP error number
+     * @param int  $width    Width of image to show
+     * @param int  $height   Height of image to show
+     * @param bool $portrait Is this a portrait?
      */
-    public static function redirectToBrokenImage($code = 500, $width = null, $height = null) {
-        static::localRedir("/images/fail.php?".http_build_query(array('code' => $code, 'width' => $width, 'height' => $height)));
+    public static function redirectToBrokenImage($code = 500, $width = null, $height = null, $portrait = false) {
+        $query = array('code' => $code, 'width' => $width, 'height' => $height, 'portrait' => $portrait);
+        static::localRedir("/images/fail.php?".http_build_query($query));
     }
 
     function goLoginPage($error = '', $page = '') {
