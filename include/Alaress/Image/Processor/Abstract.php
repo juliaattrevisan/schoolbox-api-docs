@@ -84,7 +84,7 @@ class Alaress_Image_Processor_Abstract {
 	/**
 	 * Get processing strategy
 	 *
-	 * @return null
+	 * @return Alaress_Image_Filetype_Interface
 	 */
 	protected function getFiletypeStrategy() {
 		return $this->filetypeStrategy;
@@ -175,7 +175,7 @@ class Alaress_Image_Processor_Abstract {
 	/**
 	 * Get cache
 	 *
-	 * @return null
+	 * @return Alaress_Image_Cache_Interface
 	 */
 	protected function getCache() {
 		return $this->cache;

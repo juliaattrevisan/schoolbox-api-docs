@@ -19,7 +19,7 @@ class Alaress_Image_Processor_Freeform extends Alaress_Image_Processor_Standard 
 	 * Otherwise transformations were done previously and saved, and we can skip
 	 * this step entirely
 	 *
-	 * @return \Alaress_Image_Processor
+	 * @return $this
 	 */
 	public function transformAll() {
 
