@@ -13,8 +13,8 @@ session_start();
 //
 // permission denied, corrupt, portrait only
 $code   = 500;
-$width  = intval($_GET['width']);
-$height = intval($_GET['height']);
+$width  = intval($_GET['width'])  ?: 100;
+$height = intval($_GET['height']) ?: 100;
 
 switch ($_GET['code']) {
 	case 403:
