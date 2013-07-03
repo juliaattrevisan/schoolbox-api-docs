@@ -156,6 +156,7 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
     /**
      * Load an image by an id
      *
+     * @throws Exception_Schoolbox_NotFound if file isn't found
      * @return mixed
      */
     public function load() {
@@ -197,7 +198,7 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
             return $this->standardise($info);
         }
         else {
-            die('Could not read file.');
+            throw new Exception_Schoolbox_NotFound(sprintf('Could not read file "%s"', $this->getFilename()));
         }
     }
 

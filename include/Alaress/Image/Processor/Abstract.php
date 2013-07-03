@@ -57,6 +57,7 @@ class Alaress_Image_Processor_Abstract {
 	 * Set processing strategy
 	 *
 	 * @param $imageArray
+	 * @throws Exception_Schoolbox if image isn't recognised
 	 */
 	protected function setFiletypeStrategy($imageArray) {
 		switch($imageArray['mime']) {
@@ -72,7 +73,7 @@ class Alaress_Image_Processor_Abstract {
 				$className = 'Png';
 				break;
 			default:
-				die('Unknown image type.');
+				throw new Exception_Schoolbox('Unknown image type.');
 				break;
 		}
 

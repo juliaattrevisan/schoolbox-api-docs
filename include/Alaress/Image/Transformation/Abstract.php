@@ -13,8 +13,8 @@ class Alaress_Image_Transformation_Abstract {
 	/**
 	 * Get all transformations for a particular key
 	 *
-	 * @param $key
-	 *
+	 * @param  $key
+	 * @throws Exception_Schoolbox if transformation isn't found
 	 * @return array
 	 */
 	public function retrieve($key) {
@@ -22,7 +22,7 @@ class Alaress_Image_Transformation_Abstract {
 			return $this->allTransformations[$key];
 		}
 
-		die('Could not load transformation list.');
+		throw new Exception_Schoolbox('Could not load transformation list.');
 	}
 
 	/**
