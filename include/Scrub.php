@@ -33,15 +33,11 @@ class Scrub {
      * @return string
      */
     static public function text($text) {
-        /* This in built function encode html chars
-           * the ENT_QUOTES converts all talking marks
-           */
-        $text = htmlentities($text, ENT_QUOTES, "UTF-8");
-
-        /* Get rid of any possible bad chars
-           * $text = scrubHTML($text);
-           */
-        return $text;
+        //
+        // Don't think ENT_IGNORE is a problem here.
+        // This is used to escape output as text or as an attribute - HTML tags
+        // are escaped regardless.
+        return htmlentities($text, ENT_IGNORE|ENT_QUOTES, "UTF-8");
     }
 
     /**
