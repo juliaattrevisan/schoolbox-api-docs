@@ -8,7 +8,6 @@
  */
 
 require_once __DIR__.'/../../include/Bootstrap.php';
-session_start();
 
 //
 // Get the code, then the image path from the code.
