@@ -36,8 +36,8 @@ abstract class Synchronise_Synergetic_Jpc_Strategy_Abstract extends Synchronise_
 
 				/* Perform action; report what happened
 				 */
-                //Leave groups alone once user is defined
-                unset($newUser['group_id']);
+                //Leave groups alone once user is defined (unless a student)
+				$newUser = $this->alterBeforeUpdate($newUser);
 
 				if ($this->getPerformUpdate() === true) {
 					$newUser['id'] = $existing['uid'];
@@ -141,5 +141,18 @@ abstract class Synchronise_Synergetic_Jpc_Strategy_Abstract extends Synchronise_
 	 */
 	protected function userExists($newUser) {
 		return $this->getUserHandler()->getBySynergy($newUser['synergy_id']);
+	}
+
+	/**
+	 * Mangles $newUser before they are updated. All users remain in the same
+	 * group, except for students (who move between year levels).
+	 *
+	 * @param $newUser
+	 *
+	 * @return mixed
+	 */
+	protected function alterBeforeUpdate($newUser) {
+		unset($newUser['group_id']);
+		return $newUser;
 	}
 }

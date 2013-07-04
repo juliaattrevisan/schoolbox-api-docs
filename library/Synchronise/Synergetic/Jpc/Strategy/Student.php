@@ -94,4 +94,15 @@ class Synchronise_Synergetic_Jpc_Strategy_Student extends Synchronise_Synergetic
 
 		$this->getVerboseFilter()->summary();
 	}
+
+	/**
+	 * Overrides retaining of current group for student level users.
+	 *
+	 * @param $newUser
+	 *
+	 * @return mixed
+	 */
+	protected function alterBeforeUpdate($newUser) {
+		return $newUser;
+	}
 }
