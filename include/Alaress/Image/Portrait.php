@@ -12,7 +12,7 @@
 class Alaress_Image_Portrait {
 
     /**
-     * @var Alaress_Image_Processor
+     * @var Alaress_Image_Processor_Abstract
      */
     protected $imageProcessor = null;
 
@@ -55,15 +55,15 @@ class Alaress_Image_Portrait {
 
     /**
      * Sets the image processor
-     * @param \Alaress_Image_Processor $imageProcessor
+     * @param Alaress_Image_Processor_Abstract $imageProcessor
      */
-    private function setImageProcessor(\Alaress_Image_Processor $imageProcessor) {
+    private function setImageProcessor(Alaress_Image_Processor_Abstract $imageProcessor) {
         $this->imageProcessor = $imageProcessor;
     }
 
     /**
      * Gets the image processor
-     * @return \Alaress_Image_Processor
+     * @return Alaress_Image_Processor_Abstract
      */
     private function getImageProcessor() {
         return $this->imageProcessor;
