@@ -1,0 +1,49 @@
+<script type="text/javascript">
+    $j(function () {
+        $j('#category li:first-child a').addClass('selected');
+        $j('ul.topic li:first-child').show();
+
+        $j('#category a').click(function (event) {
+            event.preventDefault();
+            if (!$j(this).hasClass("selected")) {
+                $j('#category a').removeClass('selected');
+                $j(this).addClass('selected');
+                var el = $j(this).attr('title');
+                $j('ul.topic > li').hide();
+                $j('ul.topic > li.' + el).show();
+            }
+            return false;
+        });
+    });
+</script>
+
+<div class="box clearfix news">
+    <h2>My News Feed</h2>
+
+    <ul id="category" class="news-headlines">
+        <!-- BEGIN topic_header -->
+        <li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+        <!-- END topic_header -->
+    </ul>
+    <div class="listing clearfix">
+        <ul class="topic">
+            <!-- BEGIN topic -->
+            <li class="hide {TOPIC_CLEAN}">
+                <ul class="news-list">
+                    <!-- BEGIN news -->
+                    <li class="{ON_OFF} clearfix">
+                        <!-- BEGIN news_image -->
+                        <a href="{NEWS_URL}" title="{NEWS_TITLE}"><img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/></a>
+                        <!-- END news_image -->
+                        <h3><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h3>
+                        <span class="time">{NEWS_TIME}</span>
+                        <p>{NEWS_SHORT}</p>
+                    </li>
+                    <!-- END news -->
+                </ul>
+            </li>
+            <!-- END topic -->
+        </ul>
+    </div>
+</div>
+
