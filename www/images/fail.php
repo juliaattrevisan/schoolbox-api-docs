@@ -25,18 +25,18 @@ switch ($_GET['code']) {
 }
 $path = null;
 if ($_GET['portrait']) {
-	$path = WEB_root . '/images/core/placeholder.png';
+	$path = '/images/core/placeholder.png';
 }
 else {
 	switch ($code) {
 		case 403:
-			$path = WEB_root . '/images/core/permission-denied.png';
+			$path = '/images/core/permission-denied.png';
 			break;
 
 		case 404:
 		case 500:
 		default:
-			$path = WEB_root . '/images/core/corrupt-image.png';
+			$path = '/images/core/corrupt-image.png';
 			break;
 	}
 }
@@ -69,11 +69,18 @@ switch ($_GET['transform_type']) {
 		break;
 }
 
-$imageProcessor = new Alaress_Image_Processor_Freeform(
-	new Alaress_Image_Cache_Filesystem($path, $cache_key),
-	$transform
-);
-if (isset($transform_key)) {
-	$imageProcessor->setTransformKey($transform_key);
+//
+// Try to output the fail image. If even THAT fails, just redirect to the image.
+try {
+	$imageProcessor = new Alaress_Image_Processor_Freeform(
+		new Alaress_Image_Cache_Filesystem(WEB_root.$path, $cache_key),
+		$transform
+	);
+	if (isset($transform_key)) {
+		$imageProcessor->setTransformKey($transform_key);
+	}
+	$imageProcessor->load()->transformAll()->stream();
 }
-$imageProcessor->load()->transformAll()->stream();
+catch (Exception $e) {
+	SitePage::localRedir($path);
+}
