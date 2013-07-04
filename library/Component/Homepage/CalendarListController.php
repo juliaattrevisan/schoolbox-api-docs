@@ -124,7 +124,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                     'CAL_ID' => $event['id'],
                     'CAL_NOTE' => Scrub::text($event['note']),
                     'CAL_LOCATION' => Scrub::text($event['location']),
-                    'CAL_DETAIL' => Scrub::text($event['detail']),
+                    'CAL_DETAIL' => Scrub::html($event['detail']),
                     'CAL_COLOUR' => $event['colour'],
                     'CAL_MODIFY' => $this->calendarHandler->getPerm(
                         $event['id']

@@ -153,7 +153,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 						'LOCATION' => '',
 						'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
 						'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
-						'DETAIL' => Scrub::text($currentEvent->getSubmissionBoxDetail()),
+						'DETAIL' => Scrub::html($currentEvent->getSubmissionBoxDetail()),
 						/* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
 						 */
 						'EVENT_TYPE' => 'submission',
@@ -175,7 +175,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 						'FULL_TIME' => $currentEvent->getFullDate(),
 						'NOTE' => Scrub::text($currentEvent->getNote()),
 						'LOCATION' => Scrub::text($currentEvent->getLocation()),
-						'DETAIL' => Scrub::text($currentEvent->getDetail()),
+						'DETAIL' => Scrub::html($currentEvent->getDetail()),
 						'COLOUR' => $currentEvent->getColour(),
 						'EVENT_TYPE' => 'type' . $currentEvent->getType(),
 						'TYPE' => $currentEvent->getEventType(),
