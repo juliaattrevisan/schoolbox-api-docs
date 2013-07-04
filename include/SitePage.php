@@ -799,15 +799,14 @@ class SitePage extends Page {
     /**
      * Redirects to a broken image with a given size.
      *
-     * @param int  $width    Width of image to show
-     * @param int  $height   Height of image to show
-     * @param int  $code     The HTTP error number
-     * @param bool $portrait Is this a portrait?
+     * @param int  $width  Width of image to show
+     * @param int  $height Height of image to show
+     * @param int  $code   The HTTP error number
      */
-    public static function redirectToBrokenImageOfSize($width, $height, $code = 500, $portrait = false) {
+    public static function redirectToBrokenImageOfSize($width, $height, $code = 500) {
         static::redirectToBrokenImage(
             $code,
-            array('width' => $width, 'height' => $height, 'portrait' => $portrait)
+            array('width' => $width, 'height' => $height,)
         );
     }
 
@@ -817,12 +816,11 @@ class SitePage extends Page {
      * @param string $transform_type Width of image to show
      * @param string $transform      Height of image to show
      * @param int    $code           The HTTP error number
-     * @param bool   $portrait       Is this a portrait?
      */
-    public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500, $portrait = false) {
+    public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500) {
         static::redirectToBrokenImage(
             $code,
-            array('transform_type' => $transform_type, 'transform' => $transform, 'portrait' => $portrait)
+            array('transform_type' => $transform_type, 'transform' => $transform,)
         );
     }
 
@@ -838,7 +836,6 @@ class SitePage extends Page {
             'code'           => true,
             'width'          => true,
             'height'         => true,
-            'portrait'       => true,
             'transform'      => true,
             'transform_type' => true,
         );

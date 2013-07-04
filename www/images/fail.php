@@ -23,21 +23,16 @@ switch ($_GET['code']) {
 		break;
 }
 $path = null;
-if ($_GET['portrait']) {
-	$path = '/images/core/placeholder.png';
-}
-else {
-	switch ($code) {
-		case 403:
-			$path = '/images/core/permission-denied.png';
-			break;
+switch ($code) {
+	case 403:
+		$path = '/images/core/permission-denied.png';
+		break;
 
-		case 404:
-		case 500:
-		default:
-			$path = '/images/core/corrupt-image.png';
-			break;
-	}
+	case 404:
+	case 500:
+	default:
+		$path = '/images/core/corrupt-image.png';
+		break;
 }
 
 
@@ -49,6 +44,7 @@ $transform_key = null;
 $cache_key     = '';
 switch ($_GET['transform_type']) {
 	case 'portrait':
+		$path          = '/images/core/placeholder.png';
 		$transform     = new Alaress_Image_Transformation_Portrait();
 		$transform_key = $_GET['transform'];
 		$cache_key     = "portrait:$transform_key";
