@@ -113,16 +113,16 @@ laber.error,
 
 #category
 {
-    -moz-border-radius: 6px;
+    /*-moz-border-radius: 6px;
     -webkit-border-radius: 6px;
-    border-radius: 6px;
+    border-radius: 6px;*/
 }
 
 .box #category
 {
-    -moz-border-radius: 0 0 6px 6px;
+    /*-moz-border-radius: 0 0 6px 6px;
     -webkit-border-radius: 0 0 6px 6px;
-    border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;*/
 }
 
 #tabs .navthis a,
@@ -138,7 +138,9 @@ laber.error,
     -webkit-border-radius: 0 7px 7px 7px;
     border-radius: 0 7px 7px 7px;*/
     border-top: 1px solid #897000;
-    margin-left: 223px
+    margin-left: 206px;
+    position: relative;
+    top: -88px;
 }
 
 .admin-nav
@@ -176,24 +178,26 @@ laber.error,
 body{
   background:#e6e6e6;
 }
-h1,h2,h3{ color: #006461; }
-h2,.calendar-controls{color:#006461; background:#fdf5e6;}
+h1,h2,h3{ color: #000000; }
+h2,.calendar-controls{color:#013a63; background:#e4ebf7;}
 .calendar-controls h3{color:#000000;}
-a, h2 a{color:#0066b0;}
-a:hover, h2 a:hover{color:#007fdb;}
+a, h2 a{color:#2f5992;}
+a:hover, h2 a:hover{color:#3666a7;}
 #header, .login #header{
-    height:70px;
-    background:transparent;
+    height: 162px;
+    background: white;
 }
+#header{ border-bottom: 3px solid #897000; }
 #header .logo{
     padding: 0;
     width: 162px;
     height: 133px;
-    left: 32px;
+    left: 22px;
     top: 11px;
 }
 #tabs{
-  left: 222px;
+  left: 205px;
+  bottom: 85px;
 }
 
 #tabs li{
@@ -223,15 +227,29 @@ a:hover, h2 a:hover{color:#007fdb;}
 }
 
 #nav{
-  top:152px;
+  top: 172px;
   width: 190px;
 }
+
 #nav h3,
-#nav h3.my-links{background: transparent;}
-
+#nav h3.my-links{
+  background: transparent;
+}
+#nav h3{
+  padding-left: 7px;
+  text-transform: uppercase;
+  color: black;
+}
 #nav .nav-wrapper, #nav ul ul,.colours-buttons, #nav .nav-wrapper.my-links {background:transparent;}
-
+#nav ul{ width: 175px; }
 #nav ul ul{border-color:#6faff9;}
+
+#nav li a {
+  color: #2f5992;
+  margin: 0;
+  padding: 3px 8px;
+  width: 157px;
+}
 
 #tabs-homepage li.ui-state-default a {
     background: none repeat scroll 0 0 #eee;
@@ -250,7 +268,7 @@ a:hover, h2 a:hover{color:#007fdb;}
 }
 
 #nav ul li a:hover, #nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
-    background-color: #0066b0;
+    background-color: #2f5992;
     color: #ffffff;
 }
 
@@ -266,7 +284,7 @@ a:hover, h2 a:hover{color:#007fdb;}
 #category,
 #tabs-homepage .customise-components,
 .mark-sheet.assessments .dark td {
-    background: none repeat scroll 0 0 #f0f7fe;
+    background: none repeat scroll 0 0 #f7f7f7;
 }
 
 .search-item:nth-child(2n){
@@ -276,16 +294,16 @@ a:hover, h2 a:hover{color:#007fdb;}
 #category li a.selected,
 #tabs-sub li.ui-tabs-selected a,
 .topic-list li a.selected{
-    background:#0066b0; color:#ffffff; border-radius: 0px;
+    background:#2f5992; color:#ffffff; border-radius: 0px;
 }
 
 .topic-list li a:hover {
-    background: #007fdb;
+    background: #2f5992;
     color: #fff;
 }
 
 #category li a:hover{
-    background:#007fdb;
+    background:#2f5992;
     color:#ffffff;
     -moz-border-radius: 0px;
     -webkit-border-radius: 0px;
@@ -346,36 +364,42 @@ ADMIN!
     border-radius: 0;}
 .admin-nav li a.current{background:#F0F7FE;color:#054B93; font-weight:bold;}
 #search-button{
-    background: url('/images/stpatricks/search-btn.png') 6px 7px no-repeat !important;
-    position: relative;
-    float: left;
-    height: 25px;
+  background: url('/images/stpatricks/search-btn.png') 6px 7px no-repeat !important;
+  position: absolute;
+  left: 5px;
+  height: 25px;
+  top: 3px;
 }
 #search {
   margin: 8px 16px 0 0;
   position: absolute;
   right: 0;
   top: 2px;
+  width: 259px;
 }
+
 #search, #search-field{ height: 27px; }
 .admin-contents .level{background:#eee; border-color:#ddd;}
 .admin-contents h4{border-color:#ddd;}
 
 #search-field{
-    color:#797979;
-    font-style: italic;
-    padding: 6px 12px;
-    height: 15px;
-    font-weight: normal;
-    line-height: 18px;
+  background: #fcfcfc;
+  border: 1px solid #cbcbcb;
+  color: #797979;
+  font-style: italic;
+  padding: 6px 8px 6px 35px;
+  height: 19px;
+  font-weight: normal;
+  line-height: 18px;
+  width: 213px;
 }
-#infoPanel {margin-top:15px;}
-#infoPanel li{color:#b2c5d6;}
-#infoPanel li a{color:#ffffff; text-decoration: underline;}
+#infoPanel {margin-top: 11px; position: absolute; right: 275px;}
+#infoPanel li{color:#2f5992;}
+#infoPanel li a{color:#2f5992; text-decoration: underline;}
 
 #footer ul {float:right;padding-right: 40px;}
-#footer ul li {color:#c9c9c9}
-#footer ul li a{color:#c9c9c9}
+#footer ul li {color:#2f5992;}
+#footer ul li a{color:#2f5992;}
 
 .standardForm td {
     border-bottom: 1px solid #eee;
