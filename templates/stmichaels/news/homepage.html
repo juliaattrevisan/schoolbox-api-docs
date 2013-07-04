@@ -1,0 +1,103 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+	mode : "textareas",
+	theme : "advanced",
+    skin : "cirkuit",
+	plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+	content_css : "/css/core/tiny.css",
+	theme_advanced_toolbar_location : "top",
+	theme_advanced_toolbar_align : "left",
+	theme_advanced_statusbar_location : "bottom",
+    theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+    theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
+    theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+    theme_advanced_buttons4 : "tablecontrols",
+    pdw_toggle_on : 1,
+    pdw_toggle_toolbars : '2, 3, 4',
+    extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+    theme_advanced_blockformats : "p,address,h4,h5",
+	file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+	file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
+	file_browser_category_id : {CATEGORY_ID},
+	tabfocus_elements : ":prev,:next",
+	convert_urls : false
+});
+</script>
+<script language="JavaScript" type="text/javascript">
+
+$j(function() {
+	
+	$j('#newsForm').validate();
+
+    $j('#datetime_published, #datetime_expires').datepicker({
+        dateFormat: 'dd/mm/yy',
+        showOn: 'both',
+        buttonImage: '/images/core/calendar/calendar-click.png',
+        buttonImageOnly: true,
+        constrainInput: false,
+        onClose: function (string) {
+            var input = $j(this);
+
+            $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                input.val(data.time);
+            })
+        }
+    });
+
+    $j('.customise').click(function(event) {
+        event.preventDefault();
+        $j(this).children('span').toggle();
+        $j('.advanced').toggle();
+        if ($j('.advanced').is(':visible')) {
+            $j('.advanced').children('td').delay(1000).animate({opacity:'1'});
+        } else {
+             $j('.advanced').queue('fx', []);
+        }
+    });
+
+});
+
+</script>
+<!-- END custom_head -->
+
+<h1>{ACTION} Homepage News<a class="customise" href="#"><span>Show Advanced Options</span><span style="display:none">Close Advanced Options</span></a></h1>
+<form action="/news/homepageForm.php" method="post" class="clearfix" enctype="multipart/form-data" id="newsForm">
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>Headline</h4>
+			</td>
+			<td><label><input type="text" class="required" name="heading" size="35" maxlength="100" value="{HEADING}" /></label></td>
+		</tr>
+		<tr>
+			<td valign="top"><h4>Article</h4>
+				<em>This is the main portion of your news.</em>
+				</td>
+			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
+		</tr>
+        <tr class="advanced">
+            <td><h4>Publish Date</h4>
+                <em>Select a date for when this news item will become available.</em>
+            <td>
+                <input type="text" class="required" name="datetime_published" id="datetime_published" size="12" maxlength="50" value="{DATETIME_PUBLISHED}" />
+            </td>
+        </tr>
+        <tr>
+            <td><h4>Expiry Date</h4>
+                <em>Select a date for when this item will expire.</em>
+            <td>
+                <input type="text" class="required" name="datetime_expires" id="datetime_expires" size="12" maxlength="50" value="{DATETIME_EXPIRES}" />
+            </td>
+        </tr>
+	</table>
+    <input type="hidden" name="id" value="{NEWS_ID}" />
+    <input type="hidden" name="code" value="{CATEGORY_ID}" />
+	<input type="submit" name="submit" value="{ACTION} News" class="submit-btn-plain"/>
+	<!-- BEGIN delete_button -->
+	<input type="submit" name="delete" value="Delete News" class="submit-btn-plain">
+	<!-- END delete_button -->
+
+</form>

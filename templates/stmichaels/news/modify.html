@@ -1,0 +1,265 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css"/>
+
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.color.js"></script>
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+    tinyMCE.init({
+        mode:"textareas",
+        theme:"advanced",
+        skin:"cirkuit",
+        plugins:"pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+        content_css:"/css/core/tiny.css",
+        theme_advanced_toolbar_location:"top",
+        theme_advanced_toolbar_align:"left",
+        theme_advanced_statusbar_location:"bottom",
+        theme_advanced_buttons1:"bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+        theme_advanced_buttons2:"forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,spellchecker",
+        theme_advanced_buttons3:"outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+        theme_advanced_buttons4:"tablecontrols",
+        pdw_toggle_on:1,
+        pdw_toggle_toolbars:'2, 3, 4',
+        extended_valid_elements:"a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+        file_browser_callback:'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+        file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
+        file_browser_category_id:0,
+        tabfocus_elements:":prev,:next",
+        convert_urls:false,
+        force_br_newlines:false,
+        force_p_newlines:true
+    });
+
+    function confirmDelete(newsID) {
+        if (confirm('Delete this news item?')) {
+            window.open('/news/modifyForm.php?delete=' + newsID, '_self', '');
+        }
+    }
+
+    $j(function () {
+        $j('#item_datetime_published, #item_datetime_expires').datepicker({
+            dateFormat:'dd/mm/yy',
+            showOn:'both',
+            buttonImage:'/images/core/calendar/calendar-click.png',
+            buttonImageOnly:true,
+            constrainInput:false,
+            onClose:function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $j('#addUser').autocomplete({
+            serviceUrl:'/ajax/user.php?groupID=0',
+            minChars:2,
+            maxHeight:400,
+            width:200,
+            onSelect:function (value, data) {
+                if ($j('#userList').val()) {
+                    $j('.visible-users').empty()
+                }
+                ;
+
+                $j('.visible-users')
+                        .append('<li><input type="hidden" name="userList[]" value="' + data + '"><span>' + value + '</span><a href="#" class="delete-from-list">delete</a></li>');
+                $j('#addUser').val("").focus();
+                $j('.groups input').valid();
+            }
+        });
+
+        $j('#type_form input').each(function () {
+            $j(this).click(function () {
+                $j.get('/group/modifyForm.php', {categoryID:'{CATEGORY_ID}', type:$j(this).val()});
+            });
+        });
+
+        $j('.delete-from-list').live('click', function (event) {
+            event.preventDefault();
+            $j(this).parent().remove();
+            $j('#addUser').val("").focus();
+        });
+
+        $j(':checkbox').each(function () {
+            if ($j(this).is(':checked')) {
+                $j(this).parent().addClass('active-checkbox');
+            }
+        });
+
+        $j(':checkbox').click(function () {
+            if ($j(this).parent().hasClass('active-checkbox')) {
+                $j(this).parent().removeClass('active-checkbox')
+            } else {
+                $j(this).parent().addClass('active-checkbox');
+            }
+        });
+
+        $j('.customise').click(function (event) {
+            event.preventDefault();
+            $j(this).children('span').toggle();
+            $j('.advanced').toggle();
+            if ($j('.advanced').is(':visible')) {
+                $j('.advanced').children('td').delay(1000).animate({opacity:'1'});
+            } else {
+                $j('.advanced').queue('fx', []);
+            }
+        });
+
+
+        jQuery.validator.addMethod("groupCheck", function (value, element) {
+            console.log($j(element).prop("checked"));
+
+            if (($j('.visible-users').children('li').length < 1) && ($j('.groups input:checked').length < 1 )) {
+                return false;
+            } else {
+                return true;
+            }
+
+
+        }, "Please tick at least one group");
+
+        $j('#newsForm').validate({
+
+            rules:{
+                'group[]':{
+                    groupCheck:true
+                },
+                'campus[]':{
+                    required:true,
+                    minlength:1
+                }
+            },
+            messages:{
+                'group[]':"Please tick at least one group",
+                'campus[]':"Please tick at least one campus"
+            },
+            errorPlacement:function (error, element) {
+                if (element.parent().parent().hasClass('checkboxes')) {
+                    error.insertAfter(element.parent().parent().parent().children(':last-child'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+    });
+
+</script>
+<!-- END custom_head -->
+
+<h1><span>{ACTION} News</span><a class="customise" href="#"><span{ADV_OFF}>Show Advanced Options</span><span{ADV_ON}>Close
+    Advanced Options</span></a></h1>
+<form id="newsForm" method="post" enctype="multipart/form-data" action="/news/modifyForm.php">
+    <input type="hidden" name="newsID" value="{NEWS_ID}"/>
+    <table class="standardForm">
+        <colgroup>
+            <col width="250"/>
+        </colgroup>
+        <tr>
+            <td><h4>Headline</h4></td>
+            <td><label>
+                <input type="text" class="required" name="heading" size="35" maxlength="100" value="{HEADING}"/>
+            </label>
+            </td>
+        </tr>
+        <tr>
+            <td><h4>Article</h4>
+                <em>This is the main portion of your news.</em></td>
+            <td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
+        </tr>
+        <tr>
+            <td><h4>Feature Image</h4>
+                <em>Upload an image to be attached to your news post</em></td>
+            <td><!-- BEGIN image -->
+                <img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/><br />
+                <a href="/news/modifyForm.php?removeImage={NEWS_ID}" onclick="return(confirm('Are you sure you wish to remove this image from the post'))">Remove</a> <br />
+                <!-- END image -->
+                <input id="custom_file_upload" name="file" type="file"/></td>
+        </tr>
+        <tr>
+            <td><h4>Topic</h4></td>
+            <td><select name="item_topic_id">
+                <!-- BEGIN topic_list -->
+                <option value="{TOPIC_ID}"
+                {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option>
+                <!-- END topic_list -->
+            </select></td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Groups</h4>
+                <em>This news item will only be visible to the groups you select.</em></td>
+            <td>
+                <div class="clearfix checkboxes groups"><!-- BEGIN group_selection -->
+
+                    <label class="float-left clear">
+                        <input type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>{GROUP_NAME}
+                    </label>
+
+                    <!-- END group_selection --></div>
+            </td>
+        </tr>
+        <!-- BEGIN campus_row -->
+        <tr>
+            <td><h4>Campus</h4>
+                <em>This news item will only be visible to users that are within this campus.</em></td>
+            <td>
+                <div class="clearfix checkboxes"><!-- BEGIN campus_selection -->
+
+                    <label class="float-left clear">
+                        <input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />
+                        {CAMPUS_NAME} </label>
+
+                    <!-- END campus_selection --></div>
+            </td>
+        </tr>
+        <!-- END campus_row -->
+        <tr class="advanced"
+        {SHOW_ADVANCED} >
+        <td valign="top"
+        {OPAC_ADVANCED} >
+        <h4>Add users</h4>
+        <em>You may add users individually by typing their name and selecting from the list. Use the delete button to
+            remove users</em></td>
+        <td
+        {OPAC_ADVANCED} >
+        <input id="addUser" type="text" size="30"/>
+        <ul class="visible-users">
+            <!-- BEGIN current_users -->
+            <li>
+                <input type="hidden" value="{USER_ID}" name="userList[]">
+                <span>{USER_NAME}</span> <a class="delete-from-list" href="#">delete</a></li>
+            <!-- END current_users -->
+        </ul>
+        </td>
+        </tr>
+
+        <tr class="advanced"
+        {SHOW_ADVANCED}>
+        <td
+        {OPAC_ADVANCED}><h4>Publish Date</h4>
+        <em>Select a date for when this news item will become available.</em>
+        <td
+        {OPAC_ADVANCED}>
+        <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12"
+               maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
+        </td>
+        </tr>
+        <tr>
+            <td><h4>Expiry Date</h4>
+                <em>Select a date for when this item will expire.</em>
+            <td>
+                <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" size="12"
+                       maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
+            </td>
+        </tr>
+    </table>
+    <input class="submit-btn-plain" type="submit" name="submit" value="{ACTION} News"/>
+    <!-- BEGIN delete_button -->
+    <input type="button" name="delete" value="Delete News" class="submit-btn-plain"
+           onclick="confirmDelete({NEWS_ID});"/>
+    <!-- END delete_button -->
+</form>
