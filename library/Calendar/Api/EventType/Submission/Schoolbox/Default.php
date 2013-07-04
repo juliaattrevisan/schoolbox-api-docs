@@ -11,12 +11,20 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	private $calendarHandler = null;
 
 	/**
+	 * The user ID to retrieve events for, defaults to the logged in user.
+	 *
+	 * @var int
+	 */
+	protected $user_id;
+
+	/**
 	 * Constructor
 	 *
 	 * @param $config
 	 */
 	public function __construct($config) {
 		$this->setCalendarHandler(new Calendar());
+		$this->setUserId($_SESSION['id']);
 	}
 
 	/**
@@ -31,7 +39,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	public function getEvents($startTimestamp, $endTimestamp) {
 		$stack       = new Calendar_Event_Collection();
 		$user_mapper = new Schoolbox\UserMapper();
-		$user        = $user_mapper->findById($_SESSION['id']);
+		$user        = $user_mapper->findById($this->getUserId());
 		if (!$user instanceof Schoolbox\User) {
 			return $stack;
 		}
@@ -135,4 +143,22 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	public function getCalendarHandler() {
 		return $this->calendarHandler;
 	}
+
+	/**
+	 * @param  int $user_id
+	 *
+	 * @return $this
+	 */
+	public function setUserId($user_id) {
+		$this->user_id = $user_id;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getUserId() {
+		return $this->user_id;
+	}
+
 }
