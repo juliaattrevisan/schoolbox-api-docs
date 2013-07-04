@@ -8,9 +8,6 @@
  */
 
 require_once '../../include/Bootstrap.php';
-//
-// Don't need to be logged in to view image.
-$sitePage = new SitePage(false);
 
 try {
 	if (isset($_GET['hash']) && $_GET['hash']) {

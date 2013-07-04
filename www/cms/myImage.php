@@ -11,7 +11,6 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 /* Preserve old checks
  */
-$page = new SitePage(false);
 session_start();
 
 if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
