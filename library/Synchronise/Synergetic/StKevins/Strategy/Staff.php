@@ -27,7 +27,12 @@ class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_St
 	 * @return string
 	 */
 	public function getUsernameFromUser($currentUser) {
-		list($username, $domain) = explode('@', $this->getAltEmailFromUser($currentUser));
+		$username = parent::getUsernameFromUser($currentUser);
+		if (!(strlen($username) > 0)) {
+			$first_initial = mb_substr($this->getFirstNameFromUser($currentUser), 0, 1);
+			$surname       = $this->getLastNameFromUser($currentUser);
+			$username      = strtolower($surname . $first_initial);
+		}
 		return $username;
 	}
 
