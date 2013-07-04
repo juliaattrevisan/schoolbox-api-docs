@@ -14,11 +14,11 @@ class Synchronise_Synergetic_Balcombe_Strategy_Staff extends Synchronise_Synerge
 	protected $strategyTitle = "Update Schoolbox Staff Details Synchronisation";
 
 	const T_GROUP_ID = 4;
-	const IT_GROUP_ID = 28;
-	const LC_GROUP_ID = 30;
-	const LT_GROUP_ID = 27;
+	const IT_GROUP_ID = 6;
+	const LC_GROUP_ID = 4;
+	const LT_GROUP_ID = 4;
 	const N_GROUP_ID = 6;
-	const SC_GROUP_ID = 31;
+	const SC_GROUP_ID = 4;
 
 	/**
 	 * Setup

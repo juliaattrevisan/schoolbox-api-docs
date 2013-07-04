@@ -90,11 +90,22 @@ abstract class Synchronise_Synergetic_Balcombe_Strategy_Abstract extends Synchro
 	 * @return bool|int
 	 */
 	protected function getGroupIDFromYearLevel($year) {
-        // group IDs are conveniently sequential in this install
-		if($year >= 0 && $year <= 12) {
-            return $year + 7;
-        }
-        return false;
+		// group IDs are mapped into 4 spanning groups - SB-2754
+		if($year >=0 && $year <=3){
+			return 10;
+		}
+		elseif($year >= 4 && $year <=7){
+			return 14;
+		}
+		elseif($year >= 8 && $year <=9){
+			return 16;
+		}
+		elseif($year >=10 && $year <=12){
+			return 19;
+		}
+		else{
+			return false;
+		}
 	}
 
 	/**
