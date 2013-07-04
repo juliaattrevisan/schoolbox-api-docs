@@ -21,13 +21,18 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 	}
 
 	/**
-	 * Student's username is always the student ID.
+	 * Student's username is always the student ID, unless the NetworkLogin
+	 * field value is defined.
 	 *
 	 * @param  array  $currentUser
 	 * @return string
 	 */
 	public function getUsernameFromUser($currentUser) {
-		return $this->getExternalIdFromUser($currentUser);
+		$username = parent::getUsernameFromUser($currentUser);
+		if (!(strlen($username) > 0)) {
+			$username = $this->getExternalIdFromUser($currentUser);
+		}
+		return $username;
 	}
 
 	/**
