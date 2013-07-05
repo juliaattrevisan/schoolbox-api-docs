@@ -10,6 +10,11 @@ class News_Article_API {
 
     public function School($newsID) {
         $newsHandler = new News();
+
+	    if(!is_numeric($newsID) || $newsID < 1) {
+		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+	    }
+
         $news = $newsHandler->getByID($newsID);
 	    if(is_array($news) ) {
 		    $response = new Response_HTTP();
@@ -39,6 +44,11 @@ class News_Article_API {
     public function Category($newsID) {
 	    
         $newsHandler = new CategoryNews();
+
+	    if(!is_numeric($newsID) || $newsID < 1) {
+		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+	    }
+
         $news = $newsHandler->getByID($newsID);
 	    if(is_array($news)) {
 		    $response = new Response_HTTP();
