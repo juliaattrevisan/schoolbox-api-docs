@@ -87,7 +87,7 @@ class ICal_Creator {
 
 		$v->setProperty('calscale', 'GREGORIAN');
 		$v->setProperty('method', 'PUBLISH');
-		$v->setProperty('X-WR-TIMEZONE', 'Australia/Melbourne');
+		$v->setProperty('X-WR-TIMEZONE', Cfg::get('date_timezone'));
 		$v->parse();
 		$v->sort();
 
