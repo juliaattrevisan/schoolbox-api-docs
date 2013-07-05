@@ -85,6 +85,7 @@ function sendUpcomingNotifications($testRun) {
 				'SURNAME'     => trim($user['lastname']),
 				'SITE_DOMAIN' => Cfg::get('site_domain'),
 				'USER_EMAIL'  => trim($user['alt_email']),
+				'DUEWORK_UID' => $user['id'],
 			);
 			$hostname = Cfg::get('site_hostname');
 			if (!empty($hostname)) {
@@ -113,7 +114,6 @@ function sendUpcomingNotifications($testRun) {
 							$due .= ' on ' . date('D, jS M', $stamp);
 
 							$dump->setVar('DUEWORK_ID',   $box['id']);
-							$dump->setVar('DUEWORK_UID',   $user['uid']);
 							$dump->setVar('DUEWORK_NAME', $box['name']);
 							$dump->setVar('DUEWORK_DATE', $due);
 							$dump->parse('due_work_block', 'due_work', true);
@@ -160,6 +160,12 @@ function sendOverdueNotifictions($testRun) {
 	$list = $shandler->getSubmissionReminderList(OVERDUE_WORK_TYPE);
 	$flagAsSent = array();
 	// yes, this looks like O(n^3)... the execution time is the same as if the array were flat.
+
+	$site_domain = Cfg::get('site_domain');
+	$host_name   = Cfg::get('site_hostname');
+	if (!empty($host_name)) {
+		$site_domain = $host_name . '.' . $site_domain;
+	}
 	foreach($list as $user) {
 		foreach($user['categories'] as $category) {
 			foreach($category['work'] as $dueWork) {
@@ -188,14 +194,14 @@ function sendOverdueNotifictions($testRun) {
 				$output = array(
 					'NAME'        => trim($user['firstname']),
 					'SURNAME'     => trim($user['lastname']),
-					'SITE_DOMAIN' => Cfg::get('site_domain'),
+					'SITE_DOMAIN' => $site_domain,
 					'USER_EMAIL'  => trim($user['alt_email']),
 
 					'CATEGORY_ID'   => $category['id'],
 					'CATEGORY_NAME' => $category['name'],
 
 					'DUEWORK_ID'   => $dueWork['id'],
-					'DUEWORK_UID'   => $user['uid'],
+					'DUEWORK_UID'  => $user['id'],
 					'DUEWORK_NAME' => $dueWork['name'],
 					'DUEWORK_DATE' => $due
 				);
