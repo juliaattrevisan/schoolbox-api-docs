@@ -17,7 +17,7 @@ class Alaress_Image_Filetype_Jpg extends Alaress_Image_Filetype_Abstract {
      * @return resource
      */
     public function loadImageResource($filename) {
-        return imagecreatefromjpeg($filename);
+        return @imagecreatefromjpeg($filename);
     }
 
     /**

@@ -17,7 +17,7 @@ class Alaress_Image_Filetype_Png extends Alaress_Image_Filetype_Abstract {
      * @return resource
      */
     public function loadImageResource($filename) {
-        return imagecreatefrompng($filename);
+        return @imagecreatefrompng($filename);
     }
 
     /**

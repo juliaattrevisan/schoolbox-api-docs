@@ -16,7 +16,10 @@ class Alaress_Image_Filetype_Gif extends Alaress_Image_Filetype_Abstract {
      * @return resource
      */
     public function loadImageResource($filename) {
-        return imagecreatefromgif($filename);
+        //
+        // Sadly silence operator is needed for all imagecreatefrom* methods,
+        // otherwise error output corrupts image output.
+        return @imagecreatefromgif($filename);
     }
 
     /**
