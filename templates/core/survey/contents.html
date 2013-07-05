@@ -38,7 +38,7 @@ $j(function() {
 	$j(".question-list").sortable({
 		stop: function(event, ui) {
 			var allQuestions = $j(this).find('li');
-
+			var section = $j(this).attr('id');
 			var data = new Array();
 
 			$j.each(allQuestions, function(index, element) {
@@ -48,7 +48,13 @@ $j(function() {
 			/* Reorder questions upon reorder completion
 			 */
 			$j.post('/survey/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function(data) {
-				console.log(data);
+				var sequence = 1;
+
+				$j.each($j('#' + section).find('li'), function(index, element) {
+					$j(element).find('strong').html('Q' + sequence);
+					sequence++;
+				});
+//				console.log(data);
 			});
 		}
 	});
@@ -79,7 +85,7 @@ $j(function() {
 			</li>
 		</ul>
 
-		<ul class="question-list" id='{SECTION_TITLE}'>
+		<ul class="question-list" id='section{SECTION_SECTION_ID}'>
 			<!-- BEGIN question -->
 			<li id='question_{QUESTION_QUESTION_ID}'>
 				<strong>Q{QUESTION_SEQUENCE})</strong>
