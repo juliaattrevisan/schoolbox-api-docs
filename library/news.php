@@ -12,11 +12,11 @@ class News extends DeprecatedModel {
 
     function getByID($newsID) {
 
-        $query = "SELECT * FROM " . $this->_table . " WHERE " . $this->_index . " = $newsID AND item_deleted = 0";
+        $query = "SELECT * FROM " . $this->_table . " WHERE " . $this->_index . " = ".$this->db->smartQuote($newsID)." AND item_deleted = 0";
         $news = $this->db->getRow($query);
 
         if ($news[$this->_index]) {
-            $query = "SELECT * FROM newsGroup WHERE id = " . $news[$this->_index];
+            $query = "SELECT * FROM newsGroup WHERE id = " . $this->db->smartQuote($news[$this->_index]);
             $groupList = $this->db->getAll($query);
             if (is_array($groupList)) {
                 foreach ($groupList as $group) {
@@ -24,7 +24,7 @@ class News extends DeprecatedModel {
                 }
             }
 
-            $query = "SELECT * FROM newsCampus WHERE id = " . $news[$this->_index];
+            $query = "SELECT * FROM newsCampus WHERE id = " . $this->db->smartQuote($news[$this->_index]);
             $campusList = $this->db->getAll($query);
             if (is_array($campusList)) {
                 foreach ($campusList as $campus) {
@@ -34,7 +34,7 @@ class News extends DeprecatedModel {
 
             $query = "SELECT id, username, title, firstname, lastname
                                     FROM newsUser JOIN user ON user.id = newsUser.userID
-                                    WHERE newsID = {$news[$this->_index]}";
+                                    WHERE newsID = ". $this->db->smartQuote($news[$this->_index]);
             $news['userList'] = $this->db->getAll($query);
 
         }
