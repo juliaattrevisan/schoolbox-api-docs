@@ -150,15 +150,13 @@ abstract class Mapper {
 	 * @return Collection
 	 */
 	public function findIn($column, $permittedValues) {
-		$permittedValuesSql = implode(',', $permittedValues);
-
 		$statement = $this->database->prepare("
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
-            WHERE `{$column}` IN ({$permittedValuesSql})
+            WHERE `{$column}` IN {$this->getArrayPlaceholders($permittedValues, 'val')}
         ");
 
-		$statement->execute();
+		$statement->execute($this->getArrayParameters($permittedValues, 'val'));
 
 		$rowset = $statement->fetchAll();
 
