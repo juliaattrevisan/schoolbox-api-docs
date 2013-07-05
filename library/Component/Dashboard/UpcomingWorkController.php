@@ -155,6 +155,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             // override the above manipulation of output (we don't need it)
             $output = array(
                 'UPCOMING_ID'      => $item['id'],
+	            'UPCOMING_UID'     => $this->userID,
                 'UPCOMING_TITLE'   => $item['title'],
                 'UPCOMING_TYPE'    => $item['type'],
                 'UPCOMING_DATE'    => $adr->getRelativeTime(),

@@ -8,7 +8,7 @@ use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 
 $page = new SitePage;
 
-if ($_REQUEST['id']) {
+if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
 
     $subStudHandler = new SubmissionStudent;
     $groupHandler = new Group;
@@ -26,7 +26,7 @@ if ($_REQUEST['id']) {
         $action = 'View Results';
         if ($_SERVER['REQUEST_TIME'] <= $assessment->getFinish()->getUnixTimestamp()) {
             $max_attempts = $assessment->getMaxAttempts();
-            $attempts     = $attempt_mapper->getAttemptCountForStudent($assessment->getId(), $_SESSION['id']);
+            $attempts     = $attempt_mapper->getAttemptCountForStudent($assessment->getId(), $_REQUEST['uid']);
             if ($max_attempts <= 0 || $attempts < $max_attempts) {
                 $action = ($attempts === 0) ? 'Sit' : 'Resit';
             }
@@ -35,6 +35,7 @@ if ($_REQUEST['id']) {
         $output = array(
             'id'          => $assessment->getId(),
             'cid'         => $assessment->getCategory()->getId(),
+	        'uid'         => $_REQUEST['uid'],
             'category'    => Scrub::text($assessment->getCategory()->getName()),
             'typeName'    => Scrub::text($assessment->getWorkType()->getName()),
             'name'        => Scrub::text($assessment->getTitle()),
@@ -51,7 +52,7 @@ if ($_REQUEST['id']) {
         $current_time = new DateTime();
 
         /* Get status to set action */
-        $student_submission = $subStudHandler->getStatus($_SESSION['id'], $submission_id);
+        $student_submission = $subStudHandler->getStatus($_REQUEST['uid'], $submission_id);
 
         if ($student_submission['accept_submission']) {
             $action = 'View Details';
@@ -66,6 +67,7 @@ if ($_REQUEST['id']) {
         $output = array(
             'id'          => $submission_id,
             'cid'         => $submission_cat_id,
+	        'uid'         => $_REQUEST['uid'],
             'category'    => Scrub::text($submission->getCategory()->getName()),
             'typeName'    => Scrub::text($submission->getWorkType()->getName()),
             'name'        => Scrub::text($submission->getName()),
@@ -76,7 +78,7 @@ if ($_REQUEST['id']) {
 
     /* Check involved in subject */
     $groupHandler = new Group;
-    if (!$groupHandler->involvedInSubject($output['cid']) && !$groupHandler->involvedInGroup($_SESSION['id'], $output['cid'])) {
+    if (!$groupHandler->involvedInSubject($output['cid']) && !$groupHandler->involvedInGroup($_REQUEST['uid'], $output['cid'])) {
         exit();
     }
 

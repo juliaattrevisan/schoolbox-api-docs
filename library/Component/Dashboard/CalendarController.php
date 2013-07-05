@@ -126,7 +126,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 					$this->setVar(
 						'MODIFY',
 						'<a class="btn go-to float-left" href="/submission/submissionHistory/' .
-						$currentEvent->getSubmissionBoxId() .
+						$currentEvent->getSubmissionBoxId() . '/' . $_SESSION['id'] .
 						'"><span></span>' . $action . '</a>'
 					);
 				}

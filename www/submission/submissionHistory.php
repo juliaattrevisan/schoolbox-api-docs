@@ -37,6 +37,10 @@ $this->setBlock('work', 'work_grade', 'work_grade_block');
 $this->setBlock('history_marked', 'history_marked_hascomment', 'history_marked_hascomment_block');
 $this->setVar('teacher_block', '');
 
+if($this->arg[0] == false || $this->arg[1] == false) {
+	error(2);
+}
+
 use Schoolbox\Assessment\Component;
 $mapper = new Component\SubmissionBoxMapper();
 $work_mapper = new Component\SubmissionBox\WorkTypeMapper();
@@ -90,7 +94,12 @@ if (is_array($categoryList)) {
 
 /* Submission Box Details
  */
+
 $submission = $mapper->findById($this->arg[0]);
+
+if($submission == false)
+	error(17);
+
 $is_mark_shown = true;
 if ($groupHandler->isStudent() && !$submission->isMarkShownToStudents()) {
 	$is_mark_shown = false;

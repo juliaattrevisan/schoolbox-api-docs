@@ -82,7 +82,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
                 // what to display if student
                 if($this->groupHandler->isStudent()) {
-                    $actionURL = '/submission/submissionHistory/' . $submission['id'];
+                    $actionURL = '/submission/submissionHistory/' . $submission['id'] .'/'. $_SESSION['id'];
 
 
                     // if a mark has been given, regardless of all other detail, display "View Mark"

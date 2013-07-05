@@ -38,7 +38,7 @@ $j(function () {
 			is_assess = 1;
 		}
 
-		$j.post('/ajax/submission.php', { id : ev , is_assess: is_assess}, function (data) {
+		$j.post('/ajax/submission.php', { id : ev , uid : {WORK_USER_ID}, is_assess: is_assess}, function (data) {
 
             if (data !== null) {
 				var template = is_assess ? $j('#assess-popup-template') : $j('#duework-popup-template');
@@ -128,7 +128,7 @@ $j(function () {
                     <p class="comment">${description}</p>
                 {{/if}}
                 <p class="details clearfix">
-                <a class="btn modify float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a>
+                <a class="btn modify float-left" href="/submission/submissionHistory/${id}/${uid}"><span></span>${action}</a>
                 </p>
             </div>
             <div class="bottom"><strong></strong></div>
