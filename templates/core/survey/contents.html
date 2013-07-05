@@ -39,8 +39,16 @@ $j(function() {
 		stop: function(event, ui) {
 			var allQuestions = $j(this).find('li');
 
+			var data = new Array();
+
 			$j.each(allQuestions, function(index, element) {
-				console.log(element.id);
+				data.push(element.id);
+			});
+
+			/* Reorder questions upon reorder completion
+			 */
+			$j.post('/survey/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function(data) {
+				console.log(data);
 			});
 		}
 	});
