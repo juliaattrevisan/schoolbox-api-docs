@@ -83,7 +83,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 					'meta' => array(
 						'eventId' => $currentEvent->getEventId(),
 						'time' => $currentEvent->getTime(),
-						'detail' => $currentEvent->getDetail(),
+						'detail' => Scrub::html($currentEvent->getDetail()),
 						'location' => $currentEvent->getLocation(),
 						'eventType' => 'type' . $currentEvent->getType(),
 						'type' => $currentEvent->getEventType(),

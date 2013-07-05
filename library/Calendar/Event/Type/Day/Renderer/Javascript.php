@@ -186,7 +186,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 					'meta' => array(
 						'eventId' => $currentEvent->getEventId(),
 						'time' => $currentEvent->getTime(),
-						'detail' => Scrub::html(nl2br($currentEvent->getDetail())),
+						'detail' => Scrub::html($currentEvent->getDetail()),
 						'location' => Scrub::text($currentEvent->getLocation()),
 						'eventTypeId' => $currentEvent->getType(),
 						'eventType' => 'type' . $currentEvent->getType(),
