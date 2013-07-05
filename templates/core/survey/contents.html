@@ -14,7 +14,7 @@ $j(function() {
 
 
     $j('.show-section-options').click(function() {
-		$j(this).parent().siblings('.question-list').children(":first-child").slideToggle();
+		$j(this).parent().siblings('.sectionOptions').children(":first-child").slideToggle();
 		$j(this).toggleClass('active')
 		return false;
 	});
@@ -32,50 +32,65 @@ $j(function() {
 
 	});
 
+	/* Make questions sortable
+	 */
 
+	$j(".question-list").sortable({
+		stop: function(event, ui) {
+			var allQuestions = $j(this).find('li');
+
+			$j.each(allQuestions, function(index, element) {
+				console.log(element.id);
+			});
+		}
+	});
+
+	$j(".question-list" ).disableSelection();
 });
 </script>
 
 <h2>Manage Survey</h2>
-	<div class="pad-it ">
+<div class="pad-it">
+	<p class="clearfix tiny-btns no-marg">
+		<a class="btn add float-left marg" href="/survey/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
+		<a href="/survey/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
+	</p>
+	<p class="clearfix tiny-btns">
+		<a href="/survey/export/xml/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg" ><span></span>Export</a>
+		<a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Overview and dates</a>
+	</p>
 
-		<p class="clearfix tiny-btns no-marg">
-            <a class="btn add float-left marg" href="/survey/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
-            <a href="/survey/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
-        </p>
-        <p class="clearfix tiny-btns">
-            <a href="/survey/export/xml/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg" ><span></span>Export</a>
-            <a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Overview and dates</a>
-		</p>
+	<!-- BEGIN section -->
+	<div class="evaluation-section">
+		<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
 
-		<!-- BEGIN section -->
-		<div class="evaluation-section">
-			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
+		<ul class='sectionOptions'>
+			<li class="hide evaluation-section-options clearfix">
+				<a href="/survey/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
+				<a href="/survey/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
+			</li>
+		</ul>
 
-			<ul class="question-list">
+		<ul class="question-list" id='{SECTION_TITLE}'>
+			<!-- BEGIN question -->
+			<li id='question_{QUESTION_QUESTION_ID}'>
+				<strong>Q{QUESTION_SEQUENCE})</strong>
+				{QUESTION_QUESTION}
+				<a href="/survey/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
+				<a class="delete" href="/survey/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
+			</li>
+			<!-- END question -->
+		</ul>
 
-				<li class="hide evaluation-section-options clearfix">
-					<a href="/survey/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
-					<a href="/survey/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
-				</li>
-
-				<!-- BEGIN question -->
-				<li>
-					<strong>Q{QUESTION_SEQUENCE})</strong>
-					{QUESTION_QUESTION}
-					<a href="/survey/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
-					<a class="delete" href="/survey/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
-				</li>
-				<!-- END question -->
-				<li class="clearfix">
-					<p class="clearfix no-marg">
-						<a class="btn add marg" href="/survey/question/create/{SECTION_SECTION_ID}"><span></span>New Question</a>
-                        <a class="btn download marg" href="/survey/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}"><span></span>Import Question</a>
-					</p>
-				</li>
-			</ul>
-
-		</div>
-		<!-- END section -->
+		<ul>
+			<li class="clearfix">
+				<p class="clearfix no-marg">
+					<a class="btn add marg" href="/survey/question/create/{SECTION_SECTION_ID}"><span></span>New Question</a>
+					<a class="btn download marg" href="/survey/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}"><span></span>Import Question</a>
+				</p>
+			</li>
+		</ul>
 	</div>
+	<!-- END section -->
+</div>
 
