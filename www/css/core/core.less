@@ -4984,10 +4984,9 @@ ul.js_happening {
     position: absolute;
     width: 400px;
     display: none;
-    // Restore unordered list items bullet type
-    ul {
-        list-style-type: inherit;
-        margin-left: 2.5em;
+    &.wysiwyg {
+        padding: 0;
+        overflow: visible;
     }
 }
 
