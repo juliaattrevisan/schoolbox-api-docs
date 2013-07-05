@@ -170,8 +170,8 @@ class ICal_Creator {
 						$event = array(
 							'owner' => $this->getUid(),
 							'access' => 3,
-							'groupList' => array_map(array(Scrub, 'text'), $this->getGroupList()),
-							'campusList' => array_map(array(Scrub, 'text'), $this->getCampusList()),
+							'groupList' => array_map(array('Scrub', 'text'), $this->getGroupList()),
+							'campusList' => array_map(array('Scrub', 'text'), $this->getCampusList()),
 							'type' => 1,
 							'note' => $summary,
 							'detail' => $description,
