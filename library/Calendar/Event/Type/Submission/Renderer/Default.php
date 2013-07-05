@@ -35,7 +35,7 @@ class Calendar_Event_Type_Submission_Renderer_Default extends Calendar_Event_Typ
             $this->getPage()->setVar(
                 'MODIFY',
                 '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $currentEvent->getSubmissionBoxId(
-                ) . '"><span></span>' . $action . '</a>'
+                ) . '/'. $_SESSION['id'] . '"><span></span>' . $action . '</a>'
             );
         } else {
             if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {

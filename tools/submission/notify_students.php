@@ -113,6 +113,7 @@ function sendUpcomingNotifications($testRun) {
 							$due .= ' on ' . date('D, jS M', $stamp);
 
 							$dump->setVar('DUEWORK_ID',   $box['id']);
+							$dump->setVar('DUEWORK_UID',   $user['uid']);
 							$dump->setVar('DUEWORK_NAME', $box['name']);
 							$dump->setVar('DUEWORK_DATE', $due);
 							$dump->parse('due_work_block', 'due_work', true);
@@ -194,6 +195,7 @@ function sendOverdueNotifictions($testRun) {
 					'CATEGORY_NAME' => $category['name'],
 
 					'DUEWORK_ID'   => $dueWork['id'],
+					'DUEWORK_UID'   => $user['uid'],
 					'DUEWORK_NAME' => $dueWork['name'],
 					'DUEWORK_DATE' => $due
 				);
