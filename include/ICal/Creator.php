@@ -87,7 +87,7 @@ class ICal_Creator {
 
 		$v->setProperty('calscale', 'GREGORIAN');
 		$v->setProperty('method', 'PUBLISH');
-		$v->setProperty('X-WR-TIMEZONE', 'Australia/Melbourne');
+		$v->setProperty('X-WR-TIMEZONE', Cfg::get('date_timezone'));
 		$v->parse();
 		$v->sort();
 
@@ -156,7 +156,12 @@ class ICal_Creator {
 						/* dtstart required, one occurence, (orig. start date)
 						 */
 						$summary = $vevent->getProperty('summary');
-						$description = $vevent->getProperty('description');
+						//
+						// Description: \n needs to be replaced by real linebreaks
+						$description = strtr(
+							$vevent->getProperty('description'),
+							array('\n' => '<br />', '\N' => '<br />',)
+						);
 						$location = $vevent->getProperty('location');
 
 						$start = $this->decideTimes($year, $month, $day, $dtstart);
@@ -165,8 +170,8 @@ class ICal_Creator {
 						$event = array(
 							'owner' => $this->getUid(),
 							'access' => 3,
-							'groupList' => array_map(array(Scrub, 'text'), $this->getGroupList()),
-							'campusList' => array_map(array(Scrub, 'text'), $this->getCampusList()),
+							'groupList' => array_map(array('Scrub', 'text'), $this->getGroupList()),
+							'campusList' => array_map(array('Scrub', 'text'), $this->getCampusList()),
 							'type' => 1,
 							'note' => $summary,
 							'detail' => $description,

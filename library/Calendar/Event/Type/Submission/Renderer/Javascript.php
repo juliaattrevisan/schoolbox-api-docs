@@ -90,7 +90,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 					'meta' => array(
 						'eventId' => $currentEvent->getEventId(),
 						'time' => $currentEvent->getTime(),
-						'detail' => Scrub::text($currentEvent->getDetail()),
+						'detail' => Scrub::html($currentEvent->getSubmissionBoxDetail()),
 						'location' => Scrub::text($currentEvent->getLocation()),
 						'eventType' => 'type' . $currentEvent->getType(),
 						'type' => $currentEvent->getEventType(),

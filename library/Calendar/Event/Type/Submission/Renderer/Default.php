@@ -59,7 +59,7 @@ class Calendar_Event_Type_Submission_Renderer_Default extends Calendar_Event_Typ
                 'LOCATION' => '',
                 'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
                 'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
-                'DETAIL' => Scrub::text($currentEvent->getSubmissionBoxDetail()),
+                'DETAIL' => Scrub::html($currentEvent->getSubmissionBoxDetail()),
                 /* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
                  */
                 'EVENT_TYPE' => 'submission',
