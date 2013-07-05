@@ -131,7 +131,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 						'startTime' => $start_time,
 						'endTime' => $finish_time,
 						'note' => $name,
-						'detail' => $detail,
+						'detail' => nl2br($detail),
 						'location' => $location,
 						'allday' => $all_day,
 
