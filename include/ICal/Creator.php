@@ -156,7 +156,12 @@ class ICal_Creator {
 						/* dtstart required, one occurence, (orig. start date)
 						 */
 						$summary = $vevent->getProperty('summary');
-						$description = $vevent->getProperty('description');
+						//
+						// Description: \n needs to be replaced by real linebreaks
+						$description = strtr(
+							$vevent->getProperty('description'),
+							array('\n' => '<br />', '\N' => '<br />',)
+						);
 						$location = $vevent->getProperty('location');
 
 						$start = $this->decideTimes($year, $month, $day, $dtstart);
