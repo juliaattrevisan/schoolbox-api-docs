@@ -34,7 +34,10 @@ class FileTest extends TestCase {
 
 		//
 		// Mock the mimetype loader too.
-		$mock_mimetype = $this->getMock(get_class($this->object->getMimetypeLoader()));
+		$mock_mimetype = $this->getMock(
+			get_class($this->object->getMimetypeLoader()),
+			array('getMimetypeForFilename', 'getIconForFilename')
+		);
 		$mock_mimetype
 			->expects($this->any())
 			->method('getMimetypeForFilename')

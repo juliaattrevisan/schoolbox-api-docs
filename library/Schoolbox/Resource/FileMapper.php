@@ -106,6 +106,8 @@ class FileMapper extends Mapper {
 			'updated_timestamp' => true,
 		));
 
+		$this->hasSoftDeleteBooleanField('deleted');
+
 		$this->hasJoin('user', array(
              'mapper'    => '\\Schoolbox\\UserMapper',
              'this_key'  => 'owner',

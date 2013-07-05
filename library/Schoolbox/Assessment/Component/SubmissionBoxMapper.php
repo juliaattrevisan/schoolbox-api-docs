@@ -220,6 +220,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'box_id',
 		));
 
+		$this->hasSoftDeleteBooleanField('deleted');
+
 		$this
 			->registerCallback('preSave',  array($this, 'preSave'))
 			->registerCallback('postSave', array($this, 'postSave'))
@@ -261,9 +263,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
 			$submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
 		}
-
-		//
-		// TODO get submission history for a user as part of submission (or of user?)
 
 		if ($submission_box instanceof SubmissionBox) {
 			foreach ($notify_mapper->findByColumn('box_id', $submission_box->getId()) as $notify) {
@@ -337,21 +336,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		}
 	}
 
-	/**
-	 * @param SubmissionBox $object
-	 * @param bool          $hard_delete
-	 *
-	 * @return bool
-	 */
-	public function delete($object, $hard_delete = false) {
-		if ($hard_delete) {
-			return parent::delete($object);
-		}
-		$query     = "UPDATE {$this->getTable()} SET deleted=TRUE WHERE id=?";
-		$statement = $this->database->prepare($query);
-		return $statement->execute(array($object->getId()));
-	}
-
 
 	/**
 	 * Conversion of SubmissionBoxHandler->getAllYearsByUser().
@@ -423,6 +407,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				LEFT JOIN student_submission ss ON ss.box_id = sb.id
 				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
 				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
+				AND sb.deleted IS FALSE
 				AND (
 					(YEAR(ss.submitted) = :year AND MONTH(ss.submitted) BETWEEN :month_start AND :month_end)
 					OR
@@ -530,6 +515,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.open_date < NOW()
+					AND sb.deleted IS FALSE
 					ORDER BY sb.open_date DESC
 					LIMIT :limit
 				",
@@ -551,6 +537,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sm.id IS NULL
 					AND sb.date < NOW()
+					AND sb.deleted IS FALSE
 					ORDER BY sb.date DESC
 					LIMIT :limit
 				",
@@ -568,6 +555,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.late_date < NOW()
+					AND sb.deleted IS FALSE
 					ORDER BY sb.late_date DESC
 					LIMIT :limit
 				",
@@ -687,6 +675,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$where_parts = array(
 			'sb.late_date > NOW()',
 			'sb.accept_submission IS TRUE',
+			'sb.deleted IS FALSE',
 		);
 		if ($cat_ids) {
 			$params        = $this->getArrayParameters($cat_ids, 'cat');

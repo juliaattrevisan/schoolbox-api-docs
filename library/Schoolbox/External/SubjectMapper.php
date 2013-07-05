@@ -50,8 +50,6 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 	/**
 	 * Retrieves subject by Schoolbox ID.
 	 *
-	 * @todo Move to Category mapper.
-	 *
 	 * @param int $id
 	 * @return mixed
 	 */
@@ -76,11 +74,6 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 	 */
 	public function findAllForStudent(\Schoolbox\User $user) {
 		$subjects = $this->external_user->getSubjectList($user->getExternalId(), $user->getId());
-		//
-		// Get list of subjects by code.
-		// There could be 0 or 1 category for a subject.
-		// TODO: write a mapper for categories.
-		// CategoryMapper->getByCode($subject['code']);
 		$category_statement = $this->database->prepare('
 			SELECT c.id, GROUP_CONCAT(co.code) AS code
 			FROM category c
