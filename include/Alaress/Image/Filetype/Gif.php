@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Filetype_Gif implements Alaress_Image_Filetype_Interface {
+class Alaress_Image_Filetype_Gif extends Alaress_Image_Filetype_Abstract {
 
     /**
      * Create an image
@@ -15,8 +15,11 @@ class Alaress_Image_Filetype_Gif implements Alaress_Image_Filetype_Interface {
      * @param $filename
      * @return resource
      */
-    public function create($filename) {
-        return imagecreatefromgif($filename);
+    public function loadImageResource($filename) {
+        //
+        // Sadly silence operator is needed for all imagecreatefrom* methods,
+        // otherwise error output corrupts image output.
+        return @imagecreatefromgif($filename);
     }
 
     /**

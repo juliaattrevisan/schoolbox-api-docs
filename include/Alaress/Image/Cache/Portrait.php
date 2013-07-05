@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Cache_Portrait {
+class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
 
     /* The image to load
       */
@@ -74,33 +74,37 @@ class Alaress_Image_Cache_Portrait {
         $this->setPlaceholder(WEB_root . '/images/core/placeholder.png');
         $this->setCacheLocation(Cfg::get('stream_dir').'/portrait');
 
-        $this->decidePlaceholder();
+        $this->loadPortraitPath();
     }
 
     /**
-     * Decide whether or not to use a placeholder
+     * Loads the path for this user's portrait.
+     *
+     * @throws Exception_Schoolbox_NotFound     if the portrait wasn't found
+     * @throws Exception_Schoolbox_AccessDenied if the current user doesn't have
+     *                                          permission to view portrait of
+     *                                          this user
      */
-    private function decidePlaceholder() {
-
-        /* Use placeholder by default
-           */
-        $portraitPath = $this->getPlaceholder();
+    private function loadPortraitPath() {
 
         /* If you are able to view this portrait, try finding image file
            * Otherwise use a placeholder image instead
            */
         if ($this->canViewImage()) {
-            $portraitPathExists = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
+            $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
 
             /* If the portrait path exists, use it
                 */
-            if ($portraitPathExists) {
-                $portraitPath = $portraitPathExists;
+            if ($portraitPath) {
+                $this->setFilename($portraitPath);
             }
-
+            else {
+                throw new Exception_Schoolbox_NotFound('Portrait not found');
+            }
         }
-
-        $this->setFilename($portraitPath);
+        else {
+            throw new Exception_Schoolbox_AccessDenied('Cannot view image');
+        }
     }
 
     /**
@@ -156,6 +160,7 @@ class Alaress_Image_Cache_Portrait {
     /**
      * Load an image by an id
      *
+     * @throws Exception_Schoolbox_NotFound if file isn't found
      * @return mixed
      */
     public function load() {
@@ -197,7 +202,7 @@ class Alaress_Image_Cache_Portrait {
             return $this->standardise($info);
         }
         else {
-            die('Could not read file.');
+            throw new Exception_Schoolbox_NotFound(sprintf('Could not read file "%s"', $this->getFilename()));
         }
     }
 
@@ -367,7 +372,7 @@ class Alaress_Image_Cache_Portrait {
     /**
      * Set external handler
      *
-     * @param $externalHandler
+     * @param External_User $externalHandler
      */
     private function setExternalHandler($externalHandler) {
         $this->externalHandler = $externalHandler;
@@ -376,7 +381,7 @@ class Alaress_Image_Cache_Portrait {
     /**
      * Get external handler
      *
-     * @return null
+     * @return External_User
      */
     private function getExternalHandler() {
         return $this->externalHandler;

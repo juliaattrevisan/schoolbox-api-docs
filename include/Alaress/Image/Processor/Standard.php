@@ -25,7 +25,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      *
      * Supports chained methods
      *
-     * @return \Alaress_Image_Processor
+     * @return $this
      */
     public function load() {
         $imageArray = $this->getCache()->load();
@@ -54,7 +54,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      *
      * @param $strategy
      * @param null $args
-     * @return \Alaress_Image_Processor
+     * @return $this
      */
     private function loadProcessorStrategy($strategy, $args = null) {
         $strategyName = $this->getProcessorStrategyPrefix() . $strategy;
@@ -72,7 +72,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      *
      * Supports chained methods
      *
-     * @return \Alaress_Image_Processor
+     * @return $this
      */
     private function manipulate() {
         $manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
@@ -87,7 +87,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      * Otherwise transformations were done previously and saved, and we can skip
      * this step entirely
      *
-     * @return \Alaress_Image_Processor
+     * @return $this
      */
     public function transformAll() {
 
@@ -117,7 +117,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      *
      * @param $strategy
      * @param null $args
-     * @return Alaress_Image_Processor
+     * @return $this
      */
     public function transform($strategy, $args = null) {
         $this->loadProcessorStrategy($strategy, $args);
@@ -138,7 +138,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
 
     /**
      * Saves the transformed image
-     * @return Alaress_Image_Processor
+     * @return $this
      */
     public function save() {
         $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->getCachedFileLocation());

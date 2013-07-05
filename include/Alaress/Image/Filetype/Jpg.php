@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Filetype_Jpg implements Alaress_Image_Filetype_Interface {
+class Alaress_Image_Filetype_Jpg extends Alaress_Image_Filetype_Abstract {
     private $quality = 90;
 
     /**
@@ -16,8 +16,8 @@ class Alaress_Image_Filetype_Jpg implements Alaress_Image_Filetype_Interface {
      * @param $filename
      * @return resource
      */
-    public function create($filename) {
-        return imagecreatefromjpeg($filename);
+    public function loadImageResource($filename) {
+        return @imagecreatefromjpeg($filename);
     }
 
     /**

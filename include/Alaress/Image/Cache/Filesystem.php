@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Cache_Filesystem {
+class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 
 	/* The image to load
 	 */
@@ -49,11 +49,13 @@ class Alaress_Image_Cache_Filesystem {
 	public function __construct($filename, $key) {
 		$this->setFilename($filename);
 		$this->setKey($key);
+		$this->setCacheLocation(Cfg::get('thumbnail_dir'));
 	}
 
 	/**
 	 * Load an image by an id
 	 *
+	 * @throws Exception_Schoolbox_NotFound if file isn't found
 	 * @return mixed
 	 */
 	public function load() {
@@ -93,7 +95,7 @@ class Alaress_Image_Cache_Filesystem {
 			return $this->standardise($info);
 		}
 		else {
-			die('Could not read file.');
+			throw new Exception_Schoolbox_NotFound(sprintf('Could not read file "%s"', $this->getFilename()));
 		}
 	}
 

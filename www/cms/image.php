@@ -11,7 +11,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 /* Preserve old checks
  */
-$page = new SitePage();
+session_start();
 
 if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
     $db = DeprecatedDatabase::getInstance();
@@ -27,11 +27,11 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 		$groupHandler = new Group();
 
 		if ($groupHandler->getPermission($imageInfo['category']) < READ_ACCESS) {
-			error(5);
+			SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
 		}
 	}
 	else {
-		error(5);
+		SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
 	}
 }
 
@@ -44,4 +44,12 @@ $cache = new Alaress_Image_Cache_Image($_GET['id'], $key);
 /* Process and stream image
  */
 $imageProcessor = new Alaress_Image_Processor_Freeform($cache, new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']));
-$imageProcessor->load()->transformAll()->stream();
+try {
+	$imageProcessor->load()->transformAll()->stream();
+}
+catch (Exception_Schoolbox_NotFound $e) {
+	SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
+}
+catch (Exception $e) {
+	SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
+}

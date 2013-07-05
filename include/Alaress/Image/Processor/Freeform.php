@@ -15,11 +15,18 @@
 class Alaress_Image_Processor_Freeform extends Alaress_Image_Processor_Standard {
 
 	/**
+	 * The transform key to use, defaults to "Constrain".
+	 *
+	 * @var string
+	 */
+	protected $transform_key = 'Constrain';
+
+	/**
 	 * Perform all transformations if we didn't load an image from the cache.
 	 * Otherwise transformations were done previously and saved, and we can skip
 	 * this step entirely
 	 *
-	 * @return \Alaress_Image_Processor
+	 * @return $this
 	 */
 	public function transformAll() {
 
@@ -32,7 +39,7 @@ class Alaress_Image_Processor_Freeform extends Alaress_Image_Processor_Standard 
 			 * or rammed into the constructor as an additional param, if you want
 			 * other parameterised transformation definitions.
 			 */
-			$allTransformations = $this->getTransformations()->retrieve('Constrain');
+			$allTransformations = $this->getTransformations()->retrieve($this->getTransformKey());
 
 			/* Do it
 			 */
@@ -42,5 +49,21 @@ class Alaress_Image_Processor_Freeform extends Alaress_Image_Processor_Standard 
 		}
 
 		return $this;
+	}
+
+	/**
+	 * @param  string $transform_key
+	 * @return $this
+	 */
+	public function setTransformKey($transform_key) {
+		$this->transform_key = $transform_key;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTransformKey() {
+		return $this->transform_key;
 	}
 }
