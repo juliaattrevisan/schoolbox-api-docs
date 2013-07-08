@@ -62,6 +62,10 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
+	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+		    return false;
+	    }
+
         $this->setBlock($templateHandle, 'forum', 'forum_block');
         $this->setBlock($templateHandle, 'forum_post', 'forum_post_block');
         $this->setBlock('forum', 'forum_reply', 'forum_reply_block');
