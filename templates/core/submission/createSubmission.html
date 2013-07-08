@@ -393,10 +393,17 @@
 			var file_id = link.data('file_id');
 			var box_id  = link.data('box_id');
 			var row     = link.closest('.existing_file');
+			//
+			// Send to file delete form
 			$j.post(
 				$j(this).attr('href'),
 				{file_id: file_id, box_id: box_id},
 				function(data) {
+					//
+					// Old file: remove from fileID element too
+					if (file_id === 'old') {
+						$j('input[name="fileId"]').val('');
+					}
 					if (!data.success) {
 						alert('Error: '+data.message);
 					}

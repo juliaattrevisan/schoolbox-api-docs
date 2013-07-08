@@ -177,19 +177,29 @@ foreach(array('overdue', 'upcoming', 'returned') as $i) {
 }
 
 // create new
-if($action == 'create') {
-	$submission->setCategory($categoryID);
-	$submission->setOwner($_SESSION['id']);
-	$mapper->save($submission);
-	$submissionBoxID = $submission->getId();
+try {
+	if($action == 'create') {
+		$submission->setCategory($categoryID);
+		$submission->setOwner($_SESSION['id']);
+		$mapper->save($submission);
+		$submissionBoxID = $submission->getId();
+	}
+	// update existing
+	elseif($action == 'update') {
+		$mapper->save($submission);
+	}
+	// something happened that shouldn't have
+	else {
+		error(105);
+	}
 }
-// update existing
-elseif($action == 'update') {
-	$mapper->save($submission);
-}
-// something happened that shouldn't have
-else {
-    error(15);
+catch (Schoolbox\Resource\Exception $e) {
+	if ($e->getCode() == Schoolbox\Resource\Exception::CODE_COPY_TO_STORAGE_FAILED) {
+		error(105, 'The attached file could not be processed - try deleting it and re-attaching it.');
+	}
+	else {
+		error(105);
+	}
 }
 
 // persist rubric data
