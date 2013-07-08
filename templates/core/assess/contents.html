@@ -26,55 +26,81 @@ $j(function() {
 		$this.children('span').stop(true, true).fadeOut("fast", function() {
 			$this.removeAttr('style');
 		});
-
 	});
 
+	/* Make questions sortable
+	 */
+	$j(".question-list").sortable({
+		stop: function(event, ui) {
+			var allQuestions = $j(this).find('li');
+			var section = $j(this).attr('id');
+			var data = new Array();
 
+			$j.each(allQuestions, function(index, element) {
+				data.push(element.id);
+			});
+
+			/* Reorder questions upon reorder completion
+			 */
+			$j.post('/assess/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function(data) {
+				var sequence = 1;
+
+				$j.each($j('#' + section).find('li'), function(index, element) {
+					$j(element).find('strong').html('Q' + sequence);
+					sequence++;
+				});
+			});
+		}
+	});
+
+	$j(".question-list" ).disableSelection();
 });
 </script>
 
 <h2>Manage Assessment</h2>
-	<div class="pad-it">
+<div class="pad-it">
 
-		<p class="clearfix tiny-btns">
-            <a class="btn add float-left marg tiny" href="/assess/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
-            <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg tiny" ><span></span>Modify</a>
-            <a href="/assess/export/xml/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg tiny" ><span></span>Export</a>
+	<p class="clearfix tiny-btns">
+		<a class="btn add float-left marg tiny" href="/assess/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
+		<a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg tiny" ><span></span>Modify</a>
+		<a href="/assess/export/xml/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg tiny" ><span></span>Export</a>
 
-            <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg tiny" ><span></span>Delete</a>
-			<a class="btn float-left marg tiny" href="/assess/summary/{ASSESS_ASSESS_ID}"><span></span>View summary</a>
+		<a href="/assess/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg tiny" ><span></span>Delete</a>
+		<a class="btn float-left marg tiny" href="/assess/summary/{ASSESS_ASSESS_ID}"><span></span>View summary</a>
+	</p>
 
-		</p>
+	<!-- BEGIN section -->
+	<div class="evaluation-section">
+		<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
 
-		<!-- BEGIN section -->
-		<div class="evaluation-section">
-			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
+		<ul class='sectionOptions'>
+			<li class="hide evaluation-section-options clearfix">
+				<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
+				<a href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
+			</li>
+		</ul>
 
-			<ul class="question-list">
+		<ul class="question-list" id='section{SECTION_SECTION_ID}'>
+			<!-- BEGIN question -->
+			<li id='question_{QUESTION_QUESTION_ID}'>
+				<strong>Q{QUESTION_SEQUENCE})</strong>
+				{QUESTION_QUESTION} - ({QUESTION_MARKS} marks)
+				<a href="/assess/question/export/{QUESTION_QUESTION_ID}">Export</a> |
+				<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
+				<a class="delete" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
+			</li>
+			<!-- END question -->
+		</ul>
 
-				<li class="hide evaluation-section-options clearfix">
-					<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
-					<a href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
-				</li>
-
-				<!-- BEGIN question -->
-				<li>
-					<strong>Q{QUESTION_SEQUENCE})</strong>
-					{QUESTION_QUESTION} - ({QUESTION_MARKS} marks)
-					<a href="/assess/question/export/{QUESTION_QUESTION_ID}">Export</a> |
-					<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
-					<a class="delete" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
-				</li>
-				<!-- END question -->
-				<li class="clearfix">
-					<p class="clearfix no-marg">
-						<a class="btn add marg" href="/assess/question/create/{SECTION_SECTION_ID}"><span></span>New Question</a>
-                        <a class="btn download marg" href="/assess/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}"><span></span>Import Question</a>
-					</p>
-				</li>
-			</ul>
-
-		</div>
-		<!-- END section -->
+		<ul>
+			<li class="clearfix">
+				<p class="clearfix no-marg">
+					<a class="btn add marg" href="/assess/question/create/{SECTION_SECTION_ID}"><span></span>New Question</a>
+					<a class="btn download marg" href="/assess/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}"><span></span>Import Question</a>
+				</p>
+			</li>
+		</ul>
 	</div>
+	<!-- END section -->
+</div>
 

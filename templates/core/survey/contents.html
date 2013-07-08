@@ -11,8 +11,6 @@ $j(function() {
   		}
 	});
 
-
-
     $j('.show-section-options').click(function() {
 		$j(this).parent().siblings('.sectionOptions').children(":first-child").slideToggle();
 		$j(this).toggleClass('active')
@@ -29,12 +27,10 @@ $j(function() {
 		$this.children('span').stop(true, true).fadeOut("fast", function() {
 			$this.removeAttr('style');
 		});
-
 	});
 
 	/* Make questions sortable
 	 */
-
 	$j(".question-list").sortable({
 		stop: function(event, ui) {
 			var allQuestions = $j(this).find('li');
