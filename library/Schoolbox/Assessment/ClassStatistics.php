@@ -59,8 +59,10 @@ class ClassStatistics {
 
 	/**
 	 * @param Category $category
+	 * @param int $year
+	 * @param int $semester
 	 */
-	public function __construct(Category $category) {
+	public function __construct(Category $category, $year = 0, $semester = 0) {
 		$this->category = $category;
 
 		// compile the due work, assessments, marks returned, et al
@@ -74,7 +76,29 @@ class ClassStatistics {
 		// retrieve ALL the submission boxes for this category
 		$boxCollection = $this->submissionBoxMapper->findByColumn('category', $this->getCategory()->getId());
 		foreach($boxCollection as $box) {
-			$this->addWork($box);
+			/**
+			 * @var $box SubmissionBox
+			 */
+			$due = $box->getDueDate();
+			$dueYear = $due->getUsingFormat('Y');
+			$dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
+
+			// if year (and possibly also semester) are given, filter dates
+			if($year) {
+				if($dueYear == $year) {
+					if($semester) {
+						if($dueSemester == $semester) {
+							$this->addWork($box);
+						}
+					}
+					else {
+						$this->addWork($box);
+					}
+				}
+			}
+			else {
+				$this->addWork($box);
+			}
 		}
 
 		// retrieve ALL the online assessments (not surveys) for this category

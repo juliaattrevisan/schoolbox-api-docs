@@ -72,7 +72,7 @@ class StudentReportCard {
 
 		// setup helper vars
 		$this->currentYear = date('Y');
-		$this->currentSemester = date('M') > 6 ? 2 : 1;
+		$this->currentSemester = date('m') > 6 ? 2 : 1;
 	}
 
 	/**
@@ -156,10 +156,14 @@ class StudentReportCard {
 	 * @param $subjectId
 	 */
 	public function setSubject($subjectId) {
+		$this->setSubjectWithinSemester($subjectId, 0, 0);
+	}
+
+	public function setSubjectWithinSemester($subjectId) {
 		$this->targetCategoryId = $subjectId;
 
 		// populate data for the subject using the category and user
-		$this->subjectData = new SubjectReportCard($subjectId, $this->targetUserId);
+		$this->subjectData = new SubjectReportCard($subjectId, $this->targetUserId, $this->targetYear, $this->targetSemester);
 	}
 
 	/**

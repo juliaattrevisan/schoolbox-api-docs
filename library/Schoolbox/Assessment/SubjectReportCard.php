@@ -47,12 +47,18 @@ class SubjectReportCard {
 	protected $_assessments;
 	protected $_comments;
 
+	protected $targetYear;
+	protected $targetSemester;
 
-	public function __construct($categoryId, $userId) {
+
+	public function __construct($categoryId, $userId, $year = 0, $semester = 0) {
 
 		// dependencies
 		$catMap = new CategoryMapper();
 		$uMap = new UserMapper();
+
+		$this->targetYear = $year;
+		$this->targetSemester = $semester;
 
 		// TODO check (somehow) that user is (or was) a member of this category
 
@@ -60,7 +66,7 @@ class SubjectReportCard {
 		$this->category = $catMap->findById($categoryId);
 		$this->user = $uMap->findById($userId);
 
-		$this->_fullClassHistory = new ClassStatistics($this->getCategory());
+		$this->_fullClassHistory = new ClassStatistics($this->getCategory(), $year, $semester);
 	}
 
 
@@ -126,8 +132,14 @@ class SubjectReportCard {
 			// Ensure that grades are properly ordered by date.
 			$studentGrades = array_merge(
 //				$returnMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array('visibility' => $visibilities)),
-				$returnMapper->getStudentMarks($this->category->getId(), $this->user->getId()),
-				$assessMapper->getStudentMarks($this->category->getId(), $this->user->getId())
+				$returnMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
+					'year' => $this->targetYear,
+					'semester' => $this->targetSemester
+				)),
+				$assessMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
+					'year' => $this->targetYear,
+					'semester' => $this->targetSemester
+				))
 			);
 
 			usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
