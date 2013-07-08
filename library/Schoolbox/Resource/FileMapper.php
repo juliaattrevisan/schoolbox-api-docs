@@ -119,15 +119,22 @@ class FileMapper extends Mapper {
 	 * Copies this file to the storage engine, or returns the existing copy if
 	 * it's already there.
 	 *
-	 * @param File $file The file object to copy to storage.
-	 *
+	 * @param  File $file The file object to copy to storage.
+	 * @throws Exception If the file stored in $file can't be loaded.
 	 * @return Storage The new storage item or existing item.
 	 */
 	public function copyToStorage(File $file) {
-		$storage = $this->storage_mapper->createModel();
+		$location = $file->getFileLocation();
+		if (!(is_file($location) && is_readable($location))) {
+			throw new Exception(
+				'The file could not be loaded - try deleting it and re-attaching it.',
+				Exception::CODE_COPY_TO_STORAGE_FAILED
+			);
+		}
+		$storage  = $this->storage_mapper->createModel();
 		$storage
 			->setFilename($file->getFilename())
-			->setTempLocation($file->getFileLocation())
+			->setTempLocation($location)
 			->setUploadedBy($file->getOwner());
 		$storage->loadHashFromTempLocation();
 		$storage->loadMimetypeFromFilename();
