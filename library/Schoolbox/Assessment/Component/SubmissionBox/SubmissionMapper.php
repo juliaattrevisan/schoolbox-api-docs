@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Resource\Exception;
 use \External_User;
 
 class SubmissionMapper extends Schoolbox\Mapper {
@@ -287,7 +288,10 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		// Are online submissions accepted?
 		$submission_box = $submission->getSubmissionBox();
 		if (!$submission_box->getAcceptOnline()) {
-			throw new Schoolbox\Resource\Exception('This submission box does not accept online submission.');
+			throw new Exception(
+				'This submission box does not accept online submission.',
+				Exception::CODE_NO_ONLINE_SUBMISSION
+			);
 		}
 
 		//
@@ -300,14 +304,20 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		$count_statement->execute(array($box_id, $user_id));
 		$submitted = ($count_statement->rowCount() > 0);
 		if ($submitted && !$submission_box->getAcceptMultiple()) {
-			throw new Schoolbox\Resource\Exception('This submission box does not accept multiple submissions.');
+			throw new Exception(
+				'This submission box does not accept multiple submissions.',
+				Exception::CODE_NO_MULTIPLE_SUBMISSION
+			);
 		}
 
 		//
 		// Is the submission late (after overdue time)?
 		$now = new \DateTime('now');
 		if ($submission_box->getLateDate()->getUnixTimestamp() < $now->getTimestamp()) {
-			throw new Schoolbox\Resource\Exception('This submission box no longer accepts submissions.');
+			throw new Exception(
+				'This submission box no longer accepts submissions.',
+				Exception::CODE_SUBMISSION_CLOSED
+			);
 		}
 
 		//
@@ -322,13 +332,16 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		if (!in_array($submission_box->getCategory()->getId(), $categories)) {
 			//
 			// 403 forbidden error
-			throw new Schoolbox\Resource\Exception('Access denied');
+			throw new Exception('Access denied', Exception::CODE_ACCESS_DENIED);
 		}
 
 		//
 		// Is the submission early (before open time)?
 		if ($submission_box->getOpenDate()->getUnixTimestamp() > $now->getTimestamp()) {
-			throw new Schoolbox\Resource\Exception('This submission box does not accept submissions yet.');
+			throw new Exception(
+				'This submission box does not accept submissions yet.',
+				Exception::CODE_SUBMISSION_NOT_YET_OPEN
+			);
 		}
 		return true;
 	}
