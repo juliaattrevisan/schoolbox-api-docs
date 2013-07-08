@@ -34,9 +34,9 @@ if (is_numeric($_GET['id'])) {
 
 		// Allow file return owner, parent of owner or all staff access to this file
 		$groupHandler = new Group;
-		if (!(
-			$return->getOwner()->getId() == $_SESSION['id']
-			|| $groupHandler->isParentOfChild($return['owner'])
+		$owner        = $return->getOwner()->getId();
+		if (!($owner == $_SESSION['id']
+			|| $groupHandler->isParentOfChild($owner)
 			|| $groupHandler->isStaff()
 		)) {
 			error(44);
