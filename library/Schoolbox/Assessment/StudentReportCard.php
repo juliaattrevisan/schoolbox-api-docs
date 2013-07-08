@@ -80,7 +80,7 @@ class StudentReportCard {
 	 */
 	protected function establishPermissions() {
 
-		$allowClassAverage = \Cfg::get('display_grade_average');
+		$allowClassAverage = \Cfg::get('display_grade_average') ? true : false;
 
 		// if viewing own, all permissions enabled
 		if($this->viewingUserId == $this->targetUserId) {
