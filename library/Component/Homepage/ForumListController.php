@@ -62,18 +62,13 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
-	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
-		    return false;
-	    }
+        if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+            return false;
+        }
 
         $this->setBlock($templateHandle, 'forum', 'forum_block');
         $this->setBlock($templateHandle, 'forum_post', 'forum_post_block');
         $this->setBlock('forum', 'forum_reply', 'forum_reply_block');
-
-        $this->setVar('forum_post_block', '');
-        if ($is_post_allowed) {
-            $this->parse('forum_post_block', 'forum_post');
-        }
 
         // Set up component name
         $this->setVar(array(
@@ -82,6 +77,11 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             'COMPONENT_HANDLE'          => strtolower($templateHandle),
             'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Forum',
         ));
+
+        $this->setVar('forum_post_block', '');
+        if ($is_post_allowed) {
+            $this->parse('forum_post_block', 'forum_post');
+        }
 
         /* Prevent multiple forum entries from other categories stacking up in the wrong place
          * and initialise empty forum roll by default
