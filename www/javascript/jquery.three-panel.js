@@ -86,16 +86,20 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             if(meta.type) {
                 threePanel.folderDetail.find('p.type').show()
                 threePanel.folderDetail.find('span.type').html(meta.type + ' Group')
+                var pending_element = threePanel.folderDetail.find('.pending');
+                var join_element    = threePanel.folderDetail.find('.join-btn');
                 switch(meta.joinable) {
                     case 2: // pending approval
-                        threePanel.folderDetail.find('.pending').show()
-                        // no break
+                        join_element.hide().parent().data('id','')
+                        pending_element.show()
+                        break
                     case 0: // not joinable
-                        threePanel.folderDetail.find('.join-btn').hide().parent().data('id','')
+                        join_element.hide().parent().data('id','')
+                        pending_element.hide()
                         break
                     case 1: // joinable
-                        threePanel.folderDetail.find('.join-btn').show().parent().data('id', meta.id)
-                        threePanel.folderDetail.find('.pending').hide()
+                        join_element.show().parent().data('id', meta.id)
+                        pending_element.hide()
                         break
                 }
             }
