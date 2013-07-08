@@ -72,7 +72,7 @@ class StudentReportCard {
 
 		// setup helper vars
 		$this->currentYear = date('Y');
-		$this->currentSemester = date('M') > 6 ? 2 : 1;
+		$this->currentSemester = date('m') > 6 ? 2 : 1;
 	}
 
 	/**

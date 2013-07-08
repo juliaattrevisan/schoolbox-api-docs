@@ -45,7 +45,7 @@ if(isset($this->arg[2])) {
 	}
 }
 else {
-	$semester = date('M') > 6 ? 2 : 1;
+	$semester = date('m') > 6 ? 2 : 1;
 }
 
 $subject = isset($this->arg[3]) ? $this->arg[3] : false;
