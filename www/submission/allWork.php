@@ -119,7 +119,7 @@ $report = new StudentReportCard($userId);
 $report->setSemester($year, $semester);
 
 if($subject) {
-	$report->setSubject($subject);
+	$report->setSubjectWithinSemester($subject);
 }
 else {
 	$this->setVar(array(

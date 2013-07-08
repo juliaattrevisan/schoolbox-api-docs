@@ -156,10 +156,14 @@ class StudentReportCard {
 	 * @param $subjectId
 	 */
 	public function setSubject($subjectId) {
+		$this->setSubjectWithinSemester($subjectId, 0, 0);
+	}
+
+	public function setSubjectWithinSemester($subjectId) {
 		$this->targetCategoryId = $subjectId;
 
 		// populate data for the subject using the category and user
-		$this->subjectData = new SubjectReportCard($subjectId, $this->targetUserId);
+		$this->subjectData = new SubjectReportCard($subjectId, $this->targetUserId, $this->targetYear, $this->targetSemester);
 	}
 
 	/**
