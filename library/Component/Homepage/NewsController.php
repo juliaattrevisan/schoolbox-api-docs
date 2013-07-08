@@ -59,7 +59,11 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'news', 'news_block');
+	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+		    return false;
+	    }
+
+	    $this->setBlock($templateHandle, 'news', 'news_block');
         $this->setBlock($templateHandle, "submit_news", "submit_news_block");
         $this->setBlock('news', "has_publish_date", "has_publish_date_block");
 

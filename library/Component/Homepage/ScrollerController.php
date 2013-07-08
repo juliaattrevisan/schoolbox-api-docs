@@ -58,7 +58,11 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
+	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+		    return false;
+	    }
+
+	    $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
         $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 

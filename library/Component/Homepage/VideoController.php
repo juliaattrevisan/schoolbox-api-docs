@@ -12,6 +12,13 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 	 */
 	protected $outputList;
 
+	/**
+	 * Source category for this component.
+	 *
+	 * @var int
+	 */
+	protected $source_category_id;
+
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -25,6 +32,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 		if (empty($source)) {
 			$source = $this->getContext('id');
 		}
+		$this->source_category_id = $source;
 		if($this->getConfig('size') > 1)
 			$this->outputList = $videoResourceMapper->findByCategory($source, $this->getConfig('size')-1);
 		else if($this->getConfig('size') == 0)
@@ -46,6 +54,11 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
      */
     public function renderTemplate($templateHandle) {
         if(!parent::loadTemplate($templateHandle, 'video')) {
+            return false;
+        }
+
+        $group_handler = new Group();
+        if ($group_handler->getPermission($this->source_category_id) < READ_ACCESS) {
             return false;
         }
 

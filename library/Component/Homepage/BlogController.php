@@ -64,8 +64,9 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         }
         $this->parseConfig();
 
-
-
+		if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+			return false;
+		}
 
         $this->setBlock($templateHandle, 'blog', 'blog_block');
         $this->setBlock($templateHandle, 'submit', 'submit_block');

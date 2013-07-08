@@ -60,7 +60,11 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         $this->parseConfig();
 
-        // Set up component name
+	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+		    return false;
+	    }
+
+	    // Set up component name
         $this->setVar(
             array(
                 // These are for the Select Alternate Source resourcebrowser

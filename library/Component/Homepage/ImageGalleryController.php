@@ -52,7 +52,11 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
+	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+		    return false;
+	    }
+
+	    $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
         $this->setBlock($templateHandle, "submit_image", "submit_image_block");
 
         $limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') * IMAGES_PER_ROW : 0;

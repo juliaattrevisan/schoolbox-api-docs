@@ -53,6 +53,10 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         }
         $this->parseConfig();
 
+	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+		    return false;
+	    }
+
         //file output
         $this->setBlock($templateHandle, 'folders', 'folders_block');
         $this->setBlock('folders', 'homepage_folder', 'homepage_folder_block');
