@@ -268,24 +268,22 @@ abstract class Mapper {
         $query = "
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
-            WHERE
         ";
 
-        $index = 0;
-
-        foreach ($columnList as $columnName => $columnValue) {
-            if ($index > 0) {
-                $query .= " AND ";
+        $where_parts = array();
+        $params      = array();
+        if (!empty($columnList)) {
+            $query .= ' WHERE ';
+            foreach ($columnList as $columnName => $columnValue) {
+                $where_parts[] = "`$columnName` = ?";
+                $params[]      = $columnValue;
             }
-
-            $query .= "`$columnName` = '$columnValue'";
-
-            $index++;
+            $query .= implode(' AND ', $where_parts);
         }
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute();
+        $statement->execute($params);
 
         $rowset = $statement->fetchAll();
 
