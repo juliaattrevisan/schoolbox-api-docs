@@ -39,6 +39,21 @@ class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_St
 	}
 
 	/**
+	 * Alt email (if not set) is based off of the student's username (which for
+	 * St. Kevins is also their ID).
+	 *
+	 * @param  array  $currentUser
+	 * @return string
+	 */
+	public function getAltEmailFromUser($currentUser) {
+		$email = parent::getAltEmailFromUser($currentUser);
+		if (!isset($email)) {
+			$email = $this->getUsernameFromUser($currentUser).'@stkevins.vic.edu.au';
+		}
+		return $email;
+	}
+
+	/**
 	 * Gets campus according to the following map:
 	 *
 	 * * J (Glendalough) => 1
