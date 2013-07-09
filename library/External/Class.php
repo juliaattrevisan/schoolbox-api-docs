@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
  
-class External_Class {
+class External_Class implements External_ClassInterface{
 	private $database;
 
 	/**
