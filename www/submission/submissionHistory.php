@@ -138,7 +138,8 @@ if($codes && count($codes)) {
                 'TEACHER_NAME' => $userHandler->formatName($meta),
                 'TEACHER_EXTERNAL_ID' => $synid,
                 'TEACHER_GROUP' => $meta['gname'],
-                'TEACHER_THUMB' => "/portrait?userId=$synid&size=square32"
+                'TEACHER_AVATAR' => "/portrait?userId=$synid&size=square32",
+                'TEACHER_AVATAR_TITLE' => $userHandler->formatName($meta)
             ));
 
             $this->parse('teacher_block','teacher', true);
@@ -226,10 +227,16 @@ else {
 
 // set the teacher details
 $teacher = $userHandler->getByID($submission->getOwner()->getId());
+
+// retrieve and format email for teacher in question
+$emailObj = new Email();
+$emailAddress = $emailObj->formatEmailFromArray($teacher);
+
 $teacher_details = array(
 	'TEACHER_ID'    => $teacher['uid'],
 	'TEACHER_NAME'  => $userHandler->formatName($teacher),
 	'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
+	'TEACHER_URL'   => $_SESSION['mailhandle'] . $emailAddress
 );
 $this->setVar($teacher_details);
 
