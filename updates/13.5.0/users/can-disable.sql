@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD COLUMN `enabled` BOOL DEFAULT TRUE NOT NULL COMMENT 'Is this account active?' AFTER `calendar_view`;
