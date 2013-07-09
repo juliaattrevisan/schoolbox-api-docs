@@ -45,7 +45,7 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 	public function getAltEmailFromUser($currentUser) {
 		$email = parent::getAltEmailFromUser($currentUser);
 		if (!isset($email)) {
-			$email = $this->getUsernameFromUser($currentUser).'@student.stkevins.vic.edu.au';
+			$email = $this->getUsernameFromUser($currentUser).'@stkevins.vic.edu.au';
 		}
 		return $email;
 	}
