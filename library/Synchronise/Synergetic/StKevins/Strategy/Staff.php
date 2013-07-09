@@ -21,7 +21,9 @@ class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_St
 	}
 
 	/**
-	 * Staff member's username is based on their OccupEmail field.
+	 * Staff member's username is based on their username if it's there.
+	 * Otherwise, it's generated from the first letter of their first name, then
+	 * their surname (all lower cased)
 	 *
 	 * @param  array  $currentUser
 	 * @return string
