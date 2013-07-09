@@ -58,7 +58,7 @@ class User extends DeprecatedModel {
 	function getByUsername($username) {
 
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,`key`, hash,
-						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view
+						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
@@ -95,7 +95,7 @@ class User extends DeprecatedModel {
 	function getBySynergy($sid) {
 
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house
+						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house, enabled
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
@@ -112,7 +112,7 @@ class User extends DeprecatedModel {
 	function getBySynergyAndGroup($sid, $gid) {
 
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house
+						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house, enabled
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
