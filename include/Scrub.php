@@ -115,6 +115,11 @@ class Scrub {
                 'www.sunsmart.com.au/uvalert/',
                 'skydrive.live.com/embed',
                 '(?:www\\.)?studyboost.com/',
+	            'prezi.com/embed/',
+	            '(?:www\\.)?spiderscribe.net/app/',
+	            '(?:www\\.)?evt.org.nz',
+				'vhss-d.oddcast.com/vhss_editors/voki_player.swf'
+
             );
 
             $config->set('URI.SafeIframeRegexp', '%^(?:https?:|)//(?:' . implode('|', $safeIframeSources) . ')%');
