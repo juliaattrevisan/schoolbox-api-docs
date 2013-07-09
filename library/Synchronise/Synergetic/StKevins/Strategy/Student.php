@@ -117,4 +117,15 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 	public function getEportfolioEnabledFromUser($currentUser) {
 		return false;
 	}
+
+	/**
+	 * St. Kevins students have local email on.
+	 *
+	 * @param array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getLocalEmailFromUser($currentUser) {
+		return 1;
+	}
 }

@@ -19,4 +19,15 @@ class Synchronise_Synergetic_StKevins_Strategy_Parent extends Synchronise_Base_S
 	protected function setup() {
 		$this->verbose_filter = new Synchronise_Synergetic_StKevins_Verbose();
 	}
+
+	/**
+	 * St. Kevins parents have local email on.
+	 *
+	 * @param array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getLocalEmailFromUser($currentUser) {
+		return 1;
+	}
 }

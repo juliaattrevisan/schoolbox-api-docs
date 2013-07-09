@@ -88,4 +88,14 @@ class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_St
 		return false;
 	}
 
+	/**
+	 * St. Kevins staff have local email on.
+	 *
+	 * @param array $currentUser
+	 *
+	 * @return int
+	 */
+	public function getLocalEmailFromUser($currentUser) {
+		return 1;
+	}
 }
