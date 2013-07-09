@@ -129,6 +129,7 @@ if($codes && count($codes)) {
     $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
     if(is_array($listSyns)) {
+        $emailObj = new Email();
         foreach($listSyns as $synid) {
             $teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
             $meta = $userHandler->getByID($teacher['uid']);
@@ -138,7 +139,9 @@ if($codes && count($codes)) {
                 'TEACHER_NAME' => $userHandler->formatName($meta),
                 'TEACHER_EXTERNAL_ID' => $synid,
                 'TEACHER_GROUP' => $meta['gname'],
-                'TEACHER_THUMB' => "/portrait?userId=$synid&size=square32"
+                'TEACHER_AVATAR' => "/portrait?userId=$synid&size=square32",
+                'TEACHER_AVATAR_TITLE' => $userHandler->formatName($meta),
+                'TEACHER_URL'   => $_SESSION['mailhandle'] . $emailObj->formatEmailFromArray($teacher),
             ));
 
             $this->parse('teacher_block','teacher', true);
@@ -226,6 +229,7 @@ else {
 
 // set the teacher details
 $teacher = $userHandler->getByID($submission->getOwner()->getId());
+
 $teacher_details = array(
 	'TEACHER_ID'    => $teacher['uid'],
 	'TEACHER_NAME'  => $userHandler->formatName($teacher),
