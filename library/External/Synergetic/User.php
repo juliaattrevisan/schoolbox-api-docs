@@ -470,7 +470,9 @@ class External_Synergetic_User implements External_UserInterface {
 					StudentClasses.FileYear=" . $_SESSION['FileYear'] . " AND
 					StudentClasses.ID=$synergyID
 					AND StudentClasses.StartDate <= getdate()
-					AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)";
+					AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+					ORDER BY SubjectClasses.FileType ASC, SubjectClasses.Description ASC
+					";
 		} else {
 
 			$sql = "SELECT DISTINCT(c1.ClassCode), c1.ClassCampus, c2.description as name
