@@ -65,6 +65,8 @@ if(is_numeric($this->arg[0])) {
 	                    'ACCOUNT_ENABLED_CHECKED'=> $user['enabled']==1?'checked="checked"':'',
                         'YEAR'              => $user['year'],
                         'DATABASE_TYPE'     => ucfirst(Cfg::get('external_type')),
+	                    'ASSUME_PROMPT'     => $user['enabled'] ? 'Login as user' : 'Account disabled',
+	                    'ASSUME_CLASS'      => $user['enabled'] ? '' : 'disabled' // doesn't affect admin ability to assume user
             );
         $this->setVar($output);
 

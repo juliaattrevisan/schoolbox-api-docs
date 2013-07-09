@@ -255,7 +255,16 @@ $j(function() {
 		$j(this).closest('form').validate().element($j(this));
 	})
 
-	
+  // locate the assume button and add a listener if it's disabled
+  $j('#content')
+      .children('.admin-contents')
+      .children('form.modify-form')
+      .children('a.user.submit.disabled')
+      .click(function()
+  {
+      alert('Warning: you are assuming a disabled account.');
+  })
+
 });
 </script>
 
@@ -271,7 +280,7 @@ $j(function() {
 <h2><span><a href="/adminv2/user">&laquo; Back to users</a></span>Modify user: <strong>{FULLNAME}</strong></h2>
 <form method="POST" action="/adminv2/userForm.php" class="modify-form" clear="clearfix">
 	<input type="hidden" name="login" value="{USERNAME}" />
-	<a href="#" class="btn user submit"><span></span>Login as user</a>
+	<a href="#" class="btn user submit {ASSUME_CLASS}"><span></span>{ASSUME_PROMPT}</a>
 </form>
 <div class="level clearfix">
 	<h3>User Details<span class="question">?</span></h3>
