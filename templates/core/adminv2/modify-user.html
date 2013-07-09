@@ -370,17 +370,20 @@ $j(function() {
                     <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
                     <!-- END residential_house -->
                 </select></label>
-				<label for="eportfolio">E-Portfolio
-					<input id="eportfolio" type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
-				</label>
+                <label for="eportfolio">E-Portfolio
+                    <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
+                </label>
                 <label for="local_email" class="width2 ">Email Address from Username
-						<input id="local_email" type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
-			    </label>
+                    <input id="local_email" type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
+                </label>
                 <label for="mail_handler" class="width2 ">Use External Mail Client
                     <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {MAILHANDLER_CHECKED} />
                 </label>
                 <label for="superuser" class="width2 ">Superuser
                     <input  id="superuser" type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />
+                </label>
+                <label for="account_enabled" class="width2 ">Account Enabled
+                    <input id="account_enabled" type="checkbox" name="account_enabled" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}\'s account status?'));" {ACCOUNT_ENABLED_CHECKED} />
                 </label>
 
 			</div>
