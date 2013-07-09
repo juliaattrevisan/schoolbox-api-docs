@@ -109,6 +109,14 @@ class Session
     public function authenticate($username, $password)
     {
 
+	    // user must be a valid object (username exists) and also enabled
+	    $uMap = new \Schoolbox\UserMapper();
+	    $user = $uMap->findByColumn('username', $username)->current();
+	    if(!($user instanceof \Schoolbox\User && $user->getEnabled())) {
+		    $page = new SitePage(FALSE);
+		    $page->goLoginPage("This account is currently disabled.");
+		    return false;
+	    }
 
         $result = false;
 
@@ -261,7 +269,7 @@ class Session
         // Function to check username exists and password is correct
 
         $query = "SELECT user.id FROM user WHERE username = '" . mysql_real_escape_string($username) . "'
-        AND password = PASSWORD('" . mysql_real_escape_string($password) . "')";
+        AND password = PASSWORD('" . mysql_real_escape_string($password) . "') AND `enabled` IS TRUE";
         $this->db->query($query);
         $result = $this->db->countRows();
         //$user = $db->getNextArray();
