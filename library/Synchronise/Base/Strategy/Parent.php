@@ -333,7 +333,7 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	 * @return int
 	 */
 	public function getSpouseGroupIDFromUser($currentUser) {
-		return 1;
+		return self::DEFAULT_PARENT_GROUP;
 	}
 
 	/**
