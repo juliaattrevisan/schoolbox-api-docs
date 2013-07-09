@@ -293,6 +293,9 @@ abstract class Component_ControllerAbstract {
         $page->setBlock('settings_panel', 'config_element', 'config_element_block');
         $page->setVar('config_element_block', '');
 
+	    // it's possible hiding configs will hide all; check for this and hide the config dropdown if need be
+	    $configCount = 0;
+
         if ($processConfig) {
             // every config key has a corresponding controller and template to be called
             foreach ($config as $key => $params) {
@@ -316,6 +319,7 @@ abstract class Component_ControllerAbstract {
                 if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                     if (!($is_for_template && !$conf->isShownOnTemplate())) {
 					    $this->parseConfigInstance($conf, $key, $page, $params);
+	                    ++$configCount;
                     }
                 }
                 $page->setVar('CONFIG_ELEMENT_CONTENT', '');
@@ -327,7 +331,7 @@ abstract class Component_ControllerAbstract {
         }
 
         // now clear things we don't want seen
-        if (!$displayConfig) {
+        if (!$displayConfig || $configCount == 0) {
             $page->setVar('settings_link_block', '');
             $page->setVar('settings_panel_block', '');
         } else {
