@@ -8040,19 +8040,21 @@ ul.submission-list {
             display: none;
             visibility: hidden;
         }
-        .grade {
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: 100%;
-            width: 50px;
-            padding: 5px;
-            font-size: 0.8em;
-            border-left: 1px solid @border-color;
-            span {
-                display: block;
-                font-size: 1.6em;
-                font-weight: bold;
+        &.grade {
+            .grade {
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 100%;
+                width: 50px;
+                padding: 5px;
+                font-size: 0.8em;
+                border-left: 1px solid @border-color;
+                span {
+                    display: block;
+                    font-size: 1.6em;
+                    font-weight: bold;
+                }
             }
         }
     }
