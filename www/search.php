@@ -645,10 +645,9 @@ if (!empty($result['event'])) {
 
         $page->setVar(array(
             'EVENT_TITLE' => Scrub::text($event['note']),
-            'EVENT_LINK' => '/calendar/week/' . $date->format('d-m-Y'),
             'EVENT_TYPE' => $event['eventType'],
             'EVENT_DETAIL' => Scrub::text($event['detail']),
-            'EVENT_DATE' => $event['date'],
+            'EVENT_DATE' => $event['startDate'],
             'EVENT_LOCATION' => $event['location'],
             'EVENT_TIME' => $event_time
         ));
