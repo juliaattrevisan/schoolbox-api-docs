@@ -99,7 +99,7 @@ class Poll extends DeprecatedModel {
 	}
 	
 	function homepageClean($cid) {
-		$query = "DELETE p, l FROM  `".$this->_table."` p, pollLog l WHERE p.pollID=l.pollID AND categoryID='$cid'";
+		$query = "DELETE p, l FROM  `".$this->_table."` p LEFT JOIN pollLog l ON l.pollID = p.pollID WHERE p.categoryID='$cid'";
 		$this->db->query($query);
 	}
 }
