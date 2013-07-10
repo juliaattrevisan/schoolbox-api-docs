@@ -231,8 +231,29 @@ else {
 			$homepage = new Homepage($category['id']);
 			$homepage->emptyHomepage();
 
-			// remove files and links
-			$categoryHandler->recursiveDelete($category['id'], false);
+			/**
+			 * @see SB-2793
+			 * Don't recursively delete the category contents
+			 */
+//			$categoryHandler->recursiveDelete($category['id'], false);
+
+			/* Delete all files */
+			$fileHandler = new File;
+			$fileList = $fileHandler->getAllInCategory($category['id']);
+			if (is_array($fileList)) {
+				foreach ($fileList as $file) {
+					$fileHandler->delete($file['id']);
+				}
+			}
+
+			/* Delete all links */
+			$linkHandler = new Link;
+			$linkList = $linkHandler->getAllInCategory($category['id']);
+			if (is_array($linkList)) {
+				foreach ($linkList as $link) {
+					$linkHandler->delete($link['id']);
+				}
+			}
 
 			SitePage::localRedir("/homepage/{$category['id']}");
 		}
