@@ -229,14 +229,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         if($this->getGroupHandler()->isStudent($userId)) {
-            $type = 'student';
             $join = "
                 LEFT JOIN db2inst1.schoolbox_studentclass c ON t.class_code = c.class_code
                 WHERE c.student_number = :sn
             ";
         }
         elseif($this->getGroupHandler()->isStaff($userId)) {
-            $type = 'staff';
             $join = "
                 WHERE t.staff_number = :sn
             ";
@@ -246,7 +244,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         $stmt = $this->getDatabase()->prepare("
-            SELECT period AS description, day, t.class_code AS code, c.{$type}_number AS staffID, room, cl.class
+            SELECT period AS description, day, t.class_code AS code, t.staff_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
