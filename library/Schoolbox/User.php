@@ -30,6 +30,7 @@ class User {
     private $campusCollection;            //Collection of campuses
     private $defaultCampus;     //The users default campus
     private $superuser;         //Bool
+private $enabled;               //Bool
 
 	/**
 	 * @var \Schoolbox\External\SubjectCollection
@@ -290,6 +291,16 @@ class User {
     public function getYear() {
         return $this->year;
     }
+
+	public function setEnabled($enabled) {
+		// explicit cast
+		$this->enabled = $enabled ? true : false;
+	}
+
+	public function getEnabled() {
+		// explicit cast
+		return $this->enabled ? true : false;
+	}
 
     public function setCampusCollection($campusCollection) {
         $this->campusCollection = $campusCollection;

@@ -117,6 +117,12 @@ class UserMapper extends Mapper {
 				'type'       => Mapper::TYPE_STRING,
 			));
 
+		$this->hasMap(array(
+			'column'     => 'enabled',
+			'property'   => 'enabled',
+			'type'       => Mapper::TYPE_BOOLEAN,
+		));
+
 		parent::mapping();
 	}
 

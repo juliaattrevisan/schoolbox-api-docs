@@ -62,8 +62,11 @@ if(is_numeric($this->arg[0])) {
                         'EPORTFOLIO_CHECKED'=> $user['eportfolio_enabled']==1?'checked="checked"':'',
                         'LOCAL_EMAIL_CHECKED'=> $user['local_email']==1?'checked="checked"':'',
 	                    'MAILHANDLER_CHECKED'=> $user['mail_handler']==1?'checked="checked"':'',
+	                    'ACCOUNT_ENABLED_CHECKED'=> $user['enabled']==1?'checked="checked"':'',
                         'YEAR'              => $user['year'],
                         'DATABASE_TYPE'     => ucfirst(Cfg::get('external_type')),
+	                    'ASSUME_PROMPT'     => $user['enabled'] ? 'Login as user' : 'Account disabled',
+	                    'ASSUME_CLASS'      => $user['enabled'] ? 'submit' : 'disabled' // doesn't affect admin ability to assume user
             );
         $this->setVar($output);
 
