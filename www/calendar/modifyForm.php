@@ -36,7 +36,7 @@ switch($_POST['action']) {
 			'owner' => $_SESSION['id'],
 			'access' => $_POST['level'],
 			'sid' => $_POST['group'],
-			'campusList' => !empty($_POST['campus']) ? $_POST['campus'] : array($_SESSION['campus'][0]),
+			'campusList' => $_POST['campus'],
 			'groupList' => $_POST['groupCheck'],
 			'type' => $_POST['type'],
 			'note' => $_POST['note'],
