@@ -8,17 +8,29 @@
  */
 class Component_Config_Src extends Component_Config_Abstract {
 
-    protected $is_shown_on_template = false;
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue) {
+//    protected $is_shown_on_template = false;
+
+	public function parse(SitePage $page, $key, $keyblock, $configValue) {
         $catHandler = new Category();
         $cat = $catHandler->getByID($configValue);
 
-        $page->setVar(array(
-            'COMPONENT_CONFIG_SRC_ID'   => $cat['id'],
-            'COMPONENT_CONFIG_SRC_NAME' => $cat['name'],
-        ));
-
+		if(empty($cat['name'])) {
+			$page->setVar(array(
+				'COMPONENT_CONFIG_SRC_ID'   => '#',
+				'COMPONENT_CONFIG_SRC_NAME' => 'Local',
+			));
+		}
+		else {
+			$page->setVar(array(
+	            'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $cat['id'],
+	            'COMPONENT_CONFIG_SRC_NAME' => $cat['name'],
+	        ));
+		}
     }
+
+	/**
+	 * - Add visual feedback that it actually succeeded. Will probably need to modify template.
+	 */
 
 }
