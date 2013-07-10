@@ -138,7 +138,8 @@ switch($_POST['action']) {
             }
         }
 
-        $page->backToTheFuture(2);
+		// instead of just going back to the future, send the user to the calendar view that shows them their event
+        $page->localRedir('/calendar/full/' . $startDate->getUsingFormat('d-m-Y'));
         break;
 
     case 'Delete':
