@@ -55,6 +55,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      *
      * @param $campusId
      * @param int $day
+     * @return array
      */
     public function getTimetableDefinition($campusId, $day = 0) {
 
@@ -131,6 +132,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     }
 
     /**
+     * Return a user's timetable for a specific day
+     *
      * @param $externalUserId
      * @param $userId
      * @param $campusId int ignored
@@ -215,6 +218,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @param $externalUserId
      * @param $userId
      * @param $campusId
+     * @return array|bool
      */
     public function getFullTimetable($externalUserId, $userId, $campusId) {
         $definition = $this->getTimetableDefinition($campusId);
@@ -225,17 +229,14 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         if($this->getGroupHandler()->isStudent($userId)) {
-            $type = 'student';
             $join = "
                 LEFT JOIN db2inst1.schoolbox_studentclass c ON t.class_code = c.class_code
                 WHERE c.student_number = :sn
             ";
         }
         elseif($this->getGroupHandler()->isStaff($userId)) {
-            $type = 'staff';
             $join = "
-                LEFT JOIN db2inst1.schoolbox_teacherclass c ON t.class_code = c.class_code
-                WHERE c.staff_number = :sn
+                WHERE t.staff_number = :sn
             ";
         }
         else {
@@ -243,7 +244,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         $stmt = $this->getDatabase()->prepare("
-            SELECT period AS description, day, t.class_code AS code, c.{$type}_number AS staffID, room, cl.class
+            SELECT period AS description, day, t.class_code AS code, t.staff_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
@@ -294,7 +295,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     }
 
     /**
-     *
+     * Retrieve the list of subjects for a user on a particular day
      *
      * @param $externalUserId
      * @param $dayNumber
@@ -327,6 +328,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      *
      * @param $classCode
      * @param $dayNumber
+     * @return int|bool
      */
     public function getSubjectPeriod($classCode, $dayNumber) {
         $stmt = $this->getDatabase()->prepare("
@@ -360,7 +362,13 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
     }
 
-    public function getSubjectName($classCode) {
+	/**
+	 * Retrieves the name of a subject based on its class code
+	 *
+	 * @param $classCode
+	 * @return string
+	 */
+	public function getSubjectName($classCode) {
         $stmt = $this->getDatabase()->prepare("
             SELECT class
             FROM db2inst1.schoolbox_classes
