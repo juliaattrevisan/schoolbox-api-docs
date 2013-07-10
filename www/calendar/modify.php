@@ -122,7 +122,7 @@ if (is_numeric($_GET['eventID'])) {
         $page->setVar('recurring_dates_block', '');
     }
 
-    if ($event['series_id'] || $event['publish_date']) {
+    if ($event['series_id'] || $event['publish_date'] != '0000-00-00 00:00:00') {
         // set the advanced options to be shown by default since there is information in there
         $page->setVar(
             array(
