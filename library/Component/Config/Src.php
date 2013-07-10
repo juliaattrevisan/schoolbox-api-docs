@@ -29,8 +29,4 @@ class Component_Config_Src extends Component_Config_Abstract {
 		}
     }
 
-	/**
-	 * - Add visual feedback that it actually succeeded. Will probably need to modify template.
-	 */
-
 }
