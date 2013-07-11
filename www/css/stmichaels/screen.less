@@ -172,13 +172,20 @@ laber.error,
 }
 /* Rounded-corners end */
 
-body{
-  background:#fff;
+html{
+  height: 100%;
 }
 
-body.login{
-  border-bottom: 20px solid #fdc900;
+body{
+  background:#fff;
+  height: 100%;
 }
+
+#wrap {min-height: 100%;}
+
+#container {
+  overflow:auto;
+  padding-bottom: 15px;}  /* must be same height as the footer */
 
 .login #schol-gradient{
   background: #cc032c; /* Old browsers */
@@ -470,17 +477,34 @@ ADMIN!
 #infoPanel li a{color:#000;}
 #infoPanel li.first a{ font-weight: bold; }
 
+/*#footer {
+  position: relative;
+  right: 0;
+  bottom: 0;
+  margin-left: 200px;
+  padding-left: 10px;
+}*/
 #footer ul li {color:#000}
 #footer ul li a{color:#0054D3}
 #footer{
-  padding-left: 260px;
-  margin: 0;
+  padding-left: 218px;
   border-bottom: 15px solid #fdc900;
+  position: relative;
+  margin-top: -62px; /* negative value of footer height */
+  margin-left: 0;
+  height: 15px;
+  clear:both;
 }
 .login #footer{
-  width: 1080px;
+  width: 100%;
   margin: 0 auto;
-  border: 0;
+}
+
+.login #footer ul{
+  margin: 0 0 0 -572px;
+  padding: 0;
+  left: 50%;
+  position: relative;
 }
 
 .standardForm td {
