@@ -190,7 +190,8 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             }
             else {
                 // assess
-                $output['UPCOMING_HREF'] = 'assess/intro/';
+                $output['UPCOMING_HREF'] = 'assess/intro';
+                $output['UPCOMING_UID']  = '';
                 $output['UPCOMING_BTN_ICON']  = 'up-arrow';
 
                 if($item['attempt_count']) {
