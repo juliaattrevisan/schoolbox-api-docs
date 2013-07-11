@@ -101,13 +101,14 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
 
                 if(is_array($sub['subboxes'])) {
                     foreach($sub['subboxes'] as $subid => $subdetails) {
-                        $subout = array('BOX_ID'	=> $subid,
-                                        'BOX_NAME'	=> $subdetails['description'],
-                                        'BOX_COUNT'	=> $subdetails['count'],
+                        $subout = array('BOX_ID'     => $subid,
+                                        'BOX_NAME'   => $subdetails['description'],
+                                        'BOX_COUNT'  => $subdetails['count'],
+                                        'BOX_PLURAL' => ($subdetails['count'] > 1 ? 's' : ''),
                                         );
                         $this->setVar($subout);
 
-                        $this->parse('sub_block', 'sub_work');
+                        $this->parse('sub_block', 'sub_work', true);
                     }
                 }
                 else
