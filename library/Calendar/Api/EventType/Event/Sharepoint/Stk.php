@@ -134,15 +134,13 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 		/* TODO: Update this for SK
 		 */
-        $now   = new Alaress_Date_Format(new DateTime(), 'U');
         $start = new Alaress_Date_Format($startTimestamp, 'U');
         $end   = new Alaress_Date_Format($endTimestamp, 'U');
 
-		$startDate = $start->getUsingFormat('Y-m-d\\TH:i:s\\Z');
-		$endDate   = $end->getUsingFormat('Y-m-d\\TH:i:s\\Z');
+		$startDate = new DateTime($start->getUsingFormat('Y-m-d\\TH:i:s\\Z'));
+		$endDate   = new DateTime($end->getUsingFormat('Y-m-d\\TH:i:s\\Z'));
 
         $xmlPayload = new Calendar_Api_EventType_Event_Sharepoint_Stk_Payload($startDate, $endDate);
-//	    new Alaress_Probe($xmlPayload->getPayload());
 
 		/* Fill in your query result set here and populate $collection
 		 */
@@ -224,13 +222,12 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 				$event->setAllday((string)$attribs->ows_fAllDayEvent == 1);
 
-				$this->addEventsToCollection(
+				$this->addEventAtTime(
 					$collection,
 					$event,
-					$attribs,
-					$startTimestamp,
-					$endTimestamp,
-					$deleted_events
+					new DateTime($attribs->ows_EventDate),
+					(int)$attribs->ows_Duration,
+					array()
 				);
 			}
 		}
@@ -291,6 +288,9 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 	/**
 	 * Adds events based on recurrence
+	 *
+	 * @deprecated This should no longer be needed, as we can now retrieve
+	 *             actual event recurrences from Sharepoint.
 	 *
 	 * @param Calendar_Event_Collection    $collection Collection to add to
 	 * @param Calendar_Event_Type_Abstract $event      Event to add. If it recurs,

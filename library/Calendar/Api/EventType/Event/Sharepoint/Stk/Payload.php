@@ -16,10 +16,15 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 	private $listName = 'Master Calendar';
 	private $rowLimit = 1000;
 
-	/* Should be in database date format yyyy-mm-dd hh:ii:ss
+	/**
+	 * @var DateTime
 	 */
-	private $startDate = '';
-	private $endDate = '';
+	private $startDate;
+
+	/**
+	 * @var DateTime
+	 */
+	private $endDate;
 
 	/* Special dromedary
 	 *
@@ -37,40 +42,14 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 				<Query xmlns="http://schemas.microsoft.com/sharepoint/soap/">
 					<Where>
 						<And>
-							<Or>
-								<And>
-									<Geq>
-										<FieldRef Name="EventDate"/>
-										<Value Type="DateTime">%s</Value>
-									</Geq>
-									<Leq>
-										<FieldRef Name="EndDate"/>
-										<Value Type="DateTime">%s</Value>
-									</Leq>
-								</And>
-								<Or>
-									<And>
-										<Eq>
-											<FieldRef Name="EventDate"/>
-											<Value Type="DateTime">%s</Value>
-										</Eq>
-										<Eq>
-											<FieldRef Name="fAllDayEvent"/>
-											<Value Type="Number">1</Value>
-										</Eq>
-									</And>
-									<And>
-										<Leq>
-											<FieldRef Name="EventDate"/>
-											<Value Type="DateTime">%s</Value>
-										</Leq>
-										<Geq>
-											<FieldRef Name="EndDate"/>
-											<Value Type="DateTime">%s</Value>
-										</Geq>
-									</And>
-								</Or>
-							</Or>
+							<DateRangesOverlap>
+								<FieldRef Name="EventDate" />
+								<FieldRef Name="EndDate" />
+								<FieldRef Name="RecurrenceID" />
+								<Value Type="DateTime">
+									<%s />
+								</Value>
+							</DateRangesOverlap>
 							<Eq>
 								<FieldRef Name="_ModerationStatus"/>
 								<Value Type="Number">0</Value>
@@ -119,10 +98,10 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 	/**
 	 * Constructor
 	 *
-	 * @param $startDate
-	 * @param $endDate
+	 * @param DateTime $startDate
+	 * @param DateTime $endDate
 	 */
-	public function __construct($startDate, $endDate) {
+	public function __construct(DateTime $startDate, DateTime $endDate) {
 		$this->setStartDate($startDate);
 		$this->setEndDate($endDate);
 
@@ -135,17 +114,22 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 	 * @return string
 	 */
 	public function generatePayload() {
+		//
+		// Mangle request date into something in the middle of start and end
+		// Request month, year or day based on how many days are being requested
+		$diff = $this->getStartDate()->diff($this->getEndDate());
+		$days = floor($diff->days/2);
+		$midpoint = clone $this->getStartDate();
+		$midpoint->modify("+$days day");
+
 		$payload = sprintf(
 			$this->getCamlQuery(),
 			$this->getListName(),
 			$this->getRowLimit(),
-			$this->getStartDate(),
-			$this->getEndDate(),
-			$this->getStartDate(),
-			$this->getStartDate(),
-			$this->getEndDate(),
-			$this->getStartDate()
+			($days <= 1 ? 'Today' : 'Month'),
+			$midpoint->format('Y-m-d')
 		);
+//		new Alaress_Probe($payload);
 
 		$this->setPayload($payload);
 	}
@@ -195,7 +179,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 	/**
 	 * Set start date
 	 *
-	 * @param $startDate
+	 * @param DateTime $startDate
 	 */
 	private function setStartDate($startDate) {
 		$this->startDate = $startDate;
@@ -204,7 +188,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 	/**
 	 * Get start date
 	 *
-	 * @return string
+	 * @return DateTime
 	 */
 	private function getStartDate() {
 		return $this->startDate;
@@ -213,7 +197,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 	/**
 	 * Set end date
 	 *
-	 * @param $endDate
+	 * @param DateTime $endDate
 	 */
 	private function setEndDate($endDate) {
 		$this->endDate = $endDate;
@@ -222,7 +206,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 	/**
 	 * Get end date
 	 *
-	 * @return string
+	 * @return DateTime
 	 */
 	private function getEndDate() {
 		return $this->endDate;
