@@ -1,0 +1,140 @@
+<?php
+/**
+ * Eportfolio_PageMapper
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace SocialStream\Post;
+use SocialStream\Post;
+use Schoolbox;
+
+class PostMapper extends Schoolbox\Mapper {
+
+	/**
+	 * Define column/property mapping
+	 *
+	 * @return Bool|void
+	 */
+	protected function mapping() {
+		$this->hasTable('socialstream_post');
+
+		$this->hasMap(array(
+			'column'     => 'post_id',
+			'property'   => 'postId',
+			'type'       => self::TYPE_INTEGER,
+			'identifier' => true
+		));
+
+		$this->hasMap(array(
+			'column'     => 'owner_id',
+			'property'   => 'ownerId',
+			'type'       => self::TYPE_INTEGER,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'homepage_id',
+			'property'   => 'homepageId',
+			'type'       => self::TYPE_INTEGER,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'parent_id',
+			'property'   => 'parentId',
+			'type'       => self::TYPE_INTEGER,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'type',
+			'property'   => 'type',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'mimetype',
+			'property'   => 'mimetype',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'url',
+			'property'   => 'url',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'body',
+			'property'   => 'body',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'created_at',
+			'property'   => 'createdAt',
+			'type'       => self::TYPE_DATETIME,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'updated_at',
+			'property'   => 'updatedAt',
+			'type'       => self::TYPE_DATETIME,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'deleted_at',
+			'property'   => 'deletedAt',
+			'type'       => self::TYPE_DATETIME,
+		));
+
+		// Parent object: has reference to itself as a mapper.
+		$this->hasJoin('parent', array(
+			'multiple'  => true,
+			'mapper'    => $this,
+			'this_key'  => 'parent_id',
+			'other_key' => 'post_id',
+		));
+
+		parent::mapping();
+	}
+
+	public function craeteModel($type) {
+		switch($type) {
+			case 'Video' : $model = 'SocialStream_Post_Video'; break;
+			default : $model = 'SocialStream_Post_String'; break;
+		}
+
+		return new $model;
+	}
+
+	/**
+	 * @param Array $row
+	 * @param String $alias
+	 * @param callable $callback
+	 * @return Model
+	 */
+	public function hydrate($row, $alias = '', $callback = null) {
+		$model = $this->createModel();
+
+		foreach ($this->map as $map) {
+			$propertyName = $map['property'];
+			$columnName = $map['column'];
+
+			if (!empty($alias)) {
+				$columnName = "$alias.$columnName";
+			}
+
+			$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+			$this->setModelProperty($model, $propertyName, $columnValue, $map);
+		}
+
+		if (!empty($callback) && is_callable($callback)) {
+			$model = call_user_func($callback, $this, $model, $row);
+		}
+
+		return $model;
+	}
+
+}
