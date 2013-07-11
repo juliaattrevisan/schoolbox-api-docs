@@ -210,7 +210,7 @@ class Activity {
         //$returnArray = array();
 
         //select all users submission boxes which are not deleted and still open
-        $query = "SELECT description, id, datetime
+        $query = "SELECT name, id, datetime
 			FROM submission_box LEFT JOIN submission_log ON submission_log.page = '3' 
 			AND submission_box.id = submission_log.sid 
 			WHERE owner = '" . $_SESSION['id'] . "' AND deleted = '0' AND category = '$category'";
@@ -226,7 +226,7 @@ class Activity {
 
             //if there are any new submissions put them in a array for return
             if ($result['newsubs'] > 0) {
-                $returnArray[$subbox['id']]['description'] = $subbox['description'];
+                $returnArray[$subbox['id']]['description'] = $subbox['name'];
                 $returnArray[$subbox['id']]['count'] = $result['newsubs'];
 
                 //also keep count of total (for efficency)
