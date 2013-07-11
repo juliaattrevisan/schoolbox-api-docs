@@ -207,37 +207,31 @@ class Activity {
 
 
     function newSubmission($category) {
-        //$returnArray = array();
-
-        //select all users submission boxes which are not deleted and still open
-        $query = "SELECT name, id, datetime
-			FROM submission_box LEFT JOIN submission_log ON submission_log.page = '3' 
-			AND submission_box.id = submission_log.sid
-			AND submission_log.user = '" . $_SESSION['id'] . "'
-			WHERE owner = '" . $_SESSION['id'] . "' AND deleted = '0' AND category = '$category'";
-
+        $query = "
+            SELECT
+                submission_box.name AS description, submission_box.id, count(*) AS `count`
+            FROM
+                submission_box
+            LEFT JOIN submission_log ON
+                submission_log.page = '3'
+                AND submission_box.id = submission_log.sid
+                AND submission_log.user = {$this->db->smartQuote($_SESSION['id'])}
+            INNER JOIN student_submission ON
+                submission_box.id = student_submission.box_id
+            WHERE
+                submission_box.owner = {$this->db->smartQuote($_SESSION['id'])}
+                AND submission_box.deleted = '0'
+                AND submission_box.category = {$this->db->smartQuote($category)}
+                AND (submission_log.datetime IS NULL OR student_submission.submitted > submission_log.datetime)
+            GROUP BY
+                submission_box.name, submission_box.id
+        ";
+        $result = array();
         $rh = $this->db->query($query);
         while ($subbox = $this->db->getNextArray($rh)) {
-
-            //for each submission box check if there are any new submissions
-            $query = "SELECT COUNT(id) as newsubs FROM student_submission
-				WHERE box_id = '" . $subbox['id'] . "' AND submitted > '" . $subbox['datetime'] . "'";
-
-            $result = $this->db->getRow($query);
-
-            //if there are any new submissions put them in a array for return
-            if ($result['newsubs'] > 0) {
-                $returnArray[$subbox['id']]['description'] = $subbox['name'];
-                $returnArray[$subbox['id']]['count'] = $result['newsubs'];
-
-                //also keep count of total (for efficency)
-                $this->totalNewSubs += $subbox['count'];
-
-            }
+            $result[$subbox['id']] = $subbox;
         }
-        return $returnArray;
+        return $result;
     }
 
 }
-
-?>
