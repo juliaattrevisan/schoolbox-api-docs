@@ -212,7 +212,8 @@ class Activity {
         //select all users submission boxes which are not deleted and still open
         $query = "SELECT name, id, datetime
 			FROM submission_box LEFT JOIN submission_log ON submission_log.page = '3' 
-			AND submission_box.id = submission_log.sid 
+			AND submission_box.id = submission_log.sid
+			AND submission_log.user = '" . $_SESSION['id'] . "'
 			WHERE owner = '" . $_SESSION['id'] . "' AND deleted = '0' AND category = '$category'";
 
         $rh = $this->db->query($query);
