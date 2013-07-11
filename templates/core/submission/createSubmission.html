@@ -182,7 +182,14 @@
             if (!date_parts) {
                 return false;
             }
-            return new Date(date_parts[3]+'-'+date_parts[2]+'-'+date_parts[1]+'T'+time);
+            return new Date(
+                date_parts[3],
+                date_parts[2]-1,
+                date_parts[1],
+                hour,
+                minute,
+                0
+            );
         }
 
         jQuery.validator.addMethod('dateValid', function(value, element) {
