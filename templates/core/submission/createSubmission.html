@@ -150,13 +150,39 @@
             var meridian = element.find(':input[name="'+field_name+'_period"]').val();
 
             var default_time = field_name === 'open' ? '00:00:00' : '23:59:59';
-            var date_parts   = date.match(/^(\d+)\/(\d+)\/(\d+)$/);
-            var time         = hour.length ? (hour+':'+minute+' '+meridian) : default_time;
+            var time         = default_time;
+            if (hour.length) {
+                //
+                // Convert time to 24 hours
+                switch (meridian.toString().toLowerCase()) {
+                    case 'am':
+                        // 12am becomes 0
+                        if (hour === '12') {
+                            hour = '0';
+                        }
+                        break;
 
+                    case 'pm':
+                        // unless 12, add 12
+                        if (hour !== '12') {
+                            hour = String(Number(hour) + 12);
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+                if (hour.length === 1) {
+                    hour = "0".concat(hour);
+                }
+                time = hour+':'+minute+':00';
+            }
+
+            var date_parts = date.match(/^(\d+)\/(\d+)\/(\d+)$/);
             if (!date_parts) {
                 return false;
             }
-            return new Date(date_parts[3]+'-'+date_parts[2]+'-'+date_parts[1]+' '+time);
+            return new Date(date_parts[3]+'-'+date_parts[2]+'-'+date_parts[1]+'T'+time);
         }
 
         jQuery.validator.addMethod('dateValid', function(value, element) {
