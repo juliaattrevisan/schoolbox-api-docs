@@ -627,12 +627,27 @@ class Group extends DeprecatedModel
 	        $catList = $this->involvedInSubjects($userID);
         }
 
-		//get list of groups involved in
-		$query = "SELECT category.name, category.id, type, GROUP_CONCAT(cc.code) as code FROM userAccess, category LEFT JOIN categoryCode cc ON category.id = categoryID
-		WHERE userAccess.uid = '$userID' AND userAccess.sid = category.id AND userAccess.service = '" . $this->_service . "'
-		AND userAccess.type >= '$accessType'
-		GROUP BY category.id
-		ORDER BY category.name";
+		//get list of groups involved in (not already in $catList)
+	    $excluded_id_list = array();
+	    if (!empty($catList)) {
+		    foreach ($catList as $cat) {
+			    $excluded_id_list[] = intval($cat['id']);
+		    }
+	    }
+	    $exclude_part = !empty($excluded_id_list) ? ('AND category.id NOT IN ('.implode(',', $excluded_id_list).')') : '';
+		$query = "
+			SELECT
+			category.name, category.id, type,
+			GROUP_CONCAT(cc.code) as code
+			FROM userAccess, category LEFT JOIN categoryCode cc ON category.id = categoryID
+			WHERE userAccess.uid = '$userID'
+			AND userAccess.sid = category.id
+			AND userAccess.service = '" . $this->_service . "'
+			AND userAccess.type >= '$accessType'
+			$exclude_part
+			GROUP BY category.id
+			ORDER BY category.name
+		";
 
 		$this->db->query($query);
 		while ($result = $this->db->getNextArray()) {
