@@ -13,6 +13,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 	private $gateway;
 
 	protected function setup() {
+		parent::setup();
 		$plagscanApiKey = Config::get('plagscan_api_key');
 		$plagscanUsername = Config::get('plagscan_username');
 		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
