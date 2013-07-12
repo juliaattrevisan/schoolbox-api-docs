@@ -13,7 +13,8 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 if (isset($_GET['hash']) && $_GET['hash']) {
     $page = new SitePage;
 
-    $resource = Storage_ResourceMapper::getInstance()->getByHash($_GET['hash']);
+    /* @var $resource Schoolbox\File */
+    $resource = Schoolbox\FileMapper::getInstance()->findOneByColumn('hash', $_GET['hash']);
 
     if ($resource != false) {
 
@@ -24,16 +25,16 @@ if (isset($_GET['hash']) && $_GET['hash']) {
         }
 
         //send headers
-        if ($resource->mime) {
-            header("Content-Type: {$resource->mime}");
+        if ($resource->getMime()) {
+            header("Content-Type: {$resource->getMime()}");
         } else {
             header("Content-Type: application/octet-stream");
         }
 
         header("Pragma: ");
         header("Cache-control: ");
-        header("Content-Disposition: $attach filename=\"" . $resource->filename . "\"");
-        header("Content-Length: $resource->filesize");
+        header("Content-Disposition: $attach filename=\"" . $resource->getFilename() . "\"");
+        header("Content-Length: ".$resource->getFilesize());
         readfile($resource->getFileLocation());
     }
 
