@@ -8,9 +8,92 @@
  */
 class DueWork_Error extends Model {
 
-    public $id;
-    public $code;
-    public $displayAs;
-    public $normaliseAs;
+	/**
+	 * @var int
+	 */
+	public $id;
+
+	/**
+	 * @var string
+	 */
+	public $code;
+
+	/**
+	 * @var string
+	 */
+	public $displayAs;
+
+	/**
+	 * @var decimal
+	 */
+	public $normaliseAs;
+
+	/**
+	 * @param  string $code
+	 *
+	 * @return $this
+	 */
+	public function setCode($code) {
+		$this->code = $code;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCode() {
+		return $this->code;
+	}
+
+	/**
+	 * @param  string $displayAs
+	 *
+	 * @return $this
+	 */
+	public function setDisplayAs($displayAs) {
+		$this->displayAs = $displayAs;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDisplayAs() {
+		return $this->displayAs;
+	}
+
+	/**
+	 * @param  int $id
+	 *
+	 * @return $this
+	 */
+	public function setId($id) {
+		$this->id = $id;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getId() {
+		return $this->id;
+	}
+
+	/**
+	 * @param  \decimal $normaliseAs
+	 *
+	 * @return $this
+	 */
+	public function setNormaliseAs($normaliseAs) {
+		$this->normaliseAs = $normaliseAs;
+		return $this;
+	}
+
+	/**
+	 * @return \decimal
+	 */
+	public function getNormaliseAs() {
+		return $this->normaliseAs;
+	}
 
 }
