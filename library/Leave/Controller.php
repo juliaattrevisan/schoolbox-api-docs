@@ -705,7 +705,7 @@ class Leave_Controller extends Controller {
      * Returns a collection of requests for a user
      *
      * @param $userId
-     * @return Collection
+     * @return array
      * @throws Exception_Schoolbox_NotFound if user or their house isn't found.
      */
     public function executeUserRequestList($userId) {

@@ -31,7 +31,7 @@ class Component_Eportfolio_Factory extends Component_FactoryAbstract {
 	 * Return a collection of components used in any eportfolio template setup
 	 *
 	 * @param string $module
-	 * @return Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function getDefinitionList($module) {
 		return new Schoolbox\Collection(Component_InstanceMapper::getInstance()->findByModule($module));

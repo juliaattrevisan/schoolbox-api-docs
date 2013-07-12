@@ -22,7 +22,7 @@ class Component_Homepage_Statistics_Factory extends Component_FactoryAbstract {
     /**
      * Overrides parent method, since the component inclusion is not defined by the DB
      * @param $identifier
-     * @return Collection
+     * @return \Schoolbox\Collection
      */
     public function buildComponentList ($identifier) {
 

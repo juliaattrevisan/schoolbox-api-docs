@@ -40,7 +40,7 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper {
 	/**
 	 * Convenience method for finding by code
 	 * @param $code
-	 * @return Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function findByCode($code) {
 		return parent::findByColumn('code', $code);

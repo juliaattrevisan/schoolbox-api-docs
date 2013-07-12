@@ -88,7 +88,7 @@ abstract class Component_FactoryAbstract {
 
     /**
      * @param $identifier
-     * @return Collection
+     * @return array
      */
     public function getInstanceList ($identifier) {
         return Component_InstanceMapper::getInstance()->findByContext($this->module, $identifier);
@@ -106,7 +106,7 @@ abstract class Component_FactoryAbstract {
     }
 
     /**
-     * @return Collection
+     * @return \Schoolbox\Collection
      */
     public function getDefinitionList($sortBy = '') {
         return Component_DefinitionMapper::getInstance()->findAllForModule($this->module, $sortBy);

@@ -57,7 +57,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	 *
 	 * @param $module
 	 * @param $definitionId
-	 * @return Collection
+	 * @return array
 	 */
 	public function findByDefinition($module, $definitionId) {
 		$sql = '
@@ -103,6 +103,12 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 		return $this->findByFields($sql, array(':module' => $module));
 	}
 
+	/**
+	 * @param string $module
+	 * @param string $identifier
+	 *
+	 * @return array
+	 */
 	public function findByContext($module, $identifier) {
 		$sql = '
 			SELECT '.$this->getColumnString('ci').'

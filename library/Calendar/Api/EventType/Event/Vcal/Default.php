@@ -172,7 +172,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 	 * return that instead of a collection of everything
 	 *
 	 * @param $eventId
-	 * @return Collection
+	 * @return Calendar_Event_Collection
 	 */
 	public function getEvent($eventId) {
 		$collection = new Calendar_Event_Collection();

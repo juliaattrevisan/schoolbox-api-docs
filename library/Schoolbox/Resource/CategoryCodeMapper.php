@@ -41,7 +41,7 @@ class CategoryCodeMapper extends Mapper {
 	 *
 	 * @param int $category_id
 	 *
-	 * @return \Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function findForCategory($category_id) {
 		return $this->findForCategories(array($category_id));
@@ -52,7 +52,7 @@ class CategoryCodeMapper extends Mapper {
 	 *
 	 * @param array $category_ids
 	 *
-	 * @return \Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function findForCategories($category_ids) {
 		//

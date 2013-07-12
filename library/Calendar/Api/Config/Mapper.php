@@ -56,7 +56,7 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper {
 	/**
 	 * Return a set of unique types of config records being used
 	 *
-	 * @return Bool|Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function getAllConfigRecords() {
 		$query = "

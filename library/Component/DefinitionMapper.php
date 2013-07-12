@@ -77,6 +77,14 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 		return $this->hydrateList($rowset);
 	}
 
+	/**
+	 * Gets all component definitions for this module.
+	 *
+	 * @param string $module
+	 * @param string $sortBy
+	 *
+	 * @return \Schoolbox\Collection
+	 */
 	public function findAllForModule($module, $sortBy = '') {
 		$sort = '';
 		if($sortBy) {

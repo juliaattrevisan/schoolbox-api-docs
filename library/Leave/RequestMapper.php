@@ -143,7 +143,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * Returns a collection of requests by user id
 	 *
 	 * @param $userId
-	 * @return Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function findAllByUserId($userId) {
 		$statement = $this->database->prepare(
@@ -190,7 +190,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * Only show the most recent fortnight's worth of requests
 	 *
 	 * @param $houseId
-	 * @return Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function findAllByHouseId($houseId) {
 
@@ -255,7 +255,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * id 56 (bobby) 2012-05-17 13:16:11
 	 *
 	 * @param $houseId
-	 * @return Collection
+	 * @return \Schoolbox\Collection
 	 */
 	private function getAllLeaveRequests($houseId) {
 		$statement = $this->database->prepare(
@@ -350,7 +350,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * @param Integer $houseId
 	 * @param String $start
 	 * @param String $finish
-	 * @return Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function getHouseReport($houseId, $start, $finish) {
 

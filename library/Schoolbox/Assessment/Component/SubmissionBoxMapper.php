@@ -649,7 +649,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * @param User     $user     The user to filter submissions for
 	 * @param Category $category If set, restrict results to this category.
 	 *
-	 * @return \Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function getSubmittable(User $user, Category $category = null) {
 		$cat_mapper = $this->getJoinMapper('category');
