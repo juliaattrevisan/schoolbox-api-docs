@@ -8,8 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace SocialStream\Post;
-use SocialStream\Post;
+namespace SocialStream;
 use Schoolbox;
 
 class PostMapper extends Schoolbox\Mapper {
@@ -89,19 +88,49 @@ class PostMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
-		// Parent object: has reference to itself as a mapper.
-		$this->hasJoin('parent', array(
-			'multiple'  => true,
-			'mapper'    => $this,
-			'this_key'  => 'parent_id',
-			'other_key' => 'post_id',
-		));
+//		// Parent object: has reference to itself as a mapper.
+//		$this->hasJoin('parent', array(
+//			'multiple'  => true,
+//			'mapper'    => $this,
+//			'this_key'  => 'parent_id',
+//			'other_key' => 'post_id',
+//		));
 
 		parent::mapping();
 	}
 
-	public function craeteModel($type) {
-		switch($type) {
+
+	/**
+	 * Find all the social stream posts for a given homepage
+	 *
+	 * @param $homepageId
+	 * @return \Collection
+	 */
+	public function findAllForHomepage($homepageId) {
+		$query = "
+			SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            WHERE homepage_id = :homepageId
+            ORDER BY created_at DESC
+        ";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":homepageId", $homepageId);
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
+
+	/**
+	 * Spawn a subclass of SocialStream_Post_Abstract
+	 *
+	 * @param $row
+	 * @return object
+	 */
+	public function createModel($row) {
+		switch($row['type']) {
 			case 'Video' : $model = 'SocialStream_Post_Video'; break;
 			default : $model = 'SocialStream_Post_String'; break;
 		}
@@ -116,7 +145,7 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @return Model
 	 */
 	public function hydrate($row, $alias = '', $callback = null) {
-		$model = $this->createModel();
+		$model = $this->createModel($row);
 
 		foreach ($this->map as $map) {
 			$propertyName = $map['property'];
