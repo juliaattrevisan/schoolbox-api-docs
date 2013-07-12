@@ -95,7 +95,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $body
 	 */
-	protected function setBody($body) {
+	public function setBody($body) {
 		$this->body = $body;
 	}
 
@@ -104,7 +104,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return string
 	 */
-	protected function getBody() {
+	public function getBody() {
 		return $this->body;
 	}
 
@@ -113,7 +113,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $createdAt
 	 */
-	protected function setCreatedAt($createdAt) {
+	public function setCreatedAt($createdAt) {
 		$this->createdAt = $createdAt;
 	}
 
@@ -122,7 +122,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return string
 	 */
-	protected function getCreatedAt() {
+	public function getCreatedAt() {
 		return $this->createdAt;
 	}
 
@@ -131,7 +131,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $deletedAt
 	 */
-	protected function setDeletedAt($deletedAt) {
+	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
 	}
 
@@ -140,7 +140,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return string
 	 */
-	protected function getDeletedAt() {
+	public function getDeletedAt() {
 		return $this->deletedAt;
 	}
 
@@ -149,7 +149,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $homepageId
 	 */
-	protected function setHomepageId($homepageId) {
+	public function setHomepageId($homepageId) {
 		$this->homepageId = $homepageId;
 	}
 
@@ -158,7 +158,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return mixed
 	 */
-	protected function getHomepageId() {
+	public function getHomepageId() {
 		return $this->homepageId;
 	}
 
@@ -167,7 +167,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $mimetype
 	 */
-	protected function setMimetype($mimetype) {
+	public function setMimetype($mimetype) {
 		$this->mimetype = $mimetype;
 	}
 
@@ -176,7 +176,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return string
 	 */
-	protected function getMimetype() {
+	public function getMimetype() {
 		return $this->mimetype;
 	}
 
@@ -185,7 +185,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $ownerId
 	 */
-	protected function setOwnerId($ownerId) {
+	public function setOwnerId($ownerId) {
 		$this->ownerId = $ownerId;
 	}
 
@@ -194,7 +194,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return mixed
 	 */
-	protected function getOwnerId() {
+	public function getOwnerId() {
 		return $this->ownerId;
 	}
 
@@ -203,7 +203,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $parentId
 	 */
-	protected function setParentId($parentId) {
+	public function setParentId($parentId) {
 		$this->parentId = $parentId;
 	}
 
@@ -212,7 +212,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return mixed
 	 */
-	protected function getParentId() {
+	public function getParentId() {
 		return $this->parentId;
 	}
 
@@ -221,7 +221,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $postId
 	 */
-	protected function setPostId($postId) {
+	public function setPostId($postId) {
 		$this->postId = $postId;
 	}
 
@@ -230,7 +230,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return mixed
 	 */
-	protected function getPostId() {
+	public function getPostId() {
 		return $this->postId;
 	}
 
@@ -239,7 +239,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $type
 	 */
-	protected function setType($type) {
+	public function setType($type) {
 		$this->type = $type;
 	}
 
@@ -248,7 +248,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return string
 	 */
-	protected function getType() {
+	public function getType() {
 		return $this->type;
 	}
 
@@ -257,7 +257,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $updatedAt
 	 */
-	protected function setUpdatedAt($updatedAt) {
+	public function setUpdatedAt($updatedAt) {
 		$this->updatedAt = $updatedAt;
 	}
 
@@ -266,7 +266,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return string
 	 */
-	protected function getUpdatedAt() {
+	public function getUpdatedAt() {
 		return $this->updatedAt;
 	}
 
@@ -275,7 +275,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @param $url
 	 */
-	protected function setUrl($url) {
+	public function setUrl($url) {
 		$this->url = $url;
 	}
 
@@ -284,7 +284,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @return string
 	 */
-	protected function getUrl() {
+	public function getUrl() {
 		return $this->url;
 	}
 }
