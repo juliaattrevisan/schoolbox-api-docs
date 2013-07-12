@@ -20,7 +20,7 @@ class GizaCollection implements Iterator {
     }
 
     public function add($collection) {
-        if($collection instanceof Collection) {
+        if($collection instanceof ICollection) {
             $this->collection = array_merge($this->collection, $collection->getAll());
         }
 
