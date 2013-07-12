@@ -34,6 +34,11 @@ class Category {
 	protected $parent;
 
 	/**
+	 * @var int
+	 */
+	protected $templateId;
+
+	/**
 	 * @var Collection
 	 */
 	protected $codes;
@@ -129,6 +134,22 @@ class Category {
 	 */
 	public function getParentId() {
 		return $this->parent_id;
+	}
+
+	/**
+	 * @param int $templateId
+	 * @return $this
+	 */
+	public function setTemplateId($templateId) {
+		$this->templateId = $templateId;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getTemplateId() {
+		return $this->templateId;
 	}
 
 	//
