@@ -967,9 +967,12 @@ class Mapper {
 	}
 
 	/**
-	 * @param Array $rowList
-	 * @param String $alias
-	 * @param Callback $callback
+	 * Hydrates a row from the database into a model.
+	 *
+	 * @param array    $rowList  The rows from the database.
+	 * @param string   $alias    The prefix of this mapper's table cells in $row
+	 * @param callable $callback A callback to apply on all models (@see $this->hydrate)
+	 *
 	 * @return Collection
 	 */
 	public function hydrateList($rowList, $alias = '', $callback = null) {
@@ -983,10 +986,18 @@ class Mapper {
 	}
 
 	/**
-	 * @param Array $row
-	 * @param String $alias
-	 * @param callable $callback
-	 * @return Model
+	 * Hydrates a row from the database into a model.
+	 *
+	 * @param array    $row      The row from the database.
+	 * @param string   $alias    The prefix of this mapper's table cells in $row
+	 * @param callable $callback If supplied and callable, this method is
+	 *                           applied to the model once it's retrieved.
+	 *                           It takes the following parameters:
+	 *                           $mapper: this object
+	 *                           $model:  the model that has been hydrated
+	 *                           $row:    the row from the database
+	 *
+	 * @return object
 	 */
 	public function hydrate($row, $alias = '', $callback = null) {
 		$model = $this->createModel();
@@ -1134,12 +1145,12 @@ class Mapper {
 	/**
 	 * Binds values from the model into the statement.
 	 *
-	 * @param object       $model     The model to get values from
-	 * @param PDOStatement $statement The statement for inserting/updating model
+	 * @param object        $model     The model to get values from
+	 * @param \PDOStatement $statement The statement for inserting/updating model
 	 *
 	 * @return void
 	 */
-	protected function bindParamsForSave($model, PDOStatement $statement) {
+	protected function bindParamsForSave($model, \PDOStatement $statement) {
 		foreach ($this->map as $map) {
 			$propertyName = $map['property'];
 			$columnName   = $map['column'];
