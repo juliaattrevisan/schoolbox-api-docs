@@ -4,6 +4,8 @@
  *
  * This is the standard object for a stored resource in Schoolbox
  *
+ * @deprecated Use Schoolbox\File instead
+ *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2012 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
