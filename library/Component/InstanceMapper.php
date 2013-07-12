@@ -62,9 +62,9 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	public function findByDefinition($module, $definitionId) {
 		$sql = '
 			SELECT '.$this->getColumnString('ci').'
-				 , '.Component_Definitionself::getInstance()->getColumnString('cd').'
-				 , '.Component_ConfigDefinitionself::getInstance()->getColumnString('ccd').'
-				 , '.Component_Configself::getInstance()->getColumnString('cci')."
+				 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
+				 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
+				 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
 			FROM component_instance ci
 			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
 			LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -89,9 +89,9 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	public function findByModule($module) {
 		$sql = '
 			SELECT '.$this->getColumnString('ci').'
-				 , '.Component_Definitionself::getInstance()->getColumnString('cd').'
-				 , '.Component_ConfigDefinitionself::getInstance()->getColumnString('ccd').'
-				 , '.Component_Configself::getInstance()->getColumnString('cci')."
+				 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
+				 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
+				 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
 			FROM component_instance ci
 			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
 			  LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -106,9 +106,9 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	public function findByContext($module, $identifier) {
 		$sql = '
 			SELECT '.$this->getColumnString('ci').'
-				 , '.Component_Definitionself::getInstance()->getColumnString('cd').'
-				 , '.Component_ConfigDefinitionself::getInstance()->getColumnString('ccd').'
-				 , '.Component_Configself::getInstance()->getColumnString('cci')."
+				 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
+				 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
+				 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
 			FROM component_instance ci
 			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
 			  LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -123,9 +123,9 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	public function findByInstanceId($id) {
 		$sql = '
 			SELECT ' . $this->getColumnString('ci') . '
-				 , ' . Component_Definitionself::getInstance()->getColumnString('cd') .'
-				 , ' . Component_ConfigDefinitionself::getInstance()->getColumnString('ccd') . '
-				 , ' . Component_Configself::getInstance()->getColumnString('cci') . "
+				 , ' . Component_DefinitionMapper::getInstance()->getColumnString('cd') .'
+				 , ' . Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd') . '
+				 , ' . Component_ConfigMapper::getInstance()->getColumnString('cci') . "
 			FROM component_instance ci
 			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
 			  LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -151,9 +151,9 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 		$rowset = $statement->fetchAll();
 
 		$instanceCollection = $this->hydrateList($rowset, 'ci');
-		$definitionCollection = Component_Definitionself::getInstance()->hydrateList($rowset, 'cd');
-		$configInstanceCollection = Component_Configself::getInstance()->hydrateList($rowset, 'cci');
-		$configDefinitionCollection = Component_ConfigDefinitionself::getInstance()->hydrateList($rowset, 'ccd');
+		$definitionCollection = Component_DefinitionMapper::getInstance()->hydrateList($rowset, 'cd');
+		$configInstanceCollection = Component_ConfigMapper::getInstance()->hydrateList($rowset, 'cci');
+		$configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->hydrateList($rowset, 'ccd');
 
 		$finalCollection = array();
 
@@ -197,9 +197,9 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 
 		foreach ( $dirtyInstanceCollection as $dirtyInstance ) {
 
-			$instanceMapper = Component_Instanceself::getInstance();
+			$instanceMapper = Component_InstanceMapper::getInstance();
 
-			$definitionMapper = Component_Definitionself::getInstance();
+			$definitionMapper = Component_DefinitionMapper::getInstance();
 
 			$dirtyInstance->definition = $definitionMapper->findById($dirtyInstance->definitionId);
 
@@ -269,7 +269,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	}
 
 	public function delete ($object) {
-		$instanceMapper = Component_Instanceself::getInstance();
+		$instanceMapper = Component_InstanceMapper::getInstance();
 
 		/* using instanceof over is_a(), since it's the equivalent language construct
 		 * rather than a function */
