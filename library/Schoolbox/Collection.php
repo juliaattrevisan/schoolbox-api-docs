@@ -23,6 +23,15 @@ class Collection implements \ArrayAccess, \ICollection {
 	}
 
 	/**
+	 * Returns whole collection as an array.
+	 *
+	 * @return array
+	 */
+	public function getAll() {
+		return $this->stack;
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param array $stack

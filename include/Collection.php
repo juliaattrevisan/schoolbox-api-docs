@@ -48,6 +48,10 @@ class Collection implements ArrayAccess, ICollection {
         return $this->container;
     }
 
+    public function getAll() {
+        return $this->toArray();
+    }
+
     /**
      * Add item to end of this collection
      *
