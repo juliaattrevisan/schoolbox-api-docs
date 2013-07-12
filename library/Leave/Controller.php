@@ -644,7 +644,7 @@ class Leave_Controller extends Controller {
                 $this->getPage()->setVar(
                     array(
                         'USER_ID' => $request->getUser()->getId(),
-                        'USER_NAME' => $request->getUser()->getName(),
+                        'USER_NAME' => $request->getUser()->formatName(),
                         'USER_YEAR' => $request->getUser()->getYear(),
                         'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
                         'REQUEST_ID' => $request->getId(),
@@ -671,7 +671,7 @@ class Leave_Controller extends Controller {
                             'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(
                             ),
                             'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
-                            'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+                            'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
                             'CLASS' => $previousRequestCount % 2 ? '' : 'dark',
                         )
                     );
@@ -757,14 +757,14 @@ class Leave_Controller extends Controller {
                 if ($request->getStatus() == Leave_Request::STATUS_APPROVED) {
                     $rowData = array();
                     $rowData[] = $request->getUser()->getId();
-                    $rowData[] = $request->getUser()->getName();
+                    $rowData[] = $request->getUser()->formatName();
                     $rowData[] = $request->getUser()->getYear();
                     $rowData[] = $request->getStart()->getAustralian();
                     $rowData[] = $request->getFinish()->getAustralian();
                     $rowData[] = $request->getHostType(true);
                     $rowData[] = $request->getStatus(true);
                     $rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
-                    $rowData[] = $request->getAuthorisationUser()->getName();
+                    $rowData[] = $request->getAuthorisationUser()->formatName();
 
                     $allRows[] = TextFormatter::outputCSV($rowData);
                 }
@@ -816,7 +816,7 @@ class Leave_Controller extends Controller {
             $this->getPage()->setVar(
                 array(
                     'USER_ID' => $user->getId(),
-                    'USER_NAME' => $user->getName(),
+                    'USER_NAME' => $user->formatName(),
                     'HOUSE_NAME' => $house->getHouse(),
                     'HOUSE_ID' => $house->getId(),
                     'ALLOWED_ACTION' => $this->getGroup()->getPermission(null) ? 'modify' : 'view',
@@ -835,7 +835,7 @@ class Leave_Controller extends Controller {
                     $this->getPage()->setVar(
                         array(
                             'USER_ID' => $request->getUser()->getId(),
-                            'USER_NAME' => $request->getUser()->getName(),
+                            'USER_NAME' => $request->getUser()->formatName(),
                             'USER_YEAR' => $request->getUser()->getYear(),
                             'REQUEST_ID' => $request->getId(),
                             'REQUEST_START' => $request->getStart()->getAustralian(),
@@ -862,7 +862,7 @@ class Leave_Controller extends Controller {
                                     true
                                 )->getAustralian(),
                                 'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
-                                'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+                                'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
                                 'CLASS' => $previousRequestCount % 2 ? '' : 'dark',
                             )
                         );
