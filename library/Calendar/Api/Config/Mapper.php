@@ -10,14 +10,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_Config_Mapper extends Mapper {
-
-	/**
-	 * The database table this maps to
-	 *
-	 * @var string
-	 */
-	protected $table = 'calendar_connector';
+class Calendar_Api_Config_Mapper extends Schoolbox\Mapper {
 
 	/**
 	 * Mapping rules
@@ -31,35 +24,33 @@ class Calendar_Api_Config_Mapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 			'identifier' => true
 		));
 
 		$this->hasMap(array(
 			'column'     => 'event_type',
 			'property'   => 'eventType',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'connector_class',
 			'property'   => 'connectorClass',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'config',
 			'property'   => 'config',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'status',
 			'property'   => 'status',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
-
-		parent::mapping();
 	}
 
 	/**
@@ -69,11 +60,11 @@ class Calendar_Api_Config_Mapper extends Mapper {
 	 */
 	public function getAllConfigRecords() {
 		$query = "
-            SELECT *, CONCAT(event_type, '_', connector_class) AS unified
-            FROM `{$this->table}`
-            WHERE status = 1
-            GROUP BY unified
-        ";
+			SELECT *, CONCAT(event_type, '_', connector_class) AS unified
+			FROM `{$this->table}`
+			WHERE status = 1
+			GROUP BY unified
+		";
 
 		$statement = $this->database->prepare($query);
 
