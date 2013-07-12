@@ -88,14 +88,6 @@ class PostMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
-//		// Parent object: has reference to itself as a mapper.
-//		$this->hasJoin('parent', array(
-//			'multiple'  => true,
-//			'mapper'    => $this,
-//			'this_key'  => 'parent_id',
-//			'other_key' => 'post_id',
-//		));
-
 		parent::mapping();
 	}
 
@@ -162,9 +154,7 @@ class PostMapper extends Schoolbox\Mapper {
 		if (!empty($callback) && is_callable($callback)) {
 			$model = call_user_func($callback, $this, $model, $row);
 		}
-$model->setCreatedAt(null);
-		$model->setUpdatedAt(null);
-		$model->setDeletedAt(null);
+
 		return $model;
 	}
 

@@ -81,12 +81,19 @@ class Thread {
 		 */
 		$tree = array_values(array_filter($structure));
 
+		/* Transform it back into a collection, because we normally don't
+		 * remove elements from iterator classes
+		 */
+		$collection = new \Schoolbox\Collection();
+
+		foreach($tree as $node) {
+			$collection->add($node);
+		}
+
 		/* Save that one for later!
 	 	 */
-		$this->setTree($tree);
+		$this->setTree($collection);
 
-		/* Chainable
-		 */
 		return $this;
 	}
 
