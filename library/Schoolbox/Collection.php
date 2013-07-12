@@ -10,97 +10,152 @@
 namespace Schoolbox;
 use Schoolbox;
 
-class Collection implements \ICollection {
+class Collection implements \ArrayAccess, \ICollection {
 
-    protected $stack = array();
+	protected $stack = array();
 	protected $position = 0;
 
-    /**
-     * @param $element
-     */
-    public function add($element) {
-        $this->stack[] = $element;
-    }
+	/**
+	 * @param $element
+	 */
+	public function add($element) {
+		$this->stack[] = $element;
+	}
 
-    /**
-     * Constructor
-     *
-     * @param array $stack
-     */
-    public function __construct($stack = array()) {
-        $this->setStack($stack);
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param array $stack
+	 */
+	public function __construct($stack = array()) {
+		$this->setStack($stack);
+	}
 
-    /**
-     * Rewind
-     */
-    public function rewind() {
-        $this->position = 0;
-    }
+	/**
+	 * Sets key value in collection
+	 *
+	 * @param  mixed $offset
+	 * @param  mixed $value
+	 *
+	 * @return void
+	 */
+	public function offsetSet($offset, $value) {
+		if ( empty($offset) ) {
+			$this->stack[] = $value;
+		}
+		else {
+			$this->stack[$offset] = $value;
+		}
+	}
 
-    /**
-     * Current
-     *
-     * @return mixed
-     */
-    public function current() {
-        return $this->stack[$this->position];
-    }
+	/**
+	 * Gets value in collection
+	 *
+	 * @param mixed $offset
+	 *
+	 * @return mixed
+	 */
+	public function offsetGet($offset) {
+		if ( isset($this->stack[$offset]) ) {
+			return $this->stack[$offset];
+		}
+		else {
+			return null;
+		}
+	}
 
-    /**
-     * Key
-     *
-     * @return mixed
-     */
-    public function key() {
-        return $this->position;
-    }
+	/**
+	 * Does this value exist?
+	 *
+	 * @param mixed $offset
+	 *
+	 * @return bool
+	 */
+	public function offsetExists($offset) {
+		return isset($this->stack[$offset]);
+	}
 
-    /**
-     * Next
-     */
-    public function next() {
-        ++$this->position;
-    }
+	/**
+	 * Unsets value in collection
+	 *
+	 * @param mixed $offset
+	 *
+	 * @return void
+	 */
+	public function offsetUnset($offset) {
+		unset($this->stack[$offset]);
+	}
 
-    /**
-     * Valid
-     *
-     * @return bool
-     */
-    public function valid() {
-        return isset($this->stack[$this->position]);
-    }
+	/**
+	 * Rewind
+	 */
+	public function rewind() {
+		$this->position = 0;
+	}
 
-    /* Getters/Setters
-     */
+	/**
+	 * Current
+	 *
+	 * @return mixed
+	 */
+	public function current() {
+		return $this->stack[$this->position];
+	}
 
-    /**
-     * Set stack
-     *
-     * @param $stack
-     */
-    protected function setStack($stack) {
-        $this->stack = $stack;
-    }
+	/**
+	 * Key
+	 *
+	 * @return mixed
+	 */
+	public function key() {
+		return $this->position;
+	}
 
-    /**
-     * Get stack
-     *
-     * @return array
-     */
-    protected function getStack() {
-        return $this->stack;
-    }
+	/**
+	 * Next
+	 */
+	public function next() {
+		++$this->position;
+	}
 
-    /**
-     * Get number of elements in collection.
-     *
-     * @return array
-     */
-    public function count() {
-        return count($this->getStack());
-    }
+	/**
+	 * Valid
+	 *
+	 * @return bool
+	 */
+	public function valid() {
+		return isset($this->stack[$this->position]);
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set stack
+	 *
+	 * @param $stack
+	 */
+	protected function setStack($stack) {
+		$this->stack = $stack;
+	}
+
+	/**
+	 * Get stack
+	 *
+	 * @return array
+	 */
+	protected function getStack() {
+		return $this->stack;
+	}
+
+	/**
+	 * Get number of elements in collection.
+	 *
+	 * @return array
+	 */
+	public function count() {
+		return count($this->getStack());
+	}
 
 	/**
 	 * Gets the name of the get method for this field.
