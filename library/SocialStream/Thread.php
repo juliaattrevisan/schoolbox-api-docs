@@ -61,7 +61,13 @@ class Thread {
 			 */
 			if ($currentPost->getParentId()) {
 				$destination = $this->findNode($structure, $currentPost->getParentId());
-				$destination->getChildren()->add($currentPost);
+
+				/* Only try to add it if a destination is found
+				 * (This should get around orphaned posts)
+				 */
+				if ($destination) {
+					$destination->getChildren()->add($currentPost);
+				}
 
 				/* Remember which ones we can remove from the root level
 				 */
