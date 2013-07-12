@@ -1,6 +1,8 @@
 <?php
 
 /**
+ *
+ * @deprecated Models no longer need to extend a base class.
  * 
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
