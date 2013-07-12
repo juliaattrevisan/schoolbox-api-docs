@@ -194,9 +194,13 @@ class Mapper {
 	}
 
 	/**
-	 * Updated because hydrated objects won't usually belong to the Model class.
-	 * Collections will always be \Schoolbox\Collection instances for these
-	 * classes, though.
+	 * Gets a single object as a collection, if it isn't one already.
+	 *
+	 * Different possible actions based on $object:
+	 * * instanceof Collection: returns that object
+	 * * instanceof \ICollection: returns that object converted to collection
+	 * * array: returns a Collection object wrapping that array
+	 * * anything else: returns Collection with $object as only item
 	 *
 	 * @param mixed $object
 	 *
@@ -206,7 +210,13 @@ class Mapper {
 		if ($object instanceof Collection) {
 			return $object;
 		}
-		return new Collection(array($object));
+		if ($object instanceof \ICollection) {
+			return $this->createCollection($object->getAll());
+		}
+		if (is_array($object)) {
+			return $this->createCollection($object);
+		}
+		return $this->createCollection(array($object));
 	}
 
 	/**
