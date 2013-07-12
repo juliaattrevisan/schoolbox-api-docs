@@ -27,10 +27,10 @@ class Core_Nav_Sidebar {
     public function createAgenda($items = 'all') {
 
         if(is_array($items) && count($items)) {
-            $agenda['dashboard'] = array('facade/dashboard/display', 'home');
-            $agenda['timetable'] = array('timetable/display', 'clock');
-            $agenda['calendar'] = array('calendar/month', 'calendar');
-            $agenda['news'] = array('news/school', 'news');
+            $agenda['dashboard'] = array('/m/facade/dashboard/display', 'home');
+            $agenda['timetable'] = array('/m/timetable/display', 'clock');
+            $agenda['calendar'] = array('/m/calendar/month', 'calendar');
+            $agenda['news'] = array('/m/news/school', 'news');
 
             $list = array();
 
@@ -117,7 +117,7 @@ class Core_Nav_Sidebar {
 
             $subject = array(
                 'value' => $cat->getName() . $code,
-                'href'  => "facade/homepage/display/$cid",
+                'href'  => "/m/facade/homepage/display/$cid",
                 'items' => array()
             );
 
@@ -125,7 +125,7 @@ class Core_Nav_Sidebar {
                 if(isset($itemMap[$item])) {
                     $subject['items'][] = array(
                         'value' => $itemMap[$item],
-                        'href'  => "facade/homepage/$item/$cid"
+                        'href'  => "/m/facade/homepage/$item/$cid"
                     );
                 }
             }
@@ -208,7 +208,7 @@ class Core_Nav_Sidebar {
 
             $subject = array(
                 'value' => $cat->getName(),
-                'href'  => "facade/homepage/display/$cid",
+                'href'  => "/m/facade/homepage/display/$cid",
                 'items' => array()
             );
 
@@ -216,7 +216,7 @@ class Core_Nav_Sidebar {
                 if(isset($itemMap[$item])) {
                     $subject['items'][] = array(
                         'value' => $itemMap[$item],
-                        'href'  => "facade/homepage/$item/$cid"
+                        'href'  => "/m/facade/homepage/$item/$cid"
                     );
                 }
             }
@@ -326,7 +326,7 @@ class Core_Nav_Sidebar {
             );
 
             if($item['kind'] == 0) {
-                $workitem['href'] = 'due_work/submission_box/display/' . $item['id'];
+                $workitem['href'] = '/m/due_work/submission_box/display/' . $item['id'];
             }
             else {
                 $workitem['href'] = '#';
@@ -352,7 +352,7 @@ class Core_Nav_Sidebar {
         $this->more = array(
             array(
                 'value' => 'Settings',
-                'href'  => 'core/settings/preferences'
+                'href'  => '/m/core/settings/preferences'
             ),
             array(
                 'id'    => 'switch',
@@ -363,7 +363,7 @@ class Core_Nav_Sidebar {
             array(
                 'id'    => 'logout',
                 'value' => 'Logout',
-                'href'  => 'core/auth/logout',
+                'href'  => '/m/core/auth/logout',
                 'rel'   => 'alternate',
             ),
         );
