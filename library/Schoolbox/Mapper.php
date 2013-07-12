@@ -34,7 +34,11 @@ class Mapper extends BaseMapper {
      * without going through getInstance().
      */
     public function __construct() {
-        parent::__construct();
+	    $this->database = \Database::getInstance();
+	    $this->setup();
+	    $this->mapping();
+	    $this->setConfigLoader(new ConfigLoader());
+	    $this->setColumnFactory(new ColumnFactory());
     }
 
 	/**
@@ -58,10 +62,10 @@ class Mapper extends BaseMapper {
 	 */
 	protected $soft_delete_undeleted_value = null;
 
-    protected function setup() {
-        $this->setConfigLoader(new ConfigLoader());
-        $this->setColumnFactory(new ColumnFactory());
-    }
+	/**
+	 * Default setup for any other objects which compose the mapper.
+	 */
+    protected function setup() {}
 
     /**
      * @param IFactory $column_factory
@@ -190,16 +194,56 @@ class Mapper extends BaseMapper {
     }
 
     /**
-     * Overrides parent::hasMap() to set the hydrator based on the field type.
+     * Adds a mapping from a database column to a model property.
      *
-     * @param $map
-     * @return bool
+     * @param array $map An array with any of the following keys:
+     * * column: The database column to map from.
+     * * property: The model property to map to. There must be a get and set
+     *             method corresponding to the property in the model class:
+     *             'get'.ucfirst($property)
+     * * type:     The type of field this is. This affects the strategy that is
+     *             used for hydrating database row fields into model attributes,
+     *             and dehydrating model attributes to database fields. Use one
+     *             of the following class constants:
+     *             TYPE_BOOLEAN: true/false
+     *             TYPE_INTEGER: an int
+     *             TYPE_STRING, TYPE_LOB: no conversion is done
+     *             TYPE_DATETIME, TYPE_DATE, TYPE_TIME, TYPE_TIMESTAMP:
+     *               For all of these, the model is hydrated with an
+     *               Alaress_Date_Format object. the type refers to how it's
+     *               stored in the DB.
+     *               DATETIME, DATE and TIME refer to their MySQL counterparts,
+     *             TIMESTAMP refers to a Unix timestamp.
+     *             TYPE_DECIMAL: currently, a number to 2 decimal places.
+     *             TYPE_SERIALIZED: A PHP serialized value
+     *             TYPE_MODEL: Another model.
+     * * hydrator: An alternative to `type` - set this as an instance of Schoolbox\Column\IColumnType.
+     *             Usually you won't need to set this directly, but if you have
+     *             a hydration strategy that isn't covered by `type`, use this.
+     * * join:     Required and only used for TYPE_MODEL - defines which join
+     *             mapper should be used to hydrate an instance of this model for.
+     * * identifier: if true, this map is the primary key for this table, and is
+     *               used by mapper's getById method
+     * created_timestamp: if true, this column is updated with the current time
+     *                    when the row is created for the first time
+     * updated_timestamp: like `created_timestamp`, but also updated when row is
+     *                    updated at any time
+     *
+     * @return bool Was the map added?
      */
     protected function hasMap($map) {
         if (is_array($map) && !isset($map['hydrator'])) {
             $map['hydrator'] = $this->column_factory->build($map['type']);
         }
-        return parent::hasMap($map);
+
+        if (!is_array($map)) {
+            return false;
+        }
+        if (!empty($map['identifier'])) {
+            $this->identifier = $map;
+        }
+        $this->map[] = $map;
+        return true;
     }
 
     /**
@@ -260,7 +304,7 @@ class Mapper extends BaseMapper {
 
 	/**
 	 * Overrides delete() method to call softDelete if a soft delete field was
-	 * set up, or parent's delete() method if it wasn't.
+	 * set up, or hardDelete() method if it wasn't.
 	 *
 	 * @param $object
 	 *
@@ -296,14 +340,47 @@ class Mapper extends BaseMapper {
 	}
 
 	/**
-	 * Alias for parent's delete() method.
+	 * Truly deletes an item.
 	 *
 	 * @param object $object Model or collection of models to delete
 	 *
 	 * @return bool
 	 */
 	public function hardDelete($object) {
-		return parent::delete($object);
+		$identifierName = $this->identifier['column'];
+
+		$collection = $this->getModelAsCollection($object);
+
+		$statement = $this->database->prepare(
+			"
+            DELETE FROM  `{$this->table}`
+            WHERE `{$identifierName}` = :identifierValue
+        "
+		);
+
+		foreach ($collection as $model) {
+			if (!($this->triggerCallbacks('preDelete', $model))) {
+				return false;
+			}
+		}
+
+		$this->database->beginTransaction();
+
+		foreach ($collection as $model) {
+			$statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName, $this->identifier));
+
+			if (!$statement->execute()) {
+
+				return false;
+			}
+		}
+		$this->database->commit();
+
+		foreach ($collection as $model) {
+			$this->triggerCallbacks('postDelete', $model);
+		}
+
+		return true;
 	}
 
 	/**
