@@ -6,6 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\User;
+
 class Authenticator {
 
     private $authenticated = false;
@@ -66,25 +68,14 @@ class Authenticator {
 
     public function appendSession($username) {
         //
-        // Mobile not enabled? That means GizaUser_DataMapper doesn't exist.
-        // That's not an issue if mobile doesn't exist, so return true.
+        // Mobile not enabled? Just pretend we added the mobile portion of the session.
         if (!Cfg::get('mobile_enabled')) {
             return true;
         }
 
-        //
-        // Avoid SQL injection weakness in Giza mapper by getting ID of user
-        // (always an int) and querying Giza on that.
-        // Not a long term fix of course, but should result in less backward
-        // compatibility issues than changing the old mapper.
-        $uid  = Schoolbox\UserMapper::getInstance()->getIdForUsername($username);
-        if (!$uid) {
-            return false;
-        }
-        $uMap = new GizaUser_DataMapper();
-        $user = $uMap->read(array('user.id' => $uid))->get();
+	    $user = \Schoolbox\UserMapper::getInstance()->findByColumn('username', $username)->current();
 
-        if(count($user)) {
+        if($user instanceof User) {
             $this->setSessionUser($user);
 
             // indicate that session creation was successful
@@ -122,7 +113,7 @@ class Authenticator {
      */
 
     /**
-     * @param GizaUser $user
+     * @param User $user
      */
     public function setSessionUser($user) {
         // $_SESSION['user'] = $user->get('uid');
@@ -132,7 +123,7 @@ class Authenticator {
     }
 
     /**
-     * @return GizaUser
+     * @return User
      */
     public function getSessionUser() {
         // $uMap = new GizaUser_DataMapper();
