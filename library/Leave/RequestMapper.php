@@ -288,26 +288,24 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * Returns the next pending request by house id
+	 * Returns the previous pending request by house id
 	 *
 	 * @param $requestId
 	 * @param $houseId
 	 *
-	 * @return Collection
+	 * @return Leave_Request
 	 */
 	public function findPreviousPendingByHouseId($requestId, $houseId) {
 		$requestCollection = $this->getAllLeaveRequests($houseId);
 
 		/* Manually iterate and get the next one.
 		   */
-		for ($i = 0; $i < count($requestCollection); $i++) {
-			$currentRequest = $requestCollection[$i];
-
-			/* Return the previous one
-				*/
+		$previous = null;
+		foreach ($requestCollection as $currentRequest) {
 			if ($currentRequest->getId() == $requestId) {
-				return $requestCollection[$i - 1];
+				return $previous;
 			}
+			$previous = $currentRequest;
 		}
 
 		return null;
@@ -319,20 +317,20 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * @param $requestId
 	 * @param $houseId
 	 *
-	 * @return Collection
+	 * @return Leave_Request
 	 */
 	public function findNextPendingByHouseId($requestId, $houseId) {
 		$requestCollection = $this->getAllLeaveRequests($houseId);
 
 		/* Manually iterate and get the next one.
 		   */
-		for ($i = 0; $i < count($requestCollection); $i++) {
-			$currentRequest = $requestCollection[$i];
-
-			/* Return the previous one
-				*/
+		$next = false;
+		foreach ($requestCollection as $currentRequest) {
+			if ($next) {
+				return $currentRequest;
+			}
 			if ($currentRequest->getId() == $requestId) {
-				return $requestCollection[$i + 1];
+				$next = true;
 			}
 		}
 
