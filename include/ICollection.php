@@ -8,5 +8,17 @@
  * @link      http://www.alaress.com.au
  */
 interface ICollection extends Iterator, Countable {
+	/**
+	 * Add item to end of this collection
+	 *
+	 * @param mixed $value
+	 */
 	public function add($value);
+
+	/**
+	 * Returns entire collection as an array.
+	 *
+	 * @return array
+	 */
+	public function getAll();
 }
