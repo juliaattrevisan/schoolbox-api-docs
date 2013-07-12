@@ -38,7 +38,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			array(
 				'column' => 'start',
 				'property' => 'start',
-				'type' => self::TYPE_STRING,
+				'type' => self::TYPE_DATETIME,
 			)
 		);
 
@@ -46,7 +46,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			array(
 				'column' => 'finish',
 				'property' => 'finish',
-				'type' => self::TYPE_STRING,
+				'type' => self::TYPE_DATETIME,
 			)
 		);
 
