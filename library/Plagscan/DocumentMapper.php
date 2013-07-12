@@ -8,75 +8,72 @@
  * @version     SVN: $Id$
  * 
  */
- 
-class Plagscan_DocumentMapper extends Mapper {
-    private $gateway;
 
-    protected function __construct () {
-        parent::__construct();
+class Plagscan_DocumentMapper extends Schoolbox\Mapper {
+	private $gateway;
 
-        $plagscanApiKey = Config::get('plagscan_api_key');
-        $plagscanUsername = Config::get('plagscan_username');
+	protected function setup() {
+		$plagscanApiKey = Config::get('plagscan_api_key');
+		$plagscanUsername = Config::get('plagscan_username');
+		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
+	}
 
-        $this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
-    }
+	protected function mapping () {
+		$this->hasTable('plagscan_document');
+		$this->hasModel('Plagscan_Document');
+		$this->hasMap(array(
+			'column'     => 'id',
+			'property'   => 'id',
+			'type'       => self::TYPE_INTEGER,
+			'identifier' => true
+		));
 
-    protected function mapping () {
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => Mapper::TYPE_INTEGER,
-            'identifier' => true
-        ));
+		$this->hasMap(array(
+			'column'     => 'file_id',
+			'property'   => 'fileId',
+			'type'       => self::TYPE_INTEGER,
+		));
 
-        $this->hasMap(array(
-            'column'     => 'file_id',
-            'property'   => 'fileId',
-            'type'       => Mapper::TYPE_INTEGER,
-        ));
+		$this->hasMap(array(
+			'column'     => 'plagscan_id',
+			'property'   => 'plagscanId',
+			'type'       => self::TYPE_INTEGER,
+		));
 
-        $this->hasMap(array(
-            'column'     => 'plagscan_id',
-            'property'   => 'plagscanId',
-            'type'       => Mapper::TYPE_INTEGER,
-        ));
+		$this->hasMap(array(
+			'column'     => 'status',
+			'property'   => 'status',
+			'type'       => self::TYPE_INTEGER,
+		));
 
-        $this->hasMap(array(
-            'column'     => 'status',
-            'property'   => 'status',
-            'type'       => Mapper::TYPE_INTEGER,
-        ));
+		$this->hasMap(array(
+			'column'     => 'score',
+			'property'   => 'score',
+			'type'       => self::TYPE_STRING,
+		));
 
-        $this->hasMap(array(
-            'column'     => 'score',
-            'property'   => 'score',
-            'type'       => Mapper::TYPE_STRING,
-        ));
+		$this->hasMap(array(
+			'column'     => 'html',
+			'property'   => 'html',
+			'type'       => self::TYPE_STRING,
+		));
+	}
 
-        $this->hasMap(array(
-            'column'     => 'html',
-            'property'   => 'html',
-            'type'       => Mapper::TYPE_STRING,
-        ));
+	public function save ($dirtyDocument) {
+		if ( !$this->findById($dirtyDocument->id)->id ) {
+			$documentId = $this->gateway->submit($dirtyDocument->file['name'], $dirtyDocument->file['file']);
 
-        parent::mapping();
-    }
+			if ( !empty($documentId) ) {
+				$this->gateway->check($documentId);
 
-    public function save ($dirtyDocument) {
-        if ( !$this->findById($dirtyDocument->id)->id ) {
-            $documentId = $this->gateway->submit($dirtyDocument->file['name'], $dirtyDocument->file['file']);
+				$dirtyDocument->plagscanId = $documentId;
+				$dirtyDocument->status = Plagscan_Document::STATUS_QUEUED;
+			}
+			else {
+				return false;
+			}
+		}
 
-            if ( !empty($documentId) ) {
-                $this->gateway->check($documentId);
-
-                $dirtyDocument->plagscanId = $documentId;
-                $dirtyDocument->status = Plagscan_Document::STATUS_QUEUED;
-            }
-            else {
-                return false;
-            }
-        }
-
-        return parent::save($dirtyDocument);
-    }
+		return parent::save($dirtyDocument);
+	}
 }
