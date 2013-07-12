@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$allPosts = \SocialStream\PostMapper::getInstance()->findAllForHomepage(10);
+
 
 //$tree = new Schoolbox\Collection();
 
@@ -241,39 +241,49 @@ $allPosts = \SocialStream\PostMapper::getInstance()->findAllForHomepage(10);
 
 
 
+$homepageId = 10;
 
-function findNode($tree, $id) {
-	foreach($tree as $leaf) {
-		if ($leaf->getPostId() == $id) {
-			return $leaf;
-		}
-	}
-}
+$thread = new \SocialStream\Thread($homepageId);
+$tree = $thread->getTree();
 
+new Alaress_Probe($tree);
 
-$structure = array();
-
-foreach($allPosts as $currentPost) {
-	$structure[] = $currentPost;
-}
-
-foreach($structure as $currentPost) {
-	if ($currentPost->getParentId()) {
-		$destination = findNode($structure, $currentPost->getParentId());
-		$destination->getChildren()->add($currentPost);
-
-		$remove[] = $currentPost->getPostId();
-	}
-}
-
-for ($i = 0; $i < count($structure); $i++) {
-	if (in_array($structure[$i]->getPostId(), $remove)) {
-		$structure[$i] = null;
-	}
-}
-
-$tree = array_values(array_filter($structure));
-new Alaress_Probe($x);
+//
+//
+//
+//function findNode($tree, $id) {
+//	foreach($tree as $leaf) {
+//		if ($leaf->getPostId() == $id) {
+//			return $leaf;
+//		}
+//	}
+//}
+//
+//
+//
+//$structure = array();
+//
+//foreach($allPosts as $currentPost) {
+//	$structure[] = $currentPost;
+//}
+//
+//foreach($structure as $currentPost) {
+//	if ($currentPost->getParentId()) {
+//		$destination = findNode($structure, $currentPost->getParentId());
+//		$destination->getChildren()->add($currentPost);
+//
+//		$remove[] = $currentPost->getPostId();
+//	}
+//}
+//
+//for ($i = 0; $i < count($structure); $i++) {
+//	if (in_array($structure[$i]->getPostId(), $remove)) {
+//		$structure[$i] = null;
+//	}
+//}
+//
+//$tree = array_values(array_filter($structure));
+//new Alaress_Probe($x);
 
 
 
