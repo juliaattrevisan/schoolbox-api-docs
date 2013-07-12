@@ -7,8 +7,11 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
       */
     private $imageId = null;
 
-    /* The actual resource object from storage */
-
+    /**
+     * The actual resource object from storage
+     *
+     * @var Schoolbox\File
+     */
     private $resource;
 
     /* The $key is a way to uniquely associate a cached image with a particular
@@ -43,13 +46,14 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * Remembers what image you are trying to load from cache
      *
-     * @param $imageId
-     * @param $key
+     * @param Schoolbox\File $resource
+     * @param string         $key
+     *
      */
     public function __construct($resource, $key) {
 
         $this->resource = $resource;
-        $this->setImageId($resource->id);
+        $this->setImageId($resource->getId());
         $this->setKey($key);
         $this->setCacheLocation(Cfg::get('stream_dir').'/storage');
     }
@@ -102,16 +106,15 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
     /**
      * Standard temporary interface
      *
-     * @param $imageArray
      * @return array
      */
     public function standardise() {
         return array(
-            'fileID' => $this->resource->id,
+            'fileID' => $this->resource->getId(),
             'filepath' => $this->resource->getFileLocation(),
-            'filename' => $this->resource->filename,
-            'mime' => $this->resource->mime,
-            'size' => $this->resource->filesize,
+            'filename' => $this->resource->getFilename(),
+            'mime' => $this->resource->getMime(),
+            'size' => $this->resource->getFilesize(),
         );
 
     }
