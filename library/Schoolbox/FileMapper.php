@@ -81,4 +81,25 @@ class FileMapper extends Mapper {
 	public function postDelete(File $object) {
 		$object->deleteFile();
 	}
+
+	/**
+	 * Convenience method for creating and saving a file into storage.
+	 *
+	 * @param string $filename      The file's name.
+	 * @param string $temp_location The location of the file to save.
+	 * @param int    $user_id       The user to associate with the file.
+	 *
+	 * @return File
+	 */
+	public function upload($filename, $temp_location, $user_id) {
+		$file = new File();
+		$file->setFilename($filename);
+		$file->setTempLocation($temp_location);
+		$file->setUploadedBy($user_id);
+		$file->loadHashFromTempLocation();
+		$file->loadMimetypeFromFilename();
+		$file->loadFilesizeFromTempLocation();
+		$this->save($file);
+		return $file;
+	}
 }
