@@ -8,44 +8,45 @@
  * @version     SVN: $Id$
  * @
  */
- 
-class Component_ConfigDefinitionMapper extends Mapper {
 
-    protected $table = 'component_config_definition';
+class Component_ConfigDefinitionMapper extends Schoolbox\Mapper {
 
-    protected function mapping () {
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => Mapper::TYPE_INTEGER,
-            'identifier' => true
-        ));
+	protected $table = 'component_config_definition';
 
-        $this->hasMap(array(
-            'column'     => 'component_definition_id',
-            'property'   => 'definitionId',
-            'type'       => Mapper::TYPE_INTEGER,
-        ));
+	protected function mapping () {
+		$this->hasTable('component_config_definition');
+		$this->hasModel('Component_ConfigDefinition');
+		$this->hasMap(array(
+			'column'     => 'id',
+			'property'   => 'id',
+			'type'       => self::TYPE_INTEGER,
+			'identifier' => true
+		));
 
-        $this->hasMap(array(
-            'column'     => 'key',
-            'property'   => 'key',
-            'type'       => Mapper::TYPE_STRING,
-        ));
+		$this->hasMap(array(
+			'column'     => 'component_definition_id',
+			'property'   => 'definitionId',
+			'type'       => self::TYPE_INTEGER,
+		));
 
-        $this->hasMap(array(
-            'column'     => 'default_value',
-            'property'   => 'defaultValue',
-            'type'       => Mapper::TYPE_STRING,
-        ));
+		$this->hasMap(array(
+			'column'     => 'key',
+			'property'   => 'key',
+			'type'       => self::TYPE_STRING,
+		));
 
-        $this->hasMap(array(
-            'column'     => 'label',
-            'property'   => 'label',
-            'type'       => Mapper::TYPE_STRING,
-        ));
+		$this->hasMap(array(
+			'column'     => 'default_value',
+			'property'   => 'defaultValue',
+			'type'       => self::TYPE_STRING,
+		));
 
-        parent::mapping();
-    }
+		$this->hasMap(array(
+			'column'     => 'label',
+			'property'   => 'label',
+			'type'       => self::TYPE_STRING,
+		));
+
+	}
 
 }
