@@ -34,7 +34,7 @@ class Component_Homepage_Statistics_Factory extends Component_FactoryAbstract {
             'right' => array('RecentVisitors','Unvisited','TopLinks')
         );
 
-        $instanceCollection = new Collection();
+        $instanceCollection = new Schoolbox\Collection();
 
         foreach($include as $col => $comps) {
             foreach($comps as $loc => $comp) {
@@ -50,18 +50,18 @@ class Component_Homepage_Statistics_Factory extends Component_FactoryAbstract {
                 $inst->position = $col;
                 $inst->sequence = $loc + 1;
 
-                $instanceCollection[] = $inst;
+                $instanceCollection->add($inst);
             }
         }
 
-        $componentCollection = new Collection;
+        $componentCollection = new Schoolbox\Collection();
 
         if ( !empty($instanceCollection) ) {
             foreach ($instanceCollection as $instance) {
                 $component = $this->buildComponent($instance);
 
                 if ( !empty($component) ) {
-                    $componentCollection[] = $component;
+                    $componentCollection->add($component);
                 }
             }
         }

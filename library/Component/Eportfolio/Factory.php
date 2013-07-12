@@ -34,6 +34,6 @@ class Component_Eportfolio_Factory extends Component_FactoryAbstract {
 	 * @return Collection
 	 */
 	public function getDefinitionList($module) {
-		return new Collection(Component_InstanceMapper::getInstance()->findByModule($module));
+		return new Schoolbox\Collection(Component_InstanceMapper::getInstance()->findByModule($module));
 	}
 }

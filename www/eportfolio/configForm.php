@@ -54,7 +54,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 				// Explode the columns
 				$components[$position] = explode(',', $componentString);
 
-				$instanceCollection = new Collection();
+				$instanceCollection = new Schoolbox\Collection();
 
 				// Update the db
 				foreach ($components[$position] as $sequence => $componentID) {
@@ -63,7 +63,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 						$inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database
 						$inst->position = $position;
 
-						$instanceCollection[] = $inst;
+						$instanceCollection->add($inst);
 					}
 				}
 

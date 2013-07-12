@@ -84,7 +84,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	 * Find component records by a module, but without an identifier
 	 *
 	 * @param $module
-	 * @return Collection
+	 * @return array
 	 */
 	public function findByModule($module) {
 		$sql = '
@@ -142,7 +142,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	/**
 	 * @param $sql
 	 * @param $fields
-	 * @return Collection
+	 * @return array
 	 */
 	protected function findByFields($sql, $fields) {
 		$statement = $this->database->prepare($sql);
@@ -187,13 +187,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 
 
 	public function save ($object) {
-		if ($object instanceof Component_Instance) {
-			$dirtyInstanceCollection = new Collection();
-			$dirtyInstanceCollection[] = $object;
-		}
-		else {
-			$dirtyInstanceCollection = $object;
-		}
+		$dirtyInstanceCollection = $this->getModelAsCollection($object);
 
 		foreach ( $dirtyInstanceCollection as $dirtyInstance ) {
 
@@ -270,16 +264,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 
 	public function delete ($object) {
 		$instanceMapper = Component_InstanceMapper::getInstance();
-
-		/* using instanceof over is_a(), since it's the equivalent language construct
-		 * rather than a function */
-		if($object instanceof Component_Instance) {
-			$instanceCollection = new Collection;
-			$instanceCollection[] = $object;
-		}
-		else {
-			$instanceCollection = $object;
-		}
+		$instanceCollection = $this->getModelAsCollection($object);
 
 		// container for parents if configs that need deletion
 		$instanceIDs = array();

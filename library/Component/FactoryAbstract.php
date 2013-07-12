@@ -35,20 +35,20 @@ abstract class Component_FactoryAbstract {
 
     /**
      * @param $identifier
-     * @return Collection
+     * @return Schoolbox\Collection
      */
     public function buildComponentList ($identifier) {
         /* Get Component Instances */
         $instanceCollection = $this->getInstanceList($identifier);
 
-        $componentCollection = new Collection;
+        $componentCollection = new Schoolbox\Collection();
 
         if ( !empty($instanceCollection) ) {
             foreach ($instanceCollection as $instance) {
                 $component = $this->buildComponent($instance);
 
                 if ( !empty($component) ) {
-                    $componentCollection[] = $component;
+                    $componentCollection->add($component);
                 }
             }
         }
