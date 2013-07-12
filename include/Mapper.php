@@ -95,7 +95,7 @@ abstract class Mapper {
      * Retreives the singleton instance
      *
      * @static
-     * @return Mapper
+     * @return static
      */
     static public function getInstance() {
         if (!isset($instance)) {
