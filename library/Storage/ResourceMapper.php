@@ -5,6 +5,8 @@
  *
  * Provides access to objects within the storage engine in Schoolbox
  *
+ * @deprecated Use Schoolbox\FileMapper instead
+ *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2012 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
@@ -83,6 +85,8 @@ class Storage_ResourceMapper extends Mapper {
     /**
      * Will create a new storage object based on a file location and filename
      *
+     * @deprecated Use Schoolbox\FileMapper to create a new object instead
+     *
      * @param $filename
      * @param $location
      * @param $user_id
@@ -119,6 +123,13 @@ class Storage_ResourceMapper extends Mapper {
         return false;
     }
 
+    /**
+     * @deprecated Use Schoolbox\FileMapper->findOneByColumn('hash') instead
+     *
+     * @param $hash
+     *
+     * @return bool|Model
+     */
     public function getByHash($hash) {
         $statement = $this->database->prepare(
             "
@@ -139,6 +150,13 @@ class Storage_ResourceMapper extends Mapper {
     }
 
 
+    /**
+     * @deprecated Use Schoolbox\FileMapper to delete a file instead
+     *
+     * @param Storage_Resource $object
+     *
+     * @return void
+     */
     public function delete(Storage_Resource $object) {
         unlink($object->getFileLocation());
         parent::delete($object);
