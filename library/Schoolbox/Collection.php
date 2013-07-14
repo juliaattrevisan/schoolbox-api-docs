@@ -10,7 +10,7 @@
 namespace Schoolbox;
 use Schoolbox;
 
-class Collection implements \ArrayAccess, \ICollection {
+class Collection implements /*\ArrayAccess, */\ICollection {
 
 	protected $stack = array();
 	protected $position = 0;
