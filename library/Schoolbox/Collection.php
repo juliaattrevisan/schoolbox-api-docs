@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 use Schoolbox;
+use ArrayIterator;
 
 class Collection implements /*\ArrayAccess, */\ICollection {
 
@@ -96,44 +97,12 @@ class Collection implements /*\ArrayAccess, */\ICollection {
 	}
 
 	/**
-	 * Rewind
-	 */
-	public function rewind() {
-		$this->position = 0;
-	}
-
-	/**
-	 * Current
+	 * Retrieves an iterator over this collection's stack.
 	 *
-	 * @return mixed
+	 * @return \Traversable
 	 */
-	public function current() {
-		return $this->stack[$this->position];
-	}
-
-	/**
-	 * Key
-	 *
-	 * @return mixed
-	 */
-	public function key() {
-		return $this->position;
-	}
-
-	/**
-	 * Next
-	 */
-	public function next() {
-		++$this->position;
-	}
-
-	/**
-	 * Valid
-	 *
-	 * @return bool
-	 */
-	public function valid() {
-		return isset($this->stack[$this->position]);
+	public function getIterator() {
+		return new ArrayIterator($this->stack);
 	}
 
 	/* Getters/Setters
