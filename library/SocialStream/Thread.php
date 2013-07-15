@@ -44,6 +44,9 @@ class Thread {
 	 * @param $limit
 	 */
 	protected function init($homepageId, $limit) {
+
+		/* Get all the posts that should appear
+		 */
 		$allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($homepageId, $limit);
 
 		$ids = array();
@@ -52,8 +55,16 @@ class Thread {
 			$ids[] = $currentPost->getPostId();
 		}
 
+		/* Get each posts' hierarchy
+		 */
 		$tree = \SocialStream\PostMapper::getInstance()->findHierarchy($ids);
 
+		/* And merge it all together
+		 */
+		$tree->merge($allPosts);
+
+		/* Save it for later!
+		 */
 		$this->setAllPosts($tree);
 	}
 

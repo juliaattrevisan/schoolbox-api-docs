@@ -123,6 +123,9 @@ class PostMapper extends Schoolbox\Mapper {
 	/**
 	 * Find all the social stream hierarchies for a set of post ids
 	 *
+	 * This uses the root_id value, which is the post_id of the post
+	 * to which comments and replies belong.
+	 *
 	 * @param $ids
 	 * @return \Collection
 	 */
@@ -130,7 +133,7 @@ class PostMapper extends Schoolbox\Mapper {
 		$query = "
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
-            WHERE `post_id` IN {$this->getArrayPlaceholders($ids, 'val')}
+            WHERE `root_id` IN {$this->getArrayPlaceholders($ids, 'val')}
             AND deleted_at IS NULL
             ORDER BY parent_id DESC, created_at
         ";
