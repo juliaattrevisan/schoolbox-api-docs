@@ -30,13 +30,31 @@ class Thread {
 	 * Constructor
 	 *
 	 * @param $homepageId
+	 * @param $limit
 	 */
-	public function __construct($homepageId) {
-		$allPosts = \SocialStream\PostMapper::getInstance()->findAllForHomepage($homepageId);
-
-		$this->setAllPosts($allPosts);
-
+	public function __construct($homepageId, $limit) {
+		$this->init($homepageId, $limit);
 		$this->growTree();
+	}
+
+	/**
+	 * Initialise data set before growing tree
+	 *
+	 * @param $homepageId
+	 * @param $limit
+	 */
+	protected function init($homepageId, $limit) {
+		$allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($homepageId, $limit);
+
+		$ids = array();
+
+		foreach($allPosts as $currentPost) {
+			$ids[] = $currentPost->getPostId();
+		}
+
+		$tree = \SocialStream\PostMapper::getInstance()->findHierarchy($ids);
+
+		$this->setAllPosts($tree);
 	}
 
 	/**
@@ -46,6 +64,7 @@ class Thread {
 	 */
 	public function growTree() {
 		$structure = array();
+		$remove = array();
 
 		/* Move everything into an array to start with
 		 */
