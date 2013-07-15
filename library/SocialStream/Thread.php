@@ -55,13 +55,18 @@ class Thread {
 			$ids[] = $currentPost->getPostId();
 		}
 
-		/* Get each posts' hierarchy
-		 */
-		$tree = \SocialStream\PostMapper::getInstance()->findHierarchy($ids);
+		if (count($ids)) {
+			/* Get each posts' hierarchy
+			 */
+			$tree = \SocialStream\PostMapper::getInstance()->findHierarchy($ids);
 
-		/* And merge it all together
-		 */
-		$tree->merge($allPosts);
+			/* And merge it all together
+			 */
+			$tree->merge($allPosts);
+		}
+		else {
+			$tree = new \Schoolbox\Collection();
+		}
 
 		/* Save it for later!
 		 */
