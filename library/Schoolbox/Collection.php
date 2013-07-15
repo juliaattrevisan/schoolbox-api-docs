@@ -10,8 +10,9 @@
 namespace Schoolbox;
 use Schoolbox;
 use ArrayIterator;
+use ICollection;
 
-class Collection implements /*\ArrayAccess, */\ICollection {
+class Collection implements ICollection {
 
 	protected $stack = array();
 
