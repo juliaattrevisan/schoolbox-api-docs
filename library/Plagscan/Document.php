@@ -189,4 +189,21 @@ class Plagscan_Document extends Model {
 		return $this->status;
 	}
 
+	/**
+	 * @param  array $file
+	 *
+	 * @return $this
+	 */
+	public function setFile($file) {
+		$this->file = $file;
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getFile() {
+		return $this->file;
+	}
+
 }

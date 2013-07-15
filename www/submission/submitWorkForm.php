@@ -52,13 +52,13 @@ if ( isset( $_FILES['file']['name'] ) && $_FILES['file']['name'] && is_numeric($
         if ( is_numeric($submissionId) ) {
             $document = new Plagscan_Document();
 
-            $document->fileId = $submissionId;
+            $document->setFileId($submissionId);
 
-            $document->file = array(
+            $document->setFile(array(
                 'id' => $submissionId,
                 'name' => $_FILES['file']['name'],
                 'file' => $submitDir . "$submissionId.dat"
-            );
+            ));
 
             // argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
             $page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);
