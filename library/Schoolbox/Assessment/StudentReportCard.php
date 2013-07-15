@@ -82,13 +82,13 @@ class StudentReportCard {
 	protected function establishPermissions() {
 
 		// is the class average graph line displayed?
-		$displayClassAverage        = \Cfg::get('display_grade_average')        ? true : false;
+		$displayClassAverage        = \Cfg::get('display_grade_average') ? true : false;
 
 		// are parents barred from this page?
-		$restrictStudentSubmissions = \Cfg::get('restrict_student_submissions') ? true : false;
+		$restrictStudentSubmissions = \Cfg::get('restrict_student_submissions') == "true" ? true : false;
 
 		// is the grade average allowed to be shown?
-		$showOverallGrade           = \Cfg::get('show_overall_grade')           ? true : false;
+		$showOverallGrade           = \Cfg::get('show_overall_grade') ? true : false;
 
 
 		// if viewing own, all permissions enabled
@@ -183,6 +183,11 @@ class StudentReportCard {
 	 * @param string $tab
 	 */
 	public function renderPage(\SitePage $page, $template = 'submission/allWork.html', $tab = 'submission') {
+
+		// visibility minimum is too high, can't see anything
+		if($this->minimumVisibility > SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT) {
+			error(19);
+		}
 
 		$page->setFile(TEMPLATE_content, $template);
 		$page->setTab($tab);
