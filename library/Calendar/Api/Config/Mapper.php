@@ -91,7 +91,8 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper {
 
 		$allConfigs = array();
 
-		foreach($configs as $currentConfig) {
+		foreach ($configs as $currentConfig) {
+			/* @var $currentConfig Calendar_Api_Config_Record */
 			$config = $currentConfig->decodeConfig();
 			$config->setId($currentConfig->getId());
 
