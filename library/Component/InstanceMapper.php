@@ -156,35 +156,51 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 
 		$rowset = $statement->fetchAll();
 
-		$instanceCollection = $this->hydrateList($rowset, 'ci');
-		$definitionCollection = Component_DefinitionMapper::getInstance()->hydrateList($rowset, 'cd');
-		$configInstanceCollection = Component_ConfigMapper::getInstance()->hydrateList($rowset, 'cci');
+		//
+		// Hydrate a whole bunch of stuff here.
+		$instanceCollection         = $this->hydrateList($rowset, 'ci');
+		$definitionCollection       = Component_DefinitionMapper::getInstance()->hydrateList($rowset, 'cd');
+		$configInstanceCollection   = Component_ConfigMapper::getInstance()->hydrateList($rowset, 'cci');
 		$configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->hydrateList($rowset, 'ccd');
 
 		$finalCollection = array();
 
 		// map the definitions into their instances
 		foreach($instanceCollection as $i => $instance) {
+			/**
+			 * @var $instance   Component_Instance
+			 * @var $definition Component_Definition
+			 * @var $config     Component_Config
+			 * @var $config_def Component_ConfigDefinition
+			 */
+			$definition = $definitionCollection->getOffset($i);
+			$config     = $configInstanceCollection->getOffset($i);
+			$config_def = $configDefinitionCollection->getOffset($i);
 
 			// if this component has already been processed, just add the config and move on
-			if(isset($finalCollection[$instance->id])) {
-				$finalCollection[$instance->id]->config[$configDefinitionCollection[$i]->id] = $configDefinitionCollection[$i];
+			$instance_id = $instance->getId();
+			if (isset($finalCollection[$instance_id])) {
+				/* @var $finalCollection[$instance_id] Component_Instance */
+				$finalCollection[$instance_id]->getConfig()->setOffset($config_def->getId(), $config_def);
 				continue;
 			}
 
 			// 1:1 :: instance:definition
-			$instance->definition = $definitionCollection[$i];
+			$instance->setDefinition($definition);
 
 			// n:1 :: configDefinitions:instance
-			$instance->config[$configDefinitionCollection[$i]->id] = $configDefinitionCollection[$i];
+			$instance->getConfig()->setOffset($config_def->getId(), $config_def);
 
-			$finalCollection[$instance->id] = $instance;
+			$finalCollection[$instance_id] = $instance;
 		}
 
 		// overwrite default configurations
-		foreach($configInstanceCollection as $i => $confInstance) {
-			if($confInstance->id != null) {
-				$finalCollection[$confInstance->instanceId]->config[$confInstance->configDefinitionId]['value'] = $confInstance->value;
+		foreach ($configInstanceCollection as $confInstance) {
+			/* @var $confInstance Component_Config */
+			if ($confInstance->getId() != null) {
+				$finalCollection[$confInstance->getInstanceId()]->getConfig()
+					->getOffset($confInstance->getConfigDefinitionId())
+					->setValue($confInstance->value);
 			}
 		}
 
