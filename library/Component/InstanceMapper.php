@@ -240,7 +240,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 			$cleanInstance = $instanceMapper->findById($dirtyInstance->getId());
 
 			if (!$cleanInstance) {
-				$cleanInstance = new Component_Instance;
+				$cleanInstance = new Component_Instance();
 			}
 
 			if ($dirtyInstance->getPosition() != $cleanInstance->getPosition()

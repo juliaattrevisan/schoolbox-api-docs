@@ -67,11 +67,12 @@ if (is_numeric($_REQUEST['cid'])) {
 	else if (is_numeric($_POST['cid']) && is_numeric($_POST['add'])) {
 
         $newComp = new Component_Instance();
-        $newComp->definitionId = $_POST['add'];
-        $newComp->identifier = $_POST['cid'];
-        $newComp->module = 'homepage';
-        $newComp->sequence = 0;
-        $newComp->position = 'left';
+        $newComp
+            ->setDefinitionId($_POST['add'])
+            ->setIdentifier($_POST['cid'])
+            ->setModule('homepage')
+            ->setSequence(0)
+            ->setPosition('left');
 
         // check perms
         if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {

@@ -39,16 +39,17 @@ class Component_Homepage_Statistics_Factory extends Component_FactoryAbstract {
         foreach($include as $col => $comps) {
             foreach($comps as $loc => $comp) {
                 $inst = new Component_Instance();
-                $inst->definition = new Component_Definition();
-                $inst->definition->class = sprintf('Component_Homepage_Statistics_%sController',$comp);
-                $inst->definition->module = 'homepage_statistics';
-                $inst->definition->visible = '';
-                $inst->definition->multiple = '';
-                $inst->definition->name = '';
-
-                $inst->module = 'homepage_statistics';
-                $inst->position = $col;
-                $inst->sequence = $loc + 1;
+                $inst
+                    ->setModule('homepage_statistics')
+                    ->setPosition($col)
+                    ->setSequence($loc + 1)
+                    ->setDefinition(new Component_Definition());
+                $inst->getDefinition()
+                    ->setClass(sprintf('Component_Homepage_Statistics_%sController',$comp))
+                    ->setModule('homepage_statistics')
+                    ->setVisible('')
+                    ->setMultiple('')
+                    ->setName('');
 
                 $instanceCollection->add($inst);
             }

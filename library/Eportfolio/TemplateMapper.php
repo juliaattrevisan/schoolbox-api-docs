@@ -76,11 +76,12 @@ class TemplateMapper extends Schoolbox\Mapper {
 					/* Spawn a component instance for the template
 					 */
 					$componentInstance = new \Component_Instance();
-					$componentInstance->definitionId = $componentDefinitionId;
-					$componentInstance->module = 'eportfolio_template';
-					$componentInstance->identifier = $templateId;
-					$componentInstance->position = $currentComponent['keys']['position'];
-					$componentInstance->sequence = $currentComponent['keys']['sequence'];
+					$componentInstance
+						->setDefinitionId($componentDefinitionId)
+						->setModule('eportfolio_template')
+						->setIdentifier($templateId)
+						->setPosition($currentComponent['keys']['position'])
+						->setSequence($currentComponent['keys']['sequence']);
 
 					$instanceIds = \Component_InstanceMapper::getInstance()->save($componentInstance);
 

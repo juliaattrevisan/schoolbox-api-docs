@@ -90,11 +90,12 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
 		else if (is_numeric($_POST['add'])) {
 			$newComp = new Component_Instance();
-			$newComp->definitionId = $_POST['add'];
-			$newComp->identifier = $_POST['page_id'];
-			$newComp->module = 'eportfolio';
-			$newComp->sequence = 0;
-			$newComp->position = 'left';
+			$newComp
+				->setDefinitionId($_POST['add'])
+				->setIdentifier($_POST['page_id'])
+				->setModule('eportfolio')
+				->setSequence(0)
+				->setPosition('left');
 
 			$ids = $componentInstanceMapper->save($newComp);
 

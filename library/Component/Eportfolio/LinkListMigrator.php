@@ -46,11 +46,12 @@ class LinkListMigrator extends MigratorAbstract {
 	public function migrate() {
 		if (count($this->getAllLinkLists())) {
 			$newComp = new \Component_Instance();
-			$newComp->definitionId = $this->getDefinitionId();
-			$newComp->identifier = $this->getPageId();
-			$newComp->module = 'eportfolio';
-			$newComp->sequence = 0;
-			$newComp->position = 'left';
+			$newComp
+				->setDefinitionId($this->getDefinitionId())
+				->setIdentifier($this->getPageId())
+				->setModule('eportfolio')
+				->setSequence(0)
+				->setPosition('left');
 
 			$newCompIds = \Component_InstanceMapper::getInstance()->save($newComp);
 
