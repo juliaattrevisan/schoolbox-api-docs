@@ -6,14 +6,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\User;
+
 class Facade_Component_HomepageLinks extends Facade_Component_Generic {
 
     /**
      * This should return an array of [title, aside, content]
      * @param User $user
-     * @return arr
+     * @return array
      */
-    public function render(GizaUser $user, $catID = 0) {
+    public function render(User $user, $catID = 0) {
 
         // generate data
         try {

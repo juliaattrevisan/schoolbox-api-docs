@@ -6,13 +6,17 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\User;
+
 class Facade_Component_Salutation extends Facade_Component_Generic {
 
     // pretty easy one
-    public function render(GizaUser $user) {
+    public function render(User $user) {
+
+	    $tf = new TextFormatter();
 
         $r = array(
-            'title'   => TextFormatter::greeting() . ', ' . $user->getName(),
+            'title'   => $tf->greeting() . ', ' . $user->formatName(),
             'aside'   => '',
             'class'   => 'salutation',
             'icon'    => 'salutation',

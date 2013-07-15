@@ -6,6 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\User;
+
 abstract class Facade_Component_Generic {
 
     /**
@@ -13,5 +15,5 @@ abstract class Facade_Component_Generic {
      * @abstract
      * @param User $user
      */
-    public abstract function render(GizaUser $user);
+    public abstract function render(User $user);
 }
