@@ -6,7 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\External\SubjectMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Authenticator {
 
@@ -73,10 +75,26 @@ class Authenticator {
             return true;
         }
 
-	    $user = \Schoolbox\UserMapper::getInstance()->findByColumn('username', $username)->current();
+	    /**
+	     *
+	     * @var UserMapper $userMapper
+	     */
+	    $userMapper = UserMapper::getInstance();
+
+	    $user = $userMapper->findByColumn('username', $username)->current();
 
         if($user instanceof User) {
-            $this->setSessionUser($user);
+
+	        // yep, you ACTUALLY have to do this otherwise hydrations don't get done
+	        $user = $userMapper->findById($user->getId());
+
+	        /**
+	         * Map subjects onto the user object retrieved, and dump into session
+	         * @var SubjectMapper $subjectMapper
+	         */
+	        $subjectMapper = SubjectMapper::getInstance();
+	        $user->setSubjectCollection($subjectMapper->findAllForStudent($user));
+	        $this->setSessionUser($user);
 
             // indicate that session creation was successful
             return true;
