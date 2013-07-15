@@ -74,16 +74,28 @@ class Collection implements /*\ArrayAccess, */\ICollection {
 	}
 
 	/**
-	 * Gets first item in collection.
+	 * Gets first item in collection (regardless of its key)
 	 *
-	 * Supplied for backward compatibility which uses current() to pop first
-	 * item off the stack. Likely to be deprecated.
+	 * @return mixed
+	 */
+	public function first() {
+		foreach ($this as $item) {
+			return $item;
+			break;
+		}
+		return null;
+	}
+
+	/**
+	 * Alias for first()
+	 *
+	 * @deprecated Old code which relies on this class implementing Iterator
+	 *             interface may still use this method.
 	 *
 	 * @return mixed
 	 */
 	public function current() {
-		reset($this->stack);
-		return current($this->stack);
+		return $this->first();
 	}
 
 	/**
