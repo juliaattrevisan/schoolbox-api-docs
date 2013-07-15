@@ -40,7 +40,7 @@ class Eportfolio {
 	 * An instance of Eportfolio_Page
 	 * This is the page currently being viewed
 	 *
-	 * @var array
+	 * @var \Eportfolio\Page
 	 */
 	private $pageInstance = null;
 
@@ -530,7 +530,7 @@ class Eportfolio {
 	/**
 	 * Set page instance
 	 *
-	 * @param $pageInstance
+	 * @param \Eportfolio\Page $pageInstance
 	 */
 	private function setPageInstance($pageInstance) {
 		$this->pageInstance = $pageInstance;
@@ -539,7 +539,7 @@ class Eportfolio {
 	/**
 	 * Get page instance
 	 *
-	 * @return array
+	 * @return \Eportfolio\Page
 	 */
 	private function getPageInstance() {
 		return $this->pageInstance;
