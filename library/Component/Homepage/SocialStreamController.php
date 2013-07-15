@@ -42,8 +42,9 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		));
 
 		$homepageId = 10;
+		$limit = 3;
 
-		$thread = new \SocialStream\Thread($homepageId);
+		$thread = new \SocialStream\Thread($homepageId, $limit);
 		$tree = $thread->getTree();
 
 		/* Traverse everything
