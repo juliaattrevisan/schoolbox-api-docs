@@ -91,15 +91,19 @@ class Digest_News {
         // Setup of components for:
         // Dashboard/Homepage Activity
         // Dashboard/Upcoming Due Work
-        $this->upcoming_work_component             = new Component_Instance();
-        $this->upcoming_work_component->definition = Component_DefinitionMapper::getInstance()->findOneByColumn(
-            'class', 'Component_Dashboard_UpcomingWorkController'
+        $this->upcoming_work_component = new Component_Instance();
+        $this->upcoming_work_component->setDefinition(
+            Component_DefinitionMapper::getInstance()->findOneByColumn(
+                'class', 'Component_Dashboard_UpcomingWorkController'
+            )
         );
 
 
-        $this->homepage_activity_component             = new Component_Instance();
-        $this->homepage_activity_component->definition = Component_DefinitionMapper::getInstance()->findOneByColumn(
-            'class', 'Component_Dashboard_HomepageNewsController'
+        $this->homepage_activity_component = new Component_Instance();
+        $this->homepage_activity_component->setDefinition(
+            Component_DefinitionMapper::getInstance()->findOneByColumn(
+                'class', 'Component_Dashboard_HomepageNewsController'
+            )
         );
     }
 
@@ -331,8 +335,8 @@ class Digest_News {
         $mailer->setBlock('activity', 'activity_nolink', 'activity_nolink_block');
 
         $mailer->setVar('NAME', $u['firstname']);
-		$mailer->setVar('SITE_NAME',  Cfg::get('school_name'));
-		$mailer->setVar('TEMPLATE_YEAR',  date('Y'));
+        $mailer->setVar('SITE_NAME',  Cfg::get('school_name'));
+        $mailer->setVar('TEMPLATE_YEAR',  date('Y'));
 
         $newsFlag = false;
 

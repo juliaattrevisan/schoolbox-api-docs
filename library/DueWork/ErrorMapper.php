@@ -50,7 +50,8 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper {
 		$errs = $this->findAll();
 		$disp = array();
 		foreach($errs as $e) {
-			$disp[] = $e->displayAs;
+			/* @var $e DueWork_Error */
+			$disp[] = $e->getDisplayAs();
 		}
 		return $disp;
 	}
