@@ -364,7 +364,8 @@ class PageMapper extends Schoolbox\Mapper {
 		 */
 		if (is_array($allComponents) && count($allComponents)) {
 			foreach($allComponents as $currentComponent) {
-				$pageIds[] = $currentComponent->identifier;
+				/* @var $currentComponent \Component_Instance */
+				$pageIds[] = $currentComponent->getIdentifier();
 			}
 
 			$allPages = \Eportfolio\PageMapper::getInstance()->findIn('page_id', $pageIds);
@@ -373,6 +374,7 @@ class PageMapper extends Schoolbox\Mapper {
 			 */
 			if ($allPages->count()) {
 				foreach ($allPages as $currentPage) {
+					/* @var $currentPage \Eportfolio\Page */
 					$componentList = array();
 
 					/* Only get this user's pages

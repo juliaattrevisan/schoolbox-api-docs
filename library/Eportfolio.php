@@ -318,17 +318,18 @@ class Eportfolio {
 		$ccm = Component_ConfigMapper::getInstance();
 		$instances = $cim->findByContext($this->getContext() . '_template', $templateID);
 
-		if(count($instances)) {
-			foreach($instances as $inst) {
+		if (count($instances)) {
+			foreach ($instances as $inst) {
+				/* @var $inst Component_Instance */
 				// preserve the config
-				$configs = $inst->config;
+				$configs = $inst->getConfig();
 
 				/* unset($inst->id);
 				 * This throws notices in provisioning because $inst->id is expected to exist
 				 * but here, has been unset.
 				 */
-				$inst->id = null;
-				unset($inst->config);
+				$inst->setId(null);
+				$inst->getConfig();
 
 				$inst->module = $this->getContext();
 				$inst->identifier = $this->getPageId();
@@ -339,7 +340,7 @@ class Eportfolio {
 					foreach($configs as $c) {
 						if($c->id) {
 							$conf = new Component_Config();
-							$conf->instanceId = $id;
+							$conf->setInstanceId($id);
 							$conf->value = $c->value;
 							$conf->configDefinitionId = $c->id;
 							$ccm->save($conf);

@@ -235,6 +235,7 @@ class Eportfolio_Authenticator {
 				$parentSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findParentSetting($this->getPageId());
 
 				foreach ($parentSettingCollection as $current) {
+					/* @var $current \Eportfolio\Permission */
 					if (($current->getValue()) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
 						$youCanView = true;
 					}
@@ -321,7 +322,7 @@ class Eportfolio_Authenticator {
 	/**
 	 * Set group handler
 	 *
-	 * @param null $groupHandler
+	 * @param Group $groupHandler
 	 */
 	private function setGroupHandler($groupHandler) {
 		$this->groupHandler = $groupHandler;
@@ -330,7 +331,7 @@ class Eportfolio_Authenticator {
 	/**
 	 * Get group handler
 	 *
-	 * @return null
+	 * @return Group
 	 */
 	private function getGroupHandler() {
 		return $this->groupHandler;
