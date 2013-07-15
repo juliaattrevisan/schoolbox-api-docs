@@ -37,6 +37,13 @@ class Component_ConfigDefinition extends Model {
 	public $label;
 
 	/**
+	 * Current value of this config setting.
+	 *
+	 * @var string
+	 */
+	public $value;
+
+	/**
 	 * @param  string $defaultValue
 	 *
 	 * @return $this
@@ -119,6 +126,23 @@ class Component_ConfigDefinition extends Model {
 	 */
 	public function getLabel() {
 		return $this->label;
+	}
+
+	/**
+	 * @param  string $value
+	 *
+	 * @return $this
+	 */
+	public function setValue($value) {
+		$this->value = $value;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getValue() {
+		return $this->value;
 	}
 
 }
