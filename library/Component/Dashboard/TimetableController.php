@@ -101,8 +101,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $colourIndex = 0;
 
                 //for each period set result
+                $this->setVar("timetable_header_block", "");
+                $this->setVar("timetable_period_block", "");
                 foreach ($timetable as $period) {
                     if ($period['periodSequence'] == 1) {
+                        $this->setVar('period_class_block', '');
+                        $this->setVar('period_class_link_block', '');
+                        $this->setVar('has_attendances_block', '');
                         $this->setVar("PERIOD_NAME", $period['periodName']);
                         $this->setVar("PERIOD_START", $period['periodStart']);
                         $this->setVar("PERIOD_END", $period['periodEnd']);
@@ -123,7 +128,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                         'PERIOD_TH_CLASS' => 'dayCurrent'
                                     )
                                 );
-                            } else {
+                            }
+                            else {
                                 $this->setVar(
                                     array(
                                         'PERIOD_CLASS' => 'normal',
@@ -140,25 +146,19 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                             $this->setVar('PERIOD_COLOUR', '#' . $subjectColourMap[$period['code']]);
 
-
-                            $this->setVar('period_class_block', '');
-                            $this->setVar('period_class_link_block', '');
-
-                            if ($period['description']) {
-                                $cat = $this->category->getByCode($period['code']);
-                                if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
-                                    $this->parse('period_class_link_block', 'period_class_link');
-                                } else {
-                                    $this->parse('period_class_block', 'period_class');
-                                }
-
-
+                            $cat = $this->category->getByCode($period['code']);
+                            if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
+                                $this->parse('period_class_link_block', 'period_class_link');
+                            }
+                            else {
+                                $this->parse('period_class_block', 'period_class');
                             }
 
                             // Link to Attendance Records
-                            if (strlen($period['code']) && Cfg::get('external_type') == 'synergetic' && Cfg::get(
-                                    'external_attendance'
-                                ) && $this->group->isStaff()
+                            if (strlen($period['code'])
+                                && Cfg::get('external_type') == 'synergetic'
+                                && Cfg::get('external_attendance')
+                                && $this->group->isStaff()
                             ) {
                                 $now = new Alaress_Date_Format(time(), 'U');
 
@@ -171,12 +171,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 );
 
                                 $this->parse('has_attendances_block', 'has_attendances');
-                            } else {
-                                $this->setVar('has_attendances_block', '');
                             }
-
-
-                        } else {
+                        }
+                        else {
                             $this->setVar(
                                 array(
                                     'PERIOD_COLOUR' => '',
@@ -190,20 +187,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     'PERIOD_TH_CLASS' => 'normal',
                                 )
                             );
-
                             $this->parse('period_class_block', 'period_class');
-                            $this->setVar('period_class_link_block', '');
-
                         }
-
 
                         //output period block
                         $this->parse("timetable_header_block", "timetable_header", true);
                         $this->parse("timetable_period_block", "timetable_period", true);
-
-                        /* Clear children after parsing out the parent
-                 */
-                        $this->setVar('has_attendance_block', '');
                     }
                 }
 
