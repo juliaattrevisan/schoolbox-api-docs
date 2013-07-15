@@ -24,6 +24,7 @@ class StudentReportCard {
 	const CAN_EMAIL_TEACHER = 2;
 	const CAN_VIEW_CLASS_AVERAGE = 3;
 	const CAN_VIEW_SHOWCASE = 4;
+	const CAN_VIEW_OVERALL_GRADE = 5;
 
 	// vars that come from user input
 	protected $targetUserId;
@@ -80,11 +81,19 @@ class StudentReportCard {
 	 */
 	protected function establishPermissions() {
 
-		$allowClassAverage = \Cfg::get('display_grade_average') ? true : false;
+		// is the class average graph line displayed?
+		$displayClassAverage        = \Cfg::get('display_grade_average')        ? true : false;
+
+		// are parents barred from this page?
+		$restrictStudentSubmissions = \Cfg::get('restrict_student_submissions') ? true : false;
+
+		// is the grade average allowed to be shown?
+		$showOverallGrade           = \Cfg::get('show_overall_grade')           ? true : false;
+
 
 		// if viewing own, all permissions enabled
 		if($this->viewingUserId == $this->targetUserId) {
-			$this->permissionSet = array(true,true,true,$allowClassAverage,true);
+			$this->permissionSet = array(true, true, true, $displayClassAverage, true, $showOverallGrade);
 			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_STUDENT;
 		}
 
@@ -96,20 +105,22 @@ class StudentReportCard {
 
 		// if staff, all READ permissions enabled
 		elseif($this->groupHandler->isStaff($this->viewingUserId)) {
-			$this->permissionSet = array(false,false,true,true,true);
+			$this->permissionSet = array(false, false, true, true, true, true);
 			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
 		}
 
 		// if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
 		elseif($this->groupHandler->isParentOfChild($this->targetUserId)) {
-			$allowParent = \Cfg::get('restrict_student_submissions') ? false : true;
-			$this->permissionSet = array(false,false,$allowParent,$allowParent && $allowClassAverage,$allowParent);
-			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+			$this->permissionSet = array(
+				false, false, !$restrictStudentSubmissions, false, !$restrictStudentSubmissions,
+				(!$restrictStudentSubmissions) && $showOverallGrade
+			);
+			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT + ($restrictStudentSubmissions ? 1 : 0);
 		}
 
 		// all other cases, no permissions granted
 		else {
-			$this->permissionSet = array(false,false,false,false,false);
+			$this->permissionSet = array(false, false, false, false, false, false);
 			$this->minimumVisibility = 3; // max visibility is 2, so this will never be seen
 		}
 	}
@@ -322,6 +333,14 @@ class StudentReportCard {
 	}
 
 	protected function renderGradeAverage(\SitePage $page) {
+		$page->setBlock('subject', 'grade_average', 'grade_average_block');
+
+		// if you can't see the grade average...you, well, can't see the grade average
+		if(!$this->checkPermission(self::CAN_VIEW_OVERALL_GRADE)) {
+			$page->setVar('grade_average_block', '');
+			return;
+		}
+
 		// output student grade average
 		$gradeAvg = $this->subjectData->getGradeAverage();
 
@@ -350,6 +369,8 @@ class StudentReportCard {
 			'SUBJ_GRADE_AVG' => $returnHandler->percent2letter($gradeAvg['grade']),
 			'SUBJ_GRADE_TREND' => $gradeAvg['trend'] != 0 ? sprintf("%0.1f%% %s", $gradeAvg['trend'], $trendDir) : ''
 		));
+
+		$page->parse('grade_average_block', 'grade_average');
 
 	}
 
