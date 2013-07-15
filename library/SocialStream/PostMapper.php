@@ -103,6 +103,7 @@ class PostMapper extends Schoolbox\Mapper {
 			SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE homepage_id = :homepageId
+            AND deleted_at IS NULL
             ORDER BY parent_id DESC, created_at
         ";
 
@@ -123,7 +124,11 @@ class PostMapper extends Schoolbox\Mapper {
 	 */
 	public function createModel($row) {
 		switch($row['type']) {
-			case 'Video' : $model = 'SocialStream_Post_Video'; break;
+			case 'file' : $model = 'SocialStream_Post_File'; break;
+			case 'image' : $model = 'SocialStream_Post_Image'; break;
+			case 'video' : $model = 'SocialStream_Post_Video'; break;
+			case 'website' : $model = 'SocialStream_Post_Website'; break;
+			case 'string' : $model = 'SocialStream_Post_String'; break;
 			default : $model = 'SocialStream_Post_String'; break;
 		}
 
