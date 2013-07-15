@@ -31,6 +31,16 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		$this->parseConfig();
 
+		$this->setBlock($templateHandle, 'socialstream_post', 'socialstream_post_block');
+		$this->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
+		$this->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
+
+		$this->setVar(array(
+			'socialstream_post_block' => '',
+			'socialstream_comment_block' => '',
+			'socialstream_reply_block' => '',
+		));
+
 		return true;
 	}
 }

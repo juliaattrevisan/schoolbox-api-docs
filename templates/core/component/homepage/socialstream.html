@@ -3,6 +3,28 @@
 	{CONFIGURATION}
 
 	<div>
-		The ultimate mort
+		<!-- BEGIN socialstream_post -->
+		<ul>
+			<li>
+				{SOCIALSTREAM_POST_BODY}
+
+				<ul>
+					<!-- BEGIN socialstream_comment -->
+					<li>
+						{SOCIALSTREAM_COMMENT_BODY}
+
+						<ul>
+							<!-- BEGIN socialstream_reply -->
+							<li>
+								{SOCIALSTREAM_REPLY_BODY}
+							</li>
+							<!-- END socialstream_reply -->
+						</ul>
+					</li>
+					<!-- END socialstream_comment -->
+				</ul>
+			</li>
+		</ul>
+		<!-- END socialstream_post -->
 	</div>
 </div>
