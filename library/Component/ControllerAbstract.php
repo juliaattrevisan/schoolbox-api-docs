@@ -410,4 +410,11 @@ abstract class Component_ControllerAbstract {
         return $this->sitepage->template;
     }
 
+	/**
+	 * @return Component_Instance
+	 */
+	public function getInstance() {
+		return $this->instance;
+	}
+
 }
