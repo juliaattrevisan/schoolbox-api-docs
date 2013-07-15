@@ -91,25 +91,52 @@ class PostMapper extends Schoolbox\Mapper {
 		parent::mapping();
 	}
 
-
 	/**
-	 * Find all the social stream posts for a given homepage
+	 * Find all the social stream posts that should appear in a homepage's
+	 * SocialStream component
 	 *
 	 * @param $homepageId
+	 * @param $limit
 	 * @return \Collection
 	 */
-	public function findAllForHomepage($homepageId) {
+	public function findLatestForHomepage($homepageId, $limit) {
 		$query = "
 			SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE homepage_id = :homepageId
+            AND parent_id = 0
+            AND deleted_at IS NULL
+            ORDER BY created_at DESC
+            LIMIT :limit
+        ";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":homepageId", $homepageId);
+		$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
+
+	/**
+	 * Find all the social stream hierarchies for a set of post ids
+	 *
+	 * @param $ids
+	 * @return \Collection
+	 */
+	public function findHierarchy($ids) {
+		$query = "
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            WHERE `post_id` IN {$this->getArrayPlaceholders($ids, 'val')}
             AND deleted_at IS NULL
             ORDER BY parent_id DESC, created_at
         ";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":homepageId", $homepageId);
-		$statement->execute();
+		$statement->execute($this->getArrayParameters($ids, 'val'));
 
 		$rowset = $statement->fetchAll();
 
