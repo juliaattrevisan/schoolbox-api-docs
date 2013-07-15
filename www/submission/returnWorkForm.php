@@ -183,7 +183,8 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
     // make associative by label (since that's what's being transmitted)
     $errors = array();
     foreach($err as $e) {
-        $errors[$e->displayAs] = $e;
+        /* @var $e DueWork_Error */
+        $errors[$e->getDisplayAs()] = $e;
     }
 
     //

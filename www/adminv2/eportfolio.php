@@ -52,11 +52,12 @@ $definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnL
 ));
 
 foreach($definitionCollection as $definition) {
+    /* @var $definition Component_Definition */
     $this->setVar(array(
-        'definition.id'          => $definition->id,
-        'definition.name'        => $definition->name,
-        'definition.description' => $definition->description,
-        'definition.singleton'   => $definition->multiple == 'true' ? '' : 'single-instance'
+        'definition.id'          => $definition->getId(),
+        'definition.name'        => $definition->getName(),
+        'definition.description' => $definition->getDescription(),
+        'definition.singleton'   => $definition->getMultiple() == 'true' ? '' : 'single-instance'
     ));
 
     $this->parse('definition_block', 'definition', true);
