@@ -41,6 +41,45 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 			'socialstream_reply_block' => '',
 		));
 
+		$homepageId = 10;
+
+		$thread = new \SocialStream\Thread($homepageId);
+		$tree = $thread->getTree();
+
+		/* Traverse everything
+		 */
+		foreach($tree as $currentPost) {
+			foreach($currentPost->getChildren() as $currentComment) {
+				foreach($currentComment->getChildren() as $currentReply) {
+					$this->setVar(array(
+						'SOCIALSTREAM_REPLY_BODY' => $currentReply->getBody()
+					));
+
+					$this->parse('socialstream_reply_block', 'socialstream_reply', true);
+				}
+
+				$this->setVar(array(
+					'SOCIALSTREAM_COMMENT_BODY' => $currentComment->getBody()
+				));
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->parse('socialstream_comment_block', 'socialstream_comment', true);
+
+				$this->setVar('socialstream_reply_block', '');
+			}
+
+			$this->setVar(array(
+				'SOCIALSTREAM_POST_BODY' => $currentPost->getBody()
+			));
+
+			/* Clear children after parsing out the parent
+			 */
+			$this->parse('socialstream_post_block', 'socialstream_post', true);
+
+			$this->setVar('socialstream_comment_block', '');
+		}
+
 		return true;
 	}
 }
