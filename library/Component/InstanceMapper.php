@@ -294,34 +294,40 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 		return parent::save($dirtyInstanceCollection, false);
 	}
 
-	public function delete ($object) {
+	public function delete($object) {
 		$instanceMapper = Component_InstanceMapper::getInstance();
 		$instanceCollection = $this->getModelAsCollection($object);
 
 		// container for parents if configs that need deletion
 		$instanceIDs = array();
 
-		foreach ( $instanceCollection as $instance ) {
-			$instanceIDs[] = $this->database->quote($instance->id, PDO::PARAM_INT);
+		foreach ($instanceCollection as $instance) {
+			/* @var $instance Component_Instance */
+			$instanceIDs[] = $this->database->quote($instance->getId(), PDO::PARAM_INT);
 			$sourceInstanceCollection = $instanceMapper->findByColumnList(array(
 				'module'     => 'dashboard',
-				'identifier' => $instance->identifier,
-				'position'   => $instance->position
+				'identifier' => $instance->getIdentifier(),
+				'position'   => $instance->getPosition()
 			));
 
-			foreach ( clone $sourceInstanceCollection as $index => $sourceInstance ) {
-				if ( $sourceInstance->id == $instance->id ) {
-					unset($sourceInstanceCollection[$index]);
+			//
+			// Iterate a copy of the source instance collection, because it will
+			// be modified.
+			foreach (clone $sourceInstanceCollection as $index => $sourceInstance) {
+				/* @var $sourceInstance Component_Instance */
+				if ($sourceInstance->getId() == $instance->getId()) {
+					$sourceInstanceCollection->offsetUnset($index);
 				}
-				else if ( $sourceInstance->sequence > $instance->sequence ) {
-					$sourceInstance->sequence--;
+				elseif ($sourceInstance->getSequence() > $instance->getSequence()) {
+					$sourceInstance->setSequence($sourceInstance->getSequence() - 1);
+					$sourceInstanceCollection->offsetSet($index, $sourceInstance);
 				}
 			}
 
 			parent::save($sourceInstanceCollection);
 		}
 
-		if(parent::delete($instanceCollection) && !empty($instanceIDs)) {
+		if (parent::delete($instanceCollection) && !empty($instanceIDs)) {
 			// delete associated configs
 			$deleteIDs = implode(',', $instanceIDs);
 			$this->database->query("
