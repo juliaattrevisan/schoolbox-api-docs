@@ -14,7 +14,6 @@ use ArrayIterator;
 class Collection implements /*\ArrayAccess, */\ICollection {
 
 	protected $stack = array();
-	protected $position = 0;
 
 	/**
 	 * @param $element
@@ -72,6 +71,19 @@ class Collection implements /*\ArrayAccess, */\ICollection {
 		else {
 			return null;
 		}
+	}
+
+	/**
+	 * Gets first item in collection.
+	 *
+	 * Supplied for backward compatibility which uses current() to pop first
+	 * item off the stack. Likely to be deprecated.
+	 *
+	 * @return mixed
+	 */
+	public function current() {
+		reset($this->stack);
+		return current($this->stack);
 	}
 
 	/**
