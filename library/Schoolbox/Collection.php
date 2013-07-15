@@ -87,18 +87,6 @@ class Collection implements /*\ArrayAccess, */\ICollection {
 	}
 
 	/**
-	 * Alias for first()
-	 *
-	 * @deprecated Old code which relies on this class implementing Iterator
-	 *             interface may still use this method.
-	 *
-	 * @return mixed
-	 */
-	public function current() {
-		return $this->first();
-	}
-
-	/**
 	 * Does this value exist?
 	 *
 	 * @param mixed $offset
