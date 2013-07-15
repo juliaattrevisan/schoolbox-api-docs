@@ -50,6 +50,10 @@ class Component_Instance extends Model {
 	 */
 	public $config;
 
+	public function __construct() {
+		$this->setConfig(new \Schoolbox\Collection());
+	}
+
 	/**
 	 * @param  \Schoolbox\Collection $config
 	 *
@@ -193,7 +197,8 @@ class Component_Instance extends Model {
 		if(isset($this->config)) {
 
 			// dead index, this is actually not a config
-			if(count($this->config) == 1 && isset($this->config[''])) {
+			$dumb_index = $this->config->getOffset('');
+			if(count($this->config) == 1 && isset($dumb_index)) {
 				return array();
 			}
 
