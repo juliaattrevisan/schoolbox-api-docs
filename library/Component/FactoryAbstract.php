@@ -99,8 +99,9 @@ abstract class Component_FactoryAbstract {
      * @return Component_Instance
      */
     public function getInstance ($instanceId) {
+        /* @var $instance Component_Instance */
         $instance = Component_InstanceMapper::getInstance()->findById($instanceId);
-        $instance->definition = Component_DefinitionMapper::getInstance()->findById($instance->definitionId);
+        $instance->setDefinition(Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId()));
 
         return $instance;
     }

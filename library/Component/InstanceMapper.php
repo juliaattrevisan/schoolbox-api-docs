@@ -237,7 +237,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 			}
 
 			// Find original instance otherwise use blank instance for following conditional statements
-			$cleanInstance = $instanceMapper->findById($dirtyInstance->id);
+			$cleanInstance = $instanceMapper->findById($dirtyInstance->getId());
 
 			if (!$cleanInstance) {
 				$cleanInstance = new Component_Instance;
@@ -275,8 +275,8 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 				// Resequence destination components
 				$destinationInstanceCollection = $instanceMapper->findByColumnList(array(
 					'module'     => 'dashboard',
-					'identifier' => $dirtyInstance->identifier,
-					'position'   => $dirtyInstance->position
+					'identifier' => $dirtyInstance->getIdentifier(),
+					'position'   => $dirtyInstance->getPosition(),
 				));
 
 				foreach ($destinationInstanceCollection as $destinationInstance) {

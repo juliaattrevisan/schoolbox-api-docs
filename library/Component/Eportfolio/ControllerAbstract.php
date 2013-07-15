@@ -83,8 +83,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 
 				if ($configInstance->count()) {
 					$this->setVar(array(
-						'COMPONENT_NAME' => $configInstance->first()->value,
-						'COMPONENT_CONFIG_NAME' => $configInstance->first()->value,
+						'COMPONENT_NAME' => $configInstance->first()->getValue(),
+						'COMPONENT_CONFIG_NAME' => $configInstance->first()->getValue(),
 					));
 				}
 			}
