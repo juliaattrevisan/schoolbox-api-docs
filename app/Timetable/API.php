@@ -6,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\UserMapper;
+
 class Timetable_API {
 
     private $data_cache = array();
@@ -23,7 +26,7 @@ class Timetable_API {
             $eUser = new External_User();
             $eUser->getCurrentSemester();
 
-            $campus = $user->get('campus_id');
+            $campus = $user->getDefaultCampus()->getId();
 
             $today = $timetableHandler->getDayNumber($campus);
 
@@ -69,14 +72,18 @@ class Timetable_API {
 
             // retrieve from handler -_-
             $table = $timetableHandler->getFullTimetable(
-                $user->get('synergy_id'),
-                $user->get('uid'),
+                $user->getExternalId(),
+                $user->getId(),
                 $campus
             );
 
-            // man-handle the data
-            $uMap = new GizaUser_DataMapper();
-            $cMap = new GizaCategory_DataMapper();
+	        /**
+	         * man-handle the data
+	         * @var UserMapper $uMap
+	         * @var CategoryMapper $cMap
+	         */
+	        $uMap = UserMapper::getInstance();
+            $cMap = CategoryMapper::getInstance();
 
             foreach($table as &$period) {
                 if(($period['periodNumber'] * $tableDefinition['periodCount'] + $period['periodSequence']) == $highlightedRow) {
@@ -89,7 +96,10 @@ class Timetable_API {
                     if(isset($class['staffID'])) {
                         try {
                             $user = $this->readData($uMap, $class['staffID']);
-                            $class['teacherName'] = $user->getName();
+	                        if(!($user instanceof \Schoolbox\User)) {
+		                        throw new Exception_Schoolbox();
+	                        }
+                            $class['teacherName'] = $user->formatName();
                             $class['room'] = trim($class['room']);
                         }
                         catch (Exception_Schoolbox $e) {
@@ -98,7 +108,7 @@ class Timetable_API {
 
                         try {
                             $response->setResponse('debug', array($class));
-                            $class['catID'] = $this->readData($cMap, $class['code'])->get('id');
+                            $class['catID'] = $this->readData($cMap, $class['code'])->getId();
                         }
                         catch (Exception_Schoolbox $e) {
                             $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
@@ -134,22 +144,22 @@ class Timetable_API {
     }
 
     /**
-     * @param Generic_DataMapper $mapper
+     * @param Mapper $mapper
      * @param $id
-     * @return Generic_Object|null
+     * @return \Schoolbox\User|\Schoolbox\Resource\Category
      */
     private function readData($mapper, $id) {
         // read user from cache or db
-        if($mapper instanceof GizaUser_DataMapper) {
+        if($mapper instanceof UserMapper) {
             if(!isset($this->data_cache['user'][$id])) {
-                $this->data_cache['user'][$id] = $mapper->read(array('synergy_id' => $id))->get();
+                $this->data_cache['user'][$id] = $mapper->findOneByColumn('synergy_id', $id);
             }
             return $this->data_cache['user'][$id];
         }
         // read category from cache or db
-        elseif($mapper instanceof GizaCategory_DataMapper) {
+        elseif($mapper instanceof CategoryMapper) {
             if(!isset($this->data_cache['cat'][$id])) {
-                $this->data_cache['cat'][$id] = $mapper->read(array('categoryCode.code' => $id))->get();
+                $this->data_cache['cat'][$id] = $mapper->findOneByColumn('code', $id);
             }
             return $this->data_cache['cat'][$id];
         }
