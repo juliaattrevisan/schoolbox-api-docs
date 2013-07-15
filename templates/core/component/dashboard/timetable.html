@@ -1,5 +1,11 @@
 <div class="box tt">
-    <h2>Timetable <span>- Day {DAYNUMBER}</span></h2>
+    <!-- BEGIN campus_timetable -->
+    <h2>
+        <!-- BEGIN timetable_campus_name -->
+        {CAMPUS_NAME}
+        <!-- END timetable_campus_name -->
+        Timetable <span>- Day {DAYNUMBER}</span>
+    </h2>
     <table id="timetable" class="timetable">
         <thead>
         <tr>
@@ -35,4 +41,5 @@
         </tr>
         </tbody>
     </table>
+    <!-- END campus_timetable -->
 </div>
