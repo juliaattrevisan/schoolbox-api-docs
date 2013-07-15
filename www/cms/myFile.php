@@ -85,7 +85,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	 */
 	$componentDefinition = Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_FileListController');
 
-	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->current());
+	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->first());
 
 	/* Manufacture the necessary info
 	 */

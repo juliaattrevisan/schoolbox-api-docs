@@ -209,7 +209,7 @@ abstract class Eportfolio_Page_Abstract {
 		$history = $mapper->getSubmissionHistory($userId, $boxId);
 
 		if ($history->count()) {
-			return $history->current()->getSubmission();
+			return $history->first()->getSubmission();
 		}
 	}
 
@@ -226,7 +226,7 @@ abstract class Eportfolio_Page_Abstract {
 		$history = $mapper->getSubmissionHistory($userId, $boxId);
 
 		if ($history->count()) {
-			return $history->current()->getReturnedWork();
+			return $history->first()->getReturnedWork();
 		}
 	}
 

@@ -111,7 +111,7 @@ class Session
 
 	    // user must be a valid object (username exists) and also enabled
 	    $uMap = new \Schoolbox\UserMapper();
-	    $user = $uMap->findByColumn('username', $username)->current();
+	    $user = $uMap->findByColumn('username', $username)->first();
 	    if(!($user instanceof \Schoolbox\User && $user->getEnabled())) {
 		    $page = new SitePage(FALSE);
 		    $page->goLoginPage("This account is currently disabled.");

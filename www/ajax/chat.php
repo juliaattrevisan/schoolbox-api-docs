@@ -236,7 +236,7 @@ class AjaxChat {
             $confI = Component_ConfigMapper::getInstance()->findByColumnList(array(
                 'component_config_definition_id' => $definition->id,
                 'component_instance_id'          => $this->instance->id
-            ))->current();
+            ))->first();
 
             if(!($confI->id)) {
                 $confI = new Component_Config();

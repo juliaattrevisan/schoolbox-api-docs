@@ -473,7 +473,7 @@ if (isset($recent_submission)) {
 
 		// retrieve plagiarism score, if available
 		$docMapper = Plagscan_DocumentMapper::getInstance();
-		$plagDoc = $docMapper->findByColumn('file_id', $recent_submission->getSubmission()->getId())->current();
+		$plagDoc = $docMapper->findByColumn('file_id', $recent_submission->getSubmission()->getId())->first();
 		// test: $plagDoc = $docMapper->findByColumn('file_id', 9)->current();
 
 		// if we retrieved a plag document, use it and display to the student

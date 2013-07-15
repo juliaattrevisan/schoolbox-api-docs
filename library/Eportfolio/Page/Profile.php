@@ -136,7 +136,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 		if ($coverPhotoCollection->count()) {
 			$this->getPage()->setVar(array(
-				'COVERPHOTO_IMAGEHASH' => $coverPhotoCollection->current()->getImagehash(),
+				'COVERPHOTO_IMAGEHASH' => $coverPhotoCollection->first()->getImagehash(),
 			));
 
 			$this->getPage()->parse('has_cover_photo_block', 'has_cover_photo');

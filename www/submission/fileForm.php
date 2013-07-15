@@ -57,7 +57,7 @@ if (isset($_FILES['file'])) {
 		$file_mapper = new FileMapper();
 		$existing    = $file_mapper->findByColumn('hash', $file->getHash());
 		if ($existing->count()) {
-			$file_id = $existing->current()->getId();
+			$file_id = $existing->first()->getId();
 		}
 		else {
 			$file_mapper->save($file);

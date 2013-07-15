@@ -138,7 +138,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 						));
 
 						if ($configInstance->count()) {
-							$componentName = $configInstance->current()->value;
+							$componentName = $configInstance->first()->value;
 
 							/* Presave a config for this newly added component
 							 * so it always has the name we gave it
@@ -147,13 +147,13 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 							$newConfigInstance->id = null;
 							$newConfigInstance->configDefinitionId = $currentConfig->id;
 							$newConfigInstance->instanceId = $component->instance->id;
-							$newConfigInstance->value = $configInstance->current()->value;
+							$newConfigInstance->value = $configInstance->first()->value;
 
 							Component_ConfigMapper::getInstance()->save($newConfigInstance);
 
 							/* Force inherited name
 							 */
-							$component->instance->config[$currentConfig->id]->defaultValue = $configInstance->current()->value;
+							$component->instance->config[$currentConfig->id]->defaultValue = $configInstance->first()->value;
 						}
 					}
 				}
@@ -242,7 +242,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 					$confI = $componentConfigInstanceMapper->findByColumnList(array(
 						'component_config_definition_id' => $confD->id,
 						'component_instance_id'          => $instance->id
-					))->current();
+					))->first();
 
 					printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $config[$confD->key]);
 

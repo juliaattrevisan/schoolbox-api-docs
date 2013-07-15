@@ -76,7 +76,7 @@ class TemplateMapper extends Schoolbox\Mapper {
 					/* Spawn a component instance for the template
 					 */
 					$componentInstance = new \Component_Instance();
-					$componentInstance->definitionId = $componentDefinition->current()->id;
+					$componentInstance->definitionId = $componentDefinition->first()->id;
 					$componentInstance->module = 'eportfolio_template';
 					$componentInstance->identifier = $templateId;
 					$componentInstance->position = $currentComponent['keys']['position'];
@@ -91,7 +91,7 @@ class TemplateMapper extends Schoolbox\Mapper {
 
 						foreach($currentComponent['keys'] as $currentKey => $currentValue) {
 							$componentConfigDefinition = \Component_ConfigDefinitionMapper::getInstance()->findByColumnList(array(
-								'component_definition_id' => $componentDefinition->current()->id,
+								'component_definition_id' => $componentDefinition->first()->id,
 								'key' => $currentKey,
 							));
 
@@ -99,7 +99,7 @@ class TemplateMapper extends Schoolbox\Mapper {
 							 */
 							if ($componentConfigDefinition->count()) {
 								$componentConfigInstance = new \Component_Config();
-								$componentConfigInstance->configDefinitionId = $componentConfigDefinition->current()->id;
+								$componentConfigInstance->configDefinitionId = $componentConfigDefinition->first()->id;
 								$componentConfigInstance->instanceId = $instanceId;
 								$componentConfigInstance->value = $currentValue;
 

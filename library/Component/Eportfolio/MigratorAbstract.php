@@ -85,16 +85,16 @@ abstract class MigratorAbstract {
 	protected function firstConfig() {
 		$definition = \Component_DefinitionMapper::getInstance()->findByColumn('class', $this->getControllerClass());
 
-		$this->setDefinitionId($definition->current()->id);
+		$this->setDefinitionId($definition->first()->id);
 
 		/* Set up config definition for this component by spawning one if it doesn't already exist
 		 */
-		$exists = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('component_definition_id', $definition->current()->id);
+		$exists = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('component_definition_id', $definition->first()->id);
 
 		if (!$exists->count()) {
 			$configDefinition = new \Component_ConfigDefinition();
 			$configDefinition->id = null;
-			$configDefinition->definitionId = $definition->current()->id;
+			$configDefinition->definitionId = $definition->first()->id;
 			$configDefinition->key = 'componentname';
 			$configDefinition->defaultValue = $this->getComponentDefaultName();
 			$configDefinition->label = 'Title';
@@ -104,7 +104,7 @@ abstract class MigratorAbstract {
 			$this->setConfigDefinitionId($configDefinitionIds[0]);
 		}
 		else {
-			$this->setConfigDefinitionId($exists->current()->id);
+			$this->setConfigDefinitionId($exists->first()->id);
 		}
 	}
 

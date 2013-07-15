@@ -139,7 +139,7 @@ function getSingleFileMeta($folderId, $fileId) {
 
 	// list of portfolio pages that can be published to
 	$componentDefinition = Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_FileListController');
-	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->current());
+	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->first());
 	$publishTo = array();
 
 	if (is_array($availablePages) && count($availablePages)) {

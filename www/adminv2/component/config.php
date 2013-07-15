@@ -123,7 +123,7 @@ function writeConfig($vars) {
             $confI = $ccm->findByColumnList(array(
                 'component_config_definition_id' => $confD->id,
                 'component_instance_id'          => $instance->id
-            ))->current();
+            ))->first();
 
             printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $vars[$confD->key]);
 

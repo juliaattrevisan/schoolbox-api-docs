@@ -223,7 +223,7 @@ function getSingleFileMeta($folderId, $fileId) {
 	$userHandler = new User();
 
 	$fmap = new FileMapper();
-	$file = $fmap->findByColumnList(array('id' => $fileId, 'deleted' => 0))->current();
+	$file = $fmap->findByColumnList(array('id' => $fileId, 'deleted' => 0))->first();
 
 	if(!$file) {
 		sendError('No file with the specified ID exists');
