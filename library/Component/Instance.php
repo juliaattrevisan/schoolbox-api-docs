@@ -72,7 +72,7 @@ class Component_Instance extends Model {
 	}
 
 	/**
-	 * @param  string $definition
+	 * @param  Component_Definition $definition
 	 *
 	 * @return $this
 	 */
@@ -82,7 +82,7 @@ class Component_Instance extends Model {
 	}
 
 	/**
-	 * @return string
+	 * @return Component_Definition
 	 */
 	public function getDefinition() {
 		return $this->definition;
