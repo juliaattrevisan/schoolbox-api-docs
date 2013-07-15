@@ -72,8 +72,14 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 	 *
 	 * @return SubjectCollection
 	 */
-	public function findAllForStudent(\Schoolbox\User $user) {
+	public function findAllForStudent(Schoolbox\User $user) {
 		$subjects = $this->external_user->getSubjectList($user->getExternalId(), $user->getId());
+
+		// if no subjects, just return an empty collection
+		if($subjects === false) {
+			return new SubjectCollection();
+		}
+
 		$category_statement = $this->database->prepare('
 			SELECT c.id, GROUP_CONCAT(co.code) AS code
 			FROM category c
@@ -91,8 +97,8 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 		$id_filter = function($subject) {
 			return isset($subject['id']);
 		};
-		return new Schoolbox\External\SubjectCollection(
-			$this->hydrateList(array_filter(array_map($add_id_map, $subjects), $id_filter))
+		return new SubjectCollection(
+			array_filter(array_map($add_id_map, $subjects), $id_filter)
 		);
 	}
 }
