@@ -211,24 +211,26 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 	public function save ($object) {
 		$dirtyInstanceCollection = $this->getModelAsCollection($object);
 
-		foreach ( $dirtyInstanceCollection as $dirtyInstance ) {
+		foreach ($dirtyInstanceCollection as $dirtyInstance) {
+			/* @var $dirtyInstance Component_Instance */
 
 			$instanceMapper = Component_InstanceMapper::getInstance();
 
 			$definitionMapper = Component_DefinitionMapper::getInstance();
 
-			$dirtyInstance->definition = $definitionMapper->findById($dirtyInstance->definitionId);
+			$dirtyInstance->setDefinition($definitionMapper->findById($dirtyInstance->getDefinitionId()));
 
 			// Check for multiple instances with the same definition if disallowed
-			if ( $dirtyInstance->definition->multiple == 'false' ) {
+			if ($dirtyInstance->getDefinition()->getMultiple() == 'false') {
 				$similarInstanceCollection = $instanceMapper->findByColumnList(array(
 					'module'     => 'dashboard',
-					'identifier' => $dirtyInstance->identifier,
-					'component_definition_id' => $dirtyInstance->definition->id
+					'identifier' => $dirtyInstance->getIdentifier(),
+					'component_definition_id' => $dirtyInstance->getDefinition()->getId(),
 				));
 
-				foreach ( $similarInstanceCollection as $similarInstance ) {
-					if ( $similarInstance->id != $dirtyInstance->id ) {
+				foreach ($similarInstanceCollection as $similarInstance) {
+					/* @var $similarInstance Component_Instance */
+					if ($similarInstance->getId() != $dirtyInstance->getId()) {
 						return false;
 					}
 				}
@@ -237,26 +239,33 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 			// Find original instance otherwise use blank instance for following conditional statements
 			$cleanInstance = $instanceMapper->findById($dirtyInstance->id);
 
-			if ( !$cleanInstance ) {
+			if (!$cleanInstance) {
 				$cleanInstance = new Component_Instance;
 			}
 
-			if ( $dirtyInstance->position != $cleanInstance->position || $dirtyInstance->sequence != $cleanInstance->sequence ) {
-
+			if ($dirtyInstance->getPosition() != $cleanInstance->getPosition()
+				|| $dirtyInstance->getSequence() != $cleanInstance->getSequence()
+			) {
 				// Resequence source components
-				if ( !empty($cleanInstance->id) ) {
+				$clean_instance_id = $cleanInstance->getId();
+				if (!empty($clean_instance_id)) {
 					$sourceInstanceCollection = $instanceMapper->findByColumnList(array(
 						'module'     => 'dashboard',
-						'identifier' => $cleanInstance->identifier,
-						'position'   => $cleanInstance->position
+						'identifier' => $cleanInstance->getIdentifier(),
+						'position'   => $cleanInstance->getPosition(),
 					));
 
-					foreach ( clone $sourceInstanceCollection as $index => $sourceInstance ) {
-						if ( $sourceInstance->id == $cleanInstance->id ) {
-							unset($sourceInstanceCollection[$index]);
+					//
+					// Iterate a copy of the source instance collection, because
+					// it will be modified.
+					foreach (clone $sourceInstanceCollection as $index => $sourceInstance) {
+						/* @var $sourceInstance Component_Instance */
+						if ($sourceInstance->getId() == $cleanInstance->getId()) {
+							$sourceInstanceCollection->offsetUnset($index);
 						}
-						else if ( $sourceInstance->sequence > $cleanInstance->sequence ) {
-							$sourceInstanceCollection[$index]->sequence--;
+						elseif ($sourceInstance->getSequence() > $cleanInstance->getSequence()) {
+							$sourceInstance->setSequence($sourceInstance->getSequence()-1);
+							$sourceInstanceCollection->offsetSet($index, $sourceInstance);
 						}
 					}
 
@@ -270,9 +279,10 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 					'position'   => $dirtyInstance->position
 				));
 
-				foreach ( $destinationInstanceCollection as $destinationInstance ) {
-					if ( $destinationInstance->sequence >= $dirtyInstance->sequence ) {
-						$destinationInstance->sequence++;
+				foreach ($destinationInstanceCollection as $destinationInstance) {
+					/* @var $destinationInstance Component_Instance */
+					if ($destinationInstance->getSequence() >= $dirtyInstance->getSequence()) {
+						$destinationInstance->setSequence($destinationInstance->getSequence() + 1);
 					}
 				}
 
