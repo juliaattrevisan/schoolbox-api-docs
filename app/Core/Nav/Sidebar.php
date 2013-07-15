@@ -6,6 +6,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\User;
+
 class Core_Nav_Sidebar {
 
     private $user;
@@ -16,7 +20,7 @@ class Core_Nav_Sidebar {
     private $work;
     private $more;
 
-    public function __construct(GizaUser $user) {
+    public function __construct(User $user) {
         $this->user = $user;
     }
 
@@ -75,8 +79,9 @@ class Core_Nav_Sidebar {
 
     public function createSubjectList() {
         try {
-            $subjects = $this->user->getSubjects();
-            if ($subjects->count()) {
+            $subjects = $this->user->getSubjectCollection();
+	        $count = $subjects->count();
+            if ($count > 0) {
                 $this->subjects = array_merge(
                     $this->subjects,
                     array(array('type' => '__SEPARATOR__', 'value' => 'Your Subjects')),
@@ -92,11 +97,16 @@ class Core_Nav_Sidebar {
         }
     }
 
-    public function createSubject(GizaCategory $cat, $items = 'all') {
+	/**
+	 * @param Category $cat
+	 * @param string $items
+	 * @return array
+	 */
+	public function createSubject($cat, $items = 'all') {
 
         if(is_array($items) && !empty($items)) {
-            $code = $cat->__isset('code') ? " ({$cat->get('code')})" : '';
-            $cid = $cat->get('id');
+            $code = $cat->getCodes()->count() ? " ({$cat->getCodes()->current()->getCode()})" : '';
+            $cid = $cat->getId();
             $itemMap = array(
                 'news'      => 'News',
                 'due_work'  => 'Due Work',
@@ -106,7 +116,7 @@ class Core_Nav_Sidebar {
             );
 
             $subject = array(
-                'value' => $cat->get('name') . $code,
+                'value' => $cat->getName() . $code,
                 'href'  => "facade/homepage/display/$cid",
                 'items' => array()
             );
@@ -132,7 +142,13 @@ class Core_Nav_Sidebar {
 
     public function createGroupList() {
         try {
-            $groups = $this->user->getGroups();
+	        // get the group collection
+	        /**
+	         * @var CategoryMapper $catMapper
+	         */
+	        $catMapper = CategoryMapper::getInstance();
+	        $groups = $catMapper->findForUser($this->user, false);
+
             if ($groups->count()) {
                 $this->subjects = array_merge(
                     $this->subjects,
@@ -149,7 +165,7 @@ class Core_Nav_Sidebar {
     /**
      * Gets list of subjects for population into this object's list of subjects.
      *
-     * @param GizaCollection $subject_list
+     * @param $subject_list
      *
      * @return array
      */
@@ -158,24 +174,28 @@ class Core_Nav_Sidebar {
         foreach ($subject_list as $cat) {
             /**
              * Don't include categories that don't have a homepage (ie. template == 0)
-             * @var $cat GizaCategory
+             * And account for loose typing ($cat could be an array or Category object)
+             * @var Category $cat
              */
-            try {
-                $homepage = $cat->get('homepage');
-                $homepage->get('template');
+	        if(!($cat instanceof Category)) {
+		        $cat = CategoryMapper::getInstance()->findById($cat['id']);
+	        }
+            if($cat->getTemplateId()) {
+	            $list[] = $this->createSubject($cat);
             }
-            catch (Exception_Schoolbox $ex) {
-                continue;
-            }
-            $list[] = $this->createSubject($cat);
         }
         return $list;
     }
 
-    public function createGroup(GizaCategory $cat, $items = 'all') {
+	/**
+	 * @param Category $cat
+	 * @param string $items
+	 * @return array
+	 */
+	public function createGroup($cat, $items = 'all') {
         if(is_array($items) && !empty($items)) {
-            $code = $cat->__isset('code') ? " ({$cat->get('code')})" : '';
-            $cid = $cat->get('id');
+            $code = $cat->getCodes()->count() ? " ({$cat->getCodes()->current()})" : '';
+            $cid = $cat->getId();
             $itemMap = array(
                 'files'     => 'Files',
                 'news'      => 'News',
@@ -187,7 +207,7 @@ class Core_Nav_Sidebar {
             );
 
             $subject = array(
-                'value' => $cat->get('name'),
+                'value' => $cat->getName(),
                 'href'  => "facade/homepage/display/$cid",
                 'items' => array()
             );
@@ -215,7 +235,7 @@ class Core_Nav_Sidebar {
 
         // GENERATE UPCOMING WORK
         $subHandler = new Submission();
-        $upcoming = $subHandler->getAllUpcomingWorkAndAssessments($this->user->get('uid'));
+        $upcoming = $subHandler->getAllUpcomingWorkAndAssessments($this->user->getId());
 
         $noWork = array(array(
             'value' => '<i>No upcoming work</i>',
