@@ -1,8 +1,6 @@
 <?php
 
-$fileHandler = new MyFile();
-$folderHandler = new MyFolder();
-
+use Eportfolio\PageMapper;
 
 $this->setFile(TEMPLATE_content, 'cms/myFile.html');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
@@ -15,9 +13,21 @@ $this->setTab('myfiles');
  * @uri /cms/myFile/:myFileId/:userId
  */
 
+// userId is always arg[1]
+$userId = $this->arg[1] ?: $_SESSION['id'];
+
+// PERMISSION: must be either session user, or staff
+$groupHandler = new Group();
+if(!($groupHandler->isStaff() || $userId == $_SESSION['id'])) {
+	error(19);
+}
+
+// instantiate handlers
+$fileHandler = new MyFile($userId);
+$folderHandler = new MyFolder($userId);
+
 // create a new file
 if($this->arg[0] == 'new') {
-	$userId = $this->arg[1] ?: $_SESSION['id'];
 	$myFolderId = $this->arg[2] ?: 0;
 	$publishComponent = $this->arg[3] ?: false;
 
@@ -43,32 +53,34 @@ if($this->arg[0] == 'new') {
 
 	$folderTree = $folderHandler->getFolderTree();
 	renderTreeSelect($this, $folderTree, $parent['id']);
-	renderPublishingOptions($this, $publishComponent);
+	renderPublishingOptions($this, $userId, false, $publishComponent);
 }
 
 // modify an existing file
 elseif(is_numeric($this->arg[0])) {
 	$myFileId = $this->arg[0];
-	$userId = $this->arg[1] ?: $_SESSION['id'];
 
 	$file = $fileHandler->getByID($myFileId);
 	if (!is_array($file))
 		error(41);
 
+	$ft = new FileType('', $file['mime_type']);
+
 	$this->setTitle('Modify File');
 	$this->setVar('browse_row_block', '');
 
-	$output = array('ACTION' => 'Modify',
-	                'FILE_ID' => $file['id'],
-	                'DESCRIPTION' => Scrub::text($file['description']),
-	                'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
-	                'PARENT_ID' => $file['parent'],
+	$output = array(
+		'ACTION' => 'Modify',
+		'FILE_ID' => $file['id'],
+		'DESCRIPTION' => Scrub::text($file['description']),
+		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+		'PARENT_ID' => $file['parent'],
 	);
 	$this->setVar($output);
 
 	$folderTree = $folderHandler->getFolderTree();
 	renderTreeSelect($this, $folderTree, $file['parent']);
-	renderPublishingOptions($this);
+	renderPublishingOptions($this, $userId, $ft->isImage());
 
 }
 
@@ -115,15 +127,29 @@ function renderTreeSelect($page, $tree, $selected = 0) {
  * Render the UI options for publishing, if there are any
  *
  * @param SitePage $page
+ * @param int $userId
+ * @param bool $includeImageControllers
  * @param bool|int $publishComponent
  */
-function renderPublishingOptions($page, $publishComponent = false) {
-	/* Get a list of pages with the File List component in it
-		 * and offer these as places to which you can publish.
-		 */
-	$componentDefinition = Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_FileListController');
+function renderPublishingOptions($page, $userId, $includeImageControllers, $publishComponent = false) {
 
-	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->first());
+	/**
+	 * @var PageMapper $eMap
+	 * @var Component_DefinitionMapper $cMap
+	 */
+	$eMap = PageMapper::getInstance();
+	$cMap = Component_DefinitionMapper::getInstance();
+
+	/* Get a list of pages with the File List component in it
+	 * and offer these as places to which you can publish.
+	 */
+	$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_FileListController')->current();
+	$availablePages = $eMap->findAvailablePages($userId, $componentDefinition);
+
+	if($includeImageControllers) {
+		$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_ImageListController')->current();
+		$availablePages = array_merge($availablePages, $eMap->findAvailablePages($userId, $componentDefinition));
+	}
 
 	/* Manufacture the necessary info
 	 */
