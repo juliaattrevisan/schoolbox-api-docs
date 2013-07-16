@@ -51,6 +51,13 @@ class Component_Definition extends Model {
 	protected $componentCategory;
 
 	/**
+	 * The name of this component's category (as opposed to its ID)
+	 *
+	 * @var string
+	 */
+	protected $componentCategoryName;
+
+	/**
 	 * An unmapped count of instances of this item.
 	 *
 	 * @var int
@@ -89,6 +96,23 @@ class Component_Definition extends Model {
 	 */
 	public function getComponentCategory() {
 		return $this->componentCategory;
+	}
+
+	/**
+	 * @param  string $componentCategoryName
+	 *
+	 * @return $this
+	 */
+	public function setComponentCategoryName($componentCategoryName) {
+		$this->componentCategoryName = $componentCategoryName;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getComponentCategoryName() {
+		return $this->componentCategoryName;
 	}
 
 	/**
