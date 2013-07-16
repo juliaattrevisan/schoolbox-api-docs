@@ -438,6 +438,7 @@ if (is_numeric($this->arg[0])) {
 
 	                $studentContactList = $synUserHandler->getStudentContactList($user['synergy_id']);
 	                if (is_array($studentContactList)) {
+	                    $prevContact['StudentContactID'] = 1;
 	                    foreach ($studentContactList as $studentContact) {
 	                        if ($prevContact['StudentContactID'] != $studentContact['StudentContactSpouseID'] && ( (int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su'])) {
 	                            $j++;
