@@ -40,6 +40,16 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
+	<div>
+		<form action='/socialstream/modifyForm.php' method='post'>
+			<input type='hidden' name='type' value='string' />
+			<input type='hidden' name='homepageId' value='{ID}'/>
+
+			<input type='text' name='body' value='' />
+			<input type='submit' value='Post' />
+		</form>
+	</div>
+
 	<div class='socialstream'>
 		<!-- BEGIN socialstream_post -->
 		<ul>
