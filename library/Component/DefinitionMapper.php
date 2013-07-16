@@ -131,7 +131,8 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 		foreach($collection as $definition) {
 			/** @var Component_Definition $definition */
 			if(isset($cats[$definition->getComponentCategory()])) {
-				$definition->setComponentCategory($cats[$definition->getComponentCategory()]);
+				$definition->setComponentCategory($definition->getComponentCategory());
+				$definition->setComponentCategoryName($cats[$definition->getComponentCategory()]);
 			}
 		}
 

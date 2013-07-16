@@ -149,7 +149,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 			$definition = $instance->getDefinition();
 			$definition->setComponentCategory($instance->getIdentifier());
-			$definition->setComponentCategory($this->getEportfolioHandler()->getTemplateNameById($instance->getIdentifier()));
+			$definition->setComponentCategoryName($this->getEportfolioHandler()->getTemplateNameById($instance->getIdentifier()));
 
 			foreach ($this->getComponentCollection() as $inst) {
 				/** @var Component_Eportfolio_ControllerAbstract $inst */
@@ -253,7 +253,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 				/* >:/
 				 */
-				$this->tabList[$this_category]['name'] = $this_category;
+				$this->tabList[$this_category]['name'] = $component->getDefinition()->getComponentCategoryName();
 				$this->tabList[$this_category]['count']++;
 			}
 		}

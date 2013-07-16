@@ -148,7 +148,7 @@ if ($permission >= WRITE_ACCESS) {
 
             //
             // This was set to $component->componentCategoryName - a non-existent value
-            $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategory();
+            $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategoryName();
             $tabList[$component->getComponentCategory()]['count']++;
 
         }
