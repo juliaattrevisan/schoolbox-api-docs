@@ -210,6 +210,15 @@ abstract class Component_ControllerAbstract {
 
 
     public function __get($property) {
+        //
+        // Access property on $this->instance
+        trigger_error(
+            sprintf(
+                'Direct get of property "%s::%s" is deprecated - use get methods instead',
+                get_class($this), $property
+            ),
+            E_USER_DEPRECATED
+        );
         if (isset($this->instance->$property)) {
             return $this->instance->$property;
         } else {
