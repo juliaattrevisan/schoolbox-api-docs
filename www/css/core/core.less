@@ -3283,8 +3283,12 @@ EVALUATION
     position: relative;
 }
 
-.evaluation-content fieldset.checkboxes label {
-    width: auto;
+.evaluation-content {
+    fieldset.checkboxes, .radio-buttons {
+        label {
+          width: auto;
+        }
+    }
 }
 
 .evaluation-content .textarea-container {
