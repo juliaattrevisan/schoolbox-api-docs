@@ -30,6 +30,12 @@ class PostMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
+			'column'     => 'root_id',
+			'property'   => 'rootId',
+			'type'       => self::TYPE_INTEGER,
+		));
+
+		$this->hasMap(array(
 			'column'     => 'owner_id',
 			'property'   => 'ownerId',
 			'type'       => self::TYPE_INTEGER,
