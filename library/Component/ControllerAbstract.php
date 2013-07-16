@@ -109,7 +109,7 @@ abstract class Component_ControllerAbstract {
     protected function getTemplate($templateName = '', $templatePath = '') {
         if (empty($templateName)) {
             /* Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase */
-            $templateName = ucfirst(substr(array_pop(explode('_', $this->definition->class)), 0, -10));
+            $templateName = ucfirst(substr(array_pop(explode('_', $this->getInstance()->getDefinition()->getClass())), 0, -10));
         }
 
         if (empty($templatePath)) {
@@ -355,10 +355,10 @@ abstract class Component_ControllerAbstract {
 	/**
 	 * Split this out so subclasses can determine which config elements get rendered
 	 *
-	 * @param $conf
-	 * @param $key
-	 * @param $page
-	 * @param $params
+	 * @param Component_Config_Abstract $conf
+	 * @param string                    $key
+	 * @param SitePage                  $page
+	 * @param array                     $params
 	 */
 	protected function parseConfigInstance($conf, $key, $page, $params) {
 		$templateFile = "component/config/$key.html";
