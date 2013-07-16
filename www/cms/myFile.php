@@ -4,6 +4,13 @@ $fileHandler = new MyFile();
 $folderHandler = new MyFolder();
 
 
+$this->setFile(TEMPLATE_content, 'cms/myFile.html');
+$this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
+$this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
+$this->setBlock(TEMPLATE_content, 'publish_page', 'publish_page_block');
+$this->setTab('myfiles');
+
+
 if (is_numeric($this->arg[0])) {
 
     /* Modify existing file */
@@ -12,12 +19,7 @@ if (is_numeric($this->arg[0])) {
     if (!is_array($file))
         error(41);
 
-    $this->setFile(TEMPLATE_content, 'cms/myFile.html');
-    $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
-    $this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
     $this->setTitle('Modify File');
-    $this->setTab('myfiles');
-
     $this->setVar('browse_row_block', '');
 
     $output = array('ACTION' => 'Modify',
@@ -29,18 +31,9 @@ if (is_numeric($this->arg[0])) {
     $this->setVar($output);
 
     $folderTree = $folderHandler->getFolderTree();
-    if (is_array($folderTree)) {
-        array_unshift($folderTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-        foreach ($folderTree as $folder) {
-            $output = array('FOLDER_ID' => $folder['id'],
-                'FOLDER_NAME' => $folder['name'],
-                'FOLDER_INDENT' => str_repeat('&nbsp;', ($folder['depth'] + 1) * 4),
-                'FOLDER_SELECTED' => $folder['id'] == $file['parent'] ? 'selected="selected"' : '',
-            );
-            $this->setVar($output);
-            $this->parse('folder_list_block', 'folder_list', true);
-        }
-    }
+	renderTreeSelect($this, $folderTree, $file['parent']);
+	renderPublishingOptions($this);
+
 }
 elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -50,10 +43,8 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     elseif (!$parent = $folderHandler->getByID($this->arg[1]))
         error(13);
 
-    $this->setFile(TEMPLATE_content, 'cms/myFile.html');
-    $this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
     $this->setTitle('Add File');
-    $this->setTab('resources');
+	$this->parse('browse_row_block', 'browse_row');
 
     $output = array('ACTION' => 'Add',
         'FILE_ID' => '',
@@ -65,22 +56,56 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $this->setVar($output);
 
     $folderTree = $folderHandler->getFolderTree();
-    if (is_array($folderTree)) {
-        array_unshift($folderTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-        foreach ($folderTree as $folder) {
-            $output = array('FOLDER_ID' => $folder['id'],
-                'FOLDER_NAME' => $folder['name'],
-                'FOLDER_INDENT' => str_repeat('&nbsp;', ($folder['depth'] + 1) * 4),
-                'FOLDER_SELECTED' => $folder['id'] == $parent['id'] ? 'selected="selected"' : '',
-            );
-            $this->setVar($output);
-            $this->parse('folder_list_block', 'folder_list', true);
-        }
-    }
+	renderTreeSelect($this, $folderTree, $parent['id']);
+	renderPublishingOptions($this);
 
+}
+else
+    error(2);
+
+
+/**
+ * Render the <select> element with the tree structure defined, or just a default "top level" if there is none
+ *
+ * @param SitePage $page
+ * @param array $tree
+ * @param int $selected
+ */
+function renderTreeSelect($page, $tree, $selected = 0) {
+	if (is_array($tree)) {
+		array_unshift($tree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
+		foreach ($tree as $folder) {
+			$output = array(
+				'FOLDER_ID' => $folder['id'],
+				'FOLDER_NAME' => $folder['name'],
+				'FOLDER_INDENT' => str_repeat('&nbsp;', ($folder['depth'] + 1) * 4),
+				'FOLDER_SELECTED' => $folder['id'] == $selected ? 'selected="selected"' : '',
+			);
+			$page->setVar($output);
+			$page->parse('folder_list_block', 'folder_list', true);
+		}
+	}
+	else {
+		$output = array(
+			'FOLDER_ID' => 0,
+			'FOLDER_NAME' => 'Top Level',
+			'FOLDER_INDENT' => '',
+			'FOLDER_SELECTED' => 'selected="selected"',
+		);
+		$page->setVar($output);
+		$page->parse('folder_list_block', 'folder_list', false);
+	}
+}
+
+/**
+ * Render the UI options for publishing, if there are any
+ *
+ * @param SitePage $page
+ */
+function renderPublishingOptions($page) {
 	/* Get a list of pages with the File List component in it
-	 * and offer these as places to which you can publish.
-	 */
+		 * and offer these as places to which you can publish.
+		 */
 	$componentDefinition = Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_FileListController');
 
 	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->first());
@@ -116,11 +141,9 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 			}
 		}
 
-		$this->setBlock(TEMPLATE_content, 'publish_page', 'publish_page_block');
-
 		if (is_array($allPageData) && count($allPageData)) {
 			foreach($allPageData as $currentPageData) {
-				$this->setVar(array(
+				$page->setVar(array(
 					'PUBLISHED' => '',
 					'PUBLISH_PAGE_PAGE_ID' => $currentPageData['pageId'],
 					'PUBLISH_PAGE_PAGE_OWNER_ID' => $currentPageData['pageOwnerId'],
@@ -129,13 +152,14 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 					'PUBLISH_PAGE_COMPONENT_NAME' => $currentPageData['componentName'],
 				));
 
-				$this->parse('publish_page_block', 'publish_page', true);
+				$page->parse('publish_page_block', 'publish_page', true);
 			}
 		}
 		else {
-			$this->setVar('publish_page_block', '');
+			$page->setVar('publish_page_block', '<p>You have no locations available for publishing.</p>');
 		}
 	}
+	else {
+		$page->setVar('publish_page_block', '<p>You have no locations available for publishing.</p>');
+	}
 }
-else
-    error(2);
