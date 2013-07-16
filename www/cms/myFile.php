@@ -26,6 +26,8 @@ if(!($groupHandler->isStaff() || $userId == $_SESSION['id'])) {
 $fileHandler = new MyFile($userId);
 $folderHandler = new MyFolder($userId);
 
+$this->setVar('USER_ID', $userId);
+
 // create a new file
 if($this->arg[0] == 'new') {
 	$myFolderId = $this->arg[2] ?: 0;

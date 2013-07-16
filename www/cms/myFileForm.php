@@ -3,8 +3,15 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
-$fileHandler = new MyFile();
+$userId = isset($_POST['user']) ? $_POST['user'] : $_SESSION['id'];
+
+// PERMISSION: have to be session user or staff
+$groupHandler = new Group();
+if(!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
+	error(47);
+}
+
+$fileHandler = new MyFile($userId);
 
 // Upload a new file
 if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
@@ -18,7 +25,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         // check user owns file
         $current = $fileHandler->getByID($_POST['fileID']);
 
-        if ($current['owner'] != $_SESSION['id']) {
+        if ($current['owner'] != $userId) {
             $page->error(47);
         }
 
