@@ -46,6 +46,13 @@ class Component_Instance extends Model {
 	protected $sequence;
 
 	/**
+	 * An unmapped count of instances of this item.
+	 *
+	 * @var int
+	 */
+	protected $instanceCount = 0;
+
+	/**
 	 * @var Schoolbox\Collection
 	 */
 	protected $config;
@@ -188,6 +195,31 @@ class Component_Instance extends Model {
 	 */
 	public function getSequence() {
 		return $this->sequence;
+	}
+
+	/**
+	 * @param  int   $instanceCount
+	 * @return $this
+	 */
+	public function setInstanceCount($instanceCount) {
+		$this->instanceCount = $instanceCount;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getInstanceCount() {
+		return $this->instanceCount;
+	}
+
+	/**
+	 * Increments the instance count for this definition.
+	 *
+	 * @return void
+	 */
+	public function incrementInstanceCount() {
+		$this->instanceCount++;
 	}
 
 

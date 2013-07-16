@@ -57,7 +57,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		$this->setComponentCollection($this->getComponentFactory()->buildComponentList($this->getPageId()));
 
 		/* Page colours
- 		 */
+		 */
 		$this->setColours($this->getEportfolioHandler()->getColorList());
 	}
 
@@ -145,30 +145,33 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		$instanceCollection = $this->getComponentFactory()->getDefinitionList('eportfolio_template');
 
 		foreach ($instanceCollection as $instance) {
-			$instance->instanceCount = 0;
+			/** @var Component_Instance $instance */
 
-			$instance->definition->componentCategory = $instance->identifier;
-			$instance->definition->componentCategoryName = $this->getEportfolioHandler()->getTemplateNameById($instance->identifier);
+			$definition = $instance->getDefinition();
+			$definition->setComponentCategory($instance->getIdentifier());
+			$definition->setComponentCategory($this->getEportfolioHandler()->getTemplateNameById($instance->getIdentifier()));
 
 			foreach ($this->getComponentCollection() as $inst) {
-				if ($inst->definitionId == $instance->definitionId) {
-					++$instance->instanceCount;
+				/** @var Component_Eportfolio_ControllerAbstract $inst */
+				if ($inst->getInstance()->getDefinitionId() == $instance->getDefinitionId()) {
+					$instance->incrementInstanceCount();
 				}
 			}
 		}
 
 		if ($total = $instanceCollection->count()) {
 			$i = 0;
-			$previous = null;
+			$previous = new Component_Instance();
 
 			foreach ($instanceCollection as $component) {
+				/** @var Component_Instance $component */
 				++$i;
 				$class = '';
 
-				if ($component->definition->multiple == 'false') {
+				if ($component->getDefinition()->getMultiple() == 'false') {
 					$class = 'one-only ';
 
-					if ($component->definition->multiple == 'false' && $component->instanceCount > 0) {
+					if ($component->getDefinition()->getMultiple() == 'false' && $component->getInstanceCount() > 0) {
 						$class .= 'disabled ';
 					}
 				}
@@ -177,13 +180,16 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 				/* Draw the name and description from the config, instead of the definition
 				 */
-				if (count($component->config)) {
-					foreach($component->config as $currentConfig) {
-						if ($currentConfig->key == 'componentname') {
-							$componentName = $currentConfig['value'];
+				if (count($component->getConfig())) {
+					$componentName = '';
+					$componentDescription = '';
+					foreach($component->getConfig() as $currentConfig) {
+						/** @var Component_ConfigDefinition $currentConfig */
+						if ($currentConfig->getKey() == 'componentname') {
+							$componentName = $currentConfig->getValue();
 						}
-						else if ($currentConfig->key == 'description') {
-							$componentDescription = $currentConfig['value'];
+						else if ($currentConfig->getKey() == 'description') {
+							$componentDescription = $currentConfig->getValue();
 						}
 					}
 
@@ -191,38 +197,43 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 					 * use the defaults from component definition
 					 */
 					if (!strlen($componentName)) {
-						$componentName = $component->definition->name;
+						$componentName = $component->getDefinition()->getName();
 					}
 
 					if (!strlen($componentDescription)) {
-						$componentDescription = $component->definition->description;
+						$componentDescription = $component->getDefinition()->getDescription();
 					}
 				}
 				/* If there aren't any configs, use a default pair from definition
 				 */
 				else {
-					$componentName = $component->definition->name;
-					$componentDescription = $component->definition->description;
+					$componentName = $component->getDefinition()->getName();
+					$componentDescription = $component->getDefinition()->getDescription();
 				}
 
 				$this->getPage()->setVar(array(
 					'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($componentName),
 					'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($componentDescription),
-					'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->id),
-					'EPORTFOLIO_COMPONENT_DEFINITION_ID' => Scrub::text($component->definitionId),
-					'EPORTFOLIO_COMPONENT_COUNT' => $component->instanceCount,
+					'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->getId()),
+					'EPORTFOLIO_COMPONENT_DEFINITION_ID' => Scrub::text($component->getDefinitionId()),
+					'EPORTFOLIO_COMPONENT_COUNT' => $component->getInstanceCount(),
 					'EPORTFOLIO_COMPONENT_CLASS' => $class,
-					'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->identifier,
+					'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->getIdentifier(),
 				));
 
-				if ($component->definition->componentCategory != $previous->definition->componentCategory && $i > 1) {
+				$this_category = $component->getDefinition()->getComponentCategory();
+				$last_category = null;
+				if ($previous->getDefinition() instanceof Component_Definition) {
+					$last_category = $previous->getDefinition()->getComponentCategory();
+				}
+				if ($this_category != $last_category && $i > 1) {
 					$this->getPage()->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
 					$this->getPage()->setVar('eportfolio_component_block', '');
 					$this->getPage()->parse('eportfolio_component_block', 'eportfolio_component', true);
 
 					// last rotation
 					if ($total == $i) {
-						$this->getPage()->setVar('EPORTFOLIO_COMPONENT_CATEGORY_ID', $component->definition->componentCategory);
+						$this->getPage()->setVar('EPORTFOLIO_COMPONENT_CATEGORY_ID', $this_category);
 						$this->getPage()->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
 					}
 				}
@@ -230,7 +241,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 					// last rotation
 					if ($total == $i) {
 						$this->getPage()->parse('eportfolio_component_block', 'eportfolio_component', true);
-						$this->getPage()->setVar('EPORTFOLIO_COMPONENT_CATEGORY_ID', $component->definition->componentCategory);
+						$this->getPage()->setVar('EPORTFOLIO_COMPONENT_CATEGORY_ID', $this_category);
 						$this->getPage()->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
 					}
 					else {
@@ -242,8 +253,8 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 				/* >:/
 				 */
-				$this->tabList[$component->definition->componentCategory]['name'] = $component->definition->componentCategoryName;
-				$this->tabList[$component->definition->componentCategory]['count']++;
+				$this->tabList[$this_category]['name'] = $this_category;
+				$this->tabList[$this_category]['count']++;
 			}
 		}
 		else {
@@ -257,20 +268,21 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		$occupiedPositionList = array();
 
 		foreach ($this->getComponentCollection() as $component) {
-			$templateTarget = "component_position_{$component->position}";
-			$templateHandle = "component_{$component->instance->id}";
+			/** @var Component_ControllerAbstract $component */
+			$templateTarget = "component_position_{$component->getInstance()->getPosition()}";
+			$templateHandle = "component_{$component->getInstance()->getId()}";
 
 			/* Assign permissions
 			 */
 			$context = $this->getUser();
 			$context['permission'] = $this->getPermission();
 
-			$component->setup($context, $component->instance->getConfigArray());
+			$component->setup($context, $component->getInstance()->getConfigArray());
 
 			if ($component->execute() !== false) {
 				if ($component->renderTemplate($templateHandle) !== false) {
-					if (!in_array($component->instance->position, $occupiedPositionList)) {
-						$occupiedPositionList[] = $component->instance->position;
+					if (!in_array($component->getInstance()->getPosition(), $occupiedPositionList)) {
+						$occupiedPositionList[] = $component->getInstance()->getPosition();
 					}
 
 					$this->getPage()->parse($templateTarget, $templateHandle, true);
