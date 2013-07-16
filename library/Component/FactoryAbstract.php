@@ -35,7 +35,7 @@ abstract class Component_FactoryAbstract {
 
     /**
      * @param $identifier
-     * @return Schoolbox\Collection
+     * @return Schoolbox\Collection[Component_ControllerAbstract]
      */
     public function buildComponentList ($identifier) {
         /* Get Component Instances */
