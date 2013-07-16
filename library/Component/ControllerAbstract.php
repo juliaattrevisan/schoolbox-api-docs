@@ -96,9 +96,9 @@ abstract class Component_ControllerAbstract {
         }
 
         $output = array(
-            'COMPONENT_INSTANCE_ID' => $this->instance->id,
-            'COMPONENT_DEFINITION_ID' => $this->instance->definitionId,
-            'COMPONENT_HANDLE' => $templateHandle . '_' . $this->instance->id
+            'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
+            'COMPONENT_DEFINITION_ID' => $this->instance->getDefinitionId(),
+            'COMPONENT_HANDLE' => $templateHandle . '_' . $this->instance->getId()
         );
 
         $this->setVar($output);
@@ -274,14 +274,14 @@ abstract class Component_ControllerAbstract {
 
         // if we're building in the context of the admin system, use a different template (_templatewrapper.html),
         // otherwise use the regular one (_wrapper.html)
-        if (in_array($this->instance->module, array('dashboard', 'homepage_template', 'eportfolio_template'))) {
+        if (in_array($this->instance->getModule(), array('dashboard', 'homepage_template', 'eportfolio_template'))) {
             $template = 'component/config/_templatewrapper.html';
         }
-		else if (in_array($this->instance->module, array('homepage', 'eportfolio'))) {
+		else if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
 
 			/* eportfolio uses a special version of le wrapier
 			 */
-			$template = 'component/config/' . $this->instance->module . '_wrapper.html';
+			$template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
 		}
 		else {
 			$template = 'component/config/_wrapper.html';
