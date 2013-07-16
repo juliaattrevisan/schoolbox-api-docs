@@ -20,7 +20,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	/**
 	 * An instance of Component_FactoryAbstract
 	 *
-	 * @var null
+	 * @var Component_FactoryAbstract
 	 */
 	private $componentFactory = null;
 
@@ -580,7 +580,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	/**
 	 * Set component factory
 	 *
-	 * @param null $componentFactory
+	 * @param Component_FactoryAbstract $componentFactory
 	 */
 	private function setComponentFactory($componentFactory) {
 		$this->componentFactory = $componentFactory;
@@ -589,7 +589,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	/**
 	 * Get component factory
 	 *
-	 * @return null
+	 * @return Component_FactoryAbstract
 	 */
 	private function getComponentFactory() {
 		return $this->componentFactory;

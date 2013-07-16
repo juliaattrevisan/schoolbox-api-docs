@@ -13,7 +13,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * An instance of sitepage
 	 *
-	 * @var null
+	 * @var SitePage
 	 */
 	protected $page = null;
 
@@ -34,7 +34,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * An instance of userHandler
 	 *
-	 * @var null
+	 * @var User
 	 */
 	protected $userHandler = null;
 
@@ -162,7 +162,8 @@ abstract class Eportfolio_Page_Abstract {
 		$this->getPage()->setVar('eportfolio_page_block', '');
 
 		if ($allPages->count()) {
-			foreach($allPages as $currentPage) {
+			foreach ($allPages as $currentPage) {
+				/** @var Eportfolio\Page $currentPage */
 				if ($currentPage->getDeletedAt() == null) {
 					$this->getPage()->setVar(array(
 						'EPORTFOLIO_PAGE_ID' => $currentPage->getPageId(),
@@ -307,7 +308,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Set page
 	 *
-	 * @param null $page
+	 * @param SitePage $page
 	 */
 	protected function setPage($page) {
 		$this->page = $page;
@@ -316,7 +317,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Get page
 	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;
@@ -361,7 +362,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Set user handler
 	 *
-	 * @param null $userHandler
+	 * @param User $userHandler
 	 */
 	protected function setUserHandler($userHandler) {
 		$this->userHandler = $userHandler;
@@ -370,7 +371,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Get user handler
 	 *
-	 * @return null
+	 * @return User
 	 */
 	protected function getUserHandler() {
 		return $this->userHandler;
