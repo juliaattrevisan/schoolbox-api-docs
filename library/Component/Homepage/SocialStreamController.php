@@ -47,6 +47,8 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		$thread = new \SocialStream\Thread($homepageId, $limit);
 		$tree = $thread->getTree();
 
+		$i = 0;
+
 		/* Traverse everything
 		 */
 		foreach($tree as $currentPost) {
@@ -54,6 +56,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 				foreach($currentComment->getChildren() as $currentReply) {
 					$this->setVar(array(
 						'SOCIALSTREAM_REPLY_BODY' => $currentReply->getBody(),
+						'SOCIALSTREAM_REPLY_CREATED_AT' => $currentReply->getCreatedAt()->getShort(),
 						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => $currentReply->getOwnerId()->getExternalId(),
 						'SOCIALSTREAM_REPLY_USER_FULLNAME' => $currentReply->getOwnerId()->getFullname(),
 					));
@@ -63,6 +66,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 				$this->setVar(array(
 					'SOCIALSTREAM_COMMENT_BODY' => $currentComment->getBody(),
+					'SOCIALSTREAM_COMMENT_CREATED_AT' => $currentComment->getCreatedAt()->getShort(),
 					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => $currentComment->getOwnerId()->getExternalId(),
 					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => $currentComment->getOwnerId()->getFullname(),
 				));
@@ -76,9 +80,13 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 			$this->setVar(array(
 				'SOCIALSTREAM_POST_BODY' => $currentPost->getBody(),
+				'SOCIALSTREAM_POST_CREATED_AT' => $currentPost->getCreatedAt()->getShort(),
 				'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => $currentPost->getOwnerId()->getExternalId(),
 				'SOCIALSTREAM_POST_USER_FULLNAME' => $currentPost->getOwnerId()->getFullname(),
+				'ON_OFF' => $i%2 ? 'dark' : '',
 			));
+
+			$i++;
 
 			/* Clear children after parsing out the parent
 			 */

@@ -1,44 +1,90 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<style type='text/css'>
+
+		.socialstream ul li.socialstream-post {
+			border-top: 1px solid #eee;
+			border-bottom: 1px solid #eee;
+			padding: 20px 0px;
+		}
+
+		.socialstream ul li {
+			margin-left: 24px;
+		}
+
+		.socialstream div.avatar {
+			width: 32px;
+			margin-right: 8px;
+			float: left;
+		}
+
+		.socialstream div.body {
+			float: left;
+		}
+
+		.socialstream div.body span {
+			color: #aaa;
+		}
+
+		.socialstream li.socialstream-post div.body {
+			/*border: 1px solid #f00;*/
+		}
+
+		.socialstream li.socialstream-comment div.body {
+			/*border: 1px solid #0f0;*/
+		}
+
+		.socialstream li.socialstream-reply div.body {
+			/*border: 1px solid #00f;*/
+		}
+	</style>
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<div>
+	<div class='socialstream'>
 		<!-- BEGIN socialstream_post -->
 		<ul>
-			<li>
-				<p>
+			<li class='socialstream-post {ON_OFF}'>
+				<div class='avatar'>
 					<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
-					{SOCIALSTREAM_POST_USER_FULLNAME}
-				</p>
-
-				<p>
-					{SOCIALSTREAM_POST_BODY}
-				</p>
-
-
+				</div>
+				<div class='body'>
+					<p>
+						<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
+						{SOCIALSTREAM_POST_BODY}<br />
+						<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span> |
+						<a>Comment</a>
+					</p>
+				</div>
+				<div class='clearfix'></div>
 				<ul>
 					<!-- BEGIN socialstream_comment -->
-					<li>
-						<p>
+					<li class='socialstream-comment'>
+						<div class='avatar'>
 							<img src='/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32'>
-							{SOCIALSTREAM_COMMENT_USER_FULLNAME}
-						</p>
-
-						<p>
-							{SOCIALSTREAM_COMMENT_BODY}
-						</p>
-
+						</div>
+						<div class='body'>
+							<p>
+								<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
+								{SOCIALSTREAM_COMMENT_BODY}<br />
+								<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span> |
+								<a>Comment</a>
+							</p>
+						</div>
+						<div class='clearfix'></div>
 						<ul>
 							<!-- BEGIN socialstream_reply -->
-							<li>
-								<p>
+							<li class='socialstream-reply'>
+								<div class='avatar'>
 									<img src='/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32'>
-									{SOCIALSTREAM_REPLY_USER_FULLNAME}
-								</p>
-
-								<p>
-									{SOCIALSTREAM_REPLY_BODY}
-								</p>
+								</div>
+								<div class='body'>
+									<p>
+										<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
+										{SOCIALSTREAM_REPLY_BODY}<br />
+										<span>Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span>
+									</p>
+								</div>
+								<div class='clearfix'></div>
 							</li>
 							<!-- END socialstream_reply -->
 						</ul>
