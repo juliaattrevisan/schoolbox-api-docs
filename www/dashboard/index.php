@@ -19,8 +19,10 @@ $componentCollection = $componentFactory->buildComponentList($groupID);
 $occupiedPositionList = array();
 
 foreach ($componentCollection as $component) {
-    $templateTarget = "component_position_{$component->position}";
-    $templateHandle = "component_{$component->id}";
+    /** @var Component_Homepage_ControllerAbstract $component */
+    $instance = $component->getInstance();
+    $templateTarget = "component_position_{$instance->getPosition()}";
+    $templateHandle = "component_{$instance->getDefinitionId()}";
 
     if ($component->execute() !== false) {
 
@@ -28,8 +30,8 @@ foreach ($componentCollection as $component) {
         $component->parseConfig();
 
         if ($component->renderTemplate($templateHandle) !== false) {
-            if (!in_array($component->instance->position, $occupiedPositionList)) {
-                $occupiedPositionList[] = $component->instance->position;
+            if (!in_array($instance->getPosition(), $occupiedPositionList)) {
+                $occupiedPositionList[] = $instance->getPosition();
             }
 
             $this->parse($templateTarget, $templateHandle, true);
