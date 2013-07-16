@@ -41,8 +41,8 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 			'socialstream_reply_block' => '',
 		));
 
-		$homepageId = 10;
-		$limit = 3;
+		$homepageId = 52;
+		$limit = 5;
 
 		$thread = new \SocialStream\Thread($homepageId, $limit);
 		$tree = $thread->getTree();
