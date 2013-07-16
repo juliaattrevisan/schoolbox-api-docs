@@ -223,7 +223,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 			// Check for multiple instances with the same definition if disallowed
 			if ($dirtyInstance->getDefinition()->getMultiple() == 'false') {
 				$similarInstanceCollection = $instanceMapper->findByColumnList(array(
-					'module'     => 'dashboard',
+					'module'     => $dirtyInstance->getModule(),
 					'identifier' => $dirtyInstance->getIdentifier(),
 					'component_definition_id' => $dirtyInstance->getDefinition()->getId(),
 				));
@@ -250,7 +250,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 				$clean_instance_id = $cleanInstance->getId();
 				if (!empty($clean_instance_id)) {
 					$sourceInstanceCollection = $instanceMapper->findByColumnList(array(
-						'module'     => 'dashboard',
+						'module'     => $cleanInstance->getModule(),
 						'identifier' => $cleanInstance->getIdentifier(),
 						'position'   => $cleanInstance->getPosition(),
 					));
@@ -274,7 +274,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 
 				// Resequence destination components
 				$destinationInstanceCollection = $instanceMapper->findByColumnList(array(
-					'module'     => 'dashboard',
+					'module'     => $dirtyInstance->getModule(),
 					'identifier' => $dirtyInstance->getIdentifier(),
 					'position'   => $dirtyInstance->getPosition(),
 				));
