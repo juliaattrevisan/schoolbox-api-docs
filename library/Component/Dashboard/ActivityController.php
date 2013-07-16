@@ -47,24 +47,10 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
 
         $flag = 0;
 
-        //check mail status
-        /*Removed as it was causing issues and not well supported
-         *
-         * if(Cfg::get('mail_enable') && !(Cfg::get('site_location') == 'mgs' && $groupHandler->isStaff()) ) {
-
-            $mailbox = $whatnew->newEmail();
-            if($mailbox->unseen > 0) {
-                $this->setVar('NEW_MAIL', $mailbox->unseen);
-                $this->parse('new_mail_block','mail_block');
-            }
-            else {
-                $this->setVar('new_mail_block','');
-            }
-        }
-        else*/
-            $this->setVar('new_mail_block','');
+        $this->setVar('new_mail_block','');
 
         //for each subject
+        $this->setVar('new_category','');
         if(is_array($this->catList))
         {
             foreach($this->catList as $catInfo)
@@ -75,47 +61,42 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
 
                 /* What's New for Online Assessments
                  */
+                $this->setVar('online_assessment_block', '');
                 if ($sub['onlineAssessments']) {
                     $this->parse('online_assessment_block', 'new_online_assessment');
                 }
-                else {
-                    $this->setVar('online_assessment_block', '');
-                }
 
+                $this->setVar('reviewed_block', '');
                 if ($sub['reviewedOnlineAssessments']) {
                     $this->parse('reviewed_block', 'reviewed_online_assessment');
                 }
-                else {
-                    $this->setVar('reviewed_block', '');
-                }
 
+                $this->setVar('due_block', '');
                 if($sub['duework'])
                     $this->parse('due_block', 'due_work');
-                else
-                    $this->setVar('due_block', '');
 
+                $this->setVar('ret_block', '');
                 if($sub['retwork'])
                     $this->parse('ret_block', 'ret_work');
-                else
-                    $this->setVar('ret_block', '');
 
+                $this->setVar('sub_block', '');
                 if(is_array($sub['subboxes'])) {
                     foreach($sub['subboxes'] as $subid => $subdetails) {
-                        $subout = array('BOX_ID'	=> $subid,
-                                        'BOX_NAME'	=> $subdetails['description'],
-                                        'BOX_COUNT'	=> $subdetails['count'],
+                        $subout = array('BOX_ID'     => $subid,
+                                        'BOX_NAME'   => $subdetails['description'],
+                                        'BOX_COUNT'  => $subdetails['count'],
+                                        'BOX_PLURAL' => ($subdetails['count'] > 1 ? 's' : ''),
                                         );
                         $this->setVar($subout);
 
-                        $this->parse('sub_block', 'sub_work');
+                        $this->parse('sub_block', 'sub_work', true);
                     }
                 }
-                else
-                    $this->setVar('sub_block', '');
 
 
                 $cat = $this->activity->newCategory($catInfo['id']);
 
+                $this->setVar("new_news_item", "");
                 if($cat['news'])
                 {
                     if($cat['news'] > 1)
@@ -125,9 +106,8 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                     $this->setVar("NEW_NEWS", $cat['news']);
                     $this->parse("new_news_item", "new_news");
                 }
-                else
-                    $this->setVar("new_news_item", "");
 
+                $this->setVar('new_blog_item', '');
                 if($cat['blog'])
                 {
                     if($cat['blog'] > 1)
@@ -137,9 +117,8 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                     $this->setVar('NEW_BLOG', $cat['blog']);
                     $this->parse('new_blog_item', 'new_blog');
                 }
-                else
-                    $this->setVar('new_blog_item', '');
 
+                $this->setVar("new_file_item", "");
                 if($cat['files'])
                 {
                     if($cat['files'] > 1)
@@ -149,9 +128,8 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                     $this->setVar("NEW_FILES", $cat['files']);
                     $this->parse("new_file_item", "new_file");
                 }
-                else
-                    $this->setVar("new_file_item", "");
 
+                $this->setVar("new_url_item", "");
                 if($cat['links'])
                 {
                     if($cat['links'] > 1)
@@ -161,9 +139,8 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                     $this->setVar("NEW_URLS", $cat['links']);
                     $this->parse("new_url_item", "new_url");
                 }
-                else
-                    $this->setVar("new_url_item", "");
 
+                $this->setVar("new_forum_item", "");
                 if($cat['forum'])
                 {
                     if($cat['forum'] > 1)
@@ -173,9 +150,8 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                     $this->setVar("NEW_FORUM", $cat['forum']);
                     $this->parse("new_forum_item", "new_forum");
                 }
-                else
-                    $this->setVar("new_forum_item", "");
 
+                $this->setVar("new_wiki_item", "");
                 if($cat['wiki'])
                 {
                     if($cat['wiki'] > 1)
@@ -185,8 +161,6 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                     $this->setVar("NEW_WIKI", $cat['wiki']);
                     $this->parse("new_wiki_item", "new_wiki");
                 }
-                else
-                    $this->setVar("new_wiki_item", "");
 
                 if($sub['duework'] || $sub['retwork'] || $sub['subboxes'] || $cat['news'] || $cat['files'] || $cat['links'] || $cat['forum'] || $cat['wiki'])
                 {
@@ -200,22 +174,8 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
 
             }
         }
-        else
-            $this->setVar('new_category','');
 
-        if(!$flag && $mailbox->unseen == 0)
-        {
-            $this->setVar('new_category','');
-
-            return false;
-        }
-        else {
-            if(!$flag)
-                $this->setVar('new_category','');
-
-            return true;
-        }
-
+        return $flag ? true : false;
     }
 
 }
