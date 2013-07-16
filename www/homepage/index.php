@@ -89,6 +89,7 @@ if ($permission >= WRITE_ACCESS) {
     foreach ($definitionCollection as $definition) {
         /** @var Component_Definition $definition */
         foreach ($componentCollection as $inst) {
+            /** @var Component_ControllerAbstract $inst */
             if ($inst->definitionId == $definition->getId()) {
                 $definition->incrementInstanceCount();
             }
@@ -323,15 +324,18 @@ if (is_array($allowedList)) {
 /* PARSE COMPONENTRY */
 $occupiedPositionList = array();
 foreach ($componentCollection as $component) {
-    $templateTarget = "component_position_{$component->position}";
-    $templateHandle = "component_{$component->definitionId}";
+    /** @var Component_Homepage_ControllerAbstract $component */
+    $instance       = $component->getInstance();
+    $templateTarget = "component_position_{$instance->getPosition()}";
+    $templateHandle = "component_{$instance->getDefinitionId()}";
 
-    $component->setup($category, $component->instance->getConfigArray());
+
+    $component->setup($category, $instance->getConfigArray());
 
     if ($component->execute() !== false) {
         if ($component->renderTemplate($templateHandle) !== false) {
-            if (!in_array($component->instance->position, $occupiedPositionList)) {
-                $occupiedPositionList[] = $component->instance->position;
+            if (!in_array($instance->getPosition(), $occupiedPositionList)) {
+                $occupiedPositionList[] = $instance->getPosition();
             }
 
             $this->parse($templateTarget, $templateHandle, true);
