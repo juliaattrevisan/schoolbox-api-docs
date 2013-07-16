@@ -78,6 +78,9 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Week_Abstract {
 		 */
 		echo "{}]";
 
+		$page = new SitePage(false);
+		$page->saveHistory('/calendar/full/' . $startSequence->getUsingFormat('d-m-Y'));
+
 		exit();
 	}
 }

@@ -138,7 +138,7 @@ switch($_POST['action']) {
             }
         }
 
-        $page->backToTheFuture(2);
+		$page->backToTheFuture(2);
         break;
 
     case 'Delete':
