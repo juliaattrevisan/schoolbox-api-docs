@@ -410,11 +410,22 @@ abstract class Component_ControllerAbstract {
         return $this->sitepage->template;
     }
 
-	/**
-	 * @return Component_Instance
-	 */
-	public function getInstance() {
-		return $this->instance;
-	}
+
+    /**
+     * Public accessor for $this->instance - use this instead of magic method
+     * obscuring a protected variable. (wat)
+     *
+     * @param \Component_Instance $instance
+     */
+    public function setInstance($instance) {
+        $this->instance = $instance;
+    }
+
+    /**
+     * @return \Component_Instance
+     */
+    public function getInstance() {
+        return $this->instance;
+    }
 
 }
