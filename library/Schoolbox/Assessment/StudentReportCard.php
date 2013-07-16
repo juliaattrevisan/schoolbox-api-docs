@@ -355,6 +355,7 @@ class StudentReportCard {
 				'SUBJ_GRADE_AVG'   => 'N/A',
 				'SUBJ_GRADE_TREND' => ''
 			));
+			$page->parse('grade_average_block', 'grade_average');
 			return;
 		}
 
