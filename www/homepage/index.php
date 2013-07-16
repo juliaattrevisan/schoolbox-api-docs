@@ -87,23 +87,24 @@ if ($permission >= WRITE_ACCESS) {
     $definitionCollection = $componentFactory->getDefinitionList('component_category');
 
     foreach ($definitionCollection as $definition) {
-        $definition->instanceCount = 0;
+        /** @var Component_Definition $definition */
         foreach ($componentCollection as $inst) {
-            if ($inst->definitionId == $definition->id) {
-                ++$definition->instanceCount;
+            if ($inst->definitionId == $definition->getId()) {
+                $definition->incrementInstanceCount();
             }
         }
     }
 
     if ($total = $definitionCollection->count()) {
         $i = 0;
-        $previous = null;
+        $previous = new Component_Definition();
         foreach ($definitionCollection as $component) {
+            /** @var Component_Definition $component */
             ++$i;
             $class = '';
-            if ($component->multiple == 'false') {
+            if ($component->getMultiple() == 'false') {
                 $class = 'one-only ';
-                if ($component->multiple == 'false' && $component->instanceCount > 0) {
+                if ($component->getMultiple() == 'false' && $component->getInstanceCount() > 0) {
                     $class .= 'disabled ';
                 }
             }
@@ -111,31 +112,31 @@ if ($permission >= WRITE_ACCESS) {
             $class = trim($class);
 
             $output = array(
-                'HOMEPAGE_COMPONENT_ID' => Scrub::text($component->id),
-                'HOMEPAGE_COMPONENT_NAME' => Scrub::text($component->name),
-                'HOMEPAGE_COMPONENT_COUNT' => $component->instanceCount,
-                'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::html($component->description),
+                'HOMEPAGE_COMPONENT_ID' => Scrub::text($component->getId()),
+                'HOMEPAGE_COMPONENT_NAME' => Scrub::text($component->getName()),
+                'HOMEPAGE_COMPONENT_COUNT' => $component->getInstanceCount(),
+                'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::html($component->getDescription()),
                 'HOMEPAGE_COMPONENT_CLASS' => $class,
-                'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous->componentCategory,
+                'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous->getComponentCategory(),
             );
 
             $this->setVar($output);
 
-            if ($component->componentCategory != $previous->componentCategory && $i > 1) {
+            if ($component->getComponentCategory() != $previous->getComponentCategory() && $i > 1) {
                 $this->parse('homepage_component_page_block', 'homepage_component_page', true);
                 $this->setVar('homepage_component_block', '');
                 $this->parse('homepage_component_block', 'homepage_component', true);
 
                 // last rotation
                 if ($total == $i) {
-                    $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->componentCategory);
+                    $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->getComponentCategory());
                     $this->parse('homepage_component_page_block', 'homepage_component_page', true);
                 }
             } else {
                 // last rotation
                 if ($total == $i) {
                     $this->parse('homepage_component_block', 'homepage_component', true);
-                    $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->componentCategory);
+                    $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->getComponentCategory());
                     $this->parse('homepage_component_page_block', 'homepage_component_page', true);
                 } else {
                     $this->parse('homepage_component_block', 'homepage_component', true);
@@ -144,8 +145,10 @@ if ($permission >= WRITE_ACCESS) {
 
             $previous = $component;
 
-            $tabList[$component->componentCategory]['name'] = $component->componentCategoryName;
-            $tabList[$component->componentCategory]['count']++;
+            //
+            // This was set to $component->componentCategoryName - a non-existent value
+            $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategory();
+            $tabList[$component->getComponentCategory()]['count']++;
 
         }
     }
