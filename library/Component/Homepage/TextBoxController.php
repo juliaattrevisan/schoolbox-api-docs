@@ -53,7 +53,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $this->setVar($output);
 
-        if($this->permission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->id) {
+        if($this->permission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
             if($this->sitepage->arg[1] == 'textBoxModify') {
                 $output = array(
                     'TEXTBOX_BODY' => $textBox['body'],
