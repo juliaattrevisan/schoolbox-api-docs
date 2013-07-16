@@ -51,6 +51,13 @@ class Component_Definition extends Model {
 	protected $componentCategory;
 
 	/**
+	 * An unmapped count of instances of this item.
+	 *
+	 * @var int
+	 */
+	protected $instanceCount = 0;
+
+	/**
 	 * @param  string $class
 	 *
 	 * @return $this
@@ -184,6 +191,31 @@ class Component_Definition extends Model {
 	 */
 	public function getVisible() {
 		return $this->visible;
+	}
+
+	/**
+	 * @param  int   $instanceCount
+	 * @return $this
+	 */
+	public function setInstanceCount($instanceCount) {
+		$this->instanceCount = $instanceCount;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getInstanceCount() {
+		return $this->instanceCount;
+	}
+
+	/**
+	 * Increments the instance count for this definition.
+	 *
+	 * @return void
+	 */
+	public function incrementInstanceCount() {
+		$this->instanceCount++;
 	}
 
 }
