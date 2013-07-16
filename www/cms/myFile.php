@@ -10,58 +10,72 @@ $this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
 $this->setBlock(TEMPLATE_content, 'publish_page', 'publish_page_block');
 $this->setTab('myfiles');
 
+/**
+ * @uri /cms/myFile/new/:userId[/:myFolderId][/:publishComponent]
+ * @uri /cms/myFile/:myFileId/:userId
+ */
 
-if (is_numeric($this->arg[0])) {
+// create a new file
+if($this->arg[0] == 'new') {
+	$userId = $this->arg[1] ?: $_SESSION['id'];
+	$myFolderId = $this->arg[2] ?: 0;
+	$publishComponent = $this->arg[3] ?: false;
 
-    /* Modify existing file */
+	if($myFolderId == 0) {
+		$parent = array('id' => 0);
+	}
+	elseif(!$parent = $folderHandler->getByID($myFolderId)) {
+		error(13);
+	}
 
-    $file = $fileHandler->getByID($this->arg[0]);
-    if (!is_array($file))
-        error(41);
+	$this->setTitle('Add File');
+	$this->parse('browse_row_block', 'browse_row');
 
-    $this->setTitle('Modify File');
-    $this->setVar('browse_row_block', '');
+	$output = array(
+		'ACTION' => 'Add',
+		'FILE_ID' => '',
+		'DESCRIPTION' => '',
+		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+		'PARENT_ID' => $parent['id'],
+	);
 
-    $output = array('ACTION' => 'Modify',
-        'FILE_ID' => $file['id'],
-        'DESCRIPTION' => Scrub::text($file['description']),
-        'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
-        'PARENT_ID' => $file['parent'],
-    );
-    $this->setVar($output);
+	$this->setVar($output);
 
-    $folderTree = $folderHandler->getFolderTree();
+	$folderTree = $folderHandler->getFolderTree();
+	renderTreeSelect($this, $folderTree, $parent['id']);
+	renderPublishingOptions($this, $publishComponent);
+}
+
+// modify an existing file
+elseif(is_numeric($this->arg[0])) {
+	$myFileId = $this->arg[0];
+	$userId = $this->arg[1] ?: $_SESSION['id'];
+
+	$file = $fileHandler->getByID($myFileId);
+	if (!is_array($file))
+		error(41);
+
+	$this->setTitle('Modify File');
+	$this->setVar('browse_row_block', '');
+
+	$output = array('ACTION' => 'Modify',
+	                'FILE_ID' => $file['id'],
+	                'DESCRIPTION' => Scrub::text($file['description']),
+	                'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+	                'PARENT_ID' => $file['parent'],
+	);
+	$this->setVar($output);
+
+	$folderTree = $folderHandler->getFolderTree();
 	renderTreeSelect($this, $folderTree, $file['parent']);
 	renderPublishingOptions($this);
 
 }
-elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
-    /* Add new file to system */
-    if ($this->arg[1] == 0)
-        $parent = array('id' => 0);
-    elseif (!$parent = $folderHandler->getByID($this->arg[1]))
-        error(13);
-
-    $this->setTitle('Add File');
-	$this->parse('browse_row_block', 'browse_row');
-
-    $output = array('ACTION' => 'Add',
-        'FILE_ID' => '',
-        'DESCRIPTION' => '',
-        'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
-        'PARENT_ID' => $parent['id'],
-    );
-
-    $this->setVar($output);
-
-    $folderTree = $folderHandler->getFolderTree();
-	renderTreeSelect($this, $folderTree, $parent['id']);
-	renderPublishingOptions($this);
-
-}
-else
+// unknown case
+else {
     error(2);
+}
 
 
 /**
@@ -101,8 +115,9 @@ function renderTreeSelect($page, $tree, $selected = 0) {
  * Render the UI options for publishing, if there are any
  *
  * @param SitePage $page
+ * @param bool|int $publishComponent
  */
-function renderPublishingOptions($page) {
+function renderPublishingOptions($page, $publishComponent = false) {
 	/* Get a list of pages with the File List component in it
 		 * and offer these as places to which you can publish.
 		 */
@@ -143,8 +158,9 @@ function renderPublishingOptions($page) {
 
 		if (is_array($allPageData) && count($allPageData)) {
 			foreach($allPageData as $currentPageData) {
+				$selected = $currentPageData['componentInstanceId'] == $publishComponent;
 				$page->setVar(array(
-					'PUBLISHED' => '',
+					'PUBLISHED' => $selected ? 'checked="checked"' : '',
 					'PUBLISH_PAGE_PAGE_ID' => $currentPageData['pageId'],
 					'PUBLISH_PAGE_PAGE_OWNER_ID' => $currentPageData['pageOwnerId'],
 					'PUBLISH_PAGE_PAGE_NAME' => $currentPageData['pageTitle'],
