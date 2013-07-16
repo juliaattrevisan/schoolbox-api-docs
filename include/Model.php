@@ -33,11 +33,13 @@ abstract class Model implements ArrayAccess {
     }
 
     /**
-         * Sets the current state of the model.
-         *
-         * @param Integer $state
-         * @return Bool
-         */
+     * Sets the current state of the model.
+     *
+     * @deprecated Doesn't appear to be used anywhere.
+     *
+     * @param Integer $state
+     * @return Bool
+     */
     public function setState ($state) {
         if (empty($state) || !is_numeric($state) ) {
             return false;
@@ -49,10 +51,12 @@ abstract class Model implements ArrayAccess {
     }
 
     /**
-         * Retrieves the current state of the model.
-         *
-         * @return Bool|Mixed
-         */
+     * Retrieves the current state of the model.
+     *
+     * @deprecated Doesn't appear to be used anywhere.
+     *
+     * @return Bool|Mixed
+     */
     public function getState () {
         if ( empty($this->state) || !is_numeric($this->state) ) {
             return false;
@@ -101,5 +105,50 @@ abstract class Model implements ArrayAccess {
         }
 
         return $propertyList;
+    }
+
+    /**
+     * Sets a property of this class.
+     *
+     * @deprecated Use set*() methods instead.
+     *
+     * @param string $property
+     * @param mixed  $value
+     *
+     * @return void
+     */
+    public function __set($property, $value) {
+        trigger_error(
+            E_USER_DEPRECATED,
+            sprintf(
+                'Direct set of property "%s::%s" is deprecated - use setter methods instead',
+                __CLASS__, $property
+            )
+        );
+        if (property_exists($this, $property)) {
+            $this->$property = $value;
+        }
+    }
+
+    /**
+     * Gets a property of this class.
+     *
+     * @deprecated Use get*() methods instead.
+     *
+     * @param string $property
+     *
+     * @return mixed
+     */
+    public function __get($property) {
+        trigger_error(
+            E_USER_DEPRECATED,
+            sprintf(
+                'Direct set of property "%s::%s" is deprecated - use setter methods instead',
+                __CLASS__, $property
+            )
+        );
+        if (property_exists($this, $property)) {
+            return $this->$property;
+        }
     }
 }
