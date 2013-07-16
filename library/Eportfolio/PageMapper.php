@@ -307,7 +307,7 @@ class PageMapper extends Schoolbox\Mapper {
             FROM `{$this->table}` ep
             LEFT JOIN {$this->getJoinSql('permissions', 'ep', 'p')}
             WHERE ep.uid = :ownerId
-            ORDER BY created_at DESC
+            ORDER BY created_at
 		";
 
 		$statement = $this->database->prepare($query);

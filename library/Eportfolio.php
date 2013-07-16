@@ -288,6 +288,8 @@ class Eportfolio {
 			'template' => $templateID,
 			'left_column_width' => $tpl['left_column_width'],
 			'right_column_width' => $tpl['right_column_width'],
+			'created_at' => 'NOW()',
+			'updated_at' => 'NOW()',
 		);
 
 		foreach(array('top','left','right') as $position) {
