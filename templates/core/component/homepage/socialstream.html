@@ -6,17 +6,39 @@
 		<!-- BEGIN socialstream_post -->
 		<ul>
 			<li>
-				{SOCIALSTREAM_POST_BODY}
+				<p>
+					<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
+					{SOCIALSTREAM_POST_USER_FULLNAME}
+				</p>
+
+				<p>
+					{SOCIALSTREAM_POST_BODY}
+				</p>
+
 
 				<ul>
 					<!-- BEGIN socialstream_comment -->
 					<li>
-						{SOCIALSTREAM_COMMENT_BODY}
+						<p>
+							<img src='/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32'>
+							{SOCIALSTREAM_COMMENT_USER_FULLNAME}
+						</p>
+
+						<p>
+							{SOCIALSTREAM_COMMENT_BODY}
+						</p>
 
 						<ul>
 							<!-- BEGIN socialstream_reply -->
 							<li>
-								{SOCIALSTREAM_REPLY_BODY}
+								<p>
+									<img src='/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32'>
+									{SOCIALSTREAM_REPLY_USER_FULLNAME}
+								</p>
+
+								<p>
+									{SOCIALSTREAM_REPLY_BODY}
+								</p>
 							</li>
 							<!-- END socialstream_reply -->
 						</ul>
