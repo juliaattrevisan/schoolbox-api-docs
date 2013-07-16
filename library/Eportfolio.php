@@ -273,10 +273,10 @@ class Eportfolio {
 		/* Retrieve template data
 		 */
 		$query = "
-            SELECT id AS template, left_column_width, right_column_width
-            FROM {$this->getContext()}Template
-            WHERE id = '{$templateID}'
-        ";
+			SELECT id AS template, left_column_width, right_column_width
+			FROM {$this->getContext()}Template
+			WHERE id = '{$templateID}'
+		";
 
 		$tpl = $this->db->getRow($query);
 
@@ -338,13 +338,13 @@ class Eportfolio {
 
 				if(count($configs)) {
 					foreach($configs as $c) {
-                        /* @var $c Component_Config */
-						if($c->id) {
+						/* @var $c Component_Config */
+						if($c->getId()) {
 							$conf = new Component_Config();
 							$conf
-                                ->setInstanceId($id)
-							    ->setValue($c->getValue())
-                                ->setConfigDefinitionId($c->getId());
+								->setInstanceId($id)
+								->setValue($c->getValue())
+								->setConfigDefinitionId($c->getId());
 							$ccm->save($conf);
 						}
 					}
@@ -370,7 +370,7 @@ class Eportfolio {
 
 		if ($allComponents->count()) {
 			foreach ($allComponents as $currentComponent) {
-                /* @var $currentComponent Component_Instance */
+				/* @var $currentComponent Component_Instance */
 				/* Remember this id so we can get their configs again later
 				 */
 				$allInstanceIds[] = $currentComponent->getId();
@@ -574,7 +574,7 @@ class Eportfolio {
 
 
 
-	
+
 
 
 
