@@ -89,7 +89,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         foreach ($this->timetable as $campus_id => $timetable) {
 
             if (is_array($timetable) && !empty($timetable)) {
-                if ($timetable_count > 0) {
+                if ($timetable_count > 1) {
                     $this->setVar("CAMPUS_NAME", $campus_list[$campus_id]['name']);
                     $this->parse('timetable_campus_name_block', 'timetable_campus_name');
                 }
