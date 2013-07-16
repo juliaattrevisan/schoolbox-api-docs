@@ -62,7 +62,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
     }
     else {
-        SitePage::localRedir('/cms/portfolio/' . $_POST['parent']);
+        $page->backToTheFuture(2);
     }
 }
 // delete a single file
