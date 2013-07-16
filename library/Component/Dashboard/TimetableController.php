@@ -84,6 +84,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         }
 
         $this->setVar("campus_timetable_block", '');
+        $now             = new Alaress_Date_Format(time(), 'U');
+        $attendance_date = $now->getDatabaseDate();
         foreach ($this->timetable as $campus_id => $timetable) {
 
             if (is_array($timetable) && !empty($timetable)) {
@@ -160,12 +162,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 && Cfg::get('external_attendance')
                                 && $this->group->isStaff()
                             ) {
-                                $now = new Alaress_Date_Format(time(), 'U');
-
                                 $this->setVar(
                                     array(
                                         'ATTENDANCE_CLASS_CODE' => $period['code'],
-                                        'ATTENDANCE_ATTENDANCE_DATE' => $now->getDatabaseDate(),
+                                        'ATTENDANCE_ATTENDANCE_DATE' => $attendance_date,
                                         'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
                                     )
                                 );
