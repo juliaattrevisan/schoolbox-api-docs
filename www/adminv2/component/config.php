@@ -64,7 +64,10 @@ function readConfig($vars, SitePage $page) {
         httpError(400, "Component doesn't exist.");
     }
 
-    $component->setup(array('id' => '-1', 'code' => '', 'name' => ''), $component->instance->getConfigArray());
+    $component->setup(
+        array('id' => '-1', 'code' => '', 'name' => ''),
+        $component->instance->getConfigArray()
+    );
     $component->execute();
     $component->parseConfigForTemplate();
 
