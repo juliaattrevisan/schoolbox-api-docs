@@ -62,9 +62,10 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 
 		/* Gather everything
 		 */
-		$textBox = $this->getMapperClass()->findOneByColumn('component_instance_id', $this->instance->id);
+        $instance_id = $this->instance->getId();
+		$textBox = $this->getMapperClass()->findOneByColumn('component_instance_id', $instance_id);
 
-		$this->setVar('TEXTBOX_ITEM_ID', $this->instance->id);
+		$this->setVar('TEXTBOX_ITEM_ID', $instance_id);
 
 		if ($textBox) {
 			$this->setVar('TEXTBOX_CONTENT', Scrub::html($textBox->getContent()));
@@ -78,7 +79,7 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 		/* If modifying this textbox
 		 */
 		if ($this->permission >= WRITE_ACCESS) {
-			if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $this->instance->id)) {
+			if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $instance_id)) {
 				$this->parse('has_modify_form_block', 'has_modify_form');
 			}
 			else {

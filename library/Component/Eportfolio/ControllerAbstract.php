@@ -77,8 +77,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 				/* Get the config so we have the name
 				 */
 				$configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
-					'component_instance_id' => $this->instance->id,
-					'component_config_definition_id' => $this->instance->definition->id
+					'component_instance_id' => $this->instance->getId(),
+					'component_config_definition_id' => $this->instance->getDefinition()->getId()
 				));
 
 				if ($configInstance->count()) {
