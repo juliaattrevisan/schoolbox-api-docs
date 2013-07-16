@@ -13,22 +13,22 @@ class Component_Config extends Model {
 	/**
 	 * @var int
 	 */
-	public $id;
+	protected $id;
 
 	/**
 	 * @var int
 	 */
-	public $configDefinitionId;
+	protected $configDefinitionId;
 
 	/**
 	 * @var int
 	 */
-	public $instanceId;
+	protected $instanceId;
 
 	/**
 	 * @var string
 	 */
-	public $value;
+	protected $value;
 
 	/**
 	 * @param  int $configDefinitionId

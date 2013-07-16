@@ -13,42 +13,42 @@ class Component_Instance extends Model {
 	/**
 	 * @var int
 	 */
-	public $id;
+	protected $id;
 
 	/**
 	 * @var int
 	 */
-	public $definitionId;
+	protected $definitionId;
 
 	/**
 	 * @var Component_Definition
 	 */
-	public $definition;
+	protected $definition;
 
 	/**
 	 * @var string
 	 */
-	public $module;
+	protected $module;
 
 	/**
 	 * @var int
 	 */
-	public $identifier;
+	protected $identifier;
 
 	/**
 	 * @var string
 	 */
-	public $position;
+	protected $position;
 
 	/**
 	 * @var int
 	 */
-	public $sequence;
+	protected $sequence;
 
 	/**
 	 * @var Schoolbox\Collection
 	 */
-	public $config;
+	protected $config;
 
 	public function __construct() {
 		$this->setConfig(new \Schoolbox\Collection());

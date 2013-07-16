@@ -24,51 +24,51 @@ class Plagscan_Document extends Model {
 	/**
 	 * @var int
 	 */
-	public $id;
+	protected $id;
 
 	/**
 	 * The file from $_FILES?
 	 *
 	 * @var array
 	 */
-	public $file;
+	protected $file;
 
 	/**
 	 * @var int
 	 */
-	public $fileId;
+	protected $fileId;
 
 	/**
 	 * Is this even used?
 	 *
 	 * @var ?
 	 */
-	public $plagscan;
+	protected $plagscan;
 
 	/**
 	 * @var int
 	 */
-	public $plagscanId;
+	protected $plagscanId;
 
 	/**
 	 * @var int
 	 */
-	public $state;
+	protected $state;
 
 	/**
 	 * @var int
 	 */
-	public $status;
+	protected $status;
 
 	/**
 	 * @var string
 	 */
-	public $html;
+	protected $html;
 
 	/**
 	 * @var float
 	 */
-	public $score;
+	protected $score;
 
 	/**
 	 * @param  int $fileId

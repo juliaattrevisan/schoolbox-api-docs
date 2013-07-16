@@ -13,42 +13,42 @@ class Component_Definition extends Model {
 	/**
 	 * @var int
 	 */
-	public $id;
+	protected $id;
 
 	/**
 	 * @var string
 	 */
-	public $name;
+	protected $name;
 
 	/**
 	 * @var string
 	 */
-	public $class;
+	protected $class;
 
 	/**
 	 * @var string
 	 */
-	public $description;
+	protected $description;
 
 	/**
 	 * @var string
 	 */
-	public $module;
+	protected $module;
 
 	/**
 	 * @var string
 	 */
-	public $visible;
+	protected $visible;
 
 	/**
 	 * @var string
 	 */
-	public $multiple;
+	protected $multiple;
 
 	/**
 	 * @var string
 	 */
-	public $componentCategory;
+	protected $componentCategory;
 
 	/**
 	 * @param  string $class

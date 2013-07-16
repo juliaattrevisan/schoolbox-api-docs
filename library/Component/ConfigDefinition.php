@@ -14,34 +14,34 @@ class Component_ConfigDefinition extends Model {
 	/**
 	 * @var int
 	 */
-	public $id;
+	protected $id;
 
 	/**
 	 * @var int
 	 */
-	public $definitionId;
+	protected $definitionId;
 
 	/**
 	 * @var string
 	 */
-	public $key;
+	protected $key;
 
 	/**
 	 * @var string
 	 */
-	public $defaultValue;
+	protected $defaultValue;
 
 	/**
 	 * @var string
 	 */
-	public $label;
+	protected $label;
 
 	/**
 	 * Current value of this config setting.
 	 *
 	 * @var string
 	 */
-	public $value;
+	protected $value;
 
 	/**
 	 * @param  string $defaultValue

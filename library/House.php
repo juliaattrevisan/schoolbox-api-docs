@@ -2,9 +2,9 @@
  
 class House extends Model {
 
-    public $id;
+    protected $id;
 
-    public $house;
+    protected $house;
 
     public function setHouse($house)
     {

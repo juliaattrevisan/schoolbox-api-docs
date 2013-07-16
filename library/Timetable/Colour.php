@@ -12,12 +12,12 @@ class Timetable_Colour extends Model {
 	/**
 	 * @var int
 	 */
-	public $timetable_colour_id;
+	protected $timetable_colour_id;
 
 	/**
 	 * @var string
 	 */
-    public $hex_colour;
+	protected $hex_colour;
 
 	/**
 	 * @param  string $hex_colour

@@ -11,22 +11,22 @@ class DueWork_Error extends Model {
 	/**
 	 * @var int
 	 */
-	public $id;
+	protected $id;
 
 	/**
 	 * @var string
 	 */
-	public $code;
+    protected $code;
 
 	/**
 	 * @var string
 	 */
-	public $displayAs;
+    protected $displayAs;
 
 	/**
-	 * @var decimal
+	 * @var float
 	 */
-	public $normaliseAs;
+    protected $normaliseAs;
 
 	/**
 	 * @param  string $code
@@ -80,7 +80,7 @@ class DueWork_Error extends Model {
 	}
 
 	/**
-	 * @param  \decimal $normaliseAs
+	 * @param  float $normaliseAs
 	 *
 	 * @return $this
 	 */
@@ -90,7 +90,7 @@ class DueWork_Error extends Model {
 	}
 
 	/**
-	 * @return \decimal
+	 * @return float
 	 */
 	public function getNormaliseAs() {
 		return $this->normaliseAs;

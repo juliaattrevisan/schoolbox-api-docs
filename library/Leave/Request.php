@@ -27,25 +27,25 @@ class Leave_Request extends Model {
     const STATUS_REJECTED = 3;
     const STATUS_DELETED = 4;
 
-    /* These really shouldn't be public.
+    /* These really shouldn't be public - and now they aren't, rejoice!
       */
-    public $id;
-    public $userId;
-    public $user;
-    public $start;
-    public $finish;
-    public $hostType;
-    public $hostName;
-    public $hostPhone;
-    public $userPhone;
-    public $description;
-    public $created;
-    public $status;
-    public $authorisationDatetime;
-    public $authorisationUserId;
-    public $authorisationUser;
-    public $notes;
-    public $confirmedBy;
+    protected $id;
+    protected $userId;
+    protected $user;
+    protected $start;
+    protected $finish;
+    protected $hostType;
+    protected $hostName;
+    protected $hostPhone;
+    protected $userPhone;
+    protected $description;
+    protected $created;
+    protected $status;
+    protected $authorisationDatetime;
+    protected $authorisationUserId;
+    protected $authorisationUser;
+    protected $notes;
+    protected $confirmedBy;
 
     /**
      * @param $created
