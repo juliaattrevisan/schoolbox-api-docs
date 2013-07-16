@@ -10,6 +10,7 @@
 
 namespace SocialStream;
 use Schoolbox;
+use SocialStream\Post\SocialStream_Post_Factory;
 
 class PostMapper extends Schoolbox\Mapper {
 
@@ -192,16 +193,9 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @return object
 	 */
 	public function createModel($row) {
-		switch($row['p.type']) {
-			case 'file' : $model = 'SocialStream_Post_File'; break;
-			case 'image' : $model = 'SocialStream_Post_Image'; break;
-			case 'video' : $model = 'SocialStream_Post_Video'; break;
-			case 'website' : $model = 'SocialStream_Post_Website'; break;
-			case 'string' : $model = 'SocialStream_Post_String'; break;
-			default : $model = 'SocialStream_Post_String'; break;
-		}
+		$factory = new \SocialStream\Post\Factory($row['p.type']);
 
-		return new $model;
+		return $factory->produce();
 	}
 
 	/**
