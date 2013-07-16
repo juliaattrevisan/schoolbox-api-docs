@@ -103,10 +103,11 @@ function writeConfig($vars) {
 
     $cim = Component_InstanceMapper::getInstance();
 
+    /** @var Component_Instance $instance */
     $instance = $cim->findById($componentID);
     $ccdm = Component_ConfigDefinitionMapper::getInstance();
 
-    $cdm = $ccdm->findByColumn('component_definition_id', $instance->definitionId);
+    $cdm = $ccdm->findByColumn('component_definition_id', $instance->getDefinitionId());
 
     // much as I hate exceptional cases, this is an exceptional case: remove the prepended '/homepage/'
     if(isset($vars['src'])) {
@@ -118,24 +119,26 @@ function writeConfig($vars) {
 
     $ccm = Component_ConfigMapper::getInstance();
     $updated = 0;
+    /** @var Component_ConfigDefinition $confD */
     foreach($cdm as $confD) {
-        if(isset($vars[$confD->key])) {
+        if(isset($vars[$confD->getKey()])) {
             ++$updated;
 
             // this should be 1:1 relation, so return only the first instance of this definition
+            /** @var Component_Config $confI */
             $confI = $ccm->findByColumnList(array(
-                'component_config_definition_id' => $confD->id,
-                'component_instance_id'          => $instance->id
+                'component_config_definition_id' => $confD->getId(),
+                'component_instance_id'          => $instance->getId()
             ))->first();
 
-            printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $vars[$confD->key]);
+            printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $vars[$confD->getKey()]);
 
-            if(!($confI->id)) {
+            if(!($confI->getId())) {
                 $confI = new Component_Config();
-                $confI->configDefinitionId = $confD->id;
-                $confI->instanceId = $instance->id;
+                $confI->setConfigDefinitionId($confD->getId());
+                $confI->setInstanceId($instance->getId());
             }
-            $confI->value = $vars[$confD->key];
+            $confI->value = $vars[$confD->getKey()];
 
             $ccm->save($confI);
 

@@ -173,23 +173,25 @@ if (is_numeric($_REQUEST['cid'])) {
             $config['filter'] = $val;
         }
 
+        /** @var Component_ConfigDefinition $confD */
         foreach($configDefinitionCollection as $confD) {
-            if(isset($config[$confD->key])) {
+            if(isset($config[$confD->getKey()])) {
 
                 // this should be 1:1 relation, so return only the first instance of this definition
+                /** @var Component_Config $confI */
                 $confI = $componentConfigInstanceMapper->findByColumnList(array(
-                    'component_config_definition_id' => $confD->id,
+                    'component_config_definition_id' => $confD->getId(),
                     'component_instance_id'          => $instance->id
                 ))->first();
 
                 printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $config[$confD->key]);
 
-                if(!($confI->id)) {
+                if(!($confI->getId())) {
                     $confI = new Component_Config();
-                    $confI->configDefinitionId = $confD->id;
-                    $confI->instanceId = $instance->id;
+                    $confI->getConfigDefinitionId($confD->getId());
+                    $confI->getInstanceId($instance->id);
                 }
-                $confI->value = $config[$confD->key];
+                $confI->setValue($config[$confD->getKey()]);
 
                 $componentConfigInstanceMapper->save($confI);
 

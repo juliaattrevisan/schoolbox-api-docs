@@ -59,8 +59,7 @@ class AjaxChat {
             $this->instance = $inst[$this->componentID];
 
             // print_r($this->instance);
-
-            foreach($this->instance->config as $conf) {
+            foreach($this->instance->getConfig() as $conf) {
                 $this->config[$conf['key']] = $conf;
             }
         }
@@ -231,19 +230,20 @@ class AjaxChat {
 
 
     protected function saveConfig() {
-        foreach($this->config as $definition) {
+        /** @var Component_ConfigDefinition $definition */
+        foreach ($this->config as $definition) {
             // this should be 1:1 relation, so return only the first instance of this definition
             $confI = Component_ConfigMapper::getInstance()->findByColumnList(array(
-                'component_config_definition_id' => $definition->id,
-                'component_instance_id'          => $this->instance->id
+                'component_config_definition_id' => $definition->getId(),
+                'component_instance_id'          => $this->instance->getId()
             ))->first();
 
             if(!($confI->id)) {
                 $confI = new Component_Config();
-                $confI->configDefinitionId = $definition->id;
-                $confI->instanceId = $this->instance->id;
+                $confI->setConfigDefinitionId($definition->getId());
+                $confI->setInstanceId($this->instance->getId());
             }
-            $confI->value = $definition->value;
+            $confI->setValue($definition->getValue());
 
             Component_ConfigMapper::getInstance()->save($confI);
         }
