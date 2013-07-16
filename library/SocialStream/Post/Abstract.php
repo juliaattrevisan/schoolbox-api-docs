@@ -44,7 +44,7 @@ abstract class SocialStream_Post_Abstract {
 	 *
 	 * @var
 	 */
-	protected $parentId;
+	protected $parentId = 0;
 
 	/**
 	 * One of Website, Video, Image, File or String
