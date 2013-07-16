@@ -1,9 +1,7 @@
 <?php
-require_once '../library/my-file.php';
-require_once '../library/my-folder.php';
 
-$fileHandler = new MyFile;
-$folderHandler = new MyFolder;
+$fileHandler = new MyFile();
+$folderHandler = new MyFolder();
 
 
 if (is_numeric($this->arg[0])) {
