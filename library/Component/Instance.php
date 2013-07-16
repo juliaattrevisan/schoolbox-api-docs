@@ -203,11 +203,15 @@ class Component_Instance extends Model {
 			}
 
 			$output = array();
+			/** @var Component_ConfigDefinition $opt */
 			foreach($this->config as $opt) {
-				$key = $compat ? $this->compatMap($opt['key']) : $opt['key'];
-				$val = isset($opt['value']) ? $opt['value'] : $opt['defaultValue'];
+				$key = $compat ? $this->compatMap($opt->getKey()) : $opt->getKey();
+				$val = $opt->getValue();
+				if (!isset($val)) {
+					$val = $opt->getDefaultValue();
+				}
 				$output[$key] = array(
-					'label' => $opt['label'],
+					'label' => $opt->getLabel(),
 					'value' => $val,
 				);
 			}

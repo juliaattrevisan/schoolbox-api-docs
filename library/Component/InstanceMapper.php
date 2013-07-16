@@ -200,7 +200,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 			if ($confInstance->getId() != null) {
 				$finalCollection[$confInstance->getInstanceId()]->getConfig()
 					->getOffset($confInstance->getConfigDefinitionId())
-					->setValue($confInstance->value);
+					->setValue($confInstance->getValue());
 			}
 		}
 

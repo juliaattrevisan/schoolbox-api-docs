@@ -66,16 +66,18 @@ abstract class Component_FactoryAbstract {
             $instance = $this->getInstance($instance);
         }
 
-        if ( class_exists($instance->definition->class, true) ) {
+        /** @var Component_Instance $instance */
+        $class = $instance->getDefinition()->getClass();
+        if ( class_exists($class, true) ) {
             $argumentList = array_merge( array($instance), $this->dependencyList );
 
-            $dependencyList = $this->buildDependencyList($instance->definition->class, 3);
+            $dependencyList = $this->buildDependencyList($class, 3);
 
             if ( !empty($dependencyList) ) {
                 $argumentList = array_merge( $argumentList, $dependencyList );
             }
 
-            $controllerReflection = new ReflectionClass($instance->definition->class);
+            $controllerReflection = new ReflectionClass($class);
 
             $controller = $controllerReflection->newInstanceArgs($argumentList);
 
