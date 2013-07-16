@@ -58,7 +58,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
                 $pollData = $pollHandler->getData($poll['pollID']);
 
-                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->arg[1] == 'pollResults')  {
+                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']))  {
 
                     $this->setVar(array(
                         'POLL_HEIGHT'        => count($pollData) * 30 + 70,
