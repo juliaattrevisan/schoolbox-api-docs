@@ -41,14 +41,14 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * An instance of groupHandler
 	 *
-	 * @var null
+	 * @var Group
 	 */
 	protected $groupHandler = null;
 
 	/**
 	 * An instance of eportfolioHandler
 	 *
-	 * @var null
+	 * @var Eportfolio
 	 */
 	protected $eportfolioHandler = null;
 
@@ -380,7 +380,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Set eportfolio handler
 	 *
-	 * @param null $eportfolioHandler
+	 * @param Eportfolio $eportfolioHandler
 	 */
 	protected function setEportfolioHandler($eportfolioHandler) {
 		$this->eportfolioHandler = $eportfolioHandler;
@@ -389,7 +389,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Get eportfolio handler
 	 *
-	 * @return null
+	 * @return Eportfolio
 	 */
 	protected function getEportfolioHandler() {
 		return $this->eportfolioHandler;
@@ -398,7 +398,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Set group handler
 	 *
-	 * @param null $groupHandler
+	 * @param Group $groupHandler
 	 */
 	protected function setGroupHandler($groupHandler) {
 		$this->groupHandler = $groupHandler;
@@ -407,7 +407,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Get group handler
 	 *
-	 * @return null
+	 * @return Group
 	 */
 	protected function getGroupHandler() {
 		return $this->groupHandler;
