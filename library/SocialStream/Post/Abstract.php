@@ -18,6 +18,14 @@ abstract class SocialStream_Post_Abstract {
 	protected $postId;
 
 	/**
+	 * The root id (this is so subclass instances know who their
+	 * ultimate parent is, for easier querying etc)
+	 *
+	 * @var int
+	 */
+	protected $rootId = 0;
+
+	/**
 	 * The person who owns this post
 	 *
 	 * @var
@@ -318,5 +326,23 @@ abstract class SocialStream_Post_Abstract {
 	 */
 	public function getChildren() {
 		return $this->children;
+	}
+
+	/**
+	 * Set root id
+	 *
+	 * @param int $rootId
+	 */
+	public function setRootId($rootId) {
+		$this->rootId = $rootId;
+	}
+
+	/**
+	 * Get root id
+	 *
+	 * @return int
+	 */
+	public function getRootId() {
+		return $this->rootId;
 	}
 }
