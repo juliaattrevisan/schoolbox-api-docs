@@ -331,18 +331,20 @@ class Eportfolio {
 				$inst->setId(null);
 				$inst->getConfig();
 
-				$inst->module = $this->getContext();
-				$inst->identifier = $this->getPageId();
+				$inst->setModule($this->getContext());
+				$inst->setIdentifier($this->getPageId());
 				$ids = $cim->save($inst);
 				$id = $ids[0];
 
 				if(count($configs)) {
 					foreach($configs as $c) {
+                        /* @var $c Component_Config */
 						if($c->id) {
 							$conf = new Component_Config();
-							$conf->setInstanceId($id);
-							$conf->value = $c->value;
-							$conf->configDefinitionId = $c->id;
+							$conf
+                                ->setInstanceId($id)
+							    ->setValue($c->getValue())
+                                ->setConfigDefinitionId($c->getId());
 							$ccm->save($conf);
 						}
 					}
@@ -368,9 +370,10 @@ class Eportfolio {
 
 		if ($allComponents->count()) {
 			foreach ($allComponents as $currentComponent) {
+                /* @var $currentComponent Component_Instance */
 				/* Remember this id so we can get their configs again later
 				 */
-				$allInstanceIds[] = $currentComponent->id;
+				$allInstanceIds[] = $currentComponent->getId();
 
 				Component_InstanceMapper::getInstance()->delete($currentComponent);
 			}
