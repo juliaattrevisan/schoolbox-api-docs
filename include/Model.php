@@ -13,10 +13,12 @@
  
 abstract class Model implements ArrayAccess {
     /**
-         * Defines the state of the model
-         *
-         * @var Bool
-         */
+     * Defines the state of the model
+     *
+     * @deprecated Doesn't appear to be used anywhere.
+     *
+     * @var Bool
+     */
     protected $state;
 
     /**
@@ -66,12 +68,30 @@ abstract class Model implements ArrayAccess {
     }
 
 
-    /* ArrayAccess interface methods */
+    /**
+     * ArrayAccess set method
+     *
+     * @deprecated Use set*() methods instead.
+     *
+     * @param string $offset
+     * @param mixed  $value
+     */
     public function offsetSet ($offset, $value) {
+        $this->triggerDeprecationWarning($offset, __FUNCTION__);
         $this->$offset = $value;
     }
 
+    /**
+     * ArrayAccess get method
+     *
+     * @deprecated Use get*() methods instead.
+     *
+     * @param string $offset
+     *
+     * @return mixed
+     */
     public function offsetGet ($offset) {
+        $this->triggerDeprecationWarning($offset, __FUNCTION__);
         if ( isset($this->$offset) ) {
             return $this->$offset;
         }
@@ -80,14 +100,41 @@ abstract class Model implements ArrayAccess {
         }
     }
 
+    /**
+     * ArrayAccess exists method
+     *
+     * @deprecated Use get*() methods instead.
+     *
+     * @param string $offset
+     *
+     * @return bool
+     */
     public function offsetExists ($offset) {
+        $this->triggerDeprecationWarning($offset, __FUNCTION__);
         return isset($this->$offset);
     }
 
+    /**
+     * ArrayAccess exists method
+     *
+     * @deprecated Use set*() methods instead.
+     *
+     * @param string $offset
+     *
+     * @return void
+     */
     public function offsetUnset ($offset) {
+        $this->triggerDeprecationWarning($offset, __FUNCTION__);
         unset($this->$offset);
     }
 
+    /**
+     * Converts this object to an array.
+     *
+     * @deprecated Doesn't appeared to be used anywhere.
+     *
+     * @return array
+     */
     public function toArray () {
         $modelReflection = new ReflectionObject($this);
         
@@ -118,13 +165,7 @@ abstract class Model implements ArrayAccess {
      * @return void
      */
     public function __set($property, $value) {
-        trigger_error(
-            E_USER_DEPRECATED,
-            sprintf(
-                'Direct set of property "%s::%s" is deprecated - use setter methods instead',
-                __CLASS__, $property
-            )
-        );
+        $this->triggerDeprecationWarning($property, __FUNCTION__);
         if (property_exists($this, $property)) {
             $this->$property = $value;
         }
@@ -140,15 +181,43 @@ abstract class Model implements ArrayAccess {
      * @return mixed
      */
     public function __get($property) {
-        trigger_error(
-            E_USER_DEPRECATED,
-            sprintf(
-                'Direct set of property "%s::%s" is deprecated - use setter methods instead',
-                __CLASS__, $property
-            )
-        );
+        $this->triggerDeprecationWarning($property, __FUNCTION__);
         if (property_exists($this, $property)) {
             return $this->$property;
         }
+        return null;
+    }
+
+
+    /**
+     * Triggers an appropriate deprecation warning for this type of access.
+     *
+     * @param string $property The property that was access.
+     * @param string $method   The method that was called.
+     *
+     * @return void
+     */
+    protected function triggerDeprecationWarning($property, $method) {
+        $message = '';
+        switch ($method) {
+            case '__get':
+                $message = 'Direct get of property "%s::%s" is deprecated - use get methods instead';
+                break;
+
+            case '__set':
+                $message = 'Direct set of property "%s::%s" is deprecated - use set methods instead';
+                break;
+
+            case 'offsetGet':
+            case 'offsetSet':
+            case 'offsetUnset':
+            case 'offsetExists':
+                $message = 'Array access of property "%s::%s" is deprecated - use get/set methods instead';
+                break;
+        }
+        trigger_error(
+            sprintf($message, get_class($this), $property),
+            E_USER_DEPRECATED
+        );
     }
 }
