@@ -88,6 +88,13 @@ class PostMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
+		$this->hasJoin('user', array(
+			'multiple'  => true,
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'owner_id',
+			'other_key' => 'id',
+		));
+
 		parent::mapping();
 	}
 
@@ -100,9 +107,14 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @return \Collection
 	 */
 	public function findLatestForHomepage($homepageId, $limit) {
+		$user_mapper = $this->getJoinMapper('user');
+
 		$query = "
-			SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
+			SELECT
+				{$this->getColumnString('p')},
+				{$user_mapper->getColumnString('u')}
+            FROM `{$this->table}` p
+            LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
             WHERE homepage_id = :homepageId
             AND parent_id = 0
             AND deleted_at IS NULL
@@ -115,9 +127,20 @@ class PostMapper extends Schoolbox\Mapper {
 		$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
 		$statement->execute();
 
-		$rowset = $statement->fetchAll();
+		/* Manually construct hierarchy of posts and their users
+		 */
+		$collection = new \Schoolbox\Collection();
 
-		return $this->hydrateList($rowset);
+		foreach ($statement as $row) {
+			$postItem = $this->hydrate($row, 'p');
+			$userItem = $user_mapper->hydrate($row, 'u');
+
+			$postItem->setOwnerId($userItem);
+
+			$collection->add($postItem);
+		}
+
+		return $collection;
 	}
 
 	/**
@@ -130,9 +153,14 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @return \Collection
 	 */
 	public function findHierarchy($ids) {
+		$user_mapper = $this->getJoinMapper('user');
+
 		$query = "
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
+            SELECT
+				{$this->getColumnString('p')},
+				{$user_mapper->getColumnString('u')}
+            FROM `{$this->table}` p
+            LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
             WHERE `root_id` IN {$this->getArrayPlaceholders($ids, 'val')}
             AND deleted_at IS NULL
             ORDER BY parent_id DESC, created_at
@@ -141,9 +169,20 @@ class PostMapper extends Schoolbox\Mapper {
 		$statement = $this->database->prepare($query);
 		$statement->execute($this->getArrayParameters($ids, 'val'));
 
-		$rowset = $statement->fetchAll();
+		/* Manually construct hierarchy of posts and their users
+		 */
+		$collection = new \Schoolbox\Collection();
 
-		return $this->hydrateList($rowset);
+		foreach ($statement as $row) {
+			$postItem = $this->hydrate($row, 'p');
+			$userItem = $user_mapper->hydrate($row, 'u');
+
+			$postItem->setOwnerId($userItem);
+
+			$collection->add($postItem);
+		}
+
+		return $collection;
 	}
 
 	/**
@@ -153,7 +192,7 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @return object
 	 */
 	public function createModel($row) {
-		switch($row['type']) {
+		switch($row['p.type']) {
 			case 'file' : $model = 'SocialStream_Post_File'; break;
 			case 'image' : $model = 'SocialStream_Post_Image'; break;
 			case 'video' : $model = 'SocialStream_Post_Video'; break;
