@@ -28,10 +28,12 @@ if(!(isset($_POST['folderId']) && is_numeric($_POST['folderId']))) {
 
 $folderId = $_POST['folderId'];
 
-// check 2: user logged in an has at minimum read access
-$groupHandler = new Group();
-$access = $groupHandler->getPermission($folderId);
-if($access < READ_ACCESS) {
+// check 2: user logged in and specified folder exists
+$myFolderHandler = new MyFolder();
+
+$myFolder = $myFolderHandler->getByID($folderId);
+
+if(!is_array($myFolder) && $folderId > 0) {
 	sendError('User does not have access to this folder');
 }
 
