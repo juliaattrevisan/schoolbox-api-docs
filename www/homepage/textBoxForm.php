@@ -35,13 +35,15 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 	// select this textBox
     $cim = Component_InstanceMapper::getInstance();
     $instances = array_values($cim->findByInstanceId($_POST['componentID']));
-    $instance = $instances[0];
+    /* @var $instance Component_Instance */
+    $instance  = $instances[0];
 
     $ccm = Component_ConfigMapper::getInstance();
     $config = new Component_Config();
-    $config->instanceId = $instance->id;
-    $config->configDefinitionId = reset($instance->config)->id;
-    $config->value = $textBox['textBoxID'];
+    $config
+        ->setInstanceId($instance->getId())
+        ->setConfigDefinitionId($instance->getConfig()->first()->getId())
+        ->setValue($textBox['textBoxID']);
     $ccm->save($config);
 
     SitePage::localRedir('/homepage/' . $_POST['categoryID']);
