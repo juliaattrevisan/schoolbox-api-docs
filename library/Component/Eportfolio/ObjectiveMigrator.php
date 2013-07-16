@@ -75,9 +75,10 @@ class ObjectiveMigrator extends TextboxMigrator {
 					TextboxMapper::getInstance()->save($newTextbox);
 
 					$configInstance = new \Component_Config();
-					$configInstance->configDefinitionId = $this->getConfigDefinitionId();
-					$configInstance->instanceId = $componentInstanceID;
-					$configInstance->value = $label;
+					$configInstance
+						->setConfigDefinitionId($this->getConfigDefinitionId())
+						->setInstanceId($componentInstanceID)
+						->setValue($label);
 
 					\Component_ConfigMapper::getInstance()->save($configInstance);
 				}

@@ -71,9 +71,10 @@ class TextboxMigrator extends MigratorAbstract {
 				TextboxMapper::getInstance()->save($newTextbox);
 
 				$configInstance = new \Component_Config();
-				$configInstance->configDefinitionId = $this->getConfigDefinitionId();
-				$configInstance->instanceId = $componentInstanceID;
-				$configInstance->value = $currentTextbox['heading'];
+				$configInstance
+					->setConfigDefinitionId($this->getConfigDefinitionId())
+					->setInstanceId($componentInstanceID)
+					->setValue($currentTextbox['heading']);
 
 				\Component_ConfigMapper::getInstance()->save($configInstance);
 			}
