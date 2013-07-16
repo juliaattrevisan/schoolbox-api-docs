@@ -166,9 +166,7 @@ abstract class Model implements ArrayAccess {
      */
     public function __set($property, $value) {
         $this->triggerDeprecationWarning($property, __FUNCTION__);
-        if (property_exists($this, $property)) {
-            $this->$property = $value;
-        }
+        $this->$property = $value;
     }
 
     /**
