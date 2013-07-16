@@ -90,7 +90,7 @@ if ($permission >= WRITE_ACCESS) {
         /** @var Component_Definition $definition */
         foreach ($componentCollection as $inst) {
             /** @var Component_ControllerAbstract $inst */
-            if ($inst->definitionId == $definition->getId()) {
+            if ($inst->getInstance()->getDefinitionId() == $definition->getId()) {
                 $definition->incrementInstanceCount();
             }
         }
