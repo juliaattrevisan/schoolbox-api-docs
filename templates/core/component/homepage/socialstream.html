@@ -54,12 +54,13 @@
 				 */
 				var clone = $j('#originalAddPostForm').clone();
 				clone.attr('id', '');
+				clone.find('input[name=body]').val('').focus();
 				clone.find('input[name=parentId]').val(parentId);
 				clone.find('input[name=rootId]').val(rootId);
 
 				/* Send In The Clones
 				 */
-				$j(this).append(clone);
+				$j(this).parent('p').append(clone);
 			});
 		});
 	</script>
@@ -99,7 +100,7 @@
 						<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
 						{SOCIALSTREAM_POST_BODY}<br />
 						<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span> |
-						<a class='addPostLink' data-rootid='0' data-parentid='0'>Comment</a>
+						<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a>
 					</p>
 				</div>
 				<div class='clearfix'></div>
