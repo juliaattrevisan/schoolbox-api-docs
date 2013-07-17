@@ -30,6 +30,14 @@ $socialStream = array(
 			'default_value' => '',
 			'label' => 'Source'
 		),
+		'collaborate' => array(
+			'default_value' => '1',
+			'label' => 'Collaborate'
+		),
+		'commentsAllowed' => array(
+			'default_value' => '1',
+			'label' => 'Comments'
+		),
 	)
 );
 
