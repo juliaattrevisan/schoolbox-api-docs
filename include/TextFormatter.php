@@ -28,12 +28,13 @@ class TextFormatter {
 	/**
 	 * Cut a string to the character limit and append ellipsis (...)
 	 *
-	 * @param  $content
-	 * @param  $chars
+	 * @param  string   $content  String to cut
+	 * @param  int      $chars    Number of chars to cut to
+	 * @param  string   $encoding Encoding of $content
 	 * @return string
 	 */
-	public function cutString($content, $chars) {
-		$summary = substr($content, 0, $chars);
+	public static function cutString($content, $chars, $encoding = 'UTF-8') {
+		$summary = mb_substr($content, 0, $chars, $encoding);
 
 		if (strlen($content) > strlen($summary)) {
 			return $summary . '...';
