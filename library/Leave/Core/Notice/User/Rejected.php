@@ -21,7 +21,7 @@ class Leave_Core_Notice_User_Rejected extends Leave_Core_Notice_User_Abstract {
 		/* Custom replacements
 		 */
 		$this->getEmail()->setVar(array(
-			'LEAVE_REJECTED_BY' => $this->getRequest()->getAuthorisationUser()->getName(),
+			'LEAVE_REJECTED_BY' => $this->getRequest()->getAuthorisationUser()->formatName(),
 		));
 
 		$this->getEmail()->setVar('submitted_by_block', '');

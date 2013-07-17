@@ -68,7 +68,8 @@ class Leave_Core_Report_House_Web {
 	protected function recombination() {
 		$combined = array();
 
-		foreach($this->getRequestList() as $i => $request) {
+		foreach($this->getRequestList() as $request) {
+			/** @var Leave_Request $request */
 			$key = $request->getUser()->getId();
 
 			/* Collect general data
@@ -93,7 +94,8 @@ class Leave_Core_Report_House_Web {
 			 */
 			else {
                 if ($request->getId()) {
-                    $combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = Scrub::smartQuotes(trim($request->getAuthorisationUser()->getName()));
+                    $combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()]
+                        = Scrub::smartQuotes(trim($request->getAuthorisationUser()->formatName()));
                     $combined[$key]['row_css_class'][] = 'leave-approved';
                 } else {
 				    $combined[$key]['row_css_class'][] = '';
@@ -113,8 +115,8 @@ class Leave_Core_Report_House_Web {
 
 			/* Start and end of leave
 			 */
-			$requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d h:i:s');
-			$requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d h:i:s');
+			$requestDateStart = new Alaress_Date_Format($request->getStart(), 'y-m-d h:i:s');
+			$requestDateFinish = new Alaress_Date_Format($request->getFinish(), 'y-m-d h:i:s');
 
 			/* For each day that the person is on leave within the prescribed period of time, show an
 			 * icon. If they are starting or ending their leave on this day, show the time as well

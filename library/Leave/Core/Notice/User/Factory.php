@@ -12,7 +12,7 @@ class Leave_Core_Notice_User_Factory extends Leave_Notice_Abstract_Factory {
 	/**
 	 * Produce a family of Kings User Notifications based on status
 	 *
-	 * @return Leave_Core_Notice_User_Authorised|Leave_Core_Notice_User_Rejected|Leave_Core_Notice_User_Submitted|null
+	 * @return Leave_Core_Notice_User_Abstract
 	 */
 	public function produce() {
 		$notice = null;

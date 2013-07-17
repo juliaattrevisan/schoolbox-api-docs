@@ -368,7 +368,7 @@ class Leave_Request extends Model {
     /**
      * Set authorisation user
      *
-     * @param $authorisationUser
+     * @param Schoolbox\User $authorisationUser
      */
     public function setAuthorisationUser($authorisationUser) {
         $this->authorisationUser = $authorisationUser;
@@ -377,7 +377,7 @@ class Leave_Request extends Model {
     /**
      * Get authorisation user
      *
-     * @return mixed
+     * @return Schoolbox\User
      */
     public function getAuthorisationUser() {
         return $this->authorisationUser;

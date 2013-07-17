@@ -21,7 +21,7 @@ class Leave_Kings_Notice_User_Submitted extends Leave_Kings_Notice_User_Abstract
 		/* Custom replacements
 		 */
 		$this->getEmail()->setVar(array(
-			'LEAVE_SUBMITTED_BY' => $this->getRequest()->getUser()->getName(),
+			'LEAVE_SUBMITTED_BY' => $this->getRequest()->getUser()->formatName(),
 		));
 
 		$this->getEmail()->parse('submitted_by_block', 'submitted_by');
