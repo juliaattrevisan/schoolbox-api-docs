@@ -256,7 +256,7 @@ class Leave_Controller extends Controller {
             $this->getPage()->parse('student_autocomplete_block', 'student_autocomplete');
             $this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
         } /* Everyone else submits as themselves
-		 */
+         */
         else {
             $this->getPage()->setVar('student_autocomplete_block', '');
             $this->getPage()->setVar('student_autocomplete_javascript_block', '');
@@ -336,6 +336,7 @@ class Leave_Controller extends Controller {
         /* Only allow Teachers/Staff to modify requests
              */
         if ($this->getGroup()->getPermission(null)) {
+            /** @var Leave_Request $request */
             $request = $data['request'];
             $user = $request->getUser();
             if (!$user instanceof \Schoolbox\User) {
@@ -379,7 +380,7 @@ class Leave_Controller extends Controller {
             /* What is the next/previous pending request?
                 */
             $nextRequest = $this->getRequestMapper()->findNextPendingByHouseId(
-                $request['id'], $user->getResidentialHouse()
+                $request->getId(), $user->getResidentialHouse()
             );
 
             if ($nextRequest) {
@@ -395,13 +396,13 @@ class Leave_Controller extends Controller {
             }
 
             $previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId(
-                $request['id'], $user->getResidentialHouse()
+                $request->getId(), $user->getResidentialHouse()
             );
 
             if ($previousRequest) {
                 $this->getPage()->setVar(
                     array(
-                        'PREV_PENDING_ID' => $previousRequest['id']
+                        'PREV_PENDING_ID' => $previousRequest->getId()
                     )
                 );
 
@@ -426,6 +427,7 @@ class Leave_Controller extends Controller {
         /*Allow the user and staff to view requests
              */
 
+        /** @var Leave_Request $request */
         $request = $data['request'];
         $user = $request->getUser();
         if (!$user instanceof \Schoolbox\User) {
@@ -795,9 +797,9 @@ class Leave_Controller extends Controller {
             $house = $data['house'];
             $requestList = $data['requestList'];
 
-	        if(!is_object($user) || !is_object($house)) {
-		        return false;
-	        }
+            if(!is_object($user) || !is_object($house)) {
+                return false;
+            }
 
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
             $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
