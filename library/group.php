@@ -587,6 +587,7 @@ class Group extends DeprecatedModel
 	 */
 	public function involvedInSubjects($userID) {
 		//Fetch subject list
+		$catList = array();
 		if ($userID == $_SESSION['id']) {
 			$catList = $_SESSION['subjects'];
 		}
@@ -609,6 +610,9 @@ class Group extends DeprecatedModel
 			}
 		}
 
+		if (!is_array($catList)) {
+			$catList = array();
+		}
 		return $catList;
 	}
 
