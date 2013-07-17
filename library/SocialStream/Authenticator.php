@@ -10,11 +10,20 @@
 
 namespace SocialStream;
 
+use Component_Instance;
+
 /**
  * Class Authenticator
  * @package SocialStream
  */
 class Authenticator {
+
+	/**
+	 * A SocialStream_Post instance
+	 *
+	 * @var null
+	 */
+	private $newPost = null;
 
 	/**
 	 * A component instance
@@ -31,14 +40,41 @@ class Authenticator {
 	private $currentUser = null;
 
 	/**
+	 * Default permission level
+	 *
+	 * @var int
+	 */
+	private $permission = -1;
+
+	/**
 	 * Constructor
 	 *
-	 * @param \Component_Instance $instance
+	 * @param \SocialStream_Post_Abstract $newPost
+	 * @param Component_Instance $instance
 	 * @param \Schoolbox\User $currentUser
 	 */
-	public function __construct(\Component_Instance $instance, \Schoolbox\User $currentUser) {
+	public function __construct(\SocialStream_Post_Abstract $newPost, Component_Instance $instance, \Schoolbox\User $currentUser) {
+		$this->setNewPost($newPost);
 		$this->setInstance($instance);
 		$this->setCurrentUser($currentUser);
+		$this->setPermission($this->determinePermission());
+	}
+
+	/**
+	 * Determine permission level for the current homepage
+	 *
+	 * @return bool|int
+	 */
+	private function determinePermission() {
+		if ($_SESSION['su']) {
+			$permission = FULL_ACCESS;
+		}
+		else {
+			$groupHandler = new \Group();
+			$permission = $groupHandler->getPermission($this->getInstance()->identifier);
+		}
+
+		return $permission;
 	}
 
 	/**
@@ -63,10 +99,14 @@ class Authenticator {
 	 * @return bool
 	 */
 	public function canCollaborate() {
-		$configValue = $this->findConfigValue('collaborate');
-
-		if ($configValue) {
+		if ($this->getPermission() >= WRITE_ACCESS) {
 			return true;
+		}
+
+		if ($this->findConfigValue('collaborate')) {
+			if ($this->getPermission() >= READ_ACCESS) {
+				return true;
+			}
 		}
 
 		return false;
@@ -78,10 +118,18 @@ class Authenticator {
 	 * @return bool
 	 */
 	public function canComment() {
-		$configValue = $this->findConfigValue('commentsAllowed');
-
-		if ($configValue) {
+		if ($this->getPermission() >= WRITE_ACCESS) {
 			return true;
+		}
+
+		if ($this->findConfigValue('commentsAllowed')) {
+			if ($this->getPermission() >= READ_ACCESS) {
+				if ($this->getNewPost()->getRootId() > 0) {
+					if ($this->getNewPost()->getParentId() > 0) {
+						return true;
+					}
+				}
+			}
 		}
 
 		return false;
@@ -125,4 +173,42 @@ class Authenticator {
 	private function getInstance() {
 		return $this->instance;
 	}
+
+	/**
+	 * Set permission
+	 *
+	 * @param int $permission
+	 */
+	private function setPermission($permission) {
+		$this->permission = $permission;
+	}
+
+	/**
+	 * Get permission
+	 *
+	 * @return int
+	 */
+	private function getPermission() {
+		return $this->permission;
+	}
+
+	/**
+	 * Set new post
+	 *
+	 * @param null $newPost
+	 */
+	private function setNewPost($newPost) {
+		$this->newPost = $newPost;
+	}
+
+	/**
+	 * Get new post
+	 *
+	 * @return null
+	 */
+	private function getNewPost() {
+		return $this->newPost;
+	}
+
+
 }

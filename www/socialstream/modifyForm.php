@@ -27,26 +27,6 @@ $instance = $instanceArray[$_POST['instanceId']];
  */
 $currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
 
-/* Authenticate!
- */
-$authenticator = new Authenticator($instance, $currentUser);
-
-/* Find out if you can collaborate on this
-*/
-if ($authenticator->canCollaborate()) {
-	echo "mort";
-}
-
-/* Find out if you can comment on this
- */
-if ($authenticator->canComment()) {
-	echo "bart";
-}
-
-
-new \Alaress_Probe($instance);
-die();
-
 /* Create new SocialStream Post
  */
 $factory = new Post\Factory($_POST['type']);
@@ -61,7 +41,18 @@ $newPost->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setDeletedAt(null);
 
-$mapper = new PostMapper();
-$mapper->save($newPost);
+/* Authenticate!
+ */
+$authenticator = new Authenticator($newPost, $instance, $currentUser);
 
-$page->backToTheFuture(1);
+/* Find out if you can collaborate on this
+*/
+if ($authenticator->canCollaborate() || $authenticator->canComment()) {
+	$mapper = new PostMapper();
+	$mapper->save($newPost);
+
+	$page->backToTheFuture(1);
+}
+else {
+	error(19);
+}
