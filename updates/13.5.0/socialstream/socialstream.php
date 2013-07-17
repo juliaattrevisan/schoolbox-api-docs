@@ -26,6 +26,10 @@ $socialStream = array(
 			'default_value' => '5',
 			'label' => 'Size'
 		),
+		'src' => array(
+			'default_value' => '',
+			'label' => 'Source'
+		),
 	)
 );
 

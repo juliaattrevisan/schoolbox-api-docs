@@ -46,8 +46,18 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		$config = $this->getConfig();
 
 		/* Enforce ints
+		 * Use the homepageId that the user selected via Select Alternate Source
+		 * or, if that was not set, just use the current homepageId from arg[]
 		 */
-		$homepageId = intval($this->sitepage->arg[0]);
+		if (is_numeric($config['src'])) {
+			$homepageId = intval($config['src']);
+		}
+		else {
+			$homepageId = intval($this->sitepage->arg[0]);
+		}
+
+		/* Apply limits
+		 */
 		$limit = intval($config['size']);
 
 		/* Sew thread
@@ -56,6 +66,13 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		$tree = $thread->getTree();
 
 		$i = 0;
+
+		/* Set chosen homepageId - this was chosen using Select Alternate Source
+		 * or otherwise uses the default arg[0] value
+		 */
+		$this->setVar(array(
+			'HOMEPAGE_ID' => $homepageId
+		));
 
 		/* Traverse everything
 		 */

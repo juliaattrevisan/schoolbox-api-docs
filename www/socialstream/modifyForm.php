@@ -15,8 +15,6 @@ $page = new \SitePage();
 
 /* Create new SocialStream Post
  */
-/* Instantiate something
- */
 $factory = new Post\Factory($_POST['type']);
 
 $newPost = $factory->produce();
