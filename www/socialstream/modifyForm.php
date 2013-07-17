@@ -32,3 +32,4 @@ $newPost->setDeletedAt(null);
 $mapper = new PostMapper();
 $mapper->save($newPost);
 
+$page->backToTheFuture(1);
