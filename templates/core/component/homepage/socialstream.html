@@ -37,13 +37,28 @@
 			/*border: 1px solid #00f;*/
 		}
 	</style>
+	<script type='text/javascript'>
+		$j('.socialstream').find('.addPostLink').click(function() {
+
+			/* Clear out all instances of .addPostForm in the socialstream
+			 */
+			$j('.socialstream').find('.addPostForm').remove();
+
+			/* Clone an instance of .addPostForm to this location
+			 */
+			var clone = $j('.addPostForm');
+			clone.find('input[name=parentId]')
+		});
+	</script>
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
 	<div>
-		<form action='/socialstream/modifyForm.php' method='post'>
+		<form action='/socialstream/modifyForm.php' method='post' class='addPostForm'>
 			<input type='hidden' name='type' value='string' />
 			<input type='hidden' name='homepageId' value='{ID}'/>
+			<input type='hidden' name='parentId' value='0' />
+			<input type='hidden' name='rootId' value='0' />
 
 			<input type='text' name='body' value='' />
 			<input type='submit' value='Post' />
@@ -58,11 +73,20 @@
 					<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
 				</div>
 				<div class='body'>
+					<dl>
+						<dt>postId</dt>
+						<dd>{SOCIALSTREAM_POST_POST_ID}</dd>
+						<dt>parentId</dt>
+						<dd>0</dd>
+						<dt>rootId</dt>
+						<dd>0</dd>
+					</dl>
+					<div class='clearfix'></div>
 					<p>
 						<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
 						{SOCIALSTREAM_POST_BODY}<br />
 						<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span> |
-						<a>Comment</a>
+						<a class='addPostLink' data-rootid='0' data-parentid='0'>Comment</a>
 					</p>
 				</div>
 				<div class='clearfix'></div>
@@ -73,11 +97,20 @@
 							<img src='/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32'>
 						</div>
 						<div class='body'>
+							<dl>
+								<dt>postId</dt>
+								<dd>{SOCIALSTREAM_COMMENT_POST_ID}</dd>
+								<dt>parentId</dt>
+								<dd>{SOCIALSTREAM_POST_POST_ID}</dd>
+								<dt>rootId</dt>
+								<dd>{SOCIALSTREAM_POST_POST_ID}</dd>
+							</dl>
+							<div class='clearfix'></div>
 							<p>
 								<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
 								{SOCIALSTREAM_COMMENT_BODY}<br />
 								<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span> |
-								<a>Comment</a>
+								<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a>
 							</p>
 						</div>
 						<div class='clearfix'></div>
@@ -88,6 +121,15 @@
 									<img src='/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32'>
 								</div>
 								<div class='body'>
+									<dl>
+										<dt>postId</dt>
+										<dd>{SOCIALSTREAM_REPLY_POST_ID}</dd>
+										<dt>parentId</dt>
+										<dd>{SOCIALSTREAM_COMMENT_POST_ID}</dd>
+										<dt>rootId</dt>
+										<dd>{SOCIALSTREAM_POST_POST_ID}</dd>
+									</dl>
+									<div class='clearfix'></div>
 									<p>
 										<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
 										{SOCIALSTREAM_REPLY_BODY}<br />

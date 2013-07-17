@@ -52,9 +52,27 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		/* Traverse everything
 		 */
 		foreach($tree as $currentPost) {
+			$this->setVar(array(
+				'SOCIALSTREAM_POST_POST_ID' => $currentPost->getPostId(),
+				'SOCIALSTREAM_POST_BODY' => $currentPost->getBody(),
+				'SOCIALSTREAM_POST_CREATED_AT' => $currentPost->getCreatedAt()->getShort(),
+				'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => $currentPost->getOwnerId()->getExternalId(),
+				'SOCIALSTREAM_POST_USER_FULLNAME' => $currentPost->getOwnerId()->getFullname(),
+				'ON_OFF' => $i%2 ? 'dark' : '',
+			));
+
 			foreach($currentPost->getChildren() as $currentComment) {
+				$this->setVar(array(
+					'SOCIALSTREAM_COMMENT_POST_ID' => $currentComment->getPostId(),
+					'SOCIALSTREAM_COMMENT_BODY' => $currentComment->getBody(),
+					'SOCIALSTREAM_COMMENT_CREATED_AT' => $currentComment->getCreatedAt()->getShort(),
+					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => $currentComment->getOwnerId()->getExternalId(),
+					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => $currentComment->getOwnerId()->getFullname(),
+				));
+
 				foreach($currentComment->getChildren() as $currentReply) {
 					$this->setVar(array(
+						'SOCIALSTREAM_REPLY_POST_ID' => $currentReply->getPostId(),
 						'SOCIALSTREAM_REPLY_BODY' => $currentReply->getBody(),
 						'SOCIALSTREAM_REPLY_CREATED_AT' => $currentReply->getCreatedAt()->getShort(),
 						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => $currentReply->getOwnerId()->getExternalId(),
@@ -64,13 +82,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 					$this->parse('socialstream_reply_block', 'socialstream_reply', true);
 				}
 
-				$this->setVar(array(
-					'SOCIALSTREAM_COMMENT_BODY' => $currentComment->getBody(),
-					'SOCIALSTREAM_COMMENT_CREATED_AT' => $currentComment->getCreatedAt()->getShort(),
-					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => $currentComment->getOwnerId()->getExternalId(),
-					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => $currentComment->getOwnerId()->getFullname(),
-				));
-
 				/* Clear children after parsing out the parent
 				 */
 				$this->parse('socialstream_comment_block', 'socialstream_comment', true);
@@ -78,21 +89,14 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 				$this->setVar('socialstream_reply_block', '');
 			}
 
-			$this->setVar(array(
-				'SOCIALSTREAM_POST_BODY' => $currentPost->getBody(),
-				'SOCIALSTREAM_POST_CREATED_AT' => $currentPost->getCreatedAt()->getShort(),
-				'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => $currentPost->getOwnerId()->getExternalId(),
-				'SOCIALSTREAM_POST_USER_FULLNAME' => $currentPost->getOwnerId()->getFullname(),
-				'ON_OFF' => $i%2 ? 'dark' : '',
-			));
-
-			$i++;
-
 			/* Clear children after parsing out the parent
 			 */
 			$this->parse('socialstream_post_block', 'socialstream_post', true);
 
 			$this->setVar('socialstream_comment_block', '');
+			$this->setVar('socialstream_reply_block', '');
+
+			$i++;
 		}
 
 		return true;
