@@ -500,7 +500,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 		$requestCollection = $this->hydrateList($requestList);
 
-		return $requestCollection[0];
+		return $requestCollection->first();
 	}
 
 	public function findAllByDateRange($start, $finish) {
