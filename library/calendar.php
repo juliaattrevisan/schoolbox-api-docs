@@ -636,7 +636,7 @@ class Calendar extends DeprecatedModel {
             /* If there are no groups prevent sql error
              */
             if (count($groupList)) {
-                $groupQuery = "OR (access = '2' AND sid IN (" . implode(',', $groupList) . "))";
+                $groupQuery = "OR (access = ".self::ACCESS_GROUP." AND sid IN (" . implode(',', $groupList) . "))";
             }
         }
 
@@ -692,9 +692,9 @@ class Calendar extends DeprecatedModel {
 			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
 			WHERE
 				(
-					(access = '1' AND owner = '{$_SESSION['id']}')
+					(access = ".self::ACCESS_PERSONAL." AND owner = '{$_SESSION['id']}')
 					$groupQuery
-					OR (access = '3' AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
+					OR (access = ".self::ACCESS_CAMPUS." AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
 				)
 				AND (
 					-- Get any events which overlap timespan.
@@ -730,7 +730,6 @@ class Calendar extends DeprecatedModel {
                 $event->setAccess($currentEvent['access']);
                 $event->setEventType($currentEvent['eventType']);
                 $event->setColour($currentEvent['eventColour']);
-                $event->setCampusList($currentEvent['campusList']);
                 $event->setDetail($currentEvent['detail']);
                 $event->setLocation($currentEvent['location']);
                 $event->setPublishDate($currentEvent['publish_date']);
@@ -744,10 +743,14 @@ class Calendar extends DeprecatedModel {
                     $event->setIsEditable(false);
                 }
 
-                if ($currentEvent['access'] == 2) {
+                if ($currentEvent['access'] == self::ACCESS_GROUP) {
                     $event->setCategoryId($currentEvent['categoryId']);
                     $event->setCategoryname($currentEvent['categoryName']);
                 }
+	            else if($currentEvent['access'] == self::ACCESS_CAMPUS) {
+		            $event->setCampusList($currentEvent['campusList']);
+	            }
+
                 $event->setAttendance($currentEvent['attendance']);
 				$event->setCompleted($currentEvent['completed']);
 
