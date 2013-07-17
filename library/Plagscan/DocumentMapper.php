@@ -10,6 +10,10 @@
  */
 
 class Plagscan_DocumentMapper extends Schoolbox\Mapper {
+
+	/**
+	 * @var Plagscan_Gateway
+	 */
 	private $gateway;
 
 	protected function setup() {
@@ -60,15 +64,26 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 		));
 	}
 
+	/**
+	 * Saves a Plagscan document.
+	 *
+	 * @param Plagscan_Document $dirtyDocument
+	 *
+	 * @return array
+	 */
 	public function save ($dirtyDocument) {
-		if ( !$this->findById($dirtyDocument->id)->id ) {
-			$documentId = $this->gateway->submit($dirtyDocument->file['name'], $dirtyDocument->file['file']);
+		//
+		// Document not found already? Submit to the gateway
+		$existing_document = $this->findById($dirtyDocument->getId());
+		if (!($existing_document instanceof Plagscan_Document)) {
+			$file = $dirtyDocument->getFile();
+			$documentId = $this->gateway->submit($file['name'], $file['file']);
 
 			if ( !empty($documentId) ) {
 				$this->gateway->check($documentId);
 
-				$dirtyDocument->plagscanId = $documentId;
-				$dirtyDocument->status = Plagscan_Document::STATUS_QUEUED;
+				$dirtyDocument->setPlagscanId($documentId);
+				$dirtyDocument->setPlagscanId(Plagscan_Document::STATUS_QUEUED);
 			}
 			else {
 				return false;
