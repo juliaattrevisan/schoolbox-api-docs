@@ -41,7 +41,51 @@ class Authenticator {
 		$this->setCurrentUser($currentUser);
 	}
 
+	/**
+	 * Find a particular config value
+	 *
+	 * @param $key
+	 * @return mixed
+	 */
+	private function findConfigValue($key) {
+		if (is_array($this->getInstance()->config) && count($this->getInstance()->config)) {
+			foreach($this->getInstance()->config as $currentConfig) {
+				if ($currentConfig->key == $key) {
+					return $currentConfig->value;
+				}
+			}
+		}
+	}
 
+	/**
+	 * Determine whether $currentUser can collaborate on $instance
+	 *
+	 * @return bool
+	 */
+	public function canCollaborate() {
+		$configValue = $this->findConfigValue('collaborate');
+
+		if ($configValue) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine whether $currentUser can comment on $instance
+	 *
+	 * @return bool
+	 */
+	public function canComment() {
+		$configValue = $this->findConfigValue('commentsAllowed');
+
+		if ($configValue) {
+			return true;
+		}
+
+		return false;
+	}
 
 	/* Getters/Setters
 	 */

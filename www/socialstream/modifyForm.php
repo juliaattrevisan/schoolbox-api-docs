@@ -34,15 +34,16 @@ $authenticator = new Authenticator($instance, $currentUser);
 /* Find out if you can collaborate on this
 */
 if ($authenticator->canCollaborate()) {
+	echo "mort";
 }
 
 /* Find out if you can comment on this
  */
 if ($authenticator->canComment()) {
+	echo "bart";
 }
 
 
-print_r($_SESSION);
 new \Alaress_Probe($instance);
 die();
 
