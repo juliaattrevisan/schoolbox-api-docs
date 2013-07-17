@@ -39,7 +39,7 @@ class Synchronise_Edumate_Tigs_Strategy_Parent extends Synchronise_Edumate_Tigs_
 
 		// get campuses of attached children
 		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-		$newUser['group_id']      = 0;
+		$newUser['group_id']      = 18;
 
 		return $newUser;
 	}
@@ -63,7 +63,7 @@ class Synchronise_Edumate_Tigs_Strategy_Parent extends Synchronise_Edumate_Tigs_
 
 		// get campuses of attached children
 		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-		$newUser['group_id']      = 0;
+		$newUser['group_id']      = 18
 
 		return $newUser;
 	}
