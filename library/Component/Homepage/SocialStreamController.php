@@ -49,11 +49,11 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		 * Use the homepageId that the user selected via Select Alternate Source
 		 * or, if that was not set, just use the current homepageId from arg[]
 		 */
-		if (is_numeric($config['src'])) {
+		if (is_numeric($config['src']) && strlen($config['src'])) {
 			$homepageId = intval($config['src']);
 		}
 		else {
-			$homepageId = intval($this->sitepage->arg[0]);
+			$homepageId = intval($this->instance->identifier);
 		}
 
 		/* Apply limits
