@@ -83,7 +83,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 				$this->gateway->check($documentId);
 
 				$dirtyDocument->setPlagscanId($documentId);
-				$dirtyDocument->setPlagscanId(Plagscan_Document::STATUS_QUEUED);
+				$dirtyDocument->setStatus(Plagscan_Document::STATUS_QUEUED);
 			}
 			else {
 				return false;
