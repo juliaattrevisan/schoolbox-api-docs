@@ -75,10 +75,9 @@ try {
                 }
             } else {
                 if ($method == 'report' && $this->arg[1] == 'catering') {
-                    if (is_string($this->arg[2])) {
+                    $date = date('d/m/Y', time());
+                    if (is_string($this->arg[2]) && strlen($this->arg[2]) > 0 && $this->arg[2] != 'export') {
                         $date = str_replace('-', '/', $this->arg[2]);
-                    } else {
-                        $date = date('d/m/Y', time());
                     }
 
                     $data = $leaveController->executeCateringReport($date);
