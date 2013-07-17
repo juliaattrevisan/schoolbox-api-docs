@@ -37,7 +37,7 @@ class Synchronise_Edumate_Tigs_Strategy_Student extends Synchronise_Edumate_Tigs
 		$newUser['lastname']      = $currentUser['StudentSurname'];
 		$newUser['alt_email']     = $currentUser['StudentEmail'];
 		$newUser['synergy_id']    = $currentUser['StudentID'];
-		$newUser['local_email']   = 1;
+		$newUser['local_email']   = 0;
 		$newUser['year']          = $this->getYearCodeFromYearLevel($currentUser['StudentYearLevel']);
 		//
 		// No houses
