@@ -120,18 +120,30 @@ class PostMapper extends Schoolbox\Mapper {
 			SELECT
 				{$this->getColumnString('p')},
 				{$user_mapper->getColumnString('u')}
-            FROM `{$this->table}` p
-            LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
-            WHERE homepage_id = :homepageId
-            AND parent_id = 0
-            AND deleted_at IS NULL
-            ORDER BY created_at DESC
-            LIMIT :limit
-        ";
+			FROM `{$this->table}` p
+			LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
+			WHERE homepage_id = :homepageId
+			AND parent_id = 0
+			AND deleted_at IS NULL
+			ORDER BY created_at DESC
+		";
 
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":homepageId", $homepageId);
-		$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
+		/* Optional limit
+		 */
+		if ($limit) {
+			$query .= "
+				LIMIT :limit
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":homepageId", $homepageId);
+			$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
+		}
+		else {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":homepageId", $homepageId);
+		}
+
 		$statement->execute();
 
 		/* Manually construct hierarchy of posts and their users
