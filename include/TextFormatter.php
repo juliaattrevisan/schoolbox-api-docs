@@ -28,9 +28,9 @@ class TextFormatter {
 	/**
 	 * Cut a string to the character limit and append ellipsis (...)
 	 *
-	 * @param  string   $content  String to cut
-	 * @param  int      $chars    Number of chars to cut to
-	 * @param  string   $encoding Encoding of $content
+	 * @param  string $content  String to cut
+	 * @param  int    $chars    Number of chars to cut to
+	 * @param  string $encoding Encoding of $content
 	 * @return string
 	 */
 	public static function cutString($content, $chars, $encoding = 'UTF-8') {
@@ -47,35 +47,36 @@ class TextFormatter {
 	 * Cut off a summary at the fullstop within the character limit
 	 * Alternatively just at the word
 	 *
-	 * @param  $content
-	 * @param  $chars
+	 * @param  string $content  String to cut
+	 * @param  int    $chars    Number of chars to cut to
+	 * @param  string $encoding Encoding of $content
 	 * @return string
 	 */
-	public static function cutSentence($content, $chars) {
+	public static function cutSentence($content, $chars, $encoding = 'UTF-8') {
 
         $content = strip_tags($content);
 
-		if (strlen($content) < $chars) {
+		if (mb_strlen($content, $encoding) < $chars) {
 			return $content;
 		}
 
-		$summary = substr($content, 0, $chars);
-		$position = strrpos($summary, '.') + 1;
-		$positionQ = strrpos($summary, '?') + 1;
-		$positionB = strrpos($summary, '!') + 1;
+		$summary   = mb_substr($content, 0, $chars, $encoding);
+		$position  = mb_strrpos($summary, '.', null, $encoding) + 1;
+		$positionQ = mb_strrpos($summary, '?', null, $encoding) + 1;
+		$positionB = mb_strrpos($summary, '!', null, $encoding) + 1;
 
 		if ($position > 1 && $position > $positionQ && $position > $positionB) {
-			$output = substr($summary, 0, $position);
+			$output = mb_substr($summary, 0, $position, $encoding);
 		}
 		else if ($positionQ > 1 && $positionQ > $positionB) {
-			$output = substr($summary, 0, $positionQ);
+			$output = mb_substr($summary, 0, $positionQ, $encoding);
 		}
 		else if($positionB > 1) {
-			$output = substr($summary, 0, $positionB);
+			$output = mb_substr($summary, 0, $positionB, $encoding);
 		}
 		else {
-			$position = strrpos($summary, ' ');
-			$output = substr($summary, 0, $position);
+			$position = mb_strrpos($summary, ' ', null, $encoding);
+			$output   = mb_substr($summary, 0, $position, $encoding);
 
 			if ($output) {
 				$output .= '...';
