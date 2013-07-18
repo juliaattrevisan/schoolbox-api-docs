@@ -22,6 +22,11 @@ var socialstream = {
 	viewMoreLink: '.socialstreamViewMore',
 
 	/**
+	 * Container div for a loading graphic or message
+	 */
+	loading: '.loading',
+
+	/**
 	 * Initialise everything
 	 *
 	 * @param instanceId
@@ -87,7 +92,7 @@ var socialstream = {
 		var self = this;
 
 		$j.get(url, function(responseText) {
-			$j('div.socialstream').append(responseText);
+			$j('.socialstream').append(responseText);
 
 			/* Update offsets, hiding View More if there were none left
 			 */
@@ -96,6 +101,10 @@ var socialstream = {
 			if (self.start > self.numPosts) {
 				$j(self.viewMoreLink).hide();
 			}
+
+			/* Clear out any loading div indicators
+			 */
+			$j('.socialstream').find(self.loading).remove();
 		});
 	}
 }
