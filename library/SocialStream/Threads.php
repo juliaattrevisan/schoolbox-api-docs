@@ -10,7 +10,7 @@
 
 namespace SocialStream;
 
-class Ajax {
+class Threads {
 
 	/**
 	 * A schoolbox collection of SocialStream_Post instances

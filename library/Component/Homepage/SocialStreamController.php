@@ -91,7 +91,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		/* Sew thread
 		 */
-		$thread = new \SocialStream\Ajax($this->instance, $limit, '2013-07-16 18:00:00');
+		$thread = new \SocialStream\Threads($this->instance, $limit, '2013-07-16 18:00:00');
 		$output = $thread->generate()->render();
 
 		echo $output;
