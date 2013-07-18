@@ -102,11 +102,11 @@ if (is_numeric($_REQUEST['cid'])) {
         $catHandler = new Category;
         $category = $catHandler->getByID($_POST['cid']);
 
-        $templateTarget = "component_position_{$component->instance->position}";
-        $templateHandle = "component_{$component->instance->id}";
+        $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
+        $templateHandle = "component_{$component->getInstance()->getId()}";
         $templateHandle = TEMPLATE_content;
 
-        $component->setup($category, $component->instance->getConfigArray() );
+        $component->setup($category, $component->getInstance()->getConfigArray() );
 
         if ($component->execute() !== false) {
             $component->parseConfig();
@@ -142,12 +142,15 @@ if (is_numeric($_REQUEST['cid'])) {
 	else if ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
         $config = $_GET;
 
+        /** @var Component_Instance $instance */
         $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
         $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
-        $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn('component_definition_id', $instance->definitionId);
+        $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
+            'component_definition_id', $instance->getDefinitionId()
+        );
 
-		unset($config['cid'], $config['type'], $config['component']);
+        unset($config['cid'], $config['type'], $config['component']);
 
         // much as I hate exceptional cases, there are exceptional cases...
 
@@ -161,7 +164,7 @@ if (is_numeric($_REQUEST['cid'])) {
         // prepare filter value
         if(isset($config['filter'])) {
             // retrieve the instance so we know how to insert this data
-            $cclass = $instance->definition->class;
+            $cclass = $instance->getDefinition()->getClass();
             $controller = new $cclass($instance, new User(), $page);
             $controller->execute();
             $fields = $controller->getFilterFields();
@@ -181,15 +184,18 @@ if (is_numeric($_REQUEST['cid'])) {
                 /** @var Component_Config $confI */
                 $confI = $componentConfigInstanceMapper->findByColumnList(array(
                     'component_config_definition_id' => $confD->getId(),
-                    'component_instance_id'          => $instance->id
+                    'component_instance_id'          => $instance->getId()
                 ))->first();
+                if (!($confI instanceof Component_Config)) {
+                    $confI = new Component_Config();
+                }
 
-                printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $config[$confD->key]);
+                printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $config[$confD->getKey()]);
 
                 if(!($confI->getId())) {
                     $confI = new Component_Config();
-                    $confI->getConfigDefinitionId($confD->getId());
-                    $confI->getInstanceId($instance->id);
+                    $confI->setConfigDefinitionId($confD->getId());
+                    $confI->setInstanceId($instance->getId());
                 }
                 $confI->setValue($config[$confD->getKey()]);
 
@@ -197,8 +203,8 @@ if (is_numeric($_REQUEST['cid'])) {
 
             }
         }
-		SitePage::localRedir("/homepage/" . $_GET['cid']);
-	}
+        SitePage::localRedir("/homepage/" . $_GET['cid']);
+    }
 
 
     // AJAX new column widths
