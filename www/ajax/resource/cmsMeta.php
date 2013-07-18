@@ -146,13 +146,13 @@ function getSingleFileMeta($folderId, $fileId) {
 		foreach ($availablePages as $currentPage) {
 			if (is_array($currentPage['componentList']) && count($currentPage['componentList'])) {
 				foreach ($currentPage['componentList'] as $currentComponent) {
-
+					/** @var Component_Instance $currentComponent */
 					// Each link only needs to know this
 					$pageData = array(
 						'userId' => $_SESSION['id'],
 						'pageId' => $currentPage['page']->getPageId(),
 						'pageTitle' => $currentPage['page']->getPageTitle(),
-						'componentInstanceId' => $currentComponent->id,
+						'componentInstanceId' => $currentComponent->getId(),
 					);
 
 					$publishTo[] = $pageData;
