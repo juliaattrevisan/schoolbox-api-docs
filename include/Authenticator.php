@@ -81,7 +81,7 @@ class Authenticator {
 	     */
 	    $userMapper = UserMapper::getInstance();
 
-	    $user = $userMapper->findByColumn('username', $username)->current();
+	    $user = $userMapper->findByColumn('username', $username)->first();
 
         if($user instanceof User) {
 
