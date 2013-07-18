@@ -84,6 +84,14 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 			}
 		}
 
+		/* See how many posts there could be at the moment
+		 */
+		$numPosts = \SocialStream\PostMapper::getInstance()->findCount($homepageId);
+
+		$this->setVar(array(
+			'SOCIALSTREAM_NUM_POSTS' => $numPosts
+		));
+
 		return true;
 	}
 }

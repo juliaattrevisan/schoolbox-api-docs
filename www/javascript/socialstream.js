@@ -1,7 +1,25 @@
 var socialstream = {
+
+	/**
+	 * Component instance
+	 */
 	instanceId: 0,
+
+	/**
+	 * Start and offset values
+	 */
 	start: 0,
 	offset: 0,
+
+	/**
+	 * Maximum number of posts at the moment
+	 */
+	numPosts: 0,
+
+	/**
+	 * The element which allows you to spawn more
+	 */
+	viewMoreLink: '.socialstreamViewMore',
 
 	/**
 	 * Initialise everything
@@ -9,11 +27,13 @@ var socialstream = {
 	 * @param instanceId
 	 * @param start
 	 * @param offset
+ 	 * @param numPosts
 	 */
-	init: function(instanceId, start, offset) {
+	init: function(instanceId, start, offset, numPosts) {
 		this.instanceId = instanceId;
 		this.start = start;
 		this.offset = offset;
+		this.numPosts = numPosts;
 
 		this.initPostLinks();
 		this.initViewMore();
@@ -69,9 +89,13 @@ var socialstream = {
 		$j.get(url, function(responseText) {
 			$j('div.socialstream').append(responseText);
 
-			/* Update offsets
+			/* Update offsets, hiding View More if there were none left
 			 */
 			self.start = parseInt(self.start) + parseInt(self.offset);
+
+			if (self.start > self.numPosts) {
+				$j(self.viewMoreLink).hide();
+			}
 		});
 	}
 }

@@ -106,6 +106,32 @@ class PostMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Find the maximum number of posts at a given point in time
+	 * for a particular homepage
+	 *
+	 * @param $homepageId
+	 * @return mixed
+	 */
+	public function findCount($homepageId) {
+		$query = "
+			SELECT COUNT(*) AS num
+			FROM `{$this->table}`
+			WHERE homepage_id = :homepageId
+			AND parent_id = 0
+			AND deleted_at IS NULL
+			ORDER BY created_at DESC
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":homepageId", $homepageId);
+		$statement->execute();
+
+		$result = $statement->fetch();
+
+		return $result['num'];
+	}
+
+	/**
 	 * Find all the social stream posts that should appear in a homepage's
 	 * SocialStream component
 	 *
