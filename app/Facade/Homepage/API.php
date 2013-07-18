@@ -17,14 +17,14 @@ class Facade_Homepage_API extends Generic_API {
     public function Display($categoryID) {
         $response = new Response_HTTP();
         try {
-	        /**
-	         * @var User $user
-	         * @var Category $cat
-	         * @var Collection $page
-	         */
-	        list($user, $cat, $page) = $this->getHomepage($categoryID);
+            /**
+             * @var User $user
+             * @var Category $cat
+             * @var Schoolbox\Collection $page
+             */
+            list($user, $cat, $page) = $this->getHomepage($categoryID);
 
-            list($catTitle, $articles) = $this->renderComponents($user, $cat, $page->toArray());
+            list($catTitle, $articles) = $this->renderComponents($user, $cat, $page->getAll());
             $response->setPage('title', $catTitle);
             $response->setResponse('articles', $articles);
             $this->logVisit($user->getId(), $categoryID);
