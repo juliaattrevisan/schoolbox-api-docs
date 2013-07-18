@@ -130,15 +130,17 @@ function writeConfig($vars) {
                 'component_config_definition_id' => $confD->getId(),
                 'component_instance_id'          => $instance->getId()
             ))->first();
+            if (!($confI instanceof Component_Config)) {
+                $confI = new Component_Config();
+            }
 
             printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $vars[$confD->getKey()]);
 
             if(!($confI->getId())) {
-                $confI = new Component_Config();
                 $confI->setConfigDefinitionId($confD->getId());
                 $confI->setInstanceId($instance->getId());
             }
-            $confI->value = $vars[$confD->getKey()];
+            $confI->setValue($vars[$confD->getKey()]);
 
             $ccm->save($confI);
 
