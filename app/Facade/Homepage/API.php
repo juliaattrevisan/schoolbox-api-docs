@@ -176,11 +176,11 @@ class Facade_Homepage_API extends Generic_API {
             }
 
             // if the category is still wrapped in a collection, extract it
-            if($cat instanceof Collection) {
-                $cat = $cat->current();
+            if ($cat instanceof Schoolbox\Collection) {
+                $cat = $cat->first();
             }
-	        $codes = $cat->getCodes();
-            $catTitle = $cat->getName() . ($codes->count() ? " ({$codes->current()->getCode()})" : '');
+            $codes    = $cat->getCodes();
+            $catTitle = $cat->getName() . ($codes->count() ? " ({$codes->first()->getCode()})" : '');
 
             return array($catTitle, $articles);
         }
