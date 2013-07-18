@@ -47,6 +47,13 @@
 	<!-- BEGIN has_comments_javascript -->
 	<script type='text/javascript'>
 		$j(function() {
+
+			/* Ajax in first threads
+			 */
+			$j.get('/socialstream/threads.php?instanceId={COMPONENT_INSTANCE_ID}&limit={SOCIALSTREAM_AJAX_LIMIT}', function(responseText) {
+				$j('div.socialstream').append(responseText);
+			});
+
 			$j('.socialstream').find('.addPostLink').click(function() {
 
 				/* Clear out all instances of .addPostForm in the socialstream

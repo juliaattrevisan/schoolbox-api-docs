@@ -56,7 +56,8 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		 * or otherwise uses the default arg[0] value
 		 */
 		$this->setVar(array(
-			'HOMEPAGE_ID' => $homepageId
+			'HOMEPAGE_ID' => $homepageId,
+			'SOCIALSTREAM_AJAX_LIMIT' => $limit,
 		));
 
 		/* If you can neither comment nor collaborate, hide the form
@@ -88,13 +89,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 				$this->parse('has_comments_javascript_block', 'has_comments_javascript');
 			}
 		}
-
-		/* Sew thread
-		 */
-		$thread = new \SocialStream\Threads($this->instance, $limit, '2013-07-16 18:00:00');
-		$output = $thread->generate()->render();
-
-		echo $output;
 
 		return true;
 	}
