@@ -349,8 +349,8 @@ class PageMapper extends Schoolbox\Mapper {
 	/**
 	 * Find all the user's pages with a particular component on it
 	 *
-	 * @param $userId
-	 * @param $componentDefinition
+	 * @param int                  $userId
+	 * @param Component_Definition $componentDefinition
 	 *
 	 * @return array
 	 */
@@ -358,7 +358,9 @@ class PageMapper extends Schoolbox\Mapper {
 		$pageData = array();
 		$pageIds = array();
 
-		$allComponents = \Component_InstanceMapper::getInstance()->findByDefinition('eportfolio', $componentDefinition->id);
+		$allComponents = \Component_InstanceMapper::getInstance()->findByDefinition(
+			'eportfolio', $componentDefinition->getId()
+		);
 
 		/* Get a list of pages which have File List components
 		 */
@@ -381,7 +383,7 @@ class PageMapper extends Schoolbox\Mapper {
 					 */
 					if (($currentPage->getUid() == $userId) && ($currentPage->getDeletedAt() == null)) {
 						foreach ($allComponents as $currentComponent) {
-							if ($currentComponent->identifier == $currentPage->getPageId()) {
+							if ($currentComponent->getIdentifier() == $currentPage->getPageId()) {
 								$componentList[] = $currentComponent;
 							}
 						}
