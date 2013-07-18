@@ -31,7 +31,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		$this->parseConfig();
 
-		$this->setBlock($templateHandle, 'socialstream_ajax', 'socialstream_ajax_block');
 		$this->setBlock($templateHandle, 'has_comments_javascript', 'has_comments_javascript_block');
 
 		/* Assign homepage id and settings
