@@ -39,14 +39,14 @@ class Threads {
 	 *
 	 * @var int
 	 */
-	private $limit = 0;
+	private $start = 0;
 
 	/**
 	 * Only fetch posts newer than this date
 	 *
 	 * @var string
 	 */
-	private $dateThreshold = '0000-00-00 00:00:00';
+	private $offset = 0;
 
 	/**
 	 * The component instance
@@ -69,11 +69,18 @@ class Threads {
 	 * @param $limit
 	 * @param $dateThreshold
 	 */
-	public function __construct($instance, $limit, $dateThreshold) {
+	/**
+	 * Constructor
+	 *
+	 * @param $instance
+	 * @param $start
+	 * @param $offset
+	 */
+	public function __construct($instance, $start, $offset) {
 		$this->setInstance($instance);
 		$this->setHomepageId($instance->identifier);
-		$this->setLimit($limit);
-		$this->setDateThreshold($dateThreshold);
+		$this->setStart($start);
+		$this->setOffset($offset);
 
 		$this->init();
 		$this->growTree();
@@ -86,7 +93,7 @@ class Threads {
 
 		/* Get all the posts that should appear
 		 */
-		$allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($this->getHomepageId(), $this->getLimit(), $this->getDateThreshold());
+		$allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($this->getHomepageId(), $this->getStart(), $this->getOffset());
 
 		$ids = array();
 
@@ -342,24 +349,6 @@ class Threads {
 	}
 
 	/**
-	 * Set date threshold
-	 *
-	 * @param $dateThreshold
-	 */
-	private function setDateThreshold($dateThreshold) {
-		$this->dateThreshold = $dateThreshold;
-	}
-
-	/**
-	 * Get date threshold
-	 *
-	 * @return string
-	 */
-	private function getDateThreshold() {
-		return $this->dateThreshold;
-	}
-
-	/**
 	 * Set homepage id
 	 *
 	 * @param $homepageId
@@ -376,25 +365,6 @@ class Threads {
 	private function getHomepageId() {
 		return $this->homepageId;
 	}
-
-	/**
-	 * Set limit
-	 *
-	 * @param $limit
-	 */
-	private function setLimit($limit) {
-		$this->limit = $limit;
-	}
-
-	/**
-	 * Get limit
-	 * 
-	 * @return int
-	 */
-	private function getLimit() {
-		return $this->limit;
-	}
-
 	/**
 	 * Set instance
 	 *
@@ -429,5 +399,41 @@ class Threads {
 	 */
 	private function getAjaxHtml() {
 		return $this->ajaxHtml;
+	}
+
+	/**
+	 * Set start
+	 *
+	 * @param int $start
+	 */
+	public function setStart($start) {
+		$this->start = $start;
+	}
+
+	/**
+	 * Get start
+	 *
+	 * @return int
+	 */
+	public function getStart() {
+		return $this->start;
+	}
+
+	/**
+	 * Set offset
+	 *
+	 * @param string $offset
+	 */
+	private function setOffset($offset) {
+		$this->offset = $offset;
+	}
+
+	/**
+	 * Get offset
+	 *
+	 * @return string
+	 */
+	private function getOffset() {
+		return $this->offset;
 	}
 }

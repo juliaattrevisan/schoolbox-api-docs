@@ -13,22 +13,15 @@ namespace SocialStream;
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $instanceId = intval($_GET['instanceId']);
-$limit = intval($_GET['limit']);
-$dateThreshold = $_GET['dateThreshold'];
+$start = intval($_GET['start']);
+$offset = intval($_GET['offset']);
 
 $instance = \Component_InstanceMapper::getInstance()->findById($instanceId);
 
 /* Sew thread if instance exists
  */
 if ($instance) {
-
-	/* Enforce a $dateThreshold string
-	 */
-	if (!strlen($dateThreshold)) {
-		$dateThreshold = '0000-00-00 00:00:00';
-	}
-
-	$thread = new Threads($instance, $limit, $dateThreshold);
+	$thread = new Threads($instance, $start, $offset);
 	$output = $thread->generate()->render();
 
 	echo $output;

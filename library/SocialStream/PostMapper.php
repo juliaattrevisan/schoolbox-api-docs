@@ -110,11 +110,11 @@ class PostMapper extends Schoolbox\Mapper {
 	 * SocialStream component
 	 *
 	 * @param $homepageId
-	 * @param $limit
-	 * @param $dateThreshold
+	 * @param $start
+	 * @param $offset
 	 * @return Schoolbox\Collection
 	 */
-	public function findLatestForHomepage($homepageId, $limit, $dateThreshold) {
+	public function findLatestForHomepage($homepageId, $start, $offset) {
 		$user_mapper = $this->getJoinMapper('user');
 
 		$query = "
@@ -126,26 +126,24 @@ class PostMapper extends Schoolbox\Mapper {
 			WHERE homepage_id = :homepageId
 			AND parent_id = 0
 			AND deleted_at IS NULL
-			AND created_at >= :dateThreshold
 			ORDER BY created_at DESC
 		";
 
 		/* Optional limit
 		 */
-		if ($limit) {
+		if ($offset) {
 			$query .= "
-				LIMIT :limit
+				LIMIT :start,:offset
 			";
 
 			$statement = $this->database->prepare($query);
 			$statement->bindParam(":homepageId", $homepageId);
-			$statement->bindParam(":dateThreshold", $dateThreshold);
-			$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
+			$statement->bindParam(':start', $start, \PDO::PARAM_INT);
+			$statement->bindParam(':offset', $offset,\PDO::PARAM_INT);
 		}
 		else {
 			$statement = $this->database->prepare($query);
 			$statement->bindParam(":homepageId", $homepageId);
-			$statement->bindParam(":dateThreshold", $dateThreshold);
 		}
 
 		$statement->execute();

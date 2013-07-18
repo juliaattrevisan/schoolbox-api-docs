@@ -45,41 +45,11 @@
 	</style>
 
 	<!-- BEGIN has_comments_javascript -->
+	<script type='text/javascript' src='/javascript/socialstream.js'></script>
 	<script type='text/javascript'>
 		$j(function() {
-
-			/* Ajax in first threads
-			 */
-			$j.get('/socialstream/threads.php?instanceId={COMPONENT_INSTANCE_ID}&limit={SOCIALSTREAM_AJAX_LIMIT}', function(responseText) {
-				$j('div.socialstream').append(responseText);
-
-				/* Find the latest timestamp
-				 */
-			});
-
-			$j('.socialstream').find('.addPostLink').live('click', function() {
-
-				/* Clear out all instances of .addPostForm in the socialstream
-				 */
-				$j('.socialstream').find('.addPostForm').remove();
-
-				/* Get the ids for this node
-				 */
-				var parentId = $j(this).attr('data-parentid');
-				var rootId = $j(this).attr('data-rootid');
-
-				/* Clone an instance of .addPostForm and inject ids
-				 */
-				var clone = $j('#originalAddPostForm').clone();
-				clone.attr('id', '');
-				clone.find('input[name=body]').val('').focus();
-				clone.find('input[name=parentId]').val(parentId);
-				clone.find('input[name=rootId]').val(rootId);
-
-				/* Send In The Clones
-				 */
-				$j(this).parent('p').append(clone);
-			});
+			socialstream.init('{COMPONENT_INSTANCE_ID}', 0, '{SOCIALSTREAM_AJAX_LIMIT}');
+			socialstream.stream();
 		});
 	</script>
 	<!-- END has_comments_javascript -->
@@ -101,5 +71,11 @@
 	</div>
 
 	<div class='socialstream'>
+	</div>
+
+	<div>
+		<p>
+			<a class='socialstreamViewMore'>View More</a>
+		</p>
 	</div>
 </div>
