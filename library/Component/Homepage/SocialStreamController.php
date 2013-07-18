@@ -31,17 +31,8 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		$this->parseConfig();
 
+		$this->setBlock($templateHandle, 'socialstream_ajax', 'socialstream_ajax_block');
 		$this->setBlock($templateHandle, 'has_comments', 'has_comments_block');
-		$this->setBlock($templateHandle, 'socialstream_post', 'socialstream_post_block');
-		$this->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
-		$this->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
-
-		$this->setVar(array(
-			'socialstream_post_block' => '',
-			'socialstream_comment_block' => '',
-			'socialstream_reply_block' => '',
-			'has_comments_block' => '',
-		));
 
 		/* Assign homepage id and settings
 		 */
@@ -62,6 +53,10 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		 */
 		$limit = intval($config['size']);
 
+
+
+
+
 		/* Sew thread
 		 */
 		$thread = new \SocialStream\Thread($homepageId, $limit);
@@ -74,6 +69,19 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		 */
 		$this->setVar(array(
 			'HOMEPAGE_ID' => $homepageId
+		));
+
+
+		$this->setFile('socialstream_thread', '/component/homepage/socialstreamThread.html');
+		$this->setBlock('socialstream_thread', 'socialstream_post', 'socialstream_post_block');
+		$this->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
+		$this->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
+
+		$this->setVar(array(
+			'socialstream_post_block' => '',
+			'socialstream_comment_block' => '',
+			'socialstream_reply_block' => '',
+			'has_comments_block' => '',
 		));
 
 		/* Traverse everything
@@ -125,6 +133,18 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 			 */
 			$i++;
 		}
+
+		$this->parse('socialstream_ajax_block', 'socialstream_thread');
+		print_r($this->sitepage->template->_varVals['socialstream_post_block']);
+
+
+
+
+
+
+
+
+
 
 		/* Determine whether you have access to the input form
 		 */

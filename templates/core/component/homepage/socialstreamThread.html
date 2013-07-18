@@ -1,0 +1,53 @@
+<!-- BEGIN socialstream_post -->
+<ul>
+	<li class='socialstream-post {ON_OFF}'>
+		<div class='avatar'>
+			<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
+		</div>
+		<div class='body'>
+			<p>
+				<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
+				{SOCIALSTREAM_POST_BODY}<br />
+				<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span>
+				<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a>
+			</p>
+		</div>
+		<div class='clearfix'></div>
+		<ul>
+			<!-- BEGIN socialstream_comment -->
+			<li class='socialstream-comment'>
+				<div class='avatar'>
+					<img src='/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32'>
+				</div>
+				<div class='body'>
+					<p>
+						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
+						{SOCIALSTREAM_COMMENT_BODY}<br />
+						<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
+						<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a>
+					</p>
+				</div>
+				<div class='clearfix'></div>
+				<ul>
+					<!-- BEGIN socialstream_reply -->
+					<li class='socialstream-reply'>
+						<div class='avatar'>
+							<img src='/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32'>
+						</div>
+						<div class='body'>
+							<p>
+								<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
+								{SOCIALSTREAM_REPLY_BODY}<br />
+								<span>Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span>
+							</p>
+						</div>
+						<div class='clearfix'></div>
+					</li>
+					<!-- END socialstream_reply -->
+				</ul>
+			</li>
+			<!-- END socialstream_comment -->
+		</ul>
+	</li>
+</ul>
+<!-- END socialstream_post -->
