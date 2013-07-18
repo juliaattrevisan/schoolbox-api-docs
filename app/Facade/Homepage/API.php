@@ -135,7 +135,7 @@ class Facade_Homepage_API extends Generic_API {
         try {
             $articles = array();
 
-            if(is_array($components) || $components instanceof GizaCollection) {
+            if(is_array($components)) {
                 // plz render mine components
                 foreach ($components as $component) {
                     /** @var Component_ControllerAbstract $component */
