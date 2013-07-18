@@ -93,11 +93,11 @@ abstract class MigratorAbstract {
 
 		if (!$exists->count()) {
 			$configDefinition = new \Component_ConfigDefinition();
-			$configDefinition->id = null;
-			$configDefinition->definitionId = $id;
-			$configDefinition->key = 'componentname';
-			$configDefinition->defaultValue = $this->getComponentDefaultName();
-			$configDefinition->label = 'Title';
+			$configDefinition->setId(null);
+			$configDefinition->setDefinitionId($id);
+			$configDefinition->setKey('componentname');
+			$configDefinition->setDefaultValue($this->getComponentDefaultName());
+			$configDefinition->setLabel('Title');
 
 			$configDefinitionIds = \Component_ConfigDefinitionMapper::getInstance()->save($configDefinition);
 

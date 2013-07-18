@@ -57,7 +57,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 
 		/* Gather everything
 		 */
-		$allItems = $this->getMapperClass()->findForPage($this->instance->identifier);
+		$allItems = $this->getMapperClass()->findForPage($this->instance->getIdentifier());
 
 		/* Show edit buttons
 		 */
