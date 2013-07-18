@@ -31,8 +31,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		$this->parseConfig();
 
-		$this->setBlock($templateHandle, 'has_comments_javascript', 'has_comments_javascript_block');
-
 		/* Assign homepage id and settings
 		 */
 		$config = $this->getConfig();
@@ -70,14 +68,12 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 		if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {
 			$this->setVar(array(
 				'FORM_CLASS' => 'hide',
-				'has_comments_javascript_block' => '',
 			));
 		}
 		else {
 			if ($authenticator->canCollaborate()) {
 				$this->setVar(array(
 					'FORM_CLASS' => '',
-					'has_comments_javascript_block' => '',
 				));
 			}
 
@@ -85,8 +81,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 				$this->setVar(array(
 					'FORM_CLASS' => '',
 				));
-
-				$this->parse('has_comments_javascript_block', 'has_comments_javascript');
 			}
 		}
 
