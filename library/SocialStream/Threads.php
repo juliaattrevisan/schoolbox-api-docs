@@ -205,8 +205,21 @@ class Threads {
 	public function generate() {
 		$page = new \SitePage();
 
-		$i = 0;
+		/* Determine whether you have access to the input form
+		 */
+		$newPost = new \SocialStream_Post_String();
+		$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+		$authenticator = new \SocialStream\Authenticator($newPost, $this->getInstance(), $currentUser);
 
+		if ($authenticator->canComment()) {
+			$canComment = '';
+		}
+		else {
+			$canComment = 'hide';
+		}
+
+		/* Set up blocks and stuff
+		 */
 		$page->setFile('socialstream_thread', '/component/homepage/socialstreamThread.html');
 		$page->setBlock('socialstream_thread', 'socialstream_post', 'socialstream_post_block');
 		$page->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
@@ -216,11 +229,12 @@ class Threads {
 			'socialstream_post_block' => '',
 			'socialstream_comment_block' => '',
 			'socialstream_reply_block' => '',
-			'has_comments_block' => '',
 		));
 
 		/* Traverse everything
 		 */
+		$i = 0;
+
 		foreach($this->getTree() as $currentPost) {
 			$page->setVar(array(
 				'SOCIALSTREAM_POST_POST_ID' => \Scrub::text($currentPost->getPostId()),
@@ -230,6 +244,7 @@ class Threads {
 				'SOCIALSTREAM_POST_USER_FULLNAME' => \Scrub::text($currentPost->getOwnerId()->getFullname()),
 				'SOCIALSTREAM_POST_TIMESTAMP' => \Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
 				'ON_OFF' => $i%2 ? 'dark' : '',
+				'COMMENT_CLASS' => $canComment,
 			));
 
 			foreach($currentPost->getChildren() as $currentComment) {
@@ -239,6 +254,7 @@ class Threads {
 					'SOCIALSTREAM_COMMENT_CREATED_AT' => \Scrub::text($currentComment->getCreatedAt()->getShort()),
 					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
 					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => \Scrub::text($currentComment->getOwnerId()->getFullname()),
+					'COMMENT_CLASS' => $canComment,
 				));
 
 				foreach($currentComment->getChildren() as $currentReply) {
@@ -268,33 +284,6 @@ class Threads {
 			/* Alternating colours -_-
 			 */
 			$i++;
-		}
-
-		$page->parse('socialstream_ajax_block', 'socialstream_thread');
-
-		/* Determine whether you have access to the input form
-		 */
-		$newPost = new \SocialStream_Post_String();
-		$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
-		$authenticator = new \SocialStream\Authenticator($newPost, $this->getInstance(), $currentUser);
-
-		if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {
-			$page->setVar(array(
-				'COMMENT_CLASS' => 'hide',
-			));
-		}
-		else {
-			if ($authenticator->canCollaborate()) {
-				$page->setVar(array(
-					'COMMENT_CLASS' => 'hide',
-				));
-			}
-
-			if ($authenticator->canComment()) {
-				$page->setVar(array(
-					'COMMENT_CLASS' => '',
-				));
-			}
 		}
 
 		/* Save output for later!

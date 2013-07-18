@@ -16,7 +16,8 @@ $instanceId = intval($_GET['instanceId']);
 $start = intval($_GET['start']);
 $offset = intval($_GET['offset']);
 
-$instance = \Component_InstanceMapper::getInstance()->findById($instanceId);
+$instanceArray = \Component_InstanceMapper::getInstance()->findByInstanceId($instanceId);
+$instance = $instanceArray[$instanceId];
 
 /* Sew thread if instance exists
  */
