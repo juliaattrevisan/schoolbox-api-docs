@@ -54,7 +54,7 @@
 				$j('div.socialstream').append(responseText);
 			});
 
-			$j('.socialstream').find('.addPostLink').click(function() {
+			$j('.socialstream').find('.addPostLink').live('click', function() {
 
 				/* Clear out all instances of .addPostForm in the socialstream
 				 */
