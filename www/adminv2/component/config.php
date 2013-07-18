@@ -66,7 +66,7 @@ function readConfig($vars, SitePage $page) {
 
     $component->setup(
         array('id' => '-1', 'code' => '', 'name' => ''),
-        $component->instance->getConfigArray()
+        $component->getInstance()->getConfigArray()
     );
     $component->execute();
     $component->parseConfigForTemplate();
@@ -74,11 +74,11 @@ function readConfig($vars, SitePage $page) {
     $page->setVar(array(
         'ID'                        => $vars['cid'],
         'SITE_LOCATION'             => Cfg::get('site_location'),
-        'COMPONENT_INSTANCE_ID'     => $component->instance->id,
-        'COMPONENT_HANDLE'          => $component->instance->id,
-        'component.instance.id'     => $component->instance->id,
-        'component.definition.id'   => $component->definition->id,
-        'component.definition.name' => $component->definition->name,
+        'COMPONENT_INSTANCE_ID'     => $component->getInstance()->getId(),
+        'COMPONENT_HANDLE'          => $component->getInstance()->getId(),
+        'component.instance.id'     => $component->getInstance()->getId(),
+        'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
+        'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
     ));
 
     $page->template->pparse('CONFIGURATION', 'configTpl');
