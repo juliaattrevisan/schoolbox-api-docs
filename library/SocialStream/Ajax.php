@@ -27,29 +27,66 @@ class Ajax {
 	private $tree = null;
 
 	/**
+	 * The homepage which you are currently on
+	 * This is derived from the component instance's identifier value
+	 *
+	 * @var int
+	 */
+	private $homepageId = 0;
+
+	/**
+	 * Only fetch N posts newer than $dateThreshold
+	 *
+	 * @var int
+	 */
+	private $limit = 0;
+
+	/**
+	 * Only fetch posts newer than this date
+	 *
+	 * @var string
+	 */
+	private $dateThreshold = '0000-00-00 00:00:00';
+
+	/**
+	 * The component instance
+	 *
+	 * @var null
+	 */
+	private $instance = null;
+
+	/**
+	 * The output html structure
+	 *
+	 * @var string
+	 */
+	private $ajaxHtml = '';
+
+	/**
 	 * Constructor
 	 *
-	 * @param $homepageId
+	 * @param $instance
 	 * @param $limit
 	 * @param $dateThreshold
 	 */
-	public function __construct($homepageId, $limit, $dateThreshold) {
-		$this->init($homepageId, $limit, $dateThreshold);
+	public function __construct($instance, $limit, $dateThreshold) {
+		$this->setInstance($instance);
+		$this->setHomepageId($instance->identifier);
+		$this->setLimit($limit);
+		$this->setDateThreshold($dateThreshold);
+
+		$this->init();
 		$this->growTree();
 	}
 
 	/**
 	 * Initialise data set before growing tree
-	 *
-	 * @param $homepageId
-	 * @param $dateThreshold
-	 * @param $limit
 	 */
-	protected function init($homepageId, $limit, $dateThreshold) {
+	private function init() {
 
 		/* Get all the posts that should appear
 		 */
-		$allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($homepageId, $limit, $dateThreshold);
+		$allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($this->getHomepageId(), $this->getLimit(), $this->getDateThreshold());
 
 		$ids = array();
 
@@ -80,7 +117,7 @@ class Ajax {
 	 *
 	 * @return array
 	 */
-	public function growTree() {
+	private function growTree() {
 		$structure = array();
 		$remove = array();
 
@@ -155,6 +192,119 @@ class Ajax {
 		}
 	}
 
+	/**
+	 * Generate ajax html
+	 */
+	public function generate() {
+		$page = new \SitePage();
+
+		$i = 0;
+
+		$page->setFile('socialstream_thread', '/component/homepage/socialstreamThread.html');
+		$page->setBlock('socialstream_thread', 'socialstream_post', 'socialstream_post_block');
+		$page->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
+		$page->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
+
+		$page->setVar(array(
+			'socialstream_post_block' => '',
+			'socialstream_comment_block' => '',
+			'socialstream_reply_block' => '',
+			'has_comments_block' => '',
+		));
+
+		/* Traverse everything
+		 */
+		foreach($this->getTree() as $currentPost) {
+			$page->setVar(array(
+				'SOCIALSTREAM_POST_POST_ID' => \Scrub::text($currentPost->getPostId()),
+				'SOCIALSTREAM_POST_BODY' => \Scrub::text($currentPost->getBody()),
+				'SOCIALSTREAM_POST_CREATED_AT' => \Scrub::text($currentPost->getCreatedAt()->getShort()),
+				'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => \Scrub::text($currentPost->getOwnerId()->getExternalId()),
+				'SOCIALSTREAM_POST_USER_FULLNAME' => \Scrub::text($currentPost->getOwnerId()->getFullname()),
+				'ON_OFF' => $i%2 ? 'dark' : '',
+			));
+
+			foreach($currentPost->getChildren() as $currentComment) {
+				$page->setVar(array(
+					'SOCIALSTREAM_COMMENT_POST_ID' => \Scrub::text($currentComment->getPostId()),
+					'SOCIALSTREAM_COMMENT_BODY' => \Scrub::text($currentComment->getBody()),
+					'SOCIALSTREAM_COMMENT_CREATED_AT' => \Scrub::text($currentComment->getCreatedAt()->getShort()),
+					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
+					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => \Scrub::text($currentComment->getOwnerId()->getFullname()),
+				));
+
+				foreach($currentComment->getChildren() as $currentReply) {
+					$page->setVar(array(
+						'SOCIALSTREAM_REPLY_POST_ID' => \Scrub::text($currentReply->getPostId()),
+						'SOCIALSTREAM_REPLY_BODY' => \Scrub::text($currentReply->getBody()),
+						'SOCIALSTREAM_REPLY_CREATED_AT' => \Scrub::text($currentReply->getCreatedAt()->getShort()),
+						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => \Scrub::text($currentReply->getOwnerId()->getExternalId()),
+						'SOCIALSTREAM_REPLY_USER_FULLNAME' => \Scrub::text($currentReply->getOwnerId()->getFullname()),
+					));
+
+					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
+				}
+
+				/* Clear children after parsing out the parent
+				 */
+				$page->parse('socialstream_comment_block', 'socialstream_comment', true);
+				$page->setVar('socialstream_reply_block', '');
+			}
+
+			/* Clear children after parsing out the parent
+			 */
+			$page->parse('socialstream_post_block', 'socialstream_post', true);
+			$page->setVar('socialstream_comment_block', '');
+			$page->setVar('socialstream_reply_block', '');
+
+			/* Alternating colours -_-
+			 */
+			$i++;
+		}
+
+		$page->parse('socialstream_ajax_block', 'socialstream_thread');
+
+		/* Determine whether you have access to the input form
+		 */
+		$newPost = new \SocialStream_Post_String();
+		$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+		$authenticator = new \SocialStream\Authenticator($newPost, $this->getInstance(), $currentUser);
+
+		if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {
+			$page->setVar(array(
+				'COMMENT_CLASS' => 'hide',
+			));
+		}
+		else {
+			if ($authenticator->canCollaborate()) {
+				$page->setVar(array(
+					'COMMENT_CLASS' => 'hide',
+				));
+			}
+
+			if ($authenticator->canComment()) {
+				$page->setVar(array(
+					'COMMENT_CLASS' => '',
+				));
+			}
+		}
+
+		/* Save output for later!
+		 */
+		$this->setAjaxHtml($page->template->_varVals['socialstream_post_block']);
+
+		/* Chain it
+		 */
+		return $this;
+	}
+
+	/**
+	 * Render out a bunch of html containing each SocialStream Post
+	 */
+	public function render() {
+		return $this->getAjaxHtml();
+	}
+
 	/* Getters/Setters
 	 */
 
@@ -177,7 +327,7 @@ class Ajax {
 	 *
 	 * @param null $tree
 	 */
-	public function setTree($tree) {
+	private function setTree($tree) {
 		$this->tree = $tree;
 	}
 
@@ -186,7 +336,97 @@ class Ajax {
 	 *
 	 * @return null
 	 */
-	public function getTree() {
+	private function getTree() {
 		return $this->tree;
+	}
+
+	/**
+	 * Set date threshold
+	 *
+	 * @param $dateThreshold
+	 */
+	private function setDateThreshold($dateThreshold) {
+		$this->dateThreshold = $dateThreshold;
+	}
+
+	/**
+	 * Get date threshold
+	 *
+	 * @return string
+	 */
+	private function getDateThreshold() {
+		return $this->dateThreshold;
+	}
+
+	/**
+	 * Set homepage id
+	 *
+	 * @param $homepageId
+	 */
+	private function setHomepageId($homepageId) {
+		$this->homepageId = $homepageId;
+	}
+
+	/**
+	 * Get homepage id
+	 *
+	 * @return int
+	 */
+	private function getHomepageId() {
+		return $this->homepageId;
+	}
+
+	/**
+	 * Set limit
+	 *
+	 * @param $limit
+	 */
+	private function setLimit($limit) {
+		$this->limit = $limit;
+	}
+
+	/**
+	 * Get limit
+	 * 
+	 * @return int
+	 */
+	private function getLimit() {
+		return $this->limit;
+	}
+
+	/**
+	 * Set instance
+	 *
+	 * @param null $instance
+	 */
+	private function setInstance($instance) {
+		$this->instance = $instance;
+	}
+
+	/**
+	 * Get instance
+	 *
+	 * @return null
+	 */
+	private function getInstance() {
+		return $this->instance;
+	}
+
+	/**
+	 * Set ajax html
+	 *
+	 * @param string $ajaxHtml
+	 */
+	private function setAjaxHtml($ajaxHtml) {
+		$this->ajaxHtml = $ajaxHtml;
+	}
+
+	/**
+	 * Get ajax html
+	 *
+	 * @return string
+	 */
+	private function getAjaxHtml() {
+		return $this->ajaxHtml;
 	}
 }
