@@ -59,7 +59,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		/* Sew thread
 		 */
-		$thread = new \SocialStream\Thread($homepageId, $limit);
+		$thread = new \SocialStream\Ajax($homepageId, $limit, '2013-07-16 18:00:00');
 		$tree = $thread->getTree();
 
 		$i = 0;

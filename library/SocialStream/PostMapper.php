@@ -111,9 +111,10 @@ class PostMapper extends Schoolbox\Mapper {
 	 *
 	 * @param $homepageId
 	 * @param $limit
-	 * @return \Collection
+	 * @param $dateThreshold
+	 * @return Schoolbox\Collection
 	 */
-	public function findLatestForHomepage($homepageId, $limit) {
+	public function findLatestForHomepage($homepageId, $limit, $dateThreshold) {
 		$user_mapper = $this->getJoinMapper('user');
 
 		$query = "
@@ -125,6 +126,7 @@ class PostMapper extends Schoolbox\Mapper {
 			WHERE homepage_id = :homepageId
 			AND parent_id = 0
 			AND deleted_at IS NULL
+			AND created_at >= :dateThreshold
 			ORDER BY created_at DESC
 		";
 
@@ -137,11 +139,13 @@ class PostMapper extends Schoolbox\Mapper {
 
 			$statement = $this->database->prepare($query);
 			$statement->bindParam(":homepageId", $homepageId);
+			$statement->bindParam(":dateThreshold", $dateThreshold);
 			$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
 		}
 		else {
 			$statement = $this->database->prepare($query);
 			$statement->bindParam(":homepageId", $homepageId);
+			$statement->bindParam(":dateThreshold", $dateThreshold);
 		}
 
 		$statement->execute();
