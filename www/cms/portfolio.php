@@ -103,9 +103,11 @@ if (is_array($availablePages) && count($availablePages)) {
 	foreach ($availablePages as $currentPage) {
 		if (is_array($currentPage['componentList']) && count($currentPage['componentList'])) {
 			foreach ($currentPage['componentList'] as $currentComponent) {
-				foreach ($currentComponent->config as $currentConfig) {
-					if ($currentConfig->key == 'componentname') {
-						$componentName = $currentConfig->value;
+				/** @var Component_Instance $currentComponent */
+				foreach ($currentComponent->getConfig() as $currentConfig) {
+					/** @var Component_ConfigDefinition $currentConfig */
+					if ($currentConfig->getKey() == 'componentname') {
+						$componentName = $currentConfig->getValue();
 					}
 				}
 
@@ -115,7 +117,7 @@ if (is_array($availablePages) && count($availablePages)) {
 					'pageId' => $currentPage['page']->getPageId(),
 					'pageTitle' => $currentPage['page']->getPageTitle(),
 					'pageOwnerId' => $currentPage['page']->getUid(),
-					'componentInstanceId' => $currentComponent->id,
+					'componentInstanceId' => $currentComponent->getId(),
 					'componentName' => $componentName,
 				);
 
