@@ -6,9 +6,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
 class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
 
-    public function render(GizaUser $user) {
+    public function render(User $user) {
 
         if($_SESSION['timetable'] == 0) {
             // return an array without title set, which will prevent the article rendering
@@ -24,7 +28,7 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
             $eUser = new External_User();
             $eUser->getCurrentSemester();
 
-            $campus = $user->get('campus_id');
+            $campus = $user->getCampusCollection()->current()->getId();
 
             /*
             $dayNum = 4;
@@ -50,8 +54,8 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
             if(strtotime($c) > $now) {
 
                 $todayDef = $timetableHandler->getDayTimetable(
-                    $user->get('synergy_id'),
-                    $user->get('uid'),
+                    $user->getExternalId(),
+                    $user->getId(),
                     $campus,
                     $dayNum
                 );
@@ -65,8 +69,8 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
 
 
                 $todayDef = $timetableHandler->getDayTimetable(
-                    $user->get('synergy_id'),
-                    $user->get('uid'),
+                    $user->getExternalId(),
+                    $user->getId(),
                     $campus,
                     $dayNum
                 );
@@ -88,14 +92,25 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
             }
 
             // manipulate the datums!
-            $uMap = new GizaUser_DataMapper();
-            $cMap = new GizaCategory_DataMapper();
+	        /**
+	         * @var UserMapper $uMap
+	         * @var CategoryMapper $cMap
+	         */
+	        $uMap = UserMapper::getInstance();
+			$cMap = CategoryMapper::getInstance();
+
             foreach($ttable as &$period) {
                 if(isset($period['staffID'])) {
 
                     try {
-                        $teacher = $uMap->read(array('user.synergy_id' => $period['staffID']))->get();
-                        $period['staffName'] = $teacher->getName();
+	                    /** @var User $teacher */
+	                    $teacher = $uMap->findByColumn('synergy_id', $period['staffID'])->current();
+
+	                    if(!($teacher instanceof User)) {
+		                    throw new Exception_Schoolbox();
+	                    }
+
+                        $period['staffName'] = $teacher->formatName();
                         $period['room'] = trim($period['room']);
                     }
                     catch(Exception_Schoolbox $e) {
@@ -103,7 +118,7 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
                     }
 
                     try {
-                        $period['catID'] = $cMap->read(array('categoryCode.code' => $period['code']))->get('id');
+                        $period['catID'] = $cMap->findOneByColumn('code', $period['code'])->getId();
                     }
                     catch (Exception_Schoolbox $e) {
                         $cell['err'][] = 'Failed to read category details';

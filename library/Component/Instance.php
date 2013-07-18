@@ -14,7 +14,10 @@ class Component_Instance extends Model {
 
     public $definitionId;
 
-    public $definition;
+	/**
+	 * @var Component_Definition
+	 */
+	public $definition;
 
     public $module;
 

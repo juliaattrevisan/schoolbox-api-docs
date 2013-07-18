@@ -6,6 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\User;
+
 class Facade_Component_SubjectDueWork extends Facade_Component_Generic {
 
     /**
@@ -13,14 +15,14 @@ class Facade_Component_SubjectDueWork extends Facade_Component_Generic {
      * @param User $user
      * @return array
      */
-    public function render(GizaUser $user, $catID = 0) {
+    public function render(User $user, $catID = 0) {
 
         // GENERATE UPCOMING WORK
         $subHandler = new Submission();
         $work = array();
         $now = time();
 
-        $uid = $user->get('uid');
+        $uid = $user->getId();
 
         $upcoming = $subHandler->getUpcomingWorkAndAssessmentsByCategory($uid, $catID);
 

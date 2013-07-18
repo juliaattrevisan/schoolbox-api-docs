@@ -6,14 +6,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\User;
+
 class Facade_Component_SchoolNews extends Facade_Component_Generic {
 
-    public function render(GizaUser $user) {
+    public function render(User $user) {
 
         $limit = 3;
 
-        $newsHandler = new News();
-        $userHandler = new User();
+        $newsHandler = new \News();
+        $userHandler = new \User();
 
         $topics = $newsHandler->getTopicList();
 

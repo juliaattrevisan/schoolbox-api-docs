@@ -6,6 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\User;
+
 class Facade_Component_YourNews extends Facade_Component_Generic {
 
     /**
@@ -13,7 +15,7 @@ class Facade_Component_YourNews extends Facade_Component_Generic {
      * @param User $user
      * @return array
      */
-    public function render(GizaUser $user) {
+    public function render(User $user) {
 
         $limit = 3;
 

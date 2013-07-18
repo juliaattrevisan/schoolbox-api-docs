@@ -6,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
+
 class DueWork_SubmissionBox_API {
 
     public function Display($dueWorkID) {
@@ -27,12 +30,39 @@ class DueWork_SubmissionBox_API {
             return $response;
         }
 
-        $cMap = new GizaCategory_DataMapper();
-        $cat = $cMap->read($box['category']);
+	    /**
+	     * @var $cMap CategoryMapper
+	     * @var Category $cat
+	     */
+	    $cMap = CategoryMapper::getInstance();
+        $cat = $cMap->findById($box['category']);
+
+		// find out who teaches this subject (if it is, in fact, a subject)
+		$teachers = array();
+	    $userHandler = new User();
+	    $groupHandler = new Group();
+
+	    if ($cat->getCodes()->count() && Cfg::get('external_enable')) {
+
+		    $externalClassHandler = new External_Class();
+		    $listSyns = $externalClassHandler->getTeacherName($cat->getCodes()->current()->getCode());
+		    $staffGroups = $groupHandler->getStaffGroupTypeIds();
+
+		    if (is_array($listSyns)) {
+			    foreach($listSyns as $synid) {
+				    $teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
+				    $meta = $userHandler->getByID($teacher['uid']);
+				    if (is_array($teacher)) {
+					    $teachers[] = $userHandler->formatName($meta);
+				    }
+			    }
+		    }
+
+	    }
 
         $catDetailsContent = array(
-            'subject' => $cat->get(),
-            'teacher' => $cat->get('teacher')->asArray(),
+            'subject' => $cat,
+            'teacher' => $teachers,
         );
 
         if($box['fid']) {
@@ -75,7 +105,7 @@ class DueWork_SubmissionBox_API {
 
         $auth = new Authenticator();
 
-        $allWork = $boxHandler->getSubmissionHistory($auth->getSessionUser()->get('uid'), $dueWorkID);
+        $allWork = $boxHandler->getSubmissionHistory($auth->getSessionUser()->getId(), $dueWorkID);
 
         $historyContent = array();
 

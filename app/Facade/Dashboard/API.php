@@ -16,8 +16,10 @@ class Facade_Dashboard_API extends Generic_API {
 
         // 2n is better than n^2, so iterate across the dash and index by controller name
         $componentry = array();
-        foreach($user->get('group')->get()->get('dashboard') as $comp) {
-            $componentry[$comp->get('controller')] = $comp;
+	    $dashFactory = new Component_Dashboard_Factory(new User(), new SitePage(false));
+	    $userComponents = $dashFactory->buildComponentList($user->getRole()->getId());
+        foreach($userComponents as $comp) {
+            $componentry[get_class($comp)] = $comp;
         }
 
         if($component == 'all') {
@@ -59,7 +61,7 @@ class Facade_Dashboard_API extends Generic_API {
         $className = "Facade_Component_$component";
         if(class_exists($className)) {
             $instance = new $className();
-            if(is_a($instance, 'Facade_Component_Generic')) {
+            if($instance instanceof Facade_Component_Generic) {
                return $instance->render($user);
             }
             else {

@@ -6,6 +6,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\External\SubjectMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
 class Authenticator {
 
     private $authenticated = false;
@@ -66,26 +70,31 @@ class Authenticator {
 
     public function appendSession($username) {
         //
-        // Mobile not enabled? That means GizaUser_DataMapper doesn't exist.
-        // That's not an issue if mobile doesn't exist, so return true.
+        // Mobile not enabled? Just pretend we added the mobile portion of the session.
         if (!Cfg::get('mobile_enabled')) {
             return true;
         }
 
-        //
-        // Avoid SQL injection weakness in Giza mapper by getting ID of user
-        // (always an int) and querying Giza on that.
-        // Not a long term fix of course, but should result in less backward
-        // compatibility issues than changing the old mapper.
-        $uid  = Schoolbox\UserMapper::getInstance()->getIdForUsername($username);
-        if (!$uid) {
-            return false;
-        }
-        $uMap = new GizaUser_DataMapper();
-        $user = $uMap->read(array('user.id' => $uid))->get();
+	    /**
+	     *
+	     * @var UserMapper $userMapper
+	     */
+	    $userMapper = UserMapper::getInstance();
 
-        if(count($user)) {
-            $this->setSessionUser($user);
+	    $user = $userMapper->findByColumn('username', $username)->current();
+
+        if($user instanceof User) {
+
+	        // yep, you ACTUALLY have to do this otherwise hydrations don't get done
+	        $user = $userMapper->findById($user->getId());
+
+	        /**
+	         * Map subjects onto the user object retrieved, and dump into session
+	         * @var SubjectMapper $subjectMapper
+	         */
+	        $subjectMapper = SubjectMapper::getInstance();
+	        $user->setSubjectCollection($subjectMapper->findAllForStudent($user));
+	        $this->setSessionUser($user);
 
             // indicate that session creation was successful
             return true;
@@ -122,7 +131,7 @@ class Authenticator {
      */
 
     /**
-     * @param GizaUser $user
+     * @param User $user
      */
     public function setSessionUser($user) {
         // $_SESSION['user'] = $user->get('uid');
@@ -132,7 +141,7 @@ class Authenticator {
     }
 
     /**
-     * @return GizaUser
+     * @return User
      */
     public function getSessionUser() {
         // $uMap = new GizaUser_DataMapper();

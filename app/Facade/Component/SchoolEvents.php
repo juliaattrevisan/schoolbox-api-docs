@@ -6,15 +6,17 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\User;
+
 class Facade_Component_SchoolEvents extends Facade_Component_Generic {
 
 	/**
 	 * This should return an array of [title, aside, content]
 	 *
-	 * @param GizaUser $user
+	 * @param User $user
 	 * @return array
 	 */
-	public function render(GizaUser $user) {
+	public function render(User $user) {
 
         $calFactory = new Calendar_Api_Factory();
         $calendarHandler = $calFactory->produce();
