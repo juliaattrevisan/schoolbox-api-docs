@@ -229,7 +229,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 			");
 		}
 
-		$statement->bindParam(':externalUserId', $dayNumber);
+		$statement->bindParam(':externalUserId', $externalUserId);
 		$statement->bindParam(':dayNumber', $dayNumber, PDO::PARAM_INT);
 		$statement->execute();
 
