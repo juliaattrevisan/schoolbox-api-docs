@@ -114,10 +114,11 @@ class Authenticator {
 
 	/**
 	 * Determine whether $currentUser can comment on $instance
+	 * This is used when processing a form submission
 	 *
 	 * @return bool
 	 */
-	public function canComment() {
+	public function canAddComment() {
 		if ($this->getPermission() >= WRITE_ACCESS) {
 			return true;
 		}
@@ -129,6 +130,26 @@ class Authenticator {
 						return true;
 					}
 				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine whether $currentUser can comment on $instance
+	 * This is used when determining if the comment form is available
+	 *
+	 * @return bool
+	 */
+	public function canComment() {
+		if ($this->getPermission() >= WRITE_ACCESS) {
+			return true;
+		}
+
+		if ($this->findConfigValue('commentsAllowed')) {
+			if ($this->getPermission() >= READ_ACCESS) {
+				return true;
 			}
 		}
 

@@ -36,7 +36,15 @@
 		.socialstream li.socialstream-reply div.body {
 			/*border: 1px solid #00f;*/
 		}
+
+		.socialstream .addPostLink {
+			border-left: 1px solid #aaa;
+			padding-left: 6px;
+			margin-left: 4px;
+		}
 	</style>
+
+	<!-- BEGIN has_comments -->
 	<script type='text/javascript'>
 		$j(function() {
 			$j('.socialstream').find('.addPostLink').click(function() {
@@ -64,10 +72,12 @@
 			});
 		});
 	</script>
+	<!-- END has_comments -->
+
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<div>
+	<div class='{FORM_CLASS}'>
 		<form action='/socialstream/modifyForm.php' method='post' id='originalAddPostForm' class='addPostForm'>
 			<input type='hidden' name='type' value='string' />
 			<input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
@@ -91,8 +101,8 @@
 					<p>
 						<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
 						{SOCIALSTREAM_POST_BODY}<br />
-						<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span> |
-						<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a>
+						<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span>
+						<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a>
 					</p>
 				</div>
 				<div class='clearfix'></div>
@@ -106,8 +116,8 @@
 							<p>
 								<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
 								{SOCIALSTREAM_COMMENT_BODY}<br />
-								<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span> |
-								<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a>
+								<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
+								<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a>
 							</p>
 						</div>
 						<div class='clearfix'></div>

@@ -31,6 +31,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		$this->parseConfig();
 
+		$this->setBlock($templateHandle, 'has_comments', 'has_comments_block');
 		$this->setBlock($templateHandle, 'socialstream_post', 'socialstream_post_block');
 		$this->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
 		$this->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
@@ -39,6 +40,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 			'socialstream_post_block' => '',
 			'socialstream_comment_block' => '',
 			'socialstream_reply_block' => '',
+			'has_comments_block' => '',
 		));
 
 		/* Assign homepage id and settings
@@ -122,6 +124,41 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 			/* Alternating colours -_-
 			 */
 			$i++;
+		}
+
+		/* Determine whether you have access to the input form
+		 */
+		$newPost = new \SocialStream_Post_String();
+		$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+		$authenticator = new \SocialStream\Authenticator($newPost, $this->instance, $currentUser);
+
+		/* If you can neither comment nor collaborate, hide the form
+		 * and disable javascript and hide links
+		 */
+		if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {
+			$this->setVar(array(
+				'FORM_CLASS' => 'hide',
+				'COMMENT_CLASS' => 'hide',
+				'has_comments_block' => '',
+			));
+		}
+		else {
+			if ($authenticator->canCollaborate()) {
+				$this->setVar(array(
+					'FORM_CLASS' => '',
+					'COMMENT_CLASS' => 'hide',
+					'has_comments_block' => '',
+				));
+			}
+
+			if ($authenticator->canComment()) {
+				$this->setVar(array(
+					'FORM_CLASS' => '',
+					'COMMENT_CLASS' => '',
+				));
+
+				$this->parse('has_comments_block', 'has_comments');
+			}
 		}
 
 		return true;

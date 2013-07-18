@@ -47,7 +47,7 @@ $authenticator = new Authenticator($newPost, $instance, $currentUser);
 
 /* Find out if you can collaborate on this
 */
-if ($authenticator->canCollaborate() || $authenticator->canComment()) {
+if ($authenticator->canCollaborate() || $authenticator->canAddComment()) {
 	$mapper = new PostMapper();
 	$mapper->save($newPost);
 
