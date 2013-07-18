@@ -60,8 +60,8 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 	 * Get all the showcased submission boxes for a particular user,
 	 * ordered alphabetically by their parent category name
 	 *
-	 * @param $userId
-	 * @return bool|\Model
+	 * @param  $userId
+	 * @return Schoolbox\Collection
 	 */
 	public function getShowcasedSubmissionBoxes($userId) {
 		$statement = $this->database->prepare("
@@ -89,7 +89,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 	 *
 	 * @param $userId
 	 * @param int $limit
-	 * @return bool|\Model
+	 * @return Schoolbox\Collection
 	 */
 	public function getRecentShowcasedSubmissionBoxes($userId, $limit = 5) {
 		$statement = $this->database->prepare("

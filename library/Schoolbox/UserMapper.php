@@ -203,7 +203,7 @@ class UserMapper extends Mapper {
 	 *
 	 * @param $name
 	 * @param $permittedValues
-	 * @return bool|\Model
+	 * @return Schoolbox\Collection
 	 */
 	public function findByNameAndGroup($name, $permittedValues) {
 		$collection = new Schoolbox\Collection();
