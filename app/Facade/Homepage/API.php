@@ -180,10 +180,6 @@ class Facade_Homepage_API extends Generic_API {
                 return array('Error', array('Bad component definitions.'));
             }
 
-            // if the category is still wrapped in a collection, extract it
-            if ($cat instanceof Schoolbox\Collection) {
-                $cat = $cat->first();
-            }
             $codes    = $cat->getCodes();
             $catTitle = $cat->getName() . ($codes->count() ? " ({$codes->first()->getCode()})" : '');
 
