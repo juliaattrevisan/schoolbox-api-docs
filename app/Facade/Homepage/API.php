@@ -69,9 +69,11 @@ class Facade_Homepage_API extends Generic_API {
              * @var Schoolbox\Collection $page
              */
             list($user, $cat, $page) = $this->getHomepage($categoryID);
-            $method = sprintf("Component_Homepage_%sController", $method);
-            foreach($page->get('components') as $comp) {
-                if($comp->get('controller') == $method) {
+            $articles = array();
+            $method   = sprintf("Component_Homepage_%sController", $method);
+            foreach ($page as $comp) {
+                /** @var Component_ControllerAbstract $comp */
+                if (get_class($comp) == $method) {
                     list($catTitle, $articles) = $this->renderComponents($user, $cat, array($comp));
                 }
             }
