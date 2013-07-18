@@ -209,7 +209,7 @@ class Threads {
 		 */
 		$newPost = new \SocialStream_Post_String();
 		$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
-		$authenticator = new \SocialStream\Authenticator($newPost, $this->getInstance(), $currentUser);
+		$authenticator = new Authenticator($newPost, $this->getInstance(), $currentUser);
 
 		if ($authenticator->canComment()) {
 			$canComment = '';
