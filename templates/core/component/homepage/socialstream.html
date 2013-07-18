@@ -52,6 +52,9 @@
 			 */
 			$j.get('/socialstream/threads.php?instanceId={COMPONENT_INSTANCE_ID}&limit={SOCIALSTREAM_AJAX_LIMIT}', function(responseText) {
 				$j('div.socialstream').append(responseText);
+
+				/* Find the latest timestamp
+				 */
 			});
 
 			$j('.socialstream').find('.addPostLink').live('click', function() {
