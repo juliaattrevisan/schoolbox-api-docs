@@ -9,7 +9,7 @@
  * 
  */
 
-class Plagscan_Document extends Model {
+class Plagscan_Document {
 	const STATUS_QUEUED = 1;
 
 	const STATUS_PROCESSING = 2;

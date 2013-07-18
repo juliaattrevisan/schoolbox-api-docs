@@ -9,7 +9,7 @@
  * 
  */
 
-class Component_Definition extends Model {
+class Component_Definition {
 	/**
 	 * @var int
 	 */

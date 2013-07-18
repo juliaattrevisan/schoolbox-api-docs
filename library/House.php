@@ -1,6 +1,6 @@
 <?php
  
-class House extends Model {
+class House {
 
     protected $id;
 

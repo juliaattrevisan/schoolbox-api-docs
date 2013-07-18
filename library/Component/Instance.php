@@ -9,7 +9,7 @@
  * 
  */
 
-class Component_Instance extends Model {
+class Component_Instance {
 	/**
 	 * @var int
 	 */

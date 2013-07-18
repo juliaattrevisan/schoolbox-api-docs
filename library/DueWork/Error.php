@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class DueWork_Error extends Model {
+class DueWork_Error {
 
 	/**
 	 * @var int

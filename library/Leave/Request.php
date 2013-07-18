@@ -1,6 +1,6 @@
 <?php
 
-class Leave_Request extends Model {
+class Leave_Request {
 
     /* Host types and their presentation labels.
       */

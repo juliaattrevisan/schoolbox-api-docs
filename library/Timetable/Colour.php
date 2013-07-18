@@ -8,7 +8,7 @@
  * @copyright   2012 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  */
-class Timetable_Colour extends Model {
+class Timetable_Colour {
 	/**
 	 * @var int
 	 */
