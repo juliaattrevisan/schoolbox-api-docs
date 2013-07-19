@@ -150,7 +150,7 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 
 	if($includeImageControllers) {
 		$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_ImageListController')->first();
-		$availablePages = array_unique(array_merge($availablePages, $eMap->findAvailablePages($userId, $componentDefinition)));
+		$availablePages = array_merge($availablePages, $eMap->findAvailablePages($userId, $componentDefinition));
 	}
 
 	/* Manufacture the necessary info
@@ -159,6 +159,10 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 		$allPageData = array();
 
 		foreach ($availablePages as $currentPage) {
+			// check we haven't already seen this page
+			if(array_key_exists($currentPage['page']->getPageId(), $allPageData)) {
+				continue;
+			}
 			if (is_array($currentPage['componentList']) && count($currentPage['componentList'])) {
 				/* Each link only needs to know this
 				 */
@@ -168,7 +172,7 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 					'pageOwnerId' => $currentPage['page']->getUid(),
 				);
 
-				$allPageData[] = $pageData;
+				$allPageData[$pageData['pageId']] = $pageData;
 			}
 		}
 
