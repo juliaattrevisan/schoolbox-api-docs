@@ -145,11 +145,11 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 	/* Get a list of pages with the File List component in it
 	 * and offer these as places to which you can publish.
 	 */
-	$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_FileListController')->current();
+	$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_FileListController')->first();
 	$availablePages = $eMap->findAvailablePages($userId, $componentDefinition);
 
 	if($includeImageControllers) {
-		$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_ImageListController')->current();
+		$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_ImageListController')->first();
 		$availablePages = array_unique(array_merge($availablePages, $eMap->findAvailablePages($userId, $componentDefinition)));
 	}
 
