@@ -104,7 +104,7 @@ class MyFolder extends DeprecatedModel {
 	}
 
 	function create ($data) {
-		$data['owner'] = $_SESSION['id'];
+		$data['owner'] = $this->owner;
 		$folderID = parent::create($data);
 
 		$this->logAction($folderID, "create");
