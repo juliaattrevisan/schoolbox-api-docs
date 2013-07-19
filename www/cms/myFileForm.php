@@ -46,19 +46,16 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
 		foreach($_POST['published'] as $ownerId => $pageIds) {
 			if (is_array($pageIds) && count($pageIds)) {
-				foreach($pageIds as $currentPageId => $componentInstanceIds) {
+				foreach($pageIds as $currentPageId) {
 					$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $currentPageId);
+					if ($authenticator->canModify()) {
+						$publishedFile = new \Component\Eportfolio\FileList();
+						$publishedFile->setPageId($currentPageId);
+						$publishedFile->setFileId($fileID);
+						$publishedFile->setCreatedAt($now);
+						$publishedFile->setUpdatedAt($now);
 
-					if (is_array($componentInstanceIds) && count($componentInstanceIds) && $authenticator->canModify()) {
-						foreach($componentInstanceIds as $currentComponentInstanceId => $value) {
-							$publishedFile = new \Component\Eportfolio\FileList();
-							$publishedFile->setPageId($currentPageId);
-							$publishedFile->setFileId($fileID);
-							$publishedFile->setCreatedAt($now);
-							$publishedFile->setUpdatedAt($now);
-
-							\Component\Eportfolio\FileListMapper::getInstance()->save($publishedFile);
-						}
+						\Component\Eportfolio\FileListMapper::getInstance()->save($publishedFile);
 					}
 				}
 			}

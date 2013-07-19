@@ -55,7 +55,7 @@ if($this->arg[0] == 'new') {
 
 	$folderTree = $folderHandler->getFolderTree();
 	renderTreeSelect($this, $folderTree, $parent['id']);
-	renderPublishingOptions($this, $userId, false, $publishComponent);
+	renderPublishingOptions($this, $userId, true, $publishComponent);
 }
 
 // modify an existing file
@@ -82,7 +82,7 @@ elseif(is_numeric($this->arg[0])) {
 
 	$folderTree = $folderHandler->getFolderTree();
 	renderTreeSelect($this, $folderTree, $file['parent']);
-	renderPublishingOptions($this, $userId, $ft->isImage());
+	renderPublishingOptions($this, $userId, true);
 
 }
 
@@ -150,7 +150,7 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 
 	if($includeImageControllers) {
 		$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_ImageListController')->current();
-		$availablePages = array_merge($availablePages, $eMap->findAvailablePages($userId, $componentDefinition));
+		$availablePages = array_unique(array_merge($availablePages, $eMap->findAvailablePages($userId, $componentDefinition)));
 	}
 
 	/* Manufacture the necessary info
@@ -160,27 +160,15 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 
 		foreach ($availablePages as $currentPage) {
 			if (is_array($currentPage['componentList']) && count($currentPage['componentList'])) {
-				foreach ($currentPage['componentList'] as $currentComponent) {
-					/** @var Component_Instance $currentComponent */
-					foreach ($currentComponent->getConfig() as $currentConfig) {
-						/** @var Component_ConfigDefinition $currentConfig */
-						if ($currentConfig->getKey() == 'componentname') {
-							$componentName = $currentConfig->getValue();
-						}
-					}
+				/* Each link only needs to know this
+				 */
+				$pageData = array(
+					'pageId' => $currentPage['page']->getPageId(),
+					'pageTitle' => $currentPage['page']->getPageTitle(),
+					'pageOwnerId' => $currentPage['page']->getUid(),
+				);
 
-					/* Each link only needs to know this
-					 */
-					$pageData = array(
-						'pageId' => $currentPage['page']->getPageId(),
-						'pageTitle' => $currentPage['page']->getPageTitle(),
-						'pageOwnerId' => $currentPage['page']->getUid(),
-						'componentInstanceId' => $currentComponent->getId(),
-						'componentName' => $componentName,
-					);
-
-					$allPageData[] = $pageData;
-				}
+				$allPageData[] = $pageData;
 			}
 		}
 
