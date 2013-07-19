@@ -85,7 +85,7 @@ class StudentReportCard {
 		$displayClassAverage        = \Cfg::get('display_grade_average') ? true : false;
 
 		// are parents barred from this page?
-		$restrictStudentSubmissions = \Cfg::get('restrict_student_submissions') == "true" ? true : false;
+		$restrictStudentSubmissions = \Cfg::get('restrict_student_submissions') ? true : false;
 
 		// is the grade average allowed to be shown?
 		$showOverallGrade           = \Cfg::get('show_overall_grade') ? true : false;
