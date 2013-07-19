@@ -395,7 +395,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 			NULL                  AS "StudentContactSpouseTitle",
 			p.SPOUSE_FULL_NAME    AS "StudentContactSpousePreferred",
 			NULL                  AS "StudentContactSpouseSurname",
-			NULL                  AS "StudentContactSpouseDefaultEmail",
+			p.SPOUSE_EMAIL        AS "StudentContactSpouseDefaultEmail",
 			s.YEAR_LEVEL          AS "StudentYearLevel",
 			s.STUDENT_NUMBER      AS "StudentID"
             FROM db2inst1.schoolbox_parents AS p
