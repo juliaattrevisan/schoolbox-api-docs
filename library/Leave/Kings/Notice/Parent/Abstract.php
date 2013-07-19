@@ -63,7 +63,9 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 	 * Send a notification to all parents of the child
 	 */
 	public function send() {
-		$allEmails = $this->getExternalUser()->getParentEmails($this->getRequest()->getUser()->getSynergyId());
+		$allEmails = $this->getExternalUser()->getParentEmails(
+			array($this->getRequest()->getUser()->getSynergyId())
+		);
 
 		if (is_array($allEmails) && count($allEmails)) {
 			foreach($allEmails as $currentEmail) {
