@@ -138,9 +138,20 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 	/**
 	 * @var PageMapper $eMap
 	 * @var Component_DefinitionMapper $cMap
+	 * @var Component_InstanceMapper $iMap
 	 */
 	$eMap = PageMapper::getInstance();
 	$cMap = Component_DefinitionMapper::getInstance();
+	$iMap = Component_InstanceMapper::getInstance();
+
+	// if $publishComponent is set, use it to find the page associated with it
+	if($publishComponent) {
+		$component = $iMap->findById($publishComponent);
+		$targetPageId = $component instanceof Component_Instance ? $component->getIdentifier() : false;
+	}
+	else {
+		$targetPageId = false;
+	}
 
 	/* Get a list of pages with the File List component in it
 	 * and offer these as places to which you can publish.
@@ -178,7 +189,7 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 
 		if (is_array($allPageData) && count($allPageData)) {
 			foreach($allPageData as $currentPageData) {
-				$selected = $currentPageData['componentInstanceId'] == $publishComponent;
+				$selected = $currentPageData['pageId'] == $targetPageId;
 				$page->setVar(array(
 					'PUBLISHED' => $selected ? 'checked="checked"' : '',
 					'PUBLISH_PAGE_PAGE_ID' => $currentPageData['pageId'],
