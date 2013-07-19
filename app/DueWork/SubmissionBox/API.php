@@ -45,7 +45,7 @@ class DueWork_SubmissionBox_API {
 	    if ($cat->getCodes()->count() && Cfg::get('external_enable')) {
 
 		    $externalClassHandler = new External_Class();
-		    $listSyns = $externalClassHandler->getTeacherName($cat->getCodes()->current()->getCode());
+		    $listSyns = $externalClassHandler->getTeacherName($cat->getCodes()->first()->getCode());
 		    $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
 		    if (is_array($listSyns)) {

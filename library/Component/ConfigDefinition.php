@@ -8,17 +8,141 @@
  * @version     SVN: $Id$
  * 
  */
- 
-class Component_ConfigDefinition extends Model {
 
-    public $id;
+class Component_ConfigDefinition {
 
-    public $definitionId;
+	/**
+	 * @var int
+	 */
+	protected $id;
 
-    public $key;
+	/**
+	 * @var int
+	 */
+	protected $definitionId;
 
-    public $defaultValue;
+	/**
+	 * @var string
+	 */
+	protected $key;
 
-    public $label;
+	/**
+	 * @var string
+	 */
+	protected $defaultValue;
+
+	/**
+	 * @var string
+	 */
+	protected $label;
+
+	/**
+	 * Current value of this config setting.
+	 *
+	 * @var string
+	 */
+	protected $value;
+
+	/**
+	 * @param  string $defaultValue
+	 *
+	 * @return $this
+	 */
+	public function setDefaultValue($defaultValue) {
+		$this->defaultValue = $defaultValue;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDefaultValue() {
+		return $this->defaultValue;
+	}
+
+	/**
+	 * @param  int $definitionId
+	 *
+	 * @return $this
+	 */
+	public function setDefinitionId($definitionId) {
+		$this->definitionId = $definitionId;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getDefinitionId() {
+		return $this->definitionId;
+	}
+
+	/**
+	 * @param  int $id
+	 *
+	 * @return $this
+	 */
+	public function setId($id) {
+		$this->id = $id;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getId() {
+		return $this->id;
+	}
+
+	/**
+	 * @param  string $key
+	 *
+	 * @return $this
+	 */
+	public function setKey($key) {
+		$this->key = $key;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getKey() {
+		return $this->key;
+	}
+
+	/**
+	 * @param  string $label
+	 *
+	 * @return $this
+	 */
+	public function setLabel($label) {
+		$this->label = $label;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLabel() {
+		return $this->label;
+	}
+
+	/**
+	 * @param  string $value
+	 *
+	 * @return $this
+	 */
+	public function setValue($value) {
+		$this->value = $value;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getValue() {
+		return $this->value;
+	}
 
 }

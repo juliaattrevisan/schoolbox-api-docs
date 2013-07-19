@@ -26,7 +26,7 @@ if ($authenticator->canModify()) {
 	/* Update existing textbox
 	 */
 	if ($textboxCollection->count()) {
-		$textboxItem = $textboxCollection->current();
+		$textboxItem = $textboxCollection->first();
 		$textboxItem->setContent($content);
 		$textboxItem->setSequence(1);
 

@@ -1,6 +1,6 @@
 <?php
 
-class Leave_Request extends Model {
+class Leave_Request {
 
     /* Host types and their presentation labels.
       */
@@ -27,25 +27,25 @@ class Leave_Request extends Model {
     const STATUS_REJECTED = 3;
     const STATUS_DELETED = 4;
 
-    /* These really shouldn't be public.
+    /* These really shouldn't be public - and now they aren't, rejoice!
       */
-    public $id;
-    public $userId;
-    public $user;
-    public $start;
-    public $finish;
-    public $hostType;
-    public $hostName;
-    public $hostPhone;
-    public $userPhone;
-    public $description;
-    public $created;
-    public $status;
-    public $authorisationDatetime;
-    public $authorisationUserId;
-    public $authorisationUser;
-    public $notes;
-    public $confirmedBy;
+    protected $id;
+    protected $userId;
+    protected $user;
+    protected $start;
+    protected $finish;
+    protected $hostType;
+    protected $hostName;
+    protected $hostPhone;
+    protected $userPhone;
+    protected $description;
+    protected $created;
+    protected $status;
+    protected $authorisationDatetime;
+    protected $authorisationUserId;
+    protected $authorisationUser;
+    protected $notes;
+    protected $confirmedBy;
 
     /**
      * @param $created
@@ -324,7 +324,7 @@ class Leave_Request extends Model {
     /**
      * Set user
      *
-     * @param User $user
+     * @param \Schoolbox\User $user
      *
      * @return void
      */
@@ -335,7 +335,7 @@ class Leave_Request extends Model {
     /**
      * Get user
      *
-     * @return User
+     * @return \Schoolbox\User
      */
     public function getUser() {
         return $this->user;
@@ -368,7 +368,7 @@ class Leave_Request extends Model {
     /**
      * Set authorisation user
      *
-     * @param $authorisationUser
+     * @param Schoolbox\User $authorisationUser
      */
     public function setAuthorisationUser($authorisationUser) {
         $this->authorisationUser = $authorisationUser;
@@ -377,7 +377,7 @@ class Leave_Request extends Model {
     /**
      * Get authorisation user
      *
-     * @return mixed
+     * @return Schoolbox\User
      */
     public function getAuthorisationUser() {
         return $this->authorisationUser;

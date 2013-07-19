@@ -61,7 +61,7 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 
 		$mapper = new \Component\Eportfolio\FileListMapper();
 
-		$allImages = $mapper->findAllImagesByPage($this->instance->identifier);
+		$allImages = $mapper->findAllImagesByPage($this->getInstance()->getIdentifier());
 
 		if ($allImages->count()) {
 			foreach($allImages as $currentImage) {

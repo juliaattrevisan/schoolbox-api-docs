@@ -40,7 +40,7 @@ class Eportfolio {
 	 * An instance of Eportfolio_Page
 	 * This is the page currently being viewed
 	 *
-	 * @var array
+	 * @var \Eportfolio\Page
 	 */
 	private $pageInstance = null;
 
@@ -273,10 +273,10 @@ class Eportfolio {
 		/* Retrieve template data
 		 */
 		$query = "
-            SELECT id AS template, left_column_width, right_column_width
-            FROM {$this->getContext()}Template
-            WHERE id = '{$templateID}'
-        ";
+			SELECT id AS template, left_column_width, right_column_width
+			FROM {$this->getContext()}Template
+			WHERE id = '{$templateID}'
+		";
 
 		$tpl = $this->db->getRow($query);
 
@@ -318,30 +318,33 @@ class Eportfolio {
 		$ccm = Component_ConfigMapper::getInstance();
 		$instances = $cim->findByContext($this->getContext() . '_template', $templateID);
 
-		if(count($instances)) {
-			foreach($instances as $inst) {
+		if (count($instances)) {
+			foreach ($instances as $inst) {
+				/* @var $inst Component_Instance */
 				// preserve the config
-				$configs = $inst->config;
+				$configs = $inst->getConfig();
 
 				/* unset($inst->id);
 				 * This throws notices in provisioning because $inst->id is expected to exist
 				 * but here, has been unset.
 				 */
-				$inst->id = null;
-				unset($inst->config);
+				$inst->setId(null);
+				$inst->getConfig();
 
-				$inst->module = $this->getContext();
-				$inst->identifier = $this->getPageId();
+				$inst->setModule($this->getContext());
+				$inst->setIdentifier($this->getPageId());
 				$ids = $cim->save($inst);
 				$id = $ids[0];
 
 				if(count($configs)) {
 					foreach($configs as $c) {
-						if($c->id) {
+						/* @var $c Component_Config */
+						if($c->getId()) {
 							$conf = new Component_Config();
-							$conf->instanceId = $id;
-							$conf->value = $c->value;
-							$conf->configDefinitionId = $c->id;
+							$conf
+								->setInstanceId($id)
+								->setValue($c->getValue())
+								->setConfigDefinitionId($c->getId());
 							$ccm->save($conf);
 						}
 					}
@@ -367,9 +370,10 @@ class Eportfolio {
 
 		if ($allComponents->count()) {
 			foreach ($allComponents as $currentComponent) {
+				/* @var $currentComponent Component_Instance */
 				/* Remember this id so we can get their configs again later
 				 */
-				$allInstanceIds[] = $currentComponent->id;
+				$allInstanceIds[] = $currentComponent->getId();
 
 				Component_InstanceMapper::getInstance()->delete($currentComponent);
 			}
@@ -529,7 +533,7 @@ class Eportfolio {
 	/**
 	 * Set page instance
 	 *
-	 * @param $pageInstance
+	 * @param \Eportfolio\Page $pageInstance
 	 */
 	private function setPageInstance($pageInstance) {
 		$this->pageInstance = $pageInstance;
@@ -538,7 +542,7 @@ class Eportfolio {
 	/**
 	 * Get page instance
 	 *
-	 * @return array
+	 * @return \Eportfolio\Page
 	 */
 	private function getPageInstance() {
 		return $this->pageInstance;
@@ -570,7 +574,7 @@ class Eportfolio {
 
 
 
-	
+
 
 
 

@@ -67,7 +67,7 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 
 		/* Gather everything
 		 */
-		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
+		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->getInstance()->getId());
 
 		if ($allItems->count()) {
 			$j = 0;

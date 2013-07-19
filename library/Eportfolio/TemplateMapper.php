@@ -71,16 +71,17 @@ class TemplateMapper extends Schoolbox\Mapper {
 				/* Process each component if the template saved correctly
 				 */
 				foreach($currentTemplate['components'] as $currentComponent) {
-					$componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn('class', $currentComponent['class']);
-
+					$componentDefinition   = \Component_DefinitionMapper::getInstance()->findByColumn('class', $currentComponent['class']);
+					$componentDefinitionId = $componentDefinition->first()->getId();
 					/* Spawn a component instance for the template
 					 */
 					$componentInstance = new \Component_Instance();
-					$componentInstance->definitionId = $componentDefinition->current()->id;
-					$componentInstance->module = 'eportfolio_template';
-					$componentInstance->identifier = $templateId;
-					$componentInstance->position = $currentComponent['keys']['position'];
-					$componentInstance->sequence = $currentComponent['keys']['sequence'];
+					$componentInstance
+						->setDefinitionId($componentDefinitionId)
+						->setModule('eportfolio_template')
+						->setIdentifier($templateId)
+						->setPosition($currentComponent['keys']['position'])
+						->setSequence($currentComponent['keys']['sequence']);
 
 					$instanceIds = \Component_InstanceMapper::getInstance()->save($componentInstance);
 
@@ -91,7 +92,7 @@ class TemplateMapper extends Schoolbox\Mapper {
 
 						foreach($currentComponent['keys'] as $currentKey => $currentValue) {
 							$componentConfigDefinition = \Component_ConfigDefinitionMapper::getInstance()->findByColumnList(array(
-								'component_definition_id' => $componentDefinition->current()->id,
+								'component_definition_id' => $componentDefinitionId,
 								'key' => $currentKey,
 							));
 
@@ -99,9 +100,10 @@ class TemplateMapper extends Schoolbox\Mapper {
 							 */
 							if ($componentConfigDefinition->count()) {
 								$componentConfigInstance = new \Component_Config();
-								$componentConfigInstance->configDefinitionId = $componentConfigDefinition->current()->id;
-								$componentConfigInstance->instanceId = $instanceId;
-								$componentConfigInstance->value = $currentValue;
+								$componentConfigInstance
+									->setConfigDefinitionId($componentDefinitionId)
+									->setInstanceId($instanceId)
+									->setValue($currentValue);
 
 								\Component_ConfigMapper::getInstance()->save($componentConfigInstance);
 							}

@@ -83,7 +83,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 		 */
 		$allItems = $this->getMapperClass()->findByOrder(array(
 			'identifierName' => 'page_id',
-			'identifierValue' => $this->instance->identifier,
+			'identifierValue' => $this->getInstance()->getIdentifier(),
 			'column' => 'updated_at',
 			'order' => 'DESC'
 		));

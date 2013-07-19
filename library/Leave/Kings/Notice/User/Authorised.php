@@ -21,7 +21,7 @@ class Leave_Kings_Notice_User_Authorised extends Leave_Kings_Notice_User_Abstrac
 		/* Custom replacements
 		 */
 		$this->getEmail()->setVar(array(
-			'LEAVE_AUTHORISED_BY' => $this->getRequest()->getAuthorisationUser()->getName(),
+			'LEAVE_AUTHORISED_BY' => $this->getRequest()->getAuthorisationUser()->formatName(),
 			'LEAVE_CONFIRMED_BY' => $this->getRequest()->getConfirmedByMapIndex($this->getRequest()->getConfirmedBy()),
 		));
 

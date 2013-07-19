@@ -52,11 +52,12 @@ $definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnL
 ));
 
 foreach($definitionCollection as $definition) {
+    /* @var $definition Component_Definition */
     $this->setVar(array(
-        'definition.id'          => $definition->id,
-        'definition.name'        => $definition->name,
-        'definition.description' => $definition->description,
-        'definition.singleton'   => $definition->multiple == 'true' ? '' : 'single-instance'
+        'definition.id'          => $definition->getId(),
+        'definition.name'        => $definition->getName(),
+        'definition.description' => $definition->getDescription(),
+        'definition.singleton'   => $definition->getMultiple() == 'true' ? '' : 'single-instance'
     ));
 
     $this->parse('definition_block', 'definition', true);
@@ -78,8 +79,10 @@ $componentCollection = $componentFactory->buildComponentList($cid);
 $occupiedPositionList = array();
 
 foreach($componentCollection as $component) {
-
-    $position = "position_{$component->position}";
+    /** @var Component_ControllerAbstract $component */
+    $instance_id = $component->getInstance()->getId();
+    $position_no = $component->getInstance()->getPosition();
+    $position    = "position_{$position_no}";
 
     if(!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
@@ -89,11 +92,11 @@ foreach($componentCollection as $component) {
     $component->execute();
 
     $this->setVar(array(
-        'COMPONENT_INSTANCE_ID'     => $component->instance->id,
-        'COMPONENT_HANDLE'          => $component->instance->id,
-        'component.instance.id'     => $component->instance->id,
-        'component.definition.id'   => $component->definition->id,
-        'component.definition.name' => $component->definition->name,
+        'COMPONENT_INSTANCE_ID'     => $instance_id,
+        'COMPONENT_HANDLE'          => $instance_id,
+        'component.instance.id'     => $instance_id,
+        'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
+        'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
     ));
 
 
@@ -101,8 +104,8 @@ foreach($componentCollection as $component) {
 
     $this->parse("{$position}_block", $position, true);
 
-    if(!in_array($component->position, $occupiedPositionList)) {
-        $occupiedPositionList[] = $component->position;
+    if(!in_array($position_no, $occupiedPositionList)) {
+        $occupiedPositionList[] = $position_no;
     }
 }
 

@@ -7,7 +7,7 @@
  *														   *
  ************************************************************/
 
-class External_Schoolbox_Class extends Mapper implements External_ClassInterface {
+class External_Schoolbox_Class implements External_ClassInterface {
 
 	protected $database;
 

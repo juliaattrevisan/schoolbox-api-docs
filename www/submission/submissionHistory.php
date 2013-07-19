@@ -473,18 +473,19 @@ if (isset($recent_submission)) {
 
 		// retrieve plagiarism score, if available
 		$docMapper = Plagscan_DocumentMapper::getInstance();
-		$plagDoc = $docMapper->findByColumn('file_id', $recent_submission->getSubmission()->getId())->current();
+		/* @var $plagDoc Plagscan_Document */
+		$plagDoc = $docMapper->findByColumn('file_id', $recent_submission->getSubmission()->getId())->first();
 		// test: $plagDoc = $docMapper->findByColumn('file_id', 9)->current();
 
 		// if we retrieved a plag document, use it and display to the student
-		if($plagDoc->id && $plagDoc->status == Plagscan_Document::STATUS_COMPLETE) {
+		if ($plagDoc->getId() && $plagDoc->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
 
 			// what colour should the plagiarism text be, and what should the tooltip say?
-			if($plagDoc->score > 60) {
+			if($plagDoc->getScore() > 60) {
 				$status = 'critical';
 				$tooltip = 'Your submission is extremely similar to other documents scanned.';
 			}
-			elseif($plagDoc->score > 20) {
+			elseif($plagDoc->getScore() > 20) {
 				$status = 'warn';
 				$tooltip = 'Your submission is somewhat similar to other documents scanned.';
 			}
@@ -495,7 +496,7 @@ if (isset($recent_submission)) {
 
 			$this->setVar(array(
 				'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
-				'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => $plagDoc->score,
+				'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => $plagDoc->getScore(),
 				'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
 			));
 			$this->parse('plag_score_block', 'plag_score');

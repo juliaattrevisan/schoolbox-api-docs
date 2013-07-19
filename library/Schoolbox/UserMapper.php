@@ -123,6 +123,14 @@ class UserMapper extends Mapper {
 			'type'       => Mapper::TYPE_BOOLEAN,
 		));
 
+		if ($this->config_loader->get('boarder_leave_enabled')) {
+			$this->hasMap(array(
+				'column'   => 'boarding_status',
+				'property' => 'boardingStatus',
+				'type'     => self::TYPE_STRING,
+			));
+		}
+
 		parent::mapping();
 	}
 
@@ -195,7 +203,7 @@ class UserMapper extends Mapper {
 	 *
 	 * @param $name
 	 * @param $permittedValues
-	 * @return bool|\Model
+	 * @return Schoolbox\Collection
 	 */
 	public function findByNameAndGroup($name, $permittedValues) {
 		$collection = new Schoolbox\Collection();

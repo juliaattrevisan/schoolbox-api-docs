@@ -65,7 +65,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 		$group_handler = new Group();
 		$is_superuser  = $group_handler->isSuperuser();
 
-		foreach($allConfigs as $currentConfig) {
+		foreach ($allConfigs as $currentConfig) {
+			/* @var $currentConfig Calendar_Api_Config_Record */
 			$decodedConfig = $currentConfig->decodeConfig();
 
 			/* Check permissions - if you can view these events according to the Permissions
@@ -172,7 +173,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 	 * return that instead of a collection of everything
 	 *
 	 * @param $eventId
-	 * @return Collection
+	 * @return Calendar_Event_Collection
 	 */
 	public function getEvent($eventId) {
 		$collection = new Calendar_Event_Collection();
@@ -183,7 +184,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 			'status' => 1
 		));
 
-		foreach($allConfigs as $currentConfig) {
+		foreach ($allConfigs as $currentConfig) {
+			/* @var $currentConfig Calendar_Api_Config_Record */
 			$decodedConfig = $currentConfig->decodeConfig();
 
 			/* Check permissions - if you can view these events according to the Permissions

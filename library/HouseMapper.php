@@ -1,22 +1,22 @@
 <?php
 
-class HouseMapper extends Mapper {
+class HouseMapper extends Schoolbox\Mapper {
 	protected $table = 'house';
 
-    protected function mapping () {
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => Mapper::TYPE_INTEGER,
-            'identifier' => true
-        ));
+	protected function mapping () {
+		$this->hasTable('house');
+		$this->hasModel('House');
+		$this->hasMap(array(
+			'column'     => 'id',
+			'property'   => 'id',
+			'type'       => self::TYPE_INTEGER,
+			'identifier' => true
+		));
 
-        $this->hasMap(array(
-            'column'     => 'house',
-            'property'   => 'house',
-            'type'       => Mapper::TYPE_STRING,
-        ));
-
-        parent::mapping();
-    }
+		$this->hasMap(array(
+			'column'     => 'house',
+			'property'   => 'house',
+			'type'       => self::TYPE_STRING,
+		));
+	}
 }

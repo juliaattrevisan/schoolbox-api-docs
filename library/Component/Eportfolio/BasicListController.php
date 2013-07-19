@@ -67,7 +67,8 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 
 		/* Gather everything
 		 */
-		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
+        $instance_id = $this->instance->getId();
+		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $instance_id);
 
 		if ($allItems->count()) {
 			$j = 0;

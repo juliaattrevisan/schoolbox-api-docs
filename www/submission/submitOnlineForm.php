@@ -63,7 +63,7 @@ if (!$is_draft) {
 
 	if (!empty($plagscanApiKey) && !empty($plagscanUsername) && !empty($submission_id)) {
 		$document = new Plagscan_Document();
-		$document->fileId = $submission_id;
+		$document->setFileId($submission_id);
 
 		//
 		// Make a temp file for Plagscan to work with.
@@ -71,11 +71,11 @@ if (!$is_draft) {
 		// scannable.
 		$tempfile = tempnam(sys_get_temp_dir(), 'pgs');
 		file_put_contents($tempfile, $body);
-		$document->file = array(
+		$document->setFile(array(
 			'id'   => $submission_id,
 			'name' => $submission->getFilename().'.html',
 			'file' => $tempfile,
-		);
+		));
 
 		// argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
 		$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);

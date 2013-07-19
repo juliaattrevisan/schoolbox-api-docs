@@ -31,7 +31,8 @@ echo strftime("[%F %T] Plagscan scan started\n");
 $gateway      = new Plagscan_Gateway($username, $key);
 $updated_docs = 0;
 foreach ($docs as $doc) {
-	$doc_id = $doc->plagscanId;
+	/** @var Plagscan_Document $doc */
+	$doc_id = $doc->getPlagscanId();
 	$stats  = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
 	if (!$stats) {
 		echo strftime("[%F %T] Plagscan scan failed - check API key and username?\n");
@@ -41,7 +42,7 @@ foreach ($docs as $doc) {
 	//
 	// Is this document scannable? If not, mark as such and don't scan again.
 	if ((string)$stats->MSG === 'ERR') {
-		$doc->status = Plagscan_Document::STATUS_UNSCANNABLE;
+		$doc->setStatus(Plagscan_Document::STATUS_UNSCANNABLE);
 		Plagscan_DocumentMapper::getInstance()->save($doc);
 		continue;
 	}
@@ -50,9 +51,9 @@ foreach ($docs as $doc) {
 	// Has a level been retrieved yet? How can I tell?
 	$level = (string)$stats->LEVEL;
 	if (strlen($level) > 0) {
-		$doc->score  = $level / 10;
-		$doc->status = Plagscan_Document::STATUS_COMPLETE;
-		$doc->html   = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
+		$doc->setScore($level / 10)
+			->setStatus(Plagscan_Document::STATUS_COMPLETE)
+			->setHtml($gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE));
 		Plagscan_DocumentMapper::getInstance()->save($doc);
 		$updated_docs++;
 	}

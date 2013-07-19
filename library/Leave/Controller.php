@@ -99,7 +99,7 @@ class Leave_Controller extends Controller {
     public function __construct($page = null) {
         parent::__construct($page);
 
-        $this->setUserMapper(NewUserMapper::getInstance());
+        $this->setUserMapper(\Schoolbox\UserMapper::getInstance());
         $this->setRequestMapper(Leave_RequestMapper::getInstance());
         $this->setHouseMapper(HouseResidentialMapper::getInstance());
         $this->setExternalUser(new External_User());
@@ -256,7 +256,7 @@ class Leave_Controller extends Controller {
             $this->getPage()->parse('student_autocomplete_block', 'student_autocomplete');
             $this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
         } /* Everyone else submits as themselves
-		 */
+         */
         else {
             $this->getPage()->setVar('student_autocomplete_block', '');
             $this->getPage()->setVar('student_autocomplete_javascript_block', '');
@@ -336,12 +336,13 @@ class Leave_Controller extends Controller {
         /* Only allow Teachers/Staff to modify requests
              */
         if ($this->getGroup()->getPermission(null)) {
+            /** @var Leave_Request $request */
             $request = $data['request'];
             $user = $request->getUser();
-            if (!$user instanceof NewUser) {
+            if (!$user instanceof \Schoolbox\User) {
                 throw new Exception_Schoolbox_NotFound('User not found');
             }
-            $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+            $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
             if (!$house instanceof HouseResidential) {
                 throw new Exception_Schoolbox_NotFound('User\'s house not found');
             }
@@ -361,8 +362,8 @@ class Leave_Controller extends Controller {
                 array(
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
-                    'USER_NAME' => $user->getName(),
-                    'USER_EXTERNAL_ID' => $user->getSynergyId(),
+                    'USER_NAME' => $user->formatName(),
+                    'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
                     'USER_HOUSE' => $house->getHouse(),
                     'USER_HOUSE_ID' => $house->getId(),
@@ -379,7 +380,7 @@ class Leave_Controller extends Controller {
             /* What is the next/previous pending request?
                 */
             $nextRequest = $this->getRequestMapper()->findNextPendingByHouseId(
-                $request['id'], $user->getResidentialHouseId()
+                $request->getId(), $user->getResidentialHouse()
             );
 
             if ($nextRequest) {
@@ -395,13 +396,13 @@ class Leave_Controller extends Controller {
             }
 
             $previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId(
-                $request['id'], $user->getResidentialHouseId()
+                $request->getId(), $user->getResidentialHouse()
             );
 
             if ($previousRequest) {
                 $this->getPage()->setVar(
                     array(
-                        'PREV_PENDING_ID' => $previousRequest['id']
+                        'PREV_PENDING_ID' => $previousRequest->getId()
                     )
                 );
 
@@ -426,12 +427,13 @@ class Leave_Controller extends Controller {
         /*Allow the user and staff to view requests
              */
 
+        /** @var Leave_Request $request */
         $request = $data['request'];
         $user = $request->getUser();
-        if (!$user instanceof NewUser) {
+        if (!$user instanceof \Schoolbox\User) {
             throw new Exception_Schoolbox_NotFound('User not found');
         }
-        $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+        $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
         if (!$house instanceof HouseResidential) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
@@ -445,8 +447,8 @@ class Leave_Controller extends Controller {
                 array(
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
-                    'USER_NAME' => $user->getName(),
-                    'USER_EXTERNAL_ID' => $user->getSynergyId(),
+                    'USER_NAME' => $user->formatName(),
+                    'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
                     'USER_HOUSE' => $house->getHouse(),
                     'USER_HOUSE_ID' => $house->getId(),
@@ -644,7 +646,7 @@ class Leave_Controller extends Controller {
                 $this->getPage()->setVar(
                     array(
                         'USER_ID' => $request->getUser()->getId(),
-                        'USER_NAME' => $request->getUser()->getName(),
+                        'USER_NAME' => $request->getUser()->formatName(),
                         'USER_YEAR' => $request->getUser()->getYear(),
                         'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
                         'REQUEST_ID' => $request->getId(),
@@ -671,7 +673,7 @@ class Leave_Controller extends Controller {
                             'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(
                             ),
                             'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
-                            'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+                            'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
                             'CLASS' => $previousRequestCount % 2 ? '' : 'dark',
                         )
                     );
@@ -705,15 +707,15 @@ class Leave_Controller extends Controller {
      * Returns a collection of requests for a user
      *
      * @param $userId
-     * @return Collection
+     * @return array
      * @throws Exception_Schoolbox_NotFound if user or their house isn't found.
      */
     public function executeUserRequestList($userId) {
         $user = $this->getUserMapper()->findById($userId);
-        if (!$user instanceof NewUser) {
+        if (!$user instanceof \Schoolbox\User) {
             throw new Exception_Schoolbox_NotFound('User not found');
         }
-        $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+        $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
         if (!$house instanceof HouseResidential) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
@@ -757,14 +759,14 @@ class Leave_Controller extends Controller {
                 if ($request->getStatus() == Leave_Request::STATUS_APPROVED) {
                     $rowData = array();
                     $rowData[] = $request->getUser()->getId();
-                    $rowData[] = $request->getUser()->getName();
+                    $rowData[] = $request->getUser()->formatName();
                     $rowData[] = $request->getUser()->getYear();
                     $rowData[] = $request->getStart()->getAustralian();
                     $rowData[] = $request->getFinish()->getAustralian();
                     $rowData[] = $request->getHostType(true);
                     $rowData[] = $request->getStatus(true);
                     $rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
-                    $rowData[] = $request->getAuthorisationUser()->getName();
+                    $rowData[] = $request->getAuthorisationUser()->formatName();
 
                     $allRows[] = TextFormatter::outputCSV($rowData);
                 }
@@ -795,9 +797,9 @@ class Leave_Controller extends Controller {
             $house = $data['house'];
             $requestList = $data['requestList'];
 
-	        if(!is_object($user) || !is_object($house)) {
-		        return false;
-	        }
+            if(!is_object($user) || !is_object($house)) {
+                return false;
+            }
 
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
             $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
@@ -816,7 +818,7 @@ class Leave_Controller extends Controller {
             $this->getPage()->setVar(
                 array(
                     'USER_ID' => $user->getId(),
-                    'USER_NAME' => $user->getName(),
+                    'USER_NAME' => $user->formatName(),
                     'HOUSE_NAME' => $house->getHouse(),
                     'HOUSE_ID' => $house->getId(),
                     'ALLOWED_ACTION' => $this->getGroup()->getPermission(null) ? 'modify' : 'view',
@@ -835,7 +837,7 @@ class Leave_Controller extends Controller {
                     $this->getPage()->setVar(
                         array(
                             'USER_ID' => $request->getUser()->getId(),
-                            'USER_NAME' => $request->getUser()->getName(),
+                            'USER_NAME' => $request->getUser()->formatName(),
                             'USER_YEAR' => $request->getUser()->getYear(),
                             'REQUEST_ID' => $request->getId(),
                             'REQUEST_START' => $request->getStart()->getAustralian(),
@@ -862,7 +864,7 @@ class Leave_Controller extends Controller {
                                     true
                                 )->getAustralian(),
                                 'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
-                                'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+                                'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
                                 'CLASS' => $previousRequestCount % 2 ? '' : 'dark',
                             )
                         );
@@ -1221,7 +1223,7 @@ class Leave_Controller extends Controller {
     /**
      * Setter for $userMapper
      *
-     * @param NewUserMapper $userMapper
+     * @param \Schoolbox\UserMapper $userMapper
      *
      * @return void
      */
@@ -1232,7 +1234,7 @@ class Leave_Controller extends Controller {
     /**
      * Getter for $userMapper
      *
-     * @return NewUserMapper
+     * @return \Schoolbox\UserMapper
      */
     public function getUserMapper() {
         return $this->userMapper;

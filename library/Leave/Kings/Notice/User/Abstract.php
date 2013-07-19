@@ -17,7 +17,7 @@ abstract class Leave_Kings_Notice_User_Abstract extends Leave_Notice_Abstract_No
 	 * Setup
 	 */
 	public function setup() {
-		$subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->getName();
+		$subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
         $email = new Mailer($this->getEmailTemplateFile(), $subject , $this->getRequest()->getUser()->getAltEmail());
 
@@ -26,7 +26,7 @@ abstract class Leave_Kings_Notice_User_Abstract extends Leave_Notice_Abstract_No
 		$email->setBlock($email->t_label, 'rejected_by', 'rejected_by_block');
 
 		$email->setVar(array(
-			'LEAVE_USER_NAME' => $this->getRequest()->getUser()->getName(),
+			'LEAVE_USER_NAME' => $this->getRequest()->getUser()->formatName(),
 			'LEAVE_STATUS' => $this->getRequest()->getStatus(true),
 			'LEAVE_START' => $this->getRequest()->getStart()->getLong(),
 			'LEAVE_FINISH' => $this->getRequest()->getFinish()->getLong(),

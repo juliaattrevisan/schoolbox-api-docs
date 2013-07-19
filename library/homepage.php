@@ -288,25 +288,28 @@ class Homepage {
 
         if(count($instances)) {
             foreach($instances as $inst) {
+                /* @var $inst Component_Instance */
                 // preserve the config
-                $configs = $inst->config;
+                $configs = $inst->getConfig();
 
-                unset($inst->id);
-                unset($inst->config);
-
-                $inst->module = 'homepage';
-                $inst->identifier = $categoryID;
+                $inst
+                    ->setId(null)
+                    ->setConfig(new \Schoolbox\Collection())
+                    ->setModule('homepage')
+                    ->setIdentifier($categoryID);
 
                 $ids = $cim->save($inst);
                 $id = $ids[0];
 
                 if(count($configs)) {
                     foreach($configs as $c) {
-                        if($c->id) {
+                        /* @var $c Component_Config */
+                        if($c->getId()) {
                             $conf = new Component_Config();
-                            $conf->instanceId = $id;
-                            $conf->value = $c->value;
-                            $conf->configDefinitionId = $c->id;
+                            $conf
+                                ->setInstanceId($id)
+                                ->setValue($c->getValue())
+                                ->setConfigDefinitionId($c->getId());
                             $ccm->save($conf);
                         }
                     }

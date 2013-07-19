@@ -99,7 +99,7 @@ class SubjectReportCard {
 					return array();
 				}
 
-				$listSyns = $externalClassHandler->getTeacherName($this->category->getCodes()->current()->getCode());
+				$listSyns = $externalClassHandler->getTeacherName($this->category->getCodes()->first()->getCode());
 				$staffGroups = $groupHandler->getStaffGroupTypeIds();
 
 				if (is_array($listSyns)) {

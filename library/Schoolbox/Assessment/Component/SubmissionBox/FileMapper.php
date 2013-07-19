@@ -63,7 +63,7 @@ class FileMapper extends Schoolbox\Mapper {
 			$existing_files = $file_mapper->findByColumn('hash', $file->getHash());
 			$file_id        = null;
 			if ($existing_files->count() > 0) {
-				$file_id = $existing_files->current()->getId();
+				$file_id = $existing_files->first()->getId();
 			}
 			else {
 				//

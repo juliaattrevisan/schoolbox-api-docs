@@ -139,20 +139,20 @@ function getSingleFileMeta($folderId, $fileId) {
 
 	// list of portfolio pages that can be published to
 	$componentDefinition = Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_FileListController');
-	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->current());
+	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->first());
 	$publishTo = array();
 
 	if (is_array($availablePages) && count($availablePages)) {
 		foreach ($availablePages as $currentPage) {
 			if (is_array($currentPage['componentList']) && count($currentPage['componentList'])) {
 				foreach ($currentPage['componentList'] as $currentComponent) {
-
+					/** @var Component_Instance $currentComponent */
 					// Each link only needs to know this
 					$pageData = array(
 						'userId' => $_SESSION['id'],
 						'pageId' => $currentPage['page']->getPageId(),
 						'pageTitle' => $currentPage['page']->getPageTitle(),
-						'componentInstanceId' => $currentComponent->id,
+						'componentInstanceId' => $currentComponent->getId(),
 					);
 
 					$publishTo[] = $pageData;

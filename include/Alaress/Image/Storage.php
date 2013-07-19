@@ -15,9 +15,9 @@ class Alaress_Image_Storage {
 	 * Consructor
 	 * Sets up the caching implementation, image processor and streams it
 	 *
-	 * @param $resource
-	 * @param $key
-	 * @param $transformations
+	 * @param Schoolbox\File                        $resource
+	 * @param string                                $key
+	 * @param Alaress_Image_Transformation_Abstract $transformations
 	 */
     public function __construct($resource, $key, $transformations) {
 

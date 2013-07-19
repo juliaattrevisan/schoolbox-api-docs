@@ -11,10 +11,10 @@ require_once '../../include/Bootstrap.php';
 $sitePage = new SitePage;
 
 if (is_readable($_FILES['file']['tmp_name'])) {
-	$imageResource = Storage_ResourceMapper::getInstance()->create(
+	$imageResource = Schoolbox\FileMapper::getInstance()->upload(
 		$_FILES['file']['name'], $_FILES['file']['tmp_name'], $_SESSION['id']
 	);
-	$hash = $imageResource->hash;
+	$hash = $imageResource->getHash();
 
 	if(isset($_POST['return'])) {
 		SitePage::localRedir($_POST['return'] . '?hash=' . $hash);

@@ -90,7 +90,7 @@ class Plagscan_Gateway {
 
         $response = $this->parseXmlResponse($this->response);
 
-        return $response->PID;
+        return (string)$response->PID;
     }
 
     /**

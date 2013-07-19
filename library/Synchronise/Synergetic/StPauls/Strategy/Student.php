@@ -39,7 +39,7 @@ class Synchronise_Synergetic_StPauls_Strategy_Student extends Synchronise_Synerg
 		if($hColl->count() == 0) {
 			foreach($insertions as $name => $lookup) {
 				$h = new House();
-				$h->house = $name;
+				$h->setHouse($name);
 				$hMap->create($h);
 			}
 		}
@@ -51,8 +51,8 @@ class Synchronise_Synergetic_StPauls_Strategy_Student extends Synchronise_Synerg
 			/**
 			 * @var $house House
 			 */
-			if(isset($insertions[$house->house])) {
-				$this->houseMap[$insertions[$house->house][1]] = $house->id;
+			if(isset($insertions[$house->getHouse()])) {
+				$this->houseMap[$insertions[$house->getHouse()][1]] = $house->getId();
 			}
 		}
 	}

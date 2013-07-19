@@ -22,7 +22,7 @@ class Component_Homepage_Statistics_Factory extends Component_FactoryAbstract {
     /**
      * Overrides parent method, since the component inclusion is not defined by the DB
      * @param $identifier
-     * @return Collection
+     * @return \Schoolbox\Collection
      */
     public function buildComponentList ($identifier) {
 
@@ -34,34 +34,35 @@ class Component_Homepage_Statistics_Factory extends Component_FactoryAbstract {
             'right' => array('RecentVisitors','Unvisited','TopLinks')
         );
 
-        $instanceCollection = new Collection();
+        $instanceCollection = new Schoolbox\Collection();
 
         foreach($include as $col => $comps) {
             foreach($comps as $loc => $comp) {
                 $inst = new Component_Instance();
-                $inst->definition = new Component_Definition();
-                $inst->definition->class = sprintf('Component_Homepage_Statistics_%sController',$comp);
-                $inst->definition->module = 'homepage_statistics';
-                $inst->definition->visible = '';
-                $inst->definition->multiple = '';
-                $inst->definition->name = '';
+                $inst
+                    ->setModule('homepage_statistics')
+                    ->setPosition($col)
+                    ->setSequence($loc + 1)
+                    ->setDefinition(new Component_Definition());
+                $inst->getDefinition()
+                    ->setClass(sprintf('Component_Homepage_Statistics_%sController',$comp))
+                    ->setModule('homepage_statistics')
+                    ->setVisible('')
+                    ->setMultiple('')
+                    ->setName('');
 
-                $inst->module = 'homepage_statistics';
-                $inst->position = $col;
-                $inst->sequence = $loc + 1;
-
-                $instanceCollection[] = $inst;
+                $instanceCollection->add($inst);
             }
         }
 
-        $componentCollection = new Collection;
+        $componentCollection = new Schoolbox\Collection();
 
         if ( !empty($instanceCollection) ) {
             foreach ($instanceCollection as $instance) {
                 $component = $this->buildComponent($instance);
 
                 if ( !empty($component) ) {
-                    $componentCollection[] = $component;
+                    $componentCollection->add($component);
                 }
             }
         }

@@ -1,10 +1,10 @@
 <?php
  
-class House extends Model {
+class House {
 
-    public $id;
+    protected $id;
 
-    public $house;
+    protected $house;
 
     public function setHouse($house)
     {

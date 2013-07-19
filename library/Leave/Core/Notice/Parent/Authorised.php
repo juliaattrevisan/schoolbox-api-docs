@@ -21,7 +21,7 @@ class Leave_Core_Notice_Parent_Authorised extends Leave_Core_Notice_Parent_Abstr
 		/* Custom replacements
 		 */
 		$this->getEmail()->setVar(array(
-			'LEAVE_AUTHORISED_BY' => $this->getRequest()->getAuthorisationUser()->getName(),
+			'LEAVE_AUTHORISED_BY' => $this->getRequest()->getAuthorisationUser()->formatName(),
 			'LEAVE_CONFIRMED_BY' => $this->getRequest()->getConfirmedByMapIndex($this->getRequest()->getConfirmedBy()),
 		));
 

@@ -23,7 +23,8 @@ if(!($groupHandler->isStaff() || $groupHandler->isSuperuser())) {
 }
 
 $pdm = Plagscan_DocumentMapper::getInstance();
-$document = $pdm->findByColumn('plagscan_id', $this->arg[0])->current();
+/* @var $document Plagscan_Document */
+$document = $pdm->findByColumn('plagscan_id', $this->arg[0])->first();
 
 
 // remove all '<a...>...highlight matches in source...</a>' instances from source
@@ -32,7 +33,7 @@ $regex[] = "#<a[^>]*>((?:(?!</a>)[\s\S])*)highlight matches in source((?:(?!</a>
 // remove any href='...plagscan.com/highlight?...' from source
 $regex[] = '$http://www.plagscan.com/highlight\?[^#\'"]*#jump$is';
 
-$html = $document->html;
+$html = $document->getHtml();
 
 foreach($regex as $r) {
     $html = preg_replace($r, '', $html);

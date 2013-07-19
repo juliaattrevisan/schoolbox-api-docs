@@ -31,9 +31,10 @@ if (is_numeric($_REQUEST['cid'])) {
 			foreach ($components[$position] as $sequence => $componentID) {
                 if($componentID) {
                     $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+                    /** @var $inst Component_Instance */
 	                if($inst !== false) {
-	                    $inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database///
-	                    $inst->position = $position;
+	                    $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
+	                    $inst->setPosition($position);
 
 	                    $instanceList[] = $inst;
 	                }
@@ -49,10 +50,11 @@ if (is_numeric($_REQUEST['cid'])) {
 	else if ($_POST['cid'] && is_numeric($_POST['delete'])) {
 
         // locate the instance, locate its config instances, then blast them away
+        /** @var Component_Instance $instance */
         $instance = $componentInstanceMapper->findById($_POST['delete']);
 
 		if($instance !== false ) {
-	        $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->id);
+	        $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
 
 	        foreach ($configs as $c) {
 	            $componentConfigInstanceMapper->delete($c);
@@ -67,11 +69,12 @@ if (is_numeric($_REQUEST['cid'])) {
 	else if (is_numeric($_POST['cid']) && is_numeric($_POST['add'])) {
 
         $newComp = new Component_Instance();
-        $newComp->definitionId = $_POST['add'];
-        $newComp->identifier = $_POST['cid'];
-        $newComp->module = 'homepage';
-        $newComp->sequence = 0;
-        $newComp->position = 'left';
+        $newComp
+            ->setDefinitionId($_POST['add'])
+            ->setIdentifier($_POST['cid'])
+            ->setModule('homepage')
+            ->setSequence(0)
+            ->setPosition('left');
 
         // check perms
         if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {
@@ -99,11 +102,11 @@ if (is_numeric($_REQUEST['cid'])) {
         $catHandler = new Category;
         $category = $catHandler->getByID($_POST['cid']);
 
-        $templateTarget = "component_position_{$component->instance->position}";
-        $templateHandle = "component_{$component->instance->id}";
+        $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
+        $templateHandle = "component_{$component->getInstance()->getId()}";
         $templateHandle = TEMPLATE_content;
 
-        $component->setup($category, $component->instance->getConfigArray() );
+        $component->setup($category, $component->getInstance()->getConfigArray() );
 
         if ($component->execute() !== false) {
             $component->parseConfig();
@@ -139,12 +142,15 @@ if (is_numeric($_REQUEST['cid'])) {
 	else if ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
         $config = $_GET;
 
+        /** @var Component_Instance $instance */
         $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
         $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
-        $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn('component_definition_id', $instance->definitionId);
+        $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
+            'component_definition_id', $instance->getDefinitionId()
+        );
 
-		unset($config['cid'], $config['type'], $config['component']);
+        unset($config['cid'], $config['type'], $config['component']);
 
         // much as I hate exceptional cases, there are exceptional cases...
 
@@ -158,7 +164,7 @@ if (is_numeric($_REQUEST['cid'])) {
         // prepare filter value
         if(isset($config['filter'])) {
             // retrieve the instance so we know how to insert this data
-            $cclass = $instance->definition->class;
+            $cclass = $instance->getDefinition()->getClass();
             $controller = new $cclass($instance, new User(), $page);
             $controller->execute();
             $fields = $controller->getFilterFields();
@@ -170,30 +176,35 @@ if (is_numeric($_REQUEST['cid'])) {
             $config['filter'] = $val;
         }
 
+        /** @var Component_ConfigDefinition $confD */
         foreach($configDefinitionCollection as $confD) {
-            if(isset($config[$confD->key])) {
+            if(isset($config[$confD->getKey()])) {
 
                 // this should be 1:1 relation, so return only the first instance of this definition
+                /** @var Component_Config $confI */
                 $confI = $componentConfigInstanceMapper->findByColumnList(array(
-                    'component_config_definition_id' => $confD->id,
-                    'component_instance_id'          => $instance->id
-                ))->current();
-
-                printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $config[$confD->key]);
-
-                if(!($confI->id)) {
+                    'component_config_definition_id' => $confD->getId(),
+                    'component_instance_id'          => $instance->getId()
+                ))->first();
+                if (!($confI instanceof Component_Config)) {
                     $confI = new Component_Config();
-                    $confI->configDefinitionId = $confD->id;
-                    $confI->instanceId = $instance->id;
                 }
-                $confI->value = $config[$confD->key];
+
+                printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $config[$confD->getKey()]);
+
+                if(!($confI->getId())) {
+                    $confI = new Component_Config();
+                    $confI->setConfigDefinitionId($confD->getId());
+                    $confI->setInstanceId($instance->getId());
+                }
+                $confI->setValue($config[$confD->getKey()]);
 
                 $componentConfigInstanceMapper->save($confI);
 
             }
         }
-		SitePage::localRedir("/homepage/" . $_GET['cid']);
-	}
+        SitePage::localRedir("/homepage/" . $_GET['cid']);
+    }
 
 
     // AJAX new column widths

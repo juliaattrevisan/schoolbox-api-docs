@@ -39,7 +39,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Default extends Calendar_Api_Event
 	 * Find a particular event from this source
 	 *
 	 * @param $eventId
-	 * @return Collection
+	 * @return Calendar_Event_Collection
 	 */
 	public function getEvent($eventId) {
 		$collection = new Calendar_Event_Collection();

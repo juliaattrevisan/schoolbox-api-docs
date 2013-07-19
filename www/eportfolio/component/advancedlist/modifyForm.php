@@ -41,8 +41,8 @@ if ($authenticator->canModify()) {
 			$mime = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
 
 			if(is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(),'image/')) {
-				$imageResource = Storage_ResourceMapper::getInstance()->create($uploadedFilename, $uploadedLocation, $uploadedUid);
-				$listItem->setImagehash($imageResource->hash);
+				$imageResource = Schoolbox\FileMapper::getInstance()->upload($uploadedFilename, $uploadedLocation, $uploadedUid);
+				$listItem->setImagehash($imageResource->getHash());
 			}
 		}
 
@@ -68,8 +68,8 @@ if ($authenticator->canModify()) {
 			$mime = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
 
 			if(is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(),'image/')) {
-				$imageResource = Storage_ResourceMapper::getInstance()->create($uploadedFilename, $uploadedLocation, $uploadedUid);
-				$listItem->setImagehash($imageResource->hash);
+				$imageResource = Schoolbox\FileMapper::getInstance()->upload($uploadedFilename, $uploadedLocation, $uploadedUid);
+				$listItem->setImagehash($imageResource->getHash());
 			}
 		}
 

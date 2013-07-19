@@ -96,9 +96,9 @@ abstract class Component_ControllerAbstract {
         }
 
         $output = array(
-            'COMPONENT_INSTANCE_ID' => $this->instance->id,
-            'COMPONENT_DEFINITION_ID' => $this->instance->definitionId,
-            'COMPONENT_HANDLE' => $templateHandle . '_' . $this->instance->id
+            'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
+            'COMPONENT_DEFINITION_ID' => $this->instance->getDefinitionId(),
+            'COMPONENT_HANDLE' => $templateHandle . '_' . $this->instance->getId()
         );
 
         $this->setVar($output);
@@ -109,7 +109,7 @@ abstract class Component_ControllerAbstract {
     protected function getTemplate($templateName = '', $templatePath = '') {
         if (empty($templateName)) {
             /* Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase */
-            $templateName = ucfirst(substr(array_pop(explode('_', $this->definition->class)), 0, -10));
+            $templateName = ucfirst(substr(array_pop(explode('_', $this->getInstance()->getDefinition()->getClass())), 0, -10));
         }
 
         if (empty($templatePath)) {
@@ -210,6 +210,15 @@ abstract class Component_ControllerAbstract {
 
 
     public function __get($property) {
+        //
+        // Access property on $this->instance
+        trigger_error(
+            sprintf(
+                'Direct get of property "%s::%s" is deprecated - use get methods instead',
+                get_class($this), $property
+            ),
+            E_USER_DEPRECATED
+        );
         if (isset($this->instance->$property)) {
             return $this->instance->$property;
         } else {
@@ -274,14 +283,14 @@ abstract class Component_ControllerAbstract {
 
         // if we're building in the context of the admin system, use a different template (_templatewrapper.html),
         // otherwise use the regular one (_wrapper.html)
-        if (in_array($this->instance->module, array('dashboard', 'homepage_template', 'eportfolio_template'))) {
+        if (in_array($this->instance->getModule(), array('dashboard', 'homepage_template', 'eportfolio_template'))) {
             $template = 'component/config/_templatewrapper.html';
         }
-		else if (in_array($this->instance->module, array('homepage', 'eportfolio'))) {
+		else if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
 
 			/* eportfolio uses a special version of le wrapier
 			 */
-			$template = 'component/config/' . $this->instance->module . '_wrapper.html';
+			$template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
 		}
 		else {
 			$template = 'component/config/_wrapper.html';
@@ -346,10 +355,10 @@ abstract class Component_ControllerAbstract {
 	/**
 	 * Split this out so subclasses can determine which config elements get rendered
 	 *
-	 * @param $conf
-	 * @param $key
-	 * @param $page
-	 * @param $params
+	 * @param Component_Config_Abstract $conf
+	 * @param string                    $key
+	 * @param SitePage                  $page
+	 * @param array                     $params
 	 */
 	protected function parseConfigInstance($conf, $key, $page, $params) {
 		$templateFile = "component/config/$key.html";
@@ -410,11 +419,22 @@ abstract class Component_ControllerAbstract {
         return $this->sitepage->template;
     }
 
-	/**
-	 * @return Component_Instance
-	 */
-	public function getInstance() {
-		return $this->instance;
-	}
+
+    /**
+     * Public accessor for $this->instance - use this instead of magic method
+     * obscuring a protected variable. (wat)
+     *
+     * @param \Component_Instance $instance
+     */
+    public function setInstance($instance) {
+        $this->instance = $instance;
+    }
+
+    /**
+     * @return \Component_Instance
+     */
+    public function getInstance() {
+        return $this->instance;
+    }
 
 }

@@ -16,11 +16,11 @@ if (($permission = $groupHandler->getPermission($categoryID)) < WRITE_ACCESS) {
 $factory = new Component_Homepage_Factory(new User(), new SitePage(false));
 $component = $factory->buildComponent($instanceID);
 
-$templateTarget = "component_position_{$component->instance->position}";
-$templateHandle = "component_{$component->instance->id}";
+$templateTarget = "component_position_{$component->getInstance()->getPosition()}";
+$templateHandle = "component_{$component->getInstance()->getId()}";
 $templateHandle = TEMPLATE_content;
 
-$component->setup(array('id' => $categoryID), $component->instance->getConfigArray());
+$component->setup(array('id' => $categoryID), $component->getInstance()->getConfigArray());
 
 if ($component->execute() !== false) {
     if ($component->renderTemplate($templateHandle) !== false) {
@@ -29,5 +29,3 @@ if ($component->execute() !== false) {
 }
 
 return;
-
-?>

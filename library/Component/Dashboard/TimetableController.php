@@ -19,6 +19,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     private $timetable = array();
 
+    /**
+     * @var Schoolbox\Collection
+     */
     private $colourList;
 
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable) {
@@ -142,7 +145,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                             /* Handle colour array */
                             if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
-                                $subjectColourMap[$period['code']] = $this->colourList[$colourIndex]->hex_colour;
+                            $subjectColourMap[$period['code']] = $this->colourList->offsetGet($colourIndex)->getHexColour();
                                 ++$colourIndex;
                             }
 

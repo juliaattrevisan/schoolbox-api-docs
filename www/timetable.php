@@ -158,7 +158,7 @@ if (is_array($outputList)) {
 
                         /* Handle colour array */
                         if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
-                            $subjectColourMap[$period['code']] = $colourList[$colourIndex]->hex_colour;
+                            $subjectColourMap[$period['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
                             $colourIndex++;
                         }
 

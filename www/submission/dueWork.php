@@ -258,7 +258,7 @@ $chf = new Component_Homepage_Factory(new User, $this);
 $cdm = Component_DefinitionMapper::getInstance();
 $definition = $cdm->findByColumn('class', 'Component_Dashboard_UpcomingWorkController');
 $instance = new Component_Instance();
-$instance->definition = $definition[0];
+$instance->setDefinition($definition->first());
 
 $dueWorkController = $chf->buildComponent($instance);
 

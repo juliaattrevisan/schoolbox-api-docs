@@ -28,7 +28,7 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
             $eUser = new External_User();
             $eUser->getCurrentSemester();
 
-            $campus = $user->getCampusCollection()->current()->getId();
+            $campus = $user->getCampusCollection()->first()->getId();
 
             /*
             $dayNum = 4;
@@ -92,23 +92,23 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
             }
 
             // manipulate the datums!
-	        /**
-	         * @var UserMapper $uMap
-	         * @var CategoryMapper $cMap
-	         */
-	        $uMap = UserMapper::getInstance();
-			$cMap = CategoryMapper::getInstance();
+            /**
+             * @var UserMapper $uMap
+             * @var CategoryMapper $cMap
+             */
+            $uMap = UserMapper::getInstance();
+            $cMap = CategoryMapper::getInstance();
 
             foreach($ttable as &$period) {
                 if(isset($period['staffID'])) {
 
                     try {
-	                    /** @var User $teacher */
-	                    $teacher = $uMap->findByColumn('synergy_id', $period['staffID'])->current();
+                        /** @var User $teacher */
+                        $teacher = $uMap->findOneByColumn('synergy_id', $period['staffID']);
 
-	                    if(!($teacher instanceof User)) {
-		                    throw new Exception_Schoolbox();
-	                    }
+                        if(!($teacher instanceof User)) {
+                            throw new Exception_Schoolbox();
+                        }
 
                         $period['staffName'] = $teacher->formatName();
                         $period['room'] = trim($period['room']);

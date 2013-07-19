@@ -119,7 +119,7 @@ class CategoryMapper extends Mapper {
 	 * @param int  $access_level Defaults to UserAccess::ACCESS_READ, but may be
 	 *                           any access level.
 	 *
-	 * @return \Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function findForUser(User $user, $get_subjects = true, $access_level = UserAccess::ACCESS_READ) {
 		$query = "

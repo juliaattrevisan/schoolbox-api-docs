@@ -57,11 +57,12 @@ class ObjectiveMigrator extends TextboxMigrator {
 					/* Insert new component instance record
 					 */
 					$newComp = new \Component_Instance();
-					$newComp->definitionId = $this->getDefinitionId();
-					$newComp->identifier = $this->getPageId();
-					$newComp->module = 'eportfolio';
-					$newComp->sequence = 0;
-					$newComp->position = 'left';
+					$newComp
+						->setDefinitionId($this->getDefinitionId())
+						->setIdentifier($this->getPageId())
+						->setModule('eportfolio')
+						->setSequence(0)
+						->setPosition('left');
 
 					$newCompIds = \Component_InstanceMapper::getInstance()->save($newComp);
 
@@ -74,9 +75,10 @@ class ObjectiveMigrator extends TextboxMigrator {
 					TextboxMapper::getInstance()->save($newTextbox);
 
 					$configInstance = new \Component_Config();
-					$configInstance->configDefinitionId = $this->getConfigDefinitionId();
-					$configInstance->instanceId = $componentInstanceID;
-					$configInstance->value = $label;
+					$configInstance
+						->setConfigDefinitionId($this->getConfigDefinitionId())
+						->setInstanceId($componentInstanceID)
+						->setValue($label);
 
 					\Component_ConfigMapper::getInstance()->save($configInstance);
 				}

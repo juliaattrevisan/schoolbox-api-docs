@@ -13,7 +13,7 @@ class Eportfolio_Page_Factory {
 	/**
 	 * An instance of Eportfolio_Page_Abstract
 	 *
-	 * @var null
+	 * @var Eportfolio_Page_Abstract
 	 */
 	private $page = null;
 
@@ -36,7 +36,7 @@ class Eportfolio_Page_Factory {
 	 * @param $userId
 	 * @param $pageId
 	 * @param $permissionValue
-	 * @return \Eportfolio_Page_Create|\Eportfolio_Page_Instance|\Eportfolio_Page_Profile|\Eportfolio_Page_Showcase
+	 * @return Eportfolio_Page_Abstract
 	 */
 	private function produce($page, $userId, $pageId, $permissionValue) {
 		if (is_numeric($pageId)) {
@@ -64,7 +64,7 @@ class Eportfolio_Page_Factory {
 	/**
 	 * Set page
 	 *
-	 * @param null $page
+	 * @param Eportfolio_Page_Abstract $page
 	 */
 	private function setPage($page) {
 		$this->page = $page;
@@ -73,7 +73,7 @@ class Eportfolio_Page_Factory {
 	/**
 	 * Get page
 	 *
-	 * @return null
+	 * @return Eportfolio_Page_Abstract
 	 */
 	public function getPage() {
 		return $this->page;

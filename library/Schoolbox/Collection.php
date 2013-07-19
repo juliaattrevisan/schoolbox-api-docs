@@ -9,98 +9,144 @@
 
 namespace Schoolbox;
 use Schoolbox;
+use ArrayIterator;
+use ICollection;
 
-class Collection implements \ICollection {
+class Collection implements ICollection {
 
-    protected $stack = array();
-	protected $position = 0;
+	protected $stack = array();
 
-    /**
-     * @param $element
-     */
-    public function add($element) {
-        $this->stack[] = $element;
-    }
+	/**
+	 * @param $element
+	 */
+	public function add($element) {
+		$this->stack[] = $element;
+	}
 
-    /**
-     * Constructor
-     *
-     * @param array $stack
-     */
-    public function __construct($stack = array()) {
-        $this->setStack($stack);
-    }
+	/**
+	 * Returns whole collection as an array.
+	 *
+	 * @return array
+	 */
+	public function getAll() {
+		return $this->stack;
+	}
 
-    /**
-     * Rewind
-     */
-    public function rewind() {
-        $this->position = 0;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param array $stack
+	 */
+	public function __construct($stack = array()) {
+		$this->setStack($stack);
+	}
 
-    /**
-     * Current
-     *
-     * @return mixed
-     */
-    public function current() {
-        return $this->stack[$this->position];
-    }
+	/**
+	 * Sets key value in collection
+	 *
+	 * @param  mixed $offset
+	 * @param  mixed $value
+	 *
+	 * @return void
+	 */
+	public function offsetSet($offset, $value) {
+		if ( empty($offset) ) {
+			$this->stack[] = $value;
+		}
+		else {
+			$this->stack[$offset] = $value;
+		}
+	}
 
-    /**
-     * Key
-     *
-     * @return mixed
-     */
-    public function key() {
-        return $this->position;
-    }
+	/**
+	 * Gets value in collection
+	 *
+	 * @param mixed $offset
+	 *
+	 * @return mixed
+	 */
+	public function offsetGet($offset) {
+		if ( isset($this->stack[$offset]) ) {
+			return $this->stack[$offset];
+		}
+		else {
+			return null;
+		}
+	}
 
-    /**
-     * Next
-     */
-    public function next() {
-        ++$this->position;
-    }
+	/**
+	 * Gets first item in collection (regardless of its key)
+	 *
+	 * @return mixed
+	 */
+	public function first() {
+		foreach ($this as $item) {
+			return $item;
+			break;
+		}
+		return null;
+	}
 
-    /**
-     * Valid
-     *
-     * @return bool
-     */
-    public function valid() {
-        return isset($this->stack[$this->position]);
-    }
+	/**
+	 * Does this value exist?
+	 *
+	 * @param mixed $offset
+	 *
+	 * @return bool
+	 */
+	public function offsetExists($offset) {
+		return isset($this->stack[$offset]);
+	}
 
-    /* Getters/Setters
-     */
+	/**
+	 * Unsets value in collection
+	 *
+	 * @param mixed $offset
+	 *
+	 * @return void
+	 */
+	public function offsetUnset($offset) {
+		unset($this->stack[$offset]);
+	}
 
-    /**
-     * Set stack
-     *
-     * @param $stack
-     */
-    protected function setStack($stack) {
-        $this->stack = $stack;
-    }
+	/**
+	 * Retrieves an iterator over this collection's stack.
+	 *
+	 * @return \Traversable
+	 */
+	public function getIterator() {
+		return new ArrayIterator($this->stack);
+	}
 
-    /**
-     * Get stack
-     *
-     * @return array
-     */
-    protected function getStack() {
-        return $this->stack;
-    }
+	/* Getters/Setters
+	 */
 
-    /**
-     * Get number of elements in collection.
-     *
-     * @return array
-     */
-    public function count() {
-        return count($this->getStack());
-    }
+	/**
+	 * Set stack
+	 *
+	 * @param $stack
+	 */
+	protected function setStack($stack) {
+		$this->stack = $stack;
+	}
+
+	/**
+	 * Get stack
+	 *
+	 * @return array
+	 */
+	protected function getStack() {
+		return $this->stack;
+	}
+
+	/**
+	 * Get number of elements in collection.
+	 *
+	 * @return array
+	 */
+	public function count() {
+		return count($this->getStack());
+	}
 
 	/**
 	 * Gets the name of the get method for this field.

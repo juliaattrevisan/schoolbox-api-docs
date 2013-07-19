@@ -64,18 +64,21 @@ function readConfig($vars, SitePage $page) {
         httpError(400, "Component doesn't exist.");
     }
 
-    $component->setup(array('id' => '-1', 'code' => '', 'name' => ''), $component->instance->getConfigArray());
+    $component->setup(
+        array('id' => '-1', 'code' => '', 'name' => ''),
+        $component->getInstance()->getConfigArray()
+    );
     $component->execute();
     $component->parseConfigForTemplate();
 
     $page->setVar(array(
         'ID'                        => $vars['cid'],
         'SITE_LOCATION'             => Cfg::get('site_location'),
-        'COMPONENT_INSTANCE_ID'     => $component->instance->id,
-        'COMPONENT_HANDLE'          => $component->instance->id,
-        'component.instance.id'     => $component->instance->id,
-        'component.definition.id'   => $component->definition->id,
-        'component.definition.name' => $component->definition->name,
+        'COMPONENT_INSTANCE_ID'     => $component->getInstance()->getId(),
+        'COMPONENT_HANDLE'          => $component->getInstance()->getId(),
+        'component.instance.id'     => $component->getInstance()->getId(),
+        'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
+        'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
     ));
 
     $page->template->pparse('CONFIGURATION', 'configTpl');
@@ -100,10 +103,11 @@ function writeConfig($vars) {
 
     $cim = Component_InstanceMapper::getInstance();
 
+    /** @var Component_Instance $instance */
     $instance = $cim->findById($componentID);
     $ccdm = Component_ConfigDefinitionMapper::getInstance();
 
-    $cdm = $ccdm->findByColumn('component_definition_id', $instance->definitionId);
+    $cdm = $ccdm->findByColumn('component_definition_id', $instance->getDefinitionId());
 
     // much as I hate exceptional cases, this is an exceptional case: remove the prepended '/homepage/'
     if(isset($vars['src'])) {
@@ -115,24 +119,28 @@ function writeConfig($vars) {
 
     $ccm = Component_ConfigMapper::getInstance();
     $updated = 0;
+    /** @var Component_ConfigDefinition $confD */
     foreach($cdm as $confD) {
-        if(isset($vars[$confD->key])) {
+        if(isset($vars[$confD->getKey()])) {
             ++$updated;
 
             // this should be 1:1 relation, so return only the first instance of this definition
+            /** @var Component_Config $confI */
             $confI = $ccm->findByColumnList(array(
-                'component_config_definition_id' => $confD->id,
-                'component_instance_id'          => $instance->id
-            ))->current();
-
-            printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $vars[$confD->key]);
-
-            if(!($confI->id)) {
+                'component_config_definition_id' => $confD->getId(),
+                'component_instance_id'          => $instance->getId()
+            ))->first();
+            if (!($confI instanceof Component_Config)) {
                 $confI = new Component_Config();
-                $confI->configDefinitionId = $confD->id;
-                $confI->instanceId = $instance->id;
             }
-            $confI->value = $vars[$confD->key];
+
+            printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $vars[$confD->getKey()]);
+
+            if(!($confI->getId())) {
+                $confI->setConfigDefinitionId($confD->getId());
+                $confI->setInstanceId($instance->getId());
+            }
+            $confI->setValue($vars[$confD->getKey()]);
 
             $ccm->save($confI);
 

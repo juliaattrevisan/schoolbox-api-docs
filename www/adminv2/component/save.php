@@ -33,7 +33,7 @@ if ( !empty($_POST['instanceId']) ) {
     $instance = $cim->findById($_POST['instanceId']);
 }
 else {
-    $instance = new Component_Instance;
+    $instance = new Component_Instance();
 }
 
 $contextMap = array(
@@ -48,12 +48,14 @@ if(!isset($contextMap[$_POST['context']])) {
 }
 $context = $contextMap[$_POST['context']];
 
-if ( $definition = $cdm->findById($_POST['definitionId']) ) {
-    $instance->definitionId = $definition->id;
-    $instance->module       = $context;
-    $instance->identifier   = $_POST['targetId'];
-    $instance->position     = $_POST['position'];
-    $instance->sequence     = $_POST['sequence'];
+if ($definition = $cdm->findById($_POST['definitionId'])) {
+    /* @var $definition Component_Definition */
+    $instance
+        ->setDefinitionId($definition->getId())
+        ->setModule($context)
+        ->setIdentifier($_POST['targetId'])
+        ->setPosition($_POST['position'])
+        ->setSequence($_POST['sequence']);
 
     // it's an array, but there will only be 1
     $ids = $cim->save($instance);

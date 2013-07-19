@@ -105,7 +105,7 @@ class Core_Nav_Sidebar {
 	public function createSubject($cat, $items = 'all') {
 
         if(is_array($items) && !empty($items)) {
-            $code = $cat->getCodes()->count() ? " ({$cat->getCodes()->current()->getCode()})" : '';
+            $code = $cat->getCodes()->count() ? " ({$cat->getCodes()->first()->getCode()})" : '';
             $cid = $cat->getId();
             $itemMap = array(
                 'news'      => 'News',
@@ -194,7 +194,7 @@ class Core_Nav_Sidebar {
 	 */
 	public function createGroup($cat, $items = 'all') {
         if(is_array($items) && !empty($items)) {
-            $code = $cat->getCodes()->count() ? " ({$cat->getCodes()->current()})" : '';
+            $code = $cat->getCodes()->count() ? " ({$cat->getCodes()->first()->getCode()})" : '';
             $cid = $cat->getId();
             $itemMap = array(
                 'files'     => 'Files',

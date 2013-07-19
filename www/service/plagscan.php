@@ -30,15 +30,16 @@ class Plagscan_ServiceController {
         $documentCollection = Plagscan_DocumentMapper::getInstance()->findByColumn('plagscan_id', $documentId);
 
         if ( $documentCollection ) {
-            $document = $documentCollection[0];
+            /* @var $document Plagscan_Document */
+            $document = $documentCollection->first();
 
             $plagscanStat = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
             $plagscanHtml = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
 
-            $document->score = $plagscanStat->LEVEL / 10;
-            $document->status = Plagscan_Document::STATUS_COMPLETE;
+            $document->setScore($plagscanStat->LEVEL / 10);
+            $document->setStatus(Plagscan_Document::STATUS_COMPLETE);
 
-            $document->html = $plagscanHtml;
+            $document->setHtml($plagscanHtml);
 
             Plagscan_DocumentMapper::getInstance()->save($document);
         }

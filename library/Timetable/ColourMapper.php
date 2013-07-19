@@ -10,29 +10,29 @@
  * @link        http://www.alaress.com.au
  */
 
-class Timetable_ColourMapper extends Mapper {
+class Timetable_ColourMapper extends Schoolbox\Mapper {
 
-    protected $table = 'lu_timetable_colour';
+	protected $table = 'lu_timetable_colour';
 
-    protected function mapping() {
-        $this->hasMap(
-            array(
-                'column' => 'timetable_colour_id',
-                'property' => 'timetable_colour_id',
-                'type' => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
+	protected function mapping() {
+		$this->hasTable('lu_timetable_colour');
+		$this->hasModel('Timetable_Colour');
+		$this->hasMap(
+			array(
+				'column' => 'timetable_colour_id',
+				'property' => 'timetableColourId',
+				'type' => self::TYPE_INTEGER,
+				'identifier' => true
+			)
+		);
 
-        $this->hasMap(
-            array(
-                'column' => 'hex_colour',
-                'property' => 'hex_colour',
-                'type' => Mapper::TYPE_STRING,
-            )
-        );
-
-        parent::mapping();
-    }
+		$this->hasMap(
+			array(
+				'column' => 'hex_colour',
+				'property' => 'hexColour',
+				'type' => self::TYPE_STRING,
+			)
+		);
+	}
 
 }

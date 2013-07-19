@@ -54,7 +54,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 				// Explode the columns
 				$components[$position] = explode(',', $componentString);
 
-				$instanceCollection = new Collection();
+				$instanceCollection = new Schoolbox\Collection();
 
 				// Update the db
 				foreach ($components[$position] as $sequence => $componentID) {
@@ -63,7 +63,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 						$inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database
 						$inst->position = $position;
 
-						$instanceCollection[] = $inst;
+						$instanceCollection->add($inst);
 					}
 				}
 
@@ -90,11 +90,12 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
 		else if (is_numeric($_POST['add'])) {
 			$newComp = new Component_Instance();
-			$newComp->definitionId = $_POST['add'];
-			$newComp->identifier = $_POST['page_id'];
-			$newComp->module = 'eportfolio';
-			$newComp->sequence = 0;
-			$newComp->position = 'left';
+			$newComp
+				->setDefinitionId($_POST['add'])
+				->setIdentifier($_POST['page_id'])
+				->setModule('eportfolio')
+				->setSequence(0)
+				->setPosition('left');
 
 			$ids = $componentInstanceMapper->save($newComp);
 
@@ -115,8 +116,8 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 				die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
 			}
 
-			$templateTarget = "component_position_{$component->instance->position}";
-			$templateHandle = "component_{$component->instance->id}";
+			$templateTarget = "component_position_{$component->getInstance()->getPosition()}";
+			$templateHandle = "component_{$component->getInstance()->getId()}";
 			$templateHandle = TEMPLATE_content;
 
 			/* -_-
@@ -124,36 +125,38 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			$userHandler = new User();
 			$user = $userHandler->getById($eportfolioHandler->getSettingsPageOwner());
 
-			$component->setup($user, $component->instance->getConfigArray() );
+			$component->setup($user, $component->getInstance()->getConfigArray() );
 
 			if ($component->execute() !== false) {
 
 				/* Insert with config'd name
 				 */
-				foreach ($component->instance->config as $currentConfig) {
-					if ($currentConfig->key == 'componentname') {
+				foreach ($component->getInstance()->getConfig() as $currentConfig) {
+					/** @var Component_ConfigDefinition $currentConfig */
+					if ($currentConfig->getKey() == 'componentname') {
 						$configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
-							'component_config_definition_id' => $currentConfig->id,
+							'component_config_definition_id' => $currentConfig->getId(),
 							'component_instance_id' => $_POST['from'],
-						));
+						))->first();
 
-						if ($configInstance->count()) {
-							$componentName = $configInstance->current()->value;
+						if ($configInstance instanceof Component_Config) {
+							$componentName = $configInstance->getValue();
 
 							/* Presave a config for this newly added component
 							 * so it always has the name we gave it
 							 */
 							$newConfigInstance = new Component_Config();
-							$newConfigInstance->id = null;
-							$newConfigInstance->configDefinitionId = $currentConfig->id;
-							$newConfigInstance->instanceId = $component->instance->id;
-							$newConfigInstance->value = $configInstance->current()->value;
+							$newConfigInstance->setId(null);
+							$newConfigInstance->setConfigDefinitionId($currentConfig->getId());
+							$newConfigInstance->setInstanceId($component->getInstance()->getId());
+							$newConfigInstance->setValue($componentName);
 
 							Component_ConfigMapper::getInstance()->save($newConfigInstance);
 
 							/* Force inherited name
 							 */
-							$component->instance->config[$currentConfig->id]->defaultValue = $configInstance->current()->value;
+							$component->getInstance()->getConfig()->offsetGet($currentConfig->getId())
+								->setDefaultValue($componentName);
 						}
 					}
 				}
@@ -202,10 +205,13 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		else if (($_POST['type'] == 'config') && $_POST['component']) {
 			$config = $_POST;
 
+			/** @var Component_Instance $instance */
 			$instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
 			$componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
-			$configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn('component_definition_id', $instance->definitionId);
+			$configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
+				'component_definition_id', $instance->getDefinitionId()
+			);
 
 			$pageId = $config['page_id'];
 
@@ -223,7 +229,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			// prepare filter value
 			if(isset($config['filter'])) {
 				// retrieve the instance so we know how to insert this data
-				$cclass = $instance->definition->class;
+				$cclass = $instance->getDefinition()->getClass();
 				$controller = new $cclass($instance, new User(), $page);
 				$controller->execute();
 				$fields = $controller->getFilterFields();
@@ -235,23 +241,27 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 				$config['filter'] = $val;
 			}
 
+            /** @var Component_ConfigDefinition $confD */
 			foreach($configDefinitionCollection as $confD) {
-				if (isset($config[$confD->key])) {
+				if (isset($config[$confD->getKey()])) {
 
 					// this should be 1:1 relation, so return only the first instance of this definition
+                    /** @var Component_Config $confI */
 					$confI = $componentConfigInstanceMapper->findByColumnList(array(
-						'component_config_definition_id' => $confD->id,
-						'component_instance_id'          => $instance->id
-					))->current();
-
-					printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $config[$confD->key]);
-
-					if(!($confI->id)) {
+						'component_config_definition_id' => $confD->getId(),
+						'component_instance_id'          => $instance->getId()
+					))->first();
+					if (!($confI instanceof Component_Config)) {
 						$confI = new Component_Config();
-						$confI->configDefinitionId = $confD->id;
-						$confI->instanceId = $instance->id;
 					}
-					$confI->value = $config[$confD->key];
+
+					printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $config[$confD->getKey()]);
+
+					if(!($confI->getId())) {
+						$confI->setConfigDefinitionId($confD->getId());
+						$confI->setInstanceId($instance->getId());
+					}
+					$confI->setValue($config[$confD->getKey()]);
 
 					$componentConfigInstanceMapper->save($confI);
 

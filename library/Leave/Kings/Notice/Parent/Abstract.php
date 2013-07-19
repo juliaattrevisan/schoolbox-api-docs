@@ -32,7 +32,7 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 		$housemasterName = $housemaster['firstname'] . ' ' . $housemaster['lastname'];
 		$housemasterEmail = $housemaster['alt_email'];
 
-		$subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->getName();
+		$subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
 		/* Set destination email address in loop in send()
 		 */
@@ -45,7 +45,7 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 		$email->setBlock($email->t_label, 'rejected_by', 'rejected_by_block');
 
 		$email->setVar(array(
-			'LEAVE_USER_NAME' => $this->getRequest()->getUser()->getName(),
+			'LEAVE_USER_NAME' => $this->getRequest()->getUser()->formatName(),
 			'LEAVE_STATUS' => $this->getRequest()->getStatus(true),
 			'LEAVE_START' => $this->getRequest()->getStart()->getLong(),
 			'LEAVE_FINISH' => $this->getRequest()->getFinish()->getLong(),

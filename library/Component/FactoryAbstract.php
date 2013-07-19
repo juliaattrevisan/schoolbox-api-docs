@@ -35,20 +35,20 @@ abstract class Component_FactoryAbstract {
 
     /**
      * @param $identifier
-     * @return Collection
+     * @return Schoolbox\Collection[Component_ControllerAbstract]
      */
     public function buildComponentList ($identifier) {
         /* Get Component Instances */
         $instanceCollection = $this->getInstanceList($identifier);
 
-        $componentCollection = new Collection;
+        $componentCollection = new Schoolbox\Collection();
 
         if ( !empty($instanceCollection) ) {
             foreach ($instanceCollection as $instance) {
                 $component = $this->buildComponent($instance);
 
                 if ( !empty($component) ) {
-                    $componentCollection[] = $component;
+                    $componentCollection->add($component);
                 }
             }
         }
@@ -66,16 +66,18 @@ abstract class Component_FactoryAbstract {
             $instance = $this->getInstance($instance);
         }
 
-        if ( class_exists($instance->definition->class, true) ) {
+        /** @var Component_Instance $instance */
+        $class = $instance->getDefinition()->getClass();
+        if ( class_exists($class, true) ) {
             $argumentList = array_merge( array($instance), $this->dependencyList );
 
-            $dependencyList = $this->buildDependencyList($instance->definition->class, 3);
+            $dependencyList = $this->buildDependencyList($class, 3);
 
             if ( !empty($dependencyList) ) {
                 $argumentList = array_merge( $argumentList, $dependencyList );
             }
 
-            $controllerReflection = new ReflectionClass($instance->definition->class);
+            $controllerReflection = new ReflectionClass($class);
 
             $controller = $controllerReflection->newInstanceArgs($argumentList);
 
@@ -88,7 +90,7 @@ abstract class Component_FactoryAbstract {
 
     /**
      * @param $identifier
-     * @return Collection
+     * @return array
      */
     public function getInstanceList ($identifier) {
         return Component_InstanceMapper::getInstance()->findByContext($this->module, $identifier);
@@ -99,14 +101,15 @@ abstract class Component_FactoryAbstract {
      * @return Component_Instance
      */
     public function getInstance ($instanceId) {
+        /* @var $instance Component_Instance */
         $instance = Component_InstanceMapper::getInstance()->findById($instanceId);
-        $instance->definition = Component_DefinitionMapper::getInstance()->findById($instance->definitionId);
+        $instance->setDefinition(Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId()));
 
         return $instance;
     }
 
     /**
-     * @return Collection
+     * @return \Schoolbox\Collection
      */
     public function getDefinitionList($sortBy = '') {
         return Component_DefinitionMapper::getInstance()->findAllForModule($this->module, $sortBy);

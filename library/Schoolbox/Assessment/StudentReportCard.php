@@ -526,7 +526,7 @@ class StudentReportCard {
 						// has this already been published?
 						if(count($existingShowcasedItem)) {
 							// yes: offer unpublish action
-							$output['WORK_PUBLISH_ID']        = $existingShowcasedItem->current()->getId();
+							$output['WORK_PUBLISH_ID']        = $existingShowcasedItem->first()->getId();
 							$output['WORK_PUBLISH_TYPE']      = 'showcaseItemId';
 							$output['WORK_PUBLISH_ACTION']    = 'unpublish';
 							$output['WORK_PUBLISH_BTN_ICON']  = 'download';

@@ -17,14 +17,14 @@ class Facade_Homepage_API extends Generic_API {
     public function Display($categoryID) {
         $response = new Response_HTTP();
         try {
-	        /**
-	         * @var User $user
-	         * @var Category $cat
-	         * @var Collection $page
-	         */
-	        list($user, $cat, $page) = $this->getHomepage($categoryID);
+            /**
+             * @var User $user
+             * @var Category $cat
+             * @var Schoolbox\Collection $page
+             */
+            list($user, $cat, $page) = $this->getHomepage($categoryID);
 
-            list($catTitle, $articles) = $this->renderComponents($user, $cat, $page->toArray());
+            list($catTitle, $articles) = $this->renderComponents($user, $cat, $page->getAll());
             $response->setPage('title', $catTitle);
             $response->setResponse('articles', $articles);
             $this->logVisit($user->getId(), $categoryID);
@@ -63,10 +63,17 @@ class Facade_Homepage_API extends Generic_API {
     private function getModule($categoryID, $method) {
         $response = new Response_HTTP();
         try {
+            /**
+             * @var User $user
+             * @var Category $cat
+             * @var Schoolbox\Collection $page
+             */
             list($user, $cat, $page) = $this->getHomepage($categoryID);
-            $method = sprintf("Component_Homepage_%sController", $method);
-            foreach($page->get('components') as $comp) {
-                if($comp->get('controller') == $method) {
+            $articles = array();
+            $method   = sprintf("Component_Homepage_%sController", $method);
+            foreach ($page as $comp) {
+                /** @var Component_ControllerAbstract $comp */
+                if (get_class($comp) == $method) {
                     list($catTitle, $articles) = $this->renderComponents($user, $cat, array($comp));
                 }
             }
@@ -83,7 +90,7 @@ class Facade_Homepage_API extends Generic_API {
             else {
                 $response->setPage('title', '');
             }
-            $this->logVisit($user->get('uid'), $categoryID);
+            $this->logVisit($user->getId(), $categoryID);
         }
         catch (Exception_Schoolbox $e) {
             //
@@ -109,32 +116,32 @@ class Facade_Homepage_API extends Generic_API {
         $s = new Authenticator();
         $user = $s->getSessionUser();
 
-	    /** @var $cMap CategoryMapper */
-	    $cMap = CategoryMapper::getInstance();
+        /** @var $cMap CategoryMapper */
+        $cMap = CategoryMapper::getInstance();
 
         $cat = $cMap->findById($catID);
 
-	    $homeFactory = new Component_Homepage_Factory(new \User(), new \SitePage(false));
+        $homeFactory = new Component_Homepage_Factory(new \User(), new \SitePage(false));
         $page = $homeFactory->buildComponentList($catID);
 
         return array($user, $cat, $page);
     }
 
-	/**
-	 * @param User $user
-	 * @param Category $cat
-	 * @param $components
-	 * @return array
-	 */
-	private function renderComponents($user, $cat, $components) {
+    /**
+     * @param User     $user
+     * @param Category $cat
+     * @param array    $components
+     * @return array
+     */
+    private function renderComponents($user, $cat, $components) {
         try {
             $articles = array();
 
-            if(is_array($components) || $components instanceof GizaCollection) {
+            if(is_array($components)) {
                 // plz render mine components
-                foreach($components as $component) {
+                foreach ($components as $component) {
+                    /** @var Component_ControllerAbstract $component */
                     foreach($this->componentRefactoryMap(get_class($component)) as $className) {
-//                        echo "`$className` ";
                         if(in_array($className, $this->custom)) {
                             if(class_exists($className)) {
                                 $instance = new $className();
@@ -163,7 +170,7 @@ class Facade_Homepage_API extends Generic_API {
                     $instance = new $className();
 
                     if($instance instanceof Facade_Component_Generic) {
-                        $articles[$matches[2]] = $instance->render($user, $cat->get('id'));
+                        $articles[$matches[2]] = $instance->render($user, $cat->getId());
                     }
 
                     else {
@@ -175,12 +182,8 @@ class Facade_Homepage_API extends Generic_API {
                 return array('Error', array('Bad component definitions.'));
             }
 
-            // if the category is still wrapped in a collection, extract it
-            if($cat instanceof Collection) {
-                $cat = $cat->current();
-            }
-	        $codes = $cat->getCodes();
-            $catTitle = $cat->getName() . ($codes->count() ? " ({$codes->current()->getCode()})" : '');
+            $codes    = $cat->getCodes();
+            $catTitle = $cat->getName() . ($codes->count() ? " ({$codes->first()->getCode()})" : '');
 
             return array($catTitle, $articles);
         }

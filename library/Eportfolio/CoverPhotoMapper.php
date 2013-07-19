@@ -67,7 +67,7 @@ class CoverPhotoMapper extends Schoolbox\Mapper {
 	 * Find the latest cover photo
 	 *
 	 * @param $userId
-	 * @return \Collection
+	 * @return \Schoolbox\Collection
 	 */
 	public function findLatest($userId) {
 		$statement = $this->database->prepare("
