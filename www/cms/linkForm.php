@@ -27,7 +27,9 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
 		/* Double check permission on link
 		 */
 		$currentLink = $linkHandler->getById($_POST['linkID']);
-
+		if (!is_array($currentLink)) {
+			error(2);
+		}
 		if ($groupHandler->getPermission($currentLink['cid']) < WRITE_ACCESS) {
 			error(6);
 		}
