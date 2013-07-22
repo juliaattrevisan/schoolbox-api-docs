@@ -93,15 +93,19 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 	}
 
 	/**
-	 * Strips error-causing characters from the name of the subject.
-	 * Currently only strips out / characters as that's the only thing that
-	 * directory names outright choke on.
+	 * Strips characters which may have special meaning in filenames.
+	 *
+	 * Currently strips out:
+	 * * All non-printable chars and null (\x00 - \x1F)
+	 * * The following characters: < > : " / \ | ? *
+	 *
+	 * @see http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
 	 *
 	 * @param  string $name
 	 * @return string
 	 */
 	protected function sanitiseName($name) {
-		return strtr($name, array('/' => ''));
+		return preg_replace('/[<>:\\/\\\\|?*\\x00-\\x1F]/', '', $name);
 	}
 
 	/**
