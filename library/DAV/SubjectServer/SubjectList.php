@@ -23,7 +23,7 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 	 *
 	 * The subject list will only be shown for the root path, usually.
 	 *
-	 * @param $path The path that is being displayed.
+	 * @param  string $path The path that is being displayed.
 	 *
 	 * @return bool
 	 */
@@ -66,6 +66,7 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 		$mapper = new SubmissionBoxMapper();
 		$categories = array();
 		foreach ($mapper->getSubmittable($this->getUser()) as $box) {
+			/** @var Schoolbox\Assessment\Component\SubmissionBox $box */
 			$category = $box->getCategory();
 			if (array_key_exists($category->getId(), $categories)) {
 				continue;
@@ -74,13 +75,14 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 
 			$codes = array();
 			foreach ($category->getCodes() as $code) {
+				/** @var Schoolbox\Resource\CategoryCode $code */
 				$codes[] = $code->getCode();
 			}
 			$name = $category->getName();
 			if (!empty($codes)) {
 				$name .= ' ('.implode(', ', $codes).')';
 			}
-			$child = new DAV_SubjectServer_Subject($name);
+			$child = new DAV_SubjectServer_Subject($this->getUniqueName($this->sanitiseName($name)));
 			$child
 				->setCategory($category)
 				->setUser($this->getUser())
@@ -88,6 +90,46 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 			$this->addChild($child);
 		}
 		return $this;
+	}
+
+	/**
+	 * Strips error-causing characters from the name of the subject.
+	 * Currently only strips out / characters as that's the only thing that
+	 * directory names outright choke on.
+	 *
+	 * @param  string $name
+	 * @return string
+	 */
+	protected function sanitiseName($name) {
+		return strtr($name, array('/' => ''));
+	}
+
+	/**
+	 * Attempts to resolve conflicts with subject names by appending a number to
+	 * the name if it's already in use.
+	 *
+	 * @throws Sabre\DAV\Exception if this method couldn't create a unique name
+	 *                             after 1000 attempts
+	 * @param  string $name
+	 * @return string
+	 */
+	protected function getUniqueName($name) {
+		if ($this->childExists($name)) {
+			for ($i = 1; $i <= 1000; $i++) {
+				$new_name = $name.'-'.$i;
+				if (!$this->childExists($new_name)) {
+					return $new_name;
+				}
+			}
+			//
+			// Fell through all the way to here? That means we couldn't find a
+			// unique name after way too many attempts.
+			// Maybe you should have an exception instead.
+			throw new Sabre\DAV\Exception('Could not assign a unique name to subject "'.$name.'"');
+		}
+		else {
+			return $name;
+		}
 	}
 
 	/**
