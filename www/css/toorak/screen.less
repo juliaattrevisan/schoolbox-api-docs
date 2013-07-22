@@ -3,6 +3,7 @@
 @skin: 							'demo';
 @banner-background: 			#f6f5f2;
 @banner-color:      			#002664;
+@ivy:                           #6a963b;
 @banner-links:      			@banner-color;
 @banner-height:     			72px;
 
@@ -38,7 +39,9 @@ html, body { min-height: 100%; }
 body {
 	background: @background-color url('/images/toorak/ivy-bg.png') bottom left no-repeat;
 }
-
+body.login {
+  background: @banner-background;
+}
 #wrap{
   background: url('/images/toorak/ivy-bg-2.png') 100% -6px no-repeat;
 }
@@ -63,16 +66,26 @@ a:hover{color:@link-hover-color;}
 img.bg{
   /* Set rules to fill background */
   min-height: 100%;
-  min-width: 1024px;
+  //min-width: 1024px;
 
   /* Set up proportionate scaling */
-  width: 100%;
-  height: auto;
+  //width: 100%;
+  height: 100%;
 
-  /* Set up positioning */
+  /* Set up positioning
   position: fixed;
   top: 0;
-  left: 0;
+  left: 0;*/
+}
+
+#login-background{
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  z-index: -1;
 }
 
 .login #header{
@@ -83,13 +96,13 @@ img.bg{
   position: absolute;
   left: 50%;
   top: 61px;
-  margin-left: 274px;
+  margin-left: 97px;
 }
 
 .login #header .logo{
   left: 50%;
   top: 2px;
-  margin-left: -555px;
+  margin-left: -339px;
 }
 
 .login #header .logo,
