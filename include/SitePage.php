@@ -912,7 +912,7 @@ class SitePage extends Page {
         }
     }
 
-    function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '') {
+    function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array()) {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array($selected);
         if (is_array($data) || $data instanceof Traversable) {
