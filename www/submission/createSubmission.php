@@ -197,24 +197,24 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $file_links = $submission->getFileLinks();
     if ($file_links->count() > 0) {
         foreach ($file_links as $file_link) {
+            /** @var Schoolbox\Assessment\Component\SubmissionBox\File $file_link */
             $file = $file_link->getFile();
             $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
             $this->setVar('CURRENT_FILE_ID',   $file->getId());
             $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
             $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
+            $this->setVar('CURRENT_FILE_URL',  '/storage/fetch.php?'.http_build_query(array('hash' => $file->getHash(), 'save' => 1)));
             $this->parse('existing_file_block','existing_file', true);
         }
     }
     elseif ($submission->getLegacyFileId()) {
-
         $fileHandler = new File;
         $file = $fileHandler->getByID($submission->getLegacyFileId());
-
         $this->setVar('CURRENT_FILE_NAME', $file['realname']);
         $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
         $this->setVar('CURRENT_FILE_ID',   'old');
         $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
-
+        $this->setVar('CURRENT_FILE_URL',  '/send.php?'.http_build_query(array('id' => $submission->getLegacyFileId(), 'save' => 1)));
         $this->parse('existing_file_block','existing_file');
     }
     else {
