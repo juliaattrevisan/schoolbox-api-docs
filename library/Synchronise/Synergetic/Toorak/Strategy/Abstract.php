@@ -121,17 +121,17 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
 		// RED, BLU, GOL: ?
 		switch ($house) {
 			case 'PYE':
-				return 383;
+				return 21;
 			case 'TRI':
-				return 384;
+				return 25;
 			case 'MAY':
-				return 385;
+				return 24;
 			case 'HAM':
-				return 386;
+				return 20;
 			case 'CER':
-				return 387;
+				return 22;
 			case 'DOU':
-				return 388;
+				return 23;
 			default:
 				return false;
 		}
@@ -161,11 +161,11 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
 			case '10':
 			case '11':
 			case '12':
-				return 3;
+				return 1;
 			case '32':
 			case '33':
 			case '44':
-				return 1;
+				return 3;
 			default:
 				return false;
 		}
