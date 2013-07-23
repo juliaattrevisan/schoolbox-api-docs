@@ -89,6 +89,7 @@ function openUploader(img_id, target_form_element, type, option) {
         // unfortunately this line can't be used, have to replicate functionality instead
         // tinyMCEPopup.openBrowser(target_form_element, type, option);
 
+        tinyMCEPopup.restoreSelection();
         tinyMCEPopup.editor.execCallback("file_uploader_callback", target_form_element,
             document.getElementById(target_form_element).value, option, window)
     }
