@@ -43,11 +43,6 @@ class CategoryMapper extends Mapper {
 			'property'   => 'parentId',
 			'type'       => self::TYPE_INTEGER,
 		));
-		$this->hasMap(array(
-			'column'    => 'template',
-			'property'  => 'templateId',
-			'type'      => self::TYPE_INTEGER,
-		));
 
 		//
 		// Joins:
