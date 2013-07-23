@@ -116,9 +116,12 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	 * Transform the datetime into an arbitrary format
 	 *
 	 * @param  $format
-	 * @return string
+	 * @return string  Empty if date isn't valid.
 	 */
 	public function getUsingFormat($format) {
+		if (!$this->isValid()) {
+			return '';
+		}
 		if ($this->getDateTimeObject() instanceof DateTime) {
 			return $this->getDateTimeObject()->format($format);
 		}
