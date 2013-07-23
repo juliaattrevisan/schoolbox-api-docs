@@ -465,14 +465,17 @@ class Category extends DeprecatedModel {
      */
     public function create($data) {
         $group = $data['group'];
+        $template = $data['template'];
         unset($data['group']);
         unset($data['recursive']);
+        unset($data['template']);
 
         /* Check if the category code exists. If it already does, spawn error;
          * otherwise continue creating. array_filter() removes empty, false
          * and null elements from the array
          */
         $codeList = explode(',', trim($data['code']));
+        unset($data['code']);
 
         if (is_array($codeList) && count($codeList)) {
             $codeList = array_values(array_filter($codeList, 'trim'));
@@ -495,12 +498,9 @@ class Category extends DeprecatedModel {
             }
         }
 
-        if ($data['template']) {
+        if ($template) {
             $homepageHandler = new Homepage($categoryID);
-            $homepageHandler->createHomepageFromTemplate($data['template']);
-        } else {
-            // we don't want an invalid template ID going into the database
-            unset($data['template']);
+            $homepageHandler->createHomepageFromTemplate($template);
         }
 
         /* Insert synergetic subject code */
@@ -532,6 +532,7 @@ class Category extends DeprecatedModel {
          * and null elements from the array
          */
         $codeList = explode(',', trim($data['code']));
+        unset($code);
 
         if (is_array($codeList) && count($codeList)) {
             $codeList = array_values(array_filter($codeList, 'trim'));
