@@ -32,7 +32,7 @@ class AjaxChat {
     /**
      * @var array
      */
-    private $config;
+    private $config = array();
 
     /**
      * @var Component_Instance
