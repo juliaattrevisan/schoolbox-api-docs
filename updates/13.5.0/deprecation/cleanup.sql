@@ -2,6 +2,7 @@ ALTER TABLE `category` DROP `code`;
 ALTER TABLE `category` DROP `teacherid`;
 ALTER TABLE `category` DROP `template`;
 ALTER TABLE `user` DROP `campus`;
+ALTER TABLE `homepageTemplate` DROP `layout`;
 DROP TABLE `cache`;
 DROP TABLE `component_option`;
 DROP TABLE `component_option_definition`;
