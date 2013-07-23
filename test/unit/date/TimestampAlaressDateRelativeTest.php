@@ -11,7 +11,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testRelativeTimeSeconds2() {
@@ -23,7 +23,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testRelativeTimeMinutes1() {
@@ -35,7 +35,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testRelativeTimeMinutes2() {
@@ -47,7 +47,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testRelativeTimeHours1() {
@@ -59,7 +59,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testRelativeTimeHours2() {
@@ -71,7 +71,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testRelativeTimeDays1() {
@@ -83,7 +83,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testRelativeTimeDays2() {
@@ -95,7 +95,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testRelativeTimeWeeks1() {
@@ -107,7 +107,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 	/**
@@ -124,6 +124,6 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 		$result = $relativeDate->getRelativeTime();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 }
