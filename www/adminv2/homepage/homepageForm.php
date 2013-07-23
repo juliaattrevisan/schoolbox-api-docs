@@ -55,27 +55,36 @@ switch($action) {
         return;
 }
 
+
+
+
+
 // if we're here, all above is valid
 
 if($action == 'delete') {
-    $sql[0] = "DELETE FROM `component_instance` WHERE `module` = 'homepage_template' AND `indentifier` = :templateID";
-    $vars[0] = array('templateID' => $templateID);
 
-    $sql[1] = "DELETE FROM `homepageTemplate` WHERE `id` = :templateID";
-    $vars[1] = array('templateID' => $templateID);
+    $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
+    $homepageTemplate = $homepageTemplateMapper->findById($templateID);
+
+    if($homepageTemplate != false) {
+        $homepageTemplateMapper->delete($homepageTemplate);
+    }
 }
 elseif($action == 'rename') {
-    $sql[0] = "UPDATE `homepageTemplate` SET `name` = :name WHERE `id` = :templateID";
-    $vars[0] = array('templateID' => $templateID, 'name' => $name);
+
+    $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
+    $homepageTemplate = $homepageTemplateMapper->findById($templateID);
+    $homepageTemplate->setName($name);
+
+    $homepageTemplateMapper->save($homepageTemplate);
+
 }
 else {
-    $sql[0] = "INSERT INTO `homepageTemplate` (`name`,`layout`,`left_column_width`,`right_column_width`) VALUES (:name,'1','69.9','29.9')";
-    $vars[0] = array('name' => $name);
-}
+    $homepageTemplate = new \Schoolbox\Resource\HomepageTemplate();
+    $homepageTemplate->setName($name)->setLeftColumnWidth(69.5)->setRightColumnWidth(29.5);
 
-for($i = 0; $i < count($sql); $i++) {
-    $stmt = Database::getInstance()->prepare($sql[$i]);
-    $stmt->execute($vars[$i]);
+    $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
+    $homepageTemplateMapper->create($homepageTemplate);
 }
 
 $sitePage->backToTheFuture(1);

@@ -35,22 +35,16 @@ foreach($allGroups as $currentGroup) {
 
 /* Show all the possible templates a homepage can have
  */
-$homepageTemplateHandler = new HomepageTemplate();
+$this->setVar('homepage_template_block', '');
 
-$allTemplates = $homepageTemplateHandler->getTemplateListDropDown();
+$homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
+$homepageTemplateList = $homepageTemplateMapper->findAll();
 
-if (is_array($allTemplates) && count($allTemplates)) {
-	foreach($allTemplates as $currentTemplate) {
-		$this->setVar(array(
-			'HOMEPAGE_TEMPLATE_ID' => $currentTemplate['TEMPLATE_ID'],
-			'HOMEPAGE_TEMPLATE_NAME' => $currentTemplate['TEMPLATE_NAME']
-		));
+foreach($homepageTemplateList as $currentTemplate) {
+    $this->setVar(array(
+        'HOMEPAGE_TEMPLATE_ID' => $currentTemplate->getId(),
+        'HOMEPAGE_TEMPLATE_NAME' => $currentTemplate->getName(),
+    ));
 
-		$this->parse('homepage_template_block', 'homepage_template', true);
-	}
+    $this->parse('homepage_template_block', 'homepage_template', true);
 }
-else {
-	$this->setVar('homepage_template_block', '');
-}
-
-?>

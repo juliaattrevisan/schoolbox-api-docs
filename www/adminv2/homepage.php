@@ -25,18 +25,17 @@ $this->setBlock(TEMPLATE_content, 'template', 'template_block');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'homepage');
 
-$templateHandler = new HomepageTemplate();
-$templateList = $templateHandler->getAll();
 
-if(is_array($templateList)) {
-    foreach($templateList as $template) {
-        $this->setVar(array(
-            'template.id'   => $template['id'],
-            'template.name' => $template['name']
+$homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
+$homepageTemplateList = $homepageTemplateMapper->findAll();
+
+foreach($homepageTemplateList as $currentTemplate) {
+    $this->setVar(array(
+            'template.id'   => $currentTemplate->getId(),
+            'template.name' => $currentTemplate->getName()
         ));
 
-        $this->parse('template_block', 'template', true);
-    }
+    $this->parse('template_block', 'template', true);
 }
 
 /* Component Palette */
