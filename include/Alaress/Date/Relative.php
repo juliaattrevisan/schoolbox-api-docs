@@ -108,7 +108,7 @@ class Alaress_Date_Relative extends Alaress_Date_Format {
         }
 
         // fall back to full format
-        return $this->getPrefix() . ' ' . $this->getUsingFormat('jS M Y');
+        return $this->getPrefix() . ' ' . $this->getDateOnly();
     }
 
     /**
@@ -145,7 +145,7 @@ class Alaress_Date_Relative extends Alaress_Date_Format {
         }
 
         // fall back to full format
-        return $this->getPrefix() . ' ' . $this->getUsingFormat('jS M Y');
+        return $this->getPrefix() . ' ' . $this->getDateOnly();
     }
 
 
