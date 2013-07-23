@@ -150,15 +150,17 @@
             nav.find('ul li[role="tab"]:nth-of-type('+ (ni + 1) +') ul li:nth-of-type('+ (mi + 1) + ')').addClass('current')
             nav.find('li[role="tab"]:nth-of-type('+ (ni + 1) +')').addClass('current')
 
-            // Link to page
+            // Link to page.
+            // Is this an external link? (starts with http, or / (but not /m/))
+            // Render page but don't push onto stack.
             var href = $(this).attr('href')
-            if(href.indexOf('http') == 0 || href.indexOf('/') === 0) {
+            if ((href.indexOf('http') === 0 || href.indexOf('/') === 0) && href.indexOf('/m/') !== 0) {
                 $('#menu, #menu li, #nav li').removeClass('active')
                 renderPage(href, false)
             }
             else if(href != '#' && href != 'undefined'){
                 $('#menu, #menu li, #nav li').removeClass('active')
-                renderPage('/m/'+href, true)
+                renderPage(href, true)
             }
         }
     });
