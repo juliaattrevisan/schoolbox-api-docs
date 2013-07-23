@@ -1,8 +1,5 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../include/Autoloader.php';
-Autoloader::initialise();
-
 class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
 	public function testRelativeTimePastSeconds1() {
