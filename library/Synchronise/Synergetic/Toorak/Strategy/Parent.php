@@ -115,8 +115,12 @@ class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synerget
 
 				/* Update previous user
 					 */
-				$this->executeCreateUpdate($previousUser);
-				$this->executeCreateUpdate($previousSpouse);
+				if ($this->userExistsBySynergyAndGroup($previousUser)) {
+					$this->executeCreateUpdate($previousUser);
+				}
+				if ($this->userExistsBySynergyAndGroup($previousSpouse)) {
+					$this->executeCreateUpdate($previousSpouse);
+				}
 
 				/* Recompile
 					 */
