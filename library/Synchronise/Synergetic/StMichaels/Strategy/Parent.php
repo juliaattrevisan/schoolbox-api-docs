@@ -139,7 +139,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
         }
 
         // from here on, use synergy data
-        $targetUser['password'] = $currentUser["StudentContact{$fieldVariant}Password"];
+        $targetUser['password'] = '';
         $targetUser['title'] = trim($currentUser["StudentContact{$fieldVariant}Title"]);
         $targetUser['firstname'] = trim($currentUser["StudentContact{$fieldVariant}Preferred"]);
         $targetUser['lastname'] = trim($currentUser["StudentContact{$fieldVariant}Surname"]);
