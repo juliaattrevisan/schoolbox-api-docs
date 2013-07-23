@@ -32,6 +32,9 @@ class Plagscan_ServiceController {
         if ( $documentCollection ) {
             /* @var $document Plagscan_Document */
             $document = $documentCollection->first();
+            if (!($document instanceof Plagscan_Document)) {
+                return false;
+            }
 
             $plagscanStat = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
             $plagscanHtml = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
