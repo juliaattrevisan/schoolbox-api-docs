@@ -117,7 +117,7 @@ class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testRelativeTimeAncientHistory() {
 		$input = date('U', strtotime('2001-01-03 02:02:12'));
-		$expected = 'on 03-01-2001 02:02:12';
+		$expected = 'on 3rd Jan 2001';
 
 		$relativeDate = new Alaress_Date_Relative($input);
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 17:40:11')));
