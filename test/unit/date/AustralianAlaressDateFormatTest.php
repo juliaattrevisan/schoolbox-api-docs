@@ -135,6 +135,16 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$date = new Alaress_Date_Format($input, 'd/m/y');
 		$result = $date->getDatabase();
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
+	}
+
+	public function testDbFormat() {
+		$input = '2011-07-01 20:51:00';
+		$expected = '2011-07-01 20:51:00';
+
+		$date = new Alaress_Date_Format($input, 'y-m-d');
+		$result = $date->getDatabase();
+
+		$this->assertEquals($expected, $result);
 	}
 }

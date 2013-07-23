@@ -145,18 +145,4 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($result, $expected);
 	}
-
-	/**
-	 *
-	 * @return void
-	 */
-	public function testDbFormat() {
-		$input = '2011-07-01 20:51:00';
-		$expected = '2011-07-01 20:51:00';
-
-		$date = new Alaress_Date_Format($input, 'y-m-d');
-		$result = $date->getDatabase();
-
-		$this->assertEquals($result, $expected);
-	}
 }
