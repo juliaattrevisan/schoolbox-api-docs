@@ -111,7 +111,7 @@ class PostMapper extends Schoolbox\Mapper {
 			SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE homepage_id = :homepageId
-            ORDER BY created_at DESC
+            ORDER BY parent_id DESC, created_at
         ";
 
 		$statement = $this->database->prepare($query);
@@ -162,7 +162,9 @@ class PostMapper extends Schoolbox\Mapper {
 		if (!empty($callback) && is_callable($callback)) {
 			$model = call_user_func($callback, $this, $model, $row);
 		}
-
+$model->setCreatedAt(null);
+		$model->setUpdatedAt(null);
+		$model->setDeletedAt(null);
 		return $model;
 	}
 

@@ -12,9 +12,10 @@ use Schoolbox;
 use ArrayIterator;
 use ICollection;
 
-class Collection implements ICollection {
+class Collection implements \ICollection {
 
 	protected $stack = array();
+	protected $position = 0;
 
 	/**
 	 * @param $element
@@ -24,21 +25,21 @@ class Collection implements ICollection {
 	}
 
 	/**
-	 * Returns whole collection as an array.
-	 *
-	 * @return array
-	 */
-	public function getAll() {
-		return $this->stack;
-	}
-
-	/**
 	 * Constructor
 	 *
 	 * @param array $stack
 	 */
 	public function __construct($stack = array()) {
 		$this->setStack($stack);
+	}
+	
+	/**
+	 * Returns whole collection as an array.
+	 *
+	 * @return array
+	 */
+	public function getAll() {
+		return $this->stack;
 	}
 
 	/**
@@ -75,19 +76,6 @@ class Collection implements ICollection {
 	}
 
 	/**
-	 * Gets first item in collection (regardless of its key)
-	 *
-	 * @return mixed
-	 */
-	public function first() {
-		foreach ($this as $item) {
-			return $item;
-			break;
-		}
-		return null;
-	}
-
-	/**
 	 * Does this value exist?
 	 *
 	 * @param mixed $offset
@@ -108,18 +96,6 @@ class Collection implements ICollection {
 	public function offsetUnset($offset) {
 		unset($this->stack[$offset]);
 	}
-
-	/**
-	 * Retrieves an iterator over this collection's stack.
-	 *
-	 * @return \Traversable
-	 */
-	public function getIterator() {
-		return new ArrayIterator($this->stack);
-	}
-
-	/* Getters/Setters
-	 */
 
 	/**
 	 * Set stack
@@ -147,6 +123,72 @@ class Collection implements ICollection {
 	public function count() {
 		return count($this->getStack());
 	}
+
+	/**
+	 * Retrieves an iterator over this collection's stack.
+	 *
+	 * @return \Traversable
+	 */
+	public function getIterator() {
+		return new ArrayIterator($this->stack);
+	}
+	
+    /**
+     * Rewind
+     */
+    public function rewind() {
+        $this->position = 0;
+    }
+
+    /**
+     * Current
+     *
+     * @return mixed
+     */
+    public function current() {
+        return $this->stack[$this->position];
+    }
+
+    /**
+     * Key
+     *
+     * @return mixed
+     */
+    public function key() {
+        return $this->position;
+    }
+
+	/**
+	 * Gets first item in collection (regardless of its key)
+	 *
+	 * @return mixed
+	 */
+	public function first() {
+		foreach ($this as $item) {
+			return $item;
+			break;
+		}
+		return null;
+	}
+
+    /**
+     * Next
+     */
+    public function next() {
+        ++$this->position;
+    }
+
+    /**
+     * Valid
+     *
+     * @return bool
+     */
+    public function valid() {
+        return isset($this->stack[$this->position]);
+    }
+
+    /* Getters/Setters
+     */
 
 	/**
 	 * Gets the name of the get method for this field.

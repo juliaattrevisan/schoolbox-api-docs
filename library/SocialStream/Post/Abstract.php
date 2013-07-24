@@ -67,6 +67,13 @@ abstract class SocialStream_Post_Abstract {
 	protected $body = '';
 
 	/**
+	 * Children posts
+	 *
+	 * @var null
+	 */
+	protected $children = null;
+
+	/**
 	 * Created at
 	 *
 	 * @var string
@@ -86,6 +93,13 @@ abstract class SocialStream_Post_Abstract {
 	 * @var string
 	 */
 	protected $deletedAt = '';
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setChildren(new Schoolbox\Collection());
+	}
 
 	/* Getters/Setters
 	 */
@@ -286,5 +300,23 @@ abstract class SocialStream_Post_Abstract {
 	 */
 	public function getUrl() {
 		return $this->url;
+	}
+
+	/**
+	 * Set children
+	 *
+	 * @param null $children
+	 */
+	public function setChildren($children) {
+		$this->children = $children;
+	}
+
+	/**
+	 * Get children
+	 *
+	 * @return null
+	 */
+	public function getChildren() {
+		return $this->children;
 	}
 }
