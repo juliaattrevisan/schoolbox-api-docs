@@ -158,6 +158,9 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 							$component->getInstance()->getConfig()->offsetGet($currentConfig->getId())
 								->setDefaultValue($componentName);
 						}
+						else {
+							$componentName = $currentConfig->defaultValue;
+						}
 					}
 				}
 
