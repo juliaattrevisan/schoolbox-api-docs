@@ -159,7 +159,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 								->setDefaultValue($componentName);
 						}
 						else {
-							$componentName = $currentConfig->defaultValue;
+							$componentName = $currentConfig->getDefaultValue();
 						}
 					}
 				}
