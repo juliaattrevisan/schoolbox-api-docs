@@ -3,3 +3,7 @@ CREATE TABLE `socialstream_post`( `post_id` INT(11) NOT NULL AUTO_INCREMENT, `pa
 /* root_id is the post_id
  */
 ALTER TABLE `socialstream_post` ADD COLUMN `root_id` INT(11) NULL AFTER `parent_id`;
+
+/* link it to a brownhole
+ */
+ALTER TABLE `socialstream_post` ADD COLUMN `storage_id` INT(11) NULL AFTER `homepage_id`;

@@ -47,6 +47,13 @@ abstract class SocialStream_Post_Abstract {
 	protected $parentId = 0;
 
 	/**
+	 * Storage id of the avatar used in this post (if any)
+	 *
+	 * @var int
+	 */
+	protected $storageId = 0;
+
+	/**
 	 * One of Website, Video, Image, File or String
 	 *
 	 * @var string
@@ -344,5 +351,23 @@ abstract class SocialStream_Post_Abstract {
 	 */
 	public function getRootId() {
 		return $this->rootId;
+	}
+
+	/**
+	 * Set storage id
+	 *
+	 * @param int $storageId
+	 */
+	public function setStorageId($storageId) {
+		$this->storageId = $storageId;
+	}
+
+	/**
+	 * Get storage id
+	 *
+	 * @return int
+	 */
+	public function getStorageId() {
+		return $this->storageId;
 	}
 }

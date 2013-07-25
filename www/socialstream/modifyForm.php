@@ -13,20 +13,6 @@ namespace SocialStream;
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 $page = new \SitePage();
 
-/* Set up authentication
- * Put your permissions and stuff in here, just like ePortfolio v2
- */
-$instanceMapper = \Component_InstanceMapper::getInstance();
-
-/* Seriously?
- */
-$instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
-$instance = $instanceArray[$_POST['instanceId']];
-
-/* Current User
- */
-$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
-
 /* Create new SocialStream Post
  */
 $type = $_POST['type'];
@@ -60,9 +46,7 @@ if (strlen($newPost->getUrl())) {
 		/* Verify that it's actually an allowable image type
 		 * before assigning it to the SocialStream post
 		 */
-		echo 'Streaming image file from the internets: ';
-		echo $file->getSavedFile()->getId();
-
+		$newPost->setStorageId($file->getSavedFile()->getId());
 	}
 	/* If it's just a url, get it, and find an avatar for it
 	 */
@@ -87,15 +71,24 @@ if (strlen($newPost->getUrl())) {
 			/* Verify that it's actually an allowable image type
 			 * before assigning it to the SocialStream post
 			 */
-			echo 'Acquiring avatar from og:image and saving it: ';
-			echo $file->getSavedFile()->getId();
-
-			//$fileType = new \FileType();
+			$newPost->setStorageId($file->getSavedFile()->getId());
 		}
 	}
 }
 
-die();
+/* Set up authentication
+ * Put your permissions and stuff in here, just like ePortfolio v2
+ */
+$instanceMapper = \Component_InstanceMapper::getInstance();
+
+/* Seriously?
+ */
+$instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
+$instance = $instanceArray[$_POST['instanceId']];
+
+/* Current User
+ */
+$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
 
 /* Authenticate!
  */
