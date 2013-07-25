@@ -15,17 +15,14 @@ $page = new \SitePage();
 
 /* Create new SocialStream Post
  */
-$type = $_POST['type'];
-$type = 'website';
-
-$factory = new Post\Factory('website');
+$factory = new Post\Factory($_POST['type']);
 
 $newPost = $factory->produce();
 $newPost->setRootId($_POST['rootId']);
 $newPost->setParentId($_POST['parentId']);
 $newPost->setHomepageId($_POST['homepageId']);
 $newPost->setOwnerId($_SESSION['id']);
-$newPost->setUrl('http://www.vanessaamorosi.com');
+$newPost->setUrl($_POST['url']);
 $newPost->setBody($_POST['body']);
 $newPost->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
@@ -61,15 +58,19 @@ if (strlen($newPost->getUrl())) {
 
 		preg_match($pattern, $curl->getResult(), $matches);
 
-		/* If an opengraph image was found, curl that too and brownhole it
+		/* If an opengraph image was found, curl that too
 		 */
 		if (count($matches)) {
-			$file = new File($matches[1], $newPost->getOwnerId());
-			$file->saveImage();
 
-			/* Verify that it's actually an allowable image type
-			 * before assigning it to the SocialStream post
+			/* To prevent a double-curl, remember the place where a thumbnail was
+			 * located (this is used as the cached image transform filename hash)
 			 */
+			$newPost->setThumbnail($matches[1]);
+
+			/* Save the original in the cache location
+			 */
+			$originalThumbnailCache = new Cache\Original();
+			$originalThumbnailCache->init($newPost->getThumbnail());
 		}
 	}
 }
