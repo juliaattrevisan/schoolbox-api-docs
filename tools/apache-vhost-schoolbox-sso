@@ -64,6 +64,9 @@
 	php_value session.gc_maxlifetime 43200
 	php_value session.cache_expire 43200
 	php_value session.cookie_lifetime 43200
+	php_value session.save_handler redis
+	php_value session.save_path "tcp://127.0.0.1:6379"
+
 
 	# Assess uses JSON arrays to transfer data in multi-choice/matching pairs
 	# JSON arrays don't like being escaped!!
