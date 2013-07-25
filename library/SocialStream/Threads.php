@@ -243,6 +243,7 @@ class Threads {
 				'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => \Scrub::text($currentPost->getOwnerId()->getExternalId()),
 				'SOCIALSTREAM_POST_USER_FULLNAME' => \Scrub::text($currentPost->getOwnerId()->getFullname()),
 				'SOCIALSTREAM_POST_TIMESTAMP' => \Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
+				'SOCIALSTREAM_POST_THUMBNAIL_HASH' => \Scrub::text($currentPost->getStorageId()->getHash()),
 				'ON_OFF' => $i%2 ? 'dark' : '',
 				'COMMENT_CLASS' => $canComment,
 			));
@@ -254,6 +255,7 @@ class Threads {
 					'SOCIALSTREAM_COMMENT_CREATED_AT' => \Scrub::text($currentComment->getCreatedAt()->getShort()),
 					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
 					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => \Scrub::text($currentComment->getOwnerId()->getFullname()),
+					'SOCIALSTREAM_COMMENT_THUMBNAIL_HASH' => \Scrub::text($currentComment->getStorageId()->getHash()),
 					'COMMENT_CLASS' => $canComment,
 				));
 
@@ -264,6 +266,7 @@ class Threads {
 						'SOCIALSTREAM_REPLY_CREATED_AT' => \Scrub::text($currentReply->getCreatedAt()->getShort()),
 						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => \Scrub::text($currentReply->getOwnerId()->getExternalId()),
 						'SOCIALSTREAM_REPLY_USER_FULLNAME' => \Scrub::text($currentReply->getOwnerId()->getFullname()),
+						'SOCIALSTREAM_REPLY_THUMBNAIL_HASH' => \Scrub::text($currentReply->getStorageId()->getHash()),
 					));
 
 					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
