@@ -47,6 +47,13 @@ abstract class SocialStream_Post_Abstract {
 	protected $parentId = 0;
 
 	/**
+	 * The place where a thumbnail exists for this post
+	 *
+	 * @var string
+	 */
+	protected $thumbnail = '';
+
+	/**
 	 * One of Website, Video, Image, File or String
 	 *
 	 * @var string
@@ -344,5 +351,23 @@ abstract class SocialStream_Post_Abstract {
 	 */
 	public function getRootId() {
 		return $this->rootId;
+	}
+
+	/**
+	 * Set thumbnail
+	 *
+	 * @param string $thumbnail
+	 */
+	public function setThumbnail($thumbnail) {
+		$this->thumbnail = $thumbnail;
+	}
+
+	/**
+	 * Get thumbnail
+	 *
+	 * @return string
+	 */
+	public function getThumbnail() {
+		return $this->thumbnail;
 	}
 }
