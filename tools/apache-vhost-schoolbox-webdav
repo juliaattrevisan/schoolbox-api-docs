@@ -20,6 +20,11 @@
 	php_value error_reporting 30711
 	php_value upload_max_filesize 512M
 	php_value post_max_size 512M
+	php_value session.gc_maxlifetime 360
+    php_value session.cache_expire 360
+    php_value session.cookie_lifetime
+    php_value session.save_handler redis
+    php_value session.save_path "tcp://127.0.0.1:6379"
 
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
