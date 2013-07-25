@@ -78,7 +78,7 @@ class Threads {
 	 */
 	public function __construct($instance, $start, $offset) {
 		$this->setInstance($instance);
-		$this->setHomepageId($instance->identifier);
+		$this->setHomepageId($instance->getIdentifier());
 		$this->setStart($start);
 		$this->setOffset($offset);
 

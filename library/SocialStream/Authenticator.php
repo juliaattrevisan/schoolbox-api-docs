@@ -71,7 +71,7 @@ class Authenticator {
 		}
 		else {
 			$groupHandler = new \Group();
-			$permission = $groupHandler->getPermission($this->getInstance()->identifier);
+			$permission = $groupHandler->getPermission($this->getInstance()->getIdentifier());
 		}
 
 		return $permission;
@@ -84,8 +84,8 @@ class Authenticator {
 	 * @return mixed
 	 */
 	private function findConfigValue($key) {
-		if (is_array($this->getInstance()->config) && count($this->getInstance()->config)) {
-			foreach($this->getInstance()->config as $currentConfig) {
+		if (is_array($this->getInstance()->getConfig()) && count($this->getInstance()->getConfig())) {
+			foreach($this->getInstance()->getConfig() as $currentConfig) {
 				if ($currentConfig->key == $key) {
 					return $currentConfig->value;
 				}
