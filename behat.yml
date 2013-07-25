@@ -2,3 +2,10 @@ default:
   paths:
     features: test/behavior
     bootstrap: %behat.paths.features%/bootstrap
+  extensions:
+    Behat\MinkExtension\Extension:
+      default_session: sahi
+      javascript_session: sahi
+      browser_name: firefox
+      base_url: http://192.168.36.10/
+      sahi: ~
