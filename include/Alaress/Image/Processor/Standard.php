@@ -33,14 +33,13 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
         /* Figure out what kind of file it is
          */
         $this->setFiletypeStrategy($imageArray);
+		$this->setFilePath($imageArray['filepath']);
 
         /* Prepare an image resource for chained manipulation
          */
-        if ($this->getCache()->isLoadedFromCache()) {
-            $this->getFiletypeStrategy()->streamFile($imageArray['filepath']);
-        }
-		else {
-            $this->setImage($this->getFiletypeStrategy()->create($imageArray['filepath']));
+        if (!$this->getCache()->isLoadedFromCache()) {
+            $this->setImage($this->getFiletypeStrategy()->create($this->getFilePath()));
+			$this->transformAll();
         }
 
         return $this;
@@ -134,9 +133,17 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      * Cache then stream the manipulated image
      */
     public function stream() {
-        $this->save();
-        $this->getFiletypeStrategy()->streamFile($this->getCache()->getCachedFileLocation());
+		if ($this->getCache()->isLoadedFromCache()) {
+			$this->getFiletypeStrategy()->streamFile($this->getFilePath());
+		}
+		else {
+			$this->save();
+			$this->getFiletypeStrategy()->streamFile($this->getCache()->getCachedFileLocation());
+		}
     }
+
+	public function streamFile() {
+	}
 
     /**
      * Saves the transformed image
@@ -154,4 +161,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
     public function getCachedFileLocation() {
         return $this->getCache()->getCachedFileLocation();
     }
+
+
+
 }
