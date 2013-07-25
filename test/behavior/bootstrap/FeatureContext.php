@@ -55,7 +55,7 @@ class FeatureContext extends MinkContext {
     public function createTemplate($name) {
         $form = $this->getSession()->getPage()->findById('template-action');
         $form->findField('name')->setValue($name);
-        $form->findButton('new')->press();
+        $form->findButton('New')->press();
         //
         // Once loaded - select this button and wait for it to show.
         // A new item won't have anything there.
