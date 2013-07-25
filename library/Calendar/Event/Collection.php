@@ -125,6 +125,30 @@ class Calendar_Event_Collection implements Iterator {
 	}
 
 	/**
+	 * Merge another stack into this one, but ensures that duplicate events are
+	 * not added to the stack again.
+	 *
+	 * @param \Calendar_Event_Collection $collection
+	 */
+	public function mergeWithoutDuplicates(Calendar_Event_Collection $collection) {
+		$id_list = array();
+		foreach ($this as $event) {
+			/** @var Calendar_Event_Type_Abstract $event */
+			$id_list[$event->getEventId()] = true;
+		}
+		foreach ($collection as $event) {
+			/** @var Calendar_Event_Type_Abstract $event */
+			$id = $event->getEventId();
+			//
+			// No ID for this event? it can't be identified as a duplicate or
+			// not, so assume it's not one.
+			if (empty($id) || !array_key_exists($id, $id_list)) {
+				$this->add($event);
+			}
+		}
+	}
+
+	/**
 	 * Comparison - sorts on day of event, start time, end time, then finally name.
 	 * Also, all day events are always before timed events on the same day.
 	 *
