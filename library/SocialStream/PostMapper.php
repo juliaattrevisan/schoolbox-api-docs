@@ -54,12 +54,6 @@ class PostMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
-			'column'     => 'storage_id',
-			'property'   => 'storageId',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-		$this->hasMap(array(
 			'column'     => 'type',
 			'property'   => 'type',
 			'type'       => self::TYPE_STRING,
@@ -108,13 +102,6 @@ class PostMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 		));
 
-		$this->hasJoin('file', array(
-			'multiple'  => true,
-			'mapper'    => '\\Schoolbox\\FileMapper',
-			'this_key'  => 'storage_id',
-			'other_key' => 'storage_id',
-		));
-
 		parent::mapping();
 	}
 
@@ -155,16 +142,13 @@ class PostMapper extends Schoolbox\Mapper {
 	 */
 	public function findLatestForHomepage($homepageId, $start, $offset) {
 		$user_mapper = $this->getJoinMapper('user');
-		$file_mapper = $this->getJoinMapper('file');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('p')},
-				{$user_mapper->getColumnString('u')},
-				{$file_mapper->getColumnString('f')}
+				{$user_mapper->getColumnString('u')}
 			FROM `{$this->table}` p
 			LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
-			LEFT JOIN {$this->getJoinSql('file', 'p', 'f')}
 			WHERE homepage_id = :homepageId
 			AND parent_id = 0
 			AND deleted_at IS NULL
@@ -196,11 +180,9 @@ class PostMapper extends Schoolbox\Mapper {
 
 		foreach ($statement as $row) {
 			$postItem = $this->hydrate($row, 'p');
-			$fileItem = $file_mapper->hydrate($row, 'f');
 			$userItem = $user_mapper->hydrate($row, 'u');
 
 			$postItem->setOwnerId($userItem);
-			$postItem->setStorageId($fileItem);
 
 			$collection->add($postItem);
 		}
@@ -219,16 +201,13 @@ class PostMapper extends Schoolbox\Mapper {
 	 */
 	public function findHierarchy($ids) {
 		$user_mapper = $this->getJoinMapper('user');
-		$file_mapper = $this->getJoinMapper('file');
 
 		$query = "
             SELECT
 				{$this->getColumnString('p')},
-				{$user_mapper->getColumnString('u')},
-				{$file_mapper->getColumnString('f')}
+				{$user_mapper->getColumnString('u')}
             FROM `{$this->table}` p
             LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
-            LEFT JOIN {$this->getJoinSql('file', 'p', 'f')}
             WHERE `root_id` IN {$this->getArrayPlaceholders($ids, 'val')}
             AND deleted_at IS NULL
             ORDER BY parent_id DESC, created_at
@@ -243,11 +222,9 @@ class PostMapper extends Schoolbox\Mapper {
 
 		foreach ($statement as $row) {
 			$postItem = $this->hydrate($row, 'p');
-			$fileItem = $file_mapper->hydrate($row, 'f');
 			$userItem = $user_mapper->hydrate($row, 'u');
 
 			$postItem->setOwnerId($userItem);
-			$postItem->setStorageId($fileItem);
 
 			$collection->add($postItem);
 		}
@@ -294,5 +271,4 @@ class PostMapper extends Schoolbox\Mapper {
 
 		return $model;
 	}
-
 }

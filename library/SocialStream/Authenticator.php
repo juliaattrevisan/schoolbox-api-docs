@@ -230,6 +230,4 @@ class Authenticator {
 	private function getNewPost() {
 		return $this->newPost;
 	}
-
-
 }

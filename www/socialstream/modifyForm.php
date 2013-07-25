@@ -46,7 +46,6 @@ if (strlen($newPost->getUrl())) {
 		/* Verify that it's actually an allowable image type
 		 * before assigning it to the SocialStream post
 		 */
-		$newPost->setStorageId($file->getSavedFile()->getId());
 	}
 	/* If it's just a url, get it, and find an avatar for it
 	 */
@@ -71,7 +70,6 @@ if (strlen($newPost->getUrl())) {
 			/* Verify that it's actually an allowable image type
 			 * before assigning it to the SocialStream post
 			 */
-			$newPost->setStorageId($file->getSavedFile()->getId());
 		}
 	}
 }
