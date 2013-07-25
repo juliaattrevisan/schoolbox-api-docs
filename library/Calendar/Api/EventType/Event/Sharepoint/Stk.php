@@ -123,19 +123,37 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 	/**
 	 * Get day events from this data source
 	 *
-	 * @param $startTimestamp
-	 * @param $endTimestamp
-	 * @internal param $currentDay
+	 * Because Sharepoint is dumb and can't get events between a date span (only
+	 * between a month or day span) we get events offset slightly twice. This
+	 * should ensure that a whole calendar month of events gets fetched.
+	 *
+	 * @param int $startTimestamp
+	 * @param int $endTimestamp
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-    public function getEvents($startTimestamp, $endTimestamp) {
-        $groupHandler = new Group();
+	public function getEvents($startTimestamp, $endTimestamp) {
+		$difference = $endTimestamp - $startTimestamp;
+		$offset     = intval($difference/2);
+		$collection = $this->retrieveEventsBetweenTimespan($startTimestamp, $endTimestamp);
+		$collection->mergeWithoutDuplicates(
+			$this->retrieveEventsBetweenTimespan($startTimestamp+$offset, $endTimestamp+$offset)
+		);
+		return $collection;
+	}
 
-		/* TODO: Update this for SK
-		 */
-        $start = new Alaress_Date_Format($startTimestamp, 'U');
-        $end   = new Alaress_Date_Format($endTimestamp, 'U');
+	/**
+	 * Gets events between the given time spans.
+	 *
+	 * @param int $startTimestamp
+	 * @param int $endTimestamp
+	 *
+	 * @return Calendar_Event_Collection
+	 */
+	protected function retrieveEventsBetweenTimespan($startTimestamp, $endTimestamp) {
+		$groupHandler = new Group();
+		$start = new Alaress_Date_Format($startTimestamp, 'U');
+		$end   = new Alaress_Date_Format($endTimestamp, 'U');
 
 		$startDate = new DateTime($start->getUsingFormat('Y-m-d\\TH:i:s\\Z'));
 		$endDate   = new DateTime($end->getUsingFormat('Y-m-d\\TH:i:s\\Z'));
@@ -144,8 +162,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 		/* Fill in your query result set here and populate $collection
 		 */
-		$collection     = new Calendar_Event_Collection();
-		$deleted_events = array();
+		$collection = new Calendar_Event_Collection();
 
 		/* If the SOAP connection succeeded, proceed normally
 		 * Otherwise return an empty collection
@@ -154,16 +171,6 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 			$response = $this->getSoap()->GetListItems(new SoapVar($xmlPayload->getPayload(), XSD_ANYXML));
 
 			$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
-
-			//
-			// Collect deleted events first
-			foreach ($allEvents->rsdata->zrow as $currentEvent) {
-				//
-				// Deleted or exception events: store now and handle later
-				if ($this->isDeletedEvent($currentEvent)) {
-					$deleted_events[] = $this->getDeletedEventMarker($currentEvent);
-				}
-			}
 
 			//
 			// And then check each item
@@ -231,8 +238,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 				);
 			}
 		}
-        return $collection;
-    }
+		return $collection;
+	}
 
 	/**
 	 * Find a particular event from this source
