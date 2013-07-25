@@ -225,6 +225,12 @@ class Threads {
 		$page->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
 		$page->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
 
+		/* Thumbnail stuff
+		 */
+		$page->setBlock('socialstream_post', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
+		$page->setBlock('socialstream_comment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
+		$page->setBlock('socialstream_reply', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
+
 		$page->setVar(array(
 			'socialstream_post_block' => '',
 			'socialstream_comment_block' => '',
@@ -243,10 +249,24 @@ class Threads {
 				'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => \Scrub::text($currentPost->getOwnerId()->getExternalId()),
 				'SOCIALSTREAM_POST_USER_FULLNAME' => \Scrub::text($currentPost->getOwnerId()->getFullname()),
 				'SOCIALSTREAM_POST_TIMESTAMP' => \Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
-				'SOCIALSTREAM_POST_THUMBNAIL_HASH' => \Scrub::text($currentPost->getStorageId()->getHash()),
 				'ON_OFF' => $i%2 ? 'dark' : '',
 				'COMMENT_CLASS' => $canComment,
 			));
+
+			/* Thumbnails
+			 */
+			if ($currentPost->getStorageId()->getId()) {
+				$page->setVar(array(
+					'SOCIALSTREAM_POST_THUMBNAIL_HASH' => \Scrub::text($currentPost->getStorageId()->getHash()),
+				));
+
+				$page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
+			}
+			else {
+				$page->setVar(array(
+					'socialstream_post_has_thumbnail_block' => ''
+				));
+			}
 
 			foreach($currentPost->getChildren() as $currentComment) {
 				$page->setVar(array(
@@ -255,9 +275,23 @@ class Threads {
 					'SOCIALSTREAM_COMMENT_CREATED_AT' => \Scrub::text($currentComment->getCreatedAt()->getShort()),
 					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
 					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => \Scrub::text($currentComment->getOwnerId()->getFullname()),
-					'SOCIALSTREAM_COMMENT_THUMBNAIL_HASH' => \Scrub::text($currentComment->getStorageId()->getHash()),
 					'COMMENT_CLASS' => $canComment,
 				));
+
+				/* Thumbnails
+				 */
+				if ($currentComment->getStorageId()->getId()) {
+					$page->setVar(array(
+						'SOCIALSTREAM_COMMENT_THUMBNAIL_HASH' => \Scrub::text($currentComment->getStorageId()->getHash()),
+					));
+
+					$page->parse('socialstream_comment_has_thumbnail_block', 'socialstream_comment_has_thumbnail');
+				}
+				else {
+					$page->setVar(array(
+						'socialstream_comment_has_thumbnail_block' => ''
+					));
+				}
 
 				foreach($currentComment->getChildren() as $currentReply) {
 					$page->setVar(array(
@@ -266,21 +300,41 @@ class Threads {
 						'SOCIALSTREAM_REPLY_CREATED_AT' => \Scrub::text($currentReply->getCreatedAt()->getShort()),
 						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => \Scrub::text($currentReply->getOwnerId()->getExternalId()),
 						'SOCIALSTREAM_REPLY_USER_FULLNAME' => \Scrub::text($currentReply->getOwnerId()->getFullname()),
-						'SOCIALSTREAM_REPLY_THUMBNAIL_HASH' => \Scrub::text($currentReply->getStorageId()->getHash()),
 					));
 
+					/* Thumbnails
+					 */
+					if ($currentReply->getStorageId()->getId()) {
+						$page->setVar(array(
+							'SOCIALSTREAM_REPLY_THUMBNAIL_HASH' => \Scrub::text($currentReply->getStorageId()->getHash()),
+						));
+
+						$page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
+					}
+					else {
+						$page->setVar(array(
+							'socialstream_reply_has_thumbnail_block' => ''
+						));
+					}
+
 					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
+
+					/* Clear children after parsing out the parent
+					 */
+					$page->setVar('socialstream_reply_has_thumbnail_block', '');
 				}
 
 				/* Clear children after parsing out the parent
 				 */
 				$page->parse('socialstream_comment_block', 'socialstream_comment', true);
+				$page->setVar('socialstream_comment_has_thumbnail_block', '');
 				$page->setVar('socialstream_reply_block', '');
 			}
 
 			/* Clear children after parsing out the parent
 			 */
 			$page->parse('socialstream_post_block', 'socialstream_post', true);
+			$page->setVar('socialstream_post_has_thumbnail_block', '');
 			$page->setVar('socialstream_comment_block', '');
 			$page->setVar('socialstream_reply_block', '');
 

@@ -5,7 +5,9 @@
 			<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
 		</div>
 		<div class='body'>
+			<!-- BEGIN socialstream_post_has_thumbnail -->
 			<img src='/storage/image.php?hash={SOCIALSTREAM_POST_THUMBNAIL_HASH}&size=square64' style='outline:1px dashed #f00;'/>
+			<!-- END socialstream_post_has_thumbnail -->
 			<p>
 				<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
 				{SOCIALSTREAM_POST_BODY}<br />
@@ -21,7 +23,9 @@
 					<img src='/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32'>
 				</div>
 				<div class='body'>
+					<!-- BEGIN socialstream_comment_has_thumbnail -->
 					<img src='/storage/image.php?hash={SOCIALSTREAM_COMMENT_THUMBNAIL_HASH}&size=square64' style='outline:1px dashed #f00;'/>
+					<!-- END socialstream_comment_has_thumbnail -->
 					<p>
 						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
 						{SOCIALSTREAM_COMMENT_BODY}<br />
@@ -37,7 +41,9 @@
 							<img src='/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32'>
 						</div>
 						<div class='body'>
+							<!-- BEGIN socialstream_reply_has_thumbnail -->
 							<img src='/storage/image.php?hash={SOCIALSTREAM_REPLY_THUMBNAIL_HASH}&size=square64' style='outline:1px dashed #f00;'/>
+							<!-- END socialstream_reply_has_thumbnail -->
 							<p>
 								<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
 								{SOCIALSTREAM_REPLY_BODY}<br />
