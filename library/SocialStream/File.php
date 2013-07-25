@@ -23,6 +23,13 @@ class File {
 	private $ownerId = -1;
 
 	/**
+	 * An instance of Schoolbox\File
+	 *
+	 * @var null
+	 */
+	private $savedFile = null;
+
+	/**
 	 * Constructor
 	 *
 	 * Finds the file at url $url
@@ -51,7 +58,9 @@ class File {
 		$metadata = stream_get_meta_data($brownhole);
 
 		if (file_exists($metadata['uri'])) {
-			\Schoolbox\FileMapper::getInstance()->upload(basename($this->getUrl()), $metadata['uri'], $this->getOwnerId());
+			$savedFile = \Schoolbox\FileMapper::getInstance()->upload(basename($this->getUrl()), $metadata['uri'], $this->getOwnerId());
+
+			$this->setSavedFile($savedFile);
 		}
 
 		fclose($brownhole);
@@ -94,5 +103,23 @@ class File {
 	 */
 	public function getUrl() {
 		return $this->url;
+	}
+
+	/**
+	 * Set saved file
+	 *
+	 * @param null $savedFile
+	 */
+	public function setSavedFile($savedFile) {
+		$this->savedFile = $savedFile;
+	}
+
+	/**
+	 * Get saved file
+	 *
+	 * @return null
+	 */
+	public function getSavedFile() {
+		return $this->savedFile;
 	}
 }
