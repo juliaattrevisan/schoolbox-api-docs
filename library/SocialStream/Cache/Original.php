@@ -7,9 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace SocialStream;
+namespace SocialStream\Cache;
 
-class Cache extends \Alaress_Cache_Abstract {
+class Original extends \Alaress_Cache_Abstract {
 
 	/**
 	 * A prefix for cached filenames
