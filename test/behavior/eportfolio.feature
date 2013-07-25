@@ -4,8 +4,9 @@ Feature: ePortfolio
   I need to be able to create my own personal ePortfolio pages
 
 Scenario: Create an ePortfolio template
-  Given I am logged in as "alaress" with password "alaress"
-  When  I go to page "/adminv2/eportfolio"
+  Given I am on "/"
+  And   I am logged in as "alaress" with password "alaress"
+  When  I am on "/adminv2/eportfolio"
   And   I create a template "New Template"
   And   I add "Textbox" to "left" at position "1"
   And   I rename component on "left" at position "1" to "About Me"
@@ -19,7 +20,7 @@ Scenario: Create an ePortfolio template
   And   I add "Image Gallery" to "top" at position "1"
   And   I rename component on "top" at position "1" to "My Pictures"
   And   I repurpose component on "top" at position "1" to "Photos of myself"
-  Then  I go to page "/eportfolio/"
+  Then  I am on "/eportfolio"
   Then  I click link "Add Page"
   And   I type "My Page" in "#name"
   And   I select "New Template" in "select[name='page_template']"
