@@ -4,6 +4,6 @@ CREATE TABLE `socialstream_post`( `post_id` INT(11) NOT NULL AUTO_INCREMENT, `pa
  */
 ALTER TABLE `socialstream_post` ADD COLUMN `root_id` INT(11) NULL AFTER `parent_id`;
 
-/* link it to a brownhole
+/* the place where thumbnail urls are found
  */
-ALTER TABLE `socialstream_post` ADD COLUMN `storage_id` INT(11) NULL AFTER `homepage_id`;
+ALTER TABLE `socialstream_post` ADD COLUMN `thumbnail` VARCHAR(255) NULL AFTER `mimetype`;
