@@ -13,7 +13,7 @@
 class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergetic_Moriah_Strategy_Abstract {
 	protected $strategyTitle = "Staff Synchronisation";
 	const STAFF_GROUP_ID = 2;
-	const STAFF_DEFAULT_CAMPUS = 1;
+	const STAFF_DEFAULT_CAMPUS = self::HS;
 
 	/**
 	 * Get a list of users' Synergy IDs to sync
@@ -71,12 +71,23 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
         else if( $currentUser['StaffCampus'] ) {
 
             if($currentUser['StaffCampus'] == 'CG') { //Users in College General are put in all campuses
-                $newUser['campus'] = array(3,4,5,6,7,8,9,10,11,12);
-                $newUser['defaultCampus'] = 4;
+                $newUser['campus'] = array(
+                    self::EC,
+                    self::HS,
+                    self::IS,
+                    self::MD,
+                    self::MG,
+                    self::MR,
+                    self::MS,
+                    self::P,
+                    self::PS,
+                    self::Z
+                );
+                $newUser['defaultCampus'] = self::HS;
             }
             else if($currentUser['StaffCampus'] == 'S') { //Users in Secondary School are put in MS & HS
-                $newUser['campus'] = array(9,4);
-                $newUser['defaultCampus'] = 4;
+                $newUser['campus'] = array(self::MS,self::HS);
+                $newUser['defaultCampus'] = self::HS;
             }
             else {
                 $newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
@@ -85,8 +96,8 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
         }
         else {
             //Just put staff in main if no campus retrieved from timetable
-            $newUser['defaultCampus'] = self::CG;
-            $newUser['campus'] = array(self::CG);
+            $newUser['defaultCampus'] = self::HS;
+            $newUser['campus'] = array(self::HS);
         }
 
         $newUser['campus'] = array_unique($newUser['campus']);

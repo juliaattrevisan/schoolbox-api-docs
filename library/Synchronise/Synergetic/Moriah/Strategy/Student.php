@@ -50,17 +50,12 @@ class Synchronise_Synergetic_Moriah_Strategy_Student extends Synchronise_Synerge
 		 */
 		$newUser['year'] = $currentUser['StudentYearLevel'];
 
-		/* Campus config: needs to map to a campus id
-		 */
-		$newUser['defaultCampus'] = 1;
-		$newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-
-
         // if they're preschool, we need to use the campus field from synergetic for mapping
         $campus = $this->getCampusFromYearLevel($currentUser['StudentYearLevel']);
         if($campus == self::P) {
             $campus = $this->getCampusFromCode($currentUser['StudentCampus']);
         }
+        $newUser['defaultCampus'] = $campus;
         $newUser['campus'] = array($campus);
 
 		/* Staff Group ID

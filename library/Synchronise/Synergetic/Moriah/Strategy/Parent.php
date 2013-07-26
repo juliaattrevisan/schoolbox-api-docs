@@ -112,8 +112,8 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
 
         /* Campus config: needs to map to a campus id
            */
-		$newUser['defaultCampus'] = 1;
-		$newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+		$newUser['defaultCampus'] = $this->getCampusFromYearLevel($currentUser['StudentYearLevel']);
+		$newUser['campus'] = array($newUser['defaultCampus']);
 
 		/* Staff Group ID
 		 */
@@ -165,8 +165,8 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
 
         /* Campus config: needs to map to a campus id
            */
-		$spouse['defaultCampus'] = 1;
-		$spouse['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+		$spouse['defaultCampus'] = $this->getCampusFromYearLevel($currentUser['StudentYearLevel']);
+		$spouse['campus'] = array($spouse['defaultCampus']);
 
 		/* Staff Group ID
 		 */
