@@ -225,4 +225,38 @@ class FeatureContext extends MinkContext {
         );
     }
 
+    /**
+     * Attempts to run $callback($this) once per second for $timeout seconds.
+     * Returns true as soon as this callback returns true.
+     * Any exceptions the callback throws are ignored.
+     *
+     * @see http://docs.behat.org/cookbook/using_spin_functions.html
+     *
+     * @param  callable  $callback
+     * @param  int       $timeout
+     * @throws Exception if $timeout is reached and the callback still hasn't
+     *                   returned true.
+     * @return bool
+     */
+    protected function spin($callback, $timeout = 15) {
+        for ($i = 0; $i < $timeout; $i++) {
+            try {
+                if ($callback($this)) {
+                    return true;
+                }
+            }
+            catch (Exception $e) {
+                // do nothing
+            }
+            sleep(1);
+        }
+
+        $backtrace = debug_backtrace();
+
+        throw new Exception(
+            "Timeout thrown by " . $backtrace[1]['class'] . "::" . $backtrace[1]['function'] . "()\n" .
+            $backtrace[1]['file'] . ", line " . $backtrace[1]['line']
+        );
+    }
+
 }
