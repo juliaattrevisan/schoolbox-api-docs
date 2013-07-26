@@ -32,8 +32,8 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
     */
 
 
-    const CG =  1; // College General;
-    const S  =  2; // Secondary School;
+//    const CG =  1; // College General;
+//    const S  =  2; // Secondary School;
     const EC =  3; // Early Childhood Centre;
     const HS =  4; // High School;
     const IS =  5; // Primary School K-2;
@@ -157,21 +157,7 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
 	 * @return bool|string
 	 */
 	protected function getCampusFromCode($code) {
-        return defined('self::'.$code) ? constant(sprintf("%s::%s",'self',$code)) : self::CG;
-
-/*
-		switch($code) {
-			case 'PS':
-                return 5;
-            case 'MS':
-                return 9;
-			case 'HS':
-                return 4;
-			default:
-                // return 'main';
-				return self::CG;
-		}
-*/
+        return defined('self::'.$code) ? constant(sprintf("%s::%s",'self',$code)) : self::HS;
 	}
 
 	/**
