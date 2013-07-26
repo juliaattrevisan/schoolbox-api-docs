@@ -36,7 +36,7 @@ class Group {
      * @return bool
      */
     public function isPrivate() {
-        if($this->getType() == PRIVATE_GROUP) {
+        if($this->getType() == self::PRIVATE_GROUP) {
             return true;
         }
         else {
@@ -50,7 +50,7 @@ class Group {
      * @return bool
      */
     public function isModerated() {
-        if($this->getType() == MODERATED_GROUP) {
+        if($this->getType() ==self::MODERATED_GROUP) {
             return true;
         }
         else {
@@ -64,7 +64,7 @@ class Group {
      * @return bool
      */
     public function isFree() {
-        if($this->getType() == FREE_GROUP) {
+        if($this->getType() == self::FREE_GROUP) {
             return true;
         }
         else {
