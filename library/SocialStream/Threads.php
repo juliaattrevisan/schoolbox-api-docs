@@ -255,18 +255,14 @@ class Threads {
 
 			/* Thumbnails
 			 */
-//			if ($currentPost->getStorageId()->getId()) {
-//				$page->setVar(array(
-//					'SOCIALSTREAM_POST_THUMBNAIL_HASH' => \Scrub::text($currentPost->getStorageId()->getHash()),
-//				));
-//
-//				$page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
-//			}
-//			else {
-//				$page->setVar(array(
-//					'socialstream_post_has_thumbnail_block' => ''
-//				));
-//			}
+			if (strlen($currentPost->getThumbnail())) {
+				$page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
+			}
+			else {
+				$page->setVar(array(
+					'socialstream_post_has_thumbnail_block' => ''
+				));
+			}
 
 			foreach($currentPost->getChildren() as $currentComment) {
 				$page->setVar(array(
@@ -280,18 +276,14 @@ class Threads {
 
 				/* Thumbnails
 				 */
-//				if ($currentComment->getStorageId()->getId()) {
-//					$page->setVar(array(
-//						'SOCIALSTREAM_COMMENT_THUMBNAIL_HASH' => \Scrub::text($currentComment->getStorageId()->getHash()),
-//					));
-//
-//					$page->parse('socialstream_comment_has_thumbnail_block', 'socialstream_comment_has_thumbnail');
-//				}
-//				else {
-//					$page->setVar(array(
-//						'socialstream_comment_has_thumbnail_block' => ''
-//					));
-//				}
+				if (strlen($currentComment->getThumbnail())) {
+					$page->parse('socialstream_comment_has_thumbnail_block', 'socialstream_comment_has_thumbnail');
+				}
+				else {
+					$page->setVar(array(
+						'socialstream_comment_has_thumbnail_block' => ''
+					));
+				}
 
 				foreach($currentComment->getChildren() as $currentReply) {
 					$page->setVar(array(
@@ -304,18 +296,14 @@ class Threads {
 
 					/* Thumbnails
 					 */
-//					if ($currentReply->getStorageId()->getId()) {
-//						$page->setVar(array(
-//							'SOCIALSTREAM_REPLY_THUMBNAIL_HASH' => \Scrub::text($currentReply->getStorageId()->getHash()),
-//						));
-//
-//						$page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
-//					}
-//					else {
-//						$page->setVar(array(
-//							'socialstream_reply_has_thumbnail_block' => ''
-//						));
-//					}
+					if (strlen($currentReply->getThumbnail())) {
+						$page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
+					}
+					else {
+						$page->setVar(array(
+							'socialstream_reply_has_thumbnail_block' => ''
+						));
+					}
 
 					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
 
