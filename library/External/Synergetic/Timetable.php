@@ -11,6 +11,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 	private $database;
     private $offset;
 
+	protected $synergeticDay = array();
+
 	function __construct () {
 		$this->setDatabase( new MSSQL() );
 		$this->groupHandler = new Group;
@@ -23,6 +25,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 	function getTimetableDefinition($campus, $day = 0) {
 
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return array();
+		}
 
 		$query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
 					TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
@@ -64,6 +69,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 	function getDayNumber($campus, $date = 0) {
 
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return false;
+		}
 		$days = $campusModel->getTimetableDay();
 
 		if(!$date) {
@@ -179,6 +187,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			}
 
 			$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+			if (!($campusModel instanceof \Schoolbox\Campus)) {
+				return false;
+			}
 			$days = $campusModel->getTimetableDay();
 
 
@@ -241,6 +252,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 	function getPeriodNumber($campus)
 	{
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return false;
+		}
 		$campusString = $campusModel->getExtTimetableCode();
 
 		# Since the year information in the TimeFrom and TimeTo fields is not reliable, this rips out just the time
@@ -280,6 +294,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
         }
 
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return false;
+		}
 		$campusString = $campusModel->getExtTimetableCode();
 
 		if($this->groupHandler->isStudent($userID))
@@ -384,6 +401,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
         }
 
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return false;
+		}
 		$campusString = $campusModel->getExtTimetableCode();
 
 		if( $this->groupHandler->isStudent($userID))
