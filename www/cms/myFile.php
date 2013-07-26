@@ -156,13 +156,7 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 	/* Get a list of pages with the File List component in it
 	 * and offer these as places to which you can publish.
 	 */
-	$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_FileListController')->first();
-	$availablePages = $eMap->findAvailablePages($userId, $componentDefinition);
-
-	if($includeImageControllers) {
-		$componentDefinition = $cMap->findByColumn('class', 'Component_Eportfolio_ImageListController')->first();
-		$availablePages = array_merge($availablePages, $eMap->findAvailablePages($userId, $componentDefinition));
-	}
+	$availablePages = $eMap->findPublishablePages($userId);
 
 	/* Manufacture the necessary info
 	 */
@@ -170,21 +164,12 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 		$allPageData = array();
 
 		foreach ($availablePages as $currentPage) {
-			// check we haven't already seen this page
-			if(array_key_exists($currentPage['page']->getPageId(), $allPageData)) {
-				continue;
-			}
-			if (is_array($currentPage['componentList']) && count($currentPage['componentList'])) {
-				/* Each link only needs to know this
-				 */
-				$pageData = array(
-					'pageId' => $currentPage['page']->getPageId(),
-					'pageTitle' => $currentPage['page']->getPageTitle(),
-					'pageOwnerId' => $currentPage['page']->getUid(),
-				);
-
-				$allPageData[$pageData['pageId']] = $pageData;
-			}
+			$pageData = array(
+				'pageId' => $currentPage['page']->getPageId(),
+				'pageTitle' => $currentPage['page']->getPageTitle(),
+				'pageOwnerId' => $currentPage['page']->getUid(),
+			);
+			$allPageData[$pageData['pageId']] = $pageData;
 		}
 
 		if (is_array($allPageData) && count($allPageData)) {
