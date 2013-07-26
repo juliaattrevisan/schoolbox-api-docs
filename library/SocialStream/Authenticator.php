@@ -84,11 +84,9 @@ class Authenticator {
 	 * @return mixed
 	 */
 	private function findConfigValue($key) {
-		if (is_array($this->getInstance()->getConfig()) && count($this->getInstance()->getConfig())) {
-			foreach($this->getInstance()->getConfig() as $currentConfig) {
-				if ($currentConfig->key == $key) {
-					return $currentConfig->value;
-				}
+		foreach($this->getInstance()->getConfig() as $currentConfig) {
+			if ($currentConfig->getKey() == $key) {
+				return $currentConfig->getValue();
 			}
 		}
 	}
