@@ -23,7 +23,7 @@ if (is_numeric($_GET['id'])) {
 	$contents = null;
 	$size     = null;
 	$mime     = null;
-	$attach   = $_GET['view'] ? '' : 'attachment;';
+	$attach   = $_GET['save'] ? '' : 'attachment;';
 	if(is_numeric($_GET['return'])) {
 		$mapper = new ReturnedWorkMapper();
 		$return = $mapper->findById($_GET['id']);
