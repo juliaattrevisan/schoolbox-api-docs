@@ -366,11 +366,13 @@ class PageMapper extends Schoolbox\Mapper {
 			$pages = array_merge($pages, $this->findAvailablePages($user_id, $definition));
 		}
 		//
-		// Currently don't care about component list.
-		foreach ($pages as &$page) {
+		// Currently don't care about component list, only a unique list of pages.
+		$return = array();
+		foreach ($pages as $page) {
 			unset($page['componentList']);
+			$return[$page['page']->getPageId()] = $page;
 		}
-		return array_unique($pages);
+		return $return;
 	}
 
 	/**
