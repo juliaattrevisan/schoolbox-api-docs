@@ -28,50 +28,22 @@ $newPost->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setDeletedAt(null);
 
-/* Curl that brutha to find images
+/* Find thumbnail from the given url in one of the many
+ * ways that they can exist
  */
 if (strlen($newPost->getUrl())) {
-	$fileType = new \FileType($newPost->getUrl());
-	$extension = $fileType->getExtension();
+	$chain = new Post\Thumbnail\Chain($newPost);
 
-	/* If it has at least the right extension, download and brownhole it
+	/* To prevent a double-curl, remember the place where a thumbnail was
+	 * located (this is used as the cached image transform filename hash)
 	 */
-	if (in_array($extension, array('jpg', 'gif', 'png'))) {
-		$file = new File($newPost->getUrl(), $newPost->getOwnerId());
-		$file->saveImage();
+	if (strlen($chain->getResult())) {
+		$newPost->setThumbnail($chain->getResult());
 
-		/* Verify that it's actually an allowable image type
-		 * before assigning it to the SocialStream post
+		/* 	Save the original in the cache location
 		 */
-	}
-	/* If it's just a url, get it, and find an avatar for it
-	 */
-	else {
-		$curl = new \Alaress_Curl_Url($newPost->getUrl());
-		$curl->exec();
-
-		/* Find OG Image
-		 */
-		$matches = array();
-
-		$pattern = '#property=[\"\']?og:image[\"\']?.*content=[\"\']([^\"\']+)[\"\']?#m';
-
-		preg_match($pattern, $curl->getResult(), $matches);
-
-		/* If an opengraph image was found, curl that too
-		 */
-		if (count($matches)) {
-
-			/* To prevent a double-curl, remember the place where a thumbnail was
-			 * located (this is used as the cached image transform filename hash)
-			 */
-			$newPost->setThumbnail($matches[1]);
-
-			/* Save the original in the cache location
-			 */
-			$originalThumbnailCache = new Cache\Original();
-			$originalThumbnailCache->init($newPost->getThumbnail());
-		}
+		$originalThumbnailCache = new Cache\Original();
+		$originalThumbnailCache->init($newPost->getThumbnail());
 	}
 }
 
