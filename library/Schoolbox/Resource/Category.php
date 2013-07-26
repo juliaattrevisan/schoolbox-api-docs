@@ -33,19 +33,37 @@ class Category {
 	 */
 	protected $parent;
 
-	/**
-	 * @var int
-	 */
-	protected $templateId;
+    /**
+     * @var \Schoolbox\Resource\HomepageConfig
+     */
+    protected $homepage;
 
 	/**
 	 * @var Collection
 	 */
 	protected $codes;
 
+    /**
+     *
+     * @var \Schoolbox\Resource\Group
+     */
+    protected $group;
+
 	public function __construct() {
 		$this->setCodes(new Collection(array()));
 	}
+
+    /**
+     * Does this category have a homepage?
+     *
+     * @return bool
+     */
+    public function hasHomepage() {
+        if($this->homepage->getTemplate())
+            return true;
+        else
+            return false;
+    }
 
 	/**
 	 * @param  Collection $codes
@@ -140,27 +158,38 @@ class Category {
 	 * @param int $templateId
 	 * @return $this
 	 */
-	public function setTemplateId($templateId) {
-		$this->templateId = $templateId;
+	public function setHomepage($homepage) {
+		$this->homepage = $homepage;
 		return $this;
 	}
-
 	/**
-	 * @return int
+	 * @return \Schoolbox\Resource\HomepageConfig
 	 */
-	public function getTemplateId() {
-		return $this->templateId;
+	public function getHomepage() {
+		return $this->homepage;
 	}
+
+    /**
+     * @param \Schoolbox\Resource\Group $group
+     * @return $this
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\Resource\Group
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
 
 	//
 	// TODO implement group type, user access joins
-//	protected $group_type;
 //	protected $user_access;
 
-	//
-	// Deprectaed fields - teacher ID is in user access, codes are in category
-	// code collection.
-//	protected $teacher_id;
-//	protected $code;
 
 }

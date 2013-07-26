@@ -180,7 +180,7 @@ class Core_Nav_Sidebar {
 	        if(!($cat instanceof Category)) {
 		        $cat = CategoryMapper::getInstance()->findById($cat['id']);
 	        }
-            if($cat->getTemplateId()) {
+            if($cat->hasHomepage()) {
 	            $list[] = $this->createSubject($cat);
             }
         }

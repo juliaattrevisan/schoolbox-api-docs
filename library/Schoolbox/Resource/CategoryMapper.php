@@ -43,11 +43,6 @@ class CategoryMapper extends Mapper {
 			'property'   => 'parentId',
 			'type'       => self::TYPE_INTEGER,
 		));
-		$this->hasMap(array(
-			'column'    => 'template',
-			'property'  => 'templateId',
-			'type'      => self::TYPE_INTEGER,
-		));
 
 		//
 		// Joins:
@@ -57,12 +52,28 @@ class CategoryMapper extends Mapper {
 			'this_key'  => 'id',
 			'other_key' => 'categoryID',
 		));
+
+		$this->hasJoin('homepages', array(
+            'multiple'  => false,
+            'mapper'    => '\\Schoolbox\\Resource\\HomepageConfigMapper',
+            'this_key'  => 'id',
+            'other_key' => 'cid',
+        ));
+
 		$this->hasJoin('files', array(
 			'multiple'  => true,
 			'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
 			'this_key'  => 'id',
 			'other_key' => 'category',
 		));
+
+        $this->hasJoin('groups', array(
+                'multiple'  => true,
+                'mapper'    => '\\Schoolbox\\Resource\\GroupMapper',
+                'this_key'  => 'id',
+                'other_key' => 'cid',
+            ));
+
 		//
 		// Parent object: has reference to itself as a mapper.
 		$this->hasJoin('parent', array(
@@ -72,29 +83,26 @@ class CategoryMapper extends Mapper {
 			'other_key' => 'id',
 		));
 
-		//
-		// I think category.teacher is obsolete - it's replaced by owning user
-
-		//
-		// I think category.template is obsolete - it's replaced by
-		// homepage_config entry.
-
-		//
-		// I think category.code is obsolete, replaced by multiple entries in
-		// categoryCode table.
 	}
 
 
 	public function findById($id) {
 		$code_mapper = $this->getJoinMapper('codes');
+        $homepageConfig_mapper = $this->getJoinMapper('homepages');
+        $group_mapper = $this->getJoinMapper('groups');
 		$query = "
 			SELECT
 				{$this->getColumnString('c')},
-				{$code_mapper->getColumnString('cc')}
+				{$code_mapper->getColumnString('cc')},
+				{$homepageConfig_mapper->getColumnString('hp')},
+				{$group_mapper->getColumnString('ug')}
 			FROM {$this->getTable()} c
 			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
+			LEFT JOIN {$this->getJoinSql('groups', 'c','ug')}
 			WHERE c.id=?
 		";
+
 		$statement = $this->database->prepare($query);
 		$statement->execute(array($id));
 
@@ -107,6 +115,13 @@ class CategoryMapper extends Mapper {
 			if ($code->getCategory()->getId()) {
 				$category->addCode($code);
 			}
+
+            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+            $category->setHomepage($homepageConfig);
+
+            $group = $group_mapper->hydrate($row, 'ug');
+            $category->setGroup($group);
+
 		}
 		return $category;
 	}

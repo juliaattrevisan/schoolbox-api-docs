@@ -89,8 +89,10 @@ function getFolderMeta($folderId) {
 	// handler setup
 	$catHandler = new Category();
 	$groupHandler = new Group();
-	$homeTemplateHandler = new HomepageTemplate();
-	$cat = $catHandler->getByID($folderId);
+
+    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+    $cat = $categoryMapper->findById($folderId);
+
 
 	// if it's the root node, return add-folder functions if admin
 	if($folderId == 0) {
@@ -112,29 +114,23 @@ function getFolderMeta($folderId) {
 	}
 
 	// determine the name of the template, if the folder has a homepage
-	if($cat['template'] == 0) {
-		$template = '';
-	}
-	else {
-		$homeHandler = new Homepage($cat['id']);
-		$template = $homeTemplateHandler->getByID($homeHandler->getTemplate());
-	}
+
+
 
 	// determine the group type (open, restricted, moderated)
-	switch($cat['type']) {
-		case GROUP_TYPE_RESTRICTED:
-			$type = 'Restricted';
-			break;
-		case GROUP_TYPE_MODERATED:
-			$type = 'Moderated';
-			break;
-		case GROUP_TYPE_FREE:
-			$type = 'Open';
-			break;
-		default:
-			$type = '';
-			break;
-	}
+    if($cat->getGroup()->isPrivate()) {
+        $type = 'Restricted';
+    }
+    else if($cat->getGroup()->isModerated()) {
+        $type = 'Moderated';
+    }
+    else if($cat->getGroup()->isFree()) {
+        $type = 'Open';
+    }
+    else {
+        $type = '';
+    }
+
 
 	// joinable: is the logged in user not already a member?
 	$accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
@@ -189,20 +185,19 @@ function getFolderMeta($folderId) {
 			break;
 	}
 
-	if($template['name']) {
+	if($cat->hasHomepage()) {
 		$actions[] = 'homepage';
 	}
 
 
 	$folder = array(
-		'name' => $cat['name'],
-		'id' => $cat['id'],
-		'template' => $template['name'],
+		'name' => $cat->getName(),
+		'id' => $cat->getId(),
+		'template' =>  $cat->getHomepage()->getTemplate()->getName(),
 		'type' => $type,
 		'joinable' => $joinable,
 		'permissions' => $permissions,
 		'actions' => $actions,
-		'debug' => $debug
 	);
 
 	return $folder;

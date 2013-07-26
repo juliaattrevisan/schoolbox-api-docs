@@ -1,11 +1,9 @@
 <?php
 require_once '../library/category.php';
 require_once '../library/homepage.php';
-require_once '../library/homepage-template.php';
 require_once '../library/group.php';
 
 $categoryHandler = new Category();
-$homeTemplateHandler = new HomepageTemplate();
 $groupHandler = new Group();
 
 if (is_numeric($this->arg[0])) {
@@ -57,24 +55,22 @@ if (is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
 
-	$templateList = $homeTemplateHandler->getTemplateListDropDown();
+    $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
+    $homepageTemplateList = $homepageTemplateMapper->findAll();
 
 	/* Prepend
 	 */
-	array_unshift($templateList, array(
-		'TEMPLATE_ID' => 0,
-		'TEMPLATE_NAME' =>
-		'Keep Existing'
-	));
+    $keepExisting = new \Schoolbox\Resource\HomepageTemplate;
+    $keepExisting->setName('Keep Existing')->setId(0);
+	$homepageTemplateList->add($keepExisting);
 
 	/* Used to remove homepages
 	 */
-	$templateList[] = array(
-		'TEMPLATE_ID' => -1,
-		'TEMPLATE_NAME' => 'No homepage'
-	);
+    $noHomepage = new \Schoolbox\Resource\HomepageTemplate;
+    $noHomepage->setName('No Homepage')->setId(-1);
+    $homepageTemplateList->add($noHomepage);
 
-	$this->dropDown('template_list', $templateList);
+	$this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
 
 	$groupPermList = $categoryHandler->getGroupPerms($category['id']);
 
@@ -164,9 +160,17 @@ else {
 
 		$this->setVar($output);
 
-		$templateList = $homeTemplateHandler->getTemplateListDropDown();
-		array_unshift($templateList, array('TEMPLATE_ID' => 0, 'TEMPLATE_NAME' => 'No Homepage'));
-		$this->dropDown('template_list', $templateList);
+        $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
+        $homepageTemplateList = $homepageTemplateMapper->findAll();
+
+        /* Used to remove homepages
+         */
+        $noHomepage = new \Schoolbox\Resource\HomepageTemplate;
+        $noHomepage->setName('No Homepage')->setId(-1);
+        $homepageTemplateList->add($noHomepage);
+
+        $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
+
 
 		/* Suggest Group Permissions based on parent folder's Group Permissions
 		 */
