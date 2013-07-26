@@ -46,7 +46,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
 		foreach($_POST['published'] as $ownerId => $pageIds) {
 			if (is_array($pageIds) && count($pageIds)) {
-				foreach($pageIds as $currentPageId) {
+				foreach($pageIds as $currentPageId => $unused) {
 					$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $currentPageId);
 					if ($authenticator->canModify()) {
 						$publishedFile = new \Component\Eportfolio\FileList();
