@@ -347,6 +347,33 @@ class PageMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Finds all publish targets. Currently, this means all eportfolio pages
+	 * which have either a file list or image list controller.
+	 *
+	 * @param  int  $user_id
+	 * @return array
+	 */
+	public function findPublishablePages($user_id) {
+		$definition_list = \Component_DefinitionMapper::getInstance()->findIn(
+			'class',
+			array(
+				'Component_Eportfolio_FileListController',
+				'Component_Eportfolio_ImageListController',
+			)
+		);
+		$pages = array();
+		foreach ($definition_list as $definition) {
+			$pages = array_merge($pages, $this->findAvailablePages($user_id, $definition));
+		}
+		//
+		// Currently don't care about component list.
+		foreach ($pages as &$page) {
+			unset($page['componentList']);
+		}
+		return array_unique($pages);
+	}
+
+	/**
 	 * Find all the user's pages with a particular component on it
 	 *
 	 * @param int                  $userId
