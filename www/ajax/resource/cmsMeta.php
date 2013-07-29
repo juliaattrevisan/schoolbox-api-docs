@@ -28,10 +28,12 @@ if(!(isset($_POST['folderId']) && is_numeric($_POST['folderId']))) {
 
 $folderId = $_POST['folderId'];
 
-// check 2: user logged in an has at minimum read access
-$groupHandler = new Group();
-$access = $groupHandler->getPermission($folderId);
-if($access < READ_ACCESS) {
+// check 2: user logged in and specified folder exists
+$myFolderHandler = new MyFolder();
+
+$myFolder = $myFolderHandler->getByID($folderId);
+
+if(!is_array($myFolder) && $folderId > 0) {
 	sendError('User does not have access to this folder');
 }
 
@@ -138,27 +140,17 @@ function getSingleFileMeta($folderId, $fileId) {
 	$actions = array('modify', 'delete', 'open', 'download');
 
 	// list of portfolio pages that can be published to
-	$componentDefinition = Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_FileListController');
-	$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->first());
+	$availablePages = \Eportfolio\PageMapper::getInstance()->findPublishablePages($_SESSION['id']);
 	$publishTo = array();
 
-	if (is_array($availablePages) && count($availablePages)) {
-		foreach ($availablePages as $currentPage) {
-			if (is_array($currentPage['componentList']) && count($currentPage['componentList'])) {
-				foreach ($currentPage['componentList'] as $currentComponent) {
-					/** @var Component_Instance $currentComponent */
-					// Each link only needs to know this
-					$pageData = array(
-						'userId' => $_SESSION['id'],
-						'pageId' => $currentPage['page']->getPageId(),
-						'pageTitle' => $currentPage['page']->getPageTitle(),
-						'componentInstanceId' => $currentComponent->getId(),
-					);
-
-					$publishTo[] = $pageData;
-				}
-			}
-		}
+	foreach ($availablePages as $currentPage) {
+		// Each link only needs to know this
+		$pageData = array(
+			'userId' => $_SESSION['id'],
+			'pageId' => $currentPage['page']->getPageId(),
+			'pageTitle' => $currentPage['page']->getPageTitle(),
+		);
+		$publishTo[] = $pageData;
 	}
 
 	$mtypeMap = new MimetypeMapper();

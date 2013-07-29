@@ -179,7 +179,7 @@ class MyFile extends DeprecatedModel {
 	function create	($data, $file) {
 
 		$data['submitted']	= 'NOW()';
-		$data['owner']	= $_SESSION['id'];
+		$data['owner']	= $this->owner;
 
 		if(is_file($file['tmp_name']) && is_readable($file['tmp_name']) ) {
 			$data['file_size'] = filesize($file['tmp_name']);

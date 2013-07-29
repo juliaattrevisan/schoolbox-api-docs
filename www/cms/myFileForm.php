@@ -3,8 +3,15 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
-$fileHandler = new MyFile();
+$userId = isset($_POST['user']) ? $_POST['user'] : $_SESSION['id'];
+
+// PERMISSION: have to be session user or staff
+$groupHandler = new Group();
+if(!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
+	error(47);
+}
+
+$fileHandler = new MyFile($userId);
 
 // Upload a new file
 if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
@@ -18,7 +25,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         // check user owns file
         $current = $fileHandler->getByID($_POST['fileID']);
 
-        if ($current['owner'] != $_SESSION['id']) {
+        if ($current['owner'] != $userId) {
             $page->error(47);
         }
 
@@ -39,19 +46,16 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
 		foreach($_POST['published'] as $ownerId => $pageIds) {
 			if (is_array($pageIds) && count($pageIds)) {
-				foreach($pageIds as $currentPageId => $componentInstanceIds) {
+				foreach($pageIds as $currentPageId => $unused) {
 					$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $currentPageId);
+					if ($authenticator->canModify()) {
+						$publishedFile = new \Component\Eportfolio\FileList();
+						$publishedFile->setPageId($currentPageId);
+						$publishedFile->setFileId($fileID);
+						$publishedFile->setCreatedAt($now);
+						$publishedFile->setUpdatedAt($now);
 
-					if (is_array($componentInstanceIds) && count($componentInstanceIds) && $authenticator->canModify()) {
-						foreach($componentInstanceIds as $currentComponentInstanceId => $value) {
-							$publishedFile = new \Component\Eportfolio\FileList();
-							$publishedFile->setPageId($currentPageId);
-							$publishedFile->setFileId($fileID);
-							$publishedFile->setCreatedAt($now);
-							$publishedFile->setUpdatedAt($now);
-
-							\Component\Eportfolio\FileListMapper::getInstance()->save($publishedFile);
-						}
+						\Component\Eportfolio\FileListMapper::getInstance()->save($publishedFile);
 					}
 				}
 			}
@@ -62,7 +66,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
     }
     else {
-        SitePage::localRedir('/cms/portfolio/' . $_POST['parent']);
+        $page->backToTheFuture(2);
     }
 }
 // delete a single file

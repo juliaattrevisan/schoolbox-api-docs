@@ -1,6 +1,5 @@
 <?php
-require_once '../library/my-folder.php';
-$folderHandler = new MyFolder;
+$folderHandler = new MyFolder();
 
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 

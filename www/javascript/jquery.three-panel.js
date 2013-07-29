@@ -273,7 +273,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                     $j.each(meta.publish, function(i, dest) {
                         sel.append(
                             $j('<option/>').val(dest.pageId + '&componentInstanceId=' + dest.componentInstanceId)
-                                .html('ePortfolio/'+dest.pageTitle)
+                                .html(dest.pageTitle)
                         )
                     })
                     frm.attr('action','/eportfolio/component/filelist/modifyForm.php').show()

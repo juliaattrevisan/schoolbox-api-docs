@@ -277,7 +277,7 @@ $j(document).ready(function() {
           return true
         },
         f_file : function(id) {
-          window.open("/cms/myFile/new/" + id, "_self")
+          window.open("/cms/myFile/new/{USER_ID}/0/" + id, "_self")
           return true
         }
       },
@@ -460,7 +460,7 @@ $j(document).ready(function() {
           <h4 class="rfile publish">Publishing</h4>
           <form class="rfile publish" action="{{PUBLISH_PAGE_ACTION}}" method="get">
             <select name="pageId">
-              <option value="{{PUBLISH_PAGE_PAGE_ID}}-{{PUBLISH_PAGE_COMPONENT_INSTANCE_ID}}">ePortfolio/{{PUBLISH_PAGE_PAGE_NAME}}</option>
+              <option value="{{PUBLISH_PAGE_PAGE_ID}}-{{PUBLISH_PAGE_COMPONENT_INSTANCE_ID}}">{{PUBLISH_PAGE_PAGE_NAME}}</option>
             </select>
             <input type="hidden" name="fileId" value="{{PUBLISH_PAGE_FILE_ID}}" />
             <input type="hidden" name="userId" value="{{PUBLISH_PAGE_PAGE_OWNER_ID}}" />

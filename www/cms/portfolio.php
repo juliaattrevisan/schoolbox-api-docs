@@ -86,69 +86,6 @@ if (is_array($folderList)) {
 }
 
 
-// output files, column 2
-
-/* Get a list of pages with the File List component in it
- * and offer these as places to which you can publish.
- */
-$componentDefinition = Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_FileListController');
-
-$availablePages = \Eportfolio\PageMapper::getInstance()->findAvailablePages($_SESSION['id'], $componentDefinition->first());
-
-/* Manufacture the necessary info
- */
-if (is_array($availablePages) && count($availablePages)) {
-	$allPageData = array();
-
-	foreach ($availablePages as $currentPage) {
-		if (is_array($currentPage['componentList']) && count($currentPage['componentList'])) {
-			foreach ($currentPage['componentList'] as $currentComponent) {
-				/** @var Component_Instance $currentComponent */
-				foreach ($currentComponent->getConfig() as $currentConfig) {
-					/** @var Component_ConfigDefinition $currentConfig */
-					if ($currentConfig->getKey() == 'componentname') {
-						$componentName = $currentConfig->getValue();
-					}
-				}
-
-				/* Each link only needs to know this
-				 */
-				$pageData = array(
-					'pageId' => $currentPage['page']->getPageId(),
-					'pageTitle' => $currentPage['page']->getPageTitle(),
-					'pageOwnerId' => $currentPage['page']->getUid(),
-					'componentInstanceId' => $currentComponent->getId(),
-					'componentName' => $componentName,
-				);
-
-				$allPageData[] = $pageData;
-			}
-		}
-	}
-}
-
-/* Render options
- */
-//$this->setBlock('custom_head', 'publish_page', 'publish_page_block');
-//
-//if (is_array($allPageData) && count($allPageData)) {
-//	foreach($allPageData as $currentPageData) {
-//		$this->setVar(array(
-//			'PUBLISH_PAGE_PAGE_ID' => $currentPageData['pageId'],
-//			'PUBLISH_PAGE_PAGE_OWNER_ID' => $currentPageData['pageOwnerId'],
-//			'PUBLISH_PAGE_PAGE_NAME' => $currentPageData['pageTitle'],
-//			'PUBLISH_PAGE_COMPONENT_INSTANCE_ID' => $currentPageData['componentInstanceId'],
-//			'PUBLISH_PAGE_COMPONENT_NAME' => $currentPageData['componentName'],
-//		));
-//
-//		$this->parse('publish_page_block', 'publish_page', true);
-//	}
-//}
-//else {
-//	$this->setVar('publish_page_block', '');
-//}
-
-
 $fileList = $fileHandler->getAllInFolder($openFolder);
 if (is_array($fileList) && count($fileList) > 0) {
 
