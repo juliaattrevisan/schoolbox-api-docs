@@ -141,7 +141,10 @@ class SubjectReportCard {
 					'semester' => $this->targetSemester
 				))
 			);
-
+			$studentGrades = array_filter(
+				$studentGrades,
+				function($grade) { return isset($grade['mark']); }
+			);
 			usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
 			$studentGrades = array_map(function($row) { return $row['mark']; }, $studentGrades);
 
