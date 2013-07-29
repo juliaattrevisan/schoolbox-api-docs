@@ -240,7 +240,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
                     }
                 }
 
-               if(empty($this->synergeticDay)) {
+               if(!empty($this->synergeticDay)) {
 				foreach($this->synergeticDay as $date => $day){
 					return $date;
 				}
