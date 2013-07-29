@@ -101,7 +101,7 @@ class TemplateMapper extends Schoolbox\Mapper {
 							if ($componentConfigDefinition->count()) {
 								$componentConfigInstance = new \Component_Config();
 								$componentConfigInstance
-									->setConfigDefinitionId($componentDefinitionId)
+									->setConfigDefinitionId($componentConfigDefinition->first()->getId())
 									->setInstanceId($instanceId)
 									->setValue($currentValue);
 
