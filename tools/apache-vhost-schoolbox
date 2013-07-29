@@ -10,6 +10,10 @@
 		Satisfy all
 	</Directory>
 
+	ErrorLog /var/log/apache2/schoolbox_error.log
+	LogLevel warn
+	CustomLog /var/log/apache2/schoolbox_access.log combined
+
 	# Minify Exceptions
 	<Directory /usr/share/schoolbox/www/min>
 		RewriteEngine on
@@ -55,10 +59,6 @@
 	php_value session.cookie_lifetime
 	php_value session.save_handler redis
 	php_value session.save_path "tcp://127.0.0.1:6379"
-
-
-
-
 
 	# Assess uses JSON arrays to transfer data in multi-choice/matching pairs
 	# JSON arrays don't like being escaped!!
