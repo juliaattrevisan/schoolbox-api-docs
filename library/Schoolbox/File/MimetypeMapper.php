@@ -75,7 +75,8 @@ class MimetypeMapper extends Schoolbox\Mapper {
 	/**
 	 * Used to fetch a mime object for a given filename
 	 *
-	 * @param $filename
+	 * @param  string $filename
+	 * @throws Exception if the mimetype wasn't found
 	 * @return Mimetype
 	 */
 	public function getByFilename($filename) {
@@ -94,6 +95,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		if ($row = $statement->fetch()) {
 			return $this->hydrate($row, 'aft');
 		}
+		throw new Exception('Mimetype not found', Exception::CODE_MIMETYPE_NOT_FOUND);
 
 	}
 
