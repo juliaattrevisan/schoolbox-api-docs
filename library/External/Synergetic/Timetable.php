@@ -181,7 +181,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			//date format yyyy-dd-mm 00:00:00
 
 			//Access cache first
-			if(is_array($this->synergeticDay)) {
+			if(!empty($this->synergeticDay)) {
 				foreach($this->synergeticDay as $tdate => $tday) {
 					if($date > $tdate) {
 						return $tdate;
@@ -217,7 +217,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			}
 
 			//yes this is meant to get the first element and return it
-			if(is_array($this->synergeticDay)) {
+			if(!empty($this->synergeticDay)) {
                 foreach($this->synergeticDay as $date => $day){
 					return $date;
 				}
@@ -240,7 +240,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
                     }
                 }
 
-               if(is_array($this->synergeticDay)) {
+               if(empty($this->synergeticDay)) {
 				foreach($this->synergeticDay as $date => $day){
 					return $date;
 				}
