@@ -371,7 +371,7 @@ class StudentReportCard {
 		$returnHandler = new \SubmissionReturn();
 
 		$page->setVar(array(
-			'SUBJ_GRADEIENT' => (int)($gradeAvg['grade'] / 10),
+			'SUBJ_GRADEIENT' => (isset($gradeAvg['grade']) ? (int)($gradeAvg['grade'] / 10) : ''),
 			'SUBJ_GRADE_AVG' => $returnHandler->percent2letter($gradeAvg['grade']),
 			'SUBJ_GRADE_TREND' => $gradeAvg['trend'] != 0 ? sprintf("%0.1f%% %s", $gradeAvg['trend'], $trendDir) : ''
 		));
@@ -611,7 +611,7 @@ class StudentReportCard {
 		}
 
 		if($marks && $this->canViewMark($box)) {
-			$output['WORK_GRADIENT'] = (int)($marks['mark'] / 10);
+			$output['WORK_GRADIENT'] = (isset($marks['mark']) ? (int)($marks['mark'] / 10) : '');
 			$output['WORK_GRADE']    = $marks['display_mark'];
 			$output['WORK_COMMENT']  = $marks['comment'];
 		}
@@ -719,7 +719,7 @@ class StudentReportCard {
 			$output['WORK_URGENCY']  = 'none';
 		}
 		if($marks) {
-			$output['WORK_GRADIENT'] = (int)($marks['mark'] / 10);
+			$output['WORK_GRADIENT'] = (isset($marks['mark']) ? (int)($marks['mark'] / 10) : '');
 			$output['WORK_GRADE']    = $marks['display_mark'];
 			$output['WORK_COMMENT']  = $marks['comment'];
 		}
