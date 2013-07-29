@@ -29,6 +29,7 @@
 	php_value session.cookie_lifetime
 	php_value session.save_handler redis
 	php_value session.save_path "tcp://127.0.0.1:6379"
+	php_value newrelic.appname "Schoolbox 13.5"
 
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
