@@ -346,4 +346,13 @@ class File {
 	public function getMimetypeLoader() {
 		return $this->mimetype_loader;
 	}
+
+	/**
+	 * Is this file's name an allowed file name?
+	 *
+	 * @return bool
+	 */
+	public function isUploadAllowed() {
+		return $this->mimetype_loader->isFilenameMimetypeAllowed($this->getFilename());
+	}
 }
