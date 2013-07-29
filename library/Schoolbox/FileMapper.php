@@ -85,6 +85,8 @@ class FileMapper extends Mapper {
 	/**
 	 * Convenience method for creating and saving a file into storage.
 	 *
+	 * @throws File\Exception if the upload was not allowed.
+	 *
 	 * @param string $filename      The file's name.
 	 * @param string $temp_location The location of the file to save.
 	 * @param int    $user_id       The user to associate with the file.
@@ -94,6 +96,9 @@ class FileMapper extends Mapper {
 	public function upload($filename, $temp_location, $user_id) {
 		$file = new File();
 		$file->setFilename($filename);
+		if (!($file->isUploadAllowed())) {
+			throw new File\Exception('Invalid mime type', File\Exception::CODE_MIMETYPE_NOT_FOUND);
+		}
 		$file->setTempLocation($temp_location);
 		$file->setUploadedBy($user_id);
 		$file->loadHashFromTempLocation();
