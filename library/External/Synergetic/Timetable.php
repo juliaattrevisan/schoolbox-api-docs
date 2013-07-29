@@ -8,8 +8,11 @@
 ************************************************************/
 
 class External_Synergetic_Timetable implements External_TimetableInterface {
+
+	/**
+	 * @var MSSQL $database
+	 */
 	private $database;
-    private $offset;
 
 	protected $synergeticDay = array();
 
@@ -192,8 +195,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			}
 			$days = $campusModel->getTimetableDay();
 
-
-			$mssqldate = date('Y',$date)."-01-01 00:00:00";
 			$nowmssqldate = date('Y-m-d',$date).' 00:00:00';
 
             /* First attempt to get calendar dates based on campus */
@@ -346,17 +347,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				ORDER BY Timetable.PeriodNumber";
 		}
 		
-		$periodCount = $timetabledef['periodCount'];
-		$dayCount = $timetabledef['dayCount'];
-		
 		$result = $this->getDatabase()->query($query);
 		//get first period
 		if ($result !== FALSE && $result !== TRUE)
 			$desc = $this->getDatabase()->getNextArray($result);
 		 else
-			$desc = "";	
-			
+			$desc = "";
+
 		//for each period
+		$timetable = array();
 		for ($x = 0; isset($timetabledef['desc'][$x]); $x++) 
 		{
 			$timetable[$x]['periodName'] = $timetabledef['desc'][$x];
@@ -466,7 +465,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 		}
 
-		$periodCount = $timetabledef['periodCount'];
 		$dayCount = $timetabledef['dayCount'];
 
 		$result = $this->getDatabase()->query($query);
@@ -475,9 +473,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		if ($result != 1)
 			$desc = $this->getDatabase()->getNextArray();
 		 else
-			$desc = "";	
+			$desc = "";
 
 		//for each period
+		$timetable = array();
 		for ($x = 0; isset($timetabledef['desc'][$x]); $x++) 
 		{
 			$timetable[$x]['periodName'] = $timetabledef['desc'][$x];
@@ -567,13 +566,17 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			return $this->getDatabase()->getOne($query);
 	}
 
+	/**
+	 * @var MSSQL $database
+	 */
 	private function setDatabase ($database) {
 		$this->database = $database;
 	}
 
+	/**
+	 * @return MSSQL
+	 */
 	private function getDatabase () {
 		return $this->database;
 	}
 }
-
-?>
