@@ -57,6 +57,22 @@ class MimetypeMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Retrieves whether filename has a valid mimetype.
+	 *
+	 * @param  string $filename
+	 * @return bool
+	 */
+	public function isFilenameMimetypeAllowed($filename) {
+		try {
+			$mimetype = $this->getByFilename($filename);
+			return ($mimetype instanceof Mimetype && $mimetype->getEnable());
+		}
+		catch (Exception $ex) {
+			return false;
+		}
+	}
+
+	/**
 	 * Used to fetch a mime object for a given filename
 	 *
 	 * @param $filename
