@@ -64,7 +64,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         //due output
         $this->setBlock($templateHandle, 'duework', 'duework_block');
-	    $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
+        $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
 
 
         if (is_array($this->submissionList)) {
@@ -79,6 +79,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
                 /* Actions Block */
                 $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
+
+                $actionURL = null;
 
                 // what to display if student
                 if($this->groupHandler->isStudent()) {
@@ -115,6 +117,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                         }
                     }
 
+                    $this->setVar('DUE_ACTION', $actionURL);
                     $this->parse('duework_actions_block', 'duework_actions');
                 }
 
@@ -128,14 +131,14 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                     $this->setVar('duework_actions_block', '');
                 }
 
-	            $nameHTML = ($actionURL ? '<a href="'.$actionURL.'">' : "") . Scrub::text($submission['name']) . ($actionURL ? '</a>' : "");
+                $nameHTML = ($actionURL ? '<a href="'.$actionURL.'">' : "") . Scrub::text($submission['name']) . ($actionURL ? '</a>' : "");
 
                 $output = array(
                     'DUE_ID'      => $submission['id'],
-	                'DUE_ACTION'  => $actionURL,
-                    'DUE_NAME'	  => $nameHTML,
-                    'DUE_TYPE'	  => Scrub::text($submission['typeName']),
-                    'DUE_DATE'	  => $dateHTML,
+                    'DUE_ACTION'  => $actionURL,
+                    'DUE_NAME'    => $nameHTML,
+                    'DUE_TYPE'    => Scrub::text($submission['typeName']),
+                    'DUE_DATE'    => $dateHTML,
                     'DUE_COMMENT' => Scrub::html($submission['description']),
                     'ON_OFF'      => ++$j % 2 ? '' : 'dark',
                 );
@@ -153,10 +156,10 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         else
             $this->parse("submit_dw_block", "submit_dw");
 
-	    // if the user is SOMEHOW involved in this category...
-	    $this->setVar('allwork_button_block', '');
+        // if the user is SOMEHOW involved in this category...
+        $this->setVar('allwork_button_block', '');
 
-	    if($this->groupHandler->isStudent()) {
+        if($this->groupHandler->isStudent()) {
 
             // is the current user a member of this category?
             $catAccess = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'));
