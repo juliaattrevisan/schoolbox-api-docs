@@ -20,13 +20,18 @@ class OpenGraph extends Thumbnail {
 	public function fetchThumbnail() {
 		$matches = array();
 
-		$pattern = '#property=[\"\']?og:image[\"\']?.*content=[\"\']([^\"\']+)[\"\']?#m';
+		$allPatterns[] = '#property=[\"\']?og:image[\"\']?.*content=[\"\']([^\"\']+)[\"\']?#m';
+		$allPatterns[] = '#.*content=[\"\']([^\"\']+)[\"\']?.*property=[\"\']?og:image[\"\']?#m';
 
-		preg_match($pattern, $this->getCurl()->getResult(), $matches);
+		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
+			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {
+				$found = true;
+			}
+		}
 
 		/* If an opengraph image was found, curl that too
 		 */
-		if (count($matches)) {
+		if ($found) {
 			return $matches[1];
 		}
 
