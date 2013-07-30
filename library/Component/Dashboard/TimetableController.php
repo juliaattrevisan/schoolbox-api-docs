@@ -38,15 +38,26 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             return false;
         }
 
+
         $timetableHandler = $this->externalTimetable;
 
-        //get current day and period
+        // get current day and period.
+        // Don't output a timetable if it has the same code as another that has
+        // already been added.
+        $checked_campus_list = array();
         foreach ($_SESSION['campus'] as $campus_id) {
-            $this->dayNumber[$campus_id]     = $timetableHandler->getDayNumber($campus_id);
-            $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus_id);
-            $this->timetable[$campus_id]     = $timetableHandler->getDayTimetable(
-                $_SESSION['sid'], $_SESSION['id'], $campus_id, $this->dayNumber[$campus_id]
-            );
+            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
+            if ($campus instanceof Schoolbox\Campus) {
+                $campus_code = $campus->getExtTimetableCode();
+                if (!isset($checked_campus_list[$campus_code])) {
+                    $checked_campus_list[$campus_code] = true;
+                    $this->dayNumber[$campus_id]     = $timetableHandler->getDayNumber($campus_id);
+                    $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus_id);
+                    $this->timetable[$campus_id]     = $timetableHandler->getDayTimetable(
+                        $_SESSION['sid'], $_SESSION['id'], $campus_id, $this->dayNumber[$campus_id]
+                    );
+                }
+            }
         }
 
         $this->colourList = Timetable_ColourMapper::getInstance()->findAll();
