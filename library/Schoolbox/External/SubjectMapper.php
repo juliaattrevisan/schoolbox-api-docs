@@ -18,7 +18,7 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 	/**
 	 * Defines mapping for this mapper.
 	 *
-	 * @return voids
+	 * @return void
 	 */
 	protected function mapping() {
 		//
@@ -50,8 +50,9 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 	/**
 	 * Retrieves subject by Schoolbox ID.
 	 *
-	 * @param int $id
-	 * @return mixed
+	 * @throws Schoolbox\Mapper\Exception if no instance of model is found
+	 * @param  int $id
+	 * @return Subject
 	 */
 	public function findById($id) {
 		$statement = $this->database->prepare('
@@ -61,7 +62,11 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 			WHERE co.id=?
 		');
 		$statement->execute(array($id));
-		return $statement->fetch();
+		$row = $statement->fetch();
+		if (!empty($row)) {
+			throw new Schoolbox\Mapper\Exception('Instance of object not found');
+		}
+		return $this->hydrate($row);
 }
 
 

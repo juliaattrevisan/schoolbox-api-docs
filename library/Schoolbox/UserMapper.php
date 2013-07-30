@@ -155,7 +155,7 @@ class UserMapper extends Mapper {
 		$statement->execute(array($id));
 
 		foreach( $statement as $row ) {
-			if(!is_object($user)){
+			if ($user instanceof User) {
 				$user = $this->hydrate($row, 'u');
 				$user->setSuperUser($row['u.superuser'] == 1);
 
@@ -169,6 +169,9 @@ class UserMapper extends Mapper {
 			if($row['uc.defaultCampus'] == 1) {
 				$user->setDefaultCampus($campus);
 			}
+		}
+		if (!($user instanceof User)) {
+			throw new Schoolbox\Mapper\Exception('Instance of object not found');
 		}
 		return $user;
 	}

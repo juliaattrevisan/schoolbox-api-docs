@@ -229,9 +229,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * @param int  $id
-	 * @param bool $include_deleted If true, then include soft-deleted items.
-	 *
+	 * @throws Schoolbox\Mapper\Exception if submission box is not found
+	 * @param  int  $id
+	 * @param  bool $include_deleted If true, then include soft-deleted items.
 	 * @return SubmissionBox
 	 */
 	public function findById($id, $include_deleted = false) {
@@ -287,6 +287,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$box_file->setFile($file_mapper->hydrate($row, 'f'));
 				$submission_box->addFileLink($box_file);
 			}
+		}
+		if (!($submission_box instanceof SubmissionBox)) {
+			throw new Schoolbox\Mapper\Exception('Instance of object not found');
 		}
 		return $submission_box;
 	}
