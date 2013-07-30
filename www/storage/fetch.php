@@ -10,13 +10,12 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-if (isset($_GET['hash']) && $_GET['hash']) {
-    $page = new SitePage;
+try {
+    if (isset($_GET['hash']) && $_GET['hash']) {
+        $page = new SitePage;
 
-    /* @var $resource Schoolbox\File */
-    $resource = Schoolbox\FileMapper::getInstance()->findOneByColumn('hash', $_GET['hash']);
-
-    if ($resource != false) {
+        /* @var $resource Schoolbox\File */
+        $resource = Schoolbox\FileMapper::getInstance()->findOneByColumn('hash', $_GET['hash']);
 
         if ($_GET['save']) {
             $attach = "attachment;";
@@ -36,6 +35,10 @@ if (isset($_GET['hash']) && $_GET['hash']) {
         header("Content-Disposition: $attach filename=\"" . $resource->getFilename() . "\"");
         header("Content-Length: ".$resource->getFilesize());
         readfile($resource->getFileLocation());
+        exit;
     }
-
 }
+catch (Exception $ex) {}
+//
+// File not found error
+error(41);
