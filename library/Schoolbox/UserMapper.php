@@ -155,7 +155,7 @@ class UserMapper extends Mapper {
 		$statement->execute(array($id));
 
 		foreach( $statement as $row ) {
-			if ($user instanceof User) {
+			if (!($user instanceof User)) {
 				$user = $this->hydrate($row, 'u');
 				$user->setSuperUser($row['u.superuser'] == 1);
 
