@@ -86,7 +86,7 @@ class FeatureContext extends MinkContext {
         // targetId: whatever the current selected template is
         $path    = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
         $context = null;
-        if (preg_match('/^adminv2/.*$/i', $path, $matches)) {
+        if (preg_match('/^\\/adminv2\\/(.*$)/i', $path, $matches)) {
             list(, $context) = $matches;
         }
         if (!$context) {
