@@ -650,8 +650,9 @@ class Mapper {
 	/**
 	 * Retreives a model by id
 	 *
-	 * @param Mixed $identifierValue
-	 * @return Model
+	 * @throws Exception if no instance of model is found
+	 * @param  mixed  $identifierValue
+	 * @return object
 	 */
 	public function findById($identifierValue) {
 		$identifierName = $this->identifier['column'];
@@ -698,10 +699,10 @@ class Mapper {
 	/**
 	 * Returns first model whose $columnName = $columnValue.
 	 *
-	 * @param String $columnName
-	 * @param String $columnValue
-	 *
-	 * @return object or false if not found.
+	 * @throws Exception if no instance of model is found
+	 * @param  String $columnName
+	 * @param  String $columnValue
+	 * @return object
 	 */
 	public function findOneByColumn($columnName, $columnValue) {
 		$statement = $this->database->prepare("
