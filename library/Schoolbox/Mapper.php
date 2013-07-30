@@ -674,7 +674,7 @@ class Mapper {
 			$model = $this->hydrate($row);
 			return $model;
 		}
-		throw new Exception('Instance of mapper not found');
+		throw new Exception('Instance of object not found');
 	}
 
 	/**
@@ -717,7 +717,7 @@ class Mapper {
 		if ($result) {
 			return $this->hydrate($result);
 		}
-		throw new Exception('Instance of mapper not found');
+		throw new Exception('Instance of object not found');
 	}
 
 	/**
