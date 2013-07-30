@@ -65,7 +65,7 @@ class Mapper {
 	protected $model;
 
 	/**
-	 * @var array
+	 * @var MappingCollection
 	 */
 	protected $map;
 
@@ -127,6 +127,7 @@ class Mapper {
 	 */
 	public function __construct() {
 		$this->database = \Database::getInstance();
+		$this->map = new MappingCollection();
 		$this->setup();
 		$this->setConfigLoader(new ConfigLoader());
 		$this->setColumnFactory(new ColumnFactory());
@@ -341,7 +342,7 @@ class Mapper {
 		if (!empty($map['identifier'])) {
 			$this->identifier = $map;
 		}
-		$this->map[] = $map;
+		$this->map->add($map);
 		return true;
 	}
 
