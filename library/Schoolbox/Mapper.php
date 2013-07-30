@@ -829,6 +829,9 @@ class Mapper {
 
 	/**
 	 * @brief Attempts to complete a partially defined map
+	 *
+	 * @deprecated Define all mappings yourself instead of relying on magic
+	 *
 	 * @return Bool
 	 */
 	protected function mapping() {
