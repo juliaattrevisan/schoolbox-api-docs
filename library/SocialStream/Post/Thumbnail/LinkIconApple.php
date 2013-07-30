@@ -31,7 +31,6 @@ class LinkIconApple extends Thumbnail {
 			}
 		}
 
-		new \Alaress_Probe($matches);
 		/* If an opengraph image was found, curl that too
 		 */
 		if ($found) {

@@ -37,10 +37,16 @@ class Chain {
 		$itempropImage = new ItempropImage($curl, $newPost);
 		$itempropPhoto = new ItempropPhoto($curl, $newPost);
 		$itempropIcon = new ItempropIcon($curl, $newPost);
+		$linkIcon = new LinkIcon($curl, $newPost);
+		$linkIconApple = new LinkIconApple($curl, $newPost);
+		$linkIconApplePrecompiled = new LinkIconApplePrecompiled($curl, $newPost);
 
 		/* Try directly, otherwise try the other meta tag variants in sequence
 		 * until one of them matches
 		 */
+		$linkIconApple->setNext($linkIconApplePrecompiled);
+		$linkIcon->setNext($linkIconApple);
+		$itempropIcon->setNext($linkIcon);
 		$itempropPhoto->setNext($itempropIcon);
 		$itempropImage->setNext($itempropPhoto);
 		$opengraph->setNext($itempropImage);
@@ -48,8 +54,6 @@ class Chain {
 
 		$result = $direct->fetchThumbnail();
 
-		print_r($result);
-		die();
 		$this->setResult($result);
 	}
 
