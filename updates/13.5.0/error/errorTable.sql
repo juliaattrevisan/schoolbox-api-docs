@@ -1,1 +1,1 @@
-ALTER TABLE `error` CHANGE `message` `message` TEXT NULL; 
+ALTER TABLE `error` CHANGE `message` `message` TEXT CHARSET utf8 COLLATE utf8_general_ci NULL;
