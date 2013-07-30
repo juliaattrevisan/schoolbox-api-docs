@@ -123,15 +123,20 @@ class UserMapper extends Mapper {
 			'type'       => Mapper::TYPE_BOOLEAN,
 		));
 
-		if ($this->config_loader->get('boarder_leave_enabled')) {
-			$this->hasMap(array(
-				'column'   => 'boarding_status',
-				'property' => 'boardingStatus',
-				'type'     => self::TYPE_STRING,
-			));
-		}
+		//
+		// Boarder leave field is only there if the boarder leave module is
+		// enabled.
+		$this_object = $this;
+		$this->hasMap(array(
+			'column'   => 'boarding_status',
+			'property' => 'boardingStatus',
+			'type'     => self::TYPE_STRING,
+			'enabled'  => function() use ($this_object) {
+				return $this_object->getConfigLoader()->get('boarder_leave_enabled');
+			}
+		));
+		unset($this_object);
 
-		parent::mapping();
 	}
 
 	public function findById($id) {
