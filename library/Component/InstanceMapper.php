@@ -237,9 +237,10 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 			}
 
 			// Find original instance otherwise use blank instance for following conditional statements
-			$cleanInstance = $instanceMapper->findById($dirtyInstance->getId());
-
-			if (!$cleanInstance) {
+			try {
+				$cleanInstance = $instanceMapper->findById($dirtyInstance->getId());
+			}
+			catch (Schoolbox\Mapper\Exception $e) {
 				$cleanInstance = new Component_Instance();
 			}
 
