@@ -850,7 +850,7 @@ class Mapper {
 			$this->table = $this->toUnderscore($this->model);
 		}
 
-		if (empty($this->map)) {
+		if ($this->map->count() === 0) {
 			$propertyList = array_keys(get_class_vars($this->model));
 
 			if (!empty($propertyList)) {
