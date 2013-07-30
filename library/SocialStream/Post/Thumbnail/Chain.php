@@ -36,16 +36,20 @@ class Chain {
 		$opengraph = new OpenGraph($curl, $newPost);
 		$itempropImage = new ItempropImage($curl, $newPost);
 		$itempropPhoto = new ItempropPhoto($curl, $newPost);
+		$itempropIcon = new ItempropIcon($curl, $newPost);
 
 		/* Try directly, otherwise try the other meta tag variants in sequence
 		 * until one of them matches
 		 */
+		$itempropPhoto->setNext($itempropIcon);
 		$itempropImage->setNext($itempropPhoto);
 		$opengraph->setNext($itempropImage);
 		$direct->setNext($opengraph);
 
 		$result = $direct->fetchThumbnail();
 
+		print_r($result);
+		die();
 		$this->setResult($result);
 	}
 

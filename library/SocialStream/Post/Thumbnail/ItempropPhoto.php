@@ -1,6 +1,6 @@
 <?php
 /**
- * ItempropImage
+ * ItempropPhoto
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -30,7 +30,7 @@ class ItempropPhoto extends Thumbnail {
 				$found = true;
 			}
 		}
-
+$found=false;
 		/* If an opengraph image was found, curl that too
 		 */
 		if ($found) {
