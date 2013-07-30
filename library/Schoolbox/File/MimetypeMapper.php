@@ -78,7 +78,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		if ($row = $statement->fetch()) {
 			return $this->hydrate($row, 'aft');
 		}
-
+		throw new Schoolbox\Mapper\Exception();
 	}
 
     /*

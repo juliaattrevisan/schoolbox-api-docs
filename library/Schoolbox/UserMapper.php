@@ -180,8 +180,8 @@ class UserMapper extends Mapper {
 	/**
 	 * Fetches the user, and all of the user's subjects.
 	 *
-	 * @param $id
-	 *
+	 * @throws Schoolbox\Mapper\Exception if user wasn't found
+	 * @param  int $id
 	 * @return \Schoolbox\User
 	 */
 	public function findWithSubjects($id) {
@@ -198,7 +198,7 @@ class UserMapper extends Mapper {
 			$user->setSubjectCollection($subject_mapper->findAllForStudent($user));
 			return $user;
 		}
-		return false;
+		throw new Schoolbox\Mapper\Exception();
 	}
 
 	/**

@@ -93,7 +93,7 @@ class BlogMapper extends Schoolbox\Mapper {
 	 * http://stackoverflow.com/questions/2542410/how-do-i-set-order-by-params-using-prepared-pdo-statement
 	 *
 	 * @param $args
-	 * @return bool|Model
+	 * @return Schoolbox\Collection
 	 */
 	public function findByOrder($args) {
 		$comment_mapper = $this->getJoinMapper('comments');

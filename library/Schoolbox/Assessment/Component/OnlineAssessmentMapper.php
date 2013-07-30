@@ -184,8 +184,6 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 
 			//
 			// Pass to activity collection instead? createFromOnlineAssessment?
-
-			$get_method = $this->getGetMethodName($query['date_field']);
 			foreach ($statement as $row) {
 				$assess = $this->hydrate($row, 'a');
 				$assess->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
