@@ -1,70 +1,9 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css"/>
 <script type="text/javascript"
-        src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.contextmenu.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
+        src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript">
 $j(document).ready(function () {
-
-    // define file context menu
-    var fileMenu = [
-        {"Open":{
-            onclick:function () {
-                window.open("/cms/sendNetworkFile.php?id=" + $j(this).attr("id").substring(5), "_blank");
-            },
-            icon:'/images/famicons/page_go.png'
-        }},
-        {"Save As":{
-            onclick:function () {
-                window.open("/cms/sendNetworkFile.php?save=1&id=" + $j(this).attr("id").substring(5), "_self");
-            },
-            icon:'/images/famicons/disk.png'
-        }},
-        $j.contextMenu.separator,
-        {"Modify":{
-            onclick:function () {
-                window.open("/cms/networkFile/" + $j(this).attr("id").substring(5), "_self");
-            },
-            icon:'/images/famicons/page_edit.png'
-        }},
-        {"Delete":{
-            onclick:function () {
-                var _name = $j(this).find(".file").text();
-                if (confirm("Are you sure you want to delete " + _name + "?"))
-                    window.open("/cms/networkFileForm.php?delete=" + $j(this).attr("id").substring(5), "_self");
-            },
-            icon:'/images/famicons/page_delete.png'
-        }}
-    ];
-
-    // define folder context menu
-    var folderMenu = [
-        {"Modify":{
-            onclick:function () {
-                window.open("/cms/networkFolder/" + $j(this).attr("id").substring(5), "_self");
-            },
-            icon:'/images/famicons/folder_edit.png'
-        }},
-        {"Delete":{
-            onclick:function () {
-                var _name = $j(this).find(".folder").text();
-                if (confirm("Are you sure you want to delete " + _name + "?")) window.open("/cms/networkFolderForm.php?delete=" + $j(this).attr("id").substring(5), "_self");
-            },
-            icon:'/images/famicons/folder_delete.png'
-        }},
-        $j.contextMenu.separator,
-        {"New File":{
-            onclick:function () {
-                window.open("/cms/networkFile/new/" + $j(this).attr("id").substring(5), "_self");
-            },
-            icon:'/images/famicons/page_add.png'
-        }},
-        {"New Folder":{
-            onclick:function () {
-                window.open("/cms/networkFolder/new/" + $j(this).attr("id").substring(5), "_self");
-            },
-            icon:'/images/famicons/folder_add.png'
-        }}
-    ];
 
     /* left tree navigation */
     $j('#tree').tree({
@@ -162,21 +101,6 @@ $j(document).ready(function () {
         $j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 
         /* apply file context menus */
-        newChildren.contextMenu(fileMenu, {
-            theme:'vista',
-            beforeShow:function (event) {
-
-                /* un-select selection if clicked outside */
-                if (!$j(this.target).hasClass('selected')) {
-                    $j(this.target).triggerHandler('click', event);
-                }
-
-                var categoryID = $j(this.target)[0].className.match(/category-([\d]+)/), folder = $j('#node-' + categoryID[1].toString())
-
-                /* enable all options */
-                $j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
-            }
-        });
 
         /* double click files, default action */
         newChildren.dblclick(function () {
@@ -283,25 +207,6 @@ $j(document).ready(function () {
             }
         }
 
-        /* apply folder context menus
-         */
-        var newRows = table.find('tbody tr:not(.context)').addClass('context');
-
-        newRows.contextMenu(folderMenu, {
-            theme:'vista',
-            beforeShow:function () {
-
-                /* enable all options */
-                $j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
-
-                /* Disable modify and delete for node-0 (Top) and immediate children */
-                if ($j(this.target).hasClass('server')) {
-                    for (var i = 0; i <= 1; i++) {
-                        $j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true);
-                    }
-                }
-            }
-        });
     });
 
     $j('#tree').triggerHandler('loaded');
