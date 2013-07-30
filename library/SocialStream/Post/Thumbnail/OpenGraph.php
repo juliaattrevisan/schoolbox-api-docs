@@ -10,6 +10,7 @@
 
 namespace SocialStream\Post\Thumbnail;
 
+
 class OpenGraph extends Thumbnail {
 
 	/**
@@ -20,8 +21,9 @@ class OpenGraph extends Thumbnail {
 	public function fetchThumbnail() {
 		$matches = array();
 
-		$allPatterns[] = '#property=[\"\']?og:image[\"\']?.*content=[\"\']([^\"\']+)[\"\']?#m';
-		$allPatterns[] = '#.*content=[\"\']([^\"\']+)[\"\']?.*property=[\"\']?og:image[\"\']?#m';
+		$allPatterns = array();
+		$allPatterns[] = '#property=[\"\']og:image[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
+		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*property=[\"\']og:image[\"\']#m';
 
 		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
 			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {

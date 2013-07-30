@@ -21,14 +21,20 @@ class ItempropImage extends Thumbnail {
 	public function fetchThumbnail() {
 		$matches = array();
 
-		$pattern = '#.*content=[\"\']([^\"\']+)[\"\']?.*itemprop=[\"\']?image[\"\']?#m';
+		$allPatterns = array();
+		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']image[\"\']#m';
+		$allPatterns[] = '#itemprop=[\"\']image[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
 
-		preg_match($pattern, $this->getCurl()->getResult(), $matches);
+		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
+			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {
+				$found = true;
+			}
+		}
 
 		/* If an opengraph image was found, curl that too
 		 */
-		if (count($matches)) {
-			return $matches[0];
+		if ($found) {
+			return $matches[1];
 		}
 
 		/* Otherwise get the next class to deal with it
