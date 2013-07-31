@@ -9,7 +9,6 @@
  */
  
 namespace Schoolbox\Column;
-use Schoolbox\LazyModel;
 use Schoolbox\Mapper;
 
 class Model implements IColumnType {
