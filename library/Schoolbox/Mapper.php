@@ -91,7 +91,7 @@ class Mapper {
 	/**
 	 * Stores the singleton instance of the mapper
 	 *
-	 * @var Mapper
+	 * @var array[Mapper]
 	 */
 	static protected $instance;
 
@@ -115,10 +115,11 @@ class Mapper {
 	 * @return static
 	 */
 	static public function getInstance() {
-		if (!isset($instance)) {
-			static::$instance = new static();
+		$class_name = get_called_class();
+		if (!isset(self::$instance[$class_name])) {
+			self::$instance[$class_name] = new static();
 		}
-		return static::$instance;
+		return self::$instance[$class_name];
 	}
 
 	/**
