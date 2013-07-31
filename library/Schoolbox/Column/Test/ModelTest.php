@@ -64,9 +64,6 @@ class ModelTest extends TestCase {
 	public function testHydrate() {
 		$hydrate = $this->object->hydrate(1, $this->test_mapper);
 		$this->assertSame(1, $hydrate->getId());
-//		$this->assertFalse($hydrate->isModelLoaded());
-//		$this->assertSame('d.txt', $hydrate->getFilename());
-//		$this->assertTrue($hydrate->isModelLoaded());
 	}
 
 	public function testDehydrate() {
@@ -76,28 +73,20 @@ class ModelTest extends TestCase {
 	public function testDehydrateNull() {
 		$this->assertSame(null, $this->object->dehydrate(null, $this->test_mapper));
 	}
-
 	/**
 	 * Test when dehydrating with an alternate field name.
 	 */
 	public function testHydrateWithFieldName() {
-		$this->object
-			->setHydrateColumn('filename')
-			->setDehydrateProperty('filename');
+		$this->object->setIdentifierProperty('filename');
 		$hydrate = $this->object->hydrate('d.txt', $this->test_mapper);
 		$this->assertSame('d.txt', $hydrate->getFilename());
-//		$this->assertFalse($hydrate->isModelLoaded());
-//		$this->assertSame(1, $hydrate->getId());
-//		$this->assertTrue($hydrate->isModelLoaded());
 	}
 
 	/**
 	 * Test when dehydrating with an alternate field name.
 	 */
 	public function testDehydrateWithFieldName() {
-		$this->object
-			->setHydrateColumn('filename')
-			->setDehydrateProperty('filename');
+		$this->object->setIdentifierProperty('filename');
 		$this->assertSame('d.txt', $this->object->dehydrate($this->test_model, $this->test_mapper));
 	}
 }
