@@ -67,6 +67,42 @@ abstract class Thumbnail {
 	 */
 	abstract public function fetchThumbnail();
 
+	/**
+	 * Try to find one of the patterns in $allPatterns
+	 *
+	 * @param $allPatterns
+	 * @return mixed
+	 */
+	protected function analyse($allPatterns) {
+		$matches = array();
+
+		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
+			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {
+
+				/* Check this path for extension and if it is an image extension,
+				 * presume something useful was found
+				 */
+				$this->getFileType()->setPath($matches[1]);
+
+				if ($this->getFileType()->isImageExtension()) {
+					$found = true;
+				}
+			}
+		}
+
+		/* If an opengraph image was found, curl that too
+		 */
+		if ($found) {
+			return $matches[1];
+		}
+
+		/* Otherwise get the next class to deal with it
+		 */
+		if ($this->getNext()) {
+			return $this->getNext()->fetchThumbnail();
+		}
+	}
+
 	/* Getters/Setters
 	 */
 
