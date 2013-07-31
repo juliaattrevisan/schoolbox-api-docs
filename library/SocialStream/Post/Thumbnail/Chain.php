@@ -37,6 +37,7 @@ class Chain {
 		$itempropImage = new ItempropImage($curl, $newPost);
 		$itempropPhoto = new ItempropPhoto($curl, $newPost);
 		$itempropIcon = new ItempropIcon($curl, $newPost);
+		$itempropThumbnailUrl = new ItempropThumbnailUrl($curl, $newPost);
 		$linkIcon = new LinkIcon($curl, $newPost);
 		$linkIconApple = new LinkIconApple($curl, $newPost);
 		$linkIconApplePrecompiled = new LinkIconApplePrecompiled($curl, $newPost);
@@ -46,7 +47,8 @@ class Chain {
 		 */
 		$linkIconApple->setNext($linkIconApplePrecompiled);
 		$linkIcon->setNext($linkIconApple);
-		$itempropIcon->setNext($linkIcon);
+		$itempropThumbnailUrl->setNext($linkIcon);
+		$itempropIcon->setNext($itempropThumbnailUrl);
 		$itempropPhoto->setNext($itempropIcon);
 		$itempropImage->setNext($itempropPhoto);
 		$opengraph->setNext($itempropImage);
