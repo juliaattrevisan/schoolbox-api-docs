@@ -32,6 +32,23 @@ abstract class Thumbnail {
 	protected $url = '';
 
 	/**
+	 * Next class to deal with the problem
+	 *
+	 * @var
+	 */
+	protected $next = false;
+
+	/**
+	 * An instance of FileType
+	 *
+	 * This checks whether a url contains a valid image or not
+	 * by checking file extension
+	 *
+	 * @var null
+	 */
+	protected $fileType = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @param $curl
@@ -40,15 +57,14 @@ abstract class Thumbnail {
 	public function __construct($curl, $newPost) {
 		$this->setCurl($curl);
 		$this->setUrl($newPost->getUrl());
+		$this->setFileType(new \FileType($newPost->getUrl()));
 	}
 
 	/**
-	 * Next class to deal with the problem
+	 * Subclasses define how to fetch thumbnails
 	 *
-	 * @var
+	 * @return mixed
 	 */
-	protected $next = false;
-
 	abstract public function fetchThumbnail();
 
 	/* Getters/Setters
@@ -77,7 +93,7 @@ abstract class Thumbnail {
 	 *
 	 * @param $curl
 	 */
-	public function setCurl($curl) {
+	protected function setCurl($curl) {
 		$this->curl = $curl;
 	}
 
@@ -86,7 +102,7 @@ abstract class Thumbnail {
 	 *
 	 * @return string
 	 */
-	public function getCurl() {
+	protected function getCurl() {
 		return $this->curl;
 	}
 
@@ -95,7 +111,7 @@ abstract class Thumbnail {
 	 *
 	 * @param $url
 	 */
-	public function setUrl($url) {
+	protected function setUrl($url) {
 		$this->url = $url;
 	}
 
@@ -104,7 +120,25 @@ abstract class Thumbnail {
 	 *
 	 * @return string
 	 */
-	public function getUrl() {
+	protected function getUrl() {
 		return $this->url;
+	}
+
+	/**
+	 * Set file type
+	 *
+	 * @param null $fileType
+	 */
+	protected function setFileType($fileType) {
+		$this->fileType = $fileType;
+	}
+
+	/**
+	 * Get file type
+	 *
+	 * @return null
+	 */
+	protected function getFileType() {
+		return $this->fileType;
 	}
 }

@@ -19,12 +19,10 @@ class Direct extends Thumbnail {
 	 * @return mixed
 	 */
 	public function fetchThumbnail() {
-		$fileType = new \FileType($this->getUrl());
-		$extension = $fileType->getExtension();
 
 		/* If it has at least the right extension, download it directly
 		 */
-		if (in_array($extension, array('jpg', 'jpeg', 'gif', 'png'))) {
+		if ($this->getFileType()->isImage()) {
 
 			/* TODO: Check header types via curl
 			 * rather than just rely on the file extension

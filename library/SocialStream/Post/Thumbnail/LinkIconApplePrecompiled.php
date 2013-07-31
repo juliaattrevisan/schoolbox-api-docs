@@ -27,7 +27,9 @@ class LinkIconApplePrecompiled extends Thumbnail {
 
 		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
 			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {
-				$found = true;
+				if ($this->getFileType()->isImage()) {
+					$found = true;
+				}
 			}
 		}
 
