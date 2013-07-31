@@ -231,19 +231,19 @@ class File extends DeprecatedModel {
     function delete ($id, $clean = false) {
 
         if ( $clean ) {
-	        $videoMapper = new Schoolbox\Video\ResourceVideoMapper();
-	        $video = $videoMapper->findById($id);
+            $videoMapper = new Schoolbox\Video\ResourceVideoMapper();
+            try {
+                /** @var Schoolbox\Video\ResourceVideo $video */
+                $video = $videoMapper->findById($id);
+                parent::delete($id);
+                $filename = Cfg::get('file_dir') . '/' . $id . '.dat';
+                @unlink($filename);
 
-            parent::delete($id);
-            $filename = Cfg::get('file_dir') . '/' . $id . '.dat';
-            @unlink($filename);
-
-	        /* unlink video files */
-	        if(is_object($video)) {
-		        @unlink($video->getVideoLocation());
-		        @unlink($video->getThumbnailLocation());
-	        }
-
+                /* unlink video files */
+                @unlink($video->getVideoLocation());
+                @unlink($video->getThumbnailLocation());
+            }
+            catch (Schoolbox\Mapper\Exception $ex) {}
         }
         else {
             /* We just mark files as deleted */

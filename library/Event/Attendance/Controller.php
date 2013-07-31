@@ -352,9 +352,11 @@ class Event_Attendance_Controller extends Controller
 
         $this->getLeaveRequestMapper()->save($request);
 
-        if ( $request = $this->getLeaveRequestMapper()->findById( $request->getId() ) ) {
+        try {
+            $request = $this->getLeaveRequestMapper()->findById($request->getId());
             $this->getLeaveController()->sendParentNotice($request);
         }
+        catch (Schoolbox\Mapper\Exception $e) {}
     }
 
     public function processRemoveAttendance ($attendanceId) {

@@ -111,11 +111,12 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render personal details
 	 */
 	private function renderPersonal() {
-		$house = HouseMapper::getInstance()->findById($this->getUserHouse());
-
-		if ($house) {
+		$houseName = '';
+		try {
+			$house = HouseMapper::getInstance()->findById($this->getUserHouse());
 			$houseName = $house->getHouse();
 		}
+		catch (Schoolbox\Mapper\Exception $e) {}
 
 		$this->getPage()->setVar(array(
 			'USER_EXTERNAL_ID' => $this->getExternalUserId(),

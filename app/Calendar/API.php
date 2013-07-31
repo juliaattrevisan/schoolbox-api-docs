@@ -402,13 +402,12 @@ class Calendar_API extends Generic_API {
 	 */
     public function Event($event_id, $connector_id) {
 
-		/* Find out from whence this event came
-		 */
-		$configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($connector_id);
-
-		/* If the config was found, continue as normal
-		 */
-		if (is_a($configRecord, 'Calendar_Api_Config_Record')) {
+		try {
+			/* Find out from whence this event came
+			 * If the config was found, continue as normal
+			 */
+			/** @var Calendar_Api_Config_Record $configRecord */
+			$configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($connector_id);
 			$config = $configRecord->decodeConfig();
 			$config->setId($connector_id);
 
@@ -475,7 +474,7 @@ class Calendar_API extends Generic_API {
 	            $response = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
 	        }
 		}
-        else {
+		catch (Schoolbox\Mapper\Exception $e) {
 			$response = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
 		}
 

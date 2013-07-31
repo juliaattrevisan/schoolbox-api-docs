@@ -74,8 +74,10 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 	public function save ($dirtyDocument) {
 		//
 		// Document not found already? Submit to the gateway
-		$existing_document = $this->findById($dirtyDocument->getId());
-		if (!($existing_document instanceof Plagscan_Document)) {
+		try {
+			//
+			// Don't do anything if $existing_document isn't found
+			$existing_document = $this->findById($dirtyDocument->getId());
 			$file = $dirtyDocument->getFile();
 			$documentId = $this->gateway->submit($file['name'], $file['file']);
 
@@ -89,6 +91,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 				return false;
 			}
 		}
+		catch (Schoolbox\Mapper\Exception $e) {}
 
 		return parent::save($dirtyDocument);
 	}

@@ -39,8 +39,10 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	public function getEvents($startTimestamp, $endTimestamp) {
 		$stack       = new Calendar_Event_Collection();
 		$user_mapper = new Schoolbox\UserMapper();
-		$user        = $user_mapper->findById($this->getUserId());
-		if (!$user instanceof Schoolbox\User) {
+		try {
+			$user = $user_mapper->findById($this->getUserId());
+		}
+		catch (Schoolbox\Mapper\Exception $e) {
 			return $stack;
 		}
 
