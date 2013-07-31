@@ -25,7 +25,8 @@ class FeatureContext extends MinkContext {
      * @param array $parameters context parameters (set them up through behat.yml)
      */
     public function __construct(array $parameters) {
-        // Initialize your context here
+        //
+        // Reset the database and filesystem back to a well-known state
     }
 
     /**
@@ -41,9 +42,13 @@ class FeatureContext extends MinkContext {
         $page->findById('username')->setValue($username);
         $page->findById('password')->setValue($password);
         $page->find('css', 'input.login')->press();
-        if ($this->getSession()->evaluateScript('$j(\'a[href="/logout.php"]\').length') != 1) {
-            throw new Exception('Could not login');
-        }
+        $this->spin(
+            function($context) {
+                /** @param FeatureContext $context */
+                return $context->getSession()->getPage()->findLink('Logout') instanceof Element\NodeElement;
+            },
+            10
+        );
     }
 
     /**
@@ -205,11 +210,13 @@ class FeatureContext extends MinkContext {
      */
     protected function waitForAjax($duration = 5000) {
 //        $this->printDebug('Waiting for AJAX requests to complete...');
-        $ajax_finished_condition = '(0 === jQuery.active)';
-        $this->getSession()->wait($duration, $ajax_finished_condition);
-        if (!$this->getSession()->evaluateScript($ajax_finished_condition)) {
-            throw new Exception('Ajax wait timed out');
-        }
+        $this->spin(
+            function($context) {
+                /** @param FeatureContext $context */
+                return $context->getSession()->evaluateScript('return (0 === jQuery.active)');
+            },
+            ($duration/1000)
+        );
     }
 
     /**
