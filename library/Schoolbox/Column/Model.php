@@ -10,6 +10,7 @@
  
 namespace Schoolbox\Column;
 use Schoolbox\LazyModel;
+use Schoolbox\Mapper;
 
 class Model implements IColumnType {
 
@@ -71,8 +72,31 @@ class Model implements IColumnType {
 		return $this->hydrate_column;
 	}
 
+	/**
+	 * Hydrates this column with a model which is empty, except for its
+	 * identifier property.
+	 *
+	 * @example hydrating "2" with the UserMapper creates a new User object,
+	 *          with its ID property set to 2.
+	 *          If setDehydrateProperty() was called on this column object, that
+	 *          property will be hydrated instead.
+	 *
+	 * @param mixed  $value
+	 * @param Mapper $mapper
+	 *
+	 * @return object
+	 */
 	public function hydrate($value, $mapper = null) {
-		return new LazyModel($mapper, $value, $this->getHydrateColumn(), $this->getDehydrateProperty());
+		/** @var Mapper $mapper */
+		$model = $mapper->createModel();
+		//
+		// Figure out the identifier property to set on the model.
+		$dehydrate_property = $this->getDehydrateProperty();
+		$identifier_method  = isset($dehydrate_property) ?
+			$mapper->getSetMethodName($dehydrate_property):
+			$mapper->getSetIdentifierMethodName();
+		$model->$identifier_method($value);
+		return $model;
 	}
 
 	/**
