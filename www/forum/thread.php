@@ -98,7 +98,7 @@ if (!$pageNum) {
 
 $postPerPage = FORUM_POSTS_PER_PAGE;
 $totalPages = ceil(count($postList) / $postPerPage);
-$postIndex = $postPerPage * ($pageNum - 1);
+$postIndex = max(0, $postPerPage * ($pageNum - 1));
 
 $this->setVar('previous_button_block', '');
 $this->setVar('next_button_block', '');
