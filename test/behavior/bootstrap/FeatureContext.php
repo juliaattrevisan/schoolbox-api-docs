@@ -160,17 +160,45 @@ class FeatureContext extends MinkContext {
     }
 
     /**
-     * @Given /^I rename component on "([^"]*)" at position "([^"]*)" to "([^"]*)"$/
+     * @param string $section   The section the component is in (top, left, right)
+     * @param string $position  The position to load the component into
+     *
+     * @return Element\NodeElement
+     * @throws Exception if the form wasn't found
      */
-    public function iRenameComponentOnAtPositionTo($section, $position, $new_name) {
-        throw new PendingException();
+    protected function getComponentForm($section, $position) {
+        foreach ($this->getSession()->getPage()->find('css', "#position-$section form") as $i => $potential_form) {
+            if ($i+1 == $position) {
+                return $potential_form;
+            }
+        }
+        throw new Exception(sprintf('Could not find component at position "%s:%d"', $section, $position));
+    }
+
+    /**
+     * @Given /^I rename component on "([^"]*)" at position "([^"]*)" to "([^"]*)"$/
+     * @param string $section   The section the component is in (top, left, right)
+     * @param string $position  The position to load the component into
+     * @param string $new_name  The name of the new component
+     */
+    public function renameComponent($section, $position, $new_name) {
+        $form = $this->getComponentForm($section, $position);
+        $form->findField('componentname')->setValue($new_name);
+        $form->findButton('Update')->press();
+        $this->waitForAjax();
     }
 
     /**
      * @Given /^I repurpose component on "([^"]*)" at position "([^"]*)" to "([^"]*)"$/
+     * @param string $section     The section the component is in (top, left, right)
+     * @param string $position    The position to load the component into
+     * @param string $new_purpose The new purpose of the component
      */
-    public function iRepurposeComponentOnAtPositionTo($section, $position, $new_purpose) {
-        throw new PendingException();
+    public function repurposeComponent($section, $position, $new_purpose) {
+        $form = $this->getComponentForm($section, $position);
+        $form->findField('description')->setValue($new_purpose);
+        $form->findButton('Update')->press();
+        $this->waitForAjax();
     }
 
     /**
