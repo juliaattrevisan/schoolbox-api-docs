@@ -26,4 +26,8 @@
             </exclude>
         </whitelist>
     </filter>
+    <php>
+        <!-- Dial down param collection as PHP5.3 leaks everywhere if at 3 -->
+        <ini name="xdebug.collect_params" value="1" />
+    </php>
 </phpunit>
