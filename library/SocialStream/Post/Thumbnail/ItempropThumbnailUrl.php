@@ -1,6 +1,6 @@
 <?php
 /**
- * ItempropPhoto
+ * ItempropThumbnailUrl
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,7 +11,7 @@
 namespace SocialStream\Post\Thumbnail;
 
 
-class ItempropPhoto extends Thumbnail {
+class ItempropThumbnailUrl extends Thumbnail {
 
 	/**
 	 * Find itemprop='image'
