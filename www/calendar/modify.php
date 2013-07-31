@@ -226,8 +226,8 @@ else {
         //
         // Is current category not it group list? Put it there (as first)
         if (!in_array($_GET['sid'], array_map(function($b) { return $b['id']; }, $groupList))) {
-            $this_category = Schoolbox\Resource\CategoryMapper::getInstance()->findById($_GET['sid']);
-            if ($this_category) {
+            try {
+                $this_category = Schoolbox\Resource\CategoryMapper::getInstance()->findById($_GET['sid']);
                 array_unshift(
                     $groupList,
                     array(
@@ -236,6 +236,7 @@ else {
                     )
                 );
             }
+            catch (Schoolbox\Mapper\Exception $e) {}
         }
         $page->dropDown(
             'group_drop', $groupList, $_GET['sid'], TEMPLATE_content,

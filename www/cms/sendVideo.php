@@ -17,10 +17,12 @@ if (is_numeric($_GET['id'])) {
 	$groupHandler = new Group;
 	$fileHandler = new File;
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
-	$video = $videoQueueMapper->findById($_GET['id']);
-
-	if (!is_object($video))
+	try {
+		$video = $videoQueueMapper->findById($_GET['id']);
+	}
+	catch (Schoolbox\Mapper\Exception $e) {
 		exit;
+	}
 
 	if ($groupHandler->getPermission($video->getFile()->getFolder()) < READ_ACCESS)
 		exit;

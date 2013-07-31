@@ -146,8 +146,13 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
 
 	// if $publishComponent is set, use it to find the page associated with it
 	if($publishComponent) {
-		$component = $iMap->findById($publishComponent);
-		$targetPageId = $component instanceof Component_Instance ? $component->getIdentifier() : false;
+		try {
+			$component = $iMap->findById($publishComponent);
+			$targetPageId = $component->getIdentifier();
+		}
+		catch (Schoolbox\Mapper\Exception $e) {
+			$targetPageId = false;
+		}
 	}
 	else {
 		$targetPageId = false;

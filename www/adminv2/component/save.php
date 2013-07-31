@@ -48,8 +48,9 @@ if(!isset($contextMap[$_POST['context']])) {
 }
 $context = $contextMap[$_POST['context']];
 
-if ($definition = $cdm->findById($_POST['definitionId'])) {
+try {
     /* @var $definition Component_Definition */
+    $definition = $cdm->findById($_POST['definitionId']);
     $instance
         ->setDefinitionId($definition->getId())
         ->setModule($context)
@@ -64,3 +65,5 @@ if ($definition = $cdm->findById($_POST['definitionId'])) {
     header('Content-type: application/json');
     echo json_encode($instance);
 }
+catch (Schoolbox\Mapper\Exception $e) {}
+

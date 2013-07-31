@@ -64,11 +64,11 @@ switch($action) {
 if($action == 'delete') {
 
     $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
-    $homepageTemplate = $homepageTemplateMapper->findById($templateID);
-
-    if($homepageTemplate != false) {
+    try {
+        $homepageTemplate = $homepageTemplateMapper->findById($templateID);
         $homepageTemplateMapper->delete($homepageTemplate);
     }
+    catch (Schoolbox\Mapper\Exception $e) {}
 }
 elseif($action == 'rename') {
 

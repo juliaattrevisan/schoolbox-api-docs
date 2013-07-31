@@ -95,10 +95,13 @@ if (is_array($categoryList)) {
 /* Submission Box Details
  */
 
-$submission = $mapper->findById($this->arg[0]);
-
-if($submission == false)
+try {
+	$submission = $mapper->findById($this->arg[0]);
+}
+catch (Schoolbox\Mapper\Exception $e) {
 	error(17);
+	exit;
+}
 
 $is_mark_shown = true;
 if ($groupHandler->isStudent() && !$submission->isMarkShownToStudents()) {
