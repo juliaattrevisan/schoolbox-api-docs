@@ -22,8 +22,16 @@ class ItempropPhoto extends Thumbnail {
 		$matches = array();
 
 		$allPatterns = array();
+
+		/* Search for content/itemprop combo
+		 */
 		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']photo[\"\']#m';
 		$allPatterns[] = '#itemprop=[\"\']photo[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
+
+		/* Search for src/itemprop combo
+		 */
+		$allPatterns[] = '#src=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']photo[\"\']#m';
+		$allPatterns[] = '#itemprop=[\"\']photo[\"\'].*src=[\"\']([^\"\']+)[\"\']#m';
 
 		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
 			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {
@@ -34,7 +42,7 @@ class ItempropPhoto extends Thumbnail {
 		/* If an opengraph image was found, curl that too
 		 */
 		if ($found) {
-			return $matches[0];
+			return $matches[1];
 		}
 
 		/* Otherwise get the next class to deal with it

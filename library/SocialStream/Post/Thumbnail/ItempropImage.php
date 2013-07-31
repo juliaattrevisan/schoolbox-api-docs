@@ -22,8 +22,16 @@ class ItempropImage extends Thumbnail {
 		$matches = array();
 
 		$allPatterns = array();
+
+		/* Search for content/itemprop combo
+ 		 */
 		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']image[\"\']#m';
 		$allPatterns[] = '#itemprop=[\"\']image[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
+
+		/* Search for src/itemprop combo
+		 */
+		$allPatterns[] = '#src=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']image[\"\']#m';
+		$allPatterns[] = '#itemprop=[\"\']image[\"\'].*src=[\"\']([^\"\']+)[\"\']#m';
 
 		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
 			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {
