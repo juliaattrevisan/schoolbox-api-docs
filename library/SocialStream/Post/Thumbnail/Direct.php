@@ -22,7 +22,7 @@ class Direct extends Thumbnail {
 
 		/* If it has at least the right extension, download it directly
 		 */
-		if ($this->getFileType()->isImage()) {
+		if (in_array($this->getFileType()->getExtension(), array('jpg', 'jpeg', 'gif', 'png'))) {
 
 			/* TODO: Check header types via curl
 			 * rather than just rely on the file extension
