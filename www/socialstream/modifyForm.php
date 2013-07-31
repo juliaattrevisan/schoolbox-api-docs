@@ -28,51 +28,57 @@ $newPost->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setDeletedAt(null);
 
-/* Find thumbnail from the given url in one of the many
- * ways that they can exist
- */
-if (strlen($newPost->getUrl())) {
-	$chain = new Post\Thumbnail\Chain($newPost);
+if (strlen(trim($newPost->getBody()))) {
 
-	/* To prevent a double-curl, remember the place where a thumbnail was
-	 * located (this is used as the cached image transform filename hash)
+	/* Find thumbnail from the given url in one of the many
+	 * ways that they can exist
 	 */
-	if (strlen($chain->getResult())) {
-		$newPost->setThumbnail($chain->getResult());
+	if (strlen($newPost->getUrl())) {
+		$chain = new Post\Thumbnail\Chain($newPost);
 
-		/* 	Save the original in the cache location
+		/* To prevent a double-curl, remember the place where a thumbnail was
+		 * located (this is used as the cached image transform filename hash)
 		 */
-		$originalThumbnailCache = new Cache\Original();
-		$originalThumbnailCache->init($newPost->getThumbnail());
+		if (strlen($chain->getResult())) {
+			$newPost->setThumbnail($chain->getResult());
+
+			/* 	Save the original in the cache location
+			 */
+			$originalThumbnailCache = new Cache\Original();
+			$originalThumbnailCache->init($newPost->getThumbnail());
+		}
+	}
+
+	/* Set up authentication
+	 * Put your permissions and stuff in here, just like ePortfolio v2
+	 */
+	$instanceMapper = \Component_InstanceMapper::getInstance();
+
+	/* Seriously?
+	 */
+	$instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
+	$instance = $instanceArray[$_POST['instanceId']];
+
+	/* Current User
+	 */
+	$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+
+	/* Authenticate!
+	 */
+	$authenticator = new Authenticator($newPost, $instance, $currentUser);
+
+	/* Find out if you can collaborate on this
+	*/
+	if ($authenticator->canCollaborate() || $authenticator->canAddComment()) {
+		$mapper = new PostMapper();
+		$mapper->save($newPost);
+
+		$page->backToTheFuture(1);
+	}
+	else {
+		error(19);
 	}
 }
-
-/* Set up authentication
- * Put your permissions and stuff in here, just like ePortfolio v2
- */
-$instanceMapper = \Component_InstanceMapper::getInstance();
-
-/* Seriously?
- */
-$instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
-$instance = $instanceArray[$_POST['instanceId']];
-
-/* Current User
- */
-$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
-
-/* Authenticate!
- */
-$authenticator = new Authenticator($newPost, $instance, $currentUser);
-
-/* Find out if you can collaborate on this
-*/
-if ($authenticator->canCollaborate() || $authenticator->canAddComment()) {
-	$mapper = new PostMapper();
-	$mapper->save($newPost);
-
-	$page->backToTheFuture(1);
-}
 else {
-	error(19);
+	die('Your post must contain something');
 }
