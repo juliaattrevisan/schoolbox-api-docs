@@ -30,7 +30,7 @@ class ItempropPhoto extends Thumbnail {
 				$found = true;
 			}
 		}
-$found=false;
+
 		/* If an opengraph image was found, curl that too
 		 */
 		if ($found) {
