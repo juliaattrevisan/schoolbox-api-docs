@@ -167,7 +167,7 @@ class FeatureContext extends MinkContext {
      * @throws Exception if the form wasn't found
      */
     protected function getComponentForm($section, $position) {
-        foreach ($this->getSession()->getPage()->find('css', "#position-$section form") as $i => $potential_form) {
+        foreach ($this->getSession()->getPage()->findAll('css', "#position-$section form") as $i => $potential_form) {
             if ($i+1 == $position) {
                 return $potential_form;
             }
