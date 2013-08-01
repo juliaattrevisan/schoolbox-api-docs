@@ -7,7 +7,7 @@
  * Time: 3:56 PM
  * To change this template use File | Settings | File Templates.
  */
- 
+
 require_once '../../include/Bootstrap.php';
 
 class Plagscan_ServiceController {
@@ -23,15 +23,12 @@ class Plagscan_ServiceController {
     /**
      * Executed when callback from PlagScan is triggered, and requests the report from PlagScan
      * @param $documentId
-     * @param int $mode
      * @return bool
      */
     public function notifyComplete ($documentId) {
-        $documentCollection = Plagscan_DocumentMapper::getInstance()->findByColumn('plagscan_id', $documentId);
-
-        if ( $documentCollection ) {
+        try {
             /* @var $document Plagscan_Document */
-            $document = $documentCollection->first();
+            $document = Plagscan_DocumentMapper::getInstance()->findOneByColumn('plagscan_id', $documentId);
             if (!($document instanceof Plagscan_Document)) {
                 return false;
             }
@@ -46,7 +43,7 @@ class Plagscan_ServiceController {
 
             Plagscan_DocumentMapper::getInstance()->save($document);
         }
-        else {
+        catch (Schoolbox\Mapper\Exception $e) {
             return false;
         }
         return true;
@@ -59,6 +56,6 @@ $documentId = $_SERVER["QUERY_STRING"];
 
 if ( !empty($documentId) ) {
     $serviceController = new Plagscan_ServiceController;
-    
+
     echo $serviceController->notifyComplete($documentId);
 }

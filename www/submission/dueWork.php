@@ -256,9 +256,9 @@ for ($i = 0; $i < $totalDays; $i++) {
 // create a custom instance of the upcoming work controller, and set it up for this context
 $chf = new Component_Homepage_Factory(new User, $this);
 $cdm = Component_DefinitionMapper::getInstance();
-$definition = $cdm->findByColumn('class', 'Component_Dashboard_UpcomingWorkController');
+$definition = $cdm->findOneByColumn('class', 'Component_Dashboard_UpcomingWorkController');
 $instance = new Component_Instance();
-$instance->setDefinition($definition->first());
+$instance->setDefinition($definition);
 
 $dueWorkController = $chf->buildComponent($instance);
 

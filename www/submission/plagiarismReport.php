@@ -24,7 +24,7 @@ if(!($groupHandler->isStaff() || $groupHandler->isSuperuser())) {
 
 $pdm = Plagscan_DocumentMapper::getInstance();
 /* @var $document Plagscan_Document */
-$document = $pdm->findByColumn('plagscan_id', $this->arg[0])->first();
+$document = $pdm->findOneByColumn('plagscan_id', $this->arg[0]);
 
 
 // remove all '<a...>...highlight matches in source...</a>' instances from source

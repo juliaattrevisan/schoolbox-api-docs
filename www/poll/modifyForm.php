@@ -54,7 +54,7 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
 
     /* Select this poll in the component
      */
-    $cdm = Component_ConfigDefinitionMapper::getInstance()->findByColumn('key', 'poll')->first();
+    $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
 
     $confI = new Component_Config();
     $confI->setConfigDefinitionId($cdm->getId());
