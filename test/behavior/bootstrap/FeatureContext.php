@@ -241,7 +241,7 @@ class FeatureContext extends MinkContext {
         $this->spin(
             function($context) {
                 /** @param FeatureContext $context */
-                return $context->getSession()->evaluateScript('return (0 === jQuery.active)');
+                return $context->getSession()->evaluateScript('(0 === jQuery.active)');
             },
             ($duration/1000)
         );
