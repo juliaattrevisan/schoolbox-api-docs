@@ -167,9 +167,16 @@ class FeatureContext extends MinkContext {
      * @throws Exception if the form wasn't found
      */
     protected function getComponentForm($section, $position) {
-        foreach ($this->getSession()->getPage()->findAll('css', "#position-$section form") as $i => $potential_form) {
+        foreach ($this->getSession()->getPage()->findAll('css', "#position-$section .component") as $i => $base_component) {
+            /** @var Element\NodeElement $base_component */
             if ($i+1 == $position) {
-                return $potential_form;
+                //
+                // Selenium throws a wobbley if you try to use an invisible
+                // element. Show it, then.
+                if ($show_button = $base_component->find('css', '.config-this:not(.active)')) {
+                    $show_button->click();
+                }
+                return $base_component->find('css', 'form');
             }
         }
         throw new Exception(sprintf('Could not find component at position "%s:%d"', $section, $position));
