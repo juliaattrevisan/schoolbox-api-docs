@@ -181,6 +181,7 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
     $err = $dem->findAll();
 
     // make associative by label (since that's what's being transmitted)
+    /* @var DueWork_Error[] $errors */
     $errors = array();
     foreach($err as $e) {
         /* @var $e DueWork_Error */
@@ -195,8 +196,8 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
     }
     elseif (isset($errors[$givenMark])) {
         // error given
-        $mark['mark'] = $errors[$givenMark]->displayAs;
-        $mark['norm_mark'] = $errors[$givenMark]->normaliseAs === NULL ? 'NULL' : $errors[$givenMark]->normaliseAs;
+        $mark['mark'] = $errors[$givenMark]->getDisplayAs();
+        $mark['norm_mark'] = $errors[$givenMark]->getNormaliseAs() === NULL ? 'NULL' : $errors[$givenMark]->getNormaliseAs();
     }
     // not a recognised error code, check for rubric
     elseif($subbox['mark_type_slug'] == 'rubric') {
