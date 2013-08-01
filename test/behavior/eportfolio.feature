@@ -13,7 +13,8 @@ Scenario: Create an ePortfolio template
   And   I add "Textbox" to "right" at position "2"
   And   I add "Image Gallery" to "top" at position "1"
   # Currently need to reload so that component form inputs show up
-  Then  I reload the page
+  # Problem: reload doesn't wait for page to reload!
+  Then  I go to "/adminv2/eportfolio"
   And   I rename component on "left" at position "1" to "About Me"
   And   I repurpose component on "left" at position "1" to "A short paragraph about me"
   And   I rename component on "right" at position "1" to "My Thoughts"

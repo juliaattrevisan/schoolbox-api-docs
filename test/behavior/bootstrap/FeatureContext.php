@@ -173,8 +173,12 @@ class FeatureContext extends MinkContext {
                 //
                 // Selenium throws a wobbley if you try to use an invisible
                 // element. Show it, then.
-                if ($show_button = $base_component->find('css', '.config-this:not(.active)')) {
-                    $show_button->click();
+                // Kill off animations so there's less chance of hitting button
+                // in the middle of transition (meaning element is visible but
+                // becoming invisible)
+                $this->disableAnimation();
+                if (!$base_component->find('css', '.editPanel')->isVisible()) {
+                    $base_component->find('css', '.config-this')->click();
                 }
                 return $base_component->find('css', 'form');
             }
@@ -258,6 +262,16 @@ class FeatureContext extends MinkContext {
             },
             ($duration/1000)
         );
+    }
+
+    /**
+     * Switches off all jQuery animation - all transiations now run immediately.
+     * Required for some tests when using Selenium (which doesn't work when
+     * manipulating invisible elements - what if an element is transitioning
+     * from visible to invisible?)
+     */
+    protected function disableAnimation() {
+        $this->getSession()->executeScript('jQuery.fx.off = true');
     }
 
     /**
