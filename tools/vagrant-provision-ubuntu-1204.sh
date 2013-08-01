@@ -7,8 +7,6 @@ then
 	rm -vf *latest*;
 	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.tar.gz
 	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.sql
-	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.vhost
-	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-dav.vhost
 	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-vagrant-latest.sql
 	echo "$vag Restarting MySQL";
 	service mysql restart > /dev/null;
@@ -48,9 +46,19 @@ then
 	rm -f /etc/apache2/sites-enabled/10*;
 	echo "$vag Enabling Schoolbox apache vhost";
 	sed -i 's/vagrant\/vagrant-xhdebug/vagrant\/data\/vagrant-xhdebug/g' /etc/apache2/sites-enabled/*xhdebug*
-	cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
+	sed 's/usr\/share\/schoolbox/vagrant/g' /vagrant/tools/apache-vhost-schoolbox > /etc/apache2/sites-available/schoolbox.vhost;
+	sed -i 's/php_flag\ display_startup_errors\ off/php_flag\ display_startup_errors\ on/g' /etc/apache2/sites-available/schoolbox.vhost;
+	sed -i 's/php_flag\ display_errors\ off/php_flag\ display_errors\ on/g' /etc/apache2/sites-available/schoolbox.vhost;
+	sed -i 's/php_flag\ html_errors\ off/php_flag\ html_errors\ on/g' /etc/apache2/sites-available/schoolbox.vhost;
+	sed -i 's/var\/log\/apache2/vagrant\/data/g' /etc/apache2/sites-available/schoolbox.vhost;
 	a2ensite schoolbox.vhost
-	cp /home/vagrant/schoolboxdemo-latest-dav.vhost /etc/apache2/sites-available/schoolbox-dav.vhost
+	echo 'Listen 8000' > /etc/apache2/sites-available/schoolbox-dav.vhost;
+	sed 's/usr\/share\/schoolbox/vagrant/g' /vagrant/tools/apache-vhost-schoolbox-webdav >> /etc/apache2/sites-available/schoolbox-dav.vhost;
+	sed -i 's/php_flag\ display_startup_errors\ off/php_flag\ display_startup_errors\ on/g' /etc/apache2/sites-available/schoolbox-dav.vhost;
+	sed -i 's/php_flag\ display_errors\ off/php_flag\ display_errors\ on/g' /etc/apache2/sites-available/schoolbox-dav.vhost;
+	sed -i 's/php_flag\ html_errors\ off/php_flag\ html_errors\ on/g' /etc/apache2/sites-available/schoolbox-dav.vhost;
+	sed -i 's/var\/log\/apache2/vagrant\/data/g' /etc/apache2/sites-available/schoolbox-dav.vhost;
+	sed -i 's/*:80/*:8000/g' /etc/apache2/sites-available/schoolbox-dav.vhost;
 	a2ensite schoolbox-dav.vhost
 	puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
 	echo "$vag Set up video cronjobs"
@@ -60,6 +68,28 @@ then
 	sed -i 's/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
 	sed -i 's/www-data/root/g' /home/vagrant/schoolboxdemo-latest-cron
 	cp -f /home/vagrant/schoolboxdemo-latest-cron /etc/cron.d/vagrant
+	echo "$vag Installing Redis";
+	keycheck=`apt-key list | grep BC45BCB5 | wc -l`;
+	if [ $keycheck -eq 0 ];
+	then
+		apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BC45BCB5
+	fi
+
+	keycheck=`apt-key list | grep BC45BCB5 | wc -l`;
+	if [ $keycheck -eq 0 ];
+	then
+		echo "$vag Error installing php-redis keys";
+		exit 1;
+	else
+		if [ ! -f /etc/apt/sources.list.d/php-redis.list ];
+		then
+			echo 'deb http://ppa.launchpad.net/ufirst/php/ubuntu precise main' >> /etc/apt/sources.list.d/php-redis.list;
+			echo 'deb-src http://ppa.launchpad.net/ufirst/php/ubuntu precise main' >> /etc/apt/sources.list.d/php-redis.list
+			apt-get -y update > /dev/null 2>&1;
+		fi
+	fi
+
+	apt-get -y install php5-redis redis-server
 	echo "$vag Loading all demo data complete";
 fi
 echo "$vag Ensure all services are running";
