@@ -237,11 +237,17 @@ class FeatureContext extends MinkContext {
      * @throws Exception if AJAX requests didn't finish in $duration
      */
     protected function waitForAjax($duration = 5000) {
-//        $this->printDebug('Waiting for AJAX requests to complete...');
+        //
+        // wat. Sahi fails with a return in the script to evaluate,
+        // Selenium fails without one. FAIL
+        $script = '(0 === jQuery.active)';
+        if ($this->getSession()->getDriver() instanceof \Behat\Mink\Driver\Selenium2Driver) {
+            $script = 'return (0 === jQuery.active)';
+        }
         $this->spin(
-            function($context) {
+            function($context) use($script) {
                 /** @param FeatureContext $context */
-                return $context->getSession()->evaluateScript('(0 === jQuery.active)');
+                return $context->getSession()->evaluateScript($script);
             },
             ($duration/1000)
         );
