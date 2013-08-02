@@ -68,6 +68,7 @@ override_dh_install:
 	rm -fR tools/major-updater.sh
 	rm -fR tools/minor-updater.sh
 	rm -fR tools/composer*
+	rm -fR www/test
 	# Start install
 	dh_install
 	# Auto build the sql update scripts
