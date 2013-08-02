@@ -62,7 +62,7 @@
                 var input = $j(this);
 
                 $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time);
+                    input.val(data.time).blur();
                 })
             }
         });
@@ -277,6 +277,18 @@
                 }
             }
         });
+
+        //
+        // Open/due/late date change triggers validation on other date fields.
+        submission_form.find('input')
+            .filter('[name^="open_"], [name^="due_"], [name^="late_"]')
+            .blur(
+                function() {
+                    submission_form.find('input[name="open_date"]').valid();
+                    submission_form.find('input[name="due_date"]').valid();
+                    submission_form.find('input[name="late_date"]').valid();
+                }
+            );
 
         // trigger show or hide of descriptors when radio off
         $j('#rubric-results input').change(function () {
