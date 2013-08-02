@@ -19,7 +19,7 @@ Scenario: Create an ePortfolio template
   # Problem: reload doesn't wait for page to reload!
   Then  I go to "/adminv2/eportfolio"
   Then  I select "New Template" from "template-select"
-  Then  I wait for AJAX
+  Then  I wait 2000ms for AJAX to finish
   And   I rename component on "left" at position "1" to "About Me"
   And   I repurpose component on "left" at position "1" to "A short paragraph about me"
   And   I rename component on "right" at position "1" to "My Thoughts"

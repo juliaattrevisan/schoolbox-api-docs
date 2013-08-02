@@ -233,38 +233,37 @@ class FeatureContext extends MinkContext {
     }
 
     /**
-     * @Then /^I click link "([^"]*)"$/
-     */
-    public function iClickLink($selector) {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^I type "([^"]*)" in "([^"]*)"$/
-     */
-    public function iTypeIn($selector, $value) {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^I select "([^"]*)" in "([^"]*)"$/
-     */
-    public function iSelectIn($selector, $label) {
-        throw new PendingException();
-    }
-
-    /**
+     * Checks that a component exists in the given position on the current page.
+     *
      * @Then /^I see component "([^"]*)" on "([^"]*)" in position "([^"]*)"$/
      */
-    public function iSeeComponentOnInPosition($name, $section, $position) {
-        throw new PendingException();
+    public function verifyComponentInPosition($name, $section, $position) {
+
+        foreach ($this->getSession()->getPage()->findAll('css', "#content .homepage .$section .box") as $i => $box) {
+            /** @var Element\NodeElement $box */
+            if ($i+1 == $position) {
+                //
+                // Search for $name
+                $actual_name = $box->find('css', 'h2')->getText();
+                if (trim($actual_name) !== trim($name)) {
+                    throw new Exception(
+                        sprintf(
+                            'Component at position "%s:%d" is named "%s" instead of "%s"',
+                            $section, $position, $actual_name, $name
+                        )
+                    );
+                }
+                return true;
+            }
+        }
+        throw new Exception(sprintf('Could not find component at position "%s:%d"', $section, $position));
     }
 
     /**
      * Waits for all AJAX requests to return before continuing.
      *
-     * @Then /^I wait for AJAX$/
      * @Then /^I wait for AJAX to finish$/
+     * @Then /^I wait (?P<duration>\d+)ms for AJAX to finish$/
      *
      * @param int $duration Milliseconds to wait for AJAX requests to finish.
      *
