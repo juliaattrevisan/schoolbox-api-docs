@@ -243,11 +243,14 @@ class FeatureContext extends MinkContext {
     /**
      * Waits for all AJAX requests to return before continuing.
      *
+     * @Then /^I wait for AJAX$/
+     * @Then /^I wait for AJAX to finish$/
+     *
      * @param int $duration Milliseconds to wait for AJAX requests to finish.
      *
      * @throws Exception if AJAX requests didn't finish in $duration
      */
-    protected function waitForAjax($duration = 5000) {
+    public function waitForAjax($duration = 5000) {
         //
         // wat. Sahi fails with a return in the script to evaluate,
         // Selenium fails without one. FAIL
