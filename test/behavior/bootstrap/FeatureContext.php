@@ -29,16 +29,15 @@ class FeatureContext extends MinkContext {
         // Reset the database and filesystem back to a well-known state
     }
 
-//    /**
-//     * Resets the database to a known clean state.
-//     *
-//     * @BeforeScenario
-//     */
-//    public function resetDatabase(Behat\Behat\Event\ScenarioEvent $event) {
-//        //
-//        // Run the rebuild script through web.
-//        $this->getSession()->visit('/test/reset.php');
-//    }
+    /**
+     * Resets the database to a known clean state.
+     *
+     * @BeforeScenario
+     */
+    public function resetDatabase(Behat\Behat\Event\ScenarioEvent $event) {
+//        $this->printDebug('Resetting database');
+        $this->visit('/test/reset.php');
+    }
 
     /**
      * Resets the browser.
@@ -46,6 +45,7 @@ class FeatureContext extends MinkContext {
      * @AfterScenario
      */
     public function resetBrowser(Behat\Behat\Event\ScenarioEvent $event) {
+//        $this->printDebug('Resetting browser session');
         $this->getSession()->reset();
     }
 

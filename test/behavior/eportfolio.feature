@@ -5,8 +5,7 @@ Feature: ePortfolio
 
 @javascript
 Scenario: Create an ePortfolio template
-  Given I go to "/test/reset.php"
-  Then  I go to "/"
+  Given I go to "/"
   And   I am logged in as "alaress" with password "alaress"
   When  I go to "/adminv2/eportfolio"
   And   I create a template "New Template"
