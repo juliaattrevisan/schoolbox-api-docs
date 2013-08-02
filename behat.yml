@@ -8,6 +8,8 @@ default:
       javascript_session: selenium2
       browser_name: firefox
       base_url: http://192.168.36.10/
-      sahi: ~
       selenium2: ~
+      # Replace above line with below to run Selenium tests against the PhantomJS browser
+      # Start PhantomJS with ./phantomjs --webdriver=8643
+#      selenium2:
 #        wd_host: "http://localhost:8643/wd/hub"
