@@ -25,6 +25,7 @@ $newPost->setRootId($_POST['rootId']);
 $newPost->setParentId($_POST['parentId']);
 $newPost->setHomepageId($_POST['homepageId']);
 $newPost->setOwnerId($_SESSION['id']);
+$newPost->setType($type);
 $newPost->setUrl($_POST['url']);
 $newPost->setBody($_POST['body']);
 $newPost->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
