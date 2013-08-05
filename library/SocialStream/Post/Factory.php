@@ -54,19 +54,28 @@ class Factory {
 			 */
 			foreach ($this->getVideoSites() as $currentPattern) {
 				if (preg_match($currentPattern, $url)) {
-					return new \SocialStream_Post_Video();
+					$object = new \SocialStream_Post_Video();
+					$object->setType('video');
+
+					return $object;
 				}
 			}
 
 			/* Alternatively it's just a link to the internet
 			 */
-			return new \SocialStream_Post_Url();
+			$object = new \SocialStream_Post_Url();
+			$object->setType('url');
+
+			return $object;
 		}
 
 		/* If it was not a video, link to the internet, then assume it's
 		 * just a plain old text message
 		 */
-		return new \SocialStream_Post_String();
+		$object = new \SocialStream_Post_Url();
+		$object->setType('string');
+
+		return $object;
 	}
 
 	/* Getters/Setters
