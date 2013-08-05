@@ -107,8 +107,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 							// next.
 							// (are either value: date)
 							$all_day = $currentEvent->DTSTART['value']->value === 'DATE';
-							$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
-							$eventEndTimestamp   = strtotime($currentEvent->DTEND->value);
+							$eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART->value));
+							$eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND->value));
 
 							//
 							// According to VCAL standard: end of all day event
@@ -128,19 +128,19 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
 								$event->setAuthorName('');
 								$event->setAuthorId(-1);
-								$event->setEventId($currentEvent->UID->value);
+								$event->setEventId($this->escapeVcalValue($currentEvent->UID->value));
 
 								$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 								$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
 								$event->setType($metaDetails['eventTypeID']);
-								$event->setNote($currentEvent->SUMMARY->value);
+								$event->setNote($this->escapeVcalValue($currentEvent->SUMMARY->value));
 								$event->setAccess('');
 								$event->setEventType($metaDetails['eventType']);
 								$event->setColour($metaDetails['eventColour']);
 								$event->setCampusList(implode(',', $decodedConfig->getCampus()));
-								$event->setDetail(nl2br($currentEvent->DESCRIPTION->value));
-								$event->setLocation($currentEvent->LOCATION->value);
+								$event->setDetail(nl2br($this->escapeVcalValue($currentEvent->DESCRIPTION->value)));
+								$event->setLocation($this->escapeVcalValue($currentEvent->LOCATION->value));
 								$event->setPublishDate('');
 								$event->setSid('');
 								$event->setAllday($all_day);
@@ -220,31 +220,31 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						 * as they seem to be the calendar items themselves
 						 */
 						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
-							$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
-							$eventEndTimestamp = strtotime($currentEvent->DTEND->value);
+							$eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART->value));
+							$eventEndTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTEND->value));
 
 							/* Only get events that fit within the range specified
 							 */
-							if ($eventId == $currentEvent->UID->value) {
+							if ($eventId == $this->escapeVcalValue($currentEvent->UID->value)) {
 								$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
 
 								$event = new Calendar_Event_Type_Day();
 
 								$event->setAuthorName('');
 								$event->setAuthorId(-1);
-								$event->setEventId($currentEvent->UID->value);
+								$event->setEventId($this->escapeVcalValue($currentEvent->UID->value));
 
 								$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 								$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
 								$event->setType($metaDetails['eventTypeID']);
-								$event->setNote($currentEvent->SUMMARY->value);
+								$event->setNote($this->escapeVcalValue($currentEvent->SUMMARY->value));
 								$event->setAccess('');
 								$event->setEventType($metaDetails['eventType']);
 								$event->setColour($metaDetails['eventColour']);
 								$event->setCampusList('');
-								$event->setDetail($currentEvent->DESCRIPTION->value);
-								$event->setLocation($currentEvent->LOCATION->value);
+								$event->setDetail($this->escapeVcalValue($currentEvent->DESCRIPTION->value));
+								$event->setLocation($this->escapeVcalValue($currentEvent->LOCATION->value));
 								$event->setPublishDate('');
 								$event->setSid('');
 
@@ -271,6 +271,18 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 		}
 
 		return $collection;
+	}
+
+	/**
+	 * Patch for sabre/vobject 2 not dealing with escaped ; and , characters.
+	 *
+	 * @todo Remove this method and all usages when upgrading to sabre/vobject 3
+	 *
+	 * @param  string $value
+	 * @return string
+	 */
+	protected function escapeVcalValue($value) {
+		return strtr($value, array('\,' => ',', '\;' => ';',));
 	}
 
 	/* Getters/Setters
