@@ -21,7 +21,7 @@ class Youtube extends Player {
 	public function fetchThumbnail() {
 		$matches = array();
 
-		preg_match('/v=([a-zA-Z0-9_]+)&?/', $this->getUrl(), $matches);
+		preg_match('/v=([a-zA-Z0-9_\-]+)&?/', $this->getUrl(), $matches);
 
 		if (count($matches)) {
 			return "//www.youtube.com/embed/{$matches[1]}";
