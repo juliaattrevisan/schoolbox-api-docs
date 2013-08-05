@@ -7,7 +7,13 @@
  * @version     SVN: $Id$
  */
 
-class Core_Auth_API extends Generic_API {
+namespace Schoolbox\Mobile\Core\Auth;
+
+use Schoolbox\Mobile\Generic;
+use Response_HTTP;
+use Authenticator;
+
+class API extends Generic\API {
 
     public function Login() {
 

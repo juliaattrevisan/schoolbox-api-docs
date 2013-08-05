@@ -6,7 +6,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Generic_API {
+
+namespace Schoolbox\Mobile\Generic;
+
+abstract class API {
 
     protected $responseCode;
 

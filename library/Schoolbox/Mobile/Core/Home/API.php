@@ -6,7 +6,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Core_Home_API extends Generic_API {
+
+namespace Schoolbox\Mobile\Core\Home;
+
+use Schoolbox\Mobile\Generic;
+use Response_HTTP;
+
+class API extends Generic\API {
 
     // this method makes the mediator shut up about its 404
     public function Framework() { return new Response_HTTP(); }

@@ -6,7 +6,14 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Core_Nav_API extends Generic_API {
+namespace Schoolbox\Mobile\Core\Nav;
+
+use Schoolbox\Mobile\Generic;
+use Response_HTTP;
+use Authenticator;
+use Cfg;
+
+class API extends Generic\API {
 
     /**
      * Render the Sidebar for the current context
@@ -18,7 +25,7 @@ class Core_Nav_API extends Generic_API {
         $a = new Authenticator();
         $user = $a->getSessionUser();
 
-        $sidebar = new Core_Nav_Sidebar($user);
+        $sidebar = new Sidebar($user);
         $sidebar->createAgenda();
 
         /* It is understood that this is an extremely quick and nasty solution. It is not intended to be permanent,

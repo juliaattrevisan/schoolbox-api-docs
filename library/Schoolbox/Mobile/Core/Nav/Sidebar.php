@@ -6,11 +6,19 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\Mobile\Core\Nav;
+
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\User;
+use Cfg;
+use ErrorException;
+use Exception_Schoolbox;
+use Submission;
+use Alaress_Date_Relative;
 
-class Core_Nav_Sidebar {
+class Sidebar {
 
     private $user;
     private $agenda;
