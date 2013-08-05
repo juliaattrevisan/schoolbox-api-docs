@@ -62,7 +62,7 @@
                 var input = $j(this);
 
                 $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time);
+                    input.val(data.time).blur();
                 })
             }
         });
@@ -149,8 +149,6 @@
             var minute   = element.find(':input[name="'+field_name+'_minute"]').val();
             var meridian = element.find(':input[name="'+field_name+'_period"]').val();
 
-            var default_time = field_name === 'open' ? '00:00:00' : '23:59:59';
-            var time         = default_time;
             if (hour.length) {
                 //
                 // Convert time to 24 hours
@@ -158,24 +156,31 @@
                     case 'am':
                         // 12am becomes 0
                         if (hour === '12') {
-                            hour = '0';
+                            hour = 0;
                         }
                         break;
 
                     case 'pm':
                         // unless 12, add 12
                         if (hour !== '12') {
-                            hour = String(Number(hour) + 12);
+                            hour = Number(hour) + 12;
                         }
                         break;
 
                     default:
                         break;
                 }
-                if (hour.length === 1) {
-                    hour = "0".concat(hour);
+                hour = Number(hour);
+            }
+            else {
+                if (field_name === 'open') {
+                    hour   = 0;
+                    minute = 0;
                 }
-                time = hour+':'+minute+':00';
+                else {
+                    hour   = 23;
+                    minute = 59;
+                }
             }
 
             var date_parts = date.match(/^(\d+)\/(\d+)\/(\d+)$/);
@@ -277,6 +282,18 @@
                 }
             }
         });
+
+        //
+        // Open/due/late date change triggers validation on other date fields.
+        submission_form.find('input')
+            .filter('[name^="open_"], [name^="due_"], [name^="late_"]')
+            .blur(
+                function() {
+                    submission_form.find('input[name="open_date"]').valid();
+                    submission_form.find('input[name="due_date"]').valid();
+                    submission_form.find('input[name="late_date"]').valid();
+                }
+            );
 
         // trigger show or hide of descriptors when radio off
         $j('#rubric-results input').change(function () {
