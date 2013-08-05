@@ -62,5 +62,5 @@ if ($definition = $cdm->findById($_POST['definitionId'])) {
     $cim->resequenceComponents($context, $_POST['targetId'], $ids[0]);
 
     header('Content-type: application/json');
-    echo json_encode($instance);
+    echo json_encode(array('id' => $instance->getId()));
 }
