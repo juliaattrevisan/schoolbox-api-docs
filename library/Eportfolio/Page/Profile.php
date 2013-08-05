@@ -184,6 +184,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
 				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
 				$currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
+				if (!($currentBox instanceof Schoolbox\Assessment\Component\SubmissionBox)) {
+					continue;
+				}
 
 				$this->getPage()->setVar(array(
 					'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),

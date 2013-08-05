@@ -98,6 +98,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
             LEFT JOIN submission_box ON `{$this->table}`.submission_box_id = submission_box.id
             LEFT JOIN category ON submission_box.category = category.id
             WHERE eportfolio_showcase_item.uid = :userId
+            AND submission_box.deleted IS FALSE
             ORDER BY eportfolio_showcase_item.created_at DESC
             LIMIT :limit
         ");
