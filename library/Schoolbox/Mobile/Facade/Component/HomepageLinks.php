@@ -6,9 +6,20 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use Schoolbox\User;
 
-class Facade_Component_HomepageLinks extends Facade_Component_Generic {
+namespace Schoolbox\Mobile\Facade\Component;
+
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\CategoryLogMapper;
+use Config;
+use ClientDevice;
+use Scrub;
+use Link;
+use ErrorException;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
+class HomepageLinks extends Generic {
 
     /**
      * This should return an array of [title, aside, content]

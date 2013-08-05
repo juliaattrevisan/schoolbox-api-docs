@@ -6,9 +6,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\Mobile\Facade\Component;
+
+use Alaress_Date_Relative;
+use Scrub;
+use Submission;
 use Schoolbox\User;
 
-class Facade_Component_SubjectDueWork extends Facade_Component_Generic {
+class SubjectDueWork extends Generic {
 
     /**
      * This should return an array of [title, aside, content]

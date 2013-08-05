@@ -6,9 +6,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\Mobile\Facade\Component;
+
+use CategoryNews;
+use Config;
+use Scrub;
 use Schoolbox\User;
 
-class Facade_Component_YourNews extends Facade_Component_Generic {
+class YourNews extends Generic {
 
     /**
      * This should return an array of [title, aside, content]

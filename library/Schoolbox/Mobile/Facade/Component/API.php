@@ -6,7 +6,21 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Facade_Component_API extends Generic_API {
+
+namespace Schoolbox\Mobile\Facade\Component;
+
+use Schoolbox\Mobile\Facade\Component\Generic as GenericComponent;
+use Schoolbox\Mobile\Generic;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\CategoryLogMapper;
+use Authenticator;
+use Config;
+use ClientDevice;
+use Scrub;
+use Response_HTTP;
+use User;
+
+class API extends Generic\API {
 
     private $user;
 
@@ -53,8 +67,9 @@ class Facade_Component_API extends Generic_API {
         // just in case
         $name = ucfirst($name);
 
-        $className = "Facade_Component_$name";
+        $className = "\\Schoolbox\\Mobile\\Facade\\Component\\$name";
 
+        /** @var GenericComponent $instance */
         $instance = new $className();
         $response->setResponse($name, $instance->render($this->user));
 

@@ -6,9 +6,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\Mobile\Facade\Component;
+
+use Alaress_Date_Relative;
+use Scrub;
+use TextFormatter;
 use Schoolbox\User;
 
-class Facade_Component_SchoolNews extends Facade_Component_Generic {
+class SchoolNews extends Generic {
 
     public function render(User $user) {
 

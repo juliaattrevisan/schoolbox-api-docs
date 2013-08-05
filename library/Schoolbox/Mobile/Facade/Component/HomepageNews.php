@@ -6,9 +6,20 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use Schoolbox\User;
 
-class Facade_Component_HomepageNews extends Facade_Component_Generic {
+namespace Schoolbox\Mobile\Facade\Component;
+
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\CategoryLogMapper;
+use Alaress_Date_Relative;
+use TextFormatter;
+use Config;
+use ClientDevice;
+use Scrub;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
+class HomepageNews extends Generic {
 
     /**
      * This should return an array of [title, aside, content]

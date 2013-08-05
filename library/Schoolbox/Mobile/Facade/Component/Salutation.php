@@ -6,9 +6,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\Mobile\Facade\Component;
+
+use TextFormatter;
 use Schoolbox\User;
 
-class Facade_Component_Salutation extends Facade_Component_Generic {
+class Salutation extends Generic {
 
     // pretty easy one
     public function render(User $user) {

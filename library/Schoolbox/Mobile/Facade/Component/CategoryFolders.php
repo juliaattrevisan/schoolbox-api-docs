@@ -6,9 +6,19 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\Mobile\Facade\Component;
+
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\CategoryLogMapper;
+use Category;
+use Group;
+use Config;
+use ClientDevice;
+use Scrub;
 use Schoolbox\User;
 
-class Facade_Component_CategoryFolders extends Facade_Component_Generic {
+class CategoryFolders extends Generic {
 
     /**
      * This should return an array of [title, aside, content]

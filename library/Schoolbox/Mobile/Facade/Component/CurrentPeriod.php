@@ -6,11 +6,22 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\Mobile\Facade\Component;
+
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\CategoryLogMapper;
+use Config;
+use ClientDevice;
+use Scrub;
+use External_Timetable;
+use External_User;
+use Exception_Schoolbox;
+use ErrorException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
+class CurrentPeriod extends Generic {
 
     public function render(User $user) {
 
