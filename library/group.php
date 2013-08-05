@@ -390,7 +390,7 @@ class Group extends DeprecatedModel
 		$query = "SELECT type FROM userAccess WHERE uid = " . $this->db->smartQuote($userID) . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
 
 		if (in_array($this->_service, array(HOMEPAGE_SERVICE, CALENDAR_SERVICE)))
-			$query .= "AND sid = " . mysql_real_escape_string($relationID) . " ";
+			$query .= "AND sid = " . $this->db->smartQuote($relationID) . " ";
 
 		$query .= " ) ";
 
