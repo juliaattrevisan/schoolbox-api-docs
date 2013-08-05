@@ -213,6 +213,18 @@ class Calendar_Event_Collection implements Iterator {
 		$this->setStack($sorted);
 	}
 
+	/**
+	 * Filters out items from the collection.
+	 *
+	 * @param callable $callback The callback to call against each collection
+	 *                           element - if it returns false, it's removed.
+	 */
+	public function filter($callback) {
+		if (is_callable($callback)) {
+			$this->setStack(array_filter($this->getStack(), $callback));
+		}
+	}
+
 	/* Getters/Setters
 	 */
 

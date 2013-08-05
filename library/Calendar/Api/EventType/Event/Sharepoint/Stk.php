@@ -139,6 +139,17 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		$collection->mergeWithoutDuplicates(
 			$this->retrieveEventsBetweenTimespan($startTimestamp+$offset, $endTimestamp+$offset)
 		);
+		//
+		// After all that wrangling of Sharepoint - filter events that don't fit
+		// within $startTimestamp and $endTimestamp
+		$collection->filter(
+			function($event) use($startTimestamp, $endTimestamp) {
+				/** @var Calendar_Event_Type_Day $event */
+				return $event->getStartTime()->getUnixTimestamp() <= $endTimestamp
+					&& $event->getEndTime()->getUnixTimestamp()   >= $startTimestamp;
+			}
+		);
+
 		return $collection;
 	}
 
