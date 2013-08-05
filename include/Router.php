@@ -11,6 +11,9 @@ class Router {
     private $route;
     private $reroutes;
 
+    protected $class_base = '';
+    protected $use_namespace_classes = false;
+
     public function __construct() {
         $this->route = array();
         $this->reroutes = array();
@@ -22,10 +25,10 @@ class Router {
      */
     public function parseURL($url) {
 
-		/* Only allow certain characters to appear in a url
-		 * Any illegal characters resets controller names, method names, method args and view names to empty
-		 * This can eventually land you back at the whale
-		 */
+        /* Only allow certain characters to appear in a url
+         * Any illegal characters resets controller names, method names, method args and view names to empty
+         * This can eventually land you back at the whale
+         */
         if (preg_match("/[^a-zA-Z0-9\/\-\_\.@]+/", $url)) {
             throw new Exception_Schoolbox("Invalid URL");
         }
@@ -181,4 +184,40 @@ class Router {
     private function setViewName($viewName) {
         $this->route['vn'] = $viewName;
     }
+
+    /**
+     * @param  string $class_base
+     *
+     * @return $this
+     */
+    public function setClassBase($class_base) {
+        $this->class_base = $class_base;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassBase() {
+        return $this->class_base;
+    }
+
+    /**
+     * @param  boolean $use_namespace_classes
+     *
+     * @return $this
+     */
+    public function setUseNamespaceClasses($use_namespace_classes) {
+        $this->use_namespace_classes = $use_namespace_classes;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getUseNamespaceClasses() {
+        return $this->use_namespace_classes;
+    }
+
+
 }
