@@ -258,8 +258,14 @@ class Threads {
 				'COMMENT_CLASS' => $canComment,
 			));
 
+			/* Thumbnails
+			 */
+			$page->setVar('socialstream_post_has_thumbnail_block', '');
+			$page->setVar('socialstream_post_has_player_block', '');
 			$currentPost->renderThumbnail('post', $page);
 
+			/* Descendents
+			 */
 			foreach($currentPost->getChildren() as $currentComment) {
 				$page->setVar(array(
 					'SOCIALSTREAM_COMMENT_POST_ID' => \Scrub::text($currentComment->getPostId()),
@@ -272,8 +278,12 @@ class Threads {
 
 				/* Thumbnails
 				 */
+				$page->setVar('socialstream_comment_has_thumbnail_block', '');
+				$page->setVar('socialstream_comment_has_player_block', '');
 				$currentComment->renderThumbnail('comment', $page);
 
+				/* Descendents
+				 */
 				foreach($currentComment->getChildren() as $currentReply) {
 					$page->setVar(array(
 						'SOCIALSTREAM_REPLY_POST_ID' => \Scrub::text($currentReply->getPostId()),
@@ -285,12 +295,13 @@ class Threads {
 
 					/* Thumbnails
 					 */
+					$page->setVar('socialstream_reply_has_thumbnail_block', '');
+					$page->setVar('socialstream_reply_has_player_block', '');
 					$currentReply->renderThumbnail('reply', $page);
-
-					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
 
 					/* Clear children after parsing out the parent
 					 */
+					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
 					$page->setVar('socialstream_reply_has_thumbnail_block', '');
 					$page->setVar('socialstream_reply_has_player_block', '');
 				}
