@@ -493,6 +493,10 @@ if (is_numeric($this->arg[0])) {
 	                                'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
 	                                'SPOUSE_EMAIL' => $spouseEmail,
 	                            );
+		                        //
+		                        // Links to /search/user page (if this user has one)
+		                        $output['CONTACT_LINK'] = $output['CONTACT_ID'] ? ('/search/user/'.$output['CONTACT_ID']) : '#';
+		                        $output['SPOUSE_LINK']  = $output['SPOUSE_ID']  ? ('/search/user/'.$output['SPOUSE_ID'])  : '#';
 	                            $this->setVar($output);
 
 		                        /* Output each of the block for contact details */
