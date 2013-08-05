@@ -228,13 +228,18 @@ class Threads {
 		/* Thumbnail stuff
 		 */
 		$page->setBlock('socialstream_post', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
+		$page->setBlock('socialstream_post', 'socialstream_post_has_player', 'socialstream_post_has_player_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
+		$page->setBlock('socialstream_comment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
 		$page->setBlock('socialstream_reply', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
+		$page->setBlock('socialstream_reply', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
 
 		$page->setVar(array(
 			'socialstream_post_block' => '',
 			'socialstream_comment_block' => '',
 			'socialstream_reply_block' => '',
+			'socialstream_reply_has_thumbnail_block' => '',
+			'socialstream_reply_has_player_block' => '',
 		));
 
 		/* Traverse everything
@@ -287,12 +292,14 @@ class Threads {
 					/* Clear children after parsing out the parent
 					 */
 					$page->setVar('socialstream_reply_has_thumbnail_block', '');
+					$page->setVar('socialstream_reply_has_player_block', '');
 				}
 
 				/* Clear children after parsing out the parent
 				 */
 				$page->parse('socialstream_comment_block', 'socialstream_comment', true);
 				$page->setVar('socialstream_comment_has_thumbnail_block', '');
+				$page->setVar('socialstream_comment_has_player_block', '');
 				$page->setVar('socialstream_reply_block', '');
 			}
 
@@ -300,6 +307,7 @@ class Threads {
 			 */
 			$page->parse('socialstream_post_block', 'socialstream_post', true);
 			$page->setVar('socialstream_post_has_thumbnail_block', '');
+			$page->setVar('socialstream_post_has_player_block', '');
 			$page->setVar('socialstream_comment_block', '');
 			$page->setVar('socialstream_reply_block', '');
 
