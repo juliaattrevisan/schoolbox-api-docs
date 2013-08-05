@@ -116,6 +116,13 @@ abstract class SocialStream_Post_Abstract {
 		$this->setChildren(new Schoolbox\Collection());
 	}
 
+	/**
+	 * Spawn a thumbnail of the resource that was linked
+	 * if applicable; otherwise does nothing at all
+	 */
+	public function spawnThumbnail() {
+	}
+
 	/* Getters/Setters
 	 */
 

@@ -34,10 +34,8 @@ class Factory {
 	 */
 	public function produce() {
 		switch($this->getType()) {
-			case 'file' : $model = 'SocialStream_Post_File'; break;
-			case 'image' : $model = 'SocialStream_Post_Image'; break;
+			case 'url' : $model = 'SocialStream_Post_Url'; break;
 			case 'video' : $model = 'SocialStream_Post_Video'; break;
-			case 'website' : $model = 'SocialStream_Post_Website'; break;
 			case 'string' : $model = 'SocialStream_Post_String'; break;
 			default : $model = 'SocialStream_Post_String'; break;
 		}

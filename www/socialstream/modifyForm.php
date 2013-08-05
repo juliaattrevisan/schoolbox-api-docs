@@ -15,7 +15,10 @@ $page = new \SitePage();
 
 /* Create new SocialStream Post
  */
-$factory = new Post\Factory($_POST['type']);
+$type = $_POST['type'];
+$type = 'url';
+
+$factory = new Post\Factory($type);
 
 $newPost = $factory->produce();
 $newPost->setRootId($_POST['rootId']);
@@ -31,22 +34,10 @@ $newPost->setDeletedAt(null);
 if (strlen(trim($newPost->getBody()))) {
 
 	/* Find thumbnail from the given url in one of the many
-	 * ways that they can exist
+	 * ways that they can exist, if applicable
 	 */
 	if (strlen($newPost->getUrl())) {
-		$chain = new Post\Thumbnail\Chain($newPost);
-
-		/* To prevent a double-curl, remember the place where a thumbnail was
-		 * located (this is used as the cached image transform filename hash)
-		 */
-		if (strlen($chain->getResult())) {
-			$newPost->setThumbnail($chain->getResult());
-
-			/* 	Save the original in the cache location
-			 */
-			$originalThumbnailCache = new Cache\Original();
-			$originalThumbnailCache->init($newPost->getThumbnail());
-		}
+		$newPost->spawnThumbnail();
 	}
 
 	/* Set up authentication
