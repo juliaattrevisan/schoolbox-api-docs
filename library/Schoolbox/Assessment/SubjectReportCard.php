@@ -160,7 +160,8 @@ class SubjectReportCard {
 			// if more than 1 assessment, can calculate trending
 			if ($grade_count > 1) {
 				// get previous average by removing most recent and recalculating
-				array_pop($studentGrades);
+				// (most recent is at head of studentGrades, not tail)
+				array_shift($studentGrades);
 				$prevAvg = array_sum($studentGrades) / count($studentGrades);
 				if($prevAvg != 0) {
 					$trendAmt = ($gradeAvg - $prevAvg) / $prevAvg * 100;
