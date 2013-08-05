@@ -52,7 +52,10 @@ class Router {
                 $this->setViewName('default');
             }
 
-            $cName = Mediator::concatenate(array($args[0], 'API'), true, false);
+            $cName = preg_replace(
+                '/\\\\+/', '\\',
+                $this->getClassBase().Mediator::concatenate(array($args[0], 'API'), true, false)
+            );
 
             $mIndex = 3;
 
@@ -154,7 +157,11 @@ class Router {
     /* GETTERS AND SETTERS */
 
     public function getClassName($withSuffix = true) {
-        return $this->route['cn'] . ($withSuffix ?  '_API' : '');
+        $class_name = $this->route['cn'];
+        if ($withSuffix) {
+            $class_name = ($this->getUseNamespaceClasses() ? '\\' : '_') . 'API';
+        }
+        return $class_name;
     }
 
     public function getMethodName() {

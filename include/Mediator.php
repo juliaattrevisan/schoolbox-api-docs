@@ -53,7 +53,9 @@ class Mediator {
 
         // TODO: refactor the definitions of static reroutes somewhere else
         // register '/' reroute
-        $router->registerReroute('_', array('Core_Home', 'Framework'));
+        $router->setClassBase('\\Schoolbox\\Mobile\\');
+        $router->setUseNamespaceClasses(true);
+        $router->registerReroute('\\', array('Core\\Home', 'Framework'));
 
         // set a whole lot of vars to do with what will be returned and how
         try {
@@ -74,7 +76,7 @@ class Mediator {
         // if authentication fails
         catch(Exception_Schoolbox_AccessDenied $e) {
             // create a dynamic reroute to substitute the destination page contents with the login page
-            $router->registerReroute($this->getClassName(false), array('Core_Auth', 'Login'));
+            $router->registerReroute($this->getClassName(false), array('Core\\Auth', 'Login'));
             $router->reroute();
 
             $this->parseRoute($router);
@@ -145,8 +147,9 @@ class Mediator {
             $this->nameTransaction('/m/'.$classname.'->'.$methodname);
 
             // avoid fatal error by checking the class and method are registered
+	        $classname = '\\Schoolbox\\Mobile\\'.$classname;
             if (!class_exists($classname)) {
-                throw new Exception_Schoolbox("Class does not exist");
+                throw new Exception_Schoolbox(sprintf("Class `$classname` does not exist", $classname));
             }
             $class = new $classname($this->getResponseCode());
 //            if (!is_callable(array($class, $methodname))) {
@@ -296,7 +299,7 @@ class Mediator {
         }
     }
 
-	/**
+    /**
      * Conveyerbelt methodology.
      * Return the response to the client in the format requested
      */
@@ -340,11 +343,11 @@ class Mediator {
         // Caution: any method added to this will bypass authentication checks.
         // This could probably be some kind of class registration, or listener, or something like that...
         $AUTH_EXCEPTION = array(
-            'Core_Auth_API::Login',
-            'Core_Auth_API::ForgotPassword',
-            'Core_Auth_API::Logout',
-            'Core_Auth_API::AmILoggedIn',
-            'Core_Settings_API::Skin'
+            'Core\\Auth\\API::Login',
+            'Core\\Auth\\API::ForgotPassword',
+            'Core\\Auth\\API::Logout',
+            'Core\\Auth\\API::AmILoggedIn',
+            'Core\\Settings\\API::Skin'
         );
 
         if( in_array("{$this->getClassName()}::{$this->getMethodName()}", $AUTH_EXCEPTION) ) {
@@ -368,8 +371,9 @@ class Mediator {
      */
     public static function concatenate($pieces, $preserveUnderscores = true, $forceLower = true) {
         // if we've been passed a string, explode across underscore
-        if(!is_array($pieces))
-            $pieces = explode('_', $pieces);
+        if (!is_array($pieces)) {
+            $pieces = preg_split('/[_\\\\]/', $pieces);
+        }
 
         // if we still only have a string, as opposed to an array, just return the string
         if(!is_array($pieces))
@@ -382,7 +386,7 @@ class Mediator {
                 $piece = strtolower($piece);
             $piece = ucfirst($piece);
         }
-        return implode($preserveUnderscores ? '_' : '', $pieces);
+        return implode($preserveUnderscores ? '\\' : '', $pieces);
     }
 
     /**
@@ -471,7 +475,7 @@ class Mediator {
     }
 
     public function getClassName($withSuffix = true) {
-        return $this->className . ($withSuffix ?  '_API' : '');
+        return $this->className . ($withSuffix ?  '\\API' : '');
     }
 
     public function getMethodName() {
