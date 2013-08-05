@@ -172,7 +172,7 @@ else if (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
             'WIKI_ID' => $wiki['wikiID'],
             'CATEGORY_ID' => $wiki['categoryID'],
             'HEADING' => Scrub::text($wiki['heading']),
-            'BODY' => $wikiHandler->activateStubLinks($wiki['body']),
+            'BODY' => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
             'MODIFIED' => $modifiedDate->getLong(),
             'AUTHOR' => $userHandler->formatName($wiki),
             'AUTHOR_ID' => $wiki['authorID'],
