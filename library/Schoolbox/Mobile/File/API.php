@@ -6,7 +6,18 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class File_API extends Generic_API {
+namespace Schoolbox\Mobile\File;
+
+use Schoolbox\Mobile\Generic;
+use Schoolbox\Resource\CategoryMapper;
+use Response_HTTP;
+use Config;
+use Group;
+use File;
+use ClientDevice;
+use Scrub;
+
+class API extends Generic\API {
 
     public function View($fileID, $save = false) {
 

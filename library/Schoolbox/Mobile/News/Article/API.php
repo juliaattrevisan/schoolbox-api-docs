@@ -6,7 +6,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class News_Article_API {
+namespace Schoolbox\Mobile\News\Article;
+
+use News;
+use Response_HTTP;
+use CategoryNews;
+
+class API {
 
     public function School($newsID) {
         $newsHandler = new News();

@@ -6,8 +6,22 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\Mobile\DueWork\SubmissionBox;
+
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Response_HTTP;
+use Cfg;
+use Submission;
+use Alaress_Date_Relative;
+use User;
+use Group;
+use File;
+use ClientDevice;
+use External_Class;
+use Scrub;
+use Authenticator;
 
 class DueWork_SubmissionBox_API {
 

@@ -6,10 +6,23 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+namespace Schoolbox\Mobile\Timetable;
+
+use Schoolbox\Mobile\Generic;
 use Schoolbox\Resource\CategoryMapper;
+use Response_HTTP;
+use Config;
+use Exception_Schoolbox;
+use ErrorException;
+use External_User;
+use External_Timetable;
+use ClientDevice;
+use Scrub;
+use Authenticator;
+
 use Schoolbox\UserMapper;
 
-class Timetable_API {
+class API {
 
     private $data_cache = array();
 
@@ -144,7 +157,7 @@ class Timetable_API {
     }
 
     /**
-     * @param Mapper $mapper
+     * @param \Schoolbox\Mapper $mapper
      * @param $id
      * @return \Schoolbox\User|\Schoolbox\Resource\Category
      */
