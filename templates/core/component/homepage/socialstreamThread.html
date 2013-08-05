@@ -8,8 +8,9 @@
 			<!-- BEGIN socialstream_post_has_thumbnail -->
 			<img src='/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 			<!-- END socialstream_post_has_thumbnail -->
+
 			<!-- BEGIN socialstream_post_has_player -->
-			<img src='/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
+			<iframe width="560" height="315" src="{SOCIALSTREAM_POST_URL}" frameborder="0" allowfullscreen></iframe>
 			<!-- END socialstream_post_has_player -->
 
 			<p>
@@ -30,6 +31,11 @@
 					<!-- BEGIN socialstream_comment_has_thumbnail -->
 					<img src='/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 					<!-- END socialstream_comment_has_thumbnail -->
+
+					<!-- BEGIN socialstream_comment_has_player -->
+					<iframe width="560" height="315" src="{SOCIALSTREAM_COMMENT_URL}" frameborder="0" allowfullscreen></iframe>
+					<!-- END socialstream_comment_has_player -->
+
 					<p>
 						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
 						{SOCIALSTREAM_COMMENT_BODY}<br />
@@ -48,6 +54,11 @@
 							<!-- BEGIN socialstream_reply_has_thumbnail -->
 							<img src='/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 							<!-- END socialstream_reply_has_thumbnail -->
+
+							<!-- BEGIN socialstream_reply_has_player -->
+							<iframe width="560" height="315" src="{SOCIALSTREAM_REPLY_URL}" frameborder="0" allowfullscreen></iframe>
+							<!-- END socialstream_reply_has_player -->
+
 							<p>
 								<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
 								{SOCIALSTREAM_REPLY_BODY}<br />

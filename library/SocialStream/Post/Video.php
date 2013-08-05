@@ -11,6 +11,17 @@
 class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 
 	/**
+	 * Interpret youtube's embed link
+	 */
+	private function parseVideoUrl() {
+		$matches = array();
+
+		preg_match('/v=([a-zA-Z0-9_]+)&?/', $this->getUrl(), $matches);
+
+		return "//www.youtube.com/embed/{$matches[1]}";
+	}
+
+	/**
 	 * Contextually render thumbnail images
 	 *
 	 * @param $context
@@ -19,6 +30,10 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 	 */
 	public function renderThumbnail($context, $page) {
 		if ($context == 'post') {
+			$page->setVar(array(
+				'SOCIALSTREAM_POST_URL' => $this->parseVideoUrl(),
+			));
+
 			if (strlen($this->getThumbnail())) {
 				$page->parse('socialstream_post_has_player_block', 'socialstream_post_has_player');
 			}
@@ -29,6 +44,10 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 			}
 		}
 		else if ($context == 'comment') {
+			$page->setVar(array(
+				'SOCIALSTREAM_COMMENT_URL' => $this->parseVideoUrl(),
+			));
+
 			if (strlen($this->getThumbnail())) {
 				$page->parse('socialstream_comment_has_player_block', 'socialstream_comment_has_player');
 			}
@@ -39,6 +58,10 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 			}
 		}
 		else if ($context == 'reply') {
+			$page->setVar(array(
+				'SOCIALSTREAM_REPLY_URL' => $this->parseVideoUrl(),
+			));
+
 			if (strlen($this->getThumbnail())) {
 				$page->parse('socialstream_reply_has_player_block', 'socialstream_reply_has_player');
 			}
