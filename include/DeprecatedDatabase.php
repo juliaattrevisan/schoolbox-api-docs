@@ -38,9 +38,10 @@ static public function getInstance() {
 /* Estabilishes a connection to the database */
 function connect()
 {
-	if(!isset($this->dbf))
+	if(!isset($this->dbf)) {
 		$this->dbf = mysql_connect($this->host, $this->user, $this->passwd);
-
+		mysql_set_charset('UTF8', $this->dbf);
+	}
 	if(!isset($this->dbf)){
 		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db;
 		exit;

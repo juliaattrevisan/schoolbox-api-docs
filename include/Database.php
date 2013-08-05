@@ -88,7 +88,10 @@ class Database {
 
         /* Create PDO connection */
         try {
-            $this->connection = new PDO($dsn, $username, $password, array(PDO::ATTR_PERSISTENT => true));
+            $this->connection = new PDO($dsn, $username, $password, array(
+                PDO::ATTR_PERSISTENT => true,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
+            );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
         } catch (PDOException $exception) {
             $this->error($exception);
