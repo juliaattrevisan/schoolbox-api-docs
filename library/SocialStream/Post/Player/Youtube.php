@@ -14,7 +14,7 @@ namespace SocialStream\Post\Player;
 class Youtube extends Player {
 
 	/**
-	 *
+	 * Fetch thumbnail
 	 *
 	 * @return mixed
 	 */

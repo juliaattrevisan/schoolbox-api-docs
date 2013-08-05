@@ -15,19 +15,15 @@ $page = new \SitePage();
 
 /* Create new SocialStream Post
  */
-$type = $_POST['type'];
-$type = 'url';
-
-$factory = new Post\Factory($type);
+$factory = new Post\Factory($_POST['url']);
 
 $newPost = $factory->produce();
 $newPost->setRootId($_POST['rootId']);
 $newPost->setParentId($_POST['parentId']);
 $newPost->setHomepageId($_POST['homepageId']);
 $newPost->setOwnerId($_SESSION['id']);
-$newPost->setType($type);
-$newPost->setUrl($_POST['url']);
-$newPost->setBody($_POST['body']);
+$newPost->setUrl(trim($_POST['url']));
+$newPost->setBody(trim($_POST['body']));
 $newPost->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 $newPost->setDeletedAt(null);

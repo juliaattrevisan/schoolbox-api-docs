@@ -12,19 +12,30 @@ namespace SocialStream\Post;
 class Factory {
 
 	/**
-	 * A string corresponding to a type of SocialStream_Post_Abstract
+	 * The submitted url
 	 *
-	 * @var string
+ 	 * @var string
 	 */
-	private $type = '';
+	private $url = '';
+
+	/**
+	 * Regexes that permit the relevant sites
+	 * These are used to spawn a SocialStream_Post_Video instance
+	 *
+	 * @var array
+	 */
+	private $videoSites = array(
+		'#^(http://)?(www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_\-]+)#',
+		'#^(http://)?vimeo\.com/([0-9]+)#',
+	);
 
 	/**
 	 * Constructor
 	 *
-	 * @param $type
+	 * @param $url
 	 */
-	public function __construct($type) {
-		$this->setType($type);
+	public function __construct($url) {
+		$this->setUrl($url);
 	}
 
 	/**
@@ -33,34 +44,67 @@ class Factory {
 	 * @return mixed
 	 */
 	public function produce() {
-		switch($this->getType()) {
-			case 'url' : $model = 'SocialStream_Post_Url'; break;
-			case 'video' : $model = 'SocialStream_Post_Video'; break;
-			case 'string' : $model = 'SocialStream_Post_String'; break;
-			default : $model = 'SocialStream_Post_String'; break;
+		$url = trim($this->getUrl());
+
+		/* If a url was provided, determine what kind it was
+		 */
+		if (strlen($url)) {
+
+			/* Figure out if it's a video
+			 */
+			foreach ($this->getVideoSites() as $currentPattern) {
+				if (preg_match($currentPattern, $url)) {
+					return new \SocialStream_Post_Video();
+				}
+			}
+
+			/* Alternatively it's just a link to the internet
+			 */
+			return new \SocialStream_Post_Url();
 		}
 
-		return new $model;
+		/* If it was not a video, link to the internet, then assume it's
+		 * just a plain old text message
+		 */
+		return new \SocialStream_Post_String();
 	}
 
 	/* Getters/Setters
 	 */
 
 	/**
-	 * Set type
-	 * 
-	 * @param string $type
+	 * Set video sites
+	 *
+	 * @param array $videoSites
 	 */
-	private function setType($type) {
-		$this->type = $type;
+	private function setVideoSites($videoSites) {
+		$this->videoSites = $videoSites;
 	}
 
 	/**
-	 * Get type
+	 * Get video sites
+	 *
+	 * @return array
+	 */
+	private function getVideoSites() {
+		return $this->videoSites;
+	}
+
+	/**
+	 * Set url
+	 *
+	 * @param string $url
+	 */
+	private function setUrl($url) {
+		$this->url = $url;
+	}
+
+	/**
+	 * Get url
 	 *
 	 * @return string
 	 */
-	private function getType() {
-		return $this->type;
+	private function getUrl() {
+		return $this->url;
 	}
 }
