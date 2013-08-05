@@ -6,7 +6,22 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Facade_Dashboard_API extends Generic_API {
+namespace Schoolbox\Mobile\Facade\Dashboard;
+
+use Schoolbox\Mobile\Facade\Component\Generic as GenericComponent;
+use Schoolbox\Mobile\Generic;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\CategoryLogMapper;
+use Authenticator;
+use Component_Dashboard_Factory;
+use SitePage;
+use Config;
+use ClientDevice;
+use Scrub;
+use Response_HTTP;
+use User;
+
+class API extends Generic\API {
 
     public function Display($component = 'all') {
 
@@ -61,7 +76,7 @@ class Facade_Dashboard_API extends Generic_API {
         $className = "Facade_Component_$component";
         if(class_exists($className)) {
             $instance = new $className();
-            if($instance instanceof Facade_Component_Generic) {
+            if($instance instanceof GenericComponent) {
                return $instance->render($user);
             }
             else {

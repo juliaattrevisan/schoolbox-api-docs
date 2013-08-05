@@ -6,11 +6,26 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use Schoolbox\Resource\Category;
+namespace Schoolbox\Mobile\Facade\Homepage;
+
+use Schoolbox\Mobile\Facade\Component\Generic as GenericComponent;
+use Schoolbox\Mobile\Generic;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\CategoryLogMapper;
+use Schoolbox\Collection;
+use Authenticator;
+use Component_Homepage_Factory;
+use Component_ControllerAbstract;
+use Config;
+use ClientDevice;
+use Scrub;
+use Response_HTTP;
+use ErrorException;
+use Exception_Schoolbox;
+use Schoolbox\Resource\Category;
 use Schoolbox\User;
 
-class Facade_Homepage_API extends Generic_API {
+class API extends Generic\API {
 
     private $custom = array('Component_Homepage_SubjectGradesController', 'SubjectGrades');
 
@@ -146,7 +161,7 @@ class Facade_Homepage_API extends Generic_API {
                             if(class_exists($className)) {
                                 $instance = new $className();
 
-                                if($instance instanceof Facade_Component_Generic) {
+                                if($instance instanceof GenericComponent) {
                                     $articles[$className] = $instance->render($user, $cat->getId());
                                 }
                                 else {
@@ -169,7 +184,7 @@ class Facade_Homepage_API extends Generic_API {
                 if(class_exists($className)) {
                     $instance = new $className();
 
-                    if($instance instanceof Facade_Component_Generic) {
+                    if($instance instanceof GenericComponent) {
                         $articles[$matches[2]] = $instance->render($user, $cat->getId());
                     }
 
@@ -200,7 +215,7 @@ class Facade_Homepage_API extends Generic_API {
                 $className = "Facade_Component_$className";
                 if(class_exists($className)) {
                     $instance = new $className();
-                    if($instance instanceof Facade_Component_Generic) {
+                    if($instance instanceof GenericComponent) {
                         return $instance->render($user, $catID);
                     }
                     else {
@@ -244,7 +259,7 @@ class Facade_Homepage_API extends Generic_API {
      * @return void
      */
     protected function logVisit($user_id, $category_id) {
-        $mapper = new Schoolbox\Resource\CategoryLogMapper();
+        $mapper = new CategoryLogMapper();
         $mapper->incrementHitcount($user_id, $category_id);
     }
 
