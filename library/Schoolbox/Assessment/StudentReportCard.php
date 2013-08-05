@@ -395,7 +395,9 @@ class StudentReportCard {
 		// split into separate series, and mess around with php's loose typing
 		foreach($data as $stamp => $d) {
 			if($this->canViewMark($d['visibility'])) {
-				$averageSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['average_mark']) * 1);
+				if(!is_null($d['average_mark'])) {
+					$averageSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['average_mark']) * 1);
+				}
 
 				if(!is_null($d['user_mark'])) {
 					$userSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['user_mark']) * 1);
