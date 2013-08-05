@@ -38,8 +38,8 @@ class Mediator {
 
     public function __construct($url = '') {
         // general config
-        set_error_handler('Core_Mediator_ErrorHandler');
-	    session_set_cookie_params(MOBILE_SESSION_TIMEOUT);
+        set_error_handler(array($this, 'errorHandler'));
+        session_set_cookie_params(MOBILE_SESSION_TIMEOUT);
         session_start();
 
         $regex = "#^/m/(.*)$#si";
@@ -505,21 +505,21 @@ class Mediator {
         $this->viewName = $viewName;
     }
 
-}
-
-/**
- * Custom Error Handler for the Mediator to convert Errors to Exception
- * @param $errNum
- * @param $errString
- * @param $errFile
- * @param $errLine
- * @return bool
- * @throws ErrorException
- */
-function Core_Mediator_ErrorHandler($errNum, $errString, $errFile, $errLine) {
-    if (!(error_reporting() & $errNum)) {
-        // This error code is not included in error_reporting
-        return true;
+    /**
+     * Custom Error Handler for the Mediator to convert Errors to Exception
+     * @param $errNum
+     * @param $errString
+     * @param $errFile
+     * @param $errLine
+     * @return bool
+     * @throws ErrorException
+     */
+    public function errorHandler($errNum, $errString, $errFile, $errLine) {
+        if (!(error_reporting() & $errNum)) {
+            // This error code is not included in error_reporting
+            return true;
+        }
+        throw new ErrorException($errString, 0, $errNum, $errFile, $errLine);
     }
-    throw new ErrorException($errString, 0, $errNum, $errFile, $errLine);
+
 }
