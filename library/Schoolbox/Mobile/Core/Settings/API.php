@@ -6,7 +6,14 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Core_Settings_API {
+namespace Schoolbox\Mobile\Core\Settings;
+
+use Cfg;
+use Mediator;
+use Response_HTTP;
+use Schoolbox\Mobile\Generic;
+
+class API extends Generic\API {
 
     public function Preferences() {
 
