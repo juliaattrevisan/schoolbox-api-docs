@@ -10,4 +10,13 @@
 
 class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 
+	/**
+	 * Pop out embed code
+	 *
+	 * @param $context
+	 * @param $page
+	 * @return mixed|void
+	 */
+	public function renderThumbnail($context, $page) {
+	}
 }

@@ -10,4 +10,13 @@
 
 class SocialStream_Post_String extends SocialStream_Post_Abstract {
 
+	/**
+	 * Nothing to render here
+	 *
+	 * @param $context
+	 * @param $page
+	 * @return mixed|void
+	 */
+	public function renderThumbnail($context, $page) {
+	}
 }

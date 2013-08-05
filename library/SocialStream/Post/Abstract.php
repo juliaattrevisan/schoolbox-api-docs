@@ -123,6 +123,15 @@ abstract class SocialStream_Post_Abstract {
 	public function spawnThumbnail() {
 	}
 
+	/**
+	 * Render thumbnail (or equivalents) as determined by subclasses
+	 *
+	 * @param $context
+	 * @param $page
+	 * @return mixed
+	 */
+	abstract public function renderThumbnail($context, $page);
+
 	/* Getters/Setters
 	 */
 

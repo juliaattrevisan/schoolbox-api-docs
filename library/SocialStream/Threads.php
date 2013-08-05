@@ -253,16 +253,7 @@ class Threads {
 				'COMMENT_CLASS' => $canComment,
 			));
 
-			/* Thumbnails
-			 */
-			if (strlen($currentPost->getThumbnail())) {
-				$page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
-			}
-			else {
-				$page->setVar(array(
-					'socialstream_post_has_thumbnail_block' => ''
-				));
-			}
+			$currentPost->renderThumbnail('post', $page);
 
 			foreach($currentPost->getChildren() as $currentComment) {
 				$page->setVar(array(
@@ -276,14 +267,7 @@ class Threads {
 
 				/* Thumbnails
 				 */
-				if (strlen($currentComment->getThumbnail())) {
-					$page->parse('socialstream_comment_has_thumbnail_block', 'socialstream_comment_has_thumbnail');
-				}
-				else {
-					$page->setVar(array(
-						'socialstream_comment_has_thumbnail_block' => ''
-					));
-				}
+				$currentComment->renderThumbnail('comment', $page);
 
 				foreach($currentComment->getChildren() as $currentReply) {
 					$page->setVar(array(
@@ -296,14 +280,7 @@ class Threads {
 
 					/* Thumbnails
 					 */
-					if (strlen($currentReply->getThumbnail())) {
-						$page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
-					}
-					else {
-						$page->setVar(array(
-							'socialstream_reply_has_thumbnail_block' => ''
-						));
-					}
+					$currentReply->renderThumbnail('reply', $page);
 
 					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
 
