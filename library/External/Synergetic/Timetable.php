@@ -8,8 +8,13 @@
 ************************************************************/
 
 class External_Synergetic_Timetable implements External_TimetableInterface {
+
+	/**
+	 * @var MSSQL $database
+	 */
 	private $database;
-    private $offset;
+
+	protected $synergeticDay = array();
 
 	function __construct () {
 		$this->setDatabase( new MSSQL() );
@@ -23,6 +28,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 	function getTimetableDefinition($campus, $day = 0) {
 
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return array();
+		}
 
 		$query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
 					TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
@@ -64,6 +72,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 	function getDayNumber($campus, $date = 0) {
 
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return false;
+		}
 		$days = $campusModel->getTimetableDay();
 
 		if(!$date) {
@@ -170,7 +181,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			//date format yyyy-dd-mm 00:00:00
 
 			//Access cache first
-			if(is_array($this->synergeticDay)) {
+			if(!empty($this->synergeticDay)) {
 				foreach($this->synergeticDay as $tdate => $tday) {
 					if($date > $tdate) {
 						return $tdate;
@@ -179,10 +190,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			}
 
 			$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+			if (!($campusModel instanceof \Schoolbox\Campus)) {
+				return false;
+			}
 			$days = $campusModel->getTimetableDay();
 
-
-			$mssqldate = date('Y',$date)."-01-01 00:00:00";
 			$nowmssqldate = date('Y-m-d',$date).' 00:00:00';
 
             /* First attempt to get calendar dates based on campus */
@@ -205,7 +217,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			}
 
 			//yes this is meant to get the first element and return it
-			if(is_array($this->synergeticDay)) {
+			if(!empty($this->synergeticDay)) {
                 foreach($this->synergeticDay as $date => $day){
 					return $date;
 				}
@@ -228,7 +240,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
                     }
                 }
 
-               if(is_array($this->synergeticDay)) {
+               if(!empty($this->synergeticDay)) {
 				foreach($this->synergeticDay as $date => $day){
 					return $date;
 				}
@@ -241,6 +253,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 	function getPeriodNumber($campus)
 	{
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return false;
+		}
 		$campusString = $campusModel->getExtTimetableCode();
 
 		# Since the year information in the TimeFrom and TimeTo fields is not reliable, this rips out just the time
@@ -280,6 +295,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
         }
 
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return false;
+		}
 		$campusString = $campusModel->getExtTimetableCode();
 
 		if($this->groupHandler->isStudent($userID))
@@ -329,17 +347,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				ORDER BY Timetable.PeriodNumber";
 		}
 		
-		$periodCount = $timetabledef['periodCount'];
-		$dayCount = $timetabledef['dayCount'];
-		
 		$result = $this->getDatabase()->query($query);
 		//get first period
 		if ($result !== FALSE && $result !== TRUE)
 			$desc = $this->getDatabase()->getNextArray($result);
 		 else
-			$desc = "";	
-			
+			$desc = "";
+
 		//for each period
+		$timetable = array();
 		for ($x = 0; isset($timetabledef['desc'][$x]); $x++) 
 		{
 			$timetable[$x]['periodName'] = $timetabledef['desc'][$x];
@@ -384,6 +400,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
         }
 
 		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		if (!($campusModel instanceof \Schoolbox\Campus)) {
+			return false;
+		}
 		$campusString = $campusModel->getExtTimetableCode();
 
 		if( $this->groupHandler->isStudent($userID))
@@ -446,7 +465,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 		}
 
-		$periodCount = $timetabledef['periodCount'];
 		$dayCount = $timetabledef['dayCount'];
 
 		$result = $this->getDatabase()->query($query);
@@ -455,9 +473,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		if ($result != 1)
 			$desc = $this->getDatabase()->getNextArray();
 		 else
-			$desc = "";	
+			$desc = "";
 
 		//for each period
+		$timetable = array();
 		for ($x = 0; isset($timetabledef['desc'][$x]); $x++) 
 		{
 			$timetable[$x]['periodName'] = $timetabledef['desc'][$x];
@@ -547,13 +566,17 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			return $this->getDatabase()->getOne($query);
 	}
 
+	/**
+	 * @var MSSQL $database
+	 */
 	private function setDatabase ($database) {
 		$this->database = $database;
 	}
 
+	/**
+	 * @return MSSQL
+	 */
 	private function getDatabase () {
 		return $this->database;
 	}
 }
-
-?>
