@@ -22,7 +22,7 @@ abstract class Alaress_Image_Filetype_Abstract implements Alaress_Image_Filetype
 			$im = $this->loadImageResource($filename);
 		}
 		if (!$im) {
-			throw new Exception_Schoolbox_NotFound(sprintf('Cannot read file "%s"'. $filename));
+			throw new Exception_Schoolbox_NotFound(sprintf('Cannot read file "%s"', $filename));
 		}
 		return $im;
 	}
