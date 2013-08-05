@@ -13,12 +13,21 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 	/**
 	 * Interpret youtube's embed link
 	 */
+//	private function parseVideoUrl() {
+//		$matches = array();
+//
+//		preg_match('/v=([a-zA-Z0-9_]+)&?/', $this->getUrl(), $matches);
+//
+//		return "//www.youtube.com/embed/{$matches[1]}";
+//	}
+
+
 	private function parseVideoUrl() {
 		$matches = array();
 
-		preg_match('/v=([a-zA-Z0-9_]+)&?/', $this->getUrl(), $matches);
+		preg_match('/vimeo.com\/([0-9]+)/', $this->getUrl(), $matches);
 
-		return "//www.youtube.com/embed/{$matches[1]}";
+		return "http://player.vimeo.com/video/{$matches[1]}?color=999999";
 	}
 
 	/**
