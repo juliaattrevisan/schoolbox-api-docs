@@ -212,7 +212,7 @@ class API extends Generic\API {
         try {
             // TODO component definitions should be refactored in database to point to new modules
             foreach($this->componentRefactoryMap(get_class($component)) as $className) {
-                $className = "Facade_Component_$className";
+                $className = "\\Schoolbox\\Mobile\\Facade\\Component\\$className";
                 if(class_exists($className)) {
                     $instance = new $className();
                     if($instance instanceof GenericComponent) {
