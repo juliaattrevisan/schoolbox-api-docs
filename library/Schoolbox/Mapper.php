@@ -12,6 +12,7 @@ use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
+use Schoolbox\Mapper\Exception;
 
 class Mapper {
 	/**
@@ -651,8 +652,9 @@ class Mapper {
 	/**
 	 * Retreives a model by id
 	 *
-	 * @param Mixed $identifierValue
-	 * @return Model
+	 * @throws Exception if no instance of model is found
+	 * @param  mixed  $identifierValue
+	 * @return object
 	 */
 	public function findById($identifierValue) {
 		$identifierName = $this->identifier['column'];
@@ -673,9 +675,8 @@ class Mapper {
 		if ($row != false) {
 			$model = $this->hydrate($row);
 			return $model;
-		} else {
-			return false;
 		}
+		throw new Exception('Instance of object not found');
 	}
 
 	/**
@@ -700,10 +701,10 @@ class Mapper {
 	/**
 	 * Returns first model whose $columnName = $columnValue.
 	 *
-	 * @param String $columnName
-	 * @param String $columnValue
-	 *
-	 * @return object or false if not found.
+	 * @throws Exception if no instance of model is found
+	 * @param  String $columnName
+	 * @param  String $columnValue
+	 * @return object
 	 */
 	public function findOneByColumn($columnName, $columnValue) {
 		$statement = $this->database->prepare("
@@ -718,7 +719,7 @@ class Mapper {
 		if ($result) {
 			return $this->hydrate($result);
 		}
-		return false;
+		throw new Exception('Instance of object not found');
 	}
 
 	/**

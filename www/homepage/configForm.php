@@ -30,14 +30,14 @@ if (is_numeric($_REQUEST['cid'])) {
 			// Update the db
 			foreach ($components[$position] as $sequence => $componentID) {
                 if($componentID) {
-                    $inst = Component_InstanceMapper::getInstance()->findById($componentID);
-                    /** @var $inst Component_Instance */
-	                if($inst !== false) {
-	                    $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
-	                    $inst->setPosition($position);
-
-	                    $instanceList[] = $inst;
+	                try {
+		                /** @var $inst Component_Instance */
+		                $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+		                $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
+		                $inst->setPosition($position);
+		                $instanceList[] = $inst;
 	                }
+	                catch (Schoolbox\Mapper\Exception $e) {}
                 }
 			}
 
@@ -50,18 +50,16 @@ if (is_numeric($_REQUEST['cid'])) {
 	else if ($_POST['cid'] && is_numeric($_POST['delete'])) {
 
         // locate the instance, locate its config instances, then blast them away
-        /** @var Component_Instance $instance */
-        $instance = $componentInstanceMapper->findById($_POST['delete']);
-
-		if($instance !== false ) {
+		try {
+			/** @var Component_Instance $instance */
+			$instance = $componentInstanceMapper->findById($_POST['delete']);
 	        $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
-
 	        foreach ($configs as $c) {
 	            $componentConfigInstanceMapper->delete($c);
 	        }
 	        $componentInstanceMapper->delete($instance);
 		}
-
+		catch (Schoolbox\Mapper\Exception $e) {}
 	}
 
 

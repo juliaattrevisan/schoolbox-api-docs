@@ -117,10 +117,10 @@ class SubjectReportCard {
 						/* TODO this is horrible, we need to move this into the usermapper */
 						$teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
 						if($teacher['uid']) {
-							$teacherObj = $userMapper->findById($teacher['uid']);
-							if($teacherObj != false) {
-								$this->_teachers[] = $teacherObj;
+							try {
+								$this->_teachers[] = $userMapper->findById($teacher['uid']);
 							}
+							catch (\Schoolbox\Mapper\Exception $e) {}
 						}
 					}
 				}

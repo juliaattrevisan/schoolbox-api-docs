@@ -28,21 +28,21 @@ try {
 	//
 	// Not 100% happy with this token but meh, it's what's being used in other
 	// places that need a token.
-	$user = Schoolbox\UserMapper::getInstance()->findOneByColumn('key', $token);
-	if (!$user instanceof User) {
+	try {
+		$user = Schoolbox\UserMapper::getInstance()->findOneByColumn('key', $token);
+	}
+	catch (Exception $ex) {
 		throw new Exception_Schoolbox('Invalid token', 401);
 	}
-	else {
-		//
-		// Clobber current user's session for this request only.
-		// Register a shutdown function so that user's session is restored.
-		// (If PHP < 5.5 supported finally blocks, I'd use that.)
-		$old_session = $_SESSION;
-		$session->create($user->getUsername());
-		register_shutdown_function(function() use ($old_session) {
-			$_SESSION = $old_session;
-		});
-	}
+	//
+	// Clobber current user's session for this request only.
+	// Register a shutdown function so that user's session is restored.
+	// (If PHP < 5.5 supported finally blocks, I'd use that.)
+	$old_session = $_SESSION;
+	$session->create($user->getUsername());
+	register_shutdown_function(function() use ($old_session) {
+		$_SESSION = $old_session;
+	});
 
 	switch ($export_type) {
 		case 'personal':

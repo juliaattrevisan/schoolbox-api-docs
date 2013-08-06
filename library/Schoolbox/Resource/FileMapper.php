@@ -140,12 +140,12 @@ class FileMapper extends Mapper {
 		$storage->loadMimetypeFromFilename();
 		$storage->loadFilesizeFromTempLocation();
 
-		$existing = $this->storage_mapper->findOneByColumn('hash', $storage->getHash());
-		if ($existing) {
-			return $existing;
+		try {
+			$existing = $this->storage_mapper->findOneByColumn('hash', $storage->getHash());
 		}
-		else {
+		catch (Exception $ex) {
 			return $storage;
 		}
+		return $existing;
 	}
 }

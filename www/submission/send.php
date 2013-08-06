@@ -26,10 +26,12 @@ if (is_numeric($_GET['id'])) {
 	$attach   = $_GET['save'] ? 'attachment;' : '';
 	if(is_numeric($_GET['return'])) {
 		$mapper = new ReturnedWorkMapper();
-		$return = $mapper->findById($_GET['id']);
-
-		if (empty($return)) {
+		try {
+			$return = $mapper->findById($_GET['id']);
+		}
+		catch (Schoolbox\Mapper\Exception $e) {
 			error(44);
+			exit;
 		}
 
 		// Allow file return owner, parent of owner or all staff access to this file
@@ -54,11 +56,13 @@ if (is_numeric($_GET['id'])) {
 		$filename = $return->getFilename();
 	}
 	else {
-		$mapper     = new SubmissionMapper();
-		$studentSub = $mapper->findById($_GET['id']);
-
-		if (empty($studentSub)) {
+		$mapper = new SubmissionMapper();
+		try {
+			$studentSub = $mapper->findById($_GET['id']);
+		}
+		catch (Schoolbox\Mapper\Exception $e) {
 			error(44);
+			exit;
 		}
 
 		$subBox = $studentSub->getSubmissionBox();

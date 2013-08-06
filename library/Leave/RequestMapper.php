@@ -500,6 +500,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 		$requestCollection = $this->hydrateList($requestList);
 
+		if ($requestCollection->count() === 0) {
+			throw new Schoolbox\Mapper\Exception('Instance of object not found');
+		}
+
 		return $requestCollection->first();
 	}
 

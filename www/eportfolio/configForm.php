@@ -59,10 +59,10 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 				// Update the db
 				foreach ($components[$position] as $sequence => $componentID) {
 					if ($componentID) {
+						/** @var Component_Instance $inst */
 						$inst = Component_InstanceMapper::getInstance()->findById($componentID);
-						$inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database
-						$inst->position = $position;
-
+						$inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
+						$inst->setPosition($position);
 						$instanceCollection->add($inst);
 					}
 				}
@@ -77,8 +77,9 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		else if (is_numeric($_POST['delete'])) {
 
 			// locate the instance, locate its config instances, then blast them away
+			/** @var Component_Instance $instance */
 			$instance = $componentInstanceMapper->findById($_POST['delete']);
-			$configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->id);
+			$configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
 
 			foreach ($configs as $c) {
 				$componentConfigInstanceMapper->delete($c);
