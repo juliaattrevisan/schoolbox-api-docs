@@ -34,7 +34,11 @@ if (strlen(trim($newPost->getBody()))) {
 	 * ways that they can exist, if applicable
 	 */
 	if (strlen($newPost->getUrl())) {
-		$newPost->spawnThumbnail();
+		$curl = new \Alaress_Curl_Url($newPost->getUrl());
+		$curl->exec();
+
+		$newPost->spawnMetadata($curl);
+		$newPost->spawnThumbnail($curl);
 	}
 
 	/* Set up authentication

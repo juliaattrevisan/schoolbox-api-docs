@@ -24,11 +24,10 @@ class Chain {
 	/**
 	 * Constructor
 	 *
+	 * @param $curl
 	 * @param $newPost
 	 */
-	public function __construct($newPost) {
-		$curl = new \Alaress_Curl_Url($newPost->getUrl());
-		$curl->exec();
+	public function __construct($curl, $newPost) {
 
 		/* Set up chain of responsibility
 		 */
