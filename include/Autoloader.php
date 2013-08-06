@@ -18,7 +18,7 @@ class Autoloader {
     /**
      * @var array Possible class locations
      */
-    static $includePathArray = array('include', 'library', 'app');
+    static $includePathArray = array('include', 'library');
 
     /**
      * Initializes variables, registers autoloading functions with PHP and sets include paths
