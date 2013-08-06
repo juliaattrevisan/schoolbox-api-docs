@@ -39,6 +39,7 @@ class Autoloader {
             foreach (self::$includePathArray as &$includePath) {
                 $includePath = self::$rootPath . '/' . trim($includePath, '/');
             }
+            unset($includePath);
         }
     }
 
