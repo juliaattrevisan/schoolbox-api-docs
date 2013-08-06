@@ -55,7 +55,7 @@ class Autoloader {
      */
     public static function load($class_name) {
         if ($class_file = self::getClassFile($class_name)) {
-            self::includeFile($class_file);
+            require($class_file);
         }
     }
 
@@ -91,15 +91,5 @@ class Autoloader {
         }
 
         return false;
-    }
-
-    /**
-     * @static
-     * @param String $file Includes files
-     * @return Bool
-     */
-    private static function includeFile ($file) {
-        require_once($file);
-        return true;
     }
 }
