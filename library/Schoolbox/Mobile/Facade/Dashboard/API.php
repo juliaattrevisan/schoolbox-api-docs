@@ -73,7 +73,7 @@ class API extends Generic\API {
     }
 
     private function renderComponent($component, $user) {
-        $className = "Facade_Component_$component";
+        $className = "\\Schoolbox\\Mobile\\Facade\\Component\\$component";
         if(class_exists($className)) {
             $instance = new $className();
             if($instance instanceof GenericComponent) {
