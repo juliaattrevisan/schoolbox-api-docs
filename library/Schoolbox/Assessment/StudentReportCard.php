@@ -174,7 +174,23 @@ class StudentReportCard {
 		$this->targetCategoryId = $subjectId;
 
 		// populate data for the subject using the category and user
-		$this->subjectData = new SubjectReportCard($subjectId, $this->targetUserId, $this->targetYear, $this->targetSemester);
+		$duework_visibilities = array(
+			Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+		);
+		if ($this->groupHandler->isStudent()) {
+			$duework_visibilities[] = Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+		}
+		elseif ($this->groupHandler->isStaff() || $this->groupHandler->isSuperuser()) {
+			$duework_visibilities[] = Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
+			$duework_visibilities[] = Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+		}
+		$this->subjectData = new SubjectReportCard(
+			$subjectId,
+			$this->targetUserId,
+			$this->targetYear,
+			$this->targetSemester,
+			$duework_visibilities
+		);
 	}
 
 	/**
