@@ -1,8 +1,8 @@
 <?php
 
-require_once '../library/group.php';
-require_once '../library/blog.php';
-require_once '../library/blog-comment.php';
+require_once '../library/Group.php';
+require_once '../library/Blog.php';
+require_once '../library/Comment.php';
 
 $groupHandle   = new Group();
 $blogHandle    = new Blog();

@@ -1,6 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/blog.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/blog-comment.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Comment.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 
