@@ -23,7 +23,6 @@ if (is_numeric($_POST['categoryID'])) {
     	// add homepage "file"
     	if (isset($_POST['homelink'])) {
 
-    	    require_once SITE_root . '/library/category.php';
     	    $categoryHandler = new Category;
             $category = $categoryHandler->getByID($_POST['categoryID']);
 

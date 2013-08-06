@@ -8,8 +8,6 @@
  */
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
 if (is_numeric($_GET['id'])) {
 	$page = new SitePage;

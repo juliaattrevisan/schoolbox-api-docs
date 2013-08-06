@@ -1,8 +1,5 @@
 <?php
 
-require_once '../library/Group.php';
-require_once '../library/Blog.php';
-require_once '../library/Comment.php';
 
 $groupHandle   = new Group();
 $blogHandle    = new Blog();

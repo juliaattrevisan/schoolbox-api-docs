@@ -1,6 +1,4 @@
 <?php
-require_once SITE_root . '/library/allowed-file.php';
-require_once SITE_root . '/library/group.php';
 
 $groupHandler = new Group();
 

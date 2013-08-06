@@ -1,9 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 $this->setFile(TEMPLATE_content, 'cms/portfolio.html');
 $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');

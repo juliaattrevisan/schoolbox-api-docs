@@ -7,8 +7,6 @@
  * @version     SVN: $Id$
  */
 
-require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/user.php';
 
 $groupHandler = new Group();
 $userHandler = new User();

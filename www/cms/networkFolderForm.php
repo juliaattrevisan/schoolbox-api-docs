@@ -7,7 +7,6 @@ if (!Cfg::get('webdav_enable')) {
     error(2);
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 $folderHandler = PortfolioWebDAV::factory();
 
 if (isset($_POST['name'])) {

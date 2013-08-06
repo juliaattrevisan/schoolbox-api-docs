@@ -12,7 +12,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/group.php');
 
 $assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
