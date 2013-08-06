@@ -66,7 +66,7 @@ class Autoloader {
     private static function getClassFile ($className) {
         $classSegments = preg_split('/[_\\\\]/', $className);
         $ideal_filename = implode('/', $classSegments).'.php';
-        if (self::fileExists($ideal_filename)) {
+        if ($ideal_filename = self::fileExists($ideal_filename)) {
             return $ideal_filename;
         }
         return false;
@@ -85,9 +85,8 @@ class Autoloader {
 
         foreach (self::$includePathArray as $includePath) {
             $includePath = rtrim($includePath, '/');
-
             if ( file_exists("$includePath/$filename") ) {
-                return true;
+                return "$includePath/$filename";
             }
         }
 
@@ -96,24 +95,11 @@ class Autoloader {
 
     /**
      * @static
-     * @param String $file Includes files from paths defined in Autoloader::$includePathArray
+     * @param String $file Includes files
      * @return Bool
      */
     private static function includeFile ($file) {
-        if ( empty(self::$includePathArray) ) {
-            return false;
-        }
-
-        foreach (self::$includePathArray as $includePath) {
-            $currentFile = rtrim($includePath, '/') . '/' . $file;
-
-            if ( file_exists($currentFile) ) {
-                require_once($currentFile);
-
-                return true;
-            }
-        }
-
-        return false;
+        require_once($file);
+        return true;
     }
 }
