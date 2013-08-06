@@ -42,8 +42,13 @@ class MetaTag extends Metadata {
 		/* Search for content/title combo
  		 */
 		$allPatterns = array();
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*name=[\"\']title[\"\']#m';
-		$allPatterns[] = '#name=[\"\']title[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
+		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*name=[\"\']title[\"\']#ms';
+		$allPatterns[] = '#name=[\"\']title[\"\'].*content=[\"\']([^\"\']+)[\"\']#ms';
+
+		/* Google uses itemprop!
+		 */
+		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']name[\"\']#ms';
+		$allPatterns[] = '#itemprop=[\"\']name[\"\'].*content=[\"\']([^\"\']+)[\"\']#ms';
 
 		foreach($allPatterns as $currentPattern) {
 			preg_match($currentPattern, $this->getCurl()->getResult(), $matches);
@@ -63,8 +68,13 @@ class MetaTag extends Metadata {
 		/* Search for content/title combo
  		 */
 		$allPatterns = array();
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*name=[\"\']description[\"\']#m';
-		$allPatterns[] = '#name=[\"\']description[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
+		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*name=[\"\']description[\"\']#ms';
+		$allPatterns[] = '#name=[\"\']description[\"\'].*content=[\"\']([^\"\']+)[\"\']#ms';
+
+		/* Google uses itemprop!
+		 */
+		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']description[\"\']#ms';
+		$allPatterns[] = '#itemprop=[\"\']description[\"\'].*content=[\"\']([^\"\']+)[\"\']#ms';
 
 		foreach($allPatterns as $currentPattern) {
 			preg_match($currentPattern, $this->getCurl()->getResult(), $matches);

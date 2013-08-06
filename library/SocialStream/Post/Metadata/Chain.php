@@ -28,13 +28,16 @@ class Chain {
 	 */
 	public function __construct($curl, $newPost) {
 
+
 		/* Set up chain of responsibility
 		 */
 		$opengraph = new OpenGraph($curl, $newPost);
 		$metatag = new MetaTag($curl, $newPost);
+		$null = new Null($curl, $newPost);
 
 		/* Try until one of them matches
 		 */
+		$metatag->setNext($null);
 		$opengraph->setNext($metatag);
 
 		$result = $opengraph->fetchMetadata();
