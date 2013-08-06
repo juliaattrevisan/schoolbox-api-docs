@@ -96,7 +96,31 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
 			case 'P':
 				return 3;
 			default:
-				return false;
+				return $self::STAFF_DEFAULT_CAMPUS;
+		}
+	}
+
+	/**
+	 * Figure out which grup a staff member is in, based on the category provided
+	 *
+	 * * TCH: Teacher (default)
+	 * * ACC: Administrative
+	 * * BUS: Administrative
+	 * * ADM: Administrative
+	 *
+	 * @param  $category
+	 * @return int
+	 */
+	protected function getGroupIDFromCategory($category) {
+		switch ($category) {
+			case 'ACC':
+				return 1;
+			case 'ADM':
+				return 1;
+			case 'BUS':
+				return 1;
+			default:
+				return self::STAFF_GROUP_ID;
 		}
 	}
 
