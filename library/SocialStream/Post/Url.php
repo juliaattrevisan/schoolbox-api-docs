@@ -52,6 +52,11 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 	public function renderThumbnail($context, $page) {
 		if ($context == 'post') {
 			if (strlen($this->getThumbnail())) {
+				$page->setVar(array(
+					'SOCIALSTREAM_POST_EXTERNAL_TITLE' => $this->getExternalTitle(),
+					'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
+				));
+
 				$page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
 			}
 			else {
@@ -62,6 +67,11 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 		}
 		else if ($context == 'comment') {
 			if (strlen($this->getThumbnail())) {
+				$page->setVar(array(
+					'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => $this->getExternalTitle(),
+					'SOCIALSTREAM_COMMENT_EXTERNAL_BODY' => $this->getExternalBody(),
+				));
+
 				$page->parse('socialstream_comment_has_thumbnail_block', 'socialstream_comment_has_thumbnail');
 			}
 			else {
@@ -72,6 +82,11 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 		}
 		else if ($context == 'reply') {
 			if (strlen($this->getThumbnail())) {
+				$page->setVar(array(
+					'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => $this->getExternalTitle(),
+					'SOCIALSTREAM_REPLY_EXTERNAL_BODY' => $this->getExternalBody(),
+				));
+
 				$page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
 			}
 			else {

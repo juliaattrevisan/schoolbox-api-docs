@@ -37,6 +37,10 @@ if (strlen(trim($newPost->getBody()))) {
 		$curl = new \Alaress_Curl_Url($newPost->getUrl());
 		$curl->exec();
 
+		/* Optionally parse the curl result here into a dom parser
+		 * That would allow for attribute gathering
+		 */
+
 		$newPost->spawnMetadata($curl);
 		$newPost->spawnThumbnail($curl);
 	}
