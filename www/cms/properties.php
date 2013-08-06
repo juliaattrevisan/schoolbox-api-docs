@@ -1,9 +1,6 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $page = new SitePage;
 $fileHandler = new File;

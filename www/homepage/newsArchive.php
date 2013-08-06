@@ -1,7 +1,4 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/categoryNews.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $categoryHandler = new Category;
 $groupHandler = new Group;

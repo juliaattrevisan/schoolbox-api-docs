@@ -14,7 +14,6 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
      * @return void
      */
     public function execute() {
-        require_once SITE_root.'/include/FileType.php';
     }
 
     /**

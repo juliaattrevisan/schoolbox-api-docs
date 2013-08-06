@@ -11,9 +11,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/group.php');
-require_once('../library/category.php');
-require_once('../library/user.php');
 
 /**
  * Process an Attempt row. Functionised because it is used in an iteration to

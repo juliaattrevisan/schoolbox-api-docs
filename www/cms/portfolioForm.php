@@ -1,7 +1,6 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 $page = new SitePage;
 $allowedFiles = new AllowedFile;
@@ -9,12 +8,10 @@ $allowedFiles = new AllowedFile;
 if (isset($_POST['relationID'])) {
     // native folder node request
 
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
     $folderHandler = new MyFolder;
 } else {
     // native files request
 
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
     $fileHandler = new MyFile;
 }
 

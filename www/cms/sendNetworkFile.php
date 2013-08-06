@@ -10,7 +10,6 @@
 
 //includes
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 
 if (is_numeric($_GET['id']) && Cfg::get('webdav_enable')) {
     $page = new SitePage;

@@ -1,8 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once '../library/my-folder.php';
-require_once '../library/my-file.php';
 
 $groupHandler = new Group;
 
@@ -10,8 +7,6 @@ if(is_numeric($this->arg[0])) {
 
 	/* Modify existing file */
 
-	require_once '../library/file.php';
-	require_once '../library/submission.php';
 	$fileHandler = new File;
 
 	$file = $fileHandler->getByID($this->arg[0]);
@@ -87,7 +82,6 @@ if(is_numeric($this->arg[0])) {
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	/* Add new file to system */
-	require_once '../library/category.php';
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
 	$this->setBlock(TEMPLATE_content, 'show_my_files', 'show_my_files_block');
@@ -190,7 +184,6 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 }
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	/* Upload multiple files at once */
-	require_once '../library/category.php';
 
 	$this->setFile(TEMPLATE_content, 'cms/add-multi-file.html');
 
@@ -220,7 +213,6 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 }
 else if($this->arg[0] == 'multicat') {
 	/* Upload a file to multiple categories */
-	require_once '../library/group.php';
 
 	$this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
 	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');

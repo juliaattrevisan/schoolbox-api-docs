@@ -1,6 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
@@ -237,8 +236,6 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 
     // clear blocks that aren't used in this context
@@ -249,7 +246,6 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     if(is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         /* File ID submitted, associate box with file */
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
         $fileHandler = new File;
         $file = $fileHandler->getByID($this->arg[2]);

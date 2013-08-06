@@ -1,5 +1,4 @@
 <?php
-require_once dirname(__FILE__) . '/DeprecatedDatabase.php';
 
 class Session
 {
@@ -31,8 +30,6 @@ class Session
 
     public function create($username)
     {
-        require_once(dirname(__FILE__) . '/../library/user.php');
-        require_once(dirname(__FILE__) . '/../library/group.php');
         $userHandler = new User;
         $groupHandler = new Group;
 
@@ -356,8 +353,6 @@ class Session
 
     function setSynergyInfo($userHandler)
     {
-        require_once dirname(__FILE__) . '/../library/group.php';
-        require_once dirname(__FILE__) . '/../library/category.php';
         $synUser = new External_User;
         $groupHandler = new Group;
         $catHandler = new Category;

@@ -7,7 +7,6 @@
  ************************************************************/
 
 require_once(dirname(__FILE__) . '/../www/conf/conf.php');
-require_once(dirname(__FILE__) . '/DeprecatedDatabase.php');
 
 class DeprecatedModel
 {

@@ -1,7 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'member', 'member_block');

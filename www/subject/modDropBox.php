@@ -1,8 +1,6 @@
 <?php
 
 require_once '../../include/SitePage.php';
-require_once '../../library/allowed-file.php';
-require_once '../../library/dropbox.php';
 
 $page = new SitePage;
 

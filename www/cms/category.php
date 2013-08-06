@@ -1,7 +1,4 @@
 <?php
-require_once '../library/category.php';
-require_once '../library/homepage.php';
-require_once '../library/group.php';
 
 $categoryHandler = new Category();
 $groupHandler = new Group();

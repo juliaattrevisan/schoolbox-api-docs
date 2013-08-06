@@ -1,9 +1,5 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/zipFileUpload.php';
 
 require_once('../include/pclzip.lib.php');
 

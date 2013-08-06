@@ -3,7 +3,6 @@
 session_start();
 
 require_once dirname(__FILE__) . '/../include/SitePage.php';
-require_once SITE_root . '/library/user.php';
 
 $page = new SitePage( false );
 $userHandler = new User;

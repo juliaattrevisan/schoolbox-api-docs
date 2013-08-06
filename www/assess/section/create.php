@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/group.php';
 
 $assessHandler = new Assess_Main();
 $groupHandler = new Group();

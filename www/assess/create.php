@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/group.php');
 require_once('include/time.php');
 
 $groupHandler = new Group();

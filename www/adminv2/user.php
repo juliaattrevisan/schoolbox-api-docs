@@ -1,5 +1,4 @@
 <?php
-require_once SITE_root . '/library/group.php';
 
 $groupHandler = new Group();
 
@@ -15,7 +14,6 @@ $this->setBlock(TEMPLATE_content, 'superusers', 'superusers_block');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'user');
 
-require_once SITE_root . '/library/user.php';
 $userHandler = new User();
 
 $superuserList = $userHandler->getSuperusers();

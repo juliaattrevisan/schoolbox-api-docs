@@ -150,7 +150,6 @@ class DueWork_Detail {
      */
     public function renderDetails(SitePage $page) {
 
-        require_once(SITE_root . '/include/FileType.php');
         $allowedHandler = new AllowedFile();
         $fileTypeHandler = new FileType('');
 
