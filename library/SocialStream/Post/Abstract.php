@@ -68,11 +68,25 @@ abstract class SocialStream_Post_Abstract {
 	protected $mimetype = '';
 
 	/**
-	 * THe url to the resource
+	 * The url to the resource
 	 *
 	 * @var string
 	 */
 	protected $url = '';
+
+	/**
+	 * The title of the resource
+	 *
+	 * @var string
+	 */
+	protected $externalTitle = '';
+
+	/**
+	 * The description of the resource
+	 *
+	 * @var string
+	 */
+	protected $externalBody = '';
 
 	/**
 	 * What they typed into that box
@@ -385,5 +399,37 @@ abstract class SocialStream_Post_Abstract {
 	 */
 	public function getThumbnail() {
 		return $this->thumbnail;
+	}
+
+	/**
+	 * @param string $externalBody
+	 */
+	public function setExternalBody($externalBody) {
+		$this->externalBody = $externalBody;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getExternalBody() {
+		return $this->externalBody;
+	}
+
+	/**
+	 * Set external title
+	 *
+	 * @param string $externalTitle
+	 */
+	public function setExternalTitle($externalTitle) {
+		$this->externalTitle = $externalTitle;
+	}
+
+	/**
+	 * Get external title
+	 *
+	 * @return string
+	 */
+	public function getExternalTitle() {
+		return $this->externalTitle;
 	}
 }

@@ -84,6 +84,18 @@ class PostMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
+			'column'     => 'external_title',
+			'property'   => 'externalTitle',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'external_body',
+			'property'   => 'externalBody',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
 			'column'     => 'created_at',
 			'property'   => 'createdAt',
 			'type'       => self::TYPE_DATETIME,

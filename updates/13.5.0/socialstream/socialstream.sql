@@ -7,3 +7,12 @@ ALTER TABLE `socialstream_post` ADD COLUMN `root_id` INT(11) NULL AFTER `parent_
 /* the place where thumbnail urls are found
  */
 ALTER TABLE `socialstream_post` ADD COLUMN `thumbnail` VARCHAR(255) NULL AFTER `mimetype`;
+
+/* Add external_title and external_description columns
+ * These are meta attributes derived from linked urls
+ */
+ALTER TABLE `socialstream_post` ADD COLUMN `external_title` VARCHAR(255) NULL COMMENT 'Title for the external link' AFTER `url`, ADD COLUMN `external_body` VARCHAR(255) NULL COMMENT 'Description for the external link' AFTER `external_title`;
+
+/* Remove obsolete storage_id column
+ */
+ALTER TABLE `socialstream_post` DROP COLUMN `storage_id`;

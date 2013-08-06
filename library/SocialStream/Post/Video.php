@@ -26,6 +26,8 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 			if ($context == 'post') {
 				$page->setVar(array(
 					'SOCIALSTREAM_POST_URL' => $chain->getResult(),
+					'SOCIALSTREAM_POST_EXTERNAL_TITLE' => $this->getExternalTitle(),
+					'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
 				if (strlen($chain->getResult())) {
@@ -40,6 +42,8 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 			else if ($context == 'comment') {
 				$page->setVar(array(
 					'SOCIALSTREAM_COMMENT_URL' => $chain->getResult(),
+					'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => $this->getExternalTitle(),
+					'SOCIALSTREAM_COMMENT_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
 				if (strlen($chain->getResult())) {
@@ -54,6 +58,8 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 			else if ($context == 'reply') {
 				$page->setVar(array(
 					'SOCIALSTREAM_REPLY_URL' => $chain->getResult(),
+					'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => $this->getExternalTitle(),
+					'SOCIALSTREAM_REPLY_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
 				if (strlen($chain->getResult())) {
