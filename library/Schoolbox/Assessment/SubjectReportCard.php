@@ -50,8 +50,17 @@ class SubjectReportCard {
 	protected $targetYear;
 	protected $targetSemester;
 
+	/**
+	 * Only due work items with a mark visibility value in this array will be
+	 * retrieved by getGradeAverage().
+	 *
+	 * If this is empty, it is ignored and all marks will be retrieved.
+	 *
+	 * @var array
+	 */
+	protected $visibilities = array();
 
-	public function __construct($categoryId, $userId, $year = 0, $semester = 0) {
+	public function __construct($categoryId, $userId, $year = 0, $semester = 0, $visibilities = array()) {
 
 		// dependencies
 		$catMap = new CategoryMapper();
@@ -59,6 +68,7 @@ class SubjectReportCard {
 
 		$this->targetYear = $year;
 		$this->targetSemester = $semester;
+		$this->visibilities = $visibilities;
 
 		// TODO check (somehow) that user is (or was) a member of this category
 
@@ -131,13 +141,13 @@ class SubjectReportCard {
 			// retrieve subject grades.
 			// Ensure that grades are properly ordered by date.
 			$studentGrades = array_merge(
-//				$returnMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array('visibility' => $visibilities)),
 				$returnMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
-					'year' => $this->targetYear,
-					'semester' => $this->targetSemester
+					'year'       => $this->targetYear,
+					'semester'   => $this->targetSemester,
+					'visibility' => $this->visibilities,
 				)),
 				$assessMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
-					'year' => $this->targetYear,
+					'year'     => $this->targetYear,
 					'semester' => $this->targetSemester
 				))
 			);
