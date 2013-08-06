@@ -57,15 +57,32 @@ class MimetypeMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Retrieves whether filename has a valid mimetype.
+	 *
+	 * @param  string $filename
+	 * @return bool
+	 */
+	public function isFilenameMimetypeAllowed($filename) {
+		try {
+			$mimetype = $this->getByFilename($filename);
+			return ($mimetype instanceof Mimetype && $mimetype->getEnable());
+		}
+		catch (Exception $ex) {
+			return false;
+		}
+	}
+
+	/**
 	 * Used to fetch a mime object for a given filename
 	 *
-	 * @param $filename
+	 * @param  string $filename
+	 * @throws Exception if the mimetype wasn't found
 	 * @return Mimetype
 	 */
 	public function getByFilename($filename) {
 
 		// Copied from AllowedFile methods getExtension() and getMimetype()
-		$extension = substr(strrchr($filename, "."), 1);
+		$extension = pathinfo($filename, PATHINFO_EXTENSION);
 		$query = "
 			SELECT {$this->getColumnString('aft')}
 			FROM allowedFileExtension afe
@@ -78,6 +95,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		if ($row = $statement->fetch()) {
 			return $this->hydrate($row, 'aft');
 		}
+		throw new Exception('Mimetype not found', Exception::CODE_MIMETYPE_NOT_FOUND);
 
 	}
 

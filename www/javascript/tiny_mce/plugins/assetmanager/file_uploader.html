@@ -2,7 +2,6 @@
 <head>
   <title>{#fileuploader.title}</title>
   <link rel="stylesheet" type="text/css" href="css/screen.css" media="screen" />
-  <link rel="stylesheet" type="text/css" href="css/tree.css" media="screen" />
   <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
   <script type="text/javascript" src="/javascript/jquery.js"></script>
   <script type="text/javascript">
@@ -56,6 +55,9 @@
 </head>
 <body id="file-uploader-frame">
   <div class="control">
+    <!-- BEGIN error -->
+      <div class="error">{ERROR_MESSAGE}</div>
+    <!-- END error -->
     <form action="/storage/upload.php" method="post" enctype="multipart/form-data" id="upload-form">
       <span class="bold">Upload new file: <input type="file" name="file" id="file" /></span>
       <input type="hidden" name="return" id="return" value="{REQUEST_URI}" />
