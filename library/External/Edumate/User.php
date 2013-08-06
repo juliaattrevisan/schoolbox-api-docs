@@ -21,7 +21,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $caseSensitiveFields = array('ID', 'Email', 'MobilePhone', 'SpouseID', 'SpouseMobilePhone');
 
         $stmt = $this->getDatabase()->prepare("
-            SELECT carer_number AS ID, full_name, email AS Email, mobile AS MobilePhone, spouse_carer_number AS SpouseID, spouse_full_name,
+            SELECT carer_number AS ID, full_name, COMBINED_EMAIL_ADDRESS AS Email, mobile AS MobilePhone, spouse_carer_number AS SpouseID, spouse_full_name,
               spouse_mobile AS SpouseMobilePhone
             FROM db2inst1.schoolbox_parents
             WHERE carer_number = :id
@@ -204,7 +204,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             'StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail', 'StudentContactType');
 
         $stmt = $this->getDatabase()->prepare("
-            SELECT p.carer_number AS StudentContactID, full_name, email AS StudentContactDefaultEmail,
+            SELECT p.carer_number AS StudentContactID, full_name, COMBINED_EMAIL_ADDRESS AS StudentContactDefaultEmail,
               mobile AS StudentContactMobilePhone
             FROM db2inst1.schoolbox_parents p
             INNER JOIN db2inst1.schoolbox_parent_student ps ON p.carer_number = ps.carer_number
