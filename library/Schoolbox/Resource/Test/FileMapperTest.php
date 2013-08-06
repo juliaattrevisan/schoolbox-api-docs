@@ -11,7 +11,7 @@
  */
 
 namespace Schoolbox\Resource\Test;
-use Sabre\CalDAV\Property\ScheduleCalendarTransp;
+use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\FileMapper;
 use Schoolbox\Test\TestCase;
@@ -80,8 +80,8 @@ class FileMapperTest extends TestCase {
 		//
 		// Storage item mapper:
 		// createModel(): returns a new (mocked) storage item.
-		// findByColumn(): First call returns no matches, second returns a
-		// storage item.
+		// findByColumn(): First call throws an exception, others return the
+		// saved storage item.
 		$storage_mapper = $this->getMock('\\Schoolbox\\FileMapper', array('createModel', 'findOneByColumn'));
 		$storage_mapper
 			->expects($this->any())
@@ -89,10 +89,16 @@ class FileMapperTest extends TestCase {
 			->will($this->returnCallback(function() use ($new_storage) {
 				return clone $new_storage;
 			}));
+		$matcher = $this->any();
 		$storage_mapper
-			->expects($this->any())
+			->expects($matcher)
 			->method('findOneByColumn')
-			->will($this->onConsecutiveCalls(false, $saved_storage));
+			->will($this->returnCallback(function() use($matcher, $saved_storage) {
+				if ($matcher->getInvocationCount() === 1) {
+					throw new Exception('Instance of object not found');
+				}
+				return $saved_storage;
+			}));
 		$this->object->setStorageMapper($storage_mapper);
 
 		$file_to_copy = new File();
