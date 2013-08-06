@@ -163,7 +163,6 @@ class PortfolioWebDAV
 
     public static function factory()
     {
-        require_once SITE_root . '/library/group.php';
         $groupHandler = new Group;
 
         $site_location = Cfg::get('site_location');

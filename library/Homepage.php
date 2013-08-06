@@ -154,7 +154,6 @@ class Homepage {
 
 
 	function deleteHomepage() {
-		require_once dirname(__FILE__) . '/group.php';
 		$groupHandler = new Group;
 		$groupHandler->disbandGroup($this->cid);
 

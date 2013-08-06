@@ -112,8 +112,6 @@ class Category extends DeprecatedModel {
 
     function getByID($categoryID) {
 
-        require_once dirname(__FILE__) . '/group.php';
-
         $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
 				  FROM (category c)
 				  LEFT JOIN categoryCode co ON co.categoryID = c.id
@@ -128,8 +126,6 @@ class Category extends DeprecatedModel {
     }
 
     function getByCode($code) {
-
-        require_once dirname(__FILE__) . '/group.php';
 
         $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
                   FROM (category c)
@@ -600,7 +596,6 @@ class Category extends DeprecatedModel {
         $cim->delete($collection);
 
         /* Delete group */
-        require_once dirname(__FILE__) . '/group.php';
         $groupHandler = new Group();
         $groupHandler->disbandGroup($categoryID);
 
@@ -610,10 +605,6 @@ class Category extends DeprecatedModel {
     }
 
     function recursiveDelete($categoryID, $deleteSelf = true) {
-
-        require_once dirname(__FILE__) . '/file.php';
-        require_once dirname(__FILE__) . '/link.php';
-        require_once dirname(__FILE__) . '/group.php';
 
         $groupHandler = new Group;
 

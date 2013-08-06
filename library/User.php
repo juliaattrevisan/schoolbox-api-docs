@@ -359,7 +359,6 @@ class User extends DeprecatedModel {
 			$hash = substr(md5(uniqid() . time()), 0, 25);
 			$this->update(array('id' => $user['id'], 'hash' => $hash));
 
-			require_once SITE_root . '/include/Mailer.php';
 			$mailHandler = new Mailer('reset-password.html', Cfg::get('title') . ' Password Reset', $user['alt_email']);
 			$mailHandler->setVar('NAME', $user['firstname']);
 			$mailHandler->setVar(
@@ -384,7 +383,6 @@ class User extends DeprecatedModel {
 			$hash = substr(md5(uniqid() . time()), 0, 25);
 			$this->update(array('id' => $user['id'], 'hash' => $hash));
 
-			require_once SITE_root . '/include/Mailer.php';
 			$mailHandler = new Mailer('change-password.html', Cfg::get('password_change_email_subject'), $user['alt_email']);
 			$from = Cfg::get('password_change_email_from');
 			if ($from) {
@@ -414,7 +412,6 @@ class User extends DeprecatedModel {
 	public function sendPasswordChangeFailureEmail($id, $is_synergetic_failure = false) {
 		$admin_address = Cfg::get('mail_admin_address');
 		if (!empty($admin_address) && ($user = $this->getByID($id))) {
-			require_once SITE_root . '/include/Mailer.php';
 			//
 			// Send a different email if the password change failed because the
 			// passwords are desynched between Synergetic and Schoolbox.
@@ -446,7 +443,6 @@ class User extends DeprecatedModel {
 		if (!empty($user_list)) {
 			foreach ($user_list as $user) {
 				if ($groupHandler->isParent($user['id'])) {
-					require_once SITE_root . '/include/Mailer.php';
 					$mailHandler = new Mailer(
 						'new-password.html',
 						Cfg::get('title') . ' Password Reminder',

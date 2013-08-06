@@ -784,7 +784,6 @@ class Calendar extends DeprecatedModel {
 
     function getStudentBirthdays($currentDay) {
 
-        require_once '../library/mssql.php';
         $db = new MSSQL;
 
 //		$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,

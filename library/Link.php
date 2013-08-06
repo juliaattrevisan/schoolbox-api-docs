@@ -27,7 +27,6 @@ class Link extends DeprecatedModel
     function getAllInCategory($categoryID, $config = false)
     {
 
-        require_once dirname(__FILE__) . '/group.php';
         $groupHandler = new Group;
 
         if (is_array($categoryID)) {

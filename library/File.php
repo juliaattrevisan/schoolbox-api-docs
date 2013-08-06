@@ -139,7 +139,6 @@ class File extends DeprecatedModel {
     }
 
     function create ($data, $file = '') {
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
         $allowedFileHandler = new AllowedFile();
         $fileDir = Cfg::get('file_dir') . '/';

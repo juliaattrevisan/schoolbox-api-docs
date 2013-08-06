@@ -32,7 +32,6 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
 
         $this->setBlock($templateHandle, "duties", "d_block");
 
-        require_once SITE_root.'/library/duty.php';
         $dutyHandler = new Duty;
 
         $dutyList = $dutyHandler->getAllInCategory($this->getContext('id'));

@@ -120,7 +120,6 @@ class MyFolder extends DeprecatedModel {
 	function delete ($folderID) {
 
 		// delete files
-		require_once dirname(__FILE__) . '/my-file.php';
 		$fileHandler = new MyFile;
 		$fileHandler->deleteByParent($folderID);
 
