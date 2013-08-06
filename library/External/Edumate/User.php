@@ -390,7 +390,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 			NULL                  AS "StudentContactTitle",
 			p.FULL_NAME           AS "StudentContactPreferred",
 			NULL                  AS "StudentContactSurname",
-			p.EMAIL               AS "StudentContactDefaultEmail",
+			p.COMBINED_EMAIL_ADDRESS AS "StudentContactDefaultEmail",
 			p.SPOUSE_CARER_NUMBER AS "StudentContactSpouseID",
 			NULL                  AS "StudentContactSpouseTitle",
 			p.SPOUSE_FULL_NAME    AS "StudentContactSpousePreferred",
