@@ -33,7 +33,6 @@ class Autoloader {
 
         /* Register autoloaders with PHP */
         spl_autoload_register(array('Autoloader', 'load'));
-        spl_autoload_register(array('Autoloader', 'deprecatedLoad'));
 
         /* Add include paths */
         if ( is_array(self::$includePathArray) && !empty(self::$includePathArray) ) {
@@ -60,122 +59,15 @@ class Autoloader {
     }
 
     /**
-     * Old-style autoloader - attempts to load the class using the much less
-     * efficient method in getDeprecatedClassFile().
-     *
-     * @param string $class_name The name of the class to be included
-     *
-     * @return void
-     */
-    public static function deprecatedLoad($class_name) {
-        if ($class_file = self::getDeprecatedClassFile($class_name)) {
-            self::includeFile($class_file);
-        }
-    }
-
-    /**
      * @param String $className The name of the relevant class
      * @return String|Bool The path to the file containing the class or false
      */
     private static function getClassFile ($className) {
         $classSegments = preg_split('/[_\\\\]/', $className);
-
-        //
-        // For efficiency - attempt to load this filename with the PEAR standard
-        // class name first.
         $ideal_filename = implode('/', $classSegments).'.php';
         if (self::fileExists($ideal_filename)) {
             return $ideal_filename;
         }
-
-        $unqualClassName = $classSegments[count($classSegments) - 1];
-        $pathSegments = $classSegments;
-
-        /* Determine path */
-        $path = '';
-
-        while ( array_pop($pathSegments) ) {
-            $currentPath = implode('/', $pathSegments);
-
-            if ( self::fileExists($currentPath) ) {
-                $path = $currentPath;
-                break;
-            }
-        }
-
-        /* Determine file name */
-        $filename = array_pop($classSegments);
-
-        /* Array of expected classfile definitions, in descending order of likelihood */
-        $possibleFiles = array();
-        $possibleFiles[] = ltrim("$path/$filename.php", '/');
-        $possibleFiles[] = ltrim("$path/$unqualClassName/$unqualClassName.php", '/');
-        $possibleFiles[] = ltrim("$className.php", '/');
-
-        foreach($possibleFiles as $classFile) {
-            if ( self::fileExists($classFile) ) {
-                return $classFile;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param String $className The name of the relevant class
-     * @return String|Bool The path to the file containing the class or false
-     */
-    private static function getDeprecatedClassFile ($className) {
-        $classSegments = preg_split('/(?<=\\w)(?=[A-Z])/', $className);
-
-        foreach ($classSegments as &$currentSegment) {
-            $currentSegment = strtolower($currentSegment);
-        }
-
-        $pathSegments = $classSegments;
-
-        /* Determine path */
-        $path = '';
-
-        while ( count($pathSegments) ) {
-            $currentPath = implode('/', $pathSegments);
-
-            if ( self::fileExists($currentPath) ) {
-                $path = $currentPath;
-
-                break;
-            }
-
-            array_pop($pathSegments);
-        }
-
-        /* Lower case class name */
-        $currentFilename = strtolower($className) . '.php';
-        $currentFile = ltrim("$path/$currentFilename", '/');
-
-        if ( self::fileExists($currentFile) ) {
-            return $currentFile;
-        }
-
-        /* Lower case first letter of class name */
-        $currentFilename = lcfirst($className) . '.php';
-        $currentFile = ltrim("$path/$currentFilename", '/');
-
-        if ( self::fileExists($currentFile) ) {
-            return $currentFile;
-        }
-
-        /* Dash separated class names */
-        while ( count($classSegments) ) {
-            $currentFilename = implode('-', $classSegments) . '.php';
-            $currentFile = ltrim("$path/$currentFilename", '/');
-
-            if ( self::fileExists($currentFile) ) {
-                return $currentFile;
-            }
-
-            array_pop($classSegments);
-        }
-
         return false;
     }
 
