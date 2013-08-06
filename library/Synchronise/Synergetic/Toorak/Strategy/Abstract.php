@@ -96,7 +96,7 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
 			case 'P':
 				return 3;
 			default:
-				return $self::STAFF_DEFAULT_CAMPUS;
+				return self::STAFF_DEFAULT_CAMPUS;
 		}
 	}
 
