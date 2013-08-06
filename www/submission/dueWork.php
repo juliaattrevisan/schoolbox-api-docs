@@ -345,22 +345,25 @@ foreach ($categoryList as $category) {
     $trendDir = '';
     $trendAmt = '';
     if ($show_grades) {
-        if ($grade_count > 0) {
-            $gradeAvg = array_sum($studentGrades) / count($studentGrades);
-        }
-
-        // if more than 1 assessment, can calculate trending
-        if ($grade_count > 1) {
-            // get previous average
-            array_pop($studentGrades);
-            $prevAvg = array_sum($studentGrades) / count($studentGrades);
-            if ($gradeAvg > $prevAvg) {
+        $card = new Schoolbox\Assessment\SubjectReportCard(
+            $category['id'],
+            $userID,
+            $selectedYear,
+            DueWork_All::getSemester($targetDate->getUnixTimestamp()),
+            $visibilities
+        );
+        $grade = $card->getGradeAverage();
+        if (isset($grade['grade'])) {
+            $gradeAvg = $grade['grade'];
+            $trendAmt = $grade['trend'];
+            if ($trendAmt > 0) {
                 $trendDir = '&#x25B2;';
-            } elseif ($gradeAvg < $prevAvg) {
+            }
+            elseif ($trendAmt < 0) {
                 $trendDir = '&#x25BC;';
             }
-            if($prevAvg != 0) {
-                $trendAmt = sprintf('%0.1f', ($gradeAvg - $prevAvg) / $prevAvg * 100) . '%';
+            if ($trendAmt != 0) {
+                $trendAmt = sprintf('%0.1f', $trendAmt) . '%';
             }
         }
     }
