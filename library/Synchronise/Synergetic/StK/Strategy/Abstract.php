@@ -17,7 +17,7 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 	protected $verboseFilter = null;
 	const PARENT_GROUP_ID = 4;
 	const STAFF_GROUP_ID  = 2;
-	const ADMIN_GROUP_ID  = 1;
+	const ADMIN_GROUP_ID  = 2;
 
 	const STAFF_DEFAULT_CAMPUS = 1;
 
