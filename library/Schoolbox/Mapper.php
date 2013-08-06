@@ -233,6 +233,16 @@ class Mapper {
 	}
 
 	/**
+	 * Gets name of set method for identifier column.
+	 *
+	 * @return string
+	 */
+	public function getSetIdentifierMethodName() {
+		$identifier = $this->getIdentifier();
+		return $this->getSetMethodName($identifier['property']);
+	}
+
+	/**
 	 * Gets name of get method for given property.
 	 *
 	 * @param string $property

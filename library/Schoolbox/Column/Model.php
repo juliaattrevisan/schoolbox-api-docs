@@ -9,70 +9,60 @@
  */
  
 namespace Schoolbox\Column;
-use Schoolbox\LazyModel;
+use Schoolbox\Mapper;
 
 class Model implements IColumnType {
 
 	/**
-	 * The database column name to pull the value from when calling hydrate().
-	 * If not set, then the database's identifier is retrieved.
+	 * The property to set on the model when hydrating, or get when dehydrating.
+	 * If not set, then the mapper's ID property is used.
 	 *
 	 * @var string
 	 */
-	protected $hydrate_column;
-
-	/**
-	 * The model property name to get the value from when calling dehydrate().
-	 * If not set, then the model's ID property is retrieved.
-	 *
-	 * @var string
-	 */
-	protected $dehydrate_property;
-
-	/**
-	 * The field name to get from the associated model when calling dehydrate().
-	 * If not set, then the model's identifier is retrieved.
-	 *
-	 * @var string
-	 */
-	protected $field_name;
+	protected $identifier_property;
 
 	/**
 	 * @param  string $dehydrate_property
 	 *
 	 * @return $this
 	 */
-	public function setDehydrateProperty($dehydrate_property) {
-		$this->dehydrate_property = $dehydrate_property;
+	public function setIdentifierProperty($dehydrate_property) {
+		$this->identifier_property = $dehydrate_property;
 		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getDehydrateProperty() {
-		return $this->dehydrate_property;
+	public function getIdentifierProperty() {
+		return $this->identifier_property;
 	}
 
 	/**
-	 * @param  string $hydrate_column
+	 * Hydrates this column with a model which is empty, except for its
+	 * identifier property.
 	 *
-	 * @return $this
+	 * @example hydrating "2" with the UserMapper creates a new User object,
+	 *          with its ID property set to 2.
+	 *          If setIdentifierProperty() was called on this column object, that
+	 *          property will be hydrated instead.
+	 *
+	 * @param mixed  $value
+	 * @param Mapper $mapper
+	 *
+	 * @return object
 	 */
-	public function setHydrateColumn($hydrate_column) {
-		$this->hydrate_column = $hydrate_column;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getHydrateColumn() {
-		return $this->hydrate_column;
-	}
-
 	public function hydrate($value, $mapper = null) {
-		return new LazyModel($mapper, $value, $this->getHydrateColumn(), $this->getDehydrateProperty());
+		/** @var Mapper $mapper */
+		$model = $mapper->createModel();
+		//
+		// Figure out the identifier property to set on the model.
+		$id_property = $this->getIdentifierProperty();
+		$identifier_method  = isset($id_property) ?
+			$mapper->getSetMethodName($id_property):
+			$mapper->getSetIdentifierMethodName();
+		$model->$identifier_method($value);
+		return $model;
 	}
 
 	/**
@@ -83,7 +73,7 @@ class Model implements IColumnType {
 	 * * If $value is null, returns null (represents a missing foreign key).
 	 * * If $value is a scalar value, returns $value. (user probably meant to
 	 *   set an ID value - might as well allow this)
-	 * * If $this->setDehydrateProperty() was called, returns the value of that
+	 * * If $this->setIdentifierProperty() was called, returns the value of that
 	 *   field from $value
 	 * * Otherwise, returns ID of $value
 	 */
@@ -94,9 +84,9 @@ class Model implements IColumnType {
 		if (is_scalar($value)) {
 			return $value;
 		}
-		$dehydrate_property = $this->getDehydrateProperty();
-		$identifier_method  = isset($dehydrate_property) ?
-			$mapper->getGetMethodName($dehydrate_property):
+		$id_property = $this->getIdentifierProperty();
+		$identifier_method  = isset($id_property) ?
+			$mapper->getGetMethodName($id_property):
 			$mapper->getGetIdentifierMethodName();
 		return $value->$identifier_method();
 	}

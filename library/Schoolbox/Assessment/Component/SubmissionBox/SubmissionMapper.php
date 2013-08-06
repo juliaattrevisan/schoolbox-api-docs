@@ -82,9 +82,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		/* Relation to Allowed Files
 		 */
 		$hydrator = new Schoolbox\Column\Model();
-		$hydrator
-			->setHydrateColumn('mime')
-			->setDehydrateProperty('mime');
+		$hydrator->setIdentifierProperty('mime');
 		$this->hasMap(array(
 			'column'     => 'mime_type',
 			'property'   => 'mimetype',
