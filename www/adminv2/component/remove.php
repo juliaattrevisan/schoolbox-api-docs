@@ -22,7 +22,9 @@ if ( empty($_POST['instanceId']) ) {
     httpError('400', 2);
 }
 
-if ( $instance = Component_InstanceMapper::getInstance()->findById($_POST['instanceId']) ) {
-    Component_InstanceMapper::getInstance()->delete($instance);
-    echo 'Component instance removed.';
+try {
+	$instance = Component_InstanceMapper::getInstance()->findById($_POST['instanceId']);
+	Component_InstanceMapper::getInstance()->delete($instance);
+	echo 'Component instance removed.';
 }
+catch (Schoolbox\Mapper\Exception $e) {}

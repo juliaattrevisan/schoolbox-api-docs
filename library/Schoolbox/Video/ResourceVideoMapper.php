@@ -91,9 +91,13 @@ class ResourceVideoMapper extends Mapper {
 
 		$statement->execute(array($id));
 
+		$video = null;
 		foreach($statement as $row) {
 			$video = $this->hydrate($row, 'vq');
 			$video->setFile($fileMapper->hydrate($row,'f'));
+		}
+		if (!($video instanceof ResourceVideo)) {
+			throw new \Schoolbox\Mapper\Exception('Instance of object not found');
 		}
 		return $video;
 

@@ -317,8 +317,10 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if the request doesn't exist.
      */
     public function executeModifyRequest($requestId) {
-        $request = $this->getRequestMapper()->findById($requestId);
-        if (!$request instanceof Leave_Request) {
+        try {
+            $request = $this->getRequestMapper()->findById($requestId);
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
         return array('request' => $request);
@@ -342,8 +344,10 @@ class Leave_Controller extends Controller {
             if (!$user instanceof \Schoolbox\User) {
                 throw new Exception_Schoolbox_NotFound('User not found');
             }
-            $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
-            if (!$house instanceof HouseResidential) {
+            try {
+                $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
+            }
+            catch (Schoolbox\Mapper\Exception $e) {
                 throw new Exception_Schoolbox_NotFound('User\'s house not found');
             }
 
@@ -433,8 +437,10 @@ class Leave_Controller extends Controller {
         if (!$user instanceof \Schoolbox\User) {
             throw new Exception_Schoolbox_NotFound('User not found');
         }
-        $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
-        if (!$house instanceof HouseResidential) {
+        try {
+            $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
 
@@ -477,8 +483,10 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if request isn't found.
      */
     public function processModifyRequest($data) {
-        $request = $this->getRequestMapper()->findById($data['request']['id']);
-        if (!$request instanceof Leave_Request) {
+        try {
+            $request = $this->getRequestMapper()->findById($data['request']['id']);
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
 
@@ -537,8 +545,10 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if the house $houseID doesn't exist.
      */
     public function executeHouseRequestList($houseId) {
-        $house = $this->getHouseMapper()->findById($houseId);
-        if (!$house instanceof HouseResidential) {
+        try {
+            $house = $this->getHouseMapper()->findById($houseId);
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('House not found');
         }
         $requestList = $this->getRequestMapper()->findAllByHouseId($house->getId());
@@ -711,12 +721,16 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if user or their house isn't found.
      */
     public function executeUserRequestList($userId) {
-        $user = $this->getUserMapper()->findById($userId);
-        if (!$user instanceof \Schoolbox\User) {
+        try {
+            $user = $this->getUserMapper()->findById($userId);
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('User not found');
         }
-        $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
-        if (!$house instanceof HouseResidential) {
+        try {
+            $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
         $requestList = $this->getRequestMapper()->findAllByUserId($user->getId());
@@ -914,8 +928,10 @@ class Leave_Controller extends Controller {
 
             if (!empty($requestList)) {
                 foreach ($requestList as $request) {
-                    $request = $this->getRequestMapper()->findById($request['id']);
-                    if (!$request instanceof Leave_Request) {
+                    try {
+                        $request = $this->getRequestMapper()->findById($request['id']);
+                    }
+                    catch (Schoolbox\Mapper\Exception $e) {
                         throw new Exception_Schoolbox_NotFound('Request not found');
                     }
 
@@ -992,8 +1008,10 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if house isn't found
      */
     public function executeHouseReport($houseId, $date) {
-        $house = $this->getHouseMapper()->findById($houseId);
-        if (!$house instanceof HouseResidential) {
+        try {
+            $house = $this->getHouseMapper()->findById($houseId);
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('House not found');
         }
 

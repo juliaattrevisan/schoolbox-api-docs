@@ -63,17 +63,15 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 		/* Gather everything
 		 */
         $instance_id = $this->instance->getId();
-		$textBox = $this->getMapperClass()->findOneByColumn('component_instance_id', $instance_id);
 
 		$this->setVar('TEXTBOX_ITEM_ID', $instance_id);
 
-		if ($textBox) {
+		try {
+			$textBox = $this->getMapperClass()->findOneByColumn('component_instance_id', $instance_id);
 			$this->setVar('TEXTBOX_CONTENT', Scrub::html($textBox->getContent()));
 		}
-		else {
-			$this->setVar(array(
-				'TEXTBOX_CONTENT' => '',
-			));
+		catch (Exception $e) {
+			$this->setVar('TEXTBOX_CONTENT', '');
 		}
 
 		/* If modifying this textbox

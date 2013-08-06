@@ -121,11 +121,13 @@ class Eportfolio_Authenticator {
 			else {
 				$pageMapper = new \Eportfolio\PageMapper();
 
-				$exists = $pageMapper->findById($this->getPageId());
-
-				if ($exists && ($exists->getDeletedAt() == null)) {
-					return true;
+				try {
+					$exists = $pageMapper->findById($this->getPageId());
+					if ($exists && ($exists->getDeletedAt() == null)) {
+						return true;
+					}
 				}
+				catch (Schoolbox\Mapper\Exception $e) {}
 			}
 		}
 

@@ -105,22 +105,17 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
                     try {
                         /** @var User $teacher */
                         $teacher = $uMap->findOneByColumn('synergy_id', $period['staffID']);
-
-                        if(!($teacher instanceof User)) {
-                            throw new Exception_Schoolbox();
-                        }
-
                         $period['staffName'] = $teacher->formatName();
                         $period['room'] = trim($period['room']);
                     }
-                    catch(Exception_Schoolbox $e) {
+                    catch (Exception $e) {
                         $cell['err'][] = 'Failed to read teacher details';
                     }
 
                     try {
                         $period['catID'] = $cMap->findOneByColumn('code', $period['code'])->getId();
                     }
-                    catch (Exception_Schoolbox $e) {
+                    catch (Exception $e) {
                         $cell['err'][] = 'Failed to read category details';
                     }
                 }

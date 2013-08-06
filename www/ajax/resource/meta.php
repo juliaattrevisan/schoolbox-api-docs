@@ -91,7 +91,13 @@ function getFolderMeta($folderId) {
 	$groupHandler = new Group();
 
     $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-    $cat = $categoryMapper->findById($folderId);
+	try {
+		$cat = $categoryMapper->findById($folderId);
+	}
+	catch (Schoolbox\Mapper\Exception $e) {
+		sendError('No folder with specified ID exists');
+		exit;
+	}
 
 
 	// if it's the root node, return add-folder functions if admin
@@ -107,10 +113,6 @@ function getFolderMeta($folderId) {
 			'actions' => $actions,
 		);
 		return $folder;
-	}
-
-	if(!$cat) {
-		sendError('No folder with specified ID exists');
 	}
 
 	// determine the name of the template, if the folder has a homepage

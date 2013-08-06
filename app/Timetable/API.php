@@ -96,14 +96,14 @@ class Timetable_API {
                     if(isset($class['staffID'])) {
                         try {
                             $user = $this->readData($uMap, $class['staffID']);
-	                        if(!($user instanceof \Schoolbox\User)) {
-		                        throw new Exception_Schoolbox();
-	                        }
                             $class['teacherName'] = $user->formatName();
                             $class['room'] = trim($class['room']);
                         }
                         catch (Exception_Schoolbox $e) {
                             $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}': {$e->getErrorMessage()}";
+                        }
+                        catch (Exception $e) {
+	                        $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}'";
                         }
 
                         try {
@@ -112,6 +112,9 @@ class Timetable_API {
                         }
                         catch (Exception_Schoolbox $e) {
                             $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
+                        }
+                        catch (Exception $e) {
+	                        $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}'";
                         }
                     }
                 }

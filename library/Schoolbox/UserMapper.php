@@ -160,7 +160,7 @@ class UserMapper extends Mapper {
 		$statement->execute(array($id));
 
 		foreach( $statement as $row ) {
-			if(!is_object($user)){
+			if (!($user instanceof User)) {
 				$user = $this->hydrate($row, 'u');
 				$user->setSuperUser($row['u.superuser'] == 1);
 
@@ -175,6 +175,9 @@ class UserMapper extends Mapper {
 				$user->setDefaultCampus($campus);
 			}
 		}
+		if (!($user instanceof User)) {
+			throw new Schoolbox\Mapper\Exception('Instance of object not found');
+		}
 		return $user;
 	}
 
@@ -182,8 +185,8 @@ class UserMapper extends Mapper {
 	/**
 	 * Fetches the user, and all of the user's subjects.
 	 *
-	 * @param $id
-	 *
+	 * @throws Schoolbox\Mapper\Exception if user wasn't found
+	 * @param  int $id
 	 * @return \Schoolbox\User
 	 */
 	public function findWithSubjects($id) {
@@ -200,7 +203,7 @@ class UserMapper extends Mapper {
 			$user->setSubjectCollection($subject_mapper->findAllForStudent($user));
 			return $user;
 		}
-		return false;
+		throw new Schoolbox\Mapper\Exception();
 	}
 
 	/**

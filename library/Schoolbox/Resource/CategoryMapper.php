@@ -115,13 +115,14 @@ class CategoryMapper extends Mapper {
 			if ($code->getCategory()->getId()) {
 				$category->addCode($code);
 			}
+			$homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+			$category->setHomepage($homepageConfig);
 
-            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
-            $category->setHomepage($homepageConfig);
-
-            $group = $group_mapper->hydrate($row, 'ug');
-            $category->setGroup($group);
-
+			$group = $group_mapper->hydrate($row, 'ug');
+			$category->setGroup($group);
+		}
+		if (!($category instanceof Category)) {
+			throw new \Schoolbox\Mapper\Exception('Instance of object not found');
 		}
 		return $category;
 	}

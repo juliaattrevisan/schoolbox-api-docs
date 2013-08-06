@@ -75,35 +75,33 @@ class Authenticator {
             return true;
         }
 
-	    /**
-	     *
-	     * @var UserMapper $userMapper
-	     */
-	    $userMapper = UserMapper::getInstance();
+        /**
+         *
+         * @var UserMapper $userMapper
+         */
+        $userMapper = UserMapper::getInstance();
 
-	    $user = $userMapper->findByColumn('username', $username)->first();
+        try {
+            $user = $userMapper->findOneByColumn('username', $username);
 
-        if($user instanceof User) {
+            // yep, you ACTUALLY have to do this otherwise hydrations don't get done
+            $user = $userMapper->findById($user->getId());
 
-	        // yep, you ACTUALLY have to do this otherwise hydrations don't get done
-	        $user = $userMapper->findById($user->getId());
-
-	        /**
-	         * Map subjects onto the user object retrieved, and dump into session
-	         * @var SubjectMapper $subjectMapper
-	         */
-	        $subjectMapper = SubjectMapper::getInstance();
-	        $user->setSubjectCollection($subjectMapper->findAllForStudent($user));
-	        $this->setSessionUser($user);
+            /**
+             * Map subjects onto the user object retrieved, and dump into session
+             * @var SubjectMapper $subjectMapper
+             */
+            $subjectMapper = SubjectMapper::getInstance();
+            $user->setSubjectCollection($subjectMapper->findAllForStudent($user));
+            $this->setSessionUser($user);
 
             // indicate that session creation was successful
             return true;
         }
+        catch (Schoolbox\Mapper\Exception $e) {}
 
         return false;
     }
-
-// oqhd37hs
 
     public function setSessionVar($key, $value) {
         $_SESSION[$key] = $value;
