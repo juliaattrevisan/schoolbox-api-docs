@@ -168,15 +168,19 @@ class ClassStatistics {
 		foreach($returnCollection as $return) {
 			/* @var $return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork */
 			$userId = $return->getOwner()->getId();
-			if(!array_key_exists($userId, $marks)) {
+			if (!array_key_exists($userId, $marks)) {
+				$this_mark = $return->getNormalizedMark();
 				$marks[$userId] = array(
-					'mark' => $return->getNormalizedMark(),
+					'mark' => $this_mark,
 					'display_mark' => $return->getMark(),
 					'comment' => $return->getComment(),
 					'attempts' => 0,
 				);
 				// grab numbers for averages
-				++$count;
+				// This only counts toward average if there's an actual mark.
+				if (isset($this_mark)) {
+					$count++;
+				}
 				$sum += $return->getNormalizedMark();
 			}
 		}
@@ -198,7 +202,7 @@ class ClassStatistics {
 		}
 
 		// calculate and insert an average
-		$marks['avg'] = $count ? $sum / $count : 0;
+		$marks['avg'] = $count ? $sum / $count : null;
 
 //		echo "<b>MARRRKS</b><br/>\n";
 //		var_dump($marks);
