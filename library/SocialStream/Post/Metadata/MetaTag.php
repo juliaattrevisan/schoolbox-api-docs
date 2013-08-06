@@ -37,25 +37,12 @@ class MetaTag extends Metadata {
 	 * Find the title
 	 */
 	private function analyseTitle() {
-		$matches = array();
+		$allElements = $this->getXml()->query("/html/head/title");
 
-		/* Search for content/title combo
- 		 */
-		$allPatterns = array();
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*name=[\"\']title[\"\']#ms';
-		$allPatterns[] = '#name=[\"\']title[\"\'].*content=[\"\']([^\"\']+)[\"\']#ms';
+		foreach($allElements as $currentElement) {
+			$this->setTitle(trim($currentElement->nodeValue));
 
-		/* Google uses itemprop!
-		 */
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']name[\"\']#ms';
-		$allPatterns[] = '#itemprop=[\"\']name[\"\'].*content=[\"\']([^\"\']+)[\"\']#ms';
-
-		foreach($allPatterns as $currentPattern) {
-			preg_match($currentPattern, $this->getCurl()->getResult(), $matches);
-		}
-
-		if (count($matches)) {
-			$this->setTitle($matches[1]);
+			return;
 		}
 	}
 
@@ -63,25 +50,18 @@ class MetaTag extends Metadata {
 	 * Find the description
 	 */
 	private function analyseDescription() {
-		$matches = array();
+		$query = "/html/head/meta[@name='description']";
 
-		/* Search for content/title combo
- 		 */
-		$allPatterns = array();
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*name=[\"\']description[\"\']#ms';
-		$allPatterns[] = '#name=[\"\']description[\"\'].*content=[\"\']([^\"\']+)[\"\']#ms';
+		$allElements = $this->getXml()->query($query);
 
-		/* Google uses itemprop!
-		 */
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']description[\"\']#ms';
-		$allPatterns[] = '#itemprop=[\"\']description[\"\'].*content=[\"\']([^\"\']+)[\"\']#ms';
+		foreach($allElements as $currentElement) {
+			foreach($currentElement->attributes as $currentAttribute) {
+				if ($currentAttribute->nodeName == 'content') {
+					$this->setDescription(trim($currentAttribute->nodeValue));
 
-		foreach($allPatterns as $currentPattern) {
-			preg_match($currentPattern, $this->getCurl()->getResult(), $matches);
-		}
-
-		if (count($matches)) {
-			$this->setDescription($matches[1]);
+					return;
+				}
+			}
 		}
 	}
 }

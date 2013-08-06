@@ -37,20 +37,18 @@ class OpenGraph extends Metadata {
 	 * Find the title
 	 */
 	private function analyseTitle() {
-		$matches = array();
+		$query = "//meta[@property='og:title']";
 
-		/* Search for content/title combo
- 		 */
-		$allPatterns = array();
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*property=[\"\']og:title[\"\']#m';
-		$allPatterns[] = '#property=[\"\']og:title[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
+		$allElements = $this->getXml()->query($query);
 
-		foreach($allPatterns as $currentPattern) {
-			preg_match($currentPattern, $this->getCurl()->getResult(), $matches);
-		}
+		foreach($allElements as $currentElement) {
+			foreach($currentElement->attributes as $currentAttribute) {
+				if ($currentAttribute->nodeName == 'content') {
+					$this->setTitle(trim($currentAttribute->nodeValue));
 
-		if (count($matches)) {
-			$this->setTitle($matches[1]);
+					return;
+				}
+			}
 		}
 	}
 
@@ -58,20 +56,18 @@ class OpenGraph extends Metadata {
 	 * Find the description
 	 */
 	private function analyseDescription() {
-		$matches = array();
+		$query = "//meta[@property='og:description']";
 
-		/* Search for content/title combo
- 		 */
-		$allPatterns = array();
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*property=[\"\']og:description[\"\']#m';
-		$allPatterns[] = '#property=[\"\']og:description[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
+		$allElements = $this->getXml()->query($query);
 
-		foreach($allPatterns as $currentPattern) {
-			preg_match($currentPattern, $this->getCurl()->getResult(), $matches);
-		}
+		foreach($allElements as $currentElement) {
+			foreach($currentElement->attributes as $currentAttribute) {
+				if ($currentAttribute->nodeName == 'content') {
+					$this->setDescription(trim($currentAttribute->nodeValue));
 
-		if (count($matches)) {
-			$this->setDescription($matches[1]);
+					return;
+				}
+			}
 		}
 	}
 }

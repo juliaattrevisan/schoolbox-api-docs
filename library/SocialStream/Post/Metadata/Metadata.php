@@ -18,11 +18,11 @@ namespace SocialStream\Post\Metadata;
 abstract class Metadata {
 
 	/**
-	 * A curl handler
+	 * XML output from curl
 	 *
 	 * @var string
 	 */
-	protected $curl = null;
+	protected $xml = null;
 
 	/**
 	 * Url title
@@ -55,11 +55,11 @@ abstract class Metadata {
 	/**
 	 * Constructor
 	 *
-	 * @param $curl
+	 * @param $xml
 	 * @param $newPost
 	 */
-	public function __construct($curl, $newPost) {
-		$this->setCurl($curl);
+	public function __construct($xml, $newPost) {
+		$this->setXml($xml);
 		$this->setUrl($newPost->getUrl());
 	}
 
@@ -89,24 +89,6 @@ abstract class Metadata {
 	 */
 	public function getNext() {
 		return $this->next;
-	}
-
-	/**
-	 * Set curl
-	 *
-	 * @param $curl
-	 */
-	protected function setCurl($curl) {
-		$this->curl = $curl;
-	}
-
-	/**
-	 * Get curl
-	 *
-	 * @return string
-	 */
-	protected function getCurl() {
-		return $this->curl;
 	}
 
 	/**
@@ -161,5 +143,23 @@ abstract class Metadata {
 	 */
 	public function getTitle() {
 		return $this->title;
+	}
+
+	/**
+	 * Set xml
+	 *
+	 * @param string $xml
+	 */
+	protected function setXml($xml) {
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Get xml
+	 *
+	 * @return string
+	 */
+	protected function getXml() {
+		return $this->xml;
 	}
 }
