@@ -142,6 +142,7 @@ rm -fR %{buildroot}%{_datadir}/%{name}/composer*
 rm -fR %{buildroot}%{_datadir}/%{name}/debian
 rm -fR %{buildroot}%{_datadir}/%{name}/tools/major-updater.sh
 rm -fR %{buildroot}%{_datadir}/%{name}/tools/minor-updater.sh
+rm -fR %{buildroot}%{_datadir}/%{name}/www/test
 
 # Build css files from less
 %{buildroot}%{_datadir}/%{name}/tools/build-less-css.sh

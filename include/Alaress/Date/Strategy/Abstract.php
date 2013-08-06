@@ -139,7 +139,7 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	 * @param  $dateComponent
 	 */
 	private function setDateComponents($dateComponent) {
-		preg_match('/([dym])([\-\/])([dm])[\-\/]([dmy])/', $this->getInputDateFormat(), $matches);
+		$is_match = preg_match('/([dym])([\-\/])([dm])[\-\/]([dmy])/', $this->getInputDateFormat(), $matches);
 
 		$partMap = array(
 			1 => 0, // First date part
@@ -147,15 +147,20 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 			4 => 2, // Third date part
 		);
 
-		$this->setDateSeparator($matches[2]);
+		if ($is_match) {
+			$this->setDateSeparator($matches[2]);
 
-		/* Explode out the date and remember values
-		 */
-		$dateParts = explode($this->getDateSeparator(), $dateComponent);
+			/* Explode out the date and remember values
+			 */
+			$dateParts   = explode($this->getDateSeparator(), $dateComponent);
+			$day_index   = array_search('d', $matches);
+			$month_index = array_search('m', $matches);
+			$year_index  = array_search('y', $matches);
 
-		$this->setDay($dateParts[$partMap[array_search('d', $matches)]]);
-		$this->setMonth($dateParts[$partMap[array_search('m', $matches)]]);
-		$this->setYear($dateParts[$partMap[array_search('y', $matches)]]);
+			$this->setDay(isset($dateParts[$partMap[$day_index]])     ? $dateParts[$partMap[$day_index]]   : null);
+			$this->setMonth(isset($dateParts[$partMap[$month_index]]) ? $dateParts[$partMap[$month_index]] : null);
+			$this->setYear(isset($dateParts[$partMap[$year_index]])   ? $dateParts[$partMap[$year_index]]  : null);
+		}
 	}
 
 	/**

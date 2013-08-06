@@ -65,7 +65,7 @@ class Mapper {
 	protected $model;
 
 	/**
-	 * @var array
+	 * @var MappingCollection
 	 */
 	protected $map;
 
@@ -91,7 +91,7 @@ class Mapper {
 	/**
 	 * Stores the singleton instance of the mapper
 	 *
-	 * @var Mapper
+	 * @var array[Mapper]
 	 */
 	static protected $instance;
 
@@ -115,10 +115,11 @@ class Mapper {
 	 * @return static
 	 */
 	static public function getInstance() {
-		if (!isset($instance)) {
-			static::$instance = new static();
+		$class_name = get_called_class();
+		if (!isset(self::$instance[$class_name])) {
+			self::$instance[$class_name] = new static();
 		}
-		return static::$instance;
+		return self::$instance[$class_name];
 	}
 
 	/**
@@ -127,6 +128,7 @@ class Mapper {
 	 */
 	public function __construct() {
 		$this->database = \Database::getInstance();
+		$this->map = new MappingCollection();
 		$this->setup();
 		$this->setConfigLoader(new ConfigLoader());
 		$this->setColumnFactory(new ColumnFactory());
@@ -341,7 +343,7 @@ class Mapper {
 		if (!empty($map['identifier'])) {
 			$this->identifier = $map;
 		}
-		$this->map[] = $map;
+		$this->map->add($map);
 		return true;
 	}
 
@@ -828,6 +830,9 @@ class Mapper {
 
 	/**
 	 * @brief Attempts to complete a partially defined map
+	 *
+	 * @deprecated Define all mappings yourself instead of relying on magic
+	 *
 	 * @return Bool
 	 */
 	protected function mapping() {
@@ -846,7 +851,7 @@ class Mapper {
 			$this->table = $this->toUnderscore($this->model);
 		}
 
-		if (empty($this->map)) {
+		if ($this->map->count() === 0) {
 			$propertyList = array_keys(get_class_vars($this->model));
 
 			if (!empty($propertyList)) {
