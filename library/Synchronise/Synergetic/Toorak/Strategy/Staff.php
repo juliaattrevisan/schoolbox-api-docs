@@ -46,7 +46,7 @@ class Synchronise_Synergetic_Toorak_Strategy_Staff extends Synchronise_Synergeti
 		$newUser['local_email']   = 0;
 		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
 		$newUser['campus']        = array($newUser['defaultCampus']);
-		$newUser['group_id']      = self::STAFF_GROUP_ID;
+		$newUser['group_id']      = $this->getGroupIDFromCategory($currentUser['StaffCategory']);
 		return $newUser;
 	}
 
