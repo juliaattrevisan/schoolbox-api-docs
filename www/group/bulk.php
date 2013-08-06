@@ -1,6 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 
 $this->setFile(TEMPLATE_content, 'group/bulk.html');
 

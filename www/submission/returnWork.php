@@ -1,8 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
 $this->setFile(TEMPLATE_content, 'submission/returnWork.html');
 $this->setBlock(TEMPLATE_content, 'mark_type_percent', 'mark_type_percent_block');

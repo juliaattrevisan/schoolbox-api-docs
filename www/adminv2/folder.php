@@ -1,7 +1,4 @@
 <?php
-require_once SITE_root . '/library/user.php';
-require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/homepage-template.php';
 
 $groupHandler = new Group();
 

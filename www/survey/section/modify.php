@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/group.php';
 
 $surveyHandler = new Survey_Main();
 $groupHandler = new Group();

@@ -8,10 +8,6 @@
 $time_start = microtime(true);
 
 require_once '../include/SitePage.php';
-require_once '../library/group.php';
-require_once '../library/category.php';
-require_once '../library/allowed-file.php';
-//require_once 'include/permission.php';
 
 $page = new SitePage();
 $group = new Group();
@@ -118,7 +114,6 @@ if (empty($type) || $type == 'all') {
     // iterate through the handle types
     foreach ($handle as $type_name => &$type_handle) {
         // include & instantiate
-        require_once("../library/$type_handle.php");
         $type_class = ucfirst($type_handle);
         $type_handle = new $type_class;
 
@@ -162,7 +157,6 @@ if (empty($type) || $type == 'all') {
 } //
 elseif (!empty($handle[$type])) {
     // include & instantiate
-    require_once("../library/{$handle[$type]}.php");
     $type_class = ucfirst($handle[$type]);
     $handle[$type] = new $type_class;
 

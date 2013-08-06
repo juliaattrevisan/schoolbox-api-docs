@@ -1,7 +1,6 @@
 <?php
 
 require_once 'synergetic-curriculum.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 $synCurric = new SynergeticCurriculum;
 $groupHandler = new Group;
 

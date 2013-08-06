@@ -24,7 +24,6 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
      * @return void
      */
     public function execute() {
-        require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/my-links.php');
         $this->myLinkHandler = new MyLinks();
         $this->groupHandler = new Group();
     }

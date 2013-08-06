@@ -9,8 +9,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/group.php');
-require_once('../library/user.php');
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();

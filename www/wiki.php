@@ -1,8 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-
 $wikiHandler = new Wiki();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 

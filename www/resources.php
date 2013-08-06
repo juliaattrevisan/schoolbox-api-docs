@@ -1,10 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 $this->setFile(TEMPLATE_content, 'resources.html');

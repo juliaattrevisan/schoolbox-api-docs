@@ -37,7 +37,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         $this->setJavascript('/javascript/swfobject.js');
         $this->setBlock($templateHandle, 'audio_list', 'audio_list_block');
 
-        require_once SITE_root. '/library/file.php';
         $fileHandler = new File;
 
         //

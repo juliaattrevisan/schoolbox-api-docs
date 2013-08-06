@@ -1,12 +1,10 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 $page = new SitePage;
 $allowedFiles = new AllowedFile;
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 
 $folderHandler = PortfolioWebDAV::factory();
 $fileHandler = $folderHandler;

@@ -59,10 +59,7 @@ class Category {
      * @return bool
      */
     public function hasHomepage() {
-        if($this->homepage->getTemplate())
-            return true;
-        else
-            return false;
+        return ($this->homepage instanceof HomepageConfig && $this->homepage->getTemplate());
     }
 
 	/**

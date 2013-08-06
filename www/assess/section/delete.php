@@ -8,7 +8,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/group.php';
 
 /* Get a list of questions and answers to softdelete
  */

@@ -1,8 +1,6 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 
 $page = new SitePage;
 $groupHandler = new Group;
@@ -43,10 +41,6 @@ if (is_numeric($_POST['folders'])) {
 	print json_encode($output);
 }
 elseif (is_numeric($_POST['files'])) {
-
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/link.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 	$fileHandler = new File;
 	$linkHandler = new Link;

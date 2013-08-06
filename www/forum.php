@@ -1,9 +1,6 @@
 <?php
 
 require_once SITE_root . '/include/SitePage.php';
-require_once SITE_root . '/library/category.php';
-require_once SITE_root . '/library/forum.php';
-require_once SITE_root . '/library/group.php';
 
 $categoryHandler = new Category();
 $forumHandler = new Forum();

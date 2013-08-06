@@ -54,7 +54,6 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         else {
 
             $this->setVar('drop_student_block', '');
-            require_once SITE_root.'/library/dropbox.php';
             $dropbox = new Dropbox;
             $fileList = $dropbox->getFileList($this->getContext('id'));
             $userHandler = new User();

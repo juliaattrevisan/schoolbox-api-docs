@@ -1,7 +1,5 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/generic.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $page = new SitePage();
 $groupHandler = new Group();

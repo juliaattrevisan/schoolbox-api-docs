@@ -1,5 +1,4 @@
 <?php
-require_once SITE_root .'/library/mssql.php';
 
 class SynergeticCurriculum extends MSSQL{
 

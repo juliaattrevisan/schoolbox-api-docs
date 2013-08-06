@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/group.php');
 
 $factory = new Survey_Factory();
 $assessHandler = new Survey_Main();

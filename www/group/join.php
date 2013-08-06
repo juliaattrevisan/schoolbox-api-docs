@@ -1,6 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $this->setFile(TEMPLATE_content, 'group/join.html');
 $this->setBlock(TEMPLATE_content, 'free_list', 'free_list_block');

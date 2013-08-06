@@ -2,7 +2,6 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $page = new SitePage();
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
 $folderHandler = new MyFolder();
 
 if (isset($_POST['name'])) {
