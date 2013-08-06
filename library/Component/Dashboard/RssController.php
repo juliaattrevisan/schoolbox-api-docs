@@ -67,10 +67,6 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
                 }
 
                 $this->parse("rss_block", "rss_stories", true);
-
-                if ($j == Cfg::get('welcome_rss_limit')) {
-                    break;
-                }
             }
 
             return true;
