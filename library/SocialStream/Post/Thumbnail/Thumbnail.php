@@ -18,11 +18,11 @@ namespace SocialStream\Post\Thumbnail;
 abstract class Thumbnail {
 
 	/**
-	 * A curl handler
+	 * XML output
 	 *
-	 * @var string
+	 * @var null
 	 */
-	protected $curl = null;
+	protected $xml = null;
 
 	/**
 	 * The url to fetch
@@ -51,11 +51,11 @@ abstract class Thumbnail {
 	/**
 	 * Constructor
 	 *
-	 * @param $curl
+	 * @param $xml
 	 * @param $newPost
 	 */
-	public function __construct($curl, $newPost) {
-		$this->setCurl($curl);
+	public function __construct($xml, $newPost) {
+		$this->setXml($xml);
 		$this->setUrl($newPost->getUrl());
 		$this->setFileType(new \FileType($newPost->getUrl()));
 	}
@@ -66,42 +66,42 @@ abstract class Thumbnail {
 	 * @return mixed
 	 */
 	abstract public function fetchThumbnail();
-
-	/**
-	 * Try to find one of the patterns in $allPatterns
-	 *
-	 * @param $allPatterns
-	 * @return mixed
-	 */
-	protected function analyse($allPatterns) {
-		$matches = array();
-
-		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
-			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {
-
-				/* Check this path for extension and if it is an image extension,
-				 * presume something useful was found
-				 */
-				$this->getFileType()->setPath($matches[1]);
-
-				if ($this->getFileType()->isImageExtension()) {
-					$found = true;
-				}
-			}
-		}
-
-		/* If an opengraph image was found, curl that too
-		 */
-		if ($found) {
-			return $matches[1];
-		}
-
-		/* Otherwise get the next class to deal with it
-		 */
-		if ($this->getNext()) {
-			return $this->getNext()->fetchThumbnail();
-		}
-	}
+//
+//	/**
+//	 * Try to find one of the patterns in $allPatterns
+//	 *
+//	 * @param $allPatterns
+//	 * @return mixed
+//	 */
+//	protected function analyse($allPatterns) {
+//		$matches = array();
+//
+//		for ($i=0, $found=false; ($i < count($allPatterns)) && !$found; $i++) {
+//			if (preg_match($allPatterns[$i], $this->getCurl()->getResult(), $matches)) {
+//
+//				/* Check this path for extension and if it is an image extension,
+//				 * presume something useful was found
+//				 */
+//				$this->getFileType()->setPath($matches[1]);
+//
+//				if ($this->getFileType()->isImageExtension()) {
+//					$found = true;
+//				}
+//			}
+//		}
+//
+//		/* If an opengraph image was found, curl that too
+//		 */
+//		if ($found) {
+//			return $matches[1];
+//		}
+//
+//		/* Otherwise get the next class to deal with it
+//		 */
+//		if ($this->getNext()) {
+//			return $this->getNext()->fetchThumbnail();
+//		}
+//	}
 
 	/* Getters/Setters
 	 */
@@ -122,24 +122,6 @@ abstract class Thumbnail {
 	 */
 	public function getNext() {
 		return $this->next;
-	}
-
-	/**
-	 * Set curl
-	 *
-	 * @param $curl
-	 */
-	protected function setCurl($curl) {
-		$this->curl = $curl;
-	}
-
-	/**
-	 * Get curl
-	 *
-	 * @return string
-	 */
-	protected function getCurl() {
-		return $this->curl;
 	}
 
 	/**
@@ -176,5 +158,23 @@ abstract class Thumbnail {
 	 */
 	protected function getFileType() {
 		return $this->fileType;
+	}
+
+	/**
+	 * Set xml
+	 *
+	 * @param null $xml
+	 */
+	protected function setXml($xml) {
+		$this->xml = $xml;
+	}
+
+	/**
+	 * Get xml
+	 *
+	 * @return null
+	 */
+	protected function getXml() {
+		return $this->xml;
 	}
 }

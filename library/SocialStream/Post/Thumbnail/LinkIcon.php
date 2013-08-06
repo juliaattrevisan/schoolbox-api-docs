@@ -19,10 +19,32 @@ class LinkIcon extends Thumbnail {
 	 * @return mixed
 	 */
 	public function fetchThumbnail() {
-		$allPatterns = array();
-		$allPatterns[] = '#href=[\"\']([^\"\']+)[\"\'].*rel=[\"\']icon[\"\']#m';
-		$allPatterns[] = '#rel=[\"\']icon[\"\'].*href=[\"\']([^\"\']+)[\"\']#m';
+		$query = "//link[@rel='icon']";
 
-		return $this->analyse($allPatterns);
+		$allElements = $this->getXml()->query($query);
+
+		foreach($allElements as $currentElement) {
+			foreach($currentElement->attributes as $currentAttribute) {
+
+				if (in_array($currentAttribute->nodeName, array('href'))) {
+					$match = trim($currentAttribute->nodeValue);
+
+					/* Check this path for extension and if it is an image extension,
+					 * presume something useful was found
+					 */
+					$this->getFileType()->setPath($match);
+
+					if ($this->getFileType()->isImageExtension()) {
+						return $match;
+					}
+				}
+			}
+		}
+
+		/* Otherwise get the next class to deal with it
+		 */
+		if ($this->getNext()) {
+			return $this->getNext()->fetchThumbnail();
+		}
 	}
 }

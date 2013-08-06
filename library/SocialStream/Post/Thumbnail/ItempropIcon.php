@@ -19,18 +19,31 @@ class ItempropIcon extends Thumbnail {
 	 * @return mixed
 	 */
 	public function fetchThumbnail() {
-		$allPatterns = array();
+		$query = "//*[@itemprop='icon']";
 
-		/* Search for content/itemprop combo
- 		 */
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']icon[\"\']#m';
-		$allPatterns[] = '#itemprop=[\"\']icon[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
+		$allElements = $this->getXml()->query($query);
 
-		/* Search for src/itemprop combo
+		foreach($allElements as $currentElement) {
+			foreach($currentElement->attributes as $currentAttribute) {
+				if (in_array($currentAttribute->nodeName, array('src', 'content'))) {
+					$match = trim($currentAttribute->nodeValue);
+
+					/* Check this path for extension and if it is an image extension,
+					 * presume something useful was found
+					 */
+					$this->getFileType()->setPath($match);
+
+					if ($this->getFileType()->isImageExtension()) {
+						return $match;
+					}
+				}
+			}
+		}
+
+		/* Otherwise get the next class to deal with it
 		 */
-		$allPatterns[] = '#src=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']icon[\"\']#m';
-		$allPatterns[] = '#itemprop=[\"\']icon[\"\'].*src=[\"\']([^\"\']+)[\"\']#m';
-
-		return $this->analyse($allPatterns);
+		if ($this->getNext()) {
+			return $this->getNext()->fetchThumbnail();
+		}
 	}
 }

@@ -2,6 +2,8 @@
 /**
  * ItempropPhoto
  *
+ * Used in Nigella's recipes
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -19,18 +21,31 @@ class ItempropPhoto extends Thumbnail {
 	 * @return mixed
 	 */
 	public function fetchThumbnail() {
-		$allPatterns = array();
+		$query = "//*[@itemprop='photo']";
 
-		/* Search for content/itemprop combo
+		$allElements = $this->getXml()->query($query);
+
+		foreach($allElements as $currentElement) {
+			foreach($currentElement->attributes as $currentAttribute) {
+				if (in_array($currentAttribute->nodeName, array('src', 'content'))) {
+					$match = trim($currentAttribute->nodeValue);
+
+					/* Check this path for extension and if it is an image extension,
+					 * presume something useful was found
+					 */
+					$this->getFileType()->setPath($match);
+
+					if ($this->getFileType()->isImageExtension()) {
+						return $match;
+					}
+				}
+			}
+		}
+
+		/* Otherwise get the next class to deal with it
 		 */
-		$allPatterns[] = '#content=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']photo[\"\']#m';
-		$allPatterns[] = '#itemprop=[\"\']photo[\"\'].*content=[\"\']([^\"\']+)[\"\']#m';
-
-		/* Search for src/itemprop combo
-		 */
-		$allPatterns[] = '#src=[\"\']([^\"\']+)[\"\'].*itemprop=[\"\']photo[\"\']#m';
-		$allPatterns[] = '#itemprop=[\"\']photo[\"\'].*src=[\"\']([^\"\']+)[\"\']#m';
-
-		return $this->analyse($allPatterns);
+		if ($this->getNext()) {
+			return $this->getNext()->fetchThumbnail();
+		}
 	}
 }

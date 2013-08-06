@@ -29,17 +29,32 @@ class Chain {
 	 */
 	public function __construct($curl, $newPost) {
 
+		/* xml the curl result so we can find things better
+		 * This allows us to xpath our way around
+		 *
+		 * Still, improperly formed documents according to
+		 * simplexml or domdocument causes it to fatally die
+		 * Avoid it by using internal_errors(true)
+		 * http://stackoverflow.com/questions/6090667/php-domdocument-errors-warnings-on-html5-tags
+		 */
+		$document = new \DomDocument();
+		libxml_use_internal_errors(true);
+		$document->loadHTML($curl->getResult());
+		libxml_clear_errors();
+
+		$xml = new \DOMXpath($document);
+
 		/* Set up chain of responsibility
 		 */
-		$direct = new Direct($curl, $newPost);
-		$opengraph = new OpenGraph($curl, $newPost);
-		$itempropImage = new ItempropImage($curl, $newPost);
-		$itempropPhoto = new ItempropPhoto($curl, $newPost);
-		$itempropIcon = new ItempropIcon($curl, $newPost);
-		$itempropThumbnailUrl = new ItempropThumbnailUrl($curl, $newPost);
-		$linkIcon = new LinkIcon($curl, $newPost);
-		$linkIconApple = new LinkIconApple($curl, $newPost);
-		$linkIconApplePrecompiled = new LinkIconApplePrecompiled($curl, $newPost);
+		$direct = new Direct($xml, $newPost);
+		$opengraph = new OpenGraph($xml, $newPost);
+		$itempropImage = new ItempropImage($xml, $newPost);
+		$itempropPhoto = new ItempropPhoto($xml, $newPost);
+		$itempropIcon = new ItempropIcon($xml, $newPost);
+		$itempropThumbnailUrl = new ItempropThumbnailUrl($xml, $newPost);
+		$linkIcon = new LinkIcon($xml, $newPost);
+		$linkIconApple = new LinkIconApple($xml, $newPost);
+		$linkIconApplePrecompiled = new LinkIconApplePrecompiled($xml, $newPost);
 
 		/* Try directly, otherwise try the other meta tag variants in sequence
 		 * until one of them matches
