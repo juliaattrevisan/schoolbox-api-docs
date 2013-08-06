@@ -147,14 +147,14 @@ class Mediator {
             $this->nameTransaction('/m/'.$classname.'->'.$methodname);
 
             // avoid fatal error by checking the class and method are registered
-	        $classname = '\\Schoolbox\\Mobile\\'.$classname;
+            $classname = '\\Schoolbox\\Mobile\\'.$classname;
             if (!class_exists($classname)) {
                 throw new Exception_Schoolbox(sprintf("Class `$classname` does not exist", $classname));
             }
             $class = new $classname($this->getResponseCode());
-//            if (!is_callable(array($class, $methodname))) {
-//                throw new Exception_Schoolbox("Method does not exist in class");
-//            }
+            if (!is_callable(array($class, $methodname))) {
+                throw new Exception_Schoolbox("Method `$methodname` does not exist in class `$classname`");
+            }
 
             // try to dynamically call the method specified with the args specified
             try {
