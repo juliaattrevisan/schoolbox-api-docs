@@ -7,7 +7,13 @@ class SitePage extends Page {
 
     private $lite;
 
-    public function SitePage($login = true) {
+    /**
+     * @var DebugBar\DebugBar
+     */
+    protected $debug_bar;
+
+    public function SitePage($login = true) {        
+        $this->debug_bar = new DebugBar\StandardDebugBar();
         parent::Page();
 
         $this->db = new DeprecatedDatabase;
@@ -155,6 +161,9 @@ class SitePage extends Page {
 
         $userHandler = new User();
 
+        $renderer = $this->debug_bar->getJavascriptRenderer();
+        $renderer->setBaseUrl('/debugbar/');
+
         $templateVar = array(
             'TEMPLATE_YEAR' => date('Y'),
             'SITE_NAME' => Cfg::get('school_name'),
@@ -166,6 +175,8 @@ class SitePage extends Page {
             'EXTERNAL_ID' => $_SESSION['sid'],
             'SITE_VERSION' => Cfg::get('site_version'),
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
+            'DEBUGBAR'      => $renderer->render(),
+            'DEBUGBAR_HEAD' => $renderer->renderHead(),
         );
 
         $this->setVar($templateVar);
@@ -268,7 +279,7 @@ class SitePage extends Page {
             $_SESSION['history'] = array();
         }
 
-	    $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
+        $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
 
         /* Dont handle duplicates (page refreshes) */
         if ($_SESSION['history'][0] != $requestUri) {
