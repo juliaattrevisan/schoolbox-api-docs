@@ -90,7 +90,7 @@ var socialstream = {
 	 * for when you make posts. Clear it upon change
 	 */
 	initAttachmentSelectors: function() {
-		$j('.socialstreamAttachment').change(function() {
+		$j('.socialstreamAttachment').live('change', function() {
 			var urlElement = $j(this).closest('form').find('input[name=url]');
 
 			/* Empty this upon change
