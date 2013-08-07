@@ -41,12 +41,10 @@ switch($to)
 
     case "britannica":
         $form="loginForm";
-        $action="http://www.school.eb.com.au/login";
+        $action="http://school.eb.com.au/login";
         $method="POST";
         $formArray['username']="mggs";
         $formArray['password']="mggs";
-        $formArray['remember'] = 'false';
-        $formArray['fail']	= '/failedLogin';
         $formArray['target'] = '/';
     break;
 
