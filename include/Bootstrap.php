@@ -33,6 +33,14 @@ if ($is_debug_enabled = Debug\DebugBar::isEnabled()) {
     Debug\DebugBar::init();
 }
 
+//
+// XHProf on the debug bar.
+if ($is_debug_enabled && extension_loaded('xhprof')) {
+    include_once '/usr/share/php5-xhprof/xhprof_lib/utils/xhprof_lib.php';
+    include_once '/usr/share/php5-xhprof/xhprof_lib/utils/xhprof_runs.php';
+    Debug\DebugBar::getInstance()->addCollector(new Debug\DataCollector\XhprofCollector());
+}
+
 /* Configure Database connection */
 $database = Database::getInstance();
 $database->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => $is_debug_enabled));
