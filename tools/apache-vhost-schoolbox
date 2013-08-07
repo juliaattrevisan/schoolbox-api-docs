@@ -14,6 +14,9 @@
 	LogLevel warn
 	CustomLog /var/log/apache2/schoolbox_access.log combined
 
+	#Setup xhprof for debugging, only works if module is installed on server
+	Alias /xhprof /usr/share/php5-xhprof/xhprof_html
+
 	# Minify Exceptions
 	<Directory /usr/share/schoolbox/www/min>
 		RewriteEngine on
