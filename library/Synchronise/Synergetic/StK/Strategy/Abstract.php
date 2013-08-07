@@ -47,6 +47,11 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 			//
 			// If the current user exists in Schoolbox, update them
 			if ($existing) {
+				/* dont update staff campuses */
+				if($newUser['group_id'] == self::STAFF_GROUP_ID || $newUser['group_id'] == self::ADMIN_GROUP_ID){
+					unset($newUser['campus']);
+					unset($newUser['defaultCampus']);
+				}
 				if ($this->getPerformUpdate() === true) {
 					$newUser['id'] = $existing['uid'];
 					$this->getUserHandler()->update($newUser);
