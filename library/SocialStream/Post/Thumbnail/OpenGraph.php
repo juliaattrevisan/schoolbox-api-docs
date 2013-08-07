@@ -14,36 +14,17 @@ namespace SocialStream\Post\Thumbnail;
 class OpenGraph extends Thumbnail {
 
 	/**
-	 * Find og:image
+	 * The xpath query
 	 *
-	 * @return mixed
+	 * @var string
 	 */
-	public function fetchThumbnail() {
-		$query = "/html/head/meta[@property='og:image']";
+	protected $query = "/html/head/meta[@property='og:image']";
 
-		$allElements = $this->getXml()->query($query);
-
-		foreach($allElements as $currentElement) {
-			foreach($currentElement->attributes as $currentAttribute) {
-				if ($currentAttribute->nodeName == 'content') {
-					$match = trim($currentAttribute->nodeValue);
-
-					/* Check this path for extension and if it is an image extension,
-					 * presume something useful was found
-					 */
-					$this->getFileType()->setPath($match);
-
-					if ($this->getFileType()->isImageExtension()) {
-						return $match;
-					}
-				}
-			}
-		}
-
-		/* Otherwise get the next class to deal with it
-		 */
-		if ($this->getNext()) {
-			return $this->getNext()->fetchThumbnail();
-		}
-	}
+	/**
+	 * These are the attributes that might contain a link
+	 * to an image you want to retrieve
+	 *
+	 * @var array
+	 */
+	protected $contentAttributes = array('content');
 }
