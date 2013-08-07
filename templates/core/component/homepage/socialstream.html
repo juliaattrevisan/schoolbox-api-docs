@@ -74,8 +74,21 @@
 			<label>
 				Body: <input type='text' name='body' maxlength='255' value='' />
 			</label>
+
 			<label>
-				URL: <input type='text' name='url' maxlength='255' value='' />
+ 				URL: <input type='text' name='url' class='hide' maxlength='255' value='' />
+			</label>
+
+			<label>
+				<input type='radio' class='socialstreamAttachment' name='socialstreamAttachment' value='link' />Link
+			</label>
+
+			<label>
+				<input type='radio' class='socialstreamAttachment' name='socialstreamAttachment' value='upload' />Upload
+			</label>
+
+			<label>
+				<input type='radio' class='socialstreamAttachment' name='socialstreamAttachment' value='resource' />Resource
 			</label>
 
 			<input type='submit' value='Post' />

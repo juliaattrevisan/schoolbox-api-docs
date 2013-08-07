@@ -42,6 +42,7 @@ var socialstream = {
 
 		this.initPostLinks();
 		this.initViewMore();
+		this.initAttachmentSelectors();
 	},
 
 	/**
@@ -81,6 +82,29 @@ var socialstream = {
 
 		$j('.socialstreamViewMore').click(function() {
 			self.stream();
+		});
+	},
+
+	/**
+	 * Add event handlers for Link, Upload and Resource buttons
+	 * for when you make posts. Clear it upon change
+	 */
+	initAttachmentSelectors: function() {
+		$j('.socialstreamAttachment').change(function() {
+			var urlElement = $j(this).closest('form').find('input[name=url]');
+
+			/* Empty this upon change
+			 */
+			urlElement.val('');
+
+			/* Make the input element visible or not
+			 */
+			if ($j(this).val() == 'link') {
+				urlElement.show();
+			}
+			else {
+				urlElement.hide();
+			}
 		});
 	},
 
