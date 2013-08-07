@@ -2,6 +2,8 @@
 /**
  * Alaress_Probe
  *
+ * Now outputs to the debugbar if it is enabled!
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
@@ -15,8 +17,13 @@ class Alaress_Probe {
 	 * @param $dataStructure
 	 */
 	public function __construct($dataStructure) {
-		echo "<pre>";
-		print_r($dataStructure);
-		echo "</pre>";
+		if (Debug\DebugBar::isEnabled()) {
+			Debug\DebugBar::getInstance()->getCollector('messages')->addMessage($dataStructure);
+		}
+		else {
+			echo "<pre>";
+			print_r($dataStructure);
+			echo "</pre>";
+		}
 	}
 }
