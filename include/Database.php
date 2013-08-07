@@ -89,7 +89,7 @@ class Database {
         /* Create PDO connection */
         try {
             $this->connection = new PDO($dsn, $username, $password, array(
-                PDO::ATTR_PERSISTENT => true,
+                PDO::ATTR_PERSISTENT => empty($options['debug']),
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
@@ -98,6 +98,18 @@ class Database {
         }
 
         return true;
+    }
+
+    /**
+     * Retrieves the query collector from this connection.
+     *
+     * Will fail if $this->options[debug] is off.
+     *
+     * @return \DebugBar\DataCollector\PDO\PDOCollector
+     */
+    public function getCollector() {
+        $this->connection = new DebugBar\DataCollector\PDO\TraceablePDO($this->connection);
+        return new DebugBar\DataCollector\PDO\PDOCollector($this->connection);
     }
 
     /**

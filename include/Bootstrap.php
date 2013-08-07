@@ -23,11 +23,23 @@ set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include
 
 /* Load the Autoloader */
 require_once dirname(__FILE__) . '/Autoloader.php';
-$autoloader = Autoloader::initialise();
+Autoloader::initialise();
+
+//
+// Set up the debug bar, and add listeners for various parts of the debug bar
+// (database calls, XHProf)
+// Should go in a DI container instead of a static class.
+if ($is_debug_enabled = Debug\DebugBar::isEnabled()) {
+    Debug\DebugBar::init();
+}
 
 /* Configure Database connection */
 $database = Database::getInstance();
-$database->connect(SQL_dsn, SQL_user, SQL_passwd);
+$database->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => $is_debug_enabled));
+if ($is_debug_enabled) {
+    $debug_bar = Debug\DebugBar::getInstance();
+    $debug_bar->addCollector($database->getCollector());
+}
 
 /* Set default time zone */
 date_default_timezone_set(Cfg::get('date_timezone'));
