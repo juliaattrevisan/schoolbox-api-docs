@@ -52,16 +52,6 @@ class MetaTag extends Metadata {
 	private function analyseDescription() {
 		$query = "/html/head/meta[@name='description']";
 
-		$allElements = $this->getXml()->query($query);
-
-		foreach($allElements as $currentElement) {
-			foreach($currentElement->attributes as $currentAttribute) {
-				if ($currentAttribute->nodeName == 'content') {
-					$this->setDescription(trim($currentAttribute->nodeValue));
-
-					return;
-				}
-			}
-		}
+		$this->setDescription($this->analyse($query, array('content')));
 	}
 }

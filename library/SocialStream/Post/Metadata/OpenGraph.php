@@ -39,17 +39,7 @@ class OpenGraph extends Metadata {
 	private function analyseTitle() {
 		$query = "//meta[@property='og:title']";
 
-		$allElements = $this->getXml()->query($query);
-
-		foreach($allElements as $currentElement) {
-			foreach($currentElement->attributes as $currentAttribute) {
-				if ($currentAttribute->nodeName == 'content') {
-					$this->setTitle(trim($currentAttribute->nodeValue));
-
-					return;
-				}
-			}
-		}
+		$this->setTitle($this->analyse($query, array('content')));
 	}
 
 	/**
@@ -58,16 +48,6 @@ class OpenGraph extends Metadata {
 	private function analyseDescription() {
 		$query = "//meta[@property='og:description']";
 
-		$allElements = $this->getXml()->query($query);
-
-		foreach($allElements as $currentElement) {
-			foreach($currentElement->attributes as $currentAttribute) {
-				if ($currentAttribute->nodeName == 'content') {
-					$this->setDescription(trim($currentAttribute->nodeValue));
-
-					return;
-				}
-			}
-		}
+		$this->setDescription($this->analyse($query, array('content')));
 	}
 }

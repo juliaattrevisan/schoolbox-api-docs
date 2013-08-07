@@ -70,6 +70,25 @@ abstract class Metadata {
 	 */
 	abstract public function fetchMetadata();
 
+	/**
+	 * Have a think about $query and return whatever it found
+	 *
+	 * @param $query
+	 * @param $allowableAttributes
+	 * @return string
+	 */
+	protected function analyse($query, $allowableAttributes) {
+		$allElements = $this->getXml()->query($query);
+
+		foreach($allElements as $currentElement) {
+			foreach($currentElement->attributes as $currentAttribute) {
+				if (in_array($currentAttribute->nodeName, $allowableAttributes)) {
+					return trim($currentAttribute->nodeValue);
+				}
+			}
+		}
+	}
+
 	/* Getters/Setters
 	 */
 
