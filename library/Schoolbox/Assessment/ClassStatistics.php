@@ -76,9 +76,10 @@ class ClassStatistics {
 		// retrieve ALL the submission boxes for this category
 		$boxCollection = $this->submissionBoxMapper->findByColumn('category', $this->getCategory()->getId());
 		foreach($boxCollection as $box) {
-			/**
-			 * @var $box SubmissionBox
-			 */
+			/** @var $box SubmissionBox */
+			if ($box->isDeleted()) {
+				continue;
+			}
 			$due = $box->getDueDate();
 			$dueYear = $due->getUsingFormat('Y');
 			$dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
@@ -107,7 +108,10 @@ class ClassStatistics {
 			'availability' => 'assess'
 		));
 		foreach($assessCollection as $assess) {
-			$this->addWork($assess);
+			/** @var $assess OnlineAssessment */
+			if (!$assess->isDeleted()) {
+				$this->addWork($assess);
+			}
 		}
 
 //		print_r($this->workMap);
