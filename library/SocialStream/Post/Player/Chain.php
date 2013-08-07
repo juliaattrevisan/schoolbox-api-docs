@@ -31,9 +31,11 @@ class Chain {
 		 */
 		$youtube = new Youtube($newPost);
 		$vimeo = new Vimeo($newPost);
+		$ted = new Ted($newPost);
 
 		/* Try until one of them matches
 		 */
+		$vimeo->setNext($ted);
 		$youtube->setNext($vimeo);
 
 		$result = $youtube->fetchThumbnail();
