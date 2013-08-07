@@ -17,9 +17,13 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         parent::__construct($instance, $user, $sitepage);
 
 
-	    $this->rss = new Alaress_Rss_Stream($this->getConfig('url'));
-	    $this->rss->setLimit(Cfg::get('welcome_rss_limit'));
-	    $this->rss->stream();
+        $this->rss = new Alaress_Rss_Stream($this->getConfig('url'));
+        $size = $this->getConfig('size');
+        if (!$size) {
+            $size = Cfg::get('welcome_rss_limit');
+        }
+        $this->rss->setLimit($size);
+        $this->rss->stream();
 
     }
 
@@ -39,10 +43,11 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         $this->setVar('RSS_NAME', Scrub::text($this->rss->getTitle()));
         $this->setVar('RSS_LINK', urlencode(base64_encode($this->rss->getLink())));
 
-	    $allRss = $this->rss->getOutput();
+        $allRss = $this->rss->getOutput();
 
-	    if (count($allRss)) {
-		    foreach($allRss as $item) {
+        $j = 0;
+        if (count($allRss)) {
+            foreach($allRss as $item) {
 
                 $this->setVar(
                     array(
@@ -62,10 +67,6 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
                 }
 
                 $this->parse("rss_block", "rss_stories", true);
-
-                if ($j == Cfg::get('welcome_rss_limit')) {
-                    break;
-                }
             }
 
             return true;
