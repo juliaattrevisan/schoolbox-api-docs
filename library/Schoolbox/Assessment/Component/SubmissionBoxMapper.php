@@ -144,6 +144,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'markVisibility',
 			'type'       => self::TYPE_INTEGER,
 		));
+		$this->hasMap(array(
+			'column'     => 'deleted',
+			'property'   => 'deleted',
+			'type'       => self::TYPE_BOOLEAN,
+		));
 
 		//
 		// adds listeners:

@@ -87,6 +87,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
+		$this->hasMap(array(
+			'column'     => 'deleted_at',
+			'property'   => 'deleted',
+			'type'       => self::TYPE_DATETIME,
+		));
 
 
 		$this->hasJoin('category', array(

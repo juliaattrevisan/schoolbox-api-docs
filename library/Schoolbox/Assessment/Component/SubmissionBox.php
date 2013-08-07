@@ -119,6 +119,11 @@ class SubmissionBox {
 	 */
 	protected $mark_visibility;
 
+	/**
+	 * @var bool
+	 */
+	protected $deleted;
+
 	public function __construct() {
 		$this->setNotifications(new NotificationCollection(array()));
 		$this->setFileLinks(new SubmissionBox\FileCollection(array()));
@@ -407,6 +412,32 @@ class SubmissionBox {
 	 */
 	public function getMarkVisibility() {
 		return $this->mark_visibility;
+	}
+
+	/**
+	 * @param  boolean $deleted
+	 * @return $this
+	 */
+	public function setDeleted($deleted) {
+		$this->deleted = $deleted;
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getDeleted() {
+		return $this->deleted;
+	}
+
+	/**
+	 * Is this deleted? (added so there's a consistent method for determining if
+	 * a model is deleted)
+	 *
+	 * @return bool
+	 */
+	public function isDeleted() {
+		return $this->getDeleted();
 	}
 
 	/**

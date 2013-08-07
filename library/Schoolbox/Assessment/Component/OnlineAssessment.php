@@ -94,6 +94,11 @@ class OnlineAssessment {
 	protected $created;
 
 	/**
+	 * @var Alaress_Date_Format
+	 */
+	protected $deleted;
+
+	/**
 	 * @param  boolean $anonymous_result
 	 *
 	 * @return $this
@@ -330,4 +335,31 @@ class OnlineAssessment {
 	public function getWorkType() {
 		return $this->work_type;
 	}
+
+	/**
+	 * @param  \Alaress_Date_Format $deleted
+	 * @return $this
+	 */
+	public function setDeleted($deleted) {
+		$this->deleted = $deleted;
+		return $this;
+	}
+
+	/**
+	 * @return \Alaress_Date_Format
+	 */
+	public function getDeleted() {
+		return $this->deleted;
+	}
+
+	/**
+	 * Is this deleted? (added so there's a consistent method for determining if
+	 * a model is deleted)
+	 *
+	 * @return bool
+	 */
+	public function isDeleted() {
+		return ($this->getDeleted() instanceof \Alaress_Date_Format);
+	}
+
 }
