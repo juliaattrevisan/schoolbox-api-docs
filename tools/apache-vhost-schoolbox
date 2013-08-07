@@ -16,6 +16,7 @@
 
 	#Setup xhprof for debugging, only works if module is installed on server
 	Alias /xhprof /usr/share/php5-xhprof/xhprof_html
+	Alias /debugbar /usr/share/schoolbox/vendor/maximebf/debugbar/src/DebugBar/Resources/
 
 	# Minify Exceptions
 	<Directory /usr/share/schoolbox/www/min>
