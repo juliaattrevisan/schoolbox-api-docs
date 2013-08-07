@@ -5,6 +5,13 @@
 			<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
 		</div>
 		<div class='body'>
+			<p>
+				<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
+				<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span>
+				<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a><br />
+				{SOCIALSTREAM_POST_BODY}<br />
+			</p>
+
 			<!-- BEGIN socialstream_post_has_thumbnail -->
 			<img src='/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 			<p>
@@ -20,13 +27,6 @@
 				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
 			</p>
 			<!-- END socialstream_post_has_player -->
-
-			<p>
-				<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
-				{SOCIALSTREAM_POST_BODY}<br />
-				<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span>
-				<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a>
-			</p>
 		</div>
 		<div class='clearfix'></div>
 		<ul>
@@ -36,6 +36,13 @@
 					<img src='/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32'>
 				</div>
 				<div class='body'>
+					<p>
+						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
+						<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
+						<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a><br />
+						{SOCIALSTREAM_COMMENT_BODY}<br />
+					</p>
+
 					<!-- BEGIN socialstream_comment_has_thumbnail -->
 					<img src='/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 					<p>
@@ -51,13 +58,6 @@
 						<em>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</em>
 					</p>
 					<!-- END socialstream_comment_has_player -->
-
-					<p>
-						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
-						{SOCIALSTREAM_COMMENT_BODY}<br />
-						<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
-						<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a>
-					</p>
 				</div>
 				<div class='clearfix'></div>
 				<ul>
@@ -67,6 +67,12 @@
 							<img src='/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32'>
 						</div>
 						<div class='body'>
+							<p>
+								<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
+								<span>Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span><br />
+								{SOCIALSTREAM_REPLY_BODY}<br />
+							</p>
+
 							<!-- BEGIN socialstream_reply_has_thumbnail -->
 							<img src='/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 							<p>
@@ -82,12 +88,6 @@
 								<em>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</em>
 							</p>
 							<!-- END socialstream_reply_has_player -->
-
-							<p>
-								<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
-								{SOCIALSTREAM_REPLY_BODY}<br />
-								<span>Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span>
-							</p>
 						</div>
 						<div class='clearfix'></div>
 					</li>
