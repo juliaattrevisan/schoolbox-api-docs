@@ -7,13 +7,7 @@ class SitePage extends Page {
 
     private $lite;
 
-    /**
-     * @var DebugBar\DebugBar
-     */
-    protected $debug_bar;
-
-    public function SitePage($login = true) {        
-        $this->debug_bar = new DebugBar\StandardDebugBar();
+    public function SitePage($login = true) {
         parent::Page();
 
         $this->db = new DeprecatedDatabase;
@@ -161,8 +155,15 @@ class SitePage extends Page {
 
         $userHandler = new User();
 
-        $renderer = $this->debug_bar->getJavascriptRenderer();
-        $renderer->setBaseUrl('/debugbar/');
+        $debug_bar_head = '';
+        $debug_bar_body = '';
+
+        if (Debug\DebugBar::isEnabled()) {
+            $renderer = Debug\DebugBar::getInstance()->getJavascriptRenderer();
+            $renderer->setBaseUrl('/debugbar/');
+            $debug_bar_head = $renderer->renderHead();
+            $debug_bar_body = $renderer->render();
+        }
 
         $templateVar = array(
             'TEMPLATE_YEAR' => date('Y'),
@@ -175,8 +176,8 @@ class SitePage extends Page {
             'EXTERNAL_ID' => $_SESSION['sid'],
             'SITE_VERSION' => Cfg::get('site_version'),
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
-            'DEBUGBAR'      => $renderer->render(),
-            'DEBUGBAR_HEAD' => $renderer->renderHead(),
+            'DEBUGBAR'      => $debug_bar_body,
+            'DEBUGBAR_HEAD' => $debug_bar_head,
         );
 
         $this->setVar($templateVar);
