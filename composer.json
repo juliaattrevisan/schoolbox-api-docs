@@ -12,7 +12,6 @@
         "behat/mink": "1.5.*",
         "behat/mink-extension": "1.1.*",
         "behat/mink-sahi-driver": "1.1.*",
-        "behat/mink-selenium2-driver": "1.1.*",
-        "facebook/xhprof": "dev-master"
+        "behat/mink-selenium2-driver": "1.1.*"
     }
 }

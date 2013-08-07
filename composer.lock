@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "e9c84c9583e6444e12627556c84a1299",
+    "hash": "6397c85e8aacd2424aa24fc7d1696536",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -754,42 +754,6 @@
                 "testing"
             ],
             "time": "2013-02-17 12:17:51"
-        },
-        {
-            "name": "facebook/xhprof",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/facebook/xhprof.git",
-                "reference": "62638e0b4126823dbf3f02deb6e68753a4f0f7e6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/facebook/xhprof/zipball/62638e0b4126823dbf3f02deb6e68753a4f0f7e6",
-                "reference": "62638e0b4126823dbf3f02deb6e68753a4f0f7e6",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2.0"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "xhprof_lib/utils/xhprof_lib.php",
-                    "xhprof_lib/utils/xhprof_runs.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "description": "XHProf: A Hierarchical Profiler for PHP",
-            "homepage": "http://pecl.php.net/package/xhprof",
-            "keywords": [
-                "performance",
-                "profiling"
-            ],
-            "time": "2013-07-19 22:03:53"
         },
         {
             "name": "instaclick/php-webdriver",
@@ -1716,9 +1680,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "facebook/xhprof": 20
-    },
+    "stability-flags": [
+
+    ],
     "platform": [
 
     ],
