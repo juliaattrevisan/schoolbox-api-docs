@@ -59,7 +59,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Student extends Synchronise_Syn
 		$newUser['lastname'] = $currentUser['StudentSurname'];
         $newUser['alt_email'] = $currentUser['StudentEmail'];
         $newUser['synergy_id'] = $currentUser['StudentID'];
-        $newUser['local_email'] = 1;
+//      $newUser['local_email'] = 1;
         $newUser['eportfolio_enabled'] = 1;
 
 
