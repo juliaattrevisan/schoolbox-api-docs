@@ -42,6 +42,13 @@ class MSSQL {
 	 */
 	protected $collector = null;
 
+	/**
+	 * Static instance of this class
+	 *
+	 * @var self
+	 */
+	protected static $instance = null;
+
 	function MSSQL($db = false, $optionalConfig = false) {
 
 		/* Blasphemy (heresy unavoidable)
@@ -73,6 +80,19 @@ class MSSQL {
 		}
 	}
 
+	/**
+	 * Gets static instance of this class (with default settings). Should be
+     * alright as this never gets called
+	 *
+	 * @return self
+	 */
+	public static function getInstance() {
+		if (!self::$instance) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
 	function connect() {
 		if(!isset($this->dbf))
 			$this->dbf = mssql_connect($this->host, $this->user, $this->passwd);
@@ -95,10 +115,12 @@ class MSSQL {
 	}
 
 	/**
-	 * Installs the PHP debug bar collector into this object, and returns it.
+	 * Installs the PHP debug bar collector into this object.
 	 */
 	public function installCollector() {
-		$this->collector = new MssqlDatabaseCollector($this->dbf);
+		if (!($this->collector instanceof MssqlDatabaseCollector)) {
+			$this->collector = new MssqlDatabaseCollector($this->dbf);
+		}
 	}
 
 	/**
