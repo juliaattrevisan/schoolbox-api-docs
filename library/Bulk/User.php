@@ -92,6 +92,7 @@ class Bulk_User extends Bulk_Abstract {
 							$userCampus[] = $campus;
 						}
 					}
+					$userCampus = array_unique(array_filter($userCampus));
 
 					/* New User object
 					 */
@@ -109,6 +110,15 @@ class Bulk_User extends Bulk_Abstract {
 						'mail_handler' => $user[11],
 						'alt_email' => $user[12],
 					);
+
+					if (empty($userCampus)) {
+						$output[] = array(
+							'username' => $user['username'] . ' (' . $newUser['firstname'] . ' ' . $newUser['lastname'] . ')',
+							'status' => 'Not Added',
+							'error' => 'No valid campus IDs',
+						);
+						continue;
+					}
 
 					$result = $userHandler->create($newUser);
 
