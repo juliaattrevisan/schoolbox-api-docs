@@ -2,8 +2,11 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css"/>
 <script type="text/javascript"
         src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript">
-$j(document).ready(function () {
+$j(function() {
+
+  var threePanel = new ThreePanelView('/ajax/resource/networkMeta.php', 'network')
 
     /* left tree navigation */
     $j('#tree').tree({
@@ -28,6 +31,8 @@ $j(document).ready(function () {
 
         var relationID = $j(this).attr('id').substring(5);
         var files = $j('tr.category-' + relationID + ':not(.empty)');
+
+        threePanel.getMeta(relationID);
 
         if (files.length > 0) {
             /* files exist, show them */
@@ -142,6 +147,8 @@ $j(document).ready(function () {
 
             $j('#file-list tr.current').removeClass('current');
             $j(this).addClass('current');
+
+            threePanel.getMeta(relationID, $j('#file-list tr.selected'));
         });
 
         /* drag files */
@@ -222,27 +229,91 @@ $j(document).ready(function () {
     /* auto scroll to open branch
      */
     $j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
+
+  threePanel.getMeta({OPEN});
+
+  threePanel.resizePanels()
+  $j(window).resize(threePanel.resizePanels());
+
+  var actions = {
+    cms : {
+      f_open : function(kind, id) {
+        window.open("", "_blank")
+        return true
+      },
+      f_download : function(kind, id) {
+        window.open("/cms/sendNetworkFile.php?id="+id, "_blank")
+        return true
+      },
+      f_modify : function(kind, id) {
+        window.open("/cms/networkFile/"+id, "_self")
+        return true
+      },
+      f_delete : function(kind, id) {
+        if (confirm("Are you sure you want to delete this file?")) {
+          window.open("/cms/networkFileForm.php?delete="+id, "_self")
+          return true
+        }
+        return false
+      },
+      f_properties : function(kind, id) {
+
+      }
+    },
+    folder : {
+      f_modify : function(id) {
+        window.open("/cms/networkFolder/"+id, "_self")
+        return true
+      },
+      f_delete : function(id) {
+        if (confirm("Are you sure you want to delete this folder and its contents?")) {
+          window.open("/cms/networkFolderForm.php?delete="+id, "_self")
+          return true
+        }
+        return false
+      },
+//      f_download : function(id) {
+//      },
+      f_folder : function(id) {
+        window.open("/cms/networkFolder/new/"+id, "_self")
+        return true
+      },
+      f_file : function(id) {
+        window.open("/cms/networkFile/new/"+id, "_self")
+        return true
+//      },
+//      f_zip : function(id) {
+      }
+    },
+    multi : {
+      f_delete : function() {
+        var selected = $j('#file-list tr.selected'), fileList = '', id
+
+        if(selected.length > 1) {
+          selected.each(function() {
+            fileList += $j(this).attr("id").substring(5) + ','
+          })
+          if (confirm("Are you sure you want to delete this selection?")) {
+            window.open("/cms/fileForm.php?fileList="+fileList+"&deleteList=1", "_self")
+            return true
+          }
+        }
+        return false
+      }
+    }
+  };
+
+  $j(document).ready(function() {
+    threePanel.actionBind(actions)
+  });
 });
 </script>
 <style type="text/css">
 
         /* wrap mimetypes in classes */
-    <!--
-    BEGIN allowed_files
-
-    -->
-    span.file. {
-        NAME
-    }
-
-    {
-        background-image: url(/images/mime/22x22/{ICON})
-    ;
-    }
-    <!--
-    END allowed_files
-
-    -->
+    <!-- BEGIN allowed_files -->
+    span.file.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
+    <!-- END allowed_files -->
 
 </style>
 <!--[if lt IE 7]>
@@ -257,7 +328,7 @@ $j(document).ready(function () {
 </style>
 <![endif]-->
 <!-- END custom_head -->
-<div class="template4">
+<div class="template3">
     <div class="left">
         <div id="category-window">
             <div class="loading"></div>
@@ -298,7 +369,7 @@ $j(document).ready(function () {
         </div>
     </div>
 
-    <div class="right">
+    <div class="center">
         <div id="file-window">
             <div class="loading"></div>
 
@@ -340,4 +411,82 @@ $j(document).ready(function () {
             </div>
         </div>
     </div>
+
+  <div class="right">
+    <div id="detail-window">
+      <div class="loading">
+        <img src="/images/resources/ajax.gif" />
+      </div>
+
+      <!-- BEGIN folder_detail -->
+      <div class="rfolder detail" id="folder-detail">
+        <img src="{FOLDER_MIME_IMG}" alt="{FOLDER_NAME}" />
+        <h3 class="rfolder name">{FOLDER_NAME}</h3>
+        <p class="rfolder template">{FOLDER_TEMPLATE}</p>
+        <p class="rfolder type">
+          <span class="rfolder type">{FOLDER_TYPE}</span>
+          <a data-action="join" class="rfolder join-btn btn groups">
+            <span></span>Join
+          </a>
+          <span class="pending">Membership pending approval</span>
+        </p>
+
+        <div class="rfolder actions clearfix">
+          <h4 class="rfolder actions">Actions</h4>
+          <a class="btn rhomepage" data-action="homepage"><span></span>View Homepage</a>
+          <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
+          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+          <a class="btn download rdownload" data-action="download"><span></span>Download</a>
+          <a class="btn add rfolder" data-action="folder"><span></span>Add Folder</a>
+          <a class="btn create rfile" data-action="file"><span></span>Post File</a>
+          <a class="btn up-arrow rzip" data-action="zip"><span></span>Upload ZIP</a>
+        </div>
+
+        <h4 class="rfolder perms">Permissions</h4>
+        <table class="rfolder perms">
+          <!-- BEGIN folder_detail_perms -->
+          <tr class="{ON_OFF}">
+            <th scope="row">{FOLDER_PERM_GROUP}:</th><td>{FOLDER_PERM_ACCESS}</td>
+          </tr>
+          <!-- END folder_detail_perms -->
+        </table>
+      </div>
+      <!-- END folder_detail -->
+
+      <!-- BEGIN file_detail -->
+      <div class="rfile detail" id="file-detail">
+        <img src="{FILE_MIME_IMG}" alt="{FILE_NAME}" />
+        <h3 class="rfile name">{FILE_NAME}</h3>
+        <p class="rfile filesize">({FILE_SIZE})</p>
+        <p class="rfile hidden-warning"><span class="i" title="This file cannot be seen by users who do not have write permissions in this folder"></span>(Hidden)</p>
+        <p class="rfile description">{FILE_DESCRIPTION}</p>
+        <p class="rfile meta">
+          Posted by <span class="meta-who">{FILE_POSTED_BY}</span> on <span class="meta-when">{FILE_POSTED_DATE}</span>,
+          last modified <span class="meta-modified-when">{FILE_MODIFIED_DATE}</span>
+        </p>
+        <div class="rfile actions">
+          <h4 class="rfile actions">Actions</h4>
+          <a class="btn open ropen" data-action="open"><span></span>Open</a>
+          <a class="btn download rdownload" data-action="download"><span></span>Download</a>
+          <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
+          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+          <a class="btn report rproperties" data-action="properties"><span></span>Properties</a>
+        </div>
+      </div>
+      <!-- END file_detail -->
+
+      <!-- BEGIN multi_file_detail -->
+      <div class="rmultifile detail" id="multi-file-detail">
+        <img src="{MULTIFILE_MIME_IMG}" alt="Multiple files selected" />
+        <h3 class="rmultifile count">{MULTIFILE_COUNT}</h3>
+        <div class="rmultifile actions">
+          <h4 class="rmultifile actions">Actions</h4>
+          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+        </div>
+      </div>
+      <!-- END multi_file_detail -->
+
+    </div>
+  </div>
+
 </div>

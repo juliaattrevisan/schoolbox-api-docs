@@ -38,7 +38,8 @@ if (is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('location_block', '');
 
-} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+}
+elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     /* Add new file to system */
     if ($this->arg[1] == 0) {
@@ -66,6 +67,7 @@ if (is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('desc_block', '');
     $this->setVar('location_block', '');
-} else {
+}
+else {
     error(2);
 }

@@ -44,6 +44,8 @@ if (!is_array($folderList)) {
     $folderList = $folderHandler->getFolderNode($openFolder);
 }
 
+$this->setVar('OPEN', $openFolder);
+
 if (is_array($folderList)) {
     foreach ($folderList as $folder) {
 
