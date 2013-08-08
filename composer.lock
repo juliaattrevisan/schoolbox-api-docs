@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "6397c85e8aacd2424aa24fc7d1696536",
+    "hash": "93e8878d339cf165cfb9efe3439b4d4f",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -51,16 +51,16 @@
         },
         {
             "name": "maximebf/debugbar",
-            "version": "1.0.4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maximebf/php-debugbar.git",
-                "reference": "1.0.4"
+                "reference": "b33cfcd79d691af3216ec60588a1d138ac11db7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/1.0.4",
-                "reference": "1.0.4",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/b33cfcd79d691af3216ec60588a1d138ac11db7b",
+                "reference": "b33cfcd79d691af3216ec60588a1d138ac11db7b",
                 "shasum": ""
             },
             "require": {
@@ -96,7 +96,7 @@
             "keywords": [
                 "debug"
             ],
-            "time": "2013-08-04 12:01:49"
+            "time": "2013-08-07 23:15:53"
         },
         {
             "name": "psr/log",
@@ -1680,9 +1680,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "maximebf/debugbar": 20
+    },
     "platform": [
 
     ],
