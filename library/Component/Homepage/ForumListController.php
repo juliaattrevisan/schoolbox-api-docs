@@ -40,6 +40,10 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
                 $this->getContext('id')
         );
 
+	    if($this->source === false) {
+		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+	    }
+
         $this->sortFields = array('Threads', 'Posts');
     }
 

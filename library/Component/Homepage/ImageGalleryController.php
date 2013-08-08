@@ -39,6 +39,10 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
                 $this->getConfig('src') :
                 $this->getContext('id')
         );
+
+	    if($this->source === false) {
+		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+	    }
     }
 
     /**

@@ -45,6 +45,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 $this->getContext('id')
         );
 
+	    if($this->source === false) {
+		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+	    }
+
         $this->sortFields = array('Name', 'Date');
     }
 

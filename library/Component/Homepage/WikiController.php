@@ -40,6 +40,10 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                 $this->getContext('id')
         );
 
+	    if($this->source === false) {
+		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+	    }
+
         // specify the sorting fields this module uses
         $this->sortFields = array('Heading', 'Created', 'Modified');
 
