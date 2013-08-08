@@ -34,6 +34,10 @@ class MSSQL {
 	 */
 	protected $previous_encoding = null;
 
+	/**
+	 * @var \Debug\DataCollector\MssqlDatabaseCollector
+	 */
+	protected $collector = null;
 
 	function MSSQL($db = false, $optionalConfig = false) {
 
@@ -87,17 +91,36 @@ class MSSQL {
 			return false;
 	}
 
+	/**
+	 * Installs the PHP debug bar collector into this object, and returns it.
+	 */
+	public function installCollector() {
+		$this->collector = new Debug\DataCollector\MssqlDatabaseCollector($this->dbf);
+	}
+
+	/**
+	 * @return \Debug\DataCollector\DeprecatedDatabaseCollector
+	 */
+	public function getCollector() {
+		return $this->collector;
+	}
+
 	function query($sql_q)
 	{
 		if($this->dbf) {
-			$this->result = mssql_query($sql_q, $this->dbf);
+			if ($this->collector instanceof \Debug\DataCollector\MssqlDatabaseCollector) {
+				$this->result = $this->collector->query($sql_q);
+			}
+			else {
+				$this->result = mssql_query($sql_q, $this->dbf);
 
-			if ($this->result == false) {
-				if($this->debug)
-					print "<b>Query:</b> $sql_q<br />";
-				else
-					error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
+				if ($this->result == false) {
+					if($this->debug)
+						print "<b>Query:</b> $sql_q<br />";
+					else
+						error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
 
+				}
 			}
 
 			return $this->result;
