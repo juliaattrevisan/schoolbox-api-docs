@@ -10,7 +10,7 @@ class SitePage extends Page {
     public function SitePage($login = true) {
         parent::Page();
 
-        $this->db = new DeprecatedDatabase;
+        $this->db = DeprecatedDatabase::getInstance();
 
         if ($login) {
             $this->initSession();
@@ -309,7 +309,7 @@ class SitePage extends Page {
 
     function error($ec, $message = "") {
 
-        $db = new DeprecatedDatabase(SQL_db, 1);
+        $db = DeprecatedDatabase::getInstance();
 
         $query = "SELECT message FROM error WHERE id = '$ec'";
         $error = $db->getRow($query);

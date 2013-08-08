@@ -4,7 +4,7 @@ class Session
 {
     function  __construct()
     {
-        $this->db = new DeprecatedDatabase;
+        $this->db = DeprecatedDatabase::getInstance();
     }
 
     /**
