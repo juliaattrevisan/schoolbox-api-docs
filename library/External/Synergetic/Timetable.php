@@ -22,7 +22,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		$this->setDatabase( new MSSQL() );
 		if (DebugBar::isEnabled()) {
 			$this->getDatabase()->installCollector();
-			DebugBar::getInstance()->addCollector($this->getDatabase()->getCollector());
+			/** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
+			$collector = $this->getDatabase()->getCollector();
+			if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
+				DebugBar::getInstance()->addCollector($collector);
+			}
 		}
 		$this->groupHandler = new Group;
 

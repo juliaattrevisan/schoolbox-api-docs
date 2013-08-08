@@ -19,7 +19,11 @@ class External_Synergetic_Class implements External_ClassInterface
         $this->setDatabase(new MSSQL());
         if (DebugBar::isEnabled()) {
             $this->getDatabase()->installCollector();
-            DebugBar::getInstance()->addCollector($this->getDatabase()->getCollector());
+            /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
+            $collector = $this->getDatabase()->getCollector();
+            if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
+                DebugBar::getInstance()->addCollector($collector);
+            }
         }
     }
 
