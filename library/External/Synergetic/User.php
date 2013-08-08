@@ -19,6 +19,10 @@ class External_Synergetic_User implements External_UserInterface {
 	 */
 	public function __construct() {
 		$this->setDatabase(new MSSQL());
+		if (Debug\DebugBar::isEnabled()) {
+			$this->getDatabase()->installCollector();
+			\Debug\DebugBar::getInstance()->addCollector($this->getDatabase()->getCollector());
+		}
 		$this->setGroup(new Group());
 	}
 

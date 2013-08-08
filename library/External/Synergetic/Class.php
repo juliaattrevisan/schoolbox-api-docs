@@ -15,6 +15,10 @@ class External_Synergetic_Class implements External_ClassInterface
     function __construct()
     {
         $this->setDatabase(new MSSQL());
+        if (Debug\DebugBar::isEnabled()) {
+            $this->getDatabase()->installCollector();
+            \Debug\DebugBar::getInstance()->addCollector($this->getDatabase()->getCollector());
+        }
     }
 
 	public function getClass($classCode) {
