@@ -26,7 +26,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 		$this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
 
         // use defaults to connect to Synergetic for passwords
-        $link = new MSSQL();
+        $link = MSSQL::getInstance();
         $link->query("
             SELECT vCommunityAddresses.id AS SynergyID,
                    CommunityAttributes.AttributeCode AS CommunityAttribute,

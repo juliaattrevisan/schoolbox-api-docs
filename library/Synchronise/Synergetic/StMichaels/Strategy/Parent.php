@@ -33,7 +33,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 	public function generateList() {
 
         // replicate the query from the synergetic user handler and join it to the passwords table
-        $link = new MSSQL();
+        $link = MSSQL::getInstance();
 
         $query = "
 			SELECT DISTINCT

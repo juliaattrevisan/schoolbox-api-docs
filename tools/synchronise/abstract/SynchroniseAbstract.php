@@ -74,7 +74,7 @@ class SynchroniseAbstract {
     /* all private methods with 'Schoolbox' or the current db name will be picked up by the reflection in diagnose() */
 
     private function lookupSynergeticCampusCodes() {
-        $db = new MSSQL();
+        $db = MSSQL::getInstance();
         $campuses = $db->getAll("SELECT DISTINCT( ClassCampus ) AS campus FROM timetable");
         echo "Campus Codes in Synergetic\n";
         foreach ($campuses as $c) {

@@ -89,7 +89,7 @@ if ($class) {
 
 	/* Get the attendance record for this class
 	 */
-	$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], new MSSQL());
+	$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
 	$attendanceHandler->findAttendanceRecords();
 
 	/* If the roll has been marked before, just show the students that were originally
