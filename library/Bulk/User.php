@@ -113,7 +113,7 @@ class Bulk_User extends Bulk_Abstract {
 
 					if (empty($userCampus)) {
 						$output[] = array(
-							'username' => $user['username'] . ' (' . $newUser['firstname'] . ' ' . $newUser['lastname'] . ')',
+							'username' => $newUser['username'] . ' (' . $newUser['firstname'] . ' ' . $newUser['lastname'] . ')',
 							'status' => 'Not Added',
 							'error' => 'No known campuses',
 						);
