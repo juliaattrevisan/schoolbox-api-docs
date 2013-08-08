@@ -154,7 +154,7 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
      * {@inheritDoc}
      */
     public function getName() {
-        return 'oldDatabase';
+        return $this->widget_name;
     }
 
     /**
@@ -164,11 +164,11 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
         return array(
             $this->widget_name => array(
                 "widget"  => "PhpDebugBar.Widgets.SQLQueriesWidget",
-                "map"     => "oldDatabase",
+                "map"     => $this->widget_name,
                 "default" => "[]"
             ),
             $this->widget_name.":badge" => array(
-                "map"     => "oldDatabase.nb_statements",
+                "map"     => $this->widget_name.".nb_statements",
                 "default" => 0
             )
         );
