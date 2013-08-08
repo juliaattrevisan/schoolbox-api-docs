@@ -14,6 +14,8 @@ use DebugBar\DataCollector\Renderable;
 
 class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
 
+    protected $widget_name = 'oldDatabase';
+
     /**
      * The MySQL database connection, created by mysql_connect
      *
@@ -43,25 +45,18 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
      * @return resource Query resource, or boolean success|failure
      */
     public function query($query) {
+        $start  = microtime(true);
+        $result = $this->getResult($query);
         $statement = array(
             'sql'           => $query,
             'prepared_stmt' => $query,
             'params'        => array(),
-            'is_success'    => true,
+            'is_success'    => $this->isSuccessful($result),
+            'row_count'     => $this->getRowCount($result),
+            'error_code'    => $this->getErrorCode(),
+            'error_message' => $this->getErrorMessage(),
         );
-        $start  = microtime(true);
-        $result = mysql_query($query, $this->connection);
-        if ($result === true) {
-            $statement['row_count'] = mysql_affected_rows($this->connection);
-        }
-        elseif (is_resource($result)) {
-            $statement['row_count'] = mysql_num_rows($result);
-        }
-        else {
-            $statement['is_success']    = false;
-            $statement['error_code']    = mysql_errno($this->connection);
-            $statement['error_message'] = mysql_error($this->connection);
-        }
+
         $duration = microtime(true) - $start;
         $memory   = memory_get_peak_usage(true);
         $statement['duration']     = $duration;
@@ -70,6 +65,60 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
         $statement['memory_str']   = $this->formatBytes($memory);
         $this->statements[] = $statement;
         return $result;
+    }
+
+    /**
+     * Runs query and returns result
+     *
+     * @param  string $query
+     * @return resource|bool
+     */
+    protected function getResult($query) {
+        return mysql_query($query, $this->connection);
+    }
+
+    /**
+     * Gets row count from result
+     *
+     * @param  resource|bool $result
+     * @return int
+     */
+    protected function getRowCount($result) {
+        if ($result === true) {
+            return mysql_affected_rows($this->connection);
+        }
+        elseif (is_resource($result)) {
+            return mysql_num_rows($result);
+        }
+        return null;
+    }
+
+    /**
+     * Gets error code from last query
+     *
+     * @return int
+     */
+    protected function getErrorCode() {
+        return mysql_errno($this->connection);
+    }
+
+    /**
+     * Gets error from last query
+     *
+     * @return string
+     */
+    protected function getErrorMessage() {
+        return mysql_error($this->connection);
+    }
+
+    /**
+     * Gets whether result from getResult() is successful
+     *
+     * @param  resource|bool $result
+     * @return bool
+     */
+    protected function isSuccessful($result) {
+        return $result === true || is_resource($result);
     }
 
     /**
@@ -113,12 +162,12 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
      */
     public function getWidgets() {
         return array(
-            "oldDatabase" => array(
+            $this->widget_name => array(
                 "widget"  => "PhpDebugBar.Widgets.SQLQueriesWidget",
                 "map"     => "oldDatabase",
                 "default" => "[]"
             ),
-            "oldDatabase:badge" => array(
+            $this->widget_name.":badge" => array(
                 "map"     => "oldDatabase.nb_statements",
                 "default" => 0
             )
