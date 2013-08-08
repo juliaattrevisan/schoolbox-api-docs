@@ -7,6 +7,8 @@
  *                                                           *
  ************************************************************/
 
+use Alaress\DebugBar\Instance as DebugBar;
+
 class External_Synergetic_Class implements External_ClassInterface
 {
 
@@ -15,9 +17,9 @@ class External_Synergetic_Class implements External_ClassInterface
     function __construct()
     {
         $this->setDatabase(new MSSQL());
-        if (Debug\DebugBar::isEnabled()) {
+        if (DebugBar::isEnabled()) {
             $this->getDatabase()->installCollector();
-            \Debug\DebugBar::getInstance()->addCollector($this->getDatabase()->getCollector());
+            DebugBar::getInstance()->addCollector($this->getDatabase()->getCollector());
         }
     }
 

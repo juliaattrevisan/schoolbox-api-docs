@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Debug\DataCollector;
+namespace Alaress\DebugBar\DataCollector;
 
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;

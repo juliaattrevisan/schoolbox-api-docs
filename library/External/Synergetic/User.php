@@ -7,6 +7,8 @@
  *                                                           *
  ************************************************************/
 
+use Alaress\DebugBar\Instance as DebugBar;
+
 class External_Synergetic_User implements External_UserInterface {
 	/**
 	 * @var MSSQL
@@ -19,9 +21,9 @@ class External_Synergetic_User implements External_UserInterface {
 	 */
 	public function __construct() {
 		$this->setDatabase(new MSSQL());
-		if (Debug\DebugBar::isEnabled()) {
+		if (DebugBar::isEnabled()) {
 			$this->getDatabase()->installCollector();
-			\Debug\DebugBar::getInstance()->addCollector($this->getDatabase()->getCollector());
+			DebugBar::getInstance()->addCollector($this->getDatabase()->getCollector());
 		}
 		$this->setGroup(new Group());
 	}

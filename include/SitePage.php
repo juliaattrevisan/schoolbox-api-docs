@@ -158,8 +158,8 @@ class SitePage extends Page {
         $debug_bar_head = '';
         $debug_bar_body = '';
 
-        if (Debug\DebugBar::isEnabled()) {
-            $renderer = Debug\DebugBar::getInstance()->getJavascriptRenderer();
+        if (Alaress\DebugBar\Instance::isEnabled()) {
+            $renderer = Alaress\DebugBar\Instance::getInstance()->getJavascriptRenderer();
             $renderer->setBaseUrl('/debugbar/');
             $debug_bar_head = $renderer->renderHead();
             $debug_bar_body = $renderer->render();

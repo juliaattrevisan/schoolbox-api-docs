@@ -17,8 +17,8 @@ class Alaress_Probe {
 	 * @param $dataStructure
 	 */
 	public function __construct($dataStructure) {
-		if (Debug\DebugBar::isEnabled()) {
-			Debug\DebugBar::getInstance()->getCollector('messages')->addMessage($dataStructure);
+		if (DebugBar\Instance::isEnabled()) {
+			DebugBar\Instance::getInstance()->getCollector('messages')->addMessage($dataStructure);
 		}
 		else {
 			echo "<pre>";

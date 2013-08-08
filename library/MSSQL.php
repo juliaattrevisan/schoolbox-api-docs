@@ -8,6 +8,9 @@
 *	It also includes error handling and a debug mode.		*
 *                                                           *
 ************************************************************/
+
+use Alaress\DebugBar\DataCollector\MssqlDatabaseCollector;
+
 class MSSQL {
 
 	/**
@@ -35,7 +38,7 @@ class MSSQL {
 	protected $previous_encoding = null;
 
 	/**
-	 * @var \Debug\DataCollector\MssqlDatabaseCollector
+	 * @var MssqlDatabaseCollector
 	 */
 	protected $collector = null;
 
@@ -95,11 +98,11 @@ class MSSQL {
 	 * Installs the PHP debug bar collector into this object, and returns it.
 	 */
 	public function installCollector() {
-		$this->collector = new Debug\DataCollector\MssqlDatabaseCollector($this->dbf);
+		$this->collector = new MssqlDatabaseCollector($this->dbf);
 	}
 
 	/**
-	 * @return \Debug\DataCollector\DeprecatedDatabaseCollector
+	 * @return MssqlDatabaseCollector
 	 */
 	public function getCollector() {
 		return $this->collector;
@@ -108,7 +111,7 @@ class MSSQL {
 	function query($sql_q)
 	{
 		if($this->dbf) {
-			if ($this->collector instanceof \Debug\DataCollector\MssqlDatabaseCollector) {
+			if ($this->collector instanceof MssqlDatabaseCollector) {
 				$this->result = $this->collector->query($sql_q);
 			}
 			else {

@@ -7,15 +7,15 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Debug;
+namespace Alaress\DebugBar;
 
 use Config;
 use DebugBar\StandardDebugBar;
 
-class DebugBar {
+class Instance {
 
     /**
-     * @return \DebugBar\DebugBar
+     * @return StandardDebugBar
      */
     protected static $debug_bar;
 
@@ -29,7 +29,7 @@ class DebugBar {
     /**
      * Retrieves the debug bar.
      *
-     * @return \DebugBar\DebugBar
+     * @return StandardDebugBar
      */
     public static function getInstance() {
         if (!isset(self::$debug_bar)) {

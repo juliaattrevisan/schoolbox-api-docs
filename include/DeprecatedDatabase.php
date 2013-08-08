@@ -11,6 +11,8 @@
 *                                                           *
 ************************************************************/
 
+use Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector;
+
 class DeprecatedDatabase
 {
 
@@ -18,7 +20,7 @@ class DeprecatedDatabase
 static private $instance = false;
 
 /**
- * @var \Debug\DataCollector\DeprecatedDatabaseCollector
+ * @var Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector
  */
 protected $collector;
 
@@ -77,7 +79,7 @@ function changeDb($db)
 /* Returns the result resource for the query, also saves the result resource as a object var */
 function query($sql_q)
 {
-	if ($this->debug && $this->collector instanceof \Debug\DataCollector\DeprecatedDatabaseCollector) {
+	if ($this->debug && $this->collector instanceof DeprecatedDatabaseCollector) {
 		$this->result = $this->collector->query($sql_q);
 	}
 	else {
@@ -313,11 +315,11 @@ function endQuery($result = 0)
  * Installs the PHP debug bar collector into this object, and returns it.
  */
 public function installCollector() {
-    $this->collector = new Debug\DataCollector\DeprecatedDatabaseCollector($this->dbf);
+    $this->collector = new DeprecatedDatabaseCollector($this->dbf);
 }
 
 /**
- * @return \Debug\DataCollector\DeprecatedDatabaseCollector
+ * @return DeprecatedDatabaseCollector
  */
 public function getCollector() {
     return $this->collector;

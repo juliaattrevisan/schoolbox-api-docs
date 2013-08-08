@@ -8,6 +8,9 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\DebugBar\DataCollector\XhprofCollector;
+
 /* Load Configuration Files */
 require_once dirname(__FILE__) . '/../www/conf/conf.php';
 
@@ -29,8 +32,8 @@ Autoloader::initialise();
 // Set up the debug bar, and add listeners for various parts of the debug bar
 // (database calls, XHProf)
 // Should go in a DI container instead of a static class.
-if ($is_debug_enabled = Debug\DebugBar::isEnabled()) {
-    Debug\DebugBar::init();
+if ($is_debug_enabled = DebugBar::isEnabled()) {
+    DebugBar::init();
 }
 
 //
@@ -38,14 +41,14 @@ if ($is_debug_enabled = Debug\DebugBar::isEnabled()) {
 if ($is_debug_enabled && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
     include_once '/usr/share/php5-xhprof/xhprof_lib/utils/xhprof_lib.php';
     include_once '/usr/share/php5-xhprof/xhprof_lib/utils/xhprof_runs.php';
-    Debug\DebugBar::getInstance()->addCollector(new Debug\DataCollector\XhprofCollector());
+    DebugBar::getInstance()->addCollector(new XhprofCollector());
 }
 
 /* Configure Database connection */
 $database = Database::getInstance();
 $database->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => $is_debug_enabled));
 if ($is_debug_enabled) {
-    $debug_bar = Debug\DebugBar::getInstance();
+    $debug_bar = Alaress\DebugBar\Instance::getInstance();
     $debug_bar->addCollector($database->getCollector());
 
     $deprecated_database = DeprecatedDatabase::getInstance();
