@@ -47,7 +47,12 @@ $database->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => $is_debug_ena
 if ($is_debug_enabled) {
     $debug_bar = Debug\DebugBar::getInstance();
     $debug_bar->addCollector($database->getCollector());
+
+    $deprecated_database = DeprecatedDatabase::getInstance();
+    $deprecated_database->installCollector();
+    $debug_bar->addCollector($deprecated_database->getCollector());
 }
+
 
 /* Set default time zone */
 date_default_timezone_set(Cfg::get('date_timezone'));
