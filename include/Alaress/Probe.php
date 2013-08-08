@@ -9,6 +9,9 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+
+use Alaress\DebugBar\Instance as DebugBar;
+
 class Alaress_Probe {
 
 	/**
@@ -17,8 +20,8 @@ class Alaress_Probe {
 	 * @param $dataStructure
 	 */
 	public function __construct($dataStructure) {
-		if (DebugBar\Instance::isEnabled()) {
-			DebugBar\Instance::getInstance()->getCollector('messages')->addMessage($dataStructure);
+		if (DebugBar::isEnabled()) {
+			DebugBar::getInstance()->getCollector('messages')->addMessage($dataStructure);
 		}
 		else {
 			echo "<pre>";

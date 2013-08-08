@@ -36,6 +36,9 @@ if ($is_debug_enabled = DebugBar::isEnabled()) {
     DebugBar::init();
 }
 
+
+new Alaress_Probe($_REQUEST);
+
 //
 // XHProf on the debug bar.
 if ($is_debug_enabled && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
