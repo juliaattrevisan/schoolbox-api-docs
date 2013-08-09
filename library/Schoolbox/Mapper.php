@@ -628,11 +628,15 @@ class Mapper {
 	 * @return Collection
 	 */
 	public function findIn($column, $permittedValues, $deleted = false) {
-		$statement = $this->database->prepare("
+		$query = "
 			SELECT {$this->getColumnString()}
 			FROM `{$this->table}`
 			WHERE `{$column}` IN {$this->getArrayPlaceholders($permittedValues, 'val')}
-		");
+		";
+		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+			$query .= ' AND '.$delete_part;
+		}
+		$statement = $this->database->prepare($query);
 
 		$statement->execute($this->getArrayParameters($permittedValues, 'val'));
 
@@ -647,12 +651,11 @@ class Mapper {
 	 * @return Collection
 	 */
 	public function findAll($deleted = false) {
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-		"
-		);
+		$query = "SELECT {$this->getColumnString()} FROM `{$this->table}`";
+		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+			$query .= ' WHERE '.$delete_part;
+		}
+		$statement = $this->database->prepare($query);
 
 		$statement->execute();
 
@@ -703,11 +706,11 @@ class Mapper {
 	 * @return Collection
 	 */
 	public function findByColumn($columnName, $columnValue, $deleted = false) {
-		$statement = $this->database->prepare("
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE `{$columnName}` = :$columnName
-		");
+		$query = "SELECT {$this->getColumnString()} FROM `{$this->table}` WHERE `{$columnName}` = :$columnName";
+		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+			$query .= ' AND '.$delete_part;
+		}
+		$statement = $this->database->prepare($query);
 		$statement->bindParam(":$columnName", $columnValue);
 		$statement->execute();
 		return $this->hydrateList($statement->fetchAll());
@@ -770,6 +773,9 @@ class Mapper {
 				}
 			}
 			$query .= implode(' AND ', $where_parts);
+		}
+		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+			$query .= (empty($columnList) ? ' WHERE ' : ' AND ').$delete_part;
 		}
 
 		$statement = $this->database->prepare($query);
@@ -1072,6 +1078,22 @@ class Mapper {
 			$e->setDeletedObject($model);
 			throw $e;
 		}
+	}
+
+	/**
+	 * Retrieves an SQL fragment for filtering out soft-deleted items.
+	 *
+	 * @return string
+	 */
+	protected function getSoftDeleteFilterSql() {
+		if (isset($this->soft_delete_column)) {
+			$value = $this->soft_delete_undeleted_value;
+			if (!isset($value)) {
+				return "`{$this->soft_delete_column}` IS NULL";
+			}
+			return "`{$this->soft_delete_column}` = ".$this->database->quote($value);
+		}
+		return null;
 	}
 
 	/**
