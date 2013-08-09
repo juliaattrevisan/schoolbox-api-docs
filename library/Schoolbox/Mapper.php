@@ -1083,15 +1083,20 @@ class Mapper {
 	/**
 	 * Retrieves an SQL fragment for filtering out soft-deleted items.
 	 *
+	 * @param  string $alias The alias used for this table, if any.
 	 * @return string
 	 */
-	protected function getSoftDeleteFilterSql() {
+	protected function getSoftDeleteFilterSql($alias = null) {
 		if (isset($this->soft_delete_column)) {
 			$value = $this->soft_delete_undeleted_value;
-			if (!isset($value)) {
-				return "`{$this->soft_delete_column}` IS NULL";
+			$column = "`{$this->soft_delete_column}`";
+			if (isset($alias)) {
+				$column = "`$alias`.$column";
 			}
-			return "`{$this->soft_delete_column}` = ".$this->database->quote($value);
+			if (!isset($value)) {
+				return "$column IS NULL";
+			}
+			return "$column = ".$this->database->quote($value);
 		}
 		return null;
 	}
