@@ -8,13 +8,14 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 namespace Schoolbox\Resource;
 use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 
-class File {
+class File implements ISoftDeletable {
 	/**
 	 * @var int
 	 */
@@ -74,6 +75,11 @@ class File {
 	 * @var IConfigLoader
 	 */
 	protected $config_loader;
+
+	/**
+	 * @var bool
+	 */
+	protected $deleted;
 
 	/**
 	 * Creates object and sets up sub-objects.
@@ -256,6 +262,25 @@ class File {
 		return $this->filesize;
 	}
 
+	/**
+	 * @param  boolean $deleted
+	 *
+	 * @return $this
+	 */
+	public function setDeleted($deleted) {
+		$this->deleted = $deleted;
+		return $this;
+	}
 
+	/**
+	 * @return boolean
+	 */
+	public function getDeleted() {
+		return $this->deleted;
+	}
+
+	public function isDeleted() {
+		return $this->getDeleted();
+	}
 
 }

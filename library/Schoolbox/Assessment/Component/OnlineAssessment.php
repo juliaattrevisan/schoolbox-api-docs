@@ -12,11 +12,12 @@
 namespace Schoolbox\Assessment\Component;
 
 use \Alaress_Date_Format;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
-class OnlineAssessment {
+class OnlineAssessment implements ISoftDeletable {
 
 	const AVAILABILITY_ASSESS = 'assess';
 	const AVAILABILITY_SURVEY = 'survey';

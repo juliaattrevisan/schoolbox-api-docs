@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\Component\SubmissionBox\File;
 use Schoolbox\Assessment\Component\SubmissionBox\FileCollection;
@@ -18,7 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\User;
 
-class SubmissionBox {
+class SubmissionBox implements ISoftDeletable {
 
 	const MARK_VISIBILITY_PRIVATE        = 0;
 	const MARK_VISIBILITY_STUDENT        = 1;
