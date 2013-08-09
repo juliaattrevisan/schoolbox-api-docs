@@ -622,11 +622,12 @@ class Mapper {
 	 * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
 	 * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
 	 *
-	 * @param $column
-	 * @param $permittedValues
+	 * @param string $column
+	 * @param array  $permittedValues
+	 * @param bool   $deleted         If set to false, filters out deleted items.
 	 * @return Collection
 	 */
-	public function findIn($column, $permittedValues) {
+	public function findIn($column, $permittedValues, $deleted = false) {
 		$statement = $this->database->prepare("
 			SELECT {$this->getColumnString()}
 			FROM `{$this->table}`
@@ -642,9 +643,10 @@ class Mapper {
 
 	/**
 	 * @brief Retrieves the entire collection unfiltered
+	 * @param bool $deleted If set to false, filters out deleted items.
 	 * @return Collection
 	 */
-	public function findAll() {
+	public function findAll($deleted = false) {
 		$statement = $this->database->prepare(
 			"
 			SELECT {$this->getColumnString()}
@@ -694,10 +696,11 @@ class Mapper {
 	 *
 	 * @param String $columnName
 	 * @param String $columnValue
+	 * @param bool   $deleted     If set to false, filters out deleted items.
 	 *
 	 * @return Collection
 	 */
-	public function findByColumn($columnName, $columnValue) {
+	public function findByColumn($columnName, $columnValue, $deleted = false) {
 		$statement = $this->database->prepare("
 			SELECT {$this->getColumnString()}
 			FROM `{$this->table}`
@@ -735,9 +738,10 @@ class Mapper {
 	/**
 	 * @brief Returns a collection with models which match the values pairs in the column list
 	 * @param Array $columnList
+	 * @param bool  $deleted    If set to false, filters out deleted items.
 	 * @return Bool|Collection
 	 */
-	public function findByColumnList($columnList) {
+	public function findByColumnList($columnList, $deleted = false) {
 		if (!is_array($columnList)) {
 			return false;
 		}
