@@ -66,8 +66,6 @@
 	php_value post_max_size 512M
 	php_flag session.use_trans_sid on
 	php_value session.gc_maxlifetime 43200
-	php_value session.cache_expire 43200
-	php_value session.cookie_lifetime 43200
 	php_value session.save_handler redis
 	php_value session.save_path "tcp://127.0.0.1:6379"
 	php_value newrelic.appname "Schoolbox 13.5"
