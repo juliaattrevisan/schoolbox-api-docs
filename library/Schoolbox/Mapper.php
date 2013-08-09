@@ -665,6 +665,7 @@ class Mapper {
 	 * Retreives a model by id
 	 *
 	 * @throws Exception if no instance of model is found
+	 * @throws Exception\Deleted if the model was found but has been deleted
 	 * @param  mixed  $identifierValue
 	 * @return object
 	 */
@@ -686,6 +687,7 @@ class Mapper {
 		$row = $statement->fetch();
 		if ($row != false) {
 			$model = $this->hydrate($row);
+			$this->throwIfDeleted($model);
 			return $model;
 		}
 		throw new Exception('Instance of object not found');
@@ -715,6 +717,7 @@ class Mapper {
 	 * Returns first model whose $columnName = $columnValue.
 	 *
 	 * @throws Exception if no instance of model is found
+	 * @throws Exception\Deleted if the model was found but has been deleted
 	 * @param  String $columnName
 	 * @param  String $columnValue
 	 * @return object
@@ -730,7 +733,9 @@ class Mapper {
 		$statement->execute();
 		$result = $statement->fetch();
 		if ($result) {
-			return $this->hydrate($result);
+			$model = $this->hydrate($result);
+			$this->throwIfDeleted($model);
+			return $model;
 		}
 		throw new Exception('Instance of object not found');
 	}
@@ -1051,6 +1056,22 @@ class Mapper {
 		}
 
 		return $model;
+	}
+
+	/**
+	 * Helper method used by methods for finding a single model - this throws an
+	 * exception if the model is deleted (it is an ISoftDeletable and isDeleted()
+	 * returns true)
+	 *
+	 * @throws Exception\Deleted if the model is marked as deleted.
+	 * @param  object $model
+	 */
+	protected function throwIfDeleted($model) {
+		if ($model instanceof ISoftDeletable && $model->isDeleted()) {
+			$e = new Exception\Deleted();
+			$e->setDeletedObject($model);
+			throw $e;
+		}
 	}
 
 	/**
