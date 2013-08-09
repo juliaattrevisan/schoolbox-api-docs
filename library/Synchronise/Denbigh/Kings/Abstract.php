@@ -33,12 +33,20 @@ abstract class Synchronise_Denbigh_Kings_Abstract extends Synchronise_Denbigh_Ab
     }
 
     protected function getGroupIDFromYearLevel($yearLevel) {
-        // all students are merely students, no distinction between groups
+        //
+        // Students in Primary school: group 5, otherwise group 3.
+        if ($yearLevel < 7) {
+            return 5;
+        }
         return $this::STUDENT_GROUP_ID;
     }
 
     protected function getCampusFromYearLevel($yearLevel) {
-        // single campus
+        //
+        // Students in Primary school: campus 3, otherwise campus 1.
+        if ($yearLevel < 7) {
+            return 3;
+        }
         return $this::DEFAULT_CAMPUS_ID;
     }
 
