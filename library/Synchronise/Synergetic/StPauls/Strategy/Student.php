@@ -78,7 +78,11 @@ class Synchronise_Synergetic_StPauls_Strategy_Student extends Synchronise_Synerg
 		/* Login details
 		 * We don't know how the password is given to us
 		 */
-		$newUser['username'] = $currentUser['NetworkLogin'];
+		$username = trim($currentUser['NetworkLogin']);
+		if (strlen($username) === 0) {
+			$username = str_pad($currentUser['StudentID'], 8, '0', STR_PAD_LEFT);
+		}
+		$newUser['username'] = $username;
 
 		/* User details
 		 */
