@@ -1276,6 +1276,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID'
             WHERE c.id $conditional AND sb.deleted IS FALSE
             AND YEAR(sb.date) = $this_year
+            AND sb.deleted IS FALSE
             GROUP BY sb.id
             ORDER BY sb.date ASC
             ";
@@ -1290,6 +1291,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id` AND aa.user_id = '$studentID'
             WHERE c.id $conditional
             AND a.availability = 'assess'
+            AND a.deleted_at IS NULL
             AND YEAR(a.finish) = $this_year
             GROUP BY a.assess_id
             ORDER BY a.finish ASC
