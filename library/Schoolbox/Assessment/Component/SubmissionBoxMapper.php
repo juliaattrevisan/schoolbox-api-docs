@@ -744,6 +744,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
 			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND sb.date BETWEEN :from_date AND :to_date
+			AND sb.deleted IS FALSE
 			ORDER BY sb.date ASC
 		";
 
