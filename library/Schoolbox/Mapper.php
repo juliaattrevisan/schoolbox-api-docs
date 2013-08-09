@@ -197,6 +197,23 @@ class Mapper {
 	}
 
 	/**
+	 * @param  \Database $database
+	 *
+	 * @return $this
+	 */
+	public function setDatabase($database) {
+		$this->database = $database;
+		return $this;
+	}
+
+	/**
+	 * @return \Database
+	 */
+	public function getDatabase() {
+		return $this->database;
+	}
+
+	/**
 	 * Gets a single object as a collection, if it isn't one already.
 	 *
 	 * Different possible actions based on $object:
