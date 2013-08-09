@@ -64,7 +64,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 
 	}
 
-	public function findAll () {
+	public function findAll($deleted = false) {
 		$statement = $this->database->prepare("
 			SELECT {$this->getColumnString()}
 			FROM `{$this->table}` WHERE visible = 'true'
