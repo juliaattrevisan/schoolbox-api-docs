@@ -40,13 +40,7 @@ class Queue {
 	public function processVideo() {
 
 
-		if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
-			$sourceStore = $this->config->get('file_dir');
-			$sourceFile = $sourceStore . '/' . $this->fileID . '.dat';
-		}
-		else {
-			throw new \Exception_Schoolbox('Processing of this type of video is not implemented');
-		}
+        $sourceFile = $this->getSourceFile();
 
 		//
 		// Choose whether to use AVconv or FFMpeg, depending on whether AVconv
@@ -136,6 +130,20 @@ class Queue {
 	public function getPosterLocation() {
 		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-poster.jpg';
 	}
+
+    private function getSourceFile() {
+        if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
+            $sourceStore = $this->config->get('file_dir');
+            return $sourceStore . '/' . $this->fileID . '.dat';
+        }
+        else if($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
+            $sourceStore = $this->config->get('storage_dir');
+            return $sourceStore . '/' . $this->fileID . '.dat';
+        }
+        else {
+            throw new \Exception_Schoolbox('Processing of this type of video is not implemented');
+        }
+    }
 
 	private function setConfig($config) {
 		$this->config = $config;
