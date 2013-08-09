@@ -106,13 +106,13 @@ class FileMapper extends Mapper {
 		$file->loadFilesizeFromTempLocation();
 		$this->save($file);
 
-        /* If video add to video processing queue */
-	    if(stristr($file->getMime(),'video/')) {
-		    $mapper = new Schoolbox\Video\QueueMapper();
-	        $videoQ = new Schoolbox\Video\Queue();
+        /* If video add to video processing queue, note checks ID to ensure its a new file and not an already existing file */
+	    if(stristr($file->getMime(),'video/') && $file->getId() != 0) {
+		    $mapper = new Video\QueueMapper();
+	        $videoQ = new Video\Queue();
 		    $videoQ->setFileID($file->getId());
-		    $videoQ->setStatus( Schoolbox\Video\QueueMapper::STATUS_PENDING );
-		    $videoQ->setType( Schoolbox\Video\QueueMapper::FILE_TYPE_STORAGE);
+		    $videoQ->setStatus( Video\QueueMapper::STATUS_PENDING );
+		    $videoQ->setType( Video\QueueMapper::FILE_TYPE_STORAGE);
 
 		    $mapper->save($videoQ);
 	    }
