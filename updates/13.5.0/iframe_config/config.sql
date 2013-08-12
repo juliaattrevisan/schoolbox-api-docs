@@ -19,7 +19,7 @@ INSERT INTO `config`(
   `required`
 )
 VALUES (
-  'safe_iframe_sources',
+  'safe_iframe_source_list',
   'www.youtube.com/embed/
 player.vimeo.com/video/
 www.slideshare.net/slideshow/embed_code/
