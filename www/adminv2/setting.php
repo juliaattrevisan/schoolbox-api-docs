@@ -13,6 +13,7 @@ $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_noneditable', 'setting_type_noneditable_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_input', 'setting_type_input_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_textarea', 'setting_type_textarea_block');
+$this->setBlock(TEMPLATE_content, 'setting_type_html', 'setting_type_html_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_boolean', 'setting_type_boolean_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_select', 'setting_type_select_block');
 $this->setBlock('setting_type_select', 'setting_select', 'setting_select_block');
@@ -25,12 +26,13 @@ $nav = new AdminV2_Nav();
 $nav->parse($this, 'setting');
 
 $output = array(
-	'setting_type_noneditable_block' => '',
-	'setting_type_input_block'       => '',
-	'setting_type_textarea_block'    => '',
-	'setting_type_boolean_block'     => '',
-	'setting_type_select_block'      => '',
-	'setting_type_check_block'       => '',
+    'setting_type_noneditable_block' => '',
+    'setting_type_input_block'       => '',
+    'setting_type_textarea_block'    => '',
+    'setting_type_html_block'        => '',
+    'setting_type_boolean_block'     => '',
+    'setting_type_select_block'      => '',
+    'setting_type_check_block'       => '',
     'setting_type_list_block'        => '',
 );
 
@@ -106,6 +108,10 @@ if(is_array($optionList)) {
 
                 case 'textarea' :
                     $this->parse('setting_type_textarea_block', 'setting_type_textarea', true);
+                    break;
+
+                case 'html' :
+                    $this->parse('setting_type_html_block', 'setting_type_html', true);
                     break;
 
                 case 'boolean' :
