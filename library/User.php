@@ -165,7 +165,8 @@ class User extends DeprecatedModel {
 			LEFT JOIN `groups` ON `user`.group_id = `groups`.id
 			LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
 			LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
-			WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
+			WHERE CONCAT_WS(' ',title,firstname,lastname) LIKE '%$keyword%'
+			OR CONCAT_WS(' ',title,lastname) LIKE '%$keyword%'
 			OR username LIKE '%$keyword%' OR synergy_id = '$keyword'
 		";
 
@@ -175,7 +176,8 @@ class User extends DeprecatedModel {
 		// retreive count
 		$count_query = "SELECT COUNT(*)
 								FROM `user`
-								WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
+								WHERE CONCAT_WS(' ',title,firstname,lastname) LIKE '%$keyword%'
+								OR CONCAT_WS(' ',title,lastname) LIKE '%$keyword%'
 								OR username LIKE '%$keyword%' OR synergy_id = '$keyword'";
 
 		$count = $this->db->getOne($count_query);
