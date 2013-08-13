@@ -14,15 +14,25 @@ if (is_numeric($_GET['id'])) {
 	$groupHandler = new Group;
 
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
-	try {
-		$video = $videoQueueMapper->findById($_GET['id']);
-	}
-	catch (Schoolbox\Mapper\Exception $e) {
-		error(41);
-	}
 
-	if ($groupHandler->getPermission($video->getFile()->getFolder()) < READ_ACCESS)
-		error(5);
+    try {
+        if($_GET['type'] == 'storage') {
+            $video = $videoQueueMapper->findByStorageId($_GET['id']);
+        }
+        else {
+            $video = $videoQueueMapper->findByFileId($_GET['id']);
+
+            //Check permissions on video
+            if ($groupHandler->getPermission($video->getFile()->getFolder()) < READ_ACCESS)
+                SitePage::redirectToBrokenImageOfSize(64, 64, 403);
+        }
+    }
+    catch (Schoolbox\Mapper\Exception $e) {
+        var_dump($e);
+        /* Video not found */
+        //SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+    }
+
 
 	if($_GET['type'] == 'poster') {
 		$filename = $video->getPosterLocation();
