@@ -55,16 +55,17 @@ $componentFactory = new Component_Homepage_Statistics_Factory(new User, $this);
 $componentCollection = $componentFactory->buildComponentList($categoryID);
 $occupiedPositionList = array();
 $j = 0;
+/** @var Component_Homepage_Statistics_ControllerAbstract[] $componentCollection */
 foreach ($componentCollection as $component) {
-    $templateTarget = "component_position_{$component->position}";
+    $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
     $templateHandle = 'component_'.$j++;
 
-    $component->setup($category, $component->instance->getConfigArray());
+    $component->setup($category, $component->getInstance()->getConfigArray());
 
     if ($component->execute() !== false) {
         if ($component->renderTemplate($templateHandle) !== false) {
-            if (!in_array($component->instance->position, $occupiedPositionList)) {
-                $occupiedPositionList[] = $component->instance->position;
+            if (!in_array($component->getInstance()->getPosition(), $occupiedPositionList)) {
+                $occupiedPositionList[] = $component->getInstance()->getPosition();
             }
 
             $this->parse($templateTarget, $templateHandle, true);
