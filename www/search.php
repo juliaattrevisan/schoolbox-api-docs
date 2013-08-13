@@ -14,7 +14,7 @@ $group = new Group();
 $categoryStd = new Category();
 $allowedFile = new AllowedFile();
 
-$keyword = preg_replace('/[^\ A-Za-z0-9\"\'\+\-_=\@\?!\.]/', '', $_GET['keyword']);
+$keyword = trim(preg_replace('/[^\ A-Za-z0-9\"\'\+\-_=\@\?!\.]/', '', $_GET['keyword']));
 
 if (is_numeric($keyword) || ($keyword && strlen($keyword) > 2)) {
     // strip out any injection attempts
