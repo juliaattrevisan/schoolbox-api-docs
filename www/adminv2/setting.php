@@ -71,10 +71,10 @@ $editable = false;
 if(is_array($optionList)) {
     foreach ($optionList as $option) {
         $output = array(
-            'SETTING_TITLE' => $option['title'],
-            'SETTING_DESC' => $option['description'],
-            'SETTING_NAME' => $option['name'],
-            'SETTING_VALUE' => $option['value'],
+            'SETTING_TITLE' => Scrub::text($option['title']),
+            'SETTING_DESC'  => Scrub::text($option['description']),
+            'SETTING_NAME'  => Scrub::text($option['name']),
+            'SETTING_VALUE' => Scrub::text($option['value']),
         );
 
         $this->setVar($output);
