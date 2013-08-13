@@ -53,12 +53,13 @@ class CategoryLogMapper extends Mapper {
 	}
 
 	/**
-	 * Override of getUpdateString() to only ever increment the hit count.
+	 * Override of getUpdateString() to only ever increment the hit count, and
+	 * to update the last visit time to the current time.
 	 *
 	 * @return String
 	 */
 	public function getUpdateString() {
-		return '`hitcount` = `hitcount` + 1';
+		return '`hitcount` = `hitcount` + 1, `datetime` = NOW()';
 	}
 
 	/**
