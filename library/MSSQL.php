@@ -140,11 +140,12 @@ class MSSQL {
 				$this->result = mssql_query($sql_q, $this->dbf);
 
 				if ($this->result == false) {
-					if($this->debug)
-						print "<b>Query:</b> $sql_q<br />";
-					else
+					if ($this->debug) {
+						trigger_error(sprintf('MSSQL Query: "%s" triggered error: "%s"', $sql_q, mssql_get_last_message()), E_USER_WARNING);
+					}
+					else {
 						error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
-
+					}
 				}
 			}
 

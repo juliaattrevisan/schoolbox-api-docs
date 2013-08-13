@@ -86,13 +86,12 @@ function query($sql_q)
 		$this->result = mysql_query($sql_q, $this->dbf) or $mysql_eval_error = mysql_error();
 
 		if (isset($mysql_eval_error)) {
-			if($this->debug)
-			{
-				print "<b>Query:</b> $sql_q<br />\n";
-				print "<b>Error:</b> $mysql_eval_error\n";
+			if ($this->debug) {
+				trigger_error(sprintf('Query: "%s" triggered error: "%s"', $sql_q, $mysql_eval_error), E_USER_WARNING);
 			}
-			else
+			else {
 				error(21, $mysql_eval_error);
+			}
 		}
 	}
 
