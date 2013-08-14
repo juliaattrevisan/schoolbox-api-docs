@@ -479,20 +479,10 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 			'v' => $value
 		));
 
-		$collection = new Collection();
-		while($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			$c = $this->findByInstanceId($record['component_instance_id']);
-
-			/* Ostensibly, findByInstanceId() returns a Collection. But it can possibly return an array.
-			 * There's no guarantee of type, so account for a few different cases.
-			 */
-			if($c instanceof Collection) {
-				$collection->add($c->current());
-			}
-			elseif(is_array($c)) {
-					$collection->add(reset($c));
-			}
-			elseif($c instanceof Component_Instance) {
+		$collection = new Schoolbox\Collection();
+		while ($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			// findByInstanceID() always returns an array
+			foreach ($this->findByInstanceId($record['component_instance_id']) as $c) {
 				$collection->add($c);
 			}
 		}
