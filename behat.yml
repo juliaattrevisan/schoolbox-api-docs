@@ -6,10 +6,11 @@ default:
     Behat\MinkExtension\Extension:
       default_session: selenium2
       javascript_session: selenium2
+      files_path: %behat.paths.features%/files
       browser_name: firefox
       base_url: http://192.168.36.10/
-      selenium2: ~
+      selenium2:
+        wd_host: http://127.0.0.1:4444/wd/hub
       # Replace above line with below to run Selenium tests against the PhantomJS browser
       # Start PhantomJS with ./phantomjs --webdriver=8643
-#      selenium2:
 #        wd_host: "http://localhost:8643/wd/hub"
