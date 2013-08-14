@@ -41,7 +41,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         );
 
 	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+		    $this->source = $this->categoryHandler->getByID($this->getContext('id'));
 	    }
     }
 
