@@ -51,6 +51,10 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                 $this->getContext('id')
         );
 
+	    if($this->source === false) {
+		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+	    }
+
     }
 
     /**

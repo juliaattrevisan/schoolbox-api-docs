@@ -40,6 +40,10 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                 $this->getContext('id')
         );
 
+	    if($this->source === false) {
+		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+	    }
+
     }
 
     /**

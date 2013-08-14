@@ -52,6 +52,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 $this->getContext('id')
         );
 
+	    if($this->source === false) {
+		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+	    }
+
         // if you need to edit this array, see Component_Config_Filter for how this data is passed in/out of the database
         $this->filterFields = array('document', 'audio', 'video', 'image', 'other');
         $this->sortFields = array('name', 'date');
