@@ -48,10 +48,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 	    if($this->source === false) {
 		    $this->source = $this->catHandler->getByID($this->getContext('id'));
 	    }
-
-	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
-	    }
     }
 
     /**
