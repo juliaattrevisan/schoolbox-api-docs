@@ -172,20 +172,27 @@ laber.error,
 }
 /* Rounded-corners end */
 
-html{
+html, body{
   height: 100%;
+  min-width: 1120px;
+  margin: 0;
+  padding: 0;
 }
 
 body{
   background:#fff;
-  height: 100%;
+  margin: 0;
 }
 
-#wrap {min-height: 100%;}
+#wrap {
+  height: 100%;
+  width: 100%;
+}
 
 #container {
-  overflow:auto;
-  padding-bottom: 15px;}  /* must be same height as the footer */
+  overflow: auto;
+  padding-bottom: 30px;
+}  /* must be same height as the footer */
 
 .login #schol-gradient{
   background: #cc032c; /* Old browsers */
@@ -222,6 +229,12 @@ body{
   color: #ffffff;
   line-height: 20px;
   padding: 0;
+}
+
+#content{
+  width: 100%;
+  position: relative;
+  min-width: 650px;
 }
 
 .login #content{
@@ -298,24 +311,25 @@ h2 a:hover{
 }
 
 #nav{
-    top: 121px; /* 152 in original smgs skin */
-	left:-15px; /* Change from 15px in the core */
-	padding-left:5px;
 	padding-right:5px;
 	width:200px; /* core width is 224 */
-	}
+    position: relative;
+    margin: 6px 0 0 6px;
+    float: left;
+    top: auto;
+}
 	
-	#container {
+#container {
 	/*left:-72px; /* core was 272px */
 	margin-left:200px;
-	top: 5px;
 	margin-right:5px;	
 	padding-top:6px;
-	}
+}
 
-    .login #container{
-      background: url('/images/stmichaels/login-gradient.png') top left repeat-x;
-    }
+.login #container{
+    background: url('/images/stmichaels/login-gradient.png') top left repeat-x;
+    padding: 5px 0 0 0;
+}
 	
 #nav h3, #nav h3.my-links{
     color:#fff;
@@ -484,28 +498,34 @@ ADMIN!
   margin-left: 200px;
   padding-left: 10px;
 }*/
-#footer ul li {color:#000}
-#footer ul li a{color:#0054D3}
+
 #footer{
   padding-left: 218px;
   border-bottom: 15px solid #fdc900;
   position: relative;
-  margin-top: -62px; /* negative value of footer height */
+  margin-top: -77px; /* negative value of footer height */
+  height: 30px;
+  clear: both;
   margin-left: 0;
-  height: 15px;
   clear:both;
+  line-height: 22px;
 }
+
 .login #footer{
   width: 100%;
   margin: 0 auto;
+  padding: 20px 0 10px 0;
 }
 
 .login #footer ul{
-  margin: 0 0 0 -572px;
   padding: 0;
+  margin: 0 0 0 -534px;
   left: 50%;
-  position: relative;
+  position: absolute;
 }
+
+#footer ul li {color:#000}
+#footer ul li a{color:#0054D3}
 
 .standardForm td {
     border-bottom: 1px solid #eee;
