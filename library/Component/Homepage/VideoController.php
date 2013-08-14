@@ -64,7 +64,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             $this->defaultVideo = $videoResourceMapper->findById($this->getConfig('video'));
         }
         else {
-            $this->defaultVideo = $this->outputList->current();
+            $this->defaultVideo = $this->outputList->first();
         }
 
         $group_handler = new Group();
