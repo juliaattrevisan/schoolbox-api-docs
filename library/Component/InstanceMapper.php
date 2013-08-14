@@ -451,4 +451,52 @@ class Component_InstanceMapper extends Schoolbox\Mapper {
 			'id' => $identifier
 		));
 	}
+
+	/**
+	 * This method really only serves to retrieve components that have a 'src' config pointed at a particular category
+	 * so that we can delete them when that page is deleted. But we might have other uses for it later.
+	 *
+	 * @param $key
+	 * @param $value
+	 * @return \Collection
+	 */
+	public function findComponentByConfigValue($key, $value) {
+
+		$stmt = $this->database->prepare("
+			SELECT component_instance_id
+			FROM component_config_instance
+			WHERE component_config_definition_id IN
+			(
+				SELECT id
+				FROM component_config_definition
+				WHERE `key` = :k
+			)
+			AND `value` = :v
+		");
+
+		$stmt->execute(array(
+			'k' => $key,
+			'v' => $value
+		));
+
+		$collection = new Collection();
+		while($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			$c = $this->findByInstanceId($record['component_instance_id']);
+
+			/* Ostensibly, findByInstanceId() returns a Collection. But it can possibly return an array.
+			 * There's no guarantee of type, so account for a few different cases.
+			 */
+			if($c instanceof Collection) {
+				$collection->add($c->current());
+			}
+			elseif(is_array($c)) {
+					$collection->add(reset($c));
+			}
+			elseif($c instanceof Component_Instance) {
+				$collection->add($c);
+			}
+		}
+		return $collection;
+	}
+
 }

@@ -591,9 +591,14 @@ class Category extends DeprecatedModel {
 
 
         // locate all the component instances associated with this homepage, and clear them out
+	    /** @var Component_InstanceMapper $cim */
         $cim = Component_InstanceMapper::getInstance();
         $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
         $cim->delete($collection);
+
+	    // locate all the component instances that reference this category as an alt source, and delete them too
+		$referencingComponents = $cim->findComponentByConfigValue('src', $categoryID);
+	    $cim->delete($referencingComponents);
 
         /* Delete group */
         $groupHandler = new Group();
