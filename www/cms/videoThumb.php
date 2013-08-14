@@ -28,9 +28,8 @@ if (is_numeric($_GET['id'])) {
         }
     }
     catch (Schoolbox\Mapper\Exception $e) {
-        var_dump($e);
         /* Video not found */
-        //SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
     }
 
 
