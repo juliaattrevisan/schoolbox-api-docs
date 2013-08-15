@@ -134,4 +134,36 @@ class ResourceVideoMapper extends Mapper {
 
     }
 
+    /**
+     * Like findByStorageId() except it accepts a brownhole hash instead of a
+     * brownhole storage ID.
+     *
+     * @throws \Schoolbox\Mapper\Exception if no video with this hash was found
+     * @param  string $hash
+     * @return ResourceVideo
+     */
+    public function findByStorageHash($hash) {
+
+        $storageMapper = $this->getJoinMapper('storage');
+        $statement     = $this->database->prepare("
+            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
+            FROM `{$this->getTable()}` vq
+            INNER JOIN {$this->getJoinSQL('storage','vq','s')}
+            WHERE s.hash = ? AND vq.status = 'completed'
+        ");
+
+        $statement->execute(array($hash));
+
+        $video = null;
+        if (($row = $statement->fetch())) {
+            $video = $this->hydrate($row, 'vq');
+            $video->setFile($storageMapper->hydrate($row, 's'));
+        }
+
+        if (!($video instanceof ResourceVideo)) {
+            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+        }
+        return $video;
+    }
+
 }
