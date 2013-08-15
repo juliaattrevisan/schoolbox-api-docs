@@ -784,7 +784,7 @@ class Mapper {
 			}
 			$query .= implode(' AND ', $where_parts);
 		}
-		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+		if (!$deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
 			$query .= (empty($columnList) ? ' WHERE ' : ' AND ').$delete_part;
 		}
 
@@ -1105,6 +1105,12 @@ class Mapper {
 			}
 			if (!isset($value)) {
 				return "$column IS NULL";
+			}
+			if ($value === false) {
+				return "$column IS FALSE";
+			}
+			if ($value === true) {
+				return "$column IS TRUE";
 			}
 			return "$column = ".$this->database->quote($value);
 		}
