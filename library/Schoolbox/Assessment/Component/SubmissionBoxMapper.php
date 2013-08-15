@@ -770,19 +770,4 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		return $collection;
 	}
 
-	/**
-	 * TODO: delete from 13.5 - proper soft delete is implemented.
-	 *
-	 * @param String $columnName
-	 * @param String $columnValue
-	 *
-	 * @return \Collection
-	 */
-	public function findByColumn($columnName, $columnValue) {
-		return $this->findByColumnList(array(
-			$columnName => $columnValue,
-			'deleted'   => false,
-		));
-	}
-
 }
