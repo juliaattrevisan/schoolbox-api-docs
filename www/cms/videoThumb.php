@@ -9,7 +9,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-if (is_numeric($_GET['id'])) {
+if (is_numeric($_GET['id']) || isset($_GET['hash'])) {
 	$page = new SitePage;
 	$groupHandler = new Group;
 
@@ -17,7 +17,12 @@ if (is_numeric($_GET['id'])) {
 
     try {
         if($_GET['type'] == 'storage') {
-            $video = $videoQueueMapper->findByStorageId($_GET['id']);
+            if (isset($_GET['hash'])) {
+                $video = $videoQueueMapper->findByStorageHash($_GET['hash']);
+            }
+            else {
+                $video = $videoQueueMapper->findByStorageId($_GET['id']);
+            }
         }
         else {
             $video = $videoQueueMapper->findByFileId($_GET['id']);
