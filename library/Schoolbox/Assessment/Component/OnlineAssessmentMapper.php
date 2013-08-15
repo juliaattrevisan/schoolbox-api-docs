@@ -87,6 +87,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
+		$this->hasMap(array(
+			'column'     => 'deleted_at',
+			'property'   => 'deleted',
+			'type'       => self::TYPE_DATETIME,
+		));
 
 
 		$this->hasJoin('category', array(
@@ -259,6 +264,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$this->getJoinSql('user',     'a', 'u')}
 			WHERE a.category_id IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND a.finish BETWEEN :from_date AND :to_date
+			AND a.deleted_at IS NULL
 			ORDER BY a.finish ASC
 		";
 
@@ -338,4 +344,21 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		}
 		return $collection;
 	}
+
+	/**
+	 * TODO: delete from 13.5 - proper soft delete is implemented.
+	 *
+	 * @brief Returns a collection with models which match the values pairs in the column list
+	 * @param Array $columnList
+	 * @return Bool|\Collection
+	 */
+	public function findByColumnList($columnList) {
+		if (!is_array($columnList)) {
+			return false;
+		}
+		return parent::findByColumnList(
+			array_merge($columnList, array('deleted_at' => null))
+		);
+	}
+
 }

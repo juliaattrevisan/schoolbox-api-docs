@@ -752,8 +752,13 @@ class Mapper {
 		if (!empty($columnList)) {
 			$query .= ' WHERE ';
 			foreach ($columnList as $columnName => $columnValue) {
-				$where_parts[] = "`$columnName` = ?";
-				$params[]      = $columnValue;
+				if (!isset($columnValue)) {
+					$where_parts[] = "`$columnName` IS NULL";
+				}
+				else {
+					$where_parts[] = "`$columnName` = ?";
+					$params[]      = $columnValue;
+				}
 			}
 			$query .= implode(' AND ', $where_parts);
 		}

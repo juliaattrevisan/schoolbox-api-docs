@@ -144,6 +144,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'markVisibility',
 			'type'       => self::TYPE_INTEGER,
 		));
+		$this->hasMap(array(
+			'column'     => 'deleted',
+			'property'   => 'deleted',
+			'type'       => self::TYPE_BOOLEAN,
+		));
 
 		//
 		// adds listeners:
@@ -739,6 +744,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
 			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND sb.date BETWEEN :from_date AND :to_date
+			AND sb.deleted IS FALSE
 			ORDER BY sb.date ASC
 		";
 
@@ -766,4 +772,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		);
 		return $collection;
 	}
+
+	/**
+	 * TODO: delete from 13.5 - proper soft delete is implemented.
+	 *
+	 * @param String $columnName
+	 * @param String $columnValue
+	 *
+	 * @return \Collection
+	 */
+	public function findByColumn($columnName, $columnValue) {
+		return $this->findByColumnList(array(
+			$columnName => $columnValue,
+			'deleted'   => false,
+		));
+	}
+
 }

@@ -76,9 +76,6 @@ class ClassStatistics {
 		// retrieve ALL the submission boxes for this category
 		$boxCollection = $this->submissionBoxMapper->findByColumn('category', $this->getCategory()->getId());
 		foreach($boxCollection as $box) {
-			/**
-			 * @var $box SubmissionBox
-			 */
 			$due = $box->getDueDate();
 			$dueYear = $due->getUsingFormat('Y');
 			$dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
