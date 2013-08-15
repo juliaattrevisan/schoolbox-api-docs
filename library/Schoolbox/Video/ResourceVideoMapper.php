@@ -42,6 +42,12 @@ class ResourceVideoMapper extends Mapper {
                          'this_key'  => 'file_id',
                          'other_key' => 'id',
                      ));
+
+        $this->hasJoin('storage', array(
+                'mapper'    => '\\Schoolbox\\FileMapper',
+                'this_key'  => 'file_id',
+                'other_key' => 'storage_id',
+        ));
 	}
 
 	public function findByCategory($category, $limit = false) {
@@ -79,8 +85,8 @@ class ResourceVideoMapper extends Mapper {
 
 	}
 
-	public function findById($id) {
-		$fileMapper = new FileMapper;
+	public function findByFileId($id) {
+		$fileMapper = new \Schoolbox\Resource\FileMapper;
 
 		$statement = $this->database->prepare( "
             SELECT {$fileMapper->getColumnString('f')}, {$this->getColumnString('vq')}
@@ -102,5 +108,62 @@ class ResourceVideoMapper extends Mapper {
 		return $video;
 
 	}
+
+    public function findByStorageId($id) {
+        $storageMapper = new \Schoolbox\FileMapper;
+
+        $statement = $this->database->prepare( "
+            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
+                     FROM `{$this->getTable()}` vq
+                    JOIN {$this->getJoinSQL('storage','vq','s')}
+            WHERE s.storage_id = ? AND vq.status = 'completed'
+            " );
+
+        $statement->execute(array($id));
+
+        $video = null;
+        foreach($statement as $row) {
+            $video = $this->hydrate($row, 'vq');
+            $video->setFile($storageMapper->hydrate($row,'s'));
+        }
+
+        if (!($video instanceof ResourceVideo)) {
+            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+        }
+        return $video;
+
+    }
+
+    /**
+     * Like findByStorageId() except it accepts a brownhole hash instead of a
+     * brownhole storage ID.
+     *
+     * @throws \Schoolbox\Mapper\Exception if no video with this hash was found
+     * @param  string $hash
+     * @return ResourceVideo
+     */
+    public function findByStorageHash($hash) {
+
+        $storageMapper = $this->getJoinMapper('storage');
+        $statement     = $this->database->prepare("
+            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
+            FROM `{$this->getTable()}` vq
+            INNER JOIN {$this->getJoinSQL('storage','vq','s')}
+            WHERE s.hash = ? AND vq.status = 'completed'
+        ");
+
+        $statement->execute(array($hash));
+
+        $video = null;
+        if (($row = $statement->fetch())) {
+            $video = $this->hydrate($row, 'vq');
+            $video->setFile($storageMapper->hydrate($row, 's'));
+        }
+
+        if (!($video instanceof ResourceVideo)) {
+            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+        }
+        return $video;
+    }
 
 }
