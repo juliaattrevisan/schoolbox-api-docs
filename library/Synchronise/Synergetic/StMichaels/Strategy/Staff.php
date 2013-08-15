@@ -51,9 +51,9 @@ class Synchronise_Synergetic_StMichaels_Strategy_Staff extends Synchronise_Syner
 		$newUser['title'] = $currentUser['StaffTitle'];
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
-        $newUser['synergy_id'] = $currentUser['StaffID'];
-		$newUser['alt_email'] = '';
-        $newUser['local_email'] = 1;
+		$newUser['synergy_id'] = $currentUser['StaffID'];
+		$newUser['alt_email'] = $currentUser['OccupEmail'];
+		$newUser['local_email'] = 0;
 
 		/* Campus config: needs to map to a campus id
 		 */
