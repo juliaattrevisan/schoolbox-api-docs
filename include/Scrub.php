@@ -118,8 +118,8 @@ class Scrub {
 	            'prezi.com/embed/',
 	            '(?:www\\.)?spiderscribe.net/app/',
 	            '(?:www\\.)?evt.org.nz',
-				'vhss-d.oddcast.com/vhss_editors/voki_player.swf'
-
+				'vhss-d.oddcast.com/vhss_editors/voki_player.swf',
+                'e.issuu.com/embed.html',
             );
 
             $config->set('URI.SafeIframeRegexp', '%^(?:https?:|)//(?:' . implode('|', $safeIframeSources) . ')%');
