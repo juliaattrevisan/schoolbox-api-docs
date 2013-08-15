@@ -723,14 +723,7 @@ class Mapper {
 	 * @return Collection
 	 */
 	public function findByColumn($columnName, $columnValue, $deleted = false) {
-		$query = "SELECT {$this->getColumnString()} FROM `{$this->table}` WHERE `{$columnName}` = :$columnName";
-		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
-			$query .= ' AND '.$delete_part;
-		}
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":$columnName", $columnValue);
-		$statement->execute();
-		return $this->hydrateList($statement->fetchAll());
+		return $this->findByColumnList(array($columnName => $columnValue), $deleted);
 	}
 
 	/**
