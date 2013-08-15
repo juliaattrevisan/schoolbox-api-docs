@@ -8,7 +8,7 @@ if (!$groupHandler->isSuperuser()) {
 	error(19);
 }
 
-$menuHandler = new sideMenu();
+$menuHandler = new SideMenu();
 
 $menuItem = array(
 	'id'     => $_POST['id'],
