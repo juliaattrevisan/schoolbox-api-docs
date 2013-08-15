@@ -57,10 +57,10 @@ class Synchronise_Synergetic_StMichaels_Strategy_Student extends Synchronise_Syn
 		$newUser['title'] = '';
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname'] = $currentUser['StudentSurname'];
-        $newUser['alt_email'] = $currentUser['StudentEmail'];
-        $newUser['synergy_id'] = $currentUser['StudentID'];
-//      $newUser['local_email'] = 1;
-        $newUser['eportfolio_enabled'] = 1;
+		$newUser['alt_email'] = $currentUser['StudentEmail'];
+		$newUser['synergy_id'] = $currentUser['StudentID'];
+		$newUser['local_email'] = 0;
+		$newUser['eportfolio_enabled'] = 1;
 
 
 		/* Year level
