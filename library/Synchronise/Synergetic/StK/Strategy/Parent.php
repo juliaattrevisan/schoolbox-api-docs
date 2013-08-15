@@ -37,7 +37,7 @@ class Synchronise_Synergetic_StK_Strategy_Parent extends Synchronise_Synergetic_
 		$newUser['title']      = $currentUser['StudentContactTitle'];
 		$newUser['firstname']  = $currentUser['StudentContactPreferred'];
 		$newUser['lastname']   = $currentUser['StudentContactSurname'];
-		$newUser['alt_email']  = $parent['DirectoryIncludeFlag'] ? $currentUser['StudentContactDefaultEmail'] : '';
+		$newUser['alt_email']  = $currentUser['StudentContactDefaultEmail'];
 
 		// get campuses of attached children
 		$newUser['campus']        = array($this->getCampusFromCurrentUser($currentUser));
@@ -65,7 +65,7 @@ class Synchronise_Synergetic_StK_Strategy_Parent extends Synchronise_Synergetic_
 		$newUser['title']      = $currentUser['StudentContactSpouseTitle'];
 		$newUser['firstname']  = $currentUser['StudentContactSpousePreferred'];
 		$newUser['lastname']   = $currentUser['StudentContactSpouseSurname'];
-		$newUser['alt_email']  = $parent['DirectoryIncludeFlag'] ? $currentUser['StudentContactSpouseDefaultEmail'] : '';
+		$newUser['alt_email']  = $currentUser['StudentContactSpouseDefaultEmail'];
 
 		// get campuses of kids
 		$newUser['campus']        = array($this->getCampusFromCurrentUser($currentUser));
