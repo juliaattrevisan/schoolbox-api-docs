@@ -13,7 +13,9 @@
 			</p>
 
 			<!-- BEGIN socialstream_post_has_thumbnail -->
-			<img src='/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
+			<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="lightbox[portal]" alt="" title="">
+				<img src='/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
+			</a>
 			<p>
 				<strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong><br />
 				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
@@ -44,7 +46,9 @@
 					</p>
 
 					<!-- BEGIN socialstream_comment_has_thumbnail -->
-					<img src='/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
+					<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="lightbox[portal]" alt="" title="">
+						<img src='/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
+					</a>
 					<p>
 						<strong>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</strong><br />
 						<em>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</em>
@@ -74,7 +78,9 @@
 							</p>
 
 							<!-- BEGIN socialstream_reply_has_thumbnail -->
-							<img src='/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
+							<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="lightbox[portal]" alt="" title="">
+								<img src='/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
+							</a>
 							<p>
 								<strong>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</strong><br />
 								<em>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</em>

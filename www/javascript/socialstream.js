@@ -129,6 +129,10 @@ var socialstream = {
 			/* Clear out any loading div indicators
 			 */
 			$j('.socialstream').find(self.loading).remove();
+
+			/* Lightbox everything!
+			 */
+			$j("a[rel^='lightbox']").slimbox();
 		});
 	}
 }
