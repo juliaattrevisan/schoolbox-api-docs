@@ -44,7 +44,11 @@ class Synchronise_Synergetic_StPauls_Strategy_Staff extends Synchronise_Synerget
 		/* Login details
 		 * We don't know how the password is given to us
 		 */
-		$newUser['username'] = $currentUser['NetworkLogin'];
+		$username = trim($currentUser['NetworkLogin']);
+		if (strlen($username) === 0) {
+			$username = strtolower($currentUser['StaffPreferredName'].'.'.$currentUser['StaffSurname']);
+		}
+		$newUser['username'] = $username;
 
 		/* User details
 		 */
