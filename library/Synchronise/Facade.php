@@ -106,6 +106,15 @@ class Synchronise_Facade {
         }
     }
 
+    private function lookupSynergeticTimetableCodes() {
+        $db = new MSSQL();
+        $codes = $db->getAll("SELECT DISTINCT ( TimetableGroup ) FROM Timetable WHERE FileYear='".date('Y')."'");
+        echo "Timetable Codes in Synergetic (Current Year)\n";
+        foreach ($codes as $c) {
+            echo "  '" . $c['TimetableGroup'] . "'\n";
+        }
+    }
+
     private function lookupSynergeticStudentExample() {
         echo "Synergetic Student Entity Examples\n";
         $esu = new External_Synergetic_User();
