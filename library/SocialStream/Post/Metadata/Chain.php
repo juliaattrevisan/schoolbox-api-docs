@@ -36,9 +36,20 @@ class Chain {
 		 * Avoid it by using internal_errors(true)
 		 * http://stackoverflow.com/questions/6090667/php-domdocument-errors-warnings-on-html5-tags
 		 */
+		if (strlen($curl->getResult())) {
+			$data = $curl->getResult();
+		}
+		/* Use a default xml-parser friendly version of empty string
+		 * in case someone links to a nonexistent file or something
+		 */
+		else {
+			$data = '<html></html>';
+		}
+
 		$document = new \DomDocument();
 		libxml_use_internal_errors(true);
-		$document->loadHTML($curl->getResult());
+
+		$document->loadHTML($data);
 		libxml_clear_errors();
 
 		$xml = new \DOMXpath($document);
