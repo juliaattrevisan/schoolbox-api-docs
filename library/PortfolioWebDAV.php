@@ -188,7 +188,7 @@ class PortfolioWebDAV
             }
         } else if ($site_location == 'jpc') {
             $settings = array(
-                'baseUri' => 'http://kazon/',
+                'baseUri' => 'https://malastare/',
                 'userName' => "jpc/" . $_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
