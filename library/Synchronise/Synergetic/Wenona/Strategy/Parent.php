@@ -18,7 +18,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
      */
     public function generateList() {
         // custom query provided by Wenona
-        $mssqlDB = new MSSQL();
+        $mssqlDB = MSSQL::getInstance();
         $sql = 'SELECT * FROM SynergyOne.dbo.uvCurrentAndNearFutureParents';
         $result = $mssqlDB->getAll($sql);
 

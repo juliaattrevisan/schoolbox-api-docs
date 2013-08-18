@@ -17,7 +17,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
 	function __construct() {
 		define('TASS_tt_id', 13);
 
-		$this->setDatabase(new MSSQL());
+		$this->setDatabase(MSSQL::getInstance());
 		$this->getDatabase()->setConvertEncoding(false);
 
 		$this->days = $this->getDays();

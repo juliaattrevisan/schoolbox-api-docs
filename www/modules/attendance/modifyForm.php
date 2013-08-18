@@ -61,7 +61,7 @@ $redirect = '/modules/attendance/modify/' . $class['ClassCode'] . '/' . $attenda
 
 /* Deal with it all
  */
-$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], new MSSQL());
+$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
 
 /* Create everyone's attendance initially
  */
@@ -79,7 +79,7 @@ if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
 		/* This is a pretty hollow shell of a class, it just contains the mssql
 		 * instance and a query to insert/update
 		 */
-		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(new MSSQL());
+		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
 
 		/* Then if you could do that, save each person
 		 */
@@ -141,7 +141,7 @@ else if (isset($_POST['updateOne']) && is_numeric($_POST['updateOne'])) {
 		/* This is a pretty hollow shell of a class, it just contains the mssql
 		 * instance and a query to insert/update
 		 */
-		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(new MSSQL());
+		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
 		$attendanceRecord->update($data);
 
 		SitePage::localRedir($redirect);
@@ -172,7 +172,7 @@ else if (isset($_POST['present']) && is_numeric($_POST['externalId'])) {
 		/* This is a pretty hollow shell of a class, it just contains the mssql
 		 * instance and a query to insert/update
 		 */
-		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(new MSSQL());
+		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
 		$attendanceRecord->update($data);
 	}
 }

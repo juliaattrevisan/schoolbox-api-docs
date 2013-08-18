@@ -65,7 +65,7 @@ class Eportfolio {
 	 * @param $pageId
 	 */
 	public function __construct($userId, $pageId) {
-		$this->setDb(new DeprecatedDatabase(SQL_db));
+		$this->setDb(DeprecatedDatabase::getInstance());
 		$this->setUserId($userId);
 		$this->setPageId($pageId);
 

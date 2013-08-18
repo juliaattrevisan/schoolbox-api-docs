@@ -10,7 +10,7 @@ class SitePage extends Page {
     public function SitePage($login = true) {
         parent::Page();
 
-        $this->db = new DeprecatedDatabase;
+        $this->db = DeprecatedDatabase::getInstance();
 
         if ($login) {
             $this->initSession();
@@ -155,6 +155,16 @@ class SitePage extends Page {
 
         $userHandler = new User();
 
+        $debug_bar_head = '';
+        $debug_bar_body = '';
+
+        if (Alaress\DebugBar\Instance::isEnabled()) {
+            $renderer = Alaress\DebugBar\Instance::getInstance()->getJavascriptRenderer();
+            $renderer->setBaseUrl('/debugbar/');
+            $debug_bar_head = $renderer->renderHead();
+            $debug_bar_body = $renderer->render();
+        }
+
         $templateVar = array(
             'TEMPLATE_YEAR' => date('Y'),
             'SITE_NAME' => Cfg::get('school_name'),
@@ -166,6 +176,8 @@ class SitePage extends Page {
             'EXTERNAL_ID' => $_SESSION['sid'],
             'SITE_VERSION' => Cfg::get('site_version'),
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
+            'DEBUGBAR'      => $debug_bar_body,
+            'DEBUGBAR_HEAD' => $debug_bar_head,
         );
 
         $this->setVar($templateVar);
@@ -268,7 +280,7 @@ class SitePage extends Page {
             $_SESSION['history'] = array();
         }
 
-	    $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
+        $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
 
         /* Dont handle duplicates (page refreshes) */
         if ($_SESSION['history'][0] != $requestUri) {
@@ -297,7 +309,7 @@ class SitePage extends Page {
 
     function error($ec, $message = "") {
 
-        $db = new DeprecatedDatabase(SQL_db, 1);
+        $db = DeprecatedDatabase::getInstance();
 
         $query = "SELECT message FROM error WHERE id = '$ec'";
         $error = $db->getRow($query);

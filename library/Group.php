@@ -442,7 +442,7 @@ class Group extends DeprecatedModel
 	{
 
 		$userHandler = new User;
-		$mssql = new MSSQL;
+		$mssql = MSSQL::getInstance();
 
 		$user = $userHandler->getByID($userID);
 

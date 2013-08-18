@@ -14,7 +14,7 @@ class External_Tass_Class implements External_ClassInterface {
 	private $database;
 
 	function __construct () {
-		$this->setDatabase( new MSSQL() );
+		$this->setDatabase(MSSQL::getInstance());
 		$this->getDatabase()->setConvertEncoding(false);
 	}
 	

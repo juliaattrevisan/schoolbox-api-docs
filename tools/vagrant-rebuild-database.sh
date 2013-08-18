@@ -33,3 +33,6 @@ echo "$vag Generating data dir sql fixes";
 
 echo "$vag Applying vagrant SQL fixes";
 mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-vagrant-latest.sql
+
+echo "$vag Switching off debug mode for testing";
+mysql -u root -ptnp879 -e "UPDATE config SET value='0' WHERE name='debug_mode';" schoolbox

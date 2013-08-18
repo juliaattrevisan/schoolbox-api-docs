@@ -11,11 +11,18 @@
 *                                                           *
 ************************************************************/
 
+use Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector;
+
 class DeprecatedDatabase
 {
 
 
 static private $instance = false;
+
+/**
+ * @var Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector
+ */
+protected $collector;
 
 /* Constuctor sets up variables and connects to database */
 function DeprecatedDatabase($db = SQL_db, $debug = 1)
@@ -72,16 +79,20 @@ function changeDb($db)
 /* Returns the result resource for the query, also saves the result resource as a object var */
 function query($sql_q)
 {
-	$this->result = mysql_query($sql_q, $this->dbf) or $mysql_eval_error = mysql_error();
+	if ($this->debug && $this->collector instanceof DeprecatedDatabaseCollector) {
+		$this->result = $this->collector->query($sql_q);
+	}
+	else {
+		$this->result = mysql_query($sql_q, $this->dbf) or $mysql_eval_error = mysql_error();
 
-	if (isset($mysql_eval_error)) {
-		if($this->debug)
-		{
-			print "<b>Query:</b> $sql_q<br />\n";
-			print "<b>Error:</b> $mysql_eval_error\n";
+		if (isset($mysql_eval_error)) {
+			if ($this->debug) {
+				trigger_error(sprintf('Query: "%s" triggered error: "%s"', $sql_q, $mysql_eval_error), E_USER_WARNING);
+			}
+			else {
+				error(21, $mysql_eval_error);
+			}
 		}
-		else
-			error(21, $mysql_eval_error);
 	}
 
 	return $this->result;
@@ -297,6 +308,20 @@ function endQuery($result = 0)
 		mysql_free_result($this->result);
 	else
 		return false;
+}
+
+/**
+ * Installs the PHP debug bar collector into this object, and returns it.
+ */
+public function installCollector() {
+    $this->collector = new DeprecatedDatabaseCollector($this->dbf);
+}
+
+/**
+ * @return DeprecatedDatabaseCollector
+ */
+public function getCollector() {
+    return $this->collector;
 }
 
 /* PRIVATE FUNCTIONS */

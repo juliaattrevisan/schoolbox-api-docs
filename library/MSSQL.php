@@ -8,6 +8,9 @@
 *	It also includes error handling and a debug mode.		*
 *                                                           *
 ************************************************************/
+
+use Alaress\DebugBar\DataCollector\MssqlDatabaseCollector;
+
 class MSSQL {
 
 	/**
@@ -34,6 +37,17 @@ class MSSQL {
 	 */
 	protected $previous_encoding = null;
 
+	/**
+	 * @var MssqlDatabaseCollector
+	 */
+	protected $collector = null;
+
+	/**
+	 * Static instance of this class
+	 *
+	 * @var self
+	 */
+	protected static $instance = null;
 
 	function MSSQL($db = false, $optionalConfig = false) {
 
@@ -66,6 +80,19 @@ class MSSQL {
 		}
 	}
 
+	/**
+	 * Gets static instance of this class (with default settings). Should be
+     * alright as this never gets called
+	 *
+	 * @return self
+	 */
+	public static function getInstance() {
+		if (!self::$instance) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
 	function connect() {
 		if(!isset($this->dbf))
 			$this->dbf = mssql_connect($this->host, $this->user, $this->passwd);
@@ -87,17 +114,39 @@ class MSSQL {
 			return false;
 	}
 
+	/**
+	 * Installs the PHP debug bar collector into this object.
+	 */
+	public function installCollector() {
+		if (!($this->collector instanceof MssqlDatabaseCollector)) {
+			$this->collector = new MssqlDatabaseCollector($this->dbf);
+		}
+	}
+
+	/**
+	 * @return MssqlDatabaseCollector
+	 */
+	public function getCollector() {
+		return $this->collector;
+	}
+
 	function query($sql_q)
 	{
 		if($this->dbf) {
-			$this->result = mssql_query($sql_q, $this->dbf);
+			if ($this->collector instanceof MssqlDatabaseCollector) {
+				$this->result = $this->collector->query($sql_q);
+			}
+			else {
+				$this->result = mssql_query($sql_q, $this->dbf);
 
-			if ($this->result == false) {
-				if($this->debug)
-					print "<b>Query:</b> $sql_q<br />";
-				else
-					error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
-
+				if ($this->result == false) {
+					if ($this->debug) {
+						trigger_error(sprintf('MSSQL Query: "%s" triggered error: "%s"', $sql_q, mssql_get_last_message()), E_USER_WARNING);
+					}
+					else {
+						error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
+					}
+				}
 			}
 
 			return $this->result;
