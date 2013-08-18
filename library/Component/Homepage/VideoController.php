@@ -12,6 +12,11 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 	 */
 	protected $outputList;
 
+    /**
+     * @var \Schoolbox\Video\ResourceVideo
+     */
+    protected $defaultVideo;
+
 	/**
 	 * Source category for this component.
 	 *
@@ -25,25 +30,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
      * @return void
      */
     public function execute() {
-	    $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
-
-		$this->parseConfig();
-		$source = $this->getConfig('src');
-		if (empty($source)) {
-			$source = $this->getContext('id');
-		}
-		$this->source_category_id = $source;
-		if($this->getConfig('size') > 1)
-			$this->outputList = $videoResourceMapper->findByCategory($source, $this->getConfig('size')-1);
-		else if($this->getConfig('size') == 0)
-			$this->outputList = $videoResourceMapper->findByCategory($source);
-		else
-			$this->outputList = new \Schoolbox\Collection(array());
-
-	    if($this->getConfig('video'))
-	        $this->defaultVideo = $videoResourceMapper->findById($this->getConfig('video'));
-	    else
-		    $this->defaultVideo = $this->outputList->first();
 
     }
 
@@ -55,6 +41,30 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     public function renderTemplate($templateHandle) {
         if(!parent::loadTemplate($templateHandle, 'video')) {
             return false;
+        }
+        $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
+
+        $this->parseConfig();
+        $source = $this->getConfig('src');
+        if (empty($source)) {
+            $source = $this->getContext('id');
+        }
+        $this->source_category_id = $source;
+        if ($this->getConfig('size') > 1) {
+            $this->outputList = $videoResourceMapper->findByCategory($source, $this->getConfig('size')-1);
+        }
+        elseif ($this->getConfig('size') == 0) {
+            $this->outputList = $videoResourceMapper->findByCategory($source);
+        }
+        else {
+            $this->outputList = new \Schoolbox\Collection(array());
+        }
+
+        if ($this->getConfig('video')) {
+            $this->defaultVideo = $videoResourceMapper->findById($this->getConfig('video'));
+        }
+        else {
+            $this->defaultVideo = $this->outputList->first();
         }
 
         $group_handler = new Group();
