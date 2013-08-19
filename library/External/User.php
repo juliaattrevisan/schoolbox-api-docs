@@ -24,12 +24,16 @@ class External_User implements External_UserInterface {
 		$databaseClass = 'External_'.ucfirst($databaseName).'_User';
 
 		if ( class_exists($databaseClass, true) ) {
-			$database = new $databaseClass;
-
-			$this->setDatabase( $database );
+			try {
+				$database = new $databaseClass;
+				$this->setDatabase( $database );
+			}
+			catch(\Schoolbox\External\Exception $e) {
+				$this->setDatabase(new External_Offline_User());
+			}
 		}
 		else {
-			error(22);
+			$this->setDatabase(new External_Offline_User());
 		}
 	}
 

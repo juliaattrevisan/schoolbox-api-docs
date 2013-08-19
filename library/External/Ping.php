@@ -26,7 +26,15 @@ class External_Ping implements External_PingInterface {
 		}
 		$databaseClass = 'External_'.ucfirst($databaseName).'_Ping';
 		if ( class_exists($databaseClass, true) ) {
-			$this->database = new $databaseClass();
+			try {
+				$this->database = new $databaseClass();
+			}
+			catch(\Schoolbox\External\Exception $e) {
+				$this->database(new External_Offline_Ping());
+			}
+		}
+		else {
+			$this->database = new External_Offline_Ping();
 		}
 	}
 

@@ -24,12 +24,16 @@ class External_Class implements External_ClassInterface{
 		$databaseClass = 'External_'.ucfirst($databaseName).'_Class';
 
 		if ( class_exists($databaseClass, true) ) {
-			$database = new $databaseClass;
-
-			$this->setDatabase( $database );
+			try {
+				$database = new $databaseClass;
+				$this->setDatabase( $database );
+			}
+			catch(\Schoolbox\External\Exception $e) {
+				$this->setDatabase(new External_Offline_Class());
+			}
 		}
 		else {
-			error(22);
+			$this->setDatabase(new External_Offline_Class());
 		}
 	}
 
