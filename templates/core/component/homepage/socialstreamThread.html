@@ -12,7 +12,7 @@
 				{SOCIALSTREAM_POST_BODY}<br />
 			</p>
 			<!-- BEGIN socialstream_post_has_icon -->
-			<img src='/images/mime/60x60/{SOCIALSTREAM_POST_ICON}' style='outline:1px dashed #f00;'/>
+			<img src='/images/mime/60x60/{SOCIALSTREAM_POST_ICON}' style='outline:1px dashed #00f;'/>
 			<p>
 				<strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong><br />
 				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
@@ -52,6 +52,14 @@
 						{SOCIALSTREAM_COMMENT_BODY}<br />
 					</p>
 
+					<!-- BEGIN socialstream_comment_has_icon -->
+					<img src='/images/mime/60x60/{SOCIALSTREAM_COMMENT_ICON}' style='outline:1px dashed #00f;'/>
+					<p>
+						<strong>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</strong><br />
+						<em>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</em>
+					</p>
+					<!-- END socialstream_comment_has_icon -->
+
 					<!-- BEGIN socialstream_comment_has_thumbnail -->
 					<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="lightbox[portal]" alt="" title="">
 						<img src='/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
@@ -83,6 +91,14 @@
 								<span>Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span><br />
 								{SOCIALSTREAM_REPLY_BODY}<br />
 							</p>
+
+							<!-- BEGIN socialstream_reply_has_icon -->
+							<img src='/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}' style='outline:1px dashed #00f;'/>
+							<p>
+								<strong>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</strong><br />
+								<em>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</em>
+							</p>
+							<!-- END socialstream_reply_has_icon -->
 
 							<!-- BEGIN socialstream_reply_has_thumbnail -->
 							<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="lightbox[portal]" alt="" title="">
