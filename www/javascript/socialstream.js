@@ -90,20 +90,42 @@ var socialstream = {
 	 * for when you make posts. Clear it upon change
 	 */
 	initAttachmentSelectors: function() {
+		var form = $j('.socialstreamAttachment').closest('form');
+
+		var urlElement = form.find('input[name=url]');
+		var fileElement = form.find('input[name=file]');
+		var resourceElement = form.find('input[name=resource]');
+
+		/* Hide everything so the default is a plain text message unadorned
+		 */
+		urlElement.parent('label').hide();
+		fileElement.parent('label').hide();
+		resourceElement.parent('label').hide();
+
+		/* Deal with changing options
+		 */
 		$j('.socialstreamAttachment').live('change', function() {
-			var urlElement = $j(this).closest('form').find('input[name=url]');
 
 			/* Empty this upon change
 			 */
 			urlElement.val('');
 
+			/* Hide everything
+			 */
+			urlElement.parent('label').hide();
+			fileElement.parent('label').hide();
+			resourceElement.parent('label').hide();
+
 			/* Make the input element visible or not
 			 */
 			if ($j(this).val() == 'url') {
-				urlElement.show();
+				urlElement.parent('label').show();
 			}
-			else {
-				urlElement.hide();
+			else if ($j(this).val() == 'upload') {
+				fileElement.parent('label').show();
+			}
+			else if ($j(this).val() == 'resource') {
+				resourceElement.parent('label').show();
 			}
 		});
 	},

@@ -36,11 +36,11 @@ class Creational extends AbstractFactory {
 	}
 
 	/**
-	 * Produce an instance of SocialStream_Post_Abstract subclass
+	 * Construct a post from a link by doing url analysis
 	 *
-	 * @return mixed
+	 * @return \SocialStream_Post_Url|\SocialStream_Post_Video
 	 */
-	public function produce() {
+	private function constructFromLink() {
 
 		/* If a url was provided, determine what kind it was
 		 */
@@ -72,6 +72,32 @@ class Creational extends AbstractFactory {
 		$object->setType('string');
 
 		return $object;
+	}
+
+	/**
+	 * Construct a post from a link by doing mimetype analysis
+	 */
+	private function constructFromUpload() {
+
+		new \Alaress_Probe($_FILES);
+		die('mog');
+	}
+
+	/**
+	 * Produce an instance of SocialStream_Post_Abstract subclass
+	 *
+	 * @return mixed
+	 */
+	public function produce() {
+
+		if ($this->getType() == 'url') {
+			return $this->constructFromLink();
+		}
+		else if ($this->getType() == 'upload') {
+			return $this->constructFromUpload();
+		}
+		else {
+		}
 	}
 
 	/* Getters/Setters
