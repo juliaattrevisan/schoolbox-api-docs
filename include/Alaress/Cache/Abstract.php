@@ -214,7 +214,8 @@ abstract class Alaress_Cache_Abstract {
 	 * @return bool
 	 */
 	protected function saveStreamContents() {
-		$streamHandle = @fopen($this->getUrl(), 'r');
+		$context = Proxy\Server::getInstance()->getContext();
+		$streamHandle = @fopen($this->getUrl(), 'r', false, $context);
 		$cacheHandle = @fopen($this->getCachedFile(), 'w');
 
 		/* Could not open stream source for reading
