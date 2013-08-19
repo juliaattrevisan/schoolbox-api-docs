@@ -57,13 +57,26 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 					'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
-				$page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
+				/* Display a mime icon
+				 * Otherwise display thumbnail via image transform
+				 */
+				if (preg_match('#^icon:(.*)#', $this->getThumbnail(), $matches)) {
+					$page->setVar(array(
+						'SOCIALSTREAM_POST_ICON' => $matches[1],
+					));
+
+					$page->parse('socialstream_post_has_icon_block', 'socialstream_post_has_icon');
+				}
+				else {
+					$page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
+				}
 			}
-			else {
-				$page->setVar(array(
-					'socialstream_post_has_thumbnail_block' => ''
-				));
-			}
+//			else {
+//				$page->setVar(array(
+//					'socialstream_post_has_icon_block' => '',
+//					'socialstream_post_has_thumbnail_block' => '',
+//				));
+//			}
 		}
 		else if ($context == 'comment') {
 			if (strlen($this->getThumbnail())) {
@@ -74,11 +87,11 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
 				$page->parse('socialstream_comment_has_thumbnail_block', 'socialstream_comment_has_thumbnail');
 			}
-			else {
-				$page->setVar(array(
-					'socialstream_comment_has_thumbnail_block' => ''
-				));
-			}
+//			else {
+//				$page->setVar(array(
+//					'socialstream_comment_has_thumbnail_block' => ''
+//				));
+//			}
 		}
 		else if ($context == 'reply') {
 			if (strlen($this->getThumbnail())) {
@@ -89,11 +102,11 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
 				$page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
 			}
-			else {
-				$page->setVar(array(
-					'socialstream_reply_has_thumbnail_block' => ''
-				));
-			}
+//			else {
+//				$page->setVar(array(
+//					'socialstream_reply_has_thumbnail_block' => ''
+//				));
+//			}
 		}
 	}
 }
