@@ -115,12 +115,20 @@ class Scrub {
                 'www.sunsmart.com.au/uvalert/',
                 'skydrive.live.com/embed',
                 '(?:www\\.)?studyboost.com/',
-	            'prezi.com/embed/',
-	            '(?:www\\.)?spiderscribe.net/app/',
-	            '(?:www\\.)?evt.org.nz',
-				'vhss-d.oddcast.com/vhss_editors/voki_player.swf',
+                'prezi.com/embed/',
+                '(?:www\\.)?spiderscribe.net/app/',
+                '(?:www\\.)?evt.org.nz',
+                'vhss-d.oddcast.com/vhss_editors/voki_player.swf',
                 'e.issuu.com/embed.html',
             );
+
+            // Add any additional iframe sources as configured
+            foreach (explode("\n", Config::get('safe_iframe_source_list')) as $source) {
+                $source = trim($source);
+                if (strlen($source) > 0) {
+                    $safeIframeSources[] = preg_quote($source, '%');
+                }
+            }
 
             $config->set('URI.SafeIframeRegexp', '%^(?:https?:|)//(?:' . implode('|', $safeIframeSources) . ')%');
             $config->set('Output.FlashCompat', true);
@@ -136,18 +144,18 @@ class Scrub {
             );
 
 
-	        $config->set(
-		        'URI.AllowedSchemes', array (
+            $config->set(
+                'URI.AllowedSchemes', array (
                     'http' => true,
                     'https' => true,
                     'mailto' => true,
-			        'ftp'   => true,
+                    'ftp'   => true,
                     'ed2k' => true,
                     'magnet' => true,
                     'feed' => true,
-			        'dvcplay' => true,
+                    'dvcplay' => true,
                 )
-	        );
+            );
             //
             // Allow embeds and objects, allowing more properties than standard
             // HTMLPurifier definition allows.
