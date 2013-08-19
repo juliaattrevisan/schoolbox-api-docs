@@ -106,9 +106,15 @@ $j(function() {
 
                 <!-- BEGIN setting_type_textarea -->
 				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em>
-					<textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+					<textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
 				</label>
                 <!-- END setting_type_textarea -->
+
+				<!-- BEGIN setting_type_html -->
+				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em>
+					<textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+				</label>
+				<!-- END setting_type_html -->
 
                 <!-- BEGIN setting_type_boolean -->
 				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em><br />
