@@ -56,7 +56,7 @@ class Alaress_Curl_Url {
 	 */
 	public function exec() {
 
-		$ch = curl_init($this->getUrl());
+		$ch = \Proxy\Server::getInstance()->curl_init($this->getUrl());
 
 		curl_setopt_array($ch, $this->getOptions());
 

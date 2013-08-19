@@ -119,7 +119,7 @@ if(in_array('nojscript', $this->arg)) {
 
 	// Believe it or not, this is actually really slow!
 
-	$curl = curl_init('http://schoolbox.com.au/schoolboxinstaller/status.html');
+	$curl = \Proxy\Server::getInstance()->curl_init('http://schoolbox.com.au/schoolboxinstaller/status.html');
 	curl_setopt($curl, CURLOPT_NOBODY, true);
 	curl_setopt($curl, CURLOPT_TIMEOUT, 2);
 
