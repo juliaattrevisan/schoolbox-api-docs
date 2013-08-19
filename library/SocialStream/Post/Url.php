@@ -42,6 +42,12 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 		$this->setExternalBody($chain->getResult()->getDescription());
 	}
 
+	/**
+	 * Determine whether this should display an icon or something
+	 * via the image transform
+	 * 
+	 * @return bool
+	 */
 	private function determineIcon() {
 		if (preg_match('#^icon:(.*)#', $this->getThumbnail(), $matches)) {
 			return $matches;
