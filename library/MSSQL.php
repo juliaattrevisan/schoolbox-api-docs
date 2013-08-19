@@ -95,17 +95,17 @@ class MSSQL {
 
 	function connect() {
 		if(!isset($this->dbf))
-			$this->dbf = mssql_connect($this->host, $this->user, $this->passwd);
+			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd);
 
-		if(!isset($this->dbf))
-			error(22);
+		if($this->dbf == false)
+			throw new \Schoolbox\External\Exception("External database is offline.");
 
 		if(!$this->changeDb($this->db))
-			error(22);
+			throw new \Schoolbox\External\Exception("External database is online, but unable to connect.");
 	}
 
 	function changeDB($db) {
-		if(mssql_select_db($db, $this->dbf))
+		if(@mssql_select_db($db, $this->dbf))
 		{
 			$this->db = $db;
 			return true;
