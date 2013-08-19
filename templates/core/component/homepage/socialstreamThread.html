@@ -11,6 +11,13 @@
 				<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a><br />
 				{SOCIALSTREAM_POST_BODY}<br />
 			</p>
+			<!-- BEGIN socialstream_post_has_icon -->
+			<img src='/images/mime/60x60/{SOCIALSTREAM_POST_ICON}' style='outline:1px dashed #f00;'/>
+			<p>
+				<strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong><br />
+				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
+			</p>
+			<!-- END socialstream_post_has_icon -->
 
 			<!-- BEGIN socialstream_post_has_thumbnail -->
 			<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="lightbox[portal]" alt="" title="">
