@@ -24,11 +24,18 @@ class Direct extends Thumbnail {
 		 */
 		if ($this->getFileType()->isImageExtension()) {
 
-			/* TODO: Check header types via curl
-			 * rather than just rely on the file extension
+			/* Check that it's a link to something on the internet
+			 * This prevents someone typing in something like
+			 * mort.jpg and breaking the thumbnail
 			 */
-			
-			return $this->getUrl();
+			if (preg_match('#^http#', $this->getUrl())) {
+
+				/* TODO: Check header types via curl
+				 * rather than just rely on the file extension
+				 */
+
+				return $this->getUrl();
+			}
 		}
 
 		/* Otherwise get the next class to deal with it
