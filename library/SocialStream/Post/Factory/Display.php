@@ -7,28 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace SocialStream\Post;
+namespace SocialStream\Post\Factory;
 
-class Factory {
-
-	/**
-	 * The submitted url
-	 *
- 	 * @var string
-	 */
-	private $url = '';
-
-	/**
-	 * Regexes that permit the relevant sites
-	 * These are used to spawn a SocialStream_Post_Video instance
-	 *
-	 * @var array
-	 */
-	private $videoSites = array(
-		'#^(http://)?(www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_\-]+)#',
-		'#^(http://)?vimeo\.com/([0-9]+)#',
-		'#^(http://)?www\.ted\.com/talks/([a-zA-Z0-9_]+)\.html#',
-	);
+class Display extends AbstractFactory {
 
 	/**
 	 * Constructor
@@ -76,44 +57,5 @@ class Factory {
 		$object->setType('string');
 
 		return $object;
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set video sites
-	 *
-	 * @param array $videoSites
-	 */
-	private function setVideoSites($videoSites) {
-		$this->videoSites = $videoSites;
-	}
-
-	/**
-	 * Get video sites
-	 *
-	 * @return array
-	 */
-	private function getVideoSites() {
-		return $this->videoSites;
-	}
-
-	/**
-	 * Set url
-	 *
-	 * @param string $url
-	 */
-	private function setUrl($url) {
-		$this->url = $url;
-	}
-
-	/**
-	 * Get url
-	 *
-	 * @return string
-	 */
-	private function getUrl() {
-		return $this->url;
 	}
 }
