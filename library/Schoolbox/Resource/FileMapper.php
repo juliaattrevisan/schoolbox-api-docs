@@ -105,7 +105,11 @@ class FileMapper extends Mapper {
 			'type'              => self::TYPE_DATETIME,
 			'updated_timestamp' => true,
 		));
-
+		$this->hasMap(array(
+			'column'     => 'deleted',
+			'property'   => 'deleted',
+			'type'       => self::TYPE_BOOLEAN,
+		));
 		$this->hasSoftDeleteBooleanField('deleted');
 
 		$this->hasJoin('user', array(

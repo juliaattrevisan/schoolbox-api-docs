@@ -345,20 +345,4 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		return $collection;
 	}
 
-	/**
-	 * TODO: delete from 13.5 - proper soft delete is implemented.
-	 *
-	 * @brief Returns a collection with models which match the values pairs in the column list
-	 * @param Array $columnList
-	 * @return Bool|\Collection
-	 */
-	public function findByColumnList($columnList) {
-		if (!is_array($columnList)) {
-			return false;
-		}
-		return parent::findByColumnList(
-			array_merge($columnList, array('deleted_at' => null))
-		);
-	}
-
 }

@@ -49,7 +49,11 @@ class AttemptMapper extends Mapper {
 			'property'   => 'reviewed',
 			'type'       => self::TYPE_DATETIME,
 		));
-
+		$this->hasMap(array(
+			'column'     => 'deleted_at',
+			'property'   => 'deleted',
+			'type'       => self::TYPE_DATETIME,
+		));
 		$this->hasSoftDeleteDateField('deleted_at');
 	}
 

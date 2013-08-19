@@ -236,10 +236,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	/**
 	 * @throws Schoolbox\Mapper\Exception if submission box is not found
 	 * @param  int  $id
-	 * @param  bool $include_deleted If true, then include soft-deleted items.
 	 * @return SubmissionBox
 	 */
-	public function findById($id, $include_deleted = false) {
+	public function findById($id) {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
 		$notify_mapper   = $this->getJoinMapper('notify');
@@ -255,9 +254,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			WHERE sb.id=?
 		";
-		if (!$include_deleted) {
-			$query .= ' AND sb.deleted IS FALSE';
-		}
 		$statement = $this->database->prepare($query);
 		$statement->execute(array($id));
 
@@ -296,6 +292,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		if (!($submission_box instanceof SubmissionBox)) {
 			throw new Schoolbox\Mapper\Exception('Instance of object not found');
 		}
+		$this->throwIfDeleted($submission_box);
 		return $submission_box;
 	}
 
@@ -771,21 +768,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			function($item) { return $item->getCategory(); }
 		);
 		return $collection;
-	}
-
-	/**
-	 * TODO: delete from 13.5 - proper soft delete is implemented.
-	 *
-	 * @param String $columnName
-	 * @param String $columnValue
-	 *
-	 * @return \Collection
-	 */
-	public function findByColumn($columnName, $columnValue) {
-		return $this->findByColumnList(array(
-			$columnName => $columnValue,
-			'deleted'   => false,
-		));
 	}
 
 }

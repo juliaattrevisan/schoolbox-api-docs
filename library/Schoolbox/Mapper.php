@@ -197,6 +197,23 @@ class Mapper {
 	}
 
 	/**
+	 * @param  \Database $database
+	 *
+	 * @return $this
+	 */
+	public function setDatabase($database) {
+		$this->database = $database;
+		return $this;
+	}
+
+	/**
+	 * @return \Database
+	 */
+	public function getDatabase() {
+		return $this->database;
+	}
+
+	/**
 	 * Gets a single object as a collection, if it isn't one already.
 	 *
 	 * Different possible actions based on $object:
@@ -622,16 +639,21 @@ class Mapper {
 	 * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
 	 * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
 	 *
-	 * @param $column
-	 * @param $permittedValues
+	 * @param string $column
+	 * @param array  $permittedValues
+	 * @param bool   $deleted         If set to false, filters out deleted items.
 	 * @return Collection
 	 */
-	public function findIn($column, $permittedValues) {
-		$statement = $this->database->prepare("
+	public function findIn($column, $permittedValues, $deleted = false) {
+		$query = "
 			SELECT {$this->getColumnString()}
 			FROM `{$this->table}`
 			WHERE `{$column}` IN {$this->getArrayPlaceholders($permittedValues, 'val')}
-		");
+		";
+		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+			$query .= ' AND '.$delete_part;
+		}
+		$statement = $this->database->prepare($query);
 
 		$statement->execute($this->getArrayParameters($permittedValues, 'val'));
 
@@ -642,15 +664,15 @@ class Mapper {
 
 	/**
 	 * @brief Retrieves the entire collection unfiltered
+	 * @param bool $deleted If set to false, filters out deleted items.
 	 * @return Collection
 	 */
-	public function findAll() {
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-		"
-		);
+	public function findAll($deleted = false) {
+		$query = "SELECT {$this->getColumnString()} FROM `{$this->table}`";
+		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+			$query .= ' WHERE '.$delete_part;
+		}
+		$statement = $this->database->prepare($query);
 
 		$statement->execute();
 
@@ -663,6 +685,7 @@ class Mapper {
 	 * Retreives a model by id
 	 *
 	 * @throws Exception if no instance of model is found
+	 * @throws Exception\Deleted if the model was found but has been deleted
 	 * @param  mixed  $identifierValue
 	 * @return object
 	 */
@@ -684,6 +707,7 @@ class Mapper {
 		$row = $statement->fetch();
 		if ($row != false) {
 			$model = $this->hydrate($row);
+			$this->throwIfDeleted($model);
 			return $model;
 		}
 		throw new Exception('Instance of object not found');
@@ -694,24 +718,19 @@ class Mapper {
 	 *
 	 * @param String $columnName
 	 * @param String $columnValue
+	 * @param bool   $deleted     If set to false, filters out deleted items.
 	 *
 	 * @return Collection
 	 */
-	public function findByColumn($columnName, $columnValue) {
-		$statement = $this->database->prepare("
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE `{$columnName}` = :$columnName
-		");
-		$statement->bindParam(":$columnName", $columnValue);
-		$statement->execute();
-		return $this->hydrateList($statement->fetchAll());
+	public function findByColumn($columnName, $columnValue, $deleted = false) {
+		return $this->findByColumnList(array($columnName => $columnValue), $deleted);
 	}
 
 	/**
 	 * Returns first model whose $columnName = $columnValue.
 	 *
 	 * @throws Exception if no instance of model is found
+	 * @throws Exception\Deleted if the model was found but has been deleted
 	 * @param  String $columnName
 	 * @param  String $columnValue
 	 * @return object
@@ -727,7 +746,9 @@ class Mapper {
 		$statement->execute();
 		$result = $statement->fetch();
 		if ($result) {
-			return $this->hydrate($result);
+			$model = $this->hydrate($result);
+			$this->throwIfDeleted($model);
+			return $model;
 		}
 		throw new Exception('Instance of object not found');
 	}
@@ -735,9 +756,10 @@ class Mapper {
 	/**
 	 * @brief Returns a collection with models which match the values pairs in the column list
 	 * @param Array $columnList
+	 * @param bool  $deleted    If set to false, filters out deleted items.
 	 * @return Bool|Collection
 	 */
-	public function findByColumnList($columnList) {
+	public function findByColumnList($columnList, $deleted = false) {
 		if (!is_array($columnList)) {
 			return false;
 		}
@@ -761,6 +783,9 @@ class Mapper {
 				}
 			}
 			$query .= implode(' AND ', $where_parts);
+		}
+		if (!$deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+			$query .= (empty($columnList) ? ' WHERE ' : ' AND ').$delete_part;
 		}
 
 		$statement = $this->database->prepare($query);
@@ -1047,6 +1072,49 @@ class Mapper {
 		}
 
 		return $model;
+	}
+
+	/**
+	 * Helper method used by methods for finding a single model - this throws an
+	 * exception if the model is deleted (it is an ISoftDeletable and isDeleted()
+	 * returns true)
+	 *
+	 * @throws Exception\Deleted if the model is marked as deleted.
+	 * @param  object $model
+	 */
+	protected function throwIfDeleted($model) {
+		if ($model instanceof ISoftDeletable && $model->isDeleted()) {
+			$e = new Exception\Deleted();
+			$e->setDeletedObject($model);
+			throw $e;
+		}
+	}
+
+	/**
+	 * Retrieves an SQL fragment for filtering out soft-deleted items.
+	 *
+	 * @param  string $alias The alias used for this table, if any.
+	 * @return string
+	 */
+	protected function getSoftDeleteFilterSql($alias = null) {
+		if (isset($this->soft_delete_column)) {
+			$value = $this->soft_delete_undeleted_value;
+			$column = "`{$this->soft_delete_column}`";
+			if (isset($alias)) {
+				$column = "`$alias`.$column";
+			}
+			if (!isset($value)) {
+				return "$column IS NULL";
+			}
+			if ($value === false) {
+				return "$column IS FALSE";
+			}
+			if ($value === true) {
+				return "$column IS TRUE";
+			}
+			return "$column = ".$this->database->quote($value);
+		}
+		return null;
 	}
 
 	/**

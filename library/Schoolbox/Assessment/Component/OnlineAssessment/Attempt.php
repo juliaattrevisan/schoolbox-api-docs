@@ -9,9 +9,10 @@
 
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 
-class Attempt {
+class Attempt implements ISoftDeletable {
 
 	/**
 	 * @var int
@@ -42,6 +43,11 @@ class Attempt {
 	 * @var \Alaress_Date_Format
 	 */
 	protected $reviewed;
+
+	/**
+	 * @var \Alaress_Date_Format
+	 */
+	protected $deleted;
 
 	/**
 	 * @param  \Schoolbox\Assessment\Component\OnlineAssessment $assessment
@@ -145,4 +151,30 @@ class Attempt {
 		return $this->user;
 	}
 
+	/**
+	 * @param  \Alaress_Date_Format $deleted
+	 *
+	 * @return $this
+	 */
+	public function setDeleted($deleted) {
+		$this->deleted = $deleted;
+		return $this;
+	}
+
+	/**
+	 * @return \Alaress_Date_Format
+	 */
+	public function getDeleted() {
+		return $this->deleted;
+	}
+
+	/**
+	 * Is this deleted? (added so there's a consistent method for determining if
+	 * a model is deleted)
+	 *
+	 * @return bool
+	 */
+	public function isDeleted() {
+		return ($this->getDeleted() instanceof \Alaress_Date_Format);
+	}
 }
