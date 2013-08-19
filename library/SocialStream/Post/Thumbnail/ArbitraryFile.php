@@ -29,9 +29,11 @@ class ArbitraryFile extends Thumbnail {
 			$icon = $mapper->getIconForFilename($this->getUrl());
 		}
 		catch(\Schoolbox\File\Exception $e) {
-			$icon = 'default icon';
+			$icon = 'mime.png';
 		}
 
-		return $icon;
+		/* Return a particular formatted string for templating reasons
+		 */
+		return "icon:$icon";
 	}
 }
