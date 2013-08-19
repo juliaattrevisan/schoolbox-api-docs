@@ -12,13 +12,6 @@ namespace SocialStream\Post;
 class Factory {
 
 	/**
-	 * The value of the $_POST['socialstreamAttachment'] field
-	 *
-	 * @var string
-	 */
-	private $type = '';
-
-	/**
 	 * The submitted url
 	 *
  	 * @var string
@@ -40,11 +33,9 @@ class Factory {
 	/**
 	 * Constructor
 	 *
-	 * @param $type
 	 * @param $url
 	 */
-	public function __construct($type, $url) {
-		$this->setType($type);
+	public function __construct($url) {
 		$this->setUrl(trim($url));
 	}
 
@@ -55,41 +46,28 @@ class Factory {
 	 */
 	public function produce() {
 
-		/* If someone chose to add a link to their post, try to determine
-		 * what kind of link it is and display media accordingly
+		/* If a url was provided, determine what kind it was
 		 */
-		if ($this->getType() == 'url') {
+		if (strlen($this->getUrl())) {
 
-			/* If a url was provided, determine what kind it was
+			/* Figure out if it's a video
 			 */
-			if (strlen($this->getUrl())) {
+			foreach ($this->getVideoSites() as $currentPattern) {
+				if (preg_match($currentPattern, $this->getUrl())) {
+					$object = new \SocialStream_Post_Video();
+					$object->setType('video');
 
-				/* Figure out if it's a video
-				 */
-				foreach ($this->getVideoSites() as $currentPattern) {
-					if (preg_match($currentPattern, $this->getUrl())) {
-						$object = new \SocialStream_Post_Video();
-						$object->setType('video');
-
-						return $object;
-					}
+					return $object;
 				}
-
-				/* Alternatively it's just a link to the internet
-				 */
-				$object = new \SocialStream_Post_Url();
-				$object->setType('url');
-
-				return $object;
 			}
-		}
-		/* If someone chose to upload a file to their post, try to determine
-		 * what kind of link it is and display media accordingly. Do this by
-		 * checking the mime type of the uploaded file's name
-		 */
-		else if ($this->getType() == 'upload') {
-		}
 
+			/* Alternatively it's just a link to the internet
+			 */
+			$object = new \SocialStream_Post_Url();
+			$object->setType('url');
+
+			return $object;
+		}
 
 		/* If it was not a video, link to the internet, then assume it's
 		 * just a plain old text message
@@ -137,23 +115,5 @@ class Factory {
 	 */
 	private function getUrl() {
 		return $this->url;
-	}
-
-	/**
-	 * Set type
-	 *
-	 * @param string $type
-	 */
-	private function setType($type) {
-		$this->type = $type;
-	}
-
-	/**
-	 * Get type
-	 *
-	 * @return string
-	 */
-	private function getType() {
-		return $this->type;
 	}
 }

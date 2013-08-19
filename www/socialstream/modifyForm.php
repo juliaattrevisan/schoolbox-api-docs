@@ -15,7 +15,7 @@ $page = new \SitePage();
 
 /* Create new SocialStream Post
  */
-$factory = new Post\Factory($_POST['socialstreamAttachment'], $_POST['url']);
+$factory = new Post\Factory($_POST['url']);
 
 $newPost = $factory->produce();
 $newPost->setRootId($_POST['rootId']);
