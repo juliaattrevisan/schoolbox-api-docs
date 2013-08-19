@@ -159,7 +159,7 @@ class Server {
 
 		if($this->usesProxy()) {
 			// global boolean
-			curl_setopt($c, CURLOPT_HTTPPROXYTUNNEL, true);
+			curl_setopt($c, CURLOPT_HTTPPROXYTUNNEL, false);
 
 			// currently constant values, may need to be overridden in future
 			curl_setopt($c, CURLOPT_PROXYAUTH, self::PROXY_AUTH_METHOD);
