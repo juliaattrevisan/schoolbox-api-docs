@@ -99,7 +99,7 @@ var socialstream = {
 
 			/* Make the input element visible or not
 			 */
-			if ($j(this).val() == 'link') {
+			if ($j(this).val() == 'url') {
 				urlElement.show();
 			}
 			else {

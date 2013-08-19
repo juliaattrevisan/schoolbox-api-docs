@@ -15,7 +15,7 @@ $page = new \SitePage();
 
 /* Create new SocialStream Post
  */
-$factory = new Post\Factory($_POST['url']);
+$factory = new Post\Factory($_POST['socialstreamAttachment'], $_POST['url']);
 
 $newPost = $factory->produce();
 $newPost->setRootId($_POST['rootId']);
@@ -30,19 +30,32 @@ $newPost->setDeletedAt(null);
 
 if (strlen(trim($newPost->getBody()))) {
 
-	/* Find thumbnail from the given url in one of the many
-	 * ways that they can exist, if applicable
+	/* Post links
 	 */
-	if (strlen($newPost->getUrl())) {
-		$curl = new \Alaress_Curl_Url($newPost->getUrl());
-		$curl->exec();
+	if ($_POST['socialstreamAttachment'] == 'url') {
 
-		/* Optionally parse the curl result here into a dom parser
-		 * That would allow for attribute gathering
+		/* Find thumbnail from the given url in one of the many
+		 * ways that they can exist, if applicable
 		 */
+		if (strlen($newPost->getUrl())) {
+			$curl = new \Alaress_Curl_Url($newPost->getUrl());
+			$curl->exec();
 
-		$newPost->spawnMetadata($curl);
-		$newPost->spawnThumbnail($curl);
+			/* Optionally parse the curl result here into a dom parser
+			 * That would allow for attribute gathering
+			 */
+			$newPost->spawnMetadata($curl);
+			$newPost->spawnThumbnail($curl);
+		}
+	}
+	/* Post files
+ 	*/
+	else if ($_POST['socialstreamAttachment'] == 'upload') {
+
+	}
+	/* Use the resource browser
+	 */
+	else if ($_POST['socialstreamAttachment'] == 'resource') {
 	}
 
 	/* Set up authentication

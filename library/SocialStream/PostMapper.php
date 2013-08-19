@@ -257,7 +257,7 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @return object
 	 */
 	public function createModel($row) {
-		$factory = new \SocialStream\Post\Factory($row['p.url']);
+		$factory = new \SocialStream\Post\Factory($row['p.type'], $row['p.url']);
 
 		return $factory->produce();
 	}
