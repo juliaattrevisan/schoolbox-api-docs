@@ -19,6 +19,8 @@ class Server {
 
 	const PROXY_AUTH_METHOD = CURLAUTH_BASIC;
 	const PROXY_TYPE = CURLPROXY_HTTP;
+	const PROXY_AUTH_STRING = "Basic";
+	const PROXY_TYPE_STRING = "HTTP";
 
 	protected static $instance;
 
@@ -126,7 +128,10 @@ class Server {
 	 * @return bool
 	 */
 	public function isAuthenticated() {
-		return $this->user && $this->pass;
+		if($this->usesProxy()) {
+			return $this->user && $this->pass;
+		}
+		return null;
 	}
 
 	/**
@@ -136,7 +141,10 @@ class Server {
 	 * @return bool
 	 */
 	public function isAnonymous() {
-		return !$this->isAuthenticated();
+		if($this->usesProxy()) {
+			return !$this->isAuthenticated();
+		}
+		return null;
 	}
 
 
@@ -156,14 +164,44 @@ class Server {
 			// currently constant values, may need to be overridden in future
 			curl_setopt($c, CURLOPT_PROXYAUTH, self::PROXY_AUTH_METHOD);
 			curl_setopt($c, CURLOPT_PROXYTYPE, self::PROXY_TYPE);
+			curl_setopt($c, CURLOPT_FOLLOWLOCATION, 1);
+			curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($c, CURLOPT_HEADER, 1);
 
 			// configuration values
 			curl_setopt($c, CURLOPT_PROXY, $this->getHost());
 			curl_setopt($c, CURLOPT_PROXYPORT, $this->getPort());
-			curl_setopt($c, CURLOPT_PROXYUSERPWD, $this->getUserPwd());
+
+			if($this->isAuthenticated()) {
+				curl_setopt($c, CURLOPT_PROXYUSERPWD, $this->getUserPwd());
+			}
+
 		}
 
 		return $c;
+	}
+
+	/**
+	 * Returns to context resource for proxied streams
+	 *
+	 * @param string $protocol
+	 * @return null|resource
+	 */
+	public function getContext($protocol = 'http') {
+		if(!$this->usesProxy()) {
+			return null;
+		}
+
+		$opts[$protocol]['proxy'] = 'tcp://' . $this->getURI();
+
+		if($this->isAuthenticated()) {
+			$opts[$protocol]['header'] = array(
+				'Proxy-Authorization: ' . self::PROXY_AUTH_STRING . ' ' . $this->getUserPwd(true)
+			);
+		}
+
+
+		return stream_context_create($opts);
 	}
 
 }
