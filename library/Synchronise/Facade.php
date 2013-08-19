@@ -114,6 +114,15 @@ class Synchronise_Facade {
             echo "  '" . $c['TimetableGroup'] . "'\n";
         }
     }
+    
+    private function lookupSynergeticHouseCodes() {
+        $db = new MSSQL();
+        $codes = $db->getAll("SELECT Code, Description FROM luHouse WHERE ActiveFlag='1' GROUP BY Code,Description");
+        echo "House Codes in Synergetic\n";
+        foreach ($codes as $c) {
+            echo "  '" . $c['Code'] . "'\t'" . $c['Description'] . "'\n";
+        }
+    }
 
     private function lookupSynergeticStudentExample() {
         echo "Synergetic Student Entity Examples\n";
