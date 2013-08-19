@@ -53,15 +53,15 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
             $uploaded_file = null;
 
             //
-            // Add file, if there was one.
+            // Add file and save, only if there was a file.
             if (isset($_FILES[$uploadIndex])) {
                 if ($_FILES[$uploadIndex]['name']) {
                     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES[$uploadIndex]));
                     $mark = $marksheet->normaliseMark($_POST['mark'][$k], $subbox);
                     $uploaded_file = $_FILES[$uploadIndex];
+                    saveReturn($return, null, $uploaded_file);
                 }
             }
-            saveReturn($return, null, $uploaded_file);
         }
     }
     $page->localRedir('/submission/viewSubmission/' . $_POST['box_id']);
