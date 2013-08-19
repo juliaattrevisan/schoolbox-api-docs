@@ -69,7 +69,7 @@ elseif($action == 'rename') {
     $vars[0] = array('templateID' => $templateID, 'name' => $name);
 }
 else {
-    $sql[0] = "INSERT INTO `eportfolioTemplate` (`name`,`layout`,`left_column_width`,`right_column_width`) VALUES (:name,'1','69.9','29.9')";
+    $sql[0] = "INSERT INTO `eportfolioTemplate` (`name`,`layout`,`left_column_width`,`right_column_width`) VALUES (:name,'1','69.5','29.5')";
     $vars[0] = array('name' => $name);
 }
 
