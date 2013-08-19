@@ -19,13 +19,7 @@ $j(function() {
 
         cellValidation: function() {
             $j('.mark-input, .comment').change(function(){
-                var inlinefrm = $j(this).closest('.inlineform');
-                // remove '.inline-submit' from all inline forms, then apply it to this one so the form
-                // knows to only submit this row
-                $j("#returnWorkForm div.inlineform").removeClass('inline-submit');
-                inlinefrm.addClass('inline-submit');
-                // this will submit the whole form, unfortunately
-                inlinefrm.submit();
+                $j(this).closest('.inlineform').submit();
             });
 
             /*
@@ -71,7 +65,11 @@ $j(function() {
             $j('#returnWorkForm').each(function() {
                 $j(this).validate({
                     submitHandler: function(form) {
-                        if(ajax) {
+                        // Any inline submit forms? (there will be, if we are
+                        // focused on a form element.) Use them if so.
+                        // (Thankfully, the change event triggers before blur
+                        //  in all browsers.)
+                        if ($j(form).find('div.inline-submit').length) {
                             // perform ajax update of work, no file upload
                             var submitDiv = $j(form).find('div.inline-submit');
                             var submitForm = submitDiv.clone();
@@ -113,6 +111,16 @@ $j(function() {
             $j('#upload-returns-submit').click(function() {
                 ajax = false;
             });
+
+            // Focus/blur events on all return work form inputs: focus sets this
+            // row as the inline submit form, blur unsets it.
+            var inputs = $j('#returnWorkForm :input');
+            inputs.focus(function() {
+                $j(this).closest('.inlineform').addClass('inline-submit');
+            })
+            inputs.blur(function() {
+                $j(this).closest('.inlineform').removeClass('inline-submit');
+            })
         },
 
         selectGrouping: function() {
