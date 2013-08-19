@@ -13,7 +13,7 @@ $this->setTitle('Admin - Side Menu');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'side-menu');
 
-$menuHandler = new SideMenu;
+$menuHandler = new SideMenu();
 
 $this->setVar('MENU_TREE', $menuHandler->outputTree($menuHandler->getTree()));
 

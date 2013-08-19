@@ -10,7 +10,7 @@
 /* Class defines interface between the menu database and the administration software.   *
  * The following actions can be performed; delete, add, update, return 			 */
 
-class sideMenu extends DeprecatedModel {
+class SideMenu extends DeprecatedModel {
 
     function __construct() {
 
