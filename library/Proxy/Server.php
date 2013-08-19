@@ -140,4 +140,30 @@ class Server {
 	}
 
 
+	/**
+	 * Wrapper method for CURL resource creation, automatically sets proxy information
+	 *
+	 * @param null $hostname
+	 * @return resource
+	 */
+	public function curl_init($hostname = null) {
+		$c = curl_init($hostname);
+
+		if($this->usesProxy()) {
+			// global boolean
+			curl_setopt($c, CURLOPT_HTTPPROXYTUNNEL, true);
+
+			// currently constant values, may need to be overridden in future
+			curl_setopt($c, CURLOPT_PROXYAUTH, self::PROXY_AUTH_METHOD);
+			curl_setopt($c, CURLOPT_PROXYTYPE, self::PROXY_TYPE);
+
+			// configuration values
+			curl_setopt($c, CURLOPT_PROXY, $this->getHost());
+			curl_setopt($c, CURLOPT_PROXYPORT, $this->getPort());
+			curl_setopt($c, CURLOPT_PROXYUSERPWD, $this->getUserPwd());
+		}
+
+		return $c;
+	}
+
 }
