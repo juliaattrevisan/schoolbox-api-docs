@@ -28,6 +28,7 @@ class External_Offline_Timetable implements External_TimetableInterface {
 
 	public function getFullTimetable($externalUserId, $userId, $campusId) {
 		// TODO: Implement getFullTimetable() method.
+		throw new Schoolbox\External\Exception("Timetable is unavailable.");
 	}
 
 	public function getDaySubjects($externalUserId, $dayNumber) {

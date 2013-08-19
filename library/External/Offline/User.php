@@ -44,7 +44,7 @@ class External_Offline_User implements External_UserInterface {
 	}
 
 	public function getSubjectList($externalUserId, $userId) {
-		// TODO: Implement getSubjectList() method.
+		return array();
 	}
 
 	public function getEnrolledStudents($externalUserId) {
