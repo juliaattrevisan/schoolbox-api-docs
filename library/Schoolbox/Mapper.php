@@ -1000,7 +1000,7 @@ class Mapper {
 		}
 		$mapper = $this->joins[$name]['mapper'];
 		if (!($mapper instanceof Mapper) && class_exists($mapper)) {
-			$this->joins[$name]['mapper'] = call_user_func(array($mapper, 'getInstance'));
+			return call_user_func(array($mapper, 'getInstance'));
 		}
 		return $this->joins[$name]['mapper'];
 	}
