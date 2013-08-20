@@ -24,6 +24,10 @@ class Chain {
 	/**
 	 * Constructor
 	 *
+	 * You can optionally pass null as $curl, if you want to bypass
+	 * curl usage altogether (this defaults to an empty html doc for
+	 * DomDocument parsing)
+	 *
 	 * @param $curl
 	 * @param $newPost
 	 */
@@ -37,7 +41,7 @@ class Chain {
 		 * Avoid it by using internal_errors(true)
 		 * http://stackoverflow.com/questions/6090667/php-domdocument-errors-warnings-on-html5-tags
 		 */
-		if (strlen($curl->getResult())) {
+		if (($curl != null) && strlen($curl->getResult())) {
 			$data = $curl->getResult();
 		}
 		/* Use a default xml-parser friendly version of empty string
