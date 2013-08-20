@@ -13,6 +13,10 @@ namespace SocialStream;
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 $page = new \SitePage();
 
+if (!strlen(trim($_POST['body']))) {
+	die('Your post must contain something');
+}
+
 /* Compile some misc data
  */
 $data = array_merge($_POST, array(
@@ -25,38 +29,32 @@ $data = array_merge($_POST, array(
 $factory = new Post\Factory\Creational($_POST['socialstreamAttachment'], $_POST['url']);
 $newPost = $factory->produce($data);
 
-if (strlen($newPost->getBody())) {
+/* Set up authentication
+ * Put your permissions and stuff in here, just like ePortfolio v2
+ */
+$instanceMapper = \Component_InstanceMapper::getInstance();
 
-	/* Set up authentication
-	 * Put your permissions and stuff in here, just like ePortfolio v2
-	 */
-	$instanceMapper = \Component_InstanceMapper::getInstance();
+/* Seriously?
+ */
+$instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
+$instance = $instanceArray[$_POST['instanceId']];
 
-	/* Seriously?
-	 */
-	$instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
-	$instance = $instanceArray[$_POST['instanceId']];
+/* Current User
+ */
+$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
 
-	/* Current User
-	 */
-	$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+/* Authenticate!
+ */
+$authenticator = new Authenticator($newPost, $instance, $currentUser);
 
-	/* Authenticate!
-	 */
-	$authenticator = new Authenticator($newPost, $instance, $currentUser);
+/* Find out if you can collaborate on this
+*/
+if ($authenticator->canCollaborate() || $authenticator->canAddComment()) {
+	$mapper = new PostMapper();
+	$mapper->save($newPost);
 
-	/* Find out if you can collaborate on this
-	*/
-	if ($authenticator->canCollaborate() || $authenticator->canAddComment()) {
-		$mapper = new PostMapper();
-		$mapper->save($newPost);
-
-		$page->backToTheFuture(1);
-	}
-	else {
-		error(19);
-	}
+	$page->backToTheFuture(1);
 }
 else {
-	die('Your post must contain something');
+	error(19);
 }
