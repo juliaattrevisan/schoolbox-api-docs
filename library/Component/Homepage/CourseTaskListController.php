@@ -66,31 +66,12 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setVar('task_block', '');
         $i = 0;
         foreach ($this->task_list as $task) {
-            // Temp conversion of task classes
-            $class = '';
-            switch ($task->getType()->getId()) {
-                case TaskType::TYPE_LINK:
-                    $class = 'link';
-                    break;
-                case TaskType::TYPE_STUDENT_ASSESS:
-                    $class = 'folder';
-                    break;
-                case TaskType::TYPE_TEACHER_ASSESS:
-                    $class = 'tick';
-                    break;
-                case TaskType::TYPE_DUE_WORK:
-                    $class = 'new';
-                    break;
-                case TaskType::TYPE_ONLINE_ASSESS:
-                    $class = 'onlineassess';
-                    break;
-            }
             $this->setVar(
                 array(
                     'TASK_ID'    => $task->getId(),
                     'TASK_NAME'  => Scrub::text($task->getTitle()),
                     'TASK_TYPE'  => Scrub::text($task->getType()->getLabel()),
-                    'TASK_CLASS' => $class,
+                    'TASK_CLASS' => Scrub::text($task->getType()->getIconClass()),
                     'DARK'       => ($i++%2 === 1 ? 'dark' : ''),
                 )
             );

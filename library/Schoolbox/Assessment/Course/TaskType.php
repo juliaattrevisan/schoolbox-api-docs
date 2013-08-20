@@ -83,4 +83,34 @@ class TaskType {
         return $this->label;
     }
 
+    /**
+     * Temp method for getting this task's icon class. May not be the best place
+     * to put this, consider moving to a renderer class at some point.
+     *
+     * @return string
+     */
+    public function getIconClass() {
+        $class = '';
+        switch ($this->getId()) {
+            case TaskType::TYPE_LINK:
+                $class = 'link';
+                break;
+            case TaskType::TYPE_STUDENT_ASSESS:
+                $class = 'folder';
+                break;
+            case TaskType::TYPE_TEACHER_ASSESS:
+                $class = 'tick';
+                break;
+            case TaskType::TYPE_DUE_WORK:
+                $class = 'new';
+                break;
+            case TaskType::TYPE_ONLINE_ASSESS:
+                $class = 'onlineassess';
+                break;
+            default:
+                break;
+        }
+        return $class;
+    }
+
 }
