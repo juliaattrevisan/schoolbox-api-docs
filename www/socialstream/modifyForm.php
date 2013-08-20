@@ -25,7 +25,7 @@ $data = array_merge($_POST, array(
 $factory = new Post\Factory\Creational($_POST['socialstreamAttachment'], $_POST['url']);
 $newPost = $factory->produce($data);
 
-if (strlen(trim($newPost->getBody()))) {
+if (strlen($newPost->getBody())) {
 
 	/* Set up authentication
 	 * Put your permissions and stuff in here, just like ePortfolio v2
