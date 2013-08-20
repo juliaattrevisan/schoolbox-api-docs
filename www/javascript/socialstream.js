@@ -92,29 +92,30 @@ var socialstream = {
 	initAttachmentSelectors: function() {
 		var form = $j('.socialstreamAttachment').closest('form');
 
-		var urlElement = form.find('input[name=url]');
-		var fileElement = form.find('input[name=file]');
-		var resourceElement = form.find('input[name=resource]');
-
 		/* Hide everything so the default is a plain text message unadorned
 		 */
-		urlElement.parent('label').hide();
-		fileElement.parent('label').hide();
-		resourceElement.parent('label').hide();
+		form.find('input[name=url]').parent('label').hide();
+		form.find('input[name=file]').parent('label').hide();
+		form.find('input[name=resource]').parent('label').hide();
 
 		/* Deal with changing options
 		 */
 		$j('.socialstreamAttachment').live('change', function() {
+			var form = $j(this).closest('form');
 
-			/* Empty this upon change
-			 */
-			urlElement.val('');
+			var urlElement = form.find('input[name=url]');
+			var fileElement = form.find('input[name=file]');
+			var resourceElement = form.find('input[name=resource]');
 
 			/* Hide everything
 			 */
 			urlElement.parent('label').hide();
 			fileElement.parent('label').hide();
 			resourceElement.parent('label').hide();
+
+			/* Empty this upon change
+			 */
+			urlElement.val('');
 
 			/* Make the input element visible or not
 			 */
