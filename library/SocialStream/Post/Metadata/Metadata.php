@@ -56,11 +56,11 @@ abstract class Metadata {
 	 * Constructor
 	 *
 	 * @param $xml
-	 * @param $newPost
+	 * @param $url
 	 */
-	public function __construct($xml, $newPost) {
+	public function __construct($xml, $url) {
 		$this->setXml($xml);
-		$this->setUrl($newPost->getUrl());
+		$this->setUrl($url);
 	}
 
 	/**

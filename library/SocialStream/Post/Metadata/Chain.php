@@ -24,9 +24,9 @@ class Chain {
 	 * Constructor
 	 *
 	 * @param $curl
-	 * @param $newPost
+	 * @param $url
 	 */
-	public function __construct($curl, $newPost) {
+	public function __construct($curl, $url) {
 
 		/* xml the curl result so we can find things better
 		 * This allows us to xpath our way around
@@ -36,7 +36,7 @@ class Chain {
 		 * Avoid it by using internal_errors(true)
 		 * http://stackoverflow.com/questions/6090667/php-domdocument-errors-warnings-on-html5-tags
 		 */
-		if (strlen($curl->getResult())) {
+		if (($curl != null) && strlen($curl->getResult())) {
 			$data = $curl->getResult();
 		}
 		/* Use a default xml-parser friendly version of empty string
@@ -56,9 +56,9 @@ class Chain {
 
 		/* Set up chain of responsibility
 		 */
-		$opengraph = new OpenGraph($xml, $newPost);
-		$metatag = new MetaTag($xml, $newPost);
-		$null = new Null($xml, $newPost);
+		$opengraph = new OpenGraph($xml, $url);
+		$metatag = new MetaTag($xml, $url);
+		$null = new Null($xml, $url);
 
 		/* Try until one of them matches
 		 */
