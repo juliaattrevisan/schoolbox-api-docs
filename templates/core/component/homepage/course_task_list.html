@@ -1,7 +1,27 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	<h2>{COMPONENT_NAME}</h2>
-	{CONFIGURATION}
-	<div class="course_task_listing listing box clearfix">
-		<h3>Task List</h3>
-	</div>
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
+    <div class="course_task_listing listing box clearfix">
+        Part of course: <a href="/homepage/{PARENT_CATEGORY_ID}/">{PARENT_CATEGORY_NAME}</a>
+        <ul>
+        <!-- BEGIN task -->
+            <li class="task {DARK}">
+                <span class="icon {ICON_CLASS}"><span></span></span>
+                <h3>{TASK_NAME}</h3>
+                <!-- BEGIN edit_task -->
+                <div class="interact">
+                    <a href="/task/modify/{TASK_ID}" class="btn delete"><span></span>Modify</a>
+                    <a href="/task/modifyForm.php?delete={TASK_ID}" class="btn modify"><span></span>Delete</a>
+                </div>
+                <!-- END edit_task -->
+            </li>
+        <!-- END task -->
+        </ul>
+        <p class="interact">
+            <a href="/submission/createSubmission/new/{ID}/task" class="btn up-arrow"><span></span>Add Due Work</a>
+            <a href="/assess/create/{ID}/task" class="btn create"><span></span>Add Assessment</a>
+            <a href="#" class="btn tick"><span></span>Add Task</a>
+            <a href="#" class="btn translate"><span></span>Add Link</a>
+        </p>
+    </div>
 </div>

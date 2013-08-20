@@ -7,8 +7,10 @@
  * @link      http://www.alaress.com.au/
  */
 
-use \Schoolbox\Assessment\Course\Task;
-use \Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 
 class Component_Homepage_CourseTaskListController extends Component_Homepage_ControllerAbstract {
 
@@ -16,6 +18,11 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
      * @var Group
      */
     protected $group_handler;
+
+    /**
+     * @var Category
+     */
+    protected $category;
 
     /**
      * @var Task[]
@@ -26,8 +33,12 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
      * {@inheritdoc}
      */
     public function execute() {
-        $this->group_handler = new Group();
-        $this->task_list     = TaskMapper::getInstance()->findByCategory($this->getContext('id'));
+        $this->group_handler   = new Group();
+        $this->category        = CategoryMapper::getInstance()->findById($this->getContext('id'));
+        $this->task_list       = TaskMapper::getInstance()->findByCategory($this->category);
+        $this->category->setParent(
+            CategoryMapper::getInstance()->findById($this->category->getParentId())
+        );
     }
 
     /**
@@ -44,6 +55,23 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         }
 
         $this->parseConfig();
+
+        $this->setBlock($templateHandle, 'task', 'task_block');
+        $this->setBlock('task', 'edit_task', 'edit_task_block');
+
+        // Start shitting out tasks into the template
+        $this->setVar('PARENT_CATEGORY_ID',   $this->category->getParent()->getId());
+        $this->setVar('PARENT_CATEGORY_NAME', $this->category->getParent()->getName());
+        $this->setVar('task_block', '');
+        foreach ($this->task_list as $task) {
+            $this->setVar('edit_task_block', '');
+
+            $this->setVar('TASK_ID',   $task->getId());
+            $this->setVar('TASK_NAME', $task->getTitle());
+
+            $this->parse('edit_task_block', 'edit_task');
+            $this->parse('task_block', 'task', true);
+        }
 
         return true;
     }
