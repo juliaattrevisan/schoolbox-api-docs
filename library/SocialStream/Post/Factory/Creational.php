@@ -44,8 +44,6 @@ class Creational extends AbstractFactory {
 
 	/**
 	 * Construct a post from a link by doing url analysis
-	 *
-	 * @return \SocialStream_Post_Url|\SocialStream_Post_Video
 	 */
 	private function constructFromLink() {
 
@@ -60,7 +58,7 @@ class Creational extends AbstractFactory {
 					$object = new \SocialStream_Post_Video();
 					$object->setType('video');
 
-					return $object;
+					$this->setProduct($object);
 				}
 			}
 
@@ -69,7 +67,7 @@ class Creational extends AbstractFactory {
 			$object = new \SocialStream_Post_Url();
 			$object->setType('url');
 
-			return $object;
+			$this->setProduct($object);
 		}
 	}
 
@@ -80,25 +78,29 @@ class Creational extends AbstractFactory {
 		$fileArray = $_FILES['file'];
 
 		try {
-			$imageResource = \Schoolbox\FileMapper::getInstance()->upload($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
+			$resource = \Schoolbox\FileMapper::getInstance()->upload($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
 		}
 		catch (Exception $ex) {
 		}
 
-		var_dump($imageResource->isImage());
-		new \Alaress_Probe($imageResource);
+		new \Alaress_Probe($resource);
 
 		/* Figure out if it's a video
 		 */
-		if (preg_match('#^video/#', $fileArray['type'])) {
-			die('mort');
+		if ($resource->isVideo()) {
+			$object = new \SocialStream_Post_Video();
+			$object->setType('video');
+
+			$this->setProduct($object);
 		}
-		else if (preg_match('#^image/#', $fileArray['type'])) {
-			die('bart');
+		else if ($resource->isImage()) {
+			$object = new \SocialStream_Post_Url();
+			$object->setType('url');
+
+			$this->setProduct($object);
 		}
 
-
-		die('mog');
+		return $resource;
 	}
 
 	/**
@@ -125,7 +127,7 @@ class Creational extends AbstractFactory {
 		/* If the url option was chosen, try to curl metadata/thumbnails
 		 */
 		if ($this->getType() == 'url') {
-			$this->setProduct($this->constructFromLink());
+			$this->constructFromLink();
 			$this->populate($data);
 
 			/* Find thumbnail from the given url in one of the many
@@ -135,7 +137,9 @@ class Creational extends AbstractFactory {
 				$curl = new \Alaress_Curl_Url($this->getProduct()->getUrl());
 				$curl->exec();
 
-				/* Optionally parse the curl result here into a dom parser
+				/* Spawn additional stuff
+				 *
+				 * Optionally parse the curl result here into a dom parser
 				 * That would allow for attribute gathering
 				 */
 				$this->spawnMetadataFromCurl($curl);
@@ -146,8 +150,13 @@ class Creational extends AbstractFactory {
 		 * directly from already-known information (no curling needed)
 		 */
 		else if ($this->getType() == 'upload') {
-			$this->setProduct($this->constructFromUpload());
+			$uploadedFile = $this->constructFromUpload();
 			$this->populate($data);
+
+			/* Spawn additional stuff
+			 */
+			$this->spawnMetadataFromUpload($uploadedFile);
+			$this->spawnThumbnailFromUpload($uploadedFile);
 		}
 		else {
 			$this->setProduct($this->constructDefault());
@@ -203,10 +212,33 @@ class Creational extends AbstractFactory {
 		if (strlen($chain->getResult())) {
 			$this->getProduct()->setThumbnail($chain->getResult());
 
-			/* 	Save the original in the cache location
+			/* Save the original in the cache location
 			 */
 			$originalThumbnailCache = new \SocialStream\Cache\Original();
 			$originalThumbnailCache->init($this->getProduct()->getThumbnail());
+		}
+	}
+
+	/**
+	 * Get the title and description
+	 *
+	 * @param \Schoolbox\File $uploadedFile
+	 */
+	private function spawnMetadataFromUpload(\Schoolbox\File $uploadedFile) {
+		$this->getProduct()->setExternalTitle($uploadedFile->getFilename());
+		$this->getProduct()->setExternalBody('');
+	}
+
+	/**
+	 * Get the thumbnail usage
+	 *
+	 * @param \Schoolbox\File $uploadedFile
+	 */
+	private function spawnThumbnailFromUpload(\Schoolbox\File $uploadedFile) {
+		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $uploadedFile->getFilename());
+
+		if (strlen($chain->getResult())) {
+			$this->getProduct()->setThumbnail($chain->getResult());
 		}
 	}
 
