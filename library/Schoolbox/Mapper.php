@@ -1104,6 +1104,23 @@ class Mapper {
 	}
 
 	/**
+	 * Helper method for hydrating a row through a join that has been set up
+	 * with $this->hasJoin().
+	 *
+	 * @see $this->hydrate()
+	 *
+	 * @param array    $row      The row received from the database
+	 * @param string   $join     The name of the join on this mapper
+	 * @param string   $alias    The alias that the joined table was given
+	 * @param callable $callback An optional callback
+	 *
+	 * @return object
+	 */
+	public function hydrateJoin($row, $join, $alias, $callback = null) {
+		return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
+	}
+
+	/**
 	 * Helper method used by methods for finding a single model - this throws an
 	 * exception if the model is deleted (it is an ISoftDeletable and isDeleted()
 	 * returns true)
@@ -1179,6 +1196,20 @@ class Mapper {
 		}
 
 		return implode(', ', $columnList);
+	}
+
+	/**
+	 * Helper method for getting a column string from a join.
+	 *
+	 * @see $this->getColumnString()
+	 *
+	 * @param string $join  The name of the join on this mapper
+	 * @param string $alias The alias to give this join.
+	 *
+	 * @return string
+	 */
+	public function getJoinColumnString($join, $alias = '') {
+		return $this->getJoinMapper($join)->getColumnString($alias);
 	}
 
 	/**
