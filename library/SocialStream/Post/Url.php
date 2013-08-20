@@ -11,38 +11,6 @@
 class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
 	/**
-	 * Use a two-layer caching setup for spawning thumbnail images
-	 * For images, thumbnails are obtained via a series of regexes
-	 */
-	public function spawnThumbnail($curl) {
-		$chain = new \SocialStream\Post\Thumbnail\Chain($curl, $this);
-
-		/* To prevent a double-curl, remember the place where a thumbnail was
-		 * located (this is used as the cached image transform filename hash)
-		 */
-		if (strlen($chain->getResult())) {
-			$this->setThumbnail($chain->getResult());
-
-			/* 	Save the original in the cache location
-			 */
-			$originalThumbnailCache = new \SocialStream\Cache\Original();
-			$originalThumbnailCache->init($this->getThumbnail());
-		}
-	}
-
-	/**
-	 * Get the title and description
-	 *
-	 * @param $curl
-	 */
-	public function spawnMetadata($curl) {
-		$chain = new \SocialStream\Post\Metadata\Chain($curl, $this);
-
-		$this->setExternalTitle($chain->getResult()->getTitle());
-		$this->setExternalBody($chain->getResult()->getDescription());
-	}
-
-	/**
 	 * Determine whether this should display an icon or something
 	 * via the image transform
 	 * 
