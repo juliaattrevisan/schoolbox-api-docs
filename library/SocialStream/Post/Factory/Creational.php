@@ -118,7 +118,7 @@ class Creational extends AbstractFactory {
 	 * Spawn metadata and thumbnails where appropriate
 	 *
 	 * @param $data
-	 * @return mixed
+	 * @return mixed|null
 	 */
 	public function produce($data) {
 
@@ -138,8 +138,8 @@ class Creational extends AbstractFactory {
 				/* Optionally parse the curl result here into a dom parser
 				 * That would allow for attribute gathering
 				 */
-				$this->getProduct()->spawnMetadata($curl);
-				$this->getProduct()->spawnThumbnail($curl);
+				$this->spawnMetadataFromCurl($curl);
+				$this->spawnThumbnailFromCurl($curl);
 			}
 		}
 		/* If upload option was chosen, extract metadata and thumbnail information
@@ -173,6 +173,41 @@ class Creational extends AbstractFactory {
 		$this->getProduct()->setCreatedAt($data['requestTime']);
 		$this->getProduct()->setUpdatedAt($data['requestTime']);
 		$this->getProduct()->setDeletedAt(null);
+	}
+
+	/* Spawn metadata and thumbnails via different ways
+	 */
+
+	/**
+	 * Get the title and description
+	 *
+	 * @param $curl
+	 */
+	private function spawnMetadataFromCurl($curl) {
+		$chain = new \SocialStream\Post\Metadata\Chain($curl, $this->getProduct());
+
+		$this->getProduct()->setExternalTitle($chain->getResult()->getTitle());
+		$this->getProduct()->setExternalBody($chain->getResult()->getDescription());
+	}
+
+	/**
+	 * Use a two-layer caching setup for spawning thumbnail images
+	 * For images, thumbnails are obtained via a series of regexes
+	 */
+	private function spawnThumbnailFromCurl($curl) {
+		$chain = new \SocialStream\Post\Thumbnail\Chain($curl, $this->getProduct());
+
+		/* To prevent a double-curl, remember the place where a thumbnail was
+		 * located (this is used as the cached image transform filename hash)
+		 */
+		if (strlen($chain->getResult())) {
+			$this->getProduct()->setThumbnail($chain->getResult());
+
+			/* 	Save the original in the cache location
+			 */
+			$originalThumbnailCache = new \SocialStream\Cache\Original();
+			$originalThumbnailCache->init($this->getProduct()->getThumbnail());
+		}
 	}
 
 	/* Getters/Setters
