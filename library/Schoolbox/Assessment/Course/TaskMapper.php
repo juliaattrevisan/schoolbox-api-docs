@@ -27,7 +27,8 @@ class TaskMapper extends Mapper {
         $this->hasMap(array(
             'column'     => 'type',
             'property'   => 'type',
-            'type'       => self::TYPE_INTEGER,
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'type',
         ));
         $this->hasMap(array(
             'column'     => 'category_id',
@@ -70,6 +71,11 @@ class TaskMapper extends Mapper {
             'type'       => self::TYPE_DATETIME,
         ));
 
+        $this->hasJoin('type', array(
+            'mapper'    => '\\Schoolbox\\Assessment\\Course\\TaskTypeMapper',
+            'this_key'  => 'type',
+            'other_key' => 'id',
+        ));
         $this->hasJoin('category', array(
             'mapper'    => 'Schoolbox\\Resource\\CategoryMapper',
             'this_key'  => 'category_id',
@@ -104,11 +110,13 @@ class TaskMapper extends Mapper {
         return "
             SELECT
                 {$this->getColumnString('t')},
+                {$this->getJoinColumnString('type',           'tt')},
                 {$this->getJoinColumnString('category',       'c')},
                 {$this->getJoinColumnString('submission_box', 'sb')},
                 {$this->getJoinColumnString('assessment',     'as')},
                 {$this->getJoinColumnString('owner',          'u')}
             FROM {$this->getTable()} AS t
+            LEFT JOIN {$this->getJoinSql('type',           't', 'tt')}
             LEFT JOIN {$this->getJoinSql('category',       't', 'c')}
             LEFT JOIN {$this->getJoinSql('submission_box', 't', 'sb')}
             LEFT JOIN {$this->getJoinSql('assessment',     't', 'as')}
@@ -127,6 +135,7 @@ class TaskMapper extends Mapper {
      */
     public static function baseHydrateCallback($mapper, $model, $row) {
         $model
+            ->setType($mapper->hydrateJoin($row, 'type', 'tt'))
             ->setCategory($mapper->hydrateJoin($row, 'category', 'c'))
             ->setOwner($mapper->hydrateJoin($row, 'owner', 'u'))
             ->setAssessment($mapper->hydrateJoin($row, 'assessment', 'as'))

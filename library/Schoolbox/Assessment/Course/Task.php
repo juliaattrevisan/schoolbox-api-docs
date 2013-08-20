@@ -35,7 +35,7 @@ class Task implements ISoftDeletable {
     protected $category;
 
     /**
-     * @var int
+     * @var TaskType
      */
     protected $type;
 
@@ -166,7 +166,7 @@ class Task implements ISoftDeletable {
     }
 
     /**
-     * @param  int $type
+     * @param  TaskType $type
      * @return $this
      */
     public function setType($type) {
@@ -175,7 +175,7 @@ class Task implements ISoftDeletable {
     }
 
     /**
-     * @return int
+     * @return TaskType
      */
     public function getType() {
         return $this->type;
