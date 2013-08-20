@@ -191,7 +191,7 @@ class Creational extends AbstractFactory {
 	 * @param $curl
 	 */
 	private function spawnMetadataFromCurl($curl) {
-		$chain = new \SocialStream\Post\Metadata\Chain($curl, $this->getProduct());
+		$chain = new \SocialStream\Post\Metadata\Chain($curl, $this->getProduct()->getUrl());
 
 		$this->getProduct()->setExternalTitle($chain->getResult()->getTitle());
 		$this->getProduct()->setExternalBody($chain->getResult()->getDescription());
@@ -202,7 +202,7 @@ class Creational extends AbstractFactory {
 	 * For images, thumbnails are obtained via a series of regexes
 	 */
 	private function spawnThumbnailFromCurl($curl) {
-		$chain = new \SocialStream\Post\Thumbnail\Chain($curl, $this->getProduct());
+		$chain = new \SocialStream\Post\Thumbnail\Chain($curl, $this->getProduct()->getUrl());
 
 		/* To prevent a double-curl, remember the place where a thumbnail was
 		 * located (this is used as the cached image transform filename hash)
@@ -233,10 +233,24 @@ class Creational extends AbstractFactory {
 	 * @param \Schoolbox\File $uploadedFile
 	 */
 	private function spawnThumbnailFromUpload(\Schoolbox\File $uploadedFile) {
-		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $uploadedFile->getFilename());
+		if ($uploadedFile->isImage()) {
+			$url = "/storage/image.php?size=maxsize&hash={$uploadedFile->getHash()}";
 
-		if (strlen($chain->getResult())) {
-			$this->getProduct()->setThumbnail($chain->getResult());
+			$this->getProduct()->setThumbnail($url);
+
+			/* Save the original in the cache location
+			 */
+			$originalThumbnailCache = new \SocialStream\Cache\Original();
+			$originalThumbnailCache->init($url);
+		}
+		else {
+//			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $uploadedFile->getFilename());
+//
+//			if (strlen($chain->getResult())) {
+//				$url = "/storage/image.php?size=square64&hash={$chain->getResult()}";
+//
+//				$this->getProduct()->setThumbnail($url);
+//			}
 		}
 	}
 
