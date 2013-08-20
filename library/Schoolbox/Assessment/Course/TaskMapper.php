@@ -8,13 +8,12 @@
  */
 
 namespace Schoolbox\Assessment\Course;
-use Schoolbox;
-use Schoolbox\User;
-use Schoolbox\Resource\Category;
-use Schoolbox\Assessment\ActivityFactory;
-use Schoolbox\Assessment\ActivityCollection;
 
-class TaskMapper extends Schoolbox\Mapper {
+use Schoolbox\Collection;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Category;
+
+class TaskMapper extends Mapper {
 
     protected function mapping() {
         $this->hasTable('task');
@@ -24,6 +23,11 @@ class TaskMapper extends Schoolbox\Mapper {
             'property'   => 'id',
             'type'       => self::TYPE_INTEGER,
             'identifier' => true,
+        ));
+        $this->hasMap(array(
+            'column'     => 'type',
+            'property'   => 'type',
+            'type'       => self::TYPE_INTEGER,
         ));
         $this->hasMap(array(
             'column'     => 'category_id',
@@ -77,12 +81,12 @@ class TaskMapper extends Schoolbox\Mapper {
             'other_key' => 'id',
         ));
         $this->hasJoin('submission_box', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox',
+            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
             'this_key'  => 'type',
             'other_key' => 'id',
         ));
         $this->hasJoin('assessment', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessment',
+            'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessmentMapper',
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));
@@ -91,51 +95,81 @@ class TaskMapper extends Schoolbox\Mapper {
     }
 
     /**
-     * @throws Schoolbox\Mapper\Exception if task is not found
-     * @param  int  $id
+     * Helper method for retrieving a sensible base task. It contains a join to
+     * the category, submission box, assessment and owner of this task.
+     *
+     * @return string
+     */
+    protected function getBaseQuery() {
+        return "
+            SELECT
+                {$this->getColumnString('t')},
+                {$this->getJoinColumnString('category',       'c')},
+                {$this->getJoinColumnString('submission_box', 'sb')},
+                {$this->getJoinColumnString('assessment',     'as')},
+                {$this->getJoinColumnString('owner',          'u')}
+            FROM {$this->getTable()} AS t
+            LEFT JOIN {$this->getJoinSql('category',       't', 'c')}
+            LEFT JOIN {$this->getJoinSql('submission_box', 't', 'sb')}
+            LEFT JOIN {$this->getJoinSql('assessment',     't', 'as')}
+            LEFT JOIN {$this->getJoinSql('owner',          't', 'u')}
+        ";
+    }
+
+    /**
+     * Hydrate callback for use with queries created with $this->getBaseQuery();
+     *
+     * @param TaskMapper $mapper
+     * @param Task       $model
+     * @param array      $row
+     *
+     * @return Task
+     */
+    public static function baseHydrateCallback($mapper, $model, $row) {
+        $model
+            ->setCategory($mapper->hydrateJoin($row, 'category', 'c'))
+            ->setOwner($mapper->hydrateJoin($row, 'owner', 'u'))
+            ->setAssessment($mapper->hydrateJoin($row, 'assessment', 'as'))
+            ->setSubmissionBox($mapper->hydrateJoin($row, 'submission_box', 'sb'))
+        ;
+        return $model;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @return Task
      */
     public function findById($id) {
-        $cat_mapper    = $this->getJoinMapper('category');
-        $box_mapper    = $this->getJoinMapper('submission_box');
-        $assess_mapper = $this->getJoinMapper('assessment');
-        $owner_mapper  = $this->getJoinMapper('owner');
-
-        //
-        // Join: category, submission box, assessment, owner.
-        $query = "
-            SELECT
-                {$this->getColumnString('t')},
-                {$cat_mapper->getColumnString('c')},
-                {$box_mapper->getColumnString('sb')},
-                {$assess_mapper->getColumnString('as')},
-                {$owner_mapper->getColumnString('u')}
-            FROM {$this->getTable()} AS t
-            LEFT JOIN {$this->getJoinSql('category', 't', 'c')}
-            LEFT JOIN {$this->getJoinSql('submission_box', 't', 'sb')}
-            LEFT JOIN {$this->getJoinSql('assessment', 't', 'as')}
-            LEFT JOIN {$this->getJoinSql('owner', 't', 'u')}
-            WHERE sb.id=?
-        ";
+        $query     = $this->getBaseQuery() . " WHERE t.id=?";
         $statement = $this->database->prepare($query);
         $statement->execute(array($id));
-
         if (($row = $statement->fetch()) !== false) {
-            /** @var Task $task */
-            $task = $this->hydrate($row, 't');
-            $task
-                ->setCategory($cat_mapper->hydrate($row, 'c'))
-                ->setOwner($owner_mapper->hydrate($row, 'u'))
-                ->setAssessment($assess_mapper->hydrate($row, 'as'))
-                ->setSubmissionBox($box_mapper->hydrate($row, 'sb'))
-            ;
+            $task = $this->hydrate($row, 't', array($this, 'baseHydrateCallback'));
             $this->throwIfDeleted($task);
             return $task;
         }
         else {
-            throw new Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception('Instance of object not found');
         }
     }
 
-    // public function findForCategory(Category $category)
+    /**
+     * Gets the tasks in the given category.
+     *
+     * @param int|Category $category Either a Category object or a category ID
+     * @param bool         $deleted  True to get deleted tasks too
+     *
+     * @return Collection
+     */
+    public function findByCategory($category, $deleted = false) {
+        $query = $this->getBaseQuery() . " WHERE t.category_id=?";
+        if (!$deleted) {
+            $query .= ' AND '.$this->getSoftDeleteFilterSql('t');
+        }
+        $statement = $this->database->prepare($query);
+        $cat_id    = ($category instanceof Category) ? $category->getId() : $category;
+        $statement->execute(array($cat_id));
+        return $this->hydrateList($statement, 't', array($this, 'baseHydrateCallback'));
+    }
 }
