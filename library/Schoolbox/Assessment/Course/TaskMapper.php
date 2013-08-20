@@ -167,6 +167,8 @@ class TaskMapper extends Mapper {
         if (!$deleted) {
             $query .= ' AND '.$this->getSoftDeleteFilterSql('t');
         }
+        $query .= ' ORDER BY t.title ASC';
+
         $statement = $this->database->prepare($query);
         $cat_id    = ($category instanceof Category) ? $category->getId() : $category;
         $statement->execute(array($cat_id));
