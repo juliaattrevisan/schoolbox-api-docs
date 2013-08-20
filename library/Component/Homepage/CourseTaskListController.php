@@ -63,11 +63,13 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setVar('PARENT_CATEGORY_ID',   $this->category->getParent()->getId());
         $this->setVar('PARENT_CATEGORY_NAME', $this->category->getParent()->getName());
         $this->setVar('task_block', '');
+        $i = 0;
         foreach ($this->task_list as $task) {
             $this->setVar('edit_task_block', '');
 
             $this->setVar('TASK_ID',   $task->getId());
             $this->setVar('TASK_NAME', $task->getTitle());
+            $this->setVar('DARK',      ($i++%2 === 1 ? 'dark' : ''));
 
             $this->parse('edit_task_block', 'edit_task');
             $this->parse('task_block', 'task', true);
