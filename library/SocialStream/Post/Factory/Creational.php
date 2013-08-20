@@ -243,14 +243,10 @@ class Creational extends AbstractFactory {
 			$originalThumbnailCache = new \SocialStream\Cache\Original();
 			$originalThumbnailCache->init($url);
 		}
-		else {
-//			$chain = new \SocialStream\Post\Player\Chain(null, $uploadedFile->getFilename());
-//
-//			if (strlen($chain->getResult())) {
-//				$url = "/storage/image.php?size=square64&hash={$chain->getResult()}";
-//
-//				$this->getProduct()->setThumbnail($url);
-//			}
+		else if ($uploadedFile->isVideo()) {
+			$url = "/cms/sendVideo.php?type=storage&id={$uploadedFile->getHash()}";
+
+			$this->getProduct()->setUrl($url);
 		}
 	}
 
