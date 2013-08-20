@@ -2,17 +2,44 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div class="course_task_listing listing box clearfix">
-        Part of course: <a href="/homepage/{PARENT_CATEGORY_ID}/">{PARENT_CATEGORY_NAME}</a>
-        <ul>
+        <style type="text/css">
+            .course_task_listing .course_definition {
+                padding: 7px 16px;
+            }
+            .course_task_listing .course_definition dt {
+                width: auto;
+                max-width: 70%;
+                margin-right: 0.5em;
+            }
+            .course_task_listing .task h3 {
+                float: none;
+                display: inline-block;
+                width: 70%;
+            }
+            .course_task_listing .task .interact {
+                display: inline-block;
+                width: 29%;
+                text-align: right;
+            }
+            .course_task_listing .task .interact .btn {
+                float: none;
+                display: inline-block;
+            }
+        </style>
+        <dl class="clearfix course_definition">
+            <dt>These tasks are part of course:</dt>
+            <dd><a href="/homepage/{PARENT_CATEGORY_ID}/">{PARENT_CATEGORY_NAME}</a></dd>
+        </dl>
+        <ul class="task-list">
         <!-- BEGIN task -->
-            <li class="task {DARK}">
-                <span class="icon {ICON_CLASS}"><span></span></span>
+            <li class="task interact {DARK}">
+                <span class="icon {TASK_CLASS}" title="{TASK_TYPE}"><span></span></span>
                 <h3>{TASK_NAME}</h3>
                 <!-- BEGIN edit_task -->
-                <div class="interact">
-                    <a href="/task/modify/{TASK_ID}" class="btn delete"><span></span>Modify</a>
-                    <a href="/task/modifyForm.php?delete={TASK_ID}" class="btn modify"><span></span>Delete</a>
-                </div>
+                <span class="interact">
+                <a href="/task/modify/{TASK_ID}" class="btn delete" title="Modify this task"><span></span></a>
+                <a href="/task/modifyForm.php?delete={TASK_ID}" class="btn modify" title="Delete this task"><span></span></a>
+                </span>
                 <!-- END edit_task -->
             </li>
         <!-- END task -->
