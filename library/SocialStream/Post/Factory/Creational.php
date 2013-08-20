@@ -244,7 +244,7 @@ class Creational extends AbstractFactory {
 			$originalThumbnailCache->init($url);
 		}
 		else {
-//			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $uploadedFile->getFilename());
+//			$chain = new \SocialStream\Post\Player\Chain(null, $uploadedFile->getFilename());
 //
 //			if (strlen($chain->getResult())) {
 //				$url = "/storage/image.php?size=square64&hash={$chain->getResult()}";

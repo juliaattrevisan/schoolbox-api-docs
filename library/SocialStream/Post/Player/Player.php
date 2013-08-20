@@ -34,10 +34,10 @@ abstract class Player {
 	/**
 	 * Constructor
 	 *
-	 * @param $newPost
+	 * @param $url
 	 */
-	public function __construct($newPost) {
-		$this->setUrl($newPost->getUrl());
+	public function __construct($url) {
+		$this->setUrl($url);
 	}
 
 	/**

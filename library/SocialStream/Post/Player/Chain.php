@@ -23,15 +23,15 @@ class Chain {
 	/**
 	 * Constructor
 	 *
-	 * @param $newPost
+	 * @param $url
 	 */
-	public function __construct($newPost) {
+	public function __construct($url) {
 
 		/* Set up chain of responsibility
 		 */
-		$youtube = new Youtube($newPost);
-		$vimeo = new Vimeo($newPost);
-		$ted = new Ted($newPost);
+		$youtube = new Youtube($url);
+		$vimeo = new Vimeo($url);
+		$ted = new Ted($url);
 
 		/* Try until one of them matches
 		 */

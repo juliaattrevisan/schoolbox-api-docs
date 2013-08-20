@@ -30,7 +30,7 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 	 * @return mixed|void
 	 */
 	public function renderThumbnail($context, $page) {
-		$chain = new \SocialStream\Post\Player\Chain($this);
+		$chain = new \SocialStream\Post\Player\Chain($this->getUrl());
 
 		/* If it was interpreted, embed that player
 		 */
