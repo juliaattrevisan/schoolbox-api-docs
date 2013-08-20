@@ -9,6 +9,7 @@
 
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\TaskType;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 
@@ -65,12 +66,34 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setVar('task_block', '');
         $i = 0;
         foreach ($this->task_list as $task) {
-            $this->setVar('edit_task_block', '');
-
-            $this->setVar('TASK_ID',   $task->getId());
-            $this->setVar('TASK_NAME', $task->getTitle());
-            $this->setVar('DARK',      ($i++%2 === 1 ? 'dark' : ''));
-
+            // Temp conversion of task classes
+            $class = '';
+            switch ($task->getType()->getId()) {
+                case TaskType::TYPE_LINK:
+                    $class = 'link';
+                    break;
+                case TaskType::TYPE_STUDENT_ASSESS:
+                    $class = 'folder';
+                    break;
+                case TaskType::TYPE_TEACHER_ASSESS:
+                    $class = 'tick';
+                    break;
+                case TaskType::TYPE_DUE_WORK:
+                    $class = 'new';
+                    break;
+                case TaskType::TYPE_ONLINE_ASSESS:
+                    $class = 'onlineassess';
+                    break;
+            }
+            $this->setVar(
+                array(
+                    'TASK_ID'    => $task->getId(),
+                    'TASK_NAME'  => Scrub::text($task->getTitle()),
+                    'TASK_TYPE'  => Scrub::text($task->getType()->getLabel()),
+                    'TASK_CLASS' => $class,
+                    'DARK'       => ($i++%2 === 1 ? 'dark' : ''),
+                )
+            );
             $this->parse('edit_task_block', 'edit_task');
             $this->parse('task_block', 'task', true);
         }
