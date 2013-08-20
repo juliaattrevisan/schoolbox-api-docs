@@ -131,20 +131,6 @@ abstract class SocialStream_Post_Abstract {
 	}
 
 	/**
-	 * Spawn a thumbnail of the resource that was linked
-	 * if applicable; otherwise does nothing at all
-	 */
-	public function spawnThumbnail() {
-	}
-
-	/**
-	 * Spawn meta data oft he resource that was linked
-	 * if applicable; otherwise does nothing at all
-	 */
-	public function spawnMetaData() {
-	}
-
-	/**
 	 * Render thumbnail (or equivalents) as determined by subclasses
 	 *
 	 * @param $context
