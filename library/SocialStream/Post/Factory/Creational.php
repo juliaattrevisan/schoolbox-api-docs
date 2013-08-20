@@ -121,6 +121,9 @@ class Creational extends AbstractFactory {
 	 * @return mixed
 	 */
 	public function produce($data) {
+
+		/* If the url option was chosen, try to curl metadata/thumbnails
+		 */
 		if ($this->getType() == 'url') {
 			$this->setProduct($this->constructFromLink());
 			$this->populate($data);
@@ -139,6 +142,9 @@ class Creational extends AbstractFactory {
 				$this->getProduct()->spawnThumbnail($curl);
 			}
 		}
+		/* If upload option was chosen, extract metadata and thumbnail information
+		 * directly from already-known information (no curling needed)
+		 */
 		else if ($this->getType() == 'upload') {
 			$this->setProduct($this->constructFromUpload());
 			$this->populate($data);
@@ -207,6 +213,4 @@ class Creational extends AbstractFactory {
 	private function getProduct() {
 		return $this->product;
 	}
-
-
 }

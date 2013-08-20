@@ -27,34 +27,6 @@ $newPost = $factory->produce($data);
 
 if (strlen(trim($newPost->getBody()))) {
 
-//	/* Post links
-//	 */
-//	if ($_POST['socialstreamAttachment'] == 'url') {
-//
-//		/* Find thumbnail from the given url in one of the many
-//		 * ways that they can exist, if applicable
-//		 */
-//		if (strlen($newPost->getUrl())) {
-//			$curl = new \Alaress_Curl_Url($newPost->getUrl());
-//			$curl->exec();
-//
-//			/* Optionally parse the curl result here into a dom parser
-//			 * That would allow for attribute gathering
-//			 */
-//			$newPost->spawnMetadata($curl);
-//			$newPost->spawnThumbnail($curl);
-//		}
-//	}
-//	/* Post files
-// 	*/
-//	else if ($_POST['socialstreamAttachment'] == 'upload') {
-//
-//	}
-//	/* Use the resource browser
-//	 */
-//	else if ($_POST['socialstreamAttachment'] == 'resource') {
-//	}
-
 	/* Set up authentication
 	 * Put your permissions and stuff in here, just like ePortfolio v2
 	 */
