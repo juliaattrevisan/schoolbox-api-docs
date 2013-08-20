@@ -23,9 +23,10 @@ class Display extends AbstractFactory {
 	/**
 	 * Produce an instance of SocialStream_Post_Abstract subclass
 	 *
-	 * @return mixed
+	 * @param null $data
+	 * @return mixed|\SocialStream_Post_Url|\SocialStream_Post_Video
 	 */
-	public function produce() {
+	public function produce($data = null) {
 
 		/* If a url was provided, determine what kind it was
 		 */

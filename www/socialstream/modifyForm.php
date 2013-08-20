@@ -13,50 +13,47 @@ namespace SocialStream;
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 $page = new \SitePage();
 
+/* Compile some misc data
+ */
+$data = array_merge($_POST, array(
+	'ownerId' => $_SESSION['id'],
+	'requestTime' => new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'),
+));
+
 /* Create new SocialStream Post
  */
 $factory = new Post\Factory\Creational($_POST['socialstreamAttachment'], $_POST['url']);
-
-$newPost = $factory->produce();
-$newPost->setRootId($_POST['rootId']);
-$newPost->setParentId($_POST['parentId']);
-$newPost->setHomepageId($_POST['homepageId']);
-$newPost->setOwnerId($_SESSION['id']);
-$newPost->setUrl(trim($_POST['url']));
-$newPost->setBody(trim($_POST['body']));
-$newPost->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-$newPost->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-$newPost->setDeletedAt(null);
+$newPost = $factory->produce($data);
 
 if (strlen(trim($newPost->getBody()))) {
 
-	/* Post links
-	 */
-	if ($_POST['socialstreamAttachment'] == 'url') {
-
-		/* Find thumbnail from the given url in one of the many
-		 * ways that they can exist, if applicable
-		 */
-		if (strlen($newPost->getUrl())) {
-			$curl = new \Alaress_Curl_Url($newPost->getUrl());
-			$curl->exec();
-
-			/* Optionally parse the curl result here into a dom parser
-			 * That would allow for attribute gathering
-			 */
-			$newPost->spawnMetadata($curl);
-			$newPost->spawnThumbnail($curl);
-		}
-	}
-	/* Post files
- 	*/
-	else if ($_POST['socialstreamAttachment'] == 'upload') {
-
-	}
-	/* Use the resource browser
-	 */
-	else if ($_POST['socialstreamAttachment'] == 'resource') {
-	}
+//	/* Post links
+//	 */
+//	if ($_POST['socialstreamAttachment'] == 'url') {
+//
+//		/* Find thumbnail from the given url in one of the many
+//		 * ways that they can exist, if applicable
+//		 */
+//		if (strlen($newPost->getUrl())) {
+//			$curl = new \Alaress_Curl_Url($newPost->getUrl());
+//			$curl->exec();
+//
+//			/* Optionally parse the curl result here into a dom parser
+//			 * That would allow for attribute gathering
+//			 */
+//			$newPost->spawnMetadata($curl);
+//			$newPost->spawnThumbnail($curl);
+//		}
+//	}
+//	/* Post files
+// 	*/
+//	else if ($_POST['socialstreamAttachment'] == 'upload') {
+//
+//	}
+//	/* Use the resource browser
+//	 */
+//	else if ($_POST['socialstreamAttachment'] == 'resource') {
+//	}
 
 	/* Set up authentication
 	 * Put your permissions and stuff in here, just like ePortfolio v2

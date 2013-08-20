@@ -35,9 +35,10 @@ abstract class AbstractFactory {
 	/**
 	 * Produce an object
 	 *
+	 * @param $data
 	 * @return mixed
 	 */
-	abstract public function produce();
+	abstract public function produce($data);
 
 	/* Getters/Setters
 	 */

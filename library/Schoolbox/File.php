@@ -355,4 +355,49 @@ class File {
 	public function isUploadAllowed() {
 		return $this->mimetype_loader->isFilenameMimetypeAllowed($this->getFilename());
 	}
+
+	/**
+	 * Determine if a file is audio
+	 *
+	 * @return bool
+	 */
+	public function isAudio() {
+		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
+
+		if (preg_match('#^audio/#', $mimetype)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine if a file is video
+	 *
+	 * @return bool
+	 */
+	public function isVideo() {
+		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
+
+		if (preg_match('#^video/#', $mimetype)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine if a file is an image
+	 *
+	 * @return bool
+	 */
+	public function isImage() {
+		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
+
+		if (preg_match('#^image/#', $mimetype)) {
+			return true;
+		}
+
+		return false;
+	}
 }
