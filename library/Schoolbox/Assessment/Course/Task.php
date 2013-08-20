@@ -18,12 +18,6 @@ use Schoolbox\User;
 
 class Task implements ISoftDeletable {
 
-    const TYPE_LINK           = 1;
-    const TYPE_STUDENT_ASSESS = 2;
-    const TYPE_TEACHER_ASSESS = 3;
-    const TYPE_DUE_WORK       = 4;
-    const TYPE_ONLINE_ASSESS  = 5;
-
     /**
      * @var int
      */
