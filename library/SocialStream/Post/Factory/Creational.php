@@ -83,8 +83,6 @@ class Creational extends AbstractFactory {
 		catch (Exception $ex) {
 		}
 
-		new \Alaress_Probe($resource);
-
 		/* Figure out if it's a video
 		 */
 		if ($resource->isVideo()) {
