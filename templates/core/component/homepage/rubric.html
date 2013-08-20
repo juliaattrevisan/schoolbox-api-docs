@@ -1,14 +1,14 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="rubric_list box clearfix">
+    <div class="rubric_listing listing box clearfix">
         <ul>
             <!-- BEGIN rubric_criterion -->
-            <li>
-                {CRITERION_NAME}
+            <li class="criterion clearfix {DARK}">
+                <h3>{CRITERION_NAME}</h3>
                 <ul>
                     <!-- BEGIN rubric_descriptor -->
-                    <li>{DESCRIPTOR_NAME}</li>
+                    <li class="descriptor"><span class="name">{DESCRIPTOR_NAME}</span></li>
                     <!-- END rubric_descriptor -->
                 </ul>
             </li>

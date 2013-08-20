@@ -51,8 +51,10 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         $this->setBlock($templateHandle, 'rubric_criterion', 'rubric_criterion_block');
         $this->setBlock('rubric_criterion', 'rubric_descriptor', 'rubric_descriptor_block');
         $this->setVar('rubric_criterion_block', '');
+        $i = 0;
         foreach ($this->criteria as $criterion_name => $criterion_descriptors) {
             $this->setVar('CRITERION_NAME', Scrub::text($criterion_name));
+            $this->setVar('DARK', ($i++%2 === 1 ? 'dark' : ''));
             $this->setVar('rubric_descriptor_block', '');
             foreach ($criterion_descriptors as $descriptor) {
                 $this->setVar('DESCRIPTOR_NAME', $descriptor['name']);
