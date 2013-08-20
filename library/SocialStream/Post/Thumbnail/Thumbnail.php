@@ -67,12 +67,12 @@ abstract class Thumbnail {
 	 * Constructor
 	 *
 	 * @param $xml
-	 * @param $newPost
+	 * @param $url
 	 */
-	public function __construct($xml, $newPost) {
+	public function __construct($xml, $url) {
 		$this->setXml($xml);
-		$this->setUrl($newPost->getUrl());
-		$this->setFileType(new \FileType($newPost->getUrl()));
+		$this->setUrl($url);
+		$this->setFileType(new \FileType($url));
 	}
 
 	/**

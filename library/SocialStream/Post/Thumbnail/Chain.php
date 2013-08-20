@@ -29,9 +29,9 @@ class Chain {
 	 * DomDocument parsing)
 	 *
 	 * @param $curl
-	 * @param $newPost
+	 * @param $url
 	 */
-	public function __construct($curl, $newPost) {
+	public function __construct($curl, $url) {
 
 		/* xml the curl result so we can find things better
 		 * This allows us to xpath our way around
@@ -61,16 +61,16 @@ class Chain {
 
 		/* Set up chain of responsibility
 		 */
-		$direct = new Direct($xml, $newPost);
-		$opengraph = new OpenGraph($xml, $newPost);
-		$itempropImage = new ItempropImage($xml, $newPost);
-		$itempropPhoto = new ItempropPhoto($xml, $newPost);
-		$itempropIcon = new ItempropIcon($xml, $newPost);
-		$itempropThumbnailUrl = new ItempropThumbnailUrl($xml, $newPost);
-		$linkIcon = new LinkIcon($xml, $newPost);
-		$linkIconApple = new LinkIconApple($xml, $newPost);
-		$linkIconApplePrecompiled = new LinkIconApplePrecompiled($xml, $newPost);
-		$arbitraryFile = new ArbitraryFile($xml, $newPost);
+		$direct = new Direct($xml, $url);
+		$opengraph = new OpenGraph($xml, $url);
+		$itempropImage = new ItempropImage($xml, $url);
+		$itempropPhoto = new ItempropPhoto($xml, $url);
+		$itempropIcon = new ItempropIcon($xml, $url);
+		$itempropThumbnailUrl = new ItempropThumbnailUrl($xml, $url);
+		$linkIcon = new LinkIcon($xml, $url);
+		$linkIconApple = new LinkIconApple($xml, $url);
+		$linkIconApplePrecompiled = new LinkIconApplePrecompiled($xml, $url);
+		$arbitraryFile = new ArbitraryFile($xml, $url);
 
 		/* Try directly, otherwise try the other meta tag variants in sequence
 		 * until one of them matches
