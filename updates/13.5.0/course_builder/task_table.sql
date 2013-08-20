@@ -17,3 +17,19 @@ CREATE TABLE `task` (
   INDEX `task_user_id` (`user_id` ASC) ,
   INDEX `task_deleted_at` (`deleted_at` ASC)
 );
+
+-- Lookup table for task types
+CREATE TABLE `lu_task_type` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `label` VARCHAR(250) NOT NULL ,
+  `class` VARCHAR(250) NOT NULL ,
+  PRIMARY KEY (`id`)
+);
+INSERT INTO `lu_task_type`
+  (`id`, `label`,                   `class`) VALUES
+  (1,    'Link',                    'link'),
+  (2,    'Student Self-Assessment', 'self_assess'),
+  (3,    'Teacher Assessment',      'teacher_assess'),
+  (4,    'Due Work Item',           'due_work'),
+  (5,    'Online Assessment',       'online_assess')
+;
