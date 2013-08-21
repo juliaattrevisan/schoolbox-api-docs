@@ -142,10 +142,14 @@ var socialstream = {
 			$j('.socialstream').append(responseText);
 
 			/* Update offsets, hiding View More if there were none left
+			 * after streaming 
 			 */
 			self.start = parseInt(self.start) + parseInt(self.offset);
 
-			if (self.start > self.numPosts) {
+			if (self.start < self.numPosts) {
+				$j(self.viewMoreLink).show();
+			}
+			else {
 				$j(self.viewMoreLink).hide();
 			}
 
