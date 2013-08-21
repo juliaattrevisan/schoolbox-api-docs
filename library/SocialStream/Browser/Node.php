@@ -31,6 +31,13 @@ class Node {
 	private $result = array();
 
 	/**
+	 * An instance of a category mapper
+	 *
+	 * @var null
+	 */
+	private $categoryMapper = null;
+
+	/**
 	 * Constructor
 	 *
 	 * $nodeId is the primary key of the category whose contents
@@ -41,6 +48,7 @@ class Node {
 	public function __construct($nodeId) {
 		if (is_numeric($nodeId)) {
 			$this->setNodeId($nodeId);
+			$this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
 			$this->processNode();
 		}
@@ -58,9 +66,41 @@ class Node {
 	 * Combine the categories and files into a single list
 	 */
 	private function processNode() {
-		$output = array_merge($this->getCategories(), $this->getFiles());
+		$output = array(
+			'breadcrumbs' => $this->getBreadcrumbs(),
+			'records' => array_merge($this->getCategories(), $this->getFiles()),
+		);
 
 		$this->setResult($output);
+	}
+
+	/**
+	 * Get a list of breadcrumbs for this node
+	 *
+	 * @return array
+	 */
+	private function getBreadcrumbs() {
+		$category = $this->getCategoryMapper()->findById($this->getNodeId());
+
+		$breadcrumbs = array();
+
+		$breadcrumbs[] = array(
+			'categoryId' => $category->getId(),
+			'name' => $category->getName(),
+		);
+
+		for ($i = 0; ($category->getParentId() > 0) && $i < 100; $i++) {
+			$currentCategory = $this->getCategoryMapper()->findById($category->getParentId());
+
+			$breadcrumbs[] = array(
+				'categoryId' => $currentCategory->getId(),
+				'name' => $currentCategory->getName(),
+			);
+
+			$category = $currentCategory;
+		}
+
+		return $breadcrumbs;
 	}
 
 	/**
@@ -71,9 +111,7 @@ class Node {
 	private function getCategories() {
 		$output = array();
 
-		$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-
-		$allCategories = $categoryMapper->findByParent($this->getNodeId());
+		$allCategories = $this->getCategoryMapper()->findByParent($this->getNodeId());
 
 		foreach($allCategories as $currentCategory) {
 			$record = array(
@@ -150,5 +188,23 @@ class Node {
 	 */
 	private function getResult() {
 		return $this->result;
+	}
+
+	/**
+	 * Set category mapper
+	 *
+	 * @param null $categoryMapper
+	 */
+	private function setCategoryMapper($categoryMapper) {
+		$this->categoryMapper = $categoryMapper;
+	}
+
+	/**
+	 * Get category mapper
+	 *
+	 * @return null
+	 */
+	private function getCategoryMapper() {
+		return $this->categoryMapper;
 	}
 }
