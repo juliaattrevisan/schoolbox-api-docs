@@ -28,8 +28,14 @@ class Storage extends Player {
 		 * via the usual iframe
 		 */
 		if (count($matches)) {
-			return '/socialstream/video.php';
-			return $matches[0];
+
+			/* Get the hash by snapping the query string into shiny little
+			 * pieces, ripe for recombination
+			 */
+			$stuff = parse_url($matches[0]);
+			parse_str($stuff['query'], $bits);
+
+			return "/socialstream/video.php?hash={$bits['hash']}&type={$bits['type']}";
 		}
 
 		/* Otherwise get the next class to deal with it
