@@ -1,0 +1,38 @@
+<!-- BEGIN create_header -->
+<h1>Add a Task</h1>
+<!-- END create_header -->
+<!-- BEGIN modify_header -->
+<h1>Modify Task</h1>
+<!-- END modify_header -->
+<form action="/task/modifyForm.php" method="post" name="form">
+    <input type="hidden" name="id"       value="{TASK_ID}"/>
+    <input type="hidden" name="category" value="{TASK_CATEGORY}"/>
+    <input type="hidden" name="type"     value="{TASK_TYPE}"/>
+
+    <dl>
+        <dt><label for="title">Task:</label></dt>
+        <dd><input id="title" name="title" type="text" value="{TASK_TITLE}" /></dd>
+
+        <!-- BEGIN link_input -->
+        <dt><label for="link">Link:</label></dt>
+        <dd><input id="link" name="link" type="text" value="{TASK_LINK}" /></dd>
+        <!-- END link_input -->
+
+        <!-- BEGIN task_input -->
+        <dt>Assess method:</dt>
+        <dd>
+            <input id="assess_method_self" type="radio" name="assess_method" value="self" {TASK_CHECK_ASSESS_SELF} />
+            <label for="assess_method_self">Self assessed</label>
+            <input id="assess_method_teacher" type="radio" name="assess_method" value="teacher" {TASK_CHECK_ASSESS_TEACHER} />
+            <label for="assess_method_teacher">Teacher only</label>
+        </dd>
+        <!-- END task_input -->
+    </dl>
+
+    <!-- BEGIN create_button -->
+    <input type="submit" name="Submit" value="Post" class="submit-btn-plain" />
+    <!-- END create_button -->
+    <!-- BEGIN modify_button -->
+    <input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
+    <!-- END modify_button -->
+</form>
