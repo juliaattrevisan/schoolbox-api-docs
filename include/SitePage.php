@@ -7,6 +7,13 @@ class SitePage extends Page {
 
     private $lite;
 
+    /**
+     * List of arguments passed in URL
+     *
+     * @var array
+     */
+    public $arg = array();
+
     public function SitePage($login = true) {
         parent::Page();
 
