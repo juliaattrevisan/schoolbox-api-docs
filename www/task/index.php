@@ -62,6 +62,7 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
     error(6);
 }
 
+// Shitty block parsing
 $this->setFile(TEMPLATE_content, "task/index.html");
 $this->setBlock(TEMPLATE_content, 'create_header', 'create_header_block');
 $this->setBlock(TEMPLATE_content, 'modify_header', 'modify_header_block');
@@ -86,6 +87,7 @@ else {
     $this->parse('create_button_block', 'create_button');
 }
 
+// Show only this task type's inputs
 $this->parse("{$task_type}_input_block", "{$task_type}_input");
 
 $this->setVar(
