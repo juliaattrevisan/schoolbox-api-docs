@@ -36,6 +36,15 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_MODEL,
 			'join'       => 'user',
 		));
+		// Probably redundant to store task ID in this table and assess ID in
+		// task table. Oh well, it will make querying on whether a relation is a
+		// task easier.
+		$this->hasMap(array(
+			'column'     => 'task_id',
+			'property'   => 'task',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'task',
+		));
 		$this->hasMap(array(
 			'column'     => 'type',
 			'property'   => 'workType',
@@ -113,6 +122,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		$this->hasJoin('work_type', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\WorkTypeMapper',
 			'this_key'  => 'type',
+			'other_key' => 'id',
+		));
+		$this->hasJoin('task', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Course\\TaskMapper',
+			'this_key'  => 'task_id',
 			'other_key' => 'id',
 		));
 		$this->hasJoin('attempt', array(

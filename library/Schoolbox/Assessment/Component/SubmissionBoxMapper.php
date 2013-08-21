@@ -91,6 +91,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'join'       => 'owner',
 		));
 		$this->hasMap(array(
+			'column'     => 'task_id',
+			'property'   => 'task',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'task',
+		));
+		$this->hasMap(array(
 			'column'     => 'open_date',
 			'property'   => 'openDate',
 			'type'       => self::TYPE_DATETIME,
@@ -223,6 +229,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\ReturnedWorkMapper',
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
+		));
+		$this->hasJoin('task', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Course\\TaskMapper',
+			'this_key'  => 'task_id',
+			'other_key' => 'id',
 		));
 
 		$this->hasSoftDeleteBooleanField('deleted');
@@ -462,7 +473,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$params['month_end']   = $months['end'];
 
 		$query = "
-		    SELECT
+			SELECT
 			b.id AS bid,
 			s.id AS sid,
 			r.id AS rid,
@@ -486,7 +497,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND YEAR(b.date) = :year
 			AND MONTH(b.date) BETWEEN :month_start AND :month_end
-            GROUP BY b.id
+			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
 		";
 		$statement = $this->database->prepare($query);

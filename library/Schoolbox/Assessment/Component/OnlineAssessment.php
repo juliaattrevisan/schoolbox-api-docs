@@ -12,6 +12,7 @@
 namespace Schoolbox\Assessment\Component;
 
 use \Alaress_Date_Format;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
 use Schoolbox\User;
@@ -48,6 +49,11 @@ class OnlineAssessment implements ISoftDeletable {
 	 * @var string
 	 */
 	protected $title;
+
+	/**
+	 * @var Task
+	 */
+	protected $task;
 
 	/**
 	 * @var string
@@ -141,6 +147,22 @@ class OnlineAssessment implements ISoftDeletable {
 	public function setCategory($category) {
 		$this->category = $category;
 		return $this;
+	}
+
+	/**
+	 * @param  \Schoolbox\Assessment\Course\Task $task
+	 * @return $this
+	 */
+	public function setTask($task) {
+		$this->task = $task;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\Assessment\Course\Task
+	 */
+	public function getTask() {
+		return $this->task;
 	}
 
 	/**
