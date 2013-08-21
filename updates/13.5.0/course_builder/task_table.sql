@@ -33,3 +33,9 @@ INSERT INTO `lu_task_type`
   (4,    'Due Work Item',           'due_work'),
   (5,    'Online Assessment',       'online_assess')
 ;
+
+-- Add reference to tasks table into assessments and submissions.
+ALTER TABLE `assess` ADD COLUMN `task_id` INT NULL DEFAULT NULL AFTER `user_id` ;
+ALTER TABLE `assess` ADD INDEX `assess_task_id` (`task_id` ASC) ;
+ALTER TABLE `submission_box` ADD COLUMN `task_id` INT NULL DEFAULT NULL AFTER `owner` ;
+ALTER TABLE `submission_box` ADD INDEX `submission_box_task_id` (`task_id` ASC) ;
