@@ -46,7 +46,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
      * {@inheritdoc}
      */
     public function renderTemplate($templateHandle) {
-        if (!parent::loadTemplate($templateHandle, 'course_task_list')) {
+        if (!parent::loadTemplate($templateHandle, 'courseTaskList')) {
             return false;
         }
 
