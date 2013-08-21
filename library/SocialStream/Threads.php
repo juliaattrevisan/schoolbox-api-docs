@@ -220,7 +220,7 @@ class Threads {
 
 		/* Set up blocks and stuff
 		 */
-		$page->setFile('socialstream_thread', '/component/homepage/socialstreamThread.html');
+		$page->setFile('socialstream_thread', '/component/homepage/socialstream/thread.html');
 		$page->setBlock('socialstream_thread', 'socialstream_post', 'socialstream_post_block');
 		$page->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
 		$page->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');

@@ -12,7 +12,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 $page = new SitePage();
 $page->setLite(true);
 
-$page->setFile(TEMPLATE_content, '/component/homepage/socialstreamVideo.html');
+$page->setFile(TEMPLATE_content, '/component/homepage/socialstream/video.html');
 
 $page->setVar(array(
 	'SOCIALSTREAM_STORAGE_HASH' => $_GET['hash'],

@@ -25,7 +25,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 	 * @return bool
 	 */
 	public function renderTemplate($templateHandle) {
-		if (!parent::loadTemplate($templateHandle, 'socialstream')) {
+		if (!parent::loadTemplate($templateHandle, 'container', 'component/homepage/socialstream/')) {
 			return false;
 		}
 
@@ -43,7 +43,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 			$homepageId = intval($config['src']);
 		}
 		else {
-			$homepageId = intval($this->instance->identifier);
+			$homepageId = intval($this->instance->getIdentifier());
 		}
 
 		/* Apply limits
