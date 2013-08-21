@@ -77,6 +77,7 @@ class Node {
 
 		foreach($allCategories as $currentCategory) {
 			$record = array(
+				'categoryId' => $currentCategory->getId(),
 				'name' => $currentCategory->getName()
 			);
 
@@ -95,12 +96,15 @@ class Node {
 		$output = array();
 
 		$fileMapper = new \Schoolbox\Resource\FileMapper();
+		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
 
 		$allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), false);
 
 		foreach($allFiles as $currentFile) {
 			$record = array(
+				'fileId' => $currentFile->getId(),
 				'name' => $currentFile->getFilename(),
+				'icon' => $mimetypeMapper->getIconForFilename($currentFile->getFilename()),
 			);
 
 			$output[] = $record;
