@@ -12,6 +12,8 @@ use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Assessment\Course\Task;
+
 
 class OnlineAssessmentMapper extends Schoolbox\Mapper {
 
@@ -142,16 +144,24 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * Pre-save callback - ensures that work type is always
-	 * WorkType::TYPE_ONLINE_ASSESSMENT.
+	 * Pre-save callback.
+	 * * ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
+	 * * if a task, sets start time and finish time to current date to avoid
+	 *   SQL errors
 	 *
 	 * @param  OnlineAssessment $object
 	 * @return bool             Always returns true
 	 */
 	public function preSave(OnlineAssessment $object) {
-		// Always set work type as online assessment
 		$object->setWorkType(WorkType::TYPE_ONLINE_ASSESSMENT);
-		return true;
+		if (!$object->getId()) {
+			$task    = $object->getTask();
+			$task_id = ($task instanceof Task) ? $task->getId() : $task;
+			if ($task_id) {
+				$time = new \Alaress_Date_Format(time(), 'U');
+				$object->setStart($time)->setFinish($time);
+			}
+		}
 	}
 
 	/**
