@@ -30,6 +30,7 @@ abstract class AbstractFactory {
 		'#^(http://)?(www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_\-]+)#',
 		'#^(http://)?vimeo\.com/([0-9]+)#',
 		'#^(http://)?www\.ted\.com/talks/([a-zA-Z0-9_]+)\.html#',
+		'#^/cms/sendVideo\.php\?(.*)#',
 	);
 
 	/**

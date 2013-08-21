@@ -32,9 +32,11 @@ class Chain {
 		$youtube = new Youtube($url);
 		$vimeo = new Vimeo($url);
 		$ted = new Ted($url);
+		$storage = new Storage($url);
 
 		/* Try until one of them matches
 		 */
+		$ted->setNext($storage);
 		$vimeo->setNext($ted);
 		$youtube->setNext($vimeo);
 
