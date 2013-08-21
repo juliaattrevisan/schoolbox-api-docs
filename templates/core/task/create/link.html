@@ -1,0 +1,15 @@
+<h1>Add a Task</h1>
+<form action="/task/createForm.php" method="post" name="form">
+    <input type="hidden" name="category" value="{TASK_CATEGORY}"/>
+    <input type="hidden" name="type"     value="{TASK_TYPE}"/>
+
+    <dl>
+        <dt><label for="title">Task:</label></dt>
+        <dd><input id="title" name="title" type="text" /></dd>
+
+        <dt><label for="link">Link:</label></dt>
+        <dd><input id="link" name="link" type="text" /></dd>
+    </dl>
+
+    <input type="submit" name="Submit" value="Post" class="submit-btn-plain" />
+</form>
