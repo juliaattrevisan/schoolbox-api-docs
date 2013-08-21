@@ -42,6 +42,11 @@ class TaskMapper extends Mapper {
             'type'       => self::TYPE_STRING,
         ));
         $this->hasMap(array(
+            'column'     => 'link',
+            'property'   => 'link',
+            'type'       => self::TYPE_STRING,
+        ));
+        $this->hasMap(array(
             'column'     => 'box_id',
             'property'   => 'submissionBox',
             'type'       => self::TYPE_MODEL,

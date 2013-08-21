@@ -39,6 +39,11 @@ class Task implements ISoftDeletable {
     protected $title;
 
     /**
+     * @var string
+     */
+    protected $link;
+
+    /**
      * @var User
      */
     protected $owner;
@@ -157,6 +162,22 @@ class Task implements ISoftDeletable {
      */
     public function getTitle() {
         return $this->title;
+    }
+
+    /**
+     * @param  string $link
+     * @return $this
+     */
+    public function setLink($link) {
+        $this->link = $link;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLink() {
+        return $this->link;
     }
 
     /**
