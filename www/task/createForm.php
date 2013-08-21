@@ -21,7 +21,7 @@ $category    = CategoryMapper::getInstance()->findById($category_id);
 
 // Shitty permission handling
 $group = new Group();
-if (!$group->getPermission($category_id) < WRITE_ACCESS) {
+if ($group->getPermission($category_id) < WRITE_ACCESS) {
     error(6);
 }
 
