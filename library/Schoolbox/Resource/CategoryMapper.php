@@ -86,6 +86,57 @@ class CategoryMapper extends Mapper {
 	}
 
 
+	/**
+	 * Get a list of categorys which belong to a particular parent
+	 *
+	 * @param $id
+	 * @return Category
+	 * @throws \Schoolbox\Mapper\Exception
+	 */
+	public function findByParent($id) {
+		$code_mapper = $this->getJoinMapper('codes');
+		$homepageConfig_mapper = $this->getJoinMapper('homepages');
+		$group_mapper = $this->getJoinMapper('groups');
+		$query = "
+			SELECT
+				{$this->getColumnString('c')},
+				{$code_mapper->getColumnString('cc')},
+				{$homepageConfig_mapper->getColumnString('hp')},
+				{$group_mapper->getColumnString('ug')}
+			FROM {$this->getTable()} c
+			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
+			LEFT JOIN {$this->getJoinSql('groups', 'c','ug')}
+			WHERE c.parent=?
+			ORDER BY c.name
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute(array($id));
+
+		$collection = new \Schoolbox\Collection();
+		$category = null;
+
+		foreach ($statement as $row) {
+			$category = $this->hydrate($row, 'c');
+			$code = $code_mapper->hydrate($row, 'cc');
+
+			if ($code->getCategory()->getId()) {
+				$category->addCode($code);
+			}
+
+			$homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+			$category->setHomepage($homepageConfig);
+
+			$group = $group_mapper->hydrate($row, 'ug');
+			$category->setGroup($group);
+
+			$collection->add($category);
+		}
+
+		return $collection;
+	}
+
 	public function findById($id) {
 		$code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
