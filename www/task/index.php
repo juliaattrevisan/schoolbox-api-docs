@@ -45,8 +45,16 @@ elseif ($action === 'modify') {
     $task         = TaskMapper::getInstance()->findById($task_id);
     $task_type    = 'task';
     $task_type_id = $task->getType()->getId();
+    // Set the template type.
+    // If an assess or due work task, redirect to those edit pages.
     if ($task_type_id === TaskType::TYPE_LINK) {
         $task_type = 'link';
+    }
+    elseif ($task_type_id === TaskType::TYPE_ONLINE_ASSESS) {
+        $this->localRedir('/assess/modify/'.$task->getAssessment()->getId());
+    }
+    elseif ($task_type_id === TaskType::TYPE_DUE_WORK) {
+        $this->localRedir('/submission/createSubmission/modify/'.$task->getSubmissionBox()->getId());
     }
 }
 else {
