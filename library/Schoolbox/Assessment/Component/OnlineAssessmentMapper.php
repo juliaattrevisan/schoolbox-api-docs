@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
 class OnlineAssessmentMapper extends Schoolbox\Mapper {
 
@@ -44,6 +45,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'title',
 			'property'   => 'title',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'description',
+			'property'   => 'description',
 			'type'       => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
@@ -117,6 +123,21 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasSoftDeleteDateField('deleted_at');
+
+		$this->registerCallback('preSave', array($this, 'preSave'));
+	}
+
+	/**
+	 * Pre-save callback - ensures that work type is always
+	 * WorkType::TYPE_ONLINE_ASSESSMENT.
+	 *
+	 * @param  OnlineAssessment $object
+	 * @return bool             Always returns true
+	 */
+	public function preSave(OnlineAssessment $object) {
+		// Always set work type as online assessment
+		$object->setWorkType(WorkType::TYPE_ONLINE_ASSESSMENT);
+		return true;
 	}
 
 	/**
