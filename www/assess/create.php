@@ -56,26 +56,35 @@ if (!empty($_POST)) {
 
     SitePage::localRedir('/assess/section/create/' . $assess_id);
 } else {
-    if (!is_numeric($this->arg[0])) {
+    $category_id = $this->arg[0];
+    $is_task     = ($this->arg[1] === 'task');
+
+    if (!is_numeric($category_id)) {
         error(117);
     }
 
-    if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($category_id) < WRITE_ACCESS) {
         error(126);
     }
 
     /* Render create page
      */
-    $this->setFile(TEMPLATE_content, 'assess/modify.html');
-    $this->setBlock(TEMPLATE_content, 'startHour', 'startHour_block');
-    $this->setBlock(TEMPLATE_content, 'startMinute', 'startMinute_block');
-    $this->setBlock(TEMPLATE_content, 'startMeridiem', 'startMeridiem_block');
-    $this->setBlock(TEMPLATE_content, 'finishHour', 'finishHour_block');
-    $this->setBlock(TEMPLATE_content, 'finishMinute', 'finishMinute_block');
-    $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
-    $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
-    $this->setBlock(TEMPLATE_content, 'max_attempts', 'max_attempts_block');
+    $this->setFile(TEMPLATE_content,   'assess/modify.html');
+    $this->setBlock(TEMPLATE_content,  'assess_task',     'assess_task_block');
+    $this->setBlock(TEMPLATE_content,  'assess_timespan', 'assess_timespan_block');
+    $this->setBlock('assess_timespan', 'startHour', 'startHour_block');
+    $this->setBlock('assess_timespan', 'startHour', 'startHour_block');
+    $this->setBlock('assess_timespan', 'startMinute', 'startMinute_block');
+    $this->setBlock('assess_timespan', 'startMeridiem', 'startMeridiem_block');
+    $this->setBlock('assess_timespan', 'finishHour', 'finishHour_block');
+    $this->setBlock('assess_timespan', 'finishMinute', 'finishMinute_block');
+    $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
+    $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
+    $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
     $this->setTitle('Manage Assessment');
+
+    $this->setVar('assess_task_block',     '');
+    $this->setVar('assess_timespan_block', '');
 
     $assessDate = new Alaress_Date_Format(time(), 'U');
     $assessEndDate = new Alaress_Date_Format(strtotime('+1 week'), 'U');
@@ -83,7 +92,7 @@ if (!empty($_POST)) {
     $this->setVar(array(
         'ACTION' => 'create',
         'ASSESS_ASSESS_ID' => '',
-        'ASSESS_CATEGORY_ID' => $this->arg[0],
+        'ASSESS_CATEGORY_ID' => $category_id,
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE' => $assessDate->getLocalShort(),
@@ -178,6 +187,14 @@ if (!empty($_POST)) {
         ));
 
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
+    }
+
+    // Task or instance?
+    if ($is_task) {
+        $this->parse('assess_task_block', 'assess_task');
+    }
+    else {
+        $this->parse('assess_timespan_block', 'assess_timespan');
     }
 
     /* Resit amounts
