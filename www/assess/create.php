@@ -9,6 +9,9 @@
  */
 require_once('include/time.php');
 
+use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 
@@ -37,20 +40,21 @@ if (!empty($_POST)) {
         $duration = Assess_Main::UNLIMITED_DURATION;
     }
 
-    $assess_id = $assessHandler->create(array(
-        'category_id' => $_POST['category_id'],
-        'user_id' => $_SESSION['id'],
-        'title' => $_POST['title'],
-        'description' => $_POST['description'],
-        'start' => $start->getDatabase(),
-        'finish' => $finish->getDatabase(),
-        'duration' => $duration,
-        'max_attempts' => $_POST['max_attempts'],
-        'availability' => 'assess',
-        'created_at' => 'NOW()',
-    ));
+    $assessment = new OnlineAssessment();
+    $assessment
+        ->setCategory($_POST['category_id'])
+        ->setUser($_SESSION['id'])
+        ->setTitle($_POST['title'])
+        ->setDescription($_POST['description'])
+        ->setStart($start)
+        ->setFinish($finish)
+        ->setDuration($duration)
+        ->setMaxAttempts($_POST['max_attempts'])
+        ->setAvailability('assess')
+    ;
+    OnlineAssessmentMapper::getInstance()->save($assessment);
 
-    if (!$assess_id) {
+    if (!($assess_id = $assessment->getId())) {
         error(112);
     }
 
