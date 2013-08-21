@@ -19,6 +19,12 @@ $page = new SitePage();
 $category_id = $_POST['category'];
 $category    = CategoryMapper::getInstance()->findById($category_id);
 
+// Shitty permission handling
+$group = new Group();
+if (!$group->getPermission($category_id) < WRITE_ACCESS) {
+    error(6);
+}
+
 // Make the task and set various fields
 $task = new Task();
 $task
@@ -47,13 +53,13 @@ switch ($_POST['type']) {
         break;
 }
 if (!isset($task_type)) {
-    // error out
+    error(2);
 }
 $task->setType($task_type);
 if ($task_type === TaskType::TYPE_LINK) {
     $link = trim($_POST['link']);
     if (strlen($link) === 0) {
-        // error out
+        error(2);
     }
     $task->setLink($link);
 }

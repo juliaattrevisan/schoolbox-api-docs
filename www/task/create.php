@@ -7,9 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
-
 /** @var SitePage $this */
 
 // Wrangle arguments
@@ -25,10 +22,11 @@ if (isset($this->arg[1])) {
     }
 }
 
-/** @var Category $category */
-$category = CategoryMapper::getInstance()->findById($category_id);
-
-// TODO Check category permissions - user needs WRITE_ACCESS to category
+// Shitty permission handling
+$group = new Group();
+if (!$group->getPermission($category_id) < WRITE_ACCESS) {
+    error(6);
+}
 
 $this->setFile(TEMPLATE_content, "task/create/$task_type.html");
 $this->setVar(
