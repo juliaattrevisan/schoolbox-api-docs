@@ -11,6 +11,9 @@ require_once('include/time.php');
 
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\TaskType;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -18,17 +21,6 @@ $assessHandler = new Assess_Main();
 if (!empty($_POST)) {
     if ($groupHandler->getPermission($_POST['category_id']) < WRITE_ACCESS) {
         error(126);
-    }
-
-    /* Format date, time
-     */
-    $start = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/y');
-    $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/y');
-
-    /* Check that finish time cannot be before start time
-      */
-    if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
-        error(145);
     }
 
     /* Cater for unlimited duration tests. Can't use zero because of countdown
@@ -46,13 +38,40 @@ if (!empty($_POST)) {
         ->setUser($_SESSION['id'])
         ->setTitle($_POST['title'])
         ->setDescription($_POST['description'])
-        ->setStart($start)
-        ->setFinish($finish)
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
         ->setAvailability('assess')
     ;
+
+    // Is this a task? If so, just set the start and finish to now.
+    $is_task = isset($_POST['task_title']);
+    if ($is_task) {
+        $task = new Task();
+        $task
+            ->setCategory($_POST['category_id'])
+            ->setOwner($_SESSION['id'])
+            ->setType(TaskType::TYPE_ONLINE_ASSESS)
+            ->setTitle($_POST['task_title']);
+        TaskMapper::getInstance()->save($task);
+        $assessment->setTask($task);
+    }
+    else {
+        $start  = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/y');
+        $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/y');
+        if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
+            error(145);
+        }
+        $assessment->setStart($start)->setFinish($finish);
+    }
     OnlineAssessmentMapper::getInstance()->save($assessment);
+
+    // Is there a task for this item? If so, create it and link it back to this
+    // new item.
+    if ($is_task) {
+        $task = $assessment->getTask();
+        $task->setAssessment($assessment);
+        TaskMapper::getInstance()->save($task);
+    }
 
     if (!($assess_id = $assessment->getId())) {
         error(112);
@@ -100,7 +119,8 @@ if (!empty($_POST)) {
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE' => $assessDate->getLocalShort(),
-        'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort()
+        'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
+        'ASSESS_TASK_TITLE' => '',
     ));
 
     /* Select default settings

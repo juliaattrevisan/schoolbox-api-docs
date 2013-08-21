@@ -11,6 +11,7 @@ require_once('include/time.php');
 
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Course\TaskMapper;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -26,17 +27,6 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 }
 
 if (!empty($_POST)) {
-
-    /* Format date, time
-     */
-    $start = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/y');
-    $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/y');
-
-    /* Check that finish time cannot be before start time
-      */
-    if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
-        error(145);
-    }
 
     /* Cater for unlimited duration tests. Can't use zero because of countdown
      * timer, so we use -1
@@ -59,6 +49,27 @@ if (!empty($_POST)) {
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
     ;
+
+    // Is this a task? If so, just set the start and finish to now.
+    $task_id = $assessment->getTask()->getId();
+    if ($task_id) {
+        $task = TaskMapper::getInstance()->findById($task_id);
+        $task->setTitle($_POST['task_title']);
+        TaskMapper::getInstance()->save($task);
+    }
+    else {
+        /* Format date, time
+         */
+        $start  = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/y');
+        $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/y');
+
+        /* Check that finish time cannot be before start time
+          */
+        if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
+            error(145);
+        }
+        $assessment->setStart($start)->setFinish($finish);
+    }
     OnlineAssessmentMapper::getInstance()->save($assessment);
     SitePage::localRedir('/assess/summary/' . $this->arg[0]);
 } else {
@@ -83,17 +94,15 @@ if (!empty($_POST)) {
     $this->setVar('assess_task_block',     '');
     $this->setVar('assess_timespan_block', '');
 
-    // Replace this with a damn mapper
     /** @var OnlineAssessment $assessment */
+    $task_id = null;
     try {
         $assessment = OnlineAssessmentMapper::getInstance()->findById($this->arg[0]);
+        $task_id    = $assessment->getTask()->getId();
+        $task       = TaskMapper::getInstance()->findById($task_id);
+        $this->setVar('ASSESS_TASK_TITLE', Scrub::text($task->getTitle()));
     }
     catch (Exception $ex) {
-        error(112);
-    }
-    $assess = $assessHandler->getByID($this->arg[0]);
-
-    if (!$assess) {
         error(112);
     }
 
@@ -179,7 +188,12 @@ if (!empty($_POST)) {
         'DURATION_MINUTE_VALUE' => $duration['minutes'],
     ));
 
-    $this->parse('assess_timespan_block', 'assess_timespan');
+    if ($task_id) {
+        $this->parse('assess_task_block', 'assess_task');
+    }
+    else {
+        $this->parse('assess_timespan_block', 'assess_timespan');
+    }
 
     /* Resit amounts
       */
