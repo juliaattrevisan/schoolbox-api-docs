@@ -105,7 +105,7 @@ class TaskType {
                 $class = 'new';
                 break;
             case TaskType::TYPE_ONLINE_ASSESS:
-                $class = 'onlineassess';
+                $class = 'onlineassessment';
                 break;
             default:
                 break;
