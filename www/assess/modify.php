@@ -44,8 +44,6 @@ if (!empty($_POST)) {
         ->setUser($_SESSION['id'])
         ->setTitle($_POST['title'])
         ->setDescription($_POST['description'])
-        ->setStart($start)
-        ->setFinish($finish)
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
     ;
