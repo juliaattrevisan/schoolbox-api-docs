@@ -128,14 +128,14 @@
 				$j(element).find('a').click(function() {
 					console.log($j(this).attr('href'));
 
+					$j(self.config.element).dialog('close');
+
 					return false;
 				});
 			});
-			http://192.168.36.10/send.php?save=1&id={NODE_FILE_ID}
 
-
-
-
+			/* For all the world to see
+			 */
 			$j(self.config.element).dialog('open');
 		});
 	}
