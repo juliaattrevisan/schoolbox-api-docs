@@ -12,6 +12,8 @@ $this->setBlock('marktype', 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
 $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
+$this->setBlock(TEMPLATE_content, 'duework_task', 'duework_task_block');
+$this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
 
 $this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
 if(Cfg::get('due_work_notifications_enabled')) {
@@ -26,6 +28,7 @@ $this->setVar('existing_marks_warning_block', '');
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\Task;
 
 $mapper      = new SubmissionBoxMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
@@ -236,13 +239,22 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
-
-
     // clear blocks that aren't used in this context
     $this->setVar(array(
         'existing_file_block' => '',
-        'existing_marks_warning_block'
+        'existing_marks_warning_block' => '',
+        'duework_task_block' => '',
+        'duework_timespan_block' => '',
     ));
+
+    // Is this a task?
+    $is_task = ($this->arg[2] === 'task');
+    if ($is_task) {
+        $this->parse('duework_task_block', 'duework_task');
+    }
+    else {
+        $this->parse('duework_timespan_block', 'duework_timespan');
+    }
 
     if(is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         /* File ID submitted, associate box with file */
@@ -293,6 +305,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'CATEGORY'          => $this->arg[1],
         'ID'                => '',
         'NAME'              => $file['name'],
+        'TASK_TITLE'        => '',
         'DESCRIPTION'       => $file['description'],
         'FILEID'            => $file['id'],
         'CATLIST'           => $catOutput,
