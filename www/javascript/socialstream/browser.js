@@ -44,10 +44,13 @@
 		 * @returns {*}
 		 */
 		function init(options, element) {
+			var instanceId = $j(element).attr('id').replace('socialstream-browser-', '');
+
 			var defaults = {
 				url: '/socialstream/tree.php',
 				element: element,
-				instanceId: $j(element).attr('id').substring(13),
+				instanceId: instanceId,
+				form: $j('socialstream-form-' + instanceId),
 				firstOpen: false
 			}
 
@@ -130,7 +133,7 @@
 
 					/* Chooze and cloze
 					 */
-					$j(self.config.element).find('.socialstream-resource').val(url);
+					$j(self.config.form).find('input[name=url]').val(url);
 					$j(self.config.element).dialog('close');
 
 					return false;

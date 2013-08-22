@@ -10,35 +10,33 @@
 			socialstream.init('{COMPONENT_INSTANCE_ID}', 0, '{SOCIALSTREAM_AJAX_LIMIT}', '{SOCIALSTREAM_NUM_POSTS}');
 			socialstream.stream();
 
-			/* Start up socialstream browser
+			/* Start up socialstream browser for new posts
 			 */
-			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
+			$j('#socialstream-browser-0').socialstreamBrowser();
 
-			/* Activate socialstream browser
+			/* Activate socialstream browser for new posts
 			 */
-			$j('.socialstream-browser-{COMPONENT_INSTANCE_ID}').click(function() {
-				$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.open(51);
+			$j('.socialstream-browser-button-0').click(function() {
+				$j('#socialstream-browser-0').socialstreamBrowser.open(51);
 			});
+
+//			/* Start up socialstream browser for comments/replies (clones)
+//			 */
+//			$j('#socialstream-browser-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
+//
+//			/* Activate socialstream browser for comments/replies (clones)
+//			 */
+//			$j('.socialstream-browser-button-{COMPONENT_INSTANCE_ID}').click(function() {
+//				$j('#socialstream-browser-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.open(51);
+//			});
 		});
 	</script>
 
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<!--
-	Don't rename this id, because you'll have to update the init() method
-
-	Don't rename socialstream-browser class as this is used to reinitialise
-	these browsers after they are drag and dropped around the homepage
-
-	Don't rename socialstream-resource either, as this is the selector that
-	gets populated via the socialstream resource browser
-	-->
-	<div id='socialstream-{COMPONENT_INSTANCE_ID}' class='socialstream-browser'>
-	</div>
-
-	<div class='{FORM_CLASS}'>
-		<form action='/socialstream/modifyForm.php' method='post' id='originalAddPostForm' class='addPostForm' enctype='multipart/form-data'>
+	<div>
+		<form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-0' class='addPostForm' enctype='multipart/form-data'>
 			<input type='hidden' name='type' value='string' />
 			<input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
 			<input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
@@ -66,11 +64,21 @@
 			</label>
 
 			<label>
-				<input type='radio' class='socialstreamAttachment socialstream-browser-{COMPONENT_INSTANCE_ID}' name='socialstreamAttachment' value='resource' />Resource
-				<input type='text' class='socialstream-resource' name='resource' value='' />
+				<input type='radio' class='socialstreamAttachment socialstream-browser-button-0' name='socialstreamAttachment' value='resource' />Resource
 			</label>
 
 			<input type='submit' value='Post' />
+
+			<!--
+			Don't rename this id, because you'll have to update the init() method
+
+			Don't rename socialstream-browser-button class as this is used to reinitialise
+			these browsers after they are drag and dropped around the homepage
+
+			The browser is cloned
+			-->
+			<div id='socialstream-browser-0' class='socialstream-browser'>
+			</div>
 		</form>
 	</div>
 

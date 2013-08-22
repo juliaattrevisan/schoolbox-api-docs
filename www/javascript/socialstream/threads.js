@@ -62,7 +62,7 @@ var socialstream = {
 
 			/* Clone an instance of .addPostForm and inject ids
 			 */
-			var clone = $j('#originalAddPostForm').clone();
+			var clone = $j('#socialstream-form-0').clone();
 			clone.attr('id', '');
 			clone.find('input[name=body]').val('').focus();
 			clone.find('input[name=parentId]').val(parentId);
@@ -94,9 +94,9 @@ var socialstream = {
 
 		/* Hide everything so the default is a plain text message unadorned
 		 */
-		form.find('input[name=url]').parent('label').hide();
-		form.find('input[name=file]').parent('label').hide();
-		form.find('input[name=resource]').parent('label').hide();
+//		form.find('input[name=url]').parent('label').css('visibility', 'hidden');
+//		form.find('input[name=file]').parent('label').css('visibility', 'hidden');
+//		form.find('input[name=resource]').parent('label').css('visibility', 'hidden');
 
 		/* Deal with changing options
 		 */
@@ -107,27 +107,27 @@ var socialstream = {
 			var fileElement = form.find('input[name=file]');
 			var resourceElement = form.find('input[name=resource]');
 
-			/* Hide everything
-			 */
-			urlElement.parent('label').hide();
-			fileElement.parent('label').hide();
-			resourceElement.parent('label').hide();
-
-			/* Empty this upon change
-			 */
-			urlElement.val('');
+//			/* Hide everything
+//			 */
+//			urlElement.parent('label').css('visibility', 'hidden');
+//			fileElement.parent('label').css('visibility', 'hidden');
+//			resourceElement.parent('label').css('visibility', 'hidden');
+//
+//			/* Empty this upon change
+//			 */
+//			urlElement.val('');
 
 			/* Make the input element visible or not
 			 */
-			if ($j(this).val() == 'url') {
-				urlElement.parent('label').show();
-			}
-			else if ($j(this).val() == 'upload') {
-				fileElement.parent('label').show();
-			}
-			else if ($j(this).val() == 'resource') {
-				resourceElement.parent('label').show();
-			}
+//			if ($j(this).val() == 'url') {
+//				urlElement.parent('label').css('visibility', 'visible');
+//			}
+//			else if ($j(this).val() == 'upload') {
+//				fileElement.parent('label').css('visibility', 'visible');
+//			}
+//			else if ($j(this).val() == 'resource') {
+//				resourceElement.parent('label').css('visibility', 'visible');
+//			}
 		});
 	},
 
