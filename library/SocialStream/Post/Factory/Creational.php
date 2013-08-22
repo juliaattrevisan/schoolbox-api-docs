@@ -91,7 +91,9 @@ class Creational extends AbstractFactory {
 
 			$this->setProduct($object);
 		}
-		else if ($resource->isImage()) {
+		/* Other files
+		 */
+		else {
 			$object = new \SocialStream_Post_Url();
 			$object->setType('url');
 
@@ -233,7 +235,17 @@ class Creational extends AbstractFactory {
 	 * @param \Schoolbox\File $uploadedFile
 	 */
 	private function spawnThumbnailFromUpload(\Schoolbox\File $uploadedFile) {
-		if ($uploadedFile->isImage()) {
+
+		/* Set up video thumbnails
+		 */
+		if ($uploadedFile->isVideo()) {
+			$url = "/cms/sendVideo.php?type=storage&hash={$uploadedFile->getHash()}";
+
+			$this->getProduct()->setUrl($url);
+		}
+		/* Set up image thumbnails
+		 */
+		else if ($uploadedFile->isImage()) {
 			$url = "/storage/image.php?size=maxsize&hash={$uploadedFile->getHash()}";
 
 			$this->getProduct()->setThumbnail($url);
@@ -244,10 +256,14 @@ class Creational extends AbstractFactory {
 			$originalThumbnailCache = new \SocialStream\Cache\Original();
 			$originalThumbnailCache->init($url);
 		}
-		else if ($uploadedFile->isVideo()) {
-			$url = "/cms/sendVideo.php?type=storage&hash={$uploadedFile->getHash()}";
-
+		/* Set up storage stream location and its icon thumbnails
+		 */
+		else {
+			$url = "/storage/fetch.php?hash={$uploadedFile->getHash()}";
 			$this->getProduct()->setUrl($url);
+
+			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $uploadedFile->getFilename());
+			$this->getProduct()->setThumbnail($chain->getResult());
 		}
 	}
 
