@@ -124,6 +124,7 @@ class Node {
 
 		foreach($allCategories as $currentCategory) {
 			$record = array(
+				'type' => 'category',
 				'categoryId' => $currentCategory->getId(),
 				'name' => $currentCategory->getName()
 			);
@@ -149,6 +150,7 @@ class Node {
 
 		foreach($allFiles as $currentFile) {
 			$record = array(
+				'type' => 'file',
 				'fileId' => $currentFile->getId(),
 				'name' => $currentFile->getFilename(),
 				'icon' => $mimetypeMapper->getIconForFilename($currentFile->getFilename()),
