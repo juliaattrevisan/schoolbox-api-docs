@@ -16,7 +16,7 @@ CREATE TABLE `task` (
   INDEX `task_box_id` (`box_id` ASC) ,
   INDEX `task_user_id` (`user_id` ASC) ,
   INDEX `task_deleted_at` (`deleted_at` ASC)
-);
+) DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
 -- Lookup table for task types
 CREATE TABLE `lu_task_type` (
@@ -24,7 +24,7 @@ CREATE TABLE `lu_task_type` (
   `label` VARCHAR(250) NOT NULL ,
   `class` VARCHAR(250) NOT NULL ,
   PRIMARY KEY (`id`)
-);
+) DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 INSERT INTO `lu_task_type`
   (`id`, `label`,                   `class`) VALUES
   (1,    'Link',                    'link'),
