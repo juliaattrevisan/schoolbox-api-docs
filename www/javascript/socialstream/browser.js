@@ -107,14 +107,14 @@
 		/* Load data into the node container
 		 */
 		self.config.element.load(self.config.url, args, function() {
-			$j(self.config.element).dialog('open');
 
-			/* Assign event handlers to all the categories
+			/* These allow new nodes to be loaded
 			 */
-			var allCategories = $j(self.config.element).find('.socialstream-node-category');
+			var allNavigators = $j(self.config.element).find('.socialstream-breadcrumb, .socialstream-node-category');
 
-			$j.each(allCategories, function(index, element) {
+			$j.each(allNavigators, function(index, element) {
 				$j(element).find('a').click(function() {
+					console.log('mort');
 					$j(self.config.element).socialstreamBrowser.loadNode($j(this).attr('rel'));
 
 					return false;
@@ -123,6 +123,9 @@
 
 			/* Assign event handlers to all the files
 			 */
+
+			
+			$j(self.config.element).dialog('open');
 		});
 	}
 }(jQuery));

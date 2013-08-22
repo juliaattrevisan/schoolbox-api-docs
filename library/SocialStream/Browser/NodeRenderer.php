@@ -94,6 +94,7 @@ class NodeRenderer {
 
 		foreach($allBreadcrumbs as $currentBreadcrumb) {
 			$this->getPage()->setVar(array(
+				'BREADCRUMB_CATEGORY_ID' => $currentBreadcrumb['categoryId'],
 				'BREADCRUMB_NAME' => $currentBreadcrumb['name']
 			));
 
