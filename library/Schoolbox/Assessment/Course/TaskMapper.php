@@ -93,7 +93,7 @@ class TaskMapper extends Mapper {
         ));
         $this->hasJoin('submission_box', array(
             'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
-            'this_key'  => 'type',
+            'this_key'  => 'box_id',
             'other_key' => 'id',
         ));
         $this->hasJoin('assessment', array(
