@@ -55,11 +55,20 @@ class Node {
 	}
 
 	/**
-	 * Render it out
+	 * Render it out in a json format in case you need it
 	 */
-	public function render() {
+	public function ajax() {
 		header("Content-type: application/json");
 		echo json_encode($this->getResult());
+	}
+
+	/**
+	 * Render it out so phplib can do it
+	 *
+	 * @return array
+	 */
+	public function render() {
+		return $this->getResult();
 	}
 
 	/**
@@ -89,7 +98,7 @@ class Node {
 			'name' => $category->getName(),
 		);
 
-		for ($i = 0; ($category->getParentId() > 0) && $i < 100; $i++) {
+		for ($i = 0; ($category->getParentId() > 0) && ($i < 100); $i++) {
 			$currentCategory = $this->getCategoryMapper()->findById($category->getParentId());
 
 			$breadcrumbs[] = array(
