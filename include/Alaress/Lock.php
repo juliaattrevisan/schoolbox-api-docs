@@ -72,4 +72,19 @@ class Alaress_Lock {
 			unlink($this->filename);
 		}
 	}
+
+	/**
+	 * Kills the process in the lockfile.
+	 *
+	 * @param  int  $signal The signal to send, defaults to SIGKILL.
+	 * @return bool Was the process killed?
+	 */
+	public function killProcess($signal = SIGKILL) {
+		if (file_exists($this->filename)) {
+			if (posix_kill(file_get_contents($this->filename), $signal)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
