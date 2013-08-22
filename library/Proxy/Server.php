@@ -185,9 +185,10 @@ class Server {
 	 * Returns to context resource for proxied streams
 	 *
 	 * @param string $protocol
-	 * @return null|resource
+	 * @param bool $asArray
+	 * @return null|resource|array
 	 */
-	public function getContext($protocol = 'http') {
+	public function getContext($protocol = 'http', $asArray = false) {
 		if(!$this->usesProxy()) {
 			return null;
 		}
@@ -205,7 +206,7 @@ class Server {
 		}
 
 
-		return stream_context_create($opts);
+		return $asArray ? $opts : stream_context_create($opts);
 	}
 
 }
