@@ -191,8 +191,12 @@ class Server {
 		if(!$this->usesProxy()) {
 			return null;
 		}
+		$transport = $protocol == 'https' ? 'ssl' : 'tcp';
 
-		$opts[$protocol]['proxy'] = 'tcp://' . $this->getURI();
+		$opts[$protocol] = array(
+			'proxy' => $transport . '://' . $this->getURI(),
+			'request_fulluri' => true
+		);
 
 		if($this->isAuthenticated()) {
 			$opts[$protocol]['header'] = array(
