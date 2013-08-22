@@ -76,7 +76,7 @@ class Node {
 	 */
 	private function processNode() {
 		$output = array(
-			'breadcrumbs' => $this->getBreadcrumbs(),
+			'breadcrumbs' => array_reverse($this->getBreadcrumbs()),
 			'records' => array_merge($this->getCategories(), $this->getFiles()),
 		);
 

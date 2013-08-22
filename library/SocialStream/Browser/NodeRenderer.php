@@ -77,7 +77,7 @@ class NodeRenderer {
 	private function renderCurrentNode() {
 		$nodeData = $this->getNodeData();
 
-		$currentNode = $nodeData['breadcrumbs'][0];
+		$currentNode = end(array_values($nodeData['breadcrumbs']));
 
 		$this->getPage()->setVar(array(
 			'NODE_NAME' => $currentNode['name']
