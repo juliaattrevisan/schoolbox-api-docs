@@ -159,7 +159,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $task_title = '';
     if ($task_id) {
         $task       = TaskMapper::getInstance()->findById($task_id);
-        $task_title = $task->getTitle();
+        $task_title = Scrub::text($task->getTitle());
         $this->parse('duework_task_block', 'duework_task');
     }
     else {
