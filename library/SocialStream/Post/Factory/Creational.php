@@ -244,7 +244,7 @@ class Creational extends AbstractFactory {
 			$originalThumbnailCache->init($url);
 		}
 		else if ($uploadedFile->isVideo()) {
-			$url = "/cms/sendVideo.php?type=storage&id={$uploadedFile->getHash()}";
+			$url = "/cms/sendVideo.php?type=storage&hash={$uploadedFile->getHash()}";
 
 			$this->getProduct()->setUrl($url);
 		}
