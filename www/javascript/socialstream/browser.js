@@ -47,7 +47,9 @@
 			var defaults = {
 				url: '/socialstream/tree.php',
 				element: element,
-				instanceId: $j(element).attr('id').substring(13)
+				instanceId: $j(element).attr('id').substring(13),
+				currentCategory: 0,
+				firstOpen: false
 			}
 
 			return $j.extend(defaults, options);
@@ -66,6 +68,26 @@
 				modal: true,
 				resizable: false
 			});
+		}
+	}
+
+	/**
+	 * Open le browser
+	 */
+	$j.fn.socialstreamBrowser.open = function() {
+		var self = $j.fn.socialstreamBrowser;
+
+		/* Open default category when you open the browser for
+		 * the very first time; otherwise open where you last
+		 * navigated to
+		 */
+		if (!self.config.firstOpen) {
+			$j.fn.socialstreamBrowser.loadNode(self.config.currentCategory);
+
+			self.config.firstOpen = true;
+		}
+		else {
+			$j(self.config.element).dialog('open');
 		}
 	}
 

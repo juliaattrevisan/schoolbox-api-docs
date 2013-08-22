@@ -12,12 +12,14 @@
 
 			/* Start up socialstream browser
 			 */
-			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
+			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser({
+				currentCategory: '{HOMEPAGE_ID}'
+			});
 
 			/* Activate socialstream browser
 			 */
 			$j('.socialstream-browser-{COMPONENT_INSTANCE_ID}').click(function() {
-				$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.loadNode(51);
+				$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.open();
 			});
 		});
 	</script>
@@ -27,7 +29,7 @@
 
 	<!--
 	Don't rename this id, because you'll have to update the init() method
-	
+
 	Don't rename socialstream-browser class as this is used to reinitialise
 	these browsers after they are drag and dropped around the homepage
 	-->
