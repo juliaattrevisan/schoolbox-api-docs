@@ -161,7 +161,9 @@ class SitePage extends Page {
         if (Alaress\DebugBar\Instance::isEnabled()) {
             $renderer = Alaress\DebugBar\Instance::getInstance()->getJavascriptRenderer();
             $renderer->setBaseUrl('/debugbar/');
-            $debug_bar_head = $renderer->renderHead();
+            // Debug bar includes its own jQuery - return control to our own
+            // once the debug bar loads.
+            $debug_bar_head = $renderer->renderHead() . '<script type="text/javascript">jQuery.noConflict(true);</script>';
             $debug_bar_body = $renderer->render();
         }
 
