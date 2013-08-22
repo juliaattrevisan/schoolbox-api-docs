@@ -104,6 +104,32 @@ class Creational extends AbstractFactory {
 	}
 
 	/**
+	 * Construct a post from an already-uploaded resource
+	 *
+	 * @param $url
+	 * @return object
+	 */
+	private function constructFromResource($url) {
+		$bits = parse_url($url);
+		$query = $bits['query'];
+
+		parse_str($query, $values);
+		$fileId = $values['id'];
+
+		$fileMapper = new \Schoolbox\Resource\FileMapper();
+		$file = $fileMapper->findById($fileId);
+
+		/* TODO: Assume just ordinary files for now
+		 */
+		$object = new \SocialStream_Post_Url();
+		$object->setType('url');
+
+		$this->setProduct($object);
+
+		return $file;
+	}
+
+	/**
 	 * If it was not a video, link to the internet, etc then assume it's
 	 * just a plain old text message
 	 */
@@ -157,6 +183,18 @@ class Creational extends AbstractFactory {
 			 */
 			$this->spawnMetadataFromUpload($uploadedFile);
 			$this->spawnThumbnailFromUpload($uploadedFile);
+		}
+		/* If resource option was chosen,extract metadata and thumbnail information
+		 * directly from already-known information (no curling needed)
+		 */
+		else if ($this->getType() == 'resource') {
+			$resource = $this->constructFromResource($this->getUrl());
+			$this->populate($data);
+
+			/* Spawn additional stuff
+			 */
+			$this->spawnMetadataFromResource($resource);
+			$this->spawnThumbnailFromResource($resource);
 		}
 		else {
 			$this->setProduct($this->constructDefault());
@@ -265,6 +303,30 @@ class Creational extends AbstractFactory {
 			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $uploadedFile->getFilename());
 			$this->getProduct()->setThumbnail($chain->getResult());
 		}
+	}
+
+	/**
+	 * Get the title and description
+	 *
+	 * @param $file
+	 */
+	private function spawnMetadataFromResource($file) {
+		$this->getProduct()->setExternalTitle($file->getFilename());
+		$this->getProduct()->setExternalBody('');
+	}
+
+	/**
+	 * Get the thumbnail usage
+	 *
+	 * @param $file
+	 */
+	private function spawnThumbnailFromResource($file) {
+		$url = "/send.php?id={$file->getId()}";
+
+		$this->getProduct()->setUrl($url);
+
+		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
+		$this->getProduct()->setThumbnail($chain->getResult());
 	}
 
 	/* Getters/Setters
