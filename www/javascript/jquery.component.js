@@ -480,6 +480,12 @@ setupCustomise = {
 					tinyMCE.execCommand( 'mceAddControl', true, $j(this).attr('id') );
 					$j(this).sortable("refresh");
 				});
+
+				/* Reinitialise browsers upon drag end
+				 */
+				$j('.socialstream-browser').each(function() {
+					$j(this).socialstreamBrowser();
+				});
 			},
 			update: function () {
 				var left = '';

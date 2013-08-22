@@ -58,9 +58,13 @@
 			socialstream.init('{COMPONENT_INSTANCE_ID}', 0, '{SOCIALSTREAM_AJAX_LIMIT}', '{SOCIALSTREAM_NUM_POSTS}');
 			socialstream.stream();
 
+			/* Start up socialstream browser
+			 */
 			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
 
-			$j('#mog').click(function() {
+			/* Activate socialstream browser
+			 */
+			$j('.socialstream-browser-{COMPONENT_INSTANCE_ID}').click(function() {
 				$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.loadNode(51);
 			});
 		});
@@ -95,9 +99,8 @@
 				function init(options, element) {
 					var defaults = {
 						url: '/socialstream/tree.php',
-						elementId: $j(element).attr('id'),
-						instanceId: $j(element).attr('id').substring(13),
-						nodeElement: $j(element).find('.nodes')
+						element: element,
+						instanceId: $j(element).attr('id').substring(13)
 					}
 
 					return $j.extend(defaults, options);
@@ -109,7 +112,7 @@
 				 * @param config
 				 */
 				function initModal(config) {
-					$j(config.nodeElement).dialog({
+					$j(config.element).dialog({
 						width: 650,
 						autoOpen: false,
 						title: "Browse Resources",
@@ -135,8 +138,8 @@
 
 				/* Load data into the node container
 				 */
-				self.config.nodeElement.load(self.config.url, args, function() {
-					$j(self.config.nodeElement).dialog('open');
+				self.config.element.load(self.config.url, args, function() {
+					$j(self.config.element).dialog('open');
 				});
 			}
 		}(jQuery));
@@ -147,11 +150,11 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<div id='socialstream-{COMPONENT_INSTANCE_ID}'>
-		<a id='mog'>Le Browser</a>
-
-		<div class='nodes'>
-		</div>
+	<!--
+	Don't rename socialstream-browser class as this is used to reinitialise
+	these browsers after they are drag and dropped around the homepage
+	-->
+	<div id='socialstream-{COMPONENT_INSTANCE_ID}' class='socialstream-browser'>
 	</div>
 
 	<div class='{FORM_CLASS}'>
@@ -183,7 +186,7 @@
 			</label>
 
 			<label>
-				<input type='radio' class='socialstreamAttachment socialstream-browser' name='socialstreamAttachment' value='resource' />Resource
+				<input type='radio' class='socialstreamAttachment socialstream-browser-{COMPONENT_INSTANCE_ID}' name='socialstreamAttachment' value='resource' />Resource
 			</label>
 
 			<input type='submit' value='Post' />
