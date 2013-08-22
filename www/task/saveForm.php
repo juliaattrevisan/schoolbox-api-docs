@@ -90,7 +90,12 @@ if ($group->getPermission($task->getCategory()->getId()) < WRITE_ACCESS) {
     error(6);
 }
 
-TaskMapper::getInstance()->save($task);
+if ($_POST['action'] === 'delete') {
+    TaskMapper::getInstance()->delete($task);
+}
+else {
+    TaskMapper::getInstance()->save($task);
+}
 
 // Redirect: depends on request type.
 // Ajax: dump out a request type

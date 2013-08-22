@@ -13,8 +13,12 @@
                 <h3>{TASK_NAME}</h3>
                 <!-- BEGIN edit_task -->
                 <span class="interact">
-                <a href="/task/modify/{TASK_ID}" class="btn modify" title="Modify this task"><span></span></a>
-                <a href="/task/modifyForm.php?delete={TASK_ID}" class="btn delete" title="Delete this task"><span></span></a>
+                <form action="/task/saveForm.php" method="post" class="delete_form">
+					<a href="/task/modify/{TASK_ID}" class="btn modify" title="Modify this task"><span></span></a>
+                    <input type="hidden" name="action" value="delete" />
+                    <input type="hidden" name="id"     value="{TASK_ID}" />
+                    <button type="submit" class="btn delete" title="Delete this task"><span></span></button>
+                </form>
                 </span>
                 <!-- END edit_task -->
             </li>
