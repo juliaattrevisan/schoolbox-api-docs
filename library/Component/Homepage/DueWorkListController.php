@@ -140,7 +140,13 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                     $this->setVar('duework_actions_block', '');
                 }
 
-                $nameHTML = ($actionURL ? '<a href="'.$actionURL.'">' : "") . Scrub::text($submission['name']) . ($actionURL ? '</a>' : "");
+                if ($submission['task_id']) {
+                    $nameHTML = Scrub::text($submission['name']);
+                    $dateHTML = '';
+                }
+                else {
+                    $nameHTML = ($actionURL ? '<a href="'.$actionURL.'">' : "") . Scrub::text($submission['name']) . ($actionURL ? '</a>' : "");
+                }
 
                 $output = array(
                     'DUE_ID'      => $submission['id'],
