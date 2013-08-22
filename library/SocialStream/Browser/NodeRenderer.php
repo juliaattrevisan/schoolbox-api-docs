@@ -42,8 +42,6 @@ class NodeRenderer {
 	 * Render tree and excrete it
 	 */
 	public function render() {
-		$nodeData = $this->getNodeData();
-
 		$this->getPage()->setFile(TEMPLATE_content, 'component/homepage/socialstream/node.html');
 		$this->getPage()->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'node_category', 'node_category_block');
@@ -57,14 +55,41 @@ class NodeRenderer {
 
 		/* Current node is breadcrumbs[0]
 		 */
+		$this->renderCurrentNode();
+
+		/* Render all the breadcrumbs
+		 */
+		$this->renderBreadcrumbs();
+
+		/* Render all the records
+		 */
+		$this->renderContents();
+
+		/* Send it out
+		 */
+		$this->getPage()->setAjax();
+		$this->getPage()->template->pparse('finaloutput', TEMPLATE_content);
+	}
+
+	/**
+	 * Render the title of the node you're currently in
+	 */
+	private function renderCurrentNode() {
+		$nodeData = $this->getNodeData();
+
 		$currentNode = $nodeData['breadcrumbs'][0];
 
 		$this->getPage()->setVar(array(
 			'NODE_NAME' => $currentNode['name']
 		));
+	}
 
-		/* Render all the breadcrumbs
-		 */
+	/**
+	 * Render breadcrumbs for this node
+	 */
+	private function renderBreadcrumbs() {
+		$nodeData = $this->getNodeData();
+
 		$allBreadcrumbs = $nodeData['breadcrumbs'];
 
 		foreach($allBreadcrumbs as $currentBreadcrumb) {
@@ -74,9 +99,14 @@ class NodeRenderer {
 
 			$this->getPage()->parse('breadcrumb_block', 'breadcrumb', true);
 		}
+	}
 
-		/* Render all the records
-		 */
+	/**
+	 * Render all the contents of the current node
+	 */
+	private function renderContents() {
+		$nodeData = $this->getNodeData();
+
 		$allRecords = $nodeData['records'];
 
 		foreach($allRecords as $currentRecord) {
@@ -86,9 +116,6 @@ class NodeRenderer {
 				default: break;
 			}
 		}
-
-		$this->getPage()->setAjax();
-		$this->getPage()->template->pparse('finaloutput', TEMPLATE_content);
 	}
 
 	/**
