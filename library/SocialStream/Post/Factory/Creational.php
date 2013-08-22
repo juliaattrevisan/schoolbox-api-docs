@@ -329,6 +329,8 @@ class Creational extends AbstractFactory {
 //		/* Set up image thumbnails
 //		 * TODO: Why does this tell me I'm not logged in, and then save the html
 //		 * in the file which would normally contain image data? wtf
+//		 *
+//		 * Is because fopen() is trying to get to a password-protected place?
 //		 */
 //		else if ($file->isImage()) {
 //			$url = "/send.php?id={$file->getId()}";
