@@ -103,11 +103,16 @@
 					return $j.extend(defaults, options);
 				};
 
+				/**
+				 * Set up modal window
+				 *
+				 * @param config
+				 */
 				function initModal(config) {
 					$j(config.nodeElement).dialog({
 						width: 650,
 						autoOpen: false,
-						title: "Select a homepage",
+						title: "Browse Resources",
 						modal: true,
 						resizable: false
 					});
