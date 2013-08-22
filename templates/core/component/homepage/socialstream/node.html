@@ -1,2 +1,14 @@
-Well this has been a fun ride.
-		Hold me
+<h1>{NODE_NAME}</h1>
+<ul>
+	<!-- BEGIN node_category -->
+	<li>
+		{NODE_CATEGORY_NAME}
+	</li>
+	<!-- END node_category -->
+	<!-- BEGIN node_file -->
+	<li>
+		<img src='/images/mime/60x60/{NODE_FILE_ICON}' alt="{NODE_FILE_NAME}" title="{NODE_FILE_NAME}" />
+		{NODE_FILE_NAME}
+	</li>
+	<!-- END node_file -->
+</ul>

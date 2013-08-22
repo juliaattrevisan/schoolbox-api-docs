@@ -42,9 +42,70 @@ class NodeRenderer {
 	 * Render tree and excrete it
 	 */
 	public function render() {
+		$nodeData = $this->getNodeData();
+
 		$this->getPage()->setFile(TEMPLATE_content, 'component/homepage/socialstream/node.html');
+		$this->getPage()->setBlock(TEMPLATE_content, 'node_category', 'node_category_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'node_file', 'node_file_block');
+
+		$this->getPage()->setVar(array(
+			'node_category_block' => '',
+			'node_file_block' => ''
+		));
+
+		/* Current node is breadcrumbs[0]
+		 */
+		$currentNode = $nodeData['breadcrumbs'][0];
+
+		$this->getPage()->setVar(array(
+			'NODE_NAME' => $currentNode['name']
+		));
+
+		/* Render all the breadcrumbs
+		 */
+//		new \Alaress_Probe($nodeData['breadcrumbs']);
+
+		/* Render all the records
+		 */
+		$allRecords = $nodeData['records'];
+
+		foreach($allRecords as $currentRecord) {
+			switch ($currentRecord['type']) {
+				case 'category': $this->renderCategory($currentRecord); break;
+				case 'file': $this->renderFile($currentRecord); break;
+				default: break;
+			}
+		}
+
 		$this->getPage()->setAjax();
 		$this->getPage()->template->pparse('finaloutput', TEMPLATE_content);
+	}
+
+	/**
+	 * Render a category record
+	 *
+	 * @param $currentRecord
+	 */
+	private function renderCategory($currentRecord) {
+		$this->getPage()->setVar(array(
+			'NODE_CATEGORY_NAME' => $currentRecord['name'],
+		));
+
+		$this->getPage()->parse('node_category_block', 'node_category', true);
+	}
+
+	/**
+	 * Render a file record
+	 *
+	 * @param $currentRecord
+	 */
+	private function renderFile($currentRecord) {
+		$this->getPage()->setVar(array(
+			'NODE_FILE_NAME' => $currentRecord['name'],
+			'NODE_FILE_ICON' => $currentRecord['icon'],
+		));
+
+		$this->getPage()->parse('node_file_block', 'node_file', true);
 	}
 
 	/**
