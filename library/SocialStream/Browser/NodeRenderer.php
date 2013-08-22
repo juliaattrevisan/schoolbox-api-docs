@@ -125,6 +125,7 @@ class NodeRenderer {
 	 */
 	private function renderCategory($currentRecord) {
 		$this->getPage()->setVar(array(
+			'NODE_CATEGORY_ID' => $currentRecord['categoryId'],
 			'NODE_CATEGORY_NAME' => $currentRecord['name'],
 		));
 

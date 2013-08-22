@@ -108,6 +108,21 @@
 		 */
 		self.config.element.load(self.config.url, args, function() {
 			$j(self.config.element).dialog('open');
+
+			/* Assign event handlers to all the categories
+			 */
+			var allCategories = $j(self.config.element).find('.socialstream-node-category');
+
+			$j.each(allCategories, function(index, element) {
+				$j(element).find('a').click(function() {
+					$j(self.config.element).socialstreamBrowser.loadNode($j(this).attr('rel'));
+
+					return false;
+				});
+			});
+
+			/* Assign event handlers to all the files
+			 */
 		});
 	}
 }(jQuery));

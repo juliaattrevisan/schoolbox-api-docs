@@ -13,16 +13,20 @@
 	<!-- END breadcrumb -->
 </ul>
 <ul class='socialstream-node'>
+
 	<!-- BEGIN node_category -->
-	<li>
-		<a href='#'>
+	<!-- Don't rename socialstream-node-category class as it's used to navigate around -->
+	<li class='socialstream-node-category'>
+		<a href='#' rel='{NODE_CATEGORY_ID}'>
 			<img src='/images/mime/22x22/folder.png' alt="{NODE_CATEGORY_NAME}" title="{NODE_CATEGORY_NAME}" />
 			{NODE_CATEGORY_NAME}
 		</a>
 	</li>
 	<!-- END node_category -->
+
 	<!-- BEGIN node_file -->
-	<li>
+	<!-- Don't rename socialstream-node-file class as it's used to navigate around -->
+	<li class='socialstream-node-file'>
 		<a href='#'>
 			<img src='/images/mime/22x22/{NODE_FILE_ICON}' alt="{NODE_FILE_NAME}" title="{NODE_FILE_NAME}" />
 			{NODE_FILE_NAME}
