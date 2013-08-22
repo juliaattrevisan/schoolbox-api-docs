@@ -10,6 +10,7 @@
  * @link        http://www.alaress.com.au
  */
 
+use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
@@ -18,11 +19,24 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $mapper = new QueueMapper();
 $lock   = new Alaress_Lock(Cfg::get('video_dir').'/.lock');
 if (!$lock->acquire()) {
-	echo strftime("[%F %T] A video processor is already running.\n");
-	exit;
+	echo strftime("[%F %T] A video processor is already running, checking timeout.\n");
+	// Check timeout: if any processing video has been processing for more than
+	// x minutes, then kill their process, mark as failed and start over.
+	// (Should never be more than one video processing at once (per server)).
+	$timeout = Config::get('video_processing_timeout');
+	if (($num_timed_out = $mapper->markAllProcessingAsTimedOut($timeout)) > 0) {
+		echo strftime("[%F %T] Processing of $num_timed_out video(s) has timed out - marking these as failed, and continuing.\n");
+		$lock->killProcess();
+		$lock->acquire();
+	}
+	else {
+		echo strftime("[%F %T] No video processing has timed out.\n");
+		exit;
+	}
 }
 echo strftime("[%F %T] Processing of videos started.\n");
 
+/** @var Queue[] $pendingQueue */
 $pendingQueue = $mapper->getPending();
 
 $failed  = 0;
