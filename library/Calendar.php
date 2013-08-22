@@ -462,6 +462,7 @@ class Calendar extends DeprecatedModel {
 					AND submission_box.deleted = 0
 					AND	DATE(submission_box.date) >= DATE(FROM_UNIXTIME('{$startTimestamp}'))
 					AND DATE(submission_box.date) < DATE(FROM_UNIXTIME('{$endTimestamp}'))
+					AND submission_box.task_id IS NULL
 					GROUP BY submission_box.id, category.id
 					ORDER BY submission_box.date
 				";
@@ -471,6 +472,7 @@ class Calendar extends DeprecatedModel {
 					WHERE DATE(submission_box.date) >= DATE(FROM_UNIXTIME('{$startTimestamp}'))
 					AND DATE(submission_box.date) < DATE(FROM_UNIXTIME('{$endTimestamp}'))
 					AND submission_box.deleted = 0
+					AND submission_box.task_id IS NULL
 					GROUP BY submission_box.id
 					ORDER BY submission_box.date
 				";

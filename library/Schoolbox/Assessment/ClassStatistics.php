@@ -74,7 +74,9 @@ class ClassStatistics {
 		$this->attemptMapper = new AttemptMapper();
 
 		// retrieve ALL the submission boxes for this category
-		$boxCollection = $this->submissionBoxMapper->findByColumn('category', $this->getCategory()->getId());
+		$boxCollection = $this->submissionBoxMapper->findByColumnList(
+			array('category' => $this->getCategory()->getId(), 'task_id' => null)
+		);
 		foreach($boxCollection as $box) {
 			$due = $box->getDueDate();
 			$dueYear = $due->getUsingFormat('Y');

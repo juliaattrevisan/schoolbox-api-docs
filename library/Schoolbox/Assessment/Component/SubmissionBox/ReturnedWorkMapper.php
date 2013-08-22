@@ -166,6 +166,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'sr.owner = :student',
 			'sr.deleted IS FALSE',
 			'sb.deleted IS FALSE',
+			'sb.task_id IS NULL',
 		);
 		if (!empty($extra_params['year'])) {
 			$params['year'] = $extra_params['year'];

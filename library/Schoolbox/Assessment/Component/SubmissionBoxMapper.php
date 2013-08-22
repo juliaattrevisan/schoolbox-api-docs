@@ -441,6 +441,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
 				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
 				AND sb.deleted IS FALSE
+				AND sb.task_id IS NULL
 				AND (
 					(YEAR(ss.submitted) = :year AND MONTH(ss.submitted) BETWEEN :month_start AND :month_end)
 					OR
@@ -509,6 +510,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND YEAR(b.date) = :year
 			AND MONTH(b.date) BETWEEN :month_start AND :month_end
+			AND b.task_id IS NULL
 			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
 		";
@@ -549,6 +551,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.open_date < NOW()
 					AND sb.deleted IS FALSE
+					AND sb.task_id IS NULL
 					ORDER BY sb.open_date DESC
 					LIMIT :limit
 				",
@@ -571,6 +574,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					AND sm.id IS NULL
 					AND sb.date < NOW()
 					AND sb.deleted IS FALSE
+					AND sb.task_id IS NULL
 					ORDER BY sb.date DESC
 					LIMIT :limit
 				",
@@ -589,6 +593,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.late_date < NOW()
 					AND sb.deleted IS FALSE
+					AND sb.task_id IS NULL
 					ORDER BY sb.late_date DESC
 					LIMIT :limit
 				",
@@ -650,6 +655,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND sb.date > NOW()
 			AND sb.deleted IS FALSE
+			AND sb.task_id IS NULL
 			HAVING (submission_count = 0 OR sb.multi_submission IS TRUE)
 			ORDER BY sb.date ASC
 			LIMIT :limit
@@ -709,6 +715,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'sb.late_date > NOW()',
 			'sb.accept_submission IS TRUE',
 			'sb.deleted IS FALSE',
+			'sb.task_id IS NULL',
 		);
 		if ($cat_ids) {
 			$params        = $this->getArrayParameters($cat_ids, 'cat');
@@ -770,6 +777,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND sb.date BETWEEN :from_date AND :to_date
 			AND sb.deleted IS FALSE
+			AND sb.task_id IS NULL
 			ORDER BY sb.date ASC
 		";
 
