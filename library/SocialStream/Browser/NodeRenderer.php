@@ -45,10 +45,12 @@ class NodeRenderer {
 		$nodeData = $this->getNodeData();
 
 		$this->getPage()->setFile(TEMPLATE_content, 'component/homepage/socialstream/node.html');
+		$this->getPage()->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'node_category', 'node_category_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'node_file', 'node_file_block');
 
 		$this->getPage()->setVar(array(
+			'breadcrumb_block' => '',
 			'node_category_block' => '',
 			'node_file_block' => ''
 		));
@@ -63,7 +65,15 @@ class NodeRenderer {
 
 		/* Render all the breadcrumbs
 		 */
-//		new \Alaress_Probe($nodeData['breadcrumbs']);
+		$allBreadcrumbs = $nodeData['breadcrumbs'];
+
+		foreach($allBreadcrumbs as $currentBreadcrumb) {
+			$this->getPage()->setVar(array(
+				'BREADCRUMB_NAME' => $currentBreadcrumb['name']
+			));
+
+			$this->getPage()->parse('breadcrumb_block', 'breadcrumb', true);
+		}
 
 		/* Render all the records
 		 */

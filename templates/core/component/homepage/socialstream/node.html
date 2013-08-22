@@ -1,14 +1,43 @@
+<style type='text/css'>
+	ul.socialstream-breadcrumb li {
+		display: inline;
+	}
+
+	ul.socialstream-node li {
+		list-style: none;
+	}
+</style>
+
+
 <h1>{NODE_NAME}</h1>
-<ul>
+<ul class='socialstream-breadcrumb'>
+	<li>
+		Home
+	</li>
+	<!-- BEGIN breadcrumb -->
+	<li>
+		>
+	</li>
+	<li>
+		<a href='#'>{BREADCRUMB_NAME}</a>
+	</li>
+	<!-- END breadcrumb -->
+</ul>
+<ul class='socialstream-node'>
 	<!-- BEGIN node_category -->
 	<li>
-		{NODE_CATEGORY_NAME}
+		<a href='#'>
+			<img src='/images/mime/22x22/folder.png' alt="{NODE_CATEGORY_NAME}" title="{NODE_CATEGORY_NAME}" />
+			{NODE_CATEGORY_NAME}
+		</a>
 	</li>
 	<!-- END node_category -->
 	<!-- BEGIN node_file -->
 	<li>
-		<img src='/images/mime/60x60/{NODE_FILE_ICON}' alt="{NODE_FILE_NAME}" title="{NODE_FILE_NAME}" />
-		{NODE_FILE_NAME}
+		<a href='#'>
+			<img src='/images/mime/22x22/{NODE_FILE_ICON}' alt="{NODE_FILE_NAME}" title="{NODE_FILE_NAME}" />
+			{NODE_FILE_NAME}
+		</a>
 	</li>
 	<!-- END node_file -->
 </ul>
