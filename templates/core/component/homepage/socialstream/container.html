@@ -10,25 +10,19 @@
 			socialstream.init('{COMPONENT_INSTANCE_ID}', 0, '{SOCIALSTREAM_AJAX_LIMIT}', '{SOCIALSTREAM_NUM_POSTS}');
 			socialstream.stream();
 
-			/* Start up socialstream browser for new posts
-			 */
-			$j('#socialstream-browser-0').socialstreamBrowser();
-
 			/* Activate socialstream browser for new posts
 			 */
 			$j('.socialstream-browser-button-0').click(function() {
+				$j('#socialstream-browser-0').socialstreamBrowser();
 				$j('#socialstream-browser-0').socialstreamBrowser.open(51);
 			});
 
-//			/* Start up socialstream browser for comments/replies (clones)
-//			 */
-//			$j('#socialstream-browser-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
-//
-//			/* Activate socialstream browser for comments/replies (clones)
-//			 */
-//			$j('.socialstream-browser-button-{COMPONENT_INSTANCE_ID}').click(function() {
-//				$j('#socialstream-browser-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.open(51);
-//			});
+			/* Activate socialstream browser for comments/replies (clones)
+			 */
+			$j('.socialstream-browser-button-{COMPONENT_INSTANCE_ID}').live('click', function() {
+				$j('#socialstream-browser-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
+				$j('#socialstream-browser-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.open(51);
+			});
 		});
 	</script>
 
