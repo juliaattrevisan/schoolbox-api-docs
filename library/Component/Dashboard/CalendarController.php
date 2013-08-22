@@ -103,6 +103,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		$j = 0;
 		foreach ($this->eventList as $currentEvent) {
+			$this->setVar('has_category_block', '');
 
 			//
 			// Current day: will never be before the start time
