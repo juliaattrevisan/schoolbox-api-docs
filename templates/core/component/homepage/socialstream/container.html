@@ -30,6 +30,9 @@
 
 	Don't rename socialstream-browser class as this is used to reinitialise
 	these browsers after they are drag and dropped around the homepage
+
+	Don't rename socialstream-resource either, as this is the selector that
+	gets populated via the socialstream resource browser
 	-->
 	<div id='socialstream-{COMPONENT_INSTANCE_ID}' class='socialstream-browser'>
 	</div>
@@ -64,6 +67,7 @@
 
 			<label>
 				<input type='radio' class='socialstreamAttachment socialstream-browser-{COMPONENT_INSTANCE_ID}' name='socialstreamAttachment' value='resource' />Resource
+				<input type='text' class='socialstream-resource' name='resource' value='' />
 			</label>
 
 			<input type='submit' value='Post' />

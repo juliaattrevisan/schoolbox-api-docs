@@ -126,8 +126,11 @@
 
 			$j.each(allFiles, function(index, element) {
 				$j(element).find('a').click(function() {
-					console.log($j(this).attr('href'));
+					var url = $j(this).attr('href');
 
+					/* Chooze and cloze
+					 */
+					$j(self.config.element).find('.socialstream-resource').val(url);
 					$j(self.config.element).dialog('close');
 
 					return false;
