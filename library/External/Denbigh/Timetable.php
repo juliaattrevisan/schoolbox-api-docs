@@ -26,7 +26,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 		$username = Config::get('external_db_user');
 		$password = Config::get('external_db_passwd');
 
-		$database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password);
+		$database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password, array('throw' => true));
 
 		$this->setExternalDatabase($database);
 

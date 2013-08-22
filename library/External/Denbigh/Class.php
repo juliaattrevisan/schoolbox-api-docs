@@ -9,7 +9,9 @@
 
 class External_Denbigh_Class implements External_ClassInterface {
 
-	private $database;
+	private $internalDatabase;
+
+	private $externalDatabase;
 
 	public function __construct () {
 		/* Set internal database */
@@ -23,7 +25,7 @@ class External_Denbigh_Class implements External_ClassInterface {
 		$username = Config::get('external_db_user');
 		$password = Config::get('external_db_passwd');
 
-		$database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password);
+		$database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password, array('throw' => true));
 
 		$this->setExternalDatabase($database);
 	}

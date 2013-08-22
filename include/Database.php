@@ -94,6 +94,9 @@ class Database {
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
         } catch (PDOException $exception) {
+	        if($options['throw']) {
+		        throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);
+	        }
             $this->error($exception);
         }
 
