@@ -28,7 +28,7 @@ $this->setVar('existing_marks_warning_block', '');
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\TaskMapper;
 
 $mapper      = new SubmissionBoxMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
@@ -150,6 +150,21 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         $late_min  = $late_date->getUsingFormat('i');
     }
 
+    // Messing around with blocks
+    $this->setVar(array(
+        'duework_task_block' => '',
+        'duework_timespan_block' => '',
+    ));
+    $task_id = $submission->getTask()->getId();
+    $task_title = '';
+    if ($task_id) {
+        $task       = TaskMapper::getInstance()->findById($task_id);
+        $task_title = $task->getTitle();
+        $this->parse('duework_task_block', 'duework_task');
+    }
+    else {
+        $this->parse('duework_timespan_block', 'duework_timespan');
+    }
 
     $output = array(
         'HEADING'           => 'Modify',
@@ -157,6 +172,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'CATEGORY'          => $submission->getCategory()->getId(),
         'CURRENT_CAT'       => $catOutput,
         'NAME'              => $submission->getName(),
+        'TASK_TITLE'        => $task_title,
         'DESCRIPTION'       => $submission->getDescription(),
         'FILEID'            => $submission->getLegacyFileId(),
         'ACCEPT_SUBMISSION' => $submission->getAcceptOnline() ? ' checked="checked"' : '',
