@@ -50,7 +50,7 @@
 				url: '/socialstream/tree.php',
 				element: element,
 				instanceId: instanceId,
-				form: $j('socialstream-form-' + instanceId),
+				formId: '#socialstream-form-' + instanceId,
 				firstOpen: false
 			}
 
@@ -133,7 +133,7 @@
 
 					/* Chooze and cloze
 					 */
-					$j(self.config.form).find('input[name=url]').val(url);
+					$j(self.config.formId).find('input[name=url]').val(url);
 					$j(self.config.element).dialog('close');
 
 					return false;
