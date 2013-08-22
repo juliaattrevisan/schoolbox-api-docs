@@ -140,6 +140,7 @@ class NodeRenderer {
 	 */
 	private function renderFile($currentRecord) {
 		$this->getPage()->setVar(array(
+			'NODE_FILE_ID' => $currentRecord['fileId'],
 			'NODE_FILE_NAME' => $currentRecord['name'],
 			'NODE_FILE_ICON' => $currentRecord['icon'],
 		));

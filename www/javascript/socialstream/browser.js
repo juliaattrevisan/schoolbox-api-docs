@@ -122,6 +122,18 @@
 
 			/* Assign event handlers to all the files
 			 */
+			var allFiles = $j(self.config.element).find('.socialstream-node-file');
+
+			$j.each(allFiles, function(index, element) {
+				$j(element).find('a').click(function() {
+					console.log($j(this).attr('href'));
+
+					return false;
+				});
+			});
+			http://192.168.36.10/send.php?save=1&id={NODE_FILE_ID}
+
+
 
 
 			$j(self.config.element).dialog('open');
