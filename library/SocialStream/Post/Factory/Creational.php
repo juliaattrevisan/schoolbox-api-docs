@@ -237,6 +237,7 @@ class Creational extends AbstractFactory {
 			$url = "/storage/image.php?size=maxsize&hash={$uploadedFile->getHash()}";
 
 			$this->getProduct()->setThumbnail($url);
+			$this->getProduct()->setUrl($url);
 
 			/* Save the original in the cache location
 			 */
