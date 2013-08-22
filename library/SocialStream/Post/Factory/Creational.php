@@ -43,6 +43,70 @@ class Creational extends AbstractFactory {
 	}
 
 	/**
+	 * Produce an instance of SocialStream_Post_Abstract subclass
+	 * Populate it with the information from $_POST etc
+	 * Spawn metadata and thumbnails where appropriate
+	 *
+	 * @param $data
+	 * @return mixed|null
+	 */
+	public function produce($data) {
+
+		/* If the url option was chosen, try to curl metadata/thumbnails
+		 */
+		if ($this->getType() == 'url') {
+			$this->constructFromLink();
+			$this->populate($data);
+
+			/* Find thumbnail from the given url in one of the many
+			 * ways that they can exist, if applicable
+			 */
+			if (strlen($this->getProduct()->getUrl())) {
+				$curl = new \Alaress_Curl_Url($this->getProduct()->getUrl());
+				$curl->exec();
+
+				/* Spawn additional stuff
+				 *
+				 * Optionally parse the curl result here into a dom parser
+				 * That would allow for attribute gathering
+				 */
+				$this->spawnMetadataFromCurl($curl);
+				$this->spawnThumbnailFromCurl($curl);
+			}
+		}
+		/* If upload option was chosen, extract metadata and thumbnail information
+		 * directly from already-known information (no curling needed)
+		 */
+		else if ($this->getType() == 'upload') {
+			$uploadedFile = $this->constructFromUpload();
+			$this->populate($data);
+
+			/* Spawn additional stuff
+			 */
+			$this->spawnMetadataFromUpload($uploadedFile);
+			$this->spawnThumbnailFromUpload($uploadedFile);
+		}
+		/* If resource option was chosen,extract metadata and thumbnail information
+		 * directly from already-known information (no curling needed)
+		 */
+		else if ($this->getType() == 'resource') {
+			$resource = $this->constructFromResource($this->getUrl());
+			$this->populate($data);
+
+			/* Spawn additional stuff
+			 */
+			$this->spawnMetadataFromResource($resource);
+			$this->spawnThumbnailFromResource($resource);
+		}
+		else {
+			$this->setProduct($this->constructDefault());
+			$this->populate($data);
+		}
+
+		return $this->getProduct();
+	}
+
+	/**
 	 * Construct a post from a link by doing url analysis
 	 */
 	private function constructFromLink() {
@@ -138,70 +202,6 @@ class Creational extends AbstractFactory {
 		$object->setType('string');
 
 		return $object;
-	}
-
-	/**
-	 * Produce an instance of SocialStream_Post_Abstract subclass
-	 * Populate it with the information from $_POST etc
-	 * Spawn metadata and thumbnails where appropriate
-	 *
-	 * @param $data
-	 * @return mixed|null
-	 */
-	public function produce($data) {
-
-		/* If the url option was chosen, try to curl metadata/thumbnails
-		 */
-		if ($this->getType() == 'url') {
-			$this->constructFromLink();
-			$this->populate($data);
-
-			/* Find thumbnail from the given url in one of the many
-			 * ways that they can exist, if applicable
-			 */
-			if (strlen($this->getProduct()->getUrl())) {
-				$curl = new \Alaress_Curl_Url($this->getProduct()->getUrl());
-				$curl->exec();
-
-				/* Spawn additional stuff
-				 *
-				 * Optionally parse the curl result here into a dom parser
-				 * That would allow for attribute gathering
-				 */
-				$this->spawnMetadataFromCurl($curl);
-				$this->spawnThumbnailFromCurl($curl);
-			}
-		}
-		/* If upload option was chosen, extract metadata and thumbnail information
-		 * directly from already-known information (no curling needed)
-		 */
-		else if ($this->getType() == 'upload') {
-			$uploadedFile = $this->constructFromUpload();
-			$this->populate($data);
-
-			/* Spawn additional stuff
-			 */
-			$this->spawnMetadataFromUpload($uploadedFile);
-			$this->spawnThumbnailFromUpload($uploadedFile);
-		}
-		/* If resource option was chosen,extract metadata and thumbnail information
-		 * directly from already-known information (no curling needed)
-		 */
-		else if ($this->getType() == 'resource') {
-			$resource = $this->constructFromResource($this->getUrl());
-			$this->populate($data);
-
-			/* Spawn additional stuff
-			 */
-			$this->spawnMetadataFromResource($resource);
-			$this->spawnThumbnailFromResource($resource);
-		}
-		else {
-			$this->setProduct($this->constructDefault());
-			$this->populate($data);
-		}
-
-		return $this->getProduct();
 	}
 
 	/**
@@ -321,12 +321,35 @@ class Creational extends AbstractFactory {
 	 * @param $file
 	 */
 	private function spawnThumbnailFromResource($file) {
-		$url = "/send.php?id={$file->getId()}";
 
-		$this->getProduct()->setUrl($url);
+//		/* Set up video thumbnails
+//		 */
+//		if ($file->isVideo()) {
+//		}
+//		/* Set up image thumbnails
+//		 * TODO: Why does this tell me I'm not logged in, and then save the html
+//		 * in the file which would normally contain image data? wtf
+//		 */
+//		else if ($file->isImage()) {
+//			$url = "/send.php?id={$file->getId()}";
+//
+//			$this->getProduct()->setThumbnail($url);
+//			$this->getProduct()->setUrl($url);
+//
+//			/* Save the original in the cache location
+//			 */
+//			$originalThumbnailCache = new \SocialStream\Cache\Original();
+//			$originalThumbnailCache->init($url);
+//		}
+//		/* Set up icon thumbnails
+//		 */
+//		else {
+			$url = "/send.php?id={$file->getId()}";
+			$this->getProduct()->setUrl($url);
 
-		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
-		$this->getProduct()->setThumbnail($chain->getResult());
+			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
+			$this->getProduct()->setThumbnail($chain->getResult());
+//		}
 	}
 
 	/* Getters/Setters
