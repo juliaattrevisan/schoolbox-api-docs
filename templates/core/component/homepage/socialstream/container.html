@@ -12,14 +12,12 @@
 
 			/* Start up socialstream browser
 			 */
-			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser({
-				currentCategory: '{HOMEPAGE_ID}'
-			});
+			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
 
 			/* Activate socialstream browser
 			 */
 			$j('.socialstream-browser-{COMPONENT_INSTANCE_ID}').click(function() {
-				$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.open();
+				$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.open('{HOMEPAGE_ID}');
 			});
 		});
 	</script>

@@ -48,7 +48,6 @@
 				url: '/socialstream/tree.php',
 				element: element,
 				instanceId: $j(element).attr('id').substring(13),
-				currentCategory: 0,
 				firstOpen: false
 			}
 
@@ -74,7 +73,7 @@
 	/**
 	 * Open le browser
 	 */
-	$j.fn.socialstreamBrowser.open = function() {
+	$j.fn.socialstreamBrowser.open = function(currentCategory) {
 		var self = $j.fn.socialstreamBrowser;
 
 		/* Open default category when you open the browser for
@@ -82,7 +81,7 @@
 		 * navigated to
 		 */
 		if (!self.config.firstOpen) {
-			$j.fn.socialstreamBrowser.loadNode(self.config.currentCategory);
+			$j.fn.socialstreamBrowser.loadNode(currentCategory);
 
 			self.config.firstOpen = true;
 		}
