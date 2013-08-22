@@ -57,11 +57,80 @@
 		$j(function() {
 			socialstream.init('{COMPONENT_INSTANCE_ID}', 0, '{SOCIALSTREAM_AJAX_LIMIT}', '{SOCIALSTREAM_NUM_POSTS}');
 			socialstream.stream();
+
+			$j('#socialstream-3174').socialstreamBrowser();
+			$j('#socialstream-3174').socialstreamBrowser.loadNode(51);
 		});
+
+
+		(function($j) {
+
+			/**
+			 * Constructor
+			 *
+			 * @param options
+			 */
+			$j.fn.socialstreamBrowser = function(options) {
+				var self = $j.fn.socialstreamBrowser;
+
+				/* Store the config in this instance so private methods
+				 * can access it
+				 */
+				self.config = init(options, this);
+
+				/**
+				 * Initialise various configured params and determine a bunch
+				 * of ids and stuff that we'll probably use elsewhere
+				 *
+				 * @param options
+				 * @param element
+				 * @returns {*}
+				 */
+				function init(options, element) {
+					var defaults = {
+						url: '/socialstream/tree.php',
+						elementId: $j(element).attr('id'),
+						instanceId: $j(element).attr('id').substring(13),
+						nodeElement: $j(element).find('.nodes')
+					}
+
+					return $j.extend(defaults, options);
+				}
+			}
+
+			/**
+			 * Load a node contents
+			 *
+			 * @param node
+			 */
+			$j.fn.socialstreamBrowser.loadNode = function(node) {
+				var self = $j.fn.socialstreamBrowser;
+
+				/* The thing you clicked on
+				 */
+				var args = {
+					relationID: node
+				}
+
+				/* Load data into the node container
+				 */
+				self.config.nodeElement.load(self.config.url, args, function() {
+				});
+			}
+		}(jQuery));
+
+
 	</script>
 
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
+
+	<div id='socialstream-{COMPONENT_INSTANCE_ID}'>
+		Le Browser
+
+		<div class='nodes'>
+		</div>
+	</div>
 
 	<div class='{FORM_CLASS}'>
 		<form action='/socialstream/modifyForm.php' method='post' id='originalAddPostForm' class='addPostForm' enctype='multipart/form-data'>
@@ -92,7 +161,7 @@
 			</label>
 
 			<label>
-				<input type='radio' class='socialstreamAttachment' name='socialstreamAttachment' value='resource' />Resource
+				<input type='radio' class='socialstreamAttachment socialstream-browser' name='socialstreamAttachment' value='resource' />Resource
 			</label>
 
 			<input type='submit' value='Post' />
