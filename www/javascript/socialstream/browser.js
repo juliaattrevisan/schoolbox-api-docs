@@ -114,7 +114,6 @@
 
 			$j.each(allNavigators, function(index, element) {
 				$j(element).find('a').click(function() {
-					console.log('mort');
 					$j(self.config.element).socialstreamBrowser.loadNode($j(this).attr('rel'));
 
 					return false;
@@ -124,7 +123,7 @@
 			/* Assign event handlers to all the files
 			 */
 
-			
+
 			$j(self.config.element).dialog('open');
 		});
 	}
