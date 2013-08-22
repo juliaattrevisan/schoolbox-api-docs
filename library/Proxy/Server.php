@@ -10,6 +10,9 @@
 
 namespace Proxy;
 
+use Schoolbox\ConfigLoader;
+use Schoolbox\IConfigLoader;
+
 /**
  * Class Server
  * @package Proxy
@@ -25,11 +28,13 @@ class Server {
 	protected static $instance;
 
 	/**
+	 * Return the Singleton ProxyServer instance.
+	 *
 	 * @return Server
 	 */
 	public static function getInstance() {
 		if(!self::$instance) {
-			self::$instance = new self();
+			self::$instance = new self(null);
 		}
 		return self::$instance;
 	}
@@ -44,11 +49,20 @@ class Server {
 	/** @var string */
 	protected $pass;
 
-	protected function __construct() {
-		$this->host = \Config::get("proxy_host");
-		$this->port = (int)\Config::get("proxy_port");
-		$this->user = \Config::get("proxy_user");
-		$this->pass = \Config::get("proxy_pass");
+
+	/**
+	 * Constructor for ProxyServer. Accepts a config loader as a dependency.
+	 *
+	 * @param IConfigLoader $conf
+	 */
+	public function __construct($conf) {
+		if(!$conf instanceof IConfigLoader) {
+			$conf = new ConfigLoader();
+		}
+		$this->host = $conf->get("proxy_host");
+		$this->port = (int)$conf->get("proxy_port");
+		$this->user = $conf->get("proxy_user");
+		$this->pass = $conf->get("proxy_pass");
 	}
 
 	/**
