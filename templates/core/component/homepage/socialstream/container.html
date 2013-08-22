@@ -1,58 +1,10 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	<style type='text/css'>
+	<link link rel="stylesheet" type="text/css" media="screen" href='/javascript/socialstream/threads.css' />
+	<script type='text/javascript' src='/javascript/socialstream/threads.js'></script>
 
-		.socialstream ul li.socialstream-post {
-			border-top: 1px solid #eee;
-			border-bottom: 1px solid #eee;
-			padding: 20px 0px;
-		}
+	<link link rel="stylesheet" type="text/css" media="screen" href='/javascript/socialstream/browser.css' />
+	<script type='text/javascript' src='/javascript/socialstream/browser.js'></script>
 
-		.socialstream ul li {
-			margin-left: 24px;
-		}
-
-		.socialstream div.avatar {
-			width: 32px;
-			margin-right: 8px;
-			float: left;
-		}
-
-		.socialstream div.body {
-			float: left;
-		}
-
-		.socialstream div.body span {
-			color: #aaa;
-		}
-
-		.socialstream li.socialstream-post div.body {
-			/*border: 1px solid #f00;*/
-		}
-
-		.socialstream li.socialstream-comment div.body {
-			/*border: 1px solid #0f0;*/
-		}
-
-		.socialstream li.socialstream-reply div.body {
-			/*border: 1px solid #00f;*/
-		}
-
-		.socialstream .addPostLink {
-			border-left: 1px solid #aaa;
-			padding-left: 6px;
-			margin-left: 4px;
-		}
-
-		.socialstream .loading {
-			background-color: #f00;
-			text-align: center;
-			font-weight: bold;
-			color: #fff;
-			padding: 20px;
-		}
-	</style>
-
-	<script type='text/javascript' src='/javascript/socialstream.js'></script>
 	<script type='text/javascript'>
 		$j(function() {
 			socialstream.init('{COMPONENT_INSTANCE_ID}', 0, '{SOCIALSTREAM_AJAX_LIMIT}', '{SOCIALSTREAM_NUM_POSTS}');
@@ -68,83 +20,6 @@
 				$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.loadNode(51);
 			});
 		});
-
-		(function($j) {
-
-			/**
-			 * Constructor
-			 *
-			 * @param options
-			 */
-			$j.fn.socialstreamBrowser = function(options) {
-				var self = $j.fn.socialstreamBrowser;
-
-				/* Store the config in this instance so private methods
-				 * can access it
-				 */
-				self.config = init(options, this);
-
-				/* Set up modal thingy
-				 */
-				initModal(self.config);
-
-				/**
-				 * Initialise various configured params and determine a bunch
-				 * of ids and stuff that we'll probably use elsewhere
-				 *
-				 * @param options
-				 * @param element
-				 * @returns {*}
-				 */
-				function init(options, element) {
-					var defaults = {
-						url: '/socialstream/tree.php',
-						element: element,
-						instanceId: $j(element).attr('id').substring(13)
-					}
-
-					return $j.extend(defaults, options);
-				};
-
-				/**
-				 * Set up modal window
-				 *
-				 * @param config
-				 */
-				function initModal(config) {
-					$j(config.element).dialog({
-						width: 650,
-						autoOpen: false,
-						title: "Browse Resources",
-						modal: true,
-						resizable: false
-					});
-				}
-			}
-
-			/**
-			 * Load a node contents
-			 *
-			 * @param node
-			 */
-			$j.fn.socialstreamBrowser.loadNode = function(node) {
-				var self = $j.fn.socialstreamBrowser;
-
-				/* The thing you clicked on
-				 */
-				var args = {
-					relationID: node
-				}
-
-				/* Load data into the node container
-				 */
-				self.config.element.load(self.config.url, args, function() {
-					$j(self.config.element).dialog('open');
-				});
-			}
-		}(jQuery));
-
-
 	</script>
 
 	<h2>{COMPONENT_NAME}</h2>
