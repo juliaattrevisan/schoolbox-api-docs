@@ -58,10 +58,9 @@
 			socialstream.init('{COMPONENT_INSTANCE_ID}', 0, '{SOCIALSTREAM_AJAX_LIMIT}', '{SOCIALSTREAM_NUM_POSTS}');
 			socialstream.stream();
 
-			$j('#socialstream-3174').socialstreamBrowser();
-			$j('#socialstream-3174').socialstreamBrowser.loadNode(51);
+			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
+			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.loadNode(51);
 		});
-
 
 		(function($j) {
 
