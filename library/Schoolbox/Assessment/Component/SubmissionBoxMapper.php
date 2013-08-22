@@ -15,6 +15,7 @@ use Schoolbox\User;
 use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Course\Task;
 
 class SubmissionBoxMapper extends Schoolbox\Mapper {
 
@@ -313,8 +314,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * Pre-save method for submission boxes - converts legacy file to a new
-	 * storage file.
+	 * Pre-save method for submission boxes.
+	 * * converts legacy file to a new storage file
+	 * * Sets start, end and due time to now if this is a task
 	 *
 	 * @param SubmissionBox $object
 	 *
@@ -332,6 +334,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			//
 			// Remove legacy file link because it is no longer needed.
 			$object->setLegacyFileId(null);
+		}
+		if (!$object->getId()) {
+			$task    = $object->getTask();
+			$task_id = ($task instanceof Task) ? $task->getId() : $task;
+			if ($task_id) {
+				$time = new \Alaress_Date_Format(time(), 'U');
+				$object->setOpenDate($time);
+				$object->setDueDate($time);
+				$object->setLateDate($time);
+			}
 		}
 		return true;
 	}
