@@ -28,6 +28,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
             FROM  $studentClass
             LEFT JOIN $students ON $studentClass.student_number = $students.student_number
             WHERE $studentClass.class_code = :code
+            ORDER BY surname ASC
         ");
 
         // retrieve
