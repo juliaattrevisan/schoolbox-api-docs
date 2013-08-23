@@ -74,16 +74,16 @@ var socialstream = {
 		});
 	},
 
-	/**
-	 * Stream more stuff in
-	 */
-	initViewMore: function() {
-		var self = this;
-
-		$j('.socialstreamViewMore').click(function() {
-			self.stream();
-		});
-	},
+//	/**
+//	 * Stream more stuff in
+//	 */
+//	initViewMore: function() {
+//		var self = this;
+//
+//		$j('.socialstreamViewMore').click(function() {
+//			self.stream();
+//		});
+//	},
 
 	/**
 	 * Add event handlers for Link, Upload and Resource buttons
@@ -131,35 +131,35 @@ var socialstream = {
 		});
 	},
 
-	/**
-	 * Load initial stream
-	 */
-	stream: function() {
-		var url = '/socialstream/threads.php?instanceId=' + this.instanceId + '&start=' + this.start + '&offset=' + this.offset;
-		var self = this;
-
-		$j.get(url, function(responseText) {
-			$j('.socialstream').append(responseText);
-
-			/* Update offsets, hiding View More if there were none left
-			 * after streaming 
-			 */
-			self.start = parseInt(self.start) + parseInt(self.offset);
-
-			if (self.start < self.numPosts) {
-				$j(self.viewMoreLink).show();
-			}
-			else {
-				$j(self.viewMoreLink).hide();
-			}
-
-			/* Clear out any loading div indicators
-			 */
-			$j('.socialstream').find(self.loading).remove();
-
-			/* Lightbox everything!
-			 */
-			$j("a[rel^='lightbox']").slimbox();
-		});
-	}
+//	/**
+//	 * Load initial stream
+//	 */
+//	stream: function() {
+//		var url = '/socialstream/threads.php?instanceId=' + this.instanceId + '&start=' + this.start + '&offset=' + this.offset;
+//		var self = this;
+//
+//		$j.get(url, function(responseText) {
+//			$j('.socialstream').append(responseText);
+//
+//			/* Update offsets, hiding View More if there were none left
+//			 * after streaming
+//			 */
+//			self.start = parseInt(self.start) + parseInt(self.offset);
+//
+//			if (self.start < self.numPosts) {
+//				$j(self.viewMoreLink).show();
+//			}
+//			else {
+//				$j(self.viewMoreLink).hide();
+//			}
+//
+//			/* Clear out any loading div indicators
+//			 */
+//			$j('.socialstream').find(self.loading).remove();
+//
+//			/* Lightbox everything!
+//			 */
+//			$j("a[rel^='lightbox']").slimbox();
+//		});
+//	}
 }

@@ -25,6 +25,10 @@
 		 */
 		self.config = init(options, this);
 
+		/* Set up the input form
+		 */
+		initPostForm();
+
 		/* Stream first batch, I guess
 		 */
 		self.stream();
@@ -60,6 +64,14 @@
 				 */
 				streamUrl: self.generateStreamUrl(options.instanceId, options.start, options.offset),
 
+				/* The element which allows you to make comments and replies
+				 */
+				addPostLink: $j(element).find('.addPostLink'),
+
+				/* The form which spawns when making comments and replies
+				 */
+				addPostForm: '.addPostForm',
+
 				/* The element which allows you to spawn more
 				 */
 				viewMoreLink: $j(element).find('.socialstreamViewMore'),
@@ -83,6 +95,46 @@
 			merged.numPosts = parseInt(merged.numPosts);
 
 			return merged;
+		}
+
+		/**
+		 * Allow input forms to be spawned
+		 */
+		function initPostForm() {
+			var self = $j.fn.socialstreamThreads;
+
+			self.config.addPostLink.live('click', function() {
+
+				/* Clear out all instances of .addPostForm in the socialstream
+				 */
+				clearAllPostForms();
+
+				/* Get the ids for this node
+				 */
+				var parentId = $j(this).attr('data-parentid');
+				var rootId = $j(this).attr('data-rootid');
+
+				/* Clone an instance of .addPostForm and inject ids
+				 */
+				var clone = $j('#socialstream-form-0').clone();
+				clone.attr('id', 'socialstream-form-' + parentId);
+				clone.find('input[name=body]').val('').focus();
+				clone.find('input[name=parentId]').val(parentId);
+				clone.find('input[name=rootId]').val(rootId);
+
+				/* Send In The Clones
+				 */
+				$j(this).parent('p').append(clone);
+			});
+		}
+
+		/**
+		 * Clear all the forms used to make comments and replies
+		 */
+		function clearAllPostForms() {
+			var self = $j.fn.socialstreamThreads;
+
+			self.config.container.find(this.addPostForm).remove();
 		}
 	}
 
