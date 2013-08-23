@@ -50,7 +50,7 @@
 				url: '/socialstream/tree.php',
 				element: element,
 				instanceId: instanceId,
-				formId: '#socialstream-form-' + instanceId,
+				formId: '#socialstream-form-default-' + instanceId,
 				firstOpen: false
 			}
 
@@ -131,9 +131,10 @@
 				$j(element).find('a').click(function() {
 					var url = $j(this).attr('href');
 
+					console.log(self.config.formId);
+
 					/* Chooze and cloze
 					 */
-					console.log(self.config.formId);
 					$j(self.config.formId).find('input[name=url]').val(url);
 					$j(self.config.element).dialog('close');
 

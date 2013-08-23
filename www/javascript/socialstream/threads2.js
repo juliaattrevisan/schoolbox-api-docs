@@ -76,7 +76,7 @@
 				/* The form which gets cloned per post and the one
 				 * which allows you to make new posts
 				 */
-				defaultForm: $j('#socialstream-form-' + options.instanceId),
+				defaultForm: $j('#socialstream-form-default-' + options.instanceId),
 
 				/* The url to stream from
 				 */
