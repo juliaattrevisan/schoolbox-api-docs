@@ -1,79 +1,79 @@
 var socialstream = {
-
-	/**
-	 * Component instance
-	 */
-	instanceId: 0,
-
-	/**
-	 * Start and offset values
-	 */
-	start: 0,
-	offset: 0,
-
-	/**
-	 * Maximum number of posts at the moment
-	 */
-	numPosts: 0,
-
-	/**
-	 * The element which allows you to spawn more
-	 */
-	viewMoreLink: '.socialstreamViewMore',
-
-	/**
-	 * Container div for a loading graphic or message
-	 */
-	loading: '.loading',
-
-	/**
-	 * Initialise everything
-	 *
-	 * @param instanceId
-	 * @param start
-	 * @param offset
- 	 * @param numPosts
-	 */
-	init: function(instanceId, start, offset, numPosts) {
-		this.instanceId = instanceId;
-		this.start = start;
-		this.offset = offset;
-		this.numPosts = numPosts;
-
-		this.initPostLinks();
-		this.initViewMore();
-		this.initAttachmentSelectors();
-	},
-
-	/**
-	 * Add event handlers for .addPostLink tags
-	 */
-	initPostLinks: function() {
-		$j('.socialstream').find('.addPostLink').live('click', function() {
-
-			/* Clear out all instances of .addPostForm in the socialstream
-			 */
-			$j('.socialstream').find('.addPostForm').remove();
-
-			/* Get the ids for this node
-			 */
-			var parentId = $j(this).attr('data-parentid');
-			var rootId = $j(this).attr('data-rootid');
-
-			/* Clone an instance of .addPostForm and inject ids
-			 */
-			var clone = $j('#socialstream-form-0').clone();
-			clone.attr('id', 'socialstream-form-' + parentId);
-			clone.find('input[name=body]').val('').focus();
-			clone.find('input[name=parentId]').val(parentId);
-			clone.find('input[name=rootId]').val(rootId);
-
-			/* Send In The Clones
-			 */
-			$j(this).parent('p').append(clone);
-		});
-	},
-
+//
+//	/**
+//	 * Component instance
+//	 */
+//	instanceId: 0,
+//
+//	/**
+//	 * Start and offset values
+//	 */
+//	start: 0,
+//	offset: 0,
+//
+//	/**
+//	 * Maximum number of posts at the moment
+//	 */
+//	numPosts: 0,
+//
+//	/**
+//	 * The element which allows you to spawn more
+//	 */
+//	viewMoreLink: '.socialstreamViewMore',
+//
+//	/**
+//	 * Container div for a loading graphic or message
+//	 */
+////	loading: '.loading',
+//
+//	/**
+//	 * Initialise everything
+//	 *
+//	 * @param instanceId
+//	 * @param start
+//	 * @param offset
+// 	 * @param numPosts
+//	 */
+//	init: function(instanceId, start, offset, numPosts) {
+//		this.instanceId = instanceId;
+//		this.start = start;
+//		this.offset = offset;
+//		this.numPosts = numPosts;
+//
+//		this.initPostLinks();
+//		this.initViewMore();
+//		this.initAttachmentSelectors();
+//	},
+//
+//	/**
+//	 * Add event handlers for .addPostLink tags
+//	 */
+//	initPostLinks: function() {
+//		$j('.socialstream').find('.addPostLink').live('click', function() {
+//
+//			/* Clear out all instances of .addPostForm in the socialstream
+//			 */
+//			$j('.socialstream').find('.addPostForm').remove();
+//
+//			/* Get the ids for this node
+//			 */
+//			var parentId = $j(this).attr('data-parentid');
+//			var rootId = $j(this).attr('data-rootid');
+//
+//			/* Clone an instance of .addPostForm and inject ids
+//			 */
+//			var clone = $j('#socialstream-form-0').clone();
+//			clone.attr('id', 'socialstream-form-' + parentId);
+//			clone.find('input[name=body]').val('').focus();
+//			clone.find('input[name=parentId]').val(parentId);
+//			clone.find('input[name=rootId]').val(rootId);
+//
+//			/* Send In The Clones
+//			 */
+//			$j(this).parent('p').append(clone);
+//		});
+//	},
+//
 //	/**
 //	 * Stream more stuff in
 //	 */
@@ -94,9 +94,9 @@ var socialstream = {
 
 		/* Hide everything so the default is a plain text message unadorned
 		 */
-//		form.find('input[name=url]').parent('label').css('visibility', 'hidden');
-//		form.find('input[name=file]').parent('label').css('visibility', 'hidden');
-//		form.find('input[name=resource]').parent('label').css('visibility', 'hidden');
+		form.find('input[name=url]').parent('label').css('visibility', 'hidden');
+		form.find('input[name=file]').parent('label').css('visibility', 'hidden');
+		form.find('input[name=resource]').parent('label').css('visibility', 'hidden');
 
 		/* Deal with changing options
 		 */
@@ -107,30 +107,30 @@ var socialstream = {
 			var fileElement = form.find('input[name=file]');
 			var resourceElement = form.find('input[name=resource]');
 
-//			/* Hide everything
-//			 */
-//			urlElement.parent('label').css('visibility', 'hidden');
-//			fileElement.parent('label').css('visibility', 'hidden');
-//			resourceElement.parent('label').css('visibility', 'hidden');
-//
-//			/* Empty this upon change
-//			 */
-//			urlElement.val('');
+			/* Hide everything
+			 */
+			urlElement.parent('label').css('visibility', 'hidden');
+			fileElement.parent('label').css('visibility', 'hidden');
+			resourceElement.parent('label').css('visibility', 'hidden');
+
+			/* Empty this upon change
+			 */
+			urlElement.val('');
 
 			/* Make the input element visible or not
 			 */
-//			if ($j(this).val() == 'url') {
-//				urlElement.parent('label').css('visibility', 'visible');
-//			}
-//			else if ($j(this).val() == 'upload') {
-//				fileElement.parent('label').css('visibility', 'visible');
-//			}
-//			else if ($j(this).val() == 'resource') {
-//				resourceElement.parent('label').css('visibility', 'visible');
-//			}
+			if ($j(this).val() == 'url') {
+				urlElement.parent('label').css('visibility', 'visible');
+			}
+			else if ($j(this).val() == 'upload') {
+				fileElement.parent('label').css('visibility', 'visible');
+			}
+			else if ($j(this).val() == 'resource') {
+				resourceElement.parent('label').css('visibility', 'visible');
+			}
 		});
-	},
-
+	}
+//
 //	/**
 //	 * Load initial stream
 //	 */

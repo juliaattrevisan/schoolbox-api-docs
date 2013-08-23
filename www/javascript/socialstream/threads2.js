@@ -51,6 +51,9 @@
 		 * @returns {*}
 		 */
 		function init(options, element) {
+
+			/* Default values
+			 */
 			var defaults = {
 				instanceId: 0,
 				start: 0,
@@ -58,8 +61,12 @@
 
 				/* Total number of posts that exist
 				 */
-				numPosts: 0,
+				numPosts: 0
+			}
 
+			/* Derived values
+			 */
+			var derived = {
 				/* The url to stream from
 				 */
 				streamUrl: self.generateStreamUrl(options.instanceId, options.start, options.offset),
@@ -82,12 +89,12 @@
 
 				/* Container div for threads
 				 */
-				container: $j(element).find('.socialstream-threads')
+				threadContainer: $j(element).find('.socialstream-threads')
 			}
 
 			/* Force integer (use the force)
 			 */
-			var merged = $j.extend(defaults, options);
+			var merged = $j.extend(defaults, derived, options);
 
 			merged.instanceId = parseInt(merged.instanceId);
 			merged.start = parseInt(merged.start);
@@ -134,7 +141,7 @@
 		function clearAllPostForms() {
 			var self = $j.fn.socialstreamThreads;
 
-			self.config.container.find(this.addPostForm).remove();
+			self.config.threadContainer.find(this.addPostForm).remove();
 		}
 	}
 
@@ -187,7 +194,7 @@
 		function addThreads(html) {
 			var self = $j.fn.socialstreamThreads;
 
-			self.config.container.append(html);
+			self.config.threadContainer.append(html);
 		}
 
 		/**
