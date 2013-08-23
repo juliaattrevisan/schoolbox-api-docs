@@ -88,11 +88,11 @@ class QueueMapper extends Mapper {
             UPDATE {$this->getTable()}
             SET    status = :new_status, message = :message
             WHERE  status = :old_status
-            AND    (createdOn + INTERVAL :timeout SECOND) > NOW()
+            AND    (modifiedOn + INTERVAL :timeout SECOND) < NOW()
         ");
         $statement->bindValue('old_status', self::STATUS_PROCESSING);
         $statement->bindValue('new_status', self::STATUS_FAILED);
-        $statement->bindValue('message',    sprintf('Timed out - failed to finish processing after %d minutes', $timeout));
+        $statement->bindValue('message',    sprintf('Timed out - failed to finish processing after %d seconds', $timeout));
         $statement->bindValue('timeout',    intval($timeout), \PDO::PARAM_INT);
         $statement->execute();
         return $statement->rowCount();
