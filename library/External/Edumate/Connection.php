@@ -44,9 +44,14 @@ abstract class External_Edumate_Connection {
             $dsn .= "HOSTNAME={$hosts[0]};";
         }
 
-        $this->setDatabase(new DB2($dsn, $un, $pw));
-        $this->setGroupHandler(new Group());
-        $this->setUserHandler(new User());
+	    try {
+	        $this->setDatabase(new DB2($dsn, $un, $pw));
+	        $this->setGroupHandler(new Group());
+	        $this->setUserHandler(new User());
+	    } catch(PDOException $e) {
+		    /// chain off the PDO exception and throw an External instead to be caught by the interface class
+		    throw new \Schoolbox\External\Exception($e->getMessage(), $e->getCode(), $e);
+	    }
     }
 
     /**

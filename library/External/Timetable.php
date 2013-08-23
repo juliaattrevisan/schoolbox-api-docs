@@ -24,10 +24,15 @@ class External_Timetable {
 		$databaseClass = 'External_'.ucfirst($databaseName).'_Timetable';
 
 		if ( class_exists($databaseClass, true) ) {
-			$database = new $databaseClass;
-			$this->setDatabase( $database );
+			try {
+				$database = new $databaseClass;
+				$this->setDatabase( $database );
+			}
+			catch(\Schoolbox\External\Exception $e) {
+				$this->setDatabase(new External_Offline_Timetable());
+			}
 		} else {
-			error(22);
+			$this->setDatabase(new External_Offline_Timetable());
 		}
 	}
 

@@ -107,7 +107,12 @@ if (is_array($outputList)) {
         $periodCurrent = $timetableHandler->getPeriodNumber($user['campus']);
         $dayCurrent = $timetableHandler->getDayNumber($user['campus']);
 
-        $timetable = $timetableHandler->getFullTimetable($user['synergy_id'], $user['uid'], $user['campus']);
+	    try {
+            $timetable = $timetableHandler->getFullTimetable($user['synergy_id'], $user['uid'], $user['campus']);
+	    }
+	    catch(\Schoolbox\External\Exception $e) {
+			error(22);
+	    }
 
         if (is_array($timetable) && !empty($timetable)) {
             $days = count($timetable[1]['day']);

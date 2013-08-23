@@ -15,7 +15,7 @@ class External_Denbigh_Ping implements External_PingInterface {
 		$username     = Config::get('external_db_user');
 		$password     = Config::get('external_db_passwd');
 		try {
-			return $database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password);
+			return $database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password, array('throw' => true));
 		}
 		catch (Exception $ex) {}
 		return false;
