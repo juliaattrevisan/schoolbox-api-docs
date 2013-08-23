@@ -133,6 +133,7 @@
 
 					/* Chooze and cloze
 					 */
+					console.log(self.config.formId);
 					$j(self.config.formId).find('input[name=url]').val(url);
 					$j(self.config.element).dialog('close');
 

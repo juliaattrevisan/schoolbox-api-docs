@@ -66,17 +66,18 @@
 
 				/* Total number of posts that exist
 				 */
-				numPosts: 0,
-
-				/* The form which gets cloned per post and the one
-				 * which allows you to make new posts
-				 */
-				defaultForm: $j('#socialstream-form-0')
+				numPosts: 0
 			}
 
 			/* Derived values
 			 */
 			var derived = {
+
+				/* The form which gets cloned per post and the one
+				 * which allows you to make new posts
+				 */
+				defaultForm: $j('#socialstream-form-' + options.instanceId),
+
 				/* The url to stream from
 				 */
 				streamUrl: self.generateStreamUrl(options.instanceId, options.start, options.offset),
@@ -140,7 +141,7 @@
 
 				/* Clone an instance of .addPostForm and inject ids
 				 */
-				var clone = $j('#socialstream-form-0').clone();
+				var clone = self.config.defaultForm.clone();
 				clone.attr('id', 'socialstream-form-' + parentId);
 				clone.find('input[name=body]').val('').focus();
 				clone.find('input[name=parentId]').val(parentId);
