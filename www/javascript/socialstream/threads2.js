@@ -50,7 +50,7 @@
 
 		/* Give default values to default form
 		 */
-		self.resetAttachmentSelectors($j('#socialstream-form-0'));
+		self.resetAttachmentSelectors(self.config.defaultForm);
 
 		/**
 		 * Initialise parameters
@@ -70,7 +70,13 @@
 
 				/* Total number of posts that exist
 				 */
-				numPosts: 0
+				numPosts: 0,
+
+				/* The form which gets cloned per post
+				 * and the one which allows you to make
+				 * new posts
+				 */
+				defaultForm: $j('#socialstream-form-0')
 			}
 
 			/* Derived values
