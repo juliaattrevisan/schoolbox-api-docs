@@ -163,7 +163,7 @@
 		function clearAllPostForms() {
 			var self = $j.fn.socialstreamThreads;
 
-			self.config.threadContainer.find(this.addPostForm).remove();
+			self.config.threadContainer.find(self.config.addPostForm).remove();
 		}
 
 		/**
