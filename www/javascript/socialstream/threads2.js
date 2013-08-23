@@ -48,10 +48,6 @@
 		 */
 		self.initAttachmentSelectors(self.config.defaultForm);
 
-		/* Give default values to default form
-		 */
-		self.resetAttachmentSelectors(self.config.defaultForm);
-
 		/**
 		 * Initialise parameters
 		 *
@@ -152,25 +148,7 @@
 
 				/* Show specific ones
 				 */
-				clone.find('.socialstream-attachment-url').click(function() {
-					console.log('url clicked');
-					clone.find('input[name=url]').parent('label').show();
-					clone.find('input[name=file]').parent('label').hide();
-				});
-
-				clone.find('.socialstream-attachment-upload').click(function() {
-					console.log('file clicked');
-					clone.find('input[name=url]').parent('label').hide();
-					clone.find('input[name=file]').parent('label').show();
-				});
-
-				clone.find('.socialstream-attachment-resource').click(function() {
-					console.log('resource clicked');
-					clone.find('input[name=url]').parent('label').show();
-					clone.find('input[name=file]').parent('label').hide();
-				});
-
-//				self.initAttachmentSelectors(clone);
+				self.initAttachmentSelectors(clone);
 
 				/* Send In The Clones
 				 */
@@ -192,45 +170,34 @@
 	 * Abilities granted to all attachment selectors everywhere
 	 */
 	$j.fn.socialstreamThreads.initAttachmentSelectors = function(form) {
-		console.log(form);
-//		var self = $j.fn.socialstreamThreads;
-//
-//		/* Show specific ones
-//		 */
-//		form.find('.socialstream-attachment-url').click(function() {
-//			console.log('mort');
-//			self.resetAttachmentSelectors(form);
-//
-//			form.find('input[name=url]').parent('label').show();
-//		});
-//
-//		/* Show specific ones
-//		 */
-//		self.config.attachmentUploadSelector.click(function() {console.log('mort');
-//			self.resetAttachmentSelectors(form);
-//
-//			form.find('input[name=file]').parent('label').show();
-//		});
-//
-//		/* Show specific ones
-//		 * This is used to show what url you picked from
-//		 * the resource browser dialog
-//		 */
-//		self.config.attachmentResourceSelector.click(function() {console.log('mort');
-//			self.resetAttachmentSelectors(form);
-//
-//			form.find('input[name=url]').parent('label').show();
-//		});
-	}
+		resetAttachmentSelectors(form);
 
-	/**
-	 * Hide certain form controls
-	 *
-	 * @param form
-	 */
-	$j.fn.socialstreamThreads.resetAttachmentSelectors = function(form) {
-//		form.find('input[name=url]').parent('label').hide();
-//		form.find('input[name=file]').parent('label').hide();
+		form.find('.socialstream-attachment-url').click(function() {
+			form.find('input[name=url]').parent('label').show();
+			form.find('input[name=file]').parent('label').hide();
+		});
+
+		form.find('.socialstream-attachment-upload').click(function() {
+			form.find('input[name=url]').parent('label').hide();
+			form.find('input[name=file]').parent('label').show();
+		});
+
+		form.find('.socialstream-attachment-resource').click(function() {
+			form.find('input[name=url]').parent('label').show();
+			form.find('input[name=file]').parent('label').hide();
+		});
+
+		return form;
+
+		/**
+		 * Hide certain form controls
+		 *
+		 * @param form
+		 */
+		function resetAttachmentSelectors(form) {
+			form.find('input[name=url]').parent('label').hide();
+			form.find('input[name=file]').parent('label').hide();
+		}
 	}
 
 	/**
