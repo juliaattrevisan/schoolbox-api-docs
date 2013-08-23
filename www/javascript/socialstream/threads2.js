@@ -46,7 +46,7 @@
 		/* Allow you to chooze the kind of attachment (if any)
 		 * to accompany your post
 		 */
-		initAttachmentSelectors();
+		self.initAttachmentSelectors(self.config.defaultForm);
 
 		/* Give default values to default form
 		 */
@@ -72,9 +72,8 @@
 				 */
 				numPosts: 0,
 
-				/* The form which gets cloned per post
-				 * and the one which allows you to make
-				 * new posts
+				/* The form which gets cloned per post and the one
+				 * which allows you to make new posts
 				 */
 				defaultForm: $j('#socialstream-form-0')
 			}
@@ -151,6 +150,28 @@
 				clone.find('input[name=parentId]').val(parentId);
 				clone.find('input[name=rootId]').val(rootId);
 
+				/* Show specific ones
+				 */
+				clone.find('.socialstream-attachment-url').click(function() {
+					console.log('url clicked');
+					clone.find('input[name=url]').parent('label').show();
+					clone.find('input[name=file]').parent('label').hide();
+				});
+
+				clone.find('.socialstream-attachment-upload').click(function() {
+					console.log('file clicked');
+					clone.find('input[name=url]').parent('label').hide();
+					clone.find('input[name=file]').parent('label').show();
+				});
+
+				clone.find('.socialstream-attachment-resource').click(function() {
+					console.log('resource clicked');
+					clone.find('input[name=url]').parent('label').show();
+					clone.find('input[name=file]').parent('label').hide();
+				});
+
+//				self.initAttachmentSelectors(clone);
+
 				/* Send In The Clones
 				 */
 				$j(this).parent('p').append(clone);
@@ -165,43 +186,41 @@
 
 			self.config.threadContainer.find(self.config.addPostForm).remove();
 		}
+	}
 
-		/**
-		 * Abilities granted to all attachment selectors everywhere
-		 */
-		function initAttachmentSelectors() {
-			var self = $j.fn.socialstreamThreads;
-
-			/* Show specific ones
-			 */
-			self.config.attachmentUrlSelector.click(function() {
-				var form = $j(this).closest('form')
-				self.resetAttachmentSelectors(form);
-
-				$j(this).closest('form').find('input[name=url]').parent('label').show();
-			});
-
-			/* Show specific ones
-			 */
-			self.config.attachmentUploadSelector.click(function() {
-				var form = $j(this).closest('form')
-				self.resetAttachmentSelectors(form);
-
-				$j(this).closest('form').find('input[name=file]').parent('label').show();
-			});
-
-			/* Show specific ones
-			 * This is used to show what url you picked from
-			 * the resource browser dialog
-			 */
-			self.config.attachmentResourceSelector.click(function() {
-				var form = $j(this).closest('form')
-				self.resetAttachmentSelectors(form);
-
-
-				$j(this).closest('form').find('input[name=url]').parent('label').show();
-			});
-		}
+	/**
+	 * Abilities granted to all attachment selectors everywhere
+	 */
+	$j.fn.socialstreamThreads.initAttachmentSelectors = function(form) {
+		console.log(form);
+//		var self = $j.fn.socialstreamThreads;
+//
+//		/* Show specific ones
+//		 */
+//		form.find('.socialstream-attachment-url').click(function() {
+//			console.log('mort');
+//			self.resetAttachmentSelectors(form);
+//
+//			form.find('input[name=url]').parent('label').show();
+//		});
+//
+//		/* Show specific ones
+//		 */
+//		self.config.attachmentUploadSelector.click(function() {console.log('mort');
+//			self.resetAttachmentSelectors(form);
+//
+//			form.find('input[name=file]').parent('label').show();
+//		});
+//
+//		/* Show specific ones
+//		 * This is used to show what url you picked from
+//		 * the resource browser dialog
+//		 */
+//		self.config.attachmentResourceSelector.click(function() {console.log('mort');
+//			self.resetAttachmentSelectors(form);
+//
+//			form.find('input[name=url]').parent('label').show();
+//		});
 	}
 
 	/**
@@ -210,8 +229,8 @@
 	 * @param form
 	 */
 	$j.fn.socialstreamThreads.resetAttachmentSelectors = function(form) {
-		form.find('input[name=url]').parent('label').hide();
-		form.find('input[name=file]').parent('label').hide();
+//		form.find('input[name=url]').parent('label').hide();
+//		form.find('input[name=file]').parent('label').hide();
 	}
 
 	/**
