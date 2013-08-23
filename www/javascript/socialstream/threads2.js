@@ -43,6 +43,15 @@
 			self.stream();
 		});
 
+		/* Allow you to chooze the kind of attachment (if any)
+		 * to accompany your post
+		 */
+		initAttachmentSelectors();
+
+		/* Give default values to default form
+		 */
+		self.resetAttachmentSelectors($j('#socialstream-form-0'));
+
 		/**
 		 * Initialise parameters
 		 *
@@ -89,7 +98,14 @@
 
 				/* Container div for threads
 				 */
-				threadContainer: $j(element).find('.socialstream-threads')
+				threadContainer: $j(element).find('.socialstream-threads'),
+
+				/* Attachment selectors everywhere in the entire stream
+				 */
+				attachment: $j('.socialstream-attachment'),
+				attachmentUrlSelector: $j('.socialstream-attachment-url').parent('label'),
+				attachmentUploadSelector:  $j('.socialstream-attachment-upload').parent('label'),
+				attachmentResourceSelector: $j('.socialstream-attachment-resource').parent('label')
 			}
 
 			/* Force integer (use the force)
@@ -143,6 +159,53 @@
 
 			self.config.threadContainer.find(this.addPostForm).remove();
 		}
+
+		/**
+		 * Abilities granted to all attachment selectors everywhere
+		 */
+		function initAttachmentSelectors() {
+			var self = $j.fn.socialstreamThreads;
+
+			/* Show specific ones
+			 */
+			self.config.attachmentUrlSelector.click(function() {
+				var form = $j(this).closest('form')
+				self.resetAttachmentSelectors(form);
+
+				$j(this).closest('form').find('input[name=url]').parent('label').show();
+			});
+
+			/* Show specific ones
+			 */
+			self.config.attachmentUploadSelector.click(function() {
+				var form = $j(this).closest('form')
+				self.resetAttachmentSelectors(form);
+
+				$j(this).closest('form').find('input[name=file]').parent('label').show();
+			});
+
+			/* Show specific ones
+			 * This is used to show what url you picked from
+			 * the resource browser dialog
+			 */
+			self.config.attachmentResourceSelector.click(function() {
+				var form = $j(this).closest('form')
+				self.resetAttachmentSelectors(form);
+
+
+				$j(this).closest('form').find('input[name=url]').parent('label').show();
+			});
+		}
+	}
+
+	/**
+	 * Hide certain form controls
+	 *
+	 * @param form
+	 */
+	$j.fn.socialstreamThreads.resetAttachmentSelectors = function(form) {
+		form.find('input[name=url]').parent('label').hide();
+		form.find('input[name=file]').parent('label').hide();
 	}
 
 	/**

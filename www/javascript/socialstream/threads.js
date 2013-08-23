@@ -84,52 +84,52 @@ var socialstream = {
 //			self.stream();
 //		});
 //	},
-
-	/**
-	 * Add event handlers for Link, Upload and Resource buttons
-	 * for when you make posts. Clear it upon change
-	 */
-	initAttachmentSelectors: function() {
-		var form = $j('.socialstreamAttachment').closest('form');
-
-		/* Hide everything so the default is a plain text message unadorned
-		 */
-		form.find('input[name=url]').parent('label').css('visibility', 'hidden');
-		form.find('input[name=file]').parent('label').css('visibility', 'hidden');
-		form.find('input[name=resource]').parent('label').css('visibility', 'hidden');
-
-		/* Deal with changing options
-		 */
-		$j('.socialstreamAttachment').live('change', function() {
-			var form = $j(this).closest('form');
-
-			var urlElement = form.find('input[name=url]');
-			var fileElement = form.find('input[name=file]');
-			var resourceElement = form.find('input[name=resource]');
-
-			/* Hide everything
-			 */
-			urlElement.parent('label').css('visibility', 'hidden');
-			fileElement.parent('label').css('visibility', 'hidden');
-			resourceElement.parent('label').css('visibility', 'hidden');
-
-			/* Empty this upon change
-			 */
-			urlElement.val('');
-
-			/* Make the input element visible or not
-			 */
-			if ($j(this).val() == 'url') {
-				urlElement.parent('label').css('visibility', 'visible');
-			}
-			else if ($j(this).val() == 'upload') {
-				fileElement.parent('label').css('visibility', 'visible');
-			}
-			else if ($j(this).val() == 'resource') {
-				resourceElement.parent('label').css('visibility', 'visible');
-			}
-		});
-	}
+//
+//	/**
+//	 * Add event handlers for Link, Upload and Resource buttons
+//	 * for when you make posts. Clear it upon change
+//	 */
+//	initAttachmentSelectors: function() {
+//		var form = $j('.socialstreamAttachment').closest('form');
+//
+//		/* Hide everything so the default is a plain text message unadorned
+//		 */
+//		form.find('input[name=url]').parent('label').css('visibility', 'hidden');
+//		form.find('input[name=file]').parent('label').css('visibility', 'hidden');
+//		form.find('input[name=resource]').parent('label').css('visibility', 'hidden');
+//
+//		/* Deal with changing options
+//		 */
+//		$j('.socialstreamAttachment').live('change', function() {
+//			var form = $j(this).closest('form');
+//
+//			var urlElement = form.find('input[name=url]');
+//			var fileElement = form.find('input[name=file]');
+//			var resourceElement = form.find('input[name=resource]');
+//
+//			/* Hide everything
+//			 */
+//			urlElement.parent('label').css('visibility', 'hidden');
+//			fileElement.parent('label').css('visibility', 'hidden');
+//			resourceElement.parent('label').css('visibility', 'hidden');
+//
+//			/* Empty this upon change
+//			 */
+//			urlElement.val('');
+//
+//			/* Make the input element visible or not
+//			 */
+//			if ($j(this).val() == 'url') {
+//				urlElement.parent('label').css('visibility', 'visible');
+//			}
+//			else if ($j(this).val() == 'upload') {
+//				fileElement.parent('label').css('visibility', 'visible');
+//			}
+//			else if ($j(this).val() == 'resource') {
+//				resourceElement.parent('label').css('visibility', 'visible');
+//			}
+//		});
+//	}
 //
 //	/**
 //	 * Load initial stream
