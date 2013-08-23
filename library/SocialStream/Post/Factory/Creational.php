@@ -318,6 +318,14 @@ class Creational extends AbstractFactory {
 	/**
 	 * Get the thumbnail usage
 	 *
+	 * Why does this tell me I'm not logged in, and then save the html
+	 * in the file which would normally contain image data? wtf
+	 *
+	 * Is because fopen() is trying to get to a password-protected place
+	 * send.php kicks you out at ->getPermission() (about line 47)
+	 *
+	 * Force an icon representation instead
+	 *
 	 * @param $file
 	 */
 	private function spawnThumbnailFromResource($file) {
@@ -327,10 +335,6 @@ class Creational extends AbstractFactory {
 //		if ($file->isVideo()) {
 //		}
 //		/* Set up image thumbnails
-//		 * TODO: Why does this tell me I'm not logged in, and then save the html
-//		 * in the file which would normally contain image data? wtf
-//		 *
-//		 * Is because fopen() is trying to get to a password-protected place?
 //		 */
 //		else if ($file->isImage()) {
 //			$url = "/send.php?id={$file->getId()}";
@@ -346,12 +350,20 @@ class Creational extends AbstractFactory {
 //		/* Set up icon thumbnails
 //		 */
 //		else {
-			$url = "/send.php?id={$file->getId()}";
-			$this->getProduct()->setUrl($url);
-
-			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
-			$this->getProduct()->setThumbnail($chain->getResult());
+//			$url = "/send.php?id={$file->getId()}";
+//			$this->getProduct()->setUrl($url);
+//
+//			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
+//			$this->getProduct()->setThumbnail($chain->getResult());
 //		}
+
+		/* Force icon representation for now
+		 */
+		$url = "/send.php?id={$file->getId()}";
+		$this->getProduct()->setUrl($url);
+
+		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
+		$this->getProduct()->setThumbnail($chain->getResult());
 	}
 
 	/* Getters/Setters
