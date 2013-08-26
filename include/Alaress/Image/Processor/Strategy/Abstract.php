@@ -9,13 +9,20 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Alaress_Image_Processor_Strategy_Abstract {
+abstract class Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
 
 	/* Canvas image resource
 	 */
 	protected $canvas = null;
 	protected $canvasWidth = 0;
 	protected $canvasHeight = 0;
+
+    /**
+     * Does this processor support alpha channel transformation?
+     *
+     * @var bool
+     */
+    protected $supports_alpha_channel;
 
 	/**
 	 * Specify a background colour for canvas if provided
@@ -144,6 +151,9 @@ abstract class Alaress_Image_Processor_Strategy_Abstract {
      * @return void
      */
     protected function alphaFill($canvas = null) {
+        if (!($this->getSupportsAlphaChannel())) {
+            return;
+        }
         if (!isset($canvas)) {
             $canvas = $this->getCanvas();
         }
@@ -151,5 +161,21 @@ abstract class Alaress_Image_Processor_Strategy_Abstract {
         imagesavealpha($canvas, true);
         $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
         imagefill($canvas, 0, 0, $transparent);
+    }
+
+    /**
+     * @param  bool  $supports_alpha_channel
+     * @return $this
+     */
+    public function setSupportsAlphaChannel($supports_alpha_channel) {
+        $this->supports_alpha_channel = $supports_alpha_channel;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSupportsAlphaChannel() {
+        return $this->supports_alpha_channel;
     }
 }
