@@ -142,7 +142,7 @@
 				/* Clone an instance of .addPostForm and inject ids
 				 */
 				var clone = self.config.defaultForm.clone();
-				clone.attr('id', 'socialstream-form-' + parentId);
+				clone.attr('id', '');
 				clone.find('input[name=body]').val('').focus();
 				clone.find('input[name=parentId]').val(parentId);
 				clone.find('input[name=rootId]').val(rootId);
