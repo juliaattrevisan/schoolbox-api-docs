@@ -6,10 +6,6 @@
  * This requires the jquery Dialog addon and was based on
  * Doctore's original implementation.
  *
- * Usage:
- * $j('#socialstream-3174').socialstreamBrowser();
- * $j('a').socialstreamBrowser.loadNode(51);
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
