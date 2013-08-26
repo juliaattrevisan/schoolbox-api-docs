@@ -7,27 +7,25 @@
 
 	<script type='text/javascript'>
 		$j(function() {
-//			socialstream.init('{COMPONENT_INSTANCE_ID}', 0, '{SOCIALSTREAM_AJAX_LIMIT}', '{SOCIALSTREAM_NUM_POSTS}');
-//			socialstream.stream();
-
 			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
 				instanceId: '{COMPONENT_INSTANCE_ID}',
 				offset: '{SOCIALSTREAM_AJAX_LIMIT}',
 				numPosts: '{SOCIALSTREAM_NUM_POSTS}'
 			});
 
-			/* Activate socialstream browser for new posts
-			 */
-			$j('.socialstream-browser-button-0').click(function() {
-				$j('#socialstream-browser-0').socialstreamBrowser();
-				$j('#socialstream-browser-0').socialstreamBrowser.open('{HOMEPAGE_ID}');
-			});
-
 			/* Activate socialstream browser for comments/replies (clones)
+			 * One resource browser per socialstream component
 			 */
-			$j('.socialstream-browser-button-{COMPONENT_INSTANCE_ID}').live('click', function() {
-				$j('#socialstream-browser-{COMPONENT_INSTANCE_ID}').socialstreamBrowser();
-				$j('#socialstream-browser-{COMPONENT_INSTANCE_ID}').socialstreamBrowser.open('{HOMEPAGE_ID}');
+			$j('.socialstream-browser-button').live('click', function() {
+				var self = $j(this);
+
+				$j('#socialstream-browser').socialstreamBrowser({
+					submitCallback: function(url) {
+						self.parents('form').find('input[name=url]').val(url);
+					}
+				});
+
+				$j('#socialstream-browser').socialstreamBrowser.open('{HOMEPAGE_ID}');
 			});
 		});
 	</script>
@@ -64,22 +62,14 @@
 			</label>
 
 			<label>
-				<input type='radio' class='socialstream-attachment-resource socialstream-browser-button-{COMPONENT_INSTANCE_ID}' name='socialstreamAttachment' value='resource' />Resource
+				<input type='radio' class='socialstream-attachment-resource socialstream-browser-button' name='socialstreamAttachment' value='resource' />Resource
 			</label>
 
 			<input type='submit' value='Post' />
-
-			<!--
-			Don't rename this id, because you'll have to update the init() method
-
-			Don't rename socialstream-browser-button class as this is used to reinitialise
-			these browsers after they are drag and dropped around the homepage
-
-			The browser is cloned
-			-->
-			<div id='socialstream-browser-{COMPONENT_INSTANCE_ID}' class='socialstream-browser'>
-			</div>
 		</form>
+	</div>
+
+	<div id='socialstream-browser' class='socialstream-browser'>
 	</div>
 
 	<div id='socialstream-{COMPONENT_INSTANCE_ID}'>

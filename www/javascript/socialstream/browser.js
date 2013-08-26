@@ -44,14 +44,16 @@
 		 * @returns {*}
 		 */
 		function init(options, element) {
-			var instanceId = $j(element).attr('id').replace('socialstream-browser-', '');
-
 			var defaults = {
 				url: '/socialstream/tree.php',
 				element: element,
-				instanceId: instanceId,
-				formId: '#socialstream-form-default-' + instanceId,
-				firstOpen: false
+				firstOpen: false,
+
+				/* A callback method. The file you choze from the browser is passed
+				 * to this method to deal with in whatever manner you want
+				 */
+				submitTo: function(url) {
+				}
 			}
 
 			return $j.extend(defaults, options);
@@ -131,11 +133,10 @@
 				$j(element).find('a').click(function() {
 					var url = $j(this).attr('href');
 
-					console.log(self.config.formId);
-
 					/* Chooze and cloze
 					 */
-					$j(self.config.formId).find('input[name=url]').val(url);
+					self.config.submitCallback(url);
+
 					$j(self.config.element).dialog('close');
 
 					return false;
