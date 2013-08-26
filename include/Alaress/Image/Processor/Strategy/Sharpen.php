@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Processor_Strategy_Sharpen implements Alaress_Image_Processor_Strategy_Interface {
+class Alaress_Image_Processor_Strategy_Sharpen extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
 
 	/**
 	 * Manipulate image
