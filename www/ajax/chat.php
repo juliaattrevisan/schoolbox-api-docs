@@ -30,7 +30,7 @@ class AjaxChat {
     private $output;
 
     /**
-     * @var array
+     * @var Component_ConfigDefinition[]
      */
     private $config = array();
 
@@ -55,12 +55,13 @@ class AjaxChat {
         $this->output = '';
 
         if($this->componentID) {
+            /** @var Component_Instance[] $inst */
             $inst = Component_InstanceMapper::getInstance()->findByInstanceId($this->componentID);
             $this->instance = $inst[$this->componentID];
 
-            // print_r($this->instance);
             foreach($this->instance->getConfig() as $conf) {
-                $this->config[$conf['key']] = $conf;
+                /** @var Component_ConfigDefinition $conf */
+                $this->config[$conf->getKey()] = $conf;
             }
         }
     }
@@ -163,12 +164,12 @@ class AjaxChat {
 
                     // deactivate the chat if no staff members
                     if(!$staffPresent) {
-                        $this->config['state']->value = 'Inactive';
+                        $this->config['state']->setValue('Inactive');
                     }
                 }
                 else {
                     // yes? set the flag
-                    $this->config['state']->value = 'Active';
+                    $this->config['state']->setValue('Active');
                 }
 
                 $this->saveConfig();
@@ -194,7 +195,7 @@ class AjaxChat {
             unset($mutedUsers[$idx]);
         }
 
-        $this->config['muted_users']['value'] = serialize($mutedUsers);
+        $this->config['muted_users']->setValue(serialize($mutedUsers));
 
         $this->saveConfig();
 
@@ -214,15 +215,15 @@ class AjaxChat {
      */
     protected function getConfig($key = '') {
         if($key) {
-            return isset($this->config[$key]) ? $this->config[$key]['value'] : false;
+            return isset($this->config[$key]) ? $this->config[$key]->getValue() : false;
         }
         $return = array();
         foreach($this->config as $key => $config) {
             if($key == 'muted_users') {
-                $return[$key] = unserialize($config['value']);
+                $return[$key] = unserialize($config->getValue());
             }
             else {
-                $return[$key] = $config['value'];
+                $return[$key] = $config->getValue();
             }
         }
         return $return;
@@ -233,12 +234,13 @@ class AjaxChat {
         /** @var Component_ConfigDefinition $definition */
         foreach ($this->config as $definition) {
             // this should be 1:1 relation, so return only the first instance of this definition
+            /** @var Component_Config $confI */
             $confI = Component_ConfigMapper::getInstance()->findByColumnList(array(
                 'component_config_definition_id' => $definition->getId(),
                 'component_instance_id'          => $this->instance->getId()
             ))->first();
 
-            if(!($confI->id)) {
+            if(!($confI->getId())) {
                 $confI = new Component_Config();
                 $confI->setConfigDefinitionId($definition->getId());
                 $confI->setInstanceId($this->instance->getId());
@@ -264,5 +266,3 @@ class AjaxChat {
 $ac = new AjaxChat($_POST);
 $ac->prepare();
 $ac->respond();
-
-?>
