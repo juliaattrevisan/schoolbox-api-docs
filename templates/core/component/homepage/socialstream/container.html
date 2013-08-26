@@ -47,6 +47,7 @@
 			<input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
 			<input type='hidden' name='parentId' value='0' />
 			<input type='hidden' name='rootId' value='0' />
+			<input type='text' name='socialstreamAttachment' value=''>
 
 			<label>
 				Body: <input type='text' name='body' maxlength='255' value='' />
@@ -60,17 +61,9 @@
 				File: <input type='file' class='upload' name='file' value='' />
 			</label>
 
-			<label>
-				<input type='radio' class='socialstream-attachment-url' name='socialstreamAttachment' value='url' />URL
-			</label>
-
-			<label>
-				<input type='radio' class='socialstream-attachment-upload' name='socialstreamAttachment' value='upload' />Upload
-			</label>
-
-			<label>
-				<input type='radio' class='socialstream-attachment-resource socialstream-browser-button' name='socialstreamAttachment' value='resource' />Resource
-			</label>
+			<a class='btn socialstream-attachment-resource socialstream-browser-button' data-value='resource'>Resource</a>
+			<a class='btn socialstream-attachment-upload' data-value='upload'>Upload</a>
+			<a class='btn socialstream-attachment-url' data-value='url'>URL</a>
 
 			<input type='submit' value='Post' />
 		</form>

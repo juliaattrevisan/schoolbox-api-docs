@@ -174,17 +174,29 @@
 	$j.fn.socialstreamThreads.initAttachmentSelectors = function(form) {
 		resetAttachmentSelectors(form);
 
+		/* Url attachment options
+		 */
 		form.find('.socialstream-attachment-url').click(function() {
+			form.find('input[name=socialstreamAttachment]').val('url');
+
 			form.find('input[name=url]').parent('label').show();
 			form.find('input[name=file]').parent('label').hide();
 		});
 
+		/* Upload attachment options
+		 */
 		form.find('.socialstream-attachment-upload').click(function() {
+			form.find('input[name=socialstreamAttachment]').val('upload');
+
 			form.find('input[name=url]').parent('label').hide();
 			form.find('input[name=file]').parent('label').show();
 		});
 
+		/* Resource attachment options
+		 */
 		form.find('.socialstream-attachment-resource').click(function() {
+			form.find('input[name=socialstreamAttachment]').val('resource');
+
 			form.find('input[name=url]').parent('label').show();
 			form.find('input[name=file]').parent('label').hide();
 		});
