@@ -35,6 +35,10 @@
 		 */
 		initModal(self.config);
 
+		/* For chaining
+		 */
+		return self;
+
 		/**
 		 * Initialise various configured params and determine a bunch
 		 * of ids and stuff that we'll probably use elsewhere
@@ -49,6 +53,10 @@
 				element: element,
 				firstOpen: false,
 
+				/* The default category to open
+				 */
+				categoryId: 0,
+
 				/* A callback method. The file you choze from the browser is passed
 				 * to this method to deal with in whatever manner you want
 				 */
@@ -56,7 +64,10 @@
 				}
 			}
 
-			return $j.extend(defaults, options);
+			var merged = $j.extend(defaults, options);
+			merged.categoryId = parseInt(merged.categoryId);
+
+			return merged
 		};
 
 		/**
