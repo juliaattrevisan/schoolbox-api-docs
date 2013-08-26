@@ -1042,36 +1042,49 @@ Notifications
 }
 
 /** Course task component listings **/
-.course_task_listing .course_definition {
-    padding: 7px 16px;
+.course_task_listing {
+	.course_definition {
+		padding: 7px 16px;
+		dt {
+			width: auto;
+			max-width: 70%;
+			margin-right: 0.5em;
+		}
+		dd .category {
+			&:after {
+				content: ' › ';
+			}
+			&:last-child:after {
+				content: '';
+			}
+		}
+	}
+	.task {
+		h3 {
+			float: none;
+			display: inline-block;
+			width: 70%;
+		}
+		.interact {
+			display: inline-block;
+			width: 29%;
+			text-align: right;
+		}
+		.interact .btn {
+			float: none;
+			display: inline-block;
+			vertical-align: top;
+			height:22px;
+			line-height:22px;
+		}
+		// Should make this style available to all buttons
+		.interact button.btn {
+			height:24px;
+			line-height:24px;
+		}
+	}
 }
-.course_task_listing .course_definition dt {
-    width: auto;
-    max-width: 70%;
-    margin-right: 0.5em;
-}
-.course_task_listing .task h3 {
-    float: none;
-    display: inline-block;
-    width: 70%;
-}
-.course_task_listing .task .interact {
-    display: inline-block;
-    width: 29%;
-    text-align: right;
-}
-.course_task_listing .task .interact .btn {
-    float: none;
-    display: inline-block;
-    vertical-align: top;
-    height:22px;
-    line-height:22px;
-}
-// Should make this style available to all buttons
-.course_task_listing .task .interact button.btn {
-    height:24px;
-    line-height:24px;
-}
+
 
 /*--------------------------------------------------------------
  Information List - Displays summary info with minimal actions
