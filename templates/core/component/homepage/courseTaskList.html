@@ -4,7 +4,11 @@
     <div class="course_task_listing listing box clearfix">
         <dl class="clearfix course_definition">
             <dt>These tasks are part of course:</dt>
-            <dd><a href="/homepage/{PARENT_CATEGORY_ID}/">{PARENT_CATEGORY_NAME}</a></dd>
+            <dd>
+				<!-- BEGIN category_breadcrumb -->
+				<span class="category"><a href="/homepage/{PARENT_CATEGORY_ID}/">{PARENT_CATEGORY_NAME}</a></span>
+				<!-- END category_breadcrumb -->
+			</dd>
         </dl>
         <ul class="task-list">
         <!-- BEGIN task -->
@@ -14,7 +18,7 @@
                 <!-- BEGIN edit_task -->
                 <span class="interact">
                 <form action="/task/saveForm.php" method="post" class="delete_form">
-					<a href="/task/modify/{TASK_ID}" class="btn modify" title="Modify this task"><span></span></a>
+                    <a href="/task/modify/{TASK_ID}" class="btn modify" title="Modify this task"><span></span></a>
                     <input type="hidden" name="action" value="delete" />
                     <input type="hidden" name="id"     value="{TASK_ID}" />
                     <button type="submit" class="btn delete" title="Delete this task"><span></span></button>
