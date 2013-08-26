@@ -25,4 +25,11 @@ interface Alaress_Image_Filetype_Interface {
     public function streamFile($filename);
 
     public function save($image, $filename);
+
+    /**
+     * Does this image type support the alpha (transparency) channel?
+     *
+     * @return bool
+     */
+    public function supportsAlphaChannel();
 }

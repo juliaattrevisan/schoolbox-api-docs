@@ -78,4 +78,13 @@ class Alaress_Image_Filetype_Jpg extends Alaress_Image_Filetype_Abstract {
     private function getQuality() {
         return $this->quality;
     }
+
+    /**
+     * JPEG does not support the alpha channel
+     *
+     * @return bool Always false
+     */
+    public function supportsAlphaChannel() {
+        return false;
+    }
 }

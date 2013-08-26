@@ -73,4 +73,13 @@ class Alaress_Image_Filetype_Png extends Alaress_Image_Filetype_Abstract {
     private function getQuality() {
         return $this->quality;
     }
+
+    /**
+     * PNG does support the alpha channel
+     *
+     * @return bool Always true
+     */
+    public function supportsAlphaChannel() {
+        return true;
+    }
 }
