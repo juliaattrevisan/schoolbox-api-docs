@@ -24,6 +24,7 @@ class Category {
 	protected $name;
 
 	/**
+	 * @deprecated Use $this->getParent() instead
 	 * @var int
 	 */
 	protected $parent_id;
@@ -136,6 +137,7 @@ class Category {
 	}
 
 	/**
+	 * @deprecated Use $this->getParent()->setId() instead
 	 * @param  int $parent_id
 	 * @return $this
 	 */
@@ -145,6 +147,7 @@ class Category {
 	}
 
 	/**
+	 * @deprecated Use $this->getParent()->getId() instead
 	 * @return int
 	 */
 	public function getParentId() {
