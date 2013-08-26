@@ -97,8 +97,11 @@ if (!empty($_POST)) {
     try {
         $assessment = OnlineAssessmentMapper::getInstance()->findById($this->arg[0]);
         $task_id    = $assessment->getTask()->getId();
-        $task       = TaskMapper::getInstance()->findById($task_id);
-        $this->setVar('ASSESS_TASK_TITLE', Scrub::text($task->getTitle()));
+        $this->setVar('ASSESS_TASK_TITLE', '');
+        if ($task_id) {
+            $task = TaskMapper::getInstance()->findById($task_id);
+            $this->setVar('ASSESS_TASK_TITLE', Scrub::text($task->getTitle()));
+        }
     }
     catch (Exception $ex) {
         error(112);
