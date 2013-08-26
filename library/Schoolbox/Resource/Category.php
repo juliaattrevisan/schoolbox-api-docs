@@ -24,12 +24,6 @@ class Category {
 	protected $name;
 
 	/**
-	 * @deprecated Use $this->getParent() instead
-	 * @var int
-	 */
-	protected $parent_id;
-
-	/**
 	 * @var Category
 	 */
 	protected $parent;
@@ -137,25 +131,7 @@ class Category {
 	}
 
 	/**
-	 * @deprecated Use $this->getParent()->setId() instead
-	 * @param  int $parent_id
-	 * @return $this
-	 */
-	public function setParentId($parent_id) {
-		$this->parent_id = $parent_id;
-		return $this;
-	}
-
-	/**
-	 * @deprecated Use $this->getParent()->getId() instead
-	 * @return int
-	 */
-	public function getParentId() {
-		return $this->parent_id;
-	}
-
-	/**
-	 * @param int $templateId
+	 * @param \Schoolbox\Resource\HomepageConfig $homepage
 	 * @return $this
 	 */
 	public function setHomepage($homepage) {
