@@ -146,6 +146,7 @@
 				clone.find('input[name=body]').val('').focus();
 				clone.find('input[name=parentId]').val(parentId);
 				clone.find('input[name=rootId]').val(rootId);
+				clone.find('input[name=url]').val('');
 
 				/* Show specific ones
 				 */
