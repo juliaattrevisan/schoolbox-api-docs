@@ -49,8 +49,17 @@
 		 */
 		function init(options, element) {
 			var defaults = {
+
+				/* The title of the browser
+				 */
+				title: 'hoax',
+
+				/* The url to load node contents from
+				 */
 				url: '/socialstream/tree.php',
-				element: element,
+
+				/* Whether the dialog was previously opened
+				 */
 				firstOpen: false,
 
 				/* The default category to open
@@ -61,13 +70,19 @@
 				 * to this method to deal with in whatever manner you want
 				 */
 				submitTo: function(url) {
-				}
+				},
+
+				/* The element containing the browser
+				 */
+				element: element
 			}
 
+			/* Type casting
+			 */
 			var merged = $j.extend(defaults, options);
 			merged.categoryId = parseInt(merged.categoryId);
 
-			return merged
+			return merged;
 		};
 
 		/**
@@ -79,7 +94,7 @@
 			$j(config.element).dialog({
 				width: 650,
 				autoOpen: false,
-				title: "Browse Resources",
+				title: config.title,
 				modal: true,
 				resizable: false
 			});
