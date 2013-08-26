@@ -40,8 +40,9 @@ class CategoryMapper extends Mapper {
 		));
 		$this->hasMap(array(
 			'column'     => 'parent',
-			'property'   => 'parentId',
-			'type'       => self::TYPE_INTEGER,
+			'property'   => 'parent',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'parent',
 		));
 
 		//
