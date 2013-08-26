@@ -57,6 +57,10 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setBlock($templateHandle, 'task', 'task_block');
         $this->setBlock($templateHandle, 'category_breadcrumb', 'category_breadcrumb_block');
         $this->setBlock('task', 'edit_task', 'edit_task_block');
+        $this->setBlock('task', 'edit_task_form', 'edit_task_form_block');
+        $this->setBlock('edit_task_form', 'link_input', 'link_input_block');
+        $this->setBlock('edit_task_form', 'task_input', 'task_input_block');
+
 
         // Start shitting out tasks into the template
         $this->setVar('category_breadcrumb_block', '');
@@ -73,13 +77,41 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             $this->setVar(
                 array(
                     'TASK_ID'    => $task->getId(),
-                    'TASK_NAME'  => Scrub::text($task->getTitle()),
+                    'TASK_TITLE' => Scrub::text($task->getTitle()),
                     'TASK_TYPE'  => Scrub::text($task->getType()->getLabel()),
                     'TASK_CLASS' => Scrub::text($task->getType()->getIconClass()),
+                    'TASK_LINK'  => Scrub::text($task->getLink()),
                     'DARK'       => ($i++%2 === 1 ? 'dark' : ''),
                 )
             );
             $this->parse('edit_task_block', 'edit_task');
+
+            $task_type = $task->getType()->getId();
+
+            $this->setVar('edit_task_form_block', '');
+            $this->setVar('link_input_block', '');
+            $this->setVar('task_input_block', '');
+            if ($task_type === TaskType::TYPE_LINK) {
+                $this->parse('link_input_block', 'link_input');
+                $this->parse('edit_task_form_block', 'edit_task_form');
+            }
+            elseif ($task_type === TaskType::TYPE_STUDENT_ASSESS) {
+                $this->setVar(array(
+                    'TASK_CHECK_ASSESS_SELF'    => 'checked',
+                    'TASK_CHECK_ASSESS_TEACHER' => '',
+                ));
+                $this->parse('task_input_block', 'task_input');
+                $this->parse('edit_task_form_block', 'edit_task_form');
+            }
+            elseif ($task_type === TaskType::TYPE_TEACHER_ASSESS) {
+                $this->setVar(array(
+                    'TASK_CHECK_ASSESS_SELF'    => '',
+                    'TASK_CHECK_ASSESS_TEACHER' => 'checked',
+                ));
+                $this->parse('task_input_block', 'task_input');
+                $this->parse('edit_task_form_block', 'edit_task_form');
+            }
+
             $this->parse('task_block', 'task', true);
         }
 
