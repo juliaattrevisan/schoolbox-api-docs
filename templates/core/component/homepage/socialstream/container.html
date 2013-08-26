@@ -20,12 +20,13 @@
 				var self = $j(this);
 
 				$j('#socialstream-browser').socialstreamBrowser({
+
+					/* Deal with the output url that you choze
+					 */
 					submitCallback: function(url) {
 						self.parents('form').find('input[name=url]').val(url);
 					}
-				});
-
-				$j('#socialstream-browser').socialstreamBrowser.open('{HOMEPAGE_ID}');
+				}).open('{HOMEPAGE_ID}');
 			});
 		});
 	</script>
