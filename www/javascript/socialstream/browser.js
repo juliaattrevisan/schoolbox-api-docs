@@ -58,10 +58,6 @@
 				 */
 				url: '/socialstream/tree.php',
 
-				/* Whether the dialog was previously opened
-				 */
-				firstOpen: false,
-
 				/* The default category to open
 				 */
 				categoryId: 0,
@@ -104,21 +100,10 @@
 	/**
 	 * Open le browser
 	 */
-	$j.fn.socialstreamBrowser.open = function(currentCategory) {
+	$j.fn.socialstreamBrowser.open = function() {
 		var self = $j.fn.socialstreamBrowser;
 
-		/* Open default category when you open the browser for
-		 * the very first time; otherwise open where you last
-		 * navigated to
-		 */
-		if (!self.config.firstOpen) {
-			$j.fn.socialstreamBrowser.loadNode(currentCategory);
-
-			self.config.firstOpen = true;
-		}
-		else {
-			$j(self.config.element).dialog('open');
-		}
+		self.loadNode(socialstreamSession.categoryId);
 	}
 
 	/**
@@ -134,6 +119,10 @@
 		var args = {
 			relationID: node
 		}
+
+		/* Remember where we left off and reopen from here
+		 */
+		socialstreamSession.categoryId = node;
 
 		/* Load data into the node container
 		 */

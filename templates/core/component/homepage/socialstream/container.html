@@ -6,6 +6,12 @@
 	<script type='text/javascript' src='/javascript/socialstream/browser.js'></script>
 
 	<script type='text/javascript'>
+		/* Pseudo session - things are rememberised
+		 */
+		var socialstreamSession = {
+			categoryId: '{HOMEPAGE_ID}'
+		}
+
 		$j(function() {
 			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
 				instanceId: '{COMPONENT_INSTANCE_ID}',
@@ -26,7 +32,7 @@
 					submitCallback: function(url) {
 						self.parents('form').find('input[name=url]').val(url);
 					}
-				}).open('{HOMEPAGE_ID}');
+				}).open();
 			});
 		});
 	</script>
