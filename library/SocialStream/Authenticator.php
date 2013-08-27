@@ -234,9 +234,11 @@ class Authenticator {
 	/**
 	 * Set new post
 	 *
+	 * Public for setting values from within a loop
+	 *
 	 * @param null $newPost
 	 */
-	private function setNewPost($newPost) {
+	public function setNewPost($newPost) {
 		$this->newPost = $newPost;
 	}
 

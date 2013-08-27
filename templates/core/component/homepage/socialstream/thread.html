@@ -1,6 +1,8 @@
 <!-- BEGIN socialstream_post -->
 <ul>
 	<li class='socialstream-post {ON_OFF}'>
+		<p><a class='btn delete no-text {DELETE_CLASS}' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}' alt='' title=''><span></span></a></p>
+
 		<div class='avatar'>
 			<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
 		</div>
@@ -43,9 +45,12 @@
 		<ul>
 			<!-- BEGIN socialstream_comment -->
 			<li class='socialstream-comment'>
+				<p><a class='btn delete no-text {DELETE_CLASS}' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}' alt='' title=''><span></span></a></p>
+
 				<div class='avatar'>
 					<img src='/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32'>
 				</div>
+
 				<div class='body'>
 					<p>
 						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
@@ -86,9 +91,12 @@
 				<ul>
 					<!-- BEGIN socialstream_reply -->
 					<li class='socialstream-reply'>
+						<p><a class='btn delete no-text {DELETE_CLASS}' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}' alt='' title=''><span></span></a></p>
+
 						<div class='avatar'>
 							<img src='/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32'>
 						</div>
+
 						<div class='body'>
 							<p>
 								<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />

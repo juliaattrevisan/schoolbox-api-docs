@@ -211,6 +211,8 @@ class Threads {
 		$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
 		$authenticator = new Authenticator($newPost, $this->getInstance(), $currentUser);
 
+		/* Simply hide the comment icon if you can't view it
+ 		 */
 		if ($authenticator->canComment()) {
 			$canComment = '';
 		}
@@ -262,6 +264,15 @@ class Threads {
 		$i = 0;
 
 		foreach($this->getTree() as $currentPost) {
+			$authenticator->setNewPost($currentPost);
+
+			if ($authenticator->canDelete()) {
+				$canDelete = '';
+			}
+			else {
+				$canDelete = 'hide';
+			}
+
 			$page->setVar(array(
 				'SOCIALSTREAM_POST_POST_ID' => \Scrub::text($currentPost->getPostId()),
 				'SOCIALSTREAM_POST_BODY' => \Scrub::text($currentPost->getBody()),
@@ -271,6 +282,7 @@ class Threads {
 				'SOCIALSTREAM_POST_TIMESTAMP' => \Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
 				'ON_OFF' => $i%2 ? 'dark' : '',
 				'COMMENT_CLASS' => $canComment,
+				'DELETE_CLASS' => $canDelete,
 			));
 
 			/* Thumbnails
@@ -283,6 +295,15 @@ class Threads {
 			/* Descendents
 			 */
 			foreach($currentPost->getChildren() as $currentComment) {
+				$authenticator->setNewPost($currentComment);
+
+				if ($authenticator->canDelete()) {
+					$canDelete = '';
+				}
+				else {
+					$canDelete = 'hide';
+				}
+
 				$page->setVar(array(
 					'SOCIALSTREAM_COMMENT_POST_ID' => \Scrub::text($currentComment->getPostId()),
 					'SOCIALSTREAM_COMMENT_BODY' => \Scrub::text($currentComment->getBody()),
@@ -290,6 +311,7 @@ class Threads {
 					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
 					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => \Scrub::text($currentComment->getOwnerId()->getFullname()),
 					'COMMENT_CLASS' => $canComment,
+					'DELETE_CLASS' => $canDelete,
 				));
 
 				/* Thumbnails
@@ -302,12 +324,23 @@ class Threads {
 				/* Descendents
 				 */
 				foreach($currentComment->getChildren() as $currentReply) {
+					$authenticator->setNewPost($currentComment);
+
+					if ($authenticator->canDelete()) {
+						$canDelete = '';
+					}
+					else {
+						$canDelete = 'hide';
+					}
+
 					$page->setVar(array(
 						'SOCIALSTREAM_REPLY_POST_ID' => \Scrub::text($currentReply->getPostId()),
 						'SOCIALSTREAM_REPLY_BODY' => \Scrub::text($currentReply->getBody()),
 						'SOCIALSTREAM_REPLY_CREATED_AT' => \Scrub::text($currentReply->getCreatedAt()->getShort()),
 						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => \Scrub::text($currentReply->getOwnerId()->getExternalId()),
 						'SOCIALSTREAM_REPLY_USER_FULLNAME' => \Scrub::text($currentReply->getOwnerId()->getFullname()),
+						'COMMENT_CLASS' => $canComment,
+						'DELETE_CLASS' => $canDelete,
 					));
 
 					/* Thumbnails
