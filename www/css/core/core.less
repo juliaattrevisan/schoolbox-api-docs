@@ -1081,15 +1081,23 @@ Notifications
             height:22px;
             line-height:22px;
         }
-        // Should make this style available to all buttons
-        .interact button.btn {
-            height:24px;
-            line-height:24px;
-        }
     }
 }
-.create_task_form_container, .course_task_listing {
+.create_task_form_container, .edit_task_form_container, .delete_task_form_container {
+    display: none;
+    p.notice {
+        display: block;
+        text-align: right;
+    }
+    // Should make this style available to all buttons
+    button.btn {
+        height:24px;
+        line-height:24px;
+    }
     form {
+        input[type=text] {
+            width: 20em;
+        }
         dl {
             clear: both;
             label {
