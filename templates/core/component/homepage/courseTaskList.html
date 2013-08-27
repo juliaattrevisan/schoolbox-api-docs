@@ -1,4 +1,4 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div class="box clearfix component-" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div class="course_task_listing listing box clearfix">
@@ -16,68 +16,9 @@
             // the session name and ID have to be passed.
             (function($) {
                 $(function() {
-                    var dialog = $('#component{COMPONENT_INSTANCE_ID} .file_uploader');
-                    dialog.dialog({
-                        minWidth: 400,
-                        modal: true,
-                        autoOpen: false
-                    });
-                    dialog.find('form').each(function() {
-                        var form        = $(this);
-                        var file_upload = form.find(':input[name="upload"]');
-                        var upload_id   = file_upload.attr('id');
-
-                        if (file_upload.length) {
-                            file_upload.uploadify({
-                                'uploader':'/javascript/uploadify/uploadify.swf',
-                                'script':'/storage/asyncUpload.php?{SESSION_NAME}={SESSION_ID}',
-                                'cancelImg':'/javascript/uploadify/cancel.png',
-                                'fileDataName':'upload',
-                                'multi':false,
-                                'auto':false,
-                                'descriptionField':false,
-                                'removeCompleted':true,
-                                onComplete: function(event, code, file, output) {
-                                    var result = JSON.parse(output);
-                                    var link   = '/storage/fetch.php?hash='+result.hash+'&save=1';
-                                    dialog.data('source_form').find(':input[name="link"]').val(link);
-                                    dialog.dialog('close');
-                                }
-                            });
-                            // Form submit event.
-                            // If this is a browser submission, and the upload queue isn't empty,
-                            // trigger Uploadify uploader instead of submitting form. The Uploadify
-                            // uploader submits the form once it's done.
-                            form.submit(function(event) {
-                                event.preventDefault();
-                                file_upload.uploadifyUpload();
-                            });
-                        }
-                    });
-
-                    $('#component{COMPONENT_INSTANCE_ID} form[data-form_type="link"] a[data-function="upload"]').click(function(event) {
-                        event.preventDefault();
-                        // Set the form that this dialog was triggered from.
-                        dialog.data('source_form', $(this).closest('form'));
-                        dialog.dialog('open');
-                    });
-
-                    // AJAX form submissions
-                    $('#component{COMPONENT_INSTANCE_ID}').find('form.edit_task_form, form.create_task_form').submit(function(event) {
-                        var form = $(this);
-                        event.preventDefault();
-                        // Is this a new form?
-                        var is_new = form.hasClass("create_task_form");
-                        $.post(form.attr('action'), form.serialize(), function(data) {
-                            // Do validation stuff here
-                            if (is_new) {
-                                form.get(0).reset();
-                            }
-                            var container = form.closest('.edit_task_form_container, .create_task_form_container');
-                            container.slideUp('fast');
-                            // Probably want to reload all tasks too.
-                            // Jam the list of tasks into data somewhere
-                        });
+                    $('#component{COMPONENT_INSTANCE_ID}').setupCourseTaskList({
+                        session_name: '{SESSION_NAME}',
+                        session_id:   '{SESSION_ID}'
                     });
                 });
             })(jQuery);
@@ -206,7 +147,7 @@
         <form action="/task/saveForm.php" method="post" class="create_task_form" data-form_type="link">
             <input type="hidden" name="id"       value=""/>
             <input type="hidden" name="category" value="{ID}"/>
-            <input type="hidden" name="type"     value="link"/>
+            <input type="hidden" name="type"     value="task"/>
 
             <dl>
                 <dt><label for="title-new_task">Task:</label></dt>
@@ -226,15 +167,6 @@
         </form>
     </div>
 
-    <div class="create_task_form_container for_due_work">
-        <p>
-            This task creates a task for a due work item.
-        </p>
-        <p class="interact">
-            <a href="/submission/createSubmission/new/{ID}/task" class="btn up-arrow"><span></span>Create Due Work Task</a>
-        </p>
-    </div>
-
     <div class="create_task_form_container for_assessment">
         <p>
             This task creates a task for an online assessment.
@@ -244,10 +176,19 @@
         </p>
     </div>
 
+    <div class="create_task_form_container for_due_work">
+        <p>
+            This task creates a task for a due work item.
+        </p>
+        <p class="interact">
+            <a href="/submission/createSubmission/new/{ID}/task" class="btn up-arrow"><span></span>Create Due Work Task</a>
+        </p>
+    </div>
+
     <!-- Dialog for file browser -->
     <div class="file_uploader">
         If you upload a file, its URL will appear in the Link section.
-        <form action="/storage/asyncUpload.php" method="post" class="create_task_form" data-form_type="link" enctype="multipart/form-data">
+        <form action="/storage/asyncUpload.php" method="post" enctype="multipart/form-data">
             <input id="upload" name="upload" type="file" />
             <input type="submit" value="Upload" class="submit-btn-plain" />
         </form>
