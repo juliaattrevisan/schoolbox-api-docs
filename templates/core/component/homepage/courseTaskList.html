@@ -61,6 +61,24 @@
                         dialog.data('source_form', $(this).closest('form'));
                         dialog.dialog('open');
                     });
+
+                    // AJAX form submissions
+                    $('#component{COMPONENT_INSTANCE_ID}').find('form.edit_task_form, form.create_task_form').submit(function(event) {
+                        var form = $(this);
+                        event.preventDefault();
+                        // Is this a new form?
+                        var is_new = form.hasClass("create_task_form");
+                        $.post(form.attr('action'), form.serialize(), function(data) {
+                            // Do validation stuff here
+                            if (is_new) {
+                                form.get(0).reset();
+                            }
+                            var container = form.closest('.edit_task_form_container, .create_task_form_container');
+                            container.slideUp('fast');
+                            // Probably want to reload all tasks too.
+                            // Jam the list of tasks into data somewhere
+                        });
+                    });
                 });
             })(jQuery);
         </script>
