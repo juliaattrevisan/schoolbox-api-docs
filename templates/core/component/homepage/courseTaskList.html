@@ -2,7 +2,52 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div class="course_task_listing listing box clearfix">
+        <script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
+        <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
         <script type="text/javascript" src="/javascript/jquery.courseTaskList.js"></script>
+        <script type="text/javascript">
+            // Addition of an AJAX form submission - need to add here because
+            // the session name and ID have to be passed.
+            (function($) {
+                $(function() {
+                    $('#component{COMPONENT_INSTANCE_ID} form[data-form_type="link"]').each(function() {
+                        var form        = $(this);
+                        var file_upload = form.find(':input[name="upload"]');
+                        var upload_id   = file_upload.attr('id');
+
+                        if (file_upload.length) {
+                            file_upload.uploadify({
+                                'uploader':'/javascript/uploadify/uploadify.swf',
+                                'script':'/storage/asyncUpload.php?{SESSION_NAME}={SESSION_ID}',
+                                'cancelImg':'/javascript/uploadify/cancel.png',
+                                'fileDataName':'upload',
+                                'multi':false,
+                                'auto':false,
+                                'descriptionField':false,
+                                'removeCompleted':true,
+                                onComplete: function(event, code, file, output, upload) {
+                                    var result = JSON.parse(output);
+                                    var link   = '/storage/fetch.php?hash='+result.hash+'&save=1';
+                                    form.find(':input[name="link"]').val(link);
+                                    form.submit();
+                                }
+                            });
+                            // Form submit event.
+                            // If this is a browser submission, and the upload queue isn't empty,
+                            // trigger Uploadify uploader instead of submitting form. The Uploadify
+                            // uploader submits the form once it's done.
+                            form.submit(function(event) {
+                                var uploads = $('#'+upload_id+'Queue .uploadifyQueueItem');
+                                if (uploads.length > 0 && 'originalEvent' in event) {
+                                    event.preventDefault();
+                                    file_upload.uploadifyUpload();
+                                }
+                            });
+                        }
+                    });
+                });
+            })(jQuery);
+        </script>
         <dl class="clearfix course_definition">
             <dt>These tasks are part of course:</dt>
             <dd>
@@ -46,7 +91,16 @@
 
                             <!-- BEGIN link_input -->
                             <dt><label for="link-{TASK_ID}">Link:</label></dt>
-                            <dd><input id="link-{TASK_ID}" name="link" type="text" value="{TASK_LINK}" /></dd>
+                            <dd>
+                                <input id="link-{TASK_ID}" name="link" type="text" value="{TASK_LINK}" />
+
+                                <a href="#" class="resource">Browse for a file or folder</a>
+
+                                <a href="#" class="upload">Upload a file</a>
+
+                                <!-- uploadify if possible -->
+                                If you upload a file, its URL will appear in the Link section.
+                                <input id="upload-{TASK_ID}" name="upload" type="file" /></dd>
                             <!-- END link_input -->
 
                             <!-- BEGIN task_input -->
@@ -96,7 +150,27 @@
                 <dd><input id="title-new_link" name="title" type="text" value="" /></dd>
 
                 <dt><label for="link-new_link">Link:</label></dt>
-                <dd><input id="link-new_link" name="link" type="text" value="" /></dd>
+                <dd>
+                    <!--
+                    <input id="link_type_url-new_link" type="radio" name="link_type" value="url" />
+                    <label for="link_type_url-new_link">Link</label>
+
+                    <input id="link_type_url-new_link" type="radio" name="link_type" value="storage" />
+                    <label for="link_type_url-new_link">Upload</label>
+
+                    <input id="link_type_url-new_link" type="radio" name="link_type" value="resource" />
+                    <label for="link_type_url-new_link">Resource</label>
+                    -->
+                    <input id="link-new_link" name="link" type="text" value="" />
+
+                    <a href="#" class="resource">Browse for a file or folder</a>
+
+                    <a href="#" class="upload">Upload a file</a>
+
+                    <!-- uploadify if possible -->
+                    If you upload a file, its URL will appear in the Link section.
+                    <input id="upload-new_link" name="upload" type="file" />
+                </dd>
             </dl>
 
             <input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
