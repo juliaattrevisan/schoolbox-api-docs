@@ -2,6 +2,7 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div class="course_task_listing listing box clearfix">
+        <script type="text/javascript" src="/javascript/jquery.courseTaskList.js"></script>
         <dl class="clearfix course_definition">
             <dt>These tasks are part of course:</dt>
             <dd>
@@ -17,14 +18,20 @@
                 <h3>{TASK_TITLE}</h3>
                 <!-- BEGIN edit_task -->
                 <span class="interact">
-                    <form action="/task/saveForm.php" method="post" class="delete_form">
-                        <a href="/task/modify/{TASK_ID}" class="btn modify" title="Modify this task"><span></span></a>
-                        <input type="hidden" name="action" value="delete" />
-                        <input type="hidden" name="id"     value="{TASK_ID}" />
-                        <button type="submit" class="btn delete" title="Delete this task"><span></span></button>
-                    </form>
+                    <a href="/task/modify/{TASK_ID}" class="btn modify" title="Modify this task"><span></span></a>
+                    <a href="#" class="btn delete" title="Delete this task"><span></span></a>
                 </span>
                 <!-- END edit_task -->
+
+                <div class="delete_task_form_container">
+                    <p class="notice">Are you sure you wish to delete this task?</p>
+                    <form action="/task/saveForm.php" method="post" class="delete_form">
+                        <input type="hidden" name="action" value="delete" />
+                        <input type="hidden" name="id"     value="{TASK_ID}" />
+                        <button type="submit" class="btn delete"><span></span> Yes</button>
+                        <a href="#" class="btn go-to delete-reject"><span></span> No</a>
+                    </form>
+                </div>
 
                 <!-- Form for changing this task (inline: only for link and assess tasks -->
                 <!-- BEGIN edit_task_form -->
@@ -61,11 +68,11 @@
             </li>
         <!-- END task -->
         </ul>
-        <p class="interact">
-            <a href="/submission/createSubmission/new/{ID}/task" class="btn up-arrow"><span></span>Add Due Work</a>
-            <a href="/assess/create/{ID}/task" class="btn create"><span></span>Add Assessment</a>
-            <a href="/task/create/{ID}/task" class="btn tick"><span></span>Add Task</a>
-            <a href="/task/create/{ID}/link" class="btn translate"><span></span>Add Link</a>
+        <p class="interact add_buttons">
+            <a href="/submission/createSubmission/new/{ID}/task" class="btn up-arrow" data-form_class="for_due_work"><span></span>Add Due Work</a>
+            <a href="/assess/create/{ID}/task" class="btn create" data-form_class="for_assessment"><span></span>Add Assessment</a>
+            <a href="/task/create/{ID}/task" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
+            <a href="/task/create/{ID}/link" class="btn translate" data-form_class="for_link"><span></span>Add Link</a>
         </p>
     </div>
 
