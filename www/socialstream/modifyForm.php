@@ -54,6 +54,8 @@ if (is_numeric($_GET['delete'])) {
 			$currentPost->setDeletedAt($now);
 			$postMapper->save($currentPost);
 		}
+
+		$page->backToTheFuture(1);
 	}
 	else {
 		error(19);
