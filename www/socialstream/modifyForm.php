@@ -16,13 +16,33 @@ $page = new \SitePage();
 /* Delete a post
  */
 if (is_numeric($_GET['delete'])) {
-	$postMapper = new PostMapper();
+	$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
+	/* Softdelete the post and the entire thread
+	 */
+	$postMapper = new PostMapper();
 	$post = $postMapper->findById($_GET['delete']);
-	$post->setDeletedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+	$post->setDeletedAt($now);
 	$postMapper->save($post);
 
-	var_dump($post);
+	/* This is for top-level posts
+	 */
+	if ($post->getRootId() == 0) {
+		$allPosts = $postMapper->findByColumn('root_id', $_GET['delete']);
+	}
+	/* For any threaded stuff that isn't a top-level post
+	 * delete by parent_id
+	 */
+	else {
+		$allPosts = $postMapper->findByColumn('parent_id', $_GET['delete']);
+	}
+
+	/* Softdelete the entire thread for the specified post
+	 */
+	foreach ($allPosts as $currentPost) {
+		$currentPost->setDeletedAt($now);
+		 $postMapper->save($currentPost);
+	}
 }
 /* Otherwise create a post
  */
