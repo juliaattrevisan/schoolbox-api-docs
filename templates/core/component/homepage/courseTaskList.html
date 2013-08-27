@@ -17,38 +17,38 @@
                 <h3>{TASK_TITLE}</h3>
                 <!-- BEGIN edit_task -->
                 <span class="interact">
-                <form action="/task/saveForm.php" method="post" class="delete_form">
-                    <a href="/task/modify/{TASK_ID}" class="btn modify" title="Modify this task"><span></span></a>
-                    <input type="hidden" name="action" value="delete" />
-                    <input type="hidden" name="id"     value="{TASK_ID}" />
-                    <button type="submit" class="btn delete" title="Delete this task"><span></span></button>
-                </form>
+                    <form action="/task/saveForm.php" method="post" class="delete_form">
+                        <a href="/task/modify/{TASK_ID}" class="btn modify" title="Modify this task"><span></span></a>
+                        <input type="hidden" name="action" value="delete" />
+                        <input type="hidden" name="id"     value="{TASK_ID}" />
+                        <button type="submit" class="btn delete" title="Delete this task"><span></span></button>
+                    </form>
                 </span>
                 <!-- END edit_task -->
 
                 <!-- Form for changing this task (inline: only for link and assess tasks -->
                 <!-- BEGIN edit_task_form -->
-                <div>
-                    <form action="/task/saveForm.php" method="post" class="save_form">
+                <div class="edit_task_form_container">
+                    <form action="/task/saveForm.php" method="post" class="edit_task_form">
                         <input type="hidden" name="id"       value="{TASK_ID}"/>
                         <input type="hidden" name="category" value="{ID}"/>
 
                         <dl>
-                            <dt><label for="title">Task:</label></dt>
-                            <dd><input id="title" name="title" type="text" value="{TASK_TITLE}" /></dd>
+                            <dt><label for="title-{TASK_ID}">Task:</label></dt>
+                            <dd><input id="title-{TASK_ID}" name="title" type="text" value="{TASK_TITLE}" /></dd>
 
                             <!-- BEGIN link_input -->
-                            <dt><label for="link">Link:</label></dt>
-                            <dd><input id="link" name="link" type="text" value="{TASK_LINK}" /></dd>
+                            <dt><label for="link-{TASK_ID}">Link:</label></dt>
+                            <dd><input id="link-{TASK_ID}" name="link" type="text" value="{TASK_LINK}" /></dd>
                             <!-- END link_input -->
 
                             <!-- BEGIN task_input -->
                             <dt>Assess method:</dt>
                             <dd>
-                                <input id="assess_method_self" type="radio" name="assess_method" value="self" {TASK_CHECK_ASSESS_SELF} />
-                                <label for="assess_method_self">Self assessed</label>
-                                <input id="assess_method_teacher" type="radio" name="assess_method" value="teacher" {TASK_CHECK_ASSESS_TEACHER} />
-                                <label for="assess_method_teacher">Teacher only</label>
+                                <input id="assess_method_self-{TASK_ID}" type="radio" name="assess_method" value="self" {TASK_CHECK_ASSESS_SELF} />
+                                <label for="assess_method_self-{TASK_ID}">Self assessed</label>
+                                <input id="assess_method_teacher-{TASK_ID}" type="radio" name="assess_method" value="teacher" {TASK_CHECK_ASSESS_TEACHER} />
+                                <label for="assess_method_teacher-{TASK_ID}">Teacher only</label>
                             </dd>
                             <!-- END task_input -->
                         </dl>
@@ -68,5 +68,49 @@
             <a href="/task/create/{ID}/link" class="btn translate"><span></span>Add Link</a>
         </p>
     </div>
+
     <!-- This is the form for inline creation of links -->
+    <div class="create_task_form_container for_link">
+        <form action="/task/saveForm.php" method="post" class="create_task_form">
+            <input type="hidden" name="id"       value=""/>
+            <input type="hidden" name="category" value="{ID}"/>
+            <input type="hidden" name="type"     value="link"/>
+
+            <dl>
+                <dt><label for="title-new_link">Task:</label></dt>
+                <dd><input id="title-new_link" name="title" type="text" value="" /></dd>
+
+                <dt><label for="link-new_link">Link:</label></dt>
+                <dd><input id="link-new_link" name="link" type="text" value="" /></dd>
+            </dl>
+
+            <input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
+
+        </form>
+    </div>
+
+    <!-- This is the form for inline creation of tasks -->
+    <div class="create_task_form_container for_task">
+        <form action="/task/saveForm.php" method="post" class="create_task_form">
+            <input type="hidden" name="id"       value=""/>
+            <input type="hidden" name="category" value="{ID}"/>
+            <input type="hidden" name="type"     value="link"/>
+
+            <dl>
+                <dt><label for="title-new_task">Task:</label></dt>
+                <dd><input id="title-new_task" name="title" type="text" value="" /></dd>
+
+                <dt>Assess method:</dt>
+                <dd>
+                    <input id="assess_method_self-new_task" type="radio" name="assess_method" value="self" />
+                    <label for="assess_method_self-new_task">Self assessed</label>
+                    <input id="assess_method_teacher-new_task" type="radio" name="assess_method" value="teacher" />
+                    <label for="assess_method_teacher-new_task">Teacher only</label>
+                </dd>
+            </dl>
+
+            <input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
+
+        </form>
+    </div>
 </div>
