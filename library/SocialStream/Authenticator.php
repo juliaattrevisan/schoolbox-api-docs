@@ -92,6 +92,26 @@ class Authenticator {
 	}
 
 	/**
+	 * Determine whether $currentUser can softdelete $newPost and its threads
+	 *
+	 * @return bool
+	 */
+	public function canDelete() {
+		if ($this->getPermission() >= WRITE_ACCESS) {
+			return true;
+		}
+
+		/* Post/Comment/Reply owner can softdelete a post's children regardless
+		 * of their children's owner_ids
+		 */
+		if ($this->getCurrentUser()->getId() == $this->getNewPost()->getOwnerId()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine whether $currentUser can collaborate on $instance
 	 *
 	 * @return bool

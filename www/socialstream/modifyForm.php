@@ -13,6 +13,10 @@ namespace SocialStream;
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 $page = new \SitePage();
 
+/* Current User
+ */
+$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+
 /* Delete a post
  */
 if (is_numeric($_GET['delete'])) {
@@ -22,26 +26,37 @@ if (is_numeric($_GET['delete'])) {
 	 */
 	$postMapper = new PostMapper();
 	$post = $postMapper->findById($_GET['delete']);
-	$post->setDeletedAt($now);
-	$postMapper->save($post);
 
-	/* This is for top-level posts
+	/* Determine permissions
+	 * Component instance not necessary in this context
 	 */
-	if ($post->getRootId() == 0) {
-		$allPosts = $postMapper->findByColumn('root_id', $_GET['delete']);
+	$authenticator = new Authenticator($post, new \Component_Instance(), $currentUser);
+
+	if ($authenticator->canDelete()) {
+		$post->setDeletedAt($now);
+		$postMapper->save($post);
+
+		/* This is for top-level posts
+		 */
+		if ($post->getRootId() == 0) {
+			$allPosts = $postMapper->findByColumn('root_id', $_GET['delete']);
+		}
+		/* For any threaded stuff that isn't a top-level post
+		 * delete by parent_id
+		 */
+		else {
+			$allPosts = $postMapper->findByColumn('parent_id', $_GET['delete']);
+		}
+
+		/* Softdelete the entire thread for the specified post
+		 */
+		foreach ($allPosts as $currentPost) {
+			$currentPost->setDeletedAt($now);
+			$postMapper->save($currentPost);
+		}
 	}
-	/* For any threaded stuff that isn't a top-level post
-	 * delete by parent_id
-	 */
 	else {
-		$allPosts = $postMapper->findByColumn('parent_id', $_GET['delete']);
-	}
-
-	/* Softdelete the entire thread for the specified post
-	 */
-	foreach ($allPosts as $currentPost) {
-		$currentPost->setDeletedAt($now);
-		 $postMapper->save($currentPost);
+		error(19);
 	}
 }
 /* Otherwise create a post
@@ -72,10 +87,6 @@ else {
 	 */
 	$instanceArray = $instanceMapper->findByInstanceId($_POST['instanceId']);
 	$instance = $instanceArray[$_POST['instanceId']];
-
-	/* Current User
-	 */
-	$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
 
 	/* Authenticate!
 	 */
