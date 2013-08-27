@@ -46,7 +46,8 @@ abstract class Evaluation_Export_CSV {
 	private $mandatoryColumns = array(
 		'External ID',
 		'User ID',
-		'Name',
+		'Last Name',
+		'First Name',
 		'Start',
 		'Finish',
 	);
@@ -232,7 +233,8 @@ abstract class Evaluation_Export_CSV {
 			$thisResponse = array(
 				$currentAttempt['synergy_id'],
 				$currentAttempt['user_id'],
-				$user['firstname'] . ' ' . $user['lastname'],
+				$user['lastname'],
+				$user['firstname'],
 				$start->getShort(),
 				$finishTime,
 			);
