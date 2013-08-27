@@ -12,9 +12,9 @@
             </dd>
         </dl>
         <ul class="task-list">
-        <!-- BEGIN task -->
+            <!-- BEGIN task -->
             <li class="task interact {DARK}">
-                <span class="icon {TASK_CLASS}" title="{TASK_TYPE}"><span></span></span>
+                <span class="icon {TASK_CLASS}" title="{TASK_TYPE_LABEL}"><span></span></span>
                 <h3>{TASK_TITLE}</h3>
                 <!-- BEGIN edit_task -->
                 <span class="interact">
@@ -23,7 +23,7 @@
                 </span>
                 <!-- END edit_task -->
 
-                <div class="delete_task_form_container">
+                <div class="delete_task_form_container for_{TASK_TYPE}">
                     <p class="notice">Are you sure you wish to delete this task?</p>
                     <form action="/task/saveForm.php" method="post" class="delete_form">
                         <input type="hidden" name="action" value="delete" />
@@ -33,12 +33,12 @@
                     </form>
                 </div>
 
-                <!-- Form for changing this task (inline: only for link and assess tasks -->
                 <!-- BEGIN edit_task_form -->
-                <div class="edit_task_form_container">
-                    <form action="/task/saveForm.php" method="post" class="edit_task_form">
+                <div class="edit_task_form_container for_{TASK_TYPE}">
+                    <form action="/task/saveForm.php" method="post" class="edit_task_form" data-form_type="{TASK_TYPE}" enctype="multipart/form-data">
                         <input type="hidden" name="id"       value="{TASK_ID}"/>
                         <input type="hidden" name="category" value="{ID}"/>
+                        <input type="hidden" name="type"     value="{TASK_TYPE}"/>
 
                         <dl>
                             <dt><label for="title-{TASK_ID}">Task:</label></dt>
@@ -66,7 +66,7 @@
                 </div>
                 <!-- END edit_task_form -->
             </li>
-        <!-- END task -->
+            <!-- END task -->
         </ul>
         <p class="interact add_buttons">
             <a href="/submission/createSubmission/new/{ID}/task" class="btn up-arrow" data-form_class="for_due_work"><span></span>Add Due Work</a>
@@ -76,9 +76,17 @@
         </p>
     </div>
 
-    <!-- This is the form for inline creation of links -->
+    <!--
+    This is the form for inline creation of links
+    Try to make this a template instead of copy-pasting all the time
+    -->
     <div class="create_task_form_container for_link">
-        <form action="/task/saveForm.php" method="post" class="create_task_form">
+        <p>
+            This task creates a link for a student to visit. You can supply a link to an existing
+            web page or file, upload a file from your computer for students to download, or select
+            an existing homepage or file from the resource browser.
+        </p>
+        <form action="/task/saveForm.php" method="post" class="create_task_form" data-form_type="link" enctype="multipart/form-data">
             <input type="hidden" name="id"       value=""/>
             <input type="hidden" name="category" value="{ID}"/>
             <input type="hidden" name="type"     value="link"/>
@@ -98,7 +106,13 @@
 
     <!-- This is the form for inline creation of tasks -->
     <div class="create_task_form_container for_task">
-        <form action="/task/saveForm.php" method="post" class="create_task_form">
+        <p>
+            This task creates a task for a student to complete. This task can be
+            marked off by a student (example: a student checks off that they have read
+            a chapter of a book), or by a teacher only (example: a teacher confirms
+            a student's attendance at a laboratory, class or workshop).
+        </p>
+        <form action="/task/saveForm.php" method="post" class="create_task_form" data-form_type="link" enctype="multipart/form-data">
             <input type="hidden" name="id"       value=""/>
             <input type="hidden" name="category" value="{ID}"/>
             <input type="hidden" name="type"     value="link"/>
@@ -119,5 +133,23 @@
             <input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
 
         </form>
+    </div>
+
+    <div class="create_task_form_container for_due_work">
+        <p>
+            This task creates a task for a due work item.
+        </p>
+        <p class="interact">
+            <a href="/submission/createSubmission/new/{ID}/task" class="btn up-arrow"><span></span>Create Due Work Task</a>
+        </p>
+    </div>
+
+    <div class="create_task_form_container for_assessment">
+        <p>
+            This task creates a task for an online assessment.
+        </p>
+        <p class="interact">
+            <a href="/assess/create/{ID}/task" class="btn create"><span></span>Create Online Assessment Task</a>
+        </p>
     </div>
 </div>
