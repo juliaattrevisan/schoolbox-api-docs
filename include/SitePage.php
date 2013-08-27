@@ -142,6 +142,14 @@ class SitePage extends Page {
         $this->site = Cfg::get('site_location');
     }
 
+    public function getAjax() {
+        return $this->ajax;
+    }
+
+    public function getLite() {
+        return $this->lite;
+    }
+
     function setAjax($state = true) {
         $this->ajax = $state;
     }
