@@ -1,0 +1,76 @@
+// =============================================================================
+// Default variables
+// These will be overridden by skin values
+// =============================================================================
+// Ze Master palette!
+// These form a palete of shades as lightened (for backgrounds) and darkened
+// (for borders, text, etc).
+@lighten-value: 				10%; // Higher values will blast colors to #FFF
+@darken-value: 					20%; // @darken-value /2 or *2 can also be used
+
+@neutral-color: 				#b0ddfe; // For when you just need some color
+@positive-color: 				#CAE9B9; // For good stuff
+@negative-color: 				#FF5757; // For the bad times
+@highlight-color: 				#FFFFB2; // For when something needs attention
+
+// Shades of grey (down from 46 absolute greys and 9 virtually-greys)
+// Remember these are for UI elements. Skinable elements should use @dark
+@black: 						#000000;
+@dgrey: 						#797979;
+@mgrey: 						#AAAAAA;
+@std-grey: 						#CCCCCC;
+@lgrey: 						#DEDEDE;
+@white: 						#FFFFFF;
+
+// Glorious graduated gamut generator
+@color-red: 					#BB0000;
+@color-bg: 						#FFEEEE;
+
+// Dimensions
+@search-width: 					256px;
+@logo-width: 					173px;
+@logo-height: 					35px;
+@banner-height:     			72px;
+@navigation-width:				200px;
+@navigation-padding:			16px;
+
+// Generic colors
+@body-background: 				#EEEEEE; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FAF9F5; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#0066B0;
+@link-hover: 					#FF5A00;
+
+// Main banner
+@banner-background: 			#013A63;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+
+// Modules
+@module-heading: 				#000000;
+@module-background: 			#E5EFF7;
+
+// Refers to the left navigation
+
+@navigation-background:  		transparent;
+@navigation-color:  			#000000;
+@navigation-links:  			#0066B0;
+@navigation-hover-background: 	@navigation-links;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@body-background;
+
+// Main "Tab" Navigation
+@tab-background:				#0066B0;
+@tab-color:						#FFFFFF;
+@tab-hover-background:			@tab-color;
+@tab-hover-color:				@tab-background;
+
+// Footer text
+@footer-color:					#797979;
+@footer-links:					@footer-color;
