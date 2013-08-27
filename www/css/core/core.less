@@ -1070,16 +1070,20 @@ Notifications
             width: 70%;
         }
         .interact {
-            display: inline-block;
-            width: 29%;
-            text-align: right;
-        }
-        .interact .btn {
             float: none;
-            display: inline-block;
-            vertical-align: top;
-            height:22px;
-            line-height:22px;
+            display: block;
+            text-align: right;
+            &.modify_buttons {
+                display: inline-block;
+                width: 29%;
+            }
+            .btn {
+                float: none;
+                display: inline-block;
+                vertical-align: top;
+                height:22px;
+                line-height:22px;
+            }
         }
     }
 }
@@ -1089,10 +1093,18 @@ Notifications
         display: block;
         text-align: right;
     }
-    // Should make this style available to all buttons
-    button.btn {
-        height:24px;
-        line-height:24px;
+    .interact {
+        float: none;
+        display: block;
+        text-align: right;
+        // Should make this style available to all buttons
+        .btn {
+            float: none;
+            display: inline-block;
+            vertical-align: top;
+            height:24px;
+            line-height:24px;
+        }
     }
     form {
         input[type=text] {
@@ -1100,6 +1112,11 @@ Notifications
         }
         dl {
             clear: both;
+            dd, dt {
+                input {
+                    vertical-align: top;
+                }
+            }
             label {
                 display: inline-block;
             }
