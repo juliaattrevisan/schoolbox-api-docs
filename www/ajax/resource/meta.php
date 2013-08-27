@@ -179,7 +179,8 @@ function getFolderMeta($folderId) {
 			$actions = array_merge($actions, array('zip'));
 			// no break
 		case WRITE_ACCESS:
-			$actions = array_merge($actions, array('file', 'folder', 'delete', 'modify', 'download'));
+			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download'));
+			$actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
 			// no break
 		case READ_ACCESS:
 		default:
