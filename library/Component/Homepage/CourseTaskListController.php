@@ -61,6 +61,10 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setBlock('edit_task_form', 'link_input', 'link_input_block');
         $this->setBlock('edit_task_form', 'task_input', 'task_input_block');
 
+        $this->setVar(array(
+            'SESSION_NAME' => session_name(),
+            'SESSION_ID'   => session_id(),
+        ));
 
         // Start shitting out tasks into the template
         $this->setVar('category_breadcrumb_block', '');
