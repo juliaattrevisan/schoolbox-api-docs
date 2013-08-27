@@ -98,7 +98,11 @@ class API {
 	        $uMap = UserMapper::getInstance();
             $cMap = CategoryMapper::getInstance();
 
-            foreach($table as &$period) {
+	        $colourList = \Timetable_ColourMapper::getInstance()->findAll();
+	        $subjectColourMap = array();
+	        $colourIndex = 0;
+
+	        foreach($table as &$period) {
                 if(($period['periodNumber'] * $tableDefinition['periodCount'] + $period['periodSequence']) == $highlightedRow) {
                     $period['highlight'] = '1';
                 }
@@ -107,7 +111,14 @@ class API {
                         $class['today'] = '1';
                     }
                     if(isset($class['staffID'])) {
-                        try {
+
+	                    if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
+		                    $subjectColourMap[$class['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
+		                    $colourIndex++;
+	                    }
+
+	                    try {
+		                    $class['colour'] = '#' . $subjectColourMap[$class['code']];
                             $user = $this->readData($uMap, $class['staffID']);
                             $class['teacherName'] = $user->formatName();
                             $class['room'] = trim($class['room']);
@@ -115,7 +126,7 @@ class API {
                         catch (Exception_Schoolbox $e) {
                             $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}': {$e->getErrorMessage()}";
                         }
-                        catch (Exception $e) {
+                        catch (\Exception $e) {
 	                        $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}'";
                         }
 
@@ -126,7 +137,7 @@ class API {
                         catch (Exception_Schoolbox $e) {
                             $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
                         }
-                        catch (Exception $e) {
+                        catch (\Exception $e) {
 	                        $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}'";
                         }
                     }

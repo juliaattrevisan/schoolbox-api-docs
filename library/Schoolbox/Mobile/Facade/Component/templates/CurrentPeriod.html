@@ -1,7 +1,7 @@
 <div id="dashboard-timetable-wrapper">
 <ul style="width: {{ content | length * 50 }}%;" class="scroller">
 {% for period in content %}
-    <li style="width: {{ 100 / content | length }}%;" {% if period.current %}class="current"{% endif %}>
+    <li style="width: {{ 100 / content | length }}%; background: {{ period.colour }};" {% if period.current %}class="current"{% endif %}>
         {% if period.catID %}
         <a href="/m/facade/homepage/display/{{ period.catID }}">
         {% else %}
