@@ -45,6 +45,16 @@
                 }
             });
 
+            // Post-AJAX form event
+            var postCallback = function(form, data) {
+                var container = form.closest('.edit_task_form_container, .create_task_form_container, .delete_task_form_container');
+                container.slideUp('fast', function() {
+                    // reload all tasks too.
+                    var new_tasks = $(data.html).find('.task-list');
+                    component.find('.task-list').replaceWith(new_tasks);
+                });
+            }
+
             // Upload button for link items
             component.find('form[data-form_type="link"] a[data-function="upload"]').bind('click.courseTaskList', function(event) {
                 event.preventDefault();
@@ -60,15 +70,12 @@
                 // Is this a new form?
                 var is_new = form.hasClass("create_task_form");
                 $.post(form.attr('action'), form.serialize(), function(data) {
-                    // Do validation stuff here
+                    // Do validation stuff here eventually, but for now validate.
                     if (is_new) {
                         form.get(0).reset();
                     }
-                    var container = form.closest('.edit_task_form_container, .create_task_form_container');
-                    container.slideUp('fast');
-                    // Probably want to reload all tasks too.
-                    // Jam the list of tasks into data somewhere
-                });
+                    postCallback(form, data);
+                }, 'json');
             });
 
             // Modify task: if there's a modify form inline, show/hide it.
@@ -87,6 +94,15 @@
                 var delete_form = $(this).closest('.task').find('.delete_task_form_container');
                 delete_form.slideToggle('fast');
                 event.preventDefault();
+            });
+
+            // "why, yes I am"
+            component.delegate('.delete_form', 'submit.courseTaskList', {}, function() {
+                var form = $(this);
+                event.preventDefault();
+                $.post(form.attr('action'), form.serialize(), function(data) {
+                    postCallback(form, data);
+                }, 'json');
             });
 
             // Create new tasks: show inline form if there is one.
