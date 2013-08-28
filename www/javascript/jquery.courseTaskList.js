@@ -5,10 +5,11 @@
     $(function() {
 
         $.fn.setupCourseTaskList = function(options) {
-            $.extend(options, {
+            var defaults = {
                 session_name: '',
                 session_id:   ''
-            })
+            };
+            var settings  = $.extend({}, defaults, options);
             var component = $(this);
             var dialog    = component.find('.file_uploader');
             dialog.dialog({
@@ -23,7 +24,7 @@
                 if (file_upload.length) {
                     file_upload.uploadify({
                         'uploader':'/javascript/uploadify/uploadify.swf',
-                        'script':'/storage/asyncUpload.php?'+options.session_name+'='+options.session_id,
+                        'script':'/storage/asyncUpload.php?'+settings.session_name+'='+settings.session_id,
                         'cancelImg':'/javascript/uploadify/cancel.png',
                         'fileDataName':'upload',
                         'multi':false,
