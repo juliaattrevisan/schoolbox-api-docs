@@ -13,9 +13,9 @@
 				<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
 				<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span>
 
-				<!-- BEGIN socialstream_post_add -->
+				<!-- BEGIN socialstream_post_has_add -->
 				<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a><br />
-				<!-- END socialstream_post_add -->
+				<!-- END socialstream_post_has_add -->
 
 				{SOCIALSTREAM_POST_BODY}<br />
 			</p>
@@ -64,9 +64,9 @@
 						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
 						<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
 
-						<!-- BEGIN socialstream_comment_add -->
+						<!-- BEGIN socialstream_comment_has_add -->
 						<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a><br />
-						<!-- END socialstream_comment_add -->
+						<!-- END socialstream_comment_has_add -->
 
 						{SOCIALSTREAM_COMMENT_BODY}<br />
 					</p>
