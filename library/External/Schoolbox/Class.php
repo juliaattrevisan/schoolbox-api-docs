@@ -71,27 +71,19 @@ class External_Schoolbox_Class implements External_ClassInterface {
 		return $studentListAdaption;
 	}
 
-	public function getTeacherName ($classCode) {
-		$statement = $this->getDatabase()->prepare("
-			SELECT u.synergy_id
-			FROM class c
-			LEFT JOIN class_user cu ON cu.class_id = c.id
-			LEFT JOIN user u ON u.id = cu.user_id
-			LEFT JOIN groups g ON g.id = u.group_id
-			WHERE c.code = :code
-				AND g.group_type = :type
-		");
-
-		$statement->execute( array(
-			':code' => $classCode,
-			':type' => Group::STAFF_GROUP_TYPE
-		) );
-
-		$teacher = $statement->fetch(PDO::FETCH_NUM);
-
-		return $teacher;
+	public function getTeacherName($classCode) {
+		$statement = $this->getQuery($classCode);
+		if (!$statement) {
+			return false;
+		}
+		$statement->execute();
+		$teacher_id_list = array();
+		foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+			$teacher_id_list[] = $row['synergy_id'];
+		}
+		return $teacher_id_list;
 	}
-	
+
 	/**
 	 * @param Database $database
 	 * @return void
