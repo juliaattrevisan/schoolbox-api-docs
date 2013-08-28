@@ -232,14 +232,17 @@ class Threads {
 		$page->setBlock('socialstream_post', 'socialstream_post_has_icon', 'socialstream_post_has_icon_block');
 		$page->setBlock('socialstream_post', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
 		$page->setBlock('socialstream_post', 'socialstream_post_has_player', 'socialstream_post_has_player_block');
+		$page->setBlock('socialstream_post', 'socialstream_post_has_delete', 'socialstream_post_has_delete_block');
 
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_icon', 'socialstream_comment_has_icon_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
+		$page->setBlock('socialstream_comment', 'socialstream_comment_has_delete', 'socialstream_comment_has_delete_block');
 
 		$page->setBlock('socialstream_reply', 'socialstream_reply_has_icon', 'socialstream_reply_has_icon_block');
 		$page->setBlock('socialstream_reply', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
 		$page->setBlock('socialstream_reply', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
+		$page->setBlock('socialstream_reply', 'socialstream_reply_has_delete', 'socialstream_reply_has_delete_block');
 
 		$page->setVar(array(
 			'socialstream_post_block' => '',
@@ -249,14 +252,17 @@ class Threads {
 			'socialstream_post_has_icon_block' => '',
 			'socialstream_post_has_thumbnail_block' => '',
 			'socialstream_post_has_player_block' => '',
+			'socialstream_post_has_delete_block' => '',
 
 			'socialstream_comment_has_icon_block' => '',
 			'socialstream_comment_has_thumbnail_block' => '',
 			'socialstream_comment_has_player_block' => '',
+			'socialstream_comment_has_delete_block' => '',
 
 			'socialstream_reply_has_icon_block' => '',
 			'socialstream_reply_has_thumbnail_block' => '',
 			'socialstream_reply_has_player_block' => '',
+			'socialstream_reply_has_delete_block' => '',
 		));
 
 		/* Traverse everything
@@ -264,15 +270,6 @@ class Threads {
 		$i = 0;
 
 		foreach($this->getTree() as $currentPost) {
-			$authenticator->setNewPost($currentPost);
-
-			if ($authenticator->canDelete()) {
-				$canDelete = '';
-			}
-			else {
-				$canDelete = 'hide';
-			}
-
 			$page->setVar(array(
 				'SOCIALSTREAM_POST_POST_ID' => \Scrub::text($currentPost->getPostId()),
 				'SOCIALSTREAM_POST_BODY' => \Scrub::text($currentPost->getBody()),
@@ -282,8 +279,18 @@ class Threads {
 				'SOCIALSTREAM_POST_TIMESTAMP' => \Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
 				'ON_OFF' => $i%2 ? 'dark' : '',
 				'COMMENT_CLASS' => $canComment,
-				'DELETE_CLASS' => $canDelete,
 			));
+
+			/* Ability to delete posts
+			 */
+			$authenticator->setNewPost($currentPost);
+
+			if ($authenticator->canDelete()) {
+				$page->parse('socialstream_post_has_delete_block', 'socialstream_post_has_delete');
+			}
+			else {
+				$page->setVar('socialstream_post_has_delete_block', '');
+			}
 
 			/* Thumbnails
 			 */
@@ -295,15 +302,6 @@ class Threads {
 			/* Descendents
 			 */
 			foreach($currentPost->getChildren() as $currentComment) {
-				$authenticator->setNewPost($currentComment);
-
-				if ($authenticator->canDelete()) {
-					$canDelete = '';
-				}
-				else {
-					$canDelete = 'hide';
-				}
-
 				$page->setVar(array(
 					'SOCIALSTREAM_COMMENT_POST_ID' => \Scrub::text($currentComment->getPostId()),
 					'SOCIALSTREAM_COMMENT_BODY' => \Scrub::text($currentComment->getBody()),
@@ -311,8 +309,18 @@ class Threads {
 					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
 					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => \Scrub::text($currentComment->getOwnerId()->getFullname()),
 					'COMMENT_CLASS' => $canComment,
-					'DELETE_CLASS' => $canDelete,
 				));
+
+				/* Ability to delete posts
+				 */
+				$authenticator->setNewPost($currentComment);
+
+				if ($authenticator->canDelete()) {
+					$page->parse('socialstream_comment_has_delete_block', 'socialstream_comment_has_delete');
+				}
+				else {
+					$page->setVar('socialstream_comment_has_delete_block', '');
+				}
 
 				/* Thumbnails
 				 */
@@ -324,15 +332,6 @@ class Threads {
 				/* Descendents
 				 */
 				foreach($currentComment->getChildren() as $currentReply) {
-					$authenticator->setNewPost($currentComment);
-
-					if ($authenticator->canDelete()) {
-						$canDelete = '';
-					}
-					else {
-						$canDelete = 'hide';
-					}
-
 					$page->setVar(array(
 						'SOCIALSTREAM_REPLY_POST_ID' => \Scrub::text($currentReply->getPostId()),
 						'SOCIALSTREAM_REPLY_BODY' => \Scrub::text($currentReply->getBody()),
@@ -340,8 +339,18 @@ class Threads {
 						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => \Scrub::text($currentReply->getOwnerId()->getExternalId()),
 						'SOCIALSTREAM_REPLY_USER_FULLNAME' => \Scrub::text($currentReply->getOwnerId()->getFullname()),
 						'COMMENT_CLASS' => $canComment,
-						'DELETE_CLASS' => $canDelete,
 					));
+
+					/* Ability to delete posts
+					 */
+					$authenticator->setNewPost($currentReply);
+
+					if ($authenticator->canDelete()) {
+						$page->parse('socialstream_reply_has_delete_block', 'socialstream_reply_has_delete');
+					}
+					else {
+						$page->setVar('socialstream_reply_has_delete_block', '');
+					}
 
 					/* Thumbnails
 					 */
@@ -356,6 +365,7 @@ class Threads {
 					$page->setVar('socialstream_reply_has_icon_block', '');
 					$page->setVar('socialstream_reply_has_thumbnail_block', '');
 					$page->setVar('socialstream_reply_has_player_block', '');
+					$page->setVar('socialstream_reply_has_delete_block', '');
 				}
 
 				/* Clear children after parsing out the parent
@@ -364,6 +374,7 @@ class Threads {
 				$page->setVar('socialstream_comment_has_icon_block', '');
 				$page->setVar('socialstream_comment_has_thumbnail_block', '');
 				$page->setVar('socialstream_comment_has_player_block', '');
+				$page->setVar('socialstream_comment_has_delete_block', '');
 				$page->setVar('socialstream_reply_block', '');
 			}
 
@@ -373,6 +384,7 @@ class Threads {
 			$page->setVar('socialstream_post_has_icon_block', '');
 			$page->setVar('socialstream_post_has_thumbnail_block', '');
 			$page->setVar('socialstream_post_has_player_block', '');
+			$page->setVar('socialstream_post_has_delete_block', '');
 			$page->setVar('socialstream_comment_block', '');
 			$page->setVar('socialstream_reply_block', '');
 

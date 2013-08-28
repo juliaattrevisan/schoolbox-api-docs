@@ -1,7 +1,9 @@
 <!-- BEGIN socialstream_post -->
 <ul>
 	<li class='socialstream-post {ON_OFF}'>
-		<p><a class='btn delete no-text {DELETE_CLASS}' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}' alt='' title=''><span></span></a></p>
+		<!-- BEGIN socialstream_post_has_delete -->
+		<p><a class='btn delete no-text {SOCIALSTREAM_POST_DELETE_CLASS}' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}' alt='' title=''><span></span></a></p>
+		<!-- END socialstream_post_has_delete -->
 
 		<div class='avatar'>
 			<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
@@ -10,7 +12,11 @@
 			<p>
 				<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
 				<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span>
-				<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a><br />
+
+				<!-- BEGIN socialstream_post_add -->
+				<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a><br />
+				<!-- END socialstream_post_add -->
+
 				{SOCIALSTREAM_POST_BODY}<br />
 			</p>
 			<!-- BEGIN socialstream_post_has_icon -->
@@ -45,7 +51,9 @@
 		<ul>
 			<!-- BEGIN socialstream_comment -->
 			<li class='socialstream-comment'>
-				<p><a class='btn delete no-text {DELETE_CLASS}' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}' alt='' title=''><span></span></a></p>
+				<!-- BEGIN socialstream_comment_has_delete -->
+				<p><a class='btn delete no-text' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}' alt='' title=''><span></span></a></p>
+				<!-- END socialstream_comment_has_delete -->
 
 				<div class='avatar'>
 					<img src='/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32'>
@@ -55,7 +63,11 @@
 					<p>
 						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
 						<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
-						<a class='addPostLink {COMMENT_CLASS}' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a><br />
+
+						<!-- BEGIN socialstream_comment_add -->
+						<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a><br />
+						<!-- END socialstream_comment_add -->
+
 						{SOCIALSTREAM_COMMENT_BODY}<br />
 					</p>
 
@@ -91,7 +103,9 @@
 				<ul>
 					<!-- BEGIN socialstream_reply -->
 					<li class='socialstream-reply'>
-						<p><a class='btn delete no-text {DELETE_CLASS}' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}' alt='' title=''><span></span></a></p>
+						<!-- BEGIN socialstream_reply_has_delete -->
+						<p><a class='btn delete no-text' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}' alt='' title=''><span></span></a></p>
+						<!-- END socialstream_reply_has_delete -->
 
 						<div class='avatar'>
 							<img src='/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32'>
