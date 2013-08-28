@@ -15,28 +15,48 @@ class External_Schoolbox_Class implements External_ClassInterface {
 		$this->setdatabase( Database::getInstance() );
 	}
 
-	public function getStudents ($classCode) {
+	/**
+	 * Gets the query used by both getStudents() and getTeacherName().
+	 *
+	 * @param  string $class_code
+	 * @return PDOStatement
+	 */
+	protected function getQuery($class_code) {
+		$codes = explode(',', $class_code);
+		if (empty($codes)) {
+			return false;
+		}
+
+		// Put each code into a param. Argh
+		$query_parts = array();
+		foreach ($codes as $i => $code) {
+			$query_parts[] = ':code'.$i;
+		}
+		$code_query = implode(',', $query_parts);
 		$statement = $this->getDatabase()->prepare("
 			SELECT u.id, u.synergy_id, u.title, u.firstname, u.lastname, u.year, u.house
 			FROM class c
 			LEFT JOIN class_user cu ON cu.class_id = c.id
 			LEFT JOIN user u ON u.id = cu.user_id
 			LEFT JOIN groups g ON g.id = u.group_id
-			WHERE c.code = :code
-				AND g.group_type = :type
+			WHERE c.code IN ($code_query) AND g.group_type = :type
 			ORDER BY u.lastname, u.firstname
 		");
+		$statement->bindValue(':type', Group::STUDENT_GROUP_TYPE);
+		foreach ($codes as $i => $code) {
+			$statement->bindValue(':code'.$i, $code);
+		}
+		return $statement;
+	}
 
-		$statement->execute( array(
-			':code' => $classCode,
-			':type' => Group::STUDENT_GROUP_TYPE
-		) );
-
-		$studentList = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		$studentListAdaption  = array();
-
-		foreach ( $studentList as $student ) {
+	public function getStudents($classCode) {
+		$statement = $this->getQuery($classCode);
+		if (!$statement) {
+			return array();
+		}
+		$statement->execute();
+		$studentListAdaption = array();
+		foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $student) {
 			$studentListAdaption[] = array(
 				'synergy_id' => $student['synergy_id'],
 				'lastname' => $student['lastname'],
