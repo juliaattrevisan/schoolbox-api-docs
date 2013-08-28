@@ -64,6 +64,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setVar(array(
             'SESSION_NAME' => session_name(),
             'SESSION_ID'   => session_id(),
+            'COMPONENT_NAME' => $this->getConfig('componentname'),
         ));
 
         // Start shitting out tasks into the template
