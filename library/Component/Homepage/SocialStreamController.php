@@ -31,6 +31,8 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		$this->parseConfig();
 
+		$this->setBlock($templateHandle, 'socialstream_has_newpost', 'socialstream_has_newpost_block');
+
 		/* Assign homepage id and settings
 		 */
 		$config = $this->getConfig();
@@ -67,21 +69,24 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
 		if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {
 			$this->setVar(array(
-				'FORM_CLASS' => 'hide',
+				'socialstream_has_newpost_block' => '',
 			));
 		}
 		else {
 			if ($authenticator->canCollaborate()) {
 				$this->setVar(array(
-					'FORM_CLASS' => '',
+					'FORM_CLASS' => ''
+				));
+			}
+			/* Use hidden cloneable
+			 */
+			else if ($authenticator->canComment()) {
+				$this->setVar(array(
+					'FORM_CLASS' => 'hide'
 				));
 			}
 
-			if ($authenticator->canComment()) {
-				$this->setVar(array(
-					'FORM_CLASS' => '',
-				));
-			}
+			$this->parse('socialstream_has_newpost_block', 'socialstream_has_newpost');
 		}
 
 		/* See how many posts there could be at the moment

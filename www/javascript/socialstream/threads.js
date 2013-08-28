@@ -152,6 +152,10 @@
 				 */
 				self.initAttachmentSelectors(clone);
 
+				/* Unhide it
+				 */
+				clone.removeClass('hide');
+
 				/* Send In The Clones
 				 */
 				$j(this).parent('p').append(clone);

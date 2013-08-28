@@ -41,7 +41,8 @@
 	{CONFIGURATION}
 
 	<div>
-		<form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm' enctype='multipart/form-data'>
+		<!-- BEGIN socialstream_has_newpost -->
+		<form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
 			<input type='hidden' name='type' value='string' />
 			<input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
 			<input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
@@ -67,6 +68,7 @@
 
 			<input class='submit-btn-plain' type='submit' value='Post' />
 		</form>
+		<!-- END socialstream_has_newpost -->
 	</div>
 
 	<div id='socialstream-browser' class='socialstream-browser'>
