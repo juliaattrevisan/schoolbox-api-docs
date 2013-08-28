@@ -1,13 +1,8 @@
-<div class="box clearfix component-" id="component{COMPONENT_INSTANCE_ID}">
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div class="course_task_listing listing box clearfix">
         <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
-        <style type="text/css">
-            #component{COMPONENT_INSTANCE_ID} .file_uploader {
-                display: none;
-            }
-        </style>
         <script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
         <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
         <script type="text/javascript" src="/javascript/jquery.courseTaskList.js"></script>
@@ -56,9 +51,10 @@
                 <!-- BEGIN edit_task_form -->
                 <div class="edit_task_form_container for_{TASK_TYPE}">
                     <form action="/task/saveForm.php" method="post" class="edit_task_form" data-form_type="{TASK_TYPE}">
-                        <input type="hidden" name="id"       value="{TASK_ID}"/>
-                        <input type="hidden" name="category" value="{ID}"/>
-                        <input type="hidden" name="type"     value="{TASK_TYPE}"/>
+                        <input type="hidden" name="id"        value="{TASK_ID}"/>
+                        <input type="hidden" name="category"  value="{ID}"/>
+                        <input type="hidden" name="type"      value="{TASK_TYPE}"/>
+                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
 
                         <dl>
                             <dt><label for="title-{TASK_ID}">Task:</label></dt>
@@ -113,9 +109,10 @@
             an existing homepage or file from the resource browser.
         </p>
         <form action="/task/saveForm.php" method="post" class="create_task_form" data-form_type="link">
-            <input type="hidden" name="id"       value=""/>
-            <input type="hidden" name="category" value="{ID}"/>
-            <input type="hidden" name="type"     value="link"/>
+            <input type="hidden" name="id"        value=""/>
+            <input type="hidden" name="category"  value="{ID}"/>
+            <input type="hidden" name="type"      value="link"/>
+            <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
 
             <dl>
                 <dt><label for="title-new_link">Task:</label></dt>
@@ -145,9 +142,10 @@
             a student's attendance at a laboratory, class or workshop).
         </p>
         <form action="/task/saveForm.php" method="post" class="create_task_form" data-form_type="link">
-            <input type="hidden" name="id"       value=""/>
-            <input type="hidden" name="category" value="{ID}"/>
-            <input type="hidden" name="type"     value="task"/>
+            <input type="hidden" name="id"        value=""/>
+            <input type="hidden" name="category"  value="{ID}"/>
+            <input type="hidden" name="type"      value="task"/>
+            <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
 
             <dl>
                 <dt><label for="title-new_task">Task:</label></dt>
@@ -186,7 +184,7 @@
     </div>
 
     <!-- Dialog for file browser -->
-    <div class="file_uploader">
+    <div class="file_uploader hide">
         If you upload a file, its URL will appear in the Link section.
         <form action="/storage/asyncUpload.php" method="post" enctype="multipart/form-data">
             <input id="upload" name="upload" type="file" />
