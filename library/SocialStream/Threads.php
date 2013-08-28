@@ -288,7 +288,9 @@ class Threads {
 				$page->parse('socialstream_post_has_add_block', 'socialstream_post_has_add');
 			}
 			else {
-				$page->setVar('socialstream_post_has_add_block', '');
+				$page->setVar(array(
+					'socialstream_post_has_add_block' => '',
+				));
 			}
 
 			/* Ability to delete posts
@@ -299,14 +301,19 @@ class Threads {
 				$page->parse('socialstream_post_has_delete_block', 'socialstream_post_has_delete');
 			}
 			else {
-				$page->setVar('socialstream_post_has_delete_block', '');
+				$page->setVar(array(
+					'socialstream_post_has_delete_block' => '',
+				));
 			}
 
 			/* Thumbnails
 			 */
-			$page->setVar('socialstream_post_has_icon_block', '');
-			$page->setVar('socialstream_post_has_thumbnail_block', '');
-			$page->setVar('socialstream_post_has_player_block', '');
+			$page->setVar(array(
+				'socialstream_post_has_icon_block' => '',
+				'socialstream_post_has_thumbnail_block' => '',
+				'socialstream_post_has_player_block' => '',
+			));
+
 			$currentPost->renderThumbnail('post', $page);
 
 			/* Descendents
@@ -326,7 +333,9 @@ class Threads {
 					$page->parse('socialstream_comment_has_add_block', 'socialstream_comment_has_add');
 				}
 				else {
-					$page->setVar('socialstream_comment_has_add_block', '');
+					$page->setVar(array(
+						'socialstream_comment_has_add_block' => '',
+					));
 				}
 
 				/* Ability to delete posts
@@ -337,14 +346,19 @@ class Threads {
 					$page->parse('socialstream_comment_has_delete_block', 'socialstream_comment_has_delete');
 				}
 				else {
-					$page->setVar('socialstream_comment_has_delete_block', '');
+					$page->setVar(array(
+						'socialstream_comment_has_delete_block' => '',
+					));
 				}
 
 				/* Thumbnails
 				 */
-				$page->setVar('socialstream_comment_has_icon_block', '');
-				$page->setVar('socialstream_comment_has_thumbnail_block', '');
-				$page->setVar('socialstream_comment_has_player_block', '');
+				$page->setVar(array(
+					'socialstream_comment_has_icon_block' => '',
+					'socialstream_comment_has_thumbnail_block' => '',
+					'socialstream_comment_has_player_block' => '',
+				));
+
 				$currentComment->renderThumbnail('comment', $page);
 
 				/* Descendents
@@ -366,48 +380,62 @@ class Threads {
 						$page->parse('socialstream_reply_has_delete_block', 'socialstream_reply_has_delete');
 					}
 					else {
-						$page->setVar('socialstream_reply_has_delete_block', '');
+						$page->setVar(array(
+							'socialstream_reply_has_delete_block' => '',
+						));
 					}
 
 					/* Thumbnails
 					 */
-					$page->setVar('socialstream_reply_has_icon_block', '');
-					$page->setVar('socialstream_reply_has_thumbnail_block', '');
-					$page->setVar('socialstream_reply_has_player_block', '');
+					$page->setVar(array(
+						'socialstream_reply_has_icon_block' => '',
+						'socialstream_reply_has_thumbnail_block' => '',
+						'socialstream_reply_has_player_block' => '',
+					));
+
 					$currentReply->renderThumbnail('reply', $page);
 
 					/* Clear children after parsing out the parent
 					 */
 					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
-					$page->setVar('socialstream_reply_has_icon_block', '');
-					$page->setVar('socialstream_reply_has_thumbnail_block', '');
-					$page->setVar('socialstream_reply_has_player_block', '');
-					$page->setVar('socialstream_reply_has_add_block', '');
-					$page->setVar('socialstream_reply_has_delete_block', '');
+
+					$page->setVar(array(
+						'socialstream_reply_has_icon_block' => '',
+						'socialstream_reply_has_thumbnail_block' => '',
+						'socialstream_reply_has_player_block' => '',
+						'socialstream_reply_has_add_block' => '',
+						'socialstream_reply_has_delete_block' => '',
+					));
 				}
 
 				/* Clear children after parsing out the parent
 				 */
 				$page->parse('socialstream_comment_block', 'socialstream_comment', true);
-				$page->setVar('socialstream_comment_has_icon_block', '');
-				$page->setVar('socialstream_comment_has_thumbnail_block', '');
-				$page->setVar('socialstream_comment_has_player_block', '');
-				$page->setVar('socialstream_comment_has_add_block', '');
-				$page->setVar('socialstream_comment_has_delete_block', '');
-				$page->setVar('socialstream_reply_block', '');
+
+				$page->setVar(array(
+					'socialstream_comment_has_icon_block' => '',
+					'socialstream_comment_has_thumbnail_block' => '',
+					'socialstream_comment_has_player_block' => '',
+					'socialstream_comment_has_add_block' => '',
+					'socialstream_comment_has_delete_block' => '',
+					'socialstream_reply_block' => '',
+				));
 			}
 
 			/* Clear children after parsing out the parent
 			 */
 			$page->parse('socialstream_post_block', 'socialstream_post', true);
-			$page->setVar('socialstream_post_has_icon_block', '');
-			$page->setVar('socialstream_post_has_thumbnail_block', '');
-			$page->setVar('socialstream_post_has_player_block', '');
-			$page->setVar('socialstream_post_has_add_block', '');
-			$page->setVar('socialstream_post_has_delete_block', '');
-			$page->setVar('socialstream_comment_block', '');
-			$page->setVar('socialstream_reply_block', '');
-
+			
+			$page->setVar(array(
+				'socialstream_post_has_icon_block' => '',
+				'socialstream_post_has_thumbnail_block' => '',
+				'socialstream_post_has_player_block' => '',
+				'socialstream_post_has_add_block' => '',
+				'socialstream_post_has_delete_block' => '',
+				'socialstream_comment_block' => '',
+				'socialstream_reply_block' => '',
+			));
+			
 			/* Alternating colours -_-
 			 */
 			$i++;
