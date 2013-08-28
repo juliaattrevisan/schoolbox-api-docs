@@ -361,7 +361,7 @@ class Creational extends AbstractFactory {
 
 		/* Force icon representation for now
 		 */
-		$url = "/send.php?id={$file->getId()}";
+		$url = "/send.php?id={$file->getId()}&save=1";
 		$this->getProduct()->setUrl($url);
 
 		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
