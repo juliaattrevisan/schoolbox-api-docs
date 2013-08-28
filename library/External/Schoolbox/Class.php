@@ -56,16 +56,22 @@ class External_Schoolbox_Class implements External_ClassInterface {
 		$statement->bindValue(':type', Group::STUDENT_GROUP_TYPE);
 		$statement->execute();
 		$studentListAdaption = array();
+		$student_id_list = array();
 		foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $student) {
-			$studentListAdaption[] = array(
-				'synergy_id' => $student['synergy_id'],
-				'lastname' => $student['lastname'],
-				'firstname' => $student['firstname'],
-				'yearlevel' => $student['year'],
-				'house' => $student['house'],
-				'StudentMedicalAlert' => '',
-				'StudentSpecialNeedsFlag' => '',
-			);
+			// Make sure student isn't in list already.
+			$student_sid = $student['synergy_id'];
+			if (!array_key_exists($student_sid, $student_id_list)) {
+				$student_id_list[$student_sid] = true;
+				$studentListAdaption[] = array(
+					'synergy_id' => $student['synergy_id'],
+					'lastname' => $student['lastname'],
+					'firstname' => $student['firstname'],
+					'yearlevel' => $student['year'],
+					'house' => $student['house'],
+					'StudentMedicalAlert' => '',
+					'StudentSpecialNeedsFlag' => '',
+				);
+			}
 		}
 
 		return $studentListAdaption;
