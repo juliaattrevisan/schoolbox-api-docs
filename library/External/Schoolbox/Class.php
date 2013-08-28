@@ -42,7 +42,6 @@ class External_Schoolbox_Class implements External_ClassInterface {
 			WHERE c.code IN ($code_query) AND g.group_type = :type
 			ORDER BY u.lastname, u.firstname
 		");
-		$statement->bindValue(':type', Group::STUDENT_GROUP_TYPE);
 		foreach ($codes as $i => $code) {
 			$statement->bindValue(':code'.$i, $code);
 		}
@@ -54,6 +53,7 @@ class External_Schoolbox_Class implements External_ClassInterface {
 		if (!$statement) {
 			return array();
 		}
+		$statement->bindValue(':type', Group::STUDENT_GROUP_TYPE);
 		$statement->execute();
 		$studentListAdaption = array();
 		foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $student) {
@@ -76,12 +76,13 @@ class External_Schoolbox_Class implements External_ClassInterface {
 		if (!$statement) {
 			return false;
 		}
+		$statement->bindValue(':type', Group::STAFF_GROUP_TYPE);
 		$statement->execute();
 		$teacher_id_list = array();
 		foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
 			$teacher_id_list[] = $row['synergy_id'];
 		}
-		return $teacher_id_list;
+		return array_unique($teacher_id_list);
 	}
 
 	/**
