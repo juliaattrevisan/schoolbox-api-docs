@@ -65,7 +65,7 @@ if (is_numeric($_GET['delete'])) {
  */
 else {
 	if (!strlen(trim($_POST['body']))) {
-		die('Your post must contain something');
+		error(157);
 	}
 
 	/* Compile some misc data

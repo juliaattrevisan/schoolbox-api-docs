@@ -16,3 +16,7 @@ ALTER TABLE `socialstream_post` ADD COLUMN `external_title` VARCHAR(255) NULL CO
 /* Remove obsolete storage_id column
  */
 ALTER TABLE `socialstream_post` DROP COLUMN `storage_id`;
+
+/* Add empty-post error message
+ */
+INSERT INTO `error` (`id`, `message`) VALUES ('157', 'Please compose a message before posting to the SocialStream.');
