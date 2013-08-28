@@ -124,6 +124,44 @@ class PostMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Custom findById
+	 *
+	 * @param mixed $identifier
+	 * @return object|Model
+	 * @throws \Exception
+	 */
+	public function findById($identifier) {
+		$user_mapper = $this->getJoinMapper('user');
+
+		$query = "
+			SELECT
+				{$this->getColumnString('p')},
+				{$user_mapper->getColumnString('u')}
+			FROM `{$this->table}` p
+			LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
+			WHERE p.post_id = :postId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":postId", $identifier);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		if ($row != false) {
+			$postItem = $this->hydrate($row, 'p');
+
+			$userItem = $user_mapper->hydrate($row, 'u');
+			$postItem->setOwnerId($userItem);
+
+			$this->throwIfDeleted($postItem);
+
+			return $postItem;
+		}
+		throw new \Exception('Instance of object not found');
+	}
+
+	/**
 	 * Find the maximum number of posts at a given point in time
 	 * for a particular homepage
 	 *

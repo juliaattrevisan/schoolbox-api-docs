@@ -104,7 +104,7 @@ class Authenticator {
 		/* Post/Comment/Reply owner can softdelete a post's children regardless
 		 * of their children's owner_ids
 		 */
-		if ($this->getCurrentUser()->getId() == $this->getNewPost()->getOwnerId()) {
+		if ($this->getCurrentUser()->getId() == $this->getNewPost()->getOwnerId()->getId()) {
 			return true;
 		}
 
