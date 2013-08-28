@@ -158,6 +158,19 @@ class SitePage extends Page {
         $this->lite = $state;
     }
 
+    /**
+     * Detects AJAX state based on value of request header X-Requested-With - if
+     * it's XMLHttpRequest, the request was made via AJAX.
+     *
+     * (obviously this isn't totally reliable, but jQuery and other libraries
+     *  set this header)
+     *
+     * @return bool
+     */
+    public function detectAjax() {
+        return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
+    }
+
     function outputPage($lite = false) {
         if ($this->ajax) {
             return true;

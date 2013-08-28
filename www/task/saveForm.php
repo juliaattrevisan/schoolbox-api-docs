@@ -98,6 +98,50 @@ else {
 }
 
 // Redirect: depends on request type.
-// Ajax: dump out a request type
+// Ajax: dump out request details, including rendering of component
 // Non-Ajax: redirect to the homepage
-$page->localRedir("/homepage/{$task->getCategory()->getId()}/");
+if ($page->detectAjax()) {
+    $result = array(
+        'success' => false,
+        'error'   => 500,
+        'message' => 'Unknown Error',
+        'html'    => '',
+    );
+
+    // Load the component that this task was added to.
+    /** @var Component_Instance[] $component_list */
+    $component_id   = $_POST['component'];
+    $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
+    $component      = $component_list[$component_id];
+
+    if ($component instanceof Component_Instance) {
+        // Dump out template contents
+        $chf = new Component_Homepage_Factory(new User(), new SitePage(false));
+
+        /** @var Component_Homepage_CourseTaskListController $controller */
+        $controller = $chf->buildComponent($component);
+        $controller->setup(
+            array('id' => $task->getCategory()->getId()),
+            $controller->getInstance()->getConfigArray()
+        );
+
+        $target = "component_position_{$controller->getInstance()->getPosition()}";
+        $handle = TEMPLATE_content;
+
+        if ($controller->execute() !== false) {
+            if ($controller->renderTemplate($handle) !== false) {
+                $controller->parse($target, $handle, true);
+            }
+        }
+        $result['success'] = true;
+        $result['error']   = 200;
+        $result['message'] = 'OK';
+        $result['html']    = $controller->getPageTemplate()->parse($target, $handle);
+    }
+
+    echo json_encode($result);
+    exit;
+}
+else {
+    $page->localRedir("/homepage/{$task->getCategory()->getId()}/");
+}
