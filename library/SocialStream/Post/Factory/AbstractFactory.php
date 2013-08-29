@@ -31,6 +31,7 @@ abstract class AbstractFactory {
 		'#^(http://)?vimeo\.com/([0-9]+)#',
 		'#^(http://)?www\.ted\.com/talks/([a-zA-Z0-9_]+)\.html#',
 		'#^/cms/sendVideo\.php\?(.*)#',
+		'#^/send\.php\?(.*)#',
 	);
 
 	/**
