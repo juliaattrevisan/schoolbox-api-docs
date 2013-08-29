@@ -18,6 +18,10 @@ use Schoolbox\User;
 
 class Task implements ISoftDeletable {
 
+    const TYPE_TASK          = 1;
+    const TYPE_DUE_WORK      = 2;
+    const TYPE_ONLINE_ASSESS = 3;
+
     /**
      * @var int
      */
@@ -216,4 +220,53 @@ class Task implements ISoftDeletable {
     public function isDeleted() {
         return ($this->getDeleted() instanceof \Alaress_Date_Format);
     }
+
+    public function getType() {
+        if ($this->getAssessment()->getId()) {
+            return self::TYPE_ONLINE_ASSESS;
+        }
+        if ($this->getSubmissionBox()->getId()) {
+            return self::TYPE_DUE_WORK;
+        }
+        return self::TYPE_TASK;
+    }
+
+    /**
+     * Temp method for getting this task's icon class.
+     *
+     * @todo move this to a renderer class at some point.
+     *
+     * @return string
+     */
+    public function getIconClass() {
+        switch ($this->getType()) {
+            case self::TYPE_DUE_WORK:
+                return 'new';
+            case self::TYPE_ONLINE_ASSESS:
+                return 'onlineassessment';
+            default:
+                break;
+        }
+        return 'tick';
+    }
+
+    /**
+     * Temp method for getting this task's icon class.
+     *
+     * @todo move this back to lookup table?
+     *
+     * @return string
+     */
+    public function getLabel() {
+        switch ($this->getType()) {
+            case self::TYPE_DUE_WORK:
+                return 'Due Work';
+            case self::TYPE_ONLINE_ASSESS:
+                return 'Online Assessment';
+            default:
+                break;
+        }
+        return 'Task';
+    }
+
 }
