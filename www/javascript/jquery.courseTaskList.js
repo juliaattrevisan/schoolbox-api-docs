@@ -57,7 +57,7 @@
             }
 
             // Upload button for link items
-            component.find('form[data-form_type="link"] a[data-function="upload"]').bind('click.courseTaskList', function(event) {
+            component.find('form a[data-function="upload"]').bind('click.courseTaskList', function(event) {
                 event.preventDefault();
                 // Set the form that this dialog was triggered from.
                 dialog.data('source_form', $(this).closest('form'));
