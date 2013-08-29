@@ -183,7 +183,7 @@ body {
     background: #ffffff url(/images/mggs/body-top.jpg) top left repeat-x;
 	min-width: 991px;
 }
-h2, h2 span a, h2 a {
+h2, h2 span a, h2 a, .box h2 a {
     color: #FFFFFF;
 }
 
@@ -237,6 +237,7 @@ a{
     background: url(/images/mggs/header-cross.png) 303px 12px no-repeat;
     height: 137px;
 	padding-right: 15px;
+	width: auto;
 	border: 0;
 }
 #header .logo {
@@ -374,7 +375,8 @@ a{
     -webkit-border-radius: 0px;
     border-radius: 0px;
 }
-#nav li a:hover,
+#nav li.hover > a,
+#nav ul li a:hover,
 #nav li li a:hover {
 	background: #129bf7;
 	color: #fff;
