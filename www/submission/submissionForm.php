@@ -200,7 +200,6 @@ try {
             $task
                 ->setCategory($categoryID)
                 ->setOwner($_SESSION['id'])
-                ->setType(TaskType::TYPE_DUE_WORK)
                 ->setTitle($_POST['task_title']);
             TaskMapper::getInstance()->save($task);
             $submission->setTask($task);
@@ -220,7 +219,8 @@ try {
     elseif ($action == 'update') {
         $mapper->save($submission);
         if ($is_task) {
-            $task = $submission->getTask();
+            // Load this submission's task from database
+            $task = TaskMapper::getInstance()->findById($submission->getTask()->getId());
             $task->setTitle($_POST['task_title']);
             TaskMapper::getInstance()->save($task);
             $page->localRedir('/homepage/'.$categoryID);
