@@ -48,12 +48,9 @@ class Original extends \Alaress_Cache_Abstract {
 	/**
 	 * Save stream contents from the url
 	 *
-	 * @return bool
+	 * @return bool|void
 	 */
 	protected function saveStreamContents() {
-
-		/* Cache Factory -_-
-		 */
 		$urlDetection = new \SocialStream\UrlDetection($this->getUrl());
 
 		if ($urlDetection->isLocalUrl()) {
