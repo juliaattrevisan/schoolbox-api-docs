@@ -82,19 +82,8 @@ class Creational extends AbstractFactory {
 			 * as if they had been uploaded
 			 */
 			else if ($this->getUrlDetection()->isStorageUrl()) {
-
-				/* Detect file id
-				 * Get file resource
-				 * Ram it into this method
-				 */
-				$bits = parse_url($this->getUrl());
-				$query = $bits['query'];
-
-				parse_str($query, $values);
-				$hash = $values['hash'];
-
 				$fileMapper = new \Schoolbox\FileMapper();
-				$file = $fileMapper->findOneByColumn('hash', $hash);
+				$file = $fileMapper->findOneByColumn('hash', $this->getUrlDetection()->getHash());
 
 				$uploadedFile = $this->constructFromUpload($file);
 				$this->populate($data);
@@ -291,8 +280,8 @@ class Creational extends AbstractFactory {
 
 			/* Save the original in the cache location
 			 */
-			$originalThumbnailCache = new \SocialStream\Cache\Original();
-			$originalThumbnailCache->init($this->getProduct()->getThumbnail());
+			$cache = new \SocialStream\Cache\Original();
+			$cache->init($this->getProduct()->getThumbnail());
 		}
 	}
 
@@ -330,8 +319,8 @@ class Creational extends AbstractFactory {
 
 			/* Save the original in the cache location
 			 */
-			$originalThumbnailCache = new \SocialStream\Cache\Original();
-			$originalThumbnailCache->init($url);
+			$cache = new \SocialStream\Cache\Original();
+			$cache->init($url);
 		}
 		/* Set up storage stream location and its icon thumbnails
 		 */
@@ -383,8 +372,8 @@ class Creational extends AbstractFactory {
 
 			/* Save the original in the cache location
  			 */
-			$resourceThumbnailCache = new \SocialStream\Cache\Local();
-			$resourceThumbnailCache->init($url);
+			$cache = new \SocialStream\Cache\Original();
+			$cache->init($url);
 		}
 		/* Set up icon thumbnails
 		 */
