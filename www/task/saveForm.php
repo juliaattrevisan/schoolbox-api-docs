@@ -19,27 +19,11 @@ $page = new SitePage();
 $task_id = $_POST['id'];
 if ($task_id) {
     $task = TaskMapper::getInstance()->findById($task_id);
-    $task->setTitle($_POST['title']);
-
-    // Modify field values based on the type of this item.
-    switch ($task->getType()->getId()) {
-        case TaskType::TYPE_LINK:
-            $task->setLink($_POST['link']);
-            break;
-        case TaskType::TYPE_TEACHER_ASSESS:
-        case TaskType::TYPE_STUDENT_ASSESS:
-            switch ($_POST['assess_method']) {
-                case 'self':
-                    $task->setType(TaskType::TYPE_STUDENT_ASSESS);
-                    break;
-                case 'teacher':
-                    $task->setType(TaskType::TYPE_TEACHER_ASSESS);
-                    break;
-            }
-            break;
-        default:
-            break;
-    }
+    $task
+        ->setTitle($_POST['title'])
+        ->setLink($_POST['link'])
+        ->setRequiresConfirmation($_POST['requires_confirmation'])
+    ;
 }
 else {
     // Make the task and set various fields
@@ -50,38 +34,9 @@ else {
         ->setOwner($_SESSION['id'])
         ->setTitle($_POST['title'])
         ->setCategory($category)
+        ->setLink($_POST['link'])
+        ->setRequiresConfirmation($_POST['requires_confirmation'])
     ;
-
-    // Set the task type based on what was passed in
-    $task_type = null;
-    switch ($_POST['type']) {
-        case 'task':
-            switch ($_POST['assess_method']) {
-                case 'self':
-                    $task_type = TaskType::TYPE_STUDENT_ASSESS;
-                    break;
-                case 'teacher':
-                    $task_type = TaskType::TYPE_TEACHER_ASSESS;
-                    break;
-            }
-            break;
-        case 'link':
-            $task_type = TaskType::TYPE_LINK;
-            break;
-        default:
-            break;
-    }
-    if (!isset($task_type)) {
-        error(2);
-    }
-    $task->setType($task_type);
-    if ($task_type === TaskType::TYPE_LINK) {
-        $link = trim($_POST['link']);
-        if (strlen($link) === 0) {
-            error(2);
-        }
-        $task->setLink($link);
-    }
 }
 
 // Shitty permission handling
