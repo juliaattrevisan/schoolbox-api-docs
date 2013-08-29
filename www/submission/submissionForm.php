@@ -33,7 +33,6 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Course\TaskType;
 
 $mapper = new SubmissionBoxMapper();
 

@@ -11,7 +11,6 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Course\TaskType;
 use Schoolbox\Resource\CategoryMapper;
 
 $page = new SitePage();

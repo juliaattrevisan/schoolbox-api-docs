@@ -13,7 +13,6 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Course\TaskType;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
