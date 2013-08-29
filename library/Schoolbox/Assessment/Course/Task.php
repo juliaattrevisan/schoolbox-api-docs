@@ -48,6 +48,11 @@ class Task implements ISoftDeletable {
     protected $requires_confirmation;
 
     /**
+     * @var int
+     */
+    protected $order;
+
+    /**
      * @var User
      */
     protected $owner;
@@ -198,6 +203,22 @@ class Task implements ISoftDeletable {
      */
     public function getRequiresConfirmation() {
         return $this->requires_confirmation;
+    }
+
+    /**
+     * @param  int   $order
+     * @return $this
+     */
+    public function setOrder($order) {
+        $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrder() {
+        return $this->order;
     }
 
     /**

@@ -64,6 +64,11 @@ class TaskMapper extends Mapper {
             'join'       => 'owner',
         ));
         $this->hasMap(array(
+            'column'     => 'order',
+            'property'   => 'order',
+            'type'       => self::TYPE_INTEGER,
+        ));
+        $this->hasMap(array(
             'column'     => 'created_at',
             'property'   => 'created',
             'type'       => self::TYPE_DATETIME,
@@ -97,6 +102,7 @@ class TaskMapper extends Mapper {
         ));
 
         $this->hasSoftDeleteDateField('deleted_at');
+        $this->registerCallback('preSave', array($this, 'preSave'));
     }
 
     /**
@@ -172,11 +178,31 @@ class TaskMapper extends Mapper {
         if (!$deleted) {
             $query .= ' AND '.$this->getSoftDeleteFilterSql('t');
         }
-        $query .= ' ORDER BY t.title ASC';
+        $query .= ' ORDER BY t.order ASC, t.title ASC';
 
         $statement = $this->database->prepare($query);
         $cat_id    = ($category instanceof Category) ? $category->getId() : $category;
         $statement->execute(array($cat_id));
         return $this->hydrateList($statement, 't', array($this, 'baseHydrateCallback'));
+    }
+
+    /**
+     * Pre-save method: if this doesn't have an order, sets it to whatever the
+     * highest order for this category is, +1 (so it shows as the last item in
+     * the list)
+     *
+     * @param  Task $object
+     * @return bool Always true
+     */
+    public function preSave(Task $object) {
+        if (!$object->getOrder()) {
+            $statement = $this->database->prepare(
+                "SELECT COALESCE(MAX(`order`), -1) FROM `{$this->getTable()}` WHERE `category_id` = :cat_id"
+            );
+            $statement->bindValue('cat_id', $object->getCategory()->getId(), \PDO::PARAM_INT);
+            $statement->execute();
+            $object->setOrder(intval($statement->fetchColumn())+1);
+        }
+        return true;
     }
 }
