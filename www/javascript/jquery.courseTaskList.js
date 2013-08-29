@@ -44,7 +44,9 @@
                 // Calculate ordering of all items
                 var form   = component.find('form.reorder_form');
                 var params = form.serializeArray();
-                task_list.find('.task').each(function() {
+                task_list.find('.task').each(function(index) {
+                    // Switch dark on/off
+                    $(this).toggleClass('dark', (index % 2 === 1));
                     params.push({name: 'id[]', value: $(this).data('task_id')});
                 });
                 $.post(form.attr('action'), params, reloadTaskList, 'json');
