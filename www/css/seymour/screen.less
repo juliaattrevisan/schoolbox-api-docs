@@ -178,25 +178,26 @@ body{
     margin: 0 auto -80px;
 }
 h2,.calendar-controls{color:#fff; background:#002c76;}
-.calendar-controls h3{color:#fff;}
+.box h2 a, .calendar-controls h3{color:#fff;}
 h2 a:hover{ color: #006C56; }
-h3 a{ color: #002c76; }
+h3 a { color: #002c76;}
 a{color:#0054d3;}
 a:hover{color:#002c76;}
 #header,
-body.login #header{
+.login #header{
     height:108px;
     background: url('/images/seymour/header-bg.png') top left;
+
+	.logo{
+		padding: 0;
+		width: 193px;
+		height: 63px;
+		left: 22px;
+		top: 22px;
+	}
 }
 .login #container {
-    padding: 15px 0 0 37px;
-}
-#header .logo{
-    padding: 0;
-    width: 193px;
-    height: 63px;
-    left: 22px;
-    top: 22px;
+	padding: 15px 0 0 37px;
 }
 #slogan {
 	position: absolute;
@@ -327,7 +328,9 @@ body.login #header{
 #tabs-sub .ui-tabs-nav li a {
     background:#fcfbf2;
 }
-#nav ul li a:hover, #nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
+#nav li.hover > a,
+#nav ul li a:hover,
+#nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
     background-color: #f1f1f1;
     color: #006C56;
 }
