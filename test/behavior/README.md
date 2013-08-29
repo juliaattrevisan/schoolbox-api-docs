@@ -16,3 +16,11 @@ The Selenium driver is also capable of driving the PhantomJS headless browser
 for CI testing, as it's able to be run from a command line without a window
 system, and supports JavaScript fully unlike other headless browser
 implementations.
+
+## Running behavioural tests
+
+If using the Selenium Server, start it with the command: `java -jar /path/to/selenium-server-standalone-x.y.z.jar`.
+It's currently set up to run Firefox only.
+
+If using the PhantomJS headless browser, start it with the command: `/path/to/phantomjs-dir/bin/phantomjs --webdriver=4444`
+
