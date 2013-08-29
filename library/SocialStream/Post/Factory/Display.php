@@ -36,10 +36,31 @@ class Display extends AbstractFactory {
 			 */
 			foreach ($this->getVideoSites() as $currentPattern) {
 				if (preg_match($currentPattern, $this->getUrl())) {
-					$object = new \SocialStream_Post_Video();
-					$object->setType('video');
 
-					return $object;
+					/* If it was a Resource url, find out whether it was
+					 * actually a video or not -_-
+					 */
+					$urlDetection = new \SocialStream\UrlDetection($this->getUrl());
+
+					if ($urlDetection->isResourceUrl()) {
+						$fileMapper = new \Schoolbox\Resource\FileMapper();
+						$file = $fileMapper->findById($urlDetection->getId());
+
+						if ($file->isVideo()) {
+							$object = new \SocialStream_Post_Video();
+							$object->setType('video');
+
+							return $object;
+						}
+					}
+					/* All other non-Resource urls
+					 */
+					else {
+						$object = new \SocialStream_Post_Video();
+						$object->setType('video');
+
+						return $object;
+					}
 				}
 			}
 
