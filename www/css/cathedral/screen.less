@@ -177,7 +177,7 @@ h2,.calendar-controls{color:#004b93; background:#ece1a6;}
 .calendar-controls h3 { color:#004b93;}
 a{color:#0076fa;}
 #header{height:144px;}
-#header .logo{padding:0; width:756px; height:112px; left:0;}
+#header .logo{padding:0; width:756px; height:112px;left:0; }
 #header .competition{padding-left:456px; display:block; width:118px;}
 #header #tabs li.navthis a{color:#054b93; }
 #header #tabs li a{color:#fff;}
@@ -202,8 +202,10 @@ a{color:#0076fa;}
 	background:#fcfbf2;
 }
 
-#nav li a:hover, #nav li li a:hover, #category li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
-    background-color: #c9a900;
+#nav li.hover > a,
+#nav ul li a:hover,
+#nav li li a:hover, #category li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
+    background: #c9a900;
     color: #ffffff;
 }
 

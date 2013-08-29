@@ -459,7 +459,7 @@ Notifications
  HEADER
 --------------------------------------------------------------*/
 #header, .login #header{
-	background: @banner-background;
+	background-color: @banner-background;
 	height: auto; min-height: @banner-height;
 	width: 100%; min-width: 768px;
 	position: relative;
@@ -545,11 +545,11 @@ Notifications
         &.first a {
             margin-right: 10px
         }
-		a {
-			color: @banner-links;
-			text-decoration: underline;
-		}
     }
+	a {
+		color: @banner-links;
+		text-decoration: underline;
+	}
 	img { 	margin-top: -14px; }
 }
 
@@ -744,12 +744,9 @@ Notifications
     float: right;
 }
 
-.template2 .left {
-    width: 49.5%;
-}
-
-.template2 .right {
-    width: 49.5%;
+.template2 {
+	.left 		{ width: 49.5%; }
+	.right 		{ width: 49.5%;}
 }
 
 .template3 {
@@ -761,12 +758,9 @@ Notifications
   }
 }
 
-.template4 .right {
-    width: 49.5%;
-}
-
-.template4 .left {
-    width: 49.5%;
+.template4 {
+	.left 		{ width: 49.5%; }
+	.right 		{ width: 49.5%; }
 }
 
 /*--------------------------------------------------------------
@@ -899,17 +893,15 @@ Notifications
             background: @dark;
         }
     }
-
 }
 
 .dark {
     background: @dark;
-}
-
-.dark td {
-    background: @dark;
-    zoom: 1;
-    min-height: 1px;
+	td {
+		background: @dark;
+		zoom: 1;
+		min-height: 1px;
+	}
 }
 
 /*--------------------------------------------------------------
@@ -954,119 +946,97 @@ Notifications
 	.news-list p { clear: right; }
 }
 
-/* This needs to get refactored into core.css and core.less in some way.
- *
- * These styles are used in homepage components Group Members, Group Managers, Class Students, Class Teachers
- * to represent members with their respective portraits.
+/*
+ * Listing
  */
 
 .listing {
     overflow: hidden;
-}
+	.button {
+		display: block;
+		margin: 0;
+		background: @white;
+		&:hover {
+			text-decoration: none;
+			background-color: lighten(@positive-color,@lighten-value);
+		}
+		span {
+			display: block;
+		}
+		.name {
+			color: @black;
+			em {
+				font-style: normal;
+				color: @dgrey;
+			}
+		}
+		.group {
+			color: @dgrey;
+		}
+		.prog {
+			height: 2px;
+			.gradient(lighten(@neutral-color,@lighten-value),@neutral-color);
+			border: solid 1px @neutral-color;
+			margin: 6px 0 0 0;
+		}
+		&.thumb {
+			width: 64px;
+			float: left;
+			margin: 0;
+			border-top: solid 1px @lgrey;
+			border-left: solid 1px @lgrey;
+			position: relative;
+			top: -1px;
+			left: -1px;
+			padding: 5px;
+			img {
+				width: 64px;
+				height: 64px;
+				margin: 0;
+			}
+			.name {
+				margin-left: 1px;
+				@white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.group {
+				margin: 1px;
+				@white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+		&.bar {
+			padding: 4px;
+			border-bottom: solid 1px @lgrey;
+			.name {
+				margin-left: 0px;
+			}
 
-/* COMMON TO ALL BUTTON TYPES */
-.listing .button {
-    display: block;
-    margin: 0;
-    background: @white;
+			.name.single {
+				height: 30px;
+				line-height: 32px;
+			}
+			.group {
+				margin: 2px 0 0 0px;
+			}
+			&:before {
+				content: "\203a";
+				float: right;
+				line-height: 14px;
+				margin-right: 24px;
+				font-size: 24px;
+			}
+			img {
+				float: left;
+				width: 32px;
+				height: 32px;
+				border: none;
+			}
+		}
+	}
 }
-
-.listing .button:hover {
-    text-decoration: none;
-    background-color: lighten(@positive-color,@lighten-value);
-}
-
-.listing .button span {
-    display: block;
-}
-
-.listing .button .name {
-    color: @black;
-}
-
-.listing .button .name em {
-    font-style: normal;
-    color: @dgrey;
-}
-
-.listing .button .group {
-    color: @dgrey;
-}
-
-.listing .button .prog {
-    height: 2px;
-	.gradient(lighten(@neutral-color,@lighten-value),@neutral-color);
-    border: solid 1px @neutral-color;
-    margin: 6px 0 0 0;
-}
-
-/* BUTTON THUMB */
-.listing .button.thumb {
-    width: 64px;
-    float: left;
-    margin: 0;
-    border-top: solid 1px @lgrey;
-    border-left: solid 1px @lgrey;
-    position: relative;
-    top: -1px;
-    left: -1px;
-    padding: 5px;
-}
-
-.listing .button.thumb img {
-    width: 64px;
-    height: 64px;
-    margin: 0;
-}
-
-.listing .button.thumb .name {
-    margin-left: 1px;
-    @white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.listing .button.thumb .group {
-    margin: 1px;
-    @white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* BUTTON BAR */
-.listing .button.bar {
-    padding: 4px;
-    border-bottom: solid 1px @lgrey;
-}
-
-.listing .button.bar .name {
-    margin-left: 0px;
-}
-
-.listing .button.bar .name.single {
-    height: 30px;
-    line-height: 32px;
-}
-
-.listing .button.bar .group {
-    margin: 2px 0 0 0px;
-}
-
-.listing .button.bar:before {
-    content: "\203a";
-    float: right;
-    line-height: 14px;
-    margin-right: 24px;
-    font-size: 24px;
-}
-
-.listing .button.bar img {
-    float: left;
-    width: 32px;
-    height: 32px;
-    border: none;
-}
-
 
 /*--------------------------------------------------------------
  PROFILES
@@ -1267,7 +1237,7 @@ Notifications
   padding: 10px;
   span{
     padding: 0 0 0 5px;
-    color:red;
+    color:darken(@negative-color, @darken-value);
     font-weight:bold;
   }
 }
@@ -1391,7 +1361,8 @@ Notifications
     }
 }
 
-.editPanel form div { .config-inline;
+.editPanel form div {
+	.config-inline;
 }
 
 .box {
@@ -1462,7 +1433,6 @@ Notifications
 				white-space: normal;
 			}
 		}
-
     }
 
     .editPanelImitation {
@@ -1492,7 +1462,6 @@ Notifications
         &.image-height {
             min-height: 53px;
         }
-
         .student-name {
             display: block;
             font-weight: bold;
@@ -1755,6 +1724,33 @@ input.timeField {
     overflow: visible;
     margin-top: 4px;
     font-family: Arial, Helvetica, sans-serif;
+	&.no-marg {
+		margin: 0 8px 0 0;
+	}
+
+	&.no-icon {
+		padding: 0 16px;
+	}
+
+	&.marg {
+		margin: 4px;
+	}
+
+	&.margin-left-right {
+		margin: 0 8px;
+	}
+	&.in-heading-absolute {
+		position: absolute;
+		float: none;
+		top: 0;
+		right: 0;
+		margin: 0;
+	}
+	&.inline {
+		width: auto;
+		float: none;
+		display: inline;
+	}
 }
 
 .submit-btn-plain {
@@ -1772,7 +1768,6 @@ input.timeField {
 	font-weight:normal;
 	text-shadow:none;
 	filter: none;
-
     &:hover {
 		background: lighten(@banner-background,10%);
 		border: 0;
@@ -1780,55 +1775,19 @@ input.timeField {
 		cursor: pointer;
 		text-shadow:none;
 		filter: none;
+	}
+	&.float-remove {
+		float: none;
+	}
 
+	&.float-right {
+		float: right
 	}
 }
-
-.submit-btn-plain.no-marg {
-    margin: 0 8px 0 0;
-}
-
-.btn.no-icon {
-    padding: 0 16px;
-}
-
-.btn.no-marg {
-    margin: 0 8px 0 0;
-}
-
-.btn.marg {
-    margin: 4px;
-}
-
-.btn.margin-left-right {
-    margin: 0 8px;
-}
-
 .btn.float-left, .submit-btn-plain {
     float: left;
     margin-left: 0;
     margin-right: 12px;
-}
-
-.btn.in-heading-absolute {
-    position: absolute;
-    float: none;
-    top: 0;
-    right: 0;
-    margin: 0;
-}
-.btn.inline {
-	width: auto;
-	float: none;
-	display: inline;
-}
-
-.submit-btn-plain.float-remove {
-    float: none;
-}
-
-.submit-btn-plain.float-right {
-    float: right
 }
 
 .btn {
@@ -2442,55 +2401,49 @@ ADMIN BODY
 .parent-level .jstree-schoolbox a,
 .parent-level .jstree-schoolbox .jstree-leaf a {
     background: @std-grey;
-}
-
-.parent-level .jstree-schoolbox a.active,
-.parent-level .jstree-schoolbox .jstree-leaf a.active {
-    background: @positive-color
+	&.active {
+		background: @positive-color
+	}
 }
 
 .level table {
     width: 100%;
-}
-
-.level table td, .level table th {
-    padding: 0 8px 0 0;
-}
-
-.level table td.colours-buttons {
-    padding: 16px;
-}
-
-.level table thead td {
-    font-weight: bold;
+	td, th {
+		padding: 0 8px 0 0;
+		&.colours-buttons {
+			padding: 16px;
+		}
+	}
+	td {
+		font-weight: bold;
+	}
 }
 
 .sortable {
     padding: 16px;
     margin: 0;
-}
+	li {
+		div {
+			margin-bottom: 8px;
+			height: 32px;
+			line-height: 32px;
+			padding: 0 16px;
+			background: @neutral-color;
+			font-weight: bold;
+		}
+		li {
+			margin-left: 32px;
+			div {
+				background: @module-background;
+				font-weight: normal;
+			}
+		}
 
-.sortable li li {
-    margin-left: 32px;
-}
-
-.sortable li div {
-    margin-bottom: 8px;
-    height: 32px;
-    line-height: 32px;
-    padding: 0 16px;
-    background: @neutral-color;
-    font-weight: bold;
-}
-
-.sortable li li div {
-    background: @module-background;
-    font-weight: normal;
-}
-
-.sortable .placeholder {
-    border: 3px dotted @highlight-color;
-    margin: 16px 0;
+	}
+	.placeholder {
+		border: 3px dotted @highlight-color;
+		margin: 16px 0;
+	}
 }
 
 .row-holder {
@@ -2526,23 +2479,17 @@ ADMIN BODY
 
 .enabled {
     width: 8%;
+	img {
+		position: absolute;
+		top: 4px;
+		right: 0;
+	}
+	button img {
+		position: relative;
+		top: 0;
+	}
 }
 
-.enabled img {
-    position: absolute;
-    top: 4px;
-    right: 0;
-}
-
-.enabled button img {
-    position: relative;
-    top: 0;
-}
-
-.enabled button img {
-    position: relative;
-    top: 0;
-}
 
 .description {
     width: 19%;
@@ -2564,20 +2511,23 @@ ADMIN BODY
     width: 20%;
 }
 
-.allowed-files td {
-    padding: 7px 0 7px 16px;
+.allowed-files {
+	td {
+		padding: 7px 0 7px 16px;
+	}
+	.text-input {
+		width: 95%;
+	}
+	.textarea {
+		min-height: 32px;
+	}
+	tr.add-new td {
+		background: @alternate-background;
+	}
 }
 
 .allowed-files, .row, .row form {
     width: 100%;
-}
-
-.allowed-files .text-input {
-    width: 95%;
-}
-
-.allowed-files .textarea {
-    min-height: 32px;
 }
 
 .allowed-files h3, .bulk-users h3 {
@@ -2587,10 +2537,6 @@ ADMIN BODY
 
 .bulk-users h3 em {
     display: none;
-}
-
-.allowed-files tr.add-new td {
-    background: @alternate-background;
 }
 
 .settings-nav-holder, .admin-contents .settings {
@@ -2621,96 +2567,84 @@ ADMIN BODY
     border: 1px solid darken(@alternate-background, @darken-value);
     color: @link;
     background: @alternate-background;
-}
-
-.settings-nav li a.current {
-    background: darken(@alternate-background, @darken-value);
-    color: @link;
-    font-weight: bold;
-}
-
-.settings-nav li a.current span {
-    border-bottom: 8px solid transparent;
-    border-left: 8px solid darken(@alternate-background, @darken-value);
-    border-top: 8px solid transparent;
-    height: 0;
-    width: 0;
-    position: absolute;
-    right: -8px;
-    top: 4px;
+	&.current {
+    	background: darken(@alternate-background, @darken-value);
+    	color: @link;
+    	font-weight: bold;
+		span {
+			border-bottom: 8px solid transparent;
+			border-left: 8px solid darken(@alternate-background, @darken-value);
+			border-top: 8px solid transparent;
+			height: 0;
+			width: 0;
+			position: absolute;
+			right: -8px;
+			top: 4px;
+		}
+	}
 }
 
 .settings-nav li {
     margin-bottom: 4px;
 }
 
-.admin-form label {
-    clear: both;
-    width: 100%;
-    margin-bottom: 8px;
-    float: left;
-    color: @dgrey;
-    font-weight: bold;
-}
-
-.admin-form label.error {
-    margin: -8px 0 0 0;
-}
-
-.admin-form textarea {
-    width: 100%;
-}
-
-.admin-form label span.help {
-    background: darken(@alternate-background, @darken-value);
-    font-weight: normal;
-    font-size: 14px;
-    padding: 0 4px;
-    cursor: help;
-    margin: 0 8px;
-}
-
-.admin-form label input[type=text], .admin-form label input[type=password] {
-    width: 100%;
-    margin: 8px 0;
-    padding: 2px 0
-}
-
-.admin-form label {
-    margin: 8px 8px 8px 0;
-}
-
-.admin-form label input.datepicker {
-    width: 75%;
-}
-
-.admin-form label select {
-    margin: 8px 0;
-    width: 100%;
-}
-
-.admin-form label em {
-    display: none;
-}
-
-.admin-form fieldset label {
-    width: 50%;
-    font-weight: normal;
-    margin: 0;
-}
-
-.admin-form fieldset label input[type=checkbox] {
-    margin: 4px;
-}
-
-.admin-form label.preferred fieldset label {
-    width: 100%;
-}
-
-.admin-form label.preferred select {
-    width: 20%;
-    margin-right: 2%;
-    float: left;
+.admin-form {
+	label {
+		clear: both;
+		width: 100%;
+		margin: 8px 8px 8px 0;
+		float: left;
+		color: @dgrey;
+		font-weight: bold;
+		&.error {
+			margin: -8px 0 0 0;
+		}
+		span.help {
+			background: darken(@alternate-background, @darken-value);
+			font-weight: normal;
+			font-size: 14px;
+			padding: 0 4px;
+			cursor: help;
+			margin: 0 8px;
+		}
+		input[type=text],
+		input[type=password] {
+			width: 100%;
+			margin: 8px 0;
+			padding: 2px 0
+		}
+		input.datepicker {
+			width: 75%;
+		}
+		select {
+			margin: 8px 0;
+			width: 100%;
+		}
+		em {
+			display: none;
+		}
+		&.preferred {
+			fieldset label {
+				width: 100%;
+			}
+			select {
+				width: 20%;
+				margin-right: 2%;
+				float: left;
+			}
+		}
+	}
+	textarea {
+		width: 100%;
+	}
+	fieldset label {
+		width: 50%;
+		font-weight: normal;
+		margin: 0;
+		input[type=checkbox] {
+			margin: 4px;
+		}
+	}
 }
 
 .admin-form table {
@@ -2725,31 +2659,25 @@ ADMIN BODY
 .reveal-password {
     float: left;
     margin-top: 10px;
-}
-
-.reveal-password a {
-    display: block;
-    padding: 8px;
-    border: 1px solid @std-grey;
-}
-
-.reveal-password em {
-    font-size: 16px;
-    padding: 7px;
-    border: 1px solid @std-grey;
-    font-style: normal;
-    background: lighten(@positive-color,@lighten-value);
-}
-
-.reveal-password a.hide-pass {
-    border: 0;
-    padding: 0;
-}
-
-.reveal-password a.hide-pass {
-    text-align: center;
-    margin-top: 3px;
-    display: none;
+	a {
+		display: block;
+		padding: 8px;
+		border: 1px solid @std-grey;
+		&:hide-pass {
+			border: 0;
+			padding: 0;
+			text-align: center;
+			margin-top: 3px;
+			display: none;
+		}
+	}
+	em {
+		font-size: 16px;
+		padding: 7px;
+		border: 1px solid @std-grey;
+		font-style: normal;
+		background: lighten(@positive-color,@lighten-value);
+	}
 }
 
 .admin-contents .user {
@@ -2773,11 +2701,10 @@ ADMIN BODY
     border: 1px solid @dgrey;
     .gradient(@dark, darken(@dark,@darken-value));
     padding: 4px 4px 0 4px;
-}
-
-.new-button:hover {
-    cursor: pointer;
-	.gradient(darken(@dark,@darken-value), darken(@dark,@darken-value * 2));
+	&:hover {
+		cursor: pointer;
+		.gradient(darken(@dark,@darken-value), darken(@dark,@darken-value * 2));
+	}
 }
 
 .eventList h3 {
@@ -2923,13 +2850,17 @@ HOMEPAGE TEMPLATES
 	(~'#@{context}-layout') {
         float: right;
         width: 78%;
-        .component {   .component-draggable;
+        .component {
+			.component-draggable;
         }
-        .ui-sortable-helper {   .component-draggable;
+        .ui-sortable-helper {
+			.component-draggable;
         }
-        #position-left {   .layout-position;
+        #position-left {
+			.layout-position;
         }
-        #position-right {   .layout-position;
+        #position-right {
+			.layout-position;
             margin: 0;
             margin-left: 0.5%;
         }
@@ -2947,9 +2878,11 @@ HOMEPAGE TEMPLATES
             padding: 0;
             margin: 0;
         }
-        .delete-this {   .manage-button(13px);
+        .delete-this {
+			.manage-button(13px);
         }
-        .config-this {   .manage-button(38px);
+        .config-this {
+			.manage-button(38px);
         }
     }
     .editPanel {
@@ -3054,9 +2987,6 @@ EVALUATION
 }
 
 /****** ASSESS FORMS ********/
-.evaluation-content {
-}
-
 .evaluation-content .standardForm,
 .evaluation-content form,
 .evaluation-content.student-review .question,
@@ -6252,7 +6182,8 @@ p.forgotten {
         padding: 0 0 16px 0;
     }
 
-    input[type="text"], input[type="password"] {
+    input[type="text"],
+	input[type="password"] {
         width: 150px;
     }
 }
@@ -8306,7 +8237,12 @@ p.unmarkedResponses {
     }
 }
 
-input[type="text"], select, textarea {
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
     border: solid 1px @std-grey;
 }
 
