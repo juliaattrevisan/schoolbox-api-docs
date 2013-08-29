@@ -159,6 +159,8 @@ class Creational extends AbstractFactory {
 				$object->setType('video');
 
 				$this->setProduct($object);
+
+				return;
 			}
 		}
 
@@ -168,6 +170,8 @@ class Creational extends AbstractFactory {
 		$object->setType('url');
 
 		$this->setProduct($object);
+
+		return;
 	}
 
 	/**
@@ -180,17 +184,15 @@ class Creational extends AbstractFactory {
 		if ($resource->isVideo()) {
 			$object = new \SocialStream_Post_Video();
 			$object->setType('video');
-
-			$this->setProduct($object);
 		}
 		/* Other files
 		 */
 		else {
 			$object = new \SocialStream_Post_Url();
 			$object->setType('url');
-
-			$this->setProduct($object);
 		}
+
+		$this->setProduct($object);
 
 		return $resource;
 	}
@@ -211,10 +213,14 @@ class Creational extends AbstractFactory {
 		$fileMapper = new \Schoolbox\Resource\FileMapper();
 		$file = $fileMapper->findById($fileId);
 
-		/* TODO: Assume just ordinary files for now
-		 */
-		$object = new \SocialStream_Post_Url();
-		$object->setType('url');
+		if ($file->isVideo()) {
+			$object = new \SocialStream_Post_Video();
+			$object->setType('video');
+		}
+		else {
+			$object = new \SocialStream_Post_Url();
+			$object->setType('url');
+		}
 
 		$this->setProduct($object);
 
