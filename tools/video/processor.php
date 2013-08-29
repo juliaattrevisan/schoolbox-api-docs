@@ -23,8 +23,12 @@ if (!$lock->acquire()) {
 	// Check timeout: if any processing video has been processing for more than
 	// x minutes, then kill their process, mark as failed and start over.
 	// (Should never be more than one video processing at once (per server)).
-	$timeout = Config::get('video_processing_timeout');
-	if (($num_timed_out = $mapper->markAllProcessingAsTimedOut($timeout)) > 0) {
+	$timeout = intval(Config::get('video_processing_timeout'));
+	if ($timeout <= 0) {
+		echo strftime("[%F %T] Timeout of video processing is disabled.\n");
+		exit;
+	}
+	elseif (($num_timed_out = $mapper->markAllProcessingAsTimedOut($timeout)) > 0) {
 		echo strftime("[%F %T] Processing of $num_timed_out video(s) has timed out - marking these as failed, and continuing.\n");
 		$lock->killProcess();
 		$lock->acquire();
