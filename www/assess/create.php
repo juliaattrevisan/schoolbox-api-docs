@@ -50,7 +50,6 @@ if (!empty($_POST)) {
         $task
             ->setCategory($_POST['category_id'])
             ->setOwner($_SESSION['id'])
-            ->setType(TaskType::TYPE_ONLINE_ASSESS)
             ->setTitle($_POST['task_title']);
         TaskMapper::getInstance()->save($task);
         $assessment->setTask($task);
