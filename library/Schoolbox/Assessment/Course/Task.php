@@ -29,11 +29,6 @@ class Task implements ISoftDeletable {
     protected $category;
 
     /**
-     * @var TaskType
-     */
-    protected $type;
-
-    /**
      * @var string
      */
     protected $title;
@@ -178,22 +173,6 @@ class Task implements ISoftDeletable {
      */
     public function getLink() {
         return $this->link;
-    }
-
-    /**
-     * @param  TaskType $type
-     * @return $this
-     */
-    public function setType($type) {
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * @return TaskType
-     */
-    public function getType() {
-        return $this->type;
     }
 
     /**
