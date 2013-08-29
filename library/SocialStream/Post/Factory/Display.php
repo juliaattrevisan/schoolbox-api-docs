@@ -54,7 +54,7 @@ class Display extends AbstractFactory {
 		/* If it was not a video, link to the internet, then assume it's
 		 * just a plain old text message
 		 */
-		$object = new \SocialStream_Post_Url();
+		$object = new \SocialStream_Post_String();
 		$object->setType('string');
 
 		return $object;
