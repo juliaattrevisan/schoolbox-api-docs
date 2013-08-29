@@ -428,40 +428,35 @@ class Creational extends AbstractFactory {
 	 */
 	private function spawnThumbnailFromResource($file) {
 
-//		/* Set up video thumbnails
-//		 */
-//		if ($file->isVideo()) {
-//		}
-//		/* Set up image thumbnails
-//		 */
-//		else if ($file->isImage()) {
-//			$url = "/send.php?id={$file->getId()}";
-//
-//			$this->getProduct()->setThumbnail($url);
-//			$this->getProduct()->setUrl($url);
-//
-//			/* Save the original in the cache location
-//			 */
-//			$originalThumbnailCache = new \SocialStream\Cache\Original();
-//			$originalThumbnailCache->init($url);
-//		}
-//		/* Set up icon thumbnails
-//		 */
-//		else {
-//			$url = "/send.php?id={$file->getId()}";
-//			$this->getProduct()->setUrl($url);
-//
-//			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
-//			$this->getProduct()->setThumbnail($chain->getResult());
-//		}
-
-		/* Force icon representation for now
+		/* Set up video thumbnails
 		 */
-		$url = "/send.php?id={$file->getId()}&save=1";
-		$this->getProduct()->setUrl($url);
+		if ($file->isVideo()) {
+		}
+		/* Set up image thumbnails
+		 */
+		else if ($file->isImage()) {
+			$url = "/send.php?id={$file->getId()}";
 
-		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
-		$this->getProduct()->setThumbnail($chain->getResult());
+			$this->getProduct()->setThumbnail($url);
+			$this->getProduct()->setUrl($url);
+		}
+		/* Set up icon thumbnails
+		 */
+		else {
+			$url = "/send.php?id={$file->getId()}";
+			$this->getProduct()->setUrl($url);
+
+			$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
+			$this->getProduct()->setThumbnail($chain->getResult());
+		}
+
+//		/* Force icon representation for now
+//		 */
+//		$url = "/send.php?id={$file->getId()}&save=1";
+//		$this->getProduct()->setUrl($url);
+//
+//		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
+//		$this->getProduct()->setThumbnail($chain->getResult());
 	}
 
 	/* Getters/Setters
