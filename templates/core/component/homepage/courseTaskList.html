@@ -29,7 +29,7 @@
         </dl>
         <ul class="task-list">
             <!-- BEGIN task -->
-            <li class="task interact {DARK}">
+            <li class="task interact {DARK}" data-task_id="{TASK_ID}">
                 <span class="icon {TASK_CLASS}" title="{TASK_TYPE_LABEL}"><span></span></span>
                 <h3>{TASK_TITLE}</h3>
                 <!-- BEGIN edit_task -->
@@ -151,6 +151,15 @@
         <p class="interact">
             <a href="/submission/createSubmission/new/{ID}/task" class="btn up-arrow"><span></span>Create Due Work Task</a>
         </p>
+    </div>
+
+    <!-- Form for reodering tasks -->
+    <div class="reorder_form hide">
+        <form action="/task/saveForm.php" method="post" class="reorder_form">
+            <input type="hidden" name="action"    value="reorder"/>
+            <input type="hidden" name="category"  value="{ID}"/>
+            <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+        </form>
     </div>
 
     <!-- Dialog for file browser -->

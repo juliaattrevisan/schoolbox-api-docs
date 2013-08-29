@@ -22,10 +22,35 @@
             var container = form.closest('.edit_task_form_container, .create_task_form_container, .delete_task_form_container');
             container.slideUp('fast', function() {
                 // reload all tasks too.
-                var new_tasks = $(data.html).find('.task-list');
-                component.find('.task-list').replaceWith(new_tasks);
+                reloadTaskList(data);
             });
         }
+
+        // Reloads the task list, setting up drag/drop again too.
+        var reloadTaskList = function(data) {
+            var new_tasks = $(data.html).find('.task-list');
+            component.find('.task-list').replaceWith(new_tasks);
+            initTaskList();
+        }
+
+        // Initialises the task list, setting up drag/drop as well.
+        var initTaskList = function() {
+            var task_list = component.find('.task-list');
+            task_list.sortable({
+                handle: '.icon',
+                cursor: 'move'
+            });
+            task_list.bind('sortstop', function(event, ui) {
+                // Calculate ordering of all items
+                var form   = component.find('form.reorder_form');
+                var params = form.serializeArray();
+                task_list.find('.task').each(function() {
+                    params.push({name: 'id[]', value: $(this).data('task_id')});
+                });
+                $.post(form.attr('action'), params, reloadTaskList, 'json');
+            })
+        };
+        initTaskList();
 
         // Upload button for link items
         component.find('form a[data-function="upload"]').bind('click.courseTaskList', function(event) {

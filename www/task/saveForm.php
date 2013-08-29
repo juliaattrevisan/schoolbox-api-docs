@@ -15,40 +15,54 @@ use Schoolbox\Resource\CategoryMapper;
 
 $page = new SitePage();
 
-$task_id = $_POST['id'];
-if ($task_id) {
-    $task = TaskMapper::getInstance()->findById($task_id);
-    $task
-        ->setTitle($_POST['title'])
-        ->setLink($_POST['link'])
-        ->setRequiresConfirmation($_POST['requires_confirmation'])
-    ;
-}
-else {
-    // Make the task and set various fields
-    $category_id = $_POST['category'];
-    $category    = CategoryMapper::getInstance()->findById($category_id);
-    $task        = new Task();
-    $task
-        ->setOwner($_SESSION['id'])
-        ->setTitle($_POST['title'])
-        ->setCategory($category)
-        ->setLink($_POST['link'])
-        ->setRequiresConfirmation($_POST['requires_confirmation'])
-    ;
-}
+$category_id = $_POST['category'];
 
 // Shitty permission handling
 $group = new Group();
-if ($group->getPermission($task->getCategory()->getId()) < WRITE_ACCESS) {
-    error(6);
-}
-
-if ($_POST['action'] === 'delete') {
-    TaskMapper::getInstance()->delete($task);
+$permission_denied = false;
+if ($group->getPermission($category_id) < WRITE_ACCESS) {
+    $permission_denied = true;
 }
 else {
-    TaskMapper::getInstance()->save($task);
+    if ($_POST['action'] === 'delete') {
+        $task        = TaskMapper::getInstance()->findById($_POST['id']);
+        $category_id = $task->getCategory()->getId();
+        TaskMapper::getInstance()->delete($task);
+    }
+    elseif ($_POST['action'] === 'reorder') {
+        $i = 1;
+        foreach ($_POST['id'] as $id) {
+            $task = TaskMapper::getInstance()->findById($id);
+            $task->setOrder($i++);
+            TaskMapper::getInstance()->save($task);
+        }
+    }
+    else {
+        $task_id = $_POST['id'];
+        if ($task_id) {
+            $task = TaskMapper::getInstance()->findById($task_id);
+            $task
+                ->setTitle($_POST['title'])
+                ->setLink($_POST['link'])
+                ->setRequiresConfirmation($_POST['requires_confirmation'])
+            ;
+            $category_id = $task->getCategory()->getId();
+        }
+        else {
+            // Make the task and set various fields
+            $category_id = $_POST['category'];
+            $category    = CategoryMapper::getInstance()->findById($category_id);
+            $task        = new Task();
+            $task
+                ->setOwner($_SESSION['id'])
+                ->setTitle($_POST['title'])
+                ->setCategory($category)
+                ->setLink($_POST['link'])
+                ->setRequiresConfirmation($_POST['requires_confirmation'])
+            ;
+        }
+        TaskMapper::getInstance()->save($task);
+    }
 }
 
 // Redirect: depends on request type.
@@ -61,41 +75,49 @@ if ($page->detectAjax()) {
         'message' => 'Unknown Error',
         'html'    => '',
     );
+    if ($permission_denied) {
+        $result['error']   = 403;
+        $result['message'] = 'Permission Denied';
+    }
+    else {
+        // Load the component that this task was added to.
+        /** @var Component_Instance[] $component_list */
+        $component_id   = $_POST['component'];
+        $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
+        $component      = $component_list[$component_id];
 
-    // Load the component that this task was added to.
-    /** @var Component_Instance[] $component_list */
-    $component_id   = $_POST['component'];
-    $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
-    $component      = $component_list[$component_id];
+        if ($component instanceof Component_Instance) {
+            // Dump out template contents
+            $chf = new Component_Homepage_Factory(new User(), new SitePage(false));
 
-    if ($component instanceof Component_Instance) {
-        // Dump out template contents
-        $chf = new Component_Homepage_Factory(new User(), new SitePage(false));
+            /** @var Component_Homepage_CourseTaskListController $controller */
+            $controller = $chf->buildComponent($component);
+            $controller->setup(
+                array('id' => $category_id),
+                $controller->getInstance()->getConfigArray()
+            );
 
-        /** @var Component_Homepage_CourseTaskListController $controller */
-        $controller = $chf->buildComponent($component);
-        $controller->setup(
-            array('id' => $task->getCategory()->getId()),
-            $controller->getInstance()->getConfigArray()
-        );
+            $target = "component_position_{$controller->getInstance()->getPosition()}";
+            $handle = TEMPLATE_content;
 
-        $target = "component_position_{$controller->getInstance()->getPosition()}";
-        $handle = TEMPLATE_content;
-
-        if ($controller->execute() !== false) {
-            if ($controller->renderTemplate($handle) !== false) {
-                $controller->parse($target, $handle, true);
+            if ($controller->execute() !== false) {
+                if ($controller->renderTemplate($handle) !== false) {
+                    $controller->parse($target, $handle, true);
+                }
             }
+            $result['success'] = true;
+            $result['error']   = 200;
+            $result['message'] = 'OK';
+            $result['html']    = $controller->getPageTemplate()->parse($target, $handle);
         }
-        $result['success'] = true;
-        $result['error']   = 200;
-        $result['message'] = 'OK';
-        $result['html']    = $controller->getPageTemplate()->parse($target, $handle);
     }
 
     echo json_encode($result);
     exit;
 }
 else {
-    $page->localRedir("/homepage/{$task->getCategory()->getId()}/");
+    if ($permission_denied) {
+        error(6);
+    }
+    $page->localRedir("/homepage/$category_id/");
 }
