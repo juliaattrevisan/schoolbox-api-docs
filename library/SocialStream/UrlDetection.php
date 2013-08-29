@@ -48,16 +48,32 @@ class UrlDetection {
 	}
 
 	/**
-	 * Get the hash value out of the url, if provided
+	 * Get the id value out of the given url, if provided
 	 */
-	public function getHash() {
+	public function getParameter($parameter) {
 		$bits = parse_url($this->getUrl());
 		$query = $bits['query'];
 
 		parse_str($query, $values);
-		$hash = $values['hash'];
+		$val = $values[$parameter];
 
-		return $hash;
+		return $val;
+	}
+
+	/**
+	 * Get the id value out of the provided url
+	 *
+	 * @return mixed
+	 */
+	public function getId() {
+		return $this->getParameter('id');
+	}
+
+	/**
+	 * Get the hash value out of the provided url
+	 */
+	public function getHash() {
+		return $this->getParameter('hash');
 	}
 
 	/**
