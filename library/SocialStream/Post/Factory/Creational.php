@@ -32,6 +32,26 @@ class Creational extends AbstractFactory {
 	private $product = null;
 
 	/**
+	 * Urls used by Storage
+	 *
+	 * @var array
+	 */
+	private $storagePatterns = array(
+		'#^/cms/sendVideo\.php\?#',
+		'#^/storage/fetch\.php\?#',
+		'#^/storage/image\.php\?#',
+	);
+
+	/**
+	 * Urls used by the resource browser
+	 *
+	 * @var array
+	 */
+	private $resourcePatterns = array(
+		'#^/send\.php\?#',
+	);
+
+	/**
 	 * Constructor
 	 *
 	 * @param $type
@@ -40,6 +60,54 @@ class Creational extends AbstractFactory {
 	public function __construct($type, $url) {
 		$this->setType($type);
 		$this->setUrl(trim($url));
+	}
+
+	/**
+	 * Bypass caching for local urls
+	 *
+	 * @return bool
+	 */
+	private function isLocalUrl() {
+
+		/* A list of local streaming urls which are used to
+		 * bypass caching for Upload and Resource attachments
+		 */
+		$allPatterns = array_merge(
+			$this->getStoragePatterns(),
+			$this->getResourcePatterns()
+		);
+
+		foreach($allPatterns as $currentPattern) {
+			if (preg_match($currentPattern, $this->getUrl())) {
+				return true;
+			}
+		}
+	}
+
+	/**
+	 * Bypass caching for local urls
+	 *
+	 * @return bool
+	 */
+	private function isStorageUrl() {
+		foreach($this->getStoragePatterns() as $currentPattern) {
+			if (preg_match($currentPattern, $this->getUrl())) {
+				return true;
+			}
+		}
+	}
+
+	/**
+	 * Bypass caching for local urls
+	 *
+	 * @return bool
+	 */
+	private function isResourceUrl() {
+		foreach($this->getResourcePatterns() as $currentPattern) {
+			if (preg_match($currentPattern, $this->getUrl())) {
+				return true;
+			}
+		}
 	}
 
 	/**
@@ -52,17 +120,80 @@ class Creational extends AbstractFactory {
 	 */
 	public function produce($data) {
 
-		/* If the url option was chosen, try to curl metadata/thumbnails
-		 * but only if a url was provided
+		/* Treat local urls differently as they should bypass the caching
+		 * stuff entirely - this applies to the Resource browser mainly,
+		 * but also when people input a local url manually
 		 */
-		if (($this->getType() == 'url') && strlen($this->getUrl())) {
-			$this->constructFromLink();
-			$this->populate($data);
+		if ($this->isLocalUrl()) {
 
-			/* Find thumbnail from the given url in one of the many
-			 * ways that they can exist, if applicable
+			/* When a Resource url is provided
 			 */
-			if (strlen($this->getProduct()->getUrl())) {
+			if ($this->isResourceUrl()) {
+				$resource = $this->constructFromResource($this->getUrl());
+				$this->populate($data);
+
+				/* Spawn additional stuff
+				 */
+				$this->spawnMetadataFromResource($resource);
+				$this->spawnThumbnailFromResource($resource);
+			}
+			/* When a Storage url is provided, manufacture metadata and thumbnail
+			 * as if they had been uploaded
+			 */
+			else if ($this->isStorageUrl()) {
+
+				/* Detect file id
+				 * Get file resource
+				 * Ram it into this method
+				 */
+				$bits = parse_url($this->getUrl());
+				$query = $bits['query'];
+
+				parse_str($query, $values);
+				$hash = $values['hash'];
+
+				$fileMapper = new \Schoolbox\FileMapper();
+				$file = $fileMapper->findOneByColumn('hash', $hash);
+
+				$uploadedFile = $this->constructFromUpload($file);
+				$this->populate($data);
+
+				/* Spawn additional stuff
+				 */
+				$this->spawnMetadataFromUpload($uploadedFile);
+				$this->spawnThumbnailFromUpload($uploadedFile);
+			}
+		}
+		/* If upload option was chosen, extract metadata and thumbnail information
+		 * directly from already-known information (no curling needed)
+		 */
+		else if (($this->getType() == 'upload') && ($_FILES['file']['size'] > 0)) {
+			$fileArray = $_FILES['file'];
+
+			try {
+				$resource = \Schoolbox\FileMapper::getInstance()->upload($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
+
+				$uploadedFile = $this->constructFromUpload($resource);
+				$this->populate($data);
+
+				/* Spawn additional stuff
+				 */
+				$this->spawnMetadataFromUpload($uploadedFile);
+				$this->spawnThumbnailFromUpload($uploadedFile);
+			}
+			catch (Exception $ex) {
+			}
+		}
+		/* Try to process as a url instead
+		 */
+		else {
+			if (strlen($this->getUrl())) {
+				$this->constructFromUrl();
+				$this->populate($data);
+
+				/* Find thumbnail from the given url in one of the many
+				 * ways that they can exist, if applicable
+				 */
 				$curl = new \Alaress_Curl_Url($this->getProduct()->getUrl());
 				$curl->exec();
 
@@ -74,35 +205,12 @@ class Creational extends AbstractFactory {
 				$this->spawnMetadataFromCurl($curl);
 				$this->spawnThumbnailFromCurl($curl);
 			}
-		}
-		/* If upload option was chosen, extract metadata and thumbnail information
-		 * directly from already-known information (no curling needed)
-		 */
-		else if (($this->getType() == 'upload') && ($_FILES['file']['size'] > 0)) {
-			$uploadedFile = $this->constructFromUpload();
-			$this->populate($data);
-
-			/* Spawn additional stuff
+			/* Plain text messsage
 			 */
-			$this->spawnMetadataFromUpload($uploadedFile);
-			$this->spawnThumbnailFromUpload($uploadedFile);
-		}
-		/* If resource option was chosen,extract metadata and thumbnail information
-		 * directly from already-known information (no curling needed) but only if a
-		 * url was provided
-		 */
-		else if (($this->getType() == 'resource') && strlen($this->getUrl())) {
-			$resource = $this->constructFromResource($this->getUrl());
-			$this->populate($data);
-
-			/* Spawn additional stuff
-			 */
-			$this->spawnMetadataFromResource($resource);
-			$this->spawnThumbnailFromResource($resource);
-		}
-		else {
-			$this->setProduct($this->constructDefault());
-			$this->populate($data);
+			else {
+				$this->setProduct($this->constructDefault());
+				$this->populate($data);
+			}
 		}
 
 		return $this->getProduct();
@@ -111,43 +219,31 @@ class Creational extends AbstractFactory {
 	/**
 	 * Construct a post from a link by doing url analysis
 	 */
-	private function constructFromLink() {
+	private function constructFromUrl() {
 
-		/* If a url was provided, determine what kind it was
+		/* Figure out if it's a video
 		 */
-		if (strlen($this->getUrl())) {
+		foreach ($this->getVideoSites() as $currentPattern) {
+			if (preg_match($currentPattern, $this->getUrl())) {
+				$object = new \SocialStream_Post_Video();
+				$object->setType('video');
 
-			/* Figure out if it's a video
-			 */
-			foreach ($this->getVideoSites() as $currentPattern) {
-				if (preg_match($currentPattern, $this->getUrl())) {
-					$object = new \SocialStream_Post_Video();
-					$object->setType('video');
-
-					$this->setProduct($object);
-				}
+				$this->setProduct($object);
 			}
-
-			/* Alternatively it's just a link to the internet
-			 */
-			$object = new \SocialStream_Post_Url();
-			$object->setType('url');
-
-			$this->setProduct($object);
 		}
+
+		/* Alternatively it's just a link to the internet
+		 */
+		$object = new \SocialStream_Post_Url();
+		$object->setType('url');
+
+		$this->setProduct($object);
 	}
 
 	/**
 	 * Construct a post from a link by doing mimetype analysis
 	 */
-	private function constructFromUpload() {
-		$fileArray = $_FILES['file'];
-
-		try {
-			$resource = \Schoolbox\FileMapper::getInstance()->upload($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
-		}
-		catch (Exception $ex) {
-		}
+	private function constructFromUpload($resource) {
 
 		/* Figure out if it's a video
 		 */
@@ -406,4 +502,41 @@ class Creational extends AbstractFactory {
 	private function getProduct() {
 		return $this->product;
 	}
+
+	/**
+	 * Set resource patterns
+	 *
+	 * @param array $resourcePatterns
+	 */
+	private function setResourcePatterns($resourcePatterns) {
+		$this->resourcePatterns = $resourcePatterns;
+	}
+
+	/**
+	 * Get resource patterns
+	 *
+	 * @return array
+	 */
+	private function getResourcePatterns() {
+		return $this->resourcePatterns;
+	}
+
+	/**
+	 * Set storage patterns
+	 *
+	 * @param array $storagePatterns
+	 */
+	private function setStoragePatterns($storagePatterns) {
+		$this->storagePatterns = $storagePatterns;
+	}
+
+	/**
+	 * Get storage patterns
+	 *
+	 * @return array
+	 */
+	private function getStoragePatterns() {
+		return $this->storagePatterns;
+	}
+
 }
