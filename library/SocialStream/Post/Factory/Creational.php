@@ -32,24 +32,12 @@ class Creational extends AbstractFactory {
 	private $product = null;
 
 	/**
-	 * Urls used by Storage
+	 * This class knows how to figure out which urls
+	 * are Storage and Resource ones
 	 *
-	 * @var array
+	 * @var null
 	 */
-	private $storagePatterns = array(
-		'#^/cms/sendVideo\.php\?#',
-		'#^/storage/fetch\.php\?#',
-		'#^/storage/image\.php\?#',
-	);
-
-	/**
-	 * Urls used by the resource browser
-	 *
-	 * @var array
-	 */
-	private $resourcePatterns = array(
-		'#^/send\.php\?#',
-	);
+	private $urlDetection = null;
 
 	/**
 	 * Constructor
@@ -60,54 +48,7 @@ class Creational extends AbstractFactory {
 	public function __construct($type, $url) {
 		$this->setType($type);
 		$this->setUrl(trim($url));
-	}
-
-	/**
-	 * Bypass caching for local urls
-	 *
-	 * @return bool
-	 */
-	private function isLocalUrl() {
-
-		/* A list of local streaming urls which are used to
-		 * bypass caching for Upload and Resource attachments
-		 */
-		$allPatterns = array_merge(
-			$this->getStoragePatterns(),
-			$this->getResourcePatterns()
-		);
-
-		foreach($allPatterns as $currentPattern) {
-			if (preg_match($currentPattern, $this->getUrl())) {
-				return true;
-			}
-		}
-	}
-
-	/**
-	 * Bypass caching for local urls
-	 *
-	 * @return bool
-	 */
-	private function isStorageUrl() {
-		foreach($this->getStoragePatterns() as $currentPattern) {
-			if (preg_match($currentPattern, $this->getUrl())) {
-				return true;
-			}
-		}
-	}
-
-	/**
-	 * Bypass caching for local urls
-	 *
-	 * @return bool
-	 */
-	private function isResourceUrl() {
-		foreach($this->getResourcePatterns() as $currentPattern) {
-			if (preg_match($currentPattern, $this->getUrl())) {
-				return true;
-			}
-		}
+		$this->setUrlDetection(new \SocialStream\UrlDetection($url));
 	}
 
 	/**
@@ -124,11 +65,11 @@ class Creational extends AbstractFactory {
 		 * stuff entirely - this applies to the Resource browser mainly,
 		 * but also when people input a local url manually
 		 */
-		if ($this->isLocalUrl()) {
+		if ($this->getUrlDetection()->isLocalUrl()) {
 
 			/* When a Resource url is provided
 			 */
-			if ($this->isResourceUrl()) {
+			if ($this->getUrlDetection()->isResourceUrl()) {
 				$resource = $this->constructFromResource($this->getUrl());
 				$this->populate($data);
 
@@ -140,7 +81,7 @@ class Creational extends AbstractFactory {
 			/* When a Storage url is provided, manufacture metadata and thumbnail
 			 * as if they had been uploaded
 			 */
-			else if ($this->isStorageUrl()) {
+			else if ($this->getUrlDetection()->isStorageUrl()) {
 
 				/* Detect file id
 				 * Get file resource
@@ -439,6 +380,11 @@ class Creational extends AbstractFactory {
 
 			$this->getProduct()->setThumbnail($url);
 			$this->getProduct()->setUrl($url);
+
+			/* Save the original in the cache location
+ 			 */
+			$resourceThumbnailCache = new \SocialStream\Cache\Local();
+			$resourceThumbnailCache->init($url);
 		}
 		/* Set up icon thumbnails
 		 */
@@ -499,39 +445,21 @@ class Creational extends AbstractFactory {
 	}
 
 	/**
-	 * Set resource patterns
+	 * Set url detection
 	 *
-	 * @param array $resourcePatterns
+	 * @param null $urlDetection
 	 */
-	private function setResourcePatterns($resourcePatterns) {
-		$this->resourcePatterns = $resourcePatterns;
+	private function setUrlDetection($urlDetection) {
+		$this->urlDetection = $urlDetection;
 	}
 
 	/**
-	 * Get resource patterns
+	 * Get url detection
 	 *
-	 * @return array
+	 * @return null
 	 */
-	private function getResourcePatterns() {
-		return $this->resourcePatterns;
-	}
-
-	/**
-	 * Set storage patterns
-	 *
-	 * @param array $storagePatterns
-	 */
-	private function setStoragePatterns($storagePatterns) {
-		$this->storagePatterns = $storagePatterns;
-	}
-
-	/**
-	 * Get storage patterns
-	 *
-	 * @return array
-	 */
-	private function getStoragePatterns() {
-		return $this->storagePatterns;
+	private function getUrlDetection() {
+		return $this->urlDetection;
 	}
 
 }
