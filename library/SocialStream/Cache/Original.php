@@ -37,6 +37,10 @@ class Original extends \Alaress_Cache_Abstract {
 		$urlDetection = new \SocialStream\UrlDetection($this->getUrl());
 
 		/* Find what the file was called
+		 *
+		 * Resource files would normally be copied into the socialstream cache location
+		 * but to save space maybe we can redirect generateCachedFilename() instead,
+		 * so it reads directly from the original's location.
 		 */
 		if ($urlDetection->isResourceUrl()) {
 			return \Cfg::get('file_dir') . '/' . $urlDetection->getId() . '.dat';
@@ -62,11 +66,6 @@ class Original extends \Alaress_Cache_Abstract {
 				$url = "http://{$_SERVER['HTTP_HOST']}{$this->getUrl()}";
 				$this->processUrl($url);
 			}
-
-			/* Resource files would normally be copied into the socialstream cache location
-			 * but to save space maybe we can redirect generateCachedFilename() instead,
-			 * so it reads directly from the original's location.
-			 */
 		}
 		else {
 			$url = $this->getUrl();
