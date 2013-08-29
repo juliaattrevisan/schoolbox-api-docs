@@ -13,20 +13,14 @@
         <dt><label for="title">Task:</label></dt>
         <dd><input id="title" name="title" type="text" value="{TASK_TITLE}" /></dd>
 
-        <!-- BEGIN link_input -->
         <dt><label for="link">Link:</label></dt>
         <dd><input id="link" name="link" type="text" value="{TASK_LINK}" /></dd>
-        <!-- END link_input -->
 
-        <!-- BEGIN task_input -->
-        <dt>Assess method:</dt>
+        <dt><label for="requires_confirmation">Requires confirmation?</label></dt>
         <dd>
-            <input id="assess_method_self" type="radio" name="assess_method" value="self" {TASK_CHECK_ASSESS_SELF} />
-            <label for="assess_method_self">Self assessed</label>
-            <input id="assess_method_teacher" type="radio" name="assess_method" value="teacher" {TASK_CHECK_ASSESS_TEACHER} />
-            <label for="assess_method_teacher">Teacher only</label>
+            <input name="requires_confirmation" value="0" type="hidden" />
+            <input name="requires_confirmation" value="1" type="checkbox" id="requires_confirmation" {TASK_CONF_REQUIRED} />
         </dd>
-        <!-- END task_input -->
     </dl>
 
     <!-- BEGIN create_button -->
