@@ -16,13 +16,13 @@ $size = $_GET['size'];
 
 $post = PostMapper::getInstance()->findById($postId);
 
-$originalThumbnailCache = new Cache\Original();
-$originalThumbnailCache->init($post->getThumbnail());
+$cache = new Cache\Original();
+$cache->init($post->getThumbnail());
 
 /* Transform it to some arbitrary dimension for now
  * and borrow the Storage transformation definitions
  */
-$cache = new Cache\Filesystem($originalThumbnailCache->getCachedFile(), $size);
+$cache = new Cache\Filesystem($cache->getCachedFile(), $size);
 
 $processor = new \Alaress_Image_Processor_Standard($cache, new \Alaress_Image_Transformation_Storage());
 $processor->load()->stream();
