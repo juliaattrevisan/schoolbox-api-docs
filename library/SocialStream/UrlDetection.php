@@ -48,6 +48,19 @@ class UrlDetection {
 	}
 
 	/**
+	 * Get the hash value out of the url, if provided
+	 */
+	public function getHash() {
+		$bits = parse_url($this->getUrl());
+		$query = $bits['query'];
+
+		parse_str($query, $values);
+		$hash = $values['hash'];
+
+		return $hash;
+	}
+
+	/**
 	 * Bypass caching for local urls
 	 *
 	 * @return bool
