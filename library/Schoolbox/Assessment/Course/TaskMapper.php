@@ -41,6 +41,11 @@ class TaskMapper extends Mapper {
             'type'       => self::TYPE_STRING,
         ));
         $this->hasMap(array(
+            'column'     => 'requires_confirmation',
+            'property'   => 'requiresConfirmation',
+            'type'       => self::TYPE_BOOLEAN,
+        ));
+        $this->hasMap(array(
             'column'     => 'box_id',
             'property'   => 'submissionBox',
             'type'       => self::TYPE_MODEL,

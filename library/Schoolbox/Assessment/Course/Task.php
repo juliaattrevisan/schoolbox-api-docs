@@ -43,6 +43,11 @@ class Task implements ISoftDeletable {
     protected $link;
 
     /**
+     * @var bool
+     */
+    protected $requires_confirmation;
+
+    /**
      * @var User
      */
     protected $owner;
@@ -177,6 +182,22 @@ class Task implements ISoftDeletable {
      */
     public function getLink() {
         return $this->link;
+    }
+
+    /**
+     * @param  bool  $requires_confirmation
+     * @return $this
+     */
+    public function setRequiresConfirmation($requires_confirmation) {
+        $this->requires_confirmation = $requires_confirmation;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRequiresConfirmation() {
+        return $this->requires_confirmation;
     }
 
     /**
