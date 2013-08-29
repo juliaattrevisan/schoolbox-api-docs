@@ -195,7 +195,8 @@ class TaskMapper extends Mapper {
      * @return bool Always true
      */
     public function preSave(Task $object) {
-        if (!$object->getOrder()) {
+        $order = $object->getOrder();
+        if (!isset($order)) {
             $statement = $this->database->prepare(
                 "SELECT COALESCE(MAX(`order`), -1) FROM `{$this->getTable()}` WHERE `category_id` = :cat_id"
             );
