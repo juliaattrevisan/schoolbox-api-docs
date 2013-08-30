@@ -1,6 +1,6 @@
 @charset "utf-8";
 // =============================================================================
-// Legacy Schoolbox skin loader
+// Winifred West's Schoolbox skin
 // =============================================================================
 //*
 //*   Ride The Whale                         ~777IIIIIIIIIII7~_
@@ -11,6 +11,188 @@
 //*                                     #/
 //*/
 // =============================================================================
-@import "../core/core.less";
-@import "screen.less";
+// 1. Load dependencies
 // =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width: 					152px;
+@logo-height: 					79px;
+
+// Generic colors
+@body-background: 				#D8D7D4; // Body, but not the content area
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#400080;
+@link-hover: 					lighten(@link,20%);
+
+// Main banner
+@banner-background: 			#7F7F7F;
+@banner-color:      			@white;
+@banner-links:      			@banner-color;
+@banner-height:     			72px;
+
+// Modules
+@module-heading: 				@white;
+@module-background: 			#400080;
+
+// Refers to the left navigation
+@navigation-width:				184px;
+@navigation-padding:			8px;
+@navigation-background:  		transparent;
+@navigation-color:  			@black;
+@navigation-links:  			@link;
+@navigation-hover-background: 	#2D2D2D;
+@navigation-hover-color:  		@white;
+@navigation-sub-background:  	@navigation-hover-background;
+
+// Main "Tab" Navigation
+@tab-background:				transparent;
+@tab-color:						@white;
+@tab-hover-background:			@tab-color;
+@tab-hover-color:				@black;
+
+// Footer text
+@footer-color:					#929292;
+@footer-links:					@footer-color;
+
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/chrome.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+body {
+	background: @body-background url('/images/winifred/header-background.png') repeat-x 0 0;
+}
+
+#container {
+	background-image: url('/images/winifred/container-background.png');
+	background-repeat: no-repeat;
+	background-position: top right;
+	border-radius: 0 0 0 10px;
+	&.login { margin-left: @navigation-width; }
+}
+h2 { border-radius: 2px; }
+
+/*
+ * Header
+ */
+#header, .login #header{
+	background: url('/images/winifred/header-curves.png') no-repeat 0 0;
+}
+
+#header .logo{
+	width: 184px;
+	height: 110px;
+	left: 0px;
+	top: 0px;
+	z-index: 3;
+	img {
+		margin-left: 16px;
+		margin-top: 16px;
+	}
+}
+
+#search-field {
+	background: darken(@banner-background,25%);
+	background: rgba(0,0,0,0.5);
+	box-shadow: inset 1px -1px 0 #000;
+	padding: 8px 0 0 25px;
+	width: @search-width - 25px; height: 24px;
+}
+#search-button{
+	background: url('/images/winifred/search-button.png') 6px 16px no-repeat !important;
+}
+
+/*
+ * Tabs
+ */
+#tabs { float: right;
+	li {
+		a {
+			height: 12px;
+			line-height: 12px;
+			margin: 6px 0;
+			border-left: 1px solid #fff;
+		}
+		&.navthis a {
+			font-weight: normal;
+			border-radius: 2px 2px 0 0;
+			height: 26px;
+			line-height: 26px;
+			margin: -2px -2px 0 0;
+			padding: 0 13px;
+		}
+		&:first-child a {
+			border-left: 0;
+		}
+	}
+}
+#tabs-sub .ui-tabs-nav li a:hover {
+	background-color: @navigation-hover-background;
+	color: @navigation-hover-color;
+}
+
+
+#tabs-homepage li.ui-tabs-selected a {
+	background: none repeat scroll 0 0 @banner-background;
+	color: #000;
+}
+
+/*
+ * Navigation
+ */
+#nav{ 		margin-top: 62px; margin-left: 0;
+	h3, .nav-wrapper {
+		background: @navigation-background; margin: 0 8px;
+	}
+	li a {
+		font-size: 13px;
+		border-bottom: 1px dashed @banner-background;
+	}
+	li.hover > a,
+	ul li a:hover {
+		color: @navigation-hover-color;
+		background: @navigation-hover-background;
+	}
+	li li a {
+		color: @navigation-hover-color;
+		border: none;
+	}
+	li li a:hover {
+		color: @navigation-hover-color;
+		background: @banner-background;
+	}
+	ul ul {	background: @navigation-sub-background;
+		border: none;
+		width: @navigation-width; padding: 8px 0; top: -8px;
+		left: @navigation-width - @navigation-padding * 2;
+		ul {
+			width: @navigation-width; padding: 8px 0; top: -8px;
+			left: @navigation-width;
+		}
+	}
+	ul, li, li a { width: @navigation-width - @navigation-padding * 4; }
+	li li, li li a {
+		width: @navigation-width - @navigation-padding * 2;
+	}
+}
+
+#category li a.selected,
+#category li a:hover,
+#tabs-sub li.ui-tabs-selected a,
+.topic-list li a.selected {
+	background: @navigation-hover-background;
+	color: @navigation-hover-color;
+	font-weight: normal;
+}

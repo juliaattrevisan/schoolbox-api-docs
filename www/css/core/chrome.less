@@ -287,8 +287,8 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-h1,h2,h3{ color: @module-heading; }
-h3.my-links a{ color: @module-heading; }
+h1,h2,h3{ color: @body-text; }
+h3.my-links a{ color: @navigation-links; }
 h2,.calendar-controls{color:@module-heading; background:@module-background;}
 .calendar-controls h3{color:@module-heading;}
 a, h2 a{color:@link;}
@@ -685,7 +685,7 @@ Notifications
 		float: left;
 		position: relative;
 		margin-right: 1px;
-		margin-top: 1px;
+
 		a {
 			display: block;
 			float: left;
@@ -700,6 +700,7 @@ Notifications
 		&.navthis {
 			z-index: 2;
 			a {
+				font-weight: bold;
 				background: @tab-hover-background;
 				color: @tab-hover-color;
 			}
