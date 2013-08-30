@@ -52,7 +52,9 @@ class FeatureContext extends MinkContext {
     /**
      * Logs in user.
      *
-     * @Given /^I am logged in as "([^"]*)" with password "([^"]*)"$/
+     * @Given /^(?:|I am) logged in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
+     * @Given /^(?:|I )log in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
+     *
      * @param string $username
      * @param string $password
      * @throws Exception if login failed
