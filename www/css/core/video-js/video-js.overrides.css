@@ -1,0 +1,10 @@
+/** Customisations for VideoJS **/
+
+/** Ensures that the play button shows in the middle of the video. **/
+.vjs-default-skin .vjs-big-play-button {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+}
