@@ -149,7 +149,7 @@ class FeatureContext extends MinkContext {
             $labels = $form->findAll('css', 'label');
             foreach ($labels as $label) {
                 // Anything after beginning of a tag isn't part of field name
-                $label_name = trim(preg_replace('/<.*/', '', $label->getHtml()));
+                $label_name = $this->getBeginningText($label);
                 if ($label_name === $name) {
                     $field = $form->findField($label->getAttribute('for'));
                     break;
@@ -270,6 +270,55 @@ class FeatureContext extends MinkContext {
 //            $drop_target = $potential_drop_targets[$drop_index];
 //        }
 //        $drag_target->dragTo($drop_target);
+    }
+
+    /**
+     * Adds a component to the current homepage.
+     *
+     * @Then /^(?:|I )add component "(?P<type>[^:]*):(?P<name>[^"]*)"$/
+     *
+     * @param string $type
+     * @param string $name
+     * @throws Exception if the component couldn't be found
+     */
+    public function addComponentToHomepage($type, $name) {
+        // Show the component list
+        $custom_button = $this->getSession()->getPage()->find('css', '.customise');
+        if (!$custom_button) {
+            throw new Exception('No customise button found');
+        }
+        $custom_button->click();
+
+        // Find the component section of this type.
+        /** @var Element\NodeElement[] $section_list */
+        $section_id   = null;
+        $section_list = $this->getSession()->getPage()->findAll('css', '#tabs-homepage .component-categories a');
+        foreach ($section_list as $section) {
+            $section_name = substr(trim($section->getHtml()), 0, strlen($type));
+            if ($section_name === $type) {
+                $section_id = parse_url($section->getAttribute('href'), PHP_URL_FRAGMENT);
+                $section->click();
+                break;
+            }
+        }
+        if (!$section_id) {
+            throw new Exception(sprintf('Component type "%s" was not found', $type));
+        }
+
+        /** @var Element\NodeElement[] $component_list */
+        $component_list = $this->getSession()->getPage()->findAll('css', '#tabs-homepage #'.$section_id.' .add-component');
+        foreach ($component_list as $component) {
+            $component_name = $this->getBeginningText($component->find('css', 'h4'));
+            if ($component_name === $name) {
+                $button = $component->find('css', 'a.add');
+                if (!$button) {
+                    throw new Exception(sprintf('Component of name "%s" has no add button', $name));
+                }
+                $button->click();
+                return;
+            }
+        }
+        throw new Exception(sprintf('No component of name "%s" exists', $name));
     }
 
     /**
@@ -423,6 +472,19 @@ class FeatureContext extends MinkContext {
             },
             ($duration/1000)
         );
+    }
+
+    /**
+     * Gets the beginning text out of a node (presuming it starts with text)
+     *
+     * @example Calling this on a node containing "some text <div> blah</div>"
+     *          returns "some text"
+     *
+     * @param  Element\Element $node
+     * @return string
+     */
+    protected function getBeginningText(Element\Element $node) {
+        return htmlspecialchars_decode(trim(preg_replace('/<.*/', '', $node->getHtml())));
     }
 
     /**
