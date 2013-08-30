@@ -79,6 +79,7 @@ class FeatureContext extends MinkContext {
      * @Then /^I go to homepage "(?P<homepage_path>[^"]*)"$/
      *
      * @param string $homepage_path
+     * @throws Exception if the folder was not found.
      */
     public function goToHomepage($homepage_path) {
         $this->visit('/resources/');
@@ -93,11 +94,13 @@ class FeatureContext extends MinkContext {
             // item, click "visit homepage" instead.
             /** @var Element\NodeElement[] $child_folder_list */
             $child_folder_list = $folder_browser->findAll('css', '.child-of-node-'.$current_folder_id);
+            $is_dirname_found  = false;
             foreach ($child_folder_list as $child_folder) {
                 $label       = $child_folder->find('css', '.label');
                 $folder_name = $label->getText();
 
                 if ($dirname === $folder_name) {
+                    $is_dirname_found = true;
                     list(, $current_folder_id) = explode('-', $child_folder->getAttribute('id'));
                     if ($i < ($count-1)) {
                         // Not last folder: drill down to next in tree
@@ -112,6 +115,14 @@ class FeatureContext extends MinkContext {
                     }
                     break;
                 }
+            }
+            if (!$is_dirname_found) {
+                throw new Exception(
+                    sprintf(
+                        'Could not find folder "%s" in path "%s"',
+                        $dirname, implode('/', array_slice($dirname_list, 0, $i))
+                    )
+                );
             }
         }
     }
