@@ -74,6 +74,43 @@ class FeatureContext extends MinkContext {
     }
 
     /**
+     * Sets a config setting in the admin section.
+     *
+     * @Then /^(?:|I )set (?:config|setting|configuration) "(?P<type>[^:]*):(?P<name>[^"]*)" to "(?P<value>[^"]*)"$/
+     *
+     * @param string $type
+     * @param string $name
+     * @param string $value
+     * @throws Exception if the form was not found.
+     *
+     */
+    public function setConfigurationSetting($type, $name, $value) {
+        $this->visit('/adminv2/setting/'.$type);
+        $form = $this->getSession()->getPage()->find('css', 'form#settings');
+
+        // Name could be either a label text or field name, try field name first.
+        $field = $form->findField($name);
+        if (!$field) {
+            /** @var Element\NodeElement[] $labels */
+            $labels = $form->findAll('css', 'label');
+            foreach ($labels as $label) {
+                // Anything after beginning of a tag isn't part of field name
+                $label_name = trim(preg_replace('/<.*/', '', $label->getHtml()));
+                if ($label_name === $name) {
+                    $field = $form->findField($label->getAttribute('for'));
+                    break;
+                }
+            }
+        }
+        if (!$field) {
+            throw new Exception(sprintf('Could not find setting "%s:%s"', $type, $name));
+        }
+        $field->setValue($value);
+        $form->findButton('Save')->press();
+    }
+
+
+    /**
      * Creates a new template on either the homepage, eportfolio or dashboard
      * pages.
      *
