@@ -28,8 +28,8 @@ Scenario: Create a course
   # For now:
   # * Courses: any homepage underneath course home
   # * Lessons: any homepage directly underneath selected course with a task list component
-  Given I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical Reactions"
-  Then  I add component "Course Task List"
+  Given I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  And   add component "Learning:Course Task List"
 
   # Start adding tasks
   # Types:
