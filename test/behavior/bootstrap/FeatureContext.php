@@ -260,6 +260,52 @@ class FeatureContext extends MinkContext {
     }
 
     /**
+     * Waits for an element with specified CSS to exist on this page.
+     *
+     * Required because Selenium doesn't wait for the page to load by default
+     * when clicking a link. This isn't a bad thing to have anyway, what with
+     * AJAX requests and all that.
+     *
+     * @see $this->assertElementOnPage()
+     *
+     * @Then /^(?:|I )wait for an? "(?P<element>[^"]*)" element$/
+     * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<element>[^"]*)" element$/
+     */
+    public function waitForElementOnPage($element, $duration = 5000) {
+        $this->spin(
+            function($context) use($element) {
+                /** @param FeatureContext $context */
+                $context->assertElementOnPage($element);
+                return true;
+            },
+            ($duration/1000)
+        );
+    }
+
+    /**
+     * Waits for an element with specified CSS to exist on this page.
+     *
+     * Required because Selenium doesn't wait for the page to load by default
+     * when clicking a link. This isn't a bad thing to have anyway, what with
+     * AJAX requests and all that.
+     *
+     * @see $this->fillField()
+     *
+     * @Then /^(?:|I )wait for an? "(?P<field>[^"]*)" field$/
+     * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<field>[^"]*)" field$/
+     */
+    public function waitForFieldOnPage($field, $duration = 5000) {
+        $this->spin(
+            function($context) use($field) {
+                /** @param FeatureContext $context */
+                $element = $context->getSession()->getPage()->findField($field);
+                return $element instanceof Element\NodeElement;
+            },
+            ($duration/1000)
+        );
+    }
+
+    /**
      * Waits for all AJAX requests to return before continuing.
      *
      * @Then /^I wait for AJAX to finish$/
