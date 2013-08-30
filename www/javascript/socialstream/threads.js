@@ -277,6 +277,7 @@
 
 		/**
 		 * Update stream url
+		 * This is subject to the issue SB-3160
 		 */
 		function updateStreamUrl() {
 			var self = $j.fn.socialstreamThreads;
