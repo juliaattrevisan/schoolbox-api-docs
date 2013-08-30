@@ -74,6 +74,49 @@ class FeatureContext extends MinkContext {
     }
 
     /**
+     * Visits a homepage, given a folder path from the resource browser.
+     *
+     * @Then /^I go to homepage "(?P<homepage_path>[^"]*)"$/
+     *
+     * @param string $homepage_path
+     */
+    public function goToHomepage($homepage_path) {
+        $this->visit('/resources/');
+        $dirname_list = array_filter(array_map('trim', explode('/', $homepage_path)), 'strlen');
+
+        $folder_browser    = $this->getSession()->getPage()->find('css', '#category-window');
+        $current_folder_id = 0;
+
+        $count = count($dirname_list);
+        foreach ($dirname_list as $i => $dirname) {
+            // Click the expand button, if there is one. If this is the last
+            // item, click "visit homepage" instead.
+            /** @var Element\NodeElement[] $child_folder_list */
+            $child_folder_list = $folder_browser->findAll('css', '.child-of-node-'.$current_folder_id);
+            foreach ($child_folder_list as $child_folder) {
+                $label       = $child_folder->find('css', '.label');
+                $folder_name = $label->getText();
+
+                if ($dirname === $folder_name) {
+                    list(, $current_folder_id) = explode('-', $child_folder->getAttribute('id'));
+                    if ($i < ($count-1)) {
+                        // Not last folder: drill down to next in tree
+                        $child_folder->find('css', '.elbow')->click();
+                        $this->waitForAjax();
+                    }
+                    else {
+                        // Last folder: open node, click "View Homepage"
+                        $label->click();
+                        $this->waitForAjax();
+                        $this->getSession()->getPage()->find('css', '#detail-window a.rhomepage')->click();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
      * Sets a config setting in the admin section.
      *
      * @Then /^(?:|I )set (?:config|setting|configuration) "(?P<type>[^:]*):(?P<name>[^"]*)" to "(?P<value>[^"]*)"$/
