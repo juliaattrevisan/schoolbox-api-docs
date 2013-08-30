@@ -256,7 +256,7 @@
 
 			/* Lightbox everything!
 			 */
-			$j("a[rel^='lightbox']").slimbox();
+//			$j("a[rel^='lightbox']").slimbox();
 		});
 
 		/**
