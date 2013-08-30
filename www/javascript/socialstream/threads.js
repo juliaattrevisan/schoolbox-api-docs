@@ -94,6 +94,10 @@
 				 */
 				viewMoreLink: $j(element).find('.socialstreamViewMore'),
 
+				/* Lightboxed attachments are found using this key
+				 */
+				lightboxKey: 'socialstream-' + options.instanceId + '-lightbox',
+
 				/* Container div for a loading graphic or message
 				 */
 				loading: $j(element).find('.loading'),
@@ -255,8 +259,9 @@
 			removeLoaderGifs();
 
 			/* Lightbox everything!
+			 * But only the images in a particular socialstream thread
 			 */
-//			$j("a[rel^='lightbox']").slimbox();
+			$j("a[rel='" + self.config.lightboxKey + "']").slimbox();
 		});
 
 		/**

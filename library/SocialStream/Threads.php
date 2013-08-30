@@ -273,6 +273,7 @@ class Threads {
 
 		foreach($this->getTree() as $currentPost) {
 			$page->setVar(array(
+				'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
 				'SOCIALSTREAM_POST_POST_ID' => \Scrub::text($currentPost->getPostId()),
 				'SOCIALSTREAM_POST_BODY' => \Scrub::text($currentPost->getBody()),
 				'SOCIALSTREAM_POST_CREATED_AT' => \Scrub::text($currentPost->getCreatedAt()->getShort()),
@@ -320,6 +321,7 @@ class Threads {
 			 */
 			foreach($currentPost->getChildren() as $currentComment) {
 				$page->setVar(array(
+					'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
 					'SOCIALSTREAM_COMMENT_POST_ID' => \Scrub::text($currentComment->getPostId()),
 					'SOCIALSTREAM_COMMENT_BODY' => \Scrub::text($currentComment->getBody()),
 					'SOCIALSTREAM_COMMENT_CREATED_AT' => \Scrub::text($currentComment->getCreatedAt()->getShort()),
@@ -365,6 +367,7 @@ class Threads {
 				 */
 				foreach($currentComment->getChildren() as $currentReply) {
 					$page->setVar(array(
+						'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
 						'SOCIALSTREAM_REPLY_POST_ID' => \Scrub::text($currentReply->getPostId()),
 						'SOCIALSTREAM_REPLY_BODY' => \Scrub::text($currentReply->getBody()),
 						'SOCIALSTREAM_REPLY_CREATED_AT' => \Scrub::text($currentReply->getCreatedAt()->getShort()),
