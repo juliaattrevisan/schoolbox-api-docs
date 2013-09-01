@@ -17,13 +17,28 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @Then /^(?:|I )add a task named "(?P<name>[^"]*)" to visit "(?P<url>[^"]*)"$/
      * @Then /^(?:|I )add a task named "(?P<name>[^"]*)"$/
      *
-     * @param string $name
-     * @param string $url
-     * @param bool   $requires_confirmation
+     * @param  string $name
+     * @param  string $url
+     * @param  bool   $requires_confirmation
+     * @throws Exception if task list or button isn't found
+     * @return void
      */
     public function addTask($name, $url = '', $requires_confirmation = false) {
-        // Type: task, online_assess, due_work
-        // Name:
+        $component = $this->findCourseBuilderComponent();
+        $button    = $component->find('css', '.add_buttons a[data-form_class="for_task"]');
+        if (!($button instanceof Element\NodeElement)) {
+            throw new Exception('Add task button not found');
+        }
+        $button->click();
+        $form = $component->find('css', '.for_task form');
+        $form->fillField('title', $name);
+        // Somehow be able to use this for file uploads too.
+        $form->fillField('link',  $url);
+        if ($requires_confirmation) {
+            $form->checkField('requires_confirmation');
+        }
+        $form->find('css', 'input[type="submit"]')->press();
+        $this->getCoreContext()->waitForAjax();
     }
 
     /**
@@ -59,5 +74,19 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      */
     public function addOnlineAssessmentTask($name) {
 
+    }
+
+    /**
+     * Finds the course task listing component on the current homepage.
+     *
+     * @throws Exception if task list isn't found
+     * @return Element\NodeElement
+     */
+    protected function findCourseBuilderComponent() {
+        $component = $this->getSession()->getPage()->find('css', '.component.course_task_list');
+        if (!($component instanceof Element\NodeElement)) {
+            throw new Exception('Course task list component not found');
+        }
+        return $component;
     }
 }
