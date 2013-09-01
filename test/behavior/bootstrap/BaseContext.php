@@ -79,7 +79,8 @@ abstract class BaseContext extends RawMinkContext {
      * @return bool
      */
     protected function spin($callback, $timeout = 15) {
-        for ($i = 0; $i < $timeout; $i++) {
+        $finish_time = microtime(true) + $timeout;
+        do {
             try {
                 if ($callback($this)) {
                     return true;
@@ -88,8 +89,10 @@ abstract class BaseContext extends RawMinkContext {
             catch (Exception $e) {
                 // do nothing
             }
-            sleep(1);
+            // Try again in 100 milliseconds (100 * 10e3 microseconds)
+            usleep(100 * 10e3);
         }
+        while (microtime(true) < $finish_time);
 
         $backtrace = debug_backtrace();
 
