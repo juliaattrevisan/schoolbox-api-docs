@@ -20,6 +20,7 @@ class FeatureContext extends BaseContext {
         $this->useContext('mink', new MinkContext($parameters));
         $this->useContext('core', new Subcontext_CoreContext($parameters));
         $this->useContext('component', new Subcontext_ComponentContext($parameters));
+        $this->useContext('course_builder', new Subcontext_CourseBuilderContext($parameters));
     }
 
     /**
