@@ -163,6 +163,7 @@ class Subcontext_ComponentContext extends BaseContext {
                     throw new Exception(sprintf('Component of name "%s" has no add button', $name));
                 }
                 $button->click();
+                $this->getCoreContext()->waitForAjax();
                 return;
             }
         }
