@@ -143,10 +143,11 @@
 			$j.each(allFiles, function(index, element) {
 				$j(element).find('a').click(function() {
 					var url = $j(this).attr('href');
+					var filename = $j(this).html();
 
 					/* Chooze and cloze
 					 */
-					self.config.submitCallback(url);
+					self.config.submitCallback(url, filename);
 
 					$j(self.config.element).dialog('close');
 

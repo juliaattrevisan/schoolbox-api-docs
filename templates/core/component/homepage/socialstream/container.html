@@ -34,8 +34,11 @@
 
 					/* Deal with the output url that you choze
 					 */
-					submitCallback: function(url) {
+					submitCallback: function(url, filename) {
 						self.parents('form').find('input[name=url]').val(url);
+						self.parents('form').find('.socialstream-selected-file').html(filename);
+
+						console.log(filename);
 					}
 				}).open();
 			});
@@ -65,6 +68,10 @@
 
 			<label>
 				File: <input type='file' class='upload' name='file' value='' />
+			</label>
+
+			<label>
+				Resoure: <span class='socialstream-selected-file'>TS</span>
 			</label>
 
 			<a class='btn socialstream-attachment-resource socialstream-browser-button' data-value='resource'><span></span>Resource</a>
