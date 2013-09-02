@@ -132,7 +132,7 @@ class Subcontext_CoreContext extends BaseContext {
      * when clicking a link. This isn't a bad thing to have anyway, what with
      * AJAX requests and all that.
      *
-     * @see $this->assertElementOnPage()
+     * @see MinkContext->assertElementOnPage()
      *
      * @Then /^(?:|I )wait for an? "(?P<element>[^"]*)" element$/
      * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<element>[^"]*)" element$/
@@ -155,7 +155,7 @@ class Subcontext_CoreContext extends BaseContext {
      * when clicking a link. This isn't a bad thing to have anyway, what with
      * AJAX requests and all that.
      *
-     * @see $this->fillField()
+     * @see MinkContext->fillField()
      *
      * @Then /^(?:|I )wait for an? "(?P<field>[^"]*)" field$/
      * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<field>[^"]*)" field$/
@@ -196,5 +196,49 @@ class Subcontext_CoreContext extends BaseContext {
             },
             ($duration/1000)
         );
+    }
+
+    /**
+     * Version of fillField() that works with WYSIWYG (e.g. TinyMCE) textareas.
+     * Required because Selenium refuses to fill in elements that are invisible.
+     *
+     * @see MinkContext->fillField()
+     *
+     * @When /^(?:|I )fill in wysiwyg "(?P<field>(?:[^"]|\\")*)" with "(?P<value>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )fill in wysiwyg "(?P<field>(?:[^"]|\\")*)" with:$/
+     * @When /^(?:|I )fill in wysiwyg "(?P<value>(?:[^"]|\\")*)" for "(?P<field>(?:[^"]|\\")*)"$/
+     */
+    public function fillWysiwygField($field, $value) {
+        try {
+            $this->getMinkContext()->fillField($field, $value);
+        }
+        catch (\Behat\Mink\Exception\ElementNotFoundException $e) {
+            throw $e;
+        }
+        catch (\Behat\Mink\Exception\ElementException $e) {
+            // Element probably wasn't found because it was invisible.
+            // Fill it with JS.
+            $script  = sprintf('return (tinyMCE.get(%s).setContent(%s) || true)', json_encode($field), json_encode($value));
+            $this->getSession()->executeScript($script);
+        }
+        catch (Exception $e) {
+            throw $e;
+        }
+        // If it worked, this code would've used the "official" way to type into
+        // wysiwyg boxes:
+        // find the iframe, then type into its body.
+//        $page  = $this->getSession()->getPage();
+//        $field = $page->findField($field);
+//        // Just use JS to set the value
+//        $id = $field->getAttribute('id');
+//        $iframe = $page->findById($id.'_ifr');
+//        $this->getSession()->switchToIFrame($id.'_ifr');
+//        $length = mb_strlen($value);
+//        $body = $this->getSession()->getPage()->find('css', 'body');
+//        for ($i = 0; $i < ($length-1); $i++) {
+//            $body->keyPress(mb_substr($value, $i, 1));
+//        }
+//        $this->getSession()->switchToIFrame(null);
+        return;
     }
 }
