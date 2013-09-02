@@ -142,7 +142,7 @@ abstract class Evaluation_Main extends DeprecatedModel
                 $questionNumber = 1;
 
                 $page->setVar(array(
-                    'SECTION_TITLE' => $allQuestions[$i - 1]['title'],
+                    'SECTION_TITLE' => Scrub::text($allQuestions[$i - 1]['title']),
                     'SECTION_SEQUENCE' => $allQuestions[$i - 1]['sectionSequence'],
                     'SECTION_SECTION_ID' => $allQuestions[$i - 1]['section_id'],
                 ));
@@ -187,7 +187,7 @@ abstract class Evaluation_Main extends DeprecatedModel
          */
         if (is_numeric($currentQuestion['section_id'])) {
             $page->setVar(array(
-                'SECTION_TITLE' => $currentQuestion['title'],
+                'SECTION_TITLE' => Scrub::text($currentQuestion['title']),
                 'SECTION_SEQUENCE' => $currentQuestion['sectionSequence'],
                 'SECTION_SECTION_ID' => $currentQuestion['section_id'],
             ));
