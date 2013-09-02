@@ -61,6 +61,7 @@
 			 */
 			var defaults = {
 				instanceId: 0,
+				homepageId: 0,
 				start: 0,
 				end: 0,
 				offset: 0,
@@ -73,6 +74,7 @@
 			/* Derived values
 			 */
 			var derived = {
+				element: element,
 
 				/* The form which gets cloned per post and the one
 				 * which allows you to make new posts
@@ -81,7 +83,7 @@
 
 				/* The url to stream from
 				 */
-				streamUrl: self.generateStreamUrlSlow(options.instanceId, options.end, options.offset),
+				streamUrl: self.generateStreamUrlSlow(options.instanceId, options.homepageId, options.end, options.offset),
 
 				/* The element which allows you to make comments and replies
 				 */
@@ -233,22 +235,24 @@
 	 * Generate a stream url
 	 *
 	 * @param instanceId
+	 * @param homepageId
 	 * @param start
 	 * @param offset
 	 */
-	$j.fn.socialstreamThreads.generateStreamUrl = function(instanceId, start, offset) {
-		return '/socialstream/threads.php?instanceId=' + instanceId + '&start=' + start + '&offset=' + offset;
+	$j.fn.socialstreamThreads.generateStreamUrl = function(instanceId, homepageId, start, offset) {
+		return '/socialstream/threads.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=' + start + '&offset=' + offset;
 	}
 
 	/**
 	 * Generate a stream url
 	 *
 	 * @param instanceId
+	 * @param homepageId
 	 * @param end
 	 * @param offset
 	 */
-	$j.fn.socialstreamThreads.generateStreamUrlSlow = function(instanceId, end, offset) {
-		return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
+	$j.fn.socialstreamThreads.generateStreamUrlSlow = function(instanceId, homepageId, end, offset) {
+		return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
 	}
 
 	/**
@@ -305,7 +309,7 @@
 			/* Remember updated values
 			 */
 			self.config.start = newStart;
-			self.config.streamUrl = self.generateStreamUrl(self.config.instanceId, self.config.start, self.config.offset);
+			self.config.streamUrl = self.generateStreamUrl(self.config.instanceId, self.config.homepageId, self.config.start, self.config.offset);
 		}
 
 		/**
@@ -320,7 +324,7 @@
 			/* Remember updated values
 			 */
 			self.config.end = newEnd;
-			self.config.streamUrl = self.generateStreamUrlSlow(self.config.instanceId, self.config.end, self.config.offset);
+			self.config.streamUrl = self.generateStreamUrlSlow(self.config.instanceId, self.config.homepageId, self.config.end, self.config.offset);
 		}
 
 		/**

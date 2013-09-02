@@ -66,12 +66,13 @@ class ThreadsSlow {
 	 * Constructor
 	 *
 	 * @param $instance
+	 * @param $homepageId
 	 * @param $end
 	 * @param $offset
 	 */
-	public function __construct($instance, $end, $offset) {
+	public function __construct($instance, $homepageId, $end, $offset) {
 		$this->setInstance($instance);
-		$this->setHomepageId($instance->getIdentifier());
+		$this->setHomepageId($homepageId);
 		$this->setEnd($end);
 		$this->setOffset($offset);
 

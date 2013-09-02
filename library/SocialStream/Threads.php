@@ -66,19 +66,13 @@ class Threads {
 	 * Constructor
 	 *
 	 * @param $instance
-	 * @param $limit
-	 * @param $dateThreshold
-	 */
-	/**
-	 * Constructor
-	 *
-	 * @param $instance
+	 * @param $homepageId
 	 * @param $start
 	 * @param $offset
 	 */
-	public function __construct($instance, $start, $offset) {
+	public function __construct($instance, $homepageId, $start, $offset) {
 		$this->setInstance($instance);
-		$this->setHomepageId($instance->getIdentifier());
+		$this->setHomepageId($homepageId);
 		$this->setStart($start);
 		$this->setOffset($offset);
 

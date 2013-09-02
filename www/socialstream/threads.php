@@ -13,6 +13,7 @@ namespace SocialStream;
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $instanceId = intval($_GET['instanceId']);
+$homepageId = intval($_GET['homepageId']);
 $start = intval($_GET['start']);
 $offset = intval($_GET['offset']);
 
@@ -22,7 +23,7 @@ $instance = $instanceArray[$instanceId];
 /* Sew thread if instance exists
  */
 if ($instance) {
-	$thread = new Threads($instance, $start, $offset);
+	$thread = new Threads($instance, $homepageId, $start, $offset);
 	$output = $thread->generate()->render();
 
 	echo $output;

@@ -118,7 +118,7 @@
 
 		/* Remember where we left off and reopen from here
 		 */
-		socialstreamSession.categoryId = node;
+		socialstreamSession[self.config.instanceId].categoryId = node;
 
 		/* Load data into the node container
 		 */
