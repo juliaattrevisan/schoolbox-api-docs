@@ -287,13 +287,13 @@ class Mapper {
 	 *
 	 * @param object $model
 	 * @param string $property
-	 * @param array  $map
 	 *
 	 * @return mixed
 	 */
-	protected function getModelProperty($model, $property, $map) {
+	protected function getModelProperty($model, $property) {
 		$get_method  = $this->getGetMethodName($property);
 		$value       = $model->$get_method();
+		$map         = $this->map->getOffset($property);
 		$join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
 		if ($map['hydrator'] instanceof IColumnType) {
 			$value = $map['hydrator']->dehydrate($value, $join_mapper);
@@ -308,12 +308,12 @@ class Mapper {
 	 * @param object $model
 	 * @param string $property
 	 * @param mixed  $value
-	 * @param array  $map
 	 *
 	 * @return $this
 	 */
-	protected function setModelProperty($model, $property, $value, $map) {
+	protected function setModelProperty($model, $property, $value) {
 		$set_method  = $this->getSetMethodName($property);
+		$map         = $this->map->getOffset($property);
 		$join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
 		if ($map['hydrator'] instanceof IColumnType) {
 			$value = $map['hydrator']->hydrate($value, $join_mapper);
@@ -371,7 +371,7 @@ class Mapper {
 		if (!empty($map['identifier'])) {
 			$this->identifier = $map;
 		}
-		$this->map->add($map);
+		$this->map->setOffset($map['property'], $map);
 		return true;
 	}
 
@@ -496,7 +496,7 @@ class Mapper {
 		$this->database->beginTransaction();
 
 		foreach ($collection as $model) {
-			$statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName, $this->identifier));
+			$statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName));
 
 			if (!$statement->execute()) {
 
@@ -575,9 +575,9 @@ class Mapper {
 		$id_values = array();
 		foreach ($collection as $model) {
 			if (isset($property_map)) {
-				$this->setModelProperty($model, $property_map['property'], $value, $property_map);
+				$this->setModelProperty($model, $property_map['property'], $value);
 			}
-			$id_values[] = $this->getModelProperty($model, $identifier['property'], $identifier);
+			$id_values[] = $this->getModelProperty($model, $identifier['property']);
 		}
 		if (empty($id_values)) {
 			return false;
@@ -834,7 +834,7 @@ class Mapper {
 	public function create($object) {
 		$collection = $this->getModelAsCollection($object);
 		foreach ($collection as $model) {
-			$this->setModelProperty($model, $this->identifier['property'], null, $this->identifier);
+			$this->setModelProperty($model, $this->identifier['property'], null);
 		}
 		return $this->save($collection);
 	}
@@ -876,10 +876,10 @@ class Mapper {
 			$this->bindParamsForSave($model, $statement);
 			if ($statement->execute()) {
 				if ($id_property) {
-					if (!$this->getModelProperty($model, $id_property, $identifier)) {
-						$this->setModelProperty($model, $id_property, $this->database->lastInsertId(), $identifier);
+					if (!$this->getModelProperty($model, $id_property)) {
+						$this->setModelProperty($model, $id_property, $this->database->lastInsertId());
 					}
-					$affectedIDs[] = $this->getModelProperty($model, $id_property, $identifier);
+					$affectedIDs[] = $this->getModelProperty($model, $id_property);
 				}
 			}
 			else {
@@ -890,7 +890,7 @@ class Mapper {
 		$this->database->commit();
 
 		foreach ($collection as $model) {
-			if ($id_property && $this->getModelProperty($model, $id_property, $identifier)) {
+			if ($id_property && $this->getModelProperty($model, $id_property)) {
 				$this->triggerCallbacks('postSave', $model);
 			}
 		}
@@ -1093,7 +1093,7 @@ class Mapper {
 			}
 
 			$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
-			$this->setModelProperty($model, $propertyName, $columnValue, $map);
+			$this->setModelProperty($model, $propertyName, $columnValue);
 		}
 
 		if (!empty($callback) && is_callable($callback)) {
@@ -1319,7 +1319,7 @@ class Mapper {
 			//
 			// Timestamp fields will never be bound.
 			if (!(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
-				$statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName, $map));
+				$statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName));
 			}
 		}
 	}
