@@ -41,7 +41,8 @@ Scenario: Create a course
   Then  I add an online assessment task
   # online assessment stuff is separate
   Then  I fill in "title" with "Chemical Reactions 1"
-  And   I fill in "description" with "This is a description<b>!</b>"
+  Then  I fill in "task_title" with "Complete test 'Chemical Reactions 1'"
+  And   I fill in wysiwyg "description" with "This is a description<b>!</b>"
   And   I press "Continue"
   Then  I fill in "title" with "Section 1"
   And   I fill in "description" with "The first section of the test"
