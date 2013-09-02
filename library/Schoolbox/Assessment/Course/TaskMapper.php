@@ -200,7 +200,12 @@ class TaskMapper extends Mapper {
             $statement = $this->database->prepare(
                 "SELECT COALESCE(MAX(`order`), -1) FROM `{$this->getTable()}` WHERE `category_id` = :cat_id"
             );
-            $statement->bindValue('cat_id', $object->getCategory()->getId(), \PDO::PARAM_INT);
+            // Ugly code for dealing with the possibility that someone set a
+            // scalar category instead of an object.
+            // TODO consider standardising object values before callbacks are called
+            $category = $object->getCategory();
+            $cat_id   = ($category instanceof Category) ? $category->getId() : $category;
+            $statement->bindValue('cat_id', $cat_id, \PDO::PARAM_INT);
             $statement->execute();
             $object->setOrder(intval($statement->fetchColumn())+1);
         }
