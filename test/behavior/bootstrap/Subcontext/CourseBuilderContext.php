@@ -21,7 +21,6 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param  string $url
      * @param  bool   $requires_confirmation
      * @throws Exception if task list or button isn't found
-     * @return void
      */
     public function addTask($name, $url = '', $requires_confirmation = false) {
         $component = $this->findCourseBuilderComponent();
@@ -66,14 +65,32 @@ class Subcontext_CourseBuilderContext extends BaseContext {
     }
 
     /**
-     * Adds an assessment task to the course builder component of this homepage.
+     * Starts to add an online assessment task.
      *
+     * @Then /^(?:|I )add an online assessment task$/
      * @Then /^(?:|I )add an online assessment task named "(?P<name>[^"]*)"$/
      *
      * @param string $name
+     * @throws Exception if task list or button isn't found
      */
-    public function addOnlineAssessmentTask($name) {
-
+    public function addOnlineAssessmentTask($name = '') {
+        $component = $this->findCourseBuilderComponent();
+        $button    = $component->find('css', '.add_buttons a[data-form_class="for_assessment"]');
+        if (!($button instanceof Element\NodeElement)) {
+            throw new Exception('Add online assessment button not found');
+        }
+        $button->click();
+        // Element may not be visible yet
+        $this->spin(
+            function($context) use($component) {
+                $component->find('css', '.for_assessment .interact a.create')->click();
+                return true;
+            },
+            5
+        );
+        $this->getCoreContext()->waitForElementOnPage('form#createAssess');
+        $form = $this->getSession()->getPage()->findById('createAssess');
+        $form->fillField('task_title', $name);
     }
 
     /**
