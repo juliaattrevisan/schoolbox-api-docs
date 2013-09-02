@@ -48,13 +48,14 @@ Scenario: Create a course
   And   I fill in "description" with "The first section of the test"
   And   I press "Create Section"
   Then  I select "Multiple Choice" from "type_id"
-  Then  I fill in "question" with "Choose the correct answer"
+  And   wait for a "question" field
+  Then  I fill in wysiwyg "question" with "Choose the correct answer"
   And   I fill in "marks" with "10"
   # Answers options
-  And   I fill in right answer "1" with "Answer 1"
-  And   I fill in wrong answer "2" with "Answer 2"
-  And   I fill in wrong answer "3" with "Answer 3"
-  And   I fill in wrong answer "4" with "Answer 4"
+  And   I add right answer "Answer 1" at position "1"
+  And   I add wrong answer "Answer 2" at position "2"
+  And   I add wrong answer "Answer 3" at position "3"
+  And   I add wrong answer "Answer 4" at position "4"
   And   I press "Add Question"
   # That's it for the online assessment, go back to the homepage
   Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical Reactions"
