@@ -35,7 +35,7 @@
 
 		/* Show or hide the View More link contextually
 		 */
-		self.updateViewMoreLink();
+		self.updateViewMoreLinkSlow();
 
 		/* Allow View More to load more stuff
 		 */
@@ -62,6 +62,7 @@
 			var defaults = {
 				instanceId: 0,
 				start: 0,
+				end: 0,
 				offset: 0,
 
 				/* Total number of posts that exist
@@ -80,7 +81,7 @@
 
 				/* The url to stream from
 				 */
-				streamUrl: self.generateStreamUrl(options.instanceId, options.start, options.offset),
+				streamUrl: self.generateStreamUrlSlow(options.instanceId, options.end, options.offset),
 
 				/* The element which allows you to make comments and replies
 				 */
@@ -120,6 +121,7 @@
 
 			merged.instanceId = parseInt(merged.instanceId);
 			merged.start = parseInt(merged.start);
+			merged.end = parseInt(merged.end);
 			merged.offset = parseInt(merged.offset);
 			merged.numPosts = parseInt(merged.numPosts);
 
@@ -234,6 +236,17 @@
 	}
 
 	/**
+	 * Generate a stream url
+	 *
+	 * @param instanceId
+	 * @param end
+	 * @param offset
+	 */
+	$j.fn.socialstreamThreads.generateStreamUrlSlow = function(instanceId, end, offset) {
+		return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
+	}
+
+	/**
 	 * Stream more content
 	 */
 	$j.fn.socialstreamThreads.stream = function() {
@@ -248,11 +261,11 @@
 			/* Update offsets, hiding View More if there were none left
 			 * after streaming
 			 */
-			updateStreamUrl();
+			updateStreamUrlSlow();
 
 			/* Show or hide the View More link
 			 */
-			self.updateViewMoreLink();
+			self.updateViewMoreLinkSlow();
 
 			/* Clear out any loading div indicators
 			 */
@@ -272,7 +285,7 @@
 		function addThreads(html) {
 			var self = $j.fn.socialstreamThreads;
 
-			self.config.threadContainer.append(html);
+			self.config.threadContainer.html(html);
 		}
 
 		/**
@@ -288,6 +301,21 @@
 			 */
 			self.config.start = newStart;
 			self.config.streamUrl = self.generateStreamUrl(self.config.instanceId, self.config.start, self.config.offset);
+		}
+
+		/**
+		 * Update stream url
+		 * This is subject to the issue SB-3160
+		 */
+		function updateStreamUrlSlow() {
+			var self = $j.fn.socialstreamThreads;
+
+			var newEnd = parseInt(self.config.end) + parseInt(self.config.offset);
+
+			/* Remember updated values
+			 */
+			self.config.end = newEnd;
+			self.config.streamUrl = self.generateStreamUrlSlow(self.config.instanceId, self.config.end, self.config.offset);
 		}
 
 		/**
@@ -307,6 +335,20 @@
 		var self = $j.fn.socialstreamThreads;
 
 		if (self.config.start < self.config.numPosts) {
+			$j(self.config.viewMoreLink).show();
+		}
+		else {
+			self.config.viewMoreLink.hide();
+		}
+	}
+
+	/**
+	 * Show or hide the View More link contextually
+	 */
+	$j.fn.socialstreamThreads.updateViewMoreLinkSlow = function() {
+		var self = $j.fn.socialstreamThreads;
+
+		if (self.config.end < self.config.numPosts) {
 			$j(self.config.viewMoreLink).show();
 		}
 		else {

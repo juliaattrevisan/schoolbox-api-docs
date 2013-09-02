@@ -247,6 +247,53 @@ class PostMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Find all the social stream posts that should appear in a homepage's
+	 * SocialStream component
+	 *
+	 * @param $homepageId
+	 * @param $end
+	 * @param $offset
+	 * @return Schoolbox\Collection
+	 */
+	public function findLatestForHomepageSlow($homepageId, $end, $offset) {
+		$user_mapper = $this->getJoinMapper('user');
+
+		$query = "
+			SELECT
+				{$this->getColumnString('p')},
+				{$user_mapper->getColumnString('u')}
+			FROM `{$this->table}` p
+			LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
+			WHERE homepage_id = :homepageId
+			AND parent_id = 0
+			AND deleted_at IS NULL
+			ORDER BY created_at DESC
+			LIMIT :end
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":homepageId", $homepageId);
+		$statement->bindParam(':end', $end, \PDO::PARAM_INT);
+
+		$statement->execute();
+
+		/* Manually construct hierarchy of posts and their users
+		 */
+		$collection = new \Schoolbox\Collection();
+
+		foreach ($statement as $row) {
+			$postItem = $this->hydrate($row, 'p');
+			$userItem = $user_mapper->hydrate($row, 'u');
+
+			$postItem->setOwnerId($userItem);
+
+			$collection->add($postItem);
+		}
+
+		return $collection;
+	}
+
+	/**
 	 * Find all the social stream hierarchies for a set of post ids
 	 *
 	 * This uses the root_id value, which is the post_id of the post

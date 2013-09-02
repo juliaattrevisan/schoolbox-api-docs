@@ -15,6 +15,11 @@
 		$j(function() {
 			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
 				instanceId: '{COMPONENT_INSTANCE_ID}',
+
+				/* Slow
+				 */
+				end: 0,
+
 				offset: '{SOCIALSTREAM_AJAX_LIMIT}',
 				numPosts: '{SOCIALSTREAM_NUM_POSTS}'
 			});
