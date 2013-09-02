@@ -23,7 +23,7 @@
 		/* Store the config in this instance so private methods
 		 * can access it
 		 */
-		self.config = init(options, this);
+		var config = init(options, this);
 
 		/* Set up the input form
 		 */
@@ -31,22 +31,22 @@
 
 		/* Stream first batch, I guess
 		 */
-		self.stream();
+		stream();
 
 		/* Show or hide the View More link contextually
 		 */
-		self.updateViewMoreLinkSlow();
+		updateViewMoreLinkSlow();
 
 		/* Allow View More to load more stuff
 		 */
-		self.config.viewMoreLink.click(function() {
-			self.stream();
+		config.viewMoreLink.click(function() {
+			stream();
 		});
 
 		/* Allow you to chooze the kind of attachment (if any)
 		 * to accompany your post
 		 */
-		self.initAttachmentSelectors(self.config.defaultForm);
+		self.initAttachmentSelectors(config.defaultForm);
 
 		/**
 		 * Initialise parameters
@@ -136,7 +136,7 @@
 		function initPostForm() {
 			var self = $j.fn.socialstreamThreads;
 
-			self.config.addPostLink.live('click', function() {
+			config.addPostLink.live('click', function() {
 
 				/* Clear out all instances of .addPostForm in the socialstream
 				 */
@@ -149,7 +149,7 @@
 
 				/* Clone an instance of .addPostForm and inject ids
 				 */
-				var clone = self.config.defaultForm.clone();
+				var clone = config.defaultForm.clone();
 				clone.attr('id', '');
 				clone.find('input[name=body]').val('').focus();
 				clone.find('input[name=parentId]').val(parentId);
@@ -177,6 +177,102 @@
 			var self = $j.fn.socialstreamThreads;
 
 			self.config.threadContainer.find(self.config.addPostForm).remove();
+		}
+
+		/**
+		 * Stream more content
+		 */
+		function stream() {
+			var self = $j.fn.socialstreamThreads;
+			var threadContainer = config.threadContainer;
+
+			$j.get(config.streamUrl, function(responseText) {
+
+				/* Shove in the new content
+				 */
+				addThreads(responseText, threadContainer);
+
+				/* Update offsets, hiding View More if there were none left
+				 * after streaming
+				 */
+				updateStreamUrlSlow();
+
+				/* Show or hide the View More link
+				 */
+				updateViewMoreLinkSlow();
+
+				/* Clear out any loading div indicators
+				 */
+				removeLoaderGifs();
+
+				/* Lightbox everything!
+				 * But only the images in a particular socialstream thread
+				 */
+				$j("a[rel='" + config.lightboxKey + "']").slimbox();
+			});
+
+			/**
+			 * Add new threads
+			 *
+			 * @param html
+			 * @param threadContainer
+			 */
+			function addThreads(html, threadContainer) {
+				var self = $j.fn.socialstreamThreads;
+
+				threadContainer.html(html);
+			}
+
+			/**
+			 * Update stream url
+			 * This is subject to the issue SB-3160
+			 */
+			function updateStreamUrl() {
+				var self = $j.fn.socialstreamThreads;
+
+				var newStart = parseInt(self.config.start) + parseInt(self.config.offset);
+
+				/* Remember updated values
+				 */
+				self.config.start = newStart;
+				self.config.streamUrl = self.generateStreamUrl(self.config.instanceId, self.config.homepageId, self.config.start, self.config.offset);
+			}
+
+			/**
+			 * Update stream url
+			 * This is subject to the issue SB-3160
+			 */
+			function updateStreamUrlSlow() {
+				var self = $j.fn.socialstreamThreads;
+
+				var newEnd = parseInt(config.end) + parseInt(config.offset);
+
+				/* Remember updated values
+				 */
+				config.end = newEnd;
+				config.streamUrl = self.generateStreamUrlSlow(config.instanceId, config.homepageId, config.end, config.offset);
+			}
+
+			/**
+			 * Clear out any loading gifs
+			 */
+			function removeLoaderGifs() {
+				var self = $j.fn.socialstreamThreads;
+
+				config.loading.remove();
+			}
+		}
+
+		/**
+		 * Show or hide the View More link contextually
+		 */
+		function updateViewMoreLinkSlow() {
+			if (config.end < config.numPosts) {
+				$j(config.viewMoreLink).show();
+			}
+			else {
+				config.viewMoreLink.hide();
+			}
 		}
 	}
 
@@ -255,89 +351,6 @@
 		return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
 	}
 
-	/**
-	 * Stream more content
-	 */
-	$j.fn.socialstreamThreads.stream = function() {
-		var self = $j.fn.socialstreamThreads;
-		var threadContainer = self.config.threadContainer;
-
-		$j.get(self.config.streamUrl, function(responseText) {
-
-			/* Shove in the new content
-			 */
-			addThreads(responseText, threadContainer);
-
-			/* Update offsets, hiding View More if there were none left
-			 * after streaming
-			 */
-			updateStreamUrlSlow();
-
-			/* Show or hide the View More link
-			 */
-			self.updateViewMoreLinkSlow();
-
-			/* Clear out any loading div indicators
-			 */
-			removeLoaderGifs();
-
-			/* Lightbox everything!
-			 * But only the images in a particular socialstream thread
-			 */
-			$j("a[rel='" + self.config.lightboxKey + "']").slimbox();
-		});
-
-		/**
-		 * Add new threads
-		 *
-		 * @param html
-		 * @param threadContainer
-		 */
-		function addThreads(html, threadContainer) {
-			var self = $j.fn.socialstreamThreads;
-
-			threadContainer.html(html);
-		}
-
-		/**
-		 * Update stream url
-		 * This is subject to the issue SB-3160
-		 */
-		function updateStreamUrl() {
-			var self = $j.fn.socialstreamThreads;
-
-			var newStart = parseInt(self.config.start) + parseInt(self.config.offset);
-
-			/* Remember updated values
-			 */
-			self.config.start = newStart;
-			self.config.streamUrl = self.generateStreamUrl(self.config.instanceId, self.config.homepageId, self.config.start, self.config.offset);
-		}
-
-		/**
-		 * Update stream url
-		 * This is subject to the issue SB-3160
-		 */
-		function updateStreamUrlSlow() {
-			var self = $j.fn.socialstreamThreads;
-
-			var newEnd = parseInt(self.config.end) + parseInt(self.config.offset);
-
-			/* Remember updated values
-			 */
-			self.config.end = newEnd;
-			self.config.streamUrl = self.generateStreamUrlSlow(self.config.instanceId, self.config.homepageId, self.config.end, self.config.offset);
-		}
-
-		/**
-		 * Clear out any loading gifs
-		 */
-		function removeLoaderGifs() {
-			var self = $j.fn.socialstreamThreads;
-
-			self.config.loading.remove();
-		}
-	}
 
 	/**
 	 * Show or hide the View More link contextually
@@ -353,17 +366,5 @@
 		}
 	}
 
-	/**
-	 * Show or hide the View More link contextually
-	 */
-	$j.fn.socialstreamThreads.updateViewMoreLinkSlow = function() {
-		var self = $j.fn.socialstreamThreads;
 
-		if (self.config.end < self.config.numPosts) {
-			$j(self.config.viewMoreLink).show();
-		}
-		else {
-			self.config.viewMoreLink.hide();
-		}
-	}
 }(jQuery));
