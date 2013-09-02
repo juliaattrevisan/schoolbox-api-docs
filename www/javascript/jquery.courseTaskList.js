@@ -87,37 +87,37 @@
             // Show the form instead
             var edit_form = $(this).closest('.task').find('.edit_task_form_container');
             if (edit_form.length) {
-                edit_form.slideToggle('fast');
                 event.preventDefault();
+                edit_form.slideToggle('fast');
             }
         });
 
         // Delete task: "are you sure?"
-        component.delegate('.interact a.delete, .delete_task_form_container a.delete-reject', 'click.courseTaskList', {}, function() {
+        component.delegate('.interact a.delete, .delete_task_form_container a.delete-reject', 'click.courseTaskList', {}, function(event) {
+            event.preventDefault();
             var delete_form = $(this).closest('.task').find('.delete_task_form_container');
             delete_form.slideToggle('fast');
-            event.preventDefault();
         });
 
         // "why, yes I am"
-        component.delegate('.delete_form', 'submit.courseTaskList', {}, function() {
-            var form = $(this);
+        component.delegate('.delete_form', 'submit.courseTaskList', {}, function(event) {
             event.preventDefault();
+            var form = $(this);
             $.post(form.attr('action'), form.serialize(), function(data) {
                 postCallback(form, data);
             }, 'json');
         });
 
         // Create new tasks: show inline form if there is one.
-        component.find('.add_buttons .btn').bind('click.courseTaskList', function() {
+        component.find('.add_buttons .btn').bind('click.courseTaskList', function(event) {
             var create_forms = component.find('.create_task_form_container');
             var form_class   = $(this).data('form_class');
             if (form_class) {
                 var create_form = create_forms.filter('.'+form_class);
                 if (create_form.length) {
+                    event.preventDefault();
                     create_forms.not(create_form).slideUp('fast');
                     create_form.slideToggle('fast');
-                    event.preventDefault();
                 }
             }
         });
