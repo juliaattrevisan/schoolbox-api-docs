@@ -38,8 +38,6 @@
 					submitCallback: function(url, filename) {
 						self.parents('form').find('input[name=url]').val(url);
 						self.parents('form').find('.socialstream-selected-file').html(filename);
-
-						console.log(filename);
 					}
 				}).open();
 			});
