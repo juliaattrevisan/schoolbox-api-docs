@@ -260,12 +260,13 @@
 	 */
 	$j.fn.socialstreamThreads.stream = function() {
 		var self = $j.fn.socialstreamThreads;
+		var threadContainer = self.config.threadContainer;
 
 		$j.get(self.config.streamUrl, function(responseText) {
 
 			/* Shove in the new content
 			 */
-			addThreads(responseText);
+			addThreads(responseText, threadContainer);
 
 			/* Update offsets, hiding View More if there were none left
 			 * after streaming
@@ -290,11 +291,12 @@
 		 * Add new threads
 		 *
 		 * @param html
+		 * @param threadContainer
 		 */
-		function addThreads(html) {
+		function addThreads(html, threadContainer) {
 			var self = $j.fn.socialstreamThreads;
 
-			self.config.threadContainer.html(html);
+			threadContainer.html(html);
 		}
 
 		/**
