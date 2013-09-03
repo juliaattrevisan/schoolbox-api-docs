@@ -164,9 +164,10 @@ class MSSQL {
 	 *                        to mssql_bind in order, minus the first (the stored
 	 *                        procedure resource is created by this method)
 	 *
-	 * @return array output: output vars from the procedure
-	 *               result: if the procedure returned a result set, the results
-	 *                       from the procedure (untested)
+	 * @return array success: Did the procedure run successfully?
+	 *               output:  output vars from the procedure
+	 *               result:  if the procedure returned a result set, the results
+	 *                        from the procedure (untested)
 	 */
 	public function executeProcedure($name, $params) {
 		$proc          = mssql_init($name, $this->dbf);
@@ -196,17 +197,24 @@ class MSSQL {
 		}
 
 		// Run procedure, fetching the result set if there is one
-		$result = mssql_execute($proc);
-		$return = array();
+		$success = true;
+		$result  = mssql_execute($proc);
+		$return  = array();
 		if (is_resource($result)) {
 			while (mssql_next_result($result)) {
 				$return[] = mssql_fetch_assoc($result);
 			}
 		}
+		elseif ($result === false) {
+			// Did the procedure error out? Return nothing instead.
+			$success       = false;
+			$bound_outputs = array();
+		}
 		mssql_free_statement($proc);
 		return array(
-			'output' => $bound_outputs,
-			'result' => $return,
+			'success' => $success,
+			'output'  => $bound_outputs,
+			'result'  => $return,
 		);
 	}
 
