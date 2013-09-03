@@ -182,7 +182,7 @@
 
 				/* Shove in the new content
 				 */
-				addThreads(responseText, config.threadContainer);
+				addThreads(responseText);
 
 				/* Update offsets, hiding View More if there were none left
 				 * after streaming
@@ -207,10 +207,9 @@
 			 * Add new threads
 			 *
 			 * @param html
-			 * @param threadContainer
 			 */
-			function addThreads(html, threadContainer) {
-				threadContainer.html(html);
+			function addThreads(html) {
+				config.threadContainer.html(html);
 			}
 
 			/**
