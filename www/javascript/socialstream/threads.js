@@ -174,16 +174,13 @@
 		 * Clear all the forms used to make comments and replies
 		 */
 		function clearAllPostForms() {
-			var self = $j.fn.socialstreamThreads;
-
-			self.config.threadContainer.find(self.config.addPostForm).remove();
+			config.threadContainer.find(config.addPostForm).remove();
 		}
 
 		/**
 		 * Stream more content
 		 */
 		function stream() {
-			var self = $j.fn.socialstreamThreads;
 			var threadContainer = config.threadContainer;
 
 			$j.get(config.streamUrl, function(responseText) {
@@ -218,8 +215,6 @@
 			 * @param threadContainer
 			 */
 			function addThreads(html, threadContainer) {
-				var self = $j.fn.socialstreamThreads;
-
 				threadContainer.html(html);
 			}
 
@@ -230,12 +225,12 @@
 			function updateStreamUrl() {
 				var self = $j.fn.socialstreamThreads;
 
-				var newStart = parseInt(self.config.start) + parseInt(self.config.offset);
+				var newStart = parseInt(config.start) + parseInt(config.offset);
 
 				/* Remember updated values
 				 */
-				self.config.start = newStart;
-				self.config.streamUrl = self.generateStreamUrl(self.config.instanceId, self.config.homepageId, self.config.start, self.config.offset);
+				config.start = newStart;
+				config.streamUrl = self.generateStreamUrl(config.instanceId, config.homepageId, config.start, config.offset);
 			}
 
 			/**
@@ -257,9 +252,19 @@
 			 * Clear out any loading gifs
 			 */
 			function removeLoaderGifs() {
-				var self = $j.fn.socialstreamThreads;
-
 				config.loading.remove();
+			}
+		}
+
+		/**
+		 * Show or hide the View More link contextually
+		 */
+		function updateViewMoreLink() {
+			if (config.start < config.numPosts) {
+				$j(config.viewMoreLink).show();
+			}
+			else {
+				$j(config.viewMoreLink).hide();
 			}
 		}
 
@@ -271,7 +276,7 @@
 				$j(config.viewMoreLink).show();
 			}
 			else {
-				config.viewMoreLink.hide();
+				$j(config.viewMoreLink).hide();
 			}
 		}
 	}
@@ -350,21 +355,5 @@
 	$j.fn.socialstreamThreads.generateStreamUrlSlow = function(instanceId, homepageId, end, offset) {
 		return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
 	}
-
-
-	/**
-	 * Show or hide the View More link contextually
-	 */
-	$j.fn.socialstreamThreads.updateViewMoreLink = function() {
-		var self = $j.fn.socialstreamThreads;
-
-		if (self.config.start < self.config.numPosts) {
-			$j(self.config.viewMoreLink).show();
-		}
-		else {
-			self.config.viewMoreLink.hide();
-		}
-	}
-
 
 }(jQuery));
