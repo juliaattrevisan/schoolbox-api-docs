@@ -156,6 +156,61 @@ class MSSQL {
 	}
 
 	/**
+	 * Runs a stored procedure
+	 *
+	 * @param string  $name   The name of the stored procedure.
+	 * @param array[] $params A list of parameters to bind {@see mssql_bind}
+	 *                        Each array in this list should contain parameters
+	 *                        to mssql_bind in order, minus the first (the stored
+	 *                        procedure resource is created by this method)
+	 *
+	 * @return array output: output vars from the procedure
+	 *               result: if the procedure returned a result set, the results
+	 *                       from the procedure (untested)
+	 */
+	public function executeProcedure($name, $params) {
+		$proc          = mssql_init($name, $this->dbf);
+		$bound_inputs  = array();
+		$bound_outputs = array();
+
+		// Bind each parameter to the procedure
+		foreach ($params as &$param) {
+			list($param_name, $var, $type, $is_output, $is_null, $maxlen) = $param;
+			if (!$is_output) {
+				$is_output = false;
+			}
+			if (!$is_null) {
+				$is_null = false;
+			}
+			if (!$maxlen) {
+				$maxlen = -1;
+			}
+			if ($is_output) {
+				$bound_outputs[$param_name] = $var;
+				mssql_bind($proc, $param_name, $bound_outputs[$param_name], $type, true, $is_null, $maxlen);
+			}
+			else {
+				$bound_inputs[$param_name] = $var;
+				mssql_bind($proc, $param_name, $bound_inputs[$param_name], $type, false, $is_null, $maxlen);
+			}
+		}
+
+		// Run procedure, fetching the result set if there is one
+		$result = mssql_execute($proc);
+		$return = array();
+		if (is_resource($result)) {
+			while (mssql_next_result($result)) {
+				$return[] = mssql_fetch_assoc($result);
+			}
+		}
+		mssql_free_statement($proc);
+		return array(
+			'output' => $bound_outputs,
+			'result' => $return,
+		);
+	}
+
+	/**
 	 * Gets the first result returned by the query
 	 * Returns an associative array of row, false if none exists
 	 *
