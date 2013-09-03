@@ -45,7 +45,7 @@
 		/* Allow you to chooze the kind of attachment (if any)
 		 * to accompany your post
 		 */
-		initAttachmentSelectors();
+		initAttachmentSelectors(config.defaultForm);
 
 		/**
 		 * Initialise parameters
@@ -297,9 +297,7 @@
 		/**
 		 * Abilities granted to all attachment selectors everywhere
 		 */
-		function initAttachmentSelectors() {
-			var form = config.defaultForm;
-
+		function initAttachmentSelectors(form) {
 			resetAttachmentSelectors(form);
 
 			/* Url attachment options
