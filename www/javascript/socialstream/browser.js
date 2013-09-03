@@ -20,20 +20,19 @@
 	 * @param options
 	 */
 	$j.fn.socialstreamBrowser = function(options) {
-		var self = $j.fn.socialstreamBrowser;
 
 		/* Store the config in this instance so private methods
 		 * can access it
 		 */
-		self.config = init(options, this);
+		var config = init(options, this);
 
 		/* Set up modal thingy
 		 */
-		initModal(self.config);
+		initModal();
 
-		/* For chaining
+		/* Open Pandora's Box
 		 */
-		return self;
+		loadNode(socialstreamSession.categoryId);
 
 		/**
 		 * Initialise various configured params and determine a bunch
@@ -48,7 +47,7 @@
 
 				/* The title of the browser
 				 */
-				title: 'hoax',
+				title: 'Choose a file',
 
 				/* The url to load node contents from
 				 */
@@ -75,14 +74,12 @@
 			merged.categoryId = parseInt(merged.categoryId);
 
 			return merged;
-		};
+		}
 
 		/**
 		 * Set up modal window
-		 *
-		 * @param config
 		 */
-		function initModal(config) {
+		function initModal() {
 			$j(config.element).dialog({
 				width: 650,
 				autoOpen: false,
@@ -91,73 +88,63 @@
 				resizable: false
 			});
 		}
-	}
 
-	/**
-	 * Open le browser
-	 */
-	$j.fn.socialstreamBrowser.open = function() {
-		var self = $j.fn.socialstreamBrowser;
-
-		self.loadNode(socialstreamSession.categoryId);
-	}
-
-	/**
-	 * Load a node contents
-	 *
-	 * @param node
-	 */
-	$j.fn.socialstreamBrowser.loadNode = function(node) {
-		var self = $j.fn.socialstreamBrowser;
-
-		/* The thing you clicked on
+		/**
+		 * Load a node contents
+		 *
+		 * @param node
 		 */
-		var args = {
-			relationID: node
+		function loadNode(node) {
+
+			/* The thing you clicked on
+			 */
+			var args = {
+				relationID: node
+			}
+
+			/* Remember where we left off and reopen from here
+			 */
+			socialstreamSession.categoryId = node;
+
+			/* Load data into the node container
+			 */
+			config.element.load(config.url, args, function() {
+
+				/* These allow new nodes to be loaded
+				 */
+				var allNavigators = $j(config.element).find('.socialstream-breadcrumb, .socialstream-node-category');
+
+				$j.each(allNavigators, function(index, element) {
+					$j(element).find('a').click(function() {
+						loadNode($j(this).attr('rel'));
+
+						return false;
+					});
+				});
+
+				/* Assign event handlers to all the files
+				 */
+				var allFiles = $j(config.element).find('.socialstream-node-file');
+
+				$j.each(allFiles, function(index, element) {
+					$j(element).find('a').click(function() {
+						var url = $j(this).attr('href');
+						var filename = $j(this).html();
+
+						/* Chooze and cloze
+						 */
+						config.submitCallback(url, filename);
+
+						$j(config.element).dialog('close');
+
+						return false;
+					});
+				});
+
+				/* For all the world to see
+				 */
+				$j(config.element).dialog('open');
+			});
 		}
-
-		/* Remember where we left off and reopen from here
-		 */
-		socialstreamSession[self.config.instanceId].categoryId = node;
-
-		/* Load data into the node container
-		 */
-		self.config.element.load(self.config.url, args, function() {
-
-			/* These allow new nodes to be loaded
-			 */
-			var allNavigators = $j(self.config.element).find('.socialstream-breadcrumb, .socialstream-node-category');
-
-			$j.each(allNavigators, function(index, element) {
-				$j(element).find('a').click(function() {
-					$j(self.config.element).socialstreamBrowser.loadNode($j(this).attr('rel'));
-
-					return false;
-				});
-			});
-
-			/* Assign event handlers to all the files
-			 */
-			var allFiles = $j(self.config.element).find('.socialstream-node-file');
-
-			$j.each(allFiles, function(index, element) {
-				$j(element).find('a').click(function() {
-					var url = $j(this).attr('href');
-					var filename = $j(this).html();
-
-					/* Chooze and cloze
-					 */
-					self.config.submitCallback(url, filename);
-
-					$j(self.config.element).dialog('close');
-
-					return false;
-				});
-			});
-
-			/* For all the world to see
-			 */
-			$j(self.config.element).dialog('open');
-		});
 	}
 }(jQuery));
