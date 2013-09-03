@@ -120,6 +120,7 @@ class Scrub {
                 '(?:www\\.)?evt.org.nz',
                 'vhss-d.oddcast.com/vhss_editors/voki_player.swf',
                 'e.issuu.com/embed.html',
+                'webplayer.clickview.com.au/home/ev/',
             );
 
             // Add any additional iframe sources as configured
