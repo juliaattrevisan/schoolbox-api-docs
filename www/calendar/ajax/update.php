@@ -47,7 +47,9 @@ else {
 /* Update that event
  */
 $updatedEvent = array();
-$updatedEvent['id'] = $event['id'];
+$updatedEvent['id']        = $event['id'];
+$updatedEvent['owner']     = $event['owner'];
+$updatedEvent['access']    = $event['access'];
 $updatedEvent['startDate'] = $startTime->getDatabaseDate();
 $updatedEvent['startTime'] = $startTime->getDatabaseTime();
 $updatedEvent['endDate']   = $endTime->getDatabaseDate();
