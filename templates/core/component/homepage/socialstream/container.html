@@ -6,12 +6,6 @@
 	<script type='text/javascript' src='/javascript/socialstream/browser.js'></script>
 
 	<script type='text/javascript'>
-		/* Pseudo session - things are rememberised
-		 */
-		var socialstreamSession = {
-			categoryId: '{HOMEPAGE_ID}'
-		}
-
 		$j(function() {
 			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
 				instanceId: '{COMPONENT_INSTANCE_ID}',
@@ -23,23 +17,6 @@
 
 				offset: '{SOCIALSTREAM_AJAX_LIMIT}',
 				numPosts: '{SOCIALSTREAM_NUM_POSTS}'
-			});
-
-			/* Activate socialstream browser for comments/replies (clones)
-			 * One resource browser per socialstream component
-			 */
-			$j('.socialstream-browser-button').live('click', function() {
-				var self = $j(this);
-
-				$j('#socialstream-browser').socialstreamBrowser({
-
-					/* Deal with the output url that you choze
-					 */
-					submitCallback: function(url, filename) {
-						self.parents('form').find('input[name=url]').val(url);
-						self.parents('form').find('.socialstream-selected-file').html(filename);
-					}
-				});
 			});
 		});
 	</script>

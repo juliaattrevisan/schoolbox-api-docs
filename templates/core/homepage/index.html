@@ -12,11 +12,6 @@
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript">
-
-	/* Pseudo session - things are rememberised
-	 */
-	var socialstreamSession = new Array();
-
     $j(function() {
         /* Set up variables and urls
          */
@@ -43,6 +38,31 @@
          */
         setupCustomise.activeComponents();
     });
+
+	/* Pseudo session - things are rememberised
+	 */
+	var socialstreamSession = {
+		categoryId: '{HOMEPAGE_ID}'
+	}
+
+	$j(function() {
+		/* Activate socialstream browser for comments/replies (clones)
+		 * One resource browser per socialstream component
+		 */
+		$j('.socialstream-browser-button').live('click', function() {
+			var self = $j(this);
+
+			$j('#socialstream-browser').socialstreamBrowser({
+
+				/* Deal with the output url that you choze
+				 */
+				submitCallback: function(url, filename) {
+					self.parents('form').find('input[name=url]').val(url);
+					self.parents('form').find('.socialstream-selected-file').html(filename);
+				}
+			});
+		});
+	});
 </script>
 
 
