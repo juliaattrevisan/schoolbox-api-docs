@@ -133,8 +133,6 @@
 		 * Allow input forms to be spawned
 		 */
 		function initPostForm() {
-			var self = $j.fn.socialstreamThreads;
-
 			config.addPostLink.live('click', function() {
 
 				/* Clear out all instances of .addPostForm in the socialstream
@@ -157,7 +155,7 @@
 
 				/* Show specific ones
 				 */
-				self.initAttachmentSelectors(clone);
+				initAttachmentSelectors(clone);
 
 				/* Unhide it
 				 */
