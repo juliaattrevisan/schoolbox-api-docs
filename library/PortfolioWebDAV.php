@@ -295,6 +295,36 @@ class PortfolioWebDAV
             );
             $paths = array('/oneNet/NetStorage/');
         }
+        else if ($site_location == 'mggs'){
+
+            $settings = array(
+
+                'userName' => "mggs/" . $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+
+
+            if ($groupHandler->isStaff()) {
+                $settings['baseUri'] = 'http://mggs-fs01/';
+
+                $paths = array(
+                    '/STAFF/Users/' . $_SESSION['username'] . '/',
+                    '/EXCHANGE/',
+                );
+
+            } else if ($groupHandler->isStudent()) {
+                $settings['baseUri'] = 'http://mggs-fs02/';
+                $paths = array(
+                    '/STUDENTS/Users/'.(12 - $_SESSION['year'] + date('y')) .'/' . $_SESSION['username'] . '/',
+                );
+            } else {
+                return false;
+            }
+
+            print_r($settings);
+            print_r($paths);
+
+        }
         else if (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
@@ -352,7 +382,7 @@ class PortfolioWebDAV
         } /* Handle Sabre_DAV_Exception specifically
          */
         catch (Sabre\DAV\Exception $e) {
-            error(141, DAV_Error::getMeaning($e->getMessage()));
+            error(141, $e->getMessage() );
         }
 
         // remove parent
