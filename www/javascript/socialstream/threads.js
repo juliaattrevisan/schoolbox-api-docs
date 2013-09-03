@@ -46,7 +46,7 @@
 		/* Allow you to chooze the kind of attachment (if any)
 		 * to accompany your post
 		 */
-		self.initAttachmentSelectors(config.defaultForm);
+		initAttachmentSelectors(config.defaultForm);
 
 		/**
 		 * Initialise parameters
@@ -297,56 +297,56 @@
 		function generateStreamUrlSlow(instanceId, homepageId, end, offset) {
 			return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
 		}
-	}
-
-	/**
-	 * Abilities granted to all attachment selectors everywhere
-	 */
-	$j.fn.socialstreamThreads.initAttachmentSelectors = function(form) {
-		resetAttachmentSelectors(form);
-
-		/* Url attachment options
-		 */
-		form.find('.socialstream-attachment-url').click(function() {
-			form.find('input[name=socialstreamAttachment]').val('url');
-
-			form.find('input[name=url]').val('').removeAttr('readonly', '').parent('label').show();
-			form.find('input[name=file]').parent('label').hide();
-			form.find('.socialstream-selected-file').html('').parent('label').hide();
-
-		});
-
-		/* Upload attachment options
-		 */
-		form.find('.socialstream-attachment-upload').click(function() {
-			form.find('input[name=socialstreamAttachment]').val('upload');
-
-			form.find('input[name=url]').val('').parent('label').hide();
-			form.find('input[name=file]').parent('label').show();
-			form.find('.socialstream-selected-file').html('').parent('label').hide();
-		});
-
-		/* Resource attachment options
-		 */
-		form.find('.socialstream-attachment-resource').click(function() {
-			form.find('input[name=socialstreamAttachment]').val('resource');
-
-			form.find('input[name=url]').val('').attr('readonly', 'readonly').parent('label').show();
-			form.find('input[name=file]').parent('label').hide();
-			form.find('.socialstream-selected-file').html('').parent('label').show();
-		});
-
-		return form;
 
 		/**
-		 * Hide certain form controls
-		 *
-		 * @param form
+		 * Abilities granted to all attachment selectors everywhere
 		 */
-		function resetAttachmentSelectors(form) {
-			form.find('.socialstream-selected-file').parent('label').hide();
-			form.find('input[name=url]').parent('label').hide();
-			form.find('input[name=file]').parent('label').hide();
+		function initAttachmentSelectors(form) {
+			resetAttachmentSelectors(form);
+
+			/* Url attachment options
+			 */
+			form.find('.socialstream-attachment-url').click(function() {
+				form.find('input[name=socialstreamAttachment]').val('url');
+
+				form.find('input[name=url]').val('').removeAttr('readonly', '').parent('label').show();
+				form.find('input[name=file]').parent('label').hide();
+				form.find('.socialstream-selected-file').html('').parent('label').hide();
+
+			});
+
+			/* Upload attachment options
+			 */
+			form.find('.socialstream-attachment-upload').click(function() {
+				form.find('input[name=socialstreamAttachment]').val('upload');
+
+				form.find('input[name=url]').val('').parent('label').hide();
+				form.find('input[name=file]').parent('label').show();
+				form.find('.socialstream-selected-file').html('').parent('label').hide();
+			});
+
+			/* Resource attachment options
+			 */
+			form.find('.socialstream-attachment-resource').click(function() {
+				form.find('input[name=socialstreamAttachment]').val('resource');
+
+				form.find('input[name=url]').val('').attr('readonly', 'readonly').parent('label').show();
+				form.find('input[name=file]').parent('label').hide();
+				form.find('.socialstream-selected-file').html('').parent('label').show();
+			});
+
+			return form;
+
+			/**
+			 * Hide certain form controls
+			 *
+			 * @param form
+			 */
+			function resetAttachmentSelectors(form) {
+				form.find('.socialstream-selected-file').parent('label').hide();
+				form.find('input[name=url]').parent('label').hide();
+				form.find('input[name=file]').parent('label').hide();
+			}
 		}
 	}
 }(jQuery));
