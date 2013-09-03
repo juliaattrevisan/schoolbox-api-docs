@@ -282,10 +282,17 @@ $j(function() {
       },
       f_delete : function(id) {
         var name = $j('#folder-detail h3.name').html()
-        if(confirm("Are you sure you want to delete " + name + " and all its contents?")) {
+        if(confirm("Are you sure you want to delete " + name + "?")) {
           window.open("/cms/categoryForm.php?delete=" + id, "_self")
         }
         return true
+      },
+      f_delete_all : function(id) {
+        var name = $j('#folder-detail h3.name').html()
+        if(confirm("Are you sure you want to delete " + name + "? This will also delte all its contents.")) {
+          var path = '/cms/categoryForm.php?deleteAll=' + id
+          window.open(path, "_self")
+        }
       },
       f_download : function(id) {
         window.open("/cms/fetchFolder.php?folder=" + id, "_self")
@@ -453,6 +460,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
           <a class="btn rhomepage" data-action="homepage"><span></span>View Homepage</a>
           <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
           <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+          <a class="btn delete rdelete_all" data-action="delete_all"><span></span>Delete</a>
           <a class="btn download rdownload" data-action="download"><span></span>Download</a>
           <a class="btn add rfolder" data-action="folder"><span></span>Add Folder</a>
           <a class="btn create rfile" data-action="file"><span></span>Post File</a>
