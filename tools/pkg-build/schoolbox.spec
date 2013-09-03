@@ -41,10 +41,13 @@ Requires:	php-soap
 Requires:	php-xml
 Requires:	php-xmlrpc
 Requires:	php-mbstring
+Requires:	php-pspell
 Requires:	mysql
 Requires:	mysql-server
 Requires:	wget
 Requires:	cifs-utils
+Requires:	libpspell-dev
+Requires:	aspell-en
 
 # TODO: Fix missing build dependencies (npm)
 BuildArch:	noarch

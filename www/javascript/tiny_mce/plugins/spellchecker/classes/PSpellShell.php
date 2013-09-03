@@ -4,7 +4,7 @@
  *
  * @package MCManager.includes
  * @author Moxiecode
- * @copyright Copyright © 2004-2007, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2004-2007, Moxiecode Systems AB, All rights reserved.
  */
 
 class PSpellShell extends SpellChecker {
@@ -103,14 +103,14 @@ class PSpellShell extends SpellChecker {
 	function _getCMD($lang) {
 		$this->_tmpfile = tempnam($this->_config['PSpellShell.tmp'], "tinyspell");
 
-		$file = $this->_tmpfile;
-		$lang = preg_replace("/[^-_a-z]/", "", strtolower($lang));
-		$bin  = $this->_config['PSpellShell.aspell'];
+		$file = escapeshellarg($this->_tmpfile);
+		$lang = escapeshellarg(preg_replace("/[^-_a-z]/", "", strtolower($lang)));
+		$bin  = escapeshellarg($this->_config['PSpellShell.aspell']);
 
 		if (preg_match("#win#i", php_uname()))
 			return "$bin -a --lang=$lang --encoding=utf-8 -H < $file 2>&1";
 
-		return "cat $file | $bin -a --lang=$lang --encoding=utf-8 -H");
+		return "cat $file | $bin -a --lang=$lang --encoding=utf-8 -H";
 	}
 }
 
