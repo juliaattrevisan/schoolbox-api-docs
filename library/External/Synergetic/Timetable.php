@@ -99,8 +99,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				array('@CurrentDay',     'day',                               SQLINT4,    true,  false, -1),
 			)
 		);
-		if (isset($result['@CurrentDay'])) {
-			return $result['@CurrentDay'];
+		if (isset($result['output']['@CurrentDay'])) {
+			return $result['output']['@CurrentDay'];
 		}
 
 		if(date('w', $date) == 0 || date('w', $date) == 6)
