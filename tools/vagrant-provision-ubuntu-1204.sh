@@ -92,6 +92,7 @@ then
 	fi
 
 	apt-get -y install php5-redis redis-server
+	apt-get -y install libpspell-dev php5-pspell aspell-en php5 php5-dev php-pear > /dev/null 2>&1;
 	echo "$vag Loading all demo data complete";
 fi
 echo "$vag Ensure all services are running";
