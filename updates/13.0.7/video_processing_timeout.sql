@@ -12,7 +12,7 @@ INSERT INTO `config`(
 )
 VALUES (
   'video_processing_timeout',
-  15*60,
+  60*60,
   'Video Processing Timeout',
   'The maximum number of seconds that a video may process for before timing out and being marked as failed. (Set to 0 or less to disable timeout.)',
   'input',
