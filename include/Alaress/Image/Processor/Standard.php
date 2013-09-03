@@ -57,9 +57,11 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      * @return $this
      */
     private function loadProcessorStrategy($strategy, $args = null) {
+        /** @var Alaress_Image_Processor_Strategy_Interface $processor */
         $strategyName = $this->getProcessorStrategyPrefix() . $strategy;
-
-        $this->setProcessorStrategy(new $strategyName($args));
+        $processor    = new $strategyName($args);
+        $processor->setSupportsAlphaChannel($this->getFiletypeStrategy()->supportsAlphaChannel());
+        $this->setProcessorStrategy($processor);
 
         return $this;
     }

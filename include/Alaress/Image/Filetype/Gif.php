@@ -59,5 +59,13 @@ class Alaress_Image_Filetype_Gif extends Alaress_Image_Filetype_Abstract {
         exit;
     }
 
+    /**
+     * GIF does support the alpha channel
+     *
+     * @return bool Always true
+     */
+    public function supportsAlphaChannel() {
+        return true;
+    }
 
 }

@@ -68,11 +68,13 @@ class Alaress_Image_Processor_Strategy_Rectangle extends Alaress_Image_Processor
 		$currentRatio = $currentWidth / $currentHeight;
 		$finalRatio = $this->getCanvasWidth() / $this->getCanvasHeight();
 
-		/* Resize only if the image is larger than the canvas
-		 * Otherwise just return the original image dimensions
+		/* Resize if image is larger than the canvas in either dimension
+		 * (or upscaling small images)
 		 */
-		if ((($currentWidth > $this->getCanvasWidth()) && ($currentHeight > $this->getCanvasHeight())) || $this->getSmallImageUpscales()) {
-
+		if ($currentWidth > $this->getCanvasWidth()
+			|| $currentHeight > $this->getCanvasHeight()
+			|| $this->getSmallImageUpscales()
+		) {
 			/* Landscape
 			 */
 			if (($this->getCanvasWidth()/$this->getCanvasHeight()) >= 1) {
@@ -138,8 +140,6 @@ class Alaress_Image_Processor_Strategy_Rectangle extends Alaress_Image_Processor
 				}
 			}
 
-			$bgColor = $this->getBgColors();
-
 			/* Resize the canvas to fit the new resized dimensions, so
 			 * you don't get excess canvas space
 			 */
@@ -147,16 +147,10 @@ class Alaress_Image_Processor_Strategy_Rectangle extends Alaress_Image_Processor
 			imagecopyresampled($this->getCanvas(), $image, 0, 0, $startX, $startY, $this->getCanvasWidth(), $this->getCanvasHeight(), $endX, $endY);
 		}
 		else {
-			$startX = 0;
-			$startY = 0;
-
-			$endX = $currentWidth;
-			$endY = $currentHeight;
-
-			/* Put small image in the middle of the canvas
-			 */
+			// Create a new truecolor canvas of the same size, and copy onto it.
+			$this->setCanvas(imagecreatetruecolor($currentWidth, $currentHeight));
 			$this->alphaFill();
-			imagecopyresampled($this->getCanvas(), $image, ($this->getCanvasWidth() - $currentWidth)/2, ($this->getCanvasHeight() - $currentHeight)/2, $startX, $startY, $currentWidth, $currentHeight, $endX, $endY);
+			imagecopy($this->getCanvas(), $image, 0, 0, 0, 0, $currentWidth, $currentHeight);
 		}
 
 

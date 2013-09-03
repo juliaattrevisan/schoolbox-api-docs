@@ -17,11 +17,19 @@ class Alaress_Image_Processor_Abstract {
 	/* Strategies for image manipulation
 	 */
 	protected $processorStrategyPrefix = 'Alaress_Image_Processor_Strategy_';
+
+	/**
+	 * @var Alaress_Image_Processor_Strategy_Interface
+	 */
 	protected $processorStrategy = null;
 
 	/* Strategies for polymorphic image output
 	 */
 	protected $filetypeStrategyPrefix = 'Alaress_Image_Filetype_';
+
+	/**
+	 * @var Alaress_Image_Filetype_Interface
+	 */
 	protected $filetypeStrategy = null;
 
 	/* Image being manipulated
@@ -112,7 +120,7 @@ class Alaress_Image_Processor_Abstract {
 	/**
 	 * Set processor strategy
 	 *
-	 * @param $processorStrategy
+	 * @param Alaress_Image_Processor_Strategy_Interface $processorStrategy
 	 */
 	protected function setProcessorStrategy($processorStrategy) {
 		$this->processorStrategy = $processorStrategy;
@@ -121,7 +129,7 @@ class Alaress_Image_Processor_Abstract {
 	/**
 	 * Get processor strategy
 	 *
-	 * @return null
+	 * @return Alaress_Image_Processor_Strategy_Interface
 	 */
 	protected function getProcessorStrategy() {
 		return $this->processorStrategy;

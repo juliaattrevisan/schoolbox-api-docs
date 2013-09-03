@@ -8,5 +8,22 @@
  * @version	 SVN: $Id$
  */
 interface Alaress_Image_Processor_Strategy_Interface {
-	public function manipulate($image);
+    /**
+     * Manipulate image
+     *
+     * @param  resource $image
+     * @return resource The manipulated image
+     */
+    public function manipulate($image);
+
+    /**
+     * @param  bool  $supports_alpha_channel
+     * @return $this
+     */
+    public function setSupportsAlphaChannel($supports_alpha_channel);
+
+    /**
+     * @return bool
+     */
+    public function getSupportsAlphaChannel();
 }
