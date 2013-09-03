@@ -18,7 +18,6 @@
 	 * @param options
 	 */
 	$j.fn.socialstreamThreads = function(options) {
-		var self = $j.fn.socialstreamThreads;
 
 		/* Store the config in this instance so private methods
 		 * can access it
