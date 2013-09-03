@@ -19,6 +19,7 @@ Depends: apache2,
  cifs-utils,
  libav-tools, libavcodec-extra-53,
  redis-server,
+ libpspell-dev, php5-pspell, aspell-en
  ${misc:Depends}
 Conflicts: javascript-common
 Description: Schoolbox LMS by Alaress Pty. Ltd.
