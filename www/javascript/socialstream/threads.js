@@ -223,8 +223,6 @@
 			 * This is subject to the issue SB-3160
 			 */
 			function updateStreamUrl() {
-				var self = $j.fn.socialstreamThreads;
-
 				var newStart = parseInt(config.start) + parseInt(config.offset);
 
 				/* Remember updated values
@@ -238,8 +236,6 @@
 			 * This is subject to the issue SB-3160
 			 */
 			function updateStreamUrlSlow() {
-				var self = $j.fn.socialstreamThreads;
-
 				var newEnd = parseInt(config.end) + parseInt(config.offset);
 
 				/* Remember updated values
