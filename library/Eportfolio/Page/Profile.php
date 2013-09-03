@@ -227,7 +227,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 					$mark = $latestReturn->getMark();
 					$this->getPage()->setVar(array(
 						'SHOWCASED_WORK_RETURNED_MARK' => $mark,
-						'SHOWCASED_WORK_RETURNED_GRADIENT' => (int)($mark / 10),
+						'SHOWCASED_WORK_RETURNED_GRADIENT' => $latestReturn->getGradientFromNormalizedMark(),
 					));
 				}
 				else {
