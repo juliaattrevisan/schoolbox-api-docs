@@ -83,7 +83,7 @@
 
 				/* The url to stream from
 				 */
-				streamUrl: self.generateStreamUrlSlow(options.instanceId, options.homepageId, options.end, options.offset),
+				streamUrl: generateStreamUrlSlow(options.instanceId, options.homepageId, options.end, options.offset),
 
 				/* The element which allows you to make comments and replies
 				 */
@@ -230,7 +230,7 @@
 				/* Remember updated values
 				 */
 				config.start = newStart;
-				config.streamUrl = self.generateStreamUrl(config.instanceId, config.homepageId, config.start, config.offset);
+				config.streamUrl = generateStreamUrl(config.instanceId, config.homepageId, config.start, config.offset);
 			}
 
 			/**
@@ -245,7 +245,7 @@
 				/* Remember updated values
 				 */
 				config.end = newEnd;
-				config.streamUrl = self.generateStreamUrlSlow(config.instanceId, config.homepageId, config.end, config.offset);
+				config.streamUrl = generateStreamUrlSlow(config.instanceId, config.homepageId, config.end, config.offset);
 			}
 
 			/**
@@ -278,6 +278,30 @@
 			else {
 				$j(config.viewMoreLink).hide();
 			}
+		}
+
+		/**
+		 * Generate a stream url
+		 *
+		 * @param instanceId
+		 * @param homepageId
+		 * @param start
+		 * @param offset
+		 */
+		function generateStreamUrl(instanceId, homepageId, start, offset) {
+			return '/socialstream/threads.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=' + start + '&offset=' + offset;
+		}
+
+		/**
+		 * Generate a stream url
+		 *
+		 * @param instanceId
+		 * @param homepageId
+		 * @param end
+		 * @param offset
+		 */
+		function generateStreamUrlSlow(instanceId, homepageId, end, offset) {
+			return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
 		}
 	}
 
@@ -331,29 +355,4 @@
 			form.find('input[name=file]').parent('label').hide();
 		}
 	}
-
-	/**
-	 * Generate a stream url
-	 *
-	 * @param instanceId
-	 * @param homepageId
-	 * @param start
-	 * @param offset
-	 */
-	$j.fn.socialstreamThreads.generateStreamUrl = function(instanceId, homepageId, start, offset) {
-		return '/socialstream/threads.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=' + start + '&offset=' + offset;
-	}
-
-	/**
-	 * Generate a stream url
-	 *
-	 * @param instanceId
-	 * @param homepageId
-	 * @param end
-	 * @param offset
-	 */
-	$j.fn.socialstreamThreads.generateStreamUrlSlow = function(instanceId, homepageId, end, offset) {
-		return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
-	}
-
 }(jQuery));
