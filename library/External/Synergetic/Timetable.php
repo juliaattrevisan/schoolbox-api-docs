@@ -91,6 +91,18 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			$date = mktime();
 		}
 
+		$result = $this->getDatabase()->executeProcedure(
+			'spgTimetableDay',
+			array(
+				array('@TimeTableGroup', $campusModel->getExtTimetableCode(), SQLVARCHAR, false, false, -1),
+				array('@Date',           date('Y-m-d', $date),                SQLVARCHAR, false, false, -1),
+				array('@CurrentDay',     'day',                               SQLINT4,    true,  false, -1),
+			)
+		);
+		if (isset($result['output']['@CurrentDay'])) {
+			return $result['output']['@CurrentDay'];
+		}
+
 		if(date('w', $date) == 0 || date('w', $date) == 6)
 			return false;
 
