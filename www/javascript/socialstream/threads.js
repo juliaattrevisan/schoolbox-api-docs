@@ -181,13 +181,11 @@
 		 * Stream more content
 		 */
 		function stream() {
-			var threadContainer = config.threadContainer;
-
 			$j.get(config.streamUrl, function(responseText) {
 
 				/* Shove in the new content
 				 */
-				addThreads(responseText, threadContainer);
+				addThreads(responseText, config.threadContainer);
 
 				/* Update offsets, hiding View More if there were none left
 				 * after streaming
