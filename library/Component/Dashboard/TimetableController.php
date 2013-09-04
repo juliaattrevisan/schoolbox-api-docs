@@ -51,11 +51,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $campus_code = $campus->getExtTimetableCode();
                 if (!isset($checked_campus_list[$campus_code])) {
                     $checked_campus_list[$campus_code] = true;
-                    $this->dayNumber[$campus_id]     = $timetableHandler->getDayNumber($campus_id);
-                    $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus_id);
-                    $this->timetable[$campus_id]     = $timetableHandler->getDayTimetable(
-                        $_SESSION['sid'], $_SESSION['id'], $campus_id, $this->dayNumber[$campus_id]
-                    );
+                    $day_number = $timetableHandler->getDayNumber($campus_id);
+                    if ($day_number) {
+                        $this->dayNumber[$campus_id]     = $timetableHandler->getDayNumber($campus_id);
+                        $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus_id);
+                        $this->timetable[$campus_id]     = $timetableHandler->getDayTimetable(
+                            $_SESSION['sid'], $_SESSION['id'], $campus_id, $day_number
+                        );
+                    }
                 }
             }
         }
