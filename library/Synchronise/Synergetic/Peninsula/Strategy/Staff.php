@@ -48,4 +48,52 @@ class Synchronise_Synergetic_Peninsula_Strategy_Staff extends Synchronise_Base_S
         }
         return 0;
     }
+
+    /**
+     * @param  array $currentUser
+     * @return int
+     */
+    public function getGroupIDFromUser($currentUser) {
+        switch ($currentUser['StaffCategory']) {
+            // Academic Staff
+            case 'AADPR':
+            case 'ADPOP':
+            case 'ADVPR':
+            case 'CHAPLAIN':
+            case 'LIBRARY':
+            case 'MUSICCAS':
+            case 'MUSICSAL':
+            case 'TEACHKIN':
+            case 'TEACHPRI':
+            case 'TEACHSEC':
+                return 2;
+
+            // Non-Academic Staff
+            case 'ADWBMGR':
+            case 'ASS':
+            case 'BOARDHSE':
+            case 'BUSTEAMACC':
+            case 'BUSTEAMADMIN':
+            case 'BUSTEAMARCH':
+            case 'BUSTEAMIT':
+            case 'CRADM':
+            case 'CRMARK':
+            case 'CSLR':
+            case 'GAPSTUD':
+            case 'MISC':
+            case 'OTHER':
+            case 'PROPERTY':
+            case 'SCHLT':
+            case 'STUDSERV':
+            case 'TEACHAIDE':
+            case 'TUCKSHOP':
+            case 'CLEAN':
+            case 'CASRELTEA':
+                return 3;
+
+            // ?
+            default:
+                return 0;
+        }
+    }
 }
