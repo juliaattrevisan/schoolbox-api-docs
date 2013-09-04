@@ -117,7 +117,7 @@ class Scrub {
                 '(?:www\\.)?studyboost.com/',
                 'prezi.com/embed/',
                 '(?:www\\.)?spiderscribe.net/app/',
-                '(?:www\\.)?evt.org.nz',
+                '(?:www\\.)?etv.org.nz',
                 'vhss-d.oddcast.com/vhss_editors/voki_player.swf',
                 'e.issuu.com/embed.html',
                 'webplayer.clickview.com.au/home/ev/',
