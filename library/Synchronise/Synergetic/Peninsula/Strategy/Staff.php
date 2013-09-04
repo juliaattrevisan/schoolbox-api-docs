@@ -28,6 +28,8 @@ class Synchronise_Synergetic_Peninsula_Strategy_Staff extends Synchronise_Base_S
      * * M      => Middle (2)
      * * S, ELC => Senior (1)
      *
+     * Defaults to senior.
+     *
      * @param  array $currentUser
      * @return int
      */
@@ -46,7 +48,7 @@ class Synchronise_Synergetic_Peninsula_Strategy_Staff extends Synchronise_Base_S
             default:
                 break;
         }
-        return 0;
+        return 1;
     }
 
     /**
