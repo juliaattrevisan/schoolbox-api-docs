@@ -30,11 +30,10 @@
             content:'The file extension, everything after the dot. Comma seperate multiple extensions'});
 
         $j('.allowed-files tr:first td:nth-child(5)').qtip({
-            content:'Determines if file will be opened in the browser or by a third party application'});
-
-        $j('.allowed-files tr:first td:nth-child(6)').qtip({
             content:'The maximum file size when uploading a file of this type - defaults to system-wide max file size'});
 
+        $j('.allowed-files tr:first td:nth-child(6)').qtip({
+            content:'Determines if file will be opened in the browser or by a third party application'});
 
         $j('.modify').live('click', function () {
             var trigger = 0;
