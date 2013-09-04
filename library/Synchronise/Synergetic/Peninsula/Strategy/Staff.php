@@ -91,11 +91,8 @@ class Synchronise_Synergetic_Peninsula_Strategy_Staff extends Synchronise_Base_S
             case 'TUCKSHOP':
             case 'CLEAN':
             case 'CASRELTEA':
-                return 3;
-
-            // ?
             default:
-                return 0;
+                return 3;
         }
     }
 }
