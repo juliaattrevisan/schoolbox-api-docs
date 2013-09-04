@@ -122,7 +122,30 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 							 * Event's start time is before end time of span: ignore
 							 */
 							if (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp)) {
-								$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
+
+								// Get category list for this event.
+								// If this event has a category which matches
+								// any event type, then apply that event type's
+								// color instead of the configured one.
+								$category_list = explode(';', $currentEvent->CATEGORIES->value);
+								$category_list = array_map('trim',       $category_list);
+								$category_list = array_map('strtoupper', $category_list);
+								$category_list = array_filter($category_list, 'strlen');
+								$metaDetails   = null;
+								foreach ($category_list as $category_name) {
+									foreach ($this->getAllLuEventTypes() as $event_type) {
+										if (strtoupper($event_type['eventType']) === $category_name) {
+											$metaDetails = $event_type;
+											break;
+										}
+									}
+									if (!empty($metaDetails)) {
+										break;
+									}
+								}
+								if (empty($metaDetails)) {
+									$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
+								}
 
 								$event = new Calendar_Event_Type_Day();
 
