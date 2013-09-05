@@ -52,22 +52,25 @@ class Subcontext_CoreContext extends BaseContext {
 
         $count = count($dirname_list);
         foreach ($dirname_list as $i => $dirname) {
-            // Click the expand button, if there is one. If this is the last
-            // item, click "visit homepage" instead.
+            // Click the expand button, if there is one and it isn't expanded.
+            // If this is the last item, click "visit homepage" instead.
             /** @var Element\NodeElement[] $child_folder_list */
             $child_folder_list = $folder_browser->findAll('css', '.child-of-node-'.$current_folder_id);
             $is_dirname_found  = false;
             foreach ($child_folder_list as $child_folder) {
                 $label       = $child_folder->find('css', '.label');
                 $folder_name = $label->getText();
+                $is_expanded = $child_folder->hasClass('expanded');
 
                 if ($dirname === $folder_name) {
                     $is_dirname_found = true;
                     list(, $current_folder_id) = explode('-', $child_folder->getAttribute('id'));
                     if ($i < ($count-1)) {
                         // Not last folder: drill down to next in tree
-                        $child_folder->find('css', '.elbow')->click();
-                        $this->getCoreContext()->waitForAjax();
+                        if (!$is_expanded) {
+                            $child_folder->find('css', '.elbow')->click();
+                            $this->getCoreContext()->waitForAjax();
+                        }
                     }
                     else {
                         // Last folder: open node, click "View Homepage"
