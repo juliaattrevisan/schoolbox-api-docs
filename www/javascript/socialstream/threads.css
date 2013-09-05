@@ -1,6 +1,7 @@
 /* Socialstream Threads
  */
 .socialstream-threads ul li {
+    padding-right: 0px;
     margin-left: 24px;
     clear: both;
 }
