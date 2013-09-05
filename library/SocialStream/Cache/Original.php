@@ -12,6 +12,13 @@ namespace SocialStream\Cache;
 class Original extends \Alaress_Cache_Abstract {
 
 	/**
+	 * Whether the given url was fopen'd successfully
+	 *
+	 * @var bool
+	 */
+	protected $result = false;
+
+	/**
 	 * A prefix for cached filenames
 	 *
 	 * @var string
@@ -64,12 +71,12 @@ class Original extends \Alaress_Cache_Abstract {
 			 */
 			if ($urlDetection->isStorageUrl()) {
 				$url = "http://{$_SERVER['HTTP_HOST']}{$this->getUrl()}";
-				$this->processUrl($url);
+				$this->setResult($this->processUrl($url));
 			}
 		}
 		else {
 			$url = $this->getUrl();
-			$this->processUrl($url);
+			$this->setResult($this->processUrl($url));
 		}
 	}
 
@@ -100,5 +107,36 @@ class Original extends \Alaress_Cache_Abstract {
 
 		fclose($streamHandle);
 		fclose($cacheHandle);
+
+		return true;
+	}
+
+	/**
+	 * Alias for getResult() so it can be used in a more meaningful context
+	 * outside of this class
+	 */
+	public function hasThumbnail() {
+		return $this->getResult();
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set result
+	 *
+	 * @param boolean $result
+	 */
+	protected function setResult($result) {
+		$this->result = $result;
+	}
+
+	/**
+	 * Get result
+	 *
+	 * @return boolean
+	 */
+	protected function getResult() {
+		return $this->result;
 	}
 }

@@ -292,6 +292,13 @@ class Creational extends AbstractFactory {
 			if (!preg_match('/^icon:/', $chain->getResult())) {
 				$cache = new \SocialStream\Cache\Original();
 				$cache->init($this->getProduct()->getThumbnail());
+
+				/* Thumbnail metadata was found, but thumbnail itself
+				 * isn't there (broken link)
+				 */
+				if (!$cache->hasThumbnail()) {
+					$this->getProduct()->setThumbnail('');
+				}
 			}
 		}
 	}
