@@ -1,48 +1,49 @@
 /* Socialstream Threads
  */
-.socialstream ul li.socialstream-post {
+.socialstream-threads ul li {
+    margin-left: 24px;
+    clear: both;
+}
+
+.socialstream-threads ul li.socialstream-post {
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
     padding: 20px 0px;
 }
 
-.socialstream ul li {
-    margin-left: 24px;
-}
-
-.socialstream div.avatar {
+.socialstream-threads div.avatar {
     width: 32px;
     margin-right: 8px;
     float: left;
 }
 
-.socialstream div.body {
+.socialstream-threads div.body {
     float: left;
 }
 
-.socialstream div.body span {
+.socialstream-threads div.body span {
     color: #aaa;
 }
 
-.socialstream li.socialstream-post div.body {
+.socialstream-threads li.socialstream-post div.body {
     /*border: 1px solid #f00;*/
 }
 
-.socialstream li.socialstream-comment div.body {
+.socialstream-threads li.socialstream-comment div.body {
     /*border: 1px solid #0f0;*/
 }
 
-.socialstream li.socialstream-reply div.body {
+.socialstream-threads li.socialstream-reply div.body {
     /*border: 1px solid #00f;*/
 }
 
-.socialstream .addPostLink {
+.socialstream-threads .addPostLink {
     border-left: 1px solid #aaa;
     padding-left: 6px;
     margin-left: 4px;
 }
 
-.socialstream .loading {
+.socialstream-threads .loading {
     background-color: #f00;
     text-align: center;
     font-weight: bold;
