@@ -62,9 +62,21 @@ else {
 	        $user = $userHandler->getByID($child_id);
 	        $campusList = $userHandler->getUserCampus($child_id);
 
+            /* Don't output if multiple timetables if external campus code is the same */
+            $checked_campus_list = array();
 	        foreach($campusList as $campus ) {
-		        $user['campus'] = $campus;
-		        $outputList[] = $user;
+                $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
+                if ($campusObj instanceof Schoolbox\Campus) {
+                    $campus_code = $campusObj->getExtTimetableCode();
+                    if (!isset($checked_campus_list[$campus_code])) {
+                        $checked_campus_list[$campus_code] = true;
+
+		                $user['campus'] = $campus;
+                        $user['campusName'] = $campusObj->getName();
+		                $outputList[] = $user;
+
+                    }
+                }
 	        }
         }
         else {
@@ -77,9 +89,19 @@ else {
 	        $user = $userHandler->getByID($_SESSION['id']);
 	        $campusList = $userHandler->getUserCampus($_SESSION['id']);
 
-	        foreach($campusList as $campus ) {
-		        $user['campus'] = $campus;
-		        $outputList[] = $user;
+            /* Don't output if multiple timetables if external campus code is the same */
+            $checked_campus_list = array();
+            foreach($campusList as $campus ) {
+                $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
+                if ($campusObj instanceof Schoolbox\Campus) {
+                    $campus_code = $campusObj->getExtTimetableCode();
+                    if (!isset($checked_campus_list[$campus_code])) {
+                        $checked_campus_list[$campus_code] = true;
+                        $user['campus'] = $campus;
+                        $user['campusName'] = $campusObj->getName();
+                        $outputList[] = $user;
+                    }
+                }
             }
 	    }
 		else {
@@ -263,7 +285,8 @@ if (is_array($outputList)) {
             //reset blocks in case we coming back...
             $this->setVar('period_listing', '');
             $this->setVar('day_header_listing', '');
-        } else {
+        } else if($days == 0) {
+            //In case no timetable has been output for what ever reason
             $this->setVar('timetable_listing', '');
         }
 
