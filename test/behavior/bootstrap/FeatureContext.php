@@ -25,22 +25,11 @@ class FeatureContext extends BaseContext {
     }
 
     /**
-     * Resets the database to a known clean state.
-     *
-     * @BeforeScenario
-     */
-    public function resetDatabase(Behat\Behat\Event\ScenarioEvent $event) {
-//        $this->printDebug('Resetting database');
-        $this->getMinkContext()->visit('/test/reset.php');
-    }
-
-    /**
-     * Resets the browser.
+     * Resets the browser after a scenario has run.
      *
      * @AfterScenario
      */
     public function resetBrowser(Behat\Behat\Event\ScenarioEvent $event) {
-//        $this->printDebug('Resetting browser session');
         $this->getSession()->reset();
     }
 }
