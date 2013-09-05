@@ -201,11 +201,11 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             'StudentContactPostCode', 'StudentContactState', 'StudentContactPhoneActual', 'StudentContactMobilePhone',
             'StudentContactOccupPhone', 'StudentContactSpouseID', 'StudentContactSpouseTitle',
             'StudentContactSpousePreferred', 'StudentContactSpouseSurname', 'StudentContactSpouseMobilePhone',
-            'StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail', 'StudentContactType');
+            'StudentContactSpouseOccupPhone','StudentContactSpouseDefaultEmail', 'StudentContactType');
 
         $stmt = $this->getDatabase()->prepare("
             SELECT p.carer_number AS StudentContactID, full_name, COMBINED_EMAIL_ADDRESS AS StudentContactDefaultEmail,
-              mobile AS StudentContactMobilePhone
+              mobile AS StudentContactMobilePhone, p.spouse_carer_number as StudentContactSpouseID, spouse_full_name, spouse_mobile as StudentContactSpouseMobilePhone, COMBINED_EMAIL_ADDRESS AS StudentContactSpouseDefaultEmail
             FROM db2inst1.schoolbox_parents p
             INNER JOIN db2inst1.schoolbox_parent_student ps ON p.carer_number = ps.carer_number
             WHERE ps.student_number = :id
@@ -224,6 +224,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
                 unset($row['FULL_NAME']);
             }
 
+            if($spouseName = $this->guessNamePartsFromFull($row['SPOUSE_FULL_NAME'], 'StudentContactSpouse')) {
+                $row = array_merge($row, $spouseName);
+                unset($row['SPOUSE_FULL_NAME']);
+            }
             $parents[] = $this->normaliseFields($row, $caseSensitiveFields);
         }
 
