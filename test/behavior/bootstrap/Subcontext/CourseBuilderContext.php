@@ -72,7 +72,7 @@ class Subcontext_CourseBuilderContext extends BaseContext {
         // Element may not be visible yet
         $this->spin(
             function($context) use($component) {
-                $component->find('css', '.for_due_work .interact a.create')->click();
+                $component->find('css', '.for_due_work .interact a')->click();
                 return true;
             },
             5
