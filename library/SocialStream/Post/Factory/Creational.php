@@ -280,14 +280,19 @@ class Creational extends AbstractFactory {
 
 		/* To prevent a double-curl, remember the place where a thumbnail was
 		 * located (this is used as the cached image transform filename hash)
+		 *
+		 * Avoid caching icons
 		 */
 		if (strlen($chain->getResult())) {
 			$this->getProduct()->setThumbnail($chain->getResult());
 
 			/* Save the original in the cache location
+			 * but don't cache icons
 			 */
-			$cache = new \SocialStream\Cache\Original();
-			$cache->init($this->getProduct()->getThumbnail());
+			if (!preg_match('/^icon:/', $chain->getResult())) {
+				$cache = new \SocialStream\Cache\Original();
+				$cache->init($this->getProduct()->getThumbnail());
+			}
 		}
 	}
 
