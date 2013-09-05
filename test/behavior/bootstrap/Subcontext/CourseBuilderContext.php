@@ -77,7 +77,7 @@ class Subcontext_CourseBuilderContext extends BaseContext {
             },
             5
         );
-        $this->getCoreContext()->waitForElementOnPage('form#createAssess');
+        $this->getCoreContext()->waitForElementOnPage('form#createSubmissionForm');
         $form = $this->getSession()->getPage()->findById('createSubmissionForm');
         $form->fillField('task_title', $name);
     }
