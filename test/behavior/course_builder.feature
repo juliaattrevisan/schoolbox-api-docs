@@ -58,7 +58,7 @@ Scenario: Create a course
   And   I add wrong answer "Answer 4" at position "4"
   And   I press "Add Question"
   # That's it for the online assessment, go back to the homepage
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical Reactions"
+  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
 
   # Add a due work task
   And   I add a due work task
@@ -70,7 +70,7 @@ Scenario: Create a course
   And   I check "accept_submission"
   And   I press "Create"
   # That's it for the due work, go back to the homepage
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical Reactions"
+  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
 
   # Add another due work item, this one not submittable online
   And   I add a due work task
@@ -78,7 +78,7 @@ Scenario: Create a course
   And   I select "Letter Grade" from "marktype"
   And   I uncheck "accept_submission"
   And   I press "Create"
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical Reactions"
+  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
 
   # Create a self-assess task
   Then  I add a task named "Read chapter 3"
