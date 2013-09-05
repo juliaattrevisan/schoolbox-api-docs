@@ -2,7 +2,8 @@
 /**
  * The base context for all context classes (even the feature context!)
  *
- * Defines all sorts of useful generic methods
+ * Defines all sorts of useful generic methods, but no step definitions (as if
+ * it did, the steps would be defined multiple times)
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -59,7 +60,6 @@ abstract class BaseContext extends RawMinkContext {
      * @param array  $post_vars An array of post variables to send.
      */
     protected function ajaxPost($url, $post_vars) {
-//        $this->printDebug(sprintf('Post to "%s"', $url));
         $this->getSession()->executeScript(
             sprintf('jQuery.post(%s, %s)', json_encode($url), json_encode($post_vars))
         );
