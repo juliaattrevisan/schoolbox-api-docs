@@ -43,6 +43,7 @@ if (is_numeric($_GET['id']) && Cfg::get('webdav_enable')) {
     header("Content-Disposition: $attach filename=\"" . $file['realname'] . "\"");
     header("Content-Length: $filesize");
     readfile($filename);
+    unlink($filename);
 } else
     error(2);
 
