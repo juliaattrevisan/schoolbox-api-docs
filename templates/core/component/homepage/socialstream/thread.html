@@ -22,9 +22,10 @@
 			<!-- BEGIN socialstream_post_has_icon -->
 			<a href='{SOCIALSTREAM_POST_URL}'>
 				<img src='/images/mime/60x60/{SOCIALSTREAM_POST_ICON}' style='outline:1px dashed #00f;'/>
+				{SOCIALSTREAM_POST_URL}
 			</a>
 			<p>
-				<strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong><br />
+				<a href='{SOCIALSTREAM_POST_URL}'><strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong></a><br />
 				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
 			</p>
 			<!-- END socialstream_post_has_icon -->
@@ -34,7 +35,7 @@
 				<img src='/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 			</a>
 			<p>
-				<strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong><br />
+				<a href='{SOCIALSTREAM_POST_URL}'><strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong></a><br />
 				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
 			</p>
 			<!-- END socialstream_post_has_thumbnail -->
@@ -74,9 +75,10 @@
 					<!-- BEGIN socialstream_comment_has_icon -->
 					<a href='{SOCIALSTREAM_COMMENT_URL}'>
 						<img src='/images/mime/60x60/{SOCIALSTREAM_COMMENT_ICON}' style='outline:1px dashed #00f;'/>
+						{SOCIALSTREAM_COMMENT_URL}
 					</a>
 					<p>
-						<strong>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</strong><br />
+						<a href='{SOCIALSTREAM_COMMENT_URL}'><strong>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</strong></a><br />
 						<em>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</em>
 					</p>
 					<!-- END socialstream_comment_has_icon -->
@@ -86,7 +88,7 @@
 						<img src='/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 					</a>
 					<p>
-						<strong>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</strong><br />
+						<a href='{SOCIALSTREAM_COMMENT_URL}'><strong>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</strong></a><br />
 						<em>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</em>
 					</p>
 					<!-- END socialstream_comment_has_thumbnail -->
@@ -121,9 +123,10 @@
 							<!-- BEGIN socialstream_reply_has_icon -->
 							<a href='{SOCIALSTREAM_REPLY_URL}'>
 								<img src='/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}' style='outline:1px dashed #00f;'/>
+								{SOCIALSTREAM_REPLY_URL}
 							</a>
 							<p>
-								<strong>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</strong><br />
+								<a href='{SOCIALSTREAM_REPLY_URL}'><strong>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</strong></a><br />
 								<em>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</em>
 							</p>
 							<!-- END socialstream_reply_has_icon -->
@@ -133,7 +136,7 @@
 								<img src='/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64' style='outline:1px dashed #f00;'/>
 							</a>
 							<p>
-								<strong>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</strong><br />
+								<a href='{SOCIALSTREAM_REPLY_URL}'><strong>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</strong></a><br />
 								<em>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</em>
 							</p>
 							<!-- END socialstream_reply_has_thumbnail -->
