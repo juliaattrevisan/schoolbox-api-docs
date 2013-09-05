@@ -99,7 +99,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 		// If a resource is supplied, its file could be deleted before it can
 		// be copied to its destination.
 		// Copy it to a temp file before this happens.
-		$temp_file = tempnam(sys_get_temp_dir(), 'dav');
+		$temp_file = tempnam(sys_get_temp_dir(), 'sb');
 		if (!is_resource($data)) {
 			file_put_contents($temp_file, $data);
 		}

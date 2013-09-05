@@ -7,7 +7,7 @@ $page = new SitePage;
 
 class ZipFolder {
    function ZipFolder($folder, $fileList) {
-      $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
+      $this->tmpName = tempnam(Cfg::get('zip_dir'), 'sb');
       $this->tmpZip = $this->tmpName.'.zip';
       $this->tmpFolder = $this->tmpName.'dir';
       $this->folder = $folder;

@@ -162,7 +162,7 @@ class DAV_Folder extends Sabre\DAV\Collection {
 
         if($this->getGroupHandler()->getPermission($this->getFolderID()) >= WRITE_ACCESS) {
 
-            $tmpLoc = tempnam(sys_get_temp_dir(),'DAV');
+            $tmpLoc = tempnam(sys_get_temp_dir(),'sb');
             file_put_contents($tmpLoc, $data);
 
             $file = array('description'   => $name,

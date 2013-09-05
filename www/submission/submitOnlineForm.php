@@ -69,7 +69,7 @@ if (!$is_draft) {
 		// Make a temp file for Plagscan to work with.
 		// Molest the filename so that Plagscan always accepts the document as
 		// scannable.
-		$tempfile = tempnam(sys_get_temp_dir(), 'pgs');
+		$tempfile = tempnam(sys_get_temp_dir(), 'sb');
 		file_put_contents($tempfile, $body);
 		$document->setFile(array(
 			'id'   => $submission_id,
