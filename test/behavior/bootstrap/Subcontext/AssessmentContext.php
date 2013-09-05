@@ -74,6 +74,13 @@ class Subcontext_AssessmentContext extends BaseContext {
         }
     }
 
+    public function selectRubricOnDueWork() {
+
+//        And   I check rubric criterion "Boringness - Blandness"
+//        And   I check rubric criterion "Boringness - Mediocrity"
+//        And   I check rubric criterion "Boringness - Dullness"
+    }
+
     /**
      * Adds a multiple choice answer, at a position (1-indexed)
      *

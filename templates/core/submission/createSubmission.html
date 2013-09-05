@@ -605,7 +605,33 @@
             </div>
             <div class="clearfix"></div>
             <div id="rubric-criteria">
+                <!-- Tasks can use either this category's criteria, or the course's -->
                 <em>Criteria being assessed:</em>
+
+                <!-- BEGIN course_criterion_label -->
+                <em>Course-level criteria:</em>
+                <!-- END course_criterion_label -->
+
+                <!-- BEGIN course_criterion -->
+                <div class="crit">
+                    <input type="hidden" value="0" name="{CRIT_SLUG}"/>
+                    <input id="c-{CRIT_ID}" type="checkbox" value="1" name="{CRIT_SLUG}"{CRIT_CHECKED} />
+                    <label for="c-{CRIT_ID}">{CRIT_LABEL}</label>
+                    <ul class="descs">
+                        <!-- BEGIN course_crit_input -->
+                        <li style="display:none;">
+                            <span></span>
+                            <textarea name="des[{CRIT_ID}][]">{CRIT_INPUT_VALUE}</textarea>
+                        </li>
+                        <!-- END course_crit_input -->
+                    </ul>
+                </div>
+                <!-- END course_criterion -->
+
+                <!-- BEGIN criterion_label -->
+                <em>Unit-level criteria:</em>
+                <!-- END criterion_label -->
+
                 <!-- BEGIN criterion -->
                 <div class="crit">
                     <input type="hidden" value="0" name="{CRIT_SLUG}"/>

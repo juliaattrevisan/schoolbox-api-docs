@@ -3,11 +3,19 @@
 
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
+
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
 $this->setBlock('browse_row', 'existing_file', 'existing_file_block');
+
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 $this->setBlock('marktype', 'criterion', 'criterion_block');
+$this->setBlock('marktype', 'criterion_label', 'criterion_label_block');
 $this->setBlock('criterion', 'crit_input', 'crit_input_block');
+
+$this->setBlock('marktype', 'course_criterion', 'course_criterion_block');
+$this->setBlock('marktype', 'course_criterion_label', 'course_criterion_label_block');
+$this->setBlock('course_criterion', 'course_crit_input', 'course_crit_input_block');
+
 $this->setBlock('marktype', 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
 $this->setBlock('marktype', 'des_count', 'des_count_block');
@@ -87,6 +95,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
         outputVisibilityDropdown($this, $submission->getMarkVisibility());
 
+        $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
         // if the rubric creation fails it will throw an exception, in which case just output the empty sets
         try {
             if($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
@@ -102,15 +111,18 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
                 $resultCount = $rubric->getResultCount();
 
                 outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount);
+                outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true);
                 outputResultSets($this, $resultSetID, $resultCount);
             }
             else {
                 outputResultSets($this);
                 outputCriteria($this, $submission->getCategory()->getId(), array(), array());
+                outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true);
             }
         } catch(Exception $e) {
             outputResultSets($this);
             outputCriteria($this, $submission->getCategory()->getId(), array(), array());
+            outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true);
         }
 
 
@@ -306,7 +318,10 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     outputVisibilityDropdown($this, Cfg::get('submission_access'));
     outputResultSets($this);
-    outputCriteria($this, $this->arg[1], array(), array());
+
+    $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($this->arg[1]);
+    outputCriteria($this, $category->getId(), array(), array());
+    outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true);
 
     $this->parse('marktype_block','marktype');
 
@@ -404,13 +419,21 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
 }
 
 
-function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $descriptorCount = 2) {
+function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $descriptorCount = 2, $is_course = false) {
 
     $rubricHandler = new DueWork_Rubric_Handler();
 
     $crits = $rubricHandler->getAvailableCriteria($catID);
 
-    $page->setVar('criterion_block','');
+    if ($is_course) {
+        $page->setVar('course_criterion_block','');
+        $page->parse('course_criterion_label_block','course_criterion_label');
+    }
+    else {
+        $page->setVar('criterion_block','');
+        $page->parse('criterion_label_block','criterion_label');
+    }
+
     foreach($crits as $group => $elements) {
         foreach($elements as $id => $elem) {
             $page->setVar(array(
@@ -420,26 +443,46 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $desc
                 'CRIT_CHECKED' => in_array($id, $checkedIDs) ? 'checked="checked"' : ''
             ));
 
-            $page->setVar('crit_input_block', '');
+            if ($is_course) {
+                $page->setVar('course_crit_input_block', '');
+            }
+            else {
+                $page->setVar('crit_input_block', '');
+            }
 
             if(is_array($descriptors[$id])) {
                 foreach($descriptors[$id] as $descriptor) {
                     $page->setVar(array(
                         'CRIT_INPUT_VALUE' => $descriptor->getDescription()
                     ));
-                    $page->parse('crit_input_block','crit_input', true);
+                    if ($is_course) {
+                        $page->parse('course_crit_input_block','course_crit_input', true);
+                    }
+                    else {
+                        $page->parse('crit_input_block','crit_input', true);
+                    }
                 }
             }
             // disply blank inputs, they weren't used
             else {
                 for($i = 0; $i < $descriptorCount; ++$i) {
                     $page->setVar('CRIT_INPUT_VALUE');
-                    $page->parse('crit_input_block','crit_input', true);
+                    if ($is_course) {
+                        $page->parse('course_crit_input_block','course_crit_input', true);
+                    }
+                    else {
+                        $page->parse('crit_input_block','crit_input', true);
+                    }
 
                 }
             }
 
-            $page->parse('criterion_block','criterion', true);
+            if ($is_course) {
+                $page->parse('course_criterion_block','course_criterion', true);
+            }
+            else {
+                $page->parse('criterion_block','criterion', true);
+            }
         }
     }
 }
