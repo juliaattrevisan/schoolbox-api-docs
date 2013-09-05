@@ -12,6 +12,21 @@ use Behat\Mink\Element;
 class Subcontext_CoreContext extends BaseContext {
 
     /**
+     * Resets the database to a known clean state.
+     *
+     * The database state no longer resets after each scenario (I want to build
+     * upon each scenario), so please call this as the first step in the first
+     * scenario in a feature.
+     *
+     * @When /^(?:|I )start afresh$/
+     * @When /^(?:|I )reset the database$/
+     * @When /^(?:|I )wipe the slate clean$/
+     */
+    public function startAfresh() {
+        $this->getMinkContext()->visit('/test/reset.php');
+    }
+
+    /**
      * Logs in user.
      *
      * @Given /^(?:|I am) logged in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
