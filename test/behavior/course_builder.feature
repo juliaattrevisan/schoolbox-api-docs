@@ -66,9 +66,9 @@ Scenario: Create a course
   Then  I fill in "title" with "Dumb Due Work"
   Then  I fill in "task_title" with "Complete due work 'Dumb Due Work'"
   And   I select "Rubric" from "marktype"
-  And   I check rubric criterion "Boringness - Blandness"
-  And   I check rubric criterion "Boringness - Mediocrity"
-  And   I check rubric criterion "Boringness - Dullness"
+  And   I check rubric criterion "Boringness:Blandness"
+  And   I check rubric criterion "Boringness:Mediocrity"
+  And   I check rubric criterion "Boringness:Dullness"
   And   I check "accept_submission"
   And   I press "Create"
   # That's it for the due work, go back to the homepage
