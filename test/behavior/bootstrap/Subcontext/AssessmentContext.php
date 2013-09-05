@@ -12,6 +12,69 @@ use Behat\Mink\Element;
 class Subcontext_AssessmentContext extends BaseContext {
 
     /**
+     * Clicks the "add rubric" button on a homepage.
+     *
+     * @Then /^(?:|I )edit rubrics$/
+     */
+    public function setRubrics() {
+        $this->getSession()->getPage()->find('css', '.rubric_listing a.modify')->click();
+    }
+
+    /**
+     * Adds a new rubric item.
+     *
+     * @Then /^(?:|I )add rubric group "(?P<name>[^"]*)" with criteria "(?P<items>[^"]*)"$/
+     *
+     * @param  string $name
+     * @param  string $items
+     * @throws Exception if the form isn't found
+     */
+    public function addRubricGroup($name, $items) {
+
+        // Find the rubric form, and add a new group to it.
+        $this->getCoreContext()->waitForElementOnPage('form.rubric-settings');
+        $form  = $this->getSession()->getPage()->find('css', 'form.rubric-settings');
+        $group = $form->find('css', 'ul#crit-list li.group.new');
+        $group_input = $group->find('css', 'input.group.new');
+        $this->spin(
+            function() use($group_input) {
+                return $group_input->isVisible();
+            }
+        );
+        $group_input->setValue($name);
+        $group_input->blur();
+
+        // What group did we just add? We're going to add items to it.
+        $is_group_found = false;
+        foreach ($form->findAll('css', 'ul#crit-list li.group') as $group) {
+            /** @var Element\NodeElement $group */
+            $group_input = $group->find('css', 'input.group');
+            if ($group_input->getValue() === $name) {
+                $is_group_found = true;
+                break;
+            }
+        }
+        if (!$is_group_found) {
+            throw new Exception('The group we just entered could not be found');
+        }
+
+        // And add the items.
+        foreach (explode(',', $items) as $item) {
+            $item = trim($item);
+            if (strlen($item)) {
+                $item_input = $group->find('css', 'input.item.new');
+                $this->spin(
+                    function() use($item_input) {
+                        return $item_input->isVisible();
+                    }
+                );
+                $item_input->setValue($item);
+                $item_input->blur();
+            }
+        }
+    }
+
+    /**
      * Adds a multiple choice answer, at a position (1-indexed)
      *
      * @Then /^(?:|I )add (?:right |correct |)answer "(?P<answer>[^"]*)" at position "(?P<position>[^"]*)"$/

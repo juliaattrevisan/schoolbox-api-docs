@@ -8,105 +8,105 @@ Feature: Course Builder
 #  And   log in as "alaress" with password "alaress"
 #  And   set setting "Course Builder:Course Home" to "Faculties"
 
-#Scenario: Create a course rubric set
-#  Given I am on homepage
-#  And   log in as "wwhite" with password "password"
-#  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
-#  # Rubrics: unique for course.
-#  # When adding a task list to a unit page: rubrics from parent are copied across?
-#  Then  I add component "Course Rubrics"
-#  Then  I set rubrics
-#  And   I add group "Boringness" with criteria "Dullness,Blandness,Mediocrity"
-#  And   I add group "Understanding" with criteria "Enlightenment,Knowledge,Cognizance"
-#  And   I press button "Save Changes"
-#  # Descriptors should also be pre-filled.
-
-Scenario: Create a course
-  When  I wipe the slate clean
+Scenario: Create a course rubric set
+  Given I wipe the slate clean
   Then  I go to homepage
   And   log in as "wwhite" with password "password"
-  # How are available courses/lessons chosen?
-  # For now:
-  # * Courses: any homepage underneath course home
-  # * Lessons: any homepage directly underneath selected course with a task list component
-  Given I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
-  And   add component "Learning:Course Task List"
+  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
+  # Rubrics: unique for course.
+  # When adding a task list to a unit page: rubrics from parent are copied across?
+  Then  I add component "Learning:Rubrics"
+  Then  I edit rubrics
+  And   I add rubric group "Boringness" with criteria "Dullness,Blandness,Mediocrity"
+  And   I add rubric group "Understanding" with criteria "Enlightenment,Knowledge,Cognizance"
+  And   I press "Save Changes"
+  # Descriptors should also be pre-filled.
 
-  # Start adding tasks
-  # Types:
-  # * Tasks (link optional, may be confirmed or not confirmed)
-  # * Online assessments
-  # * Due work
-  Then  I add a task named "Visit this link" to visit "http://192.168.36.10/"
-
-  Then  I add an online assessment task
-  # online assessment stuff is separate
-  Then  I fill in "title" with "Chemical Reactions 1"
-  Then  I fill in "task_title" with "Complete test 'Chemical Reactions 1'"
-  And   I fill in wysiwyg "description" with "This is a description<b>!</b>"
-  And   I press "Continue"
-  Then  I fill in "title" with "Section 1"
-  And   I fill in "description" with "The first section of the test"
-  And   I press "Create Section"
-  Then  I select "Multiple Choice" from "type_id"
-  And   wait for a "question" field
-  Then  I fill in wysiwyg "question" with "Choose the correct answer"
-  And   I fill in "marks" with "10"
-  # Answers options
-  And   I add right answer "Answer 1" at position "1"
-  And   I add wrong answer "Answer 2" at position "2"
-  And   I add wrong answer "Answer 3" at position "3"
-  And   I add wrong answer "Answer 4" at position "4"
-  And   I press "Add Question"
-  # That's it for the online assessment, go back to the homepage
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
-
-  # Add a due work task
-  And   I add a due work task
-  Then  I fill in "title" with "Dumb Due Work"
-  Then  I fill in "task_title" with "Complete due work 'Dumb Due Work'"
-  And   I select "Rubric" from "marktype"
-  And   I check rubric criterion "Boringness - Blandness"
-  And   I check rubric criterion "Boringness - Mediocrity"
-  And   I check rubric criterion "Boringness - Dullness"
-  And   I check "accept_submission"
-  And   I press "Create"
-  # That's it for the due work, go back to the homepage
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
-
-  # Add another due work item, this one not submittable online
-  And   I add a due work task
-  Then  I fill in "title" with "Offline Due Work"
-  And   I select "Letter Grade" from "marktype"
-  And   I uncheck "accept_submission"
-  And   I press "Create"
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
-
-  # Create a self-assess task
-  Then  I add a task named "Read chapter 3"
-
-  # Create a teacher assess task
-  Then  I add a task named "Attend 3 classes" which requires confirmation
-
-  # Add more task lists
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Atomic structure and bonding"
-  And   I add component "Task List"
-  And   I add a self-assessment task named "Read chapter 4"
-  And   I add a teacher-only assessment task named "Attend a laboratory"
-  And   I add a due work task
-  Then  I fill in "title" with "Dumb Due Work for bonding"
-  And   I select "Letter Grade" from "marktype"
-  And   I check "accept_submission"
-  And   I press "Create"
-
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Macroscopic properties of matter"
-  And   I add component "Task List"
-  And   I add a self-assessment task named "Read chapter 5"
-  And   I add a due work task
-  Then  I fill in "title" with "Dumb Due Work 2"
-  And   I select "Letter Grade" from "marktype"
-  And   I check "accept_submission"
-  And   I press "Create"
+#Scenario: Create a course
+#  Then  I go to homepage
+#  And   log in as "wwhite" with password "password"
+#  # How are available courses/lessons chosen?
+#  # For now:
+#  # * Courses: any homepage underneath course home
+#  # * Lessons: any homepage directly underneath selected course with a task list component
+#  Given I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+#  And   add component "Learning:Course Task List"
+#
+#  # Start adding tasks
+#  # Types:
+#  # * Tasks (link optional, may be confirmed or not confirmed)
+#  # * Online assessments
+#  # * Due work
+#  Then  I add a task named "Visit this link" to visit "http://192.168.36.10/"
+#
+#  Then  I add an online assessment task
+#  # online assessment stuff is separate
+#  Then  I fill in "title" with "Chemical Reactions 1"
+#  Then  I fill in "task_title" with "Complete test 'Chemical Reactions 1'"
+#  And   I fill in wysiwyg "description" with "This is a description<b>!</b>"
+#  And   I press "Continue"
+#  Then  I fill in "title" with "Section 1"
+#  And   I fill in "description" with "The first section of the test"
+#  And   I press "Create Section"
+#  Then  I select "Multiple Choice" from "type_id"
+#  And   wait for a "question" field
+#  Then  I fill in wysiwyg "question" with "Choose the correct answer"
+#  And   I fill in "marks" with "10"
+#  # Answers options
+#  And   I add right answer "Answer 1" at position "1"
+#  And   I add wrong answer "Answer 2" at position "2"
+#  And   I add wrong answer "Answer 3" at position "3"
+#  And   I add wrong answer "Answer 4" at position "4"
+#  And   I press "Add Question"
+#  # That's it for the online assessment, go back to the homepage
+#  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+#
+#  # Add a due work task
+#  And   I add a due work task
+#  Then  I fill in "title" with "Dumb Due Work"
+#  Then  I fill in "task_title" with "Complete due work 'Dumb Due Work'"
+#  And   I select "Rubric" from "marktype"
+#  And   I check rubric criterion "Boringness - Blandness"
+#  And   I check rubric criterion "Boringness - Mediocrity"
+#  And   I check rubric criterion "Boringness - Dullness"
+#  And   I check "accept_submission"
+#  And   I press "Create"
+#  # That's it for the due work, go back to the homepage
+#  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+#
+#  # Add another due work item, this one not submittable online
+#  And   I add a due work task
+#  Then  I fill in "title" with "Offline Due Work"
+#  And   I select "Letter Grade" from "marktype"
+#  And   I uncheck "accept_submission"
+#  And   I press "Create"
+#  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+#
+#  # Create a self-assess task
+#  Then  I add a task named "Read chapter 3"
+#
+#  # Create a teacher assess task
+#  Then  I add a task named "Attend 3 classes" which requires confirmation
+#
+#  # Add more task lists
+#  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Atomic structure and bonding"
+#  And   I add component "Task List"
+#  And   I add a self-assessment task named "Read chapter 4"
+#  And   I add a teacher-only assessment task named "Attend a laboratory"
+#  And   I add a due work task
+#  Then  I fill in "title" with "Dumb Due Work for bonding"
+#  And   I select "Letter Grade" from "marktype"
+#  And   I check "accept_submission"
+#  And   I press "Create"
+#
+#  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Macroscopic properties of matter"
+#  And   I add component "Task List"
+#  And   I add a self-assessment task named "Read chapter 5"
+#  And   I add a due work task
+#  Then  I fill in "title" with "Dumb Due Work 2"
+#  And   I select "Letter Grade" from "marktype"
+#  And   I check "accept_submission"
+#  And   I press "Create"
 
 #Scenario: Add a course to a class
 #  Given I log in as "cglenn" with password "password"
