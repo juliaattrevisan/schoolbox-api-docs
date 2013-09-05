@@ -22,7 +22,8 @@ Feature: Course Builder
 #  # Descriptors should also be pre-filled.
 
 Scenario: Create a course
-  Given I am on homepage
+  When  I wipe the slate clean
+  Then  I go to homepage
   And   log in as "wwhite" with password "password"
   # How are available courses/lessons chosen?
   # For now:
@@ -63,6 +64,7 @@ Scenario: Create a course
   # Add a due work task
   And   I add a due work task
   Then  I fill in "title" with "Dumb Due Work"
+  Then  I fill in "task_title" with "Complete due work 'Dumb Due Work'"
   And   I select "Rubric" from "marktype"
   And   I check rubric criterion "Boringness - Blandness"
   And   I check rubric criterion "Boringness - Mediocrity"

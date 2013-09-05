@@ -5,7 +5,8 @@ Feature: ePortfolio
 
 @javascript
 Scenario: Create an ePortfolio template
-  Given I am on homepage
+  When  I wipe the slate clean
+  Then  I go to homepage
   And   log in as "alaress" with password "alaress"
   When  I go to "/adminv2/eportfolio"
   And   I create a template "New Template"
