@@ -8,13 +8,18 @@ $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
 $this->setBlock('browse_row', 'existing_file', 'existing_file_block');
 
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
-$this->setBlock('marktype', 'criterion', 'criterion_block');
-$this->setBlock('marktype', 'criterion_label', 'criterion_label_block');
-$this->setBlock('criterion', 'crit_input', 'crit_input_block');
 
-$this->setBlock('marktype', 'course_criterion', 'course_criterion_block');
-$this->setBlock('marktype', 'course_criterion_label', 'course_criterion_label_block');
-$this->setBlock('course_criterion', 'course_crit_input', 'course_crit_input_block');
+// Instead of all this block BS I'll create a sub-template
+$this->setFile('rubricTpl', 'submission/_submissionRubrics.html');
+$this->setBlock('rubricTpl', 'rubric_type_label', 'rubric_type_label_block');
+$this->setBlock('rubricTpl', 'criterion', 'criterion_block');
+$this->setBlock('criterion', 'crit_input', 'crit_input_block');
+//$this->setBlock('marktype', 'criterion', 'criterion_block');
+//$this->setBlock('marktype', 'criterion_label', 'criterion_label_block');
+//$this->setBlock('criterion', 'crit_input', 'crit_input_block');
+//$this->setBlock('marktype', 'course_criterion', 'course_criterion_block');
+//$this->setBlock('marktype', 'course_criterion_label', 'course_criterion_label_block');
+//$this->setBlock('course_criterion', 'course_crit_input', 'course_crit_input_block');
 
 $this->setBlock('marktype', 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
@@ -419,23 +424,35 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
 }
 
 
-function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $descriptorCount = 2, $is_course = false) {
+function outputCriteria(
+    SitePage $page,
+    $catID,
+    $checkedIDs,
+    $descriptors,
+    $descriptorCount = 2,
+    $is_course = false
+) {
+
+    // Output this all as part of a single template, and inject into the block.
 
     $rubricHandler = new DueWork_Rubric_Handler();
 
     $crits = $rubricHandler->getAvailableCriteria($catID);
 
-    if ($is_course) {
-        $page->setVar('course_criterion_block','');
-        $page->parse('course_criterion_label_block','course_criterion_label');
-    }
-    else {
-        $page->setVar('criterion_block','');
-        $page->parse('criterion_label_block','criterion_label');
-    }
+    $page->setVar(
+        array(
+            'RUBRIC_CAT_ID'         => $catID,
+            'LABEL'                 => ($is_course ? 'Course-level criteria' : 'Unit-level criteria'),
+            'MANAGE_CRITERIA_LABEL' => ($is_course ? 'Manage course-level criteria' : 'Manage unit-level criteria'),
+        )
+    );
 
-    foreach($crits as $group => $elements) {
-        foreach($elements as $id => $elem) {
+    $page->parse('rubric_type_label_block', 'rubric_type_label');
+
+    $page->setVar('criterion_block', '');
+    foreach ($crits as $group => $elements) {
+        foreach ($elements as $id => $elem) {
+            $page->setVar('crit_input_block', '');
             $page->setVar(array(
                 'CRIT_ID'      => $id,
                 'CRIT_SLUG'    => "crit[$id]",
@@ -443,48 +460,26 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $desc
                 'CRIT_CHECKED' => in_array($id, $checkedIDs) ? 'checked="checked"' : ''
             ));
 
-            if ($is_course) {
-                $page->setVar('course_crit_input_block', '');
-            }
-            else {
-                $page->setVar('crit_input_block', '');
-            }
-
-            if(is_array($descriptors[$id])) {
-                foreach($descriptors[$id] as $descriptor) {
+            if (is_array($descriptors[$id])) {
+                foreach ($descriptors[$id] as $descriptor) {
                     $page->setVar(array(
                         'CRIT_INPUT_VALUE' => $descriptor->getDescription()
                     ));
-                    if ($is_course) {
-                        $page->parse('course_crit_input_block','course_crit_input', true);
-                    }
-                    else {
-                        $page->parse('crit_input_block','crit_input', true);
-                    }
+                    $page->parse('crit_input_block','crit_input', true);
                 }
             }
             // disply blank inputs, they weren't used
             else {
-                for($i = 0; $i < $descriptorCount; ++$i) {
-                    $page->setVar('CRIT_INPUT_VALUE');
-                    if ($is_course) {
-                        $page->parse('course_crit_input_block','course_crit_input', true);
-                    }
-                    else {
-                        $page->parse('crit_input_block','crit_input', true);
-                    }
-
+                for ($i = 0; $i < $descriptorCount; ++$i) {
+                    $page->setVar('CRIT_INPUT_VALUE', '');
+                    $page->parse('crit_input_block','crit_input', true);
                 }
             }
-
-            if ($is_course) {
-                $page->parse('course_criterion_block','course_criterion', true);
-            }
-            else {
-                $page->parse('criterion_block','criterion', true);
-            }
+            $page->parse('criterion_block','criterion', true);
         }
     }
+    $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
+    $page->parse($handle, 'rubricTpl', true);
 }
 
 /**

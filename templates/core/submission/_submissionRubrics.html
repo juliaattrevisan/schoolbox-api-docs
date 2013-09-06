@@ -1,0 +1,20 @@
+<!-- BEGIN rubric_type_label -->
+<em>{LABEL}:</em>
+<!-- END rubric_type_label -->
+
+<!-- BEGIN criterion -->
+<div class="crit">
+    <input type="hidden" value="0" name="{CRIT_SLUG}"/>
+    <input id="c-{CRIT_ID}" type="checkbox" value="1" name="{CRIT_SLUG}"{CRIT_CHECKED} />
+    <label for="c-{CRIT_ID}">{CRIT_LABEL}</label>
+    <ul class="descs">
+        <!-- BEGIN crit_input -->
+        <li style="display:none;">
+            <span></span>
+            <textarea name="des[{CRIT_ID}][]">{CRIT_INPUT_VALUE}</textarea>
+        </li>
+        <!-- END crit_input -->
+    </ul>
+</div>
+<!-- END criterion -->
+<p class="pad-it"><a href="/submission/rubricCriteria/{RUBRIC_CAT_ID}">{MANAGE_CRITERIA_LABEL}</a></p>
