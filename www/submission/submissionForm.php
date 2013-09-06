@@ -211,7 +211,6 @@ try {
             $task = $submission->getTask();
             $task->setSubmissionBox($submission);
             TaskMapper::getInstance()->save($task);
-            $page->localRedir('/homepage/'.$categoryID);
         }
     }
     // update existing
@@ -222,7 +221,6 @@ try {
             $task = TaskMapper::getInstance()->findById($submission->getTask()->getId());
             $task->setTitle($_POST['task_title']);
             TaskMapper::getInstance()->save($task);
-            $page->localRedir('/homepage/'.$categoryID);
         }
     }
     // something happened that shouldn't have
@@ -245,7 +243,7 @@ if(isset($rubric)) {
     $rubricHandler->persistRubric($rubric, isset($invalidateExistingMarks) ? $invalidateExistingMarks : false, $submissionBoxID);
 }
 
-$page->localRedir('/submission/listSubmission/');
+$page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmission/');
 
 /**
  * Uses POST variables to create dates
