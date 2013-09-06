@@ -10,7 +10,7 @@
 		</div>
 		<div class='body'>
 			<p>
-				<a>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
+				<a href='/search/user/{SOCIALSTREAM_POST_USER_ID}'>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
 				<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span>
 
 				<!-- BEGIN socialstream_post_has_add -->
@@ -57,7 +57,7 @@
 
 				<div class='body'>
 					<p>
-						<a>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
+						<a href='/search/user/{SOCIALSTREAM_COMMENT_USER_ID}'>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a><br />
 						<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
 
 						<!-- BEGIN socialstream_comment_has_add -->
@@ -105,7 +105,7 @@
 
 						<div class='body'>
 							<p>
-								<a>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
+								<a href='/search/user/{SOCIALSTREAM_REPLY_USER_ID}'>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
 								<span>Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span><br />
 								{SOCIALSTREAM_REPLY_BODY}<br />
 							</p>
