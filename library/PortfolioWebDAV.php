@@ -493,7 +493,7 @@ class PortfolioWebDAV
             array('{DAV:}getcontentlength',)
         );
         $file_size  = $properties['{DAV:}getcontentlength'];
-        $temp       = tempnam(sys_get_temp_dir(), uniqid());
+        $temp       = tempnam(sys_get_temp_dir(), 'sb');
         if ($file_size <= $chunk_size) {
             $response = $this->client->request('GET', $_SESSION['portfolioIdPathMap'][$id]);
             file_put_contents($temp, $response['body'], LOCK_EX);

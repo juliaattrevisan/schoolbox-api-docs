@@ -109,7 +109,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 
 		//
 		// Load this file's contents.
-		$temp_file = tempnam(sys_get_temp_dir(), 'dav');
+		$temp_file = tempnam(sys_get_temp_dir(), 'sb');
 		$fp = fopen($temp_file, 'wb');
 		stream_copy_to_stream($data, $fp, -1, 0);
 		fclose($fp);
