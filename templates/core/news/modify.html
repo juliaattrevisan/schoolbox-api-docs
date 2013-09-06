@@ -93,6 +93,9 @@
         $j(':checkbox').click(function () {
             if ($j(this).parent().hasClass('active-checkbox')) {
                 $j(this).parent().removeClass('active-checkbox')
+				if($j(this).closest('.checkboxes').find('.select_all').is(':checked')){
+					$j(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+				}
             } else {
                 $j(this).parent().addClass('active-checkbox');
             }
@@ -108,6 +111,14 @@
                 $j('.advanced').queue('fx', []);
             }
         });
+
+		$j('.select_all').change(function(){
+			if($j(this).is(':checked')){
+				$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+			} else {
+				$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+			}
+		});
 
 
         jQuery.validator.addMethod("groupCheck", function (value, element) {
@@ -193,13 +204,16 @@
             <td class="formLabelWidth"><h4>Groups</h4>
                 <em>This news item will only be visible to the groups you select.</em></td>
             <td>
-                <div class="clearfix checkboxes groups"><!-- BEGIN group_selection -->
-
+                <div class="clearfix checkboxes groups">
+					<label class="float-left clear">
+						<input type="checkbox" value="{GROUP_ID}" name="group[]" class="select_all" />Select all
+					</label>
+					<!-- BEGIN group_selection -->
                     <label class="float-left clear">
                         <input type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>{GROUP_NAME}
                     </label>
-
-                    <!-- END group_selection --></div>
+                    <!-- END group_selection -->
+				</div>
             </td>
         </tr>
         <!-- BEGIN campus_row -->
@@ -207,13 +221,16 @@
             <td><h4>Campus</h4>
                 <em>This news item will only be visible to users that are within this campus.</em></td>
             <td>
-                <div class="clearfix checkboxes"><!-- BEGIN campus_selection -->
-
+                <div class="clearfix checkboxes">
+					<label class="float-left clear">
+						<input type="checkbox" value="{GROUP_ID}" name="group[]" class="select_all" />Select all
+					</label>
+					<!-- BEGIN campus_selection -->
                     <label class="float-left clear">
-                        <input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />
-                        {CAMPUS_NAME} </label>
-
-                    <!-- END campus_selection --></div>
+                        <input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}
+					</label>
+                    <!-- END campus_selection -->
+				</div>
             </td>
         </tr>
         <!-- END campus_row -->

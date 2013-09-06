@@ -71,6 +71,33 @@
             return false;
         });
 
+		//greenerising the checkboxes if they're ticked.
+		$j(':checkbox').each(function () {
+			if ($j(this).is(':checked')) {
+				$j(this).parent().addClass('active-checkbox');
+			}
+		});
+
+		$j(':checkbox').click(function () {
+			if ($j(this).parent().hasClass('active-checkbox')) {
+				$j(this).parent().removeClass('active-checkbox')
+				if($j(this).closest('.checkboxes').find('.select_all').is(':checked')){
+					$j(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+				}
+			}
+			else {
+				$j(this).parent().addClass('active-checkbox');
+			}
+		});
+
+		$j('.select_all').change(function(){
+			if($j(this).is(':checked')){
+				$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+			} else {
+				$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+			}
+		});
+
     });
 
 </script>
@@ -160,10 +187,16 @@
                         by people in both the campuses and groups selected</em>
                 </td>
                 <td>
-                    <!-- BEGIN campus -->
-                    <label><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}
-                        />{CAMPUS_NAME}</label>
-                    <!-- END campus -->
+					<div class="clearfix checkboxes">
+						<label class="float-left clear">
+							<input type="checkbox" value="{GROUP_ID}" name="group[]" class="select_all" />Select all
+						</label>
+						<!-- BEGIN campus -->
+						<label class="float-left clear">
+							<input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>{CAMPUS_NAME}
+						</label>
+	                    <!-- END campus -->
+					</div>
                 </td>
             </tr>
             <tr>
@@ -171,10 +204,16 @@
                     <h2>Group Access</h2>
                 </td>
                 <td>
-                    <!-- BEGIN group -->
-                    <label><input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}
-                        />{GROUP_NAME}</label>
-                    <!-- END group -->
+					<div class="clearfix checkboxes">
+						<label class="float-left clear">
+							<input type="checkbox" value="{GROUP_ID}" name="group[]" class="select_all" />Select all
+						</label>
+						<!-- BEGIN group -->
+						<label class="float-left clear">
+							<input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>{GROUP_NAME}
+						</label>
+						<!-- END group -->
+					</div>
                 </td>
             </tr>
             <tr>
