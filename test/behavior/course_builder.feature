@@ -63,9 +63,10 @@ Scenario: Create a course
 
   # Add a due work task
   And   I add a due work task
-  Then  I fill in "title" with "Dumb Due Work"
+  Then  I fill in "name" with "Dumb Due Work"
   Then  I fill in "task_title" with "Complete due work 'Dumb Due Work'"
   And   I select "Rubric" from "marktype"
+  And   I choose 5-level result set
   And   I check rubric criterion "Boringness:Blandness"
   And   I check rubric criterion "Boringness:Mediocrity"
   And   I check rubric criterion "Boringness:Dullness"
@@ -76,7 +77,8 @@ Scenario: Create a course
 
   # Add another due work item, this one not submittable online
   And   I add a due work task
-  Then  I fill in "title" with "Offline Due Work"
+  Then  I fill in "name" with "Offline Due Work"
+  Then  I fill in "task_title" with "Hand in 'Offline Due Work'"
   And   I select "Letter Grade" from "marktype"
   And   I uncheck "accept_submission"
   And   I press "Create"
@@ -90,20 +92,22 @@ Scenario: Create a course
 
   # Add more task lists
   Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Atomic structure and bonding"
-  And   I add component "Task List"
-  And   I add a self-assessment task named "Read chapter 4"
-  And   I add a teacher-only assessment task named "Attend a laboratory"
+  And   add component "Learning:Course Task List"
+  And   I add a task named "Read chapter 4"
+  And   I add a task named "Attend a laboratory" which requires confirmation
   And   I add a due work task
-  Then  I fill in "title" with "Dumb Due Work for bonding"
+  Then  I fill in "name" with "Dumb Due Work for bonding"
+  Then  I fill in "task_title" with "Hand in 'Dumb Due Work for bonding'"
   And   I select "Letter Grade" from "marktype"
   And   I check "accept_submission"
   And   I press "Create"
 
   Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Macroscopic properties of matter"
-  And   I add component "Task List"
-  And   I add a self-assessment task named "Read chapter 5"
+  And   add component "Learning:Course Task List"
+  And   I add a task named "Read chapter 5"
   And   I add a due work task
-  Then  I fill in "title" with "Dumb Due Work 2"
+  Then  I fill in "name" with "Dumb Due Work 2"
+  Then  I fill in "task_title" with "Hand in 'Dumb Due Work 2'"
   And   I select "Letter Grade" from "marktype"
   And   I check "accept_submission"
   And   I press "Create"

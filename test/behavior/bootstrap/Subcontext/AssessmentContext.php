@@ -74,11 +74,43 @@ class Subcontext_AssessmentContext extends BaseContext {
         }
     }
 
-    public function selectRubricOnDueWork() {
+    /**
+     * Chooses the rubric result set "None, Very Poor, Poor, Average, Good, Very Good"
+     *
+     * @Then /^(?:|I )choose 5-level result set$/
+     */
+    public function selectFiveLevelResultSet() {
+        $this->getSession()->getPage()->checkField('rs-2');
+    }
 
-//        And   I check rubric criterion "Boringness - Blandness"
-//        And   I check rubric criterion "Boringness - Mediocrity"
-//        And   I check rubric criterion "Boringness - Dullness"
+    /**
+     * Chooses a rubric criterion for this due work item.
+     *
+     * @Then /^(?:|I )check rubric criterion "(?P<base_name>[^"]*):(?P<item>[^"]*)"$/
+     *
+     * @param string $base_name
+     * @param string $item
+     * @throws Exception if the rubric option isn't found
+     */
+    public function selectRubricOnDueWork($base_name, $item) {
+        $label_text = "$base_name - $item";
+        $form       = $this->getSession()->getPage()->find('css', 'form#createSubmissionForm');
+        $input_id   = false;
+        foreach ($form->findAll('css', '#marktype-rubric .crit label') as $label) {
+            /** @var Element\NodeElement $label */
+            if ($label->getText() === $label_text) {
+                $input_id = $label->getAttribute('for');
+                break;
+            }
+        }
+        if (!$input_id) {
+            throw new Exception('The group we just entered could not be found');
+        }
+
+        $checkbox = $form->findById($input_id);
+        if (!$checkbox->isChecked()) {
+            $checkbox->click();
+        }
     }
 
     /**
