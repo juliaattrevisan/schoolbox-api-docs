@@ -38,6 +38,8 @@ else {
 
 $this->setVar('category_select_block', '');
 $this->setVar('existing_marks_warning_block', '');
+$this->setVar('COURSE_CRITERIA', '');
+$this->setVar('CLASS_CRITERIA', '');
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -62,6 +64,9 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setTitle('Modify Submission Box');
 
     $submission = $mapper->findById($this->arg[1]);
+
+    $task_id = $submission->getTask()->getId();
+    $is_task = (bool)$task_id;
 
     //
     // Authorisation: user has write access to group?
@@ -115,19 +120,25 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
                 $results = $rubric->getResults();
                 $resultCount = $rubric->getResultCount();
 
-                outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount);
-                outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true);
                 outputResultSets($this, $resultSetID, $resultCount);
+                outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
+                if ($is_task) {
+                    outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true, $is_task);
+                }
             }
             else {
                 outputResultSets($this);
-                outputCriteria($this, $submission->getCategory()->getId(), array(), array());
-                outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true);
+                outputCriteria($this, $submission->getCategory()->getId(), array(), array(), 2, true, $is_task);
+                if ($is_task) {
+                    outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
+                }
             }
         } catch(Exception $e) {
             outputResultSets($this);
-            outputCriteria($this, $submission->getCategory()->getId(), array(), array());
-            outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true);
+            outputCriteria($this, $submission->getCategory()->getId(), array(), array(), 2, true, $is_task);
+            if ($is_task) {
+                outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
+            }
         }
 
 
@@ -172,7 +183,6 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'duework_task_block' => '',
         'duework_timespan_block' => '',
     ));
-    $task_id = $submission->getTask()->getId();
     $task_title = '';
     if ($task_id) {
         $task       = TaskMapper::getInstance()->findById($task_id);
@@ -325,8 +335,10 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     outputResultSets($this);
 
     $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($this->arg[1]);
-    outputCriteria($this, $category->getId(), array(), array());
-    outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true);
+    outputCriteria($this, $category->getId(), array(), array(), 2, true, $is_task);
+    if ($is_task) {
+        outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
+    }
 
     $this->parse('marktype_block','marktype');
 
@@ -430,7 +442,8 @@ function outputCriteria(
     $checkedIDs,
     $descriptors,
     $descriptorCount = 2,
-    $is_course = false
+    $is_course = false,
+    $is_for_task = false
 ) {
 
     // Output this all as part of a single template, and inject into the block.
@@ -447,7 +460,13 @@ function outputCriteria(
         )
     );
 
-    $page->parse('rubric_type_label_block', 'rubric_type_label');
+    $page->setVar('rubric_type_label_block', '');
+    if ($is_for_task) {
+        $page->parse('rubric_type_label_block', 'rubric_type_label');
+    }
+    else {
+        $page->setVar('MANAGE_CRITERIA_LABEL', 'Manage available criteria');
+    }
 
     $page->setVar('criterion_block', '');
     foreach ($crits as $group => $elements) {
