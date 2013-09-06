@@ -108,6 +108,24 @@ class Healthcheck {
         }
     }
 
-
+    private function SynergeticCheckStoredProcedures(){
+        echo "\nSynergetic Permission Check - Stored Procedures\n";
+        $db = new MSSQL();
+        $db->debug = true;
+        $result = $db->executeProcedure(
+            'spgTimetableDay',
+            array(
+                array('@TimeTableGroup', 'SEN',         SQLVARCHAR, false, false, -1),
+                array('@Date',           date('Y-m-d'), SQLVARCHAR, false, false, -1),
+                array('@CurrentDay',     'day',         SQLINT4,    true,  false, -1),
+            )
+        );
+        echo "  spgTimetableDay : ";
+        if($result['success']){
+            echo "OK\n";
+        }else{
+            echo "\n    Failed - ".mssql_get_last_message()."\n";
+        }
+    }
 
 }
