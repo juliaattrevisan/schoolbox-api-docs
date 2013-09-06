@@ -125,6 +125,11 @@ class Creational extends AbstractFactory {
 				 * ways that they can exist, if applicable
 				 */
 				$curl = new \Alaress_Curl_Url($this->getProduct()->getUrl());
+
+				$curl->addOptions(array(
+					CURLOPT_FOLLOWLOCATION => true
+				));
+
 				$curl->exec();
 
 				/* Spawn additional stuff
