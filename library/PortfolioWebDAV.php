@@ -299,7 +299,7 @@ class PortfolioWebDAV
 
             $settings = array(
 
-                'userName' => "mggs/" . $_SESSION['username'],
+                'userName' =>  'mggs/'.$_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
 
@@ -315,7 +315,7 @@ class PortfolioWebDAV
             } else if ($groupHandler->isStudent()) {
                 $settings['baseUri'] = 'http://mggs-fs02/';
                 $paths = array(
-                    '/STUDENTS/Users/'.(12 - $_SESSION['year'] + date('y')) .'/' . $_SESSION['username'] . '/',
+                    '/STUDENTS/Users/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
                 );
             } else {
                 return false;
