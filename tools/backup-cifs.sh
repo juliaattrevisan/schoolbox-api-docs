@@ -49,6 +49,9 @@ backup_extra_options='';
 # Disk usage override - set to 1 to not check SMB/CIFS disk usage before backup
 backup_usage_override=0;
 
+# Backup Failure Email Notification address (already sends to support@schoolbox.com.au)
+backup_failure_email='';
+
 ############## End of Config Options ##############
 ########### DO NOT EDIT past this line! ###########
 
@@ -62,7 +65,7 @@ if [ -f /etc/$package-backup-cifs.conf ];
 then
 	source /etc/$package-backup-cifs.conf;
 else
-	echo -e "Please set the configuration options for this script in /etc/schoolbox-backup-cifs.sh";
+	echo -e "Please set the configuration options for this script in: /etc/$package-backup-cifs.conf";
 	exit 1;
 fi
 
@@ -215,6 +218,11 @@ if [ `grep -i error $logfile | wc -l` -ne 0 ];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Sending Email to support@schoolbox.com.au" >> $logfile;
 	mail -s "[`date +%Y-%m-%d\ %H:%M:%S`] Schoolbox Backup on '$HOSTNAME'" support@schoolbox.com.au < $logfile 2>>$logfile;
+	if [ `echo "$backup_failure_email" | grep '@' | wc -l` -eq 1 ];
+	then
+		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Sending Email to $backup_failure_email" >> $logfile;
+		mail -s "[`date +%Y-%m-%d\ %H:%M:%S`] Schoolbox Backup on '$HOSTNAME'" $backup_failure_email < $logfile 2>>$logfile;
+	fi
 	exit 1;
 fi
 
