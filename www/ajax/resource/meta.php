@@ -102,7 +102,7 @@ function getFolderMeta($folderId) {
 
 	// if it's the root node, return add-folder functions if admin
 	if($folderId == 0) {
-		$actions = $groupHandler->isSuperuser() ? array('folder') : array();
+		$actions = $groupHandler->isSuperuser() ? array('folder', 'multi') : array();
 		$folder = array(
 			'name' => 'Resources',
 			'id' => 0,
@@ -176,7 +176,7 @@ function getFolderMeta($folderId) {
 	$actions = array();
 	switch($userAccess) {
 		case FULL_ACCESS:
-			$actions = array_merge($actions, array('zip'));
+			$actions = array_merge($actions, array('multi', 'zip'));
 			// no break
 		case WRITE_ACCESS:
 			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download'));
