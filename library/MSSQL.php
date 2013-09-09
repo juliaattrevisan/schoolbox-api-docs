@@ -175,7 +175,7 @@ class MSSQL {
 		$bound_outputs = array();
 
 		// Bind each parameter to the procedure
-		foreach ($params as &$param) {
+		foreach ($params as $param) {
 			list($param_name, $var, $type, $is_output, $is_null, $maxlen) = $param;
 			if (!$is_output) {
 				$is_output = false;
@@ -198,23 +198,33 @@ class MSSQL {
 
 		// Run procedure, fetching the result set if there is one
 		$success = true;
-		$result  = mssql_execute($proc);
 		$return  = array();
-		if (is_resource($result)) {
-			while (mssql_next_result($result)) {
-				$return[] = mssql_fetch_assoc($result);
+		$message = '';
+		try {
+			$result  = mssql_execute($proc);
+			$message = mssql_get_last_message();
+			if (is_resource($result)) {
+				while (mssql_next_result($result)) {
+					$return[] = mssql_fetch_assoc($result);
+				}
+			}
+			elseif ($result === false) {
+				// Did the procedure error out? Return nothing instead.
+				$success       = false;
+				$bound_outputs = array();
 			}
 		}
-		elseif ($result === false) {
-			// Did the procedure error out? Return nothing instead.
+		catch (ErrorException $e) {
 			$success       = false;
 			$bound_outputs = array();
+			$message       = $e->getMessage();
 		}
 		mssql_free_statement($proc);
 		return array(
 			'success' => $success,
 			'output'  => $bound_outputs,
 			'result'  => $return,
+			'message' => $message,
 		);
 	}
 
