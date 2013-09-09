@@ -89,24 +89,28 @@ class Node {
 	 * @return array
 	 */
 	private function getBreadcrumbs() {
-		$category = $this->getCategoryMapper()->findById($this->getNodeId());
-
 		$breadcrumbs = array();
 
-		$breadcrumbs[] = array(
-			'categoryId' => $category->getId(),
-			'name' => $category->getName(),
-		);
-
-		for ($i = 0; ($category->getParentId() > 0) && ($i < 100); $i++) {
-			$currentCategory = $this->getCategoryMapper()->findById($category->getParentId());
+		/* Special case for root node
+		 */
+		if ($this->getNodeId()) {
+			$category = $this->getCategoryMapper()->findById($this->getNodeId());
 
 			$breadcrumbs[] = array(
-				'categoryId' => $currentCategory->getId(),
-				'name' => $currentCategory->getName(),
+				'categoryId' => $category->getId(),
+				'name' => $category->getName(),
 			);
 
-			$category = $currentCategory;
+			for ($i = 0; ($category->getParentId() > 0) && ($i < 100); $i++) {
+				$currentCategory = $this->getCategoryMapper()->findById($category->getParentId());
+
+				$breadcrumbs[] = array(
+					'categoryId' => $currentCategory->getId(),
+					'name' => $currentCategory->getName(),
+				);
+
+				$category = $currentCategory;
+			}
 		}
 
 		return $breadcrumbs;
