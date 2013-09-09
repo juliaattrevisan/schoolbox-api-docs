@@ -46,7 +46,6 @@ Requires:	mysql
 Requires:	mysql-server
 Requires:	wget
 Requires:	cifs-utils
-Requires:	libpspell-dev
 Requires:	aspell-en
 
 # TODO: Fix missing build dependencies (npm)
