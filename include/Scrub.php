@@ -121,6 +121,7 @@ class Scrub {
                 'vhss-d.oddcast.com/vhss_editors/voki_player.swf',
                 'e.issuu.com/embed.html',
                 'webplayer.clickview.com.au/home/ev/',
+                'online.clickview.com.au/MyLibrary/PlayEmbed',
             );
 
             // Add any additional iframe sources as configured
