@@ -76,12 +76,12 @@ if (is_numeric($_GET['eventID'])) {
 
     $campusList = $calendarHandler->getCampusList();
 
-    if (count($campusList) > 1) {
+    if (count($campusList) > 0) {
         $page->checkList('campus_list', $campusList, $calendarHandler->getEventCampus($event['id']));
     }
     else {
         $page->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
-        $page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
+        $page->setVar('campus_list_block', '');
     }
 
     $groupList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
@@ -211,11 +211,11 @@ else {
 
     $campusList = $calendarHandler->getCampusList();
 
-    if (count($campusList) > 1) {
+    if (count($campusList) > 0) {
         $page->checkList('campus_list', $campusList, array($_SESSION['campus'][0]));
     } else {
         $page->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
-        $page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
+        $page->setVar('campus_list_block', '');
     }
 
     $page->checkList('group_list', $calendarHandler->getGroupList(), '');
