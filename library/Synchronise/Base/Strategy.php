@@ -91,7 +91,12 @@ abstract class Synchronise_Base_Strategy {
 	public function createIfExists() {
 		$this->verbose_filter->intro();
 		foreach($this->list as $user) {
-			$this->executeCreateUpdate($this->setupUserDetails($user));
+			$new_user = $this->setupUserDetails($user);
+			$user_id  = $this->executeCreateUpdate($new_user);
+			if ($user_id > 0) {
+				$new_user['id'] = $user_id;
+				$this->executePostCreateUpdate($new_user, $user);
+			}
 		}
 		$this->verbose_filter->summary();
 	}
@@ -100,7 +105,8 @@ abstract class Synchronise_Base_Strategy {
 	 * Identical algorithm used to create/update a user
 	 *
 	 * @param  array $newUser The record that is to be added
-	 * @return void
+	 * @return int            The user ID if the create/update was performed, or
+	 *                        zero otherwise.
 	 */
 	protected function executeCreateUpdate($newUser) {
 		$this->verbose_filter->setNewUser($newUser);
@@ -117,6 +123,7 @@ abstract class Synchronise_Base_Strategy {
 					$newUser['id'] = $existing['uid'];
 					$this->user_handler->update($newUser);
 					$this->verbose_filter->performUpdate();
+					return $existing['uid'];
 				}
 				else {
 					$this->verbose_filter->planUpdate();
@@ -127,8 +134,9 @@ abstract class Synchronise_Base_Strategy {
 				//
 				// Perform action; report what happened
 				if ($this->perform_update) {
-					$this->user_handler->create($newUser);
+					$user_id = $this->user_handler->create($newUser);
 					$this->verbose_filter->performCreation();
+					return $user_id;
 				}
 				else {
 					$this->verbose_filter->planCreation();
@@ -140,6 +148,19 @@ abstract class Synchronise_Base_Strategy {
 			$this->verbose_filter->skip();
 			$this->verbose_filter->incrementSkipped();
 		}
+		return 0;
+	}
+
+	/**
+	 * Called after a user is added or created, or planned to be added or
+	 * created.
+	 *
+	 * @param array $newUser      The record that was created or updated
+	 * @param array $externalUser The external record that was read from
+	 *                            whatever the external source was
+	 */
+	protected function executePostCreateUpdate($newUser, $externalUser) {
+		return;
 	}
 
 	/**
