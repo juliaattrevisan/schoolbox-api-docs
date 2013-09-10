@@ -9,6 +9,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Assess_Answer_RichText extends Evaluation_Answer_RichText {
+class Assess_Answer_RichText extends Assess_Answer_Short {
 
 }
