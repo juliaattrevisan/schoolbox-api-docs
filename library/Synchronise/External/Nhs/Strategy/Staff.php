@@ -56,6 +56,7 @@ class Synchronise_External_Nhs_Strategy_Staff extends Synchronise_Base_Strategy_
      */
     public function generateList() {
         $this->list = array();
+        // TODO move this somewhere into its own function
         $fp = fopen(__DIR__.'/staff.csv', 'r');
         while (($row = fgetcsv($fp, null, ',', '"')) !== false) {
             $list_row = array();
