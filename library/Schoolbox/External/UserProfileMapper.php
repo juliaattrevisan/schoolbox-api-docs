@@ -181,4 +181,28 @@ class UserProfileMapper extends Schoolbox\External\Mapper {
             )
         );
     }
+
+    /**
+     * Gets a user profile object from the external ID of the user.
+     *
+     * @param  string      $external_id
+     * @return UserProfile or false if not found
+     */
+    public function findByExternalId($external_id) {
+        $user_join = $this->getJoinMapper('user');
+        $query     = "
+            SELECT {$this->getColumnString('up')}, {$user_join->getColumnString('u')}
+            FROM `{$this->getTable()}` `up`
+            INNER JOIN {$this->getJoinSql('user', 'up', 'u')}
+            WHERE `u`.`synergy_id` = ?
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute(array($external_id));
+
+        if ($row = $statement->fetch()) {
+            return $this->hydrate($row, 'up');
+        }
+        // TODO in develop, make this throw exception on not found
+        return false;
+    }
 }
