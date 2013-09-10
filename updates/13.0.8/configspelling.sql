@@ -1,0 +1,1 @@
+UPDATE `config` SET `title` = 'Password Change Failed Email Subject' WHERE `name` = 'password_change_failed_email_subject';
