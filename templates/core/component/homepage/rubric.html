@@ -1,0 +1,21 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
+    <div class="rubric_listing listing box clearfix">
+        <ul>
+            <!-- BEGIN rubric_criterion -->
+            <li class="criterion clearfix {DARK}">
+                <h3>{CRITERION_NAME}</h3>
+                <ul>
+                    <!-- BEGIN rubric_descriptor -->
+                    <li class="descriptor"><span class="name">{DESCRIPTOR_NAME}</span></li>
+                    <!-- END rubric_descriptor -->
+                </ul>
+            </li>
+            <!-- END rubric_criterion -->
+        </ul>
+        <p class="interact">
+            <a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubrics</a>
+        </p>
+    </div>
+</div>
