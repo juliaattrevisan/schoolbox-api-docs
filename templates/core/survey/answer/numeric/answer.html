@@ -1,0 +1,26 @@
+<script type='text/javascript' src='/javascript/jquery.alphanumeric.js'></script>
+<script type='text/javascript'>
+	$j(function() {
+		$j.each($j('.numeric-only'), function(index, element) {
+
+			/* For typing
+			 */
+			$j(element).numeric({
+				allow: "e./"
+			});
+
+			/* Clean copy/paste
+			 */
+			$j(element).change(function() {
+				var str = $j(this).val().toString().replace(/([^0-9e\.\/])+/g, '');
+
+				$j(this).val(str);
+			});
+		});
+	});
+</script>
+<fieldset>
+	<!-- BEGIN answerOption -->
+	<input class='numeric-only' name="answer" />
+	<!-- END answerOption -->
+</fieldset>
