@@ -325,6 +325,9 @@ $j(function() {
                 }
               }
             })
+      },
+      f_multi : function(id) {
+        window.open('/cms/file/multi/' + id, '_self')
       }
     },
     multi : {
@@ -464,6 +467,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
           <a class="btn download rdownload" data-action="download"><span></span>Download</a>
           <a class="btn add rfolder" data-action="folder"><span></span>Add Folder</a>
           <a class="btn create rfile" data-action="file"><span></span>Post File</a>
+          <a class="btn up-arrow rmulti" data-action="multi"><span></span>Bulk Upload</a>
           <a class="btn up-arrow rzip" data-action="zip"><span></span>Upload ZIP</a>
         </div>
 
