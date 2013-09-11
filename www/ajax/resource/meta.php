@@ -9,6 +9,7 @@
  */
 
 require_once('../../../include/Bootstrap.php');
+use Schoolbox\UserMapper;
 use Schoolbox\Resource\FileMapper;
 use Schoolbox\File\MimetypeMapper;
 
@@ -222,6 +223,7 @@ function getSingleFileMeta($folderId, $fileId) {
 
 	$fmap = new FileMapper();
 	$file = $fmap->findByColumnList(array('id' => $fileId, 'deleted' => 0))->first();
+	$owner = UserMapper::getInstance()->findById($file->getOwner()->getId());
 
 	if(!$file) {
 		sendError('No file with the specified ID exists');
@@ -254,7 +256,7 @@ function getSingleFileMeta($folderId, $fileId) {
 		'filesize' => Alaress_Byte_Format::bytesToString($file->getFilesize()),
 		'hidden' => $file->getHidden() ? 1 : 0,
 		'description' => $file->getComment(),
-		'posted_by' => $file->getOwner()->formatName(),
+		'posted_by' => $owner->formatName(),
 		'posted_date' => $file->getSubmitted()->getDateOnly(),
 		'modified' => $modified->getRelativeTime(),
 		'actions' => $actions
