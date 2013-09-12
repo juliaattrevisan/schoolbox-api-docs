@@ -321,6 +321,8 @@ class PortfolioWebDAV
                 return false;
             }
 
+            print_r($settings);
+            print_r($paths);
 
         }
         else if (in_array($site_location, array('core', 'demo'))) {
