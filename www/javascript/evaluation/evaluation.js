@@ -5,7 +5,6 @@ $(function() {
 
 			var plugin = "$.fn." + $(element).data('plugin') + ".saveOne($('#questionForm-" + id + "'))";
 
-			console.log(plugin);
 			var hadoken = new Function(plugin);
 			hadoken();
 		});
