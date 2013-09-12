@@ -22,7 +22,6 @@
 			}
 
 			var derived = {
-				editorSelector: 'multiplechoice-' + options.id,
 				questionForm: $('#questionForm-' + options.id)
 			}
 
