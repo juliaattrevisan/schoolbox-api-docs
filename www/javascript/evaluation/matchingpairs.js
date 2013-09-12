@@ -54,8 +54,6 @@
 	 * @param element
 	 */
 	$.fn.evaluationMatchingPairs.saveOne = function(element) {
-		tinyMCE.triggerSave();
-
 		$.ajax({
 			type: 'post',
 			url: $(element).attr('action'),

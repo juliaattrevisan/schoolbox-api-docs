@@ -44,8 +44,6 @@
 	 * @param element
 	 */
 	$.fn.evaluationMultipleChoice.saveOne = function(element) {
-		tinyMCE.triggerSave();
-
 		$.ajax({
 			type: 'post',
 			url: $(element).attr('action'),
