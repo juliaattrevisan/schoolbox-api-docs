@@ -298,7 +298,7 @@ class User extends DeprecatedModel {
 					$is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
 				}
 				catch (SoapFault $ex) {
-					$this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $api->getLastException());
+					$this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $ex);
 				}
 				if (!$is_changed) {
 					//
