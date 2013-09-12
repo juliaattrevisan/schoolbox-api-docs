@@ -8,6 +8,7 @@
 		<script type='text/javascript' src='/javascript/evaluation/evaluation.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/richtext.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/multiplechoice.js'></script>
+		<script type='text/javascript' src='/javascript/evaluation/radio.js'></script>
 
 		<script type='text/javascript'>
 			$(function() {
@@ -19,12 +20,8 @@
 					id: 1133
 				});
 
-				$('#questionForm-2234').evaluationRichText({
-					id: 2234
-				});
-
-				$('#questionForm-4490').evaluationRichText({
-					id: 4490
+				$('#questionForm-1134').evaluationRadio({
+					id: 1134
 				});
 			});
 		</script>
@@ -48,17 +45,13 @@
 			</label>
 		</form>
 
-		<!-- Rich Text -->
-		<form data-plugin='evaluationRichText' action='mort.php' method='post' class='questionForm' id='questionForm-2234'>
-			<label>
-				<textarea class='richtext-2234' name="answer">Blue</textarea>
+		<!-- Radio -->
+		<form data-plugin='evaluationRadio' action='mort.php' method='post' class='questionForm' id='questionForm-1134'>
+			<label class="checkboxes">
+				A) <input name="answer" class="answerCorrect checkbox" type="radio" value="kitty"><span>First</span>
 			</label>
-		</form>
-
-		<!-- Rich Text -->
-		<form data-plugin='evaluationRichText' action='mort.php' method='post' class='questionForm' id='questionForm-4490'>
-			<label>
-				<textarea class='richtext-4490' name="answer">Green</textarea>
+			<label class="checkboxes">
+				B) <input name="answer" class="answerCorrect checkbox" type="radio" value="cat"><span>Second</span>
 			</label>
 		</form>
 
