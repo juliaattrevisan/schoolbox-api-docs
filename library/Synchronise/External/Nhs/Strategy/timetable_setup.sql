@@ -1,3 +1,4 @@
+-- Add terms for this year
 INSERT INTO `timetable_cycle`
 (`id`, `title`, `cycle_length`, `day_length`, `regular`)
 VALUES
@@ -6,6 +7,7 @@ VALUES
 (3, 'Term 3 2013', 10, 5, 1),
 (4, 'Term 4 2013', 10, 5, 1);
 
+-- Add start and end dates for campuses
 INSERT INTO `timetable_campus`
 (`cycle_id`, `campus_id`, `start`, `reset`, `finish`, `offset`)
 VALUES
@@ -14,6 +16,9 @@ VALUES
 (3, 1, '2013-07-15', null, '2013-09-20', 0),
 (4, 1, '2013-10-07', null, '2013-12-20', 0);
 
+-- Add timetable periods.
+-- We will need to know their actual period start and end time
+-- (UPDATE `timetable_period` SET `start` = ?, `finish` = ? WHERE sequence = ?)
 INSERT INTO `timetable_period`
 (`cycle_id`, `title`, `day`, `sequence`, `start`, `finish`, `usable`)
 VALUES
