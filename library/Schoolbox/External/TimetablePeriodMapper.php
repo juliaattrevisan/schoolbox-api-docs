@@ -79,7 +79,7 @@ class TimetablePeriodMapper extends Schoolbox\External\Mapper {
         $this->hasJoin(
             'class',
             array(
-                'mapper'    => '\\Schoolbox\\External\\TimetableClassMapper',
+                'mapper'    => '\\Schoolbox\\External\\ClassEntryMapper',
                 'this_key'  => 'class_id',
                 'other_key' => 'id',
             )
