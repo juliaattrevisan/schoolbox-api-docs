@@ -10,7 +10,9 @@
  */
 
 namespace Schoolbox\External;
+
 use Schoolbox;
+use Schoolbox\Campus;
 
 class TimetableCampusMapper extends Schoolbox\External\Mapper {
 
@@ -68,5 +70,46 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
                 'other_key' => 'id',
             )
         );
+    }
+
+    /**
+     * Gets the TimetableCampus object for this campus and date.
+     *
+     * @param Campus $campus
+     * @param string $date   The date to get the campus for, defaults to now.
+     *
+     * @return TimetableCampus
+     */
+    public function findCurrentTimetable(Campus $campus, $date = 'now') {
+        $cycle_mapper  = $this->getJoinMapper('cycle');
+        $campus_mapper = $this->getJoinMapper('campus');
+        $query = "
+            SELECT
+                {$this->getColumnString('tc')},
+                {$cycle_mapper->getColumnString('ty')},
+                {$campus_mapper->getColumnString('ca')}
+            FROM `{$this->getTable()}` `tc`
+            INNER JOIN {$this->getJoinSql('cycle',  'tc', 'ty')}
+            INNER JOIN {$this->getJoinSql('campus', 'tc', 'ca')}
+            WHERE `tc`.`start` <= :date AND `tc`.`finish` >= :date AND `tc`.`campus_id` = :campus
+        ";
+        $statement = $this->database->prepare($query);
+
+        // Date: depends on what is passed
+        $date = new \DateTime($date);
+        $statement->bindValue('campus', $campus->getId());
+        $statement->bindValue('date',   $date->format('Y-m-d'));
+        $statement->execute();
+
+        if ($row = $statement->fetch()) {
+            /** @var TimetableCampus $timetable_campus **/
+            $timetable_campus = $this->hydrate('tc');
+            $timetable_campus
+                ->setCycle($cycle_mapper->hydrate($row, 'ty'))
+                ->setCampus($campus_mapper->hydrate($row, 'ca'))
+            ;
+            return $timetable_campus;
+        }
+        return false;
     }
 }
