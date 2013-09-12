@@ -109,6 +109,21 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
         return $this->getDatabase()->prepare($query);
     }
 
+    /**
+     * Gets a statement for fetching a user's classes.
+     *
+     * @return PDOStatement
+     */
+    protected function getClassUserStatement() {
+        return $this->getDatabase()->prepare("
+            SELECT c.name, c.code, c.description, cp.period_id
+            FROM class_user cl
+            LEFT JOIN class c ON c.id = cl.class_id
+            LEFT JOIN class_period cp ON cp.class_id = c.id
+            WHERE cl.user_id = :userId
+        ");
+    }
+
     public function getPeriodNumber ($campusId) {
         // Surely this should take a day number????
 
@@ -141,14 +156,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
 
 		/* Get user's classes */
-		$classStatement = $this->getDatabase()->prepare("
-			SELECT c.name, c.code, c.description, cp.period_id
-			FROM class_user cl
-			LEFT JOIN class c ON c.id = cl.class_id
-			LEFT JOIN class_period cp ON cp.class_id = c.id
-			WHERE cl.user_id = :userId
-		");
-
+		$classStatement = $this->getClassUserStatement();
 		$classStatement->execute( array(
 			':userId' => $userId,
 		) );
@@ -200,14 +208,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
 
 		/* Get user's classes */
-		$classStatement = $this->getDatabase()->prepare("
-			SELECT c.name, c.code, c.description, cp.period_id
-			FROM class_user cl
-			LEFT JOIN class c ON c.id = cl.class_id
-			LEFT JOIN class_period cp ON cp.class_id = c.id
-			WHERE cl.user_id = :userId
-		");
-
+		$classStatement = $this->getClassUserStatement();
 		$classStatement->execute( array(
 			':userId' => $userId,
 		) );
