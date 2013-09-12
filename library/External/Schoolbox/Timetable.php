@@ -85,15 +85,51 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		return $currentDay;
 	}
 
-	public function getPeriodNumber ($campusId) {
+    /**
+     * Gets a statement for fetching the periods for a given campus. Has
+     * parameters :campusId (and :day if $single_day is true).
+     *
+     * @param bool $single_day True if fetching only a single day's timetable.
+     *
+     * @return PDOStatement
+     */
+    protected function getPeriodStatement($single_day = false) {
+        $query = "
+            SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
+            FROM timetable_campus tc
+            LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+            LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
+            WHERE tc.campus_id = :campusId
+            AND tc.start < NOW()
+            AND tc.finish > NOW()
+        ";
+        if ($single_day) {
+            $query .= ' AND tp.day = :day ';
+        }
+        return $this->getDatabase()->prepare($query);
+    }
+
+    public function getPeriodNumber ($campusId) {
+        // Surely this should take a day number????
+
         if ( !$definition = $this->getTimetableDefinition($campusId) ) {
             return false;
         }
 
-		if ( empty($definition['regular']) ) {
-			return false;
-		}
-	}
+        if ( empty($definition['regular']) ) {
+            return false;
+        }
+
+        $periodStatement = $this->getPeriodStatement(false);
+        $periodStatement->execute(array(':campusId' => $campusId,));
+        $current_time = date('H:i:s');
+        foreach ($periodStatement as $item) {
+            if ($item['start'] <= $current_time && $item['finish'] >= $current_time) {
+                return $item['sequence'];
+            }
+        }
+        return false;
+    }
 
 	public function getFullTimetable ($externalUserId, $userId, $campusId) {
 		/* Get current campus timetable */
