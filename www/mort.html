@@ -7,11 +7,16 @@
 
 		<script type='text/javascript' src='/javascript/evaluation/evaluation.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/richtext.js'></script>
+		<script type='text/javascript' src='/javascript/evaluation/multiplechoice.js'></script>
 
 		<script type='text/javascript'>
 			$(function() {
 				$('#questionForm-1045').evaluationRichText({
 					id: 1045
+				});
+
+				$('#questionForm-1133').evaluationMultipleChoice({
+					id: 1133
 				});
 
 				$('#questionForm-2234').evaluationRichText({
@@ -26,18 +31,31 @@
 		<script type='text/javascript' src='/javascript/evaluation/evaluation.js'></script>
 	</head>
 	<body>
+		<!-- Rich Text -->
 		<form data-plugin='evaluationRichText' action='mort.php' method='post' class='questionForm' id='questionForm-1045'>
 			<label>
 				<textarea class='richtext-1045' name="answer">Red</textarea>
 			</label>
 		</form>
 
+		<!-- Multiple Choice -->
+		<form data-plugin='evaluationMultipleChoice' action='mort.php' method='post' class='questionForm' id='questionForm-1133'>
+			<label class="checkboxes">
+				A) <input name="answer[]" class="answerCorrect checkbox" type="checkbox" value="A"><span>First of the multiple choice</span>
+			</label>
+			<label class="checkboxes">
+				B) <input name="answer[]" class="answerCorrect checkbox" type="checkbox" value="B"><span>Second of the multiple choice</span>
+			</label>
+		</form>
+
+		<!-- Rich Text -->
 		<form data-plugin='evaluationRichText' action='mort.php' method='post' class='questionForm' id='questionForm-2234'>
 			<label>
 				<textarea class='richtext-2234' name="answer">Blue</textarea>
 			</label>
 		</form>
 
+		<!-- Rich Text -->
 		<form data-plugin='evaluationRichText' action='mort.php' method='post' class='questionForm' id='questionForm-4490'>
 			<label>
 				<textarea class='richtext-4490' name="answer">Green</textarea>
