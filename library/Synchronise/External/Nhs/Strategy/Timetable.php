@@ -17,6 +17,8 @@ use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassPeriod;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
@@ -46,6 +48,8 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
     protected function setup() {
         $this->verbose_filter = new Synchronise_External_Nhs_Verbose();
         $this->campus         = CampusMapper::getInstance()->findById($this->campus_id);
+
+        // Get the cycle for this campus.
         $timetable_campus = null;
         try {
             $timetable_campus = TimetableCampusMapper::getInstance()->findCurrentTimetable($this->campus);
@@ -164,7 +168,6 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
 
         // First delete all classes for this cycle and campus.
         // Then restore them.
-        TimetablePeriodMapper::getInstance()->deleteForClassAndCycle($class, $this->cycle);
 
         printf(
             "Setting %d periods for class \"%s\"\n",
@@ -172,36 +175,25 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
             $new_item['class']
         );
         foreach ($new_item['period_list'] as $period) {
-            $sequence         = $period['period'];
-            $timetable_period = new TimetablePeriod();
-            // Guess at start/finish
-            // for now, it can be: start: 8+period, finish: 9+period
-            $start  = new DateTime(8+$sequence.':00');
-            $finish = new DateTime(9+$sequence.':00');
-            $name   = trim($class->getName());
-            $code   = trim($class->getCode());
-            $title  = '';
-            if (strlen($name) > 0 && strlen($code) > 0) {
-                $title = sprintf('%s (%s)', $name, $class->getCode());
+            $class_period = new ClassPeriod();
+            // Period: whatever the period for this cycle, day and sequence is
+            $period_list = TimetablePeriodMapper::getInstance()->findByColumnList(
+                array(
+                    'cycle_id' => $this->cycle->getId(),
+                    'day'      => $period['day'],
+                    'sequence' => $period['period'],
+                )
+            );
+            foreach ($period_list as $period_object) {
+                ClassPeriodMapper::getInstance()->deleteForClassAndPeriod($class, $period_object);
+                // TODO add room and teacher to classPeriod object
+                $class_period
+                    ->setClass($class)
+                    ->setPeriod($period_object)
+                ;
+                ClassPeriodMapper::getInstance()->save($class_period);
+                break;
             }
-            elseif (strlen($name) > 0) {
-                $title = $name;
-            }
-            elseif (strlen($code) > 0) {
-                $title = $code;
-            }
-            $timetable_period
-                ->setCycle($this->cycle)
-                ->setClass($class)
-                ->setTitle($title)
-                ->setDay($period['day'])
-                ->setSequence($sequence)
-                ->setUsable(true)
-                ->setStart($start)
-                ->setFinish($finish)
-            ;
-            TimetablePeriodMapper::getInstance()->save($timetable_period);
-
         }
         return 1;
     }
