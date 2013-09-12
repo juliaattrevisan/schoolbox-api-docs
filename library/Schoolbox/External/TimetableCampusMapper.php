@@ -21,12 +21,6 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
         $this->hasTable('timetable_campus');
         $this->hasModel('\\Schoolbox\\External\\TimetableCampus');
         $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true
-        ));
-        $this->hasMap(array(
             'column'   => 'cycle_id',
             'property' => 'cycle',
             'type'     => self::TYPE_MODEL,
