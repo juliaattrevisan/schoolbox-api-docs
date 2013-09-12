@@ -71,4 +71,19 @@ class TimetablePeriodMapper extends Schoolbox\External\Mapper {
             )
         );
     }
+
+    /**
+     * Clears all timetable period entries for this class and cycle.
+     *
+     * @param ClassEntry     $class
+     * @param TimetableCycle $cycle
+     *
+     * @return int
+     */
+    public function deleteForClassAndCycle(ClassEntry $class, TimetableCycle $cycle) {
+        $query = "DELETE FROM `{$this->getTable()}` WHERE `title` = :class_title AND `cycle_id` = :cycle";
+        $statement = $this->database->prepare($query);
+        $statement->execute(array('class_title' => $class->getCode(), 'cycle' => $cycle->getId()));
+        return $statement->rowCount();
+    }
 }
