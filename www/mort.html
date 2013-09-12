@@ -3,12 +3,17 @@
 <html>
 	<head>
 		<script type='text/javascript' src='javascript/jquery-1.7.1.min.js'></script>
+		<script type='text/javascript' src='javascript/jquery.ui.js'></script>
 		<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+		<script type="text/javascript" src="/javascript/jquery.swappable.js"></script>
 
 		<script type='text/javascript' src='/javascript/evaluation/evaluation.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/richtext.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/multiplechoice.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/radio.js'></script>
+
+
+		<script type='text/javascript' src='/javascript/evaluation/matchingpairs.js'></script>
 
 		<script type='text/javascript'>
 			$(function() {
@@ -23,6 +28,10 @@
 				$('#questionForm-1134').evaluationRadio({
 					id: 1134
 				});
+
+				$('#questionForm-1135').evaluationMatchingPairs({
+					id: 1135
+				});
 			});
 		</script>
 	</head>
@@ -36,22 +45,57 @@
 
 		<!-- Multiple Choice -->
 		<form data-plugin='evaluationMultipleChoice' action='mort.php' method='post' class='questionForm' id='questionForm-1133'>
-			<label class="checkboxes">
-				A) <input name="answer[]" class="answerCorrect checkbox" type="checkbox" value="A"><span>First of the multiple choice</span>
+			<label>
+				A) <input name="answer[]" type="checkbox" value="A"><span>First of the multiple choice</span>
 			</label>
 			<label class="checkboxes">
-				B) <input name="answer[]" class="answerCorrect checkbox" type="checkbox" value="B"><span>Second of the multiple choice</span>
+				B) <input name="answer[]" type="checkbox" value="B"><span>Second of the multiple choice</span>
 			</label>
 		</form>
 
 		<!-- Radio -->
 		<form data-plugin='evaluationRadio' action='mort.php' method='post' class='questionForm' id='questionForm-1134'>
-			<label class="checkboxes">
-				A) <input name="answer" class="answerCorrect checkbox" type="radio" value="kitty"><span>First</span>
+			<label>
+				A) <input name="answer" type="radio" value="kitty"><span>First</span>
 			</label>
-			<label class="checkboxes">
-				B) <input name="answer" class="answerCorrect checkbox" type="radio" value="cat"><span>Second</span>
+			<label>
+				B) <input name="answer" type="radio" value="cat"><span>Second</span>
 			</label>
+		</form>
+
+		<!-- Matching Pairs -->
+		<form data-plugin='evaluationMatchingPairs' action='mort.php' method='post' class='questionForm' id='questionForm-1135'>
+			<ul class='evaluation-matchingpairs-left'>
+				<li>
+					<strong>Cat</strong> matches
+				</li>
+				<li>
+					<strong>Dog</strong> matches
+				</li>
+				<li>
+					<strong>Horse</strong> matches
+				</li>
+			</ul>
+			<ul class='evaluation-matchingpairs-right'>
+				<li>
+					<input name="answerRight[]" type="hidden" readonly="readonly" value="Kitten" />
+					<strong>
+						Kitten
+					</strong>
+				</li>
+				<li>
+					<input name="answerRight[]" type="hidden" readonly="readonly" value="Puppy" />
+					<strong>
+						Puppy
+					</strong>
+				</li>
+				<li>
+					<input name="answerRight[]" type="hidden" readonly="readonly" value="Fawn" />
+					<strong>
+						Fawn
+					</strong>
+				</li>
+			</ul>
 		</form>
 
 		<a id='trigger'>Save it all</a>
