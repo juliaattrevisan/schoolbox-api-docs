@@ -13,6 +13,7 @@
 		<script type='text/javascript' src='/javascript/evaluation/radio.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/matchingpairs.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/fillgap.js'></script>
+		<script type='text/javascript' src='/javascript/evaluation/shortanswer.js'></script>
 
 		<script type='text/javascript'>
 			$(function() {
@@ -31,8 +32,13 @@
 				$('#questionForm-1135').evaluationMatchingPairs({
 					id: 1135
 				});
+
 				$('#questionForm-1136').evaluationFillGap({
 					id: 1136
+				});
+
+				$('#questionForm-1137').evaluationShortAnswer({
+					id: 1137
 				});
 			});
 		</script>
@@ -109,8 +115,14 @@
 			</p>
 		</form>
 
-		<a id='trigger'>Save it all</a>
+		<!-- Short Answer -->
+		<form id='questionForm-1137' data-plugin='evaluationShortAnswer' action='mort.php' method='post' class='questionForm'>
+			<label>
+				<textarea name="answer"></textarea>
+			</label>
+		</form>
 
+		<a id='trigger'>Save it all</a>
 	</body>
 </html>
 
