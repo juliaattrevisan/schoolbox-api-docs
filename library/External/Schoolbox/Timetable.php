@@ -133,17 +133,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 	public function getFullTimetable ($externalUserId, $userId, $campusId) {
 		/* Get current campus timetable */
-		$periodStatement = $this->getDatabase()->prepare("
-			SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
-			FROM timetable_campus tc
-			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-			LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
-			WHERE tc.campus_id = :campusId
-                AND tc.start < NOW()
-			    AND tc.finish > NOW()
-			ORDER BY tp.day ASC, tp.sequence ASC
-		");
-
+		$periodStatement = $this->getPeriodStatement(false);
 		$periodStatement->execute( array(
 			':campusId' => $campusId,
 		) );
@@ -201,18 +191,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
 		/* Get current campus timetable */
-		$periodStatement = $this->getDatabase()->prepare("
-			SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
-			FROM timetable_campus tc
-			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-			LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
-			WHERE tc.campus_id = :campusId
-                AND tc.start < NOW()
-			    AND tc.finish > NOW()
-				AND tp.day = :day
-			ORDER BY tp.day ASC, tp.sequence ASC
-		");
-
+		$periodStatement = $this->getPeriodStatement(true);
 		$periodStatement->execute( array(
 			':campusId' => $campusId,
 		    ':day' => $dayNumber
