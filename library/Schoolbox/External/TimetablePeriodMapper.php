@@ -33,6 +33,12 @@ class TimetablePeriodMapper extends Schoolbox\External\Mapper {
             'join'     => 'cycle'
         ));
         $this->hasMap(array(
+            'column'   => 'class_id',
+            'property' => 'class',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'class'
+        ));
+        $this->hasMap(array(
             'column'   => 'title',
             'property' => 'title',
             'type'     => self::TYPE_STRING,
@@ -70,6 +76,14 @@ class TimetablePeriodMapper extends Schoolbox\External\Mapper {
                 'other_key' => 'id',
             )
         );
+        $this->hasJoin(
+            'class',
+            array(
+                'mapper'    => '\\Schoolbox\\External\\TimetableClassMapper',
+                'this_key'  => 'class_id',
+                'other_key' => 'id',
+            )
+        );
     }
 
     /**
@@ -81,9 +95,9 @@ class TimetablePeriodMapper extends Schoolbox\External\Mapper {
      * @return int
      */
     public function deleteForClassAndCycle(ClassEntry $class, TimetableCycle $cycle) {
-        $query = "DELETE FROM `{$this->getTable()}` WHERE `title` = :class_title AND `cycle_id` = :cycle";
+        $query = "DELETE FROM `{$this->getTable()}` WHERE `class_id` = :class AND `cycle_id` = :cycle";
         $statement = $this->database->prepare($query);
-        $statement->execute(array('class_title' => $class->getCode(), 'cycle' => $cycle->getId()));
+        $statement->execute(array('class' => $class->getId(), 'cycle' => $cycle->getId()));
         return $statement->rowCount();
     }
 }

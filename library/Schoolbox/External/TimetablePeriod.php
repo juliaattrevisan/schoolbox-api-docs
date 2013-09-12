@@ -22,6 +22,11 @@ class TimetablePeriod {
     protected $cycle;
 
     /**
+     * @var ClassEntry
+     */
+    protected $class;
+
+    /**
      * @var string
      */
     protected $title;
@@ -50,6 +55,22 @@ class TimetablePeriod {
      * @var bool
      */
     protected $usable;
+
+    /**
+     * @param  \Schoolbox\External\ClassEntry $class
+     * @return $this
+     */
+    public function setClass($class) {
+        $this->class = $class;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\External\ClassEntry
+     */
+    public function getClass() {
+        return $this->class;
+    }
 
     /**
      * @param  \Schoolbox\External\TimetableCycle $cycle
