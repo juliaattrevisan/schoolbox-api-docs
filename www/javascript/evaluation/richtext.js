@@ -8,7 +8,7 @@
 	$.fn.evaluationRichText = function(options) {
 		var config = init(options);
 
-		initTiny();
+		initChange();
 
 		/**
 		 * Set up options
@@ -32,7 +32,7 @@
 		/**
 		 * Initialise tiny
 		 */
-		function initTiny() {
+		function initChange() {
 			tinyMCE.init({
 				mode : "specific_textareas",
 				editor_selector: config.editorSelector,
