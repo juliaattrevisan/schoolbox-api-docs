@@ -40,11 +40,95 @@
 				$('#questionForm-1137').evaluationShortAnswer({
 					id: 1137
 				});
+
+				/* Sample output for percentage complete
+				 * 1 section
+				 */
+				var results = {
+					"response_id":"14",
+					"question_id":"63",
+					"percentageComplete":[{
+						"section_id":"13",
+						"assess_id":"14",
+						"sequence":"1",
+						"title":"Second",
+						"description":"aghaha",
+						"random":"0",
+						"pool":"0",
+						"deleted_at":null,
+						"numQuestions":"1",
+						"numResponses":"1",
+						"percentageComplete":11
+					}]
+				}
+
+				/* Update the percentage completed whenever a response is saved
+				 */
+				$.fn.evaluationPercentageComplete({
+					result: results
+				});
+
+				/* Sample output for percentage complete
+				 * multiple sections
+				 */
+				var results2 = {
+					"response_id":"16",
+					"question_id":"65",
+					"percentageComplete":[{
+						"section_id":"13",
+						"assess_id":"14",
+						"sequence":"1",
+						"title":"Second",
+						"description":"aghaha",
+						"random":"0",
+						"pool":"0",
+						"deleted_at":null,
+						"numQuestions":"1",
+						"numResponses":"1",
+						"percentageComplete":100
+					},{
+						"section_id":"14",
+						"assess_id":"14",
+						"sequence":"2",
+						"title":"another section",
+						"description":"",
+						"random":"0",
+						"pool":"0",
+						"deleted_at":null,
+						"numQuestions":"2",
+						"numResponses":"1",
+						"percentageComplete":50
+					}]
+				}
+
+				$('#simulateUpdate').click(function() {
+					$.fn.evaluationPercentageComplete({
+						result: results2
+					});
+				});
 			});
 		</script>
 	</head>
 	<body>
+		<h1>Percentage Complete</h1>
+		<div id='#evaluation-percentage-complete'>
+
+			<section>
+				<h2>Section 1</h2>
+				<div id='evaluation-percentage-bar-13' style='background-color:#0a0;height:24px;width:1px;display:block'></div>
+			</section>
+			<section>
+				<h2>Section 2</h2>
+				<div id='evaluation-percentage-bar-14' style='background-color:#0a0;height:24px;width:1px;display:block'></div>
+			</section>
+
+			<a id='simulateUpdate'>Simulate bar update</a>
+		</div>
+
+		<hr />
+
 		<!-- Rich Text -->
+		<h1>Rich Text</h1>
 		<form id='questionForm-1045' data-plugin='evaluationRichText' action='mort.php' method='post' class='questionForm'>
 			<label>
 				<textarea class='richtext-1045' name="answer">Red</textarea>
@@ -52,6 +136,7 @@
 		</form>
 
 		<!-- Multiple Choice -->
+		<h1>Multiple Choice</h1>
 		<form id='questionForm-1133' data-plugin='evaluationMultipleChoice' action='mort.php' method='post' class='questionForm'>
 			<label>
 				A) <input name="answer[]" type="checkbox" value="A"><span>First of the multiple choice</span>
@@ -62,6 +147,7 @@
 		</form>
 
 		<!-- Radio -->
+		<h1>Radio</h1>
 		<form id='questionForm-1134' data-plugin='evaluationRadio' action='mort.php' method='post' class='questionForm'>
 			<label>
 				A) <input name="answer" type="radio" value="kitty"><span>First</span>
@@ -72,6 +158,7 @@
 		</form>
 
 		<!-- Matching Pairs -->
+		<h1>Matching Pairs</h1>
 		<form id='questionForm-1135' data-plugin='evaluationMatchingPairs' action='mort.php' method='post' class='questionForm'>
 			<ul class='evaluation-matchingpairs-left'>
 				<li>
@@ -107,6 +194,7 @@
 		</form>
 
 		<!-- Fill Gap -->
+		<h1>Fill Gap</h1>
 		<form id='questionForm-1136' data-plugin='evaluationFillGap' action='mort.php' method='post' class='questionForm'>
 			<p>Can
 				<input name="fillgap_1136[]" type="text" value="">
@@ -116,6 +204,7 @@
 		</form>
 
 		<!-- Short Answer -->
+		<h1>Short Answer</h1>
 		<form id='questionForm-1137' data-plugin='evaluationShortAnswer' action='mort.php' method='post' class='questionForm'>
 			<label>
 				<textarea name="answer"></textarea>
@@ -123,6 +212,9 @@
 		</form>
 
 		<a id='trigger'>Save it all</a>
+
+
+
 	</body>
 </html>
 
