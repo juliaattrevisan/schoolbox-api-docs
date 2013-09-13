@@ -2,6 +2,49 @@
  * Update the percentage-complete bars for each section
  */
 (function($) {
+	$.fn.evaluation = function() {
+	}
+
+	/**
+	 * Save each individual question
+	 */
+
+
+	$.fn.evaluation.saveAll = function() {
+		init();
+
+		/* Allow display of saving indicator before locking browser up
+		 * by using a delayed response
+		 *
+		 * http://stackoverflow.com/questions/4971062/jquery-ajax-synchronous-call-beforesend
+		 */
+		setTimeout(saveForms, 2500);
+
+		/**
+		 * Init - show loading div
+		 */
+		function init() {
+			$('.evaluation-saving').show();
+		}
+
+		/**
+		 * Save each question form
+		 */
+		function saveForms() {
+			$('.questionForm').each(function(index, element) {
+				var id = $(element).attr('id').replace('questionForm-', '');
+
+				var plugin = "$.fn." + $(element).data('plugin') + ".saveOne($('#questionForm-" + id + "'))";
+
+				var hadoken = new Function(plugin);
+				hadoken();
+			});
+
+			/* Redirect upon completion
+			 */
+		}
+	}
+
 	$.fn.evaluationPercentageComplete = function(options) {
 		var config = init(options);
 
@@ -51,14 +94,7 @@
 
 $(function() {
 	$('#trigger').click(function() {
-		$('.questionForm').each(function(index, element) {
-			var id = $(element).attr('id').replace('questionForm-', '');
-
-			var plugin = "$.fn." + $(element).data('plugin') + ".saveOne($('#questionForm-" + id + "'))";
-
-			var hadoken = new Function(plugin);
-			hadoken();
-		});
+		$.fn.evaluation.saveAll();
 	});
 });
 
