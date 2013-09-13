@@ -724,8 +724,8 @@ class Category extends DeprecatedModel {
       				  FROM category ca
       				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
       				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
-      				  WHERE parent = $parentId
-      				    AND name = '$name'
+      				  WHERE parent = ".$this->db->smartQuote($parentId)."
+      				    AND name = ".$this->db->smartQuote($name)."
       				  GROUP BY ca.id
       				  LIMIT 1
       	";
