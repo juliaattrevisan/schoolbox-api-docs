@@ -2,8 +2,7 @@
 /**
  * Synchronise_External_Nhs_Strategy_Definition
  *
- * This class is currently a contractual obligation for external sync types. It
- * doesn't do anything for NHS (yet).
+ * Implements sync types and included fields for the NHS sync.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
