@@ -8,6 +8,7 @@
 	$.fn.evaluationRadio = function(options) {
 		var config = init(options);
 
+		initSelected();
 		initChange();
 
 		/**
@@ -29,10 +30,27 @@
 		}
 
 		/**
+		 * Highlight preselected items
+		 */
+		function initSelected() {
+			config.questionForm.find('input[type=radio]').each(function() {
+				if ($(this).is(':checked')) {
+					$(this).parent().addClass('evaluation-selected');
+				}
+			});
+		}
+
+		/**
 		 * Save response upon change
 		 */
 		function initChange() {
+
+			/* Remove all selected classes and reapply just one
+			 */
 			config.questionForm.find('input').change(function() {
+				config.questionForm.find('input').parent().removeClass('evaluation-selected');
+				$(this).parent().addClass('evaluation-selected');
+ss
 				$.fn.evaluationRadio.saveOne(config.questionForm);
 			});
 		}
