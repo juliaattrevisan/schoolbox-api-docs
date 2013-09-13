@@ -104,6 +104,7 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
             // Get this parent's children, and link to each of those children.
             if (!empty($this->relation_list[$parent_details['synergy_id']])) {
                 foreach ($this->relation_list[$parent_details['synergy_id']] as $child_id => $type) {
+                    $message = sprintf('info for student "%s"', $child_id);
                     $profile = null;
                     try {
                         $profile = UserProfileMapper::getInstance()->findByExternalId($child_id);
@@ -111,7 +112,16 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
                     catch (Exception $e) {
                         // Nothing found
                     }
-                    if ($profile instanceof UserProfile && $type === '0') {
+
+                    if (!($profile instanceof UserProfile)) {
+                        $this->verbose_filter->outputSkipMessage('parent '.$message.', because profile was not found');
+                        $this->verbose_filter->incrementSkipped();
+                    }
+                    elseif (intval($type) !== 0) {
+                        $this->verbose_filter->outputSkipMessage('parent '.$message.', because user is not primary guardian');
+                        $this->verbose_filter->incrementSkipped();
+                    }
+                    else {
                         $profile
                             ->setGuardian1Name($currentUser['StudentContactName'])
                             ->setGuardian1Email($currentUser['StudentContactDefaultEmail'])
@@ -134,23 +144,24 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
                                 ->setGuardian2MobilePhone($currentUser['StudentContactEmergencyPhone'])
                                 ->setGuardian2WorkPhone($currentUser['StudentContactEmergencyPhone'])
                             ;
+                            $message = 'parent and spouse '.$message;
+                        }
+                        else {
+                            $message = 'parent '.$message;
                         }
                         if ($this->perform_update) {
                             UserProfileMapper::getInstance()->save($profile);
+                            $this->verbose_filter->outputPerformUpdateMessage($message);
                         }
                         else {
-                            $this->verbose_filter->planUpdate();
+                            $this->verbose_filter->outputPlanUpdateMessage($message);
                         }
                         $this->verbose_filter->incrementUpdated();
                     }
-                    else {
-                        $this->verbose_filter->skip();
-                        $this->verbose_filter->incrementSkipped();
-                    }
-
                 }
             }
         }
+        $this->verbose_filter->summary();
     }
 
 }
