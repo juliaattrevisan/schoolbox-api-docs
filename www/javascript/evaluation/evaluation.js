@@ -8,8 +8,6 @@
 	/**
 	 * Save each individual question
 	 */
-
-
 	$.fn.evaluation.saveAll = function() {
 		init();
 
@@ -40,7 +38,9 @@
 				hadoken();
 			});
 
-			/* Redirect upon completion
+			$('.evaluation-saving').html('<h2>Saved</h2>');
+
+			/* TODO: Redirect upon completion
 			 */
 		}
 	}
