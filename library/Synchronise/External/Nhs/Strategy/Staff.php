@@ -12,62 +12,32 @@
  */
 class Synchronise_External_Nhs_Strategy_Staff extends Synchronise_Base_Strategy_Staff {
 
+    protected $location = '';
+    protected $columns  = array();
+    protected $title    = "Update Schoolbox Staff Details Synchronisation";
 
-    // StaffID, NetworkLogin, ActiveFlag,
-    // StaffTitle, StaffPreferredName, StaffSurname,
-    // DefaultEmailCode, OccupEmail, Email,
-    // StaffCampus, StaffCategoryType, StaffCategory
-    // Try to map columns from export as closely to Synergetic returns.
-    protected $columns = array(
-        'StaffID',
-        'NetworkLogin',
-        'StaffSurname',
-        'StaffGivenName',
-        'StaffPreferredName',
-        'StaffMiddleName',
-        'StaffGender',
-        null,
-        null,
-        null,
-        'OccupEmail',
-        'StaffPhone',
-        'StaffTeacherNumber',
-        null,
-        'StaffBirthDate',
-        'StaffSubAddress',
-        'StaffAddress',
-        'StaffSuburb',
-        'StaffState',
-        'StaffPostcode',
-        'StaffCountry',
-        'StaffHomePhone',
-        null,
-        null,
-        null,
-        null,
-        null,
-        'StaffFullName',
-    );
-
-    protected $title = "Update Schoolbox Staff Details Synchronisation";
+    /**
+     * Sets up synchronisation with parameters passed from the definition.
+     *
+     * @param string $location Where the CSV for import is located
+     * @param array  $columns  The columns to import
+     */
+    public function __construct($location, $columns) {
+        parent::__construct();
+        $this->location = $location;
+        $this->columns  = $columns;
+    }
 
     /**
      * Creates a list from a CSV file instead of from a DB connection
      */
     public function generateList() {
         $this->list = array();
-        // TODO move this somewhere into its own function
-        $fp = fopen(__DIR__.'/staff.csv', 'r');
-        while (($row = fgetcsv($fp, null, ',', '"')) !== false) {
-            $list_row = array();
-            foreach ($this->columns as $i => $column) {
-                if (isset($column)) {
-                    $list_row[$column] = isset($row[$i]) ? $row[$i] : null;
-                }
-            }
-            $this->list[] = $list_row;
+        $reader = new Alaress\Csv\Reader($this->location);
+        $reader->setColumnList($this->columns);
+        foreach ($reader as $row) {
+            $this->list[] = $row;
         }
-        fclose($fp);
     }
 
     /**

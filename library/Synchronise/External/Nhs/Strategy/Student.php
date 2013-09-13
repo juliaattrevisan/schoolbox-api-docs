@@ -15,26 +15,21 @@ use Schoolbox\External\UserProfileMapper;
 
 class Synchronise_External_Nhs_Strategy_Student extends Synchronise_Base_Strategy_Student {
 
-    // Try to map columns from export as closely to Synergetic returns.
-    protected $columns = array(
-        'StudentID',
-        'NetworkLogin',
-        'StudentSurname',
-        'StudentGiven',
-        'StudentPreferred',
-        'StudentMiddleName',
-        'StudentGender',
-        'StudentClassGroup',
-        'StudentHouse',
-        'StudentYearLevel',
-        'StudentEmail',
-        'StudentPhone',
-        'StudentVceNumber',
-        null,
-        'StudentBirthDate',
-    );
+    protected $location = '';
+    protected $columns  = array();
+    protected $title    = "Update Schoolbox Student Details Synchronisation";
 
-    protected $title = "Update Schoolbox Student Details Synchronisation";
+    /**
+     * Sets up synchronisation with parameters passed from the definition.
+     *
+     * @param string $location Where the CSV for import is located
+     * @param array  $columns  The columns to import
+     */
+    public function __construct($location, $columns) {
+        parent::__construct();
+        $this->location = $location;
+        $this->columns  = $columns;
+    }
 
     /**
      * Setup verbose output
@@ -48,20 +43,12 @@ class Synchronise_External_Nhs_Strategy_Student extends Synchronise_Base_Strateg
      */
     public function generateList() {
         $this->list = array();
-        // Where's the CSV file? Let's say in students_csv for now.
-        // Need a better method for loading students too.
-        $fp = fopen(__DIR__.'/students.csv', 'r');
-        while (($row = fgetcsv($fp, null, ',', '"')) !== false) {
-            $list_row = array();
-            foreach ($this->columns as $i => $column) {
-                if (isset($column)) {
-                    $list_row[$column] = isset($row[$i]) ? $row[$i] : null;
-                }
-            }
-            $list_row['StudentOccupEmail'] = $list_row['StudentEmail'];
-            $this->list[] = $list_row;
+        $reader = new Alaress\Csv\Reader($this->location);
+        $reader->setColumnList($this->columns);
+        foreach ($reader as $row) {
+            $list_row['StudentOccupEmail'] = $row['StudentEmail'];
+            $this->list[] = $row;
         }
-        fclose($fp);
     }
 
     // Usually overridden:
@@ -95,6 +82,7 @@ class Synchronise_External_Nhs_Strategy_Student extends Synchronise_Base_Strateg
      * @return int
      */
     public function getGroupIDFromUser($currentUser) {
+        return 3;
         $year = $this->getYearFromUser($currentUser);
         return ($year >= 7 && $year <= 12) ? ($year - 3) : 0;
     }

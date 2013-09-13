@@ -20,85 +20,59 @@ use Schoolbox\External\UserProfileMapper;
 
 class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
 
-    protected $columns = array(
-        'StudentContactID',
-        'NetworkLogin',
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        'StudentContactDefaultEmail',
-        null,
-        null,
-        null,
-        null,
-        null,
-        'StudentContactAddress',
-        'StudentContactSuburb',
-        'StudentContactState',
-        'StudentContactPostcode',
-        'StudentContactCountry',
-        'StudentContactPhone',
-        'StudentContactName',
-        'StudentContactWorkPhone',
-        'StudentContactSpouseName',
-        'StudentContactSpouseWorkPhone',
-        'StudentContactIdentifier',
-        'StudentContactCombinedName',
-        'StudentContactSpouseDefaultEmail',
-        'StudentYearLevel',
-        'StudentCampus',
-    );
-
-    protected $title = "Update Schoolbox Parent Details Synchronisation";
-
+    protected $location = '';
+    protected $columns  = array();
+    protected $title    = "Update Schoolbox Parent Details Synchronisation";
     protected $relation_list = array();
+
+    /**
+     * Sets up synchronisation with parameters passed from the definition.
+     *
+     * @param string $location Where the CSV for import is located
+     * @param array  $columns  The columns to import
+     */
+    public function __construct($location, $columns) {
+        parent::__construct();
+        $this->location = $location;
+        $this->columns  = $columns;
+    }
 
     /**
      * Creates a list from a CSV file instead of from a DB connection
      */
     public function generateList() {
         $this->list = array();
-        // TODO move this somewhere into its own function
-        $fp = fopen(__DIR__.'/parents.csv', 'r');
-        while (($row = fgetcsv($fp, null, ',', '"')) !== false) {
-            $list_row = array();
-            foreach ($this->columns as $i => $column) {
-                if (isset($column)) {
-                    $list_row[$column] = isset($row[$i]) ? $row[$i] : null;
-                }
-            }
-            $list_row['StudentContactSurname']   = '';
-            $list_row['StudentContactPreferred'] = '';
-            $list_row['StudentContactTitle']     = '';
-            if (!empty($list_row['StudentContactName'])) {
-                list($list_row['StudentContactSurname'], $list_row['StudentContactPreferred']) = array_map(
-                    'trim', explode(',', $list_row['StudentContactName'])
-                );
-            }
-            if (!empty($list_row['StudentContactSpouseName'])) {
-                list($list_row['StudentContactSpouseSurname'], $list_row['StudentContactSpousePreferred']) = array_map(
-                    'trim', explode(',', $list_row['StudentContactSpouseName'])
-                );
-            }
-            $this->list[] = $list_row;
-        }
-        fclose($fp);
 
-        $fp = fopen(__DIR__.'/relations.csv', 'r');
-        while (($row = fgetcsv($fp, null, ',', '"')) !== false) {
+        // Load parent list
+        $reader = new Alaress\Csv\Reader($this->location);
+        $reader->setColumnList($this->columns);
+        foreach ($reader as $row) {
+            $row['StudentContactSurname']   = '';
+            $row['StudentContactPreferred'] = '';
+            $row['StudentContactTitle']     = '';
+            if (!empty($row['StudentContactName'])) {
+                list($row['StudentContactSurname'], $row['StudentContactPreferred']) = array_map(
+                    'trim', explode(',', $row['StudentContactName'])
+                );
+            }
+            if (!empty($row['StudentContactSpouseName'])) {
+                list($row['StudentContactSpouseSurname'], $row['StudentContactSpousePreferred']) = array_map(
+                    'trim', explode(',', $row['StudentContactSpouseName'])
+                );
+            }
+            $this->list[] = $row;
+        }
+        unset($reader);
+
+        // Load relations
+        $reader = new Alaress\Csv\Reader(Config::get('external_sync_relation_csv'));
+        foreach ($reader as $row) {
             list($child, $parent, $type) = $row;
             // Relation types:
             // 0: child -> parent
             // 1: child -> separated parent? (don't associate with child?)
             $this->relation_list[$parent][$child] = $type;
         }
-        fclose($fp);
-
     }
 
     /**
@@ -107,9 +81,6 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
     protected function setup() {
         $this->verbose_filter = new Synchronise_External_Nhs_Verbose();
     }
-
-    // Don't get campus relations here. Stitch them together in user
-    // relationship exporter.
 
     /**
      * Doesn't do anything, but always returns 1 so that executePostCreateUpdate
@@ -182,39 +153,4 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
         }
     }
 
-//    public function setupSpouseDetails($external_user) {
-//        return array();
-//    }
-//
-//    /**
-//     * Sticks stuff into the Schoolbox connector.
-//     *
-//     * @param array $newUser
-//     * @param array $externalUser
-//     */
-//    protected function executePostCreateUpdate($newUser, $externalUser) {
-//        var_dump($newUser, $externalUser);exit;
-////        try {
-////            $profile = UserProfileMapper::getInstance()->findById($newUser['id']);
-////            if (!$profile) {
-////                throw new Exception('User Profile does not exist');
-////            }
-////        }
-////        catch (Exception $e) {
-////            $profile = new UserProfile();
-////            $profile->setUserId($newUser['id']);
-////        }
-////        $profile
-////            ->setHouse($externalUser['StudentHouse'])
-////            ->setLevel($externalUser['StudentYearLevel'])
-////            ->setDob(new Alaress_Date_Format(new DateTime($externalUser['StudentBirthDate'])))
-////            ->setBirthDate($externalUser['StudentBirthDate'])
-////            ->setHomegroup($externalUser['StudentClassGroup'])
-////            ->setGivenName($externalUser['StudentPreferred'])
-////            ->setLastName($externalUser['StudentSurname'])
-////            ->setGender($externalUser['StudentGender'])
-////            ->setEmail($externalUser['StudentEmail'])
-////        ;
-////        UserProfileMapper::getInstance()->save($profile);
-//    }
 }
