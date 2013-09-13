@@ -30,7 +30,8 @@ if(isset($_POST['module'])) {
 
         case 'service_www':
 //          $a = microtime(true);                             // DEBUG
-            if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html')) {
+            $context = \Proxy\Server::getInstance()->getContext();
+		    if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
 //              $b = number_format(microtime(true) - $a, 4);  // DEBUG
                 $output[] = array('WWW_LIGHT'  => 'on',
                                   'WWW_STATUS' => 'Available'

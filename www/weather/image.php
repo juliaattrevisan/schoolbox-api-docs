@@ -20,8 +20,12 @@ if (is_string($file_path)) {
     $file_name = basename($file_path);
     if (file_exists($cache_path . '/' . $file_name)) {
         $file_contents = file_get_contents($cache_path . '/' . $file_name);
-    } elseif ($file_contents = file_get_contents($real_url . '/' . $file_path)) {
-        file_put_contents($cache_path . '/' . $file_name, $file_contents);
+    } else {
+	    // proxy check
+	    $ps = new \Proxy\Server(new \Schoolbox\ConfigLoader());
+	    if ($file_contents = file_get_contents($real_url . '/' . $file_path, null, $ps->getContext())) {
+            file_put_contents($cache_path . '/' . $file_name, $file_contents);
+	    }
     }
 
     //$file_info = new finfo(FILEINFO_MIME);
@@ -31,5 +35,3 @@ if (is_string($file_path)) {
     header('Content-type: image/gif');
     echo $file_contents;
 }
-
-?>

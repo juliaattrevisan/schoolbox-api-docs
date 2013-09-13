@@ -4,7 +4,7 @@
  *
  * @package MCManager.includes
  * @author Moxiecode
- * @copyright Copyright © 2004-2007, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2004-2007, Moxiecode Systems AB, All rights reserved.
  */
 
 class GoogleSpell extends SpellChecker {
@@ -74,7 +74,7 @@ class GoogleSpell extends SpellChecker {
 		// Use curl if it exists
 		if (function_exists('curl_init')) {
 			// Use curl
-			$ch = curl_init();
+			$ch = \Proxy\Server::getInstance()->curl_init();
 			curl_setopt($ch, CURLOPT_URL,$url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $header);
