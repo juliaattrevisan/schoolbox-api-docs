@@ -70,28 +70,19 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
         $this->list = array();
         // Where's the CSV file? Let's say in students_csv for now.
         // Need a better method for loading students too.
-        $fp = fopen(__DIR__.'/timetable.csv', 'r');
-        $this->columns = fgetcsv($fp, null, ',', '"');
-        while (($row = fgetcsv($fp, null, ',', '"')) !== false) {
-            $list_row = array();
-            foreach ($this->columns as $i => $column) {
-                if (isset($column)) {
-                    $list_row[$column] = isset($row[$i]) ? $row[$i] : null;
-                }
-            }
-
+        $reader = new Alaress\Csv\Reader(__DIR__.'/timetable.csv');
+        $reader->setLoadFromFirst(true);
+        foreach ($reader as $row) {
             // Group by class
-            $class = $list_row['Class'];
+            $class = $row['Class'];
             $this->list[$class]['class']         = $class;
             $this->list[$class]['period_list'][] = array(
-                'day'     => $list_row['Day'],
-                'period'  => $list_row['Period'],
-                'teacher' => $list_row['Teacher'],
-                'room'    => $list_row['Room'],
+                'day'     => $row['Day'],
+                'period'  => $row['Period'],
+                'teacher' => $row['Teacher'],
+                'room'    => $row['Room'],
             );
         }
-
-        fclose($fp);
     }
 
     /**
