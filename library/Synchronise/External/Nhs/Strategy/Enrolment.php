@@ -22,7 +22,21 @@ use Schoolbox\External\ClassInvolvementMapper;
 
 class Synchronise_External_Nhs_Strategy_Enrolment extends Synchronise_Base_Strategy_Enrolment {
 
-    public $columns = array();
+    protected $location = '';
+    protected $columns  = array();
+    protected $title    = "Update Schoolbox Enrolment Details Synchronisation";
+
+    /**
+     * Sets up synchronisation with parameters passed from the definition.
+     *
+     * @param string $location Where the CSV for import is located
+     * @param array  $columns  The columns to import
+     */
+    public function __construct($location, $columns) {
+        parent::__construct();
+        $this->location = $location;
+        $this->columns  = $columns;
+    }
 
     /**
      * Setup verbose output
@@ -36,27 +50,15 @@ class Synchronise_External_Nhs_Strategy_Enrolment extends Synchronise_Base_Strat
      */
     public function generateList() {
         $this->list = array();
-        // Where's the CSV file? Let's say in students_csv for now.
-        // Need a better method for loading students too.
-        $fp = fopen(__DIR__.'/enrolments.csv', 'r');
-        $this->columns = fgetcsv($fp, null, ',', '"');
-        while (($row = fgetcsv($fp, null, ',', '"')) !== false) {
-            $list_row = array();
-            foreach ($this->columns as $i => $column) {
-                if (isset($column)) {
-                    $list_row[$column] = isset($row[$i]) ? $row[$i] : null;
-                }
-            }
+        $reader = new Alaress\Csv\Reader($this->location);
+        $reader->setLoadFromFirst(true);
+        foreach ($reader as $row) {
             // Study classes (free preiods?) exist, these have a space afterward.
             // These aren't separate classes
-            list($code) = explode(' ', $list_row['Class']);
+            list($code) = explode(' ', $row['Class']);
             $this->list[$code]['code']           = $code;
-            $this->list[$code]['student_list'][] = $list_row['Student'];
+            $this->list[$code]['student_list'][] = $row['Student'];
         }
-
-        // Need to group students and their classes together
-
-        fclose($fp);
     }
 
     /**
