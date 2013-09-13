@@ -204,7 +204,7 @@ class Server {
 	 */
 	public function getContext($protocol = 'http', $asArray = false) {
 		if(!$this->usesProxy()) {
-			return null;
+			return $asArray ? null : stream_context_create();
 		}
 		$transport = $protocol == 'https' ? 'ssl' : 'tcp';
 
