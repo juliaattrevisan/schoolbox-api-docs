@@ -1,3 +1,5 @@
+@import url("jquery-ui.less");
+
 /*
 Le Reset
 */
@@ -4166,8 +4168,8 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 			color: @navigation-links;
             word-break: break-word;
             &:hover {
-                background: @link;
-                color: @link;
+                background: @module-background;
+                color: @module-heading;
                 text-decoration: none;
             }
             &.selected {
@@ -8317,9 +8319,6 @@ img.mimetype {
     background: url('/images/famicons/arrow_out.png') no-repeat;
     margin: 3px 3px 3px 5px;
 }
-.ui-state-highlight {
-    height: 20px;
-}
 
 /* submission/allDueWork */
 .allduework table.subjectList {
@@ -9478,13 +9477,8 @@ table img { max-width: none; }
 }
 #category li a { padding: 4px 16px; }
 #category li a.selected,
-#tabs-sub li.ui-tabs-selected a,
-.topic-list li a.selected{
+#tabs-sub li.ui-tabs-selected a {
 	background:@tab-background; color:@white; font-weight: normal;
-}
-.topic-list li a:hover {
-	background: @tab-background;
-	color: @white;
 }
 
 #category li a:hover{
