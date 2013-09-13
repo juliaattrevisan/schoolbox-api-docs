@@ -116,7 +116,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
      */
     protected function getClassUserStatement() {
         return $this->getDatabase()->prepare("
-            SELECT c.name, c.code, c.description, cp.period_id
+            SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id
             FROM class_user cl
             LEFT JOIN class c ON c.id = cl.class_id
             LEFT JOIN class_period cp ON cp.class_id = c.id
@@ -197,7 +197,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 				if ( $class['period_id'] == $period['id'] ) {
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['description'] = $class['name'];
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['code'] = $class['code'];
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['room'] = '';
+					$periodListAdaption[$periodSequence]['day'][$dayNumber]['room'] = $class['room'];
 
 					unset($classList[$i]);
 				}
