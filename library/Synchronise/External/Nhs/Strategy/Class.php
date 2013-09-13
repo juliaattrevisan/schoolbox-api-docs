@@ -24,29 +24,33 @@ use Schoolbox\External\ClassInvolvementMapper;
 
 class Synchronise_External_Nhs_Strategy_Class extends Synchronise_Base_Strategy_Class {
 
-    public $columns = array();
+    protected $location = '';
+    protected $columns  = array();
+    protected $title    = "Update Schoolbox Class Details Synchronisation";
+
+    /**
+     * Sets up synchronisation with parameters passed from the definition.
+     *
+     * @param string $location Where the CSV for import is located
+     * @param array  $columns  The columns to import
+     */
+    public function __construct($location, $columns) {
+        parent::__construct();
+        $this->location = $location;
+        $this->columns  = $columns;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function generateList() {
         $this->list = array();
-        // Where's the CSV file? Let's say in students_csv for now.
-        // Need a better method for loading students too.
-        $fp = fopen(__DIR__.'/classes.csv', 'r');
-        $this->columns = fgetcsv($fp, null, ',', '"');
-        while (($row = fgetcsv($fp, null, ',', '"')) !== false) {
-            $list_row = array();
-            foreach ($this->columns as $i => $column) {
-                if (isset($column)) {
-                    $list_row[$column] = isset($row[$i]) ? $row[$i] : null;
-                }
-            }
-            $this->list[] = $list_row;
+        $reader = new Alaress\Csv\Reader($this->location);
+        $reader->setLoadFromFirst(true);
+        foreach ($reader as $row) {
+            $this->list[] = $row;
         }
-        fclose($fp);
     }
-
 
     /**
      * Setup verbose output
@@ -96,7 +100,12 @@ class Synchronise_External_Nhs_Strategy_Class extends Synchronise_Base_Strategy_
         // Teacher connections:
         // Delete all old ones for this class, then put in the new ones.
         ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STAFF_GROUP_TYPE);
-        $teacher_list = UserMapper::getInstance()->findIn('synergy_id', $new_item['teacher_list']);
+        $teacher_list = UserMapper::getInstance()->findIn('synergy_id', $new_item['teacher_list']);printf(
+            "Adding %d teachers for class \"%s (%s)\"\n",
+            count($teacher_list),
+            $new_item['name'],
+            $new_item['code']
+        );
         foreach ($teacher_list as $teacher) {
             $class_involvement = new ClassInvolvement();
             $class_involvement->setClass($class)->setUser($teacher);
