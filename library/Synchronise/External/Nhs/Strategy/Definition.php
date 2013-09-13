@@ -1,10 +1,13 @@
 <?php
 /**
+ * Synchronise_External_Nhs_Strategy_Definition
  *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * This class is currently a contractual obligation for external sync types. It
+ * doesn't do anything for NHS (yet).
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2013, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 class Synchronise_External_Nhs_Strategy_Definition extends Synchronise_External_Strategy_Definition {
 
@@ -30,41 +33,41 @@ class Synchronise_External_Nhs_Strategy_Definition extends Synchronise_External_
 //            array('studentID', 'parentID')
 //        );
 //
-        $this->setDefinition(
-            'staff',
-            array(
-                'StaffID',
-                'NetworkLogin',
-                'StaffSurname',
-                'StaffPreferredName',
-                'StaffPreferredName2',
-                'StaffMiddleName',
-                'StaffGender',
-                null,
-                null,
-                null,
-                'OccupEmail',
-                'StaffPhone',
-                'StaffTeacherNumber',
-                null,
-                'StaffBirthDate',
-                'StaffAddress1',
-                'StaffAddress2',
-                'StaffSuburb',
-                'StaffState',
-                'StaffPostcode',
-                'StaffCountry',
-                'StaffHomePhone',
-                'StaffHomePhone',
-                null,
-                null,
-                null,
-                null,
-                null,
-                'StaffFullName',
-            )
-        );
-
+//        $this->setDefinition(
+//            'staff',
+//            array(
+//                'StaffID',
+//                'NetworkLogin',
+//                'StaffSurname',
+//                'StaffPreferredName',
+//                'StaffPreferredName2',
+//                'StaffMiddleName',
+//                'StaffGender',
+//                null,
+//                null,
+//                null,
+//                'OccupEmail',
+//                'StaffPhone',
+//                'StaffTeacherNumber',
+//                null,
+//                'StaffBirthDate',
+//                'StaffAddress1',
+//                'StaffAddress2',
+//                'StaffSuburb',
+//                'StaffState',
+//                'StaffPostcode',
+//                'StaffCountry',
+//                'StaffHomePhone',
+//                'StaffHomePhone',
+//                null,
+//                null,
+//                null,
+//                null,
+//                null,
+//                'StaffFullName',
+//            )
+//        );
+//
 //        $this->setDefinition(
 //            'student',
 //            array(
