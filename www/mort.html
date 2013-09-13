@@ -118,6 +118,10 @@
 			.evaluation-saving {
 				display: none;
 			}
+
+			.evaluation-selected {
+				background-color: #0f0;
+			}
 		</style>
 		<style type='text/css'>
 			.steve {
@@ -184,7 +188,7 @@
 		<h1>Multiple Choice</h1>
 		<form id='questionForm-1133' data-plugin='evaluationMultipleChoice' action='mort.php' method='post' class='questionForm'>
 			<label>
-				A) <input name="answer[]" type="checkbox" value="A"><span>First of the multiple choice</span>
+				A) <input name="answer[]" type="checkbox" checked='checked' value="A"><span>First of the multiple choice</span>
 			</label>
 			<label class="checkboxes">
 				B) <input name="answer[]" type="checkbox" value="B"><span>Second of the multiple choice</span>
@@ -198,7 +202,7 @@
 				A) <input name="answer" type="radio" value="kitty"><span>First</span>
 			</label>
 			<label>
-				B) <input name="answer" type="radio" value="cat"><span>Second</span>
+				B) <input name="answer" type="radio" checked='checked' value="cat"><span>Second</span>
 			</label>
 		</form>
 

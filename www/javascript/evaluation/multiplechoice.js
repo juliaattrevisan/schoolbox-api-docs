@@ -8,6 +8,7 @@
 	$.fn.evaluationMultipleChoice = function(options) {
 		var config = init(options);
 
+		initSelected();
 		initChange();
 
 		/**
@@ -29,10 +30,23 @@
 		}
 
 		/**
+		 * Highlight preselected items
+		 */
+		function initSelected() {
+			config.questionForm.find('input[type=checkbox]').each(function() {
+				if ($(this).is(':checked')) {
+					$(this).parent().addClass('evaluation-selected');
+				}
+			});
+		}
+
+		/**
 		 * Save response upon change
 		 */
 		function initChange() {
 			config.questionForm.find('input').change(function() {
+				$(this).parent().toggleClass('evaluation-selected');
+
 				$.fn.evaluationMultipleChoice.saveOne(config.questionForm);
 			});
 		}
