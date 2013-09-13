@@ -28,8 +28,9 @@ use Schoolbox\External\TimetablePeriodMapper;
 
 class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strategy_Timetable {
 
-    protected $columns = array();
-
+    protected $location  = '';
+    protected $columns   = array();
+    protected $title     = "Update Schoolbox Timetable Details Synchronisation";
     protected $campus_id = 1;
 
     /**
@@ -41,6 +42,18 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
      * @var TimetableCycle
      */
     protected $cycle;
+
+    /**
+     * Sets up synchronisation with parameters passed from the definition.
+     *
+     * @param string $location Where the CSV for import is located
+     * @param array  $columns  The columns to import
+     */
+    public function __construct($location, $columns) {
+        parent::__construct();
+        $this->location = $location;
+        $this->columns  = $columns;
+    }
 
     /**
      * Setup verbose output
@@ -59,9 +72,7 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
      */
     public function generateList() {
         $this->list = array();
-        // Where's the CSV file? Let's say in students_csv for now.
-        // Need a better method for loading students too.
-        $reader = new Alaress\Csv\Reader(__DIR__.'/timetable.csv');
+        $reader = new Alaress\Csv\Reader($this->location);
         $reader->setLoadFromFirst(true);
         foreach ($reader as $row) {
             // Group by class
