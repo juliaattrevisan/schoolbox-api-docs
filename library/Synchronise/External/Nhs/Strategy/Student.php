@@ -82,7 +82,6 @@ class Synchronise_External_Nhs_Strategy_Student extends Synchronise_Base_Strateg
      * @return int
      */
     public function getGroupIDFromUser($currentUser) {
-        return 3;
         $year = $this->getYearFromUser($currentUser);
         return ($year >= 7 && $year <= 12) ? ($year - 3) : 0;
     }
