@@ -85,9 +85,13 @@ class Synchronise_External_Nhs_Strategy_Class extends Synchronise_Base_Strategy_
     public function executeCreateUpdate($new_item) {
 
         // Create or update class
+        $class         = null;
         $class_message = sprintf('class "%s" (%s)', $new_item['name'], $new_item['code']);
         try {
             $class = ClassEntryMapper::getInstance()->findOneByColumn('code', $new_item['code']);
+        }
+        catch (Exception $e) {}
+        if ($class instanceof ClassEntry) {
             if ($this->perform_update) {
                 $this->verbose_filter->outputPerformUpdateMessage($class_message);
             }
@@ -96,8 +100,7 @@ class Synchronise_External_Nhs_Strategy_Class extends Synchronise_Base_Strategy_
             }
             $this->verbose_filter->incrementUpdated();
         }
-        catch (Exception $e) {}
-        if (empty($class)) {
+        else {
             $class = new ClassEntry();
             $class->setCode($new_item['code']);
             if ($this->perform_update) {
