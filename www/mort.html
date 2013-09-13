@@ -108,17 +108,63 @@
 				});
 			});
 		</script>
+		<style type='text/css'>
+			.evaluation-bar {
+				width:1px;
+				height:24px;
+				display:block
+			}
+
+			.evaluation-saving {
+				display: none;
+			}
+		</style>
+		<style type='text/css'>
+			.steve {
+				border: 4px dotted #f00;
+				-webkit-animation: steve 1s linear infinite;
+				-moz-animation: steve 1s linear infinite;
+				-ms-animation: steve 1s linear infinite;
+				-o-animation: steve 1s linear infinite;
+				animation: steve 1s linear infinite;
+			}
+
+			@-webkit-keyframes steve {
+				from { border-color: #f00; }
+				33%  { border-color: #0f0; }
+				66%  { border-color: #00f; }
+				to   { border-color: #f00; }
+			}
+			@-moz-keyframes steve {
+				from { border-color: #f00; }
+				33%  { border-color: #0f0; }
+				66%  { border-color: #00f; }
+				to   { border-color: #f00; }
+			}
+			@-ms-keyframes steve {
+				from { border-color: #f00; }
+				33%  { border-color: #0f0; }
+				66%  { border-color: #00f; }
+				to   { border-color: #f00; }
+			}
+			@-o-keyframes steve {
+				from { border-color: #f00; }
+				33%  { border-color: #0f0; }
+				66%  { border-color: #00f; }
+				to   { border-color: #f00; }
+			}
+		</style>
 	</head>
 	<body>
 		<h1>Percentage Complete</h1>
 		<div>
 			<section>
 				<h2>Section 1</h2>
-				<div id='evaluation-percentage-bar-13' style='border:4px dashed #f0f;background-color:#a0a;height:24px;width:1px;display:block'></div>
+				<div id='evaluation-percentage-bar-13' class='evaluation-bar steve'></div>
 			</section>
 			<section>
 				<h2>Section 2</h2>
-				<div id='evaluation-percentage-bar-14' style='border:4px dashed #f0f;background-color:#a0a;height:24px;width:1px;display:block'></div>
+				<div id='evaluation-percentage-bar-14' class='evaluation-bar steve'></div>
 			</section>
 
 			<a id='simulateUpdate'>Simulate bar update</a>
@@ -210,7 +256,7 @@
 			</label>
 		</form>
 
-		<div class='evaluation-saving' style='display:none;'>
+		<div class='evaluation-saving'>
 			<h4>Saving your stuff</h4>
 		</div>
 
