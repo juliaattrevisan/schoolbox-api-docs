@@ -83,34 +83,36 @@ class Synchronise_External_Nhs_Strategy_Enrolment extends Synchronise_Base_Strat
 //        if ($new_item['code'] === '12Study.R2') {
 //            return 0;
 //        }
-
+        $class         = null;
+        $class_message = sprintf('enrolment for class "%s"', $new_item['code']);
         // Load existing class
         try {
             $class = ClassEntryMapper::getInstance()->findOneByColumn('code', $new_item['code']);
         }
-        catch (Exception $e) {
-            return 0;
-        }
+        catch (Exception $e) {}
         if (!($class instanceof ClassEntry)) {
+            $this->verbose_filter->outputSkipMessage($class_message.', because it was not found');
+            $this->verbose_filter->incrementSkipped();
             return 0;
         }
 
         // Student connections:
         // Delete all old ones for this class, then put in the new ones.
-
-        // Message: setting %d students into class %s
-        ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STUDENT_GROUP_TYPE);
-        $student_list = UserMapper::getInstance()->findIn('synergy_id', $new_item['student_list']);
-        printf(
-            "Setting %d students as enrolled in class \"%s\"\n",
-            count($student_list),
-            $new_item['code']
-        );
-        foreach ($student_list as $student) {
-            $class_involvement = new ClassInvolvement();
-            $class_involvement->setClass($class)->setUser($student);
-            ClassInvolvementMapper::getInstance()->save($class_involvement);
+        $enrolment_message = count($new_item['student_list']).' enrolment(s) for '.$class_message;
+        if ($this->perform_update) {
+            ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STUDENT_GROUP_TYPE);
+            $student_list = UserMapper::getInstance()->findIn('synergy_id', $new_item['student_list']);
+            foreach ($student_list as $student) {
+                $class_involvement = new ClassInvolvement();
+                $class_involvement->setClass($class)->setUser($student);
+                ClassInvolvementMapper::getInstance()->save($class_involvement);
+            }
+            $this->verbose_filter->outputPerformUpdateMessage($enrolment_message);
         }
+        else {
+            $this->verbose_filter->outputPlanUpdateMessage($enrolment_message);
+        }
+        $this->verbose_filter->incrementUpdated();
         return 1;
     }
 
