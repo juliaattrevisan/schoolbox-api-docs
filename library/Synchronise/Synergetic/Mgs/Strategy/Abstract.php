@@ -36,7 +36,7 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
     const STAFF_EMAIL_SUFFIX = "mgs.vic.edu.au";
 
     // ePortfolio enabled by default (parents miss out on these too)
-    const STUDENT_EPORTFOLIO = 0;
+    const STUDENT_EPORTFOLIO = 1;
     const STAFF_EPORTFOLIO = 0;
 
     /**
