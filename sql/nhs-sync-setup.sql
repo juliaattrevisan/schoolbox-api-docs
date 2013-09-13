@@ -1,3 +1,10 @@
+-- Things you need to test out NHS sync.
+-- You'll also have to set the school as NHS
+-- update config set value = 'nhs' where name='site_location' limit 1;
+-- update config set value = 'schoolbox' where name='external_type' limit 1;
+update config set value = 1 where name='external_sync_data' limit 1;
+update config set value = 'Student Staff Parent Class Enrolment Timetable' where name='sync_patterns' limit 1;
+
 -- Add terms for this year
 INSERT INTO `timetable_cycle`
 (`id`, `title`, `cycle_length`, `day_length`, `regular`)
