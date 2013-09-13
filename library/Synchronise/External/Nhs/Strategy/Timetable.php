@@ -105,57 +105,61 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
      * @return int
      */
     public function executeCreateUpdate($new_item) {
-        $class = null;
+        $class         = null;
+        $class_message = sprintf('timetable for class "%s"', $new_item['class']);
         try {
             $class = ClassEntryMapper::getInstance()->findOneByColumn('code', $new_item['class']);
         }
-        catch (Exception $e) {
-            return 0;
-        }
+        catch (Exception $e) {}
         if (!($class instanceof ClassEntry)) {
+            $this->verbose_filter->outputSkipMessage($class_message.', because it was not found');
+            $this->verbose_filter->incrementSkipped();
             return 0;
         }
 
         // First delete all classes for this cycle and campus.
         // Then restore them.
-        printf(
-            "Setting %d periods for class \"%s\"\n",
-            count($new_item['period_list']),
-            $new_item['class']
-        );
-        foreach ($new_item['period_list'] as $period) {
-            $class_period = new ClassPeriod();
-            // Period: whatever the period for this cycle, day and sequence is
-            $period_list = TimetablePeriodMapper::getInstance()->findByColumnList(
-                array(
-                    'cycle_id' => $this->cycle->getId(),
-                    'day'      => $period['day'],
-                    'sequence' => $period['period'],
-                )
-            );
-            foreach ($period_list as $period_object) {
-                ClassPeriodMapper::getInstance()->deleteForClassAndPeriod($class, $period_object);
-                $class_period
-                    ->setClass($class)
-                    ->setPeriod($period_object)
-                    ->setRoom($period['room'])
-                ;
-                // Attach teacher
-                $teacher = null;
-                try {
-                    $teacher = UserMapper::getInstance()->findOneByColumn(
-                        'synergy_id', $period['teacher']
-                    );
+        $timetable_message = count($new_item['period_list']).' period(s) for '.$class_message;
+        if ($this->perform_update) {
+            $this->verbose_filter->outputPerformUpdateMessage($timetable_message);
+            foreach ($new_item['period_list'] as $period) {
+                $class_period = new ClassPeriod();
+                // Period: whatever the period for this cycle, day and sequence is
+                $period_list = TimetablePeriodMapper::getInstance()->findByColumnList(
+                    array(
+                        'cycle_id' => $this->cycle->getId(),
+                        'day'      => $period['day'],
+                        'sequence' => $period['period'],
+                    )
+                );
+                foreach ($period_list as $period_object) {
+                    ClassPeriodMapper::getInstance()->deleteForClassAndPeriod($class, $period_object);
+                    $class_period
+                        ->setClass($class)
+                        ->setPeriod($period_object)
+                        ->setRoom($period['room'])
+                    ;
+                    // Attach teacher
+                    $teacher = null;
+                    try {
+                        $teacher = UserMapper::getInstance()->findOneByColumn(
+                            'synergy_id', $period['teacher']
+                        );
+                    }
+                    catch (Exception $e) {}
+                    if ($teacher instanceof User) {
+                        $class_period->setTeacher($teacher);
+                    }
+                    ClassPeriodMapper::getInstance()->save($class_period);
+                    // Break because we only want one row per period.
+                    break;
                 }
-                catch (Exception $e) {}
-                if ($teacher instanceof User) {
-                    $class_period->setTeacher($teacher);
-                }
-                ClassPeriodMapper::getInstance()->save($class_period);
-                // Break because we only want one row per period.
-                break;
             }
         }
+        else {
+            $this->verbose_filter->outputPlanUpdateMessage($timetable_message);
+        }
+        $this->verbose_filter->incrementUpdated();
         return 1;
     }
 }
