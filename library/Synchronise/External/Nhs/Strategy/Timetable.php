@@ -15,15 +15,15 @@
 
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 
 class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strategy_Timetable {
@@ -50,16 +50,7 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
         $this->campus         = CampusMapper::getInstance()->findById($this->campus_id);
 
         // Get the cycle for this campus.
-        $timetable_campus = null;
-        try {
-            $timetable_campus = TimetableCampusMapper::getInstance()->findCurrentTimetable($this->campus);
-        }
-        catch (Exception $e) {
-            return 0;
-        }
-        if (!($timetable_campus instanceof TimetableCampus)) {
-            return 0;
-        }
+        $timetable_campus = TimetableCampusMapper::getInstance()->findCurrentTimetable($this->campus);
         $this->cycle = $timetable_campus->getCycle();
     }
 
@@ -103,33 +94,6 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
      * @return int
      */
     public function executeCreateUpdate($new_item) {
-
-        // Timetable cycle:
-        // ID: whatever
-        // Title: whatever
-        // cycle_length: max(day)
-        // day_length: max(period)
-        // regular: let's say True
-        // You would likely have one per term.
-
-        // Timetable campus:
-        // cycle_id, campus_id: obvious
-        // start: whenever their timetable starts!
-        // reset: ?
-        // offset: I'm saying 0
-        // finish: end of the universe
-
-        // Timetable:
-        // There's only one campus for NHS, so everything goes into that one.
-        // They don't have a start or an end, either.
-        // cycle_id: whatever the current cycle is
-        // title: lookup class name
-        // day, sequence: from CSV (Day and Period)
-        // start, finish: guess from Period
-        // usable: I'm going to say True
-        // room: doesn't exist in Schoolbox table, but should be added
-        // teacher: should probably be stored as well, but isn't.
-
         $class = null;
         try {
             $class = ClassEntryMapper::getInstance()->findOneByColumn('code', $new_item['class']);
@@ -140,26 +104,9 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
         if (!($class instanceof ClassEntry)) {
             return 0;
         }
-//
-//        $timetable_campus = null;
-//        try {
-//            $timetable_campus = TimetableCampusMapper::getInstance()->findCurrentTimetable($this->campus);
-//        }
-//        catch (Exception $e) {
-//            return 0;
-//        }
-//        if (!($timetable_campus instanceof TimetableCampus)) {
-//            return 0;
-//        }
-//
-//        $cycle = $timetable_campus->getCycle();
-//        $campus = $timetable_campus->getCampus();
-
-
 
         // First delete all classes for this cycle and campus.
         // Then restore them.
-
         printf(
             "Setting %d periods for class \"%s\"\n",
             count($new_item['period_list']),
@@ -177,12 +124,24 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
             );
             foreach ($period_list as $period_object) {
                 ClassPeriodMapper::getInstance()->deleteForClassAndPeriod($class, $period_object);
-                // TODO add room and teacher to classPeriod object
                 $class_period
                     ->setClass($class)
                     ->setPeriod($period_object)
+                    ->setRoom($period['room'])
                 ;
+                // Attach teacher
+                $teacher = null;
+                try {
+                    $teacher = UserMapper::getInstance()->findOneByColumn(
+                        'synergy_id', $period['teacher']
+                    );
+                }
+                catch (Exception $e) {}
+                if ($teacher instanceof User) {
+                    $class_period->setTeacher($teacher);
+                }
                 ClassPeriodMapper::getInstance()->save($class_period);
+                // Break because we only want one row per period.
                 break;
             }
         }
