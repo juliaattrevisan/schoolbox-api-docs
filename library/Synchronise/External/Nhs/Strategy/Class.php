@@ -100,7 +100,8 @@ class Synchronise_External_Nhs_Strategy_Class extends Synchronise_Base_Strategy_
         // Teacher connections:
         // Delete all old ones for this class, then put in the new ones.
         ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STAFF_GROUP_TYPE);
-        $teacher_list = UserMapper::getInstance()->findIn('synergy_id', $new_item['teacher_list']);printf(
+        $teacher_list = UserMapper::getInstance()->findIn('synergy_id', $new_item['teacher_list']);
+        printf(
             "Adding %d teachers for class \"%s (%s)\"\n",
             count($teacher_list),
             $new_item['name'],
