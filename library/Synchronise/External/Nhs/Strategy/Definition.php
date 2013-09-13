@@ -16,82 +16,100 @@ class Synchronise_External_Nhs_Strategy_Definition extends Synchronise_External_
      * Cfg::get('external_sync_STRATEGY_csv')
      */
     public function __construct() {
+        $this->setDefinition(
+            'student',
+            array(
+                'StudentID',
+                'NetworkLogin',
+                'StudentSurname',
+                'StudentGiven',
+                'StudentPreferred',
+                'StudentMiddleName',
+                'StudentGender',
+                'StudentClassGroup',
+                'StudentHouse',
+                'StudentYearLevel',
+                'StudentEmail',
+                'StudentPhone',
+                'StudentVceNumber',
+                null,
+                'StudentBirthDate',
+            )
+        );
+        $this->setDefinition(
+            'staff',
+            array(
+                'StaffID',
+                'NetworkLogin',
+                'StaffSurname',
+                'StaffGivenName',
+                'StaffPreferredName',
+                'StaffMiddleName',
+                'StaffGender',
+                null,
+                null,
+                null,
+                'OccupEmail',
+                'StaffPhone',
+                'StaffTeacherNumber',
+                null,
+                'StaffBirthDate',
+                'StaffSubAddress',
+                'StaffAddress',
+                'StaffSuburb',
+                'StaffState',
+                'StaffPostcode',
+                'StaffCountry',
+                'StaffHomePhone',
+                null,
+                null,
+                null,
+                null,
+                null,
+                'StaffFullName',
+            )
+        );
+        $this->setDefinition(
+            'parent',
+            array(
+                'StudentContactID',
+                'NetworkLogin',
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                'StudentContactDefaultEmail',
+                null,
+                null,
+                null,
+                null,
+                null,
+                'StudentContactAddress',
+                'StudentContactSuburb',
+                'StudentContactState',
+                'StudentContactPostcode',
+                'StudentContactCountry',
+                'StudentContactPhone',
+                'StudentContactName',
+                'StudentContactWorkPhone',
+                'StudentContactSpouseName',
+                'StudentContactSpouseWorkPhone',
+                'StudentContactIdentifier',
+                'StudentContactCombinedName',
+                'StudentContactSpouseDefaultEmail',
+                'StudentYearLevel',
+                'StudentCampus',
+            )
+        );
 
-//        $this->setDefinition('class',
-//            array('code', 'name', 'staffID')
-//        );
-//
-//        $this->setDefinition('enrolment',
-//            array('classCode', 'studentID')
-//        );
-//
-//        $this->setDefinition('parent',
-//            array('parentID', 'title', 'firstName', 'lastName', 'networkLogin', '?', 'externalEmail')
-//        );
-//
-//        $this->setDefinition('parentrelation',
-//            array('studentID', 'parentID')
-//        );
-//
-//        $this->setDefinition(
-//            'staff',
-//            array(
-//                'StaffID',
-//                'NetworkLogin',
-//                'StaffSurname',
-//                'StaffPreferredName',
-//                'StaffPreferredName2',
-//                'StaffMiddleName',
-//                'StaffGender',
-//                null,
-//                null,
-//                null,
-//                'OccupEmail',
-//                'StaffPhone',
-//                'StaffTeacherNumber',
-//                null,
-//                'StaffBirthDate',
-//                'StaffAddress1',
-//                'StaffAddress2',
-//                'StaffSuburb',
-//                'StaffState',
-//                'StaffPostcode',
-//                'StaffCountry',
-//                'StaffHomePhone',
-//                'StaffHomePhone',
-//                null,
-//                null,
-//                null,
-//                null,
-//                null,
-//                'StaffFullName',
-//            )
-//        );
-//
-//        $this->setDefinition(
-//            'student',
-//            array(
-//                'StudentID',
-//                'NetworkLogin',
-//                'StudentSurname',
-//                'StudentGiven',
-//                'StudentPreferred',
-//                'StudentMiddleName',
-//                'StudentGender',
-//                'StudentClassGroup',
-//                'StudentHouse',
-//                'StudentYearLevel',
-//                'StudentEmail',
-//                'StudentPhone',
-//                'StudentVceNumber',
-//                null,
-//                'StudentBirthDate',
-//            )
-//        );
-
-//        $this->setDefinition('timetable',
-//            array('classCode', 'day', 'period', 'room')
-//        );
+        // Class, timetable and enrolment have the first row as the column list.
+        $this->setDefinition('class', null);
+        $this->setDefinition('enrolment', null);
+        $this->setDefinition('timetable', null);
     }
 
 }
