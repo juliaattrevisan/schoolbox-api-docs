@@ -9,6 +9,8 @@
 
 namespace Schoolbox\External;
 
+use Schoolbox\User;
+
 class ClassPeriod {
 
     /**
@@ -25,6 +27,16 @@ class ClassPeriod {
      * @var TimetablePeriod
      */
     protected $period;
+
+    /**
+     * @var User
+     */
+    protected $teacher;
+
+    /**
+     * @var string
+     */
+    protected $room;
 
     /**
      * @param  \Schoolbox\External\ClassEntry $class
@@ -72,6 +84,38 @@ class ClassPeriod {
      */
     public function getPeriod() {
         return $this->period;
+    }
+
+    /**
+     * @param  string $room
+     * @return $this
+     */
+    public function setRoom($room) {
+        $this->room = $room;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoom() {
+        return $this->room;
+    }
+
+    /**
+     * @param  \Schoolbox\User $teacher
+     * @return $this
+     */
+    public function setTeacher($teacher) {
+        $this->teacher = $teacher;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\User
+     */
+    public function getTeacher() {
+        return $this->teacher;
     }
 
 }

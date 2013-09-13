@@ -38,6 +38,17 @@ class ClassPeriodMapper extends Schoolbox\External\Mapper {
             'type'     => self::TYPE_MODEL,
             'join'     => 'period',
         ));
+        $this->hasMap(array(
+            'column'   => 'teacher_id',
+            'property' => 'teacher',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'teacher',
+        ));
+        $this->hasMap(array(
+            'column'   => 'room',
+            'property' => 'room',
+            'type'     => self::TYPE_STRING,
+        ));
         $this->hasJoin(
             'class',
             array(
@@ -54,13 +65,21 @@ class ClassPeriodMapper extends Schoolbox\External\Mapper {
                 'other_key' => 'id',
             )
         );
+        $this->hasJoin(
+            'teacher',
+            array(
+                'mapper'    => '\\Schoolbox\\UserMapper',
+                'this_key'  => 'teacher_id',
+                'other_key' => 'id',
+            )
+        );
     }
 
     /**
      * Clears all timetable period entries for this class.
      *
      * @param ClassEntry      $class
-     * @param TimetablePeriod $cycle
+     * @param TimetablePeriod $period
      *
      * @return int
      */
