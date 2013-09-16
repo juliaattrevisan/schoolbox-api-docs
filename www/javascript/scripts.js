@@ -51,8 +51,11 @@ $j(function() {
 	* Submit the form with a href links with the classes below
 	* */
 	$j('.submit, .submit-this').click(function(event) {
-		event.preventDefault();
-		$j(this).closest('form').submit();
+		var form = $j(this).closest('form');
+		if (form.length > 0) {
+			event.preventDefault();
+			form.submit();
+		}
 	});
 
 	/*
