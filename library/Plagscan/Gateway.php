@@ -154,7 +154,7 @@ class Plagscan_Gateway {
 
 	    // build a proxy context (will be null if proxy isn't configured)
 	    $context = Proxy\Server::getInstance()->getContext('https');
-        if ( $socket = stream_socket_client("ssl://$host", $errorCode, $errorMessage, 300, STREAM_CLIENT_CONNECT, $context) ) {
+        if ( $socket = stream_socket_client("ssl://$host:443", $errorCode, $errorMessage, 300, STREAM_CLIENT_CONNECT, $context) ) {
             fputs($socket, "POST $path HTTP/1.0\n");
             fputs($socket, "Host: $host\n");
             fputs($socket, "Content-type: multipart/form-data; boundary=$boundary\n");

@@ -139,6 +139,11 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 			throw new Sabre\DAV\Exception\Forbidden($e->getMessage(), $e->getCode(), $e);
 		}
 		$mapper->save($submission);
+		// Queue it for Plagscanning as well, if that's supported.
+		if (Config::get('plagscan_api_key') && Config::get('plagscan_username')) {
+			$plagdoc = Plagscan_DocumentMapper::getInstance()->createFromSubmission($submission);
+			Plagscan_DocumentMapper::getInstance()->save($plagdoc);
+		}
 		return null;
 
 //		$dav_file = new Sabre\DAV\SimpleFile(

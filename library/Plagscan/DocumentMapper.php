@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  * 
  */
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 
@@ -72,12 +73,14 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 	 * @return array
 	 */
 	public function save ($dirtyDocument) {
-		//
-		// Document not found already? Submit to the gateway
+		$existing_id = null;
 		try {
-			//
-			// Don't do anything if $existing_document isn't found
+			// Don't do anything if $existing_document exists already
 			$existing_document = $this->findById($dirtyDocument->getId());
+			$existing_id       = $existing_document->getId();
+		}
+		catch (Schoolbox\Mapper\Exception $e) {}
+		if (!isset($existing_id)) {
 			$file = $dirtyDocument->getFile();
 			$documentId = $this->gateway->submit($file['name'], $file['file']);
 
@@ -91,8 +94,24 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 				return false;
 			}
 		}
-		catch (Schoolbox\Mapper\Exception $e) {}
-
 		return parent::save($dirtyDocument);
 	}
+
+    /**
+     * Populates a Plagscan document out of a submission. Doesn't actually save
+     * it, though.
+     *
+     * @param  Submission        $submission
+     * @return Plagscan_Document
+     */
+    public function createFromSubmission(Submission $submission) {
+        $document = new Plagscan_Document();
+        $document->setFileId($submission->getId());
+        $document->setFile(array(
+            'id'   => $submission->getId(),
+            'name' => $submission->getFilename(),
+            'file' => $submission->getTempLocation(),
+        ));
+        return $document;
+    }
 }
