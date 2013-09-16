@@ -117,7 +117,11 @@ class ZipFileUpload extends DeprecatedModel {
 					$this->traverse($currentPath, $id);
 				}
 				else {
-					
+					// Ignore filenames starting with a . (these are usually
+					// hidden or system files, and should be ignored)
+					if (substr($obj, 0, 1) === '.') {
+						continue;
+					}
 
 					/* For the File table
 					 */
