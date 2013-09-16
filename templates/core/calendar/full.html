@@ -128,7 +128,7 @@
                     }
                     // Attend/Unattend butonye
                     else if (data.attendanceRequestButton.toString() != 'false') {
-                        data.attendanceRequestButton = "<span></span>" + calEvent.data.attendance.requestButton.toString()
+                        data.attendanceRequestButton = '<a class="btn no-icon float-right" href="#">' + calEvent.data.attendance.requestButton.toString() + '</a>'
                     }
 
                     c.bubble.display('edit', data, jsEvent, this)
@@ -332,13 +332,13 @@
         // AJAX update attendance when the attendance toggle-button is clicked
         c.getForm('editEvent').delegate('.attendanceRequestButton', 'click', function(e) {
             c.post('/service/attendance/processToggleAttendance', c.getForm('editEvent').serialize(), function (data) {
-                var btn = c.getForm('editEvent').find('.attendanceRequestButton')
+                var btn = c.getForm('editEvent').find('.attendanceRequestButton a')
                 if (data.error == undefined) {
                     if (btn.text() == 'Attend') {
-                        btn.html('<span></span>Unattend')
+                        btn.html('Unattend')
                     }
                     else {
-                        btn.html('<span></span>Attend')
+                        btn.html('Attend')
                     }
                 }
             })
@@ -488,9 +488,11 @@
                 </div>
                 <div class="actions">
                     <dl>
-                        <dd><p class="modifyLink"></p></dd>
-                        <dd><p class="attendanceListButton"></p></dd>
-                        <dd><p class="attendanceRequestButton"></p></dd>
+                        <dd>
+                            <span class="modifyLink"></span>
+                            <span class="attendanceListButton"></span>
+                            <span class="attendanceRequestButton"></span>
+                        </dd>
                     </dl>
                 </div>
             </form>
