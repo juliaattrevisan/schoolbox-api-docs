@@ -1045,11 +1045,11 @@ class SitePage extends Page {
      * is refreshed).
      *
      * This takes advantage of the fact that most form submit requests in
-     * Schoolbox go through a page with "modify" somewhere in the URL, and then
-     * redirect.
+     * Schoolbox go through a page with "create" or "modify" somewhere in the
+     * URL, and then redirect.
      *
-     * It checks the referer - if it's local and it contains 'modify' in the
-     * path, it sets the X-XSS-Protection header to 0.
+     * It checks the referer - if it's local and it contains "create" or
+     * "modify" in the path, it sets the X-XSS-Protection header to 0.
      *
      * Want more information?
      * @see http://stackoverflow.com/questions/1547884/refused-to-execute-a-javascript-script-source-code-of-script-found-within-reque
@@ -1058,9 +1058,13 @@ class SitePage extends Page {
      */
     protected function disableXssProtectionAfterForm() {
         $referer = parse_url($_SERVER['HTTP_REFERER']);
-        if ($referer['host'] === $_SERVER['SERVER_NAME'] && (stripos($referer['path'], 'modify') !== false)) {
-            header("X-XSS-Protection: 0\r\n");
-            return true;
+        if ($referer['host'] === $_SERVER['SERVER_NAME']) {
+            foreach (array('create', 'modify') as $path) {
+                if (stripos($referer['path'], $path) !== false) {
+                    header("X-XSS-Protection: 0\r\n");
+                    return true;
+                }
+            }
         }
         return false;
     }
