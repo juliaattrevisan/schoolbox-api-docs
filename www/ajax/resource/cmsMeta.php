@@ -100,8 +100,7 @@ function getFolderMeta($folderId) {
 	// handler setup
 	$folderHandler = new MyFolder();
 
-	$folder = $folderHandler->getFolderNode($folderId);
-	$folder = $folder[0];
+	$folder = $folderHandler->getByID($folderId);
 
 	if(!$folder) {
 		sendError('No folder with specified ID exists');
