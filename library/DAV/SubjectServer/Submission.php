@@ -118,6 +118,12 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 		// And put it in the submission object.
 		$mapper = new SubmissionMapper();
 		$mapper->save($this->getSubmission()->setTempLocation($temp_file));
+
+		// Queue it for Plagscanning as well, if that's supported.
+		if (Config::get('plagscan_api_key') && Config::get('plagscan_username')) {
+			$plagdoc = Plagscan_DocumentMapper::getInstance()->createFromSubmission($this->getSubmission());
+			Plagscan_DocumentMapper::getInstance()->save($plagdoc);
+		}
 		return null;
 	}
 }
