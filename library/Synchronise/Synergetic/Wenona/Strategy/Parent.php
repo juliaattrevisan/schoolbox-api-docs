@@ -163,52 +163,53 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
         }
 
 
-        // retrieve all parent records from the user table where passwords are blank, and apply passwords
-        $db = DeprecatedDatabase::getInstance();
-        $users = $db->getAll(
-            "SELECT `id`, `username`
-             FROM `user`
-             WHERE (`password` = '' OR `password` IS NULL)
-             AND `group_id` = " . self::PARENT_GROUP_ID
-        );
-
-        if (is_array($users) && count($users)) {
-            $output = '/tmp/ppw.csv';
-            $fp = fopen($output, 'w');
-            fputcsv($fp, array('login', 'password'));
-
-            foreach ($users as $user) {
-                // plaintext generation needs to be stored: randomly 3 letters, 4 numbers
-                $pw = '';
-                for ($i = 0; $i < 7; $i++) {
-                    $rnd = rand(97, 122);
-                    if ($i < 3) {
-                        $pw .= chr($rnd);
-                    } else {
-                        $pw .= $rnd % 10;
-                    }
-                }
-
-                // store password
-                fputcsv($fp, array($user['username'], $pw));
-
-                if ($this->getPerformUpdate() === true) {
-                    // store password in schoolbox
-                    $userHandler->setPasswordInternal($user['id'], $pw);
-                }
-            }
-            fclose($fp);
-
-            // don't send the email if we didn't update any passwords
-            if ($this->getPerformUpdate() === true) {
-                $m = new Mailer('');
-                $m->setTo('support@alaress.com.au');
-                $m->setSubject('Wenona Parent Sync');
-                $m->addFile($output, 'text/csv');
-                $m->send();
-            }
-            unlink($output);
-        }
+        // As of SB-3199, Wenona no longer wants passwords to be created for users.
+//        // retrieve all parent records from the user table where passwords are blank, and apply passwords
+//        $db = DeprecatedDatabase::getInstance();
+//        $users = $db->getAll(
+//            "SELECT `id`, `username`
+//             FROM `user`
+//             WHERE (`password` = '' OR `password` IS NULL)
+//             AND `group_id` = " . self::PARENT_GROUP_ID
+//        );
+//
+//        if (is_array($users) && count($users)) {
+//            $output = '/tmp/ppw.csv';
+//            $fp = fopen($output, 'w');
+//            fputcsv($fp, array('login', 'password'));
+//
+//            foreach ($users as $user) {
+//                // plaintext generation needs to be stored: randomly 3 letters, 4 numbers
+//                $pw = '';
+//                for ($i = 0; $i < 7; $i++) {
+//                    $rnd = rand(97, 122);
+//                    if ($i < 3) {
+//                        $pw .= chr($rnd);
+//                    } else {
+//                        $pw .= $rnd % 10;
+//                    }
+//                }
+//
+//                // store password
+//                fputcsv($fp, array($user['username'], $pw));
+//
+//                if ($this->getPerformUpdate() === true) {
+//                    // store password in schoolbox
+//                    $userHandler->setPasswordInternal($user['id'], $pw);
+//                }
+//            }
+//            fclose($fp);
+//
+//            // don't send the email if we didn't update any passwords
+//            if ($this->getPerformUpdate() === true) {
+//                $m = new Mailer('');
+//                $m->setTo('support@alaress.com.au');
+//                $m->setSubject('Wenona Parent Sync');
+//                $m->addFile($output, 'text/csv');
+//                $m->send();
+//            }
+//            unlink($output);
+//        }
 
         $this->getVerboseFilter()->summary();
     }
