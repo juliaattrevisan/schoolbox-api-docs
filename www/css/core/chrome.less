@@ -4597,12 +4597,8 @@ CALENDAR
     .export {
         z-index: 5000;
         position: relative;
-//        background: lighten(@highlight-color,@lighten-value) url(/images/core/calendar/export.png) 11px 6px no-repeat;
         padding: 0 12px 0 39px;
         color: @dgrey;
-        &:hover {
-//            background: lighten(@neutral-color,@lighten-value) url(/images/core/calendar/export.png) 11px 6px no-repeat;
-        }
         &.active {
             background-color: lighten(@neutral-color,@lighten-value);
         }
@@ -5787,47 +5783,6 @@ Dropbox
 
 span.wrapper a {
     color: @white;
-}
-
-.due-dates-selection select {
-    float: right;
-}
-
-.due-dates-selection a.back {
-    background: url(/images/cal-prev.gif) no-repeat;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    text-indent: -9999px;
-}
-
-.due-dates-selection form {
-    float: right;
-}
-
-.due-dates-selection a.forward {
-    background: url(/images/cal-forward.gif) no-repeat;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    text-indent: -9999px;
-}
-
-.due-dates-selection a.back:hover, .due-dates-selection a.forward:hover {
-    background-position: bottom;
-}
-
-.due-dates-selection div {
-    float: left;
-    padding: 10px 0 10px 0;
-    height: 17px;
-}
-
-.due-dates-selection span {
-    margin: 0 10px;
-    padding-left: 25px;
-    background: url(/images/cal-icon.gif) no-repeat 3px 1px;
-    font-weight: bold;
 }
 
 .bubble {
