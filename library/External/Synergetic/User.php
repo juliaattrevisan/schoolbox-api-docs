@@ -438,7 +438,7 @@ class External_Synergetic_User implements External_UserInterface {
 				SynergyOne.dbo.vStudentContactAllAddress
 			WHERE
 				StudentID = '$externalUserId'
-				AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContentType = 'SC3')
+				AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
 				AND FileSemester = " . $_SESSION['FileSemester'] . "
 				AND FileYear = " . $_SESSION['FileYear'];
 
