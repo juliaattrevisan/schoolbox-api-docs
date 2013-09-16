@@ -106,12 +106,12 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
      */
     public function createFromSubmission(Submission $submission) {
         $document = new Plagscan_Document();
-        $document->fileId = $submission->getId();
-        $document->file   = array(
+        $document->setFileId($submission->getId());
+        $document->setFile(array(
             'id'   => $submission->getId(),
             'name' => $submission->getFilename(),
             'file' => $submission->getTempLocation(),
-        );
+        ));
         return $document;
     }
 }
