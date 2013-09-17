@@ -154,7 +154,7 @@ function getSingleFileMeta($folderId, $fileId) {
 	$mtypeMap = new MimetypeMapper();
 
 	try {
-		$mime = $mtypeMap->getIconForFilename($file['name']);
+		$mime = $mtypeMap->getByFilename($file['name'])->getIconFile();
 	}
 	catch(\Schoolbox\File\Exception $e) {
 		$mime = 'binary.png';

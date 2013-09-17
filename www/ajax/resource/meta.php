@@ -252,7 +252,7 @@ function getSingleFileMeta($folderId, $fileId) {
 		'kind' => 'file',
 		'id' => $file->getId(),
 		'name' => $file->getDescription(),
-		'mime' => $mtypeMap->getIconForFilename($file->getFilename()),
+		'mime' => $mtypeMap->getByFilename($file->getFilename())->getIconFile(), //TODO: mime type data should be part of resource object
 		'filesize' => Alaress_Byte_Format::bytesToString($file->getFilesize()),
 		'hidden' => $file->getHidden() ? 1 : 0,
 		'description' => $file->getComment(),
