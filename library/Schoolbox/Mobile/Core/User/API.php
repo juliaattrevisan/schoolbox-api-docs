@@ -95,6 +95,8 @@ class API extends Generic\API {
 
 		foreach($subjectCollection as $subject) {
 
+			$subject = $this->appendTeacherData($subject);
+
 			if(!$includeHrefs) {
 				unset($subject['id']);
 			}
@@ -104,32 +106,94 @@ class API extends Generic\API {
 		foreach($groupCollection as $group) {
 			/** @var $group Category */
 			$g['name'] = $group->getName();
+			$g['id'] = $group->getId();
+			$g = $this->appendTeacherData($g);
 			if($includeHrefs) {
-				$g['id'] = $group->getId();
+				unset($g['id']);
 			}
-			$groups[] = $g;
+			$groups[] = $this->appendTeacherData($g);
 		}
 
-		// second article: subjects
-		$articles[] = array(
-			'title'   => 'Subjects',
-			'aside'   => '',
-			'class'   => 'subject-list',
-			'icon'    => '',
-			'content' => array('subjectlist' => $subjects)
-		);
+		foreach($subjects as $s) {
+			$articles[] = array(
+				'title'   => $s['name'],
+				'aside'   => '',
+				'class'   => 'subject',
+				'icon'    => '',
+				'content' => $s
+			);
+		}
 
-		// third article: groups
-		$articles[] = array(
-			'title'   => 'Groups',
-			'aside'   => '',
-			'class'   => 'group-list',
-			'icon'    => '',
-			'content' => array('grouplist' => $groups)
-		);
+		foreach ($groups as $g) {
+			$articles[] = array(
+				'title'   => $g['name'],
+				'aside'   => '',
+				'class'   => 'group',
+				'icon'    => '',
+				'content' => $g
+			);
+		}
 
 		$response->setPage('title', $targetUser->formatName());
 		$response->setResponse('articles', $articles);
 		return $response;
+	}
+
+	/**
+	 * Append teacher data to a given category and return it
+	 *
+	 * @param $category
+	 * @return array
+	 */
+	protected function appendTeacherData($category) {
+		$userHandler = new \User();
+		$catId = $category['id'];
+		$category['teachers'] = array();
+
+		// attempt a synergy lookup only if a code exists
+		if(array_key_exists('code', $category)) {
+			$externalClassHandler = new \External_Class();
+			$groupHandler = new \Group();
+			$catCode = $category['code'];
+
+			$listSyns = $externalClassHandler->getTeacherName($catCode);
+			$staffGroups = $groupHandler->getStaffGroupTypeIds();
+
+			if (is_array($listSyns)) {
+				foreach($listSyns as $synid) {
+					$teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
+					if (is_array($teacher)) {
+						$teacher['format_name'] = $userHandler->formatName($teacher);
+						$category['teachers'][$teacher['uid']] = $teacher;
+					}
+				}
+			}
+		}
+
+		// attempt an internal lookup if nothing was returned from external
+		if(!count($category['teachers'])) {
+			$managers = $userHandler->getManagers($catId);
+
+			if(is_array($managers)) {
+				foreach($managers as $teacher) {
+					$teacher['format_name'] = $userHandler->formatName($teacher);
+					$category['teachers'][$teacher['uid']] = $teacher;
+				}
+			}
+		}
+
+		// generate email links for all teachers, and clear unnecessary data
+		$emailObj = new \Email();
+
+		foreach($category['teachers'] as $k => $teacher) {
+			$emailAddress = $emailObj->formatEmailFromArray($teacher);
+			$category['teachers'][$k]['mailto'] = $_SESSION['mailhandle'] . $emailAddress;
+			foreach(array('username','group_id','local_email','alt_email','campus','year','eportfolio_enabled','house','enabled') as $field) {
+				unset($category['teachers'][$k][$field]);
+			}
+		}
+
+
+		return $category;
 	}
 }

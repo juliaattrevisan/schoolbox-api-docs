@@ -6,29 +6,11 @@
   <li class="user-profile fullname">{{ content.fullname }}</li>
 </ul>
 {% endif %}
-{% if content.subjectlist %}
-<ul id="subject-list">
-  {% for class in content.subjectlist %}
-  <li class="classlist subject">
-    {% if class.id %}
-    <a href="/m/facade/homepage/display/{{ class.id }}">{{ class.name }}</a>
-    {% else %}
-    <p>{{ class.name }}</p>
-    {% endif %}
-  </li>
-  {% endfor %}
-</ul>
-{% endif %}
-{% if content.grouplist %}
-<ul id="group-list">
-  {% for class in content.grouplist %}
-  <li class="classlist group">
-    {% if class.id %}
-    <a href="/m/facade/homepage/display/{{ class.id }}">{{ class.name }}</a>
-    {% else %}
-    <p>{{ class.name }}</p>
-    {% endif %}
-  </li>
+{% if content.code %}
+<ul>
+  <li><a href="/m/facade/homepage/display/{{ content.id }}">{{ content.code }}</a></li>
+  {% for teacher in content.teachers %}
+  <li><a href="{{ teacher.mailto }}">{{ teacher.format_name }}</a></li>
   {% endfor %}
 </ul>
 {% endif %}
