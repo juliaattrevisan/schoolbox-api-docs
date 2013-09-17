@@ -9,6 +9,8 @@ $this->setFile(TEMPLATE_content, 'submission/dueWork.html');
 $this->setTab('submission');
 $this->setTitle('Due Work');
 
+$this->setBlock('custom_head', 'subject_colour', 'subject_colour_block');
+
 $this->setBlock(TEMPLATE_content, 'week', 'week_block');
 $this->setBlock('week', 'day', 'day_block');
 $this->setBlock('day', 'event', 'event_block');
@@ -153,6 +155,17 @@ if (!isset($categoryIDList)) {
     error(153);
     exit;
 }
+
+// Output category colour styles
+$colourList = Timetable_ColourMapper::getInstance()->findAll();
+$colourIndex = 0;
+foreach($categoryList as $category) {
+    $this->setVar('CATEGORY_COLOUR', $colourList->offsetGet($colourIndex % count($colourList))->getHexColour());
+    $this->setVar('CATEGORY_ID', $category['id']);
+    $this->parse('subject_colour_block', 'subject_colour',true);
+    $colourIndex++;
+}
+
 
 // output general data
 $output = array(
