@@ -96,18 +96,24 @@ class FileMapper extends Mapper {
 	public function upload($filename, $temp_location, $user_id) {
 		$file = new File();
 		$file->setFilename($filename);
+
+        /* Check mime type is allowed */
 		if (!($file->isUploadAllowed())) {
 			throw new File\Exception('Invalid mime type', File\Exception::CODE_MIMETYPE_NOT_FOUND);
 		}
 		$file->setTempLocation($temp_location);
 		$file->setUploadedBy($user_id);
 		$file->loadHashFromTempLocation();
-		$file->loadMimetypeFromFilename();
 		$file->loadFilesizeFromTempLocation();
+
+        /* Check maximum allowed file size */
+        if($file->getMimeType()->getMaxFileSize() < $file->getFilesize()) {
+            throw new File\Exception('File to large', File\Exception::CODE_FILE_TOO_LARGE);
+        }
 		$this->save($file);
 
         /* If video add to video processing queue, note checks ID to ensure its a new file and not an already existing file */
-	    if(stristr($file->getMime(),'video/') && $file->getId() != 0) {
+	    if(stristr($file->getMimeType()->getMime(),'video/') && $file->getId() != 0) {
 		    $mapper = new Video\QueueMapper();
 	        $videoQ = new Video\Queue();
 		    $videoQ->setFileID($file->getId());
