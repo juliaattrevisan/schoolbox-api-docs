@@ -222,6 +222,7 @@ INSERT INTO allowedFileExtension SELECT fileTypeID, 'ndp' FROM allowedFileTypes 
 INSERT INTO allowedFileExtension SELECT fileTypeID, 'ma' FROM allowedFileTypes WHERE mime = 'application/mathematica';
 INSERT INTO allowedFileExtension SELECT fileTypeID, 'vsd' FROM allowedFileTypes WHERE mime = 'application/vnd.visio';
 INSERT INTO allowedFileExtension SELECT fileTypeID, 'key' FROM allowedFileTypes WHERE mime = 'application/x-iwork-keynote-sffkey';
+INSERT INTO allowedFileExtension SELECT fileTypeID, 'keynote' FROM allowedFileTypes WHERE mime = 'application/x-iwork-keynote-sffkey';
 INSERT INTO allowedFileExtension SELECT fileTypeID, 'pages' FROM allowedFileTypes WHERE mime = 'application/x-iwork-pages-sffpages';
 INSERT INTO allowedFileExtension SELECT fileTypeID, 'numbers' FROM allowedFileTypes WHERE mime = 'application/x-iwork-numbers-sffnumbers';
 INSERT INTO allowedFileExtension SELECT fileTypeID, 'webm' FROM allowedFileTypes WHERE mime = 'video/webm';
