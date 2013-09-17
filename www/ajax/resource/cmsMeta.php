@@ -160,7 +160,7 @@ function getSingleFileMeta($folderId, $fileId) {
 		'kind' => 'file',
 		'id' => $file['id'],
 		'name' => $file['description'],
-		'mime' => $mtypeMap->getIconForFilename($file['realname']),
+		'mime' => $mtypeMap->getByFilename($file['realname'])->getIconFile(),
 		'filesize' => Alaress_Byte_Format::bytesToString($file['file_size']),
 		'posted_by' => 'you',
 		'posted_date' => $postDate->getDateOnly(),
