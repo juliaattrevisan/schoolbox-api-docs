@@ -23,8 +23,8 @@ class Sidebar {
     private $user;
     private $agenda;
     private $email;
-    private $subjects = array();
-    private $groups;
+    private $subjects;
+    private $children;
     private $work;
     private $more;
 
@@ -86,6 +86,10 @@ class Sidebar {
 
 
     public function createSubjectList() {
+	    // initialise subject array
+	    if(!is_array($this->subjects)) {
+		    $this->subjects = array();
+	    }
         try {
             $subjects = $this->user->getSubjectCollection();
 	        $count = $subjects->count();
@@ -149,7 +153,12 @@ class Sidebar {
     }
 
     public function createGroupList() {
-        try {
+	    // initialise subject array
+	    if(!is_array($this->subjects)) {
+		    $this->subjects = array();
+	    }
+
+	    try {
 	        // get the group collection
 	        /**
 	         * @var CategoryMapper $catMapper
@@ -377,6 +386,31 @@ class Sidebar {
         );
     }
 
+	/**
+	 * Create a list of Children if this user is a parent
+	 * @return array
+	 */
+	public function createChildrenList() {
+		// much as using session in a class is taboo, there is no better way to get this data
+		if(isset($_SESSION['children'])) {
+			foreach($_SESSION['children'] as $child) {
+				// add the section header for the child
+				$this->children[] = array(
+					'value' => $child['name'],
+					'type'  => '__SEPARATOR__'
+				);
+				$this->children[] = array(
+					'value' => 'Timetable',
+					'href'  => '/m/timetable/display/' . $child['id']
+				);
+				$this->children[] = array(
+					'value' => 'Subjects',
+					'href'  => '/m/core/user/profile/' . $child['id']
+				);
+			}
+		}
+	}
+
     public function getAll() {
 
         $opts = array(
@@ -384,6 +418,7 @@ class Sidebar {
             'email'    => 'Webmail',
             'subjects' => 'Categories',
             'work'     => 'Due Work',
+	        'children' => 'Students',
             'more'     => 'More',
         );
 
