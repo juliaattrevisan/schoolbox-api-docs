@@ -365,6 +365,13 @@ class Sidebar {
         return;
     }
 
+	public function getUpcomingWork() {
+		if(!is_array($this->work)) {
+			$this->createUpcomingWork();
+		}
+		return $this->work;
+	}
+
     public function createSettings() {
         $this->more = array(
             array(
