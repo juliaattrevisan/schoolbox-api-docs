@@ -19,23 +19,29 @@ if(isset($_POST['module'])) {
         case 'users':
             $groupHandler = new Group();
             $summary = $groupHandler->userSummary();
+            $totalUser = 0;
+            $totalLogin = 0;
 
             foreach($summary as $group) {
                 $output[] = array( 'GROUP_ID'        => $group['id'],
                                    'GROUP_NAME'      => $group['name'],
                                    'GROUP_USER'      => $group['total'],
                                    'GROUP_LOGGED_IN' => $group['logged_in'] );
+                $totalUser += $group['total'];
+                $totalLogin += $group['logged_in'];
             }
+            $output[] = array(  'GROUP_ID'=>'',
+                                'GROUP_NAME'=>'Total',
+                                'GROUP_USER'=>$totalUser,
+                                'GROUP_LOGGED_IN'=>$totalLogin,);
+
             break;
 
         case 'service_www':
-//          $a = microtime(true);                             // DEBUG
             $context = \Proxy\Server::getInstance()->getContext();
 		    if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
-//              $b = number_format(microtime(true) - $a, 4);  // DEBUG
                 $output[] = array('WWW_LIGHT'  => 'on',
                                   'WWW_STATUS' => 'Available'
-//                              . '<br />( ' . $b . ' sec )'  // DEBUG
                 );
             }
             else {
