@@ -1,0 +1,121 @@
+
+
+#container {
+	margin-left: 256px;
+	margin-right: 16px;
+	clear: none;
+}
+/*--------------------------------------------------------------
+ HEADER
+--------------------------------------------------------------*/
+#header, .login #header {
+	background: none;
+	height: 136px;
+	float: none;
+	.logo {
+		top: 0;
+		img {
+			height: auto;
+			width: auto;
+	}
+	}
+}
+#search {
+	 background: #ffffff;
+	 float: right;
+	 width: 288px;
+	 margin: 16px 16px 0 0;
+	 clear: right;
+	 height: 32px;
+	 position: relative;
+ }
+
+#search-field {
+	font-weight: bold;
+	color: #797979;
+	font-size: 16px;
+	width: 232px;
+	padding: 0 12px;
+	height: 32px;
+	line-height: 32px;
+	background: #ffffff;
+}
+
+#search-button {
+	width: 32px;
+	left: auto;
+	right: 0;
+	background: url("/images/core/icons/search.png") no-repeat 50% 50%;
+}
+
+#infoPanel {
+	float: right;
+	margin: 15px 16px 0 0;
+	position: static;
+	height: auto;
+}
+
+/*--------------------------------------------------------------
+ NAV
+--------------------------------------------------------------*/
+#nav {
+	top: 104px;
+	width: 224px;
+	margin: 0 0 0 16px;
+	li {
+		a {
+			width: 160px;
+			margin-left: 16px;
+			padding: 3px 16px;
+		}
+	}
+	ul {
+		width: 224px;
+		ul {
+			width: 224px;
+			left: 208px;
+			top: -8px;
+			padding: 5px 0;
+			border: 1px solid #eee;
+			ul {
+				left: 208px;
+				top: -8px;
+			}
+		}
+	}
+
+	h3 {
+		padding: 0 0 0 32px;
+		font-size: 16px;
+		height: 32px;
+		line-height: 32px;
+	}
+}
+
+/*--------------------------------------------------------------
+ TABBED NAV ACROSS THE TOP
+--------------------------------------------------------------*/
+#tabs {
+	position: absolute;
+	margin-left: 0;
+	right: 20px;
+	bottom: 0;
+	left: 256px;
+	li {
+		margin-right: 2px;
+		margin-top: 0;
+		a {
+			font-weight: bold;
+			font-size: 12px;
+			height: 32px;
+			line-height: 32px;
+			padding: 0 12px;
+		}
+		&.navthis {
+			a {
+				font-weight: bold;
+			}
+		}
+
+	}
+}

@@ -258,6 +258,7 @@ h2,.calendar-controls{
 .calendar-controls h3{color:#000000;}
 a{color:#004d87;}
 a:hover{color:#cc032c;}
+.box h2 a { color: #ffffff; }
 h2 a:hover{
   color: #fff;
   text-decoration: underline;
@@ -266,6 +267,7 @@ h2 a:hover{
 #header, .login #header{
   background: #FFF;
   height: 115px;
+	width: auto;
 }
 .login #header .logo{
   padding: 0;
@@ -367,7 +369,9 @@ h2 a:hover{
     background:#fcfbf2;
 }
 #nav li a{ padding: 3px 5px; color: #000; }
-#nav ul li a:hover, #nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
+#nav li.hover > a,
+#nav ul li a:hover,
+#nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
     background-color: #cc032c;
     color: #ffffff;
 }
@@ -412,7 +416,7 @@ h2 a:hover{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#e3effe', EndColorStr='#c6dffc')";
 
     border-color: #6faff9;
-
+	color: #004d87 !important;
     text-shadow: 0 1px 0 #fff;
     font-weight:normal;
 }

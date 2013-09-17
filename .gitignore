@@ -6,6 +6,12 @@ www/conf/conf.php
 Vagrantfile
 core.css
 mchrome.css
+jquery-ui.css
+chrome.css
+legacy.css
+variables.css
+mixins.css
+dr.css
 *.log
 screen.css
 vendor/

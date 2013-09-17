@@ -237,7 +237,7 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 }
 #infoPanel img { margin-top: -14px; }
 
-#header{
+#header, .login #header{
     min-width: 980px;
     background: #1e125e url('/images/jpc/header.png') top left repeat-x;
     height: auto;
@@ -291,9 +291,15 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
     background-color: #FAEDC3;
     color: #000000;
 }
-#nav li a:hover, #nav li li a:hover, #category li a.selected {
-    background-color: #faedc3;
+#nav li a { width: 159px; }
+#nav li.hover > a,
+#nav ul li a:hover,
+#nav li li a:hover, #category li a.selected {
+    background: #faedc3;
     color: #0066b0;
+}
+#nav ul ul ul {
+	left: 184px;
 }
 .news-headlines li{
     border: 0 !important;

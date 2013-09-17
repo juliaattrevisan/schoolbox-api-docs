@@ -1,0 +1,77 @@
+@charset "utf-8";
+// =============================================================================
+// St Paul's Schoolbox skin
+// =============================================================================
+//*
+//*   Ride The Whale                         ~777IIIIIIIIIII7~_
+//*                            7I       =%#%%%%7 @ %# /========
+//*                         ]7II7I###########%%%%%%%%777777
+//*                                ~I7###########777=
+//*                                     ##7      ]/
+//*                                     #/
+//*/
+// =============================================================================
+// 1. Load dependencies
+// =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width:     				152px;
+@logo-height:     				39px;
+
+// Generic colors
+@body-background: 				#EBEBEB;
+
+// Basic type
+@link: 							#00467F;
+@link-hover: 					#00A160;
+
+// Main banner
+@banner-background: 			#013A63;
+@banner-color:      			@white;
+@banner-links:      			#FFF799;
+
+// Modules
+@module-heading: 				@white;
+@module-background: 			@link;
+
+// Refers to the left navigation
+@navigation-background:  		transparent;
+@navigation-color:  			@black;
+@navigation-links:  			@link;
+@navigation-hover-background: 	@link-hover;
+@navigation-hover-color:  		@white;
+@navigation-sub-background:  	@body-background;
+
+// Main "Tab" Navigation
+@tab-background:				@link-hover;
+@tab-hover-color:				@link;
+
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/chrome.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+/*
+ * Header
+ */
+#header, .login #header{
+	background: url('/images/stpauls/header-bg.jpg') top left repeat-x;
+	.logo {
+		left: 18px;
+	}
+}
+
+#search-button{
+	background: url('/images/stpauls/search-button.png') 8px 12px no-repeat !important;
+}
+
+

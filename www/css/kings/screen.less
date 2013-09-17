@@ -177,7 +177,7 @@ a { color: #dc291e; }
 
 a:hover { color: #dc291e; }
 
-h2, h2 a, .header_option {
+h2, h2 a, .header_option, .box h2 a {
 	color:#9e9e9e;
 	background-color: none;
 	font-weight:normal;
@@ -234,15 +234,17 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 
 #infoPanel a { color: #fff; }
 
-#header {
+#header, .login #header {
 	height:152px;
 	background:url(/images/kings/kings-banner.jpg) repeat-x;
 }
 
 #header .logo {
 	left:0;
-        padding-top: 20px;
-        padding-left: 20px;
+	padding-top: 20px;
+	padding-left: 20px;
+	height: 58px;
+	width: 280px;
 }
 
 #nav { top: 120px; }
@@ -347,7 +349,9 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 
 .box a.close-delete:hover span { color:#fff; }
 
-#nav li a:hover, #nav li li a:hover {
+#nav li.hover > a,
+#nav ul li a:hover,
+#nav li li a:hover {
 	background:#dc291e;
 	color:#fff;
 }
@@ -530,6 +534,7 @@ box-shadow: 0px 1px 1px #BDBDBD;}
 .admin-nav li a {background-color: #0053A0;-moz-box-shadow: 0px -1px 1px #BDBDBD;
 -webkit-box-shadow: 0px -1px 1px #BDBDBD;
 box-shadow: 0px -1px 1px #BDBDBD;
+	border: none;
 color: white;}
 .admin-nav li a.current{
 background-color: #F8F8FC;

@@ -198,7 +198,7 @@ a:hover, h2 a:hover{color:#1f234d;}
     left: 22px;
     top: 11px;
 }
-.login #header .logo{ left: 35px; }
+.login #header .logo{ left: 35px; top: 11px; }
 #tabs{
   left: 205px;
   bottom: 85px;
@@ -287,7 +287,9 @@ a:hover, h2 a:hover{color:#1f234d;}
     background:#fcfbf2;
 }
 
-#nav ul li a:hover, #nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
+#nav li.hover > a,
+#nav ul li a:hover,
+#nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
     background-color: #1f234d;
     color: #ffffff;
 }
@@ -433,9 +435,11 @@ ADMIN!
   font-size: 14px;
 }
 
-#infoPanel {margin-top: 11px; position: absolute; right: 275px;}
+#infoPanel {margin-top: 11px; position: absolute; right: 275px;
+	img { margin-top: 0; }
+}
 #infoPanel li{color:#2f5992;}
-#infoPanel li a{color:#2f5992; text-decoration: underline; padding-top: 10px; display: inline-block;}
+#infoPanel li a{color:#2f5992; text-decoration: underline; padding-top: 10px; display: inline-block; }
 
 #footer ul {float:right;padding-right: 40px;}
 #footer ul li {color:#2f5992;}

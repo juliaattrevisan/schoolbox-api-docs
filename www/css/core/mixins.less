@@ -1,0 +1,165 @@
+// =============================================================================
+// Mixins
+// Note: For multi-parameter mixins, @arguments only works if the first is defined when you use the mixin.
+// =============================================================================
+
+// Though I walk through the valley of the shadow of prefixes, I will fear no evil: for my less is with me
+// Prefixed properties, in alphabetical order
+.animation (@animation) {
+	-webkit-animation: @animation;
+	animation: @animation;
+}
+.backface-visibility(@backface-visibility: hidden) {
+	-webkit-backface-visibility: @backface-visibility;
+	-moz-backface-visibility: @backface-visibility;
+	-ms-backface-visibility: @backface-visibility;
+	-o-backface-visibility: @backface-visibility;
+	backface-visibility: @backface-visibility;
+}
+.border-image (@border-image) {
+	-o-border-image: @border-image;
+	border-image: @border-image;
+}
+.box-sizing (@box-sizing) {
+	-moz-box-sizing: @box-sizing; // FF is still catching up with IE8, apparently
+	box-sizing: @box-sizing;
+}
+.columns (@columns: 2 1em) {
+	-webkit-columns: @columns;
+	-moz-columns: @columns;
+	columns: @columns;
+}
+.column-rule (@column-rule) {
+	-webkit-column-rule: @column-rule;
+	-moz-column-rule: @column-rule;
+	column-rule: @column-rule;
+}
+.gradient (@startColor: black, @endColor: white) {
+	background-color: @endColor;
+	background-repeat: repeat-x;
+	background-image: -webkit-linear-gradient(@startColor, @endColor); // Safari? Really?
+	background-image: 		  linear-gradient(@startColor, @endColor);
+}
+.transform (@transform) {
+	-webkit-transform: @transform;
+	-ms-transform: @transform;
+	transform: @transform;
+}
+.transform-origin (@transform-origin) {
+	-webkit-transform-origin: @transform-origin;
+	-o-transform-origin: @transform-origin;
+	transform-origin: @transform-origin;
+}
+.transition (@transition) {
+	-webkit-transition: @transition;
+	transition: @transition;
+}
+.transition-property(@transition-property: all) {
+	-webkit-transition-property: @transition-property;
+	transition-property: @transition-property;
+}
+.transition-duration(@transition-duration: 0s) {
+	-webkit-transition-duration: @transition-duration;
+	transition-duration: @transition-duration;
+}
+.transition-timing-function(@transition-timing-function: ease) {
+	-webkit-transition-timing-function: @transition-timing-function;
+	transition-timing-function: @transition-timing-function;
+}
+.opacity (@opacity) {
+	@ie-opacity: @opacity * 100;
+	opacity: @opacity;
+	filter: alpha(opacity=@ie-opacity);
+}
+
+// =============================================================================
+// Some funky colour-generating stuff
+// =============================================================================
+
+// Generate consistant hover states based on a links colour
+.link-color(@color) 			{ color: @color;
+	//&:visited 					{ color: saturate(@color,-20%); }
+	&:hover, &:active 			{ color: lighten(@color,20%); outline: 0; }
+}
+
+// Colour text the negative of the colour provided
+.negative (@color: @body-color) {
+	color: ~"`'@{color}'.replace(/./gi,function(s){return 'fedcba9876543210#'.charAt('0123456789abcdef#'.indexOf(s));})`";
+}
+
+// Threshold text to either black or white
+.threshold (@a) when (lightness(@a) >= 50%) 	{ color: white; }
+.threshold (@a) when (lightness(@a) <  50%) 	{ color: black; }
+// Opposite of above
+.threshold_neg (@a) when (lightness(@a) >= 50%) { color: black; }
+.threshold_neg (@a) when (lightness(@a) <  50%) { color: white; }
+
+.shadow (@a) when (lightness(@a) < 50%) 		{ text-shadow: 0 -1px 0 black; }
+.shadow (@a) when (lightness(@a) >= 50%)		{ text-shadow: 0 1px 0 white; }
+
+.hi-contrast(@bg, @fg) when((lightness(@bg) - lightness(@fg)) < @contrast-threshold),
+((hue(@bg) - hue(@fg)) < 5),
+((hue(@bg) - hue(@fg)) > -5) { color: darken(@fg, 40%); }
+.hi-contrast(@bg, @fg) when ((lightness(@bg) - lightness(@fg)) >= @contrast-threshold) { color: @fg; }
+
+.placeholder(@color) {
+	&::-webkit-input-placeholder { color: @color; text-overflow: ellipsis; }
+	&:-ms-input-placeholder { color: @color; text-overflow: ellipsis; }
+	&::-moz-placeholder { color: @color; text-overflow: ellipsis; }
+	&:-moz-placeholder { color: @color; text-overflow: ellipsis; }
+}
+
+// =============================================================================
+// Various helpers and shortcuts
+// =============================================================================
+
+// I know these aren't the best order, but it means you can use it with just X,Y
+.absolute (@top: auto, @left: auto, @bottom: auto, @right: auto) {
+	position: absolute; top: @top; right: @right; bottom: @bottom; left: @left;
+}
+// I know these aren't the best order, but it means you can use it with just X,Y
+.fixed (@top: auto, @left: auto, @bottom: auto, @right: auto) {
+	position: fixed; top: @top; right: @right; bottom: @bottom; left: @left;
+}
+// I know these aren't the best order, but it means you can use it with just X,Y
+.relative (@top: auto, @left: auto, @bottom: auto, @right: auto) {
+	position: relative; top: @top; right: @right; bottom: @bottom;left: @left;
+}
+
+.box-width (@outer-width: 960px, @border-width: 0px, @padding: 0px) {
+	// Width = width - (border + padding). A bit like box-sizing
+	width: @outer-width - ( @border-width + @padding ) * 2;
+	min-width: @outer-width - ( @border-width + @padding ) * 2;
+	border: @border-width solid @body-color;
+	padding: @padding;
+}
+
+.block(@width: 100%, @height: auto) {
+	display: block; width: @width; height: @height;
+}
+
+// If we're going to use hyphenation, we'll use it well
+.hyphenate 							{ hyphenate: auto; hyphenate-lines: 3; hyphenate-before:2; hyphenate-after:3; }
+
+// Do not overuse. Forces element to be cached in RAM, use to prevent choppy rendering
+.cache {
+	.backface-visibility(hidden);
+	.transform(scale3d(1,1,1));
+}
+// All three are required to make ellipsis work, so just put them together
+.ellipsis 							{ text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+
+// To render an element invisible. This will not show, but will still exist for screen readers
+.invisible 							{ clip: rect(1px, 1px, 1px, 1px); position: absolute !important;
+	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */ }
+
+// Clears floats within the container
+.clearfix 							{ zoom: 1;
+	&:before, &:after               { content: ""; display: table;  }
+	&:after                         { clear: both; }
+}
+
+// Image replacement
+.ir 								{ text-indent: -999em; text-align: left; direction: ltr;
+	display: block; overflow: hidden; }
+

@@ -210,7 +210,8 @@ body{
 
 h1,h2,h3{ color: #000000; }
 h3.my-links a{ color: #fff; }
-h2,.calendar-controls{color:#fff; background:#002b5c;min-height: 22px;line-height: 22px;}
+h2,.calendar-controls{color:#fff; background:#002b5c;}
+h2{min-height: 22px;line-height: 22px;}
 .calendar-controls h3{color:#fff;}
 a, h2 a{color:#006bbd;}
 .box h2 a{color:#fff;}
@@ -222,15 +223,15 @@ a:hover, h2 a:hover{color:#006bbd;}
 
 #header, .login #header{
 	height:120px;
+	.logo{
+		padding: 0;
+		width: 228px;
+		height: 67px;
+		left: 20px;
+		top: 15px;
+	}
 }
 
-#header .logo{
-	padding: 0;
-	width: 228px;
-	height: 67px;
-	left: 20px;
-	top: 15px;
-}
 #header .world-school{
 	position: absolute;
 	float: right;
@@ -416,7 +417,7 @@ ADMIN!
 #infoPanel li{color:#b2c5d6;}
 #infoPanel li a{color:#ffffff; text-decoration: underline;}
 #infoPanel .portrait { position: absolute; right: 16px; top: 8px; height: 96px; width: 64px; }
-#infoPanel .portrait img { width: auto; max-width: 100%; height: auto; max-height: 100%; }
+#infoPanel .portrait img { width: auto; max-width: 100%; height: auto; max-height: 100%; margin-top: 0; }
 
 
 #footer{
