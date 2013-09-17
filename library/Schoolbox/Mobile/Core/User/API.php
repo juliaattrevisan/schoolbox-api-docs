@@ -10,6 +10,7 @@
 namespace Schoolbox\Mobile\Core\User;
 
 
+use Schoolbox\Mobile\Core\Nav\Sidebar;
 use Schoolbox\Mobile\Generic;
 use Response_HTTP;
 use Schoolbox\Resource\Category;
@@ -69,16 +70,27 @@ class API extends Generic\API {
 
 		// permission granted
 
+
+		$profile = array(
+			'id'       => $targetUser->getId(),
+			'fullname' => $targetUser->formatName(),
+			'photouri' => '/portrait.php?userId='. $targetUser->getExternalId() .'&size=profile'
+		);
+
+		// find out how much due work there is by using data from sidebar
+		$dueAPI = new Sidebar($targetUser);
+		$workData = $dueAPI->getUpcomingWork();
+
+		// yeah, that's right, we just disregarded the contents of that retrieval!
+		$profile['workcount'] = count($workData);
+
 		// first article: user photo and name
 		$articles[] = array(
 			'title'   => '',
 			'aside'   => '',
 			'class'   => 'profile-pic',
 			'icon'    => '',
-			'content' => array(
-				'fullname' => $targetUser->formatName(),
-				'photouri' => '/portrait.php?userId='. $targetUser->getExternalId() .'&size=profile'
-			)
+			'content' => $profile
 		);
 
 		/** @var $sMap SubjectMapper
@@ -117,7 +129,7 @@ class API extends Generic\API {
 		foreach($subjects as $s) {
 			$articles[] = array(
 				'title'   => $s['name'],
-				'aside'   => '',
+				'aside'   => isset($s['code']) ? $s['code'] : '',
 				'class'   => 'subject',
 				'icon'    => '',
 				'content' => $s
@@ -127,7 +139,7 @@ class API extends Generic\API {
 		foreach ($groups as $g) {
 			$articles[] = array(
 				'title'   => $g['name'],
-				'aside'   => '',
+				'aside'   => isset($g['code']) ? $g['code'] : '',
 				'class'   => 'group',
 				'icon'    => '',
 				'content' => $g
@@ -137,6 +149,70 @@ class API extends Generic\API {
 		$response->setPage('title', $targetUser->formatName());
 		$response->setResponse('articles', $articles);
 		return $response;
+	}
+
+	/**
+	 * Returns a user's upcoming work
+	 *
+	 * @param int $userId
+	 * @return Response_HTTP
+	 */
+	public function Work($userId) {
+		$auth = new \Authenticator();
+		$sessionUser = $auth->getSessionUser();
+		$targetUser = UserMapper::getInstance()->findById($userId);
+
+		// permission
+		// student: you can view your own
+		// parent: you can view your kids
+		// staff: you can view anything
+
+		switch($targetUser->getRole()->getType()) {
+			case Role::STUDENT:
+				if($sessionUser->getId() != $targetUser->getId()) {
+					return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+				}
+				break;
+			case Role::PARENT:
+				$gHandler = new \Group();
+				if(!$gHandler->isParentOfChild($targetUser->getId())) {
+					return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+				}
+				break;
+			case Role::STAFF:
+				break;
+			default:
+				return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+		}
+
+		// ok, let's display some due work
+		// pinch data from the sidebar
+		$sidebar = new Sidebar($targetUser);
+		$works = $sidebar->getUpcomingWork();
+		$articles = array();
+
+		$i = -1;
+		foreach($works as $work) {
+			if(isset($work['type'])) {
+				$articles[++$i] = array(
+					'title'   => $work['value'],
+					'aside'   => '',
+					'class'   => 'due-work',
+					'icon'    => '',
+					'content' => array()
+				);
+			}
+			else {
+				$articles[$i]['content'][] = $work;
+			}
+		}
+
+		$response = new Response_HTTP();
+		$response->setPage('title', $targetUser->formatName() . " &raquo; Due Work");
+
+		$response->setResponse('articles', array_values($articles));
+		return $response;
+
 	}
 
 	/**

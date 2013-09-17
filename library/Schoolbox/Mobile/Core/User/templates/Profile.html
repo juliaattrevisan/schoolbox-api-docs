@@ -4,13 +4,19 @@
     <img title="{{ content.fullname }}" src="{{ content.photouri }}" />
   </li>
   <li class="user-profile fullname">{{ content.fullname }}</li>
+  {% if content.workcount %}
+  <li>
+    <a href="/m/core/user/work/{{ content.id }}">
+      <p>Upcoming Due Work ({{ content.workcount }})</p>
+    </a>
+  </li>
+  {% endif  %}
 </ul>
 {% endif %}
 {% if content.code %}
 <ul>
-  <li><a href="/m/facade/homepage/display/{{ content.id }}">{{ content.code }}</a></li>
   {% for teacher in content.teachers %}
-  <li><a href="{{ teacher.mailto }}">{{ teacher.format_name }}</a></li>
+  <li><a href="{{ teacher.mailto }}"><p>{{ teacher.format_name }}</p></a></li>
   {% endfor %}
 </ul>
 {% endif %}
