@@ -34,19 +34,19 @@
 		function initChange() {
 			config.questionForm.find('input').change(function() {
 
-					/* For typing
-					 */
-					$(this).numeric({
-						allow: "e./"
-					});
+				/* For typing
+				 */
+				$(this).numeric({
+					allow: "e./"
+				});
 
-					/* Clean copy/paste
-					 */
-					$(this).change(function() {
-						var str = $j(this).val().toString().replace(/([^0-9e\.\/])+/g, '');
+				/* Clean copy/paste
+				 */
+				$(this).change(function() {
+					var str = $j(this).val().toString().replace(/([^0-9e\.\/])+/g, '');
 
-						$j(this).val(str);
-					});
+					$j(this).val(str);
+				});
 
 				$.fn.evaluationNumericAnswer.saveOne(config.questionForm);
 			});
