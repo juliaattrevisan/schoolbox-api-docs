@@ -60,7 +60,9 @@ do
 	fullpath=${filepath%/*};
 	template=${fullpath##*/};
 	newfile="$fullpath/chrome.css";
-	~/node_modules/.bin/lessc $filepath > $newfile && echo "/* less ($lessversion) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile && if [ $verbose -eq 1 ];then echo "$template - screen css";fi &
+	# De-parallelize build of chrome.less, because it's faster to build in serial
+	~/node_modules/.bin/lessc $filepath > $newfile
+	echo "/* less ($lessversion) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile && if [ $verbose -eq 1 ];then echo "$template - screen css";fi &
 done
 
 # Build mchrome.css for each template
