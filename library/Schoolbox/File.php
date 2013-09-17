@@ -61,9 +61,9 @@ class File {
 	protected $temp_location;
 
 	/**
-	 * @var MimetypeMapper
+	 * @var Mimetype
 	 */
-	protected $mimetype_loader;
+	protected $mimetype;
 
 	/**
 	 * @var IConfigLoader
@@ -74,9 +74,6 @@ class File {
 	 * Creates object and sets up sub-objects.
 	 */
 	public function __construct() {
-		//
-		// Don't really want to load a mapper here, but meh.
-		$this->mimetype_loader = new MimetypeMapper();
 		$this->config_loader   = new ConfigLoader();
 	}
 
@@ -251,23 +248,6 @@ class File {
 	}
 
 	/**
-	 * Loads the mime type for this file, based on the filename.
-	 *
-	 * @return bool
-	 */
-	public function loadMimetypeFromFilename() {
-		$filename = $this->getFilename();
-		if (!isset($filename)) {
-			return false;
-		}
-		if ($mimetype = $this->mimetype_loader->getMimetypeForFilename($filename)) {
-			$this->setMime($mimetype);
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * Loads the file size for this file, based on the temp location.
 	 *
 	 * @return bool
@@ -300,7 +280,7 @@ class File {
 	 * @return string
 	 */
 	public function getIconFromFilename() {
-		return $this->mimetype_loader->getIconForFilename($this->getFilename());
+		return $this->getMimeType()->getIconFile();
 	}
 
 	/**
@@ -331,17 +311,9 @@ class File {
 		return $this->config_loader;
 	}
 
-	/**
-	 * @param  \Schoolbox\File\MimetypeMapper $mimetype_loader
-	 * @return $this
-	 */
-	public function setMimetypeLoader($mimetype_loader) {
-		$this->mimetype_loader = $mimetype_loader;
-		return $this;
-	}
 
 	/**
-	 * @return \Schoolbox\File\MimetypeMapper
+	 * @return \Schoolbox\File\Mimetype
 	 */
 	public function getMimetypeLoader() {
 		return $this->mimetype_loader;
@@ -353,7 +325,7 @@ class File {
 	 * @return bool
 	 */
 	public function isUploadAllowed() {
-		return $this->mimetype_loader->isFilenameMimetypeAllowed($this->getFilename());
+        return $this->getMimetype()->isEnabled();
 	}
 
 	/**

@@ -132,8 +132,7 @@ class FileTest extends TestCase {
 	 */
 	public function testLoadMimetypeFromFilename($filename, $mimetype) {
 		$this->object->setFilename($filename);
-		$this->object->loadMimetypeFromFilename();
-		$this->assertEquals($this->object->getMime(), $mimetype);
+		$this->assertEquals($this->object->getMimeType()->getMime(), $mimetype);
 	}
 
 	public function getIconFromFilenameData() {
@@ -151,6 +150,6 @@ class FileTest extends TestCase {
 	 */
 	public function testGetIconFromFilename($filename, $icon) {
 		$this->object->setFilename($filename);
-		$this->assertEquals($this->object->getIconFromFilename(), $icon);
+		$this->assertEquals($this->object->getMimetype()->getIconFile(), $icon);
 	}
 }
