@@ -19,5 +19,5 @@ try {
 		}
 	}
 }
-catch (Exception $e) {}
+catch (Exception $e) { }
 SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], 404);

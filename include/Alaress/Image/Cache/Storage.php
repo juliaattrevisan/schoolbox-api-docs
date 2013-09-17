@@ -113,7 +113,7 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
             'fileID' => $this->resource->getId(),
             'filepath' => $this->resource->getFileLocation(),
             'filename' => $this->resource->getFilename(),
-            'mime' => $this->resource->getMime(),
+            'mime' => $this->resource->getMimetype()->getMime(),
             'size' => $this->resource->getFilesize(),
         );
 
