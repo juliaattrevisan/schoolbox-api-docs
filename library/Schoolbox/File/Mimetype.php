@@ -9,6 +9,7 @@
  */
 
 namespace Schoolbox\File;
+use Config;
 
 /**
  * Class Mimetype
@@ -58,7 +59,14 @@ class Mimetype {
 	 */
 	private $enable;
 
-	/**
+    /**
+     * Max file size allowed for mime
+     *
+     * @var int
+     */
+    private $maxFileSize;
+
+    /**
 	 * Get icon class by deriving it from the iconFile
 	 *
 	 * This previously abused the \Url class, but now it's all self-contained here and independent.
@@ -199,5 +207,34 @@ class Mimetype {
 	 */
 	public function getMime() {
 		return $this->mime;
-	}
+    }
+
+
+    /**
+     * Set max file size for mime type
+     *
+     * @param $maxFileSize
+     * @return $this
+     */
+    public function setMaxFileSize($maxFileSize) {
+        $this->maxFileSize = $maxFileSize;
+        return $this;
+    }
+
+    /**
+     * Get the max file size allowed for this particular mime type
+     *
+     * @return mixed
+     */
+    public function getMaxFileSize()  {
+        return ($this->maxFileSize > 0) ? $this->maxFileSize : Config::get('max_file_size');
+    }
+
+    /**
+     * Is mime type allowed
+     * @return bool
+     */
+    public function isEnabled() {
+        return $this->getEnable() ===  'true';
+    }
 }
