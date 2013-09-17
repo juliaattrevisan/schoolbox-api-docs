@@ -14,6 +14,7 @@
 		<script type='text/javascript' src='/javascript/evaluation/matchingpairs.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/fillgap.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/shortanswer.js'></script>
+		<script type='text/javascript' src='/javascript/evaluation/exactanswer.js'></script>
 
 		<script type='text/javascript'>
 			$(function() {
@@ -39,6 +40,10 @@
 
 				$('#questionForm-1137').evaluationShortAnswer({
 					id: 1137
+				});
+
+				$('#questionForm-1138').evaluationExactAnswer({
+					id: 1138
 				});
 
 				/* Sample output for percentage complete
@@ -257,6 +262,14 @@
 		<form id='questionForm-1137' data-plugin='evaluationShortAnswer' action='mort.php' method='post' class='questionForm'>
 			<label>
 				<textarea name="answer"></textarea>
+			</label>
+		</form>
+
+		<!-- Exact Answer -->
+		<h1>Exact Answer</h1>
+		<form id='questionForm-1138' data-plugin='evaluationExactAnswer' action='mort.php' method='post' class='questionForm'>
+			<label>
+				<input type='text' name='answer' />
 			</label>
 		</form>
 
