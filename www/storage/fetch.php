@@ -24,8 +24,8 @@ try {
         }
 
         //send headers
-        if ($resource->getMime()) {
-            header("Content-Type: {$resource->getMime()}");
+        if ($resource->getMimetype()->getMime()) {
+            header("Content-Type: {$resource->getMimetype()->getMime()}");
         } else {
             header("Content-Type: application/octet-stream");
         }
