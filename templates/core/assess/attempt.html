@@ -16,22 +16,80 @@ $j(document).ready(function() {
 
     /* Set up countdown
      */
-	 var timeLeft = '{ASSESS_TIME_REMAINING}'
+	(function($j) {
+		$j.fn.evaluationCountdown = function(options) {
+			var config = init(options, $j(this));
 
-	 if ((timeLeft) > 0) {
-        $j('#countdown').countdown({
-            until: '+{ASSESS_TIME_REMAINING}',
-            layout: '{hn} : {mn} : {sn}',
-            alwaysExpire: true,
-            onExpiry: function() {
-                window.location = '/assess/end/{ASSESS_ASSESS_ID}';
-            }
-        });
-	 }
+			renderCountdown();
 
-	 if ($j('#countdown').html() == '') {
-		 $j('#countdown').parent().hide();
-	 }
+			/**
+			 * Init
+			 *
+			 * @param options
+			 * @param element
+			 * @returns {*}
+			 */
+			function init(options, element) {
+				var defaults = {
+					evaluationId: 0,
+					evaluationType: 'assess',
+					element: element,
+					timeLeft: 0
+				}
+
+				var derived = {
+					endUrl: '/' + options.evaluationType + '/end/' + options.evaluationId
+				}
+
+				var merged = $j.extend(defaults, options);
+				merged.timeLeft = parseInt(merged.timeLeft);
+
+				return merged;
+			}
+
+			/**
+			 * Render countdown timer
+			 */
+			function renderCountdown() {
+				 if (config.timeLeft > 0) {
+			        config.element.countdown({
+			            until: '+' + config.timeLeft,
+			            layout: '{hn} : {mn} : {sn}',
+			            alwaysExpire: true,
+			            onExpiry: function() {
+			                window.location = config.endUrl;
+			            }
+			        });
+				 }
+
+				 if (config.element.html() == '') {
+					 config.element.parent().hide();
+				 }
+			}
+		}
+	}(jQuery));
+
+	$j('#countdown').evaluationCountdown({
+		evaluationId: '{ASSESS_ASSESS_ID}',
+		timeLeft: '{ASSESS_TIME_REMAINING}'
+	});
+
+//	 var timeLeft = '{ASSESS_TIME_REMAINING}'
+//
+//	 if ((timeLeft) > 0) {
+//        $j('#countdown').countdown({
+//            until: '+{ASSESS_TIME_REMAINING}',
+//            layout: '{hn} : {mn} : {sn}',
+//            alwaysExpire: true,
+//            onExpiry: function() {
+//                window.location = '/assess/end/{ASSESS_ASSESS_ID}';
+//            }
+//        });
+//	 }
+//
+//	 if ($j('#countdown').html() == '') {
+//		 $j('#countdown').parent().hide();
+//	 }
 
 	/* Submit each type on change
 	 */
