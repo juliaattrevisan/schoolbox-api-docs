@@ -25,7 +25,7 @@
 				endUrl: '/' + options.evaluationType + '/end/' + options.evaluationId
 			}
 
-			var merged = $j.extend(defaults, options);
+			var merged = $j.extend(defaults, derived, options);
 			merged.timeLeft = parseInt(merged.timeLeft);
 
 			return merged;
