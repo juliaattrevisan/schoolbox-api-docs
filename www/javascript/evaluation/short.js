@@ -5,7 +5,7 @@
 	 *
 	 * @param options
 	 */
-	$.fn.evaluationNumericAnswer = function(options) {
+	$.fn.evaluationShort = function(options) {
 		var config = init(options);
 
 		initChange();
@@ -32,23 +32,8 @@
 		 * Initialise tiny
 		 */
 		function initChange() {
-			config.questionForm.find('input').change(function() {
-
-				/* For typing
-				 */
-				$(this).numeric({
-					allow: "e./"
-				});
-
-				/* Clean copy/paste
-				 */
-				$(this).change(function() {
-					var str = $j(this).val().toString().replace(/([^0-9e\.\/])+/g, '');
-
-					$j(this).val(str);
-				});
-
-				$.fn.evaluationNumericAnswer.saveOne(config.questionForm);
+			config.questionForm.find('textarea').change(function() {
+				$.fn.evaluationShort.saveOne(config.questionForm);
 			});
 		}
 	}
@@ -58,7 +43,7 @@
 	 *
 	 * @param element
 	 */
-	$.fn.evaluationNumericAnswer.saveOne = function(element) {
+	$.fn.evaluationShort.saveOne = function(element) {
 		$.ajax({
 			type: 'post',
 			url: $(element).attr('action'),

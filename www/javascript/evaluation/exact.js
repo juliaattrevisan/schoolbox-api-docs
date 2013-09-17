@@ -5,7 +5,7 @@
 	 *
 	 * @param options
 	 */
-	$.fn.evaluationExactAnswer = function(options) {
+	$.fn.evaluationExact = function(options) {
 		var config = init(options);
 
 		initChange();
@@ -33,7 +33,7 @@
 		 */
 		function initChange() {
 			config.questionForm.find('input').change(function() {
-				$.fn.evaluationExactAnswer.saveOne(config.questionForm);
+				$.fn.evaluationExact.saveOne(config.questionForm);
 			});
 		}
 	}
@@ -43,7 +43,7 @@
 	 *
 	 * @param element
 	 */
-	$.fn.evaluationExactAnswer.saveOne = function(element) {
+	$.fn.evaluationExact.saveOne = function(element) {
 		$.ajax({
 			type: 'post',
 			url: $(element).attr('action'),
