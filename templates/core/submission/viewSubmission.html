@@ -21,7 +21,7 @@
                 if ($j('.btn.tick').length) {
                     css = {'visibility':'visible'};
                 }
-                $j('#upload-returns-submit').css(css);
+                $j('#returnWorkForm').find('input.submit-btn-plain').css(css);
             }
         });
 
@@ -94,7 +94,7 @@
                 <th></th>
                 <th></th>
                 <th>
-                    <input style="visibility:hidden;" id="upload-returns-submit" type="submit" class="submit-btn-plain up-arrow" value="Upload all"/>
+                    <input style="visibility:hidden;" id="upload-returns-submit-north" type="submit" class="submit-btn-plain up-arrow" value="Upload all"/>
                 </th>
             </tr>
             </thead>
@@ -145,6 +145,11 @@
             </tr>
             <!-- END submission_row -->
             <!-- END student_row -->
+            <tr>
+              <td colspan="3">
+                <input style="visibility:hidden;" id="upload-returns-submit-south" type="submit" class="submit-btn-plain up-arrow" value="Upload all"/>
+              </td>
+            </tr>
             </tbody>
         </table>
     </form>
