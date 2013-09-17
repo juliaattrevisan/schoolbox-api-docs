@@ -430,10 +430,6 @@ class StudentReportCard {
 		});
 
 		$graph = array();
-		$graph[] = array(
-			'label' => 'You',
-			'data'  => $userSeries
-		);
 
 		// if permission to see class average, include the data series
 		if($this->checkPermission(self::CAN_VIEW_CLASS_AVERAGE)) {
@@ -446,6 +442,12 @@ class StudentReportCard {
 		else {
 			unset($colours['average']);
 		}
+
+		// add the user to the graph second, so it appears on top
+		$graph[] = array(
+			'label' => 'You',
+			'data'  => $userSeries
+		);
 
 		// display the graph for the semester
 		$start = mktime(0, 0, 0, ($this->targetSemester - 1) * 6 + 1, 0, $this->targetYear) * 1000;
