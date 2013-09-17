@@ -54,6 +54,12 @@ class MimetypeMapper extends Schoolbox\Mapper {
 			'property'   => 'enable',
 			'type'       => self::TYPE_STRING,
 		));
+
+        $this->hasMap(array(
+            'column'     => 'max_file_size',
+            'property'   => 'maxFileSize',
+            'type'       => self::TYPE_INTEGER,
+        ));
 	}
 
 	/**
@@ -97,18 +103,5 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		}
 		throw new Exception('Mimetype not found', Exception::CODE_MIMETYPE_NOT_FOUND);
 
-	}
-
-    /*
-     * TODO: These are silly functions and not in the spirit of the game, please remove!
-     */
-	public function getMimetypeForFilename($filename) {
-		$extension_info = $this->getByFilename($filename);
-		return $extension_info->getMime();
-	}
-
-	public function getIconForFilename($filename) {
-		$extension_info = $this->getByFilename($filename);
-		return $extension_info->getIconFile();
 	}
 }
