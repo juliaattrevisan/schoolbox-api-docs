@@ -6,7 +6,9 @@
 		<script type='text/javascript' src='javascript/jquery.ui.js'></script>
 		<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 		<script type="text/javascript" src="/javascript/jquery.swappable.js"></script>
-
+		<script type='text/javascript' src='/javascript/jquery.alphanumeric.js'></script>
+		<script type='text/javascript'>
+		</script>
 		<script type='text/javascript' src='/javascript/evaluation/evaluation.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/richtext.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/multiplechoice.js'></script>
@@ -15,6 +17,7 @@
 		<script type='text/javascript' src='/javascript/evaluation/fillgap.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/shortanswer.js'></script>
 		<script type='text/javascript' src='/javascript/evaluation/exactanswer.js'></script>
+		<script type='text/javascript' src='/javascript/evaluation/numericanswer.js'></script>
 
 		<script type='text/javascript'>
 			$(function() {
@@ -44,6 +47,10 @@
 
 				$('#questionForm-1138').evaluationExactAnswer({
 					id: 1138
+				});
+
+				$('#questionForm-1139').evaluationNumericAnswer({
+					id: 1139
 				});
 
 				/* Sample output for percentage complete
@@ -268,6 +275,18 @@
 		<!-- Exact Answer -->
 		<h1>Exact Answer</h1>
 		<form id='questionForm-1138' data-plugin='evaluationExactAnswer' action='mort.php' method='post' class='questionForm'>
+			<label>
+				<input type='text' name='answer' />
+			</label>
+		</form>
+
+		<div class='evaluation-saving'>
+			<h4>Saving your stuff</h4>
+		</div>
+
+		<!-- Numeric Answer -->
+		<h1>Numeric Answer</h1>
+		<form id='questionForm-1139' data-plugin='evaluationNumericAnswer' action='mort.php' method='post' class='questionForm'>
 			<label>
 				<input type='text' name='answer' />
 			</label>
