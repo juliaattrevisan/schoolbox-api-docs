@@ -50,7 +50,7 @@
 			config.questionForm.find('input').change(function() {
 				config.questionForm.find('input').parent().removeClass('evaluation-selected');
 				$(this).parent().addClass('evaluation-selected');
-ss
+
 				$.fn.evaluationRadio.saveOne(config.questionForm);
 			});
 		}

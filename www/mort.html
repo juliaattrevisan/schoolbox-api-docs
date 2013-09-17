@@ -53,6 +53,24 @@
 					id: 1139
 				});
 
+				/* Re-use plugins for similar context questions
+				 */
+				$('#questionForm-1140').evaluationRadio({
+					id: 1140
+				});
+
+				$('#questionForm-1141').evaluationRadio({
+					id: 1141
+				});
+
+				$('#questionForm-1142').evaluationRadio({
+					id: 1142
+				});
+
+				$('#questionForm-1143').evaluationRadio({
+					id: 1143
+				});
+
 				/* Sample output for percentage complete
 				 * 1 section
 				 */
@@ -289,6 +307,52 @@
 		<form id='questionForm-1139' data-plugin='evaluationNumericAnswer' action='mort.php' method='post' class='questionForm'>
 			<label>
 				<input type='text' name='answer' />
+			</label>
+		</form>
+
+		<hr />
+
+		<!-- True/False -->
+		<h1>True/False</h1>
+		<form id='questionForm-1140' data-plugin='evaluationRadio' action='mort.php' method='post' class='questionForm'>
+			<label>
+				A) <input name="answer" type="radio" value="true"><span>True</span>
+			</label>
+			<label>
+				B) <input name="answer" type="radio" checked='checked' value="false"><span>False</span>
+			</label>
+		</form>
+
+		<!-- Yes/No -->
+		<h1>Yes/No</h1>
+		<form id='questionForm-1141' data-plugin='evaluationRadio' action='mort.php' method='post' class='questionForm'>
+			<label>
+				A) <input name="answer" type="radio" value="yes"><span>Yes</span>
+			</label>
+			<label>
+				B) <input name="answer" type="radio" checked='checked' value="no"><span>No</span>
+			</label>
+		</form>
+
+		<!-- RatingAgree -->
+		<h1>RatingAgree</h1>
+		<form id='questionForm-1142' data-plugin='evaluationRadio' action='mort.php' method='post' class='questionForm'>
+			<label>
+				A) <input name="answer" type="radio" value="yes"><span>Agree</span>
+			</label>
+			<label>
+				B) <input name="answer" type="radio" checked='checked' value="no"><span>Disagree</span>
+			</label>
+		</form>
+
+		<!-- RatingImportant -->
+		<h1>RatingImportant</h1>
+		<form id='questionForm-1143' data-plugin='evaluationRadio' action='mort.php' method='post' class='questionForm'>
+			<label>
+				A) <input name="answer" type="radio" value="yes"><span>Important</span>
+			</label>
+			<label>
+				B) <input name="answer" type="radio" checked='checked' value="no"><span>Not Important</span>
 			</label>
 		</form>
 
