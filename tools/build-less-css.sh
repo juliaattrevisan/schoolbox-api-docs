@@ -53,18 +53,18 @@ then
 	cd $curdir;
 fi
 
-# Build screen.css for each template
-for i in `ls -1 $instdir/www/css/*/screen.less`;
+# Build chrome.css for each template (except core)
+for i in `ls -1 $instdir/www/css/*/chrome.less | grep -v 'core/chrome.less'`;
 do
 	filepath=`readlink -f $i`;
 	fullpath=${filepath%/*};
 	template=${fullpath##*/};
-	newfile="$fullpath/screen.css";
+	newfile="$fullpath/chrome.css";
 	~/node_modules/.bin/lessc $filepath > $newfile && echo "/* less ($lessversion) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile && if [ $verbose -eq 1 ];then echo "$template - screen css";fi &
 done
 
 # Build mchrome.css for each template
-for i in `ls -1 $instdir/www/css/*/mchrome.less`;
+for i in `ls -1 $instdir/www/css/*/mchrome.less | grep -v 'core/mchrome.less'`;
 do
 	filepath=`readlink -f $i`;
 	fullpath=${filepath%/*};
