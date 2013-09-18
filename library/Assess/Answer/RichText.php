@@ -9,6 +9,23 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Assess_Answer_RichText extends Assess_Answer_Short {
+class Assess_Answer_RichText extends Evaluation_Answer_RichText {
 
+	/**
+	 * Get an instance of a responseHandler upon instantiation
+	 */
+	public function __construct() {
+		parent::__construct();
+
+		$this->responseHandler = new Assess_Response();
+	}
+
+	/**
+	 * Automatically marks a response. Customised to be applicable to the way in
+	 * which the response is actually stored.
+	 *
+	 * @return void
+	 */
+	public function mark() {
+	}
 }
