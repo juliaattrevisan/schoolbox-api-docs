@@ -1045,19 +1045,33 @@ class SitePage extends Page {
      * frame won't display after it has been submitted (but is fine after page
      * is refreshed).
      *
-     * This takes advantage of the fact that most form submit requests in
-     * Schoolbox go through a page with "create" or "modify" somewhere in the
-     * URL, and then redirect.
-     *
-     * It checks the referer - if it's local and it contains "create" or
-     * "modify" in the path, it sets the X-XSS-Protection header to 0.
+     * * If this is a form, XSS protection is removed for the NEXT page load.
+     * * If the last page was a form, XSS protection is removed
+     * * If the referrer contained "create" or "modify", protection is removed
      *
      * Want more information?
      * @see http://stackoverflow.com/questions/1547884/refused-to-execute-a-javascript-script-source-code-of-script-found-within-reque
      *
+     * @todo consider using Content-Security-Policy header instead of this
+     *
      * @return bool True if protection was disabled, false if not.
      */
-    protected function disableXssProtectionAfterForm() {
+    protected static function disableXssProtectionAfterForm() {
+        // Is this a form? If so, disable for NEXT page load
+        if (stripos($_SERVER['REQUEST_URI'], 'form.php') !== false) {
+            $_SESSION['disableXssProtectionForNextPage'] = true;
+            return true;
+        }
+
+        // Was the last page a form? If so, disable
+        if (!empty($_SESSION['disableXssProtectionForNextPage'])) {
+            unset($_SESSION['disableXssProtectionForNextPage']);
+            header("X-XSS-Protection: 0\r\n");
+            return true;
+        }
+
+        // Check referrer for if the last page was a create or modify page.
+        unset($_SESSION['disableXssProtectionForNextPage']);
         $referer = parse_url($_SERVER['HTTP_REFERER']);
         if ($referer['host'] === $_SERVER['SERVER_NAME']) {
             foreach (array('create', 'modify') as $path) {
