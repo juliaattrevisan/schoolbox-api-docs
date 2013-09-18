@@ -51,7 +51,7 @@
 	/*height: 23px;*/
 	background: transparent url(/images/icons/22x22/folder.png) no-repeat 0 0;
 	cursor: default;
-	-moz-user-select: none;	
+	-moz-user-select: none;
 }
 
 #tree tr.loading span.label {
@@ -73,11 +73,11 @@ span.file {
 }
 span.file.ui-draggable, #tree span.label.ui-draggable {
 	cursor: move;overflow: hidden;
-    width: 150px;
+    min-width: 150px;
 }
 
 #file-window #file-list tbody tr.empty td {
-	padding: 10px; 
+	padding: 10px;
 }
 
 /* drag + drop */
@@ -93,7 +93,7 @@ span.file.ui-draggable, #tree span.label.ui-draggable {
 	border-bottom: none;
 }
 #tree tbody tr.selected td, #file-list tbody tr.selected td {
-	background-color: #CAE4FF;
+	background-color: #FFFFB2;
 }
 
 #file-template {
@@ -103,26 +103,26 @@ span.file.ui-draggable, #tree span.label.ui-draggable {
  * ------------------------------------------------------------------------- */
 /* Overlay */
 #properties-overlay {
-	background-color: #000; 
+	background-color: #000;
 	cursor: wait;
 }
 
 /* Container */
 #properties-container {
-	width:300px; 
-	background-color:#fff; 
+	width:300px;
+	background-color:#fff;
 	border:3px solid #ccc;
 	padding: 0.8em;
 }
 #properties-container a.modalCloseImg {
-	background:url(/images/resources/x.png) no-repeat; 
-	width:25px; 
-	height:29px; 
-	display:inline; 
-	z-index:3200; 
-	position:absolute; 
-	top:-15px; 
-	right:-18px; 
+	background:url(/images/resources/x.png) no-repeat;
+	width:25px;
+	height:29px;
+	display:inline;
+	z-index:3200;
+	position:absolute;
+	top:-15px;
+	right:-18px;
 	cursor:pointer;
 }
 #properties-container a.modalCloseX,
@@ -156,5 +156,5 @@ table#properties tbody tr td {
 }
 #properties td.bold {
 	font-weight: bold;
-	
+
 }
