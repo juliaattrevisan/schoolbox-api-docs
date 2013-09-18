@@ -2401,11 +2401,19 @@ ADMIN BODY
     background-clip: padding-box;
 }
 
-.parent-level .jstree-schoolbox a,
-.parent-level .jstree-schoolbox .jstree-leaf a {
-    background: @std-grey;
+.jstree-schoolbox span.file,
+.jstree-schoolbox a,
+.jstree-schoolbox .jstree-leaf a {
+    background: lighten(@neutral-color, @lighten-value) !important;
 	&.active {
-		background: @positive-color
+		background: @highlight-color !important;
+	}
+}
+
+.jstree-schoolbox .jstree-open > a {
+	background: @positive-color !important;
+	&.active {
+		background: @highlight-color !important;
 	}
 }
 
@@ -2417,7 +2425,7 @@ ADMIN BODY
 			padding: 16px;
 		}
 	}
-	th {
+	td {
 		font-weight: bold;
 	}
 }
