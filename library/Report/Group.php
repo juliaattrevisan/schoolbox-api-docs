@@ -163,7 +163,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
                 $email = $address ? "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>" : '';
 
                 $page->setVar(array(
-                    'USER_ID'         => $user['id'],
+                    'UID'             => $user['id'],
                     'USER_TITLE'      => $user['title'],
                     'USER_FIRSTNAME'  => $user['firstname'],
                     'USER_SURNAME'    => $user['lastname'],

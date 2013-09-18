@@ -223,7 +223,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
                 $displayName = $userHandler->formatName($nameShards);
 
                 $page->setVar(array(
-                    'USER_ID'   => $log['user'],
+                    'UID'       => $log['user'],
                     'DATE'      => $log['date'],
                     'USERNAME'  => $displayName,
                     'ACTION'    => $action,

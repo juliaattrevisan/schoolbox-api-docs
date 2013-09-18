@@ -18,8 +18,8 @@
         <!-- BEGIN user -->
         <tr class="{DARK}">
             <td>{USER_TITLE}</td>
-            <td><a href="/search/user/{USER_ID}">{USER_FIRSTNAME}</a></td>
-            <td><a href="/search/user/{USER_ID}">{USER_SURNAME}</a></td>
+            <td><a href="/search/user/{UID}">{USER_FIRSTNAME}</a></td>
+            <td><a href="/search/user/{UID}">{USER_SURNAME}</a></td>
             <td>{USER_USERNAME}</td>
             <td>{USER_SYNERGY_ID}</td>
             <td>{USER_CAMPUS}</td>
@@ -28,7 +28,7 @@
             <td>
                 <div class="ssearch-functions clearfix">
                     <!-- BEGIN modify -->
-                    <a href="/adminv2/modify-user/{USER_ID}" class="btn modify no-text" title="Modify User"><span></span></a>
+                    <a href="/adminv2/modify-user/{UID}" class="btn modify no-text" title="Modify User"><span></span></a>
                     <!-- END modify -->
                 </div>
             </td>
