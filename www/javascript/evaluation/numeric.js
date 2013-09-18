@@ -32,6 +32,13 @@
 		 * Initialise tiny
 		 */
 		function initChange() {
+
+			/* For typing
+			 */
+			config.questionForm.find('input').numeric({
+				allow: "e./"
+			});
+
 			config.questionForm.find('input').change(function() {
 
 				/* For typing
@@ -43,9 +50,9 @@
 				/* Clean copy/paste
 				 */
 				$(this).change(function() {
-					var str = $j(this).val().toString().replace(/([^0-9e\.\/])+/g, '');
+					var str = $(this).val().toString().replace(/([^0-9e\.\/])+/g, '');
 
-					$j(this).val(str);
+					$(this).val(str);
 				});
 
 				$.fn.evaluationNumeric.saveOne(config.questionForm);
@@ -72,7 +79,11 @@
 			/* Callback on success
 			 */
 			success: function(responseText) {
-				console.log(responseText);
+				var result = new Function('return ' + responseText);
+
+				$.fn.evaluationPercentageComplete({
+					result: result()
+				});
 			}
 		});
 	}
