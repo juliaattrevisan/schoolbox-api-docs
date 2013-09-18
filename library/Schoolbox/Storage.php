@@ -309,17 +309,17 @@ class Storage {
      * @return $this;
      */
     public function setMimetype(Mimetype $mimetype) {
-        $this->mimetype = $mimetype;
+        $this->mime = $mimetype;
         return $this;
     }
 
-    /**
+	/**
      * Return a mime type object, if none is found a blank object is returned
-     * @return \Schoolbox\File\Mimetype
-     */
-    public function getMimetype() {
-        if($this->mimetype instanceof Mimetype)
-            return $this->mimetype;
+	 * @return \Schoolbox\File\Mimetype
+	 */
+	public function getMimetype() {
+        if($this->mime instanceof Mimetype)
+		    return $this->mime;
         else
             return new Mimetype();
     }

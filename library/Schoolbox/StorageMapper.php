@@ -113,7 +113,6 @@ class StorageMapper extends Mapper {
 		$file = new Storage();
 		$file->setFilename($filename);
         $file->setMimeType(MimetypeMapper::getInstance()->getByFilename($filename));
-        $file->setMime($file->getMimeType()->getMime());
 
         /* Check mime type is allowed */
 		if (!($file->isUploadAllowed())) {
@@ -126,7 +125,7 @@ class StorageMapper extends Mapper {
 
         /* Check maximum allowed file size */
         if($file->getMimeType()->getMaxFileSize() < $file->getFilesize()) {
-            throw new File\Exception('File to large', File\Exception::CODE_FILE_TOO_LARGE);
+            throw new File\Exception('File too large', File\Exception::CODE_FILE_TOO_LARGE);
         }
 
 		$this->save($file);
@@ -173,7 +172,7 @@ class StorageMapper extends Mapper {
 
         if (($row = $statement->fetch()) !== false) {
             $file = $this->hydrate($row, 'storage');
-            $file->setMimeType($mimeTypeMapper->hydrate($row, 'mime'));
+            $file->setMimeType($mimeTypeMapper->hydrate($row, 'm'));
         }
 
         if (!($file instanceof Storage)) {
