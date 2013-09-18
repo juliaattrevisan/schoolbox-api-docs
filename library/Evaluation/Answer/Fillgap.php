@@ -9,8 +9,14 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
-{
+abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
+
+	/**
+	 * Javascript class to use when creating UI
+	 *
+	 * @var string
+	 */
+	protected $plugin = 'evaluationFillGap';
 
     /* HTML input element prefix used in conjunction with a question_id to
      * differentiate this Fillgap's inputs from other Fillgap inputs that might
@@ -139,6 +145,8 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             }
 
             $page->setVar(array(
+				'QUESTION_ID' => $question_id,
+				'QUESTION_PLUGIN' => $this->plugin,
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => $ans,
             ));
@@ -150,6 +158,8 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             $replace = " <input name='fillgap_{$question_id}[]' type='text' value='' /> ";
 
             $page->setVar(array(
+				'QUESTION_ID' => $question_id,
+				'QUESTION_PLUGIN' => $this->plugin,
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => preg_replace($pattern, $replace, $currentAnswer['answer']),
             ));
