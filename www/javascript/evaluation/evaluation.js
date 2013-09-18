@@ -69,12 +69,19 @@
 				result: []
 			}
 
+			/* For every section's progress bar, distill important values
+			 * and stack them up
+			 */
 			for (var i = 0; i < options.result.percentageComplete.length; i++) {
-				var selector = '#evaluation-percentage-bar-' + options.result.percentageComplete[i].section_id;
+				var bar = '#evaluation-percentage-bar-' + options.result.percentageComplete[i].section_id;
+
+				var barSelector = $j(bar).find('.percentage-bar');
+				var valueSelector = $j(bar).find('.percentage-text');
 				var percentage = options.result.percentageComplete[i].percentageComplete.toString();
 
 				var element = {
-					element: $j(selector),
+					barSelector: $j(barSelector),
+					valueSelector: $j(valueSelector).find('em'),
 					value: percentage
 				}
 
@@ -86,12 +93,12 @@
 		}
 
 		/**
-		 * Update bar dimensions
+		 * Update bar dimensions for every section
 		 */
 		function updateBar() {
-			console.log(config.result);
 			for (var i = 0; i < config.result.length; i++) {
-				config.result[i].element.css('width', config.result[i].value + '%');
+				config.result[i].barSelector.css('width', config.result[i].value + '%');
+				config.result[i].valueSelector.html(config.result[i].value);
 			}
 		}
 	}
