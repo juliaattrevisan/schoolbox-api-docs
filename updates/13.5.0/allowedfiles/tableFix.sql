@@ -1,5 +1,5 @@
 #Delete duplicates
-DELETE a1, a2 FROM allowedFileExtension a1 JOIN allowedFileExtension a2 ON a1.extension = a2.extension AND a1.fileTypeID > a2.fileTypeID
+DELETE a1, a2 FROM allowedFileExtension a1 JOIN allowedFileExtension a2 ON a1.extension = a2.extension AND a1.fileTypeID > a2.fileTypeID;
 
 
 #Enforce unqieuness
