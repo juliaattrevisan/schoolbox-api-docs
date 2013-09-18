@@ -18,9 +18,9 @@ class DueWork_Detail {
     const ON_TIME = ' on time';
     const LATE = ' late';
 
-    const CLASS_UNSUBMITTED = 'submit regular';
-    const CLASS_ON_TIME = 'submit ok';
-    const CLASS_LATE = 'submit critical';
+    const CLASS_UNSUBMITTED = 'submit-regular';
+    const CLASS_ON_TIME = 'submit-ok';
+    const CLASS_LATE = 'submit-critical';
 
     const CLASS_PLAG_0 = 'plag-score ok';
     const CLASS_PLAG_20 = 'plag-score warn';
