@@ -135,17 +135,20 @@ class FileMapper extends Mapper {
 				Exception::CODE_COPY_TO_STORAGE_FAILED
 			);
 		}
+		/** @var Storage $storage */
 		$storage  = $this->storage_mapper->createModel();
 		$storage
 			->setFilename($file->getFilename())
 			->setTempLocation($location)
 			->setUploadedBy($file->getOwner());
 		$storage->loadHashFromTempLocation();
-		$storage->loadMimetypeFromFilename();
 		$storage->loadFilesizeFromTempLocation();
 
 		try {
 			$existing = $this->storage_mapper->findOneByColumn('hash', $storage->getHash());
+		}
+		catch (Mapper\Exception $ex) {
+			return $storage;
 		}
 		catch (Exception $ex) {
 			return $storage;
