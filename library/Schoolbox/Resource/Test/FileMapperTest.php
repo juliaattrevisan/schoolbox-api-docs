@@ -47,31 +47,13 @@ class FileMapperTest extends TestCase {
 
 	public function testCopyToStorage() {
 		//
-		// Need to mock storage mapper to return a set value, instead of from
-		// database.
-		$mock_mimetype = $this->getMock(
-			'\\Schoolbox\\File\\MimetypeMapper',
-			array('getMimetypeForFilename', 'getIconForFilename')
-		);
-		$mock_mimetype
-			->expects($this->any())
-			->method('getMimetypeForFilename')
-			->will($this->returnValue('text/plain'));
-		$mock_mimetype
-			->expects($this->any())
-			->method('getIconForFilename')
-			->will($this->returnValue('text_plain.png'));
-
-		//
 		// Storage items - mock their mimetype and config loaders.
 		$new_storage = new Storage();
 		$new_storage
-			->setMimetypeLoader($mock_mimetype)
 			->setConfigLoader($this->mock_config)
 		;
 		$saved_storage = new Storage();
 		$saved_storage
-			->setMimetypeLoader($mock_mimetype)
 			->setConfigLoader($this->mock_config)
 			->setFilename('dumb.txt')
 			->setId(2)
