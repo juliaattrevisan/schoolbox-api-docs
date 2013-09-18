@@ -10,7 +10,7 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
     /**
      * The actual resource object from storage
      *
-     * @var Schoolbox\File
+     * @var Schoolbox\Storage
      */
     private $resource;
 
@@ -46,7 +46,7 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * Remembers what image you are trying to load from cache
      *
-     * @param Schoolbox\File $resource
+     * @param Schoolbox\Storage $resource
      * @param string         $key
      *
      */
