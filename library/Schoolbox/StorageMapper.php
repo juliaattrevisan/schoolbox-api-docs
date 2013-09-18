@@ -10,7 +10,7 @@
 namespace Schoolbox;
 use Schoolbox;
 use Schoolbox\Mapper;
-use Schoolbox\File;
+use Schoolbox\Storage;
 use Schoolbox\File\MimetypeMapper;
 
 class StorageMapper extends Mapper {
@@ -38,11 +38,7 @@ class StorageMapper extends Mapper {
 			'property'   => 'filesize',
 			'type'       => self::TYPE_INTEGER,
 		));
-		$this->hasMap(array(
-			'column'     => 'mime',
-			'property'   => 'mime',
-			'type'       => self::TYPE_STRING,
-		));
+
 		$this->hasMap(array(
 			'column'     => 'uploaded_by',
 			'property'   => 'uploadedBy',
@@ -70,7 +66,7 @@ class StorageMapper extends Mapper {
                 'property'   => 'mime',
                 'hydrator'   => $hydrator,
                 'join'       => 'allowedFileType',
-            ));
+        ));
 
         $this->hasJoin('allowedFileType', array(
                 'mapper'    => '\\Schoolbox\\File\\MimetypeMapper',
@@ -87,18 +83,18 @@ class StorageMapper extends Mapper {
 	/**
 	 * Copies file from temp location into a location accessible by this model.
 	 *
-	 * @param File $object
+	 * @param Storage $object
 	 */
-	public function postSave(File $object) {
+	public function postSave(Storage $object) {
 		$object->copyFromTempLocation();
 	}
 
 	/**
 	 * Deletes this model's file.
 	 *
-	 * @param File $object
+	 * @param Storage $object
 	 */
-	public function postDelete(File $object) {
+	public function postDelete(Storage $object) {
 		$object->deleteFile();
 	}
 
@@ -114,9 +110,10 @@ class StorageMapper extends Mapper {
 	 * @return File
 	 */
 	public function upload($filename, $temp_location, $user_id) {
-		$file = new File();
+		$file = new Storage();
 		$file->setFilename($filename);
         $file->setMimeType(MimetypeMapper::getInstance()->getByFilename($filename));
+        $file->setMime($file->getMimeType()->getMime());
 
         /* Check mime type is allowed */
 		if (!($file->isUploadAllowed())) {
@@ -133,6 +130,8 @@ class StorageMapper extends Mapper {
         }
 
 		$this->save($file);
+        print_r($file);
+        exit;
 
         /* If video add to video processing queue, note checks ID to ensure its a new file and not an already existing file */
 	    if(stristr($file->getMimeType()->getMime(),'video/') && $file->getId() != 0) {
