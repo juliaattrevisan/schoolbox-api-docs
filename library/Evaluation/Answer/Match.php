@@ -9,8 +9,15 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Match extends Evaluation_Answer
-{
+abstract class Evaluation_Answer_Match extends Evaluation_Answer {
+
+	/**
+	 * Javascript class to use when creating UI
+	 *
+	 * @var string
+	 */
+	protected $plugin = 'evaluationMatchingPairs';
+
     protected $correctClass = 'matchCorrect';
     protected $incorrectClass = 'matchIncorrect';
 
@@ -159,7 +166,9 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
         /* Parse question number, so you can have multiple sortable instances
          */
         $page->setVar(array(
-            'MATCHPAIRS_QUESTION_ID' => $question_id
+            'MATCHPAIRS_QUESTION_ID' => $question_id,
+			'QUESTION_ID' => $question_id,
+			'QUESTION_PLUGIN' => $this->plugin,
         ));
     }
 

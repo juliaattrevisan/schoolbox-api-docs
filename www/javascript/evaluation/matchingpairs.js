@@ -67,7 +67,11 @@
 			/* Callback on success
 			 */
 			success: function(responseText) {
-				console.log(responseText);
+				var result = new Function('return ' + responseText);
+
+				$.fn.evaluationPercentageComplete({
+					result: result()
+				});
 			}
 		});
 	}
