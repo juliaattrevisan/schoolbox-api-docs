@@ -24,7 +24,7 @@
           var win = tinyMCEPopup.getWindowArg("window"),
               input = tinyMCEPopup.getWindowArg("input"),
               src = win.document.getElementById(input),
-              url = '/storage/'+(input=='href'?'fetch':'image')+'.php?size=maxsize&hash='+matched[1].toString();
+              url = '/storage/'+(input=='href'?'fetch.php?':'image.php?size=maxsize&')+'hash='+matched[1].toString();
 
           src.value = url;
 
