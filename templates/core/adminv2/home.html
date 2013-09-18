@@ -51,9 +51,15 @@ $j(function() {
                 for (i in data) {
                     var row = data[i];
 
-                    $j('<tr><td nowrap="nowrap"><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
-                       '</a></td><td>' + row.GROUP_USER +
-                       '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($j('#group-summary'));
+                    if(row.GROUP_ID > 0) {
+                        $j('<tr><td nowrap="nowrap"><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
+                           '</a></td><td>' + row.GROUP_USER +
+                           '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($j('#group-summary'));
+                    } else {
+                        $j('<tr><td nowrap="nowrap"><strong>' + row.GROUP_NAME +
+                                '</strong></td><td>' + row.GROUP_USER +
+                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($j('#group-summary'));
+                    }
                 }
                 /* re-apply on off */
                 $j('#group-summary tr').removeClass('dark');

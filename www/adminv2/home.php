@@ -119,19 +119,16 @@ if(in_array('nojscript', $this->arg)) {
 
 	// Believe it or not, this is actually really slow!
 
-	$curl = \Proxy\Server::getInstance()->curl_init('http://schoolbox.com.au/schoolboxinstaller/status.html');
-	curl_setopt($curl, CURLOPT_NOBODY, true);
-	curl_setopt($curl, CURLOPT_TIMEOUT, 2);
-
-    if(curl_exec($curl)) {
-       $www = array('WWW_LIGHT'  => 'on',
-                    'WWW_STATUS' => 'Available');
+    $context = \Proxy\Server::getInstance()->getContext();
+    if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
+        $www = array('WWW_LIGHT'  => 'on',
+                    'WWW_STATUS' => 'Available'
+        );
     }
     else {
-       $www = array('WWW_LIGHT'  => '',
+        $www = array('WWW_LIGHT'  => '',
                     'WWW_STATUS' => 'Inaccessible');
     }
-	curl_close($curl);
 
 } else {
     $www = array('WWW_LIGHT'  => '',
@@ -145,17 +142,31 @@ $this->setVar($www);
 if(in_array('nojscript', $this->arg)) {
 
     $summary = $groupHandler->userSummary();
+    $totalUser = 0;
+    $totalLogin = 0;
+
 
     foreach($summary as $group) {
         $groupOut = array('GROUP_ID'        => $group['id'],
                           'GROUP_NAME'      => $group['name'],
                           'GROUP_USER'      => $group['total'],
                           'GROUP_LOGGED_IN' => $group['logged_in']);
+        $totalUser += $group['total'];
+        $totalLogin += $group['logged_in'];
 
         $this->setVar($groupOut);
-        $this->setVar('no_js_warning_block', '');
+
         $this->parse('group_summary_block','group_summary',true);
     }
+
+    $this->setVar( array(  'GROUP_ID'=>'',
+        'GROUP_NAME'=>'Total',
+        'GROUP_USER'=>$totalUser,
+        'GROUP_LOGGED_IN'=>$totalLogin,));
+    $this->setVar('no_js_warning_block', '');
+    $this->parse('group_summary_block','group_summary',true);
+
+
 } else {
     $this->setVar($groupOut);
     $this->setVar('group_summary_block', '');
