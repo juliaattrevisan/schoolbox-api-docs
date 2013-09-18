@@ -151,9 +151,11 @@ abstract class Evaluation_Section extends DeprecatedModel
                       assess_question.type_id,
                       assess_question.sequence,
                       assess_question.marks,
-                      assess_question.question
+                      assess_question.question,
+                      assess_luQuestionType.plugin
                   FROM assess_response
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
+                  LEFT JOIN assess_luQuestionType ON assess_question.type_id = assess_luQuestionType.type_id
                   LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
                   WHERE assess_response.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND assess_response.section_id = " . $this->db->smartQuote($section_id) . "

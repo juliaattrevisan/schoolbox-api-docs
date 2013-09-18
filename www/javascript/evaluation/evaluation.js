@@ -1,14 +1,14 @@
 /**
  * Update the percentage-complete bars for each section
  */
-(function($) {
-	$.fn.evaluation = function() {
+(function($j) {
+	$j.fn.evaluation = function() {
 	}
 
 	/**
 	 * Save each individual question
 	 */
-	$.fn.evaluation.saveAll = function() {
+	$j.fn.evaluation.saveAll = function() {
 		init();
 
 		/* Allow display of saving indicator before locking browser up
@@ -22,30 +22,35 @@
 		 * Init - show loading div
 		 */
 		function init() {
-			$('.evaluation-saving').show();
+			$j('.evaluation-saving').show();
 		}
 
 		/**
 		 * Save each question form
 		 */
 		function saveForms() {
-			$('.questionForm').each(function(index, element) {
-				var id = $(element).attr('id').replace('questionForm-', '');
+			$j('.questionForm').each(function(index, element) {
+				var id = $j(element).attr('id').replace('questionForm-', '');
 
-				var plugin = "$.fn." + $(element).data('plugin') + ".saveOne($('#questionForm-" + id + "'))";
+				var plugin = "$.fn." + $j(element).data('plugin') + ".saveOne($('#questionForm-" + id + "'))";
 
 				var hadoken = new Function(plugin);
 				hadoken();
 			});
 
-			$('.evaluation-saving').html('<h2>Saved</h2>');
+			$j('.evaluation-saving').html('<h2>Saved</h2>');
 
 			/* TODO: Redirect upon completion
 			 */
 		}
 	}
 
-	$.fn.evaluationPercentageComplete = function(options) {
+	/**
+	 * Update percentage complete bars
+	 *
+	 * @param options
+	 */
+	$j.fn.evaluationPercentageComplete = function(options) {
 		var config = init(options);
 
 		updateBar();
@@ -69,14 +74,14 @@
 				var percentage = options.result.percentageComplete[i].percentageComplete.toString();
 
 				var element = {
-					element: $(selector),
+					element: $j(selector),
 					value: percentage
 				}
 
 				derived.result.push(element);
 			}
 
-			var merged = $.extend(defaults, derived);
+			var merged = $j.extend(defaults, derived);
 			return merged;
 		}
 
@@ -84,6 +89,7 @@
 		 * Update bar dimensions
 		 */
 		function updateBar() {
+			console.log(config.result);
 			for (var i = 0; i < config.result.length; i++) {
 				config.result[i].element.css('width', config.result[i].value + '%');
 			}
@@ -92,10 +98,5 @@
 }(jQuery));
 
 
-$(function() {
-	$('#trigger').click(function() {
-		$.fn.evaluation.saveAll();
-	});
-});
 
 
