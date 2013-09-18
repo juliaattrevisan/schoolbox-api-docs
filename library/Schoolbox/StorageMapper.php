@@ -130,8 +130,6 @@ class StorageMapper extends Mapper {
         }
 
 		$this->save($file);
-        print_r($file);
-        exit;
 
         /* If video add to video processing queue, note checks ID to ensure its a new file and not an already existing file */
 	    if(stristr($file->getMimeType()->getMime(),'video/') && $file->getId() != 0) {
