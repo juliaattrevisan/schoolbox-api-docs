@@ -9,8 +9,15 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Multi extends Evaluation_Answer
-{
+abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
+
+	/**
+	 * Javascript class to use when creating UI
+	 *
+	 * @var string
+	 */
+	protected $plugin = 'evaluationMultipleChoice';
+
     protected $correctClass = 'multiCorrect';
     protected $incorrectClass = 'multiIncorrect';
 
@@ -120,6 +127,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
 
             foreach ($allAnswers as $currentAnswer) {
                 $page->setVar(array(
+					'QUESTION_ID' => $question_id,
+					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $answerGroup['answer_id'],
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
