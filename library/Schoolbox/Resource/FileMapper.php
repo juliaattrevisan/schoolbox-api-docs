@@ -12,8 +12,8 @@
  
 namespace Schoolbox\Resource;
 use Schoolbox\Mapper;
-use Schoolbox\File       as Storage;
-use Schoolbox\FileMapper as StorageMapper;
+use Schoolbox\Storage;
+use Schoolbox\StorageMapper;
 
 class FileMapper extends Mapper {
 
@@ -145,7 +145,7 @@ class FileMapper extends Mapper {
 		$storage->loadFilesizeFromTempLocation();
 
 		try {
-			$existing = $this->storage_mapper->findOneByColumn('hash', $storage->getHash());
+			$existing = $this->storage_mapper->findByHash($storage->getHash());
 		}
 		catch (Exception $ex) {
 			return $storage;

@@ -30,7 +30,7 @@ if ($_POST['heading']) {
 	    $mime = $allowedFiles->getByFilename($_FILES['file']['name']);
 
 	    if(is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(),'image/')) {
-	        $imageResource = Schoolbox\FileMapper::getInstance()->upload(
+	        $imageResource = Schoolbox\StorageMapper::getInstance()->upload(
 	            $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_SESSION['id']
 	        );
 	        $news['item_image'] = $imageResource->getHash();

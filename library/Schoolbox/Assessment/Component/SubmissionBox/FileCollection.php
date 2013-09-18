@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
-use Schoolbox\FileMapper as SchoolboxFileMapper;
+use Schoolbox\StorageMapper;
 
 class FileCollection extends Collection {
 
@@ -34,7 +34,7 @@ class FileCollection extends Collection {
 	 */
 	public function addFromFileId($file_id) {
 		if (!$this->isFileIdInCollection($file_id)) {
-			$file_mapper = new SchoolboxFileMapper();
+			$file_mapper = new StorageMapper();
 			$file        = $file_mapper->findById($file_id);
 			$file_link   = new SubmissionBox\File();
 			$file_link->setFile($file);

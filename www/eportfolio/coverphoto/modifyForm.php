@@ -37,7 +37,7 @@ if ($authenticator->canModify()) {
 				$coverPhoto->setCreatedAt($now);
 				$coverPhoto->setUpdatedAt($now);
 
-				$imageResource = Schoolbox\FileMapper::getInstance()->upload($uploadedFilename, $uploadedLocation, $uploadedUid);
+				$imageResource = Schoolbox\StorageMapper::getInstance()->upload($uploadedFilename, $uploadedLocation, $uploadedUid);
 				$coverPhoto->setImagehash($imageResource->getHash());
 
 				\Eportfolio\CoverPhotoMapper::getInstance()->save($coverPhoto);

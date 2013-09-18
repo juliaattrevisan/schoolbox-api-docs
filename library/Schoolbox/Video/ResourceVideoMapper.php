@@ -44,7 +44,7 @@ class ResourceVideoMapper extends Mapper {
                      ));
 
         $this->hasJoin('storage', array(
-                'mapper'    => '\\Schoolbox\\FileMapper',
+                'mapper'    => '\\Schoolbox\\StorageMapper',
                 'this_key'  => 'file_id',
                 'other_key' => 'storage_id',
         ));
@@ -110,7 +110,7 @@ class ResourceVideoMapper extends Mapper {
 	}
 
     public function findByStorageId($id) {
-        $storageMapper = new \Schoolbox\FileMapper;
+        $storageMapper = new \Schoolbox\StorageMapper;
 
         $statement = $this->database->prepare( "
             SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}

@@ -9,9 +9,10 @@
 
 namespace Schoolbox;
 use Schoolbox\ConfigLoader;
+use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-class File {
+class Storage {
 
 	/**
 	 * @var int
@@ -274,14 +275,6 @@ class File {
 		return false;
 	}
 
-	/**
-	 * Gets the icon for this file from its filename.
-	 *
-	 * @return string
-	 */
-	public function getIconFromFilename() {
-		return $this->getMimeType()->getIconFile();
-	}
 
 	/**
 	 * Deletes file from permanent upload location.
@@ -311,13 +304,25 @@ class File {
 		return $this->config_loader;
 	}
 
+    /**
+     * @param \Schoolbox\File\Mimetype $mimetype
+     * @return $this;
+     */
+    public function setMimetype(Mimetype $mimetype) {
+        $this->mimetype = $mimetype;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\File\Mimetype
-	 */
-	public function getMimetypeLoader() {
-		return $this->mimetype_loader;
-	}
+    /**
+     * Return a mime type object, if none is found a blank object is returned
+     * @return \Schoolbox\File\Mimetype
+     */
+    public function getMimetype() {
+        if($this->mimetype instanceof Mimetype)
+            return $this->mimetype;
+        else
+            return new Mimetype();
+    }
 
 	/**
 	 * Is this file's name an allowed file name?

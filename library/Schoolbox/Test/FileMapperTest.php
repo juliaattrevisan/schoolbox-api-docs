@@ -11,7 +11,7 @@
  */
 
 namespace Schoolbox\Test;
-use Schoolbox\FileMapper;
+use Schoolbox\StorageMapper;
 use Schoolbox\Test\TestCase;
 
 class FileMapperTest extends TestCase {

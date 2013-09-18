@@ -15,7 +15,7 @@ try {
         $page = new SitePage;
 
         /* @var $resource Schoolbox\File */
-        $resource = Schoolbox\FileMapper::getInstance()->findOneByColumn('hash', $_GET['hash']);
+        $resource = Schoolbox\StorageMapper::getInstance()->findByHash($_GET['hash']);
 
         if ($_GET['save']) {
             $attach = "attachment;";
