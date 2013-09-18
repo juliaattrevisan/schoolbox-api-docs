@@ -105,13 +105,14 @@ $j(function() {
 		<div id="sectionPercentageComplete_{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}" class="evaluation-section percentage-complete">
 			<h3>Section {SECTION_SEQUENCE} - <span>{SECTION_PERCENTAGE_COMPLETE_TITLE}</span></h3>
 			<div class="pad-it">
+
 				<div id='evaluation-percentage-bar-{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}'>
-					<section class='percentage-bar' style='width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%'>
-					</section>
-					<section class='percentage-text'>
+					<div class='percentage-bar' style='width:{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}%'></div>
+					<div class='percentage-text'>
 						<em>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</em>% Complete
-					</section>
+					</div>
 				</div>
+				
 			</div>
 		</div>
 		<!-- END sectionPercentageComplete --> 
