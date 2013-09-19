@@ -69,14 +69,6 @@ class Subcontext_CourseBuilderContext extends BaseContext {
             throw new Exception('Add due work button not found');
         }
         $button->click();
-        // Element may not be visible yet
-        $this->spin(
-            function($context) use($component) {
-                $component->find('css', '.for_due_work .interact a')->click();
-                return true;
-            },
-            5
-        );
         $this->getCoreContext()->waitForElementOnPage('form#createSubmissionForm');
         $form = $this->getSession()->getPage()->findById('createSubmissionForm');
         $form->fillField('task_title', $name);
@@ -98,14 +90,6 @@ class Subcontext_CourseBuilderContext extends BaseContext {
             throw new Exception('Add online assessment button not found');
         }
         $button->click();
-        // Element may not be visible yet
-        $this->spin(
-            function($context) use($component) {
-                $component->find('css', '.for_assessment .interact a.create')->click();
-                return true;
-            },
-            5
-        );
         $this->getCoreContext()->waitForElementOnPage('form#createAssess');
         $form = $this->getSession()->getPage()->findById('createAssess');
         $form->fillField('task_title', $name);
