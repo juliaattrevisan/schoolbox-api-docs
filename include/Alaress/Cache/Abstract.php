@@ -215,10 +215,22 @@ abstract class Alaress_Cache_Abstract {
 	 */
 	protected function saveStreamContents() {
 		$context = Proxy\Server::getInstance()->getContext();
-		$streamHandle = @fopen($this->getUrl(), 'r', false, $context);
+		
+		/* For images that existed in Storage since fopen can't
+		 * open relative urls
+		 */
+		if (preg_match('#^/#', $this->getUrl())) {
+			$url = "http://{$_SERVER['HTTP_HOST']}{$this->getUrl()}";
+		}
+		else {
+			$url = $this->getUrl();
+		}
+
+		$streamHandle = @fopen($url, 'r', false, $context);
 		$cacheHandle = @fopen($this->getCachedFile(), 'w');
 
 		/* Could not open stream source for reading
+		 * This will leave intended cache file size at 0 bytes
 		 */
 		if (!$streamHandle) {
 			return false;
