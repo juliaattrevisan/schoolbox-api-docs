@@ -19,10 +19,10 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      *
      * @param  string $name
      * @param  string $url
-     * @param  bool   $requires_confirmation
+     * @param  bool   $self_assess
      * @throws Exception if task list or button isn't found
      */
-    public function addTask($name, $url = '', $requires_confirmation = false) {
+    public function addTask($name, $url = '', $self_assess = true) {
         $component = $this->findCourseBuilderComponent();
         $button    = $component->find('css', '.add_buttons a[data-form_class="for_task"]');
         if (!($button instanceof Element\NodeElement)) {
@@ -33,8 +33,13 @@ class Subcontext_CourseBuilderContext extends BaseContext {
         $form->fillField('title', $name);
         // Somehow be able to use this for file uploads too.
         $form->fillField('link',  $url);
-        if ($requires_confirmation) {
-            $form->checkField('requires_confirmation');
+        // Requires confirmation field: now labeled "self-assess", and the other
+        // way around (checked = doesn't require confirmation)
+        if ($self_assess) {
+            $form->checkField('self_assess');
+        }
+        else {
+            $form->uncheckField('self_assess');
         }
         $form->find('css', 'input[type="submit"]')->press();
         $this->getCoreContext()->waitForAjax();
@@ -43,14 +48,14 @@ class Subcontext_CourseBuilderContext extends BaseContext {
     /**
      * Adds a task to the course builder component of this homepage.
      *
-     * @Then /^(?:|I )add a task named "(?P<name>[^"]*)" to visit "(?P<url>[^"]*)" which requires confirmation$/
-     * @Then /^(?:|I )add a task named "(?P<name>[^"]*)" which requires confirmation$/
+     * @Then /^(?:|I )add a task named "(?P<name>[^"]*)" to visit "(?P<url>[^"]*)" which is not self-assess$/
+     * @Then /^(?:|I )add a task named "(?P<name>[^"]*)" which is not self-assess$/
      *
      * @param string $name
      * @param string $url
      */
-    public function addTaskRequiringConfirmation($name, $url = '') {
-        $this->addTask($name, $url, true);
+    public function addNonSelfAssessTask($name, $url = '') {
+        $this->addTask($name, $url, false);
     }
 
     /**

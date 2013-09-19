@@ -88,13 +88,13 @@ Scenario: Create a course
   Then  I add a task named "Read chapter 3"
 
   # Create a teacher assess task
-  Then  I add a task named "Attend 3 classes" which requires confirmation
+  Then  I add a task named "Attend 3 classes" which is not self-assess
 
   # Add more task lists
   Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Atomic structure and bonding"
   And   add component "Learning:Course Task List"
   And   I add a task named "Read chapter 4"
-  And   I add a task named "Attend a laboratory" which requires confirmation
+  And   I add a task named "Attend a laboratory" which is not self-assess
   And   I add a due work task
   Then  I fill in "name" with "Dumb Due Work for bonding"
   Then  I fill in "task_title" with "Hand in 'Dumb Due Work for bonding'"
