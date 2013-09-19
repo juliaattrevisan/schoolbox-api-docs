@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 // DETERMINE A COURSE OF ACTION
 
 // ID provided, DueWork already exists
-$is_task = isset($_POST['task_title']);
+$is_task = !empty($_POST['is_task']);
 if (is_numeric($_POST['id']) && ($is_task || $_POST['due_date']) && is_numeric($_POST['category'])) {
     $action = 'update';
 }
@@ -104,12 +104,7 @@ else {
 }
 
 // If not a task: check if any of the dates failed to parse
-if ($is_task) {
-    if (strlen(trim($_POST['task_title'])) === 0) {
-        error(2);
-    }
-}
-else {
+if (!$is_task) {
     if (!($openDate->isValid() && $dueDate->isValid() && $lateDate->isValid())) {
         error(15);
     }
@@ -199,7 +194,7 @@ try {
             $task
                 ->setCategory($categoryID)
                 ->setOwner($_SESSION['id'])
-                ->setTitle($_POST['task_title']);
+                ->setTitle($_POST['name']);
             TaskMapper::getInstance()->save($task);
             $submission->setTask($task);
         }
@@ -219,7 +214,7 @@ try {
         if ($is_task) {
             // Load this submission's task from database
             $task = TaskMapper::getInstance()->findById($submission->getTask()->getId());
-            $task->setTitle($_POST['task_title']);
+            $task->setTitle($_POST['name']);
             TaskMapper::getInstance()->save($task);
         }
     }

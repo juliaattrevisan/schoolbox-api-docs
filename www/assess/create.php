@@ -43,13 +43,13 @@ if (!empty($_POST)) {
     ;
 
     // Is this a task? If so, just set the start and finish to now.
-    $is_task = isset($_POST['task_title']);
+    $is_task = !empty($_POST['is_task']);
     if ($is_task) {
         $task = new Task();
         $task
             ->setCategory($_POST['category_id'])
             ->setOwner($_SESSION['id'])
-            ->setTitle($_POST['task_title']);
+            ->setTitle($_POST['title']);
         TaskMapper::getInstance()->save($task);
         $assessment->setTask($task);
     }
