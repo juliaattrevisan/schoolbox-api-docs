@@ -1180,14 +1180,20 @@ class Mapper {
 	 * with each other.
 	 *
 	 * @param array  $input
-	 * @param string $prefix
+	 * @param string $prefix If not supplied, ? will be assumed as placeholder
+	 *                       for all values.
 	 *
 	 * @return array
 	 */
-	public function getArrayParameters($input, $prefix) {
+	public function getArrayParameters($input, $prefix = null) {
 		$params = array();
 		foreach ($input as $i => $param) {
-			$params[$prefix.'_'.$i] = $param;
+			if (isset($prefix)) {
+				$params[$prefix.'_'.$i] = $param;
+			}
+			else {
+				$params[] = $param;
+			}
 		}
 		return $params;
 	}
