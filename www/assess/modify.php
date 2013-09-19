@@ -52,7 +52,7 @@ if (!empty($_POST)) {
     $task_id = $assessment->getTask()->getId();
     if ($task_id) {
         $task = TaskMapper::getInstance()->findById($task_id);
-        $task->setTitle($_POST['task_title']);
+        $task->setTitle($_POST['title']);
         TaskMapper::getInstance()->save($task);
     }
     else {
@@ -104,14 +104,15 @@ if (!empty($_POST)) {
     $assessFinishDate = $assessment->getFinish();
 
     $this->setVar(array(
-        'ACTION' => 'modify',
-        'ASSESS_ASSESS_ID' => $assessment->getId(),
-        'ASSESS_CATEGORY_ID' => $assessment->getCategory()->getId(),
-        'ASSESS_TITLE' => Scrub::text($assessment->getTitle()),
-        'ASSESS_DESCRIPTION' => Scrub::text($assessment->getDescription()),
-        'ASSESS_START_DATE' => $assessStartDate->getLocalShort(),
-        'ASSESS_FINISH_DATE' => $assessFinishDate->getLocalShort(),
-        'ALLOW_RESIT_CHECKED' => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',
+        'ACTION'                  => 'modify',
+        'ASSESS_IS_TASK'          => !empty($task_id) ? 1 : 0,
+        'ASSESS_ASSESS_ID'        => $assessment->getId(),
+        'ASSESS_CATEGORY_ID'      => $assessment->getCategory()->getId(),
+        'ASSESS_TITLE'            => Scrub::text($assessment->getTitle()),
+        'ASSESS_DESCRIPTION'      => Scrub::text($assessment->getDescription()),
+        'ASSESS_START_DATE'       => $assessStartDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'      => $assessFinishDate->getLocalShort(),
+        'ALLOW_RESIT_CHECKED'     => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',
         'ASSESS_DURATION_CHECKED' => $assessment->getDuration() >= 0 ? 'checked=\'checked\'' : '',
     ));
 

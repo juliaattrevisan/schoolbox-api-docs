@@ -109,12 +109,13 @@ if (!empty($_POST)) {
     $assessEndDate = new Alaress_Date_Format(strtotime('+1 week'), 'U');
 
     $this->setVar(array(
-        'ACTION' => 'create',
-        'ASSESS_ASSESS_ID' => '',
+        'ACTION'             => 'create',
+        'ASSESS_IS_TASK'     => $is_task ? 1 : 0,
+        'ASSESS_ASSESS_ID'   => '',
         'ASSESS_CATEGORY_ID' => $category_id,
-        'ASSESS_TITLE' => '',
+        'ASSESS_TITLE'       => '',
         'ASSESS_DESCRIPTION' => '',
-        'ASSESS_START_DATE' => $assessDate->getLocalShort(),
+        'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
     ));
 

@@ -181,12 +181,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setVar(array(
         'duework_timespan_block' => '',
     ));
-    $task_title = '';
-    if ($task_id) {
-        $task       = TaskMapper::getInstance()->findById($task_id);
-        $task_title = Scrub::text($task->getTitle());
-    }
-    else {
+    if (!$task_id) {
         $this->parse('duework_timespan_block', 'duework_timespan');
     }
 
@@ -196,7 +191,6 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'CATEGORY'          => $submission->getCategory()->getId(),
         'CURRENT_CAT'       => $catOutput,
         'NAME'              => $submission->getName(),
-        'TASK_TITLE'        => $task_title,
         'DESCRIPTION'       => $submission->getDescription(),
         'FILEID'            => $submission->getLegacyFileId(),
         'ACCEPT_SUBMISSION' => $submission->getAcceptOnline() ? ' checked="checked"' : '',
@@ -346,7 +340,6 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'CATEGORY'          => $this->arg[1],
         'ID'                => '',
         'NAME'              => $file['name'],
-        'TASK_TITLE'        => '',
         'DESCRIPTION'       => $file['description'],
         'FILEID'            => $file['id'],
         'CATLIST'           => $catOutput,
@@ -373,6 +366,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
         'SESSION_NAME'    => session_name(),
         'SESSION_ID'      => session_id(),
+        'IS_TASK'         => $is_task ? 1 : 0,
     );
 
     // notifications on by default
