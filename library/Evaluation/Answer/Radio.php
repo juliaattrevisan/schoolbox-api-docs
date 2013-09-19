@@ -119,6 +119,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
             foreach ($allAnswers as $currentAnswer) {
                 $page->setVar(
                     array(
+						'QUESTION_ID' => $question_id,
+						'QUESTION_PLUGIN' => $this->plugin,
                         'ANSWER_ID' => $answerGroup['answer_id'],
                         'ANSWER_VALUE' => $currentAnswer->value,
                         'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
