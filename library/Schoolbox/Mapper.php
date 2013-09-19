@@ -643,20 +643,20 @@ class Mapper {
 	 *
 	 * @param string $column
 	 * @param array  $permittedValues
-	 * @param bool   $deleted         If set to false, filters out deleted items.
+	 * @param array  $options         @see findByColumnList() $options param
 	 * @return Collection
 	 */
-	public function findIn($column, $permittedValues, $deleted = false) {
-		return $this->findByColumn($column, $permittedValues, $deleted);
+	public function findIn($column, $permittedValues, $options = array()) {
+		return $this->findByColumn($column, $permittedValues, $options);
 	}
 
 	/**
 	 * @brief Retrieves the entire collection unfiltered
-	 * @param bool $deleted If set to false, filters out deleted items.
+	 * @param array $options @see findByColumnList() $options param
 	 * @return Collection
 	 */
-	public function findAll($deleted = false) {
-		return $this->findByColumnList(array(), $deleted);
+	public function findAll($options = array()) {
+		return $this->findByColumnList(array(), $options);
 	}
 
 	/**
@@ -668,27 +668,7 @@ class Mapper {
 	 * @return object
 	 */
 	public function findById($identifierValue) {
-		$identifierName = $this->identifier['column'];
-
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE `{$identifierName}` = :identifierValue
-		"
-		);
-
-		$statement->bindParam(':identifierValue', $identifierValue);
-
-		$statement->execute();
-
-		$row = $statement->fetch();
-		if ($row != false) {
-			$model = $this->hydrate($row);
-			$this->throwIfDeleted($model);
-			return $model;
-		}
-		throw new Exception('Instance of object not found');
+		return $this->findOneByColumn($this->identifier['column'], $identifierValue);
 	}
 
 	/**
@@ -696,12 +676,12 @@ class Mapper {
 	 *
 	 * @param String $columnName
 	 * @param String $columnValue
-	 * @param bool   $deleted     If set to false, filters out deleted items.
+	 * @param array  $options     @see findByColumnList() $options param
 	 *
 	 * @return Collection
 	 */
-	public function findByColumn($columnName, $columnValue, $deleted = false) {
-		return $this->findByColumnList(array($columnName => $columnValue), $deleted);
+	public function findByColumn($columnName, $columnValue, $options = array()) {
+		return $this->findByColumnList(array($columnName => $columnValue), $options);
 	}
 
 	/**
@@ -711,20 +691,19 @@ class Mapper {
 	 * @throws Exception\Deleted if the model was found but has been deleted
 	 * @param  String $columnName
 	 * @param  String $columnValue
+	 * @param  array  $order       Fields to order by (@see findByColumnList() $options param)
 	 * @return object
 	 */
-	public function findOneByColumn($columnName, $columnValue) {
-		$statement = $this->database->prepare("
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE `{$columnName}` = :$columnName
-			LIMIT 1
-		");
-		$statement->bindParam(":$columnName", $columnValue);
-		$statement->execute();
-		$result = $statement->fetch();
-		if ($result) {
-			$model = $this->hydrate($result);
+	public function findOneByColumn($columnName, $columnValue, $order = array()) {
+		$result_collection = $this->findByColumnList(
+			array($columnName => $columnValue),
+			array(
+				'deleted' => true,
+				'limit'   => 1,
+				'order'   => $order,
+			)
+		);
+		foreach ($result_collection as $model) {
 			$this->throwIfDeleted($model);
 			return $model;
 		}
