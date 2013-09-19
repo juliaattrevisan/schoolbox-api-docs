@@ -79,11 +79,12 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         $return_counts     = array();
         $submission_counts = array();
         if ($this->groupHandler->isStudent()) {
+            $box_id_list = $this->submissionList->getColumnValues('id');
             $return_counts = SubmissionBox\ReturnedWorkMapper::getInstance()->findCountsForSubmissionBoxes(
-                $this->submissionList->getColumnValues('id'), $_SESSION['id']
+                $box_id_list, $_SESSION['id']
             );
             $submission_counts = SubmissionBox\SubmissionMapper::getInstance()->findCountsForSubmissionBoxes(
-                $this->submissionList->getColumnValues('id'), $_SESSION['id']
+                $box_id_list, $_SESSION['id']
             );
         }
         $time = new Alaress_Date_Format(new DateTime());
