@@ -91,11 +91,11 @@ else {
 
 $this->setVar(
     array(
-        'TASK_ID'            => $task->getId(),
-        'TASK_CATEGORY'      => $task->getCategory()->getId(),
-        'TASK_TYPE'          => $task_type,
-        'TASK_LINK'          => $task->getLink(),
-        'TASK_TITLE'         => $task->getTitle(),
-        'TASK_CONF_REQUIRED' => ($task->getRequiresConfirmation() ? 'checked' : ''),
+        'TASK_ID'          => $task->getId(),
+        'TASK_CATEGORY'    => $task->getCategory()->getId(),
+        'TASK_TYPE'        => $task_type,
+        'TASK_LINK'        => $task->getLink(),
+        'TASK_TITLE'       => $task->getTitle(),
+        'TASK_SELF_ASSESS' => ($task->getRequiresConfirmation() ? '' : 'checked'),
     )
 );

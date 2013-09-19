@@ -80,15 +80,15 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         foreach ($this->task_list as $task) {
             $this->setVar(
                 array(
-                    'task_link_block'    => '',
-                    'TASK_ID'            => $task->getId(),
-                    'TASK_TITLE'         => Scrub::text($task->getTitle()),
-                    'TASK_TYPE'          => '',
-                    'TASK_TYPE_LABEL'    => Scrub::text($task->getLabel()),
-                    'TASK_CLASS'         => Scrub::text($task->getIconClass()),
-                    'TASK_LINK'          => Scrub::text($task->getLink()),
-                    'TASK_CONF_REQUIRED' => ($task->getRequiresConfirmation() ? 'checked' : ''),
-                    'DARK'               => ($i++%2 === 1 ? 'dark' : ''),
+                    'task_link_block'  => '',
+                    'TASK_ID'          => $task->getId(),
+                    'TASK_TITLE'       => Scrub::text($task->getTitle()),
+                    'TASK_TYPE'        => '',
+                    'TASK_TYPE_LABEL'  => Scrub::text($task->getLabel()),
+                    'TASK_CLASS'       => Scrub::text($task->getIconClass()),
+                    'TASK_LINK'        => Scrub::text($task->getLink()),
+                    'TASK_SELF_ASSESS' => ($task->getRequiresConfirmation() ? '' : 'checked'),
+                    'DARK'             => ($i++%2 === 1 ? 'dark' : ''),
                 )
             );
             $this->parse('task_no_link_block', 'task_no_link');

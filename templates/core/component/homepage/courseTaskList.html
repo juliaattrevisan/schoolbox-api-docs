@@ -76,10 +76,10 @@
                                 </p>
                             </dd>
 
-                            <dt><label for="requires_confirmation-{TASK_ID}">Requires confirmation?</label></dt>
+                            <dt><label for="self_assess-{TASK_ID}">Self-assessed?</label></dt>
                             <dd>
-                                <input name="requires_confirmation" value="0" type="hidden" />
-                                <input name="requires_confirmation" value="1" type="checkbox" id="requires_confirmation-{TASK_ID}" {TASK_CONF_REQUIRED} />
+                                <input name="self_assess" value="0" type="hidden" />
+                                <input name="self_assess" value="1" type="checkbox" id="self_assess-{TASK_ID}" {TASK_SELF_ASSESS} />
                             </dd>
                         </dl>
 
@@ -129,10 +129,10 @@
                     </p>
                 </dd>
 
-                <dt><label for="requires_confirmation-new_task">Requires confirmation?</label></dt>
+                <dt><label for="self_assess-new_task">Self-assessed?</label></dt>
                 <dd>
-                    <input name="requires_confirmation" value="0" type="hidden" />
-                    <input name="requires_confirmation" value="1" type="checkbox" id="requires_confirmation-new_task" />
+                    <input name="self_assess" value="0" type="hidden" />
+                    <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" {TASK_SELF_ASSESS} />
                 </dd>
             </dl>
 

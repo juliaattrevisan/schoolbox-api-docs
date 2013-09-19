@@ -44,7 +44,7 @@ else {
             $task
                 ->setTitle($_POST['title'])
                 ->setLink($_POST['link'])
-                ->setRequiresConfirmation($_POST['requires_confirmation'])
+                ->setRequiresConfirmation(!$_POST['self_assess'])
             ;
             $category_id = $task->getCategory()->getId();
         }
@@ -58,7 +58,7 @@ else {
                 ->setTitle($_POST['title'])
                 ->setCategory($category)
                 ->setLink($_POST['link'])
-                ->setRequiresConfirmation($_POST['requires_confirmation'])
+                ->setRequiresConfirmation(!$_POST['self_assess'])
             ;
         }
         TaskMapper::getInstance()->save($task);
