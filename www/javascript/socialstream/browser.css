@@ -1,0 +1,9 @@
+/* Socialstream Browser
+ */
+ul.socialstream-breadcrumb li {
+    display: inline;
+}
+
+ul.socialstream-node li {
+    list-style: none;
+}

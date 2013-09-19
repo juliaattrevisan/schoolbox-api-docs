@@ -13,7 +13,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 
 	/* The image to load
 	 */
-	private $filename = null;
+	protected $filename = null;
 
 	/* The $key is a way to uniquely associate a cached image with a particular
 	 * series of transformations applied to it. In this caching implementation,
@@ -21,22 +21,22 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * e.g. 51-Web.dat
 	 */
-	private $key = null;
+	protected $key = null;
 
 	/* This is where cached images are stored
 	 */
-	private $cacheLocation = '../cache/image';
+	protected $cacheLocation = '../cache/image';
 
 	/* The filepath for processed image output
 	 * Defaults to /tmp if it couldn't figure out where the file goes
 	 */
-	private $cachedFileLocation = '/tmp';
+	protected $cachedFileLocation = '/tmp';
 
 	/* Remember whether we loaded from the cached file. If it was loaded from the
 	 * cache, we can skip transformations as we assume they have been done in the past.
 	 * Otherwise we would be re-transforming an already-transformed image repeatedly
 	 */
-	private $loadedFromCache = false;
+	protected $loadedFromCache = false;
 
 	/**
 	 * Constructor
@@ -120,7 +120,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @param $filename
 	 */
-	private function setFilename($filename) {
+	protected function setFilename($filename) {
 		$this->filename = $filename;
 	}
 
@@ -129,7 +129,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @return null
 	 */
-	private function getFilename() {
+	protected function getFilename() {
 		return $this->filename;
 	}
 
@@ -138,7 +138,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @param $originalsLocation
 	 */
-	private function setOriginalsLocation($originalsLocation) {
+	protected function setOriginalsLocation($originalsLocation) {
 		$this->originalsLocation = $originalsLocation;
 	}
 
@@ -147,7 +147,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @return string
 	 */
-	private function getOriginalsLocation() {
+	protected function getOriginalsLocation() {
 		return $this->originalsLocation;
 	}
 
@@ -165,7 +165,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @param $cachedFileLocation
 	 */
-	private function setCachedFileLocation($cachedFileLocation) {
+	protected function setCachedFileLocation($cachedFileLocation) {
 		$this->cachedFileLocation = $cachedFileLocation;
 	}
 
@@ -183,7 +183,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @param $key
 	 */
-	private function setKey($key) {
+	protected function setKey($key) {
 		$this->key = $key;
 	}
 
@@ -201,7 +201,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @param $cacheLocation
 	 */
-	private function setCacheLocation($cacheLocation) {
+	protected function setCacheLocation($cacheLocation) {
 		$this->cacheLocation = $cacheLocation;
 	}
 
@@ -210,7 +210,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @return string
 	 */
-	private function getCacheLocation() {
+	protected function getCacheLocation() {
 		return $this->cacheLocation;
 	}
 
@@ -220,7 +220,7 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 	 *
 	 * @param $loadedFromCache
 	 */
-	private function setLoadedFromCache($loadedFromCache) {
+	protected function setLoadedFromCache($loadedFromCache) {
 		if ($loadedFromCache === false) {
 			$this->loadedFromCache = $loadedFromCache;
 		}
@@ -229,5 +229,3 @@ class Alaress_Image_Cache_Filesystem implements Alaress_Image_Cache_Interface {
 		}
 	}
 }
-
-

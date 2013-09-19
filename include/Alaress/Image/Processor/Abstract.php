@@ -44,6 +44,13 @@ class Alaress_Image_Processor_Abstract {
 	 */
 
 	/**
+	 * Path to a cached transformation
+	 *
+	 * @var string
+	 */
+	protected $filepath = '';
+
+	/**
 	 * Set image id
 	 *
 	 * @param $imageId
@@ -206,5 +213,23 @@ class Alaress_Image_Processor_Abstract {
 	 */
 	protected function getTransformations() {
 		return $this->transformations;
+	}
+
+	/**
+	 * Set filepath
+	 *
+	 * @param string $filepath
+	 */
+	protected function setFilepath($filepath) {
+		$this->filepath = $filepath;
+	}
+
+	/**
+	 * Get filepath
+	 *
+	 * @return string
+	 */
+	protected function getFilepath() {
+		return $this->filepath;
 	}
 }

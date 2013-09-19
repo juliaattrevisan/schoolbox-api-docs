@@ -35,6 +35,19 @@ class FileType extends DeprecatedModel {
 	}
 
 	/**
+	 * Determine if $path has an valid image extension
+	 *
+	 * @return bool
+	 */
+	public function isImageExtension() {
+		if (in_array($this->getExtension(), array('jpg', 'jpeg', 'gif', 'png'))) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine if a file is audio
 	 *
 	 * @return bool
@@ -101,7 +114,7 @@ class FileType extends DeprecatedModel {
 	 * @param  $val
 	 * @return void
 	 */
-	private function setPath($val) {
+	public function setPath($val) {
 		$this->path = $val;
 	}
 
