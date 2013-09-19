@@ -16,22 +16,22 @@
             name:'green'
         }
 
-        $j('.allowed-files tr:first td:first').qtip({
+        $j('.allowed-files tr:first th:first').qtip({
             content:'Controls if files of this type can be uploaded'});
 
-        $j('.allowed-files tr:first td:nth-child(2)').qtip({
+        $j('.allowed-files tr:first th:nth-child(2)').qtip({
             content:'A simple name for the type of file'});
 
-        $j('.allowed-files tr:first td:nth-child(3)').qtip({
+        $j('.allowed-files tr:first th:nth-child(3)').qtip({
             content:'The mime type for a file can be found by searching google'});
 
-        $j('.allowed-files tr:first td:nth-child(4)').qtip({
+        $j('.allowed-files tr:first th:nth-child(4)').qtip({
             content:'The file extension, everything after the dot. Comma seperate multiple extensions'});
 
-        $j('.allowed-files tr:first td:nth-child(5)').qtip({
+        $j('.allowed-files tr:first th:nth-child(5)').qtip({
             content:'The maximum file size when uploading a file of this type - defaults to system-wide max file size'});
 
-        $j('.allowed-files tr:first td:nth-child(6)').qtip({
+        $j('.allowed-files tr:first th:nth-child(6)').qtip({
             content:'Determines if file will be opened in the browser or by a third party application'});
 
         $j('.modify').live('click', function () {
@@ -148,12 +148,12 @@
             </colgroup>
             <thead>
             <tr>
-                <td><h3>Enabled<span>?</span></h3></td>
-                <td><h3>Description<span>?</span></h3></td>
-                <td><h3>Mime<span>?</span></h3></td>
-                <td><h3>Extensions<span>?</span></h3></td>
-                <td><h3>Max Size<span>?</span></h3></td>
-                <td><h3>Inline<span>?</span></h3></td>
+                <th scope="col">Enabled<span>?</span></th>
+                <th scope="col">Description<span>?</span></th>
+                <th scope="col">Mime<span>?</span></th>
+                <th scope="col">Extensions<span>?</span></th>
+                <th scope="col">Max Size<span>?</span></th>
+                <th scope="col">Inline<span>?</span></th>
             </tr>
             <tr class="add-new">
                 <td><input type="checkbox" name="enable" checked="checked" value="true"/>
@@ -169,7 +169,7 @@
                     <option value="true">Inline</option>
                     <option value="false">External</option>
                 </select>
-                    <a href="#" class="btn add submit no-marg"><span></span>Add new file type</a></td>
+                    <a href="#" class="btn add submit-this no-marg"><span></span>Add new file type</a></td>
             </tr>
             </thead>
         </table>
@@ -238,7 +238,7 @@
                                 <option value="false"
                                 {FILE_EXTERN_CHECKED}>External</option>
                             </select>
-                            <a href="#" class="btn tick submit no-marg"><span></span>Save</a> <a rel="" href="#"
+                            <a href="#" class="btn tick submit-this no-marg"><span></span>Save</a> <a rel="" href="#"
                                                                                                  class="btn delete no-marg"><span></span>Delete</a>
                         </fieldset>
                     </fieldset>

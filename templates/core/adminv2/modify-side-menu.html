@@ -29,7 +29,7 @@
         $j(".jstree a").click(function () {
             $this = $j(this);
             var idToInput = $this.attr('ID');
-            $j(".jstree").removeClass('active');
+            $j(".jstree a").removeClass('active');
             $this.addClass('active');
             $j('#prent').val(idToInput);
             $j('.parent-selection').text($this.text());

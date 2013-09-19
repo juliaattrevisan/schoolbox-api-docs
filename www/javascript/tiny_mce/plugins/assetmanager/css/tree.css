@@ -18,7 +18,7 @@ ul#tree {
 	display: none;
 }
 #tree li.selected span.file {
-	background-color: #99CCFF;
+	background-color: #FFFFB2;
 }
 #tree span {
 	margin: 0;
