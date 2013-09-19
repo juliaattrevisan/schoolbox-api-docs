@@ -1,5 +1,12 @@
-<fieldset>
+<script type='text/javascript'>
+	$j(function() {
+		$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+			id: {QUESTION_ID}
+		});
+	});
+</script>
+<label>
     <!-- BEGIN answerOption -->
     <div class="textarea-container"><textarea name="answer">{ANSWER}</textarea></div>
     <!-- END answerOption -->
-</fieldset>
+</label>
