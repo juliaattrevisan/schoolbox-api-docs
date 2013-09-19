@@ -764,8 +764,15 @@ class Mapper {
 					$where_parts[] = "`$columnName` IS NULL";
 				}
 				else {
-					$where_parts[] = "`$columnName` = ?";
-					$params[]      = $columnValue;
+					// should be smart enough to work with arrays and IN statements
+					if (is_array($columnValue)) {
+						$where_parts[] = "`$columnName` IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+						$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
+					}
+					else {
+						$where_parts[]       = "`$columnName` = :$columnName";
+						$params[$columnName] = $columnValue;
+					}
 				}
 			}
 			$query .= implode(' AND ', $where_parts);
