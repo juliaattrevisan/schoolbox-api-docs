@@ -733,16 +733,38 @@ class Mapper {
 
 	/**
 	 * @brief Returns a collection with models which match the values pairs in the column list
-	 * @param Array $columnList
-	 * @param bool  $deleted    If set to false, filters out deleted items.
+	 * @param array $columnList a set of key-value pairs:
+	 *                          * key:   the name of the column to find
+	 *                          * value: the value (or array of values) to search for
+	 * @param array $options    * limit, offset: limit and offset for query
+	 *                          * deleted:       whether to retrieve deleted items
+	 *                                           (defaults to false)
+	 *                          * order:         a list of field orderings
+	 *                                           (format: 'fieldname ASC/DESC')
+	 *
 	 * @return Collection
 	 */
-	public function findByColumnList($columnList, $deleted = false) {
+	public function findByColumnList($columnList, $options = array()) {
+
+		// Compatibility with old deleted option: if a non-array was passed,
+		// assume that we're asking for whether the item was deleted.
+		if (!is_array($options)) {
+			$options = array('deleted' => $options,);
+		}
+		$defaults = array(
+			'limit'   => null,
+			'offset'  => null,
+			'deleted' => false,
+			'order'   => array(),
+		);
+		$options = array_merge($defaults, $options);
+
 		$query = "
 			SELECT {$this->getColumnString()}
 			FROM `{$this->table}`
 		";
 
+		// Build WHERE part
 		$where_parts = array();
 		$params      = array();
 		if (!empty($columnList)) {
@@ -752,7 +774,7 @@ class Mapper {
 					$where_parts[] = "`$columnName` IS NULL";
 				}
 				else {
-					// should be smart enough to work with arrays and IN statements
+					// This method is smart enough to work with arrays and IN statements
 					if (is_array($columnValue)) {
 						$where_parts[] = "`$columnName` IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
 						$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
@@ -765,8 +787,26 @@ class Mapper {
 			}
 			$query .= implode(' AND ', $where_parts);
 		}
-		if (!$deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+		if (!$options['deleted'] && ($delete_part = $this->getSoftDeleteFilterSql())) {
 			$query .= (empty($columnList) ? ' WHERE ' : ' AND ').$delete_part;
+		}
+
+		// Build ORDER part
+		if (!empty($options['order'])) {
+			$query .= ' ORDER BY '.(implode(', ', $options['order']));
+		}
+
+		// Build LIMIT and OFFSET part
+		if (isset($options['limit'])) {
+			$query .= ' LIMIT '.intval($options['limit']);
+			if (isset($options['offset'])) {
+				$query .= ' OFFSET '.intval($options['offset']);
+			}
+		}
+		elseif (isset($options['offset'])) {
+			// Offset but no limit? all we can do is use some massive number as
+			// the limit.
+			$query .= ' LIMIT '.PHP_INT_MAX.' OFFSET '.intval($options['offset']);
 		}
 
 		$statement = $this->database->prepare($query);
