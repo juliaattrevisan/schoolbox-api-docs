@@ -636,6 +636,8 @@ class Mapper {
 	/**
 	 * TODO: PDO Array support for using WHERE IN
 	 *
+	 * @deprecated findByColumn/findByColumnList now have array support
+	 *
 	 * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
 	 * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
 	 *
@@ -645,21 +647,7 @@ class Mapper {
 	 * @return Collection
 	 */
 	public function findIn($column, $permittedValues, $deleted = false) {
-		$query = "
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE `{$column}` IN {$this->getArrayPlaceholders($permittedValues, 'val')}
-		";
-		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
-			$query .= ' AND '.$delete_part;
-		}
-		$statement = $this->database->prepare($query);
-
-		$statement->execute($this->getArrayParameters($permittedValues, 'val'));
-
-		$rowset = $statement->fetchAll();
-
-		return $this->hydrateList($rowset);
+		return $this->findByColumn($column, $permittedValues, $deleted);
 	}
 
 	/**
