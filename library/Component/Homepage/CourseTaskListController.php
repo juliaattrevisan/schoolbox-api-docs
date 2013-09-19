@@ -56,6 +56,8 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setBlock($templateHandle, 'task', 'task_block');
         $this->setBlock($templateHandle, 'category_breadcrumb', 'category_breadcrumb_block');
         $this->setBlock('task', 'edit_task', 'edit_task_block');
+        $this->setBlock('task', 'task_link', 'task_link_block');
+        $this->setBlock('task', 'task_no_link', 'task_no_link_block');
         $this->setBlock('task', 'edit_task_form', 'edit_task_form_block');
 
         $this->setVar(array(
@@ -78,6 +80,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         foreach ($this->task_list as $task) {
             $this->setVar(
                 array(
+                    'task_link_block'    => '',
                     'TASK_ID'            => $task->getId(),
                     'TASK_TITLE'         => Scrub::text($task->getTitle()),
                     'TASK_TYPE'          => '',
@@ -88,13 +91,18 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
                     'DARK'               => ($i++%2 === 1 ? 'dark' : ''),
                 )
             );
-            $this->parse('edit_task_block', 'edit_task');
+            $this->parse('task_no_link_block', 'task_no_link');
+            $this->parse('edit_task_block',    'edit_task');
 
             $task_type = $task->getType();
             $this->setVar('edit_task_form_block', '');
             if ($task_type === Task::TYPE_TASK) {
                 $this->parse('edit_task_form_block', 'edit_task_form');
                 $this->setVar('TASK_TYPE', 'task');
+                if (strlen($task->getLink()) > 0) {
+                    $this->setVar('task_no_link_block', '');
+                    $this->parse('task_link_block',  'task_link');
+                }
             }
             elseif ($task_type === Task::TYPE_DUE_WORK) {
                 $this->setVar('TASK_TYPE', 'due_work');

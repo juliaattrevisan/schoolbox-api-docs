@@ -30,7 +30,14 @@
             <!-- BEGIN task -->
             <li class="task interact {DARK}" data-task_id="{TASK_ID}">
                 <span class="icon {TASK_CLASS}" title="{TASK_TYPE_LABEL}"><span></span></span>
-                <h3>{TASK_TITLE}</h3>
+
+                <!-- BEGIN task_link -->
+                    <h3><a href="{TASK_LINK}">{TASK_TITLE}</a></h3>
+                <!-- END task_link -->
+                <!-- BEGIN task_no_link -->
+                    <h3>{TASK_TITLE}</h3>
+                <!-- END task_no_link -->
+
                 <!-- BEGIN edit_task -->
                 <span class="interact modify_buttons">
                     <a href="/task/modify/{TASK_ID}" class="btn modify no-text" title="Modify this task"><span></span></a>
