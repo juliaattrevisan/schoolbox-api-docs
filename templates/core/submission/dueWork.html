@@ -112,6 +112,13 @@ $j(function () {
 	display: inline;
 	float: none;
 }
+
+<!-- BEGIN subject_colour -->
+.category-{CATEGORY_ID} {
+    background-color: #{CATEGORY_COLOUR};
+}
+<!-- END subject_colour -->
+
 </style>
 <!-- END custom_head -->
 
@@ -171,7 +178,7 @@ $j(function () {
                 <select name="subject" id="subjectFilter">
                     <option value="">Show All</option>
                     <!-- BEGIN subject -->
-                    <option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
+                    <option value="{SUBJECT_ID}" class="category-{SUBJECT_ID}">{SUBJECT_NAME}</option>
                     <!-- END subject -->
                 </select>
 				<!-- BEGIN is_parent -->

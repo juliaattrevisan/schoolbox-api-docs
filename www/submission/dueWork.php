@@ -9,6 +9,8 @@ $this->setFile(TEMPLATE_content, 'submission/dueWork.html');
 $this->setTab('submission');
 $this->setTitle('Due Work');
 
+$this->setBlock('custom_head', 'subject_colour', 'subject_colour_block');
+
 $this->setBlock(TEMPLATE_content, 'week', 'week_block');
 $this->setBlock('week', 'day', 'day_block');
 $this->setBlock('day', 'event', 'event_block');
@@ -154,6 +156,7 @@ if (!isset($categoryIDList)) {
     exit;
 }
 
+
 // output general data
 $output = array(
     'CURRENT_DATE' => date('F Y', $targetDate->getUnixTimestamp()),
@@ -238,6 +241,7 @@ for ($i = 0; $i < $totalDays; $i++) {
         /* record overview for summary box */
         $summary[$category_id] = array(
             'name' => $event->getCategoryName(),
+            'cid'   => $category_id,
             'total' => ++$summary[$category_id]['total'],
             'code' => $event->getCategoryCodes(),
         );
@@ -551,8 +555,17 @@ else {
 }
 
 // subject drop down
-$this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
+$this->dropDown('subject', $summary, '', TEMPLATE_content, array('cid' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
 
+// Output category colour styles
+$colourList = Timetable_ColourMapper::getInstance()->findAll();
+$colourIndex = 0;
+foreach($summary as $category) {
+    $this->setVar('CATEGORY_COLOUR', $colourList->offsetGet($colourIndex % count($colourList))->getHexColour());
+    $this->setVar('CATEGORY_ID', $category['cid']);
+    $this->parse('subject_colour_block', 'subject_colour',true);
+    $colourIndex++;
+}
 
 /**
  * Gets activities from new mapper classes.
