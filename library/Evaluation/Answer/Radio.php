@@ -10,6 +10,14 @@
  * @version     SVN: $Id$
  */
 abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
+
+	/**
+	 * Javascript class to use when creating UI
+	 *
+	 * @var string
+	 */
+	protected $plugin = 'evaluationRadio';
+
     protected $correctClass = 'multiCorrect';
     protected $incorrectClass = 'multiIncorrect';
 

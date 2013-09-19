@@ -10,11 +10,4 @@
  * @version     SVN: $Id$
  */
 abstract class Evaluation_Answer_TrueFalse extends Evaluation_Answer_Radio {
-
-	/**
-	 * Javascript class to use when creating UI
-	 *
-	 * @var string
-	 */
-	protected $plugin = 'evaluationFillGap';
 }
