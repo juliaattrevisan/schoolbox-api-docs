@@ -69,15 +69,10 @@ $j(document).ready(function() {
 			title: {
 				required: true,
 				minlength: 2
-			},
-			task_title: {
-				required: true,
-				minlength: 2
 			}
 		},
 		messages: {
 			title: "Please enter a title",
-			task_title: "Please enter a task title",
 			description: "Please enter a description"
 		}
 	});
@@ -99,19 +94,6 @@ $j(document).ready(function() {
 					</label>
 				</td>
 			</tr>
-
-			<!-- Creating as a task? Doesn't get a start or end time, but does get a task name. -->
-			<!-- BEGIN assess_task -->
-			<tr>
-				<td>
-					<h4>Task Title</h4>
-					<em>When this task is added to a class, it will show with this name.</em>
-					<label>
-						<input name="task_title" type="text" size="35" maxlength="100" value="{ASSESS_TASK_TITLE}" id="task_title"/>
-					</label>
-				</td>
-			</tr>
-			<!-- END assess_task -->
 
 			<!-- BEGIN assess_timespan -->
 			<tr>

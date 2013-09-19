@@ -75,7 +75,6 @@ if (!empty($_POST)) {
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content,   'assess/modify.html');
-    $this->setBlock(TEMPLATE_content,  'assess_task',     'assess_task_block');
     $this->setBlock(TEMPLATE_content,  'assess_timespan', 'assess_timespan_block');
     $this->setBlock('assess_timespan', 'startHour', 'startHour_block');
     $this->setBlock('assess_timespan', 'startHour', 'startHour_block');
@@ -89,7 +88,6 @@ if (!empty($_POST)) {
     $this->setTitle('Manage Assessment');
 
     $this->setVar('question_block', '');
-    $this->setVar('assess_task_block',     '');
     $this->setVar('assess_timespan_block', '');
 
     /** @var OnlineAssessment $assessment */
@@ -97,11 +95,6 @@ if (!empty($_POST)) {
     try {
         $assessment = OnlineAssessmentMapper::getInstance()->findById($this->arg[0]);
         $task_id    = $assessment->getTask()->getId();
-        $this->setVar('ASSESS_TASK_TITLE', '');
-        if ($task_id) {
-            $task = TaskMapper::getInstance()->findById($task_id);
-            $this->setVar('ASSESS_TASK_TITLE', Scrub::text($task->getTitle()));
-        }
     }
     catch (Exception $ex) {
         error(112);
@@ -189,10 +182,7 @@ if (!empty($_POST)) {
         'DURATION_MINUTE_VALUE' => $duration['minutes'],
     ));
 
-    if ($task_id) {
-        $this->parse('assess_task_block', 'assess_task');
-    }
-    else {
+    if (!$task_id) {
         $this->parse('assess_timespan_block', 'assess_timespan');
     }
 

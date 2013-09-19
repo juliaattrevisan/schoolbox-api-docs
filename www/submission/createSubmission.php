@@ -25,7 +25,6 @@ $this->setBlock('marktype', 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
 $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
-$this->setBlock(TEMPLATE_content, 'duework_task', 'duework_task_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
 
 $this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
@@ -180,14 +179,12 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
     // Messing around with blocks
     $this->setVar(array(
-        'duework_task_block' => '',
         'duework_timespan_block' => '',
     ));
     $task_title = '';
     if ($task_id) {
         $task       = TaskMapper::getInstance()->findById($task_id);
         $task_title = Scrub::text($task->getTitle());
-        $this->parse('duework_task_block', 'duework_task');
     }
     else {
         $this->parse('duework_timespan_block', 'duework_timespan');
@@ -286,16 +283,12 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $this->setVar(array(
         'existing_file_block' => '',
         'existing_marks_warning_block' => '',
-        'duework_task_block' => '',
         'duework_timespan_block' => '',
     ));
 
     // Is this a task?
     $is_task = ($this->arg[2] === 'task');
-    if ($is_task) {
-        $this->parse('duework_task_block', 'duework_task');
-    }
-    else {
+    if (!$is_task) {
         $this->parse('duework_timespan_block', 'duework_timespan');
     }
 

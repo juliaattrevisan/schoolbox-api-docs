@@ -91,7 +91,6 @@ if (!empty($_POST)) {
     /* Render create page
      */
     $this->setFile(TEMPLATE_content,   'assess/modify.html');
-    $this->setBlock(TEMPLATE_content,  'assess_task',     'assess_task_block');
     $this->setBlock(TEMPLATE_content,  'assess_timespan', 'assess_timespan_block');
     $this->setBlock('assess_timespan', 'startHour', 'startHour_block');
     $this->setBlock('assess_timespan', 'startHour', 'startHour_block');
@@ -104,7 +103,6 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
     $this->setTitle('Manage Assessment');
 
-    $this->setVar('assess_task_block',     '');
     $this->setVar('assess_timespan_block', '');
 
     $assessDate = new Alaress_Date_Format(time(), 'U');
@@ -118,7 +116,6 @@ if (!empty($_POST)) {
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE' => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
-        'ASSESS_TASK_TITLE' => '',
     ));
 
     /* Select default settings
@@ -212,10 +209,7 @@ if (!empty($_POST)) {
     }
 
     // Task or instance?
-    if ($is_task) {
-        $this->parse('assess_task_block', 'assess_task');
-    }
-    else {
+    if (!$is_task) {
         $this->parse('assess_timespan_block', 'assess_timespan');
     }
 
