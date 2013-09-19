@@ -297,7 +297,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
     public function findCountsForSubmissionBoxes($box_ids, $user_id) {
         // Retrieve count of submission IDs from a list of IDs for a user
         $query = "
-            SELECT sr.id, COUNT(*) as submission_count
+            SELECT sr.box_id, COUNT(*) as submission_count
             FROM {$this->getTable()} sr
             WHERE sr.owner = :user_id
             AND sr.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
@@ -311,7 +311,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 
         $return = array();
         foreach ($statement as $row) {
-            $return[$row['id']] = $row['submission_count'];
+            $return[$row['box_id']] = $row['submission_count'];
         }
         return $return;
     }
