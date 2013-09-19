@@ -76,7 +76,7 @@ class Subcontext_CourseBuilderContext extends BaseContext {
         $button->click();
         $this->getCoreContext()->waitForElementOnPage('form#createSubmissionForm');
         $form = $this->getSession()->getPage()->findById('createSubmissionForm');
-        $form->fillField('task_title', $name);
+        $form->fillField('title', $name);
     }
 
     /**
@@ -97,7 +97,7 @@ class Subcontext_CourseBuilderContext extends BaseContext {
         $button->click();
         $this->getCoreContext()->waitForElementOnPage('form#createAssess');
         $form = $this->getSession()->getPage()->findById('createAssess');
-        $form->fillField('task_title', $name);
+        $form->fillField('title', $name);
     }
 
     /**
