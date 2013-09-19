@@ -757,13 +757,9 @@ class Mapper {
 	 * @brief Returns a collection with models which match the values pairs in the column list
 	 * @param Array $columnList
 	 * @param bool  $deleted    If set to false, filters out deleted items.
-	 * @return Bool|Collection
+	 * @return Collection
 	 */
 	public function findByColumnList($columnList, $deleted = false) {
-		if (!is_array($columnList)) {
-			return false;
-		}
-
 		$query = "
 			SELECT {$this->getColumnString()}
 			FROM `{$this->table}`
