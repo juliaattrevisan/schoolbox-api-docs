@@ -215,7 +215,7 @@ abstract class Alaress_Cache_Abstract {
 	 */
 	protected function saveStreamContents() {
 		$context = Proxy\Server::getInstance()->getContext();
-		
+
 		/* For images that existed in Storage since fopen can't
 		 * open relative urls
 		 */
