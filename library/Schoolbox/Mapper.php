@@ -668,17 +668,7 @@ class Mapper {
 	 * @return Collection
 	 */
 	public function findAll($deleted = false) {
-		$query = "SELECT {$this->getColumnString()} FROM `{$this->table}`";
-		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
-			$query .= ' WHERE '.$delete_part;
-		}
-		$statement = $this->database->prepare($query);
-
-		$statement->execute();
-
-		$rowset = $statement->fetchAll();
-
-		return $this->hydrateList($rowset);
+		return $this->findByColumnList(array(), $deleted);
 	}
 
 	/**
