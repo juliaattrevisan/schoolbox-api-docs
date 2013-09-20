@@ -18,7 +18,10 @@ $j(function() {
         },
 
         cellValidation: function() {
-            $j('.mark-input, .comment').change(function(){
+            $j('.mark-input').blur(function(){
+                $j(this).closest('.inlineform').submit();
+            });
+            $j('.comment').change(function(){
                 $j(this).closest('.inlineform').submit();
             });
 
