@@ -741,10 +741,8 @@ class Mapper {
 		);
 		$options = array_merge($defaults, $options);
 
-		$query = "
-			SELECT {$this->getColumnString()}
-			FROM {$this->database->quoteIdentifier($this->table)}
-		";
+		$quoted_table = $this->database->quoteIdentifier($this->table);
+		$query        = "SELECT {$this->getColumnString()} FROM $quoted_table";
 
 		// Build WHERE part
 		$where_parts = array();
@@ -781,7 +779,7 @@ class Mapper {
 				$escaped_name = $this->database->quoteIdentifier($column);
 				$order_option = strtoupper($order_option);
 				if (in_array($order_option, array('ASC', 'DESC'))) {
-					$order_parts[] = "$escaped_name $order_option";
+					$order_parts[] = "$quoted_table.$escaped_name $order_option";
 				}
 			}
 		}
