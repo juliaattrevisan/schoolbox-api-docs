@@ -720,7 +720,10 @@ class Mapper {
 	 *                                           (defaults to false)
 	 *                          * order:         a set of key-value pairs:
 	 *                                           key: column name, value: ASC or DESC
-	 *
+	 * @throws Exception if for some reason the limit or offset parameters
+	 *                   cannot be created (this should never happen in practise
+	 *                   as columnList would have to contain a field named
+	 *                   'limit' or 'offset')
 	 * @return Collection
 	 */
 	public function findByColumnList($columnList, $options = array()) {
@@ -760,8 +763,8 @@ class Mapper {
 						$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
 					}
 					else {
-						$where_parts[]       = "$escaped_name = :$columnName";
-						$params[$columnName] = $columnValue;
+						$where_parts[]            = "$escaped_name = :{$columnName}_0";
+						$params[$columnName.'_0'] = $columnValue;
 					}
 				}
 			}
@@ -787,21 +790,38 @@ class Mapper {
 		}
 
 		// Build LIMIT and OFFSET part (should bind as parameters instead)
+		$limit  = null;
+		$offset = null;
 		if (isset($options['limit'])) {
-			$query .= ' LIMIT '.intval($options['limit']);
+			$query .= " LIMIT :limit";
+			$limit  = $options['limit'];
 			if (isset($options['offset'])) {
-				$query .= ' OFFSET '.intval($options['offset']);
+				$query .= " OFFSET :offset";
+				$offset = $options['offset'];
 			}
 		}
 		elseif (isset($options['offset'])) {
 			// Offset but no limit? all we can do is use some massive number as
 			// the limit.
-			$query .= ' LIMIT '.PHP_INT_MAX.' OFFSET '.intval($options['offset']);
+			$query .= " LIMIT :limit OFFSET :offset";
+			$limit  = PHP_INT_MAX;
+			$offset = $options['offset'];
 		}
 
 		$statement = $this->database->prepare($query);
+		foreach ($params as $name => $value) {
+			$statement->bindValue($name, $value);
+		}
 
-		$statement->execute($params);
+		// Bind limit and offset if they were set
+		if (isset($limit)) {
+			$statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+		}
+		if (isset($offset)) {
+			$statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+		}
+
+		$statement->execute();
 
 		$rowset = $statement->fetchAll();
 
