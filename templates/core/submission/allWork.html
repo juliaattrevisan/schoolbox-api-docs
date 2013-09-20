@@ -1,39 +1,122 @@
 <!-- BEGIN custom_head -->
+<style type="text/css">
+  #context {
+    clear: both;
+    height: 100px;
+  }
+  #context select {
+    padding: 5px;
+  }
+  #context option {
+    line-height: 20px;
+  }
+  #student {
+    width: 55%;
+    height: 72px;
+    position: absolute;
+    left: 0;
+  }
+  #enrolment {
+    width: 44%;
+    height: 72px;
+    position: absolute;
+    right: 0;
+  }
+  #semesters, #subjects {
+    height: 36px;
+    line-height: 36px;
+    text-align: right;
+  }
+  #semesters {
+
+  }
+  #semesters .sem-back, #semesters .sem-fwd {
+    border: solid 1px #ccc;
+    color: #555;
+    padding: 1px 8px 5px;
+    font-size: 1.6em;
+  }
+  #semesters .sem-back:hover, #semesters .sem-fwd:hover {
+    background: #eee;
+    text-decoration: none;
+  }
+  #semesters select {
+    width: 75%;
+  }
+  #subjects {
+
+  }
+  #subjects select {
+    width: 65%;
+    position: absolute;
+    right: 28px;
+  }
+  #subjects .elbow {
+    position: absolute;
+    right: 74%;
+    font-size: 1.5em;
+    color: #777;
+    line-height: 2em;
+  }
+  .button.bar.large {
+    height: 64px;
+  }
+  .button.bar.large:before {
+    line-height: 64px;
+  }
+  .button.bar.large img {
+    width: 64px;
+    height: 64px;
+  }
+  .button.bar.large .name {
+    font-size: 1.2em;
+    line-height: 2.5em;
+    margin-left: 70px;
+  }
+  .button.bar.large .group {
+    margin: 2px 0 0 70px;
+  }
+  .button.bar.large span {
+
+  }
+</style>
 <script type="text/javascript" src="/javascript/excanvas.compiled.js"></script>
 <script type="text/javascript" src="/javascript/flot/jquery.flot.js"></script>
 <!-- END custom_head -->
 <div id="all-work">
-  <div id="semester">
-    <div class="semester-controls">
-      <form class="fade" action="/submission/allWork/{WORK_USER_ID}" method="GET">
-        <span>
-            <label for="sem">Semester</label>
-            <select id="sem" name="semester">
-              <!-- BEGIN semester_option -->
-              <option{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
-              <!-- END semester_option -->
-            </select>
-            <label for="yr">,</label>
-            <select id="yr" name="year">
-              <!-- BEGIN year_option -->
-              <option{YEAR_SELECTED}>{YEAR_VALUE}</option>
-              <!-- END year_option -->
-            </select>
-        </span>
-        <input type="submit" class="btn" value="Update"/>
-      </form>
+  <h1>Report Card &ndash; {RC_TITLE}</h1>
+  <div id="context">
+    <div id="student">
+      <a class="bar large button" href="/search/user/{WORK_USER_ID}">
+        <img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64">
+        <span class="name">{WORK_USER_NAME}</span>
+        <span class="group">{WORK_USER_BYLINE} Student</span>
+      </a>
     </div>
-    <form action="/submission/allWork/" method="get" class="fade enrolled-subjects">
+    <div id="enrolment">
+      <form id="semesters">
+        <a class="sem-back" href="/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
+        <select name="semester">
+          <!-- BEGIN semester_option -->
+          <option{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
+          <!-- END semester_option -->
+        </select>
+        <a class="sem-fwd" href="/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
+      </form>
+      <form id="subjects" action="/submission/allWork/" method="get">
+        <span class="elbow">&#9492;</span>
         <select id="enrolled-subjects">
-          <option disabled="disabled" selected="selected">Subjects</option>
+          <option disabled="disabled" selected="selected">Select a subject</option>
           <!-- BEGIN subject_selector -->
           <option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}" value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}" {ENR_SUBJ_SELECTED}>
-            {ENR_SUBJ_NAME}
+          {ENR_SUBJ_NAME}
           </option>
           <!-- END subject_selector -->
         </select>
-    </form>
+      </form>
+    </div>
   </div>
+
 
   <div id="subject-main">
     <!-- BEGIN subject -->

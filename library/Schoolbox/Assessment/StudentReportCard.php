@@ -15,6 +15,8 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class StudentReportCard {
 
@@ -212,8 +214,13 @@ class StudentReportCard {
 		$page->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 
 		// global vars
+		/** @var $target User */
+		$target = UserMapper::getInstance()->findById($this->targetUserId);
 		$page->setVar(array(
-			'WORK_USER_ID' => $this->targetUserId
+			'WORK_USER_ID' => $target->getId(),
+			'WORK_USER_NAME' => $target->formatName(),
+			'WORK_USER_EXT_ID' => $target->getExternalId(),
+			'WORK_USER_BYLINE' => 'Year' . $target->getYear()
 		));
 
 		$this->renderSemesterSelectors($page);
@@ -237,17 +244,7 @@ class StudentReportCard {
 		$page->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
 		$page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
 
-		// Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
-		$semesters = array(1, 2);
-		foreach($semesters as $sem) {
-			$page->setVar(array(
-				'SEMESTER_SELECTED' => $sem == $this->targetSemester ? ' selected="selected"' : '',
-				'SEMESTER_VALUE'    => $sem
-			));
-			$page->parse('semester_option_block','semester_option', true);
-		}
-
-		// Years is trickier, because we first need to find out all the years in which the student in question has submitted work
+		// Years is tricksy, because we first need to find out all the years in which the student in question has submitted work
 		// also, merging in this current year is a tad unfortunate
 		$years = array_unique(
 			array_merge(
@@ -255,17 +252,28 @@ class StudentReportCard {
 				$this->submissionMapper->getAllYearsByUser($this->targetUserId)
 			)
 		);
+
 		foreach($years as $y) {
-			$page->setVar(array(
-				'YEAR_SELECTED' => $y == $this->targetYear ? ' selected="selected"' : '',
-				'YEAR_VALUE'    => $y
-			));
-			$page->parse('year_option_block', 'year_option', true);
+
+			// Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
+			$semesters = array(1, 2);
+			foreach($semesters as $sem) {
+
+				$selected = $y == $this->targetYear && $sem == $this->targetSemester;
+
+				$page->setVar(array(
+					'SEMESTER_SELECTED' => $selected ? ' selected="selected"' : '',
+					'SEMESTER_VALUE'    => "Semester $sem, $y"
+				));
+				$page->parse('semester_option_block','semester_option', true);
+			}
 		}
 
 		$page->setVar(array(
 			'WORK_YEAR' => $this->targetYear,
-			'WORK_SEMESTER' => $this->targetSemester
+			'WORK_SEMESTER' => $this->targetSemester,
+			'SEMESTER_BACK' => $this->targetYear-($this->targetSemester==1?1:0).'/'.($this->targetSemester+1)%2,
+			'SEMESTER_FWD'  => $this->targetYear+($this->targetSemester==2?1:0).'/'.($this->targetSemester+1)%2,
 		));
 
 	}
@@ -312,6 +320,7 @@ class StudentReportCard {
 
 		// subject globals
 		$page->setVar(array(
+			'RC_TITLE'      => $this->subjectData->getCategory()->getName(),
 			'SUBJ_ID'       => $this->subjectData->getCategory()->getId(),
 			'SUBJ_NAME'     => $this->subjectData->getCategory()->getName(),
 			'SUBJ_SEMESTER' => "Semester {$this->targetSemester}, {$this->targetYear}",
