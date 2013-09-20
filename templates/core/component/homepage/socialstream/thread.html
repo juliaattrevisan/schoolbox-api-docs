@@ -1,3 +1,4 @@
+
 <!-- BEGIN socialstream_post -->
 	<li class='socialstream-post {ON_OFF} clearfix'>
 		<!-- BEGIN socialstream_post_has_delete -->
@@ -13,39 +14,42 @@
 				<img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32" />
 				<span class="name">{SOCIALSTREAM_POST_USER_FULLNAME}</span>
 			</a>
+			<span class="subtitle">Posted on {SOCIALSTREAM_POST_CREATED_AT}
+				<!-- BEGIN socialstream_post_has_add -->
+				| <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}">Comment</a>
+				<!-- END socialstream_post_has_add -->
+			</span>
 		</p>
 		<div class="body">
 			{SOCIALSTREAM_POST_BODY}
 
-			<!-- BEGIN socialstream_post_has_icon -->
-			<a href='{SOCIALSTREAM_POST_URL}'>
-				<img src='/images/mime/60x60/{SOCIALSTREAM_POST_ICON}' style='outline:3px dashed #00f;'/>
-				{SOCIALSTREAM_POST_URL}
-			</a>
-			<!-- END socialstream_post_has_icon -->
 
-			<!-- BEGIN socialstream_post_has_thumbnail -->
-			<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
-				<img src='/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64' style='outline:3px dashed #f00;'/>
-			</a>
-			<!-- END socialstream_post_has_thumbnail -->
+			<!-- BEGIN socialstream_post_has_attachment -->
+			<div class="socialstream-attachment">
+				<!-- BEGIN socialstream_post_has_icon -->
+				<a href='{SOCIALSTREAM_POST_URL}'>
+					<img src="/images/mime/22x22/{SOCIALSTREAM_POST_ICON}" />
+					<!--{SOCIALSTREAM_POST_URL}-->
+				</a>
+				<!-- END socialstream_post_has_icon -->
 
-			<!-- BEGIN socialstream_post_has_player -->
-			<iframe width="560" height="315" src="{SOCIALSTREAM_POST_URL}" frameborder="0" allowfullscreen></iframe>
-			<!-- END socialstream_post_has_player -->
+				<!-- BEGIN socialstream_post_has_thumbnail -->
+				<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
+					<img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
+				</a>
+				<!-- END socialstream_post_has_thumbnail -->
 
-			<!-- BEGIN socialstream_post_has_metadata -->
-			<p>
-				<a href='{SOCIALSTREAM_POST_URL}'><strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong></a><br />
-				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
-			</p>
-			<!-- END socialstream_post_has_metadata -->
+				<!-- BEGIN socialstream_post_has_player -->
+				<iframe width="560" height="315" src="{SOCIALSTREAM_POST_URL}" frameborder="0" allowfullscreen></iframe>
+				<!-- END socialstream_post_has_player -->
 
-			<p class="meta">Posted on {SOCIALSTREAM_POST_CREATED_AT}
-				<!-- BEGIN socialstream_post_has_add -->
-				| <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}">Comment</a>
-				<!-- END socialstream_post_has_add -->
-			</p>
+				<!-- BEGIN socialstream_post_has_metadata -->
+					<a href="{SOCIALSTREAM_POST_URL}"><strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong></a><br />
+					<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
+				<!-- END socialstream_post_has_metadata -->
+			</div>
+			<!-- END socialstream_post_has_attachment -->
+
 		</div>
 		<div class='clearfix'></div>
 		<ul>
@@ -70,30 +74,34 @@
 
 						{SOCIALSTREAM_COMMENT_BODY}<br />
 					</p>
+					<!-- BEGIN socialstream_comment_has_attachment -->
+					<div class='socialstream-attachment'>
 
-					<!-- BEGIN socialstream_comment_has_icon -->
-					<a href='{SOCIALSTREAM_COMMENT_URL}'>
-						<img src='/images/mime/60x60/{SOCIALSTREAM_COMMENT_ICON}' style='outline:3px dashed #00f;'/>
-						{SOCIALSTREAM_COMMENT_URL}
-					</a>
-					<!-- END socialstream_comment_has_icon -->
+						<!-- BEGIN socialstream_comment_has_icon -->
+						<a href='{SOCIALSTREAM_COMMENT_URL}'>
+							<img src='/images/mime/60x60/{SOCIALSTREAM_COMMENT_ICON}' style='outline:3px dashed #00f;'/>
+							{SOCIALSTREAM_COMMENT_URL}
+						</a>
+						<!-- END socialstream_comment_has_icon -->
 
-					<!-- BEGIN socialstream_comment_has_thumbnail -->
-					<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
-						<img src='/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64' style='outline:3px dashed #f00;'/>
-					</a>
-					<!-- END socialstream_comment_has_thumbnail -->
+						<!-- BEGIN socialstream_comment_has_thumbnail -->
+						<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
+							<img src='/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64' style='outline:3px dashed #f00;'/>
+						</a>
+						<!-- END socialstream_comment_has_thumbnail -->
 
-					<!-- BEGIN socialstream_comment_has_player -->
-					<iframe width="560" height="315" src="{SOCIALSTREAM_COMMENT_URL}" frameborder="0" allowfullscreen></iframe>
-					<!-- END socialstream_comment_has_player -->
+						<!-- BEGIN socialstream_comment_has_player -->
+						<iframe width="560" height="315" src="{SOCIALSTREAM_COMMENT_URL}" frameborder="0" allowfullscreen></iframe>
+						<!-- END socialstream_comment_has_player -->
 
-					<!-- BEGIN socialstream_comment_has_metadata -->
-					<p>
-						<a href='{SOCIALSTREAM_COMMENT_URL}'><strong>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</strong></a><br />
-						<em>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</em>
-					</p>
-					<!-- END socialstream_comment_has_metadata -->
+						<!-- BEGIN socialstream_comment_has_metadata -->
+						<p>
+							<a href='{SOCIALSTREAM_COMMENT_URL}'><strong>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</strong></a><br />
+							<em>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</em>
+						</p>
+						<!-- END socialstream_comment_has_metadata -->
+					</div>
+					<!-- END socialstream_comment_has_attachment -->
 				</div>
 				<div class='clearfix'></div>
 				<ul>
@@ -108,35 +116,39 @@
 						</div>
 
 						<div class='body'>
-							<p>
-								<a href='/search/user/{SOCIALSTREAM_REPLY_USER_ID}'>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
-								<span>Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span><br />
-								{SOCIALSTREAM_REPLY_BODY}<br />
-							</p>
+							<!-- BEGIN socialstream_reply_has_attachment -->
+							<div class='socialstream-attachment'>
+								<p>
+									<a href='/search/user/{SOCIALSTREAM_REPLY_USER_ID}'>{SOCIALSTREAM_REPLY_USER_FULLNAME}</a><br />
+									<span>Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span><br />
+									{SOCIALSTREAM_REPLY_BODY}<br />
+								</p>
 
-							<!-- BEGIN socialstream_reply_has_icon -->
-							<a href='{SOCIALSTREAM_REPLY_URL}'>
-								<img src='/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}' style='outline:3px dashed #00f;'/>
-								{SOCIALSTREAM_REPLY_URL}
-							</a>
-							<!-- END socialstream_reply_has_icon -->
+								<!-- BEGIN socialstream_reply_has_icon -->
+								<a href='{SOCIALSTREAM_REPLY_URL}'>
+									<img src='/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}' style='outline:3px dashed #00f;'/>
+									{SOCIALSTREAM_REPLY_URL}
+								</a>
+								<!-- END socialstream_reply_has_icon -->
 
-							<!-- BEGIN socialstream_reply_has_thumbnail -->
-							<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
-								<img src='/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64' style='outline:3px dashed #f00;'/>
-							</a>
-							<!-- END socialstream_reply_has_thumbnail -->
+								<!-- BEGIN socialstream_reply_has_thumbnail -->
+								<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
+									<img src='/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64' style='outline:3px dashed #f00;'/>
+								</a>
+								<!-- END socialstream_reply_has_thumbnail -->
 
-							<!-- BEGIN socialstream_reply_has_player -->
-							<iframe width="560" height="315" src="{SOCIALSTREAM_REPLY_URL}" frameborder="0" allowfullscreen></iframe>
-							<!-- END socialstream_reply_has_player -->
+								<!-- BEGIN socialstream_reply_has_player -->
+								<iframe width="560" height="315" src="{SOCIALSTREAM_REPLY_URL}" frameborder="0" allowfullscreen></iframe>
+								<!-- END socialstream_reply_has_player -->
 
-							<!-- BEGIN socialstream_reply_has_metadata -->
-							<p>
-								<a href='{SOCIALSTREAM_REPLY_URL}'><strong>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</strong></a><br />
-								<em>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</em>
-							</p>
-							<!-- END socialstream_reply_has_metadata -->
+								<!-- BEGIN socialstream_reply_has_metadata -->
+								<p>
+									<a href='{SOCIALSTREAM_REPLY_URL}'><strong>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</strong></a><br />
+									<em>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</em>
+								</p>
+								<!-- END socialstream_reply_has_metadata -->
+							</div>
+							<!-- END socialstream_reply_has_attachment -->
 						</div>
 						<div class='clearfix'></div>
 					</li>
