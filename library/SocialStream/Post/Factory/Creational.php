@@ -127,7 +127,8 @@ class Creational extends AbstractFactory {
 				$curl = new \Alaress_Curl_Url($this->getProduct()->getUrl());
 
 				$curl->addOptions(array(
-					CURLOPT_FOLLOWLOCATION => true
+					CURLOPT_FOLLOWLOCATION => true,
+					CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36',
 				));
 
 				$curl->exec();
