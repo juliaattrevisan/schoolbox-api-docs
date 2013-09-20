@@ -11,6 +11,7 @@
  */
  
 namespace Schoolbox\Resource;
+use Schoolbox;
 use Schoolbox\Mapper;
 use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
@@ -55,11 +56,6 @@ class FileMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'realname',
 			'property'   => 'filename',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'mime_type',
-			'property'   => 'mimeType',
 			'type'       => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
@@ -117,7 +113,62 @@ class FileMapper extends Mapper {
              'this_key'  => 'owner',
              'other_key' => 'id',
 		));
+
+        // Relation to Allowed Files
+
+        $hydrator = new Schoolbox\Column\Model();
+        $hydrator->setIdentifierProperty('mime');
+        $this->hasMap(array(
+                'column'     => 'mime_type',
+                'property'   => 'mimeType',
+                'hydrator'   => $hydrator,
+                'join'       => 'allowedFileType',
+            ));
+
+        $this->hasJoin('allowedFileType', array(
+                'mapper'    => '\\Schoolbox\\File\\MimetypeMapper',
+                'this_key'  => 'mime_type',
+                'other_key' => 'mime',
+            ));
+
 	}
+
+    /**
+     * Retreives a schoolbox file system file with a mime type object
+     *
+     * @throws Exception if no instance of model is found
+     * @param  int  $identifierValue
+     * @return \Schoolbox\Resource\File
+     */
+    public function findById($id) {
+
+        $file = false;
+
+        $mimeTypeMapper = $this->getJoinMapper('allowedFileType');
+
+        $query = "
+			SELECT {$this->getColumnString('file')},
+			      {$mimeTypeMapper->getColumnString('m')}
+			FROM `{$this->table}`
+			LEFT JOIN {$this->getJoinSql('allowedFileType', 'file', 'm')}
+			WHERE file.id = ?
+		";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array($id));
+
+        if (($row = $statement->fetch()) !== false) {
+            $file = $this->hydrate($row, 'file');
+            $file->setMimeType($mimeTypeMapper->hydrate($row, 'm'));
+        }
+
+        if (!($file instanceof File)) {
+            throw new Schoolbox\Mapper\Exception('Instance of object not found');
+        }
+
+        return $file;
+
+    }
 
 	/**
 	 * Copies this file to the storage engine, or returns the existing copy if
@@ -152,4 +203,7 @@ class FileMapper extends Mapper {
 		}
 		return $existing;
 	}
+
+
+
 }

@@ -237,4 +237,43 @@ class Mimetype {
     public function isEnabled() {
         return $this->getEnable() ===  'true';
     }
+
+    /**
+     * Determine if a file is audio
+     *
+     * @return bool
+     */
+    public function isAudio() {
+        if (preg_match('#^audio/#', $this->getMime())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if a file is video
+     *
+     * @return bool
+     */
+    public function isVideo() {
+        if (preg_match('#^video/#', $this->getMime())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if a file is an image
+     *
+     * @return bool
+     */
+    public function isImage() {
+        if (preg_match('#^image/#', $this->getMime())) {
+            return true;
+        }
+
+        return false;
+    }
 }

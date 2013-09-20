@@ -83,7 +83,7 @@ class Creational extends AbstractFactory {
 			 */
 			else if ($this->getUrlDetection()->isStorageUrl()) {
 				$fileMapper = new \Schoolbox\FileMapper();
-				$file = $fileMapper->findOneByColumn('hash', $this->getUrlDetection()->getHash());
+				$file = $fileMapper->findByHash($this->getUrlDetection()->getHash());
 
 				$uploadedFile = $this->constructFromUpload($file);
 				$this->populate($data);
@@ -187,7 +187,7 @@ class Creational extends AbstractFactory {
 
 		/* Figure out if it's a video
 		 */
-		if ($resource->isVideo()) {
+		if ($resource->getMimeType()->isVideo()) {
 			$object = new \SocialStream_Post_Video();
 			$object->setType('video');
 		}
@@ -219,7 +219,7 @@ class Creational extends AbstractFactory {
 		$fileMapper = new \Schoolbox\Resource\FileMapper();
 		$file = $fileMapper->findById($fileId);
 
-		if ($file->isVideo()) {
+		if ($file->getMimeType()->isVideo()) {
 			$object = new \SocialStream_Post_Video();
 			$object->setType('video');
 		}
@@ -328,14 +328,14 @@ class Creational extends AbstractFactory {
 
 		/* Set up video thumbnails
 		 */
-		if ($uploadedFile->isVideo()) {
+		if ($uploadedFile->getMimeType()->isVideo()) {
 			$url = "/cms/sendVideo.php?type=storage&hash={$uploadedFile->getHash()}";
 
 			$this->getProduct()->setUrl($url);
 		}
 		/* Set up image thumbnails
 		 */
-		else if ($uploadedFile->isImage()) {
+		else if ($uploadedFile->getMimeType()->isImage()) {
 			$url = "/storage/image.php?size=maxsize&hash={$uploadedFile->getHash()}";
 
 			$this->getProduct()->setThumbnail($url);
@@ -384,11 +384,11 @@ class Creational extends AbstractFactory {
 
 		/* Set up video thumbnails
 		 */
-		if ($file->isVideo()) {
+		if ($file->getMimeType()->isVideo()) {
 		}
 		/* Set up image thumbnails
 		 */
-		else if ($file->isImage()) {
+		else if ($file->getMimeType()->isImage()) {
 			$url = "/send.php?id={$file->getId()}";
 
 			$this->getProduct()->setThumbnail($url);

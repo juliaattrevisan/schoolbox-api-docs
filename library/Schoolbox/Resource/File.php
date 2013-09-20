@@ -14,6 +14,7 @@ use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
+use Schoolbox\File\Mimetype;
 
 class File implements ISoftDeletable {
 	/**
@@ -81,18 +82,11 @@ class File implements ISoftDeletable {
 	 */
 	protected $deleted;
 
-	/**
-	 * @var MimetypeMapper
-	 */
-	protected $mimetype_loader;
 
 	/**
 	 * Creates object and sets up sub-objects.
 	 */
 	public function __construct() {
-		//
-		// Don't really want to load a mapper here, but meh.
-		$this->mimetype_loader = new \Schoolbox\File\MimetypeMapper();
 		$this->config_loader = new ConfigLoader();
 	}
 
@@ -142,18 +136,23 @@ class File implements ISoftDeletable {
 	}
 
 	/**
-	 * @param string $mimeType
+	 * @param \Schoolbox\File\Mimetype $mimeType
 	 */
 	public function setMimeType($mimeType) {
 		$this->mimeType = $mimeType;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getMimeType() {
-		return $this->mimeType;
-	}
+    /**
+     * Return a mime type object, if none is found a blank object is returned
+     * @return \Schoolbox\File\Mimetype
+     */
+    public function getMimetype() {
+        if($this->mimeType instanceof Mimetype)
+            return $this->mimeType;
+        else
+            return new Mimetype();
+    }
+
 	/**
 	 * @param  \Alaress_Date_Format $modified
 	 * @return $this
@@ -289,54 +288,5 @@ class File implements ISoftDeletable {
 
 	public function isDeleted() {
 		return $this->getDeleted();
-	}
-
-	/* TODO: This is duped in Schoolbox\File, which is Storage -_-
-	 * But these aliased methods are just far too useful and convenient
-	 */
-
-	/**
-	 * Determine if a file is audio
-	 *
-	 * @return bool
-	 */
-	public function isAudio() {
-		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
-
-		if (preg_match('#^audio/#', $mimetype)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Determine if a file is video
-	 *
-	 * @return bool
-	 */
-	public function isVideo() {
-		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
-
-		if (preg_match('#^video/#', $mimetype)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Determine if a file is an image
-	 *
-	 * @return bool
-	 */
-	public function isImage() {
-		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
-
-		if (preg_match('#^image/#', $mimetype)) {
-			return true;
-		}
-
-		return false;
 	}
 }
