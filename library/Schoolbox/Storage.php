@@ -9,9 +9,10 @@
 
 namespace Schoolbox;
 use Schoolbox\ConfigLoader;
+use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-class File {
+class Storage {
 
 	/**
 	 * @var int
@@ -61,9 +62,9 @@ class File {
 	protected $temp_location;
 
 	/**
-	 * @var MimetypeMapper
+	 * @var Mimetype
 	 */
-	protected $mimetype_loader;
+	protected $mimetype;
 
 	/**
 	 * @var IConfigLoader
@@ -74,9 +75,6 @@ class File {
 	 * Creates object and sets up sub-objects.
 	 */
 	public function __construct() {
-		//
-		// Don't really want to load a mapper here, but meh.
-		$this->mimetype_loader = new MimetypeMapper();
 		$this->config_loader   = new ConfigLoader();
 	}
 
@@ -251,23 +249,6 @@ class File {
 	}
 
 	/**
-	 * Loads the mime type for this file, based on the filename.
-	 *
-	 * @return bool
-	 */
-	public function loadMimetypeFromFilename() {
-		$filename = $this->getFilename();
-		if (!isset($filename)) {
-			return false;
-		}
-		if ($mimetype = $this->mimetype_loader->getMimetypeForFilename($filename)) {
-			$this->setMime($mimetype);
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * Loads the file size for this file, based on the temp location.
 	 *
 	 * @return bool
@@ -294,14 +275,6 @@ class File {
 		return false;
 	}
 
-	/**
-	 * Gets the icon for this file from its filename.
-	 *
-	 * @return string
-	 */
-	public function getIconFromFilename() {
-		return $this->mimetype_loader->getIconForFilename($this->getFilename());
-	}
 
 	/**
 	 * Deletes file from permanent upload location.
@@ -331,21 +304,25 @@ class File {
 		return $this->config_loader;
 	}
 
-	/**
-	 * @param  \Schoolbox\File\MimetypeMapper $mimetype_loader
-	 * @return $this
-	 */
-	public function setMimetypeLoader($mimetype_loader) {
-		$this->mimetype_loader = $mimetype_loader;
-		return $this;
-	}
+    /**
+     * @param \Schoolbox\File\Mimetype $mimetype
+     * @return $this;
+     */
+    public function setMimetype(Mimetype $mimetype) {
+        $this->mime = $mimetype;
+        return $this;
+    }
 
 	/**
-	 * @return \Schoolbox\File\MimetypeMapper
+     * Return a mime type object, if none is found a blank object is returned
+	 * @return \Schoolbox\File\Mimetype
 	 */
-	public function getMimetypeLoader() {
-		return $this->mimetype_loader;
-	}
+	public function getMimetype() {
+        if($this->mime instanceof Mimetype)
+		    return $this->mime;
+        else
+            return new Mimetype();
+    }
 
 	/**
 	 * Is this file's name an allowed file name?
@@ -353,51 +330,7 @@ class File {
 	 * @return bool
 	 */
 	public function isUploadAllowed() {
-		return $this->mimetype_loader->isFilenameMimetypeAllowed($this->getFilename());
+        return $this->getMimetype()->isEnabled();
 	}
 
-	/**
-	 * Determine if a file is audio
-	 *
-	 * @return bool
-	 */
-	public function isAudio() {
-		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
-
-		if (preg_match('#^audio/#', $mimetype)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Determine if a file is video
-	 *
-	 * @return bool
-	 */
-	public function isVideo() {
-		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
-
-		if (preg_match('#^video/#', $mimetype)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Determine if a file is an image
-	 *
-	 * @return bool
-	 */
-	public function isImage() {
-		$mimetype = $this->mimetype_loader->getByFilename($this->getFilename())->getMime();
-
-		if (preg_match('#^image/#', $mimetype)) {
-			return true;
-		}
-
-		return false;
-	}
 }

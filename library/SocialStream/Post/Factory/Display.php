@@ -46,7 +46,7 @@ class Display extends AbstractFactory {
 						$fileMapper = new \Schoolbox\Resource\FileMapper();
 						$file = $fileMapper->findById($urlDetection->getId());
 
-						if ($file->isVideo()) {
+						if ($file->getMimeType()->isVideo()) {
 							$object = new \SocialStream_Post_Video();
 							$object->setType('video');
 

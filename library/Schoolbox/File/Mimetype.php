@@ -9,6 +9,7 @@
  */
 
 namespace Schoolbox\File;
+use Config;
 
 /**
  * Class Mimetype
@@ -58,7 +59,14 @@ class Mimetype {
 	 */
 	private $enable;
 
-	/**
+    /**
+     * Max file size allowed for mime
+     *
+     * @var int
+     */
+    private $maxFileSize;
+
+    /**
 	 * Get icon class by deriving it from the iconFile
 	 *
 	 * This previously abused the \Url class, but now it's all self-contained here and independent.
@@ -199,5 +207,73 @@ class Mimetype {
 	 */
 	public function getMime() {
 		return $this->mime;
-	}
+    }
+
+
+    /**
+     * Set max file size for mime type
+     *
+     * @param $maxFileSize
+     * @return $this
+     */
+    public function setMaxFileSize($maxFileSize) {
+        $this->maxFileSize = $maxFileSize;
+        return $this;
+    }
+
+    /**
+     * Get the max file size allowed for this particular mime type
+     *
+     * @return mixed
+     */
+    public function getMaxFileSize()  {
+        return ($this->maxFileSize > 0) ? $this->maxFileSize : Config::get('max_file_size');
+    }
+
+    /**
+     * Is mime type allowed
+     * @return bool
+     */
+    public function isEnabled() {
+        return $this->getEnable() ===  'true';
+    }
+
+    /**
+     * Determine if a file is audio
+     *
+     * @return bool
+     */
+    public function isAudio() {
+        if (preg_match('#^audio/#', $this->getMime())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if a file is video
+     *
+     * @return bool
+     */
+    public function isVideo() {
+        if (preg_match('#^video/#', $this->getMime())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if a file is an image
+     *
+     * @return bool
+     */
+    public function isImage() {
+        if (preg_match('#^image/#', $this->getMime())) {
+            return true;
+        }
+
+        return false;
+    }
 }

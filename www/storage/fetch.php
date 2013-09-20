@@ -15,7 +15,7 @@ try {
         $page = new SitePage;
 
         /* @var $resource Schoolbox\File */
-        $resource = Schoolbox\FileMapper::getInstance()->findOneByColumn('hash', $_GET['hash']);
+        $resource = Schoolbox\StorageMapper::getInstance()->findByHash($_GET['hash']);
 
         if ($_GET['save']) {
             $attach = "attachment;";
@@ -24,8 +24,8 @@ try {
         }
 
         //send headers
-        if ($resource->getMime()) {
-            header("Content-Type: {$resource->getMime()}");
+        if ($resource->getMimetype()->getMime()) {
+            header("Content-Type: {$resource->getMimetype()->getMime()}");
         } else {
             header("Content-Type: application/octet-stream");
         }

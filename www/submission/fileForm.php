@@ -19,8 +19,7 @@ session_start();
 // Submission doesn't exist yet?
 // Save the files in storage, and when the submission is saved save them as part
 // of what was uploaded.
-use Schoolbox\File;
-use Schoolbox\FileMapper;
+use Schoolbox\StorageMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\FileMapper as SubmissionFileMapper;
 
@@ -54,8 +53,7 @@ if (isset($_FILES['file'])) {
 		// Does a file with this hash exist already? If so use it, otherwise create a
 		// new one.
 		$file_id     = null;
-		$file_mapper = new FileMapper();
-		$existing    = $file_mapper->findByColumn('hash', $file->getHash());
+		$existing    = \Schoolbox\StorageMapper::getInstance()->findByHash($file->getHash());
 		if ($existing->count()) {
 			$file_id = $existing->first()->getId();
 		}
