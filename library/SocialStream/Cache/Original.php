@@ -87,7 +87,7 @@ class Original extends \Alaress_Cache_Abstract {
 	 * @return bool
 	 */
 	private function processUrl($url) {
-		$streamHandle = fopen($url, 'r');
+		$streamHandle = @fopen($url, 'r');
 		$cacheHandle = @fopen($this->getCachedFile(), 'w');
 
 		/* Could not open stream source for reading

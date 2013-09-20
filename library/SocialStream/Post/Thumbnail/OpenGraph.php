@@ -18,7 +18,7 @@ class OpenGraph extends Thumbnail {
 	 *
 	 * @var string
 	 */
-	protected $query = "/html/head/meta[@property='og:image']";
+	protected $query = "//meta[@property='og:image']";
 
 	/**
 	 * These are the attributes that might contain a link
