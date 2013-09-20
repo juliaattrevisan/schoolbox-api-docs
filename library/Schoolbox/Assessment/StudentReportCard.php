@@ -272,8 +272,8 @@ class StudentReportCard {
 		$page->setVar(array(
 			'WORK_YEAR' => $this->targetYear,
 			'WORK_SEMESTER' => $this->targetSemester,
-			'SEMESTER_BACK' => $this->targetYear-($this->targetSemester==1?1:0).'/'.($this->targetSemester+1)%2,
-			'SEMESTER_FWD'  => $this->targetYear+($this->targetSemester==2?1:0).'/'.($this->targetSemester+1)%2,
+			'SEMESTER_BACK' => $this->targetYear-($this->targetSemester==1?1:0).'/'.($this->targetSemester==1?2:1),
+			'SEMESTER_FWD'  => $this->targetYear+($this->targetSemester==2?1:0).'/'.($this->targetSemester==1?2:1),
 		));
 
 	}
@@ -762,8 +762,180 @@ class StudentReportCard {
 	 * @param \SitePage $page
 	 */
 	protected function renderOverview(\SitePage $page) {
-		// for now, this is just "please select a subject"
-		$page->setVar('subject_block', 'Please select a subject to view.');
+		$page->setVar('RC_TITLE', "Semester {$this->targetSemester}, {$this->targetYear}");
+
+		// we need to inject content into subject_block rather than use its template
+
+		$page->setFile('subjectListTpl', 'submission/allWorkOverview.html');
+		$page->setFile('subjectTpl', 'activity/subjectlist.html');
+		$page->setBlock('subjectTpl', 'teacher', 'teacher_block');
+		$page->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
+
+		/**
+		 * @var $returnMapper SubmissionBox\ReturnedWorkMapper
+		 * @var $attemptMapper OnlineAssessment\AttemptMapper
+		 */
+		$returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
+		$attemptMapper = OnlineAssessment\AttemptMapper::getInstance();
+		$returnHandler = new \SubmissionReturn();
+		$groupHandler = new \Group();
+		$synClass = new \External_Class;
+		$userHandler = new \User();
+		$j = 0;
+
+		$visibilities = array(
+			SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+		);
+		if ($groupHandler->isStudent()) {
+			$visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
+		}
+		elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+			$visibilities[] = SubmissionBox::MARK_VISIBILITY_PRIVATE;
+			$visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
+		}
+
+		foreach($this->categoriesInSemester as $category) {
+
+			$categoryID = $category['id'];
+			$categoryCode = $category['code'] ? '(' . $category['code'] . ')' : '';
+
+			/* yes it actually requires THIS MUCH code to get a teachers name. */
+			if (\Cfg::get('external_enable')) {
+				$teacherOutput = array();
+				$teacherList = array();
+				$codeList = explode(',', $category['code']);
+
+				if (is_array($codeList)) {
+					foreach ($codeList as $code) {
+						if (is_array($temp = $synClass->getTeacherName($code))) {
+							$teacherList = array_merge($teacherList, $temp);
+						}
+					}
+				}
+
+				if (is_array($teacherList)) {
+					foreach ($teacherList as $teacherSynID) {
+						$teacher = $userHandler->getBySynergy($teacherSynID);
+						if (is_array($teacher)) {
+							$teacherName = $userHandler->formatName($teacher);
+
+							$emailObj = new \Email();
+							$emailAddress = $emailObj->formatEmailFromArray($teacher);
+
+							$teacherOutput[] = array(
+								'id' => $teacher['uid'],
+								'name' => $teacherName,
+								'email' => $_SESSION['mailhandle'] . $emailAddress,
+								'synid' => $teacherSynID,
+							);
+						}
+					}
+				}
+			}
+
+
+			// Ensure that grades are properly ordered by date.
+			if (!(\Cfg::get('restrict_student_submissions') && $groupHandler->isParent())) {
+				$studentGrades = array_merge(
+					$returnMapper->getStudentMarks($categoryID, $this->targetUserId, array('visibility' => $visibilities)),
+					$attemptMapper->getStudentMarks($categoryID, $this->targetUserId)
+				);
+				usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
+				$studentGrades = array_map(function($row) { return $row['mark']; }, $studentGrades);
+			}
+			else {
+				$studentGrades = array();
+			}
+
+			$gradeAvg    = -1;
+			$grade_count = count($studentGrades);
+			$show_grades = \Cfg::get('show_overall_grade');
+			$trendDir = '';
+			$trendAmt = '';
+
+			if ($show_grades) {
+				$card = new SubjectReportCard(
+					$category['id'],
+					$this->targetUserId,
+					$this->targetYear,
+					$this->targetSemester,
+					$visibilities
+				);
+				$grade = $card->getGradeAverage();
+				if (isset($grade['grade'])) {
+					$gradeAvg = $grade['grade'];
+					$trendAmt = $grade['trend'];
+					if ($trendAmt > 0) {
+						$trendDir = '&#x25B2;';
+					}
+					elseif ($trendAmt < 0) {
+						$trendDir = '&#x25BC;';
+					}
+					if ($trendAmt != 0) {
+						$trendAmt = sprintf('%0.1f', $trendAmt) . '%';
+					}
+				}
+			}
+
+
+			// calculate grade averages and trending
+			$output = array(
+				'SUBJ_CAT_ID' => $categoryID,
+				'SUBJ_SUBJECT_NAME' => \Scrub::Text($category['name']),
+				'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
+				'SUBJ_SUBJECT_CODE' => $categoryCode,
+				'SUBJ_SUBJECT_URL' => "/submission/allWork/{$this->targetUserId}/{$this->targetYear}/{$this->targetSemester}/$categoryID",
+//				'SUBJ_TOTAL' => $summary[$category['id']]['total'],
+				'SUBJ_TREND_DIR' => $trendDir,
+				'SUBJ_TREND_AMT' => $trendAmt,
+				'SUBJ_HAS_GRADE' => $show_grades ? 'grade' : '',
+				'DARK' => ++$j % 2 ? '' : 'dark'
+			);
+				$page->setVar($output);
+
+			if ($gradeAvg == -1) {
+				$page->setVar('subject_grade_block', '');
+			}
+			else {
+				$page->setVar(array(
+					'SUBJ_GRADE' => $returnHandler->percent2letter($gradeAvg),
+					'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
+				));
+				$page->parse('subject_grade_block', 'subject_grade');
+			}
+
+			if (\Cfg::get('external_enable')) {
+				$page->setVar('teacher_block', '');
+				if (isset($teacherOutput) && count($teacherOutput)) {
+					foreach ($teacherOutput as $teacher) {
+						$tOutput = array(
+							'SUBJ_TEACHER_ID' => $teacher['id'],
+							'SUBJ_TEACHER_NAME' => $teacher['name'],
+							'SUBJ_TEACHER_URL' => $teacher['email'],
+							'SUBJ_TEACHER_ROLE' => 'Teacher',
+							'SUBJ_TEACHER_AVATAR' => "/portrait?userId={$teacher['synid']}&size=square32",
+							'SUBJ_TEACHER_AVATAR_TITLE' => $teacher['name']
+						);
+						$page->setVar($tOutput);
+						$page->parse('teacher_block', 'teacher', true);
+					}
+				}
+			}
+			else {
+				$page->setVar('teacher_block', '');
+			}
+			// $this->parse('icon_block', 'icon');
+			$page->parse('SUBJECT_LIST', 'subjectTpl', true);
+
+		}
+
+		if(count($this->categoriesInSemester)) {
+			$page->parse('subject_block', 'subjectListTpl');
+		}
+		else {
+			$page->setVar('subject_block', '<h2>No subjects</h2>');
+		}
+
 	}
 
 

@@ -79,12 +79,20 @@
   .button.bar.large span {
 
   }
+  #subject-main .subject-list {
+    border-top: solid 1px #eee;
+  }
+  #subject-main .subject-list .grade {
+    border-right-width: 0;
+    font-size: 13px;
+    font-weight: normal;
+  }
 </style>
 <script type="text/javascript" src="/javascript/excanvas.compiled.js"></script>
 <script type="text/javascript" src="/javascript/flot/jquery.flot.js"></script>
 <!-- END custom_head -->
 <div id="all-work">
-  <h1>Report Card &ndash; {RC_TITLE}</h1>
+  <h1>Grades &ndash; {RC_TITLE}</h1>
   <div id="context">
     <div id="student">
       <a class="bar large button" href="/search/user/{WORK_USER_ID}">
@@ -95,13 +103,13 @@
     </div>
     <div id="enrolment">
       <form id="semesters">
-        <a class="sem-back" href="/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
+        <a class="sem-back" href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
         <select name="semester">
           <!-- BEGIN semester_option -->
           <option{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
           <!-- END semester_option -->
         </select>
-        <a class="sem-fwd" href="/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
+        <a class="sem-fwd" href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
       </form>
       <form id="subjects" action="/submission/allWork/" method="get">
         <span class="elbow">&#9492;</span>
