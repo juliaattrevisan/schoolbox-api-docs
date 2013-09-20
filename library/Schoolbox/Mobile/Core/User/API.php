@@ -167,7 +167,7 @@ class API extends Generic\API {
 		// parent: you can view your kids
 		// staff: you can view anything
 
-		switch($targetUser->getRole()->getType()) {
+		switch($sessionUser->getRole()->getType()) {
 			case Role::STUDENT:
 				if($sessionUser->getId() != $targetUser->getId()) {
 					return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
