@@ -30,10 +30,17 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
      */
     public function execute() {
         $this->groupHandler = new Group();
-        // Use mappers instead (currently there's no limit for this search, or ordering)
-        // Consider including user's mark as well
+        $options = array(
+            'order' => array('date' => 'desc'),
+        );
+        $size = $this->getConfig('size');
+        if ($size > 0) {
+            $options['limit'] = $size;
+        }
         $this->submissionList = SubmissionBoxMapper::getInstance()->findByColumn(
-            'category', $this->getContext('id')
+            'category',
+            $this->getContext('id'),
+            $options
         );
     }
 
@@ -89,14 +96,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         }
         $time = new Alaress_Date_Format(new DateTime());
 
-        $size = $this->getConfig('size');
         foreach ($this->submissionList as $submission) {
             $box_id = $submission->getId();
-            if ($size > 0 && $j >= $size) {
-                break;
-            }
-            $j++;
-
             $dateHTML = $submission->getDueDate()->getDateOnly();
 
             /* Actions Block */
