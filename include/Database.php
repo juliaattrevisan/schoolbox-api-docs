@@ -181,6 +181,29 @@ class Database {
     }
 
     /**
+     * Tries to create a unique parameter name
+     *
+     * @param string $param_name      The base name to attempt to add
+     * @param array  $existing_params The existing list of parameters to add to
+     *                                a query
+     *
+     * @return string The param name, or null if it couldn't be created after
+     *                100 attempts.
+     */
+    public function createUniqueParameterName($param_name, $existing_params) {
+        $new_name = $param_name;
+        $count    = 0;
+        while ($count < 100) {
+            if (!array_key_exists($new_name, $existing_params)) {
+                return $new_name;
+            }
+            $new_name = $param_name . '_' . $count;
+            $count++;
+        }
+        return null;
+    }
+
+    /**
      * Wrapper for PDO::lastInsertId
      * Returns the ID of the last inserted row, or the last value from a sequence object, depending
      * on the underlying driver. For example, PDO_PGSQL() requires you to specify the name of a sequence object
