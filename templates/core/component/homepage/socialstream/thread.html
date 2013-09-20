@@ -1,24 +1,22 @@
 <!-- BEGIN socialstream_post -->
-<ul>
-	<li class='socialstream-post {ON_OFF}'>
+	<li class='socialstream-post {ON_OFF} clearfix'>
 		<!-- BEGIN socialstream_post_has_delete -->
-		<p><a class='btn delete no-text {SOCIALSTREAM_POST_DELETE_CLASS}' href='/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}' alt='' title=''><span></span></a></p>
+		<div class="small-right">
+			<p class="interact">
+				<a class="btn delete no-text {SOCIALSTREAM_POST_DELETE_CLASS}" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" title='Delete post'><span></span></a>
+			</p>
+		</div>
 		<!-- END socialstream_post_has_delete -->
 
-		<div class='avatar'>
-			<img src='/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32'>
-		</div>
-		<div class='body'>
-			<p>
-				<a href='/search/user/{SOCIALSTREAM_POST_USER_ID}'>{SOCIALSTREAM_POST_USER_FULLNAME}</a><br />
-				<span>Posted on {SOCIALSTREAM_POST_CREATED_AT}</span>
+		<p class="author">
+			<a href="/search/user/{SOCIALSTREAM_POST_USER_ID}">
+				<img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32" />
+				<span class="name">{SOCIALSTREAM_POST_USER_FULLNAME}</span>
+			</a>
+		</p>
+		<div class="body">
+			{SOCIALSTREAM_POST_BODY}
 
-				<!-- BEGIN socialstream_post_has_add -->
-				<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_POST_POST_ID}'>Comment</a><br />
-				<!-- END socialstream_post_has_add -->
-
-				{SOCIALSTREAM_POST_BODY}<br />
-			</p>
 			<!-- BEGIN socialstream_post_has_icon -->
 			<a href='{SOCIALSTREAM_POST_URL}'>
 				<img src='/images/mime/60x60/{SOCIALSTREAM_POST_ICON}' style='outline:3px dashed #00f;'/>
@@ -42,6 +40,12 @@
 				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
 			</p>
 			<!-- END socialstream_post_has_metadata -->
+
+			<p class="meta">Posted on {SOCIALSTREAM_POST_CREATED_AT}
+				<!-- BEGIN socialstream_post_has_add -->
+				| <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}">Comment</a>
+				<!-- END socialstream_post_has_add -->
+			</p>
 		</div>
 		<div class='clearfix'></div>
 		<ul>
@@ -61,7 +65,7 @@
 						<span>Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
 
 						<!-- BEGIN socialstream_comment_has_add -->
-						<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Comment</a><br />
+						<a class='addPostLink' data-rootid='{SOCIALSTREAM_POST_POST_ID}' data-parentid='{SOCIALSTREAM_COMMENT_POST_ID}'>Reply</a><br />
 						<!-- END socialstream_comment_has_add -->
 
 						{SOCIALSTREAM_COMMENT_BODY}<br />
@@ -142,5 +146,4 @@
 			<!-- END socialstream_comment -->
 		</ul>
 	</li>
-</ul>
 <!-- END socialstream_post -->
