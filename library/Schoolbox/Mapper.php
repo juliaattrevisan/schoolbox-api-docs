@@ -751,7 +751,7 @@ class Mapper {
 			foreach ($columnList as $columnName => $columnValue) {
 				$escaped_name = $this->database->quoteIdentifier($columnName);
 				if (!isset($columnValue)) {
-					$where_parts[] = "`$columnName` IS NULL";
+					$where_parts[] = "$escaped_name IS NULL";
 				}
 				else {
 					// This method is smart enough to work with arrays and IN statements
