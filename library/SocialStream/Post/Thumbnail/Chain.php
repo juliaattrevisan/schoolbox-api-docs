@@ -70,12 +70,14 @@ class Chain {
 		$linkIcon = new LinkIcon($xml, $url);
 		$linkIconApple = new LinkIconApple($xml, $url);
 		$linkIconApplePrecompiled = new LinkIconApplePrecompiled($xml, $url);
+		$linkIconApplePrecomposed = new LinkIconApplePrecomposed($xml, $url);
 		$arbitraryFile = new ArbitraryFile($xml, $url);
 
 		/* Try directly, otherwise try the other meta tag variants in sequence
 		 * until one of them matches
 		 */
-		$linkIconApplePrecompiled->setNext($arbitraryFile);
+		$linkIconApplePrecomposed->setNext($arbitraryFile);
+		$linkIconApplePrecompiled->setNext($linkIconApplePrecomposed);
 		$linkIconApple->setNext($linkIconApplePrecompiled);
 		$linkIcon->setNext($linkIconApple);
 		$itempropThumbnailUrl->setNext($linkIcon);
