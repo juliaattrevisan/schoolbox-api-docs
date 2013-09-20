@@ -263,6 +263,7 @@ class StudentReportCard {
 
 				$page->setVar(array(
 					'SEMESTER_SELECTED' => $selected ? ' selected="selected"' : '',
+					'SEMESTER_SLUG'     => "{$this->targetUserId}/$y/$sem",
 					'SEMESTER_VALUE'    => "Semester $sem, $y"
 				));
 				$page->parse('semester_option_block','semester_option', true);
