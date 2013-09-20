@@ -24,6 +24,7 @@ class Server {
 	const PROXY_TYPE = CURLPROXY_HTTP;
 	const PROXY_AUTH_STRING = "Basic";
 	const PROXY_TYPE_STRING = "HTTP";
+	const PROXY_DEFAULT_TIMEOUT = 2;
 
 	protected static $instance;
 
@@ -181,6 +182,7 @@ class Server {
 			curl_setopt($c, CURLOPT_FOLLOWLOCATION, 1);
 			curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($c, CURLOPT_HEADER, 1);
+			curl_setopt($c, CURLOPT_TIMEOUT, self::PROXY_DEFAULT_TIMEOUT);
 
 			// configuration values
 			curl_setopt($c, CURLOPT_PROXY, $this->getHost());
