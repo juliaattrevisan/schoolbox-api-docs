@@ -59,6 +59,12 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
 			));
 
+			/* Parse metadata
+ 			 */
+			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+				$page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
+			}
+
 			/* Parse icon
  			 */
 			if ($matches) {
@@ -77,14 +83,6 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
 				return true;
 			}
-
-			/* Parse metadata
-			 */
-			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-				$page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
-
-				return true;
-			}
 		}
 		else if ($context == 'comment') {
 			$page->setVar(array(
@@ -92,6 +90,12 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => $this->getExternalTitle(),
 				'SOCIALSTREAM_COMMENT_EXTERNAL_BODY' => $this->getExternalBody(),
 			));
+
+			/* Parse metadata
+			 */
+			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+				$page->parse('socialstream_comment_has_metadata_block', 'socialstream_comment_has_metadata');
+			}
 
 			/* Parse icon
 			 */
@@ -111,14 +115,6 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
 				return true;
 			}
-
-			/* Parse metadata
-			 */
-			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-				$page->parse('socialstream_comment_has_metadata_block', 'socialstream_comment_has_metadata');
-
-				return true;
-			}
 		}
 		else if ($context == 'reply') {
 			$page->setVar(array(
@@ -126,6 +122,12 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => $this->getExternalTitle(),
 				'SOCIALSTREAM_REPLY_EXTERNAL_BODY' => $this->getExternalBody(),
 			));
+
+			/* Parse metadata
+ 			 */
+			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+				$page->parse('socialstream_reply_has_metadata_block', 'socialstream_reply_has_metadata');
+			}
 
 			/* Parse icon
 			 */
@@ -142,14 +144,6 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 			 */
 			else if ($this->hasThumbnail()) {
 				$page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
-
-				return true;
-			}
-
-			/* Parse metadata
-			 */
-			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-				$page->parse('socialstream_reply_has_metadata_block', 'socialstream_reply_has_metadata');
 
 				return true;
 			}

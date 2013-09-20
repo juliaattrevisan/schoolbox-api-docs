@@ -34,19 +34,20 @@
 				<!-- END socialstream_post_has_icon -->
 
 				<!-- BEGIN socialstream_post_has_thumbnail -->
-				<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
+				<a class="thumb clearfix" href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
 					<img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
 				</a>
 				<!-- END socialstream_post_has_thumbnail -->
+
+				<!-- BEGIN socialstream_post_has_metadata -->
+				<a href="{SOCIALSTREAM_POST_URL}"><strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong></a><br />
+				<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
+				<!-- END socialstream_post_has_metadata -->
 
 				<!-- BEGIN socialstream_post_has_player -->
 				<iframe width="560" height="315" src="{SOCIALSTREAM_POST_URL}" frameborder="0" allowfullscreen></iframe>
 				<!-- END socialstream_post_has_player -->
 
-				<!-- BEGIN socialstream_post_has_metadata -->
-					<a href="{SOCIALSTREAM_POST_URL}"><strong>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</strong></a><br />
-					<em>{SOCIALSTREAM_POST_EXTERNAL_BODY}</em>
-				<!-- END socialstream_post_has_metadata -->
 			</div>
 			<!-- END socialstream_post_has_attachment -->
 

@@ -42,6 +42,12 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 					'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
+				/* Parse metadata
+				 */
+				if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+					$page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
+				}
+
 				if (strlen($chain->getResult())) {
 					$page->parse('socialstream_post_has_player_block', 'socialstream_post_has_player');
 
@@ -60,6 +66,13 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 					'SOCIALSTREAM_COMMENT_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
+				/* Parse metadata
+   				 */
+				if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+					$page->parse('socialstream_comment_has_metadata_block', 'socialstream_comment_has_metadata');
+				}
+
+
 				if (strlen($chain->getResult())) {
 					$page->parse('socialstream_comment_has_player_block', 'socialstream_comment_has_player');
 
@@ -77,6 +90,12 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 					'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => $this->getExternalTitle(),
 					'SOCIALSTREAM_REPLY_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
+
+				/* Parse metadata
+  				 */
+				if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+					$page->parse('socialstream_reply_has_metadata_block', 'socialstream_reply_has_metadata');
+				}
 
 				if (strlen($chain->getResult())) {
 					$page->parse('socialstream_reply_has_player_block', 'socialstream_reply_has_player');

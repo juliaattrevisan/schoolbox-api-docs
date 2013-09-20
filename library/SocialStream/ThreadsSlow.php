@@ -461,7 +461,7 @@ class ThreadsSlow {
 			$page->parse('socialstream_post_block', 'socialstream_post', true);
 			
 			$page->setVar(array(
-				'socialstream_post_has_attachment_block' => '',
+				'socialstream_post_has_icon_block' => '',
 				'socialstream_post_has_icon_block' => '',
 				'socialstream_post_has_thumbnail_block' => '',
 				'socialstream_post_has_player_block' => '',
