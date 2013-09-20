@@ -2,7 +2,7 @@
 /**
  * ItempropPhoto
  *
- * Used in Nigella's recipes
+ * First seen at http://www.nigella.com/recipes/view/nursery-fish-pie-128
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
