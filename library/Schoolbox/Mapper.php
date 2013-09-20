@@ -636,49 +636,27 @@ class Mapper {
 	/**
 	 * TODO: PDO Array support for using WHERE IN
 	 *
+	 * @deprecated findByColumn/findByColumnList now have array support
+	 *
 	 * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
 	 * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
 	 *
 	 * @param string $column
 	 * @param array  $permittedValues
-	 * @param bool   $deleted         If set to false, filters out deleted items.
+	 * @param array  $options         @see findByColumnList() $options param
 	 * @return Collection
 	 */
-	public function findIn($column, $permittedValues, $deleted = false) {
-		$query = "
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE `{$column}` IN {$this->getArrayPlaceholders($permittedValues, 'val')}
-		";
-		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
-			$query .= ' AND '.$delete_part;
-		}
-		$statement = $this->database->prepare($query);
-
-		$statement->execute($this->getArrayParameters($permittedValues, 'val'));
-
-		$rowset = $statement->fetchAll();
-
-		return $this->hydrateList($rowset);
+	public function findIn($column, $permittedValues, $options = array()) {
+		return $this->findByColumn($column, $permittedValues, $options);
 	}
 
 	/**
 	 * @brief Retrieves the entire collection unfiltered
-	 * @param bool $deleted If set to false, filters out deleted items.
+	 * @param array $options @see findByColumnList() $options param
 	 * @return Collection
 	 */
-	public function findAll($deleted = false) {
-		$query = "SELECT {$this->getColumnString()} FROM `{$this->table}`";
-		if ($deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
-			$query .= ' WHERE '.$delete_part;
-		}
-		$statement = $this->database->prepare($query);
-
-		$statement->execute();
-
-		$rowset = $statement->fetchAll();
-
-		return $this->hydrateList($rowset);
+	public function findAll($options = array()) {
+		return $this->findByColumnList(array(), $options);
 	}
 
 	/**
@@ -690,27 +668,7 @@ class Mapper {
 	 * @return object
 	 */
 	public function findById($identifierValue) {
-		$identifierName = $this->identifier['column'];
-
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE `{$identifierName}` = :identifierValue
-		"
-		);
-
-		$statement->bindParam(':identifierValue', $identifierValue);
-
-		$statement->execute();
-
-		$row = $statement->fetch();
-		if ($row != false) {
-			$model = $this->hydrate($row);
-			$this->throwIfDeleted($model);
-			return $model;
-		}
-		throw new Exception('Instance of object not found');
+		return $this->findOneByColumn($this->identifier['column'], $identifierValue);
 	}
 
 	/**
@@ -718,12 +676,12 @@ class Mapper {
 	 *
 	 * @param String $columnName
 	 * @param String $columnValue
-	 * @param bool   $deleted     If set to false, filters out deleted items.
+	 * @param array  $options     @see findByColumnList() $options param
 	 *
 	 * @return Collection
 	 */
-	public function findByColumn($columnName, $columnValue, $deleted = false) {
-		return $this->findByColumnList(array($columnName => $columnValue), $deleted);
+	public function findByColumn($columnName, $columnValue, $options = array()) {
+		return $this->findByColumnList(array($columnName => $columnValue), $options);
 	}
 
 	/**
@@ -733,20 +691,19 @@ class Mapper {
 	 * @throws Exception\Deleted if the model was found but has been deleted
 	 * @param  String $columnName
 	 * @param  String $columnValue
+	 * @param  array  $order       Fields to order by (@see findByColumnList() $options param)
 	 * @return object
 	 */
-	public function findOneByColumn($columnName, $columnValue) {
-		$statement = $this->database->prepare("
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-			WHERE `{$columnName}` = :$columnName
-			LIMIT 1
-		");
-		$statement->bindParam(":$columnName", $columnValue);
-		$statement->execute();
-		$result = $statement->fetch();
-		if ($result) {
-			$model = $this->hydrate($result);
+	public function findOneByColumn($columnName, $columnValue, $order = array()) {
+		$result_collection = $this->findByColumnList(
+			array($columnName => $columnValue),
+			array(
+				'deleted' => true,
+				'limit'   => 1,
+				'order'   => $order,
+			)
+		);
+		foreach ($result_collection as $model) {
 			$this->throwIfDeleted($model);
 			return $model;
 		}
@@ -755,42 +712,114 @@ class Mapper {
 
 	/**
 	 * @brief Returns a collection with models which match the values pairs in the column list
-	 * @param Array $columnList
-	 * @param bool  $deleted    If set to false, filters out deleted items.
-	 * @return Bool|Collection
+	 * @param array $columnList a set of key-value pairs:
+	 *                          * key:   the name of the column to find
+	 *                          * value: the value (or array of values) to search for
+	 * @param array $options    * limit, offset: limit and offset for query
+	 *                          * deleted:       whether to retrieve deleted items
+	 *                                           (defaults to false)
+	 *                          * order:         a set of key-value pairs:
+	 *                                           key: column name, value: ASC or DESC
+	 * @throws Exception if for some reason the limit or offset parameters
+	 *                   cannot be created (this should never happen in practise
+	 *                   as columnList would have to contain a field named
+	 *                   'limit' or 'offset')
+	 * @return Collection
 	 */
-	public function findByColumnList($columnList, $deleted = false) {
-		if (!is_array($columnList)) {
-			return false;
+	public function findByColumnList($columnList, $options = array()) {
+
+		// Compatibility with old deleted option: if a non-array was passed,
+		// assume that we're asking for whether the item was deleted.
+		if (!is_array($options)) {
+			$options = array('deleted' => $options,);
 		}
+		$defaults = array(
+			'limit'   => null,
+			'offset'  => null,
+			'deleted' => false,
+			'order'   => array(),
+		);
+		$options = array_merge($defaults, $options);
 
-		$query = "
-			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
-		";
+		$quoted_table = $this->database->quoteIdentifier($this->table);
+		$query        = "SELECT {$this->getColumnString()} FROM $quoted_table";
 
+		// Build WHERE part
 		$where_parts = array();
 		$params      = array();
 		if (!empty($columnList)) {
 			$query .= ' WHERE ';
 			foreach ($columnList as $columnName => $columnValue) {
+				$escaped_name = $this->database->quoteIdentifier($columnName);
 				if (!isset($columnValue)) {
-					$where_parts[] = "`$columnName` IS NULL";
+					$where_parts[] = "$escaped_name IS NULL";
 				}
 				else {
-					$where_parts[] = "`$columnName` = ?";
-					$params[]      = $columnValue;
+					// This method is smart enough to work with arrays and IN statements
+					if (is_array($columnValue)) {
+						$where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+						$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
+					}
+					else {
+						$where_parts[]            = "$escaped_name = :{$columnName}_0";
+						$params[$columnName.'_0'] = $columnValue;
+					}
 				}
 			}
 			$query .= implode(' AND ', $where_parts);
 		}
-		if (!$deleted && ($delete_part = $this->getSoftDeleteFilterSql())) {
+		if (!$options['deleted'] && ($delete_part = $this->getSoftDeleteFilterSql())) {
 			$query .= (empty($columnList) ? ' WHERE ' : ' AND ').$delete_part;
 		}
 
-		$statement = $this->database->prepare($query);
+		// Build ORDER part (in an injection-safe way)
+		$order_parts = array();
+		if (!empty($options['order'])) {
+			foreach ($options['order'] as $column => $order_option) {
+				$escaped_name = $this->database->quoteIdentifier($column);
+				$order_option = strtoupper($order_option);
+				if (in_array($order_option, array('ASC', 'DESC'))) {
+					$order_parts[] = "$quoted_table.$escaped_name $order_option";
+				}
+			}
+		}
+		if (!empty($order_parts)) {
+			$query .= ' ORDER BY '.(implode(', ', $order_parts));
+		}
 
-		$statement->execute($params);
+		// Build LIMIT and OFFSET part (should bind as parameters instead)
+		$limit  = null;
+		$offset = null;
+		if (isset($options['limit'])) {
+			$query .= " LIMIT :limit";
+			$limit  = $options['limit'];
+			if (isset($options['offset'])) {
+				$query .= " OFFSET :offset";
+				$offset = $options['offset'];
+			}
+		}
+		elseif (isset($options['offset'])) {
+			// Offset but no limit? all we can do is use some massive number as
+			// the limit.
+			$query .= " LIMIT :limit OFFSET :offset";
+			$limit  = PHP_INT_MAX;
+			$offset = $options['offset'];
+		}
+
+		$statement = $this->database->prepare($query);
+		foreach ($params as $name => $value) {
+			$statement->bindValue($name, $value);
+		}
+
+		// Bind limit and offset if they were set
+		if (isset($limit)) {
+			$statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+		}
+		if (isset($offset)) {
+			$statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+		}
+
+		$statement->execute();
 
 		$rowset = $statement->fetchAll();
 
@@ -1199,14 +1228,20 @@ class Mapper {
 	 * with each other.
 	 *
 	 * @param array  $input
-	 * @param string $prefix
+	 * @param string $prefix If not supplied, ? will be assumed as placeholder
+	 *                       for all values.
 	 *
 	 * @return array
 	 */
-	public function getArrayParameters($input, $prefix) {
+	public function getArrayParameters($input, $prefix = null) {
 		$params = array();
 		foreach ($input as $i => $param) {
-			$params[$prefix.'_'.$i] = $param;
+			if (isset($prefix)) {
+				$params[$prefix.'_'.$i] = $param;
+			}
+			else {
+				$params[] = $param;
+			}
 		}
 		return $params;
 	}
