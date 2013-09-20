@@ -718,8 +718,8 @@ class Mapper {
 	 * @param array $options    * limit, offset: limit and offset for query
 	 *                          * deleted:       whether to retrieve deleted items
 	 *                                           (defaults to false)
-	 *                          * order:         a list of field orderings
-	 *                                           (format: 'fieldname ASC/DESC')
+	 *                          * order:         a set of key-value pairs:
+	 *                                           key: column name, value: ASC or DESC
 	 *
 	 * @return Collection
 	 */
@@ -740,7 +740,7 @@ class Mapper {
 
 		$query = "
 			SELECT {$this->getColumnString()}
-			FROM `{$this->table}`
+			FROM {$this->database->quoteIdentifier($this->table)}
 		";
 
 		// Build WHERE part
@@ -749,17 +749,18 @@ class Mapper {
 		if (!empty($columnList)) {
 			$query .= ' WHERE ';
 			foreach ($columnList as $columnName => $columnValue) {
+				$escaped_name = $this->database->quoteIdentifier($columnName);
 				if (!isset($columnValue)) {
 					$where_parts[] = "`$columnName` IS NULL";
 				}
 				else {
 					// This method is smart enough to work with arrays and IN statements
 					if (is_array($columnValue)) {
-						$where_parts[] = "`$columnName` IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+						$where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
 						$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
 					}
 					else {
-						$where_parts[]       = "`$columnName` = :$columnName";
+						$where_parts[]       = "$escaped_name = :$columnName";
 						$params[$columnName] = $columnValue;
 					}
 				}
@@ -770,12 +771,22 @@ class Mapper {
 			$query .= (empty($columnList) ? ' WHERE ' : ' AND ').$delete_part;
 		}
 
-		// Build ORDER part
+		// Build ORDER part (in an injection-safe way)
+		$order_parts = array();
 		if (!empty($options['order'])) {
-			$query .= ' ORDER BY '.(implode(', ', $options['order']));
+			foreach ($options['order'] as $column => $order_option) {
+				$escaped_name = $this->database->quoteIdentifier($column);
+				$order_option = strtoupper($order_option);
+				if (in_array($order_option, array('ASC', 'DESC'))) {
+					$order_parts[] = "$escaped_name $order_option";
+				}
+			}
+		}
+		if (!empty($order_parts)) {
+			$query .= ' ORDER BY '.(implode(', ', $order_parts));
 		}
 
-		// Build LIMIT and OFFSET part
+		// Build LIMIT and OFFSET part (should bind as parameters instead)
 		if (isset($options['limit'])) {
 			$query .= ' LIMIT '.intval($options['limit']);
 			if (isset($options['offset'])) {
