@@ -22,7 +22,7 @@ class OpenGraph extends Metadata {
 		$this->analyseTitle();
 		$this->analyseDescription();
 
-		if (strlen($this->getTitle()) && strlen($this->getDescription())) {
+		if (strlen($this->getTitle())) {
 			return $this;
 		}
 
