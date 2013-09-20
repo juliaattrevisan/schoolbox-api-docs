@@ -37,7 +37,7 @@ class MetaTag extends Metadata {
 	 * Find the title
 	 */
 	private function analyseTitle() {
-		$allElements = $this->getXml()->query("/html/head/title");
+		$allElements = $this->getXml()->query("//title");
 
 		foreach($allElements as $currentElement) {
 			$this->setTitle(trim($currentElement->nodeValue));
@@ -50,7 +50,7 @@ class MetaTag extends Metadata {
 	 * Find the description
 	 */
 	private function analyseDescription() {
-		$query = "/html/head/meta[@name='description']";
+		$query = "//meta[@name='description']";
 
 		$this->setDescription($this->analyse($query, array('content')));
 	}
