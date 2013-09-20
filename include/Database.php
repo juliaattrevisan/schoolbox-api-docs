@@ -169,6 +169,18 @@ class Database {
     }
 
     /**
+     * Quotes column, table, etc. names so they may be safely used in queries.
+     * For MySQL: ` in an identifier is replaced with ``, and the string is
+     * wrapped with ` characters.
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function quoteIdentifier($string) {
+        return '`'.str_replace('`', '``', $string).'`';
+    }
+
+    /**
      * Wrapper for PDO::lastInsertId
      * Returns the ID of the last inserted row, or the last value from a sequence object, depending
      * on the underlying driver. For example, PDO_PGSQL() requires you to specify the name of a sequence object
