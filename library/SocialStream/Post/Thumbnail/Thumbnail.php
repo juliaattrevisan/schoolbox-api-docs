@@ -94,7 +94,19 @@ abstract class Thumbnail {
 					$this->getFileType()->setPath($match);
 
 					if ($this->getFileType()->isImageExtension()) {
-						return $match;
+
+						/* Derive absolute url if the image url is actually
+						 * specified relatively (www.google.com)
+						 */
+						if ($match[0] == '/') {
+							$bits = parse_url($this->getUrl());
+							$url = 'http://' . $bits['host'] . $match;
+
+							return $url;
+						}
+						else {
+							return $match;
+						}
 					}
 				}
 			}
