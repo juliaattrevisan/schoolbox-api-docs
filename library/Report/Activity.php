@@ -253,7 +253,7 @@ ORDER BY $orderBy $orderDir";
                 $displayName = $userHandler->formatName($nameShards);
 
                 $page->setVar(array(
-                    'USER_ID'   => $log['user_id'],
+                    'UID'       => $log['user_id'],
                     'DATE'      => $log['time'],
                     'USERNAME'  => $displayName,
                     'ACTION'    => $actionString,

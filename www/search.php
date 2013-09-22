@@ -218,14 +218,14 @@ if (!empty($result['user'])) {
         }
         
         $page->setVar(array(
-            'USER_ID' => $user['id'],
-            'USER_SYNERGY_ID' => $user['synergy_id'],
-            'USER_NAME' => $userHandler->formatName($user),
-            'USER_EMAIL' => $email,
-            'USER_COUNT' => $count['user'],
-            'USER_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
-            'USER_CAMPUS' => stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name'],
-            'USER_GROUP' => $user['group_name'],
+            'USER_SEARCH_ID' => $user['id'],
+            'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
+            'USER_SEARCH_NAME' => $userHandler->formatName($user),
+            'USER_SEARCH_EMAIL' => $email,
+            'USER_SEARCH_COUNT' => $count['user'],
+            'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
+            'USER_SEARCH_CAMPUS' => stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name'],
+            'USER_SEARCH_GROUP' => $user['group_name'],
         ));
 
         $page->setVar('helpdesk_block');
