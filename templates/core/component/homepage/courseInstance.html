@@ -2,6 +2,25 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div class="box clearfix">
-        This is the course instance component.
+        <!-- BEGIN course_selector -->
+        <h3>This is the course instance component, so please choose a course.</h3>
+        <!-- END course_selector -->
+
+        <!-- BEGIN unit_list -->
+        <ul class="unit-list">
+            <!-- BEGIN unit -->
+            <li class="unit interact" data-unit_id="{UNIT_ID}">
+                <h3>{UNIT_NAME}</h3>
+                <ul class="unit-task-list">
+                    <!-- BEGIN unit_task -->
+                    <li class="unit-task interact" data-unit_task_id="{UNIT_TASK_ID}">
+                        <h3>{UNIT_TASK_NAME}</h3>
+                    </li>
+                    <!-- END unit_task -->
+                </ul>
+            </li>
+            <!-- END unit -->
+        </ul>
+        <!-- END unit_list -->
     </div>
 </div>
