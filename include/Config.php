@@ -80,7 +80,7 @@ class Config extends DeprecatedModel {
                 return self::getInstance()->update(array('name' => $configName, 'value' => $configValue));
         }
 
-        public function getTypeList() {
+        public static function getTypeList() {
             self::getInstance();
              /* Show non-editable field data as just plain text
 			  * $query = "SELECT DISTINCT `type` FROM `".$this->_table."` WHERE `editable` = 'true' ORDER BY type";
@@ -103,7 +103,7 @@ class Config extends DeprecatedModel {
                 return $output;
         }
 
-        public function getAll($orderBy = '', $type = '') {
+        public static function getAllOfType($orderBy = '', $type = '') {
             self::getInstance();
 			/* Show non-editable field data as just plain text
 			 * $query = "SELECT * FROM `".$this->_table."` WHERE `editable` = 'true' ";

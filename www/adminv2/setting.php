@@ -65,7 +65,7 @@ if (is_array($typeList)) {
 	}
 }
 
-$optionList = Cfg::getAll('', $selectedType);
+$optionList = Cfg::getAllOfType('', $selectedType);
 $editable = false;
 
 if(is_array($optionList)) {
