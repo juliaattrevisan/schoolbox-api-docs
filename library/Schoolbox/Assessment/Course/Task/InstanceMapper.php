@@ -7,15 +7,15 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Course;
+namespace Schoolbox\Assessment\Course\Task;
 
 use Schoolbox\Mapper;
 
-class TaskInstanceMapper extends Mapper {
+class InstanceMapper extends Mapper {
 
     protected function mapping() {
         $this->hasTable('task_instance');
-        $this->hasModel('\\Schoolbox\\Assessment\\Course\\TaskInstance');
+        $this->hasModel('\\Schoolbox\\Assessment\\Course\\Task\\Instance');
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',

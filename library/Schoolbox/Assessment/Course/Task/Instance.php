@@ -7,14 +7,16 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Course;
+namespace Schoolbox\Assessment\Course\Task;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\UnitInstance;
 
-class TaskInstance implements ISoftDeletable {
+class Instance implements ISoftDeletable {
 
     /**
      * @var int
