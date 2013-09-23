@@ -74,6 +74,7 @@ if(is_array($optionList)) {
             'setting_type_select_block'      => '',
             'setting_type_check_block'       => '',
             'setting_type_list_block'        => '',
+            'setting_type_resource_block'    => '',
         );
 
         $this->setVar($output);
@@ -111,6 +112,10 @@ if(is_array($optionList)) {
 
                 case 'html' :
                     $this->parse('setting_type_html_block', 'setting_type_html', true);
+                    break;
+
+                case 'resource':
+                    $this->parse('setting_type_resource_block', 'setting_type_resource', true);
                     break;
 
                 case 'boolean' :
