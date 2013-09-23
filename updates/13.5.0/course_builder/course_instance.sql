@@ -28,15 +28,14 @@ CREATE TABLE `task_instance` (
   `requires_confirmation` BOOL NOT NULL DEFAULT FALSE,
   `assess_id` INT NULL,
   `box_id` INT NULL,
-  `user_id` INT NOT NULL,
   `order` INT NOT NULL DEFAULT 0,
   `created_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
   PRIMARY KEY (`id`),
-  INDEX `task_instance_category_id` (`course_unit_instance_id` ASC),
+  INDEX `task_instance_task_id` (`task_id` ASC),
+  INDEX `task_instance_course_unit_instance_id` (`course_unit_instance_id` ASC),
   INDEX `task_instance_assess_id` (`assess_id` ASC),
   INDEX `task_instance_box_id` (`box_id` ASC),
-  INDEX `task_instance_user_id` (`user_id` ASC),
   INDEX `task_instance_order` (`order` ASC),
   INDEX `task_instance_deleted_at` (`deleted_at` ASC)
 ) DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
