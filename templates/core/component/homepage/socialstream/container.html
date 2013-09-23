@@ -21,9 +21,11 @@
 		});
 	</script>
 	<style>
-		.socialstream-attachment { background: #eee; margin-top: 16px; padding: 16px; display: block; }
+		.socialstream-attachment { background: #eee; margin-top: 16px; padding: 16px 16px 8px; display: block; }
+		.socialstream-attachment .description { margin-bottom: 8px; font-style: italic; }
+		.socialstream-attachment a { font-weight: bold; word-break: break-all; }
 		.socialstream-attachment img { float: left; margin: 0 16px 8px 0; }
-		.socialstream-attachment iframe { width: 100%; }
+		.socialstream-attachment iframe { max-width: 100%; height: auto; min-height: 30%; }
 	</style>
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
