@@ -10,33 +10,24 @@ $this->setFile(TEMPLATE_content, 'adminv2/settings.html');
 $this->setTitle('Admin - Settings');
 
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
-$this->setBlock(TEMPLATE_content, 'setting_type_noneditable', 'setting_type_noneditable_block');
-$this->setBlock(TEMPLATE_content, 'setting_type_input', 'setting_type_input_block');
-$this->setBlock(TEMPLATE_content, 'setting_type_textarea', 'setting_type_textarea_block');
-$this->setBlock(TEMPLATE_content, 'setting_type_html', 'setting_type_html_block');
-$this->setBlock(TEMPLATE_content, 'setting_type_boolean', 'setting_type_boolean_block');
-$this->setBlock(TEMPLATE_content, 'setting_type_select', 'setting_type_select_block');
+$this->setBlock(TEMPLATE_content, 'setting', 'setting_block');
+$this->setBlock('setting', 'setting_type_noneditable', 'setting_type_noneditable_block');
+$this->setBlock('setting', 'setting_type_input', 'setting_type_input_block');
+$this->setBlock('setting', 'setting_type_textarea', 'setting_type_textarea_block');
+$this->setBlock('setting', 'setting_type_html', 'setting_type_html_block');
+$this->setBlock('setting', 'setting_type_boolean', 'setting_type_boolean_block');
+$this->setBlock('setting', 'setting_type_select', 'setting_type_select_block');
 $this->setBlock('setting_type_select', 'setting_select', 'setting_select_block');
-$this->setBlock(TEMPLATE_content, 'setting_type_check', 'setting_type_check_block');
-$this->setBlock(TEMPLATE_content, 'setting_type_list', 'setting_type_list_block');
+$this->setBlock('setting', 'setting_type_check', 'setting_type_check_block');
+$this->setBlock('setting', 'setting_type_list', 'setting_type_list_block');
+$this->setBlock('setting', 'setting_type_resource', 'setting_type_resource_block');
 $this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
 
 // include the admin navigation
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'setting');
 
-$output = array(
-    'setting_type_noneditable_block' => '',
-    'setting_type_input_block'       => '',
-    'setting_type_textarea_block'    => '',
-    'setting_type_html_block'        => '',
-    'setting_type_boolean_block'     => '',
-    'setting_type_select_block'      => '',
-    'setting_type_check_block'       => '',
-    'setting_type_list_block'        => '',
-);
-
-$this->setVar($output);
+$this->setVar('setting_block', '');
 
 if ($this->arg[0]) {
 	$selectedType = urldecode($this->arg[0]);
@@ -75,6 +66,14 @@ if(is_array($optionList)) {
             'SETTING_DESC'  => Scrub::text($option['description']),
             'SETTING_NAME'  => Scrub::text($option['name']),
             'SETTING_VALUE' => Scrub::text($option['value']),
+            'setting_type_noneditable_block' => '',
+            'setting_type_input_block'       => '',
+            'setting_type_textarea_block'    => '',
+            'setting_type_html_block'        => '',
+            'setting_type_boolean_block'     => '',
+            'setting_type_select_block'      => '',
+            'setting_type_check_block'       => '',
+            'setting_type_list_block'        => '',
         );
 
         $this->setVar($output);
@@ -166,6 +165,7 @@ if(is_array($optionList)) {
                     break;
             }
         }
+        $this->parse('setting_block', 'setting', true);
     }
 }
 
