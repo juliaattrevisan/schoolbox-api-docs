@@ -18,4 +18,6 @@ UPDATE `config`
     SET `config`.`field` = `lu_config_field`.`id`;
 
 -- Alter config.field to int and hope everything casts properly?
-ALTER TABLE `config` CHANGE COLUMN `field` `field` INT NULL;
+ALTER TABLE `config` ADD COLUMN `field_id` INT NULL AFTER `field`;
+UPDATE `config` SET `field_id` = CAST(`field` AS UNSIGNED);
+ALTER TABLE `config` DROP COLUMN `field`;
