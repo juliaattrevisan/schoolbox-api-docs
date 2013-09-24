@@ -19,5 +19,6 @@ UPDATE `config`
 
 -- Alter config.type to int and hope everything casts properly?
 ALTER TABLE `config` ADD COLUMN `type_id` INT NULL AFTER `type`;
+ALTER TABLE `config` ADD INDEX `config_type_id` (`type_id` ASC);
 UPDATE `config` SET `type_id` = CAST(`type` AS UNSIGNED);
 ALTER TABLE `config` DROP COLUMN `type`;
