@@ -19,7 +19,7 @@ $definition = array(
     'multiple'           => 'true',
     'config'             => array(
         'componentname' => array(
-            'default_value' => 'Tasks',
+            'default_value' => 'Course',
             'label'         => 'Heading',
         ),
         // Config options: source homepage ID
