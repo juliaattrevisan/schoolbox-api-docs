@@ -300,15 +300,26 @@ class Category extends DeprecatedModel {
         return $this->categoryTree;
     }
 
-    function getCategoryNode($categoryID = 0) {
+    /**
+     * Gets a list of nodes for display in the category browser.
+     * They are returned in a flat array, with a node's children directly after
+     * its parent.
+     *
+     * @param int $categoryID The category to get nodes for
+     * @param int $base       If supplied, the list doesn't go above this point.
+     *
+     * @return array
+     */
+    function getCategoryNode($categoryID = 0, $base = null) {
         $categoryID = (int)$categoryID;
 
         // get folder contents
         $categoryList = $this->getCategoryList($categoryID);
 
-        if ($categoryID > 0) {
+        $is_at_base = !empty($base) && $categoryID == $base;
+        if ($categoryID > 0 && !$is_at_base) {
             // get parent folder contents
-            $siblingList = $this->getCategoryNode($this->getParent($categoryID));
+            $siblingList = $this->getCategoryNode($this->getParent($categoryID), $base);
 
             if (is_array($categoryList)) {
                 // find index of parent node in siblingList
