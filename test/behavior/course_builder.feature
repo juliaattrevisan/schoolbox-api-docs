@@ -3,10 +3,10 @@ Feature: Course Builder
   As the head of curriculum
   I need to be able to create a course
 
-#Scenario: Set a homepage as the course home
-#  Given I am on homepage
-#  And   log in as "alaress" with password "alaress"
-#  And   set setting "Course Builder:Course Home" to "Faculties"
+Scenario: Set a homepage as the course home
+  Given I am on homepage
+  And   log in as "alaress" with password "alaress"
+  And   set resource setting "Resources:Course Base Homepage" to "Faculties"
 
 Scenario: Create a course rubric set
   Given I wipe the slate clean
