@@ -108,7 +108,12 @@ class Config extends DeprecatedModel {
 			/* Show non-editable field data as just plain text
 			 * $query = "SELECT * FROM `".$this->_table."` WHERE `editable` = 'true' ";
 			 */
-			$query = "SELECT * FROM `config` WHERE 1=1 ";
+			$query = "
+				SELECT *, `lu_config_field`.`field`, `lu_config_type`.`type`
+				FROM `config`
+				INNER JOIN `lu_config_field` ON `config`.`field_id` = `lu_config_field`.`id`
+				INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
+				WHERE 1=1 ";
 
 			if (!empty($type)) {
 				$query .= "AND `type` = '$type' ";
