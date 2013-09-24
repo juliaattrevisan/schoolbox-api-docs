@@ -28,6 +28,7 @@
         </div>
     </div>
     <input id="destination" type="hidden" readonly="readonly" value="" />
+    <input id="destination-text" type="hidden" readonly="readonly" value="" />
     <a href="#" id="select-resource" class="submit-btn-plain"><span></span>Select</a>
 </div>
 <script type="text/javascript">
@@ -42,6 +43,9 @@
             // Trigger change on destination if it was asked for
             if ('{TRIGGER}') {
                 $j('{DESTINATION}').change();
+            }
+            if ('{DESTINATION_TEXT}') {
+                $j('{DESTINATION_TEXT}').text($j('#destination-text').val());
             }
         }
         // kbye

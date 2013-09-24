@@ -19,8 +19,9 @@ class Resource_Browser {
         $page = $this->getPage();
         $page->setFile($templateHandle, 'resource_browser.html');
         $page->setBlock($templateHandle, 'category_list', 'category_list_block');
-        $page->setVar('DESTINATION', $options['destination']);
-        $page->setVar('TRIGGER',     $options['trigger'] ? '1' : '');
+        $page->setVar('DESTINATION',      $options['destination']);
+        $page->setVar('DESTINATION_TEXT', $options['destination_text']);
+        $page->setVar('TRIGGER',          $options['trigger'] ? '1' : '');
 
         $groupHandler = new Group;
         $categoryHandler = new Category;

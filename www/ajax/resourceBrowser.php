@@ -17,10 +17,11 @@ $rb = new Resource_Browser($this);
 // start:           a resource that is used as the default selected
 // triggerChange:   true if the change event gets triggered on the destination
 $options = array(
-    'destination' => $_REQUEST['destination'],
-    'base'        => $_REQUEST['base'],
-    'start'       => $_REQUEST['start'],
-    'trigger'     => $_REQUEST['triggerChange'],
+    'destination'      => $_REQUEST['destination'],
+    'destination_text' => $_REQUEST['destinationText'],
+    'base'             => $_REQUEST['base'],
+    'start'            => $_REQUEST['start'],
+    'trigger'          => $_REQUEST['triggerChange'],
 );
 $rb->render(TEMPLATE_content, $options);
 $this->setAjax();
