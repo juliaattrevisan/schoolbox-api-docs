@@ -4,12 +4,12 @@ Feature: Course Builder
   I need to be able to create a course
 
 Scenario: Set a homepage as the course home
-  Given I am on homepage
+  Given I wipe the slate clean
+  Then  I go to homepage
   And   log in as "alaress" with password "alaress"
   And   set resource setting "Resources:Course Base Homepage" to "Faculties"
 
 Scenario: Create a course rubric set
-  Given I wipe the slate clean
   Then  I go to homepage
   And   log in as "wwhite" with password "password"
   Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
