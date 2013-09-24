@@ -157,7 +157,7 @@ class Subcontext_CoreContext extends BaseContext {
     public function setResourceConfigurationSetting($type, $name, $value) {
         $this->getMinkContext()->visit('/adminv2/setting/'.$type);
         $form  = $this->getSession()->getPage()->find('css', 'form#settings');
-        $field = $this->findConfigurationField($form, $type, $name);
+        $field = $this->findConfigurationField($form, $name);
         if (!$field) {
             throw new Exception(sprintf('Could not find setting "%s:%s"', $type, $name));
         }
@@ -166,7 +166,12 @@ class Subcontext_CoreContext extends BaseContext {
         // Search for the item in the resource builder
         $button = $form->find('css', 'input[data-input_name="'.$field->getAttribute('name').'"]');
         $button->click();
+        $this->waitForAjax();
 
+        // Traverse the browser tree
+        $browser = $this->getSession()->getPage()->findById('resource-browser');
+        $this->traverseTree($browser, $value);
+        $browser->findById('select-resource')->click();
         $form->findButton('Save')->press();
     }
 
