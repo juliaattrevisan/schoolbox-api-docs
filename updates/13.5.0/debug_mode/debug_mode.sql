@@ -15,7 +15,7 @@
 --   'Debugging'
 -- ) NULL DEFAULT NULL;
 
-INSERT INTO `lu_config_type` (`type`) VALUES ('Debugging');
+INSERT IGNORE INTO `lu_config_type` (`type`) VALUES ('Debugging');
 
 INSERT INTO `config`(
   `name`,

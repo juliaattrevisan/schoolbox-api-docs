@@ -4,7 +4,7 @@
 -- First add new "html" input type, and change existing "textarea" to "html"
 -- ALTER TABLE `config` CHANGE COLUMN `field` `field` ENUM('input','textarea','html','boolean','select','checkbox','bytes','selectKey') NULL DEFAULT 'input';
 
-INSERT INTO `lu_config_field` (`field`) VALUES ('html');
+INSERT IGNORE INTO `lu_config_field` (`field`) VALUES ('html');
 UPDATE `config`
   SET `field_id` = (SELECT `id` FROM `lu_config_field` WHERE `field` = 'html' LIMIT 1)
   WHERE `field_id` =  (SELECT `id` FROM `lu_config_field` WHERE `field` = 'textarea' LIMIT 1);
