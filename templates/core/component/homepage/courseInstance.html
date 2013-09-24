@@ -2,8 +2,46 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div class="box clearfix">
+        <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
+        <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+        <script type="text/javascript">
+            // Addition of an AJAX form submission - need to add here because
+            // the session name and ID have to be passed.
+            (function($) {
+                $(function() {
+                    var browser = $('#resource-browser');
+                    browser.dialog({
+                        width: 650,
+                        autoOpen: false,
+                        title: "Select a homepage",
+                        modal: true,
+                        resizable: false
+                    });
+                    var browser_options = {
+                        destination:     '#component{COMPONENT_INSTANCE_ID} input[name="homepage"]',
+                        base:            '{COURSE_HOMEPAGE}',
+                        start:           '{COURSE_HOMEPAGE}',
+                        triggerChange:   true
+//                        destinationText: '#component{COMPONENT_INSTANCE_ID} span[data-resource_text]'
+                    }
+                    $('#component{COMPONENT_INSTANCE_ID} :button[data-interaction="homepage_selector"]').click(function(event) {
+                        event.preventDefault();
+                        browser.load(
+                            '/ajax/resourceBrowser',
+                            browser_options,
+                            function() { browser.dialog('open'); }
+                        );
+                    });
+                });
+            })(jQuery);
+        </script>
+
         <!-- BEGIN course_selector -->
         <h3>This is the course instance component, so please choose a course.</h3>
+        <span data-resource_text></span>
+        <input type="text" name="homepage" value="" />
+        <input type="button" value="Select Source" data-interaction="homepage_selector" />
+        <!-- Use the good old resource browser -->
         <!-- END course_selector -->
 
         <!-- BEGIN unit_list -->
