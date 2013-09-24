@@ -30,10 +30,16 @@
                     $('#component{COMPONENT_INSTANCE_ID} a[data-interaction="homepage_selector"]').click(function(event) {
                         event.preventDefault();
                         browser.load(
-                            '/ajax/resourceBrowser',
-                            browser_options,
-                            function() { browser.dialog('open'); }
+                                '/ajax/resourceBrowser',
+                                browser_options,
+                                function() { browser.dialog('open'); }
                         );
+                    });
+                    $('#component{COMPONENT_INSTANCE_ID} a[data-interaction="import"]').click(function(event) {
+                        event.preventDefault();
+                        var source = $j('#component{COMPONENT_INSTANCE_ID} input[name="homepage"]').val();
+                        source = source.replace(/.*?(\d+$)/, '$1')
+                        window.location.href = '/course/import/{ID}/{COMPONENT_INSTANCE_ID}/'+source
                     });
                 });
             })(jQuery);
@@ -41,15 +47,17 @@
 
         <!-- BEGIN course_selector -->
         <h3>This is the course instance component, so please choose a course.</h3>
-        <form method="post" action="/homepage/{ID}/course/{COMPONENT_INSTANCE_ID}">
-            <span data-resource_text></span>
-            <a href="#" class="btn submit-this float-right translate">
-                <span></span>Import
-            </a>
-            <a href="#" class="btn float-right up-arrow" data-interaction="homepage_selector">
-                <span></span>Select Source
-            </a>
-        </form>
+
+        <!-- No form yet, as nothing has been saved. -->
+        <input type="hidden" name="homepage" value="" />
+
+        <span data-resource_text></span>
+        <a href="#" class="btn float-right translate" data-interaction="import">
+            <span></span>Import
+        </a>
+        <a href="#" class="btn float-right up-arrow" data-interaction="homepage_selector">
+            <span></span>Select Source
+        </a>
         <!-- END course_selector -->
 
         <!-- BEGIN unit_list -->
