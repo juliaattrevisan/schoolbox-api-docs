@@ -39,6 +39,10 @@
         if(v.length > 0 && v.indexOf('homepage/') == -1) {
             var dest = "/homepage/" + $j('#destination').val();
             $j('{DESTINATION}').val(dest);
+            // Trigger change on destination if it was asked for
+            if ('{TRIGGER}') {
+                $j('{DESTINATION}').change();
+            }
         }
         // kbye
         $j('#resource-browser').dialog('close');
