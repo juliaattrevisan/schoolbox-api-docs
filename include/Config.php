@@ -120,7 +120,7 @@ class Config extends DeprecatedModel {
 				WHERE 1=1 ";
 
 			if (!empty($type)) {
-				$query .= "AND `type` = '$type' ";
+				$query .= "AND `lu_config_type`.`type` = '$type' ";
 			}
 
 			if (!empty($orderBy)) {
