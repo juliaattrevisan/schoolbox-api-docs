@@ -85,7 +85,11 @@ class Config extends DeprecatedModel {
              /* Show non-editable field data as just plain text
 			  * $query = "SELECT DISTINCT `type` FROM `".$this->_table."` WHERE `editable` = 'true' ORDER BY type";
 			  */
-			$query = "SELECT DISTINCT `type` FROM `config` ORDER BY type";
+			$query = "
+				SELECT DISTINCT `lu_config_type`.`type`
+				FROM `config`
+				INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
+				ORDER BY `config`.`configID` ASC";
 
 			return DeprecatedDatabase::getInstance()->getAll($query);
         }
