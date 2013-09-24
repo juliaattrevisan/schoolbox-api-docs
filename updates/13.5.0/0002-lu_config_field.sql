@@ -1,4 +1,4 @@
--- Config field and type: update and replace with lookup table values
+-- Config field: update and replace with lookup table values
 CREATE TABLE `lu_config_field` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `field` VARCHAR(20),
@@ -7,7 +7,7 @@ CREATE TABLE `lu_config_field` (
 ) DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
 -- Populate lookup table
-INSERT INTO `lu_config_field` (`field`) SELECT DISTINCT `field` FROM `config`;
+INSERT INTO `lu_config_field` (`field`) SELECT DISTINCT `field` FROM `config` ORDER BY `field` DESC;
 
 -- Alter config.field to varchar
 ALTER TABLE `config` CHANGE COLUMN `field` `field` VARCHAR(250) NULL DEFAULT 'input';
@@ -19,11 +19,3 @@ UPDATE `config`
 
 -- Alter config.field to int and hope everything casts properly?
 ALTER TABLE `config` CHANGE COLUMN `field` `field` INT NULL;
-
-
-CREATE TABLE `lu_config_type` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `type` VARCHAR(40),
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `lu_config_type_type` (`type` ASC)
-) DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
