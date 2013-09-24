@@ -21,9 +21,12 @@
                         destination:     '#component{COMPONENT_INSTANCE_ID} input[name="homepage"]',
                         base:            '{COURSE_HOMEPAGE}',
                         start:           '{COURSE_HOMEPAGE}',
-                        triggerChange:   true
-//                        destinationText: '#component{COMPONENT_INSTANCE_ID} span[data-resource_text]'
+                        triggerChange:   true,
+                        destinationText: '#component{COMPONENT_INSTANCE_ID} span[data-resource_text]'
                     }
+                    $('#component{COMPONENT_INSTANCE_ID} input[name="homepage"]').change(function(event) {
+                        // console.log(event);
+                    })
                     $('#component{COMPONENT_INSTANCE_ID} :button[data-interaction="homepage_selector"]').click(function(event) {
                         event.preventDefault();
                         browser.load(
