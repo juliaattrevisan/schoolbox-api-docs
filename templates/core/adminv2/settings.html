@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/javascript/jquery.autoresize.js"></script>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript">
     tinyMCE.init({
         mode : "specific_textareas",
@@ -58,8 +59,22 @@ $j(function() {
 
     $j('#settings').validate();
 
-
-
+    // Homepage selector and its event
+    $j('#resource-browser').dialog({
+        width: 650,
+        autoOpen: false,
+        title: "Select a homepage",
+        modal: true,
+        resizable: false
+    });
+    $j(':button[data-interaction="homepage_selector"]').click(function(event) {
+        event.preventDefault();
+        $j('#resource-browser').load(
+            '/ajax/resourceBrowser',
+            {destination : ':input[name="'+$j(this).data('input_name')+'"]'},
+            function() { $j('#resource-browser').dialog('open'); }
+        );
+    });
 });
 
 </script>
@@ -110,7 +125,8 @@ $j(function() {
                     <!-- END setting_type_html -->
 
                     <!-- BEGIN setting_type_resource -->
-                    <input class="{OPTION_REQUIRED}" type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+                    <input type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+                    <input type="button" value="Select Source" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}" />
                     <!-- END setting_type_resource -->
 
                     <!-- BEGIN setting_type_boolean -->
@@ -167,3 +183,5 @@ $j(function() {
         });
     });
 </script>
+
+<div id="resource-browser" class="hide"></div>
