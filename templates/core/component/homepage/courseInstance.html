@@ -27,7 +27,7 @@
                     $('#component{COMPONENT_INSTANCE_ID} input[name="homepage"]').change(function(event) {
                         // console.log(event);
                     })
-                    $('#component{COMPONENT_INSTANCE_ID} :button[data-interaction="homepage_selector"]').click(function(event) {
+                    $('#component{COMPONENT_INSTANCE_ID} a[data-interaction="homepage_selector"]').click(function(event) {
                         event.preventDefault();
                         browser.load(
                             '/ajax/resourceBrowser',
@@ -41,10 +41,15 @@
 
         <!-- BEGIN course_selector -->
         <h3>This is the course instance component, so please choose a course.</h3>
-        <span data-resource_text></span>
-        <input type="text" name="homepage" value="" />
-        <input type="button" value="Select Source" data-interaction="homepage_selector" />
-        <!-- Use the good old resource browser -->
+        <form method="post" action="/homepage/{ID}/course/{COMPONENT_INSTANCE_ID}">
+            <span data-resource_text></span>
+            <a href="#" class="btn submit-this float-right translate">
+                <span></span>Import
+            </a>
+            <a href="#" class="btn float-right up-arrow" data-interaction="homepage_selector">
+                <span></span>Select Source
+            </a>
+        </form>
         <!-- END course_selector -->
 
         <!-- BEGIN unit_list -->
