@@ -7,7 +7,7 @@ CREATE TABLE `lu_config_field` (
 ) DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
 -- Populate lookup table
-INSERT INTO `lu_config_field` (`field`) SELECT DISTINCT `field` FROM `config` ORDER BY `field` DESC;
+INSERT INTO `lu_config_field` (`field`) SELECT DISTINCT `field` FROM `config` ORDER BY `name` ASC;
 
 -- Alter config.field to varchar
 ALTER TABLE `config` CHANGE COLUMN `field` `field` VARCHAR(250) NULL DEFAULT 'input';
