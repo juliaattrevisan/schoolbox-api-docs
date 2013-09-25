@@ -1,13 +1,18 @@
 
 <!-- BEGIN socialstream_post -->
 	<li class='socialstream-post {ON_OFF} clearfix'>
-		<!-- BEGIN socialstream_post_has_delete -->
 		<div class="small-right">
 			<p class="interact">
+				<!-- BEGIN socialstream_post_has_delete -->
 				<a class="btn delete no-text {SOCIALSTREAM_POST_DELETE_CLASS}" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" title='Delete post'><span></span></a>
+				<!-- END socialstream_post_has_delete -->
+
+				<!-- BEGIN socialstream_post_has_add -->
+				<a href="#" class="btn reply no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}" title="Add Reply"><span></span></a>
+				<!-- END socialstream_post_has_add -->
 			</p>
 		</div>
-		<!-- END socialstream_post_has_delete -->
+
 
 		<p class="author">
 			<a href="/search/user/{SOCIALSTREAM_POST_USER_ID}">
@@ -15,9 +20,7 @@
 				<span class="name">{SOCIALSTREAM_POST_USER_FULLNAME}</span>
 			</a>
 			<span class="subtitle">Posted on {SOCIALSTREAM_POST_CREATED_AT}
-				<!-- BEGIN socialstream_post_has_add -->
-				| <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}">Comment</a>
-				<!-- END socialstream_post_has_add -->
+
 			</span>
 		</p>
 		<div class="body">
@@ -54,24 +57,24 @@
 		<ul>
 			<!-- BEGIN socialstream_comment -->
 			<li class="socialstream-comment">
-				<!-- BEGIN socialstream_comment_has_delete -->
 				<div class="small-right">
 					<p class="interact">
-						<a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title='Delete Comment'><span></span></a>
+						<!-- BEGIN socialstream_comment_has_delete -->
+						<a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment"><span></span></a>
+						<!-- END socialstream_comment_has_delete -->
+
+						<!-- BEGIN socialstream_comment_has_add -->
+						<a href="#" class="btn reply no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" title="Add Reply"><span></span></a>
+						<!-- END socialstream_comment_has_add -->
 					</p>
 				</div>
-				<!-- END socialstream_comment_has_delete -->
 
 				<p class="author">
 					<a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}">
 						<img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" />
 						<span class="name">{SOCIALSTREAM_COMMENT_USER_FULLNAME}</span>
 					</a>
-					<span class="subtitle">Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}
-						<!-- BEGIN socialstream_post_has_add -->
-						| <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}">Reply</a>
-						<!-- END socialstream_post_has_add -->
-					</span>
+					<span class="subtitle">Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
 				</p>
 
 				<div class="body">

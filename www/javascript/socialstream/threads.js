@@ -133,7 +133,7 @@
 		 * Allow input forms to be spawned
 		 */
 		function initPostForm() {
-			config.addPostLink.live('click', function() {
+			config.addPostLink.live('click', function(e) {
 
 				/* Clear out all instances of .addPostForm in the socialstream
 				 */
@@ -163,7 +163,9 @@
 
 				/* Send In The Clones
 				 */
-				$j(this).parent('p').append(clone);
+				$j(this).closest('li').find('.body').append(clone);
+
+				e.preventDefault();
 			});
 		}
 

@@ -2116,7 +2116,7 @@ ADMIN NAV
             padding: 0 8px;
 			color: @footer-color;
 			background: @dark;
-			border: 1px solid @body-background;
+			border: 1px solid @border-color;
 			font-weight: normal;
 			height: 22px; line-height: 22px;
 			&.current {
@@ -9490,4 +9490,61 @@ ul.activity-list li,
 .ui-widget {
 	tr { border: 0; }
 	td { background: none; }
+}
+
+/* Socialstream Browser
+ */
+.socialstream-node li {
+	list-style: none;
+}
+.socialstream-node li a {
+	display: block;
+	padding: 5px 4px;
+	line-height: 22px;
+	.ellipsis;
+	img {
+		float: left;
+		margin-right: 6px;
+	}
+}
+.breadcrumb {
+	li { display: inline; list-style: none;}
+	a {
+		padding: 4px 5px 4px 10px;
+		background: @dark;
+		border: 1px solid @border-color;
+		position: relative;
+		margin-right: -5px;
+		line-height: 26px;
+		white-space: nowrap;
+		&:before, &:after {
+			content: '';
+			.block(0,0);
+			.absolute(0, auto, auto, -11px);
+			border: 10px solid transparent;
+			border-width: 13px 5px;
+			border-left-color: @border-color;
+			z-index: 1;
+		}
+		&:after {
+			border-left-color: @dark;
+			right: -10px;
+		}
+		&:hover {
+			color: @tab-color;
+			background: @tab-background;
+			border-color: @tab-background;
+			&:before, &:after { border-left-color: @tab-background; }
+		}
+
+	}
+	.last a {
+		border: none;
+		background: none;
+		color: @secondary-text;
+		&:before, &:after {
+			display: none;
+		}
+		&:hover { color: @secondary-text; }
+	}
 }

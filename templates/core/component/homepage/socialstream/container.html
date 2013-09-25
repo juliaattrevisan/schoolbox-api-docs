@@ -1,8 +1,5 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	<!--<link link rel="stylesheet" type="text/css" media="screen" href='/javascript/socialstream/threads.css' />-->
 	<script type='text/javascript' src='/javascript/socialstream/threads.js'></script>
-
-	<link link rel="stylesheet" type="text/css" media="screen" href='/javascript/socialstream/browser.css' />
 	<script type='text/javascript' src='/javascript/socialstream/browser.js'></script>
 
 	<script type='text/javascript'>
@@ -21,9 +18,10 @@
 		});
 	</script>
 	<style>
-		.socialstream-attachment { background: #eee; margin-top: 16px; padding: 16px 16px 8px; display: block; }
+		.socialstream-attachment { border: 1px solid #eee; background: rgba(0,0,0,0.05); margin-top: 16px;
+			padding: 16px 16px 8px; display: block; }
 		.socialstream-attachment .description { margin-bottom: 8px; font-style: italic; }
-		.socialstream-attachment a { font-weight: bold; word-break: break-all; }
+		.socialstream-attachment a { font-weight: bold; word-break: break-word; }
 		.socialstream-attachment img { float: left; margin: 0 16px 8px 0; }
 		.socialstream-attachment iframe { max-width: 100%; height: auto; min-height: 30%; }
 	</style>
@@ -41,11 +39,11 @@
 			<input type='hidden' name='socialstreamAttachment' value=''>
 
 			<label>
-				Body: <input type='text' name='body' maxlength='255' value='' />
+				<input type="text" name="body" maxlength="255" />
 			</label>
 
 			<label>
- 				URL: <input type='text' class='url' name='url' maxlength='255' value='' />
+				URL: <input type='text' class='url' name='url' maxlength='255' value='' />
 			</label>
 
 			<label>
@@ -60,8 +58,8 @@
 			<a class='btn up-arrow socialstream-attachment-upload' data-value='upload'><span></span>Upload</a>
 			<a class='btn go-to socialstream-attachment-url' data-value='url'><span></span>URL</a>
 
+
 			<input class='submit-btn-plain' type='submit' value='Post' />
-			<div class='clearfix'></div>
 		</form>
 		<!-- END socialstream_has_newpost -->
 	</div>
@@ -70,18 +68,16 @@
 	</div>
 
 	<div id='socialstream-{COMPONENT_INSTANCE_ID}'>
-		<div class='loading'>
-			Loading stream
-		</div>
+		<p class="loading">
+			Loading stream&hellp;
+		</p>
 
 		<div class="listing blog">
 			<ul class='socialstream-threads'></ul>
 		</div>
 
-		<div>
-			<p>
-				<a class='socialstreamViewMore '>View More</a>
-			</p>
-		</div>
+		<p class="interact">
+			<a class="btn update socialstreamViewMore"><span></span>Load More</a>
+		</p>
 	</div>
 </div>

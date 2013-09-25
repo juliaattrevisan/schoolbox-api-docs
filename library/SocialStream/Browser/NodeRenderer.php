@@ -92,13 +92,16 @@ class NodeRenderer {
 
 		$allBreadcrumbs = $nodeData['breadcrumbs'];
 
+		$j = 0;
 		foreach($allBreadcrumbs as $currentBreadcrumb) {
 			$this->getPage()->setVar(array(
+				'BREADCRUMB_CLASS' => (count($allBreadcrumbs) -1 == $j) ? 'last' : '',
 				'BREADCRUMB_CATEGORY_ID' => $currentBreadcrumb['categoryId'],
 				'BREADCRUMB_NAME' => $currentBreadcrumb['name']
 			));
 
 			$this->getPage()->parse('breadcrumb_block', 'breadcrumb', true);
+			$j++;
 		}
 	}
 
@@ -110,10 +113,12 @@ class NodeRenderer {
 
 		$allRecords = $nodeData['records'];
 
-		foreach($allRecords as $currentRecord) {
+		for($i = 0; $i < count($allRecords); $i++) {
+			$currentRecord = $allRecords[$i];
+
 			switch ($currentRecord['type']) {
-				case 'category': $this->renderCategory($currentRecord); break;
-				case 'file': $this->renderFile($currentRecord); break;
+				case 'category': $this->renderCategory($currentRecord, $i); break;
+				case 'file': $this->renderFile($currentRecord, $i); break;
 				default: break;
 			}
 		}
@@ -124,8 +129,9 @@ class NodeRenderer {
 	 *
 	 * @param $currentRecord
 	 */
-	private function renderCategory($currentRecord) {
+	private function renderCategory($currentRecord, $i) {
 		$this->getPage()->setVar(array(
+			'NODE_CATEGORY_ON_OFF' => $i % 2 ? '' : 'dark',
 			'NODE_CATEGORY_ID' => $currentRecord['categoryId'],
 			'NODE_CATEGORY_NAME' => $currentRecord['name'],
 		));
@@ -138,8 +144,9 @@ class NodeRenderer {
 	 *
 	 * @param $currentRecord
 	 */
-	private function renderFile($currentRecord) {
+	private function renderFile($currentRecord, $i) {
 		$this->getPage()->setVar(array(
+			'NODE_FILE_ON_OFF' => $i % 2 ? '' : 'dark',
 			'NODE_FILE_ID' => $currentRecord['fileId'],
 			'NODE_FILE_NAME' => $currentRecord['name'],
 			'NODE_FILE_ICON' => $currentRecord['icon'],

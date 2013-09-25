@@ -112,7 +112,7 @@
 
 				/* These allow new nodes to be loaded
 				 */
-				var allNavigators = $j(config.element).find('.socialstream-breadcrumb, .socialstream-node-category');
+				var allNavigators = $j(config.element).find('.breadcrumb, .socialstream-node-category');
 
 				$j.each(allNavigators, function(index, element) {
 					$j(element).find('a').click(function() {
