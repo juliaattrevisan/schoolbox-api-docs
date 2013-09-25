@@ -635,3 +635,49 @@ ul.activity-list li,
   }
 
 }
+
+.jpc-header{
+  position: relative;
+  margin: 0 0 12px 0;
+}
+
+.jpc-header form{
+  position: absolute;
+  top: 25px;
+  right: 22px;
+}
+
+.jpc-header form input{
+  background: #222478;
+  border: 0;
+  height: 26px;
+  float: left;
+  margin: 0;
+}
+
+.jpc-header form .search-field{
+  color: #ffffff !important;
+  width: 145px;
+  padding: 0px 8px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.jpc-header form .search-button{
+  background: #222478 url('/images/jpc/library-search.png') 9px 8px no-repeat;
+  width: 28px;
+}
+
+.jpc-header form .search-button:hover{
+  cursor: pointer;
+}
+
+@media all and (max-width: 1345px){
+  .jpc-header form{
+    top: 45px;
+  }
+
+  .jpc-header h3{
+    font-size: 21px;
+  }
+}
