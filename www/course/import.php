@@ -64,7 +64,7 @@ $this->setBlock('unit', 'task', 'task_block');
 $this->setVar('class_breadcrumb_block', '');
 $homepage      = CategoryMapper::getInstance()->findById($homepage_id);
 $homepage_path = CategoryMapper::getInstance()->findParents($homepage);
-$homepage_path->prepend($homepage);
+$homepage_path->add($homepage);
 foreach ($homepage_path as $parent) {
     /** @var Category $parent */
     $this->setVar('CLASS_CATEGORY_ID',   $parent->getId());
@@ -74,8 +74,10 @@ foreach ($homepage_path as $parent) {
 
 $this->setVar('course_breadcrumb_block', '');
 $course_homepage = CategoryMapper::getInstance()->findById($course_homepage_id);
-$course_homepage_path = CategoryMapper::getInstance()->findParents($course_homepage);
-$course_homepage_path->prepend($course_homepage);
+$course_base_homepage = new Category();
+$course_base_homepage->setId(str_replace('/homepage/', '', Config::get('course_homepage')));
+$course_homepage_path = CategoryMapper::getInstance()->findParents($course_homepage, $course_base_homepage);
+$course_homepage_path->add($course_homepage);
 foreach ($course_homepage_path as $parent) {
     /** @var Category $parent */
     $this->setVar('COURSE_CATEGORY_ID',   $parent->getId());
