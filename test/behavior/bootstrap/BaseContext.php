@@ -101,4 +101,20 @@ abstract class BaseContext extends RawMinkContext {
             $backtrace[1]['file'] . ", line " . $backtrace[1]['line']
         );
     }
+
+    /**
+     * Delays execution until the element is visible.
+     *
+     * @param  Element\NodeElement $element
+     * @param  int                 $timeout
+     * @throws Exception           if $timeout is reached element still isn't visible.
+     */
+    protected function delayUntilVisible(Element\NodeElement $element, $timeout = 5) {
+        $this->spin(
+            function($context) use($element) {
+                return $element->isVisible();
+            },
+            $timeout
+        );
+    }
 }
