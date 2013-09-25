@@ -65,9 +65,15 @@ foreach ($child_list as $unit) {
     if (empty($grouped_task_list[$unit_id])) {
         continue;
     }
-    $this->setVar('UNIT_ID',    $unit_id);
-    $this->setVar('UNIT_NAME',  $unit->getName());
-    $this->setVar('task_block', '');
+    $this->setVar(
+        array(
+            'UNIT_ID'        => $unit_id,
+            'UNIT_NAME'      => $unit->getName(),
+            'UNIT_OPEN_DATE' => '',
+            'UNIT_DUE_DATE'  => '',
+            'task_block'     => '',
+        )
+    );
 
 //    foreach ($grouped_task_list[$unit_id] as $task) {
 //        /** @var Task $task */
