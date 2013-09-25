@@ -9,7 +9,11 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Resource\CategoryMapper;
 
 class InstanceMapper extends Mapper {
 
@@ -30,7 +34,7 @@ class InstanceMapper extends Mapper {
         ));
         $this->hasMap(array(
             'column'     => 'course_unit_instance_id',
-            'property'   => 'courseUnitInstance',
+            'property'   => 'unitInstance',
             'type'       => self::TYPE_MODEL,
             'join'       => 'course_unit_instance',
         ));
@@ -100,6 +104,59 @@ class InstanceMapper extends Mapper {
         ));
 
         $this->hasSoftDeleteDateField('deleted_at');
-        $this->registerCallback('preSave', array($this, 'preSave'));
+        $this->registerCallback('preSave',  array($this, 'preSave'));
+        $this->registerCallback('postSave', array($this, 'postSave'));
+    }
+
+    /**
+     * Pre-save callback - copies details from the task object into this object.
+     *
+     * @param  Instance $object
+     * @return bool     Always true
+     */
+    public function preSave(Instance $object) {
+        if (!$object->getId()) {
+            $task = $object->getTask();
+            $object
+                ->setTitle($task->getTitle())
+                ->setLink($task->getLink())
+                ->setOrder($task->getOrder())
+                ->setRequiresConfirmation($task->getRequiresConfirmation())
+            ;
+        }
+        return true;
+    }
+
+    /**
+     * Post-save callback - if this is a new item, copies the submission box or
+     * assessment that is a part of the task.
+     *
+     * @param  Instance $object
+     * @param  bool     $is_new
+     * @return void
+     */
+    public function postSave(Instance $object, $is_new = false) {
+        if ($is_new) {
+            $task = $object->getTask();
+            if ($task->getAssessment()->getId()) {
+                // Clone assessment and save
+                // Use the XML input and output methods to create it.
+            }
+            if (($box_id = $task->getSubmissionBox()->getId())) {
+                // Clone this box and save it
+                // (What will happen to linked models?)
+                $category = CategoryMapper::getInstance()->findById(
+                    $object->getUnitInstance()->getComponent()->getIdentifier()
+                );
+                $box = SubmissionBoxMapper::getInstance()->findById($box_id);
+                $box
+                    ->setTask(null)
+                    ->setCategory($category)
+                ;
+                // Set box's open, close and due date as well.
+                SubmissionBoxMapper::getInstance()->create($box);
+                $this->updateAll($object, 'box_id', $box->getId());
+            }
+        }
     }
 }
