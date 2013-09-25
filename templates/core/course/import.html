@@ -1,8 +1,49 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<script type="text/javascript">
+(function($) {
+    $(function() {
+        // Setup datepickers
+        $('input[data-interaction="datepicker"]').datepicker({
+            dateFormat:'dd/mm/yy',
+            showOn:'both',
+            buttonImage:'/images/core/calendar/calendar-click.png',
+            buttonImageOnly:true,
+            constrainInput:false,
+            onClose:function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+    });
+})(jQuery);
+</script>
+<!-- END custom_head -->
+
 <h1>Import a course</h1>
 
 <form method="post" action="/course/importForm.php">
 
     <table class="standardForm">
+
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Course</h4>
+            </td>
+            <td colspan="2">
+
+            </td>
+        </tr>
+
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Destination Class</h4>
+            </td>
+            <td colspan="2"></td>
+        </tr>
+
         <tr>
             <td class="formLabelWidth">
                 <h4>Unit Name</h4>
@@ -17,28 +58,10 @@
                 <h4><a href="/homepage/{UNIT_ID}">{UNIT_NAME}</a></h4>
             </td>
             <td>
-                <fieldset>
-                    <input name="open_date[{UNIT_ID}]" type="text" value="" size="20"/>
-                    <input name="open_hour[{UNIT_ID}]" type="text" value="" maxlength="2" class="timeField"/>
-                    <span>:</span>
-                    <input name="open_minute[{UNIT_ID}]" type="text" value="" maxlength="2" class="timeField"/>
-                    <select name="open_period[{UNIT_ID}]" class="short">
-                        <option value="am">AM</option>
-                        <option value="pm">PM</option>
-                    </select>
-                </fieldset>
+                <input id="open_date-{UNIT_ID}" name="open_date[{UNIT_ID}]" type="text" size="15" maxlength="30" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
             </td>
             <td>
-                <fieldset>
-                    <input name="due_date[{UNIT_ID}]" type="text" value="" size="20"/>
-                    <input name="due_hour[{UNIT_ID}]" type="text" value="" maxlength="2" class="timeField"/>
-                    <span>:</span>
-                    <input name="due_minute[{UNIT_ID}]" type="text" value="" maxlength="2" class="timeField"/>
-                    <select name="due_period[{UNIT_ID}]" class="short">
-                        <option value="am">AM</option>
-                        <option value="pm">PM</option>
-                    </select>
-                </fieldset>
+                <input id="due_date-{UNIT_ID}" name="due_date[{UNIT_ID}]" type="text" size="15" maxlength="30" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
             </td>
         </tr>
         <!-- END unit -->
