@@ -66,7 +66,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             'COMPONENT_NAME' => $this->getConfig('componentname'),
         ));
 
-        // Start shitting out tasks into the template
+        // Start spamming out tasks into the template
         $this->setVar('category_breadcrumb_block', '');
         foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
             /** @var Category $parent */
