@@ -33,7 +33,9 @@
                 <h4>Course</h4>
             </td>
             <td colspan="2">
-
+                <!-- BEGIN course_breadcrumb -->
+                <span class="category"><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></span>
+                <!-- END course_breadcrumb -->
             </td>
         </tr>
 
@@ -41,7 +43,11 @@
             <td class="formLabelWidth">
                 <h4>Destination Class</h4>
             </td>
-            <td colspan="2"></td>
+            <td colspan="2" class="course_definition">
+                <!-- BEGIN class_breadcrumb -->
+                <span class="category"><a href="/homepage/{CLASS_CATEGORY_ID}/">{CLASS_CATEGORY_NAME}</a></span>
+                <!-- END class_breadcrumb -->
+            </td>
         </tr>
 
         <tr>

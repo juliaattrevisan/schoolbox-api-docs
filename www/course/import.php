@@ -55,11 +55,35 @@ foreach ($task_list as $task) {
 
 // block setup (PHPLib sucks)
 $this->setFile(TEMPLATE_content, "course/import.html");
-$this->setBlock(TEMPLATE_content, 'unit', 'unit_block');
+$this->setBlock(TEMPLATE_content, 'course_breadcrumb', 'course_breadcrumb_block');
+$this->setBlock(TEMPLATE_content, 'class_breadcrumb',  'class_breadcrumb_block');
+$this->setBlock(TEMPLATE_content, 'unit',              'unit_block');
 $this->setBlock('unit', 'task', 'task_block');
 
-$this->setVar('unit_block', '');
+// Output course and category breadcrumbs
+$this->setVar('class_breadcrumb_block', '');
+$homepage      = CategoryMapper::getInstance()->findById($homepage_id);
+$homepage_path = CategoryMapper::getInstance()->findParents($homepage);
+$homepage_path->prepend($homepage);
+foreach ($homepage_path as $parent) {
+    /** @var Category $parent */
+    $this->setVar('CLASS_CATEGORY_ID',   $parent->getId());
+    $this->setVar('CLASS_CATEGORY_NAME', $parent->getName());
+    $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
+}
 
+$this->setVar('course_breadcrumb_block', '');
+$course_homepage = CategoryMapper::getInstance()->findById($course_homepage_id);
+$course_homepage_path = CategoryMapper::getInstance()->findParents($course_homepage);
+$course_homepage_path->prepend($course_homepage);
+foreach ($course_homepage_path as $parent) {
+    /** @var Category $parent */
+    $this->setVar('COURSE_CATEGORY_ID',   $parent->getId());
+    $this->setVar('COURSE_CATEGORY_NAME', $parent->getName());
+    $this->parse('course_breadcrumb_block', 'course_breadcrumb', true);
+}
+
+$this->setVar('unit_block', '');
 foreach ($child_list as $unit) {
     $unit_id = $unit->getId();
     if (empty($grouped_task_list[$unit_id])) {
