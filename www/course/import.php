@@ -60,19 +60,27 @@ $this->setBlock(TEMPLATE_content, 'class_breadcrumb',  'class_breadcrumb_block')
 $this->setBlock(TEMPLATE_content, 'unit',              'unit_block');
 $this->setBlock('unit', 'task', 'task_block');
 
+$this->setVar(
+    array(
+        'class_breadcrumb_block'  => '',
+        'course_breadcrumb_block' => '',
+        'HOMEPAGE_ID'             => Scrub::text($homepage_id),
+        'COURSE_HOMEPAGE_ID'      => Scrub::text($course_homepage_id),
+        'COMPONENT_ID'            => Scrub::text($component_id),
+    )
+);
+
 // Output course and category breadcrumbs
-$this->setVar('class_breadcrumb_block', '');
 $homepage      = CategoryMapper::getInstance()->findById($homepage_id);
 $homepage_path = CategoryMapper::getInstance()->findParents($homepage);
 $homepage_path->add($homepage);
 foreach ($homepage_path as $parent) {
     /** @var Category $parent */
-    $this->setVar('CLASS_CATEGORY_ID',   $parent->getId());
-    $this->setVar('CLASS_CATEGORY_NAME', $parent->getName());
+    $this->setVar('CLASS_CATEGORY_ID',   Scrub::text($parent->getId()));
+    $this->setVar('CLASS_CATEGORY_NAME', Scrub::text($parent->getName()));
     $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
 }
 
-$this->setVar('course_breadcrumb_block', '');
 $course_homepage = CategoryMapper::getInstance()->findById($course_homepage_id);
 $course_base_homepage = new Category();
 $course_base_homepage->setId(str_replace('/homepage/', '', Config::get('course_homepage')));
@@ -80,8 +88,8 @@ $course_homepage_path = CategoryMapper::getInstance()->findParents($course_homep
 $course_homepage_path->add($course_homepage);
 foreach ($course_homepage_path as $parent) {
     /** @var Category $parent */
-    $this->setVar('COURSE_CATEGORY_ID',   $parent->getId());
-    $this->setVar('COURSE_CATEGORY_NAME', $parent->getName());
+    $this->setVar('COURSE_CATEGORY_ID',   Scrub::text($parent->getId()));
+    $this->setVar('COURSE_CATEGORY_NAME', Scrub::text($parent->getName()));
     $this->parse('course_breadcrumb_block', 'course_breadcrumb', true);
 }
 
@@ -93,8 +101,8 @@ foreach ($child_list as $unit) {
     }
     $this->setVar(
         array(
-            'UNIT_ID'        => $unit_id,
-            'UNIT_NAME'      => $unit->getName(),
+            'UNIT_ID'        => Scrub::text($unit_id),
+            'UNIT_NAME'      => Scrub::text($unit->getName()),
             'UNIT_OPEN_DATE' => '',
             'UNIT_DUE_DATE'  => '',
             'task_block'     => '',
