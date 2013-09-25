@@ -274,12 +274,19 @@ class CategoryMapper extends Mapper {
 	 * topmost parent first.
 	 *
 	 * @param  Category $category
+	 * @param  Category $stop_category If supplied, the parent list is truncated
+	 *                                 above this category.
 	 * @return Collection
 	 */
-	public function findParents(Category $category) {
+	public function findParents(Category $category, Category $stop_category = null) {
 		/** @var Category[] $stack */
 		$stack = array($category);
 		$count = 0;
+
+		$stop_id = null;
+		if ($stop_category instanceof Category) {
+			$stop_id = $stop_category->getId();
+		}
 
 		// Get the parent of the first item in the stack, and add it to the top
 		// of the stack.
@@ -289,7 +296,7 @@ class CategoryMapper extends Mapper {
 				break;
 			}
 			$parent_id = $parent->getId();
-			if (!$parent_id) {
+			if (!$parent_id || (!empty($stop_id) && $stop_id == $parent_id)) {
 				break;
 			}
 			array_unshift($stack, $this->findById($parent_id));
