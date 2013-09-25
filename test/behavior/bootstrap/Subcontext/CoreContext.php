@@ -275,6 +275,22 @@ class Subcontext_CoreContext extends BaseContext {
     }
 
     /**
+     * Waits for an element to be visible. (The element must exist on the page.)
+     *
+     * @see MinkContext->assertElementOnPage()
+     *
+     * @Then /^(?:|I )wait for an? "(?P<element>[^"]*)" element to be visible$/
+     * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<element>[^"]*)" element to be visible$/
+     */
+    public function waitForVisible($element, $duration = 5000) {
+        $node = $this->getSession()->getPage()->find('css', $element);
+        if (!($element instanceof Element\NodeElement)) {
+            throw new Exception("Element \"$element\" was not found on page");
+        }
+        $this->delayUntilVisible($node, $duration/1000);
+    }
+
+    /**
      * Version of fillField() that works with WYSIWYG (e.g. TinyMCE) textareas.
      * Required because Selenium refuses to fill in elements that are invisible.
      *
