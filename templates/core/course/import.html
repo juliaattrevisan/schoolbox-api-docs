@@ -26,13 +26,18 @@
 
 <form method="post" action="/course/importForm.php">
 
+    <input type="hidden" name="homepage"        value="{HOMEPAGE_ID}" />
+    <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
+    <input type="hidden" name="component"       value="{COMPONENT_ID}" />
+
     <table class="standardForm">
 
         <tr>
             <td class="formLabelWidth">
                 <h4>Course</h4>
+                <em>The course that is being imported.</em>
             </td>
-            <td colspan="2">
+            <td>
                 <!-- BEGIN course_breadcrumb -->
                 <span class="category"><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></span>
                 <!-- END course_breadcrumb -->
@@ -42,8 +47,9 @@
         <tr>
             <td class="formLabelWidth">
                 <h4>Destination Class</h4>
+                <em>The class that the course is being imported into.</em>
             </td>
-            <td colspan="2" class="course_definition">
+            <td class="course_definition">
                 <!-- BEGIN class_breadcrumb -->
                 <span class="category"><a href="/homepage/{CLASS_CATEGORY_ID}/">{CLASS_CATEGORY_NAME}</a></span>
                 <!-- END class_breadcrumb -->
@@ -52,25 +58,32 @@
 
         <tr>
             <td class="formLabelWidth">
-                <h4>Unit Name</h4>
-            </td>
-            <td><h4>Open Date</h4></td>
-            <td><h4>Due Date</h4></td>
-        </tr>
-
-        <!-- BEGIN unit -->
-        <tr>
-            <td class="formLabelWidth">
-                <h4><a href="/homepage/{UNIT_ID}">{UNIT_NAME}</a></h4>
+                <h4>Units</h4>
+                <em>You will need to set a start and end date for each unit that you want to import.</em>
             </td>
             <td>
-                <input id="open_date-{UNIT_ID}" name="open_date[{UNIT_ID}]" type="text" size="15" maxlength="30" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
-            </td>
-            <td>
-                <input id="due_date-{UNIT_ID}" name="due_date[{UNIT_ID}]" type="text" size="15" maxlength="30" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
+                <table>
+                    <tr>
+                        <td>Name</td>
+                        <td>Open Date</td>
+                        <td>Due Date</td>
+                    </tr>
+                    <!-- BEGIN unit -->
+                    <tr>
+                        <td>
+                            <a href="/homepage/{UNIT_ID}">{UNIT_NAME}</a>
+                        </td>
+                        <td>
+                            <input id="open_date-{UNIT_ID}" name="open_date[{UNIT_ID}]" type="text" size="15" maxlength="30" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
+                        </td>
+                        <td>
+                            <input id="due_date-{UNIT_ID}" name="due_date[{UNIT_ID}]" type="text" size="15" maxlength="30" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
+                        </td>
+                    </tr>
+                    <!-- END unit -->
+                </table>
             </td>
         </tr>
-        <!-- END unit -->
     </table>
 
     <input type="submit" value="Import" class="submit-btn-plain" />
