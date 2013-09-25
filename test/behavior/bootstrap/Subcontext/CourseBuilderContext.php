@@ -30,6 +30,7 @@ class Subcontext_CourseBuilderContext extends BaseContext {
         }
         $button->click();
         $form = $component->find('css', '.for_task form');
+        $this->delayUntilVisible($form);
         $form->fillField('title', $name);
         // Somehow be able to use this for file uploads too.
         $form->fillField('link',  $url);
