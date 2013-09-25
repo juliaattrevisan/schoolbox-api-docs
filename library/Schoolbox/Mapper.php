@@ -869,15 +869,18 @@ class Mapper {
 			}
 		}
 
-		$identifier  = $this->getIdentifier();
-		$id_property = $identifier['property'];
+		$identifier    = $this->getIdentifier();
+		$id_property   = $identifier['property'];
+		$new_item_list = array();
 		$this->database->beginTransaction();
 		foreach ($collection as $model) {
 			$this->bindParamsForSave($model, $statement);
 			if ($statement->execute()) {
 				if ($id_property) {
 					if (!$this->getModelProperty($model, $id_property)) {
-						$this->setModelProperty($model, $id_property, $this->database->lastInsertId());
+						$new_id = $this->database->lastInsertId();
+						$this->setModelProperty($model, $id_property, $new_id);
+						$new_item_list[$new_id] = true;
 					}
 					$affectedIDs[] = $this->getModelProperty($model, $id_property);
 				}
@@ -890,8 +893,8 @@ class Mapper {
 		$this->database->commit();
 
 		foreach ($collection as $model) {
-			if ($id_property && $this->getModelProperty($model, $id_property)) {
-				$this->triggerCallbacks('postSave', $model);
+			if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
+				$this->triggerCallbacks('postSave', $model, array_key_exists($id, $new_item_list));
 			}
 		}
 
