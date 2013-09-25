@@ -25,6 +25,13 @@ class Collection implements \ICollection {
 	}
 
 	/**
+	 * @param $element
+	 */
+	public function prepend($element) {
+		array_unshift($this->stack, $element);
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param array $stack
