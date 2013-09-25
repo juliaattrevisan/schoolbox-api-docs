@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
 class UnitInstanceMapper extends Mapper {
@@ -76,5 +77,34 @@ class UnitInstanceMapper extends Mapper {
         ));
 
         $this->hasSoftDeleteDateField('deleted_at');
+        $this->registerCallback('postSave', array($this, 'postSave'));
+    }
+
+    /**
+     * Post-save callback - if this is a new item, save a new task instance for
+     * each task in this unit.
+     *
+     * @param  UnitInstance $object
+     * @param  bool         $is_new
+     * @return void
+     */
+    protected function postSave(UnitInstance $object, $is_new = false) {
+        // Create tasks for this item (if this item was only just saved)
+        if ($is_new) {
+            $task_list = TaskMapper::getInstance()->findByColumn(
+                'category_id',
+                $object->getUnitCategory()->getId()
+            );
+            $task_instance_collection = new Collection();
+            foreach ($task_list as $task) {
+                $task_instance = new Task\Instance();
+                $task_instance
+                    ->setUnitInstance($object)
+                    ->setTask($task)
+                ;
+                $task_instance_collection->add($task_instance);
+            }
+            Task\InstanceMapper::getInstance()->save($task_instance_collection);
+        }
     }
 }
