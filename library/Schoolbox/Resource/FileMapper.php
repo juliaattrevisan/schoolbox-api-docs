@@ -19,7 +19,7 @@ use Schoolbox\StorageMapper;
 class FileMapper extends Mapper {
 
 	/**
-	 * @var \Schoolbox\FileMapper
+	 * @var \Schoolbox\StorageMapper
 	 */
 	protected $storage_mapper;
 
@@ -29,7 +29,7 @@ class FileMapper extends Mapper {
 	}
 
 	/**
-	 * @param  \Schoolbox\FileMapper $storage_mapper
+	 * @param  \Schoolbox\StorageMapper $storage_mapper
 	 * @return $this
 	 */
 	public function setStorageMapper($storage_mapper) {
@@ -38,7 +38,7 @@ class FileMapper extends Mapper {
 	}
 
 	/**
-	 * @return \Schoolbox\FileMapper
+	 * @return \Schoolbox\StorageMapper
 	 */
 	public function getStorageMapper() {
 		return $this->storage_mapper;

@@ -15,7 +15,7 @@ use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\FileMapper;
 use Schoolbox\Test\TestCase;
-use Schoolbox\File as Storage;
+use Schoolbox\Storage;
 
 class FileMapperTest extends TestCase {
 
@@ -64,7 +64,7 @@ class FileMapperTest extends TestCase {
 		// createModel(): returns a new (mocked) storage item.
 		// findByColumn(): First call throws an exception, others return the
 		// saved storage item.
-		$storage_mapper = $this->getMock('\\Schoolbox\\FileMapper', array('createModel', 'findOneByColumn'));
+		$storage_mapper = $this->getMock('\\Schoolbox\\FileMapper', array('createModel', 'findByHash'));
 		$storage_mapper
 			->expects($this->any())
 			->method('createModel')
@@ -74,7 +74,7 @@ class FileMapperTest extends TestCase {
 		$matcher = $this->any();
 		$storage_mapper
 			->expects($matcher)
-			->method('findOneByColumn')
+			->method('findByHash')
 			->will($this->returnCallback(function() use($matcher, $saved_storage) {
 				if ($matcher->getInvocationCount() === 1) {
 					throw new Exception('Instance of object not found');
