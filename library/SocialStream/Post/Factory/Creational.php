@@ -82,7 +82,7 @@ class Creational extends AbstractFactory {
 			 * as if they had been uploaded
 			 */
 			else if ($this->getUrlDetection()->isStorageUrl()) {
-				$fileMapper = new \Schoolbox\FileMapper();
+				$fileMapper = new \Schoolbox\StorageMapper();
 				$file = $fileMapper->findByHash($this->getUrlDetection()->getHash());
 
 				$uploadedFile = $this->constructFromUpload($file);
@@ -101,7 +101,7 @@ class Creational extends AbstractFactory {
 			$fileArray = $_FILES['file'];
 
 			try {
-				$resource = \Schoolbox\FileMapper::getInstance()->upload($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
+				$resource = \Schoolbox\StorageMapper::getInstance()->upload($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
 
 				$uploadedFile = $this->constructFromUpload($resource);
 				$this->populate($data);
@@ -111,7 +111,7 @@ class Creational extends AbstractFactory {
 				$this->spawnMetadataFromUpload($uploadedFile);
 				$this->spawnThumbnailFromUpload($uploadedFile);
 			}
-			catch (Exception $ex) {
+			catch (\Exception $ex) {
 			}
 		}
 		/* Try to process as a url instead

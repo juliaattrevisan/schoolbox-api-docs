@@ -58,7 +58,7 @@ class File {
 		$metadata = stream_get_meta_data($brownhole);
 
 		if (file_exists($metadata['uri'])) {
-			$savedFile = \Schoolbox\FileMapper::getInstance()->upload(basename($this->getUrl()), $metadata['uri'], $this->getOwnerId());
+			$savedFile = \Schoolbox\StorageMapper::getInstance()->upload(basename($this->getUrl()), $metadata['uri'], $this->getOwnerId());
 
 			$this->setSavedFile($savedFile);
 		}
