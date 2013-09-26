@@ -9493,11 +9493,42 @@ ul.activity-list li,
 }
 
 /* Socialstream */
+.addPostForm {
+	background: @dark;
+	border-bottom: 1px solid @border-color;
+	p { margin: 0 16px; }
+}
+.socialstream-form {
+	width: 100%;
+	margin: 0;
+	li {
+		padding: 7px 16px 0 12px  !important;
+	}
+	label {
+		padding-right: 0;
+		input, .socialstream-selected-file {
+			width: 75%;
+			float: right;
+			.ellipsis;
+		}
+	}
+	textarea { width: 100%; }
+}
+
+.socialstream-post {
+	.socialstream-comment,
+	.socialstream-reply {
+		padding: 3px 0 3px 8px;
+		border: 4px solid transparent;
+		border-left-color: @border-color;
+		border-right-width: 0;
+	}
+}
 .socialstream-attachment {
 	border: 1px solid darken(@alternate-background,@darken-value);
 	background: @alternate-background;
 	margin-top: 16px;
-	padding: 8px 8px 0;
+	padding: 8px 8px 4px;
 	display: block;
 	.description {
 		margin-bottom: 8px;

@@ -111,9 +111,9 @@
 				/* Attachment selectors everywhere in the entire stream
 				 */
 				attachment: $j('.socialstream-attachment'),
-				attachmentUrlSelector: $j('.socialstream-attachment-url').parent('label'),
-				attachmentUploadSelector:  $j('.socialstream-attachment-upload').parent('label'),
-				attachmentResourceSelector: $j('.socialstream-attachment-resource').parent('label')
+				attachmentUrlSelector: $j('.socialstream-attachment-url').closest('li'),
+				attachmentUploadSelector:  $j('.socialstream-attachment-upload').closest('li'),
+				attachmentResourceSelector: $j('.socialstream-attachment-resource').closest('li')
 			}
 
 			/* Force integer (use the force)
@@ -307,9 +307,9 @@
 			form.find('.socialstream-attachment-url').click(function() {
 				form.find('input[name=socialstreamAttachment]').val('url');
 
-				form.find('input[name=url]').val('').removeAttr('readonly', '').parent('label').show();
-				form.find('input[name=file]').parent('label').hide();
-				form.find('.socialstream-selected-file').html('').parent('label').hide();
+				form.find('input[name=url]').val('').removeAttr('readonly', '').closest('li').show();
+				form.find('input[name=file]').closest('li').hide();
+				form.find('.socialstream-selected-file').html('').closest('li').hide();
 
 			});
 
@@ -318,9 +318,9 @@
 			form.find('.socialstream-attachment-upload').click(function() {
 				form.find('input[name=socialstreamAttachment]').val('upload');
 
-				form.find('input[name=url]').val('').parent('label').hide();
-				form.find('input[name=file]').parent('label').show();
-				form.find('.socialstream-selected-file').html('').parent('label').hide();
+				form.find('input[name=url]').val('').closest('li').hide();
+				form.find('input[name=file]').closest('li').show();
+				form.find('.socialstream-selected-file').html('').closest('li').hide();
 			});
 
 			/* Resource attachment options
@@ -328,9 +328,9 @@
 			form.find('.socialstream-attachment-resource').click(function() {
 				form.find('input[name=socialstreamAttachment]').val('resource');
 
-				form.find('input[name=url]').val('').attr('readonly', 'readonly').parent('label').show();
-				form.find('input[name=file]').parent('label').hide();
-				form.find('.socialstream-selected-file').html('').parent('label').show();
+				form.find('input[name=url]').val('').attr('readonly', 'readonly').closest('li').show();
+				form.find('input[name=file]').closest('li').hide();
+				form.find('.socialstream-selected-file').html('').closest('li').show();
 			});
 
 			return form;
@@ -341,9 +341,9 @@
 			 * @param form
 			 */
 			function resetAttachmentSelectors(form) {
-				form.find('.socialstream-selected-file').parent('label').hide();
-				form.find('input[name=url]').parent('label').hide();
-				form.find('input[name=file]').parent('label').hide();
+				form.find('.socialstream-selected-file').closest('li').hide();
+				form.find('input[name=url]').closest('li').hide();
+				form.find('input[name=file]').closest('li').hide();
 			}
 		}
 	}
