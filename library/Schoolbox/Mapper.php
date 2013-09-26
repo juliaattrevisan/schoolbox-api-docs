@@ -695,8 +695,21 @@ class Mapper {
 	 * @return object
 	 */
 	public function findOneByColumn($columnName, $columnValue, $order = array()) {
+		return $this->findOneByColumnList(array($columnName => $columnValue), $order);
+	}
+
+	/**
+	 * Returns first model who matches all the values pairs in $columnList.
+	 *
+	 * @throws Exception if no instance of model is found
+	 * @throws Exception\Deleted if the model was found but has been deleted
+	 * @param  array  $columnList
+	 * @param  array  $order      Fields to order by (@see findByColumnList() $options param)
+	 * @return object
+	 */
+	public function findOneByColumnList($columnList, $order = array()) {
 		$result_collection = $this->findByColumnList(
-			array($columnName => $columnValue),
+			$columnList,
 			array(
 				'deleted' => true,
 				'limit'   => 1,
