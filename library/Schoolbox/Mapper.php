@@ -769,7 +769,13 @@ class Mapper {
 				}
 				else {
 					// This method is smart enough to work with arrays and IN statements
+					// If the list of values is empty, though: there's no way
+					// that the query could ever return anything, so just return
+					// an empty collection.
 					if (is_array($columnValue)) {
+						if (count($columnValue) === 0) {
+							return $this->hydrateList(array());
+						}
 						$where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
 						$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
 					}
