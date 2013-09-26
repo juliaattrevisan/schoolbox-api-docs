@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Course;
 
+use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
@@ -78,6 +79,52 @@ class UnitInstanceMapper extends Mapper {
 
         $this->hasSoftDeleteDateField('deleted_at');
         $this->registerCallback('postSave', array($this, 'postSave'));
+    }
+
+    /**
+     * Retrieves unit instances for the given component.
+     *
+     * @param  Component_Instance        $component
+     * @return UnitInstance[]|Collection
+     */
+    public function findForComponent(Component_Instance $component) {
+        /** @var Collection|UnitInstance[] $unit_list */
+        $unit_list = $this->findByColumn(
+            'component_id',
+            $component->getId(),
+            array(
+                'order' => array(
+                    'open_date' => 'asc',
+                    'due_date'  => 'asc',
+                )
+            )
+        );
+
+        // Hydrate the list of tasks within each unit, sorting by order.
+        $task_list = Task\InstanceMapper::getInstance()->findByColumn(
+            'course_unit_instance_id',
+            $unit_list->getColumnValues('id'),
+            array(
+                'order' => array(
+                    'order' => 'asc',
+                )
+            )
+        );
+
+        // Add only the relevant tasks to each unit.
+        foreach ($unit_list as $unit) {
+            $task_iterator = new \CallbackFilterIterator(
+                $task_list,
+                function($item) use($unit) {
+                    /** @var Task\Instance $item */
+                    return $item->getUnitInstance()->getId() == $unit->getId();
+                }
+            );
+            foreach ($task_iterator as $task) {
+                $unit->getTasks()->add($task);
+            }
+        }
+        return $unit_list;
     }
 
     /**
