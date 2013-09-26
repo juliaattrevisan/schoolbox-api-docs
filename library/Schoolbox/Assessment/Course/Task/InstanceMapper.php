@@ -9,7 +9,9 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
@@ -138,6 +140,8 @@ class InstanceMapper extends Mapper {
     public function postSave(Instance $object, $is_new = false) {
         if ($is_new) {
             $task = $object->getTask();
+            /** @var UnitInstance $unit */
+            $unit = UnitInstanceMapper::getInstance()->findById($object->getUnitInstance()->getId());
             if ($task->getAssessment()->getId()) {
                 // Clone assessment and save
                 // Use the XML input and output methods to create it.
@@ -148,12 +152,15 @@ class InstanceMapper extends Mapper {
                 $category = CategoryMapper::getInstance()->findById(
                     $object->getUnitInstance()->getComponent()->getIdentifier()
                 );
+                /** @var SubmissionBox $box */
                 $box = SubmissionBoxMapper::getInstance()->findById($box_id);
                 $box
                     ->setTask(null)
                     ->setCategory($category)
+                    ->setOpenDate($unit->getOpenDate())
+                    ->setDueDate($unit->getDueDate())
+                    ->setLateDate($unit->getDueDate())
                 ;
-                // Set box's open, close and due date as well.
                 SubmissionBoxMapper::getInstance()->create($box);
                 $this->updateAll($object, 'box_id', $box->getId());
             }
