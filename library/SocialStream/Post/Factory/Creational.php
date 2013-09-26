@@ -312,9 +312,9 @@ class Creational extends AbstractFactory {
 	/**
 	 * Get the title and description
 	 *
-	 * @param \Schoolbox\File $uploadedFile
+	 * @param \Schoolbox\Storage $uploadedFile
 	 */
-	private function spawnMetadataFromUpload(\Schoolbox\File $uploadedFile) {
+	private function spawnMetadataFromUpload(\Schoolbox\Storage $uploadedFile) {
 		$this->getProduct()->setExternalTitle($uploadedFile->getFilename());
 		$this->getProduct()->setExternalBody('');
 	}
@@ -322,9 +322,9 @@ class Creational extends AbstractFactory {
 	/**
 	 * Get the thumbnail usage
 	 *
-	 * @param \Schoolbox\File $uploadedFile
+	 * @param \Schoolbox\Storage $uploadedFile
 	 */
-	private function spawnThumbnailFromUpload(\Schoolbox\File $uploadedFile) {
+	private function spawnThumbnailFromUpload(\Schoolbox\Storage $uploadedFile) {
 
 		/* Set up video thumbnails
 		 */
