@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Assess_Answer_Numeric extends Evaluation_Answer_Short {
+class Assess_Answer_Numeric extends Evaluation_Answer_Numeric {
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation

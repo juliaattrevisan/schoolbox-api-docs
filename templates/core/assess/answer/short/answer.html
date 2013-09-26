@@ -1,5 +1,13 @@
+
 <label class="textarea">
     <!-- BEGIN answerOption -->
+	<script type='text/javascript'>
+		$j(function() {
+			$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+				id: {QUESTION_ID}
+			});
+		});
+	</script>
     <div class="textarea-container"><textarea name="answer">{ANSWER}</textarea></div>
     <!-- END answerOption -->
 </label>

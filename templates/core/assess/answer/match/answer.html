@@ -1,15 +1,29 @@
+<script type='text/javascript'>
+	$j(function() {
+		$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+			id: {QUESTION_ID}
+		});
+	});
+</script>
+
 <p class="information-notification">Re-order the items on the right by dragging them to match the items on the left.</p>
 
-<ul class="left-answer option">
+<ul class="evaluation-matchingpairs-left left-answer option">
 	<!-- BEGIN answerOptionLeft -->
-	<li class="left-answer clearfix"><strong>{ANSWER_LEFT_VALUE}</strong><div class="arrow"><span>matches</span></div></li>
+	<li class="left-answer clearfix">
+		<strong>{ANSWER_LEFT_VALUE}</strong>
+		<div class="arrow">
+			<span>matches</span>
+		</div>
+	</li>
 	<!-- END answerOptionLeft -->
 </ul>
-<ul id="matchPairs_{MATCHPAIRS_QUESTION_ID}" class="match-it option">
+<ul class="evaluation-matchingpairs-right match-it option">
 	<!-- BEGIN answerOptionRight -->
 	<li class="right-answer clearfix">
-	   <strong> <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
-		{ANSWER_RIGHT_VALUE}
+	   <strong>
+		   <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+			{ANSWER_RIGHT_VALUE}
 		</strong>
 	</li>
 	<!-- END answerOptionRight -->

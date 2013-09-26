@@ -11,6 +11,13 @@
  */
 abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
 
+	/**
+	 * Javascript class to use when creating UI
+	 *
+	 * @var string
+	 */
+	protected $plugin = 'evaluationNumeric';
+
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.
@@ -94,6 +101,8 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
         if ($existing['response']) {
             $page->setVar(
                 array(
+					'QUESTION_ID' => $question_id,
+					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
                     'ANSWER' => Scrub::text($existing['response']),
                 )
@@ -101,6 +110,8 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
         } else {
             $page->setVar(
                 array(
+					'QUESTION_ID' => $question_id,
+					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
                     'ANSWER' => '',
                 )
