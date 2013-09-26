@@ -88,4 +88,14 @@ class MockDatabase {
     public function prepare($query) {
         return $this->mock_statement;
     }
+
+    /**
+     * Mock of quoteIdentifier (used by Schoolbox\Mapper->findByColumnList())
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function quoteIdentifier($string) {
+        return $string;
+    }
 }
