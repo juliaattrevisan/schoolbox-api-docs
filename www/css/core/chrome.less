@@ -9492,6 +9492,32 @@ ul.activity-list li,
 	td { background: none; }
 }
 
+/* Socialstream */
+.socialstream-attachment {
+	border: 1px solid darken(@alternate-background,@darken-value);
+	background: @alternate-background;
+	margin-top: 16px;
+	padding: 8px 8px 0;
+	display: block;
+	.description {
+		margin-bottom: 8px;
+		font-style: italic;
+	}
+	a {
+		font-weight: bold;
+		word-break: break-word;
+	}
+	img {
+		float: left;
+		margin: 0 16px 8px 0;
+	}
+	iframe {
+		max-width: 100%;
+		height: auto;
+		min-height: 30%;
+	}
+}
+
 /* Socialstream Browser
  */
 .socialstream-node li {
@@ -9514,21 +9540,21 @@ ul.activity-list li,
 		background: @dark;
 		border: 1px solid @border-color;
 		position: relative;
-		margin-right: -5px;
+		margin-right: -6px;
 		line-height: 26px;
 		white-space: nowrap;
 		&:before, &:after {
 			content: '';
 			.block(0,0);
-			.absolute(0, auto, auto, -11px);
+			.absolute(-1px, auto, auto, -12px);
 			border: 10px solid transparent;
-			border-width: 13px 5px;
+			border-width: 13px 6px;
 			border-left-color: @border-color;
 			z-index: 1;
 		}
 		&:after {
 			border-left-color: @dark;
-			right: -10px;
+			right: -11px;
 		}
 		&:hover {
 			color: @tab-color;
@@ -9536,7 +9562,6 @@ ul.activity-list li,
 			border-color: @tab-background;
 			&:before, &:after { border-left-color: @tab-background; }
 		}
-
 	}
 	.last a {
 		border: none;

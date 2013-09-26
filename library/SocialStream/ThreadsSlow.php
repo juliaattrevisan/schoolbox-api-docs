@@ -243,7 +243,7 @@ class ThreadsSlow {
 		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_icon', 'socialstream_reply_has_icon_block');
 		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
 		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
-		$page->setBlock('socialstream_reply', 'socialstream_reply_has_metadata', 'socialstream_reply_has_metadata_block');
+		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_metadata', 'socialstream_reply_has_metadata_block');
 		$page->setBlock('socialstream_reply', 'socialstream_reply_has_delete', 'socialstream_reply_has_delete_block');
 
 		$page->setVar(array(
@@ -461,7 +461,7 @@ class ThreadsSlow {
 			$page->parse('socialstream_post_block', 'socialstream_post', true);
 			
 			$page->setVar(array(
-				'socialstream_post_has_icon_block' => '',
+				'socialstream_post_has_attachment_block' => '',
 				'socialstream_post_has_icon_block' => '',
 				'socialstream_post_has_thumbnail_block' => '',
 				'socialstream_post_has_player_block' => '',
