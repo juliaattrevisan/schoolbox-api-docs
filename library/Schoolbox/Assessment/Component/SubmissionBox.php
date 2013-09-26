@@ -145,10 +145,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param Category $category
+	 * @param  Category $category
+	 * @return $this
 	 */
 	public function setCategory($category) {
 		$this->category = $category;
+		return $this;
 	}
 
 	/**
@@ -159,10 +161,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param string $description
+	 * @param  string $description
+	 * @return $this
 	 */
 	public function setDescription($description) {
 		$this->description = $description;
+		return $this;
 	}
 
 	/**
@@ -173,10 +177,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param int $id
+	 * @param  int   $id
+	 * @return $this
 	 */
 	public function setId($id) {
 		$this->id = $id;
+		return $this;
 	}
 
 	/**
@@ -187,10 +193,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param int $legacy_file_id
+	 * @param  int   $legacy_file_id
+	 * @return $this
 	 */
 	public function setLegacyFileId($legacy_file_id) {
 		$this->legacy_file_id = $legacy_file_id;
+		return $this;
 	}
 
 	/**
@@ -201,10 +209,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param string $name
+	 * @param  string $name
+	 * @return $this
 	 */
 	public function setName($name) {
 		$this->name = $name;
+		return $this;
 	}
 
 	/**
@@ -231,10 +241,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param WorkType $type
+	 * @param  WorkType $type
+	 * @return $this
 	 */
 	public function setWorkType($type) {
 		$this->work_type = $type;
+		return $this;
 	}
 
 	/**
@@ -245,10 +257,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param FileCollection $link
+	 * @param  FileCollection $link
+	 * @return $this
 	 */
 	public function setFileLinks($link) {
 		$this->file_links = $link;
+		return $this;
 	}
 
 	/**
@@ -266,10 +280,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param boolean $accept_multiple
+	 * @param  boolean $accept_multiple
+	 * @return $this
 	 */
 	public function setAcceptMultiple($accept_multiple) {
 		$this->accept_multiple = $accept_multiple;
+		return $this;
 	}
 
 	/**
@@ -280,10 +296,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param boolean $accept_online
+	 * @param  boolean $accept_online
+	 * @return $this
 	 */
 	public function setAcceptOnline($accept_online) {
 		$this->accept_online = $accept_online;
+		return $this;
 	}
 
 	/**
@@ -294,10 +312,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param \Alaress_Date_Format $created
+	 * @param  \Alaress_Date_Format $created
+	 * @return $this
 	 */
 	public function setCreated($created) {
 		$this->created = $created;
+		return $this;
 	}
 
 	/**
@@ -308,10 +328,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param \Alaress_Date_Format $due_date
+	 * @param  \Alaress_Date_Format $due_date
+	 * @return $this
 	 */
 	public function setDueDate($due_date) {
 		$this->due_date = $due_date;
+		return $this;
 	}
 
 	/**
@@ -322,10 +344,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param \Alaress_Date_Format $late_date
+	 * @param  \Alaress_Date_Format $late_date
+	 * @return $this
 	 */
 	public function setLateDate($late_date) {
 		$this->late_date = $late_date;
+		return $this;
 	}
 
 	/**
@@ -336,10 +360,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param MarkType $mark_type
+	 * @param  MarkType $mark_type
+	 * @return $this
 	 */
 	public function setMarkType($mark_type) {
 		$this->mark_type = $mark_type;
+		return $this;
 	}
 
 	/**
@@ -350,10 +376,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param int $max_mark
+	 * @param  int   $max_mark
+	 * @return $this
 	 */
 	public function setMaxMark($max_mark) {
 		$this->max_mark = $max_mark;
+		return $this;
 	}
 
 	/**
@@ -364,10 +392,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param \Alaress_Date_Format $open_date
+	 * @param  \Alaress_Date_Format $open_date
+	 * @return $this
 	 */
 	public function setOpenDate($open_date) {
 		$this->open_date = $open_date;
+		return $this;
 	}
 
 	/**
@@ -378,10 +408,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param User $owner
+	 * @param  User $owner
+	 * @return $this
 	 */
 	public function setOwner($owner) {
 		$this->owner = $owner;
+		return $this;
 	}
 
 	/**
@@ -392,10 +424,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param int $rubric_result_set
+	 * @param  int   $rubric_result_set
+	 * @return $this
 	 */
 	public function setRubricResultSet($rubric_result_set) {
 		$this->rubric_result_set = $rubric_result_set;
+		return $this;
 	}
 
 	/**
@@ -406,10 +440,12 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param NotificationCollection $notifications
+	 * @param  NotificationCollection $notifications
+	 * @return $this
 	 */
 	public function setNotifications($notifications) {
 		$this->notifications = $notifications;
+		return $this;
 	}
 
 	/**
