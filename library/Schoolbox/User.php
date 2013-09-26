@@ -37,6 +37,8 @@ private $enabled;               //Bool
      */
     protected $subject_collection;
 
+	/** @var Collection */
+	protected $parent_collection;
 
     //User config options
     private $localEmail;  //Controls if user has local domain email username@domain
@@ -372,4 +374,30 @@ private $enabled;               //Bool
     public function getConfigLoader() {
         return $this->config_loader;
     }
+
+
+	/**
+	 * Load parents into object from external db
+	 */
+	public function loadParents() {
+		$this->parent_collection = new Collection();
+
+		// TODO remove handler dependency
+		$DEPRECATED_EXTERNAL_USER = new \External_User();
+		$contactArray = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
+
+		if(is_array($contactArray)) {
+			foreach($contactArray as $c) {
+				$this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactID']));
+				$this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactSpouseID']));
+			}
+		}
+	}
+
+	/**
+	 * @return Collection
+	 */
+	public function getParents() {
+		return $this->parent_collection;
+	}
 }

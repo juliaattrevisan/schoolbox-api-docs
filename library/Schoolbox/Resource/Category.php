@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Resource;
 use Schoolbox\Collection;
+use Schoolbox\External\Mapper;
+use Schoolbox\UserMapper;
 
 
 class Category {
@@ -48,6 +50,9 @@ class Category {
      * @var \Schoolbox\Resource\Group
      */
     protected $group;
+
+	/** @var Collection */
+	protected $teacher_collection;
 
 	public function __construct() {
 		$this->setCodes(new Collection(array()));
@@ -183,6 +188,45 @@ class Category {
     {
         return $this->group;
     }
+
+	/**
+	 * Returns the teacher collection
+	 *
+	 * @return Collection
+	 */
+	public function getTeachers() {
+		return $this->teacher_collection;
+	}
+
+
+	/**
+	 * Populates the teacher collection
+	 *
+	 * @param bool $includeSynergy
+	 */
+	public function loadTeachers($includeSynergy = true) {
+		// populate the teacher collection
+
+		$this->teacher_collection = new Collection();
+
+		if($includeSynergy) {
+			// TODO remove handler dependency
+			$DEPRECATED_EXTERNAL_CLASS = new \External_Class();
+
+			$codeCollection = $this->getCodes();
+
+			if($codeCollection->count()) {
+				$externalIdArray = $DEPRECATED_EXTERNAL_CLASS->getTeacherName($codeCollection->first()->getCode());
+
+				foreach($externalIdArray as $extId) {
+					$this->teacher_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $extId));
+				}
+			}
+		}
+
+		// do we include staff included in this category internally as well? for now, no.
+
+	}
 
 	//
 	// TODO implement group type, user access joins
