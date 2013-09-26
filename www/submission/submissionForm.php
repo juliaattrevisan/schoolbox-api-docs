@@ -27,7 +27,6 @@ else {
 // create required objects
 $page = new SitePage();
 
-use Schoolbox\File;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Notification;
