@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress_Date_Format;
 use Component_Instance;
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
 
@@ -30,6 +31,11 @@ class UnitInstance implements ISoftDeletable {
      * @var Category
      */
     protected $unit_category;
+
+    /**
+     * @var Collection|Task\Instance[]
+     */
+    protected $tasks;
 
     /**
      * @var string
@@ -55,6 +61,10 @@ class UnitInstance implements ISoftDeletable {
      * @var Alaress_Date_Format
      */
     protected $deleted;
+
+    public function __construct() {
+        $this->tasks = new Collection();
+    }
 
     /**
      * @param  \Component_Instance $component
@@ -182,6 +192,22 @@ class UnitInstance implements ISoftDeletable {
      */
     public function getUnitCategory() {
         return $this->unit_category;
+    }
+
+    /**
+     * @param  Collection $tasks
+     * @return $this
+     */
+    public function setTasks($tasks) {
+        $this->tasks = $tasks;
+        return $this;
+    }
+
+    /**
+     * @return Task\Instance[]|Collection
+     */
+    public function getTasks() {
+        return $this->tasks;
     }
 
     /**
