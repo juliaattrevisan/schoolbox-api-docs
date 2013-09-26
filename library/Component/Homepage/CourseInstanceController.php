@@ -9,6 +9,8 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
+
 class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract {
 
     protected $unit_list = array();
@@ -17,45 +19,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      * {@inheritdoc}
      */
     public function execute() {
-        // Test list
-        $this->unit_list = array(
-            array(
-                'id'        => 3,
-                'name'      => 'Dumb task list',
-                'task_list' => array(
-                    array(
-                        'id'   => 6,
-                        'name' => 'Dumb task 1',
-                    ),
-                    array(
-                        'id'   => 7,
-                        'name' => 'Dumb task 2',
-                    ),
-                    array(
-                        'id'   => 1,
-                        'name' => 'Dumb task 3',
-                    ),
-                ),
-            ),
-            array(
-                'id'        => 6,
-                'name'      => 'Smart task list',
-                'task_list' => array(
-                    array(
-                        'id'   => 61,
-                        'name' => 'Smart task 1',
-                    ),
-                    array(
-                        'id'   => 71,
-                        'name' => 'Smart task 2',
-                    ),
-                    array(
-                        'id'   => 11,
-                        'name' => 'Smart task 3',
-                    ),
-                ),
-            ),
-        );
+        $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
     }
 
     /**
