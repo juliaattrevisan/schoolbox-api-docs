@@ -28,6 +28,35 @@ $j(function() {
 	$j('.evaluation-finish').click(function() {
 		$j.fn.evaluation.saveAll();
 	});
+
+	/* Submit all the questions before switching between sections
+	 */
+	$j('.evaluation-navigator').click(function() {
+		event.preventDefault();
+
+		$j.fn.evaluation.saveAll();
+
+		location.href = $j(this).attr('href');
+	});
+
+	/* When someone finishes an assessment, loop through each question
+	 * and submit its values - then redirect. This avoids a wierd timing
+	 * problem which sometimes happens, where it redirects before it
+	 * submits all the questionForm elements. This causes, in particular,
+	 * Matching Pairs to remain untouched resulting in NULL values.
+	 */
+	$j('a.evaluation-finish').click(function() {
+		event.preventDefault();
+
+		$j.fn.evaluation.saveAll();
+
+		location.href = $j(this).attr('href');
+	}).confirm({
+		buttons: {
+			wrapper:'<button></button>',
+			separator:'  '
+		}
+	});
 });
 </script>
 <style type='text/css'>
@@ -81,11 +110,11 @@ $j(function() {
 		<!-- END endAssess -->
 
 		<!-- BEGIN prevSection -->
-		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a>
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn evaluation-navigator float-left"><span></span>Previous Section</a>
 		<!-- END prevSection -->
 
 		<!-- BEGIN nextSection -->
-		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a>
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn evaluation-navigator"><span></span>Next Section</a>
 		<!-- END nextSection -->
 	</p>
 </div>
