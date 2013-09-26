@@ -20,13 +20,16 @@
 
 <script type="text/javascript">
 $j(function() {
-		$j('#evaluation-countdown').evaluationCountdown({
+
+	/* Start all the navigation controls
+	 */
+	$j.fn.evaluation.initNavigators();
+
+	/* Pass necessary values
+	 */
+	$j('#evaluation-countdown').evaluationCountdown({
 		evaluationId: '{ASSESS_ASSESS_ID}',
 		timeLeft: '{ASSESS_TIME_REMAINING}'
-	});
-
-	$j('.evaluation-finish').click(function() {
-		$j.fn.evaluation.saveAll();
 	});
 });
 </script>
@@ -81,11 +84,11 @@ $j(function() {
 		<!-- END endAssess -->
 
 		<!-- BEGIN prevSection -->
-		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a>
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn evaluation-navigator float-left"><span></span>Previous Section</a>
 		<!-- END prevSection -->
 
 		<!-- BEGIN nextSection -->
-		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a>
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn evaluation-navigator"><span></span>Next Section</a>
 		<!-- END nextSection -->
 	</p>
 </div>

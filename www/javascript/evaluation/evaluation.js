@@ -3,6 +3,42 @@
  */
 (function($j) {
 	$j.fn.evaluation = function() {
+
+	}
+
+	/**
+	 * Prepare some common setup activity
+	 */
+	$j.fn.evaluation.initNavigators = function() {
+
+		/* Submit all the questions before switching between sections
+		 */
+		$j('.evaluation-navigator').click(function() {
+			event.preventDefault();
+
+			$j.fn.evaluation.saveAll();
+
+			location.href = $j(this).attr('href');
+		});
+
+		/* When someone finishes an assessment, loop through each question
+		 * and submit its values - then redirect. This avoids a wierd timing
+		 * problem which sometimes happens, where it redirects before it
+		 * submits all the questionForm elements. This causes, in particular,
+		 * Matching Pairs to remain untouched resulting in NULL values.
+		 */
+		$j('.evaluation-finish').click(function() {
+			event.preventDefault();
+
+			$j.fn.evaluation.saveAll();
+
+			location.href = $j(this).attr('href');
+		}).confirm({
+			buttons: {
+				wrapper:'<button></button>',
+				separator:'  '
+			}
+		});
 	}
 
 	/**
