@@ -107,7 +107,7 @@ class StorageMapper extends Mapper {
 	 * @param string $temp_location The location of the file to save.
 	 * @param int    $user_id       The user to associate with the file.
 	 *
-	 * @return File
+	 * @return Storage
 	 */
 	public function upload($filename, $temp_location, $user_id) {
 		$file = new Storage();
@@ -147,10 +147,10 @@ class StorageMapper extends Mapper {
     /**
      * This method will fetch a storage object via its hash and populate it the object storage and mime object
      *
-     * @throws Exception if no instance of model is found
+     * @throws Schoolbox\Mapper\Exception if no instance of model is found
      *
-     * @param string The hash identifier of the storage file
-     * @return \Schoolbox\Storage
+     * @param string $hash The hash identifier of the storage file
+     * @return Storage
      *
      */
     public function findByHash($hash) {
