@@ -9,11 +9,16 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Collection;
+use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract {
 
-    protected $unit_list = array();
+    /**
+     * @var Collection|UnitInstance[]
+     */
+    protected $unit_list;
 
     /**
      * {@inheritdoc}
@@ -53,24 +58,21 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             foreach ($this->unit_list as $unit) {
                 $this->setVar(
                     array(
-                        'UNIT_ID'   => $unit['id'],
-                        'UNIT_NAME' => $unit['name'],
+                        'UNIT_ID'   => $unit->getId(),
+                        'UNIT_NAME' => $unit->getTitle(),
                     )
                 );
 
                 // Output list of tasks within units
-                if (!empty($unit['task_list'])) {
-
-                    $this->setVar('unit_task_block', '');
-                    foreach ($unit['task_list'] as $task) {
-                        $this->setVar(
-                            array(
-                                'UNIT_TASK_ID'   => $task['id'],
-                                'UNIT_TASK_NAME' => $task['name'],
-                            )
-                        );
-                        $this->parse('unit_task_block', 'unit_task', true);
-                    }
+                $this->setVar('unit_task_block', '');
+                foreach ($unit->getTasks() as $task) {
+                    $this->setVar(
+                        array(
+                            'UNIT_TASK_ID'   => $task->getId(),
+                            'UNIT_TASK_NAME' => $task->getTitle(),
+                        )
+                    );
+                    $this->parse('unit_task_block', 'unit_task', true);
                 }
                 $this->parse('unit_block', 'unit', true);
             }
