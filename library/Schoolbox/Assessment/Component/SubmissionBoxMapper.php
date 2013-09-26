@@ -241,6 +241,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	public function findById($id) {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
+		$mime_mapper     = $file_mapper->getJoinMapper('allowedFileType');
 		$notify_mapper   = $this->getJoinMapper('notify');
 		$worktype_mapper = $this->getJoinMapper('work_type');
 		$marktype_mapper = $this->getJoinMapper('mark_type');
@@ -276,16 +277,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$query = "
 				SELECT
 					{$box_file_mapper->getColumnString('sm')},
-					{$file_mapper->getColumnString('f')}
+					{$file_mapper->getColumnString('f')},
+					{$mime_mapper->getColumnString('m')}
 				FROM {$box_file_mapper->getTable()} sm
 				LEFT JOIN {$box_file_mapper->getJoinSql('file', 'sm', 'f')}
+				LEFT JOIN {$file_mapper->getJoinSql('allowedFileType', 'f', 'm')}
 				WHERE sm.box_id=?
 			";
 			$statement = $this->database->prepare($query);
 			$statement->execute(array($id));
 			foreach ($statement as $row) {
-				$box_file       = $box_file_mapper->hydrate($row, 'sm');
-				$box_file->setFile($file_mapper->hydrate($row, 'f'));
+				$box_file     = $box_file_mapper->hydrate($row, 'sm');
+				$storage_file = $file_mapper->hydrate($row, 'f');
+				$storage_file->setMime($mime_mapper->hydrate($row, 'm'));
+				$box_file->setFile($storage_file);
 				$submission_box->addFileLink($box_file);
 			}
 		}
