@@ -114,7 +114,7 @@ class UnitInstanceMapper extends Mapper {
         // Add only the relevant tasks to each unit.
         foreach ($unit_list as $unit) {
             $task_iterator = new \CallbackFilterIterator(
-                $task_list,
+                $task_list->getIterator(),
                 function($item) use($unit) {
                     /** @var Task\Instance $item */
                     return $item->getUnitInstance()->getId() == $unit->getId();
