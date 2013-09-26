@@ -20,42 +20,16 @@
 
 <script type="text/javascript">
 $j(function() {
-		$j('#evaluation-countdown').evaluationCountdown({
+
+	/* Start all the navigation controls
+	 */
+	$j.fn.evaluation.initNavigators();
+
+	/* Pass necessary values
+	 */
+	$j('#evaluation-countdown').evaluationCountdown({
 		evaluationId: '{ASSESS_ASSESS_ID}',
 		timeLeft: '{ASSESS_TIME_REMAINING}'
-	});
-
-	$j('.evaluation-finish').click(function() {
-		$j.fn.evaluation.saveAll();
-	});
-
-	/* Submit all the questions before switching between sections
-	 */
-	$j('.evaluation-navigator').click(function() {
-		event.preventDefault();
-
-		$j.fn.evaluation.saveAll();
-
-		location.href = $j(this).attr('href');
-	});
-
-	/* When someone finishes an assessment, loop through each question
-	 * and submit its values - then redirect. This avoids a wierd timing
-	 * problem which sometimes happens, where it redirects before it
-	 * submits all the questionForm elements. This causes, in particular,
-	 * Matching Pairs to remain untouched resulting in NULL values.
-	 */
-	$j('a.evaluation-finish').click(function() {
-		event.preventDefault();
-
-		$j.fn.evaluation.saveAll();
-
-		location.href = $j(this).attr('href');
-	}).confirm({
-		buttons: {
-			wrapper:'<button></button>',
-			separator:'  '
-		}
 	});
 });
 </script>
