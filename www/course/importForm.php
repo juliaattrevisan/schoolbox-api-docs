@@ -34,12 +34,33 @@ if ($group->getPermission($homepage_id) < WRITE_ACCESS
     error(6);
 }
 
-// What to do?
-// Create new course_unit_instance items
-// Foreach task within the unit:
-// Import as a task instance
-// Import assessment if necessary
-$component          = Component_InstanceMapper::getInstance()->findById($component_id);
+/** @var Component_Instance $component */
+$component = Component_InstanceMapper::getInstance()->findById($component_id);
+
+// Get the config option called "courseHomepage" and save it.
+$definition = Component_ConfigDefinitionMapper::getInstance()->findOneByColumnList(array(
+    'component_definition_id' => $component->getDefinitionId(),
+    'key'                     => 'courseHomepage',
+));
+
+$config_mapper = Component_ConfigMapper::getInstance();
+try {
+    $config = $config_mapper->findOneByColumnList(array(
+        'component_config_definition_id' => $definition->getId(),
+        'component_instance_id'          => $component->getId(),
+    ));
+}
+catch (Schoolbox\Mapper\Exception $e) {
+    $config = new Component_Config();
+    $config
+        ->setConfigDefinitionId($definition->getId())
+        ->setInstanceId($component->getId())
+    ;
+}
+$config->setValue($course_homepage_id);
+$config_mapper->save($config);
+
+// And create a new unit instance for each option.
 $unit_instance_list = new Collection();
 foreach ($_POST['unit'] as $unit_id => $unit) {
     $unit_homepage = CategoryMapper::getInstance()->findById($unit_id);
