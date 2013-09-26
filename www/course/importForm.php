@@ -70,12 +70,11 @@ foreach ($_POST['unit'] as $unit_id => $unit) {
         ->setTitle($unit_homepage->getName())
         ->setUnitCategory($unit_homepage)
         ->setOpenDate(new Alaress_Date_Format($unit['open_date'], 'd/m/y'))
-        ->setDueDate(new Alaress_Date_Format($unit['open_date'], 'd/m/y'))
+        ->setDueDate(new Alaress_Date_Format($unit['due_date'], 'd/m/y'))
     ;
     $unit_instance_list->add($unit_instance);
 }
 UnitInstanceMapper::getInstance()->save($unit_instance_list);
-// Add post save methods to the unit instance mapper: it imports tasks within it
 
 // Go back to the homepage
 $site_page->localRedir('/homepage/'.$homepage_id);
