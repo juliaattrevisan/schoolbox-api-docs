@@ -20,6 +20,28 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
 	protected $plugin = 'evaluationRichText';
 
 	/**
+	 * Exports the answer to Moodle XML format. This is a modified version of
+	 * $this->reviewResponse()
+	 *
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function exportMoodleAnswer($page, $question_id) {
+		$currentAnswer = $this->getByQuestionID($question_id);
+
+		/* Show correct answer
+		 */
+		$page->setVar(
+			array(
+				'CORRECT_ANSWER' => Scrub::html($currentAnswer['answer'])
+			)
+		);
+
+		$page->parse('answerOption_block', 'answerOption', true);
+	}
+
+	/**
 	 * Show the response someone submitted and also show the correct answer.
 	 * Provide an option for the teacher to review the mark and adjust.
 	 *
