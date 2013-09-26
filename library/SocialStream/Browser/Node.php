@@ -149,6 +149,7 @@ class Node {
 
 		$fileMapper = new \Schoolbox\Resource\FileMapper();
 		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
+        $mimetypeMapper->getByFilename()
 
 		$allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), false);
 
@@ -157,7 +158,7 @@ class Node {
 				'type' => 'file',
 				'fileId' => $currentFile->getId(),
 				'name' => $currentFile->getFilename(),
-				'icon' => $mimetypeMapper->getIconForFilename($currentFile->getFilename()),
+				'icon' => $mimetypeMapper->getByFilename($currentFile->getFilename())->getIconFile(),
 			);
 
 			$output[] = $record;
