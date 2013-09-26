@@ -15,6 +15,11 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\StudentReportCard\Comment;
+use Schoolbox\Assessment\StudentReportCard\CommentMapper;
+use Schoolbox\Assessment\StudentReportCard\Conversation;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -27,6 +32,11 @@ class StudentReportCard {
 	const CAN_VIEW_CLASS_AVERAGE = 3;
 	const CAN_VIEW_SHOWCASE = 4;
 	const CAN_VIEW_OVERALL_GRADE = 5;
+
+	// binary? more like ternary!
+	const DISABLED = 0;
+	const ENABLED = 1;
+	const MANDATORY = 2;
 
 	// vars that come from user input
 	protected $targetUserId;
@@ -312,7 +322,7 @@ class StudentReportCard {
 	protected function renderSubject(\SitePage $page, $components = array()) {
 
 		if(empty($components)) {
-			$components = array('teachers','gradeAverage','classGraph','criteria','assessments');
+			$components = array('teachers','gradeAverage','classGraph','criteria','assessments','comments');
 		}
 
 		if(!$this->subjectData instanceof SubjectReportCard) {
@@ -757,6 +767,139 @@ class StudentReportCard {
 		return $output;
 	}
 
+	protected function renderComments(\SitePage $page) {
+
+		$page->setBlock('subject', 'subject_comments', 'subject_comments_block');
+		$page->setBlock('subject_comments', 'comment', 'comment_block');
+		$page->setBlock('subject_comments', 'create_comment', 'create_comment_block');
+		$page->setBlock('comment', 'comment_modify', 'comment_modify_block');
+
+		// sessionuser var
+		$sessionUser = UserMapper::getInstance()->findById($this->viewingUserId);
+		$sessionRole = $sessionUser->getRole()->getType();
+
+		$conversation = new Conversation($this->getTargetUser(), $this->getTargetCategory());
+
+		// show or hide the create comment form
+		if($conversation->canComment($sessionUser)) {
+			$sessionUserOutput = array(
+				'ID'        => $sessionUser->getId(),
+				'NAME'      => $sessionUser->formatName(),
+				'BYLINE'    => $sessionUser->getRole()->getName(),
+				'EXTID'     => $sessionUser->getExternalId()
+			);
+			foreach($sessionUserOutput as $k => $v) {
+				$page->setVar('SESSION_USER_'.$k, $v);
+			}
+			$page->parse('create_comment_block', 'create_comment');
+
+			$visibilities = array(
+				'STUDENT' => self::DISABLED,
+				'PARENT' => self::DISABLED
+			);
+
+			// determine default visibilities from submission_access config
+			switch(\Cfg::get('submission_access')) {
+				case SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+					$visibilities['PARENT'] = self::ENABLED;
+					continue;
+				case SubmissionBox::MARK_VISIBILITY_STUDENT:
+					$visibilities['STUDENT'] = self::ENABLED;
+					continue;
+				case SubmissionBox::MARK_VISIBILITY_PRIVATE:
+					break;
+			}
+
+			if($sessionRole == Role::PARENT) {
+				$visibilities['PARENT'] = self::MANDATORY;
+			}
+			elseif($sessionRole == Role::STUDENT) {
+				$visibilities['STUDENT'] = self::MANDATORY;
+			}
+
+			// render the checkboxes on the form
+			foreach($visibilities as $group => $visible) {
+				$attrs = '';
+				switch($visible) {
+					case self::MANDATORY: $attrs .= ' disabled="disabled"'; // fall through
+					case self::ENABLED:   $attrs .= ' checked="checked"'; break;
+				}
+				$page->setVar('COMMENT_VIS_'.$group.'_CHECKED', $attrs);
+			}
+		}
+		// hide the create comment form because you're not allowed to
+		else {
+			$page->setVar('create_comment_block', '');
+		}
+
+		// retrieve the comments visible to the session user
+		$comments = $conversation->getVisibleComments($sessionUser);
+
+
+		// if there are comments, output them
+		if($comments->count()) {
+			foreach($comments as $comment) {
+				/** @var Comment $comment */
+
+				$adr = new \Alaress_Date_Relative($comment->getCreated());
+
+				$date = $adr->getRelativeTime();
+				if($comment->getModified()) {
+					$date .= " &ndash; edited";
+				}
+
+				$commentData = array(
+					'USER_NAME' => $comment->getCommenter()->formatName(),
+					'USER_BYLINE' => $comment->getCommenter()->getRole(),
+					'USER_EXTID' => $comment->getCommenter()->getExternalId(),
+					'DATE' => $date,
+					'BODY' => $comment->getBody(),
+				);
+
+				// these vars determine the state of the little person icons
+				if($comment->isVisibleToStudent()) {
+					$commentData['VIS_STUDENT'] = 'on';
+					$commentData['VIS_STUDENT_TITLE'] = 'Visible to student';
+				}
+				else {
+					$commentData['VIS_STUDENT'] = 'off';
+					$commentData['VIS_STUDENT_TITLE'] = 'Hidden from student';
+				}
+
+				if($comment->isVisibleToParent()) {
+					$commentData['VIS_PARENT'] = 'on';
+					$commentData['VIS_PARENT_TITLE'] = 'Visible to parents';
+				}
+				else {
+					$commentData['VIS_PARENT'] = 'off';
+					$commentData['VIS_PARENT_TITLE'] = 'Hidden from parents';
+				}
+
+				// render all comment vars
+				foreach($commentData as $k => $v) {
+					$page->setVar('COMMENT_'.$k, $v);
+				}
+
+				// you can only modify a comment if you made it
+				if($sessionUser->getId() == $comment->getCommenter()->getId()) {
+					$page->parse('comment_modify_block', 'comment_modify');
+				}
+				else {
+					$page->setVar('comment_modify_block', '');
+				}
+
+				$page->parse('comment_block', 'comment', true);
+			}
+		}
+		// no comments in this conversation
+		else {
+			$page->setVar('comment_block', '<tr><td colspan="4">No comments.</td></tr>');
+		}
+
+		$page->parse('subject_comments_block', 'subject_comments');
+
+	}
+
 	/**
 	 * No subject selected, so display an overview of the semester instead
 	 *
@@ -985,6 +1128,22 @@ class StudentReportCard {
 		else {
 			return $var >= $this->minimumVisibility;
 		}
+	}
+
+	public function getTargetUser() {
+		return UserMapper::getInstance()->findById($this->targetUserId);
+	}
+
+	public function getTargetCategory() {
+		return CategoryMapper::getInstance()->findById($this->targetCategoryId);
+	}
+
+	public function getTargetYear() {
+		return $this->targetYear;
+	}
+
+	public function getTargetSemester() {
+		return $this->targetSemester;
 	}
 
 }

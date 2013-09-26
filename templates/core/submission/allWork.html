@@ -87,6 +87,58 @@
     font-size: 13px;
     font-weight: normal;
   }
+
+  .subject-comments {
+
+  }
+  .subject-comments table {
+    width: 100%;
+  }
+  .subject-comments td {
+    vertical-align: top;
+
+  }
+  .subject-comments img.thumb {
+    width: 32px;
+    height: 32px;
+  }
+  .subject-comments textarea {
+    width: 100%;
+    min-height: 64px;
+    padding: 5px;
+  }
+  .subject-comments .name {
+    display: block;
+  }
+  .subject-comments .group {
+    color: #797979;
+    display: block;
+  }
+  #create-comment div {
+    width: 300px;
+    float: right;
+    line-height: 2.6em;
+  }
+  #create-comment label {
+    display: inline;
+  }
+  .actions {
+    min-width: 125px;
+  }
+  .actions .visibility {
+    display: block;
+    float: left;
+    width: 24px;
+    height: 24px;
+    margin: 4px -1px;
+    background: url("/images/core/grades/visibilities.png");
+  }
+
+  .visibility.student.on  { background-position: 0 0; }
+  .visibility.student.off { background-position: 0 24px; }
+  .visibility.parent.on   { background-position: 24px 0; }
+  .visibility.parent.off  { background-position: 24px 24px; }
+
 </style>
 <script type="text/javascript" src="/javascript/excanvas.compiled.js"></script>
 <script type="text/javascript" src="/javascript/flot/jquery.flot.js"></script>
@@ -218,6 +270,69 @@
         </table>
       </div>
     </div>
+
+    <!-- BEGIN subject_comments -->
+    <div class="subject-comments">
+      <h2>Comments</h2>
+      <div class="listing">
+        <table class="comments">
+          <colgroup>
+            <col width="1%" />
+            <col width="10%" />
+            <col width="80%" />
+            <col width="9%" />
+          </colgroup>
+          <tbody>
+            <!-- BEGIN create_comment -->
+            <tr>
+              <td><img class="thumb" src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square32"></td>
+              <td>
+                <span class="name">{SESSION_USER_NAME}</span>
+                <span class="group">{SESSION_USER_BYLINE}</span>
+              </td>
+              <td colspan="2">
+                <form id="create-comment" action="/submission/commentForm.php" method="post">
+                  <input type="hidden" name="year" value="{WORK_YEAR}" />
+                  <input type="hidden" name="semester" value="{WORK_SEMESTER}" />
+                  <input type="hidden" name="studentId" value="{WORK_USER_ID}" />
+                  <input type="hidden" name="categoryId" value="{SUBJ_ID}" />
+                  <textarea name="comment"></textarea>
+                  <div>
+                    <span>Visible to: </span>
+                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
+                    <label for="vis-student">Student</label>
+                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
+                    <label for="vis-parent">Parent</label>
+                    <a class="submit-this btn up-arrow"><span></span>Post</a>
+                  </div>
+                </form>
+              </td>
+            </tr>
+            <!-- END create_comment -->
+            <!-- BEGIN comment -->
+            <tr>
+              <td><img class="thumb" src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square32"></td>
+              <td>
+                <span class="name">{COMMENT_USER_NAME}</span>
+                <span class="group">{COMMENT_USER_BYLINE}</span>
+                <span class="group">{COMMENT_DATE}</span>
+              </td>
+              <td><p>{COMMENT_BODY}</p></td>
+              <td class="actions">
+                <span class="visibility student {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
+                <span class="visibility parent {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
+                <!-- BEGIN comment_modify -->
+                <a class="btn delete no-text" title="Delete"><span></span></a>
+                <a class="btn modify no-text" title="Modify"><span></span></a>
+                <!-- END comment_modify -->
+              </td>
+            </tr>
+            <!-- END comment -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- END subject_comments -->
 
     <!-- END subject -->
   </div>
