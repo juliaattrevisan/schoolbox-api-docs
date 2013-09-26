@@ -25,10 +25,13 @@ if ($groupHandler->isSuperuser()) {
 		$record = $genericHandler->getByField('name', $currentRow);
 
         /* handle conversion to bytes */
-        if($record['field']=='bytes')
+        $type_name = Config::getFieldNameForOption($currentRow);
+        if ($type_name=='bytes') {
             $record['value'] = Alaress_Byte_Format::stringToBytes($_POST[$currentRow]);
-        else    
-		    $record['value'] = $_POST[$currentRow];
+        }
+        else {
+            $record['value'] = $_POST[$currentRow];
+        }
 
 		/* Update each row
 		 */
@@ -40,4 +43,3 @@ if ($groupHandler->isSuperuser()) {
 else {
 	error(19);
 }
-?>
