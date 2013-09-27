@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<h1>Welcome Back, Mort Prototyping Land</h1>
+
+	<form action='./mort.php' method='post'>
+		<ul>
+			<li>
+				<input type='checkbox' name='test[]' value='mort'> mort
+			</li>
+			<li>
+				<input type='checkbox' name='test[]' value='bart'> bart
+			</li>
+			<li>
+				<input type='checkbox' name='test[]' value='mort'> hans
+			</li>
+			<li>
+				<input type='checkbox' name='test[]' value='mort'> gruber
+			</li>
+			<li>
+				<input type='checkbox' name='test[other]' value='a'> other <input type='text' name='test[other_alias]' value='some other generic value' />
+			</li>
+		</ul>
+
+		<input type='submit' value='Submit'>
+	</form>
+</body>
+</html>
