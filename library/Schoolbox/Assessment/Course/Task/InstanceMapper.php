@@ -9,13 +9,7 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Course\UnitInstance;
-use Schoolbox\Resource\CategoryMapper;
 
 class InstanceMapper extends Mapper {
 
@@ -139,29 +133,14 @@ class InstanceMapper extends Mapper {
      */
     public function postSave(Instance $object, $is_new = false) {
         if ($is_new) {
-            $task = $object->getTask();
-            /** @var UnitInstance $unit */
-            $unit = UnitInstanceMapper::getInstance()->findById($object->getUnitInstance()->getId());
-            if ($task->getAssessment()->getId()) {
-                // Clone assessment and save
-                // Use the XML input and output methods to create it.
+            $task   = $object->getTask();
+            $cloner = new Cloner($object);
+            if (($assess_id = $task->getAssessment()->getId())) {
+                $assessment = $cloner->cloneAssessment();
+                $this->updateAll($object, 'assess_id', $assessment->getId());
             }
             if (($box_id = $task->getSubmissionBox()->getId())) {
-                // Clone this box and save it
-                // (What will happen to linked models?)
-                $category = CategoryMapper::getInstance()->findById(
-                    $object->getUnitInstance()->getComponent()->getIdentifier()
-                );
-                /** @var SubmissionBox $box */
-                $box = SubmissionBoxMapper::getInstance()->findById($box_id);
-                $box
-                    ->setTask(null)
-                    ->setCategory($category)
-                    ->setOpenDate($unit->getOpenDate())
-                    ->setDueDate($unit->getDueDate())
-                    ->setLateDate($unit->getDueDate())
-                ;
-                SubmissionBoxMapper::getInstance()->create($box);
+                $box = $cloner->cloneSubmissionBox();
                 $this->updateAll($object, 'box_id', $box->getId());
             }
         }
