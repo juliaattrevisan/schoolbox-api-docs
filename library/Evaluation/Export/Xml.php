@@ -141,6 +141,15 @@ abstract class Evaluation_Export_Xml {
 	}
 
 	/**
+	 * Retrieves the XML content of the export, without outputting it.
+	 *
+	 * @return string
+	 */
+	public function retrieveContents() {
+		return $this->getPage()->template->parse('finaloutput', 'xml');
+	}
+
+	/**
 	 * Generate a filename for the exported xml
 	 *
 	 * @return string
