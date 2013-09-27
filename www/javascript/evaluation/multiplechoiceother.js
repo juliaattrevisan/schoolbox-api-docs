@@ -44,10 +44,33 @@
 		 * Save response upon change
 		 */
 		function initChange() {
-			config.questionForm.find('input').change(function() {
-				$(this).parent().toggleClass('evaluation-selected');
+			config.questionForm.find('input[type=checkbox]').change(function() {
+
+				if ($(this).is(':checked')) {
+					$(this).parent().addClass('evaluation-selected');
+				}
+				/* Clear Other value if unchecked
+				 */
+				else {
+					$(this).parent().removeClass('evaluation-selected');
+					config.questionForm.find('input[type=text]').val('').parent().removeClass('evaluation-selected');
+				}
 
 				$.fn.evaluationMultipleChoiceOther.saveOne(config.questionForm);
+			});
+
+			/* Detect change in Other field
+			 * If the Other has content, check the Other Checkbox, and highlight
+			 */
+			config.questionForm.find('input[type=text]').change(function() {
+				if ($(this).val().length) {
+					$(this).parent().addClass('evaluation-selected');
+					config.questionForm.find('.evaluation-other').prop('checked', true).parent().addClass('evaluation-selected');
+				}
+				else {
+					$(this).parent().removeClass('evaluation-selected');
+					config.questionForm.find('.evaluation-other').prop('checked', false).parent().removeClass('evaluation-selected');
+				}
 			});
 		}
 	}
