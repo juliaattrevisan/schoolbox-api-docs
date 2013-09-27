@@ -13,7 +13,16 @@
     <form action="http://172.16.1.48/" method="get">
         <fieldset>
             <input type="submit" value="" class="search-button" />
-            <input type="text" name="search" class="search-field" defaultvalue="Catalogue Search" placeholder="Catalogue Search" />
+            <input type="text" name="srchtext" class="search-field" defaultvalue="Catalogue Search" placeholder="Catalogue Search" />
+            <!--
+            Search options:
+            fields: all
+            method: start of word
+            order:  title
+            -->
+            <input type="hidden" name="srchfield"  value="searchable" />
+            <input type="hidden" name="srchmethod" value="1" />
+            <input type="hidden" name="sortorder"  value="title" />
         </fieldset>
     </form>
 
