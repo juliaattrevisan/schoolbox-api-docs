@@ -400,7 +400,7 @@ class SitePage extends Page {
                     $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] == 7 || $_SESSION['gid'] == '8') ||
                     $this->site == 'joeys' ||
                     $this->site == 'cathedral' ||
-                    ($this->site == 'jpc' || $this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk' || $this->site == 'balcombe') && ($this->groupHandler->isStaff(
+                    ($this->site == 'jpc' || $this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk' || $this->site == 'balcombe' || $this->site == 'cedars') && ($this->groupHandler->isStaff(
                     ) || $this->groupHandler->isStudent())
             )
         ) {
