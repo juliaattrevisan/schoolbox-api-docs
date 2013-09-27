@@ -159,26 +159,39 @@ class ClassStatistics {
 		$count = 0;
 		$sum = 0;
 
+		// Later, this should be updated to return in most recent order.
+		// $this->returnMapper->findByColumn('box_id', $box->getId(), array('returned' => 'desc');
 		$returnCollection = $this->returnMapper->findByColumn('box_id', $box->getId());
 
 		// iterate across returns and index by student id
-		foreach($returnCollection as $return) {
+		foreach ($returnCollection as $return) {
 			/* @var $return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork */
 			$userId = $return->getOwner()->getId();
-			if (!array_key_exists($userId, $marks)) {
-				$this_mark = $return->getNormalizedMark();
-				$marks[$userId] = array(
-					'mark' => $this_mark,
-					'display_mark' => $return->getMark(),
-					'comment' => $return->getComment(),
-					'attempts' => 0,
-				);
-				// grab numbers for averages
-				// This only counts toward average if there's an actual mark.
-				if (isset($this_mark)) {
-					$count++;
+
+			// Don't use this mark if it's not more recent than an existing mark
+			// for this student.
+			if (array_key_exists($userId, $marks)) {
+				$thisReturnDate = $return->getReturned();
+				$lastReturnDate = $marks[$userId]['date'];
+				if ($thisReturnDate->compare($lastReturnDate) < 0) {
+					continue;
 				}
-				$sum += $return->getNormalizedMark();
+			}
+
+			$marks[$userId] = array(
+				'mark'         => $return->getNormalizedMark(),
+				'display_mark' => $return->getMark(),
+				'comment'      => $return->getComment(),
+				'attempts'     => 0,
+				'date'         => $return->getReturned(),
+			);
+		}
+
+		// Calculate sum and count only after the returned marks are collated.
+		foreach ($marks as $mark) {
+			if (isset($mark['mark'])) {
+				$count++;
+				$sum += $mark['mark'];
 			}
 		}
 
