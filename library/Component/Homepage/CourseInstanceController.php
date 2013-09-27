@@ -35,6 +35,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             return false;
         }
 
+        $this->parseConfig();
+
         $this->setVar('COMPONENT_NAME',  $this->getConfig('componentname'));
         $this->setVar('COURSE_HOMEPAGE', str_replace('/homepage/', '', Config::get('course_homepage')));
 
