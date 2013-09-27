@@ -101,8 +101,8 @@ class Cloner {
             $assess_object
                 ->setTask(null)
                 ->setUser($_SESSION['id'])
-                ->setStart($this->getTaskOpenTime())
-                ->setFinish($this->getTaskCloseTime())
+                ->setStart($this->getOpenTimeFromTask())
+                ->setFinish($this->getCloseTimeFromTask())
             ;
             OnlineAssessmentMapper::getInstance()->save($assess_object);
             return $assess_object;
@@ -125,9 +125,9 @@ class Cloner {
                 ->setTask(null)
                 ->setOwner($_SESSION['id'])
                 ->setCategory($this->category)
-                ->setOpenDate($this->getTaskOpenTime())
-                ->setDueDate($this->getTaskCloseTime())
-                ->setLateDate($this->getTaskCloseTime())
+                ->setOpenDate($this->getOpenTimeFromTask())
+                ->setDueDate($this->getCloseTimeFromTask())
+                ->setLateDate($this->getCloseTimeFromTask())
             ;
             SubmissionBoxMapper::getInstance()->create($box);
             return $box;
@@ -136,17 +136,27 @@ class Cloner {
     }
 
     /**
+     * Gets the time that all boxes and assessments from this task should open.
+     * Currently, they open at 12am on the open date of the task.
+     *
      * @return \Alaress_Date_Format
      */
-    protected function getTaskOpenTime() {
+    protected function getOpenTimeFromTask() {
         return new \Alaress_Date_Format(
             new \DateTime($this->unit->getOpenDate()->getUsingFormat('Y-m-d 00:00:00'))
         );
     }
 
-    protected function getTaskCloseTime() {
-        return new \Alaress_Date_Format(
-            new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'))
-        );
+    /**
+     * Gets the time that all boxes and assessments from the task should close.
+     * Currently, they close at 12am the day after the close date, so that the
+     * assessment is open for the whole day.
+     *
+     * @return Alaress_Date_Format
+     */
+    protected function getCloseTimeFromTask() {
+        $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 00:00:00'));
+        $close_date->modify('+1 day');
+        return new \Alaress_Date_Format($close_date);
     }
 }
