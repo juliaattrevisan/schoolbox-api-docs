@@ -38,6 +38,12 @@
 					$(this).parent().addClass('evaluation-selected');
 				}
 			});
+
+			/* Highlight the "Other" checkbox if an Other text value exists
+			 */
+			if (config.questionForm.find('input[value=Other]').is(':checked')) {
+				config.questionForm.find('input[type=text]').parent().addClass('evaluation-selected');
+			}
 		}
 
 		/**
