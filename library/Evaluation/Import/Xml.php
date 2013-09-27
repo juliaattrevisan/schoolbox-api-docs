@@ -148,6 +148,7 @@ class Evaluation_Import_Xml {
 				}
 			}
 		}
+		return $assess_id;
 	}
 
 	/* Getters/Setters
