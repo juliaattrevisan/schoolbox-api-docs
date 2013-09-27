@@ -71,6 +71,8 @@
 					$(this).parent().removeClass('evaluation-selected');
 					config.questionForm.find('.evaluation-other').prop('checked', false).parent().removeClass('evaluation-selected');
 				}
+
+				$.fn.evaluationMultipleChoiceOther.saveOne(config.questionForm);
 			});
 		}
 	}

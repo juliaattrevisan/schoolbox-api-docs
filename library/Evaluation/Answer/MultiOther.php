@@ -125,6 +125,14 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
+			/* Enforce "Other"
+ 			 */
+			$other = new StdClass();
+			$other->description = '';
+			$other->value = 'Other';
+
+			$allAnswers[] = $other;
+
             foreach ($allAnswers as $currentAnswer) {
                 $page->setVar(array(
 					'QUESTION_ID' => $question_id,
@@ -141,14 +149,28 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
-                    } else {
+
+						if (($currentAnswer->value == 'Other') && strlen(trim($existingAnswer['other']))) {
+							$page->setVar(array(
+								'ANSWER_OTHER' => $existingAnswer['other']
+							));
+						}
+						else {
+							$page->setVar(array(
+								'ANSWER_OTHER' => ''
+							));
+						}
+                    }
+					else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
+							'ANSWER_OTHER' => ''
                         ));
                     }
                 } else {
                     $page->setVar(array(
                         'ANSWER_CHECKED' => '',
+						'ANSWER_OTHER' => ''
                     ));
                 }
 
