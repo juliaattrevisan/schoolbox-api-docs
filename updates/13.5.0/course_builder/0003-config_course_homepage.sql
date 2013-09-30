@@ -1,6 +1,6 @@
 -- Config option for the course base homepage.
 -- Currently assumes that config options have been converted to lookups.
-INSERT IGNORE INTO `lu_config_field` (`field`) VALUES ('resource');
+INSERT IGNORE INTO `lu_config_field` (`id`, `field`) VALUES (9, 'resource');
 INSERT INTO `config`(
   `name`,
   `value`,
