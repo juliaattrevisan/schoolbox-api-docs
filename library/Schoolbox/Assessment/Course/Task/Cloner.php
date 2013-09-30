@@ -81,7 +81,7 @@ class Cloner {
                 $assess,
                 $factory,
                 $section,
-                new \SitePage()
+                new \SitePage(false)
             );
             $output = $export->retrieveContents();
 
@@ -91,7 +91,7 @@ class Cloner {
                 $section,
                 $factory,
                 $output,
-                new \SitePage()
+                new \SitePage(false)
             );
             $assess_id = $import->import();
 
@@ -130,6 +130,9 @@ class Cloner {
                 ->setLateDate($this->getCloseTimeFromTask())
             ;
             SubmissionBoxMapper::getInstance()->create($box);
+
+            // Clone rubrix too
+            SubmissionBox\Rubric\UsageMapper::getInstance()->copyFromCopiedSubmissionBox($box_id, $box->getId());
             return $box;
         }
         throw new ClonerException('No submission box is attached to this task');
