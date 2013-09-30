@@ -309,6 +309,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
             if ($this->getUseLongAnswers()) {
                 foreach ($data as $currentAnswer) {
 
+					/* Special case for other
+					 */
 					if ($currentAnswer == 'Other') {
 						$postprocessed[] = 'Other';
 						break;
@@ -324,6 +326,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
             if ($this->getLegendHTML() !== false) {
                 $data['response'] = '<ul><li>' . implode('</li><li>', $postprocessed) . '</li></ul>';
             } else {
+				$postprocessed[] = $data['other'];
                 $data['response'] = strip_tags(implode(', ', $postprocessed));
             }
         }
