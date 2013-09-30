@@ -58,6 +58,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
             // unit list will be a collection of Unit models
             $this->setVar('unit_block', '');
+            $now = new DateTime('now');
             foreach ($this->unit_list as $unit) {
                 $this->setVar(
                     array(
@@ -75,28 +76,29 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 // show how long until this unit opens.
                 $completion_status = null;
                 $rel_time          = null;
-                $urgency           = null;
-                $now               = new DateTime('now');
+
+                // How many days until this item is due?
+                $diff = $now->diff(new DateTime($unit->getDueDate()->getDatabase()));
+                $days = $diff->days;
+                if ($diff->invert) {
+                    $days = 0;
+                }
+                $urgency = min(10, max(0, $days));
+
                 if ($unit->isBeforeOpenDate()) {
-                    $completion_status = 'opens';
+                    $completion_status = 'Opens';
                     $rel_time          = $unit->getOpenDate();
+                    $urgency           = null;
                 }
                 // If student has completed all tasks within this course:
                 // show when they completed it
                 elseif ($unit->isOpen()) {
-                    $completion_status = 'due';
+                    $completion_status = 'Due';
                     $rel_time          = $unit->getDueDate();
 
-                    // How many days until this item is due?
-                    $diff = $now->diff(new DateTime($unit->getDueDate()->getDatabase()));
-                    $days = $diff->days;
-                    if ($diff->invert) {
-                        $days = 0;
-                    }
-                    $urgency = min(10, max(0, $days));
                 }
                 else {
-                    $completion_status = 'closed';
+                    $completion_status = 'Closed';
                     $rel_time          = $unit->getDueDate();
                     $urgency           = 0;
                 }
