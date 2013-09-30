@@ -1,8 +1,5 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	<link link rel="stylesheet" type="text/css" media="screen" href='/javascript/socialstream/threads.css' />
 	<script type='text/javascript' src='/javascript/socialstream/threads.js'></script>
-
-	<link link rel="stylesheet" type="text/css" media="screen" href='/javascript/socialstream/browser.css' />
 	<script type='text/javascript' src='/javascript/socialstream/browser.js'></script>
 
 	<script type='text/javascript'>
@@ -34,28 +31,36 @@
 			<input type='hidden' name='rootId' value='0' />
 			<input type='hidden' name='socialstreamAttachment' value=''>
 
-			<label>
-				Body: <input type='text' name='body' maxlength='255' value='' />
-			</label>
+			<ul class="socialstream-form">
+				<li>
+					<textarea rows="3" cols="50" name="body" maxlength="255" placeholder="Share something"></textarea>
+				</li>
+			</ul>
+			<ul class="socialstream-form">
+				<li>
+					<label>Link:
+						<input type='text' class='url' name='url' maxlength='255' placeholder="http://" />
+					</label>
+				</li>
 
-			<label>
- 				URL: <input type='text' class='url' name='url' maxlength='255' value='' />
-			</label>
+				<li>
+					<label>File:
+						<input type='file' class='upload' name='file' value='' />
+					</label>
+				</li>
 
-			<label>
-				File: <input type='file' class='upload' name='file' value='' />
-			</label>
-
-			<label>
-				Resoure: <span class='socialstream-selected-file'>TS</span>
-			</label>
-
-			<a class='btn socialstream-attachment-resource socialstream-browser-button' data-value='resource'><span></span>Resource</a>
-			<a class='btn up-arrow socialstream-attachment-upload' data-value='upload'><span></span>Upload</a>
-			<a class='btn go-to socialstream-attachment-url' data-value='url'><span></span>URL</a>
-
-			<input class='submit-btn-plain' type='submit' value='Post' />
-			<div class='clearfix'></div>
+				<li>
+					<label>Resource:
+						<span class='socialstream-selected-file'>TS</span>
+					</label>
+				</li>
+			</ul>
+			<p class="clearfix">
+				<a class='btn socialstream-attachment-resource socialstream-browser-button' data-value='resource'><span></span>Resource</a>
+				<a class='btn up-arrow socialstream-attachment-upload' data-value='upload'><span></span>Upload</a>
+				<a class='btn go-to socialstream-attachment-url' data-value='url'><span></span>Link</a>
+				<input class='submit-btn-plain' type='submit' value='Post' />
+			</p>
 		</form>
 		<!-- END socialstream_has_newpost -->
 	</div>
@@ -64,17 +69,16 @@
 	</div>
 
 	<div id='socialstream-{COMPONENT_INSTANCE_ID}'>
-		<div class='loading'>
-			Loading stream
+		<p class="loading">
+			Loading stream&hellip;
+		</p>
+
+		<div class="listing blog">
+			<ul class='socialstream-threads'></ul>
 		</div>
 
-		<div class='socialstream-threads'>
-		</div>
-
-		<div>
-			<p>
-				<a class='socialstreamViewMore '>View More</a>
-			</p>
-		</div>
+		<p class="interact">
+			<a class="btn update socialstreamViewMore"><span></span>Load More</a>
+		</p>
 	</div>
 </div>

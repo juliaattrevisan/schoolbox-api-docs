@@ -223,24 +223,27 @@ class Threads {
 
 		/* Thumbnail stuff
 		 */
-		$page->setBlock('socialstream_post', 'socialstream_post_has_icon', 'socialstream_post_has_icon_block');
-		$page->setBlock('socialstream_post', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
-		$page->setBlock('socialstream_post', 'socialstream_post_has_player', 'socialstream_post_has_player_block');
-		$page->setBlock('socialstream_post', 'socialstream_post_has_metadata', 'socialstream_post_has_metadata_block');
+		$page->setBlock('socialstream_post', 'socialstream_post_has_attachment', 'socialstream_post_has_attachment_block');
+		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_icon', 'socialstream_post_has_icon_block');
+		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
+		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_player', 'socialstream_post_has_player_block');
+		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_metadata', 'socialstream_post_has_metadata_block');
 		$page->setBlock('socialstream_post', 'socialstream_post_has_add', 'socialstream_post_has_add_block');
 		$page->setBlock('socialstream_post', 'socialstream_post_has_delete', 'socialstream_post_has_delete_block');
 
-		$page->setBlock('socialstream_comment', 'socialstream_comment_has_icon', 'socialstream_comment_has_icon_block');
-		$page->setBlock('socialstream_comment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
-		$page->setBlock('socialstream_comment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
-		$page->setBlock('socialstream_comment', 'socialstream_comment_has_metadata', 'socialstream_comment_has_metadata_block');
+		$page->setBlock('socialstream_comment', 'socialstream_comment_has_attachment', 'socialstream_comment_has_attachment_block');
+		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_icon', 'socialstream_comment_has_icon_block');
+		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
+		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
+		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_metadata', 'socialstream_comment_has_metadata_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_add', 'socialstream_comment_has_add_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_delete', 'socialstream_comment_has_delete_block');
 
-		$page->setBlock('socialstream_reply', 'socialstream_reply_has_icon', 'socialstream_reply_has_icon_block');
-		$page->setBlock('socialstream_reply', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
-		$page->setBlock('socialstream_reply', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
-		$page->setBlock('socialstream_reply', 'socialstream_reply_has_metadata', 'socialstream_reply_has_metadata_block');
+		$page->setBlock('socialstream_reply', 'socialstream_reply_has_attachment', 'socialstream_reply_has_attachment_block');
+		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_icon', 'socialstream_reply_has_icon_block');
+		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
+		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
+		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_metadata', 'socialstream_reply_has_metadata_block');
 		$page->setBlock('socialstream_reply', 'socialstream_reply_has_delete', 'socialstream_reply_has_delete_block');
 
 		$page->setVar(array(
@@ -248,18 +251,21 @@ class Threads {
 			'socialstream_comment_block' => '',
 			'socialstream_reply_block' => '',
 
+			'socialstream_post_has_attachment_block' => '',
 			'socialstream_post_has_icon_block' => '',
 			'socialstream_post_has_thumbnail_block' => '',
 			'socialstream_post_has_player_block' => '',
 			'socialstream_post_has_metadata_block' => '',
 			'socialstream_post_has_delete_block' => '',
 
+			'socialstream_comment_has_attachment_block' => '',
 			'socialstream_comment_has_icon_block' => '',
 			'socialstream_comment_has_thumbnail_block' => '',
 			'socialstream_comment_has_player_block' => '',
 			'socialstream_comment_has_metadata_block' => '',
 			'socialstream_comment_has_delete_block' => '',
 
+			'socialstream_reply_has_attachment_block' => '',
 			'socialstream_reply_has_icon_block' => '',
 			'socialstream_reply_has_thumbnail_block' => '',
 			'socialstream_reply_has_player_block' => '',
@@ -272,11 +278,12 @@ class Threads {
 		$i = 0;
 
 		foreach($this->getTree() as $currentPost) {
+			$rel = new \Alaress_Date_Relative($currentPost->getCreatedAt());
 			$page->setVar(array(
 				'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
 				'SOCIALSTREAM_POST_POST_ID' => \Scrub::text($currentPost->getPostId()),
 				'SOCIALSTREAM_POST_BODY' => \Scrub::text($currentPost->getBody()),
-				'SOCIALSTREAM_POST_CREATED_AT' => \Scrub::text($currentPost->getCreatedAt()->getShort()),
+				'SOCIALSTREAM_POST_CREATED_AT' => $rel->getRelativeTime(),
 				'SOCIALSTREAM_POST_USER_ID' => \Scrub::text($currentPost->getOwnerId()->getId()),
 				'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => \Scrub::text($currentPost->getOwnerId()->getExternalId()),
 				'SOCIALSTREAM_POST_USER_FULLNAME' => \Scrub::text($currentPost->getOwnerId()->getFullname()),
@@ -311,22 +318,28 @@ class Threads {
 			/* Thumbnails
 			 */
 			$page->setVar(array(
+				'socialstream_post_has_attachment_block' => '',
 				'socialstream_post_has_icon_block' => '',
 				'socialstream_post_has_thumbnail_block' => '',
 				'socialstream_post_has_player_block' => '',
 				'socialstream_post_has_metadata_block' => '',
 			));
 
-			$currentPost->renderThumbnail('post', $page);
+			$hasAttachment = $currentPost->renderThumbnail('post', $page);
+
+			if ($hasAttachment) {
+				$page->parse('socialstream_post_has_attachment_block', 'socialstream_post_has_attachment');
+			}
 
 			/* Descendents
 			 */
 			foreach($currentPost->getChildren() as $currentComment) {
+				$rel = new \Alaress_Date_Relative($currentComment->getCreatedAt());
 				$page->setVar(array(
 					'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
 					'SOCIALSTREAM_COMMENT_POST_ID' => \Scrub::text($currentComment->getPostId()),
 					'SOCIALSTREAM_COMMENT_BODY' => \Scrub::text($currentComment->getBody()),
-					'SOCIALSTREAM_COMMENT_CREATED_AT' => \Scrub::text($currentComment->getCreatedAt()->getShort()),
+					'SOCIALSTREAM_COMMENT_CREATED_AT' => $rel->getRelativeTime(),
 					'SOCIALSTREAM_COMMENT_USER_ID' => \Scrub::text($currentComment->getOwnerId()->getId()),
 					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
 					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => \Scrub::text($currentComment->getOwnerId()->getFullname()),
@@ -359,22 +372,28 @@ class Threads {
 				/* Thumbnails
 				 */
 				$page->setVar(array(
+					'socialstream_comment_has_attachment_block' => '',
 					'socialstream_comment_has_icon_block' => '',
 					'socialstream_comment_has_thumbnail_block' => '',
 					'socialstream_comment_has_player_block' => '',
 					'socialstream_comment_has_metadata_block' => '',
 				));
 
-				$currentComment->renderThumbnail('comment', $page);
+				$hasAttachment = $currentComment->renderThumbnail('comment', $page);
+
+				if ($hasAttachment) {
+					$page->parse('socialstream_comment_has_attachment_block', 'socialstream_comment_has_attachment');
+				}
 
 				/* Descendents
 				 */
 				foreach($currentComment->getChildren() as $currentReply) {
+					$rel = new \Alaress_Date_Relative($currentReply->getCreatedAt());
 					$page->setVar(array(
 						'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
 						'SOCIALSTREAM_REPLY_POST_ID' => \Scrub::text($currentReply->getPostId()),
 						'SOCIALSTREAM_REPLY_BODY' => \Scrub::text($currentReply->getBody()),
-						'SOCIALSTREAM_REPLY_CREATED_AT' => \Scrub::text($currentReply->getCreatedAt()->getShort()),
+						'SOCIALSTREAM_REPLY_CREATED_AT' => $rel->getRelativeTime(),
 						'SOCIALSTREAM_REPLY_USER_ID' => \Scrub::text($currentReply->getOwnerId()->getId()),
 						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => \Scrub::text($currentReply->getOwnerId()->getExternalId()),
 						'SOCIALSTREAM_REPLY_USER_FULLNAME' => \Scrub::text($currentReply->getOwnerId()->getFullname()),
@@ -396,19 +415,25 @@ class Threads {
 					/* Thumbnails
 					 */
 					$page->setVar(array(
+						'socialstream_reply_has_attachment_block' => '',
 						'socialstream_reply_has_icon_block' => '',
 						'socialstream_reply_has_thumbnail_block' => '',
 						'socialstream_reply_has_player_block' => '',
 						'socialstream_reply_has_metadata_block' => '',
 					));
 
-					$currentReply->renderThumbnail('reply', $page);
+					$hasAttachment = $currentReply->renderThumbnail('reply', $page);
+
+					if ($hasAttachment) {
+						$page->parse('socialstream_reply_has_attachment_block', 'socialstream_reply_has_attachment');
+					}
 
 					/* Clear children after parsing out the parent
 					 */
 					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
 
 					$page->setVar(array(
+						'socialstream_reply_has_attachment_block' => '',
 						'socialstream_reply_has_icon_block' => '',
 						'socialstream_reply_has_thumbnail_block' => '',
 						'socialstream_reply_has_player_block' => '',
@@ -423,6 +448,7 @@ class Threads {
 				$page->parse('socialstream_comment_block', 'socialstream_comment', true);
 
 				$page->setVar(array(
+					'socialstream_comment_has_attachment_block' => '',
 					'socialstream_comment_has_icon_block' => '',
 					'socialstream_comment_has_thumbnail_block' => '',
 					'socialstream_comment_has_player_block' => '',
@@ -438,6 +464,7 @@ class Threads {
 			$page->parse('socialstream_post_block', 'socialstream_post', true);
 
 			$page->setVar(array(
+				'socialstream_post_has_attachment_block' => '',
 				'socialstream_post_has_icon_block' => '',
 				'socialstream_post_has_thumbnail_block' => '',
 				'socialstream_post_has_player_block' => '',

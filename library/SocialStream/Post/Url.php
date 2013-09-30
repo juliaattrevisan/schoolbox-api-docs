@@ -42,7 +42,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 	 *
 	 * @param $context
 	 * @param $page
-	 * @return mixed|void
+	 * @return bool|mixed
 	 */
 	public function renderThumbnail($context, $page) {
 
@@ -59,6 +59,19 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
 			));
 
+			/* This should be able to render when either the metadata or the thumbnail/icon
+			 * are available
+			 */
+			$returnValue = false;
+
+			/* Parse metadata
+ 			 */
+			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+				$page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
+
+				$returnValue = true;
+			}
+
 			/* Parse icon
  			 */
 			if ($matches) {
@@ -67,18 +80,18 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				));
 
 				$page->parse('socialstream_post_has_icon_block', 'socialstream_post_has_icon');
+
+				$returnValue = true;
 			}
 			/* Parse thumbnail if one was successfully found
 			 */
 			else if ($this->hasThumbnail()) {
 				$page->parse('socialstream_post_has_thumbnail_block', 'socialstream_post_has_thumbnail');
+
+				$returnValue = true;
 			}
 
-			/* Parse metadata
-			 */
-			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-				$page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
-			}
+			return $returnValue;
 		}
 		else if ($context == 'comment') {
 			$page->setVar(array(
@@ -86,6 +99,19 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => $this->getExternalTitle(),
 				'SOCIALSTREAM_COMMENT_EXTERNAL_BODY' => $this->getExternalBody(),
 			));
+
+			/* This should be able to render when either the metadata or the thumbnail/icon
+			 * are available
+			 */
+			$returnValue = false;
+
+			/* Parse metadata
+			 */
+			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+				$page->parse('socialstream_comment_has_metadata_block', 'socialstream_comment_has_metadata');
+
+				$returnValue = true;
+			}
 
 			/* Parse icon
 			 */
@@ -95,18 +121,18 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				));
 
 				$page->parse('socialstream_comment_has_icon_block', 'socialstream_comment_has_icon');
+
+				$returnValue = true;
 			}
 			/* Parse thumbnail if one was successfully found
 			 */
 			else if ($this->hasThumbnail()) {
 				$page->parse('socialstream_comment_has_thumbnail_block', 'socialstream_comment_has_thumbnail');
+
+				$returnValue = true;
 			}
 
-			/* Parse metadata
-			 */
-			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-				$page->parse('socialstream_comment_has_metadata_block', 'socialstream_comment_has_metadata');
-			}
+			return $returnValue;
 		}
 		else if ($context == 'reply') {
 			$page->setVar(array(
@@ -114,6 +140,19 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => $this->getExternalTitle(),
 				'SOCIALSTREAM_REPLY_EXTERNAL_BODY' => $this->getExternalBody(),
 			));
+
+			/* This should be able to render when either the metadata or the thumbnail/icon
+			 * are available
+			 */
+			$returnValue = false;
+
+			/* Parse metadata
+ 			 */
+			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+				$page->parse('socialstream_reply_has_metadata_block', 'socialstream_reply_has_metadata');
+
+				$returnValue = true;
+			}
 
 			/* Parse icon
 			 */
@@ -123,18 +162,20 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 				));
 
 				$page->parse('socialstream_reply_has_icon_block', 'socialstream_reply_has_icon');
+
+				$returnValue = true;
 			}
 			/* Parse thumbnail if one was successfully found
 			 */
 			else if ($this->hasThumbnail()) {
 				$page->parse('socialstream_reply_has_thumbnail_block', 'socialstream_reply_has_thumbnail');
+
+				$returnValue = true;
 			}
 
-			/* Parse metadata
-			 */
-			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-				$page->parse('socialstream_reply_has_metadata_block', 'socialstream_reply_has_metadata');
-			}
+			return $returnValue;
 		}
+
+		return false;
 	}
 }
