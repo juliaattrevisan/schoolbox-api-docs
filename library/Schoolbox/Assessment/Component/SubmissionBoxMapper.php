@@ -362,12 +362,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * and notifications.
 	 *
 	 * @param SubmissionBox $object
+	 * @param bool          $is_new Is this a new item that is being created?
 	 *
 	 * @return void
 	 */
-	public function postSave(SubmissionBox $object) {
+	public function postSave(SubmissionBox $object, $is_new = false) {
 		foreach ($object->getFileLinks() as $box_file) {
 			if ($box_file->hasFile()) {
+				if ($is_new) {
+					$box_file->setId(null);
+				}
 				$box_file->setSubmissionBoxId($object->getId());
 				$this->getJoinMapper('files')->save($box_file);
 			}
