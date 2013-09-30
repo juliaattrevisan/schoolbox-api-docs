@@ -28,20 +28,20 @@ class SoftDeleteTest extends TestCase {
     }
 
     public function testSoftDeleteNotDeleted() {
-        $this->object->getDatabase()->setNextFetch(array(
+        $this->object->getDatabase()->setNextFetchAll(array(array(
             'id'      => 1,
             'name'    => 'something',
             'deleted' => false,
-        ));
+        )));
         $this->assertFalse($this->object->findById(1)->isDeleted());
     }
 
     public function testSoftDeleteDeletedResult() {
-        $this->object->getDatabase()->setNextFetch(array(
+        $this->object->getDatabase()->setNextFetchAll(array(array(
             'id'      => 1,
             'name'    => 'something',
             'deleted' => true,
-        ));
+        )));
         try {
             $this->object->findById(1);
             $this->fail('Exception\Deleted expected, but not thrown');

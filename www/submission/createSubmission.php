@@ -200,7 +200,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
             $file = $file_link->getFile();
             $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
             $this->setVar('CURRENT_FILE_ID',   $file->getId());
-            $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
+            $this->setVar('CURRENT_FILE_ICON', $file->getMimetype()->getIconFile());
             $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
             $this->setVar('CURRENT_FILE_URL',  '/storage/fetch.php?'.http_build_query(array('hash' => $file->getHash(), 'save' => 1)));
             $this->parse('existing_file_block','existing_file', true);

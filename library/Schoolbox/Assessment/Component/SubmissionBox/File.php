@@ -28,12 +28,12 @@ class File {
 	protected $submission_box_id;
 
 	/**
-	 * @var Schoolbox\File
+	 * @var Schoolbox\Storage
 	 */
 	protected $file;
 
 	public function __construct() {
-		$this->setFile(new Schoolbox\File());
+		$this->setFile(new Schoolbox\Storage());
 	}
 
 	/**
@@ -79,14 +79,14 @@ class File {
 	}
 
 	/**
-	 * @param Schoolbox\File $file
+	 * @param Schoolbox\Storage $file
 	 */
-	public function setFile(Schoolbox\File $file) {
+	public function setFile(Schoolbox\Storage $file) {
 		$this->file = $file;
 	}
 
 	/**
-	 * @return Schoolbox\File
+	 * @return Schoolbox\Storage
 	 */
 	public function getFile() {
 		return $this->file;

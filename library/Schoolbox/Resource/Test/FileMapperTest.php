@@ -15,7 +15,7 @@ use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\FileMapper;
 use Schoolbox\Test\TestCase;
-use Schoolbox\File as Storage;
+use Schoolbox\Storage;
 
 class FileMapperTest extends TestCase {
 
@@ -47,31 +47,13 @@ class FileMapperTest extends TestCase {
 
 	public function testCopyToStorage() {
 		//
-		// Need to mock storage mapper to return a set value, instead of from
-		// database.
-		$mock_mimetype = $this->getMock(
-			'\\Schoolbox\\File\\MimetypeMapper',
-			array('getMimetypeForFilename', 'getIconForFilename')
-		);
-		$mock_mimetype
-			->expects($this->any())
-			->method('getMimetypeForFilename')
-			->will($this->returnValue('text/plain'));
-		$mock_mimetype
-			->expects($this->any())
-			->method('getIconForFilename')
-			->will($this->returnValue('text_plain.png'));
-
-		//
 		// Storage items - mock their mimetype and config loaders.
 		$new_storage = new Storage();
 		$new_storage
-			->setMimetypeLoader($mock_mimetype)
 			->setConfigLoader($this->mock_config)
 		;
 		$saved_storage = new Storage();
 		$saved_storage
-			->setMimetypeLoader($mock_mimetype)
 			->setConfigLoader($this->mock_config)
 			->setFilename('dumb.txt')
 			->setId(2)
@@ -82,7 +64,7 @@ class FileMapperTest extends TestCase {
 		// createModel(): returns a new (mocked) storage item.
 		// findByColumn(): First call throws an exception, others return the
 		// saved storage item.
-		$storage_mapper = $this->getMock('\\Schoolbox\\FileMapper', array('createModel', 'findOneByColumn'));
+		$storage_mapper = $this->getMock('\\Schoolbox\\FileMapper', array('createModel', 'findByHash'));
 		$storage_mapper
 			->expects($this->any())
 			->method('createModel')
@@ -92,7 +74,7 @@ class FileMapperTest extends TestCase {
 		$matcher = $this->any();
 		$storage_mapper
 			->expects($matcher)
-			->method('findOneByColumn')
+			->method('findByHash')
 			->will($this->returnCallback(function() use($matcher, $saved_storage) {
 				if ($matcher->getInvocationCount() === 1) {
 					throw new Exception('Instance of object not found');

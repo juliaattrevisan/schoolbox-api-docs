@@ -10,7 +10,7 @@
  */
 
 namespace Schoolbox\Test;
-use Schoolbox\File;
+use Schoolbox\Storage;
 use Schoolbox\Test\TestCase;
 
 class FileTest extends TestCase {
@@ -18,7 +18,7 @@ class FileTest extends TestCase {
 	/**
 	 * The file that's being tested.
 	 *
-	 * @var File
+	 * @var Storage
 	 */
 	protected $object;
 
@@ -28,25 +28,8 @@ class FileTest extends TestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->object = new File();
-
+		$this->object = new Storage();
 		$this->object->setConfigLoader($this->mock_config);
-
-		//
-		// Mock the mimetype loader too.
-		$mock_mimetype = $this->getMock(
-			get_class($this->object->getMimetypeLoader()),
-			array('getMimetypeForFilename', 'getIconForFilename')
-		);
-		$mock_mimetype
-			->expects($this->any())
-			->method('getMimetypeForFilename')
-			->will($this->returnCallback(array($this, 'getMimetypeForFilename')));
-		$mock_mimetype
-			->expects($this->any())
-			->method('getIconForFilename')
-			->will($this->returnCallback(array($this, 'getIconForFilename')));
-		$this->object->setMimetypeLoader($mock_mimetype);
 	}
 
 	public function getIconForFilename($filename) {
@@ -117,39 +100,4 @@ class FileTest extends TestCase {
 		$this->assertEquals($this->object->getFileLocation(), '/tmp/5.dat');
 	}
 
-	public function getLoadMimetypeFromFilenameData() {
-		return array(
-			array(null, false),
-			array('blah.png', 'image/png'),
-			array('blah.pdf', 'application/pdf'),
-			array('somedumbname.stuff.htm', 'text/html'),
-			array('dumfile.blah', false),
-		);
-	}
-
-	/**
-	 * @dataProvider getLoadMimetypeFromFilenameData
-	 */
-	public function testLoadMimetypeFromFilename($filename, $mimetype) {
-		$this->object->setFilename($filename);
-		$this->assertEquals($this->object->getMimeType()->getMime(), $mimetype);
-	}
-
-	public function getIconFromFilenameData() {
-		return array(
-			array(null, false),
-			array('blah.png', 'image_png.png'),
-			array('blah.pdf', 'application_pdf.png'),
-			array('somedumbname.stuff.htm', 'text_html.png'),
-			array('dumfile.blah', false),
-		);
-	}
-
-	/**
-	 * @dataProvider getIconFromFilenameData
-	 */
-	public function testGetIconFromFilename($filename, $icon) {
-		$this->object->setFilename($filename);
-		$this->assertEquals($this->object->getMimetype()->getIconFile(), $icon);
-	}
 }

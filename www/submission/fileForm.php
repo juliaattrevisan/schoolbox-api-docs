@@ -19,7 +19,9 @@ session_start();
 // Submission doesn't exist yet?
 // Save the files in storage, and when the submission is saved save them as part
 // of what was uploaded.
+use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\FileMapper as SubmissionFileMapper;
 
@@ -41,24 +43,24 @@ if (isset($_FILES['file'])) {
 		$return['message'] = $allowed_file_check['message'];
 	}
 	else {
-		$file = new File();
-		$file->setFilename($_FILES['file']['name']);
-		$file->setTempLocation($_FILES['file']['tmp_name']);
-		$file->setUploadedBy($_SESSION['id']);
-		$file->loadHashFromTempLocation();
-		$file->loadMimetypeFromFilename();
-		$file->loadFilesizeFromTempLocation();
-
 		//
 		// Does a file with this hash exist already? If so use it, otherwise create a
 		// new one.
-		$file_id     = null;
-		$existing    = \Schoolbox\StorageMapper::getInstance()->findByHash($file->getHash());
-		if ($existing->count()) {
-			$file_id = $existing->first()->getId();
+		// TODO handle uploading of already uploaded files automatically in upload() method
+		$file_id = null;
+		try {
+			$file = new Storage();
+			$file->setTempLocation($_FILES['file']['tmp_name']);
+			$file->loadHashFromTempLocation();
+			$existing = Schoolbox\StorageMapper::getInstance()->findByHash($file->getHash());
+			$file_id  = $existing->getId();
 		}
-		else {
-			$file_mapper->save($file);
+		catch (Schoolbox\Mapper\Exception $e) {
+			$file = Schoolbox\StorageMapper::getInstance()->upload(
+				$_FILES['file']['name'],
+				$_FILES['file']['tmp_name'],
+				$_SESSION['id']
+			);
 			$file_id = $file->getId();
 		}
 		$return['success'] = !empty($file_id);

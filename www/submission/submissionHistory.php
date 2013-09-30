@@ -198,11 +198,12 @@ else {
 $legacy_file_id = $submission->getLegacyFileId();
 $file_links     = $submission->getFileLinks();
 if ($file_links->count() > 0) {
+    /** @var \Schoolbox\Assessment\Component\SubmissionBox\File[] $file_links */
     foreach ($file_links as $file_link) {
         $file = $file_link->getFile();
         $this->setVar(array(
             'FILE_HASH'  => $file->getHash(),
-            'FILE_THUMB' => $file->getIconFromFilename(),
+            'FILE_THUMB' => $file->getMimetype()->getIconFile(),
             'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
             'FILE_NAME'  => $file->getFilename(),
             'FILE_DATE'  => $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia')

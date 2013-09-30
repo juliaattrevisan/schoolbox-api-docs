@@ -207,7 +207,7 @@ class Storage {
 	}
 
 	/**
-	 * @param  string $uploaded_on
+	 * @param  \Alaress_Date_Format $uploaded_on
 	 * @return $this
 	 */
 	public function setUploadedOn($uploaded_on) {
@@ -216,7 +216,7 @@ class Storage {
 	}
 
 	/**
-	 * @return string
+	 * @return \Alaress_Date_Format
 	 */
 	public function getUploadedOn() {
 		return $this->uploaded_on;

@@ -19,7 +19,7 @@ use Schoolbox\StorageMapper;
 class FileMapper extends Mapper {
 
 	/**
-	 * @var \Schoolbox\FileMapper
+	 * @var \Schoolbox\StorageMapper
 	 */
 	protected $storage_mapper;
 
@@ -29,7 +29,7 @@ class FileMapper extends Mapper {
 	}
 
 	/**
-	 * @param  \Schoolbox\FileMapper $storage_mapper
+	 * @param  \Schoolbox\StorageMapper $storage_mapper
 	 * @return $this
 	 */
 	public function setStorageMapper($storage_mapper) {
@@ -38,7 +38,7 @@ class FileMapper extends Mapper {
 	}
 
 	/**
-	 * @return \Schoolbox\FileMapper
+	 * @return \Schoolbox\StorageMapper
 	 */
 	public function getStorageMapper() {
 		return $this->storage_mapper;
@@ -186,17 +186,20 @@ class FileMapper extends Mapper {
 				Exception::CODE_COPY_TO_STORAGE_FAILED
 			);
 		}
+		/** @var Storage $storage */
 		$storage  = $this->storage_mapper->createModel();
 		$storage
 			->setFilename($file->getFilename())
 			->setTempLocation($location)
 			->setUploadedBy($file->getOwner());
 		$storage->loadHashFromTempLocation();
-		$storage->loadMimetypeFromFilename();
 		$storage->loadFilesizeFromTempLocation();
 
 		try {
 			$existing = $this->storage_mapper->findByHash($storage->getHash());
+		}
+		catch (Mapper\Exception $ex) {
+			return $storage;
 		}
 		catch (Exception $ex) {
 			return $storage;

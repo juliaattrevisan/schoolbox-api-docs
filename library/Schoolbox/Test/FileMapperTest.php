@@ -17,13 +17,13 @@ use Schoolbox\Test\TestCase;
 class FileMapperTest extends TestCase {
 
 	/**
-	 * @var FileMapper
+	 * @var StorageMapper
 	 */
 	protected $object;
 
 	public function setUp() {
 		parent::setUp();
-		$this->object = new FileMapper();
+		$this->object = new StorageMapper();
 	}
 
 	public function testHydrate() {
@@ -36,7 +36,7 @@ class FileMapperTest extends TestCase {
 			'temp_location' => '/tmp/pngsomewhere'
 		);
 		$file = $this->object->hydrate($data);
-		$this->assertInstanceOf('Schoolbox\\File', $file);
+		$this->assertInstanceOf('Schoolbox\\Storage', $file);
 		$this->assertEquals(4, $file->getId());
 		$this->assertEquals('stuff.png', $file->getFilename());
 		$this->assertEquals(false, $file->getTempLocation());

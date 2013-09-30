@@ -26,7 +26,8 @@ class ArbitraryFile extends Thumbnail {
 		$mapper = new \Schoolbox\File\MimetypeMapper();
 
 		try {
-			$icon = $mapper->getIconForFilename($this->getUrl());
+			$icon = $mapper->getByFilename($this->getUrl())->getIconFile();
+
 		}
 		catch(\Schoolbox\File\Exception $e) {
 			return '';

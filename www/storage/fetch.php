@@ -14,7 +14,7 @@ try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $page = new SitePage;
 
-        /* @var $resource Schoolbox\File */
+        /* @var $resource Schoolbox\Storage */
         $resource = Schoolbox\StorageMapper::getInstance()->findByHash($_GET['hash']);
 
         if ($_GET['save']) {
