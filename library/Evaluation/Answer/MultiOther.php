@@ -308,7 +308,14 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 */
             if ($this->getUseLongAnswers()) {
                 foreach ($data as $currentAnswer) {
-                    $postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
+
+					if ($currentAnswer == 'Other') {
+						$postprocessed[] = 'Other';
+						break;
+					}
+					else {
+	                    $postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
+					}
                 }
             } else {
                 $postprocessed = $data;
@@ -326,7 +333,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         $data['comment'] = $response['comment'];
 
         /* Append awarded mark
-           */
+         */
         $data['mark'] = $response['mark'];
 
         return $data;
@@ -344,6 +351,12 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         $answer = $this->getByQuestionID($question_id);
 
         $allOptions = unserialize($answer['answer']);
+
+		$other = new StdClass();
+		$other->description = 'Other';
+		$other->value = 'Other';
+
+		$allOptions[] = $other;
 
         foreach ($allOptions as $currentOption) {
             if ($currentOption->value == $value) {
