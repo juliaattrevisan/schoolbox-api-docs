@@ -1,4 +1,4 @@
-INSERT IGNORE INTO `lu_config_type` (`id`, `type`) VALUES (13, 'Debugging');
+INSERT IGNORE INTO `lu_config_type` (`id`, `type`) VALUES (14, 'Debugging');
 
 INSERT INTO `config`(
   `name`,
