@@ -57,6 +57,11 @@ class SubmissionBox implements ISoftDeletable {
 	protected $task;
 
 	/**
+	 * @var Task\Instance
+	 */
+	protected $task_instance;
+
+	/**
 	 * @var int
 	 */
 	protected $legacy_file_id;
@@ -238,6 +243,22 @@ class SubmissionBox implements ISoftDeletable {
 	 */
 	public function getTask() {
 		return $this->task;
+	}
+
+	/**
+	 * @param  Task\Instance $task_instance
+	 * @return $this
+	 */
+	public function setTaskInstance($task_instance) {
+		$this->task_instance = $task_instance;
+		return $this;
+	}
+
+	/**
+	 * @return Task\Instance
+	 */
+	public function getTaskInstance() {
+		return $this->task_instance;
 	}
 
 	/**

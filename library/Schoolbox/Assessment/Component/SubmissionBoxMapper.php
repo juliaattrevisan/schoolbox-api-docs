@@ -98,6 +98,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'join'       => 'task',
 		));
 		$this->hasMap(array(
+			'column'     => 'task_instance_id',
+			'property'   => 'taskInstance',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'task_instance',
+		));
+		$this->hasMap(array(
 			'column'     => 'open_date',
 			'property'   => 'openDate',
 			'type'       => self::TYPE_DATETIME,
@@ -239,6 +245,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$this->hasJoin('task', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Course\\TaskMapper',
 			'this_key'  => 'task_id',
+			'other_key' => 'id',
+		));
+		$this->hasJoin('task', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceMapper',
+			'this_key'  => 'task_instance_id',
 			'other_key' => 'id',
 		));
 
