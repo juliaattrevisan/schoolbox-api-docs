@@ -1,0 +1,127 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
+<script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
+<script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
+<script type="text/javascript">
+$j(document).ready(function() {
+
+   var currentForm = '';
+	$j('form').each(function(index, formElement) {
+   		 $j(formElement).validate({
+			submitHandler: function() {
+				showAlert(formElement);
+				$j.post($j(formElement).attr('action'), $j(formElement).serialize(), function(responseText) {
+					var dataFunction = new Function('return ' + responseText);
+					var result = dataFunction();
+				});
+				return false;
+			},
+			rules: {
+				reviewedMarks: {
+					number:true
+				}
+			},
+			messages: {
+				reviewedMarks: "Please enter a decimal number"
+			},
+			errorPlacement: function(error, element) {
+                            offset = element.offset();
+                            error.insertBefore(element)
+			}
+   		});
+	});
+
+	$j('.textarea-container textarea').blur(function() {
+		if ($j(this).val() !== '') {
+			$j.post($j(this).closest('form').attr('action'),
+			$j(this).closest('form').serialize(),
+			function(responseText) {
+				var dataFunction = new Function('return ' + responseText);
+				var result = dataFunction();
+			});
+			return false;
+		}
+	});
+
+	$j('.marks-amount input').blur(function() {
+		showAlert($j(this));
+		$j.post($j(this).closest('form').attr('action'),
+		$j(this).closest('form').serialize(),
+		function(responseText) {
+			var dataFunction = new Function('return ' + responseText);
+			var result = dataFunction();
+		});
+		return false;
+	});
+
+	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
+
+
+
+	if (assessAttempted == 'true') {
+		$j('.tick').html('<span></span>Resubmit Review')
+		$j('.review-submitted').show();
+	}
+
+	function showAlert(target) {
+		var relevantLabel = $j(target).closest('form').find('.assess-alert');
+		if (assessAttempted == "false") {
+			relevantLabel.fadeIn(200);
+		}
+		if (assessAttempted == "true") {
+			relevantLabel.html('<span>In order to finish your edits to this finalised review, click \'Resubmit Review\' at the end of the assessment\</span>').fadeIn(200);
+		}
+	}
+
+	$j('a.finish-review').click(function() {
+		location.href = $j(this).attr('href');
+	}).confirm({
+		buttons: {
+			wrapper:'<button></button>',
+			separator:'  '
+  		}
+	});
+
+
+});
+</script>
+<style>
+    form input[type=text] {
+        border: solid 1px #DBDBDB;
+    }
+</style>
+<!-- END custom_head -->
+<h1>Horizontal Marking for {QUESTION_QUESTION}</h1>
+
+<p class="information-notification review-submitted hide">Please note: You are currently editing an already submitted review.</p>
+
+<div class="evaluation-content mark-test">
+	<!-- BEGIN attempt -->
+	<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
+		<div class="wysiwyg no-pad clearfix">
+			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}<span> - ({QUESTION_MARKS} marks)</span></h3>
+		</div>
+		<div class="evaluation-answer clearfix">
+			<!-- BEGIN answerInputs -->
+			<!-- END answerInputs -->
+		</div>
+		<!-- BEGIN writable_update -->
+		<label class="alert-holder clearfix">
+			<div class="assess-alert">
+				<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
+			</div>
+			<input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
+		</label>
+		<!-- END writable_update -->
+	</form>
+	<!-- END attempt -->
+
+	<p class="clearfix text-align-right">
+		<!-- BEGIN endAssess -->
+		  <!-- BEGIN writable_finalise -->
+		<a class="btn tick finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Finalise Review</a>
+		  <!-- END writable_finalise -->
+		<!-- END endAssess -->
+	</p>
+</div>
