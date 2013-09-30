@@ -247,7 +247,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'this_key'  => 'task_id',
 			'other_key' => 'id',
 		));
-		$this->hasJoin('task', array(
+		$this->hasJoin('task_instance', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceMapper',
 			'this_key'  => 'task_instance_id',
 			'other_key' => 'id',
