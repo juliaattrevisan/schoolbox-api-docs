@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\RubricCriterionMapper;
 
 $site_page = new SitePage();
 
@@ -60,9 +61,16 @@ catch (Schoolbox\Mapper\Exception $e) {
 $config->setValue($course_homepage_id);
 $config_mapper->save($config);
 
+// Merge rubrics from course into this homepage.
+RubricCriterionMapper::getInstance()->copyFromCategory($course_homepage_id, $homepage_id);
+
 // And create a new unit instance for each option.
 $unit_instance_list = new Collection();
 foreach ($_POST['unit'] as $unit_id => $unit) {
+    // Merge rubrics from first, because they need to exist before the due work is added.
+    RubricCriterionMapper::getInstance()->copyFromCategory($unit_id, $homepage_id);
+
+    // and save the unit into the course.
     $unit_homepage = CategoryMapper::getInstance()->findById($unit_id);
     $unit_instance = new UnitInstance();
     $unit_instance
