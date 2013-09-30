@@ -3470,27 +3470,16 @@ ul.section-options a.drop-arrow {
 .evaluation-content.mark-test form,
 {
     padding: 0;
-    background: none;
 }
 
 .evaluation-content.take-test h3,
 .evaluation-content.mark-test h3 {
     font-weight: normal;
     color: @black;
-    background-color: @white;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(@white), to(@dark));
-    background-image: -webkit-linear-gradient(top, @white, @dark);
-    background-image: -moz-linear-gradient(top, @white, @dark);
-    background-image: -ms-linear-gradient(top, @white, @dark);
-    background-image: -o-linear-gradient(top, @white, @dark);
-    background-image: linear-gradient(top, @white, @dark);
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = '@{white}', EndColorStr = '@{dark}')";
-
     padding: 10px;
 }
 
 .evaluation-content .evaluation-answer {
-    background: @white;
     padding: 7px 16px;
 }
 
@@ -3515,7 +3504,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-menu .percentage-complete {
-    background: #f1f7fa;
+    background: lighten(@neutral-color,@lighten-value);
     margin-bottom: 15px;
 }
 
@@ -3572,7 +3561,7 @@ ul.section-options a.drop-arrow {
     border: 1px solid @lgrey;
     display: block;
     font-weight: normal;
-    background: #e3f2fa url(/images/core/assess/drag-drop.gif) 100% 50% no-repeat;
+    background: lighten(@neutral-color,@lighten-value) url(/images/core/assess/drag-drop.gif) 100% 50% no-repeat;
     padding: 5px;
 }
 
@@ -3624,7 +3613,8 @@ ul.section-options a.drop-arrow {
 
 .evaluation-content .answer-given-container,
 .evaluation-content .correct-answer-container {
-    border: 1px solid darken(@dark,@darken-value / 4);
+    border: 1px solid @border-color;
+	background: @white;
     padding: 10px;
     margin: 5px 0;
 }
@@ -3690,7 +3680,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.mark-test .matchPairs li.matchIncorrect {
-    background-color: #F5CFCF;
+    background-color: lighten(@negative-color,@lighten-value);
 }
 
 .evaluation-content.mark-test .matchPairs li.matchIncorrect .tick-cross {
@@ -3731,7 +3721,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.mark-test span.fillgapIncorrect {
-    background: #F5CFCF;
+    background: lighten(@negative-color,@lighten-value);
 }
 
 .evaluation-content.mark-test span.fillgapCorrect {
@@ -3761,7 +3751,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.mark-test ul.multiple-choice-mark li.multiIncorrect {
-    background-color: #F5CFCF;
+    background-color: lighten(@negative-color,@lighten-value);
 }
 
 .evaluation-content.mark-test ul.multiple-choice-mark li.multiIncorrect .tick-cross {
@@ -3804,14 +3794,13 @@ ul.section-options a.drop-arrow {
 
 .evaluation-content .assess-alert {
     display: none;
-    background: #feffb8;
-    border: 1px solid #ead498;
+    background: lighten(@highlight-color,@lighten-value);
+    border: 1px solid darken(@highlight-color,@darken-value);
     position: absolute;
-    right: 0;
+    right: -1px;
     height: 40px;
     width: 100%;
     top: -4px;
-    text-align: right;
 }
 
 .evaluation-content .assess-alert span {
@@ -3819,10 +3808,10 @@ ul.section-options a.drop-arrow {
     padding-right: 150px;
     padding-left: 20px;
     line-height: 20px;
-    float: right;
     display: block;
     height: 100%;
     line-height: 40px;
+	margin-left: 16px;
 }
 
 .row-switcher {
@@ -3948,14 +3937,8 @@ ul.section-options a.drop-arrow {
 .evaluation-graph-holder .legend {
     float: left;
     margin-left: 16px;
-    border: 1px solid #e0e0e0;
-
+    border: 1px solid @border-color;
     margin-bottom: 16px;
-
-    -webkit-box-shadow: 1px 1px 2px #e0e0e0;
-    -moz-box-shadow: 1px 1px 2px #e0e0e0;
-    box-shadow: 1px 1px 2px #e0e0e0;
-
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -3967,7 +3950,7 @@ ul.section-options a.drop-arrow {
 
 /* Question bank */
 .evaluation-content.question-bank .question {
-    border: 1px solid #e0e0e0;
+    border: 1px solid @border-color;
     background: @dark;
     margin-bottom: 0;
     padding: 0;
@@ -4042,16 +4025,7 @@ ul.evaluation-category-select {
     display: block;
     padding: 7px 16px;
     background-color:  @dark;
-    background-image: -webkit-gradient(linear, left top, left bottom, from( @dark), to( @dark));
-    background-image: -webkit-linear-gradient(top,  @dark,  @dark);
-    background-image: -moz-linear-gradient(top,  @dark,  @dark);
-    background-image: -ms-linear-gradient(top,  @dark,  @dark);
-    background-image: -o-linear-gradient(top,  @dark,  @dark);
-    background-image: linear-gradient(top,  @dark,  @dark);
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
-    text-shadow: 0px 1px 0px @white;
-
-    border: 1px solid @std-grey;
+    border: 1px solid @border-color;
     margin-bottom: 8px;
 }
 
@@ -4119,15 +4093,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
     display: block;
     padding: 7px 16px;
     background-color:  @dark;
-    background-image: -webkit-gradient(linear, left top, left bottom, from( @dark), to( @dark));
-    background-image: -webkit-linear-gradient(top,  @dark,  @dark);
-    background-image: -moz-linear-gradient(top,  @dark,  @dark);
-    background-image: -ms-linear-gradient(top,  @dark,  @dark);
-    background-image: -o-linear-gradient(top,  @dark,  @dark);
-    background-image: linear-gradient(top,  @dark,  @dark);
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
-    text-shadow: 0px 1px 0px @white;
-    border: 1px solid @std-grey;
+    border: 1px solid @border-color;
     margin-bottom: 8px;
 }
 
