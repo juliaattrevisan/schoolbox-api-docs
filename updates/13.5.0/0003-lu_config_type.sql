@@ -7,7 +7,22 @@ CREATE TABLE `lu_config_type` (
 ) DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
 -- Populate lookup table
-INSERT INTO `lu_config_type` (`type`) SELECT DISTINCT `type` FROM `config` ORDER BY `name` ASC;
+INSERT INTO `lu_config_type` (`id`, `type`)
+  VALUES
+  (1,  'Site'),
+  (2,  'Security'),
+  (3,  'Paths'),
+  (4,  'Resources'),
+  (5,  'Policy'),
+  (6,  'Localisation'),
+  (7,  'External DB'),
+  (8,  'Email'),
+  (9,  'Colours'),
+  (10, '3rd Party Services'),
+  (11, 'Modules'),
+  (12, 'Board Leave'),
+  (13, 'Welcome')
+;
 
 -- Alter config.type to varchar
 ALTER TABLE `config` CHANGE COLUMN `type` `type` VARCHAR(250) NULL DEFAULT NULL;

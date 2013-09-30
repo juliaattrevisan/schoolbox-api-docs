@@ -2,9 +2,7 @@
 -- this sort of thing, and I'm sure you're sick of sending them.
 
 -- First add new "html" input type, and change existing "textarea" to "html"
--- ALTER TABLE `config` CHANGE COLUMN `field` `field` ENUM('input','textarea','html','boolean','select','checkbox','bytes','selectKey') NULL DEFAULT 'input';
-
-INSERT IGNORE INTO `lu_config_field` (`field`) VALUES ('html');
+INSERT INTO `lu_config_field` (`id`, `field`) VALUES (8, 'html');
 UPDATE `config`
   SET `field_id` = (SELECT `id` FROM `lu_config_field` WHERE `field` = 'html' LIMIT 1)
   WHERE `field_id` =  (SELECT `id` FROM `lu_config_field` WHERE `field` = 'textarea' LIMIT 1);

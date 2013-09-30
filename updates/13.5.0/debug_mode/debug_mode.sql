@@ -1,21 +1,4 @@
--- ALTER TABLE `config` CHANGE COLUMN `type` `type` ENUM(
---   'Site',
---   'Security',
---   'Policy',
---   'Paths',
---   'Resources',
---   'Email',
---   'Welcome',
---   'Localisation',
---   'External DB',
---   'Colours',
---   'Board Leave',
---   'Modules',
---   '3rd Party Services',
---   'Debugging'
--- ) NULL DEFAULT NULL;
-
-INSERT IGNORE INTO `lu_config_type` (`type`) VALUES ('Debugging');
+INSERT IGNORE INTO `lu_config_type` (`id`, `type`) VALUES (13, 'Debugging');
 
 INSERT INTO `config`(
   `name`,
