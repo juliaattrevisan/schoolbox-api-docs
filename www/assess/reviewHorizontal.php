@@ -114,7 +114,7 @@ if ($allQuestions) {
 
         /* Load individual answers
          */
-        $answerHandler->reviewResponse($this, $currentQuestion['question_id']);
+        $answerHandler->reviewResponseHorizontal($this, $currentQuestion['attempt_id'], $currentQuestion);
 
         //
         // Mark and comment blocks must be parsed before the answerInputs block
