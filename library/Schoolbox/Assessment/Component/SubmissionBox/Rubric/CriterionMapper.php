@@ -7,14 +7,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox;
+namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox;
 
-class RubricCriterionMapper extends Schoolbox\Mapper {
+class CriterionMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('rubric_criterion');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\RubricCriterion');
+        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\Criterion');
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',
@@ -55,18 +55,18 @@ class RubricCriterionMapper extends Schoolbox\Mapper {
      * @return int[] A list of new rubric IDs
      */
     public function copyFromCategory($from_id, $to_id) {
-        /** @var RubricCriterion[] $from_rubric_list */
+        /** @var Criterion[] $from_rubric_list */
         $from_rubric_list = $this->findByColumnList(
             array(
                 'parent_id'   => $from_id,
-                'parent_type' => RubricCriterion::PARENT_TYPE_CATEGORY,
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
             )
         );
-        /** @var RubricCriterion[] $existing_rubric_list */
+        /** @var Criterion[] $existing_rubric_list */
         $existing_rubric_list = $this->findByColumnList(
             array(
                 'parent_id'   => $to_id,
-                'parent_type' => RubricCriterion::PARENT_TYPE_CATEGORY,
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
             )
         );
         $new_rubric_list = new Schoolbox\Collection();

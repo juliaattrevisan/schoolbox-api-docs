@@ -7,9 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox;
+namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-class RubricCriterion {
+class Criterion {
 
     const PARENT_TYPE_CATEGORY   = 'category';
     const PARENT_TYPE_SUBMISSION = 'submission';
