@@ -266,7 +266,7 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @return FileCollection
+	 * @return FileCollection|File[]
 	 */
 	public function getFileLinks() {
 		return $this->file_links;
@@ -449,7 +449,7 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @return NotificationCollection
+	 * @return NotificationCollection|Notification[]
 	 */
 	public function getNotifications() {
 		return $this->notifications;
