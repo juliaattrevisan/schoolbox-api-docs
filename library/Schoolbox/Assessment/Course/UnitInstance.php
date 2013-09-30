@@ -216,4 +216,34 @@ class UnitInstance implements ISoftDeletable {
     public function isDeleted() {
         return ($this->getDeleted() instanceof \Alaress_Date_Format);
     }
+
+    /**
+     * This unit is open if the current date is after the open date, and before
+     * the due date.
+     *
+     * @return bool
+     */
+    public function isOpen() {
+        return !($this->isBeforeOpenDate() || $this->isAfterDueDate());
+    }
+
+    /**
+     * Is this unit open for submissions?
+     *
+     * @return bool
+     */
+    public function isBeforeOpenDate() {
+        $date = new Alaress_Date_Format(new \DateTime());
+        return $date->compare($this->getOpenDate()) < 0;
+    }
+
+    /**
+     * Is this unit open for submissions?
+     *
+     * @return bool
+     */
+    public function isAfterDueDate() {
+        $date = new Alaress_Date_Format(new \DateTime());
+        return $date->compare($this->getDueDate()) > 0;
+    }
 }

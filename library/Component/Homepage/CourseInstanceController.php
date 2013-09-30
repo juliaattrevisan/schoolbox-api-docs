@@ -43,6 +43,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock($templateHandle,  'course_selector', 'course_selector_block');
         $this->setBlock($templateHandle,  'unit_list',       'unit_list_block');
         $this->setBlock('unit_list',      'unit',            'unit_block');
+        $this->setBlock('unit',           'unit_completion', 'unit_completion_block');
         $this->setBlock('unit',           'unit_task',       'unit_task_block');
 
         $this->setVar('course_selector_block', '');
@@ -60,13 +61,52 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             foreach ($this->unit_list as $unit) {
                 $this->setVar(
                     array(
-                        'UNIT_ID'   => $unit->getId(),
-                        'UNIT_NAME' => $unit->getTitle(),
+                        'UNIT_ID'               => $unit->getId(),
+                        'UNIT_NAME'             => $unit->getTitle(),
+                        'UNIT_OPEN_DATE'        => $unit->getOpenDate()->getDatabaseDate(),
+                        'UNIT_DUE_DATE'         => $unit->getDueDate()->getDatabaseDate(),
+                        'unit_task_block'       => '',
+                        'unit_completion_block' => '',
                     )
                 );
 
+                // Output due date and urgency
+                // If due date isn't reached, don't display at all, instead only
+                // show how long until this unit opens.
+                $completion_status = null;
+                $rel_time          = null;
+                $urgency           = null;
+                $now               = new DateTime('now');
+                if ($unit->isBeforeOpenDate()) {
+                    $completion_status = 'opens';
+                    $rel_time          = $unit->getOpenDate();
+                }
+                // If student has completed all tasks within this course:
+                // show when they completed it
+                elseif ($unit->isOpen()) {
+                    $completion_status = 'due';
+                    $rel_time          = $unit->getDueDate();
+
+                    // How many days until this item is due?
+                    $diff = $now->diff(new DateTime($unit->getDueDate()->getDatabase()));
+                    $days = $diff->days;
+                    if ($diff->invert) {
+                        $days = 0;
+                    }
+                    $urgency = min(10, max(0, $days));
+                }
+                else {
+                    $completion_status = 'closed';
+                    $rel_time          = $unit->getDueDate();
+                    $urgency           = 0;
+                }
+                $rel_time = new Alaress_Date_Relative($rel_time);
+                $this->setVar('UNIT_COMPLETION_STATUS', $completion_status);
+                $this->setVar('UNIT_RELATIVE_DATE',     $rel_time->getRelativeTime());
+                $this->setVar('UNIT_UPCOMING_URGENCY',  $urgency);
+                $this->parse('unit_completion_block', 'unit_completion');
+
                 // Output list of tasks within units
-                $this->setVar('unit_task_block', '');
                 foreach ($unit->getTasks() as $task) {
                     $this->setVar(
                         array(

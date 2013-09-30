@@ -24,9 +24,6 @@
                         triggerChange:   true,
                         destinationText: '#component{COMPONENT_INSTANCE_ID} span[data-resource_text]'
                     }
-                    $('#component{COMPONENT_INSTANCE_ID} input[name="homepage"]').change(function(event) {
-                        // console.log(event);
-                    })
                     $('#component{COMPONENT_INSTANCE_ID} a[data-interaction="homepage_selector"]').click(function(event) {
                         event.preventDefault();
                         browser.load(
@@ -63,8 +60,19 @@
         <!-- BEGIN unit_list -->
         <ul class="unit-list">
             <!-- BEGIN unit -->
-            <li class="unit interact" data-unit_id="{UNIT_ID}">
+            <li class="unit interact" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
                 <h3>{UNIT_NAME}</h3>
+
+                <!--
+                Students: see completion status
+                Teachers: don't see this?
+                -->
+                <!-- BEGIN unit_completion -->
+                <span class="relative-date gradient-{UNIT_UPCOMING_URGENCY}">
+                    {UNIT_COMPLETION_STATUS} {UNIT_RELATIVE_DATE}
+                </span>
+                <!-- END unit_completion -->
+
                 <ul class="unit-task-list">
                     <!-- BEGIN unit_task -->
                     <li class="unit-task interact" data-unit_task_id="{UNIT_TASK_ID}">
