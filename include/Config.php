@@ -120,17 +120,6 @@ class Config extends DeprecatedModel {
 			return DeprecatedDatabase::getInstance()->getAll($query);
         }
 
-        public static function getFieldNameForOption($option) {
-            $esc_option = self::getInstance()->db->smartQuote($option);
-            $query = "
-				SELECT `lu_config_field`.`field`
-				FROM `config`
-				INNER JOIN `lu_config_field` ON `config`.`field_id` = `lu_config_field`.`id`
-				WHERE `config`.`name` = {$esc_option}
-				ORDER BY `config`.`configID` ASC";
-            return DeprecatedDatabase::getInstance()->getOne($query);
-        }
-
         public function getAvailableOptions() {
                 self::getInstance();
                 $query = "SELECT name FROM `config` WHERE `editable` = 'true'";
