@@ -44,18 +44,19 @@
 
         <!-- BEGIN course_selector -->
         <h3>This is the course instance component, so please choose a course.</h3>
-
         <!-- No form yet, as nothing has been saved. -->
         <input type="hidden" name="homepage" value="" />
-
         <span data-resource_text></span>
-        <a href="#" class="btn float-right translate" data-interaction="import">
-            <span></span>Import
-        </a>
-        <a href="#" class="btn float-right up-arrow" data-interaction="homepage_selector">
-            <span></span>Select Source
-        </a>
+        <p class="interact add_buttons">
+            <a href="/course/import/{ID}/{COMPONENT_INSTANCE_ID}/" class="btn float-right translate" data-interaction="import">
+                <span></span>Import
+            </a>
+            <a href="#" class="btn float-right up-arrow" data-interaction="homepage_selector">
+                <span></span>Select Source
+            </a>
+        </p>
         <!-- END course_selector -->
+
 
         <!-- BEGIN unit_list -->
         <ul class="unit-list">
@@ -83,6 +84,10 @@
             </li>
             <!-- END unit -->
         </ul>
+        <p class="interact add_buttons">
+            <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="btn float-right modify"><span></span>Modify</a>
+        </p>
         <!-- END unit_list -->
+
     </div>
 </div>

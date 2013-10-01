@@ -24,7 +24,7 @@
 
 <h1>Import a course</h1>
 
-<form method="post" action="/course/importForm.php" id="courseImport">
+<form method="post" action="{FORM_ACTION}" id="{FORM_ID}">
 
     <input type="hidden" name="homepage"        value="{HOMEPAGE_ID}" />
     <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
@@ -72,6 +72,7 @@
                     <tr>
                         <td>
                             <a href="/homepage/{UNIT_ID}" class="unit_name" data-unit_id="{UNIT_ID}">{UNIT_NAME}</a>
+                            <input name="unit[{UNIT_ID}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
                         </td>
                         <td>
                             <input id="open_date-{UNIT_ID}" name="unit[{UNIT_ID}][open_date]" type="text" size="15" maxlength="30" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
