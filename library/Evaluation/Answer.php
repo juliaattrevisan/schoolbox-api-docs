@@ -180,4 +180,16 @@ abstract class Evaluation_Answer extends DeprecatedModel
     {
         return $this->useLongAnswers;
     }
+
+	/* Getters/Setters
+ 	 */
+
+	/**
+	 * Get pluginReview
+	 *
+	 * @return string
+	 */
+	public function getPluginReview() {
+		return $this->pluginReview;
+	}
 }

@@ -12,6 +12,13 @@
 class Assess_Answer_Short extends Evaluation_Answer_Short {
 
 	/**
+	 * Javascript class to use when creating UI
+	 *
+	 * @var string
+	 */
+	protected $pluginReview = 'evaluationShortReview';
+
+	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */
     public function __construct() {

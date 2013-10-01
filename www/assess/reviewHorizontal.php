@@ -110,6 +110,7 @@ if ($allQuestions) {
             'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
             'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
             'QUESTION_MARKS' => $currentQuestion['marks'],
+			'QUESTION_PLUGIN' => $answerHandler->getPluginReview(),
         ));
 
         /* Load individual answers
