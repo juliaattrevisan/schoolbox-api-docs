@@ -9,8 +9,8 @@
 		var config = init(options);
 
 		initSaveComment();
+		initSaveMarks();
 		initSaveReview();
-
 
 		/**
 		 * Set up options
@@ -65,6 +65,15 @@
 				if ($(this).val() !== '') {
 					$.fn.evaluationShortReview.saveReview(config.questionForm);
 				}
+			});
+		}
+
+		/**
+		 * Save marks on blur
+		 */
+		function initSaveMarks() {
+			config.questionForm.find('input[name=reviewedMarks]').blur(function() {
+				$.fn.evaluationShortReview.saveReview(config.questionForm);
 			});
 		}
 	}

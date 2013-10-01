@@ -58,8 +58,6 @@ $this->setFile(TEMPLATE_content, 'assess/reviewHorizontal.html');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'writable_update', 'writable_update_block');
-$this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
-$this->setBlock('endAssess', 'writable_finalise', 'writable_finalise_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 /* Show current Section's data, and other mandatory tokens needed to complete
@@ -130,7 +128,7 @@ if ($allAttempts) {
             $this->parse('writable_comment_block', 'writable_comment');
             $this->parse('writable_mark_block',    'writable_mark');
         }
-		
+
         $this->parse('answerInputs_block', 'answerFormFragment', true);
         $this->parse('attempt_block', 'attempt', true);
 
@@ -146,8 +144,8 @@ else {
     $this->setVar('attempt_block', '');
 }
 
-if ($readonly) {
-    $this->setVar('writable_finalise_block', '');
-} else {
-    $this->parse('writable_finalise_block', 'writable_finalise');
-}
+//if ($readonly) {
+//    $this->setVar('writable_finalise_block', '');
+//} else {
+//    $this->parse('writable_finalise_block', 'writable_finalise');
+//}

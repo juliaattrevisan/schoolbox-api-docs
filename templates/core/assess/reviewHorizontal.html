@@ -4,65 +4,6 @@
 <script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/javascript/evaluation/shortReview.js"></script>
-<script type="text/javascript">
-
-	$j(document).ready(function() {
-
-//
-//	$j('.textarea-container textarea').blur(function() {
-//		if ($j(this).val() !== '') {
-//			$j.post($j(this).closest('form').attr('action'),
-//			$j(this).closest('form').serialize(),
-//			function(responseText) {
-//				var dataFunction = new Function('return ' + responseText);
-//				var result = dataFunction();
-//			});
-//			return false;
-//		}
-//	});
-//
-//	$j('.marks-amount input').blur(function() {
-//		showAlert($j(this));
-//		$j.post($j(this).closest('form').attr('action'),
-//		$j(this).closest('form').serialize(),
-//		function(responseText) {
-//			var dataFunction = new Function('return ' + responseText);
-//			var result = dataFunction();
-//		});
-//		return false;
-//	});
-//
-//	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
-//
-//
-//
-//	if (assessAttempted == 'true') {
-//		$j('.tick').html('<span></span>Resubmit Review')
-//		$j('.review-submitted').show();
-//	}
-//
-//	function showAlert(target) {
-//		var relevantLabel = $j(target).closest('form').find('.assess-alert');
-//		if (assessAttempted == "false") {
-//			relevantLabel.fadeIn(200);
-//		}
-//		if (assessAttempted == "true") {
-//			relevantLabel.html('<span>In order to finish your edits to this finalised review, click \'Resubmit Review\' at the end of the assessment\</span>').fadeIn(200);
-//		}
-//	}
-//
-//	$j('a.finish-review').click(function() {
-//		location.href = $j(this).attr('href');
-//	}).confirm({
-//		buttons: {
-//			wrapper:'<button></button>',
-//			separator:'  '
-//  		}
-//	});
-
-
-	});
-</script>
 <style>
 	form input[type=text] {
 		border: solid 1px #DBDBDB;
@@ -77,7 +18,7 @@
 	<!-- BEGIN attempt -->
 	<script type='text/javascript'>
 		$j(function() {
-			$j('questionForm-{RESPONSE_ID}').evaluationShortReview({
+			$j('questionForm-{RESPONSE_ID}').{QUESTION_PLUGIN}({
 				id: {RESPONSE_ID}
 			});
 		});
@@ -102,18 +43,6 @@
 	<!-- END attempt -->
 
 	<p class="clearfix text-align-right">
-		<!-- BEGIN prevSection -->
-		<a class="btn go-back float-left" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Previous Section</a>
-		<!-- END prevSection -->
-
-		<!-- BEGIN nextSection -->
-		<a class="btn go-to" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Next Section</a>
-		<!-- END nextSection -->
-
-		<!-- BEGIN endAssess -->
-		<!-- BEGIN writable_finalise -->
-		<a class="btn tick finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Finalise Review</a>
-		<!-- END writable_finalise -->
-		<!-- END endAssess -->
 	</p>
 </div>
+
