@@ -25,8 +25,7 @@ if ($groupHandler->isSuperuser()) {
 		$record = $genericHandler->getByField('name', $currentRow);
 
         /* handle conversion to bytes */
-        $type_name = Config::getFieldNameForOption($currentRow);
-        if ($type_name=='bytes') {
+        if ($record['field_id'] == Config::FIELD_BYTES) {
             $record['value'] = Alaress_Byte_Format::stringToBytes($_POST[$currentRow]);
         }
         else {
