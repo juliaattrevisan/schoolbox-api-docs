@@ -102,6 +102,30 @@ class Subcontext_CourseBuilderContext extends BaseContext {
     }
 
     /**
+     * Selects a course for import.
+     *
+     * @Then /^(?:|I )import course "(?P<course_path>[^"]*)"$/
+     * @Then /^(?:|I )import course "(?P<course_path>[^"]*)" on "(?P<section>[^"]*)" in position "(?P<position>[^"]*)$/
+     *
+     * @param string $course_path The course path, as shown in resource browser
+     * @param string $section     The section the course component is in -
+     *                            defaults to "left"
+     * @param int    $position    The position the course component is in -
+     *                            defaults to "1"
+     */
+    public function selectCourseForImport($course_path, $section = 'left', $position = 1) {
+        /** @var Subcontext_ComponentContext $context */
+        $context   = $this->getMainContext()->getSubcontextByClassName('Subcontext_ComponentContext');
+        $component = $context->getComponentInPosition($section, $position);
+        $component->find('css', '[data-interaction="homepage_selector"]')->click();
+        $this->getCoreContext()->waitForAjax();
+        $tree = $this->getSession()->getPage()->find('css', '#resource-browser');
+        $this->getCoreContext()->traverseTree($tree, $course_path);
+        $tree->findById('select-resource')->click();
+        $component->find('css', '[data-interaction="import"]')->click();
+    }
+
+    /**
      * Finds the course task listing component on the current homepage.
      *
      * @throws Exception if task list isn't found
