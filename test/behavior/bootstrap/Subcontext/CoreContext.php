@@ -74,7 +74,7 @@ class Subcontext_CoreContext extends BaseContext {
      * @return Element\NodeElement The node that represents the end of the path
      * @throws Exception if the end node couldn't be found
      */
-    protected function traverseTree($tree, $path) {
+    public function traverseTree($tree, $path) {
 
         $dirname_list      = array_filter(array_map('trim', explode('/', $path)), 'strlen');
         $current_folder_id = 0;
