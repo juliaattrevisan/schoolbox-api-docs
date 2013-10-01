@@ -126,6 +126,59 @@ class Subcontext_CourseBuilderContext extends BaseContext {
     }
 
     /**
+     * Sets the open date for the given unit when importing or saving it.
+     *
+     * @Then /^(?:|I )set open date for course unit "(?P<unit>[^"]*)" as "(?P<date>[^"]*)"$/
+     *
+     * @param  string $unit The name of the unit
+     * @param  string $date The date to set (as a strtotime-recognised string)
+     * @throws Exception if any required element is not found
+     */
+    public function setOpenDateForCourseUnit($unit, $date) {
+        $this->setDateForCourseUnit($unit, $date, 'open_date');
+    }
+
+    /**
+     * Sets the due date for the given unit when importing or saving it.
+     *
+     * @Then /^(?:|I )set due date for course unit "(?P<unit>[^"]*)" as "(?P<date>[^"]*)"$/
+     *
+     * @param  string $unit The name of the unit
+     * @param  string $date The date to set (as a strtotime-recognised string)
+     * @throws Exception if any required element is not found
+     */
+    public function setDueDateForCourseUnit($unit, $date) {
+        $this->setDateForCourseUnit($unit, $date, 'due_date');
+    }
+
+    /**
+     * Sets the due date for the given unit when importing or saving it.
+     *
+     * @param  string $unit The name of the unit
+     * @param  string $date The date to set (as a strtotime-recognised string)
+     * @param  string $name The name of the element to set
+     * @throws Exception if any required element is not found
+     */
+    public function setDateForCourseUnit($unit, $date, $name) {
+        $form = $this->getSession()->getPage()->find('css', 'form#courseImport');
+        if (!($form instanceof Element\NodeElement)) {
+            throw new Exception("Course import form not found");
+        }
+
+        $link = $form->findLink($unit);
+        if (!($link instanceof Element\NodeElement)) {
+            throw new Exception("Unit \"$unit\" not found in course import form");
+        }
+
+        $input = $form->find('css', 'input#'.$name.'-'.$link->getAttribute('data-unit_id'));
+        if (!($input instanceof Element\NodeElement)) {
+            throw new Exception("Date input for unit \"$unit\" not found in course import form");
+        }
+        $date_object = new DateTime($date);
+        $input->setValue($date_object->format('d/m/Y'));
+    }
+
+    /**
      * Finds the course task listing component on the current homepage.
      *
      * @throws Exception if task list isn't found

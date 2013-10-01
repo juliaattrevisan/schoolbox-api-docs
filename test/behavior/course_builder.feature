@@ -117,12 +117,13 @@ Scenario: Add a course to a class
   And   I wait for a "form#courseImport" element
   # Set due dates for units
   Then  I set open date for course unit "Chemical reactions" as "today 12:00am"
-  Then  I set close date for course unit "Chemical reactions" as "+9 days 12:00am"
+  Then  I set due date for course unit "Chemical reactions" as "+9 days 12:00am"
   # Let's say this unit was due in the past. For now, that's acceptable.
   Then  I set open date for course unit "Atomic structure and bonding" as "today -9 days 12:00am"
-  Then  I set close date for course unit "Atomic structure and bonding" as "yesterday 12:00am"
+  Then  I set due date for course unit "Atomic structure and bonding" as "yesterday 12:00am"
   Then  I set open date for course unit "Macroscopic properties of matter" as "today +10 days 12:00am"
-  Then  I set close date for course unit "Macroscopic properties of matter" as "today +19 days 12:00am"
+  Then  I set due date for course unit "Macroscopic properties of matter" as "today +19 days 12:00am"
+  And   I press "Import"
   # Everything should be imported as if by magic
 
 #Scenario: Be a student in a course
