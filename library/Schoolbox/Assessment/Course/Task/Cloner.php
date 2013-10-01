@@ -100,6 +100,7 @@ class Cloner {
             $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
             $assess_object
                 ->setTask(null)
+                ->setTaskInstance($this->task_instance)
                 ->setUser($_SESSION['id'])
                 ->setStart($this->getOpenTimeFromTask())
                 ->setFinish($this->getCloseTimeFromTask())
@@ -123,6 +124,7 @@ class Cloner {
             $box = SubmissionBoxMapper::getInstance()->findById($box_id);
             $box
                 ->setTask(null)
+                ->setTaskInstance($this->task_instance)
                 ->setOwner($_SESSION['id'])
                 ->setCategory($this->category)
                 ->setOpenDate($this->getOpenTimeFromTask())
