@@ -95,6 +95,16 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
             $this->setDateComponents($parts[0]);
             $this->setTimeComponents($parts[1], $parts[2]);
         }
+
+        // No datetime object inside? Create one for consistency.
+        if (!$this->getDateTimeObject() instanceof DateTime) {
+            $this->setDateTimeObject(
+                DateTime::createFromFormat(
+                    'Y-m-d H:i:s',
+                    $this->getUsingFormat('Y-m-d H:i:s')
+                )
+            );
+        }
 	}
 
 	/**
