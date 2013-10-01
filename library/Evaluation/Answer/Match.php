@@ -332,6 +332,127 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
         return $data;
     }
 
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function reviewResponse($page, $question_id)
+	{
+		$right = array();
+
+		$existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+		if ($existing['response']) {
+			$right = unserialize($existing['response']);
+		}
+
+		/* Define special blocks to handle this special answerOptions scenario,
+		   * because we have three columns to parse per iteration.
+		   */
+		$page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
+		$page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
+		$page->setBlock('answerFormFragment', 'answerOptionCorrectResponse', 'answerOptionCorrectResponse_block');
+
+		$answerGroup = $this->getByQuestionID($question_id);
+
+		if ($answerGroup) {
+			$page->setVar(array(
+				'ANSWER_ID' => $answerGroup['answer_id'],
+				'RESPONSE_ID' => $existing['response_id'],
+				'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+				'REVIEWED_MARKS' => $existing['mark'],
+			));
+
+			$allAnswers = unserialize($answerGroup['answer']);
+
+			for ($i = 0; $i < count($allAnswers); $i++) {
+				$currentAnswer = $allAnswers[$i];
+
+				if ($right[$i] == $currentAnswer->answerRight) {
+					$correct = $this->getCorrectClass();
+				} else {
+					$correct = $this->getIncorrectClass();
+				}
+
+				$page->setVar(array(
+					'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
+					'ANSWER_RIGHT_VALUE' => $right[$i],
+					'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
+					'CORRECT' => $correct,
+				));
+
+				$page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
+				$page->parse('answerOptionRight_block', 'answerOptionRight', true);
+				$page->parse('answerOptionCorrectResponse_block', 'answerOptionCorrectResponse', true);
+			}
+		}
+	}
+
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param $page
+	 * @param $attemptId
+	 * @param $currentQuestion
+	 */
+	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
+		$right = array();
+
+		$existing = $this->responseHandler->isResponseExists($attemptId, $currentQuestion['question_id']);
+
+		if ($existing['response']) {
+			$right = unserialize($existing['response']);
+		}
+
+		/* Define special blocks to handle this special answerOptions scenario,
+		   * because we have three columns to parse per iteration.
+		   */
+		$page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
+		$page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
+		$page->setBlock('answerFormFragment', 'answerOptionCorrectResponse', 'answerOptionCorrectResponse_block');
+
+		$answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
+
+		if ($answerGroup) {
+			$page->setVar(array(
+				'USER_FIRSTNAME' => $currentQuestion['firstname'],
+				'USER_LASTNAME' => $currentQuestion['lastname]'],
+				'ANSWER_ID' => $answerGroup['answer_id'],
+				'RESPONSE_ID' => $existing['response_id'],
+				'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+				'REVIEWED_MARKS' => $existing['mark'],
+			));
+
+			$allAnswers = unserialize($answerGroup['answer']);
+
+			for ($i = 0; $i < count($allAnswers); $i++) {
+				$currentAnswer = $allAnswers[$i];
+
+				if ($right[$i] == $currentAnswer->answerRight) {
+					$correct = $this->getCorrectClass();
+				} else {
+					$correct = $this->getIncorrectClass();
+				}
+
+				$page->setVar(array(
+					'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
+					'ANSWER_RIGHT_VALUE' => $right[$i],
+					'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
+					'CORRECT' => $correct,
+				));
+
+				$page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
+				$page->parse('answerOptionRight_block', 'answerOptionRight', true);
+				$page->parse('answerOptionCorrectResponse_block', 'answerOptionCorrectResponse', true);
+			}
+		}
+	}
+
     /* Getters/Setters
      */
 
