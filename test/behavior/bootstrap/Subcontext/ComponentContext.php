@@ -224,30 +224,39 @@ class Subcontext_ComponentContext extends BaseContext {
     }
 
     /**
+     * Retrieves the component that is in the requested section and position.
+     *
+     * @param  string $section  "top", "left" or "right"
+     * @param  int    $position The position in the section to retrieve
+     *                (1: first, 2: next, etc)
+     * @throws Exception if no component at $section and $position
+     * @return Element\NodeElement The box that contains the component.
+     */
+    public function getComponentInPosition($section, $position) {
+        foreach ($this->getSession()->getPage()->findAll('css', "#content .homepage .$section .box") as $i => $box) {
+            if ($i+1 == $position) {
+                return $box;
+            }
+        }
+        throw new Exception(sprintf('Could not find component at position "%s:%d"', $section, $position));
+    }
+
+    /**
      * Checks that a component exists in the given position on the current page.
      *
      * @Then /^I see component "([^"]*)" on "([^"]*)" in position "([^"]*)"$/
      */
     public function verifyComponentInPosition($name, $section, $position) {
-
-        foreach ($this->getSession()->getPage()->findAll('css', "#content .homepage .$section .box") as $i => $box) {
-            /** @var Element\NodeElement $box */
-            if ($i+1 == $position) {
-                //
-                // Search for $name
-                $actual_name = $box->find('css', 'h2')->getText();
-                if (trim($actual_name) !== trim($name)) {
-                    throw new Exception(
-                        sprintf(
-                            'Component at position "%s:%d" is named "%s" instead of "%s"',
-                            $section, $position, $actual_name, $name
-                        )
-                    );
-                }
-                return true;
-            }
+        $box         = $this->getComponentInPosition($section, $position);
+        $actual_name = $box->find('css', 'h2')->getText();
+        if (trim($actual_name) !== trim($name)) {
+            throw new Exception(
+                sprintf(
+                    'Component at position "%s:%d" is named "%s" instead of "%s"',
+                    $section, $position, $actual_name, $name
+                )
+            );
         }
-        throw new Exception(sprintf('Could not find component at position "%s:%d"', $section, $position));
     }
 
 }
