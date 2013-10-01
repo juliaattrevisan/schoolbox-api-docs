@@ -14,6 +14,10 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 
 /** @var SitePage $this */
+//list($homepage_id, $component_id, $course_homepage_id) = $this->arg;
+//$renderer = new Schoolbox\Assessment\Course\Renderer();
+//$renderer->setupFromCourseAndComponent($course_homepage_id, $component_id);
+//$renderer->render();
 
 // Args:
 // 0: homepage
@@ -64,6 +68,8 @@ $this->setVar(
     array(
         'class_breadcrumb_block'  => '',
         'course_breadcrumb_block' => '',
+        'FORM_ID'                 => 'importForm',
+        'FORM_ACTION'             => '/course/importForm.php',
         'HOMEPAGE_ID'             => Scrub::text($homepage_id),
         'COURSE_HOMEPAGE_ID'      => Scrub::text($course_homepage_id),
         'COMPONENT_ID'            => Scrub::text($component_id),
@@ -101,19 +107,13 @@ foreach ($child_list as $unit) {
     }
     $this->setVar(
         array(
-            'UNIT_ID'        => Scrub::text($unit_id),
-            'UNIT_NAME'      => Scrub::text($unit->getName()),
-            'UNIT_OPEN_DATE' => '',
-            'UNIT_DUE_DATE'  => '',
-            'task_block'     => '',
+            'UNIT_ID'          => Scrub::text($unit_id),
+            'UNIT_INSTANCE_ID' => '',
+            'UNIT_NAME'        => Scrub::text($unit->getName()),
+            'UNIT_OPEN_DATE'   => '',
+            'UNIT_DUE_DATE'    => '',
+            'task_block'       => '',
         )
     );
-
-//    foreach ($grouped_task_list[$unit_id] as $task) {
-//        /** @var Task $task */
-//        $this->setVar('TASK_ID',    $task->getId());
-//        $this->setVar('TASK_NAME',  $task->getTitle());
-//        $this->parse('task_block', 'task', true);
-//    }
     $this->parse('unit_block', 'unit', true);
 }
