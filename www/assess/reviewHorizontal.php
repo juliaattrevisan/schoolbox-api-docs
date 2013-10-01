@@ -79,15 +79,15 @@ $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['f
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
  */
-$allQuestions = $attemptHandler->getAllAttemptsForQuestion($question['question_id']);
+$allAttempts = $attemptHandler->getAllAttemptsForQuestion($question['question_id']);
 
-if ($allQuestions) {
-    foreach ($allQuestions as $currentQuestion) {
-        $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
+if ($allAttempts) {
+    foreach ($allAttempts as $currentAttempt) {
+        $answerHandler = $factory->createAnswerModel($currentAttempt['type_id']);
 
         /* Load answer template into answerOption block
          */
-        $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/review.html');
+        $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentAttempt['type_id']) . '/review.html');
         $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
         $this->setBlock('answerFormFragment', 'writable_comment', 'writable_comment_block');
@@ -106,16 +106,16 @@ if ($allQuestions) {
         $this->setVar('readonly_mark_block', '');
 
         $this->setVar(array(
-            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-            'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
-            'QUESTION_MARKS' => $currentQuestion['marks'],
+            'QUESTION_QUESTION_ID' => $currentAttempt['question_id'],
+            'QUESTION_SEQUENCE' => $currentAttempt['sequence'],
+            'QUESTION_QUESTION' => Scrub::html($currentAttempt['question']),
+            'QUESTION_MARKS' => $currentAttempt['marks'],
 			'QUESTION_PLUGIN' => $answerHandler->getPluginReview(),
         ));
 
         /* Load individual answers
          */
-        $answerHandler->reviewResponseHorizontal($this, $currentQuestion['attempt_id'], $currentQuestion);
+        $answerHandler->reviewResponseHorizontal($this, $currentAttempt['attempt_id'], $currentAttempt);
 
         //
         // Mark and comment blocks must be parsed before the answerInputs block
@@ -130,11 +130,12 @@ if ($allQuestions) {
             $this->parse('writable_comment_block', 'writable_comment');
             $this->parse('writable_mark_block',    'writable_mark');
         }
+		
         $this->parse('answerInputs_block', 'answerFormFragment', true);
         $this->parse('attempt_block', 'attempt', true);
 
         /* Clear child blocks after parsing out the parent
-           */
+         */
         $answerHandler->cleanupParse($this);
 
         $this->setVar('answerFormFragment', '');
