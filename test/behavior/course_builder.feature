@@ -107,22 +107,24 @@ Scenario: Create a course
   And   I check "accept_submission"
   And   I press "Create"
 
-#Scenario: Add a course to a class
-#  Given I log in as "cglenn" with password "password"
-#  # Test adding this new course to a group page. Students should be able to take this course.
-#  And   I follow link "Duke of Edinburgh"
-#  And   I add component "Course Task List"
-#  Then  I set course as "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
-#  # Set due dates for units
-#  Then  I set open date for unit "Chemical Reactions" as "today 12:00am"
-#  Then  I set close date for unit "Chemical Reactions" as "+9 days 12:00am"
-#  # Let's say this unit was due in the past
-#  Then  I set open date for unit "Atomic structure and bonding" as "today -9 days 12:00am"
-#  Then  I set close date for unit "Atomic structure and bonding" as "yesterday 12:00am"
-#  Then  I set open date for unit "Macroscopic properties of matter" as "today +10 days 12:00am"
-#  Then  I set close date for unit "Macroscopic properties of matter" as "today +19 days 12:00am"
-#  # Everything should be imported as if by magic
-#
+Scenario: Add a course to a class
+  Given I go to homepage
+  Then  I log in as "cglenn" with password "password"
+  # Test adding this new course to a group page. Students should be able to take this course.
+  And   I follow "Duke of Edinburgh"
+  And   I add component "Learning:Course Instance"
+  Then  I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
+  And   I wait for a "form#courseImport" element
+  # Set due dates for units
+  Then  I set open date for course unit "Chemical reactions" as "today 12:00am"
+  Then  I set close date for course unit "Chemical reactions" as "+9 days 12:00am"
+  # Let's say this unit was due in the past. For now, that's acceptable.
+  Then  I set open date for course unit "Atomic structure and bonding" as "today -9 days 12:00am"
+  Then  I set close date for course unit "Atomic structure and bonding" as "yesterday 12:00am"
+  Then  I set open date for course unit "Macroscopic properties of matter" as "today +10 days 12:00am"
+  Then  I set close date for course unit "Macroscopic properties of matter" as "today +19 days 12:00am"
+  # Everything should be imported as if by magic
+
 #Scenario: Be a student in a course
 #  Given I log in as "sberryhill" with password "password"
 #  Then  I follow link "Duke of Edinburgh"
