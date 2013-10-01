@@ -11,8 +11,63 @@
 //*                                     #/
 //*/
 // =============================================================================
-@import "../core/variables.less";
+// 1. Load dependencies
+// =============================================================================
 @import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width: 					116px;
+@logo-height: 					119px;
+
+// Generic colors
+@body-background: 				#EEEEEE; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#F3F8FF; // Alternate tigerstriping color
+@border-color: 					#DBDBDB; // Bordering @dark
+@alternate-background: 			#FAF9F5; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#255297;
+@link-hover: 					@link;
+
+// Main banner
+@banner-background: 			#013A63;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@banner-height:     			116px;
+
+// Modules
+@module-heading: 				#FFFFFF;
+@module-background: 			#072F63;
+
+// Refers to the left navigation
+@navigation-width:				161px;
+@navigation-padding:			16px;
+@navigation-background:  		#EDEDED;
+@navigation-links:  			#2C2C2C;
+@navigation-hover-background: 	#0066B0;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	#818181;
+
+// Main "Tab" Navigation
+@tab-background:				#EDEDED;
+@tab-color:						#024D8D;
+@tab-hover-background:			#818181;
+@tab-hover-color:				#FFFFFF;
+
+// Footer text
+@footer-color:					#FFFFFF;
+@footer-links:					@footer-color;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
 @import "../core/chrome.less";
 @import "../core/legacy.less";
 @import "screen.less";
