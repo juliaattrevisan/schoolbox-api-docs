@@ -5,7 +5,7 @@
 	 *
 	 * @param options
 	 */
-	$.fn.evaluationShortReview = function(options) {
+	$.fn.evaluationResponseReview = function(options) {
 		var config = init(options);
 
 		initSaveComment();
@@ -38,7 +38,7 @@
 				submitHandler: function() {
 //					showAlert(config.questionForm);
 
-					$.fn.evaluationShortReview.saveReview(config.questionForm);
+					$.fn.evaluationResponseReview.saveReview(config.questionForm);
 
 					return false;
 				},
@@ -63,7 +63,7 @@
 		function initSaveComment() {
 			config.questionForm.find('textarea').blur(function() {
 				if ($(this).val() !== '') {
-					$.fn.evaluationShortReview.saveReview(config.questionForm);
+					$.fn.evaluationResponseReview.saveReview(config.questionForm);
 				}
 			});
 		}
@@ -73,7 +73,7 @@
 		 */
 		function initSaveMarks() {
 			config.questionForm.find('input[name=reviewedMarks]').blur(function() {
-				$.fn.evaluationShortReview.saveReview(config.questionForm);
+				$.fn.evaluationResponseReview.saveReview(config.questionForm);
 			});
 		}
 	}
@@ -83,7 +83,7 @@
 	 *
 	 * @param element
 	 */
-	$.fn.evaluationShortReview.saveReview = function(element) {
+	$.fn.evaluationResponseReview.saveReview = function(element) {
 		$.ajax({
 			type: 'post',
 			url: $(element).attr('action'),

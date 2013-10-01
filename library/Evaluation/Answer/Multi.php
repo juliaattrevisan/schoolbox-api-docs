@@ -437,6 +437,102 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         }
     }
 
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param $page
+	 * @param $attemptId
+	 * @param $currentQuestion
+	 */
+	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
+		$existing = $this->responseHandler->isResponseExists($attemptId, $currentQuestion['question_id']);
+
+		if ($existing) {
+			$existingAnswer = unserialize($existing['response']);
+		}
+
+		$answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
+
+		if ($answerGroup) {
+			$allAnswers = unserialize($answerGroup['answer']);
+
+			$page->setVar(array(
+				'USER_FIRSTNAME' => $currentQuestion['firstname'],
+				'USER_LASTNAME' => $currentQuestion['lastname'],
+				'ANSWER_ID' => $answerGroup['answer_id'],
+				'RESPONSE_ID' => $existing['response_id'],
+				'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+				'REVIEWED_MARKS' => $existing['mark'],
+			));
+
+			foreach ($allAnswers as $currentAnswer) {
+				if ($currentAnswer->correct) {
+					$page->setVar(array(
+						'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+					));
+				}
+				else {
+					$page->setVar(array(
+						'ACTUAL_CORRECT_VALUE' => ''
+					));
+				}
+
+				$page->setVar(array(
+					'ANSWER_VALUE' => $currentAnswer->value,
+					'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+				));
+
+				if ($existing['response']) {
+					if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
+						$page->setVar(array(
+							'ANSWER_CHECKED' => 'checked=\'checked\'',
+						));
+
+						/* Was this a correctly-selected response? If so apply a
+						 * special class to it. The three cases are:
+						 *
+						 * Correct response, selected
+						 * Incorrect response, selected
+						 * Unselected
+						 */
+						if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
+							$page->setVar(array(
+								'CORRECT' => $this->getCorrectClass(),
+							));
+						}
+						else if (in_array($currentAnswer->value, $existingAnswer)) {
+							$page->setVar(array(
+								'CORRECT' => $this->getIncorrectClass(),
+							));
+						}
+						else {
+							$page->setVar(array(
+								'CORRECT' => ''
+							));
+						}
+					}
+					else {
+						$page->setVar(array(
+							'ANSWER_CHECKED' => '',
+							'CORRECT' => ''
+						));
+					}
+				}
+				else {
+					$page->setVar(array(
+						'CORRECT' => ''
+					));
+				}
+
+				$page->parse('answerOption_block', 'answerOption', true);
+			}
+		}
+		else {
+			$page->setVar('answerOption_block', '');
+		}
+	}
+
     /* Getters/Setters
      */
 
