@@ -80,8 +80,13 @@ class Resource_Browser {
 
                     $class = array();
 
-                    // set parent category
-                    $class[] = "child-of-node-{$category['parent']}";
+                    // set parent category - if this is a child of the base cat,
+                    // it's zero regardless of what it is (it has no parent)
+                    $parent  = $category['parent'];
+                    if ($parent == $options['base']) {
+                        $parent = 0;
+                    }
+                    $class[] = "child-of-node-$parent";
 
                     /* add plus sign to parent nodes */
                     if ($category['isParent'] == '1') {
