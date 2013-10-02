@@ -184,7 +184,7 @@ h2, h2 a, .header_option {
 	font-size:12px;
 }
 
-h2, .calendar-controls {
+h2 {
 	background-repeat:repeat-x;
 	background-color:#5692ce;
 	color:#fff;
@@ -203,6 +203,13 @@ h2, .calendar-controls {
    	background-image:      -o-linear-gradient(top, #5692ce, #477fc6);
    	background-image:         linear-gradient(top, #5692ce, #477fc6);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#5692ce', EndColorStr='#477fc6');
+}
+.calendar-controls h2 {
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	background-image: none !important;
+	filter: none !important;
 }
 .top h2, .left h2, .right h2 { color: #fff; }
 #calendar h3{color:#000;}
@@ -696,41 +703,3 @@ color: #0066B0;
 #brender-moss #aside { position: absolute; right: 0; width: 144px; top: 102px;}
 #library-books li { display: none; line-height: 16px; }
 #library-books img { display: block; }
-
-/*
- * Table border fixes
- */
-.calendar table .dark,
-.otherMonth,
-.past,
-.timetable th,
-.top .listing .dark,
-.right .listing .dark,
-.left .listing .dark
-{
-    background: #f2f6fa;
-}
-
-.calendar table thead th,
-.day-block,
-.calendar table,
-.left #calendar table.duedates-calendar td,
-.left #calendar table.duedates-calendar,
-#calendar table th.dark,
-table tr,
-.listing li,
-.listing .subject-list li,
-.listing .subject-list a,
-.listing .subject-list a.teacher,
-ul.activity-list li,
-.timetable td, .timetable th,
-.forum .comments li, .blog .comments li
-{
-    border-color: #f2f6fa;
-}
-.calendar table thead th,
-#calendar table th.dark,
-.timetable thead th
-{
-    border-bottom-color: #f2f6fa;
-}
