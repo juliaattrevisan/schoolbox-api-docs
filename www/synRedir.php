@@ -16,6 +16,9 @@ $login = file_get_contents($action);
 
 preg_match('/id="__VIEWSTATE" value="(.*?)"/', $login, $viewState);
 preg_match('/id="__EVENTVALIDATION" value="(.*?)"/', $login, $eventValidation);
+preg_match('/name="(.*?)" value="Login"/', $login, $loginButton);
+preg_match('/name="(.*?)" type="text"/', $login, $loginUsername);
+preg_match('/name="(.*?)" type="password"/', $login, $loginPassword);
 
 $password = isset($_SESSION['password']) ? $_SESSION['password'] : $user['email_pass'];
 $formArray['__VIEWSTATE'] = $viewState[1];
@@ -23,9 +26,9 @@ $formArray['__EVENTVALIDATION'] = $eventValidation[1];
 $formArray['__EVENTARGUMENT'] = '';
 $formArray['__EVENTTARGET'] = '';
 $formArray['__LASTFOCUS'] = '';
-$formArray['ctl00$masterPageContentPlaceHolder$loginButton'] = 'Login';
-$formArray['ctl00$masterPageContentPlaceHolder$textBox1'] = $user['username'];
-$formArray['ctl00$masterPageContentPlaceHolder$textBox2'] = $password;
+$formArray[$loginButton[1]] = 'Login';
+$formArray[$loginUsername[1]] = $user['username'];
+$formArray[$loginPassword[1]] = $password;
 $formArray['loginButton'] = 'Login';
 $formArray['textBox1'] = $user['username'];
 $formArray['textBox2'] = $password;
