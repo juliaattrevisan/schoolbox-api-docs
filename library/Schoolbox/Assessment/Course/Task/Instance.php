@@ -259,4 +259,57 @@ class Instance implements ISoftDeletable {
         return ($this->getDeleted() instanceof \Alaress_Date_Format);
     }
 
+    /**
+     * Copied from task mapper
+     *
+     * @return int
+     */
+    public function getType() {
+        if ($this->getAssessment()->getId()) {
+            return Task::TYPE_ONLINE_ASSESS;
+        }
+        if ($this->getSubmissionBox()->getId()) {
+            return Task::TYPE_DUE_WORK;
+        }
+        return Task::TYPE_TASK;
+    }
+
+    /**
+     * Temp method for getting this task's icon class.
+     *
+     * @todo move this to a renderer class at some point.
+     *
+     * @return string
+     */
+    public function getIconClass() {
+        switch ($this->getType()) {
+            case Task::TYPE_DUE_WORK:
+                return 'new';
+            case Task::TYPE_ONLINE_ASSESS:
+                return 'onlineassessment';
+            default:
+                break;
+        }
+        return 'tick';
+    }
+
+    /**
+     * Temp method for getting this task's icon class.
+     *
+     * @todo move this back to lookup table?
+     *
+     * @return string
+     */
+    public function getLabel() {
+        switch ($this->getType()) {
+            case Task::TYPE_DUE_WORK:
+                return 'Due Work';
+            case Task::TYPE_ONLINE_ASSESS:
+                return 'Online Assessment';
+            default:
+                break;
+        }
+        return 'Task';
+    }
+
 }
