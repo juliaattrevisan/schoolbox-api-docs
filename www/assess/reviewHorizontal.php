@@ -87,6 +87,8 @@ else {
 	$this->setFile(TEMPLATE_content, 'assess/reviewHorizontal.html');
 	$this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 	$this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+	$this->setBlock(TEMPLATE_content, 'next_question', 'next_question_block');
+	$this->setBlock(TEMPLATE_content, 'previous_question', 'previous_question_block');
 	$this->setBlock('attempt', 'writable_update', 'writable_update_block');
 	$this->setTitle('Assessment: ' . $assess['title']);
 
@@ -179,4 +181,33 @@ else {
 	//} else {
 	//    $this->parse('writable_finalise_block', 'writable_finalise');
 	//}
+
+	/* Navigation tools
+	 */
+	$previous = $questionHandler->getPreviousQuestion($assess['assess_id'], $question['sequence']);
+
+	if ($previous) {
+		$this->setVar(array(
+			'PREVIOUS_ID' => $previous['question_id']
+		));
+
+		$this->parse('previous_question_block', 'previous_question');
+	}
+	else {
+		$this->setVar('previous_question_block', '');
+	}
+
+	$next = $questionHandler->getNextQuestion($assess['assess_id'], $question['sequence']);
+
+	if ($next) {
+		$this->setVar(array(
+			'NEXT_ID' => $next['question_id']
+		));
+
+		$this->parse('next_question_block', 'next_question');
+	}
+	else {
+		$this->setVar('next_question_block', '');
+	}
+
 }

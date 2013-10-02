@@ -34,4 +34,46 @@ class Assess_Question extends Evaluation_Question {
 
         return $this->db->getAll($query);
     }
+
+	/**
+	 * Get the next question in the sequence
+	 *
+	 * @param $assessId
+	 * @param $questionSequence
+	 * @return array|bool
+	 */
+	public function getNextQuestion($assessId, $questionSequence) {
+		$query = "
+			SELECT *
+			FROM assess_section
+			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
+			WHERE assess_question.sequence > $questionSequence
+			AND assess_section.assess_id = '{$assessId}'
+			ORDER BY assess_section.sequence, assess_question.sequence
+			LIMIT 1
+		";
+
+		return $this->db->getRow($query);
+	}
+
+	/**
+	 * Get the previous question in the sequence
+	 *
+	 * @param $assessId
+	 * @param $questionSequence
+	 * @return array|bool
+	 */
+	public function getPreviousQuestion($assessId, $questionSequence) {
+		$query = "
+			SELECT *
+			FROM assess_section
+			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
+			WHERE assess_question.sequence < '{$questionSequence}'
+			AND assess_section.assess_id = '{$assessId}'
+			ORDER BY assess_section.sequence, assess_question.sequence DESC
+			LIMIT 1
+		";
+
+		return $this->db->getRow($query);
+	}
 }
