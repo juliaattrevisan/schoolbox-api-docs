@@ -21,9 +21,27 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     protected $unit_list;
 
     /**
+     * @var array
+     */
+    protected $student_list;
+
+    /**
      * {@inheritdoc}
      */
     public function execute() {
+        // Get the list of students for this class (in which method?)
+        $code = $this->getContext('code');
+        if ($code && Config::get('external_enable')) {
+            $class_handler = new External_Class();
+            $this->student_list = $class_handler->getStudents($code);
+        }
+        else {
+            $group_handler = new Group();
+            $this->student_list = $group_handler->getMemberList($this->getContext('id'));
+        }
+
+        // Get the list of units for this course, as well as who has actually
+        // completed each unit.
         $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
     }
 
@@ -59,13 +77,18 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // unit list will be a collection of Unit models
             $this->setVar('unit_block', '');
             $now = new DateTime('now');
+            $i = 0;
+
+            $student_count = count($this->student_list);
             foreach ($this->unit_list as $unit) {
                 $this->setVar(
                     array(
-                        'UNIT_ID'               => $unit->getId(),
-                        'UNIT_NAME'             => $unit->getTitle(),
-                        'UNIT_OPEN_DATE'        => $unit->getOpenDate()->getDatabaseDate(),
-                        'UNIT_DUE_DATE'         => $unit->getDueDate()->getDatabaseDate(),
+                        'UNIT_ID'               => Scrub::text($unit->getId()),
+                        'UNIT_NAME'             => Scrub::text($unit->getTitle()),
+                        'UNIT_OPEN_DATE'        => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
+                        'UNIT_DUE_DATE'         => Scrub::text($unit->getDueDate()->getDatabaseDate()),
+                        'UNIT_BACKGROUND'       => ($i++%2 === 1 ? 'dark' : ''),
+                        'UNIT_STUDENT_COUNT'    => $student_count,
                         'unit_task_block'       => '',
                         'unit_completion_block' => '',
                     )
@@ -103,19 +126,26 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                     $urgency           = 0;
                 }
                 $rel_time = new Alaress_Date_Relative($rel_time);
-                $this->setVar('UNIT_COMPLETION_STATUS', $completion_status);
-                $this->setVar('UNIT_RELATIVE_DATE',     $rel_time->getRelativeTime());
-                $this->setVar('UNIT_UPCOMING_URGENCY',  $urgency);
+                $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
+                $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
+                $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
                 $this->parse('unit_completion_block', 'unit_completion');
 
                 // Output list of tasks within units
                 foreach ($unit->getTasks() as $task) {
+                    $complete_count = 0;
+                    $gradient       = round($complete_count / $student_count * 10);
                     $this->setVar(
                         array(
-                            'UNIT_TASK_ID'   => $task->getId(),
-                            'UNIT_TASK_NAME' => $task->getTitle(),
+                            'UNIT_TASK_ID'               => Scrub::text($task->getId()),
+                            'UNIT_TASK_NAME'             => Scrub::text($task->getTitle()),
+                            'UNIT_TASK_CLASS'            => Scrub::text($task->getIconClass()),
+                            'UNIT_TASK_TYPE_LABEL'       => Scrub::text($task->getLabel()),
+                            'UNIT_TASK_COMPLETION_COUNT' => $complete_count,
+                            'UNIT_TASK_GRADIENT'         => $gradient,
                         )
                     );
+                    // What's the gradient?
                     $this->parse('unit_task_block', 'unit_task', true);
                 }
                 $this->parse('unit_block', 'unit', true);

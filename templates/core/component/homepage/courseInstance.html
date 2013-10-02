@@ -3,12 +3,47 @@
     {CONFIGURATION}
     <div class="box clearfix">
         <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
+        <style type="text/css">
+            .course_instance h3 {
+                display: inline-block;
+                float: none;
+            }
+            .course_instance h4 {
+                display: inline-block;
+                float: none;
+            }
+            .course_instance .unit-completion {
+                display: inline-block;
+                width: 20%;
+                text-align: right;
+            }
+            .course_instance .unit-list .expand-link {
+                text-decoration: none;
+            }
+            .course_instance .unit-list .expand-button {
+                line-height: 11px;
+                width: 11px;
+                min-height: 11px;
+                display: inline-block;
+                background-color: transparent;
+                background-position-x: -2px;
+                background-position-y: -6px;
+                background-repeat: no-repeat;
+            }
+            .course_instance .unit-list .unit.collapsed .expand-button {
+                background-image: url(/images/tree/elbow-collapsed.gif);
+            }
+            .course_instance .unit-list .unit.expanded  .expand-button {
+                background-image: url(/images/tree/elbow-expanded.gif);
+            }
+        </style>
         <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
         <script type="text/javascript">
             // Addition of an AJAX form submission - need to add here because
             // the session name and ID have to be passed.
             (function($) {
                 $(function() {
+                    // Resource browser parts
                     var browser = $('#resource-browser');
                     browser.dialog({
                         width: 650,
@@ -38,6 +73,28 @@
                         source = source.replace(/.*?(\d+$)/, '$1')
                         window.location.href = '/course/import/{ID}/{COMPONENT_INSTANCE_ID}/'+source
                     });
+
+                    // Expand/collapse of units
+                    $('#component{COMPONENT_INSTANCE_ID} a[data-interaction="toggle-expanded"]').click(function(event) {
+                        event.preventDefault();
+                        var element = $(this);
+                        var is_collapsed = element.data('interaction-state') == "collapsed";
+                        var unit_element = element.closest('.unit');
+                        var task_list    = unit_element.find('.task-list');
+                        if (is_collapsed) {
+                            unit_element.removeClass('collapsed').addClass('expanded');
+                            task_list.slideDown('fast')
+                            element.data('interaction-state', 'expanded');
+                        }
+                        else {
+                            unit_element.removeClass('expanded').addClass('collapsed');
+                            task_list.slideUp('fast')
+                            element.data('interaction-state', 'collapsed');
+                        }
+                    });
+
+
+
                 });
             })(jQuery);
         </script>
@@ -59,25 +116,51 @@
 
 
         <!-- BEGIN unit_list -->
-        <ul class="unit-list">
+        <ul class="unit-list listing">
             <!-- BEGIN unit -->
-            <li class="unit interact" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
-                <h3>{UNIT_NAME}</h3>
+            <li class="unit interact collapsed {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
+
+                <a href="#" class="expand-link" data-interaction="toggle-expanded" data-interaction-state="collapsed">
+                    <span class="expand-button"></span>
+                    <h3>{UNIT_NAME}</h3>
+                </a>
+
 
                 <!--
                 Students: see completion status
                 Teachers: don't see this?
                 -->
+
                 <!-- BEGIN unit_completion -->
-                <span class="relative-date gradient-{UNIT_UPCOMING_URGENCY}">
+                <span class="unit-completion gradient-{UNIT_UPCOMING_URGENCY}">
                     {UNIT_COMPLETION_STATUS} {UNIT_RELATIVE_DATE}
                 </span>
                 <!-- END unit_completion -->
 
-                <ul class="unit-task-list">
+                <!-- BEGIN edit_task -->
+                <span class="interact modify_buttons">
+                    <a href="#" class="btn delete no-text" title="Delete this task"><span></span></a>
+                </span>
+                <!-- END edit_task -->
+
+                <ul class="task-list listing hide">
                     <!-- BEGIN unit_task -->
-                    <li class="unit-task interact" data-unit_task_id="{UNIT_TASK_ID}">
-                        <h3>{UNIT_TASK_NAME}</h3>
+                    <li class="unit-task interact {UNIT_BACKGROUND}" data-unit_task_id="{UNIT_TASK_ID}">
+                        <span class="icon {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}"><span></span></span>
+
+                        <!--
+                        Student: see buttons for starting/ending task
+                        Teacher: sees completion stats
+                        -->
+                        <h4>{UNIT_TASK_NAME}</h4>
+
+
+
+                        <!-- BEGIN unit_task_completion_count -->
+                        <span class="unit-completion gradient-{UNIT_TASK_GRADIENT}">
+                            ({UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT})
+                        </span>
+                        <!-- END unit_task_completion_count -->
                     </li>
                     <!-- END unit_task -->
                 </ul>
