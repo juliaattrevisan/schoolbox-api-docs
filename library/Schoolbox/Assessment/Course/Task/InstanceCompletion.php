@@ -14,6 +14,10 @@ use Schoolbox\User;
 
 class InstanceCompletion {
 
+    const COMPLETION_STATUS_INCOMPLETE            = 1;
+    const COMPLETION_STATUS_REQUIRES_CONFIRMATION = 2;
+    const COMPLETION_STATUS_COMPLETE              = 3;
+
     /**
      * @var int
      */
@@ -37,7 +41,7 @@ class InstanceCompletion {
     /**
      * @var int
      */
-    protected $completion_status;
+    protected $completion_status = self::COMPLETION_STATUS_INCOMPLETE;
 
     /**
      * @param  \Alaress_Date_Format $completion_date
