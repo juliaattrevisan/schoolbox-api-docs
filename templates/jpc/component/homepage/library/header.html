@@ -1,0 +1,34 @@
+<div class="box jpc-header" id="component{COMPONENT_INSTANCE_ID}">
+    <!-- uncomment to allow drag/drop of this component -->
+    <!--
+    <h2></h2>
+    {CONFIGURATION}
+    -->
+
+    <h3>John Paul College <b>Resource Centre</b></h3>
+
+    <ul>
+        <li><a href="/homepage/9167" title="Home">Home</a></li>
+        <li><a href="http://172.16.1.48/" title="Library Catalogue">Library Catalogue</a></li>
+        <li><a href="http://172.16.1.48/" title="DVC">DVC</a></li>
+    </ul>
+
+    <!--Search Here-->
+
+    <form action="http://172.16.1.48/" method="get">
+        <fieldset>
+            <input type="submit" value="" class="search-button" />
+            <input type="text" name="srchtext" class="search-field" defaultvalue="Catalogue Search" placeholder="Catalogue Search" />
+            <!--
+            Search options:
+            fields: all
+            method: start of word
+            order:  title
+            -->
+            <input type="hidden" name="srchfield"  value="searchable" />
+            <input type="hidden" name="srchmethod" value="1" />
+            <input type="hidden" name="sortorder"  value="title" />
+        </fieldset>
+    </form>
+
+</div>

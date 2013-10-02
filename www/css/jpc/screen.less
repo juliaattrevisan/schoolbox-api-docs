@@ -529,3 +529,159 @@ ul.activity-list li,
     clear: both;
     position: relative;
 }
+
+.jpc-header{
+  font-family: Arial, Verdana, Helvetica, sans-serif;
+  background: #f7e19b url('/images/jpc/header-bg.png') 100% 50% no-repeat;
+  width: 96%;
+  margin: 0;
+  padding: 2%;
+}
+
+.jpc-header h3{
+  color: #222478 !important;
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 26px;
+  font-weight: lighter;
+  padding: 0;
+}
+
+.jpc-header ul{
+  margin: 10px 0;
+  padding: 0;
+  overflow: auto;
+}
+
+.jpc-header ul li{
+  float: left;
+  list-style: none;
+  padding: 0;
+  border: 0;
+  line-height: auto;
+}
+
+.jpc-header li a{
+  background: #faedc3;
+  color: #0066b0;
+  display: block;
+  padding: 7px 14px;
+  margin: 0 10px 0 0;
+  text-decoration: none;
+}
+
+.jpc-header li a:hover{
+  background: #fff;
+}
+
+.jpc-lib{
+  font-family: Arial, Verdana, Helvetica, sans-serif;
+  margin: 0 !important;
+  padding: 0;
+  width: 100%;
+  overflow: auto;
+}
+
+.jpc-lib li{
+  list-style: none;
+}
+
+.jpc-lib li a{
+  background: #222478 url('/images/jpc/link-bg.jpg') bottom left repeat-x;
+  color: #ffffff;
+  display: block;
+  width: 30%;
+  height: 100px;
+  position: relative;
+  float: left;
+  font-size: 22px;
+  padding: 16px 1% 1% 1%;
+  margin: 5px 0.6%;
+  text-decoration: none;
+}
+
+.jpc-lib li a:hover{
+  background: #0066b0 url('/images/jpc/link-bg.jpg') bottom left repeat-x;
+  color: #fff !important;
+}
+
+.jpc-lib .img{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.jpc-lib .img img{
+  max-width: 100%;
+  height: auto;
+}
+
+.jpc-lib .txt{
+  width: 59%;
+  float: left;
+  position: absolute;
+  bottom: 8px;
+  line-height: 24px;
+}
+
+@media all and (max-width: 1300px){
+  .jpc-lib li a{
+    font-size: 14px;
+  }
+
+  .jpc-lib .txt{
+    width: 45%;
+    line-height: 16px;
+  }
+
+  .jpc-lib .img {
+    width: 40%;
+  }
+
+}
+
+.jpc-header{
+  position: relative;
+  margin: 0 0 12px 0;
+}
+
+.jpc-header form{
+  position: absolute;
+  top: 25px;
+  right: 22px;
+}
+
+.jpc-header form input{
+  background: #222478;
+  border: 0;
+  height: 26px;
+  float: left;
+  margin: 0;
+}
+
+.jpc-header form .search-field{
+  color: #ffffff !important;
+  width: 145px;
+  padding: 0px 8px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.jpc-header form .search-button{
+  background: #222478 url('/images/jpc/library-search.png') 9px 8px no-repeat;
+  width: 28px;
+}
+
+.jpc-header form .search-button:hover{
+  cursor: pointer;
+}
+
+@media all and (max-width: 1345px){
+  .jpc-header form{
+    top: 45px;
+  }
+
+  .jpc-header h3{
+    font-size: 21px;
+  }
+}
