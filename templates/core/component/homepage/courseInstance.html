@@ -17,6 +17,9 @@
                 width: 20%;
                 text-align: right;
             }
+            .course_instance .unit-list .no-expand {
+                padding-left: 15px;
+            }
             .course_instance .unit-list .expand-link {
                 text-decoration: none;
             }
@@ -24,6 +27,7 @@
                 line-height: 11px;
                 width: 11px;
                 min-height: 11px;
+                margin-right: 4px;
                 display: inline-block;
                 background-color: transparent;
                 background-position-x: -2px;
@@ -120,10 +124,17 @@
             <!-- BEGIN unit -->
             <li class="unit interact collapsed {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
 
-                <a href="#" class="expand-link" data-interaction="toggle-expanded" data-interaction-state="collapsed">
-                    <span class="expand-button"></span>
-                    <h3>{UNIT_NAME}</h3>
+                <!-- BEGIN unit_expand -->
+                <a href="#" class="unit-name expand-link" data-interaction="toggle-expanded" data-interaction-state="collapsed">
+                    <span class="expand-button"></span><h3>{UNIT_NAME}</h3>
                 </a>
+                <!-- END unit_expand -->
+
+                <!-- BEGIN unit_no_expand -->
+                <span class="unit-name no-expand">
+                    <h3>{UNIT_NAME}</h3>
+                </span>
+                <!-- END unit_no_expand -->
 
 
                 <!--
@@ -145,22 +156,38 @@
 
                 <ul class="task-list listing hide">
                     <!-- BEGIN unit_task -->
-                    <li class="unit-task interact {UNIT_BACKGROUND}" data-unit_task_id="{UNIT_TASK_ID}">
+                    <li class="unit-task interact {UNIT_BACKGROUND} {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
                         <span class="icon {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}"><span></span></span>
 
                         <!--
                         Student: see buttons for starting/ending task
                         Teacher: sees completion stats
                         -->
+
+                        <!-- BEGIN unit_task_link -->
+                        <a href="/task/start/{UNIT_TASK_ID}"><h4>{UNIT_TASK_NAME}</h4></a>
+                        <!-- END unit_task_link -->
+                        <!-- BEGIN unit_task_no_link -->
                         <h4>{UNIT_TASK_NAME}</h4>
+                        <!-- END unit_task_no_link -->
 
 
+                        <!-- BEGIN unit_task_completion_status -->
+                        <!-- END unit_task_completion_status -->
 
-                        <!-- BEGIN unit_task_completion_count -->
+
+                        <!-- BEGIN unit_task_count -->
                         <span class="unit-completion gradient-{UNIT_TASK_GRADIENT}">
                             ({UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT})
                         </span>
-                        <!-- END unit_task_completion_count -->
+                        <!-- END unit_task_count -->
+
+
+                        <!-- BEGIN unit_task_start_button -->
+                        <span class="interact modify_buttons">
+                            <a href="/task/start/{UNIT_TASK_ID}" class="btn modify" title="Start this task"><span></span> Start this task</a>
+                        </span>
+                        <!-- END unit_task_start_button -->
                     </li>
                     <!-- END unit_task -->
                 </ul>

@@ -12,6 +12,7 @@
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Course\Task;
 
 class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract {
 
@@ -21,28 +22,62 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     protected $unit_list;
 
     /**
+     * @var Collection|Task\InstanceCompletion[]
+     */
+    protected $completion_list;
+
+    /**
      * @var array
      */
     protected $student_list;
+
+    /**
+     * @var bool
+     */
+    protected $is_student;
 
     /**
      * {@inheritdoc}
      */
     public function execute() {
         // Get the list of students for this class (in which method?)
+        $group_handler = new Group();
         $code = $this->getContext('code');
         if ($code && Config::get('external_enable')) {
             $class_handler = new External_Class();
             $this->student_list = $class_handler->getStudents($code);
         }
         else {
-            $group_handler = new Group();
             $this->student_list = $group_handler->getMemberList($this->getContext('id'));
         }
 
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
         $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
+
+        // Get task instance IDs out of unit list.
+        // Then, retrieve for: current user if a student, or all students if a
+        // teacher.
+        $task_list = array_reduce(
+            array_map(
+                function($v) { return $v->getColumnValues('id'); },
+                $this->unit_list->getColumnValues('tasks')
+            ),
+            'array_merge',
+            array()
+        );
+        $column_list = array(
+            'task_instance_id' => $task_list,
+        );
+
+        $this->is_student = $group_handler->isStudent();
+        if ($this->is_student) {
+            $column_list['student_id'] = $_SESSION['id'];
+        }
+
+        $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findByColumnList(
+            $column_list
+        );
     }
 
     /**
@@ -58,11 +93,17 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar('COMPONENT_NAME',  $this->getConfig('componentname'));
         $this->setVar('COURSE_HOMEPAGE', str_replace('/homepage/', '', Config::get('course_homepage')));
 
-        $this->setBlock($templateHandle,  'course_selector', 'course_selector_block');
-        $this->setBlock($templateHandle,  'unit_list',       'unit_list_block');
-        $this->setBlock('unit_list',      'unit',            'unit_block');
-        $this->setBlock('unit',           'unit_completion', 'unit_completion_block');
-        $this->setBlock('unit',           'unit_task',       'unit_task_block');
+        $this->setBlock($templateHandle,  'course_selector',    'course_selector_block');
+        $this->setBlock($templateHandle,  'unit_list',          'unit_list_block');
+        $this->setBlock('unit_list',      'unit',               'unit_block');
+        $this->setBlock('unit',           'unit_expand',        'unit_expand_block');
+        $this->setBlock('unit',           'unit_no_expand',     'unit_no_expand_block');
+        $this->setBlock('unit',           'unit_completion',    'unit_completion_block');
+        $this->setBlock('unit',           'unit_task',          'unit_task_block');
+        $this->setBlock('unit_task',      'unit_task_link',     'unit_task_link_block');
+        $this->setBlock('unit_task',      'unit_task_no_link',  'unit_task_no_link_block');
+        $this->setBlock('unit_task',      'unit_task_count',    'unit_task_count_block');
+
 
         $this->setVar('course_selector_block', '');
         $this->setVar('unit_list_block',       '');
@@ -83,16 +124,30 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             foreach ($this->unit_list as $unit) {
                 $this->setVar(
                     array(
-                        'UNIT_ID'               => Scrub::text($unit->getId()),
-                        'UNIT_NAME'             => Scrub::text($unit->getTitle()),
-                        'UNIT_OPEN_DATE'        => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
-                        'UNIT_DUE_DATE'         => Scrub::text($unit->getDueDate()->getDatabaseDate()),
-                        'UNIT_BACKGROUND'       => ($i++%2 === 1 ? 'dark' : ''),
-                        'UNIT_STUDENT_COUNT'    => $student_count,
-                        'unit_task_block'       => '',
-                        'unit_completion_block' => '',
+                        'UNIT_ID'                  => Scrub::text($unit->getId()),
+                        'UNIT_NAME'                => Scrub::text($unit->getTitle()),
+                        'UNIT_OPEN_DATE'           => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
+                        'UNIT_DUE_DATE'            => Scrub::text($unit->getDueDate()->getDatabaseDate()),
+                        'UNIT_BACKGROUND'          => ($i++%2 === 1 ? 'dark' : ''),
+                        'UNIT_STUDENT_COUNT'       => $student_count,
+                        'UNIT_TASK_COMPLETE_CLASS' => '',
+                        'unit_task_block'          => '',
+                        'unit_completion_block'    => '',
+                        'unit_expand_block'        => '',
+                        'unit_no_expand_block'     => '',
                     )
                 );
+
+                $display_task_list =
+                    $unit->getTasks()->count() > 0 &&
+                    ($unit->isOpen() || !$this->is_student)
+                ;
+                if ($display_task_list) {
+                    $this->parse('unit_expand_block', 'unit_expand');
+                }
+                else {
+                    $this->parse('unit_no_expand_block', 'unit_no_expand');
+                }
 
                 // Output due date and urgency
                 // If due date isn't reached, don't display at all, instead only
@@ -131,22 +186,67 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
                 $this->parse('unit_completion_block', 'unit_completion');
 
-                // Output list of tasks within units
-                foreach ($unit->getTasks() as $task) {
-                    $complete_count = 0;
-                    $gradient       = round($complete_count / $student_count * 10);
-                    $this->setVar(
-                        array(
-                            'UNIT_TASK_ID'               => Scrub::text($task->getId()),
-                            'UNIT_TASK_NAME'             => Scrub::text($task->getTitle()),
-                            'UNIT_TASK_CLASS'            => Scrub::text($task->getIconClass()),
-                            'UNIT_TASK_TYPE_LABEL'       => Scrub::text($task->getLabel()),
-                            'UNIT_TASK_COMPLETION_COUNT' => $complete_count,
-                            'UNIT_TASK_GRADIENT'         => $gradient,
-                        )
-                    );
-                    // What's the gradient?
-                    $this->parse('unit_task_block', 'unit_task', true);
+                // Output list of tasks within units, only if the task is open
+                if ($display_task_list) {
+                    foreach ($unit->getTasks() as $task) {
+
+                        // Students only:
+                        // Output whether this item is complete.
+                        $unit_task_class = '';
+                        if ($this->is_student) {
+                            $unit_task_class = 'incomplete';
+                            foreach ($this->completion_list as $completion_item) {
+                                if ($completion_item->getTaskInstance()->getId() == $task->getId()) {
+                                    switch ($completion_item->getCompletionStatus()) {
+                                        case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
+                                            $unit_task_class = 'complete';
+                                            break;
+                                        case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
+                                            $unit_task_class = 'pending';
+                                            break;
+                                        case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
+                                        default:
+                                            break;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        $this->setVar('UNIT_TASK_COMPLETE_CLASS', $unit_task_class);
+
+
+                        $complete_count = 0;
+                        $gradient       = round($complete_count / $student_count * 10);
+                        $this->setVar(
+                            array(
+                                'UNIT_TASK_ID'               => Scrub::text($task->getId()),
+                                'UNIT_TASK_NAME'             => Scrub::text($task->getTitle()),
+                                'UNIT_TASK_CLASS'            => Scrub::text($task->getIconClass()),
+                                'UNIT_TASK_TYPE_LABEL'       => Scrub::text($task->getLabel()),
+                                'UNIT_TASK_COMPLETION_COUNT' => $complete_count,
+                                'UNIT_TASK_GRADIENT'         => $gradient,
+                                'unit_task_link_block'       => '',
+                                'unit_task_no_link_block'    => '',
+                                'unit_task_count_block'      => '',
+                            )
+                        );
+
+                        // Is there a link for this item?
+                        if (strlen($task->getLink()) > 0) {
+                            $this->parse('unit_task_link_block', 'unit_task_link');
+                        }
+                        else {
+                            $this->parse('unit_task_no_link_block', 'unit_task_no_link');
+                        }
+
+                        // Teacher sees the number of students that have completed
+                        // this task, nobody else does.
+                        if (!$this->is_student) {
+                            $this->parse('unit_task_count_block', 'unit_task_count');
+                        }
+
+                        $this->parse('unit_task_block', 'unit_task', true);
+                    }
                 }
                 $this->parse('unit_block', 'unit', true);
             }
