@@ -10,40 +10,42 @@
 	}
 </style>
 <!-- END custom_head -->
-<h1>Mark the test results for {RESPONDENT_NAME}</h1>
+<h1>Horizontal Marking for {ASSESS_TITLE}</h1>
 
-<p class="information-notification review-submitted hide">Please note: You are currently editing an already submitted review.</p>
-<div class="evaluation-content mark-test">
+<div  style='border:3px dashed #f00;'>
+	<div class="wysiwyg no-pad clearfix">
+		<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}</h3>
+	</div>
 
-	<!-- BEGIN attempt -->
-	<script type='text/javascript'>
-		$j(function() {
-			$j('questionForm-{RESPONSE_ID}').evaluationResponseReview({
-				id: {RESPONSE_ID}
+	<div class="evaluation-content mark-test">
+
+		<!-- BEGIN attempt -->
+		<script type='text/javascript'>
+			$j(function() {
+				$j('questionForm-{RESPONSE_ID}').evaluationResponseReview({
+					id: {RESPONSE_ID}
+				});
 			});
-		});
-	</script>
-	<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID} questionForm' method="post">
-		<h1>{USER_LASTNAME}, {USER_FIRSTNAME}</h1>
-		<div class="wysiwyg no-pad clearfix">
-			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}<span> - ({QUESTION_MARKS} marks)</span></h3>
-		</div>
-		<div class="evaluation-answer clearfix">
-			<!-- BEGIN answerInputs -->
-			<!-- END answerInputs -->
-		</div>
-		<!-- BEGIN writable_update -->
-		<label class="alert-holder clearfix">
-			<div class="assess-alert">
-				<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
+		</script>
+		<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID} questionForm' method="post">
+			<h1>{USER_LASTNAME}, {USER_FIRSTNAME}</h1>
+
+			<div class="evaluation-answer clearfix">
+				<!-- BEGIN answerInputs -->
+				<!-- END answerInputs -->
 			</div>
-			<input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
-		</label>
-		<!-- END writable_update -->
-	</form>
-	<!-- END attempt -->
+			<!-- BEGIN writable_update -->
+			<label class="alert-holder clearfix">
+				<div class="assess-alert">
+					<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
+				</div>
+				<input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
+			</label>
+			<!-- END writable_update -->
+		</form>
+		<!-- END attempt -->
 
-	<p class="clearfix text-align-right">
-	</p>
+		<p class="clearfix text-align-right">
+		</p>
+	</div>
 </div>
-
