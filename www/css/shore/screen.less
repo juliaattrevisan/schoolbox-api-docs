@@ -120,9 +120,9 @@ laber.error,
 
 .box #category
 {
-    -moz-border-radius: 0 0 6px 6px;
-    -webkit-border-radius: 0 0 6px 6px;
-    border-radius: 0 0 6px 6px;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
 }
 
 #tabs .navthis a,
@@ -437,16 +437,22 @@ p.interact a {
 
 #category li{margin:7px 0;}
 #category li a.selected,
-.topic-list li a.selected
+.topic-list li a.selected,
+#category li a.selected:hover,
+.topic-list li a.selected:hover,
 {
     background-color:#003E7E;
     color: #fff;
 }
+.topic-list li a {
+	color: @link;
+}
 
 #category {
-    -moz-border-radius: 6px 6px 6px 6px;
     background: #e4e4e4;
-	margin-left:8px;
+}
+#category li a:hover {
+	color: @link;
 }
 
 .box{padding-bottom:8px; border:1px solid #e4e4e4;}
