@@ -10,6 +10,7 @@ if (Config::get('site_location') === 'jpc') {
         'class'              => 'Component_Homepage_BlankController',
         'description'        => 'Displays a template.',
         'multiple'           => 'true',
+        'visible'            => 'false',
         'config'             => array(
             'template'        => array(
                 'default_value' => 'library/header',
