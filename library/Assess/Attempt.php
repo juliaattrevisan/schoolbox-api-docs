@@ -25,10 +25,16 @@ class Assess_Attempt extends Evaluation_Attempt {
 			SELECT *
 			FROM assess_question
 			LEFT JOIN assess_response ON assess_question.question_id = assess_response.question_id
-			LEFT JOIN assess_attempt ON assess_response.attempt_id = assess_attempt.attempt_id
-			LEFT JOIN `user` ON assess_attempt.user_id = user.id
+			INNER JOIN (
+				SELECT assess_attempt.attempt_id, user_id
+				FROM  assess_attempt
+				WHERE deleted_at IS NULL
+				ORDER BY user_id, `start` DESC
+			) el_boomerang ON assess_response.attempt_id = el_boomerang.attempt_id
+			LEFT JOIN `user` ON el_boomerang.user_id = `user`.id
 			WHERE assess_question.question_id = '{$questionId}'
-			ORDER BY `user`.lastname, assess_attempt.finish DESC
+			GROUP BY el_boomerang.user_id
+			ORDER BY `user`.lastname
 		";
 
 		return $this->db->getAll($query);
