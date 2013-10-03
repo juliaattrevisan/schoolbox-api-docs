@@ -22,6 +22,7 @@ $sectionHandler = new Assess_Section();
 $groupHandler = new Group();
 $userHandler = new User();
 $questionHandler = new Assess_Question();
+$answerHandler = new Assess_Answer();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -102,6 +103,18 @@ else {
 	$this->setVar('writable_finalise_block', '');
 	$this->setTitle('Assessment: ' . $assess['title']);
 
+	/* Correct answer displayed once, at the top of the page, under the question
+	 * Each answer is handled uniquely by each answerHandler
+	 */
+	$this->setBlock(TEMPLATE_content, 'answerInputsTop', 'answerInputsTop_block');
+	$this->setFile('answerFormFragmentTop', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/reviewTop.html');
+	$this->setBlock('answerFormFragmentTop', 'answerTop', 'answerTop_block');
+
+	$answerHandler = $factory->createAnswerModel($question['type_id']);
+	$answerHandler->reviewResponseHorizontalAnswerForQuestion($this, $question);
+
+	$this->parse('answerInputsTop_block', 'answerFormFragmentTop', true);
+
 	/* Show current Section's data, and other mandatory tokens needed to complete
 	 * the Assessment.
 	 */
@@ -123,7 +136,6 @@ else {
 
 	if ($allAttempts) {
 		foreach ($allAttempts as $currentAttempt) {
-			$answerHandler = $factory->createAnswerModel($currentAttempt['type_id']);
 
 			/* Load answer template into answerOption block
 			 */
