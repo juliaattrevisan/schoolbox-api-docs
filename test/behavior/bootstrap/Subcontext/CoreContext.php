@@ -18,12 +18,26 @@ class Subcontext_CoreContext extends BaseContext {
      * upon each scenario), so please call this as the first step in the first
      * scenario in a feature.
      *
-     * @When /^(?:|I )start afresh$/
-     * @When /^(?:|I )reset the database$/
-     * @When /^(?:|I )wipe the slate clean$/
+     * @Given /^(?:|I )start afresh$/
+     * @Given /^(?:|I )reset the database$/
+     * @Given /^(?:|I )wipe the slate clean$/
      */
     public function startAfresh() {
         $this->getMinkContext()->visit('/test/reset.php');
+    }
+
+    /**
+     * Placeholder step for not clearing the database when at the start of a
+     * feature description.
+     *
+     * This method does nothing, but is included for clarity when defining
+     * a scenario that continues on from the previous scenario.
+     *
+     * @Given /^(?:|I )do not start afresh$/
+     * @Given /^(?:|I )do not reset the database$/
+     * @Given /^(?:|I )do not wipe the slate clean$/
+     */
+    public function doNotStartAfresh() {
     }
 
     /**

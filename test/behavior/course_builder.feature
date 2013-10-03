@@ -12,6 +12,7 @@ Scenario: Set a homepage as the course home
 
 @setup-course
 Scenario: Create a course rubric set
+  Given I do not wipe the slate clean
   Then  I go to homepage
   And   log in as "wwhite" with password "password"
   Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
@@ -26,6 +27,7 @@ Scenario: Create a course rubric set
 
 @setup-course
 Scenario: Create a course
+  Given I do not wipe the slate clean
   Then  I go to homepage
   And   log in as "wwhite" with password "password"
   # How are available courses/lessons chosen?
@@ -110,8 +112,9 @@ Scenario: Create a course
   And   I check "accept_submission"
   And   I press "Create"
 
-@add-course
+@use-course
 Scenario: Add a course to a class
+  Given I do not wipe the slate clean
   Given I go to homepage
   Then  I log in as "cglenn" with password "password"
   # Test adding this new course to a group page. Students should be able to take this course.
