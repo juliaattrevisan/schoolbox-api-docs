@@ -122,10 +122,10 @@
         <!-- BEGIN unit_list -->
         <ul class="unit-list listing">
             <!-- BEGIN unit -->
-            <li class="unit interact collapsed {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
+            <li class="unit interact {UNIT_EXPANDED_STATE} {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
 
                 <!-- BEGIN unit_expand -->
-                <a href="#" class="unit-name expand-link" data-interaction="toggle-expanded" data-interaction-state="collapsed">
+                <a href="#" class="unit-name expand-link" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}">
                     <span class="expand-button"></span><h3>{UNIT_NAME}</h3>
                 </a>
                 <!-- END unit_expand -->
@@ -154,7 +154,7 @@
                 </span>
                 <!-- END edit_task -->
 
-                <ul class="task-list listing hide">
+                <ul class="task-list listing {UNIT_LIST_CLASS}">
                     <!-- BEGIN unit_task -->
                     <li class="unit-task interact {UNIT_BACKGROUND} {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
                         <span class="icon {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}"><span></span></span>
