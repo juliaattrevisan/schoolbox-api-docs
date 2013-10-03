@@ -1,6 +1,6 @@
 @charset "utf-8";
 // =============================================================================
-// Legacy Schoolbox skin loader
+// Toorak College Mount Eliza Schoolbox skin
 // =============================================================================
 //*
 //*   Ride The Whale                         ~777IIIIIIIIIII7~_
@@ -11,9 +11,268 @@
 //*                                     #/
 //*/
 // =============================================================================
-@import "../core/variables.less";
-@import "../core/mixins.less";
-@import "../core/chrome.less";
-@import "../core/legacy.less";
-@import "screen.less";
+// 1. Load dependencies
 // =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width: 					154px;
+@logo-height: 					148px;
+
+// Generic colors
+@body-background: 				#F6F5F2; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FAF9F5; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#002664;
+@link-hover: 					lighten(@link,@lighten-value / 2);
+
+// Main banner
+@banner-background: 			#F6F5F2;
+@banner-color:      			#002664;
+@banner-links:      			@banner-color;
+@banner-height:     			80px;
+
+// Modules
+@module-heading: 				#FFFFFF;
+@module-background: 			#002664;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			#C4262E;
+@navigation-links:  			#002664;
+@navigation-hover-background: 	@navigation-links;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@navigation-links;
+
+// Main "Tab" Navigation
+@tab-background:				transparent;
+@tab-color:						#002664;
+@tab-hover-background:			@tab-background;
+@tab-hover-color:				@tab-color;
+
+// Footer text
+@footer-color:					#888888;
+@footer-links:					@footer-color;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/chrome.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+body {
+	background: @body-background url('/images/toorak/ivy-bg.png') bottom left no-repeat;
+}
+body.login {
+	background: @banner-background;
+}
+#wrap{
+	background: url('/images/toorak/ivy-bg-2.png') 100% -6px no-repeat;
+}
+
+#container {
+	border-top: 2px solid #c4262e;
+	margin-left: @navigation-width;
+	margin-right: 0px;
+}
+
+#header{
+	background: url('/images/toorak/iVE.png') 200px 8px no-repeat;
+}
+
+.login #header{ height: 182px; }
+
+#header .logo{
+	left: 17px;
+	top: 15px;
+}
+
+// Footer
+ .login #footer ul li,
+ .login #footer ul li a {
+	 color: @white;
+ }
+
+// Nav
+#nav {
+	top: 170px;
+}
+#nav ul ul a{
+	color: @white;
+	&:hover{
+		background: @navigation-color;
+	}
+}
+
+#search-field {
+	color:#006272;
+	background: @white;
+}
+#search-button{
+	background: url('/images/toorak/search-button.png') 10px 12px no-repeat !important;
+}
+
+// Tabs
+#tabs li.navthis a {
+	background: @navigation-color;
+	color: @white;
+}
+
+// Topic-list
+.topic-list li a {
+	color: @navigation-links;
+}
+#category li a:hover {
+	background: #C4262E;
+}
+#category li a.selected,
+#tabs-sub li.ui-tabs-selected a,
+.topic-list li a.selected{
+	background:#eaab00;
+	color: @white;
+}
+
+/*
+ * Login
+ */
+img.bg{
+	/* Set rules to fill background */
+	min-height: 100%;
+	//min-width: 1024px;
+
+	/* Set up proportionate scaling */
+	//width: 100%;
+	height: 100%;
+
+	/* Set up positioning
+	  position: fixed;
+	  top: 0;
+	  left: 0;*/
+}
+
+#login-background{
+	text-align: center;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	z-index: -1;
+}
+
+.login #header{
+	background: transparent;
+}
+
+.login #iVE{
+	position: absolute;
+	left: 50%;
+	top: 61px;
+	margin-left: 97px;
+}
+
+.login #header .logo{
+	left: 50%;
+	top: 2px;
+	margin-left: -339px;
+}
+
+.login #header .logo,
+.login #header .logo img{
+	height: 282px;
+	width: 287px;
+}
+
+.login #container {
+	background-color: rgb(0, 38, 100);
+	background-color: rgba(0, 38, 100, 0.5);
+	padding: 30px;
+	width: 335px;
+	left: 50%;
+	top: 240px;
+	margin: 0 0 0 -195px;
+	position: absolute;
+	min-width: 335px;
+	border: 0;
+}
+
+.login #content {
+	min-width: 335px;
+	color: #fff;
+}
+
+#loginForm label{
+	width: 100%;
+}
+
+#loginForm input[type=text],
+#loginForm input[type=password]{
+	border: 0;
+	height: 28px;
+	padding: 4px 10px;
+	width: 310px !important;
+	font-weight: bold;
+	color: #002664;
+	line-height: 24px;
+}
+
+#loginForm input.login{
+	background: #c4262e;
+	font-weight: bold;
+	font-size: 16px;
+	height: 34px;
+	width: 140px;
+}
+
+#loginForm input.login:hover{
+	opacity: 0.9;
+}
+
+#loginForm fieldset {
+	padding: 0 0 28px 0;
+}
+
+.login #footer {
+	padding-left: 37px;
+	position: absolute;
+	bottom: 10px;
+	left: 50%;
+	margin-left: -525px;
+}
+
+.login .forgotten a{
+	color: #fff;
+	text-decoration: underline;
+}
+
+.login ::-webkit-input-placeholder{
+	color: #002664;
+	font-size: 16px;
+}
+login ::-moz-placeholder { /* Firefox 19+ */
+	color: #002664;
+	font-size: 16px;
+}
+login :-ms-input-placeholder {
+	color: #002664;
+	font-size: 16px;
+}
+login :-moz-placeholder { /* Firefox 18- */
+	color: #002664;
+	font-size: 16px;
+}
+
