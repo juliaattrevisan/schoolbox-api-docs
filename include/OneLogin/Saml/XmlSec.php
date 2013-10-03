@@ -73,7 +73,7 @@ class OneLogin_Saml_XmlSec
      */
     public function isValid()
     {
-        $objXMLSecDSig = new XMLSecurityDSig();
+        $objXMLSecDSig = new XMLSecurity\Signature();
 
         $objDSig = $objXMLSecDSig->locateSignature($this->_document);
         if (!$objDSig) {
@@ -108,7 +108,7 @@ class OneLogin_Saml_XmlSec
             throw new Exception('We have no idea about the key');
         }
 
-        XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
+        XmlSecurity\Encoder::staticLocateKeyInfo($objKey, $objDSig);
 
         $objKey->loadKey($this->_settings->idpPublicCertificate, FALSE, TRUE);
 
