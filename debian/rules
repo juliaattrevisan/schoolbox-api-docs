@@ -52,6 +52,8 @@ override_dh_install:
 	rm -fR templates/*/m
 	cp -a --parents sql/modules/mobile $(CURDIR)/mobile
 	rm -fR sql/modules/mobile
+	cp -a --parents library/Schoolbox/Mobile $(CURDIR)/mobile
+	rm -fR library/Schoolbox/Mobile
 	## End Mobile Module
 	# Install submodules using composer
 	tools/composer.sh --no-dev

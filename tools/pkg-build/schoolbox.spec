@@ -187,7 +187,7 @@ chown -R alaress:alaress %{_datadir}/%{name};
 %exclude %{_datadir}/%{name}/sql/modules/leave
 %exclude %{_datadir}/%{name}/templates/*/m
 %exclude %{_datadir}/%{name}/sql/modules/mobile
-%exclude %{_datadir}/%{name}/app
+%exclude %{_datadir}/%{name}/library/Schoolbox/Mobile
 %exclude %{_datadir}/%{name}/www/include/permission.php
 
 %files sso
@@ -202,7 +202,7 @@ chown -R alaress:alaress %{_datadir}/%{name};
 %files mobile
 %{_datadir}/%{name}/templates/*/m
 %{_datadir}/%{name}/sql/modules/mobile
-%{_datadir}/%{name}/app
+%{_datadir}/%{name}/library/Schoolbox/Mobile
 
 %files mgssport
 %{_datadir}/%{name}/www/include/permission.php
