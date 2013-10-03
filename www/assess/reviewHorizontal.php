@@ -29,6 +29,18 @@ if (!is_numeric($this->arg[0])) {
 
 $assess = $assessHandler->getByID($this->arg[0]);
 
+if (!$assess) {
+	error(112);
+}
+
+if ($assessHandler->isDeleted($this->arg[0])) {
+	error(112);
+}
+
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(127);
+}
+
 /* Index of questions
  */
 if (!isset($this->arg[1])) {
@@ -59,9 +71,6 @@ if (!isset($this->arg[1])) {
  * How do you like them apples
  */
 else if ($this->arg[1] == 'finalise') {
-
-	/* TODO: Check whether you are actually allowed to do this or not
-	 */
 	$attemptHandler->finaliseAllLatestAttempts($assess['assess_id']);
 
 	$this->backToTheFuture(1);
@@ -75,20 +84,8 @@ else {
 
 	$question = $questionHandler->getByID($this->arg[1]);
 
-	if (!$assess) {
-		error(112);
-	}
-
 	if (!$question) {
 		error(119);
-	}
-
-	if ($assessHandler->isDeleted($this->arg[0])) {
-		error(112);
-	}
-
-	if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-		error(127);
 	}
 
 	$user = $userHandler->getByID($attempt['user_id']);
