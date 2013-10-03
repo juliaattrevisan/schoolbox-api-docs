@@ -533,6 +533,48 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 		}
 	}
 
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param $page
+	 * @param $currentQuestion
+	 */
+	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+		$answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
+
+		if ($answerGroup) {
+			$allAnswers = unserialize($answerGroup['answer']);
+
+			$page->setVar(array(
+				'ANSWER_ID' => $answerGroup['answer_id'],
+			));
+
+			foreach ($allAnswers as $currentAnswer) {
+				if ($currentAnswer->correct) {
+					$page->setVar(array(
+						'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+					));
+				}
+				else {
+					$page->setVar(array(
+						'ACTUAL_CORRECT_VALUE' => ''
+					));
+				}
+
+				$page->setVar(array(
+					'ANSWER_VALUE' => $currentAnswer->value,
+					'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+				));
+
+				$page->parse('answerTop_block', 'answerTop', true);
+			}
+		}
+		else {
+			$page->setVar('answerTop_block', '');
+		}
+	}
+
     /* Getters/Setters
      */
 
