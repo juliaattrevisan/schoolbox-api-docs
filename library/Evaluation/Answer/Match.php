@@ -453,6 +453,52 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 		}
 	}
 
+	/**
+	 * The answer for a question during horizontal marking, so it appears at the
+	 * top under the question itself, and not repeated for each attempt
+	 *
+	 * @param $page
+	 * @param $currentQuestion
+	 * @return void
+	 */
+	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+		$right = array();
+
+		/* Define special blocks to handle this special answerOptions scenario,
+		 * because we have three columns to parse per iteration.
+		 */
+		$page->setBlock('answerFormFragmentTop', 'answerOptionTopLeft', 'answerOptionTopLeft_block');
+		$page->setBlock('answerFormFragmentTop', 'answerOptionTopRight', 'answerOptionTopRight_block');
+		$page->setBlock('answerFormFragmentTop', 'answerOptionTopCorrectResponse', 'answerOptionTopCorrectResponse_block');
+
+		$answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
+
+		if ($answerGroup) {
+			$allAnswers = unserialize($answerGroup['answer']);
+
+			for ($i = 0; $i < count($allAnswers); $i++) {
+				$currentAnswer = $allAnswers[$i];
+
+				if ($right[$i] == $currentAnswer->answerRight) {
+					$correct = $this->getCorrectClass();
+				} else {
+					$correct = $this->getIncorrectClass();
+				}
+
+				$page->setVar(array(
+					'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
+					'ANSWER_RIGHT_VALUE' => $right[$i],
+					'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
+					'CORRECT' => $correct,
+				));
+
+				$page->parse('answerOptionTopLeft_block', 'answerOptionTopLeft', true);
+				$page->parse('answerOptionTopRight_block', 'answerOptionTopRight', true);
+				$page->parse('answerOptionTopCorrectResponse_block', 'answerOptionTopCorrectResponse', true);
+			}
+		}
+	}
+
     /* Getters/Setters
      */
 
