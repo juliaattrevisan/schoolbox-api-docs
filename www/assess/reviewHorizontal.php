@@ -55,6 +55,17 @@ if (!isset($this->arg[1])) {
 
 	$this->parse('allQuestions_block', 'assessContentsFragment', true);
 }
+/* Update the reviewed_at for all the latest attempts for a particular assess :D
+ * How do you like them apples
+ */
+else if ($this->arg[1] == 'finalise') {
+
+	/* TODO: Check whether you are actually allowed to do this or not
+	 */
+	$attemptHandler->finaliseAllLatestAttempts($assess['assess_id']);
+
+	$this->backToTheFuture(1);
+}
 /* Reviewing attempts for a question
  */
 else {
@@ -89,7 +100,9 @@ else {
 	$this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 	$this->setBlock(TEMPLATE_content, 'next_question', 'next_question_block');
 	$this->setBlock(TEMPLATE_content, 'previous_question', 'previous_question_block');
+	$this->setBlock(TEMPLATE_content, 'writable_finalise', 'writable_finalise_block');
 	$this->setBlock('attempt', 'writable_update', 'writable_update_block');
+	$this->setVar('writable_finalise_block', '');
 	$this->setTitle('Assessment: ' . $assess['title']);
 
 	/* Show current Section's data, and other mandatory tokens needed to complete
@@ -176,13 +189,10 @@ else {
 		$this->setVar('attempt_block', '');
 	}
 
-	//if ($readonly) {
-	//    $this->setVar('writable_finalise_block', '');
-	//} else {
-	//    $this->parse('writable_finalise_block', 'writable_finalise');
-	//}
-
 	/* Navigation tools
+	 */
+
+	/* Previous question
 	 */
 	$previous = $questionHandler->getPreviousQuestion($assess['assess_id'], $question['sequence']);
 
@@ -197,6 +207,8 @@ else {
 		$this->setVar('previous_question_block', '');
 	}
 
+	/* Next question
+	 */
 	$next = $questionHandler->getNextQuestion($assess['assess_id'], $question['sequence']);
 
 	if ($next) {
@@ -207,7 +219,16 @@ else {
 		$this->parse('next_question_block', 'next_question');
 	}
 	else {
+
+		/* Finalise all the attempts in a macro-ey way
+		 *
+		 * This option only exists on the last question so you don't
+		 * accidentally finalise everything prematurely
+		 */
+		if (!$readonly) {
+			$this->parse('writable_finalise_block', 'writable_finalise');
+		}
+
 		$this->setVar('next_question_block', '');
 	}
-
 }

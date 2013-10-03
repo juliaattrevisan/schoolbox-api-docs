@@ -39,4 +39,31 @@ class Assess_Attempt extends Evaluation_Attempt {
 
 		return $this->db->getAll($query);
 	}
+
+	/**
+	 * Update the reviewed_at for all the latest attempts for a particular assess :D
+	 * How do you like them apples
+	 *
+	 * @param $assessId
+	 */
+	public function finaliseAllLatestAttempts($assessId) {
+		$query = "
+			UPDATE assess_attempt
+			INNER JOIN (
+				SELECT assess_attempt.*
+				FROM assess_attempt
+				INNER JOIN (
+					SELECT *
+					FROM assess_attempt
+					ORDER BY user_id, `start` DESC
+				) q ON assess_attempt.`attempt_id` = q.attempt_id
+				GROUP BY assess_attempt.user_id
+			) AS latestAttempt ON assess_attempt.attempt_id = latestAttempt.attempt_id
+			SET assess_attempt.reviewed_at = NOW()
+			WHERE assess_attempt.assess_id = '{$assessId}'
+		";
+
+		$this->db->query($query);
+	}
+
 }
