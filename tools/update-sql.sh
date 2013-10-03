@@ -62,7 +62,7 @@ fi
 
 backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='file_dir' \G;" | grep 'value' | cut -d' ' -f2`;
 backupdir=`readlink -f $backupdir/../`
-backupfile="$backupdir/`date +%Y-%m-%d_%H-%M-%S`.sql";
+backupfile="$backupdir/$sqlver-`date +%Y-%m-%d_%H-%M-%S`.sql"
 
 echo "Current SQL Version: "$sqlver;
 echo "New SQL Version: "$newver;
