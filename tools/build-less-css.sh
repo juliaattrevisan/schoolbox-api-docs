@@ -74,9 +74,3 @@ do
 	newfile="$fullpath/mchrome.css";
 	~/node_modules/.bin/lessc $filepath > $newfile && echo "/* less ($lessversion) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile && if [ $verbose -eq 1 ];then echo "$template - mobile css";fi &
 done
-
-# Build core.css
-~/node_modules/.bin/lessc $instdir/www/css/core/core.less > $instdir/www/css/core/core.css
-echo "/* less ($lessversion) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $instdir/www/css/core/core.css
-if [ $verbose -eq 1 ];then echo "core css";fi
-# End of script
