@@ -23,14 +23,13 @@ require_once __DIR__.'/../../include/Bootstrap.php';
 $settings = new OneLogin_Saml_Settings();
 
 // When using Service Provider Initiated SSO (starting at index.php), this URL asks the IdP to authenticate the user.
-$settings->idpSingleSignOnUrl = 'https://WIN-NFQC027AIDJ.schoolbox.alrs/adfs/ls';
 $settings->idpSingleSignOnUrl = Config::get('saml_sso_url');
 
 // The certificate for the users account in the IdP
 $settings->idpPublicCertificate = preg_replace("/\r/m", "", Config::get('saml_idp_certificate'));
 
 // The URL where to the SAML Response/SAML Assertion will be posted
-$settings->spReturnUrl = 'http://'.$_SERVER['HTTP_HOST'].'/saml/consume.php';
+$settings->spReturnUrl = 'https://'.$_SERVER['HTTP_HOST'].'/saml/consume.php';
 
 // Name of this application
 $settings->spIssuer = 'schoolbox';
