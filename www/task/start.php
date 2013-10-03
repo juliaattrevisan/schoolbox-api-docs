@@ -57,10 +57,16 @@ switch ($task->getType()) {
     case Task::TYPE_DUE_WORK:
         // redirect to due work item
         // When the due work item is complete, mark task as complete.
+        SitePage::localRedir(
+            '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$_SESSION['id']
+        );
         break;
     case Task::TYPE_ONLINE_ASSESS:
         // redirect to online assessment item
         // When it's complete, the mark task is marked as complete.
+        SitePage::localRedir(
+            '/assess/intro/'.$task->getAssessment()->getId().'/'
+        );
         break;
     default:
         // Mark this item as complete.
@@ -85,6 +91,9 @@ switch ($task->getType()) {
         if (strlen($link) > 0) {
             header('Location: '.$link);
             exit;
+        }
+        else {
+            SitePage::localRedir('/homepage/'.$component->getIdentifier().'/');
         }
         break;
 }
