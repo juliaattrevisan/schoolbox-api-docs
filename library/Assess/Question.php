@@ -39,41 +39,63 @@ class Assess_Question extends Evaluation_Question {
 	 * Get the next question in the sequence
 	 *
 	 * @param $assessId
-	 * @param $questionSequence
+	 * @param $questionId
 	 * @return array|bool
 	 */
-	public function getNextQuestion($assessId, $questionSequence) {
+	public function getNextQuestion($assessId, $questionId) {
 		$query = "
 			SELECT *
-			FROM assess_section
-			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-			WHERE assess_question.sequence > $questionSequence
-			AND assess_section.assess_id = '{$assessId}'
-			ORDER BY assess_section.sequence, assess_question.sequence
-			LIMIT 1
+			FROM assess_question
+			LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
+			WHERE assess_section.assess_id = '{$assessId}'
+			ORDER BY assess_question.section_id, assess_question.sequence
 		";
 
-		return $this->db->getRow($query);
+		$allQuestions = $this->db->getAll($query);
+
+		/* PHP traversal because assess_question.sequence resets to 1 for each section
+		 * This makes navigation across sections non-trivial with a simple "next" link
+		 */
+		if (is_array($allQuestions) && count($allQuestions)) {
+			for ($i=0; $i < count($allQuestions); $i++) {
+				if (($allQuestions[$i]['question_id'] == $questionId) && isset($allQuestions[$i+1])) {
+					return $allQuestions[$i+1];
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
 	 * Get the previous question in the sequence
 	 *
 	 * @param $assessId
-	 * @param $questionSequence
+	 * @param $questionId
 	 * @return array|bool
 	 */
-	public function getPreviousQuestion($assessId, $questionSequence) {
+	public function getPreviousQuestion($assessId, $questionId) {
 		$query = "
 			SELECT *
-			FROM assess_section
-			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-			WHERE assess_question.sequence < '{$questionSequence}'
-			AND assess_section.assess_id = '{$assessId}'
-			ORDER BY assess_section.sequence, assess_question.sequence DESC
-			LIMIT 1
+			FROM assess_question
+			LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
+			WHERE assess_section.assess_id = '{$assessId}'
+			ORDER BY assess_question.section_id, assess_question.sequence
 		";
 
-		return $this->db->getRow($query);
+		$allQuestions = $this->db->getAll($query);
+
+		/* PHP traversal because assess_question.sequence resets to 1 for each section
+		 * This makes navigation across sections non-trivial with a simple "next" link
+		 */
+		if (is_array($allQuestions) && count($allQuestions)) {
+			for ($i=0; $i < count($allQuestions); $i++) {
+				if (($allQuestions[$i]['question_id'] == $questionId) && isset($allQuestions[$i-1])) {
+					return $allQuestions[$i-1];
+				}
+			}
+		}
+
+		return false;
 	}
 }

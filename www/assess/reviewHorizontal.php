@@ -191,7 +191,7 @@ else {
 
 	/* Previous question
 	 */
-	$previous = $questionHandler->getPreviousQuestion($assess['assess_id'], $question['sequence']);
+	$previous = $questionHandler->getPreviousQuestion($assess['assess_id'], $question['question_id']);
 
 	if ($previous) {
 		$this->setVar(array(
@@ -206,7 +206,7 @@ else {
 
 	/* Next question
 	 */
-	$next = $questionHandler->getNextQuestion($assess['assess_id'], $question['sequence']);
+	$next = $questionHandler->getNextQuestion($assess['assess_id'], $question['question_id']);
 
 	if ($next) {
 		$this->setVar(array(
