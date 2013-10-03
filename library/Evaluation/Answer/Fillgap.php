@@ -493,4 +493,29 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 
 		$page->parse('answerOption_block', 'answerOption', true);
 	}
+
+	/**
+	 * The answer for a question during horizontal marking, so it appears at the
+	 * top under the question itself, and not repeated for each attempt
+	 *
+	 * @param $page
+	 * @param $currentQuestion
+	 * @return void
+	 */
+	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+
+		/* Pattern match spans to find answers
+		 */
+		$matches = array();
+		$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+
+		preg_match_all($pattern, $currentAnswer['answer'], $matches);
+
+		$page->setVar(array(
+			'ANSWER' => Scrub::html($currentAnswer['answer']),
+		));
+
+		$page->parse('answerTop_block', 'answerTop', true);
+	}
 }

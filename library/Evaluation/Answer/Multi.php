@@ -534,11 +534,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 	}
 
 	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
+	 * The answer for a question during horizontal marking, so it appears at the
+	 * top under the question itself, and not repeated for each attempt
 	 *
 	 * @param $page
 	 * @param $currentQuestion
+	 * @return void
 	 */
 	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
 		$answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
