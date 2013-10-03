@@ -119,4 +119,24 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
 
 		$page->parse('answerOption_block', 'answerOption', true);
 	}
+
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param $page
+	 * @param $currentQuestion
+	 * @return void
+	 */
+	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+
+		/* Show correct answer
+		 */
+		$page->setVar(array(
+			'CORRECT_ANSWER' => Scrub::html($currentAnswer['answer'])
+		));
+
+		$page->parse('answerTop_block', 'answerTop', true);
+	}
 }
