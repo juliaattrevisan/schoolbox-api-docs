@@ -310,4 +310,24 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
 
 		$page->parse('answerOption_block', 'answerOption', true);
 	}
+
+	/**
+	 * The answer for a question during horizontal marking, so it appears at the
+	 * top under the question itself, and not repeated for each attempt
+	 *
+	 * @param $page
+	 * @param $currentQuestion
+	 * @return void
+	 */
+	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+
+		/* Show correct answer
+		 */
+		$page->setVar(array(
+			'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+		));
+
+		$page->parse('answerTop_block', 'answerTop', true);
+	}
 }
