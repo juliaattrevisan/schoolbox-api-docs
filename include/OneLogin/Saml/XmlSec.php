@@ -73,7 +73,7 @@ class OneLogin_Saml_XmlSec
      */
     public function isValid()
     {
-        $objXMLSecDSig = new XMLSecurity\Signature();
+        $objXMLSecDSig = new XmlSecurity\Signature();
 
         $objDSig = $objXMLSecDSig->locateSignature($this->_document);
         if (!$objDSig) {
