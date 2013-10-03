@@ -80,4 +80,43 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
 
 		$page->parse('answerOption_block', 'answerOption', true);
 	}
+
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param $page
+	 * @param $attemptId
+	 * @param $currentQuestion
+	 * @return void
+	 */
+	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
+		$existing = $this->responseHandler->isResponseExists($attemptId, $currentQuestion['question_id']);
+
+		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+
+		/* Removed this check because it was wrongly matching a blank saved
+		 * response with no response at all, preventing reviewed marks from
+		 * displaying properly.
+		 *
+		 * if ($existing['response'] != null) { ... } else { ... }
+		 */
+		$page->setVar(array(
+			'USER_FIRSTNAME' => $currentQuestion['firstname'],
+			'USER_LASTNAME' => $currentQuestion['lastname'],
+			'ANSWER_ID' => $currentAnswer['answer_id'],
+			'ANSWER' => Scrub::html($existing['response']),
+			'RESPONSE_ID' => $existing['response_id'],
+			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+			'REVIEWED_MARKS' => $existing['mark'],
+		));
+
+		/* Show correct answer
+		 */
+		$page->setVar(array(
+			'CORRECT_ANSWER' => Scrub::html($currentAnswer['answer'])
+		));
+
+		$page->parse('answerOption_block', 'answerOption', true);
+	}
 }
