@@ -160,7 +160,7 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @throws Exception if any required element is not found
      */
     public function setDateForCourseUnit($unit, $date, $name) {
-        $form = $this->getSession()->getPage()->find('css', 'form#courseImport');
+        $form = $this->getSession()->getPage()->find('css', 'form#importForm');
         if (!($form instanceof Element\NodeElement)) {
             throw new Exception("Course import form not found");
         }
