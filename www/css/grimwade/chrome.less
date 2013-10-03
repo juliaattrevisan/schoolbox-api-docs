@@ -11,9 +11,65 @@
 //*                                     #/
 //*/
 // =============================================================================
-@import "../core/variables.less";
+// 1. Load dependencies
+// =============================================================================
 @import "../core/mixins.less";
-@import "../core/chrome.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width: 					130px;
+@logo-height: 					146px;
+
+// Generic colors
+@body-background: 				#FFFFFF; // Body, but not the content area
+@content-background: 			#EEEEEE; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#F0F7FE; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#4661b2;
+@link-hover: 					#0066B0;
+
+// Main banner
+@banner-background: 			#00133D;
+@banner-color:      			#FFFFFF;
+@banner-links:      			#B19A53;
+@banner-height:     			100px;
+
+// Modules
+@module-heading: 				#FFFFFF;
+@module-background: 			#007088;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			#5A5A5A;
+@navigation-links:  			#5A5A5A;
+@navigation-hover-background: 	#B19A53;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@body-background;
+
+// Main "Tab" Navigation
+@tab-background:				transparent;
+@tab-color:						#FFFFFF;
+@tab-hover-background:			transparent;
+@tab-hover-color:				#FFFFFF;
+
+// Footer text
+@footer-color:					#5A5A5A;
+@footer-links:					@footer-color;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================

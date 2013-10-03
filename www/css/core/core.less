@@ -1,3 +1,5 @@
+@import url("jquery-ui.less");
+
 /*
 Le Reset
 */
@@ -61,63 +63,6 @@ table {
     border-spacing: 0;
 }
 
-/*
-Variablahs
-*/
-
-@black: #000000;
-@white: #ffffff;
-@light-grey: #ededed;
-
-@body-background: #d9effe;
-
-@dark: #fafafa;
-@h1-color: @black;
-@module-heading: #ffffff;
-@module-background: #0066b0;
-@alternate-background: #faf9f5;
-@body-text: @black;
-@secondary-text: #797979;
-@link: #0066b0;
-@link-hover: #ff5a00;
-@btn-background-color: #1d9ffc;
-@subnav-background: #ffffff;
-@subnav-header-background: #ffffff;
-@subnav-stroke: #ffffff;
-@subnav-text-up: #0066b0;
-@subnav-header-text: #797979;
-@chat-list-background: #f3fbef;
-@chat-list-alternative-background: #ecf7e7;
-@search-background: #fffde9;
-
-@border-color: #eeeeee;
-@highlight-color: #ffffb2;
-@dark-dark: #eaeaea;
-
-
-@hot: #f33;
-@cold: #09f;
-
-@more-border: #0066B0;
-
-@rlblue: #def;
-
-@dgrey: #797979;
-@mgrey: #aaa;
-@lgrey: #dedede;
-
-@input-border: #ccc;
-
-@markavg: #f1f1f1;
-@markavg-dark: #e9e9e9;
-
-@warning: #a33;
-
-@hlight-green: #CAE9B9;
-
-@button-hov: #E9F6FF;
-@button-prog-bg: #76C4F9;
-@button-prog-bdr: #44AEFF;
 
 /*
 Mixarns
@@ -138,30 +83,32 @@ body {
     *font-size: small;
 }
 
-body {
-    *font-size: small;
-    font-size: 12px;
-    background: @body-background;
-    color: @black;
-    font-family: Arial, Helvetica, sans-serif;
-    text-align: left;
-    margin: 0;
-
-}
-
 .contextMenu {
-    width: 200px !important;
+	width: 200px !important;
 }
 
 body#tinymce {
-    background: @white;
-    padding: 8px;
+	background: @white;
+	padding: 8px;
 }
 
 #tinymce p span {
-    background: #E0F2DF;
+	background: @positive-color;
 }
 
+
+html, body { min-height: 100%; }
+
+body {
+	*font-size: small;
+	font-size: 12px;
+	background: @body-background;
+	color: @black;
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: left;
+	margin: 0;
+
+}
 /*--------------------------------------------------------------
  Main Link Styles
 --------------------------------------------------------------*/
@@ -204,7 +151,7 @@ ol {
 }
 
 hr {
-    background-color: #cccccc;
+    background-color: @std-grey;
     border: 0;
     height: 1px;
 }
@@ -342,6 +289,15 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
+h1,h2,h3{ color: @body-text; }
+h3.my-links a{ color: @navigation-links; }
+h2,.calendar-controls{color:@module-heading; background:@module-background;}
+.calendar-controls h3{color:@module-heading;}
+a, h2 a{color:@link;}
+.box h2 a{color:@module-heading;}
+a:hover{color:@link;}
+
+
 h1 {
     margin: 0;
     border: 0;
@@ -371,9 +327,9 @@ h2 {
     position: absolute;
     display: none;
     z-index: 200000;
-    background: #FFFDE9;
+    background: lighten(@highlight-color,@lighten-value);
     padding: 2px 16px;
-    border: 1px solid @subnav-header-background;
+    border: 1px solid @highlight-color;
     font-size: 10px;
 }
 
@@ -456,10 +412,10 @@ Notifications
 --------------------------------------------------------------*/
 .information-notification {
     padding: 2px 8px 2px 28px;
-    background: #e8f5ff url(/images/famicons/information.png) 8px 2px no-repeat;
+    background: lighten(@neutral-color,@lighten-value) url(/images/famicons/information.png) 8px 2px no-repeat;
     line-height: 16px;
     margin-bottom: 16px;
-    color: #000;
+    color: @black;
     z-index: 120;
     border: 1px solid @body-background;
 }
@@ -467,7 +423,7 @@ Notifications
 .error-notification {
     .information-notification;
     background-image: url(/images/famicons/exclamation.png);
-    background-color: #FBBCA8;
+    background-color: @negative-color;
 }
 
 /*--------------------------------------------------------------
@@ -486,11 +442,12 @@ Notifications
 }
 
 #container {
-    margin-left: 256px;
-    margin-right: 16px;
+    margin-left: @navigation-width;
+	margin-right: 0px;
     min-width: 687px;
     padding: 16px;
     background: @white;
+	clear: left;
 }
 
 #content {
@@ -503,43 +460,56 @@ Notifications
 /*--------------------------------------------------------------
  HEADER
 --------------------------------------------------------------*/
-#header {
-    height: 136px;
-    position: relative;
-    min-width: 985px;
-    .logo {
-        height: 78px;
-        padding-top: 26px;
-        display: block;
-        left: 16px;
-        top: 0;
-        position: absolute;
-        width: 300px;
-    }
+#header, .login #header{
+	background-color: @banner-background;
+	height: auto; min-height: @banner-height;
+	width: 100%; min-width: 768px;
+	position: relative;
+	float: left;
+}
 
+#header .logo{
+	padding: 0;
+	width: @logo-width;
+	height: @logo-height;
+	left: 3px;
+	top: 18px;
+	z-index: 3;
+	zoom: 1;
+	display: block;
+	position: absolute;
+	img {
+		display: block;
+		height: @logo-height;
+		width: @logo-width;
+		zoom: 1;
+	}
 }
 
 #search {
-    background: #ffffff;
-    float: right;
-    width: 288px;
-    margin: 16px 16px 0 0;
-    clear: right;
+	background: transparent;
+	width: @search-width;
+	position: absolute;
+	z-index: 3;
+	right: 0;
+	margin: 8px;
     border: 0;
     height: 32px;
-    position: relative;
+	fieldset {
+		width: 100%;
+	}
 }
 
 #search-field {
-    font-weight: bold;
-    color: #797979;
-    font-size: 16px;
-    width: 232px;
-    padding: 0 12px;
-    height: 32px;
-    line-height: 32px;
+    color: @white;
+    font-size: 13px;
+	line-height: 13px;
+	padding: 6px 0 0 27px;
+	width: @search-width - 27px; height: 26px;
+	height: 26px;
     border: 0;
-    background: #ffffff;
+	background: saturate(lighten(@banner-background,25%),-70%);
+	background: rgba(255,255,255,0.3);
     font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -551,11 +521,11 @@ Notifications
     text-align: center;
     line-height: 32px;
     height: 32px;
-    width: 32px;
+    width: 24px;
     position: absolute;
     top: 0;
-    right: 0;
-    background: url("/images/core/icons/search.png") no-repeat 50% 50%;
+    left: 0;
+    background: url("/images/core/search-button.png") no-repeat 8px 12px;
     padding: 0;
     &:hover {
         cursor: pointer;
@@ -563,17 +533,26 @@ Notifications
 }
 
 #infoPanel {
+	margin: 22px 16px 0 0;
+	position: relative;
+	right: @search-width;
+	z-index: 2;
+	height: @banner-height - 22px - 24px;
     float: right;
-    margin: 15px 16px 0 0;
     li {
         float: left;
-        color: @white;
         padding-left: 11px;
-        color: #797979;
+		color:@banner-color;
+		min-width: 32px;
         &.first a {
             margin-right: 10px
         }
     }
+	a {
+		color: @banner-links;
+		text-decoration: underline;
+	}
+	img { 	margin-top: -14px; }
 }
 
 /*--------------------------------------------------------------
@@ -581,18 +560,27 @@ Notifications
 --------------------------------------------------------------*/
 
 #nav {
-    top: 104px;
+    top: @banner-height;
     text-align: left;
     left: 0;
-    width: 224px;
-    margin: 0 0 0 16px;
+    width: @navigation-width;
+    margin: 12px 0 0 0;
     position: absolute;
     z-index: 100;
     .nav-wrapper {
-        background: @subnav-background;
+        background: @navigation-background;
         &.my-links {
         }
     }
+	ul, li, li a {
+		width: @navigation-width - @navigation-padding * 2;
+	}
+	li.hover > a,
+	ul li a:hover,
+	li li a:hover {
+		color: @navigation-hover-color;
+		background: @navigation-hover-background;
+	}
     li {
         display: block;
         list-style: none;
@@ -602,16 +590,15 @@ Notifications
         z-index: 200;
         a {
             position: relative;
-            width: 160px;
-            margin-left: 16px;
-            color: #0066b0;
-            padding: 3px 16px;
+            color: @navigation-links;
+            padding: 4px @navigation-padding;
+			margin: 0;
             word-wrap: break-word;
             display: block;
             &:hover {
                 color: @white;
                 text-decoration: none;
-                background: @btn-background-color;
+                background: @tab-hover-color;
             }
             span strong {
                 position: absolute;
@@ -627,31 +614,27 @@ Notifications
         padding: 0;
         position: relative;
         z-index: 200;
-        width: 224px;
+        width: @navigation-width;
         margin-bottom: 16px !important;
         padding: 9px 0;
         ul {
             display: none;
             position: absolute;
             margin: 0;
-            padding: 0;
-            width: 224px;
-            left: 208px;
-            top: -8px;
+            width: @navigation-width;
+            left: @navigation-width;
+            top: 0;
             z-index: 300;
-            border: 1px solid #eee;
-            padding: 5px 0;
+            padding: 0;
             -moz-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
             -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
             z-index: 120;
             box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
-            background: @subnav-background;
+            background: @navigation-sub-background;
             a {
                 zoom: 1;
             }
             ul {
-                left: 208px;
-                top: -8px;
                 z-index: 400;
             }
         }
@@ -665,17 +648,16 @@ Notifications
         position: relative;
         z-index: 50;
         clear: left;
-        color: #797979;
-        padding: 0 0 0 32px;
-        font-size: 16px;
-        height: 32px;
+        color: @navigation-color;
+        padding: 0 0 0 @navigation-padding;
+        font-size: 14px;
+        height: 24px;
         line-height: 32px;
         font-weight: bold;
         text-transform: none;
-        background: @subnav-header-background;
+        background: @navigation-background;
         &.my-links {
             a {
-
                 height: 19px;
                 line-height: 19px;
                 position: absolute;
@@ -693,40 +675,59 @@ Notifications
 /*--------------------------------------------------------------
  TABBED NAV ACROSS THE TOP
 --------------------------------------------------------------*/
+
 #tabs {
-    position: absolute;
-    right: 20px;
-    bottom: 0;
-    left: 256px;
-    min-width: 730px;
-    z-index: 50;
-    li {
-        z-index: 1;
-        float: left;
-        position: relative;
-        margin-right: 2px;
+	position: static;
+	margin-left: @navigation-width;
+	min-width: 730px;
+	z-index: 50;
+	clear: right;
+	li {
+		z-index: 1;
+		float: left;
+		position: relative;
+		margin-right: 1px;
 
-        a {
-            font-weight: bold;
-            font-size: 12px;
-            color: #0066b0;
-            height: 32px;
-            line-height: 32px;
-            display: block;
-            float: left;
-            padding: 0 12px;
-            background: #ecf7ff;
-        }
-        &.navthis {
-            z-index: 2;
-            a {
-                background: @white;
-                font-weight: bold;
-                color: #0066b0;
-            }
-        }
+		a {
+			display: block;
+			float: left;
+			padding: 0 12px;
+			background: @tab-background;
+			color:@tab-color;
+			font-size: 13px;
+			height: 24px;
+			line-height: 24px;
+			font-weight:normal;
+		}
+		&.navthis {
+			z-index: 2;
+			a {
+				font-weight: bold;
+				background: @tab-hover-background;
+				color: @tab-hover-color;
+			}
+		}
+	}
+}
+#tabs-sub .ui-tabs-nav li a:hover {
+	background-color: @navigation-hover-background;
+	color: @navigation-hover-color;
+}
 
-    }
+#tabs-homepage li.ui-state-default a {
+	background: none repeat scroll 0 0 @lgrey;
+	color: @black;
+}
+
+#tabs-homepage li.ui-tabs-selected a {
+	background: none repeat scroll 0 0 @module-background;
+	color: @black;
+}
+#tabs-homepage #tabs-sub li.ui-tabs-selected a{
+	background:@lgrey
+}
+#tabs-sub .ui-tabs-nav li a {
+	background: @lgrey;
 }
 
 /*COLUMNS*/
@@ -746,12 +747,9 @@ Notifications
     float: right;
 }
 
-.template2 .left {
-    width: 49.5%;
-}
-
-.template2 .right {
-    width: 49.5%;
+.template2 {
+	.left 		{ width: 49.5%; }
+	.right 		{ width: 49.5%;}
 }
 
 .template3 {
@@ -763,41 +761,30 @@ Notifications
   }
 }
 
-.template4 .right {
-    width: 49.5%;
-}
-
-.template4 .left {
-    width: 49.5%;
+.template4 {
+	.left 		{ width: 49.5%; }
+	.right 		{ width: 49.5%; }
 }
 
 /*--------------------------------------------------------------
  BOXES/COMPONENT LAYOUT ^_^
 --------------------------------------------------------------*/
 .marker, .empty-column {
-    border: 1px dashed #aaf482;
+    border: 1px dashed @positive-color;
     height: 150px;
     margin: 16px;
     display: block;
-    background: @module-background;
     z-index: 2;
     text-align: center;
     font-size: 18px;
-    color: #9cc586;
+    color: darken(@positive-color,@darken-value);
     font-weight: bold;
     line-height: 150px;
     text-shadow: 0 1px 1px @white;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    background-color: #f5fff0;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#f5fff0), to(#e5ffd7));
-    background-image: -webkit-linear-gradient(top, #f5fff0, #e5ffd7);
-    background-image: -moz-linear-gradient(top, #f5fff0, #e5ffd7);
-    background-image: -ms-linear-gradient(top, #f5fff0, #e5ffd7);
-    background-image: -o-linear-gradient(top, #f5fff0, #e5ffd7);
-    background-image: linear-gradient(top, #f5fff0, #e5ffd7);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#f5fff0', EndColorStr = '#e5ffd7');
+    .gradient(lighten(@positive-color,@lighten-value * 2),lighten(@positive-color,@lighten-value));
 }
 .farbtastic .marker {
 	filter: none;
@@ -809,9 +796,9 @@ Notifications
     height: auto;
     line-height: 50px;
     background: none;
-    color: #ccc;
+    color: @std-grey;
     margin: 16px 0;
-    border-color: #ccc;
+    border-color: @std-grey;
     filter: none;
     position: relative;
     .box {
@@ -821,7 +808,7 @@ Notifications
         text-align: center;
         padding: 0px 16px;
         font-size: 18px;
-        color: #ccc !important;
+        color: @std-grey !important;
         font-weight: bold;
         text-shadow: 0 1px 1px @white;
         margin: 0;
@@ -860,7 +847,7 @@ Notifications
         top: 6px;
         width: 84px;
         height: 26px;
-        color: #000 !important;
+        color: @black !important;
         font-size: 22px;
         background: @dark;
     }
@@ -871,12 +858,12 @@ Notifications
         top: 6px;
         width: 84px;
         height: 26px;
-        color: #000 !important;
+        color: @black !important;
         &:hover {
             text-decoration: none;
             cursor: pointer;
             span {
-                background: #000;
+                background: @black;
                 color: @white;
             }
         }
@@ -885,7 +872,7 @@ Notifications
             position: absolute;
             right: 27px;
             top: 3px;
-            color: #000 !important;
+            color: @black !important;
             width: 50px;
             height: 20px;
             display: none;
@@ -893,7 +880,7 @@ Notifications
                 display: block;
             }
             &.active {
-                background: #dcdcdc;
+                background: @lgrey;
             }
         }
         span {
@@ -905,21 +892,19 @@ Notifications
             position: absolute;
             top: 0;
             right: 0;
-            color: #000;
+            color: @black;
             background: @dark;
         }
     }
-
 }
 
 .dark {
     background: @dark;
-}
-
-.dark td {
-    background: @dark;
-    zoom: 1;
-    min-height: 1px;
+	td {
+		background: @dark;
+		zoom: 1;
+		min-height: 1px;
+	}
 }
 
 /*--------------------------------------------------------------
@@ -964,139 +949,97 @@ Notifications
 	.news-list p { clear: right; }
 }
 
-/* This needs to get refactored into core.css and core.less in some way.
- *
- * These styles are used in homepage components Group Members, Group Managers, Class Students, Class Teachers
- * to represent members with their respective portraits.
+/*
+ * Listing
  */
 
 .listing {
     overflow: hidden;
-}
+	.button {
+		display: block;
+		margin: 0;
+		background: @white;
+		&:hover {
+			text-decoration: none;
+			background-color: lighten(@positive-color,@lighten-value);
+		}
+		span {
+			display: block;
+		}
+		.name {
+			color: @black;
+			em {
+				font-style: normal;
+				color: @dgrey;
+			}
+		}
+		.group {
+			color: @dgrey;
+		}
+		.prog {
+			height: 2px;
+			.gradient(lighten(@neutral-color,@lighten-value),@neutral-color);
+			border: solid 1px @neutral-color;
+			margin: 6px 0 0 0;
+		}
+		&.thumb {
+			width: 64px;
+			float: left;
+			margin: 0;
+			border-top: solid 1px @lgrey;
+			border-left: solid 1px @lgrey;
+			position: relative;
+			top: -1px;
+			left: -1px;
+			padding: 5px;
+			img {
+				width: 64px;
+				height: 64px;
+				margin: 0;
+			}
+			.name {
+				margin-left: 1px;
+				@white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.group {
+				margin: 1px;
+				@white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+		&.bar {
+			padding: 4px;
+			border-bottom: solid 1px @lgrey;
+			.name {
+				margin-left: 0px;
+			}
 
-/* COMMON TO ALL BUTTON TYPES */
-.listing .button {
-    display: block;
-    margin: 0;
-    background: #fff;
+			.name.single {
+				height: 30px;
+				line-height: 32px;
+			}
+			.group {
+				margin: 2px 0 0 0px;
+			}
+			&:before {
+				content: "\203a";
+				float: right;
+				line-height: 14px;
+				margin-right: 24px;
+				font-size: 24px;
+			}
+			img {
+				float: left;
+				width: 32px;
+				height: 32px;
+				border: none;
+			}
+		}
+	}
 }
-
-.listing .button:hover {
-    text-decoration: none;
-    background-color: #E9F6FF;
-}
-
-.listing .button span {
-    display: block;
-}
-
-.listing .button .name {
-    color: #000;
-}
-
-.listing .button .name em {
-    font-style: normal;
-    color: #797979;
-}
-
-.listing .button .group {
-    color: #797979;
-}
-
-.listing .button .prog {
-    height: 2px;
-    background: #76C4F9;
-    border: solid 1px #44AEFF;
-    margin: 6px 0 0 0;
-}
-
-/* BUTTON THUMB */
-.listing .button.thumb {
-    width: 64px;
-    float: left;
-    margin: 0;
-    border-top: solid 1px #DEDEDE;
-    border-left: solid 1px #DEDEDE;
-    position: relative;
-    top: -1px;
-    left: -1px;
-    padding: 5px;
-}
-
-.listing .button.thumb img {
-    width: 64px;
-    height: 64px;
-    margin: 0;
-}
-
-.listing .button.thumb .name {
-    margin-left: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.listing .button.thumb .group {
-    margin: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* BUTTON BAR */
-.listing .button.bar {
-    padding: 4px;
-    border-bottom: solid 1px #dedede;
-}
-
-.listing .button.bar .name {
-    margin-left: 0px;
-}
-
-.listing .button.bar .name.single {
-    height: 30px;
-    line-height: 32px;
-}
-
-.listing .button.bar .group {
-    margin: 2px 0 0 0px;
-}
-
-.listing .button.bar:before {
-    content: "\203a";
-    float: right;
-    line-height: 14px;
-    margin-right: 24px;
-    font-size: 24px;
-}
-
-.listing .button.bar img {
-    float: left;
-    width: 32px;
-    height: 32px;
-    border: none;
-}
-
-/** Rubric listings **/
-.rubric_listing .criterion h3 {
-    float: none;
-}
-.rubric_listing .criterion ul {
-    padding-bottom: 7px;
-    margin: 0 16px;
-}
-.rubric_listing .criterion .descriptor {
-    padding-top: 1px;
-    padding-bottom: 1px;
-    padding-left: 0;
-}
-.rubric_listing .criterion .descriptor:before {
-    content: '›';
-}
-.rubric_listing .criterion .descriptor .name {
-    padding-left: 16px;
-}
-
 
 /*--------------------------------------------------------------
  PROFILES
@@ -1148,8 +1091,8 @@ Notifications
 }
 
 .profile-med{
-  background: #fff3dd;
-  border: 1px solid #ffe6b5;
+  background: lighten(@highlight-color,@lighten-value);
+  border: 1px solid darken(@highlight-color,@darken-value);
   float: left;
   display: block;
   margin: 24px 0 0 0;
@@ -1196,7 +1139,7 @@ Notifications
       height: 32px;
       color: @body-text;
       &:hover{
-        background-color: @button-hov;
+        background-color: lighten(@positive-color,@lighten-value);
         color: @link;
         text-decoration: none;
       }
@@ -1251,7 +1194,7 @@ Notifications
   .contact-phone{
     li{ border-bottom: 0; }
   }
-  ul:nth-child(even){ background: #fafafa; }
+  ul:nth-child(even){ background: @dark; }
 }
 
 .profile{
@@ -1277,7 +1220,7 @@ Notifications
     position: absolute;
     margin: 0 0 0 4px;
     top: 26px;
-    color: #797979;
+    color: @dgrey;
   }
   .icon{
     background-image: url('/images/core/icons/action-icons.png');
@@ -1293,11 +1236,11 @@ Notifications
 }
 
 .contact-alert{
-  background: #fff3dd;
+  background: @highlight-color;
   padding: 10px;
   span{
     padding: 0 0 0 5px;
-    color:red;
+    color:darken(@negative-color, @darken-value);
     font-weight:bold;
   }
 }
@@ -1415,13 +1358,14 @@ Notifications
 .config-inline {
     line-height: 25px;
     display: inline;
-    white-space: nowrap;
+    @white-space: nowrap;
     .filter {
         display: block;
     }
 }
 
-.editPanel form div { .config-inline;
+.editPanel form div {
+	.config-inline;
 }
 
 .box {
@@ -1432,7 +1376,7 @@ Notifications
     a.edit.active span,
     a.edit.active:hover span {
         background: none;
-        color: #000;
+        color: @black;
     }
     a.close-delete {
         right: 6px;
@@ -1443,15 +1387,15 @@ Notifications
         height: 20px;
         &:hover {
             text-decoration: none;
-            background: #000;
-            color: #fff !important;
+            background: @black;
+            color: @white !important;
         }
     }
     .editPanel, .editPanelImitation {
         zoom: 1;
         clear: both;
         padding: 8px 7px;
-        background: #dcdcdc;
+        background: @lgrey;
         text-align: right;
         label {
             display: inline;
@@ -1471,7 +1415,7 @@ Notifications
             top: 2px;
         }
         input[type=text] {
-            border: solid 1px #bbb;
+            border: solid 1px @std-grey;
             padding: 2px;
         }
 
@@ -1492,11 +1436,10 @@ Notifications
 				white-space: normal;
 			}
 		}
-
     }
 
     .editPanelImitation {
-        background: #ededed;
+        background: @lgrey;
         display:none;
     }
     .listing {
@@ -1522,7 +1465,6 @@ Notifications
         &.image-height {
             min-height: 53px;
         }
-
         .student-name {
             display: block;
             font-weight: bold;
@@ -1582,8 +1524,8 @@ p.interact-left.home-calendar {
 .scroller {
     width: 100%;
     .caption-holder {
-        background: #576369;
-        color: #fff;
+        background: @secondary-text;
+        color: @white;
         padding: 10px;
         text-decoration: none;
         opacity: 0.9;
@@ -1596,8 +1538,8 @@ p.interact-left.home-calendar {
 #galleryCycle {
     width: 100%;
     .caption-holder {
-        background: #576369;
-        color: #fff;
+        background: @secondary-text;
+        color: @white;
         padding: 10px;
         text-decoration: none;
         opacity: 0.9;
@@ -1611,10 +1553,10 @@ p.interact-left.home-calendar {
     position: relative;
     z-index: 1;
     margin: 10px auto;
-    border: 4px solid #fff;
-    -moz-box-shadow: 0 0 8px #000;
-    -webkit-box-shadow: 0 0 8px #000;
-    box-shadow: 0 0 8px #000;
+    border: 4px solid @white;
+    -moz-box-shadow: 0 0 8px @black;
+    -webkit-box-shadow: 0 0 8px @black;
+    box-shadow: 0 0 8px @black;
 }
 
 /*--------------------------------------------------------------
@@ -1630,13 +1572,13 @@ label {
 
     &.error {
 
-        background: #fffddb url(/images/core/icons/label-error.png) no-repeat 6px 2px;
+        background: lighten(@highlight-color,@lighten-value) url(/images/core/icons/label-error.png) no-repeat 6px 2px;
         width: 100%;
         padding: 4px;
         text-indent: 36px;
         padding: 3px 0;
-        border: 1px solid #ffcc00;
-        color: #ff5f45 !important;
+        border: 1px solid @highlight-color;
+        color: @negative-color !important;
         display: block;
 
         -moz-background-clip: padding;
@@ -1663,7 +1605,7 @@ fieldset {
 }
 
 .standardForm {
-    background: @subnav-background;
+    background: @content-background;
     margin: 0 0 16px 0;
     width: 100%;
     table {
@@ -1687,12 +1629,12 @@ fieldset {
     tr.advanced {
         display: none;
         td {
-            background: #E9E3D6;
+            background: @alternate-background;
             position: relative;
         }
     }
     tr.dark, m tr.dark td {
-        background: #eee;
+        background: @lgrey;
     }
     .checkAll,
     .delCheck,
@@ -1703,8 +1645,8 @@ fieldset {
 
 dl.errors {
     padding: 7px 8px;
-    border: 1px solid #ebe58e;
-    background: #fffaa8;
+    border: 1px solid darken(@highlight-color,@darken-value);
+    background: lighten(@highlight-color,@lighten-value);
     margin-bottom: 16px;
     dt {
         padding-top: 67px;
@@ -1730,7 +1672,7 @@ dl.errors {
     display: block;
     z-index: 50;
     .error {
-        background: #fff99a;
+        background: lighten(@highlight-color,@lighten-value);
         padding: 5px;
     }
 }
@@ -1745,7 +1687,7 @@ dl.errors {
 }
 
 .color-to-fade {
-    background: #E9E3D6;
+    background: @alternate-background;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -1765,16 +1707,15 @@ input.timeField {
 }
 
 .btn, .submit-btn-plain {
-    border: 1px solid #d1d1d1;
-    color: #000000 !important;
+    border: 1px solid @lgrey;
+    color: @black !important;
     display: block;
     float: right;
     text-shadow: 0 1px 0px @white;
-    background-color: #fbfbfb;
-    background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#fbfbfb', EndColorStr = '#f7f7f7');
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
+    background-color:  @dark;
+    background-image: -moz-linear-gradient(top,  @dark,  @dark);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0,  @dark), color-stop(1,  @dark));
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
     height: 22px;
     line-height: 22px;
     margin-left: 8px;
@@ -1785,21 +1726,36 @@ input.timeField {
     overflow: visible;
     margin-top: 4px;
     font-family: Arial, Helvetica, sans-serif;
+	&.no-marg {
+		margin: 0 8px 0 0;
+	}
+
+	&.no-icon {
+		padding: 0 16px;
+	}
+
+	&.marg {
+		margin: 4px;
+	}
+
+	&.margin-left-right {
+		margin: 0 8px;
+	}
+	&.in-heading-absolute {
+		position: absolute;
+		float: none;
+		top: 0;
+		right: 0;
+		margin: 0;
+	}
+	&.inline {
+		width: auto;
+		float: none;
+		display: inline;
+	}
 }
 
 .submit-btn-plain {
-    border-color: @btn-background-color;
-    background-color: #e4f5f9;
-    background-image: -moz-linear-gradient(top, #e4f5f9, #c9ebf3);
-    background-image: -o-linear-gradient(top, #e4f5f9, #c9ebf3);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e4f5f9), color-stop(1, #c9ebf3));
-    background-image: -webkit-linear-gradient(#e4f5f9, #c9ebf3);
-    background-image: linear-gradient(top, #e4f5f9, #c9ebf3);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#e4f5f9', EndColorStr = '#c9ebf3');
-
-    text-shadow: 0 1px 0px #ffffff;
-    color: #000000 !important;
-
     line-height: 23px;
     float: left;
     padding: 0 13px 0 13px;
@@ -1808,67 +1764,32 @@ input.timeField {
     height: 23px;
     outline: none;
 
+	background: @banner-background;
+	border: 0;
+	color: @white !important;
+	font-weight:normal;
+	text-shadow:none;
+	filter: none;
     &:hover {
-        color: #ff5a00 !important;
-        border-color: #ffc5a6;
-        text-shadow: none;
-        background-color: #fff4ee;
-        background-image: -webkit-gradient(linear, left top, left bottom, from(#fff4ee), to(#ffe9dd));
-        background-image: -webkit-linear-gradient(top, #fff4ee, #ffe9dd);
-        background-image: -moz-linear-gradient(top, #fff4ee, #ffe9dd);
-        background-image: -ms-linear-gradient(top, #fff4ee, #ffe9dd);
-        background-image: -o-linear-gradient(top, #fff4ee, #ffe9dd);
-        background-image: linear-gradient(top, #fff4ee, #ffe9dd);
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#fff4ee', EndColorStr = '#ffe9dd');
-        cursor: pointer;
-    }
-}
+		background: lighten(@banner-background,10%);
+		border: 0;
+		color: @white !important;
+		cursor: pointer;
+		text-shadow:none;
+		filter: none;
+	}
+	&.float-remove {
+		float: none;
+	}
 
-.submit-btn-plain.no-marg {
-    margin: 0 8px 0 0;
+	&.float-right {
+		float: right
+	}
 }
-
-.btn.no-icon {
-    padding: 0 16px;
-}
-
-.btn.no-marg {
-    margin: 0 8px 0 0;
-}
-
-.btn.marg {
-    margin: 4px;
-}
-
-.btn.margin-left-right {
-    margin: 0 8px;
-}
-
 .btn.float-left, .submit-btn-plain {
     float: left;
     margin-left: 0;
     margin-right: 12px;
-}
-
-.btn.in-heading-absolute {
-    position: absolute;
-    float: none;
-    top: 0;
-    right: 0;
-    margin: 0;
-}
-.btn.inline {
-	width: auto;
-	float: none;
-	display: inline;
-}
-
-.submit-btn-plain.float-remove {
-    float: none;
-}
-
-.submit-btn-plain.float-right {
-    float: right
 }
 
 .btn {
@@ -1883,7 +1804,7 @@ input.timeField {
     &:hover {
         background-position: bottom left;
         cursor: pointer;
-        color: #ff5a00 !important;
+        color:  @link-hover !important;
         text-decoration: none;
         span {
             .btn-icon(1);
@@ -2040,7 +1961,7 @@ input.timeField {
         padding: 0 9px 0 38px;
         display: inline-block;
         margin: 0;
-        background: @subnav-background;
+        background: @content-background;
         border: 0;
         -moz-background-clip: padding;
         -webkit-background-clip: padding-box;
@@ -2056,8 +1977,8 @@ input.timeField {
         top: 3px;
     }
     &.disabled {
-        color: #aaa !important;
-        border-color: #ddd;
+        color: @mgrey !important;
+        border-color: @lgrey;
     }
     &.calendar-add span {
         left: 2px;
@@ -2113,7 +2034,7 @@ td.small {
 }
 
 .customise {
-    color: #797979;
+    color: @dgrey;
     background: url(/images/core/icons/configuration.png) no-repeat 100% 0;
     position: absolute;
     top: 0;
@@ -2174,7 +2095,6 @@ CHOOSE FILE SELECTOR
     outline: none;
     filter: ~"alpha(opacity = 1)";
     opacity: 0.01;
-    -ms-filter: ~"progid:DXImageTransform.Microsoft.Alpha(opacity=1)";
 }
 
 /*-------------------------------------------------------------
@@ -2191,16 +2111,18 @@ ADMIN NAV
         margin: 0 8px 8px 0;
         a {
             display: block;
-            line-height: 32px;
-            height: 32px;
             padding: 0 8px;
-            color: #579dcf;
-            font-weight: bold;
-            background: #f5f5f5;
-            &.current {
-                color: #0066b0;
-                background: @subnav-header-background;
-            }
+			color: @footer-color;
+			background: @dark;
+			border: 1px solid @border-color;
+			font-weight: normal;
+			height: 22px; line-height: 22px;
+			&.current {
+				color: @tab-color;
+				background: @tab-background;
+				border-color: @tab-background;
+			}
+
 			&.add {
 				position: relative;
 				padding-left: 30px;
@@ -2225,7 +2147,7 @@ ADMIN BODY
 .admin-contents {
     min-height: 1px;
     clear: both;
-    background: @subnav-header-background;
+    background: @content-background;
     padding: 16px;
     position: relative;
     h2 {
@@ -2233,7 +2155,7 @@ ADMIN BODY
         text-indent: 0;
         padding: 0;
         font-size: 18px;
-        color: #000;
+        color: @black;
         span {
             font-size: 12px;
             display: block;
@@ -2248,12 +2170,12 @@ ADMIN BODY
         font-size: 18px;
         font-weight: bold;
         margin-bottom: 16px;
-        color: #000;
+        color: @black;
         span {
-            background: #e9e3d6;
+            background: darken(@alternate-background, @darken-value);
             font-weight: normal;
             font-size: 14px;
-            padding: 4px;
+            padding: 0 4px;
             margin: 0 8px;
             &:hover {
                 cursor: help;
@@ -2275,7 +2197,7 @@ ADMIN BODY
         }
     }
     h4 {
-        border-bottom: 1px solid #E9E3D6;
+        border-bottom: 1px solid @alternate-background;
         font-size: 14px;
         font-weight: bold;
         margin-bottom: 8px;
@@ -2287,20 +2209,13 @@ ADMIN BODY
     }
     .level {
         padding: 16px;
-        background: #faf9f6;
-        border: 1px solid #e9e3d6;
+        background: @alternate-background;
+        border: 1px solid darken(@alternate-background,@darken-value);
         margin-bottom: 16px;
         position: relative;
         min-height: 1px;
         .dark td {
             background: @dark;
-        }
-        &.green {
-            background: @alternate-background;
-            border-color: #e9e3d6;
-            .split {
-                border-color: #e9e3d6;
-            }
         }
     }
     .split-container {
@@ -2311,7 +2226,7 @@ ADMIN BODY
             text-align: left;
         }
         .split {
-            border-right: 1px solid #e9e3d6;
+            border-right: 1px solid @alternate-background;
             padding: 0 16px 0 0;
             .btn.center-it {
                 float: left;
@@ -2373,7 +2288,7 @@ ADMIN BODY
             }
             em {
                 font-style: normal;
-                color: #797979;
+                color: @dgrey;
                 width: 10%;
             }
             p {
@@ -2400,16 +2315,11 @@ ADMIN BODY
         margin-right: 3%;
         margin: 0 3% 8px 0;
         .bar {
-            border: 1px solid #eaedef;
+            border: 1px solid @lgrey;
             height: 16px;
             position: relative;
-            background-color: #f0f2f3;
-            background-image: -moz-linear-gradient(top, #f0f2f3, #e8ebed);
-            background-image: -o-linear-gradient(top, #f0f2f3, #e8ebed);
-            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f0f2f3), color-stop(1, #e8ebed));
-            background-image: -webkit-linear-gradient(#f0f2f3, #e8ebed);
-            background-image: linear-gradient(top, #f0f2f3, #e8ebed);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#f0f2f3', EndColorStr = '#e8ebed');
+            background-color: lighten(@lgrey,@lighten-value);
+            .gradient(lighten(@lgrey,@lighten-value), @lgrey);
             span {
                 display: block;
                 height: 14px;
@@ -2419,14 +2329,9 @@ ADMIN BODY
                 .style {
                     display: block;
                     position: relative;
-                    background-color: #eaf3fa;
-                    background-image: -moz-linear-gradient(top, #eaf3fa, #e0eef7);
-                    background-image: -o-linear-gradient(top, #eaf3fa, #e0eef7);
-                    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eaf3fa), color-stop(1, #e0eef7));
-                    background-image: -webkit-linear-gradient(#eaf3fa, #e0eef7);
-                    background-image: linear-gradient(top, #eaf3fa, #e0eef7);
-                    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#eaf3fa', EndColorStr = '#e0eef7');
-                    border: 1px solid #aed0ea;
+                    background-color: lighten(@neutral-color,@lighten-value);
+                    .gradient(lighten(@neutral-color,@lighten-value), @neutral-color);
+                    border: 1px solid @neutral-color;
                 }
             }
         }
@@ -2485,72 +2390,74 @@ ADMIN BODY
 
 .parent-selection {
     padding: 4px 7px;
-    border: 1px solid #CCC;
+    border: 1px solid @std-grey;
     font-weight: bold;
-    background: #EDF7E7;
+    background: lighten(@positive-color,@lighten-value);
     margin-bottom: 16px;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
 }
 
-.parent-level .jstree-schoolbox a,
-.parent-level .jstree-schoolbox .jstree-leaf a {
-    background: #ccc;
+.jstree-schoolbox span.file,
+.jstree-schoolbox a,
+.jstree-schoolbox .jstree-leaf a {
+    background: lighten(@neutral-color, @lighten-value) !important;
+	&.active {
+		background: @highlight-color !important;
+	}
 }
 
-.parent-level .jstree-schoolbox a.active,
-.parent-level .jstree-schoolbox .jstree-leaf a.active {
-    background: #CAE9B9
+.jstree-schoolbox .jstree-open > a {
+	background: @positive-color !important;
+	&.active {
+		background: @highlight-color !important;
+	}
 }
 
 .level table {
     width: 100%;
-}
-
-.level table td, .level table th {
-    padding: 0 8px 0 0;
-}
-
-.level table td.colours-buttons {
-    padding: 16px;
-}
-
-.level table thead td {
-    font-weight: bold;
+	td, th {
+		padding: 0 8px 0 0;
+		&.colours-buttons {
+			padding: 16px;
+		}
+	}
+	td {
+		font-weight: bold;
+	}
 }
 
 .sortable {
     padding: 16px;
     margin: 0;
-}
+	li {
+		div {
+			margin-bottom: 8px;
+			height: 32px;
+			line-height: 32px;
+			padding: 0 16px;
+			background: @neutral-color;
+			font-weight: bold;
+		}
+		li {
+			margin-left: 32px;
+			div {
+				background: @module-background;
+				font-weight: normal;
+			}
+		}
 
-.sortable li li {
-    margin-left: 32px;
-}
-
-.sortable li div {
-    margin-bottom: 8px;
-    height: 32px;
-    line-height: 32px;
-    padding: 0 16px;
-    background: #a9e8e1;
-    font-weight: bold;
-}
-
-.sortable li li div {
-    background: @module-background;
-    font-weight: normal;
-}
-
-.sortable .placeholder {
-    border: 3px dotted #dbccad;
-    margin: 16px 0;
+	}
+	.placeholder {
+		border: 3px dotted @highlight-color;
+		margin: 16px 0;
+	}
 }
 
 .row-holder {
     width: 100%;
-    background: #faf9f6;
+    background: @dark;
     position: relative;
 }
 
@@ -2571,7 +2478,7 @@ ADMIN BODY
 }
 
 .row.form-holder {
-    background: #e4e4e4;
+    background: @dark;
     display: none;
 }
 
@@ -2581,23 +2488,17 @@ ADMIN BODY
 
 .enabled {
     width: 8%;
+	img {
+		position: absolute;
+		top: 4px;
+		right: 0;
+	}
+	button img {
+		position: relative;
+		top: 0;
+	}
 }
 
-.enabled img {
-    position: absolute;
-    top: 4px;
-    right: 0;
-}
-
-.enabled button img {
-    position: relative;
-    top: 0;
-}
-
-.enabled button img {
-    position: relative;
-    top: 0;
-}
 
 .description {
     width: 19%;
@@ -2619,20 +2520,23 @@ ADMIN BODY
     width: 20%;
 }
 
-.allowed-files td {
-    padding: 7px 0 7px 16px;
+.allowed-files {
+	td {
+		padding: 7px 0 7px 16px;
+	}
+	.text-input {
+		width: 95%;
+	}
+	.textarea {
+		min-height: 32px;
+	}
+	tr.add-new td {
+		background: @alternate-background;
+	}
 }
 
 .allowed-files, .row, .row form {
     width: 100%;
-}
-
-.allowed-files .text-input {
-    width: 95%;
-}
-
-.allowed-files .textarea {
-    min-height: 32px;
 }
 
 .allowed-files h3, .bulk-users h3 {
@@ -2642,10 +2546,6 @@ ADMIN BODY
 
 .bulk-users h3 em {
     display: none;
-}
-
-.allowed-files tr.add-new td {
-    background: @module-background;
 }
 
 .settings-nav-holder, .admin-contents .settings {
@@ -2673,103 +2573,91 @@ ADMIN BODY
     display: block;
     padding: 7px 16px;
     margin-right: 8px;
-    border: 1px solid #E9E3D6;
-    color: #579DCF;
-    background: #F5F5F5;
-}
-
-.settings-nav li a.current {
-    background: #E9E3D6;
-    color: #0066B0;
-    font-weight: bold;
-}
-
-.settings-nav li a.current span {
-    border-bottom: 8px solid transparent;
-    border-left: 8px solid #E9E3D6;
-    border-top: 8px solid transparent;
-    height: 0;
-    width: 0;
-    position: absolute;
-    right: -8px;
-    top: 4px;
+    border: 1px solid darken(@alternate-background, @darken-value);
+    color: @link;
+    background: @alternate-background;
+	&.current {
+    	background: darken(@alternate-background, @darken-value);
+    	color: @link;
+    	font-weight: bold;
+		span {
+			border-bottom: 8px solid transparent;
+			border-left: 8px solid darken(@alternate-background, @darken-value);
+			border-top: 8px solid transparent;
+			height: 0;
+			width: 0;
+			position: absolute;
+			right: -8px;
+			top: 4px;
+		}
+	}
 }
 
 .settings-nav li {
     margin-bottom: 4px;
 }
 
-.admin-form label {
-    clear: both;
-    width: 100%;
-    margin-bottom: 8px;
-    float: left;
-    color: #797979;
-    font-weight: bold;
-}
-
-.admin-form label.error {
-    margin: -8px 0 0 0;
-}
-
-.admin-form textarea {
-    width: 100%;
-}
-
-.admin-form label span.help {
-    background: #e9e3d6;
-    font-weight: normal;
-    font-size: 14px;
-    padding: 2px;
-    cursor: help;
-    margin: 0 8px;
-}
-
-.admin-form label input[type=text], .admin-form label input[type=password] {
-    width: 100%;
-    margin: 8px 0;
-    padding: 2px 0
-}
-
-.admin-form label {
-    margin: 8px 8px 8px 0;
-}
-
-.admin-form label input.datepicker {
-    width: 75%;
-}
-
-.admin-form label select {
-    margin: 8px 0;
-    width: 100%;
-}
-
-.admin-form label em {
-    display: none;
-}
-
-.admin-form fieldset label {
-    width: 50%;
-    font-weight: normal;
-    margin: 0;
-}
-
-.admin-form fieldset label input[type=checkbox] {
-    margin: 4px;
-}
-
-.admin-form label.preferred fieldset label {
-    width: 100%;
-}
-
-.admin-form label.preferred select {
-    width: 20%;
-    margin-right: 2%;
-    float: left;
+.admin-form {
+	label {
+		clear: both;
+		width: 100%;
+		margin: 8px 8px 8px 0;
+		float: left;
+		color: @dgrey;
+		font-weight: bold;
+		&.error {
+			margin: -8px 0 0 0;
+		}
+		span.help {
+			background: darken(@alternate-background, @darken-value);
+			font-weight: normal;
+			font-size: 14px;
+			padding: 0 4px;
+			cursor: help;
+			margin: 0 8px;
+		}
+		input[type=text],
+		input[type=password] {
+			width: 100%;
+			margin: 8px 0;
+			padding: 2px 0
+		}
+		input.datepicker {
+			width: 75%;
+		}
+		select {
+			margin: 8px 0;
+			width: 100%;
+		}
+		em {
+			display: none;
+		}
+		&.preferred {
+			fieldset label {
+				width: 100%;
+			}
+			select {
+				width: 20%;
+				margin-right: 2%;
+				float: left;
+			}
+		}
+	}
+	textarea {
+		width: 100%;
+	}
+	fieldset label {
+		width: 50%;
+		font-weight: normal;
+		margin: 0;
+		input[type=checkbox] {
+			margin: 4px;
+		}
+	}
 }
 
 .admin-form table {
-    color: #797979;
+    color: @dgrey;
 }
 
 .password-container .actual-password {
@@ -2780,31 +2668,25 @@ ADMIN BODY
 .reveal-password {
     float: left;
     margin-top: 10px;
-}
-
-.reveal-password a {
-    display: block;
-    padding: 8px;
-    border: 1px solid #ccc;
-}
-
-.reveal-password em {
-    font-size: 16px;
-    padding: 7px;
-    border: 1px solid #ccc;
-    font-style: normal;
-    background: #edf7e7;
-}
-
-.reveal-password a.hide-pass {
-    border: 0;
-    padding: 0;
-}
-
-.reveal-password a.hide-pass {
-    text-align: center;
-    margin-top: 3px;
-    display: none;
+	a {
+		display: block;
+		padding: 8px;
+		border: 1px solid @std-grey;
+		&:hide-pass {
+			border: 0;
+			padding: 0;
+			text-align: center;
+			margin-top: 3px;
+			display: none;
+		}
+	}
+	em {
+		font-size: 16px;
+		padding: 7px;
+		border: 1px solid @std-grey;
+		font-style: normal;
+		background: lighten(@positive-color,@lighten-value);
+	}
 }
 
 .admin-contents .user {
@@ -2824,28 +2706,14 @@ ADMIN BODY
 
 .new-button {
     margin: 4px;
-    background: #ccc;
-    border: 1px solid #797979;
-    background: @subnav-header-background;
-    background-color: @subnav-header-background;
-    background-image: -moz-linear-gradient(top, @subnav-header-background, #eae7e0);
-    background-image: -o-linear-gradient(top, @subnav-header-background, #eae7e0);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, @subnav-header-background), color-stop(1, #eae7e0));
-    background-image: -webkit-linear-gradient(@subnav-header-background, #eae7e0);
-    background-image: linear-gradient(top, @subnav-header-background, #eae7e0);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#F4F1EA', EndColorStr = '#eae7e0');
+    background: @std-grey;
+    border: 1px solid @dgrey;
+    .gradient(@dark, darken(@dark,@darken-value));
     padding: 4px 4px 0 4px;
-}
-
-.new-button:hover {
-    cursor: pointer;
-    background-color: #edeae3;
-    background-image: -moz-linear-gradient(top, #edeae3, #e0ddd7);
-    background-image: -o-linear-gradient(top, #edeae3, #e0ddd7);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #edeae3), color-stop(1, #e0ddd7));
-    background-image: -webkit-linear-gradient(#edeae3, #e0ddd7);
-    background-image: linear-gradient(top, #edeae3, #e0ddd7);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#edeae3', EndColorStr = '#e0ddd7');
+	&:hover {
+		cursor: pointer;
+		.gradient(darken(@dark,@darken-value), darken(@dark,@darken-value * 2));
+	}
 }
 
 .eventList h3 {
@@ -2854,9 +2722,9 @@ ADMIN BODY
 }
 
 .connector-active {
-	background: #fff;
+	background: @white;
 	padding: 8px;
-	border: 1px solid #ddd;
+	border: 1px solid @lgrey;
 }
 
 .calendar-connector {
@@ -2871,7 +2739,7 @@ ADMIN BODY
 }
 
 .calendarOptions {
-	border-top: 1px solid #ddd;
+	border-top: 1px solid @lgrey;
 	h4 {
 		padding-bottom: 0;
 		padding-top: 5px;
@@ -2901,128 +2769,7 @@ fieldset.calendarOptions fieldset {
 		float: right;
 	}
 }
-/***********************************************
-DASHBOARD (to mostly deprecate)
-************************************************/
-/*
-.dashboard #definition-palette {
-    float: left;
-    width: 22%;
-}
 
-.dashboard .component {
-    position: relative;
-    padding: 7px 8px 7px 28px;
-    margin: 0 16px 4px 0px;
-    cursor: move;
-    border: 1px solid @link;
-    font-size: 14px;
-    font-weight: bold;
-    background: #B0DDFE url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
-}
-
-.dashboard .component.disabled {
-    background: #EDEDED;
-    border-color: #CCC;
-    color: #A1A1A1;
-}
-
-.dashboard .component:hover {
-    cursor: move
-}
-
-.dashboard .component.disabled:hover {
-    cursor: help;
-}
-
-.dashboard #group-select {
-    margin: 0 2% 8px 2%;
-    width: 91%;
-}
-
-.dashboard #dashboard-layout:after {
-    clear: both;
-    content: '.';
-    display: block;
-    height: 0;
-    line-height: 0;
-    font-size: 0;
-    visibility: hidden;
-    padding: 0;
-    margin: 0;
-}
-
-.dashboard #dashboard-layout .component,
-.dashboard .ui-draggable-dragging {
-    text-align: center;
-    margin: 0 8px 8px 8px;
-    border-color: #CCC;
-    border-style: dashed;
-    background: #E7E7E7;
-    color: #888;
-    height: 40px;
-    line-height: 40px;
-    text-shadow: 0px 1px 1px @white;
-    font-size: 16px;
-    padding: 7px 8px;
-    position: relative;
-}
-
-.dashboard .component .delete-this {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 24px;
-    height: 24px;
-    display: block;
-    line-height: 24px;
-    text-align: center;
-    color: #000;
-    font-weight: bold;
-    background: @white;
-}
-
-.dashboard .marker {
-    margin: 8px;
-    padding: 0;
-    height: 60px;
-}
-
-.dashboard #dashboard-layout .component.ui-sortable-helper,
-.dashboard .ui-draggable-dragging {
-    opacity: 0.8;
-    background: #E7E7E7 url(/images/famicons/arrow_in.png) no-repeat 50% 8px;
-    line-height: 58px;
-}
-
-.dashboard .layout-position {
-    margin-bottom: 8px;
-    background: @white;
-}
-
-.dashboard .component-holder {
-    padding: 12px 4px 4px 4px;
-    border: 1px solid #ccc;
-}
-
-.dashboard #dashboard-layout {
-    float: right;
-    width: 78%;
-}
-
-.dashboard #dashboard-layout #position-left,
-.dashboard #dashboard-layout #position-right {
-    float: left;
-    width: 49.5%;
-    margin-right: .5%;
-    min-height: 18px;
-}
-
-.dashboard #dashboard-layout #position-right {
-    margin: 0;
-    margin-left: 0.5%;
-}
-*/
 /*--------------------------------------------------------------
 HOMEPAGE TEMPLATES
 --------------------------------------------------------------*/
@@ -3043,16 +2790,16 @@ HOMEPAGE TEMPLATES
 
     text-align: center;
     margin: 0 8px 8px 8px;
-    border-color: #CCC;
+    border-color: @std-grey;
     border-style: dashed;
-    background: #E7E7E7;
-    color: #888;
+    background: @lgrey ;
+    color: @dgrey;
     min-height: 30px; // line-height: 30px;
-    text-shadow: 0px 1px 1px #ffffff;
+    text-shadow: 0px 1px 1px @white;
     font-size: 16px;
     padding: 7px 8px;
     position: relative;
-    opacity: 0.8; // background: #e7e7e7 url(/images/famicons/arrow_in.png) no-repeat 50% 8px;
+    opacity: 0.8; // background: @lgrey  url(/images/famicons/arrow_in.png) no-repeat 50% 8px;
     line-height: 58px;
 }
 
@@ -3064,14 +2811,14 @@ HOMEPAGE TEMPLATES
     display: block;
     line-height: 20px;
     text-align: center;
-    color: #bebebe;
+    color: @mgrey;
     font-weight: bold;
     font-size: 12px;
-    background-color: #ffffff;
+    background-color: @white;
     text-shadow: none;
     right: @right;
     &:hover {
-        background: #000;
+        background: @black;
         text-decoration: none;
     }
 }
@@ -3089,11 +2836,11 @@ HOMEPAGE TEMPLATES
         border: 1px solid @link;
         font-size: 14px;
         font-weight: bold;
-        background: #b0ddfe url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
+        background: @neutral-color url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
         &.disabled {
-            background: #EDEDED;
-            border-color: #CCC;
-            color: #A1A1A1;
+            background: @lgrey;
+            border-color: @std-grey;
+            color: @mgrey;
             &:hover {
                 cursor: help;
             }
@@ -3106,18 +2853,23 @@ HOMEPAGE TEMPLATES
         margin: 0 2% 8px 2%;
         width: 91%;
     }
-    .ui-draggable-dragging {   .component-draggable;
+    .ui-draggable-dragging {
+		.component-draggable;
     }
-    (~'#@{context}-layout') {
+	(~'#@{context}-layout') {
         float: right;
         width: 78%;
-        .component {   .component-draggable;
+        .component {
+			.component-draggable;
         }
-        .ui-sortable-helper {   .component-draggable;
+        .ui-sortable-helper {
+			.component-draggable;
         }
-        #position-left {   .layout-position;
+        #position-left {
+			.layout-position;
         }
-        #position-right {   .layout-position;
+        #position-right {
+			.layout-position;
             margin: 0;
             margin-left: 0.5%;
         }
@@ -3135,9 +2887,11 @@ HOMEPAGE TEMPLATES
             padding: 0;
             margin: 0;
         }
-        .delete-this {   .manage-button(13px);
+        .delete-this {
+			.manage-button(13px);
         }
-        .config-this {   .manage-button(38px);
+        .config-this {
+			.manage-button(38px);
         }
     }
     .editPanel {
@@ -3165,11 +2919,11 @@ HOMEPAGE TEMPLATES
     }
     .layout-position {
         margin-bottom: 8px;
-        background: #ffffff;
+        background: @white;
     }
     .component-holder {
         padding: 12px 4px 4px 4px;
-        border: 1px solid #ccc;
+        border: 1px solid @std-grey;
     }
     .delete-it p {
         margin: 0;
@@ -3177,14 +2931,14 @@ HOMEPAGE TEMPLATES
     }
     .component input[type=text] {
         width: auto;
-        border: solid 1px #ccc;
+        border: solid 1px @std-grey;
         padding: 2px;
     }
     form {
         padding-bottom: 16px;
         .errmsg {
             display: block;
-            color: #c44;
+            color: darken(@negative-color,@darken-value);
         }
     }
     #definition-palette {
@@ -3198,7 +2952,7 @@ HOMEPAGE TEMPLATES
             margin-top: 0;
         }
         input[type=text] {
-            border: solid 1px #ccc;
+            border: solid 1px @std-grey;
             width: 91%;
             margin: 8px 2% 4px 2%;
         }
@@ -3222,7 +2976,7 @@ EVALUATION
 --------------------------------------------------------------*/
 
 .additional-details span.time {
-    color: #F00;
+    color: darken(@negative-color,@darken-value);
 }
 
 /****** ASSESS LAYOUT ********/
@@ -3242,17 +2996,14 @@ EVALUATION
 }
 
 /****** ASSESS FORMS ********/
-.evaluation-content {
-}
-
 .evaluation-content .standardForm,
 .evaluation-content form,
 .evaluation-content.student-review .question,
 .evaluation-menu .pad-it {
-    border: 1px solid #dbdbdb;
+    border: 1px solid @lgrey;
     margin-bottom: 16px;
     padding: 10px;
-    background: #f8f8f8;
+    background: @dark;
 }
 
 .evaluation-content .standardForm, .evaluation-content .questionForm {
@@ -3267,12 +3018,12 @@ EVALUATION
 .evaluation-content label {
     font-weight: bold;
     padding: 8px 0;
-    border-bottom: 1px solid @light-grey;
+    border-bottom: 1px solid @lgrey;
 }
 
 .evaluation-content label.error {
     padding: 3px 0;
-    border-bottom: 1px solid #FFCC00;
+    border-bottom: 1px solid @highlight-color;
 }
 
 .evaluation-content label:first-child {
@@ -3283,7 +3034,7 @@ EVALUATION
     margin-top: 8px;
     width: 50%;
     display: block;
-    border: 1px solid #dbdbdb;
+    border: 1px solid @lgrey;
 }
 
 .evaluation-content label .textarea-container {
@@ -3314,7 +3065,7 @@ EVALUATION
 .evaluation-content .textarea-container {
     background: @white;
     padding: 10px;
-    border: 1px solid #dbdbdb;
+    border: 1px solid @lgrey;
     margin-bottom: 10px;
 }
 
@@ -3338,8 +3089,8 @@ EVALUATION
 }
 
 .evaluation-menu .evaluation-section h3 {
-    background: #1597cb;
-    color: @white;
+    background: @module-background;
+    color: @module-heading;
     font-size: 11px;
     padding: 7px;
     border: none;
@@ -3368,13 +3119,13 @@ fieldset.edit-duration {
 
 .evaluation-menu .question-list li {
     padding: 7px 16px;
-    border-top: 1px solid @light-grey;
+    border-top: 1px solid @lgrey;
     position: relative;
     overflow: hidden
 }
 
 .evaluation-menu .question-list li .border {
-    border: 1px solid @light-grey;
+    border: 1px solid @lgrey;
     position: relative;
     z-index: 2
 }
@@ -3385,7 +3136,7 @@ fieldset.edit-duration {
     top: -11px;
     width: 0px;
     height: 0px;
-    border-bottom: 11px solid @light-grey;
+    border-bottom: 11px solid @lgrey;
     border-left: 11px solid transparent;
     border-right: 11px solid transparent;
     z-index: 3;
@@ -3400,7 +3151,7 @@ fieldset.edit-duration {
     text-align: center;
     font-size: 14px;
     padding: 9px;
-    background: @light-grey;
+    background: @lgrey;
     margin: 8px 0;
 }
 
@@ -3412,8 +3163,8 @@ fieldset.edit-duration {
 }
 
 .evaluation-menu .drop-arrow {
-    background: #ddefd3 url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
-    background: white;
+    background: @lgrey url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
+    background: @white;
     width: 20px;
     display: block;
     height: 20px;
@@ -3422,26 +3173,26 @@ fieldset.edit-duration {
     position: absolute;
     top: 7px;
     right: 7px;
-    color: #BEBEBE;
+    color: @mgrey;
 }
 
 .evaluation-menu  .drop-arrow.active {
-    background: #ddefd3 url(/images/core/icons/chat-up.png) no-repeat 50% 50%;
+    background: @lgrey url(/images/core/icons/chat-up.png) no-repeat 50% 50%;
 }
 
 .evaluation-options {
-    background: #ddefd3
+    background: @lgrey
 }
 
 .evaluation-section-options {
     background: #F1F7FA;
-    border-bottom: 1px solid #DBDBDB
+    border-bottom: 1px solid @lgrey
 }
 
 .assessment-content .drop-arrow:hover {
     text-decoration: none;
-    color: #000;
-    background-color: #ddefd3;
+    color: @black;
+    background-color: @lgrey;
 }
 
 .evaluation-content .drop-arrow {
@@ -3471,8 +3222,8 @@ fieldset.edit-duration {
     min-width: 0;
     position: relative;
     padding: 5px;
-    background: @light-grey;
-    border: 1px solid #dbdbdb;
+    background: @lgrey;
+    border: 1px solid @lgrey;
     margin-bottom: 10px;
 }
 
@@ -3482,7 +3233,7 @@ fieldset.edit-duration {
     background: @white;
     padding: 10px 5px;
     line-height: 14px;
-    border: 1px solid #dbdbdb;
+    border: 1px solid @lgrey;
 }
 
 .evaluation-content ul li .mark,
@@ -3549,7 +3300,7 @@ fieldset.edit-duration {
 }
 
 .evaluation-content li.inputs .answer-value {
-    border: 1px solid #dbdbdb;
+    border: 1px solid @lgrey;
     width: 78%;
     height: 100%;
     background: @white;
@@ -3598,7 +3349,7 @@ fieldset.edit-duration {
     height: 100%;
     background: @white;
     padding: 5px 5px;
-    border: 1px solid #dbdbdb;
+    border: 1px solid @lgrey;
 }
 
 .evaluation-content .keywords .text-box {
@@ -3646,11 +3397,11 @@ fieldset.edit-duration {
     left: 5px;
     height: 15px;
     width: 16px;
-    background: #E0F2DF url("/images/core/assess/correct-incorrect.gif") no-repeat;
+    background: @positive-color url("/images/core/assess/correct-incorrect.gif") no-repeat;
 }
 
 .evaluation-content .answerList li {
-    background: #E0F2DF;
+    background: @positive-color;
     float: left;
     margin: 0 10px 10px 0;
 }
@@ -3676,8 +3427,8 @@ fieldset.edit-duration {
 
 .mceContentBody p span, .mceContentBody span {
     padding: 1px 2px;
-    background: #E0F2DF;
-    border: 1px solid #dbdbdb;
+    background: @positive-color;
+    border: 1px solid @lgrey;
 }
 
 ul.section-options a.drop-arrow {
@@ -3725,15 +3476,15 @@ ul.section-options a.drop-arrow {
 .evaluation-content.take-test h3,
 .evaluation-content.mark-test h3 {
     font-weight: normal;
-    color: #000;
-    background-color: #f2f2f2;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#f4f4f4));
-    background-image: -webkit-linear-gradient(top, #f2f2f2, #f4f4f4);
-    background-image: -moz-linear-gradient(top, #f2f2f2, #f4f4f4);
-    background-image: -ms-linear-gradient(top, #f2f2f2, #f4f4f4);
-    background-image: -o-linear-gradient(top, #f2f2f2, #f4f4f4);
-    background-image: linear-gradient(top, #f2f2f2, #f4f4f4);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#f2f2f2', EndColorStr = '#f4f4f4');
+    color: @black;
+    background-color: @white;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(@white), to(@dark));
+    background-image: -webkit-linear-gradient(top, @white, @dark);
+    background-image: -moz-linear-gradient(top, @white, @dark);
+    background-image: -ms-linear-gradient(top, @white, @dark);
+    background-image: -o-linear-gradient(top, @white, @dark);
+    background-image: linear-gradient(top, @white, @dark);
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = '@{white}', EndColorStr = '@{dark}')";
 
     padding: 10px;
 }
@@ -3756,11 +3507,11 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.take-test  ul li.right-answer {
-    background: #e3f2fa;
+    background: lighten(@neutral-color,@lighten-value);
 }
 
 .evaluation-content.take-test  ul li.right-answer.drophover strong {
-    background: #a1daf9;
+    background: @neutral-color;
 }
 
 .evaluation-menu .percentage-complete {
@@ -3782,7 +3533,7 @@ ul.section-options a.drop-arrow {
 
 .evaluation-menu .percentage-bar {
     margin-bottom: 10px;
-    border: 1px solid #638961;
+    border: 1px solid darken(@positive-color, @darken-value);
     height: 20px;
     clear: both;
     background: url(/images/core/assess/progress-bar.png);
@@ -3796,7 +3547,7 @@ ul.section-options a.drop-arrow {
     padding: 5px;
     font-weight: normal;
     display: block;
-    border: 1px solid #ccc;
+    border: 1px solid @std-grey;
     width: 67%;
     background: @white;
 }
@@ -3818,7 +3569,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.take-test ul li.right-answer strong {
-    border: 1px solid #dfdfdf;
+    border: 1px solid @lgrey;
     display: block;
     font-weight: normal;
     background: #e3f2fa url(/images/core/assess/drag-drop.gif) 100% 50% no-repeat;
@@ -3835,7 +3586,7 @@ ul.section-options a.drop-arrow {
     padding: 15px 40px 15px 10px;
     background: @white;
     background: @white;
-    border: 1px solid #DBDBDB;
+    border: 1px solid @lgrey;
     margin-bottom: 10px;
     width: auto;
     line-height: 16px;
@@ -3852,11 +3603,11 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.take-test label.selected {
-    background-color: #E0F2DF;
+    background-color: @positive-color;
 }
 
 .evaluation-answer .evaluation-rating label {
-    border: 1px solid @light-grey;
+    border: 1px solid @lgrey;
     width: 14%;
     float: left;
     padding: 8px 0;
@@ -3873,7 +3624,7 @@ ul.section-options a.drop-arrow {
 
 .evaluation-content .answer-given-container,
 .evaluation-content .correct-answer-container {
-    border: 1px solid #f1f1f1;
+    border: 1px solid darken(@dark,@darken-value / 4);
     padding: 10px;
     margin: 5px 0;
 }
@@ -3901,7 +3652,7 @@ ul.section-options a.drop-arrow {
 .evaluation-content.student-review p.marks-amount {
     float: right;
     margin: 10px 0;
-    border: 1px solid #e7e7e7;
+    border: 1px solid @lgrey ;
     -moz-transform: rotate(5.5deg);
     -o-transform: rotate(5.5deg);
     -webkit-transform: rotate(5.5deg);
@@ -3917,8 +3668,8 @@ ul.section-options a.drop-arrow {
 .evaluation-content.mark-test .matchPairs li {
     font-size: 12px;
     margin-bottom: 10px;
-    background: @light-grey;
-    border: 1px solid #DBDBDB;
+    background: @lgrey;
+    border: 1px solid @lgrey;
     padding: 5px;
 }
 
@@ -3935,7 +3686,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.mark-test .matchPairs li.matchCorrect {
-    background-color: #E0F2DF;
+    background-color: @positive-color;
 }
 
 .evaluation-content.mark-test .matchPairs li.matchIncorrect {
@@ -3976,7 +3727,7 @@ ul.section-options a.drop-arrow {
 .evaluation-content.mark-test span.fillgapIncorrect,
 .evaluation-content.mark-test span.fillgapCorrect {
     padding: 1px 5px;
-    border: 1px solid #dbdbdb;
+    border: 1px solid @lgrey;
 }
 
 .evaluation-content.mark-test span.fillgapIncorrect {
@@ -3984,7 +3735,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.mark-test span.fillgapCorrect {
-    background: #E0F2DF;
+    background: @positive-color;
 }
 
 /* multiple choice */
@@ -3998,11 +3749,11 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.mark-test ul.multiple-choice-mark li.correct-answer {
-    background-color: #ededed
+    background-color: @lgrey
 }
 
 .evaluation-content.mark-test ul.multiple-choice-mark li.multiCorrect {
-    background-color: #E0F2DF;
+    background-color: @positive-color;
 }
 
 .evaluation-content.mark-test ul.multiple-choice-mark li.multiCorrect .tick-cross {
@@ -4075,7 +3826,7 @@ ul.section-options a.drop-arrow {
 }
 
 .row-switcher {
-    background-color: @light-grey;
+    background-color: @lgrey;
 }
 
 /*results for the evaluation */
@@ -4087,7 +3838,7 @@ ul.section-options a.drop-arrow {
 
 .evaluation-content h2 span {
     background: url(/images/core/transparencies/40-white.png) repeat;
-    color: #000;
+    color: @black;
     display: block;
     float: left;
     padding: 0 16px;
@@ -4103,7 +3854,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-question-result {
-    border: 1px solid #e7e7e7;
+    border: 1px solid @lgrey ;
     margin-bottom: 16px;
 }
 
@@ -4111,7 +3862,7 @@ ul.section-options a.drop-arrow {
     font-weight: bold;
     font-size: 16px;
     margin-bottom: 16px;
-    color: #000;
+    color: @black;
 }
 
 .evaluation-question-result .evaluation-results {
@@ -4134,9 +3885,9 @@ ul.section-options a.drop-arrow {
     padding: 2px 6px;
     margin-right: 2px;
     display: block;
-    color: #000;
+    color: @black;
     margin-bottom: 2px;
-    background: @light-grey;
+    background: @lgrey;
 }
 
 .evaluation-legend {
@@ -4145,15 +3896,15 @@ ul.section-options a.drop-arrow {
 .evaluation-legend ul li a {
     padding: 7px 16px;
     margin-bottom: 4px;
-    background: @light-grey;
+    background: @lgrey;
     margin-bottom: 4px;
-    color: #000;
+    color: @black;
     display: block;
     font-weight: bold;
 }
 
 .evaluation-legend ul li a.active, .evaluation-response ul li a.active {
-    background: #cae9b9
+    background: @positive-color
 }
 
 .evaluation-legend ul li span {
@@ -4182,7 +3933,7 @@ ul.section-options a.drop-arrow {
 }
 
 .sub-table-row td {
-    background: @light-grey;
+    background: @lgrey;
 }
 
 /*Graphs*/
@@ -4217,7 +3968,7 @@ ul.section-options a.drop-arrow {
 /* Question bank */
 .evaluation-content.question-bank .question {
     border: 1px solid #e0e0e0;
-    background: #f8f8f8;
+    background: @dark;
     margin-bottom: 0;
     padding: 0;
 }
@@ -4232,7 +3983,7 @@ ul.section-options a.drop-arrow {
     font-size: 16px;
     padding: 7px 16px;
     margin-bottom: 16px;
-    border: 1px solid #000;
+    border: 1px solid @black;
 }
 
 .evaluation-content.question-bank .question-answers {
@@ -4272,7 +4023,7 @@ question-content
 }
 
 .question-bank .show-answers {
-    background: #ebebeb /*url(/images/core/icons/chat-down.png) no-repeat 50% 50%*/;
+    background: @dark /*url(/images/core/icons/chat-down.png) no-repeat 50% 50%*/;
     display: block;
     text-align: center;
     padding: 2px 0;
@@ -4284,23 +4035,23 @@ ul.evaluation-category-select {
 }
 
 .evaluation-category-select li a {
-    color: #000;
+    color: @black;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     display: block;
     padding: 7px 16px;
-    background-color: #FBFBFB;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#FBFBFB), to(#f7f7f7));
-    background-image: -webkit-linear-gradient(top, #FBFBFB, #f7f7f7);
-    background-image: -moz-linear-gradient(top, #FBFBFB, #f7f7f7);
-    background-image: -ms-linear-gradient(top, #FBFBFB, #f7f7f7);
-    background-image: -o-linear-gradient(top, #FBFBFB, #f7f7f7);
-    background-image: linear-gradient(top, #FBFBFB, #f7f7f7);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#FBFBFB', EndColorStr = '#f7f7f7');
+    background-color:  @dark;
+    background-image: -webkit-gradient(linear, left top, left bottom, from( @dark), to( @dark));
+    background-image: -webkit-linear-gradient(top,  @dark,  @dark);
+    background-image: -moz-linear-gradient(top,  @dark,  @dark);
+    background-image: -ms-linear-gradient(top,  @dark,  @dark);
+    background-image: -o-linear-gradient(top,  @dark,  @dark);
+    background-image: linear-gradient(top,  @dark,  @dark);
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
     text-shadow: 0px 1px 0px @white;
 
-    border: 1px solid #ccc;
+    border: 1px solid @std-grey;
     margin-bottom: 8px;
 }
 
@@ -4323,7 +4074,7 @@ ul.evaluation-category-select {
 }
 
 #categoryTree {
-    background: #f1f1f1;
+    background: darken(@dark,@darken-value / 4);
     padding: 16px;
 }
 
@@ -4367,16 +4118,16 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
     background-clip: padding-box;
     display: block;
     padding: 7px 16px;
-    background-color: #FBFBFB;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#FBFBFB), to(#f7f7f7));
-    background-image: -webkit-linear-gradient(top, #FBFBFB, #f7f7f7);
-    background-image: -moz-linear-gradient(top, #FBFBFB, #f7f7f7);
-    background-image: -ms-linear-gradient(top, #FBFBFB, #f7f7f7);
-    background-image: -o-linear-gradient(top, #FBFBFB, #f7f7f7);
-    background-image: linear-gradient(top, #FBFBFB, #f7f7f7);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#FBFBFB', EndColorStr = '#f7f7f7');
-    text-shadow: 0px 1px 0px white;
-    border: 1px solid #CCC;
+    background-color:  @dark;
+    background-image: -webkit-gradient(linear, left top, left bottom, from( @dark), to( @dark));
+    background-image: -webkit-linear-gradient(top,  @dark,  @dark);
+    background-image: -moz-linear-gradient(top,  @dark,  @dark);
+    background-image: -ms-linear-gradient(top,  @dark,  @dark);
+    background-image: -o-linear-gradient(top,  @dark,  @dark);
+    background-image: linear-gradient(top,  @dark,  @dark);
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
+    text-shadow: 0px 1px 0px @white;
+    border: 1px solid @std-grey;
     margin-bottom: 8px;
 }
 
@@ -4387,7 +4138,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 
 .archive .menu h3 {
     font-size: 16px;
-    color: #000;
+    color: @black;
     font-weight: bold;
     margin-bottom: 8px;
 }
@@ -4418,15 +4169,17 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
     li {
         a {
             display: block;
-            padding: 16px;
+            padding: 4px 16px;
+			font-size: 13px;
+			color: @navigation-links;
             word-break: break-word;
             &:hover {
-                background: #d6f0f6;
-                color: #0066b0;
+                background: @module-background;
+                color: @module-heading;
                 text-decoration: none;
             }
             &.selected {
-                background: @btn-background-color;
+                background: @tab-hover-color;
                 color: @white;
                 border: none;
             }
@@ -4566,10 +4319,10 @@ BLOG COMPONENT
         color: @secondary-text;
     }
     .box {
-        background: #fafafa;
+        background: @dark;
         padding: 7px 16px;
         margin: 0;
-        border: 2px solid #f1f1f1;
+        border: 2px solid darken(@dark,@darken-value / 4);
         width: auto;
         float: none;
         margin: 3px 0;
@@ -4592,7 +4345,7 @@ BLOG COMPONENT
 }
 
 .blog .comments p.interact {
-    border-top: 1px dashed #ccc;
+    border-top: 1px dashed @std-grey;
     padding-top: 0.5em;
     margin-top: 7px;
 //    float: none;
@@ -4604,10 +4357,10 @@ BLOG COMPONENT
 }
 
 .blog .comments .box {
-    background: #fafafa;
+    background: @dark;
     padding: 7px 16px;
     margin: 0;
-    border: 2px solid #f1f1f1;
+    border: 2px solid darken(@dark,@darken-value / 4);
     width: auto;
     float: none;
     margin: 3px 0;
@@ -4659,12 +4412,12 @@ CALENDAR
 
         thead {
             td {
-                border-top: 2px solid #000;
+                border-top: 2px solid @black;
             }
         }
         .js_happening {
             li {
-                border-top: 1px solid #f0f0f0;
+                border-top: 1px solid @dark;
                 margin: 0;
                 padding: 4px;
             }
@@ -4733,7 +4486,7 @@ CALENDAR
         color: @black;
         font-weight: normal;
         &:hover {
-            background-color: @subnav-header-background;
+            background-color: @white;
         }
     }
     .float-left {
@@ -4756,10 +4509,10 @@ CALENDAR
         text-indent: -9999em;
         font-size: 1px;
         padding: 0;
-        background-color: @subnav-background;
+        background-color: @content-background;
         margin-left: 6px;
         margin-top: 5px;
-        border: 1px solid #D1D1D1;
+        border: 1px solid @lgrey;
     }
     .back, .forward {
         text-indent: -99999em;
@@ -4774,7 +4527,7 @@ CALENDAR
         float: left;
         text-align: center;
         &:hover {
-            background-color: @subnav-header-background;
+            background-color: @white;
         }
     }
 
@@ -4783,11 +4536,11 @@ CALENDAR
         height: 22px;
         line-height: 22px;
         padding: 0 9px 0 38px;
-        color: #797979;
+        color: @dgrey;
         display: inline-block;
         text-decoration: none;
-        background: @subnav-background;
-        border: 1px solid #D1D1D1;
+        background: @content-background;
+        border: 1px solid @lgrey;
         position: relative;
         margin-left: 6px;
         span {
@@ -4798,7 +4551,7 @@ CALENDAR
             width: 12px;
         }
         &.current, &:hover {
-            background: @subnav-header-background;
+            background: @white;
         }
         &.day {
             span {
@@ -4837,23 +4590,23 @@ CALENDAR
     .filters {
         z-index: 5000;
         position: relative;
-        background: #fffde9 url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
+        background: lighten(@highlight-color,@lighten-value) url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
         padding: 0 12px 0 39px;
-        color: #797979;
+        color: @dgrey;
         &:hover {
-            background: #e6f6f9 url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
+            background: lighten(@neutral-color,@lighten-value) url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
         }
         &.active {
-            background-color: #e6f6f9;
+            background-color: lighten(@neutral-color,@lighten-value);
         }
     }
     .export {
         z-index: 5000;
         position: relative;
         padding: 0 12px 0 39px;
-        color: #797979;
+        color: @dgrey;
         &.active {
-            background-color: #e6f6f9;
+            background-color: lighten(@neutral-color,@lighten-value);
         }
     }
     .link-case {
@@ -4913,7 +4666,7 @@ CALENDAR
             hr {
                 height: 0px;
                 width: 100%;
-                border-bottom: 1px solid #8e8f8f;
+                border-bottom: 1px solid @dgrey;
                 margin: 15px 0 0 0;
             }
             a#applyFilters {
@@ -4923,10 +4676,10 @@ CALENDAR
                 padding: 0 6px 0 28px
             }
             .filter-list {
-                background: #e6f6f9;
+                background: lighten(@neutral-color,@lighten-value);
                 padding: 16px 16px 0 16px;
                 line-height: 16px;
-                color: #000;
+                color: @black;
             }
         }
     }
@@ -4938,7 +4691,7 @@ CALENDAR
 }
 #calendar-export-dialog-url {
     font-family: monospace;
-    background-color: #eeeeee;
+    background-color: @lgrey;
     padding: 5px;
     border: 1px solid black;
     width: 100%;
@@ -4965,7 +4718,7 @@ CALENDAR
 .day-block {
     width: 14%;
     padding: 0;
-    background: @subnav-background;
+    background: @content-background;
     border-bottom: 1px solid @border-color;
     border-right: 1px solid @border-color;
     vertical-align: top;
@@ -5021,7 +4774,7 @@ ul.js_happening {
     -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
     line-height: 16px;
     background: @white;
-    border: 1px solid #eee;
+    border: 1px solid @lgrey;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -5037,8 +4790,8 @@ ul.js_happening {
     top: 21px;
     width: 19px;
     height: 19px;
-    background: #eee;
-    color: #797979;
+    background: @lgrey;
+    color: @dgrey;
     text-align: center;
     cursor: pointer;
     font-size: 16px;
@@ -5067,7 +4820,7 @@ ul.js_happening {
     height: 0px;
     border-bottom: 25px solid transparent; /* left arrow slant */
     border-top: 0px solid transparent; /* right arrow slant */
-    border-right: 25px solid #eee; /* bottom, add background color here */
+    border-right: 25px solid @lgrey; /* bottom, add background color here */
     font-size: 0px;
     line-height: 0px;
     position: absolute;
@@ -5081,7 +4834,7 @@ ul.js_happening {
     height: 0px;
     border-bottom: 23px solid transparent; /* left arrow slant */
     border-top: 0px solid transparent; /* right arrow slant */
-    border-right: 23px solid #ffffff; /* bottom, add background color here */
+    border-right: 23px solid @white; /* bottom, add background color here */
     font-size: 0px;
     line-height: 0px;
     display: block;
@@ -5094,7 +4847,7 @@ ul.js_happening {
 .cal-bubble h3 {
     margin-bottom: 16px;
     font-size: 16px;
-    color: #013a63;
+    color: @banner-background;
     font-weight: bold;
     width: 330px;
 }
@@ -5111,7 +4864,6 @@ ul.js_happening {
  */
 ul.js_happening li.translucent span {
     opacity: 0.4;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
     filter: ~"alpha(opacity = 40)";
     background-image: url(/images/famicons/time.png);
     background-repeat: no-repeat;
@@ -5120,7 +4872,6 @@ ul.js_happening li.translucent span {
 
 ul.js_happening li.translucent span:hover {
     opacity: 0.5;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
     filter: ~"alpha(opacity = 40)";
 }
 
@@ -5148,10 +4899,6 @@ ul.js_happening li span:hover {
     background-color: @dark;
 }
 
-.otherMonth .dayWrap p, .otherMonth .dayWrap a {
-/*color: #1597cb;*/
-}
-
 .otherMonth .day-num {
     font-weight: normal;
 }
@@ -5167,7 +4914,7 @@ ul.js_happening li span:hover {
 /*CATEGORY WINDOW*/
 #category-window, #file-window, #detail-window {
     margin: 0;
-    border: 1px solid #ccc;
+    border: 1px solid @std-grey;
     position: relative;
     overflow: auto;
     overflow-x: hidden;
@@ -5179,7 +4926,7 @@ ul.js_happening li span:hover {
   .loading      { width: 100%;
                   height: 100%;
                   position: absolute;
-                  background: #fff;
+                  background: @white;
                   z-index: 2;
                   opacity: 0.75;
                   text-align: center;
@@ -5195,9 +4942,9 @@ ul.js_happening li span:hover {
                   margin: 4px 0;
   }
   h4 {            text-align: left;
-                  border-bottom: solid 1px #ccc;
+                  border-bottom: solid 1px @std-grey;
                   font-size: 1.2em;
-                  color: #777;
+                  color: @secondary-text;
                   margin-top: 24px;
   }
   p             { margin-bottom: 4px;
@@ -5222,7 +4969,7 @@ ul.js_happening li span:hover {
                   min-width: 150px;
   }
   .pending      { float: right;
-                  color: #A7A7A7;
+                  color: @mgrey;
   }
   .perms 		{ width: 100%;
   	  td, th 	{ padding: 7px; }
@@ -5246,7 +4993,8 @@ ul.js_happening li span:hover {
 #category-head th, #file-head th {
     border: 0;
     font-weight: bold;
-    background: #eee;
+    background: @module-background;
+	color: @module-heading;
     line-height: 25px;
     padding: 3px 7px;
 
@@ -5272,10 +5020,6 @@ ul.js_happening li span:hover {
     padding: 0 0 0 28px;
 }
 
-.treeTable tr.selected td {
-    background: #3875D7;
-    color: @white;
-}
 
 .scroller {
     zoom: 1;
@@ -5314,7 +5058,7 @@ CHAT
     }
     .chat-users {
         display: none;
-        background: #f3fbef;
+        background: @dark;
         li {
             position: relative;
         }
@@ -5341,20 +5085,20 @@ CHAT
         }
     }
     .show-users {
-        background: #ddefd3 url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
+        background: darken(@dark,@darken-value) url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
         display: block;
         height: 16px;
         text-align: center;
         line-height: 16px;
-        color: #000;
+        color: @black;
         font-weight: bold;
         &.active {
-            background: #ddefd3 url(/images/core/icons/chat-up.png) no-repeat 50% 50%;
+            background: darken(@dark,@darken-value) url(/images/core/icons/chat-up.png) no-repeat 50% 50%;
         }
         &:hover {
             text-decoration: none;
-            color: #000;
-            background-color: #ddefd3;
+            color: @black;
+            background-color: darken(@dark,@darken-value);
         }
     }
     .chat-messages {
@@ -5392,22 +5136,22 @@ CHAT
         .chat-message {
             display: block;
             padding: 6px 16px;
-            color: #000;
-            background: @subnav-background;
-            border: 1px solid #e9e3d6;
+            color: @black;
+            background: @content-background;
+            border: 1px solid @alternate-background;
             word-wrap: break-word;
         }
         .chat-time {
             right: 0;
             top: 0;
-            color: #797979
+            color: @dgrey
         }
     }
 
     .chat-message-user-me {
         .chat-message {
-            background: #fffde9;
-            border-color: #f5f0bb;
+            background: lighten(@highlight-color,@lighten-value);
+            border-color: darken(@highlight-color,@darken-value);
         }
         .chat-user .triangulate {
             background-position: 0 -24px;
@@ -5415,8 +5159,8 @@ CHAT
     }
     .chat-message-user-admin {
         .chat-message {
-            background: #e8f5ff;
-            border-color: #b0ddfe;
+            background: lighten(@neutral-color,@lighten-value);
+            border-color: @neutral-color;
         }
         .chat-user {
             font-weight: bold;
@@ -5430,7 +5174,7 @@ CHAT
         }
     }
     .chat-message-container {
-        border: 1px solid #ccc;
+        border: 1px solid @std-grey;
         padding: 4px;
         margin: 8px 0;
     }
@@ -5492,7 +5236,7 @@ COLOUR ADJUSTMENT BOX
     width: 20px;
     height: 20px;
     float: left;
-    border: 2px solid #797979;
+    border: 2px solid @dgrey;
     -moz-box-shadow: 3px 5px 0px rgba(0, 0, 0, 0.04);
     -webkit-box-shadow: 3px 5px 0px rgba(0, 0, 0, 0.04);
     box-shadow: 3px 5px 0px rgba(0, 0, 0, 0.04);
@@ -5505,7 +5249,7 @@ COLOUR ADJUSTMENT BOX
 }
 
 .top-split {
-    border-bottom: 2px solid #e9e3d6;
+    border-bottom: 2px solid @alternate-background;
 }
 
 .farbtastic {
@@ -5513,16 +5257,16 @@ COLOUR ADJUSTMENT BOX
 }
 
 .active-box {
-    background-color: #e9e3d6
+    background-color: @alternate-background
 }
 
 .colour:hover {
-    background-color: #ffffff;
+    background-color: @white;
     cursor: pointer;
 }
 
 .colours-buttons {
-    background: @subnav-header-background;
+    background: @white;
     padding: 16px;
     padding-bottom: 8px;
 }
@@ -5616,18 +5360,18 @@ HOMEPAGE COLUMN SLIDER
 
 #tabs-homepage #slider {
     height: 14px;
-    border: 1px solid #d1d1d1;
-    background: @light-grey;
+    border: 1px solid @lgrey;
+    background: @lgrey;
     width: 100%;
     position: relative;
-    background-color: #dbdbdb;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#dbdbdb), to(#ececec));
-    background-image: -webkit-linear-gradient(top, #dbdbdb, #ececec);
-    background-image: -moz-linear-gradient(top, #dbdbdb, #ececec);
-    background-image: -ms-linear-gradient(top, #dbdbdb, #ececec);
-    background-image: -o-linear-gradient(top, #dbdbdb, #ececec);
-    background-image: linear-gradient(top, #dbdbdb, #ececec);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#dbdbdb', EndColorStr = '#ececec');
+    background-color: @lgrey;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(@lgrey), to(@dark));
+    background-image: -webkit-linear-gradient(top, @lgrey, @dark);
+    background-image: -moz-linear-gradient(top, @lgrey, @dark);
+    background-image: -ms-linear-gradient(top, @lgrey, @dark);
+    background-image: -o-linear-gradient(top, @lgrey, @dark);
+    background-image: linear-gradient(top, @lgrey, @dark);
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = '@{lgrey}', EndColorStr = '@{dark}')";
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -5635,26 +5379,26 @@ HOMEPAGE COLUMN SLIDER
 }
 
 #tabs-homepage #slider .ui-slider-handle {
-    border: 1px solid #d1d1d1;
+    border: 1px solid @lgrey;
     margin-top: -9px;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     width: 38px;
     height: 30px;
-    background: #ccc;
+    background: @std-grey;
     top: 0;
     position: absolute;
     margin-left: -21px;
 
-    background-color: #fbfbfb;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#f7f7f7));
-    background-image: -webkit-linear-gradient(top, #fbfbfb, #f7f7f7);
-    background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7);
-    background-image: -ms-linear-gradient(top, #fbfbfb, #f7f7f7);
-    background-image: -o-linear-gradient(top, #fbfbfb, #f7f7f7);
-    background-image: linear-gradient(top, #fbfbfb, #f7f7f7);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#fbfbfb', EndColorStr = '#f7f7f7');
+    background-color:  @dark;
+    background-image: -webkit-gradient(linear, left top, left bottom, from( @dark), to( @dark));
+    background-image: -webkit-linear-gradient(top,  @dark,  @dark);
+    background-image: -moz-linear-gradient(top,  @dark,  @dark);
+    background-image: -ms-linear-gradient(top,  @dark,  @dark);
+    background-image: -o-linear-gradient(top,  @dark,  @dark);
+    background-image: linear-gradient(top,  @dark,  @dark);
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
 
     -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, .04);
     -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, .04);
@@ -5674,7 +5418,7 @@ HOMEPAGE COLUMN SLIDER
 
 .slide-guide {
     margin-bottom: 16px;
-    border: #e7e7e7;
+    border: @lgrey ;
     padding: 8px;
 }
 
@@ -5688,7 +5432,7 @@ HOMEPAGE COLUMN SLIDER
     min-height: 20px;
     text-align: center;
     line-height: 20px;
-    background: #e7e7e7;
+    background: @lgrey ;
 
 }
 
@@ -5744,13 +5488,13 @@ HOMEPAGE CUSTOMISE
 }
 
 #tabs-homepage li.ui-state-default a {
-    background: #f5f5f5;
-    color: #579dcf;
+    background: @dark;
+    color: @link;
 }
 
 #tabs-homepage li.ui-tabs-selected a {
-    background: @subnav-background;
-    color: #0066b0;
+    background: @content-background;
+    color: @link;
 }
 
 #tabs-homepage #tabs-sub .ui-tabs-nav {
@@ -5769,7 +5513,7 @@ HOMEPAGE CUSTOMISE
     text-align: left;
     display: block;
     font-size: 12px;
-    color: #000;
+    color: @black;
     width: 96px;
     display: block;
 }
@@ -5785,28 +5529,28 @@ HOMEPAGE CUSTOMISE
 }
 
 #tabs-homepage #tabs-sub .ui-tabs-nav li a:hover {
-    background: #ffffff;
+    background: @white;
 }
 
 #tabs-homepage #tabs-sub li.ui-tabs-selected a {
-    background: #e9e3d6;
+    background: @alternate-background;
 }
 
 /*CUSTOMISE COMPONENT*/
 #tabs-homepage .customise-components {
     padding: 16px;
     margin-bottom: 16px;
-    background: @subnav-background;
+    background: @content-background;
 }
 
 .saved-colours, .saved-layout {
     color: @white;
     padding: 0 8px 0 28px;
-    background: #cae9b9 url(/images/core/icons/black-tick.png) 8px 50% no-repeat;
+    background: @positive-color url(/images/core/icons/black-tick.png) 8px 50% no-repeat;
     height: 23px;
     line-height: 23px;
     margin-bottom: 8px;
-    color: #000;
+    color: @black;
     z-index: 120;
     display: none;
 }
@@ -5818,11 +5562,11 @@ HOMEPAGE CUSTOMISE
 .add-component {
     position: relative;
     float: left;
-    background: #b0ddfe;
+    background: @neutral-color;
     width: 158px;
     padding: 16px;
     margin: 0 16px 16px 0;
-    border: 1px solid @link;
+    border: 1px solid darken(@neutral-color,@darken-value);
     min-height: 156px;
     zoom: 1;
     .btn {
@@ -5849,7 +5593,7 @@ HOMEPAGE CUSTOMISE
 }
 
 .add-component strong {
-    border-bottom: 1px dotted #000;
+    border-bottom: 1px dotted @black;
 }
 
 .add-component strong em {
@@ -5867,15 +5611,15 @@ HOMEPAGE CUSTOMISE
     position: absolute;
     top: 50px;
     left: 50px;
-    background: #cae9b9;
+    background: @positive-color;
     color: @white;
     width: 62px;
     height: 34px;
     line-height: 34px;
     padding-left: 28px;
-    color: #000;
+    color: @black;
     font-weight: bold;
-    border: 3px solid #aad791;
+    border: 3px solid darken(@positive-color,@darken-value);
     -moz-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
     -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
     z-index: 120;
@@ -5905,9 +5649,9 @@ HOMEPAGE CUSTOMISE
 }
 
 .add-component.disabled {
-    background: #e6f6f9;
-    border-color: #a9e1eb;
-    color: #797979;
+    background: lighten(@neutral-color,@lighten-value);
+    border-color: @neutral-color;
+    color: @dgrey;
 }
 
 .add-component.disabled .btn {
@@ -6020,15 +5764,13 @@ Dropbox
 }
 
 .left #calendar table.duedates-calendar span.wrapper {
-    color: #000000;
+    color: @black;
     cursor: pointer;
     display: block;
     padding: 4px;
 }
 
 .left #calendar table.duedates-calendar li {
-    background: none repeat scroll 0 50% transparent;
-    color: #007DCD;
     font-size: 11px;
     margin: 1px 0 0 0;
     position: relative;
@@ -6056,7 +5798,7 @@ span.wrapper a {
 }
 
 .bubble-main {
-    background-color: #717171;
+    background-color: @secondary-text;
     padding: 10px;
 }
 
@@ -6099,7 +5841,7 @@ span.wrapper a {
     padding: 0;
     font-weight: bold;
     margin-bottom: 8px;
-    color: #000;
+    color: @black;
 }
 
 h2 .btn {
@@ -6110,7 +5852,7 @@ h2 .btn {
 }
 
 .left #calendar table .bubble .bubble-main h3 {
-    background-color: #717171;
+    background-color: @secondary-text;
     color: @white;
     padding: 0;
     font-size: 12px;
@@ -6121,7 +5863,7 @@ h2 .btn {
 }
 
 .left #calendar table .bubble p.details {
-    border-top: 1px dotted #b8b8b8;
+    border-top: 1px dotted @mgrey;
     padding: 4px;
     margin-bottom: 0;
 }
@@ -6136,14 +5878,14 @@ p.bubble-name {
 }
 
 .bubble .comment {
-    color: #000;
+    color: @black;
 }
 
 .image-thumbnail a {
     padding: 8px;
     margin: 4px;
     text-align: center;
-    background: #fcfcfc;
+    background: @dark;
     display: block;
     -moz-transition-property: border-color, background-color;
     -moz-transition-duration: .4s;
@@ -6160,7 +5902,7 @@ p.bubble-name {
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     &:hover {
-        background-color: #f0f0f0;
+        background-color: @dark;
         -moz-transition-property: border-color, background-color;
         -moz-transition-duration: .4s;
         -moz-transition-timing-function: ease-out;
@@ -6190,13 +5932,12 @@ STUDENT AND PARENT DIRECTORIES
     text-indent: 16px;
     filter: ~"alpha(opacity = 40)"; /* internet explorer */
     opacity: 0.4; /* fx, safari, opera, chrome */
-    -ms-filter: ~"progid:DXImageTransform.Microsoft.Alpha(opacity=40)"; /*IE8*/
     font-size: 12px;
 }
 
 .directory.parents table {
     width: 98%;
-    border: 1px solid #f1f1f1;
+    border: 1px solid darken(@dark,@darken-value / 4);
     margin: 4px 1%;
 }
 
@@ -6219,7 +5960,7 @@ STUDENT AND PARENT DIRECTORIES
 }
 
 .directory .directory-sorter {
-    background: #f1f1f1 url(/images/core/tablesorter/sort.gif) no-repeat 100% 50%;
+    background: darken(@dark,@darken-value / 4) url(/images/core/tablesorter/sort.gif) no-repeat 100% 50%;
     padding-right: 21px;
 }
 
@@ -6236,9 +5977,9 @@ STUDENT AND PARENT DIRECTORIES
 }
 
 .directory.staff th {
-    border: 1px solid #ccc;
+    border: 1px solid @std-grey;
     text-align: left;
-    white-space: nowrap;
+    @white-space: nowrap;
 }
 
 .directory.staff .larger-image {
@@ -6262,7 +6003,7 @@ FORUM
 }
 
 .post {
-    border-bottom: 3px solid #E9E3D6;
+    border-bottom: 3px solid @alternate-background;
 }
 
 .post-left {
@@ -6274,7 +6015,7 @@ FORUM
 }
 
 .post-content blockquote {
-    background: #fffde9;
+    background: lighten(@highlight-color,@lighten-value);
     padding: 8px;
     margin-bottom: 16px;
     margin-left: 16px;
@@ -6291,7 +6032,7 @@ FORUM
 }
 
 .post-left {
-    background-color: @subnav-background;
+    background-color: @content-background;
     padding: 0;
     vertical-align: top
 }
@@ -6305,7 +6046,7 @@ FORUM
 .cite-it {
     position: relative;
     padding: 16px 16px 0 32px;
-    border: 1px solid #E9E3D6;
+    border: 1px solid @alternate-background;
     margin-bottom: 16px;
 }
 
@@ -6329,7 +6070,7 @@ FORUM
     img {
         padding: 5px;
         margin: 0 16px 0 0;
-        background: #f0f0f0;
+        background: @dark;
         float: left;
         display: block
     }
@@ -6354,11 +6095,11 @@ FORUM
     float: left;
     color: @white;
     padding: 0 8px 0 28px;
-    background: #cae9b9 url(/images/core/icons/black-tick.png) 8px 50% no-repeat;
+    background: @positive-color url(/images/core/icons/black-tick.png) 8px 50% no-repeat;
     height: 23px;
     line-height: 23px;
     margin-top: 4px;
-    color: #000;
+    color: @black;
     width: 111px;
     z-index: 120;
 }
@@ -6378,10 +6119,6 @@ FORUM
     #container {
         padding-left: 37px;
     }
-    #header {
-        height: 110px;
-    }
-
 }
 
 p.forgotten {
@@ -6405,20 +6142,21 @@ p.forgotten {
         padding: 0 0 16px 0;
     }
 
-    input[type="text"], input[type="password"] {
+    input[type="text"],
+	input[type="password"] {
         width: 150px;
     }
 }
 
 /* MERGING WIKI VERSIONS */
 .highlightedMessage {
-    border: 1px solid #e00;
+    border: 1px solid darken(@negative-color,@darken-value);
     width: 100%;
     margin-bottom: 10px;
 }
 
 .highlightedMessage p span {
-    color: #e00;
+    color: darken(@negative-color,@darken-value);
     font-weight: bold;
 }
 
@@ -6430,7 +6168,7 @@ p.forgotten {
 }
 
 #category {
-    background: @subnav-background;
+    background: @content-background;
     list-style: none;
     margin: 0;
     clear: both;
@@ -6448,17 +6186,16 @@ p.forgotten {
             padding: 7px 16px;
             word-break: break-word;
             &:hover {
-                background: #d6f0f6;
-                color: #0066b0;
+                color: @link;
                 text-decoration: none;
             }
             &.selected {
-                background: @btn-background-color;
+                background: @tab-hover-color;
                 color: @white;
                 border: none;
             }
             &.disabled {
-                color: #ccc;
+                color: @std-grey;
             }
         }
     }
@@ -6514,7 +6251,7 @@ p.forgotten {
 }
 
 .revision-box {
-    border: 1px solid #ccc;
+    border: 1px solid @std-grey;
     margin-bottom: 16px;
 }
 
@@ -6557,7 +6294,7 @@ p.forgotten {
 }
 
 .uploadifyQueueItem {
-    border-top: 1px solid #dedede;
+    border-top: 1px solid @lgrey;
     margin-top: 20px;
 }
 
@@ -6576,12 +6313,12 @@ p.forgotten {
 }
 
 .uploadifyProgress {
-    background-color: #E5E5E5;
+    background-color: @dark;
     width: 40%;
 }
 
 .uploadifyProgressBar {
-    background-color: #0099FF;
+    background-color: @neutral-color;
     height: 10px;
     width: 1px;
 }
@@ -6594,11 +6331,11 @@ p.forgotten {
 
 /*REVISIONS*/
 .revisionCompare {
-    background-color: #DBE7F2;
+    background-color: lighten(@neutral-color,@lighten-value);
 }
 
 .revisionCurrent {
-    background-color: #DBE7F2;
+    background-color: lighten(@neutral-color,@lighten-value);
     font-weight: bold;
 }
 
@@ -6617,8 +6354,8 @@ table.ruler thead td {
     float: left;
     li {
         float: left;
-        background: #ececec;
-        border: 1px solid #ccc;
+        background: @dark;
+        border: 1px solid @std-grey;
         border-bottom: 0;
         padding: 0;
         margin: 0 2px 0 0;
@@ -6626,17 +6363,17 @@ table.ruler thead td {
             display: block;
             padding: 5px 10px;
             &.selected {
-                background: #ccc;
+                background: @std-grey;
             }
             &.disabled {
-                color: #ccc;
+                color: @std-grey;
             }
         }
     }
 }
 
 .results {
-    border-top: 1px solid #ccc;
+    border-top: 1px solid @std-grey;
     clear: both;
     margin: 0;
     padding: 10px 0 0 0;
@@ -6646,7 +6383,7 @@ table.ruler thead td {
         font-weight: bold;
         border: none;
         background: none;
-        color: #000;
+        color: @black;
         &:first-child {
             margin-top: 5px;
         }
@@ -6683,7 +6420,7 @@ li.bars {
 /* SUBMISSION */
 
 .submission td span.alert {
-    background: #e8f5ff url(/images/famicons/information.png) no-repeat 50% 50%;
+    background: lighten(@neutral-color,@lighten-value) url(/images/famicons/information.png) no-repeat 50% 50%;
     font-weight: 400;
     text-indent: -9999em;
     display: inline-block;
@@ -6707,12 +6444,12 @@ li.bars {
 }
 
 .background {
-    background-color: @subnav-background;
+    background-color: @content-background;
 }
 
 .submission-history h4 {
     font-size: 14px;
-    color: #797979;
+    color: @dgrey;
     font-weight: bold;
     margin-bottom: 8px;
 }
@@ -6734,7 +6471,7 @@ li.bars {
 
 .mark-box .mark-content {
     padding: 4px;
-    border: 1px solid #000;
+    border: 1px solid @black;
     text-align: center;
 }
 
@@ -6767,7 +6504,7 @@ table.subjectList {
 .mark-sheet.names table {
     table-layout: fixed;
     td {
-        white-space: nowrap;
+        @white-space: nowrap;
         word-break: break-all;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -6778,7 +6515,7 @@ table.subjectList {
     vertical-align: bottom;
     text-align: left;
     font-size: 12px;
-    white-space: nowrap;
+    @white-space: nowrap;
 }
 
 .mark-sheet.names {
@@ -6815,11 +6552,11 @@ table.subjectList {
 }
 
 .mark-sheet.assessments .dark td {
-    background: #f4f4f4;
+    background: @dark;
 }
 
 .mark-sheet .highlight-student td {
-    background: #edf7e7 !important
+    background: lighten(@positive-color,@lighten-value) !important
 }
 
 .mark-sheet .save-notification {
@@ -6836,7 +6573,7 @@ table.subjectList {
     height: 17px;
     font-size: 12px;
     margin: 0;
-    border: 1px #ccc solid;
+    border: 1px @std-grey solid;
     padding: 0;
     float: left;
 }
@@ -6894,7 +6631,7 @@ table.subjectList {
                     }
                 }
                 input, select {
-                    border: solid 1px #ccc;
+                    border: solid 1px @std-grey;
                     -webkit-transition: border-color 0.2s linear;
                 }
             }
@@ -6914,7 +6651,7 @@ table.subjectList {
                     right: 8px;
                 }
                 td {
-                    border-bottom: solid 1px #ccc;
+                    border-bottom: solid 1px @std-grey;
                     position: relative;
                 }
                 .plag-score {
@@ -6928,7 +6665,7 @@ table.subjectList {
                 padding: 0;
 
                 &.nowrap {
-                    white-space: nowrap;
+                    @white-space: nowrap;
                 }
             }
             p {
@@ -6943,32 +6680,37 @@ table.subjectList {
             }
         }
     }
-    .regular {
-        color: #333;
+    .submit-regular {
+        color: @secondary-text;
     }
-    .ok {
-        color: #292;
+    .submit-ok {
+        color: darken(@positive-color,@darken-value);
     }
-    .warn {
-        color: #e71;
+    .submit-warn {
+        color: darken(@highlight-color,@darken-value);
     }
-    .critical {
-        color: #922;
+    .submit-critical {
+        color: darken(@negative-color,@darken-value);
     }
     .file-input {
-        float: right;
-        width: 70%; //      .btn                      { width: 112px; }
+		float: none;
+  //      float: right;
+//        width: 70%; //      .btn                      { width: 112px; }
+
     }
+	.button-set {
+		text-align: right;
+	}
     .file-holder {
         margin-top: 10px;
-        white-space: nowrap;
-        width: 100%;
+        @white-space: nowrap;
+        //width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         float: right;
         text-align: right;
         display: block;
-        width: 45%;
+        //width: 45%;
     }
     .prettify {
         top: 3px;
@@ -6995,10 +6737,10 @@ table.subjectList {
 }
 
 .see-more-arrow {
-    border: 1px solid #D1D1D1;
-    color: #777 !important;
+    border: 1px solid @lgrey;
+    color: @secondary-text !important;
     float: left;
-    text-shadow: 0 1px 0 white;
+    text-shadow: 0 1px 0 @white;
     width: 17px;
     height: 19px;
     line-height: 19px;
@@ -7011,14 +6753,13 @@ table.subjectList {
     overflow: visible;
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
-    background-color: #FBFBFB;
-    background-image: -moz-linear-gradient(top, #FBFBFB, #F7F7F7);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FBFBFB), color-stop(1, #F7F7F7));
-    filter: progid:dximagetransform.microsoft.gradient(startColorStr = '#fbfbfb', EndColorStr = '#f7f7f7');
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
+    background-color:  @dark;
+    background-image: -moz-linear-gradient(top,  @dark,  @dark);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0,  @dark), color-stop(1,  @dark));
+    filter: "progid:dximagetransform.microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
     &:hover {
         text-decoration: none;
-        color: #FF5A00 !important;
+        color:  @link-hover !important;
     }
 
 }
@@ -7039,31 +6780,31 @@ table.subjectList {
     submission/returnWork
 ---------------------------- */
 .rubric {
-    border: solid 1px #ccc;
-    background: #fff;
+    border: solid 1px @std-grey;
+    background: @white;
     table-layout: fixed;
     tr {
         &:hover {
             td {
-                background: #f7f7f7;
+                background:  @dark;
                 &.criterion-label {
-                    background: #e7e7e7;
+                    background: @lgrey ;
                 }
             }
         }
         td {
-            border: solid 1px #ccc;
+            border: solid 1px @std-grey;
             padding: 0;
             &.criterion-label {
-                background: #F5F5F5;
+                background: @dark;
                 font-weight: bold;
                 &.span {
-                    background: #e7e7e7;
+                    background: @lgrey ;
                 }
             }
             &.criterion-value {
                 &:hover {
-                    background: #FFFDDB;
+                    background: lighten(@highlight-color,@lighten-value);
                 }
             }
             &.pad {
@@ -7074,7 +6815,7 @@ table.subjectList {
                 padding: 0;
                 margin: 0;
                 &.focused {
-                    background: #CAE9B9;
+                    background: @positive-color;
                 }
                 span {
                     padding: 8px;
@@ -7082,7 +6823,7 @@ table.subjectList {
                 }
             }
 			&.criterion-value.focused {
-				background: #CAE9B9;
+				background: @positive-color;
 			}
         }
     }
@@ -7092,13 +6833,13 @@ table.subjectList {
 		display: none;
     }
     .warning {
-        border: solid 1px #FAF9F5;
-        background: #FAF9F5;
+        border: solid 1px @alternate-background;
+        background: @alternate-background;
         padding: 0;
         div {
             margin-left: 8px;
             padding: 8px 0;
-            color: #FF654A;
+            color: darken(@negative-color,@darken-value);
             font-weight: bold;
             span {
                 display: block;
@@ -7106,7 +6847,7 @@ table.subjectList {
                 height: 12px;
                 background: transparent;
                 margin-right: 4px;
-                border: solid 2px #FF654A;
+                border: solid 2px darken(@negative-color,@darken-value);
                 text-align: center;
                 font-size: 12px;
                 line-height: 11px;
@@ -7116,13 +6857,13 @@ table.subjectList {
 }
 
 .rubric-grade {
-    background: #F4FBF1;
-    color: #3F9E00;
+    background: lighten(@positive-color,@lighten-value);
+    color: darken(@positive-color,@darken-value);
     float: left;
     padding: 8px 16px;
     font-size: 1.5em;
     line-height: 1.2em;
-    border: solid 1px #CAE9B9;
+    border: solid 1px @positive-color;
 }
 
 /* -----------------------------------------
@@ -7132,7 +6873,7 @@ table.subjectList {
 table.tiny-tables {
     td, th {
         position: relative;
-        white-space: nowrap;
+        @white-space: nowrap;
         overflow: hidden;
     }
     th:first-child,
@@ -7158,17 +6899,17 @@ table.tiny-tables {
     position: absolute;
     left: 0;
     top: 0;
-    background: #fff;
+    background: @white;
     width: 30%;
     overflow: hidden;
     overflow-x: scroll;
-    border-right: 1px solid #ccc;
+    border-right: 1px solid @std-grey;
     table {
         border-right: none;
         border-left: none;
         width: 100%;
         th, td {
-            white-space: nowrap;
+            @white-space: nowrap;
         }
         th {
             text-align: left;
@@ -7220,7 +6961,7 @@ table.tiny-tables {
 }
 
 .mark-sheet.assessments .error {
-    border-color: #db0101;
+    border-color: @negative-color;
 }
 
 .mark-sheet.assessments label.error {
@@ -7235,7 +6976,7 @@ table.tiny-tables {
     line-height: 16px;
 }
 .mark-sheet .disabled {
-    color: #888;
+    color: @dgrey;
 }
 .mark-sheet .inlineform .rubric-inline {
     float: none;
@@ -7255,9 +6996,9 @@ dd {
 }
 
 .overdue {
-    color: #e00;
+    color: darken(@negative-color,@darken-value);
     a {
-        color: #db0101;
+        color: darken(@negative-color,@darken-value);
     }
 }
 
@@ -7282,7 +7023,7 @@ dd {
     td {
         vertical-align: top;
         padding: 4px 4px 12px 4px;
-        .title { font-weight: bold; display: block; white-space: normal; word-break: break-word; }
+        .title { font-weight: bold; display: block; }
         .class { display: block; }
         a { color: @body-text; }
     }
@@ -7313,7 +7054,7 @@ dd {
         display: block;
         color: @secondary-text;
         font-weight: normal;
-//        white-space: nowrap; // removed because it takes up valuable space
+//        @white-space: nowrap; // removed because it takes up valuable space
     }
 }
 .box .timetable {
@@ -7321,7 +7062,7 @@ dd {
         padding: 6px 8px;
     }
     td {
-        white-space: nowrap;
+        @white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
         word-break: break-all;
@@ -7378,7 +7119,7 @@ dd {
 }
 
 #translatedText {
-    border: 1px solid #ddd;
+    border: 1px solid @lgrey;
     margin-top: 8px;
     margin-bottom: 16px;
     padding: 12px;
@@ -7473,12 +7214,12 @@ ul.tree .collapsable .hitarea {
 .home-icon {
     padding-left: 30px;
     background: url(/images/core/home.gif) no-repeat 6px 0;
-    border-left: 1px solid #ccc;
+    border-left: 1px solid @std-grey;
     margin-left: 4px;
 }
 
 .news-index-tree {
-    background: #f0f0f0;
+    background: @dark;
 }
 
 .news-index-tree li li {
@@ -7493,13 +7234,13 @@ ul.tree .collapsable .hitarea {
 }
 
 .weather p span {
-    color: #999;
+    color: @dgrey;
     font-size: 90%;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 .weather p span a {
-    color: #999;
+    color: @dgrey;
 }
 
 .weatherDay p {
@@ -7529,12 +7270,12 @@ ul.tree .collapsable .hitarea {
     float: left;
     text-align: left;
     height: 50px;
-    color: #aaa;
+    color: @mgrey;
     margin-left: 8px;
 }
 
 .weatherDay h4 {
-    color: #2c2c2c;
+    color: @body-text;
     margin: 0.2em 0;
     float: none;
     width: auto;
@@ -7543,7 +7284,7 @@ ul.tree .collapsable .hitarea {
 }
 
 .weatherDay .temp-actual {
-    color: #000;
+    color: @black;
 }
 
 /* Countdown */
@@ -7551,8 +7292,8 @@ ul.tree .collapsable .hitarea {
     overflow-y: auto;
     height: 140px;
     width: 6.5em;
-    background: #fff;
-    border: 1px solid #ddd;
+    background: @white;
+    border: 1px solid @lgrey;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -7569,37 +7310,37 @@ ul.tree .collapsable .hitarea {
 
 .ui-timepicker-duration {
     margin-left: 5px;
-    color: #888;
+    color: @dgrey;
 }
 
 .ui-timepicker-list:hover .ui-timepicker-duration {
-    color: #888;
+    color: @dgrey;
 }
 
 .ui-timepicker-container .ui-timepicker-list li {
     padding: 3px 0 3px 5px;
     cursor: pointer;
-    white-space: nowrap;
-    color: #000;
+    @white-space: nowrap;
+    color: @black;
     list-style: none;
     margin: 0;
 }
 
 .ui-timepicker-list:hover .ui-timepicker-selected {
-    background: #fff;
-    color: #000;
+    background: @white;
+    color: @black;
 }
 
 li.ui-timepicker-selected,
 .ui-timepicker-list li:hover,
 .ui-timepicker-list:hover .ui-timepicker-selected:hover {
-    background: #1980EC;
-    color: #fff;
+    background: @link;
+    color: @white;
 }
 
 li.ui-timepicker-selected .ui-timepicker-duration,
 .ui-timepicker-list li:hover .ui-timepicker-duration {
-    color: #ccc;
+    color: @std-grey;
 }
 
 .dash {
@@ -7627,7 +7368,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
     left: 0;
     width: 100%;
     font-size: 7pt;
-    color: #555;
+    color: @secondary-text;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
@@ -7638,20 +7379,21 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 #footer {
     padding: 16px 0;
     text-align: left;
-    margin-left: 250px;
+    margin-left: @navigation-width;
     padding-left: 10px;
-    margin-bottom: -100px;
     ul {
+		float: right;
         margin: 0;
-        padding: 0;
+        padding: 0 16px 0 0;
         li {
             display: inline;
-            color: #888;
+            color: @footer-color;
             background: url(/images/footer-div.gif) no-repeat 100% 2px;
-            margin-right: 16px;
-            padding-right: 17px;
+            margin-right: 4px;
+            padding-right: 8px;
             a {
-                color: #888;
+                color: @footer-links;
+				white-space: nowrap;
                 font-weight: normal;
                 display: inline;
             }
@@ -7665,21 +7407,21 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 
 .red {
-    color: #f00;
+    color: darken(@negative-color,@darken-value);
 }
 
 /* Leave Report
  */
 .sortable-table, .signatures {
     td {
-        border: 1px solid #000;
+        border: 1px solid @black;
         border-collapse: collapse;
     }
     td, th {
         padding: 7px;
     }
     tr span.leave-pending.grey {
-        color: #808080;
+        color: @secondary-text;
     }
     .leaveReportHeaderDate {
         text-align: center;
@@ -7691,8 +7433,8 @@ li.ui-timepicker-selected .ui-timepicker-duration,
         width: 0;
         padding: 0;
         overflow: hidden;
-        border-top: 1px solid #000;
-        border-bottom: 1px solid #000;
+        border-top: 1px solid @black;
+        border-bottom: 1px solid @black;
         border-left-width: 0;
         border-right-width: 0;
         display: none;
@@ -7715,9 +7457,9 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 
 tr span.leave-pending {
-    background: #e8f5ff;
-    color: #777;
-    text-shadow: 0 1px 0 white;
+    background: lighten(@neutral-color,@lighten-value);
+    color: @secondary-text;
+    text-shadow: 0 1px 0 @white;
     padding: 2px 4px;
     border: 1px solid @body-background;
 }
@@ -7749,7 +7491,7 @@ tr span.leave-pending {
 }
 
 .homepage .active {
-    background: #ddd;
+    background: @lgrey;
 }
 
 .add-component.undeveloped .btn {
@@ -7758,7 +7500,7 @@ tr span.leave-pending {
 
 h4 a.hidden {
     opacity: 0.5;
-    color: #444;
+    color: @secondary-text;
 }
 
 #rubric-window {
@@ -7856,86 +7598,6 @@ label {
     background-color: @alternate-background;
 }
 
-/* -------------------------
-    profile card styles
-------------------------- */
-@pcard-border: #e7e7e7;
-@pcard-hover: #e9f6ff;
-@pcard-darker: #dedede;
-@pcard-fade: #797979;
-@pcard-back: #fff;
-
-.profile-card {
-    border: solid 1px @pcard-border;
-    display: block;
-    margin: 0;
-    background: @pcard-back; // common to both styles of card
-    img {
-        border: solid 1px @pcard-border;
-    }
-    .name {
-        color: @black;
-        em {
-            font-style: normal;
-            color: @pcard-fade;
-        }
-    }
-    .subtitle {
-        color: @pcard-fade;
-    }
-    span {
-        display: block;
-    }
-
-// states
-    &:hover {
-        text-decoration: none;
-        background-color: @pcard-hover;
-    }
-
-// bar style
-    &.bar {
-        // height: 40px;
-        padding: 4px;
-        border-bottom: solid 1px @pcard-darker; // short makes it a card rather than list item
-        &.short {
-            width: 250px;
-        }
-        &:before {
-            float: right;
-            line-height: 40px;
-            margin-right: 24px;
-            font-size: 24px;
-        }
-        img {
-            float: left;
-            width: 32px;
-            height: 32px;
-            border: none;
-        }
-        .name {
-            margin-left: 44px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .single {
-            height: 30px;
-            line-height: 32px;
-        }
-        .subtitle {
-            margin: 2px 0 0 44px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
-// thumbnail style
-    &.thumb {
-
-    }
-}
-
 .inline-block {
     display: inline-block;
     *display: inline;
@@ -7961,9 +7623,7 @@ ul.submission-list {
         overflow: hidden;
         min-height: 32px;
         border-bottom: 1px solid @border-color;
-		&:hover {
-			background-color: @pcard-hover
-		}
+
         .icon {
             .inline-block;
             width: 32px;
@@ -8089,7 +7749,7 @@ ul.submission-list {
         color: @body-text;
         height: 30px;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        @white-space: nowrap;
         overflow: hidden;
         &.subject {
             font-weight: bold;
@@ -8106,7 +7766,7 @@ ul.submission-list {
             }
         }
         &:hover {
-            background-color: @pcard-hover
+            background-color: lighten(@positive-color,@lighten-value)
         }
     }
     img {
@@ -8153,13 +7813,13 @@ ul.submission-list {
         color: @secondary-text;
         height: 30px;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        @white-space: nowrap;
         overflow: hidden;
         .icon { .action-icon(0,2) }
         .time { display: block; }
         .name { color: @body-text; }
         &:hover {
-            background-color: @pcard-hover
+            background-color: lighten(@positive-color,@lighten-value)
         }
     }
     img {
@@ -8220,13 +7880,13 @@ ul.submission-list {
         float: right;
         margin-right: 4px;
         &.ok {
-          color: #292;
+          color: darken(@positive-color,@darken-value);
         }
         &.warn {
-          color: #e71;
+          color: darken(@highlight-color,@darken-value);
         }
         &.critical {
-          color: #922;
+          color: darken(@negative-color,@darken-value);
         }
     }
     .teacher-profile {
@@ -8267,10 +7927,10 @@ td.name {
 }
 
 .color (@index) {
-    color: spin(#BB0000, @index * 10);
+    color: spin(@color-red, @index * 10);
 }
 .colorbg (@index) {
-    background: spin(#FFEEEE, @index * 10);
+    background: spin(@color-bg, @index * 10);
 }
 
 .colorX(10);
@@ -8285,10 +7945,10 @@ td.name {
         color: @mgrey;
     }
     .temp-h {
-        color: @hot;
+        color: @negative-color;
     }
     .temp-l {
-        color: @cold;
+        color: darken(@neutral-color,@darken-value);
     }
     .supplied-by {
         line-height: 22px;
@@ -8310,7 +7970,7 @@ td.name {
         padding: 25px 25px 25px 9px;
     }
     .fade {
-        color: #555;
+        color: @secondary-text;
     }
 }
 #forecast td {
@@ -8339,13 +7999,17 @@ td.name {
         float: left;
     }
     &.error {
-        border-color: #f00 !important;
-        background: #fee;
+        border-color: @negative-color !important;
+        background: lighten(@highlight-color,@lighten-value);
     }
     label.error {
         position: absolute;
         width: 300px;
     }
+}
+#upload-returns-submit-south {
+    float: right;
+    margin-right: 132px;
 }
 
 /* submission/rubricCriteria */
@@ -8353,14 +8017,14 @@ td.name {
     max-width: 400px;
 
     input {
-        border: solid 1px @input-border;
+        border: solid 1px @std-grey;
         font-size: 12px;
         padding: 2px;
         width: 250px;
 
         &[disabled=disabled] {
             background: transparent;
-            color: #222;
+            color: @dgrey;
             border: solid 1px transparent;
         }
         &.group {
@@ -8384,7 +8048,7 @@ td.name {
         }
     }
     p {
-        color: #222;
+        color: @dgrey;
         margin: 0;
         line-height: 1.4em;
     }
@@ -8460,10 +8124,10 @@ td.name {
 .mark-sheet {
     tr {
         td.mark-average {
-            background: @markavg;
+            background: darken(@dark,@darken-value / 4);
         }
         &.dark td.mark-average {
-            background: @markavg-dark;
+            background: darken(@dark,@darken-value / 2);
         }
         th, td {
             padding: 7px 16px 7px 0;
@@ -8473,7 +8137,7 @@ td.name {
 
 /* submission/listSubmission */
 .fade {
-    color: #333;
+    color: @secondary-text;
     padding-left: 1em;
     position: absolute;
     top: 0;
@@ -8484,7 +8148,7 @@ td.name {
     select {
         font-size: 1em;
         font-weight: bold;
-        color: #333;
+        color: @secondary-text;
         background: transparent;
         border: none;
     }
@@ -8531,16 +8195,21 @@ p.unmarkedResponses {
 /* submission/createSubmission */
 .accept-hide, .marks-hide {
     dark {
-        background-color: #E9E3D6;
-        background-color: #E9E3D6;
+        background-color: @alternate-background;
+        background-color: @alternate-background;
         td  {
-            border-bottom: solid 1px #FAF9F5;
+            border-bottom: solid 1px @alternate-background;
         }
     }
 }
 
-input[type="text"], select, textarea {
-    border: solid 1px @input-border;
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    border: solid 1px @std-grey;
 }
 
 #ui-datepicker-div {
@@ -8548,7 +8217,7 @@ input[type="text"], select, textarea {
 }
 
 .warning {
-    color: @warning;
+    color: darken(@negative-color,@darken-value);
     margin-top: 8px;
     ul {
         list-style-type: disc;
@@ -8557,7 +8226,7 @@ input[type="text"], select, textarea {
     li {
         color: @black;
         &.warning {
-            color: @warning;
+            color: darken(@negative-color,@darken-value);
         }
     }
 }
@@ -8598,7 +8267,7 @@ img.mimetype {
         width: 375px;
     }
     .highlight {
-        background: @hlight-green;
+        background: @positive-color;
         border-radius: 4px;
         padding-bottom: 5px;
         margin-bottom: 4px;
@@ -8613,9 +8282,6 @@ img.mimetype {
     background: url('/images/famicons/arrow_out.png') no-repeat;
     margin: 3px 3px 3px 5px;
 }
-.ui-state-highlight {
-    height: 20px;
-}
 
 /* submission/allDueWork */
 .allduework table.subjectList {
@@ -8626,7 +8292,7 @@ img.mimetype {
 }
 
 .pick-semester {
-    color: #333;
+    color: @secondary-text;
     padding-left: 1em;
     position: absolute;
     top: 0;
@@ -8637,7 +8303,7 @@ img.mimetype {
     select {
         font-size: 1em;
         font-weight: bold;
-        color: #333;
+        color: @secondary-text;
         background: transparent;
         border: none;
     }
@@ -8677,7 +8343,7 @@ img.mimetype {
 
 // component/homepage/statistics
     .page-visits {
-        border: solid 1px #eee;
+        border: solid 1px @lgrey;
         border-top: none;
         min-height: 100px;
     }
@@ -8688,9 +8354,9 @@ img.mimetype {
 
 // component/homepage/navigator
     .navigator {
-        border: solid 1px #eee;
+        border: solid 1px @lgrey;
         border-radius: 4px;
-        background: #FAF9F5;
+        background: @alternate-background;
         height: 40px;
         .star-rating {
             margin: 10px 0 0 10px;
@@ -8726,8 +8392,8 @@ img.mimetype {
                 display: inline;
             }
             select {
-                border: solid 1px #DEDEDE;
-                background: #FDFDFD;
+                border: solid 1px @lgrey;
+                background: @dark;
                 padding: 2px;
             }
             .btn {
@@ -8753,7 +8419,7 @@ img.mimetype {
 
     &:hover {
         text-decoration: none;
-        background-color: @button-hov;
+        background-color: lighten(@positive-color,@lighten-value);
     }
     span {
         display: block;
@@ -8770,8 +8436,8 @@ img.mimetype {
     }
     .prog {
         height: 2px;
-        background: @button-prog-bg;
-        border: solid 1px @button-prog-bdr;
+        .gradient(lighten(@neutral-color,@lighten-value),@neutral-color);
+        border: solid 1px @neutral-color;
         margin: 6px 0 0 0;
     }
 
@@ -8793,13 +8459,13 @@ img.mimetype {
         }
         .name {
             margin-left: 1px;
-            white-space: nowrap;
+            @white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .group {
             margin: 1px;
-            white-space: nowrap;
+            @white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -8812,7 +8478,7 @@ img.mimetype {
         border-bottom: solid 1px @lgrey;
         .name {
             margin-left: 44px;
-            white-space: nowrap;
+            @white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             &.single {
@@ -8822,7 +8488,7 @@ img.mimetype {
         }
         .group {
             margin: 2px 0 0 44px;
-            white-space: nowrap;
+            @white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -8864,7 +8530,7 @@ img.mimetype {
 .colorBox {
     width: 15px;
     height: 15px;
-    border: 1px solid #000;
+    border: 1px solid @black;
     cursor: pointer;
 }
 .selected {
@@ -8880,7 +8546,7 @@ div.colours p {
 
 /* component/dashboard/slideshow  */
 #galleryCycle {
-    border: 1px solid #dbdbdb;
+    border: 1px solid @lgrey;
     div {
         position: relative;
         img {
@@ -8890,8 +8556,8 @@ div.colours p {
         }
     }
     span {
-        background: #576369;
-        color: #fff;
+        background: @secondary-text;
+        color: @white;
         display: none;
         width: 100%;
         position: absolute;
@@ -8921,7 +8587,7 @@ div.colours p {
         }
     }
     .orderby {
-        background: #dfdfdf;
+        background: @lgrey;
     }
     .archive {
         .pagination {
@@ -8939,7 +8605,7 @@ div.colours p {
             padding-bottom: 5px;
         }
         input[type="text"] {
-            border: solid 1px #ccc;
+            border: solid 1px @std-grey;
             margin-top: 5px;
         }
         ul li {
@@ -8971,7 +8637,7 @@ div.colours p {
         display: inline;
     }
     .default {
-        border: solid 1px #ccc;
+        border: solid 1px @std-grey;
     }
 }
 
@@ -9015,17 +8681,17 @@ div.colours p {
         }
     }
     .prompt {
-        color: #bbb;
+        color: @std-grey;
     }
     .hidden {
         display: none;
     }
     .err {
         code {
-            color: #c00;
+            color: @negative-color;
         }
         input {
-            border: solid 1px #c00;
+            border: solid 1px @negative-color;
         }
     }
     #add-set {
@@ -9035,7 +8701,7 @@ div.colours p {
         width: 300px;
     }
     input {
-        border: solid 1px #ccc;
+        border: solid 1px @std-grey;
         padding: 2px;
         width: 250px;
         margin-left: 10px;
@@ -9046,7 +8712,7 @@ div.colours p {
     #err-expl {
         margin-top: 26px;
         display: none;
-        color: #c00;
+        color: @negative-color;
     }
 }
 
@@ -9069,11 +8735,11 @@ div.colours p {
  ******************/
 #returnWorkForm {
     .err {
-        color: #C00;
-        border: solid 1px #C00;
+        color: @negative-color;
+        border: solid 1px @negative-color;
         padding: 2px 10px;
         margin-top: 4px;
-        background: #FFEFEF;
+        background: lighten(@highlight-color,@lighten-value);
     }
 }
 
@@ -9099,7 +8765,7 @@ div.colours p {
     width: 100%;
     padding: 0px 2px;
     font-size: 9px;
-    color: #333;
+    color: @secondary-text;
 }
 .combobox_button {
     -webkit-border-radius: 0 4px 4px 0;
@@ -9108,21 +8774,21 @@ div.colours p {
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    background: #ccc;
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #ccc), color-stop(0.6, #eee));
-    background-image: -webkit-linear-gradient(center bottom, #ccc 0%, #eee 60%);
-    background-image: -moz-linear-gradient(center bottom, #ccc 0%, #eee 60%);
-    background-image: -o-linear-gradient(bottom, #ccc 0%, #eee 60%);
-    background-image: -ms-linear-gradient(top, #cccccc 0%,#eeeeee 60%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cccccc', endColorstr='#eeeeee',GradientType=0 );
-    background-image: linear-gradient(top, #cccccc 0%,#eeeeee 60%);
+    background: @std-grey;
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, @std-grey), color-stop(0.6, @lgrey));
+    background-image: -webkit-linear-gradient(center bottom, @std-grey 0%, @lgrey 60%);
+    background-image: -moz-linear-gradient(center bottom, @std-grey 0%, @lgrey 60%);
+    background-image: -o-linear-gradient(bottom, @std-grey 0%, @lgrey 60%);
+    background-image: -ms-linear-gradient(top, @std-grey 0%,@lgrey 60%);
+    filter: "progid:DXImageTransform.Microsoft.gradient( startColorstr='@{std-grey}', endColorstr='@{lgrey}',GradientType=0 )";
+    background-image: linear-gradient(top, @std-grey 0%,@lgrey 60%);
     position: absolute;
     right: 0;
     top: 0;
     display: block;
     height: 100%;
     width: 18px;
-    border: solid 1px #CCC;
+    border: solid 1px @std-grey;
     border-left: none;
 }
 
@@ -9135,7 +8801,7 @@ div.colours p {
 }
 
 .combobox_selector {
-    background-color: #EEE;
+    background-color: @lgrey;
     font-size: 12px;
     z-index: 1000;
     max-height: 200px;
@@ -9146,7 +8812,7 @@ div.colours p {
     padding: 0;
     margin: 0;
     list-style: none;
-    border:1px solid #CCC;
+    border:1px solid @std-grey;
 }
 
 .combobox_selector li {
@@ -9156,8 +8822,8 @@ div.colours p {
 
 .combobox_selector li:hover,
 .combobox_selector li.selected {
-    background-color: #0066CC;
-    color: #FFF;
+    background-color: @link;
+    color: @white;
 }
 
 .markForm input[type=text] {
@@ -9212,8 +8878,8 @@ table img { max-width: none; }
 ***********************/
 
 .no-height {
-    height: 0;
-    min-height: 0;
+    height: 0 !important;
+    min-height: 0 !important;
 }
 
 // styles common to popup divs
@@ -9291,10 +8957,10 @@ table img { max-width: none; }
         top: 3px;
         right: 10px;
         font-size: 20px;
-        color: #555;
+        color: @secondary-text;
     }
     #calendarBubbleAttendanceIcon {
-        color: #333;
+        color: @secondary-text;
         margin: 0;
         padding-right: 20px;
     }
@@ -9421,7 +9087,7 @@ table img { max-width: none; }
             &.fc-button-today {
                 color: @black;
                 &.fc-state-disabled {
-                    color: #797979;
+                    color: @dgrey;
                 }
             }
         }
@@ -9430,15 +9096,15 @@ table img { max-width: none; }
             font-weight: normal;
             &.filters {
                 &.engaged {
-                    background-color: #FDFDFD;
+                    background-color: @dark;
                     span {
                         display: block;
                         top: 22px;
                         left: -1px;
                         width: 100%;
                         height: 6px;
-                        background: #FDFDFD;
-                        border: solid 1px #D1D1D1;
+                        background: @dark;
+                        border: solid 1px @lgrey;
                         border-top-width: 0;
                         border-bottom-width: 0;
                     }
@@ -9478,8 +9144,8 @@ table img { max-width: none; }
     .fc-widget-header {
         font-weight: bold;
         color: black;
-        border-right: 1px solid #EEE;
-        border-bottom: 1px solid #D5D5D5;
+        border-right: 1px solid @lgrey;
+        border-bottom: 1px solid @dark;
         padding: 7px 5px;
         background: @dark;
     }
@@ -9491,7 +9157,7 @@ table img { max-width: none; }
     right: 0px;
     .filter-list {
         background: rgba(255, 255, 255, 0.9);
-        border: solid 1px #E7E7E7;
+        border: solid 1px @lgrey ;
         border-top-width: 0;
         .filter-cat {
             position: relative;
@@ -9539,7 +9205,7 @@ table img { max-width: none; }
 	width: auto;
 	padding-left: 280px;
 	background: rgba(255,255,255,0.7);
-	text-shadow: 0 0 16px #fff;
+	text-shadow: 0 0 16px @white;
 	position: absolute; bottom: 0; left: 0; right: 0; top: auto;
 	h1 {
 		margin-top: 16px;
@@ -9548,7 +9214,7 @@ table img { max-width: none; }
 	img {
 		position: absolute;
 		bottom: -32px; left: 40px;
-		border: 12px solid #fff;
+		border: 12px solid @white;
 	}
 }
 .profile-banner .background {
@@ -9565,7 +9231,7 @@ table img { max-width: none; }
 	width: 100%;
 	.title { font-weight: bold; }
 	td {
-		color: #797979;
+		color: @dgrey;
 		vertical-align: top;
 	}
 	.grade {
@@ -9580,7 +9246,7 @@ table img { max-width: none; }
 		.icons { height: 20px; line-height: 0; }
 	}
 }
-.listing.photos img { width: 32.9%; height: auto; vertical-align: middle; }
+.listing.photos img { width: 32.9%; height: auto; }
 #coverphoto-form input { display: none; visibility: hidden; }
 
 /* *
@@ -9644,4 +9310,300 @@ table img { max-width: none; }
   #subject-graph      { height: 250px;
                         margin: 20px 0;
   }
+}
+
+@media print {
+/*********** CALENDAR WEEK VIEW
+******************************/
+
+	@page {size:landscape}
+
+	body{font-family:Arial, Helvetica, sans-serif;font-size:10px !important;}
+	#container{margin:0; width:100% !important; }
+	#calendar h3{float:none; width:100%;text-align:center; font-weight:bold;}
+	#calendar { height:100%; }
+	#calendar table { vertical-align:top; font-size:10px; width:100%;}
+	#calendar table td{vertical-align:top; text-align:left; font-size:10px; width:14.2%}
+	#calendar table td.dark{padding:4px; text-align:center; background-color:@black }
+
+	#nav, #tabs, #header, #footer, .link-case, .datepicker-box, .header_option, .back, .forward, .dates, .note, .btn, .created,
+	.calendar-controls .float-left, .calendar-controls .float-right
+	{display:none;}
+	.cal-mid h3{font-size:16px !important; font-weight:bold; margin-bottom:16px;}
+	.cal-bubble{display:none;}
+	.day-num{display:block; }
+	.day-block{border-right:1px solid @std-grey; width:14.2%;}
+	.otherMonth{background-color:black}
+	.day-block ul.js_happening{margin:0;margin-top:3px; padding:0; display:block;font-size:10px}
+	.calendar-controls h3{float:none;}
+	.day-block ul.js_happening li{
+		display:block;
+		padding:3px;
+		margin:0;
+	}
+
+	.clearfix:after {
+		display:none;
+	}
+
+	.dayWrap{height:auto; display:block;padding:3px;border:1px solid @black; border-left:0; border-right:0;}
+	.otherMonth .dayWrap{border-color:@std-grey;}
+	.day-block ul.js_happening li span{display:none}
+	.day-block ul.js_happening li h4 span.time{display:block;font-size:10px !important;}
+	.calTable, .calTableCurrent{}
+	.time{ font-weight:bold; }
+	.hidden-fields{display:block;font-size:10px !important;border:1px solid @dgrey;padding:4px; margin:0;}
+	.otherMonth .hidden-fields{border:1px dashed @std-grey}
+	p, li{margin:0;}
+	.meta, .modify-event{display:none;}
+	.noteWrap{display:block;  margin:0;}
+	h1, h2, h3, h4, h5, h6 {
+		font-weight: normal;
+		margin: 0;
+		position: relative;
+		width:100%;
+		font-size:10px;
+	}
+	h3{font-size:16px;}
+	h4{font-size:10px;}
+
+
+	/*********** DIRECTORY (PARENT AND STUDENT)
+	******************************/
+	.directory h1{
+		font-size:16px;
+		font-weight:bold;
+		border-bottom: 2px double black;
+	}
+
+	.directory h2{
+		font-size:12px;
+		padding:4px;
+		border-bottom:1px black solid;
+	}
+
+	.directory .private h2:after{
+		content: '    *Details have not been made available';
+		font-size:10px;
+		color:@lgrey;
+	}
+	.directory .contact {
+		page-break-inside: avoid;
+		margin-bottom:0px;
+	}
+
+	.directory .contact table{border-collapse: collapse;}
+	.directory .contact{ margin-bottom:16px; float:left; width:100%;}
+	.directory .contact td{border:1px solid @lgrey;}
+	.directory .primary,
+	.directory .spouse{
+		float:left;
+		width:45%;
+		margin:8px 8px 0 8px;
+		padding-bottom:4px;
+	}
+
+	/*********** SORTABLE TABLES (incl leave report)
+	******************************/
+	#letterhead img {
+		position:absolute;
+		top: 0;
+		left: 0;
+		height: 120px;
+		width:95px;
+	}
+
+	.leave-pending {
+		color: @std-grey;
+		font-style: italic;
+	}
+}
+
+/*
+ * Borders & Backgrounds
+ */
+#category ul li a:hover,
+.dark,
+.dark td,
+#tree .dark,
+.standardForm,
+#assess .standardForm,
+#assess .additional-details,
+#assess .assess-body,
+.blog-comments .box,
+.post-left,
+#category,
+#tabs-homepage .customise-components,
+.mark-sheet.assessments .dark td,
+.search-item:nth-child(2n){
+	background: none repeat scroll 0 0 @dark;
+}
+#category li a { padding: 4px 16px; }
+#category li a.selected,
+#tabs-sub li.ui-tabs-selected a {
+	background:@tab-background; color:@white; font-weight: normal;
+}
+
+#category li a:hover{
+	background:@tab-background;
+	color:@white;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+}
+.standardForm td {
+	border-bottom: 1px solid @border-color;
+}
+
+.calendar table .dark,
+.otherMonth,
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
+{
+	background: @dark;
+}
+
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark,
+table tr,
+.listing li,
+.listing .subject-list li,
+.listing .subject-list a,
+.listing .subject-list a.teacher,
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
+{
+	border-color: @border-color;
+}
+.calendar table thead th,
+#calendar table th.dark,
+.timetable thead th
+{
+	border-bottom-color: @border-color;
+}
+
+.ui-widget {
+	tr { border: 0; }
+	td { background: none; }
+}
+
+/* Socialstream */
+.addPostForm {
+	background: @dark;
+	border-bottom: 1px solid @border-color;
+	p { margin: 0 16px; }
+}
+.socialstream-form {
+	width: 100%;
+	margin: 0;
+	li {
+		padding: 7px 16px 0 12px  !important;
+	}
+	label {
+		padding-right: 0;
+		input, .socialstream-selected-file {
+			width: 75%;
+			float: right;
+			.ellipsis;
+		}
+	}
+	textarea { width: 100%; }
+}
+
+.socialstream-post {
+	.socialstream-comment,
+	.socialstream-reply {
+		padding: 3px 0 3px 8px;
+		border: 4px solid transparent;
+		border-left-color: @border-color;
+		border-right-width: 0;
+	}
+}
+.socialstream-attachment {
+	border: 1px solid darken(@alternate-background,@darken-value);
+	background: @alternate-background;
+	margin-top: 16px;
+	padding: 8px 8px 4px;
+	display: block;
+	.description {
+		margin-bottom: 8px;
+		font-style: italic;
+	}
+	a {
+		font-weight: bold;
+		word-break: break-word;
+	}
+	img {
+		float: left;
+		margin: 0 16px 8px 0;
+	}
+	iframe {
+		max-width: 100%;
+		height: auto;
+		min-height: 30%;
+	}
+}
+
+/* Socialstream Browser
+ */
+.socialstream-node li {
+	list-style: none;
+}
+.socialstream-node li a {
+	display: block;
+	padding: 5px 4px;
+	line-height: 22px;
+	.ellipsis;
+	img {
+		float: left;
+		margin-right: 6px;
+	}
+}
+.breadcrumb {
+	li { display: inline; list-style: none;}
+	a {
+		padding: 4px 5px 4px 10px;
+		background: @dark;
+		border: 1px solid @border-color;
+		position: relative;
+		margin-right: -6px;
+		line-height: 26px;
+		white-space: nowrap;
+		&:before, &:after {
+			content: '';
+			.block(0,0);
+			.absolute(-1px, auto, auto, -12px);
+			border: 10px solid transparent;
+			border-width: 13px 6px;
+			border-left-color: @border-color;
+			z-index: 1;
+		}
+		&:after {
+			border-left-color: @dark;
+			right: -11px;
+		}
+		&:hover {
+			color: @tab-color;
+			background: @tab-background;
+			border-color: @tab-background;
+			&:before, &:after { border-left-color: @tab-background; }
+		}
+	}
+	.last a {
+		border: none;
+		background: none;
+		color: @secondary-text;
+		&:before, &:after {
+			display: none;
+		}
+		&:hover { color: @secondary-text; }
+	}
 }

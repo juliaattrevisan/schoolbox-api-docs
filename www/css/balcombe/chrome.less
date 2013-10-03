@@ -11,9 +11,61 @@
 //*                                     #/
 //*/
 // =============================================================================
-@import "../core/variables.less";
+// 1. Load dependencies
+// =============================================================================
 @import "../core/mixins.less";
-@import "../core/chrome.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width: 					109px;
+@logo-height: 					128px;
+
+// Generic colors
+@body-background: 				#FFFFFF; // Body, but not the content area
+@dark: 							#F0F7FE; // Alternate tigerstriping color
+@alternate-background: 			#F0F7FE; // Sections such as admin
+
+// Basic type
+@link: 							#696B73;
+@link-hover: 					#696B73;
+
+// Main banner
+//@banner-background: 			transparent;
+@banner-color:      			#B7B9BF;
+@banner-links:      			#FFFFFF;
+@banner-height:     			143px;
+
+// Modules
+@module-heading: 				#696B73;
+@module-background: 			#EAEAEB;
+
+// Refers to the left navigation
+@navigation-width:				224px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			#FFFFFF;
+@navigation-links:  			#FFFFFF;
+@navigation-hover-background: 	@link;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@body-background;
+
+// Main "Tab" Navigation
+@tab-background:				#B81237;
+@tab-color:						#FFFFFF;
+@tab-hover-background:			transparent;
+@tab-hover-color:				@tab-color;
+
+// Footer text
+@footer-color:					#696B73;
+@footer-links:					@footer-color;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
