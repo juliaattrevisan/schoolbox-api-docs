@@ -94,9 +94,17 @@ then
 	exit;
 fi
 
-echo "Backing up database before changes";
-mkdir -p $backupdir;
-mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+# Only run DB backup if not completed in the last hour
+existingbackup=$(ls -1 $backupdir/$sqlver-`date +%Y-%m-%d_%H-`*.sql 2>/dev/null);
+if [[ (-f $existingbackup) && (! -z $existingbackup) ]];
+then
+	echo "Backup already completed";
+	backupfile=$existingbackup;
+else
+	echo "Backing up database before changes";
+	mkdir -p $backupdir;
+	mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+fi
 
 echo "Updating database to new version";
 errorint=0;
@@ -155,7 +163,7 @@ do
 	fi
 done
 
-echo "Backup of database at version $sqlver located at: $backupfile";
+echo "Backup of database located at: $backupfile";
 
 if [ $errorint -ne 0 ];
 then
