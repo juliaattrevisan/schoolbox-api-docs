@@ -59,6 +59,50 @@ class InstanceCompletionMapper extends Mapper {
     }
 
     /**
+     * Sets this task instance as having been completed by the student.
+     *
+     * If the task instance requires confirmation, then it's marked off as that,
+     * otherwise it's marked off as complete.
+     *
+     * @param int $task_instance_id
+     * @param int $student_id
+     *
+     * @return array
+     */
+    public function markAsCompleted($task_instance_id, $student_id) {
+
+        // Is there already a completion record for this item? If so, don't
+        // create a new one.
+        $existing = $this->findByColumnList(
+            array(
+                'task_instance_id' => $task_instance_id,
+                'student_id'       => $student_id,
+            ),
+            array('limit' => 1)
+        );
+        if (count($existing) > 0) {
+            return array();
+        }
+
+        // Get the related task instance (should it have been passed?) for the
+        // completion status to set.
+        $task_instance = $this->getJoinMapper('task_instance')->findById($task_instance_id);
+        $model = new InstanceCompletion();
+        $model
+            ->setTaskInstance($task_instance_id)
+            ->setStudent($student_id)
+            ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
+            ->setCompletionStatus(
+                $task_instance->getRequiresConfirmation() ?
+                    InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
+                    InstanceCompletion::COMPLETION_STATUS_COMPLETE
+            )
+        ;
+
+        return $this->save($model);
+    }
+
+    /**
      * Retrieves the most recent completions for each task instance in
      * $task_instance_id_list.
      *
@@ -94,6 +138,9 @@ class InstanceCompletionMapper extends Mapper {
             $where_parts[]     = 'ti.student_id = :student';
             $params['student'] = $student_id;
         }
+        $where_parts[]            = 'ti.completion_status != :exclude_status';
+        $params['exclude_status'] = InstanceCompletion::COMPLETION_STATUS_INCOMPLETE;
+
         $statement = $this->getDatabase()->prepare($query . ' WHERE ' . implode(' AND ', $where_parts));
         $statement->execute($params);
 
