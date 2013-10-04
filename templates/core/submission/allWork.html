@@ -114,12 +114,12 @@
     color: #797979;
     display: block;
   }
-  #create-comment div {
+  form.comment-form div {
     width: 300px;
     float: right;
     line-height: 2.6em;
   }
-  #create-comment label {
+  form.comment-form label {
     display: inline;
   }
   .actions {
@@ -138,6 +138,10 @@
   .visibility.student.off { background-position: 0 24px; }
   .visibility.parent.on   { background-position: 24px 0; }
   .visibility.parent.off  { background-position: 24px 24px; }
+
+  .locked {
+    opacity: 0.5;
+  }
 
 </style>
 <script type="text/javascript" src="/javascript/excanvas.compiled.js"></script>
@@ -275,7 +279,7 @@
     <div class="subject-comments">
       <h2>Comments</h2>
       <div class="listing">
-        <table class="comments">
+        <table class="comments" id="comment-table">
           <colgroup>
             <col width="1%" />
             <col width="10%" />
@@ -291,7 +295,7 @@
                 <span class="group">{SESSION_USER_BYLINE}</span>
               </td>
               <td colspan="2">
-                <form id="create-comment" action="/submission/commentForm.php" method="post">
+                <form id="create-comment" class="comment-form" action="/submission/commentForm.php" method="post">
                   <input type="hidden" name="year" value="{WORK_YEAR}" />
                   <input type="hidden" name="semester" value="{WORK_SEMESTER}" />
                   <input type="hidden" name="studentId" value="{WORK_USER_ID}" />
@@ -310,7 +314,7 @@
             </tr>
             <!-- END create_comment -->
             <!-- BEGIN comment -->
-            <tr>
+            <tr data-id="{COMMENT_ID}">
               <td><img class="thumb" src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square32"></td>
               <td>
                 <span class="name">{COMMENT_USER_NAME}</span>
@@ -392,5 +396,114 @@
       return false;
     })
 
+    $j('#comment-table').delegate('a.btn.no-text', 'click', function() {
+      // if a button on the table is clicked, find out its context and function, and execute
+      var btn = $j(this);
+      var row = btn.closest('tr');
+      var commentId = row.data('id');
+
+      if(btn.hasClass('modify')) {
+        row.addClass('locked');
+        // retrieve comment
+        $j.ajax({
+          type : 'GET',
+          url : '/ajax/comment.php',
+          data : { commentId : commentId },
+          success : function(data) {
+            // on success, replace row elements with form inputs
+            var editForm = $j('#create-comment').clone();
+            editForm.removeAttr('id');
+            editForm.addClass('edit-comment');
+            editForm.find('a.submit-this').html('<span></span>Update');
+            editForm.find('textarea').text(data.body);
+            $j.each(['vis-student','vis-parent'], function(k, v) {
+              editForm.find('#'+v).attr('id', v+'-'+commentId);
+              editForm.find('label[for='+v+']').attr('for', v+'-'+commentId);
+            });
+            editForm.prepend(
+                $j('<input type="hidden" />').attr('name', 'commentId').attr('value', commentId)
+            );
+
+            // safety check
+            if(data.visibility) {
+              var svis = editForm.find('input.visibility.student');
+              var pvis = editForm.find('input.visibility.parent');
+
+              if(data.visibility.student) {
+                svis.attr('checked', 'checked');
+              }
+              else {
+                svis.removeAttr('checked');
+              }
+
+              if(data.visibility.parent) {
+                pvis.attr('checked', 'checked');
+              }
+              else {
+                pvis.removeAttr('checked');
+              }
+            }
+
+            row.find('td.actions').remove();
+            row.find('td').last().attr('colspan', '2').html(editForm);
+            row.removeClass('locked');
+          },
+          error : function(xhr) {
+            // on failure, indicate failure
+            row.removeClass('locked');
+            alert(xhr.responseText);
+          }
+        });
+      }
+      else if(btn.hasClass('delete')) {
+        row.addClass('locked');
+        // confirm deletion
+        if(window.confirm('Are you sure you want to delete this comment?')) {
+          $j.ajax({
+            type : 'POST',
+            url : '/ajax/comment.php',
+            data : { commentId : commentId, deleteComment : true },
+            success : function() {
+              row.hide(500, function() { row.remove(); });
+            },
+            error : function(xhr) {
+              // inform the user that it failed
+              alert(xhr.responseText);
+              row.removeClass('locked');
+            }
+          });
+        }
+        else {
+          row.removeClass('locked');
+        }
+      }
+    });
+
+    $j('#comment-table').delegate('form.edit-comment a.submit-this', 'click', function() {
+      var form = $j(this).closest('form');
+      var commentId = form.closest('tr').data('id');
+
+      var data = {
+        commentId : form.find('input[name=commentId]').val(),
+        commentBody : form.find('textarea').val(),
+        studentVisibility : form.find('#vis-student-'+commentId).is(':checked') ? 1 : 0,
+        parentVisibility : form.find('#vis-parent-'+commentId).is(':checked') ? 1 : 0
+      };
+
+      // submit the form
+      $j.ajax({
+        type : 'POST',
+        url : '/ajax/comment.php',
+        data : data,
+        success : function() {
+          // later this will be a nice ajax visual update, but for now just reload the page
+          window.location.reload();
+        },
+        error : function(xhr) {
+          // inform the user that it failed
+          alert(xhr.responseText);
+        }
+      });
+    });
   });
 </script>
