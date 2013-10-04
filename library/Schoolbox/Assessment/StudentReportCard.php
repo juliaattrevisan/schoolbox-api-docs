@@ -853,6 +853,7 @@ class StudentReportCard {
 					'USER_BYLINE' => $comment->getCommenter()->getRole(),
 					'USER_EXTID' => $comment->getCommenter()->getExternalId(),
 					'DATE' => $date,
+					'DATETIME' => $adr->getDatabase(),
 					'BODY' => $comment->getBody(),
 				);
 
