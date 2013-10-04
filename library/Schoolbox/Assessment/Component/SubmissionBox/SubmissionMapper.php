@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Resource\Exception;
 use \External_User;
 
@@ -260,16 +261,30 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		return $submission;
 	}
 
-
 	/**
-	 * Copies file from temp location into a location accessible by this model.
+	 * Post-save callback for Submission models.
+	 *
+	 * Peforms the following actions:
+	 * * Copies file from temp location into a location accessible by this model
+	 * * Saves a task completion for this submission's user, if there's a task
+	 *   related to this submission box.
 	 *
 	 * @param Submission $object
+	 * @param bool       $is_new
 	 */
-	public function postSave(Submission $object) {
+	public function postSave(Submission $object, $is_new = false) {
 		$object->copyFromTempLocation();
+		if ($is_new && !$object->getDraft()) {
+			// Attempt to save a task instance entry for this item.
+			$submission_box   = $this->getJoinMapper('submission_box')->findById($object->getSubmissionBox()->getId());
+			$task_instance_id = $submission_box->getTaskInstance()->getId();
+			if (isset($task_instance_id)) {
+				Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+					$task_instance_id, $object->getOwner()->getId()
+				);
+			}
+		}
 	}
-
 
 	/**
 	 * Port of SubmissionStudent handler's securityCheck() method.
