@@ -152,6 +152,12 @@ rm -fR %{buildroot}%{_datadir}/%{name}/www/test
 # Build default config paths for packaged install
 %{buildroot}%{_datadir}/%{name}/tools/generate-dir-sql.sh %{_localstatedir}/lib/%{name} %{_datadir}/%{name} > %{buildroot}%{_datadir}/%{name}/sql/%{name}-package-config.sql
 
+%pre
+# If a DB backup script has been previously shipped, use it
+if [ -f %{_datadir}/%{name}/tools/backup-database.sh ]; then
+	%{_datadir}/%{name}/tools/backup-database.sh;
+fi
+
 %post
 # Fix ownership and permissions of existing configuration.
 if [ -f %{_sysconfdir}/%{name}/conf.php ]; then
@@ -159,20 +165,20 @@ if [ -f %{_sysconfdir}/%{name}/conf.php ]; then
 	chmod 0644 %{_sysconfdir}/%{name}/conf.php;
 fi
 chown -R alaress:alaress %{_datadir}/%{name};
-/usr/share/%{name}/tools/create-data-dirs.sh /%{_localstatedir}/lib/%{name};
-/usr/share/%{name}/tools/set-data-dir-perms.sh /%{_localstatedir}/lib/%{name} apache;
-/usr/share/%{name}/tools/update-sql.sh;
-/usr/share/%{name}/tools/clean-cache-dir.sh;
+%{_datadir}/%{name}/tools/create-data-dirs.sh /%{_localstatedir}/lib/%{name};
+%{_datadir}/%{name}/tools/set-data-dir-perms.sh /%{_localstatedir}/lib/%{name} apache;
+%{_datadir}/%{name}/tools/update-sql.sh;
+%{_datadir}/%{name}/tools/clean-cache-dir.sh;
 rm -f /usr/share/%{name}/www/.htaccess;
 service httpd restart;
 
 %post leave
 chown -R alaress:alaress %{_datadir}/%{name};
-/usr/share/%{name}/tools/module.sh install leave;
+%{_datadir}/%{name}/tools/module.sh install leave;
 
 %post mobile
 chown -R alaress:alaress %{_datadir}/%{name};
-/usr/share/%{name}/tools/module.sh install mobile;
+%{_datadir}/%{name}/tools/module.sh install mobile;
 
 %files
 %{_datadir}/%{name}
