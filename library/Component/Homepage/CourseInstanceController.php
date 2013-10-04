@@ -92,16 +92,17 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar('COMPONENT_NAME',  $this->getConfig('componentname'));
         $this->setVar('COURSE_HOMEPAGE', str_replace('/homepage/', '', Config::get('course_homepage')));
 
-        $this->setBlock($templateHandle,  'course_selector',    'course_selector_block');
-        $this->setBlock($templateHandle,  'unit_list',          'unit_list_block');
-        $this->setBlock('unit_list',      'unit',               'unit_block');
-        $this->setBlock('unit',           'unit_expand',        'unit_expand_block');
-        $this->setBlock('unit',           'unit_no_expand',     'unit_no_expand_block');
-        $this->setBlock('unit',           'unit_completion',    'unit_completion_block');
-        $this->setBlock('unit',           'unit_task',          'unit_task_block');
-        $this->setBlock('unit_task',      'unit_task_link',     'unit_task_link_block');
-        $this->setBlock('unit_task',      'unit_task_no_link',  'unit_task_no_link_block');
-        $this->setBlock('unit_task',      'unit_task_count',    'unit_task_count_block');
+        $this->setBlock($templateHandle,  'course_selector',      'course_selector_block');
+        $this->setBlock($templateHandle,  'unit_list',            'unit_list_block');
+        $this->setBlock('unit_list',      'unit',                 'unit_block');
+        $this->setBlock('unit',           'unit_expand',          'unit_expand_block');
+        $this->setBlock('unit',           'unit_no_expand',       'unit_no_expand_block');
+        $this->setBlock('unit',           'unit_completion',      'unit_completion_block');
+        $this->setBlock('unit',           'unit_task',            'unit_task_block');
+        $this->setBlock('unit_task',      'unit_task_link',       'unit_task_link_block');
+        $this->setBlock('unit_task',      'unit_task_no_link',    'unit_task_no_link_block');
+        $this->setBlock('unit_task',      'unit_task_count',      'unit_task_count_block');
+        $this->setBlock('unit_task',      'unit_task_completion', 'unit_task_completion_block');
 
 
         $this->setVar('course_selector_block', '');
@@ -227,15 +228,17 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                         $gradient       = round($complete_count / $student_count * 10);
                         $this->setVar(
                             array(
-                                'UNIT_TASK_ID'               => Scrub::text($task->getId()),
-                                'UNIT_TASK_NAME'             => Scrub::text($task->getTitle()),
-                                'UNIT_TASK_CLASS'            => Scrub::text($task->getIconClass()),
-                                'UNIT_TASK_TYPE_LABEL'       => Scrub::text($task->getLabel()),
-                                'UNIT_TASK_COMPLETION_COUNT' => $complete_count,
-                                'UNIT_TASK_GRADIENT'         => $gradient,
-                                'unit_task_link_block'       => '',
-                                'unit_task_no_link_block'    => '',
-                                'unit_task_count_block'      => '',
+                                'UNIT_TASK_ID'                => Scrub::text($task->getId()),
+                                'UNIT_TASK_NAME'              => Scrub::text($task->getTitle()),
+                                'UNIT_TASK_CLASS'             => Scrub::text($task->getIconClass()),
+                                'UNIT_TASK_TYPE_LABEL'        => Scrub::text($task->getLabel()),
+                                'UNIT_TASK_COMPLETION_COUNT'  => $complete_count,
+                                'UNIT_TASK_GRADIENT'          => $gradient,
+                                'UNIT_TASK_COMPLETION_STATUS' => '',
+                                'unit_task_link_block'        => '',
+                                'unit_task_no_link_block'     => '',
+                                'unit_task_count_block'       => '',
+                                'unit_task_completion_block'  => '',
                             )
                         );
 
@@ -249,10 +252,12 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
                         // Teacher sees the number of students that have completed
                         // this task, nobody else does.
-                        if (!$this->is_student) {
+                        if ($this->is_student) {
+                            $this->parse('unit_task_completion_block', 'unit_task_completion');
+                        }
+                        else {
                             $this->parse('unit_task_count_block', 'unit_task_count');
                         }
-
                         $this->parse('unit_task_block', 'unit_task', true);
                     }
                 }
