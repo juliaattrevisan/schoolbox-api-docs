@@ -400,7 +400,7 @@ class SitePage extends Page {
                     $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] == 7 || $_SESSION['gid'] == '8') ||
                     $this->site == 'joeys' ||
                     $this->site == 'cathedral' ||
-                    ($this->site == 'jpc' || $this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk' || $this->site == 'balcombe') && ($this->groupHandler->isStaff(
+                    ($this->site == 'jpc' || $this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk' || $this->site == 'balcombe' || $this->site == 'cedars') && ($this->groupHandler->isStaff(
                     ) || $this->groupHandler->isStudent())
             )
         ) {
@@ -473,10 +473,26 @@ class SitePage extends Page {
                                                 'href="https://webmail.saintkentigern.com/owa" rel="external"'
                                             );
                                         } else {
-                                            $this->setVar(
-                                                'WEBMAIL_LOCATION',
-                                                'href="' . Cfg::get('mail_webmail') . '" rel="external"'
-                                            );
+                                            if ($this->site == 'cedars') {
+                                                if ($this->groupHandler->isStaff()) {
+                                                    $this->setVar(
+                                                        'WEBMAIL_LOCATION',
+                                                        'href="https://mail.cedars.nsw.edu.au/owa" rel="external"'
+                                                    );
+                                                } else {
+                                                    if ($this->groupHandler->isStudent()) {
+                                                        $this->setVar(
+                                                            'WEBMAIL_LOCATION',
+                                                            'href="https://portal.microsoftonline.com" rel="external"'
+                                                        );
+                                                    }
+                                                }
+                                            } else {
+                                                $this->setVar(
+                                                    'WEBMAIL_LOCATION',
+                                                    'href="' . Cfg::get('mail_webmail') . '" rel="external"'
+                                                );
+                                            }
                                         }
                                     }
                                 }
