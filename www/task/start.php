@@ -73,18 +73,9 @@ switch ($task->getType()) {
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
         if ($group_handler->isStudent()) {
-            $instance = new Task\InstanceCompletion();
-            $instance
-                ->setTaskInstance($task)
-                ->setStudent($_SESSION['id'])
-                ->setCompletionDate(new Alaress_Date_Format(new DateTime()))
-                ->setCompletionStatus(
-                    $task->getRequiresConfirmation() ?
-                        $instance::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                        $instance::COMPLETION_STATUS_COMPLETE
-                )
-            ;
-            Task\InstanceCompletionMapper::getInstance()->save($instance);
+            Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+                $task->getId(), $_SESSION['id']
+            );
         }
 
         $link = $task->getLink();

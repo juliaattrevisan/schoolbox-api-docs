@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Course\Task;
+
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $questionHandler = new Assess_Question();
@@ -68,6 +70,14 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ATTEMPT_END' => $attemptFinishDate->getShort(),
     ));
+
+    // Does this item have a task instance associated? if so, set it as
+    // completed (pending, instead of completed?)
+    if (!empty($assess['task_instance_id'])) {
+        Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+            $assess['task_instance_id'], $attempt['user_id']
+        );
+    }
 
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
