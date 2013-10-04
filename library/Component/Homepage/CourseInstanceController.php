@@ -204,17 +204,20 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
                         // Students only:
                         // Output whether this item is complete.
-                        $unit_task_class = '';
+                        $unit_task_class  = '';
+                        $unit_task_status = '';
                         if ($this->is_student) {
                             $unit_task_class = 'incomplete';
                             $completion_item = $grouped_list[$task->getId()][$_SESSION['id']];
                             if ($completion_item instanceof Task\InstanceCompletion) {
                                 switch ($completion_item->getCompletionStatus()) {
                                     case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
-                                        $unit_task_class = 'complete';
+                                        $unit_task_class  = 'complete';
+                                        $unit_task_status = 'Complete';
                                         break;
                                     case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                                        $unit_task_class = 'pending';
+                                        $unit_task_class  = 'pending';
+                                        $unit_task_status = 'Pending';
                                         break;
                                     case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
                                     default:
@@ -234,7 +237,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                                 'UNIT_TASK_TYPE_LABEL'        => Scrub::text($task->getLabel()),
                                 'UNIT_TASK_COMPLETION_COUNT'  => $complete_count,
                                 'UNIT_TASK_GRADIENT'          => $gradient,
-                                'UNIT_TASK_COMPLETION_STATUS' => '',
+                                'UNIT_TASK_COMPLETION_STATUS' => $unit_task_status,
+                                'UNIT_TASK_COMPLETE_CLASS'    => $unit_task_class,
                                 'unit_task_link_block'        => '',
                                 'unit_task_no_link_block'     => '',
                                 'unit_task_count_block'       => '',
@@ -253,7 +257,9 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                         // Teacher sees the number of students that have completed
                         // this task, nobody else does.
                         if ($this->is_student) {
-                            $this->parse('unit_task_completion_block', 'unit_task_completion');
+                            if ($unit_task_status) {
+                                $this->parse('unit_task_completion_block', 'unit_task_completion');
+                            }
                         }
                         else {
                             $this->parse('unit_task_count_block', 'unit_task_count');
