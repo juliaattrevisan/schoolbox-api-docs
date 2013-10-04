@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
 class InstanceCompletionMapper extends Mapper {
@@ -55,5 +56,47 @@ class InstanceCompletionMapper extends Mapper {
             'this_key'  => 'student_id',
             'other_key' => 'id',
         ));
+    }
+
+    /**
+     * Retrieves the most recent completions for each task instance in
+     * $task_instance_id_list.
+     *
+     * @param int[] $task_instance_id_list
+     * @param int   $student_id
+     *
+     * @return Collection
+     */
+    public function findLatestForList($task_instance_id_list, $student_id = null) {
+        if (empty($task_instance_id_list)) {
+            return $this->createCollection();
+        }
+        $query = "
+            SELECT {$this->getColumnString('ti')}
+            FROM `{$this->getTable()}` `ti`
+            INNER JOIN (
+                    SELECT
+                        `ti_inner`.`task_instance_id`,
+                        `ti_inner`.`student_id`,
+                        MAX(`ti_inner`.`completion_date`) as `completion_date`
+                    FROM `{$this->getTable()}` `ti_inner`
+                    GROUP BY `ti_inner`.`task_instance_id`, `ti_inner`.`student_id`
+                ) `x`
+                ON  `ti`.`task_instance_id` = `x`.`task_instance_id`
+                AND `ti`.`student_id`       = `x`.`student_id`
+                AND `ti`.`completion_date`  = `x`.`completion_date`
+        ";
+        $where_parts = array(
+            'ti.task_instance_id IN '.$this->getArrayPlaceholders($task_instance_id_list, 'ti')
+        );
+        $params = $this->getArrayParameters($task_instance_id_list, 'ti');
+        if (!empty($student_id)) {
+            $where_parts[]     = 'ti.student_id = :student';
+            $params['student'] = $student_id;
+        }
+        $statement = $this->getDatabase()->prepare($query . ' WHERE ' . implode(' AND ', $where_parts));
+        $statement->execute($params);
+
+        return $this->hydrateList($statement, 'ti');
     }
 }
