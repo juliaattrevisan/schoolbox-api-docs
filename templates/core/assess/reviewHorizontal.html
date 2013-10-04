@@ -8,60 +8,80 @@
 	form input[type=text] {
 		border: solid 1px #DBDBDB;
 	}
+
+	div.respondent-attempt {
+		border: 1px solid #0f0;
+		width: 100%;
+		float: left;
+		clear: both;
+	}
+
+	ul.respondent-attempt li.column {
+		width: 200px;
+		border: 1px solid #00f;
+		display: block;
+		float: left;
+	}
 </style>
 <!-- END custom_head -->
 <h1>Horizontal Marking for {ASSESS_TITLE}</h1>
 
-<div style='border:3px dashed #f00;'>
+<div style='border:1px dashed #f00;'>
 	<div class="wysiwyg no-pad clearfix">
 		<h2><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}</h2>
 	</div>
 
-	<div style='border:6px dashed #f00;'>
+	<div style='border:1px dashed #f00;'>
 		<h3>Correct Answer</h3>
 		<!-- BEGIN answerInputsTop -->
 		<!-- END answerInputsTop -->
 	</div>
 
-	<div class="evaluation-content mark-test">
+	<div>
 		<!-- BEGIN attempt -->
-		<script type='text/javascript'>
-			$j(function() {
-				$j('questionForm-{RESPONSE_ID}').evaluationResponseReview({
-					id: {RESPONSE_ID}
+		<div class='respondent-attempt'>
+			<script type='text/javascript'>
+				$j(function() {
+					$j('questionForm-{RESPONSE_ID}').evaluationResponseReview({
+						id: {RESPONSE_ID}
+					});
 				});
-			});
-		</script>
-		<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID} questionForm' method="post">
-			<h1>{USER_LASTNAME}, {USER_FIRSTNAME}</h1>
+			</script>
 
-			<div class="evaluation-answer clearfix">
-				<!-- BEGIN answerInputs -->
-				<!-- END answerInputs -->
-			</div>
-			<!-- BEGIN writable_update -->
-			<label class="alert-holder clearfix">
-				<div class="assess-alert">
-					<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
-				</div>
-				<input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
-			</label>
-			<!-- END writable_update -->
-		</form>
+			<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID} questionForm' method="post">
+				<ul class='respondent-attempt'>
+					<li class='column'>
+						{USER_LASTNAME}, {USER_FIRSTNAME}
+					</li>
+
+					<!-- BEGIN answerInputs -->
+					<!-- END answerInputs -->
+
+					<li class='column'>
+						<!-- BEGIN writable_update -->
+						<input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
+						<!-- END writable_update -->
+					</li>
+				</ul>
+			</form>
+		</div>
 		<!-- END attempt -->
 
 		<p class="clearfix text-align-right">
-			<!-- BEGIN previous_question -->
-			<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'>Previous</a>
-			<!-- END previous_question -->
-
-			<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'>Index</a>
-
 			<!-- BEGIN next_question -->
-			<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'>Next</a>
+			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'>Next</a>
 			<!-- END next_question -->
 
+			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'>Index</a>
+
+			<!-- BEGIN previous_question -->
+			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'>Previous</a>
+			<!-- END previous_question -->
+
 			<!-- BEGIN writable_finalise -->
+			<div class="assess-alert">
+				<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
+			</div>
 			<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise'>Finalise all attempts</a>
 			<!-- END writable_finalise -->
 		</p>
