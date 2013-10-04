@@ -431,6 +431,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 		$correctResponse = preg_replace($pattern, $replace, $currentAnswer['answer']);
 
 		$page->setVar(array(
+			'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
 			'USER_FIRSTNAME' => $currentQuestion['firstname'],
 			'USER_LASTNAME' => $currentQuestion['lastname'],
 			'ANSWER_ID' => $currentAnswer['answer_id'],

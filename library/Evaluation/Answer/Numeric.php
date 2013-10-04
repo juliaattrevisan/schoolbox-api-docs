@@ -288,25 +288,22 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
 		   *
 		   * if ($existing['response'] != null) { ... } else { ... }
 		   */
-		$page->setVar(
-			array(
-				'USER_FIRSTNAME' => $currentQuestion['firstname'],
-				'USER_LASTNAME' => $currentQuestion['lastname'],
-				'ANSWER_ID' => $currentAnswer['answer_id'],
-				'ANSWER' => Scrub::text($existing['response']),
-				'RESPONSE_ID' => $existing['response_id'],
-				'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-				'REVIEWED_MARKS' => $existing['mark'],
-			)
-		);
+		$page->setVar(array(
+			'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+			'USER_FIRSTNAME' => $currentQuestion['firstname'],
+			'USER_LASTNAME' => $currentQuestion['lastname'],
+			'ANSWER_ID' => $currentAnswer['answer_id'],
+			'ANSWER' => Scrub::text($existing['response']),
+			'RESPONSE_ID' => $existing['response_id'],
+			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+			'REVIEWED_MARKS' => $existing['mark'],
+		));
 
 		/* Show correct answer
 		   */
-		$page->setVar(
-			array(
-				'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-			)
-		);
+		$page->setVar(array(
+			'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+		));
 
 		$page->parse('answerOption_block', 'answerOption', true);
 	}
