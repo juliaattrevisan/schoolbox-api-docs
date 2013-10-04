@@ -1049,6 +1049,7 @@ Notifications
 	li {
 		border-bottom: 1px solid @border-color;
 		clear: both;
+		.clearfix;
 	}
 	// Tigerstripe
 	.dark {
@@ -1061,7 +1062,7 @@ Notifications
 	h4 {
 		font-weight: bold;
 	}
-	h4 + p {
+	h3 + p, h4 + p {
 		margin-top: 8px;
 	}
 	// De-emphasise meta information
@@ -1074,7 +1075,6 @@ Notifications
 	}
 	// Floated avatar for authors
 	.author {
-		margin-top: 6px;
 		display: block;
 		img {
 			float: left;
@@ -1098,7 +1098,7 @@ Notifications
 		}
 	}
 	// Obsfucate buttons unless hovering over the line
-	li:hover .actions .btn {
+	li:hover > .actions .btn {
 		border-color: @lgrey;
 		background: @dark;
 		opacity: 1;

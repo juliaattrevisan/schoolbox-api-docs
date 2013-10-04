@@ -120,7 +120,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
             foreach($blogs as $blog) {
                 if($blog['owner'] == $_SESSION['id'] || $this->permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $this->permission >= WRITE_ACCESS))
-                    $this->setVar("MODIFY_BLOG", '<a class="btn modify" href="/blog/modify/'.$blog['id'].'"><span></span>Modify</a>');
+                    $this->setVar("MODIFY_BLOG", '<a class="btn no-text modify" href="/blog/modify/'.$blog['id'].'" title="Modify Blog post"><span></span></a>');
                 else
                     $this->setVar('MODIFY_BLOG', '');
 

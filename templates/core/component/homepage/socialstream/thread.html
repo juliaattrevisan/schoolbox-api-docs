@@ -1,27 +1,22 @@
 
 <!-- BEGIN socialstream_post -->
-	<li class='socialstream-post {ON_OFF} clearfix'>
-		<div class="small-right">
-			<p class="interact">
-				<!-- BEGIN socialstream_post_has_delete -->
-				<a class="btn delete no-text {SOCIALSTREAM_POST_DELETE_CLASS}" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" title='Delete post'><span></span></a>
-				<!-- END socialstream_post_has_delete -->
+	<li class='socialstream-post {ON_OFF}'>
+		<span class="actions">
+			<!-- BEGIN socialstream_post_has_delete -->
+			<a class="btn delete no-text {SOCIALSTREAM_POST_DELETE_CLASS}" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" title='Delete post'><span></span></a>
+			<!-- END socialstream_post_has_delete -->
 
-				<!-- BEGIN socialstream_post_has_add -->
-				<a href="#" class="btn reply no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}" title="Add Reply"><span></span></a>
-				<!-- END socialstream_post_has_add -->
-			</p>
-		</div>
+			<!-- BEGIN socialstream_post_has_add -->
+			<a href="#" class="btn chat no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}" title="Add Reply"><span></span></a>
+			<!-- END socialstream_post_has_add -->
+		</span>
 
-
-		<p class="author">
-			<a href="/search/user/{SOCIALSTREAM_POST_USER_ID}">
-				<img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32" />
-				<span class="name">{SOCIALSTREAM_POST_USER_FULLNAME}</span>
+		<p class="meta">
+			<a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" class="author">
+				<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32" />
+				{SOCIALSTREAM_POST_USER_FULLNAME}
 			</a>
-			<span class="subtitle">Posted on {SOCIALSTREAM_POST_CREATED_AT}
-
-			</span>
+			Posted on {SOCIALSTREAM_POST_CREATED_AT}
 		</p>
 		<div class="body">
 			{SOCIALSTREAM_POST_BODY}
@@ -57,24 +52,22 @@
 		<ul>
 			<!-- BEGIN socialstream_comment -->
 			<li class="socialstream-comment">
-				<div class="small-right">
-					<p class="interact">
-						<!-- BEGIN socialstream_comment_has_delete -->
-						<a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment"><span></span></a>
-						<!-- END socialstream_comment_has_delete -->
+				<span class="actions">
+					<!-- BEGIN socialstream_comment_has_delete -->
+					<a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment"><span></span></a>
+					<!-- END socialstream_comment_has_delete -->
 
-						<!-- BEGIN socialstream_comment_has_add -->
-						<a href="#" class="btn reply no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" title="Add Reply"><span></span></a>
-						<!-- END socialstream_comment_has_add -->
-					</p>
-				</div>
+					<!-- BEGIN socialstream_comment_has_add -->
+					<a href="#" class="btn chat no-text addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" title="Add Reply"><span></span></a>
+					<!-- END socialstream_comment_has_add -->
+				</span>
 
-				<p class="author">
-					<a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}">
-						<img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" />
-						<span class="name">{SOCIALSTREAM_COMMENT_USER_FULLNAME}</span>
+				<p class="meta">
+					<a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" class="author">
+						<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" />
+						{SOCIALSTREAM_COMMENT_USER_FULLNAME}
 					</a>
-					<span class="subtitle">Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
+					Posted on {SOCIALSTREAM_COMMENT_CREATED_AT}
 				</p>
 
 				<div class="body">
@@ -111,19 +104,17 @@
 					<!-- BEGIN socialstream_reply -->
 					<li class="socialstream-reply">
 						<!-- BEGIN socialstream_reply_has_delete -->
-						<div class="small-right">
-							<p class="interact">
+						<span class="actions">
 								<a class="btn delete no-text" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply"><span></span></a>
-							</p>
-						</div>
+						</span>
 						<!-- END socialstream_reply_has_delete -->
 
-						<p class="author">
-							<a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}">
-								<img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" />
-								<span class="name">{SOCIALSTREAM_REPLY_USER_FULLNAME}</span>
+						<p class="meta">
+							<a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" class="author">
+								<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" />
+								{SOCIALSTREAM_REPLY_USER_FULLNAME}
 							</a>
-							<span class="subtitle">Posted on {SOCIALSTREAM_REPLY_CREATED_AT}</span>
+							Posted on {SOCIALSTREAM_REPLY_CREATED_AT}
 						</p>
 
 						<div class="body">
