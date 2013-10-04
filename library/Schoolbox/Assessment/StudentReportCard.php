@@ -849,6 +849,7 @@ class StudentReportCard {
 				}
 
 				$commentData = array(
+					'ID' => $comment->getId(),
 					'USER_NAME' => $comment->getCommenter()->formatName(),
 					'USER_BYLINE' => $comment->getCommenter()->getRole(),
 					'USER_EXTID' => $comment->getCommenter()->getExternalId(),
