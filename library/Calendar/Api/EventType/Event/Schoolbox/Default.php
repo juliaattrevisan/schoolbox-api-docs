@@ -19,9 +19,11 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * Constructor
 	 *
+	 * @param $user
 	 * @param $config
 	 */
-	public function __construct($config) {
+	public function __construct($user, $config) {
+		$this->setUser($user);
 		$this->setCalendarHandler(new Calendar());
 	}
 

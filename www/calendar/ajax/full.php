@@ -8,5 +8,8 @@
  * @version	 SVN: $Id$
  */
 
-$calendar = new Calendar_Layout_Full_Ajax_JSON($this, $this->arg[0]);
+$user_mapper = new \Schoolbox\UserMapper();
+$user = $user_mapper->findById($_SESSION['id']);
+
+$calendar = new Calendar_Layout_Full_Ajax_JSON($this, $user, $this->arg[0]);
 $calendar->render();

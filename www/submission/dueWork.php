@@ -189,7 +189,12 @@ $startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$fi
 // output calendar
 $summary = array();
 
-$event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default(null);
+/* Have to replace all the other $user's with this one -_-
+ */
+$user_mapper = new \Schoolbox\UserMapper();
+$userObj = $user_mapper->findById($_SESSION['id']);
+
+$event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default($userObj, null);
 $event_api->setUserId($user['uid']);
 $event_list = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();

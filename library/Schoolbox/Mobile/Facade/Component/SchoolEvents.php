@@ -23,8 +23,10 @@ class SchoolEvents extends Generic {
      * @return array
      */
     public function render(User $user) {
+		$user_mapper = new \Schoolbox\UserMapper();
+		$user = $user_mapper->findById($_SESSION['id']);
 
-        $calFactory = new Calendar_Api_Factory();
+        $calFactory = new Calendar_Api_Factory($user);
         $calendarHandler = $calFactory->produce();
 
         $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');

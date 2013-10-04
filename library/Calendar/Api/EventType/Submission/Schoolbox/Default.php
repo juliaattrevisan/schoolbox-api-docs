@@ -11,20 +11,14 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	private $calendarHandler = null;
 
 	/**
-	 * The user ID to retrieve events for, defaults to the logged in user.
-	 *
-	 * @var int
-	 */
-	protected $user_id;
-
-	/**
 	 * Constructor
 	 *
+	 * @param \Schoolbox\User $user
 	 * @param $config
 	 */
-	public function __construct($config) {
+	public function __construct(\Schoolbox\User $user, $config) {
 		$this->setCalendarHandler(new Calendar());
-		$this->setUserId($_SESSION['id']);
+		$this->setUser($user);
 	}
 
 	/**
@@ -37,14 +31,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
-		$stack       = new Calendar_Event_Collection();
-		$user_mapper = new Schoolbox\UserMapper();
-		try {
-			$user = $user_mapper->findById($this->getUserId());
-		}
-		catch (Schoolbox\Mapper\Exception $e) {
-			return $stack;
-		}
+		$stack = new Calendar_Event_Collection();
 
 		//
 		// Use the mapper classes to get events for this day.
@@ -53,7 +40,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 		$cat_mapper = new Schoolbox\Resource\CategoryMapper();
 		$cat_mapper->setExternalUser(new External_User());
 		$category_id_list = array();
-		foreach ($cat_mapper->findForUser($user) as $category) {
+		foreach ($cat_mapper->findForUser($this->getUser()) as $category) {
 			$category_id_list[] = $category->getId();
 		}
 
@@ -145,22 +132,4 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	public function getCalendarHandler() {
 		return $this->calendarHandler;
 	}
-
-	/**
-	 * @param  int $user_id
-	 *
-	 * @return $this
-	 */
-	public function setUserId($user_id) {
-		$this->user_id = $user_id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getUserId() {
-		return $this->user_id;
-	}
-
 }

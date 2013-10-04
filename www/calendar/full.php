@@ -7,5 +7,8 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-$calendar = new Calendar_Layout_Full_Javascript($this, $this->arg[0]);
+$user_mapper = new \Schoolbox\UserMapper();
+$user = $user_mapper->findById($_SESSION['id']);
+
+$calendar = new Calendar_Layout_Full_Javascript($this, $user, $this->arg[0]);
 $calendar->render();

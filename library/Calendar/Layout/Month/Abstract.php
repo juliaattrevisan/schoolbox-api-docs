@@ -30,10 +30,11 @@ abstract class Calendar_Layout_Month_Abstract {
 	 * Constructor
 	 *
 	 * @param $page
+	 * @param $user
 	 * @param $date
 	 */
-	public function __construct($page, $date) {
-		$factory = new Calendar_Api_Factory();
+	public function __construct($page, $user, $date) {
+		$factory = new Calendar_Api_Factory($user);
 		$api = $factory->produce();
 
 		$this->setApi($api);

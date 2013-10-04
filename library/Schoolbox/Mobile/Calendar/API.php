@@ -22,9 +22,12 @@ use ClientDevice;
 class API extends Generic\API {
 
     public function Month($date = '') {
+		$user_mapper = new \Schoolbox\UserMapper();
+		$user = $user_mapper->findById($_SESSION['id']);
+
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory();
+        $calFactory = new Calendar_Api_Factory($user);
         $calendarHandler = $calFactory->produce();
 
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
