@@ -421,7 +421,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 		if ($answerGroup) {
 			$page->setVar(array(
 				'USER_FIRSTNAME' => $currentQuestion['firstname'],
-				'USER_LASTNAME' => $currentQuestion['lastname]'],
+				'USER_LASTNAME' => $currentQuestion['lastname'],
 				'ANSWER_ID' => $answerGroup['answer_id'],
 				'RESPONSE_ID' => $existing['response_id'],
 				'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
@@ -462,7 +462,6 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 	 * @return void
 	 */
 	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
-		$right = array();
 
 		/* Define special blocks to handle this special answerOptions scenario,
 		 * because we have three columns to parse per iteration.
@@ -479,17 +478,11 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 			for ($i = 0; $i < count($allAnswers); $i++) {
 				$currentAnswer = $allAnswers[$i];
 
-				if ($right[$i] == $currentAnswer->answerRight) {
-					$correct = $this->getCorrectClass();
-				} else {
-					$correct = $this->getIncorrectClass();
-				}
-
 				$page->setVar(array(
 					'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
-					'ANSWER_RIGHT_VALUE' => $right[$i],
+					'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
 					'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
-					'CORRECT' => $correct,
+					'CORRECT' => $this->getCorrectClass(),
 				));
 
 				$page->parse('answerOptionTopLeft_block', 'answerOptionTopLeft', true);

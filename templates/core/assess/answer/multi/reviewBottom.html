@@ -1,0 +1,37 @@
+<p class="information-notification">Please note: An option with a grey background is a correct answer which was not selected by the student.</p>
+
+<strong>Question Options:</strong>
+<div class="answer-given-container">
+	<ul class="multiple-choice-mark">
+		<!-- BEGIN answerOption -->
+		<li class="{ACTUAL_CORRECT_VALUE} {CORRECT}">
+			<input disabled="disabled" type="checkbox" {ANSWER_CHECKED} class="hide"/> {ANSWER_DESCRIPTION}
+			<span class="tick-cross"></span>
+		</li>
+		<!-- END answerOption -->
+	</ul>
+</div>
+
+<!-- BEGIN writable_comment -->
+<label><strong>Enter your comments:</strong>
+    <div class="textarea-container">
+        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+    </div>
+</label>
+<!-- END writable_comment -->
+<!-- BEGIN readonly_comment -->
+<label><strong>Comments:</strong>
+    <div class="textarea-container">
+        <p>{REVIEWED_COMMENT}</p>
+    </div>
+</label>
+<!-- END readonly_comment -->
+
+<p class="marks-amount">
+    <!-- BEGIN writable_mark -->
+    <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
+    <!-- END writable_mark -->
+    <!-- BEGIN readonly_mark -->
+    {REVIEWED_MARKS} / {QUESTION_MARKS}
+    <!-- END readonly_mark -->
+</p>

@@ -1,0 +1,30 @@
+<strong>Answer given:</strong>
+<div class="answer-given-container">
+
+	<!-- BEGIN answerOption -->
+	{ANSWER}
+	<!-- END answerOption -->
+</div>
+
+<!-- BEGIN writable_comment -->
+<label><strong>Enter your comments:</strong>
+	<div class="textarea-container">
+		<textarea name="comment">{REVIEWED_COMMENT}</textarea>
+	</div>
+</label>
+<!-- END writable_comment -->
+<!-- BEGIN readonly_comment -->
+<label><strong>Comments:</strong>
+	<div class="textarea-container">
+		<p>{REVIEWED_COMMENT}</p>
+	</div>
+</label>
+<!-- END readonly_comment -->
+<p class="marks-amount">
+	<!-- BEGIN writable_mark -->
+	<input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
+	<!-- END writable_mark -->
+	<!-- BEGIN readonly_mark -->
+	{REVIEWED_MARKS} / {QUESTION_MARKS}
+	<!-- END readonly_mark -->
+</p>

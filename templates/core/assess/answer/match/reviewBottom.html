@@ -1,0 +1,46 @@
+<p class="information-notification"> A green row indicates a correctly matched answer, the red indicates an incorrectly matched one.</p>
+<strong>Answer</strong>
+<div class="answer-given-container clearfix">
+	<ul class="matchPairs match-left">
+		<!-- BEGIN answerOptionLeft -->
+		<li class="left-columns {CORRECT} clearfix">
+			<strong>{ANSWER_LEFT_VALUE}</strong>
+			<div class="arrow"><span></span></div>
+		</li>
+		<!-- END answerOptionLeft -->
+	</ul>
+	
+	<ul class="matchPairs match-right">
+		<!-- BEGIN answerOptionRight -->
+		<li class="right-columns {CORRECT} clearfix">
+			<strong>{ANSWER_RIGHT_VALUE}</strong>
+			<div class="tick-cross"><span></span></div>
+		</li>
+		<!-- END answerOptionRight -->
+	</ul>
+	<!-- BEGIN answerOptionCorrectResponse -->
+	
+	<!-- END answerOptionCorrectResponse -->
+</div>
+<!-- BEGIN writable_comment -->
+<label><strong>Enter your comments:</strong>
+    <div class="textarea-container">
+        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+    </div>
+</label>
+<!-- END writable_comment -->
+<!-- BEGIN readonly_comment -->
+<label><strong>Comments:</strong>
+    <div class="textarea-container">
+        <p>{REVIEWED_COMMENT}</p>
+    </div>
+</label>
+<!-- END readonly_comment -->
+<p class="marks-amount">
+    <!-- BEGIN writable_mark -->
+    <input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
+    <!-- END writable_mark -->
+    <!-- BEGIN readonly_mark -->
+    {REVIEWED_MARKS} / {QUESTION_MARKS}
+    <!-- END readonly_mark -->
+</p>
