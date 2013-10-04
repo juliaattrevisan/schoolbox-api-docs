@@ -43,6 +43,10 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // Get the list of students for this class (in which method?)
         $group_handler = new Group();
         $code = $this->getContext('code');
+
+        $this->is_student = $group_handler->isStudent();
+
+        // Consider getting class by student ID
         if ($code && Config::get('external_enable')) {
             $class_handler = new External_Class();
             $this->student_list = $class_handler->getStudents($code);
@@ -66,17 +70,12 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             'array_merge',
             array()
         );
-        $column_list = array(
-            'task_instance_id' => $task_list,
-        );
-
-        $this->is_student = $group_handler->isStudent();
+        $this_student_id = null;
         if ($this->is_student) {
-            $column_list['student_id'] = $_SESSION['id'];
+            $this_student_id = $_SESSION['id'];
         }
-
-        $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findByColumnList(
-            $column_list
+        $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findLatestForList(
+            $task_list, $this_student_id
         );
     }
 
@@ -191,6 +190,15 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
                 // Output list of tasks within units, only if the task is open
                 if ($display_task_list) {
+
+                    // Group the task list by task, then student.
+                    $grouped_list = array();
+                    foreach ($this->completion_list as $item) {
+                        $student_id       = $item->getStudent()->getId();
+                        $task_instance_id = $item->getTaskInstance()->getId();
+                        $grouped_list[$task_instance_id][$student_id] = $item;
+                    }
+
                     foreach ($unit->getTasks() as $task) {
 
                         // Students only:
@@ -198,27 +206,24 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                         $unit_task_class = '';
                         if ($this->is_student) {
                             $unit_task_class = 'incomplete';
-                            foreach ($this->completion_list as $completion_item) {
-                                if ($completion_item->getTaskInstance()->getId() == $task->getId()) {
-                                    switch ($completion_item->getCompletionStatus()) {
-                                        case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
-                                            $unit_task_class = 'complete';
-                                            break;
-                                        case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                                            $unit_task_class = 'pending';
-                                            break;
-                                        case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
-                                        default:
-                                            break;
-                                    }
-                                    break;
+                            $completion_item = $grouped_list[$task->getId()][$_SESSION['id']];
+                            if ($completion_item instanceof Task\InstanceCompletion) {
+                                switch ($completion_item->getCompletionStatus()) {
+                                    case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
+                                        $unit_task_class = 'complete';
+                                        break;
+                                    case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
+                                        $unit_task_class = 'pending';
+                                        break;
+                                    case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
+                                    default:
+                                        break;
                                 }
                             }
                         }
                         $this->setVar('UNIT_TASK_COMPLETE_CLASS', $unit_task_class);
 
-
-                        $complete_count = 0;
+                        $complete_count = count($grouped_list[$task->getId()]);
                         $gradient       = round($complete_count / $student_count * 10);
                         $this->setVar(
                             array(
