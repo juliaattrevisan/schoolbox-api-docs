@@ -139,8 +139,7 @@ else {
 
 			/* Load answer template into answerOption block
 			 */
-			$this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentAttempt['type_id']) . '/review.html');
-			$this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
+			$this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentAttempt['type_id']) . '/reviewBottom.html');
 
 			$this->setBlock('answerFormFragment', 'writable_comment', 'writable_comment_block');
 			$this->setBlock('answerFormFragment', 'readonly_comment', 'readonly_comment_block');
@@ -150,7 +149,6 @@ else {
 
 			/* Reset answer options and marks from previous iteration
 			 */
-			$this->setVar('answerOption_block', '');
 			$this->setVar('writable_update_block', '');
 			$this->setVar('writable_comment_block', '');
 			$this->setVar('writable_mark_block', '');

@@ -281,8 +281,6 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
 		$existing = $this->responseHandler->isResponseExists($attemptId, $currentQuestion['question_id']);
 
-		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
-
 		/* Removed this check because it was wrongly matching a blank saved
 		 * response with no response at all, preventing reviewed marks from
 		 * displaying properly.
@@ -292,20 +290,11 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 		$page->setVar(array(
 			'USER_FIRSTNAME' => $currentQuestion['firstname'],
 			'USER_LASTNAME' => $currentQuestion['lastname'],
-			'ANSWER_ID' => $currentAnswer['answer_id'],
 			'ANSWER' => Scrub::text($existing['response']),
 			'RESPONSE_ID' => $existing['response_id'],
 			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
 			'REVIEWED_MARKS' => $existing['mark'],
 		));
-
-		/* Show correct answer
-		 */
-		$page->setVar(array(
-			'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-		));
-
-		$page->parse('answerOption_block', 'answerOption', true);
 	}
 
 	/**
