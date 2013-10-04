@@ -1062,12 +1062,12 @@ Notifications
 	h4 {
 		font-weight: bold;
 	}
-	h3 + p, h4 + p {
+	h3 + p, h4 + p, .meta + p {
 		margin-top: 8px;
 	}
 	// De-emphasise meta information
 	.meta, .footnote {
-		color: @secondary-text;
+		color: @secondary-text !important;
 		margin: 0;
 	}
 	.footnote {
@@ -1078,7 +1078,7 @@ Notifications
 		display: block;
 		img {
 			float: left;
-			margin: 0 6px 6px 0;
+			margin: 0 6px 0 0;
 		}
 	}
 

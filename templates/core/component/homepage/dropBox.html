@@ -44,14 +44,15 @@
         </form>
         <!-- END drop_student -->
         <!-- BEGIN drop_staff -->
-        <ul>
+        <ul class="information-list">
             <!-- BEGIN drop_file -->
-            <li class="{ON_OFF} clearfix">
+            <li class="{ON_OFF}">
+                <span class="actions">
+                    <a class="btn delete no-text" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"><span></span></a>
+                </span>
+
                 <h4><a class="icons {DROPBOX_MIME_IMAGE}" href="/subject/modDropBox.php?id={DROPBOX_ID}" rel="external">{DROPBOX_DESCRIPTION}</a></h4>
-                <div class="small-right">
-                    <p class="interact"><a href="/subject/modDropBox.php?delete={DROPBOX_ID}">Delete</a></p>
-                </div>
-                <p class="interact">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
+                <p class="meta">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
             </li>
             <!-- END drop_file -->
         </ul>
