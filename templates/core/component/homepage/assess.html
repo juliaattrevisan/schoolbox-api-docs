@@ -1,38 +1,46 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>Online Assessments</h2>
     {CONFIGURATION}
-    <div class="listing">
-		<ul>
-			<!-- BEGIN assess -->
-			<li class="wysiwyg {ON_OFF} clearfix">
-        <!-- BEGIN assessLink -->
-				<h4><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h4>
-        <!-- END assessLink -->
-        <!-- BEGIN resumeLink -->
-        <h4><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h4>
-        <!-- END resumeLink -->
-        <!-- BEGIN assessNoLink -->
-        <h4>{ASSESS_TITLE}</h4>
-        <!-- END assessNoLink -->
-				<div class="small-right">
-          <p>
-          {ASSESS_FINISH_DATE}
-            <!-- BEGIN teacherLink -->
-            <a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a><br />
-            <a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a><br />
-            <!-- END teacherLink -->
-            <!-- BEGIN studentLink -->
-            <a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}/{ASSESS_ATTEMPT_ID}">View Results</a><br />
-            <!-- END studentLink -->
-          </p>
-        </div>
-        <div class="summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>
-				<p class="interact {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
-			</li>
-			<!-- END assess -->
-		</ul>
-		<!-- BEGIN createAssessment -->
+	<ul class="information-list">
+		<!-- BEGIN assess -->
+		<li class="{ON_OFF}">
+			<span class="actions">
+				<!-- BEGIN teacherLink -->
+				<a class="btn no-text go-to" href="/assess/results/{ASSESS_ASSESS_ID}" title="View Results"><span></span></a>
+				<a class="btn no-text modify" href="/assess/modify/{ASSESS_ASSESS_ID}" title="Modify Assessment"><span></span></a>
+				<!-- END teacherLink -->
+
+				<!-- BEGIN studentLink -->
+				<a class="btn no-text go-to" href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}/{ASSESS_ATTEMPT_ID}" title="View Results"><span></span></a>
+				<!-- END studentLink -->
+			</span>
+
+        	<!-- BEGIN assessLink -->
+			<h4><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h4>
+        	<!-- END assessLink -->
+
+			<!-- BEGIN resumeLink -->
+			<h4><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h4>
+			<!-- END resumeLink -->
+
+			<!-- BEGIN assessNoLink -->
+			<h4>{ASSESS_TITLE}</h4>
+			<!-- END assessNoLink -->
+
+			<p class="meta">Due {ASSESS_FINISH_DATE}</p>
+
+
+
+			<div class="wysiwyg summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>
+
+			<p class="footnote {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
+		</li>
+		<!-- END assess -->
+	</ul>
+
+	<!-- BEGIN createAssessment -->
+	<p class="interact">
 		<a href="/assess/create/{ID}" class="btn create"><span></span>Create Assessment</a>
-		<!-- END createAssessment -->
-	</div>
+	</p>
+	<!-- END createAssessment -->
 </div>

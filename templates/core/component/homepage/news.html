@@ -1,30 +1,36 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="listing blog">
-        <ul>
-            <!-- BEGIN news -->
-            <li class="{ON_OFF} clearfix">
-                <h3 class="clearfix">{NEWS_HEADING}</h3>
-                <div class="small-right">
-                    <p class="interact">{MOD_NEWS}</p>
-                </div>
-                <p class="author">
-                    <a href="/search/user/{AUTHOR_ID}" class="author">
-                        <img width="32" height="32" src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32"/>
-                        <span class="name">{AUTHOR}</span>
-                    </a>
-                    <span class="subtitle">Posted {POSTED_DATE}
-                    <!-- BEGIN has_publish_date -->
-                        (Published on {NEWS_PUBLISH_DATE})
-                    <!-- END has_publish_date --></span>
-                </p>
-                <div class="blog-body wysiwyg">{NEWS_BODY}</div>
-            </li>
-            <!-- END news -->
-        </ul>
-    </div>
-    <p class="interact"> <a href="/homepage/newsArchive/{NEWS_CATEGORY_ID}" class="btn"><span></span>News Archive</a>
-        <!-- BEGIN submit_news --> <a href="/news/homepage/new/{NEWS_CATEGORY_ID}" class="btn up-arrow"><span></span>Post News</a><!-- END submit_news -->
+
+	<ul class="information-list">
+		<!-- BEGIN news -->
+		<li class="{ON_OFF} clearfix">
+			<span class="actions">
+				{MOD_NEWS}
+			</span>
+
+			<h3>{NEWS_HEADING}</h3>
+
+			<p class="meta">
+				<a href="/search/user/{AUTHOR_ID}" class="author">
+					<img width="32" height="32" src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32"/>
+					{AUTHOR}
+				</a>
+				Posted {POSTED_DATE}
+				<!-- BEGIN has_publish_date -->
+					(Published on {NEWS_PUBLISH_DATE})
+				<!-- END has_publish_date -->
+			</p>
+
+			<div class="wysiwyg">{NEWS_BODY}</div>
+		</li>
+		<!-- END news -->
+	</ul>
+
+    <p class="interact">
+		<a href="/homepage/newsArchive/{NEWS_CATEGORY_ID}" class="btn"><span></span>News Archive</a>
+        <!-- BEGIN submit_news -->
+		<a href="/news/homepage/new/{NEWS_CATEGORY_ID}" class="btn up-arrow"><span></span>Post News</a>
+		<!-- END submit_news -->
     </p>
 </div>

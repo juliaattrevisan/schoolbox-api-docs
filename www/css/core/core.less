@@ -1042,6 +1042,78 @@ Notifications
 }
 
 /*--------------------------------------------------------------
+ Information List - Displays summary info with minimal actions
+--------------------------------------------------------------*/
+.information-list {
+	// List clear and rule between list items
+	li {
+		border-bottom: 1px solid @border-color;
+		clear: both;
+	}
+	// Tigerstripe
+	.dark {
+		background-color: @dark;
+	}
+	// Emphasise the title
+	h3 {
+		font-size: 1.2em;
+	}
+	h4 {
+		font-weight: bold;
+	}
+	h4 + p {
+		margin-top: 8px;
+	}
+	// De-emphasise meta information
+	.meta, .footnote {
+		color: @secondary-text;
+		margin: 0;
+	}
+	.footnote {
+		text-align: right;
+	}
+	// Floated avatar for authors
+	.author {
+		margin-top: 6px;
+		display: block;
+		img {
+			float: left;
+			margin: 0 6px 6px 0;
+		}
+	}
+
+	// Actions are the buttons to interact with the list item, such as edit, delete
+	.actions {
+		position: relative;
+		z-index: 1;
+		float: right;
+		// Put all buttons on the one row
+		.btn {
+			background-color: transparent;
+			border-color: transparent;
+			opacity: 0.3;
+			.transition(all 0.2s);
+			float: none;
+			display: inline-block;
+		}
+	}
+	// Obsfucate buttons unless hovering over the line
+	li:hover .actions .btn {
+		border-color: @lgrey;
+		background: @dark;
+		opacity: 1;
+	}
+	// Because LI has padding, we can remove it from wysiwyg. Add spacing from meta
+	.wysiwyg {
+		padding: 0;
+		margin-top: 16px;
+	}
+}
+
+
+
+
+/*--------------------------------------------------------------
  PROFILES
 --------------------------------------------------------------*/
 .profile-info {
@@ -1713,9 +1785,6 @@ input.timeField {
     float: right;
     text-shadow: 0 1px 0px @white;
     background-color:  @dark;
-    background-image: -moz-linear-gradient(top,  @dark,  @dark);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0,  @dark), color-stop(1,  @dark));
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
     height: 22px;
     line-height: 22px;
     margin-left: 8px;

@@ -90,6 +90,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                     // if a mark has been given, regardless of all other detail, display "View Mark"
                     if (!empty($submission['returned'])) {
                         $this->setVar('DUE_ACTION_NAME', 'View Mark');
+                        $this->setVar('DUE_ACTION_ICON', 'go-to');
                     }
                     // no mark has been given
                     else {
@@ -98,22 +99,26 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                             // if something has been submitted
                             if (!empty($submission['submitted'])) {
                                 $this->setVar('DUE_ACTION_NAME', 'Awaiting Mark');
+                                $this->setVar('DUE_ACTION_ICON', 'go-to');
                             }
                             // nothing has been submitted
                             else {
                                 // if the submission box is open
                                 if (time() > $submission['open'] && time() < $submission['late']) {
                                     $this->setVar('DUE_ACTION_NAME', 'Submit Work');
+                                    $this->setVar('DUE_ACTION_ICON', 'up-arrow');
                                 }
                                 // if submission box is closed
                                 else {
                                     $this->setVar('DUE_ACTION_NAME', 'View Details');
+                                    $this->setVar('DUE_ACTION_ICON', 'go-to');
                                 }
                             }
                         }
                         // dueWork not accepting submissions
                         else {
                             $this->setVar('DUE_ACTION_NAME', 'View Details');
+                            $this->setVar('DUE_ACTION_ICON', 'go-to');
                         }
                     }
 
@@ -124,7 +129,11 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 // what to display if staff
                 elseif ($this->groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
                     $actionURL = '/submission/viewSubmission/' . $submission['id'];
-                    $this->setVar('duework_actions_block', '<a href="/submission/createSubmission/modify/'.$submission['id'].'">Modify</a>');
+                    $this->setVar('DUE_ACTION', '/submission/createSubmission/modify/'.$submission['id']);
+					$this->setVar('DUE_ACTION_NAME', 'Modify');
+					$this->setVar('DUE_ACTION_ICON', 'modify');
+
+					$this->parse('duework_actions_block', 'duework_actions');
                 }
                 // if anybody else, don't display anything
                 else {
