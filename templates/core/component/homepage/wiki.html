@@ -1,27 +1,25 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="listing">
-        <ul>
-            <!-- BEGIN wiki_row -->
-            <li class="{ON_OFF} clearfix">
-                <h4><a class="icons textfile" href="/wiki/{WIKI_CATEGORYID}/{WIKI_SLUG}">{WIKI_HEADING}</a></h4>
-                <!-- BEGIN compact_hide -->
-                <div class="small-right">
-                    <p class="interact">
-                        <!-- BEGIN modify_wiki -->
-                        <a href="/wiki/modify/{WIKI_ID}">Modify</a>
-                        <!-- END modify_wiki -->
-                    </p>
-                </div>
-                <p class="interact {COMPONENT_COMPACTMODE}">Created by <a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a> {WIKI_MODIFIED}</p>
-                <!-- END compact_hide -->
-            </li>
+	<ul class="information-list">
+		<!-- BEGIN wiki_row -->
+		<li class="{ON_OFF}">
+			<!-- BEGIN modify_wiki -->
+			<span class="actions">
+				<a class="btn modify no-text" href="/wiki/modify/{WIKI_ID}" title="Modify Wiki page"><span></span></a>
+			</span>
+			<!-- END modify_wiki -->
 
-            <!-- END wiki_row -->
-        </ul>
-    </div>
-    <!-- BEGIN submit_wiki -->
-    <p class="interact"><a href="/wiki/modify/new/{WIKI_CATEGORY_ID}" class="btn add"><span></span>Create Document</a></p>
-    <!-- END submit_wiki -->
+			<h4><a class="icons textfile" href="/wiki/{WIKI_CATEGORYID}/{WIKI_SLUG}">{WIKI_HEADING}</a></h4>
+			<!-- BEGIN compact_hide -->
+			<p></p>
+			<p class="footnote {COMPONENT_COMPACTMODE}">Created by <a href="/search/user/{WIKI_AUTHOR_ID}">{WIKI_AUTHOR}</a> {WIKI_MODIFIED}</p>
+			<!-- END compact_hide -->
+		</li>
+
+		<!-- END wiki_row -->
+	</ul>
+	<!-- BEGIN submit_wiki -->
+	<p class="interact"><a href="/wiki/modify/new/{WIKI_CATEGORY_ID}" class="btn add"><span></span>Create Document</a></p>
+	<!-- END submit_wiki -->
 </div>

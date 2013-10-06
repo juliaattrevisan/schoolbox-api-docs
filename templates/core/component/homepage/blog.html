@@ -27,44 +27,50 @@
 <div class="box component blog clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="listing">
-        <ul>
-            <!-- BEGIN blog -->
-            <li class="{BLOG_SHADING} clearfix">
-                <h3 class="clearfix">{BLOG_HEADING}</h3>
-                <div class="small-right">
-                    <p class="interact">{MODIFY_BLOG}</p>
-                </div>
-                <p class="author">
-                    <a href="/search/user/{BLOG_AUTHOR_ID}" class="author">
-                        <img src="{BLOG_AUTHOR_THUMB}"/>
-                        <span class="name">{BLOG_AUTHOR_NAME}</span>
-                    </a>
-                    <span class="subtitle">Posted {BLOG_CREATED}</span>
-                </p>
-                <div class="blog-body wysiwyg">{BLOG_BODY}</div>
 
-                <ul class="comments" style="display: none;">
-                    <!-- BEGIN comment -->
-                    <li class="{ON_OFF}">{DELETE_COMMENT}
-                        <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
-                            <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                            <span class="name">{COMMENT_AUTHOR_NAME}</span>
-                        </a>
-                        <span class="subtitle">Commented {COMMENT_CREATED}</span>
-                        <p class="comment-body">{COMMENT_BODY}</p>
-                    </li>
-                    <!-- END comment -->
-                </ul>
-                <form method="post" action="/blog/comment/new/{BLOG_ID}" style="display: none;">
-                    <p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                        <input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
-                </form>
-                <a href="#" class="btn show-comments"><span></span>Show comments</a>
-            </li>
-            <!-- END blog -->
-        </ul>
-    </div>
+	<ul class="information-list">
+		<!-- BEGIN blog -->
+		<li class="{BLOG_SHADING}">
+			<span class="actions">{MODIFY_BLOG}</span>
+
+			<h3>{BLOG_HEADING}</h3>
+
+			<p class="meta">
+				<a href="/search/user/{BLOG_AUTHOR_ID}" class="author">
+					<img width="32" height="32" src="{BLOG_AUTHOR_THUMB}" />
+					{BLOG_AUTHOR_NAME}
+				</a>
+				Posted {BLOG_CREATED}
+			</p>
+
+			<div class="blog-body wysiwyg">{BLOG_BODY}</div>
+
+			<ul class="comments" style="display: none;">
+				<!-- BEGIN comment -->
+				<li class="{ON_OFF}">
+					<span class="actions">{DELETE_COMMENT}</span>
+
+					<p class="meta">
+						<a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
+							<img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
+							{COMMENT_AUTHOR_NAME}
+						</a>
+						Commented {COMMENT_CREATED}
+					</p>
+
+					<p class="comment-body">{COMMENT_BODY}</p>
+				</li>
+				<!-- END comment -->
+			</ul>
+			<form method="post" action="/blog/comment/new/{BLOG_ID}" style="display: none;">
+				<p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+					<input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
+			</form>
+			<a href="#" class="btn chat show-comments"><span></span>Show comments</a>
+		</li>
+		<!-- END blog -->
+	</ul>
+
     <p class="interact">
         <!-- BEGIN submit -->
         <a href="/blog/modify/new/{BLOG_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Entry</a>

@@ -123,7 +123,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 if ($news['owner'] == $_SESSION['id'] || $this->permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $this->permission >= WRITE_ACCESS)) {
                     $this->setVar(
                         'MOD_NEWS',
-                        '<a class="btn modify" href="/news/homepage/' . $news['id'] . '"><span></span>Modify</a>'
+                        '<a class="btn no-text modify" href="/news/homepage/' . $news['id'] . '" title="Modify News"><span></span></a>'
                     );
                 } else {
                     $this->setVar('MOD_NEWS', '');

@@ -16,22 +16,17 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{PODCAST_COMPONENT_TITLE}</h2>
     {CONFIGURATION}
-    <div class="listing clearfix" >
-        <ul>
-            <!-- BEGIN podcast_list -->
-            <li class="{ON_OFF} clearfix">
-                <h4><a class="icons soundmp3" href="{PODCAST_URL}">{PODCAST_TITLE}</a></h4>
-                <div class="small-right">
-                    <p class="interact">
-                    <div class="play-button">
-                        <div id="podcast-player-{PODCAST_ID}"><a onclick="loadPodcastSWF('{PODCAST_ID}', '{PODCAST_URL}'); return false;"></a></div>
-                    </div>
-                    </p>
-                </div>
-                <div class="clearfix"></div>
-                <div class="wsywig {COMPONENT_COMPACTMODE}">{PODCAST_DESCRIPTION}</div>
-            </li>
-            <!-- END podcast_list -->
-        </ul>
-    </div>
+	<ul class="information-list">
+		<!-- BEGIN podcast_list -->
+		<li class="{ON_OFF}">
+			<div class="play-button actions">
+				<div id="podcast-player-{PODCAST_ID}"><a onclick="loadPodcastSWF('{PODCAST_ID}', '{PODCAST_URL}'); return false;"></a></div>
+			</div>
+
+			<h4><a class="icons soundmp3" href="{PODCAST_URL}">{PODCAST_TITLE}</a></h4>
+
+			<div class="wysiwyg {COMPONENT_COMPACTMODE}">{PODCAST_DESCRIPTION}</div>
+		</li>
+		<!-- END podcast_list -->
+	</ul>
 </div>

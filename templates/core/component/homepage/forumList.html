@@ -1,26 +1,27 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="listing forum">
-        <ul class="comments">
-            <!-- BEGIN forum -->
-            <li class="{ON_OFF}">
-                <!-- BEGIN forum_reply -->
-                <a class="btn modify" href="/forum/modify/{ID}/{THREAD_ID}"><span></span>Reply</a>
-                <!-- END forum_reply -->
-                <a href="/search/user/{THREAD_USER_ID}" class="author">
-                    <img height="32" width="32" src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square32"/>
-                </a>
-                <h4><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h4>
 
-                <span class="subtitle">Posted {THREAD_DATE} by </span>
-                <a href="/search/user/{THREAD_USER_ID}" class="author">{THREAD_USER}</a>
+	<ul class="information-list">
+		<!-- BEGIN forum -->
+		<li class="{ON_OFF}">
+			<!-- BEGIN forum_reply -->
+			<span class="actions">
+				<a class="btn no-text chat" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"><span></span></a>
+			</span>
+			<!-- END forum_reply -->
+			<h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h3>
 
-                <p class="comment-body"></p>
-            </li>
-            <!-- END forum -->
-        </ul>
-    </div>
+			<p class="meta">
+				<a href="/search/user/{THREAD_USER_ID}" class="author">
+					<img height="32" width="32" src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square32"/>
+					{THREAD_USER}
+				</a>
+				Posted on {THREAD_DATE}</p>
+		</li>
+		<!-- END forum -->
+	</ul>
+
     <p class="interact">
         <a href="/forum/{COMPONENT_CONFIG_SRC_ID}" class="btn go-to"><span></span>Go to Forum</a>
         <!-- BEGIN forum_post -->

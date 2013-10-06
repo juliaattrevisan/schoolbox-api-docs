@@ -1,28 +1,27 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>Due Work</h2>
     {CONFIGURATION}
-    <div class="listing clearfix">
-        <ul>
-            <!-- BEGIN duework -->
-            <li class="{ON_OFF} clearfix">
-                <h4><span class="{COMPONENT_COMPACTMODE}">{DUE_TYPE} - </span>{DUE_NAME}</h4>
-                <div class="small-right">
-                    <p class="interact">{DUE_DATE}
-                        <!-- BEGIN duework_actions -->
-                        <a href="{DUE_ACTION}">{DUE_ACTION_NAME}</a>
-                        <!-- END duework_actions -->
-                    </p>
-                </div>
-                <div class="summ wysiwyg {COMPONENT_COMPACTMODE}">{DUE_COMMENT}</div>
-            </li>
-            <!-- END duework -->
-        </ul>
-    </div>
-    <!-- BEGIN allwork_button -->
-    <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades"  class="btn"><span></span>Grades</a>
-    <!-- END allwork_button -->
-    <!-- BEGIN submit_dw -->
-    <p class="interact">
+	<ul class="information-list">
+		<!-- BEGIN duework -->
+		<li class="{ON_OFF}">
+			<span class="actions">
+			<!-- BEGIN duework_actions -->
+				<a class="btn no-text {DUE_ACTION_ICON}" href="{DUE_ACTION}" title="{DUE_ACTION_NAME}"><span></span></a>
+			<!-- END duework_actions -->
+			</span>
+
+			<h4><span class="{COMPONENT_COMPACTMODE}">{DUE_TYPE} - </span>{DUE_NAME}</h4>
+			<p class="meta">{DUE_DATE}</p>
+			<div class="wysiwyg {COMPONENT_COMPACTMODE}">{DUE_COMMENT}</div>
+		</li>
+		<!-- END duework -->
+	</ul>
+
+	<p class="interact">
+		<!-- BEGIN allwork_button -->
+		<a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades"  class="btn"><span></span>Grades</a>
+		<!-- END allwork_button -->
+		<!-- BEGIN submit_dw -->
         <a href="/submission/createSubmission/new/{ID}/" class="btn up-arrow"><span></span>Post Due Work</a>
         <a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubric Criteria</a>
     </p>

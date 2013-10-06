@@ -1,26 +1,25 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="listing clearfix">
-        <ul>
-            <!-- BEGIN link -->
-            <li class="{ON_OFF} clearfix">
-                <h4><a class="icons link" rel="{LINK_TARGET}" href="{LINK_URL}">{LINK_NAME}</a></h4>
+	<ul class="information-list">
+		<!-- BEGIN link -->
+		<li class="{ON_OFF} clearfix">
+			<!-- BEGIN modify_link -->
+			<span class="actions">
+				<a class="btn no-text modify" href="/cms/link/{LINK_ID}" title="Edit link"><span></span></a>
+			</span>
+			<!-- END modify_link -->
 
-                <div class="small-right">
-                    <!-- BEGIN modify_link -->
-                    <p class="interact"><a href="/cms/link/{LINK_ID}">Modify</a></p>
-                    <!-- END modify_link -->
-                </div>
-                <p class="{COMPONENT_COMPACTMODE}">{LINK_COMMENT}</p>
+			<h4><a class="icons link" rel="{LINK_TARGET}" href="{LINK_URL}">{LINK_NAME}</a></h4>
 
-                <p class="{COMPONENT_COMPACTMODE} interact">
-                    Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}
-                </p>
-            </li>
-            <!-- END link -->
-        </ul>
-    </div>
+			<p class="{COMPONENT_COMPACTMODE}">{LINK_COMMENT}</p>
+
+			<p class="{COMPONENT_COMPACTMODE} footnote">
+				Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}
+			</p>
+		</li>
+		<!-- END link -->
+	</ul>
     <p class="interact"><a href="/resources/{LINK_CAT_ID}" class="btn"><span></span>View All Links</a>
         <!-- BEGIN submit_link -->
         <a href="/cms/link/new/{LINK_CAT_ID}" class="btn up-arrow"><span></span>Post Link</a>

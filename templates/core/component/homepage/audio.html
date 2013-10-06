@@ -16,21 +16,22 @@ function loadSWF(audioID, url){
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>Audio</h2>
 	{CONFIGURATION}
-	<div class="listing clearfix" >
-		<ul>
-			<!-- BEGIN audio_list -->
-			<li class="{ON_OFF} clearfix">
-				<h4><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION}</a></h4>
-				<div class="play-button ">
-					<div id="audio-player-{AUDIO_ID}"><a onclick="loadSWF({AUDIO_ID}, '{AUDIO_URL}'); return false;"></a></div>
-				</div>
-                <div class="clearfix"></div>
-				<p class="{COMPONENT_COMPACTMODE}">{AUDIO_COMMENT}</p>
-			</li>
-			<!-- END audio_list -->
-		</ul>
-	</div>
+	<ul class="information-list">
+		<!-- BEGIN audio_list -->
+		<li class="{ON_OFF}">
+			<div class="play-button actions">
+				<div id="audio-player-{AUDIO_ID}"><a onclick="loadSWF({AUDIO_ID}, '{AUDIO_URL}'); return false;"></a></div>
+			</div>
+
+			<h4><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION}</a></h4>
+
+			<p class="{COMPONENT_COMPACTMODE}">{AUDIO_COMMENT}</p>
+		</li>
+		<!-- END audio_list -->
+	</ul>
 	<!-- BEGIN submit_file -->
-	<p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a></p>
+	<p class="interact">
+		<a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a>
+	</p>
 	<!-- END submit_file -->
 </div>

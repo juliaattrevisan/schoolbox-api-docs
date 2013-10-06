@@ -1,15 +1,18 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>Twitter</h2>
     {CONFIGURATION}
-    <div class="listing tweets">
-        <ul>
-            <!-- BEGIN tweet -->
-            <li class="clearfix {ON_OFF}">
-                <h4><span style="background-image:url({TWEET_AVATAR});">{TWEET_TEXT}</span></h4>
-
-                <div class="small-right"><p><strong>{TWEET_AUTHOR}</strong><br>{TWEET_DATE}</p></div>
-            </li>
-            <!-- END tweet -->
-        </ul>
-    </div>
+	<ul class="information-list">
+		<!-- BEGIN tweet -->
+		<li class="{ON_OFF}">
+			<p class="meta">
+				<span class="author">
+					<img height="32" width="32" src="{TWEET_AVATAR}" />
+					@{TWEET_AUTHOR}
+				</span>
+				Tweeted on {TWEET_DATE}
+			</p>
+			<p>{TWEET_TEXT}<p>
+		</li>
+		<!-- END tweet -->
+	</ul>
 </div>

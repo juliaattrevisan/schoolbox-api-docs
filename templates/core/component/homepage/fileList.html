@@ -1,36 +1,37 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
-	<div class="listing clearfix">
-		<ul>
-			<!-- BEGIN files -->
-			<li class="{ON_OFF} clearfix">
+	<ul class="information-list">
+		<!-- BEGIN files -->
+		<li class="{ON_OFF} clearfix">
+			<!-- BEGIN modify_file -->
+			<span class="actions">
+				<a class="btn no-text modify" href="/cms/file/{FILE_ID}" title="Modify File"><span></span></a>
+			</span>
+			<!-- END modify_file -->
 
-				<!-- BEGIN file_url -->
-				<h4><a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" rel="external">{FILE_DESCRIPTION}</a></h4>
-				<!-- END file_url -->
-				<!-- BEGIN file_no_url -->
-				<h4>{FILE_DESCRIPTION}</h4>
-				<!-- END file_no_url -->
+			<!-- BEGIN file_url -->
+			<h4><a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" rel="external">{FILE_DESCRIPTION}</a></h4>
+			<!-- END file_url -->
 
-				<div class="small-right">
-					<!-- BEGIN modify_file -->
-					<p class="interact"> <a href="/cms/file/{FILE_ID}">Modify</a> </p>
-					<!-- END modify_file -->
-				</div>
-				<p class="{COMPONENT_COMPACTMODE}">{FILE_COMMENT}</p>
-				<p class="{COMPONENT_COMPACTMODE} interact">
-					Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE},
-					last modified {FILE_MODIFIED_DATE}
-				</p>
-			</li>
-			<!-- END files -->
-		</ul>
-	</div>
-    <p class="interact"><a href="/resources/{FILE_CAT_ID}" class="btn"><span></span>View All Files</a>
-	<!-- BEGIN submit_file -->
-	<a href="/cms/file/new/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post File</a>
-    <a href="/cms/file/multi/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post Multiple Files</a>
-	<!-- END submit_file -->
+			<!-- BEGIN file_no_url -->
+			<h4>{FILE_DESCRIPTION}</h4>
+			<!-- END file_no_url -->
+
+			<p class="{COMPONENT_COMPACTMODE}">{FILE_COMMENT}</p>
+			<p class="{COMPONENT_COMPACTMODE} footnote">
+				Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE},
+				last modified {FILE_MODIFIED_DATE}
+			</p>
+		</li>
+		<!-- END files -->
+	</ul>
+
+    <p class="interact">
+		<a href="/resources/{FILE_CAT_ID}" class="btn"><span></span>View All Files</a>
+		<!-- BEGIN submit_file -->
+		<a href="/cms/file/new/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post File</a>
+		<a href="/cms/file/multi/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post Multiple Files</a>
+		<!-- END submit_file -->
     </p>
 </div>

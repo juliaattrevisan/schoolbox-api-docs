@@ -67,7 +67,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 	    $this->setBlock($templateHandle, 'wiki_row', 'wiki_row_block');
         $this->setBlock($templateHandle, 'submit_wiki', 'submit_wiki_block');
         $this->setBlock('wiki_row', 'compact_hide', 'compact_hide_block');
-        $this->setBlock('compact_hide', 'modify_wiki', 'modify_wiki_block');
+        $this->setBlock('wiki_row', 'modify_wiki', 'modify_wiki_block');
 
         // Custom sorting options
 
