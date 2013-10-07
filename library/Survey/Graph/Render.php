@@ -43,6 +43,14 @@ class Survey_Graph_Render {
 		$i = 0;
 
 		if (is_array($currentQuestion['summary']) && count($currentQuestion['summary'])) {
+
+			/* Find out if an "Other" value was selected
+			 * If it was, dump the last element as this is the freetext someone entered
+			 */
+			if (isset($currentQuestion['summary']['Other'])) {
+				array_pop($currentQuestion['summary']);
+			}
+
 			foreach($currentQuestion['summary'] as $key => $value) {
 
 				/* If the option hasn't been responded to

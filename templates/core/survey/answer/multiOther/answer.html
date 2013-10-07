@@ -1,0 +1,18 @@
+<script type='text/javascript'>
+	$j(function() {
+		$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+			id: {QUESTION_ID}
+		});
+	});
+</script>
+<fieldset class="checkboxes">
+	<!-- BEGIN answerOption -->
+	<label>{ANSWER_VALUE})
+		<input name="answer[]" class="answerCorrect checkbox" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED}/><span>{ANSWER_DESCRIPTION}</span>
+	</label>
+	<!-- END answerOption -->
+
+	<label>
+		<input name="answer[other]" class="answerCorrect" type="text" value="{ANSWER_OTHER}" />
+	</label>
+</fieldset>
