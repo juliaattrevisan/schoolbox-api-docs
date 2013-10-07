@@ -220,6 +220,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
         'SESSION_NAME'    => session_name(),
         'SESSION_ID'      => session_id(),
+        'IS_TASK'         => $is_task ? 1 : 0,
 
     );
 
