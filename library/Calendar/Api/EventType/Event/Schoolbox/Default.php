@@ -60,7 +60,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 * @return Calendar_Event_Collection
 	 */
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
-		return $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
+		return $this->getCalendarHandler()->getDayEvents($this->getUser(), $startTimestamp, $endTimestamp);
 	}
 
 	/**

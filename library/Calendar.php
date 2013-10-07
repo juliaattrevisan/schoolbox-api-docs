@@ -601,6 +601,7 @@ class Calendar extends DeprecatedModel {
 	/**
 	 * Get all events occurring across the specified date span.
 	 *
+	 * @param $user
 	 * @param int   $startTimestamp
 	 * @param int   $endTimestamp
 	 * @param array $filter         A filter to put on the list of results.
@@ -614,11 +615,23 @@ class Calendar extends DeprecatedModel {
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getDayEvents($startTimestamp, $endTimestamp, $filter = array()) {
-        if (is_array($_SESSION['campus'])) {
-            $campusList = $_SESSION['campus'];
+	public function getDayEvents($user, $startTimestamp, $endTimestamp, $filter = array()) {
+        if ($user->getCampusCollection()->count()) {
+			$campusList = array();
+
+			$firstCampus = false;
+
+			foreach ($user->getCampusCollection() as $currentCampus) {
+				if (!$firstCampus) {
+					$firstCampus = $currentCampus;
+				}
+
+				$campusList[] = $currentCampus->getId();
+			}
+
             $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
-        } else {
+        }
+		else {
             $campusQuery = '1 = 1';
         }
 
@@ -628,7 +641,7 @@ class Calendar extends DeprecatedModel {
         $groupQuery = '';
 
         $this->groupHandler->setService(HOMEPAGE_SERVICE);
-        $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
+        $tempList = $this->groupHandler->involvedInCategoryList($user->getId());
 
         if (is_array($tempList)) {
             foreach ($tempList as $temp) {
@@ -644,13 +657,13 @@ class Calendar extends DeprecatedModel {
 
         $this->groupHandler->setService(CALENDAR_SERVICE);
 
-        /* Give people with userAccess to moderate Calendar Access to view all Camups Posts
+        /* Give people with userAccess to moderate Calendar Access to view all Campus Posts
          */
         if (is_array($_SESSION['campus'])) {
-            if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS) {
+            if ($this->groupHandler->getPermission($firstCampus->getId()) > WRITE_ACCESS) {
                 $groupChunk = "";
             } else {
-                $groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
+                $groupChunk = "AND eventGroup.groupID = {$user->getRole()->getId()}";
             }
         }
 
@@ -694,9 +707,9 @@ class Calendar extends DeprecatedModel {
 			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
 			WHERE
 				(
-					(access = ".self::ACCESS_PERSONAL." AND owner = '{$_SESSION['id']}')
+					(access = ".self::ACCESS_PERSONAL." AND owner = '{$user->getId()}')
 					$groupQuery
-					OR (access = ".self::ACCESS_CAMPUS." AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
+					OR (access = ".self::ACCESS_CAMPUS." AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
 				)
 				AND (
 					-- Get any events which overlap timespan.
