@@ -344,4 +344,42 @@ class Collection implements \ICollection {
 	public function reindex() {
 		$this->setStack(array_values($this->getStack()));
 	}
+
+	/**
+	 * Groups all results by a field value.
+	 *
+	 * @param  string $field The field to search by.
+	 * @return Collection|Collection[] @see $this->groupByCallback()
+	 */
+	public function groupBy($field) {
+		$get_method = $this->getGetMethodName($field);
+		return $this->groupByCallback(
+			function($item) use($get_method) {
+				return $item->$get_method();
+			}
+		);
+	}
+
+	/**
+	 * Groups results by the return value of $callback.
+	 *
+	 * @param  callable $callback A callback which takes each item within $this
+	 *                            as its only parameter, and returns a key.
+	 * @return Collection|Collection[]
+	 *   A collection of collections.
+	 *   * key:   result of $item->$callback()
+	 *   * value: a collection of all items in $this where $item->$callback() = $key
+	 */
+	public function groupByCallback($callback) {
+		/** @var Collection[] $result */
+		$result = array();
+		foreach ($this as $item) {
+			$key = call_user_func($callback, $item);
+			if (!array_key_exists($key, $result)) {
+				$result[$key] = new Collection();
+			}
+			$result[$key]->add($item);
+		}
+		return new Collection($result);
+	}
 }
