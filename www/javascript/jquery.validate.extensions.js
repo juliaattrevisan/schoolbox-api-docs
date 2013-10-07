@@ -1,10 +1,5 @@
 /**
  * Custom extensions for jQuery validate plugin.
- *
- * current extensions:
- * * dateValid:     the datepicker value is a valid date
- * * dateNotBefore: the datepicker value is valid, and not before the value of
- *                  another
  */
 (function($) {
     var getNormalizedDate = function(date_field, form) {
@@ -56,6 +51,10 @@
             }
         }
 
+        return getDateFromString(date, hour, minute, 0)
+    }
+
+    var getDateFromString = function(date, hour, minute, second) {
         var date_parts = date.match(/^(\d+)\/(\d+)\/(\d+)$/);
         if (!date_parts) {
             return false;
@@ -66,19 +65,46 @@
             date_parts[1],
             hour,
             minute,
-            0
+            second
         );
     }
 
+    /**
+     * Validator for a datepicker (format: dd/mm/yyyy)
+     */
+    $.validator.addMethod('datepickerDate', function(value, element) {
+        var date = getDateFromString(value, 0, 0, 0);
+        return (date !== false);
+    }, 'Please enter a valid date');
+
+    /**
+     * Extension of datepickerDate for checking that the date is not earlier
+     * than another element's date.
+     */
+    $.validator.addMethod('datepickerDateNotBefore', function(value, element, other_element_selector) {
+        var date       = getDateFromString(value, 0, 0, 0);
+        var other_date = getDateFromString(other_element_selector.val(), 0, 0, 0);
+        return (date !== false && other_date !== false && date.getTime() >= other_date.getTime());
+    }, 'Please enter a valid date');
+
+    /**
+     * Date-time validation method - works with a time selector as well, and
+     * uses some guesswork to find the datetime fields.
+     *
+     * It's used on the submission create field.
+     */
     $.validator.addMethod('dateValid', function(value, element) {
         var date = getNormalizedDate(element);
         return date && date.getTime && !isNaN(date.getTime());
     }, 'Please enter a valid date');
 
+    /**
+     * dateValid extension - checks that this field's date is not earlier than
+     * than another one.
+     */
     $.validator.addMethod('dateNotBefore', function(value, element, other_date_field) {
         var item = $j(element);
         var form = item.closest('form');
         return (getNormalizedDate(element) >= getNormalizedDate(other_date_field, form));
     }, 'Please enter a date that is after');
-
 }(jQuery));
