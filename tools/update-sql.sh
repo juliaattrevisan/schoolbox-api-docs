@@ -28,7 +28,7 @@ echo "Starting SQL update process";
 
 # Build update version list
 rm -f $versionlist;
-for release in `echo "12.0.5";find $instdir/updates -maxdepth 1 -type d | sort -V | cut -c$baselength-1000`;
+for release in `find $instdir/updates -maxdepth 1 -type d | sort -V | cut -c$baselength-1000`;
 do
 	echo $release >> $versionlist;
 	newver=$release;
