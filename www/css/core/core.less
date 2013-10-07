@@ -1167,12 +1167,24 @@ Notifications
 			margin: 0 6px 0 0;
 		}
 	}
-	.icon {
+	// Icons & Thumbnails at the left of the box
+	.icon, .thumbnail {
 		float: left;
-		width: 32px;
 		margin: 0 6px 0 0;
-		line-height: 1.5;
-		font-size: 2em;
+		line-height: 0;
+		// If text, make biggerer
+		.text {
+			line-height: 1.5;
+			font-size: 2em;
+		}
+	}
+	// 32px image
+	.icon {
+		width: 32px;
+	}
+	// 64px image
+	.thumbnail {
+		width: 64px;
 	}
 
 	// Actions are the buttons to interact with the list item, such as edit, delete
