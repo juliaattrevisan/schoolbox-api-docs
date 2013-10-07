@@ -344,8 +344,9 @@ if (is_numeric($this->arg[0])) {
 	                                }
 	                            }
 
+                                $cat_name = is_array($category) ? $category['name'] : $subject['name'];
 	                            $output = array(
-	                                'SUBJECT_NAME' => Scrub::Text($category['name']),
+	                                'SUBJECT_NAME' => Scrub::Text($cat_name),
 		                            'SUBJECT_URL' => is_array($category) && $groupHandler->getPermission( $category['id']  ) >= READ_ACCESS ? "/homepage/{$subject['code']}": '#',
 	                            );
 
