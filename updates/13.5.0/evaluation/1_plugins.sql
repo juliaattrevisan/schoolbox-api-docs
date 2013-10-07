@@ -4,6 +4,7 @@
  * but I'm going to stash them here until we use Mappers for Evaluation
  */
 ALTER TABLE `assess_luQuestionType` ADD COLUMN `plugin` VARCHAR(255) NULL AFTER `classname`;
+ALTER TABLE `assess_luQuestionType` CHANGE `type_id` `type_id` INT(8) NOT NULL AUTO_INCREMENT;
 
 UPDATE `assess_luQuestionType` SET `plugin` = 'evaluationShort' WHERE `classname` = 'Short';
 UPDATE `assess_luQuestionType` SET `plugin` = 'evaluationMultipleChoice' WHERE `classname` = 'Multi';
