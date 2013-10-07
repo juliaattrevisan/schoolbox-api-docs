@@ -170,7 +170,7 @@ if (!empty($_POST)) {
     foreach (array('am', 'pm') as $meridiem) {
         $this->setVar(array(
             'FINISH_MERIDIEM_VALUE' => $meridiem,
-            'FINISH_MERIDIEM_SELECTED' => $assessFinishDate->getUsingFormat('a') ? 'selected=\'selected\'' : '',
+            'FINISH_MERIDIEM_SELECTED' => $meridiem == $assessFinishDate->getUsingFormat('a') ? 'selected=\'selected\'' : '',
         ));
 
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
