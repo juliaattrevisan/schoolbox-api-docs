@@ -18,8 +18,21 @@
             }
         });
 
-        // Form for validation: on any blur event on a form field, it's validated.
         var form = $('form#importForm');
+        form.delegate('input[data-interaction="enable"]', 'click', function(event) {
+            var element = $(this);
+            var row     = element.closest('[data-type="unit_row"]');
+            if (!element.is(':checked')) {
+                row.find(':input').not(this).prop('disabled', true);
+                row.data('enabled', false);
+            }
+            else {
+                row.find(':input').not(this).prop('disabled', false);
+                row.data('enabled', true);
+            }
+        });
+
+        // Form for validation: on any blur event on a form field, it's validated.
         form.validate();
         form.delegate('input', 'blur', function() { form.valid(); })
 
@@ -37,7 +50,7 @@
                 datepickerDate: true,
                 datepickerDateNotBefore: {
                     param: function(this_element) {
-                        return $(this_element).closest('tr').find('input.open_date');
+                        return $(this_element).closest('[data-type="unit_row"]').find('input.open_date');
                     }
                 },
                 messages: {
@@ -98,9 +111,12 @@
                         <td>Due Date</td>
                     </tr>
                     <!-- BEGIN unit -->
-                    <tr>
+                    <tr data-type="unit_row" data-enabled="1">
                         <td>
-                            <a href="/homepage/{UNIT_ID}" class="unit_name" data-unit_id="{UNIT_ID}">{UNIT_NAME}</a>
+                            <input name="unit[{UNIT_ID}][import]" type="hidden" value="0" />
+                            <input id="import-{UNIT_ID}" name="unit[{UNIT_ID}][import]" type="checkbox" value="1" checked="checked" data-interaction="enable" />
+                            <label for="import-{UNIT_ID}">{UNIT_NAME}</label>
+                            (<a href="/homepage/{UNIT_ID}" class="unit_name" data-unit_id="{UNIT_ID}">View</a>)
                             <input name="unit[{UNIT_ID}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
                         </td>
                         <td>
