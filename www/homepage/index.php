@@ -61,7 +61,7 @@ $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
-$componentFactory = new Component_Homepage_Factory(new User, $this);
+$componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
 $componentCollection = $componentFactory->buildComponentList($categoryID);
 
 // User has elevated priviliges: can write to page
