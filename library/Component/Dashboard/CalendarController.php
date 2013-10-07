@@ -30,7 +30,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 	 */
 	protected $eventList;
 
-	public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Calendar $calendar, Group $group) {
+	public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Calendar $calendar, Group $group) {
 		parent::__construct($instance, $user, $sitepage);
 
 		$this->setCalendar($calendar);

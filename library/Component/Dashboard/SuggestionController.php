@@ -17,7 +17,7 @@ class Component_Dashboard_SuggestionController extends Component_Dashboard_Contr
 
     protected $categoryNewsList;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, CategoryNews $categoryNews) {
+    public function __construct (Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, CategoryNews $categoryNews) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->categoryNews = $categoryNews;

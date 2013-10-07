@@ -15,7 +15,7 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
 
     protected $activity;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Group $group, Activity $activity) {
+    public function __construct (Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Activity $activity) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->group = $group;

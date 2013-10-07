@@ -13,7 +13,7 @@ class Component_Dashboard_OrganisationController extends Component_Dashboard_Con
 
     protected $group;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Group $group) {
+    public function __construct (Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->group = $group;

@@ -24,7 +24,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private $colourList;
 
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable) {
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;

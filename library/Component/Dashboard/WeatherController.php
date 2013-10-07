@@ -16,7 +16,7 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
     protected $forecastDays = 3;
 
 
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
         $this->weatherController = new Weather_Wunderground();
     }

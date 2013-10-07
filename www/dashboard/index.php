@@ -13,7 +13,7 @@ $this->setTab('main');
 /* Instance factory */
 $groupID = $_SESSION['gid'];
 
-$componentFactory = new Component_Dashboard_Factory(new User, $this);
+$componentFactory = new Component_Dashboard_Factory(new \Schoolbox\User(), $this);
 $componentCollection = $componentFactory->buildComponentList($groupID);
 
 $occupiedPositionList = array();

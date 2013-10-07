@@ -13,7 +13,7 @@ class Component_Dashboard_ParentHelpdeskController extends Component_Dashboard_C
 
     protected $helpdesk;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct (Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
 
         require_once( 'modules/helpdesk/helpdesk.php' );

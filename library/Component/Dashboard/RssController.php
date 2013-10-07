@@ -13,7 +13,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
 
     protected $rss;
 
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
 
 
