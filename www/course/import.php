@@ -93,6 +93,7 @@ foreach ($child_list as $unit) {
     $this->setVar(
         array(
             'UNIT_ID'          => Scrub::text($unit_id),
+            'UNIT_ENABLED'     => 1,
             'UNIT_INSTANCE_ID' => '',
             'UNIT_NAME'        => Scrub::text($unit->getName()),
             'UNIT_OPEN_DATE'   => '',

@@ -100,6 +100,7 @@ foreach ($course_list as $unit) {
     $this->setVar(
         array(
             'UNIT_ID'          => Scrub::text($unit->getUnitCategory()->getId()),
+            'UNIT_ENABLED'     => 1,
             'UNIT_INSTANCE_ID' => Scrub::text($unit->getId()),
             'UNIT_NAME'        => Scrub::text($unit->getUnitCategory()->getName()),
             'UNIT_OPEN_DATE'   => $unit->getOpenDate()->getUsingFormat('d/m/Y'),
