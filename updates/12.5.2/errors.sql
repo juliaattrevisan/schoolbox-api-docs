@@ -1,2 +1,0 @@
-/* Add an error for when you cannot use the multi-category uploader for lack of permissions [SB-1724] */
-INSERT INTO `error` (`id`, `message`) VALUES ('154', 'You do not have write permission to any categories.');

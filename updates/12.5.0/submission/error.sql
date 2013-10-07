@@ -1,1 +1,0 @@
-INSERT INTO `error`(`id`,`message`) VALUES ( '153','You are currently not enrolled in any classes so this page is unavailable');

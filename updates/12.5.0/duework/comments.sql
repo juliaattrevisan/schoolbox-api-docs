@@ -1,2 +1,0 @@
-/* Make return work comment a full 'text' field, rather than the 255 chars it is at the moment. */
-ALTER TABLE `submission_return` CHANGE `comment` `comment` TEXT CHARSET utf8 COLLATE utf8_general_ci NULL;

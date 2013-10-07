@@ -1,1 +1,0 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field`, `options`, `type`, `editable`, `hidden`, `required`) VALUES ('storage_dir', '/var/www/schoolbox/data/storage', 'Data Store Location', 'Multi purpose storage engine, stores all files in this path', 'input', NULL, 'Paths', 'false', 'false', 'true');

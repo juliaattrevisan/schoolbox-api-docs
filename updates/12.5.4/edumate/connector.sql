@@ -1,1 +1,0 @@
-UPDATE `config` SET `options` = 'synergetic:tass:denbigh:edumate:schoolbox' WHERE `name` = 'external_type';
