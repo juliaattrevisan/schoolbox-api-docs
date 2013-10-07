@@ -42,20 +42,7 @@ if ($group->getPermission($homepage_id) < WRITE_ACCESS
 /** @var Collection|Category[] $child_list */
 $child_list    = CategoryMapper::getInstance()->findByColumn('parent', $course_homepage_id);
 $child_id_list = $child_list->getColumnValues('id');
-
-/** @var Task[] $task_list */
-$task_list = TaskMapper::getInstance()->findByColumn(
-    'category_id',
-    $child_id_list,
-    array(
-        'order' => array('category_id' => 'asc'),
-    )
-);
-// Group task list by category
-$grouped_task_list = array();
-foreach ($task_list as $task) {
-    $grouped_task_list[$task->getCategory()->getId()][] = $task;
-}
+$task_list     = TaskMapper::getInstance()->findGroupedListForCategoryList($child_id_list);
 
 // block setup (PHPLib sucks)
 $this->setFile(TEMPLATE_content, "course/import.html");
@@ -100,7 +87,7 @@ foreach ($course_homepage_path as $parent) {
 $this->setVar('unit_block', '');
 foreach ($child_list as $unit) {
     $unit_id = $unit->getId();
-    if (empty($grouped_task_list[$unit_id])) {
+    if (count($task_list->getOffset($unit_id)) == 0) {
         continue;
     }
     $this->setVar(
