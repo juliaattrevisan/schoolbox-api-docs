@@ -68,8 +68,6 @@ $this->setVar(
     array(
         'class_breadcrumb_block'  => '',
         'course_breadcrumb_block' => '',
-        'FORM_ID'                 => 'importForm',
-        'FORM_ACTION'             => '/course/importForm.php',
         'HOMEPAGE_ID'             => Scrub::text($homepage_id),
         'COURSE_HOMEPAGE_ID'      => Scrub::text($course_homepage_id),
         'COMPONENT_ID'            => Scrub::text($component_id),

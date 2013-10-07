@@ -1,64 +1,9 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.courseImport.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
-        // Setup datepickers
-        $('input[data-interaction="datepicker"]').datepicker({
-            dateFormat:'dd/mm/yy',
-            showOn:'both',
-            buttonImage:'/images/core/calendar/calendar-click.png',
-            buttonImageOnly:true,
-            constrainInput:false,
-            onClose:function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
-        var form = $('form#importForm');
-        form.delegate('input[data-interaction="enable"]', 'click', function(event) {
-            var element = $(this);
-            var row     = element.closest('[data-type="unit_row"]');
-            if (!element.is(':checked')) {
-                row.find(':input').not(this).prop('disabled', true);
-                row.data('enabled', false);
-            }
-            else {
-                row.find(':input').not(this).prop('disabled', false);
-                row.data('enabled', true);
-            }
-        });
-
-        // Form for validation: on any blur event on a form field, it's validated.
-        form.validate();
-        form.delegate('input', 'blur', function() { form.valid(); })
-
-        // Date validation
-        form.find('input.open_date').each(function() {
-            $(this).rules('add', {
-                datepickerDate: true,
-                messages: {
-                    datepickerDate: 'Please enter a valid date.'
-                }
-            });
-        });
-        form.find('input.due_date').each(function() {
-            $(this).rules('add', {
-                datepickerDate: true,
-                datepickerDateNotBefore: {
-                    param: function(this_element) {
-                        return $(this_element).closest('[data-type="unit_row"]').find('input.open_date');
-                    }
-                },
-                messages: {
-                    datepickerDate: 'Please enter a valid date.',
-                    datepickerDateNotBefore: 'Please enter a valid date not before the open date.'
-                }
-            });
-        });
+        $('form#importForm').setupCourseImport();
     });
 })(jQuery);
 </script>
@@ -66,7 +11,7 @@
 
 <h1>Import a course</h1>
 
-<form method="post" action="{FORM_ACTION}" id="importForm">
+<form method="post" action="/course/importForm.php" id="importForm">
 
     <input type="hidden" name="homepage"        value="{HOMEPAGE_ID}" />
     <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />

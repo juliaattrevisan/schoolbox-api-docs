@@ -53,7 +53,7 @@ $course_list = UnitInstanceMapper::getInstance()->findByColumn(
 //var_dump($component, $course_list);exit;
 
 // block setup (PHPLib sucks)
-$this->setFile(TEMPLATE_content, "course/import.html");
+$this->setFile(TEMPLATE_content, "course/modify.html");
 $this->setBlock(TEMPLATE_content, 'course_breadcrumb', 'course_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'class_breadcrumb',  'class_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'unit',              'unit_block');
@@ -63,8 +63,6 @@ $this->setVar(
     array(
         'class_breadcrumb_block'  => '',
         'course_breadcrumb_block' => '',
-        'FORM_ID'                 => 'modifyForm',
-        'FORM_ACTION'             => '/course/modifyForm.php',
         'HOMEPAGE_ID'             => '',
         'COURSE_HOMEPAGE_ID'      => '',
         'COMPONENT_ID'            => Scrub::text($component_id),
