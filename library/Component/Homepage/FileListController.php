@@ -123,6 +123,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 }
 
                 $date = new Alaress_Date_Format($file['submitted'], 'U');
+                $posted_relative = new Alaress_Date_Relative($file['submitted'], 'U');
                 $modified = new Alaress_Date_Relative($file['modified'], 'U');
                 $output = array('FILE_DESCRIPTION'	=> Scrub::text($file['description']),
                     'FILE_ID'			=> $file['id'],
@@ -130,6 +131,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     'FILE_POSTED_BY'	=> $this->user->formatName($file),
                     'FILE_POSTED_BY_ID'	=> $file['owner'],
                     'FILE_POSTED_DATE'	=> $date->getShort(),
+                    'FILE_POSTED_RELATIVE'	=> $posted_relative->getRelativeTime(),
                     'FILE_MODIFIED_DATE' => $modified->getRelativeTime(),
                     'FILE_COMMENT'		=> nl2br(Scrub::text($file['comment'])),
                     'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
