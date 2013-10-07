@@ -1,1 +1,0 @@
-ALTER TABLE `news_items` ADD COLUMN `item_image` VARCHAR(100) NULL AFTER `item_group`;

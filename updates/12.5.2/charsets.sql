@@ -1,5 +1,0 @@
-ALTER TABLE `rubric_result` CHANGE `label` `label` VARCHAR(32) CHARSET utf8 NOT NULL;
-ALTER TABLE `rubric_descriptor` CHANGE `description` `description` VARCHAR(512) CHARSET utf8 NULL;
-ALTER TABLE `rubric_criterion` CHANGE `grouping` `grouping` VARCHAR(64) CHARSET utf8 NOT NULL, CHANGE `name` `name` VARCHAR(128) CHARSET utf8 NOT NULL, CHANGE `parent_type` `parent_type` ENUM('submission','category','curriculum') CHARSET utf8 DEFAULT 'category' NOT NULL;
-ALTER TABLE `storage` CHANGE `filename` `filename` VARCHAR(250) CHARSET utf8 NOT NULL, CHANGE `hash` `hash` VARCHAR(100) CHARSET utf8 NOT NULL, CHANGE `mime` `mime` VARCHAR(100) CHARSET utf8 NULL, CHARSET=utf8, COLLATE=utf8_general_ci;
-ALTER TABLE `user_profile` CHANGE `title` `title` VARCHAR(16) CHARSET utf8 NULL, CHANGE `given_name` `given_name` VARCHAR(128) CHARSET utf8 NULL, CHANGE `preferred_name` `preferred_name` VARCHAR(32) CHARSET utf8 NULL, CHANGE `last_name` `last_name` VARCHAR(64) CHARSET utf8 NULL, CHANGE `email` `email` VARCHAR(64) CHARSET utf8 NULL, CHARSET=utf8, COLLATE=utf8_general_ci;

@@ -1,1 +1,0 @@
-UPDATE `config` SET `title`='Enable WebDAV connector',`description`='Turns on webDAV, enabling the network drives tab' WHERE `name`='webdav_enable';
