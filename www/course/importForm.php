@@ -67,20 +67,22 @@ CriterionMapper::getInstance()->copyFromCategory($course_homepage_id, $homepage_
 // And create a new unit instance for each option.
 $unit_instance_list = new Collection();
 foreach ($_POST['unit'] as $unit_id => $unit) {
-    // Merge rubrics from first, because they need to exist before the due work is added.
-    CriterionMapper::getInstance()->copyFromCategory($unit_id, $homepage_id);
+    if (!empty($unit['import'])) {
+        // Merge rubrics from first, because they need to exist before the due work is added.
+        CriterionMapper::getInstance()->copyFromCategory($unit_id, $homepage_id);
 
-    // and save the unit into the course.
-    $unit_homepage = CategoryMapper::getInstance()->findById($unit_id);
-    $unit_instance = new UnitInstance();
-    $unit_instance
-        ->setComponent($component)
-        ->setTitle($unit_homepage->getName())
-        ->setUnitCategory($unit_homepage)
-        ->setOpenDate(new Alaress_Date_Format($unit['open_date'], 'd/m/y'))
-        ->setDueDate(new Alaress_Date_Format($unit['due_date'], 'd/m/y'))
-    ;
-    $unit_instance_list->add($unit_instance);
+        // and save the unit into the course.
+        $unit_homepage = CategoryMapper::getInstance()->findById($unit_id);
+        $unit_instance = new UnitInstance();
+        $unit_instance
+            ->setComponent($component)
+            ->setTitle($unit_homepage->getName())
+            ->setUnitCategory($unit_homepage)
+            ->setOpenDate(new Alaress_Date_Format($unit['open_date'], 'd/m/y'))
+            ->setDueDate(new Alaress_Date_Format($unit['due_date'], 'd/m/y'))
+        ;
+        $unit_instance_list->add($unit_instance);
+    }
 }
 UnitInstanceMapper::getInstance()->save($unit_instance_list);
 
