@@ -9,7 +9,7 @@
  */
 
 $user_mapper = new \Schoolbox\UserMapper();
-$user = $user_mapper->findById($_SESSION['id']);
+$user = $user_mapper->findById($_GET['userId']);
 
 $calendar = new Calendar_Layout_Full_Ajax_JSON($this, $user, $this->arg[0]);
 $calendar->render();

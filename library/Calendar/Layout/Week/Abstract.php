@@ -24,13 +24,20 @@ abstract class Calendar_Layout_Week_Abstract {
 	protected $api = null;
 
 	/**
+	 * An instance of Schoolbox\User
+	 *
+	 * @var null
+	 */
+	protected $user = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @param $page
 	 * @param $user
 	 * @param $date
 	 */
-	public function __construct($page, $user, $date) {
+	public function __construct($page, \Schoolbox\User $user, $date) {
 		$factory = new Calendar_Api_Factory($user);
 		$api = $factory->produce();
 
@@ -40,6 +47,7 @@ abstract class Calendar_Layout_Week_Abstract {
 		 */
 		$this->setCalendarHandler(new Calendar());
 
+		$this->setUser($user);
 		$this->setGroupHandler(new Group());
 		$this->setSubStuHandler(new SubmissionStudent());
 		$this->setPage($page);
@@ -376,5 +384,23 @@ abstract class Calendar_Layout_Week_Abstract {
 	 */
 	protected function getApi() {
 		return $this->api;
+	}
+
+	/**
+	 * Set user
+	 *
+	 * @param null $user
+	 */
+	protected function setUser($user) {
+		$this->user = $user;
+	}
+
+	/**
+	 * Get user
+	 *
+	 * @return null
+	 */
+	protected function getUser() {
+		return $this->user;
 	}
 }

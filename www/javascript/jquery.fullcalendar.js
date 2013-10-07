@@ -1,4 +1,5 @@
 /* Alaress FullCalendar implementation
+
 * @dep customised fullcalendar.min.js
 * */
 
@@ -319,10 +320,17 @@ Calendar.prototype.init = function() {
         }
     })
 
+	var self = this;
+	
     $j('#datepicker').datepicker({
         dateFormat: 'dd-mm-yy',
         onSelect: function(dateText, inst) {
             var url = location.pathname.match(/^[^0-9]+/g).toString().replace(/\/*$/g, '') + '/' + dateText;
+
+			/* Append user id
+			 */
+			url += '/' + self.options.userId;
+
             window.open(url, "_self");
         },
         defaultDate: $j.datepicker.parseDate("dd-mm-yy", c.options.fullCalendar.date + '-' +
