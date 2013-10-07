@@ -616,10 +616,10 @@ class Calendar extends DeprecatedModel {
 	 * @return Calendar_Event_Collection
 	 */
 	public function getDayEvents($user, $startTimestamp, $endTimestamp, $filter = array()) {
-        if ($user->getCampusCollection()->count()) {
-			$campusList = array();
+		$firstCampus = false;
 
-			$firstCampus = false;
+		if ($user->getCampusCollection()->count()) {
+			$campusList = array();
 
 			foreach ($user->getCampusCollection() as $currentCampus) {
 				if (!$firstCampus) {

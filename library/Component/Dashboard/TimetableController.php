@@ -96,8 +96,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         }
 
         $campus_list = array();
-        foreach ($this->user->getCampusList() as $campus) {
-            $campus_list[$campus['id']] = $campus;
+        foreach ($this->user->getCampusCollection() as $campus) {
+            $campus_list[$campus->getId()] = $campus;
         }
 
         $this->setVar("campus_timetable_block", '');
