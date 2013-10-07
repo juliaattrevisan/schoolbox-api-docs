@@ -17,6 +17,35 @@
                 })
             }
         });
+
+        // Form for validation: on any blur event on a form field, it's validated.
+        var form = $('form#importForm');
+        form.validate();
+        form.delegate('input', 'blur', function() { form.valid(); })
+
+        // Date validation
+        form.find('input.open_date').each(function() {
+            $(this).rules('add', {
+                datepickerDate: true,
+                messages: {
+                    datepickerDate: 'Please enter a valid date.'
+                }
+            });
+        });
+        form.find('input.due_date').each(function() {
+            $(this).rules('add', {
+                datepickerDate: true,
+                datepickerDateNotBefore: {
+                    param: function(this_element) {
+                        return $(this_element).closest('tr').find('input.open_date');
+                    }
+                },
+                messages: {
+                    datepickerDate: 'Please enter a valid date.',
+                    datepickerDateNotBefore: 'Please enter a valid date not before the open date.'
+                }
+            });
+        });
     });
 })(jQuery);
 </script>
@@ -24,7 +53,7 @@
 
 <h1>Import a course</h1>
 
-<form method="post" action="{FORM_ACTION}" id="{FORM_ID}">
+<form method="post" action="{FORM_ACTION}" id="importForm">
 
     <input type="hidden" name="homepage"        value="{HOMEPAGE_ID}" />
     <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
@@ -75,10 +104,10 @@
                             <input name="unit[{UNIT_ID}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
                         </td>
                         <td>
-                            <input id="open_date-{UNIT_ID}" name="unit[{UNIT_ID}][open_date]" type="text" size="15" maxlength="30" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
+                            <input class="open_date" id="open_date-{UNIT_ID}" name="unit[{UNIT_ID}][open_date]" type="text" size="15" maxlength="30" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
                         </td>
                         <td>
-                            <input id="due_date-{UNIT_ID}" name="unit[{UNIT_ID}][due_date]" type="text" size="15" maxlength="30" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
+                            <input class="due_date" id="due_date-{UNIT_ID}" name="unit[{UNIT_ID}][due_date]" type="text" size="15" maxlength="30" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
                         </td>
                     </tr>
                     <!-- END unit -->
