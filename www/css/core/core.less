@@ -1170,12 +1170,14 @@ Notifications
 	// Icons & Thumbnails at the left of the box
 	.icon, .thumbnail {
 		float: left;
-		margin: 0 6px 0 0;
+		margin: 0 12px 0 0;
 		line-height: 0;
 		// If text, make biggerer
-		.text {
+		&.text {
+			margin-right: 6px;
 			line-height: 1.5;
 			font-size: 2em;
+			padding: 0;
 		}
 	}
 	// 32px image
@@ -1626,17 +1628,7 @@ Notifications
         width: 100%;
     }
 
-    ul.topic li li {
-        list-style: none;
-        border-top-width: 1px;
-        border-top-style: solid;
-    }
-
-    .listing .topic > li {
-        padding: 0;
-        margin: 0;
-        height: 1%;
-    }
+	.topic > li { padding: 0; }
 }
 
 .student-subjects {
@@ -6351,6 +6343,7 @@ p.forgotten {
     clear: both;
     width: 100%;
     float: left;
+	border-bottom: 1px solid @border-color;
     //margin-bottom: 8px;
 	padding-left: 16px;
     li {
