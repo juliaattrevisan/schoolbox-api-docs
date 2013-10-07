@@ -56,14 +56,15 @@ class Cloner {
         $this->unit          = UnitInstanceMapper::getInstance()->findById(
             $object->getUnitInstance()->getId()
         );
-        $this->category = CategoryMapper::getInstance()->findById(
-            $object->getUnitInstance()->getComponent()->getIdentifier()
+        $component = \Component_InstanceMapper::getInstance()->findById(
+            $this->unit->getComponent()->getId()
         );
+        $this->category = CategoryMapper::getInstance()->findById($component->getIdentifier());
     }
 
     /**
-     * Clones the submission box (if there is one) that is attached to this
-     * object's task instance.
+     * Clones the assessment (if there is one) that is attached to this object's
+     * task instance.
      *
      * @return OnlineAssessment The assessment that was created.
      * @throws ClonerException  if the assessment was not able to be created
@@ -103,7 +104,7 @@ class Cloner {
                 ->setTaskInstance($this->task_instance)
                 ->setUser($_SESSION['id'])
                 ->setStart($this->getOpenTimeFromTask())
-                ->setFinish($this->getCloseTimeFromTask())
+                ->setFinish($this->getAssessmentCloseTimeFromTask())
             ;
             OnlineAssessmentMapper::getInstance()->save($assess_object);
             return $assess_object;
@@ -128,8 +129,8 @@ class Cloner {
                 ->setOwner($_SESSION['id'])
                 ->setCategory($this->category)
                 ->setOpenDate($this->getOpenTimeFromTask())
-                ->setDueDate($this->getCloseTimeFromTask())
-                ->setLateDate($this->getCloseTimeFromTask())
+                ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
+                ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
             ;
             SubmissionBoxMapper::getInstance()->create($box);
 
@@ -138,6 +139,34 @@ class Cloner {
             return $box;
         }
         throw new ClonerException('No submission box is attached to this task');
+    }
+
+    /**
+     * Updates linked items (submission box or online assessment) hat is
+     * attached to this object's task instance.
+     */
+    public function updateLinkedItems() {
+        $assess_id = $this->task_instance->getAssessment()->getId();
+        if ($assess_id) {
+            /** @var OnlineAssessment $assess_object */
+            $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
+            $assess_object
+                ->setStart($this->getOpenTimeFromTask())
+                ->setFinish($this->getAssessmentCloseTimeFromTask())
+            ;
+            OnlineAssessmentMapper::getInstance()->save($assess_object);
+        }
+        $box_id = $this->task_instance->getSubmissionBox()->getId();
+        if ($box_id) {
+            /** @var SubmissionBox $box */
+            $box = SubmissionBoxMapper::getInstance()->findById($box_id);
+            $box
+                ->setOpenDate($this->getOpenTimeFromTask())
+                ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
+                ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
+            ;
+            SubmissionBoxMapper::getInstance()->save($box);
+        }
     }
 
     /**
@@ -159,7 +188,19 @@ class Cloner {
      *
      * @return Alaress_Date_Format
      */
-    protected function getCloseTimeFromTask() {
+    protected function getSubmissionBoxCloseTimeFromTask() {
+        $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'));
+        return new \Alaress_Date_Format($close_date);
+    }
+
+    /**
+     * Gets the time that all boxes and assessments from the task should close.
+     * Currently, they close at 12am the day after the close date, so that the
+     * assessment is open for the whole day.
+     *
+     * @return Alaress_Date_Format
+     */
+    protected function getAssessmentCloseTimeFromTask() {
         $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 00:00:00'));
         $close_date->modify('+1 day');
         return new \Alaress_Date_Format($close_date);
