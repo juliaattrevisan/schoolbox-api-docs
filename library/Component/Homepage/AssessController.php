@@ -30,6 +30,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
         $this->setBlock($templateHandle, 'assess', 'assess_block');
         $this->setBlock($templateHandle, 'createAssessment', 'createAssessment_block');
+        $this->setBlock('assess', 'resultLink', 'resultLink_block');
         $this->setBlock('assess', 'teacherLink', 'teacherLink_block');
         $this->setBlock('assess', 'resumeLink', 'resumeLink_block');
         $this->setBlock('assess', 'assessLink', 'assessLink_block');
@@ -86,6 +87,13 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                             'ON_OFF' => $i++ % 2 ? 'dark' : '',
                         )
                     );
+                    if (isset($currentAssess['task_id'])) {
+                        $this->setVar('ASSESS_FINISH_DATE', '');
+                        $this->setVar('resultLink_block', '');
+                    }
+                    else {
+                        $this->parse('resultLink_block', 'resultLink');
+                    }
 
                     /* Check if you have completed an assessment already
                   *

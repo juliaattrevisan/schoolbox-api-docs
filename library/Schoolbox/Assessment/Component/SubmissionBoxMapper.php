@@ -15,6 +15,7 @@ use Schoolbox\User;
 use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Course\Task;
 
 class SubmissionBoxMapper extends Schoolbox\Mapper {
 
@@ -89,6 +90,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'owner',
 			'type'       => self::TYPE_MODEL,
 			'join'       => 'owner',
+		));
+		$this->hasMap(array(
+			'column'     => 'task_id',
+			'property'   => 'task',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'task',
 		));
 		$this->hasMap(array(
 			'column'     => 'open_date',
@@ -224,6 +231,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
+		$this->hasJoin('task', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Course\\TaskMapper',
+			'this_key'  => 'task_id',
+			'other_key' => 'id',
+		));
 
 		$this->hasSoftDeleteBooleanField('deleted');
 
@@ -302,8 +314,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * Pre-save method for submission boxes - converts legacy file to a new
-	 * storage file.
+	 * Pre-save method for submission boxes.
+	 * * converts legacy file to a new storage file
+	 * * Sets start, end and due time to now if this is a task
 	 *
 	 * @param SubmissionBox $object
 	 *
@@ -321,6 +334,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			//
 			// Remove legacy file link because it is no longer needed.
 			$object->setLegacyFileId(null);
+		}
+		if (!$object->getId()) {
+			$task    = $object->getTask();
+			$task_id = ($task instanceof Task) ? $task->getId() : $task;
+			if ($task_id) {
+				$time = new \Alaress_Date_Format(time(), 'U');
+				$object->setOpenDate($time);
+				$object->setDueDate($time);
+				$object->setLateDate($time);
+			}
 		}
 		return true;
 	}
@@ -418,6 +441,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
 				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
 				AND sb.deleted IS FALSE
+				AND sb.task_id IS NULL
 				AND (
 					(YEAR(ss.submitted) = :year AND MONTH(ss.submitted) BETWEEN :month_start AND :month_end)
 					OR
@@ -462,7 +486,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$params['month_end']   = $months['end'];
 
 		$query = "
-		    SELECT
+			SELECT
 			b.id AS bid,
 			s.id AS sid,
 			r.id AS rid,
@@ -486,7 +510,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND YEAR(b.date) = :year
 			AND MONTH(b.date) BETWEEN :month_start AND :month_end
-            GROUP BY b.id
+			AND b.task_id IS NULL
+			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
 		";
 		$statement = $this->database->prepare($query);
@@ -526,6 +551,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.open_date < NOW()
 					AND sb.deleted IS FALSE
+					AND sb.task_id IS NULL
 					ORDER BY sb.open_date DESC
 					LIMIT :limit
 				",
@@ -548,6 +574,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					AND sm.id IS NULL
 					AND sb.date < NOW()
 					AND sb.deleted IS FALSE
+					AND sb.task_id IS NULL
 					ORDER BY sb.date DESC
 					LIMIT :limit
 				",
@@ -566,6 +593,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.late_date < NOW()
 					AND sb.deleted IS FALSE
+					AND sb.task_id IS NULL
 					ORDER BY sb.late_date DESC
 					LIMIT :limit
 				",
@@ -627,6 +655,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND sb.date > NOW()
 			AND sb.deleted IS FALSE
+			AND sb.task_id IS NULL
 			HAVING (submission_count = 0 OR sb.multi_submission IS TRUE)
 			ORDER BY sb.date ASC
 			LIMIT :limit
@@ -686,6 +715,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'sb.late_date > NOW()',
 			'sb.accept_submission IS TRUE',
 			'sb.deleted IS FALSE',
+			'sb.task_id IS NULL',
 		);
 		if ($cat_ids) {
 			$params        = $this->getArrayParameters($cat_ids, 'cat');
@@ -747,6 +777,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND sb.date BETWEEN :from_date AND :to_date
 			AND sb.deleted IS FALSE
+			AND sb.task_id IS NULL
 			ORDER BY sb.date ASC
 		";
 

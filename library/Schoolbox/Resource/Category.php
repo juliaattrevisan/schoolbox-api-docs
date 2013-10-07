@@ -24,11 +24,6 @@ class Category {
 	protected $name;
 
 	/**
-	 * @var int
-	 */
-	protected $parent_id;
-
-	/**
 	 * @var Category
 	 */
 	protected $parent;
@@ -136,23 +131,7 @@ class Category {
 	}
 
 	/**
-	 * @param  int $parent_id
-	 * @return $this
-	 */
-	public function setParentId($parent_id) {
-		$this->parent_id = $parent_id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getParentId() {
-		return $this->parent_id;
-	}
-
-	/**
-	 * @param int $templateId
+	 * @param \Schoolbox\Resource\HomepageConfig $homepage
 	 * @return $this
 	 */
 	public function setHomepage($homepage) {

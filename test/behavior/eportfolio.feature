@@ -5,8 +5,9 @@ Feature: ePortfolio
 
 @javascript
 Scenario: Create an ePortfolio template
-  Given I go to "/"
-  And   I am logged in as "alaress" with password "alaress"
+  When  I wipe the slate clean
+  Then  I go to homepage
+  And   log in as "alaress" with password "alaress"
   When  I go to "/adminv2/eportfolio"
   And   I create a template "New Template"
   And   I add "Textbox" to "left" at position "1"
@@ -29,7 +30,8 @@ Scenario: Create an ePortfolio template
   And   I repurpose component on "top" at position "1" to "Photos of myself"
   Then  I go to "/eportfolio"
   Then  I follow "add-page"
-  And   I fill in "name" with "My Page"
+  And   wait for a "name" field
+  Then  I fill in "name" with "My Page"
   And   I select "New Template" from "page_template"
   And   I press "Create Page"
   Then  I see component "My Pictures" on "top" in position "1"

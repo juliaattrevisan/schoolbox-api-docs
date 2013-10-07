@@ -3,15 +3,29 @@
 
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
+
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
 $this->setBlock('browse_row', 'existing_file', 'existing_file_block');
+
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
-$this->setBlock('marktype', 'criterion', 'criterion_block');
+
+// Instead of all this block BS I'll create a sub-template
+$this->setFile('rubricTpl', 'submission/_submissionRubrics.html');
+$this->setBlock('rubricTpl', 'rubric_type_label', 'rubric_type_label_block');
+$this->setBlock('rubricTpl', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'crit_input', 'crit_input_block');
+//$this->setBlock('marktype', 'criterion', 'criterion_block');
+//$this->setBlock('marktype', 'criterion_label', 'criterion_label_block');
+//$this->setBlock('criterion', 'crit_input', 'crit_input_block');
+//$this->setBlock('marktype', 'course_criterion', 'course_criterion_block');
+//$this->setBlock('marktype', 'course_criterion_label', 'course_criterion_label_block');
+//$this->setBlock('course_criterion', 'course_crit_input', 'course_crit_input_block');
+
 $this->setBlock('marktype', 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
 $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
+$this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
 
 $this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
 if(Cfg::get('due_work_notifications_enabled')) {
@@ -23,9 +37,12 @@ else {
 
 $this->setVar('category_select_block', '');
 $this->setVar('existing_marks_warning_block', '');
+$this->setVar('COURSE_CRITERIA', '');
+$this->setVar('CLASS_CRITERIA', '');
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\TaskMapper;
 
 $mapper      = new SubmissionBoxMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
@@ -46,6 +63,9 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setTitle('Modify Submission Box');
 
     $submission = $mapper->findById($this->arg[1]);
+
+    $task_id = $submission->getTask()->getId();
+    $is_task = (bool)$task_id;
 
     //
     // Authorisation: user has write access to group?
@@ -84,6 +104,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
         outputVisibilityDropdown($this, $submission->getMarkVisibility());
 
+        $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
         // if the rubric creation fails it will throw an exception, in which case just output the empty sets
         try {
             if($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
@@ -98,16 +119,25 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
                 $results = $rubric->getResults();
                 $resultCount = $rubric->getResultCount();
 
-                outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount);
                 outputResultSets($this, $resultSetID, $resultCount);
+                outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
+                if ($is_task) {
+                    outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true, $is_task);
+                }
             }
             else {
                 outputResultSets($this);
-                outputCriteria($this, $submission->getCategory()->getId(), array(), array());
+                outputCriteria($this, $submission->getCategory()->getId(), array(), array(), 2, true, $is_task);
+                if ($is_task) {
+                    outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
+                }
             }
         } catch(Exception $e) {
             outputResultSets($this);
-            outputCriteria($this, $submission->getCategory()->getId(), array(), array());
+            outputCriteria($this, $submission->getCategory()->getId(), array(), array(), 2, true, $is_task);
+            if ($is_task) {
+                outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
+            }
         }
 
 
@@ -147,6 +177,13 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         $late_min  = $late_date->getUsingFormat('i');
     }
 
+    // Messing around with blocks
+    $this->setVar(array(
+        'duework_timespan_block' => '',
+    ));
+    if (!$task_id) {
+        $this->parse('duework_timespan_block', 'duework_timespan');
+    }
 
     $output = array(
         'HEADING'           => 'Modify',
@@ -236,13 +273,18 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
-
-
     // clear blocks that aren't used in this context
     $this->setVar(array(
         'existing_file_block' => '',
-        'existing_marks_warning_block'
+        'existing_marks_warning_block' => '',
+        'duework_timespan_block' => '',
     ));
+
+    // Is this a task?
+    $is_task = ($this->arg[2] === 'task');
+    if (!$is_task) {
+        $this->parse('duework_timespan_block', 'duework_timespan');
+    }
 
     if(is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         /* File ID submitted, associate box with file */
@@ -278,7 +320,12 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     outputVisibilityDropdown($this, Cfg::get('submission_access'));
     outputResultSets($this);
-    outputCriteria($this, $this->arg[1], array(), array());
+
+    $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($this->arg[1]);
+    outputCriteria($this, $category->getId(), array(), array(), 2, true, $is_task);
+    if ($is_task) {
+        outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
+    }
 
     $this->parse('marktype_block','marktype');
 
@@ -319,6 +366,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
         'SESSION_NAME'    => session_name(),
         'SESSION_ID'      => session_id(),
+        'IS_TASK'         => $is_task ? 1 : 0,
     );
 
     // notifications on by default
@@ -375,15 +423,42 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
 }
 
 
-function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $descriptorCount = 2) {
+function outputCriteria(
+    SitePage $page,
+    $catID,
+    $checkedIDs,
+    $descriptors,
+    $descriptorCount = 2,
+    $is_course = false,
+    $is_for_task = false
+) {
+
+    // Output this all as part of a single template, and inject into the block.
 
     $rubricHandler = new DueWork_Rubric_Handler();
 
     $crits = $rubricHandler->getAvailableCriteria($catID);
 
-    $page->setVar('criterion_block','');
-    foreach($crits as $group => $elements) {
-        foreach($elements as $id => $elem) {
+    $page->setVar(
+        array(
+            'RUBRIC_CAT_ID'         => $catID,
+            'LABEL'                 => ($is_course ? 'Course-level criteria' : 'Unit-level criteria'),
+            'MANAGE_CRITERIA_LABEL' => ($is_course ? 'Manage course-level criteria' : 'Manage unit-level criteria'),
+        )
+    );
+
+    $page->setVar('rubric_type_label_block', '');
+    if ($is_for_task) {
+        $page->parse('rubric_type_label_block', 'rubric_type_label');
+    }
+    else {
+        $page->setVar('MANAGE_CRITERIA_LABEL', 'Manage available criteria');
+    }
+
+    $page->setVar('criterion_block', '');
+    foreach ($crits as $group => $elements) {
+        foreach ($elements as $id => $elem) {
+            $page->setVar('crit_input_block', '');
             $page->setVar(array(
                 'CRIT_ID'      => $id,
                 'CRIT_SLUG'    => "crit[$id]",
@@ -391,10 +466,8 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $desc
                 'CRIT_CHECKED' => in_array($id, $checkedIDs) ? 'checked="checked"' : ''
             ));
 
-            $page->setVar('crit_input_block', '');
-
-            if(is_array($descriptors[$id])) {
-                foreach($descriptors[$id] as $descriptor) {
+            if (is_array($descriptors[$id])) {
+                foreach ($descriptors[$id] as $descriptor) {
                     $page->setVar(array(
                         'CRIT_INPUT_VALUE' => $descriptor->getDescription()
                     ));
@@ -403,16 +476,16 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $desc
             }
             // disply blank inputs, they weren't used
             else {
-                for($i = 0; $i < $descriptorCount; ++$i) {
-                    $page->setVar('CRIT_INPUT_VALUE');
+                for ($i = 0; $i < $descriptorCount; ++$i) {
+                    $page->setVar('CRIT_INPUT_VALUE', '');
                     $page->parse('crit_input_block','crit_input', true);
-
                 }
             }
-
             $page->parse('criterion_block','criterion', true);
         }
     }
+    $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
+    $page->parse($handle, 'rubricTpl', true);
 }
 
 /**

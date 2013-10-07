@@ -11,6 +11,9 @@ namespace Schoolbox\Assessment\Component;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Assessment\Course\Task;
+
 
 class OnlineAssessmentMapper extends Schoolbox\Mapper {
 
@@ -35,6 +38,15 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_MODEL,
 			'join'       => 'user',
 		));
+		// Probably redundant to store task ID in this table and assess ID in
+		// task table. Oh well, it will make querying on whether a relation is a
+		// task easier.
+		$this->hasMap(array(
+			'column'     => 'task_id',
+			'property'   => 'task',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'task',
+		));
 		$this->hasMap(array(
 			'column'     => 'type',
 			'property'   => 'workType',
@@ -44,6 +56,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'title',
 			'property'   => 'title',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'description',
+			'property'   => 'description',
 			'type'       => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
@@ -109,6 +126,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'this_key'  => 'type',
 			'other_key' => 'id',
 		));
+		$this->hasJoin('task', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Course\\TaskMapper',
+			'this_key'  => 'task_id',
+			'other_key' => 'id',
+		));
 		$this->hasJoin('attempt', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessment\\AttemptMapper',
 			'multiple'  => true,
@@ -117,6 +139,29 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasSoftDeleteDateField('deleted_at');
+
+		$this->registerCallback('preSave', array($this, 'preSave'));
+	}
+
+	/**
+	 * Pre-save callback.
+	 * * ensures that work type is always WorkType::TYPE_ONLINE_ASSESSMENT
+	 * * if a task, sets start time and finish time to current date to avoid
+	 *   SQL errors
+	 *
+	 * @param  OnlineAssessment $object
+	 * @return bool             Always returns true
+	 */
+	public function preSave(OnlineAssessment $object) {
+		$object->setWorkType(WorkType::TYPE_ONLINE_ASSESSMENT);
+		if (!$object->getId()) {
+			$task    = $object->getTask();
+			$task_id = ($task instanceof Task) ? $task->getId() : $task;
+			if ($task_id) {
+				$time = new \Alaress_Date_Format(time(), 'U');
+				$object->setStart($time)->setFinish($time);
+			}
+		}
 	}
 
 	/**
@@ -265,6 +310,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			WHERE a.category_id IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND a.finish BETWEEN :from_date AND :to_date
 			AND a.deleted_at IS NULL
+			AND a.task_id IS NULL
 			ORDER BY a.finish ASC
 		";
 

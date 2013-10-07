@@ -170,6 +170,8 @@ class SubmissionReturn extends DeprecatedModel {
             WHERE b.category = $catID
             AND r.owner = $studentID
             AND b.deleted = 0
+            AND b.task_id IS NULL
+
             $dateCondA
             $ownCondA
             ORDER BY b.id ASC, r.returned DESC

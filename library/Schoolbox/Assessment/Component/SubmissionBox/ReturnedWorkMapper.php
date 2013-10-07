@@ -166,6 +166,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'sr.owner = :student',
 			'sr.deleted IS FALSE',
 			'sb.deleted IS FALSE',
+			'sb.task_id IS NULL',
 		);
 		if (!empty($extra_params['year'])) {
 			$params['year'] = $extra_params['year'];
@@ -283,4 +284,35 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 		$return->setSubmissionBox($box);
 		return $return;
 	}
+
+    /**
+     * Retrieves the number of returns that have been made on each box in a
+     * list.
+     *
+     * @param array $box_ids
+     * @param int   $user_id
+     *
+     * @return array The submission box ID as the key, the count as the value.
+     */
+    public function findCountsForSubmissionBoxes($box_ids, $user_id) {
+        // Retrieve count of submission IDs from a list of IDs for a user
+        $query = "
+            SELECT sr.box_id, COUNT(*) as submission_count
+            FROM {$this->getTable()} sr
+            WHERE sr.owner = :user_id
+            AND sr.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
+            AND sr.deleted IS FALSE
+            GROUP BY sr.box_id
+        ";
+        $statement = $this->database->prepare($query);
+        $params = $this->getArrayParameters($box_ids, 'sb');
+        $params['user_id'] = $user_id;
+        $statement->execute($params);
+
+        $return = array();
+        foreach ($statement as $row) {
+            $return[$row['box_id']] = $row['submission_count'];
+        }
+        return $return;
+    }
 }

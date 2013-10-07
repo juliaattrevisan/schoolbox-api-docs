@@ -770,8 +770,12 @@ class StudentReportCard {
 			foreach($categoryList as $k => $cat) {
 				$count = 0;
 				// is there any other way to do this? such that count(db_calls) < 2n
-				$count += $this->submissionMapper->findByColumn('category', $cat['id'])->count();
-				$count += $this->assessMapper->findByColumn('category_id', $cat['id'])->count();
+				$count += $this->submissionMapper->findByColumnList(
+					array('category' =>  $cat['id'], 'task_id' => null)
+				)->count();
+				$count += $this->assessMapper->findByColumnList(
+					array('category_id' =>  $cat['id'], 'task_id' => null)
+				)->count();
 				if(!$count) {
 					unset($categoryList[$k]);
 				}

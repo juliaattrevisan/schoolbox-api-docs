@@ -165,7 +165,7 @@ class Activity {
         $lastvisit = $this->lastDueWorkVisit();
 
         //check for due work (* currently does not check if work has been returned *)
-        $query = "SELECT COUNT(id) AS duework FROM submission_box WHERE category = '$id' AND created > '$lastvisit' AND owner != '" . $_SESSION['id'] . "' AND deleted = 0";
+        $query = "SELECT COUNT(id) AS duework FROM submission_box WHERE category = '$id' AND created > '$lastvisit' AND owner != '" . $_SESSION['id'] . "' AND deleted = 0 AND task_id IS NULL";
         $result = $this->db->getRow($query);
 
         return $result['duework'];
@@ -176,7 +176,7 @@ class Activity {
 
         $query = "SELECT COUNT(sub.id) as submitted, COUNT(box.id) as total FROM submission_box AS box
 			LEFT JOIN student_submission AS sub ON sub.box_id = box.id AND sub.owner = '" . $_SESSION['id'] . "'
-			WHERE box.category = '$id' AND box.deleted = '0' AND box.owner != '" . $_SESSION['id'] . "'";
+			WHERE box.category = '$id' AND box.deleted = '0' AND box.owner != '" . $_SESSION['id'] . "' AND task_id IS NULL";
 
         $result = $this->db->getRow($query);
 
@@ -189,7 +189,7 @@ class Activity {
         //check for returned work
         $query = "SELECT COUNT(submission_return.id) AS retwork FROM submission_return, submission_box WHERE
 			submission_return.box_id = submission_box.id AND category = '$id' 
-			AND submission_return.owner = '" . $_SESSION['id'] . "' AND returned > '$lastvisit'";
+			AND submission_return.owner = '" . $_SESSION['id'] . "' AND returned > '$lastvisit' AND task_id IS NULL";
         $result = $this->db->getRow($query);
 
         return $result['retwork'];
@@ -223,6 +223,7 @@ class Activity {
                 AND submission_box.deleted = '0'
                 AND submission_box.category = {$this->db->smartQuote($category)}
                 AND (submission_log.datetime IS NULL OR student_submission.submitted > submission_log.datetime)
+                AND submission_box.task_id IS NULL
             GROUP BY
                 submission_box.name, submission_box.id
         ";

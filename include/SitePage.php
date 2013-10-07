@@ -7,6 +7,13 @@ class SitePage extends Page {
 
     private $lite;
 
+    /**
+     * List of arguments passed in URL
+     *
+     * @var array
+     */
+    public $arg = array();
+
     public function SitePage($login = true) {
         parent::Page();
 
@@ -135,12 +142,33 @@ class SitePage extends Page {
         $this->site = Cfg::get('site_location');
     }
 
+    public function getAjax() {
+        return $this->ajax;
+    }
+
+    public function getLite() {
+        return $this->lite;
+    }
+
     function setAjax($state = true) {
         $this->ajax = $state;
     }
 
     function setLite($state) {
         $this->lite = $state;
+    }
+
+    /**
+     * Detects AJAX state based on value of request header X-Requested-With - if
+     * it's XMLHttpRequest, the request was made via AJAX.
+     *
+     * (obviously this isn't totally reliable, but jQuery and other libraries
+     *  set this header)
+     *
+     * @return bool
+     */
+    public function detectAjax() {
+        return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
     }
 
     function outputPage($lite = false) {

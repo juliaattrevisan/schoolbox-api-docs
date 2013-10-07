@@ -545,7 +545,7 @@ class User extends DeprecatedModel {
 
 	function cleanSubmissionBoxes($id) {
 		//first select all users submission boxes
-		$query = "SELECT id FROM submission_box WHERE owner = '$id'";
+		$query = "SELECT id FROM submission_box WHERE owner = '$id' AND task_id IS NULL";
 		$result = $this->db->query($query);
 
 		//foreach submission box delete all student submissions
@@ -564,7 +564,7 @@ class User extends DeprecatedModel {
 		}
 
 		//delete all submission boxes from db
-		$query = "DELETE FROM submission_box WHERE owner = '$id'";
+		$query = "DELETE FROM submission_box WHERE owner = '$id' AND task_id IS NULL";
 		$this->db->query($query);
 	}
 

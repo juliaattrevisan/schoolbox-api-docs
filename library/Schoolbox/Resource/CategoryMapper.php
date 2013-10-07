@@ -9,6 +9,7 @@
  
 
 namespace Schoolbox\Resource;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserAccess;
@@ -40,8 +41,9 @@ class CategoryMapper extends Mapper {
 		));
 		$this->hasMap(array(
 			'column'     => 'parent',
-			'property'   => 'parentId',
-			'type'       => self::TYPE_INTEGER,
+			'property'   => 'parent',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'parent',
 		));
 
 		//
@@ -249,6 +251,37 @@ class CategoryMapper extends Mapper {
 	 */
 	public function getExternalUser() {
 		return $this->external_user;
+	}
+
+	/**
+	 * Gets a collection of parents for the given category, starting from the
+	 * topmost parent first.
+	 *
+	 * @param  Category $category
+	 * @return Collection
+	 */
+	public function findParents(Category $category) {
+		/** @var Category[] $stack */
+		$stack = array($category);
+		$count = 0;
+
+		// Get the parent of the first item in the stack, and add it to the top
+		// of the stack.
+		while ($count++ < 50) {
+			$parent = $stack[0]->getParent();
+			if (!($parent instanceof Category)) {
+				break;
+			}
+			$parent_id = $parent->getId();
+			if (!$parent_id) {
+				break;
+			}
+			array_unshift($stack, $this->findById($parent_id));
+		}
+
+		// Remove the current category from the parent list first.
+		array_pop($stack);
+		return new Collection($stack);
 	}
 
 }

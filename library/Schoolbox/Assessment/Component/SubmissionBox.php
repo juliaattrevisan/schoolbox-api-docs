@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\User;
 
 class SubmissionBox implements ISoftDeletable {
@@ -49,6 +50,11 @@ class SubmissionBox implements ISoftDeletable {
 	 * @var string
 	 */
 	protected $description;
+
+	/**
+	 * @var Task
+	 */
+	protected $task;
 
 	/**
 	 * @var int
@@ -201,6 +207,22 @@ class SubmissionBox implements ISoftDeletable {
 	 */
 	public function getName() {
 		return $this->name;
+	}
+
+	/**
+	 * @param  \Schoolbox\Assessment\Course\Task $task
+	 * @return $this
+	 */
+	public function setTask($task) {
+		$this->task = $task;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\Assessment\Course\Task
+	 */
+	public function getTask() {
+		return $this->task;
 	}
 
 	/**

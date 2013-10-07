@@ -111,7 +111,8 @@ class SubmissionStudent extends DeprecatedModel {
                   LEFT JOIN submission_return sr ON sb.id = sr.box_id AND sr.owner = $user_id
                   LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = $user_id
                   WHERE sb.id = $submission_box_id
-                  AND sb.deleted = 0";
+                  AND sb.deleted = 0
+                  AND sb.task_id IS NULL";
 
 		$submission = $this->db->getRow($query);
 

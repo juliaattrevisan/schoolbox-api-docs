@@ -7,7 +7,7 @@
 <script type="text/javascript">
         tinyMCE.init({
             mode:"exact",
-			elements:'description-box',
+            elements:'description-box',
             theme:"advanced",
             skin:"cirkuit",
             plugins:"pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
@@ -392,77 +392,77 @@
                 }
             });
         }
-		//
-		// File uploader
-		// May need custom file to be uploaded.
-		var form        = $j('form');
-		var file_upload = $j('#custom_file_upload');
-		file_upload.uploadify({
-			'uploader':'/javascript/uploadify/uploadify.swf',
-			'script':'/submission/fileForm.php?{SESSION_NAME}={SESSION_ID}',
-			'cancelImg':'/javascript/uploadify/cancel.png',
-			'fileDataName':'file',
-			'multi':true,
-			'auto':false,
-			'queueSizeLimit':'{FILE_MAX_UPLOAD}',
-			'descriptionField':false,
-			'removeCompleted':false,
-			onComplete: function(event, code, file, output, upload) {
-				//
-				// Add hidden element with uploaded file ID.
-				var parsed_output = JSON.parse(output);
-				if (!parsed_output.success) {
-					alert('Error: '+parsed_output.message);
-				}
-				$j('#custom_file_upload'+code).prepend(
-					$j('<input name="file_ids[]" type="hidden" />').val(parsed_output.file_id)
-				);
-			},
-			'onAllComplete':function(event, upload) {
-				form.submit();
-			}
-		});
+        //
+        // File uploader
+        // May need custom file to be uploaded.
+        var form        = $j('form');
+        var file_upload = $j('#custom_file_upload');
+        file_upload.uploadify({
+            'uploader':'/javascript/uploadify/uploadify.swf',
+            'script':'/submission/fileForm.php?{SESSION_NAME}={SESSION_ID}',
+            'cancelImg':'/javascript/uploadify/cancel.png',
+            'fileDataName':'file',
+            'multi':true,
+            'auto':false,
+            'queueSizeLimit':'{FILE_MAX_UPLOAD}',
+            'descriptionField':false,
+            'removeCompleted':false,
+            onComplete: function(event, code, file, output, upload) {
+                //
+                // Add hidden element with uploaded file ID.
+                var parsed_output = JSON.parse(output);
+                if (!parsed_output.success) {
+                    alert('Error: '+parsed_output.message);
+                }
+                $j('#custom_file_upload'+code).prepend(
+                    $j('<input name="file_ids[]" type="hidden" />').val(parsed_output.file_id)
+                );
+            },
+            'onAllComplete':function(event, upload) {
+                form.submit();
+            }
+        });
 
-		//
-		// Form submit event.
-		// If this is a browser submission, and the upload queue isn't empty,
-		// trigger Uploadify uploader instead of submitting form. The Uploadify
-		// uploader submits the form once it's done.
-		form.submit(function(event) {
-			var uploads = $j('#custom_file_uploadQueue .uploadifyQueueItem');
-			if (uploads.length > 0 && 'originalEvent' in event) {
-				event.preventDefault();
-				file_upload.uploadifyUpload();
-			}
-		});
+        //
+        // Form submit event.
+        // If this is a browser submission, and the upload queue isn't empty,
+        // trigger Uploadify uploader instead of submitting form. The Uploadify
+        // uploader submits the form once it's done.
+        form.submit(function(event) {
+            var uploads = $j('#custom_file_uploadQueue .uploadifyQueueItem');
+            if (uploads.length > 0 && 'originalEvent' in event) {
+                event.preventDefault();
+                file_upload.uploadifyUpload();
+            }
+        });
 
-		$j('a.delete_existing').click(function(event) {
-			event.preventDefault();
-			var link    = $j(this);
-			var file_id = link.data('file_id');
-			var box_id  = link.data('box_id');
-			var row     = link.closest('.existing_file');
-			//
-			// Send to file delete form
-			$j.post(
-				$j(this).attr('href'),
-				{file_id: file_id, box_id: box_id},
-				function(data) {
-					//
-					// Old file: remove from fileID element too
-					if (file_id === 'old') {
-						$j('input[name="fileId"]').val('');
-					}
-					if (!data.success) {
-						alert('Error: '+data.message);
-					}
-					else {
-						row.fadeOut();
-					}
-				},
-				'json'
-			);
-		});
+        $j('a.delete_existing').click(function(event) {
+            event.preventDefault();
+            var link    = $j(this);
+            var file_id = link.data('file_id');
+            var box_id  = link.data('box_id');
+            var row     = link.closest('.existing_file');
+            //
+            // Send to file delete form
+            $j.post(
+                $j(this).attr('href'),
+                {file_id: file_id, box_id: box_id},
+                function(data) {
+                    //
+                    // Old file: remove from fileID element too
+                    if (file_id === 'old') {
+                        $j('input[name="fileId"]').val('');
+                    }
+                    if (!data.success) {
+                        alert('Error: '+data.message);
+                    }
+                    else {
+                        row.fadeOut();
+                    }
+                },
+                'json'
+            );
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -471,6 +471,7 @@
 <form action="/submission/submissionForm.php" method="post" name="form" class="clearfix" id="createSubmissionForm"
       enctype="multipart/form-data">
 <input type="hidden" name="category" value="{CATEGORY}"/>
+<input name="is_task" type="hidden" value="{IS_TASK}" />
 <table class="standardForm">
     <tr>
         <td class="formLabelWidth"><h4>Title</h4></td>
@@ -478,6 +479,7 @@
             <input class="required" name="name" type="text" value="{NAME}" size="30"/>
         </label></td>
     </tr>
+
     <tr>
         <td class="formLabelWidth"><h4>Description</h4></td>
         <td><label>
@@ -487,21 +489,21 @@
     <!-- BEGIN browse_row -->
     <tr>
         <td class="formLabelWidth">
-			<h4>Attach Files</h4>
-			<em>When browsing your computer you can select multiple files by holding control and clicking. You can add
-				files from multiple folders by clicking the select files multiple times.</em>
+            <h4>Attach Files</h4>
+            <em>When browsing your computer you can select multiple files by holding control and clicking. You can add
+                files from multiple folders by clicking the select files multiple times.</em>
         </td>
         <td>
             <!-- BEGIN existing_file -->
             <p class="existing_file">
-				<a href="/submission/fileForm.php?delete=1"
-				   class="delete_existing"
-				   data-file_id="{CURRENT_FILE_ID}"
-				   data-box_id="{ID}"
-				><img src="/javascript/uploadify/cancel.png" border="0"></a>
-				<img class="mimetype" src="/images/mime/22x22/{CURRENT_FILE_ICON}"/>
-				<a href="{CURRENT_FILE_URL}">{CURRENT_FILE_NAME}</a> (uploaded {CURRENT_FILE_DATE})
-			</p>
+                <a href="/submission/fileForm.php?delete=1"
+                   class="delete_existing"
+                   data-file_id="{CURRENT_FILE_ID}"
+                   data-box_id="{ID}"
+                ><img src="/javascript/uploadify/cancel.png" border="0"></a>
+                <img class="mimetype" src="/images/mime/22x22/{CURRENT_FILE_ICON}"/>
+                <a href="{CURRENT_FILE_URL}">{CURRENT_FILE_NAME}</a> (uploaded {CURRENT_FILE_DATE})
+            </p>
             <!-- END existing_file -->
             <input type="file" name="file" id="custom_file_upload" />
             <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}"/>
@@ -591,26 +593,14 @@
                 <input type="hidden" name="result_set" />
             </div>
             <div class="clearfix"></div>
+
             <div id="rubric-criteria">
                 <em>Criteria being assessed:</em>
-                <!-- BEGIN criterion -->
-                <div class="crit">
-                    <input type="hidden" value="0" name="{CRIT_SLUG}"/>
-                    <input id="c-{CRIT_ID}" type="checkbox" value="1" name="{CRIT_SLUG}"{CRIT_CHECKED} />
-                    <label for="c-{CRIT_ID}">{CRIT_LABEL}</label>
-                    <ul class="descs">
-                        <!-- BEGIN crit_input -->
-                        <li style="display:none;">
-                            <span></span>
-							<textarea name="des[{CRIT_ID}][]">{CRIT_INPUT_VALUE}</textarea>
-                        </li>
-                        <!-- END crit_input -->
-                    </ul>
-                </div>
-                <!-- END criterion -->
-                <input type="hidden" name="criteria" />
+
+                {COURSE_CRITERIA}
+                {CLASS_CRITERIA}
+
             </div>
-            <p class="pad-it"><a href="/submission/rubricCriteria/{CATEGORY}">Manage available criteria</a></p>
         </td>
     </tr>
     <tr>
@@ -636,6 +626,7 @@
         <td><input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}></td>
     </tr>
 
+    <!-- BEGIN duework_timespan -->
     <tr class="accept-hide dark">
         <td class="formLabelWidth"><h4>Open Date</h4>
             <em>The date from when the due work will be available for submission.
@@ -683,9 +674,9 @@
                 <option value="pm"
                 {LATE_PM}>PM</option>
             </select>
-            <input type="hidden" name='fileId' value="{FILEID}"/>
-            <input type="hidden" name="id" value="{ID}"/></td>
     </tr>
+    <!-- END duework_timespan -->
+
     <!-- BEGIN notification_enable -->
     <tr>
         <td><h4>Send Notifications</h4>
@@ -703,5 +694,7 @@
     </tr>
     <!-- END notification_enable -->
 </table>
+<input type="hidden" name='fileId' value="{FILEID}"/>
+<input type="hidden" name="id" value="{ID}"/></td>
 <input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
 </form>

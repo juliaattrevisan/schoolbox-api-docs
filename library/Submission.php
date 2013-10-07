@@ -101,6 +101,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
             LEFT JOIN submission_notification sn ON s.id = sn.`box_id`
             WHERE $field $conditional
+            AND s.task_id IS NULL
             GROUP BY s.id, c.id, sn.type
         ";
 
@@ -163,6 +164,7 @@ class Submission extends DeprecatedModel {
                     AND s.category = c.id
                     AND DATE(s.date) = DATE(FROM_UNIXTIME({$date}))
                     AND c.id IN (" . implode(',', $categoryList) . ")
+                    AND s.task_id IS NULL
                     GROUP BY s.id
                     )
                     UNION
@@ -191,6 +193,7 @@ class Submission extends DeprecatedModel {
                     LEFT JOIN categoryCode ON categoryCode.categoryID = assess.category_id
                     WHERE assess.deleted_at IS NULL
                     AND assess.availability = 'assess'
+                    AND assess.task_id IS NULL
                     AND DATE(assess.finish) = DATE(FROM_UNIXTIME({$date}))
                     AND category.id IN (" . implode(',', $categoryList) . ")
                     GROUP BY id
@@ -210,7 +213,9 @@ class Submission extends DeprecatedModel {
 				  LEFT JOIN allowedFileTypes a ON file.mime_type = a.mime
 			 	  LEFT JOIN file_type ft ON s.type = ft.id
 				  WHERE s.category = c.id AND s.deleted = 0 AND s.late_date > NOW() AND s.owner != '$userID' AND t.id IS NULL
-                    AND c.id IN (" . implode(',', $categoryList) . ") ORDER BY s.date";
+                  AND c.id IN (" . implode(',', $categoryList) . ")
+                  AND s.task_id IS NULL
+                  ORDER BY s.date";
 
         return $this->db->getAll($query);
     }
@@ -250,6 +255,7 @@ class Submission extends DeprecatedModel {
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = '$userID' OR s.owner IS NULL)
 			LEFT JOIN submission_return r ON r.box_id = b.id AND (r.owner = '$userID' OR r.owner IS NULL)
 			WHERE b.deleted = 0
+			AND b.task_id IS NULL
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			AND DATE_FORMAT(b.date, '%Y') = $year
 			AND DATE_FORMAT(b.date, '%m') $semesterTest
@@ -326,6 +332,7 @@ class Submission extends DeprecatedModel {
 			LEFT JOIN submission_return r ON r.box_id = b.id  AND (r.owner = '$userID' OR r.owner IS NULL)
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
+			AND b.task_id IS NULL
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			AND $orderBy IS NOT NULL";
 
@@ -406,6 +413,7 @@ class Submission extends DeprecatedModel {
 			LEFT JOIN student_submission s ON s.box_id = b.id
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
+			AND b.task_id IS NULL
 			AND s.owner = '$userID'
 			AND b.id = '$boxID'
 			AND s.submitted IS NOT NULL)
@@ -425,6 +433,7 @@ class Submission extends DeprecatedModel {
 			LEFT JOIN submission_return r ON r.box_id = b.id
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
+			AND b.task_id IS NULL
 			AND r.owner = '$userID'
 			AND b.id = '$boxID'
 			AND r.returned IS NOT NULL)
@@ -437,7 +446,7 @@ class Submission extends DeprecatedModel {
         if ($userID == -1) {
             $userID = $_SESSION['id'];
         }
-        $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
+        $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner, sb.task_id,
                               UNIX_TIMESTAMP(sb.open_date) AS open,
                               UNIX_TIMESTAMP(sb.date) AS date,
                               UNIX_TIMESTAMP(sb.late_date) AS late,
@@ -451,7 +460,8 @@ class Submission extends DeprecatedModel {
                               LEFT JOIN file_type ft ON sb.type = ft.id
                               WHERE
                               sb.category = '" . $categoryID . "'
-                              AND sb.deleted = '0'";
+                              AND sb.deleted = '0'
+                              AND sb.task_id IS NULL";
         if ($distinct) {
             $query .= " GROUP BY id";
         }
@@ -495,6 +505,7 @@ class Submission extends DeprecatedModel {
             WHERE sb.category = '$categoryID'
             AND sb.owner = '$userID'
             AND sb.deleted = '0'
+            AND sb.task_id IS NULL
             $dateCondA
         ";
 
@@ -516,6 +527,7 @@ class Submission extends DeprecatedModel {
             WHERE category_id = '$categoryID'
             AND assess.deleted_at IS NULL
             AND assess.user_id = '$userID'
+            AND assess.task_id IS NULL
             $dateCondB
         ";
 
@@ -548,6 +560,7 @@ class Submission extends DeprecatedModel {
                               LEFT JOIN student_submission ss ON ss.box_id = sb.id AND ss.owner = '" . $_SESSION['id'] . "'
                               LEFT JOIN file_type ft ON sb.type = ft.id
                               WHERE sb.category = '" . $categoryID . "' AND sb.deleted = '0' AND sb.type = '" . $type . "'
+                              AND sb.task_id IS NULL
                               ORDER BY sb.date DESC";
 
         if ($config['size'] > 0) {
@@ -605,6 +618,7 @@ class Submission extends DeprecatedModel {
                 WHERE category.id = submission_box.category
                 AND submission_box.owner = '$userID'
                 AND submission_box.deleted = '0'
+                AND submission_box.task_id IS NULL
                 $dateConditionA
                 GROUP BY submission_box.id, category.id
             )
@@ -631,6 +645,7 @@ class Submission extends DeprecatedModel {
                 LEFT JOIN category ON assess.category_id = category.id
                 WHERE category.id = assess.category_id
                 AND assess.deleted_at IS NULL
+                AND assess.task_id IS NULL
                 AND assess.availability = 'assess'
                 AND assess.user_id = '$userID'
                 $dateConditionB
@@ -945,6 +960,7 @@ class Submission extends DeprecatedModel {
         // For overdue work - only send the notice if the submission box allows
         // online submissions, because only they allow late submissions.
         $where = "sb.deleted = 0
+            AND sb.task_id IS NULL
             AND sn.type = :notif_type
             AND sn.enabled = :notif_enabled
             AND sn.sent = :notif_sent
@@ -1277,6 +1293,7 @@ class Submission extends DeprecatedModel {
             WHERE c.id $conditional AND sb.deleted IS FALSE
             AND YEAR(sb.date) = $this_year
             AND sb.deleted IS FALSE
+            AND sb.task_id IS NULL
             GROUP BY sb.id
             ORDER BY sb.date ASC
             ";
@@ -1292,6 +1309,7 @@ class Submission extends DeprecatedModel {
             WHERE c.id $conditional
             AND a.availability = 'assess'
             AND a.deleted_at IS NULL
+            AND a.task_id IS NULL
             AND YEAR(a.finish) = $this_year
             GROUP BY a.assess_id
             ORDER BY a.finish ASC

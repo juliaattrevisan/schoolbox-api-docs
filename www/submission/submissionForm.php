@@ -4,19 +4,20 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 // DETERMINE A COURSE OF ACTION
 
 // ID provided, DueWork already exists
-if(is_numeric($_POST['id']) && $_POST['due_date'] && is_numeric($_POST['category'])) {
+$is_task = !empty($_POST['is_task']);
+if (is_numeric($_POST['id']) && ($is_task || $_POST['due_date']) && is_numeric($_POST['category'])) {
     $action = 'update';
 }
 // no ID, create a new DueWork
-elseif($_POST['due_date'] && is_numeric($_POST['category'])) {
+elseif (($is_task || $_POST['due_date']) && is_numeric($_POST['category'])) {
     $action = 'create';
 }
 // deletion flagged, delete existing DueWork
-elseif(isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
+elseif (isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
     $action = 'delete';
 }
 // data was POSTed, but nothing received: file upload size exceeded
-elseif(upload_failed()) {
+elseif (upload_failed()) {
     error(10);
 }
 // unknown case, bug out
@@ -30,10 +31,13 @@ $page = new SitePage();
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Notification;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\TaskMapper;
+
 $mapper = new SubmissionBoxMapper();
 
 if($action == 'delete') {
-	$mapper->delete($mapper->findById($_GET['deleteBox']));
+    $mapper->delete($mapper->findById($_GET['deleteBox']));
     $page->localRedir("/submission/listSubmission/");
 }
 
@@ -67,17 +71,17 @@ $useDescriptors = $resultSetID == 0;
 //
 // Attach any files that were passed (they will have been saved in fileForm)
 if (!empty($_POST['file_ids']) && is_array($_POST['file_ids'])) {
-	foreach ($_POST['file_ids'] as $file_id) {
-		if (!empty($file_id)) {
-			$submission->getFileLinks()->addFromFileId($file_id);
-		}
-	}
+    foreach ($_POST['file_ids'] as $file_id) {
+        if (!empty($file_id)) {
+            $submission->getFileLinks()->addFromFileId($file_id);
+        }
+    }
 }
 //
 // Legacy file ID (if passed through createSubmission/new/{catId}/{fileId})
 // submission's save method stores this as a storage file anyway.
 if (!empty($_POST['fileId'])) {
-	$submission->setLegacyFileId($_POST['fileId']);
+    $submission->setLegacyFileId($_POST['fileId']);
 }
 
 
@@ -99,21 +103,23 @@ else {
     $lateDate = generateDate('late', '23:59:59');
 }
 
-// if any of the dates failed to parse
-if (!($openDate->isValid() && $dueDate->isValid() && $lateDate->isValid())) {
-    error(15);
-}
+// If not a task: check if any of the dates failed to parse
+if (!$is_task) {
+    if (!($openDate->isValid() && $dueDate->isValid() && $lateDate->isValid())) {
+        error(15);
+    }
 
-// late date is greater than due date
-if (!empty($_POST['accept_submission']) && $dueDate->getDatabase() > $lateDate->getDatabase()) {
-    error(15);
+    // late date is greater than due date
+    if (!empty($_POST['accept_submission']) && $dueDate->getDatabase() > $lateDate->getDatabase()) {
+        error(15);
+    }
 }
 
 $markMax = !$_POST['markvalue'] ? '100' : $_POST['markvalue']; // if not set, default to 100
 
 // if Total Mark selected, mark value must be specified
 if ($markTypeID == SubmissionBox\MarkType::TYPE_RAW && empty($_POST['markvalue'])) {
-    error(15);
+    error(2);
 }
 // if Rubric selected, generate the objects needed
 elseif($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
@@ -135,12 +141,12 @@ elseif($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
     }
 
     // need to determine if the resultset is different, and if it is, that any marks already given are invalidated
-	if (!empty($submissionBoxID)) {
-		$this_submission = $mapper->findById($submissionBoxID);
-		if ($resultSetID != $this_submission->getRubricResultSet()) {
-			$invalidateExistingMarks = true;
-		}
-	}
+    if (!empty($submissionBoxID)) {
+        $this_submission = $mapper->findById($submissionBoxID);
+        if ($resultSetID != $this_submission->getRubricResultSet()) {
+            $invalidateExistingMarks = true;
+        }
+    }
 
     $markMax = $rubric->getCriteriaCount() * ($rubric->getResultCount() - 1);
 }
@@ -149,9 +155,11 @@ elseif($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
 // define submissionBox 'object': elements common to both scenarios
 $submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
 $submission->setAcceptMultiple(!empty($_POST['multi_submission'])  ? true : false);
-$submission->setOpenDate($openDate);
-$submission->setDueDate($dueDate);
-$submission->setLateDate($lateDate);
+if (!$is_task) {
+    $submission->setOpenDate($openDate);
+    $submission->setDueDate($dueDate);
+    $submission->setLateDate($lateDate);
+}
 $submission->setName($_POST['name']);
 $submission->setDescription($_POST['description']);
 $submission->getWorkType()->setId($_POST['type']);
@@ -162,43 +170,66 @@ $submission->setMarkVisibility($_POST['mark_visibility']);
 
 // append the notification data to be parsed in
 foreach(array('overdue', 'upcoming', 'returned') as $i) {
-	$notification     = $submission->getNotifications()->getOfType($i);
-	$new_notification = false;
-	if (!$notification instanceof Notification) {
-		$notification     = new Notification();
-		$new_notification = true;
-	}
-	$notification->setType($i);
-	$notification->setEnabled(isset($_POST['notif_'.$i]));
-	if ($new_notification) {
-		$submission->addNotification($notification);
-	}
+    $notification     = $submission->getNotifications()->getOfType($i);
+    $new_notification = false;
+    if (!$notification instanceof Notification) {
+        $notification     = new Notification();
+        $new_notification = true;
+    }
+    $notification->setType($i);
+    $notification->setEnabled(isset($_POST['notif_'.$i]));
+    if ($new_notification) {
+        $submission->addNotification($notification);
+    }
 }
 
 // create new
 try {
-	if($action == 'create') {
-		$submission->setCategory($categoryID);
-		$submission->setOwner($_SESSION['id']);
-		$mapper->save($submission);
-		$submissionBoxID = $submission->getId();
-	}
-	// update existing
-	elseif($action == 'update') {
-		$mapper->save($submission);
-	}
-	// something happened that shouldn't have
-	else {
-		error(105);
-	}
+    if ($action == 'create') {
+        $submission->setCategory($categoryID);
+        $submission->setOwner($_SESSION['id']);
+
+        if ($is_task) {
+            $task = new Task();
+            $task
+                ->setCategory($categoryID)
+                ->setOwner($_SESSION['id'])
+                ->setTitle($_POST['name']);
+            TaskMapper::getInstance()->save($task);
+            $submission->setTask($task);
+        }
+
+        $mapper->save($submission);
+
+        $submissionBoxID = $submission->getId();
+        if ($is_task) {
+            $task = $submission->getTask();
+            $task->setSubmissionBox($submission);
+            TaskMapper::getInstance()->save($task);
+        }
+    }
+    // update existing
+    elseif ($action == 'update') {
+        $mapper->save($submission);
+        if ($is_task) {
+            // Load this submission's task from database
+            $task = TaskMapper::getInstance()->findById($submission->getTask()->getId());
+            $task->setTitle($_POST['name']);
+            TaskMapper::getInstance()->save($task);
+        }
+    }
+    // something happened that shouldn't have
+    else {
+        error(105);
+    }
 }
 catch (Schoolbox\Resource\Exception $e) {
-	if ($e->getCode() == Schoolbox\Resource\Exception::CODE_COPY_TO_STORAGE_FAILED) {
-		error(105, 'The attached file could not be processed - try deleting it and re-attaching it.');
-	}
-	else {
-		error(105);
-	}
+    if ($e->getCode() == Schoolbox\Resource\Exception::CODE_COPY_TO_STORAGE_FAILED) {
+        error(105, 'The attached file could not be processed - try deleting it and re-attaching it.');
+    }
+    else {
+        error(105);
+    }
 }
 
 // persist rubric data
@@ -207,7 +238,7 @@ if(isset($rubric)) {
     $rubricHandler->persistRubric($rubric, isset($invalidateExistingMarks) ? $invalidateExistingMarks : false, $submissionBoxID);
 }
 
-$page->localRedir('/submission/listSubmission/');
+$page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmission/');
 
 /**
  * Uses POST variables to create dates

@@ -75,7 +75,7 @@ $j(document).ready(function() {
 			title: "Please enter a title",
 			description: "Please enter a description"
 		}
-    });
+	});
 });
 </script>
 <!-- END custom_head -->
@@ -84,6 +84,7 @@ $j(document).ready(function() {
 	<h2>Create and modify your assessment</h2>
 	<form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
 		<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
+		<input name="is_task" type="hidden" value="{ASSESS_IS_TASK}" />
 		<table class="standardForm" width="100%">
 			<tr>
 				<td class="formLabelWidth">
@@ -94,6 +95,8 @@ $j(document).ready(function() {
 					</label>
 				</td>
 			</tr>
+
+			<!-- BEGIN assess_timespan -->
 			<tr>
 				<!-- Available from this time -->
 				<td>
@@ -144,6 +147,8 @@ $j(document).ready(function() {
 					<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
 				</td>
 			</tr>
+			<!-- END assess_timespan -->
+
 			<tr>
 				<td>
 					<h4>Duration</h4>
