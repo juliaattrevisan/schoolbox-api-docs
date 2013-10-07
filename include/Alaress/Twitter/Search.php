@@ -81,6 +81,7 @@ class Alaress_Twitter_Search {
 					$processed[] = array(
 						'text'   => $this->getFilter()->filterText($result->text),
 						'date'   => $result->created_at,
+                        'fullname' => $result->user->name,
 						'author' => $result->user->screen_name,
 						'avatar' => $result->user->profile_image_url,
 					);

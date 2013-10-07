@@ -43,10 +43,12 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
             foreach($allResults as $currentTweet) {
                 $color = ++$i % 2 ? '' : 'dark';
                 $date = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
+
                 $this->setVar(array(
                     'TWEET_TEXT' => $currentTweet['text'],
                     'TWEET_DATE' => $date->getShort(),
                     'TWEET_AUTHOR' => $currentTweet['author'],
+                    'TWEET_FULLNAME' => $currentTweet['fullname'],
                     'TWEET_AVATAR' => $currentTweet['avatar'],
                     'ON_OFF' => $color,
                 ));
