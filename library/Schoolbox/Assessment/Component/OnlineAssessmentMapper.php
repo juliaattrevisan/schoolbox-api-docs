@@ -391,4 +391,89 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		return $collection;
 	}
 
+
+	/**
+	 * Calculates and returns the statistics for the given online assessment
+	 *
+	 * @param $assess
+	 * @return array
+	 */
+	public function getStatistics($assess) {
+		if($assess instanceof OnlineAssessment) {
+			$assess_id = $assess->getId();
+		}
+		else {
+			$assess_id = $assess;
+		}
+
+		$sql = "
+			SELECT
+			    AVG(sum_mark) AS `mean`,
+			    STDDEV(sum_mark) AS `stdev`,
+			    MIN(sum_mark) AS `min`,
+			    MAX(sum_mark) AS `max`
+			FROM
+			(
+			  SELECT SUM(mark) AS sum_mark
+			  FROM assess_response ar
+			  WHERE attempt_id IN (
+			    SELECT attempt_id FROM
+			    (
+			      SELECT attempt_id, user_id
+			      FROM assess_attempt aa
+			      WHERE assess_id = :assess_id
+			      AND aa.reviewed_at IS NOT NULL
+			      AND aa.deleted_at IS NULL
+			      ORDER BY finish DESC
+			    ) t0
+			    GROUP BY user_id
+			  ) GROUP BY attempt_id
+			) t1;
+		";
+
+		$stmt = $this->database->prepare($sql);
+		$stmt->execute('assess_id', $assess_id);
+
+		return $stmt->fetch(\PDO::FETCH_ASSOC);
+
+	}
+
+
+	/**
+	 * Returns the progress of the given online assess, ie. the number of submissions made and returns given
+	 *
+	 * @param $assess
+	 * @return array
+	 */
+	public function getProgress($assess) {
+		if($assess instanceof OnlineAssessment) {
+			$assess_id = $assess->getId();
+		}
+		else {
+			$assess_id = $assess;
+		}
+
+		$stmt = $this->database->prepare("
+			SELECT COUNT(*)
+			FROM assess_attempt
+			WHERE assess_id = :assess_id
+		");
+
+		$stmt->execute(array('assess_id' => $assess_id));
+		$progress['submission_count'] = $stmt->fetchColumn(0);
+
+
+		$stmt = $this->database->prepare("
+			SELECT COUNT(*)
+			FROM assess_attempt
+			WHERE assess_id = :assess_id
+			AND reviewed_at IS NOT NULL
+		");
+
+		$stmt->execute(array('assess_id' => $assess_id));
+		$progress['return_count'] = $stmt->fetchColumn(0);
+
+		return $progress;
+	}
+
 }
