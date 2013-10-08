@@ -66,7 +66,7 @@ CriterionMapper::getInstance()->copyFromCategory($course_homepage_id, $homepage_
 
 // And create a new unit instance for each option.
 $unit_instance_list = new Collection();
-foreach ($_POST['unit'] as $unit) {
+foreach ($_POST['unit'] as $unit_data) {
     $unit_id = $unit_data['unit_id'];
     $import  = !empty($unit_data['import']);
     if ($import) {
@@ -80,8 +80,8 @@ foreach ($_POST['unit'] as $unit) {
             ->setComponent($component)
             ->setTitle($unit_homepage->getName())
             ->setUnitCategory($unit_homepage)
-            ->setOpenDate(new Alaress_Date_Format($unit['open_date'], 'd/m/y'))
-            ->setDueDate(new Alaress_Date_Format($unit['due_date'], 'd/m/y'))
+            ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
+            ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
         ;
         $unit_instance_list->add($unit_instance);
     }
