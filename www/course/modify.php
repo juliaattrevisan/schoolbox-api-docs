@@ -80,8 +80,9 @@ foreach ($homepage_path as $parent) {
     $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
 }
 
-$component_config = $component->getConfigArray();
-$course_homepage = CategoryMapper::getInstance()->findById($component_config['courseHomepage']['value']);
+$component_config     = $component->getConfigArray();
+$course_homepage_id   = $component_config['courseHomepage']['value'];
+$course_homepage      = CategoryMapper::getInstance()->findById($course_homepage_id);
 $course_base_homepage = new Category();
 $course_base_homepage->setId(str_replace('/homepage/', '', Config::get('course_homepage')));
 $course_homepage_path = CategoryMapper::getInstance()->findParents($course_homepage, $course_base_homepage);
@@ -94,9 +95,11 @@ foreach ($course_homepage_path as $parent) {
 }
 
 $this->setVar('unit_block', '');
+$displayed_category_list = array();
 foreach ($course_list as $unit) {
     $unit_id = $unit->getId();
     $unit->setUnitCategory(CategoryMapper::getInstance()->findById($unit->getUnitCategory()->getId()));
+    $displayed_category_list[$unit->getUnitCategory()->getId()] = true;
     $this->setVar(
         array(
             'UNIT_ID'          => Scrub::text($unit->getUnitCategory()->getId()),
@@ -105,6 +108,33 @@ foreach ($course_list as $unit) {
             'UNIT_NAME'        => Scrub::text($unit->getUnitCategory()->getName()),
             'UNIT_OPEN_DATE'   => $unit->getOpenDate()->getUsingFormat('d/m/Y'),
             'UNIT_DUE_DATE'    => $unit->getDueDate()->getUsingFormat('d/m/Y'),
+            'task_block'       => '',
+        )
+    );
+    $this->parse('unit_block', 'unit', true);
+}
+
+// Output any items that aren't in the existing block, too.
+/** @var Category[]|Collection $child_list */
+$child_list    = CategoryMapper::getInstance()->findByColumn('parent', $course_homepage_id);
+$child_id_list = $child_list->getColumnValues('id');
+$task_list     = TaskMapper::getInstance()->findGroupedListForCategoryList($child_id_list);
+foreach ($child_list as $unit) {
+    $unit_id = $unit->getId();
+    if (array_key_exists($unit_id, $displayed_category_list)) {
+        continue;
+    }
+    if (count($task_list->getOffset($unit_id)) == 0) {
+        continue;
+    }
+    $this->setVar(
+        array(
+            'UNIT_ID'          => Scrub::text($unit_id),
+            'UNIT_ENABLED'     => 0,
+            'UNIT_INSTANCE_ID' => '',
+            'UNIT_NAME'        => Scrub::text($unit->getName()),
+            'UNIT_OPEN_DATE'   => '',
+            'UNIT_DUE_DATE'    => '',
             'task_block'       => '',
         )
     );
