@@ -45,11 +45,11 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 $date = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
 
                 $this->setVar(array(
-                    'TWEET_TEXT' => $currentTweet['text'],
+                    'TWEET_TEXT' => Scrub::html($currentTweet['text']),
                     'TWEET_DATE' => $date->getShort(),
-                    'TWEET_AUTHOR' => $currentTweet['author'],
-                    'TWEET_FULLNAME' => $currentTweet['fullname'],
-                    'TWEET_AVATAR' => $currentTweet['avatar'],
+                    'TWEET_AUTHOR' => Scrub::text($currentTweet['author']),
+                    'TWEET_FULLNAME' => Scrub::text($currentTweet['fullname']),
+                    'TWEET_AVATAR' => Scrub::text($currentTweet['avatar']),
                     'ON_OFF' => $color,
                 ));
                 $this->parse('tweet_block', 'tweet', true);
