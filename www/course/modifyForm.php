@@ -39,19 +39,31 @@ if ($group->getPermission($component->getIdentifier()) < WRITE_ACCESS) {
 // Save each set of dates.
 /** @var Collection|UnitInstance[] $course_instance_list */
 $course_instance_list = UnitInstanceMapper::getInstance()->findByColumn('component_id', $component_id);
+$saved_list           = new Collection();
+$deleted_list         = new Collection();
 foreach ($course_instance_list as $course) {
     foreach ($_POST['unit'] as $unit_data) {
         if ($unit_data['unit_instance_id'] == $course->getId()) {
-            $course
-                ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
-                ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
-            ;
+            if ($unit_data['import']) {
+                $course
+                    ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
+                    ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
+                ;
+                $saved_list->add($course);
+            }
+            else {
+                $deleted_list->add($course);
+            }
             break;
         }
     }
 }
-UnitInstanceMapper::getInstance()->save($course_instance_list);
-
+if (count($saved_list)) {
+    UnitInstanceMapper::getInstance()->save($saved_list);
+}
+if (count($deleted_list)) {
+    UnitInstanceMapper::getInstance()->delete($deleted_list);
+}
 
 // Go back to the homepage
 $site_page->localRedir('/homepage/'.$component->getIdentifier());
