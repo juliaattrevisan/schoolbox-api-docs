@@ -42,8 +42,10 @@ $saved_list   = new Collection();
 $deleted_list = new Collection();
 foreach ($_POST['unit'] as $unit_data) {
     // Figure out which unit instance ID (if any) is attached
-    $unit_id = $unit_data['unit_id'];
-    $import  = !empty($unit_data['import']);
+    $unit_id   = $unit_data['unit_id'];
+    $import    = !empty($unit_data['import']);
+    $open_date = new Alaress_Date_Format($unit_data['open_date'], 'd/m/y');
+    $due_date  = new Alaress_Date_Format($unit_data['due_date'], 'd/m/y');
     try {
         // Is there a unit instance? If so fetch it, otherwise fetch by unit
         // category and component.
@@ -60,8 +62,8 @@ foreach ($_POST['unit'] as $unit_data) {
         }
         if ($import) {
             $course_instance
-                ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
-                ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
+                ->setOpenDate($open_date)
+                ->setDueDate($due_date)
             ;
             $saved_list->add($course_instance);
         }
@@ -78,8 +80,8 @@ foreach ($_POST['unit'] as $unit_data) {
                 ->setComponent($component)
                 ->setTitle($unit_homepage->getName())
                 ->setUnitCategory($unit_homepage)
-                ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
-                ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
+                ->setOpenDate($open_date)
+                ->setDueDate($due_date)
             ;
             $saved_list->add($course_instance);
         }
