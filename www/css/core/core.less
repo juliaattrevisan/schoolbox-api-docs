@@ -1228,6 +1228,15 @@ Notifications
 			text-overflow: ellipsis;
 		}
 	}
+	// Meter... For whatever it meters...
+	.prog {
+		height: 2px;
+		display: block;
+		clear: left;
+		.gradient(lighten(@neutral-color,@lighten-value),@neutral-color);
+		border: solid 1px @neutral-color;
+		margin: 6px 0 0 0;
+	}
 }
 
 

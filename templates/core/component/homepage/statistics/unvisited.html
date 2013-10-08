@@ -1,11 +1,14 @@
-<h2>Yet to Visit</h2>
-<div class="module">
+<div class="box">
+	<h2>Yet to Visit</h2>
+	<ul class="information-list grid">
     <!-- BEGIN unvisitor -->
-    <a class="button thumb" href="/search/user/{VISITOR_ID}" title="{VISITOR_NAME}">
-        <img src="{VISITOR_THUMB}"/>
-        <span class="name">{VISITOR_NAME}</span>
-        <span class="group">{VISITOR_GROUP}</span>
-    </a>
+	<li>
+		<a title="{VISITOR_TOOLTIP}" class="author" href="/search/user/{VISITOR_ID}">
+			<img class="thumbnail" height="64" width="64" src="{VISITOR_THUMB}" />
+			<h4>{VISITOR_NAME}</h4>
+		</a>
+		<p class="meta">{VISITOR_GROUP}</p>
+	</li>
     <!-- END unvisitor -->
-    <div class="clearfix"></div>
+    </ul>
 </div>
