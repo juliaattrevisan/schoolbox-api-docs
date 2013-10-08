@@ -17,26 +17,28 @@
                 $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
                     input.val(data.time);
                 })
+                input.trigger('blur.courseImport');
             }
         });
 
-        // Setup enable/disable of courses within the form
-        form.delegate('input[data-interaction="enable"]', 'click', function(event) {
-            var element = $(this);
-            var row     = element.closest('[data-type="unit_row"]');
-            if (!element.is(':checked')) {
-                row.find(':input').not(this).prop('disabled', true);
-                row.data('enabled', false);
-            }
-            else {
-                row.find(':input').not(this).prop('disabled', false);
-                row.data('enabled', true);
-            }
+        // Setup enable/disable of courses within the form, and do initial setup
+        var enableUnitClickEvent = function(element) {
+            var row            = element.closest('[data-type="unit_row"]');
+            var inputs         = row.find(':input:visible').not(element);
+            var is_now_enabled = element.prop('checked');
+            inputs.prop('disabled', !is_now_enabled);
+            row.data('enabled', is_now_enabled);
+        }
+        form.delegate('input[data-interaction="enable"]', 'click.courseImport', function() {
+            enableUnitClickEvent($(this));
         });
+        form.find('input[data-interaction="enable"]').each(function() {
+            enableUnitClickEvent($(this));
+        })
 
         // Form validation: Run the validation on any blur event on a field
         form.validate();
-        form.delegate('input', 'blur', function() { form.valid(); })
+        form.delegate('input', 'blur.courseImport', function() { form.valid(); })
 
         // Open date validation
 //        var errorPlacerCallback = function(error, element) {

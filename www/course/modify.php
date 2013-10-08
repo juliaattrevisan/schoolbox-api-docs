@@ -102,13 +102,14 @@ foreach ($course_list as $unit) {
     $displayed_category_list[$unit->getUnitCategory()->getId()] = true;
     $this->setVar(
         array(
-            'UNIT_ID'          => Scrub::text($unit->getUnitCategory()->getId()),
-            'UNIT_ENABLED'     => 1,
-            'UNIT_INSTANCE_ID' => Scrub::text($unit->getId()),
-            'UNIT_NAME'        => Scrub::text($unit->getUnitCategory()->getName()),
-            'UNIT_OPEN_DATE'   => $unit->getOpenDate()->getUsingFormat('d/m/Y'),
-            'UNIT_DUE_DATE'    => $unit->getDueDate()->getUsingFormat('d/m/Y'),
-            'task_block'       => '',
+            'UNIT_ID'              => Scrub::text($unit->getUnitCategory()->getId()),
+            'UNIT_ENABLED'         => 1,
+            'UNIT_ENABLED_CHECKED' => 'checked',
+            'UNIT_INSTANCE_ID'     => Scrub::text($unit->getId()),
+            'UNIT_NAME'            => Scrub::text($unit->getUnitCategory()->getName()),
+            'UNIT_OPEN_DATE'       => $unit->getOpenDate()->getUsingFormat('d/m/Y'),
+            'UNIT_DUE_DATE'        => $unit->getDueDate()->getUsingFormat('d/m/Y'),
+            'task_block'           => '',
         )
     );
     $this->parse('unit_block', 'unit', true);
@@ -129,13 +130,14 @@ foreach ($child_list as $unit) {
     }
     $this->setVar(
         array(
-            'UNIT_ID'          => Scrub::text($unit_id),
-            'UNIT_ENABLED'     => 0,
-            'UNIT_INSTANCE_ID' => '',
-            'UNIT_NAME'        => Scrub::text($unit->getName()),
-            'UNIT_OPEN_DATE'   => '',
-            'UNIT_DUE_DATE'    => '',
-            'task_block'       => '',
+            'UNIT_ID'              => Scrub::text($unit_id),
+            'UNIT_ENABLED'         => 0,
+            'UNIT_ENABLED_CHECKED' => '',
+            'UNIT_INSTANCE_ID'     => '',
+            'UNIT_NAME'            => Scrub::text($unit->getName()),
+            'UNIT_OPEN_DATE'       => '',
+            'UNIT_DUE_DATE'        => '',
+            'task_block'           => '',
         )
     );
     $this->parse('unit_block', 'unit', true);

@@ -92,13 +92,14 @@ foreach ($child_list as $unit) {
     }
     $this->setVar(
         array(
-            'UNIT_ID'          => Scrub::text($unit_id),
-            'UNIT_ENABLED'     => 1,
-            'UNIT_INSTANCE_ID' => '',
-            'UNIT_NAME'        => Scrub::text($unit->getName()),
-            'UNIT_OPEN_DATE'   => '',
-            'UNIT_DUE_DATE'    => '',
-            'task_block'       => '',
+            'UNIT_ID'              => Scrub::text($unit_id),
+            'UNIT_ENABLED'         => 1,
+            'UNIT_ENABLED_CHECKED' => 'checked',
+            'UNIT_INSTANCE_ID'     => '',
+            'UNIT_NAME'            => Scrub::text($unit->getName()),
+            'UNIT_OPEN_DATE'       => '',
+            'UNIT_DUE_DATE'        => '',
+            'task_block'           => '',
         )
     );
     $this->parse('unit_block', 'unit', true);

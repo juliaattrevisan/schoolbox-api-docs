@@ -59,7 +59,7 @@
                     <tr data-type="unit_row" data-enabled="1">
                         <td>
                             <input name="unit[{UNIT_ID}][import]" type="hidden" value="0" />
-                            <input id="import-{UNIT_ID}" name="unit[{UNIT_ID}][import]" type="checkbox" value="1" checked="checked" data-interaction="enable" />
+                            <input id="import-{UNIT_ID}" name="unit[{UNIT_ID}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
                             <label for="import-{UNIT_ID}">{UNIT_NAME}</label>
                             (<a href="/homepage/{UNIT_ID}" class="unit_name" data-unit_id="{UNIT_ID}">View</a>)
                             <input name="unit[{UNIT_ID}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
