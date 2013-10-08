@@ -101,8 +101,8 @@ class Node {
 				'name' => $category->getName(),
 			);
 
-			for ($i = 0; ($category->getParentId() > 0) && ($i < 100); $i++) {
-				$currentCategory = $this->getCategoryMapper()->findById($category->getParentId());
+			for ($i = 0; ($category->getParent()->getId() > 0) && ($i < 100); $i++) {
+				$currentCategory = $this->getCategoryMapper()->findById($category->getParent()->getId());
 
 				$breadcrumbs[] = array(
 					'categoryId' => $currentCategory->getId(),

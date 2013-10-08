@@ -64,9 +64,6 @@ if (is_numeric($_GET['delete'])) {
 /* Otherwise create a post
  */
 else {
-	if (!strlen(trim($_POST['body']))) {
-		error(157);
-	}
 
 	/* Compile some misc data
 	 */
