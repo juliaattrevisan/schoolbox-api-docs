@@ -66,8 +66,10 @@ CriterionMapper::getInstance()->copyFromCategory($course_homepage_id, $homepage_
 
 // And create a new unit instance for each option.
 $unit_instance_list = new Collection();
-foreach ($_POST['unit'] as $unit_id => $unit) {
-    if (!empty($unit['import'])) {
+foreach ($_POST['unit'] as $unit) {
+    $unit_id = $unit_data['unit_id'];
+    $import  = !empty($unit_data['import']);
+    if ($import) {
         // Merge rubrics from first, because they need to exist before the due work is added.
         CriterionMapper::getInstance()->copyFromCategory($unit_id, $homepage_id);
 

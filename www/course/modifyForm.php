@@ -10,6 +10,7 @@
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
 use Schoolbox\Collection;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
@@ -36,25 +37,51 @@ if ($group->getPermission($component->getIdentifier()) < WRITE_ACCESS) {
     error(6);
 }
 
-// Save each set of dates.
-/** @var Collection|UnitInstance[] $course_instance_list */
-$course_instance_list = UnitInstanceMapper::getInstance()->findByColumn('component_id', $component_id);
-$saved_list           = new Collection();
-$deleted_list         = new Collection();
-foreach ($course_instance_list as $course) {
-    foreach ($_POST['unit'] as $unit_data) {
-        if ($unit_data['unit_instance_id'] == $course->getId()) {
-            if ($unit_data['import']) {
-                $course
-                    ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
-                    ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
-                ;
-                $saved_list->add($course);
-            }
-            else {
-                $deleted_list->add($course);
-            }
-            break;
+// Save each set of units.
+$saved_list   = new Collection();
+$deleted_list = new Collection();
+foreach ($_POST['unit'] as $unit_data) {
+    // Figure out which unit instance ID (if any) is attached
+    $unit_id = $unit_data['unit_id'];
+    $import  = !empty($unit_data['import']);
+    try {
+        // Is there a unit instance? If so fetch it, otherwise fetch by unit
+        // category and component.
+        if (!empty($unit_data['unit_instance_id'])) {
+            $course_instance = UnitInstanceMapper::getInstance()->findById($unit_data['unit_instance_id']);
+        }
+        else {
+            $course_instance = UnitInstanceMapper::getInstance()->findOneByColumnList(
+                array(
+                    'component_id'     => $component_id,
+                    'unit_category_id' => $unit_id,
+                )
+            );
+        }
+        if ($import) {
+            $course_instance
+                ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
+                ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
+            ;
+            $saved_list->add($course_instance);
+        }
+        else {
+            $deleted_list->add($course_instance);
+        }
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        if ($import) {
+            // This is an item that wasn't in the list before, add it.
+            $unit_homepage   = CategoryMapper::getInstance()->findById($unit_id);
+            $course_instance = new UnitInstance();
+            $course_instance
+                ->setComponent($component)
+                ->setTitle($unit_homepage->getName())
+                ->setUnitCategory($unit_homepage)
+                ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
+                ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
+            ;
+            $saved_list->add($course_instance);
         }
     }
 }
