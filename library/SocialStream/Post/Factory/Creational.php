@@ -118,6 +118,13 @@ class Creational extends AbstractFactory {
 		 */
 		else {
 			if (strlen($this->getUrl())) {
+
+				/* Prepend Scheme before using
+				 */
+				$url = new \Url($this->getUrl());
+				$url->prependScheme();
+				$this->setUrl($url->getUrl());
+
 				$this->constructFromUrl();
 				$this->populate($data);
 
