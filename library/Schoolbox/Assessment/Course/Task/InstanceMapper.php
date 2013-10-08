@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
 
 class InstanceMapper extends Mapper {
@@ -100,8 +103,10 @@ class InstanceMapper extends Mapper {
         ));
 
         $this->hasSoftDeleteDateField('deleted_at');
-        $this->registerCallback('preSave',  array($this, 'preSave'));
-        $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback('preSave',        array($this, 'preSave'));
+        $this->registerCallback('postSave',       array($this, 'postSave'));
+        $this->registerCallback('postDelete',     array($this, 'postDelete'));
+        $this->registerCallback('postSoftDelete', array($this, 'postDelete'));
     }
 
     /**
@@ -143,6 +148,20 @@ class InstanceMapper extends Mapper {
                 $box = $cloner->cloneSubmissionBox();
                 $this->updateAll($object, 'box_id', $box->getId());
             }
+        }
+    }
+
+    /**
+     * Post-delete callback - deletes related assessment and course.
+     *
+     * @param Instance $object
+     */
+    public function postDelete(Instance $object) {
+        if ($object->getAssessment()->getId()) {
+            OnlineAssessmentMapper::getInstance()->delete($object->getAssessment());
+        }
+        if ($object->getSubmissionBox()->getId()) {
+            SubmissionBoxMapper::getInstance()->delete($object->getSubmissionBox());
         }
     }
 }

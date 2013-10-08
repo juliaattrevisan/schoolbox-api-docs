@@ -79,7 +79,9 @@ class UnitInstanceMapper extends Mapper {
         ));
 
         $this->hasSoftDeleteDateField('deleted_at');
-        $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback('postSave',       array($this, 'postSave'));
+        $this->registerCallback('postDelete',     array($this, 'postDelete'));
+        $this->registerCallback('postSoftDelete', array($this, 'postDelete'));
     }
 
     /**
@@ -166,5 +168,22 @@ class UnitInstanceMapper extends Mapper {
                 $cloner->updateLinkedItems();
             }
         }
+    }
+
+    /**
+     * Post-delete callback - deletes all task instances that are related to
+     * this item.
+     *
+     * @param UnitInstance $object
+     */
+    protected function postDelete(UnitInstance $object) {
+        // Delete any related task instances
+        $task_instance_mapper = Task\InstanceMapper::getInstance();
+        $task_instance_mapper->delete(
+            $task_instance_mapper->findByColumn(
+                'course_unit_instance_id',
+                $object->getId()
+            )
+        );
     }
 }
