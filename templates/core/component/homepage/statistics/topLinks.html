@@ -1,10 +1,14 @@
-<h2>Top Links</h2>
-<div class="module">
-    <!-- BEGIN top_link -->
-    <a class="bar button" href="/redir.php?id={LINK_ID}">
-        <img src="{LINK_THUMB}"/>
-        <span class="name single">{LINK_NAME}</span>
-        <span class="prog" style="width:{LINK_PROGRESS}%"></span>
-    </a>
-    <!-- END top_link -->
+<div class="box">
+	<h2>Top Links</h2>
+	<ul class="information-list">
+		<!-- BEGIN top_link -->
+		<li>
+			<a href="/redir.php?id={LINK_ID}">
+				<img class="icon" height="32" width="32" src="{LINK_THUMB}" />
+				<h4>{LINK_NAME}</h4>
+			</a>
+			<span class="prog" style="width:{LINK_PROGRESS}%"></span>
+		</li>
+		<!-- END top_link -->
+	</ul>
 </div>

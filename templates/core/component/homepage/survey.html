@@ -1,37 +1,32 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div class="box" id="component{COMPONENT_INSTANCE_ID}">
     <h2>Surveys</h2>
     {CONFIGURATION}
-    <div class="listing">
-        <ul>
-            <!-- BEGIN survey -->
-            <li class="wysiwyg {ON_OFF} clearfix">
-                <!-- BEGIN surveyLink -->
-                <h4><a href="/survey/intro/{SURVEY_ASSESS_ID}" >{SURVEY_TITLE}</a></h4>
-                <!-- END surveyLink -->
-                <!-- BEGIN resumeLink -->
-                <h4><a href="/survey/attempt/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}">{SURVEY_TITLE}</a></h4>
-                <!-- END resumeLink -->
-                <!-- BEGIN surveyNoLink -->
-                <h4>{SURVEY_TITLE}</h4>
-                <!-- END surveyNoLink -->
-                <div class="small-right">
-                    <p>
-                        {SURVEY_FINISH_DATE}
-                        <!-- BEGIN teacherLink -->
-                        <a href="/survey/results/{SURVEY_ASSESS_ID}">View Results</a><br />
-                        <a href="/survey/modify/{SURVEY_ASSESS_ID}">Modify</a><br />
-                        <!-- END teacherLink -->
+	<ul class="information-list">
+		<!-- BEGIN survey -->
+		<li class="{ON_OFF}">
+			<!-- BEGIN teacherLink -->
+			<span class="actions">
+				<a class="btn statistics no-text" href="/survey/results/{SURVEY_ASSESS_ID}" title="View Results"><span></span></a>
+				<a class="btn modify no-text" href="/survey/modify/{SURVEY_ASSESS_ID}" title="Modify Survey"><span></span></a>
+			</span>
+			<!-- END teacherLink -->
 
-                    </p>
-
-                </div>
-                <div class="summ {COMPONENT_COMPACTMODE} ">{SURVEY_DESCRIPTION}</div>
-                <p class="interact {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{SURVEY_USER_ID}'>{SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}</a> {SURVEY_CREATED}</p>
-            </li>
-            <!-- END survey -->
-        </ul>
-        <!-- BEGIN createSurvey -->
-        <a href="/survey/create/{ID}" class="btn create"><span></span>Create Survey</a>
-        <!-- END createSurvey -->
-    </div>
+			<!-- BEGIN surveyLink -->
+			<h4><a href="/survey/intro/{SURVEY_ASSESS_ID}">{SURVEY_TITLE}</a></h4>
+			<!-- END surveyLink -->
+			<!-- BEGIN resumeLink -->
+			<h4><a href="/survey/attempt/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}">{SURVEY_TITLE}</a></h4>
+			<!-- END resumeLink -->
+			<!-- BEGIN surveyNoLink -->
+			<h4>{SURVEY_TITLE}</h4>
+			<!-- END surveyNoLink -->
+			<p class="meta">Due {SURVEY_FINISH_DATE}</p>
+			<div class="wysiwyg {COMPONENT_COMPACTMODE}">{SURVEY_DESCRIPTION}</div>
+			<p class="footnote {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{SURVEY_USER_ID}'>{SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}</a> {SURVEY_CREATED}</p>
+		</li>
+		<!-- END survey -->
+	</ul>
+	<!-- BEGIN createSurvey -->
+	<p class="interact"><a href="/survey/create/{ID}" class="btn create"><span></span>Create Survey</a></p>
+	<!-- END createSurvey -->
 </div>

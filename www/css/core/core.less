@@ -1167,6 +1167,27 @@ Notifications
 			margin: 0 6px 0 0;
 		}
 	}
+	// Icons & Thumbnails at the left of the box
+	.icon, .thumbnail {
+		float: left;
+		margin: 0 12px 0 0;
+		line-height: 0;
+		// If text, make biggerer
+		&.text {
+			margin-right: 6px;
+			line-height: 1.5;
+			font-size: 2em;
+			padding: 0;
+		}
+	}
+	// 32px image
+	.icon {
+		width: 32px;
+	}
+	// 64px image
+	.thumbnail {
+		width: 64px;
+	}
 
 	// Actions are the buttons to interact with the list item, such as edit, delete
 	.actions {
@@ -1193,6 +1214,28 @@ Notifications
 	.wysiwyg {
 		padding: 0;
 		margin-top: 16px;
+	}
+	p:last-child, .wysiwyg p:last-child {
+		margin-bottom: 0;
+	}
+	// Grid view! Because...
+	&.grid li {
+		float: left;
+		clear: none;
+		width: 164px;
+		.meta {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+	// Meter... For whatever it meters...
+	.prog {
+		height: 2px;
+		display: block;
+		clear: left;
+		.gradient(lighten(@neutral-color,@lighten-value),@neutral-color);
+		border: solid 1px @neutral-color;
+		margin: 6px 0 0 0;
 	}
 }
 
@@ -1604,17 +1647,7 @@ Notifications
         width: 100%;
     }
 
-    ul.topic li li {
-        list-style: none;
-        border-top-width: 1px;
-        border-top-style: solid;
-    }
-
-    .listing .topic > li {
-        padding: 0;
-        margin: 0;
-        height: 1%;
-    }
+	.topic > li { padding: 0; }
 }
 
 .student-subjects {
@@ -2577,9 +2610,6 @@ ADMIN BODY
 		&.colours-buttons {
 			padding: 16px;
 		}
-	}
-	td {
-		font-weight: bold;
 	}
 }
 
@@ -6329,6 +6359,7 @@ p.forgotten {
     clear: both;
     width: 100%;
     float: left;
+	border-bottom: 1px solid @border-color;
     //margin-bottom: 8px;
 	padding-left: 16px;
     li {

@@ -89,12 +89,14 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 		));
 
 		if ($allItems->count()) {
+			$i = 0;
 			foreach($allItems as $currentItem) {
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
 					'LIST_ITEM_CONTENT' => Scrub::html($currentItem->getContent()),
 					'LIST_ITEM_UPDATED_AT' => $currentItem->getUpdatedAt()->getShort(),
+					'ON_OFF' => ++$i % 2 ? '' : 'dark',
 				));
 
 				/* If an author exists
@@ -110,18 +112,17 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				/* Add commentary
 				 */
 				if ($currentItem->getComments()->count()) {
-					$i = 0;
 
 					foreach($currentItem->getComments() as $currentComment) {
 						$createdAt = new Alaress_Date_Relative($currentComment->getCreatedAt());
 
 						$this->setVar(array(
 							'COMMENT_ID' => $currentComment->getId(),
+							'COMMENT_AUTHOR_ID' => $currentComment->getAuthor()->getExternalId(),
 							'COMMENT_EXTERNAL_USER_ID' => $currentComment->getAuthor()->getExternalId(),
 							'COMMENT_AUTHOR_FULLNAME' => $currentComment->getAuthor()->getFullname(),
 							'COMMENT_CONTENT' => Scrub::text($currentComment->getContent()),
 							'COMMENT_CREATED_AT' => $createdAt->getRelativeTime(),
-							'ON_OFF' => ++$i % 2 ? '' : 'dark',
 						));
 
 						/* Controls for deleting comments

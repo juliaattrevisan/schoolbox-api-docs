@@ -1,19 +1,20 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>Teachers</h2>
     {CONFIGURATION}
-    <div class="listing">
-        <!-- BEGIN person -->
-        <a href='/search/user/{PERSON_UID}' class='button {LIST_STYLE}' alt='{PERSON_NAME}' title='{PERSON_NAME}'>
-            <!-- BEGIN has_portrait -->
-            <img src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64'/>
-            <!-- END has_portrait -->
-
-            <span class='name'>{PERSON_NAME}</span>
-
-            <!-- BEGIN has_group -->
-            <span class='group'>{PERSON_GROUP}</span>
-            <!-- END has_group -->
-        </a>
-        <!-- END person -->
-    </div>
+	<ul class="information-list {LIST_STYLE}">
+		<!-- BEGIN person -->
+		<li class="{ON_OFF}">
+			<a href="/search/user/{PERSON_UID}" alt="{PERSON_NAME}" class="author" title="{PERSON_NAME}">
+				<!-- BEGIN has_thumbnail -->
+				<img class="thumbnail" height="64" width="64" src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64'/>
+				<!-- END has_thumbnail -->
+				<!-- BEGIN has_icon -->
+				<img class="icon" height="32" width="32" src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square32'/>
+				<!-- END has_icon -->
+				<h4>{PERSON_NAME}</h4>
+			</a>
+			<p class="meta">{PERSON_GROUP}</p>
+		</li>
+		<!-- END person -->
+	</ul>
 </div>

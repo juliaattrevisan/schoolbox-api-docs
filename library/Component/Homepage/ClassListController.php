@@ -38,12 +38,11 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'parent', 'parent_block');
         $this->setBlock($templateHandle, 'parent_email', 'parent_email_block');
 
-        $this->setBlock('person', 'has_portrait', 'has_portrait_block');
-        $this->setBlock('person', 'has_group', 'has_group_block');
+        $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
+        $this->setBlock('person', 'has_icon', 'has_icon_block');
 
-        $this->setVar('displayportraits_block', '');
-        $this->setVar('has_portrait_block', '');
-        $this->setVar('has_group_block', '');
+        $this->setVar('has_thumbnail_block', '');
+        $this->setVar('has_icon_block', '');
         $this->setVar('person_block', '');
         $this->setVar('student_email_block', '');
         $this->setVar('parent_email_block', '');
@@ -55,14 +54,20 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             'grid' => array(
                 'name' => 'Grid',
                 'value' => 'grid',
-                'css' => 'thumb',
+                'css' => 'grid',
             ),
             'list' => array(
                 'name' => 'List',
                 'value' => 'list',
-                'css' => 'bar',
+                'css' => '',
             ),
         );
+
+		$this->setVar(
+			array(
+				'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
+			)
+		);
 
         /* Get all the students belonging to this category code
          */
@@ -75,6 +80,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         $allStudentEmails = array();
 
         if (is_array($allStudents)) {
+			$j = 0;
             foreach ($allStudents as $currentStudent) {
                 $user = $userHandler->getBySynergy($currentStudent['synergy_id']);
 
@@ -96,30 +102,30 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                     $this->setVar(
                         array(
+							'ON_OFF' => ++$j % 2 ? '' : 'dark',
                             'PERSON_UID' => $user['uid'],
                             'PERSON_EXTERNAL_ID' => $user['synergy_id'],
                             'PERSON_NAME' => $name,
                             'PERSON_GROUP' => $user['gname'],
-                            'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
                         )
                     );
 
                     /* Don't display images in list view
                         */
                     if ($this->getConfig('displayPortraits') == 'grid') {
-                        $this->parse('has_portrait_block', 'has_portrait');
-                        $this->parse('has_group_block', 'has_group');
+                        $this->parse('has_thumbnail_block', 'has_thumbnail');
+                        $this->setVar('has_icon_block', '');
                     } else {
-                        $this->setVar('has_portrait_block', '');
-                        $this->setVar('has_group_block', '');
+						$this->setVar('has_thumbnail_block', '');
+						$this->parse('has_icon_block', 'has_icon');
                     }
 
                     $this->parse('person_block', 'person', true);
 
                     /* Clear children after parsing out the parent
                         */
-                    $this->setVar('has_portrait_block', '');
-                    $this->setVar('has_group_block', '');
+                    $this->setVar('has_thumbnail_block', '');
+                    $this->setVar('has_icon_block', '');
                 }
             }
 

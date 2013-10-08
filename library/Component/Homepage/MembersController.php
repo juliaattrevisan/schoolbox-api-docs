@@ -31,12 +31,11 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         //output users of group
         $this->setBlock($templateHandle, "member_email", "member_email_block");
         $this->setBlock($templateHandle, "person", "person_block");
-        $this->setBlock('person', 'has_portrait', 'has_portrait_block');
-        $this->setBlock('person', 'has_group', 'has_group_block');
+		$this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
+		$this->setBlock('person', 'has_icon', 'has_icon_block');
 
-        $this->setVar('displayportraits_block', '');
-        $this->setVar('has_portrait_block', '');
-        $this->setVar('has_group_block', '');
+		$this->setVar('has_thumbnail_block', '');
+		$this->setVar('has_icon_block', '');
         $this->setVar('person_block', '');
 
         /* Display options
@@ -45,14 +44,19 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             'grid' => array(
                 'name'  => 'Grid',
                 'value' => 'grid',
-                'css'   => 'thumb',
+                'css'   => 'grid',
             ),
             'list' => array(
                 'name'  => 'List',
                 'value' => 'list',
-                'css'   => 'bar',
+                'css'   => '',
             ),
         );
+
+		$display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
+		$this->setVar(array(
+			'LIST_STYLE' => $displayOptions[$display]['css'],
+		));
 
         $userHandler = new User;
         $userList = $userHandler->getAllInCategory($this->getContext('id'));
@@ -60,7 +64,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         $emailall = array();
         if (is_array($userList)) {
-            $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
+            $j = 0;
             foreach ($userList as $user) {
                 $name = $userHandler->formatName($user);
                 $email = $emailObj->formatEmailFromArray($user);
@@ -75,6 +79,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 }
 
                 $this->setVar(array(
+					'ON_OFF' => ++$j % 2 ? '' : 'dark',
                     'PERSON_UID' => $user['uid'],
                     'PERSON_NAME' => $name,
                     'PERSON_EXTERNAL_ID' => $user['synergy_id'],
@@ -82,24 +87,24 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     'LIST_STYLE' => $displayOptions[$display]['css'],
                 ));
 
-                /* Don't display images in list view
-                 */
-                if ($display == 'grid') {
-                    $this->parse('has_portrait_block', 'has_portrait');
-                    $this->parse('has_group_block', 'has_group');
-                }
-                else {
-                    $this->setVar('has_portrait_block', '');
-                    $this->setVar('has_group_block', '');
-                }
+				/* Don't display images in list view
+			   */
+				if ($this->getConfig('displayPortraits') == 'grid') {
+					$this->parse('has_thumbnail_block', 'has_thumbnail');
+					$this->setVar('has_icon_block', '');
+				} else {
+					$this->setVar('has_thumbnail_block', '');
+					$this->parse('has_icon_block', 'has_icon');
+				}
 
-                $this->parse('person_block', 'person', true);
+				$this->parse('person_block', 'person', true);
 
-                /* Clear children after parsing out the parent
-             */
-                $this->setVar('has_portrait_block', '');
-                $this->setVar('has_group_block', '');
-            }
+				/* Clear children after parsing out the parent
+			   */
+				$this->setVar('has_thumbnail_block', '');
+				$this->setVar('has_icon_block', '');
+
+			}
 
             $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
             $this->setVar("EMAILALL", implode(',', $emailall));

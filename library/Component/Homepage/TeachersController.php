@@ -30,26 +30,29 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
 
         // gets teachers involved in subject, outputs links to their addressbook page
         $this->setBlock($templateHandle, "person", "person_block");
-        $this->setBlock('person', 'has_portrait', 'has_portrait_block');
-        $this->setBlock('person', 'has_group', 'has_group_block');
+		$this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
+		$this->setBlock('person', 'has_icon', 'has_icon_block');
 
-        $this->setVar('displayportraits_block', '');
-        $this->setVar('has_portrait_block', '');
-        $this->setVar('has_group_block', '');
+		$this->setVar('has_thumbnail_block', '');
+		$this->setVar('has_icon_block', '');
         $this->setVar('person_block', '');
 
         $displayOptions = array(
             'grid' => array(
                 'name'  => 'Grid',
                 'value' => 'grid',
-                'css'   => 'thumb',
+                'css'   => 'grid',
             ),
             'list' => array(
                 'name'  => 'List',
                 'value' => 'list',
-                'css'   => 'bar',
+                'css'   => '',
             ),
         );
+		$display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
+		$this->setVar(array(
+			'LIST_STYLE' => $displayOptions[$display]['css'],
+		));
 
         if (($this->getContext('code') != '') && Cfg::get('external_enable')) {
 
@@ -61,37 +64,36 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
             if (is_array($listSyns)) {
-                $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
+				$j = 0;
                 foreach($listSyns as $synid) {
                     $teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
                     $meta = $userHandler->getByID($teacher['uid']);
 
                     if (is_array($teacher)) {
                         $this->setVar(array(
+							'ON_OFF' => ++$j % 2 ? '' : 'dark',
                             'PERSON_UID' => $teacher['uid'],
                             'PERSON_NAME' => $teacher['firstname'] . ' ' . $teacher['lastname'],
                             'PERSON_EXTERNAL_ID' => $synid,
                             'PERSON_GROUP' => $meta['gname'],
-                            'LIST_STYLE' => $displayOptions[$display]['css'],
                         ));
 
                         /* Don't display images in list view
                        */
-                        if ($display == 'grid') {
-                            $this->parse('has_portrait_block', 'has_portrait');
-                            $this->parse('has_group_block', 'has_group');
-                        }
-                        else {
-                            $this->setVar('has_portrait_block', '');
-                            $this->setVar('has_group_block', '');
-                        }
+						if ($this->getConfig('displayPortraits') == 'grid') {
+							$this->parse('has_thumbnail_block', 'has_thumbnail');
+							$this->setVar('has_icon_block', '');
+						} else {
+							$this->setVar('has_thumbnail_block', '');
+							$this->parse('has_icon_block', 'has_icon');
+						}
 
                         $this->parse('person_block', 'person', true);
 
                         /* Clear children after parsing out the parent
                        */
-                        $this->setVar('has_portrait_block', '');
-                        $this->setVar('has_group_block', '');
+						$this->setVar('has_thumbnail_block', '');
+						$this->setVar('has_icon_block', '');
                     }
                 }
             }
