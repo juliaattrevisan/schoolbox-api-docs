@@ -1,0 +1,100 @@
+@charset "utf-8";
+// =============================================================================
+// Cedar's Christian College Schoolbox skin
+// =============================================================================
+//*
+//*   Ride The Whale                         ~777IIIIIIIIIII7~_
+//*                            7I       =%#%%%%7 @ %# /========
+//*                         ]7II7I###########%%%%%%%%777777
+//*                                ~I7###########777=
+//*                                     ##7      ]/
+//*                                     #/
+//*/
+// =============================================================================
+// 1. Load dependencies
+// =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width:     				160px;
+@logo-height:     				48px;
+
+// Generic colors
+@body-background: 				#EEEEEE; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FAF9F5; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#6B6B6B;
+@link-hover: 					#6B6B6B;
+
+// Main banner
+@banner-background: 			#A5102E;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@banner-height:     			72px;
+
+// Modules
+@module-heading: 				#FFFFFF;
+@module-background: 			#6B6B6B;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			#000000;
+@navigation-links:  			#6B6B6B;
+@navigation-hover-background: 	@navigation-links;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@body-background;
+
+// Main "Tab" Navigation
+@tab-background:				#862433;
+@tab-color:						#FFFFFF;
+@tab-hover-background:			@tab-color;
+@tab-hover-color:				@tab-background;
+
+// Footer text
+@footer-color:					#797979;
+@footer-links:					@footer-color;
+
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+/*
+ * Header
+ */
+#header, .login #header{
+	.logo {
+		left: 16px;
+		top:  13px;
+	}
+}
+#search { background: transparent; width: @search-width;
+	position: absolute; z-index: 3; right: 0; margin: 8px;
+	fieldset { width: 100%; }
+}
+#search-field {
+	color: @banner-background;
+	background: @banner-color;
+	padding: 6px 0 0 7px;
+	width: @search-width - 7px;
+}
+#search-button{
+	background: url('/images/cedars/search-button.png') 8px 12px no-repeat !important;
+	left: auto; right: 8px;
+}
