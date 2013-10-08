@@ -165,12 +165,21 @@ class Subcontext_CourseBuilderContext extends BaseContext {
             throw new Exception("Course import form not found");
         }
 
-        $link = $form->findLink($unit);
-        if (!($link instanceof Element\NodeElement)) {
+        // Search for rows in the table
+        /** @var Element\NodeElement[] $rows */
+        $unit_row_list = $form->findAll('css', 'tr[data-type="unit_row"]');
+        $row           = null;
+        foreach ($unit_row_list as $unit_row) {
+            if (stripos($unit_row->getText(), $unit) !== false) {
+                $row = $unit_row;
+                break;
+            }
+        }
+        if (!($row instanceof Element\NodeElement)) {
             throw new Exception("Unit \"$unit\" not found in course import form");
         }
 
-        $input = $form->find('css', 'input#'.$name.'-'.$link->getAttribute('data-unit_id'));
+        $input = $row->find('css', 'input.'.$name);
         if (!($input instanceof Element\NodeElement)) {
             throw new Exception("Date input for unit \"$unit\" not found in course import form");
         }

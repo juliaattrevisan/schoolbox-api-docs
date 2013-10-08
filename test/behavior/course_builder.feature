@@ -121,7 +121,7 @@ Scenario: Add a course to a class
   When  I follow "Duke of Edinburgh"
   And   I add component "Learning:Course Instance"
   And   I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
-  Then  I wait for a "form#importForm" element
+  And   I wait for a "form#importForm" element
   # Set due dates for units
   When  I set open date for course unit "Chemical reactions" as "today 12:00am"
   And   I set due date for course unit "Chemical reactions" as "+9 days 12:00am"
