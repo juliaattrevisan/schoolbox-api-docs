@@ -16,8 +16,8 @@
                 var input = $(this);
                 $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
                     input.val(data.time);
+                    form.valid();
                 })
-                input.trigger('blur.courseImport');
             }
         });
 
