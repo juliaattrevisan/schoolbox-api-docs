@@ -71,14 +71,12 @@ class Chain {
 		$linkIconApple = new LinkIconApple($xml, $url);
 		$linkIconApplePrecompiled = new LinkIconApplePrecompiled($xml, $url);
 		$linkIconApplePrecomposed = new LinkIconApplePrecomposed($xml, $url);
-		$googleFavIcon = new GoogleFavIcon($xml, $url);
 		$arbitraryFile = new ArbitraryFile($xml, $url);
 
 		/* Try directly, otherwise try the other meta tag variants in sequence
 		 * until one of them matches
 		 */
-		$googleFavIcon->setNext($arbitraryFile);
-		$linkIconApplePrecomposed->setNext($googleFavIcon);
+		$linkIconApplePrecomposed->setNext($arbitraryFile);
 		$linkIconApplePrecompiled->setNext($linkIconApplePrecomposed);
 		$linkIconApple->setNext($linkIconApplePrecompiled);
 		$linkIcon->setNext($linkIconApple);
