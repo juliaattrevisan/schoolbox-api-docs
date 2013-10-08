@@ -48,13 +48,17 @@ $task_list     = TaskMapper::getInstance()->findGroupedListForCategoryList($chil
 $this->setFile(TEMPLATE_content, "course/import.html");
 $this->setBlock(TEMPLATE_content, 'course_breadcrumb', 'course_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'class_breadcrumb',  'class_breadcrumb_block');
-$this->setBlock(TEMPLATE_content, 'unit',              'unit_block');
+$this->setBlock(TEMPLATE_content, 'importable',        'importable_block');
+$this->setBlock(TEMPLATE_content, 'unimportable',      'unimportable_block');
+$this->setBlock('importable',     'unit',              'unit_block');
 $this->setBlock('unit', 'task', 'task_block');
 
 $this->setVar(
     array(
         'class_breadcrumb_block'  => '',
         'course_breadcrumb_block' => '',
+        'importable_block'        => '',
+        'unimportable_block'      => '',
         'HOMEPAGE_ID'             => Scrub::text($homepage_id),
         'COURSE_HOMEPAGE_ID'      => Scrub::text($course_homepage_id),
         'COMPONENT_ID'            => Scrub::text($component_id),
@@ -105,4 +109,10 @@ foreach ($child_list as $unit) {
         )
     );
     $this->parse('unit_block', 'unit', true);
+}
+if ($count > 0) {
+    $this->parse('importable_block', 'importable');
+}
+else {
+    $this->parse('unimportable_block', 'unimportable');
 }
