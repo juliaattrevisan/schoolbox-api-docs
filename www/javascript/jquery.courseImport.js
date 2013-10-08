@@ -31,19 +31,20 @@
         }
         form.delegate('input[data-interaction="enable"]', 'click.courseImport', function() {
             enableUnitClickEvent($(this));
+            form.valid();
         });
         form.find('input[data-interaction="enable"]').each(function() {
             enableUnitClickEvent($(this));
         })
 
         // Form validation: Run the validation on any blur event on a field
-        form.validate();
-        form.delegate('input', 'blur.courseImport', function() { form.valid(); })
+        form.validate({
+            errorPlacement: function(error, element) {
+                error.insertAfter(element.parent('td').find('.ui-datepicker-trigger'));
+            }
+        });
 
         // Open date validation
-//        var errorPlacerCallback = function(error, element) {
-//            error.insertAfter(element.parent('td').find('.ui-datepicker-trigger'));
-//        }
         form.find('input.open_date').each(function() {
             $(this).rules('add', {
                 datepickerDate: true,
