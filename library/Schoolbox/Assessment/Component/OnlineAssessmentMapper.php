@@ -419,21 +419,25 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			    MAX(sum_mark) AS `max`
 			FROM
 			(
-			  SELECT SUM(mark) AS sum_mark
-			  FROM assess_response ar
-			  WHERE attempt_id IN (
-			    SELECT attempt_id FROM
-			    (
-			      SELECT attempt_id, user_id
-			      FROM assess_attempt aa
-			      WHERE assess_id = :assess_id
-			      AND aa.reviewed_at IS NOT NULL
-			      AND aa.deleted_at IS NULL
+			  SELECT *
+			  FROM
+			  (
+			      SELECT SUM(mark) AS sum_mark, ar.attempt_id, t0.user_id, t0.finish
+			      FROM assess_response ar
+			      INNER JOIN
+			      (
+			            SELECT attempt_id, user_id, finish
+			            FROM assess_attempt aa
+			            WHERE assess_id = :assess_id
+			            AND aa.reviewed_at IS NOT NULL
+			            AND aa.deleted_at IS NULL
+			      ) t0
+			      ON ar.attempt_id = t0.attempt_id
+			      GROUP BY t0.attempt_id
 			      ORDER BY finish DESC
-			    ) t0
-			    GROUP BY user_id
-			  ) GROUP BY attempt_id
-			) t1;
+			  ) t1
+			  GROUP BY user_id
+			) t2;
 		";
 
 		$stmt = $this->database->prepare($sql);
