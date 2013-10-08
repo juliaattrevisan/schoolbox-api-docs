@@ -95,6 +95,7 @@ foreach ($course_homepage_path as $parent) {
 }
 
 $this->setVar('unit_block', '');
+$count = 0;
 $displayed_category_list = array();
 foreach ($course_list as $unit) {
     $unit_id = $unit->getId();
@@ -103,6 +104,7 @@ foreach ($course_list as $unit) {
     $this->setVar(
         array(
             'UNIT_ID'              => Scrub::text($unit->getUnitCategory()->getId()),
+            'UNIT_COUNT'           => $count++,
             'UNIT_ENABLED'         => 1,
             'UNIT_ENABLED_CHECKED' => 'checked',
             'UNIT_INSTANCE_ID'     => Scrub::text($unit->getId()),
@@ -131,6 +133,7 @@ foreach ($child_list as $unit) {
     $this->setVar(
         array(
             'UNIT_ID'              => Scrub::text($unit_id),
+            'UNIT_COUNT'           => $count++,
             'UNIT_ENABLED'         => 0,
             'UNIT_ENABLED_CHECKED' => '',
             'UNIT_INSTANCE_ID'     => '',

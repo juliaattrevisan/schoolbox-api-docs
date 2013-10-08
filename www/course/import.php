@@ -84,6 +84,7 @@ foreach ($course_homepage_path as $parent) {
     $this->parse('course_breadcrumb_block', 'course_breadcrumb', true);
 }
 
+$count = 0;
 $this->setVar('unit_block', '');
 foreach ($child_list as $unit) {
     $unit_id = $unit->getId();
@@ -93,6 +94,7 @@ foreach ($child_list as $unit) {
     $this->setVar(
         array(
             'UNIT_ID'              => Scrub::text($unit_id),
+            'UNIT_COUNT'           => $count++,
             'UNIT_ENABLED'         => 1,
             'UNIT_ENABLED_CHECKED' => 'checked',
             'UNIT_INSTANCE_ID'     => '',
