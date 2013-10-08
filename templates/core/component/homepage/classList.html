@@ -18,21 +18,19 @@
         <!-- END person -->
 	</ul>
 
-	<p class="interact">
-		<!-- BEGIN student_email -->
-		<form action="/mail/createMail.php" method="post" class="clearfix" name="form2" style="float:right;">
-			<input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
-			<input type="hidden" name="bcc" value="{EMAIL_ALL_STUDENTS}"/>
-			<a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all</a>
-		</form>
-		<!-- END student_email -->
+	<!-- BEGIN student_email -->
+	<form action="/mail/createMail.php" method="post" name="form2">
+		<input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
+		<input type="hidden" name="bcc" value="{EMAIL_ALL_STUDENTS}"/>
+		<a href="#" class="btn submit-this email"><span></span>Email all</a>
+	</form>
+	<!-- END student_email -->
 
-		<!-- BEGIN parent_email -->
-		<form action="/mail/createMail.php" method="post" class="clearfix" name="form2" style="float:right;">
-			<input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
-			<input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
-			<a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all parents</a>
-		</form>
-		<!-- END parent_email -->
-	</p>
+	<!-- BEGIN parent_email -->
+	<form action="/mail/createMail.php" method="post" name="form2">
+		<input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
+		<input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+		<a href="#" class="btn submit-this email"><span></span>Email all parents</a>
+	</form>
+	<!-- END parent_email -->
 </div>
