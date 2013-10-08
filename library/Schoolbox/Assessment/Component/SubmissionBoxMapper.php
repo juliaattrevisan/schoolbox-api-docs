@@ -128,6 +128,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
+		$this->hasMap(array(
+			'column'     => 'weight',
+			'property'   => 'weight',
+			'type'       => self::TYPE_INTEGER,
+		));
 		//
 		// TODO add TYPE_COLLECTION
 		$this->hasMap(array(

@@ -84,6 +84,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(
+			'column'     => 'weight',
+			'property'   => 'weight',
+			'type'       => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
 			'column'     => 'availability',
 			'property'   => 'availability',
 			'type'       => self::TYPE_STRING,
