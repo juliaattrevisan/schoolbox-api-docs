@@ -81,6 +81,13 @@
 						clone.removeClass('dir-template');
 						clone.addClass(options.childPrefix + node.attr('id'));
 						clone.addClass(row.permission);
+						// Add course and homepage icons here
+						if (row.template) {
+							clone.addClass('homepage');
+						}
+						if (Number(row.taskCount) > 0) {
+							clone.addClass('course');
+						}
 						clone.find(options.label).text(row.name);
 						
 						if (row.isParent == 1) {
