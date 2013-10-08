@@ -847,7 +847,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		";
 
 		$stmt = $this->database->prepare($sql);
-		$stmt->execute('box_id', $submission_box_id);
+		$stmt->execute(array('box_id' => $submission_box_id));
 
 		return $stmt->fetch(\PDO::FETCH_ASSOC);
 
