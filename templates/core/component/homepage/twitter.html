@@ -5,10 +5,10 @@
 		<!-- BEGIN tweet -->
 		<li class="{ON_OFF}">
 			<p class="meta">
-				<span class="author">
-					<img height="32" width="32" src="{TWEET_AVATAR}" />
-					@{TWEET_AUTHOR}
-				</span>
+                <a class="author" href="https://twitter.com/{TWEET_AUTHOR}">
+                    <img height="32" width="32" src="{TWEET_AVATAR}" />
+                    {TWEET_FULLNAME} @{TWEET_AUTHOR}
+                </a>
 				Tweeted on {TWEET_DATE}
 			</p>
 			<p>{TWEET_TEXT}<p>
