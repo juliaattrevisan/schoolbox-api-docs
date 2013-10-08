@@ -17,7 +17,7 @@ use Authenticator;
 use Exception;
 use ClientDevice;
 
-class Calendar_API extends Generic\API {
+class API extends Generic\API {
 
     public function Month($date = '') {
         $response = new Response_HTTP();

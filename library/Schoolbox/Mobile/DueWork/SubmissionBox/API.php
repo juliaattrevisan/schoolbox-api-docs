@@ -23,7 +23,7 @@ use External_Class;
 use Scrub;
 use Authenticator;
 
-class DueWork_SubmissionBox_API {
+class API {
 
     public function Display($dueWorkID) {
         $response = new Response_HTTP();
