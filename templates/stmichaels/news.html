@@ -60,22 +60,19 @@
     </div>
 
 
-    <div class="menu">
-        <ul>
-            <!-- BEGIN year -->
-            <li class="{YEAR_CLASS}"><h3>{YEAR}</h3>
-                <ul>
-                    <!-- BEGIN month -->
-                    <li>
-                        <a class="{MONTH_CLASS}"
-                           href="/news-archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
-                    </li>
-                    <!-- END month -->
-                </ul>
-            </li>
-            <!-- END year -->
-        </ul>
-    </div>
+	<div class="menu">
+		<!-- BEGIN year -->
+		<h3 class="{YEAR_CLASS}">{YEAR}</h3>
+		<ul class="admin-nav vertical">
+			<!-- BEGIN month -->
+			<li>
+				<a class="{MONTH_CLASS}"
+						href="/news-archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+			</li>
+			<!-- END month -->
+		</ul>
+		<!-- END year -->
+	</div>
 
 	<ul class="admin-nav foot">
 		<!-- BEGIN previous_button -->

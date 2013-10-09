@@ -2292,11 +2292,22 @@ ADMIN
 /*-------------------------------------------------------------
 ADMIN NAV
 --------------------------------------------------------------*/
+// This is the new default tab style. I haven't renamed it to something better yet though.
 .admin-nav {
     float: left;
+	// Variants: add margin if underneath content
 	&.foot {
 		margin-top: 8px;
 	}
+	// Full-width if vertical
+	&.vertical {
+		float: none;
+		width: 100%;
+		li {
+			float: none;
+		}
+	}
+	// Float list items and remove any padding
     li {
         float: left;
         margin: 0 8px 8px 0;
@@ -2309,12 +2320,13 @@ ADMIN NAV
 			border: 1px solid @border-color;
 			font-weight: normal;
 			height: 22px; line-height: 22px;
+			// Gotta highlight your current states!
 			&.current {
 				color: @tab-color;
 				background: @tab-background;
 				border-color: @tab-background;
 			}
-
+			// HATE
 			&.add {
 				position: relative;
 				padding-left: 30px;
@@ -2755,35 +2767,6 @@ ADMIN BODY
 
 .admin-contents .settings input[type=text] {
     width: 100%;
-}
-
-.settings-nav li a {
-    position: relative;
-    display: block;
-    padding: 7px 16px;
-    margin-right: 8px;
-    border: 1px solid darken(@alternate-background, @darken-value);
-    color: @link;
-    background: @alternate-background;
-	&.current {
-    	background: darken(@alternate-background, @darken-value);
-    	color: @link;
-    	font-weight: bold;
-		span {
-			border-bottom: 8px solid transparent;
-			border-left: 8px solid darken(@alternate-background, @darken-value);
-			border-top: 8px solid transparent;
-			height: 0;
-			width: 0;
-			position: absolute;
-			right: -8px;
-			top: 4px;
-		}
-	}
-}
-
-.settings-nav li {
-    margin-bottom: 4px;
 }
 
 .admin-form {
@@ -4297,32 +4280,6 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 .archive .posts {
     width: 82%;
     float: left;
-}
-
-.archive .menu ul li a,
-.archive .pagination a {
-    color: black;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    display: block;
-    padding: 7px 16px;
-    background-color:  @dark;
-    background-image: -webkit-gradient(linear, left top, left bottom, from( @dark), to( @dark));
-    background-image: -webkit-linear-gradient(top,  @dark,  @dark);
-    background-image: -moz-linear-gradient(top,  @dark,  @dark);
-    background-image: -ms-linear-gradient(top,  @dark,  @dark);
-    background-image: -o-linear-gradient(top,  @dark,  @dark);
-    background-image: linear-gradient(top,  @dark,  @dark);
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
-    text-shadow: 0px 1px 0px @white;
-    border: 1px solid @std-grey;
-    margin-bottom: 8px;
-}
-
-.archive .menu ul li a.selected {
-    background: @alternate-background;
-    filter: none;
 }
 
 .archive .menu h3 {

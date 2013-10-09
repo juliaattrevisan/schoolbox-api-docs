@@ -20,18 +20,16 @@
         <!-- END category_header -->
     </ul>
     <div class="menu">
-        <ul>
             <!-- BEGIN year -->
-            <li class="{YEAR_CLASS}"><h3>{YEAR}</h3>
-                <ul>
-                    <!-- BEGIN month -->
-                    <li>
-                        <a class="{MONTH_CLASS}"
-                           href="/homepage/chatArchive/{MENU_CATEGORY_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
-                    </li>
-                    <!-- END month -->
-                </ul>
-            </li>
+            <h3 class="{YEAR_CLASS}">{YEAR}</h3>
+			<ul class="admin-nav vertical">
+				<!-- BEGIN month -->
+				<li>
+					<a class="{MONTH_CLASS}"
+					   href="/homepage/chatArchive/{MENU_CATEGORY_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+				</li>
+				<!-- END month -->
+			</ul>
             <!-- END year -->
         </ul>
     </div>

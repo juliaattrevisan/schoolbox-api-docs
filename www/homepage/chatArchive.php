@@ -76,14 +76,14 @@ if ($occupiedDateList) {
         $this->setVar(
             array(
                 'YEAR' => $date['year'],
-                'YEAR_ClASS' => $date['year'] == $filter['year'] ? 'selected' : ''
+                'YEAR_ClASS' => $date['year'] == $filter['year'] ? 'current' : ''
             )
         );
 
         /* Highlight only for the selected month and selected year
            */
         if (($date['month'] == $filter['month']) && ($date['year'] == $filter['year'])) {
-            $monthClass = 'selected';
+            $monthClass = 'current';
         } else {
             $monthClass = '';
         }
