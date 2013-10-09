@@ -51,7 +51,7 @@ $this->setVar('CATEGORY_NAME', $category['name']);
 $this->setVar('ID', $categoryID);
 
 /* PARSE COMPONENTRY */
-$componentFactory = new Component_Homepage_Statistics_Factory(new User, $this);
+$componentFactory = new Component_Homepage_Statistics_Factory(new \Schoolbox\User(), $this);
 $componentCollection = $componentFactory->buildComponentList($categoryID);
 $occupiedPositionList = array();
 $j = 0;

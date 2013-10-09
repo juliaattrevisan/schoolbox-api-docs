@@ -88,7 +88,7 @@ if ($page->detectAjax()) {
 
         if ($component instanceof Component_Instance) {
             // Dump out template contents
-            $chf = new Component_Homepage_Factory(new User(), new SitePage(false));
+            $chf = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
 
             /** @var Component_Homepage_CourseTaskListController $controller */
             $controller = $chf->buildComponent($component);

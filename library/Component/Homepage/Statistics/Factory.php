@@ -14,7 +14,7 @@ class Component_Homepage_Statistics_Factory extends Component_FactoryAbstract {
      */
     protected $module;
 
-    public function __construct(User $user, SitePage $sitepage) {
+    public function __construct(\Schoolbox\User $user, SitePage $sitepage) {
         $this->module = 'homepage_statistics';
         parent::__construct($user, $sitepage);
     }
