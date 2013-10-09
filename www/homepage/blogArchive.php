@@ -57,7 +57,7 @@ if ($dateList = $blogHandler->getOccupiedDateList($category['id'])) {
         $this->setVar(
             array(
                 'YEAR' => $date['year'],
-                'YEAR_ClASS' => $date['year'] == $yearNumber ? 'selected' : ''
+                'YEAR_ClASS' => $date['year'] == $yearNumber ? 'current' : ''
             )
         );
 
@@ -66,7 +66,7 @@ if ($dateList = $blogHandler->getOccupiedDateList($category['id'])) {
         /* Highlight only for the selected month and selected year
          */
         if (($month->getUsingFormat('m') == $monthNumber) && ($month->getUsingFormat('Y') == $yearNumber)) {
-            $monthClass = 'selected';
+            $monthClass = 'current';
         } else {
             $monthClass = '';
         }

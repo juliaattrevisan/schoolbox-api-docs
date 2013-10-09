@@ -29,19 +29,16 @@
 	<a href="/homepage/{ID}" class="btn go-back"><span></span>Return to Homepage</a>
 	</span>
 	<div class="menu">
-		<ul>
 			<!-- BEGIN year -->
-			<li class="{YEAR_ClASS}"><h3>{YEAR}</h3>
-				<ul>
-				<!-- BEGIN month -->
-					<li><a class="{MONTH_ClASS}"
-						href="/homepage/blogArchive/{ID}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
-					</li>
-				<!-- END month -->
-				</ul>
-			</li>
+			<h3 class="{YEAR_ClASS}">{YEAR}</h3>
+			<ul class="admin-nav vertical">
+			<!-- BEGIN month -->
+				<li><a class="{MONTH_ClASS}"
+					href="/homepage/blogArchive/{ID}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+				</li>
+			<!-- END month -->
+			</ul>
 			<!-- END year -->
-		</ul>
 	</div>
 
 	<ul class="posts blog listing">

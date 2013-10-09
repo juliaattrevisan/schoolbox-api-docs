@@ -97,7 +97,7 @@ foreach ($topicList as $sidebarTopic) {
     $output = array(
         'LIST_TOPIC_NAME' => $sidebarTopic['name'],
         'LIST_TOPIC_CLEAN' => $topicUrl->getSlug(),
-        'LIST_TOPIC_SELECTED' => $topicUrl->getSlug() == $url->getSlug() ? 'selected' : '',
+        'LIST_TOPIC_SELECTED' => $topicUrl->getSlug() == $url->getSlug() ? 'current' : '',
     );
     $this->setVar($output);
     $this->parse('topic_list_block', 'topic_list', true);

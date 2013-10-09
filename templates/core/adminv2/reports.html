@@ -45,29 +45,30 @@
                 {RESULT}
             </div>
             <!-- END result -->
-            <div class="archive">
-                <div class="pagination clearfix">
-            <!-- BEGIN previous_button -->
-                    <a class="prev" href="/adminv2/reports/{PREVIOUS_PAGE}">&laquo; Prev</a>
-            <!-- END previous_button -->
 
-            <!-- BEGIN first_page -->
-            <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><span>...</span>
-            <!-- END first_page -->
+			<ul class="admin-nav foot">
+				<!-- BEGIN previous_button -->
+				<li><a class="prev" href="/adminv2/reports/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
+				<!-- END previous_button -->
 
-            <!-- BEGIN page_number -->
-                    <a class="{CURRENT}" href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-            <!-- END page_number -->
+				<!-- BEGIN first_page -->
+				<li><a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
+				<li>&hellip;</li>
+				<!-- END first_page -->
 
-            <!-- BEGIN last_page -->
-            <span>...</span><a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-            <!-- END last_page -->
+				<!-- BEGIN page_number -->
+				<li><a class="{CURRENT}" href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
+				<!-- END page_number -->
 
-            <!-- BEGIN next_button -->
-                    <a class="next" href="/adminv2/reports/{NEXT_PAGE}">Next &raquo;</a>
-            <!-- END next_button -->
-                </div>
-            </div>
+				<!-- BEGIN last_page -->
+				<li>&hellip;</li>
+				<li><a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
+				<!-- END last_page -->
+
+				<!-- BEGIN next_button -->
+				<li><a class="next" href="/adminv2/reports/{NEXT_PAGE}">Next &rsaquo;</a></li>
+				<!-- END next_button -->
+			</ul>
         </div>
         <!-- END result_table -->
     </div>

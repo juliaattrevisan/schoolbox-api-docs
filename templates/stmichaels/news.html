@@ -18,7 +18,7 @@
 
 <div class="archive news clearfix">
 
-    <ul id="category" class="clearfix">
+    <ul id="category" class="admin-nav">
         <!-- BEGIN topic_header -->
         <li><a {TOPIC_CLASS} href="/news-archive/{TOPIC_CLEAN}" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
         <!-- END topic_header -->
@@ -60,30 +60,30 @@
     </div>
 
 
-    <div class="menu">
-        <ul>
-            <!-- BEGIN year -->
-            <li class="{YEAR_CLASS}"><h3>{YEAR}</h3>
-                <ul>
-                    <!-- BEGIN month -->
-                    <li>
-                        <a class="{MONTH_CLASS}"
-                           href="/news-archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
-                    </li>
-                    <!-- END month -->
-                </ul>
-            </li>
-            <!-- END year -->
-        </ul>
-    </div>
+	<div class="menu">
+		<!-- BEGIN year -->
+		<h3 class="{YEAR_CLASS}">{YEAR}</h3>
+		<ul class="admin-nav vertical">
+			<!-- BEGIN month -->
+			<li>
+				<a class="{MONTH_CLASS}"
+						href="/news-archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+			</li>
+			<!-- END month -->
+		</ul>
+		<!-- END year -->
+	</div>
 
-    <div class="pagination clearfix">
-        <!-- BEGIN previous_button -->
-        <a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&laquo; Prev</a><!-- END previous_button -->
-        <!-- BEGIN page_number -->
-        <a class="number {CURRENT}" href="/news-archive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><!-- END page_number -->
-        <!-- BEGIN next_button -->
-        <a class="next" href="/news-archive/{NEXT_PAGE}">Next &raquo;</a><!-- END next_button -->
-    </div>
+	<ul class="admin-nav foot">
+		<!-- BEGIN previous_button -->
+		<li><a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
+		<!-- END previous_button -->
+		<!-- BEGIN page_number -->
+		<li><a class="number {CURRENT}" href="/news-archive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
+		<!-- END page_number -->
+		<!-- BEGIN next_button -->
+		<li><a class="next" href="/news-archive/{NEXT_PAGE}">Next &rsaquo;</a></li>
+		<!-- END next_button -->
+	</ul>
 
 </div>

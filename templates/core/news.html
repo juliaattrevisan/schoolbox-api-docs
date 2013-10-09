@@ -18,7 +18,7 @@
 
 <div class="archive news clearfix">
 
-    <ul id="category" class="clearfix">
+    <ul class="admin-nav">
         <!-- BEGIN topic_header -->
         <li><a {TOPIC_CLASS} href="/news-archive/{TOPIC_CLEAN}" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
         <!-- END topic_header -->
@@ -27,29 +27,30 @@
     <div class="posts">
         <!-- BEGIN topic -->
         <div id="{TOPIC_CLEAN}">
-            <ul id="a{NEWS_ID}" class="blog listing">
+            <ul id="a{NEWS_ID}" class="information-list">
             <!-- BEGIN news -->
                 <li class="{ON_OFF}">
-                <h3><a href="/news/item/{NEWS_ID}">{NEWS_TITLE}</a></h3>
+					<!-- BEGIN has_modify_button -->
+					<span class="actions">
+						<a href="/news/modify/{HAS_MODIFY_BUTTON_ITEM_ID}" class='btn no-text modify' title="Modify this News Post"><span></span></a>
+					</span>
+					<!-- END has_modify_button -->
 
-                <!-- BEGIN has_modify_button -->
-                <a href="/news/modify/{HAS_MODIFY_BUTTON_ITEM_ID}" class='btn modify'><span></span>Modify</a>
-                <!-- END has_modify_button -->
-                    <p class="author">
-                        <a href="/search/user/{POSTER_ID}" class="author">
-                            <img width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
-                            <span class="name">{POSTER}</span>
-                        </a>
-                        <span class="subtitle">Posted {DATETIME}</span>
+					<h3><a href="/news/item/{NEWS_ID}">{NEWS_TITLE}</a></h3>
+
+					<a href="/search/user/{POSTER_ID}" class="author">
+						<img class="icon" width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32" />
+						{POSTER}
+					</a>
+					<p class="meta">Posted {DATETIME}
                         <!-- BEGIN has_expiry -->
-                        <span class="subtitle">{EXPIRY_VERB} on {EXPIRY_DATE}</span>
+                        | {EXPIRY_VERB} on {EXPIRY_DATE}
                         <!-- END has_expiry -->
                         <!-- BEGIN has_publish_date -->
-                        <span class="subtitle">Publishes on {PUBLISH_DATE}</span>
+                        | Published on {PUBLISH_DATE}
                         <!-- END has_publish_date -->
-                    </p>
-
-                    {NEWS_BODY}
+					</p>
+					<div class="wysiwyg">{NEWS_BODY}</div>
                 </li>
 
 
@@ -61,29 +62,28 @@
 
 
     <div class="menu">
-        <ul>
-            <!-- BEGIN year -->
-            <li class="{YEAR_CLASS}"><h3>{YEAR}</h3>
-                <ul>
-                    <!-- BEGIN month -->
-                    <li>
-                        <a class="{MONTH_CLASS}"
-                           href="/news-archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
-                    </li>
-                    <!-- END month -->
-                </ul>
-            </li>
-            <!-- END year -->
-        </ul>
+		<!-- BEGIN year -->
+		<h3 class="{YEAR_CLASS}">{YEAR}</h3>
+		<ul class="admin-nav vertical">
+			<!-- BEGIN month -->
+			<li>
+				<a class="{MONTH_CLASS}" href="/news-archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+			</li>
+			<!-- END month -->
+		</ul>
+		<!-- END year -->
     </div>
 
-    <div class="pagination clearfix">
+    <ul class="admin-nav foot">
         <!-- BEGIN previous_button -->
-        <a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&laquo; Prev</a><!-- END previous_button -->
+		<li><a class="prev" href="/news-archive/{PREVIOUS_PAGE}">&laquo; Prev</a></li>
+		<!-- END previous_button -->
         <!-- BEGIN page_number -->
-        <a class="number {CURRENT}" href="/news-archive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><!-- END page_number -->
+        <li><a class="number {CURRENT}" href="/news-archive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
+		<!-- END page_number -->
         <!-- BEGIN next_button -->
-        <a class="next" href="/news-archive/{NEXT_PAGE}">Next &raquo;</a><!-- END next_button -->
-    </div>
+		<li><a class="next" href="/news-archive/{NEXT_PAGE}">Next &raquo;</a></li>
+		<!-- END next_button -->
+    </ul>
 
 </div>

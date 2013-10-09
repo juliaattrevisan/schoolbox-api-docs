@@ -60,7 +60,7 @@ foreach ($topicList as $sidebarTopic) {
     $output = array(
         'LIST_TOPIC_NAME' => $sidebarTopic['name'],
         'LIST_TOPIC_CLEAN' => $url->getSlug(),
-        'LIST_TOPIC_SELECTED' => $selectedTopic == $url->getSlug() ? 'selected' : '',
+        'LIST_TOPIC_SELECTED' => $selectedTopic == $url->getSlug() ? 'current' : '',
     );
     $this->setVar($output);
     $topicSlugMap[$url->getSlug()] = $sidebarTopic['name'];
