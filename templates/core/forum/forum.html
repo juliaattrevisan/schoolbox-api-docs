@@ -19,8 +19,7 @@
             <!-- END modify_heading -->
             <th width="40%">Forum</th>
             <th width="20%">Last Post</th>
-            <th
-            ">Replies</th>
+            <th>Replies</th>
             <th>Views</th>
             <th width="30%">&nbsp;</th>
         </tr>
@@ -71,15 +70,14 @@
         <!-- END delete_button -->
     </p>
 </form>
-<div class="pagination navhelp">
+<ul class="admin-nav foot">
     <!-- BEGIN previous_button -->
-    <a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lt; Prev</a>
+	<li><a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
     <!-- END previous_button -->
     <!-- BEGIN page_number -->
-    <a class="{CURRENT}"
-       href="/forum/{CATEGORY_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a>
+	<li><a class="{CURRENT}" href="/forum/{CATEGORY_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
     <!-- END page_number -->
     <!-- BEGIN next_button -->
-    <a href="/forum/{CATEGORY_ID}/{NEXT_PAGE}">Next &gt;</a>
+    <li><a href="/forum/{CATEGORY_ID}/{NEXT_PAGE}">Next &rsaquo;</a></li>
     <!-- END next_button -->
-</div>
+</ul>

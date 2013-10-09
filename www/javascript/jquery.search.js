@@ -69,7 +69,7 @@ search = {
 	 * Add pagination events to all the <a> links
 	 */
 	paginate: function(){
-		$j('div.pagination > a').bind('click', function(event) {
+		$j('.admin-nav.foot li > a').bind('click', function(event) {
 			event.preventDefault();
 
 			/* Set the page number
@@ -173,7 +173,7 @@ search = {
 		 * through this particular section
 		 */
 		if (this.getSection() == 'all') {
-			$j('.pagination').remove();
+			$j('.admin-nav.foot').remove();
 		}
 	},
 

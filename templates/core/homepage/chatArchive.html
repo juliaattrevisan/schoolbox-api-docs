@@ -61,13 +61,16 @@
     </div>
     <div class="clearfix"></div>
 
-    <div class="pagination clearfix">
+    <ul class="admin-nav foot">
         <!-- BEGIN previous_button -->
-        <a class="prev" href="/homepage/chatArchive/{PREVIOUS_PAGE}">&laquo; Prev</a><!-- END previous_button -->
+		<li><a class="prev" href="/homepage/chatArchive/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
+			<!-- END previous_button -->
         <!-- BEGIN page_number -->
-        <a class="number {CURRENT}" href="/homepage/chatArchive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><!-- END page_number -->
+		<li><a class="number {CURRENT}" href="/homepage/chatArchive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
+		<!-- END page_number -->
         <!-- BEGIN next_button -->
-        <a class="next" href="/homepage/chatArchive/{NEXT_PAGE}">Next &raquo;</a><!-- END next_button -->
-    </div>
+		<li><a class="next" href="/homepage/chatArchive/{NEXT_PAGE}">Next &rsaquo;</a></li>
+		<!-- END next_button -->
+    </ul>
 
 </div>
