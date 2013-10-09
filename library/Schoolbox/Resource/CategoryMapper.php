@@ -192,15 +192,19 @@ class CategoryMapper extends Mapper {
 	 */
 	public function findForUser(User $user, $get_subjects = true, $access_level = UserAccess::ACCESS_READ) {
 		$query = "
-			SELECT DISTINCT {$this->getColumnString('c')}
+			SELECT DISTINCT
+				{$this->getColumnString('c')},
+				{$this->getJoinColumnString('homepages', 'h')}
 			FROM {$this->getTable()} c
 			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
-			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-			WHERE a.uid=:user
+			LEFT JOIN {$this->getJoinSql('codes',     'c', 'cc')}
+			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
+			WHERE a.uid = :user AND a.type >= :access
 		";
 		$params = array(
 			'user'    => $user->getId(),
-			'service' => $access_level,
+			'service' => UserAccess::SERVICE_HOMEPAGE,
+			'access'  => $access_level,
 		);
 
 		//
@@ -231,7 +235,19 @@ class CategoryMapper extends Mapper {
 
 		$statement = $this->database->prepare($query);
 		$statement->execute($params);
-		return $this->hydrateList($statement, 'c');
+		return $this->hydrateList(
+			$statement,
+			'c',
+			function($mapper, $model, $row) {
+				/**
+				 * @var CategoryMapper $mapper
+				 * @var Category       $model
+				 * @var array          $row
+				 */
+				$model->setHomepage($mapper->getJoinMapper('homepages')->hydrate($row, 'h'));
+				return $model;
+			}
+		);
 	}
 
 	/**
