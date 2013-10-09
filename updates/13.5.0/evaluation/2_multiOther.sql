@@ -1,1 +1,0 @@
-INSERT INTO `schoolbox`.`assess_luQuestionType` (`classname`, `plugin`, `filename`, `description`, `moodle`, `automated_marking`, `availability`) VALUES ('MultiOther', 'evaluationMultipleChoiceOther', 'multiOther', 'Multiple Choice w/ Other', 'multiOther', 'false', 'survey');
