@@ -191,10 +191,7 @@ $summary = array();
 
 /* Have to replace all the other $user's with this one -_-
  */
-$user_mapper = new \Schoolbox\UserMapper();
-$userObj = $user_mapper->findById($_SESSION['id']);
-
-$event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default($userObj, null);
+$event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default($_SESSION['user'], null);
 $event_api->setUserId($user['uid']);
 $event_list = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();
