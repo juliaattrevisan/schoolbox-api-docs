@@ -16,13 +16,13 @@
                 text-align: right;
                 */
             }
-            .course_instance .unit-list .no-expand {
+            .course_instance .information-list .no-expand {
                 padding-left: 15px;
             }
-            .course_instance .unit-list .expand-link {
+            .course_instance .information-list .expand-link {
                 text-decoration: none;
             }
-            .course_instance .unit-list .expand-button {
+            .course_instance .information-list .expand-button {
                 line-height: 11px;
                 width: 11px;
                 min-height: 11px;
@@ -33,10 +33,10 @@
                 background-position-y: -6px;
                 background-repeat: no-repeat;
             }
-            .course_instance .unit-list .unit.collapsed .expand-button {
+            .course_instance .information-list .unit.collapsed .expand-button {
                 background-image: url(/images/tree/elbow-collapsed.gif);
             }
-            .course_instance .unit-list .unit.expanded  .expand-button {
+            .course_instance .information-list .unit.expanded  .expand-button {
                 background-image: url(/images/tree/elbow-expanded.gif);
             }
             .course_instance .task-list h4 {
@@ -122,7 +122,7 @@
 
 
         <!-- BEGIN unit_list -->
-        <ul class="unit-list listing">
+        <ul class="information-list listing">
             <!-- BEGIN unit -->
             <li class="unit interact {UNIT_EXPANDED_STATE} {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
 
@@ -138,7 +138,6 @@
                 </span>
                 <!-- END unit_no_expand -->
 
-
                 <!--
                 Students: see completion status
                 Teachers: don't see this?
@@ -151,7 +150,7 @@
                 <!-- END unit_completion -->
 
                 <!-- BEGIN edit_task -->
-                <span class="interact modify_buttons">
+                <span class="actions">
                     <a href="#" class="btn delete no-text" title="Delete this task"><span></span></a>
                 </span>
                 <!-- END edit_task -->
@@ -185,8 +184,8 @@
 
 
                         <!-- BEGIN unit_task_start_button -->
-                        <span class="interact modify_buttons">
-                            <a href="/task/start/{UNIT_TASK_ID}" class="btn modify" title="Start this task"><span></span> Start this task</a>
+                        <span class="actions">
+                            <a href="/task/start/{UNIT_TASK_ID}" class="btn go-to no-text" title="Start this task"><span></span></a>
                         </span>
                         <!-- END unit_task_start_button -->
                     </li>
