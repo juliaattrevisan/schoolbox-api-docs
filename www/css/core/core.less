@@ -8108,12 +8108,15 @@ td.name {
         margin-left: 1em;
         margin-top: 2px;
     }
-    .current li {
+	.current {
+		background: lighten(@highlight-color,@lighten-value);
+	}
+    .currently li {
         height: 25px;
         line-height: 25px;
         list-style: none;
     }
-    .current img {
+    .currently img {
         float: left;
         padding: 25px 25px 25px 9px;
     }
