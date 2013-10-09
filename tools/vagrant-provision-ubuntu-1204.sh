@@ -42,8 +42,6 @@ then
 	/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /home/vagrant/schoolboxdemo-vagrant-latest.sql;
 	echo "$vag Applying vagrant SQL fixes";
 	mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-vagrant-latest.sql
-	echo "$vag Switching on debug mode for development";
-	mysql -u root -ptnp879 -e "UPDATE config SET value='1' WHERE name='debug_mode';" schoolbox
 	echo "$vag Removing existing apache vhosts";
 	rm -f /etc/apache2/sites-enabled/10*;
 	echo "$vag Enabling Schoolbox apache vhost";
