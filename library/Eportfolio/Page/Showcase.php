@@ -40,8 +40,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 		$user = $this->getUser();
 
 		$this->getPage()->setVar(array(
-			'USER_FIRSTNAME' => $user['firstname'],
-			'USER_LASTNAME' => $user['lastname'],
+			'USER_FIRSTNAME' => $user->getFirstname(),
+			'USER_LASTNAME' => $user->getLastname(),
 		));
 
 		/* Intro text

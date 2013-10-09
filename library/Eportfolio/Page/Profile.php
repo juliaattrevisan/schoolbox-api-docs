@@ -83,8 +83,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		$user = $this->getUser();
 
 		$this->getPage()->setVar(array(
-			'USER_FIRSTNAME' => $user['firstname'],
-			'USER_LASTNAME' => $user['lastname'],
+			'USER_FIRSTNAME' => $user->getFirstname(),
+			'USER_LASTNAME' => $user->getLastname(),
 		));
 
 		/* Render mime types
@@ -375,7 +375,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * @return mixed
 	 */
 	private function getUserHouse() {
-		return $this->user['house'];
+		return $this->user->getSchoolHouse();
 	}
 
 	/**
@@ -384,7 +384,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * @return mixed
 	 */
 	private function getUserYear() {
-		return $this->user['year'];
+		return $this->user->getYear();
 	}
 
 	/**
@@ -393,7 +393,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * @return mixed
 	 */
 	private function getExternalUserId() {
-		return $this->user['synergy_id'];
+		return $this->user->getExternalId();
 	}
 
 	/**
@@ -402,7 +402,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * @return mixed
 	 */
 	private function getUserCampusName() {
-		return $this->user['campusName'];
+		return $this->user->getDefaultCampus()->getName();
 	}
 
 	/**
