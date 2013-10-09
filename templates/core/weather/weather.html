@@ -2,7 +2,7 @@
 <h1>Weather for {LOCATION}</h1>
 <h2>Currently</h2>
 <div class="weather">
-    <div class="current pad-it">
+    <div class="currently pad-it">
     <img src="{C_IMAGE}" alt="{C_PRECIS}" title="{C_PRECIS}" width="50" height="50"/>
     <ul>
         <li><strong>Temperature:</strong> {TEMP}&deg; (feels like {TEMP_FL}&deg;)</li>
@@ -24,14 +24,14 @@
             </tr>
             <tr>
                 <!-- BEGIN forecast_image -->
-                <td><img src="{FC_IMAGE}" alt="{FC_PRECIS}" width="50" height="50"/><br/>
+                <td class="{FC_CURRENT}"><img src="{FC_IMAGE}" alt="{FC_PRECIS}" width="50" height="50"/><br/>
                     {FC_PRECIS}
                 </td>
                 <!-- END forecast_image -->
             </tr>
             <tr>
                 <!-- BEGIN forecast_data -->
-                <td class="temp"><span class="temp-h">{FC_HIGH}&deg;</span> | <span class="temp-l">{FC_LOW}&deg;</span></td>
+                <td class="temp {FC_CURRENT}"><span class="temp-h">{FC_HIGH}&deg;</span> | <span class="temp-l">{FC_LOW}&deg;</span></td>
                 <!-- END forecast_data -->
             </tr>
         </table>
@@ -52,11 +52,13 @@
     <!-- END weather_unavailable -->
 
     <div class="right">
-        <h2>Weather around Australia</h2>
-        <ul style="margin-top: 10px;" class="pad-it">
-            <!-- BEGIN regions -->
-            <li><a href="/weather/{LOCATION_VALUE}">{LOCATION_NAME}</a></li>
-            <!-- END regions -->
-        </ul>
+		<div class="box">
+        	<h2>Weather around Australia</h2>
+        	<ul class="information-list">
+            	<!-- BEGIN regions -->
+            	<li class="{ON_OFF}"><a href="/weather/{LOCATION_VALUE}"><h4>{LOCATION_NAME}</h4></a></li>
+	            <!-- END regions -->
+    	    </ul>
+		</div>
     </div>
 </div>

@@ -61,6 +61,7 @@ if($count) {
         $forecastConditions = $weather['forecast'][$i];
         $forecastDate = new Alaress_Date_Format($forecastConditions['datetime'], 'U');
         $this->setVar(array(
+			"FC_CURRENT"=> ($i == 0) ? 'current' : '',
             "FC_DAY"    => $forecastDate->getUsingFormat('D'),
             "FC_IMAGE"  => $imageLocation . parse_url($forecastConditions['styles']['wxug_icon'], PHP_URL_PATH),
             "FC_PRECIS" => $forecastConditions['conditions'],
@@ -85,14 +86,14 @@ if($weather['location']['city']) {
 
 //ouput drop down box of available locations
 $locations = array(
-    array('LOCATION_VALUE' => 'Australia/Adelaide', 'LOCATION_NAME' => 'Adelaide'),
-    array('LOCATION_VALUE' => 'Australia/Brisbane', 'LOCATION_NAME' => 'Brisbane'),
-    array('LOCATION_VALUE' => 'Australia/Canberra', 'LOCATION_NAME' => 'Canberra'),
-    array('LOCATION_VALUE' => 'Australia/Darwin', 'LOCATION_NAME' => 'Darwin'),
-    array('LOCATION_VALUE' => 'Australia/Hobart', 'LOCATION_NAME' => 'Hobart'),
-    array('LOCATION_VALUE' => 'Australia/Melbourne', 'LOCATION_NAME' => 'Melbourne'),
-    array('LOCATION_VALUE' => 'Australia/Perth', 'LOCATION_NAME' => 'Perth'),
-    array('LOCATION_VALUE' => 'Australia/Sydney', 'LOCATION_NAME' => 'Sydney')
+    array('LOCATION_VALUE' => 'Australia/Adelaide', 'LOCATION_NAME' => 'Adelaide', 'ON_OFF' => ''),
+    array('LOCATION_VALUE' => 'Australia/Brisbane', 'LOCATION_NAME' => 'Brisbane', 'ON_OFF' => 'dark'),
+    array('LOCATION_VALUE' => 'Australia/Canberra', 'LOCATION_NAME' => 'Canberra', 'ON_OFF' => ''),
+    array('LOCATION_VALUE' => 'Australia/Darwin', 'LOCATION_NAME' => 'Darwin', 'ON_OFF' => 'dark'),
+    array('LOCATION_VALUE' => 'Australia/Hobart', 'LOCATION_NAME' => 'Hobart', 'ON_OFF' => ''),
+    array('LOCATION_VALUE' => 'Australia/Melbourne', 'LOCATION_NAME' => 'Melbourne', 'ON_OFF' => 'dark'),
+    array('LOCATION_VALUE' => 'Australia/Perth', 'LOCATION_NAME' => 'Perth', 'ON_OFF' => ''),
+    array('LOCATION_VALUE' => 'Australia/Sydney', 'LOCATION_NAME' => 'Sydney', 'ON_OFF' => 'dark')
 );
 
 $this->dropDown('regions', $locations, $location);
