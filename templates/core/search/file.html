@@ -1,28 +1,35 @@
+<div class="box">
 <h2>Files <!-- BEGIN count -->({FILE_DISP_COUNT} / {FILE_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN file -->
-<div class="search-item clearfix"> 
-	<div class="search-details clearfix">
-		<div class="usr-image" ><img src="/images/mime/60x60/{FILE_ICON}" /></div>
-		<h3><a href="/send.php?id={FILE_ID}" rel="external">{FILE_DESCRIPTION}</a></h3>
-		<p><em>{FILE_COMMENT} ({FILE_SIZE})</em></p>
-		<p class="search-sml">Uploaded by <a href="/search/user/{FILE_OWNER}">{FILE_OWNER_NAME}</a> {FILE_CREATED}</p>
-		<p class="search-sml">{FILE_BREADCRUMB}</p>
-		
-	</div>
-	<div class="search-functions"> 
+	<li>
 		<!-- BEGIN modify -->
-		<p><a href="/cms/file/{FILE_ID}" class="btn modify"><span></span>Modify</a></p>
-		<!-- END modify --> 
-	</div>
-</div>
+			<span class="actions">
+				<a href="/cms/file/{FILE_ID}" class="btn no-text modify"><span></span></a>
+			</span>
+		<!-- END modify -->
+
+		<a href="/send.php?id={FILE_ID}" rel="external">
+			<img class="thumbnail" height="60" width="60" src="/images/mime/60x60/{FILE_ICON}" />
+			<h4>{FILE_DESCRIPTION}</h4>
+		</a>
+		<p class="meta">{FILE_BREADCRUMB}</p>
+		<p class="meta">{FILE_SIZE} | Uploaded by <a href="/search/user/{FILE_OWNER}">{FILE_OWNER_NAME}</a> {FILE_CREATED}</p>
+		<p>{FILE_COMMENT}</p>
+
+	</li>
 <!-- END file -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="file-more" class="more"><a title="file" href="#">See all {MORE_COUNT} results for Files</a></h5>
+<p class="interact">
+	<a id="file-more" class="btn more" rel="file" href="#"><span></span>See all {MORE_COUNT} results for Files</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>

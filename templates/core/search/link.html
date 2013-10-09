@@ -1,23 +1,28 @@
+<div class="box">
 <h2>Links <!-- BEGIN count -->({LINK_DISP_COUNT} / {LINK_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN link -->
-<div class="search-item clearfix"> 
-	<div class="search-details">
-		<div class="usr-image" ><img src="images/icons/60x60/link.png" /></div>
-		<h3><a href="{LINK_URL}" rel="{LINK_TARGET}">{LINK_DESCRIPTION}</a></h3>
-		<p><em>{LINK_COMMENT}</em></p>
-		<p class="search-sml">Created by <a href="/search/user/{LINK_OWNER}">{LINK_OWNER_NAME}</a> {LINK_CREATED}</p>
-		<p class="search-sml">{LINK_BREADCRUMB}</p>
-	</div>
-	<div class="search-functions"> </div>
-</div>
+	<li>
+		<a href="{LINK_URL}" rel="{LINK_TARGET}">
+			<img class="thumbnail" height="60" width="60" src="images/icons/60x60/link.png" />
+			<h4>{LINK_DESCRIPTION}</h4>
+		</a>
+		<p class="meta">{LINK_BREADCRUMB}</p>
+		<p class="meta">Created by <a href="/search/user/{LINK_OWNER}">{LINK_OWNER_NAME}</a> {LINK_CREATED}</p>
+		<p>{LINK_COMMENT}</p>
+	</li>
 <!-- END link -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="link-more" class="more"><a title="link" href="#">See all {MORE_COUNT} results for Links</a></h5>
+<p class="interact">
+	<a id="link-more" class="btn more" rel="link" href="#"><span></span>See all {MORE_COUNT} results for Links</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>

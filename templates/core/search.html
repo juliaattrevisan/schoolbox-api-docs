@@ -24,22 +24,22 @@ $j(function() {
 	}
 
     $j(document).ready(function() {
-        $j('#content div.results').delegate('h5.more a', 'click', function() {
-            var type = $j(this).attr('title');
-            var selector = '#type a[title='+type+']';
+        $j('#content div.results').delegate('a.more', 'click', function() {
+            var type = $j(this).attr('rel');
+            var selector = '#type a[rel='+type+']';
             $j(selector).trigger('click');
             event.preventDefault();
         });
     });
 
-	search.runOnce(keyword, section, $j('#type a[title=' + section + ']'), pageNumber);
+	search.runOnce(keyword, section, $j('#type a[rel=' + section + ']'), pageNumber);
 
 	/* Runs when you change sections
 	 */
 	$j('#type a[class!=disabled]').click(function(event) {
 		event.preventDefault();
 
-		search.runOnce(keyword, $j(this).attr('title'), $j(this), 1);
+		search.runOnce(keyword, $j(this).attr('rel'), $j(this), 1);
 	});
 
 
@@ -49,17 +49,17 @@ $j(function() {
 
 <h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
 
-<ul id="type">
+<ul id="type" class="admin-nav">
     <!-- BEGIN type -->
     <li>
-		<a href='#' title="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a>
+		<a href='#' rel="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a>
 	</li>
     <!-- END type -->
 </ul>
 
 <div class="results">
     <!-- BEGIN result -->
-    <div title="{RESULT_TITLE}" class="{RESULT_CLASS}">
+    <div rel="{RESULT_TITLE}" class="{RESULT_CLASS}">
 		{RESULT}
 	</div>
     <!-- END result -->
@@ -76,7 +76,7 @@ $j(function() {
         <label for="inline_search_field">
             Search again:
         </label>
-        <input id="inline_search_field" type="text" value="{ENCODED_KEYWORD}" name="keyword" title="search" placeholder="search" class="default" />
+        <input id="inline_search_field" type="text" value="{ENCODED_KEYWORD}" name="keyword" placeholder="search" class="default" />
         <input type="submit" class="submit-btn-plain" value="Search" />
     </form>
 </div>

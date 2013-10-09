@@ -1,24 +1,28 @@
+<div class="box">
 <h2>Homepage News <!-- BEGIN count -->({NEWS_DISP_COUNT} / {NEWS_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN news -->
-<div class="search-item clearfix">
-	<div class="search-details">
-		<div class="usr-image" > <img src="images/icons/60x60/news.png" /></div>
-		<h3><a href="{NEWS_LINK}">{NEWS_HEADING}</a></h3>
+	<li>
+		<a href="{NEWS_LINK}">
+			<img class="thumbnail" height="60" width="60" src="images/icons/60x60/news.png" />
+			<h4>{NEWS_HEADING}</h4>
+		</a>
+		<p class="meta">{NEWS_BREADCRUMB}</p>
+		<p class="meta">Written by <a href="/search/user/{NEWS_OWNER}">{NEWS_OWNER_NAME}</a> {NEWS_CREATED}</p>
 		<p>{NEWS_BODY}</p>
-		<p class="search-sml">Written by <a href="/search/user/{NEWS_OWNER}">{NEWS_OWNER_NAME}</a> {NEWS_CREATED}</p>
-		<p class="search-sml">{NEWS_BREADCRUMB}</p>
-	</div>
-	<div class="search-functions"> </div>
-</div>
+	</li>
 <!-- END news -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="news-more" class="more"><a title="news" href="#">See all {MORE_COUNT} results for News</a></h5>
-
+<p class="interact">
+	<a rel="news" id="news-more" class="btn more" href="#">See all {MORE_COUNT} results for News</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>

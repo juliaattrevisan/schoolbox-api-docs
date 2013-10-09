@@ -74,7 +74,7 @@ search = {
 
 			/* Set the page number
 			 */
-            search.setPageNumber( $j(this).attr('title') );
+            search.setPageNumber( $j(this).attr('rel') );
 
 			/* Update hash configuration
 			 */
@@ -159,15 +159,15 @@ search = {
 	updateStyles: function() {
 		/* Alternating row colours when data is loaded
 		 */
-		$j('.search-item:nth-child(even)').addClass('dark');
+		$j('.information-list li:nth-child(even)').addClass('dark');
 
 		/* Remove all selected classes
 		 */
-		$j('#type a').removeClass('selected');
+		$j('#type a').removeClass('current');
 
 		/* Select only the current section
 		 */
-		this.getSectionElement().addClass('selected');
+		this.getSectionElement().addClass('current');
 
 		/* If this was in section "all", then hide pagination. We don't paginate
 		 * through this particular section
@@ -251,8 +251,8 @@ search = {
 	/**
 	 * Set the div where search results get loaded in
 	 */
-	setTargetDiv: function(title) {
-		this.targetDiv = 'div.results > div[title=' + title + ']';
+	setTargetDiv: function(rel) {
+		this.targetDiv = 'div.results > div[rel=' + rel + ']';
 	},
 
 	/**
@@ -278,6 +278,6 @@ search = {
 	 */
 	getSection: function() {
 		return this.section;
-	},
+	}
 
 }
