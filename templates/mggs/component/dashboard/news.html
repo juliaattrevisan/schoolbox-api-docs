@@ -1,13 +1,13 @@
 <script type="text/javascript">
 	$j(function() {
-		$j('#category li:first-child a').addClass('selected');
+		$j('#category li:first-child a').addClass('current');
 		$j('ul.topic li:first-child').show();
 
 		$j('#category a').click(function(event) {
 			event.preventDefault();
-			if (!$j(this).hasClass("selected")) {
-				$j('#category a').removeClass('selected');
-				$j(this).addClass('selected');
+			if (!$j(this).hasClass("current")) {
+				$j('#category a').removeClass('current');
+				$j(this).addClass('current');
 				var el = $j(this).attr('title');
 				$j('ul.topic > li').hide();
 				$j('ul.topic > li.' + el).show();
@@ -19,7 +19,7 @@
 
 <div class="box">
   <h2>&nbsp;</h2>
-    <ul id="category" class="news-headlines">
+    <ul id="category" class="admin-nav">
         <!-- BEGIN topic_header -->
         <li><a href="#" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
         <!-- END topic_header -->

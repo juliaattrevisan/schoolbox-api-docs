@@ -6323,29 +6323,7 @@ p.forgotten {
 	border-bottom: 1px solid @border-color;
     //margin-bottom: 8px;
 	padding-left: 16px;
-    li {
-        display: block;
-        margin: 8px 8px 8px 0;
-        float: left;
-        padding: 0;
-        a {
-            display: block;
-            padding: 7px 16px;
-            word-break: break-word;
-            &:hover {
-                color: @link;
-                text-decoration: none;
-            }
-            &.selected {
-                background: @tab-hover-color;
-                color: @white;
-                border: none;
-            }
-            &.disabled {
-                color: @std-grey;
-            }
-        }
-    }
+	padding-top: 8px;
 }
 
 .topic {
@@ -9531,7 +9509,6 @@ table img { max-width: none; }
 /*
  * Borders & Backgrounds
  */
-#category ul li a:hover,
 .dark,
 .dark td,
 #tree .dark,
@@ -9547,19 +9524,10 @@ table img { max-width: none; }
 .search-item:nth-child(2n){
 	background: none repeat scroll 0 0 @dark;
 }
-#category li a { padding: 4px 16px; }
-#category li a.selected,
 #tabs-sub li.ui-tabs-selected a {
 	background:@tab-background; color:@white; font-weight: normal;
 }
 
-#category li a:hover{
-	background:@tab-background;
-	color:@white;
-	-moz-border-radius: 0px;
-	-webkit-border-radius: 0px;
-	border-radius: 0px;
-}
 .standardForm td {
 	border-bottom: 1px solid @border-color;
 }

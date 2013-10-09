@@ -380,7 +380,7 @@ if (is_array($items)) {
             $url = new Url($topic);
 
             $output = array(
-                'TOPIC_CLASS' => strtolower($topic) == $filter['topic'] ? 'class="selected"' : '',
+                'TOPIC_CLASS' => strtolower($topic) == $filter['topic'] ? 'class="current"' : '',
                 'NEWS_TOPIC' => Scrub::text(ucwords($topic)),
                 'TOPIC_CLEAN' => $filter['archive'] . strtolower($url->getSlug())
             );
