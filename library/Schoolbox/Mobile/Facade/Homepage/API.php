@@ -81,7 +81,7 @@ class API extends Generic\API {
             /**
              * @var User $user
              * @var Category $cat
-             * @var Schoolbox\Collection $page
+             * @var \Schoolbox\Collection $page
              */
             list($user, $cat, $page) = $this->getHomepage($categoryID);
             $articles = array();
@@ -136,7 +136,7 @@ class API extends Generic\API {
 
         $cat = $cMap->findById($catID);
 
-        $homeFactory = new Component_Homepage_Factory(new \User(), new \SitePage(false));
+        $homeFactory = new Component_Homepage_Factory(new \Schoolbox\User(), new \SitePage(false));
         $page = $homeFactory->buildComponentList($catID);
 
         return array($user, $cat, $page);
