@@ -54,7 +54,7 @@ class Category {
      * @return bool
      */
     public function hasHomepage() {
-        return ($this->homepage instanceof HomepageConfig && $this->homepage->getTemplate());
+        return ($this->homepage instanceof HomepageConfig && $this->homepage->getTemplate()->getId());
     }
 
 	/**

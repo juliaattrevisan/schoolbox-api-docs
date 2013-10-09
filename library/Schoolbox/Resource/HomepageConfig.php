@@ -22,7 +22,7 @@ class HomepageConfig {
 	/**
 	 * The template originally used to create the page
 	 *
-	 * @var int
+	 * @var HomepageTemplate
 	 */
 	protected $template;
 
@@ -495,7 +495,7 @@ class HomepageConfig {
     }
 
     /**
-     * @param int $template
+     * @param HomepageTemplate $template
      * @return $this
      */
     public function setTemplate($template)
@@ -505,7 +505,7 @@ class HomepageConfig {
     }
 
     /**
-     * @return int
+     * @return HomepageTemplate
      */
     public function getTemplate()
     {
