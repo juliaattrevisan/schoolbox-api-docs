@@ -9,15 +9,17 @@
 
 namespace Schoolbox\Mobile\Calendar;
 
+use Scrub;
 use Schoolbox\Mobile\Generic;
 use Response_HTTP;
 use Calendar_Api_Factory;
 use Calendar_Api_Config_Mapper;
+use Calendar_Api_Config_Record;
 use Authenticator;
 use Exception;
 use ClientDevice;
 
-class Calendar_API extends Generic\API {
+class API extends Generic\API {
 
     public function Month($date = '') {
         $response = new Response_HTTP();
@@ -485,7 +487,7 @@ class Calendar_API extends Generic\API {
 	            $response = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
 	        }
 		}
-		catch (Schoolbox\Mapper\Exception $e) {
+		catch (\Schoolbox\Mapper\Exception $e) {
 			$response = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
 		}
 
