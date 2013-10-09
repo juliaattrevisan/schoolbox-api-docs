@@ -1,23 +1,28 @@
+<div class="box">
 <h2>Blogs <!-- BEGIN count -->({BLOG_DISP_COUNT} / {BLOG_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN blog -->
-<div class="search-item clearfix"> 
-	<div class="search-details">
-		<div class="usr-image" ><img src="images/mime/60x60/blog.png" /></div>
-		<h3><a href="/homepage/{BLOG_CID}">{BLOG_HEADING}</a></h3>
+	<li>
+		<a href="/homepage/{BLOG_CID}">
+			<img class="thumbnail" height="60" width="60" src="images/mime/60x60/blog.png" />
+			<h4>{BLOG_HEADING}</h4>
+		</a>
+		<p class="meta">{BLOG_BREADCRUMB}</p>
+		<p class="meta">Written by <a href="/search/user/{BLOG_OWNER}">{BLOG_OWNER_NAME}</a> {BLOG_CREATED}</p>
 		<p>{BLOG_BODY}</p>
-		<p class="searclassch-sml">Written by <a href="/search/user/{BLOG_OWNER}">{BLOG_OWNER_NAME}</a> {BLOG_CREATED}</p>
-		<p class="searclassch-sml">{BLOG_BREADCRUMB}</p>
-	</div>
-	<div class="search-functions"> </div>
-</div>
+	</li>
 <!-- END blog -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="blog-more" class="more"><a title="blog" href="#">See all {MORE_COUNT} results for Blogs</a></h5>
+<p class="interact">
+	<a rel="blog" id="blog-more" class="btn more" href="#"><span></span>See all {MORE_COUNT} results for Blogs</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>

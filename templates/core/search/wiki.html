@@ -1,23 +1,28 @@
+<div class="box">
 <h2>Wiki <!-- BEGIN count -->({WIKI_DISP_COUNT} / {WIKI_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN wiki -->
-<div class="search-item clearfix">
-	<div class="search-details clearfix">
-		<div class="usr-image" > <img src="/images/mime/60x60/wiki.png" /></div>
-		<h3><a href="/wiki/{WIKI_CID}/{WIKI_SLUG}">{WIKI_HEADING}</a></h3>
+	<li>
+		<a href="/wiki/{WIKI_CID}/{WIKI_SLUG}">
+			<img class="thumbnail" width="60" height="60" src="/images/mime/60x60/wiki.png" />
+			<h4>{WIKI_HEADING}</h4>
+		</a>
+		<p class="meta">{WIKI_BREADCRUMB}</p>
+		<p class="meta">Revised by <a href="/search/user/{WIKI_OWNER}">{WIKI_OWNER_NAME}</a> {WIKI_CREATED}</p>
 		<p>{WIKI_BODY}</p>
-		<p class="search-sml">Revised by <a href="/search/user/{WIKI_OWNER}">{WIKI_OWNER_NAME}</a> {WIKI_CREATED}</p>
-		<p class="search-sml">{WIKI_BREADCRUMB}</p>
-	</div>
-	<div class="search-functions"> </div>
-</div>
+	</li>
 <!-- END wiki -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="wiki-more" class="more"><a title="wiki" href="#">See all {MORE_COUNT} results for Wiki</a></h5>
+<p class="interact">
+	<a rel="wiki" id="wiki-more" class="btn more" href="#"><span></span>See all {MORE_COUNT} results for Wiki</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>

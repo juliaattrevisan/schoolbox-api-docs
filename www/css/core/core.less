@@ -1182,11 +1182,11 @@ Notifications
 	}
 	// 32px image
 	.icon {
-		width: 32px;
+		max-width: 32px;
 	}
 	// 64px image
 	.thumbnail {
-		width: 64px;
+		max-width: 64px;
 	}
 
 	// Actions are the buttons to interact with the list item, such as edit, delete
@@ -6534,47 +6534,8 @@ table.ruler thead td {
     padding: 0;
 }
 
-#type {
-    list-style: none;
-    margin: 0;
-    float: left;
-    li {
-        float: left;
-        background: @dark;
-        border: 1px solid @std-grey;
-        border-bottom: 0;
-        padding: 0;
-        margin: 0 2px 0 0;
-        a {
-            display: block;
-            padding: 5px 10px;
-            &.selected {
-                background: @std-grey;
-            }
-            &.disabled {
-                color: @std-grey;
-            }
-        }
-    }
-}
 
-.results {
-    border-top: 1px solid @std-grey;
-    clear: both;
-    margin: 0;
-    padding: 10px 0 0 0;
-    h2 {
-        font-size: 130%;
-        margin-top: 30px;
-        font-weight: bold;
-        border: none;
-        background: none;
-        color: @black;
-        &:first-child {
-            margin-top: 5px;
-        }
-    }
-}
+
 
 /* SUBJECT COMPLETION GRAPH*/
 .barchart {
@@ -9755,7 +9716,10 @@ ul.activity-list li,
 	}
 }
 .breadcrumb {
-	li { display: inline; list-style: none;}
+	li {
+		display: inline;
+		list-style: none;
+	}
 	a {
 		padding: 4px 5px 4px 10px;
 		background: @dark;

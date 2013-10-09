@@ -1,23 +1,28 @@
+<div class="box">
 <h2>Forums <!-- BEGIN count -->({FORUM_DISP_COUNT} / {FORUM_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN forum -->
-<div class="search-item clearfix"> 
-	<div class="search-details">
-		<div class="usr-image" ><img src="images/mime/60x60/forum.png" /></div>
-		<h3><a href="/forum/thread/{FORUM_THREADID}">{FORUM_TITLE}</a></h3>
+	<li>
+		<a href="/forum/thread/{FORUM_THREADID}">
+			<img class="thumbnail" height="60" width="60" src="images/mime/60x60/forum.png" />
+			<h4>{FORUM_TITLE}</h4>
+		</a>
+		<p class="meta">{FORUM_BREADCRUMB}</p>
+		<p class="meta">Posted by <a href="/search/user/{FORUM_OWNER}">{FORUM_OWNER_NAME}</a> {FORUM_CREATED}</p>
 		<p>{FORUM_BODY}</p>
-		<p class="search-sml">Posted by <a href="/search/user/{FORUM_OWNER}">{FORUM_OWNER_NAME}</a> {FORUM_CREATED}</p>
-		<p class="search-sml">{FORUM_BREADCRUMB}</p>
-	</div>
-	<div class="search-functions"> </div>
-</div>
+	</li>
 <!-- END forum -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="forum-more" class="more"><a title="forum" href="#">See all {MORE_COUNT} results for Forums</a></h5>
+<p class="interact">
+	<a rel="forum" id="forum-more" class="btn more" href="#"><span></span>See all {MORE_COUNT} results for Forums</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>

@@ -1,25 +1,31 @@
+<div class="box">
 <h2>Folders <!-- BEGIN count -->({CATEGORY_DISP_COUNT} / {CATEGORY_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN category -->
-<div class="search-item clearfix">
-	<div class="search-details">
-		<div class="usr-image" ><img src="/images/icons/60x60/folder.png" /></div>
-		<h3><a href="/homepage/{CATEGORY_ID}">{CATEGORY_NAME}</a></h3>
-		<p class="search-sml">{CATEGORY_BREADCRUMB}</p>
-	</div>
-	<div class="search-functions clearfix">
+	<li>
+		<span class="actions">
+			<!-- BEGIN modify --><a href="/cms/category/{CATEGORY_ID}" class="btn no-text modify" title="Modify Folder"><span></span></a><!-- END modify -->
+		</span>
+		<a href="/homepage/{CATEGORY_ID}">
+			<img class="thumbnail" height="60" width="60" src="/images/icons/60x60/folder.png" />
+			<h4>{CATEGORY_NAME}</h4>
+		</a>
+		<p class="meta">{CATEGORY_BREADCRUMB}</p>
 		<a class="btn report" href="/resources/{CATEGORY_ID}"><span></span>Resources</a>
-		<a class="btn resources" href="/cms/imageGallery/{CATEGORY_ID}"><span></span>Image Gallery</a> 
-		<!-- BEGIN modify --><a href="/cms/category/{CATEGORY_ID}" class="btn modify"><span></span>Modify</a><!-- END modify -->
-	</div>
-</div>
+		<a class="btn resources" href="/cms/imageGallery/{CATEGORY_ID}"><span></span>Image Gallery</a>
+	</li>
 <!-- END category -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="category-more" class="more"><a title="category" href="#">See all {MORE_COUNT} results for Folders</a></h5>
+<p class="interact">
+	<a id="category-more" class="btn more" rel="category" href="#"><span></span>See all {MORE_COUNT} results for Folders</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>

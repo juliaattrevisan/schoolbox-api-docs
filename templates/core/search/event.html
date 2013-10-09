@@ -1,23 +1,28 @@
+<div class="box">
 <h2>Calendar <!-- BEGIN count -->({EVENT_DISP_COUNT} / {EVENT_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN event -->
-<div class="search-item clearfix">
-	<div class="search-details">
-        <div class="usr-image" ><img src="images/icons/60x60/event.png" /></div>
-		<h3><a href="/calendar/full/{EVENT_DATE}">{EVENT_TITLE}</a></h3>
+	<li>
+		<a href="/calendar/full/{EVENT_DATE}">
+        	<img class="thumbnail" height="64" width="64" src="images/icons/60x60/event.png" />
+			<h4>{EVENT_TITLE}</h4>
+		</a>
+		<p class="meta">{EVENT_DATE} {EVENT_TIME}</p>
+		<p class="meta">{EVENT_LOCATION}</p>
 		<p>{EVENT_TYPE}: {EVENT_DETAIL}</p>
-		<p class="search-sml">{EVENT_DATE} {EVENT_TIME}</p>
-		<p class="search-sml">{EVENT_LOCATION}</p>
-	</div>
-	<div class="search-functions"> </div>
-</div>
+	</li>
 <!-- END event -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="event-more" class="more"><a title="event" href="#">See all {MORE_COUNT} results for Events</a></h5>
+<p class="interact">
+	<a rel="event" id="event-more" class="btn more" href="#"><span></span>See all {MORE_COUNT} results for Events</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>

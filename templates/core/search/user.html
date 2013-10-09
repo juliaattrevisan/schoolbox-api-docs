@@ -1,43 +1,45 @@
+<div class="box">
 <h2>People <!-- BEGIN count -->({USER_DISP_COUNT} / {USER_COUNT})<!-- END count --></h2>
+<ul class="information-list">
 <!-- BEGIN user -->
-<div class="search-item clearfix">
-    <div class="search-details clearfix">
-        <div class="usr-image"><img src="/portrait.php?userId={USER_SEARCH_SYNERGY_ID}&size=square64" alt="{USER_SEARCH_NAME}"/></div>
-        <h3><a href="/search/user/{USER_SEARCH_ID}">{USER_SEARCH_NAME}</a></h3>
-
-        <p>{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
-
+    <li>
+		<a href="/search/user/{USER_SEARCH_ID}">
+    	    <img class="thumbnail" height="64" width="64" src="/portrait.php?userId={USER_SEARCH_SYNERGY_ID}&size=square64" alt="{USER_SEARCH_NAME}"/>
+	        <h4>{USER_SEARCH_NAME}</h4>
+		</a>
+        <p class="meta">{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
         <p>{USER_SEARCH_EMAIL}</p>
-    </div>
-    <div class="search-functions clearfix">
-        <!-- BEGIN due_work -->
-        <a href="/submission/dueWork/0/{USER_SEARCH_ID}" class="btn due-work"><span></span>Due Work</a>
-        <!-- END due_work -->
-        <!-- BEGIN timetable -->
-        <a href="/timetable/{USER_SEARCH_ID}" class="btn report"><span></span>Timetable</a>
-        <!-- END timetable -->
-        <!-- BEGIN eportfolio -->
-        <a href="/eportfolio/{USER_SEARCH_ID}/profile" class="btn eportfolio"><span></span>ePortfolio</a>
-        <!-- END eportfolio -->
-        <!-- BEGIN helpdesk -->
-        <a href="/modules/helpdesk/{USER_SEARCH_ID}" class="btn help"><span></span>Helpdesk</a>
-        <!-- END helpdesk -->
-        <!-- BEGIN modify -->
-        <a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="btn modify"><span></span>Modify User</a>
-        <!-- END modify -->
-        <!-- BEGIN boarder_leave -->
-        <a href="/modules/leave/student/{USER_SEARCH_ID}" class="btn eportfolio"><span></span>Boarder Leave History</a>
-        <!-- END boarder_leave -->
-    </div>
-</div>
+		<!-- BEGIN due_work -->
+		<a href="/submission/dueWork/0/{USER_SEARCH_ID}" class="btn due-work"><span></span>Due Work</a>
+		<!-- END due_work -->
+		<!-- BEGIN timetable -->
+		<a href="/timetable/{USER_SEARCH_ID}" class="btn report"><span></span>Timetable</a>
+		<!-- END timetable -->
+		<!-- BEGIN eportfolio -->
+		<a href="/eportfolio/{USER_SEARCH_ID}/profile" class="btn eportfolio"><span></span>ePortfolio</a>
+		<!-- END eportfolio -->
+		<!-- BEGIN helpdesk -->
+		<a href="/modules/helpdesk/{USER_SEARCH_ID}" class="btn help"><span></span>Helpdesk</a>
+		<!-- END helpdesk -->
+		<!-- BEGIN modify -->
+		<a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="btn modify"><span></span>Modify User</a>
+		<!-- END modify -->
+		<!-- BEGIN boarder_leave -->
+		<a href="/modules/leave/student/{USER_SEARCH_ID}" class="btn eportfolio"><span></span>Boarder Leave History</a>
+		<!-- END boarder_leave -->
+    </li>
 <!-- END user -->
+</ul>
 <!-- BEGIN see_more -->
-<h5 id="user-more" class="more"><a title="user" href="#">See all {MORE_COUNT} results for People</a></h5>
+<p class="interact">
+	<a id="user-more" class="btn more" rel="user" href="#"><span></span>See all {MORE_COUNT} results for People</a>
+</p>
 <!-- END see_more -->
 <div class="archive">
     <div class="pagination">
         <!-- BEGIN pagination -->
-        <a href="javascript:void(0);" title="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
+        <a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a>
         <!-- END pagination -->
     </div>
+</div>
 </div>
