@@ -659,7 +659,7 @@ class Calendar extends DeprecatedModel {
 
         /* Give people with userAccess to moderate Calendar Access to view all Campus Posts
          */
-        if (is_array($_SESSION['campus'])) {
+        if ($user->getCampusCollection()->count()) {
             if ($this->groupHandler->getPermission($firstCampus->getId()) > WRITE_ACCESS) {
                 $groupChunk = "";
             } else {

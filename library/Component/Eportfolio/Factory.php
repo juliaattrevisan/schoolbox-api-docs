@@ -17,11 +17,11 @@ class Component_Eportfolio_Factory extends Component_FactoryAbstract {
 	/**
 	 * Constructor
 	 *
-	 * @param User $user
+	 * @param \Schoolbox\User $user
 	 * @param SitePage $sitepage
 	 * @param bool $template
 	 */
-	public function __construct(User $user, SitePage $sitepage, $template = false) {
+	public function __construct(\Schoolbox\User $user, SitePage $sitepage, $template = false) {
 		$this->module = $template ? 'eportfolio_template' : 'eportfolio';
 
 		parent::__construct($user, $sitepage);
