@@ -93,31 +93,37 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar('COMPONENT_NAME',  $this->getConfig('componentname'));
         $this->setVar('COURSE_HOMEPAGE', str_replace('/homepage/', '', Config::get('course_homepage')));
 
-        $this->setBlock($templateHandle,  'course_selector',      'course_selector_block');
-        $this->setBlock($templateHandle,  'unit_list',            'unit_list_block');
-        $this->setBlock('unit_list',      'unit',                 'unit_block');
-        $this->setBlock('unit',           'unit_expand',          'unit_expand_block');
-        $this->setBlock('unit',           'unit_no_expand',       'unit_no_expand_block');
-        $this->setBlock('unit',           'unit_completion',      'unit_completion_block');
-        $this->setBlock('unit',           'unit_delete',          'unit_delete_block');
-        $this->setBlock('unit',           'unit_task',            'unit_task_block');
-        $this->setBlock('unit_task',      'unit_task_link',       'unit_task_link_block');
-        $this->setBlock('unit_task',      'unit_task_no_link',    'unit_task_no_link_block');
-        $this->setBlock('unit_task',      'unit_task_count',      'unit_task_count_block');
-        $this->setBlock('unit_task',      'unit_task_completion', 'unit_task_completion_block');
-        $this->setBlock('unit_task',      'unit_task_start',      'unit_task_start_block');
-        $this->setBlock('unit_task',      'unit_task_delete',     'unit_task_delete_block');
+        $this->setBlock($templateHandle,    'course_selector',      'course_selector_block');
+        $this->setBlock($templateHandle,    'course_modify',        'course_modify_block');
+        $this->setBlock($templateHandle,    'course_unit_list',     'course_unit_list_block');
+        $this->setBlock('course_unit_list', 'unit',                 'unit_block');
+        $this->setBlock('course_unit_list', 'course_modify',        'course_modify_block');
+        $this->setBlock('unit',             'unit_expand',          'unit_expand_block');
+        $this->setBlock('unit',             'unit_no_expand',       'unit_no_expand_block');
+        $this->setBlock('unit',             'unit_completion',      'unit_completion_block');
+        $this->setBlock('unit',             'unit_delete',          'unit_delete_block');
+        $this->setBlock('unit',             'unit_task',            'unit_task_block');
+        $this->setBlock('unit_task',        'unit_task_link',       'unit_task_link_block');
+        $this->setBlock('unit_task',        'unit_task_no_link',    'unit_task_no_link_block');
+        $this->setBlock('unit_task',        'unit_task_count',      'unit_task_count_block');
+        $this->setBlock('unit_task',        'unit_task_completion', 'unit_task_completion_block');
+        $this->setBlock('unit_task',        'unit_task_start',      'unit_task_start_block');
+        $this->setBlock('unit_task',        'unit_task_delete',     'unit_task_delete_block');
 
-
-        $this->setVar('course_selector_block', '');
-        $this->setVar('unit_list_block',       '');
+        $this->setVar('course_selector_block',  '');
+        $this->setVar('course_unit_list_block', '');
+        $this->setVar('course_modify_block',    '');
 
         // If courseHomepage is set, a course has been selected.
         // This means that the units and tasks that were imported are displayed.
         // If it isn't, then a selector is displayed (if user has write access)
         if ($this->getConfig('courseHomepage')) {
             // iterate the list of homepages
-            $this->parse('unit_list_block', 'unit_list');
+            $this->setVar('course_modify_block', '');
+            if (!$this->is_student) {
+                $this->parse('course_modify_block', 'course_modify');
+            }
+            $this->parse('course_unit_list_block', 'course_unit_list');
 
             // unit list will be a collection of Unit models
             $this->setVar('unit_block', '');
