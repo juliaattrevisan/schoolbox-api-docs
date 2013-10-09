@@ -25,11 +25,13 @@ abstract class Component_FactoryAbstract {
      */
     protected $dependencyList;
 
-    /**
-     * @param User $user
-     * @param SitePage $sitepage
-     */
-    public function __construct (User $user, SitePage $sitepage) {
+	/**
+	 * Constructor
+	 *
+	 * @param \Schoolbox\User $user
+	 * @param SitePage $sitepage
+	 */
+	public function __construct (\Schoolbox\User $user, SitePage $sitepage) {
         $this->dependencyList = array($user, $sitepage);
     }
 

@@ -23,9 +23,18 @@ class Calendar_Api_Factory {
 	protected $allTypes = array();
 
 	/**
+	 * An instance of Schoolbox\User
+	 *
+	 * @var null
+	 */
+	protected $user = null;
+
+	/**
 	 * Constructor
 	 */
-	public function __construct() {
+	public function __construct($user) {
+		$this->setUser($user);
+
 		$allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
 		/* These configs are base64-encode()'d to get around a weird issue with unserialize
@@ -63,13 +72,13 @@ class Calendar_Api_Factory {
 			 * so it knows from whence it came
 			 */
 			if (class_exists($uniqueImplementation)) {
-				$implementation = new $uniqueImplementation($config);
+				$implementation = new $uniqueImplementation($this->getUser(), $config);
 				$implementation->setConnectorId($config->getId());
 
 				$compositeApi->add($implementation);
 			}
 			else if (class_exists($defaultImplementation)) {
-				$implementation = new $defaultImplementation($config);
+				$implementation = new $defaultImplementation($this->getUser(), $config);
 				$implementation->setConnectorId($config->getId());
 
 				$compositeApi->add($implementation);
@@ -117,5 +126,23 @@ class Calendar_Api_Factory {
 	 */
 	protected function getAllTypes() {
 		return $this->allTypes;
+	}
+
+	/**
+	 * Set user
+	 *
+	 * @param null $user
+	 */
+	private function setUser($user) {
+		$this->user = $user;
+	}
+
+	/**
+	 * Get user
+	 *
+	 * @return null
+	 */
+	private function getUser() {
+		return $this->user;
 	}
 }

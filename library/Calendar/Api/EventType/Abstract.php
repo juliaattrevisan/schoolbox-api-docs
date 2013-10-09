@@ -21,6 +21,13 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
 	 */
 	protected $connectorId = '';
 
+	/**
+	 * An instance of User
+	 *
+	 * @var int
+	 */
+	protected $user = null;
+
 	/* Getters/Setters
 	 */
 
@@ -40,5 +47,24 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
 	 */
 	public function getConnectorId() {
 		return $this->connectorId;
+	}
+
+	/**
+	 * Set user
+	 *
+	 * @param $user
+	 * @return $this
+	 */
+	public function setUser($user) {
+		$this->user = $user;
+
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	protected function getUser() {
+		return $this->user;
 	}
 }

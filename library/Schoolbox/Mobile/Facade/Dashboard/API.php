@@ -24,14 +24,13 @@ use User;
 class API extends Generic\API {
 
     public function Display($component = 'all') {
-
         $response = new Response_HTTP();
         $s = new Authenticator();
         $user = $s->getSessionUser();
 
         // 2n is better than n^2, so iterate across the dash and index by controller name
         $componentry = array();
-	    $dashFactory = new Component_Dashboard_Factory(new User(), new SitePage(false));
+	    $dashFactory = new Component_Dashboard_Factory(new \Schoolbox\User(), new SitePage(false));
 	    $userComponents = $dashFactory->buildComponentList($user->getRole()->getId());
         foreach($userComponents as $comp) {
             $componentry[get_class($comp)] = $comp;

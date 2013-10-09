@@ -101,7 +101,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
     /**
      * Constructor
      */
-	public function __construct($config) {
+	public function __construct(\Schoolbox\User $user, $config) {
+		$this->setUser($user);
 
         /* Create soap client
          */

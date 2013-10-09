@@ -24,7 +24,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private $colourList;
 
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable) {
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
@@ -96,8 +96,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         }
 
         $campus_list = array();
-        foreach ($this->user->getCampusList() as $campus) {
-            $campus_list[$campus['id']] = $campus;
+        foreach ($this->user->getCampusCollection() as $campus) {
+            $campus_list[$campus->getId()] = $campus;
         }
 
         $this->setVar("campus_timetable_block", '');

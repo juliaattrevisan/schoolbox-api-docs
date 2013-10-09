@@ -53,7 +53,7 @@ function readConfig($vars, SitePage $page) {
 
     // get the component
     $cim = Component_InstanceMapper::getInstance();
-    $chf = new Component_Homepage_Factory(new User(), $page, true);
+    $chf = new Component_Homepage_Factory(new \Schoolbox\User(), $page, true);
 
     $instance = array_shift($cim->findByInstanceId($vars['component']));
 

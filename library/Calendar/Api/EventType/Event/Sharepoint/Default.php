@@ -12,9 +12,10 @@ class Calendar_Api_EventType_Event_Sharepoint_Default extends Calendar_Api_Event
 	/**
 	 * Constructor
 	 *
+	 * @param $user
 	 * @param $config
 	 */
-	public function __construct($config) {
+	public function __construct($user, $config) {
 	}
 
 	/**

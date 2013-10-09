@@ -71,7 +71,7 @@ $this->setBlock('layout', 'position_top', 'position_top_block');
 $this->setBlock('layout', 'position_left', 'position_left_block');
 $this->setBlock('layout', 'position_right', 'position_right_block');
 
-$componentFactory = new Component_Eportfolio_Factory(new User, $this, true);
+$componentFactory = new Component_Eportfolio_Factory(new \Schoolbox\User(), $this, true);
 
 $cid = $templateList[0]['id'];
 $componentCollection = $componentFactory->buildComponentList($cid);

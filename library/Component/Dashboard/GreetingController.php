@@ -13,23 +13,22 @@ class Component_Dashboard_GreetingController extends Component_Dashboard_Control
 
     private $greeting;
 
-    public function execute () {
-
+	/**
+	 * Generate a text string for the header, containing a greeting and
+	 * the current user's full name
+	 *
+	 * @return bool|void
+	 */
+	public function execute() {
         $tf = new TextFormatter();
-        $greeting = $tf->greeting();
 
-        $user = $this->user->getByID($_SESSION['id']);
+		/* What the what - manual template var replacement and stuff?
+		 * Anyway this adjusts compatibility between userHandler and
+		 * the Schoolbox\User object's formatName() interfaces
+		 */
+		$greetingString = str_replace('{timeofday}', $tf->greeting(), $this->getConfig('componentname'));
 
-        $availableFields = array(
-            'timeofday' => $greeting,
-            'title' => $user['title'],
-            'firstname' => $user['firstname'],
-            'lastname' => $user['lastname']
-        );
-
-        $output = $this->user->formatName($availableFields, $this->getConfig('componentname'));
-
-        $this->greeting = Scrub::html($output);
+        $this->greeting = Scrub::html($_SESSION['user']->formatName($greetingString));
 
         return true;
     }

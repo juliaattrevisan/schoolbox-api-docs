@@ -46,12 +46,12 @@ try {
 
 	switch ($export_type) {
 		case 'personal':
-			$api      = new Calendar_Api_EventType_Event_Schoolbox_Personal(array());
+			$api      = new Calendar_Api_EventType_Event_Schoolbox_Personal($user, array());
 			$filename = 'personal.ics';
 			break;
 
 		case 'group':
-			$api       = new Calendar_Api_EventType_Event_Schoolbox_Group(array());
+			$api       = new Calendar_Api_EventType_Event_Schoolbox_Group($user, array());
 			$export_id = intval($_GET['group']);
 			if ($export_id > 0) {
 				$api->setGroupId($export_id);
@@ -63,7 +63,7 @@ try {
 			break;
 
 		case 'campus':
-			$api       = new Calendar_Api_EventType_Event_Schoolbox_Campus(array());
+			$api       = new Calendar_Api_EventType_Event_Schoolbox_Campus($user, array());
 			$export_id = intval($_GET['campus']);
 			if ($export_id > 0) {
 				$api->setCampusId($export_id);
@@ -75,12 +75,12 @@ try {
 			break;
 
 		case 'duework':
-			$api      = new Calendar_Api_EventType_Submission_Schoolbox_Default(array());
+			$api      = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, array());
 			$filename = 'duework.ics';
 			break;
 
 		case 'all':
-			$factory = new Calendar_Api_Factory();
+			$factory = new Calendar_Api_Factory($user);
 			$api     = $factory->produce();
 			break;
 

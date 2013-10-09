@@ -13,6 +13,8 @@
     // once the DOM has loaded, punch a fancy calendar into it
     $j(document).ready(function() {
         c = new Calendar('calendar', 'calendar-bubble', {
+			userId: '{CALENDAR_USER_ID}',
+
             // overrides and callbacks
             taskTypeId: '{TASK_TYPE_ID}',
             crud: {
@@ -279,7 +281,8 @@
                         url:      '/calendar/ajax/full',
                         data: {
                             start: Math.round(start.getTime()/1000),
-                            end:   Math.round(end.getTime()/1000)
+                            end:   Math.round(end.getTime()/1000),
+							userId: {CALENDAR_USER_ID}
                         },
                         success: function(data) {
                             callback(data);

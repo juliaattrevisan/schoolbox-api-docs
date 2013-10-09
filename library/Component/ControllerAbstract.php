@@ -51,12 +51,14 @@ abstract class Component_ControllerAbstract {
      */
     protected $filterFields = null;
 
-    /**
-     * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
-     */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+	/**
+	 * Constructor
+	 *
+	 * @param Component_Instance $instance
+	 * @param \Schoolbox\User $user
+	 * @param SitePage $sitepage
+	 */
+	public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage) {
         $this->instance = $instance;
         $this->user = $user;
         $this->sitepage = $sitepage;

@@ -15,7 +15,7 @@ class Component_Dashboard_LinkController extends Component_Dashboard_ControllerA
 
     protected $linkList;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Link $link) {
+    public function __construct (Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Link $link) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->link = $link;

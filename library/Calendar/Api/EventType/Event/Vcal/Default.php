@@ -20,9 +20,12 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 	/**
 	 * Constructor
 	 *
+	 * @param \Schoolbox\User $user
 	 * @param $config
 	 */
-	public function __construct($config) {
+	public function __construct(\Schoolbox\User $user, $config) {
+		$this->setUser($user);
+
 		$eventHandler = new Calendar();
 
 		$this->setAllLuEventTypes($eventHandler->getTypeList());
@@ -66,7 +69,6 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 		$is_superuser  = $group_handler->isSuperuser();
 
 		foreach ($allConfigs as $currentConfig) {
-			/* @var $currentConfig Calendar_Api_Config_Record */
 			$decodedConfig = $currentConfig->decodeConfig();
 
 			/* Check permissions - if you can view these events according to the Permissions
