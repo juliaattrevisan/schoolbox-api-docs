@@ -23,6 +23,7 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "helpdesk", "helpdesk_block");
         $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
         $this->setBlock(TEMPLATE_content, "boarder_leave", "boarder_leave_block");
+		$this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
         $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
         $this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
         $this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
@@ -50,14 +51,15 @@ if (is_numeric($this->arg[0])) {
 	    $this->setBlock('group', 'group_mail', 'group_mail_block');
 	    $this->setBlock('group_row', 'group_item', 'group_item_block');
 	    $this->setBlock('group_item', 'group_teacher', 'group_teacher_block');
-
-    } else {
+    }
+	else {
         if ($groupHandler->isParent($user['uid'])) {
             $this->setFile(TEMPLATE_content, 'user/parent.html');
             $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
             $this->setBlock(TEMPLATE_content, 'parent_synergy_form', 'parent_synergy_form_block');
             $this->setBlock('parent_synergy_form', 'parent_spouse', 'parent_spouse_block');
-        } else {
+        }
+		else {
             $this->setFile(TEMPLATE_content, 'user/staff.html');
             $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
             $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
@@ -93,11 +95,29 @@ if (is_numeric($this->arg[0])) {
         'subject_row_block' => '',
 	    'group_block' => '',
 	    'group_row_block' => '',
+		'user_calendar_block' => ''
     );
 
     $this->setVar($blank);
 
-    //Format email address link
+	/* Calendar only exist for students' parents, staff, supers, and themselves
+	 */
+	$isParentOfChild = $groupHandler->isParentOfChild($user['uid']);
+	$isSuperuser = $_SESSION['user']->getSuperuser();
+	$isStaff = $groupHandler->isStaff();
+	$isSelf = ($user['uid'] == $_SESSION['user']->getId());
+
+	if ($isParentOfChild || $isSuperuser || $isStaff || $isSelf) {
+		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+		$this->setVar(array(
+			'USER_CALENDAR_CURRENTDATE' => $now->getUsingFormat('d-m-Y'),
+		));
+
+		$this->parse('user_calendar_block', 'user_calendar');
+	}
+
+	//Format email address link
     $emailObj = new Email();
     $emailAddress = $emailObj->formatEmailFromArray($user);
 

@@ -182,6 +182,7 @@ if (!empty($result['user'])) {
     $page->setBlock('user', 'eportfolio', 'eportfolio_block');
     $page->setBlock('user', 'modify', 'modify_block');
     $page->setBlock('user', 'boarder_leave', 'boarder_leave_block');
+	$page->setBlock('user', 'user_calendar', 'user_calendar_block');
 
     $page->setVar(array(
         'USER_DISP_COUNT' => count($result['user']),
@@ -276,6 +277,27 @@ if (!empty($result['user'])) {
 
 		if ($authenticator->canView()) {
 			$page->parse('eportfolio_block', 'eportfolio');
+		}
+
+		/* Calendar link
+		 * Calendar only exist for students' parents, staff, supers, and themselves
+		 */
+		$isParentOfChild = $groupHandler->isParentOfChild($user['id']);
+		$isSuperuser = $_SESSION['user']->getSuperuser();
+		$isStaff = $groupHandler->isStaff();
+		$isSelf = ($user['id'] == $_SESSION['user']->getId());
+
+		if ($isParentOfChild || $isSuperuser || $isStaff || $isSelf) {
+			$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+			$page->setVar(array(
+				'USER_CALENDAR_CURRENTDATE' => $now->getUsingFormat('d-m-Y'),
+			));
+
+			$page->parse('user_calendar_block', 'user_calendar');
+		}
+		else {
+			$page->setVar('user_calendar_block', '');
 		}
 
 		$page->parse('user_block', 'user', true);
