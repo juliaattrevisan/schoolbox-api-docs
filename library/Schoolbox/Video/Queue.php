@@ -125,8 +125,8 @@ class Queue {
 			'-ac 2 ' . escapeshellarg($this->getVideoLocation()).' 2>&1';
 
 
-		//exec($processString, $message, $return);
-		//$this->setMessage(implode( "\n", $message));
+		exec($processString, $message, $return);
+		$this->setMessage(implode( "\n", $message));
 
 		preg_match('/Duration: ([0-9\:]+)/',$this->getMessage(), $match);
 
