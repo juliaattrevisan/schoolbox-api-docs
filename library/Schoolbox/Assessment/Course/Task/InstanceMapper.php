@@ -12,6 +12,8 @@ namespace Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Mapper;
 
 class InstanceMapper extends Mapper {
@@ -110,7 +112,9 @@ class InstanceMapper extends Mapper {
     }
 
     /**
-     * Pre-save callback - copies details from the task object into this object.
+     * Pre-save callback.
+     * * copies details from the task object into this object.
+     * * If order isn't set, then sets it at the end of this task.
      *
      * @param  Instance $object
      * @return bool     Always true
@@ -118,12 +122,26 @@ class InstanceMapper extends Mapper {
     public function preSave(Instance $object) {
         if (!$object->getId()) {
             $task = $object->getTask();
-            $object
-                ->setTitle($task->getTitle())
-                ->setLink($task->getLink())
-                ->setOrder($task->getOrder())
-                ->setRequiresConfirmation($task->getRequiresConfirmation())
-            ;
+            if ($task instanceof Task && $task->getId()) {
+                $object
+                    ->setTitle($task->getTitle())
+                    ->setLink($task->getLink())
+                    ->setOrder($task->getOrder())
+                    ->setRequiresConfirmation($task->getRequiresConfirmation())
+                ;
+            }
+        }
+        $order = $object->getOrder();
+        if (!isset($order)) {
+            $statement = $this->database->prepare(
+                "SELECT COALESCE(MAX(`order`), -1)
+                FROM `{$this->getTable()}` WHERE `course_unit_instance_id` = :unit_id"
+            );
+            $unit    = $object->getUnitInstance();
+            $unit_id = ($unit instanceof UnitInstance) ? $unit->getId() : $unit;
+            $statement->bindValue('unit_id', $unit_id, \PDO::PARAM_INT);
+            $statement->execute();
+            $object->setOrder(intval($statement->fetchColumn())+1);
         }
         return true;
     }
@@ -138,15 +156,17 @@ class InstanceMapper extends Mapper {
      */
     public function postSave(Instance $object, $is_new = false) {
         if ($is_new) {
-            $task   = $object->getTask();
-            $cloner = new Cloner($object);
-            if (($assess_id = $task->getAssessment()->getId())) {
-                $assessment = $cloner->cloneAssessment();
-                $this->updateAll($object, 'assess_id', $assessment->getId());
-            }
-            if (($box_id = $task->getSubmissionBox()->getId())) {
-                $box = $cloner->cloneSubmissionBox();
-                $this->updateAll($object, 'box_id', $box->getId());
+            $task = $object->getTask();
+            if ($task instanceof Task && $task->getId()) {
+                $cloner = new Cloner($object);
+                if (($assess_id = $task->getAssessment()->getId())) {
+                    $assessment = $cloner->cloneAssessment();
+                    $this->updateAll($object, 'assess_id', $assessment->getId());
+                }
+                if (($box_id = $task->getSubmissionBox()->getId())) {
+                    $box = $cloner->cloneSubmissionBox();
+                    $this->updateAll($object, 'box_id', $box->getId());
+                }
             }
         }
     }
