@@ -43,12 +43,10 @@ class API extends Generic\API {
 		}
 
 		$sessionUser = UserMapper::getInstance()->findById($_SESSION['id']);
-		$includeHrefs = false;
 
 		switch($sessionUser->getRole()->getType()) {
 			case Role::STAFF:
 				// can view any profile, complete with homepage links
-				$includeHrefs = true;
 				break;
 			case Role::PARENT:
 				// can only view your own kids
@@ -62,7 +60,6 @@ class API extends Generic\API {
 				if($sessionUser->getId() != $targetUser->getId()) {
 					return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
 				}
-				$includeHrefs = true;
 				break;
 		}
 
@@ -105,11 +102,15 @@ class API extends Generic\API {
 		$subjects = array();
 		$groups = array();
 
+		$groupHandler = new \Group();
+
 		foreach($subjectCollection as $subject) {
 
+			/** @var $subject Category */
 			$subject = $this->appendTeacherData($subject);
 
-			if(!$includeHrefs) {
+			// if session user has >= read access to the subject, keep the subject id
+			if($groupHandler->getPermission($subject->getId(), $sessionUser->getId()) < READ_ACCESS) {
 				unset($subject['id']);
 			}
 			$subjects[] = $subject;
@@ -120,7 +121,7 @@ class API extends Generic\API {
 			$g['name'] = $group->getName();
 			$g['id'] = $group->getId();
 			$g = $this->appendTeacherData($g);
-			if($includeHrefs) {
+			if($groupHandler->getPermission($group->getId(), $sessionUser->getId()) < READ_ACCESS) {
 				unset($g['id']);
 			}
 			$groups[] = $this->appendTeacherData($g);
