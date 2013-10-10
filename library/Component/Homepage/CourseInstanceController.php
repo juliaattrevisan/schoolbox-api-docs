@@ -103,6 +103,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit',             'unit_completion',      'unit_completion_block');
         $this->setBlock('unit',             'unit_delete',          'unit_delete_block');
         $this->setBlock('unit',             'unit_task',            'unit_task_block');
+        $this->setBlock('unit',             'unit_actions',         'unit_actions_block');
         $this->setBlock('unit_task',        'unit_task_link',       'unit_task_link_block');
         $this->setBlock('unit_task',        'unit_task_no_link',    'unit_task_no_link_block');
         $this->setBlock('unit_task',        'unit_task_count',      'unit_task_count_block');
@@ -149,10 +150,14 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                         'unit_expand_block'        => '',
                         'unit_no_expand_block'     => '',
                         'unit_delete_block'        => '',
+                        'unit_actions_block'       => '',
                     )
                 );
                 if (!$this->is_student) {
                     $this->parse('unit_delete_block', 'unit_delete');
+                    if (!$unit->isAfterDueDate()) {
+                        $this->parse('unit_actions_block', 'unit_actions');
+                    }
                 }
 
                 $display_task_list =
