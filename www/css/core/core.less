@@ -5188,7 +5188,6 @@ ul.js_happening li span:hover {
 /********************************************
 CHAT
 *********************************************/
-
 .chat {
     h2 {
         .light {
@@ -5231,6 +5230,7 @@ CHAT
         }
     }
     .show-users {
+		clear: both;
         background: darken(@dark,@darken-value) url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
         display: block;
         height: 16px;
@@ -5247,78 +5247,83 @@ CHAT
             background-color: darken(@dark,@darken-value);
         }
     }
+
     .chat-messages {
         position: relative;
         max-height: 450px;
         overflow: auto;
+		li {
+			padding: 8px 0 0;
+		}
     }
+	.chat-archive {
+		li {
+			padding: 8px 0 0;
+		}
+	}
+	.chat-avatar {
+		float: left;
+		margin-right: 8px;
+	}
+	.chat-username {
+		font-weight: bold;
+		display: block;
+	}
+	.chat-time {
+		float: right;
+		color: @secondary-text
+	}
+	.chat-message {
+		margin: 0 0 0 40px;
+		padding: 8px;
+		position: relative;
+		background: @dark;
+		border: 1px solid @border-color;
+		&:before, &:after {
+			content: '';
+			.absolute(-1px,-16px);
+			.block(0,0);
+			border: 8px solid transparent;
+			border-right-color: @border-color;
+		}
+		&:after {
+			left: -15px;
+			border-right-color: @dark;
+		}
+	}
 
-    .chat-message-user {
-        padding: 2px 0;
-        .chat-time, .chat-user .triangulate {
-            position: absolute;
-            display: block;
-            z-index: 5;
-        }
-        .chat-user {
-            width: 100%;
-            position: relative;
-            display: block;
-            .triangulate {
-                background: url(/images/core/icons/chat-me-triangle.png) no-repeat;
-                bottom: -1px;
-                left: 60%;
-                height: 12px;
-                width: 11px;
-                z-index: 5;
-            }
-        }
-        .chat-username {
-            display: block;
-            width: 60%;
-            padding-left: 16px;
-            padding-bottom: 4px;
-        }
-        .chat-message {
-            display: block;
-            padding: 6px 16px;
-            color: @black;
-            background: @content-background;
-            border: 1px solid @alternate-background;
-            word-wrap: break-word;
-        }
-        .chat-time {
-            right: 0;
-            top: 0;
-            color: @dgrey
-        }
-    }
-
-    .chat-message-user-me {
-        .chat-message {
-            background: lighten(@highlight-color,@lighten-value);
-            border-color: darken(@highlight-color,@darken-value);
-        }
-        .chat-user .triangulate {
-            background-position: 0 -24px;
-        }
-    }
     .chat-message-user-admin {
         .chat-message {
             background: lighten(@neutral-color,@lighten-value);
             border-color: @neutral-color;
-        }
-        .chat-user {
-            font-weight: bold;
-            color: @link;
-            .time {
-                font-weight: bold;
-            }
-            .triangulate {
-                background-position: 0 -12px;
-            }
+			&:before { border-right-color: darken(@neutral-color,@darken-value); }
+			&:after { border-right-color: lighten(@neutral-color,@lighten-value); }
         }
     }
+
+	.chat-message-user-me {
+		.chat-avatar {
+			float: right;
+			margin-left: 8px;
+			margin-right: 0px;
+		}
+		.chat-message {
+			margin-right: 40px;
+			background: lighten(@highlight-color,@lighten-value);
+			border-color: darken(@highlight-color,@darken-value);
+			&:before, &:after {
+				left: auto; right: -16px;
+				border-right-color: transparent;
+			}
+			&:before {
+				border-left-color: darken(@highlight-color,@darken-value);
+			}
+			&:after {
+				right: -15px;
+				border-left-color: lighten(@highlight-color,@lighten-value);
+			}
+		}
+	}
     .chat-message-container {
         border: 1px solid @std-grey;
         padding: 4px;

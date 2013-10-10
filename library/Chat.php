@@ -181,8 +181,9 @@ class Chat extends DeprecatedModel {
         $yearFilter = $year != 0 ? " AND YEAR(time) = $year " : '';
         $monthFilter = $month != 0 ? " AND MONTH(time) = $month " : '';
 
-        $query = "SELECT *, DATE(`time`) AS `date`
-                  FROM `{$this->_table}`
+        $query = "SELECT c.*, DATE(`time`) AS `date`, u.synergy_id
+                  FROM `{$this->_table}` c
+                  LEFT JOIN `user` u on c.user_id = u.id
                   WHERE category_id = $categoryID $yearFilter $monthFilter";
 
         if($limit) {

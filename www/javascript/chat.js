@@ -77,9 +77,6 @@ $.widget("ui.chat",  {
 
             if ($body_el.val().length > 0) {
                 $self._send($self);
-			} else {
-                $body_el.animate({ backgroundColor: "#f0f0f0" }, 100).animate({ backgroundColor:'#fff'}, 100);
-                $body_el.parent().animate({ backgroundColor: "#f0f0f0" }, 100).animate({ backgroundColor:'#fff'}, 100);
 			}
         });
 
@@ -92,9 +89,6 @@ $.widget("ui.chat",  {
 
 				if ($body_el.val().length > 0) {
                     $self._send($self);
-				} else {
-                    $body_el.animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
-                    $body_el.parent().animate({backgroundColor: "#f0f0f0" }, 100).animate({backgroundColor:'#fff'}, 100);
 				}
             }
         });
@@ -219,14 +213,13 @@ $.widget("ui.chat",  {
             $message_el.addClass('chat-message-user-me');
         }
 
-        $tpl =
-            '<span class="chat-user">' +
-                '<span class="triangulate"></span>' +
-                '<span class="chat-username">{0}</span>' +
-                '<img class="chat-avatar" src="/portrait.php?userId={1}&size=square32" />' +
-                '<span class="chat-time">{2}</span>' +
-            '</span>' +
-            '<span class="chat-message">{3}</span>';
+		$tpl =
+
+				'<img class="chat-avatar" height="32" width="32" src="/portrait.php?userId={1}&size=square32" title="{0}" />' +
+				'<p class="chat-message">' +
+					'<span class="chat-time">{2}</span>' +
+					'<span class="chat-username">{0}</span>' +
+					'{3}</p>';
 
         $message_el.html($tpl.format($message.name, $message.user_ext_id, $message.time, $message.body));
 
@@ -259,8 +252,12 @@ $.widget("ui.chat",  {
                     var $user = $data.users[$i];
 
                     var $user_el = $('<li></li>');
+					$tpl =
+						'<img class="icon" height="32" width="32" src="/portrait.php?userId={1}&size=square32" title="{0}" />' +
+						'<h4>{0}</h4>';
 
-                    $user_el.text($user.name).data('user_id', $user.user_id);
+					$user_el.html($tpl.format($user.name, $user.user_ext_id));
+                    $user_el.data('user_id', $user.user_id);
 
                     //every two add in the dark class chimchim
                     if ($x%2 != 0) {
@@ -355,20 +352,3 @@ $.widget("ui.chat",  {
 });
 
 })(jQuery);
-
-/*
-render_config: function (config) {
-    if (config.state == 'Active') {
-        $j('.light').css('background-position', "bottom");
-        $j('.light').addClass('is-active');
-    } else {
-        this.render_users({});
-
-        $j('.light').css('background-position', "top");
-
-        if(!this.is_admin()) {
-            $j('textarea.chat-message-box').attr('disabled', 'true');
-        }
-    }
-}
-*/
