@@ -573,6 +573,8 @@ class Category extends DeprecatedModel {
             }
         }
 
+        unset($data['code']);
+
         parent::update($data);
 
         $this->logAction($data[$this->_index], 'modify');
