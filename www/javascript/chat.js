@@ -1,3 +1,14 @@
+/* String.format function: http://stackoverflow.com/a/2648463/1877343 */
+String.prototype.format = function() {
+    var s = this,
+        i = arguments.length;
+
+    while (i--) {
+        s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), arguments[i]);
+    }
+    return s;
+};
+
 (function($) {
 
 $.widget("ui.chat",  {
@@ -6,6 +17,7 @@ $.widget("ui.chat",  {
         category_id: null,
         component_id: null,
         user_id: null,
+        user_ext_id: null,
         user_name: null,
         user_perm: 1, // 1 Read Access, 2 Write Access, 3 Full Access
         log_el: 'ul.chat-messages',
@@ -140,6 +152,7 @@ $.widget("ui.chat",  {
             category_id: $self.options.category_id,
             component_id: $self.options.component_id,
             user_id: $self.options.user_id,
+            user_ext_id: $self.options.user_ext_id,
             user_perm: $self.options.user_perm,
             last_poll: $self.last_poll,
             name: $self.options.user_name,
@@ -206,7 +219,16 @@ $.widget("ui.chat",  {
             $message_el.addClass('chat-message-user-me');
         }
 
-        $message_el.html('<span class="chat-user"><span class="triangulate"></span><span class="chat-username">'+$message.name+'</span><span class="chat-time">'+$message.time+'</span></span><span class="chat-message">'+$message.body+'</span>');
+        $tpl =
+            '<span class="chat-user">' +
+                '<span class="triangulate"></span>' +
+                '<span class="chat-username">{0}</span>' +
+                '<img class="chat-avatar" src="/portrait.php?userId={1}&size=square32" />' +
+                '<span class="chat-time">{2}</span>' +
+            '</span>' +
+            '<span class="chat-message">{3}</span>';
+
+        $message_el.html($tpl.format($message.name, $message.user_ext_id, $message.time, $message.body));
 
         this.options.log_el.append($message_el).prop({ scrollTop: this.options.log_el.prop("scrollHeight") });
 
