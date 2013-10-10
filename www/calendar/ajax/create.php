@@ -19,10 +19,22 @@ $page = new SitePage();
 $dateObj      = new Alaress_Date_Format($_POST['date']/1000, 'U');
 $publish_date = new Alaress_Date_Format(new DateTime(), 'U');
 
+$groupHandler = new Group();
+
+$user = $_SESSION['user'];
+
+/* Superuser/Staff/Parent adding event for someone else
+ * Student creating their own event,
+ */
+if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($user->getId()) || $groupHandler->isStudent($user->getId())) {
+	$ownerId = $_POST['userId'];
+}
+
 $event = array(
-	'owner' => $_SESSION['id'],
+	'owner' => $ownerId,
+	'author_id' => $user->getId(),
 	'access' => 1,
-	'sid' => $_SESSION['id'],
+	'sid' => $ownerId,
 	'campusList' => array(),
 	'groupList' => array(),
 	'type' => $_POST['type'],
