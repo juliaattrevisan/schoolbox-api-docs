@@ -13,7 +13,7 @@ if (($permission = $groupHandler->getPermission($categoryID)) < WRITE_ACCESS) {
 }
 
 // get the Instance's Definition's Controller
-$factory = new Component_Homepage_Factory(new User(), new SitePage(false));
+$factory = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
 $component = $factory->buildComponent($instanceID);
 
 $templateTarget = "component_position_{$component->getInstance()->getPosition()}";

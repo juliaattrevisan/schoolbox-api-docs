@@ -85,7 +85,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $componentInstanceMapper->cascadeSequence($_POST['cid']);
 
         // get the Instance's Definition's Controller
-        $factory = new Component_Homepage_Factory(new User(), new SitePage(false));
+        $factory = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
 
         // $component instanceof Component_ControllerAbstract
         $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
@@ -163,7 +163,7 @@ if (is_numeric($_REQUEST['cid'])) {
         if(isset($config['filter'])) {
             // retrieve the instance so we know how to insert this data
             $cclass = $instance->getDefinition()->getClass();
-            $controller = new $cclass($instance, new User(), $page);
+            $controller = new $cclass($instance, new \Schoolbox\User(), $page);
             $controller->execute();
             $fields = $controller->getFilterFields();
             $val = 0;

@@ -27,9 +27,9 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * The user record for the owner of the page being viewed
 	 *
-	 * @var array
+	 * @var \Schoolbox\User
 	 */
-	protected $user = array();
+	protected $user = null;
 
 	/**
 	 * An instance of userHandler
@@ -77,10 +77,10 @@ abstract class Eportfolio_Page_Abstract {
 	 * @param $pageId
 	 * @param $permission
 	 */
-	final public function __construct($page, $userId, $pageId, $permission) {
+	public function __construct($page, $userId, $pageId, $permission) {
 		$this->setPage($page);
 		$this->setPageId($pageId);
-		$this->setUserHandler(new User());
+		$this->setUserHandler(new \Schoolbox\User());
 		$this->setGroupHandler(new Group());
 		$this->setPermission($permission);
 
@@ -119,13 +119,17 @@ abstract class Eportfolio_Page_Abstract {
 
 		/* Retrieve the user ID from the URI, must be an integer and at least 1 character long
 		 */
+        $user = null;
 		if (preg_match('/^\d+$/', $userId)) {
-			$user = $this->getUserHandler()->getByID($userId);
+            try {
+                $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {}
 		}
 
 		/* if we still have no user, advise that these are not the droids you're looking for
 		 */
-		if (!isset($user['uid'])) {
+		if (!($user instanceof \Schoolbox\User)) {
 			error(18);
 		}
 
@@ -291,7 +295,7 @@ abstract class Eportfolio_Page_Abstract {
 	 * @return mixed
 	 */
 	protected function getUserId() {
-		return $this->user['uid'];
+		return $this->user->getId();
 	}
 
 	/**
@@ -302,7 +306,7 @@ abstract class Eportfolio_Page_Abstract {
 	protected function getUserName() {
 		$user = $this->getUser();
 
-		return Scrub::text($user['firstname'] . ' ' . $user['lastname']);
+		return Scrub::text($user->getFirstname() . ' ' . $user->getLastname());
 	}
 
 	/**
@@ -344,7 +348,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Set user
 	 *
-	 * @param array $user
+	 * @param \Schoolbox\User $user
 	 */
 	protected function setUser($user) {
 		$this->user = $user;
@@ -353,7 +357,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Get user
 	 *
-	 * @return array
+	 * @return \Schoolbox\User
 	 */
 	protected function getUser() {
 		return $this->user;
@@ -362,7 +366,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Set user handler
 	 *
-	 * @param User $userHandler
+	 * @param \Schoolbox\User $userHandler
 	 */
 	protected function setUserHandler($userHandler) {
 		$this->userHandler = $userHandler;
@@ -371,7 +375,7 @@ abstract class Eportfolio_Page_Abstract {
 	/**
 	 * Get user handler
 	 *
-	 * @return User
+	 * @return \Schoolbox\User
 	 */
 	protected function getUserHandler() {
 		return $this->userHandler;

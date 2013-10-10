@@ -402,7 +402,7 @@ class Digest_News {
 
         //
         // Give dashboard component factory a user and sitepage to shut it up
-        $chf = new Component_Dashboard_Factory(new \User(), new SitePage(false));
+        $chf = new Component_Dashboard_Factory(new \Schoolbox\User(), new SitePage(false));
 
         $homepage_activity_controller = $chf->buildComponent($this->homepage_activity_component);
         $homepage_activity_controller->setup(array(), $component_config);

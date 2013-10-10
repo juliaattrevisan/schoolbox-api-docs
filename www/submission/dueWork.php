@@ -260,7 +260,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 
 // create a custom instance of the upcoming work controller, and set it up for this context
-$chf = new Component_Homepage_Factory(new User, $this);
+$chf = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
 $cdm = Component_DefinitionMapper::getInstance();
 $definition = $cdm->findOneByColumn('class', 'Component_Dashboard_UpcomingWorkController');
 $instance = new Component_Instance();
