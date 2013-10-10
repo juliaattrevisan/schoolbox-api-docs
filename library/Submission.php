@@ -499,9 +499,11 @@ class Submission extends DeprecatedModel {
                 UNIX_TIMESTAMP(sb.late_date) AS late,
                 sb.name,
                 sb.description,
-                sb.created
+                sb.created,
+                smt.slug
             FROM submission_box sb
             LEFT JOIN file_type ft ON sb.type = ft.id
+            LEFT JOIN submission_mark_type smt ON sb.mark_type = smt.mark_type_id
             WHERE sb.category = '$categoryID'
             AND sb.owner = '$userID'
             AND sb.deleted = '0'
