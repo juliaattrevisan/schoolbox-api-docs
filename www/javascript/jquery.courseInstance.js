@@ -75,7 +75,7 @@
             '.add_buttons .btn',
             'click.courseInstance',
             function(event) {
-                var create_forms = component.find('.create_task_form_container');
+                var create_forms = $(this).closest('.unit').find('.form_container');
                 var form_class   = $(this).data('form_class');
                 if (form_class) {
                     var create_form = create_forms.filter('.'+form_class);
@@ -87,5 +87,40 @@
                 }
             }
         );
+
+        // Create task form submission
+        component.delegate(
+            'form[data-form_type="task"]',
+            'submit.courseInstance',
+            function(event) {
+                var form = $(this);
+                event.preventDefault();
+                // Is this a new form?
+                var is_new = !(form.find('input[name="id"]').val());
+                $.post(form.attr('action'), form.serialize(), function(data) {
+                    // Do validation stuff here eventually, but for now validate.
+                    if (is_new) {
+                        form.get(0).reset();
+                    }
+                    postCallback(form, data);
+                }, 'json');
+            }
+        );
+
+        var postCallback = function(form, data) {
+            var container = form.closest('.form_container');
+            container.slideUp('fast', function() {
+//                var new_tasks = $(data.html).find('.information-list');
+                component.find('.information-list').replaceWith($(data.html).find('.information-list'));
+//                reloadTaskList(data)
+            });
+        }
+
+        // Reloads the task list, setting up drag/drop again too.
+        var reloadTaskList = function(data) {
+            var new_tasks = $(data.html).find('.information-list');
+            component.find('.information-list').replaceWith(new_tasks);
+//            initTaskList();
+        }
     }
 })(jQuery);

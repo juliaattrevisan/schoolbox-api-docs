@@ -48,7 +48,10 @@
         <script type="text/javascript">
             (function($) {
                 $(function() {
-                    $('#component{COMPONENT_INSTANCE_ID}').setupCourseInstance({});
+                    $('#component{COMPONENT_INSTANCE_ID}').setupCourseInstance({
+                        session_name: '{SESSION_NAME}',
+                        session_id:   '{SESSION_ID}'
+                    });
                 });
             })(jQuery);
         </script>
@@ -140,18 +143,18 @@
 
                 <!-- BEGIN unit_actions -->
                 <p class="interact add_buttons">
-                    <a href="/submission/createSubmission/new/{ID}/taskInstance" class="btn up-arrow" data-form_class="for_due_work"><span></span>Add Due Work</a>
-                    <a href="/assess/create/{ID}/taskInstance" class="btn create" data-form_class="for_assessment"><span></span>Add Assessment</a>
-                    <a href="/task/createInstance/{ID}" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
+                    <a href="/submission/createSubmission/new/{ID}/taskInstance/{UNIT_ID}" class="btn up-arrow" data-form_class="for_due_work"><span></span>Add Due Work</a>
+                    <a href="/assess/create/{ID}/taskInstance/{UNIT_ID}" class="btn create" data-form_class="for_assessment"><span></span>Add Assessment</a>
+                    <a href="/task/createInstance/{UNIT_ID}" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
                 </p>
                 <!-- END unit_actions -->
 
                 <!-- This is the form for inline creation of tasks -->
-                <div class="create_task_form_container for_task hide">
+                <div class="clear form_container for_task hide">
                     <p>
                         This task creates a task for a student to complete.
                         This task can be marked off by a student, but you may set whether it requires
-                        that a teacher confirms its completion.
+                        that you confirm its completion.
                     </p>
                     <p>
                         You may optionally add a link for a student to visit - the task will be marked
@@ -162,9 +165,9 @@
                     <p>
                         (This task will not be added to the course that this unit is based off of - it will only exist on this instance of the unit.)
                     </p>
-                    <form action="/task/saveInstanceForm.php" method="post" class="create_task_form" data-form_type="task">
+                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
                         <input type="hidden" name="id" value=""/>
-                        <input type="hidden" name="course_unit_instance_id" value="{COMPONENT_INSTANCE_ID}"/>
+                        <input type="hidden" name="course_unit_instance_id" value="{UNIT_ID}"/>
 
                         <dl>
                             <dt><label for="title-new_task">Task:</label></dt>
@@ -182,7 +185,7 @@
                             <dt><label for="self_assess-new_task">Self-assessed?</label></dt>
                             <dd>
                                 <input name="self_assess" value="0" type="hidden" />
-                                <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" {TASK_SELF_ASSESS} />
+                                <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" />
                             </dd>
                         </dl>
 
