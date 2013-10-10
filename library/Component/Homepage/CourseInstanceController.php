@@ -90,8 +90,12 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         $this->parseConfig();
 
-        $this->setVar('COMPONENT_NAME',  $this->getConfig('componentname'));
-        $this->setVar('COURSE_HOMEPAGE', str_replace('/homepage/', '', Config::get('course_homepage')));
+        $this->setVar(array(
+            'SESSION_NAME'    => session_name(),
+            'SESSION_ID'      => session_id(),
+            'COMPONENT_NAME'  => $this->getConfig('componentname'),
+            'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
+        ));
 
         $this->setBlock($templateHandle,    'course_selector',      'course_selector_block');
         $this->setBlock($templateHandle,    'course_modify',        'course_modify_block');
