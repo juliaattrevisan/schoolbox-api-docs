@@ -24,10 +24,15 @@ $groupHandler = new Group();
 $user = $_SESSION['user'];
 
 /* Superuser/Staff/Parent adding event for someone else
- * Student creating their own event,
+ * Student creating their own event
  */
 if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($user->getId()) || $groupHandler->isStudent($user->getId())) {
 	$ownerId = $_POST['userId'];
+}
+/* You're not supposed to be able to create events under other circumstances
+ */
+else {
+	error(19);
 }
 
 $event = array(
