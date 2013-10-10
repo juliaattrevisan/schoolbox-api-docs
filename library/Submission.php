@@ -976,10 +976,12 @@ class Submission extends DeprecatedModel {
               GROUP_CONCAT(cc.code) c_code,
               sb.id sb_id,
               sb.name sb_name,
-              sb.date sb_date
+              sb.date sb_date,
+              teacher.firstname, teacher.lastname, teacher.title, teacher.alt_email, teacher.local_email, teacher.username
             FROM submission_box sb
             LEFT JOIN category c ON sb.category = c.id
             LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+            LEFT JOIN `user` teacher ON sb.owner = teacher.id
             INNER JOIN submission_notification sn ON sb.id = sn.box_id
             WHERE $where
             GROUP BY sb.id, c.id
@@ -1121,6 +1123,8 @@ class Submission extends DeprecatedModel {
                         'id'   => $submission_id,
                         'name' => $row['sb_name'],
                         'date' => $row['sb_date'],
+                        'teacher' => $userHandler->formatName($row),
+                        'email' => $emailObj->formatEmailFromArray($row),
                     );
                 }
             }
