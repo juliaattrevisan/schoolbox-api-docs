@@ -97,7 +97,13 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         $time = new Alaress_Date_Format(new DateTime());
 
         foreach ($this->submissionList as $submission) {
-            $box_id = $submission->getId();
+
+	        // if the late date has passed, then don't display this item (to staff or students)
+	        if($submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
+		        continue;
+	        }
+
+	        $box_id = $submission->getId();
             $dateHTML = $submission->getDueDate()->getDateOnly();
 
             /* Actions Block */
@@ -127,8 +133,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                         else {
                             // if the submission box is open
                             // (Check submission number)
-                            if ($time > $submission->getOpenDate()->getDateTimeObject()
-                                && $time < $submission->getLateDate()->getDateTimeObject()
+                            if ($time->getDateTimeObject() > $submission->getOpenDate()->getDateTimeObject()
+                                && $time->getDateTimeObject() < $submission->getLateDate()->getDateTimeObject()
                             ) {
                                 $this->setVar('DUE_ACTION_NAME', 'Submit Work');
                                 $this->setVar('DUE_ACTION_ICON', 'up-arrow');
