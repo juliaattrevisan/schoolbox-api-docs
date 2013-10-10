@@ -12,7 +12,7 @@ class Chat extends DeprecatedModel {
 
     /* Get logs */
     function get_logs ($category_id, $last_poll = null, $not_user_id = 0) {
-        $query = "SELECT title, firstname, lastname, c.*
+        $query = "SELECT title, firstname, lastname, synergy_id AS user_ext_id, c.*
                   FROM {$this->_table} c LEFT JOIN user ON c.user_id = user.id
                   WHERE `category_id` = $category_id";
 
@@ -86,7 +86,7 @@ class Chat extends DeprecatedModel {
 
     function get_users ($category_id) {
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
-        $query = "SELECT title, firstname, lastname, group_type, chat_poll.*
+        $query = "SELECT title, firstname, lastname, synergy_id AS user_ext_id, group_type, chat_poll.*
                   FROM chat_poll
                   LEFT JOIN `user` ON chat_poll.user_id = user.id
                   LEFT JOIN `groups` ON user.`group_id` = groups.`id`
@@ -181,8 +181,9 @@ class Chat extends DeprecatedModel {
         $yearFilter = $year != 0 ? " AND YEAR(time) = $year " : '';
         $monthFilter = $month != 0 ? " AND MONTH(time) = $month " : '';
 
-        $query = "SELECT *, DATE(`time`) AS `date`
-                  FROM `{$this->_table}`
+        $query = "SELECT c.*, DATE(`time`) AS `date`, u.synergy_id
+                  FROM `{$this->_table}` c
+                  LEFT JOIN `user` u on c.user_id = u.id
                   WHERE category_id = $categoryID $yearFilter $monthFilter";
 
         if($limit) {

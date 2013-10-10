@@ -29,22 +29,19 @@
         </ul>
     </div>
 
-    <div class="posts">
+    <div class="left">
         <div id="{CATEGORY_CLEAN}">
             <!-- BEGIN chat_date -->
             <div>
                 <h2>{CHAT_DATE}</h2>
                 <ul class="chat-archive box">
                 <!-- BEGIN chat -->
-                    <li class="chat-message-user chat-message-user-admin chat-message-user-me">
-                        <span class="chat-user">
-                            <span class="triangulate"></span>
-                            <span class="chat-username">{POSTER}</span>
-                            <span class="chat-time">{DATETIME}</span>
-                        </span>
-                        <span id="a{CHAT_ID}" class="chat-message">
-                            {CHAT_BODY}
-                        </span>
+					<li class="chat-message-user">
+						<img class="chat-avatar" height="32" width="32" src="/portrait.php?userId={CHAT_USER_SYNERGY_ID}&amp;size=square32" />
+						<p class="chat-message">
+							<span class="chat-time">{DATETIME}</span>
+							<span class="chat-username">{POSTER}</span>
+							{CHAT_BODY}</p>
                     </li>
                 <!-- END chat -->
                 </ul>
