@@ -393,6 +393,7 @@ class Session
                                     if (is_array($cat) && is_numeric($cat['id'])) {
                                         if ($groupHandler->getPermission($cat['id']) >= READ_ACCESS) {
                                             $subject['id'] = $cat['categoryID'];
+                                            $subject['name'] = $cat['name'];
                                             $subjects[] = $subject;
                                         }
                                     }
