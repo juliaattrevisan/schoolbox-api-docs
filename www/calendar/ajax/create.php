@@ -23,10 +23,10 @@ $groupHandler = new Group();
 
 $user = $_SESSION['user'];
 
-/* Superuser/Staff/Parent adding event for someone else
- * Student creating their own event
+/* Superuser/Staff/Parent adding event for someone else or
+ * someone creating their own event
  */
-if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($user->getId()) || $groupHandler->isStudent($user->getId())) {
+if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($_POST['userId']) || ($user->getId() == $_POST['userId'])) {
 	$ownerId = $_POST['userId'];
 }
 /* You're not supposed to be able to create events under other circumstances
