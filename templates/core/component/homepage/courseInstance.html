@@ -44,63 +44,11 @@
             }
         </style>
         <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+        <script type="text/javascript" src="/javascript/jquery.courseInstance.js"></script>
         <script type="text/javascript">
-            // Addition of an AJAX form submission - need to add here because
-            // the session name and ID have to be passed.
             (function($) {
                 $(function() {
-                    // Resource browser parts
-                    var browser = $('#resource-browser');
-                    browser.dialog({
-                        width: 650,
-                        autoOpen: false,
-                        title: "Select a homepage",
-                        modal: true,
-                        resizable: false
-                    });
-                    var browser_options = {
-                        destination:     '#component{COMPONENT_INSTANCE_ID} input[name="homepage"]',
-                        base:            '{COURSE_HOMEPAGE}',
-                        start:           '{COURSE_HOMEPAGE}',
-                        triggerChange:   true,
-                        destinationText: '#component{COMPONENT_INSTANCE_ID} span[data-resource_text]'
-                    }
-                    $('#component{COMPONENT_INSTANCE_ID} a[data-interaction="homepage_selector"]').click(function(event) {
-                        event.preventDefault();
-                        browser.load(
-                                '/ajax/resourceBrowser',
-                                browser_options,
-                                function() { browser.dialog('open'); }
-                        );
-                    });
-                    $('#component{COMPONENT_INSTANCE_ID} a[data-interaction="import"]').click(function(event) {
-                        event.preventDefault();
-                        var source = $j('#component{COMPONENT_INSTANCE_ID} input[name="homepage"]').val();
-                        source = source.replace(/.*?(\d+$)/, '$1')
-                        window.location.href = '/course/import/{ID}/{COMPONENT_INSTANCE_ID}/'+source
-                    });
-
-                    // Expand/collapse of units
-                    $('#component{COMPONENT_INSTANCE_ID} a[data-interaction="toggle-expanded"]').click(function(event) {
-                        event.preventDefault();
-                        var element = $(this);
-                        var is_collapsed = element.data('interaction-state') == "collapsed";
-                        var unit_element = element.closest('.unit');
-                        var task_list    = unit_element.find('.task-list');
-                        if (is_collapsed) {
-                            unit_element.removeClass('collapsed').addClass('expanded');
-                            task_list.slideDown('fast')
-                            element.data('interaction-state', 'expanded');
-                        }
-                        else {
-                            unit_element.removeClass('expanded').addClass('collapsed');
-                            task_list.slideUp('fast')
-                            element.data('interaction-state', 'collapsed');
-                        }
-                    });
-
-
-
+                    $('#component{COMPONENT_INSTANCE_ID}').setupCourseInstance({});
                 });
             })(jQuery);
         </script>
@@ -197,6 +145,51 @@
                     <a href="/task/createInstance/{ID}" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
                 </p>
                 <!-- END unit_actions -->
+
+                <!-- This is the form for inline creation of tasks -->
+                <div class="create_task_form_container for_task hide">
+                    <p>
+                        This task creates a task for a student to complete.
+                        This task can be marked off by a student, but you may set whether it requires
+                        that a teacher confirms its completion.
+                    </p>
+                    <p>
+                        You may optionally add a link for a student to visit - the task will be marked
+                        as complete once the student visits that link. You can supply a link to an existing
+                        web page or file, upload a file from your computer for students to download, or select
+                        an existing homepage or file from the resource browser.
+                    </p>
+                    <p>
+                        (This task will not be added to the course that this unit is based off of - it will only exist on this instance of the unit.)
+                    </p>
+                    <form action="/task/saveInstanceForm.php" method="post" class="create_task_form" data-form_type="task">
+                        <input type="hidden" name="id" value=""/>
+                        <input type="hidden" name="course_unit_instance_id" value="{COMPONENT_INSTANCE_ID}"/>
+
+                        <dl>
+                            <dt><label for="title-new_task">Task:</label></dt>
+                            <dd><input id="title-new_task" name="title" type="text" value="" /></dd>
+
+                            <dt><label for="link-new_task">Link:</label></dt>
+                            <dd>
+                                <input id="link-new_task" name="link" type="text" value="" />
+                                <p class="interact">
+                                    <a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
+                                    <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
+                                </p>
+                            </dd>
+
+                            <dt><label for="self_assess-new_task">Self-assessed?</label></dt>
+                            <dd>
+                                <input name="self_assess" value="0" type="hidden" />
+                                <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" {TASK_SELF_ASSESS} />
+                            </dd>
+                        </dl>
+
+                        <input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
+
+                    </form>
+                </div>
 
             </li>
             <!-- END unit -->
