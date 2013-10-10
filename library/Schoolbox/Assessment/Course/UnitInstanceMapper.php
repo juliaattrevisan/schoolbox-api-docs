@@ -152,6 +152,7 @@ class UnitInstanceMapper extends Mapper {
                 $task_instance
                     ->setUnitInstance($object)
                     ->setTask($task)
+                    ->setOwner($_SESSION['id'])
                 ;
                 $task_instance_collection->add($task_instance);
             }
