@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course\Task;
 
 use Alaress_Date_Format;
+use Schoolbox\User;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\OnlineAssessment;
@@ -52,6 +53,11 @@ class Instance implements ISoftDeletable {
      * @var int
      */
     protected $order;
+
+    /**
+     * @var User
+     */
+    protected $owner;
 
     /**
      * @var SubmissionBox
@@ -247,6 +253,22 @@ class Instance implements ISoftDeletable {
      */
     public function getSubmissionBox() {
         return $this->submission_box;
+    }
+
+    /**
+     * @param  \Schoolbox\User $owner
+     * @return $this
+     */
+    public function setOwner($owner) {
+        $this->owner = $owner;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\User
+     */
+    public function getOwner() {
+        return $this->owner;
     }
 
     /**

@@ -67,6 +67,12 @@ class InstanceMapper extends Mapper {
             'join'       => 'assessment',
         ));
         $this->hasMap(array(
+            'column'     => 'user_id',
+            'property'   => 'owner',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'owner',
+        ));
+        $this->hasMap(array(
             'column'     => 'order',
             'property'   => 'order',
             'type'       => self::TYPE_INTEGER,
@@ -91,6 +97,11 @@ class InstanceMapper extends Mapper {
         $this->hasJoin('course_unit_instance', array(
             'mapper'    => 'Schoolbox\\Assessment\\Course\\UnitInstanceMapper',
             'this_key'  => 'course_unit_instance_id',
+            'other_key' => 'id',
+        ));
+        $this->hasJoin('owner', array(
+            'mapper'    => 'Schoolbox\\UserMapper',
+            'this_key'  => 'user_id',
             'other_key' => 'id',
         ));
         $this->hasJoin('submission_box', array(

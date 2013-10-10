@@ -58,6 +58,7 @@ else {
             // Make the task and set various fields
             $task_instance = new Task\Instance();
             $task_instance
+                ->setOwner($_SESSION['id'])
                 ->setTask(null)
                 ->setUnitInstance($course_instance)
                 ->setTitle($_POST['title'])
