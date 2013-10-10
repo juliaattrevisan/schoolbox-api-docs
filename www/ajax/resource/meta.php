@@ -193,11 +193,10 @@ function getFolderMeta($folderId) {
 		$actions[] = 'homepage';
 	}
 
-
 	$folder = array(
 		'name' => $cat->getName(),
 		'id' => $cat->getId(),
-		'template' =>  $cat->getHomepage()->getTemplate()->getName(),
+		'template' =>  $cat->hasHomepage(),
 		'type' => $type,
 		'joinable' => $joinable,
 		'permissions' => $permissions,
