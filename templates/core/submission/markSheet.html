@@ -25,7 +25,7 @@
     });
 </script>
 <!-- END custom_head -->
-<h1>{CATEGORY}</h1>
+<h1>Marksheet for {CATEGORY}<aside>{CATEGORY_CODE}</aside></h1>
 <div class="header_option">
 
     <form id="time-pick" action="/submission/markSheet/{CID}" method="GET" class="fade">
@@ -56,15 +56,25 @@
 <div class="mark-sheet names">
     <table>
         <thead>
-
         <tr>
-            <th>Name</th>
+            <th class="blank"></th>
         </tr>
+        <!-- BEGIN stat_header_list -->
+        <tr>
+            <th scope="row" class="{STAT_CLASS}">{STAT_NAME}</th>
+        </tr>
+        <!-- END stat_header_list  -->
         </thead>
         <tbody>
         <!-- BEGIN student_list -->
         <tr class="{ON_OFF}">
-            <td><a href="/search/user/{UID}" title="{SURNAME}, {FIRSTNAME}">{SURNAME}, {FIRSTNAME}</a></td>
+            <th class="student" scope="row">
+              <a class="bar button" href="/search/user/{UID}">
+                <img src="/portrait.php?userId={EXTID}&amp;size=square32" alt="{FIRSTNAME} {SURNAME}" />
+                <span class="name">{SURNAME}, {FIRSTNAME}</span>
+                <span class="group">{SUBTITLE}</span>
+              </a>
+            </th>
         </tr>
         <!-- END student_list -->
         </tbody>
@@ -76,33 +86,45 @@
         <thead>
             <tr>
                 <!-- BEGIN sub_headers -->
-                <th id="work-{BOX_ID}" class="column-{BOX_ID}">
+                <th scope="col" id="work-{BOX_ID}" class="column-{BOX_ID}">
                     <div class="height-control">
                         <!-- BEGIN sub_head -->
-                        <a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
+                        <a href="/submission/viewSubmission/{BOX_ID}">{SUB_NAME}</a>
                         <!-- END sub_head -->
                         <!-- BEGIN assess_head -->
-                        <a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
+                        <a href="/assess/results/{BOX_ID}">{SUB_NAME}</a>
                         <!-- END assess_head -->
+                        <span class="submission-type">{SUB_TYPE}</span>
                     </div>
-                </th>
-                <!-- END sub_headers -->
-            </tr>
 
-            <tr>
+                <!-- END sub_headers -->
                 <!-- BEGIN sub_type_head -->
-                <th>
-                    <em>{SUB_TYPE}</em>
-                </th>
+
                 <!-- END sub_type_head -->
-                <!-- BEGIN average_type_head -->
-                <th>
-                    <em>Average</em>
                 </th>
+                <!-- BEGIN average_type_head -->
+                <th scope="col">Average</th>
                 <!-- END average_type_head -->
             </tr>
         </thead>
         <tbody>
+        <!-- BEGIN stat_list -->
+        <tr class="{STAT_CLASS}">
+          <!-- BEGIN stat_item -->
+          <td class="column-{BOX_ID}">
+            <div class="row-fix">
+              <!-- BEGIN stat_input -->
+              <input type="text" maxlength="3" name="weight[{BOX_ID}]" value="{STAT_VALUE}" />
+              <!-- END stat_input -->
+              <!-- BEGIN stat_readonly -->
+              {STAT_VALUE}
+              <!-- END stat_readonly -->
+            </div>
+          </td>
+          <!-- END stat_item -->
+          <td class="blank"></td>
+        </tr>
+        <!-- END stat_list -->
         <!-- BEGIN student_mark_list -->
         <tr class="{ON_OFF}">
             <!-- BEGIN markItem -->
