@@ -539,6 +539,7 @@ elseif (is_numeric($categoryID)) {
                                 $this->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
 
                                 $this->parse('STUDENT_MARKING', 'markTpl');
+                                $this->setVar('STUDENT_MARKING', 'foo');
                             }
 
                             $this->parse('mark_block', 'mark');
