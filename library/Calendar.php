@@ -196,8 +196,10 @@ class Calendar extends DeprecatedModel {
 
         switch ($event['access']) {
 
+			/* Allow people to post events on your behalf, such as parents, staff, superuser
+			 */
             case self::ACCESS_PERSONAL:
-                return $event['owner'] == $_SESSION['id'] ? 2 : 0;
+                return (($event['owner'] == $_SESSION['id']) || ($event['author_id'] == $_SESSION['id'])) ? 2 : 0;
 
             case self::ACCESS_GROUP:
                 $this->groupHandler->setService(HOMEPAGE_SERVICE);

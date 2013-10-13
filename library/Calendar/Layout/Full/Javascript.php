@@ -29,6 +29,11 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Week_Abstract {
 	protected function setupBlocks() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
 		$this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
+
+		$this->getPage()->setVar(array(
+			'USER_CALENDAR_ID' => $this->getUser()->getId(),
+		));
+
         $this->setupSelectedDayMonthYear();
 	}
 
