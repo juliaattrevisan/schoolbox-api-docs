@@ -16,7 +16,7 @@ use Schoolbox\Resource\CategoryMapper;
 
 $page = new SitePage();
 
-$course_instance_id = $_POST['course_unit_instance_id'];
+$course_instance_id = $_POST['unit_id'];
 /** @var UnitInstance $course_instance */
 $course_instance = UnitInstanceMapper::getInstance()->findById($course_instance_id);
 /** @var Component_Instance $component */
@@ -27,47 +27,45 @@ $category_id = $component->getIdentifier();
 // Current user needs write access to the category this task instance is in.
 $group = new Group();
 $permission_denied = false;
-if ($group->getPermission($component->getIdentifier()) < WRITE_ACCESS) {
+if ($group->getPermission($category_id) < WRITE_ACCESS) {
     $permission_denied = true;
 }
 else {
     if ($_POST['action'] === 'delete') {
-        $task = Task\InstanceMapper::getInstance()->findById($_POST['id']);
-        Task\InstanceMapper::getInstance()->delete($task);
+        Task\InstanceMapper::getInstance()->delete(
+            Task\InstanceMapper::getInstance()->findByColumnList(
+                array(
+                    'id'                      => $_POST['id'],
+                    'course_unit_instance_id' => $course_instance_id,
+                )
+            )
+        );
     }
-//    elseif ($_POST['action'] === 'reorder') {
-//        $i = 1;
-//        foreach ($_POST['id'] as $id) {
-//            $task = TaskMapper::getInstance()->findById($id);
-//            $task->setOrder($i++);
-//            TaskMapper::getInstance()->save($task);
+//    else {
+//        $task_instance_id = $_POST['id'];
+//        if ($task_instance_id) {
+//            $task_instance = Task\InstanceMapper::getInstance()->findById($task_instance_id);
+//            $task_instance
+//                ->setTitle($_POST['title'])
+//                ->setLink($_POST['link'])
+//                ->setRequiresConfirmation(!$_POST['self_assess'])
+//            ;
+////            $category_id = $task->getCategory()->getId();
 //        }
+//        else {
+//            // Make the task and set various fields
+//            $task_instance = new Task\Instance();
+//            $task_instance
+//                ->setOwner($_SESSION['id'])
+//                ->setTask(null)
+//                ->setUnitInstance($course_instance)
+//                ->setTitle($_POST['title'])
+//                ->setLink($_POST['link'])
+//                ->setRequiresConfirmation(!$_POST['self_assess'])
+//            ;
+//        }
+//        Task\InstanceMapper::getInstance()->save($task_instance);
 //    }
-    else {
-        $task_instance_id = $_POST['id'];
-        if ($task_instance_id) {
-            $task_instance = Task\InstanceMapper::getInstance()->findById($task_instance_id);
-            $task_instance
-                ->setTitle($_POST['title'])
-                ->setLink($_POST['link'])
-                ->setRequiresConfirmation(!$_POST['self_assess'])
-            ;
-//            $category_id = $task->getCategory()->getId();
-        }
-        else {
-            // Make the task and set various fields
-            $task_instance = new Task\Instance();
-            $task_instance
-                ->setOwner($_SESSION['id'])
-                ->setTask(null)
-                ->setUnitInstance($course_instance)
-                ->setTitle($_POST['title'])
-                ->setLink($_POST['link'])
-                ->setRequiresConfirmation(!$_POST['self_assess'])
-            ;
-        }
-        Task\InstanceMapper::getInstance()->save($task_instance);
-    }
 }
 
 // Redirect: depends on request type.
@@ -93,6 +91,7 @@ if ($page->detectAjax()) {
 
         if ($component instanceof Component_Instance) {
             // Dump out template contents
+            // There ought to be a method which does this.
             $chf = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
 
             /** @var Component_Homepage_CourseInstanceController $controller */
