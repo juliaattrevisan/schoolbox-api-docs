@@ -102,17 +102,16 @@
                        class="btn delete no-text"
                        title="Delete this unit"
                        data-interaction="open_delete_unit_form"
-                       data-interaction-state="collapsed"
                     ><span></span></a>
                     <!-- END unit_delete -->
                 </span>
 
-                <div class="hide" data-interaction="delete_unit_container">
+                <div class="hide clear" data-interaction="delete_unit_container">
                     <p class="notice">Are you sure you wish to delete this unit?</p>
                     <p class="notice">All tasks within the unit will be deleted, as will any linked due work items and online assessments.</p>
                     <form action="/task/saveInstanceForm.php" method="post" class="delete_form" data-form_type="delete_unit">
                         <input type="hidden" name="action"    value="delete" />
-                        <input type="hidden" name="id"        value="{UNIT_ID}" />
+                        <input type="hidden" name="unit_id"   value="{UNIT_ID}" />
                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                         <button type="submit" class="btn delete" data-interaction="delete_confirm"><span></span> Yes</button>
                         <a href="#" class="btn go-to delete-reject" data-interaction="delete_reject"><span></span> No</a>
@@ -148,13 +147,29 @@
 
                         <span class="actions">
                             <!-- BEGIN unit_task_delete -->
-                            <a href="/task/delete/{UNIT_TASK_ID}" class="btn delete no-text" title="Delete this task"><span></span></a>
+                            <a href="#"
+                               class="btn delete no-text"
+                               title="Delete this task"
+                               data-interaction="open_delete_task_form"
+                            ><span></span></a>
                             <!-- END unit_task_delete -->
 
                             <!-- BEGIN unit_task_start -->
                             <a href="/task/start/{UNIT_TASK_ID}" class="btn go-to no-text" title="Start this task"><span></span></a>
                             <!-- END unit_task_start -->
                         </span>
+
+                        <div class="hide clear" data-interaction="delete_task_container">
+                            <p class="notice">Are you sure you wish to delete this task?</p>
+                            <p class="notice">Any linked due work items and online assessments will be deleted, as will all student's completion of this task.</p>
+                            <form action="/task/saveInstanceForm.php" method="post" class="delete_form" data-form_type="delete_task">
+                                <input type="hidden" name="action"    value="delete" />
+                                <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
+                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                <button type="submit" class="btn delete" data-interaction="delete_confirm"><span></span> Yes</button>
+                                <a href="#" class="btn go-to delete-reject" data-interaction="delete_reject"><span></span> No</a>
+                            </form>
+                        </div>
                     </li>
                     <!-- END unit_task -->
                 </ul>

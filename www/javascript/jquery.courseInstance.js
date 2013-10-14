@@ -105,10 +105,46 @@
         // "No, I am not"
         component.delegate(
             'form[data-form_type="delete_unit"] [data-interaction="delete_reject"]',
-            'submit.courseInstance',
+            'click.courseInstance',
             function(event) {
                 event.preventDefault();
                 var container = $(this).closest('[data-interaction="delete_unit_container"]');
+                container.slideToggle('fast');
+            }
+        );
+
+        // Delete task - are you sure?
+        component.delegate(
+            'a[data-interaction="open_delete_task_form"]',
+            'click.courseInstance',
+            function(event) {
+                event.preventDefault();
+                var element      = $(this);
+                var unit_element = element.closest('.unit-task');
+                var container    = unit_element.find('[data-interaction="delete_task_container"]');
+                container.slideToggle('fast');
+            }
+        );
+        // Yes
+        component.delegate(
+            'form[data-form_type="delete_task"]',
+            'submit.courseInstance',
+            function(event) {
+                event.preventDefault();
+                // Submit form via Ajax
+                var form = $(this);
+                $.post(form.attr('action'), form.serialize(), function(data) {
+                    postCallback(form, data);
+                }, 'json');
+            }
+        );
+        // No
+        component.delegate(
+            'form[data-form_type="delete_task"] [data-interaction="delete_reject"]',
+            'click.courseInstance',
+            function(event) {
+                event.preventDefault();
+                var container = $(this).closest('[data-interaction="delete_task_container"]');
                 container.slideToggle('fast');
             }
         );
