@@ -42,6 +42,11 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 		return $result['total'];
 	}
 
+	/**
+	 * Find total category usage
+	 * 
+	 * @return array
+	 */
 	public function findGroupUsage() {
 		$query = "
 			SELECT category.name, SUM(file_size) AS bytes
