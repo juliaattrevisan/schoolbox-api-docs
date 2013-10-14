@@ -13,12 +13,15 @@
             modal: true,
             resizable: false
         });
+
+        // Browser options: now based on component
+        var component_id    = component.attr('id');
         var browser_options = {
-            destination:     '#component{COMPONENT_INSTANCE_ID} input[name="homepage"]',
-            base:            '{COURSE_HOMEPAGE}',
-            start:           '{COURSE_HOMEPAGE}',
+            destination:     '#'+component_id+' input[name="homepage"]',
+            base:            options.course_homepage,
+            start:           options.course_homepage,
             triggerChange:   true,
-            destinationText: '#component{COMPONENT_INSTANCE_ID} span[data-resource_text]'
+            destinationText: '#'+component_id+' span[data-resource_text]'
         }
 
         // Event for displaying the homepage selector.
@@ -41,9 +44,10 @@
             'click.courseInstance',
             function(event) {
                 event.preventDefault();
-                var source = $j('#component{COMPONENT_INSTANCE_ID} input[name="homepage"]').val();
-                source = source.replace(/.*?(\d+$)/, '$1')
-                window.location.href = '/course/import/{ID}/{COMPONENT_INSTANCE_ID}/'+source
+                var source = component.find('input[name="homepage"]').val().replace(/.*?(\d+$)/, '$1')
+                // What's the last char of the href? Add a / if there isn't one.
+                var base_href = $(this).attr('href').replace(/\/*$/, '');
+                window.location.href = base_href+'/'+source
             }
         )
 
