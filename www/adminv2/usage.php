@@ -11,6 +11,6 @@
 namespace Schoolbox\Usage;
 
 $mort = new OverallStorage\Data();
-$mort->getMapper()->updateSubmissions();
+//$mort->getMapper()->updateSubmissions();
 
 exit();

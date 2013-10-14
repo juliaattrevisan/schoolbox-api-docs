@@ -146,6 +146,58 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	}
 
 	/**
+	 * Find total type usage
+	 *
+	 * @return array
+	 */
+	public function findUserUsage() {
+		$query = "
+			SELECT `user`.firstname, `user`.lastname, COALESCE(SUM(bytes), 0) AS bytes
+			FROM `user`
+			INNER JOIN `groups` ON `user`.group_id = `groups`.id
+			LEFT JOIN
+			(
+				(SELECT owner AS userId, SUM(file_size) AS bytes
+				FROM `file`
+				WHERE deleted = 0
+				GROUP BY owner)
+				UNION
+				(SELECT owner AS userId, SUM(file_size) AS bytes
+				FROM `myFile`
+				WHERE deleted = 0
+				GROUP BY owner)
+				UNION
+				(SELECT uploaded_by AS userId, SUM(filesize) AS bytes
+				FROM `storage`
+				GROUP BY uploaded_by)
+				UNION
+				(SELECT owner AS userId, SUM(filesize) AS bytes
+				FROM `student_submission`
+				GROUP BY owner)
+				UNION
+				(SELECT owner AS userId, SUM(filesize) AS bytes
+				FROM `submission_return`
+				GROUP BY owner)
+			) allTotals ON `user`.id = allTotals.userId
+			GROUP BY `user`.id
+			ORDER BY bytes DESC
+/*			ORDER BY `user`.lastname*/
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$result = array();
+
+		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+			$result[] = $row;
+		}
+
+		return $result;
+	}
+
+
+	/**
 	 * Insert filesizes of all submissions
 	 */
 	public function updateSubmissions() {

@@ -39,6 +39,9 @@ class Data {
 
 		echo 'Group Storage:';
 		new \Alaress_Probe($this->getMapper()->findGroupUsage());
+
+		echo 'User Storage:';
+		new \Alaress_Probe($this->getMapper()->findUserUsage());
 	}
 
 	/* Getters/Setters
