@@ -84,6 +84,9 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				UNION
 				(SELECT 'Storage' AS name, SUM(filesize) AS bytes
 				FROM `storage`)
+				UNION
+				(SELECT 'Submissions' AS name, SUM(filesize) AS bytes
+				FROM `student_submission`)
 			) AS allTotals
 		";
 
