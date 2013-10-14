@@ -52,6 +52,13 @@ class ReturnedWork {
 	protected $filename;
 
 	/**
+	 * Size of the file attached to the return
+	 *
+	 * @var null
+	 */
+	protected $filesize = null;
+
+	/**
 	 * @var \Alaress_Date_Format
 	 */
 	protected $submitted;
@@ -99,12 +106,32 @@ class ReturnedWork {
 	}
 
 	/**
+	 * Set filesize
+	 *
+	 * @param $filesize
+	 * @return $this
+	 */
+	public function setFilesize($filesize) {
+		$this->filesize = $filesize;
+		return $this;
+	}
+
+	/**
+	 * Get filesize
+	 *
+	 * @return null
+	 */
+	public function getFilesize() {
+		return $this->filesize;
+	}
+
+	/**
 	 * Gets the size of this file (from where it's stored on the file system),
 	 * or false if it doesn't exist.
 	 *
 	 * @return bool|int
 	 */
-	public function getFilesize() {
+	public function getFilesizeByPath() {
 		if (($location = $this->getFileLocation()) !== false) {
 			if (file_exists($location)) {
 				return filesize($location);

@@ -34,6 +34,9 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				UNION
 				(SELECT SUM(filesize) AS bytes
 				FROM `student_submission`)
+				UNION
+				(SELECT SUM(filesize) AS bytes
+				FROM `submission_return`)
 			) AS allTotals
 		";
 
@@ -85,11 +88,18 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				FROM `file`
 				WHERE deleted = 0)
 				UNION
+				(SELECT 'MyFiles' AS name, SUM(file_size) AS bytes
+				FROM `myFile`
+				WHERE deleted = 0)
+				UNION
 				(SELECT 'Storage' AS name, SUM(filesize) AS bytes
 				FROM `storage`)
 				UNION
 				(SELECT 'Submissions' AS name, SUM(filesize) AS bytes
 				FROM `student_submission`)
+				UNION
+				(SELECT 'Returns' AS name, SUM(filesize) AS bytes
+				FROM `submission_return`)
 			) AS allTotals
 		";
 

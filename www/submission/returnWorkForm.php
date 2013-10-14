@@ -59,6 +59,11 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
                     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES[$uploadIndex]));
                     $mark = $marksheet->normaliseMark($_POST['mark'][$k], $subbox);
                     $uploaded_file = $_FILES[$uploadIndex];
+
+					/* Save filesize in db
+					 */
+					$return['filesize'] = $_FILES[$uploadIndex]['size'];
+
                     saveReturn($return, null, $uploaded_file);
                 }
             }
