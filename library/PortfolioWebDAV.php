@@ -308,21 +308,19 @@ class PortfolioWebDAV
                 $settings['baseUri'] = 'http://mggs-fs01/';
 
                 $paths = array(
-                    '/STAFF/Users/' . $_SESSION['username'] . '/',
+                    '/STAFF/' . $_SESSION['username'] . '/',
                     '/EXCHANGE/',
                 );
 
             } else if ($groupHandler->isStudent()) {
                 $settings['baseUri'] = 'http://mggs-fs02/';
                 $paths = array(
-                    '/STUDENTS/Users/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
+                    '/STUDENTS/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
                 );
             } else {
                 return false;
             }
 
-            print_r($settings);
-            print_r($paths);
 
         }
         else if (in_array($site_location, array('core', 'demo'))) {
@@ -394,6 +392,9 @@ class PortfolioWebDAV
         foreach ($response as $filepath => $info) {
 
             $filename = basename($filepath);
+
+            if(!is_object($info['{DAV:}resourcetype']))
+                continue;
 
             $type = $info['{DAV:}resourcetype']->is('{DAV:}collection') ? 'dir' : 'file';
 
