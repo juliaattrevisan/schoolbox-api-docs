@@ -170,11 +170,11 @@
 
 			<!-- BEGIN action_publish -->
 			<form action='/eportfolio/showcase/modifyForm.php' method='post'>
-				<input type='hidden' name='action' value='publish' />
+				<input type='hidden' name='action' value='{PUBLISH_ACTION}' />
 				<input type='hidden' name='userId' value='{USER_ID}' />
-				<input type='hidden' name='boxId' value='{BOX_ID}' />
+                <input type='hidden' name='{PUBLISH_TYPE}' value='{PUBLISH_ID}' />
 
-				<input type='submit' value='Showcase Work' class="submit-btn-plain" />
+				<input type='submit' value='{PUBLISH_BUTTON}' class="submit-btn-plain" />
 			</form>
 			<!-- END action_publish -->
         </div>
