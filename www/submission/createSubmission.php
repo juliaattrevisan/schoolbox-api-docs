@@ -56,42 +56,29 @@ $rubricHandler = new DueWork_Rubric_Handler();
 $work_types = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
 $mark_types = $mark_mapper->getAll();
 
+$title            = '';
+$submission       = new SubmissionBox();
+$category         = new Category();
+$is_task          = false;
+$unit_id          = null;
+$task_instance_id = null;
+
 // IF PRE-EXISTING
-$title      = '';
-$submission = new SubmissionBox();
-$category   = new Category();
-$is_task    = false;
-$unit_id    = null;
 if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
-    //Modify submission box
-    $title = 'Modify Submission Box';
+    $submission_id = $this->arg[1];
 
-    $submission = $mapper->findById($this->arg[1]);
-    $category   = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
-
-    $task_id = $submission->getTask()->getId();
-//    $task_instance_id = $submission->getTaskInstance()->getId();
-    $is_task = (bool)$task_id;
-
-    //
-    // Authorisation: user has write access to group?
-    if ($groupHandler->getPermission($submission->getCategory()->getId()) < WRITE_ACCESS) {
-        error(19);
-    }
-
-    // Messing around with blocks
-    $this->setVar(array(
-        'duework_timespan_block' => '',
-    ));
-    if (!$task_id) {
-        $this->parse('duework_timespan_block', 'duework_timespan');
-    }
+    $title            = 'Modify Submission Box';
+    $submission       = $mapper->findById($submission_id);
+    $category         = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
+    $task_id          = $submission->getTask()->getId();
+    $is_task          = (bool)$task_id;
+    $task_instance_id = $submission->getTaskInstance()->getId();
 }
-
 // IF NEW
-else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-    $title    = 'Create Submission Box';
-    $category = CategoryMapper::getInstance()->findById($this->arg[1]);
+elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+    $category_id = $this->arg[1];
+    $title       = 'Create Submission Box';
+    $category    = CategoryMapper::getInstance()->findById($category_id);
     $submission
         ->setCategory($category)
         ->setOpenDate(new Alaress_Date_Format(new DateTime('00:00:00')))
@@ -101,27 +88,11 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         ->setMarkType(new SubmissionBox\MarkType())
     ;
 
-    //
-    // Authorisation: user has write access to group.
-    if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS) {
-        error(19);
-    }
-
-    // clear blocks that aren't used in this context
-    $this->setVar(array(
-        'existing_file_block'             => '',
-        'existing_marks_warning_block'    => '',
-        'duework_timespan_block'          => '',
-    ));
-
     // Is this a task?
     $is_task = ($this->arg[2] === 'task');
-//    if (!$is_task) {
-//        $this->parse('duework_timespan_block', 'duework_timespan');
-//    }
+
     // Is this being created for a unit?
-    // If so don't show the timespan as editable - instead, it gets pulled from
-    // the unit.
+    // If so, pre-fill start and end times
     $is_unit = ($this->arg[2] === 'unit');
     $unit_id = $this->arg[3];
     if ($is_unit) {
@@ -142,8 +113,20 @@ else {
     error(2);
 }
 
-$this->setTitle($title);
+// Authorisation: user has write access to group.
+if ($groupHandler->getPermission($category->getId()) < WRITE_ACCESS) {
+    error(19);
+}
 
+// Start outputting the submission and its stupid blocks
+$this->setTitle($title);
+$this->setVar(array(
+    'existing_file_block'             => '',
+    'existing_marks_warning_block'    => '',
+    'duework_timespan_block'          => '',
+    'browse_block'                    => '',
+    'marktype_block'                  => '',
+));
 
 // Set file inputs
 $file_links = $submission->getFileLinks();
@@ -169,9 +152,6 @@ elseif ($submission->getLegacyFileId()) {
     $this->setVar('CURRENT_FILE_URL',  '/send.php?'.http_build_query(array('id' => $submission->getLegacyFileId(), 'save' => 1)));
     $this->parse('existing_file_block','existing_file');
 }
-else {
-    $this->setVar('existing_file_block', '');
-}
 
 // File browser:
 // A new submission box can be created from a file, if it is then don't show the
@@ -189,14 +169,7 @@ if (!$submission->getId() && is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         ;
         $this->setVar('browse_block', '');
     }
-//    else {
-//        $this->parse('browse_block', 'browse_row');
-//    }
-//}
-//else {
-//    $this->parse('browse_block', 'browse_row');
 }
-
 
 // Output submission work_type drop down.
 // Used to be able to be passed from $this->arg[3]
@@ -222,9 +195,7 @@ else {
         'slug' => 'MARKTYPE_SLUG'
     ));
 
-//    $category = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
     // if the rubric creation fails it will throw an exception, in which case just output the empty sets
-
     // Default values for criteria
     $criteria    = array();
     $results     = array();
@@ -261,7 +232,7 @@ if (!$is_task) {
     $this->parse('duework_timespan_block', 'duework_timespan');
 }
 
-// Set date inputs
+// Set date values
 $open_date = $submission->getOpenDate();
 $due_date  = $submission->getDueDate();
 $late_date = $submission->getLateDate();
@@ -318,17 +289,19 @@ $output = array(
     'LATE_MIN'  => $late_min,
     'LATE_PM'   => $late_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
 
-    'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
-    'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
-    'SESSION_NAME'    => session_name(),
-    'SESSION_ID'      => session_id(),
-    'IS_TASK'         => $is_task ? 1 : 0,
-    'UNIT_ID'         => $unit_id,
+    'FILE_MAX_UPLOAD'  => Cfg::get('file_upload_count'),
+    'MAX_FILE_SIZE'    => Cfg::get('max_file_size'),
+    'SESSION_NAME'     => session_name(),
+    'SESSION_ID'       => session_id(),
+    'IS_TASK'          => $is_task ? 1 : 0,
+    'UNIT_ID'          => $unit_id,
+    'TASK_INSTANCE_ID' => $task_instance_id,
 );
 
 foreach (array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
     $notification = $submission->getNotifications()->getOfType(strtolower($i));
-    $is_enabled   =
+    // Notifications: enabled by default
+    $is_enabled =
         !($submission->getId()) ||
         ($notification instanceof SubmissionBox\Notification && $notification->getEnabled());
     $output["NOTIF_{$i}_ENABLED"] = $is_enabled ? ' checked="checked"' : '';
