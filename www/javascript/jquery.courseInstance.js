@@ -97,7 +97,14 @@
                 // Submit form via Ajax
                 var form = $(this);
                 $.post(form.attr('action'), form.serialize(), function(data) {
-                    postCallback(form, data);
+                    //postCallback(form, data);
+                    //container.slideToggle('fast');
+                    var unit = form.closest('.unit');
+                    unit.slideUp(
+                        'fast', function() {
+                            unit.remove();
+                        }
+                    );
                 }, 'json');
             }
         );
