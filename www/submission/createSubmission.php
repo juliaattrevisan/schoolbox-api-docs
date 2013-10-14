@@ -27,6 +27,7 @@ $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
 $this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
+$this->setBlock(TEMPLATE_content, 'duework_timespan_readonly', 'duework_timespan_readonly_block');
 
 $this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
 if(Cfg::get('due_work_notifications_enabled')) {
@@ -44,6 +45,8 @@ $this->setVar('CLASS_CRITERIA', '');
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 $mapper      = new SubmissionBoxMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
@@ -280,9 +283,10 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     // clear blocks that aren't used in this context
     $this->setVar(array(
-        'existing_file_block' => '',
-        'existing_marks_warning_block' => '',
-        'duework_timespan_block' => '',
+        'existing_file_block'             => '',
+        'existing_marks_warning_block'    => '',
+        'duework_timespan_block'          => '',
+        'duework_timespan_readonly_block' => '',
     ));
 
     // Is this a task?
@@ -290,6 +294,25 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     if (!$is_task) {
         $this->parse('duework_timespan_block', 'duework_timespan');
     }
+    // Is this being created for a unit?
+    // If so don't show the timespan as editable - instead, it gets pulled from
+    // the unit.
+    $is_unit = ($this->arg[2] === 'unit');
+    $unit_id = $this->arg[3];
+    if ($is_unit) {
+        $this->setVar('duework_timespan_block', '');
+        $this->parse('duework_timespan_readonly_block', 'duework_timespan_readonly');
+        /** @var UnitInstance $unit */
+        $unit = UnitInstanceMapper::getInstance()->findById($unit_id);
+        $this->setVar(
+            array(
+                'OPEN_UNIT_DATE' => $unit->getOpenDate()->getDateOnly(),
+                'DUE_UNIT_DATE'  => $unit->getDueDate()->getDateOnly(),
+                'LATE_UNIT_DATE' => $unit->getDueDate()->getDateOnly(),
+            )
+        );
+    }
+
 
     if(is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         /* File ID submitted, associate box with file */
@@ -374,6 +397,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'SESSION_NAME'    => session_name(),
         'SESSION_ID'      => session_id(),
         'IS_TASK'         => $is_task ? 1 : 0,
+        'UNIT_ID'         => $unit_id,
     );
 
     // notifications on by default
