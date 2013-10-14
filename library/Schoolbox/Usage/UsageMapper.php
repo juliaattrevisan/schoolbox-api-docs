@@ -55,12 +55,42 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	 */
 	public function findGroupUsage() {
 		$query = "
-			SELECT category.name, SUM(file_size) AS bytes
-			FROM `file`
-			INNER JOIN `user` ON file.owner = `user`.id
-			LEFT JOIN category ON category.`id` = `file`.`category`
-			WHERE deleted = 0
-			GROUP BY category
+			SELECT `groups`.name, COALESCE(SUM(bytes), 0) AS bytes
+			FROM groups
+			LEFT JOIN
+			(
+				(SELECT `groups`.id, `groups`.name, SUM(file_size) AS bytes
+				FROM `file`
+				INNER JOIN `user` ON `user`.id = `file`.owner
+				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				GROUP BY `groups`.id)
+				UNION
+				(SELECT `groups`.id, `groups`.name, SUM(file_size) AS bytes
+				FROM `myFile`
+				INNER JOIN `user` ON `user`.id = `myFile`.owner
+				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				GROUP BY `groups`.id)
+				UNION
+				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
+				FROM `storage`
+				INNER JOIN `user` ON `user`.id = `storage`.uploaded_by
+				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				GROUP BY `groups`.id)
+				UNION
+				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
+				FROM `student_submission`
+				INNER JOIN `user` ON `user`.id = `student_submission`.owner
+				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				GROUP BY `groups`.id)
+				UNION
+				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
+				FROM `submission_return`
+				INNER JOIN `user` ON `user`.id = `submission_return`.owner
+				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				GROUP BY `groups`.id)
+			) allTotals ON `groups`.id = allTotals.id
+			GROUP BY `groups`.name
+			ORDER BY `groups`.id
 		";
 
 		$statement = $this->database->prepare($query);
