@@ -41,31 +41,36 @@ else {
             )
         );
     }
-//    else {
-//        $task_instance_id = $_POST['id'];
-//        if ($task_instance_id) {
-//            $task_instance = Task\InstanceMapper::getInstance()->findById($task_instance_id);
-//            $task_instance
-//                ->setTitle($_POST['title'])
-//                ->setLink($_POST['link'])
-//                ->setRequiresConfirmation(!$_POST['self_assess'])
-//            ;
-////            $category_id = $task->getCategory()->getId();
-//        }
-//        else {
-//            // Make the task and set various fields
-//            $task_instance = new Task\Instance();
-//            $task_instance
-//                ->setOwner($_SESSION['id'])
-//                ->setTask(null)
-//                ->setUnitInstance($course_instance)
-//                ->setTitle($_POST['title'])
-//                ->setLink($_POST['link'])
-//                ->setRequiresConfirmation(!$_POST['self_assess'])
-//            ;
-//        }
-//        Task\InstanceMapper::getInstance()->save($task_instance);
-//    }
+    else {
+        $task_instance_id = $_POST['id'];
+        if ($task_instance_id) {
+            /** @var Task\Instance $task_instance */
+            $task_instance = Task\InstanceMapper::getInstance()->findOneByColumnList(
+                array(
+                    'id'                      => $_POST['id'],
+                    'course_unit_instance_id' => $course_instance_id,
+                )
+            );
+            $task_instance
+                ->setTitle($_POST['title'])
+                ->setLink($_POST['link'])
+                ->setRequiresConfirmation(!$_POST['self_assess'])
+            ;
+        }
+        else {
+            // Make the task and set various fields
+            $task_instance = new Task\Instance();
+            $task_instance
+                ->setOwner($_SESSION['id'])
+                ->setTask(null)
+                ->setUnitInstance($course_instance)
+                ->setTitle($_POST['title'])
+                ->setLink($_POST['link'])
+                ->setRequiresConfirmation(!$_POST['self_assess'])
+            ;
+        }
+        Task\InstanceMapper::getInstance()->save($task_instance);
+    }
 }
 
 // Redirect: depends on request type.
