@@ -31,7 +31,11 @@ class Data {
 	 * non-softdeleted files
 	 */
 	public function findData() {
-		echo 'Total Storage: ' . $this->getMapper()->findTotalUsage();
+		echo 'Total Storage:';
+		new \Alaress_Probe($this->getMapper()->findTotalUsage());
+
+		echo 'Group Storage:';
+		new \Alaress_Probe($this->getMapper()->findGroupUsage());
 	}
 
 	/* Getters/Setters
