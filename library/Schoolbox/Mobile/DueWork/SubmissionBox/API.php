@@ -22,8 +22,9 @@ use ClientDevice;
 use External_Class;
 use Scrub;
 use Authenticator;
+use Schoolbox\Mobile\Generic;
 
-class API {
+class API extends Generic\API {
 
     public function Display($dueWorkID) {
         $response = new Response_HTTP();

@@ -1,0 +1,14 @@
+{% if not title %}
+<ul id="work-list">
+  {% for work in content %}
+  <li>
+    <a href="{{ work.href }}">
+      {{ work.value }}
+      <p>{{ work.date }}</p>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No upcoming work.</p>
+{% endif %}

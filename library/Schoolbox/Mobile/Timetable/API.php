@@ -17,6 +17,7 @@ use ErrorException;
 use External_User;
 use External_Timetable;
 use ClientDevice;
+use Schoolbox\Role;
 use Scrub;
 use Authenticator;
 
@@ -26,26 +27,62 @@ class API {
 
     private $data_cache = array();
 
-    public function Display() {
+    public function Display($userId = 0) {
 
         $response = new Response_HTTP();
 
         try {
             $auth = new Authenticator();
-            $user = $auth->getSessionUser();
+	        $gHandler = new \Group();
+
+	        // set up the viewing and target users
+	        $sessionUser = $auth->getSessionUser();
+	        $targetUser = $userId ? UserMapper::getInstance()->findById($userId) : $sessionUser;
+
+	        // you can view a timetable if ANY of the following conditions are true
+	        //  - it is your own and you are not a parent (they don't have them)
+	        //  - you are a super
+	        //  - you are staff and it is a student's
+	        //  - you are a parent and it is your child's
+
+	        if(!(
+	            ($sessionUser->getId() == $targetUser->getId())
+		        || $sessionUser->isSuperuser()
+		        || ($sessionUser->getRole()->getType() == Role::STAFF && $targetUser->getRole()->getType() == Role::STUDENT)
+		        || $gHandler->isParentOfChild($targetUser->getId())
+	        )) {
+				// deny access
+		        return $this->generateErrorResponse(new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN));
+	        }
+
+	        // parents don't have roles, 404.
+	        if($targetUser->getRole()->getType() == Role::PARENT) {
+		        return $this->generateErrorResponse(new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND));
+	        }
 
             $timetableHandler = new External_Timetable();
 
             $eUser = new External_User();
             $eUser->getCurrentSemester();
 
-            $campus = $user->getDefaultCampus()->getId();
+	        // most likely, default campus will be populated
+	        if($targetUser->getDefaultCampus()) {
+		        $campus = $targetUser->getDefaultCampus()->getId();
+	        }
+	        // if not, attempt to retrieve the first campus from their list of campuses (campi?)
+	        elseif($targetUser->getCampusCollection()->count()) {
+		        $campus = $targetUser->getCampusCollection()->first()->getId();
+	        }
+	        // if user not in any campus, cannot generate timetable: 404.
+	        else {
+				return $this->generateErrorResponse(new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND));
+	        }
 
             $today = $timetableHandler->getDayNumber($campus);
 
             $tableDefinition = $timetableHandler->getTimetableDefinition($campus, $today);
 
-            if(!is_array($tableDefinition) || !count($tableDefinition) || $_SESSION['timetable'] != 1) {
+            if(!is_array($tableDefinition) || !count($tableDefinition)) {
                 $r = array(
                     'title'   => 'Timetable',
                     'aside'   => '',
@@ -85,8 +122,8 @@ class API {
 
             // retrieve from handler -_-
             $table = $timetableHandler->getFullTimetable(
-                $user->getExternalId(),
-                $user->getId(),
+	            $targetUser->getExternalId(),
+	            $targetUser->getId(),
                 $campus
             );
 
@@ -146,6 +183,8 @@ class API {
             }
 			unset($period);
 
+	        $forUser = $sessionUser->getId() == $targetUser->getId() ? '' : " &raquo; " . $targetUser->formatName();
+
             $r = array(
                 'title'   => 'Timetable',
                 'aside'   => '',
@@ -154,7 +193,7 @@ class API {
                 'content' => array_values($table),
             );
 
-            $response->setPage('title','Timetable');
+            $response->setPage('title', "Timetable $forUser");
             $response->setResponse('articles', array($r));
 
             return $response;

@@ -12,6 +12,7 @@ use Schoolbox\Mobile\Generic;
 use Response_HTTP;
 use Authenticator;
 use Cfg;
+use Schoolbox\Role;
 
 class API extends Generic\API {
 
@@ -20,13 +21,18 @@ class API extends Generic\API {
      * @return Response_HTTP
      */
     public function Sidebar() {
+	    $gHandler = new \Group();
+
         $response = new Response_HTTP();
 
         $a = new Authenticator();
         $user = $a->getSessionUser();
 
         $sidebar = new Sidebar($user);
+
+		// common elements between roles
         $sidebar->createAgenda();
+	    $sidebar->createSettings();
 
         /* It is understood that this is an extremely quick and nasty solution. It is not intended to be permanent,
          * and is to be replaced with proper, polymorphic code at the very first opportunity available. [SB-1724] */
@@ -34,10 +40,21 @@ class API extends Generic\API {
             $sidebar->createWebmail();
         }
 
-        $sidebar->createSubjectList();
-        $sidebar->createGroupList();
-        $sidebar->createUpcomingWork();
-        $sidebar->createSettings();
+	    switch($user->getRole()->getType()) {
+		    case Role::PARENT:
+			    // only parents get a children list
+			    $sidebar->createChildrenList();
+			    break;
+		    case Role::STUDENT:
+			    // only students have upcoming work
+			    $sidebar->createUpcomingWork();
+			    // NO BREAK
+		    case Role::STAFF:
+			    // students and staff have subject/group lists
+			    $sidebar->createSubjectList();
+			    $sidebar->createGroupList();
+			    break;
+	    }
 
         $response->setResponse('menu', $sidebar->getAll());
 
