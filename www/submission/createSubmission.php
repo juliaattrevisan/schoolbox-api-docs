@@ -21,7 +21,6 @@ $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
 $this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
-$this->setBlock(TEMPLATE_content, 'duework_timespan_readonly', 'duework_timespan_readonly_block');
 
 $this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
 if(Cfg::get('due_work_notifications_enabled')) {
@@ -113,7 +112,6 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'existing_file_block'             => '',
         'existing_marks_warning_block'    => '',
         'duework_timespan_block'          => '',
-        'duework_timespan_readonly_block' => '',
     ));
 
     // Is this a task?
@@ -127,17 +125,17 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $is_unit = ($this->arg[2] === 'unit');
     $unit_id = $this->arg[3];
     if ($is_unit) {
-        $this->setVar('duework_timespan_block', '');
-        $this->parse('duework_timespan_readonly_block', 'duework_timespan_readonly');
         /** @var UnitInstance $unit */
+        // Adjust due date to end of unit day
         $unit = UnitInstanceMapper::getInstance()->findById($unit_id);
-        $this->setVar(
-            array(
-                'OPEN_UNIT_DATE' => $unit->getOpenDate()->getDateOnly(),
-                'DUE_UNIT_DATE'  => $unit->getDueDate()->getDateOnly(),
-                'LATE_UNIT_DATE' => $unit->getDueDate()->getDateOnly(),
-            )
-        );
+        $due_date = $unit->getDueDate()->getDateTimeObject();
+        $due_date->modify('23:59:59');
+        $due_date_object = new Alaress_Date_Format($due_date);
+        $submission
+            ->setOpenDate($unit->getOpenDate())
+            ->setDueDate($due_date_object)
+            ->setLateDate($due_date_object)
+        ;
     }
 }
 else {
@@ -208,6 +206,9 @@ $this->dropDown('type_drop', $work_types, $work_type, TEMPLATE_content, array(
     'id'   => 'TYPE_VALUE'
 ));
 
+// Output mark visibility
+outputVisibilityDropdown($this, $submission->getMarkVisibility());
+
 // Output marktype drop down
 // (If it's an old style free mark, then output nothing)
 $mark_type = $submission->getMarkType()->getId();
@@ -221,14 +222,7 @@ else {
         'slug' => 'MARKTYPE_SLUG'
     ));
 
-    outputCriteria($this, $category->getId(), array(), array(), 2, true, $is_task);
-    if ($is_task) {
-        outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
-    }
-
-    outputVisibilityDropdown($this, $submission->getMarkVisibility());
-
-    $category = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
+//    $category = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
     // if the rubric creation fails it will throw an exception, in which case just output the empty sets
 
     // Default values for criteria
@@ -248,28 +242,9 @@ else {
             $criteria    = $rubric->getCriteriaIndices();
             $results     = $rubric->getResults();
             $resultCount = $rubric->getResultCount();
-
-//            outputResultSets($this, $resultSetID, $resultCount);
-//            outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
-//            if ($is_task) {
-//                outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true, $is_task);
-//            }
         }
-//        else {
-//            outputResultSets($this);
-//            outputCriteria($this, $submission->getCategory()->getId(), array(), array(), 2, false, $is_task);
-//            if ($is_task) {
-//                outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
-//            }
-//        }
     }
-    catch (Exception $e) {
-//        outputResultSets($this);
-//        outputCriteria($this, $submission->getCategory()->getId(), array(), array(), 2, true, $is_task);
-//        if ($is_task) {
-//            outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
-//        }
-    }
+    catch (Exception $e) {}
     outputResultSets($this, $resultSetID, $resultCount);
     outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
     if ($is_task) {
