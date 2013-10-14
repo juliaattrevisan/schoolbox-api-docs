@@ -11,7 +11,6 @@
 require_once('../../../include/Bootstrap.php');
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\FileMapper;
-use Schoolbox\File\MimetypeMapper;
 
 // kickstart a session
 new SitePage();
@@ -218,10 +217,9 @@ function getFolderMeta($folderId) {
 function getSingleFileMeta($folderId, $fileId) {
 
 	$groupHandler = new Group();
-	$userHandler = new User();
 
 	$fmap = new FileMapper();
-	$file = $fmap->findByColumnList(array('id' => $fileId, 'deleted' => 0))->first();
+	$file = $fmap->findById($fileId);;
 	$owner = UserMapper::getInstance()->findById($file->getOwner()->getId());
 
 	if(!$file) {
@@ -245,13 +243,12 @@ function getSingleFileMeta($folderId, $fileId) {
 			break;
 	}
 
-	$mtypeMap = new MimetypeMapper();
 	$modified = new Alaress_Date_Relative($file->getModified());
 	$file = array(
 		'kind' => 'file',
 		'id' => $file->getId(),
 		'name' => $file->getDescription(),
-		'mime' => $mtypeMap->getByFilename($file->getFilename())->getIconFile(), //TODO: mime type data should be part of resource object
+		'mime' => $file->getMimeType()->getIconFile(), //TODO: mime type data should be part of resource object
 		'filesize' => Alaress_Byte_Format::bytesToString($file->getFilesize()),
 		'hidden' => $file->getHidden() ? 1 : 0,
 		'description' => $file->getComment(),
