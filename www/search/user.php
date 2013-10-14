@@ -52,22 +52,23 @@ if (is_numeric($this->arg[0])) {
 	    $this->setBlock('group_row', 'group_item', 'group_item_block');
 	    $this->setBlock('group_item', 'group_teacher', 'group_teacher_block');
     }
-	else {
-        if ($groupHandler->isParent($user['uid'])) {
-            $this->setFile(TEMPLATE_content, 'user/parent.html');
-            $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
-            $this->setBlock(TEMPLATE_content, 'parent_synergy_form', 'parent_synergy_form_block');
-            $this->setBlock('parent_synergy_form', 'parent_spouse', 'parent_spouse_block');
-        }
-		else {
-            $this->setFile(TEMPLATE_content, 'user/staff.html');
-            $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
-            $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
-            $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
-            $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
-            $this->setBlock(TEMPLATE_content, "staff_synergy", "staff_synergy_block");
-            $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
-        }
+	else if ($groupHandler->isParent($user['uid'])) {
+        $this->setFile(TEMPLATE_content, 'user/parent.html');
+        $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
+        $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
+        $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
+        $this->setBlock(TEMPLATE_content, 'parent_synergy_form', 'parent_synergy_form_block');
+        $this->setBlock('parent_synergy_form', 'parent_spouse', 'parent_spouse_block');
+    } else {
+        $this->setFile(TEMPLATE_content, 'user/staff.html');
+        $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
+        $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
+        $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
+        $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
+        $this->setBlock(TEMPLATE_content, "staff_synergy", "staff_synergy_block");
+        $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
+        $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
+
     }
 
     $blank = array(
@@ -155,6 +156,10 @@ if (is_numeric($this->arg[0])) {
 
     $this->setVar($outputUser);
 
+    if ($_SESSION['su']) {
+        $this->parse('modify_block', 'modify');
+    }
+
     //advanced synergetic information
     if (Cfg::get('external_enable') && $user['synergy_id']) {
 
@@ -166,8 +171,8 @@ if (is_numeric($this->arg[0])) {
             if ($parent['DirectoryIncludeFlag']) {
                 $output = array(
                     'NAME' => Scrub::text($parent['Title'] . ' ' . $parent['Preferred'] . ' ' . $parent['Surname']),
-                    'HOME_PHONE' => !$parent['SilentPhoneFlag'] ? $parent['HomePhone'] : '',
-                    'MOBILE_PHONE' => $parent['MobilePhone'],
+                    'HOME_PHONE' => !$parent['SilentPhoneFlag'] ? '<a href="tel:'.Scrub::text($parent['HomePhone']).'">'.Scrub::text($parent['HomePhone']).'</a>' : '',
+                    'MOBILE_PHONE' => '<a href="tel:'.Scrub::text($parent['MobilePhone']).'">'.Scrub::text($parent['MobilePhone']).'</a>',
                 );
 
                 $this->setVar($output);
@@ -178,7 +183,7 @@ if (is_numeric($this->arg[0])) {
                         'SPOUSE_NAME' => Scrub::text(
                             $parent['SpouseTitle'] . ' ' . $parent['SpousePreferred'] . ' ' . $parent['SpouseSurname']
                         ),
-                        'SPOUSE_MOBILE' => $parent['SpouseMobilePhone'],
+                        'SPOUSE_MOBILE' => '<a href="tel:'.Scrub::text($parent['SpouseMobilePhone']).'">'.Scrub::text($parent['SpouseMobilePhone']).'</a>',
                         'SPOUSE_EMAIL' => '<a href="' . $_SESSION['mailhandle'] . $parent['SpouseEmail'] . '\">' . $parent['SpouseEmail'] . '</a>',
                     );
                     
@@ -496,9 +501,9 @@ if (is_numeric($this->arg[0])) {
 	                                ) . '<br>' . Scrub::text(
 	                                    $studentContact['StudentContactSuburb'] . ', ' . $studentContact['StudentContactState'] . ' ' . $studentContact['StudentContactPostCode']
 	                                ),
-	                                'CONTACT_HOME_PHONE' => Scrub::text($studentContact['StudentContactPhoneActual']),
-	                                'CONTACT_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactMobilePhone']),
-	                                'CONTACT_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactOccupPhone']),
+	                                'CONTACT_HOME_PHONE' => '<a href="tel:'.Scrub::text($studentContact['StudentContactPhoneActual']).'">'.Scrub::text($studentContact['StudentContactPhoneActual']).'</a>',
+	                                'CONTACT_MOBILE_PHONE' => '<a href="tel:'.Scrub::text($studentContact['StudentContactMobilePhone']).'">'.Scrub::text($studentContact['StudentContactMobilePhone']).'</a>',
+	                                'CONTACT_OCCUP_PHONE' => '<a href="tel:'.Scrub::text($studentContact['StudentContactOccupPhone']).'">'.Scrub::text($studentContact['StudentContactOccupPhone']).'</a>',
 	                                'CONTACT_EMAIL' =>  $contactEmail,
 	                                'CONTACT_NAME_EMAIL' => $contactName,
 	                                'SPOUSE_NAME' => Scrub::text(
@@ -506,10 +511,8 @@ if (is_numeric($this->arg[0])) {
 	                                ),
 		                            'SPOUSE_ID' => $spouse['uid'],
 		                            'SPOUSE_ROLE' => Scrub::text($studentContact['StudentContactSpouseRelation']),
-	                                'SPOUSE_MOBILE_PHONE' => Scrub::text(
-	                                    $studentContact['StudentContactSpouseMobilePhone']
-	                                ),
-	                                'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
+	                                'SPOUSE_MOBILE_PHONE' => '<a href="tel:'.Scrub::text($studentContact['StudentContactSpouseMobilePhone']).'">'.Scrub::text($studentContact['StudentContactSpouseMobilePhone']).'</a>',
+	                                'SPOUSE_OCCUP_PHONE' => '<a href="tel:'.Scrub::text($studentContact['StudentContactSpouseOccupPhone']).'">'.Scrub::text($studentContact['StudentContactSpouseOccupPhone']).'</a>',
 	                                'SPOUSE_EMAIL' => $spouseEmail,
 	                            );
 		                        //
@@ -576,8 +579,8 @@ if (is_numeric($this->arg[0])) {
 			            if($synInfo['StudentEmergency'.$index.'Name']) {
 				            $this->setVar(array(
 		                          'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergency'.$index.'Name']),
-		                          'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'Phone']),
-		                          'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']),
+		                          'EMERGENCY_PHONE' => '<a href="tel:'.Scrub::text($synInfo['StudentEmergency'.$index.'Phone']).'">'.Scrub::text($synInfo['StudentEmergency'.$index.'Phone']).'</a>',
+		                          'EMERGENCY_ALT_PHONE' => '<a href="tel:'.Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']).'">'.Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']).'</a>',
 				                          ));
 			                $this->parse('emergency_contact_block', 'emergency_contact', true);
 			            }
@@ -609,10 +612,6 @@ if (is_numeric($this->arg[0])) {
 	                    }
 	                }
 
-	                if ($_SESSION['su']) {
-	                    $this->parse('modify_block', 'modify');
-	                }
-
 	                $this->parse('contact_synergy_block', 'contact_synergy');
 
 	                if (trim($synInfo['StudentForm'])) {
@@ -623,27 +622,25 @@ if (is_numeric($this->arg[0])) {
 	                    $this->setVar('student_synergy_form_block', '');
 	                }
 	            }
-            } else {
-                if ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
+            } else if ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
 
-                    $this->parse("timetable_link_block", "timetable_link");
-                    $this->parse("portrait_block", "portrait");
+                $this->parse("timetable_link_block", "timetable_link");
+                $this->parse("portrait_block", "portrait");
 
-                    $synInfo = $synUserHandler->getStaff($user['synergy_id']);
+                $synInfo = $synUserHandler->getStaff($user['synergy_id']);
 
-                    $this->setVar('EXTENSION', $synInfo['StaffExtension']);
-                    $this->setVar('MOBILE', $synInfo['StaffMobilePhone']);
-                    $this->setVar('DEPARTMENT', $synInfo['StaffDepartment']);
-                    $this->setVar('ROOM', $synInfo['StaffRoom']);
-                    $this->setVar('BUILDING', $synInfo['StaffBuilding']);
-                    $this->setVar('CAMPUS', $synInfo['StaffCampusDescription']);
-                    $this->setVar('CATEGORY', $synInfo['StaffCategoryDescription']);
-                    $this->setVar('VOICEMAIL', $synInfo['StaffVoiceMail']);
+                $this->setVar('EXTENSION', $synInfo['StaffExtension']);
+                $this->setVar('MOBILE', $synInfo['StaffMobilePhone']);
+                $this->setVar('DEPARTMENT', $synInfo['StaffDepartment']);
+                $this->setVar('ROOM', $synInfo['StaffRoom']);
+                $this->setVar('BUILDING', $synInfo['StaffBuilding']);
+                $this->setVar('CAMPUS', $synInfo['StaffCampusDescription']);
+                $this->setVar('CATEGORY', $synInfo['StaffCategoryDescription']);
+                $this->setVar('VOICEMAIL', $synInfo['StaffVoiceMail']);
 
-                    $this->parse('staff_synergy_block', 'staff_synergy');
-                    if ($_SESSION['su']) {
-                        $this->parse('modify_block', 'modify');
-                    }
+                $this->parse('staff_synergy_block', 'staff_synergy');
+                if ($_SESSION['su']) {
+                    $this->parse('modify_block', 'modify');
                 }
             }
         }
