@@ -44,7 +44,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 	/**
 	 * Find total category usage
-	 * 
+	 *
 	 * @return array
 	 */
 	public function findGroupUsage() {
@@ -60,7 +60,39 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 		$statement = $this->database->prepare($query);
 		$statement->execute();
 
+		$result = array();
+
 		while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+			$result[] = $row;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Find total type usage
+	 *
+	 * @return array
+	 */
+	public function findTypeUsage() {
+		$query = "
+			SELECT *
+			FROM (
+				(SELECT 'Resources' AS name, SUM(file_size) AS bytes
+				FROM `file`
+				WHERE deleted = 0)
+				UNION
+				(SELECT 'Storage' AS name, SUM(filesize) AS bytes
+				FROM `storage`)
+			) AS allTotals
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$result = array();
+
+		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 			$result[] = $row;
 		}
 
