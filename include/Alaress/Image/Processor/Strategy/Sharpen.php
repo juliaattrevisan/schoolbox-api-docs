@@ -19,9 +19,9 @@ class Alaress_Image_Processor_Strategy_Sharpen extends Alaress_Image_Processor_S
 	 */
 	public function manipulate($image) {
 		$sharpenMatrix = array (
-			array(-1.2, -1, -1.2),
-			array(-1, 20, -1),
-			array(-1.2, -1, -1.2)
+			array(-0.2, -1, -0.2),
+			array(-1, 15, -1),
+			array(-0.2, -1, -0.2)
 		);
 
 		$divisor = array_sum(array_map('array_sum', $sharpenMatrix));
