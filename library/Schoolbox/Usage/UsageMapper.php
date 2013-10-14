@@ -148,9 +148,13 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	/**
 	 * Find total type usage
 	 *
+	 * @param $orderBy
+	 * @param $order
 	 * @return array
 	 */
-	public function findUserUsage() {
+	public function findUserUsage($orderBy = false, $order = 'DESC') {
+
+
 		$query = "
 			SELECT `user`.firstname, `user`.lastname, COALESCE(SUM(bytes), 0) AS bytes
 			FROM `user`
@@ -180,12 +184,23 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				GROUP BY owner)
 			) allTotals ON `user`.id = allTotals.userId
 			GROUP BY `user`.id
-			ORDER BY bytes DESC
-/*			ORDER BY `user`.lastname*/
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute();
+		if ($orderBy) {
+			$query .= "
+				ORDER BY :orderBy :order
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->execute(array(
+				'orderBy' => $orderBy,
+				'order' => $order
+			));
+		}
+		else {
+			$statement = $this->database->prepare($query);
+			$statement->execute();
+		}
 
 		$result = array();
 
