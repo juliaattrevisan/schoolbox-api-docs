@@ -122,6 +122,7 @@ class Scrub {
                 'e.issuu.com/embed.html',
                 'webplayer.clickview.com.au/home/ev/',
                 'online.clickview.com.au/MyLibrary/PlayEmbed',
+                'www.khanacademy.org/embed_video',
             );
 
             // Add any additional iframe sources as configured
