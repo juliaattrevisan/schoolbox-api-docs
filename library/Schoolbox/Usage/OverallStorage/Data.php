@@ -12,16 +12,17 @@ namespace Schoolbox\Usage\OverallStorage;
 class Data {
 
 	/**
-	 * An instance of dbManager
+	 * An instance of UsageMapper
 	 *
 	 * @var null
 	 */
-	private $fileHandler = null;
+	private $mapper = null;
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
+		$this->setMapper(new \Schoolbox\Usage\UsageMapper());
 		$this->findData();
 	}
 
@@ -29,12 +30,28 @@ class Data {
 	 * Find the total amount of usage by non-deleted and
 	 * non-softdeleted files
 	 */
-	public function findTotalUsage() {
-		$mapper = new \Schoolbox\Usage\UsageMapper();
-		return $mapper->findTotalUsage();
+	public function findData() {
+		echo 'Total Storage: ' . $this->getMapper()->findTotalUsage();
 	}
 
-	public function findData() {
-		echo 'Total Storage: ' . $this->findTotalUsage();
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set mapper
+	 *
+	 * @param null $mapper
+	 */
+	private function setMapper($mapper) {
+		$this->mapper = $mapper;
+	}
+
+	/**
+	 * Get mapper
+	 *
+	 * @return null
+	 */
+	private function getMapper() {
+		return $this->mapper;
 	}
 }
