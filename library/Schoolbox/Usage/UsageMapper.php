@@ -153,8 +153,6 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	 * @return array
 	 */
 	public function findUserUsage($orderBy = false, $order = 'DESC') {
-
-
 		$query = "
 			SELECT `user`.firstname, `user`.lastname, COALESCE(SUM(bytes), 0) AS bytes
 			FROM `user`
@@ -210,7 +208,6 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 		return $result;
 	}
-
 
 	/**
 	 * Insert filesizes of all submissions
