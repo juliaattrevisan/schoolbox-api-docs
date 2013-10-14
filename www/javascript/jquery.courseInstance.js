@@ -74,6 +74,45 @@
             }
         );
 
+        // Delete unit - "are you sure?"
+        // (write the expand/collapse stuff into its own plugin)
+        component.delegate(
+            'a[data-interaction="open_delete_unit_form"]',
+            'click.courseInstance',
+            function(event) {
+                event.preventDefault();
+                var element      = $(this);
+                var unit_element = element.closest('.unit');
+                var container    = unit_element.find('[data-interaction="delete_unit_container"]');
+                container.slideToggle('fast');
+            }
+        );
+
+        // "Yes, I am"
+        component.delegate(
+            'form[data-form_type="delete_unit"]',
+            'submit.courseInstance',
+            function(event) {
+                event.preventDefault();
+                // Submit form via Ajax
+                var form = $(this);
+                $.post(form.attr('action'), form.serialize(), function(data) {
+                    postCallback(form, data);
+                }, 'json');
+            }
+        );
+
+        // "No, I am not"
+        component.delegate(
+            'form[data-form_type="delete_unit"] [data-interaction="delete_reject"]',
+            'submit.courseInstance',
+            function(event) {
+                event.preventDefault();
+                var container = $(this).closest('[data-interaction="delete_unit_container"]');
+                container.slideToggle('fast');
+            }
+        );
+
         // Create new tasks: show inline form if there is one.
         component.delegate(
             '.add_buttons .btn',
