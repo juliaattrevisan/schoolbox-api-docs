@@ -242,11 +242,17 @@ try {
     // update existing
     elseif ($action == 'update') {
         $mapper->save($submission);
+        // Update task or task instance for this box
         if ($is_task) {
-            // Load this submission's task from database
             $task = TaskMapper::getInstance()->findById($submission->getTask()->getId());
             $task->setTitle($_POST['name']);
             TaskMapper::getInstance()->save($task);
+        }
+        if ($submission->getTaskInstance()->getId()) {
+            $task_instance = Task\InstanceMapper::getInstance()->findById($submission->getTaskInstance()->getId());
+            $task_instance->setTitle($_POST['name']);
+            Task\InstanceMapper::getInstance()->save($task_instance);
+
         }
     }
     // something happened that shouldn't have
