@@ -3,8 +3,14 @@
  */
 (function($) {
     $.fn.setupCourseInstance = function(options) {
-
+        var defaults = {
+            course_homepage: '',
+            session_name:    '',
+            session_id:      ''
+        };
+        var settings  = $.extend({}, defaults, options);
         var component = $(this);
+
         var browser   = $('#resource-browser');
         browser.dialog({
             width: 650,
@@ -14,12 +20,20 @@
             resizable: false
         });
 
+        var dialog = component.find('.file_uploader');
+        dialog.ajaxUploadDialog({
+            session: {
+                name: settings.session_name,
+                id:   settings.session_id
+            }
+        });
+
         // Browser options: now based on component
         var component_id    = component.attr('id');
         var browser_options = {
             destination:     '#'+component_id+' input[name="homepage"]',
-            base:            options.course_homepage,
-            start:           options.course_homepage,
+            base:            settings.course_homepage,
+            start:           settings.course_homepage,
             triggerChange:   true,
             destinationText: '#'+component_id+' span[data-resource_text]'
         }
@@ -190,6 +204,22 @@
                     }
                     postCallback(form, data);
                 }, 'json');
+            }
+        );
+
+        // Create/edit task upload file
+        component.delegate(
+            'form a[data-function="upload"]',
+            'click.courseInstance',
+            function(event) {
+                event.preventDefault();
+                // Set the form that this dialog was triggered from.
+                var source_form = $(this).closest('form');
+                dialog.ajaxUploadDialog('open', function(output) {
+                    var result = JSON.parse(output);
+                    var link   = '/storage/fetch.php?hash='+result.hash+'&save=1';
+                    source_form.find(':input[name="link"]').val(link);
+                });
             }
         );
 

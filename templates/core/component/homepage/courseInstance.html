@@ -44,7 +44,11 @@
             }
         </style>
         <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+        <script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
+        <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
         <script type="text/javascript" src="/javascript/jquery.courseInstance.js"></script>
+        <script type="text/javascript" src="/javascript/jquery.ajaxUploadDialog.js"></script>
+
         <script type="text/javascript">
             (function($) {
                 $(function() {
@@ -246,5 +250,14 @@
         <!-- END course_modify -->
         <!-- END course_unit_list -->
 
+    </div>
+
+    <!-- Dialog for file browser -->
+    <div class="file_uploader hide">
+        If you upload a file, its URL will appear in the Link section.
+        <form action="/storage/asyncUpload.php" method="post" enctype="multipart/form-data">
+            <input id="upload" name="upload" type="file" />
+            <input type="submit" value="Upload" class="submit-btn-plain" />
+        </form>
     </div>
 </div>
