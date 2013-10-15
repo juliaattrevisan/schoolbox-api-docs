@@ -1,15 +1,19 @@
 <script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
 <script type='text/javascript' src='/javascript/flot/jquery.flot.stack.js'></script>
 <script type='text/javascript' src='/javascript/usage/total.js'></script>
+<script type='text/javascript' src='/javascript/usage/group.js'></script>
 
 <script type='text/javascript'>
 
 	$j(function() {
 		$j('#global-usage').usageTotal();
+		$j('#group-usage').usageGroup();
 	});
 </script>
 
 <h1>Global Usage</h1>
 <div id='global-usage' style='width:500px;height:400px;'></div>
+
+<div id='group-usage' style='width:500px;height:400px;'></div>
 
 

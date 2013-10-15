@@ -65,11 +65,12 @@ class AjaxFlot {
 		$allData = $this->getMapper()->findGroupUsage();
 		$allResults = array();
 
-		foreach ($allData as $currentData) {
+		for ($i = 0; $i < count($allData); $i++) {
+			$currentData = $allData[$i];
+
 			$result = array();
 			$result['label'] = $currentData['name'];
-			$result['data'] = array(1, $currentData['bytes']);
-			$result['bars'] = array('show' => true, 'fill' => true);
+			$result['data'] = array(array($i+1, $currentData['bytes']+0));
 
 			$allResults[] = $result;
 		}
