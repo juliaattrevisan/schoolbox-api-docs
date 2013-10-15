@@ -102,9 +102,18 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $is_unit = preg_match('/^unit:(\d+)$/', $this->arg[2], $matches);
     if ($is_unit) {
         $unit_id = $matches[1];
+
         /** @var UnitInstance $unit */
-        // Adjust due date to end of unit day
         $unit = UnitInstanceMapper::getInstance()->findById($unit_id);
+        /** @var Component_Instance $component */
+        $component = Component_InstanceMapper::getInstance()->findById($unit->getComponent()->getId());
+        // Check the unit's category == $category_id, if not throw some sort of
+        // error.
+        if ($component->getIdentifier() != $category_id) {
+            error(2);
+        }
+
+        // Adjust due date to end of unit day
         $due_date = $unit->getDueDate()->getDateTimeObject();
         $due_date->modify('23:59:59');
         $due_date_object = new Alaress_Date_Format($due_date);
