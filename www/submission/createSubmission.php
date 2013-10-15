@@ -62,11 +62,13 @@ $category         = new Category();
 $is_task          = false;
 $unit_id          = null;
 $task_instance_id = null;
+$has_file_preset  = false;
 
-// IF PRE-EXISTING
 if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
-    $submission_id = $this->arg[1];
-
+    // IF PRE-EXISTING
+    // Args:
+    // 1: submission box ID
+    $submission_id    = $this->arg[1];
     $title            = 'Modify Submission Box';
     $submission       = $mapper->findById($submission_id);
     $category         = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
@@ -74,8 +76,12 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $is_task          = (bool)$task_id;
     $task_instance_id = $submission->getTaskInstance()->getId();
 }
-// IF NEW
 elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+    // IF NEW
+    // Args:
+    // 1: category ID
+    // 2: "task", "unit:$unit_id" or an integer (in which case it's a file ID)
+    // 3: work type, if provided
     $category_id = $this->arg[1];
     $title       = 'Create Submission Box';
     $category    = CategoryMapper::getInstance()->findById($category_id);
@@ -93,9 +99,9 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     // Is this being created for a unit?
     // If so, pre-fill start and end times
-    $is_unit = ($this->arg[2] === 'unit');
-    $unit_id = $this->arg[3];
+    $is_unit = preg_match('/^unit:(\d+)$/', $this->arg[2], $matches);
     if ($is_unit) {
+        $unit_id = $matches[1];
         /** @var UnitInstance $unit */
         // Adjust due date to end of unit day
         $unit = UnitInstanceMapper::getInstance()->findById($unit_id);
@@ -107,6 +113,26 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
             ->setDueDate($due_date_object)
             ->setLateDate($due_date_object)
         ;
+    }
+
+    // Has a file been attached in $this->arg[2]?
+    if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
+        /* File ID submitted, associate box with file */
+        $has_file_preset = true;
+        $fileHandler = new File();
+        $file = $fileHandler->getByID($this->arg[2]);
+        if (is_array($file)) {
+            $submission
+                ->setLegacyFileId($file['id'])
+                ->setDescription($file['description'])
+                ->setName($file['name'])
+            ;
+        }
+    }
+
+    // Was a work type set?
+    if (!empty($this->arg[3])) {
+        $submission->setWorkType(SubmissionBox\WorkTypeMapper::getInstance()->findById($this->arg[3]));
     }
 }
 else {
@@ -156,23 +182,11 @@ elseif ($submission->getLegacyFileId()) {
 // File browser:
 // A new submission box can be created from a file, if it is then don't show the
 // browser.
-$this->parse('browse_block', 'browse_row');
-if (!$submission->getId() && is_numeric($this->arg[2]) && $this->arg[2] > 0) {
-    /* File ID submitted, associate box with file */
-    $fileHandler = new File();
-    $file = $fileHandler->getByID($this->arg[2]);
-    if (is_array($file)) {
-        $submission
-            ->setLegacyFileId($file['id'])
-            ->setDescription($file['description'])
-            ->setName($file['name'])
-        ;
-        $this->setVar('browse_block', '');
-    }
+if (!$has_file_preset) {
+    $this->parse('browse_block', 'browse_row');
 }
 
 // Output submission work_type drop down.
-// Used to be able to be passed from $this->arg[3]
 $work_type = $submission->getWorkType()->getId();
 $this->dropDown('type_drop', $work_types, $work_type, TEMPLATE_content, array(
     'name' => 'TYPE_TEXT',
