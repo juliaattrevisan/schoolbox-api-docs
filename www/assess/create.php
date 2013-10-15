@@ -13,6 +13,8 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -77,9 +79,39 @@ if (!empty($_POST)) {
     }
 
     SitePage::localRedir('/assess/section/create/' . $assess_id);
-} else {
-    $category_id = $this->arg[0];
-    $is_task     = ($this->arg[1] === 'task');
+}
+else {
+    // Params:
+    // 0: category ID
+    // 1: "task" or "unit:$unit_id"
+    $category_id    = $this->arg[0];
+    $is_task        = ($this->arg[1] === 'task');
+    $unit_id        = null;
+    $is_unit        = preg_match('/^unit:(\d+)$/', $this->arg[1], $matches);
+    $assessDate     = new Alaress_Date_Format(time(), 'U');
+    $assessEndDate  = new Alaress_Date_Format(strtotime('+1 week'), 'U');
+    $startHour      = date('g', time() + 3600);
+    $startMeridiem  = date('a', time() + 3600);
+    $finishHour     = date('g', time() + 2 * 3600);
+    $finishMeridiem = date('a', time() + 2 * 3600);
+    if ($is_unit) {
+        $unit_id = $matches[1];
+        /** @var UnitInstance $unit */
+        try {
+            $unit           = UnitInstanceMapper::getInstance()->findByIdAndCategoryId($unit_id, $category_id);
+            $assessDate     = $unit->getOpenDate();
+            $end            = $unit->getDueDate()->getDateTimeObject();
+            $end->modify('00:00:00 +1 day');
+            $assessEndDate  = new Alaress_Date_Format($end);
+            $startHour      = $assessDate->getUsingFormat('g');
+            $startMeridiem  = $assessDate->getUsingFormat('a');
+            $finishHour     = $assessEndDate->getUsingFormat('g');
+            $finishMeridiem = $assessEndDate->getUsingFormat('a');
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
+            error(126);
+        }
+    }
 
     if (!is_numeric($category_id)) {
         error(117);
@@ -106,28 +138,20 @@ if (!empty($_POST)) {
 
     $this->setVar('assess_timespan_block', '');
 
-    $assessDate = new Alaress_Date_Format(time(), 'U');
-    $assessEndDate = new Alaress_Date_Format(strtotime('+1 week'), 'U');
-
     $this->setVar(array(
-        'ACTION'             => 'create',
-        'ASSESS_IS_TASK'     => $is_task ? 1 : 0,
-        'ASSESS_ASSESS_ID'   => '',
-        'ASSESS_CATEGORY_ID' => $category_id,
-        'ASSESS_TITLE'       => '',
-	    'ASSESS_WEIGHT'      => 100,
-        'ASSESS_DESCRIPTION' => '',
-        'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
-        'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
+        'ACTION'                  => 'create',
+        'ASSESS_IS_TASK'          => $is_task ? 1 : 0,
+        'ASSESS_ASSESS_ID'        => '',
+        'ASSESS_CATEGORY_ID'      => $category_id,
+        'ASSESS_UNIT_ID'          => $unit_id,
+        'ASSESS_TASK_INSTANCE_ID' => null,
+        'ASSESS_TITLE'            => 'Create New',
+        'ASSESS_WEIGHT'           => 100,
+        'ASSESS_DESCRIPTION'      => '',
+        'ASSESS_START_DATE'       => $assessDate->getLocalShort(),
+        'ASSESS_FINISH_DATE'      => $assessEndDate->getLocalShort(),
+
     ));
-
-    /* Select default settings
-     */
-    $startHour = date('g', time() + 3600);
-    $startMeridiem = date('a', time() + 3600);
-
-    $finishHour = date('g', time() + 2 * 3600);
-    $finishMeridiem = date('a', time() + 2 * 3600);
 
     /* Render starting times
      */
