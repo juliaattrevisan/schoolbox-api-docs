@@ -46,7 +46,9 @@ if (!empty($_POST)) {
     ;
 
     // Is this a task? If so, just set the start and finish to now.
-    $is_task = !empty($_POST['is_task']);
+    $is_task       = !empty($_POST['is_task']);
+    $is_unit       = !empty($_POST['unit_id']);
+    $task_instance = new Task\Instance();
     if ($is_task) {
         $task = new Task();
         $task
@@ -64,6 +66,24 @@ if (!empty($_POST)) {
         }
         $assessment->setStart($start)->setFinish($finish);
     }
+
+    if ($is_unit) {
+        /** @var UnitInstance $unit */
+        try {
+            $unit = UnitInstanceMapper::getInstance()->findByIdAndCategoryId($_POST['unit_id'], $_POST['category_id']);
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
+            error(2);
+        }
+        $task_instance
+            ->setTitle($assessment->getTitle())
+            ->setUnitInstance($unit)
+            ->setOwner($_SESSION['id'])
+        ;
+        Task\InstanceMapper::getInstance()->save($task_instance);
+        $assessment->setTaskInstance($task_instance);
+    }
+
     OnlineAssessmentMapper::getInstance()->save($assessment);
 
     // Is there a task for this item? If so, create it and link it back to this
@@ -72,6 +92,11 @@ if (!empty($_POST)) {
         $task = $assessment->getTask();
         $task->setAssessment($assessment);
         TaskMapper::getInstance()->save($task);
+    }
+    if ($is_unit) {
+        $task_instance = $assessment->getTaskInstance();
+        $task_instance->setAssessment($assessment);
+        Task\InstanceMapper::getInstance()->save($task_instance);
     }
 
     if (!($assess_id = $assessment->getId())) {
