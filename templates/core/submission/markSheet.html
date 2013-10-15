@@ -147,262 +147,68 @@
 
 </div>
 
-<!-- This is as it should be, but not as it is -->
-
 <table class="mark-sheet angled">
 	<thead>
 	<tr>
 		<th></th>
+    <!-- BEGIN work_header -->
 		<th scope="col" class="rotate">
 			<div><span>
-					<a href="/submission/viewSubmission/29">Test</a>
-					Assessment Task
+					<a href="{WORK_PATH}/{WORK_ID}">{WORK_TITLE}</a>
+					{WORK_TYPE}
 				</span></div>
-		<th scope="col" class="rotate">
-			<div><span>
-					<a href="/assess/results/11">Test</a>
-					Online Assessment
-				</span></div>
-		<th scope="col" class="rotate">
-			<div><span>
-					<a href="/submission/viewSubmission/22">Extra-Curricular - Gattaca P2</a>
-					Assessment Task
-				</span></div>
-		</th>
-		<th scope="col" class="rotate"><div><span>Average</span></div></th>
+    </th>
+    <!-- END work_header -->
+		<th scope="col" class="rotate"><div><span>Student Average</span></div></th>
 	</tr>
 	</thead>
 	<tbody>
 	<tr>
 		<th scope="row">
 			<a href="#" class="toggle-averages submission-dropdown" title="Show additional metrics">&#x25BC;</a>
-			Class Averages</th>
-		<td class="gradient-7-bg gradient-7">68%</td>
-		<td class="gradient-5-bg gradient-5">C+</td>
-		<td class="gradient-8-bg gradient-8">80/100</td>
-		<td class="gradient-7-bg gradient-7">65%</td>
+			Class Average
+    </th>
+    <!-- BEGIN class_average -->
+		<td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">{WORK_CLASSAVG_CLEAN}</td>
+    <!-- END class_average -->
+    <td></td>
 	</tr>
-	<tr class="sub-table-row">
-		<th scope="row">Weight</th>
-		<td><input type="text" maxlength="3" length="3" name="weight[22]" value="100" /> %</td>
-		<td><input type="text" maxlength="3" length="3" name="weight[22]" value="100" /> %</td>
-		<td><input type="text" maxlength="3" length="3" name="weight[22]" value="100" /> %</td>
+  <!-- BEGIN stat -->
+	<tr class="sub-table-row {WORK_STAT_CLASS}">
+		<th scope="row">{WORK_STAT_TITLE}</th>
+    <!-- BEGIN stat_item -->
+    <td>
+		  <!-- BEGIN stat_editable -->
+      <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}" />
+		  <!-- END stat_editable -->
+      <!-- BEGIN stat_readonly -->
+      {WORK_STAT_VALUE}
+    <!-- END stat_readonly -->
+    </td>
+    <!-- END stat_item -->
 		<td></td>
 	</tr>
-	<tr class="sub-table-row">
-		<th scope="row">Mean</th>
-		<td>33.333</td>
-		<td>54.134</td>
-		<td>75.354</td>
-		<td>54.273</td>
-	</tr>
-	<tr class="sub-table-row rule">
-		<th scope="row">Standard Deviation</th>
-		<td>3.333</td>
-		<td>3.444</td>
-		<td>2.275</td>
-		<td>3.017</td>
-	</tr>
-	<tr class="sub-table-row">
-		<th scope="row">Minimum</th>
-		<td>10</td>
-		<td>23.6</td>
-		<td>20</td>
-		<td>17.866</td>
-	</tr>
-	<tr class="sub-table-row rule">
-		<th scope="row">Maximum</th>
-		<td>100</td>
-		<td>75</td>
-		<td>50</td>
-		<td>75</td>
-	</tr>
-	<tr class="sub-table-row">
-		<th scope="row">Submitted</th>
-		<td>19/21</td>
-		<td>20/21</td>
-		<td>15/21</td>
-		<td>18/21</td>
-	</tr>
-	<tr class="sub-table-row rule">
-		<th scope="row">Returned</th>
-		<td>7/19</td>
-		<td>20/20</td>
-		<td>14/15</td>
-		<td>16.3/21</td>
-	</tr>
-	<tr class="dark">
+  <!-- END stat -->
+  <!-- BEGIN student_row -->
+	<tr class="{DARK}">
 		<th class="avatar" scope="row">
-			<a href="/search/user/239" class="author">
-				<img height="32" width="32" src="/portrait.php?userId=287&amp;size=square32" alt="Byron Agius" />
-				Agius, Byron
+			<a href="/search/user/{STUDENT_ID}" class="author">
+				<img height="32" width="32" src="/portrait.php?userId={STUDENT_EXTID}&amp;size=square32" alt="{STUDENT_NAME}" />
+				{STUDENT_NAME_FORMAL}
 			</a>
 		</th>
-		<td>100%</td>
-		<td class="column-assess-11">
-			<a href="/assess/review/11/10/">B-</a>
+    <!-- BEGIN student_work -->
+		<td class="column-{WORK_TYPE}-{WORK_ID}">
+			<a href="{STUDENT_WORK_PATH}" title="{STUDENT_WORK_COMMENT}">{STUDENT_WORK_MARK}</a>
 		</td>
-		<td>50/100</td>
-		<td class="gradient-7 gradient-7-bg">75%</td>
+    <!-- END student_work -->
+		<td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
+      <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
+    </td>
 	</tr>
-	<tr class="">
-		<th class="avatar" scope="row">
-			<a href="/search/user/230" class="author">
-				<img height="32" width="32" src="/portrait.php?userId=135&amp;size=square32" alt="David Rhodes" />
-				Rhodes, David
-			</a>
-		</th>
-		<td>10%</td>
-		<td class="column-assess-11"><a href="/assess/review/11/10/">E+</a></td>
-		<td>20/100</td>
-		<td class="gradient-2 gradient-2-bg">16%</td>
-	</tr>
-	<tr class="dark">
-		<th class="avatar" scope="row">
-			<a href="/search/user/229" class="author">
-				<img height="32" width="32" src="/portrait.php?userId=133&amp;size=square32" alt="Rachel Rhodes" />
-				Rhodes, Rachel
-			</a>
-		</th>
-		<td>100%</td>
-		<td class="column-assess-11"><a href="/assess/review/11/10/">A+</a></td>
-		<td>100/100</td>
-		<td class="gradient-10 gradient-10-bg">100%</td>
-	</tr>
-		<tr class="">
-		<th class="avatar" scope="row">
-			<a href="/search/user/239" class="author">
-				<img height="32" width="32" src="/portrait.php?userId=287&amp;size=square32" alt="Byron Agius" />
-				Agius, Byron
-			</a>
-		</th>
-		<td>100%</td>
-		<td class="column-assess-11">
-			<a href="/assess/review/11/10/">B-</a>
-		</td>
-		<td>50/100</td>
-		<td class="gradient-7 gradient-7-bg">75%</td>
-	</tr>
-	<tr class="dark">
-		<th class="avatar" scope="row">
-			<a href="/search/user/230" class="author">
-				<img height="32" width="32" src="/portrait.php?userId=135&amp;size=square32" alt="David Rhodes" />
-				Rhodes, David
-			</a>
-		</th>
-		<td>10%</td>
-		<td class="column-assess-11"><a href="/assess/review/11/10/">E+</a></td>
-		<td>20/100</td>
-		<td class="gradient-2 gradient-2-bg">16%</td>
-	</tr>
-	<tr class="">
-		<th class="avatar" scope="row">
-			<a href="/search/user/229" class="author">
-				<img height="32" width="32" src="/portrait.php?userId=133&amp;size=square32" alt="Rachel Rhodes" />
-				Rhodes, Rachel
-			</a>
-		</th>
-		<td>100%</td>
-		<td class="column-assess-11"><a href="/assess/review/11/10/">A+</a></td>
-		<td>100/100</td>
-		<td class="gradient-10 gradient-10-bg">100%</td>
-	</tr>
+  <!-- END student_row -->
 	</tbody>
 </table>
-
-
-<!-- Fuck the following shit -->
-<div class="mark-sheet wrap" style="display:none;">
-<div class="mark-sheet names">
-    <table>
-        <thead>
-        <!-- BEGIN stat_header_list -->
-        <tr>
-            <th scope="row" class="{STAT_CLASS}">{STAT_NAME}</th>
-        </tr>
-        <!-- END stat_header_list  -->
-        </thead>
-        <tbody>
-        <!-- BEGIN student_list -->
-        <tr class="{ON_OFF}">
-            <th class="student" scope="row">
-              <a href="/search/user/{UID}" class="author">
-                <img height="32" width="32" src="/portrait.php?userId={EXTID}&amp;size=square32" alt="{FIRSTNAME} {SURNAME}" />
-                {SURNAME}, {FIRSTNAME}
-              </a>
-            </th>
-        </tr>
-        <!-- END student_list -->
-        </tbody>
-    </table>
-</div>
-
-<div class="mark-sheet assessments">
-    <table>
-        <thead>
-            <tr>
-                <!-- BEGIN sub_headers -->
-                <th scope="col" id="work-{BOX_ID}" class="rotate column-{BOX_ID}">
-					<div><span>
-						<!-- BEGIN sub_head -->
-						<a href="/submission/viewSubmission/{BOX_ID}">{SUB_NAME}</a>
-						<!-- END sub_head -->
-						<!-- BEGIN assess_head -->
-						<a href="/assess/results/{BOX_ID}">{SUB_NAME}</a>
-						<!-- END assess_head -->
-						{SUB_TYPE}
-					</span></div>
-                <!-- END sub_headers -->
-                </th>
-                <!-- BEGIN average_type_head -->
-                <th scope="col">Average</th>
-                <!-- END average_type_head -->
-            </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN stat_list -->
-        <tr class="{STAT_CLASS}">
-          <!-- BEGIN stat_item -->
-          <td class="column-{BOX_ID}">
-              <!-- BEGIN stat_input -->
-				  <input type="text" maxlength="3" length="3" name="weight[{BOX_ID}]" value="{STAT_VALUE}" /> %
-              <!-- END stat_input -->
-              <!-- BEGIN stat_readonly -->
-              {STAT_VALUE}
-              <!-- END stat_readonly -->
-          </td>
-          <!-- END stat_item -->
-          <td></td>
-        </tr>
-        <!-- END stat_list -->
-        <!-- BEGIN student_mark_list -->
-        <tr class="{ON_OFF}">
-            <!-- BEGIN markItem -->
-            <!-- BEGIN mark -->
-            <td class="column-{BOX_ID}">
-				{STUDENT_MARKING}
-            </td>
-            <!-- END mark -->
-
-            <!-- BEGIN onlineAssessmentMark -->
-            <td class="column-assess-{ASSESS_ASSESS_ID}">
-                <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ID}">{MARK}</a>
-            </td>
-            <!-- END onlineAssessmentMark -->
-            <!-- END markItem -->
-            <!-- BEGIN mark_average -->
-            <td class="mark-average">
-      			{STUDENT_AVERAGE_MARK}
-            </td>
-            <!-- END mark_average -->
-        </tr>
-        <!-- END student_mark_list -->
-        </tbody>
-    </table>
-
-</div>
-
-</div>
 
 <!-- BEGIN CUSTOM_JAVASCRIPT -->
 <script>

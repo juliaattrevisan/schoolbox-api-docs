@@ -2,6 +2,7 @@
 
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Marksheet;
 
 if(!isset($this)) {
     require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
@@ -44,6 +45,36 @@ else {
     $year = $currentYear;
     $semester = $currentSemester;
 }
+
+$m = new Marksheet($categoryID, $_SESSION['id'], array(
+	// inject handler dependencies
+	'user' => new User(),
+	'group' => new Group(),
+	'category' => new Category(),
+	'synergy' => new External_Class(),
+
+	'submission' => new Submission(),
+	'return' => new SubmissionReturn(),
+	'marktypeFactory' => new Marksheet_Factory(),
+
+	'assessFactory' => new Assess_Factory(),
+	'assess' => new Assess_Main(),
+	'attempt' => new Assess_Attempt(),
+	'section' => new Assess_Section(),
+	'response' => new Assess_Response(),
+
+), array(
+	// inject mapper dependencies
+	'user' => \Schoolbox\UserMapper::getInstance(),
+	'category' => \Schoolbox\Resource\CategoryMapper::getInstance(),
+	'sb' => SubmissionBoxMapper::getInstance(),
+	'oa' => OnlineAssessmentMapper::getInstance()
+), new \Schoolbox\ConfigLoader());
+
+
+$m->generateData($year, $semester);
+$m->renderSitepage($this);
+return;
 
 //
 // Set year and semester into the template.
@@ -211,33 +242,16 @@ elseif (is_numeric($categoryID)) {
     $this->setTitle('Class Mark Sheet');
     $this->setTab('submission');
 
-    $this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
-    $this->setBlock(TEMPLATE_content, 'assess_head', 'assess_head_block');
-    $this->setBlock(TEMPLATE_content, 'sub_headers', 'sub_headers_block');
-    $this->setBlock(TEMPLATE_content, 'assess_type_head', 'assess_type_head_block');
-    $this->setBlock(TEMPLATE_content, 'average_type_head', 'average_type_head_block');
-    $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
-    $this->setBlock(TEMPLATE_content, 'student_mark_list', 'student_mark_list_block');
-    $this->setBlock('student_mark_list', 'mark_average', 'mark_average_block');
-    $this->setBlock('student_mark_list', 'markItem', 'markItem_block');
-    $this->setBlock('markItem', 'mark', 'mark_block');
-    $this->setBlock('markItem', 'onlineAssessmentMark', 'onlineAssessmentMark_block');
-    $this->setBlock('mark', 'mark_type_percent', 'mark_type_percent_block');
-    $this->setBlock('mark', 'mark_type_letter', 'mark_type_letter_block');
-    $this->setBlock('mark', 'mark_type_raw', 'mark_type_raw_block');
-    $this->setBlock('mark', 'mark_type_free', 'mark_type_free_block');
-
-	$this->setBlock(TEMPLATE_content, 'stat_header_list', 'stat_header_list_block');
-	$this->setBlock(TEMPLATE_content, 'stat_list', 'stat_list_block');
-	$this->setBlock('stat_list', 'stat_item', 'stat_item_block');
-	$this->setBlock('stat_item', 'stat_input', 'stat_input_block');
-	$this->setBlock('stat_item', 'stat_readonly', 'stat_readonly_block');
-
-	$this->setBlock(TEMPLATE_content, 'no_submissions', 'no_submissions_block');
-    $this->setBlock(TEMPLATE_content, 'no_assessments', 'no_assessments_block');
-
     $this->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
     $this->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
+
+	$this->setBlock(TEMPLATE_content, 'work_header', 'work_header_block');
+	$this->setBlock(TEMPLATE_content, 'class_average', 'class_average_block');
+	$this->setBlock(TEMPLATE_content, 'stat', 'stat_block');
+	$this->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
+	$this->setBlock('student_row', 'student_work', 'student_work_block');
+	$this->setBlock('student_row', '', '_block');
+
 
     if (!$groupHandler->isStaff()) {
         error(19);
@@ -294,13 +308,6 @@ elseif (is_numeric($categoryID)) {
 
     $subList = $subHandler->getAllForUserCategory($categoryID, $_SESSION['id'], $year, $semester);
 
-    $this->setVar('sub_head_block', '');
-    $this->setVar('sub_headers_block', '');
-    $this->setVar('assess_head_block', '');
-    $this->setVar('assess_type_head_block', '');
-
-    $this->setVar('no_submissions_block', '');
-    $this->setVar('no_assessments_block', '');
     if (is_array($subList)) {
 	    $statData = array();
 
@@ -351,8 +358,6 @@ elseif (is_numeric($categoryID)) {
 	            $classAvg = Marksheet_Factory::build('raw')->convertRawMark($stats['mean']);
             }
             else {
-                $this->setVar('assess_head_block', '');
-                $this->parse('sub_head_block', 'sub_head');
 
 	            // retrieve SB stat data for this column
 	            $stats = SubmissionBoxMapper::getInstance()->getStatistics($sub['id']);
