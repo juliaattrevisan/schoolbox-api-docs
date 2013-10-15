@@ -170,7 +170,7 @@ else {
         'ASSESS_CATEGORY_ID'      => $category_id,
         'ASSESS_UNIT_ID'          => $unit_id,
         'ASSESS_TASK_INSTANCE_ID' => null,
-        'ASSESS_TITLE'            => 'Create New',
+        'ASSESS_TITLE'            => '',
         'ASSESS_WEIGHT'           => 100,
         'ASSESS_DESCRIPTION'      => '',
         'ASSESS_START_DATE'       => $assessDate->getLocalShort(),
