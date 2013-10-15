@@ -79,21 +79,38 @@ class AjaxFlot {
 	}
 
 	/**
+	 * Calculate percentage
+	 *
+	 * @param $top
+	 * @param $bottom
+	 * @return float|int
+	 */
+	private function percentage($top, $bottom) {
+		if (!$bottom) {
+			return 0;
+		}
+
+		return 100*$top/$bottom;
+	}
+
+	/**
 	 * Delegation method
 	 *
-	 * Find total type usage
+	 * Find total type usage and pie it out, which uses a percentage
 	 *
 	 * @return bool|float|int|string
 	 */
 	public function findTypeUsage() {
+		$totalUsage = $this->getMapper()->findTotalUsage();
+		$totalBytes = $totalUsage['bytes'];
+
 		$allData = $this->getMapper()->findTypeUsage();
 		$allResults = array();
 
 		foreach ($allData as $currentData) {
 			$result = array();
 			$result['label'] = $currentData['name'];
-			$result['data'] = array(1, $currentData['bytes']);
-			$result['bars'] = array('show' => true, 'fill' => true);
+			$result['data'] = $this->percentage($currentData['bytes'], $totalBytes);
 
 			$allResults[] = $result;
 		}
