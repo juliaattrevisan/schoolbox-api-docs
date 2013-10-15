@@ -37,7 +37,7 @@
 @link-hover: 					#007FDB;
 
 // Main banner
-@banner-background: 			#013A63;
+@banner-background: 			#006461;
 @banner-color:      			#B2C5D6;
 @banner-links:      			#FFFFFF;
 @banner-height:     			106px;
@@ -73,3 +73,15 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
+body.login {
+	#header {
+		height: @banner-height;
+		.logo {
+			top: 11px;
+		}
+		margin-bottom: 16px;
+	}
+	#container {
+		border-radius: 7px;
+	}
+}
