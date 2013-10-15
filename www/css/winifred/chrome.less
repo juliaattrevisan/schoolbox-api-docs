@@ -71,6 +71,21 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // =============================================================================
+body.login {
+	#header {
+		background: @body-background;
+		border-bottom: 5px solid @navigation-hover-background;
+		height: @banner-height + 50;
+		.logo {
+			top: 0;
+		}
+	}
+	#container {
+		background-image: none;
+		border-radius: 0 0 10px 10px;
+	}
+}
+
 body {
 	background: @body-background url('/images/winifred/header-background.png') repeat-x 0 0;
 }
@@ -87,7 +102,7 @@ h2 { border-radius: 2px; }
 /*
  * Header
  */
-#header, .login #header{
+#header {
 	background: url('/images/winifred/header-curves.png') no-repeat 0 0;
 }
 
