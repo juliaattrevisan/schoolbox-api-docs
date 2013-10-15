@@ -164,17 +164,16 @@ else {
     $this->setVar('assess_timespan_block', '');
 
     $this->setVar(array(
-        'ACTION'                  => 'create',
-        'ASSESS_IS_TASK'          => $is_task ? 1 : 0,
-        'ASSESS_ASSESS_ID'        => '',
-        'ASSESS_CATEGORY_ID'      => $category_id,
-        'ASSESS_UNIT_ID'          => $unit_id,
-        'ASSESS_TASK_INSTANCE_ID' => null,
-        'ASSESS_TITLE'            => '',
-        'ASSESS_WEIGHT'           => 100,
-        'ASSESS_DESCRIPTION'      => '',
-        'ASSESS_START_DATE'       => $assessDate->getLocalShort(),
-        'ASSESS_FINISH_DATE'      => $assessEndDate->getLocalShort(),
+        'ACTION'             => 'create',
+        'ASSESS_IS_TASK'     => $is_task ? 1 : 0,
+        'ASSESS_ASSESS_ID'   => '',
+        'ASSESS_CATEGORY_ID' => $category_id,
+        'ASSESS_UNIT_ID'     => $unit_id,
+        'ASSESS_TITLE'       => '',
+        'ASSESS_WEIGHT'      => 100,
+        'ASSESS_DESCRIPTION' => '',
+        'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
+        'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
 
     ));
 
