@@ -44,5 +44,5 @@ if ($authenticator->canModify()) {
 		}
 	}
 
-	SitePage::localRedir("/eportfolio/{$ownerId}/showcase");
+    $page->backToTheFuture(1);
 }
