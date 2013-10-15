@@ -474,9 +474,11 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getAllForUserCategory($categoryID, $userID, $year = 0, $semester = 0) {
+    function getAllForUserCategory($categoryID, $userID = 0, $year = 0, $semester = 0) {
         $dateCondA = '';
         $dateCondB = '';
+	    $ownerCondA = '';
+	    $ownerCondB = '';
 
         if ($year) {
             $dateCondA .= " AND DATE_FORMAT(sb.date, '%Y') = $year";
@@ -486,6 +488,10 @@ class Submission extends DeprecatedModel {
             $dateCondA .= " AND DATE_FORMAT(sb.date, '%m') " . DueWork_All::getSemesterLogic($semester);
             $dateCondB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
         }
+	    if ($userID) {
+		    $ownerCondA = "AND sb.owner = '$userID'";
+		    $ownerCondB = "AND assess.user_id = '$userID'";
+	    }
 
         $q[] = "
             SELECT
@@ -505,7 +511,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN file_type ft ON sb.type = ft.id
             LEFT JOIN submission_mark_type smt ON sb.mark_type = smt.mark_type_id
             WHERE sb.category = '$categoryID'
-            AND sb.owner = '$userID'
+			$ownerCondA
             AND sb.deleted = '0'
             AND sb.task_id IS NULL
             $dateCondA
@@ -528,7 +534,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN file_type ON file_type.id = assess.type
             WHERE category_id = '$categoryID'
             AND assess.deleted_at IS NULL
-            AND assess.user_id = '$userID'
+            $ownerCondB
             AND assess.task_id IS NULL
             $dateCondB
         ";
