@@ -110,6 +110,7 @@ if (!empty($_POST)) {
         'ASSESS_CATEGORY_ID'      => $assessment->getCategory()->getId(),
         'ASSESS_TITLE'            => Scrub::text($assessment->getTitle()),
         'ASSESS_DESCRIPTION'      => Scrub::text($assessment->getDescription()),
+	    'ASSESS_WEIGHT'           => $assessment->getWeight(),
         'ASSESS_START_DATE'       => $assessStartDate->getLocalShort(),
         'ASSESS_FINISH_DATE'      => $assessFinishDate->getLocalShort(),
         'ALLOW_RESIT_CHECKED'     => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',

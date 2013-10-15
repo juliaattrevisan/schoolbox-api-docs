@@ -25,6 +25,7 @@ $this->setBlock('marktype', 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
 $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
+$this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
 
 $this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
@@ -144,6 +145,9 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     }
 
     $this->parse('marktype_block', 'marktype');
+
+	// this block exists so that if a config variable needs to be introduced, this can be blanked out
+	$this->parse('mark_weight_block', 'mark_weight');
 
     /* Convert times */
     $open_date = $submission->getOpenDate();

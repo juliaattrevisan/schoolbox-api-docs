@@ -69,11 +69,16 @@ $j(document).ready(function() {
 			title: {
 				required: true,
 				minlength: 2
-			}
+			},
+      weight: {
+        required: true,
+        maxlength: 3
+      }
 		},
 		messages: {
 			title: "Please enter a title",
-			description: "Please enter a description"
+			description: "Please enter a description",
+      weight: "Please add a numeric weight"
 		}
 	});
 });
@@ -184,6 +189,17 @@ $j(document).ready(function() {
 					</select>
 				</td>
 			</tr>
+      <!-- BEGIN mark_weight -->
+      <tr>
+        <td>
+          <h4>Weight</h4>
+          <em>The weighting of this Online Assessment (default is 100).</em>
+          <label>
+            <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
+          </label>
+        </td>
+      </tr>
+      <!-- END mark_weight -->
 		</table>
 		<label class="clearfix">
 			<input type="submit" value="Continue" class="submit-btn-plain no-marg" />
