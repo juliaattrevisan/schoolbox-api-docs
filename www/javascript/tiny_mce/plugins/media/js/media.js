@@ -310,7 +310,7 @@
 						data.height = 350;
 						data.params.frameborder = '0';
 						data.type = 'iframe';
-						src = 'http://www.youtube.com/embed/' + src.match(/youtu.be\/([a-z1-9.-_]+)/)[1];
+						src = '//www.youtube.com/embed/' + src.match(/youtu.be\/([a-z1-9.-_]+)/)[1];
 						setVal('src', src);
 						setVal('media_type', data.type);
 					}
@@ -321,7 +321,7 @@
 						data.height = 350;
 						data.params.frameborder = '0';
 						data.type = 'iframe';
-						src = 'http://www.youtube.com/embed/' + src.match(/v=([^&]+)/)[1];
+						src = '//www.youtube.com/embed/' + src.match(/v=([^&]+)/)[1];
 						setVal('src', src);
 						setVal('media_type', data.type);
 					}
@@ -343,7 +343,7 @@
 					data.height = 350;
 					data.params.frameborder = '0';
 					data.type = 'iframe';
-					src = 'http://player.vimeo.com/video/' + src.match(/vimeo.com\/([0-9]+)/)[1];
+					src = '//player.vimeo.com/video/' + src.match(/vimeo.com\/([0-9]+)/)[1];
 					setVal('src', src);
 					setVal('media_type', data.type);
 				}
