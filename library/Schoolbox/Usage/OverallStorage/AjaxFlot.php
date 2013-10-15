@@ -41,8 +41,14 @@ class AjaxFlot {
 		$available = 80000000 - $currentData['bytes'];
 
 		$result['data'] = array(
-			array(array(1, (int)$currentData['bytes'])),
-			array(array(1, (int)$available))
+			array(
+				'label' => 'Used',
+				'data' => array(array(1, $currentData['bytes'])),
+			),
+			array(
+				'label' => 'Available',
+				'data' => array(array(1, $available))
+			)
 		);
 
 		return json_encode($result);

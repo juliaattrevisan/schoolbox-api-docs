@@ -2,6 +2,7 @@
 <script type='text/javascript' src='/javascript/flot/jquery.flot.stack.js'></script>
 
 <script type='text/javascript'>
+
 	$j(function() {
 		$j.ajax({
 			url: '/adminv2/usage/ajax?type=total',
@@ -20,7 +21,14 @@
 							show: true,
 							barWidth: 0.6
 						}
+					},
+					xaxis: {
+						show: false
+					},
+					yaxis: {
+						show: false
 					}
+
 				});
 			}
 		});
