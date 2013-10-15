@@ -14,11 +14,22 @@
 	});
 </script>
 
+<style type='text/css'>
+	.graph {
+		width:500px;
+		height:400px;
+	}
+
+	.loader {
+		background-image: url('/images/loading-bar.gif');
+		background-repeat: no-repeat;
+		background-position: center center;
+	}
+</style>
+
 <h1>Global Usage</h1>
-<div id='global-usage' style='width:500px;height:400px;'></div>
-
-<div id='group-usage' style='width:500px;height:400px;'></div>
-
-<div id='type-usage' style='width:500px;height:400px;'></div>
+<div id='global-usage' class='graph loader'></div>
+<div id='group-usage' class='graph loader'></div>
+<div id='type-usage' class='graph loader'></div>
 
 

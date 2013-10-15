@@ -37,7 +37,12 @@
 				method: 'GET',
 				dataType: 'json',
 				success: function(datasets) {
-					$j.plot($j(config.element), datasets.data, {
+
+					/* Remove loader
+					 */
+					config.element.removeClass('loader');
+
+					$j.plot(config.element, datasets.data, {
 						series: {
 							stack: true,
 							lines: {
