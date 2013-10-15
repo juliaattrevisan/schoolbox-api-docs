@@ -12,7 +12,13 @@
 		$j('#global-usage').usageTotal();
 		$j('#group-usage').usageGroup();
 		$j('#type-usage').usageType();
-		$j('#user-usage').usageUser();
+
+		$j('#user-usage').usageUser({
+			orderBy: 'lastname',
+			order: 'ASC',
+			start: 0,
+			numPerPage: 5
+		});
 	});
 </script>
 

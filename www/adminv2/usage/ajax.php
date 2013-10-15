@@ -15,7 +15,7 @@ switch($_GET['type']) {
 		echo $usage->findTypeUsage();
 		break;
 	case 'user':
-		echo $usage->findUserUsage('bytes', 'DESC', 0, 8);
+		echo $usage->findUserUsage($_GET['orderBy'], $_GET['order'], $_GET['start'], $_GET['numPerPage']);
 		break;
 	default: break;
 }
