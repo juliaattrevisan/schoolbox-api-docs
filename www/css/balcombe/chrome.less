@@ -70,7 +70,10 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
-
-.login #header {
-	background-position: center (@logo-height + 70 );
+body.login {
+	background: url('/images/balcombe/bg.png') top left repeat-x;
+	#header {
+		background-position: center (@logo-height + 70 );
+	}
+	#footer ul li, #footer ul li a { color: @footer-color; }
 }
