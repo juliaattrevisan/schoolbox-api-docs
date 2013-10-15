@@ -131,6 +131,49 @@ class UnitInstanceMapper extends Mapper {
     }
 
     /**
+     * Retrieves a unit instance by ID and category ID.
+     *
+     * Implemented as a function because it's common to be provided with a unit
+     * instance ID, and a category ID for checking it against.
+     *
+     * @throws Mapper\Exception if no instance of model is found
+     * @throws Mapper\Exception\Deleted if the model was found but has been deleted
+     * @param  int $id
+     * @param  int $category_id
+     * @return UnitInstance
+     */
+    public function findByIdAndCategoryId($id, $category_id) {
+        $query = "
+            SELECT
+                {$this->getColumnString('ui')},
+                {$this->getJoinColumnString('component', 'ci')}
+            FROM `{$this->getTable()}` `ui`
+            LEFT JOIN {$this->getJoinSql('component', 'ui', 'ci')}
+            WHERE `ui`.`id` = :id
+            AND `ci`.`identifier` = :category_id
+            LIMIT 1
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array('id' => $id, 'category_id' => $category_id));
+        $result = $this->hydrateList(
+            $statement, 'ui',
+            function($mapper, $model, $row) {
+                /**
+                 * @var UnitInstanceMapper $mapper
+                 * @var UnitInstance       $model
+                 */
+                $model->setComponent($mapper->getJoinMapper('component')->hydrate($row, 'ci'));
+                return $model;
+            }
+        );
+        foreach ($result as $model) {
+            $this->throwIfDeleted($model);
+            return $model;
+        }
+        throw new Mapper\Exception('Instance of object not found');
+    }
+
+    /**
      * Post-save callback:
      * * if a new item, save a new task instance for each task in this unit.
      * * if not, update existing task instances for this course.

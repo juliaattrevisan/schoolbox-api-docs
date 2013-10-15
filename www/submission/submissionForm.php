@@ -209,10 +209,10 @@ try {
         $task_instance = new Task\Instance();
         if ($is_unit) {
             /** @var UnitInstance $unit */
-            $unit = UnitInstanceMapper::getInstance()->findById($_POST['unit_id']);
-            /** @var Component_Instance $component */
-            $component = Component_InstanceMapper::getInstance()->findById($unit->getComponent()->getId());
-            if ($component->getIdentifier() != $categoryID) {
+            try {
+                $unit = UnitInstanceMapper::getInstance()->findByIdAndCategoryId($_POST['unit_id'], $categoryID);
+            }
+            catch (Schoolbox\Mapper\Exception $e) {
                 error(2);
             }
             $task_instance
@@ -252,7 +252,6 @@ try {
             $task_instance = Task\InstanceMapper::getInstance()->findById($submission->getTaskInstance()->getId());
             $task_instance->setTitle($_POST['name']);
             Task\InstanceMapper::getInstance()->save($task_instance);
-
         }
     }
     // something happened that shouldn't have

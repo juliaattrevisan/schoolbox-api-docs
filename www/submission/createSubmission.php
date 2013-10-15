@@ -108,12 +108,10 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         $unit_id = $matches[1];
 
         /** @var UnitInstance $unit */
-        $unit = UnitInstanceMapper::getInstance()->findById($unit_id);
-        /** @var Component_Instance $component */
-        $component = Component_InstanceMapper::getInstance()->findById($unit->getComponent()->getId());
-        // Check the unit's category == $category_id, if not throw some sort of
-        // error.
-        if ($component->getIdentifier() != $category_id) {
+        try {
+            $unit = UnitInstanceMapper::getInstance()->findByIdAndCategoryId($unit_id, $category_id);
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
             error(2);
         }
 
