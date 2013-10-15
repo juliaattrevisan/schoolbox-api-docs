@@ -333,6 +333,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     $this->parse('marktype_block','marktype');
 
+	// this block exists so that if a config variable needs to be introduced, this can be blanked out
+	$this->parse('mark_weight_block', 'mark_weight', false);
 
     /* Convert times */
     $open_date = strtotime('now');
