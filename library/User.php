@@ -818,8 +818,9 @@ class User extends DeprecatedModel {
 	/**
 	 * Format a name from a user object
 	 *
-	 * @param  $userInfo
-	 * @param null $format
+	 * @param  array $userInfo
+	 * @param string $format
+     * @param bool $useNonBreakingSpace
 	 * @return mixed|null|string
 	 */
 	public function formatName($userInfo, $format = null, $useNonBreakingSpace = false) {

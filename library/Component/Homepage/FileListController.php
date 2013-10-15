@@ -43,6 +43,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->groupHandler = new Group();
         $this->catHandler = new Category();
         $this->fileHandler = new File();
+        $this->userHandler = new User();
         $this->allowedFileHandler = new AllowedFile();
 
         // remove any non-numeric values from the source config
@@ -128,7 +129,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 $output = array('FILE_DESCRIPTION'	=> Scrub::text($file['description']),
                     'FILE_ID'			=> $file['id'],
                     'FILE_MIME_IMAGE'	=> $this->allowedFileHandler->getClass($file['iconFile']),
-                    'FILE_POSTED_BY'	=> $this->user->formatName($file),
+                    'FILE_POSTED_BY'	=> $this->userHandler->formatName($file),
                     'FILE_POSTED_BY_ID'	=> $file['owner'],
                     'FILE_POSTED_DATE'	=> $date->getShort(),
                     'FILE_POSTED_RELATIVE'	=> $posted_relative->getRelativeTime(),
