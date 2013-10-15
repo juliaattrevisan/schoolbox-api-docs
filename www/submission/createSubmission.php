@@ -92,6 +92,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         ->setLateDate(new Alaress_Date_Format(new DateTime('+1 day 23:59:59')))
         ->setWorkType(new SubmissionBox\WorkType())
         ->setMarkType(new SubmissionBox\MarkType())
+        ->setMarkVisibility(Config::get('submission_access'))
     ;
 
     // Is this a task?
