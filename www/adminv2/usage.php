@@ -8,9 +8,9 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Usage;
+if (!$_SESSION['user']->isSuperuser()) {
+	error(19);
+}
 
-$mort = new OverallStorage\Data();
-//$mort->getMapper()->updateSubmissions();
 
-exit();
+$this->setFile(TEMPLATE_content, 'adminv2/usage.html');

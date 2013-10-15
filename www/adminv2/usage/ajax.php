@@ -2,7 +2,7 @@
 
 namespace Schoolbox\Usage;
 
-$usage = new OverallStorage\Data();
+$usage = new OverallStorage\AjaxFlot();
 
 switch($_GET['type']) {
 	case 'total':
