@@ -12,5 +12,10 @@ if (!$_SESSION['user']->isSuperuser()) {
 	error(19);
 }
 
+$mapper = new \Schoolbox\Usage\UsageMapper();
 
 $this->setFile(TEMPLATE_content, 'adminv2/usage.html');
+
+$this->setVar(array(
+	'USAGE_NUM_USERS' => $mapper->numUsers()
+));

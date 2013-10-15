@@ -14,6 +14,25 @@ namespace Schoolbox\Usage;
 class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 	/**
+	 * The total number of users
+	 *
+	 * @return mixed
+	 */
+	public function numUsers() {
+		$query = "
+			SELECT COUNT(`user`.id) AS num
+			FROM `user`
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$result = $statement->fetch(\PDO::FETCH_ASSOC);
+
+		return $result['num'];
+	}
+
+	/**
 	 * Find total usage
 	 */
 	public function findTotalUsage() {
