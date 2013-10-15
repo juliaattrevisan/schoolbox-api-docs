@@ -75,7 +75,7 @@
 // 4. Any overrides for styles can be specified below
 // =============================================================================
 
-#header, .login #header{
+#header {
   background: #3b0f5f url(/images/nhs/header-bg.png) top left no-repeat;
   min-height: 107px;
 }
@@ -107,4 +107,8 @@
 
 .submit-btn-plain{
   background: @banner-background;
+}
+
+body.login #header {
+	background: none;
 }
