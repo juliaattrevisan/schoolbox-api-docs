@@ -33,6 +33,8 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 $mapper = new SubmissionBoxMapper();
 
@@ -190,6 +192,7 @@ try {
         $submission->setCategory($categoryID);
         $submission->setOwner($_SESSION['id']);
 
+        // If a task, save the task entry first and then attach to submission.
         if ($is_task) {
             $task = new Task();
             $task
@@ -200,13 +203,40 @@ try {
             $submission->setTask($task);
         }
 
-        $mapper->save($submission);
+        // If a unit was passed, create a task instance within that unit for
+        // this submission box.
+        $is_unit       = !$is_task && !empty($_POST['unit_id']);
+        $task_instance = new Task\Instance();
+        if ($is_unit) {
+            /** @var UnitInstance $unit */
+            $unit = UnitInstanceMapper::getInstance()->findById($_POST['unit_id']);
+            /** @var Component_Instance $component */
+            $component = Component_InstanceMapper::getInstance()->findById($unit->getComponent()->getId());
+            if ($component->getIdentifier() != $categoryID) {
+                error(2);
+            }
+            $task_instance
+                ->setTitle($submission->getName())
+                ->setUnitInstance($unit)
+                ->setOwner($_SESSION['id'])
+            ;
+            Task\InstanceMapper::getInstance()->save($task_instance);
+            $submission->setTaskInstance($task_instance);
+        }
 
+        $mapper->save($submission);
         $submissionBoxID = $submission->getId();
+
+        // Save the task or task instance for this box.
         if ($is_task) {
             $task = $submission->getTask();
             $task->setSubmissionBox($submission);
             TaskMapper::getInstance()->save($task);
+        }
+        if ($is_unit) {
+            $task_instance = $submission->getTaskInstance();
+            $task_instance->setSubmissionBox($submission);
+            Task\InstanceMapper::getInstance()->save($task_instance);
         }
     }
     // update existing
