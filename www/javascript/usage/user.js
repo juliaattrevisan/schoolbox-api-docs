@@ -32,6 +32,32 @@
 		}
 
 		/**
+		 * Apply sortorder controls
+		 */
+		function applySortorder() {
+			$j.each(config.element.find('a.control'), function(index, element) {
+				$j(element).click(function() {
+
+					/* Toggle ordering upon click
+					 */
+					if (config.order == 'ASC') {
+						var order = 'DESC';
+					}
+					else {
+						var order = 'ASC';
+					}
+
+					config.element.usageUser({
+						orderBy: $j(this).attr('rel'),
+						order: order,
+						index: 0,
+						numPerPage: config.numPerPage
+					});
+				});
+			});
+		}
+
+		/**
 		 * Plot graph
 		 */
 		function plot() {
@@ -66,28 +92,7 @@
 
 					config.element.html(html.replace('{CONTENTS}', datasets));
 
-					/* Apply sortorder controls
-					 */
-					$j.each(config.element.find('a.control'), function(index, element) {
-						$j(element).click(function() {
-
-							/* Toggle ordering upon click
-							 */
-							if (config.order == 'ASC') {
-								var order = 'DESC';
-							}
-							else {
-								var order = 'ASC';
-							}
-
-							config.element.usageUser({
-								orderBy: $j(this).attr('rel'),
-								order: order,
-								index: 0,
-								numPerPage: config.numPerPage
-							});
-						});
-					});
+					applySortorder();
 				}
 			});
 		}
