@@ -16,7 +16,7 @@
 			orderBy: 'lastname',
 			order: 'ASC',
 			index: 0,
-			numPerPage: 5,
+			numPerPage: 10,
 			numUsers: {USAGE_NUM_USERS}
 		});
 	});
@@ -34,11 +34,16 @@
 		background-position: center center;
 	}
 
+	ul.paginator {
+		margin-top: 16px;
+	}
+
 	ul.paginator li {
 		display: block;
 		float: left;
 		margin-right: 8px;
 		margin-bottom: 16px;
+		cursor: pointer;
 	}
 </style>
 
