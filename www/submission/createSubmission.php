@@ -57,6 +57,7 @@ $work_types = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASS
 $mark_types = $mark_mapper->getAll();
 
 $title            = '';
+$heading          = '';
 $submission       = new SubmissionBox();
 $category         = new Category();
 $is_task          = false;
@@ -70,6 +71,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     // 1: submission box ID
     $submission_id    = $this->arg[1];
     $title            = 'Modify Submission Box';
+    $heading          = 'Modify';
     $submission       = $mapper->findById($submission_id);
     $category         = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
     $task_id          = $submission->getTask()->getId();
@@ -84,6 +86,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     // 3: work type, if provided
     $category_id = $this->arg[1];
     $title       = 'Create Submission Box';
+    $heading     = 'Create';
     $category    = CategoryMapper::getInstance()->findById($category_id);
     $submission
         ->setCategory($category)
@@ -288,7 +291,7 @@ else {
 }
 
 $output = array(
-    'HEADING'           => 'Modify',
+    'HEADING'           => $heading,
     'CATEGORY'          => $submission->getCategory()->getId(),
     'ID'                => $submission->getId(),
     'NAME'              => $submission->getName(),
