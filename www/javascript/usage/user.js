@@ -57,6 +57,21 @@
 			});
 		}
 
+		function applyPaginator() {
+			$j.each(config.element.find('li a'), function(index, element) {
+				$j(element).click(function() {
+					event.preventDefault();
+
+					config.element.usageUser({
+						orderBy: config.orderBy,
+						order: config.order,
+						index: $j(this).attr('rel'),
+						numPerPage: config.numPerPage
+					});
+				});
+			});
+		}
+
 		/**
 		 * Plot graph
 		 */
@@ -93,6 +108,7 @@
 					config.element.html(html.replace('{CONTENTS}', datasets));
 
 					applySortorder();
+					applyPaginator();
 				}
 			});
 		}
