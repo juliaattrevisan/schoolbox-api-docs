@@ -23,25 +23,50 @@ class Data {
 	 */
 	public function __construct() {
 		$this->setMapper(new \Schoolbox\Usage\UsageMapper());
-		$this->findData();
 	}
 
 	/**
-	 * Find the total amount of usage by non-deleted and
-	 * non-softdeleted files
+	 * Delegation method
+	 *
+	 * Find total usage
+	 *
+	 * @return bool|float|int|string
 	 */
-	public function findData() {
-		echo 'Type Storage:';
-		new \Alaress_Probe($this->getMapper()->findTypeUsage());
+	public function findTotalUsage() {
+		return json_encode($this->getMapper()->findTotalUsage());
+	}
 
-		echo 'Total Storage:';
-		new \Alaress_Probe($this->getMapper()->findTotalUsage());
+	/**
+	 * Delegation method
+	 *
+	 * Find total group usage
+	 *
+	 * @return bool|float|int|string
+	 */
+	public function findGroupUsage() {
+		return json_encode($this->getMapper()->findGroupUsage());
+	}
 
-		echo 'Group Storage:';
-		new \Alaress_Probe($this->getMapper()->findGroupUsage());
+	/**
+	 * Delegation method
+	 *
+	 * Find total type usage
+	 *
+	 * @return bool|float|int|string
+	 */
+	public function findTypeUsage() {
+		return json_encode($this->getMapper()->findTypeUsage());
+	}
 
-		echo 'User Storage:';
-		new \Alaress_Probe($this->getMapper()->findUserUsage());
+	/**
+	 * Delegation method
+	 *
+	 * Find total user usage
+	 *
+	 * @return bool|float|int|string
+	 */
+	public function findUserUsage() {
+		return json_encode($this->getMapper()->findUserUsage());
 	}
 
 	/* Getters/Setters

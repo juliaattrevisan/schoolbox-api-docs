@@ -18,7 +18,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	 */
 	public function findTotalUsage() {
 		$query = "
-			SELECT SUM(bytes) as total
+			SELECT 'Total' AS name, SUM(bytes) AS bytes
 			FROM
 				(
 				(SELECT SUM(file_size) AS bytes
@@ -45,7 +45,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 		$result = $statement->fetch(\PDO::FETCH_ASSOC);
 
-		return $result['total'];
+		return $result;
 	}
 
 	/**
