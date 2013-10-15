@@ -7,7 +7,6 @@
 <script type='text/javascript' src='/javascript/usage/user.js'></script>
 
 <script type='text/javascript'>
-
 	$j(function() {
 		$j('#global-usage').usageTotal();
 		$j('#group-usage').usageGroup();
@@ -17,7 +16,8 @@
 			orderBy: 'lastname',
 			order: 'ASC',
 			index: 0,
-			numPerPage: 5
+			numPerPage: 5,
+			numUsers: 244
 		});
 	});
 </script>
@@ -32,6 +32,13 @@
 		background-image: url('/images/loading-bar.gif');
 		background-repeat: no-repeat;
 		background-position: center center;
+	}
+
+	ul.paginator li {
+		display: block;
+		float: left;
+		margin-right: 8px;
+		margin-bottom: 16px;
 	}
 </style>
 

@@ -51,12 +51,16 @@
 						orderBy: $j(this).attr('rel'),
 						order: order,
 						index: 0,
-						numPerPage: config.numPerPage
+						numPerPage: config.numPerPage,
+						numUsers: config.numUsers
 					});
 				});
 			});
 		}
 
+		/**
+		 * Paginate things
+		 */
 		function applyPaginator() {
 			$j.each(config.element.find('li a'), function(index, element) {
 				$j(element).click(function() {
@@ -66,7 +70,8 @@
 						orderBy: config.orderBy,
 						order: config.order,
 						index: $j(this).attr('rel'),
-						numPerPage: config.numPerPage
+						numPerPage: config.numPerPage,
+						numUsers: config.numUsers
 					});
 				});
 			});
@@ -98,14 +103,23 @@
 							{CONTENTS}\
 							</tbody>\
 						</table>\
-						<ul>\
-							<li><a rel="1">1</a></li>\
-							<li><a rel="2">2</a></li>\
-							<li><a rel="3">3</a></li>\
+						<ul class="paginator">\
+							{PAGINATION}\
 						</ul>\
+						<div class="clearfix"></div>\
 					';
 
-					config.element.html(html.replace('{CONTENTS}', datasets));
+					var pagination = '';
+
+					for(var i = 0; i < Math.ceil(config.numUsers/config.numPerPage); i++) {
+						pagination += '<li><a rel="' + i +'">' + (i+1) + '</a></li>';
+					}
+
+					/* Table and paginator
+					 */
+					var inject = html.replace('{CONTENTS}', datasets).replace('{PAGINATION}', pagination);
+
+					config.element.html(inject);
 
 					applySortorder();
 					applyPaginator();
