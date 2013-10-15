@@ -103,6 +103,16 @@ Scenario: Create an expired news item
   Then  I should see "This is an expired event"
   And   I should see "This article is for the archive only."
 
+Scenario: Create an news item with failed validation
+  When  I go to "/logout.php"
+  Then  I go to homepage
+  And   log in as "alaress" with password "alaress"
+  When  I go to "/news/modify"
+  And   I press "Add News"
+  Then  I should see "This field is required."
+  And   I should see "Please tick at least one group"
+  And   I should see "Please tick at least one campus"
+
 Scenario: Check news items are in correct categories
   When  I go to "/logout.php"
   Then  I go to homepage
