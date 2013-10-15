@@ -193,20 +193,21 @@
             }
         );
 
+        /**
+         * Callback that gets called when the list of tasks changes - it reloads
+         * the contents of the component.
+         *
+         * @param form The form that was submitted
+         * @param data Object returned by JSON call. The "html" key contains
+         *             the contents of this component.
+         */
         var postCallback = function(form, data) {
             var container = form.closest('.form_container');
             container.slideUp('fast', function() {
-//                var new_tasks = $(data.html).find('.information-list');
-                component.find('.information-list').replaceWith($(data.html).find('.information-list'));
-//                reloadTaskList(data)
+                component.find('.box > .information-list').replaceWith(
+                    $(data.html).find('.box > .information-list')
+                );
             });
-        }
-
-        // Reloads the task list, setting up drag/drop again too.
-        var reloadTaskList = function(data) {
-            var new_tasks = $(data.html).find('.information-list');
-            component.find('.information-list').replaceWith(new_tasks);
-//            initTaskList();
         }
     }
 })(jQuery);
