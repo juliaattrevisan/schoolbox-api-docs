@@ -128,8 +128,8 @@ class External_User implements External_UserInterface {
 	 *
 	 * @return Integer
 	 */
-	function getCurrentSemester () {
-		return $this->getDatabase()->getCurrentSemester();
+	function getCurrentSemester ($externalUserId) {
+		return $this->getDatabase()->getCurrentSemester($externalUserId);
 	}
 
 	/**

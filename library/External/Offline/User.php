@@ -39,7 +39,7 @@ class External_Offline_User implements External_UserInterface {
 		// TODO: Implement getStudentContactList() method.
 	}
 
-	public function getCurrentSemester() {
+	public function getCurrentSemester($externalUserId) {
 		// TODO: Implement getCurrentSemester() method.
 	}
 

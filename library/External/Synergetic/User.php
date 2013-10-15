@@ -445,7 +445,22 @@ class External_Synergetic_User implements External_UserInterface {
 		return $this->getDatabase()->getAll($query);
 	}
 
-	function getCurrentSemester() {
+	function getCurrentSemester($externalUserId) {
+
+        $result = $this->getDatabase()->executeProcedure('spsConfigUserDefaultYearSemester',
+                array(
+                    array('@ID',$externalUserId,SQLINT1,false,false, -1),
+                    )
+        );
+
+        if ($result['success'] && isset($result['result'][0]['UserFileSemester']) && isset($result['result'][0]['UserFileYear']) ) {
+            $_SESSION['FileSemester'] = $result['result'][0]['UserFileSemester'];
+            $_SESSION['FileYear'] = $result['result'][0]['UserFileYear'];
+
+            return true;
+        }
+
+
 		#Get current FileSemester and FileYear
 		$query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1";
 
@@ -696,7 +711,7 @@ class External_Synergetic_User implements External_UserInterface {
 	/**
 	 * Get database
 	 *
-	 * @return mixed
+	 * @return MSSQL
 	 */
 	private function getDatabase() {
 		return $this->database;
