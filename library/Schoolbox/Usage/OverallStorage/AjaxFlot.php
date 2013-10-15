@@ -126,19 +126,24 @@ class AjaxFlot {
 	 * @return bool|float|int|string
 	 */
 	public function findUserUsage() {
-		$allData = $this->getMapper()->findUserUsage();
-		$allResults = array();
+		$allData = $this->getMapper()->findUserUsage('bytes', 'DESC', 0, 8);
+
+		$page = new \SitePage();
+		$page->setFile('user_list', '/adminv2/usage/user.html');
+		$page->setBlock('user_list', 'user', 'user_block');
 
 		foreach ($allData as $currentData) {
-			$result = array();
-			$result['label'] = $currentData['firstname'] . ' ' . $currentData['lastname'];
-			$result['data'] = array(1, $currentData['bytes']);
-			$result['bars'] = array('show' => true, 'fill' => true);
+			$page->setVar(array(
+				'USER_FIRSTNAME' => $currentData['firstname'],
+				'USER_LASTNAME' => $currentData['lastname'],
+				'USER_GROUP' => $currentData['name'],
+				'USER_BYTES' => $currentData['bytes']
+			));
 
-			$allResults[] = $result;
+			$page->parse('user_block', 'user', true);
 		}
 
-		return json_encode($allResults);
+		echo $page->template->_varVals['user_block'];
 	}
 
 	/* Getters/Setters

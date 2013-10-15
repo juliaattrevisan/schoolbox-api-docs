@@ -4,6 +4,7 @@
 <script type='text/javascript' src='/javascript/usage/total.js'></script>
 <script type='text/javascript' src='/javascript/usage/group.js'></script>
 <script type='text/javascript' src='/javascript/usage/type.js'></script>
+<script type='text/javascript' src='/javascript/usage/user.js'></script>
 
 <script type='text/javascript'>
 
@@ -11,6 +12,7 @@
 		$j('#global-usage').usageTotal();
 		$j('#group-usage').usageGroup();
 		$j('#type-usage').usageType();
+		$j('#user-usage').usageUser();
 	});
 </script>
 
@@ -28,8 +30,11 @@
 </style>
 
 <h1>Global Usage</h1>
+<div id='user-usage' class='loader'></div>
+
 <div id='global-usage' class='graph loader'></div>
 <div id='group-usage' class='graph loader'></div>
 <div id='type-usage' class='graph loader'></div>
+
 
 

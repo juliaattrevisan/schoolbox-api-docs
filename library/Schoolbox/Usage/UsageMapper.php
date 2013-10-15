@@ -146,15 +146,21 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	}
 
 	/**
-	 * Find total type usage
+	 * Find total user usage
 	 *
-	 * @param $orderBy
-	 * @param $order
+	 * @param string $orderBy
+	 * @param string $order
+	 * @param int $index
+	 * @param $usersPerPage
 	 * @return array
 	 */
-	public function findUserUsage($orderBy = false, $order = 'DESC') {
+	public function findUserUsage($orderBy, $order, $index, $usersPerPage) {
 		$query = "
-			SELECT `user`.firstname, `user`.lastname, COALESCE(SUM(bytes), 0) AS bytes
+			SELECT
+				`user`.firstname, `user`.lastname,
+				CONCAT(`user`.firstname, ' ', `user`.lastname) AS fullname,
+				`groups`.name,
+				COALESCE(SUM(bytes), 0) AS bytes
 			FROM `user`
 			INNER JOIN `groups` ON `user`.group_id = `groups`.id
 			LEFT JOIN
@@ -184,21 +190,34 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 			GROUP BY `user`.id
 		";
 
-		if ($orderBy) {
-			$query .= "
-				ORDER BY :orderBy :order
-			";
+		/* Select order by
+		 */
+		if (!in_array($orderBy, array('firstname', 'lastname', 'name', 'bytes'))) {
+			$orderBy = 'lastname';
+		}
 
-			$statement = $this->database->prepare($query);
-			$statement->execute(array(
-				'orderBy' => $orderBy,
-				'order' => $order
-			));
+		if (!in_array($order, array('DESC', 'ASC'))) {
+			$order = 'ASC';
 		}
-		else {
-			$statement = $this->database->prepare($query);
-			$statement->execute();
-		}
+
+		/* Cast Away
+		 */
+		$index = (int)$index;
+		$usersPerPage = (int)$usersPerPage;
+
+		/* Pagination
+		 */
+		$start = $index * $usersPerPage;
+
+		$query .= "
+			ORDER BY $orderBy $order
+			LIMIT $start, $usersPerPage
+		";
+
+		/* Spit it out
+		 */
+		$statement = $this->database->prepare($query);
+		$statement->execute();
 
 		$result = array();
 
