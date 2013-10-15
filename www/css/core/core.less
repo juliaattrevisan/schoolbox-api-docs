@@ -8301,11 +8301,19 @@ p.unmarkedResponses {
 
 input[type="text"],
 input[type="password"],
+input[type="email"],
+input[type="tel"],
 input[type="number"],
 input[type="date"],
 select,
 textarea {
     border: solid 1px @std-grey;
+}
+input,select,textarea {
+	&:focus {
+		border-color: @link;
+		box-shadow: 0 0 3px @link;
+	}
 }
 
 #ui-datepicker-div {
