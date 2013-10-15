@@ -1,37 +1,11 @@
 <script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
 <script type='text/javascript' src='/javascript/flot/jquery.flot.stack.js'></script>
+<script type='text/javascript' src='/javascript/usage/total.js'></script>
 
 <script type='text/javascript'>
 
 	$j(function() {
-		$j.ajax({
-			url: '/adminv2/usage/ajax?type=total',
-			method: 'GET',
-			dataType: 'json',
-			success: function(datasets) {
-				$j.plot($j('#global-usage'), datasets.data, {
-					series: {
-						stack: true,
-						lines: {
-							show: false,
-							fill: true,
-							steps: false
-						},
-						bars: {
-							show: true,
-							barWidth: 0.6
-						}
-					},
-					xaxis: {
-						show: false
-					},
-					yaxis: {
-						show: false
-					}
-
-				});
-			}
-		});
+		$j('#global-usage').usageTotal();
 	});
 </script>
 
