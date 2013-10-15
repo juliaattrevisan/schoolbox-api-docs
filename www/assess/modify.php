@@ -73,7 +73,7 @@ if (!empty($_POST)) {
     OnlineAssessmentMapper::getInstance()->save($assessment);
     if ($assessment->getTaskInstance()->getId()) {
         $task_instance = Task\InstanceMapper::getInstance()->findById($assessment->getTaskInstance()->getId());
-        $task_instance->setTitle($_POST['name']);
+        $task_instance->setTitle($_POST['title']);
         Task\InstanceMapper::getInstance()->save($task_instance);
     }
     SitePage::localRedir('/assess/summary/' . $this->arg[0]);
