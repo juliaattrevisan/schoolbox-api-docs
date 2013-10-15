@@ -56,7 +56,6 @@
 						yaxis: {
 							show: false
 						}
-
 					});
 				}
 			});
