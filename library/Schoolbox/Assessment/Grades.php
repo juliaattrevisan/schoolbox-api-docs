@@ -120,9 +120,6 @@ class Grades {
 			$weightSum += $a->getWeight();
 		}
 
-		var_dump($weightSum);
-
-
 		$grades = array();
 
 		foreach ($marks as $type => $student) {
@@ -149,9 +146,6 @@ class Grades {
 					$gradeList[] = $markArray['mark'] * $rwi;
 
 				}
-
-				$minusOne = $gradeList;
-				array_pop($minusOne);
 
 				$grades[$userId] = array(
 					'grades' => $gradeList,
