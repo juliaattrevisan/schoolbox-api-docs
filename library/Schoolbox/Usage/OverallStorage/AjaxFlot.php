@@ -123,10 +123,13 @@ class AjaxFlot {
 	 *
 	 * Find total user usage
 	 *
-	 * @return bool|float|int|string
+	 * @param $orderBy
+	 * @param $order
+	 * @param $index
+	 * @param $numPerPage
 	 */
-	public function findUserUsage() {
-		$allData = $this->getMapper()->findUserUsage('bytes', 'DESC', 0, 8);
+	public function findUserUsage($orderBy, $order, $index, $numPerPage) {
+		$allData = $this->getMapper()->findUserUsage($orderBy, $order, $index, $numPerPage);
 
 		$page = new \SitePage();
 		$page->setFile('user_list', '/adminv2/usage/user.html');

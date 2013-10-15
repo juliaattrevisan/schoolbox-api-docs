@@ -15,7 +15,7 @@ switch($_GET['type']) {
 		echo $usage->findTypeUsage();
 		break;
 	case 'user':
-		echo $usage->findUserUsage();
+		echo $usage->findUserUsage('bytes', 'DESC', 0, 8);
 		break;
 	default: break;
 }
