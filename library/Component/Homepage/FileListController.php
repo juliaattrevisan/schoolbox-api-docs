@@ -30,6 +30,11 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $allowedFileHandler;
 
     /**
+     * @var User
+     */
+    private $userHandler;
+
+    /**
      * @var array
      */
     private $source;
