@@ -59,11 +59,11 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
             /* Get status to set action */
             $student_submission = $subStudHandler->getStatus($_REQUEST['uid'], $submission_id);
 
-            if ($student_submission['accept_submission']) {
-                $action = 'View Details';
-            }
-            elseif ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
-                $action = 'Submit Work';
+            if($submission->getAcceptOnline() &&
+               $submission->getOpenDate()->getDateTimeObject() < $current_time &&
+               $submission->getLateDate()->getDateTimeObject() > $current_time &&
+               $student_submission['status'] < 2) {
+                $action = 'Submit';
             }
             else {
                 $action = 'View Details';
