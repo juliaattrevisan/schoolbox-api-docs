@@ -130,39 +130,130 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	 * @return array
 	 */
 	public function findTypeUsage() {
+		$cmd = 'du -sb ';
+
+		/* "categories" of usage
+		 */
+		$collection = new \Schoolbox\Collection();
+		$collection->add(new Item('Cache'));
+		$collection->add(new Item('Dropbox'));
+		$collection->add(new Item('My Files'));
+		$collection->add(new Item('Resources'));
+		$collection->add(new Item('Returns'));
+		$collection->add(new Item('Storage'));
+		$collection->add(new Item('Submissions'));
+		$collection->add(new Item('Videos'));
+		$collection->add(new Item('Other'));
+
+		/* Map keys to locks
+		 */
+		$mapping = array(
+			'dropbox_dir' => 'Dropbox',
+			'file_dir' => 'Resources',
+			'logs_dir' => 'Cache',
+			'minify_dir' => 'Cache',
+			'myfiles_cache_dir' => 'Cache',
+			'myfile_dir' => 'My Files',
+			'portrait_dir' => 'Cache',
+			'returns_dir' => 'Returns',
+			'storage_dir' => 'Storage',
+			'stream_dir' => 'Cache',
+			'submission_dir' => 'Submissions',
+			'thumbnail_dir' => 'Cache',
+			'video_dir' => 'Videos',
+			'weather_dir' => 'Cache',
+			'xml_dir' => 'Cache',
+			'zip_dir' => 'Cache',
+		);
+
+		/* Quizzle it
+		 */
 		$query = "
-			SELECT *
-			FROM (
-				(SELECT 'Resources' AS name, SUM(file_size) AS bytes
-				FROM `file`
-				WHERE deleted = 0)
-				UNION
-				(SELECT 'MyFiles' AS name, SUM(file_size) AS bytes
-				FROM `myFile`
-				WHERE deleted = 0)
-				UNION
-				(SELECT 'Storage' AS name, SUM(filesize) AS bytes
-				FROM `storage`)
-				UNION
-				(SELECT 'Submissions' AS name, SUM(filesize) AS bytes
-				FROM `student_submission`)
-				UNION
-				(SELECT 'Returns' AS name, SUM(filesize) AS bytes
-				FROM `submission_return`)
-			) AS allTotals
+			SELECT `name`,`value`
+			FROM `config`
+			WHERE `name` LIKE '%dir'
+			AND `name` != 'template_dir'
+			ORDER BY `name`
 		";
 
 		$statement = $this->database->prepare($query);
 		$statement->execute();
 
-		$result = array();
-
+		/* Iterate
+		 */
 		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-			$result[] = $row;
+
+			/* Gather results for directories which exist
+			 */
+			if (is_dir($row['value'])) {
+				$path = escapeshellarg($row['value']);
+
+				$output = shell_exec($cmd . $path);
+
+				$bits = explode(' ', $output);
+
+				/* Get to that Item object and byte it
+				 *
+				 * If there's a directory that isn't mapped, throw it into Other
+				 *
+				 * That is a good way to see that something is occupying space that we don't
+				 * necessarily know about...like another _dir folder in config table
+				 */
+				if (array_key_exists($row['name'], $mapping)) {
+					$key = $mapping[$row['name']];
+				}
+				else {
+					$key = 'Other';
+				}
+
+				$collection->getBy('name', $key)->add($bits[0]);
+			}
 		}
 
-		return $result;
+		return $collection;
 	}
+
+//	/**
+//	 * Find total type usage
+//	 *
+//	 * This is deprecated in favour of Samuel's du
+//	 *
+//	 * @return array
+//	 */
+//	public function findTypeUsageOld() {
+//		$query = "
+//			SELECT *
+//			FROM (
+//				(SELECT 'Resources' AS name, SUM(file_size) AS bytes
+//				FROM `file`
+//				WHERE deleted = 0)
+//				UNION
+//				(SELECT 'MyFiles' AS name, SUM(file_size) AS bytes
+//				FROM `myFile`
+//				WHERE deleted = 0)
+//				UNION
+//				(SELECT 'Storage' AS name, SUM(filesize) AS bytes
+//				FROM `storage`)
+//				UNION
+//				(SELECT 'Submissions' AS name, SUM(filesize) AS bytes
+//				FROM `student_submission`)
+//				UNION
+//				(SELECT 'Returns' AS name, SUM(filesize) AS bytes
+//				FROM `submission_return`)
+//			) AS allTotals
+//		";
+//
+//		$statement = $this->database->prepare($query);
+//		$statement->execute();
+//
+//		$result = array();
+//
+//		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+//			$result[] = $row;
+//		}
+//
+//		return $result;
+//	}
 
 	/**
 	 * Find total user usage
