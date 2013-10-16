@@ -123,31 +123,6 @@ class AjaxFlot {
 		return json_encode($allResults);
 	}
 
-//	/**
-//	 * Delegation method
-//	 *
-//	 * Find total type usage and pie it out, which uses a percentage
-//	 *
-//	 * @return bool|float|int|string
-//	 */
-//	public function findTypeUsageOld() {
-//		$totalUsage = $this->getMapper()->findTotalUsage();
-//		$totalBytes = $totalUsage['bytes'];
-//
-//		$allData = $this->getMapper()->findTypeUsage();
-//		$allResults = array();
-//
-//		foreach ($allData as $currentData) {
-//			$result = array();
-//			$result['label'] = $currentData['name'];
-//			$result['data'] = $this->percentage($currentData['bytes'], $totalBytes);
-//
-//			$allResults[] = $result;
-//		}
-//
-//		return json_encode($allResults);
-//	}
-
 	/**
 	 * Delegation method
 	 *
