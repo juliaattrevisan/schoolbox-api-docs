@@ -47,6 +47,8 @@ Requires:	mysql-server
 Requires:	wget
 Requires:	cifs-utils
 Requires:	aspell-en
+Requires:	redis
+Requires:	php-redis
 
 # TODO: Fix missing build dependencies (npm)
 BuildArch:	noarch
