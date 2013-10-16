@@ -241,93 +241,105 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 }
 
                 foreach ($unit->getTasks() as $task) {
-
-                    // Students only:
-                    // Output whether this item is complete.
-                    $unit_task_class  = '';
-                    $unit_task_status = '';
-                    if ($this->is_student) {
-                        $unit_task_class = 'incomplete';
-                        $completion_item = $grouped_list[$task->getId()][$_SESSION['id']];
-                        if ($completion_item instanceof Task\InstanceCompletion) {
-                            switch ($completion_item->getCompletionStatus()) {
-                                case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
-                                    $unit_task_class  = 'complete';
-                                    $unit_task_status = 'Complete';
-                                    break;
-                                case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                                    $unit_task_class  = 'pending';
-                                    $unit_task_status = 'Pending';
-                                    break;
-                                case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-                    $this->setVar('UNIT_TASK_COMPLETE_CLASS', $unit_task_class);
-
-                    $complete_count = count($grouped_list[$task->getId()]);
-                    $gradient       = round($complete_count / $student_count * 10);
-                    $this->setVar(
-                        array(
-                            'UNIT_TASK_ID'                => Scrub::text($task->getId()),
-                            'UNIT_TASK_NAME'              => Scrub::text($task->getTitle()),
-                            'UNIT_TASK_LINK'              => Scrub::text($task->getLink()),
-                            'UNIT_TASK_CLASS'             => Scrub::text($task->getIconClass()),
-                            'UNIT_TASK_TYPE_LABEL'        => Scrub::text($task->getLabel()),
-                            'UNIT_TASK_SELF_ASSESS'       => ($task->getRequiresConfirmation() ? '' : 'checked'),
-                            'UNIT_TASK_COMPLETION_COUNT'  => $complete_count,
-                            'UNIT_TASK_GRADIENT'          => $gradient,
-                            'UNIT_TASK_COMPLETION_STATUS' => $unit_task_status,
-                            'UNIT_TASK_COMPLETE_CLASS'    => $unit_task_class,
-                            'unit_task_link_block'        => '',
-                            'unit_task_no_link_block'     => '',
-                            'unit_task_count_block'       => '',
-                            'unit_task_completion_block'  => '',
-                            'unit_task_start_block'       => '',
-                            'unit_task_delete_block'      => '',
-                            'unit_task_modify_block'      => '',
-                            'unit_task_delete_form_block' => '',
-                            'unit_task_modify_form_block' => '',
-                        )
-                    );
-
-                    // Is there a link for this item?
-                    if (strlen($task->getLink()) > 0) {
-                        $this->parse('unit_task_link_block', 'unit_task_link');
-                    }
-                    else {
-                        $this->parse('unit_task_no_link_block', 'unit_task_no_link');
-                    }
-
-                    // Teacher sees the number of students that have completed
-                    // this task, nobody else does.
-                    if ($this->is_student) {
-                        if ($unit_task_status) {
-                            $this->parse('unit_task_completion_block', 'unit_task_completion');
-                        }
-                        if ($unit->isOpen()) {
-                            $this->parse('unit_task_start_block', 'unit_task_start');
-                        }
-                    }
-                    else {
-                        $this->parse('unit_task_count_block', 'unit_task_count');
-                        $this->parse('unit_task_delete_block', 'unit_task_delete');
-                        $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
-                        $this->parse('unit_task_modify_block', 'unit_task_modify');
-                        // Only show modify form if this is a simple task.
-                        // (No assessment or due work)
-                        if ($task->getType() == Task::TYPE_TASK) {
-                            $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
-                        }
-                    }
-                    $this->parse('unit_task_block', 'unit_task', true);
+                    $task->setUnitInstance($unit);
+                    $this->renderTaskInTaskList($task, $unit, $grouped_list[$task->getId()]);
                 }
             }
             $this->parse('unit_block', 'unit', true);
         }
 
+    }
+
+    /**
+     * Displays this task in the list of tasks for a unit.
+     *
+     * @param Task\Instance             $task            The task that is being rendered
+     * @param UnitInstance              $unit            The unit that the task is rendered into
+     * @param Task\InstanceCompletion[] $completion_list The list of completions, keyed by student
+     */
+    public function renderTaskInTaskList(Task\Instance $task, UnitInstance $unit, $completion_list) {
+
+        // Students only:
+        // Output whether this item is complete.
+        $unit_task_class  = '';
+        $unit_task_status = '';
+        if ($this->is_student) {
+            $unit_task_class = 'incomplete';
+            $completion_item = $completion_list[$_SESSION['id']];
+            if ($completion_item instanceof Task\InstanceCompletion) {
+                switch ($completion_item->getCompletionStatus()) {
+                    case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
+                        $unit_task_class  = 'complete';
+                        $unit_task_status = 'Complete';
+                        break;
+                    case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
+                        $unit_task_class  = 'pending';
+                        $unit_task_status = 'Pending';
+                        break;
+                    case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
+                    default:
+                        break;
+                }
+            }
+        }
+        $this->setVar('UNIT_TASK_COMPLETE_CLASS', $unit_task_class);
+
+        $complete_count = count($completion_list);
+        $gradient       = round($complete_count / count($this->student_list) * 10);
+        $this->setVar(
+            array(
+                'UNIT_TASK_ID'                => Scrub::text($task->getId()),
+                'UNIT_TASK_NAME'              => Scrub::text($task->getTitle()),
+                'UNIT_TASK_LINK'              => Scrub::text($task->getLink()),
+                'UNIT_TASK_CLASS'             => Scrub::text($task->getIconClass()),
+                'UNIT_TASK_TYPE_LABEL'        => Scrub::text($task->getLabel()),
+                'UNIT_TASK_SELF_ASSESS'       => ($task->getRequiresConfirmation() ? '' : 'checked'),
+                'UNIT_TASK_COMPLETION_COUNT'  => $complete_count,
+                'UNIT_TASK_GRADIENT'          => $gradient,
+                'UNIT_TASK_COMPLETION_STATUS' => $unit_task_status,
+                'UNIT_TASK_COMPLETE_CLASS'    => $unit_task_class,
+                'unit_task_link_block'        => '',
+                'unit_task_no_link_block'     => '',
+                'unit_task_count_block'       => '',
+                'unit_task_completion_block'  => '',
+                'unit_task_start_block'       => '',
+                'unit_task_delete_block'      => '',
+                'unit_task_modify_block'      => '',
+                'unit_task_delete_form_block' => '',
+                'unit_task_modify_form_block' => '',
+            )
+        );
+
+        // Is there a link for this item?
+        if (strlen($task->getLink()) > 0) {
+            $this->parse('unit_task_link_block', 'unit_task_link');
+        }
+        else {
+            $this->parse('unit_task_no_link_block', 'unit_task_no_link');
+        }
+
+        // Teacher sees the number of students that have completed
+        // this task, nobody else does.
+        if ($this->is_student) {
+            if ($unit_task_status) {
+                $this->parse('unit_task_completion_block', 'unit_task_completion');
+            }
+            if ($unit->isOpen()) {
+                $this->parse('unit_task_start_block', 'unit_task_start');
+            }
+        }
+        else {
+            $this->parse('unit_task_count_block', 'unit_task_count');
+            $this->parse('unit_task_delete_block', 'unit_task_delete');
+            $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
+            $this->parse('unit_task_modify_block', 'unit_task_modify');
+            // Only show modify form if this is a simple task.
+            // (No assessment or due work)
+            if ($task->getType() == Task::TYPE_TASK) {
+                $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
+            }
+        }
+        $this->parse('unit_task_block', 'unit_task', true);
     }
 
 }
