@@ -127,202 +127,207 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // This means that the units and tasks that were imported are displayed.
         // If it isn't, then a selector is displayed (if user has write access)
         if ($this->getConfig('courseHomepage')) {
-            // iterate the list of homepages
-            $this->setVar('course_modify_block', '');
-            if (!$this->is_student) {
-                $this->parse('course_modify_block', 'course_modify');
-            }
-            $this->parse('course_unit_list_block', 'course_unit_list');
-
-            // unit list will be a collection of Unit models
-            $this->setVar('unit_block', '');
-            $now = new DateTime('now');
-            $i = 0;
-
-            $student_count = count($this->student_list);
-            foreach ($this->unit_list as $unit) {
-                $is_open = $unit->isOpen();
-                $this->setVar(
-                    array(
-                        'UNIT_ID'                  => Scrub::text($unit->getId()),
-                        'UNIT_NAME'                => Scrub::text($unit->getTitle()),
-                        'UNIT_OPEN_DATE'           => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
-                        'UNIT_DUE_DATE'            => Scrub::text($unit->getDueDate()->getDatabaseDate()),
-                        'UNIT_BACKGROUND'          => ($i++%2 === 1 ? 'dark' : ''),
-                        'UNIT_STUDENT_COUNT'       => $student_count,
-                        'UNIT_TASK_COMPLETE_CLASS' => '',
-                        'UNIT_EXPANDED_STATE'      => ($is_open ? 'expanded' : 'collapsed'),
-                        'UNIT_LIST_CLASS'          => ($is_open ? ''         : 'hide'),
-                        'unit_task_block'          => '',
-                        'unit_completion_block'    => '',
-                        'unit_expand_block'        => '',
-                        'unit_no_expand_block'     => '',
-                        'unit_delete_block'        => '',
-                        'unit_modify_block'        => '',
-                        'unit_actions_block'       => '',
-                    )
-                );
-                if (!$this->is_student) {
-                    $this->parse('unit_delete_block', 'unit_delete');
-                    $this->parse('unit_modify_block', 'unit_modify');
-                    if (!$unit->isAfterDueDate()) {
-                        $this->parse('unit_actions_block', 'unit_actions');
-                    }
-                }
-
-                $display_task_list =
-                    $unit->getTasks()->count() > 0 &&
-                    ($unit->isOpen() || !$this->is_student)
-                ;
-                if ($display_task_list) {
-                    $this->parse('unit_expand_block', 'unit_expand');
-                }
-                else {
-                    $this->parse('unit_no_expand_block', 'unit_no_expand');
-                }
-
-                // Output due date and urgency
-                // If due date isn't reached, don't display at all, instead only
-                // show how long until this unit opens.
-                $completion_status = null;
-                $rel_time          = null;
-
-                // How many days until this item is due?
-                $diff = $now->diff(new DateTime($unit->getDueDate()->getDatabase()));
-                $days = $diff->days;
-                if ($diff->invert) {
-                    $days = 0;
-                }
-                $urgency = min(10, max(0, $days));
-
-                if ($unit->isBeforeOpenDate()) {
-                    $completion_status = 'Opens';
-                    $rel_time          = $unit->getOpenDate();
-                    $urgency           = null;
-                }
-                // If student has completed all tasks within this course:
-                // show when they completed it
-                elseif ($unit->isOpen()) {
-                    $completion_status = 'Due';
-                    $rel_time          = $unit->getDueDate();
-
-                }
-                else {
-                    $completion_status = 'Closed';
-                    $rel_time          = $unit->getDueDate();
-                    $urgency           = 0;
-                }
-                $rel_time = new Alaress_Date_Relative($rel_time);
-                $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
-                $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
-                $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
-                $this->parse('unit_completion_block', 'unit_completion');
-
-                // Output list of tasks within units, only if the task is open
-                if ($display_task_list) {
-
-                    // Group the task list by task, then student.
-                    $grouped_list = array();
-                    foreach ($this->completion_list as $item) {
-                        $student_id       = $item->getStudent()->getId();
-                        $task_instance_id = $item->getTaskInstance()->getId();
-                        $grouped_list[$task_instance_id][$student_id] = $item;
-                    }
-
-                    foreach ($unit->getTasks() as $task) {
-
-                        // Students only:
-                        // Output whether this item is complete.
-                        $unit_task_class  = '';
-                        $unit_task_status = '';
-                        if ($this->is_student) {
-                            $unit_task_class = 'incomplete';
-                            $completion_item = $grouped_list[$task->getId()][$_SESSION['id']];
-                            if ($completion_item instanceof Task\InstanceCompletion) {
-                                switch ($completion_item->getCompletionStatus()) {
-                                    case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
-                                        $unit_task_class  = 'complete';
-                                        $unit_task_status = 'Complete';
-                                        break;
-                                    case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                                        $unit_task_class  = 'pending';
-                                        $unit_task_status = 'Pending';
-                                        break;
-                                    case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
-                                    default:
-                                        break;
-                                }
-                            }
-                        }
-                        $this->setVar('UNIT_TASK_COMPLETE_CLASS', $unit_task_class);
-
-                        $complete_count = count($grouped_list[$task->getId()]);
-                        $gradient       = round($complete_count / $student_count * 10);
-                        $this->setVar(
-                            array(
-                                'UNIT_TASK_ID'                => Scrub::text($task->getId()),
-                                'UNIT_TASK_NAME'              => Scrub::text($task->getTitle()),
-                                'UNIT_TASK_LINK'              => Scrub::text($task->getLink()),
-                                'UNIT_TASK_CLASS'             => Scrub::text($task->getIconClass()),
-                                'UNIT_TASK_TYPE_LABEL'        => Scrub::text($task->getLabel()),
-                                'UNIT_TASK_SELF_ASSESS'       => ($task->getRequiresConfirmation() ? '' : 'checked'),
-                                'UNIT_TASK_COMPLETION_COUNT'  => $complete_count,
-                                'UNIT_TASK_GRADIENT'          => $gradient,
-                                'UNIT_TASK_COMPLETION_STATUS' => $unit_task_status,
-                                'UNIT_TASK_COMPLETE_CLASS'    => $unit_task_class,
-                                'unit_task_link_block'        => '',
-                                'unit_task_no_link_block'     => '',
-                                'unit_task_count_block'       => '',
-                                'unit_task_completion_block'  => '',
-                                'unit_task_start_block'       => '',
-                                'unit_task_delete_block'      => '',
-                                'unit_task_modify_block'      => '',
-                                'unit_task_delete_form_block' => '',
-                                'unit_task_modify_form_block' => '',
-                            )
-                        );
-
-                        // Is there a link for this item?
-                        if (strlen($task->getLink()) > 0) {
-                            $this->parse('unit_task_link_block', 'unit_task_link');
-                        }
-                        else {
-                            $this->parse('unit_task_no_link_block', 'unit_task_no_link');
-                        }
-
-                        // Teacher sees the number of students that have completed
-                        // this task, nobody else does.
-                        if ($this->is_student) {
-                            if ($unit_task_status) {
-                                $this->parse('unit_task_completion_block', 'unit_task_completion');
-                            }
-                            if ($unit->isOpen()) {
-                                $this->parse('unit_task_start_block', 'unit_task_start');
-                            }
-                        }
-                        else {
-                            $this->parse('unit_task_count_block', 'unit_task_count');
-                            $this->parse('unit_task_delete_block', 'unit_task_delete');
-                            $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
-                            $this->parse('unit_task_modify_block', 'unit_task_modify');
-                            // Only show modify form if this is a simple task.
-                            // (No assessment or due work)
-                            if ($task->getType() == Task::TYPE_TASK) {
-                                $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
-                            }
-                        }
-                        $this->parse('unit_task_block', 'unit_task', true);
-                    }
-                }
-                $this->parse('unit_block', 'unit', true);
-            }
-
+            $this->renderTemplateForUnitList();
         }
         else {
             $this->parse('course_selector_block', 'course_selector');
         }
 
         return true;
+    }
+
+    /**
+     * Renders the unit list template for this component.
+     */
+    protected function renderTemplateForUnitList() {
+        // iterate the list of homepages
+        $this->setVar('course_modify_block', '');
+        if (!$this->is_student) {
+            $this->parse('course_modify_block', 'course_modify');
+        }
+        $this->parse('course_unit_list_block', 'course_unit_list');
+
+        // unit list will be a collection of Unit models
+        $this->setVar('unit_block', '');
+        $now = new DateTime('now');
+        $i = 0;
+
+        $student_count = count($this->student_list);
+        foreach ($this->unit_list as $unit) {
+            $is_open = $unit->isOpen();
+            $this->setVar(
+                array(
+                    'UNIT_ID'                  => Scrub::text($unit->getId()),
+                    'UNIT_NAME'                => Scrub::text($unit->getTitle()),
+                    'UNIT_OPEN_DATE'           => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
+                    'UNIT_DUE_DATE'            => Scrub::text($unit->getDueDate()->getDatabaseDate()),
+                    'UNIT_BACKGROUND'          => ($i++%2 === 1 ? 'dark' : ''),
+                    'UNIT_STUDENT_COUNT'       => $student_count,
+                    'UNIT_TASK_COMPLETE_CLASS' => '',
+                    'UNIT_EXPANDED_STATE'      => ($is_open ? 'expanded' : 'collapsed'),
+                    'UNIT_LIST_CLASS'          => ($is_open ? ''         : 'hide'),
+                    'unit_task_block'          => '',
+                    'unit_completion_block'    => '',
+                    'unit_expand_block'        => '',
+                    'unit_no_expand_block'     => '',
+                    'unit_delete_block'        => '',
+                    'unit_modify_block'        => '',
+                    'unit_actions_block'       => '',
+                )
+            );
+            if (!$this->is_student) {
+                $this->parse('unit_delete_block', 'unit_delete');
+                $this->parse('unit_modify_block', 'unit_modify');
+                if (!$unit->isAfterDueDate()) {
+                    $this->parse('unit_actions_block', 'unit_actions');
+                }
+            }
+
+            $display_task_list =
+                $unit->getTasks()->count() > 0 &&
+                ($unit->isOpen() || $unit->isAfterDueDate() || !$this->is_student)
+            ;
+            if ($display_task_list) {
+                $this->parse('unit_expand_block', 'unit_expand');
+            }
+            else {
+                $this->parse('unit_no_expand_block', 'unit_no_expand');
+            }
+
+            // Output due date and urgency
+            // If due date isn't reached, don't display at all, instead only
+            // show how long until this unit opens.
+            $completion_status = null;
+            $rel_time          = null;
+
+            // How many days until this item is due?
+            $diff = $now->diff(new DateTime($unit->getDueDate()->getDatabase()));
+            $days = $diff->days;
+            if ($diff->invert) {
+                $days = 0;
+            }
+            $urgency = min(10, max(0, $days));
+
+            if ($unit->isBeforeOpenDate()) {
+                $completion_status = 'Opens';
+                $rel_time          = $unit->getOpenDate();
+                $urgency           = null;
+            }
+            elseif ($unit->isOpen()) {
+                $completion_status = 'Due';
+                $rel_time          = $unit->getDueDate();
+
+            }
+            else {
+                $completion_status = 'Closed';
+                $rel_time          = $unit->getDueDate();
+                $urgency           = 0;
+            }
+            $rel_time = new Alaress_Date_Relative($rel_time);
+            $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
+            $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
+            $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
+            $this->parse('unit_completion_block', 'unit_completion');
+
+            // Output list of tasks within units, only if the task is open
+            if ($display_task_list) {
+
+                // Group the task list by task, then student.
+                $grouped_list = array();
+                foreach ($this->completion_list as $item) {
+                    $student_id       = $item->getStudent()->getId();
+                    $task_instance_id = $item->getTaskInstance()->getId();
+                    $grouped_list[$task_instance_id][$student_id] = $item;
+                }
+
+                foreach ($unit->getTasks() as $task) {
+
+                    // Students only:
+                    // Output whether this item is complete.
+                    $unit_task_class  = '';
+                    $unit_task_status = '';
+                    if ($this->is_student) {
+                        $unit_task_class = 'incomplete';
+                        $completion_item = $grouped_list[$task->getId()][$_SESSION['id']];
+                        if ($completion_item instanceof Task\InstanceCompletion) {
+                            switch ($completion_item->getCompletionStatus()) {
+                                case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
+                                    $unit_task_class  = 'complete';
+                                    $unit_task_status = 'Complete';
+                                    break;
+                                case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
+                                    $unit_task_class  = 'pending';
+                                    $unit_task_status = 'Pending';
+                                    break;
+                                case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    $this->setVar('UNIT_TASK_COMPLETE_CLASS', $unit_task_class);
+
+                    $complete_count = count($grouped_list[$task->getId()]);
+                    $gradient       = round($complete_count / $student_count * 10);
+                    $this->setVar(
+                        array(
+                            'UNIT_TASK_ID'                => Scrub::text($task->getId()),
+                            'UNIT_TASK_NAME'              => Scrub::text($task->getTitle()),
+                            'UNIT_TASK_LINK'              => Scrub::text($task->getLink()),
+                            'UNIT_TASK_CLASS'             => Scrub::text($task->getIconClass()),
+                            'UNIT_TASK_TYPE_LABEL'        => Scrub::text($task->getLabel()),
+                            'UNIT_TASK_SELF_ASSESS'       => ($task->getRequiresConfirmation() ? '' : 'checked'),
+                            'UNIT_TASK_COMPLETION_COUNT'  => $complete_count,
+                            'UNIT_TASK_GRADIENT'          => $gradient,
+                            'UNIT_TASK_COMPLETION_STATUS' => $unit_task_status,
+                            'UNIT_TASK_COMPLETE_CLASS'    => $unit_task_class,
+                            'unit_task_link_block'        => '',
+                            'unit_task_no_link_block'     => '',
+                            'unit_task_count_block'       => '',
+                            'unit_task_completion_block'  => '',
+                            'unit_task_start_block'       => '',
+                            'unit_task_delete_block'      => '',
+                            'unit_task_modify_block'      => '',
+                            'unit_task_delete_form_block' => '',
+                            'unit_task_modify_form_block' => '',
+                        )
+                    );
+
+                    // Is there a link for this item?
+                    if (strlen($task->getLink()) > 0) {
+                        $this->parse('unit_task_link_block', 'unit_task_link');
+                    }
+                    else {
+                        $this->parse('unit_task_no_link_block', 'unit_task_no_link');
+                    }
+
+                    // Teacher sees the number of students that have completed
+                    // this task, nobody else does.
+                    if ($this->is_student) {
+                        if ($unit_task_status) {
+                            $this->parse('unit_task_completion_block', 'unit_task_completion');
+                        }
+                        if ($unit->isOpen()) {
+                            $this->parse('unit_task_start_block', 'unit_task_start');
+                        }
+                    }
+                    else {
+                        $this->parse('unit_task_count_block', 'unit_task_count');
+                        $this->parse('unit_task_delete_block', 'unit_task_delete');
+                        $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
+                        $this->parse('unit_task_modify_block', 'unit_task_modify');
+                        // Only show modify form if this is a simple task.
+                        // (No assessment or due work)
+                        if ($task->getType() == Task::TYPE_TASK) {
+                            $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
+                        }
+                    }
+                    $this->parse('unit_task_block', 'unit_task', true);
+                }
+            }
+            $this->parse('unit_block', 'unit', true);
+        }
+
     }
 
 }
