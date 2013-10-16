@@ -188,7 +188,22 @@
             }
         );
 
-        // Create task form submission
+        // show/hide the edit task dialog (if it exists?)
+        component.delegate(
+            'a[data-interaction="open_edit_task_form"]',
+            'click.courseInstance',
+            function(event) {
+                var element      = $(this);
+                var unit_element = element.closest('.unit-task');
+                var container    = unit_element.find('[data-interaction="edit_task_container"]');
+                if (container.length) {
+                    event.preventDefault();
+                    container.slideToggle('fast');
+                }
+            }
+        );
+
+        // Create/edit task form submission
         component.delegate(
             'form[data-form_type="task"]',
             'submit.courseInstance',
