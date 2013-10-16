@@ -34,6 +34,9 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 	/**
 	 * Find total usage
+	 *
+	 * This summates the filesizes of all files in the specified location.
+	 * This includes files which may have been marked as softdeleted in the db
 	 */
 	public function findTotalUsage() {
 		$total = disk_total_space(\Cfg::get('file_dir'));
@@ -46,43 +49,10 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 		);
 	}
 
-//	/**
-//	 * Find total usage
-//	 */
-//	public function findTotalUsageOld() {
-//		$query = "
-//			SELECT 'Total' AS name, SUM(bytes) AS bytes
-//			FROM
-//				(
-//				(SELECT SUM(file_size) AS bytes
-//				FROM `file`
-//				WHERE deleted = 0)
-//				UNION
-//				(SELECT SUM(file_size) AS bytes
-//				FROM `myFile`
-//				WHERE deleted = 0)
-//				UNION
-//				(SELECT SUM(filesize) AS bytes
-//				FROM `storage`)
-//				UNION
-//				(SELECT SUM(filesize) AS bytes
-//				FROM `student_submission`)
-//				UNION
-//				(SELECT SUM(filesize) AS bytes
-//				FROM `submission_return`)
-//			) AS allTotals
-//		";
-//
-//		$statement = $this->database->prepare($query);
-//		$statement->execute();
-//
-//		$result = $statement->fetch(\PDO::FETCH_ASSOC);
-//
-//		return $result;
-//	}
-
 	/**
 	 * Find total category usage
+	 *
+	 * This does NOT summate files which have been marked as softdeleted in the db
 	 *
 	 * @return array
 	 */
@@ -140,6 +110,9 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 	/**
 	 * Find total type usage
+	 *
+	 * This summates the filesizes of all files in the specified location.
+	 * This includes files which may have been marked as softdeleted in the db
 	 *
 	 * @return array
 	 */
@@ -227,50 +200,10 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 		return $collection;
 	}
 
-//	/**
-//	 * Find total type usage
-//	 *
-//	 * This is deprecated in favour of Samuel's du
-//	 *
-//	 * @return array
-//	 */
-//	public function findTypeUsageOld() {
-//		$query = "
-//			SELECT *
-//			FROM (
-//				(SELECT 'Resources' AS name, SUM(file_size) AS bytes
-//				FROM `file`
-//				WHERE deleted = 0)
-//				UNION
-//				(SELECT 'MyFiles' AS name, SUM(file_size) AS bytes
-//				FROM `myFile`
-//				WHERE deleted = 0)
-//				UNION
-//				(SELECT 'Storage' AS name, SUM(filesize) AS bytes
-//				FROM `storage`)
-//				UNION
-//				(SELECT 'Submissions' AS name, SUM(filesize) AS bytes
-//				FROM `student_submission`)
-//				UNION
-//				(SELECT 'Returns' AS name, SUM(filesize) AS bytes
-//				FROM `submission_return`)
-//			) AS allTotals
-//		";
-//
-//		$statement = $this->database->prepare($query);
-//		$statement->execute();
-//
-//		$result = array();
-//
-//		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-//			$result[] = $row;
-//		}
-//
-//		return $result;
-//	}
-
 	/**
 	 * Find total user usage
+	 *
+	 * This does NOT summate files which have been marked as softdeleted in the db
 	 *
 	 * @param string $orderBy
 	 * @param string $order
