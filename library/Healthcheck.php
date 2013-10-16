@@ -135,7 +135,7 @@ class Healthcheck {
         echo "\nSynergetic Permission Check - Stored Procedures\n";
         $db = new MSSQL();
         $db->debug = true;
-        $result = $db->executeProcedure(
+        $splist[] = array(
             'spgTimetableDay',
             array(
                 array('@TimeTableGroup', 'SEN',         SQLVARCHAR, false, false, -1),
@@ -143,11 +143,20 @@ class Healthcheck {
                 array('@CurrentDay',     'day',         SQLINT4,    true,  false, -1),
             )
         );
-        echo "  spgTimetableDay : ";
-        if($result['success']){
-            echo "OK\n";
-        }else{
-            echo "\n    Failed - ".mssql_get_last_message()."\n";
+        $splist[] = array(
+            'spsConfigUserDefaultYearSemester',
+            array(
+                array('@ID','1',SQLINT1,false,false, -1),
+            )
+        );
+        foreach($splist as $sp){
+            $result = $db->executeProcedure($sp[0],$sp[1]);
+            echo "  ".$sp[0]." : ";
+            if($result['success']){
+                echo "OK\n";
+            }else{
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
         }
     }
 
