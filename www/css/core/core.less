@@ -9706,7 +9706,7 @@ ul.activity-list li,
 }
 
 /* Craycray new login form */
-body.login {
+.loginPageVersion() when (@login-version = 2) {
 	background: @banner-background;
 
 	#header {
@@ -9746,6 +9746,12 @@ body.login {
 	}
 	#footer ul li { color: @banner-color; }
 	#footer ul li a { color: @banner-links; }
+
+}
+
+
+body.login {
+	.loginPageVersion;
 }
 
 
