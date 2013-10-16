@@ -39,6 +39,7 @@ if (!empty($_POST)) {
         ->setDescription($_POST['description'])
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
+        ->setWeight($_POST['weight'])
         ->setAvailability('assess')
     ;
 
