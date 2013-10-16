@@ -398,10 +398,12 @@ class OnlineAssessment implements ISoftDeletable {
 	}
 
 	/**
-	 * @param int $weight
+	 * @param  int   $weight
+	 * @return $this
 	 */
 	public function setWeight($weight) {
 		$this->weight = $weight;
+		return $this;
 	}
 
 }
