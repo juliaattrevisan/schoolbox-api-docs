@@ -109,6 +109,11 @@ class SubmissionBox implements ISoftDeletable {
 	/**
 	 * @var int
 	 */
+	protected $weight;
+
+	/**
+	 * @var int
+	 */
 	protected $max_mark;
 
 	/**
@@ -482,5 +487,19 @@ class SubmissionBox implements ISoftDeletable {
 	 */
 	public function isMarkShownToParents() {
 		return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getWeight() {
+		return $this->weight;
+	}
+
+	/**
+	 * @param int $weight
+	 */
+	public function setWeight($weight) {
+		$this->weight = $weight;
 	}
 }

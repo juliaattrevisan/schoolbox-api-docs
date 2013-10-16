@@ -114,6 +114,7 @@ if (!empty($_POST)) {
         'ASSESS_ASSESS_ID'   => '',
         'ASSESS_CATEGORY_ID' => $category_id,
         'ASSESS_TITLE'       => '',
+	    'ASSESS_WEIGHT'      => 100,
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
