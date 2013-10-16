@@ -63,6 +63,9 @@
 @footer-color:					#696B73;
 @footer-links:					@footer-color;
 
+// Optional features
+@login-version: 				1;
+
 // =============================================================================
 // 3. Load core
 // =============================================================================
@@ -70,10 +73,4 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
-body.login {
-	background: url('/images/balcombe/bg.png') top left repeat-x;
-	#header {
-		background-position: center (@logo-height + 70 );
-	}
-	#footer ul li, #footer ul li a { color: @footer-color; }
-}
+

@@ -66,6 +66,9 @@
 @footer-color:					#A6C3DE;
 @footer-links:					#A6C3DE;
 
+// Optional features
+@login-version: 				1;
+
 // =============================================================================
 // 3. Load core
 // =============================================================================
@@ -77,14 +80,5 @@
 	color: @link-hover;
 	&.current {
 		background: @navigation-hover-background;
-	}
-}
-body.login {
-	background: @body-background;
-	#header {
-		height: @banner-height;
-		.logo {
-			top: 0;
-		}
 	}
 }

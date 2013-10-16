@@ -65,6 +65,9 @@
 @footer-color:					#FFFFFF;
 @footer-links:					@footer-color;
 
+// Optional features
+@login-version: 				1;
+
 // =============================================================================
 // 3. Load core
 // =============================================================================
@@ -72,19 +75,3 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
-body.login {
-	background: @banner-background url(/images/stjo/bg-header-span.jpg) repeat-x;
-	#header {
-		background: url(/images/stjo/bg-header.jpg) no-repeat;
-		height: @banner-height + 25;
-		.logo {
-			top: 0;
-			left: 0;
-			margin-left: 0;
-			width: @logo-width;
-		}
-	}
-	#container {
-		border-radius: 7px;
-	}
-}

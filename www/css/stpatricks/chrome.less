@@ -66,6 +66,9 @@
 @footer-color:					#C9C9C9;
 @footer-links:					@footer-color;
 
+// Optional features
+@login-version: 				1;
+
 // =============================================================================
 // 3. Load core
 // =============================================================================
@@ -73,15 +76,3 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
-body.login {
-	#header {
-		height: @banner-height;
-		.logo {
-			top: 11px;
-		}
-		margin-bottom: 16px;
-	}
-	#container {
-		border-radius: 7px;
-	}
-}

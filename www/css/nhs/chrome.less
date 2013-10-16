@@ -66,6 +66,9 @@
 @footer-color:					#797979;
 @footer-links:					@footer-color;
 
+// Optional features
+@login-version: 				1;
+
 // =============================================================================
 // 3. Load core
 // =============================================================================
@@ -75,7 +78,7 @@
 // 4. Any overrides for styles can be specified below
 // =============================================================================
 
-#header {
+#header, .login #header {
   background: #3b0f5f url(/images/nhs/header-bg.png) top left no-repeat;
   min-height: 107px;
 }
@@ -109,6 +112,3 @@
   background: @banner-background;
 }
 
-body.login #header {
-	background: none;
-}
