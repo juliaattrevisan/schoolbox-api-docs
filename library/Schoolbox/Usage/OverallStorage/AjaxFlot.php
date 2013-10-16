@@ -140,12 +140,16 @@ class AjaxFlot {
 		$page->setFile('user_list', '/adminv2/usage/user.html');
 		$page->setBlock('user_list', 'user', 'user_block');
 
+		/* Really? You should be passing the bytes as constructor arg
+		 */
+		$bytes = new \Alaress_Byte_Format();
+
 		foreach ($allData as $currentData) {
 			$page->setVar(array(
 				'USER_FIRSTNAME' => $currentData['firstname'],
 				'USER_LASTNAME' => $currentData['lastname'],
 				'USER_GROUP' => $currentData['name'],
-				'USER_BYTES' => $currentData['bytes']
+				'USER_BYTES' => $bytes->bytesToString($currentData['bytes']),
 			));
 
 			$page->parse('user_block', 'user', true);
