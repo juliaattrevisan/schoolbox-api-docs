@@ -41,6 +41,29 @@ class Healthcheck {
 
     /* all private methods with 'Schoolbox' or the current db name will be picked up by the reflection in run() */
 
+    private function MssqlConnection(){
+        echo "  MSSQL : ";
+        $db = new MSSQL();
+        $db->debug = true;
+        $result = $db->query("SELECT @@VERSION");
+        if($result){
+            echo "OK\n";
+        }else{
+            echo "\n    Failed - ".mssql_get_last_message()."\n";
+        }
+        unset($db,$result);
+    }
+
+    private function TassCheckConnection(){
+        echo "\nTass Connnection Check\n";
+        $this->MssqlConnection();
+    }
+
+    private function SynergeticCheckConnection(){
+        echo "\nSynergetic Connnection Check\n";
+        $this->MssqlConnection();
+    }
+
     private function SynergeticCheckTables(){
         echo "\nSynergetic Permission Check - Tables\n";
         $list[] = 'Addresses';
