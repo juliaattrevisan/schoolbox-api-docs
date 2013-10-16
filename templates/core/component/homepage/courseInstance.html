@@ -155,7 +155,11 @@
 
                         <span class="actions">
                             <!-- BEGIN unit_task_modify -->
-                            <a href="/task/instance/modify/{UNIT_TASK_ID}" class="btn modify no-text" title="Modify this task"><span></span></a>
+                            <a href="/task/instance/modify/{UNIT_TASK_ID}"
+                               class="btn modify no-text"
+                               title="Modify this task"
+                               data-interaction="open_edit_task_form"
+                            ><span></span></a>
                             <!-- END unit_task_modify -->
 
                             <!-- BEGIN unit_task_delete -->
@@ -171,6 +175,40 @@
                             <!-- END unit_task_start -->
                         </span>
 
+                        <!-- BEGIN unit_task_modify_form -->
+                        <div class="hide clear form_container" data-interaction="edit_task_container">
+                            <form action="/task/saveInstanceForm.php" method="post" class="edit_form" data-form_type="task">
+                                <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
+                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
+
+                                <dl>
+                                    <dt><label for="title-{UNIT_TASK_ID}">Task:</label></dt>
+                                    <dd><input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" /></dd>
+
+                                    <dt><label for="link-{UNIT_TASK_ID}">Link:</label></dt>
+                                    <dd>
+                                        <input id="link-{UNIT_TASK_ID}" name="link" type="text" value="{UNIT_TASK_LINK}" />
+                                        <p class="interact">
+                                            <a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
+                                            <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
+                                        </p>
+                                    </dd>
+
+                                    <dt><label for="self_assess-{UNIT_TASK_ID}">Self-assessed?</label></dt>
+                                    <dd>
+                                        <input name="self_assess" value="0" type="hidden" />
+                                        <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
+                                    </dd>
+                                </dl>
+
+                                <input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
+
+                            </form>
+                        </div>
+                        <!-- END unit_task_modify_form -->
+
+                        <!-- BEGIN unit_task_delete_form -->
                         <div class="hide clear form_container" data-interaction="delete_task_container">
                             <p class="notice">Are you sure you wish to delete this task?</p>
                             <p class="notice">Any linked due work items and online assessments will be deleted, as will all student's completion of this task.</p>
@@ -183,6 +221,7 @@
                                 <a href="#" class="btn go-to delete-reject" data-interaction="delete_reject"><span></span> No</a>
                             </form>
                         </div>
+                        <!-- END unit_task_delete_form -->
                     </li>
                     <!-- END unit_task -->
                 </ul>

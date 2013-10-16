@@ -116,6 +116,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit_task',        'unit_task_start',      'unit_task_start_block');
         $this->setBlock('unit_task',        'unit_task_modify',     'unit_task_modify_block');
         $this->setBlock('unit_task',        'unit_task_delete',     'unit_task_delete_block');
+        $this->setBlock('unit_task',        'unit_task_modify_form', 'unit_task_modify_form_block');
+        $this->setBlock('unit_task',        'unit_task_delete_form', 'unit_task_delete_form_block');
 
         $this->setVar('course_selector_block',  '');
         $this->setVar('course_unit_list_block', '');
@@ -260,8 +262,10 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                             array(
                                 'UNIT_TASK_ID'                => Scrub::text($task->getId()),
                                 'UNIT_TASK_NAME'              => Scrub::text($task->getTitle()),
+                                'UNIT_TASK_LINK'              => Scrub::text($task->getLink()),
                                 'UNIT_TASK_CLASS'             => Scrub::text($task->getIconClass()),
                                 'UNIT_TASK_TYPE_LABEL'        => Scrub::text($task->getLabel()),
+                                'UNIT_TASK_SELF_ASSESS'       => ($task->getRequiresConfirmation() ? '' : 'checked'),
                                 'UNIT_TASK_COMPLETION_COUNT'  => $complete_count,
                                 'UNIT_TASK_GRADIENT'          => $gradient,
                                 'UNIT_TASK_COMPLETION_STATUS' => $unit_task_status,
@@ -273,6 +277,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                                 'unit_task_start_block'       => '',
                                 'unit_task_delete_block'      => '',
                                 'unit_task_modify_block'      => '',
+                                'unit_task_delete_form_block' => '',
+                                'unit_task_modify_form_block' => '',
                             )
                         );
 
@@ -297,7 +303,13 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                         else {
                             $this->parse('unit_task_count_block', 'unit_task_count');
                             $this->parse('unit_task_delete_block', 'unit_task_delete');
+                            $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
                             $this->parse('unit_task_modify_block', 'unit_task_modify');
+                            // Only show modify form if this is a simple task.
+                            // (No assessment or due work)
+                            if ($task->getType() == Task::TYPE_TASK) {
+                                $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
+                            }
                         }
                         $this->parse('unit_task_block', 'unit_task', true);
                     }
