@@ -7,7 +7,7 @@ ALTER TABLE `assess_luQuestionType` CHANGE `type_id` `type_id` INT(8) NOT NULL A
 
 /* Multi w/ other
  */
-INSERT INTO `assess_luQuestionType` (`classname`, `filename`, `description`, `moodle`, `automated_marking`, `availability`, `has_legend`) VALUES ('MultiOther', 'evaluationMultipleChoiceOther', 'multiOther', 'Multiple Choice w/ Other', 'multiOther', 'false', 'survey', 'true');
+INSERT INTO `assess_luQuestionType` (`classname`, `filename`, `description`, `moodle`, `automated_marking`, `availability`, `has_legend`) VALUES ('MultiOther', 'multiOther', 'Multiple Choice w/ Other', 'multiOther', 'false', 'survey', 'true');
 
 /* Numeric answer
  */
