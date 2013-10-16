@@ -200,7 +200,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 		/* Big slices go first
 		 */
 		$collection->sortBy('bytes', 'asc');
-		
+
 		return $collection;
 	}
 
