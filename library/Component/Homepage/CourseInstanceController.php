@@ -149,105 +149,110 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         // unit list will be a collection of Unit models
         $this->setVar('unit_block', '');
-        $now = new DateTime('now');
         $i = 0;
-
-        $student_count = count($this->student_list);
         foreach ($this->unit_list as $unit) {
-            $is_open = $unit->isOpen();
-            $this->setVar(
-                array(
-                    'UNIT_ID'                  => Scrub::text($unit->getId()),
-                    'UNIT_NAME'                => Scrub::text($unit->getTitle()),
-                    'UNIT_OPEN_DATE'           => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
-                    'UNIT_DUE_DATE'            => Scrub::text($unit->getDueDate()->getDatabaseDate()),
-                    'UNIT_BACKGROUND'          => ($i++%2 === 1 ? 'dark' : ''),
-                    'UNIT_STUDENT_COUNT'       => $student_count,
-                    'UNIT_TASK_COMPLETE_CLASS' => '',
-                    'UNIT_EXPANDED_STATE'      => ($is_open ? 'expanded' : 'collapsed'),
-                    'UNIT_LIST_CLASS'          => ($is_open ? ''         : 'hide'),
-                    'unit_task_block'          => '',
-                    'unit_completion_block'    => '',
-                    'unit_expand_block'        => '',
-                    'unit_no_expand_block'     => '',
-                    'unit_delete_block'        => '',
-                    'unit_modify_block'        => '',
-                    'unit_actions_block'       => '',
-                )
-            );
-            if (!$this->is_student) {
-                $this->parse('unit_delete_block', 'unit_delete');
-                $this->parse('unit_modify_block', 'unit_modify');
-                if (!$unit->isAfterDueDate()) {
-                    $this->parse('unit_actions_block', 'unit_actions');
-                }
-            }
+            $this->setVar('UNIT_BACKGROUND', ($i++%2 === 1 ? 'dark' : ''));
+            $this->renderUnitInUnitList($unit);
+        }
+    }
 
-            $display_task_list =
-                $unit->getTasks()->count() > 0 &&
-                ($unit->isOpen() || $unit->isAfterDueDate() || !$this->is_student)
-            ;
-            if ($display_task_list) {
-                $this->parse('unit_expand_block', 'unit_expand');
+    /**
+     * Displays this unit in the list of units
+     *
+     * @param UnitInstance $unit The unit that the task is rendered into
+     */
+    public function renderUnitInUnitList(UnitInstance $unit) {
+        $is_open = $unit->isOpen();
+        $this->setVar(
+            array(
+                'UNIT_ID'                  => Scrub::text($unit->getId()),
+                'UNIT_NAME'                => Scrub::text($unit->getTitle()),
+                'UNIT_OPEN_DATE'           => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
+                'UNIT_DUE_DATE'            => Scrub::text($unit->getDueDate()->getDatabaseDate()),
+                'UNIT_STUDENT_COUNT'       => count($this->student_list),
+                'UNIT_TASK_COMPLETE_CLASS' => '',
+                'UNIT_EXPANDED_STATE'      => ($is_open ? 'expanded' : 'collapsed'),
+                'UNIT_LIST_CLASS'          => ($is_open ? ''         : 'hide'),
+                'unit_task_block'          => '',
+                'unit_completion_block'    => '',
+                'unit_expand_block'        => '',
+                'unit_no_expand_block'     => '',
+                'unit_delete_block'        => '',
+                'unit_modify_block'        => '',
+                'unit_actions_block'       => '',
+            )
+        );
+        if (!$this->is_student) {
+            $this->parse('unit_delete_block', 'unit_delete');
+            $this->parse('unit_modify_block', 'unit_modify');
+            if (!$unit->isAfterDueDate()) {
+                $this->parse('unit_actions_block', 'unit_actions');
             }
-            else {
-                $this->parse('unit_no_expand_block', 'unit_no_expand');
-            }
-
-            // Output due date and urgency
-            // If due date isn't reached, don't display at all, instead only
-            // show how long until this unit opens.
-            $completion_status = null;
-            $rel_time          = null;
-
-            // How many days until this item is due?
-            $diff = $now->diff(new DateTime($unit->getDueDate()->getDatabase()));
-            $days = $diff->days;
-            if ($diff->invert) {
-                $days = 0;
-            }
-            $urgency = min(10, max(0, $days));
-
-            if ($unit->isBeforeOpenDate()) {
-                $completion_status = 'Opens';
-                $rel_time          = $unit->getOpenDate();
-                $urgency           = null;
-            }
-            elseif ($unit->isOpen()) {
-                $completion_status = 'Due';
-                $rel_time          = $unit->getDueDate();
-
-            }
-            else {
-                $completion_status = 'Closed';
-                $rel_time          = $unit->getDueDate();
-                $urgency           = 0;
-            }
-            $rel_time = new Alaress_Date_Relative($rel_time);
-            $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
-            $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
-            $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
-            $this->parse('unit_completion_block', 'unit_completion');
-
-            // Output list of tasks within units, only if the task is open
-            if ($display_task_list) {
-
-                // Group the task list by task, then student.
-                $grouped_list = array();
-                foreach ($this->completion_list as $item) {
-                    $student_id       = $item->getStudent()->getId();
-                    $task_instance_id = $item->getTaskInstance()->getId();
-                    $grouped_list[$task_instance_id][$student_id] = $item;
-                }
-
-                foreach ($unit->getTasks() as $task) {
-                    $task->setUnitInstance($unit);
-                    $this->renderTaskInTaskList($task, $unit, $grouped_list[$task->getId()]);
-                }
-            }
-            $this->parse('unit_block', 'unit', true);
         }
 
+        $display_task_list =
+            $unit->getTasks()->count() > 0 &&
+            ($unit->isOpen() || $unit->isAfterDueDate() || !$this->is_student)
+        ;
+        if ($display_task_list) {
+            $this->parse('unit_expand_block', 'unit_expand');
+        }
+        else {
+            $this->parse('unit_no_expand_block', 'unit_no_expand');
+        }
+
+        // Output due date and urgency
+        // If due date isn't reached, don't display at all, instead only
+        // show how long until this unit opens.
+        $completion_status = null;
+        $rel_time          = null;
+
+        // How many days until this item is due?
+        $now  = new DateTime('now');
+        $diff = $now->diff(new DateTime($unit->getDueDate()->getDatabase()));
+        $days = $diff->days;
+        if ($diff->invert) {
+            $days = 0;
+        }
+        $urgency = min(10, max(0, $days));
+
+        if ($unit->isBeforeOpenDate()) {
+            $completion_status = 'Opens';
+            $rel_time          = $unit->getOpenDate();
+            $urgency           = null;
+        }
+        elseif ($unit->isOpen()) {
+            $completion_status = 'Due';
+            $rel_time          = $unit->getDueDate();
+
+        }
+        else {
+            $completion_status = 'Closed';
+            $rel_time          = $unit->getDueDate();
+            $urgency           = 0;
+        }
+        $rel_time = new Alaress_Date_Relative($rel_time);
+        $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
+        $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
+        $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
+        $this->parse('unit_completion_block', 'unit_completion');
+
+        // Output list of tasks within units, only if the task is open
+        if ($display_task_list) {
+
+            // Group the task list by task, then student.
+            $grouped_list = array();
+            foreach ($this->completion_list as $item) {
+                $student_id       = $item->getStudent()->getId();
+                $task_instance_id = $item->getTaskInstance()->getId();
+                $grouped_list[$task_instance_id][$student_id] = $item;
+            }
+
+            foreach ($unit->getTasks() as $task) {
+                $this->renderTaskInUnit($task, $unit, $grouped_list[$task->getId()]);
+            }
+        }
+        $this->parse('unit_block', 'unit', true);
     }
 
     /**
@@ -257,7 +262,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      * @param UnitInstance              $unit            The unit that the task is rendered into
      * @param Task\InstanceCompletion[] $completion_list The list of completions, keyed by student
      */
-    public function renderTaskInTaskList(Task\Instance $task, UnitInstance $unit, $completion_list) {
+    public function renderTaskInUnit(Task\Instance $task, UnitInstance $unit, $completion_list) {
 
         // Students only:
         // Output whether this item is complete.
