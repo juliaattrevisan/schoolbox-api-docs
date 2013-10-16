@@ -36,36 +36,50 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	 * Find total usage
 	 */
 	public function findTotalUsage() {
-		$query = "
-			SELECT 'Total' AS name, SUM(bytes) AS bytes
-			FROM
-				(
-				(SELECT SUM(file_size) AS bytes
-				FROM `file`
-				WHERE deleted = 0)
-				UNION
-				(SELECT SUM(file_size) AS bytes
-				FROM `myFile`
-				WHERE deleted = 0)
-				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `storage`)
-				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `student_submission`)
-				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `submission_return`)
-			) AS allTotals
-		";
+		$total = disk_total_space(\Cfg::get('file_dir'));
+		$free = disk_free_space(\Cfg::get('file_dir'));
+		$used = $total - $free;
 
-		$statement = $this->database->prepare($query);
-		$statement->execute();
-
-		$result = $statement->fetch(\PDO::FETCH_ASSOC);
-
-		return $result;
+		return array(
+			'Used' => $used,
+			'Available' => disk_total_space(\Cfg::get('file_dir')) - $used
+		);
 	}
+
+//	/**
+//	 * Find total usage
+//	 */
+//	public function findTotalUsageOld() {
+//		$query = "
+//			SELECT 'Total' AS name, SUM(bytes) AS bytes
+//			FROM
+//				(
+//				(SELECT SUM(file_size) AS bytes
+//				FROM `file`
+//				WHERE deleted = 0)
+//				UNION
+//				(SELECT SUM(file_size) AS bytes
+//				FROM `myFile`
+//				WHERE deleted = 0)
+//				UNION
+//				(SELECT SUM(filesize) AS bytes
+//				FROM `storage`)
+//				UNION
+//				(SELECT SUM(filesize) AS bytes
+//				FROM `student_submission`)
+//				UNION
+//				(SELECT SUM(filesize) AS bytes
+//				FROM `submission_return`)
+//			) AS allTotals
+//		";
+//
+//		$statement = $this->database->prepare($query);
+//		$statement->execute();
+//
+//		$result = $statement->fetch(\PDO::FETCH_ASSOC);
+//
+//		return $result;
+//	}
 
 	/**
 	 * Find total category usage

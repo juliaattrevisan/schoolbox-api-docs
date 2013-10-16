@@ -36,18 +36,16 @@ class AjaxFlot {
 		$currentData = $this->getMapper()->findTotalUsage();
 
 		$result = array();
-		$result['label'] = $currentData['name'];
-
-		$available = disk_total_space(\Cfg::get('file_dir')); - $currentData['bytes'];
+		$result['label'] = 'Total Usage';
 
 		$result['data'] = array(
 			array(
 				'label' => 'Used',
-				'data' => array(array(1, $currentData['bytes'])),
+				'data' => array(array(1, $currentData['Used'])),
 			),
 			array(
 				'label' => 'Available',
-				'data' => array(array(1, $available))
+				'data' => array(array(1, $currentData['Available']))
 			)
 		);
 
