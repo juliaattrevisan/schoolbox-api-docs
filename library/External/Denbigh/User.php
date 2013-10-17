@@ -321,7 +321,7 @@ class External_Denbigh_User implements External_UserInterface {
         return $contactAdaptionList;
     }
 
-    function getCurrentSemester($externalUserId) {
+    function getCurrentSemester($externalUserId = null) {
 
     }
 

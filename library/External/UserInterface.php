@@ -29,7 +29,7 @@ interface External_UserInterface {
 
     public function getStudentContactList($externalUserId);
 
-    public function getCurrentSemester($externalUserId);
+    public function getCurrentSemester($externalUserId = null);
 
     public function getSubjectList($externalUserId, $userId);
 

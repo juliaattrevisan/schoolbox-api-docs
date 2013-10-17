@@ -108,7 +108,7 @@ class External_Tass_User implements External_UserInterface {
 		return $parent;
 	}
 
-	function getCurrentSemester()
+	function getCurrentSemester($exteralUserId = null)
 	{
         $query = "SELECT curr_year, curr_sem FROM ttparms WHERE cmpy_code = 01";
         $current = $this->getDatabase()->getRow($query);
