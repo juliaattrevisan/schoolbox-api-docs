@@ -137,7 +137,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                                 && $time->getDateTimeObject() < $submission->getLateDate()->getDateTimeObject()
                             ) {
                                 $this->setVar('DUE_ACTION_NAME', 'Submit Work');
-                                $this->setVar('DUE_ACTION_ICON', 'up-arrow');
+                                $this->setVar('DUE_ACTION_ICON', 'go-to');
                             }
                             // if submission box is closed
                             else {
