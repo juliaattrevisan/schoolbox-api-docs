@@ -112,7 +112,7 @@ Scenario: Create a course
   And   I check "accept_submission"
   And   I press "Create"
 
-@use-course
+@add-course
 Scenario: Add a course to a class
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -133,62 +133,64 @@ Scenario: Add a course to a class
   And   I press "Import"
   # Everything should be imported as if by magic
 
-#Scenario: Be a student in a course
-#  Given I log in as "sberryhill" with password "password"
-#  Then  I follow link "Duke of Edinburgh"
-#  Then  I should see the current unit "Chemical Reactions"
-#  And   I should see past unit "Atomic Structure and bonding"
-#  And   I should see future unit "Macroscopic properties of matter"
-#
-#  # Check task completion - nothing yet
-#  And   the task "Visit this link" in "Chemical Reactions" should not be complete
-#  And   the task "Read chapter 3" in "Chemical Reactions" should not be complete
-#  And   the task "Attend 3 classes" in "Chemical Reactions" should not be complete
-#  And   the task "Chemical Reactions 1" in "Chemical Reactions" should not be complete
-#  And   the task "Dumb Due Work" in "Chemical Reactions" should not be complete
-#  And   the task "Offline Due Work" in "Chemical Reactions" should not be complete
-#
-#  # What tasks are completable?
-#  And   I should be able to start task "Visit this link" in "Chemical Reactions"
-#  And   I should be able to start task "Read chapter 3" in "Chemical Reactions"
-#  And   I should not be able to start task "Attend 3 classes" in "Chemical Reactions"
-#  And   I should be able to start task "Chemical Reactions 1" in "Chemical Reactions"
-#  And   I should be able to start task "Dumb Due Work" in "Chemical Reactions"
-#  And   I should not be able to start task "Offline Due Work" in "Chemical Reactions"
-#
-#  # Now I do some tasks in the Chemical Reactions unit
-#  When  I start the task "Visit this link" in "Chemical Reactions"
-#  And   I move backward one page
-#  Then  the task "Visit this link" in "Chemical Reactions" should be complete
-#
-#  # Complete the chapter
-#  When  I start the task "Read chapter 3" in "Chemical Reactions"
-#  And   I reload the page
-#  Then  the task "Read chapter 3" in "Chemical Reactions" should be complete
-#
-#  # Complete the online assessment
-#  When  I start the task "Chemical Reactions 1" in "Chemical Reactions"
-#  # Ideally, we could figure out a way to shortcut writing of online assessment behaviors
-#  And   I start the assessment
-#  And   I choose answer "Answer 1" for "Choose the correct answer" in "Section 1"
-#  And   I finish the assessment
-#  And   I return to the homepage
-#  Then  the task "Chemical Reactions 1" in "Chemical Reactions" should be complete
-#
-#  # Complete the due work
-#  When  I start the task "Dumb Due Work" in "Chemical Reactions"
-#  And   I attach the file "test.txt" to "file"
-#  And   I press "Submit"
-#  And   I follow link "Duke of Edinburgh"
-#  Then  the task "Dumb Due Work" in "Chemical Reactions" should be complete
-#
-#  # Can't complete any items in tasks in past or future
-#  And   I should not be able to start task "Read chapter 4" in "Atomic structure and bonding"
-#  And   I should not be able to start task "Attend a laboratory" in "Atomic structure and bonding"
-#  And   I should not be able to start task "Dumb Due Work for bonding" in "Atomic structure and bonding"
-#  And   I should not be able to start task "Read chapter 5" in "Macroscopic properties of matter"
-#  And   I should not be able to start task "Dumb Due Work 2" in "Macroscopic properties of matter"
-#
+@use-course
+Scenario: Be a student in a course
+  Given I continue from last scenario
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+
+  # Check task completion - nothing yet
+  When  I follow "Duke of Edinburgh"
+  Then  I should see the current unit "Chemical Reactions"
+  And   I should see past unit "Atomic Structure and bonding"
+  And   I should see future unit "Macroscopic properties of matter"
+  And   the task "Visit this link" in "Chemical Reactions" should not be complete
+  And   the task "Read chapter 3" in "Chemical Reactions" should not be complete
+  And   the task "Attend 3 classes" in "Chemical Reactions" should not be complete
+  And   the task "Chemical Reactions 1" in "Chemical Reactions" should not be complete
+  And   the task "Dumb Due Work" in "Chemical Reactions" should not be complete
+  And   the task "Offline Due Work" in "Chemical Reactions" should not be complete
+
+  # Now I do some tasks in the Chemical Reactions unit
+  When  I start the task "Visit this link" in "Chemical Reactions"
+  And   I move backward one page
+  Then  the task "Visit this link" in "Chemical Reactions" should be complete
+
+  # Complete the chapter
+  When  I start the task "Read chapter 3" in "Chemical Reactions"
+  And   I reload the page
+  Then  the task "Read chapter 3" in "Chemical Reactions" should be complete
+
+  # Complete the task for attending classes - it will be marked as pending.
+  When  I start the task "Read chapter 3" in "Chemical Reactions"
+  And   I reload the page
+  Then  the task "Read chapter 3" in "Chemical Reactions" should be pending
+
+  # Complete the online assessment
+  When  I start the task "Chemical Reactions 1" in "Chemical Reactions"
+  # Ideally, we could figure out a way to shortcut writing of online assessment behaviors
+  And   I start the assessment
+  And   I choose answer "Answer 1" for "Choose the correct answer" in "Section 1"
+  And   I finish the assessment
+  And   I return to the homepage
+  Then  the task "Chemical Reactions 1" in "Chemical Reactions" should be complete
+
+  # Complete the due work
+  When  I start the task "Dumb Due Work" in "Chemical Reactions"
+  And   I attach the file "test.txt" to "file"
+  And   I press "Submit"
+  And   I follow link "Duke of Edinburgh"
+  Then  the task "Dumb Due Work" in "Chemical Reactions" should be complete
+
+  # Can't complete any items in tasks in past
+  And   I should not be able to start task "Read chapter 4" in "Atomic structure and bonding"
+  And   I should not be able to start task "Attend a laboratory" in "Atomic structure and bonding"
+
+  # Items in future should not even be visible yet
+  And   I should not be able to start task "Dumb Due Work for bonding" in "Atomic structure and bonding"
+  And   I should not be able to start task "Read chapter 5" in "Macroscopic properties of matter"
+  And   I should not be able to start task "Dumb Due Work 2" in "Macroscopic properties of matter"
+
 #Scenario: Mark a student's tasks as complete
 #  Given I log in as "cglenn" with password "password"
 #  Then  I follow link "Duke of Edinburgh"
