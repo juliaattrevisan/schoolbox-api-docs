@@ -10,6 +10,12 @@
 
 /* Empty grey background
  */
+.bar-container {
+    width: 100%;
+    height: 16px;
+    clear: both;
+    float: left;
+}
 .bar-container .bar {
     border: 1px solid #dedede;
     width: 90%;

@@ -42,17 +42,43 @@
 					 */
 					config.element.removeClass('loader');
 
-					$j.plot(config.element, datasets, {
-						bars: {
-							show: true
-						},
-						xaxis: {
-							show: true
-						},
-						yaxis: {
-							show: true
+					/* Find the largest one
+					 * Every bar will be represented as a fraction of this
+					 */
+					for (var i = 0, max = 0; i < datasets.length; i++) {
+						var value = parseInt(datasets[i].data[0][1]);
+
+						if (value > max) {
+							max = value;
 						}
-					});
+					}
+
+					/* Bar graph everything
+					 */
+					var output = '<h2>Group Usage</h2>';
+
+					for (var i = 0; i < datasets.length; i++) {
+						var used = parseInt(datasets[i].data[0][1]);
+
+						var percentage = Math.round(100*used/max).toString();
+
+						var html = '\
+							<div>\
+								{BAR}\
+								<p>\
+									{NAME} {USED}\
+								</p>\
+							</div>\
+						';
+
+						var html = html.replace(/\{NAME\}/g, datasets[i].label);
+						var html = html.replace(/\{USED\}/g, $.fn.formatBytes(used));
+						var html = html.replace(/\{BAR\}/g, $.fn.bargraphNoAmount(percentage));
+
+						output += html;
+					}
+
+					config.element.html(output);
 				}
 			});
 		}
