@@ -15,6 +15,13 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\StudentReportCard\Comment;
+use Schoolbox\Assessment\StudentReportCard\CommentMapper;
+use Schoolbox\Assessment\StudentReportCard\Conversation;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Role;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class StudentReportCard {
 
@@ -25,6 +32,11 @@ class StudentReportCard {
 	const CAN_VIEW_CLASS_AVERAGE = 3;
 	const CAN_VIEW_SHOWCASE = 4;
 	const CAN_VIEW_OVERALL_GRADE = 5;
+
+	// binary? more like ternary!
+	const DISABLED = 0;
+	const ENABLED = 1;
+	const MANDATORY = 2;
 
 	// vars that come from user input
 	protected $targetUserId;
@@ -212,8 +224,13 @@ class StudentReportCard {
 		$page->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 
 		// global vars
+		/** @var $target User */
+		$target = UserMapper::getInstance()->findById($this->targetUserId);
 		$page->setVar(array(
-			'WORK_USER_ID' => $this->targetUserId
+			'WORK_USER_ID' => $target->getId(),
+			'WORK_USER_NAME' => $target->formatName(),
+			'WORK_USER_EXT_ID' => $target->getExternalId(),
+			'WORK_USER_BYLINE' => 'Year' . $target->getYear()
 		));
 
 		$this->renderSemesterSelectors($page);
@@ -237,17 +254,7 @@ class StudentReportCard {
 		$page->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
 		$page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
 
-		// Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
-		$semesters = array(1, 2);
-		foreach($semesters as $sem) {
-			$page->setVar(array(
-				'SEMESTER_SELECTED' => $sem == $this->targetSemester ? ' selected="selected"' : '',
-				'SEMESTER_VALUE'    => $sem
-			));
-			$page->parse('semester_option_block','semester_option', true);
-		}
-
-		// Years is trickier, because we first need to find out all the years in which the student in question has submitted work
+		// Years is tricksy, because we first need to find out all the years in which the student in question has submitted work
 		// also, merging in this current year is a tad unfortunate
 		$years = array_unique(
 			array_merge(
@@ -255,17 +262,29 @@ class StudentReportCard {
 				$this->submissionMapper->getAllYearsByUser($this->targetUserId)
 			)
 		);
+
 		foreach($years as $y) {
-			$page->setVar(array(
-				'YEAR_SELECTED' => $y == $this->targetYear ? ' selected="selected"' : '',
-				'YEAR_VALUE'    => $y
-			));
-			$page->parse('year_option_block', 'year_option', true);
+
+			// Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
+			$semesters = array(1, 2);
+			foreach($semesters as $sem) {
+
+				$selected = $y == $this->targetYear && $sem == $this->targetSemester;
+
+				$page->setVar(array(
+					'SEMESTER_SELECTED' => $selected ? ' selected="selected"' : '',
+					'SEMESTER_SLUG'     => "{$this->targetUserId}/$y/$sem",
+					'SEMESTER_VALUE'    => "Semester $sem, $y"
+				));
+				$page->parse('semester_option_block','semester_option', true);
+			}
 		}
 
 		$page->setVar(array(
 			'WORK_YEAR' => $this->targetYear,
-			'WORK_SEMESTER' => $this->targetSemester
+			'WORK_SEMESTER' => $this->targetSemester,
+			'SEMESTER_BACK' => $this->targetYear-($this->targetSemester==1?1:0).'/'.($this->targetSemester==1?2:1),
+			'SEMESTER_FWD'  => $this->targetYear+($this->targetSemester==2?1:0).'/'.($this->targetSemester==1?2:1),
 		));
 
 	}
@@ -303,7 +322,7 @@ class StudentReportCard {
 	protected function renderSubject(\SitePage $page, $components = array()) {
 
 		if(empty($components)) {
-			$components = array('teachers','gradeAverage','classGraph','criteria','assessments');
+			$components = array('teachers','gradeAverage','classGraph','criteria','assessments','comments');
 		}
 
 		if(!$this->subjectData instanceof SubjectReportCard) {
@@ -312,6 +331,7 @@ class StudentReportCard {
 
 		// subject globals
 		$page->setVar(array(
+			'RC_TITLE'      => $this->subjectData->getCategory()->getName(),
 			'SUBJ_ID'       => $this->subjectData->getCategory()->getId(),
 			'SUBJ_NAME'     => $this->subjectData->getCategory()->getName(),
 			'SUBJ_SEMESTER' => "Semester {$this->targetSemester}, {$this->targetYear}",
@@ -747,14 +767,321 @@ class StudentReportCard {
 		return $output;
 	}
 
+	protected function renderComments(\SitePage $page) {
+
+		$page->setBlock('subject', 'subject_comments', 'subject_comments_block');
+		$page->setBlock('subject_comments', 'comment', 'comment_block');
+		$page->setBlock('subject_comments', 'create_comment', 'create_comment_block');
+		$page->setBlock('comment', 'comment_modify', 'comment_modify_block');
+
+		// sessionuser var
+		$sessionUser = UserMapper::getInstance()->findById($this->viewingUserId);
+		$sessionRole = $sessionUser->getRole()->getType();
+
+		$conversation = new Conversation($this->getTargetUser(), $this->getTargetCategory());
+
+		// show or hide the create comment form
+		if($conversation->canComment($sessionUser)) {
+			$sessionUserOutput = array(
+				'ID'        => $sessionUser->getId(),
+				'NAME'      => $sessionUser->formatName(),
+				'BYLINE'    => $sessionUser->getRole()->getName(),
+				'EXTID'     => $sessionUser->getExternalId()
+			);
+			foreach($sessionUserOutput as $k => $v) {
+				$page->setVar('SESSION_USER_'.$k, $v);
+			}
+			$page->parse('create_comment_block', 'create_comment');
+
+			$visibilities = array(
+				'STUDENT' => self::DISABLED,
+				'PARENT' => self::DISABLED
+			);
+
+			// determine default visibilities from submission_access config
+			switch(\Cfg::get('submission_access')) {
+				case SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+					$visibilities['PARENT'] = self::ENABLED;
+					continue;
+				case SubmissionBox::MARK_VISIBILITY_STUDENT:
+					$visibilities['STUDENT'] = self::ENABLED;
+					continue;
+				case SubmissionBox::MARK_VISIBILITY_PRIVATE:
+					break;
+			}
+
+			if($sessionRole == Role::PARENT) {
+				$visibilities['PARENT'] = self::MANDATORY;
+			}
+			elseif($sessionRole == Role::STUDENT) {
+				$visibilities['STUDENT'] = self::MANDATORY;
+			}
+
+			// render the checkboxes on the form
+			foreach($visibilities as $group => $visible) {
+				$attrs = '';
+				switch($visible) {
+					case self::MANDATORY: $attrs .= ' disabled="disabled"'; // fall through
+					case self::ENABLED:   $attrs .= ' checked="checked"'; break;
+				}
+				$page->setVar('COMMENT_VIS_'.$group.'_CHECKED', $attrs);
+			}
+		}
+		// hide the create comment form because you're not allowed to
+		else {
+			$page->setVar('create_comment_block', '');
+		}
+
+		// retrieve the comments visible to the session user
+		$comments = $conversation->getVisibleComments($sessionUser);
+
+
+		// if there are comments, output them
+		if($comments->count()) {
+			foreach($comments as $comment) {
+				/** @var Comment $comment */
+
+				$adr = new \Alaress_Date_Relative($comment->getCreated());
+
+				$date = $adr->getRelativeTime();
+				if($comment->getModified()) {
+					$date .= " &ndash; edited";
+				}
+
+				$commentData = array(
+					'ID' => $comment->getId(),
+					'USER_NAME' => $comment->getCommenter()->formatName(),
+					'USER_BYLINE' => $comment->getCommenter()->getRole(),
+					'USER_EXTID' => $comment->getCommenter()->getExternalId(),
+					'DATE' => $date,
+					'DATETIME' => $adr->getDatabase(),
+					'BODY' => $comment->getBody(),
+				);
+
+				// these vars determine the state of the little person icons
+				if($comment->isVisibleToStudent()) {
+					$commentData['VIS_STUDENT'] = 'on';
+					$commentData['VIS_STUDENT_TITLE'] = 'Visible to student';
+				}
+				else {
+					$commentData['VIS_STUDENT'] = 'off';
+					$commentData['VIS_STUDENT_TITLE'] = 'Hidden from student';
+				}
+
+				if($comment->isVisibleToParent()) {
+					$commentData['VIS_PARENT'] = 'on';
+					$commentData['VIS_PARENT_TITLE'] = 'Visible to parents';
+				}
+				else {
+					$commentData['VIS_PARENT'] = 'off';
+					$commentData['VIS_PARENT_TITLE'] = 'Hidden from parents';
+				}
+
+				// render all comment vars
+				foreach($commentData as $k => $v) {
+					$page->setVar('COMMENT_'.$k, $v);
+				}
+
+				// you can only modify a comment if you made it
+				if($sessionUser->getId() == $comment->getCommenter()->getId()) {
+					$page->parse('comment_modify_block', 'comment_modify');
+				}
+				else {
+					$page->setVar('comment_modify_block', '');
+				}
+
+				$page->parse('comment_block', 'comment', true);
+			}
+		}
+		// no comments in this conversation
+		else {
+			$page->setVar('comment_block', '<tr><td colspan="4">No comments.</td></tr>');
+		}
+
+		$page->parse('subject_comments_block', 'subject_comments');
+
+	}
+
 	/**
 	 * No subject selected, so display an overview of the semester instead
 	 *
 	 * @param \SitePage $page
 	 */
 	protected function renderOverview(\SitePage $page) {
-		// for now, this is just "please select a subject"
-		$page->setVar('subject_block', 'Please select a subject to view.');
+		$page->setVar('RC_TITLE', "Semester {$this->targetSemester}, {$this->targetYear}");
+
+		// we need to inject content into subject_block rather than use its template
+
+		$page->setFile('subjectListTpl', 'submission/allWorkOverview.html');
+		$page->setFile('subjectTpl', 'activity/subjectlist.html');
+		$page->setBlock('subjectTpl', 'teacher', 'teacher_block');
+		$page->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
+
+		/**
+		 * @var $returnMapper SubmissionBox\ReturnedWorkMapper
+		 * @var $attemptMapper OnlineAssessment\AttemptMapper
+		 */
+		$returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
+		$attemptMapper = OnlineAssessment\AttemptMapper::getInstance();
+		$returnHandler = new \SubmissionReturn();
+		$groupHandler = new \Group();
+		$synClass = new \External_Class;
+		$userHandler = new \User();
+		$j = 0;
+
+		$visibilities = array(
+			SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+		);
+		if ($groupHandler->isStudent()) {
+			$visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
+		}
+		elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+			$visibilities[] = SubmissionBox::MARK_VISIBILITY_PRIVATE;
+			$visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
+		}
+
+		foreach($this->categoriesInSemester as $category) {
+
+			$categoryID = $category['id'];
+			$categoryCode = $category['code'] ? '(' . $category['code'] . ')' : '';
+
+			/* yes it actually requires THIS MUCH code to get a teachers name. */
+			if (\Cfg::get('external_enable')) {
+				$teacherOutput = array();
+				$teacherList = array();
+				$codeList = explode(',', $category['code']);
+
+				if (is_array($codeList)) {
+					foreach ($codeList as $code) {
+						if (is_array($temp = $synClass->getTeacherName($code))) {
+							$teacherList = array_merge($teacherList, $temp);
+						}
+					}
+				}
+
+				if (is_array($teacherList)) {
+					foreach ($teacherList as $teacherSynID) {
+						$teacher = $userHandler->getBySynergy($teacherSynID);
+						if (is_array($teacher)) {
+							$teacherName = $userHandler->formatName($teacher);
+
+							$emailObj = new \Email();
+							$emailAddress = $emailObj->formatEmailFromArray($teacher);
+
+							$teacherOutput[] = array(
+								'id' => $teacher['uid'],
+								'name' => $teacherName,
+								'email' => $_SESSION['mailhandle'] . $emailAddress,
+								'synid' => $teacherSynID,
+							);
+						}
+					}
+				}
+			}
+
+
+			// Ensure that grades are properly ordered by date.
+			if (!(\Cfg::get('restrict_student_submissions') && $groupHandler->isParent())) {
+				$studentGrades = array_merge(
+					$returnMapper->getStudentMarks($categoryID, $this->targetUserId, array('visibility' => $visibilities)),
+					$attemptMapper->getStudentMarks($categoryID, $this->targetUserId)
+				);
+				usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
+				$studentGrades = array_map(function($row) { return $row['mark']; }, $studentGrades);
+			}
+			else {
+				$studentGrades = array();
+			}
+
+			$gradeAvg    = -1;
+			$grade_count = count($studentGrades);
+			$show_grades = \Cfg::get('show_overall_grade');
+			$trendDir = '';
+			$trendAmt = '';
+
+			if ($show_grades) {
+				$card = new SubjectReportCard(
+					$category['id'],
+					$this->targetUserId,
+					$this->targetYear,
+					$this->targetSemester,
+					$visibilities
+				);
+				$grade = $card->getGradeAverage();
+				if (isset($grade['grade'])) {
+					$gradeAvg = $grade['grade'];
+					$trendAmt = $grade['trend'];
+					if ($trendAmt > 0) {
+						$trendDir = '&#x25B2;';
+					}
+					elseif ($trendAmt < 0) {
+						$trendDir = '&#x25BC;';
+					}
+					if ($trendAmt != 0) {
+						$trendAmt = sprintf('%0.1f', $trendAmt) . '%';
+					}
+				}
+			}
+
+
+			// calculate grade averages and trending
+			$output = array(
+				'SUBJ_CAT_ID' => $categoryID,
+				'SUBJ_SUBJECT_NAME' => \Scrub::Text($category['name']),
+				'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
+				'SUBJ_SUBJECT_CODE' => $categoryCode,
+				'SUBJ_SUBJECT_URL' => "/submission/allWork/{$this->targetUserId}/{$this->targetYear}/{$this->targetSemester}/$categoryID",
+//				'SUBJ_TOTAL' => $summary[$category['id']]['total'],
+				'SUBJ_TREND_DIR' => $trendDir,
+				'SUBJ_TREND_AMT' => $trendAmt,
+				'SUBJ_HAS_GRADE' => $show_grades ? 'grade' : '',
+				'DARK' => ++$j % 2 ? '' : 'dark'
+			);
+				$page->setVar($output);
+
+			if ($gradeAvg == -1) {
+				$page->setVar('subject_grade_block', '');
+			}
+			else {
+				$page->setVar(array(
+					'SUBJ_GRADE' => $returnHandler->percent2letter($gradeAvg),
+					'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
+				));
+				$page->parse('subject_grade_block', 'subject_grade');
+			}
+
+			if (\Cfg::get('external_enable')) {
+				$page->setVar('teacher_block', '');
+				if (isset($teacherOutput) && count($teacherOutput)) {
+					foreach ($teacherOutput as $teacher) {
+						$tOutput = array(
+							'SUBJ_TEACHER_ID' => $teacher['id'],
+							'SUBJ_TEACHER_NAME' => $teacher['name'],
+							'SUBJ_TEACHER_URL' => $teacher['email'],
+							'SUBJ_TEACHER_ROLE' => 'Teacher',
+							'SUBJ_TEACHER_AVATAR' => "/portrait?userId={$teacher['synid']}&size=square32",
+							'SUBJ_TEACHER_AVATAR_TITLE' => $teacher['name']
+						);
+						$page->setVar($tOutput);
+						$page->parse('teacher_block', 'teacher', true);
+					}
+				}
+			}
+			else {
+				$page->setVar('teacher_block', '');
+			}
+			// $this->parse('icon_block', 'icon');
+			$page->parse('SUBJECT_LIST', 'subjectTpl', true);
+
+		}
+
+		if(count($this->categoriesInSemester)) {
+			$page->parse('subject_block', 'subjectListTpl');
+		}
+		else {
+			$page->setVar('subject_block', '<h2>No subjects</h2>');
+		}
+
 	}
 
 
@@ -807,6 +1134,22 @@ class StudentReportCard {
 		else {
 			return $var >= $this->minimumVisibility;
 		}
+	}
+
+	public function getTargetUser() {
+		return UserMapper::getInstance()->findById($this->targetUserId);
+	}
+
+	public function getTargetCategory() {
+		return CategoryMapper::getInstance()->findById($this->targetCategoryId);
+	}
+
+	public function getTargetYear() {
+		return $this->targetYear;
+	}
+
+	public function getTargetSemester() {
+		return $this->targetSemester;
 	}
 
 }
