@@ -81,11 +81,49 @@ class Queue {
 			$scale = sprintf('-vf scale=%d:%d', intval($width/2)*2, intval($height/2)*2);
 		}
 
+        // Get rotation information, for ipad and iphones that record upside down and use metadata to rotate
+        $rotation = 0;
+        $rotate = '';
+        exec('which exiftool', $unused, $errorcode);
+        if(!$errorcode) {
+            $rotationCmd = 'exiftool -Rotation '.escapeshellarg($sourceFile) ."|sed 's/^[^:]*: //'";
+            exec($rotationCmd, $rotationOut, $return);
+            if(!$return) {
+                $rotation = $rotationOut[0];
+            }
+
+            if($rotation) {
+
+                switch($rotation) {
+                    case 90:
+                        $rotate = 'transpose=1';
+                        break;
+                    case 180:
+                        $rotate = 'transpose=1,transpose=1';
+                        break;
+                    case 270:
+                        $rotate = 'transpose=2';
+                        break;
+                    default:
+                        $rotate = '';
+                }
+
+                if($scale && $rotate) {
+                    $scale .= ','.$rotate;
+                } else {
+                    $scale = $rotate;
+                }
+
+            }
+        }
+
+
 		/* Process video to 512kb in libx264 format for mobile and html5 streaming */
 		$processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
 			" -c:v libx264 $scale -preset slow -b 512k " .
 			($strict ? '-strict -2 ' : '').
 			'-ac 2 ' . escapeshellarg($this->getVideoLocation()).' 2>&1';
+
 
 		exec($processString, $message, $return);
 		$this->setMessage(implode( "\n", $message));
@@ -101,8 +139,8 @@ class Queue {
 
 		/* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in */
 		$thumbnailSeconds = $this->getDuration() > 0 ? round(($this->getDuration() / 3), 2) : 10;
-		$thumbnailString  = "nice $executable -y -i " . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -vf scale=-1:64,crop=64:64 -frames:v 1 ' . escapeshellarg($this->getThumbnailLocation()).' 2>&1';
-		$posterString     = "nice $executable -y -i " . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -frames:v 1 ' . escapeshellarg($this->getPosterLocation()).' 2>&1';
+		$thumbnailString  = "nice $executable -y -i " . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -vf scale=-1:64,crop=64:64'.(($rotate)?','.$rotate:'').' -frames:v 1 ' . escapeshellarg($this->getThumbnailLocation()).' 2>&1';
+		$posterString     = "nice $executable -y -i " . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -frames:v 1 '.(($rotate)?'-vf '.$rotate:'').' ' . escapeshellarg($this->getPosterLocation()).' 2>&1';
 
 		if($return == 0){
 			exec($thumbnailString, $output, $return);

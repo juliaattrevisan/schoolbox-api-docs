@@ -47,6 +47,7 @@ Requires:	mysql-server
 Requires:	wget
 Requires:	cifs-utils
 Requires:	aspell-en
+Requires:	perl-Image-ExifTool
 Requires:	redis
 Requires:	php-redis
 
