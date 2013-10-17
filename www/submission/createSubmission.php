@@ -298,6 +298,7 @@ $output = array(
     'ACCEPT_SUBMISSION' => $submission->getAcceptOnline() ? ' checked' : '',
     'MULTI_SUBMISSION'  => $submission->getAcceptMultiple() ? ' checked' : '',
     'TOTAL_MARK'        => $submission->getMaxMark(),
+    'SUBMISSION_WEIGHT' => $submission->getWeight(),
 
     'OPEN_DATE' => $open_date->getUsingFormat('d/m/Y'),
     'OPEN_HOUR' => $open_hour,
