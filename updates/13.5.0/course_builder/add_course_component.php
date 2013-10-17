@@ -11,15 +11,15 @@ require_once __DIR__.'/../../../include/Bootstrap.php';
 
 // This goes in the Learning category for now. Maybe it gets moved later
 $definition = array(
-    'name'               => 'Course Instance',
+    'name'               => 'Course Outline',
     'module'             => 'homepage',
     'component_category' => '3',
     'class'              => 'Component_Homepage_CourseInstanceController',
-    'description'        => 'Adds a course to a class page. Once you add this component, you will be able to select a course - any tasks in that course will be imported into this class.',
+    'description'        => 'Import a course onto your class page, along with its tasks, assessments and rubrics.',
     'multiple'           => 'true',
     'config'             => array(
         'componentname' => array(
-            'default_value' => 'Course',
+            'default_value' => 'Course Outline',
             'label'         => 'Heading',
         ),
         // Config options: source homepage ID

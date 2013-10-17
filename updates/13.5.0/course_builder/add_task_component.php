@@ -11,13 +11,13 @@ require_once __DIR__.'/../../../include/Bootstrap.php';
 
 // This goes in the Learning category for now. Maybe it gets moved later
 $definition = array(
-    'name'               => 'Course Task List',
+    'name'               => 'Course Builder',
     'module'             => 'homepage',
     'component_category' => '3',
     'class'              => 'Component_Homepage_CourseTaskListController',
-    'description'        => 'Create a unit of a course by adding this component and adding tasks to it.',
+    'description'        => 'Use this component to build tasks and assessments for a course.',
     'multiple'           => 'false',
-    'config'             => array('componentname' => array('default_value' => 'Course Task List', 'label' => 'Heading'),),
+    'config'             => array('componentname' => array('default_value' => 'Course Builder', 'label' => 'Heading'),),
 );
 
 Component_DefinitionMapper::getInstance()->create($definition);

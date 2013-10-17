@@ -35,7 +35,7 @@ Scenario: Create a course
   # * Courses: any homepage underneath course home
   # * Lessons: any homepage directly underneath selected course with a task list component
   When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
-  And   add component "Learning:Course Task List"
+  And   add component "Learning:Course Builder"
 
   # Start adding tasks
   # Types:
@@ -94,7 +94,7 @@ Scenario: Create a course
 
   # Add more task lists
   When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Atomic structure and bonding"
-  And   add component "Learning:Course Task List"
+  And   add component "Learning:Course Builder"
   And   I add a task named "Read chapter 4"
   And   I add a task named "Attend a laboratory" which is not self-assess
   And   I add a due work task
@@ -104,7 +104,7 @@ Scenario: Create a course
   And   I press "Create"
 
   When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Macroscopic properties of matter"
-  And   add component "Learning:Course Task List"
+  And   add component "Learning:Course Builder"
   And   I add a task named "Read chapter 5"
   And   I add a due work task
   And   I fill in "name" with "Dumb Due Work 2"
@@ -119,7 +119,7 @@ Scenario: Add a course to a class
   And   I log in as "cglenn" with password "password"
   # Test adding this new course to a group page. Students should be able to take this course.
   When  I follow "Duke of Edinburgh"
-  And   I add component "Learning:Course Instance"
+  And   I add component "Learning:Course Outline"
   And   I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
   And   I wait for a "form#importForm" element
   # Set due dates for units
