@@ -108,8 +108,8 @@ class Grades {
 
 		// sort all the things by their respective due-date fields
 		$assessments->sortByCallback(function($a, $b) {
-			$x = $a instanceof SubmissionBox ? $a->getDueDate() : $a->getFinish();
-			$y = $b instanceof SubmissionBox ? $b->getDueDate() : $b->getFinish();
+			$x = $a instanceof SubmissionBox ? $a->getDueDate()->getUnixTimestamp() : $a->getFinish()->getUnixTimestamp();
+			$y = $b instanceof SubmissionBox ? $b->getDueDate()->getUnixTimestamp() : $b->getFinish()->getUnixTimestamp();
 			return $x == $y ? 0 : ($x > $y ? 1 : -1);
 		});
 
