@@ -164,7 +164,7 @@ class Marksheet {
 					// automark if OA
 					$this->automarkOnlineAssessment($work['id']);
 					$mapper = $this->oaMapper;
-					$mtSlug = 'raw';
+					$mtSlug = 'percent';
 				}
 				else {
 					$mapper = $this->sbMapper;
@@ -190,11 +190,20 @@ class Marksheet {
 					}
 				}
 
+				if($object instanceof SubmissionBox) {
+					$maxMark = $object->getMaxMark();
+				}
+				elseif($object instanceof OnlineAssessment) {
+					$maxMark = 100;
+				}
+
 				if(is_null($stats['mean'])) {
 					$classAvg = null;
 				}
 				else {
-					$classAvg = $this->marktypeFactoryHandler->build($mtSlug)->convertRawMark($stats['mean']);
+					$classAvg = $this->marktypeFactoryHandler->build($mtSlug)->convertRawMark(
+						$stats['mean'], $maxMark, true, false
+					);
 				}
 
 
@@ -259,7 +268,7 @@ class Marksheet {
 							$mark = $this->getSubmissionBoxMarkForStudent($work['id'], $userId);
 						}
 						$row['marks'][$isOA][$work['id']] = $mark;
-						$row['avg'] = $studentGrades[$userId]['avg'];
+						$row['avg'] = count($studentGrades[$userId]['grades']) ? $studentGrades[$userId]['avg'] : null;
 					}
 					unset($work);
 				}
@@ -328,7 +337,12 @@ class Marksheet {
 		$marktype = $this->marktypeFactoryHandler->build($box['mark_type_slug']);
 		$mark = $marktype->retrieveMark($studentId, $boxId, false, true);
 
-		$pretty = $marktype->convertRawMark($mark['norm_mark']);
+		if(is_null($mark['norm_mark'])) {
+			$pretty = '&ndash;';
+		}
+		else {
+			$pretty = $marktype->convertRawMark($mark['norm_mark'], $mark['max_mark'], true, false);
+		}
 
 		return array(
 			'norm_mark' => $mark['norm_mark'],
@@ -380,14 +394,6 @@ class Marksheet {
 		$page->setBlock('student_row', 'student_work', 'student_work_block');
 		$page->setBlock('student_row', '', '_block');
 
-
-		// TODO iterate class averages and output (this is placeholding)
-		$page->parse('class_average_block', 'class_average', true);
-		$page->parse('class_average_block', 'class_average', true);
-		$page->parse('class_average_block', 'class_average', true);
-		$page->parse('class_average_block', 'class_average', true);
-		$page->parse('class_average_block', 'class_average', true);
-
 		// if mapping not defined here, uses ucfirst(:field)
 		$statLabelLookup = array(
 			'avg'               => 'Class Average',     // this is different to mean: same input value, but formatted according to the work marktype
@@ -407,6 +413,7 @@ class Marksheet {
 		foreach($this->statisticDataSet as $isOA => $workList) {
 			foreach($workList as $workId => $workData) {
 				foreach($workData as $statName => $statValue) {
+					// replace null (explicitly null) with an endash
 					$transposed[$statName]["$isOA-$workId"] = is_null($statValue) ? '&ndash;' : $statValue;
 				}
 			}
@@ -416,6 +423,30 @@ class Marksheet {
 		foreach($transposed as $name => $boxes) {
 			$page->setVar('stat_item_block', '');
 
+			// special case!
+			if($name == 'avg') {
+				foreach($boxes as $workId => $value) {
+
+					if(is_numeric($transposed['mean'][$workId])) {
+						$gradient = (int) ($transposed['mean'][$workId] / 10);
+					}
+					else {
+						$gradient = 'off';
+					}
+
+					$page->setVar(array(
+						'WORK_CLASSAVG_GRADIENT' => $gradient,
+						'WORK_CLASSAVG_CLEAN' => $value
+					));
+					$page->parse('class_average_block', 'class_average', true);
+				}
+
+				// don't do any of the other processing
+				continue;
+			}
+
+			// not a special case, just process as normal
+
 			$page->setVar(array(
 				'WORK_STAT_CLASS' => $name,
 				'WORK_STAT_TITLE' => isset($statLabelLookup[$name]) ? $statLabelLookup[$name] : ucfirst($name),
@@ -423,7 +454,7 @@ class Marksheet {
 
 			foreach($boxes as $workId => $value) {
 				$page->setVar(array(
-					'WORK_NS_ID' => str_replace('-', '][', $workId), // it makes sense, I promise!
+					'WORK_NS_ID' => str_replace('-', '][', $workId), // so it appears as the name attribute properly
 					'WORK_STAT_VALUE' => is_numeric($value) ? (float) round($value, 3) : $value // truncate to 3 decimals, then strip extraneous 0s
 				));
 
@@ -449,14 +480,24 @@ class Marksheet {
 			/** @var $student User */
 			$student = $row['student'];
 
+			if(is_null($row['avg'])) {
+				$gradient = 'off';
+				$average = '&ndash;';
+			}
+			else {
+				$gradient = (int)($row['avg'] / 10);
+				$average = \Marksheet_Factory::build('letter')->convertRawMark($row['avg'], null, true, false);
+			}
+
+
 			$page->setVar(array(
 				'STUDENT_NAME_FORMAL' => $student->formatName('{lastname}, {firstname}'),
 				'STUDENT_NAME' => $student->formatName(),
 				'STUDENT_EXTID' => $student->getExternalId(),
 				'STUDENT_ID' => $userId,
 				'DARK' => ++$i%2 ? 'dark' : '',
-				'STUDENT_AVG_GRADIENT' => '7',
-				'STUDENT_AVG_CLEAN' => '42'
+				'STUDENT_AVG_GRADIENT' => $gradient,
+				'STUDENT_AVG_CLEAN' => $average
 
 			));
 
