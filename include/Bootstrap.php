@@ -20,6 +20,7 @@ require_once('constants.php');
 
 // register the shutdown_safely() function in stdfuncs as the termination script
 register_shutdown_function('shutdown_safely');
+set_exception_handler('shutdown_safely');
 
 /* Set include path */
 set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include_path());

@@ -26,9 +26,18 @@ function error($ec, $message="") {
  * Handler function that will be called whenver a script terminates, but will only do something if the termination
  * was triggered by a fatal error
  */
-function shutdown_safely() {
+function shutdown_safely(Exception $e = null) {
 
-    $error = error_get_last();
+    if ($e instanceof Exception) {
+        $error = array(
+            'file'    => $e->getFile(),
+            'message' => $e->getMessage(),
+            'line'    => $e->getLine(),
+        );
+    }
+    else {
+        $error = error_get_last();
+    }
 
     // it's almost a guarantee that some kind of minor error will have occurred at some point
     if($error !== NULL) {
@@ -36,8 +45,11 @@ function shutdown_safely() {
         // use the document_root to get a Schoolbox-relative file in which the error occurred
         $cause = substr($error['file'], strlen($_SERVER['DOCUMENT_ROOT']) - 4);
 
-        // if it was a fatal error that triggered our sudden but inevitable demise...
-        if($error['type'] == E_ERROR) {
+        // if it was a fatal error or exception that triggered our sudden but inevitable demise...
+        if (
+            (intval($error['type']) & (E_ERROR|E_CORE_ERROR|E_USER_ERROR|E_COMPILE_ERROR))
+            || $e instanceof Exception
+        ) {
 
             // decide what to tell the user based on where this error came from
             switch($cause) {
