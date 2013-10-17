@@ -1566,8 +1566,20 @@ Notifications
     }
 }
 
-.editPanel form div {
-	.config-inline;
+.editPanel form {
+	div {
+		display: block;
+	}
+	span {
+		display: inline-block;
+		width: 100px;
+		span {
+			display: inline;
+		}
+	}
+	script + span {
+		display: inline;
+	}
 }
 
 .box {
@@ -1598,7 +1610,6 @@ Notifications
         clear: both;
         padding: 8px 7px;
         background: @lgrey;
-        text-align: right;
         label {
             display: inline;
         }
@@ -1606,7 +1617,9 @@ Notifications
             margin: 0;
             text-align: right;
         }
-
+		.config-filters {
+			width: auto;
+		}
         .config-filters span {
             margin-left: 6px;
             margin-right: 4px;
@@ -1622,7 +1635,6 @@ Notifications
         }
 
         form div {
-            .config-inline;
             .row {
 				display: block;
 			}
