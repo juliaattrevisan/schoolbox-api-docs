@@ -1,0 +1,302 @@
+<div class="box clearfix component course_instance" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
+    <div class="box clearfix">
+        <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
+        <style type="text/css">
+            .course_instance h3,
+            .course_instance h4 {
+                display: inline-block;
+                float: none;
+            }
+            .course_instance .unit-completion {
+                display: inline-block;
+                /*
+                width: 20%;
+                text-align: right;
+                */
+            }
+            .course_instance .information-list .no-expand {
+                padding-left: 15px;
+            }
+            .course_instance .information-list .expand-link {
+                text-decoration: none;
+            }
+            .course_instance .information-list .expand-button {
+                line-height: 11px;
+                width: 11px;
+                min-height: 11px;
+                margin-right: 4px;
+                display: inline-block;
+                background-color: transparent;
+                background-position-x: -2px;
+                background-position-y: -6px;
+                background-repeat: no-repeat;
+            }
+            .course_instance .information-list .unit.collapsed .expand-button {
+                background-image: url(/images/tree/elbow-collapsed.gif);
+            }
+            .course_instance .information-list .unit.expanded  .expand-button {
+                background-image: url(/images/tree/elbow-expanded.gif);
+            }
+            .course_instance .task-list h4 {
+                width: auto;
+            }
+        </style>
+        <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+        <script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
+        <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
+        <script type="text/javascript" src="/javascript/jquery.courseInstance.js"></script>
+        <script type="text/javascript" src="/javascript/jquery.ajaxUploadDialog.js"></script>
+
+        <script type="text/javascript">
+            (function($) {
+                $(function() {
+                    $('#component{COMPONENT_INSTANCE_ID}').setupCourseInstance({
+                        session_name:    '{SESSION_NAME}',
+                        session_id:      '{SESSION_ID}',
+                        course_homepage: '{COURSE_HOMEPAGE}'
+                    });
+                });
+            })(jQuery);
+        </script>
+
+        <!-- BEGIN course_selector -->
+        <h3>This is the course instance component, so please choose a course.</h3>
+        <!-- No form yet, as nothing has been saved. -->
+        <input type="hidden" name="homepage" value="" />
+        <span data-resource_text></span>
+        <p class="interact add_buttons">
+            <a href="/course/import/{ID}/{COMPONENT_INSTANCE_ID}/" class="btn float-right translate" data-interaction="import">
+                <span></span>Import
+            </a>
+            <a href="#" class="btn float-right up-arrow" data-interaction="homepage_selector">
+                <span></span>Select Source
+            </a>
+        </p>
+        <!-- END course_selector -->
+
+
+        <!-- BEGIN course_unit_list -->
+        <ul class="information-list listing">
+            <!-- BEGIN unit -->
+            <li class="unit interact {UNIT_EXPANDED_STATE} {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
+
+                <!-- BEGIN unit_expand -->
+                <a href="#" class="unit-name expand-link" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}">
+                    <span class="expand-button"></span>&nbsp;
+                </a>
+                <!-- END unit_expand -->
+
+                <!-- BEGIN unit_no_expand -->
+                <span class="unit-name no-expand">&nbsp;</span>
+                <!-- END unit_no_expand -->
+
+                <h3><a href="/homepage/{UNIT_HOMEPAGE_ID}">{UNIT_NAME}</a></h3>
+
+                <!-- BEGIN unit_completion -->
+                <span class="unit-completion gradient-{UNIT_UPCOMING_URGENCY}">
+                    {UNIT_COMPLETION_STATUS} {UNIT_RELATIVE_DATE}
+                </span>
+                <!-- END unit_completion -->
+
+                <span class="actions">
+                    <!-- BEGIN unit_modify -->
+                    <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="btn modify no-text" title="Modify this unit"><span></span></a>
+                    <!-- END unit_modify -->
+
+                    <!-- BEGIN unit_delete -->
+                    <a href="#"
+                       class="btn delete no-text"
+                       title="Delete this unit"
+                       data-interaction="open_delete_unit_form"
+                    ><span></span></a>
+                    <!-- END unit_delete -->
+                </span>
+
+                <div class="hide clear form_container" data-interaction="delete_unit_container">
+                    <p class="notice">Are you sure you wish to delete this unit?</p>
+                    <p class="notice">All tasks within the unit will be deleted, as will any linked due work items and online assessments.</p>
+                    <form action="/course/modifyForm.php" method="post" class="delete_form" data-form_type="delete_unit">
+                        <input type="hidden" name="action"    value="delete" />
+                        <input type="hidden" name="id"        value="{UNIT_ID}" />
+                        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                        <button type="submit" class="btn delete" data-interaction="delete_confirm"><span></span> Yes</button>
+                        <a href="#" class="btn go-to delete-reject" data-interaction="delete_reject"><span></span> No</a>
+                    </form>
+                </div>
+
+                <ul class="task-list listing {UNIT_LIST_CLASS}">
+                    <!-- BEGIN unit_task -->
+                    <li class="unit-task interact {UNIT_BACKGROUND} {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
+                        <span class="icon {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}"><span></span></span>
+
+                        <!--
+                        Student: see buttons for starting/ending task
+                        Teacher: sees completion stats
+                        -->
+
+                        <!-- BEGIN unit_task_link -->
+                        <a href="/task/start/{UNIT_TASK_ID}"><h4>{UNIT_TASK_NAME}</h4></a>
+                        <!-- END unit_task_link -->
+                        <!-- BEGIN unit_task_no_link -->
+                        <h4>{UNIT_TASK_NAME}</h4>
+                        <!-- END unit_task_no_link -->
+
+                        <!-- BEGIN unit_task_completion -->
+                        <span class="unit-task-completion">({UNIT_TASK_COMPLETION_STATUS})</span>
+                        <!-- END unit_task_completion -->
+
+                        <!-- BEGIN unit_task_count -->
+                        <span class="unit-completion gradient-{UNIT_TASK_GRADIENT}">
+                            ({UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT})
+                        </span>
+                        <!-- END unit_task_count -->
+
+                        <span class="actions">
+                            <!-- BEGIN unit_task_modify -->
+                            <a href="/task/instance/modify/{UNIT_TASK_ID}"
+                               class="btn modify no-text"
+                               title="Modify this task"
+                               data-interaction="open_edit_task_form"
+                            ><span></span></a>
+                            <!-- END unit_task_modify -->
+
+                            <!-- BEGIN unit_task_delete -->
+                            <a href="#"
+                               class="btn delete no-text"
+                               title="Delete this task"
+                               data-interaction="open_delete_task_form"
+                            ><span></span></a>
+                            <!-- END unit_task_delete -->
+
+                            <!-- BEGIN unit_task_start -->
+                            <a href="/task/start/{UNIT_TASK_ID}" class="btn go-to no-text" title="Start this task"><span></span></a>
+                            <!-- END unit_task_start -->
+                        </span>
+
+                        <!-- BEGIN unit_task_modify_form -->
+                        <div class="hide clear form_container" data-interaction="edit_task_container">
+                            <form action="/task/saveInstanceForm.php" method="post" class="edit_form" data-form_type="task">
+                                <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
+                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
+
+                                <dl>
+                                    <dt><label for="title-{UNIT_TASK_ID}">Task:</label></dt>
+                                    <dd><input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" /></dd>
+
+                                    <dt><label for="link-{UNIT_TASK_ID}">Link:</label></dt>
+                                    <dd>
+                                        <input id="link-{UNIT_TASK_ID}" name="link" type="text" value="{UNIT_TASK_LINK}" />
+                                        <p class="interact">
+                                            <a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
+                                            <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
+                                        </p>
+                                    </dd>
+
+                                    <dt><label for="self_assess-{UNIT_TASK_ID}">Self-assessed?</label></dt>
+                                    <dd>
+                                        <input name="self_assess" value="0" type="hidden" />
+                                        <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
+                                    </dd>
+                                </dl>
+
+                                <input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
+
+                            </form>
+                        </div>
+                        <!-- END unit_task_modify_form -->
+
+                        <!-- BEGIN unit_task_delete_form -->
+                        <div class="hide clear form_container" data-interaction="delete_task_container">
+                            <p class="notice">Are you sure you wish to delete this task?</p>
+                            <p class="notice">Any linked due work items and online assessments will be deleted, as will all student's completion of this task.</p>
+                            <form action="/task/saveInstanceForm.php" method="post" class="delete_form" data-form_type="delete_task">
+                                <input type="hidden" name="action"    value="delete" />
+                                <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
+                                <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
+                                <button type="submit" class="btn delete" data-interaction="delete_confirm"><span></span> Yes</button>
+                                <a href="#" class="btn go-to delete-reject" data-interaction="delete_reject"><span></span> No</a>
+                            </form>
+                        </div>
+                        <!-- END unit_task_delete_form -->
+                    </li>
+                    <!-- END unit_task -->
+                </ul>
+
+                <!-- BEGIN unit_actions -->
+                <p class="interact add_buttons">
+                    <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="btn up-arrow" data-form_class="for_due_work"><span></span>Add Due Work</a>
+                    <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="btn create" data-form_class="for_assessment"><span></span>Add Assessment</a>
+                    <a href="/task/createInstance/{UNIT_ID}" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
+                </p>
+                <!-- END unit_actions -->
+
+                <!-- This is the form for inline creation of tasks -->
+                <div class="clear form_container for_task hide">
+                    <p>
+                        This task creates a task for a student to complete.
+                        This task can be marked off by a student, but you may set whether it requires
+                        that you confirm its completion.
+                    </p>
+                    <p>
+                        You may optionally add a link for a student to visit - the task will be marked
+                        as complete once the student visits that link. You can supply a link to an existing
+                        web page or file, upload a file from your computer for students to download, or select
+                        an existing homepage or file from the resource browser.
+                    </p>
+                    <p>
+                        (This task will not be added to the course that this unit is based off of - it will only exist on this instance of the unit.)
+                    </p>
+                    <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
+                        <input type="hidden" name="id" value=""/>
+                        <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
+
+                        <dl>
+                            <dt><label for="title-new_task">Task:</label></dt>
+                            <dd><input id="title-new_task" name="title" type="text" value="" /></dd>
+
+                            <dt><label for="link-new_task">Link:</label></dt>
+                            <dd>
+                                <input id="link-new_task" name="link" type="text" value="" />
+                                <p class="interact">
+                                    <a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
+                                    <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
+                                </p>
+                            </dd>
+
+                            <dt><label for="self_assess-new_task">Self-assessed?</label></dt>
+                            <dd>
+                                <input name="self_assess" value="0" type="hidden" />
+                                <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" />
+                            </dd>
+                        </dl>
+
+                        <input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
+
+                    </form>
+                </div>
+
+            </li>
+            <!-- END unit -->
+        </ul>
+        <!-- BEGIN course_modify -->
+        <p class="interact add_buttons">
+            <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="btn float-right modify"><span></span>Modify</a>
+        </p>
+        <!-- END course_modify -->
+        <!-- END course_unit_list -->
+
+    </div>
+
+    <!-- Dialog for file browser -->
+    <div class="file_uploader hide">
+        If you upload a file, its URL will appear in the Link section.
+        <form action="/storage/asyncUpload.php" method="post" enctype="multipart/form-data">
+            <input id="upload" name="upload" type="file" />
+            <input type="submit" value="Upload" class="submit-btn-plain" />
+        </form>
+    </div>
+</div>

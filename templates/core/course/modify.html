@@ -1,0 +1,82 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.courseImport.js"></script>
+<script type="text/javascript">
+(function($) {
+    $(function() {
+        $('form#modifyForm').setupCourseImport();
+    });
+})(jQuery);
+</script>
+<!-- END custom_head -->
+
+<h1>Modify a course</h1>
+
+<form method="post" action="/course/modifyForm.php" id="modifyForm">
+
+    <input type="hidden" name="homepage"        value="{HOMEPAGE_ID}" />
+    <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
+    <input type="hidden" name="component"       value="{COMPONENT_ID}" />
+
+    <table class="standardForm">
+
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Course</h4>
+                <em>The course that has been imported.</em>
+            </td>
+            <td>
+                <!-- BEGIN course_breadcrumb -->
+                <span class="category"><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></span>
+                <!-- END course_breadcrumb -->
+            </td>
+        </tr>
+
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Destination Class</h4>
+                <em>The class that the course was imported into.</em>
+            </td>
+            <td class="course_definition">
+                <!-- BEGIN class_breadcrumb -->
+                <span class="category"><a href="/homepage/{CLASS_CATEGORY_ID}/">{CLASS_CATEGORY_NAME}</a></span>
+                <!-- END class_breadcrumb -->
+            </td>
+        </tr>
+
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Units</h4>
+                <em>You will need to set a start and end date for each unit that you want to import.</em>
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td>Name</td>
+                        <td>Open Date</td>
+                        <td>Due Date</td>
+                    </tr>
+                    <!-- BEGIN unit -->
+                    <tr data-type="unit_row" data-enabled="{UNIT_ENABLED}" data-unit_id="{UNIT_ID}">
+                        <td>
+                            <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
+                            <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
+                            <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
+                            <label for="import-{UNIT_COUNT}">{UNIT_NAME}</label>
+                            (<a href="/homepage/{UNIT_ID}" class="unit_name">View</a>)
+                            <input name="unit[{UNIT_COUNT}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
+                        </td>
+                        <td>
+                            <input class="open_date" id="open_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][open_date]" type="text" size="15" maxlength="30" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
+                        </td>
+                        <td>
+                            <input class="due_date" id="due_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][due_date]" type="text" size="15" maxlength="30" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
+                        </td>
+                    </tr>
+                    <!-- END unit -->
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <input type="submit" value="Modify" class="submit-btn-plain" />
+</form>

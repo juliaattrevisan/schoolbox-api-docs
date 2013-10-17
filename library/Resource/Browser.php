@@ -15,18 +15,25 @@ class Resource_Browser {
         $this->page = $page;
     }
 
-    public function render($templateHandle, $destinationInputIdentifier) {
+    public function render($templateHandle, $options) {
         $page = $this->getPage();
         $page->setFile($templateHandle, 'resource_browser.html');
         $page->setBlock($templateHandle, 'category_list', 'category_list_block');
-        $page->setVar('DESTINATION', $destinationInputIdentifier);
+        $page->setVar('DESTINATION',      $options['destination']);
+        $page->setVar('DESTINATION_TEXT', $options['destination_text']);
+        $page->setVar('TRIGGER',          $options['trigger'] ? '1' : '');
 
         $groupHandler = new Group;
         $categoryHandler = new Category;
 
 
 
-        $openCategory = (int)$_SESSION['resourcesID'];
+        if (isset($options['start'])) {
+            $openCategory = $options['start'];
+        }
+        else {
+            $openCategory = (int)$_SESSION['resourcesID'];
+        }
 
         // check permissions on selected category
         if ($groupHandler->getPermission($openCategory) < READ_ACCESS) {
@@ -54,7 +61,8 @@ class Resource_Browser {
 
 
         // output folders, column 1
-        $categoryList = $categoryHandler->getCategoryNode($openCategory);
+        // Don't progress above whatever the base category is
+        $categoryList = $categoryHandler->getCategoryNode($openCategory, $options['base']);
         if (is_array($categoryList)) {
 
             foreach ($categoryList as $category) {
@@ -72,8 +80,13 @@ class Resource_Browser {
 
                     $class = array();
 
-                    // set parent category
-                    $class[] = "child-of-node-{$category['parent']}";
+                    // set parent category - if this is a child of the base cat,
+                    // it's zero regardless of what it is (it has no parent)
+                    $parent  = $category['parent'];
+                    if ($parent == $options['base']) {
+                        $parent = 0;
+                    }
+                    $class[] = "child-of-node-$parent";
 
                     /* add plus sign to parent nodes */
                     if ($category['isParent'] == '1') {
@@ -88,6 +101,11 @@ class Resource_Browser {
                     /* mark homepages */
                     if ($category['template'] > 0) {
                         $class[] = "homepage";
+                    }
+
+                    /* mark courses */
+                    if ($category['taskCount'] > 0) {
+                        $class[] = "course";
                     }
 
                     /* mark write access */

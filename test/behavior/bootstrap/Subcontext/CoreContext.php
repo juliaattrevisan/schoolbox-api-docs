@@ -18,12 +18,26 @@ class Subcontext_CoreContext extends BaseContext {
      * upon each scenario), so please call this as the first step in the first
      * scenario in a feature.
      *
-     * @When /^(?:|I )start afresh$/
-     * @When /^(?:|I )reset the database$/
-     * @When /^(?:|I )wipe the slate clean$/
+     * @Given /^(?:|I )start afresh$/
+     * @Given /^(?:|I )reset the database$/
+     * @Given /^(?:|I )wipe the slate clean$/
      */
     public function startAfresh() {
         $this->getMinkContext()->visit('/test/reset.php');
+    }
+
+    /**
+     * Placeholder step for not clearing the database when at the start of a
+     * feature description.
+     *
+     * This method does nothing, but is included for clarity when defining
+     * a scenario that continues on from the previous scenario.
+     *
+     * @Given /^(?:|I )do not start afresh$/
+     * @Given /^(?:|I )do not reset the database$/
+     * @Given /^(?:|I )do not wipe the slate clean$/
+     */
+    public function doNotStartAfresh() {
     }
 
     /**
@@ -60,9 +74,23 @@ class Subcontext_CoreContext extends BaseContext {
      */
     public function goToHomepage($homepage_path) {
         $this->getMinkContext()->visit('/resources/');
-        $dirname_list = array_filter(array_map('trim', explode('/', $homepage_path)), 'strlen');
+        $this->traverseTree($this->getSession()->getPage()->find('css', '#category-window'), $homepage_path);
+        $this->getCoreContext()->waitForAjax();
+        $this->getSession()->getPage()->find('css', '#detail-window a.rhomepage')->click();
+    }
 
-        $folder_browser    = $this->getSession()->getPage()->find('css', '#category-window');
+    /**
+     * Traverses a tree structure (examples: resource browser)
+     *
+     * @param Element\NodeElement $tree The element which contains the tree.
+     * @param string              $path The path to traverse in the tree - each
+     *                                  node is separated by a / character.
+     * @return Element\NodeElement The node that represents the end of the path
+     * @throws Exception if the end node couldn't be found
+     */
+    public function traverseTree($tree, $path) {
+
+        $dirname_list      = array_filter(array_map('trim', explode('/', $path)), 'strlen');
         $current_folder_id = 0;
 
         $count = count($dirname_list);
@@ -70,7 +98,7 @@ class Subcontext_CoreContext extends BaseContext {
             // Click the expand button, if there is one and it isn't expanded.
             // If this is the last item, click "visit homepage" instead.
             /** @var Element\NodeElement[] $child_folder_list */
-            $child_folder_list = $folder_browser->findAll('css', '.child-of-node-'.$current_folder_id);
+            $child_folder_list = $tree->findAll('css', '.child-of-node-'.$current_folder_id);
             $is_dirname_found  = false;
             foreach ($child_folder_list as $child_folder) {
                 $label       = $child_folder->find('css', '.label');
@@ -88,10 +116,9 @@ class Subcontext_CoreContext extends BaseContext {
                         }
                     }
                     else {
-                        // Last folder: open node, click "View Homepage"
+                        // Last folder: return it
                         $label->click();
-                        $this->getCoreContext()->waitForAjax();
-                        $this->getSession()->getPage()->find('css', '#detail-window a.rhomepage')->click();
+                        return $label;
                     }
                     break;
                 }
@@ -105,6 +132,9 @@ class Subcontext_CoreContext extends BaseContext {
                 );
             }
         }
+        throw new Exception(
+            'Could not find folder "%s" in path "%s"'
+        );
     }
 
     /**
@@ -116,12 +146,58 @@ class Subcontext_CoreContext extends BaseContext {
      * @param string $name
      * @param string $value
      * @throws Exception if the form was not found.
-     *
      */
     public function setConfigurationSetting($type, $name, $value) {
         $this->getMinkContext()->visit('/adminv2/setting/'.$type);
-        $form = $this->getSession()->getPage()->find('css', 'form#settings');
+        $form  = $this->getSession()->getPage()->find('css', 'form#settings');
+        $field = $this->findConfigurationField($form, $name);
+        if (!$field) {
+            throw new Exception(sprintf('Could not find setting "%s:%s"', $type, $name));
+        }
+        $field->setValue($value);
+        $form->findButton('Save')->press();
+    }
 
+    /**
+     * Sets a config setting in the admin section.
+     *
+     * @Then /^(?:|I )set resource (?:config|setting|configuration) "(?P<type>[^:]*):(?P<name>[^"]*)" to "(?P<value>[^"]*)"$/
+     *
+     * @param string $type
+     * @param string $name
+     * @param string $value
+     * @throws Exception if the form was not found.
+     */
+    public function setResourceConfigurationSetting($type, $name, $value) {
+        $this->getMinkContext()->visit('/adminv2/setting/'.$type);
+        $form  = $this->getSession()->getPage()->find('css', 'form#settings');
+        $field = $this->findConfigurationField($form, $name);
+        if (!$field) {
+            throw new Exception(sprintf('Could not find setting "%s:%s"', $type, $name));
+        }
+
+        // Click the button
+        // Search for the item in the resource builder
+        $button = $form->find('css', 'input[data-input_name="'.$field->getAttribute('name').'"]');
+        $button->click();
+        $this->waitForAjax();
+
+        // Traverse the browser tree
+        $browser = $this->getSession()->getPage()->findById('resource-browser');
+        $this->traverseTree($browser, $value);
+        $browser->findById('select-resource')->click();
+        $form->findButton('Save')->press();
+    }
+
+    /**
+     * Finds the input field for a configuration setting.
+     *
+     * @param Element\NodeElement $form The form to search in.
+     * @param string              $name The label or name of the field.
+     *
+     * @return Element\NodeElement
+     */
+    protected function findConfigurationField($form, $name) {
         // Name could be either a label text or field name, try field name first.
         $field = $form->findField($name);
         if (!$field) {
@@ -136,11 +212,7 @@ class Subcontext_CoreContext extends BaseContext {
                 }
             }
         }
-        if (!$field) {
-            throw new Exception(sprintf('Could not find setting "%s:%s"', $type, $name));
-        }
-        $field->setValue($value);
-        $form->findButton('Save')->press();
+        return $field;
     }
 
     /**
@@ -214,6 +286,22 @@ class Subcontext_CoreContext extends BaseContext {
             },
             ($duration/1000)
         );
+    }
+
+    /**
+     * Waits for an element to be visible. (The element must exist on the page.)
+     *
+     * @see MinkContext->assertElementOnPage()
+     *
+     * @Then /^(?:|I )wait for an? "(?P<element>[^"]*)" element to be visible$/
+     * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<element>[^"]*)" element to be visible$/
+     */
+    public function waitForVisible($element, $duration = 5000) {
+        $node = $this->getSession()->getPage()->find('css', $element);
+        if (!($element instanceof Element\NodeElement)) {
+            throw new Exception("Element \"$element\" was not found on page");
+        }
+        $this->delayUntilVisible($node, $duration/1000);
     }
 
     /**

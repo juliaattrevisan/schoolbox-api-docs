@@ -124,6 +124,11 @@ if (is_array($categoryList)) {
 				$class[] = "homepage";
 			}
 
+			// mark courses
+			if ($category['taskCount'] > 0) {
+				$class[] = "course";
+			}
+
 			/* mark write access */
 			if ($permission[$category['id']] == WRITE_ACCESS) {
 				$class[] = "write";

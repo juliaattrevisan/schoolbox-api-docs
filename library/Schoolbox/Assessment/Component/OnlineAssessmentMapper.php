@@ -48,6 +48,12 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'join'       => 'task',
 		));
 		$this->hasMap(array(
+			'column'     => 'task_instance_id',
+			'property'   => 'taskInstance',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'task_instance',
+		));
+		$this->hasMap(array(
 			'column'     => 'type',
 			'property'   => 'workType',
 			'type'       => self::TYPE_MODEL,
@@ -141,6 +147,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'multiple'  => true,
 			'this_key'  => 'assess_id',
 			'other_key' => 'assess_id',
+		));
+		$this->hasJoin('task_instance', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceMapper',
+			'this_key'  => 'task_instance_id',
+			'other_key' => 'id',
 		));
 
 		$this->hasSoftDeleteDateField('deleted_at');

@@ -151,8 +151,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                       assess_question.type_id,
                       assess_question.sequence,
                       assess_question.marks,
-                      assess_question.question,
-                      assess_luQuestionType.plugin
+                      assess_question.question
                   FROM assess_response
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
                   LEFT JOIN assess_luQuestionType ON assess_question.type_id = assess_luQuestionType.type_id

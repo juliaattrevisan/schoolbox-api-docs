@@ -11,6 +11,7 @@ require_once('include/time.php');
 
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 
 $groupHandler = new Group();
@@ -70,6 +71,11 @@ if (!empty($_POST)) {
         $assessment->setStart($start)->setFinish($finish);
     }
     OnlineAssessmentMapper::getInstance()->save($assessment);
+    if ($assessment->getTaskInstance()->getId()) {
+        $task_instance = Task\InstanceMapper::getInstance()->findById($assessment->getTaskInstance()->getId());
+        $task_instance->setTitle($_POST['title']);
+        Task\InstanceMapper::getInstance()->save($task_instance);
+    }
     SitePage::localRedir('/assess/summary/' . $this->arg[0]);
 } else {
 
@@ -109,6 +115,7 @@ if (!empty($_POST)) {
         'ASSESS_IS_TASK'          => !empty($task_id) ? 1 : 0,
         'ASSESS_ASSESS_ID'        => $assessment->getId(),
         'ASSESS_CATEGORY_ID'      => $assessment->getCategory()->getId(),
+        'ASSESS_UNIT_ID'          => null,
         'ASSESS_TITLE'            => Scrub::text($assessment->getTitle()),
         'ASSESS_DESCRIPTION'      => Scrub::text($assessment->getDescription()),
 	    'ASSESS_WEIGHT'           => $assessment->getWeight(),
@@ -170,7 +177,7 @@ if (!empty($_POST)) {
     foreach (array('am', 'pm') as $meridiem) {
         $this->setVar(array(
             'FINISH_MERIDIEM_VALUE' => $meridiem,
-            'FINISH_MERIDIEM_SELECTED' => $assessFinishDate->getUsingFormat('a') ? 'selected=\'selected\'' : '',
+            'FINISH_MERIDIEM_SELECTED' => $meridiem == $assessFinishDate->getUsingFormat('a') ? 'selected=\'selected\'' : '',
         ));
 
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);

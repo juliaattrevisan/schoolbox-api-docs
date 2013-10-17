@@ -1,0 +1,123 @@
+<?php
+/**
+ * Mapper for rubric usage.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2013, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+
+use Schoolbox;
+use Schoolbox\Assessment\Component\SubmissionBox;
+
+class UsageMapper extends Schoolbox\Mapper {
+
+    protected function mapping() {
+        $this->hasTable('rubric_usage');
+        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\Usage');
+        $this->hasMap(array(
+            'column'     => 'criterion_id',
+            'property'   => 'criterion',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'criterion',
+        ));
+        $this->hasMap(array(
+            'column'     => 'submission_box_id',
+            'property'   => 'submissionBox',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'submission_box',
+        ));
+        $this->hasJoin(
+            'criterion',
+            array(
+                'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\CriterionMapper',
+                'this_key'  => 'criterion_id',
+                'other_key' => 'id',
+            )
+        );
+        $this->hasJoin(
+            'submission_box',
+            array(
+                'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
+                'this_key'  => 'submission_box_id',
+                'other_key' => 'id',
+            )
+        );
+    }
+
+    /**
+     * Clones rubric usage from one submission box to another.
+     *
+     * @param int $from_id The ID of the submission box to copy from.
+     * @param int $to_id   The ID of the submission box to copy to.
+     *
+     * @return int[] A list of new rubric usages
+     */
+    public function copyFromCopiedSubmissionBox($from_id, $to_id) {
+
+        // Load list of criteria to load from and to.
+        $criterion_mapper = $this->getJoinMapper('criterion');
+        $query = "
+            SELECT
+                {$this->getColumnString('ru')},
+                {$this->getJoinColumnString('criterion', 'rc')}
+            FROM `{$this->getTable()}` `ru`
+            INNER JOIN {$this->getJoinSql('criterion', 'ru', 'rc')}
+            WHERE `ru`.`submission_box_id` = ?
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+
+        $statement->execute(array($from_id));
+        /** @var Criterion[] $from_criterion_list */
+        $from_criterion_list = $criterion_mapper->hydrateList($statement, 'rc');
+
+        $statement->execute(array($to_id));
+        /** @var Criterion[] $to_criterion_list */
+        $to_criterion_list = $criterion_mapper->hydrateList($statement, 'rc');
+
+        // Load the submission box
+        $box_mapper = $this->getJoinMapper('submission_box');
+        /** @var SubmissionBox $to_box */
+        $to_box = $box_mapper->findById($to_id);
+
+        // Search for list of rubrics to load.
+        $new_criterion_list = new Schoolbox\Collection();
+        foreach ($from_criterion_list as $from_criterion) {
+            $is_used = false;
+            foreach ($to_criterion_list as $to_criterion) {
+                if (
+                    $from_criterion->getGrouping() === $to_criterion->getGrouping()
+                    && $from_criterion->getName() === $to_criterion->getName()
+                ) {
+                    $is_used = true;
+                    break;
+                }
+            }
+            if (!$is_used) {
+                $criterion_usage = new Usage();
+                $criterion_usage->setSubmissionBox($to_box);
+                // Find the criterion to link this one to.
+                try {
+                    $criterion_usage->setCriterion(
+                        $criterion_mapper->findOneByColumnList(
+                            array(
+                                'grouping'    => $from_criterion->getGrouping(),
+                                'name'        => $from_criterion->getName(),
+                                'parent_id'   => $to_box->getCategory()->getId(),
+                                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                            )
+                        )
+                    );
+                    $new_criterion_list->add($criterion_usage);
+                }
+                catch (Schoolbox\Mapper\Exception $e) {
+                    // Add this to the list of exceptions somewhere but don't do anything.
+                }
+            }
+        }
+        return $this->save($new_criterion_list);
+    }
+
+}

@@ -3,53 +3,58 @@ Feature: Course Builder
   As the head of curriculum
   I need to be able to create a course
 
-#Scenario: Set a homepage as the course home
-#  Given I am on homepage
-#  And   log in as "alaress" with password "alaress"
-#  And   set setting "Course Builder:Course Home" to "Faculties"
-
-Scenario: Create a course rubric set
+@setup-course
+Scenario: Set a homepage as the course home
   Given I wipe the slate clean
-  Then  I go to homepage
-  And   log in as "wwhite" with password "password"
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
+  And   I go to homepage
+  And   I log in as "alaress" with password "alaress"
+  When  I set resource setting "Resources:Course Base Homepage" to "Faculties"
+
+@setup-course
+Scenario: Create a course rubric set
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "wwhite" with password "password"
+  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
   # Rubrics: unique for course.
   # When adding a task list to a unit page: rubrics from parent are copied across?
-  Then  I add component "Learning:Rubrics"
-  Then  I edit rubrics
+  When  I add component "Learning:Rubrics"
+  And   I edit rubrics
   And   I add rubric group "Boringness" with criteria "Dullness,Blandness,Mediocrity"
   And   I add rubric group "Understanding" with criteria "Enlightenment,Knowledge,Cognizance"
   And   I press "Save Changes"
   # Descriptors should also be pre-filled.
 
+@setup-course
 Scenario: Create a course
-  Then  I go to homepage
-  And   log in as "wwhite" with password "password"
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "wwhite" with password "password"
   # How are available courses/lessons chosen?
   # For now:
   # * Courses: any homepage underneath course home
   # * Lessons: any homepage directly underneath selected course with a task list component
-  Given I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
-  And   add component "Learning:Course Task List"
+  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  And   add component "Learning:Course Builder"
 
   # Start adding tasks
   # Types:
   # * Tasks (link optional, may be confirmed or not confirmed)
   # * Online assessments
   # * Due work
-  Then  I add a task named "Visit this link" to visit "http://192.168.36.10/"
+  And   I add a task named "Visit this link" to visit "http://192.168.36.10/"
 
-  Then  I add an online assessment task
+  And   I add an online assessment task
   # online assessment stuff is separate
-  Then  I fill in "title" with "Chemical Reactions 1"
+  And   I fill in "title" with "Chemical Reactions 1"
   And   I fill in wysiwyg "description" with "This is a description<b>!</b>"
   And   I press "Continue"
-  Then  I fill in "title" with "Section 1"
+  And   I fill in "title" with "Section 1"
   And   I fill in "description" with "The first section of the test"
   And   I press "Create Section"
-  Then  I select "Multiple Choice" from "type_id"
+  And   I select "Multiple Choice" from "type_id"
   And   wait for a "question" field
-  Then  I fill in wysiwyg "question" with "Choose the correct answer"
+  And   I fill in wysiwyg "question" with "Choose the correct answer"
   And   I fill in "marks" with "10"
   # Answers options
   And   I add right answer "Answer 1" at position "1"
@@ -58,11 +63,11 @@ Scenario: Create a course
   And   I add wrong answer "Answer 4" at position "4"
   And   I press "Add Question"
   # That's it for the online assessment, go back to the homepage
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  And   I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
 
   # Add a due work task
-  And   I add a due work task
-  Then  I fill in "name" with "Dumb Due Work"
+  When   I add a due work task
+  And   I fill in "name" with "Dumb Due Work"
   And   I select "Rubric" from "marktype"
   And   I choose 5-level result set
   And   I check rubric criterion "Boringness:Blandness"
@@ -71,58 +76,63 @@ Scenario: Create a course
   And   I check "accept_submission"
   And   I press "Create"
   # That's it for the due work, go back to the homepage
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  And   I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
 
   # Add another due work item, this one not submittable online
-  And   I add a due work task
-  Then  I fill in "name" with "Offline Due Work"
+  When  I add a due work task
+  And   I fill in "name" with "Offline Due Work"
   And   I select "Letter Grade" from "marktype"
   And   I uncheck "accept_submission"
   And   I press "Create"
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  And   I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
 
   # Create a self-assess task
-  Then  I add a task named "Read chapter 3"
+  When  I add a task named "Read chapter 3"
 
   # Create a teacher assess task
-  Then  I add a task named "Attend 3 classes" which is not self-assess
+  When  I add a task named "Attend 3 classes" which is not self-assess
 
   # Add more task lists
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Atomic structure and bonding"
-  And   add component "Learning:Course Task List"
+  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Atomic structure and bonding"
+  And   add component "Learning:Course Builder"
   And   I add a task named "Read chapter 4"
   And   I add a task named "Attend a laboratory" which is not self-assess
   And   I add a due work task
-  Then  I fill in "name" with "Dumb Due Work for bonding"
+  And   I fill in "name" with "Dumb Due Work for bonding"
   And   I select "Letter Grade" from "marktype"
   And   I check "accept_submission"
   And   I press "Create"
 
-  Then  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Macroscopic properties of matter"
-  And   add component "Learning:Course Task List"
+  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Macroscopic properties of matter"
+  And   add component "Learning:Course Builder"
   And   I add a task named "Read chapter 5"
   And   I add a due work task
-  Then  I fill in "name" with "Dumb Due Work 2"
+  And   I fill in "name" with "Dumb Due Work 2"
   And   I select "Letter Grade" from "marktype"
   And   I check "accept_submission"
   And   I press "Create"
 
-#Scenario: Add a course to a class
-#  Given I log in as "cglenn" with password "password"
-#  # Test adding this new course to a group page. Students should be able to take this course.
-#  And   I follow link "Duke of Edinburgh"
-#  And   I add component "Course Task List"
-#  Then  I set course as "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
-#  # Set due dates for units
-#  Then  I set open date for unit "Chemical Reactions" as "today 12:00am"
-#  Then  I set close date for unit "Chemical Reactions" as "+9 days 12:00am"
-#  # Let's say this unit was due in the past
-#  Then  I set open date for unit "Atomic structure and bonding" as "today -9 days 12:00am"
-#  Then  I set close date for unit "Atomic structure and bonding" as "yesterday 12:00am"
-#  Then  I set open date for unit "Macroscopic properties of matter" as "today +10 days 12:00am"
-#  Then  I set close date for unit "Macroscopic properties of matter" as "today +19 days 12:00am"
-#  # Everything should be imported as if by magic
-#
+@use-course
+Scenario: Add a course to a class
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "cglenn" with password "password"
+  # Test adding this new course to a group page. Students should be able to take this course.
+  When  I follow "Duke of Edinburgh"
+  And   I add component "Learning:Course Outline"
+  And   I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
+  And   I wait for a "form#importForm" element
+  # Set due dates for units
+  When  I set open date for course unit "Chemical reactions" as "today 12:00am"
+  And   I set due date for course unit "Chemical reactions" as "+9 days 12:00am"
+  # Let's say this unit was due in the past. For now, that's acceptable.
+  And   I set open date for course unit "Atomic structure and bonding" as "today -9 days 12:00am"
+  And   I set due date for course unit "Atomic structure and bonding" as "yesterday 12:00am"
+  And   I set open date for course unit "Macroscopic properties of matter" as "today +10 days 12:00am"
+  And   I set due date for course unit "Macroscopic properties of matter" as "today +19 days 12:00am"
+  And   I press "Import"
+  # Everything should be imported as if by magic
+
 #Scenario: Be a student in a course
 #  Given I log in as "sberryhill" with password "password"
 #  Then  I follow link "Duke of Edinburgh"

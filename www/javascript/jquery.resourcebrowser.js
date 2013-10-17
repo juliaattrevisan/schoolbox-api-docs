@@ -21,6 +21,7 @@ $j(function() {
         $j.post('/ajax/tree.php', {resourcesID : relationID});
 
         $j('#destination').val(relationID);
+        $j('#destination-text').val($j(this).find('.label').text());
     });
 
     /* get resourcesID */

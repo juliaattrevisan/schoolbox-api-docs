@@ -695,8 +695,21 @@ class Mapper {
 	 * @return object
 	 */
 	public function findOneByColumn($columnName, $columnValue, $order = array()) {
+		return $this->findOneByColumnList(array($columnName => $columnValue), $order);
+	}
+
+	/**
+	 * Returns first model who matches all the values pairs in $columnList.
+	 *
+	 * @throws Exception if no instance of model is found
+	 * @throws Exception\Deleted if the model was found but has been deleted
+	 * @param  array  $columnList
+	 * @param  array  $order      Fields to order by (@see findByColumnList() $options param)
+	 * @return object
+	 */
+	public function findOneByColumnList($columnList, $order = array()) {
 		$result_collection = $this->findByColumnList(
-			array($columnName => $columnValue),
+			$columnList,
 			array(
 				'deleted' => true,
 				'limit'   => 1,
@@ -756,7 +769,13 @@ class Mapper {
 				}
 				else {
 					// This method is smart enough to work with arrays and IN statements
+					// If the list of values is empty, though: there's no way
+					// that the query could ever return anything, so just return
+					// an empty collection.
 					if (is_array($columnValue)) {
+						if (count($columnValue) === 0) {
+							return $this->hydrateList(array());
+						}
 						$where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
 						$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
 					}
@@ -869,15 +888,18 @@ class Mapper {
 			}
 		}
 
-		$identifier  = $this->getIdentifier();
-		$id_property = $identifier['property'];
+		$identifier    = $this->getIdentifier();
+		$id_property   = $identifier['property'];
+		$new_item_list = array();
 		$this->database->beginTransaction();
 		foreach ($collection as $model) {
 			$this->bindParamsForSave($model, $statement);
 			if ($statement->execute()) {
 				if ($id_property) {
 					if (!$this->getModelProperty($model, $id_property)) {
-						$this->setModelProperty($model, $id_property, $this->database->lastInsertId());
+						$new_id = $this->database->lastInsertId();
+						$this->setModelProperty($model, $id_property, $new_id);
+						$new_item_list[$new_id] = true;
 					}
 					$affectedIDs[] = $this->getModelProperty($model, $id_property);
 				}
@@ -890,8 +912,8 @@ class Mapper {
 		$this->database->commit();
 
 		foreach ($collection as $model) {
-			if ($id_property && $this->getModelProperty($model, $id_property)) {
-				$this->triggerCallbacks('postSave', $model);
+			if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
+				$this->triggerCallbacks('postSave', $model, array_key_exists($id, $new_item_list));
 			}
 		}
 

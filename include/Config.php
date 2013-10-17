@@ -4,6 +4,32 @@ require_once dirname(__FILE__) . '/../www/conf/conf.php';
 
 class Config extends DeprecatedModel {
 
+    const FIELD_INPUT     = 1;
+    const FIELD_TEXTAREA  = 2;
+    const FIELD_BOOLEAN   = 3;
+    const FIELD_SELECT    = 4;
+    const FIELD_CHECKBOX  = 5;
+    const FIELD_BYTES     = 6;
+    const FIELD_SELECTKEY = 7;
+    const FIELD_HTML      = 8;
+    const FIELD_RESOURCE  = 9;
+
+    const TYPE_SITE         = 1;
+    const TYPE_SECURITY     = 2;
+    const TYPE_PATHS        = 3;
+    const TYPE_RESOURCES    = 4;
+    const TYPE_POLICY       = 5;
+    const TYPE_LOCALISATION = 6;
+    const TYPE_EXTERNAL     = 7;
+    const TYPE_EMAIL        = 8;
+    const TYPE_COLOURS      = 9;
+    const TYPE_3RD          = 10;
+    const TYPE_MODULES      = 11;
+    const TYPE_BOARD        = 12;
+    const TYPE_WELCOME      = 13;
+    const TYPE_DEBUGGING    = 14;
+
+
         static private $instance = false;
         static private $data = false;
         static private $consts;
@@ -80,12 +106,16 @@ class Config extends DeprecatedModel {
                 return self::getInstance()->update(array('name' => $configName, 'value' => $configValue));
         }
 
-        public function getTypeList() {
+        public static function getTypeList() {
             self::getInstance();
              /* Show non-editable field data as just plain text
 			  * $query = "SELECT DISTINCT `type` FROM `".$this->_table."` WHERE `editable` = 'true' ORDER BY type";
 			  */
-			$query = "SELECT DISTINCT `type` FROM `config` ORDER BY type";
+			$query = "
+				SELECT DISTINCT `lu_config_type`.`type`
+				FROM `config`
+				INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
+				ORDER BY `config`.`configID` ASC";
 
 			return DeprecatedDatabase::getInstance()->getAll($query);
         }
@@ -103,15 +133,20 @@ class Config extends DeprecatedModel {
                 return $output;
         }
 
-        public function getAll($orderBy = '', $type = '') {
+        public static function getAllOfType($orderBy = '', $type = '') {
             self::getInstance();
 			/* Show non-editable field data as just plain text
 			 * $query = "SELECT * FROM `".$this->_table."` WHERE `editable` = 'true' ";
 			 */
-			$query = "SELECT * FROM `config` WHERE 1=1 ";
+			$query = "
+				SELECT *, `lu_config_field`.`field`, `lu_config_type`.`type`
+				FROM `config`
+				INNER JOIN `lu_config_field` ON `config`.`field_id` = `lu_config_field`.`id`
+				INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
+				WHERE 1=1 ";
 
 			if (!empty($type)) {
-				$query .= "AND `type` = '$type' ";
+				$query .= "AND `lu_config_type`.`type` = '$type' ";
 			}
 
 			if (!empty($orderBy)) {

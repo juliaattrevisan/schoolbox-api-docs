@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Course;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 
 class TaskMapper extends Mapper {
 
@@ -184,6 +185,27 @@ class TaskMapper extends Mapper {
         $cat_id    = ($category instanceof Category) ? $category->getId() : $category;
         $statement->execute(array($cat_id));
         return $this->hydrateList($statement, 't', array($this, 'baseHydrateCallback'));
+    }
+
+    /**
+     * Finds a list of tasks for a list of categories, then groups them by their
+     * category.
+     *
+     * @param  int[] $category_id_list A list of category IDs to retrieve tasks for
+     * @return Collection|Collection[]
+     */
+    public function findGroupedListForCategoryList($category_id_list) {
+        $task_list = TaskMapper::getInstance()->findByColumn(
+            'category_id',
+            $category_id_list,
+            array('order' => array('category_id' => 'asc'),)
+        );
+        return $task_list->groupByCallback(
+            function($item) {
+                /** @var Task $item */
+                return $item->getCategory()->getId();
+            }
+        );
     }
 
     /**

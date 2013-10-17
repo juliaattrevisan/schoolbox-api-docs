@@ -98,6 +98,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'join'       => 'task',
 		));
 		$this->hasMap(array(
+			'column'     => 'task_instance_id',
+			'property'   => 'taskInstance',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'task_instance',
+		));
+		$this->hasMap(array(
 			'column'     => 'open_date',
 			'property'   => 'openDate',
 			'type'       => self::TYPE_DATETIME,
@@ -241,6 +247,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'this_key'  => 'task_id',
 			'other_key' => 'id',
 		));
+		$this->hasJoin('task_instance', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceMapper',
+			'this_key'  => 'task_instance_id',
+			'other_key' => 'id',
+		));
 
 		$this->hasSoftDeleteBooleanField('deleted');
 
@@ -362,12 +373,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * and notifications.
 	 *
 	 * @param SubmissionBox $object
+	 * @param bool          $is_new Is this a new item that is being created?
 	 *
 	 * @return void
 	 */
-	public function postSave(SubmissionBox $object) {
+	public function postSave(SubmissionBox $object, $is_new = false) {
 		foreach ($object->getFileLinks() as $box_file) {
 			if ($box_file->hasFile()) {
+				if ($is_new) {
+					$box_file->setId(null);
+				}
 				$box_file->setSubmissionBoxId($object->getId());
 				$this->getJoinMapper('files')->save($box_file);
 			}

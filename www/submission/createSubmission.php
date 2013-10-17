@@ -14,12 +14,6 @@ $this->setFile('rubricTpl', 'submission/_submissionRubrics.html');
 $this->setBlock('rubricTpl', 'rubric_type_label', 'rubric_type_label_block');
 $this->setBlock('rubricTpl', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'crit_input', 'crit_input_block');
-//$this->setBlock('marktype', 'criterion', 'criterion_block');
-//$this->setBlock('marktype', 'criterion_label', 'criterion_label_block');
-//$this->setBlock('criterion', 'crit_input', 'crit_input_block');
-//$this->setBlock('marktype', 'course_criterion', 'course_criterion_block');
-//$this->setBlock('marktype', 'course_criterion_label', 'course_criterion_label_block');
-//$this->setBlock('course_criterion', 'course_crit_input', 'course_crit_input_block');
 
 $this->setBlock('marktype', 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
@@ -41,9 +35,13 @@ $this->setVar('existing_marks_warning_block', '');
 $this->setVar('COURSE_CRITERIA', '');
 $this->setVar('CLASS_CRITERIA', '');
 
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 $mapper      = new SubmissionBoxMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
@@ -58,337 +56,285 @@ $rubricHandler = new DueWork_Rubric_Handler();
 $work_types = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
 $mark_types = $mark_mapper->getAll();
 
-// IF PRE-EXISTING
-if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
-    //Modify submission box
-    $this->setTitle('Modify Submission Box');
+$title            = '';
+$heading          = '';
+$submission       = new SubmissionBox();
+$category         = new Category();
+$is_task          = false;
+$unit_id          = null;
+$task_instance_id = null;
+$has_file_preset  = false;
 
-    $submission = $mapper->findById($this->arg[1]);
-
-    $task_id = $submission->getTask()->getId();
-    $is_task = (bool)$task_id;
-
-    //
-    // Authorisation: user has write access to group?
-    if ($groupHandler->getPermission($submission->getCategory()->getId()) < WRITE_ACCESS) {
-        error(19);
-    }
-
-    /* Output category information */
-    $cat_name = $submission->getCategory()->getName();
-    $codes    = $submission->getCategory()->getCodes()->getColumnValues('code');
-    if (!empty($codes)) {
-        $catOutput = "<b>".$cat_name." (".implode(', ', $codes).")</b>";
-    }
-    else {
-        $catOutput = "<b>".$cat_name."</b>";
-    }
-
-    /* Output submission work_type drop down */
-    $this->dropdown('type_drop', $work_types, $submission->getWorkType()->getId(), TEMPLATE_content, array(
-        'name' => 'TYPE_TEXT',
-        'id'   => 'TYPE_VALUE'
-    ));
-
-    // legacy support
-    $mark_type = $submission->getMarkType()->getId();
-    if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
-        $this->setVar('marktype_block', '');
-    }
-    else {
-        // Output marktype drop down
-        $this->dropdown('marktype_drop', $mark_types, $mark_type, 'marktype', array(
-            'name' => 'MARKTYPE_TEXT',
-            'id'   => 'MARKTYPE_VALUE',
-            'slug' => 'MARKTYPE_SLUG'
-        ));
-
-        outputVisibilityDropdown($this, $submission->getMarkVisibility());
-
-        $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
-        // if the rubric creation fails it will throw an exception, in which case just output the empty sets
-        try {
-            if($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
-                $rubric = $rubricHandler->getRubric($submission->getId());
-                $resultSetID = $submission->getRubricResultSet();
-
-                if($rubricHandler->marksAlreadyGiven($submission->getId())) {
-                    $this->parse('existing_marks_warning_block', 'existing_marks_warning');
-                }
-
-                $criteria = $rubric->getCriteriaIndices();
-                $results = $rubric->getResults();
-                $resultCount = $rubric->getResultCount();
-
-                outputResultSets($this, $resultSetID, $resultCount);
-                outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
-                if ($is_task) {
-                    outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true, $is_task);
-                }
-            }
-            else {
-                outputResultSets($this);
-                outputCriteria($this, $submission->getCategory()->getId(), array(), array(), 2, true, $is_task);
-                if ($is_task) {
-                    outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
-                }
-            }
-        } catch(Exception $e) {
-            outputResultSets($this);
-            outputCriteria($this, $submission->getCategory()->getId(), array(), array(), 2, true, $is_task);
-            if ($is_task) {
-                outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
-            }
-        }
-
-
-    }
-
-    $this->parse('marktype_block', 'marktype');
-
-	// this block exists so that if a config variable needs to be introduced, this can be blanked out
-	$this->parse('mark_weight_block', 'mark_weight');
-
-    /* Convert times */
-    $open_date = $submission->getOpenDate();
-    $due_date  = $submission->getDueDate();
-    $late_date = $submission->getLateDate();
-
-    if ($open_date->getUsingFormat('H:i:s') == '00:00:00') {
-        $open_hour = '';
-        $open_min  = '';
-    }
-    else {
-        $open_hour = $open_date->getUsingFormat('g');
-        $open_min  = $open_date->getUsingFormat('i');
-    }
-
-    if ($due_date->getUsingFormat('H:i:s') == '23:59:59') {
-        $due_hour = '';
-        $due_min  = '';
-    }
-    else {
-        $due_hour = $due_date->getUsingFormat('g');
-        $due_min  = $due_date->getUsingFormat('i');
-    }
-
-    if ($late_date->getUsingFormat('H:i:s') == '23:59:59') {
-        $late_hour = '';
-        $late_min  = '';
-    }
-    else {
-        $late_hour = $late_date->getUsingFormat('g');
-        $late_min  = $late_date->getUsingFormat('i');
-    }
-
-    // Messing around with blocks
-    $this->setVar(array(
-        'duework_timespan_block' => '',
-    ));
-    if (!$task_id) {
-        $this->parse('duework_timespan_block', 'duework_timespan');
-    }
-
-    $output = array(
-        'HEADING'           => 'Modify',
-        'ID'                => $submission->getId(),
-        'CATEGORY'          => $submission->getCategory()->getId(),
-        'CURRENT_CAT'       => $catOutput,
-        'NAME'              => $submission->getName(),
-        'DESCRIPTION'       => $submission->getDescription(),
-        'FILEID'            => $submission->getLegacyFileId(),
-        'ACCEPT_SUBMISSION' => $submission->getAcceptOnline() ? ' checked="checked"' : '',
-        'MULTI_SUBMISSION'  => $submission->getAcceptMultiple() ? ' checked="checked"' : '',
-        'TOTAL_MARK'        => $submission->getMaxMark(),
-
-        'OPEN_DATE' => $open_date->getUsingFormat('d/m/Y'),
-        'OPEN_HOUR' => $open_hour,
-        'OPEN_MIN'  => $open_min,
-        'OPEN_PM'   => $open_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
-
-        'DUE_DATE' => $due_date->getUsingFormat('d/m/Y'),
-        'DUE_HOUR' => $due_hour,
-        'DUE_MIN'  => $due_min,
-        'DUE_PM'   => $due_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
-
-        'LATE_DATE' => $late_date->getUsingFormat('d/m/Y'),
-        'LATE_HOUR' => $late_hour,
-        'LATE_MIN'  => $late_min,
-        'LATE_PM'   => $late_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
-
-        'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
-        'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
-        'SESSION_NAME'    => session_name(),
-        'SESSION_ID'      => session_id(),
-
-    );
-
-    foreach(array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
-        $notification = $submission->getNotifications()->getOfType(strtolower($i));
-        $is_enabled   = $notification instanceof SubmissionBox\Notification && $notification->getEnabled();
-        $output["NOTIF_{$i}_ENABLED"] = $is_enabled ? ' checked="checked"' : '';
-        $output["{$i}_THRESHHOLD"] = $j;
-    }
-
-
-    $this->setVar($output);
-
-    // check for an associated file
-    $file_links = $submission->getFileLinks();
-    if ($file_links->count() > 0) {
-        foreach ($file_links as $file_link) {
-            /** @var Schoolbox\Assessment\Component\SubmissionBox\File $file_link */
-            $file = $file_link->getFile();
-            $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
-            $this->setVar('CURRENT_FILE_ID',   $file->getId());
-            $this->setVar('CURRENT_FILE_ICON', $file->getMimetype()->getIconFile());
-            $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
-            $this->setVar('CURRENT_FILE_URL',  '/storage/fetch.php?'.http_build_query(array('hash' => $file->getHash(), 'save' => 1)));
-            $this->parse('existing_file_block','existing_file', true);
-        }
-    }
-    elseif ($submission->getLegacyFileId()) {
-        $fileHandler = new File;
-        $file = $fileHandler->getByID($submission->getLegacyFileId());
-        $this->setVar('CURRENT_FILE_NAME', $file['realname']);
-        $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
-        $this->setVar('CURRENT_FILE_ID',   'old');
-        $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
-        $this->setVar('CURRENT_FILE_URL',  '/send.php?'.http_build_query(array('id' => $submission->getLegacyFileId(), 'save' => 1)));
-        $this->parse('existing_file_block','existing_file');
-    }
-    else {
-        $this->setVar('existing_file_block', '');
-    }
-
-    $this->parse('browse_block', 'browse_row');
-
+if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
+    // IF PRE-EXISTING
+    // Args:
+    // 1: submission box ID
+    $submission_id    = $this->arg[1];
+    $title            = 'Modify Submission Box';
+    $heading          = 'Modify';
+    $submission       = $mapper->findById($submission_id);
+    $category         = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
+    $task_id          = $submission->getTask()->getId();
+    $is_task          = (bool)$task_id;
+    $task_instance_id = $submission->getTaskInstance()->getId();
 }
-
-// IF NEW
-else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-
-    //
-    // Authorisation: user has write access to group.
-    if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS) {
-        error(19);
-    }
-
-    //Create submission box
-    $this->setTitle('Create Submission Box');
-
-    // clear blocks that aren't used in this context
-    $this->setVar(array(
-        'existing_file_block' => '',
-        'existing_marks_warning_block' => '',
-        'duework_timespan_block' => '',
-    ));
+elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+    // IF NEW
+    // Args:
+    // 1: category ID
+    // 2: "task", "unit:$unit_id" or an integer (in which case it's a file ID)
+    // 3: work type, if provided
+    $category_id = $this->arg[1];
+    $title       = 'Create Submission Box';
+    $heading     = 'Create';
+    $category    = CategoryMapper::getInstance()->findById($category_id);
+    $submission
+        ->setCategory($category)
+        ->setOpenDate(new Alaress_Date_Format(new DateTime('00:00:00')))
+        ->setDueDate(new Alaress_Date_Format(new DateTime('23:59:59')))
+        ->setLateDate(new Alaress_Date_Format(new DateTime('+1 day 23:59:59')))
+        ->setWorkType(new SubmissionBox\WorkType())
+        ->setMarkType(new SubmissionBox\MarkType())
+        ->setMarkVisibility(Config::get('submission_access'))
+    ;
 
     // Is this a task?
     $is_task = ($this->arg[2] === 'task');
-    if (!$is_task) {
-        $this->parse('duework_timespan_block', 'duework_timespan');
+
+    // Is this being created for a unit?
+    // If so, pre-fill start and end times
+    $is_unit = preg_match('/^unit:(\d+)$/', $this->arg[2], $matches);
+    if ($is_unit) {
+        $unit_id = $matches[1];
+
+        /** @var UnitInstance $unit */
+        try {
+            $unit = UnitInstanceMapper::getInstance()->findByIdAndCategoryId($unit_id, $category_id);
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
+            error(2);
+        }
+
+        // Adjust due date to end of unit day
+        $due_date = $unit->getDueDate()->getDateTimeObject();
+        $due_date->modify('23:59:59');
+        $due_date_object = new Alaress_Date_Format($due_date);
+        $submission
+            ->setOpenDate($unit->getOpenDate())
+            ->setDueDate($due_date_object)
+            ->setLateDate($due_date_object)
+        ;
     }
 
-    if(is_numeric($this->arg[2]) && $this->arg[2] > 0) {
+    // Has a file been attached in $this->arg[2]?
+    if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         /* File ID submitted, associate box with file */
-
-        $fileHandler = new File;
+        $has_file_preset = true;
+        $fileHandler = new File();
         $file = $fileHandler->getByID($this->arg[2]);
-        if(is_array($file))
-            $this->setVar('browse_block', '');
-        else
-            $this->parse('browse_block', 'browse_row');
-
-    }
-    else {
-        $this->parse('browse_block', 'browse_row');
-    }
-
-    /* Output category information */
-    $this->setVar('CURRENT_CAT', '');
-
-    // Output submission work_type drop down (exclude online assessment work_type)
-
-    $this->dropDown('type_drop', $work_types, $this->arg[3], TEMPLATE_content, array(
-        'name' => 'TYPE_TEXT',
-        'id'   => 'TYPE_VALUE'
-    ));
-
-    // Output marktype drop down
-    $this->dropdown('marktype_drop', $mark_types, null, 'marktype', array(
-        'name' => 'MARKTYPE_TEXT',
-        'id'   => 'MARKTYPE_VALUE',
-        'slug' => 'MARKTYPE_SLUG'
-    ));
-
-    outputVisibilityDropdown($this, Cfg::get('submission_access'));
-    outputResultSets($this);
-
-    $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($this->arg[1]);
-    outputCriteria($this, $category->getId(), array(), array(), 2, true, $is_task);
-    if ($is_task) {
-        outputCriteria($this, $category->getParent()->getId(), array(), array(), 2, true, $is_task);
+        if (is_array($file)) {
+            $submission
+                ->setLegacyFileId($file['id'])
+                ->setDescription($file['description'])
+                ->setName($file['name'])
+            ;
+        }
     }
 
-    $this->parse('marktype_block','marktype');
-
-	// this block exists so that if a config variable needs to be introduced, this can be blanked out
-	$this->parse('mark_weight_block', 'mark_weight', false);
-
-    /* Convert times */
-    $open_date = strtotime('now');
-    $due_date  = strtotime('+1 hours');
-    $late_date = strtotime('+1 day');
-
-    $output = array(
-        'HEADING'           => 'Create',
-        'CATEGORY'          => $this->arg[1],
-        'ID'                => '',
-        'NAME'              => $file['name'],
-        'DESCRIPTION'       => $file['description'],
-        'FILEID'            => $file['id'],
-        'CATLIST'           => $catOutput,
-        'ACCEPT_SUBMISSION' => '', // checked no longer default
-        'MULTI_SUBMISSION'  => '',
-        'TOTAL_MARK'        => '',
-
-        'OPEN_DATE' => date('d/m/Y', $open_date),
-        'OPEN_HOUR' => '',
-        'OPEN_MIN'  => '',
-        'OPEN_PM'   => '',
-
-        'DUE_DATE' => date('d/m/Y', $due_date),
-        'DUE_HOUR' => '',
-        'DUE_MIN'  => '',
-        'DUE_PM'   => 'selected',
-
-        'LATE_DATE' => date('d/m/Y', $late_date),
-        'LATE_HOUR' => '',
-        'LATE_MIN'  => '',
-        'LATE_PM'   => 'selected',
-
-        'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
-        'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
-        'SESSION_NAME'    => session_name(),
-        'SESSION_ID'      => session_id(),
-        'IS_TASK'         => $is_task ? 1 : 0,
-    );
-
-    // notifications on by default
-    foreach(array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
-        $output["NOTIF_{$i}_ENABLED"] = ' checked="checked"';
-        $output["{$i}_THRESHHOLD"] = $j;
+    // Was a work type set?
+    if (!empty($this->arg[3])) {
+        $submission->setWorkType(SubmissionBox\WorkTypeMapper::getInstance()->findById($this->arg[3]));
     }
-
-    $this->setVar($output);
-
 }
 else {
     error(2);
 }
 
+// Authorisation: user has write access to group.
+if ($groupHandler->getPermission($category->getId()) < WRITE_ACCESS) {
+    error(19);
+}
 
+// Start outputting the submission and its stupid blocks
+$this->setTitle($title);
+$this->setVar(array(
+    'existing_file_block'             => '',
+    'existing_marks_warning_block'    => '',
+    'duework_timespan_block'          => '',
+    'browse_block'                    => '',
+    'marktype_block'                  => '',
+));
+
+// Set file inputs
+$file_links = $submission->getFileLinks();
+if ($file_links->count() > 0) {
+    foreach ($file_links as $file_link) {
+        /** @var Schoolbox\Assessment\Component\SubmissionBox\File $file_link */
+        $file = $file_link->getFile();
+        $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
+        $this->setVar('CURRENT_FILE_ID',   $file->getId());
+        $this->setVar('CURRENT_FILE_ICON', $file->getMimetype()->getIconFile());
+        $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
+        $this->setVar('CURRENT_FILE_URL',  '/storage/fetch.php?'.http_build_query(array('hash' => $file->getHash(), 'save' => 1)));
+        $this->parse('existing_file_block','existing_file', true);
+    }
+}
+elseif ($submission->getLegacyFileId()) {
+    $fileHandler = new File;
+    $file = $fileHandler->getByID($submission->getLegacyFileId());
+    $this->setVar('CURRENT_FILE_NAME', $file['realname']);
+    $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
+    $this->setVar('CURRENT_FILE_ID',   'old');
+    $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
+    $this->setVar('CURRENT_FILE_URL',  '/send.php?'.http_build_query(array('id' => $submission->getLegacyFileId(), 'save' => 1)));
+    $this->parse('existing_file_block','existing_file');
+}
+
+// File browser:
+// A new submission box can be created from a file, if it is then don't show the
+// browser.
+if (!$has_file_preset) {
+    $this->parse('browse_block', 'browse_row');
+}
+
+// Output submission work_type drop down.
+$work_type = $submission->getWorkType()->getId();
+$this->dropDown('type_drop', $work_types, $work_type, TEMPLATE_content, array(
+    'name' => 'TYPE_TEXT',
+    'id'   => 'TYPE_VALUE'
+));
+
+// Output mark visibility
+outputVisibilityDropdown($this, $submission->getMarkVisibility());
+
+// Output marktype drop down
+// (If it's an old style free mark, then output nothing)
+$mark_type = $submission->getMarkType()->getId();
+if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
+    $this->setVar('marktype_block', '');
+}
+else {
+    $this->dropdown('marktype_drop', $mark_types, $mark_type, 'marktype', array(
+        'name' => 'MARKTYPE_TEXT',
+        'id'   => 'MARKTYPE_VALUE',
+        'slug' => 'MARKTYPE_SLUG'
+    ));
+
+    // if the rubric creation fails it will throw an exception, in which case just output the empty sets
+    // Default values for criteria
+    $criteria    = array();
+    $results     = array();
+    $resultCount = 2;
+    $resultSetID = -1;
+    try {
+        if ($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
+            $rubric      = $rubricHandler->getRubric($submission->getId());
+            $resultSetID = $submission->getRubricResultSet();
+
+            if ($rubricHandler->marksAlreadyGiven($submission->getId())) {
+                $this->parse('existing_marks_warning_block', 'existing_marks_warning');
+            }
+
+            $criteria    = $rubric->getCriteriaIndices();
+            $results     = $rubric->getResults();
+            $resultCount = $rubric->getResultCount();
+        }
+    }
+    catch (Exception $e) {}
+    outputResultSets($this, $resultSetID, $resultCount);
+    outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
+    if ($is_task) {
+        outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true, $is_task);
+    }
+}
+$this->parse('marktype_block', 'marktype');
+
+// this block exists so that if a config variable needs to be introduced, this can be blanked out
+$this->parse('mark_weight_block', 'mark_weight');
+
+// Is this a task? If so, output the timespan block.
+if (!$is_task) {
+    $this->parse('duework_timespan_block', 'duework_timespan');
+}
+
+// Set date values
+$open_date = $submission->getOpenDate();
+$due_date  = $submission->getDueDate();
+$late_date = $submission->getLateDate();
+if ($open_date->getUsingFormat('H:i:s') == '00:00:00') {
+    $open_hour = '';
+    $open_min  = '';
+}
+else {
+    $open_hour = $open_date->getUsingFormat('g');
+    $open_min  = $open_date->getUsingFormat('i');
+}
+
+if ($due_date->getUsingFormat('H:i:s') == '23:59:59') {
+    $due_hour = '';
+    $due_min  = '';
+}
+else {
+    $due_hour = $due_date->getUsingFormat('g');
+    $due_min  = $due_date->getUsingFormat('i');
+}
+
+if ($late_date->getUsingFormat('H:i:s') == '23:59:59') {
+    $late_hour = '';
+    $late_min  = '';
+}
+else {
+    $late_hour = $late_date->getUsingFormat('g');
+    $late_min  = $late_date->getUsingFormat('i');
+}
+
+$output = array(
+    'HEADING'           => $heading,
+    'CATEGORY'          => $submission->getCategory()->getId(),
+    'ID'                => $submission->getId(),
+    'NAME'              => $submission->getName(),
+    'DESCRIPTION'       => $submission->getDescription(),
+    'FILEID'            => $submission->getLegacyFileId(),
+    'ACCEPT_SUBMISSION' => $submission->getAcceptOnline() ? ' checked' : '',
+    'MULTI_SUBMISSION'  => $submission->getAcceptMultiple() ? ' checked' : '',
+    'TOTAL_MARK'        => $submission->getMaxMark(),
+    'SUBMISSION_WEIGHT' => $submission->getWeight(),
+
+    'OPEN_DATE' => $open_date->getUsingFormat('d/m/Y'),
+    'OPEN_HOUR' => $open_hour,
+    'OPEN_MIN'  => $open_min,
+    'OPEN_PM'   => $open_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+
+    'DUE_DATE' => $due_date->getUsingFormat('d/m/Y'),
+    'DUE_HOUR' => $due_hour,
+    'DUE_MIN'  => $due_min,
+    'DUE_PM'   => $due_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+
+    'LATE_DATE' => $late_date->getUsingFormat('d/m/Y'),
+    'LATE_HOUR' => $late_hour,
+    'LATE_MIN'  => $late_min,
+    'LATE_PM'   => $late_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+
+    'FILE_MAX_UPLOAD'  => Cfg::get('file_upload_count'),
+    'MAX_FILE_SIZE'    => Cfg::get('max_file_size'),
+    'SESSION_NAME'     => session_name(),
+    'SESSION_ID'       => session_id(),
+    'IS_TASK'          => $is_task ? 1 : 0,
+    'UNIT_ID'          => $unit_id,
+    'TASK_INSTANCE_ID' => $task_instance_id,
+);
+
+foreach (array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
+    $notification = $submission->getNotifications()->getOfType(strtolower($i));
+    // Notifications: enabled by default
+    $is_enabled =
+        !($submission->getId()) ||
+        ($notification instanceof SubmissionBox\Notification && $notification->getEnabled());
+    $output["NOTIF_{$i}_ENABLED"] = $is_enabled ? ' checked="checked"' : '';
+    $output["{$i}_THRESHHOLD"] = $j;
+}
+
+$this->setVar($output);
 
 
 

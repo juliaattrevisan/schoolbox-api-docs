@@ -32,7 +32,7 @@ if (!$_SESSION['id']) {
 }
 elseif (is_readable($_FILES['upload']['tmp_name'])) {
     try {
-        $imageResource = Schoolbox\FileMapper::getInstance()->upload(
+        $imageResource = Schoolbox\StorageMapper::getInstance()->upload(
             $_FILES['upload']['name'], $_FILES['upload']['tmp_name'], $_SESSION['id']
         );
         $result['success'] = true;

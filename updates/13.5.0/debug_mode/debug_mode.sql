@@ -1,28 +1,13 @@
-ALTER TABLE `config` CHANGE COLUMN `type` `type` ENUM(
-  'Site',
-  'Security',
-  'Policy',
-  'Paths',
-  'Resources',
-  'Email',
-  'Welcome',
-  'Localisation',
-  'External DB',
-  'Colours',
-  'Board Leave',
-  'Modules',
-  '3rd Party Services',
-  'Debugging'
-) NULL DEFAULT NULL;
+INSERT IGNORE INTO `lu_config_type` (`id`, `type`) VALUES (14, 'Debugging');
 
 INSERT INTO `config`(
   `name`,
   `value`,
   `title`,
   `description`,
-  `field`,
+  `field_id`,
   `options`,
-  `type`,
+  `type_id`,
   `editable`,
   `hidden`,
   `required`
@@ -32,9 +17,9 @@ VALUES (
   '0',
   'Debug mode',
   'If this is on, a debugging toolbar is displayed on the bottom of each page.',
-  'boolean',
+  (SELECT `id` FROM `lu_config_field` WHERE `field` = 'boolean' LIMIT 1),
   NULL,
-  'Debugging',
+  (SELECT `id` FROM `lu_config_type` WHERE `type` = 'Debugging' LIMIT 1),
   'true',
   'false',
   'false'
@@ -43,9 +28,9 @@ VALUES (
   '0',
   'Debug XHProf output',
   'Displays XHProf output on the debugging toolbar. Has no effect unless debug mode is on, and the XHProf PHP extension is installed.',
-  'boolean',
+  (SELECT `id` FROM `lu_config_field` WHERE `field` = 'boolean' LIMIT 1),
   NULL,
-  'Debugging',
+  (SELECT `id` FROM `lu_config_type` WHERE `type` = 'Debugging' LIMIT 1),
   'true',
   'false',
   'false'
