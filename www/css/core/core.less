@@ -8300,11 +8300,19 @@ p.unmarkedResponses {
 
 input[type="text"],
 input[type="password"],
+input[type="email"],
+input[type="tel"],
 input[type="number"],
 input[type="date"],
 select,
 textarea {
     border: solid 1px @std-grey;
+}
+input,select,textarea {
+	&:focus {
+		border-color: @link;
+		box-shadow: 0 0 3px @link;
+	}
 }
 
 #ui-datepicker-div {
@@ -9695,3 +9703,58 @@ ul.activity-list li,
 		&:hover { color: @secondary-text; }
 	}
 }
+
+/* Craycray new login form */
+.loginPageVersion() {
+	// Nothing new if not new login
+}
+.loginPageVersion() when (@login-version = 2) {
+	background: @banner-background;
+
+	#header {
+		height: @logo-height + 100px;
+		.logo {
+			left: 50%;
+			top: 50px;
+			margin-left: 0 - @logo-width / 2;
+		}
+	}
+	#container {
+		padding: 16px;
+		margin: 0 50px;
+		text-align: left;
+		h1 {
+			text-align: center;
+		}
+		&.login{
+			text-align: center;
+			min-width: 0;
+			width: 300px;
+			margin: 0 auto;
+		}
+	}
+	#content {
+		min-width: 0;
+	}
+	#footer {
+		text-align: center;
+		.absolute(auto,0,0,0);
+		ul {
+			float: none;
+		}
+	}
+	#loginForm label {
+		text-align: left;
+	}
+	#footer ul li { color: @banner-color; }
+	#footer ul li a { color: @banner-links; }
+
+}
+
+
+body.login {
+	.loginPageVersion;
+}
+
+
+
