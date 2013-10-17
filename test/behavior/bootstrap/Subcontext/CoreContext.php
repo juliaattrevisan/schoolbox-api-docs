@@ -36,6 +36,7 @@ class Subcontext_CoreContext extends BaseContext {
      * @Given /^(?:|I )do not start afresh$/
      * @Given /^(?:|I )do not reset the database$/
      * @Given /^(?:|I )do not wipe the slate clean$/
+     * @Given /^(?:|I )continue from last scenario$/
      */
     public function doNotStartAfresh() {
     }
