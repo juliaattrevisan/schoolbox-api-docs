@@ -1,6 +1,7 @@
 <script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
 <script type='text/javascript' src='/javascript/flot/jquery.flot.stack.js'></script>
 <script type='text/javascript' src='/javascript/flot/jquery.flot.pie.js'></script>
+<script type='text/javascript' src='/javascript/usage/bargraph.js'></script>
 <script type='text/javascript' src='/javascript/usage/total.js'></script>
 <script type='text/javascript' src='/javascript/usage/group.js'></script>
 <script type='text/javascript' src='/javascript/usage/type.js'></script>
@@ -34,6 +35,8 @@
 		background-position: center center;
 	}
 
+	/* For the user usage table
+	 */
 	ul.paginator {
 		margin-top: 16px;
 	}
@@ -45,14 +48,53 @@
 		margin-bottom: 16px;
 		cursor: pointer;
 	}
+
+	/* Bar graphs which should be reusable everywhere
+	 */
+
+	/* Empty grey background
+	 */
+	.bar-container .bar {
+		border: 1px solid #dedede;
+		width: 90%;
+		height: 16px;
+		background-color: #f8f8f8;
+		background-color: #dedede;
+		background-repeat: repeat-x;
+		background-image: -webkit-linear-gradient(#f8f8f8, #dedede);
+		background-image: linear-gradient(#f8f8f8, #dedede);
+		clear: both;
+		float: left;
+	}
+
+	/* Blue coloured foreground
+	 */
+	.bar-container .bar .filled {
+		border: 1px solid #b0ddfe;
+		height: 14px;
+		background-color: #e2f3ff;
+		background-color: #b0ddfe;
+		background-repeat: repeat-x;
+		background-image: -webkit-linear-gradient(#e2f3ff, #b0ddfe);
+		background-image: linear-gradient(#e2f3ff, #b0ddfe);
+		display: block;
+	}
+
+	/* Numerical representation
+	 */
+	.bar-container .amount {
+		width: 40px;
+		font-size: 18px;
+		font-weight: bold;
+		text-align: right;
+		float: right;
+	}
 </style>
 
 <h1>Global Usage</h1>
-<div id='user-usage' class='loader'></div>
-
 <div id='global-usage' class='graph loader'></div>
 <div id='group-usage' class='graph loader'></div>
 <div id='type-usage' class='graph loader'></div>
-
+<div id='user-usage' class='loader'></div>
 
 

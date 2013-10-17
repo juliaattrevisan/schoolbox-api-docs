@@ -42,26 +42,28 @@
 					 */
 					config.element.removeClass('loader');
 
-					$j.plot(config.element, datasets.data, {
-						series: {
-							stack: true,
-							lines: {
-								show: false,
-								fill: true,
-								steps: false
-							},
-							bars: {
-								show: true,
-								barWidth: 0.6
-							}
-						},
-						xaxis: {
-							show: false
-						},
-						yaxis: {
-							show: false
-						}
-					});
+					/* Use flot format to generate different bar graph
+					 * after all
+					 */
+					var used = datasets.data[0].data[0][1];
+					var total = datasets.data[1].data[0][1] + used;
+					var percentage = Math.round(100*used/total).toString();
+
+					var html = '\
+						<div>\
+							<h2>Overall Usage</h2>\
+							<p>\
+								{USED} / {TOTAL}\
+							</p>\
+							{BAR}\
+						</div>\
+					';
+
+					var html = html.replace(/\{USED\}/g, used);
+					var html = html.replace(/\{TOTAL\}/g, total);
+					var html = html.replace(/\{BAR\}/g, $.fn.bargraph(percentage));
+
+					config.element.html(html);
 				}
 			});
 		}
