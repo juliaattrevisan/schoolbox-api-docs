@@ -137,26 +137,19 @@ class Marksheet {
 
 		if($this->category->getCodes()->count() && $this->conf->get('external_enable')) {
 			$studentList = $this->synergyHandler->getStudents($this->category->getCodes()->first()->getCode());
-
-			for ($x = 0; is_array($studentList[$x]); $x++) {
-				$user = $this->userHandler->getBySynergy($studentList[$x]['synergy_id']);
-
-				/* If the Synergetic user wasn't found in the portal, just remove
-					* them from the list. Otherwise the future queries about submitted
-					* work will break, because there are no uids.
-					*/
-				if (!$user) {
-					unset($studentList[$x]);
-				}
-				else {
-					$studentList[$x]['uid']        = $user['uid'];
-					$studentList[$x]['synergy_id'] = $user['synergy_id'];
-				}
-			}
 		}
 		else {
 			$studentList = $this->groupHandler->getMemberList($this->category->getId());
 		}
+
+		// extract all the synergy IDs of the students found
+		$extIds = array();
+		foreach($studentList as $studentData) {
+			$extIds[] = $studentData['synergy_id'];
+		}
+
+		// convert to domain object collection (in 1 query, not `n`)
+		$studentCollection = $this->userMapper->findByColumn('synergy_id', $extIds);
 
 		$workList = $this->submissionHandler->getAllForUserCategory($catId, null, $year, $semester);
 
@@ -193,7 +186,7 @@ class Marksheet {
 				// this is a bit hacky, but it concisely gets the data into the desired format
 				foreach($progress as &$p) {
 					if(is_numeric($p)) {
-						$p .= ' / ' . count($studentList);
+						$p .= ' / ' . $studentCollection->count();
 					}
 				}
 
@@ -236,14 +229,14 @@ class Marksheet {
 			$this->displayOrder = $order;
 		}
 
-		if(is_array($studentList)) {
-			foreach($studentList as $student) {
-
-				$userId = $student['uid'];
+		if($studentCollection->count()) {
+			foreach($studentCollection as $student) {
+				/** @var $student User */
+				$userId = $student->getId();
 
 				// exclude if not a a valid user
 				try {
-					$row['student'] = $this->userMapper->findById($student['uid']);
+					$row['student'] = $student;
 				}
 				catch(MapperException $e) {
 					continue;
