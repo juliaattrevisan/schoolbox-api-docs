@@ -173,7 +173,7 @@ class Marksheet {
 
 				$stats = $mapper->getStatistics($work['id']);
 				$object = $mapper->findById($work['id']);
-//				$weight = $object->getWeight();
+				$weight = $object->getWeight();
 
 				$progress = $mapper->getProgress($work['id']);
 
@@ -201,7 +201,7 @@ class Marksheet {
 				$statData[$isOA][$work['id']] = array_merge(
 					array(
 						'avg' => $classAvg,
-//						'weight' => $weight
+						'weight' => $weight
 					),
 					$stats,
 					$progress
@@ -230,6 +230,12 @@ class Marksheet {
 		}
 
 		if($studentCollection->count()) {
+
+			$grades = new Grades();
+			$studentGrades = $grades->getStudentGradesForSubject(
+				$studentCollection, $this->category, $this->year, $this->semester
+			);
+
 			foreach($studentCollection as $student) {
 				/** @var $student User */
 				$userId = $student->getId();
@@ -253,6 +259,7 @@ class Marksheet {
 							$mark = $this->getSubmissionBoxMarkForStudent($work['id'], $userId);
 						}
 						$row['marks'][$isOA][$work['id']] = $mark;
+						$row['avg'] = $studentGrades[$userId]['avg'];
 					}
 					unset($work);
 				}
