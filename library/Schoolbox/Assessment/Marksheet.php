@@ -240,8 +240,7 @@ class Marksheet {
 
 		if($studentCollection->count()) {
 
-			$grades = new Grades();
-			$studentGrades = $grades->getStudentGradesForSubject(
+			$studentGrades = Grades::getInstance()->getStudentGradesForSubject(
 				$studentCollection, $this->category, $this->year, $this->semester
 			);
 
