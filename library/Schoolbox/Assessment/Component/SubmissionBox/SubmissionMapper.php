@@ -355,6 +355,9 @@ class SubmissionMapper extends Schoolbox\Mapper {
      */
     public function findCountsForSubmissionBoxes($box_ids, $user_id) {
         // Retrieve count of submission IDs from a list of IDs for a user
+        if (empty($box_ids)) {
+            return array();
+        }
         $query = "
             SELECT ss.box_id, COUNT(*) as submission_count
             FROM {$this->getTable()} ss
