@@ -114,7 +114,7 @@ class SubmissionBox implements ISoftDeletable {
 	/**
 	 * @var int
 	 */
-	protected $weight;
+	protected $weight = 100;
 
 	/**
 	 * @var int

@@ -88,7 +88,7 @@ class OnlineAssessment implements ISoftDeletable {
 	/**
 	 * @var int
 	 */
-	protected $weight;
+	protected $weight = 100;
 
 	/**
 	 * @var string
