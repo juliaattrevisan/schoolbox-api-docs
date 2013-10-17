@@ -196,6 +196,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar(
             array(
                 'UNIT_ID'                  => Scrub::text($unit->getId()),
+                'UNIT_HOMEPAGE_ID'         => Scrub::text($unit->getUnitCategory()->getId()),
                 'UNIT_NAME'                => Scrub::text($unit->getTitle()),
                 'UNIT_OPEN_DATE'           => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
                 'UNIT_DUE_DATE'            => Scrub::text($unit->getDueDate()->getDatabaseDate()),
