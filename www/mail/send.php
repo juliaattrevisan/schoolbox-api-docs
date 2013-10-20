@@ -18,10 +18,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
     $email = new Email($_SESSION['user']->getEmail());
 
     if ($email->isValid()) {
-        $mail->addFrom($_SESSIO
-
-
-        N['user']->getEmail(), $_SESSION['user']->formatName());
+        $mail->addFrom($_SESSION['user']->getEmail(), $_SESSION['user']->formatName());
         $mail->addReplyTo($_SESSION['user']->getEmail(), $_SESSION['user']->formatName());
     }
     else {
