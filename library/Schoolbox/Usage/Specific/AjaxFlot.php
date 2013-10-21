@@ -62,20 +62,20 @@ class AjaxFlot {
 	 * @return bool|float|int|string
 	 */
 	public function findGroupUsage() {
-//		$allData = $this->getMapper()->findGroupUsage();
-//		$allResults = array();
-//
-//		for ($i = 0; $i < count($allData); $i++) {
-//			$currentData = $allData[$i];
-//
-//			$result = array();
-//			$result['label'] = $currentData['name'];
-//			$result['data'] = array(array($i+1, $currentData['bytes']+0));
-//
-//			$allResults[] = $result;
-//		}
-//
-//		return json_encode($allResults);
+		$allData = $this->getMapper()->findGroupUsage();
+		$allResults = array();
+
+		for ($i = 0; $i < count($allData); $i++) {
+			$currentData = $allData[$i];
+
+			$result = array();
+			$result['label'] = $currentData['name'];
+			$result['data'] = array(array($i+1, (int)$currentData['bytes']));
+
+			$allResults[] = $result;
+		}
+
+		return json_encode($allResults);
 	}
 
 	/**

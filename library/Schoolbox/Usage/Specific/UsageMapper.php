@@ -77,55 +77,98 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	 * @return array
 	 */
 	public function findGroupUsage() {
-//		$query = "
-//			SELECT `groups`.name, COALESCE(SUM(bytes), 0) AS bytes
-//			FROM groups
-//			LEFT JOIN
-//			(
-//				(SELECT `groups`.id, `groups`.name, SUM(file_size) AS bytes
-//				FROM `file`
-//				INNER JOIN `user` ON `user`.id = `file`.owner
-//				INNER JOIN `groups` ON `user`.group_id = `groups`.id
-//				GROUP BY `groups`.id)
-//				UNION
-//				(SELECT `groups`.id, `groups`.name, SUM(file_size) AS bytes
-//				FROM `myFile`
-//				INNER JOIN `user` ON `user`.id = `myFile`.owner
-//				INNER JOIN `groups` ON `user`.group_id = `groups`.id
-//				GROUP BY `groups`.id)
-//				UNION
-//				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
-//				FROM `storage`
-//				INNER JOIN `user` ON `user`.id = `storage`.uploaded_by
-//				INNER JOIN `groups` ON `user`.group_id = `groups`.id
-//				GROUP BY `groups`.id)
-//				UNION
-//				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
-//				FROM `student_submission`
-//				INNER JOIN `user` ON `user`.id = `student_submission`.owner
-//				INNER JOIN `groups` ON `user`.group_id = `groups`.id
-//				GROUP BY `groups`.id)
-//				UNION
-//				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
-//				FROM `submission_return`
-//				INNER JOIN `user` ON `user`.id = `submission_return`.owner
-//				INNER JOIN `groups` ON `user`.group_id = `groups`.id
-//				GROUP BY `groups`.id)
-//			) allTotals ON `groups`.id = allTotals.id
-//			GROUP BY `groups`.name
-//			ORDER BY `groups`.id
-//		";
-//
-//		$statement = $this->database->prepare($query);
-//		$statement->execute();
-//
-//		$result = array();
-//
-//		while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-//			$result[] = $row;
-//		}
-//
-//		return $result;
+
+		/* TODO: Include submission_return which normally doesn't have mimetype
+		 */
+
+		$userId = $this->getUserId();
+
+		/* Just Like Voltron
+		 */
+		$query = "
+			SELECT `name`, SUM(bytes) AS bytes
+			FROM
+			(
+				(SELECT 'Images' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
+				FROM `file`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'image/%')
+				UNION
+				(SELECT 'Video' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
+				FROM `file`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'video/%')
+				UNION
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
+				FROM `file`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'audio/%')
+
+				UNION
+
+				(SELECT 'Images' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
+				FROM `myFile`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'image/%')
+				UNION
+				(SELECT 'Video' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
+				FROM `myFile`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'video/%')
+				UNION
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
+				FROM `myFile`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'audio/%')
+
+				UNION
+
+				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `storage`
+				WHERE `uploaded_by` = {$userId}
+				AND mime LIKE 'image/%')
+				UNION
+				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `storage`
+				WHERE `uploaded_by` = {$userId}
+				AND mime LIKE 'video/%')
+				UNION
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `storage`
+				WHERE `uploaded_by` = {$userId}
+				AND mime LIKE 'audio/%')
+
+				UNION
+
+				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `student_submission`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'image/%')
+				UNION
+				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `student_submission`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'video/%')
+				UNION
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `student_submission`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'audio/%')
+			) AS allTotals
+			GROUP BY `name`
+			ORDER BY bytes DESC
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$result = array();
+
+		while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+			$result[] = $row;
+		}
+
+		return $result;
 	}
 
 	/**

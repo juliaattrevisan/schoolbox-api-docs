@@ -61,7 +61,12 @@
 					for (var i = 0; i < datasets.length; i++) {
 						var used = parseInt(datasets[i].data[0][1]);
 
-						var percentage = Math.round(100*used/max).toString();
+						if (max > 0) {
+							var percentage = Math.round(100*used/max).toString();
+						}
+						else {
+							var percentage = 0;
+						}
 
 						var html = '\
 							<div>\
