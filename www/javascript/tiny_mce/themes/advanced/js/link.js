@@ -16,7 +16,7 @@ var LinkDialog = {
         document.getElementById('fileuploadcontainer').innerHTML = getUploadHTML('fileupload','href','upload','theme_advanced_upload');
 
 		if (isVisible('hrefbrowser'))
-			document.getElementById('href').style.width = '180px';
+			document.getElementById('href').style.width = '170px';
 
 		this.fillClassList('class_list');
 		this.fillFileList('link_list', 'tinyMCELinkList');
