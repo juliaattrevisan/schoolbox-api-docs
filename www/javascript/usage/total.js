@@ -59,8 +59,8 @@
 						</div>\
 					';
 
-					var html = html.replace(/\{USED\}/g, used);
-					var html = html.replace(/\{TOTAL\}/g, total);
+					var html = html.replace(/\{USED\}/g, $.fn.formatBytes(used));
+					var html = html.replace(/\{TOTAL\}/g, $.fn.formatBytes(total));
 					var html = html.replace(/\{BAR\}/g, $.fn.bargraph(percentage));
 
 					config.element.html(html);

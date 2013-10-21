@@ -86,7 +86,7 @@
 
 	/**
 	 * Convert bytes to kb, mb, gb etc
-	 * http://stackoverflow.com/questions/15900485/correctly-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+	 * http://codeaid.net/javascript/convert-size-in-bytes-to-human-readable-format-(javascript)
 	 *
 	 * ...and mangled by me
 	 *
@@ -94,22 +94,29 @@
 	 * @returns {*}
 	 */
 	$.fn.formatBytes = function(bytes) {
-		if (( bytes >> 30 ) & 0x3FF) {
-			bytes = (bytes >>> 30) + 'GB';
-		}
-		else if ((bytes >> 20) & 0x3FF) {
-			bytes = (bytes >>> 20) + 'MB';
-		}
-		else if ((bytes >> 10) & 0x3FF) {
-			bytes = (bytes >>> 10)+ 'KB';
-		}
-		else if ((bytes >> 1) & 0x3FF) {
-			bytes = (bytes >>> 1) + 'B';
-		}
-		else {
-			bytes = bytes + 'B';
-		}
+		var kilobyte = 1024;
+		var megabyte = kilobyte * 1024;
+		var gigabyte = megabyte * 1024;
+		var terabyte = gigabyte * 1024;
+		var precision = 0;
 
-		return bytes;
+		if ((bytes >= 0) && (bytes < kilobyte)) {
+			return bytes + ' B';
+
+		} else if ((bytes >= kilobyte) && (bytes < megabyte)) {
+			return (bytes / kilobyte).toFixed(precision) + ' KB';
+
+		} else if ((bytes >= megabyte) && (bytes < gigabyte)) {
+			return (bytes / megabyte).toFixed(precision) + ' MB';
+
+		} else if ((bytes >= gigabyte) && (bytes < terabyte)) {
+			return (bytes / gigabyte).toFixed(precision) + ' GB';
+
+		} else if (bytes >= terabyte) {
+			return (bytes / terabyte).toFixed(precision) + ' TB';
+
+		} else {
+			return bytes + ' B';
+		}
 	}
 }(jQuery));
