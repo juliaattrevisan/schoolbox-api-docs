@@ -3,7 +3,7 @@
 	/**
 	 * Constructor
 	 */
-	$.fn.usageUser= function(options) {
+	$.fn.usageTabulator= function(options) {
 		var config = init(this, options);
 
 		plot();
@@ -56,7 +56,7 @@
 						var order = 'ASC';
 					}
 
-					config.element.usageUser({
+					config.element.usageTabulator({
 						url: config.url,
 						columns: config.columns,
 						orderBy: $j(this).attr('rel'),
@@ -77,7 +77,7 @@
 				$j(element).click(function() {
 					event.preventDefault();
 
-					config.element.usageUser({
+					config.element.usageTabulator({
 						url: config.url,
 						columns: config.columns,
 						orderBy: config.orderBy,

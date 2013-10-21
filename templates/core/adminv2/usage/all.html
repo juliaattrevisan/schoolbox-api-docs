@@ -7,7 +7,7 @@
 <script type='text/javascript' src='/javascript/usage/total.js'></script>
 <script type='text/javascript' src='/javascript/usage/group.js'></script>
 <script type='text/javascript' src='/javascript/usage/type.js'></script>
-<script type='text/javascript' src='/javascript/usage/user.js'></script>
+<script type='text/javascript' src='/javascript/usage/tabulator.js'></script>
 
 <script type='text/javascript'>
 	$j(function() {
@@ -21,7 +21,7 @@
 			url: '/adminv2/usage/ajax?type=type'
 		});
 
-		$j('#user-usage').usageUser({
+		$j('#user-usage').usageTabulator({
 			orderBy: 'lastname',
 			order: 'ASC',
 			index: 0,
