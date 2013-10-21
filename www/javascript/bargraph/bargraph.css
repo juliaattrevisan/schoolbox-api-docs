@@ -18,7 +18,7 @@
 }
 .bar-container .bar {
     border: 1px solid #dedede;
-    width: 90%;
+    width: 85%;
     height: 16px;
     background-color: #f8f8f8;
     background-color: #dedede;
@@ -45,7 +45,7 @@
 /* Numerical representation
  */
 .bar-container .amount {
-    width: 40px;
+    width: 60px;
     font-size: 18px;
     font-weight: bold;
     text-align: right;
