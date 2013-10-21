@@ -86,7 +86,7 @@ if (is_array($_POST['active']) && count($_POST['active'])) {
 
 				/* Ram in this new record
 				 */
-				$allConfigs->set(array($configRecord));
+                $allConfigs = new Schoolbox\Collection(array($configRecord));
 			}
 		}
 
