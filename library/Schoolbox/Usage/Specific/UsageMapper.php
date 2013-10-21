@@ -103,16 +103,19 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				(SELECT 'Images' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
 				FROM `file`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				AND mime_type LIKE 'image/%')
 				UNION
 				(SELECT 'Video' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
 				FROM `file`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				AND mime_type LIKE 'video/%')
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
 				FROM `file`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				AND mime_type LIKE 'audio/%')
 
 				UNION
@@ -120,16 +123,19 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				(SELECT 'Images' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
 				FROM `myFile`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				AND mime_type LIKE 'image/%')
 				UNION
 				(SELECT 'Video' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
 				FROM `myFile`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				AND mime_type LIKE 'video/%')
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
 				FROM `myFile`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				AND mime_type LIKE 'audio/%')
 
 				UNION
@@ -199,11 +205,13 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				((SELECT 'Files' AS `name`, SUM(file_size) AS `bytes`
 				FROM `file`
 				WHERE `owner`= {$userId}
+				AND deleted = 0
 				GROUP BY `owner`)
 				UNION
 				(SELECT 'My Files' AS `name`, SUM(file_size) AS `bytes`
 				FROM `myFile`
 				WHERE `owner`= {$userId}
+				AND deleted = 0
 				GROUP BY `owner`)
 				UNION
 				(SELECT 'Storage' AS `name`, SUM(filesize) AS `bytes`
@@ -219,6 +227,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				(SELECT 'Returns'  AS `name`, SUM(filesize) AS `bytes`
 				FROM `submission_return`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				GROUP BY `owner`)) AS allTotals
 			ORDER BY `bytes` DESC
 		";
@@ -255,11 +264,13 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 			(
 				(SELECT realname AS `name`, file_size AS bytes, mime_type
 				FROM `file`
-				WHERE `owner` = {$userId})
+				WHERE `owner` = {$userId}
+				AND deleted = 0)
 				UNION
 				(SELECT realname AS `name`, file_size AS bytes, mime_type
 				FROM `myFile`
-				WHERE `owner` = {$userId})
+				WHERE `owner` = {$userId}
+				AND deleted = 0)
 				UNION
 				(SELECT filename AS `name`, filesize AS bytes, mime AS mime_type
 				FROM `storage`
@@ -271,7 +282,8 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				UNION
 				(SELECT filename AS `name`, filesize AS bytes, '' AS mime_type
 				FROM `submission_return`
-				WHERE `owner` = {$userId})
+				WHERE `owner` = {$userId}
+				AND deleted = 0)
 			) AS allTotals
 		";
 
