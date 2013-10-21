@@ -16,5 +16,5 @@ $mapper = new \Schoolbox\Usage\All\UsageMapper();
 $this->setFile(TEMPLATE_content, 'adminv2/usage/all.html');
 
 $this->setVar(array(
-	'USAGE_NUM_USERS' => $mapper->numUsers()
+	'USAGE_NUM_TOTAL' => $mapper->numUsers()
 ));
