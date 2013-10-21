@@ -53,23 +53,6 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	}
 
 	/**
-	 * Find total usage
-	 *
-	 * This summates the filesizes of all files in the specified location.
-	 * This includes files which may have been marked as softdeleted in the db
-	 */
-	public function findTotalUsage() {
-//		$total = disk_total_space(\Cfg::get('file_dir'));
-//		$free = disk_free_space(\Cfg::get('file_dir'));
-//		$used = $total - $free;
-//
-//		return array(
-//			'Used' => $used,
-//			'Available' => disk_total_space(\Cfg::get('file_dir')) - $used
-//		);
-	}
-
-	/**
 	 * Find total category usage
 	 *
 	 * This does NOT summate files which have been marked as softdeleted in the db
