@@ -13,6 +13,8 @@ var LinkDialog = {
 
 		// Setup browse button
 		document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser', 'href', 'file', 'theme_advanced_link');
+        document.getElementById('fileuploadcontainer').innerHTML = getUploadHTML('fileupload','href','upload','theme_advanced_upload');
+
 		if (isVisible('hrefbrowser'))
 			document.getElementById('href').style.width = '180px';
 
