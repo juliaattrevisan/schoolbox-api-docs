@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Usage\OverallStorage;
+namespace Schoolbox\Usage\All;
 
 class AjaxFlot {
 
@@ -22,7 +22,7 @@ class AjaxFlot {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->setMapper(new \Schoolbox\Usage\UsageMapper());
+		$this->setMapper(new UsageMapper());
 	}
 
 	/**

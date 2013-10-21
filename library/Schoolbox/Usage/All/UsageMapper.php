@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Usage;
+namespace Schoolbox\Usage\All;
 
 
 class UsageMapper extends \Schoolbox\Resource\FileMapper {

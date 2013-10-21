@@ -1,8 +1,8 @@
 <?php
 
-namespace Schoolbox\Usage;
+namespace Schoolbox\Usage\All;
 
-$usage = new OverallStorage\AjaxFlot();
+$usage = new AjaxFlot();
 
 switch($_GET['type']) {
 	case 'total':
