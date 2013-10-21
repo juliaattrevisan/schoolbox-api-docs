@@ -5,9 +5,6 @@ namespace Schoolbox\Usage\Specific;
 $usage = new AjaxFlot($_GET['userId']);
 
 switch($_GET['type']) {
-//	case 'total':
-//		echo $usage->findTotalUsage();
-//		break;
 	case 'group':
 		echo $usage->findGroupUsage();
 		break;
