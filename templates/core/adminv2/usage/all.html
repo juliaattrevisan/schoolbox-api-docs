@@ -12,7 +12,11 @@
 <script type='text/javascript'>
 	$j(function() {
 		$j('#global-usage').usageTotal();
-		$j('#group-usage').usageGroup();
+
+		$j('#group-usage').usageGroup({
+			url: '/adminv2/usage/ajax?type=group'
+		});
+
 		$j('#type-usage').usageType({
 			url: '/adminv2/usage/ajax?type=type'
 		});
