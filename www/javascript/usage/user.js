@@ -18,7 +18,13 @@
 		function init(element, options) {
 			var defaults = {
 				url: '/adminv2/usage/ajax?type=user',
-				numPerPage: 15
+				numPerPage: 15,
+				columns: [
+					{column: 'firstname', label: 'Firstname'},
+					{column: 'lastname', label: 'Lastname'},
+					{column: 'name', label: 'Group'},
+					{column: 'bytes', label: 'Usage'}
+				]
 			}
 
 			var derived = {
@@ -94,10 +100,7 @@
 					var html = '\
 						<table>\
 							<thead>\
-								<th><a class="control" rel="firstname">Firstname</a></th>\
-								<th><a class="control" rel="lastname">Lastname</a></th>\
-								<th><a class="control" rel="name">Group</a></th>\
-								<th><a class="control" rel="bytes">Usage</a></th>\
+								{THEAD}\
 							</thead>\
 							<tbody>\
 							{CONTENTS}\
@@ -109,15 +112,23 @@
 						<div class="clearfix"></div>\
 					';
 
+					var thead = '';
+
+					for (var i = 0; i < config.columns.length; i++) {
+						var current = config.columns[i];
+
+						thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label +"</a></th>"
+					}
+
 					var pagination = '';
 
 					for(var i = 0; i < Math.ceil(config.numTotal/config.numPerPage); i++) {
 						pagination += '<li><a rel="' + i +'">' + (i+1) + '</a></li>';
 					}
 
-					/* Table and paginator
+					/* Table, table heading and paginator
 					 */
-					var inject = html.replace('{CONTENTS}', datasets).replace('{PAGINATION}', pagination);
+					var inject = html.replace('{CONTENTS}', datasets).replace('{THEAD}', thead).replace('{PAGINATION}', pagination);
 
 					config.element.html(inject);
 
