@@ -13,7 +13,9 @@
 	$j(function() {
 		$j('#global-usage').usageTotal();
 		$j('#group-usage').usageGroup();
-		$j('#type-usage').usageType();
+		$j('#type-usage').usageType({
+			url: '/adminv2/usage/ajax?type=type'
+		});
 
 		$j('#user-usage').usageUser({
 			orderBy: 'lastname',

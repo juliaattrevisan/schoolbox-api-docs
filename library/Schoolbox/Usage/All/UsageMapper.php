@@ -122,15 +122,15 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 		/* "categories" of usage
 		 */
 		$collection = new \Schoolbox\Collection();
-		$collection->add(new Item('Cache'));
-		$collection->add(new Item('Dropbox'));
-		$collection->add(new Item('My Files'));
-		$collection->add(new Item('Resources'));
-		$collection->add(new Item('Returns'));
-		$collection->add(new Item('Storage'));
-		$collection->add(new Item('Submissions'));
-		$collection->add(new Item('Videos'));
-		$collection->add(new Item('Other'));
+		$collection->add(new \Schoolbox\Usage\Item('Cache'));
+		$collection->add(new \Schoolbox\Usage\Item('Dropbox'));
+		$collection->add(new \Schoolbox\Usage\Item('My Files'));
+		$collection->add(new \Schoolbox\Usage\Item('Resources'));
+		$collection->add(new \Schoolbox\Usage\Item('Returns'));
+		$collection->add(new \Schoolbox\Usage\Item('Storage'));
+		$collection->add(new \Schoolbox\Usage\Item('Submissions'));
+		$collection->add(new \Schoolbox\Usage\Item('Videos'));
+		$collection->add(new \Schoolbox\Usage\Item('Other'));
 
 		/* Map keys to locks
 		 */
