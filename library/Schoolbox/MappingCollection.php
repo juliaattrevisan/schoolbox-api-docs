@@ -46,4 +46,20 @@ class MappingCollection extends Collection {
 		return $current['enabled'];
 	}
 
+	/**
+	 * Allows retrieval of an offset by its database column, instead of its
+	 * property name.
+	 *
+	 * @param  string $column
+	 * @return array
+	 */
+	public function getOffsetByColumn($column) {
+		foreach ($this as $map) {
+			if ($map['column'] === $column) {
+				return $map;
+			}
+		}
+		return null;
+	}
+
 }
