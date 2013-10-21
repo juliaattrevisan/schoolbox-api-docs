@@ -56,7 +56,7 @@
 	/**
 	 * Constructor
 	 */
-	$.fn.bargraphNoAmount = function(percentage) {
+	$.fn.bargraphPlainAmount = function(used, percentage) {
 		return generateBar(percentage);
 
 		/**
@@ -71,10 +71,14 @@
 					<div class="bar">\
 						<span class="filled" style="width:{WIDTH}%"></span>\
 					</div>\
+					<div class="amount {GRADIENT}">\
+						{USED}\
+					</div>\
 				</div>\
 			';
 
 			var html = html.replace(/\{WIDTH\}/g, percentage);
+			var html = html.replace(/\{USED\}/g, $.fn.formatBytes(used));
 
 			return html;
 		}

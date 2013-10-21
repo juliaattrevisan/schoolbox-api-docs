@@ -66,14 +66,13 @@
 							<div>\
 								{BAR}\
 								<p>\
-									{NAME} {USED}\
+									{NAME}\
 								</p>\
 							</div>\
 						';
 
 						var html = html.replace(/\{NAME\}/g, datasets[i].label);
-						var html = html.replace(/\{USED\}/g, $.fn.formatBytes(used));
-						var html = html.replace(/\{BAR\}/g, $.fn.bargraphNoAmount(percentage));
+						var html = html.replace(/\{BAR\}/g, $.fn.bargraphPlainAmount(used, percentage));
 
 						output += html;
 					}
