@@ -14,8 +14,8 @@ var ImageDialog = {
 		tinyMCEPopup.resizeToInnerSize();
 		this.fillClassList('class_list');
 		this.fillFileList('src_list', fl);
-		this.fillFileList('over_list', fl);
-		this.fillFileList('out_list', fl);
+		//this.fillFileList('over_list', fl);
+		//this.fillFileList('out_list', fl);
 		TinyMCE_EditableSelects.init();
 
 		if (n.nodeName == 'IMG') {
@@ -66,27 +66,26 @@ var ImageDialog = {
 
         // Setup upload image button
         document.getElementById('fileuploadcontainer').innerHTML = getUploadHTML('fileupload','src','upload','theme_advanced_upload');
-//        document.getElementById('fileuploadcontainer').innerHTML = getBrowserHTML('foo','src','baz','bin');
 
 		// Setup browse button
-		document.getElementById('onmouseoversrccontainer').innerHTML = getBrowserHTML('overbrowser','onmouseoversrc','image','theme_advanced_image');
-		if (isVisible('overbrowser'))
-			document.getElementById('onmouseoversrc').style.width = '260px';
+		//document.getElementById('onmouseoversrccontainer').innerHTML = getBrowserHTML('overbrowser','onmouseoversrc','image','theme_advanced_image');
+		//if (isVisible('overbrowser'))
+		//	document.getElementById('onmouseoversrc').style.width = '260px';
 
 		// Setup browse button
-		document.getElementById('onmouseoutsrccontainer').innerHTML = getBrowserHTML('outbrowser','onmouseoutsrc','image','theme_advanced_image');
-		if (isVisible('outbrowser'))
-			document.getElementById('onmouseoutsrc').style.width = '260px';
+		//document.getElementById('onmouseoutsrccontainer').innerHTML = getBrowserHTML('outbrowser','onmouseoutsrc','image','theme_advanced_image');
+		//if (isVisible('outbrowser'))
+		//	document.getElementById('onmouseoutsrc').style.width = '260px';
 
 		// If option enabled default contrain proportions to checked
 		if (ed.getParam("advimage_constrain_proportions", true))
 			f.constrain.checked = true;
 
 		// Check swap image if valid data
-		if (nl.onmouseoversrc.value || nl.onmouseoutsrc.value)
-			this.setSwapImage(true);
-		else
-			this.setSwapImage(false);
+		//if (nl.onmouseoversrc.value || nl.onmouseoutsrc.value)
+		//	this.setSwapImage(true);
+		//else
+		//	this.setSwapImage(false);
 
 		this.changeAppearance();
 		this.showPreviewImage(nl.src.value, 1);
@@ -152,23 +151,23 @@ var ImageDialog = {
 			alt : nl.alt.value,
 			title : nl.title.value,
 			'class' : getSelectValue(f, 'class_list'),
-			style : nl.style.value,
-			id : nl.id.value,
-			dir : nl.dir.value,
-			lang : nl.lang.value,
-			usemap : nl.usemap.value,
-			longdesc : nl.longdesc.value
+			style : nl.style.value
+			//id : nl.id.value,
+			//dir : nl.dir.value,
+			//lang : nl.lang.value,
+			//usemap : nl.usemap.value,
+			//longdesc : nl.longdesc.value
 		});
 
 		args.onmouseover = args.onmouseout = '';
 
-		if (f.onmousemovecheck.checked) {
+		/*if (f.onmousemovecheck.checked) {
 			if (nl.onmouseoversrc.value)
 				args.onmouseover = "this.src='" + nl.onmouseoversrc.value + "';";
 
 			if (nl.onmouseoutsrc.value)
 				args.onmouseout = "this.src='" + nl.onmouseoutsrc.value + "';";
-		}
+		}*/
 
 		el = ed.selection.getNode();
 
@@ -399,12 +398,14 @@ var ImageDialog = {
 					if (v == '0')
 						img.style.border = isIE ? '0' : '0 none none';
 					else {
-						if (b.length == 3 && b[isIE ? 2 : 1])
-							bStyle = b[isIE ? 2 : 1];
+						var isOldIE = tinymce.isIE && (!document.documentMode || document.documentMode < 9);
+
+						if (b.length == 3 && b[isOldIE ? 2 : 1])
+							bStyle = b[isOldIE ? 2 : 1];
 						else if (!bStyle || bStyle == 'none')
 							bStyle = 'solid';
 						if (b.length == 3 && b[isIE ? 0 : 2])
-							bColor = b[isIE ? 0 : 2];
+							bColor = b[isOldIE ? 0 : 2];
 						else if (!bColor || bColor == 'none')
 							bColor = 'black';
 						img.style.border = v + 'px ' + bStyle + ' ' + bColor;

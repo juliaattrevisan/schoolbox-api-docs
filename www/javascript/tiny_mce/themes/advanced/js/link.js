@@ -15,8 +15,8 @@ var LinkDialog = {
 		document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser', 'href', 'file', 'theme_advanced_link');
         document.getElementById('fileuploadcontainer').innerHTML = getUploadHTML('fileupload','href','upload','theme_advanced_upload');
 
-        if (isVisible('hrefbrowser'))
-			document.getElementById('href').style.width = '154px';
+		if (isVisible('hrefbrowser'))
+			document.getElementById('href').style.width = '170px';
 
 		this.fillClassList('class_list');
 		this.fillFileList('link_list', 'tinyMCELinkList');
@@ -70,10 +70,16 @@ var LinkDialog = {
 		} else {
 			ed.dom.setAttribs(e, {
 				href : href,
-				title : f.linktitle.value,
-				target : f.target_list ? getSelectValue(f, "target_list") : null,
-				'class' : f.class_list ? getSelectValue(f, "class_list") : null
+				title : f.linktitle.value
 			});
+	
+			if (f.target_list) {
+				ed.dom.setAttrib(e, 'target', getSelectValue(f, "target_list"));
+			}
+
+			if (f.class_list) {
+				ed.dom.setAttrib(e, 'class', getSelectValue(f, "class_list"));
+			}
 		}
 
 		// Don't move caret if selection was image
