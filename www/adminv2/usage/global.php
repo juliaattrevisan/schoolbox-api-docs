@@ -12,10 +12,15 @@ if (!$_SESSION['user']->isSuperuser()) {
 	error(19);
 }
 
-$mapper = new \Schoolbox\Usage\UsageMapper();
+var_dump($this->arg);
+if (isset($this->arg[1])) {
+}
+else {
+	die('mort');
+	$mapper = new \Schoolbox\Usage\UsageMapper();
+	$this->setFile(TEMPLATE_content, 'adminv2/usage/global.html');
 
-$this->setFile(TEMPLATE_content, 'adminv2/usage.html');
-
-$this->setVar(array(
-	'USAGE_NUM_USERS' => $mapper->numUsers()
-));
+	$this->setVar(array(
+		'USAGE_NUM_USERS' => $mapper->numUsers()
+	));
+}
