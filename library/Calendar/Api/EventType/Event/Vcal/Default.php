@@ -81,12 +81,11 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				 */
 				$cache = new Calendar_Api_Cache();
 				$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
-
 				/* Parse it all
 				 */
 				try {
-					$allEvents = Sabre\VObject\Reader::read($source);
-				}
+					$allEvents = Sabre\VObject\Reader::read($source, Sabre\VObject\Reader::OPTION_FORGIVING);
+                }
 				catch(Exception $e) {
 
 					/* Some google calendars don't follow sabre's expected format?
@@ -98,6 +97,10 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				if ($allEvents !== null) {
 					foreach($allEvents->children as $currentEvent) {
 
+                        /*
+                         * $currentEvent \Sabre\VObject\Component\VEvent
+                         */
+
 						/* gloop returns a whole bunch of stuff all mixed up
 						 *
 						 * We only want to deal with Sabre\VObject\Component\VEvent objects
@@ -108,9 +111,11 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 							// All day event: starts at 12am one day, ends 12am
 							// next.
 							// (are either value: date)
-							$all_day = $currentEvent->DTSTART['value']->value === 'DATE';
-							$eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART->value));
-							$eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND->value));
+
+                            //var_dump($currentEvent->DTSTART);
+							$all_day = !$currentEvent->DTSTART->hasTime();
+                            $eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART));
+                            $eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND));
 
 							//
 							// According to VCAL standard: end of all day event
@@ -129,7 +134,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 								// If this event has a category which matches
 								// any event type, then apply that event type's
 								// color instead of the configured one.
-								$category_list = explode(';', $currentEvent->CATEGORIES->value);
+								$category_list = explode(';', $currentEvent->CATEGORIES);
 								$category_list = array_map('trim',       $category_list);
 								$category_list = array_map('strtoupper', $category_list);
 								$category_list = array_filter($category_list, 'strlen');
@@ -153,19 +158,19 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
 								$event->setAuthorName('');
 								$event->setAuthorId(-1);
-								$event->setEventId($this->escapeVcalValue($currentEvent->UID->value));
+								$event->setEventId($this->escapeVcalValue($currentEvent->UID));
 
 								$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 								$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
 								$event->setType($metaDetails['eventTypeID']);
-								$event->setNote($this->escapeVcalValue($currentEvent->SUMMARY->value));
+								$event->setNote($this->escapeVcalValue($currentEvent->SUMMARY));
 								$event->setAccess('');
 								$event->setEventType($metaDetails['eventType']);
 								$event->setColour($metaDetails['eventColour']);
 								$event->setCampusList(implode(',', $decodedConfig->getCampus()));
-								$event->setDetail(nl2br($this->escapeVcalValue($currentEvent->DESCRIPTION->value)));
-								$event->setLocation($this->escapeVcalValue($currentEvent->LOCATION->value));
+								$event->setDetail(nl2br($this->escapeVcalValue($currentEvent->DESCRIPTION)));
+								$event->setLocation($this->escapeVcalValue($currentEvent->LOCATION));
 								$event->setPublishDate('');
 								$event->setSid('');
 								$event->setAllday($all_day);
