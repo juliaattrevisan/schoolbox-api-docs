@@ -23,10 +23,6 @@ $mapper = new \Schoolbox\Usage\Specific\UsageMapper($userId);
 $this->setFile(TEMPLATE_content, 'adminv2/usage/specific.html');
 
 $this->setVar(array(
-	'USAGE_USER_ID' => $userId
+	'USAGE_USER_ID' => $userId,
+	'USAGE_NUM_TOTAL' => $mapper->numFiles()
 ));
-
-//
-//$this->setVar(array(
-//	'USAGE_NUM_FILES' => $mapper->numFiles()
-//));

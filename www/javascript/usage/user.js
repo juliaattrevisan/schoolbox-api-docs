@@ -28,11 +28,14 @@
 			}
 
 			var derived = {
-				element: element,
-				url: defaults.url + '&orderBy=' + options.orderBy + '&order=' + options.order + '&index=' + options.index + '&numPerPage=' + options.numPerPage
+				element: element
 			}
 
 			var merged = $.extend(defaults, derived, options);
+
+			/* Dynamically append params
+			 */
+			merged.url = merged.url + '&orderBy=' + options.orderBy + '&order=' + options.order + '&index=' + options.index + '&numPerPage=' + options.numPerPage;
 
 			return merged;
 		}
@@ -54,6 +57,8 @@
 					}
 
 					config.element.usageUser({
+						url: config.url,
+						columns: config.columns,
 						orderBy: $j(this).attr('rel'),
 						order: order,
 						index: 0,
@@ -73,6 +78,8 @@
 					event.preventDefault();
 
 					config.element.usageUser({
+						url: config.url,
+						columns: config.columns,
 						orderBy: config.orderBy,
 						order: config.order,
 						index: $j(this).attr('rel'),

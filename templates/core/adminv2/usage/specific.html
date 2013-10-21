@@ -21,13 +21,19 @@
 			url: '/adminv2/usage/specificAjax?type=type&userId={USAGE_USER_ID}'
 		});
 
-//		$j('#user-usage').usageUser({
-//			orderBy: 'lastname',
-//			order: 'ASC',
-//			index: 0,
-//			numPerPage: 10,
-//			numUsers: {USAGE_NUM_FILES}
-//		});
+		$j('#user-usage').usageUser({
+			url: '/adminv2/usage/specificAjax?type=files&userId={USAGE_USER_ID}',
+			orderBy: 'lastname',
+			order: 'ASC',
+			index: 0,
+			numPerPage: 10,
+			numTotal: {USAGE_NUM_TOTAL},
+			columns: [
+				{column: 'name', label: 'Filename'},
+				{column: 'bytes', label: 'Size'},
+				{column: 'mime_type', label: 'Type'}
+			]
+		});
 	});
 </script>
 

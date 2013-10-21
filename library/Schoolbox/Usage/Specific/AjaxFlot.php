@@ -101,36 +101,35 @@ class AjaxFlot {
 	/**
 	 * Delegation method
 	 *
-	 * Find total user usage
+	 * Find total file usage
 	 *
 	 * @param $orderBy
 	 * @param $order
 	 * @param $index
 	 * @param $numPerPage
 	 */
-	public function findUserUsage($orderBy, $order, $index, $numPerPage) {
-//		$allData = $this->getMapper()->findUserUsage($orderBy, $order, $index, $numPerPage);
-//
-//		$page = new \SitePage();
-//		$page->setFile('user_list', '/adminv2/usage/user.html');
-//		$page->setBlock('user_list', 'user', 'user_block');
-//
-//		/* Really? You should be passing the bytes as constructor arg
-//		 */
-//		$bytes = new \Alaress_Byte_Format();
-//
-//		foreach ($allData as $currentData) {
-//			$page->setVar(array(
-//				'USER_FIRSTNAME' => $currentData['firstname'],
-//				'USER_LASTNAME' => $currentData['lastname'],
-//				'USER_GROUP' => $currentData['name'],
-//				'USER_BYTES' => $bytes->bytesToString($currentData['bytes']),
-//			));
-//
-//			$page->parse('user_block', 'user', true);
-//		}
-//
-//		echo $page->template->_varVals['user_block'];
+	public function findFileUsage($orderBy, $order, $index, $numPerPage) {
+		$allData = $this->getMapper()->findFileUsage($orderBy, $order, $index, $numPerPage);
+
+		$page = new \SitePage();
+		$page->setFile('file_list', '/adminv2/usage/file.html');
+		$page->setBlock('file_list', 'file', 'file_block');
+
+		/* Really? You should be passing the bytes as constructor arg
+		 */
+		$bytes = new \Alaress_Byte_Format();
+
+		foreach ($allData as $currentData) {
+			$page->setVar(array(
+				'FILE_FILENAME' => $currentData['name'],
+				'FILE_BYTES' => $bytes->bytesToString($currentData['bytes']),
+				'FILE_MIMETYPE' => $currentData['mime_type'],
+			));
+
+			$page->parse('file_block', 'file', true);
+		}
+
+		echo $page->template->_varVals['file_block'];
 	}
 
 	/* Getters/Setters

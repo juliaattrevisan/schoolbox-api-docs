@@ -208,88 +208,81 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	}
 
 	/**
-	 * Find total user usage
+	 * Find total file usage
 	 *
 	 * This does NOT summate files which have been marked as softdeleted in the db
 	 *
 	 * @param string $orderBy
 	 * @param string $order
 	 * @param int $index
-	 * @param $usersPerPage
+	 * @param $numPerPage
 	 * @return array
 	 */
-	public function findUserUsage($orderBy, $order, $index, $usersPerPage) {
-//		$query = "
-//			SELECT
-//				`user`.firstname, `user`.lastname,
-//				CONCAT(`user`.firstname, ' ', `user`.lastname) AS fullname,
-//				`groups`.name,
-//				COALESCE(SUM(bytes), 0) AS bytes
-//			FROM `user`
-//			INNER JOIN `groups` ON `user`.group_id = `groups`.id
-//			LEFT JOIN
-//			(
-//				(SELECT owner AS userId, SUM(file_size) AS bytes
-//				FROM `file`
-//				WHERE deleted = 0
-//				GROUP BY owner)
-//				UNION
-//				(SELECT owner AS userId, SUM(file_size) AS bytes
-//				FROM `myFile`
-//				WHERE deleted = 0
-//				GROUP BY owner)
-//				UNION
-//				(SELECT uploaded_by AS userId, SUM(filesize) AS bytes
-//				FROM `storage`
-//				GROUP BY uploaded_by)
-//				UNION
-//				(SELECT owner AS userId, SUM(filesize) AS bytes
-//				FROM `student_submission`
-//				GROUP BY owner)
-//				UNION
-//				(SELECT owner AS userId, SUM(filesize) AS bytes
-//				FROM `submission_return`
-//				GROUP BY owner)
-//			) allTotals ON `user`.id = allTotals.userId
-//			GROUP BY `user`.id
-//		";
-//
-//		/* Select order by
-//		 */
-//		if (!in_array($orderBy, array('firstname', 'lastname', 'name', 'bytes'))) {
-//			$orderBy = 'lastname';
-//		}
-//
-//		if (!in_array($order, array('DESC', 'ASC'))) {
-//			$order = 'ASC';
-//		}
-//
-//		/* Cast Away
-//		 */
-//		$index = (int)$index;
-//		$usersPerPage = (int)$usersPerPage;
-//
-//		/* Pagination
-//		 */
-//		$start = $index * $usersPerPage;
-//
-//		$query .= "
-//			ORDER BY $orderBy $order
-//			LIMIT $start, $usersPerPage
-//		";
-//
-//		/* Spit it out
-//		 */
-//		$statement = $this->database->prepare($query);
-//		$statement->execute();
-//
-//		$result = array();
-//
-//		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-//			$result[] = $row;
-//		}
-//
-//		return $result;
+	public function findFileUsage($orderBy, $order, $index, $numPerPage) {
+		$userId = $this->getUserId();
+
+		$query = "
+			SELECT *
+			FROM
+			(
+				(SELECT realname AS `name`, file_size AS bytes, mime_type
+				FROM `file`
+				WHERE `owner` = {$userId})
+				UNION
+				(SELECT realname AS `name`, file_size AS bytes, mime_type
+				FROM `myFile`
+				WHERE `owner` = {$userId})
+				UNION
+				(SELECT filename AS `name`, filesize AS bytes, mime AS mime_type
+				FROM `storage`
+				WHERE `uploaded_by` = {$userId})
+				UNION
+				(SELECT realname AS `name`, filesize AS bytes, mime_type
+				FROM `student_submission`
+				WHERE `owner` = {$userId})
+				UNION
+				(SELECT filename AS `name`, filesize AS bytes, '' AS mime_type
+				FROM `submission_return`
+				WHERE `owner` = {$userId})
+			) AS allTotals
+		";
+
+		/* Select order by
+		 */
+		if (!in_array($orderBy, array('name', 'bytes', 'mime_type'))) {
+			$orderBy = 'name';
+		}
+
+		if (!in_array($order, array('DESC', 'ASC'))) {
+			$order = 'ASC';
+		}
+
+		/* Cast Away
+		 */
+		$index = (int)$index;
+		$numPerPage = (int)$numPerPage;
+
+		/* Pagination
+		 */
+		$start = $index * $numPerPage;
+
+		$query .= "
+			ORDER BY $orderBy $order
+			LIMIT $start, $numPerPage
+		";
+
+		/* Spit it out
+		 */
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$result = array();
+
+		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+			$result[] = $row;
+		}
+
+		return $result;
 	}
 
 	/* Getters/Setters

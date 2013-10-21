@@ -11,9 +11,9 @@ switch($_GET['type']) {
 	case 'type':
 		echo $usage->findTypeUsage();
 		break;
-//	case 'user':
-//		echo $usage->findUserUsage($_GET['orderBy'], $_GET['order'], $_GET['index'], $_GET['numPerPage']);
-//		break;
+	case 'files':
+		echo $usage->findFileUsage($_GET['orderBy'], $_GET['order'], $_GET['index'], $_GET['numPerPage']);
+		break;
 	default: break;
 }
 
