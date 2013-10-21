@@ -112,7 +112,6 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 							// next.
 							// (are either value: date)
 
-                            //var_dump($currentEvent->DTSTART);
 							$all_day = !$currentEvent->DTSTART->hasTime();
                             $eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART));
                             $eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND));
