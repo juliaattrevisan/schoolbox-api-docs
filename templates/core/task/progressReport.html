@@ -1,0 +1,41 @@
+<h1>{CATEGORY}</h1>
+<div class="header_option">
+
+    <div class="mark-sheet wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2">Name</th>
+                    <!-- BEGIN header_unit -->
+                    <th colspan="{HEADER_UNIT_COUNT}">{HEADER_UNIT_NAME}</th>
+                    <!-- END header_unit -->
+                </tr>
+                <tr>
+                    <!-- BEGIN subheader_unit -->
+                    <!-- BEGIN subheader_unit_task -->
+                    <th>{SUBHEADER_UNIT_TASK_NAME}</th>
+                    <!-- END subheader_unit_task -->
+                    <!-- END subheader_unit -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN student -->
+                <tr>
+                    <td>
+                        <a href="/search/user/{STUDENT_ID}" title="{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}">
+                            {STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
+                        </a>
+                    </td>
+                    <!-- BEGIN student_unit -->
+                    <!-- BEGIN student_unit_task -->
+                    <td>
+                        {STUDENT_UNIT_TASK_STATUS}
+                    </td>
+                    <!-- END student_unit_task -->
+                    <!-- END student_unit -->
+                </tr>
+                <!-- END student -->
+            </tbody>
+        </table>
+    </div>
+</div>
