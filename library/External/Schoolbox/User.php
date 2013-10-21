@@ -217,7 +217,7 @@ class External_Schoolbox_User implements External_UserInterface {
         return $contactAdaptionList;
 	}
 
-	function getCurrentSemester () {
+	function getCurrentSemester ($externalUserId = null) {
 
 	}
 

@@ -42,14 +42,54 @@ class MSSQL {
 	 */
 	protected $collector = null;
 
-	/**
+    /**
+     * The database connection resource
+     * @var resource
+     */
+    protected $dbf = null;
+
+    /**
+     * Database host address
+     * @var string
+     */
+    protected $host = null;
+
+    /**
+     * Database user
+     * @var string
+     */
+    protected $user = null;
+
+    /**
+     * Database password
+     * @var string
+     */
+    protected $passwd = null;
+
+    /**
+     * Database name
+     * @var string
+     */
+    protected $db = null;
+
+    /**
+     * Most recent result resource
+     * @var resource
+     */
+    protected $result = null;
+
+    /**
 	 * Static instance of this class
 	 *
 	 * @var self
 	 */
 	protected static $instance = null;
 
-	function MSSQL($db = false, $optionalConfig = false) {
+    /**
+     * @param bool $db
+     * @param bool $optionalConfig
+     */
+    function MSSQL($db = false, $optionalConfig = false) {
 
 		/* Blasphemy (heresy unavoidable)
 		 * Hijack these settings for alternative config
@@ -93,7 +133,11 @@ class MSSQL {
 		return self::$instance;
 	}
 
-	function connect() {
+    /**
+     * Connect to database
+     * @throws Schoolbox\External\Exception
+     */
+    function connect() {
 		if(!isset($this->dbf))
 			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd);
 
@@ -104,7 +148,12 @@ class MSSQL {
 			throw new \Schoolbox\External\Exception("External database is online, but unable to connect.");
 	}
 
-	function changeDB($db) {
+    /**
+     * Change to a different DB on server
+     * @param string $db
+     * @return bool
+     */
+    function changeDB($db) {
 		if(@mssql_select_db($db, $this->dbf))
 		{
 			$this->db = $db;
@@ -130,7 +179,11 @@ class MSSQL {
 		return $this->collector;
 	}
 
-	function query($sql_q)
+    /**
+     * @param string $sql_q
+     * @return bool|resource
+     */
+    function query($sql_q)
 	{
 		if($this->dbf) {
 			if ($this->collector instanceof MssqlDatabaseCollector) {
@@ -204,8 +257,9 @@ class MSSQL {
 			$result  = mssql_execute($proc);
 			$message = mssql_get_last_message();
 			if (is_resource($result)) {
+                $return[] = mssql_fetch_assoc($result);
 				while (mssql_next_result($result)) {
-					$return[] = mssql_fetch_assoc($result);
+                    $return[] = mssql_fetch_assoc($result);
 				}
 			}
 			elseif ($result === false) {

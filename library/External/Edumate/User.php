@@ -240,7 +240,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * Returns the current semester/reporting period (used everywhere)
      * @return bool
      */
-    public function getCurrentSemester() {
+    public function getCurrentSemester($externalUserId = null) {
         $stmt = $this->getDatabase()->prepare("
             SELECT report_period
             FROM db2inst1.schoolbox_report_periods

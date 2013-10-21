@@ -14,7 +14,6 @@ use Response_HTTP;
 use Config;
 use Exception_Schoolbox;
 use ErrorException;
-use External_User;
 use External_Timetable;
 use ClientDevice;
 use Schoolbox\Role;
@@ -61,9 +60,6 @@ class API {
 	        }
 
             $timetableHandler = new External_Timetable();
-
-            $eUser = new External_User();
-            $eUser->getCurrentSemester();
 
 	        // most likely, default campus will be populated
 	        if($targetUser->getDefaultCampus()) {

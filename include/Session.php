@@ -81,10 +81,6 @@ class Session
             if (Cfg::get('external_enable'))
                 $this->setSynergyInfo($userHandler);
 
-            /* Old ormond code for extracting data from ldap
-            * if(Cfg::get('ldap_enable'))
-                $this->setLDAPInfo($username);
-            */
 
             /* Log successful */
             $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
@@ -114,7 +110,7 @@ class Session
         }
         catch (Schoolbox\Mapper\Exception $e) {}
         if(!($user instanceof \Schoolbox\User && $user->getEnabled())) {
-            $page = new SitePage(FALSE);
+            $page = new SitePage(false);
             $page->goLoginPage("This account is currently disabled.");
             return false;
         }
@@ -196,7 +192,7 @@ class Session
                                 case '701': // ACCOUNT_EXPIRED
                                 case '533': // ACCOUNT_DISABLED
                                     // do not fall back. Throw error indicating expired account.
-                                    $page = new SitePage(FALSE);
+                                    $page = new SitePage(false);
                                     $errMsg = 'Your account has expired or been disabled.<br />
                                                Please contact a system administrator to regain access to your account.';
                                     $page->goLoginPage($errMsg);
@@ -205,7 +201,7 @@ class Session
                                 case '773': // USER_MUST_RESET_PASSWORD
                                 case '532': // PASSWORD_EXPIRED
                                     // do not fall back. Soft-redirect to password reset function.
-                                    $page = new SitePage(FALSE);
+                                    $page = new SitePage(false);
                                     $errMsg = 'Your password has expired and needs to be reset before you can log in.<br />';
 
                                     // site-specific handling for how to go about resetting a password
@@ -340,17 +336,9 @@ class Session
             return true;
     }
 
-
-    function setLDAPInfo($username)
-    {
-        $ds = @ldap_connect(LDAP_host);
-        $result = @ldap_search($ds, LDAP_base, 'uid=' . $username, array('dn', 'exchangeActive'));
-        $entries = @ldap_get_entries($ds, $result);
-        if ($entries[0]['exchangeactive'][0] == 'TRUE')
-            $_SESSION['exchange'] = true;
-
-    }
-
+    /**
+     * @param User $userHandler
+     */
     function setSynergyInfo($userHandler)
     {
         $synUser = new External_User;
@@ -359,7 +347,7 @@ class Session
 
         //setup a users enrolement for the session
 
-        $semester = $synUser->getCurrentSemester();
+        $synUser->getCurrentSemester($_SESSION['sid']);
 
         $synergy_id = $_SESSION['sid'];
 

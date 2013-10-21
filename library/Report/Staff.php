@@ -23,9 +23,6 @@ class Report_Staff extends Report_Abstract {
 		else {
 			$this->setPage($page);
 
-			$this->setExternalUserHandler(new External_User());
-			$this->getExternalUserHandler()->getCurrentSemester();
-
 			$this->setup();
 
 			$this->setAllRecords($this->getExternalUserHandler()->getStaffContactListExtended());
