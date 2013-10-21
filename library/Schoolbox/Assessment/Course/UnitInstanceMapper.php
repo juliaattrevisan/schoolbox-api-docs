@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Component_Instance;
+use Component_InstanceMapper;
 use Schoolbox\Assessment\Course\Task\Cloner;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
@@ -76,6 +77,12 @@ class UnitInstanceMapper extends Mapper {
             'mapper'    => 'Component_InstanceMapper',
             'this_key'  => 'component_id',
             'other_key' => 'id',
+        ));
+        $this->hasJoin('task', array(
+            'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceMapper',
+            'this_key'  => 'id',
+            'other_key' => 'course_unit_instance_id',
+            'multiple'  => true,
         ));
 
         $this->hasSoftDeleteDateField('deleted_at');
