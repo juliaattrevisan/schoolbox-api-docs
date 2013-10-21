@@ -890,7 +890,9 @@ class Mapper {
 	 * @param string $join    @see $this->findJoinedModelList() $join param
 	 * @param object $object  @see $this->findJoinedModelList() $object param
 	 * @param array  $options @see $this->findJoinedModelList() $options param
-	 *                        Also takes a
+	 *                        Also takes another param:
+	 *                        set_method: the setter method for setting the
+     *                                    joined models in each $object
 	 */
 	public function loadJoinedModel($join, $object, $options = array()) {
 		$collection        = $this->getModelAsCollection($object);
@@ -922,8 +924,10 @@ class Mapper {
 			}
 		);
 
-		$is_multiple = !empty($join_identifier['multiple']);
-		foreach ($collection as $item) {
+		$is_multiple     = !empty($join_identifier['multiple']);
+        $this_set_method = $options['set_method'] ?: $this->getSetMethodName($this_mapping['property']);
+
+        foreach ($collection as $item) {
 			// Is this a multiple join? If so, how do I know?
 			$item_property = $item->$this_get_method();
 			if ($is_this_model) {
@@ -931,9 +935,11 @@ class Mapper {
 			}
 			$this_model_join_list = $grouped_join_list->getOffset($item_property);
 			if ($this_model_join_list instanceof Collection) {
+                $item = $this_model_join_list;
 				if (!$is_multiple) {
-					$item->$this_set_method($this_model_join_list->first());
+                    $item = $this_model_join_list->first();
 				}
+                $item->$this_set_method($item);
 			}
 		}
 	}
