@@ -52,7 +52,7 @@
 						order: order,
 						index: 0,
 						numPerPage: config.numPerPage,
-						numUsers: config.numUsers
+						numTotal: config.numTotal
 					});
 				});
 			});
@@ -71,7 +71,7 @@
 						order: config.order,
 						index: $j(this).attr('rel'),
 						numPerPage: config.numPerPage,
-						numUsers: config.numUsers
+						numTotal: config.numTotal
 					});
 				});
 			});
@@ -111,7 +111,7 @@
 
 					var pagination = '';
 
-					for(var i = 0; i < Math.ceil(config.numUsers/config.numPerPage); i++) {
+					for(var i = 0; i < Math.ceil(config.numTotal/config.numPerPage); i++) {
 						pagination += '<li><a rel="' + i +'">' + (i+1) + '</a></li>';
 					}
 
