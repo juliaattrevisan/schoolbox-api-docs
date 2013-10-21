@@ -39,9 +39,37 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	 * @return mixed
 	 */
 	public function numFiles() {
+		$userId = $this->getUserId();
+
 		$query = "
-			SELECT COUNT(`user`.id) AS num
-			FROM `user`
+			SELECT SUM(num) AS num
+			FROM
+			(
+				(SELECT COUNT(*) AS num
+				FROM `file`
+				WHERE `owner` = {$userId}
+				GROUP BY `owner`)
+				UNION
+				(SELECT COUNT(*) AS num
+				FROM `myFile`
+				WHERE `owner` = {$userId}
+				GROUP BY `owner`)
+				UNION
+				(SELECT COUNT(*) AS num
+				FROM `storage`
+				WHERE `uploaded_by` = {$userId}
+				GROUP BY `uploaded_by`)
+				UNION
+				(SELECT COUNT(*) AS num
+				FROM `student_submission`
+				WHERE `owner` = {$userId}
+				GROUP BY `owner`)
+				UNION
+				(SELECT COUNT(*) AS num
+				FROM `submission_return`
+				WHERE `owner` = {$userId}
+				GROUP BY `owner`)
+			) AS allTotals
 		";
 
 		$statement = $this->database->prepare($query);

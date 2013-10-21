@@ -129,7 +129,7 @@
 
 					var pagination = '';
 
-					for(var i = 0; i < Math.ceil(config.numTotal/config.numPerPage); i++) {
+					for(var i = 0; i < Math.floor(config.numTotal/config.numPerPage); i++) {
 						pagination += '<li><a rel="' + i +'">' + (i+1) + '</a></li>';
 					}
 
