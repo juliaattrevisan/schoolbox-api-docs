@@ -103,6 +103,23 @@ class InstanceCompletionMapper extends Mapper {
     }
 
     /**
+     * Retrieves most recent completion for $student_id on $task_instance_id.
+     *
+     * @param int $task_instance_id
+     * @param int $student_id
+     *
+     * @return InstanceCompletion
+     * @throws Mapper\Exception if no completion was found.
+     */
+    public function findLatestForTaskAndStudent($task_instance_id, $student_id) {
+        $list = $this->findLatestForList(array($task_instance_id), $student_id);
+        if ($list->count() === 0) {
+            throw new Mapper\Exception('Instance of object not found');
+        }
+        return $list->first();
+    }
+
+    /**
      * Retrieves the most recent completions for each task instance in
      * $task_instance_id_list.
      *

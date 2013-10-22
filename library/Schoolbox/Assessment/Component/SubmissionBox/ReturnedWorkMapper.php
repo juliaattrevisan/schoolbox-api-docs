@@ -355,14 +355,44 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 	 */
 	public function postSave(ReturnedWork $object, $is_new = false) {
 		$object->copyFromTempLocation();
-		if ($is_new) {
-			// Attempt to save a task instance entry for this item.
-			$submission_box   = $this->getJoinMapper('submission_box')->findById($object->getSubmissionBox()->getId());
+
+		// Doesn't matter whether it's new or not - only whether the mark is
+		// greater than 0.
+
+		// Attempt to save a task instance entry for this item.
+		// Because this is a teacher, the task needs to be marked as
+		// complete regardless of whether it requires confirmation.
+		// It should depend on the normalized mark, though.
+		if ($object->getNormalizedMark() > 0) {
+			$submission_box   = $this->getJoinMapper('submission_box')->findById(
+				$object->getSubmissionBox()->getId()
+			);
 			$task_instance_id = $submission_box->getTaskInstance()->getId();
 			if (isset($task_instance_id)) {
-				Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-					$task_instance_id, $object->getOwner()->getId()
-				);
+				// Find most recent for this task.
+				// If it's completed, don't mark again because the student has
+				// already completed it.
+				try {
+					$recent_completion = Task\InstanceCompletionMapper::getInstance()->findLatestForTaskAndStudent(
+						$task_instance_id,
+						$object->getOwner()->getId()
+					);
+					$is_already_completed =
+						($recent_completion->getCompletionStatus() == Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE);
+				}
+				catch (Schoolbox\Mapper\Exception $e) {
+					$is_already_completed = false;
+				}
+				if (!$is_already_completed) {
+					$completion = new Task\InstanceCompletion();
+					$completion
+						->setTaskInstance($submission_box->getTaskInstance())
+						->setStudent($object->getOwner())
+						->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
+						->setCompletionStatus(Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE)
+					;
+					Task\InstanceCompletionMapper::getInstance()->save($completion);
+				}
 			}
 		}
 	}
