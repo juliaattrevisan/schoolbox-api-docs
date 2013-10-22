@@ -35,17 +35,14 @@ class AjaxFlot {
 	public function findTotalUsage() {
 		$currentData = $this->getMapper()->findTotalUsage();
 
-		$result = array();
-		$result['label'] = 'Total Usage';
-
-		$result['data'] = array(
+		$result = array(
 			array(
 				'label' => 'Used',
-				'data' => array(array(1, $currentData['Used'])),
+				'data' => (int)$currentData['Used'],
 			),
 			array(
 				'label' => 'Available',
-				'data' => array(array(1, $currentData['Available']))
+				'data' => (int)$currentData['Available']
 			)
 		);
 

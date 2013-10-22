@@ -49,8 +49,8 @@
 					/* Use flot format to generate different bar graph
 					 * after all
 					 */
-					var used = datasets.data[0].data[0][1];
-					var total = datasets.data[1].data[0][1] + used;
+					var used = datasets[0].data;
+					var total = datasets[1].data + used;
 					var percentage = Math.round(100*used/total).toString();
 
 					var html = '\
