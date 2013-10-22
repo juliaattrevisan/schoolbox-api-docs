@@ -43,7 +43,6 @@ class Updater {
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 		$mimeMapper = new \Schoolbox\File\MimetypeMapper();
 
-
 		while ($filepointer = readdir($dirhandle)) {
 			if (($filepointer != '.') && ($filepointer != '..')) {
 				$size = filesize(\Cfg::get('returns_dir') . '/' . $filepointer);

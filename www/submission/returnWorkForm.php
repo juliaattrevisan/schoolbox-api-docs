@@ -63,6 +63,7 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
 					/* Save filesize in db
 					 */
 					$return['filesize'] = $_FILES[$uploadIndex]['size'];
+					$return['mime_type'] = $uploaded_file['type'];
 
                     saveReturn($return, null, $uploaded_file);
                 }
