@@ -13,17 +13,19 @@ if (!$_SESSION['user']->isSuperuser()) {
 }
 
 if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
-	$userId = $this->arg[0];
+	$userMapper = new \Schoolbox\UserMapper();
+	$user = $userMapper->findById($this->arg[0]);
 }
 else {
-	$userId = $_SESSION['user']->getId();
+	$user = $_SESSION['user'];
 }
 
-$mapper = new \Schoolbox\Usage\Specific\UsageMapper($userId);
+$mapper = new \Schoolbox\Usage\Specific\UsageMapper($user->getId());
 $this->setFile(TEMPLATE_content, 'adminv2/usage/specific.html');
 
 $this->setVar(array(
-	'USAGE_USER_ID' => $userId,
+	'USAGE_USER_FULLNAME' => $user->getFullname(),
+	'USAGE_USER_ID' => $user->getId(),
 	'USAGE_NUM_TOTAL' => $mapper->numFiles()
 ));
 
