@@ -25,7 +25,9 @@
 					{column: 'lastname', label: 'Lastname'},
 					{column: 'name', label: 'Group'},
 					{column: 'bytes', label: 'Usage'}
-				]
+				],
+				ascendingHtml: '<img src="/images/famicons/arrow_up.png">',
+				descendingHtml: '<img src="/images/famicons/arrow_down.png">'
 			}
 
 			var derived = {
@@ -119,6 +121,28 @@
 		}
 
 		/**
+		 * Make indicator arrows for table headings
+		 *
+		 * @param currentColumn
+		 * @returns {string}
+		 */
+		function makeIndicatorArrows(currentColumn) {
+			var indicator = '';
+
+			/* Asc/desc indicator arrows
+			 */
+			if (currentColumn == config.orderBy) {
+				var indicator = config.ascendingHtml;
+
+				if (config.order == 'DESC') {
+					indicator = config.descendingHtml;
+				}
+			}
+
+			return indicator;
+		}
+
+		/**
 		 * Make table headings
 		 *
 		 * @returns {string}
@@ -128,17 +152,9 @@
 
 			for (var i = 0; i < config.columns.length; i++) {
 				var current = config.columns[i];
+				var indicator = makeIndicatorArrows(current.column);
 
-				/* Asc/desc indicator arrows
-				 */
-				if (current.column == config.orderBy) {
-					var indicator = config.order;
-				}
-				else {
-					var indicator = '';
-				}
-
-				thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label +"</a>" + indicator + "</th>"
+				thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
 			}
 
 			return thead;
