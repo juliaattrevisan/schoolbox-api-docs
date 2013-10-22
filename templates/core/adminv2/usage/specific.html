@@ -12,15 +12,18 @@
 <script type='text/javascript'>
 	$j(function() {
 		$j('#group-usage').usageGroup({
-			url: '/adminv2/usage/specificAjax?type=group&userId={USAGE_USER_ID}'
+			url: '/adminv2/usage/specificAjax?type=group&userId={USAGE_USER_ID}',
+			title: 'Type'
 		});
 
 		$j('#type-usage').usageType({
-			url: '/adminv2/usage/specificAjax?type=type&userId={USAGE_USER_ID}'
+			url: '/adminv2/usage/specificAjax?type=type&userId={USAGE_USER_ID}',
+			title: 'Category'
 		});
 
 		$j('#user-usage').usageTabulator({
 			url: '/adminv2/usage/specificAjax?type=files&userId={USAGE_USER_ID}',
+			title: 'Files',
 			orderBy: 'lastname',
 			order: 'ASC',
 			index: 0,

@@ -17,7 +17,8 @@
 		 */
 		function init(element, options) {
 			var defaults = {
-				url: ''
+				url: '',
+				title: ''
 			}
 
 			var derived = {
@@ -82,14 +83,14 @@
 				}
 			});
 
-			config.element.prepend('<h2>Type Usage</h2>');
+			config.element.prepend('<h2>' + config.title + '</h2>');
 		}
 
 		/**
 		 * This is used when there is no data
 		 */
 		function noPie() {
-			config.element.html('<h2>Type Usage</h2><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h2>' + config.title + '</h2><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));

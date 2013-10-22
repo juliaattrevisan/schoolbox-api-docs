@@ -19,7 +19,8 @@
 		 */
 		function init(element, options) {
 			var defaults = {
-				url: ''
+				url: '',
+				title: ''
 			}
 
 			var derived = {
@@ -54,7 +55,7 @@
 
 					var html = '\
 						<div>\
-							<h2>Overall Usage</h2>\
+							<h2>{TITLE}</h2>\
 							<p>\
 								{USED} / {TOTAL}\
 							</p>\
@@ -62,9 +63,10 @@
 						</div>\
 					';
 
-					var html = html.replace(/\{USED\}/g, $.fn.formatBytes(used));
-					var html = html.replace(/\{TOTAL\}/g, $.fn.formatBytes(total));
-					var html = html.replace(/\{BAR\}/g, $.fn.bargraph(percentage));
+					var html = html.replace('{TITLE}', config.title);
+					var html = html.replace('{USED}', $.fn.formatBytes(used));
+					var html = html.replace('{TOTAL}', $.fn.formatBytes(total));
+					var html = html.replace('{BAR}', $.fn.bargraph(percentage));
 
 					config.element.html(html);
 				}

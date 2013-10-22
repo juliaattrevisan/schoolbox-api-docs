@@ -17,7 +17,8 @@
 		 */
 		function init(element, options) {
 			var defaults = {
-				url: ''
+				url: '',
+				title: ''
 			}
 
 			var derived = {
@@ -49,7 +50,6 @@
 						var hasData = false;
 
 						for (var i = 0; i < datasets.length; i++) {
-							console.log(datasets[i]);
 							if (datasets[i].data > 0) {
 								hasData = true;
 							}
@@ -86,7 +86,7 @@
 
 			/* Bar graph everything
 			 */
-			var output = '<h2>Group Usage</h2>';
+			var output = '<h2>{TITLE}</h2>';
 
 			for (var i = 0; i < datasets.length; i++) {
 				var used = parseInt(datasets[i].data);
@@ -107,11 +107,13 @@
 					</div>\
 				';
 
-				var html = html.replace(/\{NAME\}/g, datasets[i].label);
-				var html = html.replace(/\{BAR\}/g, $.fn.bargraphPlainAmount(used, percentage));
+				var html = html.replace('{NAME}', datasets[i].label);
+				var html = html.replace('{BAR}', $.fn.bargraphPlainAmount(used, percentage));
 
 				output += html;
 			}
+
+			var output = output.replace('{TITLE}', config.title);
 
 			config.element.html(output);
 		}
@@ -120,7 +122,7 @@
 		 * This is used when there is no data
 		 */
 		function noBars() {
-			config.element.html('<h2>Group Usage</h2><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h2>' + config.title + '</h2><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));

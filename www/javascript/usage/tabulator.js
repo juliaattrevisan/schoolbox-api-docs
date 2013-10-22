@@ -18,6 +18,7 @@
 		function init(element, options) {
 			var defaults = {
 				url: '',
+				title: '',
 				numPerPage: 15,
 				columns: [
 					{column: 'firstname', label: 'Firstname'},
@@ -123,7 +124,7 @@
 		 */
 		function makeTable(datasets) {
 			var html = '\
-				<h2>Usage Breakdown</h2>\
+				<h2>{TITLE}</h2>\
 				<table>\
 					<thead>\
 						{THEAD}\
@@ -154,9 +155,12 @@
 
 			/* Table, table heading and paginator
 			 */
-			var inject = html.replace('{CONTENTS}', datasets).replace('{THEAD}', thead).replace('{PAGINATION}', pagination);
+			var html = html.replace('{TITLE}', config.title);
+			var html = html.replace('{CONTENTS}', datasets);
+			var html = html.replace('{THEAD}', thead);
+			var html = html.replace('{PAGINATION}', pagination);
 
-			config.element.html(inject);
+			config.element.html(html);
 
 			applySortorder();
 			applyPaginator();
@@ -166,7 +170,7 @@
 		 * This is used when there is no data
 		 */
 		function noTable() {
-			config.element.html('<h2>Usage Breakdown</h2><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h2>' + config.title + '</h2><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));
