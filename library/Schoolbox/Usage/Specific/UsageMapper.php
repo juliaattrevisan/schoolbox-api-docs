@@ -229,7 +229,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				WHERE `owner` = {$userId}
 				AND deleted = 0
 				GROUP BY `owner`)) AS allTotals
-			ORDER BY `bytes` DESC
+			ORDER BY `bytes` ASC
 		";
 
 		$statement = $this->database->prepare($query);
