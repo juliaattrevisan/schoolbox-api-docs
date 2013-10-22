@@ -26,3 +26,7 @@ $this->setVar(array(
 	'USAGE_USER_ID' => $userId,
 	'USAGE_NUM_TOTAL' => $mapper->numFiles()
 ));
+
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'usage');

@@ -18,3 +18,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/usage/all.html');
 $this->setVar(array(
 	'USAGE_NUM_TOTAL' => $mapper->numUsers()
 ));
+
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'usage');

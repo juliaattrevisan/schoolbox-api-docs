@@ -66,9 +66,15 @@
 
 </style>
 
-<h1>Global Usage</h1>
-<div id='group-usage' class='graph loader'></div>
-<div id='type-usage' class='graph loader'></div>
-<div id='user-usage' class='graph loader'></div>
-
-
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<!-- BEGIN admin_nav_item -->
+	<li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+	<!-- END admin_nav_item -->
+</ul>
+<div class="admin-contents clearfix">
+	<h1>Global Usage</h1>
+	<div id='group-usage' class='graph loader'></div>
+	<div id='type-usage' class='graph loader'></div>
+	<div id='user-usage' class='graph loader'></div>
+</div>
