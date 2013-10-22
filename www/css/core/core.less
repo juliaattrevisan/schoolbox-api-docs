@@ -9602,29 +9602,38 @@ ul.activity-list li,
 
 /* Socialstream */
 .addPostForm {
-	background: @dark;
-	border-bottom: 1px solid @border-color;
-	p {
-		margin: 0 16px;
-		clear: both;
-	}
+
 }
 
-.socialstream-form {
-	width: 100%;
-	margin: 0;
-	li {
-		padding: 7px 16px 0 12px  !important;
-	}
-	label {
-		padding-right: 0;
-		input, .socialstream-selected-file {
-			width: 75%;
-			float: right;
-			.ellipsis;
+.information-list, .socialstream-form {
+	form {
+		width: 100%;
+		margin: 0;
+		background: @dark;
+		border-bottom: 1px solid @border-color;
+		p {
+			margin: 0 16px;
+			clear: both;
 		}
+		li {
+			padding: 7px 16px 0 12px  !important;
+			border-bottom: none;
+		}
+		label {
+			padding-right: 0;
+			input, .socialstream-selected-file {
+				width: 75%;
+				float: right;
+				.ellipsis;
+			}
+			input[type="checkbox"],
+			input[type="radio"] {
+				width: auto;
+				float: none;
+			}
+		}
+		textarea { width: 100%; }
 	}
-	textarea { width: 100%; }
 }
 
 .socialstream-post {
@@ -9774,17 +9783,6 @@ body.login {
 }
 
 // Course builder
-.course_instance h4 {
-	display: inline-block;
-	float: none;
-}
-.course_instance .unit-completion {
-	display: inline-block;
-	/*
-	width: 20%;
-	text-align: right;
-	*/
-}
 .course_instance .information-list .no-expand {
 	padding-left: 15px;
 }
@@ -9808,7 +9806,3 @@ body.login {
 .course_instance .information-list .unit.expanded  .expand-button {
 	background-image: url(/images/tree/elbow-expanded.gif);
 }
-.course_instance .task-list h4 {
-	width: auto;
-}
-

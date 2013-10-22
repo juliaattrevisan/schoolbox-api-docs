@@ -37,41 +37,38 @@
 
 
         <!-- BEGIN course_unit_list -->
-        <ul class="information-list listing">
+        <ul class="information-list">
             <!-- BEGIN unit -->
             <li class="unit interact {UNIT_EXPANDED_STATE} {UNIT_BACKGROUND}" data-unit_id="{UNIT_ID}" data-open_date="{UNIT_OPEN_DATE}" data-due_date="{UNIT_DUE_DATE}">
+				<span class="actions">
+					<!-- BEGIN unit_delete -->
+                    <a href="#" class="btn delete no-text" title="Delete this unit" data-interaction="open_delete_unit_form"><span></span></a>
+                    <!-- END unit_delete -->
 
-                <!-- BEGIN unit_expand -->
-                <a href="#" class="unit-name expand-link" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}">
-                    <span class="expand-button"></span>&nbsp;
-                </a>
-                <!-- END unit_expand -->
+                    <!-- BEGIN unit_modify -->
+                    <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="btn modify no-text" title="Modify this unit"><span></span></a>
+                    <!-- END unit_modify -->
+                </span>
 
-                <!-- BEGIN unit_no_expand -->
-                <span class="unit-name no-expand">&nbsp;</span>
-                <!-- END unit_no_expand -->
+                <h3>
+					<!-- BEGIN unit_expand -->
+					<a href="#" class="unit-name expand-link" data-interaction="toggle-expanded" data-interaction-state="{UNIT_EXPANDED_STATE}">
+						<span class="expand-button"></span>&nbsp;
+					</a>
+					<!-- END unit_expand -->
 
-                <h3><a href="/homepage/{UNIT_HOMEPAGE_ID}">{UNIT_NAME}</a></h3>
+					<!-- BEGIN unit_no_expand -->
+					<span class="unit-name no-expand">&nbsp;</span>
+					<!-- END unit_no_expand -->
+
+					<a href="/homepage/{UNIT_HOMEPAGE_ID}">{UNIT_NAME}</a>
+				</h3>
 
                 <!-- BEGIN unit_completion -->
                 <span class="unit-completion gradient-{UNIT_UPCOMING_URGENCY}">
                     {UNIT_COMPLETION_STATUS} {UNIT_RELATIVE_DATE}
                 </span>
                 <!-- END unit_completion -->
-
-                <span class="actions">
-                    <!-- BEGIN unit_modify -->
-                    <a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="btn modify no-text" title="Modify this unit"><span></span></a>
-                    <!-- END unit_modify -->
-
-                    <!-- BEGIN unit_delete -->
-                    <a href="#"
-                       class="btn delete no-text"
-                       title="Delete this unit"
-                       data-interaction="open_delete_unit_form"
-                    ><span></span></a>
-                    <!-- END unit_delete -->
-                </span>
 
                 <div class="hide clear form_container" data-interaction="delete_unit_container">
                     <p class="notice">Are you sure you wish to delete this unit?</p>
@@ -85,54 +82,47 @@
                     </form>
                 </div>
 
-                <ul class="task-list listing {UNIT_LIST_CLASS}">
+                <ul class="task-list information-list {UNIT_LIST_CLASS}">
                     <!-- BEGIN unit_task -->
                     <li class="unit-task interact {UNIT_BACKGROUND} {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
-                        <span class="icon {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}"><span></span></span>
-
-                        <!--
-                        Student: see buttons for starting/ending task
-                        Teacher: sees completion stats
-                        -->
-
-                        <!-- BEGIN unit_task_link -->
-                        <a href="/task/start/{UNIT_TASK_ID}"><h4>{UNIT_TASK_NAME}</h4></a>
-                        <!-- END unit_task_link -->
-                        <!-- BEGIN unit_task_no_link -->
-                        <h4>{UNIT_TASK_NAME}</h4>
-                        <!-- END unit_task_no_link -->
-
-                        <!-- BEGIN unit_task_completion -->
-                        <span class="unit-task-completion">({UNIT_TASK_COMPLETION_STATUS})</span>
-                        <!-- END unit_task_completion -->
-
-                        <!-- BEGIN unit_task_count -->
-                        <span class="unit-completion gradient-{UNIT_TASK_GRADIENT}">
-                            ({UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT})
-                        </span>
-                        <!-- END unit_task_count -->
-
-                        <span class="actions">
-                            <!-- BEGIN unit_task_modify -->
-                            <a href="/task/instance/modify/{UNIT_TASK_ID}"
-                               class="btn modify no-text"
-                               title="Modify this task"
-                               data-interaction="open_edit_task_form"
-                            ><span></span></a>
-                            <!-- END unit_task_modify -->
-
-                            <!-- BEGIN unit_task_delete -->
-                            <a href="#"
-                               class="btn delete no-text"
-                               title="Delete this task"
-                               data-interaction="open_delete_task_form"
-                            ><span></span></a>
+						<span class="actions">
+							<!-- BEGIN unit_task_delete -->
+                            <a href="#" class="btn delete no-text" title="Delete this task" data-interaction="open_delete_task_form"><span></span></a>
                             <!-- END unit_task_delete -->
+
+                            <!-- BEGIN unit_task_modify -->
+                            <a href="/task/instance/modify/{UNIT_TASK_ID}" class="btn modify no-text" title="Modify this task" data-interaction="open_edit_task_form"><span></span></a>
+                            <!-- END unit_task_modify -->
 
                             <!-- BEGIN unit_task_start -->
                             <a href="/task/start/{UNIT_TASK_ID}" class="btn go-to no-text" title="Start this task"><span></span></a>
                             <!-- END unit_task_start -->
                         </span>
+
+                        <!--
+                        Student: see buttons for starting/ending task
+                        Teacher: sees completion stats
+                        -->
+                        <span class="icon {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}"><span></span></span>
+
+                        <!-- BEGIN unit_task_link -->
+						<h4><a href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a></h4>
+                        <!-- END unit_task_link -->
+                        <!-- BEGIN unit_task_no_link -->
+                        <h4>{UNIT_TASK_NAME}</h4>
+                        <!-- END unit_task_no_link -->
+
+						<p class="meta">
+                        	<!-- BEGIN unit_task_completion -->
+                        	<span class="unit-task-completion">{UNIT_TASK_COMPLETION_STATUS}</span>
+                        	<!-- END unit_task_completion -->
+
+                        	<!-- BEGIN unit_task_count -->
+                        	<span class="gradient-{UNIT_TASK_GRADIENT}">
+                            {UNIT_TASK_COMPLETION_COUNT}/{UNIT_STUDENT_COUNT} students completed
+                        	</span>
+                        	<!-- END unit_task_count -->
+						</p>
 
                         <!-- BEGIN unit_task_modify_form -->
                         <div class="hide clear form_container" data-interaction="edit_task_container">
@@ -141,28 +131,28 @@
                                 <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                                 <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
 
-                                <dl>
-                                    <dt><label for="title-{UNIT_TASK_ID}">Task:</label></dt>
-                                    <dd><input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" /></dd>
+                                <ul>
+                                    <li><label for="title-{UNIT_TASK_ID}">Task:
+                                    	<input id="title-{UNIT_TASK_ID}" name="title" type="text" value="{UNIT_TASK_NAME}" />
+									</label></li>
 
-                                    <dt><label for="link-{UNIT_TASK_ID}">Link:</label></dt>
-                                    <dd>
+                                    <li><label for="link-{UNIT_TASK_ID}">Link:
                                         <input id="link-{UNIT_TASK_ID}" name="link" type="text" value="{UNIT_TASK_LINK}" />
-                                        <p class="interact">
-                                            <a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
-                                            <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
-                                        </p>
-                                    </dd>
+									</label></li>
+                                    <li>
+                                        <a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
+                                        <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
+                                    </li>
 
-                                    <dt><label for="self_assess-{UNIT_TASK_ID}">Self-assessed?</label></dt>
-                                    <dd>
-                                        <input name="self_assess" value="0" type="hidden" />
+                                    <li><label for="self_assess-{UNIT_TASK_ID}">Self-assessed?
                                         <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
-                                    </dd>
-                                </dl>
+									</label></li>
 
-                                <input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
-
+									<li>
+										<input name="self_assess" value="0" type="hidden" />
+										<input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
+									</li>
+                                </ul>
                             </form>
                         </div>
                         <!-- END unit_task_modify_form -->
@@ -213,28 +203,30 @@
                         <input type="hidden" name="id" value=""/>
                         <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
 
-                        <dl>
-                            <dt><label for="title-new_task">Task:</label></dt>
-                            <dd><input id="title-new_task" name="title" type="text" value="" /></dd>
+						<ul>
+                        	<li><label for="title-new_task">Task:
+                            	<input id="title-new_task" name="title" type="text" value="" />
+							</label></li>
 
-                            <dt><label for="link-new_task">Link:</label></dt>
-                            <dd>
+                            <li><label for="link-new_task">Link:
                                 <input id="link-new_task" name="link" type="text" value="" />
-                                <p class="interact">
-                                    <a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
-                                    <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
-                                </p>
-                            </dd>
+							</label></li>
 
-                            <dt><label for="self_assess-new_task">Self-assessed?</label></dt>
-                            <dd>
-                                <input name="self_assess" value="0" type="hidden" />
+							<li>
+								<a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
+                                <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
+                            </li>
+
+                            <li><label for="self_assess-new_task">Self-assessed?
                                 <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" />
-                            </dd>
-                        </dl>
+							</label></li>
 
-                        <input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
+							<li>
+								<input name="self_assess" value="0" type="hidden" />
+								<input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
+							</li>
 
+						</ul>
                     </form>
                 </div>
 
