@@ -37,6 +37,7 @@
 			/* Dynamically append params
 			 */
 			merged.url = merged.url + '&orderBy=' + options.orderBy + '&order=' + options.order + '&index=' + options.index + '&numPerPage=' + options.numPerPage;
+			merged.index = parseInt(merged.index);
 
 			return merged;
 		}
@@ -83,7 +84,7 @@
 						columns: config.columns,
 						orderBy: config.orderBy,
 						order: config.order,
-						index: $j(this).attr('rel'),
+						index: parseInt($j(this).attr('rel')),
 						numPerPage: config.numPerPage,
 						numTotal: config.numTotal
 					});
@@ -133,7 +134,7 @@
 					{CONTENTS}\
 					</tbody>\
 				</table>\
-				<ul class="paginator">\
+				<ul class="paginator admin-nav">\
 					{PAGINATION}\
 				</ul>\
 				<div class="clearfix"></div>\
@@ -148,9 +149,31 @@
 			}
 
 			var pagination = '';
+			var numPages = Math.floor(config.numTotal/config.numPerPage);
 
-			for(var i = 0; i < Math.floor(config.numTotal/config.numPerPage); i++) {
-				pagination += '<li><a rel="' + i +'">' + (i+1) + '</a></li>';
+			/* Previous Navigator
+			 */
+			if (config.index > 0) {
+				pagination += '<li><a rel="' + (config.index-1) +'">Previous</a></li>';
+			}
+
+			/* Page Navigator
+			 */
+			for(var i = 0; i < numPages; i++) {
+				if (i == config.index) {
+					var current = 'current';
+				}
+				else {
+					var current = '';
+				}
+
+				pagination += '<li><a class="' + current + '" rel="' + i +'">' + (i+1) + '</a></li>';
+			}
+
+			/* Next Navigator
+			 */
+			if (config.index+1 < numPages) {
+				pagination += '<li><a rel="' + (config.index+1) +'">Next</a></li>';
 			}
 
 			/* Table, table heading and paginator
