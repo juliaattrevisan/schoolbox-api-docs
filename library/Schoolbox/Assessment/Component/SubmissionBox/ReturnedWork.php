@@ -52,6 +52,11 @@ class ReturnedWork {
 	protected $filename;
 
 	/**
+	 * @var string
+	 */
+	protected $mimetype;
+
+	/**
 	 * Size of the file attached to the return
 	 *
 	 * @var null
@@ -315,4 +320,22 @@ class ReturnedWork {
 	public function getConfigLoader() {
 		return $this->config_loader;
 	}
+
+	/**
+	 * @param  string $mimetype
+	 *
+	 * @return $this
+	 */
+	public function setMimetype($mimetype) {
+		$this->mimetype = $mimetype;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getMimetype() {
+		return $this->mimetype;
+	}
+
 }

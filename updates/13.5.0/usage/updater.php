@@ -10,6 +10,8 @@
 require_once('../../../include/Bootstrap.php');
 
 /* Update submissions table with filesizes
+ * Update returns table with mime types
  */
 $updater = new \Schoolbox\Usage\Updater();
 $updater->updateSubmissions();
+$updater->updateReturns();
