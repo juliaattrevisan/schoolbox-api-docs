@@ -17,7 +17,9 @@ class Updater {
 	 */
 	public function updateSubmissions() {
 		$dirhandle = opendir(\Cfg::get('submission_dir'));
+
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+		$mimeMapper = new \Schoolbox\File\MimetypeMapper();
 
 		while ($filepointer = readdir($dirhandle)) {
 			if (($filepointer != '.') && ($filepointer != '..')) {
@@ -26,6 +28,7 @@ class Updater {
 				try {
 					$file = $mapper->findById(str_replace('.dat', '', $filepointer));
 					$file->setFilesize($size);
+					$file->setMimeType($mimeMapper->getByFilename($file->getFilename()));
 					$mapper->save($file);
 				}
 				catch(\Exception $e) {
