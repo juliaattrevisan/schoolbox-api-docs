@@ -28,15 +28,19 @@ try {
     CategoryMapper::getInstance()->loadJoinedModel('codes', $category);
 }
 catch (Schoolbox\Mapper\Exception $e) {
-    error(2);
+    error(6);
 }
 
 // Check permission on category
+$group = new Group();
+if ($group->getPermission($class_id) < WRITE_ACCESS) {
+    error(6);
+}
+
+// Get list of students for this class
 /** @var UnitInstance[]|\Schoolbox\Collection $unit_list */
 $unit_list = UnitInstanceMapper::getInstance()->findForCategoryId($category->getId());
 $code      = implode(',', $category->getCodes()->getColumnValues('code'));
-
-// Consider getting class by student ID
 $student_list = array();
 if ($code && Config::get('external_enable')) {
     $class_handler = new External_Class();
