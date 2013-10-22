@@ -88,10 +88,6 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	 * @return array
 	 */
 	public function findGroupUsage() {
-
-		/* TODO: Include submission_return which normally doesn't have mimetype
-		 */
-
 		$userId = $this->getUserId();
 
 		/* Just Like Voltron
@@ -169,6 +165,23 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
 				FROM `student_submission`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'audio/%')
+
+				UNION
+
+				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `submission_return`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'image/%')
+				UNION
+				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `submission_return`
+				WHERE `owner` = {$userId}
+				AND mime_type LIKE 'video/%')
+				UNION
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
+				FROM `submission_return`
 				WHERE `owner` = {$userId}
 				AND mime_type LIKE 'audio/%')
 			) AS allTotals
@@ -301,7 +314,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				FROM `student_submission`
 				WHERE `owner` = {$userId})
 				UNION
-				(SELECT filename AS `name`, 'Return' AS groupName, filesize AS bytes, '' AS mime_type
+				(SELECT filename AS `name`, 'Return' AS groupName, filesize AS bytes, mime_type
 				FROM `submission_return`
 				WHERE `owner` = {$userId}
 				AND deleted = 0)
