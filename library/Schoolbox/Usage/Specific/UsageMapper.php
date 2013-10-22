@@ -42,7 +42,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 		$userId = $this->getUserId();
 
 		$query = "
-			SELECT SUM(num) AS num
+			SELECT COALESCE(SUM(num), 0) AS num
 			FROM
 			(
 				(SELECT COUNT(*) AS num
