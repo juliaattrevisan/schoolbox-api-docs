@@ -98,7 +98,7 @@
 		var megabyte = kilobyte * 1024;
 		var gigabyte = megabyte * 1024;
 		var terabyte = gigabyte * 1024;
-		var precision = 0;
+		var precision = 2;
 
 		if ((bytes >= 0) && (bytes < kilobyte)) {
 			return bytes + 'B';
