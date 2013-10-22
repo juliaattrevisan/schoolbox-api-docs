@@ -323,7 +323,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 		/* Select order by
 		 */
-		if (!in_array($orderBy, array('name', 'bytes', 'mime_type'))) {
+		if (!in_array($orderBy, array('name', 'groupName', 'bytes', 'mime_type'))) {
 			$orderBy = 'name';
 		}
 
