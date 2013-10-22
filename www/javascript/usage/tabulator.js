@@ -104,45 +104,69 @@
 					 */
 					config.element.removeClass('loader');
 
-					var html = '\
-						<table>\
-							<thead>\
-								{THEAD}\
-							</thead>\
-							<tbody>\
-							{CONTENTS}\
-							</tbody>\
-						</table>\
-						<ul class="paginator">\
-							{PAGINATION}\
-						</ul>\
-						<div class="clearfix"></div>\
-					';
-
-					var thead = '';
-
-					for (var i = 0; i < config.columns.length; i++) {
-						var current = config.columns[i];
-
-						thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label +"</a></th>"
-					}
-
-					var pagination = '';
-
-					for(var i = 0; i < Math.floor(config.numTotal/config.numPerPage); i++) {
-						pagination += '<li><a rel="' + i +'">' + (i+1) + '</a></li>';
-					}
-
-					/* Table, table heading and paginator
+					/* Manufacture a table only if there is data
 					 */
-					var inject = html.replace('{CONTENTS}', datasets).replace('{THEAD}', thead).replace('{PAGINATION}', pagination);
-
-					config.element.html(inject);
-
-					applySortorder();
-					applyPaginator();
+					if (datasets.length) {
+						makeTable(datasets);
+					}
+					else {
+						noTable();
+					}
 				}
 			});
+		}
+
+		/**
+		 * Manufacture a table
+		 *
+		 * @param datasets
+		 */
+		function makeTable(datasets) {
+			var html = '\
+				<h2>Usage Breakdown</h2>\
+				<table>\
+					<thead>\
+						{THEAD}\
+					</thead>\
+					<tbody>\
+					{CONTENTS}\
+					</tbody>\
+				</table>\
+				<ul class="paginator">\
+					{PAGINATION}\
+				</ul>\
+				<div class="clearfix"></div>\
+			';
+
+			var thead = '';
+
+			for (var i = 0; i < config.columns.length; i++) {
+				var current = config.columns[i];
+
+				thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label +"</a></th>"
+			}
+
+			var pagination = '';
+
+			for(var i = 0; i < Math.floor(config.numTotal/config.numPerPage); i++) {
+				pagination += '<li><a rel="' + i +'">' + (i+1) + '</a></li>';
+			}
+
+			/* Table, table heading and paginator
+			 */
+			var inject = html.replace('{CONTENTS}', datasets).replace('{THEAD}', thead).replace('{PAGINATION}', pagination);
+
+			config.element.html(inject);
+
+			applySortorder();
+			applyPaginator();
+		}
+
+		/**
+		 * This is used when there is no data
+		 */
+		function noTable() {
+			config.element.html('<h2>Usage Breakdown</h2><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));

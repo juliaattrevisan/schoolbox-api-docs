@@ -43,49 +43,84 @@
 					 */
 					config.element.removeClass('loader');
 
-					/* Find the largest one
-					 * Every bar will be represented as a fraction of this
+					/* Only manufacture a bar if there is data
 					 */
-					for (var i = 0, max = 0; i < datasets.length; i++) {
-						var value = parseInt(datasets[i].data[0][1]);
+					if (datasets.length) {
+						var hasData = false;
 
-						if (value > max) {
-							max = value;
+						for (var i = 0; i < datasets.length; i++) {
+							console.log(datasets[i]);
+							if (datasets[i].data > 0) {
+								hasData = true;
+							}
 						}
-					}
 
-					/* Bar graph everything
-					 */
-					var output = '<h2>Group Usage</h2>';
-
-					for (var i = 0; i < datasets.length; i++) {
-						var used = parseInt(datasets[i].data[0][1]);
-
-						if (max > 0) {
-							var percentage = Math.round(100*used/max).toString();
+						if (hasData) {
+							makeBars(datasets);
 						}
 						else {
-							var percentage = 0;
+							noBars();
 						}
-
-						var html = '\
-							<div>\
-								{BAR}\
-								<p>\
-									{NAME}\
-								</p>\
-							</div>\
-						';
-
-						var html = html.replace(/\{NAME\}/g, datasets[i].label);
-						var html = html.replace(/\{BAR\}/g, $.fn.bargraphPlainAmount(used, percentage));
-
-						output += html;
 					}
-
-					config.element.html(output);
 				}
 			});
+		}
+
+		/**
+		 * Manufacture a bars
+		 *
+		 * @param datasets
+		 */
+		function makeBars(datasets) {
+
+			/* Find the largest one
+			 * Every bar will be represented as a fraction of this
+			 */
+			for (var i = 0, max = 0; i < datasets.length; i++) {
+				var value = parseInt(datasets[i].data);
+
+				if (value > max) {
+					max = value;
+				}
+			}
+
+			/* Bar graph everything
+			 */
+			var output = '<h2>Group Usage</h2>';
+
+			for (var i = 0; i < datasets.length; i++) {
+				var used = parseInt(datasets[i].data);
+
+				if (max > 0) {
+					var percentage = Math.round(100*used/max).toString();
+				}
+				else {
+					var percentage = 0;
+				}
+
+				var html = '\
+					<div>\
+						{BAR}\
+						<p>\
+							{NAME}\
+						</p>\
+					</div>\
+				';
+
+				var html = html.replace(/\{NAME\}/g, datasets[i].label);
+				var html = html.replace(/\{BAR\}/g, $.fn.bargraphPlainAmount(used, percentage));
+
+				output += html;
+			}
+
+			config.element.html(output);
+		}
+
+		/**
+		 * This is used when there is no data
+		 */
+		function noBars() {
+			config.element.html('<h2>Group Usage</h2><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));

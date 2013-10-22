@@ -43,7 +43,7 @@ class AjaxFlot {
 
 			$result = array();
 			$result['label'] = $currentData['name'];
-			$result['data'] = array(array($i+1, (int)$currentData['bytes']));
+			$result['data'] = (int)$currentData['bytes'];
 
 			$allResults[] = $result;
 		}

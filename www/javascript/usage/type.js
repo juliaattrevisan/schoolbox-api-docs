@@ -43,28 +43,53 @@
 					 */
 					config.element.removeClass('loader');
 
-					$j.plot(config.element, datasets, {
-						series: {
-							pie: {
-								show: true,
-								label: {
-									show: true,
-									radius: 1,
-									formatter: function(label, series) {
-										return '<div style="font-size:11px; text-align:center; padding:2px; color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
-									},
-									background: {
-										opacity: 0.8
-									}
-								}
-							}
-						},
-						legend: {
-							show: false
-						}
-					});
+					/* Only manufacture a pie if there is data
+					 */
+					if (datasets.length) {
+						makePie(datasets);
+					}
+					else {
+						noPie();
+					}
 				}
 			});
+		}
+
+		/**
+		 * Bake pie
+		 *
+		 * @param datasets
+		 */
+		function makePie(datasets) {
+			$j.plot(config.element, datasets, {
+				series: {
+					pie: {
+						show: true,
+						label: {
+							show: true,
+							radius: 1,
+							formatter: function(label, series) {
+								return '<div style="font-size:11px; text-align:center; padding:2px; color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
+							},
+							background: {
+								opacity: 0.8
+							}
+						}
+					}
+				},
+				legend: {
+					show: false
+				}
+			});
+
+			config.element.prepend('<h2>Type Usage</h2>');
+		}
+
+		/**
+		 * This is used when there is no data
+		 */
+		function noPie() {
+			config.element.html('<h2>Type Usage</h2><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));
