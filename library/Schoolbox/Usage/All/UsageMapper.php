@@ -218,7 +218,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	public function findUserUsage($orderBy, $order, $index, $usersPerPage) {
 		$query = "
 			SELECT
-				`user`.firstname, `user`.lastname,
+				`user`.id AS userId, `user`.firstname, `user`.lastname,
 				CONCAT(`user`.firstname, ' ', `user`.lastname) AS fullname,
 				`groups`.name,
 				COALESCE(SUM(bytes), 0) AS bytes

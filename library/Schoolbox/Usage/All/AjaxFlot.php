@@ -146,6 +146,7 @@ class AjaxFlot {
 
 		foreach ($allData as $currentData) {
 			$page->setVar(array(
+				'USER_USER_ID' => $currentData['userId'],
 				'USER_FIRSTNAME' => $currentData['firstname'],
 				'USER_LASTNAME' => $currentData['lastname'],
 				'USER_GROUP' => $currentData['name'],
