@@ -58,12 +58,10 @@ $this->setTitle('Class Mark Sheet');
 
 $this->setVar(
     array(
-        'CATEGORY'    => $category->getName(),
-        'CATEGORY_ID' => $category->getId(),
+        'CATEGORY'          => $category->getName(),
+        'CATEGORY_ID'       => $category->getId(),
         'header_unit_block' => '',
-//        'subheader_unit_block' => '',
-//        'subheader_unit_task_block' => '',
-        'student_block' => '',
+        'student_block'     => '',
     )
 );
 
@@ -72,8 +70,8 @@ foreach ($unit_list as $unit) {
     // output unit header
     $this->setVar(
         array(
-            'HEADER_UNIT_NAME'  => $unit->getTitle(),
-            'HEADER_UNIT_COUNT' => $unit->getTasks()->count(),
+            'HEADER_UNIT_NAME'          => $unit->getTitle(),
+            'HEADER_UNIT_COUNT'         => $unit->getTasks()->count(),
             'subheader_unit_task_block' => '',
         )
     );
@@ -83,7 +81,7 @@ foreach ($unit_list as $unit) {
         $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
     }
     $this->parse('subheader_unit_block', 'subheader_unit', true);
-    $this->parse('header_unit_block', 'header_unit', true);
+    $this->parse('header_unit_block',    'header_unit',    true);
 }
 
 // The students
