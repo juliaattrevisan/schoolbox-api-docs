@@ -119,6 +119,66 @@
 		}
 
 		/**
+		 * Make table headings
+		 *
+		 * @returns {string}
+		 */
+		function makeTableHeadings() {
+			var thead = '';
+
+			for (var i = 0; i < config.columns.length; i++) {
+				var current = config.columns[i];
+
+				/* Asc/desc indicator arrows
+				 */
+				if (current.column == config.orderBy) {
+					var indicator = config.order;
+				}
+				else {
+					var indicator = '';
+				}
+
+				thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label +"</a>" + indicator + "</th>"
+			}
+
+			return thead;
+		}
+
+		/**
+		 * Make pagination
+		 */
+		function makePagination() {
+			var pagination = '';
+			var numPages = Math.floor(config.numTotal/config.numPerPage);
+
+			/* Previous Navigator
+			 */
+			if (config.index > 0) {
+				pagination += '<li><a rel="' + (config.index-1) +'">Previous</a></li>';
+			}
+
+			/* Page Navigator
+			 */
+			for (var i = 0; i < numPages; i++) {
+				var current = '';
+
+				if (i == config.index) {
+					var current = 'current';
+				}
+
+				pagination += '<li><a class="' + current + '" rel="' + i +'">' + (i+1) + '</a></li>';
+			}
+
+			/* Next Navigator
+			 */
+			if (config.index+1 < numPages) {
+				pagination += '<li><a rel="' + (config.index+1) +'">Next</a></li>';
+			}
+
+			return pagination;
+		}
+
+		/**
 		 * Manufacture a table
 		 *
 		 * @param datasets
@@ -140,48 +200,12 @@
 				<div class="clearfix"></div>\
 			';
 
-			var thead = '';
-
-			for (var i = 0; i < config.columns.length; i++) {
-				var current = config.columns[i];
-
-				thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label +"</a></th>"
-			}
-
-			var pagination = '';
-			var numPages = Math.floor(config.numTotal/config.numPerPage);
-
-			/* Previous Navigator
-			 */
-			if (config.index > 0) {
-				pagination += '<li><a rel="' + (config.index-1) +'">Previous</a></li>';
-			}
-
-			/* Page Navigator
-			 */
-			for(var i = 0; i < numPages; i++) {
-				if (i == config.index) {
-					var current = 'current';
-				}
-				else {
-					var current = '';
-				}
-
-				pagination += '<li><a class="' + current + '" rel="' + i +'">' + (i+1) + '</a></li>';
-			}
-
-			/* Next Navigator
-			 */
-			if (config.index+1 < numPages) {
-				pagination += '<li><a rel="' + (config.index+1) +'">Next</a></li>';
-			}
-
 			/* Table, table heading and paginator
 			 */
 			var html = html.replace('{TITLE}', config.title);
 			var html = html.replace('{CONTENTS}', datasets);
-			var html = html.replace('{THEAD}', thead);
-			var html = html.replace('{PAGINATION}', pagination);
+			var html = html.replace('{THEAD}', makeTableHeadings());
+			var html = html.replace('{PAGINATION}', makePagination());
 
 			config.element.html(html);
 
