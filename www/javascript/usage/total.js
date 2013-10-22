@@ -2,9 +2,11 @@
 
 	/**
 	 * Constructor
+	 *
+	 * @param options
 	 */
-	$.fn.usageTotal = function() {
-		var config = init(this);
+	$.fn.usageTotal = function(options) {
+		var config = init(this, options);
 
 		plot();
 
@@ -12,18 +14,19 @@
 		 * Init
 		 *
 		 * @param element
+		 * @param options
 		 * @returns {*}
 		 */
-		function init(element) {
+		function init(element, options) {
 			var defaults = {
-				url: '/adminv2/usage/ajax?type=total'
+				url: ''
 			}
 
 			var derived = {
 				element: element
 			}
 
-			var merged = $.extend(defaults, derived);
+			var merged = $.extend(defaults, derived, options);
 
 			return merged;
 		}

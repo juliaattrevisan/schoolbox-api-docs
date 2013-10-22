@@ -17,7 +17,7 @@
 		 */
 		function init(element, options) {
 			var defaults = {
-				url: '/adminv2/usage/ajax?type=type'
+				url: ''
 			}
 
 			var derived = {
