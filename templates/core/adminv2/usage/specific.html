@@ -24,8 +24,8 @@
 		$j('#user-usage').usageTabulator({
 			url: '/adminv2/usage/specificAjax?type=files&userId={USAGE_USER_ID}',
 			title: 'Files',
-			orderBy: 'lastname',
-			order: 'ASC',
+			orderBy: 'bytes',
+			order: 'DESC',
 			index: 0,
 			numPerPage: 25,
 			numTotal: {USAGE_NUM_TOTAL},
