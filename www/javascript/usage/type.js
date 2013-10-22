@@ -62,6 +62,7 @@
 		 * @param datasets
 		 */
 		function makePie(datasets) {
+			config.element.css('height', '500px');
 			$j.plot(config.element, datasets, {
 				series: {
 					pie: {
