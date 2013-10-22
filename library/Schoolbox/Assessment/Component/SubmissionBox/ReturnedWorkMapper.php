@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Course\Task;
 
 class ReturnedWorkMapper extends Schoolbox\Mapper {
 
@@ -99,6 +100,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'this_key'  => 'mime_type',
 			'other_key' => 'mime',
 		));
+		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
 	/**
@@ -306,37 +308,62 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 		return $return;
 	}
 
-    /**
-     * Retrieves the number of returns that have been made on each box in a
-     * list.
-     *
-     * @param array $box_ids
-     * @param int   $user_id
-     *
-     * @return array The submission box ID as the key, the count as the value.
-     */
-    public function findCountsForSubmissionBoxes($box_ids, $user_id) {
-        // Retrieve count of submission IDs from a list of IDs for a user
-        if (empty($box_ids)) {
-            return array();
-        }
-        $query = "
-            SELECT sr.box_id, COUNT(*) as submission_count
-            FROM {$this->getTable()} sr
-            WHERE sr.owner = :user_id
-            AND sr.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
-            AND sr.deleted IS FALSE
-            GROUP BY sr.box_id
-        ";
-        $statement = $this->database->prepare($query);
-        $params = $this->getArrayParameters($box_ids, 'sb');
-        $params['user_id'] = $user_id;
-        $statement->execute($params);
+	/**
+	 * Retrieves the number of returns that have been made on each box in a
+	 * list.
+	 *
+	 * @param array $box_ids
+	 * @param int   $user_id
+	 *
+	 * @return array The submission box ID as the key, the count as the value.
+	 */
+	public function findCountsForSubmissionBoxes($box_ids, $user_id) {
+		// Retrieve count of submission IDs from a list of IDs for a user
+		if (empty($box_ids)) {
+			return array();
+		}
+		$query = "
+			SELECT sr.box_id, COUNT(*) as submission_count
+			FROM {$this->getTable()} sr
+			WHERE sr.owner = :user_id
+			AND sr.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
+			AND sr.deleted IS FALSE
+			GROUP BY sr.box_id
+		";
+		$statement = $this->database->prepare($query);
+		$params = $this->getArrayParameters($box_ids, 'sb');
+		$params['user_id'] = $user_id;
+		$statement->execute($params);
 
-        $return = array();
-        foreach ($statement as $row) {
-            $return[$row['box_id']] = $row['submission_count'];
-        }
-        return $return;
-    }
+		$return = array();
+		foreach ($statement as $row) {
+			$return[$row['box_id']] = $row['submission_count'];
+		}
+		return $return;
+	}
+
+	/**
+	 * Post-save callback for returned work models.
+	 *
+	 * Performs the following actions:
+	 * * Copies file from temp location into a location accessible by this model
+	 * * Saves a task completion for this student, if there's a task related to
+	 *   the submission box.
+	 *
+	 * @param ReturnedWork $object
+	 * @param bool         $is_new
+	 */
+	public function postSave(ReturnedWork $object, $is_new = false) {
+		$object->copyFromTempLocation();
+		if ($is_new) {
+			// Attempt to save a task instance entry for this item.
+			$submission_box   = $this->getJoinMapper('submission_box')->findById($object->getSubmissionBox()->getId());
+			$task_instance_id = $submission_box->getTaskInstance()->getId();
+			if (isset($task_instance_id)) {
+				Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+					$task_instance_id, $object->getOwner()->getId()
+				);
+			}
+		}
+	}
 }
