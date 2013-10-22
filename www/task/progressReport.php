@@ -15,6 +15,7 @@ if (!isset($this)) {
 
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
@@ -54,6 +55,10 @@ $this->setBlock('subheader_unit', 'subheader_unit_task', 'subheader_unit_task_bl
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock('student', 'student_unit', 'student_unit_block');
 $this->setBlock('student_unit', 'student_unit_task', 'student_unit_task_block');
+$this->setBlock('student_unit_task', 'student_unit_task_check', 'student_unit_task_check_block');
+$this->setBlock('student_unit_task_check', 'student_unit_task_check_status', 'student_unit_task_check_status_block');
+$this->setBlock('student_unit_task', 'student_unit_task_submission_box', 'student_unit_task_submission_box_block');
+$this->setBlock('student_unit_task', 'student_unit_task_online_assess', 'student_unit_task_online_assess_block');
 $this->setTitle('Class Mark Sheet');
 
 $this->setVar(
@@ -84,11 +89,18 @@ foreach ($unit_list as $unit) {
     $this->parse('header_unit_block',    'header_unit',    true);
 }
 
+$status_list = array(
+    Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE => 'Incomplete',
+    Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => 'Pending',
+    Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE => 'Complete',
+);
+
 // The students
 foreach ($student_list as $student) {
     $this->setVar(
         array(
             'STUDENT_ID'         => $student['uid'],
+            'STUDENT_SYNERGY_ID' => $student['synergy_id'],
             'STUDENT_SURNAME'    => $student['lastname'],
             'STUDENT_FIRSTNAME'  => $student['firstname'],
             'student_unit_block' => '',
@@ -97,14 +109,43 @@ foreach ($student_list as $student) {
     foreach ($unit_list as $unit) {
         $this->setVar('student_unit_task_block', '');
         foreach ($unit->getTasks() as $task) {
-            $status = '-';
+            $student_status = '-';
             foreach ($task->getCompletionList() as $completion) {
                 if ($completion->getStudent()->getId() == $student['uid']) {
-                    $status = $completion->getCompletionStatus();
+                    $student_status = $completion->getCompletionStatus();
+                    break;
                 }
             }
             $completion = $task->getCompletionList();
-            $this->setVar('STUDENT_UNIT_TASK_STATUS', $status);
+            $this->setVar(
+                array(
+                    'STUDENT_UNIT_TASK_ID'                    => $task->getId(),
+                    'STUDENT_UNIT_TASK_STATUS'                => $student_status,
+                    'student_unit_task_check_block'           => '',
+                    'student_unit_task_online_assess_block'   => '',
+                    'student_unit_task_submission_box_block'  => '',
+                    'student_unit_task_check_status_block'    => '',
+                )
+            );
+            if ($task->getSubmissionBox()->getId()) {
+                // Retrieve mark for each student that did this
+            }
+            elseif ($task->getAssessment()->getId()) {
+                //
+            }
+            else {
+                foreach ($status_list as $status => $label) {
+                    $this->setVar(
+                        array(
+                            'STUDENT_UNIT_TASK_STATUS_TEXT'     => $label,
+                            'STUDENT_UNIT_TASK_STATUS_VALUE'    => $status,
+                            'STUDENT_UNIT_TASK_STATUS_SELECTED' => ($status == $student_status ? 'selected' : ''),
+                        )
+                    );
+                    $this->parse('student_unit_task_check_status_block', 'student_unit_task_check_status', true);
+                }
+                $this->parse('student_unit_task_check_block', 'student_unit_task_check', true);
+            }
             $this->parse('student_unit_task_block', 'student_unit_task', true);
         }
         $this->parse('student_unit_block', 'student_unit', true);

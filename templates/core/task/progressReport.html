@@ -1,6 +1,5 @@
-<h1>{CATEGORY}</h1>
+<h1>Unit Progress Report - {CATEGORY}</h1>
 <div class="header_option">
-
     <div class="mark-sheet wrap">
         <table>
             <thead>
@@ -22,6 +21,7 @@
                 <!-- BEGIN student -->
                 <tr>
                     <td>
+                        <img height="32" width="32" src="/portrait.php?userId={STUDENT_SYNERGY_ID}&amp;size=square32">
                         <a href="/search/user/{STUDENT_ID}" title="{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}">
                             {STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
                         </a>
@@ -29,7 +29,29 @@
                     <!-- BEGIN student_unit -->
                     <!-- BEGIN student_unit_task -->
                     <td>
-                        {STUDENT_UNIT_TASK_STATUS}
+                        <!--
+                        If an online assessment:
+                            Show mark, and allow review
+                        If due work:
+                            Show mark
+                        Otherwise:
+                            Show pending/complete/incomplete, and form for modifying
+                        -->
+                        <!-- BEGIN student_unit_task_check -->
+                            <form action="/task/progressReportForm.php" method="POST">
+                                <input type="hidden" name="student_id" value="{STUDENT_ID}" />
+                                <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
+                                <select name="status">
+                                    <!-- BEGIN student_unit_task_check_status -->
+                                    <option label="{STUDENT_UNIT_TASK_STATUS_TEXT}" value="{STUDENT_UNIT_TASK_STATUS_VALUE}" {STUDENT_UNIT_TASK_STATUS_SELECTED}>{STUDENT_UNIT_TASK_STATUS_TEXT}</option>
+                                    <!-- END student_unit_task_check_status -->
+                                </select>
+                            </form>
+                        <!-- END student_unit_task_check -->
+                        <!-- BEGIN student_unit_task_submission_box -->
+                        <!-- END student_unit_task_submission_box -->
+                        <!-- BEGIN student_unit_task_online_assess -->
+                        <!-- END student_unit_task_online_assess -->
                     </td>
                     <!-- END student_unit_task -->
                     <!-- END student_unit -->
