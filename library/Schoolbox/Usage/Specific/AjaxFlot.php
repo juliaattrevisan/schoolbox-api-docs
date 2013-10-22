@@ -123,6 +123,7 @@ class AjaxFlot {
 			$page->setVar(array(
 				'FILE_FILENAME' => $currentData['name'],
 				'FILE_BYTES' => $bytes->bytesToString($currentData['bytes']),
+				'FILE_GROUPNAME' => $currentData['groupName'],
 				'FILE_MIMETYPE' => $currentData['mime_type'],
 			));
 
