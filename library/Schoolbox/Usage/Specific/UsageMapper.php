@@ -34,7 +34,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	}
 
 	/**
-	 * The total number of users
+	 * The total number of files
 	 *
 	 * @return mixed
 	 */
@@ -180,10 +180,31 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 		$statement->execute();
 
 		$result = array();
+		$mediaBytes = 0;
 
 		while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+			$mediaBytes += $row['bytes'];
 			$result[] = $row;
 		}
+
+		/* Find all the documents this User has everywhere, and subtract
+		 * the megaquery's result to find out non-media counts
+		 */
+		$allData = $this->findTypeUsage();
+		$totalBytes = 0;
+
+		foreach($allData as $currentData) {
+			$totalBytes += $currentData['bytes'];
+		}
+
+		/* Append extra doc row
+		 */
+		$docBytes = array(
+			'name' => 'Documents',
+			'bytes' => $totalBytes - $mediaBytes
+		);
+
+		array_unshift($result, $docBytes);
 
 		return $result;
 	}
