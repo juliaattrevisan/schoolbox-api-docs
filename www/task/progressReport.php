@@ -190,7 +190,7 @@ foreach ($student_list as $student) {
             if (!empty($box_id)) {
                 // What's this student's mark for this submission?
                 // For now use the DueWork_Detail class
-                if (isset($student_submission_list[$box_id][$student['uid']])) {
+                if (isset($student_submission_list[$box_id][$student['uid']]['return']['mark'])) {
                     $attempt = $student_submission_list[$box_id][$student['uid']];
                     $this->setVar(
                         array(
