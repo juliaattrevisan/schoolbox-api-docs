@@ -89,13 +89,10 @@ $j(function() {
                             });
 
                             $j.post('/submission/returnWorkForm.php', submitForm.find('input, select').serialize(), function(data) {
-                                notification.css({
-                                    'border-color': '#080'
-                                });
+                                // Why don't I have a class for this?
+                                notification.addClass('ajax-updated');
                                 setTimeout(function() {
-                                    notification.css({
-                                        'border-color': '#ccc'
-                                    });
+                                    notification.removeClass('ajax-updated');
                                 }, 1000)
                             });
                             return false;
