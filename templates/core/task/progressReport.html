@@ -3,7 +3,21 @@
     (function($) {
         $(function(){
             $('select[data-interaction="auto_submit"]').bind('change', function(event) {
-                var form = $(this).closest('form').submit();
+                var element = $(this);
+                var form    = element.closest('form');
+                $.post(
+                    form.attr('action'),
+                    form.serialize(),
+                    function() {
+                        // Update something.
+                        // I guess add the same class the update submission has.
+                        element.addClass('ajax-updated');
+                        setTimeout(function() {
+                            element.removeClass('ajax-updated');
+                        }, 1000)
+                    },
+                    'json'
+                )
             })
         });
     })(jQuery);
