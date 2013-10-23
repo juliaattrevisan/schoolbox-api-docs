@@ -15,6 +15,7 @@ if (!isset($this)) {
 
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
@@ -74,6 +75,8 @@ $this->setVar(
     )
 );
 
+$submission_work_type_list = array();
+
 // The header
 foreach ($unit_list as $unit) {
     // output unit header
@@ -84,10 +87,19 @@ foreach ($unit_list as $unit) {
             'subheader_unit_task_block' => '',
         )
     );
-    foreach ($unit->getTasks() as $task) {
+    $task_list = $unit->getTasks();
+
+    foreach ($task_list as $task) {
         // output task header beneath unit header
         $this->setVar('SUBHEADER_UNIT_TASK_NAME', $task->getTitle());
         $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
+        $box_id = $task->getSubmissionBox()->getId();
+        if ($box_id) {
+            SubmissionBoxMapper::getInstance()->loadJoinedModel('mark_type', $task->getSubmissionBox());
+            $detail = new DueWork_Detail($box_id);
+            $detail ->processStudents($student_list);
+            $submission_work_type_list[$box_id] = $detail->getSitepageData();
+        }
     }
     $this->parse('subheader_unit_block', 'subheader_unit', true);
     $this->parse('header_unit_block',    'header_unit',    true);
@@ -131,11 +143,15 @@ foreach ($student_list as $student) {
                     'student_unit_task_check_status_block'    => '',
                 )
             );
-            if ($task->getSubmissionBox()->getId()) {
-                // Retrieve mark for each student that did this
+            $box_id = $task->getSubmissionBox()->getId();
+            if (!empty($box_id)) {
+                // What's this student's mark for this submission?
+                // For now use the DueWork_Detail class
+                $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', $submission_work_type_list[$box_id][$student['uid']]['return']['mark']);
+                $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box', true);
             }
             elseif ($task->getAssessment()->getId()) {
-                //
+                // What is the mark for this student?
             }
             else {
                 foreach ($status_list as $status => $label) {
