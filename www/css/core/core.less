@@ -1830,6 +1830,12 @@ label {
     }
 }
 
+// Why not have border transitions on all form elements?
+input, select, textarea {
+    -webkit-transition: border-color 0.2s linear;
+    transition: border-color 0.2s linear;
+}
+
 .formLabelWidth {
     width: 250px;
 }
@@ -6751,7 +6757,6 @@ table.subjectList {
                 }
                 input, select {
                     border: solid 1px @std-grey;
-                    -webkit-transition: border-color 0.2s linear;
                 }
             }
             &.submission.file {
