@@ -8,8 +8,11 @@
  */
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
+$page = new SitePage();
 
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
@@ -24,8 +27,6 @@ try {
     $task = Task\InstanceMapper::getInstance()->findById($_POST['task_id']);
     Task\InstanceMapper::getInstance()->loadJoinedModel('course_unit_instance', $task);
     UnitInstanceMapper::getInstance()->loadJoinedModel('component', $task->getUnitInstance());
-
-//    CategoryMapper::getInstance()->loadJoinedModel('codes', $category);
 }
 catch (Schoolbox\Mapper\Exception $e) {
     error(6);
@@ -37,4 +38,14 @@ if ($group->getPermission($task->getUnitInstance()->getComponent()->getIdentifie
     error(6);
 }
 
-// Update the thing
+$student = UserMapper::getInstance()->findById($_POST['student_id']);
+
+// Update the user's completion
+$completion = new Task\InstanceCompletion();
+$completion
+    ->setTaskInstance($task)
+    ->setStudent($student)
+    ->setCompletionDate(new Alaress_Date_Format(new DateTime('now')))
+    ->setCompletionStatus($_POST['status'])
+;
+Task\InstanceCompletionMapper::getInstance()->save($completion);
