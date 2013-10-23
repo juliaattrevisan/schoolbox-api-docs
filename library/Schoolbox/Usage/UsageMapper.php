@@ -98,4 +98,26 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 		return $result;
 	}
+
+	/**
+	 * Insert filesizes of all submissions
+	 */
+	public function updateSubmissions() {
+		$dirhandle = opendir(\Cfg::get('submission_dir'));
+		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+
+		while ($filepointer = readdir($dirhandle)) {
+			if (($filepointer != '.') && ($filepointer != '..')) {
+				$size = filesize(\Cfg::get('submission_dir') . '/' . $filepointer);
+
+				try {
+					$file = $mapper->findById(str_replace('.dat', '', $filepointer));
+					$file->setFilesize($size);
+					$mapper->save($file);
+				}
+				catch(\Exception $e) {
+				}
+			}
+		}
+	}
 }

@@ -192,6 +192,7 @@ $summary = array();
 /* Have to replace all the other $user's with this one -_-
  */
 $event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default($_SESSION['user'], null);
+$event_api->setUser($_SESSION['user']);
 $event_list = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();
 foreach ($event_list as $event_object) {

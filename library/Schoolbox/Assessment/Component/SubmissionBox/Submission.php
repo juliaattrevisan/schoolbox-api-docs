@@ -73,6 +73,13 @@ class Submission {
 	protected $draft = false;
 
 	/**
+	 * Size of the file that was submitted
+	 *
+	 * @var null
+	 */
+	protected $filesize = null;
+
+	/**
 	 * @var IConfigLoader
 	 */
 	protected $config_loader;
@@ -111,7 +118,7 @@ class Submission {
 	 *
 	 * @return bool|int
 	 */
-	public function getFilesize() {
+	public function getFilesizeFromPath() {
 		if (($location = $this->getFileLocation()) !== false) {
 			if (file_exists($location)) {
 				return filesize($location);
@@ -150,6 +157,24 @@ class Submission {
 	 * Auto-generated methods
 	 */
 
+	/**
+	 * Set file size
+	 *
+	 * @param $filesize
+	 * @return $this
+	 */
+	public function setFilesize($filesize) {
+		$this->filesize = $filesize;
+		return $this;
+	}
+
+	/**
+	 * Get file size
+	 * @return null
+	 */
+	public function getFilesize() {
+		return $this->filesize;
+	}
 
 	/**
 	 * @param  string $filename
@@ -403,5 +428,7 @@ class Submission {
 		}
 		return $this;
 	}
+
+
 }
 

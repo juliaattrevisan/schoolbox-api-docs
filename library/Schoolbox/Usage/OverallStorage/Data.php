@@ -58,7 +58,7 @@ class Data {
 	 *
 	 * @return null
 	 */
-	private function getMapper() {
+	public function getMapper() {
 		return $this->mapper;
 	}
 }
