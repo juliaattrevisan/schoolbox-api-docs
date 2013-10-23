@@ -152,6 +152,13 @@ foreach ($student_list as $student) {
             }
             elseif ($task->getAssessment()->getId()) {
                 // What is the mark for this student?
+                $this->setVar(
+                    array(
+                        'STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS'           => 0,
+                        'STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS' => 10,
+                    )
+                );
+                $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess', true);
             }
             else {
                 foreach ($status_list as $status => $label) {
