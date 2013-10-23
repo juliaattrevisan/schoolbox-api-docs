@@ -75,7 +75,9 @@ $this->setVar(
     )
 );
 
-$submission_work_type_list = array();
+// Store assessment and submission marks here
+$student_assess_list     = array();
+$student_submission_list = array();
 
 // The header
 foreach ($unit_list as $unit) {
@@ -93,12 +95,26 @@ foreach ($unit_list as $unit) {
         // output task header beneath unit header
         $this->setVar('SUBHEADER_UNIT_TASK_NAME', $task->getTitle());
         $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
-        $box_id = $task->getSubmissionBox()->getId();
-        if ($box_id) {
-            SubmissionBoxMapper::getInstance()->loadJoinedModel('mark_type', $task->getSubmissionBox());
+        $box_id    = $task->getSubmissionBox()->getId();
+        $assess_id = $task->getAssessment()->getId();
+        if (!empty($box_id)) {
             $detail = new DueWork_Detail($box_id);
-            $detail ->processStudents($student_list);
-            $submission_work_type_list[$box_id] = $detail->getSitepageData();
+            $detail->processStudents($student_list);
+            $student_submission_list[$box_id] = $detail->getSitepageData();
+        }
+        elseif (!empty($assess_id)) {
+            $handler = new Assess_Attempt();
+            // attempt_list is a list of all valid attempts, ordered chronologically.
+            // Filter to most recent submission only.
+            $attempt_list = $handler->getList($assess_id);
+            foreach ($attempt_list as $attempt) {
+                $student_assess_list[$assess_id][$attempt['user_id']] = $attempt;
+            }
+            // Load max mark, because getList doesn't get it.
+            foreach ($student_assess_list[$assess_id] as &$attempt) {
+                $attempt['maxMark'] = $handler->getTotalMarks($assess_id, $attempt['attempt_id']);
+            }
+            unset($attempt);
         }
     }
     $this->parse('subheader_unit_block', 'subheader_unit', true);
@@ -143,22 +159,29 @@ foreach ($student_list as $student) {
                     'student_unit_task_check_status_block'    => '',
                 )
             );
-            $box_id = $task->getSubmissionBox()->getId();
+            $box_id    = $task->getSubmissionBox()->getId();
+            $assess_id = $task->getAssessment()->getId();
             if (!empty($box_id)) {
                 // What's this student's mark for this submission?
                 // For now use the DueWork_Detail class
-                $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', $submission_work_type_list[$box_id][$student['uid']]['return']['mark']);
-                $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box', true);
+                if (isset($student_submission_list[$box_id][$student['uid']])) {
+                    $attempt = $student_submission_list[$box_id][$student['uid']];
+                    $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK',      $attempt['return']['mark']);
+                    $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box');
+                }
             }
-            elseif ($task->getAssessment()->getId()) {
+            elseif (!empty($assess_id)) {
                 // What is the mark for this student?
-                $this->setVar(
-                    array(
-                        'STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS'           => 0,
-                        'STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS' => 10,
-                    )
-                );
-                $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess', true);
+                if (isset($student_assess_list[$assess_id][$student['uid']])) {
+                    $attempt = $student_assess_list[$assess_id][$student['uid']];
+                    $this->setVar(
+                        array(
+                            'STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS'           => $attempt['totalMarks'],
+                            'STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS' => $attempt['maxMark'],
+                        )
+                    );
+                    $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess');
+                }
             }
             else {
                 foreach ($status_list as $status => $label) {
