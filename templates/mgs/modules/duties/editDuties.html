@@ -1,6 +1,6 @@
 <div><h1>Duties Listing For {DATE} </h1>
 <form class="standardForm" action="editDuties.php{GET}" method="POST">
-	<table>
+	<table class="table">
                     <tr>
                     	<td><div style="text-align:left"><a href="{WEEKBACK}" title="Back one Week">&lt;&lt;</a></div></td>
                     	<td><div style="text-align:left"><a href="{DAYBACK}" title="Back one Day">&lt;</a></div></td>
@@ -10,7 +10,7 @@
                	   </tr>
                 </table>
 
-                  <table>
+                  <table class="table">
                     <tr> 
                       <td><h2>Duty</h2></td>
                       <td><h2>Assigned User</h2></td>
@@ -41,7 +41,7 @@
                  <input name="cid" type="hidden" id="cid" value="{CID}">
                  <input name="maxi" type="hidden" id="cid" value="{MAXI}">
                	 <input name="qdate" type="hidden" id="cid" value="{QDATE}">
-				 <table>
+				 <table class="table">
                     <tr>
                     	<td>Upload CSV</td>
                         <td><input type='file' name='file' />
