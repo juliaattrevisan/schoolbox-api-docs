@@ -38,10 +38,37 @@ if ($group->getPermission($class_id) < WRITE_ACCESS) {
     error(6);
 }
 
-// Get list of students for this class
+// Check unit permissions
 /** @var UnitInstance[]|\Schoolbox\Collection $unit_list */
 $unit_list = UnitInstanceMapper::getInstance()->findForCategoryId($category->getId());
-$code      = implode(',', $category->getCodes()->getColumnValues('code'));
+if (count($unit_list) === 0) {
+    error(6);
+}
+if (!isset($unit_id)) {
+    // Redirect to view for first view.
+    $unit_id = $unit_list->first()->getId();
+    $this->localRedir('/task/progressReport/'.$class_id.'/'.$unit_id);
+    exit;
+}
+else {
+    // Check that the requested unit exists within this class.
+    $unit_exists = false;
+    $filtered_list = new \Schoolbox\Collection();
+    foreach ($unit_list as $unit) {
+        if ($unit->getId() == $unit_id) {
+            $unit_exists = true;
+            $filtered_list->add($unit);
+            $unit_list = $filtered_list;
+            break;
+        }
+    }
+    if (!$unit_exists) {
+        error(6);
+    }
+}
+
+// Get list of students for this class
+$code         = implode(',', $category->getCodes()->getColumnValues('code'));
 $student_list = array();
 if ($code && Config::get('external_enable')) {
     $class_handler = new External_Class();
@@ -54,7 +81,6 @@ else {
 
 // Dumb <!-- blocks --> and {VARIABLES}
 $this->setFile(TEMPLATE_content, 'task/progressReport.html');
-$this->setBlock(TEMPLATE_content, 'header_unit', 'header_unit_block');
 
 $this->setBlock(TEMPLATE_content, 'subheader_unit', 'subheader_unit_block');
 $this->setBlock('subheader_unit', 'subheader_unit_task', 'subheader_unit_task_block');
@@ -74,10 +100,9 @@ $this->setTitle('Class Mark Sheet');
 
 $this->setVar(
     array(
-        'CATEGORY'          => $category->getName(),
-        'CATEGORY_ID'       => $category->getId(),
-        'header_unit_block' => '',
-        'student_block'     => '',
+        'CATEGORY'      => $category->getName(),
+        'CATEGORY_ID'   => $category->getId(),
+        'student_block' => '',
     )
 );
 
@@ -143,7 +168,6 @@ foreach ($unit_list as $unit) {
         $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
     }
     $this->parse('subheader_unit_block', 'subheader_unit', true);
-    $this->parse('header_unit_block',    'header_unit',    true);
 }
 
 $status_list = array(
