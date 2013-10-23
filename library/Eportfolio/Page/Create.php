@@ -26,6 +26,7 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	 */
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+		$this->getPage()->setTab('ePortfolio');
 		$this->getPage()->setBlock(TEMPLATE_content, 'page_template_list', 'page_template_list_block');
 
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_group_permissions', 'has_group_permissions_block');
