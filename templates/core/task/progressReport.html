@@ -1,3 +1,15 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    (function($) {
+        $(function(){
+            $('select[data-interaction="auto_submit"]').bind('change', function(event) {
+                var form = $(this).closest('form').submit();
+            })
+        });
+    })(jQuery);
+</script>
+<!-- END custom_head -->
+
 <h1>Unit Progress Report - {CATEGORY}</h1>
 <div class="header_option">
     <div class="mark-sheet wrap">
@@ -40,10 +52,10 @@
                     <!-- BEGIN student_unit_task -->
                     <td>
                         <!-- BEGIN student_unit_task_check -->
-                            <form action="/task/progressReportForm.php" method="POST">
+                            <form action="/task/progressForm.php" method="POST">
                                 <input type="hidden" name="student_id" value="{STUDENT_ID}" />
                                 <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
-                                <select name="status">
+                                <select name="status" data-interaction="auto_submit">
                                     <!-- BEGIN student_unit_task_check_status -->
                                     <option label="{STUDENT_UNIT_TASK_STATUS_TEXT}" value="{STUDENT_UNIT_TASK_STATUS_VALUE}" {STUDENT_UNIT_TASK_STATUS_SELECTED}>{STUDENT_UNIT_TASK_STATUS_TEXT}</option>
                                     <!-- END student_unit_task_check_status -->
