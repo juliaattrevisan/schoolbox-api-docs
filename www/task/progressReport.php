@@ -55,8 +55,13 @@ else {
 // Dumb <!-- blocks --> and {VARIABLES}
 $this->setFile(TEMPLATE_content, 'task/progressReport.html');
 $this->setBlock(TEMPLATE_content, 'header_unit', 'header_unit_block');
+
 $this->setBlock(TEMPLATE_content, 'subheader_unit', 'subheader_unit_block');
 $this->setBlock('subheader_unit', 'subheader_unit_task', 'subheader_unit_task_block');
+$this->setBlock('subheader_unit_task', 'subheader_unit_task_submission_link', 'subheader_unit_task_submission_link_block');
+$this->setBlock('subheader_unit_task', 'subheader_unit_task_assess_link', 'subheader_unit_task_assess_link_block');
+$this->setBlock('subheader_unit_task', 'subheader_unit_task_no_link', 'subheader_unit_task_no_link_block');
+
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock('student', 'student_unit', 'student_unit_block');
 $this->setBlock('student_unit', 'student_unit_task', 'student_unit_task_block');
@@ -64,6 +69,7 @@ $this->setBlock('student_unit_task', 'student_unit_task_check', 'student_unit_ta
 $this->setBlock('student_unit_task_check', 'student_unit_task_check_status', 'student_unit_task_check_status_block');
 $this->setBlock('student_unit_task', 'student_unit_task_submission_box', 'student_unit_task_submission_box_block');
 $this->setBlock('student_unit_task', 'student_unit_task_online_assess', 'student_unit_task_online_assess_block');
+
 $this->setTitle('Class Mark Sheet');
 
 $this->setVar(
@@ -93,14 +99,23 @@ foreach ($unit_list as $unit) {
 
     foreach ($task_list as $task) {
         // output task header beneath unit header
-        $this->setVar('SUBHEADER_UNIT_TASK_NAME', $task->getTitle());
-        $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
         $box_id    = $task->getSubmissionBox()->getId();
         $assess_id = $task->getAssessment()->getId();
+        $this->setVar(
+            array(
+                'SUBHEADER_UNIT_TASK_NAME'                  => $task->getTitle(),
+                'SUBHEADER_UNIT_TASK_SUBMISSION_ID'         => $box_id,
+                'SUBHEADER_UNIT_TASK_ASSESS_ID'             => $assess_id,
+                'subheader_unit_task_submission_link_block' => '',
+                'subheader_unit_task_assess_link_block'     => '',
+                'subheader_unit_task_no_link_block'         => '',
+            )
+        );
         if (!empty($box_id)) {
             $detail = new DueWork_Detail($box_id);
             $detail->processStudents($student_list);
             $student_submission_list[$box_id] = $detail->getSitepageData();
+            $this->parse('subheader_unit_task_submission_link_block', 'subheader_unit_task_submission_link');
         }
         elseif (!empty($assess_id)) {
             $handler = new Assess_Attempt();
@@ -115,7 +130,12 @@ foreach ($unit_list as $unit) {
                 $attempt['maxMark'] = $handler->getTotalMarks($assess_id, $attempt['attempt_id']);
             }
             unset($attempt);
+            $this->parse('subheader_unit_task_assess_link_block', 'subheader_unit_task_assess_link');
         }
+        else {
+            $this->parse('subheader_unit_task_no_link_block', 'subheader_unit_task_no_link');
+        }
+        $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
     }
     $this->parse('subheader_unit_block', 'subheader_unit', true);
     $this->parse('header_unit_block',    'header_unit',    true);

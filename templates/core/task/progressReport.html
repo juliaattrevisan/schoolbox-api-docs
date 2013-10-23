@@ -12,7 +12,17 @@
                 <tr>
                     <!-- BEGIN subheader_unit -->
                     <!-- BEGIN subheader_unit_task -->
-                    <th>{SUBHEADER_UNIT_TASK_NAME}</th>
+                    <th>
+                        <!-- BEGIN subheader_unit_task_submission_link -->
+                        <a href="/submission/viewSubmission/{SUBHEADER_UNIT_TASK_SUBMISSION_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
+                        <!-- END subheader_unit_task_submission_link -->
+                        <!-- BEGIN subheader_unit_task_assess_link -->
+                        <a href="/assess/results/{SUBHEADER_UNIT_TASK_ASSESS_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
+                        <!-- END subheader_unit_task_assess_link -->
+                        <!-- BEGIN subheader_unit_task_no_link -->
+                        {SUBHEADER_UNIT_TASK_NAME}
+                        <!-- END subheader_unit_task_no_link -->
+                    </th>
                     <!-- END subheader_unit_task -->
                     <!-- END subheader_unit -->
                 </tr>
@@ -29,14 +39,6 @@
                     <!-- BEGIN student_unit -->
                     <!-- BEGIN student_unit_task -->
                     <td>
-                        <!--
-                        If an online assessment:
-                            Show mark, and allow review
-                        If due work:
-                            Show mark
-                        Otherwise:
-                            Show pending/complete/incomplete, and form for modifying
-                        -->
                         <!-- BEGIN student_unit_task_check -->
                             <form action="/task/progressReportForm.php" method="POST">
                                 <input type="hidden" name="student_id" value="{STUDENT_ID}" />
