@@ -124,15 +124,17 @@ foreach ($unit_list as $unit) {
             // attempt_list is a list of all valid attempts, ordered chronologically.
             // Filter to most recent submission only.
             $attempt_list = $handler->getList($assess_id);
-            foreach ($attempt_list as $attempt) {
-                $student_assess_list[$assess_id][$attempt['user_id']] = $attempt;
+            if (!empty($attempt_list)) {
+                foreach ($attempt_list as $attempt) {
+                    $student_assess_list[$assess_id][$attempt['user_id']] = $attempt;
+                }
+                // Load max mark, because getList doesn't get it.
+                foreach ($student_assess_list[$assess_id] as &$attempt) {
+                    $attempt['maxMark']      = $handler->getTotalMarks($assess_id, $attempt['attempt_id']);
+                    $attempt['firstSection'] = $section_handler->getFirst($assess_id);
+                }
+                unset($attempt);
             }
-            // Load max mark, because getList doesn't get it.
-            foreach ($student_assess_list[$assess_id] as &$attempt) {
-                $attempt['maxMark']      = $handler->getTotalMarks($assess_id, $attempt['attempt_id']);
-                $attempt['firstSection'] = $section_handler->getFirst($assess_id);
-            }
-            unset($attempt);
             $this->parse('subheader_unit_task_assess_link_block', 'subheader_unit_task_assess_link');
         }
         else {
