@@ -84,6 +84,9 @@ $this->setVar(
 // Store assessment and submission marks here
 $student_assess_list     = array();
 $student_submission_list = array();
+// Stupid handlers
+$handler         = new Assess_Attempt();
+$section_handler = new Assess_Section();
 
 // The header
 foreach ($unit_list as $unit) {
@@ -118,7 +121,6 @@ foreach ($unit_list as $unit) {
             $this->parse('subheader_unit_task_submission_link_block', 'subheader_unit_task_submission_link');
         }
         elseif (!empty($assess_id)) {
-            $handler = new Assess_Attempt();
             // attempt_list is a list of all valid attempts, ordered chronologically.
             // Filter to most recent submission only.
             $attempt_list = $handler->getList($assess_id);
@@ -127,7 +129,8 @@ foreach ($unit_list as $unit) {
             }
             // Load max mark, because getList doesn't get it.
             foreach ($student_assess_list[$assess_id] as &$attempt) {
-                $attempt['maxMark'] = $handler->getTotalMarks($assess_id, $attempt['attempt_id']);
+                $attempt['maxMark']      = $handler->getTotalMarks($assess_id, $attempt['attempt_id']);
+                $attempt['firstSection'] = $section_handler->getFirst($assess_id);
             }
             unset($attempt);
             $this->parse('subheader_unit_task_assess_link_block', 'subheader_unit_task_assess_link');
@@ -161,6 +164,9 @@ foreach ($student_list as $student) {
     foreach ($unit_list as $unit) {
         $this->setVar('student_unit_task_block', '');
         foreach ($unit->getTasks() as $task) {
+
+
+            // Get the completion status for this student.
             $student_status = '-';
             foreach ($task->getCompletionList() as $completion) {
                 if ($completion->getStudent()->getId() == $student['uid']) {
@@ -168,7 +174,7 @@ foreach ($student_list as $student) {
                     break;
                 }
             }
-            $completion = $task->getCompletionList();
+
             $this->setVar(
                 array(
                     'STUDENT_UNIT_TASK_ID'                    => $task->getId(),
@@ -186,7 +192,12 @@ foreach ($student_list as $student) {
                 // For now use the DueWork_Detail class
                 if (isset($student_submission_list[$box_id][$student['uid']])) {
                     $attempt = $student_submission_list[$box_id][$student['uid']];
-                    $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK',      $attempt['return']['mark']);
+                    $this->setVar(
+                        array(
+                            'STUDENT_UNIT_TASK_SUBMISSION_ID'   => $box_id,
+                            'STUDENT_UNIT_TASK_SUBMISSION_MARK' => $attempt['return']['mark'],
+                        )
+                    );
                     $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box');
                 }
             }
@@ -196,6 +207,9 @@ foreach ($student_list as $student) {
                     $attempt = $student_assess_list[$assess_id][$student['uid']];
                     $this->setVar(
                         array(
+                            'STUDENT_UNIT_TASK_ASSESS_ID'                    => $assess_id,
+                            'STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID'      => $attempt['firstSection']['section_id'],
+                            'STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID'            => $attempt['attempt_id'],
                             'STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS'           => $attempt['totalMarks'],
                             'STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS' => $attempt['maxMark'],
                         )
