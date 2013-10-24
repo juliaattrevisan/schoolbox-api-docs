@@ -56,6 +56,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
+			'column'     => 'filesize',
+			'property'   => 'filesize',
+			'type'       => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
 			'column'     => 'submitted',
 			'property'   => 'submitted',
 			'type'       => self::TYPE_DATETIME,
@@ -77,6 +82,22 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'mapper'    => '\\Schoolbox\\UserMapper',
 			'this_key'  => 'owner',
 			'other_key' => 'id',
+		));
+		/* Relation to Allowed Files
+		 */
+		$hydrator = new Schoolbox\Column\Model();
+		$hydrator->setIdentifierProperty('mime');
+		$this->hasMap(array(
+			'column'     => 'mime_type',
+			'property'   => 'mimetype',
+			'hydrator'   => $hydrator,
+			'join'       => 'allowedFileType',
+		));
+
+		$this->hasJoin('allowedFileType', array(
+			'mapper'    => '\\Schoolbox\\File\\MimetypeMapper',
+			'this_key'  => 'mime_type',
+			'other_key' => 'mime',
 		));
 	}
 

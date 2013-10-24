@@ -28,6 +28,7 @@ if ( isset( $_FILES['file']['name'] ) && $_FILES['file']['name'] && is_numeric($
         ->setSubmitted(new Alaress_Date_Format(new DateTime('now'), 'U'))
         ->setFilename($_FILES['file']['name'])
         ->setTempLocation($_FILES['file']['tmp_name'])
+		->setFilesize($_FILES['file']['size'])
         ->loadMimetypeFromFilename()
         ->loadIsLate()
     ;

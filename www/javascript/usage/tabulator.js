@@ -1,0 +1,239 @@
+(function($) {
+
+	/**
+	 * Constructor
+	 */
+	$.fn.usageTabulator= function(options) {
+		var config = init(this, options);
+
+		plot();
+
+		/**
+		 * Init
+		 *
+		 * @param element
+		 * @param options
+		 * @returns {*}
+		 */
+		function init(element, options) {
+			var defaults = {
+				url: '',
+				title: '',
+				numPerPage: 15,
+				columns: [
+					{column: 'firstname', label: 'Firstname'},
+					{column: 'lastname', label: 'Lastname'},
+					{column: 'name', label: 'Group'},
+					{column: 'bytes', label: 'Usage'}
+				],
+				ascendingHtml: '<img src="/images/famicons/arrow_up.png">',
+				descendingHtml: '<img src="/images/famicons/arrow_down.png">'
+			}
+
+			var derived = {
+				element: element
+			}
+
+			var merged = $.extend(defaults, derived, options);
+
+			/* Dynamically append params
+			 */
+			merged.url = merged.url + '&orderBy=' + options.orderBy + '&order=' + options.order + '&index=' + options.index + '&numPerPage=' + options.numPerPage;
+			merged.index = parseInt(merged.index);
+
+			return merged;
+		}
+
+		/**
+		 * Apply sortorder controls
+		 */
+		function applySortorder() {
+			$j.each(config.element.find('a.control'), function(index, element) {
+				$j(element).click(function() {
+
+					/* Toggle ordering upon click
+					 */
+					if (config.order == 'ASC') {
+						var order = 'DESC';
+					}
+					else {
+						var order = 'ASC';
+					}
+
+					config.element.usageTabulator({
+						url: config.url,
+						columns: config.columns,
+						orderBy: $j(this).attr('rel'),
+						order: order,
+						index: 0,
+						numPerPage: config.numPerPage,
+						numTotal: config.numTotal
+					});
+				});
+			});
+		}
+
+		/**
+		 * Paginate things
+		 */
+		function applyPaginator() {
+			$j.each(config.element.find('li a'), function(index, element) {
+				$j(element).click(function() {
+					event.preventDefault();
+
+					config.element.usageTabulator({
+						url: config.url,
+						columns: config.columns,
+						orderBy: config.orderBy,
+						order: config.order,
+						index: parseInt($j(this).attr('rel')),
+						numPerPage: config.numPerPage,
+						numTotal: config.numTotal
+					});
+				});
+			});
+		}
+
+		/**
+		 * Plot graph
+		 */
+		function plot() {
+			$j.ajax({
+				url: config.url,
+				method: 'GET',
+				dataType: 'text',
+				success: function(datasets) {
+
+					/* Remove loader
+					 */
+					config.element.removeClass('loader');
+
+					/* Manufacture a table only if there is data
+					 */
+					if (datasets.length) {
+						makeTable(datasets);
+					}
+					else {
+						noTable();
+					}
+				}
+			});
+		}
+
+		/**
+		 * Make indicator arrows for table headings
+		 *
+		 * @param currentColumn
+		 * @returns {string}
+		 */
+		function makeIndicatorArrows(currentColumn) {
+			var indicator = '';
+
+			/* Asc/desc indicator arrows
+			 */
+			if (currentColumn == config.orderBy) {
+				var indicator = config.ascendingHtml;
+
+				if (config.order == 'DESC') {
+					indicator = config.descendingHtml;
+				}
+			}
+
+			return indicator;
+		}
+
+		/**
+		 * Make table headings
+		 *
+		 * @returns {string}
+		 */
+		function makeTableHeadings() {
+			var thead = '';
+
+			for (var i = 0; i < config.columns.length; i++) {
+				var current = config.columns[i];
+				var indicator = makeIndicatorArrows(current.column);
+
+				thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
+			}
+
+			return thead;
+		}
+
+		/**
+		 * Make pagination
+		 */
+		function makePagination() {
+			var pagination = '';
+			var numPages = Math.floor(config.numTotal/config.numPerPage);
+
+			/* Previous Navigator
+			 */
+			if (config.index > 0) {
+				pagination += '<li><a rel="' + (config.index-1) +'">Previous</a></li>';
+			}
+
+			/* Page Navigator
+			 */
+			for (var i = 0; i < numPages; i++) {
+				var current = '';
+
+				if (i == config.index) {
+					var current = 'current';
+				}
+
+				pagination += '<li><a class="' + current + '" rel="' + i +'">' + (i+1) + '</a></li>';
+			}
+
+			/* Next Navigator
+			 */
+			if (config.index+1 < numPages) {
+				pagination += '<li><a rel="' + (config.index+1) +'">Next</a></li>';
+			}
+
+			return pagination;
+		}
+
+		/**
+		 * Manufacture a table
+		 *
+		 * @param datasets
+		 */
+		function makeTable(datasets) {
+			var html = '\
+				<h2>{TITLE}</h2>\
+				<table>\
+					<thead>\
+						{THEAD}\
+					</thead>\
+					<tbody>\
+					{CONTENTS}\
+					</tbody>\
+				</table>\
+				<ul class="paginator admin-nav">\
+					{PAGINATION}\
+				</ul>\
+				<div class="clearfix"></div>\
+			';
+
+			/* Table, table heading and paginator
+			 */
+			var html = html.replace('{TITLE}', config.title);
+			var html = html.replace('{CONTENTS}', datasets);
+			var html = html.replace('{THEAD}', makeTableHeadings());
+			var html = html.replace('{PAGINATION}', makePagination());
+
+			config.element.html(html);
+
+			applySortorder();
+			applyPaginator();
+		}
+
+		/**
+		 * This is used when there is no data
+		 */
+		function noTable() {
+			config.element.html('<h2>' + config.title + '</h2><p><strong>This user has no files.</strong></p>');
+		}
+	}
+}(jQuery));

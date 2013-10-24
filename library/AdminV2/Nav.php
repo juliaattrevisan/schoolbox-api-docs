@@ -21,7 +21,8 @@ class AdminV2_Nav {
         'folder' => 'Folder',
         'rubric-results' => 'Rubrics',
         'list' => 'Lists',
-        'cleanup' => 'Cleanup'
+        'cleanup' => 'Cleanup',
+		'usage' => 'Usage',
     );
 
     public function parse(SitePage $page, $currentPage = 'home') {

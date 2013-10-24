@@ -1,0 +1,20 @@
+<?php
+
+namespace Schoolbox\Usage\Specific;
+
+$usage = new AjaxFlot($_GET['userId']);
+
+switch($_GET['type']) {
+	case 'group':
+		echo $usage->findGroupUsage();
+		break;
+	case 'type':
+		echo $usage->findTypeUsage();
+		break;
+	case 'files':
+		echo $usage->findFileUsage($_GET['orderBy'], $_GET['order'], $_GET['index'], $_GET['numPerPage']);
+		break;
+	default: break;
+}
+
+exit();
