@@ -36,6 +36,12 @@ class InstanceCompletionMapper extends Mapper {
             'join'       => 'student',
         ));
         $this->hasMap(array(
+            'column'     => 'marking_user_id',
+            'property'   => 'markingUser',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'marking_user',
+        ));
+        $this->hasMap(array(
             'column'     => 'completion_date',
             'property'   => 'completionDate',
             'type'       => self::TYPE_DATETIME,
@@ -56,6 +62,12 @@ class InstanceCompletionMapper extends Mapper {
             'this_key'  => 'student_id',
             'other_key' => 'id',
         ));
+        $this->hasJoin('marking_user', array(
+            'mapper'    => 'Schoolbox\\UserMapper',
+            'this_key'  => 'marking_user_id',
+            'other_key' => 'id',
+        ));
+        $this->registerCallback('preSave', array($this, 'preSave'));
     }
 
     /**
@@ -162,5 +174,17 @@ class InstanceCompletionMapper extends Mapper {
         $statement->execute($params);
 
         return $this->hydrateList($statement, 'ti');
+    }
+
+    /**
+     * Pre-save method for saving an instance completion object - saves the
+     * marking user if this is a new object.
+     *
+     * @param InstanceCompletion $object
+     */
+    public function preSave(InstanceCompletion $object) {
+        if (!$object->getId()) {
+            $object->setMarkingUser($_SESSION['user']);
+        }
     }
 }
