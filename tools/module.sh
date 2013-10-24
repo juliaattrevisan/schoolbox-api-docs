@@ -1,11 +1,9 @@
 #!/bin/bash
 # Module Install/Remove Script
 # Description:
-#       Enables module in SQL config and runs any SQL changes required
-#       Disables the module in SQL config for removal, but leaves the SQL changes
-#       so as not to remove history and allow reinstall
+#       Enables or disable module in SQL config table as required
 # Usage:
-#       module.sh [install/enable/disable] [module_name] (both required)
+#       module.sh [enable/disable] [module_name] (both required)
 #       module.sh check [module_name]
 #       module.sh list
 #
@@ -28,7 +26,7 @@ package=${instdir##*/};
 curdir=`pwd`;
 
 helpmsg() {
-	echo "Usage: module.sh [install/enable/disable] [module_name]";
+	echo "Usage: module.sh [enable/disable] [module_name]";
 	echo "Usage: module.sh check [module_name]";
 	echo "Usage: module.sh list";
 	echo "";
@@ -130,28 +128,6 @@ then
 			echo "Schoolbox modules available:";
 			listmodules;
 			exit 1;
-		fi
-		if [ $1 == "install" ];
-		then
-			modcheck=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $instdir/sql/modules/$2/check.sql | grep 'value' | cut -d' ' -f2`;
-			if [ -z $modcheck -o $modcheck == "0" ];
-			then
-				echo "Backing up database before changes";
-				mkdir -p $backupdir;
-				mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
-				echo "Backup of database before installing $2 located at: $backupfile";
-				mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $instdir/sql/modules/$2/install.sql 2>&1;
-				if [ $? -ne 0 ];
-				then
-					echo "Unable to install $2.";
-					exit 1;
-				else
-					echo "Module $2 installed";
-					exit 0;
-				fi
-			else
-				echo "Module $2 already enabled, no changes made";
-			fi
 		fi
 		if [ $1 == "enable" ];
 		then
