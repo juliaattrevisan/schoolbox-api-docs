@@ -116,8 +116,8 @@ class Config extends DeprecatedModel {
                         WHERE 1=1 ";
                 
                 /* filter out references to leave module if not enabled */
-                if (!Cfg::get('boarder_leave_enabled')) {
-                        $query .= "AND `config`.`type_id` != '12'";
+                if (!self::get('boarder_leave_enabled')) {
+                        $query .= "AND `config`.`type_id` != '".self::TYPE_BOARD."'";
                 }
 
                 $query .= "ORDER BY `config`.`configID` ASC";
@@ -153,8 +153,8 @@ class Config extends DeprecatedModel {
                 }
 
                 /* filter out references to leave module if not enabled */
-                if (!Cfg::get('boarder_leave_enabled')) {
-                        $query .= "AND `config`.`type_id` != '12'";
+                if (!self::get('boarder_leave_enabled')) {
+                        $query .= "AND `config`.`type_id` != '".self::TYPE_BOARD."'";
                 }
 
                 if (!empty($orderBy)) {
