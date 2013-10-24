@@ -230,6 +230,12 @@ foreach ($student_list as $student) {
                 if (isset($student_submission_list[$box_id][$student['uid']]['return']['mark'])) {
                     $attempt = $student_submission_list[$box_id][$student['uid']];
                     $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', $attempt['return']['mark']);
+                    // Gradient: norm_mark/max_mark
+                    $gradient = '';
+                    if (isset($attempt['mark']['norm_mark'])) {
+                        $gradient = (int)($attempt['mark']['norm_mark'] / 10);
+                    }
+                    $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_GRADIENT', $gradient);
                     $this->parse('student_unit_task_submission_box_mark_block', 'student_unit_task_submission_box_mark');
                 }
                 else {
@@ -255,8 +261,15 @@ foreach ($student_list as $student) {
                             'STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID'            => $attempt['attempt_id'],
                             'STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS'           => $attempt['totalMarks'],
                             'STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS' => $attempt['maxMark'],
+                            'STUDENT_UNIT_TASK_ASSESS_REVIEWED'              => isset($attempt['reviewedAt']),
                         )
                     );
+                    // Calc gradient
+                    $gradient = '';
+                    if (isset($attempt['totalMarks'])) {
+                        $gradient = (int)($attempt['totalMarks'] / $attempt['maxMark'] * 10);
+                    }
+                    $this->setVar('STUDENT_UNIT_TASK_ASSESS_GRADIENT', $gradient);
                     $this->parse('student_unit_task_online_assess_mark_block', 'student_unit_task_online_assess_mark');
                 }
                 else {
