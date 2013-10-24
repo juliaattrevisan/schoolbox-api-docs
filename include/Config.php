@@ -60,27 +60,27 @@ class Config extends DeprecatedModel {
 
         static private function load() {
                 $configList = DeprecatedDatabase::getInstance()->getAll("SELECT * FROM `config`");
- 				self::inject($configList);
+                self::inject($configList);
         }
 
 
-		static public function inject($configList) {
-				if (is_array($configList)) {
-						foreach ($configList as $config) {
-								if(isset(self::$data[$config['name']])) {
-									//turn variable into an array if multiples
-									if(!is_array(self::$data[$config['name']])) {
-										$tempValue = self::$data[$config['name']];
-										unset(self::$data[$config['name']]);
-										self::$data[$config['name']][] = $tempValue;
-									}
-									self::$data[$config['name']][] = $config['value'];
-								}
-								else
-									self::$data[$config['name']] = $config['value'];
-						}
-				}
-		}
+        static public function inject($configList) {
+                if (is_array($configList)) {
+                        foreach ($configList as $config) {
+                                if(isset(self::$data[$config['name']])) {
+                                        //turn variable into an array if multiples
+                                        if(!is_array(self::$data[$config['name']])) {
+                                                $tempValue = self::$data[$config['name']];
+                                                unset(self::$data[$config['name']]);
+                                                self::$data[$config['name']][] = $tempValue;
+                                        }
+                                        self::$data[$config['name']][] = $config['value'];
+                                }
+                                else
+                                        self::$data[$config['name']] = $config['value'];
+                        }
+                }
+        }
 
 
 
@@ -94,7 +94,7 @@ class Config extends DeprecatedModel {
                 if (isset(self::$data[$configName]))
                         return self::$data[$configName];
                 elseif (isset(self::$consts[$configName]))
-                    return self::$consts[$configName];
+                        return self::$consts[$configName];
                 elseif (defined($configName))
                         return constant($configName);
                 else {
@@ -107,17 +107,22 @@ class Config extends DeprecatedModel {
         }
 
         public static function getTypeList() {
-            self::getInstance();
-             /* Show non-editable field data as just plain text
-			  * $query = "SELECT DISTINCT `type` FROM `".$this->_table."` WHERE `editable` = 'true' ORDER BY type";
-			  */
-			$query = "
-				SELECT DISTINCT `lu_config_type`.`type`
-				FROM `config`
-				INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
-				ORDER BY `config`.`configID` ASC";
+                self::getInstance();
 
-			return DeprecatedDatabase::getInstance()->getAll($query);
+                $query = "
+                        SELECT DISTINCT `lu_config_type`.`type`
+                        FROM `config`
+                        INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
+                        WHERE 1=1 ";
+                
+                /* filter out references to leave module if not enabled */
+                if (!Cfg::get('boarder_leave_enabled')) {
+                        $query .= "AND `config`.`type_id` != '12'";
+                }
+
+                $query .= "ORDER BY `config`.`configID` ASC";
+
+                return DeprecatedDatabase::getInstance()->getAll($query);
         }
 
         public function getAvailableOptions() {
@@ -134,26 +139,29 @@ class Config extends DeprecatedModel {
         }
 
         public static function getAllOfType($orderBy = '', $type = '') {
-            self::getInstance();
-			/* Show non-editable field data as just plain text
-			 * $query = "SELECT * FROM `".$this->_table."` WHERE `editable` = 'true' ";
-			 */
-			$query = "
-				SELECT *, `lu_config_field`.`field`, `lu_config_type`.`type`
-				FROM `config`
-				INNER JOIN `lu_config_field` ON `config`.`field_id` = `lu_config_field`.`id`
-				INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
-				WHERE 1=1 ";
+                self::getInstance();
 
-			if (!empty($type)) {
-				$query .= "AND `lu_config_type`.`type` = '$type' ";
-			}
+                $query = "
+                        SELECT *, `lu_config_field`.`field`, `lu_config_type`.`type`
+                        FROM `config`
+                        INNER JOIN `lu_config_field` ON `config`.`field_id` = `lu_config_field`.`id`
+                        INNER JOIN `lu_config_type`  ON `config`.`type_id`  = `lu_config_type`.`id`
+                        WHERE 1=1 ";
 
-			if (!empty($orderBy)) {
-				$query .= "ORDER BY `$orderBy`";
-			}
+                if (!empty($type)) {
+                        $query .= "AND `lu_config_type`.`type` = '$type' ";
+                }
 
-			return DeprecatedDatabase::getInstance()->getAll($query);
+                /* filter out references to leave module if not enabled */
+                if (!Cfg::get('boarder_leave_enabled')) {
+                        $query .= "AND `config`.`type_id` != '12'";
+                }
+
+                if (!empty($orderBy)) {
+                        $query .= "ORDER BY `$orderBy`";
+                }
+
+                return DeprecatedDatabase::getInstance()->getAll($query);
         }
 
         public function updateArray($configList) {
