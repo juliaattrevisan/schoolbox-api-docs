@@ -56,17 +56,15 @@ if (!isset($unit_id)) {
 }
 else {
     // Check that the requested unit exists within this class.
-    $unit_exists = false;
-    /** @var UnitInstance[]|\Schoolbox\Collection $filtered_list */
-    $filtered_list = new \Schoolbox\Collection();
+    /** @var UnitInstance $current_unit */
+    $current_unit = null;
     foreach ($unit_list as $unit) {
         if ($unit->getId() == $unit_id) {
-            $unit_exists = true;
-            $filtered_list->add($unit);
+            $current_unit = $unit;
             break;
         }
     }
-    if (!$unit_exists) {
+    if (!($current_unit instanceof UnitInstance)) {
         error(6);
     }
 }
@@ -158,61 +156,58 @@ $handler         = new Assess_Attempt();
 $section_handler = new Assess_Section();
 
 // The header
-foreach ($filtered_list as $unit) {
-    // output unit header
+$this->setVar(
+    array(
+        'HEADER_UNIT_NAME'          => $current_unit->getTitle(),
+        'HEADER_UNIT_COUNT'         => $current_unit->getTasks()->count(),
+        'subheader_unit_task_block' => '',
+    )
+);
+$task_list = $current_unit->getTasks();
+
+foreach ($task_list as $task) {
+    // output task header beneath unit header
+    $box_id    = $task->getSubmissionBox()->getId();
+    $assess_id = $task->getAssessment()->getId();
     $this->setVar(
         array(
-            'HEADER_UNIT_NAME'          => $unit->getTitle(),
-            'HEADER_UNIT_COUNT'         => $unit->getTasks()->count(),
-            'subheader_unit_task_block' => '',
+            'SUBHEADER_UNIT_TASK_NAME'                  => $task->getTitle(),
+            'SUBHEADER_UNIT_TASK_SUBMISSION_ID'         => $box_id,
+            'SUBHEADER_UNIT_TASK_ASSESS_ID'             => $assess_id,
+            'subheader_unit_task_submission_link_block' => '',
+            'subheader_unit_task_assess_link_block'     => '',
+            'subheader_unit_task_no_link_block'         => '',
         )
     );
-    $task_list = $unit->getTasks();
-
-    foreach ($task_list as $task) {
-        // output task header beneath unit header
-        $box_id    = $task->getSubmissionBox()->getId();
-        $assess_id = $task->getAssessment()->getId();
-        $this->setVar(
-            array(
-                'SUBHEADER_UNIT_TASK_NAME'                  => $task->getTitle(),
-                'SUBHEADER_UNIT_TASK_SUBMISSION_ID'         => $box_id,
-                'SUBHEADER_UNIT_TASK_ASSESS_ID'             => $assess_id,
-                'subheader_unit_task_submission_link_block' => '',
-                'subheader_unit_task_assess_link_block'     => '',
-                'subheader_unit_task_no_link_block'         => '',
-            )
-        );
-        if (!empty($box_id)) {
-            $detail = new DueWork_Detail($box_id);
-            $detail->processStudents($student_list);
-            $student_submission_list[$box_id] = $detail->getSitepageData();
-            $this->parse('subheader_unit_task_submission_link_block', 'subheader_unit_task_submission_link');
-        }
-        elseif (!empty($assess_id)) {
-            // attempt_list is a list of all valid attempts, ordered chronologically.
-            // Filter to most recent submission only.
-            $attempt_list = $handler->getList($assess_id);
-            if (!empty($attempt_list)) {
-                foreach ($attempt_list as $attempt) {
-                    $student_assess_list[$assess_id][$attempt['user_id']] = $attempt;
-                }
-                // Load max mark, because getList doesn't get it.
-                foreach ($student_assess_list[$assess_id] as &$attempt) {
-                    $attempt['maxMark']      = $handler->getTotalMarks($assess_id, $attempt['attempt_id']);
-                    $attempt['firstSection'] = $section_handler->getFirst($assess_id);
-                }
-                unset($attempt);
-            }
-            $this->parse('subheader_unit_task_assess_link_block', 'subheader_unit_task_assess_link');
-        }
-        else {
-            $this->parse('subheader_unit_task_no_link_block', 'subheader_unit_task_no_link');
-        }
-        $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
+    if (!empty($box_id)) {
+        $detail = new DueWork_Detail($box_id);
+        $detail->processStudents($student_list);
+        $student_submission_list[$box_id] = $detail->getSitepageData();
+        $this->parse('subheader_unit_task_submission_link_block', 'subheader_unit_task_submission_link');
     }
-    $this->parse('subheader_unit_block', 'subheader_unit', true);
+    elseif (!empty($assess_id)) {
+        // attempt_list is a list of all valid attempts, ordered chronologically.
+        // Filter to most recent submission only.
+        $attempt_list = $handler->getList($assess_id);
+        if (!empty($attempt_list)) {
+            foreach ($attempt_list as $attempt) {
+                $student_assess_list[$assess_id][$attempt['user_id']] = $attempt;
+            }
+            // Load max mark, because getList doesn't get it.
+            foreach ($student_assess_list[$assess_id] as &$attempt) {
+                $attempt['maxMark']      = $handler->getTotalMarks($assess_id, $attempt['attempt_id']);
+                $attempt['firstSection'] = $section_handler->getFirst($assess_id);
+            }
+            unset($attempt);
+        }
+        $this->parse('subheader_unit_task_assess_link_block', 'subheader_unit_task_assess_link');
+    }
+    else {
+        $this->parse('subheader_unit_task_no_link_block', 'subheader_unit_task_no_link');
+    }
+    $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
 }
+$this->parse('subheader_unit_block', 'subheader_unit', true);
 
 $status_list = array(
     Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE => 'Incomplete',
@@ -231,109 +226,107 @@ foreach ($student_list as $student) {
             'student_unit_block' => '',
         )
     );
-    foreach ($filtered_list as $unit) {
-        $this->setVar('student_unit_task_block', '');
-        foreach ($unit->getTasks() as $task) {
+    $this->setVar('student_unit_task_block', '');
+    foreach ($current_unit->getTasks() as $task) {
 
 
-            // Get the completion status for this student.
-            $student_status = '-';
-            foreach ($task->getCompletionList() as $completion) {
-                if ($completion->getStudent()->getId() == $student['uid']) {
-                    $student_status = $completion->getCompletionStatus();
-                    break;
-                }
+        // Get the completion status for this student.
+        $student_status = '-';
+        foreach ($task->getCompletionList() as $completion) {
+            if ($completion->getStudent()->getId() == $student['uid']) {
+                $student_status = $completion->getCompletionStatus();
+                break;
             }
+        }
 
+        $this->setVar(
+            array(
+                'STUDENT_UNIT_TASK_ID'                    => $task->getId(),
+                'STUDENT_UNIT_TASK_STATUS'                => $student_status,
+                'student_unit_task_check_block'           => '',
+                'student_unit_task_online_assess_block'   => '',
+                'student_unit_task_submission_box_block'  => '',
+                'student_unit_task_check_status_block'    => '',
+            )
+        );
+        $box_id    = $task->getSubmissionBox()->getId();
+        $assess_id = $task->getAssessment()->getId();
+        if (!empty($box_id)) {
+            // What's this student's mark for this submission?
+            // For now use the DueWork_Detail class
             $this->setVar(
                 array(
-                    'STUDENT_UNIT_TASK_ID'                    => $task->getId(),
-                    'STUDENT_UNIT_TASK_STATUS'                => $student_status,
-                    'student_unit_task_check_block'           => '',
-                    'student_unit_task_online_assess_block'   => '',
-                    'student_unit_task_submission_box_block'  => '',
-                    'student_unit_task_check_status_block'    => '',
+                    'STUDENT_UNIT_TASK_SUBMISSION_ID'                => $box_id,
+                    'student_unit_task_submission_box_mark_block'    => '',
+                    'student_unit_task_submission_box_no_mark_block' => '',
                 )
             );
-            $box_id    = $task->getSubmissionBox()->getId();
-            $assess_id = $task->getAssessment()->getId();
-            if (!empty($box_id)) {
-                // What's this student's mark for this submission?
-                // For now use the DueWork_Detail class
-                $this->setVar(
-                    array(
-                        'STUDENT_UNIT_TASK_SUBMISSION_ID'                => $box_id,
-                        'student_unit_task_submission_box_mark_block'    => '',
-                        'student_unit_task_submission_box_no_mark_block' => '',
-                    )
-                );
-                if (isset($student_submission_list[$box_id][$student['uid']]['return']['mark'])) {
-                    $attempt = $student_submission_list[$box_id][$student['uid']];
-                    $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', $attempt['return']['mark']);
-                    // Gradient: norm_mark/max_mark
-                    $gradient = '';
-                    if (isset($attempt['mark']['norm_mark'])) {
-                        $gradient = (int)($attempt['mark']['norm_mark'] / 10);
-                    }
-                    $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_GRADIENT', $gradient);
-                    $this->parse('student_unit_task_submission_box_mark_block', 'student_unit_task_submission_box_mark');
+            if (isset($student_submission_list[$box_id][$student['uid']]['return']['mark'])) {
+                $attempt = $student_submission_list[$box_id][$student['uid']];
+                $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', $attempt['return']['mark']);
+                // Gradient: norm_mark/max_mark
+                $gradient = '';
+                if (isset($attempt['mark']['norm_mark'])) {
+                    $gradient = (int)($attempt['mark']['norm_mark'] / 10);
                 }
-                else {
-                    $this->parse('student_unit_task_submission_box_no_mark_block', 'student_unit_task_submission_box_no_mark');
-                }
-                $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box');
-            }
-            elseif (!empty($assess_id)) {
-                // What is the mark for this student?
-                $this->setVar(
-                    array(
-                        'STUDENT_UNIT_TASK_ASSESS_ID'                   => $box_id,
-                        'student_unit_task_online_assess_mark_block'    => '',
-                        'student_unit_task_online_assess_no_mark_block' => '',
-                    )
-                );
-                $this->setVar('STUDENT_UNIT_TASK_ASSESS_ID', $assess_id);
-                if (isset($student_assess_list[$assess_id][$student['uid']])) {
-                    $attempt = $student_assess_list[$assess_id][$student['uid']];
-                    $this->setVar(
-                        array(
-                            'STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID'      => $attempt['firstSection']['section_id'],
-                            'STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID'            => $attempt['attempt_id'],
-                            'STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS'           => $attempt['totalMarks'],
-                            'STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS' => $attempt['maxMark'],
-                            'STUDENT_UNIT_TASK_ASSESS_REVIEWED'              => isset($attempt['reviewedAt']),
-                        )
-                    );
-                    // Calc gradient
-                    $gradient = '';
-                    if (isset($attempt['totalMarks'])) {
-                        $gradient = (int)($attempt['totalMarks'] / $attempt['maxMark'] * 10);
-                    }
-                    $this->setVar('STUDENT_UNIT_TASK_ASSESS_GRADIENT', $gradient);
-                    $this->parse('student_unit_task_online_assess_mark_block', 'student_unit_task_online_assess_mark');
-                }
-                else {
-                    $this->parse('student_unit_task_online_assess_no_mark_block', 'student_unit_task_online_assess_no_mark');
-                }
-                $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess');
+                $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_GRADIENT', $gradient);
+                $this->parse('student_unit_task_submission_box_mark_block', 'student_unit_task_submission_box_mark');
             }
             else {
-                foreach ($status_list as $status => $label) {
-                    $this->setVar(
-                        array(
-                            'STUDENT_UNIT_TASK_STATUS_TEXT'     => $label,
-                            'STUDENT_UNIT_TASK_STATUS_VALUE'    => $status,
-                            'STUDENT_UNIT_TASK_STATUS_SELECTED' => ($status == $student_status ? 'selected' : ''),
-                        )
-                    );
-                    $this->parse('student_unit_task_check_status_block', 'student_unit_task_check_status', true);
-                }
-                $this->parse('student_unit_task_check_block', 'student_unit_task_check', true);
+                $this->parse('student_unit_task_submission_box_no_mark_block', 'student_unit_task_submission_box_no_mark');
             }
-            $this->parse('student_unit_task_block', 'student_unit_task', true);
+            $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box');
         }
-        $this->parse('student_unit_block', 'student_unit', true);
+        elseif (!empty($assess_id)) {
+            // What is the mark for this student?
+            $this->setVar(
+                array(
+                    'STUDENT_UNIT_TASK_ASSESS_ID'                   => $box_id,
+                    'student_unit_task_online_assess_mark_block'    => '',
+                    'student_unit_task_online_assess_no_mark_block' => '',
+                )
+            );
+            $this->setVar('STUDENT_UNIT_TASK_ASSESS_ID', $assess_id);
+            if (isset($student_assess_list[$assess_id][$student['uid']])) {
+                $attempt = $student_assess_list[$assess_id][$student['uid']];
+                $this->setVar(
+                    array(
+                        'STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID'      => $attempt['firstSection']['section_id'],
+                        'STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID'            => $attempt['attempt_id'],
+                        'STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS'           => $attempt['totalMarks'],
+                        'STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS' => $attempt['maxMark'],
+                        'STUDENT_UNIT_TASK_ASSESS_REVIEWED'              => isset($attempt['reviewedAt']),
+                    )
+                );
+                // Calc gradient
+                $gradient = '';
+                if (isset($attempt['totalMarks'])) {
+                    $gradient = (int)($attempt['totalMarks'] / $attempt['maxMark'] * 10);
+                }
+                $this->setVar('STUDENT_UNIT_TASK_ASSESS_GRADIENT', $gradient);
+                $this->parse('student_unit_task_online_assess_mark_block', 'student_unit_task_online_assess_mark');
+            }
+            else {
+                $this->parse('student_unit_task_online_assess_no_mark_block', 'student_unit_task_online_assess_no_mark');
+            }
+            $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess');
+        }
+        else {
+            foreach ($status_list as $status => $label) {
+                $this->setVar(
+                    array(
+                        'STUDENT_UNIT_TASK_STATUS_TEXT'     => $label,
+                        'STUDENT_UNIT_TASK_STATUS_VALUE'    => $status,
+                        'STUDENT_UNIT_TASK_STATUS_SELECTED' => ($status == $student_status ? 'selected' : ''),
+                    )
+                );
+                $this->parse('student_unit_task_check_status_block', 'student_unit_task_check_status', true);
+            }
+            $this->parse('student_unit_task_check_block', 'student_unit_task_check', true);
+        }
+        $this->parse('student_unit_task_block', 'student_unit_task', true);
     }
+    $this->parse('student_unit_block', 'student_unit', true);
     $this->parse('student_block', 'student', true);
 }
 
