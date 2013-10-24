@@ -59,6 +59,17 @@ if (is_numeric($_GET['id'])) {
 		$mapper = new SubmissionMapper();
 		try {
 			$studentSub = $mapper->findById($_GET['id']);
+			// Now lazy model is gone, need to load submission box and owner manually
+			$studentSub->setSubmissionBox(
+				SubmissionBoxMapper::getInstance()->findById(
+					$studentSub->getSubmissionBox()->getId()
+				)
+			);
+			$studentSub->setOwner(
+				Schoolbox\UserMapper::getInstance()->findById(
+					$studentSub->getOwner()->getId()
+				)
+			);
 		}
 		catch (Schoolbox\Mapper\Exception $e) {
 			error(44);
