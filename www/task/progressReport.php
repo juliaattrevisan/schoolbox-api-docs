@@ -126,8 +126,8 @@ foreach ($unit_list as $unit) {
     $semester = $unit->getOpenDate()->getUsingFormat('m') <= 6 ? 1 : 2;
     $unit_year_list[$year][$semester][] = $unit;
 }
-foreach ($unit_year_list as $year => $unit_semester_list) {
-    foreach (array(2, 1) as $semester) {
+foreach (array_reverse($unit_year_list, true) as $year => $unit_semester_list) {
+    foreach (array(1, 2) as $semester) {
         $this->setVar(
             array(
                 'UNIT_SELECTOR_SEMESTER_SEMESTER' => $semester,
