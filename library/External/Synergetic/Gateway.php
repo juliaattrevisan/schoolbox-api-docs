@@ -41,6 +41,19 @@ class External_Synergetic_Gateway {
      * @return string Web service output (XMLOutput, ErrorMessage, SourceIPAddress)
      */
     public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword) {
+
+		/* Only do this for Bialik
+		 */
+		if ($domain = 'bialik') {
+			$external = new External_Synergetic_User();
+
+			// Check if Attribute 5 exists for this user
+			// If it doesn't create it
+			// Otherwise update it
+
+			$external->updateCustomAttribute($communityId, 5, $newPassword);
+		}
+
 		return $this->makeRequest(
 			'ChangeCommunityLoginPassword',
 			array(
