@@ -71,13 +71,31 @@
                                 </select>
                             </form>
                         <!-- END student_unit_task_check -->
+
                         <!-- BEGIN student_unit_task_submission_box -->
-                            {STUDENT_UNIT_TASK_SUBMISSION_MARK}
-                            (<a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/">History</a>)
+                            <!-- BEGIN student_unit_task_submission_box_mark -->
+                                {STUDENT_UNIT_TASK_SUBMISSION_MARK}
+                            <!-- END student_unit_task_submission_box_mark -->
+                            <!-- BEGIN student_unit_task_submission_box_no_mark -->
+                                -
+                            <!-- END student_unit_task_submission_box_no_mark -->
+                            <a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/"
+                               class="btn go-to no-text"
+                               title="View submission history for this student"
+                            ><span></span></a>
                         <!-- END student_unit_task_submission_box -->
+
                         <!-- BEGIN student_unit_task_online_assess -->
+                            <!-- BEGIN student_unit_task_online_assess_mark -->
                             {STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS} / {STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS}
-                            (<a href="/assess/review/{STUDENT_UNIT_TASK_ASSESS_ID}/{STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID}/{STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID}/">Review</a>)
+                            <!-- END student_unit_task_online_assess_mark -->
+                            <!-- BEGIN student_unit_task_online_assess_no_mark -->
+                                -
+                            <!-- END student_unit_task_online_assess_no_mark -->
+                            <a href="/assess/review/{STUDENT_UNIT_TASK_ASSESS_ID}/{STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID}/{STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID}/"
+                               class="btn go-to no-text"
+                               title="Review assessment for this student"
+                            ><span></span></a>
                         <!-- END student_unit_task_online_assess -->
                     </td>
                     <!-- END student_unit_task -->

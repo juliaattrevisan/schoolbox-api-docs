@@ -94,7 +94,11 @@ $this->setBlock('student_unit', 'student_unit_task', 'student_unit_task_block');
 $this->setBlock('student_unit_task', 'student_unit_task_check', 'student_unit_task_check_block');
 $this->setBlock('student_unit_task_check', 'student_unit_task_check_status', 'student_unit_task_check_status_block');
 $this->setBlock('student_unit_task', 'student_unit_task_submission_box', 'student_unit_task_submission_box_block');
+$this->setBlock('student_unit_task_submission_box', 'student_unit_task_submission_box_mark', 'student_unit_task_submission_box_mark_block');
+$this->setBlock('student_unit_task_submission_box', 'student_unit_task_submission_box_no_mark', 'student_unit_task_submission_box_no_mark_block');
 $this->setBlock('student_unit_task', 'student_unit_task_online_assess', 'student_unit_task_online_assess_block');
+$this->setBlock('student_unit_task_online_assess', 'student_unit_task_online_assess_mark', 'student_unit_task_online_assess_mark_block');
+$this->setBlock('student_unit_task_online_assess', 'student_unit_task_online_assess_no_mark', 'student_unit_task_online_assess_no_mark_block');
 
 $this->setTitle('Class Mark Sheet');
 
@@ -216,18 +220,32 @@ foreach ($student_list as $student) {
             if (!empty($box_id)) {
                 // What's this student's mark for this submission?
                 // For now use the DueWork_Detail class
-                $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_ID', $box_id);
+                $this->setVar(
+                    array(
+                        'STUDENT_UNIT_TASK_SUBMISSION_ID'                => $box_id,
+                        'student_unit_task_submission_box_mark_block'    => '',
+                        'student_unit_task_submission_box_no_mark_block' => '',
+                    )
+                );
                 if (isset($student_submission_list[$box_id][$student['uid']]['return']['mark'])) {
                     $attempt = $student_submission_list[$box_id][$student['uid']];
                     $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', $attempt['return']['mark']);
+                    $this->parse('student_unit_task_submission_box_mark_block', 'student_unit_task_submission_box_mark');
                 }
                 else {
-                    $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', '-');
+                    $this->parse('student_unit_task_submission_box_no_mark_block', 'student_unit_task_submission_box_no_mark');
                 }
                 $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box');
             }
             elseif (!empty($assess_id)) {
                 // What is the mark for this student?
+                $this->setVar(
+                    array(
+                        'STUDENT_UNIT_TASK_ASSESS_ID'                   => $box_id,
+                        'student_unit_task_online_assess_mark_block'    => '',
+                        'student_unit_task_online_assess_no_mark_block' => '',
+                    )
+                );
                 $this->setVar('STUDENT_UNIT_TASK_ASSESS_ID', $assess_id);
                 if (isset($student_assess_list[$assess_id][$student['uid']])) {
                     $attempt = $student_assess_list[$assess_id][$student['uid']];
@@ -239,8 +257,12 @@ foreach ($student_list as $student) {
                             'STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS' => $attempt['maxMark'],
                         )
                     );
-                    $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess');
+                    $this->parse('student_unit_task_online_assess_mark_block', 'student_unit_task_online_assess_mark');
                 }
+                else {
+                    $this->parse('student_unit_task_online_assess_no_mark_block', 'student_unit_task_online_assess_no_mark');
+                }
+                $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess');
             }
             else {
                 foreach ($status_list as $status => $label) {
