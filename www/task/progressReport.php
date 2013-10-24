@@ -216,24 +216,23 @@ foreach ($student_list as $student) {
             if (!empty($box_id)) {
                 // What's this student's mark for this submission?
                 // For now use the DueWork_Detail class
+                $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_ID', $box_id);
                 if (isset($student_submission_list[$box_id][$student['uid']]['return']['mark'])) {
                     $attempt = $student_submission_list[$box_id][$student['uid']];
-                    $this->setVar(
-                        array(
-                            'STUDENT_UNIT_TASK_SUBMISSION_ID'   => $box_id,
-                            'STUDENT_UNIT_TASK_SUBMISSION_MARK' => $attempt['return']['mark'],
-                        )
-                    );
-                    $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box');
+                    $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', $attempt['return']['mark']);
                 }
+                else {
+                    $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', '-');
+                }
+                $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box');
             }
             elseif (!empty($assess_id)) {
                 // What is the mark for this student?
+                $this->setVar('STUDENT_UNIT_TASK_ASSESS_ID', $assess_id);
                 if (isset($student_assess_list[$assess_id][$student['uid']])) {
                     $attempt = $student_assess_list[$assess_id][$student['uid']];
                     $this->setVar(
                         array(
-                            'STUDENT_UNIT_TASK_ASSESS_ID'                    => $assess_id,
                             'STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID'      => $attempt['firstSection']['section_id'],
                             'STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID'            => $attempt['attempt_id'],
                             'STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS'           => $attempt['totalMarks'],
