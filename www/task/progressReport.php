@@ -12,6 +12,10 @@ if (!isset($this)) {
     require_once __DIR__ . '/../../include/Bootstrap.php';
     SitePage::localRedir('/task/progressReport');
 }
+// If form was submitted, redirect
+if (isset($_GET['category_id']) && isset($_GET['unit_id'])) {
+    SitePage::localRedir(sprintf('/task/progressReport/%d/%d', $_GET['category_id'], $_GET['unit_id']));
+}
 
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
@@ -45,7 +49,7 @@ if (count($unit_list) === 0) {
     error(6);
 }
 if (!isset($unit_id)) {
-    // Redirect to view for first view.
+    // Redirect to first task in the list.
     $unit_id = $unit_list->first()->getId();
     $this->localRedir('/task/progressReport/'.$class_id.'/'.$unit_id);
     exit;
@@ -53,12 +57,12 @@ if (!isset($unit_id)) {
 else {
     // Check that the requested unit exists within this class.
     $unit_exists = false;
+    /** @var UnitInstance[]|\Schoolbox\Collection $filtered_list */
     $filtered_list = new \Schoolbox\Collection();
     foreach ($unit_list as $unit) {
         if ($unit->getId() == $unit_id) {
             $unit_exists = true;
             $filtered_list->add($unit);
-            $unit_list = $filtered_list;
             break;
         }
     }
@@ -81,6 +85,9 @@ else {
 
 // Dumb <!-- blocks --> and {VARIABLES}
 $this->setFile(TEMPLATE_content, 'task/progressReport.html');
+
+$this->setBlock(TEMPLATE_content, 'unit_selector_semester', 'unit_selector_semester_block');
+$this->setBlock('unit_selector_semester', 'unit_selector_unit', 'unit_selector_unit_block');
 
 $this->setBlock(TEMPLATE_content, 'subheader_unit', 'subheader_unit_block');
 $this->setBlock('subheader_unit', 'subheader_unit_task', 'subheader_unit_task_block');
@@ -107,8 +114,41 @@ $this->setVar(
         'CATEGORY'      => $category->getName(),
         'CATEGORY_ID'   => $category->getId(),
         'student_block' => '',
+        'unit_selector_semester_block' => '',
     )
 );
+
+// Unit dropdown, with semester optgroups
+$unit_year_list = array();
+foreach ($unit_list as $unit) {
+    $year     = $unit->getOpenDate()->getUsingFormat('Y');
+    $semester = $unit->getOpenDate()->getUsingFormat('m') <= 6 ? 1 : 2;
+    $unit_year_list[$year][$semester][] = $unit;
+}
+foreach ($unit_year_list as $year => $unit_semester_list) {
+    foreach (array(2, 1) as $semester) {
+        $this->setVar(
+            array(
+                'UNIT_SELECTOR_SEMESTER_SEMESTER' => $semester,
+                'UNIT_SELECTOR_SEMESTER_YEAR'     => $year,
+                'unit_selector_unit_block'        => '',
+            )
+        );
+        if (!empty($unit_semester_list[$semester])) {
+            foreach ($unit_semester_list[$semester] as $unit) {
+                $this->setVar(
+                    array(
+                        'UNIT_SELECTOR_UNIT_NAME'     => $unit->getTitle(),
+                        'UNIT_SELECTOR_UNIT_ID'       => $unit->getId(),
+                        'UNIT_SELECTOR_UNIT_SELECTED' => ($unit->getId() == $unit_id ? 'selected' : ''),
+                    )
+                );
+                $this->parse('unit_selector_unit_block', 'unit_selector_unit', true);
+            }
+        }
+        $this->parse('unit_selector_semester_block', 'unit_selector_semester', true);
+    }
+}
 
 // Store assessment and submission marks here
 $student_assess_list     = array();
@@ -118,7 +158,7 @@ $handler         = new Assess_Attempt();
 $section_handler = new Assess_Section();
 
 // The header
-foreach ($unit_list as $unit) {
+foreach ($filtered_list as $unit) {
     // output unit header
     $this->setVar(
         array(
@@ -191,7 +231,7 @@ foreach ($student_list as $student) {
             'student_unit_block' => '',
         )
     );
-    foreach ($unit_list as $unit) {
+    foreach ($filtered_list as $unit) {
         $this->setVar('student_unit_task_block', '');
         foreach ($unit->getTasks() as $task) {
 

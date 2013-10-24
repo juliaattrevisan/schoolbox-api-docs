@@ -2,7 +2,10 @@
 <script type="text/javascript">
     (function($) {
         $(function(){
-            $('select[data-interaction="auto_submit"]').bind('change', function(event) {
+            $('form[data-interaction="select_unit"] select').bind('change', function(event) {
+                $(this).closest('form').submit();
+            });
+            $('select[data-interaction="update_progress"]').bind('change', function(event) {
                 var element = $(this);
                 var form    = element.closest('form');
                 $.post(
@@ -25,6 +28,22 @@
 <!-- END custom_head -->
 
 <h1>Unit Progress Report – {CATEGORY}</h1>
+
+<form action="/task/progressReport/" method="get" data-interaction="select_unit">
+    <input type="hidden" name="category_id" value="{CATEGORY_ID}" />
+    <select name="unit_id">
+        <!-- BEGIN unit_selector_semester -->
+        <optgroup label="Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}">
+            <!-- BEGIN unit_selector_unit -->
+            <option label="{UNIT_SELECTOR_UNIT_NAME}" value="{UNIT_SELECTOR_UNIT_ID}" {UNIT_SELECTOR_UNIT_SELECTED}>
+                {UNIT_SELECTOR_UNIT_NAME}
+            </option>
+            <!-- END unit_selector_unit -->
+        </optgroup>
+        <!-- END unit_selector_semester -->
+    </select>
+</form>
+
 <table>
     <thead>
         <tr>
@@ -62,7 +81,7 @@
                     <form action="/task/progressForm.php" method="POST">
                         <input type="hidden" name="student_id" value="{STUDENT_ID}" />
                         <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
-                        <select name="status" data-interaction="auto_submit">
+                        <select name="status" data-interaction="update_progress">
                             <!-- BEGIN student_unit_task_check_status -->
                             <option label="{STUDENT_UNIT_TASK_STATUS_TEXT}" value="{STUDENT_UNIT_TASK_STATUS_VALUE}" {STUDENT_UNIT_TASK_STATUS_SELECTED}>{STUDENT_UNIT_TASK_STATUS_TEXT}</option>
                             <!-- END student_unit_task_check_status -->
