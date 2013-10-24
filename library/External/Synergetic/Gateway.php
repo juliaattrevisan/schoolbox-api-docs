@@ -44,13 +44,8 @@ class External_Synergetic_Gateway {
 
 		/* Only do this for Bialik
 		 */
-		if ($domain = 'bialik') {
+		if (Config::get('site_location') == 'bialik') {
 			$external = new External_Synergetic_User();
-
-			// Check if Attribute 5 exists for this user
-			// If it doesn't create it
-			// Otherwise update it
-
 			$external->updateCustomAttribute($communityId, 5, $newPassword);
 		}
 
@@ -62,8 +57,7 @@ class External_Synergetic_Gateway {
 				 'NewPassword'     => $newPassword,
 			)
 		);
-    }
-
+	}
 
 	/**
 	 * Makes a SOAP request, storing the error and exception (if one was thrown)
@@ -101,6 +95,7 @@ class External_Synergetic_Gateway {
 			$this->last_error     = sprintf('%s: %s', get_class($e), $e->getMessage());
 			$this->last_exception = $e;
 		}
+
 		return false;
 	}
 
