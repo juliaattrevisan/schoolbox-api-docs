@@ -135,11 +135,16 @@ class Marksheet {
 		$this->year = $year;
 		$this->semester = $semester;
 
+		$studentList = array();
+
 		if($this->category->getCodes()->count() && $this->conf->get('external_enable')) {
 			$studentList = $this->synergyHandler->getStudents($this->category->getCodes()->first()->getCode());
 		}
-		else {
-			$studentList = $this->groupHandler->getMemberList($this->category->getId());
+
+		$groupList = $this->groupHandler->getMemberList($this->category->getId());
+
+		if(is_array($groupList)) {
+			$studentList = array_merge($studentList, $groupList);
 		}
 
 		// extract all the synergy IDs of the students found
