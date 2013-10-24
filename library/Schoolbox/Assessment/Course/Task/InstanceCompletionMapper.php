@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Task;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 
 class InstanceCompletionMapper extends Mapper {
 
@@ -183,7 +184,7 @@ class InstanceCompletionMapper extends Mapper {
      * @param InstanceCompletion $object
      */
     public function preSave(InstanceCompletion $object) {
-        if (!$object->getId()) {
+        if (!$object->getId() && $_SESSION['user'] instanceof User) {
             $object->setMarkingUser($_SESSION['user']);
         }
     }
