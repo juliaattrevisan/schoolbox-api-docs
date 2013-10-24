@@ -71,9 +71,11 @@ class Grades {
 				$params
 			);
 
-			foreach($marks['oa'][$user->getId()] as $oa => $m) {
+			foreach($marks['oa'][$user->getId()] as $oa => $assessmentResults) {
 				$assessmentsSeen['oa'][$oa] = true;
 			}
+			unset($oa);
+			unset($assessmentResults);
 
 			// get all SB marks for this student in this category
 			$marks['sb'][$user->getId()] = ReturnedWorkMapper::getInstance()->getStudentMarks(
@@ -82,11 +84,14 @@ class Grades {
 				$params
 			);
 
-			foreach($marks['sb'][$user->getId()] as $sb => $m) {
+			foreach($marks['sb'][$user->getId()] as $sb => $assessmentResults) {
 				$assessmentsSeen['sb'][$sb] = true;
 			}
+			unset($sb);
+			unset($assessmentResults);
 
 		}
+		unset($user);
 
 		$weightArray = array();
 
@@ -116,7 +121,11 @@ class Grades {
 			foreach($ws as $id => $w) {
 				$assessmentWeights["$type-$id"] = $w;
 			}
+			unset($w);
+			unset($id);
 		}
+		unset($ws);
+		unset($type);
 		// get rid of this, we don't need it anymore
 		unset($weightArray);
 
@@ -135,43 +144,67 @@ class Grades {
 		 * It also has to comprehend grade error codes: 'Absent' == 0, 'Not Assessed' == NULL and 'Not Submitted' == 0
 		 */
 
-		$grades = array();
+		$weightedGrades = array();
+		$applicableWeightsArray = array();
 
-		// this is always just 2 elements
-		foreach ($marks as $type => $student) {
+		foreach($marks as $type => $student) {
+			foreach($student as $userId => $assessmentResults) {
+				foreach($assessmentResults as $assessmentId => $studentMarkInAssessment) {
 
-			// iterate students with the current OA/SB context
-			foreach($student as $userId => $marks) {
+					/* we currently have:
+					 *  - $type = "oa" | "sb"
+					 *  - $userId = student ID
+					 *  - $assessmentId = the numeric ID of the assessment in question
+					 *  - $studentMarkInAssessment = array containing ['mark']
+					 */
 
-				// reset applicable weight for this student
-				$applicableWeight = 0;
+					$normMark = $studentMarkInAssessment['mark'];
 
-				// iterate the marks given to the current student
-				foreach($marks as $aId => $markArray) {
-
-					// add the current weight to the applicable weight
-					$applicableWeight += $assessmentWeights["$type-$aId"];
-
-					// apply and append
-					$grades[$userId]['grades']["$type-$aId"] = $markArray['mark'];
-				}
-
-				// some students have no grades yet
-				if(is_array($grades[$userId]['grades'])) {
-					// apply the applicable weight sum to the marks retrieved
-					foreach($grades[$userId]['grades'] as $k => $v) {
-						$grades[$userId]['grades'][$k] = $v * ($assessmentWeights[$k] / $applicableWeight);
+					// we can disregard null marks
+					if(is_null($normMark)) {
+						continue;
 					}
+
+					$workId = "$type-$assessmentId";
+					$workWeight = $assessmentWeights[$workId];
+
+					// add the weight of this work to the applicability of the student
+					$applicableWeightsArray[$userId][$workId] = $workWeight;
+
+					// add the weighted mark of this work to the student
+					$weightedGrades[$userId][$workId] = $normMark * $workWeight / 100;
+
 				}
 			}
 		}
 
-		// summate the weighted grades given
-		foreach($grades as $userId => $marks) {
-			$grades[$userId]['avg'] = array_sum($marks['grades']);
-		}
+		// it's considered good manners to clean up after oneself..
+		unset($studentMarkInAssessment);
+		unset($assessmentId);
+		unset($normMark);
+		unset($workId);
+		unset($workWeight);
+		unset($assessmentResults);
+		unset($userId);
+		unset($student);
+		unset($type);
 
-		return $grades;
+		$returnGrades = array();
+
+		foreach ($weightedGrades as $userId => $works) {
+			$userWeightSum = array_sum($applicableWeightsArray[$userId]);
+			foreach($works as $workId => $weightedMark) {
+				$returnGrades[$userId]['grades'][$workId] = $weightedMark / $userWeightSum * 100;
+			}
+			$returnGrades[$userId]['avg'] = array_sum($works) / $userWeightSum * 100;
+		}
+		unset($weightedMark);
+		unset($workId);
+		unset($works);
+		unset($userId);
+
+		return $returnGrades;
+
 	}
 
 }
