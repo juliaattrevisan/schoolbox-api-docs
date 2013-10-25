@@ -11,6 +11,11 @@
 
 <script type='text/javascript'>
 	$j(function() {
+		$j('#total-usage').usageTotalPlain({
+			url: '/adminv2/usage/specificAjax?type=total&userId={USAGE_USER_ID}',
+			title: 'Total'
+		});
+
 		$j('#group-usage').usageGroup({
 			url: '/adminv2/usage/specificAjax?type=group&userId={USAGE_USER_ID}',
 			title: 'Type'
@@ -81,6 +86,8 @@
 </ul>
 <div class="admin-contents clearfix">
 	<h1>Usage for {USAGE_USER_FULLNAME}</h1>
+
+	<div id='total-usage' class='loader'>Loading data...</div>
 	<div id='group-usage' class='loader'>Loading data...</div>
 	<div id='type-usage' class='loader'>Loading data...</div>
 	<div id='user-usage' class='loader'>Loading data...</div>
