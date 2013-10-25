@@ -30,6 +30,24 @@ class AjaxFlot {
 	/**
 	 * Delegation method
 	 *
+	 * Find total usage
+	 *
+	 * @return bool|float|int|string
+	 */
+	public function findTotalUsage() {
+		$used = $this->getMapper()->findTotalUsage();
+
+		$result = array(
+			'label' => 'Used',
+			'data' => (int)$used,
+		);
+
+		return json_encode($result);
+	}
+
+	/**
+	 * Delegation method
+	 *
 	 * Find total group usage
 	 *
 	 * @return bool|float|int|string

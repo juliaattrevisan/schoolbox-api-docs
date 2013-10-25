@@ -34,6 +34,56 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 	}
 
 	/**
+	 * Find total usage
+	 *
+	 * This summates the filesizes of all files in the specified location.
+	 * This includes files which may have been marked as softdeleted in the db
+	 */
+	public function findTotalUsage() {
+		$userId = $this->getUserId();
+
+		$query = "
+			SELECT COALESCE(SUM(bytes), 0) AS bytes
+			FROM
+			(
+				(SELECT SUM(file_size) AS bytes
+				FROM `file`
+				WHERE `owner` = {$userId}
+				AND deleted = 0
+				GROUP BY `owner`)
+				UNION
+				(SELECT SUM(file_size) AS bytes
+				FROM `myFile`
+				WHERE `owner` = {$userId}
+				AND deleted = 0
+				GROUP BY `owner`)
+				UNION
+				(SELECT SUM(filesize) AS bytes
+				FROM `storage`
+				WHERE `uploaded_by` = {$userId}
+				GROUP BY `uploaded_by`)
+				UNION
+				(SELECT SUM(filesize) AS bytes
+				FROM `student_submission`
+				WHERE `owner` = {$userId}
+				GROUP BY `owner`)
+				UNION
+				(SELECT SUM(filesize) AS bytes
+				FROM `submission_return`
+				WHERE `owner` = {$userId}
+				GROUP BY `owner`)
+			) AS allTotals
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$result = $statement->fetch(\PDO::FETCH_ASSOC);
+
+		return $result['bytes'];
+	}
+
+	/**
 	 * The total number of files
 	 *
 	 * @return mixed
@@ -48,11 +98,13 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				(SELECT COUNT(*) AS num
 				FROM `file`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				GROUP BY `owner`)
 				UNION
 				(SELECT COUNT(*) AS num
 				FROM `myFile`
 				WHERE `owner` = {$userId}
+				AND deleted = 0
 				GROUP BY `owner`)
 				UNION
 				(SELECT COUNT(*) AS num
