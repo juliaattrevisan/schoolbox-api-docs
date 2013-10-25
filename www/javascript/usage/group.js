@@ -73,26 +73,25 @@
 		 */
 		function makeBars(datasets) {
 
-			/* Find the largest one
-			 * Every bar will be represented as a fraction of this
-			 */
-			for (var i = 0, max = 0; i < datasets.length; i++) {
-				var value = parseInt(datasets[i].data);
-
-				if (value > max) {
-					max = value;
-				}
-			}
-
 			/* Bar graph everything
 			 */
 			var output = '<h2>{TITLE}</h2>';
 
+			/* Find the total amount
+			 */
+			var total = 0;
+
+			for (var i = 0; i < datasets.length; i++) {
+				total += parseInt(datasets[i].data);
+			}
+
+			/* Make every bar relative to max
+			 */
 			for (var i = 0; i < datasets.length; i++) {
 				var used = parseInt(datasets[i].data);
 
-				if (max > 0) {
-					var percentage = Math.round(100*used/max).toString();
+				if (total > 0) {
+					var percentage = Math.round(100*used/total).toString();
 				}
 				else {
 					var percentage = 0;
