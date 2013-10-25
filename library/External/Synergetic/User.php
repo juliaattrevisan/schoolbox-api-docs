@@ -46,7 +46,7 @@ class External_Synergetic_User implements External_UserInterface {
 		";
 
 		if ($photo = $this->getDatabase()->getRow($query)) {
-			$photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
+			$photoPath = Config::get('stream_dir') . '/portrait/' . $externalUserId . '.jpg';
 
 			//TODO: delete photos on rollover
 
@@ -72,7 +72,7 @@ class External_Synergetic_User implements External_UserInterface {
 
 				/* Purge all previously transformed copies
 				 */
-				$pattern = Config::get('portrait_dir') . '/' . $externalUserId . '-*.dat';
+				$pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
 
 				foreach (glob($pattern) as $oldCacheFile) {
 					unlink($oldCacheFile);

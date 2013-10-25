@@ -351,7 +351,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getPortrait ($externalUserId) {
 
-        $portraitPath = realpath( Config::get('portrait_dir') ) . "/$externalUserId.jpg";
+        $portraitPath = realpath( Config::get('stream_dir') ) . "/portrait/$externalUserId.jpg";
 
         if ( is_readable($portraitPath) ) {
             return $portraitPath;

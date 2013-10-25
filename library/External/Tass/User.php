@@ -235,7 +235,7 @@ class External_Tass_User implements External_UserInterface {
      */
     public function getPortrait ($externalUserId) {
 
-        $portraitPath = realpath( Config::get('portrait_dir') ) . "/".strtolower($externalUserId).".jpg";
+        $portraitPath = realpath( Config::get('stream_dir') ) . "/portrait/".strtolower($externalUserId).".jpg";
 
         if ( is_readable($portraitPath) ) {
             return $portraitPath;
