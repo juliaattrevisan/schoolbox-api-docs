@@ -2,7 +2,9 @@
 <ul id="infoPanel">
     <li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|</li>
     <li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
-    <li class="portrait"><img height="96" width="64" src="/portrait.php?userId={EXTERNAL_ID}&size=constrain64"/></li>
+    <li class="portrait"><a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">
+		<img height="96" width="64" src="/portrait.php?userId={EXTERNAL_ID}&size=constrain64"/>
+	</a></li>
 </ul>
 <form id="search" action="/search.php" method="get">
     <fieldset>
