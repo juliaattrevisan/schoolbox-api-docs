@@ -35,6 +35,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $this->setBlock('assess', 'resumeLink', 'resumeLink_block');
         $this->setBlock('assess', 'assessLink', 'assessLink_block');
         $this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
+        $this->setBlock('assess', 'assessDue', 'assessDue_block');
 	    $this->setBlock('assess', 'studentLink', 'studentLink_block');
 
         /* Remove resumeLink by default
@@ -87,12 +88,22 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                             'ON_OFF' => $i++ % 2 ? 'dark' : '',
                         )
                     );
+
+                    // Tasks have no due date
                     if (isset($currentAssess['task_id'])) {
-                        $this->setVar('ASSESS_FINISH_DATE', '');
-                        $this->setVar('resultLink_block', '');
+                        $this->setVar('assessDue_block', '');
                     }
                     else {
+                        $this->parse('assessDue_block', 'assessDue');
+                    }
+
+                    // Only show results link if this assessment isn't a task,
+                    // and this user has write access
+                    if (!isset($currentAssess['task_id']) && $this->permission >= WRITE_ACCESS) {
                         $this->parse('resultLink_block', 'resultLink');
+                    }
+                    else {
+                        $this->setVar('resultLink_block', '');
                     }
 
                     /* Check if you have completed an assessment already
