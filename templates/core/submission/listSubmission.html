@@ -60,11 +60,11 @@ $j(function(){
             <!-- BEGIN submission_listing -->
             <tr class="{ON_OFF}">
                 <!-- BEGIN normalSubmission -->
-                <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
+                <td>{ASSDESC}</td>
                 <td>{TYPE}</td>
                 <td>
                     <!-- BEGIN writable_open -->
-                    <a href="/submission/createSubmission/modify/{ID}">{OPENDATE}</a>
+                    {OPENDATE}
                     <!-- END writable_open -->
                     <!-- BEGIN readonly_open -->
                     {OPENDATE}
@@ -72,7 +72,7 @@ $j(function(){
                 </td>
                 <td>
                     <!-- BEGIN writable_close -->
-                    <a href="/submission/createSubmission/modify/{ID}">{DUEDATE}</a>
+                    {DUEDATE}
                     <!-- END writable_close -->
                     <!-- BEGIN readonly_close -->
                     {DUEDATE}
