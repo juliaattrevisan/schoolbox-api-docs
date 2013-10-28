@@ -77,6 +77,8 @@ class Evaluation_Export_Graph {
 			 */
 			$currentResponse = $answerHandler->exportResponseToArray($currentAttempt['attempt_id'], $currentQuestion['question_id']);
 
+			unset($currentResponse['other']);
+
 			if (is_array($currentResponse)) {
 				foreach($currentResponse as $individualResponse) {
 
@@ -141,6 +143,7 @@ class Evaluation_Export_Graph {
 	 * @return array
 	 */
 	public function getSectionValues() {
+
 
 		/* Determine whether to get all sections, or just the one belonging to
 		 * the question by which to filter
@@ -236,6 +239,7 @@ class Evaluation_Export_Graph {
 				unset($this->sectionValues[$k]);
 			}
 		}
+
 
 		return $this->sectionValues;
 	}
