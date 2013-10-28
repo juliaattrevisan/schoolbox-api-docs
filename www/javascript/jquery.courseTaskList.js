@@ -93,7 +93,7 @@
         });
 
         // Delete task: "are you sure?"
-        component.delegate('.interact a.delete, .delete_task_form_container a.delete-reject', 'click.courseTaskList', {}, function(event) {
+        component.delegate('a.delete, .delete_task_form_container a.delete-reject', 'click.courseTaskList', {}, function(event) {
             event.preventDefault();
             var delete_form = $(this).closest('.task').find('.delete_task_form_container');
             delete_form.slideToggle('fast');
