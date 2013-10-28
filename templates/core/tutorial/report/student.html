@@ -42,7 +42,7 @@ $j(document).ready(function () {
 <h1>Student Report - {STUDENT}</h1>
 <span class="header_option"> <a href="/search/user/{STUDENT_ID}" class="btn"><span></span>View Student Details</a> </span>
 <form action="/modules/tutorial/report/student.php" method="get">
-  <table style="width: 650px;">
+  <table style="width: 650px;" class="table">
     <tr>
       <td>Student</td>
       <td><input class="lookup" type="text" name="keyword" value="{STUDENT}" /></td>
@@ -58,7 +58,7 @@ $j(document).ready(function () {
   </table>
 </form>
 <!-- BEGIN has_events -->
-<table cellspacing="0" class="ruler">
+<table cellspacing="0" class="ruler table">
   <!-- BEGIN class_list -->
   <tr class="obsessive">
     <td colspan="7"><h2>{TUTORIAL} - {CODE} - {TYPE} - {ATTENDANCE}%</h2>

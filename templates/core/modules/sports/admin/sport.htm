@@ -116,7 +116,7 @@
 			<span class="header_option">{NAV}</span>
 			<!-- BEGIN add_sport -->
 			<form action="sport.php" method="post" name="addsportform" id="addsportform" class="standard">
-				<table>
+				<table class="table">
 					<tr>
 						<td><h2>Name</h2></td>
 						<td><input type="text" name="title" value="" />
@@ -146,7 +146,7 @@
 			<!-- END add_sport -->
 			<!-- BEGIN add_team -->
 			<form action="sport.php" method="post" name="addteamform" id="addteamform" class="standard">
-				<table>
+				<table class="table">
 					<tr>
 						<td><h2>Name</h2></td>
 						<td><input type="text" name="team" value="" />
@@ -182,7 +182,7 @@
 			<!-- END add_team -->
 			<!-- BEGIN sports_body -->
 			<form action="sport.php" method="post" class="standard">
-				<table>
+				<table class="table">
 					<!-- BEGIN sports_list -->
 					<tr>
 						<td><b>{SPORT}</b>
@@ -199,7 +199,7 @@
 				<input type="hidden" name="flag" value="2" />
 				<input type="hidden" name="savesport" value="1" />
 				<input type="hidden" name="id" value="{ID}" />
-				<table>
+				<table class="table">
 					<tr>
 						<td colspan="5" style="text-align:right"><input type="submit" value="Save" />
 							<input type="reset" value="Cancel" />

@@ -42,7 +42,7 @@ $j(document).ready(function () {
 	<a href="/modules/tutorial/export/hours.php?from={FROM}&amp;to={TO}">Export to CSV</a>
 </span>
 <form action="/modules/tutorial/report/hours.php" method="get">
-  <table class="nowrap">
+  <table class="nowrap table">
     <tr class="pedantic">
       <td>From:</td>
       <td><input name="from" id="from" type="text" size="15" maxlength="10" value="{FROM}"/>
@@ -62,7 +62,7 @@ $j(document).ready(function () {
 </form>
 <!-- BEGIN has_events -->
 <form action="/modules/tutorial/report/hours.php" method="post">
-<table>
+<table class="table">
   <!-- BEGIN tutor_list -->
   <tr class="obsessive">
     <td colspan="11"><h2>{TUTOR_NAME}</h2>
