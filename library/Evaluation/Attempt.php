@@ -328,6 +328,8 @@ abstract class Evaluation_Attempt extends DeprecatedModel
 
 		$result = $this->db->getOne($query);
 
+		/* Null marks return 0.00 for formatting
+		 */
 		if ($result == null) {
 			return number_format(0, 2);
 		}
