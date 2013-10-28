@@ -111,22 +111,22 @@ $j(function() {
 			<h3 class="iconify stats">Server stats</h3>
 			<h4>Storage <span>{DISK_USED}/{DISK_TOTAL}</span></h4>
 			<div class="clearfix">
-				<div class="bar-holder">
+				<div class="bar-container">
 					<div class="bar">
-						<span style="width:{DISK_PERC}%"><span class="style"></span></span>
+						<span class="filled" style="width:{DISK_PERC}%"></span>
 					</div>
+					<span class="amount gradient-{DISK_GRADIENT}">{DISK_PERC}%</span>
 				</div>
-				<span class="number gradient-{DISK_GRADIENT}">{DISK_PERC}%</span>
 			</div>
 			<!-- BEGIN memory -->
 			<h4>Memory <span>{MEMORY_USED}/{MEMORY_TOTAL}</span></h4>
 			<div class="clearfix">
-				<div class="bar-holder">
+				<div class="bar-container">
 					<div class="bar">
-						<span style="width:{MEMORY_PERC}%"><span class="style"></span></span>
+						<span class="filled" style="width:{MEMORY_PERC}%"></span>
 					</div>
+					<span class="amount gradient-{MEMORY_GRADIENT}">{MEMORY_PERC}%</span>
 				</div>
-				<span class="number gradient-{MEMORY_GRADIENT}">{MEMORY_PERC}%</span>
 			</div>
 			<!-- END memory -->
 			<h4 style="margin-top:8px">Status of services</h4>

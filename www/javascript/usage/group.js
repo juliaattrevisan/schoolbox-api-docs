@@ -99,10 +99,10 @@
 
 				var html = '\
 					<div>\
-						{BAR}\
-						<p>\
+						<h4>\
 							{NAME}\
-						</p>\
+						</h4>\
+						{BAR}\
 					</div>\
 				';
 
