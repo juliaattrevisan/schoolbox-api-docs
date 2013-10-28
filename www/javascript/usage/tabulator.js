@@ -26,8 +26,8 @@
 					{column: 'name', label: 'Group'},
 					{column: 'bytes', label: 'Usage'}
 				],
-				ascendingHtml: '<img src="/images/famicons/arrow_up.png">',
-				descendingHtml: '<img src="/images/famicons/arrow_down.png">'
+				ascendingHtml:  '<img src="/images/core/tablesorter/sort-ascending.gif">',
+				descendingHtml: '<img src="/images/core/tablesorter/sort-descending.gif">'
 			}
 
 			var derived = {
@@ -154,7 +154,7 @@
 				var current = config.columns[i];
 				var indicator = makeIndicatorArrows(current.column);
 
-				thead += "<th><a class='control' rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
+				thead += "<th><a href='#' class='control' rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
 			}
 
 			return thead;
@@ -170,7 +170,7 @@
 			/* Previous Navigator
 			 */
 			if (config.index > 0) {
-				pagination += '<li><a rel="' + (config.index-1) +'">Previous</a></li>';
+				pagination += '<li><a href="#" rel="' + (config.index-1) +'">Previous</a></li>';
 			}
 
 			/* Page Navigator
@@ -182,13 +182,13 @@
 					var current = 'current';
 				}
 
-				pagination += '<li><a class="' + current + '" rel="' + i +'">' + (i+1) + '</a></li>';
+				pagination += '<li><a href="#" class="' + current + '" rel="' + i +'">' + (i+1) + '</a></li>';
 			}
 
 			/* Next Navigator
 			 */
 			if (config.index+1 < numPages) {
-				pagination += '<li><a rel="' + (config.index+1) +'">Next</a></li>';
+				pagination += '<li><a href="#" rel="' + (config.index+1) +'">Next</a></li>';
 			}
 
 			return pagination;
@@ -210,7 +210,7 @@
 					{CONTENTS}\
 					</tbody>\
 				</table>\
-				<ul class="paginator admin-nav">\
+				<ul class="foot admin-nav">\
 					{PAGINATION}\
 				</ul>\
 				<div class="clearfix"></div>\
