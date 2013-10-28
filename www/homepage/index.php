@@ -48,9 +48,8 @@ if(!$homepageHandler->getTemplate()) {
 
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\CategoryLogMapper();
-$mapper->incrementHitcount($_SESSION['id'], $categoryID);
-//$catHandler->logPageView($categoryID);
-
+$mapper->incrementHitcount($_SESSION['user'], $categoryID);
+$catHandler->logPageView($categoryID);
 
 /* BUILD PAGE */
 $this->setTitle($category['name']);
