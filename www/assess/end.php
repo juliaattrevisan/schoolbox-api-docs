@@ -17,7 +17,7 @@ $responseHandler = new Assess_Response();
 $groupHandler = new Group();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
-//    SitePage::localRedir('/assess/intro/' . $this->arg[0]);
+    SitePage::localRedir('/assess/intro/' . $this->arg[0]);
 }
 
 $assess = $assessHandler->getByID($this->arg[0]);
