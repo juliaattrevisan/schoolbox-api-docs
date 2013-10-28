@@ -258,7 +258,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
      */
     public function getTotalMarks($assess_id, $attempt_id)
     {
-        $query = "SELECT SUM(marks) AS totalMarks
+        $query = "SELECT COALESCE(SUM(marks),0) AS totalMarks
                   FROM assess_attempt
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
@@ -320,13 +320,19 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     public function getMarksForAttempt($attempt_id)
     {
         $query = "SELECT
-                      SUM(assess_response.mark) AS totalMarks
+                      COALESCE(SUM(assess_response.mark),0) AS totalMarks
                   FROM assess_attempt
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   GROUP BY assess_attempt.attempt_id";
 
-        return $this->db->getOne($query);
+		$result = $this->db->getOne($query);
+
+		if ($result == null) {
+			return number_format(0, 2);
+		}
+
+        return $result;
     }
 
     /**
