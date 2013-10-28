@@ -47,7 +47,13 @@ class Synchronise_Edumate_Tigs_Strategy_Student extends Synchronise_Edumate_Tigs
 		$newUser['campus']        = array($campus);
 		$newUser['group_id']      = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 
-		$newUser['eportfolio_enabled'] = false;
+		// Preserve ePortfolio setting for existing students.
+		if (!$this->userExists($newUser)) {
+			$newUser['eportfolio_enabled'] = false;
+		}
+		else {
+			unset($newUser['eportfolio_enabled']);
+		}
 
 		// students aren't superusers
 		//$newUser['su'] = false;
