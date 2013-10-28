@@ -86,6 +86,15 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
             );
         }
 
+		/* Always return something. If you don't, the graph won't render
+		 * axes, labels, the major/minor lines etc. It'll just be blank.
+		 * If you have no data to plot, just return an empty element.
+		 * This forces the axes to render.
+		 */
+		if (!count($this->graphData)) {
+			$this->graphData[] = array();
+		}
+
         return true;
     }
 
