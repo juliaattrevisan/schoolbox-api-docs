@@ -268,4 +268,54 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 
         $page->parse('answerOption_block', 'answerOption', true);
     }
+
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param $page
+	 * @param $attemptId
+	 * @param $currentQuestion
+	 * @return void
+	 */
+	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
+		$existing = $this->responseHandler->isResponseExists($attemptId, $currentQuestion['question_id']);
+
+		/* Removed this check because it was wrongly matching a blank saved
+		 * response with no response at all, preventing reviewed marks from
+		 * displaying properly.
+		 *
+		 * if ($existing['response'] != null) { ... } else { ... }
+		 */
+		$page->setVar(array(
+			'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+			'USER_FIRSTNAME' => $currentQuestion['firstname'],
+			'USER_LASTNAME' => $currentQuestion['lastname'],
+			'ANSWER' => Scrub::text($existing['response']),
+			'RESPONSE_ID' => $existing['response_id'],
+			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+			'REVIEWED_MARKS' => $existing['mark'],
+		));
+	}
+
+	/**
+	 * The answer for a question during horizontal marking, so it appears at the
+	 * top under the question itself, and not repeated for each attempt
+	 *
+	 * @param $page
+	 * @param $currentQuestion
+	 * @return void
+	 */
+	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+
+		/* Show correct answer
+		 */
+		$page->setVar(array(
+			'ANSWER_ID' => $currentAnswer['answer_id'],
+			'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+		));
+
+		$page->parse('answerTop_block', 'answerTop', true);
+	}
 }
