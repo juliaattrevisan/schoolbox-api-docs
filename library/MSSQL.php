@@ -448,4 +448,17 @@ class MSSQL {
 	public function quote($value) {
 		return str_replace("'", "''", $value);
 	}
+
+	/**
+	 * Check whether a db resource was spawned
+	 *
+	 * @return bool
+	 */
+	public function isConnected() {
+		if ($this->dbf !== null) {
+			return true;
+		}
+
+		return false;
+	}
 }
