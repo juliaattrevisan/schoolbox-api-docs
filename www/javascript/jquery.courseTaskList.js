@@ -66,6 +66,20 @@
             });
         });
 
+        // Set up the same resource browser as is used in the social stream.
+        var socialstream_browser = $('#socialstream-browser');
+        if (socialstream_browser.length && $.fn.socialstreamBrowser) {
+            component.delegate('form a[data-function="browse"]', 'click.courseTaskList', {}, function(event) {
+                var form = $(this).closest('form');
+                event.preventDefault();
+                socialstream_browser.socialstreamBrowser({
+                    submitCallback: function(url) {
+                        form.find('input[name="link"]').val(url);
+                    }
+                });
+            });
+        }
+
         // AJAX form submissions
         component.delegate('form.edit_task_form, form.create_task_form', 'submit.courseTaskList', {}, function(event) {
             var form = $(this);
