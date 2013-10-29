@@ -8,6 +8,7 @@
  */
 
 use Behat\Mink\Element;
+use Behat\Gherkin\Node\TableNode;
 
 class Subcontext_CourseBuilderContext extends BaseContext {
 
@@ -199,5 +200,116 @@ class Subcontext_CourseBuilderContext extends BaseContext {
             throw new Exception('Course task list component not found');
         }
         return $component;
+    }
+    
+    /**
+     * Finds the course instance component on the current homepage.
+     *
+     * @throws Exception if it isn't found
+     * @return Element\NodeElement
+     */
+    protected function findCourseInstanceComponent() {
+        $component = $this->getSession()->getPage()->find('css', '.component.course_instance');
+        if (!($component instanceof Element\NodeElement)) {
+            throw new Exception('Course instance component not found');
+        }
+        return $component;
+    }
+    
+    /**
+     * Finds a course on the page.
+     */
+    protected function findCourse($name) {
+        $component = $this->findCourseInstanceComponent();
+        foreach ($component->findAll('css', '.unit') as $unit) {
+            $unit_text = trim($unit->find('css', 'h3')->getText());
+            if ($name === $unit_text) {
+                return $unit;
+            }
+        }
+        throw new Exception('Unit "'.$name.'" not found');
+    }
+    
+    protected function findTasks(Element\NodeElement $course_element) {
+        return $course_element->findAll('css', '.task-list .unit-task');
+    }
+    
+    /**
+     * Expands a course definition.
+     * 
+     * @When /^I expand course "(?P<course>[^"]*)"$/
+     */
+    public function expandCourse($course) {
+        $course_element = $this->findCourse($course);
+        $toggler = $course_element->find('css', 'a[data-interaction="toggle-expanded"]');
+        if (!$toggler) {
+            throw new Exception('Unit "'.$course.'" toggler does not exist');
+        }
+        if ($course_element->hasClass('expanded')) {
+            throw new Exception('Unit "'.$course.'" is already expanded');
+        }
+        $this->disableAnimation();
+        $toggler->click();
+    }
+    
+    /**
+     * @Then /^course "(?P<course>[^"]*)" should have closed$/
+     */
+    public function courseShouldHaveClosed($course) {
+        $course_element = $this->findCourse($course);
+        $open_date      = $course_element->getAttribute('data-open_date');
+        $due_date       = $course_element->getAttribute('data-due_date');
+        $now            = date('Y-m-d');
+        if ($now <= $due_date) {
+            throw new Exception('Unit "'.$course.'" has not closed');
+        }
+    }
+
+    /**
+     * @Then /^course "(?P<course>[^"]*)" should still be open$/
+     */
+    public function courseShouldStillBeOpen($course) {
+        $course_element = $this->findCourse($course);
+        $open_date      = $course_element->getAttribute('data-open_date');
+        $due_date       = $course_element->getAttribute('data-due_date');
+        $now            = date('Y-m-d');
+        if ($now > $due_date) {
+            throw new Exception('Unit "'.$course.'" has closed');
+        }
+        if ($now < $open_date) {
+            throw new Exception('Unit "'.$course.'" has not opened yet');
+        }
+    }
+
+    /**
+     * @Then /^course "(?P<course>[^"]*)" should not be open yet$/
+     */
+    public function courseShouldNotBeOpenYet($course) {
+        $course_element = $this->findCourse($course);
+        $open_date      = $course_element->getAttribute('data-open_date');
+        $due_date       = $course_element->getAttribute('data-due_date');
+        $now            = date('Y-m-d');
+        if ($now >= $open_date) {
+            throw new Exception('Unit "'.$course.'" has opened');
+        }
+    }
+
+    /**
+     * @Then /^course "(?P<course>[^"]*)" should have tasks:$/
+     */
+    public function courseShouldHaveTasks($course, TableNode $table) {
+        $course_element = $this->findCourse($course);
+        $task_list      = $this->findTasks($course_element);
+        $expected_tasks = $table->getHash();
+        if (($actual_count = count($task_list)) !== ($expected_count = count($expected_tasks))) {
+            throw new Exception("Actual task count of $actual_count does not match expected count of $expected_count");
+        }
+        foreach ($task_list as $i => $task) {
+            $actual_name   = trim($task->find('css', 'h4')->getText());
+            $expected_name = trim($expected_tasks[$i]['name']);
+            if ($actual_name !== $expected_name) {
+                throw new Exception("Task $i \"$actual_name\" is different to expected \"$expected_name\"");
+            }
+        }
     }
 }

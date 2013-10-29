@@ -34,6 +34,14 @@ class InstanceCompletion {
     protected $student;
 
     /**
+     * The user who created this completion record, as opposed to the student
+     * who it is for.
+     *
+     * @var User
+     */
+    protected $marking_user;
+
+    /**
      * @var Alaress_Date_Format
      */
     protected $completion_date;
@@ -105,6 +113,22 @@ class InstanceCompletion {
      */
     public function getStudent() {
         return $this->student;
+    }
+
+    /**
+     * @param  \Schoolbox\User $marker
+     * @return $this
+     */
+    public function setMarkingUser($marker) {
+        $this->marking_user = $marker;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\User
+     */
+    public function getMarkingUser() {
+        return $this->marking_user;
     }
 
     /**

@@ -175,13 +175,16 @@
                     <!-- END unit_task -->
                 </ul>
 
-                <!-- BEGIN unit_actions -->
                 <p class="interact clear add_buttons">
+                    <!-- BEGIN unit_report_actions -->
+                    <a href="/task/progressReport/{ID}/{UNIT_ID}" class="btn modify"><span></span>Task Progress Report</a>
+                    <!-- END unit_report_actions -->
+                    <!-- BEGIN unit_add_task_actions -->
                     <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="btn up-arrow" data-form_class="for_due_work"><span></span>Add Due Work</a>
                     <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="btn create" data-form_class="for_assessment"><span></span>Add Assessment</a>
                     <a href="/task/createInstance/{UNIT_ID}" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
+                    <!-- END unit_add_task_actions -->
                 </p>
-                <!-- END unit_actions -->
 
                 <!-- This is the form for inline creation of tasks -->
                 <div class="clear form_container for_task hide">

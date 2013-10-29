@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course\Task;
 
 use Alaress_Date_Format;
+use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -33,6 +34,11 @@ class Instance implements ISoftDeletable {
      * @var UnitInstance
      */
     protected $unit_instance;
+
+    /**
+     * @var Collection|InstanceCompletion[]
+     */
+    protected $completion_list;
 
     /**
      * @var string
@@ -78,6 +84,10 @@ class Instance implements ISoftDeletable {
      * @var Alaress_Date_Format
      */
     protected $deleted;
+
+    public function __construct() {
+        $this->completion_list = new Collection();
+    }
 
     /**
      * @param  \Schoolbox\Assessment\Course\Task $task
@@ -269,6 +279,22 @@ class Instance implements ISoftDeletable {
      */
     public function getOwner() {
         return $this->owner;
+    }
+
+    /**
+     * @param  InstanceCompletion[]|Collection $completion_list
+     * @return $this
+     */
+    public function setCompletionList($completion_list) {
+        $this->completion_list = $completion_list;
+        return $this;
+    }
+
+    /**
+     * @return InstanceCompletion[]|Collection
+     */
+    public function getCompletionList() {
+        return $this->completion_list;
     }
 
     /**

@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Task;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 
 class InstanceCompletionMapper extends Mapper {
 
@@ -36,6 +37,12 @@ class InstanceCompletionMapper extends Mapper {
             'join'       => 'student',
         ));
         $this->hasMap(array(
+            'column'     => 'marking_user_id',
+            'property'   => 'markingUser',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'marking_user',
+        ));
+        $this->hasMap(array(
             'column'     => 'completion_date',
             'property'   => 'completionDate',
             'type'       => self::TYPE_DATETIME,
@@ -56,6 +63,12 @@ class InstanceCompletionMapper extends Mapper {
             'this_key'  => 'student_id',
             'other_key' => 'id',
         ));
+        $this->hasJoin('marking_user', array(
+            'mapper'    => 'Schoolbox\\UserMapper',
+            'this_key'  => 'marking_user_id',
+            'other_key' => 'id',
+        ));
+        $this->registerCallback('preSave', array($this, 'preSave'));
     }
 
     /**
@@ -103,6 +116,23 @@ class InstanceCompletionMapper extends Mapper {
     }
 
     /**
+     * Retrieves most recent completion for $student_id on $task_instance_id.
+     *
+     * @param int $task_instance_id
+     * @param int $student_id
+     *
+     * @return InstanceCompletion
+     * @throws Mapper\Exception if no completion was found.
+     */
+    public function findLatestForTaskAndStudent($task_instance_id, $student_id) {
+        $list = $this->findLatestForList(array($task_instance_id), $student_id);
+        if ($list->count() === 0) {
+            throw new Mapper\Exception('Instance of object not found');
+        }
+        return $list->first();
+    }
+
+    /**
      * Retrieves the most recent completions for each task instance in
      * $task_instance_id_list.
      *
@@ -145,5 +175,17 @@ class InstanceCompletionMapper extends Mapper {
         $statement->execute($params);
 
         return $this->hydrateList($statement, 'ti');
+    }
+
+    /**
+     * Pre-save method for saving an instance completion object - saves the
+     * marking user if this is a new object.
+     *
+     * @param InstanceCompletion $object
+     */
+    public function preSave(InstanceCompletion $object) {
+        if (!$object->getId() && $_SESSION['user'] instanceof User) {
+            $object->setMarkingUser($_SESSION['user']);
+        }
     }
 }

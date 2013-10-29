@@ -1,6 +1,12 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+
 $page = new SitePage;
 $returnHandler = new SubmissionReturn;
 $subHandler = new Submission();
@@ -113,46 +119,61 @@ else {
  * @return bool
  */
 function saveReturn($return, $rubric = null, $file = null) {
-    $rubric_handler = new DueWork_Rubric_Handler();
-    $return_handler = new SubmissionReturn();
-    $box_id         = $return['box_id'];
-    $student_id     = $return['owner'];
-    $result         = $return_handler->getByUser($student_id, $box_id, 1);
+    $return_mapper   = ReturnedWorkMapper::getInstance();
+    $returned_work   = new ReturnedWork();
+    $box_id          = $return['box_id'];
+    $student_id      = $return['owner'];
+    $update_existing = false;
+    try {
+        /** @var ReturnedWork $returned_work */
+        $returned_work = $return_mapper->findOneByColumnList(
+            array('owner' => $student_id, 'box_id' => $box_id,),
+            array('returned' => 'desc')
+        );
 
-    $success = false;
-    if (is_array($result)) {
-        $return_time = new Alaress_Date_Format($result[0]['returned'], 'y-m-d h:i:s');
+        // Is this outside of the update window? if so, create a new one.
+        $return_time = $returned_work->getReturned();
         $window_ago  = new Alaress_Date_Format(time() - update_window, 'U');
-
-        // is this submission within the window?
         if ($return_time->getUnixTimestamp() < $window_ago->getUnixTimestamp()) {
-            // outside window: create new
-            $success = $return_handler->create($return, $file);
-            if ($rubric) {
-                $rubric_handler->saveMarks($rubric, $student_id, $box_id);
-            }
+            $returned_work = new ReturnedWork();
         }
         else {
-            // inside window: update exising
-            $return['id'] = $result[0]['id'];
-            //
-            // Is there a file? Update it with the most recent mark.
-            $success = $return_handler->update($return, $file);
-            if ($rubric) {
-                $stamp = $rubric_handler->getLatestMarkTimestamp($_POST['uid'], $_POST['box_id']);
-                // if a valid timestamp is found, update, otherwise, create a new one (selfcontained logic)
-                $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
-            }
+            $update_existing = true;
         }
     }
-    else {
-        // no previous submission
-        $success = $return_handler->create($return, $file);
-        if ($rubric) {
-            $rubric_handler->saveMarks($rubric, $student_id, $box_id);
-        }
+    catch (\Schoolbox\Mapper\Exception $e) {}
+    if (!$update_existing) {
+        $returned_work
+            ->setOwner(UserMapper::getInstance()->findById($student_id))
+            ->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($box_id))
+            ->setReturned(new Alaress_Date_Format(new DateTime('now')))
+        ;
     }
-    return $success;
+    $returned_work
+        ->setComment($return['comment'])
+        ->setMark($return['mark'])
+        ->setNormalizedMark($return['norm_mark'])
+    ;
+    // Is there a file? If so, upload it.
+    if (!empty($file)) {
+        $returned_work
+            ->setFilename($file['name'])
+            ->setTempLocation($file['tmp_name'])
+        ;
+    }
+    $return_mapper->save($returned_work);
+
+    // Rubrics have no mappers yet, so handle them the old-fashioned way.
+    $return_id = $returned_work->getId();
+    if (!empty($return_id) && $rubric) {
+        $rubric_handler = new DueWork_Rubric_Handler();
+        $stamp          = null;
+        if ($update_existing) {
+            $stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
+        }
+        $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
+    }
+    return !empty($return_id);
 }
 
 /**

@@ -1,0 +1,170 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    (function($) {
+        $(function(){
+
+            // Semester selector:
+            // hides unit selectors that aren't for this semester.
+            $('select[data-interaction="select_semester"]').bind('change', function(event) {
+                var element = $(this);
+                var form    = element.closest('form');
+                var this_semester  = element.val();
+                var unit_selectors = form.find('select[data-interaction="select_unit"]');
+                var filter         = function() {
+                    return $(this).data('semester') === this_semester;
+                }
+                unit_selectors.not(filter).prop('disabled', true).hide();
+                unit_selectors.filter(filter).prop('disabled', false).show();
+            }).change();
+
+            // Previous/next semester selector
+            $('a[data-interaction="select_semester_prev"], a[data-interaction="select_semester_next"]').bind('click', function(event) {
+                event.preventDefault();
+                var element  = $(this);
+                var selector = element.closest('form').find('select[data-interaction="select_semester"]');
+                var current  = selector.find('option:selected');
+                var option   = (element.data('interaction') === 'select_semester_prev') ?
+                    current.prev():
+                    current.next();
+                if (option.length) {
+                    option.prop('selected', true);
+                    selector.change();
+                }
+            });
+
+            // Unit selector: on choosing a unit, jump to that unit
+            $('select[data-interaction="select_unit"]').bind('change', function(event) {
+                $(this).closest('form').submit();
+            });
+
+            // Save form for updating a student's progress
+            $('select[data-interaction="update_progress"]').bind('change', function(event) {
+                var element = $(this);
+                var form    = element.closest('form');
+                $.post(
+                    form.attr('action'),
+                    form.serialize(),
+                    function() {
+                        // Update something.
+                        // I guess add the same class the update submission has.
+                        element.addClass('ajax-updated');
+                        setTimeout(function() {
+                            element.removeClass('ajax-updated');
+                        }, 1000)
+                    },
+                    'json'
+                )
+            })
+        });
+    })(jQuery);
+</script>
+<!-- END custom_head -->
+
+<h1>Unit Progress Report – {CATEGORY}</h1>
+
+<form action="/task/progressReport/" method="get">
+    <input type="hidden" name="category_id" value="{CATEGORY_ID}" />
+    <a data-interaction="select_semester_prev" href="#">‹</a>
+    <select id="semester" data-interaction="select_semester">
+        <!-- BEGIN unit_selector_semester -->
+        <option value="{UNIT_SELECTOR_SEMESTER_SEMESTER}/{UNIT_SELECTOR_SEMESTER_YEAR}" label="Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}" {UNIT_SELECTOR_SEMESTER_SELECTED}>
+            Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}
+        </option>
+        <!-- END unit_selector_semester -->
+    </select>
+    <a data-interaction="select_semester_next" href="#">›</a>
+
+    <!-- BEGIN unit_selector_semester_unit_list -->
+    <select name="unit_id" class="hide" data-interaction="select_unit" data-semester="{UNIT_SELECTOR_UNIT_SEMESTER}/{UNIT_SELECTOR_UNIT_YEAR}">
+        <option disabled label="Select a unit">Select a unit</option>
+        <!-- BEGIN unit_selector_unit -->
+        <option label="{UNIT_SELECTOR_UNIT_NAME}" value="{UNIT_SELECTOR_UNIT_ID}" {UNIT_SELECTOR_UNIT_SELECTED}>
+            {UNIT_SELECTOR_UNIT_NAME}
+        </option>
+        <!-- END unit_selector_unit -->
+    </select>
+    <!-- END unit_selector_semester_unit_list -->
+
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <!-- BEGIN subheader_unit -->
+            <!-- BEGIN subheader_unit_task -->
+            <th>
+                <!-- BEGIN subheader_unit_task_submission_link -->
+                <a href="/submission/viewSubmission/{SUBHEADER_UNIT_TASK_SUBMISSION_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
+                <!-- END subheader_unit_task_submission_link -->
+                <!-- BEGIN subheader_unit_task_assess_link -->
+                <a href="/assess/results/{SUBHEADER_UNIT_TASK_ASSESS_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
+                <!-- END subheader_unit_task_assess_link -->
+                <!-- BEGIN subheader_unit_task_no_link -->
+                {SUBHEADER_UNIT_TASK_NAME}
+                <!-- END subheader_unit_task_no_link -->
+            </th>
+            <!-- END subheader_unit_task -->
+            <!-- END subheader_unit -->
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN student -->
+        <tr>
+            <td>
+                <img height="32" width="32" src="/portrait.php?userId={STUDENT_SYNERGY_ID}&amp;size=square32">
+                <a href="/search/user/{STUDENT_ID}" title="{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}">
+                    {STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
+                </a>
+            </td>
+            <!-- BEGIN student_unit -->
+            <!-- BEGIN student_unit_task -->
+            <td>
+                <!-- BEGIN student_unit_task_check -->
+                    <form action="/task/progressForm.php" method="POST">
+                        <input type="hidden" name="student_id" value="{STUDENT_ID}" />
+                        <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
+                        <select name="status" data-interaction="update_progress">
+                            <!-- BEGIN student_unit_task_check_status -->
+                            <option label="{STUDENT_UNIT_TASK_STATUS_TEXT}" value="{STUDENT_UNIT_TASK_STATUS_VALUE}" {STUDENT_UNIT_TASK_STATUS_SELECTED}>{STUDENT_UNIT_TASK_STATUS_TEXT}</option>
+                            <!-- END student_unit_task_check_status -->
+                        </select>
+                    </form>
+                <!-- END student_unit_task_check -->
+
+                <!-- BEGIN student_unit_task_submission_box -->
+                    <!-- BEGIN student_unit_task_submission_box_mark -->
+                        <span class="gradient-{STUDENT_UNIT_TASK_SUBMISSION_GRADIENT}">
+                            {STUDENT_UNIT_TASK_SUBMISSION_MARK}
+                        </span>
+                    <!-- END student_unit_task_submission_box_mark -->
+                    <!-- BEGIN student_unit_task_submission_box_no_mark -->
+                        -
+                    <!-- END student_unit_task_submission_box_no_mark -->
+                    <a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/"
+                       class="btn go-to no-text"
+                       title="View submission history for this student"
+                    ><span></span></a>
+                <!-- END student_unit_task_submission_box -->
+
+                <!-- BEGIN student_unit_task_online_assess -->
+                    <!-- BEGIN student_unit_task_online_assess_mark -->
+                        <span class="gradient-{STUDENT_UNIT_TASK_ASSESS_GRADIENT}">
+                            {STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS} / {STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS}
+                        </span>
+                        <a href="/assess/review/{STUDENT_UNIT_TASK_ASSESS_ID}/{STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID}/{STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID}/"
+                           class="btn go-to no-text"
+                           title="Review assessment for this student"
+                        ><span></span></a>
+                    <!-- END student_unit_task_online_assess_mark -->
+                    <!-- BEGIN student_unit_task_online_assess_no_mark -->
+                        -
+                    <!-- END student_unit_task_online_assess_no_mark -->
+                <!-- END student_unit_task_online_assess -->
+            </td>
+            <!-- END student_unit_task -->
+            <!-- END student_unit -->
+        </tr>
+        <!-- END student -->
+    </tbody>
+</table>

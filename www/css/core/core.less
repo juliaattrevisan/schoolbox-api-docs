@@ -1126,6 +1126,44 @@ Notifications
     }
 }
 
+// Course outline forms
+.course_instance {
+    h3, h4 {
+        float: none;
+    }
+    .task-list h4 {
+        width: auto;
+    }
+    .unit-completion {
+        display: inline-block;
+    }
+    .information-list {
+        .no-expand {
+            padding-left: 15px;
+        }
+        .expand-link {
+            text-decoration: none;
+        }
+        .expand-button {
+            line-height: 11px;
+            width: 11px;
+            min-height: 11px;
+            margin-right: 4px;
+            display: inline-block;
+            background-color: transparent;
+            background-position-x: -2px;
+            background-position-y: -6px;
+            background-repeat: no-repeat;
+        }
+        .unit.collapsed .expand-button {
+            background-image: url(/images/tree/elbow-collapsed.gif);
+        }
+        .unit.expanded  .expand-button {
+            background-image: url(/images/tree/elbow-expanded.gif);
+        }
+    }
+}
+
 /*--------------------------------------------------------------
  Information List - Displays summary info with minimal actions
 --------------------------------------------------------------*/
@@ -1791,6 +1829,12 @@ label {
     }
 }
 
+// Why not have border transitions on all form elements?
+input, select, textarea {
+    -webkit-transition: border-color 0.2s linear;
+    transition: border-color 0.2s linear;
+}
+
 .formLabelWidth {
     width: 250px;
 }
@@ -1907,6 +1951,11 @@ select.small, input.small {
 
 input.timeField {
     width: 30px;
+}
+
+// Class for AJAX updated form elements
+.ajax-updated {
+    border-color: #080 !important;
 }
 
 .btn, .submit-btn-plain {
@@ -6707,7 +6756,6 @@ table.subjectList {
                 }
                 input, select {
                     border: solid 1px @std-grey;
-                    -webkit-transition: border-color 0.2s linear;
                 }
             }
             &.submission.file {

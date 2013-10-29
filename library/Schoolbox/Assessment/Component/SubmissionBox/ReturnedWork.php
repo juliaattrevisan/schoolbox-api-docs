@@ -79,6 +79,11 @@ class ReturnedWork {
 	protected $config_loader;
 
 	/**
+	 * @var MimetypeMapper
+	 */
+	protected $mimetype_loader;
+
+	/**
 	 * Creates object and sets up related objects.
 	 */
 	public function __construct() {
@@ -338,4 +343,38 @@ class ReturnedWork {
 		return $this->mimetype;
 	}
 
+
+	// File related methods
+
+	/**
+	 * @param  string $temp_location
+	 * @return $this
+	 */
+	public function setTempLocation($temp_location) {
+		$this->temp_location = $temp_location;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTempLocation() {
+		return $this->temp_location;
+	}
+
+	/**
+	 * Copies file from its temp location to permanent upload location.
+	 *
+	 * @todo Traits would be great here.
+	 *
+	 * @return bool
+	 */
+	public function copyFromTempLocation() {
+		$temp_location = $this->getTempLocation();
+		$file_location = $this->getFileLocation();
+		if (file_exists($temp_location) && $file_location) {
+			return copy($temp_location, $file_location);
+		}
+		return false;
+	}
 }

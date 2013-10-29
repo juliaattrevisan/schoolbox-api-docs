@@ -112,83 +112,118 @@ Scenario: Create a course
   And   I check "accept_submission"
   And   I press "Create"
 
-@use-course
+@add-course
 Scenario: Add a course to a class
   Given I do not wipe the slate clean
   And   I go to homepage
   And   I log in as "cglenn" with password "password"
   # Test adding this new course to a group page. Students should be able to take this course.
   When  I follow "Duke of Edinburgh"
-  And   I add component "Learning:Course Outline"
-  And   I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
-  And   I wait for a "form#importForm" element
-  # Set due dates for units
-  When  I set open date for course unit "Chemical reactions" as "today 12:00am"
-  And   I set due date for course unit "Chemical reactions" as "+9 days 12:00am"
-  # Let's say this unit was due in the past. For now, that's acceptable.
-  And   I set open date for course unit "Atomic structure and bonding" as "today -9 days 12:00am"
-  And   I set due date for course unit "Atomic structure and bonding" as "yesterday 12:00am"
-  And   I set open date for course unit "Macroscopic properties of matter" as "today +10 days 12:00am"
-  And   I set due date for course unit "Macroscopic properties of matter" as "today +19 days 12:00am"
-  And   I press "Import"
-  # Everything should be imported as if by magic
+#  And   I add component "Learning:Course Outline"
+#  And   I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
+#  And   I wait for a "form#importForm" element
+#  # Set due dates for units
+#  When  I set open date for course unit "Chemical reactions" as "today 12:00am"
+#  And   I set due date for course unit "Chemical reactions" as "+9 days 12:00am"
+#  # Let's say this unit was due in the past. For now, that's acceptable.
+#  And   I set open date for course unit "Atomic structure and bonding" as "today -9 days 12:00am"
+#  And   I set due date for course unit "Atomic structure and bonding" as "yesterday 12:00am"
+#  And   I set open date for course unit "Macroscopic properties of matter" as "today +10 days 12:00am"
+#  And   I set due date for course unit "Macroscopic properties of matter" as "today +19 days 12:00am"
+#  And   I press "Import"
+  # Everything should be imported as if by magic.
+  # Atomic Structure: closed, should have "Read c4, attend lab, dumb work for bonding"
+  Then  title should contain "Duke of Edinburgh"
+  When  I expand course "Atomic structure and bonding"
+  And   I expand course "Macroscopic properties of matter"
+  Then  course "Atomic structure and bonding" should have closed
+  And   course "Atomic structure and bonding" should have tasks:
+        | name                      |
+        | Read chapter 4            |
+        | Attend a laboratory       |
+        | Dumb Due Work for bonding |
+  And   course "Chemical reactions" should still be open
+  And   course "Chemical reactions" should have tasks:
+        | name                 |
+        | Visit this link      |
+        | Chemical Reactions 1 |
+        | Dumb Due Work        |
+        | Offline Due Work     |
+        | Read Chapter 3       |
+        | Attend 3 classes     |
+  And   course "Macroscopic properties of matter" should not be open yet
+  And   course "Macroscopic properties of matter" should have tasks:
+        | name            |
+        | Read chapter 5  |
+        | Dumb Due Work 2 |
+  # Check that files and rubrics are preserved in due work items (if I can even upload files using test driver!)
+  When  I modify task "Dumb Due Work" in "Chemical reactions"
+  Then  marktype "Rubric" should be selected
+  And   5-level result set should be selected
+  And   the following rubric criteria should be selected:
+        | name                  |
+        | Boringness:Blandness  |
+        | Boringness:Mediocrity |
+        | Boringness:Dullness   |
 
-#Scenario: Be a student in a course
-#  Given I log in as "sberryhill" with password "password"
-#  Then  I follow link "Duke of Edinburgh"
-#  Then  I should see the current unit "Chemical Reactions"
-#  And   I should see past unit "Atomic Structure and bonding"
-#  And   I should see future unit "Macroscopic properties of matter"
-#
-#  # Check task completion - nothing yet
-#  And   the task "Visit this link" in "Chemical Reactions" should not be complete
-#  And   the task "Read chapter 3" in "Chemical Reactions" should not be complete
-#  And   the task "Attend 3 classes" in "Chemical Reactions" should not be complete
-#  And   the task "Chemical Reactions 1" in "Chemical Reactions" should not be complete
-#  And   the task "Dumb Due Work" in "Chemical Reactions" should not be complete
-#  And   the task "Offline Due Work" in "Chemical Reactions" should not be complete
-#
-#  # What tasks are completable?
-#  And   I should be able to start task "Visit this link" in "Chemical Reactions"
-#  And   I should be able to start task "Read chapter 3" in "Chemical Reactions"
-#  And   I should not be able to start task "Attend 3 classes" in "Chemical Reactions"
-#  And   I should be able to start task "Chemical Reactions 1" in "Chemical Reactions"
-#  And   I should be able to start task "Dumb Due Work" in "Chemical Reactions"
-#  And   I should not be able to start task "Offline Due Work" in "Chemical Reactions"
-#
-#  # Now I do some tasks in the Chemical Reactions unit
-#  When  I start the task "Visit this link" in "Chemical Reactions"
-#  And   I move backward one page
-#  Then  the task "Visit this link" in "Chemical Reactions" should be complete
-#
-#  # Complete the chapter
-#  When  I start the task "Read chapter 3" in "Chemical Reactions"
-#  And   I reload the page
-#  Then  the task "Read chapter 3" in "Chemical Reactions" should be complete
-#
-#  # Complete the online assessment
-#  When  I start the task "Chemical Reactions 1" in "Chemical Reactions"
-#  # Ideally, we could figure out a way to shortcut writing of online assessment behaviors
-#  And   I start the assessment
-#  And   I choose answer "Answer 1" for "Choose the correct answer" in "Section 1"
-#  And   I finish the assessment
-#  And   I return to the homepage
-#  Then  the task "Chemical Reactions 1" in "Chemical Reactions" should be complete
-#
-#  # Complete the due work
-#  When  I start the task "Dumb Due Work" in "Chemical Reactions"
-#  And   I attach the file "test.txt" to "file"
-#  And   I press "Submit"
-#  And   I follow link "Duke of Edinburgh"
-#  Then  the task "Dumb Due Work" in "Chemical Reactions" should be complete
-#
-#  # Can't complete any items in tasks in past or future
-#  And   I should not be able to start task "Read chapter 4" in "Atomic structure and bonding"
-#  And   I should not be able to start task "Attend a laboratory" in "Atomic structure and bonding"
-#  And   I should not be able to start task "Dumb Due Work for bonding" in "Atomic structure and bonding"
-#  And   I should not be able to start task "Read chapter 5" in "Macroscopic properties of matter"
-#  And   I should not be able to start task "Dumb Due Work 2" in "Macroscopic properties of matter"
-#
+@use-course
+Scenario: Be a student in a course
+  Given I continue from last scenario
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+
+  # Check task completion - nothing yet
+  When  I follow "Duke of Edinburgh"
+  Then  I should see the current unit "Chemical Reactions"
+  And   I should see past unit "Atomic Structure and bonding"
+  And   I should see future unit "Macroscopic properties of matter"
+  And   the task "Visit this link" in "Chemical Reactions" should not be complete
+  And   the task "Read chapter 3" in "Chemical Reactions" should not be complete
+  And   the task "Attend 3 classes" in "Chemical Reactions" should not be complete
+  And   the task "Chemical Reactions 1" in "Chemical Reactions" should not be complete
+  And   the task "Dumb Due Work" in "Chemical Reactions" should not be complete
+  And   the task "Offline Due Work" in "Chemical Reactions" should not be complete
+
+  # Now I do some tasks in the Chemical Reactions unit
+  When  I start the task "Visit this link" in "Chemical Reactions"
+  And   I move backward one page
+  Then  the task "Visit this link" in "Chemical Reactions" should be complete
+
+  # Complete the chapter
+  When  I start the task "Read chapter 3" in "Chemical Reactions"
+  And   I reload the page
+  Then  the task "Read chapter 3" in "Chemical Reactions" should be complete
+
+  # Complete the task for attending classes - it will be marked as pending.
+  When  I start the task "Read chapter 3" in "Chemical Reactions"
+  And   I reload the page
+  Then  the task "Read chapter 3" in "Chemical Reactions" should be pending
+
+  # Complete the online assessment
+  When  I start the task "Chemical Reactions 1" in "Chemical Reactions"
+  # Ideally, we could figure out a way to shortcut writing of online assessment behaviors
+  And   I start the assessment
+  And   I choose answer "Answer 1" for "Choose the correct answer" in "Section 1"
+  And   I finish the assessment
+  And   I return to the homepage
+  Then  the task "Chemical Reactions 1" in "Chemical Reactions" should be complete
+
+  # Complete the due work
+  When  I start the task "Dumb Due Work" in "Chemical Reactions"
+  And   I attach the file "test.txt" to "file"
+  And   I press "Submit"
+  And   I follow link "Duke of Edinburgh"
+  Then  the task "Dumb Due Work" in "Chemical Reactions" should be complete
+
+  # Can't complete any items in tasks in past
+  And   I should not be able to start task "Read chapter 4" in "Atomic structure and bonding"
+  And   I should not be able to start task "Attend a laboratory" in "Atomic structure and bonding"
+
+  # Items in future should not even be visible yet
+  And   I should not be able to start task "Dumb Due Work for bonding" in "Atomic structure and bonding"
+  And   I should not be able to start task "Read chapter 5" in "Macroscopic properties of matter"
+  And   I should not be able to start task "Dumb Due Work 2" in "Macroscopic properties of matter"
+
 #Scenario: Mark a student's tasks as complete
 #  Given I log in as "cglenn" with password "password"
 #  Then  I follow link "Duke of Edinburgh"
