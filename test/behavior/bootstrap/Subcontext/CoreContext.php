@@ -348,4 +348,17 @@ class Subcontext_CoreContext extends BaseContext {
 //        $this->getSession()->switchToIFrame(null);
         return;
     }
+    
+    /**
+     * Asserts that title matches a given pattern.
+     *
+     * @Then /^(?:|I ) should see title containing "(?P<title>(?:[^"]|\\")*)"$/
+     * @Then /^title should contain "(?P<title>(?:[^"]|\\")*)"$/
+     */
+    public function assertTitle($title) {
+        $actual_title = $this->getSession()->getPage()->find('xpath', '/head/title');
+        if (strpos($actual_title->getText(), $title) === 0) {
+            throw new Exception('Title did not match');
+        }
+    }
 }
