@@ -300,5 +300,16 @@ class Subcontext_CourseBuilderContext extends BaseContext {
     public function courseShouldHaveTasks($course, TableNode $table) {
         $course_element = $this->findCourse($course);
         $task_list      = $this->findTasks($course_element);
+        $expected_tasks = $table->getHash();
+        if (($actual_count = count($task_list)) !== ($expected_count = count($expected_tasks))) {
+            throw new Exception("Actual task count of $actual_count does not match expected count of $expected_count");
+        }
+        foreach ($task_list as $i => $task) {
+            $actual_name   = trim($task->find('css', 'h4')->getText());
+            $expected_name = trim($expected_tasks[$i]['name']);
+            if ($actual_name !== $expected_name) {
+                throw new Exception("Task $i \"$actual_name\" is different to expected \"$expected_name\"");
+            }
+        }
     }
 }
