@@ -10,8 +10,32 @@
 
 class External_SchoolPro_Timetable {
 
-//	public function getTimetableDefinition ($campusId, $day=0);
-//
+	/**
+	 * Get a timetable definition
+	 *
+	 * @param $campusId
+	 * @param int $day
+	 */
+	public function getTimetableDefinition($campusId, $day=0) {
+		$vars = array(
+			'sbGetDayNumber',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pCampusID', $campusId, SQLINT4, false, false, -1),
+			)
+		);
+
+		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		new \Alaress_Probe($result);
+
+		if ($result['success']) {
+		}
+		else {
+		}
+	}
+
 	/**
 	 * Get a day number
 	 *
@@ -39,6 +63,11 @@ class External_SchoolPro_Timetable {
 		}
 	}
 
+	/**
+	 * Get period number for a particular campus
+	 *
+	 * @param $campusId
+	 */
 	public function getPeriodNumber($campusId) {
 		$vars = array(
 			'sbGetDayNumber',
