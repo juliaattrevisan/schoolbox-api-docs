@@ -106,11 +106,11 @@ class API extends Generic\API {
 
 		foreach($subjectCollection as $subject) {
 
-			/** @var $subject Category */
 			$subject = $this->appendTeacherData($subject);
 
 			// if session user has >= read access to the subject, keep the subject id
-			if($groupHandler->getPermission($subject->getId(), $sessionUser->getId()) < READ_ACCESS) {
+			// ($subject is an array, not a category or other model object. Should it be?)
+			if($groupHandler->getPermission($subject['id'], $sessionUser->getId()) < READ_ACCESS) {
 				unset($subject['id']);
 			}
 			$subjects[] = $subject;
