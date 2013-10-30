@@ -187,17 +187,16 @@ class External_SchoolPro_User implements External_UserInterface {
 	}
 
 	/**
-	 * Get a list of subjects for a particular usr?
+	 * Get a list of subjects for a particular user
 	 *
 	 * @param $externalUserId
 	 * @param $userId
+	 * @return array|bool
 	 */
 	public function getSubjectList($externalUserId, $userId) {
-		$userMapper = new Schoolbox\UserMapper();
+		$groupHandler = new Group();
 
-		$user = $userMapper->findById($userId);
-
-		if ($user->isStudent()) {
+		if ($groupHandler->isStudent($userId)) {
 			$vars = array(
 				'sbGetStudentSubjectList',
 				array(
@@ -206,8 +205,27 @@ class External_SchoolPro_User implements External_UserInterface {
 					array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
 				)
 			);
+
+			$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+			if ($result['success'] && count($result['result'])) {
+				$subjectList = array();
+
+				foreach($result['result'] as $currentSubject) {
+					$subject = array(
+						'code' => $currentSubject['ClassID'],
+						'name' => $currentSubject['ItemName']
+					);
+
+					$subjectList[] = $subject;
+				}
+
+				return $subjectList;
+			}
 		}
-		else if ($user->isStaff()) {
+		/* Otherwise assume staff
+		 */
+		else {
 			$vars = array(
 				'sbGetStaffSubjectList',
 				array(
@@ -216,16 +234,29 @@ class External_SchoolPro_User implements External_UserInterface {
 					array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
 				)
 			);
+
+			$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+			if ($result['success'] && count($result['result'])) {
+				$subjectList = array();
+
+				/* TODO: Make stored proc consistent with the StudentSubjectList one
+				 * Have to confer with Scoolpro to do that.
+				 */
+				foreach($result['result'] as $currentSubject) {
+					$subject = array(
+						'code' => $currentSubject['ID'],
+						'name' => $currentSubject['ItemName']
+					);
+
+					$subjectList[] = $subject;
+				}
+
+				return $subjectList;
+			}
 		}
 
-		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-
-		new \Alaress_Probe($result);
-
-		if ($result['success']) {
-		}
-		else {
-		}
+		return false;
 	}
 
 	/**
