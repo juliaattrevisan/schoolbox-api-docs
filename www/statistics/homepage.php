@@ -11,7 +11,6 @@ if(isset($_GET['date_start']) && isset($_GET['date_end']) && isset($_GET['drop']
     $this->localRedir('/'. implode('/', $_GET));
 }
 
-
 $groupID = $_SESSION['gid'];
 $catHandler = new Category();
 
