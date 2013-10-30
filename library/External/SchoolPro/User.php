@@ -260,8 +260,9 @@ class External_SchoolPro_User implements External_UserInterface {
 	}
 
 	/**
+	 * TODO: What is a RelationSchoolNum? Why does it always return 357?
+	 *
 	 * Get a list of enrolled students
-	 * (What is a RelationSchoolNum?)
 	 *
 	 * @param $synergyID
 	 */
