@@ -55,9 +55,14 @@ class External_SchoolPro_Class implements External_ClassInterface {
 	/**
 	 * Get the class' teacher's name
 	 *
+	 * Wait, what - it returns a list of unique teacher externalIds...?
+	 *
 	 * @param $classCode
+	 * @return array|bool
 	 */
 	public function getTeacherName($classCode) {
+		$allTeachers = array();
+
 		$vars = array(
 			'sbGetTeacherName',
 			array(
@@ -69,11 +74,12 @@ class External_SchoolPro_Class implements External_ClassInterface {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		new \Alaress_Probe($result);
+		if ($result['success'] && count($result['result'])) {
+			foreach($result['result'] as $currentTeacher) {
+				$allTeachers[] = $currentTeacher['ID'];
+			}
+		}
 
-		if ($result['success']) {
-		}
-		else {
-		}
+		return $allTeachers;
 	}
 } 
