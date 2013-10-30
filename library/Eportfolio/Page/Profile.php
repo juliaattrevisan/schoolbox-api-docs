@@ -51,6 +51,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+		$this->getPage()->setTab('ePortfolio');
 
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_subjects', 'has_subjects_block');
 		$this->getPage()->setBlock('has_subjects', 'subject', 'subject_block');

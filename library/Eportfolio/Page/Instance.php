@@ -66,6 +66,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 */
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+		$this->getPage()->setTab('ePortfolio');
 
 		/* Set up blocks and stuff
 		 */
