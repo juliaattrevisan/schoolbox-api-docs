@@ -14,6 +14,7 @@ class External_SchoolPro_Class implements External_ClassInterface {
 	 * Get a list of students that are in a particular class
 	 *
 	 * @param $classCode
+	 * @return array|bool
 	 */
 	public function getStudents($classCode) {
 		$vars = array(
@@ -27,12 +28,28 @@ class External_SchoolPro_Class implements External_ClassInterface {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		new \Alaress_Probe($result);
+		if ($result['success'] && count($result['result'])) {
+			$allStudents = array();
 
-		if ($result['success']) {
+			foreach($result['result'] as $currentStudent) {
+				$student = array(
+					'synergy_id' => $currentStudent['ID'],
+					'lastname' => $currentStudent['Firstname'],
+					'firstname' => $currentStudent['Surname'],
+					'yearlevel '=> $currentStudent['YearLevel'],
+					'house' => $currentStudent['House'],
+					'StudentMedicalAlert' => '',
+					'StudentSpecialNeedsFlag' => '',
+					'ClassCampus' => '',
+				);
+
+				$allStudents[] = $student;
+			}
+
+			return $allStudents;
 		}
-		else {
-		}
+
+		return false;
 	}
 
 	/**
