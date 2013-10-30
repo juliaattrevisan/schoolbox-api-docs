@@ -40,10 +40,14 @@
     });
 
 	/* Pseudo session - things are rememberised
+	 * If not initialised, set it to 0 so the browser works
 	 */
 	var socialstreamSession = {
 		categoryId: '{HOMEPAGE_ID}'
-	}
+	};
+    if (isNaN(Number(socialstreamSession.categoryId))) {
+        socialstreamSession.categoryId = 0;
+    }
 
 	$j(function() {
 		/* Activate socialstream browser for comments/replies (clones)
