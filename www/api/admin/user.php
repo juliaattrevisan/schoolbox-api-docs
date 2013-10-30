@@ -3,7 +3,7 @@
 /* REST interface for user CRUD operations */
 header("Content-Type: text/xml");
 
-require_once '../../../include/Config.php';
+require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
 $user_handler = new User();
 
