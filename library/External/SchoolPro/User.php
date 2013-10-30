@@ -112,12 +112,27 @@ class External_SchoolPro_User implements External_UserInterface {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		new \Alaress_Probe($result);
+		if ($result['success'] && count($result['result'])) {
+			$currentStudent = $result['result'][0];
 
-		if ($result['success']) {
+			$student = array(
+				'StudentID' => $currentStudent['ID'],
+				'StudentGiven1' => $currentStudent['Firstname'],
+				'StudentSurname' => $currentStudent['Surname'],
+				'StudentBirthDate' => $currentStudent['Birthdate'],
+				'StudentHouse' => $currentStudent['HeadOfHouse'],
+				'StudentYearLevel' => $currentStudent['YearLevel'],
+				'StudentTutor' => $currentStudent['TutorName'],
+				'StudentForm' => $currentStudent['FormName'],
+				'StudentFormStaffName' => $currentStudent['FormStaffName'],
+				'StudentEmergencyName' => $currentStudent['EmergencyContactName'],
+				'StudentEmergencyPhone' => $currentStudent['EmergencyContactPhone'],
+			);
+
+			return $student;
 		}
-		else {
-		}
+
+		return false;
 	}
 
 	/**
