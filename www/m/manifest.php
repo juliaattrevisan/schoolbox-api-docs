@@ -31,16 +31,15 @@ foreach($includes as $file){
 $files = array(
 
     # Styles
-    '/inc/css/chrome.css',
+    '/css/demo/mchrome.css',
     # Scripts
-    '/inc/js/libs/zepto.min.js',
-    '/inc/js/libs/iscroll-lite.js',
+    '/m/inc/js/libs/zepto.min.js',
+    '/m/inc/js/libs/iscroll-lite.js',
     # Images
-    '/favicon.ico',
-    '/apple-touch-icon-precomposed.png',
-    '/skins/core/logo.png',
+    '/m/favicon.ico',
+    '/m/apple-touch-icon-precomposed.png',
     # Fonts
-    '/inc/font/sil.ttf'
+    '/m/inc/font/sil.ttf'
 );
 
 
