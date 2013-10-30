@@ -128,7 +128,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
                 $this->setVar(array(
 					'VISITOR_ID' => $this->unvisitors[$i]['id'],
 					'VISITOR_THUMB' => "/portrait.php?userId={$this->unvisitors[$i]['synergy_id']}&size=square64",
-					'VISITOR_NAME' => $userHandler->formatName($this->unvisitors[$i] . ' ' . $this->unvisitor[$i]),
+					'VISITOR_NAME' => $userHandler->formatName($this->unvisitors[$i]),
 					'VISITOR_GROUP' => $this->unvisitors[$i]['gname'],
 				));
 				
