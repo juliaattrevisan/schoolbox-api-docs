@@ -275,11 +275,10 @@ class External_SchoolPro_User implements External_UserInterface {
 	}
 
 	/**
-	 * TODO: What is a RelationSchoolNum? Why does it always return 357?
-	 *
-	 * Get a list of enrolled students
+	 * Returns a list of externalIds
 	 *
 	 * @param $synergyID
+	 * @return array|bool
 	 */
 	public function getEnrolledStudents($synergyID) {
 		$vars = array(
@@ -293,12 +292,17 @@ class External_SchoolPro_User implements External_UserInterface {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		new \Alaress_Probe($result);
+		if ($result['success'] && count($result['result'])) {
+			$allStudents = array();
 
-		if ($result['success']) {
+			foreach($result['result'] as $currentStudent) {
+				$allStudents[] = $currentStudent['RelationSchoolNum'];
+			}
+
+			return $allStudents;
 		}
-		else {
-		}
+
+		return false;
 	}
 
 	/**
