@@ -223,6 +223,12 @@ class Mailer {
                 self::$transport->setLocalDomain(
                     Cfg::get('site_hostname').'.'.Cfg::get('site_domain')
                 );
+
+                //Set auth details if available
+                if(Cfg::get('mail_smtp_username') && Cfg::get('mail_smtp_password')) {
+                    self::$transport->setUsername(Cfg::get('mail_smtp_username'));
+                    self::$transport->setPassword(Cfg::get('mail_smtp_password'));
+                }
             }
             else {
                 self::$transport = new Swift_MailTransport();
