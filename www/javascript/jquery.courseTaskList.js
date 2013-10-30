@@ -67,7 +67,7 @@
         });
 
         // Set up the same resource browser as is used in the social stream.
-        var socialstream_browser = $('#socialstream-browser');
+        var socialstream_browser = component.find('.resource_browser');
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
             component.delegate('form a[data-function="browse"]', 'click.courseTaskList', {}, function(event) {
                 var form = $(this).closest('form');
