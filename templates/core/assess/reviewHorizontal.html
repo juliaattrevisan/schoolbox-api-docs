@@ -5,10 +5,6 @@
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/javascript/evaluation/review.js"></script>
 <style>
-	form input[type=text] {
-		border: solid 1px #DBDBDB;
-	}
-
 	div.respondent-attempt {
 		border: 1px solid #0f0;
 		width: 100%;
@@ -24,22 +20,21 @@
 	}
 </style>
 <!-- END custom_head -->
-<h1>Horizontal Marking for {ASSESS_TITLE}</h1>
+<h1>Horizontal Marking for {ASSESS_TITLE}<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'><span></span>Back to assessment</a></h1>
 
-<div style='border:1px dashed #f00;'>
-	<div class="wysiwyg no-pad clearfix">
-		<h2><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}</h2>
-	</div>
+<div class="box">
+	<h2>Q{QUESTION_SEQUENCE})</h2>
+	<div class="wysiwyg">
+		{QUESTION_QUESTION}
 
-	<div style='border:1px dashed #f00;'>
-		<h3>Correct Answer</h3>
+		<h3>Correct Answer:</h3>
 		<!-- BEGIN answerInputsTop -->
 		<!-- END answerInputsTop -->
 	</div>
 
-	<div>
+	<div class="">
 		<!-- BEGIN attempt -->
-		<div class='respondent-attempt'>
+		<div class='respondent-attempt {ON_OFF}'>
 			<script type='text/javascript'>
 				$j(function() {
 					$j('questionForm-{RESPONSE_ID}').evaluationResponseReview({
@@ -70,13 +65,11 @@
 
 		<p class="clearfix text-align-right">
 			<!-- BEGIN next_question -->
-			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'>Next</a>
+			<a class='btn go-to' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'><span></span>Next</a>
 			<!-- END next_question -->
 
-			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'>Index</a>
-
 			<!-- BEGIN previous_question -->
-			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'>Previous</a>
+			<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'><span></span>Previous</a>
 			<!-- END previous_question -->
 
 			<!-- BEGIN writable_finalise -->
