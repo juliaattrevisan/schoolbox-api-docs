@@ -80,7 +80,8 @@ class NodeRenderer {
 		$currentNode = end(array_values($nodeData['breadcrumbs']));
 
 		$this->getPage()->setVar(array(
-			'NODE_NAME' => $currentNode['name']
+            'NODE_NAME' => $currentNode['name'],
+            'NODE_ID'   => $currentNode['categoryId'],
 		));
 	}
 

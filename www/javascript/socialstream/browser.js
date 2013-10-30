@@ -115,10 +115,9 @@
 				var allNavigators = $j(config.element).find('.breadcrumb, .socialstream-node-category');
 
 				$j.each(allNavigators, function(index, element) {
-					$j(element).find('a').click(function() {
+					$j(element).find('a').click(function(event) {
+                        event.preventDefault();
 						loadNode($j(this).attr('rel'));
-
-						return false;
 					});
 				});
 
@@ -127,7 +126,8 @@
 				var allFiles = $j(config.element).find('.socialstream-node-file');
 
 				$j.each(allFiles, function(index, element) {
-					$j(element).find('a').click(function() {
+					$j(element).find('a').click(function(event) {
+                        event.preventDefault();
 						var url = $j(this).attr('href');
 						var filename = $j(this).html();
 
@@ -136,10 +136,19 @@
 						config.submitCallback(url, filename);
 
 						$j(config.element).dialog('close');
-
-						return false;
 					});
 				});
+
+                /* event handlers for selecting a folder to use
+                 * Very similar to file event handler, but filename is contained in a data element instead.
+                 */
+                $j(config.element).find('.socialstream-node-use-folder a').click(function(event) {
+                    event.preventDefault();
+                    var url = $j(this).attr('href');
+                    var filename = $j(this).data('filename_html');
+                    config.submitCallback(url, filename);
+                    $j(config.element).dialog('close');
+                });
 
 				/* For all the world to see
 				 */
