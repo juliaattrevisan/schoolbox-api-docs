@@ -29,6 +29,7 @@ class External_SchoolPro_User implements External_UserInterface {
 	 * passed is the Synergetic of the Contact, not the Student.
 	 *
 	 * @param $externalId
+	 * @return array|bool
 	 */
 	public function getParent($externalId) {
 		$vars = array(
@@ -42,12 +43,26 @@ class External_SchoolPro_User implements External_UserInterface {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		new \Alaress_Probe($result);
+		if ($result['success'] && count($result['result'])) {
+			$currentParent = $result['result'][0];
 
-		if ($result['success']) {
+			$parent = array(
+				'ContactID' => $currentParent['ID'],
+				'ContactPreferred' => $currentParent['FirstName'],
+				'ContactSurname' => $currentParent['Surname'],
+				'ContactEmail' => $currentParent['Email'],
+				'ContactMobile' => $currentParent['Mobile'],
+				'SpouseID' => $currentParent['SpouseID'],
+				'SpousePreferred' => $currentParent['SpouseFirstName'],
+				'SpouseSurname' => $currentParent['SpouseSurname'],
+				'SpouseEmail' => $currentParent['SpouseEmail'],
+				'SpouseMobile' => $currentParent['SpouseMobile'],
+			);
+
+			return $parent;
 		}
-		else {
-		}
+
+		return false;
 	}
 
 	/**
@@ -290,28 +305,41 @@ class External_SchoolPro_User implements External_UserInterface {
 	 * Get an email address for a particular person
 	 *
 	 * @param $externalUserId
+	 * @return bool
 	 */
 	public function getEmail($externalUserId) {
+		$groupHandler = new Group();
+
+		/* 13.5 context
 		$userMapper = new Schoolbox\UserMapper();
-		$user = $userMapper->findByColumn('synergyId', $externalUserId);
+		$user = $userMapper->findOneByColumnList(array('externalId' => $externalUserId));
+		*/
+
+		/* 13.0.x context
+		 */
+		$userMapper = new User();
+		$user = $userMapper->getBySynergy($externalUserId);
 
 		/* Use a different query depending on the type of person
 		 */
-		if ($user->isStudent()) {
+		if ($groupHandler->isStudent($user['uid'])) {
 			$result = $this->getStudent($externalUserId);
 
 			return $result['email'];
 		}
-		else if ($user->isParent()) {
+		else if ($groupHandler->isParent($user['uid'])) {
 			$result = $this->getParent($externalUserId);
 
 			return $result['email'];
 		}
-		else if ($user->isStaff()) {
+		else if ($groupHandler->isStaff($user['uid'])) {
 
 			/* TODO: Not supplied?
 			 */
+			return false;
 		}
+
+		return false;
 	}
 
 	/**
