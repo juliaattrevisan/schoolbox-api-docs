@@ -137,8 +137,13 @@ class External_Tass_User implements External_UserInterface {
                                 WHERE tch_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'";
 		}
 
+
 		$this->getDatabase()->query($sql);
 		while($subject = $this->getDatabase()->getNextArray() ) {
+            if(Cfg::get('site_location') == 'meriden') {
+				$subject['year_grp'] = '';
+            }
+
 			$subjectList[] = array('code'=>trim($subject['year_grp'].'-'.$subject['sub_code'].'-'.$subject['class']), 'name'=>$subject['class']);
 		}
 

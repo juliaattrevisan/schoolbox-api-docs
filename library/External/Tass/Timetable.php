@@ -58,7 +58,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
                 ORDER BY prd_code";
 
 		$this->getDatabase()->query($query);
-
+		$periodCount = 0;
 		while ($period = $this->getDatabase()->getNextArray()) {
 			preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['prd_end'], $TimeToMatches);
 			preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['prd_start'], $TimeFromMatches);
@@ -129,7 +129,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
                         FROM studsub
                         JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                         JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester 
-                                AND studsub.class=ttmast.class AND student.year_grp=ttmast.year_grp AND studsub.yr_study=ttmast.year_num
+                                AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp is null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE yr_study = '{$_SESSION['FileYear']}' AND studsub.semester = '{$_SESSION['FileSemester']}' 
                                 AND studsub.stud_code = '$synergy_id'
@@ -195,7 +195,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
                             FROM studsub
                             JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                             JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester
-                                    AND studsub.class=ttmast.class AND student.year_grp=ttmast.year_grp AND studsub.yr_study=ttmast.year_num
+                                    AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS NULL) AND studsub.yr_study=ttmast.year_num
                             JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                             WHERE yr_study = '{$_SESSION['FileYear']}' AND studsub.semester = '{$_SESSION['FileSemester']}'
                                     AND studsub.stud_code = '$synergy_id'
