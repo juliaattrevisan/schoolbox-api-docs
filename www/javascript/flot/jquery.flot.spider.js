@@ -280,11 +280,26 @@
 				 */
 				var lowerThreshold = 0.33;
 				var upperThreshold = 0.67;
-				var testVal = j/data[0].spider.legs.data.length;
+
+				/* Number of labels, and when to truncate them,
+				 * and how long the truncated label should be
+				 */
+				var numLabels = data[0].spider.legs.data.length;
+				var truncateAt = 7;
+				var truncatedLength = 50;
+
+				var testVal = j/numLabels;
 
 				/* Initial Y positioning of the label
 				 */
 				var y = pos.y;
+
+				/* Truncate when you get more than about 8 spokes
+				 * There's just not enough room.
+				 */
+				if (numLabels > truncateAt) {
+					labelText = labelText.substring(0, truncatedLength) + '...';
+				}
 
 				/* Offset labels at the bottom
 				 */
