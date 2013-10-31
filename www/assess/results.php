@@ -159,6 +159,8 @@ $this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 $this->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
+$this->setBlock('modify_btn', 'has_attempt', 'has_attempt_block');
+
 $this->setTitle('Results for: ' . $assess['title']);
 
 $this->setVar(
@@ -197,6 +199,17 @@ if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
  */
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
+/* If there are no attempts, hide the Review Horizontal button
+ */
+if (is_array($allAttempts) && count($allAttempts)) {
+	$this->parse('has_attempt_block', 'has_attempt');
+}
+else {
+	$this->setVar('has_attempt_block', '');
+}
+
+/* Process everyone
+ */
 if (is_array($allStudents) && count($allStudents)) {
 
     /* Process each student
