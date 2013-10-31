@@ -117,7 +117,13 @@ $j(function () {
     var form = document.getElementById('#eventForm');
 
     $j('#eventForm').validate({
-        submitHandler:function (form) {
+		rules: {
+			'campus[]': {
+				required: true,
+				minlength: 1
+			}
+		},
+		submitHandler:function (form) {
 
             // the desired action, and if this is a series event or not
             var act = $j('#action').val();
