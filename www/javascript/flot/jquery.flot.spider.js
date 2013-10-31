@@ -282,12 +282,15 @@
 				var upperThreshold = 0.67;
 				var testVal = j/data[0].spider.legs.data.length;
 
+				/* Initial Y positioning of the label
+				 */
+				var y = pos.y;
+
+				/* Offset labels at the bottom
+				 */
 				if ((testVal <= upperThreshold) && (testVal >= lowerThreshold)) {
 					offset = countLines(ctx, labelText, maxWidth, lineHeight);
-					var y = pos.y - offset;
-				}
-				else {
-					var y = pos.y
+					y = y - offset;
 				}
 
 				/* Wrap 'em and bag 'em
