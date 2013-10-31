@@ -9887,3 +9887,30 @@ body.login {
 #type-usage h2 {
 	margin: 16px;
 }
+
+.horizontal-marking-table {
+	margin-top: 16px;
+	width: 100%;
+	display: table;
+	border-top: 1px solid @border-color;
+	.respondent-attempt {
+		width: 100%;
+		display: table-row;
+	}
+	.column {
+		vertical-align: top;
+		display: table-cell;
+		padding: 7px 4px;
+		border-bottom: 1px solid @border-color;
+		&.student {
+			width: 150px;
+			img {
+				float: left;
+				margin-right: 8px;
+			}
+		}
+		input[type="submit"] {
+			margin: 0;
+		}
+	}
+}

@@ -4,35 +4,6 @@
 <script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/javascript/evaluation/review.js"></script>
-<style>
-	.horizontal-marking-table {
-		margin-top: 16px;
-		width: 100%;
-		display: table;
-		border-top: 1px solid #CCC;
-	}
-	.respondent-attempt {
-		width: 100%;
-		display: table-row;
-	}
-	.column {
-		vertical-align: top;
-		display: table-cell;
-		padding: 7px 4px;
-		border-bottom: 1px solid #CCC;
-	}
-	.column.student {
-		width: 150px;
-	}
-	.column img {
-		float: left;
-		margin-right: 8px;
-	}
-	.column input[type="submit"] {
-		margin: 0;
-	}
-
-</style>
 <!-- END custom_head -->
 <h1>Horizontal Marking for {ASSESS_TITLE}<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'><span></span>Back to assessment</a></h1>
 
@@ -88,7 +59,7 @@
 		<div class="assess-alert">
 			<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
 		</div>
-		<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise'>Finalise all attempts</a>
+		<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise' class="submit-btn-plain float-right">Finalise all attempts</a>
 		<!-- END writable_finalise -->
 	</p>
 </div>
