@@ -244,13 +244,139 @@
                 ctx.lineTo(pos.x, pos.y);
                 ctx.stroke();
             }
+
+			/* Custom modification by Steve, with stuff found at:
+			 * This wordwraps labels
+			 */
             function drawspiderLeg(ctx,j,gridColor)
             {	var pos;
                 pos = calculateXY(cnt,j,100);
                 ctx.font = data[0].spider.legs.font;
                 ctx.fillStyle = data[0].spider.legs.fillStyle;
-                ctx.fillText(data[0].spider.legs.data[j].label, pos.x, pos.y);
+//                ctx.fillText(data[0].spider.legs.data[j].label, pos.x, pos.y);
+
+				/* An arbitrary measurement of each line's height
+				 */
+				var lineHeight = 15;
+
+				/* The text to draw in the label
+				 */
+				var labelText = data[0].spider.legs.data[j].label;
+
+				/* The current canvas' width
+				 */
+				var canvasWidth = parseInt(ctx.canvas.width);
+
+				/* The number of spokes
+				 */
+				var spokes = parseInt(data[0].spider.legs.data.length);
+
+				/* Maximum width of the label (roughly 1/number_of_spokes)
+				 */
+				var maxWidth = Math.ceil(canvasWidth/spokes);
+
+				/* Only worry about offsetting stuff at the bottom
+				 * of the radar so it doesn't fall off the canvas
+				 */
+				var lowerThreshold = 0.33;
+				var upperThreshold = 0.67;
+
+				/* Number of labels, and when to truncate them,
+				 * and how long the truncated label should be
+				 */
+				var numLabels = data[0].spider.legs.data.length;
+				var truncateAt = 7;
+				var truncatedLength = 50;
+
+				var testVal = j/numLabels;
+
+				/* Initial Y positioning of the label
+				 */
+				var y = pos.y;
+
+				/* Truncate when you get more than about 8 spokes
+				 * There's just not enough room.
+				 */
+				if (numLabels > truncateAt) {
+					labelText = labelText.substring(0, truncatedLength) + '...';
+				}
+
+				/* Offset labels at the bottom
+				 */
+				if ((testVal <= upperThreshold) && (testVal >= lowerThreshold)) {
+					offset = countLines(ctx, labelText, maxWidth, lineHeight);
+					y = y - offset;
+				}
+
+				/* Wrap 'em and bag 'em
+				 */
+				wrapText(ctx, labelText, pos.x, y, maxWidth, lineHeight);
             }
+
+			/**
+			 * Calculate rendered line height after wrapping
+			 * This is basically the same as wrapText() - it
+			 * calculates the wrapping etc without actually
+			 * rendering the text on the radar
+			 *
+			 * @param context
+			 * @param text
+			 * @param maxWidth
+			 * @param lineHeight
+			 * @returns {number}
+			 */
+			function countLines(context, text, maxWidth, lineHeight) {
+				var words = text.split(' ');
+				var line = '';
+				var y = 0;
+
+				for(var n = 0; n < words.length; n++) {
+					var testLine = line + words[n] + ' ';
+					var metrics = context.measureText(testLine);
+					var testWidth = metrics.width;
+
+					if (testWidth > maxWidth && n > 0) {
+						line = words[n] + ' ';
+						y += lineHeight;
+					}
+					else {
+						line = testLine;
+					}
+				}
+
+				return y;
+			}
+
+			/**
+			 * Custom modification by Steve, with stuff found at:
+			 * http://www.html5canvastutorials.com/tutorials/html5-canvas-wrap-text-tutorial/
+			 *
+			 * @param context
+			 * @param text
+			 * @param x
+			 * @param y
+			 * @param maxWidth
+			 * @param lineHeight
+			 */
+			function wrapText(context, text, x, y, maxWidth, lineHeight) {
+				var words = text.split(' ');
+				var line = '';
+
+				for(var n = 0; n < words.length; n++) {
+					var testLine = line + words[n] + ' ';
+					var metrics = context.measureText(testLine);
+					var testWidth = metrics.width;
+					if (testWidth > maxWidth && n > 0) {
+						context.fillText(line, x, y);
+						line = words[n] + ' ';
+						y += lineHeight;
+					}
+					else {
+						line = testLine;
+					}
+				}
+				context.fillText(line, x, y);
+			}
         }
         function calculatePosition(serie,ranges,j)
         {	var p;
