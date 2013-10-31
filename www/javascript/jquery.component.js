@@ -206,12 +206,12 @@ setupCustomise = {
                 return;
             }
 
-			$j('#head_font').parent().addClass('active-box');
-			var instantColour = new RGBColor($j('#left_head_font').css('background-color'));
+			$j('#top_head_font').parent().addClass('active-box');
+			var instantColour = new RGBColor($j('#top_head_font').css('background-color'));
 			var initialColour = instantColour.toHex();
-			checkTextColour();
 			$j('#currentColour').css('background-color',initialColour);
 			$j('#currentColour').val(initialColour);
+			checkTextColour();
 
 			colorpicker.linkTo(onColorChange);
 
@@ -318,7 +318,7 @@ setupCustomise = {
 
 				var color = new RGBColor($j(this).children('.colorBox').css('background-color'));
 
-				f.setColor(color.toHex());
+				colorpicker.setColor(color.toHex());
 				checkTextColour()
 				return false;
 			});
