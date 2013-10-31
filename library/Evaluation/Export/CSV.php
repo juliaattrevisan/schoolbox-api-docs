@@ -178,23 +178,25 @@ abstract class Evaluation_Export_CSV {
 			array_shift($allColumns);
 		}
 
-		foreach($this->getAllQuestions() as $currentQuestion) {
-			if (!$this->useQuestionFilter() || $this->isQuestionFiltered($currentQuestion['question_id'])) {
-				$prefix = "S{$currentQuestion['section_sequence']}. Q{$currentQuestion['question_sequence']}. ";
-				$questionText = preg_replace('/\n+/', ' ', strip_tags(html_entity_decode($currentQuestion['question'])));
+		if (is_array($this->getAllQuestions()) && count($this->getAllQuestions())) {
+			foreach($this->getAllQuestions() as $currentQuestion) {
+				if (!$this->useQuestionFilter() || $this->isQuestionFiltered($currentQuestion['question_id'])) {
+					$prefix = "S{$currentQuestion['section_sequence']}. Q{$currentQuestion['question_sequence']}. ";
+					$questionText = preg_replace('/\n+/', ' ', strip_tags(html_entity_decode($currentQuestion['question'])));
 
-				/* Append Response heading
-				 */
-				$additionalColumns = array();
-				$additionalColumns[] =  $prefix . $questionText . ' Response';
+					/* Append Response heading
+					 */
+					$additionalColumns = array();
+					$additionalColumns[] =  $prefix . $questionText . ' Response';
 
-				/* Append additional columns
-				 */
-				foreach($this->getAdditionalColumns() as $heading => $value) {
-					$additionalColumns[] =  $prefix . $questionText . ' ' . $heading;
+					/* Append additional columns
+					 */
+					foreach($this->getAdditionalColumns() as $heading => $value) {
+						$additionalColumns[] =  $prefix . $questionText . ' ' . $heading;
+					}
+
+					$allColumns = array_merge($allColumns, $additionalColumns);
 				}
-
-				$allColumns = array_merge($allColumns, $additionalColumns);
 			}
 		}
 
@@ -211,83 +213,85 @@ abstract class Evaluation_Export_CSV {
 
 		/* Collate all attempts and their responses
 		 */
-		foreach($this->getAllAttempts() as $currentAttempt) {
+		if (is_array($this->getAllQuestions()) && count($this->getAllQuestions())) {
+			foreach($this->getAllAttempts() as $currentAttempt) {
 
-			/* Get attempt details
-			 */
-			$user = $this->getAttemptHandler()->getUser($currentAttempt['attempt_id']);
+				/* Get attempt details
+				 */
+				$user = $this->getAttemptHandler()->getUser($currentAttempt['attempt_id']);
 
-			$start = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
+				$start = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
 
-			if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-				$finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
-				$finishTime = $finish->getShort();
-			}
-			else {
-				$finishTime = 'Incomplete';
-			}
+				if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+					$finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+					$finishTime = $finish->getShort();
+				}
+				else {
+					$finishTime = 'Incomplete';
+				}
 
-			/* Collect mandatory columns
-			 * Optionally include synergy_id
-			 */
-			$thisResponse = array(
-				$currentAttempt['synergy_id'],
-				$currentAttempt['user_id'],
-				$user['lastname'],
-				$user['firstname'],
-				$start->getShort(),
-				$finishTime,
-			);
+				/* Collect mandatory columns
+				 * Optionally include synergy_id
+				 */
+				$thisResponse = array(
+					$currentAttempt['synergy_id'],
+					$currentAttempt['user_id'],
+					$user['lastname'],
+					$user['firstname'],
+					$start->getShort(),
+					$finishTime,
+				);
 
-			if (!$this->getIncludeExternalId()) {
-				array_shift($thisResponse);
-			}
+				if (!$this->getIncludeExternalId()) {
+					array_shift($thisResponse);
+				}
 
-			/* Construct horizontally for this attempt
-			 */
-			$additionalColumns = array();
+				/* Construct horizontally for this attempt
+				 */
+				$additionalColumns = array();
 
-			foreach($this->getAllQuestions() as $currentQuestion) {
-				if (!$this->useQuestionFilter() || $this->isQuestionFiltered($currentQuestion['question_id'])) {
-					$answerHandler = $this->getFactory()->createAnswerModel($currentQuestion['question_type_id']);
+				foreach($this->getAllQuestions() as $currentQuestion) {
+					if (!$this->useQuestionFilter() || $this->isQuestionFiltered($currentQuestion['question_id'])) {
+						$answerHandler = $this->getFactory()->createAnswerModel($currentQuestion['question_type_id']);
 
-					/* Specify whether to include html formatting in
-					 * this output
-					 */
-					$answerHandler->setLegendHTML($this->getLegendHTML());
+						/* Specify whether to include html formatting in
+						 * this output
+						 */
+						$answerHandler->setLegendHTML($this->getLegendHTML());
 
-					/* Load answer template into answerOption block
+						/* Load answer template into answerOption block
 
-					 * Note that each answerHandler returns a $responseData containing
-					 * key => data values for Response, Mark and Comment. This is used
-					 * when collecting additional columns.
-					 *
-					 * If you want extra info beyond these three, then you need to modify
-					 * each AnswerHandler accordingly.
-					 */
-					$responseData = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $currentQuestion['question_id']);
+						 * Note that each answerHandler returns a $responseData containing
+						 * key => data values for Response, Mark and Comment. This is used
+						 * when collecting additional columns.
+						 *
+						 * If you want extra info beyond these three, then you need to modify
+						 * each AnswerHandler accordingly.
+						 */
+						$responseData = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $currentQuestion['question_id']);
 
-					/* Append horizontally
-					 */
-					$additionalColumns[] = str_replace("\t", '', $responseData['response']);
+						/* Append horizontally
+						 */
+						$additionalColumns[] = str_replace("\t", '', $responseData['response']);
 
-					/* Additional columns.
-					 *
-					 * Look for the exportResponseToCSV method which returns this data array
-					 */
-					foreach ($this->getAdditionalColumns() as $heading => $value) {
-						$additionalColumns[] = $responseData[$value];
+						/* Additional columns.
+						 *
+						 * Look for the exportResponseToCSV method which returns this data array
+						 */
+						foreach ($this->getAdditionalColumns() as $heading => $value) {
+							$additionalColumns[] = $responseData[$value];
+						}
 					}
 				}
+
+				/* Concatenate mandatory columns with additional columns
+				 */
+				$row = array_merge($thisResponse, $additionalColumns);
+
+				$allResponses[] = $row;
 			}
-
-			/* Concatenate mandatory columns with additional columns
-			 */
-			$row = array_merge($thisResponse, $additionalColumns);
-
-			$allResponses[] = $row;
 		}
-
+		
 		return $allResponses;
 	}
 
