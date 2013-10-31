@@ -10,26 +10,6 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $calendarHandler = new Calendar();
 $page = new SitePage();
 
-/** @var Schoolbox\User $user */
-$user = $_SESSION['user'];
-$ownerId = $user->getId();
-$groupHandler = new Group();
-/* Superuser/Staff/Parent adding event for someone else or
- * someone creating their own event
- */
-if ($groupHandler->isSuperuser()
-    || $groupHandler->isStaff()
-    || $groupHandler->isParentOfChild($_POST['userId'])
-    || ($user->getId() == $_POST['userId'])
-) {
-    $ownerId = $_POST['userId'];
-}
-/* You're not supposed to be able to create events under other circumstances
- */
-else {
-    error(19);
-}
-
 switch($_POST['action']) {
     case 'Add':
     case 'Update':
@@ -46,119 +26,119 @@ switch($_POST['action']) {
             $pubDateObject = 'NULL';
         }
 
+		/* Force events to have at least one campus value selected
+		 */
+		if (is_array($_POST['campus']) && count($_POST['campus'])) {
+			$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
+			$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
 
-		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
-		$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
+			$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
+			$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
-		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
-		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
+			$event = array(
+				'owner' => $_SESSION['id'],
+				'access' => $_POST['level'],
+				'sid' => $_POST['group'],
+				'campusList' => $_POST['campus'],
+				'groupList' => $_POST['groupCheck'],
+				'type' => $_POST['type'],
+				'note' => $_POST['note'],
+				'allday' => !empty($_POST['allday']),
+				'startDate' => $startDate->getDatabaseDate(),
+				'startTime' => $startDate->getDatabaseTime(),
+				'endDate' => $endDate->getDatabaseDate(),
+				'endTime' => $endDate->getDatabaseTime(),
+				'location' => $_POST['location'],
+				'attendance' => $_POST['attendance'],
+				'detail' => $_POST['detail'],
+				'publish_date' => $publishDate,
+			);
 
-        $event = array(
-			'owner' => $ownerId,
-			'access' => $_POST['level'],
-			'sid' => $_POST['group'],
-			'campusList' => $_POST['campus'],
-			'groupList' => $_POST['groupCheck'],
-			'type' => $_POST['type'],
-			'note' => $_POST['note'],
-			'allday' => !empty($_POST['allday']),
-			'startDate' => $startDate->getDatabaseDate(),
-			'startTime' => $startDate->getDatabaseTime(),
-			'endDate' => $endDate->getDatabaseDate(),
-			'endTime' => $endDate->getDatabaseTime(),
-			'location' => $_POST['location'],
-			'attendance' => $_POST['attendance'],
-			'detail' => $_POST['detail'],
-			'publish_date' => $publishDate,
-        );
+			// repeat specified, and and enddate also, populate the dates to be set
+			if (isset($validRepeat[$_POST['repeat']]) && $until) {
+				$i = 0;
 
-        $validRepeat = array(
-			'daily' => '+1 day',
-			'weekly' => '+1 week',
-			'fortnightly' => '+2 weeks',
-			'monthly' => '+1 month'
-        );
+				$event['series_id'] = $calendarHandler->getUpperSeriesIndex() + 1;
 
-        // repeat specified, and and enddate also, populate the dates to be set
-        if (isset($validRepeat[$_POST['repeat']]) && $until) {
-            $i = 0;
+				//
+				// Repeat of events: repeat until the start date is after the until
+				// date (or x100, whatever is less)
+				for ($start_timestamp = $startDate->getUnixTimestamp(),
+					 $end_timestamp   = $endDate->getUnixTimestamp();
+					 $start_timestamp <= $until;
+					 $start_timestamp = strtotime($validRepeat[$_POST['repeat']], $start_timestamp),
+					 $end_timestamp   = strtotime($validRepeat[$_POST['repeat']], $end_timestamp)
+				) {
+					if ($i++ > 100) {
+						break;
+					}
+					$this_start_date = new Alaress_Date_Format($start_timestamp, 'U');
+					$this_end_date   = new Alaress_Date_Format($end_timestamp,   'U');
+					$dateArray[] = array(
+						'start' => $this_start_date->getDatabaseDate(),
+						'end'   => $this_end_date->getDatabaseDate(),
+					);
+				}
+			}
 
-            $event['series_id'] = $calendarHandler->getUpperSeriesIndex() + 1;
+			// if repeat is set, but no enddate was specified, bail out
+			else if(isset($validRepeat[$_POST['repeat']]) && (!$until)) {
+				error(2); // "not enough data submitted to the form"
+			}
 
-            //
-            // Repeat of events: repeat until the start date is after the until
-            // date (or x100, whatever is less)
-            for ($start_timestamp = $startDate->getUnixTimestamp(),
-                 $end_timestamp   = $endDate->getUnixTimestamp();
-                 $start_timestamp <= $until;
-                 $start_timestamp = strtotime($validRepeat[$_POST['repeat']], $start_timestamp),
-                 $end_timestamp   = strtotime($validRepeat[$_POST['repeat']], $end_timestamp)
-            ) {
-                if ($i++ > 100) {
-                    break;
-                }
-                $this_start_date = new Alaress_Date_Format($start_timestamp, 'U');
-                $this_end_date   = new Alaress_Date_Format($end_timestamp,   'U');
-                $dateArray[] = array(
-                    'start' => $this_start_date->getDatabaseDate(),
-                    'end'   => $this_end_date->getDatabaseDate(),
-                );
-            }
-        }
+			// no repeat
+			else {
+				$dateArray[] = array(
+					'start' => $startDate->getDatabaseDate(),
+					'end'   => $endDate->getDatabaseDate(),
+				);
+			}
 
-        // if repeat is set, but no enddate was specified, bail out
-        else if(isset($validRepeat[$_POST['repeat']]) && (!$until)) {
-            error(2); // "not enough data submitted to the form"
-        }
+			if (is_numeric($_POST['id'])) {
+				if ($_POST['efficacy'] == 'series') {
+					// don't override the date or seriesID
+					unset($event['startDate']);
+					unset($event['endDate']);
+					unset($event['series_id']);
 
-        // no repeat
-        else {
-            $dateArray[] = array(
-                'start' => $startDate->getDatabaseDate(),
-                'end'   => $endDate->getDatabaseDate(),
-            );
-        }
+					$series = $calendarHandler->getAllInSeriesByEventID($_POST['id']);
 
-        if (is_numeric($_POST['id'])) {
-            if ($_POST['efficacy'] == 'series') {
-                // don't override the date or seriesID
-                unset($event['startDate']);
-                unset($event['endDate']);
-                unset($event['series_id']);
+					foreach($series as $seriesEvent) {
+						$event['id'] = $seriesEvent['id'];
+						$calendarHandler->update($event);
+					}
+				}
+				else if($_POST['efficacy'] == 'self') {
+					//
+					// If there's any recurrence: update first only, and create the
+					// rest from scratch.
+					$first_date_set     = array_shift($dateArray);
+					$event['id']        = $_POST['id'];
+					$event['startDate'] = $first_date_set['start'];
+					$event['endDate']   = $first_date_set['end'];
+					$calendarHandler->update($event);
+					foreach ($dateArray as $dates) {
+						unset($event['id']);
+						$event['startDate'] = $dates['start'];
+						$event['endDate']   = $dates['end'];
+						$calendarHandler->create($event);
+					}
+				}
+			}
+			else {
+				foreach ($dateArray as $dates) {
+					$event['startDate'] = $dates['start'];
+					$event['endDate']   = $dates['end'];
+					$calendarHandler->create($event);
+				}
+			}
 
-                $series = $calendarHandler->getAllInSeriesByEventID($_POST['id']);
+			$page->backToTheFuture(2);
+		}
+		else {
+			error(158);
+		}
 
-                foreach($series as $seriesEvent) {
-                    $event['id'] = $seriesEvent['id'];
-                    $calendarHandler->update($event);
-                }
-            }
-            else if($_POST['efficacy'] == 'self') {
-                //
-                // If there's any recurrence: update first only, and create the
-                // rest from scratch.
-                $first_date_set     = array_shift($dateArray);
-                $event['id']        = $_POST['id'];
-                $event['startDate'] = $first_date_set['start'];
-                $event['endDate']   = $first_date_set['end'];
-                $calendarHandler->update($event);
-                foreach ($dateArray as $dates) {
-                    unset($event['id']);
-                    $event['startDate'] = $dates['start'];
-                    $event['endDate']   = $dates['end'];
-                    $calendarHandler->create($event);
-                }
-            }
-        }
-        else {
-            foreach ($dateArray as $dates) {
-                $event['startDate'] = $dates['start'];
-                $event['endDate']   = $dates['end'];
-                $calendarHandler->create($event);
-            }
-        }
-
-		$page->backToTheFuture(2);
         break;
 
     case 'Delete':
