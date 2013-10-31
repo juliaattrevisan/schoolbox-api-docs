@@ -1,4 +1,7 @@
 <?php
+// Bootstrap is needed so I can get site_location
+require_once __DIR__ . '/../../include/Bootstrap.php';
+
 header('Content-Type: text/cache-manifest');
 header('Cache-Control: no-cache');
 
@@ -28,26 +31,26 @@ foreach($includes as $file){
     }
 }
 
+$location = Config::get('site_location');
 $files = array(
-
     # Styles
-    '/css/demo/mchrome.css',
+    "/css/$location/mchrome.css",
     # Scripts
     '/m/inc/js/libs/zepto.min.js',
     '/m/inc/js/libs/iscroll-lite.js',
     # Images
-    '/m/favicon.ico',
-    '/m/apple-touch-icon-precomposed.png',
+    "/images/$location/favicon.ico",
+    "/images/$location/apple-touch-icon-precomposed.png",
     # Fonts
     '/m/inc/font/sil.ttf'
 );
 
-
 echo "\nCACHE:\n";
-foreach($files as $file){
-    if (is_readable('.'.$file)) {
+foreach ($files as $file) {
+    $actual_file = __DIR__.'/..'.$file;
+    if (is_readable($actual_file)) {
         echo $file . "\n";
-        $hashes .= md5_file('.'.$file);
+        $hashes .= md5_file($actual_file);
     }
 }
 
