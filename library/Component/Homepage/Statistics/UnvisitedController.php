@@ -82,6 +82,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
              LEFT JOIN `user` u ON u.id = ua.uid
              LEFT JOIN groups g ON u.group_id = g.id
              WHERE c.id = :cid
+             $groupFilter
              AND u.id NOT IN (
                  SELECT `user`
                  FROM homepage_log hl
