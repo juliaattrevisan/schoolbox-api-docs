@@ -3840,7 +3840,7 @@ ul.section-options a.drop-arrow {
     float: none;
 }
 
-.evaluation-content .tick-cross {
+.tick-cross {
     position: absolute;
     top: 10px;
     right: 6px;
@@ -3871,55 +3871,57 @@ ul.section-options a.drop-arrow {
 
 /*match*/
 
-.evaluation-content.mark-test .matchPairs li {
+.matchPairs li {
     font-size: 12px;
     margin-bottom: 10px;
     background: @lgrey;
     border: 1px solid @lgrey;
     padding: 5px;
+	position: relative;
 }
 
-.evaluation-content.mark-test .matchPairs {
+.matchPairs {
     float: left;
 }
 
-.evaluation-content.mark-test .match-left {
+.match-left {
     width: 49%
 }
 
-.evaluation-content.mark-test .match-right {
+.match-right {
     width: 51%
 }
 
-.evaluation-content.mark-test .matchPairs li.matchCorrect {
+.matchPairs li.matchCorrect {
     background-color: @positive-color;
 }
 
-.evaluation-content.mark-test .matchPairs li.matchIncorrect {
+.matchPairs li.matchIncorrect {
     background-color: #F5CFCF;
 }
 
-.evaluation-content.mark-test .matchPairs li.matchIncorrect .tick-cross {
+.matchPairs li.matchIncorrect .tick-cross {
     background: url(/images/famicons/cross.png) 0 0 no-repeat;
 }
 
-.evaluation-content.mark-test .matchPairs strong {
+.matchPairs strong {
     font-weight: normal;
     background: @white;
     width: 86%;
     float: left;
     padding: 10px 5px;
+	line-height: 0;
 }
 
-.evaluation-content.mark-test .matchPairs li.left-columns {
+.matchPairs li.left-columns {
     border-right: 0;
 }
 
-.evaluation-content.mark-test .matchPairs li.right-columns {
+.matchPairs li.right-columns {
     border-left: 0;
 }
 
-.evaluation-content.mark-test .matchPairs li.right-columns strong {
+.matchPairs li.right-columns strong {
     width: 80%;
 }
 
@@ -3930,49 +3932,52 @@ ul.section-options a.drop-arrow {
 }
 
 /* cloze exercise */
-.evaluation-content.mark-test span.fillgapIncorrect,
-.evaluation-content.mark-test span.fillgapCorrect {
+span.fillgapIncorrect,
+span.fillgapCorrect,
+span.selected-word {
     padding: 1px 5px;
     border: 1px solid @lgrey;
 }
 
-.evaluation-content.mark-test span.fillgapIncorrect {
+span.fillgapIncorrect {
     background: #F5CFCF;
 }
 
-.evaluation-content.mark-test span.fillgapCorrect {
+span.fillgapCorrect,
+span.selected-word {
     background: @positive-color;
 }
 
 /* multiple choice */
-.evaluation-content.mark-test ul.multiple-choice-mark li {
+ul.multiple-choice-mark li {
+	min-width: 0;
+	position: relative;
+	border: 1px solid @lgrey;
+	margin-bottom: 10px;
     padding: 10px;
     background: @white;
+	.tick-cross {
+		background: none
+	}
+
+	&.correct-answer {
+		background-color: @lgrey
+	}
+
+	&.multiCorrect {
+		background-color: @positive-color;
+		.tick-cross {
+			background: url(/images/famicons/tick.png) 0 0 no-repeat;
+		}
+	}
+	&.multiIncorrect {
+		background-color: #F5CFCF;
+		.tick-cross {
+			background: url(/images/famicons/cross.png) 0 0 no-repeat;
+		}
+	}
 }
 
-.evaluation-content.mark-test ul.multiple-choice-mark li .tick-cross {
-    background: none
-}
-
-.evaluation-content.mark-test ul.multiple-choice-mark li.correct-answer {
-    background-color: @lgrey
-}
-
-.evaluation-content.mark-test ul.multiple-choice-mark li.multiCorrect {
-    background-color: @positive-color;
-}
-
-.evaluation-content.mark-test ul.multiple-choice-mark li.multiCorrect .tick-cross {
-    background: url(/images/famicons/tick.png) 0 0 no-repeat;
-}
-
-.evaluation-content.mark-test ul.multiple-choice-mark li.multiIncorrect {
-    background-color: #F5CFCF;
-}
-
-.evaluation-content.mark-test ul.multiple-choice-mark li.multiIncorrect .tick-cross {
-    background: url(/images/famicons/cross.png) 0 0 no-repeat;
-}
 
 /*review test */
 .evaluation-content.student-review p.marks-amount {
