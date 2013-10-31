@@ -16,8 +16,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
         $dateFilter = '';
         if (count($this->dateRange)) {
             $dateFilter = sprintf(
-                "AND datetime BETWEEN '%s' AND '%s'", date('Y-m-d', $this->dateRange[0]),
-                date('Y-m-d', $this->dateRange[1])
+                "AND datetime BETWEEN '%s' AND NOW()", date('Y-m-d', $this->dateRange[0])
             );
         }
 
