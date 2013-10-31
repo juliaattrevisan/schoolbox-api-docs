@@ -124,6 +124,9 @@ abstract class Evaluation_Export_Xml {
 				$this->getPage()->setVar('question_block', '');
 			}
 		}
+		else {
+			$this->getPage()->setVar('section_block', '');
+		}
 	}
 
 	/**
