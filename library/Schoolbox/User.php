@@ -19,6 +19,7 @@ class User {
     private $lastname;
     private $externalId;
     private $altEmail;
+    private $webmail;
     private $username;
     private $password;
     private $year;
@@ -162,6 +163,24 @@ private $enabled;               //Bool
     public function getAltEmail() {
         return $this->altEmail;
     }
+
+    /**
+     * @param int $webmail
+     */
+    public function setWebmail($webmail)
+    {
+        $this->webmail = $webmail;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWebmail()
+    {
+        return $this->webmail;
+    }
+
+
 
     public function setCalendarView($calendarView) {
         $this->calendarView = $calendarView;
