@@ -65,6 +65,10 @@
 				if ($(this).val() !== '') {
 					$.fn.evaluationResponseReview.saveReview(config.questionForm);
 				}
+				config.questionForm.find('textarea').addClass('ajax-updated');
+				setTimeout(function() {
+					config.questionForm.find('textarea').removeClass('ajax-updated');
+				}, 1000);
 			});
 		}
 
@@ -74,6 +78,10 @@
 		function initSaveMarks() {
 			config.questionForm.find('input[name=reviewedMarks]').blur(function() {
 				$.fn.evaluationResponseReview.saveReview(config.questionForm);
+				config.questionForm.find('input[name=reviewedMarks]').addClass('ajax-updated');
+				setTimeout(function() {
+					config.questionForm.find('input[name=reviewedMarks]').removeClass('ajax-updated');
+				}, 1000);
 			});
 		}
 	}

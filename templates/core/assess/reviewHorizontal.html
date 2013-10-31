@@ -5,19 +5,32 @@
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/javascript/evaluation/review.js"></script>
 <style>
-	div.respondent-attempt {
-		border: 1px solid #0f0;
+	.horizontal-marking-table {
 		width: 100%;
+		display: table;
+		border-top: 1px solid #CCC;
+	}
+	.respondent-attempt {
+		width: 100%;
+		display: table-row;
+	}
+	.column {
+		vertical-align: top;
+		display: table-cell;
+		padding: 7px 4px;
+		border-bottom: 1px solid #CCC;
+	}
+	.column.student {
+		width: 150px;
+	}
+	.column img {
 		float: left;
-		clear: both;
+		margin-right: 8px;
+	}
+	.column input[type="submit"] {
+		margin: 0;
 	}
 
-	ul.respondent-attempt li.column {
-		width: 200px;
-		border: 1px solid #00f;
-		display: block;
-		float: left;
-	}
 </style>
 <!-- END custom_head -->
 <h1>Horizontal Marking for {ASSESS_TITLE}<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'><span></span>Back to assessment</a></h1>
@@ -32,9 +45,9 @@
 		<!-- END answerInputsTop -->
 	</div>
 
-	<div class="">
+	<div class="horizontal-marking-table">
 		<!-- BEGIN attempt -->
-		<div class='respondent-attempt {ON_OFF}'>
+
 			<script type='text/javascript'>
 				$j(function() {
 					$j('questionForm-{RESPONSE_ID}').evaluationResponseReview({
@@ -43,41 +56,37 @@
 				});
 			</script>
 
-			<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID} questionForm' method="post">
-				<ul class='respondent-attempt'>
-					<li class='column'>
+			<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='respondent-attempt {ON_OFF} validation_{RESPONSE_ID} questionForm' method="post">
+					<div class='column student'>
 						<img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=square32'>
 						{USER_LASTNAME}, {USER_FIRSTNAME}
-					</li>
+					</div>
 
 					<!-- BEGIN answerInputs -->
 					<!-- END answerInputs -->
 
-					<li class='column'>
+					<div class='column submit'>
 						<!-- BEGIN writable_update -->
-						<input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
+						<input type="submit" value="Save" class="submit-btn-plain float-right"/>
 						<!-- END writable_update -->
-					</li>
-				</ul>
+					</div>
 			</form>
-		</div>
 		<!-- END attempt -->
-
-		<p class="clearfix text-align-right">
-			<!-- BEGIN next_question -->
-			<a class='btn go-to' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'><span></span>Next</a>
-			<!-- END next_question -->
-
-			<!-- BEGIN previous_question -->
-			<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'><span></span>Previous</a>
-			<!-- END previous_question -->
-
-			<!-- BEGIN writable_finalise -->
-			<div class="assess-alert">
-				<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
-			</div>
-			<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise'>Finalise all attempts</a>
-			<!-- END writable_finalise -->
-		</p>
 	</div>
+	<p class="clearfix text-align-right">
+		<!-- BEGIN next_question -->
+		<a class='btn go-to' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'><span></span>Next</a>
+		<!-- END next_question -->
+
+		<!-- BEGIN previous_question -->
+		<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'><span></span>Previous</a>
+		<!-- END previous_question -->
+
+		<!-- BEGIN writable_finalise -->
+		<div class="assess-alert">
+			<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
+		</div>
+		<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise'>Finalise all attempts</a>
+		<!-- END writable_finalise -->
+	</p>
 </div>
