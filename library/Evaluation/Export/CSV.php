@@ -213,7 +213,7 @@ abstract class Evaluation_Export_CSV {
 
 		/* Collate all attempts and their responses
 		 */
-		if (is_array($this->getAllQuestions()) && count($this->getAllQuestions())) {
+		if (is_array($this->getAllAttempts()) && count($this->getAllAttempts())) {
 			foreach($this->getAllAttempts() as $currentAttempt) {
 
 				/* Get attempt details
@@ -291,7 +291,7 @@ abstract class Evaluation_Export_CSV {
 				$allResponses[] = $row;
 			}
 		}
-		
+
 		return $allResponses;
 	}
 
