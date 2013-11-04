@@ -7,6 +7,7 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\CategoryMapper;
@@ -109,23 +110,28 @@ class Digest_News {
         unset($this->userList);
         unset($this->catHandler);
         unset($this->newsHandler);
-        unset($this->groupHandler);
         unset($this->catnewsHandler);
         unset($this->textFormatter);
     }
 
-    public function compileUserList() {
+    public function compileUserList(Role $role = null) {
+        $params = array();
         $sql = "SELECT u.id, u.username, u.firstname, u.lastname, u.group_id gid, u.local_email, u.alt_email, uc.campus
                 FROM `user` u
                 INNER JOIN userCampus uc ON uc.uid = u.id";
+        if ($role instanceof Role) {
+            $params[] = $role->getId();
+            $sql     .= ' WHERE u.group_id = ?';
+        }
 
         $prevUID = -1;
         $userList = array();
 
         // compile into 2D assoc array
-        $statement = Database::getInstance()->query($sql);
-        while($user = $statement->fetch(PDO::FETCH_ASSOC)) {
-            if($user['id'] != $prevUID) {
+        $statement = Database::getInstance()->prepare($sql);
+        $statement->execute($params);
+        foreach ($statement as $user) {
+            if ($user['id'] != $prevUID) {
                 $userList[$user['id']] = array(
                     'id'        => $user['id'],
                     'firstname' => $user['firstname'],
