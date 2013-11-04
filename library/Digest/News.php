@@ -22,7 +22,6 @@ class Digest_News {
 
     protected $catHandler;
     protected $newsHandler;
-    protected $groupHandler;
     protected $catnewsHandler;
     protected $emailHandler;
 
@@ -65,7 +64,6 @@ class Digest_News {
 
         $this->catHandler = new Category();
         $this->newsHandler = new News();
-        $this->groupHandler = new Group();
         $this->catnewsHandler = new CategoryNews();
         $this->emailHandler = new Email();
 
