@@ -14,10 +14,22 @@ class Role {
     private $type;          //Type of user group, guest, student, parent, staff
     private $canChangePassword;  //Users can change passwords (bool)
 
+    /**
+     * What's the digest schedule for this group?
+     * Always one of self::DIGEST_NEVER, self::DIGEST_DAILY, self::DIGEST_WEEKLY
+     *
+     * @var int
+     */
+    protected $digestSchedule;
+
     const GUEST = 'guest';
     const STUDENT = 'student';
     const PARENT = 'parent';
     const STAFF = 'staff';
+
+    const DIGEST_NEVER  = 0;
+    const DIGEST_WEEKLY = 1;
+    const DIGEST_DAILY  = 2;
 
     /**
      * True if role is student
@@ -78,9 +90,20 @@ class Role {
         return $this->type;
     }
 
+    /**
+     * @param  int   $digestSchedule
+     * @return $this
+     */
+    public function setDigestSchedule($digestSchedule) {
+        $this->digestSchedule = $digestSchedule;
+        return $this;
+    }
 
-
-
-
+    /**
+     * @return int
+     */
+    public function getDigestSchedule() {
+        return $this->digestSchedule;
+    }
 
 }
