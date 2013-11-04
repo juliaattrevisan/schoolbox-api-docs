@@ -883,7 +883,7 @@ class SitePage extends Page {
     function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '') {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array();
-        if (is_array($data)) {
+        if (is_array($data) && count($data) > 0) {
             foreach ($data as $row) {
                 foreach ($row as $key => $value) {
                     $mapping[$key] ? $key = $mapping[$key] : '';
@@ -904,7 +904,7 @@ class SitePage extends Page {
     function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array()) {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array($selected);
-        if (is_array($data) || $data instanceof Traversable) {
+        if ((is_array($data) && count($data) > 0 ) || $data instanceof Traversable) {
             foreach ($data as $row) {
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
