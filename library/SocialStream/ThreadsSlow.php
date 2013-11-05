@@ -172,7 +172,7 @@ class ThreadsSlow {
 		}
 
 		/* Save that one for later!
-	 	 */
+		 */
 		$this->setTree($collection);
 
 		return $this;
@@ -206,7 +206,7 @@ class ThreadsSlow {
 		$authenticator = new Authenticator($newPost, $this->getInstance(), $currentUser);
 
 		/* Simply hide the comment icon if you can't view it
- 		 */
+		 */
 		if ($authenticator->canComment()) {
 			$canComment = true;
 		}
@@ -227,7 +227,7 @@ class ThreadsSlow {
 		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_icon', 'socialstream_post_has_icon_block');
 		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
 		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_player', 'socialstream_post_has_player_block');
-        $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_video', 'socialstream_post_has_video_block');
+		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_video', 'socialstream_post_has_video_block');
 		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_metadata', 'socialstream_post_has_metadata_block');
 		$page->setBlock('socialstream_post', 'socialstream_post_has_add', 'socialstream_post_has_add_block');
 		$page->setBlock('socialstream_post', 'socialstream_post_has_delete', 'socialstream_post_has_delete_block');
@@ -236,7 +236,7 @@ class ThreadsSlow {
 		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_icon', 'socialstream_comment_has_icon_block');
 		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
 		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
-        $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video', 'socialstream_comment_has_video_block');
+		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video', 'socialstream_comment_has_video_block');
 		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_metadata', 'socialstream_comment_has_metadata_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_add', 'socialstream_comment_has_add_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_delete', 'socialstream_comment_has_delete_block');
@@ -245,7 +245,7 @@ class ThreadsSlow {
 		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_icon', 'socialstream_reply_has_icon_block');
 		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
 		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
-        $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_video', 'socialstream_reply_has_video_block');
+		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_video', 'socialstream_reply_has_video_block');
 		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_metadata', 'socialstream_reply_has_metadata_block');
 		$page->setBlock('socialstream_reply', 'socialstream_reply_has_delete', 'socialstream_reply_has_delete_block');
 
@@ -257,8 +257,8 @@ class ThreadsSlow {
 			'socialstream_post_has_attachment_block' => '',
 			'socialstream_post_has_icon_block' => '',
 			'socialstream_post_has_thumbnail_block' => '',
-            'socialstream_post_has_player_block' => '',
-            'socialstream_post_has_video_block' => '',
+			'socialstream_post_has_player_block' => '',
+			'socialstream_post_has_video_block' => '',
 			'socialstream_post_has_metadata_block' => '',
 			'socialstream_post_has_delete_block' => '',
 
@@ -266,7 +266,7 @@ class ThreadsSlow {
 			'socialstream_comment_has_icon_block' => '',
 			'socialstream_comment_has_thumbnail_block' => '',
 			'socialstream_comment_has_player_block' => '',
-            'socialstream_comment_has_video_block' => '',
+			'socialstream_comment_has_video_block' => '',
 			'socialstream_comment_has_metadata_block' => '',
 			'socialstream_comment_has_delete_block' => '',
 
@@ -274,7 +274,7 @@ class ThreadsSlow {
 			'socialstream_reply_has_icon_block' => '',
 			'socialstream_reply_has_thumbnail_block' => '',
 			'socialstream_reply_has_player_block' => '',
-            'socialstream_reply_has_video_block' => '',
+			'socialstream_reply_has_video_block' => '',
 			'socialstream_reply_has_metadata_block' => '',
 			'socialstream_reply_has_delete_block' => '',
 		));
@@ -328,7 +328,7 @@ class ThreadsSlow {
 				'socialstream_post_has_icon_block' => '',
 				'socialstream_post_has_thumbnail_block' => '',
 				'socialstream_post_has_player_block' => '',
-                'socialstream_post_has_video_block' => '',
+				'socialstream_post_has_video_block' => '',
 				'socialstream_post_has_metadata_block' => '',
 			));
 
@@ -383,7 +383,7 @@ class ThreadsSlow {
 					'socialstream_comment_has_icon_block' => '',
 					'socialstream_comment_has_thumbnail_block' => '',
 					'socialstream_comment_has_player_block' => '',
-                    'socialstream_comment_has_video_block' => '',
+					'socialstream_comment_has_video_block' => '',
 					'socialstream_comment_has_metadata_block' => '',
 				));
 
@@ -427,7 +427,7 @@ class ThreadsSlow {
 						'socialstream_reply_has_icon_block' => '',
 						'socialstream_reply_has_thumbnail_block' => '',
 						'socialstream_reply_has_player_block' => '',
-                        'socialstream_reply_has_video_block' => '',
+						'socialstream_reply_has_video_block' => '',
 						'socialstream_reply_has_metadata_block' => '',
 					));
 
@@ -446,7 +446,7 @@ class ThreadsSlow {
 						'socialstream_reply_has_icon_block' => '',
 						'socialstream_reply_has_thumbnail_block' => '',
 						'socialstream_reply_has_player_block' => '',
-                        'socialstream_reply_has_video_block' => '',
+						'socialstream_reply_has_video_block' => '',
 						'socialstream_reply_has_metadata_block' => '',
 						'socialstream_reply_has_add_block' => '',
 						'socialstream_reply_has_delete_block' => '',
@@ -462,7 +462,7 @@ class ThreadsSlow {
 					'socialstream_comment_has_icon_block' => '',
 					'socialstream_comment_has_thumbnail_block' => '',
 					'socialstream_comment_has_player_block' => '',
-                    'socialstream_comment_has_video_block' => '',
+					'socialstream_comment_has_video_block' => '',
 					'socialstream_comment_has_metadata_block' => '',
 					'socialstream_comment_has_add_block' => '',
 					'socialstream_comment_has_delete_block' => '',
@@ -473,20 +473,20 @@ class ThreadsSlow {
 			/* Clear children after parsing out the parent
 			 */
 			$page->parse('socialstream_post_block', 'socialstream_post', true);
-			
+
 			$page->setVar(array(
 				'socialstream_post_has_attachment_block' => '',
 				'socialstream_post_has_icon_block' => '',
 				'socialstream_post_has_thumbnail_block' => '',
 				'socialstream_post_has_player_block' => '',
-                'socialstream_post_has_video_block' => '',
+				'socialstream_post_has_video_block' => '',
 				'socialstream_post_has_metadata_block' => '',
 				'socialstream_post_has_add_block' => '',
 				'socialstream_post_has_delete_block' => '',
 				'socialstream_comment_block' => '',
 				'socialstream_reply_block' => '',
 			));
-			
+
 			/* Alternating colours -_-
 			 */
 			$i++;
