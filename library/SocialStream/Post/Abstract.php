@@ -352,7 +352,7 @@ abstract class SocialStream_Post_Abstract {
 	/**
 	 * Get children
 	 *
-	 * @return null
+	 * @return SocialStream_Post_Abstract[]
 	 */
 	public function getChildren() {
 		return $this->children;
