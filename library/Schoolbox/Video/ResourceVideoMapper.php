@@ -21,6 +21,13 @@ class ResourceVideoMapper extends Mapper {
 		$this->hasTable('video_queue');
 		$this->hasModel('\\Schoolbox\\Video\\ResourceVideo');
 
+        $this->hasMap(array(
+            'column'     => 'video_queue_id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true,
+        ));
+
 		$this->hasMap(array(
 			              'column'     => 'type',
 			              'property'   => 'type',
