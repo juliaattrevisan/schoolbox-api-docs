@@ -26,7 +26,7 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 	 * Contextually render thumbnail images
 	 *
 	 * @param $context
-	 * @param $page
+	 * @param SitePage $page
 	 * @return bool|mixed
 	 */
 	public function renderThumbnail($context, $page) {
@@ -108,8 +108,38 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 					));
 				}
 			}
-
-			return false;
 		}
+
+		// Do a video chaining thing
+		$chain  = new \SocialStream\Post\Video\Chain($this->getUrl());
+		$result = $chain->getResult();
+		if (!empty($result)) {
+			if ($context == 'post') {
+				$page->setVar(array(
+					'SOCIALSTREAM_POST_VIDEO_POSTER' => Scrub::text($result['poster']),
+					'SOCIALSTREAM_POST_VIDEO_SRC'    => Scrub::text($result['src']),
+				));
+				$page->parse('socialstream_post_has_video_block', 'socialstream_post_has_video');
+				return true;
+			}
+			elseif ($context == 'comment') {
+				$page->setVar(array(
+					'SOCIALSTREAM_COMMENT_VIDEO_POSTER' => Scrub::text($result['poster']),
+					'SOCIALSTREAM_COMMENT_VIDEO_SRC'    => Scrub::text($result['src']),
+				));
+				$page->parse('socialstream_comment_has_video_block', 'socialstream_comment_has_video');
+				return true;
+			}
+			elseif ($context == 'reply') {
+				$page->setVar(array(
+					'SOCIALSTREAM_REPLY_VIDEO_POSTER' => Scrub::text($result['poster']),
+					'SOCIALSTREAM_REPLY_VIDEO_SRC'    => Scrub::text($result['src']),
+				));
+				$page->parse('socialstream_reply_has_video_block', 'socialstream_reply_has_video');
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

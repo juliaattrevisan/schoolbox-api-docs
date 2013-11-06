@@ -17,13 +17,8 @@ if (is_numeric($_GET['id']) || isset($_GET['hash'])) {
 	$fileHandler = new File;
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 	try {
-        if($_GET['type'] == 'storage') {
-            if (isset($_GET['hash'])) {
-                $video = $videoQueueMapper->findByStorageHash($_GET['hash']);
-            }
-            else {
-                $video = $videoQueueMapper->findByStorageId($_GET['id']);
-            }
+        if (isset($_GET['hash'])) {
+            $video = $videoQueueMapper->findByStorageHash($_GET['hash']);
         }
         else {
             $video = $videoQueueMapper->findByFileId($_GET['id']);
