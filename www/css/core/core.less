@@ -5444,11 +5444,11 @@ COLOUR ADJUSTMENT BOX
 }
 
 .active-box {
-    background-color: @alternate-background
+    background-color: lighten(@highlight-color, @lighten-value);
 }
 
 .colour:hover {
-    background-color: @white;
+
     cursor: pointer;
 }
 
@@ -5720,7 +5720,7 @@ HOMEPAGE CUSTOMISE
 }
 
 #tabs-homepage #tabs-sub li.ui-tabs-selected a {
-    background: @alternate-background;
+    background: lighten(@highlight-color, @lighten-value);
 }
 
 /*CUSTOMISE COMPONENT*/
