@@ -8,7 +8,7 @@
  */
 class Component_Config_CaptionState extends Component_Config_Abstract {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
         //
         // Anything other than "active" gets set to "inactive" directly
         if (!($configValue == 'Active')) {

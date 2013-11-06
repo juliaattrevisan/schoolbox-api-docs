@@ -7,7 +7,7 @@
  */
 class Component_Config_Video extends Component_Config_Abstract {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
 	    $vidList = $videoMapper->findByCategory($this->getCategory('id'));

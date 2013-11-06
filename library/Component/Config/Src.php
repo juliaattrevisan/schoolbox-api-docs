@@ -11,7 +11,7 @@ class Component_Config_Src extends Component_Config_Abstract {
 
 //    protected $is_shown_on_template = false;
 
-	public function parse(SitePage $page, $key, $keyblock, $configValue) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
         $catHandler = new Category();
         $cat = $catHandler->getByID($configValue);
 

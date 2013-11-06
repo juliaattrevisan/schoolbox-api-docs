@@ -55,5 +55,5 @@ abstract class Component_Config_Abstract {
         return $this->is_shown_on_template;
     }
 
-    public abstract function parse(SitePage $page, $key, $keyblock, $configValue);
+    public abstract function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array());
 }
