@@ -92,7 +92,7 @@ class ResourceVideoMapper extends Mapper {
             SELECT {$fileMapper->getColumnString('f')}, {$this->getColumnString('vq')}
                      FROM `{$this->getTable()}` vq
                     JOIN {$this->getJoinSQL('file','vq','f')}
-            WHERE f.id = ? AND vq.status = 'completed'
+            WHERE f.id = ? AND vq.status = 'completed' AND vq.type='sbfs'
             " );
 
 		$statement->execute(array($id));
@@ -116,7 +116,7 @@ class ResourceVideoMapper extends Mapper {
             SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
                      FROM `{$this->getTable()}` vq
                     JOIN {$this->getJoinSQL('storage','vq','s')}
-            WHERE s.storage_id = ? AND vq.status = 'completed'
+            WHERE s.storage_id = ? AND vq.status = 'completed' AND vq.type='storage'
             " );
 
         $statement->execute(array($id));
@@ -149,7 +149,7 @@ class ResourceVideoMapper extends Mapper {
             SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
             FROM `{$this->getTable()}` vq
             INNER JOIN {$this->getJoinSQL('storage','vq','s')}
-            WHERE s.hash = ? AND vq.status = 'completed'
+            WHERE s.hash = ? AND vq.status = 'completed' AND vq.type='storage'
         ");
 
         $statement->execute(array($hash));
