@@ -45,6 +45,7 @@ if (is_numeric($_GET['eventID'])) {
     $output = array(
         'FUNCTION' => 'Update',
         'EVENT_ID' => $event['id'],
+        'EVENT_USER_ID' => $event['owner'],
         'START_DATE' => $startDate->getusingFormat('d/m/Y'),
         'START_HOUR' => $event['allday'] ? '' : $startDate->getUsingFormat('h'),
         'START_MIN' => $event['allday'] ? '' :$startDate->getUsingFormat('i'),
@@ -180,6 +181,7 @@ else {
     $output = array(
         'FUNCTION' => 'Add',
         'EVENT_ID' => '',
+        'EVENT_USER_ID' => $_GET['userId'] ?: $_SESSION['user']->getId(),
         'START_DATE' => $startDate->getUsingFormat('d/m/Y'),
         'START_HOUR' => '',
         'START_MIN' => '',
