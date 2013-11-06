@@ -30,7 +30,7 @@ list($class_id, $unit_id) = $this->arg;
 /** @var Category $category */
 try {
     $category = CategoryMapper::getInstance()->findById($class_id);
-    CategoryMapper::getInstance()->loadJoinedModel('codes', $category);
+    CategoryMapper::getInstance()->loadJoinedModel('codes', $category, array('set_method' => 'setCodes'));
 }
 catch (Schoolbox\Mapper\Exception $e) {
     error(6);
