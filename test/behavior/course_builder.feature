@@ -119,18 +119,18 @@ Scenario: Add a course to a class
   And   I log in as "cglenn" with password "password"
   # Test adding this new course to a group page. Students should be able to take this course.
   When  I follow "Duke of Edinburgh"
-#  And   I add component "Learning:Course Outline"
-#  And   I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
-#  And   I wait for a "form#importForm" element
-#  # Set due dates for units
-#  When  I set open date for course unit "Chemical reactions" as "today 12:00am"
-#  And   I set due date for course unit "Chemical reactions" as "+9 days 12:00am"
-#  # Let's say this unit was due in the past. For now, that's acceptable.
-#  And   I set open date for course unit "Atomic structure and bonding" as "today -9 days 12:00am"
-#  And   I set due date for course unit "Atomic structure and bonding" as "yesterday 12:00am"
-#  And   I set open date for course unit "Macroscopic properties of matter" as "today +10 days 12:00am"
-#  And   I set due date for course unit "Macroscopic properties of matter" as "today +19 days 12:00am"
-#  And   I press "Import"
+  And   I add component "Learning:Course Outline"
+  And   I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
+  And   I wait for a "form#importForm" element
+  # Set due dates for units
+  When  I set open date for course unit "Chemical reactions" as "today 12:00am"
+  And   I set due date for course unit "Chemical reactions" as "+9 days 12:00am"
+  # Let's say this unit was due in the past. For now, that's acceptable.
+  And   I set open date for course unit "Atomic structure and bonding" as "today -9 days 12:00am"
+  And   I set due date for course unit "Atomic structure and bonding" as "yesterday 12:00am"
+  And   I set open date for course unit "Macroscopic properties of matter" as "today +10 days 12:00am"
+  And   I set due date for course unit "Macroscopic properties of matter" as "today +19 days 12:00am"
+  And   I press "Import"
   # Everything should be imported as if by magic.
   # Atomic Structure: closed, should have "Read c4, attend lab, dumb work for bonding"
   Then  title should contain "Duke of Edinburgh"
@@ -149,7 +149,7 @@ Scenario: Add a course to a class
         | Chemical Reactions 1 |
         | Dumb Due Work        |
         | Offline Due Work     |
-        | Read Chapter 3       |
+        | Read chapter 3       |
         | Attend 3 classes     |
   And   course "Macroscopic properties of matter" should not be open yet
   And   course "Macroscopic properties of matter" should have tasks:
