@@ -311,7 +311,7 @@ abstract class Component_ControllerAbstract {
                 // attempt to build a configuration instance from the key provided
                 if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                     if (!($is_for_template && !$conf->isShownOnTemplate())) {
-					    $this->parseConfigInstance($conf, $key, $page, $params);
+					    $this->parseConfigInstance($conf, $key, $page, $params, $config);
 	                    ++$configCount;
                     }
                 }
@@ -347,12 +347,13 @@ abstract class Component_ControllerAbstract {
 	 * @param string                    $key
 	 * @param SitePage                  $page
 	 * @param array                     $params
+	 * @param array                     $allConfigs All configurations for this component
 	 */
-	protected function parseConfigInstance($conf, $key, $page, $params) {
+	protected function parseConfigInstance($conf, $key, $page, $params, $allConfigs = array()) {
 		$templateFile = "component/config/$key.html";
 
 		$page->setFile($key, $templateFile);
-		$conf->parse($page, $key, $key, Scrub::text($params['value']));
+		$conf->parse($page, $key, $key, Scrub::text($params['value']), $allConfigs);
 		$page->parse('CONFIG_ELEMENT_CONTENT', $key);
 		$page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
 		$page->parse('config_element_block', 'config_element', true);
