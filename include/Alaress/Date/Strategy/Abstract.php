@@ -51,14 +51,17 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	 * @return mixed|void
 	 */
 	public function setFromFormat($dateTime, $inputDateFormat) {
+		// DateTime object must be reset each time this is called, because
+		// otherwise the old DateTime is used when calling getUsingFormat().
+		$this->setDateTimeObject(null);
 		if ($dateTime instanceof DateTime) {
 			$this->setDateTimeObject($dateTime);
 		}
 		elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
-			$this->setFromFormat($dateTime->getUnixTimestamp(), 'U');
+			$this->setByTimestamp($dateTime->getUnixTimestamp());
 		}
 		elseif ($inputDateFormat == 'U') {
-            $this->setByTimestamp($dateTime);
+			$this->setByTimestamp($dateTime);
 		}
 		elseif ($inputDateFormat !== null) {
 			$this->setInputDateFormat($inputDateFormat);
