@@ -74,4 +74,38 @@ class Redis {
         return $this;
     }
 
+    /**
+     * Caches results of a function call in Redis.
+     *
+     * The result is stored in "$base_key:sha256(serialize($params))".
+     *
+     * @param string   $base_key The base of the key to store the result in.
+     * @param callable $callback A callable that returns a value to be cached,
+     *                           if there is no value already in the cache.
+     * @param mixed    $params   A parameter to pass to $callback. This is also
+     *                           used to generate the cache key.
+     * @param int      $timeout  Cache timeout (null for none)
+     *
+     * @return mixed
+     */
+    public function cacheFunctionCall($base_key, $callback, $params, $timeout = null) {
+        $redis = $this->getClient();
+        $key   = $base_key.':'.hash('sha256', serialize($params));
+
+        // Would use Redis hashes, but individual keys don't have expiry.
+        if (!($redis->exists($key))) {
+            $result = call_user_func($callback, $params);
+            if ($timeout > 0) {
+                $redis->setex($key, $timeout, $result);
+            }
+            else {
+                $redis->set($key, $result);
+            }
+        }
+        else {
+            $result = $redis->get($key);
+        }
+        return $result;
+    }
+
 }
