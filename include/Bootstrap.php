@@ -57,6 +57,8 @@ if ($is_debug_enabled) {
     $debug_bar->addCollector($deprecated_database->getCollector());
 }
 
+// Redis connection configuration
+$redis = Alaress\Redis::getInstance()->connect('tcp://127.0.0.1:6379');
 
 /* Set default time zone */
 date_default_timezone_set(Cfg::get('date_timezone'));
