@@ -15,10 +15,11 @@ class External_SchoolPro_Timetable {
 	 *
 	 * @param $campusId
 	 * @param int $day
+	 * @return array|bool
 	 */
 	public function getTimetableDefinition($campusId, $day=0) {
 		$vars = array(
-			'sbGetDayNumber',
+			'sbGetTimetableDefinition',
 			array(
 				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
@@ -29,10 +30,20 @@ class External_SchoolPro_Timetable {
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
 		if ($result['success'] && count($result['result'])) {
-			return $result['result'][0]['DayNumber'];
+			$allDefinitions = array();
+
+			foreach($result['result'] as $currentDefinition) {
+				$allDefinitions['desc'][] = $currentDefinition['PeriodDescription'];
+				$allDefinitions['start'][] = $currentDefinition['TimeFrom'];
+				$allDefinitions['end'][] = $currentDefinition['TimeTo'];
+				$allDefinitions['number'][] = preg_replace('/[^0-9]+/', '', $currentDefinition['PeriodNumber']);
+				$allDefinitions['sequence'][] = $currentDefinition['DayNumber'];
+			}
+
+			return $allDefinitions;
 		}
-		else {
-		}
+
+		return false;
 	}
 
 	/**
