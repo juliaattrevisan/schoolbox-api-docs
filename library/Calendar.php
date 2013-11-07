@@ -935,7 +935,7 @@ class Calendar extends DeprecatedModel {
         if ($this->getPerm($event) < WRITE_ACCESS) {
             error(35);
         }
-var_dump($event);
+
         $groupList = $event['groupList'];
         $campusList = $event['campusList'];
 
