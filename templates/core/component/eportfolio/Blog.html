@@ -94,25 +94,23 @@
 					<!-- END comment -->
 				</ul>
 
-				<a href="#" class="viewComments btn chat show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show comments</a>
 				<!-- END has_comments -->
-
-				<p class='interact'>
-					<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn add'><span></span>Add Comment</a>
-				</p>
-
 				<form id='modify_blogcomment_form_{LIST_ITEM_ID}' class='modifyForm hide' action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
 					<input type='hidden' name='action' value='addComment' />
 					<input type='hidden' name='userId' value='{ID}' />
 					<input type='hidden' name='pageId' value='{PAGE_ID}' />
 					<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
 
-					<label>
-						<input name='content' type='text' value='' />
-					</label>
-
-					<input type='submit' class='submit-btn-plain' value='Add Comment' />
+					<p><textarea name="content" rows="2" cols="100" placeholder="Add your comment"></textarea>
+						<input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
 				</form>
+
+				<p class='interact'>
+					<a href="#" class="viewComments btn chat show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show comments</a>
+					<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn add'><span></span>Add Comment</a>
+				</p>
+
+
 
 				<!-- BEGIN has_modify_form -->
 				<form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post'>
