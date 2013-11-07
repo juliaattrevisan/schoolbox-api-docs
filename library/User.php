@@ -215,19 +215,22 @@ class User extends DeprecatedModel {
 	function ajaxSearch($keyword, $group = 0, $limit = false) {
 		//search for a user based on at least one of the above fields
 		//assumes at least one contains something
-		$keyword = mysql_real_escape_string($keyword);
 
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email
 					FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE ";
 
 		if ($keyword != "") {
 			if (is_numeric($keyword)) {
-				$query .= "( synergy_id = $keyword OR year = $keyword ) ";
+				$param = $this->db->quote($keyword);
+				$query .= "( synergy_id = $param OR year = $param ) ";
 			} else {
-				if (preg_match('/([[:alpha:]\']+) ([[:alpha:]\']+)/', $keyword, $name)) {
-					$query .= "( firstname like '%{$name[1]}%' and lastname like '%{$name[2]}%' ) ";
+				if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
+					$firstName = $this->db->quoteForLike($name[1]);
+					$lastName  = $this->db->quoteForLike($name[2]);
+					$query .= "( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' ) ";
 				} else {
-					$query .= "( firstname like '%$keyword%' or lastname like '%$keyword%' or username like '%$keyword%' ) ";
+					$param = $this->db->quoteForLike($keyword);
+					$query .= "( firstname like '%$param%' or lastname like '%$param%' or username like '%$param%' ) ";
 				}
 			}
 
