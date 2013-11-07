@@ -85,10 +85,11 @@ class External_SchoolPro_Timetable {
 	 * Get period number for a particular campus
 	 *
 	 * @param $campusId
+	 * @return bool
 	 */
 	public function getPeriodNumber($campusId) {
 		$vars = array(
-			'sbGetDayNumber',
+			'sbGetPeriodNumber',
 			array(
 				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
@@ -98,12 +99,11 @@ class External_SchoolPro_Timetable {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		new \Alaress_Probe($result);
+		if ($result['success'] && count($result['result'])) {
+			return $result['result'][0]['PeriodNumber'];
+		}
 
-		if ($result['success']) {
-		}
-		else {
-		}
+		return false;
 	}
 
 	/**
