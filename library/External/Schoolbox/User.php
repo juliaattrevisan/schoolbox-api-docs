@@ -306,7 +306,7 @@ class External_Schoolbox_User implements External_UserInterface {
      */
     public function getPortrait ($externalUserId) {
 
-        $portraitPath = realpath( Config::get('portrait_dir') ) . "/portrait/$externalUserId.jpg";
+        $portraitPath = realpath( Config::get('portrait_dir') ) . "/$externalUserId.jpg";
 
         if ( is_readable($portraitPath) ) {
             return $portraitPath;

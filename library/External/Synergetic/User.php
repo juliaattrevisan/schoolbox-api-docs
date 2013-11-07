@@ -46,7 +46,7 @@ class External_Synergetic_User implements External_UserInterface {
 		";
 
 		if ($photo = $this->getDatabase()->getRow($query)) {
-			$photoPath = Config::get('portrait_dir') . '/portrait/' . $externalUserId . '.jpg';
+			$photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
 
 			//TODO: delete photos on rollover
 
