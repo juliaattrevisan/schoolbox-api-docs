@@ -93,17 +93,28 @@ class Redis {
         $key   = $base_key.':'.hash('sha256', serialize($params));
 
         // Would use Redis hashes, but individual keys don't have expiry.
-        if (!($redis->exists($key))) {
-            $result = call_user_func($callback, $params);
-            if ($timeout > 0) {
-                $redis->setex($key, $timeout, $result);
+        $is_result_called = false;
+        $result           = null;
+        try {
+            if (!($redis->exists($key))) {
+                $is_result_called = true;
+                $result           = call_user_func($callback, $params);
+                if ($timeout > 0) {
+                    $redis->setex($key, $timeout, $result);
+                }
+                else {
+                    $redis->set($key, $result);
+                }
             }
             else {
-                $redis->set($key, $result);
+                $result = $redis->get($key);
             }
         }
-        else {
-            $result = $redis->get($key);
+        catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
+            if (!$is_result_called) {
+                $result = call_user_func($callback, $params);
+            }
         }
         return $result;
     }
