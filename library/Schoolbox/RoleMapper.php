@@ -42,6 +42,11 @@ class RoleMapper extends Mapper {
                 'type'       => Mapper::TYPE_BOOLEAN,
         ));
 
+        $this->hasMap(array(
+            'column'   => 'digest_schedule',
+            'property' => 'digestSchedule',
+            'type'     => self::TYPE_INTEGER,
+        ));
     }
 
 }
