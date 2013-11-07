@@ -31,7 +31,8 @@ class SchoolEvents extends Generic {
 
         $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
         $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
-        $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
+        $end = new Alaress_Date_Format($start);
+        $end->addDays(1);
 
         $cList = array(
             'events' => $calendarHandler->getEvents($start->getUnixTimestamp(), $end->getUnixTimestamp())->getStack()
