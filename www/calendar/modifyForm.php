@@ -10,6 +10,26 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $calendarHandler = new Calendar();
 $page = new SitePage();
 
+/** @var Schoolbox\User $user */
+$user = $_SESSION['user'];
+$ownerId = $user->getId();
+$groupHandler = new Group();
+/* Superuser/Staff/Parent adding event for someone else or
+ * someone creating their own event
+ */
+if ($groupHandler->isSuperuser()
+    || $groupHandler->isStaff()
+    || $groupHandler->isParentOfChild($_POST['userId'])
+    || ($user->getId() == $_POST['userId'])
+) {
+    $ownerId = $_POST['userId'];
+}
+/* You're not supposed to be able to create events under other circumstances
+ */
+else {
+    error(19);
+}
+
 switch($_POST['action']) {
     case 'Add':
     case 'Update':
@@ -36,7 +56,7 @@ switch($_POST['action']) {
 			$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
 			$event = array(
-				'owner' => $_SESSION['id'],
+				'owner' => $ownerId,
 				'access' => $_POST['level'],
 				'sid' => $_POST['group'],
 				'campusList' => $_POST['campus'],
@@ -52,6 +72,13 @@ switch($_POST['action']) {
 				'attendance' => $_POST['attendance'],
 				'detail' => $_POST['detail'],
 				'publish_date' => $publishDate,
+			);
+
+			$validRepeat = array(
+				'daily' => '+1 day',
+				'weekly' => '+1 week',
+				'fortnightly' => '+2 weeks',
+				'monthly' => '+1 month'
 			);
 
 			// repeat specified, and and enddate also, populate the dates to be set
