@@ -36,7 +36,7 @@ class External_SchoolPro_Timetable {
 				$allDefinitions['desc'][] = $currentDefinition['PeriodDescription'];
 				$allDefinitions['start'][] = $currentDefinition['TimeFrom'];
 				$allDefinitions['end'][] = $currentDefinition['TimeTo'];
-				$allDefinitions['number'][] = preg_replace('/[^0-9]+/', '', $currentDefinition['PeriodNumber']);
+				$allDefinitions['number'][] = $currentDefinition['PeriodNumber'];
 				$allDefinitions['sequence'][] = $currentDefinition['DayNumber'];
 			}
 
@@ -115,7 +115,7 @@ class External_SchoolPro_Timetable {
 	 */
 	private function getStaffDayTimetable($externalUserId, $campusId, $dayNumber) {
 		$vars = array(
-			'sbGetDayNumber',
+			'sbGetStaffDayTimetable',
 			array(
 				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
@@ -143,8 +143,10 @@ class External_SchoolPro_Timetable {
 	 * @param $dayNumber
 	 */
 	private function getStudentDayTimetable($externalUserId, $campusId, $dayNumber) {
+		$definition = $this->getTimetableDefinition($campusId, $_SERVER['REQUEST_TIME']);
+
 		$vars = array(
-			'sbGetDayNumber',
+			'sbGetStudentDayTimetable',
 			array(
 				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
@@ -156,11 +158,23 @@ class External_SchoolPro_Timetable {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
+		new \Alaress_Probe($definition);
 		new \Alaress_Probe($result);
 
-		if ($result['success']) {
-		}
-		else {
+		if ($result['success'] && count($result['success'])) {
+			$allTimetables = array();
+
+			foreach($result['result'] as $currentTimetable) {
+				$timetable = array(
+					'Room' => $currentTimetable['ClassRoom'],
+					'Description' => $currentTimetable['ClassDescription'],
+					'PeriodNumber' => $currentTimetable['Identifier'],
+					'ClassCode' => $currentTimetable['ClassCode'],
+					'StaffID' => $externalUserId
+				);
+
+				$allTimetables[] = $timetable;
+			}
 		}
 	}
 
@@ -173,7 +187,7 @@ class External_SchoolPro_Timetable {
 	 * @param $dayNumber
 	 * @return bool|void
 	 */
-	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
+	public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber) {
 		$groupHandler = new Group();
 
 		if ($groupHandler->isStudent($userId)) {
