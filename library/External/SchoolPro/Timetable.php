@@ -28,9 +28,8 @@ class External_SchoolPro_Timetable {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		new \Alaress_Probe($result);
-
-		if ($result['success']) {
+		if ($result['success'] && count($result['result'])) {
+			return $result['result'][0]['DayNumber'];
 		}
 		else {
 		}
@@ -41,26 +40,34 @@ class External_SchoolPro_Timetable {
 	 *
 	 * @param $campusId
 	 * @param int $date
+	 * @return bool
 	 */
 	public function getDayNumber($campusId, $date = 0) {
-		$vars = array(
-			'sbGetDayNumber',
-			array(
-				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-				array('@pCampusID', $campusId, SQLINT4, false, false, -1),
-				array('@pDateToUse', $date, SQLINT4, false, false, -1),
-			)
-		);
 
-		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+		/* Convert from timestamp to datetime
+		 */
+		if ($date) {
+			$dateObj = new Alaress_Date_Format($date, 'U');
+			$dateToUse = $dateObj->getDatabaseDate();
 
-		new \Alaress_Probe($result);
+			$vars = array(
+				'sbGetDayNumber',
+				array(
+					array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+					array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+					array('@pCampusID', $campusId, SQLINT4, false, false, -1),
+					array('@pDateToUse', $dateToUse, SQLVARCHAR, false, false, -1),
+				)
+			);
 
-		if ($result['success']) {
+			$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+			if ($result['success'] && count($result['result'])) {
+				return $result['result'][0]['DayNumber'];
+			}
 		}
-		else {
-		}
+
+		return false;
 	}
 
 	/**
