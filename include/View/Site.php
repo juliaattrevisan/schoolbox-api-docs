@@ -98,6 +98,12 @@ class View_Site implements View_Interface {
             $twig = new Twig_Environment($loader);
             $twig->addExtension(new Twig_Extension_Debug());
 
+            $function = new Twig_SimpleFunction(
+                'inlineImage',
+                array('\\Alaress\\Twig\\Method\\InlineImage', 'execute')
+            );
+            $twig->addFunction($function);
+
             // insert the content html name config into the rdo
             $response->setPage('include', $page);
 
