@@ -234,17 +234,15 @@ class Scrub {
      * @return mixed
      */
     static public function html($html) {
-        $redis = Alaress\Redis::getClientInstance();
-        $key   = 'scrub.html:'.hash('sha256', $html);
-
-        // Would use Redis hashes, but individual keys don't have expiry.
-        if (!($redis->exists($key))) {
-            $result = self::getHtmlPurifierInstance()->purify($html);
-            $redis->setex($key, 60*60, $result);
-        }
-        else {
-            $result = $redis->get($key);
-        }
-        return $result;
+        $classname = get_called_class();
+        return Alaress\Redis::getInstance()->cacheFunctionCall(
+            'scrub.html',
+            function($param) use($classname) {
+                $purifier = call_user_func(array($classname, 'getHtmlPurifierInstance'));
+                return $purifier->purify($param);
+            },
+            $html,
+            60*60
+        );
     }
 }
