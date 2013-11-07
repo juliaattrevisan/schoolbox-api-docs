@@ -226,13 +226,25 @@ class Scrub {
     }
 
     /**
-     * Cleans crap out of input using HTMLPurifier
+     * Cleans crap out of input using HTMLPurifier.
+     * Now caches previous calls in Redis!
      *
      * @param  $html
      *
      * @return mixed
      */
     static public function html($html) {
-        return self::getHtmlPurifierInstance()->purify($html);
+        $redis = Alaress\Redis::getClientInstance();
+        $key   = 'scrub.html:'.hash('sha256', $html);
+
+        // Would use Redis hashes, but individual keys don't have expiry.
+        if (!($redis->exists($key))) {
+            $result = self::getHtmlPurifierInstance()->purify($html);
+            $redis->setex($key, 60*60, $result);
+        }
+        else {
+            $result = $redis->get($key);
+        }
+        return $result;
     }
 }
