@@ -36,6 +36,15 @@ class Redis {
     }
 
     /**
+     * Gets client within singleton instance.
+     *
+     * @return Predis\ClientInterface
+     */
+    public static function getClientInstance() {
+        return static::getInstance()->getClient();
+    }
+
+    /**
      * Connects this wrapper to Redis.
      *
      * @see Predis\Client::__construct() for parameter documentation.
