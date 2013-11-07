@@ -107,7 +107,9 @@ class External_Synergetic_User implements External_UserInterface {
 			 * Separate the queries out, fetching the photo data only if it's newer than the cached
 			 * version, or if the cache version doesn't already exist.
 			 */
-			if (!file_exists($photoPath) || (@filemtime($photoPath) > strtotime($photo['ModifiedDate']))) {
+			$cacheTime    = @filemtime($photoPath);
+			$modifiedTime = strtotime($photo['ModifiedDate']);
+			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
 				$query = "
 					SELECT vPhotos.Photo, vPhotos.PhotoType
 					FROM SynergyOne.dbo.vPhotos vPhotos
@@ -123,7 +125,7 @@ class External_Synergetic_User implements External_UserInterface {
 
 				/* Purge all previously transformed copies
 				 */
-				$pattern = Config::get('portrait_dir') . '/' . $externalUserId . '-*.dat';
+				$pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
 
 				foreach (glob($pattern) as $oldCacheFile) {
 					unlink($oldCacheFile);
