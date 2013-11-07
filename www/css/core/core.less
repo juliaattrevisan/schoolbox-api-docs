@@ -1440,10 +1440,15 @@ Notifications
   position: relative;
   .mobile{
     background: url('/images/famicons/phone.png') 8px 7px no-repeat;
-    border-bottom: 1px solid @border-color;
     display: block;
-    padding: 8px 0 8px 35px;
+    padding: 0 0 0 35px;
+	border-bottom: 1px solid @border-color;
   }
+	.mobile, .phone {
+		a {
+			border-bottom: 0;
+		}
+	}
 }
 
 .teacher-profile{
@@ -1512,7 +1517,7 @@ Notifications
   background: url('/images/famicons/telephone.png') 8px 7px no-repeat;
   border-bottom: 1px solid @border-color;
   display: block;
-  padding: 8px 0 8px 35px;
+  padding: 0 0 0 35px;
 }
 
 #spouse{
@@ -1549,6 +1554,11 @@ Notifications
   li{
     padding: 7px 8px;
   }
+	.contact-phone a {
+		border-bottom: none;
+		height: 16px;
+		margin: 0 -8px -7px -8px;
+	}
 }
 
 .profile-groups{
