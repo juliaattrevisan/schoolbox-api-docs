@@ -235,15 +235,17 @@ class User extends DeprecatedModel {
 			}
 
 			if (is_array($group)) {
-				$query .= "AND group_id IN (" . implode(',', $group) . ") ";
+				$query .= "AND group_id IN (" . implode(',', array_map(array($this->db, 'quote'), $group)) . ") ";
 			} else {
 				if (is_numeric($group) && $group > 0) {
-					$query .= "AND group_id = '$group' ";
+					$param = $this->db->quote($group);
+					$query .= "AND group_id = '$param' ";
 				}
 			}
 		} else {
 			if ($group) {
-				$query .= "group_id = '$group' ";
+				$param = $this->db->quote($group);
+				$query .= "group_id = '$param' ";
 			} else {
 				error(2);
 			}
