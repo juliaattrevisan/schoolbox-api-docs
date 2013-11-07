@@ -16,8 +16,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
         $dateFilter = '';
         if (count($this->dateRange)) {
             $dateFilter = sprintf(
-                "AND datetime BETWEEN '%s' AND '%s'", date('Y-m-d', $this->dateRange[0]),
-                date('Y-m-d', $this->dateRange[1])
+                "AND datetime BETWEEN '%s' AND NOW()", date('Y-m-d', $this->dateRange[0])
             );
         }
 
@@ -83,6 +82,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
              LEFT JOIN `user` u ON u.id = ua.uid
              LEFT JOIN groups g ON u.group_id = g.id
              WHERE c.id = :cid
+             $groupFilter
              AND u.id NOT IN (
                  SELECT `user`
                  FROM homepage_log hl
