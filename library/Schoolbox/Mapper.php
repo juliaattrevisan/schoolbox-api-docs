@@ -912,12 +912,14 @@ class Mapper {
 
 		$is_this_model   = $this_mapping['type']  === self::TYPE_MODEL;
 		$is_other_model  = $other_mapping['type'] === self::TYPE_MODEL;
-		$other_id_method = $join_mapper->getGetIdentifierMethodName();
+		$this_id_method = $this->getGetIdentifierMethodName();
 		$grouped_join_list = $joined_model_list->groupByCallback(
-			function($item) use($other_get_method, $is_other_model, $other_id_method) {
+			function($item) use($other_get_method, $is_other_model, $this_id_method) {
 				$key = $item->$other_get_method();
+				// $item->$other_get_method may return an instance of this model.
+				// If so, get its ID.
 				if ($is_other_model) {
-					$key = $key->$other_id_method();
+					$key = $key->$this_id_method();
 				}
 				return $key;
 			}
@@ -925,6 +927,7 @@ class Mapper {
 
 		$is_multiple     = !empty($join_identifier['multiple']);
 		$this_set_method = $options['set_method'] ?: $this->getSetMethodName($this_mapping['property']);
+		$other_id_method = $join_mapper->getGetIdentifierMethodName();
 
 		foreach ($collection as $item) {
 			// Is this a multiple join? If so, how do I know?
