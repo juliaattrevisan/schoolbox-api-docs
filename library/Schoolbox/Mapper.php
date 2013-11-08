@@ -1156,7 +1156,7 @@ class Mapper {
 			$other_alias = $other_table;
 		}
 		$join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
-		if (strlen($join['extra']) > 0) {
+		if (isset($join['extra']) && strlen($join['extra']) > 0) {
 			$join_sql .= ' AND ' . $join['extra'];
 		}
 		return strtr(

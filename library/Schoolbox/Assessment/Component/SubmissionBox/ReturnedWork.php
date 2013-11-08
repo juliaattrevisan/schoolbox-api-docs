@@ -74,6 +74,11 @@ class ReturnedWork {
 	protected $returned;
 
 	/**
+	 * @var string
+	 */
+	protected $temp_location;
+
+	/**
 	 * @var IConfigLoader
 	 */
 	protected $config_loader;
