@@ -350,6 +350,34 @@ function smartQuote($value) {
 	return $value;
 }
 
+/**
+ * Escapes for safe input into database. Unlike smartQuote(), doesn't coerce
+ * 'null' to NULL or wrap values in quote marks.
+ *
+ * @param  string $string
+ * @return string
+ */
+public function quote($string) {
+    return mysql_real_escape_string($string);
+}
+
+/**
+ * Escapes _ and % characters within $string, so they don't have unintended
+ * effects in LIKE queries.
+ *
+ * @param  string $string
+ * @return string
+ */
+public function quoteForLike($string) {
+    return strtr(
+        $this->quote($string),
+        array(
+            '_' => '\\_',
+            '%' => '\\%',
+        )
+    );
+}
+
 /* DEPRECEATED FUNCTIONS */
 
 function dbConnect() {
