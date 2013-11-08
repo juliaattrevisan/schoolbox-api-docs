@@ -58,42 +58,48 @@
         });
     })(jQuery);
 </script>
+
 <!-- END custom_head -->
 
 <h1>Unit Progress Report – {CATEGORY}</h1>
+<div id="context">
+	<form id="enrolment" action="/task/progressReport/" method="get">
+		<input type="hidden" name="category_id" value="{CATEGORY_ID}" />
+		<div id="semesters">
+			<a class="sem-back" data-interaction="select_semester_prev" href="#">&lsaquo;</a>
+			<select id="select_semester" data-interaction="select_semester">
+				<!-- BEGIN unit_selector_semester -->
+				<option value="{UNIT_SELECTOR_SEMESTER_SEMESTER}/{UNIT_SELECTOR_SEMESTER_YEAR}" label="Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}" {UNIT_SELECTOR_SEMESTER_SELECTED}>
+				Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}
+				</option>
+				<!-- END unit_selector_semester -->
+			</select>
+			<a class="sem-fwd" data-interaction="select_semester_next" href="#">&rsaquo;</a>
+		</div>
+		<div id="subjects" action="/submission/allWork/" method="get">
+			<span class="elbow">&#9492;</span>
+			<!-- BEGIN unit_selector_semester_unit_list -->
+			<select name="unit_id" id="enrolled-subject" class="hide" data-interaction="select_unit" data-semester="{UNIT_SELECTOR_UNIT_SEMESTER}/{UNIT_SELECTOR_UNIT_YEAR}">
+				<option disabled label="Select a unit">Select a unit</option>
+				<!-- BEGIN unit_selector_unit -->
+				<option label="{UNIT_SELECTOR_UNIT_NAME}" value="{UNIT_SELECTOR_UNIT_ID}" {UNIT_SELECTOR_UNIT_SELECTED}>
+				{UNIT_SELECTOR_UNIT_NAME}
+				</option>
+				<!-- END unit_selector_unit -->
+			</select>
+			<!-- END unit_selector_semester_unit_list -->
+		</div>
+	</form>
+</div>
 
-<form action="/task/progressReport/" method="get">
-    <input type="hidden" name="category_id" value="{CATEGORY_ID}" />
-    <a data-interaction="select_semester_prev" href="#">‹</a>
-    <select id="semester" data-interaction="select_semester">
-        <!-- BEGIN unit_selector_semester -->
-        <option value="{UNIT_SELECTOR_SEMESTER_SEMESTER}/{UNIT_SELECTOR_SEMESTER_YEAR}" label="Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}" {UNIT_SELECTOR_SEMESTER_SELECTED}>
-            Semester {UNIT_SELECTOR_SEMESTER_SEMESTER}, {UNIT_SELECTOR_SEMESTER_YEAR}
-        </option>
-        <!-- END unit_selector_semester -->
-    </select>
-    <a data-interaction="select_semester_next" href="#">›</a>
-
-    <!-- BEGIN unit_selector_semester_unit_list -->
-    <select name="unit_id" class="hide" data-interaction="select_unit" data-semester="{UNIT_SELECTOR_UNIT_SEMESTER}/{UNIT_SELECTOR_UNIT_YEAR}">
-        <option disabled label="Select a unit">Select a unit</option>
-        <!-- BEGIN unit_selector_unit -->
-        <option label="{UNIT_SELECTOR_UNIT_NAME}" value="{UNIT_SELECTOR_UNIT_ID}" {UNIT_SELECTOR_UNIT_SELECTED}>
-            {UNIT_SELECTOR_UNIT_NAME}
-        </option>
-        <!-- END unit_selector_unit -->
-    </select>
-    <!-- END unit_selector_semester_unit_list -->
-
-</form>
-
-<table>
+<table class="mark-sheet table angled">
     <thead>
         <tr>
             <th>&nbsp;</th>
             <!-- BEGIN subheader_unit -->
             <!-- BEGIN subheader_unit_task -->
-            <th>
+			<th scope="col" class="rotate">
+				<div><span>
                 <!-- BEGIN subheader_unit_task_submission_link -->
                 <a href="/submission/viewSubmission/{SUBHEADER_UNIT_TASK_SUBMISSION_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
                 <!-- END subheader_unit_task_submission_link -->
@@ -103,6 +109,8 @@
                 <!-- BEGIN subheader_unit_task_no_link -->
                 {SUBHEADER_UNIT_TASK_NAME}
                 <!-- END subheader_unit_task_no_link -->
+					</span>
+					</div>
             </th>
             <!-- END subheader_unit_task -->
             <!-- END subheader_unit -->
@@ -111,12 +119,12 @@
     <tbody>
         <!-- BEGIN student -->
         <tr>
-            <td>
-                <img height="32" width="32" src="/portrait.php?userId={STUDENT_SYNERGY_ID}&amp;size=square32">
-                <a href="/search/user/{STUDENT_ID}" title="{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}">
-                    {STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
+			<th class="avatar" scope="row">
+				<a class="author" href="/search/user/{STUDENT_ID}" title="{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}">
+                	<img height="32" width="32" src="/portrait.php?userId={STUDENT_SYNERGY_ID}&amp;size=square32">
+                	{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
                 </a>
-            </td>
+            </th>
             <!-- BEGIN student_unit -->
             <!-- BEGIN student_unit_task -->
             <td>

@@ -9892,3 +9892,223 @@ body.login {
 	left: 16px;
 	position: absolute;
 }
+
+/* Dr's semester selector */
+#context {
+	clear: both;
+	height: 100px;
+}
+#context select {
+	padding: 5px;
+}
+#context option {
+	line-height: 20px;
+}
+#student {
+	width: 55%;
+	height: 72px;
+	position: absolute;
+	left: 0;
+}
+#enrolment {
+	width: 44%;
+	height: 72px;
+	position: absolute;
+	right: 0;
+}
+#semesters, #subjects {
+	height: 36px;
+	line-height: 36px;
+	text-align: right;
+}
+#semesters {
+
+}
+#semesters .sem-back, #semesters .sem-fwd {
+	border: solid 1px @border-color;
+	color: @secondary-text;
+	padding: 1px 8px 5px;
+	font-size: 1.6em;
+}
+#semesters .sem-back:hover, #semesters .sem-fwd:hover {
+	background: lighten(@highlight-color, @lighten-value);
+	text-decoration: none;
+}
+#semesters select {
+	width: 75%;
+}
+#subjects {
+
+}
+#subjects select {
+	width: 65%;
+	position: absolute;
+	right: 28px;
+}
+#subjects .elbow {
+	position: absolute;
+	right: 74%;
+	font-size: 1.5em;
+	color: @secondary-text;
+	line-height: 2em;
+}
+.button.bar.large {
+	height: 64px;
+}
+.button.bar.large:before {
+	line-height: 64px;
+}
+.button.bar.large img {
+	width: 64px;
+	height: 64px;
+}
+.button.bar.large .name {
+	font-size: 1.2em;
+	line-height: 2.5em;
+	margin-left: 70px;
+}
+.button.bar.large .group {
+	margin: 2px 0 0 70px;
+}
+.button.bar.large span {
+
+}
+#subject-main .subject-list {
+	border-top: solid 1px @border-color;
+}
+#subject-main .subject-list .grade {
+	border-right-width: 0;
+	font-size: 13px;
+	font-weight: normal;
+}
+
+.subject-comments {
+
+}
+.subject-comments table {
+	width: 100%;
+}
+.subject-comments td {
+	vertical-align: top;
+
+}
+.subject-comments img.thumb {
+	width: 32px;
+	height: 32px;
+}
+.subject-comments textarea {
+	width: 100%;
+	min-height: 64px;
+	padding: 5px;
+}
+.subject-comments .name {
+	display: block;
+}
+.subject-comments .group {
+	color: @secondary-text;
+	display: block;
+}
+form.comment-form div {
+	width: 300px;
+	float: right;
+	line-height: 2.6em;
+}
+form.comment-form label {
+	display: inline;
+}
+.actions {
+	min-width: 125px;
+}
+.actions .visibility {
+	display: block;
+	float: left;
+	width: 24px;
+	height: 24px;
+	margin: 4px -1px;
+	background: url("/images/core/grades/visibilities.png");
+}
+
+.visibility.student.on  { background-position: 0 0; }
+.visibility.student.off { background-position: 0 24px; }
+.visibility.parent.on   { background-position: 24px 0; }
+.visibility.parent.off  { background-position: 24px 24px; }
+
+.locked {
+	opacity: 0.5;
+}
+
+/*
+ * Rotating headers of doom
+ * Be very, very afraid
+ */
+@slanty-header-height-raw: 150;
+@slanty-header-width-raw: 50;
+@slanty-header-angle-raw: 45;
+@slanty-header-height: ~`@{slanty-header-height-raw} + 'px'`;
+@slanty-header-width: ~`@{slanty-header-width-raw} + 'px'`;
+@slanty-header-angle: ~`@{slanty-header-angle-raw} + 'deg'`;
+
+.mark-sheet input { width: 30px; }
+
+
+.mark-sheet td{
+	width: @slanty-header-width;
+	border-top: 1px solid @border-color;
+	border-left: 1px solid @border-color;
+	vertical-align: middle;
+	text-align: center;
+	overflow: hidden;
+	padding: 7px !important;
+	a {
+		display: block;
+		font-weight: bold;
+	}
+	span {
+		float: right;
+	}
+}
+th.rotate {
+	height: @slanty-header-height;
+	width: @slanty-header-width;
+	min-width: @slanty-header-width;
+	max-width: @slanty-header-width;
+	position: relative;
+	vertical-align: bottom;
+	padding: 0 !important;
+	font-size: 12px;
+	letter-spacing: 0.1ex;
+	&> div{
+		position: relative;
+		top: 0px;
+		left: ~`(@{slanty-header-height-raw} * Math.tan(@{slanty-header-angle-raw} * Math.PI/180)) / 2 + 'px'`;
+		height: 100%;
+	@slanty-header-angle-neg: ~`'-' + '@{slanty-header-angle}'`;
+		.transform(skew(@slanty-header-angle-neg, 0deg));
+		overflow: hidden;
+		border-left: 1px solid @border-color;
+		border-right: 0;
+		border-top: 0;
+		border-bottom: 0;
+		&> span {
+			@slanty-header-angle-rotate: ~`(360 - (@{slanty-header-angle-raw})) + 'deg'`;
+			.transform(skew(@slanty-header-angle,0deg) rotate(@slanty-header-angle-rotate));
+			position: absolute;
+			bottom: ~`(@{slanty-header-width-raw} * Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) + 30 + 'px'`; /* 40 cos(45) = 28 with an additional 2px margin*/
+			left: -70px; /*Because it looked good, but there is probably a mathematical link here as well*/
+			display: inline-block;
+			width: ~`(@{slanty-header-height-raw} / Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) - (@{slanty-header-width-raw} * Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) + 'px'`; /* 80 / cos(45) - 40 cos (45) = 85 where 80 is the height of the cell, 40 the width of the cell and 45 the transform angle*/
+			text-align: left;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			color: @secondary-text;
+			font-weight: normal;
+		}
+	}
+	a {
+		display: block;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+}
