@@ -9925,7 +9925,7 @@ body.login {
 
 }
 #semesters .sem-back, #semesters .sem-fwd {
-	border: solid 1px @border-color;
+	border: solid 1px @std-grey;
 	color: @secondary-text;
 	padding: 1px 8px 5px;
 	font-size: 1.6em;
@@ -10016,9 +10016,6 @@ form.comment-form div {
 form.comment-form label {
 	display: inline;
 }
-.actions {
-	min-width: 125px;
-}
 .actions .visibility {
 	display: block;
 	float: left;
@@ -10066,6 +10063,13 @@ form.comment-form label {
 	span {
 		float: right;
 	}
+	.author {
+
+		img {
+			float: left;
+			margin-right: 6px;
+		}
+	}
 }
 th.rotate {
 	height: @slanty-header-height;
@@ -10081,9 +10085,11 @@ th.rotate {
 		position: relative;
 		top: 0px;
 		left: ~`(@{slanty-header-height-raw} * Math.tan(@{slanty-header-angle-raw} * Math.PI/180)) / 2 + 'px'`;
+		left: 0\9; // IE8 Hack :(
 		height: 100%;
-	@slanty-header-angle-neg: ~`'-' + '@{slanty-header-angle}'`;
+		@slanty-header-angle-neg: ~`'-' + '@{slanty-header-angle}'`;
 		.transform(skew(@slanty-header-angle-neg, 0deg));
+		-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865474, M12=-0.7071067811865477, M21=0.7071067811865477, M22=0.7071067811865474, SizingMethod='auto expand')";  // IE8 Hack :(
 		overflow: hidden;
 		border-left: 1px solid @border-color;
 		border-right: 0;
@@ -10092,9 +10098,13 @@ th.rotate {
 		&> span {
 			@slanty-header-angle-rotate: ~`(360 - (@{slanty-header-angle-raw})) + 'deg'`;
 			.transform(skew(@slanty-header-angle,0deg) rotate(@slanty-header-angle-rotate));
+			-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865483, M12=0.7071067811865467, M21=-0.7071067811865467, M22=0.7071067811865483, SizingMethod='auto expand')"; // IE8 Hack :(
 			position: absolute;
 			bottom: ~`(@{slanty-header-width-raw} * Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) + 30 + 'px'`; /* 40 cos(45) = 28 with an additional 2px margin*/
 			left: -70px; /*Because it looked good, but there is probably a mathematical link here as well*/
+			bottom:0\9; // IE8 Hack :(
+			top:0\9; // IE8 Hack :(
+			left:0\9; // IE8 Hack :(
 			display: inline-block;
 			width: ~`(@{slanty-header-height-raw} / Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) - (@{slanty-header-width-raw} * Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) + 'px'`; /* 80 / cos(45) - 40 cos (45) = 85 where 80 is the height of the cell, 40 the width of the cell and 45 the transform angle*/
 			text-align: left;
