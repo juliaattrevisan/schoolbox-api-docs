@@ -319,11 +319,19 @@ class Digest_News {
                 'missing'  => true,
                 'error'    => false,
             );
-//            $this->cli($result['error'], true);
-//            return $result;
         }
 
-        $mailer = new Mailer('news-digest.html', 'News', $u['email'], $this->host);
+        try {
+            $mailer = new Mailer('news-digest.html', 'News', $u['email'], $this->host);
+        }
+        catch (Exception $e) {
+            return array(
+                'sendable' => true,
+                'sent'     => false,
+                'missing'  => false,
+                'error'    => $e->getMessage(),
+            );
+        }
 
         $mailer->setBlock('tplBODY', 'upcominglist', 'upcominglist_block');
         $mailer->setBlock('upcominglist', 'upcoming', 'upcoming_block');
