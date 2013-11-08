@@ -14,7 +14,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 {
     $mail = new Swift_Message();
 
-	//get users email address to use in from field
+    //get users email address to use in from field
     $email = new Email($_SESSION['user']->getEmail());
 
     if ($email->isValid()) {
@@ -25,8 +25,8 @@ function sendMail($to, $cc, $bcc, $subject, $message)
         error(42);
     }
 
-	//if id is submitted to form convert to email
-	if(is_numeric($to)) {
+    //if id is submitted to form convert to email
+    if(is_numeric($to)) {
 
         $userMapper = new \Schoolbox\UserMapper();
 
@@ -34,89 +34,109 @@ function sendMail($to, $cc, $bcc, $subject, $message)
             $toUser = $userMapper->findByID($to);
             $email = new Email($toUser->getEmail());
 
-            if($email->isValid()) {
+            if ($email->isValid()) {
                 $mail->addTo($toUser->getEmail());
             } else {
-                error(43);
+                error(9, 'Your email address is not valid.');
             }
 
         } catch (Exception $e) {
-            error(43);
+            error(7);
         }
-	}
-	else {
-		//if emails have ; seperator account for it
-		$to = str_replace(";",",",$to);
-		foreach (Mailer::parseAddressString($to) as $address => $name) {
-			$mail->addTo($address, $name);
-		}
-	}
+    }
+    else {
+        //if emails have ; seperator account for it
+        $to = str_replace(";",",",$to);
+        foreach (Mailer::parseAddressString($to) as $address => $name) {
+            try {
+                $mail->addTo($address, $name);
+            }
+            catch (Exception $e) {
+                error(9, 'Email address "'.$address.'" is not valid.');
+            }
+        }
+    }
 
-	//check if its got no to address but has either cc or bcc
-	//put the users email in the to field
-	if (!stristr($to,'@') && ($bcc || $cc)) {
-		$mail->addTo($_SESSION['user']->getEmail(), $to);
-	}
+    //check if its got no to address but has either cc or bcc
+    //put the users email in the to field
+    if (!stristr($to,'@') && ($bcc || $cc)) {
+        try {
+            $mail->addTo($_SESSION['user']->getEmail(), $to);
+        }
+        catch (Exception $e) {
+            error(9, 'Your email address is not valid.');
+        }
+    }
 
-	//fix qoute escapes
-	if (get_magic_quotes_gpc())
-	{
-		$message = stripslashes($message);
-		$subject = stripslashes($subject);
-	}
+    //fix qoute escapes
+    if (get_magic_quotes_gpc())
+    {
+        $message = stripslashes($message);
+        $subject = stripslashes($subject);
+    }
 
-	//create email header
-	$mail->setSubject($subject);
+    //create email header
+    $mail->setSubject($subject);
 
-	if (strrchr($cc, '@')) {
-		$cc = str_replace(";",",",$cc);
-		foreach (Mailer::parseAddressString($cc) as $address => $name) {
-			$mail->addCc($address, $name);
-		}
-	}
+    if (strrchr($cc, '@')) {
+        $cc = str_replace(";",",",$cc);
+        foreach (Mailer::parseAddressString($cc) as $address => $name) {
+            try {
+                $mail->addCc($address, $name);
+            }
+            catch (Exception $e) {
+                error(9, 'Email address "'.$address.'" is not valid.');
+            }
+        }
+    }
 
-	if (strrchr($bcc, '@')) {
-		$bcc = str_replace(";",",",$bcc);
-		foreach (Mailer::parseAddressString($bcc) as $address => $name) {
-			$mail->addBcc($address, $name);
-		}
-	}
+    if (strrchr($bcc, '@')) {
+        $bcc = str_replace(";",",",$bcc);
+        foreach (Mailer::parseAddressString($bcc) as $address => $name) {
+            try {
+                $mail->addBcc($address, $name);
+            }
+            catch (Exception $e) {
+                error(9, 'Email address "'.$address.'" is not valid.');
+            }
+        }
+    }
 
-	$mail->setBody(strip_tags($message), null, 'utf-8');
-	$mail->addPart($message, 'text/html', 'utf-8');
+    $mail->setBody(strip_tags($message), null, 'utf-8');
+    $mail->addPart($message, 'text/html', 'utf-8');
 
-	if (is_array($_FILES)) {
-		foreach ($_FILES["file"]["error"] as $key => $error) {
-			if ($error == UPLOAD_ERR_OK && filesize($_FILES['file']['tmp_name'][$key]) < Cfg::get('max_file_size')) {
-				$attach = Swift_Attachment::fromPath($_FILES['file']['tmp_name'][$key]);
-				$attach->setFilename($_FILES['file']['name'][$key]);
-				$attach->setContentType($_FILES['file']['type'][$key]);
-				$mail->attach($attach);
-			}
-		}
-	}
+    if (is_array($_FILES)) {
+        foreach ($_FILES["file"]["error"] as $key => $error) {
+            if ($error == UPLOAD_ERR_OK && filesize($_FILES['file']['tmp_name'][$key]) < Cfg::get('max_file_size')) {
+                $attach = Swift_Attachment::fromPath($_FILES['file']['tmp_name'][$key]);
+                $attach->setFilename($_FILES['file']['name'][$key]);
+                $attach->setContentType($_FILES['file']['type'][$key]);
+                $mail->attach($attach);
+            }
+        }
+    }
 
 
-	try {
-		Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
-	}
-	catch (Exception $ex) {
-		error(9, $ex->getMessage());
-	}
+    try {
+        Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
+    }
+    catch (Exception $ex) {
+        error(9, $ex->getMessage());
+    }
 }
 
 
 //if form has been submitted
 if(isset($_POST['to']) && $_POST['to'] && Cfg::get('mail_enable'))
 {
-	sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
+    sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
 
-	//output code to send the browser to where it came from
-	$back = -2;
-	include("../include/back.php");
-	exit;
+    //output code to send the browser to where it came from
+    $back = -2;
+    include("../include/back.php");
+    exit;
 }
 else
 {
-	SitePage::localRedir('/mail/createMail.php');
+    SitePage::localRedir('/mail/createMail.php');
 }
