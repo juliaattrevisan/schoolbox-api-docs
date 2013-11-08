@@ -119,8 +119,6 @@ class External_SchoolPro_Timetable {
 	 * @return array
 	 */
 	private function getStaffDayTimetable($externalUserId, $campusId, $dayNumber) {
-		$definition = $this->getTimetableDefinition($campusId, $dayNumber);
-
 		$vars = array(
 			'sbGetStaffDayTimetable',
 			array(
@@ -134,50 +132,7 @@ class External_SchoolPro_Timetable {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		if ($result['success'] && count($result['result'])) {
-			$timetable = array();
-			$allClasses = $result['result'];
-
-			/* For every period defined in the timetable definition,
-			 * set up a stub stack which contains all the possible
-			 * periods for this day. We'll append actual classes to
-			 * this data structure.
-			 */
-			for ($x = 0; isset($definition['desc'][$x]); $x++) {
-				$timetable[$x]['periodName'] = $definition['desc'][$x];
-				$timetable[$x]['periodStart'] = $definition['start'][$x];
-				$timetable[$x]['periodEnd'] = $definition['end'][$x];
-				$timetable[$x]['periodNumber'] = $definition['number'][$x];
-				$timetable[$x]['periodSequence'] = $definition['sequence'][$x];
-			}
-
-			/* With the result set obtained above, append actual class
-			 * details to the period definition established in the previous loop
-			 * Shift the $allClasses array as you append them
-			 *
-			 * In other connectors this is done in a "merge" style operation
-			 * which requires only one loop, but I did it this way because
-			 * this kind of stuff is currently not documented well.
-			 */
-			for ($x = 0; $x < count($timetable); $x++) {
-				if (count($allClasses)) {
-					$currentClass = $allClasses[0];
-
-					/* If this class occurs in this period, append its details
-					 */
-					if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {
-						$timetable[$x]['description'] = $currentClass['ClassDescription'];
-						$timetable[$x]['code'] = $currentClass['ClassCode'];
-						$timetable[$x]['room'] = $currentClass['ClassRoom'];
-						$timetable[$x]['staffID'] = $externalUserId;
-
-						array_shift($allClasses);
-					}
-				}
-			}
-
-			return $timetable;
-		}
+		return $result;
 	}
 
 	/**
@@ -189,8 +144,6 @@ class External_SchoolPro_Timetable {
 	 * @return array
 	 */
 	private function getStudentDayTimetable($externalUserId, $campusId, $dayNumber) {
-		$definition = $this->getTimetableDefinition($campusId, $dayNumber);
-
 		$vars = array(
 			'sbGetStudentDayTimetable',
 			array(
@@ -204,50 +157,7 @@ class External_SchoolPro_Timetable {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		if ($result['success'] && count($result['result'])) {
-			$timetable = array();
-			$allClasses = $result['result'];
-
-			/* For every period defined in the timetable definition,
-			 * set up a stub stack which contains all the possible
-			 * periods for this day. We'll append actual classes to
-			 * this data structure.
-			 */
-			for ($x = 0; isset($definition['desc'][$x]); $x++) {
-				$timetable[$x]['periodName'] = $definition['desc'][$x];
-				$timetable[$x]['periodStart'] = $definition['start'][$x];
-				$timetable[$x]['periodEnd'] = $definition['end'][$x];
-				$timetable[$x]['periodNumber'] = $definition['number'][$x];
-				$timetable[$x]['periodSequence'] = $definition['sequence'][$x];
-			}
-
-			/* With the result set obtained above, append actual class
-			 * details to the period definition established in the previous loop
-			 * Shift the $allClasses array as you append them
-			 *
-			 * In other connectors this is done in a "merge" style operation
-			 * which requires only one loop, but I did it this way because
-			 * this kind of stuff is currently not documented well.
-			 */
-			for ($x = 0; $x < count($timetable); $x++) {
-				if (count($allClasses)) {
-					$currentClass = $allClasses[0];
-
-					/* If this class occurs in this period, append its details
-					 */
-					if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {
-						$timetable[$x]['description'] = $currentClass['ClassDescription'];
-						$timetable[$x]['code'] = $currentClass['ClassCode'];
-						$timetable[$x]['room'] = $currentClass['ClassRoom'];
-						$timetable[$x]['staffID'] = $externalUserId;
-
-						array_shift($allClasses);
-					}
-				}
-			}
-
-			return $timetable;
-		}
+		return $result;
 	}
 
 	/**
@@ -264,13 +174,67 @@ class External_SchoolPro_Timetable {
 
 		if ($groupHandler->isStudent($userId)) {
 			$result = $this->getStudentDayTimetable($externalUserId, $campusId, $dayNumber);
-			return $result;
 		}
 		/* Else assume staff
 		 */
 		else {
 			$result = $this->getStaffDayTimetable($externalUserId, $campusId, $dayNumber);
-			return $result;
+		}
+
+		$definition = $this->getTimetableDefinition($campusId, $dayNumber);
+
+		if ($result['success'] && count($result['result'])) {
+			$timetable = array();
+			$allClasses = $result['result'];
+
+			/* For every period defined in the timetable definition,
+			 * set up a stub stack which contains all the possible
+			 * periods for this day. We'll append actual classes to
+			 * this data structure.
+			 */
+			for ($x = 0; isset($definition['desc'][$x]); $x++) {
+				$timetable[$x]['periodName'] = $definition['desc'][$x];
+				$timetable[$x]['periodStart'] = $definition['start'][$x];
+				$timetable[$x]['periodEnd'] = $definition['end'][$x];
+				$timetable[$x]['periodNumber'] = $definition['number'][$x];
+				$timetable[$x]['periodSequence'] = $definition['sequence'][$x];
+			}
+
+			/* With the result set obtained above, append actual class
+			 * details to the period definition established in the previous loop
+			 *
+			 * Sometimes they can stuff up their db, leaving out periods - e.g.
+			 * Period 1, Period 2, Period 4, Period 5,6,7,8,9... (skipped Period 3)
+			 * in timetableDefinition, but will have a Period 3 class specified
+			 * in getStaffDayTimetable.
+			 *
+			 * Doing it in a linear fashion means the loops get stuck trying to
+			 * assign a Period 3 class to a nonexistent Period 3 definition.
+			 *
+			 * In other connectors this is done in a "merge" style operation
+			 * which requires only one loop, but I did it this way because
+			 * this kind of stuff is currently not documented well.
+			 */
+			for ($x = 0; $x < count($timetable); $x++) {
+				if (count($allClasses)) {
+					foreach($allClasses as $currentClass) {
+
+						/* If this class occurs in this period, append its details
+						 */
+						if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {
+							$timetable[$x]['description'] = $currentClass['ClassDescription'];
+							$timetable[$x]['code'] = $currentClass['ClassCode'];
+							$timetable[$x]['room'] = $currentClass['ClassRoom'];
+							$timetable[$x]['staffID'] = $externalUserId;
+
+							array_shift($allClasses);
+							break;
+						}
+					}
+				}
+			}
+
+			return $timetable;
 		}
 
 		return false;
