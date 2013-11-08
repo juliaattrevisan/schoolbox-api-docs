@@ -26,6 +26,7 @@ class IntegerTest extends TestCase {
 		return array(
 			array(true, null),
 			array(false, null),
+            array(null, null),
 			array('q', null),
 			array('O', null),
 			array('Not an integer', null),
@@ -46,6 +47,7 @@ class IntegerTest extends TestCase {
 		return array(
 			array(true, null),
 			array(false, null),
+            array(null, null),
 			array('q', null),
 			array('O', null),
 			array('Not an integer', null),

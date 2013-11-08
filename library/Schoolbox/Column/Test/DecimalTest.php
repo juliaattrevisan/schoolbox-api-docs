@@ -24,6 +24,8 @@ class DecimalTest extends TestCase {
 
 	public function getTestHydrate() {
 		return array(
+            array(null,     null,      0),
+            array(null,     null,      2),
 			array('0',     '0',        0),
 			array('0',     '0.00',     2),
 			array('0.375', '0',        0),
@@ -37,6 +39,8 @@ class DecimalTest extends TestCase {
 
 	public function getTestDehydrate() {
 		return array(
+            array(null,     null,      0),
+            array(null,     null,      2),
 			array('0',     '0',        0),
 			array('0',     '0.00',     2),
 			array('0.375', '0',        0),

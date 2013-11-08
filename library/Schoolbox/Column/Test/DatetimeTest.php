@@ -35,6 +35,7 @@ class DatetimeTest extends TestCase {
 	 */
 	public function getTestHydrate() {
 		return array(
+			array(null, false),
 			array('2012-01-01 01:40:23', true),
 			array('2012-01-01',          false),
 			array('0000-01-01 01:40:23', true),
@@ -44,6 +45,7 @@ class DatetimeTest extends TestCase {
 
 	public function getTestDehydrate() {
 		return array(
+			array(null, null),
 			array(false, null),
 			array(DateObject::createFromFormat('!Y-m-d' ,'2012-01-01'), '2012-01-01 00:00:00'),
 			array(DateObject::createFromFormat('!Y-m-d\\TH:i:s' ,'2014-01-01T12:34:56'), '2014-01-01 12:34:56'),

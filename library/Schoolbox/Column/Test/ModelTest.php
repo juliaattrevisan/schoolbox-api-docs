@@ -45,7 +45,13 @@ class ModelTest extends TestCase {
 		$this->test_mapper
 			->expects($this->any())
 			->method('findById')
+			->with($this->logicalNot($this->isNull()))
 			->will($this->returnValue($this->test_model));
+		$this->test_mapper
+			->expects($this->any())
+			->method('findById')
+			->with($this->isNull())
+			->will($this->returnValue(new TestModel()));
 		$this->test_mapper
 			->expects($this->any())
 			->method('findOneByColumn')
@@ -64,6 +70,11 @@ class ModelTest extends TestCase {
 	public function testHydrate() {
 		$hydrate = $this->object->hydrate(1, $this->test_mapper);
 		$this->assertSame(1, $hydrate->getId());
+	}
+
+	public function testHydrateNull() {
+		$hydrate = $this->object->hydrate(null, $this->test_mapper);
+		$this->assertSame(null, $hydrate->getId());
 	}
 
 	public function testDehydrate() {

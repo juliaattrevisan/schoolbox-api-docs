@@ -27,6 +27,7 @@ class BaseTest extends TestCase {
 		return array(
 			array(true, true),
 			array(false, false),
+			array(null, null),
 			array('Dumb', 'Dumb'),
 		);
 	}
@@ -35,6 +36,7 @@ class BaseTest extends TestCase {
 		return array(
 			array(true, true),
 			array(false, false),
+			array(null, null),
 			array('Dumb', 'Dumb'),
 		);
 	}
