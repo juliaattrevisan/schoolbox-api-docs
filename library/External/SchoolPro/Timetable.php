@@ -11,6 +11,16 @@
 class External_SchoolPro_Timetable {
 
 	/**
+	 * Number of days per cycle
+	 *
+	 * You could derive this, or just hardcode it
+	 * (I've only seen data for 4 days)
+	 *
+	 * @var int
+	 */
+	protected $cycleLength = 4;
+
+	/**
 	 * Get a timetable definition
 	 *
 	 * @param $campusId
@@ -35,14 +45,20 @@ class External_SchoolPro_Timetable {
 			/* Only stack it up if this day is chosen
 			 */
 			foreach($result['result'] as $currentDefinition) {
-				if ($day == $currentDefinition['DayNumber']) {
+				if (!$day || ($day == $currentDefinition['DayNumber'])) {
 					$allDefinitions['desc'][] = $currentDefinition['PeriodDescription'];
 					$allDefinitions['start'][] = $currentDefinition['TimeFrom'];
 					$allDefinitions['end'][] = $currentDefinition['TimeTo'];
 					$allDefinitions['number'][] = $currentDefinition['PeriodNumber'];
+					$allDefinitions['dayNumber'][] = $currentDefinition['DayNumber'];
 					$allDefinitions['sequence'][] = null;
 				}
 			}
+
+			/* Number of days per cycle
+			 * Used in getFullTimetable()
+			 */
+			$allDefinitions['dayCount'] = $this->getCycleLength();
 
 			return $allDefinitions;
 		}
@@ -226,6 +242,7 @@ class External_SchoolPro_Timetable {
 							$timetable[$x]['code'] = $currentClass['ClassCode'];
 							$timetable[$x]['room'] = $currentClass['ClassRoom'];
 							$timetable[$x]['staffID'] = $externalUserId;
+							$timetable[$x]['dayNumber'] = $currentClass['DayNumber'];
 
 							array_shift($allClasses);
 							break;
@@ -241,13 +258,31 @@ class External_SchoolPro_Timetable {
 	}
 
 	/**
-	 * TODO: No stored proc
+	 * Get a full timetable
 	 *
 	 * @param $externalUserId
 	 * @param $userId
 	 * @param $campusId
+	 * @return array
 	 */
-	public function getFullTimetable ($externalUserId, $userId, $campusId) {
+	public function getFullTimetable($externalUserId, $userId, $campusId) {
+		$allDayTimetables = array();
+
+		/* Get all the days' timetables first
+		 */
+		for ($i = 1; $i <= $this->getCycleLength(); $i++) {
+			$allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $i);
+		}
+
+		$timetable = array();
+
+		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
+			for ($day = 0; $day < $this->getCycleLength(); $day++) {
+				$timetable[$period]['day'][$day] = $allDayTimetables[$day][$period];
+			}
+		}
+
+		return $timetable;
 	}
 
 	/**
@@ -274,5 +309,22 @@ class External_SchoolPro_Timetable {
 	 * @param $classCode
 	 */
 	public function getSubjectName ($classCode) {
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * @param int $cycleLength
+	 */
+	private function setCycleLength($cycleLength) {
+		$this->cycleLength = $cycleLength;
+	}
+
+	/**
+	 * @return int
+	 */
+	private function getCycleLength() {
+		return $this->cycleLength;
 	}
 }
