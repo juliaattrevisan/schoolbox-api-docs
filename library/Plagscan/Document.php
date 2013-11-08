@@ -9,7 +9,9 @@
  * 
  */
 
-class Plagscan_Document {
+use Schoolbox\ISoftDeletable;
+
+class Plagscan_Document implements ISoftDeletable {
 	const STATUS_QUEUED = 1;
 
 	const STATUS_PROCESSING = 2;
@@ -69,6 +71,11 @@ class Plagscan_Document {
 	 * @var float
 	 */
 	protected $score;
+
+	/**
+	 * @var \Alaress_Date_Format
+	 */
+	protected $deleted;
 
 	/**
 	 * @param  int $fileId
@@ -204,6 +211,32 @@ class Plagscan_Document {
 	 */
 	public function getFile() {
 		return $this->file;
+	}
+
+	/**
+	 * @param  Alaress_Date_Format $deleted
+	 * @return $this
+	 */
+	public function setDeleted($deleted) {
+		$this->deleted = $deleted;
+		return $this;
+	}
+
+	/**
+	 * @return Alaress_Date_Format
+	 */
+	public function getDeleted() {
+		return $this->deleted;
+	}
+
+	/**
+	 * Is this deleted? (added so there's a consistent method for determining if
+	 * a model is deleted)
+	 *
+	 * @return bool
+	 */
+	public function isDeleted() {
+		return ($this->getDeleted() instanceof Alaress_Date_Format);
 	}
 
 }
