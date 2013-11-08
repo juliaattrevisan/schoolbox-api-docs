@@ -56,7 +56,7 @@ if (is_array($typeList)) {
 	}
 }
 
-$optionList = Cfg::getAllOfType('', $selectedType);
+$optionList = Cfg::getAllOfType('configID', $selectedType);
 $editable = false;
 
 if(is_array($optionList)) {
