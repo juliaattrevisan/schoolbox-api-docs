@@ -33,7 +33,7 @@ class BooleanTest extends TestCase {
 			array('0.0', false),
 			array('0.01', true),
 			array('-0.01', true),
-			array(null, null),
+			array(null, false),
 			array('', false),
 			array(' ', false),
 		);
@@ -50,7 +50,7 @@ class BooleanTest extends TestCase {
 			array('0.0', false),
 			array('0.01', true),
 			array('-0.01', true),
-			array(null, null),
+			array(null, false),
 			array('', false),
 			array(' ', false),
 		);

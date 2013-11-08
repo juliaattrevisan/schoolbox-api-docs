@@ -24,10 +24,10 @@ class Boolean implements IColumnType {
 	}
 
 	public function hydrate($value, $mapper = null) {
-		return isset($value) ? $this->isBoolean($value) : null;
+		return $this->isBoolean($value);
 	}
 
 	public function dehydrate($value, $mapper = null) {
-		return isset($value) ? $this->isBoolean($value) : null;
+		return $this->isBoolean($value);
 	}
 }
