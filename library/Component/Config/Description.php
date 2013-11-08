@@ -16,11 +16,12 @@ class Component_Config_Description  extends Component_Config_Abstract {
 	 * Parse out this config option
 	 *
 	 * @param SitePage $page
-	 * @param $key
-	 * @param $keyblock
-	 * @param $configValue
+	 * @param          $key
+	 * @param          $keyblock
+	 * @param          $configValue
+	 * @param array    $allConfigs
 	 */
-	public function parse(SitePage $page, $key, $keyblock, $configValue) {
+	public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 		$page->setVar('COMPONENT_CONFIG_DESCRIPTION', $configValue);
 	}
 }

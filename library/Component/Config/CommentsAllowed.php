@@ -10,15 +10,16 @@
 
 class Component_Config_CommentsAllowed extends Component_Config_Abstract {
 
-	/**
-	 * Parse out config options
-	 *
-	 * @param SitePage $page
-	 * @param $key
-	 * @param $keyblock
-	 * @param $configValue
-	 */
-	public function parse(SitePage $page, $key, $keyblock, $configValue) {
+    /**
+     * Parse out config options
+     *
+     * @param SitePage $page
+     * @param          $key
+     * @param          $keyblock
+     * @param          $configValue
+     * @param array    $allConfigs
+     */
+    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 		if ($configValue == '1') {
 			$page->setVar(array(
 				'COMPONENT_CONFIG_COMMENTSALLOWED_SELECTED' => 'checked="checked"'

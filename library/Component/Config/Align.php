@@ -6,7 +6,13 @@
  */
 class Component_Config_Align extends Component_Config_Abstract {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue) {
+    public function parse(
+        SitePage $page,
+        $key,
+        $keyblock,
+        $configValue,
+        $allConfigs = array()
+    ) {
 
         // has an internal block for the select element
         $page->setBlock($keyblock, 'aligns', 'aligns_block');

@@ -8,7 +8,7 @@
  */
 class Component_Config_Filter extends Component_Config_Abstract {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 
         $filter = array();
 
