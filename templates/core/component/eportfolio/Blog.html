@@ -2,6 +2,8 @@
 	<script type='text/javascript'>
 		$j(function() {
 
+			var component = $j('#component{COMPONENT_INSTANCE_ID}');
+
 			/* For viewing comment form
 			 *
 			 * When you have $j(function() inside the <body> tags the onclick
@@ -10,20 +12,20 @@
 			 * By Shahbaz Saleem
 			 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
 			 */
-			$j('.closeComment').unbind('click').click(function() {
+			component.find('.closeComment').unbind('click').click(function() {
 				var id = $j(this).attr('rel');
-
-				$j('#' + id).toggle();
+				component.find('#' + id).toggle();
 			});
 
 			/* For viewing comment thread
 			 */
-			$j('.viewCommentThread').hide();
-			
-			$j('.viewComments').unbind('click').click(function() {
-				var id = $j(this).attr('rel');
-
-				$j('#' + id).toggle();
+			component.find('.viewCommentThread').hide();
+			component.find('.viewComments').unbind('click').click(function() {
+				var matches = $j(this).attr('rel').match(/^viewComments_(\d+)$/)
+				if (matches) {
+					var postId = matches[1]
+					component.find('#blogComment_'+postId+' .viewCommentThread').toggle()
+				}
 			});
 		});
 	</script>
@@ -75,7 +77,7 @@
 				<!-- BEGIN has_comments -->
 				<ul class="comments" id="blogComment_{LIST_ITEM_ID}">
 					<!-- BEGIN comment -->
-					<li class='viewCommentThread' id='viewComments_{LIST_ITEM_ID}'>
+					<li class='viewCommentThread' id='comment_{COMMENT_ID}'>
 						<!-- BEGIN has_delete_comment_form -->
 						<span class="actions">
 							<a class="delete-comment btn delete no-text" href="/eportfolio/component/blogcomment/modifyForm.php?action=removeComment&userId={USER_ID}&pageId={PAGE_ID}&commentId={COMMENT_ID}" title="Delete Comment"><span></span></a>
