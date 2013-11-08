@@ -106,7 +106,7 @@ class SubmissionReturn extends DeprecatedModel {
             SELECT g.*, r.mark, r.comment FROM submission_return r, submission_grade g
             WHERE r.owner = " . $this->db->smartQuote($user_id) . "
             AND r.box_id = " . $this->db->smartQuote($box_id) . "
-            AND (g.lower_bound <= r.norm_mark OR r.norm_mark IS NULL)
+            AND g.lower_bound <= r.norm_mark
             ORDER BY returned DESC, lower_bound DESC
             LIMIT 1
         ";

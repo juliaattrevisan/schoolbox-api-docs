@@ -214,6 +214,13 @@ class Mapper {
 	}
 
 	/**
+	 * @return MappingCollection
+	 */
+	public function getMap() {
+		return $this->map;
+	}
+
+	/**
 	 * Gets a single object as a collection, if it isn't one already.
 	 *
 	 * Different possible actions based on $object:
@@ -843,6 +850,100 @@ class Mapper {
 		$rowset = $statement->fetchAll();
 
 		return $this->hydrateList($rowset);
+	}
+
+	/**
+	 * Finds a collection of models that are joined to this one.
+	 *
+	 * @param string $join    The name of a join in this mapper (set up with
+	 *                        $this->hasJoin($join, ...))
+	 * @param object $object  A model, or collection thereof.
+	 * @param array  $options Optional options to pass to query
+	 *                        (@see findByColumnList() $options param)
+	 *
+	 * @return Collection
+	 */
+	public function findJoinedModelList($join, $object, $options = array()) {
+
+		// Retrieve a list of column values for the join for $object
+		// (the column: whatever the key is in this model.)
+		$join_identifier = $this->joins[$join];
+		$mapping         = $this->map->getOffsetByColumn($join_identifier['this_key']);
+		$key_value_list  = $this->getModelAsCollection($object)->getColumnValues($mapping['property']);
+
+		// If the join is a many or one to one relation:
+		// it is likely that each value is an object (because the mapping was defined as a model type).
+		$join_mapper = $this->getJoinMapper($join);
+		if ($mapping['type'] === self::TYPE_MODEL) {
+			$get_id_method = $join_mapper->getGetIdentifierMethodName();
+			foreach ($key_value_list as &$key) {
+				$key = call_user_func(array($key, $get_id_method));
+			}
+			unset($key);
+		}
+		return $join_mapper->findByColumn($join_identifier['other_key'], $key_value_list, $options);
+	}
+
+	/**
+	 * Loads joined models into this object.
+	 *
+	 * @param string $join    @see $this->findJoinedModelList() $join param
+	 * @param object $object  @see $this->findJoinedModelList() $object param
+	 * @param array  $options @see $this->findJoinedModelList() $options param
+	 *                        Also takes another param:
+	 *                        set_method: the setter method for setting the
+	 *                                    joined models in each $object
+	 */
+	public function loadJoinedModel($join, $object, $options = array()) {
+		$collection        = $this->getModelAsCollection($object);
+		$joined_model_list = $this->findJoinedModelList($join, $collection, $options);
+
+		$join_mapper     = $this->getJoinMapper($join);
+		$join_identifier = $this->joins[$join];
+		$this_mapping    = $this->getMap()->getOffsetByColumn($join_identifier['this_key']);
+		$other_mapping   = $join_mapper->getMap()->getOffsetByColumn($join_identifier['other_key']);
+
+		// Hydrate joined models into $collection.
+		// Need to know:
+		// * how it relates back to this model ($join['other_key'])
+		// * how to set it in this model ($join['this_key')
+		$this_get_method  = $this->getGetMethodName($this_mapping['property']);
+		$other_get_method = $join_mapper->getGetMethodName($other_mapping['property']);
+
+		$is_this_model   = $this_mapping['type']  === self::TYPE_MODEL;
+		$is_other_model  = $other_mapping['type'] === self::TYPE_MODEL;
+		$this_id_method = $this->getGetIdentifierMethodName();
+		$grouped_join_list = $joined_model_list->groupByCallback(
+			function($item) use($other_get_method, $is_other_model, $this_id_method) {
+				$key = $item->$other_get_method();
+				// $item->$other_get_method may return an instance of this model.
+				// If so, get its ID.
+				if ($is_other_model) {
+					$key = $key->$this_id_method();
+				}
+				return $key;
+			}
+		);
+
+		$is_multiple     = !empty($join_identifier['multiple']);
+		$this_set_method = $options['set_method'] ?: $this->getSetMethodName($this_mapping['property']);
+		$other_id_method = $join_mapper->getGetIdentifierMethodName();
+
+		foreach ($collection as $item) {
+			// Is this a multiple join? If so, how do I know?
+			$item_property = $item->$this_get_method();
+			if ($is_this_model) {
+				$item_property = $item_property->$other_id_method();
+			}
+			$this_model_join_list = $grouped_join_list->getOffset($item_property);
+			if ($this_model_join_list instanceof Collection) {
+				$join_item = $this_model_join_list;
+				if (!$is_multiple) {
+					$join_item = $this_model_join_list->first();
+				}
+				$item->$this_set_method($join_item);
+			}
+		}
 	}
 
 	/**

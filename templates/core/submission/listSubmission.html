@@ -37,11 +37,14 @@ $j(function(){
 
 <div class="indent">
         <!-- BEGIN category_listing -->
-    <table class="ruler">
+    <table class="ruler table">
     <thead>
             <tr>
                 <td colspan="9"><h2>{CATEGORY} ({STUDENTS} Students)</h2>
-                    <span class="header_option in-h2"><a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="btn modify"><span></span>Class Mark Sheet</a></span>
+                    <span class="header_option in-h2">
+                        <a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="btn modify"><span></span>Task Progress Report</a>
+                        <a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="btn modify"><span></span>Class Mark Sheet</a>
+                    </span>
                 </td>
             <tr>
             <tr>
@@ -64,7 +67,7 @@ $j(function(){
                 <td>{TYPE}</td>
                 <td>
                     <!-- BEGIN writable_open -->
-                    <a href="/submission/createSubmission/modify/{ID}">{OPENDATE}</a>
+                    {OPENDATE}
                     <!-- END writable_open -->
                     <!-- BEGIN readonly_open -->
                     {OPENDATE}
@@ -72,7 +75,7 @@ $j(function(){
                 </td>
                 <td>
                     <!-- BEGIN writable_close -->
-                    <a href="/submission/createSubmission/modify/{ID}">{DUEDATE}</a>
+                    {DUEDATE}
                     <!-- END writable_close -->
                     <!-- BEGIN readonly_close -->
                     {DUEDATE}

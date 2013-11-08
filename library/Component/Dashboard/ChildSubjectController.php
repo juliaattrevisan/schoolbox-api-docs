@@ -42,7 +42,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $user = DeprecatedDatabase::getInstance()->getRow($query);
                 $this->setVar("STUDENT_ID", $child['id']);
                 $this->setVar("STUDENT_EXTERNAL_ID", $user['synergy_id']);
-                $this->setVar("STUDENT_NAME", $this->user->formatName('{firstname} {lastname}'));
+                $this->setVar("STUDENT_NAME", $child['name']);
                 $this->setVar("STUDENT_YEAR", $user['year']);
 
                 if ( is_array($child['subjects']) ) {

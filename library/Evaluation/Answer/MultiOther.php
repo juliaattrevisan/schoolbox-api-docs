@@ -108,6 +108,15 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         }
     }
 
+	/**
+	 * Assign a letter to the Other portion of possible answers
+	 * @param $allAnswers
+	 * @return string
+	 */
+	private function otherLetterIndex($allAnswers) {
+		return chr(65+(int)count($allAnswers));
+	}
+
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
@@ -125,11 +134,15 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-			/* Enforce "Other"
+			/* Enforce "Other" - This is assumed to always be the next letter in the sequence
+			 *
+			 * When it gets to Z, you're going to start seeing square brackets and slashes
+			 * used as array keys, which will be strange. You could do it so it goes AA, AB...
+			 * like excel does it.
  			 */
 			$other = new StdClass();
-			$other->description = '';
-			$other->value = 'Other';
+			$other->description = 'Other';
+			$other->value = $this->otherLetterIndex($allAnswers);
 
 			$allAnswers[] = $other;
 
@@ -308,18 +321,16 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 */
             if ($this->getUseLongAnswers()) {
                 foreach ($data as $currentAnswer) {
-
-					/* Special case for other
-					 */
-					if ($currentAnswer == 'Other') {
-						$postprocessed[] = 'Other';
-						break;
-					}
-					else {
-	                    $postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
-					}
+					$postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
                 }
-            } else {
+
+				/* Condense empty elements which can rseult from getAnswerText() returning
+				 * an empty string when trying to find the value of an "Other" text input
+				 * This removes double-comma phenomenon after Other in csv
+				 */
+				$postprocessed = array_filter($postprocessed);
+            }
+			else {
                 $postprocessed = $data;
             }
 
@@ -357,7 +368,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 
 		$other = new StdClass();
 		$other->description = 'Other';
-		$other->value = 'Other';
+		$other->value = $this->otherLetterIndex($allOptions);;
 
 		$allOptions[] = $other;
 

@@ -40,10 +40,14 @@
     });
 
 	/* Pseudo session - things are rememberised
+	 * If not initialised, set it to 0 so the browser works
 	 */
 	var socialstreamSession = {
 		categoryId: '{HOMEPAGE_ID}'
-	}
+	};
+    if (isNaN(Number(socialstreamSession.categoryId))) {
+        socialstreamSession.categoryId = 0;
+    }
 
 	$j(function() {
 		/* Activate socialstream browser for comments/replies (clones)
@@ -147,7 +151,7 @@
 </ul>
 <div id="tabs-1" class="customise-components">
     <div id="tabs-sub">
-        <table border="0" cellpadding="0" cellspacing="0">
+        <table border="0" cellpadding="0" cellspacing="0" class="table">
             <colgroup>
                 <col width="128" />
             </colgroup>

@@ -79,9 +79,20 @@ class NodeRenderer {
 
 		$currentNode = end(array_values($nodeData['breadcrumbs']));
 
-		$this->getPage()->setVar(array(
-			'NODE_NAME' => $currentNode['name']
-		));
+		// Fudge values for home node
+		$output = array(
+			'NODE_NAME' => 'Home',
+			'NODE_ID'   => 0,
+			'NODE_LINK' => '/',
+		);
+		if ($currentNode) {
+			$output = array(
+				'NODE_NAME' => $currentNode['name'],
+				'NODE_ID'   => $currentNode['categoryId'],
+				'NODE_LINK' => '/homepage/'.$currentNode['categoryId'],
+			);
+		}
+		$this->getPage()->setVar($output);
 	}
 
 	/**

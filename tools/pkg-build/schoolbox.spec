@@ -177,11 +177,11 @@ service httpd restart;
 
 %post leave
 chown -R alaress:alaress %{_datadir}/%{name};
-%{_datadir}/%{name}/tools/module.sh install leave;
+%{_datadir}/%{name}/tools/module.sh enable leave;
 
 %post mobile
 chown -R alaress:alaress %{_datadir}/%{name};
-%{_datadir}/%{name}/tools/module.sh install mobile;
+%{_datadir}/%{name}/tools/module.sh enable mobile;
 
 %files
 %{_datadir}/%{name}

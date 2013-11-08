@@ -50,6 +50,15 @@ class DueWork_Detail {
         $this->marksheet = Marksheet_Factory::build($this->dueWork['mark_type_slug']);
     }
 
+    /**
+     * Method for retrieving the data set that would be passed to Sitepage's
+     * rendering mechanism.
+     *
+     * @return array
+     */
+    public function getSitepageData() {
+        return $this->sitepageData;
+    }
 
     public function processStudents(array $students) {
         if (!count($students)) {

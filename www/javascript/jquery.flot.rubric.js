@@ -13,7 +13,8 @@ function setupRubricChart(data, legs, ticks) {
         ticks: ticks
     };
 
-    var options = {
+
+		var options = {
         series: {
             spider: {
                 active: true,

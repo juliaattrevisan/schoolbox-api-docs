@@ -66,7 +66,7 @@ $j(function() {
 			<input name="tableName" type="hidden" value="{TABLE_CURRENT_NAME}" />
 			<input name="tableIndex" type="hidden" value="{TABLE_CURRENT_INDEX}" />
 			<!-- END table_schema -->
-			<table id="tableData">
+			<table id="tableData" class="table">
 				<colgroup>
 					<col width="10%" />
 				</colgroup>
@@ -92,7 +92,7 @@ $j(function() {
                         <!-- BEGIN table_cell_select -->
                             <td><select name="{TABLE_COLUMN}[]">
                                 <!-- BEGIN table_cell_select_option -->
-                                    <option value="{OPTION_VALUE}" {OPTION_VALUE_SELECTED}>{OPTION_VALUE}</option>
+                                    <option value="{OPTION_VALUE}" {OPTION_VALUE_SELECTED}>{OPTION_LABEL}</option>
                                 <!-- END table_cell_select_option -->
                             </select></td>
                         <!-- END table_cell_select -->
@@ -108,7 +108,7 @@ $j(function() {
 	</div>
 </div>
 
-<table id="newData" class="hide-it">
+<table id="newData" class="hide-it table">
 	<tbody>
 		<tr>
 			<!-- BEGIN newInput -->
@@ -117,7 +117,7 @@ $j(function() {
             <!-- BEGIN newSelect -->
                 <td><select name="{TABLE_COLUMN}[]">
                     <!-- BEGIN newSelect_option -->
-                        <option value="{OPTION_VALUE}">{OPTION_VALUE}</option>
+                        <option value="{OPTION_VALUE}">{OPTION_LABEL}</option>
                     <!-- END newSelect_option -->
                 </select></td>
 			<!-- END newSelect -->

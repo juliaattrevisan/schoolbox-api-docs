@@ -28,38 +28,38 @@ if ($subBox['owner'] != $_SESSION['id'] && !$groupHandler->isSuperuser()) {
 $submissionHandler->logPageView(3, $this->arg[0]);
 
 // compile the list of students over which we will iterate
+$studentList = array();
 
 // get full student list of class to show those who have not submitted. If synergy code, get synergy students
 if ($subBox['code'] && Cfg::get('external_enable')) {
     $synHandler = new External_Class();
-    $studentList = $synHandler->getStudents($subBox['code']);
-
-} // failing that, retrieve student list from group membership
-else {
-    $studentList = $groupHandler->getMemberList($subBox['category']);
-}
-
-
-if (!(is_array($studentList) && count($studentList))) {
-    // failed to obtain a list of students from external sources: compile list from submissions
-    $studentList = array();
-
-    $allSubmissions = $studentSubHandler->getByBoxID($this->arg[0]);
-    if (is_array($allSubmissions) && count($allSubmissions)) {
-        foreach ($allSubmissions as $submission) {
-            $studentList[] = array(
-                'title' => $submission['title'],
-                'firstname' => $submission['firstname'],
-                'lastname' => $submission['lastname'],
-                'uid' => $submission['uid'],
-                'synergy_id' => $submission['synergy_id'],
-                'type' => $submission['type'],
-                'group_id' => $submission['group_id'],
-            );
-        }
+    $studentListClassCode = $synHandler->getStudents($subBox['code']);
+    if(is_array($studentListClassCode)){
+        $studentList = array_merge($studentList,$studentListClassCode);
     }
 }
 
+// list all students from group membership
+$studentListFromGroup = $groupHandler->getMemberList($subBox['category']);
+if(is_array($studentListFromGroup)){
+    $studentList = array_merge($studentList,$studentListFromGroup);
+}
+
+// list all students who have already submitted
+$allSubmissions = $studentSubHandler->getByBoxID($this->arg[0]);
+if (is_array($allSubmissions) && count($allSubmissions)) {
+    foreach ($allSubmissions as $submission) {
+        $studentList[] = array(
+            'title' => $submission['title'],
+            'firstname' => $submission['firstname'],
+            'lastname' => $submission['lastname'],
+            'uid' => $submission['uid'],
+            'synergy_id' => $submission['synergy_id'],
+            'type' => $submission['type'],
+            'group_id' => $submission['group_id'],
+        );
+    }
+}
 
 $dueWorkDetail = new DueWork_Detail($submissionBoxID);
 $dueWorkDetail->processStudents($studentList);

@@ -1,0 +1,31 @@
+<li class='column'>
+	<div class="answer-given-container">
+		<!-- BEGIN answerOption -->
+		{ANSWER}
+		<!-- END answerOption -->
+	</div>
+</li>
+<!-- BEGIN writable_comment -->
+<li class='column'>
+	<div class="textarea-container">
+		<textarea name="comment">{REVIEWED_COMMENT}</textarea>
+	</div>
+</li>
+<!-- END writable_comment -->
+<!-- BEGIN readonly_comment -->
+<li class='column'>
+	<div class="textarea-container">
+		<p>{REVIEWED_COMMENT}</p>
+	</div>
+</li>
+<!-- END readonly_comment -->
+<li class='column'>
+	<p class="marks-amount">
+		<!-- BEGIN writable_mark -->
+		<input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
+		<!-- END writable_mark -->
+		<!-- BEGIN readonly_mark -->
+		{REVIEWED_MARKS} / {QUESTION_MARKS}
+		<!-- END readonly_mark -->
+	</p>
+</li>

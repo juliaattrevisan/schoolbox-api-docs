@@ -39,9 +39,9 @@ $j(function() {
 </style>
 <!-- END custom_head -->
 
-<h1>{ACTION} Folder</h1>
+<h1>{ACTION} Folder<a class="btn go-back" href="/homepage/{CATEGORY_ID}"><span></span>Return to Homepage</a></h1>
 <form action="/cms/categoryForm.php" method="post" id="folderForm" class="clearfix">
-	<table class="standardForm" >
+	<table class="standardForm table" >
 		<tr>
 			<td class="formLabelWidth"><h4>Folder Name</h4></td>
 			<td><label><input type="text" id="name" class="required" name="name" maxlength="100" size="40" value="{NAME}" /></label></td>
@@ -67,7 +67,7 @@ $j(function() {
 			<td><h4>Group Permissions</h4>
 				<em>Allow predefined groups of users access to this folder. </em>
 				</td>
-				<td><table>
+				<td><table class="table">
 					<tr>
 						<th><b>Group</b></th>
 						<th><b>None</b></th>

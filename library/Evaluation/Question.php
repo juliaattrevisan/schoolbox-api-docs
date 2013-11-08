@@ -223,4 +223,36 @@ abstract class Evaluation_Question extends DeprecatedModel
 
         return $this->db->getOne($query);
     }
+
+	/**
+	 * Reorder questions via jquery sortable
+	 *
+	 * @param $allIds
+	 */
+	public function reorderQuestions($allIds) {
+		if (is_array($allIds) && count($allIds)) {
+			$queryComponents = array();
+			$sequence = 1;
+
+			foreach($allIds as $currentId) {
+				$id = str_replace('question_', '', $currentId);
+
+				$queryComponents[]= "($id, $sequence)";
+
+				$sequence++;
+			}
+
+			$values = implode(',', $queryComponents);
+
+			/* :>
+			 */
+			$query = "
+				INSERT INTO {$this->_table} (question_id, sequence)
+				VALUES $values
+				ON DUPLICATE KEY UPDATE sequence = VALUES(sequence)
+			";
+
+			$this->db->query($query);
+		}
+	}
 }

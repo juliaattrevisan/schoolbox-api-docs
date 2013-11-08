@@ -61,7 +61,12 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         }
 
         if ($this->getConfig('video')) {
-            $this->defaultVideo = $videoResourceMapper->findById($this->getConfig('video'));
+            try {
+                $this->defaultVideo = $videoResourceMapper->findByFileId($this->getConfig('video'));
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                $this->defaultVideo = $this->outputList->first();
+            }
         }
         else {
             $this->defaultVideo = $this->outputList->first();
@@ -75,7 +80,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         // Set up component name
         $this->setVar(array(
             'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Video',
-	        'FILE_CAT_ID'   => $this->getContext('id'),
+	        'FILE_CAT_ID'   => $this->source_category_id,
         ));
 
 	    $this->setBlock($templateHandle, 'default_video', 'default_video_block');

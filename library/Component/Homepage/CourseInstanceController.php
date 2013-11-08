@@ -108,7 +108,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit',             'unit_modify',          'unit_modify_block');
         $this->setBlock('unit',             'unit_delete',          'unit_delete_block');
         $this->setBlock('unit',             'unit_task',            'unit_task_block');
-        $this->setBlock('unit',             'unit_actions',         'unit_actions_block');
+        $this->setBlock('unit',             'unit_report_actions',   'unit_report_actions_block');
+        $this->setBlock('unit',             'unit_add_task_actions', 'unit_add_task_actions_block');
         $this->setBlock('unit_task',        'unit_task_link',       'unit_task_link_block');
         $this->setBlock('unit_task',        'unit_task_no_link',    'unit_task_no_link_block');
         $this->setBlock('unit_task',        'unit_task_count',      'unit_task_count_block');
@@ -210,14 +211,16 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_no_expand_block'     => '',
                 'unit_delete_block'        => '',
                 'unit_modify_block'        => '',
-                'unit_actions_block'       => '',
+                'unit_report_actions_block'   => '',
+                'unit_add_task_actions_block' => '',
             )
         );
         if (!$this->is_student) {
             $this->parse('unit_delete_block', 'unit_delete');
             $this->parse('unit_modify_block', 'unit_modify');
+            $this->parse('unit_report_actions_block', 'unit_report_actions');
             if (!$unit->isAfterDueDate()) {
-                $this->parse('unit_actions_block', 'unit_actions');
+                $this->parse('unit_add_task_actions_block', 'unit_add_task_actions');
             }
         }
 

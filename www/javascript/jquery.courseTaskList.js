@@ -66,6 +66,20 @@
             });
         });
 
+        // Set up the same resource browser as is used in the social stream.
+        var socialstream_browser = component.find('.resource_browser');
+        if (socialstream_browser.length && $.fn.socialstreamBrowser) {
+            component.delegate('form a[data-function="browse"]', 'click.courseTaskList', {}, function(event) {
+                var form = $(this).closest('form');
+                event.preventDefault();
+                socialstream_browser.socialstreamBrowser({
+                    submitCallback: function(url) {
+                        form.find('input[name="link"]').val(url);
+                    }
+                });
+            });
+        }
+
         // AJAX form submissions
         component.delegate('form.edit_task_form, form.create_task_form', 'submit.courseTaskList', {}, function(event) {
             var form = $(this);
@@ -93,7 +107,7 @@
         });
 
         // Delete task: "are you sure?"
-        component.delegate('.interact a.delete, .delete_task_form_container a.delete-reject', 'click.courseTaskList', {}, function(event) {
+        component.delegate('a.delete, .delete_task_form_container a.delete-reject', 'click.courseTaskList', {}, function(event) {
             event.preventDefault();
             var delete_form = $(this).closest('.task').find('.delete_task_form_container');
             delete_form.slideToggle('fast');

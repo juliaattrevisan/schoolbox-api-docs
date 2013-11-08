@@ -114,6 +114,12 @@ class InstanceMapper extends Mapper {
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id',
         ));
+        $this->hasJoin('completion', array(
+            'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceCompletionMapper',
+            'this_key'  => 'id',
+            'other_key' => 'task_instance_id',
+            'multiple'  => true,
+        ));
 
         $this->hasSoftDeleteDateField('deleted_at');
         $this->registerCallback('preSave',        array($this, 'preSave'));

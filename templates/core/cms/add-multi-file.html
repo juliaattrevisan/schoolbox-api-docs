@@ -24,7 +24,7 @@
             },
             'onSelectOnce':function () {
                 if (!$j('.uploadifyQueueItem').find('.heading-table').length > 0) {
-                    $j('.uploadifyQueueItem').prepend('<table width="100%" class="heading-table"><tr><td width="50%"><h4 style="margin: 0">Local File</h4></td><td width="50%"><h4 style="margin: 0">Title</h4></td></tr></table>');
+                    $j('.uploadifyQueueItem').prepend('<table width="100%" class="heading-table table"><tr><td width="50%"><h4 style="margin: 0">Local File</h4></td><td width="50%"><h4 style="margin: 0">Title</h4></td></tr></table>');
                 }
                 ;
 
@@ -118,7 +118,7 @@
 
 <h1>Upload Multiple Files</h1>
 <div id="upload-status" class="saved-colours hide">Successfully uploaded files!</div>
-<table class="standardForm">
+<table class="standardForm table">
     <tr>
         <td class="formLabelWidth"><h4>Location</h4> <em>File will be uploaded to this location</em></td>
         <td>{CATEGORY_NAME}</td>

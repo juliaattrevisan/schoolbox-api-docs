@@ -28,6 +28,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
 	 */
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
 		return $this->getCalendarHandler()->getDayEvents(
+			$this->getUser(),
 			$startTimestamp,
 			$endTimestamp,
 			array('campus' => $this->getCampusId())

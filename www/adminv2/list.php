@@ -34,7 +34,21 @@ $tableList = array(
     array(
         'name' => 'groups',
         'title' => 'Groups',
-        'index' => 'id'
+        'index' => 'id',
+        'fields' => array(
+            'id'         => array('readonly' => '1'),
+            'name'       => array('caption' => 'Name'),
+            'group_type' => array('caption' => 'Group Type'),
+            'can_change_password' => array('caption' => 'Can Change Password'),
+            'digest_schedule'     => array(
+                'caption' => 'Digest Schedule',
+                'options' => array(
+                    Schoolbox\Role::DIGEST_NEVER  => 'No Digest',
+                    Schoolbox\Role::DIGEST_DAILY  => 'Daily',
+                    Schoolbox\Role::DIGEST_WEEKLY => 'Weekly',
+                )
+            ),
+        ),
     ),
     array(
         'name' => 'house',
@@ -177,6 +191,8 @@ if ($table) {
             $this->setVar('TABLE_DATA', $data);
             $this->setVar('TABLE_COLUMN', $keys);
 
+            $currentColumn = $selectedTable['fields'][$keys];
+
             /* Search definition for row */
             foreach ($tableDefinition as $col) {
                 if ($col['Field'] == $keys) {
@@ -184,11 +200,19 @@ if ($table) {
                 }
             }
 
+            // Get option list out of current column, or the enum for this column
+            $option_list = $currentColumn['options'];
+            if (stristr($col['Type'], 'enum')) {
+                preg_match('/enum\((.*)\)/', $col['Type'], $match);
+                foreach (explode(',', str_replace('\'', '', $match[1])) as $enum_option) {
+                    $option_list[$enum_option] = $enum_option;
+                }
+            }
 
             if (!$rowOne) {
 
-                if ((isset($selectedTable['fields'][$keys]['caption']))) {
-                    $this->setVar('TABLE_HEAD', $selectedTable['fields'][$keys]['caption']);
+                if ((isset($currentColumn['caption']))) {
+                    $this->setVar('TABLE_HEAD', $currentColumn['caption']);
                 } else {
                     $this->setVar('TABLE_HEAD', ucwords(str_replace('_', ' ', $keys)));
                 }
@@ -204,23 +228,24 @@ if ($table) {
                     $this->parse('newInput_block', 'newInput', true);
                 } // fields specified as readonly are also...readonly.
                 else {
-                    if (isset($selectedTable['fields'][$keys]) && $selectedTable['fields'][$keys]['readonly'] == '1') {
+                    if (isset($currentColumn) && $currentColumn['readonly'] == '1') {
                         $this->setVar('TYPE', 'hidden');
                         $this->setVar('READONLY', 'readonly="readonly"');
                         $this->parse('newInput_block', 'newInput', true);
-                    } // if the field is an enum, explode it, and iteratively create select options for the list
+                    }
                     else {
-                        if (stristr($col['Type'], 'enum')) {
+                        // if the field is an enum, explode it, and iteratively create select options for the list
+                        // Also do this if fields were provided explicitly.
+                        if (!empty($option_list)) {
                             $this->setVar('newSelect_option_block', '');
-
-                            preg_match('/enum\((.*)\)/', $col['Type'], $match);
-                            $list = explode(',', str_replace('\'', '', $match[1]));
-                            foreach ($list as $option) {
-                                $this->setVar('OPTION_VALUE', $option);
+                            foreach ($option_list as $option_value => $option_label) {
+                                $this->setVar('OPTION_VALUE', $option_value);
+                                $this->setVar('OPTION_LABEL', $option_label);
                                 $this->parse('newSelect_option_block', 'newSelect_option', true);
                             }
                             $this->parse('newSelect_block', 'newSelect', true);
-                        } // generically, just go with a text input
+                        }
+                        // generically, just go with a text input
                         else {
                             $this->setVar('TYPE', 'text');
                             $this->setVar('READONLY', '');
@@ -231,17 +256,15 @@ if ($table) {
 
             }
 
-            if ($keys == $selectedTable['index'] || (isset($selectedTable['fields'][$keys]) && $selectedTable['fields'][$keys]['readonly'] == '1')) {
+            if ($keys == $selectedTable['index'] || (isset($currentColumn) && $currentColumn['readonly'] == '1')) {
                 $this->parse('table_cell_block', 'table_cell_static', true);
             } else {
-                if (stristr($col['Type'], 'enum')) {
+                if (!empty($option_list)) {
                     $this->setVar('table_cell_select_option_block', '');
-
-                    preg_match('/enum\((.*)\)/', $col['Type'], $match);
-                    $list = explode(',', str_replace('\'', '', $match[1]));
-                    foreach ($list as $option) {
-                        $this->setVar('OPTION_VALUE', $option);
-                        if ($option == $data) {
+                    foreach ($option_list as $option_value => $option_label) {
+                        $this->setVar('OPTION_VALUE', $option_value);
+                        $this->setVar('OPTION_LABEL', $option_label);
+                        if ($option_value == $data) {
                             $this->setVar('OPTION_VALUE_SELECTED', 'selected="selected"');
                         } else {
                             $this->setVar('OPTION_VALUE_SELECTED', '');
@@ -288,13 +311,11 @@ else {
                 $this->parse('newInput_block', 'newInput', true);
             } // if the field is an enum, explode it, and iteratively create select options for the list
             else {
-                if (stristr($col['Type'], 'enum')) {
+                if (!empty($option_list)) {
                     $this->setVar('newSelect_option_block', '');
-
-                    preg_match('/enum\((.*)\)/', $col['Type'], $match);
-                    $list = explode(',', str_replace('\'', '', $match[1]));
-                    foreach ($list as $option) {
-                        $this->setVar('OPTION_VALUE', $option);
+                    foreach ($option_list as $option_value => $option_label) {
+                        $this->setVar('OPTION_VALUE', $option_value);
+                        $this->setVar('OPTION_LABEL', $option_label);
                         $this->parse('newSelect_option_block', 'newSelect_option', true);
                     }
                     $this->parse('newSelect_block', 'newSelect', true);

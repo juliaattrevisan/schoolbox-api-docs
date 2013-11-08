@@ -30,7 +30,7 @@ $this->setBlock(TEMPLATE_body, 'position_top', 'position_top_block');
 $this->setBlock(TEMPLATE_body, 'position_left', 'position_left_block');
 $this->setBlock(TEMPLATE_body, 'position_right', 'position_right_block');
 
-$componentFactory = buildComponentFactory($context, new User(), $this);
+$componentFactory = buildComponentFactory($context, new Schoolbox\User(), $this);
 
 if(!$componentFactory) {
     httpError(400, 'Invalid context specified.');
@@ -81,11 +81,11 @@ foreach ( $emptyPositionList as $emptyPosition ) {
 /**
  * Factory function to produce...uh, a Factory -_-
  * @param $context
- * @param User $user
+ * @param Schoolbox\User $user
  * @param SitePage $sitepage
  * @return Component_FactoryAbstract|null
  */
-function buildComponentFactory($context, User $user, SitePage $sitepage) {
+function buildComponentFactory($context, Schoolbox\User $user, SitePage $sitepage) {
     $contextMap = array(
         'dashboard' => false,
         'homepage' => true,

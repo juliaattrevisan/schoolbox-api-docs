@@ -117,7 +117,13 @@ $j(function () {
     var form = document.getElementById('#eventForm');
 
     $j('#eventForm').validate({
-        submitHandler:function (form) {
+		rules: {
+			'campus[]': {
+				required: true,
+				minlength: 1
+			}
+		},
+		submitHandler:function (form) {
 
             // the desired action, and if this is a series event or not
             var act = $j('#action').val();
@@ -255,7 +261,7 @@ $j(function () {
 </h1>
 
 <form method="post" action="/calendar/modifyForm.php" id="eventForm">
-    <table class="standardForm">
+    <table class="standardForm table">
         <tr>
             <td class="formLabelWidth">
 				<h4>Title</h4>
@@ -449,6 +455,7 @@ $j(function () {
     </table>
 
     <input type="hidden" name="id" value="{EVENT_ID}"/>
+    <input type="hidden" name="userId" value="{EVENT_USER_ID}"/>
     <input type="hidden" name="return" value="{RETURN_TO}"/>
     <input type="hidden" id="efficacy" name="efficacy" value="self"/>
     <input type="hidden" id="action" name="action" value=""/>

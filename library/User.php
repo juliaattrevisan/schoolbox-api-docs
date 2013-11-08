@@ -44,7 +44,7 @@ class User extends DeprecatedModel {
 	function getByID($id) {
 
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, `key`, hash, eportfolio_enabled,
-						synergy_id, local_email, alt_email, email_pass, userCampus.campus, luCampus.name as campusName,
+						synergy_id, local_email, alt_email, webmail, email_pass, userCampus.campus, luCampus.name as campusName,
 						IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
@@ -58,7 +58,7 @@ class User extends DeprecatedModel {
 	function getByUsername($username) {
 
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,`key`, hash,
-						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
+						synergy_id, local_email, alt_email, webmail, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
@@ -215,32 +215,37 @@ class User extends DeprecatedModel {
 	function ajaxSearch($keyword, $group = 0, $limit = false) {
 		//search for a user based on at least one of the above fields
 		//assumes at least one contains something
-		$keyword = mysql_real_escape_string($keyword);
 
 		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email
 					FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE ";
 
 		if ($keyword != "") {
 			if (is_numeric($keyword)) {
-				$query .= "( synergy_id = $keyword OR year = $keyword ) ";
+				$param = $this->db->quote($keyword);
+				$query .= "( synergy_id = $param OR year = $param ) ";
 			} else {
-				if (preg_match('/([[:alpha:]\']+) ([[:alpha:]\']+)/', $keyword, $name)) {
-					$query .= "( firstname like '%{$name[1]}%' and lastname like '%{$name[2]}%' ) ";
+				if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
+					$firstName = $this->db->quoteForLike($name[1]);
+					$lastName  = $this->db->quoteForLike($name[2]);
+					$query .= "( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' ) ";
 				} else {
-					$query .= "( firstname like '%$keyword%' or lastname like '%$keyword%' or username like '%$keyword%' ) ";
+					$param = $this->db->quoteForLike($keyword);
+					$query .= "( firstname like '%$param%' or lastname like '%$param%' or username like '%$param%' ) ";
 				}
 			}
 
 			if (is_array($group)) {
-				$query .= "AND group_id IN (" . implode(',', $group) . ") ";
+				$query .= "AND group_id IN (" . implode(',', array_map(array($this->db, 'quote'), $group)) . ") ";
 			} else {
 				if (is_numeric($group) && $group > 0) {
-					$query .= "AND group_id = '$group' ";
+					$param = $this->db->quote($group);
+					$query .= "AND group_id = '$param' ";
 				}
 			}
 		} else {
 			if ($group) {
-				$query .= "group_id = '$group' ";
+				$param = $this->db->quote($group);
+				$query .= "group_id = '$param' ";
 			} else {
 				error(2);
 			}

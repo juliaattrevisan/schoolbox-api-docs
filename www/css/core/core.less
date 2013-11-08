@@ -13,8 +13,7 @@ del, dfn, em, font, img, ins, kbd, q, s, samp,
 small, strike, strong, sub, sup, tt, var,
 b, u, i, center,
 dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td {
+fieldset, form, label, legend {
     margin: 0;
     padding: 0;
     border: 0;
@@ -58,7 +57,7 @@ del {
 }
 
 /* tables still need 'cellspacing="0"' in the markup */
-table {
+.table {
     border-collapse: collapse;
     border-spacing: 0;
 }
@@ -373,7 +372,7 @@ h2 {
 /*--------------------------------------------------------------
  Table Styles
 --------------------------------------------------------------*/
-table {
+.table {
     border: 0;
     border-collapse: collapse;
     th, td {
@@ -1127,6 +1126,44 @@ Notifications
     }
 }
 
+// Course outline forms
+.course_instance {
+    h3, h4 {
+        float: none;
+    }
+    .task-list h4 {
+        width: auto;
+    }
+    .unit-completion {
+        display: inline-block;
+    }
+    .information-list {
+        .no-expand {
+            padding-left: 15px;
+        }
+        .expand-link {
+            text-decoration: none;
+        }
+        .expand-button {
+            line-height: 11px;
+            width: 11px;
+            min-height: 11px;
+            margin-right: 4px;
+            display: inline-block;
+            background-color: transparent;
+            background-position-x: -2px;
+            background-position-y: -6px;
+            background-repeat: no-repeat;
+        }
+        .unit.collapsed .expand-button {
+            background-image: url(/images/tree/elbow-collapsed.gif);
+        }
+        .unit.expanded  .expand-button {
+            background-image: url(/images/tree/elbow-expanded.gif);
+        }
+    }
+}
+
 /*--------------------------------------------------------------
  Information List - Displays summary info with minimal actions
 --------------------------------------------------------------*/
@@ -1403,10 +1440,15 @@ Notifications
   position: relative;
   .mobile{
     background: url('/images/famicons/phone.png') 8px 7px no-repeat;
-    border-bottom: 1px solid @border-color;
     display: block;
-    padding: 8px 0 8px 35px;
+    padding: 0 0 0 35px;
+	border-bottom: 1px solid @border-color;
   }
+	.mobile, .phone {
+		a {
+			border-bottom: 0;
+		}
+	}
 }
 
 .teacher-profile{
@@ -1475,7 +1517,7 @@ Notifications
   background: url('/images/famicons/telephone.png') 8px 7px no-repeat;
   border-bottom: 1px solid @border-color;
   display: block;
-  padding: 8px 0 8px 35px;
+  padding: 0 0 0 35px;
 }
 
 #spouse{
@@ -1512,6 +1554,11 @@ Notifications
   li{
     padding: 7px 8px;
   }
+	.contact-phone a {
+		border-bottom: none;
+		height: 16px;
+		margin: 0 -8px -7px -8px;
+	}
 }
 
 .profile-groups{
@@ -1792,6 +1839,12 @@ label {
     }
 }
 
+// Why not have border transitions on all form elements?
+input, select, textarea {
+    -webkit-transition: border-color 0.2s linear;
+    transition: border-color 0.2s linear;
+}
+
 .formLabelWidth {
     width: 250px;
 }
@@ -1908,6 +1961,11 @@ select.small, input.small {
 
 input.timeField {
     width: 30px;
+}
+
+// Class for AJAX updated form elements
+.ajax-updated {
+    border-color: #080 !important;
 }
 
 .btn, .submit-btn-plain {
@@ -2417,7 +2475,7 @@ ADMIN BODY
         border-bottom: 1px solid @alternate-background;
         font-size: 14px;
         font-weight: bold;
-        margin-bottom: 8px;
+        margin-top: 8px;
         padding-bottom: 5px;
         line-height: 28px;
         span {
@@ -2522,33 +2580,6 @@ ADMIN BODY
                 display: block;
                 &:hover {
                     background-position: 0 -18px
-                }
-            }
-        }
-    }
-    .bar-holder {
-        float: left;
-        width: 85%;
-        margin-right: 3%;
-        margin: 0 3% 8px 0;
-        .bar {
-            border: 1px solid @lgrey;
-            height: 16px;
-            position: relative;
-            background-color: lighten(@lgrey,@lighten-value);
-            .gradient(lighten(@lgrey,@lighten-value), @lgrey);
-            span {
-                display: block;
-                height: 14px;
-                position: absolute;
-                left: 0;
-                top: 0;
-                .style {
-                    display: block;
-                    position: relative;
-                    background-color: lighten(@neutral-color,@lighten-value);
-                    .gradient(lighten(@neutral-color,@lighten-value), @neutral-color);
-                    border: 1px solid @neutral-color;
                 }
             }
         }
@@ -5423,11 +5454,11 @@ COLOUR ADJUSTMENT BOX
 }
 
 .active-box {
-    background-color: @alternate-background
+    background-color: lighten(@highlight-color, @lighten-value);
 }
 
 .colour:hover {
-    background-color: @white;
+
     cursor: pointer;
 }
 
@@ -5699,7 +5730,7 @@ HOMEPAGE CUSTOMISE
 }
 
 #tabs-homepage #tabs-sub li.ui-tabs-selected a {
-    background: @alternate-background;
+    background: lighten(@highlight-color, @lighten-value);
 }
 
 /*CUSTOMISE COMPONENT*/
@@ -5895,7 +5926,7 @@ Dropbox
     }
 }
 
-#calendar table th.dark {
+#calendar .table th.dark {
     border: 0;
     padding: 7px 5px;
     border-right: 1px solid @border-color;
@@ -6017,24 +6048,24 @@ h2 .btn {
     top: 0;
 }
 
-.left #calendar table .bubble .bubble-main h3 {
+.left #calendar .table .bubble .bubble-main h3 {
     background-color: @secondary-text;
     color: @white;
     padding: 0;
     font-size: 12px;
 }
 
-.left #calendar table .bubble .bubble-main h3 a, .bubble-main p a, .bubble-main p {
+.left #calendar .table .bubble .bubble-main h3 a, .bubble-main p a, .bubble-main p {
     color: @white;
 }
 
-.left #calendar table .bubble p.details {
+.left #calendar .table .bubble p.details {
     border-top: 1px dotted @mgrey;
     padding: 4px;
     margin-bottom: 0;
 }
 
-.left #calendar table .bubble p.comment {
+.left #calendar .table .bubble p.comment {
     margin-bottom: 5px;
 }
 
@@ -6101,13 +6132,13 @@ STUDENT AND PARENT DIRECTORIES
     font-size: 12px;
 }
 
-.directory.parents table {
+.directory.parents .table {
     width: 98%;
     border: 1px solid darken(@dark,@darken-value / 4);
     margin: 4px 1%;
 }
 
-.directory table td {
+.directory .table td {
     vertical-align: top;
     padding: 7px;
 }
@@ -6602,7 +6633,7 @@ table.subjectList {
 	position: relative;
 	clear: both;
 }
-.mark-sheet.names table {
+.mark-sheet.names .table {
     table-layout: fixed;
     td {
         @white-space: nowrap;
@@ -6626,7 +6657,7 @@ table.subjectList {
     width: 250px;
 }
 
-.mark-sheet.names table {
+.mark-sheet.names .table {
     width: 100%;
 }
 
@@ -6640,11 +6671,11 @@ table.subjectList {
     position: relative;
 }
 
-.mark-sheet.assessments table {
+.mark-sheet.assessments .table {
     position: relative;
 }
 
-.mark-sheet.assessments table td {
+.mark-sheet.assessments .table td {
     padding: 0
 }
 
@@ -6698,7 +6729,7 @@ table.subjectList {
             margin-left: 1em;
         }
     }
-    table {
+    .table {
         margin-top: 16px;
         table-layout: fixed;
         width: 100%;
@@ -6733,7 +6764,6 @@ table.subjectList {
                 }
                 input, select {
                     border: solid 1px @std-grey;
-                    -webkit-transition: border-color 0.2s linear;
                 }
             }
             &.submission.file {
@@ -7005,7 +7035,7 @@ table.tiny-tables {
     overflow: hidden;
     overflow-x: scroll;
     border-right: 1px solid @std-grey;
-    table {
+    .table {
         border-right: none;
         border-left: none;
         width: 100%;
@@ -7640,8 +7670,8 @@ h4 a.hidden {
 }
 
 #rubric-chart {
-    width: 300px;
-    height: 200px;
+    width: 600px;
+    height: 400px;
 }
 
 #rubric-window .rubric-grade {
@@ -8192,8 +8222,8 @@ td.name {
     margin-right: 8px;
 }
 #rubric-chart {
-    width: 300px;
-    height: 200px;
+    width: 600px;
+    height: 400px;
     float: right;
 }
 
@@ -8692,7 +8722,7 @@ div.colours p {
 /* adminv2/report */
 .reporting {
     .directory {
-        table td {
+        .table td {
             vertical-align: middle;
         }
         th a {
@@ -8730,7 +8760,7 @@ div.colours p {
             clear: both;
         }
     }
-    #report-result table td {
+    #report-result .table td {
         padding: 2px 0;
     }
 }
@@ -8838,7 +8868,7 @@ div.colours p {
 }*/
 
 #assess {
-    table td a {
+    .table td a {
         line-height: 20px;
     }
 }
@@ -8944,7 +8974,7 @@ div.colours p {
 }
 
 .classlist {
-    table {
+    .table {
         min-width: 700px;
     }
     .no-text {
@@ -9153,7 +9183,7 @@ table img { max-width: none; }
 #calendar {
     margin: 0 auto;
     &.fc {
-        table {
+        .table {
             font-size: 13px;
         }
     }
@@ -9435,9 +9465,9 @@ table img { max-width: none; }
 	#container{margin:0; width:100% !important; }
 	#calendar h3{float:none; width:100%;text-align:center; font-weight:bold;}
 	#calendar { height:100%; }
-	#calendar table { vertical-align:top; font-size:10px; width:100%;}
-	#calendar table td{vertical-align:top; text-align:left; font-size:10px; width:14.2%}
-	#calendar table td.dark{padding:4px; text-align:center; background-color:@black }
+	#calendar .table { vertical-align:top; font-size:10px; width:100%;}
+	#calendar .table td{vertical-align:top; text-align:left; font-size:10px; width:14.2%}
+	#calendar .table td.dark{padding:4px; text-align:center; background-color:@black }
 
 	#nav, #tabs, #header, #footer, .link-case, .datepicker-box, .header_option, .back, .forward, .dates, .note, .btn, .created,
 	.calendar-controls .float-left, .calendar-controls .float-right
@@ -9558,7 +9588,7 @@ table img { max-width: none; }
 	border-bottom: 1px solid @border-color;
 }
 
-.calendar table .dark,
+.calendar .table .dark,
 .otherMonth,
 .past,
 .timetable th,
@@ -9569,13 +9599,13 @@ table img { max-width: none; }
 	background: @dark;
 }
 
-.calendar table thead th,
+.calendar .table thead th,
 .day-block,
 .calendar table,
 .left #calendar table.duedates-calendar td,
 .left #calendar table.duedates-calendar,
-#calendar table th.dark,
-table tr,
+#calendar .table th.dark,
+.table tr,
 .listing li,
 .listing .subject-list li,
 .listing .subject-list a,
@@ -9586,8 +9616,8 @@ ul.activity-list li,
 {
 	border-color: @border-color;
 }
-.calendar table thead th,
-#calendar table th.dark,
+.calendar .table thead th,
+#calendar .table th.dark,
 .timetable thead th
 {
 	border-bottom-color: @border-color;
@@ -9600,29 +9630,38 @@ ul.activity-list li,
 
 /* Socialstream */
 .addPostForm {
-	background: @dark;
-	border-bottom: 1px solid @border-color;
-	p {
-		margin: 0 16px;
-		clear: both;
-	}
+
 }
 
-.socialstream-form {
-	width: 100%;
-	margin: 0;
-	li {
-		padding: 7px 16px 0 12px  !important;
-	}
-	label {
-		padding-right: 0;
-		input, .socialstream-selected-file {
-			width: 75%;
-			float: right;
-			.ellipsis;
+.information-list, .socialstream-form {
+	form {
+		width: 100%;
+		margin: 0;
+		background: @dark;
+		border-bottom: 1px solid @border-color;
+		p {
+			margin: 0 16px;
+			clear: both;
 		}
+		li {
+			padding: 7px 16px 0 12px  !important;
+			border-bottom: none;
+		}
+		label {
+			padding-right: 0;
+			input, .socialstream-selected-file {
+				width: 75%;
+				float: right;
+				.ellipsis;
+			}
+			input[type="checkbox"],
+			input[type="radio"] {
+				width: auto;
+				float: none;
+			}
+		}
+		textarea { width: 100%; }
 	}
-	textarea { width: 100%; }
 }
 
 .socialstream-post {
@@ -9678,6 +9717,7 @@ ul.activity-list li,
 	li {
 		display: inline;
 		list-style: none;
+		padding: 1px !important;
 	}
 	a {
 		padding: 4px 5px 4px 10px;
@@ -9770,5 +9810,85 @@ body.login {
 	.loginPageVersion;
 }
 
+// Course builder
+.course_instance .information-list .no-expand {
+	padding-left: 15px;
+}
+.course_instance .information-list .expand-link {
+	text-decoration: none;
+}
+.course_instance .information-list .expand-button {
+	line-height: 11px;
+	width: 11px;
+	min-height: 11px;
+	margin-right: 4px;
+	display: inline-block;
+	background-color: transparent;
+	background-position-x: -2px;
+	background-position-y: -6px;
+	background-repeat: no-repeat;
+}
+.course_instance .information-list .unit.collapsed .expand-button {
+	background-image: url(/images/tree/elbow-collapsed.gif);
+}
+.course_instance .information-list .unit.expanded  .expand-button {
+	background-image: url(/images/tree/elbow-expanded.gif);
+}
 
+/**
+ * Bar graphs which should be reusable everywhere
+ * Used by the Bargraph plugin I maked
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2013, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 
+/* Empty grey background
+ */
+.bar-container {
+	width: 100%;
+	height: 16px;
+	clear: both;
+}
+.bar-container .bar {
+	border: 1px solid @lgrey;
+	width: 70%;
+	height: 16px;
+	background-color: lighten(@lgrey,@lighten-value);
+	.gradient(lighten(@lgrey,@lighten-value), @lgrey);
+	clear: both;
+	float: left;
+}
+
+/* Blue coloured foreground
+ */
+.bar-container .bar .filled {
+	border: 1px solid @neutral-color;
+	height: 14px;
+	background-color: lighten(@neutral-color,@lighten-value);
+	.gradient(lighten(@neutral-color,@lighten-value), @neutral-color);
+	display: block;
+}
+
+/* Numerical representation
+ */
+.bar-container .amount {
+	width: 29%;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: right;
+	float: right;
+}
+
+.loader {
+	background-image: url('/images/loading-bar.gif') !important;
+	background-repeat: no-repeat !important;
+	background-position: center center !important;
+}
+#type-usage h2 {
+	top: 16px;
+	left: 16px;
+	position: absolute;
+}

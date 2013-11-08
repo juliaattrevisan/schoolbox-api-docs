@@ -1,0 +1,183 @@
+@charset "utf-8";
+// =============================================================================
+// Default v2 Schoolbox skin
+// =============================================================================
+//*
+//*   Ride The Whale                         ~777IIIIIIIIIII7~_
+//*                            7I       =%#%%%%7 @ %# /========
+//*                         ]7II7I###########%%%%%%%%777777
+//*                                ~I7###########777=
+//*                                     ##7      ]/
+//*                                     #/
+//*/
+// =============================================================================
+// 1. Load dependencies
+// =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width: 					160px;
+@logo-height: 					55px;
+
+
+
+// Generic colors
+@body-background: 				#FFFFFF; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FAF9F5; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#142f79;
+@link-hover: 					#00adef;
+
+// Main banner
+@banner-background: 			#013A63;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@banner-height:     			72px;
+
+// Modules
+@module-heading: 				#FFFFFF;
+@module-background: 			#00adef;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		@body-background;
+@navigation-color:  			#000000;
+@navigation-links:  			#142f79;
+@navigation-hover-background: 	@navigation-links;
+@navigation-hover-color:  		#ffffff;
+@navigation-sub-background:  	@border-color;
+
+// Main "Tab" Navigation
+@tab-background:				#00adef;
+@tab-color:						#FFFFFF;
+@tab-hover-background:			@tab-color;
+@tab-hover-color:				@tab-background;
+
+// Footer text
+@footer-color:					#797979;
+@footer-links:					@footer-color;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+
+body{
+  background: url('../../images/tintern/bg.jpg') bottom left repeat-x;
+}
+
+#tabs {
+  position: relative;
+}
+
+#header, .login #header{
+  background: #008fcb; /* Old browsers */
+  background: -moz-linear-gradient(left,  #008fcb 0%, #142f79 40%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%,#008fcb), color-stop(40%,#142f79)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(left,  #008fcb 0%,#142f79 40%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(left,  #008fcb 0%,#142f79 40%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(left,  #008fcb 0%,#142f79 40%); /* IE10+ */
+  background: linear-gradient(to right,  #008fcb 0%,#142f79 40%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#008fcb', endColorstr='#142f79',GradientType=1 ); /* IE6-9 */
+}
+
+#header #search{
+  background: transparent url('../../images/tintern/wings.png') top right no-repeat;
+  height: 72px;
+  width: 580px;
+  margin: 0;
+  z-index: 5;
+  fieldset{
+    float: right;
+    width: auto;
+    margin: 8px 9px 0 0;
+    #search-field{
+      background: #FFFFFF;
+      color: @link;
+      padding: 3px 0 0 7px;
+      width: 248px;
+      height: 29px;
+    }
+    #search-button{
+      top: 7px;
+      left: auto;
+      right: 11px;
+    }
+  }
+}
+
+#infoPanel{
+  z-index: 10;
+}
+
+#header .logo {
+  width: 160px;
+  height: 55px;
+  left: 18px;
+  top: 9px;
+  img{
+    width: 160px;
+    height: 55px;
+  }
+}
+
+#nav{
+  background: #fff;
+  margin: 0;
+}
+
+/*
+ * Demo Dashboards
+ */
+
+.demo-dash{
+	li{ float: left;
+		padding: 7px 4px !important;
+		height: 135px;
+		list-style: none;
+	}
+	a{  display: block;
+		float: left;
+		text-align: center;
+		padding: 92px 0 0 0;
+		font-weight: bold;
+		width: 88px;
+		-webkit-transition: opacity 0.5s;
+		-moz-transition: opacity 0.5s;
+		-ms-transition: opacity 0.5s;
+		-o-transition: opacity 0.5s;
+		transition: opacity 0.5s;
+		&:hover{
+			cursor: pointer;
+			opacity: 0.8;
+		}
+	}
+	.parents-friends{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.due-work{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+	.manage-users{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.timetable{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+	.synergetic{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+	.admin{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+	.eportfolio{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+	.hr{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.services{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+	.leave{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+	.parent-dir{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+	.payments{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+	.online-forms{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+}

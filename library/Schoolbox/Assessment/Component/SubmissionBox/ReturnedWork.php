@@ -52,6 +52,18 @@ class ReturnedWork {
 	protected $filename;
 
 	/**
+	 * @var string
+	 */
+	protected $mimetype;
+
+	/**
+	 * Size of the file attached to the return
+	 *
+	 * @var null
+	 */
+	protected $filesize = null;
+
+	/**
 	 * @var \Alaress_Date_Format
 	 */
 	protected $submitted;
@@ -65,6 +77,11 @@ class ReturnedWork {
 	 * @var IConfigLoader
 	 */
 	protected $config_loader;
+
+	/**
+	 * @var MimetypeMapper
+	 */
+	protected $mimetype_loader;
 
 	/**
 	 * Creates object and sets up related objects.
@@ -99,12 +116,32 @@ class ReturnedWork {
 	}
 
 	/**
+	 * Set filesize
+	 *
+	 * @param $filesize
+	 * @return $this
+	 */
+	public function setFilesize($filesize) {
+		$this->filesize = $filesize;
+		return $this;
+	}
+
+	/**
+	 * Get filesize
+	 *
+	 * @return null
+	 */
+	public function getFilesize() {
+		return $this->filesize;
+	}
+
+	/**
 	 * Gets the size of this file (from where it's stored on the file system),
 	 * or false if it doesn't exist.
 	 *
 	 * @return bool|int
 	 */
-	public function getFilesize() {
+	public function getFilesizeByPath() {
 		if (($location = $this->getFileLocation()) !== false) {
 			if (file_exists($location)) {
 				return filesize($location);
@@ -287,5 +324,57 @@ class ReturnedWork {
 	 */
 	public function getConfigLoader() {
 		return $this->config_loader;
+	}
+
+	/**
+	 * @param  string $mimetype
+	 *
+	 * @return $this
+	 */
+	public function setMimetype($mimetype) {
+		$this->mimetype = $mimetype;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getMimetype() {
+		return $this->mimetype;
+	}
+
+
+	// File related methods
+
+	/**
+	 * @param  string $temp_location
+	 * @return $this
+	 */
+	public function setTempLocation($temp_location) {
+		$this->temp_location = $temp_location;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTempLocation() {
+		return $this->temp_location;
+	}
+
+	/**
+	 * Copies file from its temp location to permanent upload location.
+	 *
+	 * @todo Traits would be great here.
+	 *
+	 * @return bool
+	 */
+	public function copyFromTempLocation() {
+		$temp_location = $this->getTempLocation();
+		$file_location = $this->getFileLocation();
+		if (file_exists($temp_location) && $file_location) {
+			return copy($temp_location, $file_location);
+		}
+		return false;
 	}
 }

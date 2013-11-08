@@ -9,7 +9,7 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 namespace Schoolbox\Column;
 
 class Boolean implements IColumnType {
@@ -24,10 +24,10 @@ class Boolean implements IColumnType {
 	}
 
 	public function hydrate($value, $mapper = null) {
-		return $this->isBoolean($value);
+		return isset($value) ? $this->isBoolean($value) : null;
 	}
 
 	public function dehydrate($value, $mapper = null) {
-		return $this->isBoolean($value);
+		return isset($value) ? $this->isBoolean($value) : null;
 	}
 }

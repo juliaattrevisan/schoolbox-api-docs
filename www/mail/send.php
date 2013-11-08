@@ -10,66 +10,39 @@ require_once __DIR__."/../../include/Bootstrap.php";
 
 $page = new SitePage();
 
-define('MAX_RECIPIENTS', 10);
-
 function sendMail($to, $cc, $bcc, $subject, $message)
 {
+    $mail = new Swift_Message();
+
 	//get users email address to use in from field
+    $email = new Email($_SESSION['user']->getEmail());
 
-	$db = DeprecatedDatabase::getInstance();
-	$db->dbConnect();
-
-	$userHandler = new User();
-
-	$query = "SELECT firstname, lastname, username, local_email, title, alt_email FROM user WHERE id = '".$_SESSION["id"]."'";
-	$user = $db->dbGetSingleRow($query);
-
-	$name = $userHandler->formatName($user);
-
-	$mail = new Swift_Message();
-
-	/* Validate From email address
-	 */
-	if (strlen($user['alt_email'])) {
-		$email = new Email($user['alt_email']);
-
-		if ($email->isValid()) {
-			$mail->addFrom($user['alt_email'], $name);
-			$mail->addReplyTo($user['alt_email'], $name);
-		}
-		else {
-			error(42);
-		}
-	}
-	else if ($user['local_email'] || Cfg::get('site_location') == 'wenona') {
-		$email = new Email($user['username'] . '@' . Cfg::get('mail_address'));
-
-		if ($email->isValid()) {
-			$mail->addFrom($email->getEmail(), $name);
-			$mail->addReplyTo($email->getEmail(), $name);
-		}
-		else {
-			error(42);
-		}
-	}
-	else {
-		error(42);
-	}
+    if ($email->isValid()) {
+        $mail->addFrom($_SESSION['user']->getEmail(), $_SESSION['user']->formatName());
+        $mail->addReplyTo($_SESSION['user']->getEmail(), $_SESSION['user']->formatName());
+    }
+    else {
+        error(42);
+    }
 
 	//if id is submitted to form convert to email
 	if(is_numeric($to)) {
-		$query = "SELECT username, local_email, alt_email FROM user WHERE id = $to";
-		$toemail = $db->dbGetSingleRow($query);
 
-		if ($toemail['alt_email']) {
-			$mail->addTo($toemail['alt_email']);
-		}
-		elseif ($user['local_email'] || Cfg::get('site_location') == 'wenona') {
-			$mail->addTo($toemail['username']."@".Cfg::get('mail_address'));
-		}
-		else {
-			error(43);
-		}
+        $userMapper = new \Schoolbox\UserMapper();
+
+        try {
+            $toUser = $userMapper->findByID($to);
+            $email = new Email($toUser->getEmail());
+
+            if($email->isValid()) {
+                $mail->addTo($toUser->getEmail());
+            } else {
+                error(43);
+            }
+
+        } catch (Exception $e) {
+            error(43);
+        }
 	}
 	else {
 		//if emails have ; seperator account for it
@@ -82,7 +55,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	//check if its got no to address but has either cc or bcc
 	//put the users email in the to field
 	if (!stristr($to,'@') && ($bcc || $cc)) {
-		$mail->addTo($user['username'].'@'.Cfg::get('mail_address'), $to);
+		$mail->addTo($_SESSION['user']->getEmail(), $to);
 	}
 
 	//fix qoute escapes
@@ -114,7 +87,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	if (is_array($_FILES)) {
 		foreach ($_FILES["file"]["error"] as $key => $error) {
-			if ($error == UPLOAD_ERR_OK) {
+			if ($error == UPLOAD_ERR_OK && filesize($_FILES['file']['tmp_name'][$key]) < Cfg::get('max_file_size')) {
 				$attach = Swift_Attachment::fromPath($_FILES['file']['tmp_name'][$key]);
 				$attach->setFilename($_FILES['file']['name'][$key]);
 				$attach->setContentType($_FILES['file']['type'][$key]);
@@ -122,6 +95,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 			}
 		}
 	}
+
 
 	try {
 		Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);

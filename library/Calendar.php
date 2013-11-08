@@ -211,12 +211,14 @@ class Calendar extends DeprecatedModel {
 
                 if (is_array($event['campusList'])) {
                     $campusList = $event['campusList'];
-                } else {
+                } else if ($event['id']) {
                     $campusList = $this->getEventCampus($event['id']);
                 }
 
-                //all campuses are represented by 0. if the user has all let them in
-                $campusList[] = 0;
+				/* Find the highest permission level
+				 */
+				$output = 0;
+
                 if (is_array($campusList)) {
                     foreach ($campusList as $campus) {
                         $permission = $this->groupHandler->getPermission($campus);

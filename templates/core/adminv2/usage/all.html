@@ -1,0 +1,58 @@
+<script type='text/javascript' src='/javascript/bargraph/bargraph.js'></script>
+
+<script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
+<script type='text/javascript' src='/javascript/flot/jquery.flot.stack.js'></script>
+<script type='text/javascript' src='/javascript/flot/jquery.flot.pie.js'></script>
+<script type='text/javascript' src='/javascript/usage/total.js'></script>
+<script type='text/javascript' src='/javascript/usage/group.js'></script>
+<script type='text/javascript' src='/javascript/usage/type.js'></script>
+<script type='text/javascript' src='/javascript/usage/tabulator.js'></script>
+
+<script type='text/javascript'>
+	$j(function() {
+		$j('#global-usage').usageTotal({
+			url: '/adminv2/usage/allAjax?type=total',
+			title: 'Total'
+		});
+
+		$j('#group-usage').usageGroup({
+			url: '/adminv2/usage/allAjax?type=group',
+			title: 'Group'
+
+		});
+
+		$j('#type-usage').usageType({
+			url: '/adminv2/usage/allAjax?type=type',
+			title: 'Category'
+		});
+
+		$j('#user-usage').usageTabulator({
+			url: '/adminv2/usage/allAjax?type=user',
+			title: 'Users',
+			orderBy: 'bytes',
+			order: 'DESC',
+			index: 0,
+			numPerPage: 25,
+			numTotal: {USAGE_NUM_TOTAL}
+		});
+	});
+</script>
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<!-- BEGIN admin_nav_item -->
+	<li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+	<!-- END admin_nav_item -->
+</ul>
+<div class="admin-contents clearfix">
+	<h1>Global Usage</h1>
+	<div class="one-third clearfix">
+		<div id='global-usage' class='level loader'>Loading data...</div>
+		<div id='group-usage' class='level loader'>Loading data...</div>
+	</div>
+	<div class="two-thirds clearfix">
+		<div id='type-usage' class='level loader'>Loading data...</div>
+	</div>
+	<div class="clearfix"></div>
+	<div id='user-usage' class='level loader'>Loading data...</div>
+</div>

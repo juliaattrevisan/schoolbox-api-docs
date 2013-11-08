@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Component_Instance;
+use Component_InstanceMapper;
 use Schoolbox\Assessment\Course\Task\Cloner;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
@@ -77,6 +78,12 @@ class UnitInstanceMapper extends Mapper {
             'this_key'  => 'component_id',
             'other_key' => 'id',
         ));
+        $this->hasJoin('task', array(
+            'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceMapper',
+            'this_key'  => 'id',
+            'other_key' => 'course_unit_instance_id',
+            'multiple'  => true,
+        ));
 
         $this->hasSoftDeleteDateField('deleted_at');
         $this->registerCallback('postSave',       array($this, 'postSave'));
@@ -129,6 +136,70 @@ class UnitInstanceMapper extends Mapper {
         }
         return $unit_list;
     }
+
+    /**
+     * Gets all units and tasks for the given category.
+     *
+     * @param  int $category_id The category to get units for
+     * @return UnitInstance[]|Collection
+     */
+    public function findForCategoryId($category_id) {
+        /** @var Component_Instance[] $component_list */
+        $component_list    = Component_InstanceMapper::getInstance()->findByContext('homepage', $category_id);
+        $component_id_list = array();
+        foreach ($component_list as $component) {
+            $component_id_list[] = $component->getId();
+        }
+
+        /** @var UnitInstance[] $unit_instance_list */
+        $unit_instance_list = $this->findByColumn(
+            'component_id',
+            $component_id_list,
+            array(
+                'order' => array('open_date' => 'desc')
+            )
+        );
+
+        // Load tasks into each unit
+        /** @var Task\Instance[]|Collection $task_list */
+        $task_list = $this->findJoinedModelList('task', $unit_instance_list);
+
+        // Load completions for each unit, and load into task list
+        /** @var Task\InstanceCompletion[]|Collection $completion_list */
+        $completion_list = $this->getJoinMapper('task')
+            ->getJoinMapper('completion')
+            ->findLatestForList($task_list->getColumnValues('id'));
+
+        $grouped_completion_list = $completion_list->groupByCallback(
+            function($item) {
+                /** @var Task\InstanceCompletion $item */
+                return $item->getTaskInstance()->getId();
+            }
+        );
+        foreach ($task_list as $task) {
+            $grouped_list = $grouped_completion_list->getOffset($task->getId());
+            if ($grouped_list instanceof Collection) {
+                $task->setCompletionList($grouped_list);
+            }
+        }
+
+        // Load task list for all units
+        $grouped_task_list = $task_list->groupByCallback(
+            function($item) {
+                /** @var Task\Instance $item */
+                return $item->getUnitInstance()->getId();
+            }
+        );
+        foreach ($unit_instance_list as $unit_instance) {
+            $task_list = $grouped_task_list->getOffset($unit_instance->getId());
+            if ($task_list instanceof Collection) {
+                $unit_instance->setTasks($task_list);
+            }
+        }
+
+        return $unit_instance_list;
+    }
+
 
     /**
      * Retrieves a unit instance by ID and category ID.

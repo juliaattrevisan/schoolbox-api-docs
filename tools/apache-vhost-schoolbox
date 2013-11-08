@@ -8,6 +8,11 @@
 		Order allow,deny
 		Allow from all
 		Satisfy all
+		<LimitExcept GET POST HEAD>
+            Order Allow,Deny
+            Deny from all
+            Satisfy all
+        </LimitExcept>
 	</Directory>
 
 	ErrorLog /var/log/apache2/schoolbox_error.log

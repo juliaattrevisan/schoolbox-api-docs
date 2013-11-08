@@ -421,118 +421,55 @@ class SitePage extends Page {
         //this section handles the display of the webmail tab
         // if configuration states mail is available and user has access to local mail account display it
         $this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
+        $this->setVar('wm_tab', '');
 
-        if ((MAIL_enable && $_SESSION['local_email']) ||
-            (
-                    $this->site == 'ormond' ||
-                    $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] == 7 || $_SESSION['gid'] == '8') ||
-                    $this->site == 'joeys' ||
-                    $this->site == 'cathedral' ||
-                    ($this->site == 'jpc' || $this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk' || $this->site == 'balcombe' || $this->site == 'cedars') && ($this->groupHandler->isStaff(
-                    ) || $this->groupHandler->isStudent())
-            )
-        ) {
-            if ($this->site == 'mgs' || $this->site == 'grimwade' || $this->site == 'wadhurst') {
-                $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
-            } else if ($this->site == 'shore') {
-                if ($this->groupHandler->isStaff()) {
-                    if (strpos(Session::getIP(), '192.168.') === false) {
-                        $this->setVar(
-                            'WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"'
-                        );
-                    } else {
-                        $this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
-                    }
-                } else {
-                    if ($this->groupHandler->isStudent()) {
+        if(Cfg::get('mail_enable') && $_SESSION['webmail'] ) {
+            $location = ''; //Webmail location
+
+            switch ($this->site) {
+                case 'shore':
+                    if ($this->groupHandler->isStaff()) {
                         if (strpos(Session::getIP(), '192.168.') === false) {
-                            $this->setVar(
-                                'WEBMAIL_LOCATION',
-                                'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"'
-                            );
+                            $location = 'https://mail.shore.nsw.edu.au/exchange/';
                         } else {
-                            $this->setVar('WEBMAIL_LOCATION', 'href="http://cassandra/exchange" rel="external"');
+                            $location = 'http://shorexch01/exchange';
+                        }
+                    } else if ($this->groupHandler->isStudent()) {
+                        if (strpos(Session::getIP(), '192.168.') === false) {
+                            $location = 'https://mail.student.shore.nsw.edu.au/exchange/';
+                        } else {
+                            $location = 'http://cassandra/exchange';
                         }
                     }
-                }
-            } else {
-                if ($this->site == 'joeys') {
-                    $this->setVar('WEBMAIL_LOCATION', 'href="http://webmail/" rel="external"');
-                } else {
-                    if ($this->site == 'cathedral') {
-                        $this->setVar(
-                            'WEBMAIL_LOCATION',
-                            'href="http://outlook.com/cathedral.qld.edu.au" rel="external"'
-                        );
-                    } else {
-                        if ($this->site == 'mggs') {
-                            $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.mggs.vic.edu.au" rel="external"');
-                        } else {
-                            if ($this->site == 'bialik') {
-                                $this->setVar(
-                                    'WEBMAIL_LOCATION',
-                                    'href="https://webmail.bialik.vic.edu.au/exchange" rel="external"'
-                                );
-                            } else {
-                                if ($this->site == 'jpc') {
-                                    $this->setVar(
-                                        'WEBMAIL_LOCATION',
-                                        'href="http://jpcmail.jpcvictoria.catholic.edu.au/owa" rel="external"'
-                                    );
-                                } else {
-                                    if ($this->site == 'moriah') {
-                                        if ($this->groupHandler->isStaff()) {
-                                            $this->setVar(
-                                                'WEBMAIL_LOCATION',
-                                                'href="https://mail.moriah.nsw.edu.au/owa" rel="external"'
-                                            );
-                                        } else {
-                                            if ($this->groupHandler->isStudent()) {
-                                                $this->setVar(
-                                                    'WEBMAIL_LOCATION',
-                                                    'href="http://www.google.com/a/student.moriah.nsw.edu.au/" rel="external"'
-                                                );
-                                            }
-                                        }
-                                    } else {
-                                        if ($this->site == 'stk') {
-                                            $this->setVar(
-                                                'WEBMAIL_LOCATION',
-                                                'href="https://webmail.saintkentigern.com/owa" rel="external"'
-                                            );
-                                        } else {
-                                            if ($this->site == 'cedars') {
-                                                if ($this->groupHandler->isStaff()) {
-                                                    $this->setVar(
-                                                        'WEBMAIL_LOCATION',
-                                                        'href="https://mail.cedars.nsw.edu.au/owa" rel="external"'
-                                                    );
-                                                } else {
-                                                    if ($this->groupHandler->isStudent()) {
-                                                        $this->setVar(
-                                                            'WEBMAIL_LOCATION',
-                                                            'href="https://portal.microsoftonline.com" rel="external"'
-                                                        );
-                                                    }
-                                                }
-                                            } else {
-                                                $this->setVar(
-                                                    'WEBMAIL_LOCATION',
-                                                    'href="' . Cfg::get('mail_webmail') . '" rel="external"'
-                                                );
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                break;
+
+                case 'moriah':
+                    if ($this->groupHandler->isStaff()) {
+                        $location = 'https://mail.moriah.nsw.edu.au/owa';
+                    } else if ($this->groupHandler->isStudent()) {
+                        $location = 'http://www.google.com/a/student.moriah.nsw.edu.au/';
                     }
-                }
+                break;
+
+                case 'cedars':
+                    if ($this->groupHandler->isStaff()) {
+                        $location = 'https://mail.cedars.nsw.edu.au/owa';
+                    } else if ($this->groupHandler->isStudent()) {
+                        $location = 'https://portal.microsoftonline.com';
+                    }
+
+                break;
+
+                default:
+                    $location = Cfg::get('mail_webmail');
+                break;
             }
 
-            $this->parse('wm_tab', 'webmail_tab');
-        } else {
-            $this->setVar('wm_tab', '');
+            /* Only set webmail tab if we have a location set and user has webmail enabled */
+            if($location) {
+                $this->setVar('WEBMAIL_LOCATION', 'href="'.$location.'" rel="external"');
+                $this->parse('wm_tab', 'webmail_tab');
+            }
         }
 
         //custom code for each site is performed here
@@ -946,7 +883,7 @@ class SitePage extends Page {
     function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '') {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array();
-        if (is_array($data)) {
+        if (is_array($data) && count($data) > 0) {
             foreach ($data as $row) {
                 foreach ($row as $key => $value) {
                     $mapping[$key] ? $key = $mapping[$key] : '';
@@ -967,7 +904,7 @@ class SitePage extends Page {
     function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array()) {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array($selected);
-        if (is_array($data) || $data instanceof Traversable) {
+        if ((is_array($data) && count($data) > 0 ) || $data instanceof Traversable) {
             foreach ($data as $row) {
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {

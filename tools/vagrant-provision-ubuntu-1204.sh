@@ -4,14 +4,17 @@ if [ ! -d /vagrant/data ];
 then
 	cd /home/vagrant;
 	echo "$vag Downloading Schoolbox demo data";
-	rm -vf *latest*;
-	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.tar.gz
-	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.sql
-	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-vagrant-latest.sql
+	rm -f *latest*;
+	echo "$vag Demo Data Files";
+	curl -L --progress-bar http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.tar.gz > schoolboxdemo-latest.tar.gz
+	echo "$vag Demo Database";
+	curl -L --progress-bar http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.sql > schoolboxdemo-latest.sql
+	echo "$vag Demo DB Vagrant Fixes";
+	curl -L --progress-bar http://vagrant.alaress-dev.com.au/schoolboxdemo-vagrant-latest.sql > schoolboxdemo-vagrant-latest.sql
 	echo "$vag Restarting MySQL";
-	service mysql restart > /dev/null;
+	service mysql restart > /dev/null 2>&1;
 	echo "$vag Stopping Apache";
-	service apache2 stop > /dev/null;
+	service apache2 stop > /dev/null 2>&1;
 	echo "$vag Removing current Schoolbox MySQL database";
 	mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 	echo "$vag Loading Schoolbox MySQL Demo data";
@@ -31,7 +34,7 @@ then
 	/vagrant/tools/composer.sh;
 	echo "$vag Building SQL updates";
 	cd tools;
-	./build-sql-update.sh;
+	./build-sql-update.sh >/dev/null;
 	cd /vagrant;
 	echo "$vag Upgrading demo data with latest SQL updates";
 	mkdir /var/lib/vagrant -p > /dev/null;

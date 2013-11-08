@@ -32,7 +32,7 @@ class Synchronise_External_Stpatricks_Strategy_ParentRelation extends Synchronis
                 SELECT `id` FROM `user` WHERE synergy_id = :sid
             ");
             $relationStmt = Database::getInstance()->prepare("
-                INSERT INTO `user_relation` VALUES(:student, :parent, 1)
+                INSERT INTO `user_relation` (`relation_id`, `user_id`, `relation_type`) VALUES(:student, :parent, 1)
             ");
 
             foreach($this->entityData as $relation) {

@@ -181,6 +181,23 @@ class Database {
     }
 
     /**
+     * Escapes _ and % characters within $string, so they don't have unintended
+     * effects in LIKE queries.
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function quoteForLike($string) {
+        return strtr(
+            $this->quote($string),
+            array(
+                '_' => '\\_',
+                '%' => '\\%',
+            )
+        );
+    }
+
+    /**
      * Tries to create a unique parameter name
      *
      * @param string $param_name      The base name to attempt to add

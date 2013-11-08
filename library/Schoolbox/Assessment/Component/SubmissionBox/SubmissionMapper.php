@@ -68,6 +68,11 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			'property'   => 'draft',
 			'type'       => self::TYPE_BOOLEAN,
 		));
+		$this->hasMap(array(
+			'column'     => 'filesize',
+			'property'   => 'filesize',
+			'type'       => self::TYPE_INTEGER,
+		));
 
 		$this->hasJoin('submission_box', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',

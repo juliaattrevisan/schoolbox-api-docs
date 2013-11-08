@@ -6,7 +6,7 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 namespace Schoolbox\Column;
 
 class Decimal implements IColumnType {
@@ -32,10 +32,10 @@ class Decimal implements IColumnType {
 	}
 
 	public function hydrate($value, $mapper = null) {
-		return number_format($value, $this->places, '.', '');
+		return isset($value) ? number_format($value, $this->places, '.', '') : null;
 	}
 
 	public function dehydrate($value, $mapper = null) {
-		return number_format($value, $this->places, '.', '');
+		return isset($value) ? number_format($value, $this->places, '.', '') : null;
 	}
 }

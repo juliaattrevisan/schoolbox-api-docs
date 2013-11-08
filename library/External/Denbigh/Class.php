@@ -31,46 +31,77 @@ class External_Denbigh_Class implements External_ClassInterface {
 	}
 
 	public function getStudents ($classCode) {
-		$statement = $this->getExternalDatabase()->query("
-			SELECT p.denbighID, p.surname, p.preferred_name, s.academicYear, s.house
-			FROM Classes c
-			LEFT JOIN Enrolments e ON e.classCode = c.classCode
-			LEFT JOIN Students s ON s.peopleDenbighID = e.studentID
-			LEFT JOIN People p ON p.denbighID = s.peopleDenbighID
-			WHERE c.classCode = '$classCode'
-			ORDER BY p.surname ASC
-		");
 
-		$studentList = $statement->fetchAll(PDO::FETCH_ASSOC);
+        if(!$classCode) {
+            /* Dont bother if you got no code */
+            return false;
+        }
 
-		$studentAdaptionList = array();
+        $classQuery = '(';
 
-		if ( !empty($studentList) ) {
-			foreach ( $studentList as $student ) {
-				$studentAdaption = array(
-					'synergy_id' => $student['denbighID'],
-					'lastname' => $student['surname'],
-					'firstname' => $student['preferred_name'],
-					'yearlevel' => $student['academicYear'],
-					'house' => $student['house'],
-					'StudentMedicalAlert' => '',
-					'StudentSpecialNeedsFlag' => '',
-				);
+        $subCodeArray = explode(',', $classCode);
+        foreach ($subCodeArray as $code) {
+                $classQuery .= "c.classCode = ".$this->getExternalDatabase()->quote($code)." OR ";
+        }
 
-				$studentAdaptionList[] = $studentAdaption;
-			}
-		}
+        $classQuery = substr($classQuery, 0, -3) . ')';
 
-		return $studentAdaptionList;
+
+        $statement = $this->getExternalDatabase()->query("
+            SELECT p.denbighID, p.surname, p.preferred_name, s.academicYear, s.house
+            FROM Classes c
+            LEFT JOIN Enrolments e ON e.classCode = c.classCode
+            LEFT JOIN Students s ON s.peopleDenbighID = e.studentID
+            LEFT JOIN People p ON p.denbighID = s.peopleDenbighID
+            WHERE $classQuery
+            ORDER BY p.surname ASC
+        ");
+
+
+        $studentList = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        $studentAdaptionList = array();
+
+        if ( !empty($studentList) ) {
+            foreach ( $studentList as $student ) {
+                $studentAdaption = array(
+                    'synergy_id' => $student['denbighID'],
+                    'lastname' => $student['surname'],
+                    'firstname' => $student['preferred_name'],
+                    'yearlevel' => $student['academicYear'],
+                    'house' => $student['house'],
+                    'StudentMedicalAlert' => '',
+                    'StudentSpecialNeedsFlag' => '',
+                );
+
+                $studentAdaptionList[] = $studentAdaption;
+            }
+        }
+        return $studentAdaptionList;
 	}
 
 	public function getTeacherName ($classCode) {
+
+        if(!$classCode) {
+            /* Dont bother if you got no code */
+            return false;
+        }
+
+        $classQuery = '(';
+
+        $subCodeArray = explode(',', $classCode);
+        foreach ($subCodeArray as $code) {
+            $classQuery .= "c.classCode = ".$this->getExternalDatabase()->quote($code)." OR ";
+        }
+
+        $classQuery = substr($classQuery, 0, -3) . ')';
+
 		$statement = $this->getExternalDatabase()->query("
 			SELECT p.denbighID
 			FROM Classes c
 			LEFT JOIN Staff s ON s.staffCode = c.staffCode
 			LEFT JOIN People p ON p.denbighID = s.peopleDenbighID
-			WHERE c.classCode = '$classCode'
+			WHERE $classQuery
 		");
 
 		while($teacher = $statement->fetch(PDO::FETCH_NUM)) {

@@ -111,22 +111,22 @@ $j(function() {
 			<h3 class="iconify stats">Server stats</h3>
 			<h4>Storage <span>{DISK_USED}/{DISK_TOTAL}</span></h4>
 			<div class="clearfix">
-				<div class="bar-holder">
+				<div class="bar-container">
 					<div class="bar">
-						<span style="width:{DISK_PERC}%"><span class="style"></span></span>
+						<span class="filled" style="width:{DISK_PERC}%"></span>
 					</div>
+					<span class="amount gradient-{DISK_GRADIENT}">{DISK_PERC}%</span>
 				</div>
-				<span class="number gradient-{DISK_GRADIENT}">{DISK_PERC}%</span>
 			</div>
 			<!-- BEGIN memory -->
 			<h4>Memory <span>{MEMORY_USED}/{MEMORY_TOTAL}</span></h4>
 			<div class="clearfix">
-				<div class="bar-holder">
+				<div class="bar-container">
 					<div class="bar">
-						<span style="width:{MEMORY_PERC}%"><span class="style"></span></span>
+						<span class="filled" style="width:{MEMORY_PERC}%"></span>
 					</div>
+					<span class="amount gradient-{MEMORY_GRADIENT}">{MEMORY_PERC}%</span>
 				</div>
-				<span class="number gradient-{MEMORY_GRADIENT}">{MEMORY_PERC}%</span>
 			</div>
 			<!-- END memory -->
 			<h4 style="margin-top:8px">Status of services</h4>
@@ -138,7 +138,7 @@ $j(function() {
 			</ul>
             <div class="loading"></div>
             <h4 style="margin-top:8px">Group statistics</h4>
-			    <table cellpadding="0" cellspacing="0" class="logged-in" id="group-summary">
+			    <table cellpadding="0" cellspacing="0" class="logged-in table" id="group-summary">
                     <colgroup>
                         <col width="50%" />
                         <col width="20%" />
@@ -173,7 +173,7 @@ $j(function() {
 		<div class="level">
             <h3 class="iconify">Recent activity</h3>
             <a href="/adminv2/reports/login/all" class="btn"><span></span>See all</a>
-            <table cellpadding="0" cellspacing="0" class="logged-in">
+            <table cellpadding="0" cellspacing="0" class="logged-in table">
 				<colgroup>
 					<col width="35%" />
 					<col width="35%" />

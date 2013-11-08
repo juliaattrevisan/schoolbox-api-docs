@@ -333,7 +333,7 @@ $j(function() {
         <div id="category-window">
             <div class="loading"></div>
 
-            <table id="category-head">
+            <table id="category-head" class="table">
                 <thead>
                 <tr>
                     <th>Folders</th>
@@ -342,7 +342,7 @@ $j(function() {
             </table>
 
             <div class="scroller">
-                <table id="tree">
+                <table id="tree" class="table">
                     <tbody>
                     <tr id="node-0" class="server expanded loaded full write">
                         <td>
@@ -373,7 +373,7 @@ $j(function() {
         <div id="file-window">
             <div class="loading"></div>
 
-            <table id="file-head">
+            <table id="file-head" class="table">
                 <col width="55%"/>
                 <col width="23%"/>
                 <thead>
@@ -383,7 +383,7 @@ $j(function() {
             </table>
 
             <div class="scroller">
-                <table id="file-list">
+                <table id="file-list" class="table">
                     <col width="55%"/>
                     <col width="22%"/>
 
@@ -443,7 +443,7 @@ $j(function() {
         </div>
 
         <h4 class="rfolder perms">Permissions</h4>
-        <table class="rfolder perms">
+        <table class="rfolder perms table">
           <!-- BEGIN folder_detail_perms -->
           <tr class="{ON_OFF}">
             <th scope="row">{FOLDER_PERM_GROUP}:</th><td>{FOLDER_PERM_ACCESS}</td>

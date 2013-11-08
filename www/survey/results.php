@@ -43,7 +43,9 @@ $this->setBlock('section', 'question', 'question_block');
 $this->setBlock('question', 'graph', 'graph_block');
 
 $this->setVar(array(
-    'SURVEY_NAME' => Scrub::text($assess['title'])
+    'SURVEY_NAME' => Scrub::text($assess['title']),
+	'ASSESS_ID' => $assess['assess_id'],
+	'CID' => $assess['category_id'],
 ));
 
 $factory = new Survey_Factory();
@@ -56,7 +58,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
             foreach ($currentSection['questions'] as $currentQuestion) {
 
                 /* Question data
-                     */
+                 */
                 $this->setVar(array(
                     'ASSESS_ID' => $assess['assess_id'],
                     'CID' => $assess['category_id'],
@@ -66,8 +68,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
                 ));
 
                 /* Answer and Response data
-                     */
-
+                 */
                 $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
                 $answerHandler->graphResults($this, $currentQuestion);
@@ -75,7 +76,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
                 $this->parse('question_block', 'question', true);
 
                 /* Clear children after parsing out the parent
-                     */
+                 */
                 $this->setVar('series_block', '');
             }
         }
@@ -87,8 +88,11 @@ if (is_array($sectionValues) && count($sectionValues)) {
         $this->parse('section_block', 'section', true);
 
         /* Clear children after parsing out the parent
-           */
+         */
         $this->setVar('question_block', '');
     }
+}
+else {
+	$this->setVar('section_block', '');
 }
 

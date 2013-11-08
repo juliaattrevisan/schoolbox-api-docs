@@ -17,7 +17,7 @@
     <input type="hidden" name="course_homepage" value="{COURSE_HOMEPAGE_ID}" />
     <input type="hidden" name="component"       value="{COMPONENT_ID}" />
 
-    <table class="standardForm">
+    <table class="standardForm table">
 
         <tr>
             <td class="formLabelWidth">
@@ -25,9 +25,11 @@
                 <em>The course that has been imported.</em>
             </td>
             <td>
-                <!-- BEGIN course_breadcrumb -->
-                <span class="category"><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></span>
-                <!-- END course_breadcrumb -->
+                <ul class="breadcrumb">
+                    <!-- BEGIN course_breadcrumb -->
+                    <li><a href="/homepage/{COURSE_CATEGORY_ID}/">{COURSE_CATEGORY_NAME}</a></li>
+                    <!-- END course_breadcrumb -->
+                </ul>
             </td>
         </tr>
 
@@ -37,9 +39,11 @@
                 <em>The class that the course was imported into.</em>
             </td>
             <td class="course_definition">
-                <!-- BEGIN class_breadcrumb -->
-                <span class="category"><a href="/homepage/{CLASS_CATEGORY_ID}/">{CLASS_CATEGORY_NAME}</a></span>
-                <!-- END class_breadcrumb -->
+                <ul class="breadcrumb">
+                    <!-- BEGIN class_breadcrumb -->
+                    <li><a href="/homepage/{CLASS_CATEGORY_ID}/">{CLASS_CATEGORY_NAME}</a></li>
+                    <!-- END class_breadcrumb -->
+                </ul>
             </td>
         </tr>
 
@@ -49,7 +53,7 @@
                 <em>You will need to set a start and end date for each unit that you want to import.</em>
             </td>
             <td>
-                <table>
+                <table class="table">
                     <tr>
                         <td>Name</td>
                         <td>Open Date</td>

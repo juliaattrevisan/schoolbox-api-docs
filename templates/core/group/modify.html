@@ -65,9 +65,9 @@ $j(document).ready(function() {
 });
 </script>
 <!-- END custom_head -->
-<h1>User Group Maintenance - {CATEGORY_NAME} <a class="customise" href="/homepage/{CATEGORY_ID}">Return to Homepage</a></h1>
+<h1>User Group Maintenance - {CATEGORY_NAME} <a class="btn go-back" href="/homepage/{CATEGORY_ID}"><span></span>Return to Homepage</a></h1>
 <div class="">
-	<table class="standardForm" cellpadding="0" cellspacing="0">
+	<table class="standardForm table" cellpadding="0" cellspacing="0">
 		<tr>
 			<td class="formLabelWidth"><h4>Group Admin</h4></td>
 			<td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
@@ -107,7 +107,7 @@ $j(document).ready(function() {
 				</td>
 				<td>
 				<form action="/group/modifyForm.php" method="post" id="deleteForm">
-					<table>
+					<table class="table">
 						<tr>
 							<th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="delCheck" /></th>
 							<th>Name</th>
@@ -150,7 +150,7 @@ $j(document).ready(function() {
 				<em>These users are currently awaiting your authorisation to join this group</em>
 				</td>
 				<td><form action="/group/modifyForm.php" method="post" id="acceptForm">
-					<table>
+					<table class="table">
 						<tr>
 							<th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="acceptCheck" /></th>
 							<th>Name</th>

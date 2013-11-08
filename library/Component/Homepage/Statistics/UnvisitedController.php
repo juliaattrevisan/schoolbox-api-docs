@@ -16,8 +16,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
         $dateFilter = '';
         if (count($this->dateRange)) {
             $dateFilter = sprintf(
-                "AND datetime BETWEEN '%s' AND '%s'", date('Y-m-d', $this->dateRange[0]),
-                date('Y-m-d', $this->dateRange[1])
+                "AND datetime BETWEEN '%s' AND NOW()", date('Y-m-d', $this->dateRange[0])
             );
         }
 
@@ -83,6 +82,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
              LEFT JOIN `user` u ON u.id = ua.uid
              LEFT JOIN groups g ON u.group_id = g.id
              WHERE c.id = :cid
+             $groupFilter
              AND u.id NOT IN (
                  SELECT `user`
                  FROM homepage_log hl
@@ -106,23 +106,32 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
 
     }
 
-    public function renderTemplate($templateHandle) {
+	/**
+	 * Render template
+	 *
+	 * @param String $templateHandle
+	 * @return bool
+	 */
+	public function renderTemplate($templateHandle) {
         if (!parent::loadTemplate($templateHandle, 'unvisited')) {
             return false;
         }
+
+		/* Don't want to convert all this stuff to mappers right now.
+		 */
+		$userHandler = new User();
 
         $this->setBlock($templateHandle, 'unvisitor', 'unvisitor_block');
 
         if (count($this->unvisitors)) {
             for ($i = 0; $i < 8 && $i < count($this->unvisitors); ++$i) {
-                $this->setVar(
-                    array(
-                        'VISITOR_ID' => $this->unvisitors[$i]['id'],
-                        'VISITOR_THUMB' => "/portrait.php?userId={$this->unvisitors[$i]['synergy_id']}&size=square64",
-                        'VISITOR_NAME' => $this->user->formatName($this->unvisitors[$i]),
-                        'VISITOR_GROUP' => $this->unvisitors[$i]['gname'],
-                    )
-                );
+                $this->setVar(array(
+					'VISITOR_ID' => $this->unvisitors[$i]['id'],
+					'VISITOR_THUMB' => "/portrait.php?userId={$this->unvisitors[$i]['synergy_id']}&size=square64",
+					'VISITOR_NAME' => $userHandler->formatName($this->unvisitors[$i]),
+					'VISITOR_GROUP' => $this->unvisitors[$i]['gname'],
+				));
+				
                 $this->parse('unvisitor_block', 'unvisitor', true);
             }
         } else {

@@ -187,6 +187,8 @@ function sendOverdueNotifictions($testRun) {
                     $mailer = new Mailer('submission-overdue.html', 'Overdue Work', $user['alt_email']);
                     $mailer->setBlock('tplBODY', 'subject', 'subject_block');
 
+                    $mailer->setFrom($dueWork['email'], $dueWork['teacher']);
+
                     $due = '';
                     $stamp = strtotime($dueWork['date']);
                     if(date('Hi', $stamp) != '2359') {

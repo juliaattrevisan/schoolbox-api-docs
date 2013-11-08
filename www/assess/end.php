@@ -127,7 +127,14 @@ $responseHandler->updatedAutomatedMarks($markedResponseIDs);
  */
 $marks = $attemptHandler->getMarksForAttempt($_SESSION['attempt_id']);
 $total = $attemptHandler->getTotalMarks($this->arg[0], $_SESSION['attempt_id']);
-$percentage = 100 * number_format($marks / $total, 2);
+
+if ($total > 0) {
+	$percentage = 100 * number_format($marks / $total, 2);
+}
+else {
+	$percentage = 0;
+}
+
 $numMarkedQuestions = $responseHandler->numAutomarked($_SESSION['attempt_id']);
 $numUnmarkedQuestions = $responseHandler->numNotAutomarked($_SESSION['attempt_id']);
 $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($_SESSION['attempt_id']);

@@ -102,6 +102,8 @@ try {
 		strtotime('+1 year', $_SERVER['REQUEST_TIME']),
 		new SitePage(false)
 	);
+	// for IE8
+	header('Cache-Control: private');
 	header('Content-Type: text/calendar; charset=utf-8');
 	header('Content-Disposition: inline; filename='.$filename);
 	$exporter->renderAll();

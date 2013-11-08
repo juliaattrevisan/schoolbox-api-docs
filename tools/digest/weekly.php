@@ -8,12 +8,11 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
+
 // this is run from CLI, so explicitly include the bootstrap
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
-if (!Cfg::get('digest_send_weekly')) {
-	fwrite(STDERR, "Weekly digest is not enabled - this script will do nothing.\n");
-	exit(2);
-}
 
 //
 // Start session and set current semester, aaarrrggggh
@@ -21,20 +20,10 @@ session_start();
 $synUser  = new External_User;
 $semester = $synUser->getCurrentSemester();
 
-$debug = (isset($argv[1]) && $argv[1] == 'nomail');
-
-// every user will receive an email that contains the previous week's news
-// this should be at a school, campus and then category level
-
-// Specify the digest window. This should match the frequency of the cronjob, and end should be the current datetime.
-$digestStart = strtotime('-8 days');
-$digestEnd = time();
-
-echo strftime("[%F %T] Starting weekly news digest\n");
-$newsDigest = new Digest_News($digestStart, $digestEnd, $debug);
-$newsDigest->compileUserList();
-$result = $newsDigest->send();
-echo strftime("[%F %T] Completed weekly news digest: ");
-printf("%d sendable, %d missing emails, %d failures\n", $result['total'], $result['missing'], $result['failures']);
-
-die();
+$mailer = new Digest_Mailer();
+$mailer
+    ->setDebug(isset($argv[1]) && $argv[1] == 'nomail')
+    ->setFromTime(new DateTime('-8 days'))
+    ->setToTime(new DateTime('now'))
+    ->setRoleList(RoleMapper::getInstance()->findByColumn('digest_schedule', Role::DIGEST_WEEKLY))
+    ->send();

@@ -33,6 +33,57 @@ class External_Synergetic_User implements External_UserInterface {
 	}
 
 	/**
+	 * Update a particular custom attribute for a specific user
+	 *
+	 * @param $synergyId
+	 * @param $attributeId
+	 * @param $newValue
+	 */
+	public function updateCustomAttribute($synergyId, $attributeId, $newValue) {
+
+		/* First check if there is an Attribute $attributeId for the current person
+		 * If there is, update it's fields accordingly; otherwise ignore it
+		 *
+		 * The alternative is to create it, but where does AttributeCreatedBy come from?
+		 * Plus, you need to insert it into the lookup table luCommunityAttributes.
+		 * That may not be ideal.
+		 *
+		 * @pc = Current Parent (this query checks if the current $synergyId is also
+		 * an current parent)
+		 */
+		$query = "
+			SELECT COUNT(*) AS num
+			FROM SynergyOne.dbo.vCommunityAddresses
+			LEFT JOIN SynergyOne.dbo.CommunityAttributes ON	SynergyOne.dbo.CommunityAttributes.ID = vCommunityAddresses.id
+			WHERE ConstitCodes LIKE '%@pc%'
+			AND CommunityAttributes.AttributeCode = '{$attributeId}'
+			AND vCommunityAddresses.id = '{$synergyId}'
+		";
+
+		$result = $this->getDatabase()->getRow($query);
+
+		if ((int)$result['num']) {
+			$query = "
+				UPDATE SynergyOne.dbo.CommunityAttributes
+				SET AttributeValue = \"$newValue\"
+				WHERE ID = '{$synergyId}'
+				AND AttributeCode = '{$attributeId}'
+			";
+
+			$this->getDatabase()->query($query);
+		}
+// Deliberately disabled
+//		else {
+//			$query = "
+//				INSERT INTO SynergyOne.dbo.CommunityAttributes (ID, AttributeCode, AttributeValue, AttributeCreatedDate, AttributeModifiedDate)
+//				VALUES ('{$synergyId}', '{$attributeId}', '{$newValue}', NOW(), NOW())
+//			";
+//
+//			$this->getDatabase()->query($query);
+//		}
+	}
+
+	/**
 	 * Retrieves the user's Synergetic image
 	 *
 	 * @param Integer $externalUserId
@@ -56,7 +107,9 @@ class External_Synergetic_User implements External_UserInterface {
 			 * Separate the queries out, fetching the photo data only if it's newer than the cached
 			 * version, or if the cache version doesn't already exist.
 			 */
-			if (!file_exists($photoPath) || (@filemtime($photoPath) > strtotime($photo['ModifiedDate']))) {
+			$cacheTime    = @filemtime($photoPath);
+			$modifiedTime = strtotime($photo['ModifiedDate']);
+			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
 				$query = "
 					SELECT vPhotos.Photo, vPhotos.PhotoType
 					FROM SynergyOne.dbo.vPhotos vPhotos
@@ -72,7 +125,7 @@ class External_Synergetic_User implements External_UserInterface {
 
 				/* Purge all previously transformed copies
 				 */
-				$pattern = Config::get('portrait_dir') . '/' . $externalUserId . '-*.dat';
+				$pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
 
 				foreach (glob($pattern) as $oldCacheFile) {
 					unlink($oldCacheFile);

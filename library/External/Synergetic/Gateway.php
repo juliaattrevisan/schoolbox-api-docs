@@ -41,6 +41,14 @@ class External_Synergetic_Gateway {
      * @return string Web service output (XMLOutput, ErrorMessage, SourceIPAddress)
      */
     public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword) {
+
+		/* Only do this for Bialik
+		 */
+		if (Config::get('site_location') == 'bialik') {
+			$external = new External_Synergetic_User();
+			$external->updateCustomAttribute($communityId, 5, $newPassword);
+		}
+
 		return $this->makeRequest(
 			'ChangeCommunityLoginPassword',
 			array(
@@ -49,8 +57,7 @@ class External_Synergetic_Gateway {
 				 'NewPassword'     => $newPassword,
 			)
 		);
-    }
-
+	}
 
 	/**
 	 * Makes a SOAP request, storing the error and exception (if one was thrown)
@@ -88,6 +95,7 @@ class External_Synergetic_Gateway {
 			$this->last_error     = sprintf('%s: %s', get_class($e), $e->getMessage());
 			$this->last_exception = $e;
 		}
+
 		return false;
 	}
 
