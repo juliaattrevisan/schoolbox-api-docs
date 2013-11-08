@@ -232,9 +232,11 @@ $status_list = array(
 );
 
 // The students
+$j = 0;
 foreach ($student_list as $student) {
     $this->setVar(
         array(
+            'ON_OFF'         	 => ++$j % 2 ? '' : 'dark',
             'STUDENT_ID'         => $student['uid'],
             'STUDENT_SYNERGY_ID' => $student['synergy_id'],
             'STUDENT_SURNAME'    => $student['lastname'],
