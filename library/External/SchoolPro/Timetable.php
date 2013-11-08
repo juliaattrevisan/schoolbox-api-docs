@@ -116,8 +116,11 @@ class External_SchoolPro_Timetable {
 	 * @param $externalUserId
 	 * @param $campusId
 	 * @param $dayNumber
+	 * @return array
 	 */
 	private function getStaffDayTimetable($externalUserId, $campusId, $dayNumber) {
+		$definition = $this->getTimetableDefinition($campusId, $dayNumber);
+
 		$vars = array(
 			'sbGetStaffDayTimetable',
 			array(
@@ -131,11 +134,49 @@ class External_SchoolPro_Timetable {
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		new \Alaress_Probe($result);
+		if ($result['success'] && count($result['result'])) {
+			$timetable = array();
+			$allClasses = $result['result'];
 
-		if ($result['success']) {
-		}
-		else {
+			/* For every period defined in the timetable definition,
+			 * set up a stub stack which contains all the possible
+			 * periods for this day. We'll append actual classes to
+			 * this data structure.
+			 */
+			for ($x = 0; isset($definition['desc'][$x]); $x++) {
+				$timetable[$x]['periodName'] = $definition['desc'][$x];
+				$timetable[$x]['periodStart'] = $definition['start'][$x];
+				$timetable[$x]['periodEnd'] = $definition['end'][$x];
+				$timetable[$x]['periodNumber'] = $definition['number'][$x];
+				$timetable[$x]['periodSequence'] = $definition['sequence'][$x];
+			}
+
+			/* With the result set obtained above, append actual class
+			 * details to the period definition established in the previous loop
+			 * Shift the $allClasses array as you append them
+			 *
+			 * In other connectors this is done in a "merge" style operation
+			 * which requires only one loop, but I did it this way because
+			 * this kind of stuff is currently not documented well.
+			 */
+			for ($x = 0; $x < count($timetable); $x++) {
+				if (count($allClasses)) {
+					$currentClass = $allClasses[0];
+
+					/* If this class occurs in this period, append its details
+					 */
+					if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {
+						$timetable[$x]['description'] = $currentClass['ClassDescription'];
+						$timetable[$x]['code'] = $currentClass['ClassCode'];
+						$timetable[$x]['room'] = $currentClass['ClassRoom'];
+						$timetable[$x]['staffID'] = $externalUserId;
+
+						array_shift($allClasses);
+					}
+				}
+			}
+
+			return $timetable;
 		}
 	}
 
