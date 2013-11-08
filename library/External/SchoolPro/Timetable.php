@@ -11,6 +11,20 @@
 class External_SchoolPro_Timetable {
 
 	/**
+	 * An instance of MSSQL
+	 *
+	 * @var null
+	 */
+	private $db = null;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setDb(MSSQL::getInstance());
+	}
+
+	/**
 	 * Number of days per cycle
 	 *
 	 * You could derive this, or just hardcode it
@@ -326,5 +340,23 @@ class External_SchoolPro_Timetable {
 	 */
 	private function getCycleLength() {
 		return $this->cycleLength;
+	}
+
+	/**
+	 * Set db
+	 *
+	 * @param null $db
+	 */
+	private function setDb($db) {
+		$this->db = $db;
+	}
+
+	/**
+	 * Get db
+	 *
+	 * @return null
+	 */
+	private function getDb() {
+		return $this->db;
 	}
 }

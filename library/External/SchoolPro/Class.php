@@ -11,6 +11,20 @@
 class External_SchoolPro_Class implements External_ClassInterface {
 
 	/**
+	 * An instance of MSSQL
+	 *
+	 * @var null
+	 */
+	private $db = null;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setDb(MSSQL::getInstance());
+	}
+
+	/**
 	 * Get a list of students that are in a particular class
 	 *
 	 * @param $classCode
@@ -81,5 +95,26 @@ class External_SchoolPro_Class implements External_ClassInterface {
 		}
 
 		return $allTeachers;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set db
+	 *
+	 * @param null $db
+	 */
+	private function setDb($db) {
+		$this->db = $db;
+	}
+
+	/**
+	 * Get db
+	 *
+	 * @return null
+	 */
+	private function getDb() {
+		return $this->db;
 	}
 } 

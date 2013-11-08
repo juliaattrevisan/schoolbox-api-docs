@@ -21,7 +21,7 @@ class External_SchoolPro_User implements External_UserInterface {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->setDatabase(MSSQL::getInstance());
+		$this->setDb(MSSQL::getInstance());
 	}
 
 	/**
