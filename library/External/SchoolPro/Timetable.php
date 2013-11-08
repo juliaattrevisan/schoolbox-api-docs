@@ -296,8 +296,8 @@ class External_SchoolPro_Timetable {
 
 				/* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
 				 */
-				$start = substr($allDayTimetables[$day][$period]['periodStart'], 0,8);
-				$end = substr($allDayTimetables[$day][$period]['periodEnd'], 0,8);
+				$start = substr($allDayTimetables[$day][$period]['periodStart'], 0,5);
+				$end = substr($allDayTimetables[$day][$period]['periodEnd'], 0,5);
 
 				/* Port across some values
 				 */
