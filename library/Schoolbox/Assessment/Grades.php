@@ -71,9 +71,11 @@ class Grades {
 				$params
 			);
 
-			foreach($marks['oa'][$user->getId()] as $oa => $m) {
+			foreach($marks['oa'][$user->getId()] as $oa => $assessmentResults) {
 				$assessmentsSeen['oa'][$oa] = true;
 			}
+			unset($oa);
+			unset($assessmentResults);
 
 			// get all SB marks for this student in this category
 			$marks['sb'][$user->getId()] = ReturnedWorkMapper::getInstance()->getStudentMarks(
@@ -82,15 +84,21 @@ class Grades {
 				$params
 			);
 
-			foreach($marks['sb'][$user->getId()] as $sb => $m) {
+			foreach($marks['sb'][$user->getId()] as $sb => $assessmentResults) {
 				$assessmentsSeen['sb'][$sb] = true;
 			}
+			unset($sb);
+			unset($assessmentResults);
 
 		}
+		unset($user);
+
+		$weightArray = array();
 
 		// retrieve the objects based on those seen...if any were seen at all
 		if(count($assessmentsSeen['sb'])) {
 			$sbCollection = SubmissionBoxMapper::getInstance()->findByColumn('id', array_keys($assessmentsSeen['sb']));
+			$weightArray['sb'] = array_combine($sbCollection->getColumnValues('id'), $sbCollection->getColumnValues('weight'));
 		}
 		else {
 			$sbCollection = new Collection();
@@ -98,6 +106,7 @@ class Grades {
 
 		if(count($assessmentsSeen['oa'])) {
 			$oaCollection = OnlineAssessmentMapper::getInstance()->findByColumn('assess_id', array_keys($assessmentsSeen['oa']));
+			$weightArray['oa'] = array_combine($oaCollection->getColumnValues('id'), $oaCollection->getColumnValues('weight'));
 		}
 		else {
 			$oaCollection = new Collection();
@@ -106,59 +115,96 @@ class Grades {
 		$assessments = new Collection();
 		$assessments->merge($sbCollection)->merge($oaCollection);
 
+		// flatten the weight array
+		$assessmentWeights = array();
+		foreach($weightArray as $type => $ws) {
+			foreach($ws as $id => $w) {
+				$assessmentWeights["$type-$id"] = $w;
+			}
+			unset($w);
+			unset($id);
+		}
+		unset($ws);
+		unset($type);
+		// get rid of this, we don't need it anymore
+		unset($weightArray);
+
 		// sort all the things by their respective due-date fields
 		$assessments->sortByCallback(function($a, $b) {
-			$x = $a instanceof SubmissionBox ? $a->getDueDate() : $a->getFinish();
-			$y = $b instanceof SubmissionBox ? $b->getDueDate() : $b->getFinish();
+			$x = $a instanceof SubmissionBox ? $a->getDueDate()->getUnixTimestamp() : $a->getFinish()->getUnixTimestamp();
+			$y = $b instanceof SubmissionBox ? $b->getDueDate()->getUnixTimestamp() : $b->getFinish()->getUnixTimestamp();
 			return $x == $y ? 0 : ($x > $y ? 1 : -1);
 		});
 
-		// calculate the total weight of this set of assessments
-		$weightSum = 0;
 
-		foreach($assessments as $a) {
-			$weightSum += $a->getWeight();
-		}
+		/* Every student's grade average is uniquely calculated, based on the assessable items for which they have
+		 * received feedback. If they have not received a mark, or received a 'Not assessed', the mark should not
+		 * bear any impact on their average.
+		 *
+		 * It also has to comprehend grade error codes: 'Absent' == 0, 'Not Assessed' == NULL and 'Not Submitted' == 0
+		 */
 
-		$grades = array();
+		$weightedGrades = array();
+		$applicableWeightsArray = array();
 
-		foreach ($marks as $type => $student) {
+		foreach($marks as $type => $student) {
+			foreach($student as $userId => $assessmentResults) {
+				foreach($assessmentResults as $assessmentId => $studentMarkInAssessment) {
 
-			$coll = $type == 'sb' ? $sbCollection : $oaCollection;
+					/* we currently have:
+					 *  - $type = "oa" | "sb"
+					 *  - $userId = student ID
+					 *  - $assessmentId = the numeric ID of the assessment in question
+					 *  - $studentMarkInAssessment = array containing ['mark']
+					 */
 
-			if($coll->count()) {
-				$weights = array_combine($coll->getColumnValues('id'), $coll->getColumnValues('weight'));
-			}
-			else {
-				$weights = array();
-			}
+					$normMark = $studentMarkInAssessment['mark'];
 
-			foreach($student as $userId => $marks) {
+					// we can disregard null marks
+					if(is_null($normMark)) {
+						continue;
+					}
 
-				$gradeList = array();
+					$workId = "$type-$assessmentId";
+					$workWeight = $assessmentWeights[$workId];
 
-				foreach($marks as $aId => $markArray) {
+					// add the weight of this work to the applicability of the student
+					$applicableWeightsArray[$userId][$workId] = $workWeight;
 
-					// calculate assessment relative weight index
-					$rwi = $weights[$aId] / $weightSum;
-
-					// apply and append
-					$gradeList[] = $markArray['mark'] * $rwi;
+					// add the weighted mark of this work to the student
+					$weightedGrades[$userId][$workId] = $normMark * $workWeight / 100;
 
 				}
-
-				$grades[$userId] = array(
-					'grades' => $gradeList,
-					'avg' => array_sum($gradeList),
-				);
-
 			}
-
 		}
 
-		return $grades;
+		// it's considered good manners to clean up after oneself..
+		unset($studentMarkInAssessment);
+		unset($assessmentId);
+		unset($normMark);
+		unset($workId);
+		unset($workWeight);
+		unset($assessmentResults);
+		unset($userId);
+		unset($student);
+		unset($type);
+
+		$returnGrades = array();
+
+		foreach ($weightedGrades as $userId => $works) {
+			$userWeightSum = array_sum($applicableWeightsArray[$userId]);
+			foreach($works as $workId => $weightedMark) {
+				$returnGrades[$userId]['grades'][$workId] = $weightedMark / $userWeightSum * 100;
+			}
+			$returnGrades[$userId]['avg'] = array_sum($works) / $userWeightSum * 100;
+		}
+		unset($weightedMark);
+		unset($workId);
+		unset($works);
+		unset($userId);
+
+		return $returnGrades;
 
 	}
-
 
 }

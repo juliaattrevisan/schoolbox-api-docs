@@ -407,7 +407,6 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		return $collection;
 	}
 
-
 	/**
 	 * Calculates and returns the statistics for the given online assessment
 	 *
@@ -452,7 +451,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		";
 
 		$stmt = $this->database->prepare($sql);
-		$stmt->execute('assess_id', $assess_id);
+		$stmt->execute(array('assess_id' => $assess_id));
 
 		return $stmt->fetch(\PDO::FETCH_ASSOC);
 
@@ -482,6 +481,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		$stmt->execute(array('assess_id' => $assess_id));
 		$progress['submission_count'] = $stmt->fetchColumn(0);
 
+		$progress['accepts_submissions'] = true;
 
 		$stmt = $this->database->prepare("
 			SELECT COUNT(*)

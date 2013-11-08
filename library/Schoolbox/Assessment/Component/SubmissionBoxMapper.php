@@ -830,7 +830,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		return $collection;
 	}
 
-
 	/**
 	 * Calculates and returns the statistics of the given submission box
 	 *
@@ -884,7 +883,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$submission_box_id = $submission_box->getId();
 		}
 		else {
+			// we need both elements
 			$submission_box_id = $submission_box;
+			$submission_box = $this->findById($submission_box_id);
 		}
 
 		$stmt = $this->database->prepare("
@@ -895,6 +896,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 		$stmt->execute(array('box_id' => $submission_box_id));
 		$progress['submission_count'] = $stmt->fetchColumn(0);
+
+		$progress['accepts_submissions'] = $submission_box->getAcceptOnline();
 
 		$stmt = $this->database->prepare("
 			SELECT COUNT(DISTINCT(owner))

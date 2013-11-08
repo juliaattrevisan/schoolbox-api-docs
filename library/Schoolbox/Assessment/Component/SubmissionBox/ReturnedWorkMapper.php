@@ -213,7 +213,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 
 
 		$query = "
-			SELECT sb.id AS box_id, sr.norm_mark, sr.returned
+			SELECT sb.id AS box_id, sr.mark, sr.norm_mark, sr.returned
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			WHERE $filters
@@ -226,12 +226,14 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 		// Ignore all but the most recent mark for each submission box.
 		$marks = array();
 		foreach ($statement as $row) {
-			$box_id = $row['box_id'];
-			$mark   = $row['norm_mark'];
+			$box_id      = $row['box_id'];
+			$mark        = $row['norm_mark'];
+			$pretty_mark = $row['mark'];
 			if (!array_key_exists($box_id, $marks)) {
 				$marks[$box_id] = array(
-					'mark' => $mark,
-					'date' => $row['returned'],
+					'mark'        => $mark,
+					'pretty_mark' => $pretty_mark,
+					'date'        => $row['returned'],
 				);
 			}
 		}

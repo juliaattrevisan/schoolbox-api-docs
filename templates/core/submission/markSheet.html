@@ -15,125 +15,213 @@
         cursor: pointer;
         text-decoration: none;
     }
-</style>
-<script src="/javascript/jquery.autoellipsis-1.0.3.min.js" type="text/javascript" xmlns="http://www.w3.org/1999/html"></script>
-<script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
-<script src="/javascript/jquery.markSheet.js" type="text/javascript"></script>
-<script type="text/javascript">
-    $j(function() {
-        $j('.combobox').combobox({COMBO_OPTIONS});
-    });
-</script>
-<!-- END custom_head -->
-<h1>{CATEGORY}</h1>
-<div class="header_option">
 
-    <form id="time-pick" action="/submission/markSheet/{CID}" method="GET" class="fade">
+
+	.mark-sheet input { width: 30px; }
+
+
+	.mark-sheet td{
+		width: 50px;
+		border-top: 1px solid #eeeeee;
+		border-left: 1px solid #eeeeee;
+		border-right: 1px solid #eeeeee;
+		vertical-align: middle;
+		text-align: center;
+		overflow: hidden;
+		padding: 7px;
+	}
+	.mark-sheet td a,
+	.mark-sheet th a {
+		display: block;
+		font-weight: bold;
+	}
+	.mark-sheet th span {
+		float: right;
+	}
+
+	.sub-table-row td {
+		border-left: none;
+		border-right: none;
+	}
+	.rule th, .rule td {
+		border-bottom: 1px solid #797979 !important;
+	}
+	th {
+		width: auto;
+	}
+	th.rotate {
+		height: 170px;
+		width: 50px;
+		min-width: 50px;
+		max-width: 50px;
+		position: relative;
+		vertical-align: bottom;
+		padding: 0;
+		font-size: 12px;
+		letter-spacing: 0.1ex;
+	}
+
+	th.rotate > div{
+		position: relative;
+		top: 0px;
+		left: 85px; /* 80 * tan(45) / 2 = 40 where 80 is the height on the cell and 45 is the transform angle*/
+		height: 100%;
+		-ms-transform:skew(-45deg,0deg);
+		-moz-transform:skew(-45deg,0deg);
+		-webkit-transform:skew(-45deg,0deg);
+		-o-transform:skew(-45deg,0deg);
+		transform:skew(-45deg,0deg);
+		overflow: hidden;
+		border-left: 1px solid #eeeeee;
+		border-right: 0;
+		border-top: 0;
+		border-bottom: 0;
+	}
+
+	th.rotate > div > span {
+		-ms-transform:skew(45deg,0deg) rotate(315deg);
+		-moz-transform:skew(45deg,0deg) rotate(315deg);
+		-webkit-transform:skew(45deg,0deg) rotate(315deg);
+		-o-transform:skew(45deg,0deg) rotate(315deg);
+		transform:skew(45deg,0deg) rotate(315deg);
+		position: absolute;
+		bottom: 72px; /* 40 cos(45) = 28 with an additional 2px margin*/
+		left: -75px; /*Because it looked good, but there is probably a mathematical link here as well*/
+		display: inline-block;
+		width: 210px; /* 80 / cos(45) - 40 cos (45) = 85 where 80 is the height of the cell, 40 the width of the cell and 45 the transform angle*/
+		text-align: left;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		color: #797979;
+		font-weight: normal;
+	}
+
+	th.rotate a {
+		display: block;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+</style>
+<!-- END custom_head -->
+<h1>Marksheet for {CATEGORY}<aside>{CATEGORY_CODE}</aside></h1>
+
+<div id="semester">
+	<div class="semester-controls">
+		<form class="fade" action="/submission/markSheet/{CID}" method="GET">
         <span>
             <label for="sem">Semester</label>
             <select id="sem" name="semester">
-                <!-- BEGIN semester_option -->
-                <option{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
-                <!-- END semester_option -->
-            </select>
+				<!-- BEGIN semester_option -->
+				<option{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
+				<!-- END semester_option -->
+			</select>
             <label for="yr">,</label>
             <select id="yr" name="year">
-                <!-- BEGIN year_option -->
-                <option{YEAR_SELECTED}>{YEAR_VALUE}</option>
-                <!-- END year_option -->
-            </select>
-        <input type="submit" class="btn" value="Update"/>
+				<!-- BEGIN year_option -->
+				<option{YEAR_SELECTED}>{YEAR_VALUE}</option>
+				<!-- END year_option -->
+			</select>
         </span>
-    </form>
+			<input type="submit" class="btn" value="Update"/>
+		</form>
+	</div>
+	<form action="/submission/allWork/" method="get" class="fade enrolled-subjects">
+		<select id="enrolled-subjects">
+			<option disabled="disabled" selected="selected">Subjects</option>
+			<!-- BEGIN subject_selector -->
+			<option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}" value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}" {ENR_SUBJ_SELECTED}>
+			{ENR_SUBJ_NAME}
+			</option>
+			<!-- END subject_selector -->
+		</select>
+	</form>
+</div>
 
-<div class="clearfix"></div>
+<div class="header_option">
+
     <a href="/submission/markSheet/{CID}/{SELECTED_YEAR}/{SELECTED_SEMESTER}/export" class="btn download"><span></span>Download Spreadsheet</a>
     <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Post Due Work</a>
     <a class="btn add" href="/assess/create/{CID}/"><span></span>Create Assessment</a>
 
 </div>
-<div class="mark-sheet wrap">
-<div class="mark-sheet names">
-    <table class="table">
-        <thead>
 
-        <tr>
-            <th>Name</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN student_list -->
-        <tr class="{ON_OFF}">
-            <td><a href="/search/user/{UID}" title="{SURNAME}, {FIRSTNAME}">{SURNAME}, {FIRSTNAME}</a></td>
-        </tr>
-        <!-- END student_list -->
-        </tbody>
-    </table>
-</div>
+<table class="mark-sheet angled">
+	<thead>
+	<tr>
+		<th></th>
+    <!-- BEGIN work_header -->
+		<th scope="col" class="rotate">
+			<div><span>
+					<a href="{WORK_PATH}/{WORK_ID}">{WORK_TITLE}</a>
+					{WORK_TYPE}
+				</span></div>
+    </th>
+    <!-- END work_header -->
+		<th scope="col" class="rotate"><div><span>Student Average</span></div></th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<th scope="row">
+			<a href="#" class="toggle-averages submission-dropdown" title="Show additional metrics">&#x25BC;</a>
+			Class Average
+    </th>
+    <!-- BEGIN class_average -->
+		<td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">{WORK_CLASSAVG_CLEAN}</td>
+    <!-- END class_average -->
+    <td></td>
+	</tr>
+  <!-- BEGIN stat -->
+	<tr class="sub-table-row {WORK_STAT_CLASS}">
+		<th scope="row">{WORK_STAT_TITLE}</th>
+    <!-- BEGIN stat_item -->
+    <td>
+		  <!-- BEGIN stat_editable -->
+      <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}" />
+		  <!-- END stat_editable -->
+      <!-- BEGIN stat_readonly -->
+      {WORK_STAT_VALUE}
+    <!-- END stat_readonly -->
+    </td>
+    <!-- END stat_item -->
+		<td></td>
+	</tr>
+  <!-- END stat -->
+  <!-- BEGIN student_row -->
+	<tr class="{DARK}">
+		<th class="avatar" scope="row">
+			<a href="/search/user/{STUDENT_ID}" class="author">
+				<img height="32" width="32" src="/portrait.php?userId={STUDENT_EXTID}&amp;size=square32" alt="{STUDENT_NAME}" />
+				{STUDENT_NAME_FORMAL}
+			</a>
+		</th>
+    <!-- BEGIN student_work -->
+		<td class="column-{WORK_TYPE}-{WORK_ID}">
+			<a href="{STUDENT_WORK_PATH}" title="{STUDENT_WORK_COMMENT}">{STUDENT_WORK_MARK}</a>
+		</td>
+    <!-- END student_work -->
+		<td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
+      <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
+    </td>
+	</tr>
+  <!-- END student_row -->
+	</tbody>
+</table>
 
-<div class="mark-sheet assessments">
-    <table class="table">
-        <thead>
-            <tr>
-                <!-- BEGIN sub_headers -->
-                <th id="work-{BOX_ID}" class="column-{BOX_ID}">
-                    <div class="height-control">
-                        <!-- BEGIN sub_head -->
-                        <a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
-                        <!-- END sub_head -->
-                        <!-- BEGIN assess_head -->
-                        <a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
-                        <!-- END assess_head -->
-                    </div>
-                </th>
-                <!-- END sub_headers -->
-            </tr>
+<!-- BEGIN CUSTOM_JAVASCRIPT -->
+<script>
+	// Hide averages rows
+	$j('.sub-table-row').hide();
 
-            <tr>
-                <!-- BEGIN sub_type_head -->
-                <th>
-                    <em>{SUB_TYPE}</em>
-                </th>
-                <!-- END sub_type_head -->
-                <!-- BEGIN average_type_head -->
-                <th>
-                    <em>Average</em>
-                </th>
-                <!-- END average_type_head -->
-            </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN student_mark_list -->
-        <tr class="{ON_OFF}">
-            <!-- BEGIN markItem -->
-            <!-- BEGIN mark -->
-            <td class="column-{BOX_ID}">
-                <div class="row-fix">
-                    <form method="post" action="" class="markForm clearfix">
-                        {STUDENT_MARKING}
-                    </form>
-                </div>
-            </td>
-            <!-- END mark -->
-
-            <!-- BEGIN onlineAssessmentMark -->
-            <td class="column-assess-{ASSESS_ASSESS_ID}">
-                <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ID}">{MARK}</a>
-            </td>
-            <!-- END onlineAssessmentMark -->
-            <!-- END markItem -->
-            <!-- BEGIN mark_average -->
-            <td class="mark-average">
-                <div class="row-fix avg-mark" id="avg-{UID}">
-                    <span>{STUDENT_AVERAGE_MARK}</span>
-                </div>
-            </td>
-            <!-- END mark_average -->
-        </tr>
-        <!-- END student_mark_list -->
-        </tbody>
-    </table>
-
-</div>
-
-</div>
+	// Toggle averages rows and change arrow direction
+	$j('.toggle-averages').toggle(function(){
+		$j(this).html('&#x25B2;');
+		$j('.sub-table-row').show();
+	}, function(){
+		$j(this).html('&#x25BC;');
+		$j('.sub-table-row').hide();
+	});
+</script>
+<!-- END CUSTOM_JAVASCRIPT -->
