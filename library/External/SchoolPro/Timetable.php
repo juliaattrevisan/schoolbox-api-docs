@@ -293,6 +293,17 @@ class External_SchoolPro_Timetable {
 		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
 			for ($day = 0; $day < $this->getCycleLength(); $day++) {
 				$timetable[$period]['day'][$day] = $allDayTimetables[$day][$period];
+
+				/* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
+				 */
+				$start = substr($allDayTimetables[$day][$period]['periodStart'], 0,8);
+				$end = substr($allDayTimetables[$day][$period]['periodEnd'], 0,8);
+
+				/* Port across some values
+				 */
+				$timetable[$period]['periodName'] = $allDayTimetables[$day][$period]['periodName'];
+				$timetable[$period]['periodStart'] = $start;
+				$timetable[$period]['periodEnd'] = $end;
 			}
 		}
 
