@@ -835,6 +835,11 @@ class SitePage extends Page {
         static::localRedir("/images/fail.php?".http_build_query($options));
     }
 
+    /**
+     *
+     * @param string $error An error message to display on the login page.
+     * @param string $page  If set, this page is set as the path to redirect to.
+     */
     function goLoginPage($error = '', $page = '') {
         $this->setSite();
         $this->setFile(TEMPLATE_body, 'common/login.html');
@@ -853,6 +858,8 @@ class SitePage extends Page {
             $this->setVar('ERROR', $error);
         } else {
             $parts = parse_url($_SERVER['REQUEST_URI']);
+            // Redirect to base path, with current URI in page param, if not
+            // currently on the base path.
             if (!$page && $parts['path'] != '/login/' && $parts['path'] != '/') {
                 $this->localRedir('/?page='.urlencode($_SERVER['REQUEST_URI']));
             }
@@ -864,8 +871,17 @@ class SitePage extends Page {
             }
         }
 
-        $this->parseFooterMobileLink(TEMPLATE_body);
-        $this->outputPage(true);
+        // is SAML enabled?
+        // don't show the login page, redirect to the SAML login page.
+        // (unless ?samlLogin=0 is set)
+        $ssoUrl = Config::get('saml_sso_url');
+        if (!empty($ssoUrl) && $_GET['samlAuth'] !== '0') {
+            $this->localRedir('/saml/index.php');
+        }
+        else {
+            $this->parseFooterMobileLink(TEMPLATE_body);
+            $this->outputPage(true);
+        }
         exit;
     }
 
