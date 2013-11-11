@@ -1,11 +1,15 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
 <script type="text/javascript">
-
-
-
 $j(document).ready(function() {
+	$j('.makeAdmin').makeAdmin({
+		currentUserId: {MAKEADMIN_CURRENT_USER_ID},
+		currentAdminId: {MAKEADMIN_CURRENT_ADMIN_ID},
+		super: {MAKEADMIN_SUPER}
+	});
+
     $j('.greenCheck').change(function() {
         if ($j(this).prop('checked')) {
             var data = {
@@ -60,8 +64,6 @@ $j(document).ready(function() {
 		if (confirm('Delete all selected users?'))
 			$j('#deleteForm').submit();
 	});
-
-
 });
 </script>
 <!-- END custom_head -->
@@ -122,7 +124,7 @@ $j(document).ready(function() {
 							<td style="text-align: center;"><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
 							<td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
 							<td style="text-align: center; white-space: nowrap;"><!-- BEGIN make_owner -->
-								<a href="/group/modifyForm.php?owner={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Promote {USER_JAVA} to group admin?');">Make Admin</a>
+								<a class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
 								<!-- END make_owner --></td>
 						</tr>
 						<!-- END member -->
