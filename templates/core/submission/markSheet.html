@@ -1,153 +1,16 @@
-<!-- BEGIN custom_head -->
-<style>
-    li.ui-menu-item, .ui-combobox input {
-        width: 85px;
-    }
-    li.ui-menu-item {
-        background: #fff;
-    }
-    li.ui-menu-item .ui-corner-all {
-        display: block;
-        padding: 2px;
-    }
-    li.ui-menu-item .ui-corner-all:hover {
-        background: #e7e7e7;
-        cursor: pointer;
-        text-decoration: none;
-    }
+<h1>Marksheet for {CATEGORY}<aside>{CATEGORY_CODE}</aside>
+	<div class="header_option">
 
+		<a href="/submission/markSheet/{CID}/{SELECTED_YEAR}/{SELECTED_SEMESTER}/export" class="btn download"><span></span>Download Spreadsheet</a>
+		<a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Post Due Work</a>
+		<a class="btn add" href="/assess/create/{CID}/"><span></span>Create Assessment</a>
 
-	.mark-sheet input { width: 30px; }
-
-
-	.mark-sheet td{
-		width: 50px;
-		border-top: 1px solid #eeeeee;
-		border-left: 1px solid #eeeeee;
-		border-right: 1px solid #eeeeee;
-		vertical-align: middle;
-		text-align: center;
-		overflow: hidden;
-		padding: 7px;
-	}
-	.mark-sheet td a,
-	.mark-sheet th a {
-		display: block;
-		font-weight: bold;
-	}
-	.mark-sheet th span {
-		float: right;
-	}
-
-	.sub-table-row td {
-		border-left: none;
-		border-right: none;
-	}
-	.rule th, .rule td {
-		border-bottom: 1px solid #797979 !important;
-	}
-	th {
-		width: auto;
-	}
-	th.rotate {
-		height: 170px;
-		width: 50px;
-		min-width: 50px;
-		max-width: 50px;
-		position: relative;
-		vertical-align: bottom;
-		padding: 0;
-		font-size: 12px;
-		letter-spacing: 0.1ex;
-	}
-
-	th.rotate > div{
-		position: relative;
-		top: 0px;
-		left: 85px; /* 80 * tan(45) / 2 = 40 where 80 is the height on the cell and 45 is the transform angle*/
-		height: 100%;
-		-ms-transform:skew(-45deg,0deg);
-		-moz-transform:skew(-45deg,0deg);
-		-webkit-transform:skew(-45deg,0deg);
-		-o-transform:skew(-45deg,0deg);
-		transform:skew(-45deg,0deg);
-		overflow: hidden;
-		border-left: 1px solid #eeeeee;
-		border-right: 0;
-		border-top: 0;
-		border-bottom: 0;
-	}
-
-	th.rotate > div > span {
-		-ms-transform:skew(45deg,0deg) rotate(315deg);
-		-moz-transform:skew(45deg,0deg) rotate(315deg);
-		-webkit-transform:skew(45deg,0deg) rotate(315deg);
-		-o-transform:skew(45deg,0deg) rotate(315deg);
-		transform:skew(45deg,0deg) rotate(315deg);
-		position: absolute;
-		bottom: 72px; /* 40 cos(45) = 28 with an additional 2px margin*/
-		left: -75px; /*Because it looked good, but there is probably a mathematical link here as well*/
-		display: inline-block;
-		width: 210px; /* 80 / cos(45) - 40 cos (45) = 85 where 80 is the height of the cell, 40 the width of the cell and 45 the transform angle*/
-		text-align: left;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-		color: #797979;
-		font-weight: normal;
-	}
-
-	th.rotate a {
-		display: block;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-	}
-</style>
-<!-- END custom_head -->
-<h1>Marksheet for {CATEGORY}<aside>{CATEGORY_CODE}</aside></h1>
-
-<div id="semester">
-	<div class="semester-controls">
-		<form class="fade" action="/submission/markSheet/{CID}" method="GET">
-        <span>
-            <label for="sem">Semester</label>
-            <select id="sem" name="semester">
-				<!-- BEGIN semester_option -->
-				<option{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
-				<!-- END semester_option -->
-			</select>
-            <label for="yr">,</label>
-            <select id="yr" name="year">
-				<!-- BEGIN year_option -->
-				<option{YEAR_SELECTED}>{YEAR_VALUE}</option>
-				<!-- END year_option -->
-			</select>
-        </span>
-			<input type="submit" class="btn" value="Update"/>
-		</form>
 	</div>
-	<form action="/submission/allWork/" method="get" class="fade enrolled-subjects">
-		<select id="enrolled-subjects">
-			<option disabled="disabled" selected="selected">Subjects</option>
-			<!-- BEGIN subject_selector -->
-			<option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}" value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}" {ENR_SUBJ_SELECTED}>
-			{ENR_SUBJ_NAME}
-			</option>
-			<!-- END subject_selector -->
-		</select>
-	</form>
-</div>
 
-<div class="header_option">
+</h1>
 
-    <a href="/submission/markSheet/{CID}/{SELECTED_YEAR}/{SELECTED_SEMESTER}/export" class="btn download"><span></span>Download Spreadsheet</a>
-    <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Post Due Work</a>
-    <a class="btn add" href="/assess/create/{CID}/"><span></span>Create Assessment</a>
 
-</div>
-
-<table class="mark-sheet angled">
+<table class="mark-sheet angled table">
 	<thead>
 	<tr>
 		<th></th>

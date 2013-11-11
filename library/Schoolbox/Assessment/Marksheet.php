@@ -331,7 +331,11 @@ class Marksheet {
 		}
 
 		$output['mark'] = (float)(number_format($marks, 2)) . ' / ' . (float)(number_format($total, 2));
-		$output['norm_mark'] = $marks / $total;
+		if(is_numeric($total) && ($total > 0)) {
+			$output['norm_mark'] = $marks / $total;
+		} else {
+			$output['norm_mark'] = $marks;
+		}
 
 		return $output;
 	}
