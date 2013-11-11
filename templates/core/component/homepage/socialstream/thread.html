@@ -46,13 +46,19 @@
 
 				<!-- BEGIN socialstream_post_has_video -->
 				<div class="videoWrapper">
-					<video id="socialstream_video{SOCIALSTREAM_POST_POST_ID}" class="video-js vjs-default-skin" controls="true" preload="auto"
-						   poster="{SOCIALSTREAM_POST_VIDEO_POSTER}">
-						<source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>                                           poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}">
+					<video id="socialstream_video{SOCIALSTREAM_POST_POST_ID}"
+						class="video-js vjs-default-skin" controls="true" preload="auto"
+						poster="{SOCIALSTREAM_POST_VIDEO_POSTER}"
+					>
+						<source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>
 					</video>
 					<script> var video = _V_("socialstream_video{SOCIALSTREAM_POST_POST_ID}", {width: '100%', height: '400px'}); </script>
 				</div>
 				<!-- END socialstream_post_has_video -->
+
+				<!-- BEGIN socialstream_post_has_video_pending -->
+				<img class="thumbnail" width="64" height="64" src="{SOCIALSTREAM_POST_VIDEO_STATUS_IMG}" title="Currently transcoding video" />
+				<!-- END socialstream_post_has_video_pending -->
 
 			</div>
 			<!-- END socialstream_post_has_attachment -->
@@ -104,13 +110,19 @@
 
 						<!-- BEGIN socialstream_comment_has_video -->
 						<div class="videoWrapper">
-							<video id="socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}" class="video-js vjs-default-skin" controls="true" preload="auto"
-								   poster="{SOCIALSTREAM_COMMENT_VIDEO_POSTER}">
+							<video id="socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}"
+								class="video-js vjs-default-skin" controls="true" preload="auto"
+								poster="{SOCIALSTREAM_COMMENT_VIDEO_POSTER}"
+							>
 								<source src="{SOCIALSTREAM_COMMENT_VIDEO_SRC}" type='video/mp4'>
 							</video>
 							<script> var video = _V_("socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}", {width: '100%', height: '400px'}); </script>
 						</div>
 						<!-- END socialstream_comment_has_video -->
+
+						<!-- BEGIN socialstream_comment_has_video_pending -->
+						<img class="thumbnail" width="64" height="64" src="{SOCIALSTREAM_COMMENT_VIDEO_STATUS_IMG}" title="Currently transcoding video" />
+						<!-- END socialstream_comment_has_video_pending -->
 
 						<!-- BEGIN socialstream_comment_has_metadata -->
 						<a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</a><br />
@@ -160,13 +172,19 @@
 
 								<!-- BEGIN socialstream_reply_has_video -->
 								<div class="videoWrapper">
-									<video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}" class="video-js vjs-default-skin" controls="true" preload="auto"
-										   poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}">
+									<video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}"
+										class="video-js vjs-default-skin" controls="true" preload="auto"
+										poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}"
+									>
 										<source src="{SOCIALSTREAM_REPLY_VIDEO_SRC}" type='video/mp4'>
 									</video>
 									<script> var video = _V_("socialstream_video{SOCIALSTREAM_REPLY_POST_ID}", {width: '100%', height: '400px'}); </script>
 								</div>
 								<!-- END socialstream_reply_has_video -->
+
+								<!-- BEGIN socialstream_reply_has_video_pending -->
+								<img class="thumbnail" width="64" height="64" src="{SOCIALSTREAM_REPLY_VIDEO_STATUS_IMG}" title="Currently transcoding video" />
+								<!-- END socialstream_reply_has_video_pending -->
 
 								<!-- BEGIN socialstream_reply_has_metadata -->
 								<a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</a><br />
