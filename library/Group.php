@@ -308,10 +308,21 @@ class Group extends DeprecatedModel
 			return false;
 	}
 
-	function deleteUser($relationID, $userID)
-	{
-		//deletes a uid also can optionally delete a user based on its permission
-		$query = "DELETE FROM userAccess WHERE service = " . $this->_service . " AND sid = $relationID AND uid = $userID";
+	/**
+	 * Deletes a uid also can optionally delete a user based on its permission
+	 *
+	 * @param $relationID
+	 * @param $userID
+	 * @return resource
+	 */
+	public function deleteUser($relationID, $userID) {
+		$query = "
+			DELETE FROM userAccess
+			WHERE service = '{$this->db->quote($this->_service)}'
+			AND sid = '{$this->db->quote($relationID)}'
+			AND uid = '{$this->db->quote($userID)}'
+		";
+
 		return $this->db->query($query);
 	}
 
