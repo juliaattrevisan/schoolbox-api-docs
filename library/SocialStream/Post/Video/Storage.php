@@ -10,6 +10,10 @@
 
 namespace SocialStream\Post\Video;
 
+use Schoolbox\Mapper;
+use Schoolbox\StorageMapper;
+use Schoolbox\Video\ResourceVideo;
+use Schoolbox\Video\ResourceVideoMapper;
 use SocialStream\Post\Player\Player;
 
 class Storage extends Player {
@@ -36,9 +40,25 @@ class Storage extends Player {
 			$stuff = parse_url($matches[0]);
 			parse_str($stuff['query'], $bits);
 
+			// Figure out status of video
+			$status = 'failed';
+			try {
+				/** @var \Schoolbox\Storage $storage */
+				/** @var ResourceVideo      $video */
+				$storage = StorageMapper::getInstance()->findOneByColumn('hash', $bits['hash']);
+				$video   = ResourceVideoMapper::getInstance()->findOneByColumnList(
+					array(
+						'file_id' => $storage->getId(),
+						'type'    => 'storage',
+					)
+				);
+				$status = $video->getStatus();
+			}
+			catch (Mapper\Exception $e) {}
 			return array(
 				'poster' => "/cms/videoThumb.php?hash={$bits['hash']}&type=poster",
 				'src'    => "/cms/sendVideo.php?hash={$bits['hash']}",
+				'status' => $status,
 			);
 		}
 

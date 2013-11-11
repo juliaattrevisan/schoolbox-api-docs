@@ -10,6 +10,9 @@
 
 namespace SocialStream\Post\Video;
 
+use Schoolbox\Mapper;
+use Schoolbox\Video\ResourceVideo;
+use Schoolbox\Video\ResourceVideoMapper;
 use SocialStream\Post\Player\Player;
 
 class Resource extends Player {
@@ -36,9 +39,23 @@ class Resource extends Player {
 			$stuff = parse_url($matches[0]);
 			parse_str($stuff['query'], $bits);
 
+			// Figure out status of video
+			$status = 'failed';
+			try {
+				/** @var ResourceVideo $video */
+				$video = ResourceVideoMapper::getInstance()->findOneByColumnList(
+					array(
+						'file_id' => $bits['id'],
+						'type'    => 'sbfs',
+					)
+				);
+				$status = $video->getStatus();
+			}
+			catch (Mapper\Exception $e) {}
 			return array(
 				'poster' => "/cms/videoThumb.php?id={$bits['id']}&type=poster",
 				'src'    => "/cms/sendVideo.php?id={$bits['id']}",
+				'status' => $status,
 			);
 		}
 

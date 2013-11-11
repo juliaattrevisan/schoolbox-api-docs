@@ -67,7 +67,7 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 				));
 
 				/* Parse metadata
-   				 */
+				 */
 				if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
 					$page->parse('socialstream_comment_has_metadata_block', 'socialstream_comment_has_metadata');
 				}
@@ -92,7 +92,7 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 				));
 
 				/* Parse metadata
-  				 */
+				 */
 				if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
 					$page->parse('socialstream_reply_has_metadata_block', 'socialstream_reply_has_metadata');
 				}
@@ -114,28 +114,30 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 		$chain  = new \SocialStream\Post\Video\Chain($this->getUrl());
 		$result = $chain->getResult();
 		if (!empty($result)) {
+			$prefix = null;
 			if ($context == 'post') {
-				$page->setVar(array(
-					'SOCIALSTREAM_POST_VIDEO_POSTER' => Scrub::text($result['poster']),
-					'SOCIALSTREAM_POST_VIDEO_SRC'    => Scrub::text($result['src']),
-				));
-				$page->parse('socialstream_post_has_video_block', 'socialstream_post_has_video');
-				return true;
+				$prefix = 'SOCIALSTREAM_POST_VIDEO';
 			}
 			elseif ($context == 'comment') {
-				$page->setVar(array(
-					'SOCIALSTREAM_COMMENT_VIDEO_POSTER' => Scrub::text($result['poster']),
-					'SOCIALSTREAM_COMMENT_VIDEO_SRC'    => Scrub::text($result['src']),
-				));
-				$page->parse('socialstream_comment_has_video_block', 'socialstream_comment_has_video');
-				return true;
+				$prefix = 'SOCIALSTREAM_COMMENT_VIDEO';
 			}
 			elseif ($context == 'reply') {
-				$page->setVar(array(
-					'SOCIALSTREAM_REPLY_VIDEO_POSTER' => Scrub::text($result['poster']),
-					'SOCIALSTREAM_REPLY_VIDEO_SRC'    => Scrub::text($result['src']),
-				));
-				$page->parse('socialstream_reply_has_video_block', 'socialstream_reply_has_video');
+				$prefix = 'SOCIALSTREAM_REPLY_VIDEO';
+			}
+			if (isset($prefix)) {
+				$page->setVar(
+					array(
+						$prefix.'_POSTER'     => Scrub::text($result['poster']),
+						$prefix.'_SRC'        => Scrub::text($result['src']),
+						$prefix.'_STATUS_IMG' => "/images/core/component/video-thumbnail-".strtolower($result['status']).".gif",
+					)
+				);
+				if ($result['status'] === 'completed') {
+					$page->parse("socialstream_{$context}_has_video_block", "socialstream_{$context}_has_video");
+				}
+				elseif ($result['status'] !== 'failed') {
+					$page->parse("socialstream_{$context}_has_video_pending_block", "socialstream_{$context}_has_video_pending");
+				}
 				return true;
 			}
 		}
