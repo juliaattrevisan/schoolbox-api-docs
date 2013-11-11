@@ -176,7 +176,10 @@ function getFolderMeta($folderId) {
 	$actions = array();
 	switch($userAccess) {
 		case FULL_ACCESS:
-			$actions = array_merge($actions, array('multi', 'zip'));
+			$actions[] = 'multi';
+			if ($groupHandler->isSuperuser()) {
+				$actions[] = 'zip';
+			}
 			// no break
 		case WRITE_ACCESS:
 			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download'));
