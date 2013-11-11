@@ -98,10 +98,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         ));
 
         $this->setBlock($templateHandle,    'course_selector',      'course_selector_block');
-        $this->setBlock($templateHandle,    'course_modify',        'course_modify_block');
         $this->setBlock($templateHandle,    'course_unit_list',     'course_unit_list_block');
         $this->setBlock('course_unit_list', 'unit',                 'unit_block');
-        $this->setBlock('course_unit_list', 'course_modify',        'course_modify_block');
         $this->setBlock('unit',             'unit_expand',          'unit_expand_block');
         $this->setBlock('unit',             'unit_no_expand',       'unit_no_expand_block');
         $this->setBlock('unit',             'unit_completion',      'unit_completion_block');
@@ -141,11 +139,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      * Renders the unit list template for this component.
      */
     protected function renderTemplateForUnitList() {
-        // iterate the list of homepages
-        $this->setVar('course_modify_block', '');
-        if (!$this->is_student) {
-            $this->parse('course_modify_block', 'course_modify');
-        }
+
         $this->parse('course_unit_list_block', 'course_unit_list');
 
         // unit list will be a collection of Unit models
