@@ -38,11 +38,12 @@
 
 					<h3><a href="/news/item/{NEWS_ID}">{NEWS_TITLE}</a></h3>
 
-					<a href="/search/user/{POSTER_ID}" class="author">
-						<img class="icon" width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32" />
-						{POSTER}
-					</a>
-					<p class="meta">Posted {DATETIME}
+					<p class="meta">
+						<a href="/search/user/{POSTER_ID}" class="author">
+							<img class="icon" width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32" />
+							{POSTER}
+						</a><br />
+						Posted {DATETIME}
                         <!-- BEGIN has_expiry -->
                         | {EXPIRY_VERB} on {EXPIRY_DATE}
                         <!-- END has_expiry -->
