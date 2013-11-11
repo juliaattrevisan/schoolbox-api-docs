@@ -135,7 +135,7 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 				if ($result['status'] === 'completed') {
 					$page->parse("socialstream_{$context}_has_video_block", "socialstream_{$context}_has_video");
 				}
-				else {
+				elseif ($result['status'] !== 'failed') {
 					$page->parse("socialstream_{$context}_has_video_pending_block", "socialstream_{$context}_has_video_pending");
 				}
 				return true;
