@@ -2,10 +2,93 @@
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
+(function($j) {
+	$j.fn.makeAdmin = function(options) {
+		var config;
 
+		/* For every makeAdmin element, allow functionality
+		 */
+		$j.each(this, function(index, element) {
+			$j(element).click(function() {
+				event.preventDefault();
+
+				config = init($j(this), options);
+
+				changeAdmin();
+			});
+		});
+
+		/**
+		 * Init
+		 *
+		 * @param element
+		 * @param options
+		 * @returns {*|void|Function|extend|extend|extend}
+		 */
+		function init(element, options) {
+			var defaults = {
+				element: element,
+				super: 0
+			}
+
+			var derived = {
+				currentUserId: parseInt(options.currentUserId),
+				currentAdminId: parseInt(options.currentAdminId),
+				super: parseInt(options.super),
+				username: element.data('username'),
+				standardWarning: 'Promote ' + element.data('username') + ' to group admin?',
+				extraWarning: 'Promote ' + element.data('username') + ' to group admin?\n\nYou will lose your group admin privileges.',
+				url: ''
+			}
+
+			var merged = $j.extend(defaults, derived, options);
+
+			return merged;
+		}
+
+		/**
+		 * Change admin
+		 */
+		function changeAdmin() {
+			var url = '/group/modifyForm.php?owner=' + config.element.data('userid') + '&categoryID=' + config.element.data('categoryid');
+
+			/* If you are not the superuser, and you are changing ownership to someone
+			 * other than yourself, throw warning
+			 */
+			if (!config.super) {
+				if (config.element.data('userid') != config.user) {
+					if (confirm(config.extraWarning)) {
+						window.location.href = url;
+					}
+				}
+				/* A special case where you assign yourself to being the
+				 * group admin. This shouldn't actually occur.
+				 */
+				else {
+					if (confirm(config.standardWarning)) {
+						window.location.href = url;
+					}
+				}
+			}
+			/* Process if agreed
+			 */
+			else {
+				if (confirm(config.standardWarning)) {
+					window.location.href = url;
+				}
+			}
+		}
+	}
+})(jQuery);
 
 
 $j(document).ready(function() {
+	$j('.makeAdmin').makeAdmin({
+		currentUserId: {MAKEADMIN_CURRENT_USER_ID},
+		currentAdminId: {MAKEADMIN_CURRENT_ADMIN_ID},
+		super: {MAKEADMIN_SUPER}
+	});
+
     $j('.greenCheck').change(function() {
         if ($j(this).prop('checked')) {
             var data = {
@@ -60,8 +143,6 @@ $j(document).ready(function() {
 		if (confirm('Delete all selected users?'))
 			$j('#deleteForm').submit();
 	});
-
-
 });
 </script>
 <!-- END custom_head -->
@@ -122,7 +203,7 @@ $j(document).ready(function() {
 							<td style="text-align: center;"><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
 							<td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
 							<td style="text-align: center; white-space: nowrap;"><!-- BEGIN make_owner -->
-								<a href="/group/modifyForm.php?owner={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Promote {USER_JAVA} to group admin?');">Make Admin</a>
+								<a class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
 								<!-- END make_owner --></td>
 						</tr>
 						<!-- END member -->

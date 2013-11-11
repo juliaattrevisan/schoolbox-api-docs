@@ -99,7 +99,15 @@ if (is_numeric($this->arg[0])) {
 	} else
 		$this->setVar("authorisation_block", "");
 
-
+	/* The currently-logged in user and the current category owner
+	 * Use for comparing and summoning a warning message that you
+	 * could lose control
+	 */
+	$this->setVar(array(
+		'MAKEADMIN_CURRENT_USER_ID' => $_SESSION['user']->getId(),
+		'MAKEADMIN_CURRENT_ADMIN_ID' => $category['owner'],
+		'MAKEADMIN_SUPER' => isset($_SESSION['su']) ? $_SESSION['su'] : 0
+	));
 
 } else
 	error(2);
