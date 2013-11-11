@@ -28,7 +28,7 @@ class Authenticator {
 	/**
 	 * A component instance
 	 *
-	 * @var null
+	 * @var Component_Instance
 	 */
 	private $instance = null;
 
@@ -85,8 +85,13 @@ class Authenticator {
 	 */
 	private function findConfigValue($key) {
 		foreach($this->getInstance()->getConfig() as $currentConfig) {
+			/** @var \Component_ConfigDefinition $currentConfig */
 			if ($currentConfig->getKey() == $key) {
-				return $currentConfig->getValue();
+				$value = $currentConfig->getValue();
+				if (!isset($value)) {
+					$value = $currentConfig->getDefaultValue();
+				}
+				return $value;
 			}
 		}
 	}
@@ -198,7 +203,7 @@ class Authenticator {
 	/**
 	 * Set instance
 	 *
-	 * @param $instance
+	 * @param Component_Instance $instance
 	 */
 	private function setInstance($instance) {
 		$this->instance = $instance;
@@ -207,7 +212,7 @@ class Authenticator {
 	/**
 	 * Get instance
 	 *
-	 * @return null
+	 * @return Component_Instance
 	 */
 	private function getInstance() {
 		return $this->instance;
