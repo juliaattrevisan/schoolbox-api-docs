@@ -17,6 +17,7 @@ class Plagscan_Gateway {
     const METHOD_SUBMIT = 'Submit';
     const METHOD_RETRIEVE = 'Retrieve';
     const METHOD_CHECK = 'Check';
+    const METHOD_DELETE = 'Delete';
 
     const MODE_RETRIEVE_STATISTICS_ONLY = 0;
 
@@ -136,6 +137,21 @@ class Plagscan_Gateway {
         ));
 
         if ( $this->createRequest($parameterList) ) {
+            $response = $this->parseXmlResponse($this->response);
+            return $response;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function delete($documentId) {
+        $parameterList = $this->createParameters(array(
+            'METHOD' => self::METHOD_CHECK,
+            'PID'    => $documentId,
+        ));
+
+        if ($this->createRequest($parameterList)) {
             $response = $this->parseXmlResponse($this->response);
             return $response;
         }
