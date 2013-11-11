@@ -416,7 +416,14 @@ class SitePage extends Page {
                 $this->setVar('sm_tab', '');
                 $this->setVar('dw_tab', '');
             }
-        }
+	}
+
+	$this->setBlock('tabTpl', 'parent_tab', 'p_tab');
+	if ($this->groupHandler->isParent()) {
+		$this->parse('p_tab', 'parent_tab');
+	} else {
+		$this->setVar('p_tab', '');
+	}
 
         //this section handles the display of the webmail tab
         // if configuration states mail is available and user has access to local mail account display it
