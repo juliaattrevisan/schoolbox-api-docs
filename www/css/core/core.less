@@ -10055,7 +10055,11 @@ form.comment-form label {
 @slanty-header-width: ~`@{slanty-header-width-raw} + 'px'`;
 @slanty-header-angle: ~`@{slanty-header-angle-raw} + 'deg'`;
 
-.mark-sheet input { width: 30px; }
+.mark-sheet input {
+	width: 30px;
+	font-size: 1em;
+	text-align: center;
+}
 
 
 .mark-sheet td{
@@ -10079,6 +10083,11 @@ form.comment-form label {
 			float: left;
 			margin-right: 6px;
 		}
+	}
+	&.class-avg a {
+		white-space: nowrap;
+		font-weight: normal;
+		color: inherit;
 	}
 }
 th.rotate {
