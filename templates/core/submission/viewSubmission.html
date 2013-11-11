@@ -17,11 +17,13 @@
             defaultText:'<span></span>Select marked work',
             defaultFileSelectedText:'<span></span>',
             callback:function (e) {
-                var css = {'visibility':'hidden'};
+                var btns = $j('#returnWorkForm').find('input.submit-btn-plain');
                 if ($j('.btn.tick').length) {
-                    css = {'visibility':'visible'};
+                  btns.removeAttr('disabled');
                 }
-                $j('#returnWorkForm').find('input.submit-btn-plain').css(css);
+                else {
+                  btns.attr('disabled', 'disabled');
+                }
             }
         });
 
@@ -94,7 +96,7 @@
                 <th></th>
                 <th></th>
                 <th>
-                    <input style="visibility:hidden;" id="upload-returns-submit-north" type="submit" class="submit-btn-plain up-arrow" value="Upload all"/>
+                    <input id="upload-returns-submit-north" type="submit" class="submit-btn-plain up-arrow" disabled="disabled" value="Upload all"/>
                 </th>
             </tr>
             </thead>
@@ -147,7 +149,7 @@
             <!-- END student_row -->
             <tr>
               <td colspan="3">
-                <input style="visibility:hidden;" id="upload-returns-submit-south" type="submit" class="submit-btn-plain up-arrow" value="Upload all"/>
+                <input id="upload-returns-submit-south" type="submit" class="submit-btn-plain up-arrow" disabled="disabled" value="Upload all"/>
               </td>
             </tr>
             </tbody>
