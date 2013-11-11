@@ -46,7 +46,7 @@
 				username: element.data('username'),
 				standardWarning: 'Promote ' + element.data('username') + ' to group admin?',
 				extraWarning: 'Promote ' + element.data('username') + ' to group admin?\n\nYou will lose your group admin privileges.',
-				url: ''
+				url: '/group/modifyForm.php?owner=' + element.data('userid') + '&categoryID=' + element.data('categoryid')
 			}
 
 			var merged = $j.extend(defaults, derived, options);
@@ -58,7 +58,6 @@
 		 * Change admin
 		 */
 		function changeAdmin() {
-			var url = '/group/modifyForm.php?owner=' + config.element.data('userid') + '&categoryID=' + config.element.data('categoryid');
 
 			/* If you are not the superuser, and you are changing ownership to someone
 			 * other than yourself, throw warning
@@ -66,7 +65,7 @@
 			if (!config.super) {
 				if (config.element.data('userid') != config.user) {
 					if (confirm(config.extraWarning)) {
-						window.location.href = url;
+						window.location.href = config.url;
 					}
 				}
 				/* A special case where you assign yourself to being the
@@ -74,7 +73,7 @@
 				 */
 				else {
 					if (confirm(config.standardWarning)) {
-						window.location.href = url;
+						window.location.href = config.url;
 					}
 				}
 			}
@@ -82,7 +81,7 @@
 			 */
 			else {
 				if (confirm(config.standardWarning)) {
-					window.location.href = url;
+					window.location.href = config.url;
 				}
 			}
 		}
