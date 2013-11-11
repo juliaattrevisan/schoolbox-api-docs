@@ -20,12 +20,13 @@
 				element: element,
 				timeLeft: 0
 			}
+			var mergedOptions = $j.extend({}, defaults, options);
 
 			var derived = {
-				endUrl: '/' + options.evaluationType + '/end/' + options.evaluationId
+				endUrl: '/' + mergedOptions.evaluationType + '/end/' + mergedOptions.evaluationId
 			}
 
-			var merged = $j.extend(defaults, derived, options);
+			var merged = $j.extend({}, defaults, derived, mergedOptions);
 			merged.timeLeft = parseInt(merged.timeLeft);
 
 			return merged;
