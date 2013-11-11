@@ -20,7 +20,11 @@ try {
     if ($samlResponse->isValid()) {
         $sessionHandler = new Session();
         if ($sessionHandler->create($samlResponse->getNameId())) {
-            SitePage::localRedir('/');
+            $page = '/';
+            if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'])) {
+                $page = $_GET['page'];
+            }
+            SitePage::localRedir($page);
         }
         else {
             echo 'Invalid SAML user.';

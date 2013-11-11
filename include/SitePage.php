@@ -874,9 +874,12 @@ class SitePage extends Page {
         // is SAML enabled?
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
-        $ssoUrl = Config::get('saml_sso_url');
-        if (!empty($ssoUrl) && $_GET['samlAuth'] !== '0') {
-            $this->localRedir('/saml/index.php');
+        if (strlen(Config::get('saml_sso_url')) && $_GET['samlAuth'] !== '0') {
+            $redirectUrl = '/saml/index.php';
+            if (isset($_GET['page'])) {
+                $redirectUrl .= '?page='.urlencode($_GET['page']);
+            }
+            $this->localRedir($redirectUrl);
         }
         else {
             $this->parseFooterMobileLink(TEMPLATE_body);
