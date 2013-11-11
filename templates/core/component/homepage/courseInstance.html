@@ -186,20 +186,6 @@
 
                 <!-- This is the form for inline creation of tasks -->
                 <div class="clear form_container for_task hide">
-                    <p>
-                        This task creates a task for a student to complete.
-                        This task can be marked off by a student, but you may set whether it requires
-                        that you confirm its completion.
-                    </p>
-                    <p>
-                        You may optionally add a link for a student to visit - the task will be marked
-                        as complete once the student visits that link. You can supply a link to an existing
-                        web page or file, upload a file from your computer for students to download, or select
-                        an existing homepage or file from the resource browser.
-                    </p>
-                    <p>
-                        (This task will not be added to the course that this unit is based off of - it will only exist on this instance of the unit.)
-                    </p>
                     <form action="/task/saveInstanceForm.php" method="post" data-form_type="task">
                         <input type="hidden" name="id" value=""/>
                         <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
