@@ -30,6 +30,8 @@ then
 	sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
 	echo "$vag Building css files via less";
 	/vagrant/tools/build-less-css.sh;
+	echo "$vag Installing git if not present (may be required for composer modules)";
+	apt-get -y install git
 	echo "$vag Installing vendor submodules with composer";
 	/vagrant/tools/composer.sh;
 	echo "$vag Building SQL updates";
