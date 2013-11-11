@@ -133,6 +133,7 @@ abstract class Evaluation_Main extends DeprecatedModel
            */
         $page->setVar('question_block', '');
 
+		$j = 0;
         for ($i = 0, $questionNumber = 1; $i < count($allQuestions); $i++) {
             $currentQuestion = $allQuestions[$i];
 
@@ -164,6 +165,7 @@ abstract class Evaluation_Main extends DeprecatedModel
             if ($currentQuestion['questionDeletedAt'] == null) {
                 if (is_numeric($currentQuestion['question_id'])) {
                     $page->setVar(array(
+						'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
                         'QUESTION_SEQUENCE' => $questionNumber,
                         'QUESTION_QUESTION' => $currentQuestion['question'],
                         'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],

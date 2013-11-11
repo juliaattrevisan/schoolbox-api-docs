@@ -135,6 +135,7 @@ else {
 	$allAttempts = $attemptHandler->getAllAttemptsForQuestion($question['question_id']);
 
 	if ($allAttempts) {
+		$j = 1;
 		foreach ($allAttempts as $currentAttempt) {
 
 			/* Load answer template into answerOption block
@@ -158,6 +159,7 @@ else {
 			$this->setVar('readonly_mark_block', '');
 
 			$this->setVar(array(
+				'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
 				'QUESTION_QUESTION_ID' => $currentAttempt['question_id'],
 				'QUESTION_SEQUENCE' => $currentAttempt['sequence'],
 				'QUESTION_QUESTION' => Scrub::html($currentAttempt['question']),

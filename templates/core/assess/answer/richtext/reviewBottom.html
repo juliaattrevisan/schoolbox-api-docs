@@ -1,29 +1,29 @@
-<li class='column'>
+<div class='column'>
 	<div class="answer-given-container wysiwyg">{ANSWER}</div>
 	<!-- BEGIN answerOption -->
 	<!-- END answerOption -->
-</li>
+</div>
 <!-- BEGIN writable_comment -->
-<li class='column'>
+<div class='column'>
     <div class="textarea-container">
-        <textarea name="comment">{REVIEWED_COMMENT}</textarea>
+        <textarea name="comment" cols="30" rows="2">{REVIEWED_COMMENT}</textarea>
     </div>
-</li>
+</div>
 <!-- END writable_comment -->
 <!-- BEGIN readonly_comment -->
-<li class='column'>
+<div class='column'>
     <div class="textarea-container">
         <p>{REVIEWED_COMMENT}</p>
     </div>
-</li>
+</div>
 <!-- END readonly_comment -->
-<li class='column'>
+<div class='column'>
 	<p class="marks-amount">
 		<!-- BEGIN writable_mark -->
-		<input name="reviewedMarks" type="text" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
+		<input name="reviewedMarks" type="text" size="4" value="{REVIEWED_MARKS}" class="required number"/> / {QUESTION_MARKS}
 		<!-- END writable_mark -->
 		<!-- BEGIN readonly_mark -->
 		{REVIEWED_MARKS} / {QUESTION_MARKS}
 		<!-- END readonly_mark -->
 	</p>
-</li>
+</div>

@@ -4,42 +4,23 @@
 <script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/javascript/evaluation/review.js"></script>
-<style>
-	form input[type=text] {
-		border: solid 1px #DBDBDB;
-	}
-
-	div.respondent-attempt {
-		border: 1px solid #0f0;
-		width: 100%;
-		float: left;
-		clear: both;
-	}
-
-	ul.respondent-attempt li.column {
-		width: 200px;
-		border: 1px solid #00f;
-		display: block;
-		float: left;
-	}
-</style>
 <!-- END custom_head -->
-<h1>Horizontal Marking for {ASSESS_TITLE}</h1>
+<h1>Horizontal Marking for {ASSESS_TITLE}<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'><span></span>Back to questions</a></h1>
 
-<div style='border:1px dashed #f00;'>
-	<div class="wysiwyg no-pad clearfix">
-		<h2><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}</h2>
+<div class="box">
+	<h2>Q{QUESTION_SEQUENCE})</h2>
+	<div class="wysiwyg">
+		{QUESTION_QUESTION}
+
 	</div>
 
-	<div style='border:1px dashed #f00;'>
-		<h3>Correct Answer</h3>
-		<!-- BEGIN answerInputsTop -->
-		<!-- END answerInputsTop -->
-	</div>
+	<h2>Correct Answer:</h2>
+	<!-- BEGIN answerInputsTop -->
+	<!-- END answerInputsTop -->
 
-	<div>
+	<div class="horizontal-marking-table">
 		<!-- BEGIN attempt -->
-		<div class='respondent-attempt'>
+
 			<script type='text/javascript'>
 				$j(function() {
 					$j('questionForm-{RESPONSE_ID}').evaluationResponseReview({
@@ -48,43 +29,34 @@
 				});
 			</script>
 
-			<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID} questionForm' method="post">
-				<ul class='respondent-attempt'>
-					<li class='column'>
+			<form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='respondent-attempt {ON_OFF} validation_{RESPONSE_ID} questionForm' method="post">
+					<div class='column student'>
 						<img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=square32'>
 						{USER_LASTNAME}, {USER_FIRSTNAME}
-					</li>
+					</div>
 
 					<!-- BEGIN answerInputs -->
 					<!-- END answerInputs -->
 
-					<li class='column'>
-						<!-- BEGIN writable_update -->
-						<input type="submit" value="Update Marks" class="submit-btn-plain float-right"/>
-						<!-- END writable_update -->
-					</li>
-				</ul>
+					<!-- BEGIN writable_update -->
+					<!-- END writable_update -->
 			</form>
-		</div>
 		<!-- END attempt -->
-
-		<p class="clearfix text-align-right">
-			<!-- BEGIN next_question -->
-			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'>Next</a>
-			<!-- END next_question -->
-
-			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}'>Index</a>
-
-			<!-- BEGIN previous_question -->
-			<a class='btn' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'>Previous</a>
-			<!-- END previous_question -->
-
-			<!-- BEGIN writable_finalise -->
-			<div class="assess-alert">
-				<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
-			</div>
-			<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise'>Finalise all attempts</a>
-			<!-- END writable_finalise -->
-		</p>
 	</div>
+	<p class="clearfix text-align-right">
+		<!-- BEGIN next_question -->
+		<a class='btn go-to' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{NEXT_ID}'><span></span>Next</a>
+		<!-- END next_question -->
+
+		<!-- BEGIN previous_question -->
+		<a class='btn go-back' href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{PREVIOUS_ID}'><span></span>Previous</a>
+		<!-- END previous_question -->
+
+		<!-- BEGIN writable_finalise -->
+		<div class="assess-alert">
+			<span>In order to finalise your review, please click the "Finalise Review" button at the bottom of the page.</span>
+		</div>
+		<a href='/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/finalise' class="submit-btn-plain float-right">Finalise all attempts</a>
+		<!-- END writable_finalise -->
+	</p>
 </div>
