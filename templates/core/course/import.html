@@ -79,9 +79,11 @@
                         <td>
                             <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
                             <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
-                            <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
-                            <label for="import-{UNIT_COUNT}">{UNIT_NAME}</label>
-                            (<a href="/homepage/{UNIT_ID}" class="unit_name">View</a>)
+                            <label for="import-{UNIT_COUNT}">
+								<input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
+								{UNIT_NAME}
+                            	(<a href="/homepage/{UNIT_ID}" class="unit_name">View</a>)
+							</label>
                             <input name="unit[{UNIT_COUNT}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
                         </td>
                         <td>
