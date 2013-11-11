@@ -6,7 +6,8 @@
         var defaults = {
             course_homepage: '',
             session_name:    '',
-            session_id:      ''
+            session_id:      '',
+            import_base_url: ''
         };
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
@@ -52,18 +53,18 @@
             }
         );
 
-        // Event for opening the import page.
+        // Event for opening the import page - tied to change event of input
+        // that gets changed by resource selector, instead of a button.
         component.delegate(
-            'a[data-interaction="import"]',
-            'click.courseInstance',
-            function(event) {
-                event.preventDefault();
-                var source = component.find('input[name="homepage"]').val().replace(/.*?(\d+$)/, '$1')
-                // What's the last char of the href? Add a / if there isn't one.
-                var base_href = $(this).attr('href').replace(/\/*$/, '');
-                window.location.href = base_href+'/'+source
+            'input[name="homepage"]',
+            'change.courseInstance',
+            function() {
+                var homepage_id = this.value.replace(/.*?(\d+$)/, '$1')
+                // Strip trailing / off of the import base URL
+                var base_href   = settings.import_base_url.replace(/\/*$/, '');
+                window.location.href = base_href+'/'+homepage_id;
             }
-        )
+        );
 
         // Expand/collapse of units
         component.delegate(

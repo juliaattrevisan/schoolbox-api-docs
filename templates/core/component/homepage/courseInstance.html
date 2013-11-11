@@ -15,7 +15,8 @@
                     $('#component{COMPONENT_INSTANCE_ID}').setupCourseInstance({
                         session_name:    '{SESSION_NAME}',
                         session_id:      '{SESSION_ID}',
-                        course_homepage: '{COURSE_HOMEPAGE}'
+                        course_homepage: '{COURSE_HOMEPAGE}',
+                        import_base_url: '/course/import/{ID}/{COMPONENT_INSTANCE_ID}/'
                     });
                 });
             })(jQuery);
@@ -23,13 +24,9 @@
 
         <!-- BEGIN course_selector -->
         <h3>Please select which course you would like to import to this homepage.</h3>
-        <!-- No form yet, as nothing has been saved. -->
         <input type="hidden" name="homepage" value="" />
         <span data-resource_text></span>
         <p class="interact add_buttons">
-            <a href="/course/import/{ID}/{COMPONENT_INSTANCE_ID}/" class="btn float-right translate" data-interaction="import">
-                <span></span>Import
-            </a>
             <a href="#" class="btn float-right up-arrow" data-interaction="homepage_selector">
                 <span></span>Select Source
             </a>
