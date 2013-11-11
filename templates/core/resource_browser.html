@@ -36,6 +36,11 @@
     $j('#destination').val($j('{DESTINATION}').val());
     $j('#select-resource').click(function(event) {
         event.preventDefault();
+
+        // In case the currently selected node was never clicked:
+        // trigger the select node event on it
+        $j('#tree tr.selected').trigger('selectNode.tree');
+
         // set the contents of the nominated field to the destination value, then bug out
         var v = $j('#destination').val();
         if(v.length > 0 && v.indexOf('homepage/') == -1) {

@@ -9,9 +9,17 @@ $j(function() {
         dragDrop : false
     });
 
-    /* load right panel file list */
-    $j('#tree tr:not(.server)').live('click', function () {
+    /**
+     * Click event for selecting a folder - triggers the actual select node event.
+     */
+    $j('#tree').delegate('tr:not(.server)', 'click.tree', function() {
+        $j(this).trigger('selectNode.tree');
+    });
 
+    /**
+     * Select node event
+     */
+    $j('#tree').delegate('tr:not(.server)', 'selectNode.tree', function() {
         /* select folder */
         $j('#tree .selected').removeClass('selected');
         $j(this).addClass('selected');
