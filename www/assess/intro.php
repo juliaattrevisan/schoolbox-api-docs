@@ -81,9 +81,19 @@ else {
 }
 
 /* Check if Attempt ran out of time
+ * If it did, give the student another attempt, if they have one.
  */
 if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
-    error(122);
+    // Close off the last attempt first (at the time it would have ended naturally)
+    $closeTime = new Alaress_Date_Format($attemptEndTime, 'U');
+    $attemptHandler->update(array(
+        'attempt_id' => $attempt['attempt_id'],
+        'finish'     => $closeTime->getDatabase(),
+    ));
+    $numAttempts++;
+    if (($assess['max_attempts'] > 0) && ($numAttempts > $assess['max_attempts'])) {
+        error(122);
+    }
 }
 
 /* Continue once you get past checks
