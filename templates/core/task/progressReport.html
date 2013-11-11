@@ -130,11 +130,11 @@
                     <form action="/task/progressForm.php" method="POST">
                         <input type="hidden" name="student_id" value="{STUDENT_ID}" />
                         <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
-                        <select name="status" data-interaction="update_progress">
+                        <input type="hidden" name="status" value="" />
+						<a href="#" class="btn ticks {STUDENT_UNIT_TASK_STATUS_TEXT} no-text" title="{STUDENT_UNIT_TASK_STATUS_TEXT}"><span></span></a>
                             <!-- BEGIN student_unit_task_check_status -->
-                            <option label="{STUDENT_UNIT_TASK_STATUS_TEXT}" value="{STUDENT_UNIT_TASK_STATUS_VALUE}" {STUDENT_UNIT_TASK_STATUS_SELECTED}>{STUDENT_UNIT_TASK_STATUS_TEXT}</option>
+                            <!-- {STUDENT_UNIT_TASK_STATUS_TEXT}" {STUDENT_UNIT_TASK_STATUS_VALUE} {STUDENT_UNIT_TASK_STATUS_SELECTED} -->
                             <!-- END student_unit_task_check_status -->
-                        </select>
                     </form>
                 <!-- END student_unit_task_check -->
 
