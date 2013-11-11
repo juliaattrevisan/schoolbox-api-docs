@@ -19,17 +19,22 @@ class External_Tass_Class implements External_ClassInterface {
 	}
 	
 	function getStudents($subCode) {
+        $classQuery = '';
 		if(stristr($subCode, ',')) {
 			$subCodeArray = explode(',',$subCode);
 			foreach($subCodeArray as $code) {
 				list($year,$code,$class) = explode('-',$code);
-				$classQuery .= " ( year_grp = '$year' AND studsub.sub_code = '$code' AND class = '$class' ) OR ";
+				$yearQuery = $year ?  "year_grp = '$year' AND" : '';
+
+				$classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND class = '$class' ) OR ";
 			}
 			$classQuery .= '1=0';
 		}
 		else {
 			list($year,$code,$class) = explode('-',$subCode);
-			$classQuery = " year_grp = '$year' AND studsub.sub_code = '$code' AND class = '$class' ";
+            $yearQuery = $year ?  "year_grp = '$year' AND" : '';
+
+			$classQuery = " $yearQuery studsub.sub_code = '$code' AND class = '$class' ";
 		}
 
 
@@ -47,18 +52,23 @@ class External_Tass_Class implements External_ClassInterface {
 	}
 	
 	function getTeacherName($subCode) {
-
+		$classQuery = '';
 		if(stristr($subCode, ',')) {
 			$subCodeArray = explode(',',$subCode);
 			foreach($subCodeArray as $code) {
-									list($year,$code,$class) = explode('-',$code);
-									$classQuery .= " ( year_grp = '$year' AND sub_code = '$code' AND class = '$class' ) OR ";
+				list($year,$code,$class) = explode('-',$code);
+                $yearQuery = $year ?  "year_grp = '$year' AND" : '';
+
+
+				$classQuery .= " ( $yearQuery sub_code = '$code' AND class = '$class' ) OR ";
 			}
 			$classQuery .= '1=0';
 		}
 		else {
 			list($year,$code,$class) = explode('-',$subCode);
-			$classQuery = " year_grp = '$year' AND sub_code = '$code' AND class = '$class' ";
+            $yearQuery = $year ?  "year_grp = '$year' AND" : '';
+
+			$classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
 		}
 
 
