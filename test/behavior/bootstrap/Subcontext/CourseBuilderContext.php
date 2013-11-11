@@ -123,7 +123,6 @@ class Subcontext_CourseBuilderContext extends BaseContext {
         $tree = $this->getSession()->getPage()->find('css', '#resource-browser');
         $this->getCoreContext()->traverseTree($tree, $course_path);
         $tree->findById('select-resource')->click();
-        $component->find('css', '[data-interaction="import"]')->click();
     }
 
     /**
