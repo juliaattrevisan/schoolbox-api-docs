@@ -426,8 +426,8 @@
 
             // safety check
             if(data.visibility) {
-              var svis = editForm.find('input.visibility.student');
-              var pvis = editForm.find('input.visibility.parent');
+              var svis = editForm.find('input[name=visibility\\[student\\]]');
+              var pvis = editForm.find('input[name=visibility\\[parent\\]]');
 
               if(data.visibility.student) {
                 svis.attr('checked', 'checked');
