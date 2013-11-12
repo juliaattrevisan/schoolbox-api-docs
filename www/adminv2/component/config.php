@@ -110,7 +110,6 @@ function writeConfig($vars) {
     $cdm = $ccdm->findByColumn('component_definition_id', $instance->getDefinitionId());
 
     $ccm = Component_ConfigMapper::getInstance();
-    $updated = 0;
 
     // Create a controller object for the config class to use when dehydrating
     // config values
@@ -125,7 +124,6 @@ function writeConfig($vars) {
         if (isset($vars[$key])) {
             $configItem = Component_Config_Factory::build($key, array(), $vars);
             $value = $configItem->dehydrate($vars[$key], $controller);
-            ++$updated;
 
             // this should be 1:1 relation, so return only the first instance of this definition
             /** @var Component_Config $confI */
@@ -147,8 +145,7 @@ function writeConfig($vars) {
 
         }
     }
-    die($updated ? "Configuration: $updated updated." : 'No configuration change.');
-
+    exit;
 }
 
 
