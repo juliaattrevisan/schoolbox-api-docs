@@ -8362,6 +8362,16 @@ input,select,textarea {
 		border-color: @link;
 		box-shadow: 0 0 3px @link;
 	}
+	&.ajax-response {
+		&.win {
+			border-color: darken(@positive-color, @darken-value);
+			box-shadow: 0 0 3px darken(@positive-color, @darken-value);
+		}
+		&.fail {
+			border-color: darken(@negative-color, @darken-value);
+			box-shadow: 0 0 3px darken(@negative-color, @darken-value);
+		}
+	}
 }
 
 #ui-datepicker-div {
