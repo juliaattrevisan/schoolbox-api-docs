@@ -104,24 +104,27 @@ function writeConfig($vars) {
     $cim = Component_InstanceMapper::getInstance();
 
     /** @var Component_Instance $instance */
-    $instance = $cim->findById($componentID);
+    $instance = reset($cim->findByInstanceId($componentID));
     $ccdm = Component_ConfigDefinitionMapper::getInstance();
 
     $cdm = $ccdm->findByColumn('component_definition_id', $instance->getDefinitionId());
 
-    // much as I hate exceptional cases, this is an exceptional case: remove the prepended '/homepage/'
-    if(isset($vars['src'])) {
-        preg_match("#[^0-9]*([0-9]*)#i", $vars['src'], $matches);
-        if($matches) {
-            $vars['src'] = $matches[1];
-        }
-    }
-
     $ccm = Component_ConfigMapper::getInstance();
     $updated = 0;
+
+    // Create a controller object for the config class to use when dehydrating
+    // config values
+    $cclass = $instance->getDefinition()->getClass();
+    /** @var Component_ControllerAbstract $controller */
+    $controller = new $cclass($instance, new \Schoolbox\User(), new SitePage());
+    $controller->execute();
+
     /** @var Component_ConfigDefinition $confD */
-    foreach($cdm as $confD) {
-        if(isset($vars[$confD->getKey()])) {
+    foreach ($cdm as $confD) {
+        $key = $confD->getKey();
+        if (isset($vars[$key])) {
+            $configItem = Component_Config_Factory::build($key, array(), $vars);
+            $value = $configItem->dehydrate($vars[$key], $controller);
             ++$updated;
 
             // this should be 1:1 relation, so return only the first instance of this definition
@@ -134,13 +137,13 @@ function writeConfig($vars) {
                 $confI = new Component_Config();
             }
 
-            printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $vars[$confD->getKey()]);
+            printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $key, $confI->getValue(), $value);
 
             if(!($confI->getId())) {
                 $confI->setConfigDefinitionId($confD->getId());
                 $confI->setInstanceId($instance->getId());
             }
-            $confI->setValue($vars[$confD->getKey()]);
+            $confI->setValue($value);
 
             $ccm->save($confI);
 
