@@ -68,7 +68,8 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
 	'user' => \Schoolbox\UserMapper::getInstance(),
 	'category' => \Schoolbox\Resource\CategoryMapper::getInstance(),
 	'sb' => SubmissionBoxMapper::getInstance(),
-	'oa' => OnlineAssessmentMapper::getInstance()
+	'oa' => OnlineAssessmentMapper::getInstance(),
+	'error' => DueWork_ErrorMapper::getInstance(),
 ), new \Schoolbox\ConfigLoader());
 
 

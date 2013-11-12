@@ -72,6 +72,8 @@ class Marksheet {
 	protected $oaMapper;
 	/** @var SubmissionBoxMapper */
 	protected $sbMapper;
+	/** @var \DueWork_ErrorMapper */
+	protected $errorMapper;
 
 	/** @var IConfigLoader */
 	protected $conf;
@@ -82,6 +84,8 @@ class Marksheet {
 	protected $statisticDataSet;
 	/** @var array */
 	protected $displayOrder;
+	/** @var Collection */
+	protected $errorList;
 
 	/** @var int */
 	protected $year;
@@ -124,6 +128,7 @@ class Marksheet {
 		$this->category = $this->categoryMapper->findById($categoryId);
 		$this->sessionUser = $this->userMapper->findById($sessionUserId);
 
+		$this->errorList = $this->errorMapper->findAll();
 	}
 
 	/**
@@ -341,21 +346,30 @@ class Marksheet {
 	}
 
 	protected function getSubmissionBoxMarkForStudent($boxId, $studentId) {
-		$box = $this->submissionHandler->getByID($boxId);
-		$marktype = $this->marktypeFactoryHandler->build($box['mark_type_slug']);
-		$mark = $marktype->retrieveMark($studentId, $boxId, false, true);
 
-		if(is_null($mark['norm_mark'])) {
-			$pretty = '&ndash;';
+		$rtn = $this->returnHandler->getByUser($studentId, $boxId, 1);
+
+		if(isset($rtn[0]['mark'])) {
+			$mark = array(
+				'mark' => $rtn[0]['mark'],
+				'norm_mark' => $rtn[0]['norm_mark']
+			);
 		}
 		else {
-			$pretty = $marktype->convertRawMark($mark['norm_mark'], $mark['max_mark'], true, false);
+			$mark = array('mark' => null, 'norm_mark' => null);
 		}
 
-		return array(
-			'norm_mark' => $mark['norm_mark'],
-			'mark' => $pretty,
-		);
+		if(is_null($mark['mark'])) {
+			$mark['mark'] = '&ndash;';
+		}
+		else {
+			$error = $this->errorList->getBy('displayAs', $mark['mark']);
+			if(!is_null($error)) {
+				$mark['mark'] = $error->getCode();
+			}
+		}
+
+		return $mark;
 	}
 
 
