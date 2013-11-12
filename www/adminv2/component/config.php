@@ -137,8 +137,6 @@ function writeConfig($vars) {
                 $confI = new Component_Config();
             }
 
-            printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $key, $confI->getValue(), $value);
-
             if(!($confI->getId())) {
                 $confI->setConfigDefinitionId($confD->getId());
                 $confI->setInstanceId($instance->getId());

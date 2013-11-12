@@ -175,8 +175,6 @@ if (is_numeric($_REQUEST['cid'])) {
                     $confI = new Component_Config();
                 }
 
-                printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $key, $confI->getValue(), $value);
-
                 if(!($confI->getId())) {
                     $confI = new Component_Config();
                     $confI->setConfigDefinitionId($confD->getId());
