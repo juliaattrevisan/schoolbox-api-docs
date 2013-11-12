@@ -69,12 +69,6 @@ class Authenticator {
     }
 
     public function appendSession($username) {
-        //
-        // Mobile not enabled? Just pretend we added the mobile portion of the session.
-        if (!Cfg::get('mobile_enabled')) {
-            return true;
-        }
-
         /**
          *
          * @var UserMapper $userMapper
