@@ -3,17 +3,19 @@
 <ul class="information-list">
 <!-- BEGIN user -->
 	<li>
+		<span class="actions">
+			<!-- BEGIN modify -->
+			<a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="btn modify no-text" title="Modify User"><span></span></a>
+			<!-- END modify -->
+		</span>
 		<a href="/search/user/{USER_SEARCH_ID}">
 		<img class="thumbnail" height="64" width="64" src="/portrait.php?userId={USER_SEARCH_SYNERGY_ID}&size=square64" alt="{USER_SEARCH_NAME}"/>
 		<h4>{USER_SEARCH_NAME}</h4>
 		</a>
 		<p class="meta">{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
 		{USER_SEARCH_EMAIL}
-		<!-- BEGIN modify -->
-		<a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="btn modify"><span></span>Modify User</a>
-		<!-- END modify -->
 		<!-- BEGIN user_calendar -->
-		<a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="btn calendar"><span></span>Calendar</a>
+		<a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="btn go-to"><span></span>Calendar</a>
 		<!-- END user_calendar -->
 		<!-- BEGIN boarder_leave -->
 		<a href="/modules/leave/student/{USER_SEARCH_ID}" class="btn eportfolio"><span></span>Boarder Leave History</a>
@@ -35,8 +37,8 @@
 <!-- END user -->
 </ul>
 <!-- BEGIN see_more -->
-<p class="interact">
-	<a id="user-more" class="btn more" rel="user" href="#"><span></span>See all {MORE_COUNT} results for People</a>
+<p>
+	<a id="user-more" class="float-left btn more" rel="user" href="#"><span></span>See all {MORE_COUNT} results for People</a>
 </p>
 <!-- END see_more -->
 <ul class="admin-nav foot">
