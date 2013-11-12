@@ -48,6 +48,12 @@ class DAV_File extends Sabre\DAV\File {
 
     public function put($data) {
         file_put_contents($this->getRealFilePath(),$data);
+        $this->getFileHandler()->update(
+            array(
+                'id'        => $this->getFileID(),
+                'file_size' => filesize($this->getRealFilePath()),
+            )
+        );
     }
 
     function getSize() {
