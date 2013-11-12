@@ -248,7 +248,7 @@ foreach ($student_list as $student) {
 
 
         // Get the completion status for this student.
-        $student_status = '-';
+        $student_status = '';
         foreach ($task->getCompletionList() as $completion) {
             if ($completion->getStudent()->getId() == $student['uid']) {
                 $student_status = $completion->getCompletionStatus();
