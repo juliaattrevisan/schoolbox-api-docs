@@ -8,6 +8,20 @@
  */
 class Component_Config_Src extends Component_Config_Abstract {
 
+    /**
+     * Strips /homepage/ prefix from $value if it's there.
+     *
+     * @param  array                        $value
+     * @param  Component_ControllerAbstract $controller
+     * @return string
+     */
+    public function dehydrate($value, Component_ControllerAbstract $controller) {
+        preg_match("#[^0-9]*([0-9]*)#i", $value, $matches);
+        if ($matches) {
+            $value = $matches[1];
+        }
+        return $value;
+    }
 
 //    protected $is_shown_on_template = false;
 
