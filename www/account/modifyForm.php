@@ -38,6 +38,7 @@ if (isset($_POST['current_password'])) {
 	}
 	else {
 		$userHandler->sendChangePasswordEmail($_SESSION['id']);
+        $_SESSION['password'] = $_POST['new_password'];
 	}
 
 	SitePage::localRedir('/account/modify/success');
