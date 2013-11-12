@@ -98,7 +98,6 @@ $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock('student', 'student_unit', 'student_unit_block');
 $this->setBlock('student_unit', 'student_unit_task', 'student_unit_task_block');
 $this->setBlock('student_unit_task', 'student_unit_task_check', 'student_unit_task_check_block');
-$this->setBlock('student_unit_task_check', 'student_unit_task_check_status', 'student_unit_task_check_status_block');
 $this->setBlock('student_unit_task', 'student_unit_task_submission_box', 'student_unit_task_submission_box_block');
 $this->setBlock('student_unit_task_submission_box', 'student_unit_task_submission_box_mark', 'student_unit_task_submission_box_mark_block');
 $this->setBlock('student_unit_task_submission_box', 'student_unit_task_submission_box_no_mark', 'student_unit_task_submission_box_no_mark_block');
@@ -264,7 +263,6 @@ foreach ($student_list as $student) {
                 'student_unit_task_check_block'           => '',
                 'student_unit_task_online_assess_block'   => '',
                 'student_unit_task_submission_box_block'  => '',
-                'student_unit_task_check_status_block'    => '',
             )
         );
         $box_id    = $task->getSubmissionBox()->getId();
@@ -330,16 +328,12 @@ foreach ($student_list as $student) {
             $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess');
         }
         else {
-            foreach ($status_list as $status => $label) {
-                $this->setVar(
-                    array(
-                        'STUDENT_UNIT_TASK_STATUS_TEXT'     => $label,
-                        'STUDENT_UNIT_TASK_STATUS_VALUE'    => $status,
-                        'STUDENT_UNIT_TASK_STATUS_SELECTED' => ($status == $student_status ? 'selected' : ''),
-                    )
-                );
-                $this->parse('student_unit_task_check_status_block', 'student_unit_task_check_status', true);
-            }
+            $this->setVar(
+                array(
+                    'STUDENT_UNIT_TASK_STATUS_TEXT'  => $status_list[$student_status],
+                    'STUDENT_UNIT_TASK_STATUS_VALUE' => $student_status,
+                )
+            );
             $this->parse('student_unit_task_check_block', 'student_unit_task_check', true);
         }
         $this->parse('student_unit_task_block', 'student_unit_task', true);
