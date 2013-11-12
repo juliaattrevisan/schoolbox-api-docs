@@ -248,7 +248,7 @@ foreach ($student_list as $student) {
 
 
         // Get the completion status for this student.
-        $student_status = '';
+        $student_status = Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE;
         foreach ($task->getCompletionList() as $completion) {
             if ($completion->getStudent()->getId() == $student['uid']) {
                 $student_status = $completion->getCompletionStatus();
@@ -258,11 +258,10 @@ foreach ($student_list as $student) {
 
         $this->setVar(
             array(
-                'STUDENT_UNIT_TASK_ID'                    => $task->getId(),
-                'STUDENT_UNIT_TASK_STATUS'                => $student_status,
-                'student_unit_task_check_block'           => '',
-                'student_unit_task_online_assess_block'   => '',
-                'student_unit_task_submission_box_block'  => '',
+                'STUDENT_UNIT_TASK_ID'                   => $task->getId(),
+                'student_unit_task_check_block'          => '',
+                'student_unit_task_online_assess_block'  => '',
+                'student_unit_task_submission_box_block' => '',
             )
         );
         $box_id    = $task->getSubmissionBox()->getId();
@@ -331,7 +330,8 @@ foreach ($student_list as $student) {
             $this->setVar(
                 array(
                     'STUDENT_UNIT_TASK_STATUS_TEXT'  => $status_list[$student_status],
-                    'STUDENT_UNIT_TASK_STATUS_VALUE' => $student_status,
+                    'STUDENT_UNIT_TASK_STATUS_CLASS' => strtolower($status_list[$student_status]),
+                    'STUDENT_UNIT_TASK_STATUS'       => $student_status,
                 )
             );
             $this->parse('student_unit_task_check_block', 'student_unit_task_check', true);
