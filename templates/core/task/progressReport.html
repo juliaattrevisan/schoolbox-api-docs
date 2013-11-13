@@ -38,16 +38,31 @@
             });
 
             // Save form for updating a student's progress
-            $('select[data-interaction="update_progress"]').bind('change', function(event) {
+            $('a[data-interaction="update_progress"]').bind('click', function(event){
+                event.preventDefault()
                 var element = $(this);
                 var form    = element.closest('form');
                 $.post(
                     form.attr('action'),
                     form.serialize(),
-                    function() {
+                    function(data) {
                         // Update something.
                         // I guess add the same class the update submission has.
-                        element.addClass('ajax-updated');
+                        element.removeClass('incomplete pending complete').addClass('ajax-updated');
+                        form.find('input[name="current_status"]').val(data.status);
+                        // Update name and class as well
+                        switch (data.status) {
+                            case 1: // incomplete
+                                element.addClass('incomplete').attr('title', 'Incomplete - click to update')
+                                break;
+                            case 2: // pending
+                                element.addClass('pending').attr('title', 'Pending - click to update')
+                                break;
+                            case 3: // complete
+                                element.addClass('complete').attr('title', 'Complete - click to update')
+                                break;
+                        }
+
                         setTimeout(function() {
                             element.removeClass('ajax-updated');
                         }, 1000)
@@ -130,41 +145,36 @@
                     <form action="/task/progressForm.php" method="POST">
                         <input type="hidden" name="student_id" value="{STUDENT_ID}" />
                         <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
-                        <select name="status" data-interaction="update_progress">
-                            <!-- BEGIN student_unit_task_check_status -->
-                            <option label="{STUDENT_UNIT_TASK_STATUS_TEXT}" value="{STUDENT_UNIT_TASK_STATUS_VALUE}" {STUDENT_UNIT_TASK_STATUS_SELECTED}>{STUDENT_UNIT_TASK_STATUS_TEXT}</option>
-                            <!-- END student_unit_task_check_status -->
-                        </select>
+                        <input type="hidden" name="current_status" value="{STUDENT_UNIT_TASK_STATUS}" />
+                        <a href="#"
+                           class="btn ticks {STUDENT_UNIT_TASK_STATUS_CLASS} no-text"
+                           title="{STUDENT_UNIT_TASK_STATUS_TEXT} - click to update"
+                           data-interaction="update_progress"
+                        ><span></span></a>
                     </form>
                 <!-- END student_unit_task_check -->
 
                 <!-- BEGIN student_unit_task_submission_box -->
                     <!-- BEGIN student_unit_task_submission_box_mark -->
-                        <span class="gradient-{STUDENT_UNIT_TASK_SUBMISSION_GRADIENT}">
-                            {STUDENT_UNIT_TASK_SUBMISSION_MARK}
-                        </span>
+                        <a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/"
+                           title="View submission history for this student"
+                           class="gradient-{STUDENT_UNIT_TASK_SUBMISSION_GRADIENT}"
+                        >{STUDENT_UNIT_TASK_SUBMISSION_MARK}</a>
                     <!-- END student_unit_task_submission_box_mark -->
                     <!-- BEGIN student_unit_task_submission_box_no_mark -->
-                        -
+                        &nbsp;
                     <!-- END student_unit_task_submission_box_no_mark -->
-                    <a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/"
-                       class="btn go-to no-text"
-                       title="View submission history for this student"
-                    ><span></span></a>
                 <!-- END student_unit_task_submission_box -->
 
                 <!-- BEGIN student_unit_task_online_assess -->
                     <!-- BEGIN student_unit_task_online_assess_mark -->
-                        <span class="gradient-{STUDENT_UNIT_TASK_ASSESS_GRADIENT}">
-                            {STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS} / {STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS}
-                        </span>
                         <a href="/assess/review/{STUDENT_UNIT_TASK_ASSESS_ID}/{STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID}/{STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID}/"
-                           class="btn go-to no-text"
+                           class="gradient-{STUDENT_UNIT_TASK_ASSESS_GRADIENT}"
                            title="Review assessment for this student"
-                        ><span></span></a>
+                        >{STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS} / {STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS}</a>
                     <!-- END student_unit_task_online_assess_mark -->
                     <!-- BEGIN student_unit_task_online_assess_no_mark -->
-                        -
+                        &nbsp;
                     <!-- END student_unit_task_online_assess_no_mark -->
                 <!-- END student_unit_task_online_assess -->
             </td>

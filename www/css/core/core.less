@@ -2013,6 +2013,31 @@ input.timeField {
 		float: none;
 		display: inline;
 	}
+	&.ticks {
+		-webkit-transition: border-color 0.2s linear;
+		transition: border-color 0.2s linear;
+		span {
+			background-image: url('/images/core/icons/ticks.png');
+		}
+		&.incomplete span {
+			background-position: 0 0;
+		}
+		&.incomplete:hover span {
+			background-position: 0 0;
+		}
+		&.pending span {
+			background-position: 0 -14px;
+		}
+		&.pending:hover span {
+			background-position: 0 -14px;
+		}
+		&.complete span {
+			background-position: 0 -28px;
+		}
+		&.complete:hover span {
+			background-position: 0 -28px;
+		}
+	}
 }
 
 .submit-btn-plain {
