@@ -74,6 +74,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         //due output
         $this->setBlock($templateHandle, 'duework', 'duework_block');
+        $this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
+        $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
         $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
 
 
@@ -98,16 +100,17 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         foreach ($this->submissionList as $submission) {
 
-	        // if the late date has passed, then don't display this item (to staff or students)
-	        if($submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
-		        continue;
-	        }
+            // if the late date has passed, then don't display this item (to staff or students)
+            // unless it's a task.
+            $is_task = $submission->getTask()->getId();
+            if (!$is_task && $submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
+                continue;
+            }
 
-	        $box_id = $submission->getId();
+            $box_id = $submission->getId();
             $dateHTML = $submission->getDueDate()->getDateOnly();
 
             /* Actions Block */
-            $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
 
             $actionURL = null;
 
@@ -167,6 +170,14 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             // if anybody else, don't display anything
             else {
                 $this->setVar('duework_actions_block', '');
+            }
+
+            // Show due date only if this is not a task.
+            if ($is_task) {
+                $this->setVar('duework_due_date_block', '');
+            }
+            else {
+                $this->parse('duework_due_date_block', 'duework_due_date');
             }
 
             if ($submission->getTask()->getId()) {
