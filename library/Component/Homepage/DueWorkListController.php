@@ -74,6 +74,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         //due output
         $this->setBlock($templateHandle, 'duework', 'duework_block');
+        $this->setBlock('duework', 'duework_result_link', 'duework_result_link_block');
         $this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
         $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
         $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
@@ -115,6 +116,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $actionURL = null;
 
             // what to display if student
+            $this->setVar('duework_result_link_block', '');
             if ($this->groupHandler->isStudent()) {
                 if ($isTask) {
                     $this->setVar('duework_actions_block', '');
@@ -167,6 +169,9 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
             // what to display if staff
             elseif ($this->groupHandler->isSuperuser() || $submission->getOwner()->getId() == $_SESSION['id']) {
+                if (!$isTask) {
+                    $this->parse('duework_result_link_block', 'duework_result_link');
+                }
                 $this->setVar('DUE_ACTION', '/submission/createSubmission/modify/'.$box_id);
                 $this->setVar('DUE_ACTION_NAME', 'Modify');
                 $this->setVar('DUE_ACTION_ICON', 'modify');

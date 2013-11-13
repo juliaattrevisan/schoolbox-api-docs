@@ -1,10 +1,13 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <h2>Due Work</h2>
-    {CONFIGURATION}
+	<h2>Due Work</h2>
+	{CONFIGURATION}
 	<ul class="information-list">
 		<!-- BEGIN duework -->
 		<li class="{ON_OFF}">
 			<span class="actions">
+			<!-- BEGIN duework_result_link -->
+				<a class="btn no-text go-to" href="/submission/viewSubmission/{DUE_ID}" title="View Results"><span></span></a>
+			<!-- END duework_result_link -->
 			<!-- BEGIN duework_actions -->
 				<a class="btn no-text {DUE_ACTION_ICON}" href="{DUE_ACTION}" title="{DUE_ACTION_NAME}"><span></span></a>
 			<!-- END duework_actions -->
@@ -24,8 +27,8 @@
 		<a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades"  class="btn"><span></span>Grades</a>
 		<!-- END allwork_button -->
 		<!-- BEGIN submit_dw -->
-        <a href="/submission/createSubmission/new/{ID}/" class="btn up-arrow"><span></span>Post Due Work</a>
-        <a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubric Criteria</a>
-        <!-- END submit_dw -->
-    </p>
+		<a href="/submission/createSubmission/new/{ID}/" class="btn up-arrow"><span></span>Post Due Work</a>
+		<a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubric Criteria</a>
+		<!-- END submit_dw -->
+	</p>
 </div>
