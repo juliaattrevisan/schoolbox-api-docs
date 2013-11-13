@@ -21,7 +21,7 @@ $studentRetHandler = new SubmissionReturn();
 $subBox = $submissionHandler->getByID($this->arg[0]);
 
 // if you aren't the owner or a super, you aren't allowed to be here
-if ($subBox['owner'] != $_SESSION['id'] && !$groupHandler->isSuperuser()) {
+if (!$groupHandler->isStaff()) {
     error(17);
 }
 
