@@ -134,6 +134,10 @@
 		 */
 		function initPostForm() {
 			config.addPostLink.live('click', function(e) {
+				// Does this have a post form already? If so, don't add it back
+				// after it gets removed.
+				var body = $j(this).closest('li').find('> .body');
+				var hasPostForm = (body.find('form.addPostForm').length > 0)
 
 				/* Clear out all instances of .addPostForm in the socialstream
 				 */
@@ -163,8 +167,9 @@
 
 				/* Send In The (singular) Clone
 				 */
-				$j(this).closest('li').find('> .body').append(clone);
-
+				if (!hasPostForm) {
+					body.append(clone);
+				}
 				e.preventDefault();
 			});
 		}
