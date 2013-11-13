@@ -129,7 +129,6 @@
         setTimeout(function() { self.removeClass('ajax-response win') }, 500);
       },
       error : function(xhr) {
-        console.log(xhr.responseText);
         self.addClass('ajax-response fail');
         self.attr('title', 'Value failed to save.')
         self.removeAttr('disabled');
