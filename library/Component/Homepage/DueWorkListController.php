@@ -217,11 +217,17 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $this->setVar("submit_dw_block", "");
         }
         else {
+
             $this->parse("submit_dw_block", "submit_dw");
         }
 
         // if the user is SOMEHOW involved in this category...
         $this->setVar('allwork_button_block', '');
+        $this->setVar(array(
+                'WORK_YEAR' => date('Y'),
+                'WORK_SEMESTER' => DueWork_All::getSemester()
+        ));
+
 
         if($this->groupHandler->isStudent()) {
 
@@ -233,10 +239,6 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             }
 
             if($catAccess || $subAccess ) {
-                $this->setVar(array(
-                    'WORK_YEAR' => date('Y'),
-                    'WORK_SEMESTER' => DueWork_All::getSemester()
-                ));
                 $this->parse('allwork_button_block', 'allwork_button');
             }
         }
