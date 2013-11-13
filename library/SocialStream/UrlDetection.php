@@ -34,6 +34,16 @@ class UrlDetection {
 	);
 
 	/**
+	 * Homepage used by the resource browser. First capturing match contains the
+	 * homepage ID or code. (Assume only IDs for now)
+	 *
+	 * @var array
+	 */
+	private $homepagePatterns = array(
+		'#^/homepage/(\d+)#',
+	);
+
+	/**
 	 * The url to analyse
 	 *
 	 * @var string
@@ -77,6 +87,36 @@ class UrlDetection {
 	}
 
 	/**
+	 * Gets the homepage ID or code out of the URL for this page.
+	 *
+	 * @return string
+	 */
+	public function getHomepageIdFromUrl() {
+		foreach ($this->getHomepagePatterns() as $pattern) {
+			if (preg_match($pattern, $this->getUrl(), $matches)) {
+				return $matches[1];
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Match $this->getUrl() against a pattern list (usually from
+	 * $this->get*Patterns())
+	 *
+	 * @param  array $patterns
+	 * @return bool
+	 */
+	protected function matchAgainstPatterns($patterns) {
+		foreach ($patterns as $pattern) {
+			if (preg_match($pattern, $this->getUrl())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Bypass caching for local urls
 	 *
 	 * @return bool
@@ -88,14 +128,10 @@ class UrlDetection {
 		 */
 		$allPatterns = array_merge(
 			$this->getStoragePatterns(),
-			$this->getResourcePatterns()
+			$this->getResourcePatterns(),
+			$this->getHomepagePatterns()
 		);
-
-		foreach($allPatterns as $currentPattern) {
-			if (preg_match($currentPattern, $this->getUrl())) {
-				return true;
-			}
-		}
+		return $this->matchAgainstPatterns($allPatterns);
 	}
 
 	/**
@@ -104,11 +140,7 @@ class UrlDetection {
 	 * @return bool
 	 */
 	public function isStorageUrl() {
-		foreach($this->getStoragePatterns() as $currentPattern) {
-			if (preg_match($currentPattern, $this->getUrl())) {
-				return true;
-			}
-		}
+		return $this->matchAgainstPatterns($this->getStoragePatterns());
 	}
 
 	/**
@@ -117,11 +149,16 @@ class UrlDetection {
 	 * @return bool
 	 */
 	public function isResourceUrl() {
-		foreach($this->getResourcePatterns() as $currentPattern) {
-			if (preg_match($currentPattern, $this->getUrl())) {
-				return true;
-			}
-		}
+		return $this->matchAgainstPatterns($this->getResourcePatterns());
+	}
+
+	/**
+	 * Bypass caching for local urls
+	 *
+	 * @return bool
+	 */
+	public function isHomepageUrl() {
+		return $this->matchAgainstPatterns($this->getHomepagePatterns());
 	}
 
 	/* Getters/Setters
@@ -143,6 +180,24 @@ class UrlDetection {
 	 */
 	public function getResourcePatterns() {
 		return $this->resourcePatterns;
+	}
+
+	/**
+	 * Set homepage patterns
+	 *
+	 * @param array $homepagePatterns
+	 */
+	private function setHomepagePatterns($homepagePatterns) {
+		$this->homepagePatterns = $homepagePatterns;
+	}
+
+	/**
+	 * Get homepage patterns
+	 *
+	 * @return array
+	 */
+	public function getHomepagePatterns() {
+		return $this->homepagePatterns;
 	}
 
 	/**
