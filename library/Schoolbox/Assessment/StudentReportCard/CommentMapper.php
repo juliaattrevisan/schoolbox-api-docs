@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\StudentReportCard;
 
 use Mailer;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
 use Schoolbox\External\SubjectMapper;
@@ -236,7 +237,8 @@ class CommentMapper extends Mapper {
 		$cfg = $this->getConfigLoader();
 
 		$href = sprintf("http://%s.%s/allWork/%s/%s/%s/%s",
-			$cfg->get('site_hostname'), $cfg->get('site_domain'), $student->getId(), 0, 0, $category->getId()
+			$cfg->get('site_hostname'), $cfg->get('site_domain'),
+			$student->getId(), date('Y'), date('m') > 6 ? 2 : 1, $category->getId()
 		);
 
 		// create emailzes
