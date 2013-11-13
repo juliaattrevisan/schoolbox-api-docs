@@ -16,6 +16,7 @@ $userHandler = new User();
 $groupHandler = new Group();
 $submissionHandler = new Submission();
 $studentSubHandler = new SubmissionStudent();
+$studentRetHandler = new SubmissionReturn();
 
 $subBox = $submissionHandler->getByID($this->arg[0]);
 
@@ -60,6 +61,31 @@ if (is_array($allSubmissions) && count($allSubmissions)) {
         );
     }
 }
+
+// list all students who have been marked
+$allReturns = $studentRetHandler->getByBoxID($this->arg[0]);
+if(is_array($allReturns)){
+    foreach ($allReturns as $return) {
+        $studentList[] = array(
+            'title' => $return['title'],
+            'firstname' => $return['firstname'],
+            'lastname' => $return['lastname'],
+            'uid' => $return['uid'],
+            'synergy_id' => $return['synergy_id'],
+            'type' => $return['type'],
+            'group_id' => $return['group_id'],
+        );
+    }
+}
+
+usort($studentList, function($a, $b){
+        $last = strcmp($a['lastname'], $b['lastname']);
+        if($last == 0) {
+           return strcmp($a['firstname'],$b['firstname']);
+        } else {
+            return $last;
+        }
+});
 
 $dueWorkDetail = new DueWork_Detail($submissionBoxID);
 $dueWorkDetail->processStudents($studentList);
