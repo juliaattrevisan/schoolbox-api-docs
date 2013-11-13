@@ -161,9 +161,9 @@
 				 */
 				clone.removeClass('hide');
 
-				/* Send In The Clones
+				/* Send In The (singular) Clone
 				 */
-				$j(this).closest('li').find('.body').append(clone);
+				$j(this).closest('li').find('> .body').append(clone);
 
 				e.preventDefault();
 			});
