@@ -226,13 +226,23 @@ class Scrub {
     }
 
     /**
-     * Cleans crap out of input using HTMLPurifier
+     * Cleans crap out of input using HTMLPurifier.
+     * Now caches previous calls in Redis!
      *
      * @param  $html
      *
      * @return mixed
      */
     static public function html($html) {
-        return self::getHtmlPurifierInstance()->purify($html);
+        $classname = get_called_class();
+        return Alaress\Redis::getInstance()->cacheFunctionCall(
+            'scrub.html',
+            function($param) use($classname) {
+                $purifier = call_user_func(array($classname, 'getHtmlPurifierInstance'));
+                return $purifier->purify($param);
+            },
+            $html,
+            60*60
+        );
     }
 }

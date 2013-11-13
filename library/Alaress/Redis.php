@@ -1,0 +1,120 @@
+<?php
+/**
+ * A singleton wrapper around a Predis instance.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2013, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Alaress;
+
+use Predis;
+
+class Redis {
+
+    /**
+     * @var static
+     */
+    protected static $instance;
+
+    /**
+     * @var Predis\ClientInterface
+     */
+    protected $client;
+
+    /**
+     * Gets singleton instance of this wrapper.
+     *
+     * @return static
+     */
+    public static function getInstance() {
+        if (!(static::$instance instanceof static)) {
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
+
+    /**
+     * Gets client within singleton instance.
+     *
+     * @return Predis\ClientInterface
+     */
+    public static function getClientInstance() {
+        return static::getInstance()->getClient();
+    }
+
+    /**
+     * Connects this wrapper to Redis.
+     *
+     * @see Predis\Client::__construct() for parameter documentation.
+     *
+     * @param  mixed $parameters
+     * @param  mixed $options
+     * @return $this
+     */
+    public function connect($parameters = null, $options = null) {
+        $this->setClient(new Predis\Client($parameters, $options));
+        return $this;
+    }
+
+    /**
+     * @return Predis\ClientInterface
+     */
+    public function getClient() {
+        return $this->client;
+    }
+
+    /**
+     * @param  Predis\ClientInterface $client
+     * @return $this
+     */
+    protected function setClient($client) {
+        $this->client = $client;
+        return $this;
+    }
+
+    /**
+     * Caches results of a function call in Redis.
+     *
+     * The result is stored in "$base_key:sha256(serialize($params))".
+     *
+     * @param string   $base_key The base of the key to store the result in.
+     * @param callable $callback A callable that returns a value to be cached,
+     *                           if there is no value already in the cache.
+     * @param mixed    $params   A parameter to pass to $callback. This is also
+     *                           used to generate the cache key.
+     * @param int      $timeout  Cache timeout (null for none)
+     *
+     * @return mixed
+     */
+    public function cacheFunctionCall($base_key, $callback, $params, $timeout = null) {
+        $redis = $this->getClient();
+        $key   = $base_key.':'.hash('sha256', serialize($params));
+
+        // Would use Redis hashes, but individual keys don't have expiry.
+        $is_result_called = false;
+        $result           = null;
+        try {
+            $result = $redis->get($key);
+            if (!isset($result)) {
+                $is_result_called = true;
+                $result           = call_user_func($callback, $params);
+                if ($timeout > 0) {
+                    $redis->setex($key, $timeout, $result);
+                }
+                else {
+                    $redis->set($key, $result);
+                }
+            }
+        }
+        catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
+            if (!$is_result_called) {
+                $result = call_user_func($callback, $params);
+            }
+        }
+        return $result;
+    }
+
+}
