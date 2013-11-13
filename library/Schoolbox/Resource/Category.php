@@ -78,7 +78,18 @@ class Category {
 		return $this->codes;
 	}
 
-	/**
+    /**
+     * Gets your category codes in a , seperated string
+     * @return string
+     */
+    public function getCodeString() {
+        foreach($this->codes as $code) {
+            $codeSet[] = $code->getCode();
+        }
+        return implode(',',$codeSet);
+    }
+
+    /**
 	 * @param  CategoryCode $code
 	 * @return $this
 	 */

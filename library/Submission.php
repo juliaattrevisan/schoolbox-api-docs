@@ -506,7 +506,8 @@ class Submission extends DeprecatedModel {
                 sb.name,
                 sb.description,
                 sb.created,
-                smt.slug
+                smt.slug,
+                sb.accept_submission
             FROM submission_box sb
             LEFT JOIN file_type ft ON sb.type = ft.id
             LEFT JOIN submission_mark_type smt ON sb.mark_type = smt.mark_type_id
@@ -529,7 +530,8 @@ class Submission extends DeprecatedModel {
                 '' AS late,
                 assess.title AS name,
                 assess.description AS description,
-                assess.created_at AS created
+                assess.created_at AS created,
+                assess.availability
             FROM assess
             LEFT JOIN file_type ON file_type.id = assess.type
             WHERE category_id = '$categoryID'
