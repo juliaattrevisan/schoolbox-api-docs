@@ -287,8 +287,7 @@ class CommentMapper extends Mapper {
 			$mail->setSubject(sprintf($subjectFormat, $pronoun, $comment->getCategory()->getName()));
 
 			// add recipient
-//			$mail->setTo($user->getEmail(), $user->formatName());
-			$mail->setTo('support@alaress.com.au', $user->formatName());
+			$mail->setTo($user->getEmail(), $user->formatName());
 
 			try {
 				Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
