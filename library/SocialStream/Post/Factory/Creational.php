@@ -14,6 +14,8 @@
 namespace SocialStream\Post\Factory;
 
 
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 use SocialStream\UrlDetection;
 
 class Creational extends AbstractFactory {
@@ -79,6 +81,13 @@ class Creational extends AbstractFactory {
 				 */
 				$this->spawnMetadataFromResource($resource);
 				$this->spawnThumbnailFromResource($resource);
+			}
+			// Homepage URLs: load the link from the website
+			elseif ($this->getUrlDetection()->isHomepageUrl()) {
+				$homepage = $this->constructFromHomepage($this->getUrl());
+				$this->populate($data);
+				$this->spawnMetadataFromHomepage($homepage);
+				$this->spawnThumbnailFromHomepage($homepage);
 			}
 			/* When a Storage url is provided, manufacture metadata and thumbnail
 			 * as if they had been uploaded
@@ -243,6 +252,20 @@ class Creational extends AbstractFactory {
 		$this->setProduct($object);
 
 		return $file;
+	}
+
+	/**
+	 * Construct a post from a homepage URL
+	 *
+	 * @param  string $url
+	 * @return Category
+	 */
+	private function constructFromHomepage($url) {
+		$object = new \SocialStream_Post_Url();
+		$object->setType('url');
+		$this->setProduct($object);
+		$homepageId = $this->getUrlDetection()->getHomepageIdFromUrl();
+		return CategoryMapper::getInstance()->findById($homepageId);
 	}
 
 	/**
@@ -428,6 +451,31 @@ class Creational extends AbstractFactory {
 //
 //		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
 //		$this->getProduct()->setThumbnail($chain->getResult());
+	}
+
+
+	/**
+	 * Get the title and description out of the homepage.
+	 *
+	 * @param Category $homepage
+	 */
+	private function spawnMetadataFromHomepage($homepage) {
+		$this->getProduct()->setExternalTitle($homepage->getName());
+		$this->getProduct()->setExternalBody('');
+	}
+
+	/**
+	 * A homepage's icon will be a homepage icon, or a folder if it's not a
+	 * visitable homepage.
+	 *
+	 * @param Category $homepage
+	 */
+	private function spawnThumbnailFromHomepage($homepage) {
+		$thumbnailUrl = 'icon:folder.png';
+		if ($homepage->getHomepage()->getTemplate()->getId()) {
+			$thumbnailUrl = 'icon:home.png';
+		}
+		$this->getProduct()->setThumbnail($thumbnailUrl);
 	}
 
 	/* Getters/Setters
