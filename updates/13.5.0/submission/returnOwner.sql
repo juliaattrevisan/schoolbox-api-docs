@@ -1,0 +1,1 @@
+ALTER TABLE `submission_return` ADD COLUMN `marker` INT UNSIGNED NOT NULL AFTER `box_id`;
