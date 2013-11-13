@@ -8,6 +8,26 @@
  */
 class Component_Config_Filter extends Component_Config_Abstract {
 
+    /**
+     * Converts value from an array into a bitmask which represents the selected
+     * fields.
+     *
+     * @param  array                        $value
+     * @param  Component_ControllerAbstract $controller
+     * @return int
+     */
+    public function dehydrate($value, Component_ControllerAbstract $controller) {
+        $return = 0;
+        $fieldList = $controller->getFilterFields();
+        if (is_array($fieldList)) {
+            foreach ($fieldList as $i => $field) {
+                $add = !empty($value[$field]) ? 1 : 0;
+                $return += $add * pow(2, $i);
+            }
+        }
+        return $return;
+    }
+
     public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 
         $filter = array();

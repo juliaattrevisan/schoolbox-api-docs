@@ -150,33 +150,20 @@ if (is_numeric($_REQUEST['cid'])) {
 
         unset($config['cid'], $config['type'], $config['component']);
 
-        // much as I hate exceptional cases, there are exceptional cases...
-
-        //remove the prepended '/homepage/'
-        if(isset($config['src'])) {
-            preg_match("#[^0-9]*([0-9]*)#i", $config['src'], $matches);
-            if($matches) {
-                $config['src'] = $matches[1];
-            }
-        }
-        // prepare filter value
-        if(isset($config['filter'])) {
-            // retrieve the instance so we know how to insert this data
-            $cclass = $instance->getDefinition()->getClass();
-            $controller = new $cclass($instance, new \Schoolbox\User(), $page);
-            $controller->execute();
-            $fields = $controller->getFilterFields();
-            $val = 0;
-            for($i = 0; $i < count($fields); $i++) {
-                $add = isset($config['filter'][$fields[$i]]) && $config['filter'][$fields[$i]] ? 1 : 0;
-                $val += $add * pow(2, $i);
-            }
-            $config['filter'] = $val;
-        }
+        // Create a controller object for the config class to use when
+        // dehydrating config values into database
+        $cclass = $instance->getDefinition()->getClass();
+        /** @var Component_ControllerAbstract $controller */
+        $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+        $controller->execute();
 
         /** @var Component_ConfigDefinition $confD */
-        foreach($configDefinitionCollection as $confD) {
-            if(isset($config[$confD->getKey()])) {
+        foreach ($configDefinitionCollection as $confD) {
+            $key = $confD->getKey();
+            if (isset($config[$key])) {
+
+                $configItem = Component_Config_Factory::build($key, $category, $config);
+                $value = $configItem->dehydrate($config[$key], $controller);
 
                 // this should be 1:1 relation, so return only the first instance of this definition
                 /** @var Component_Config $confI */
@@ -188,14 +175,12 @@ if (is_numeric($_REQUEST['cid'])) {
                     $confI = new Component_Config();
                 }
 
-                printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $config[$confD->getKey()]);
-
                 if(!($confI->getId())) {
                     $confI = new Component_Config();
                     $confI->setConfigDefinitionId($confD->getId());
                     $confI->setInstanceId($instance->getId());
                 }
-                $confI->setValue($config[$confD->getKey()]);
+                $confI->setValue($value);
 
                 $componentConfigInstanceMapper->save($confI);
 

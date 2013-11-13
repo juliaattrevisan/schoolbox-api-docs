@@ -47,6 +47,17 @@ abstract class Component_Config_Abstract {
     }
 
     /**
+     * Converts value from a form into a value that can be stored in a database.
+     *
+     * @param  mixed                        $value
+     * @param  Component_ControllerAbstract $controller
+     * @return mixed
+     */
+    public function dehydrate($value, Component_ControllerAbstract $controller) {
+        return $value;
+    }
+
+    /**
      * Is this config option shown on templates?
      *
      * @return bool
