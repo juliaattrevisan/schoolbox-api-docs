@@ -379,27 +379,20 @@ $j(document).ready(function() {
       <div class="loading"></div>
 
       <table id="file-head" class="table">
-        <col width="60%" />
-        <col width="40%" />
       	<thead>
           <th>Name</th>
-          <th>Modified</th>
         </thead>
       </table>
 
       <div class="scroller">
       <table id="file-list" class="table">
       	<col width="60%" />
-        <col width="40%" />
 
         <tbody>
           <!-- BEGIN file_list -->
           <tr id="{TYPE}-{FILE_ID}" class="category-{FOLDER_ID}">
 							<td>
 								<span class="file {CLASS}">{FILE_NAME}</span>
-							</td>
-							<td>
-								{FILE_MODIFIED}
 							</td>
           </tr>
           <!-- END file_list -->
