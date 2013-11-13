@@ -96,7 +96,8 @@ class Redis {
         $is_result_called = false;
         $result           = null;
         try {
-            if (!($redis->exists($key))) {
+            $result = $redis->get($key);
+            if (!isset($result)) {
                 $is_result_called = true;
                 $result           = call_user_func($callback, $params);
                 if ($timeout > 0) {
@@ -105,9 +106,6 @@ class Redis {
                 else {
                     $redis->set($key, $result);
                 }
-            }
-            else {
-                $result = $redis->get($key);
             }
         }
         catch (Predis\PredisException $e) {
