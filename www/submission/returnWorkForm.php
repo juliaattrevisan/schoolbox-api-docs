@@ -48,6 +48,7 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
             $result = $returnHandler->getByUser($_POST['uid'][$k], $_POST['box_id'], 1);
             $return = array(
                 'box_id'    => $_POST['box_id'],
+                'marker'    => $_SESSION['id'],
                 'owner'     => $_POST['uid'][$k],
                 'comment'   => $_POST['comment'][$k],
                 'mark'      => (!empty($result[0]) ? $result[0]['mark']      : null),
@@ -91,6 +92,7 @@ elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
 
     $return = array(
         'box_id'    => $_POST['box_id'],
+        'marker'    => $_SESSION['id'],
         'owner'     => $_POST['uid'],
         'mark'      => $mark['mark'],
         'norm_mark' => $mark['norm_mark']
@@ -152,6 +154,7 @@ function saveReturn($return, $rubric = null, $file = null) {
     $returned_work
         ->setComment($return['comment'])
         ->setMark($return['mark'])
+        ->setMarker($_SESSION['user'])
         ->setNormalizedMark($return['norm_mark'])
     ;
     // Is there a file? If so, upload it.

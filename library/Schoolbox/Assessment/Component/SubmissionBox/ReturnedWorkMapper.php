@@ -36,6 +36,12 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_MODEL,
 			'join'       => 'owner',
 		));
+        $this->hasMap(array(
+            'column'     => 'marker',
+            'property'   => 'marker',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'marker',
+        ));
 		$this->hasMap(array(
 			'column'     => 'comment',
 			'property'   => 'comment',
@@ -84,6 +90,12 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'this_key'  => 'owner',
 			'other_key' => 'id',
 		));
+        $this->hasJoin('marker', array(
+            'mapper'    => '\\Schoolbox\\UserMapper',
+            'this_key'  => 'marker',
+            'other_key' => 'id',
+        ));
+
 		/* Relation to Allowed Files
 		 */
 		$hydrator = new Schoolbox\Column\Model();

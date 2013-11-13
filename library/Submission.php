@@ -581,10 +581,7 @@ class Submission extends DeprecatedModel {
     }
 
     /**
-     * Note the empty string for Availability for the first half of the Union
-     * This is to keep the column count matching for the second half of the
-     * Union (this is the only way to determine whether an Evaluation record is
-     * an Assess or a Survey)
+     * Simplified this query so we can use it just to find out what categories a user has submission boxes in
      *
      * @param  $userID
      * @return array|bool
@@ -611,26 +608,12 @@ class Submission extends DeprecatedModel {
                     submission_box.name,
                     submission_box.description,
                     submission_box.accept_submission,
-                    category.id AS catid,
-                    GROUP_CONCAT(co.code) code,
-                    category.name AS category_name,
-                    DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date,
-                    UNIX_TIMESTAMP(date) AS date_stamp,
-                    submission_box.date AS due_date,
-                    DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
-                    UNIX_TIMESTAMP(submission_box.open_date) AS open_date_stamp,
-                    submission_box.type AS type_id,
-                    file_type.name AS type,
-                    '' as availability
-                FROM (category, submission_box )
-                LEFT JOIN file_type ON submission_box.type = file_type.id
-                LEFT JOIN categoryCode co ON co.categoryID = category.id
-                WHERE category.id = submission_box.category
-                AND submission_box.owner = '$userID'
+                    submission_box.category catid
+                FROM submission_box
+                WHERE submission_box.owner = '$userID'
                 AND submission_box.deleted = '0'
                 AND submission_box.task_id IS NULL
                 $dateConditionA
-                GROUP BY submission_box.id, category.id
             )
             UNION
             (
@@ -639,28 +622,15 @@ class Submission extends DeprecatedModel {
                     assess.title,
                     assess.description,
                     true AS accept_submission,
-                    assess.category_id AS catid,
-                    '' AS code,
-                    category.name AS name,
-                    DATE_FORMAT(assess.finish, '%a, %D %b %l:%i%p') AS date,
-                    UNIX_TIMESTAMP(assess.finish) AS date_stamp,
-                    assess.finish as due_date,
-                    DATE_FORMAT(assess.start, '%a, %D %b %l:%i%p') AS open_date,
-                    UNIX_TIMESTAMP(assess.start) AS open_date_stamp,
-                    file_type.id AS type_id,
-                    file_type.name AS type,
-                    assess.availability
+                    assess.category_id AS catid
                 FROM assess
-                LEFT JOIN file_type ON file_type.id = assess.type
-                LEFT JOIN category ON assess.category_id = category.id
-                WHERE category.id = assess.category_id
-                AND assess.deleted_at IS NULL
+                WHERE assess.deleted_at IS NULL
                 AND assess.task_id IS NULL
                 AND assess.availability = 'assess'
                 AND assess.user_id = '$userID'
                 $dateConditionB
             )
-            ORDER BY catid, due_date DESC";
+            ORDER BY catid DESC";
 
         return $this->db->getAll($query);
     }

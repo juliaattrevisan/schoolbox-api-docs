@@ -340,7 +340,7 @@ if (count($submission_history)) {
 	        $history['HISTORY_RETURN_FILE_ID']   = $activity_item->getReturnedWork()->getId();
 	        $history['HISTORY_RETURN_FILE_NAME'] = Scrub::text($activity_item->getReturnedWork()->getFilename());
 
-	        $owner = $activity_item->getSubmissionBox()->getOwner()->getId();
+	        $owner = $activity_item->getReturnedWork()->getMarker()->getId();
         }
         // otherwise extension
         else {

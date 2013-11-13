@@ -12,6 +12,7 @@ $this->setTab('submission');
 $subHandler = new Submission;
 $rubricHandler = new DueWork_Rubric_Handler();
 $userHandler = new User;
+$groupHandler = new Group;
 
 if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 
@@ -19,8 +20,8 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
     $user = $userHandler->getByID($this->arg[1]);
     // $subReturn = $subReturnHandler->getOneByUser($this->arg[1], $this->arg[0]);
 
-    // Check user owners box they are returning to
-    if($subbox['owner'] != $_SESSION['id']) {
+    // Allow all staff to mark work
+    if(!$groupHandler->isStaff()) {
         error(25);
     }
 
