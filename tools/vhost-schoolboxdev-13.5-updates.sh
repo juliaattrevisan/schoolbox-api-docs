@@ -149,7 +149,7 @@ do
 			exit 1;
 		else
 			head -n `expr $tline - 1` $tfile > $tempfile;
-			echo "        php_value session.gc_maxlifetime 360" >> $tempfile;
+			echo "        php_value session.gc_maxlifetime 3600" >> $tempfile;
 			echo "        php_value session.save_handler redis" >> $tempfile;
 			echo "        php_value session.save_path \"tcp://127.0.0.1:6379\"" >> $tempfile;
 			echo "        php_value newrelic.appname \"Schoolbox Dev\"" >> $tempfile;
