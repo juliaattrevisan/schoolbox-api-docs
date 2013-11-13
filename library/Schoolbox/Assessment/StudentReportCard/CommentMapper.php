@@ -243,15 +243,15 @@ class CommentMapper extends Mapper {
 		$mail = Swift_Message::newInstance();
 
 		// set sender
-		$mail->setFrom($comment->getCommenter()->getEmail(), $comment->getCommenter()->formatName());
+		$mail->setFrom($commenter->getEmail(), $commenter->formatName());
 
 		$plainBody = sprintf('%s commented in %s.'."<br/>\n",
-			$comment->getCommenter()->formatName(),
-			$comment->getCategory()->getName()
+			$commenter->formatName(),
+			$category->getName()
 		);
 
 		$plainBody .= sprintf('%s wrote: "%s"'."<br/>\n",
-			$comment->getCommenter()->formatName('{firstname}'),
+			$commenter->formatName('{firstname}'),
 			$comment->getBody()
 		);
 
@@ -284,7 +284,7 @@ class CommentMapper extends Mapper {
 				$pronoun = $student->formatName("{firstname} {lastname}'s");
 			}
 
-			$mail->setSubject(sprintf($subjectFormat, $pronoun, $comment->getCategory()->getName()));
+			$mail->setSubject(sprintf($subjectFormat, $pronoun, $category->getName()));
 
 			// add recipient
 			$mail->setTo($user->getEmail(), $user->formatName());
