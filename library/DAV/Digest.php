@@ -16,8 +16,11 @@ class DAV_Digest extends Sabre\DAV\Auth\Backend\AbstractDigest {
 
     public function authenticate(Sabre\DAV\Server $server, $realm) {
         if (parent::authenticate($server, $realm)) {
-            $session = new Session();
-            $session->create($this->getCurrentUser());
+            session_start();
+            if ($_SESSION['user'] instanceof Schoolbox\User) {
+                $session = new Session();
+                $session->create($this->getCurrentUser());
+            }
             return true;
         }
 
