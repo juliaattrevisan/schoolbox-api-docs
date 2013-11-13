@@ -14,6 +14,8 @@
 namespace SocialStream\Post\Factory;
 
 
+use SocialStream\UrlDetection;
+
 class Creational extends AbstractFactory {
 
 	/**
@@ -27,7 +29,7 @@ class Creational extends AbstractFactory {
 	/**
 	 * The object that was produced by the factory
 	 *
-	 * @var null
+	 * @var \SocialStream_Post_Abstract
 	 */
 	private $product = null;
 
@@ -35,7 +37,7 @@ class Creational extends AbstractFactory {
 	 * This class knows how to figure out which urls
 	 * are Storage and Resource ones
 	 *
-	 * @var null
+	 * @var UrlDetection
 	 */
 	private $urlDetection = null;
 
@@ -48,7 +50,7 @@ class Creational extends AbstractFactory {
 	public function __construct($type, $url) {
 		$this->setType($type);
 		$this->setUrl(trim($url));
-		$this->setUrlDetection(new \SocialStream\UrlDetection($url));
+		$this->setUrlDetection(new UrlDetection($url));
 	}
 
 	/**
@@ -189,6 +191,9 @@ class Creational extends AbstractFactory {
 
 	/**
 	 * Construct a post from a link by doing mimetype analysis
+	 *
+	 * @param  \Schoolbox\Storage $resource
+	 * @return \Schoolbox\Storage
 	 */
 	private function constructFromUpload($resource) {
 
@@ -214,7 +219,7 @@ class Creational extends AbstractFactory {
 	 * Construct a post from an already-uploaded resource
 	 *
 	 * @param $url
-	 * @return object
+	 * @return \Schoolbox\Resource\File
 	 */
 	private function constructFromResource($url) {
 		$bits = parse_url($url);
@@ -385,7 +390,7 @@ class Creational extends AbstractFactory {
 	 *
 	 * Force an icon representation instead
 	 *
-	 * @param $file
+	 * @param \Schoolbox\Resource\File $file
 	 */
 	private function spawnThumbnailFromResource($file) {
 
@@ -402,7 +407,7 @@ class Creational extends AbstractFactory {
 			$this->getProduct()->setUrl($url);
 
 			/* Save the original in the cache location
- 			 */
+			 */
 			$cache = new \SocialStream\Cache\Original();
 			$cache->init($url);
 		}
@@ -449,7 +454,7 @@ class Creational extends AbstractFactory {
 	/**
 	 * Set product
 	 *
-	 * @param null $product
+	 * @param \SocialStream_Post_Abstract $product
 	 */
 	private function setProduct($product) {
 		$this->product = $product;
@@ -458,7 +463,7 @@ class Creational extends AbstractFactory {
 	/**
 	 * Get product
 	 *
-	 * @return null
+	 * @return \SocialStream_Post_Abstract
 	 */
 	private function getProduct() {
 		return $this->product;
@@ -467,7 +472,7 @@ class Creational extends AbstractFactory {
 	/**
 	 * Set url detection
 	 *
-	 * @param null $urlDetection
+	 * @param UrlDetection $urlDetection
 	 */
 	private function setUrlDetection($urlDetection) {
 		$this->urlDetection = $urlDetection;
@@ -476,7 +481,7 @@ class Creational extends AbstractFactory {
 	/**
 	 * Get url detection
 	 *
-	 * @return null
+	 * @return UrlDetection
 	 */
 	private function getUrlDetection() {
 		return $this->urlDetection;
