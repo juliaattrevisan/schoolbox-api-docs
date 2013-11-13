@@ -10,6 +10,15 @@ class SubmissionReturn extends DeprecatedModel {
         parent::DeprecatedModel();
     }
 
+    function getByBoxID($box_id) {
+        $query = "SELECT r.*,user.title, user.firstname, user.lastname, user.id AS uid, username,
+                         local_email, alt_email
+                         FROM ( `".$this->_table."` r,  user)
+				  WHERE r.deleted = 0 AND user.id = r.owner AND box_id = ".$this->db->smartQuote($box_id)."
+				  ORDER BY lastname, firstname DESC ";
+        return $this->db->getAll($query);
+    }
+
 	function getOneByUser($user_id, $box_id = 0) {
 		$query = "SELECT r.*, c.name categoryName, s.name, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
 				  WHERE r.deleted = 0 AND r.box_id = s.id AND s.category = c.id AND r.owner = '$user_id'";
