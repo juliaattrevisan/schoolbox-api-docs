@@ -74,8 +74,10 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         //due output
         $this->setBlock($templateHandle, 'duework', 'duework_block');
+        $this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
+        $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
         $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
-
+        $this->setBlock($templateHandle, "submit_dw", "submit_dw_block");
 
         $j = 0;
 
@@ -98,63 +100,69 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         foreach ($this->submissionList as $submission) {
 
-	        // if the late date has passed, then don't display this item (to staff or students)
-	        if($submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
-		        continue;
-	        }
+            // if the late date has passed, then don't display this item (to staff or students)
+            // unless it's a task.
+            $isTask = $submission->getTask()->getId();
+            if (!$isTask && $submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
+                continue;
+            }
 
-	        $box_id = $submission->getId();
+            $box_id = $submission->getId();
             $dateHTML = $submission->getDueDate()->getDateOnly();
 
             /* Actions Block */
-            $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
 
             $actionURL = null;
 
             // what to display if student
             if ($this->groupHandler->isStudent()) {
-                $actionURL = '/submission/submissionHistory/' . $box_id .'/'. $_SESSION['id'];
-
-                // if a mark has been given, regardless of all other detail, display "View Mark"
-                if (!empty($return_counts[$box_id])) {
-                    $this->setVar('DUE_ACTION_NAME', 'View Mark');
-                    $this->setVar('DUE_ACTION_ICON', 'go-to');
+                if ($isTask) {
+                    $this->setVar('duework_actions_block', '');
                 }
-                // no mark has been given
                 else {
-                    // if dueWork is accepting submissions
-                    if ($submission->getAcceptOnline()) {
-                        // if something has been submitted
-                        if (!empty($submission_counts[$box_id])) {
-                            $this->setVar('DUE_ACTION_NAME', 'Awaiting Mark');
-                            $this->setVar('DUE_ACTION_ICON', 'go-to');
-                        }
-                        // nothing has been submitted
-                        else {
-                            // if the submission box is open
-                            // (Check submission number)
-                            if ($time->getDateTimeObject() > $submission->getOpenDate()->getDateTimeObject()
-                                && $time->getDateTimeObject() < $submission->getLateDate()->getDateTimeObject()
-                            ) {
-                                $this->setVar('DUE_ACTION_NAME', 'Submit Work');
-                                $this->setVar('DUE_ACTION_ICON', 'go-to');
-                            }
-                            // if submission box is closed
-                            else {
-                                $this->setVar('DUE_ACTION_NAME', 'View Details');
-                                $this->setVar('DUE_ACTION_ICON', 'go-to');
-                            }
-                        }
-                    }
-                    // dueWork not accepting submissions
-                    else {
-                        $this->setVar('DUE_ACTION_NAME', 'View Details');
+                    $actionURL = '/submission/submissionHistory/' . $box_id .'/'. $_SESSION['id'];
+
+                    // if a mark has been given, regardless of all other detail, display "View Mark"
+                    if (!empty($return_counts[$box_id])) {
+                        $this->setVar('DUE_ACTION_NAME', 'View Mark');
                         $this->setVar('DUE_ACTION_ICON', 'go-to');
                     }
-                }
+                    // no mark has been given
+                    else {
+                        // if dueWork is accepting submissions
+                        if ($submission->getAcceptOnline()) {
+                            // if something has been submitted
+                            if (!empty($submission_counts[$box_id])) {
+                                $this->setVar('DUE_ACTION_NAME', 'Awaiting Mark');
+                                $this->setVar('DUE_ACTION_ICON', 'go-to');
+                            }
+                            // nothing has been submitted
+                            else {
+                                // if the submission box is open
+                                // (Check submission number)
+                                if ($time->getDateTimeObject() > $submission->getOpenDate()->getDateTimeObject()
+                                    && $time->getDateTimeObject() < $submission->getLateDate()->getDateTimeObject()
+                                ) {
+                                    $this->setVar('DUE_ACTION_NAME', 'Submit Work');
+                                    $this->setVar('DUE_ACTION_ICON', 'go-to');
+                                }
+                                // if submission box is closed
+                                else {
+                                    $this->setVar('DUE_ACTION_NAME', 'View Details');
+                                    $this->setVar('DUE_ACTION_ICON', 'go-to');
+                                }
+                            }
+                        }
+                        // dueWork not accepting submissions
+                        else {
+                            $this->setVar('DUE_ACTION_NAME', 'View Details');
+                            $this->setVar('DUE_ACTION_ICON', 'go-to');
+                        }
+                    }
 
-                $this->setVar('DUE_ACTION', $actionURL);
-                $this->parse('duework_actions_block', 'duework_actions');
+                    $this->setVar('DUE_ACTION', $actionURL);
+                    $this->parse('duework_actions_block', 'duework_actions');
+                }
             }
 
             // what to display if staff
@@ -167,6 +175,14 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             // if anybody else, don't display anything
             else {
                 $this->setVar('duework_actions_block', '');
+            }
+
+            // Show due date only if this is not a task.
+            if ($isTask) {
+                $this->setVar('duework_due_date_block', '');
+            }
+            else {
+                $this->parse('duework_due_date_block', 'duework_due_date');
             }
 
             if ($submission->getTask()->getId()) {
@@ -192,11 +208,12 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         }
 
         //setup block for submission button
-        $this->setBlock($templateHandle, "submit_dw", "submit_dw_block");
-        if($this->permission < WRITE_ACCESS)
+        if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_dw_block", "");
-        else
+        }
+        else {
             $this->parse("submit_dw_block", "submit_dw");
+        }
 
         // if the user is SOMEHOW involved in this category...
         $this->setVar('allwork_button_block', '');
