@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\StudentReportCard;
 
+use Mailer;
 use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
 use Schoolbox\External\SubjectMapper;
@@ -18,6 +19,9 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Swift_Mailer;
+use Swift_Message;
+use Swift_SwiftException;
 
 class CommentMapper extends Mapper {
 
@@ -222,30 +226,82 @@ class CommentMapper extends Mapper {
 		/** @var $comment Comment */
 		$comment = CommentMapper::getInstance()->findById($comment->getId());
 
+		// extract elements we'll be using
+		$commenter = $comment->getCommenter();
+		$student = $comment->getStudent();
+		$category = $comment->getCategory();
 
-		// right now, this method just logs the emails that WOULD be sent, until we're confident it works as expected
-		if($fp = fopen('/tmp/mails.log', 'a')) {
+		$subjectFormat = 'Comment on %s grades in %s';
 
-			$userCollection = $this->findAllUsersWhoCanView($comment);
+		$cfg = $this->getConfigLoader();
 
-			fputs($fp, sprintf("On %s, %s commented in %s: '%s'\n",
-				$comment->getRelevantDate()->getDateTimeObject()->format('r'),
-				$comment->getCommenter()->formatName(),
-				$comment->getCategory()->getName(),
-				$comment->getBody()
-			));
+		$href = sprintf("http://%s.%s/allWork/%s/%s/%s/%s",
+			$cfg->get('site_hostname'), $cfg->get('site_domain'), $student->getId(), 0, 0, $category->getId()
+		);
 
-			foreach($userCollection as $user) {
-				/** @var $user User  */
+		// create emailzes
+		$mail = Swift_Message::newInstance();
+
+		// set sender
+		$mail->setFrom($comment->getCommenter()->getEmail(), $comment->getCommenter()->formatName());
+
+		$plainBody = sprintf('%s commented in %s.'."<br/>\n",
+			$comment->getCommenter()->formatName(),
+			$comment->getCategory()->getName()
+		);
+
+		$plainBody .= sprintf('%s wrote: "%s"'."<br/>\n",
+			$comment->getCommenter()->formatName('{firstname}'),
+			$comment->getBody()
+		);
+
+		// they're the same up to this point
+		$htmlBody = nl2br($plainBody);
+
+		// and now they diverge
+		$plainBody .= sprintf("Visit %s to view the conversation.\n", $href);
+		$htmlBody  .= sprintf('<a href="%s">View the conversation</a>'."<br/>\n", $href);
+
+		// add bodyparts
+		$mail->setBody($plainBody, 'text/plain', 'utf-8');
+		$mail->addPart($htmlBody,  'text/html',  'utf-8');
+
+		$recipients = $this->findAllUsersWhoCanView($comment);
+
+		foreach($recipients as $user) {
+			/** @var $user User  */
+			if($user->getId() == $commenter->getId()) {
 				// exclude the sender!
-				if($user->getId() == $comment->getCommenter()->getId()) {
-					continue;
-				}
-				fputs($fp, sprintf(" + Sent to '%s' <%s>\n", $user->formatName(), $user->getEmail()));
+				continue;
 			}
-			fputs($fp, "\n");
-			fclose($fp);
+
+			// if this email is being sent to the student
+			if($user->getId() == $student->getId()) {
+				$pronoun = 'your';
+			}
+			// otherwise it's being sent to a parent or teacher
+			else {
+				$pronoun = $student->formatName("{firstname} {lastname}'s");
+			}
+
+			$mail->setSubject(sprintf($subjectFormat, $pronoun, $comment->getCategory()->getName()));
+
+			// add recipient
+//			$mail->setTo($user->getEmail(), $user->formatName());
+			$mail->setTo('support@alaress.com.au', $user->formatName());
+
+			try {
+				Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
+			}
+			catch (Swift_SwiftException $e) {
+				// log this
+				Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send(
+					Swift_Message::newInstance('Comment mail error', $e->getMessage() . "\n\n" . print_r($e->getTrace(), true), 'text/plain', 'utf-8')->addTo('matt.day+commentmail@alaress.com.au', 'Debug')
+				);
+			}
+
 		}
+
 	}
 
 	/**
