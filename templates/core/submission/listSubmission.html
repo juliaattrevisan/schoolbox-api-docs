@@ -17,24 +17,9 @@ $j(function(){
 </script>
 <!-- END custom_head -->
 <h1>Student Submissions</h1>
-<form action="/submission/listSubmission" method="GET" class="fade">
-<span>
-    <label for="sem">Semester</label>
-    <select id="sem" name="semester">
-        <!-- BEGIN semester_option -->
-        <option{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
-        <!-- END semester_option -->
-    </select>
-    <label for="yr">,</label>
-    <select id="yr" name="year">
-        <!-- BEGIN year_option -->
-        <option{YEAR_SELECTED}>{YEAR_VALUE}</option>
-        <!-- END year_option -->
-    </select>
-</span>
-    <input type="submit" class="btn" value="Update"/>
-</form>
-
+<div id="list-submission-context">
+  {CONTEXT_SELECTOR}
+</div>
 <div class="indent">
         <!-- BEGIN category_listing -->
     <table class="ruler table">
