@@ -1,0 +1,45 @@
+<!-- BEGIN semester_context -->
+<form class="context ctx-semesters">
+  <a class="sem-back" href="/{PAGE_HREF}/{SEMESTER_BACK}">&lsaquo;</a>
+  <select id="semester">
+    <!-- BEGIN semester_option -->
+    <option value="{SEMESTER_SLUG}" {SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
+    <!-- END semester_option -->
+  </select>
+  <a class="sem-fwd" href="/{PAGE_HREF}/{SEMESTER_FWD}">&rsaquo;</a>
+</form>
+<!-- END semester_context -->
+<!-- BEGIN subject_context -->
+<form class="context ctx-subjects">
+  <span class="elbow">&#9492;</span>
+  <select id="enrolled-subjects">
+    <option disabled="disabled" selected="selected">Select a subject</option>
+    <!-- BEGIN subject_option -->
+    <option data-id="{SUBJECT_ID}" title="{SUBJECT_CODE}" value="{SUBJECT_HREF}" {SUBJECT_SELECTED}>{SUBJECT_NAME}</option>
+    <!-- END subject_option -->
+  </select>
+</form>
+<!-- END subject_context -->
+<script type="text/javascript">
+  $j(function() {
+
+    // bind changes to semester selector
+    $j('#semester').bind('change', function() {
+      var url = $j(this).val();
+      if(url) {
+        window.location = '/{PAGE_HREF}/' + url;
+      }
+      return false;
+    });
+
+    // bind changes to subject selector
+    $j('#enrolled-subjects').bind('change', function () {
+      var url = $j(this).val();
+      if (url) {
+        window.location = '/{PAGE_HREF}/' + url;
+      }
+      return false;
+    });
+
+  });
+</script>

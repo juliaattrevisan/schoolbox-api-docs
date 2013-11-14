@@ -6761,6 +6761,57 @@ table.subjectList {
 /* ---------------------------
     submission/viewSubmission
 --------------------------- */
+
+form.context {
+  height: 36px;
+  line-height: 36px;
+  text-align: right;
+
+  select {
+    padding: 5px;
+  }
+  option {
+    line-height: 20px;
+  }
+
+  .sem-back, .sem-fwd {
+    border: solid 1px #ccc;
+    color: #555;
+    padding: 1px 8px 5px;
+    font-size: 1.6em;
+
+    &:hover {
+      background: #eee;
+      text-decoration: none;
+    }
+  }
+  .elbow {
+    position: absolute;
+    right: 74%;
+    font-size: 1.5em;
+    color: #777;
+    line-height: 2em;
+    display: none;
+  }
+
+  &.ctx-semesters {
+    select {
+      width: 75%;
+    }
+    + form.ctx-subjects {
+      select {
+        width: 65%;
+        position: absolute;
+        right: 28px;
+      }
+      .elbow {
+        display: inline;
+      }
+    }
+  }
+
+}
+
 .view-submission {
     ul {
         list-style-type: disc;
@@ -8312,51 +8363,11 @@ td.name {
 }*/
 
 /* submission/listSubmission */
-.fade {
-    color: @secondary-text;
-    padding-left: 1em;
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: inline;
-    font-size: 18px; /* why we can't use 1em I don't know... */
-    font-weight: bold;
-    select {
-        font-size: 1em;
-        font-weight: bold;
-        color: @secondary-text;
-        background: transparent;
-        border: none;
-    }
-    span {
-        margin-right: 85px;
-        label {
-            display: inline;
-        }
-    }
-    .btn {
-        position:absolute;
-        top: 0;
-        right: 0;
-        padding: 0 16px;
-        line-height: 28px;
-        height: 28px;
-        margin-top: 0;
-    }
-	&.enrolled-subjects {
-		position: static;
-		padding-left: 0;
-	}
-}
-
-.header_option .fade {
-    position: static;
-    .btn {
-        position: static;
-    }
-    span {
-        margin-right: 0;
-    }
+#list-submission-context {
+  position: absolute;
+  width: 300px;
+  top: -5px;
+  right: 0;
 }
 
 /* submission/dueWork */
