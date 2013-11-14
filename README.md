@@ -6,7 +6,6 @@ This file is internal use and is not shipped to clients.
 
 ## Directory and Structure
 
-* app - mobile site application
 * dav - WebDav site for exporting the Schoolbox resources
 * debian - APT package building definitions (not deployed to clients)
 * include
@@ -22,9 +21,7 @@ This file is internal use and is not shipped to clients.
 
 ## Installation
 
-TBC
-
-### By Package
+Deployed using packages with Puppet
 
 Installing from the package will place the following directories in new locations.
 This is to follow the standard packaging process linux distributions use for web applications.
@@ -35,7 +32,6 @@ This is to follow the standard packaging process linux distributions use for web
 * client side conf.php to be located in /etc/schoolbox
 
 /usr/share/schoolbox
-* app
 * dav
 * include
 * library
@@ -49,15 +45,3 @@ This is to follow the standard packaging process linux distributions use for web
 /var/lib/schoolbox
 * replaces previous data folder
 * directory structure auto created on install/update by tools/create-data-dirs.sh
-
-### By Script
-
-TBC
-
-## Packaging
-
-TBC
-
-## Development Process
-
-TBCz
