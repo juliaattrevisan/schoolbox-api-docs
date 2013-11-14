@@ -18,12 +18,9 @@ $submissionHandler = new Submission();
 $studentSubHandler = new SubmissionStudent();
 $studentRetHandler = new SubmissionReturn();
 
-$subBox = $submissionHandler->getByID($this->arg[0]);
 
-// if you aren't the owner or a super, you aren't allowed to be here
-if (!$groupHandler->isStaff()) {
-    error(17);
-}
+$subBox = $submissionHandler->getByID($this->arg[0]);
+$studentRetHandler->securityCheck($this->arg[0]);
 
 // we log the viewing of this page, I know not why
 $submissionHandler->logPageView(3, $this->arg[0]);

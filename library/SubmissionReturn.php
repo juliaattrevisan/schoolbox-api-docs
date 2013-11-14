@@ -291,12 +291,22 @@ class SubmissionReturn extends DeprecatedModel {
         return strtoupper($rtn);
     }
 
-    function securityCheck($box_id, $sid)
+    function securityCheck($box_id)
     {
-        /* All staff can update marks now for more relaxed security */
-
         $groupHandler = new Group();
-        if(!$groupHandler->isStaff()) {
+
+        /* All staff can update marks now for more relaxed security */
+        $query = "SELECT category FROM submission_box WHERE id = '$box_id'";
+        $cid = $this->db->getOne($query);
+
+        if($cid) {
+            if($groupHandler->getPermission($cid) >= WRITE_ACCESS)
+                return true;
+            else
+                error(25);
+        }
+        else {
+            //Submission box does not exist
             error(25);
         }
     }
