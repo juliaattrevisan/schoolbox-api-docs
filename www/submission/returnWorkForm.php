@@ -35,7 +35,7 @@ if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) 
 // inline upload of files
 elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] == 'false') {
     if(is_array($_POST['uid'])) {
-        $returnHandler->securityCheck($_POST['box_id'], 0);
+        $returnHandler->securityCheck($_POST['box_id']);
         $allowedFileHandler = new AllowedFile;
         $subbox = $subHandler->getByID($_POST['box_id']);
         $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
@@ -48,6 +48,7 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
             $result = $returnHandler->getByUser($_POST['uid'][$k], $_POST['box_id'], 1);
             $return = array(
                 'box_id'    => $_POST['box_id'],
+                'marker'    => $_SESSION['id'],
                 'owner'     => $_POST['uid'][$k],
                 'comment'   => $_POST['comment'][$k],
                 'mark'      => (!empty($result[0]) ? $result[0]['mark']      : null),
@@ -83,7 +84,7 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
 // posting from returnWork
 // test that the rubric is given
 elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
-    $returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
+    $returnHandler->securityCheck($_POST['box_id']);
 
     $subbox = $subHandler->getByID($_POST['box_id']);
     $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
@@ -91,6 +92,7 @@ elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
 
     $return = array(
         'box_id'    => $_POST['box_id'],
+        'marker'    => $_SESSION['id'],
         'owner'     => $_POST['uid'],
         'mark'      => $mark['mark'],
         'norm_mark' => $mark['norm_mark']
@@ -152,6 +154,7 @@ function saveReturn($return, $rubric = null, $file = null) {
     $returned_work
         ->setComment($return['comment'])
         ->setMark($return['mark'])
+        ->setMarker($_SESSION['user'])
         ->setNormalizedMark($return['norm_mark'])
     ;
     // Is there a file? If so, upload it.

@@ -53,6 +53,7 @@ $this->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
 $this->setVar('SEM_SLUG', $semesterSlug);
 
 $submissionHandler = new Submission();
+$groupHandler = new Group();
 
 // Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
 $semesters = array(1, 2);
@@ -74,7 +75,44 @@ for ($y = $currentYear; $y > $currentYear - 6; --$y) {
     $this->parse('year_option_block', 'year_option', true);
 }
 
-$subList = $submissionHandler->getAllForUser($_SESSION['id'], $year, $semester);
+
+/* Use provided ID, or check for the subjects the user is involved with */
+if(isset($this->arg[2]) && is_numeric($this->arg[2])){
+    $subjectList[] = $this->arg[2];
+}
+else {
+    $involvedIn = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
+    if(is_array($involvedIn)) {
+        foreach($involvedIn as $subject) {
+            $subjectList[] = $subject['id'];
+        }
+    }
+
+    /* Merge in all the rest that are not related to the user by folder but by owner
+       note i am using an older function for a simple task that is why it does more than it should */
+    $allUserBoxes = $submissionHandler->getAllForUser($_SESSION['id'], $year, $semester);
+    if(is_array($allUserBoxes)) {
+        foreach($allUserBoxes as $box) {
+            $subjectList[] = $box['catid'];
+        }
+    }
+
+    $subjectList = array_unique($subjectList);
+}
+
+
+
+$subList = array();
+foreach($subjectList as $subject) {
+    $assessments = $submissionHandler->getAllForUserCategory($subject, 0, $year, $semester);
+    if(is_array($assessments)) {
+        $subList = array_merge($subList, $assessments);
+    }
+}
+
+
+
+
 
 $attemptHandler = new Assess_Attempt();
 $groupHandler = new Group();
@@ -87,29 +125,31 @@ if (is_array($subList)) {
     $i = 0;
 
     foreach ($subList as $sub) {
-        if ($prevCat['catid'] != $sub['catid'] && $prevCat['catid'] != '') {
+        if ($prevCat['category'] != $sub['category'] && $prevCat['category'] != '') {
+            $curCategory = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($prevCat['category']);
+            /* @param  \Schoolbox\Resource\Category $curCategory
 
             /* Get full student list of class to show those who have not submitted
                 */
-            if ($prevCat['code'] && Cfg::get('external_enable')) {
+            if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
                 /* If synergy code, get synergy students
                      */
-                $studentList = $synHandler->getStudents($prevCat['code']);
+                $studentList = $synHandler->getStudents($curCategory->getCodeString());
             } else {
                 /* Retrieve student list from group membership
                      */
-                $studentList = $groupHandler->getMemberList($prevCat['catid']);
+                $studentList = $groupHandler->getMemberList($curCategory->getId());
             }
 
             $this->setVar('STUDENTS', count($studentList));
 
-            if ($prevCat['code'] != "") {
-                $this->setVar('CATEGORY', Scrub::text($prevCat['category_name']) . " (" . $prevCat['code'] . ")");
+            if (count($curCategory->getCodes()) > 0) {
+                $this->setVar('CATEGORY', Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
             } else {
-                $this->setVar('CATEGORY', Scrub::text($prevCat['category_name']));
+                $this->setVar('CATEGORY', Scrub::text($curCategory->getName()));
             }
 
-            $this->setVar('CATEGORY_ID', $prevCat['catid']);
+            $this->setVar('CATEGORY_ID', $curCategory->getId());
             $this->parse('category_block', 'category_listing', true);
             $this->setVar('submission_block', '');
 
@@ -118,10 +158,10 @@ if (is_array($subList)) {
 
         $totals = $submissionHandler->getBoxCount($sub['id']);
 
-        $readonly = !($groupHandler->isSuperuser() || date('Y', strtotime($sub['due_date'])) >= date('Y'));
+        $readonly = !($groupHandler->isSuperuser() || date('Y',$sub['date']) >= date('Y'));
 
-        $openADF = new Alaress_Date_Format($sub['open_date_stamp'], 'U');
-        $closeADF = new Alaress_Date_Format($sub['date_stamp'], 'U');
+        $openADF = new Alaress_Date_Format($sub['open'], 'U');
+        $closeADF = new Alaress_Date_Format($sub['date'], 'U');
         $formatDateOnly = 'D, jS M Y';
         $formatDateTime = $formatDateOnly . ' g:ia';
 
@@ -139,11 +179,11 @@ if (is_array($subList)) {
             $closeString = $closeADF->getUsingFormat($formatDateTime);
         }
 
-        if (($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) && ($sub['availability'] == 'assess')) {
+        if (($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) /*&& ($sub['availability'] == 'assess')*/) {
             $this->setVar(array(
                 'ASSESS_ASSESS_ID' => $sub['id'],
                 'ASSESS_TITLE' => Scrub::text($sub['name']),
-                'ASSESS_TYPE' => $sub['type'],
+                'ASSESS_TYPE' => $sub['typeName'],
                 'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
                 'ASSESS_START' => $openString,
                 'ASSESS_FINISH' => $closeString,
@@ -153,7 +193,6 @@ if (is_array($subList)) {
             ));
 
             $this->setVar('normalSubmission_block', '');
-
             if ($readonly) {
                 $this->parse('readonly_assess_block', 'readonly_assess');
                 $this->setVar('writable_assess_block', '');
@@ -177,7 +216,7 @@ if (is_array($subList)) {
             $this->setVar(array(
                 'ID' => $sub['id'],
                 'ASSDESC' => Scrub::text($sub['name']),
-                'TYPE' => $sub['type'],
+                'TYPE' => $sub['typeName'],
                 'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
                 'OPENDATE' => $sub['accept_submission'] ? $openString : '',
                 'DUEDATE' => $closeString,
@@ -219,25 +258,26 @@ if (is_array($subList)) {
 
     /* Get full student list of class to show those who have not submitted
       */
-    if ($prevCat['code'] && Cfg::get('external_enable')) {
+    $curCategory = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($prevCat['category']);
+    if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
         /* If synergy code, get synergy students
            */
-        $studentList = $synHandler->getStudents($prevCat['code']);
+        $studentList = $synHandler->getStudents($curCategory->getCodeString());
     } else {
         /* Retrieve student list from group membership
            */
-        $studentList = $groupHandler->getMemberList($prevCat['catid']);
+        $studentList = $groupHandler->getMemberList($curCategory->getId());
     }
 
     $this->setVar('STUDENTS', count($studentList));
 
-    if ($prevCat['code'] != "") {
-        $this->setVar("CATEGORY", Scrub::text($prevCat['category_name']) . " (" . $prevCat['code'] . ")");
+    if (count($curCategory->getCodes()) > 0) {
+        $this->setVar("CATEGORY", Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
     } else {
-        $this->setVar("CATEGORY", Scrub::text($prevCat['category_name']));
+        $this->setVar("CATEGORY", Scrub::text($curCategory->getName()));
     }
 
-    $this->setVar('CATEGORY_ID', $prevCat['catid']);
+    $this->setVar('CATEGORY_ID', $prevCat['category']);
 
     $this->parse("category_block", "category_listing", true);
 } else {

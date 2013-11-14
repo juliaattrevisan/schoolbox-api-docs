@@ -291,22 +291,24 @@ class SubmissionReturn extends DeprecatedModel {
         return strtoupper($rtn);
     }
 
-    function securityCheck($box_id, $sid)
+    function securityCheck($box_id)
     {
-        //check if person returning work is actual owner of the submission box
+        $groupHandler = new Group();
 
-        $query = "SELECT owner FROM submission_box WHERE id = '$box_id' AND owner = '".$_SESSION['id']."'";
-        if(!is_array($this->db->getRow($query)))
+        /* All staff can update marks now for more relaxed security */
+        $query = "SELECT category FROM submission_box WHERE id = '$box_id'";
+        $cid = $this->db->getOne($query);
+
+        if($cid) {
+            if($groupHandler->getPermission($cid) >= WRITE_ACCESS)
+                return true;
+            else
+                error(25);
+        }
+        else {
+            //Submission box does not exist
             error(25);
-
-
-        /* Removed cause you can mark work with out having a student submission and you can also update a mark
-        //check work exist
-        /*
-        $query = "SELECT marked FROM student_submission WHERE box_id = '$box_id' AND owner = '$sid' AND marked = 0";
-        if(!is_array($this->db->getRow($query)))
-            error(26);
-        */
+        }
     }
 
     function create($return, $file = FALSE) {

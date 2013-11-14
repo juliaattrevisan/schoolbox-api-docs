@@ -12,17 +12,14 @@ $this->setTab('submission');
 $subHandler = new Submission;
 $rubricHandler = new DueWork_Rubric_Handler();
 $userHandler = new User;
+$subReturn = new SubmissionReturn;
 
 if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 
     $subbox = $subHandler->getByID($this->arg[0]);
     $user = $userHandler->getByID($this->arg[1]);
-    // $subReturn = $subReturnHandler->getOneByUser($this->arg[1], $this->arg[0]);
 
-    // Check user owners box they are returning to
-    if($subbox['owner'] != $_SESSION['id']) {
-        error(25);
-    }
+    $subReturn->securityCheck($this->arg[0]);
 
     $output = array(
         'CATEGORY'  => Scrub::text($subbox['categoryName']),

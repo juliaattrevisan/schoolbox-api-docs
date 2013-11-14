@@ -26,7 +26,12 @@ class ReturnedWork {
 	 */
 	protected $submission_box;
 
-	/**
+    /**
+     * @var User
+     */
+    protected $marker;
+
+    /**
 	 * @var User
 	 */
 	protected $owner;
@@ -213,6 +218,7 @@ class ReturnedWork {
 	}
 
 	/**
+     * The person who the mark is for
 	 * @param  \Schoolbox\User $owner
 	 *
 	 * @return $this
@@ -223,11 +229,34 @@ class ReturnedWork {
 	}
 
 	/**
+     * The person who the mark is for
 	 * @return \Schoolbox\User
 	 */
 	public function getOwner() {
 		return $this->owner;
 	}
+
+    /**
+     * The person who marked the work
+     * @param \Schoolbox\User $marker
+     *
+     * @return $this
+     */
+    public function setMarker($marker)
+    {
+        $this->marker = $marker;
+        return $this;
+    }
+
+    /**
+     * The person who marked the work
+     * @return \Schoolbox\User
+     */
+    public function getMarker()
+    {
+        return $this->marker;
+    }
+
 
 	/**
 	 * @param  \Alaress_Date_Format $submitted
