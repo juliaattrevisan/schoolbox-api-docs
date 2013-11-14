@@ -326,6 +326,12 @@ class Marksheet {
 	 */
 	protected function getOnlineAssessMarkForStudent($assessId, $studentId) {
 		$mostRecentAttempt = $this->attemptHandler->getLatestForUser($assessId, $studentId);
+		if(!$mostRecentAttempt) {
+			return array(
+				'mark' => '&ndash;',
+				'norm_mark' => 'null'
+			);
+		}
 		$marks = $this->attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
 		$total = $this->attemptHandler->getTotalMarks($assessId, $mostRecentAttempt['attempt_id']);
 
@@ -556,8 +562,25 @@ class Marksheet {
 					'STUDENT_WORK_NORM_MARK' => $mark['norm_mark'],
 					'STUDENT_WORK_MARK' => strlen($mark['mark']) ? $mark['mark'] : '&ndash;',
 					'STUDENT_WORK_COMMENT' => isset($mark['comment']) ? $mark['comment'] : '',
-					'STUDENT_WORK_PATH' => ($item['isOA'] ? "/assess/review/" : "/submission/submissionHistory/") . "$workId/$userId",
 				));
+
+				if($item['isOA']) {
+					// yes, you actually have to do this...
+					$section = $this->sectionHandler->getByField('assess_id', $workId);
+					$firstSectionId = $section['section_id'];
+					$attempt = $this->attemptHandler->getLatestForUser($workId, $student->getId());
+					$attemptId = $attempt['attempt_id'];
+					if($firstSectionId && $attemptId) {
+						$page->setVar('STUDENT_WORK_PATH', "/assess/review/$workId/$firstSectionId/$attemptId");
+					}
+					else{
+						$page->setVar('STUDENT_WORK_PATH', '#');
+					}
+				}
+				else {
+					$page->setVar('STUDENT_WORK_PATH', "/submission/submissionHistory/$workId/$userId");
+				}
+
 				$page->parse('student_work_block', 'student_work', true);
 
 			}
