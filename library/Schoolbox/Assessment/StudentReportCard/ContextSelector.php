@@ -29,6 +29,8 @@ class ContextSelector {
 	protected $_template = 'submission/_contextSelector.html';
 	/** @var string */
 	protected $granularity = self::GRANULARITY_SEMESTER;
+	/** @var bool */
+	protected $categoryFirst = false;
 
 
 	/**
@@ -82,6 +84,12 @@ class ContextSelector {
 		$this->granularity = $granularity;
 	}
 
+	/**
+	 * @param bool $categoryFirst
+	 */
+	public function setCategoryFirst($categoryFirst) {
+		$this->categoryFirst = $categoryFirst;
+	}
 
 	/**
 	 * Only override the template if you absolutely must.
@@ -218,28 +226,36 @@ class ContextSelector {
 	 */
 	protected function createSubjectSelectorValues($selectedValues) {
 
-		$semester = '';
+		$href = array();
 		$output = array();
 
 		if(isset($selectedValues['year'])) {
-			$semester = $selectedValues['year'] . '/';
+			$href[] = $selectedValues['year'];
 
 			if(isset($selectedValues['semester'])) {
-				$semester .= $selectedValues['semester'] . '/';
+				$href[] = $selectedValues['semester'];
 			}
 		}
 
-		$selectedId = isset($selectedValues['subject']) ? $selectedValues['subject'] : 0;
+		$selectedId = isset($selectedValues['category']) ? $selectedValues['category'] : 0;
 
 		foreach($this->categories as $category) {
 			/** @var Category $category */
 
 			$catId = $category->getId();
 
+			// are we putting the category reference at the start or end of the href
+			$thisHref = $href;
+			if($this->categoryFirst) {
+				array_unshift($thisHref, $catId);
+			}
+			else {
+				array_push($thisHref, $catId);
+			}
+
 			$output[] = array(
 				'SUBJECT_ID' => $catId,
-				'SUBJECT_CODE' => $category->getCodes()->first()->getCode(),
-				'SUBJECT_HREF' => $semester . $catId,
+				'SUBJECT_HREF' => implode('/', $thisHref),
 				'SUBJECT_SELECTED' => $selectedId == $catId ? 'selected="selected"' : '',
 				'SUBJECT_NAME' => $category->getName()
 			);
