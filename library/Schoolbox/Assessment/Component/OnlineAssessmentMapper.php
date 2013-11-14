@@ -432,7 +432,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			  SELECT *
 			  FROM
 			  (
-			      SELECT SUM(mark) AS sum_mark, ar.attempt_id, t0.user_id, t0.finish
+			      SELECT (SUM(mark) / SUM(aq.marks) * 100) AS sum_mark, ar.attempt_id, t0.user_id, t0.finish
 			      FROM assess_response ar
 			      INNER JOIN
 			      (
@@ -443,6 +443,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			            AND aa.deleted_at IS NULL
 			      ) t0
 			      ON ar.attempt_id = t0.attempt_id
+			      LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
 			      GROUP BY t0.attempt_id
 			      ORDER BY finish DESC
 			  ) t1
