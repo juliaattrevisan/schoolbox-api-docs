@@ -13,7 +13,7 @@
 
 		/* Submit all the questions before switching between sections
 		 */
-		$j('.evaluation-navigator').click(function() {
+		$j('.evaluation-navigator').click(function(event) {
 			event.preventDefault();
 
 			$j.fn.evaluation.saveAll();
@@ -27,7 +27,7 @@
 		 * submits all the questionForm elements. This causes, in particular,
 		 * Matching Pairs to remain untouched resulting in NULL values.
 		 */
-		$j('.evaluation-finish').click(function() {
+		$j('.evaluation-finish').click(function(event) {
 			event.preventDefault();
 
 			$j.fn.evaluation.saveAll();
