@@ -62,7 +62,7 @@ class Calendar_Event_Type_Day_Renderer_Default extends Calendar_Event_Type_Rende
                 $this->getPage()->setVar(
                     'MODIFY',
                     '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
-                    ) . '&returnTo=month"><span></span>Modify</a>'
+                    ) . '&returnTo=calendar"><span></span>Modify</a>'
                 );
             }
 			else {
