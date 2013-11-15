@@ -164,7 +164,12 @@ switch($_POST['action']) {
 				}
 			}
 
-			$page->backToTheFuture(2);
+			if (!empty($_POST['return'])) {
+				$page->localRedir($_POST['return']);
+			}
+			else {
+				$page->backToTheFuture(2);
+			}
 		}
 		else {
 			error(158);
