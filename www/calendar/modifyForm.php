@@ -73,6 +73,10 @@ switch($_POST['action']) {
 				'detail' => $_POST['detail'],
 				'publish_date' => $publishDate,
 			);
+			// New event? save the author
+			if (empty($_POST['id'])) {
+				$event['author_id'] = $_SESSION['user']->getId();
+			}
 
 			$validRepeat = array(
 				'daily' => '+1 day',
