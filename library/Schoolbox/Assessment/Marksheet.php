@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -79,11 +80,11 @@ class Marksheet {
 	protected $conf;
 
 	/** @var array */
-	protected $studentDataSet;
+	protected $studentDataSet = array();
 	/** @var array */
-	protected $statisticDataSet;
+	protected $statisticDataSet = array();
 	/** @var array */
-	protected $displayOrder;
+	protected $displayOrder = array();
 	/** @var Collection */
 	protected $errorList;
 
@@ -390,8 +391,27 @@ class Marksheet {
 //		var_dump($this->studentDataSet);
 //		var_dump($this->displayOrder);
 
+		$contextSelector = new ContextSelector('submission/markSheet');
 
+		// generate a "past 6 years" array
+		for($i = 5; $i >= 0; $i--) {
+			$years[] = date('Y') - $i;
+		}
+		$contextSelector->setYears($years);
+		$contextSelector->setCategoryFirst(true);
 
+		$catIdList = array();
+		foreach($this->groupHandler->involvedInSubjects($this->sessionUser->getId()) as $catAsArray) {
+			$catIdList[] = $catAsArray['id'];
+		}
+
+		$contextSelector->setCategories($this->categoryMapper->findByColumn('id', $catIdList));
+
+		$contextSelector->render($page, 'CONTEXT_SELECTOR', array(
+			'year' => $this->year,
+			'semester' => $this->semester,
+			'category' => $this->category->getId()
+		));
 
 		$page->setFile(TEMPLATE_content, 'submission/markSheet.html');
 		$page->setTitle('Marksheet for '.$this->category->getName());
@@ -420,7 +440,6 @@ class Marksheet {
 
 		$page->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
 		$page->setBlock('student_row', 'student_work', 'student_work_block');
-		$page->setBlock('student_row', '', '_block');
 
 		// if mapping not defined here, uses ucfirst(:field)
 		$statLabelLookup = array(
@@ -498,6 +517,10 @@ class Marksheet {
 				$page->parse('stat_item_block', 'stat_item', true);
 			}
 			$page->parse('stat_block', 'stat', true);
+		}
+		if(!count($transposed)) {
+			$page->setVar('stat_block', '');
+			$page->setVar('class_average_block', '');
 		}
 
 
@@ -584,8 +607,15 @@ class Marksheet {
 				$page->parse('student_work_block', 'student_work', true);
 
 			}
+			if(!count($this->displayOrder)) {
+				$page->setVar('work_header_block', '');
+				$page->setVar('student_work_block', '');
+			}
 
 			$page->parse('student_row_block', 'student_row', true);
+		}
+		if(!count($this->studentDataSet)) {
+			$page->setVar('student_row_block', '');
 		}
 
 
