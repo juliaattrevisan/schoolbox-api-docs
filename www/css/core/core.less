@@ -8394,6 +8394,16 @@ input,select,textarea {
 		border-color: @link;
 		box-shadow: 0 0 3px @link;
 	}
+	&.ajax-response {
+		&.win {
+			border-color: darken(@positive-color, @darken-value);
+			box-shadow: 0 0 3px darken(@positive-color, @darken-value);
+		}
+		&.fail {
+			border-color: darken(@negative-color, @darken-value);
+			box-shadow: 0 0 3px darken(@negative-color, @darken-value);
+		}
+	}
 }
 
 #ui-datepicker-div {
@@ -10087,7 +10097,11 @@ form.comment-form label {
 @slanty-header-width: ~`@{slanty-header-width-raw} + 'px'`;
 @slanty-header-angle: ~`@{slanty-header-angle-raw} + 'deg'`;
 
-.mark-sheet input { width: 30px; }
+.mark-sheet input {
+	width: 30px;
+	font-size: 1em;
+	text-align: center;
+}
 
 
 .mark-sheet td{
@@ -10111,6 +10125,11 @@ form.comment-form label {
 			float: left;
 			margin-right: 6px;
 		}
+	}
+	&.class-avg a {
+		white-space: nowrap;
+		font-weight: normal;
+		color: inherit;
 	}
 }
 th.rotate {

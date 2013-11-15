@@ -44,9 +44,10 @@ class Grades {
 	 * @param Category $subject
 	 * @param int $year
 	 * @param int $semester
+	 * @param array $outputFormats
 	 * @return array
 	 */
-	public function getStudentGradesForSubject($students, $subject, $year = 0, $semester = 0) {
+	public function getStudentGradesForSubject($students, $subject, $year = 0, $semester = 0, $outputFormats = array('float')) {
 
 		$params = array();
 
@@ -196,8 +197,30 @@ class Grades {
 			foreach($works as $workId => $weightedMark) {
 				$returnGrades[$userId]['grades'][$workId] = $weightedMark / $userWeightSum * 100;
 			}
-			$returnGrades[$userId]['avg'] = array_sum($works) / $userWeightSum * 100;
+
+			$avgSum = array_sum($works) / $userWeightSum * 100;
+
+			// how do you want this data presented?
+			$availableFormats = array('float', 'int', 'letter');
+
+			foreach($availableFormats as $f) {
+				if(in_array($f, $outputFormats)) {
+					switch($f) {
+						case 'float':
+							$returnGrades[$userId]['avg'] = $avgSum;
+							break;
+						case 'int':
+							$returnGrades[$userId]['avg-int'] = (int)($avgSum / 10);
+							break;
+						case 'letter':
+							$returnGrades[$userId]['avg-letter'] = \Marksheet_Factory::build('letter')->convertRawMark($avgSum);
+							break;
+					}
+				}
+			}
 		}
+
+		unset($avgSum);
 		unset($weightedMark);
 		unset($workId);
 		unset($works);

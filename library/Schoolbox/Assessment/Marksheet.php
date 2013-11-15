@@ -72,6 +72,8 @@ class Marksheet {
 	protected $oaMapper;
 	/** @var SubmissionBoxMapper */
 	protected $sbMapper;
+	/** @var \DueWork_ErrorMapper */
+	protected $errorMapper;
 
 	/** @var IConfigLoader */
 	protected $conf;
@@ -82,6 +84,8 @@ class Marksheet {
 	protected $statisticDataSet;
 	/** @var array */
 	protected $displayOrder;
+	/** @var Collection */
+	protected $errorList;
 
 	/** @var int */
 	protected $year;
@@ -124,6 +128,7 @@ class Marksheet {
 		$this->category = $this->categoryMapper->findById($categoryId);
 		$this->sessionUser = $this->userMapper->findById($sessionUserId);
 
+		$this->errorList = $this->errorMapper->findAll();
 	}
 
 	/**
@@ -321,6 +326,12 @@ class Marksheet {
 	 */
 	protected function getOnlineAssessMarkForStudent($assessId, $studentId) {
 		$mostRecentAttempt = $this->attemptHandler->getLatestForUser($assessId, $studentId);
+		if(!$mostRecentAttempt) {
+			return array(
+				'mark' => '&ndash;',
+				'norm_mark' => 'null'
+			);
+		}
 		$marks = $this->attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
 		$total = $this->attemptHandler->getTotalMarks($assessId, $mostRecentAttempt['attempt_id']);
 
@@ -341,21 +352,30 @@ class Marksheet {
 	}
 
 	protected function getSubmissionBoxMarkForStudent($boxId, $studentId) {
-		$box = $this->submissionHandler->getByID($boxId);
-		$marktype = $this->marktypeFactoryHandler->build($box['mark_type_slug']);
-		$mark = $marktype->retrieveMark($studentId, $boxId, false, true);
 
-		if(is_null($mark['norm_mark'])) {
-			$pretty = '&ndash;';
+		$rtn = $this->returnHandler->getByUser($studentId, $boxId, 1);
+
+		if(isset($rtn[0]['mark'])) {
+			$mark = array(
+				'mark' => $rtn[0]['mark'],
+				'norm_mark' => $rtn[0]['norm_mark']
+			);
 		}
 		else {
-			$pretty = $marktype->convertRawMark($mark['norm_mark'], $mark['max_mark'], true, false);
+			$mark = array('mark' => null, 'norm_mark' => null);
 		}
 
-		return array(
-			'norm_mark' => $mark['norm_mark'],
-			'mark' => $pretty,
-		);
+		if(is_null($mark['mark'])) {
+			$mark['mark'] = '&ndash;';
+		}
+		else {
+			$error = $this->errorList->getBy('displayAs', $mark['mark']);
+			if(!is_null($error)) {
+				$mark['mark'] = $error->getCode();
+			}
+		}
+
+		return $mark;
 	}
 
 
@@ -542,8 +562,25 @@ class Marksheet {
 					'STUDENT_WORK_NORM_MARK' => $mark['norm_mark'],
 					'STUDENT_WORK_MARK' => strlen($mark['mark']) ? $mark['mark'] : '&ndash;',
 					'STUDENT_WORK_COMMENT' => isset($mark['comment']) ? $mark['comment'] : '',
-					'STUDENT_WORK_PATH' => ($item['isOA'] ? "/assess/review/" : "/submission/submissionHistory/") . "$workId/$userId",
 				));
+
+				if($item['isOA']) {
+					// yes, you actually have to do this...
+					$section = $this->sectionHandler->getByField('assess_id', $workId);
+					$firstSectionId = $section['section_id'];
+					$attempt = $this->attemptHandler->getLatestForUser($workId, $student->getId());
+					$attemptId = $attempt['attempt_id'];
+					if($firstSectionId && $attemptId) {
+						$page->setVar('STUDENT_WORK_PATH', "/assess/review/$workId/$firstSectionId/$attemptId");
+					}
+					else{
+						$page->setVar('STUDENT_WORK_PATH', '#');
+					}
+				}
+				else {
+					$page->setVar('STUDENT_WORK_PATH', "/submission/submissionHistory/$workId/$userId");
+				}
+
 				$page->parse('student_work_block', 'student_work', true);
 
 			}

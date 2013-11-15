@@ -6,6 +6,8 @@
  */
 
 // disallow SitePage context
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\CategoryMapper;
@@ -34,6 +36,17 @@ switch($_SERVER['REQUEST_METHOD']) {
 		}
 
 		respond($output, '200 OK', 'application/json');
+		break;
+
+	case 'POST':
+		if(isset($_POST['weight'])) {
+			$output = setAssessmentWeight($_POST['weight']);
+			if(!is_null($output)) {
+				respond($output, '200 OK', 'application/json');
+				break;
+			}
+		}
+		respond('Not a valid request.', '400 Bad Request');
 		break;
 
 	default:
@@ -80,6 +93,69 @@ function getMarks($userId, $catId, $sessionUserId, $year = 0, $semester = 0) {
 	return json_encode($grades);
 }
 
+function setAssessmentWeight($weights) {
+
+	$groupHandler = new Group();
+	$count = 0;
+
+	foreach($weights as $type => $idList) {
+		$mapper = $type ? OnlineAssessmentMapper::getInstance() : SubmissionBoxMapper::getInstance();
+		foreach($idList as $id => $weight) {
+			try {
+				$object = $mapper->findById($id);
+				// even if this didn't hydrate, the ID should still be set
+				$category = $object->getCategory();
+				if($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
+					$object->setWeight($weight);
+					$mapper->save($object);
+					++$count;
+				}
+			}
+			catch(MapperException $e) {
+				continue;
+			}
+		}
+	}
+
+	if(!$count) {
+		return null;
+	}
+
+
+	$category = CategoryMapper::getInstance()->findById($category->getId());
+
+	// recalculate the grade averages for all students of the category
+	$studentList = array();
+
+	$conf = Config::getInstance();
+	$synergyHandler = new External_Class();
+
+	if($category->getCodes()->count() && $conf->get('external_enable')) {
+		$studentList = $synergyHandler->getStudents($category->getCodes()->first()->getCode());
+	}
+
+	$groupList = $groupHandler->getMemberList($category->getId());
+
+	if(is_array($groupList)) {
+		$studentList = array_merge($studentList, $groupList);
+	}
+
+	// extract all the synergy IDs of the students found
+	$extIds = array();
+	foreach($studentList as $studentData) {
+		$extIds[] = $studentData['synergy_id'];
+	}
+
+	// convert to domain object collection (in 1 query, not `n`)
+	$studentCollection = UserMapper::getInstance()->findByColumn('synergy_id', $extIds);
+
+	$studentGrades = Grades::getInstance()->getStudentGradesForSubject(
+		$studentCollection, $category, 0, 0, array('int', 'letter')
+	);
+
+	// return a json string
+	return json_encode($studentGrades);
+}
 
 
 function respond($body, $code = '200 OK', $contentType = 'text/plain') {

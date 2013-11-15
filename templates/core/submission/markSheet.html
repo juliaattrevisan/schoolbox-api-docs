@@ -32,7 +32,9 @@
 			Class Average
     </th>
     <!-- BEGIN class_average -->
-		<td class="gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">{WORK_CLASSAVG_CLEAN}</td>
+		<td class="class-avg gradient-{WORK_CLASSAVG_GRADIENT}-bg gradient-{WORK_CLASSAVG_GRADIENT}">
+      <a href="{WORK_PATH}/{WORK_ID}">{WORK_CLASSAVG_CLEAN}</a>
+    </td>
     <!-- END class_average -->
     <td></td>
 	</tr>
@@ -53,7 +55,7 @@
 	</tr>
   <!-- END stat -->
   <!-- BEGIN student_row -->
-	<tr class="{DARK}">
+	<tr class="{DARK}" data-id="{STUDENT_ID}">
 		<th class="avatar" scope="row">
 			<a href="/search/user/{STUDENT_ID}" class="author">
 				<img height="32" width="32" src="/portrait.php?userId={STUDENT_EXTID}&amp;size=square32" alt="{STUDENT_NAME}" />
@@ -86,5 +88,54 @@
 		$j(this).html('&#x25BC;');
 		$j('.sub-table-row').hide();
 	});
+
+  var table = $j('#content').children('table.mark-sheet');
+
+  table.delegate('input', 'change', function(e) {
+    var self = $j(this);
+
+    // disable self
+    this.disabled = 'disabled';
+
+    // set up the data variable for POSTing
+    var data = {}
+    data[this.name] = self.val();
+
+    $j.ajax({
+      type : 'POST',
+      url : '/ajax/submission/marks.php',
+      data : data,
+      // callbacks
+      success : function(data) {
+        self.addClass('ajax-response win');
+        self.removeAttr('disabled');
+        self.attr('title', '');
+
+        var tbody = table.children('tbody');
+
+        $j.each(data, function(k, v) {
+          var userId   = k,
+              gradient = v['avg-int'],
+              letter   = v['avg-letter'];
+
+          var row = tbody.children('tr[data-id='+userId+']');
+
+          row.children('td').last()
+            .attr('class', 'gradient-'+gradient+'-bg').children('a')
+              .attr('class', 'gradient-'+gradient).text(letter);
+
+        });
+
+        setTimeout(function() { self.removeClass('ajax-response win') }, 500);
+      },
+      error : function(xhr) {
+        self.addClass('ajax-response fail');
+        self.attr('title', 'Value failed to save.')
+        self.removeAttr('disabled');
+        setTimeout(function() { self.removeClass('ajax-response fail') }, 2000);
+      }
+    });
+
+  })
 </script>
 <!-- END CUSTOM_JAVASCRIPT -->
