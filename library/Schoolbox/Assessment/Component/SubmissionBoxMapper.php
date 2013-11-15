@@ -844,23 +844,22 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$submission_box_id = $submission_box;
 		}
 
+		// Fetch only the most recent return for each student.
 		$sql = "
 			SELECT
-			  AVG(t0.norm_mark) AS `mean`,
-			  STDDEV(t0.norm_mark) AS `stdev`,
-			  MIN(t0.norm_mark) AS `min`,
-			  MAX(t0.norm_mark) AS `max`
-			FROM
-			(
-			  SELECT * FROM
-			  (
-			    SELECT *
-			    FROM submission_return sr
-			    WHERE sr.box_id = :box_id
-			    AND sr.norm_mark IS NOT NULL
-			    ORDER BY sr.returned DESC
-			  ) t1
-			  GROUP BY t1.owner
+				AVG(t0.norm_mark) AS `mean`,
+				STDDEV(t0.norm_mark) AS `stdev`,
+				MIN(t0.norm_mark) AS `min`,
+				MAX(t0.norm_mark) AS `max`
+			FROM (
+				SELECT * FROM (
+					SELECT *
+					FROM submission_return sr
+					WHERE sr.box_id = :box_id
+					ORDER BY sr.returned DESC
+				) t1
+				GROUP BY t1.owner
+				HAVING t1.norm_mark IS NOT NULL
 			) t0;
 		";
 
