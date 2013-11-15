@@ -117,7 +117,8 @@ class ContextSelector {
 		$page->setFile($tpl, $this->_template);
 		$page->setBlock($tpl, 'semester_context', 'semester_context_block');
 		$page->setBlock($tpl, 'subject_context', 'subject_context_block');
-		$page->setVar('PAGE_HREF', $this->basePath);
+		$page->setVar('PAGE_HREF',    $this->basePath);
+		$page->setVar('SUBJECT_PART', isset($selectedValues['category']) ? ($selectedValues['category'].'/') : '');
 
 		// parse the semesters, if there are any
 		if(count($this->years)) {
