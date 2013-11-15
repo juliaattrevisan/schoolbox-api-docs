@@ -474,7 +474,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		}
 
 		$stmt = $this->database->prepare("
-			SELECT COUNT(*)
+			SELECT COUNT(DISTINCT(user_id))
 			FROM assess_attempt
 			WHERE assess_id = :assess_id
 		");
@@ -485,7 +485,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		$progress['accepts_submissions'] = true;
 
 		$stmt = $this->database->prepare("
-			SELECT COUNT(*)
+			SELECT COUNT(DISTINCT(user_id))
 			FROM assess_attempt
 			WHERE assess_id = :assess_id
 			AND reviewed_at IS NOT NULL
