@@ -35,7 +35,9 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
         // replicate the query from the synergetic user handler and join it to the passwords table
         $link = MSSQL::getInstance();
 
-        $query = "
+        $query = "SELECT * FROM uvSchoolBoxParentLogin ORDER BY StudentContactID";
+
+        /*
 			SELECT DISTINCT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname,
 				StudentContactDefaultEmail, StudentContactOccupEmail, c1.DefaultEmailCode, c1.DirectoryIncludeFlag,
@@ -60,6 +62,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 			AND FileYear = '{$_SESSION[ 'FileYear']}'
 			ORDER BY StudentContactID
 		";
+        */
 
         $parentList = $link->getAll($query);
 		$this->collateList($parentList);
