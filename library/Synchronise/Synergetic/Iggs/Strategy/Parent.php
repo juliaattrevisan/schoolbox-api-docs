@@ -11,23 +11,12 @@
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
 class Synchronise_Synergetic_Iggs_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
-	protected $title = "Update Schoolbox Parent Details Synchronisation";
+    protected $title = "Update Schoolbox Parent Details Synchronisation";
 
-	/**
-	 * Setup verbose output
-	 */
-	protected function setup() {
-		$this->verbose_filter = new Synchronise_Synergetic_Iggs_Verbose();
-	}
-
-	/**
-	 * St. Kevins parents have local email on.
-	 *
-	 * @param array $currentUser
-	 *
-	 * @return int
-	 */
-	public function getLocalEmailFromUser($currentUser) {
-		return 1;
-	}
+    /**
+     * Setup verbose output
+     */
+    protected function setup() {
+        $this->verbose_filter = new Synchronise_Synergetic_Iggs_Verbose();
+    }
 }
