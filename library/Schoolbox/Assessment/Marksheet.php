@@ -453,7 +453,9 @@ class Marksheet {
 
 			// special case!
 			if($name == 'avg') {
-				foreach($boxes as $workId => $value) {
+				foreach ($this->displayOrder as $item) {
+					$workId = "{$item['isOA']}-{$item['id']}";
+					$value  = $boxes[$workId];
 
 					if(is_numeric($transposed['mean'][$workId])) {
 						$gradient = (int) ($transposed['mean'][$workId] / 10);
@@ -480,7 +482,9 @@ class Marksheet {
 				'WORK_STAT_TITLE' => isset($statLabelLookup[$name]) ? $statLabelLookup[$name] : ucfirst($name),
 			));
 
-			foreach($boxes as $workId => $value) {
+			foreach ($this->displayOrder as $item) {
+				$workId = "{$item['isOA']}-{$item['id']}";
+				$value  = $boxes[$workId];
 				$page->setVar(array(
 					'WORK_NS_ID' => str_replace('-', '][', $workId), // so it appears as the name attribute properly
 					'WORK_STAT_VALUE' => is_numeric($value) ? (float) round($value, 3) : $value // truncate to 3 decimals, then strip extraneous 0s
