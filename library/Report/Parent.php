@@ -72,6 +72,7 @@ class Report_Parent extends Report_Abstract {
 		else {
 			$this->setPage($page);
 
+			$this->setExternalUserHandler(new External_User());
 
 			$this->setup();
 
