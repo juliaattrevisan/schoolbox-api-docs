@@ -704,7 +704,7 @@ class Calendar extends DeprecatedModel {
 				category.id AS categoryId, category.name AS categoryName,
 				event.completed
 			FROM event
-			LEFT JOIN user ON owner = user.id
+			LEFT JOIN user ON event.author_id = user.id
 			LEFT JOIN luEventType ON type = eventTypeID
 			LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
