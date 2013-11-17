@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Assessment\StudentReportCard\ContextSelector;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 if (isset($_GET['year']) || isset($_GET['semester'])) {
@@ -47,33 +49,22 @@ $this->setBlock('normalSubmission', 'readonly_close', 'readonly_close_block');
 $this->setBlock('normalSubmission', 'writable_open', 'writable_open_block');
 $this->setBlock('normalSubmission', 'writable_close', 'writable_close_block');
 
-$this->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
-$this->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
-
 $this->setVar('SEM_SLUG', $semesterSlug);
 
 $submissionHandler = new Submission();
 $groupHandler = new Group();
 
-// Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
-$semesters = array(1, 2);
-foreach ($semesters as $sem) {
-    $this->setVar(array(
-        'SEMESTER_SELECTED' => $sem == $semester ? ' selected="selected"' : '',
-        'SEMESTER_VALUE' => $sem
-    ));
-    $this->parse('semester_option_block', 'semester_option', true);
-}
+$contextSelector = new ContextSelector('submission/listSubmission');
 
-// Years is trickier, because we first need to find out all the years in which the teacher has ...taught
-// while we figure that out, let's go with "the past 6 years"
-for ($y = $currentYear; $y > $currentYear - 6; --$y) {
-    $this->setVar(array(
-        'YEAR_SELECTED' => $y == $year ? ' selected="selected"' : '',
-        'YEAR_VALUE' => $y
-    ));
-    $this->parse('year_option_block', 'year_option', true);
+// generate a "past 6 years" array
+for($i = 5; $i >= 0; $i--) {
+	$years[] = $currentYear - $i;
 }
+$contextSelector->setYears($years);
+
+$contextSelector->render($this, 'CONTEXT_SELECTOR', array(
+	'year' => $year, 'semester' => $semester
+));
 
 
 /* Use provided ID, or check for the subjects the user is involved with */
