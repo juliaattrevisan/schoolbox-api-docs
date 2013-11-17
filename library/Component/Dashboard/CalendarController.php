@@ -192,7 +192,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 					$this->setVar(
 						'MODIFY',
 						'<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
-						) . '&returnTo=month"><span></span>Modify</a>'
+						) . '&returnTo=dashboard"><span></span>Modify</a>'
 					);
 				} else {
 					$this->setVar('MODIFY', '');

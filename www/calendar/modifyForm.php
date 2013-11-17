@@ -73,6 +73,10 @@ switch($_POST['action']) {
 				'detail' => $_POST['detail'],
 				'publish_date' => $publishDate,
 			);
+			// New event? save the author
+			if (empty($_POST['id'])) {
+				$event['author_id'] = $_SESSION['user']->getId();
+			}
 
 			$validRepeat = array(
 				'daily' => '+1 day',
@@ -160,7 +164,12 @@ switch($_POST['action']) {
 				}
 			}
 
-			$page->backToTheFuture(2);
+			if (!empty($_POST['return'])) {
+				$page->localRedir($_POST['return']);
+			}
+			else {
+				$page->backToTheFuture(2);
+			}
 		}
 		else {
 			error(158);

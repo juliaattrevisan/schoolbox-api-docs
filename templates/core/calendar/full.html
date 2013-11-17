@@ -323,7 +323,7 @@
         $j('#edit-full').click(function(e) {
             var getstring = $j(this).closest('form').serialize()
             var l = window.location
-            window.location = l.protocol + '//' + l.hostname + '/calendar/modify.php?from=inline&' + getstring
+            window.location = l.protocol + '//' + l.hostname + '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
         })
 
         // hide bubbles if any header buttons are clicked
