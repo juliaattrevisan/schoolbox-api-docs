@@ -222,12 +222,12 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
     // Empty mark (not zero) - treat as null
     if (trim($givenMark) === '') {
         $mark['mark']      = null;
-        $mark['norm_mark'] = 'NULL';
+        $mark['norm_mark'] = null;
     }
     elseif (isset($errors[$givenMark])) {
         // error given
-        $mark['mark'] = $errors[$givenMark]->getDisplayAs();
-        $mark['norm_mark'] = $errors[$givenMark]->getNormaliseAs() === NULL ? 'NULL' : $errors[$givenMark]->getNormaliseAs();
+        $mark['mark']      = $errors[$givenMark]->getDisplayAs();
+        $mark['norm_mark'] = $errors[$givenMark]->getNormaliseAs();
     }
     // not a recognised error code, check for rubric
     elseif($subbox['mark_type_slug'] == 'rubric') {
