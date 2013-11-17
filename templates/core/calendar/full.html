@@ -333,7 +333,10 @@
 
         // AJAX update attendance when the attendance toggle-button is clicked
         c.getForm('editEvent').delegate('.attendanceRequestButton', 'click', function(e) {
-            c.post('/service/attendance/processToggleAttendance', c.getForm('editEvent').serialize(), function (data) {
+            var postData = {
+                event: {id: c.getForm('editEvent').find('input[name="eventId"]').val()}
+            };
+            c.post('/service/attendance/processToggleAttendance', postData, function (data) {
                 var btn = c.getForm('editEvent').find('.attendanceRequestButton a')
                 if (data.error == undefined) {
                     if (btn.text() == 'Attend') {
@@ -477,6 +480,7 @@
 
             <!-- Edit Event Form -->
             <form id="editEvent">
+                <input type="hidden" name="eventId" />
                 <dl>
                     <dd><h3 class="note"></h3></dd>
                     <dd><h4><span class="date"></span></h4></dd>
