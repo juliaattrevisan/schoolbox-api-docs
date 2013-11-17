@@ -242,7 +242,7 @@ class Scrub {
                 return $purifier->purify($param);
             },
             $html,
-            60*60
+            Config::get('scrub_html_cache_timeout')
         );
     }
 }
