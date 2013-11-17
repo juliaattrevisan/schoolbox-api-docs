@@ -35,16 +35,12 @@
 			var rightList = $(config.questionForm).find('.evaluation-matchingpairs-right');
 
 			rightList.disableSelection();
-
-			$(config.questionForm).swappable({
-				items: rightList.find('li'),
-				cursorAt: {
-					top:-1
-				},
+			rightList.sortable({
+				containment: 'parent',
 				stop: function() {
 					$.fn.evaluationMatchingPairs.saveOne(config.questionForm);
 				}
-			});
+			})
 		}
 	}
 
