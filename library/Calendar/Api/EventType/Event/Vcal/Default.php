@@ -112,14 +112,13 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 							// next.
 							// (are either value: date)
 
-							$all_day = !$currentEvent->DTSTART->hasTime();
-							$eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART));
-							$eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND));
+							$allDay = !$currentEvent->DTSTART->hasTime();
+							$eventStartTimestamp = strtotime($currentEvent->DTSTART);
+							$eventEndTimestamp   = strtotime($currentEvent->DTEND);
 
-							//
 							// According to VCAL standard: end of all day event
 							// is 12am next day
-							if ($all_day) {
+							if ($allDay) {
 								$eventEndTimestamp -= 1;
 							}
 
@@ -199,7 +198,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
 							/* Only get events that fit within the range specified
 							 */
-							if ($eventId == $this->escapeVcalValue($currentEvent->UID->getValue())) {
+							if ($eventId == $currentEvent->UID->getValue()) {
 								$collection->add(
 									$this->buildCalendarEventFromVevent(
 										$currentEvent, $decodedConfig
@@ -230,12 +229,10 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 	) {
 
 		$allDay = !$currentEvent->DTSTART->hasTime();
-		$eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART));
-		$eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND));
+		$eventStartTimestamp = strtotime($currentEvent->DTSTART);
+		$eventEndTimestamp   = strtotime($currentEvent->DTEND);
 
-		//
-		// According to VCAL standard: end of all day event
-		// is 12am next day
+		// According to VCAL standard: end of all day event is 12am next day
 		if ($allDay) {
 			$eventEndTimestamp -= 1;
 		}
@@ -268,19 +265,19 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
 		$event->setAuthorName('');
 		$event->setAuthorId(-1);
-		$event->setEventId($currentEvent->UID->getValue());
+		$event->setEventId($currentEvent->UID);
 
 		$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 		$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
 		$event->setType($metaDetails['eventTypeID']);
-		$event->setNote($currentEvent->SUMMARY->getValue());
+		$event->setNote($currentEvent->SUMMARY);
 		$event->setAccess('');
 		$event->setEventType($metaDetails['eventType']);
 		$event->setColour($metaDetails['eventColour']);
 		$event->setCampusList(implode(',', $decodedConfig->getCampus()));
-		$event->setDetail(nl2br($currentEvent->DESCRIPTION->getValue()));
-		$event->setLocation($currentEvent->LOCATION->getValue());
+		$event->setDetail(nl2br($currentEvent->DESCRIPTION));
+		$event->setLocation($currentEvent->LOCATION);
 		$event->setPublishDate('');
 		$event->setSid('');
 		$event->setAllday($allDay);
@@ -296,18 +293,6 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 		$event->setConnectorId($this->getConnectorId());
 
 		return $event;
-	}
-
-	/**
-	 * Patch for sabre/vobject 2 not dealing with escaped ; and , characters.
-	 *
-	 * @todo Remove this method and all usages when upgrading to sabre/vobject 3
-	 *
-	 * @param  string $value
-	 * @return string
-	 */
-	protected function escapeVcalValue($value) {
-		return strtr($value, array('\,' => ',', '\;' => ';',));
 	}
 
 	/* Getters/Setters
