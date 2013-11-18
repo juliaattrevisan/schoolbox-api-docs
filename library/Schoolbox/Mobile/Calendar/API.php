@@ -15,6 +15,7 @@ use Response_HTTP;
 use Calendar_Api_Factory;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_Config_Record;
+use Calendar_Event_Type_Abstract;
 use Authenticator;
 use Exception;
 use ClientDevice;
@@ -436,7 +437,7 @@ class API extends Generic\API {
 
 			/* Standardise into some format that mobile expects
 			 */
-			if (is_a($event, 'Calendar_Event_Type_Abstract')) {
+			if ($event instanceof Calendar_Event_Type_Abstract) {
 				$standardisedEvent = array(
 					'id' => $event->getEventId(),
 					'series_id' => '',
@@ -450,6 +451,7 @@ class API extends Generic\API {
 					'attendance' =>  method_exists($event, 'getAtendance') ? $event->getAttendance() : '',
 					'detail' => Scrub::html($event->getDetail()),
 					'publish_date' => $event->getPublishDate(),
+					'allDay' => $event->getAllday(),
 					'date' => $event->getStartTime()->getDatabaseDate(),
 					'startTime' => $event->getStartTime()->getUsingFormat('h:iA'),
 					'endTime' => $event->getEndTime()->getUsingFormat('h:iA'),
@@ -462,7 +464,7 @@ class API extends Generic\API {
 				);
 
 				$time = array(
-					'title'   => 'mort',
+					'title'   => 'Summary',
 					'aside'   => '',
 					'class'   => '',
 					'icon'    => 'clock',

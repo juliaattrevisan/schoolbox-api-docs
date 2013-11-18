@@ -94,6 +94,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 			$event->setLocation($currentEvent['location']);
 			$event->setPublishDate($currentEvent['publish_date']);
 			$event->setSid($currentEvent['sid']);
+			$event->setAllday($currentEvent['allday']);
 
 			if ($this->getCalendarHandler()->getPerm($currentEvent) > 1) {
 				$event->setIsEditable(true);

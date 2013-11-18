@@ -1,6 +1,6 @@
 <ul>
     {% if content.startTime %}
-        {% if content.startTime == '12:00AM' and content.endTime == content.startTime %}
+        {% if content.allDay %}
             <li><p>All day event</p></li>
         {% else %}
             <li><span>starts</span>{{ content.startTime }}</li>
