@@ -427,7 +427,7 @@ class API extends Generic\API {
 			$config = $configRecord->decodeConfig();
 			$config->setId($connector_id);
 
-			$factory = new Calendar_Api_Factory();
+			$factory = new Calendar_Api_Factory($_SESSION['user']);
 			$factory->resetConfigs();
 			$factory->addConfig($config);
 
