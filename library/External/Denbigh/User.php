@@ -136,7 +136,9 @@ class External_Denbigh_User implements External_UserInterface {
             $adaption['DirectoryIncludeFlag'] = 1;
         }
 
-        if (!empty($parentList[1])) {
+        // Don't update spouse if user[1] is somehow same user as user[0]
+        // (this could happen for sole parent who has multiple addresses)
+        if (!empty($parentList[1]) && $parentList[1]['denbighID'] != $externalUserId) {
             $adaption['SpouseID'] = $parentList[1]['denbighID'];
             $adaption['SpouseTitle'] = $parentList[1]['title'];
             $adaption['SpousePreferred'] = $parentList[1]['preferred_name'];
