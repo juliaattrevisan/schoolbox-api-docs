@@ -85,7 +85,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				 */
 				try {
 					$allEvents = Sabre\VObject\Reader::read($source, Sabre\VObject\Reader::OPTION_FORGIVING);
-                }
+				}
 				catch(Exception $e) {
 
 					/* Some google calendars don't follow sabre's expected format?
@@ -97,9 +97,9 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				if ($allEvents !== null) {
 					foreach($allEvents->children as $currentEvent) {
 
-                        /*
-                         * $currentEvent \Sabre\VObject\Component\VEvent
-                         */
+						/*
+						 * $currentEvent \Sabre\VObject\Component\VEvent
+						 */
 
 						/* gloop returns a whole bunch of stuff all mixed up
 						 *
@@ -113,8 +113,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 							// (are either value: date)
 
 							$all_day = !$currentEvent->DTSTART->hasTime();
-                            $eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART));
-                            $eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND));
+							$eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART));
+							$eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND));
 
 							//
 							// According to VCAL standard: end of all day event
@@ -128,63 +128,11 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 							 * Event's start time is before end time of span: ignore
 							 */
 							if (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp)) {
-
-								// Get category list for this event.
-								// If this event has a category which matches
-								// any event type, then apply that event type's
-								// color instead of the configured one.
-								$category_list = explode(';', $currentEvent->CATEGORIES);
-								$category_list = array_map('trim',       $category_list);
-								$category_list = array_map('strtoupper', $category_list);
-								$category_list = array_filter($category_list, 'strlen');
-								$metaDetails   = null;
-								foreach ($category_list as $category_name) {
-									foreach ($this->getAllLuEventTypes() as $event_type) {
-										if (strtoupper($event_type['eventType']) === $category_name) {
-											$metaDetails = $event_type;
-											break;
-										}
-									}
-									if (!empty($metaDetails)) {
-										break;
-									}
-								}
-								if (empty($metaDetails)) {
-									$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
-								}
-
-								$event = new Calendar_Event_Type_Day();
-
-								$event->setAuthorName('');
-								$event->setAuthorId(-1);
-								$event->setEventId($this->escapeVcalValue($currentEvent->UID));
-
-								$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
-								$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
-
-								$event->setType($metaDetails['eventTypeID']);
-								$event->setNote($this->escapeVcalValue($currentEvent->SUMMARY));
-								$event->setAccess('');
-								$event->setEventType($metaDetails['eventType']);
-								$event->setColour($metaDetails['eventColour']);
-								$event->setCampusList(implode(',', $decodedConfig->getCampus()));
-								$event->setDetail(nl2br($this->escapeVcalValue($currentEvent->DESCRIPTION)));
-								$event->setLocation($this->escapeVcalValue($currentEvent->LOCATION));
-								$event->setPublishDate('');
-								$event->setSid('');
-								$event->setAllday($all_day);
-
-								$event->setIsEditable(false);
-
-								$event->setAttendance(0);
-								$event->setCompleted(0);
-
-								/* Give the calendar_connector id so this event knows where it came from
-								 * This allows you to create an event detail screen in Mobile
-								 */
-								$event->setConnectorId($this->getConnectorId());
-
-								$collection->add($event);
+								$collection->add(
+									$this->buildCalendarEventFromVevent(
+										$currentEvent, $decodedConfig
+									)
+								);
 							}
 						}
 					}
@@ -249,49 +197,14 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						 * as they seem to be the calendar items themselves
 						 */
 						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
-							$eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART->getValue()));
-							$eventEndTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTEND->getValue()));
-
 							/* Only get events that fit within the range specified
 							 */
 							if ($eventId == $this->escapeVcalValue($currentEvent->UID->getValue())) {
-								$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
-
-								$event = new Calendar_Event_Type_Day();
-
-								$event->setAuthorName('');
-								$event->setAuthorId(-1);
-								$event->setEventId($this->escapeVcalValue($currentEvent->UID->getValue()));
-
-								$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
-								$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
-
-								$event->setType($metaDetails['eventTypeID']);
-								$event->setNote($this->escapeVcalValue($currentEvent->SUMMARY->getValue()));
-								$event->setAccess('');
-								$event->setEventType($metaDetails['eventType']);
-								$event->setColour($metaDetails['eventColour']);
-								$event->setCampusList('');
-								$event->setDetail($this->escapeVcalValue($currentEvent->DESCRIPTION->getValue()));
-								$event->setLocation($this->escapeVcalValue($currentEvent->LOCATION->getValue()));
-								$event->setAllday(!($currentEvent->DTSTART->hasTime()));
-								$event->setPublishDate('');
-								$event->setSid('');
-
-								$event->setIsEditable(false);
-
-								$event->setAttendance(0);
-								$event->setCompleted(0);
-
-								/* Give the calendar_connector id so this event knows where it came from
-								 * This allows you to create an event detail screen in Mobile
-								 */
-								$event->setConnectorId($this->getConnectorId());
-
-								$collection->add($event);
-
-								/* Found the event, so exit
-								 */
+								$collection->add(
+									$this->buildCalendarEventFromVevent(
+										$currentEvent, $decodedConfig
+									)
+								);
 								return $collection;
 							}
 						}
@@ -301,6 +214,88 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 		}
 
 		return $collection;
+	}
+
+	/**
+	 * Generic method for creating a calendar event from a VEvent object
+	 *
+	 * @param \Sabre\VObject\Component\VEvent    $currentEvent
+	 * @param Calendar_Api_Config_Connector_Vcal $decodedConfig
+	 *
+	 * @return Calendar_Event_Type_Day
+	 */
+	protected function buildCalendarEventFromVevent(
+		Sabre\VObject\Component\VEvent $currentEvent,
+		Calendar_Api_Config_Connector_Vcal $decodedConfig
+	) {
+
+		$allDay = !$currentEvent->DTSTART->hasTime();
+		$eventStartTimestamp = strtotime($this->escapeVcalValue($currentEvent->DTSTART));
+		$eventEndTimestamp   = strtotime($this->escapeVcalValue($currentEvent->DTEND));
+
+		//
+		// According to VCAL standard: end of all day event
+		// is 12am next day
+		if ($allDay) {
+			$eventEndTimestamp -= 1;
+		}
+
+		// Get category list for this event.
+		// If this event has a category which matches
+		// any event type, then apply that event type's
+		// color instead of the configured one.
+		$categoryList = explode(';', $currentEvent->CATEGORIES);
+		$categoryList = array_map('trim',       $categoryList);
+		$categoryList = array_map('strtoupper', $categoryList);
+		$categoryList = array_filter($categoryList, 'strlen');
+		$metaDetails   = null;
+		foreach ($categoryList as $categoryName) {
+			foreach ($this->getAllLuEventTypes() as $eventType) {
+				if (strtoupper($eventType['eventType']) === $categoryName) {
+					$metaDetails = $eventType;
+					break;
+				}
+			}
+			if (!empty($metaDetails)) {
+				break;
+			}
+		}
+		if (empty($metaDetails)) {
+			$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
+		}
+
+		$event = new Calendar_Event_Type_Day();
+
+		$event->setAuthorName('');
+		$event->setAuthorId(-1);
+		$event->setEventId($currentEvent->UID->getValue());
+
+		$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
+		$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
+
+		$event->setType($metaDetails['eventTypeID']);
+		$event->setNote($currentEvent->SUMMARY->getValue());
+		$event->setAccess('');
+		$event->setEventType($metaDetails['eventType']);
+		$event->setColour($metaDetails['eventColour']);
+		$event->setCampusList(implode(',', $decodedConfig->getCampus()));
+		$event->setDetail(nl2br($currentEvent->DESCRIPTION->getValue()));
+		$event->setLocation($currentEvent->LOCATION->getValue());
+		$event->setPublishDate('');
+		$event->setSid('');
+		$event->setAllday($allDay);
+
+		$event->setIsEditable(false);
+
+		$event->setAttendance(0);
+		$event->setCompleted(0);
+
+		/* Give the calendar_connector id so this event knows where it came from
+		 * This allows you to create an event detail screen in Mobile
+		 */
+		$event->setConnectorId($this->getConnectorId());
+
+		return $event;
 	}
 
 	/**
