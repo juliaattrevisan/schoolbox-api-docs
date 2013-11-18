@@ -77,37 +77,11 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
     {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
-
-            /* Show what words/phrases were detected. Preserve the original
-             * answer text block in the db; this is a convenience for the user
-             * so they can double-check their selections.
-             */
-            $page->setBlock('answerFormFragment', 'answer_list_items', 'answer_list_items_block');
-
             $page->setVar(array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => Scrub::text($currentAnswer['answer'])
             ));
-
-            $allMatches = array();
-
-            preg_match_all('#<span class="selected-word">([^<]+)</span>#ms', $currentAnswer['answer'], $allMatches);
-
-            if (count($allMatches[1])) {
-                foreach ($allMatches[1] as $currentMatch) {
-                    $page->setVar(array(
-                        'ANSWER_LIST_ITEM' => Scrub::text($currentMatch)
-                    ));
-
-                    $page->parse('answer_list_items_block', 'answer_list_items', true);
-                }
-            } else {
-                $page->setVar('answer_list_items_block', '');
-            }
         } else {
-            $page->setBlock('answerFormFragment', 'answer_list_items', 'answer_list_items_block');
-            $page->setVar('answer_list_items_block', '');
-
             $page->setVar(array(
                 'ANSWER_ID' => '',
                 'ANSWER' => '',
