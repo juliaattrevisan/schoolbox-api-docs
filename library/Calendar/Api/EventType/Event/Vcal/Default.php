@@ -198,7 +198,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
 							/* Only get events that fit within the range specified
 							 */
-							if ($eventId == $currentEvent->UID) {
+							if ($eventId == "{$currentEvent->UID}") {
 								$collection->add(
 									$this->buildCalendarEventFromVevent(
 										$currentEvent, $decodedConfig
@@ -229,8 +229,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 	) {
 
 		$allDay = !$currentEvent->DTSTART->hasTime();
-		$eventStartTimestamp = strtotime($currentEvent->DTSTART);
-		$eventEndTimestamp   = strtotime($currentEvent->DTEND);
+		$eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
+		$eventEndTimestamp   = strtotime("{$currentEvent->DTEND}");
 
 		// According to VCAL standard: end of all day event is 12am next day
 		if ($allDay) {
@@ -241,7 +241,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 		// If this event has a category which matches
 		// any event type, then apply that event type's
 		// color instead of the configured one.
-		$categoryList = explode(';', $currentEvent->CATEGORIES);
+		$categoryList = explode(';', "{$currentEvent->CATEGORIES}");
 		$categoryList = array_map('trim',       $categoryList);
 		$categoryList = array_map('strtoupper', $categoryList);
 		$categoryList = array_filter($categoryList, 'strlen');
@@ -265,19 +265,19 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
 		$event->setAuthorName('');
 		$event->setAuthorId(-1);
-		$event->setEventId($currentEvent->UID);
+		$event->setEventId("{$currentEvent->UID}");
 
 		$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 		$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
 		$event->setType($metaDetails['eventTypeID']);
-		$event->setNote($currentEvent->SUMMARY);
+		$event->setNote("{$currentEvent->SUMMARY}");
 		$event->setAccess('');
 		$event->setEventType($metaDetails['eventType']);
 		$event->setColour($metaDetails['eventColour']);
 		$event->setCampusList(implode(',', $decodedConfig->getCampus()));
-		$event->setDetail(nl2br($currentEvent->DESCRIPTION));
-		$event->setLocation($currentEvent->LOCATION);
+		$event->setDetail(nl2br("{$currentEvent->DESCRIPTION}"));
+		$event->setLocation("{$currentEvent->LOCATION}");
 		$event->setPublishDate('');
 		$event->setSid('');
 		$event->setAllday($allDay);
