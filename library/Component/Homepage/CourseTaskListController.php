@@ -33,9 +33,12 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
      * {@inheritdoc}
      */
     public function execute() {
-        $this->group_handler   = new Group();
-        $this->category        = CategoryMapper::getInstance()->findById($this->getContext('id'));
-        $this->task_list       = TaskMapper::getInstance()->findByCategory($this->category);
+        $this->group_handler = new Group();
+        $categoryId = $this->getContext('id');
+        if ($categoryId > 0) {
+            $this->category = CategoryMapper::getInstance()->findById($categoryId);
+        }
+        $this->task_list = TaskMapper::getInstance()->findByCategory($this->category);
     }
 
     /**
@@ -68,11 +71,13 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
 
         // Start spamming out tasks into the template
         $this->setVar('category_breadcrumb_block', '');
-        foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
-            /** @var Category $parent */
-            $this->setVar('PARENT_CATEGORY_ID',   $parent->getId());
-            $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
-            $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
+        if ($this->category instanceof Category) {
+            foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
+                /** @var Category $parent */
+                $this->setVar('PARENT_CATEGORY_ID',   $parent->getId());
+                $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
+                $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
+            }
         }
         $this->setVar('task_block', '');
 
