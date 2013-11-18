@@ -10162,6 +10162,7 @@ th.rotate {
 	letter-spacing: 0.1ex;
 	&> div{
 		position: relative;
+		z-index: 1;
 		top: 0px;
 		left: ~`(@{slanty-header-height-raw} * Math.tan(@{slanty-header-angle-raw} * Math.PI/180)) / 2 + 'px'`;
 		left: 0\9; // IE8 Hack :(
