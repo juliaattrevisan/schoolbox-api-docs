@@ -359,6 +359,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
 		$answerGroup = $this->getByQuestionID($question_id);
 
+		$page->setVar('answerOptionCorrectResponse_block', '');
 		if ($answerGroup) {
 			$page->setVar(array(
 				'ANSWER_ID' => $answerGroup['answer_id'],
