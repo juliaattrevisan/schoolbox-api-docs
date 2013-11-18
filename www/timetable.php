@@ -185,6 +185,10 @@ if (is_array($outputList)) {
 
                         /* Handle colour array */
                         if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
+                            // not enough colors: loop around to index 0.
+                            if (!$colourList->offsetExists($colourIndex)) {
+                                $colourIndex = 0;
+                            }
                             $subjectColourMap[$period['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
                             $colourIndex++;
                         }
