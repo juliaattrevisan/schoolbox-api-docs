@@ -274,6 +274,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 								$event->setCampusList('');
 								$event->setDetail($this->escapeVcalValue($currentEvent->DESCRIPTION->getValue()));
 								$event->setLocation($this->escapeVcalValue($currentEvent->LOCATION->getValue()));
+								$event->setAllday(!($currentEvent->DTSTART->hasTime()));
 								$event->setPublishDate('');
 								$event->setSid('');
 
