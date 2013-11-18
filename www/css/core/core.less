@@ -334,6 +334,7 @@ h2 {
 
 .header_option {
     display: block;
+	clear: both;
     float: right;
     text-align: right;
     margin: -43px 0 0 0;
@@ -10116,6 +10117,7 @@ form.comment-form label {
 
 .mark-sheet td{
 	width: @slanty-header-width;
+	border-color: @border-color;
 	border-top: 1px solid @border-color;
 	border-left: 1px solid @border-color;
 	vertical-align: middle;
@@ -10142,7 +10144,9 @@ form.comment-form label {
 		color: inherit;
 	}
 }
+
 th.rotate {
+	border-color: @border-color;
 	height: @slanty-header-height;
 	width: @slanty-header-width;
 	min-width: @slanty-header-width;
@@ -10155,8 +10159,7 @@ th.rotate {
 	&> div{
 		position: relative;
 		top: 0px;
-		left: ~`(@{slanty-header-height-raw} * Math.tan(@{slanty-header-angle-raw} * Math.PI/180)) / 2 + 'px'`;
-		left: 0\9; // IE8 Hack :(
+		left: 0; // IE8 Hack :(
 		height: 100%;
 		@slanty-header-angle-neg: ~`'-' + '@{slanty-header-angle}'`;
 		.transform(skew(@slanty-header-angle-neg, 0deg));
@@ -10171,11 +10174,9 @@ th.rotate {
 			.transform(skew(@slanty-header-angle,0deg) rotate(@slanty-header-angle-rotate));
 			-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865483, M12=0.7071067811865467, M21=-0.7071067811865467, M22=0.7071067811865483, SizingMethod='auto expand')"; // IE8 Hack :(
 			position: absolute;
-			bottom: ~`(@{slanty-header-width-raw} * Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) + 30 + 'px'`;
-			left: -60px;
-			bottom:0\9; // IE8 Hack :(
-			top:0\9; // IE8 Hack :(
-			left:0\9; // IE8 Hack :(
+			bottom:0; // IE8 Hack :(
+			top:0; // IE8 Hack :(
+			left:0; // IE8 Hack :(
 			display: inline-block;
 			width: ~`(@{slanty-header-height-raw} / Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) - (@{slanty-header-width-raw} * Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) + 'px'`;
 			text-align: left;
@@ -10191,6 +10192,24 @@ th.rotate {
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
+	}
+}
+
+// IE9 fixes :(
+@media all and (min-width: 0px){
+	th.rotate {
+		&> div{
+			z-index: 1;
+			top: 0px;
+			left: ~`(@{slanty-header-height-raw} * Math.tan(@{slanty-header-angle-raw} * Math.PI/180)) / 2 + 'px'`;
+			filter: none !important;
+			&> span {
+				filter: none !important;
+				bottom: ~`(@{slanty-header-width-raw} * Math.cos(@{slanty-header-angle-raw} * Math.PI/180)) + 30 + 'px'`;
+				top: auto;
+				left: -60px;
+			}
+		}
 	}
 }
 
