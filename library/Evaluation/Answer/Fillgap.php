@@ -77,11 +77,6 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
     {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
-
-            /* Show what words/phrases were detected. Preserve the original
-             * answer text block in the db; this is a convenience for the user
-             * so they can double-check their selections.
-             */
             $page->setVar(array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => Scrub::text($currentAnswer['answer'])
