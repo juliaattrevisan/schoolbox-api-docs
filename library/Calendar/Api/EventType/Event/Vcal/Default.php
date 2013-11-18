@@ -57,6 +57,59 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
+		return $this->getFilteredEventCollection(
+			function($currentEvent) use($startTimestamp, $endTimestamp) {
+				/** @var Sabre\VObject\Component\VEvent $currentEvent */
+				$allDay              = !$currentEvent->DTSTART->hasTime();
+				$eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
+				$eventEndTimestamp   = strtotime("{$currentEvent->DTEND}");
+
+				// According to VCAL standard: end of all day event
+				// is 12am next day
+				if ($allDay) {
+					$eventEndTimestamp -= 1;
+				}
+
+				/* Only get events that overlap the range specified
+				 * Event's end time is before start time of span: ignore
+				 * Event's start time is before end time of span: ignore
+				 */
+				return (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp));
+			}
+		);
+	}
+
+	/**
+	 * Find a particular event from this source
+	 *
+	 * Do everything the same as usual, but only stack up one event (if you find it) and
+	 * return that instead of a collection of everything
+	 *
+	 * @param  int $eventId
+	 * @return Calendar_Event_Collection
+	 */
+	public function getEvent($eventId) {
+		return $this->getFilteredEventCollection(
+			function($currentEvent) use($eventId) {
+				/** @var Sabre\VObject\Component\VEvent $currentEvent */
+				return $eventId == "{$currentEvent->UID}";
+			},
+			1
+		);
+	}
+
+	/**
+	 * Retrieves collection of events which match a filter function.
+	 *
+	 * @param  callable $filterFunction   Callback which accepts following parameters:
+	 *                                    Sabre\VObject\Component\VEvent: event to add
+	 *                                    Calendar_Api_Config_Connector_Vcal: event retriever's configuration
+	 *                                    Returns true if this event is accepted
+	 * @param  int      $limit            If set, only this many events are returned
+	 * @return Calendar_Event_Collection
+	 */
+	protected function getFilteredEventCollection($filterFunction, $limit = null) {
+
 		$collection = new Calendar_Event_Collection();
 
 		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
@@ -107,103 +160,16 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						 * as they seem to be the calendar items themselves
 						 */
 						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
-							//
-							// All day event: starts at 12am one day, ends 12am
-							// next.
-							// (are either value: date)
-
-							$allDay = !$currentEvent->DTSTART->hasTime();
-							$eventStartTimestamp = strtotime($currentEvent->DTSTART);
-							$eventEndTimestamp   = strtotime($currentEvent->DTEND);
-
-							// According to VCAL standard: end of all day event
-							// is 12am next day
-							if ($allDay) {
-								$eventEndTimestamp -= 1;
+							$isAdded = true;
+							if (is_callable($filterFunction)) {
+								$isAdded = $filterFunction($currentEvent, $decodedConfig);
 							}
-
-							/* Only get events that overlap the range specified
-							 * Event's end time is before start time of span: ignore
-							 * Event's start time is before end time of span: ignore
-							 */
-							if (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp)) {
+							if ($isAdded) {
 								$collection->add(
-									$this->buildCalendarEventFromVevent(
-										$currentEvent, $decodedConfig
-									)
+									$this->buildCalendarEventFromVevent($currentEvent, $decodedConfig)
 								);
 							}
-						}
-					}
-				}
-			}
-		}
-
-		return $collection;
-	}
-
-	/**
-	 * Find a particular event from this source
-	 *
-	 * Do everything the same as usual, but only stack up one event (if you find it) and
-	 * return that instead of a collection of everything
-	 *
-	 * @param $eventId
-	 * @return Calendar_Event_Collection
-	 */
-	public function getEvent($eventId) {
-		$collection = new Calendar_Event_Collection();
-
-		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
-			'event_type' => 'Event',
-			'connector_class' => 'Vcal',
-			'status' => 1
-		));
-
-		foreach ($allConfigs as $currentConfig) {
-			/* @var $currentConfig Calendar_Api_Config_Record */
-			$decodedConfig = $currentConfig->decodeConfig();
-
-			/* Check permissions - if you can view these events according to the Permissions
-			 * settings then accumulate the events. Otherwise ignore them.
-			 */
-			if ($decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
-
-				/* Load calendar from locker cache
-				 */
-				$cache = new Calendar_Api_Cache();
-				$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
-
-				/* Parse it all
-				 */
-				try {
-					$allEvents = Sabre\VObject\Reader::read($source);
-				}
-				catch(Exception $e) {
-
-					/* Some google calendars don't follow sabre's expected format?
-					echo $decodedConfig->getUrl();
-					echo $e->getMessage();
-					 */
-				}
-
-				if ($allEvents !== null) {
-					foreach($allEvents->children as $currentEvent) {
-
-						/* gloop returns a whole bunch of stuff all mixed up
-						 *
-						 * We only want to deal with Sabre_VObject_Component_VEvent objects
-						 * as they seem to be the calendar items themselves
-						 */
-						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
-							/* Only get events that fit within the range specified
-							 */
-							if ($eventId == "{$currentEvent->UID}") {
-								$collection->add(
-									$this->buildCalendarEventFromVevent(
-										$currentEvent, $decodedConfig
-									)
-								);
+							if (isset($limit) && $collection->getCount() >= $limit) {
 								return $collection;
 							}
 						}
@@ -211,7 +177,6 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				}
 			}
 		}
-
 		return $collection;
 	}
 
@@ -228,7 +193,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 		Calendar_Api_Config_Connector_Vcal $decodedConfig
 	) {
 
-		$allDay = !$currentEvent->DTSTART->hasTime();
+		$allDay              = !$currentEvent->DTSTART->hasTime();
 		$eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
 		$eventEndTimestamp   = strtotime("{$currentEvent->DTEND}");
 
