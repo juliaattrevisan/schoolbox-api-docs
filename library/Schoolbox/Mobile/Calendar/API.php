@@ -22,12 +22,9 @@ use ClientDevice;
 class API extends Generic\API {
 
     public function Month($date = '') {
-		$user_mapper = new \Schoolbox\UserMapper();
-		$user = $user_mapper->findById($_SESSION['id']);
-
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory($user);
+        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
         $calendarHandler = $calFactory->produce();
 
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
@@ -136,7 +133,7 @@ class API extends Generic\API {
 
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory();
+        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
         $calendarHandler = $calFactory->produce();
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
@@ -173,7 +170,7 @@ class API extends Generic\API {
     public function Agenda($date = '', $limit = 7) {
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory();
+        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
         $calendarHandler = $calFactory->produce();
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
@@ -229,7 +226,7 @@ class API extends Generic\API {
     protected function phoneAgenda($selected) {
         $response = new Response_HTTP();
 
-        $calFactory = new Calendar_Api_Factory();
+        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
         $calendarHandler = $calFactory->produce();
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
@@ -305,7 +302,7 @@ class API extends Generic\API {
     private function displayWeek($selected, $user) {
         $response = new Response_HTTP();
 
-        $calFactory = new Calendar_Api_Factory();
+        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
         $calendarHandler = $calFactory->produce();
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
@@ -343,7 +340,7 @@ class API extends Generic\API {
     private function displayMonth($selected, $user) {
         $response = new Response_HTTP();
 
-        $calFactory = new Calendar_Api_Factory();
+        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
         $calendarHandler = $calFactory->produce();
 
         $week['day']    = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
@@ -427,7 +424,7 @@ class API extends Generic\API {
 			$config = $configRecord->decodeConfig();
 			$config->setId($connector_id);
 
-			$factory = new Calendar_Api_Factory();
+			$factory = new Calendar_Api_Factory($_SESSION['user']);
 			$factory->resetConfigs();
 			$factory->addConfig($config);
 
