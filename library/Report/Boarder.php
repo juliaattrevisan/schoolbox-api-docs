@@ -23,6 +23,8 @@ class Report_Boarder extends Report_Parent {
 		else {
 			$this->setPage($page);
 
+			$this->setExternalUserHandler(new External_User());			
+
 			$this->setup();
 
 			$this->setAllRecords($this->getExternalUserHandler()->getStudentBoarderContactListExtended());

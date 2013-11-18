@@ -51,7 +51,6 @@ class Report_Parent extends Report_Abstract {
 	 */
 	public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
 		$this->setGroupHandler(new Group());
-        $this->setExternalUserHandler(new External_User());
 
 		// Must provide an int or be empty
 		$yearLevel = trim($yearLevel);
@@ -72,6 +71,7 @@ class Report_Parent extends Report_Abstract {
 		else {
 			$this->setPage($page);
 
+			$this->setExternalUserHandler(new External_User());
 
 			$this->setup();
 
