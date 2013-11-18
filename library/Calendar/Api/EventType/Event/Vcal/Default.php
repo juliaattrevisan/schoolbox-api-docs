@@ -198,7 +198,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
 							/* Only get events that fit within the range specified
 							 */
-							if ($eventId == $currentEvent->UID->getValue()) {
+							if ($eventId == $currentEvent->UID) {
 								$collection->add(
 									$this->buildCalendarEventFromVevent(
 										$currentEvent, $decodedConfig
