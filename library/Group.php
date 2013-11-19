@@ -2,6 +2,8 @@
 
 class Group extends DeprecatedModel
 {
+	public $cache = array();
+	public $cacheUser = array();
 
 	/* Enum in groups table
 	  */
@@ -372,20 +374,20 @@ class Group extends DeprecatedModel
 			return $this->cache[$this->_service][$relationID][$userID];
 		}
 
-        /* Cache users aswell */
-        if(!isset($this->cacheUser[$userID])) {
-            $userHandler = new User;
-            $this->cacheUser[$userID] = $user = $userHandler->getByID($userID);
-        }
-        else {
-            $user = $this->cacheUser[$userID];
-        }
+		/* Cache users aswell */
+		if(!isset($this->cacheUser[$userID])) {
+			$userHandler = new User;
+			$this->cacheUser[$userID] = $user = $userHandler->getByID($userID);
+		}
+		else {
+			$user = $this->cacheUser[$userID];
+		}
 
 		// if superuser just return highest permission type
 		if ($user['su']) {
-            $this->cache[$this->_service][$relationID][$userID] = FULL_ACCESS;
+			$this->cache[$this->_service][$relationID][$userID] = FULL_ACCESS;
 			return FULL_ACCESS;
-        }
+		}
 		// check individual access
 
 		$query = "SELECT type FROM userAccess WHERE uid = " . $this->db->smartQuote($userID) . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
@@ -616,29 +618,29 @@ class Group extends DeprecatedModel
 		return $catList;
 	}
 
-    /*
-     * New function to make retrieving the list of user subjects easier, is deprecating involvedCategoryList
-     *
-     * @see Schoolbox\Resource\CategoryMapper->getForUser() for an implementation
-     *      that uses the mapper classes.
-     */
-    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS)
-    {
+	/*
+	 * New function to make retrieving the list of user subjects easier, is deprecating involvedCategoryList
+	 *
+	 * @see Schoolbox\Resource\CategoryMapper->getForUser() for an implementation
+	 *      that uses the mapper classes.
+	 */
+	function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS)
+	{
 
-        $catList = array();
+		$catList = array();
 
-        if ($includeSubjectList == true && Cfg::get('external_enable')) {
-	        $catList = $this->involvedInSubjects($userID);
-        }
+		if ($includeSubjectList == true && Cfg::get('external_enable')) {
+			$catList = $this->involvedInSubjects($userID);
+		}
 
 		//get list of groups involved in (not already in $catList)
-	    $excluded_id_list = array();
-	    if (!empty($catList)) {
-		    foreach ($catList as $cat) {
-			    $excluded_id_list[] = intval($cat['id']);
-		    }
-	    }
-	    $exclude_part = !empty($excluded_id_list) ? ('AND category.id NOT IN ('.implode(',', $excluded_id_list).')') : '';
+		$excluded_id_list = array();
+		if (!empty($catList)) {
+			foreach ($catList as $cat) {
+				$excluded_id_list[] = intval($cat['id']);
+			}
+		}
+		$exclude_part = !empty($excluded_id_list) ? ('AND category.id NOT IN ('.implode(',', $excluded_id_list).')') : '';
 		$query = "
 			SELECT
 			category.name, category.id, type,
@@ -727,5 +729,13 @@ class Group extends DeprecatedModel
 	{
 		$query = "SELECT name FROM groups WHERE id = \"{$groupID}\"";
 		return $this->db->getOne($query);
+	}
+
+	/**
+	 * Clears caches for users and groups permissions.
+	 */
+	public function clearPermissionsCache() {
+		$this->cache     = array();
+		$this->cacheUser = array();
 	}
 }
