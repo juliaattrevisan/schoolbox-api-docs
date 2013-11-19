@@ -49,6 +49,8 @@ class Marksheet {
 
 	/** @var \Submission */
 	protected $submissionHandler;
+	/** @var \SubmissionStudent */
+	protected $submissionStudentHandler;
 	/** @var \SubmissionReturn */
 	protected $returnHandler;
 	/** @var \Marksheet_Factory */
@@ -153,6 +155,29 @@ class Marksheet {
 			$studentList = array_merge($studentList, $groupList);
 		}
 
+		$workList = $this->submissionHandler->getAllForUserCategory($catId, null, $year, $semester);
+
+		// Get list of extra users for each work item
+		// Online assessments: get all users who have attempted assessment
+		// Due work: all users who have submitted or returned work
+		if (is_array($workList)) {
+			foreach ($workList as $work) {
+				if ($work['type_id'] == \Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
+					$studentList = array_merge(
+						$studentList,
+						$this->attemptHandler->getStudentListByAssessId($work['id'])
+					);
+				}
+				else {
+					$studentList = array_merge(
+						$studentList,
+						$this->submissionStudentHandler->getStudentListByBoxId($work['id']),
+						$this->returnHandler->getStudentListByBoxId($work['id'])
+					);
+				}
+			}
+		}
+
 		// extract all the synergy IDs of the students found
 		$extIds = array();
 		foreach($studentList as $studentData) {
@@ -161,8 +186,6 @@ class Marksheet {
 
 		// convert to domain object collection (in 1 query, not `n`)
 		$studentCollection = $this->userMapper->findByColumn('synergy_id', $extIds);
-
-		$workList = $this->submissionHandler->getAllForUserCategory($catId, null, $year, $semester);
 
 		if(is_array($workList)) {
 			$statData = array();
