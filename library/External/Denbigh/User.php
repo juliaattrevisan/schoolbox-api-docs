@@ -84,18 +84,27 @@ class External_Denbigh_User implements External_UserInterface {
     }
 
     public function getParent($externalUserId) {
+        // Get addresses with a phone number first.
+        // Then, sort by address ID (so that first 2 results have the same
+        // address but a different parent entry. First should be this user,
+        // second the spouse)
         $statement = $this->getExternalDatabase()->query(
             "
-			SELECT pe.denbighID, pe.surname, pe.given_names, pe.preferred_name, pe.title, pe.gender, pe.dateOfBirth,
-				pa.relationship, a.telephoneHome
-			FROM People
-			LEFT JOIN Parents ON Parents.peopleDenbighID = People.denbighID
-			LEFT JOIN Parents pa ON pa.familyDenbighID = Parents.familyDenbighID
-			LEFT JOIN People pe ON pe.denbighID = pa.peopleDenbighID
-			LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
-			WHERE People.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
-			ORDER BY pe.denbighID = {$this->getExternalDatabase()->quote($externalUserId)} DESC
-		"
+            SELECT
+                pe.denbighID, pe.surname, pe.given_names, pe.preferred_name, pe.title, pe.gender, pe.dateOfBirth,
+                pa.relationship, a.telephoneHome
+            FROM People
+            LEFT JOIN Parents ON Parents.peopleDenbighID = People.denbighID
+            LEFT JOIN Parents pa ON pa.familyDenbighID = Parents.familyDenbighID
+            LEFT JOIN People pe ON pe.denbighID = pa.peopleDenbighID
+            LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
+            WHERE
+                People.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
+            ORDER BY
+                a.telephoneHome IS NOT NULL DESC,
+                a.addressDenbighID DESC,
+                pe.denbighID = {$this->getExternalDatabase()->quote($externalUserId)} DESC
+        "
         );
 
         $parentList = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -127,7 +136,9 @@ class External_Denbigh_User implements External_UserInterface {
             $adaption['DirectoryIncludeFlag'] = 1;
         }
 
-        if (!empty($parentList[1])) {
+        // Don't update spouse if user[1] is somehow same user as user[0]
+        // (this could happen for sole parent who has multiple addresses)
+        if (!empty($parentList[1]) && $parentList[1]['denbighID'] != $externalUserId) {
             $adaption['SpouseID'] = $parentList[1]['denbighID'];
             $adaption['SpouseTitle'] = $parentList[1]['title'];
             $adaption['SpousePreferred'] = $parentList[1]['preferred_name'];
