@@ -19,6 +19,32 @@ class SubmissionReturn extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
+    /**
+     * Gets list of al students who have had work returned for this submission
+     * box ID.
+     *
+     * @param  int $boxId
+     * @return array
+     */
+    public function getStudentListByBoxId($boxId) {
+        $studentList = array();
+        $allReturns = $this->getByBoxID($boxId);
+        if (is_array($allReturns)){
+            foreach ($allReturns as $return) {
+                $studentList[] = array(
+                    'title' => $return['title'],
+                    'firstname' => $return['firstname'],
+                    'lastname' => $return['lastname'],
+                    'uid' => $return['uid'],
+                    'synergy_id' => $return['synergy_id'],
+                    'type' => $return['type'],
+                    'group_id' => $return['group_id'],
+                );
+            }
+        }
+        return $studentList;
+    }
+
 	function getOneByUser($user_id, $box_id = 0) {
 		$query = "SELECT r.*, c.name categoryName, s.name, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
 				  WHERE r.deleted = 0 AND r.box_id = s.id AND s.category = c.id AND r.owner = '$user_id'";

@@ -30,6 +30,31 @@ class SubmissionStudent extends DeprecatedModel {
         return $this->getByCondition($subBoxID, array());
     }
 
+    /**
+     * Gets list of al students who have submitted to this submission box ID.
+     *
+     * @param  int $boxId
+     * @return array
+     */
+    public function getStudentListByBoxId($boxId) {
+        $studentList = array();
+        $allSubmissions = $this->getByBoxID($boxId);
+        if (is_array($allSubmissions) && count($allSubmissions)) {
+            foreach ($allSubmissions as $submission) {
+                $studentList[] = array(
+                    'title' => $submission['title'],
+                    'firstname' => $submission['firstname'],
+                    'lastname' => $submission['lastname'],
+                    'uid' => $submission['uid'],
+                    'synergy_id' => $submission['synergy_id'],
+                    'type' => $submission['type'],
+                    'group_id' => $submission['group_id'],
+                );
+            }
+        }
+        return $studentList;
+    }
+
     protected function getByCondition($subBoxID, array $conditions) {
 
         $where = array();

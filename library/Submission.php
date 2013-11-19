@@ -1339,50 +1339,30 @@ class Submission extends DeprecatedModel {
         if ($box['code'] && Cfg::get('external_enable')) {
             $synHandler = new External_Class();
             $studentListClassCode = $synHandler->getStudents($box['code']);
-            if(is_array($studentListClassCode)){
-                $studentList = array_merge($studentList,$studentListClassCode);
+            if (is_array($studentListClassCode)) {
+                $studentList = array_merge($studentList, $studentListClassCode);
             }
         }
 
         // list all students from group membership
         $groupHandler = new Group();
         $studentListFromGroup = $groupHandler->getMemberList($box['category']);
-        if(is_array($studentListFromGroup)){
-            $studentList = array_merge($studentList,$studentListFromGroup);
+        if (is_array($studentListFromGroup)) {
+            $studentList = array_merge($studentList, $studentListFromGroup);
         }
 
         // list all students who have already submitted
         $studentSubHandler = new SubmissionStudent();
-        $allSubmissions = $studentSubHandler->getByBoxID($this->arg[0]);
-        if (is_array($allSubmissions) && count($allSubmissions)) {
-            foreach ($allSubmissions as $submission) {
-                $studentList[] = array(
-                    'title' => $submission['title'],
-                    'firstname' => $submission['firstname'],
-                    'lastname' => $submission['lastname'],
-                    'uid' => $submission['uid'],
-                    'synergy_id' => $submission['synergy_id'],
-                    'type' => $submission['type'],
-                    'group_id' => $submission['group_id'],
-                );
-            }
+        $studentListFromSubmissions = $studentSubHandler->getStudentListByBoxId($this->arg[0]);
+        if (is_array($studentListFromSubmissions)) {
+            $studentList = array_merge($studentList, $studentListFromSubmissions);
         }
 
         // list all students who have been marked
         $studentRetHandler = new SubmissionReturn();
-        $allReturns = $studentRetHandler->getByBoxID($this->arg[0]);
-        if(is_array($allReturns)){
-            foreach ($allReturns as $return) {
-                $studentList[] = array(
-                    'title' => $return['title'],
-                    'firstname' => $return['firstname'],
-                    'lastname' => $return['lastname'],
-                    'uid' => $return['uid'],
-                    'synergy_id' => $return['synergy_id'],
-                    'type' => $return['type'],
-                    'group_id' => $return['group_id'],
-                );
-            }
+        $studentListFromReturns = $studentRetHandler->getStudentListByBoxId($this->arg[0]);
+        if (is_array($studentListFromReturns)) {
+            $studentList = array_merge($studentList, $studentListFromReturns);
         }
 
         // Sort all students by last name, then first name
