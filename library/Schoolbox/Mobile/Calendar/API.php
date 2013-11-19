@@ -36,9 +36,6 @@ class API extends Generic\API {
         $nextMonthSlug = date('d-m-Y', $nextMonth);
         $prevMonthSlug = date('d-m-Y', $prevMonth);
 
-        $nextMonthName = date('F', $nextMonth);
-        $prevMonthName = date('F', $prevMonth);
-
 		/* $eventMap is an array of empty event containers
 		 * Each array element maps to a day of the month
 		 */
@@ -158,21 +155,27 @@ class API extends Generic\API {
     public function Agenda($date = '', $limit = 7) {
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $startOfWeek = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $dayOfWeek), $selected['year']);
 
         $events = array();
 
+        $groupedEventList = $this->getEventsForTimespan(
+            $startOfWeek,
+            strtotime("+$limit day - 1 second", $startOfWeek)
+        );
+
         for($i = 0; $i < $limit; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
-            $dayEvents = $calendarHandler->getDayEvents($currentDay);
-            if(is_array($dayEvents)) {
-                $dayEvents[0]['header'] = date('jS F', $currentDay);
-                foreach($dayEvents as $e) {
-                    $events[] = $e;
+            $dayGroup = date('Ymd', $currentDay);
+            $dayEvents = $groupedEventList[$dayGroup] ?: array();
+            if (is_array($dayEvents)) {
+                foreach ($dayEvents as $j => $event) {
+                    $events[] = array(
+                        'header' => ($j == 0 ? date('jS F', $currentDay) : ''),
+                        'event'  => $event,
+                    );
                 }
             }
         }
