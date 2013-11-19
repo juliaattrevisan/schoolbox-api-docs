@@ -9,11 +9,16 @@ if(!isset($this)) {
     SitePage::localRedir('/submission/markSheet');
 }
 
+$groupHandler = new Group();
+
 $performExport = false;
 if(is_numeric($this->arg[0])) {
     $categoryID = $this->arg[0];
     if ($this->arg[3] == 'export') {
         $performExport = true;
+        if (!$groupHandler->isStaff()) {
+            error(19);
+        }
     }
 }
 else {
@@ -49,7 +54,7 @@ else {
 $m = new Marksheet($categoryID, $_SESSION['id'], array(
 	// inject handler dependencies
 	'user' => new User(),
-	'group' => new Group(),
+	'group' => $groupHandler,
 	'category' => new Category(),
 	'synergy' => new External_Class(),
 
@@ -74,7 +79,13 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
 
 
 $m->generateData($year, $semester);
-$m->renderSitepage($this);
+if ($performExport) {
+    $m->renderCsv();
+    exit;
+}
+else {
+    $m->renderSitepage($this);
+}
 return;
 
 //
