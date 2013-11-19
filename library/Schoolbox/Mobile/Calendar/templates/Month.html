@@ -28,7 +28,7 @@
                 <li class="{{ content[i].events[j].eventType }}{% if j > 2 %} excess{% endif %}">
                 {% if content[i].events[j].eventId and content[i].events[j].eventId != -1 %}
                     <a href="/m/calendar/event/{{ content[i].events[j].eventId }}/{{content[i].events[j].connectorId}}">
-                    {% if content[i].events[j].startTime.timeOnly %}
+                    {% if not content[i].events[j].allDay %}
                         <time>{{ content[i].events[j].startTime.timeOnly }}</time>
                     {% endif %}
                         {{ content[i].events[j].note|raw }}

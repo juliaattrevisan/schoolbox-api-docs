@@ -75,14 +75,12 @@ class API extends Generic\API {
 
 		/* Get all the events for this month and fill them into the containers
 		 */
+		/** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $allEvents */
 		$allEvents = $calendarHandler->getEvents($month['start'], $month['end']);
 		$allEvents->sort();
 
 		foreach ($allEvents as $current) {
 			$currentEventDay = (int)$current->getStartTime()->getUsingFormat('d');
-			if ($current->getStartTime()->getTimeOnly() == '12:00am') {
-				$current->setStartTime('');
-			}
 			if (empty($eventMap[$currentEventDay]['events'])) {
 				$eventMap[$currentEventDay]['events'] = array();
 			}
