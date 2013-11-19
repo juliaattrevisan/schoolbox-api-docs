@@ -1353,14 +1353,14 @@ class Submission extends DeprecatedModel {
 
         // list all students who have already submitted
         $studentSubHandler = new SubmissionStudent();
-        $studentListFromSubmissions = $studentSubHandler->getStudentListByBoxId($this->arg[0]);
+        $studentListFromSubmissions = $studentSubHandler->getStudentListByBoxId($box['id']);
         if (is_array($studentListFromSubmissions)) {
             $studentList = array_merge($studentList, $studentListFromSubmissions);
         }
 
         // list all students who have been marked
         $studentRetHandler = new SubmissionReturn();
-        $studentListFromReturns = $studentRetHandler->getStudentListByBoxId($this->arg[0]);
+        $studentListFromReturns = $studentRetHandler->getStudentListByBoxId($box['id']);
         if (is_array($studentListFromReturns)) {
             $studentList = array_merge($studentList, $studentListFromReturns);
         }
