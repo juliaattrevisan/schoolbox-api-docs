@@ -101,6 +101,7 @@ else if (is_numeric($_GET['owner'])) {
 	$groupHandler->setUserPermission($_GET['categoryID'], $_GET['owner'], FULL_ACCESS);
 
 	// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
+	$groupHandler->clearPermissionsCache();
 	if ($groupHandler->getPermission($_GET['categoryID']) < FULL_ACCESS) {
 		SitePage::localRedir("/homepage/" . $_GET['categoryID']);
 	}
