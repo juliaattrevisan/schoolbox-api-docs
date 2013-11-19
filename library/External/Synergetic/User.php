@@ -364,7 +364,7 @@ class External_Synergetic_User implements External_UserInterface {
 			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
 			LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
 			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
-			LEFT JOIN SynergyOne.dbo.luYearLevel Year ON StudentYearLevel = Year.Code
+			LEFT JOIN SynergyOne.dbo.luYearLevel Year ON StudentYearLevel = Year.Code AND StudentCampus = Year.Campus
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
 			AND FileYear = " . $_SESSION['FileYear'];
