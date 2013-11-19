@@ -148,15 +148,26 @@ class API extends Generic\API {
 
         $calendar = array();
 
+        /** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $eventList */
+        $eventList = $calendarHandler->getEvents($startOfWeek, $endOfWeek-1);
+        $eventList->sort();
+        // group event list by day
+        $groupedEventList = array();
+        foreach ($eventList as $event) {
+            $eventDay = $event->getStartTime()->getUsingFormat('Ymd');
+            $groupedEventList[$eventDay][] = $event;
+        }
+
         for($i = 0; $i < 7; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
+            $eventDay = date('Ymd', $currentDay);
 
             $calendar[] = array(
                 'title'   => date('jS F', $currentDay),
                 'aside'   => '',
-                'class'   => (date('Ymd') == date('Ymd', $currentDay) ? 'cal-today ' : ' ') . 'wide',
+                'class'   => (date('Ymd') == $eventDay ? 'cal-today ' : ' ') . 'wide',
                 'icon'    => '',
-                'content' => $calendarHandler->getDayEvents($currentDay)
+                'content' => $groupedEventList[$eventDay] ?: array()
             );
         }
 
