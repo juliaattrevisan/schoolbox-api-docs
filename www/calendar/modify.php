@@ -64,7 +64,7 @@ if (is_numeric($_GET['eventID'])) {
         'LOCATION' => $event['location'],
         'ATTENDANCE' => $event['attendance'] ? 'checked="checked"' : '',
         'DETAIL' => $event['detail'],
-        'RETURN_TO' => parseReturnTo($_GET['returnTo'], $startDate->getUsingFormat('d-m-Y'), $_GET['sid']),
+        'RETURN_TO' => parseReturnTo($_GET['returnTo'], $startDate->getUsingFormat('d-m-Y'), $_GET['sid'], $event['owner']),
         'PUBLISH_DATE' => $publishDate,
     );
 
@@ -200,7 +200,7 @@ else {
         'LOCATION' => '',
         'ATTENDANCE' => '',
         'DETAIL' => '',
-        'RETURN_TO' => parseReturnTo($_GET['returnTo'], $startDate->getUsingFormat('d-m-Y'), $_GET['sid']),
+        'RETURN_TO' => parseReturnTo($_GET['returnTo'], $startDate->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
         'PUBLISH_DATE' => '',
     );
 
@@ -286,11 +286,12 @@ else {
  * @param string $returnView
  * @param string $returnDate
  * @param int    $groupId
+ * @param int    $userId
  *
  * @return string
  * @internal param $returnTo
  */
-function parseReturnTo($returnView, $returnDate = "", $groupId = null) {
+function parseReturnTo($returnView, $returnDate = "", $groupId = null, $userId = null) {
     if ($returnView === 'dashboard') {
         return '/';
     }
@@ -301,7 +302,11 @@ function parseReturnTo($returnView, $returnDate = "", $groupId = null) {
         return '/homepage/'.$groupId;
     }
     elseif ($returnView === 'calendar') {
-        return "/calendar/full/$returnDate";
+        $return = "/calendar/full/$returnDate";
+        if ($userId) {
+            $return .= '/'.$userId;
+        }
+        return $return;
     }
     // Otherwise - guess using Back to the future!
     return '';
