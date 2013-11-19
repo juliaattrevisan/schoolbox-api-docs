@@ -25,8 +25,6 @@ class API extends Generic\API {
     public function Month($date = '') {
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
 
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
         $month['first'] = date('w', $month['start']);
@@ -55,10 +53,13 @@ class API extends Generic\API {
 			$blankStart[] = '_blank';
 		}
 
+        $groupedEventList = $this->getEventsForTimespan($month['start'], $month['end']);
+
 		/* Prefill containers for each day of the month
 		 */
 		for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
             $currentDay = strtotime("+1 day", $currentDay);
+            $eventGroup = date('Ymd', $currentDay);
 
             $day = array(
 				'dayOfMonth' => date('j', $currentDay),
@@ -69,22 +70,9 @@ class API extends Generic\API {
             if (date('d-m-Y', $currentDay) == date('d-m-Y', $_SERVER['REQUEST_TIME'])) {
                 $day['isToday'] = '1';
             }
+            $day['events'] = $groupedEventList[$eventGroup] ?: array();
 
 			$eventMap[$day['dayOfMonth']] = $day;
-		}
-
-		/* Get all the events for this month and fill them into the containers
-		 */
-		/** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $allEvents */
-		$allEvents = $calendarHandler->getEvents($month['start'], $month['end']);
-		$allEvents->sort();
-
-		foreach ($allEvents as $current) {
-			$currentEventDay = (int)$current->getStartTime()->getUsingFormat('d');
-			if (empty($eventMap[$currentEventDay]['events'])) {
-				$eventMap[$currentEventDay]['events'] = array();
-			}
-			$eventMap[$currentEventDay]['events'][] = $current;
 		}
 
 		/* Pad out the final line
@@ -132,8 +120,6 @@ class API extends Generic\API {
 
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $startOfWeek = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $dayOfWeek), $selected['year']);
@@ -148,15 +134,7 @@ class API extends Generic\API {
 
         $calendar = array();
 
-        /** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $eventList */
-        $eventList = $calendarHandler->getEvents($startOfWeek, $endOfWeek-1);
-        $eventList->sort();
-        // group event list by day
-        $groupedEventList = array();
-        foreach ($eventList as $event) {
-            $eventDay = $event->getStartTime()->getUsingFormat('Ymd');
-            $groupedEventList[$eventDay][] = $event;
-        }
+        $groupedEventList = $this->getEventsForTimespan($startOfWeek, $endOfWeek-1);
 
         for($i = 0; $i < 7; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
@@ -412,6 +390,32 @@ class API extends Generic\API {
         $response->setResponse('articles', array('Month' => $calendar));
 
         return $response;
+    }
+
+    /**
+     * Retrieves and groups all events by day for the given timespan.
+     *
+     * @param  int    $start       Timestamp of start of search bracket
+     * @param  int    $end         Timestamp of end of search bracket
+     * @param  string $groupFormat Format to group retrieved event list by
+     * @return array
+     */
+    protected function getEventsForTimespan($start, $end, $groupFormat = 'Ymd') {
+        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
+        $calendarHandler = $calFactory->produce();
+        /** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $eventList */
+        $eventList = $calendarHandler->getEvents($start, $end);
+        $eventList->sort();
+
+        $groupedEventList = array();
+        foreach ($eventList as $event) {
+            $eventGrouping = $event->getStartTime()->getUsingFormat($groupFormat);
+            if (!isset($groupedEventList[$eventGrouping])) {
+                $groupedEventList[$eventGrouping] = array();
+            }
+            $groupedEventList[$eventGrouping][] = $event;
+        }
+        return $groupedEventList;
     }
 
 
