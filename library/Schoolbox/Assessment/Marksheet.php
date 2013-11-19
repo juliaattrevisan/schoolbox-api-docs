@@ -329,8 +329,8 @@ class Marksheet {
 		$mostRecentAttempt = $this->attemptHandler->getLatestForUser($assessId, $studentId);
 		if(!$mostRecentAttempt) {
 			return array(
-				'mark' => '&ndash;',
-				'norm_mark' => 'null'
+				'mark' => '',
+				'norm_mark' => null
 			);
 		}
 		$marks = $this->attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
@@ -367,7 +367,7 @@ class Marksheet {
 		}
 
 		if(is_null($mark['mark'])) {
-			$mark['mark'] = '&ndash;';
+			$mark['mark'] = '';
 		}
 		else {
 			$error = $this->errorList->getBy('displayAs', $mark['mark']);
