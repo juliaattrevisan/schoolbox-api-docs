@@ -115,6 +115,9 @@ class CurrentPeriod extends Generic {
                 if(isset($period['staffID'])) {
 
 	                if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
+                        if (!$colourList->offsetExists($colourIndex)) {
+                            $colourIndex = 0;
+                        }
 		                $subjectColourMap[$period['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
 		                $colourIndex++;
 	                }
