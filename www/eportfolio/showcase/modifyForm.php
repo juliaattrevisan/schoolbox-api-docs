@@ -31,7 +31,12 @@ if ($authenticator->canModify()) {
 
 		/* Check if the submission box is already being showcased; if so, ignore request
 		 */
-		$existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumn('submission_box_id', $boxId);
+		$existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumnList(
+			array(
+				'uid'               => $ownerId,
+				'submission_box_id' => $boxId,
+			)
+		);
 
 		if (!$existing->count()) {
 			$showcasedItem = new \Eportfolio\Showcase();
@@ -44,5 +49,5 @@ if ($authenticator->canModify()) {
 		}
 	}
 
-    $page->backToTheFuture(1);
+	$page->backToTheFuture(1);
 }
