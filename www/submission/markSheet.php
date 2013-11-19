@@ -55,6 +55,7 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
 
 	'submission' => new Submission(),
 	'return' => new SubmissionReturn(),
+	'submissionStudent' => new SubmissionStudent(),
 	'marktypeFactory' => new Marksheet_Factory(),
 
 	'assessFactory' => new Assess_Factory(),
