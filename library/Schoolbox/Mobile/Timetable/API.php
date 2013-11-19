@@ -146,6 +146,9 @@ class API {
                     if(isset($class['staffID'])) {
 
 	                    if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
+                            if (!$colourList->offsetExists($colourIndex)) {
+                                $colourIndex = 0;
+                            }
 		                    $subjectColourMap[$class['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
 		                    $colourIndex++;
 	                    }
