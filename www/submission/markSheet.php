@@ -16,9 +16,9 @@ if(is_numeric($this->arg[0])) {
     $categoryID = $this->arg[0];
     if ($this->arg[3] == 'export') {
         $performExport = true;
-        if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS) {
-            error(19);
-        }
+    }
+    if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS) {
+        error(19);
     }
 }
 else {
