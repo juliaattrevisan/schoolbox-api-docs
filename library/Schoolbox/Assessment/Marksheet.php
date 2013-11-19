@@ -630,5 +630,66 @@ class Marksheet {
 	 */
 	public function renderCsv() {
 
+		/* Open an output stream so we can use fputcsv
+		  */
+		$filename = preg_replace('/[^0-9a-zA-Z()_-]/', '_', $this->category->getName());
+
+		header("Pragma: ");
+		header("Cache-control: ");
+		header("Content-Type: text/csv");
+		header("Content-Disposition: attachment; filename=\"" . $filename . ".csv\"");
+
+		$fp = fopen('php://output', 'w');
+
+		// First level heading:
+		$header    = array('External ID', 'Surname', 'Firstname');
+		$subheader = array('', '', '');
+		foreach ($this->displayOrder as $item) {
+			if ($item['object'] instanceof OnlineAssessment) {
+				// Online assess has only two columns
+				$header[] = $item['object']->getTitle();
+				$header[] = '';
+				$subheader[] = 'Grade';
+				$subheader[] = 'Total';
+			}
+			elseif ($item['object'] instanceof SubmissionBox) {
+				$header[] = $item['object']->getName();
+				$header[] = '';
+				$header[] = '';
+				$subheader[] = 'Normalised Grade';
+				$subheader[] = 'Grade';
+				$subheader[] = 'Comment';
+			}
+			else {
+				$header[] = '';
+				$header[] = '';
+				$header[] = '';
+				$subheader[] = '';
+				$subheader[] = '';
+				$subheader[] = '';
+			}
+		}
+		fputcsv($fp, $header);
+		fputcsv($fp, $subheader);
+
+		foreach ($this->studentDataSet as $row) {
+			/** @var User $student */
+			$student = $row['student'];
+			$output  = array(
+				$student->getExternalId(),
+				$student->getLastname(),
+				$student->getFirstname(),
+			);
+			foreach ($this->displayOrder as $item) {
+				$mark = $row['marks'][$item['isOA']][$item['id']];
+				if (!($item['object'] instanceof OnlineAssessment)) {
+					$output[] = $mark['norm_mark'];
+				}
+				$output[] = $mark['mark'];
+				$output[] = $mark['comment'];
+			}
+			fputcsv($fp, $output);
+		}
+		fclose($fp);
 	}
 }
