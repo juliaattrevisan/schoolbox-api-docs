@@ -681,7 +681,7 @@ class Calendar extends DeprecatedModel {
 		}
 		if ($filter['group']) {
 			$filter_query[] = 'access = '.self::ACCESS_GROUP;
-			$filter_query[] = 'eventGroup.groupID = '.intval($filter['group']);
+			$filter_query[] = 'event.sid = '.intval($filter['group']);
 		}
 		if ($filter['personal']) {
 			$filter_query[] = 'access = '.self::ACCESS_PERSONAL;
