@@ -1,7 +1,7 @@
 <?php
 /************************************************************
 *                                                           *
-* 		Copyright (c) 2003-2004 Lektec Consulting			*
+* 		Copyright (c) 2013  Alaress Pty Ltd     			*
 *                                                           *
 *	This file provides abstraction of the database.			*
 *	This implements MySQL connections.  All standard 		*
