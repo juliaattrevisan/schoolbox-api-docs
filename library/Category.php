@@ -693,7 +693,9 @@ class Category extends DeprecatedModel {
 						MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `cscore`,
 						`perms`.type AS perms_type,
 						`userAccess`.type AS userAccess_type
+						, `homepage_config`.`template` AS `template`
 					FROM `category`
+					LEFT JOIN `homepage_config` ON `category`.id = `homepage_config`.cid
 					LEFT JOIN `perms` ON `category`.id = `perms`.cid
 						AND `perms`.gid = {$_SESSION['gid']}
 						AND `perms`.type > 0

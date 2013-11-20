@@ -373,6 +373,7 @@ if (!empty($result['category'])) {
             'CATEGORY_CODE' => $category['code'],
             'CATEGORY_BREADCRUMB' => $category['breadcrumb'],
             'CATEGORY_COUNT' => $count['category'],
+            'CATEGORY_TYPE' => ($category['template'] ? 'home' : 'folder'),
         ));
 
         if ($category['perms_type'] < 2 && $category['userAccess_type'] < 2)
