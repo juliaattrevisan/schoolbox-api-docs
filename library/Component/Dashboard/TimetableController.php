@@ -159,7 +159,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                             /* Handle colour array */
                             if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
-                            $subjectColourMap[$period['code']] = $this->colourList->offsetGet($colourIndex)->getHexColour();
+                                if (!($this->colourList->offsetExists($colourIndex))) {
+                                    $colourIndex = 0;
+                                }
+                                $subjectColourMap[$period['code']] = $this->colourList->offsetGet($colourIndex)->getHexColour();
                                 ++$colourIndex;
                             }
 
