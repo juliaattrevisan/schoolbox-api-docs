@@ -69,17 +69,32 @@ else {
     }
 }
 
-// Get list of students for this class
+// Get list of students for this class, and group if it has one.
 $code         = implode(',', $category->getCodes()->getColumnValues('code'));
 $student_list = array();
 if ($code && Config::get('external_enable')) {
     $class_handler = new External_Class();
     $student_list  = $class_handler->getStudents($code);
+    if (!is_array($student_list)) {
+        $student_list = array();
+    }
 }
-else {
-    $group_handler = new Group();
-    $student_list  = $group_handler->getMemberList($category->getId());
+$group_handler = new Group();
+$group_list    = $group_handler->getMemberList($category->getId());
+if (is_array($group_list)) {
+    $student_list = array_merge($student_list, $group_list);
 }
+//// Try loading all the students who have completed a task for this group, but
+//// may no longer be in the class.
+////var_dump($student_list);
+//$removedStudentIdList = array();
+//foreach ($current_unit->getTasks() as $task) {
+//    foreach ($task->getCompletionList() as $completion) {
+////        var_dump($completion->getStudent()->getId());
+//        $removedStudentIdList[] = $completion->getStudent()->getId();
+//    }
+//}
+//// Normalize all students in list
 
 // Dumb <!-- blocks --> and {VARIABLES}
 $this->setFile(TEMPLATE_content, 'task/progressReport.html');
@@ -235,7 +250,7 @@ $j = 0;
 foreach ($student_list as $student) {
     $this->setVar(
         array(
-            'ON_OFF'         	 => ++$j % 2 ? '' : 'dark',
+            'ON_OFF'             => ++$j % 2 ? '' : 'dark',
             'STUDENT_ID'         => $student['uid'],
             'STUDENT_SYNERGY_ID' => $student['synergy_id'],
             'STUDENT_SURNAME'    => $student['lastname'],
