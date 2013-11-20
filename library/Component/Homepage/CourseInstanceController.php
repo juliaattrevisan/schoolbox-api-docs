@@ -315,7 +315,19 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar('UNIT_TASK_COMPLETE_CLASS', $unit_task_class);
 
         $complete_count = count($completion_list);
-        $gradient       = round($complete_count / count($this->student_list) * 10);
+
+		/* Prevent division by zero issue when there are no students
+		 * in student_list
+		 */
+		$num = count($this->student_list);
+
+		if ($num) {
+        	$gradient = round($complete_count / $num * 10);
+		}
+		else {
+			$gradient = 100;
+		}
+
         $this->setVar(
             array(
                 'UNIT_TASK_ID'                => Scrub::text($task->getId()),
