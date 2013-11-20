@@ -293,9 +293,6 @@ class API extends Generic\API {
     private function displayWeek($selected, $user) {
         $response = new Response_HTTP();
 
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
-
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $startOfWeek = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $dayOfWeek), $selected['year']);
         $endOfWeek = strtotime("+6 days", $startOfWeek);
@@ -308,16 +305,18 @@ class API extends Generic\API {
         }
 
         $calendar = array();
+        $groupedEventList = $this->getEventsForTimespan($startOfWeek, $endOfWeek-1);
 
         for($i = 0; $i < 7; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
+            $eventDay = date('Ymd', $currentDay);
 
             $calendar[] = array(
                 'title'   => date('jS F', $currentDay),
                 'aside'   => '',
                 'class'   => date('Ymd') == date('Ymd', $currentDay) ? 'cal-today' : '',
                 'icon'    => '',
-                'content' => $calendarHandler->getDayEvents($currentDay)
+                'content' => $groupedEventList[$eventDay] ?: array()
             );
         }
 
@@ -331,16 +330,13 @@ class API extends Generic\API {
     private function displayMonth($selected, $user) {
         $response = new Response_HTTP();
 
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
-
         $week['day']    = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $week['start']  = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $week['day']), $selected['year']);
         $week['end']    = strtotime("+6 days", $week['start']);
 
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
         $month['first'] = date('w', $month['start']);
-        $month['end']   = strtotime("+1 month", $month['start']);
+        $month['end']   = strtotime("+1 month -1 second", $month['start']);
 
         $nextMonth = mktime(0, 0, 0, $selected['month'] + 1, 1, $selected['year']);
         $prevMonth = mktime(0, 0, 0, $selected['month'] - 1, 1, $selected['year']);
@@ -360,12 +356,13 @@ class API extends Generic\API {
             $calData[] = '_blank';
         }
 
+        $groupedEventList = $this->getEventsForTimespan($month['start'], $month['end']);
         for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
             $currentDay = strtotime("+1 day", $currentDay);
 
             $calData[] = array(
                 'day' => date('jS', $currentDay),
-                'events' => $calendarHandler->getDayEvents($currentDay)
+                'events' => $groupedEventList[date('Ymd', $currentDay)] ?: array($currentDay)
             );
         }
 
