@@ -182,7 +182,7 @@ class API extends Generic\API {
 
         $calendar = array(
             'title'   => 'Agenda',
-            'aside'   => '<a data-icon="next" href="/m/calendar/agenda/' . date('d-m-Y') . '/m/' . ($limit + 2) . '">more</a>',
+            'aside'   => '<a data-icon="next" href="/m/calendar/agenda/' . date('d-m-Y') . '/' . ($limit + 2) . '">more</a>',
             'class'   => '',
             'icon'    => '',
             'content' => $events
