@@ -15,6 +15,7 @@ $catHandler = new Category();
 $prefix = 'code';
 
 /* Retrieve the category ID from the URI, must be an integer and at least 1 character long
+ * e.g. /homepage/43
  */
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
     $category = $catHandler->getByID($this->arg[0]);
@@ -23,53 +24,27 @@ if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
 	 * numerical value i.e. treat the int as if it were a category code string
 	 */
 	if (!$category) {
-		new \Alaress_Probe("Category ID {$this->arg[0]} not found; searching for category code {$this->arg[0]} instead.");
 		$category = $catHandler->getByCode($this->arg[0]);
-
-		if (!$category) {
-			new \Alaress_Probe('Category not found at all.');
-			$category = null;
-		}
-		else {
-			new \Alaress_Probe('Category found.');
-		}
-	}
-	else {
-		new \Alaress_Probe('Category found.');
 	}
 }
 /* If a prefixed argument is given, load category code directly
+ * e.g. /homepage/$prefix/EN344
  */
 else if (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
 	$items = $this->arg;
 	array_shift($items);
 
 	$code = implode('/', $items);
-	new \Alaress_Probe("Trying to load category code $code.");
 	$category = $catHandler->getByCode(urldecode(urldecode($code)));
-
-	if (!$category) {
-		$category = null;
-	}
 }
+/* When just an alphabetical category code provided
+ * e.g. /homepage/EN344
+ */
 else if (!is_numeric($this->arg[0])) {
 	$items = $this->arg;
 	$code = implode('/', $items);
 
-	new \Alaress_Probe("Redirecting to /homepage/{$prefix}/{$code}");
-}
-else {
-    $category = null;
-}
-
-new \Alaress_Probe('<HR>');
-new \Alaress_Probe($this->arg);
-die();
-
-// if no category was found by ID, attempt a lookup by code
-if (!is_array($category)) {
-    $code = implode('/', $this->arg);
-    $category = $catHandler->getByCode(urldecode(urldecode($code)));
+	$this->localRedir("/homepage/{$prefix}/$code");
 }
 
 // if we still have no category, advise that these are not the droids you're looking for
