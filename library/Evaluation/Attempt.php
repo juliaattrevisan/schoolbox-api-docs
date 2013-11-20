@@ -397,4 +397,29 @@ abstract class Evaluation_Attempt extends DeprecatedModel
 
         return $this->db->getRow($query);
     }
+
+    /**
+     * Gets list of al students who have had work returned for this assessment.
+     *
+     * @param  int $assessId
+     * @return array
+     */
+    public function getStudentListByAssessId($assessId) {
+        $studentList = array();
+        $allAttempts = $this->getList($assessId);
+        if (is_array($allAttempts)) {
+            foreach ($allAttempts as $return) {
+                $studentList[] = array(
+                    'title'      => $return['title'],
+                    'firstname'  => $return['firstname'],
+                    'lastname'   => $return['lastname'],
+                    'uid'        => $return['user_id'],
+                    'synergy_id' => $return['synergy_id'],
+                    'type'       => null,
+                    'group_id'   => null,
+                );
+            }
+        }
+        return $studentList;
+    }
 }

@@ -1326,4 +1326,54 @@ class Submission extends DeprecatedModel {
         }
         return 0;
     }
+
+    /**
+     * Retrieves all students that are able to submit to this submission box, or
+     * who have submitted to it already.
+     *
+     * @param  array $box A result from $this->getByID()
+     * @return array
+     */
+    public function getAllStudentsForSubmission($box) {
+        $studentList = array();
+        if ($box['code'] && Cfg::get('external_enable')) {
+            $synHandler = new External_Class();
+            $studentListClassCode = $synHandler->getStudents($box['code']);
+            if (is_array($studentListClassCode)) {
+                $studentList = array_merge($studentList, $studentListClassCode);
+            }
+        }
+
+        // list all students from group membership
+        $groupHandler = new Group();
+        $studentListFromGroup = $groupHandler->getMemberList($box['category']);
+        if (is_array($studentListFromGroup)) {
+            $studentList = array_merge($studentList, $studentListFromGroup);
+        }
+
+        // list all students who have already submitted
+        $studentSubHandler = new SubmissionStudent();
+        $studentListFromSubmissions = $studentSubHandler->getStudentListByBoxId($box['id']);
+        if (is_array($studentListFromSubmissions)) {
+            $studentList = array_merge($studentList, $studentListFromSubmissions);
+        }
+
+        // list all students who have been marked
+        $studentRetHandler = new SubmissionReturn();
+        $studentListFromReturns = $studentRetHandler->getStudentListByBoxId($box['id']);
+        if (is_array($studentListFromReturns)) {
+            $studentList = array_merge($studentList, $studentListFromReturns);
+        }
+
+        // Sort all students by last name, then first name
+        usort($studentList, function($a, $b) {
+            $last = strcmp($a['lastname'], $b['lastname']);
+            if ($last == 0) {
+                return strcmp($a['firstname'],$b['firstname']);
+            }
+            return $last;
+        });
+
+        return $studentList;
+    }
 }
