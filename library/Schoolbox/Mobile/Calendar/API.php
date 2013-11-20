@@ -214,44 +214,6 @@ class API extends Generic\API {
         );
     }
 
-    protected function phoneAgenda($selected) {
-        $response = new Response_HTTP();
-
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
-
-        $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
-        $startOfWeek = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $dayOfWeek), $selected['year']);
-        $endOfWeek = strtotime("+6 days", $startOfWeek);
-
-        if (date("m", $startOfWeek) != date("m", $endOfWeek)) {
-            $title = date('jS F', $startOfWeek) . ' - ' . date("jS F", $endOfWeek);
-        }
-        else {
-            $title = date("jS", $startOfWeek) . ' - ' . date('jS F', $endOfWeek);
-        }
-
-        $calendar = array();
-
-        for($i = 0; $i < 7; $i++) {
-            $currentDay = strtotime("+$i day", $startOfWeek);
-
-            $calendar[] = array(
-                'title'   => date('jS F', $currentDay),
-                'aside'   => '',
-                'class'   => date('Ymd') == date('Ymd', $currentDay) ? 'cal-today' : '',
-                'icon'    => '',
-                'content' => $calendarHandler->getDayEvents($currentDay)
-            );
-        }
-
-        $response->setPage('title','Week Calendar');
-        $response->setResponse('articles', $calendar);
-
-        return $response;
-    }
-
-
     /**
      * Return a listing of dates with events in them.
      * Depending on $_SESSION['env'], will return a week or a month
