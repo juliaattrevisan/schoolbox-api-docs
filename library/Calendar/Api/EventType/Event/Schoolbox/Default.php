@@ -82,8 +82,8 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 			$event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
 			$event->setAuthorId($currentEvent['uid']);
 			$event->setEventId($currentEvent['id']);
-			$event->setStartTime(new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s'));
-			$event->setEndTime(new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s'));
+			$event->setStartTime(new Alaress_Date_Format(new DateTime($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'])));
+			$event->setEndTime(new Alaress_Date_Format(new DateTime($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'])));
 			$event->setType($currentEvent['type']);
 			$event->setNote($currentEvent['note']);
 			$event->setAccess($currentEvent['access']);
@@ -94,6 +94,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 			$event->setLocation($currentEvent['location']);
 			$event->setPublishDate($currentEvent['publish_date']);
 			$event->setSid($currentEvent['sid']);
+			$event->setAllday($currentEvent['allday']);
 
 			if ($this->getCalendarHandler()->getPerm($currentEvent) > 1) {
 				$event->setIsEditable(true);

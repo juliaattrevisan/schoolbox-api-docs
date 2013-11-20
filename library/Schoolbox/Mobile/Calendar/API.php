@@ -15,6 +15,7 @@ use Response_HTTP;
 use Calendar_Api_Factory;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_Config_Record;
+use Calendar_Event_Type_Abstract;
 use Authenticator;
 use Exception;
 use ClientDevice;
@@ -24,8 +25,6 @@ class API extends Generic\API {
     public function Month($date = '') {
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
 
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
         $month['first'] = date('w', $month['start']);
@@ -36,9 +35,6 @@ class API extends Generic\API {
 
         $nextMonthSlug = date('d-m-Y', $nextMonth);
         $prevMonthSlug = date('d-m-Y', $prevMonth);
-
-        $nextMonthName = date('F', $nextMonth);
-        $prevMonthName = date('F', $prevMonth);
 
 		/* $eventMap is an array of empty event containers
 		 * Each array element maps to a day of the month
@@ -54,10 +50,13 @@ class API extends Generic\API {
 			$blankStart[] = '_blank';
 		}
 
+        $groupedEventList = $this->getEventsForTimespan($month['start'], $month['end']);
+
 		/* Prefill containers for each day of the month
 		 */
 		for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
             $currentDay = strtotime("+1 day", $currentDay);
+            $eventGroup = date('Ymd', $currentDay);
 
             $day = array(
 				'dayOfMonth' => date('j', $currentDay),
@@ -68,24 +67,9 @@ class API extends Generic\API {
             if (date('d-m-Y', $currentDay) == date('d-m-Y', $_SERVER['REQUEST_TIME'])) {
                 $day['isToday'] = '1';
             }
+            $day['events'] = $groupedEventList[$eventGroup] ?: array();
 
 			$eventMap[$day['dayOfMonth']] = $day;
-		}
-
-		/* Get all the events for this month and fill them into the containers
-		 */
-		$allEvents = $calendarHandler->getEvents($month['start'], $month['end']);
-		$allEvents->sort();
-
-		foreach ($allEvents as $current) {
-			$currentEventDay = (int)$current->getStartTime()->getUsingFormat('d');
-			if ($current->getStartTime()->getTimeOnly() == '12:00am') {
-				$current->setStartTime('');
-			}
-			if (empty($eventMap[$currentEventDay]['events'])) {
-				$eventMap[$currentEventDay]['events'] = array();
-			}
-			$eventMap[$currentEventDay]['events'][] = $current;
 		}
 
 		/* Pad out the final line
@@ -133,8 +117,6 @@ class API extends Generic\API {
 
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $startOfWeek = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $dayOfWeek), $selected['year']);
@@ -149,15 +131,18 @@ class API extends Generic\API {
 
         $calendar = array();
 
+        $groupedEventList = $this->getEventsForTimespan($startOfWeek, $endOfWeek-1);
+
         for($i = 0; $i < 7; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
+            $eventDay = date('Ymd', $currentDay);
 
             $calendar[] = array(
                 'title'   => date('jS F', $currentDay),
                 'aside'   => '',
-                'class'   => (date('Ymd') == date('Ymd', $currentDay) ? 'cal-today ' : ' ') . 'wide',
+                'class'   => (date('Ymd') == $eventDay ? 'cal-today ' : ' ') . 'wide',
                 'icon'    => '',
-                'content' => $calendarHandler->getDayEvents($currentDay)
+                'content' => $groupedEventList[$eventDay] ?: array()
             );
         }
 
@@ -170,28 +155,34 @@ class API extends Generic\API {
     public function Agenda($date = '', $limit = 7) {
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $startOfWeek = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $dayOfWeek), $selected['year']);
 
         $events = array();
 
+        $groupedEventList = $this->getEventsForTimespan(
+            $startOfWeek,
+            strtotime("+$limit day - 1 second", $startOfWeek)
+        );
+
         for($i = 0; $i < $limit; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
-            $dayEvents = $calendarHandler->getDayEvents($currentDay);
-            if(is_array($dayEvents)) {
-                $dayEvents[0]['header'] = date('jS F', $currentDay);
-                foreach($dayEvents as $e) {
-                    $events[] = $e;
+            $dayGroup = date('Ymd', $currentDay);
+            $dayEvents = $groupedEventList[$dayGroup] ?: array();
+            if (is_array($dayEvents)) {
+                foreach ($dayEvents as $j => $event) {
+                    $events[] = array(
+                        'header' => ($j == 0 ? date('jS F', $currentDay) : ''),
+                        'event'  => $event,
+                    );
                 }
             }
         }
 
         $calendar = array(
             'title'   => 'Agenda',
-            'aside'   => '<a data-icon="next" href="/m/calendar/agenda/' . date('d-m-Y') . '/m/' . ($limit + 2) . '">more</a>',
+            'aside'   => '<a data-icon="next" href="/m/calendar/agenda/' . date('d-m-Y') . '/' . ($limit + 2) . '">more</a>',
             'class'   => '',
             'icon'    => '',
             'content' => $events
@@ -222,44 +213,6 @@ class API extends Generic\API {
             'year'  => date("Y", $selectedDate)
         );
     }
-
-    protected function phoneAgenda($selected) {
-        $response = new Response_HTTP();
-
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
-
-        $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
-        $startOfWeek = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $dayOfWeek), $selected['year']);
-        $endOfWeek = strtotime("+6 days", $startOfWeek);
-
-        if (date("m", $startOfWeek) != date("m", $endOfWeek)) {
-            $title = date('jS F', $startOfWeek) . ' - ' . date("jS F", $endOfWeek);
-        }
-        else {
-            $title = date("jS", $startOfWeek) . ' - ' . date('jS F', $endOfWeek);
-        }
-
-        $calendar = array();
-
-        for($i = 0; $i < 7; $i++) {
-            $currentDay = strtotime("+$i day", $startOfWeek);
-
-            $calendar[] = array(
-                'title'   => date('jS F', $currentDay),
-                'aside'   => '',
-                'class'   => date('Ymd') == date('Ymd', $currentDay) ? 'cal-today' : '',
-                'icon'    => '',
-                'content' => $calendarHandler->getDayEvents($currentDay)
-            );
-        }
-
-        $response->setPage('title','Week Calendar');
-        $response->setResponse('articles', $calendar);
-
-        return $response;
-    }
-
 
     /**
      * Return a listing of dates with events in them.
@@ -302,9 +255,6 @@ class API extends Generic\API {
     private function displayWeek($selected, $user) {
         $response = new Response_HTTP();
 
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
-
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $startOfWeek = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $dayOfWeek), $selected['year']);
         $endOfWeek = strtotime("+6 days", $startOfWeek);
@@ -317,16 +267,18 @@ class API extends Generic\API {
         }
 
         $calendar = array();
+        $groupedEventList = $this->getEventsForTimespan($startOfWeek, $endOfWeek-1);
 
         for($i = 0; $i < 7; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
+            $eventDay = date('Ymd', $currentDay);
 
             $calendar[] = array(
                 'title'   => date('jS F', $currentDay),
                 'aside'   => '',
                 'class'   => date('Ymd') == date('Ymd', $currentDay) ? 'cal-today' : '',
                 'icon'    => '',
-                'content' => $calendarHandler->getDayEvents($currentDay)
+                'content' => $groupedEventList[$eventDay] ?: array()
             );
         }
 
@@ -340,16 +292,13 @@ class API extends Generic\API {
     private function displayMonth($selected, $user) {
         $response = new Response_HTTP();
 
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
-        $calendarHandler = $calFactory->produce();
-
         $week['day']    = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $week['start']  = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $week['day']), $selected['year']);
         $week['end']    = strtotime("+6 days", $week['start']);
 
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
         $month['first'] = date('w', $month['start']);
-        $month['end']   = strtotime("+1 month", $month['start']);
+        $month['end']   = strtotime("+1 month -1 second", $month['start']);
 
         $nextMonth = mktime(0, 0, 0, $selected['month'] + 1, 1, $selected['year']);
         $prevMonth = mktime(0, 0, 0, $selected['month'] - 1, 1, $selected['year']);
@@ -369,12 +318,13 @@ class API extends Generic\API {
             $calData[] = '_blank';
         }
 
+        $groupedEventList = $this->getEventsForTimespan($month['start'], $month['end']);
         for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
             $currentDay = strtotime("+1 day", $currentDay);
 
             $calData[] = array(
                 'day' => date('jS', $currentDay),
-                'events' => $calendarHandler->getDayEvents($currentDay)
+                'events' => $groupedEventList[date('Ymd', $currentDay)] ?: array($currentDay)
             );
         }
 
@@ -402,6 +352,32 @@ class API extends Generic\API {
         $response->setResponse('articles', array('Month' => $calendar));
 
         return $response;
+    }
+
+    /**
+     * Retrieves and groups all events by day for the given timespan.
+     *
+     * @param  int    $start       Timestamp of start of search bracket
+     * @param  int    $end         Timestamp of end of search bracket
+     * @param  string $groupFormat Format to group retrieved event list by
+     * @return array
+     */
+    protected function getEventsForTimespan($start, $end, $groupFormat = 'Ymd') {
+        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
+        $calendarHandler = $calFactory->produce();
+        /** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $eventList */
+        $eventList = $calendarHandler->getEvents($start, $end);
+        $eventList->sort();
+
+        $groupedEventList = array();
+        foreach ($eventList as $event) {
+            $eventGrouping = $event->getStartTime()->getUsingFormat($groupFormat);
+            if (!isset($groupedEventList[$eventGrouping])) {
+                $groupedEventList[$eventGrouping] = array();
+            }
+            $groupedEventList[$eventGrouping][] = $event;
+        }
+        return $groupedEventList;
     }
 
 
@@ -436,7 +412,7 @@ class API extends Generic\API {
 
 			/* Standardise into some format that mobile expects
 			 */
-			if (is_a($event, 'Calendar_Event_Type_Abstract')) {
+			if ($event instanceof Calendar_Event_Type_Abstract) {
 				$standardisedEvent = array(
 					'id' => $event->getEventId(),
 					'series_id' => '',
@@ -450,6 +426,7 @@ class API extends Generic\API {
 					'attendance' =>  method_exists($event, 'getAtendance') ? $event->getAttendance() : '',
 					'detail' => Scrub::html($event->getDetail()),
 					'publish_date' => $event->getPublishDate(),
+					'allDay' => $event->getAllday(),
 					'date' => $event->getStartTime()->getDatabaseDate(),
 					'startTime' => $event->getStartTime()->getUsingFormat('h:iA'),
 					'endTime' => $event->getEndTime()->getUsingFormat('h:iA'),
@@ -462,7 +439,7 @@ class API extends Generic\API {
 				);
 
 				$time = array(
-					'title'   => 'mort',
+					'title'   => 'Summary',
 					'aside'   => '',
 					'class'   => '',
 					'icon'    => 'clock',
