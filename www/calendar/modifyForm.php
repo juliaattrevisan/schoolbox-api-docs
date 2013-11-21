@@ -53,9 +53,9 @@ switch($_POST['action']) {
         $endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
         $event = array(
-            'owner' => $ownerId,
+            'owner' => null,
             'access' => $_POST['level'],
-            'sid' => $_POST['group'],
+            'sid' => null,
             'campusList' => null,
             'groupList' => null,
             'type' => $_POST['type'],
@@ -78,6 +78,7 @@ switch($_POST['action']) {
 
         // Force events to have at least one campus value selected (if a group event)
         if ($_POST['level'] == Calendar::ACCESS_CAMPUS) {
+            $event['groupList'] = $_POST['groupCheck'];
             if (is_array($_POST['campus']) && count($_POST['campus'])) {
                 $event['campusList'] = $_POST['campus'];
             }
@@ -86,7 +87,10 @@ switch($_POST['action']) {
             }
         }
         elseif ($_POST['level'] == Calendar::ACCESS_GROUP) {
-            $event['groupList'] = $_POST['groupCheck'];
+            $event['sid'] = $_POST['group'];
+        }
+        elseif ($_POST['level'] == Calendar::ACCESS_PERSONAL) {
+            $event['owner'] = $ownerId;
         }
 
         $validRepeat = array(
