@@ -17,6 +17,8 @@ if (isset($_GET['category_id']) && isset($_GET['unit_id'])) {
     SitePage::localRedir(sprintf('/task/progressReport/%d/%d', $_GET['category_id'], $_GET['unit_id']));
 }
 
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -69,16 +71,60 @@ else {
     }
 }
 
-// Get list of students for this class
+// Get list of students for this class, and group if it has one.
 $code         = implode(',', $category->getCodes()->getColumnValues('code'));
 $student_list = array();
+$classStudentIdList   = array();
+$groupStudentIdList   = array();
+$removedStudentIdList = array();
 if ($code && Config::get('external_enable')) {
     $class_handler = new External_Class();
-    $student_list  = $class_handler->getStudents($code);
+    $class_list    = $class_handler->getStudents($code);
+    if (is_array($student_list)) {
+        $externalIdList = array_map(
+            function($student) { return $student['synergy_id']; },
+            $class_list
+        );
+        $classStudentIdList = \Schoolbox\UserMapper::getInstance()
+            ->findByColumn('synergy_id', $externalIdList)
+            ->getColumnValues('id');
+    }
 }
-else {
-    $group_handler = new Group();
-    $student_list  = $group_handler->getMemberList($category->getId());
+$group_handler = new Group();
+$group_list    = $group_handler->getMemberList($category->getId());
+if (is_array($group_list)) {
+    $groupStudentIdList = array_unique(
+        array_map(
+            function($student) { return $student['uid']; },
+            $group_list
+        )
+    );
+}
+// Try loading all the students who have completed a task for this group, but
+// may no longer be in the class.
+$removedStudentIdList = array();
+foreach ($current_unit->getTasks() as $task) {
+    foreach ($task->getCompletionList() as $completion) {
+        $studentId = $completion->getStudent()->getId();
+        if (!(in_array($studentId, $classStudentIdList) || in_array($studentId, $groupStudentIdList))) {
+            $removedStudentIdList[] = $completion->getStudent()->getId();
+        }
+    }
+}
+
+/** @var User[] $userCollection */
+$userCollection = UserMapper::getInstance()->findByColumn(
+    'id', array_merge($classStudentIdList, $groupStudentIdList, $removedStudentIdList),
+    array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
+);
+foreach ($userCollection as $userObject) {
+    $student_list[] = array(
+        'uid'        => $userObject->getId(),
+        'synergy_id' => $userObject->getExternalId(),
+        'firstname'  => $userObject->getFirstname(),
+        'lastname'   => $userObject->getLastname(),
+        'removed'    => in_array($userObject->getId(), $removedStudentIdList),
+    );
 }
 
 // Dumb <!-- blocks --> and {VARIABLES}
@@ -235,11 +281,12 @@ $j = 0;
 foreach ($student_list as $student) {
     $this->setVar(
         array(
-            'ON_OFF'         	 => ++$j % 2 ? '' : 'dark',
-            'STUDENT_ID'         => $student['uid'],
-            'STUDENT_SYNERGY_ID' => $student['synergy_id'],
-            'STUDENT_SURNAME'    => $student['lastname'],
-            'STUDENT_FIRSTNAME'  => $student['firstname'],
+            'ON_OFF'                => ++$j % 2 ? '' : 'dark',
+            'STUDENT_ID'            => $student['uid'],
+            'STUDENT_SYNERGY_ID'    => $student['synergy_id'],
+            'STUDENT_SURNAME'       => $student['lastname'],
+            'STUDENT_FIRSTNAME'     => $student['firstname'],
+            'STUDENT_REMOVED_CLASS' => $student['removed'] ? 'removed-student' : '',
             'student_unit_block' => '',
         )
     );

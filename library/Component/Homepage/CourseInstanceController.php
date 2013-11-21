@@ -10,6 +10,8 @@
  */
 
 use Schoolbox\Collection;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\Course\Task;
@@ -47,13 +49,43 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // Should check on user's permissions for this row instead
         $this->is_student = $group_handler->isStudent();
 
-        // Consider getting class by student ID
+        // Build student list
+        $classStudentIdList = array();
+        $groupStudentIdList = array();
         if ($code && Config::get('external_enable')) {
             $class_handler = new External_Class();
-            $this->student_list = $class_handler->getStudents($code);
+            $classStudentList = $class_handler->getStudents($code);
+            if (is_array($classStudentList)) {
+                $externalIdList = array_map(
+                    function($student) { return $student['synergy_id']; },
+                    $classStudentList
+                );
+                $classStudentIdList = \Schoolbox\UserMapper::getInstance()
+                    ->findByColumn('synergy_id', $externalIdList)
+                    ->getColumnValues('id');
+            }
         }
-        else {
-            $this->student_list = $group_handler->getMemberList($this->getContext('id'));
+        $groupStudentList = $group_handler->getMemberList($this->getContext('id'));
+        if (is_array($groupStudentList)) {
+            $groupStudentIdList = array_unique(
+                array_map(
+                    function($student) { return $student['uid']; },
+                    $groupStudentList
+                )
+            );
+        }
+        /** @var User[] $userCollection */
+        $userCollection = UserMapper::getInstance()->findByColumn(
+            'id', array_merge($classStudentIdList, $groupStudentIdList),
+            array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
+        );
+        foreach ($userCollection as $userObject) {
+            $this->student_list[] = array(
+                'uid'        => $userObject->getId(),
+                'synergy_id' => $userObject->getExternalId(),
+                'firstname'  => $userObject->getFirstname(),
+                'lastname'   => $userObject->getLastname(),
+            );
         }
 
         // Get the list of units for this course, as well as who has actually
@@ -160,10 +192,17 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         // Group the task list by task, then student.
         $grouped_list = array();
+        $studentIdList = array_map(
+            function($student) { return $student['uid']; },
+            $this->student_list
+        );
         foreach ($this->completion_list as $item) {
-            $student_id       = $item->getStudent()->getId();
-            $task_instance_id = $item->getTaskInstance()->getId();
-            $grouped_list[$task_instance_id][$student_id] = $item;
+            // Only add students who are in the list of students for this homepage.
+            $student_id = $item->getStudent()->getId();
+            if (in_array($student_id, $studentIdList)) {
+                $task_instance_id = $item->getTaskInstance()->getId();
+                $grouped_list[$task_instance_id][$student_id] = $item;
+            }
         }
 
         // Is this a student? If so, figure out if they've completed all units
