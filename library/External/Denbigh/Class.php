@@ -1,9 +1,9 @@
 <?php
 /************************************************************
  *														   *
- *		 Copyright (c) 2008 Lektec Consulting				*
+ *		 Copyright (c) 2013 Alaress Pty Ltd				    *
  *														   *
- *	This file provides access to Denbigh class info		*
+ *	This file provides access to Denbigh class info		    *
  *														   *
  ************************************************************/
 

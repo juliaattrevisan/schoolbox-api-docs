@@ -2,7 +2,7 @@
 
 /************************************************************
 *                                                           *
-*         Copyright (c) 2002-2008 Lektec Consulting         *
+*         Copyright (c) 2013 Alaress Pty Ltd                *
 *                                                           *
 *							                                *
 *  Script to put all resources from a folder into a zip     *

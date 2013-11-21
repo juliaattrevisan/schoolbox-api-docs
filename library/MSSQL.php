@@ -1,7 +1,7 @@
 <?php
 /************************************************************
 *                                                           *
-* 		Copyright (c) 2008 Lektec Consulting				*
+* 		Copyright (c) 2013 Alaress Pty Ltd				*
 *                                                           *
 *	This file provides abstraction of the  MSSQL database.	*
 *	This used for Synergetic connections. 	 				*

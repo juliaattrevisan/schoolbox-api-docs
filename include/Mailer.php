@@ -46,7 +46,7 @@ class Mailer {
 
         //setup header
         $this->setFrom(Cfg::get('mail_from_address'), Cfg::get('mail_from_name'));
-        $this->headers['MessageID'] = '<' . md5(mktime()) . '@lektecmailer>';
+        $this->headers['MessageID'] = '<' . md5(mktime()) . '@alaressmailer>';
 
         $this->setTo($to);
         $this->setSubject($subject);
