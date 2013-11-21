@@ -234,10 +234,17 @@ if (!empty($result['user'])) {
         $page->setVar('eportfolio_block');
         $page->setVar('boarder_leave_block');
 
-        if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id'])))
+		/* Hide Due Work link from parents, if Due Work access is restricted
+		 */
+		if ($group->isParent() && Config::get('restrict_parent_duework_access')) {
+			$page->setVar('due_work_block', '');
+		}
+        else if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id']))) {
             $page->setVar('due_work_block');
-        else
+		}
+        else {
             $page->parse('due_work_block', 'due_work');
+		}
 
         //Show student timetables to staff and parents of child
         if ($group->isStudent($user['id'])) {
