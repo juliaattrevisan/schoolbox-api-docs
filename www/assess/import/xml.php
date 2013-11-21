@@ -30,9 +30,8 @@ $import->import();
 
 /* For the Course Builder
  */
-$is_task       = !empty($_POST['is_task']);
-$task_instance = new Task\Instance();
-
+/** @var OnlineAssessment $assessment */
+$is_task = !empty($_POST['is_task']);
 if ($is_task) {
 	$task = new Task();
 	$task
@@ -48,6 +47,20 @@ if ($is_task) {
 
 	$task->setAssessment($assessment);
 	TaskMapper::getInstance()->save($task);
+}
+elseif (!empty($_POST['unit_id'])) {
+	$task_instance = new Task\Instance();
+	$task_instance
+		->setUnitInstance($_POST['unit_id'])
+		->setOwner($_SESSION['id'])
+		->setTitle($import->getTitle());
+
+	$assessment = OnlineAssessmentMapper::getInstance()->findById($import->getAssessId());
+	$assessment->setTaskInstance($task_instance);
+	OnlineAssessmentMapper::getInstance()->save($assessment);
+
+	$task_instance->setAssessment($assessment);
+	Task\InstanceMapper::getInstance()->save($task_instance);
 }
 
 SitePage::localRedir('/assess/modify/' . $import->getAssessId());
