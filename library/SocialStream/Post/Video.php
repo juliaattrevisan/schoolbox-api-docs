@@ -11,15 +11,11 @@
 class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 
 	/**
-	 * Get the title and description
+	 * Never render metadata for videos
 	 *
 	 * @param $curl
 	 */
 	public function spawnMetadata($curl) {
-		$chain = new \SocialStream\Post\Metadata\Chain($curl, $this);
-
-		$this->setExternalTitle($chain->getResult()->getTitle());
-		$this->setExternalBody($chain->getResult()->getDescription());
 	}
 
 	/**
@@ -42,11 +38,11 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 					'SOCIALSTREAM_POST_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
-				/* Parse metadata
+				/* Never parse metadata for videos
 				 */
-				if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-					$page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
-				}
+				$page->setVar(array(
+					'socialstream_post_has_metadata_block' => ''
+				));
 
 				if (strlen($chain->getResult())) {
 					$page->parse('socialstream_post_has_player_block', 'socialstream_post_has_player');
@@ -66,12 +62,11 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 					'SOCIALSTREAM_COMMENT_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
-				/* Parse metadata
+				/* Never parse metadata for videos
 				 */
-				if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-					$page->parse('socialstream_comment_has_metadata_block', 'socialstream_comment_has_metadata');
-				}
-
+				$page->setVar(array(
+					'socialstream_comment_has_metadata_block' => ''
+				));
 
 				if (strlen($chain->getResult())) {
 					$page->parse('socialstream_comment_has_player_block', 'socialstream_comment_has_player');
@@ -91,11 +86,11 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 					'SOCIALSTREAM_REPLY_EXTERNAL_BODY' => $this->getExternalBody(),
 				));
 
-				/* Parse metadata
+				/* Never parse metadata for videos
 				 */
-				if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
-					$page->parse('socialstream_reply_has_metadata_block', 'socialstream_reply_has_metadata');
-				}
+				$page->setVar(array(
+					'socialstream_reply_has_metadata_block' => ''
+				));
 
 				if (strlen($chain->getResult())) {
 					$page->parse('socialstream_reply_has_player_block', 'socialstream_reply_has_player');
