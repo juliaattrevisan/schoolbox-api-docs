@@ -38,35 +38,6 @@
          */
         setupCustomise.activeComponents();
     });
-
-	/* Pseudo session - things are rememberised
-	 * If not initialised, set it to 0 so the browser works
-	 */
-	var socialstreamSession = {
-		categoryId: '{HOMEPAGE_ID}'
-	};
-    if (isNaN(Number(socialstreamSession.categoryId))) {
-        socialstreamSession.categoryId = 0;
-    }
-
-	$j(function() {
-		/* Activate socialstream browser for comments/replies (clones)
-		 * One resource browser per socialstream component
-		 */
-		$j('.socialstream-browser-button').live('click', function() {
-			var self = $j(this);
-
-			$j('#socialstream-browser').socialstreamBrowser({
-
-				/* Deal with the output url that you choze
-				 */
-				submitCallback: function(url, filename) {
-					self.parents('form').find('input[name=url]').val(url);
-					self.parents('form').find('.socialstream-selected-file').html(filename);
-				}
-			});
-		});
-	});
 </script>
 
 
@@ -132,6 +103,38 @@
     };
     <!-- END colour_list -->
 
+</script>
+
+<script type="text/javascript">
+
+    /* Pseudo session - things are rememberised
+     * If not initialised, set it to 0 so the browser works
+     */
+    var socialstreamSession = {
+        categoryId: '{HOMEPAGE_ID}'
+    };
+    if (isNaN(Number(socialstreamSession.categoryId))) {
+        socialstreamSession.categoryId = 0;
+    }
+
+    $j(function() {
+        /* Activate socialstream browser for comments/replies (clones)
+         * One resource browser per socialstream component
+         */
+        $j('.socialstream-browser-button').live('click', function() {
+            var self = $j(this);
+
+            $j('#socialstream-browser').socialstreamBrowser({
+
+                /* Deal with the output url that you choze
+                 */
+                submitCallback: function(url, filename) {
+                    self.parents('form').find('input[name=url]').val(url);
+                    self.parents('form').find('.socialstream-selected-file').html(filename);
+                }
+            });
+        });
+    });
 </script>
 <!-- END custom_head -->
 
