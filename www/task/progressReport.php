@@ -17,6 +17,8 @@ if (isset($_GET['category_id']) && isset($_GET['unit_id'])) {
     SitePage::localRedir(sprintf('/task/progressReport/%d/%d', $_GET['category_id'], $_GET['unit_id']));
 }
 
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -72,29 +74,58 @@ else {
 // Get list of students for this class, and group if it has one.
 $code         = implode(',', $category->getCodes()->getColumnValues('code'));
 $student_list = array();
+$classStudentIdList   = array();
+$groupStudentIdList   = array();
+$removedStudentIdList = array();
 if ($code && Config::get('external_enable')) {
     $class_handler = new External_Class();
-    $student_list  = $class_handler->getStudents($code);
-    if (!is_array($student_list)) {
-        $student_list = array();
+    $class_list    = $class_handler->getStudents($code);
+    if (is_array($student_list)) {
+        $externalIdList = array_map(
+            function($student) { return $student['synergy_id']; },
+            $class_list
+        );
+        $classStudentIdList = \Schoolbox\UserMapper::getInstance()
+            ->findByColumn('synergy_id', $externalIdList)
+            ->getColumnValues('id');
     }
 }
 $group_handler = new Group();
 $group_list    = $group_handler->getMemberList($category->getId());
 if (is_array($group_list)) {
-    $student_list = array_merge($student_list, $group_list);
+    $groupStudentIdList = array_unique(
+        array_map(
+            function($student) { return $student['uid']; },
+            $group_list
+        )
+    );
 }
-//// Try loading all the students who have completed a task for this group, but
-//// may no longer be in the class.
-////var_dump($student_list);
-//$removedStudentIdList = array();
-//foreach ($current_unit->getTasks() as $task) {
-//    foreach ($task->getCompletionList() as $completion) {
-////        var_dump($completion->getStudent()->getId());
-//        $removedStudentIdList[] = $completion->getStudent()->getId();
-//    }
-//}
-//// Normalize all students in list
+// Try loading all the students who have completed a task for this group, but
+// may no longer be in the class.
+$removedStudentIdList = array();
+foreach ($current_unit->getTasks() as $task) {
+    foreach ($task->getCompletionList() as $completion) {
+        $studentId = $completion->getStudent()->getId();
+        if (!(in_array($studentId, $classStudentIdList) || in_array($studentId, $groupStudentIdList))) {
+            $removedStudentIdList[] = $completion->getStudent()->getId();
+        }
+    }
+}
+
+/** @var User[] $userCollection */
+$userCollection = UserMapper::getInstance()->findByColumn(
+    'id', array_merge($classStudentIdList, $groupStudentIdList, $removedStudentIdList),
+    array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
+);
+foreach ($userCollection as $userObject) {
+    $student_list[] = array(
+        'uid'        => $userObject->getId(),
+        'synergy_id' => $userObject->getExternalId(),
+        'firstname'  => $userObject->getFirstname(),
+        'lastname'   => $userObject->getLastname(),
+        'removed'    => in_array($userObject->getId(), $removedStudentIdList),
+    );
+}
 
 // Dumb <!-- blocks --> and {VARIABLES}
 $this->setFile(TEMPLATE_content, 'task/progressReport.html');
