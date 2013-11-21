@@ -57,6 +57,12 @@ $boxHandler = new Submission();
 /* PERMISSIONS CHECKS GO HERE */
 $permission = PERMISSION_DENIED;
 
+/* Hide Due Work link from parents, if Due Work access is restricted
+ */
+if ($groupHandler->isParent() && Config::get('restrict_parent_duework_access')) {
+	error(19);
+}
+
 // don't run this check if there is no subject selected
 if($subject) {
 	// check student and subject combination matches
