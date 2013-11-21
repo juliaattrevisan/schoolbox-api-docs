@@ -48,7 +48,7 @@ if ($group->getPermission($class_id) < WRITE_ACCESS) {
 /** @var UnitInstance[]|\Schoolbox\Collection $unit_list */
 $unit_list = UnitInstanceMapper::getInstance()->findForCategoryId($category->getId());
 if (count($unit_list) === 0) {
-    error(6);
+    error(159, sprintf('<a href="/homepage/%d">Visit this subject\'s homepage</a>', $category->getId()));
 }
 if (!isset($unit_id)) {
     // Redirect to first task in the list.
