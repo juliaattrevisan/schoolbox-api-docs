@@ -28,6 +28,13 @@ class Evaluation_Import_Xml {
 	protected $assess_id = null;
 
 	/**
+	 * The title of the Evaluation being imported
+	 *
+	 * @var string
+	 */
+	protected $title = '';
+
+	/**
 	 * Constructor
 	 *
 	 * @param $categoryId
@@ -92,10 +99,14 @@ class Evaluation_Import_Xml {
 			};
 		}
 
+		/* Remember the title, for the course builder
+		 */
+		$this->setTitle(html_entity_decode(Scrub::text($xml->title)));
+
 		$assess_id = $this->getAssessHandler()->create(array(
 			'category_id' => Scrub::text($this->getCategoryId()),
 			'user_id' => $_SESSION['id'],
-			'title' => html_entity_decode(Scrub::text($xml->title)),
+			'title' => $this->getTitle(),
 			'description' => html_entity_decode(Scrub::text($description)),
 			'start' => Scrub::text($xml->start),
 			'finish' => Scrub::text($xml->finish),
@@ -278,5 +289,23 @@ class Evaluation_Import_Xml {
 	 */
 	public function getAssessId() {
 		return $this->assess_id;
+	}
+
+	/**
+	 * Set title
+	 *
+	 * @param string $title
+	 */
+	protected function setTitle($title) {
+		$this->title = $title;
+	}
+
+	/**
+	 * Get title
+	 *
+	 * @return string
+	 */
+	public function getTitle() {
+		return $this->title;
 	}
 }
