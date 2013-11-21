@@ -281,11 +281,12 @@ $j = 0;
 foreach ($student_list as $student) {
     $this->setVar(
         array(
-            'ON_OFF'             => ++$j % 2 ? '' : 'dark',
-            'STUDENT_ID'         => $student['uid'],
-            'STUDENT_SYNERGY_ID' => $student['synergy_id'],
-            'STUDENT_SURNAME'    => $student['lastname'],
-            'STUDENT_FIRSTNAME'  => $student['firstname'],
+            'ON_OFF'                => ++$j % 2 ? '' : 'dark',
+            'STUDENT_ID'            => $student['uid'],
+            'STUDENT_SYNERGY_ID'    => $student['synergy_id'],
+            'STUDENT_SURNAME'       => $student['lastname'],
+            'STUDENT_FIRSTNAME'     => $student['firstname'],
+            'STUDENT_REMOVED_CLASS' => $student['removed'] ? 'removed-student' : '',
             'student_unit_block' => '',
         )
     );
