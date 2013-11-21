@@ -1,5 +1,5 @@
 %define rel		1
-%define beta		rc1
+%define beta		rc2
 %define tag		13.5.0
 %if %beta
 %define release		0.%beta.%rel
