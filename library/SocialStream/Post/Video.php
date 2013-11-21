@@ -11,15 +11,11 @@
 class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 
 	/**
-	 * Get the title and description
+	 * Never render metadata for videos
 	 *
 	 * @param $curl
 	 */
 	public function spawnMetadata($curl) {
-		$chain = new \SocialStream\Post\Metadata\Chain($curl, $this);
-
-		$this->setExternalTitle($chain->getResult()->getTitle());
-		$this->setExternalBody($chain->getResult()->getDescription());
 	}
 
 	/**
