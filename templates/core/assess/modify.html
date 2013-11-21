@@ -213,6 +213,7 @@ $j(document).ready(function() {
 	<h2>Import an assessment from an XML file</h2>
 	<form action="/assess/import/xml/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
 		<input type='hidden' name="is_task" value="{ASSESS_IS_TASK}" />
+		<input name="unit_id" type="hidden" value="{ASSESS_UNIT_ID}" />
 		<label>
 			<input name="importXML" type="file" />
 		</label>
