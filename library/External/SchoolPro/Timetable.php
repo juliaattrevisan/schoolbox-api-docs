@@ -18,10 +18,18 @@ class External_SchoolPro_Timetable {
 	private $db = null;
 
 	/**
+	 * An instance of CampusMapper
+	 *
+	 * @var null
+	 */
+	private $campusMapper = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->setDb(MSSQL::getInstance());
+		$this->setCampusMapper(new \Schoolbox\CampusMapper());
 	}
 
 	/**
@@ -42,12 +50,14 @@ class External_SchoolPro_Timetable {
 	 * @return array|bool
 	 */
 	public function getTimetableDefinition($campusId, $day=0) {
+		$campus = $this->getCampusMapper()->findById($campusId);
+
 		$vars = array(
 			'sbGetTimetableDefinition',
 			array(
 				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-				array('@pCampusID', $campusId, SQLINT4, false, false, -1),
+				array('@pCampusID', $campus->getExtTimetableCode(), SQLINT4, false, false, -1),
 			)
 		);
 
@@ -88,6 +98,7 @@ class External_SchoolPro_Timetable {
 	 * @return bool
 	 */
 	public function getDayNumber($campusId, $date = 0) {
+		$campus = $this->getCampusMapper()->findById($campusId);
 
 		/* Convert from timestamp to datetime
 		 */
@@ -100,7 +111,7 @@ class External_SchoolPro_Timetable {
 				array(
 					array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 					array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-					array('@pCampusID', $campusId, SQLINT4, false, false, -1),
+					array('@pCampusID', $campus->getExtTimetableCode(), SQLINT4, false, false, -1),
 					array('@pDateToUse', $dateToUse, SQLVARCHAR, false, false, -1),
 				)
 			);
@@ -122,12 +133,14 @@ class External_SchoolPro_Timetable {
 	 * @return bool
 	 */
 	public function getPeriodNumber($campusId) {
+		$campus = $this->getCampusMapper()->findById($campusId);
+
 		$vars = array(
 			'sbGetPeriodNumber',
 			array(
 				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-				array('@pCampusID', $campusId, SQLINT4, false, false, -1),
+				array('@pCampusID', $campus->getExtTimetableCode(), SQLINT4, false, false, -1),
 			)
 		);
 
@@ -149,13 +162,15 @@ class External_SchoolPro_Timetable {
 	 * @return array
 	 */
 	private function getStaffDayTimetable($externalUserId, $campusId, $dayNumber) {
+		$campus = $this->getCampusMapper()->findById($campusId);
+
 		$vars = array(
 			'sbGetStaffDayTimetable',
 			array(
 				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
-				array('@pCampusID', $campusId, SQLINT4, false, false, -1),
+				array('@pCampusID', $campus->getExtTimetableCode(), SQLINT4, false, false, -1),
 				array('@pDayNumber', $dayNumber, SQLINT4, false, false, -1),
 			)
 		);
@@ -174,13 +189,15 @@ class External_SchoolPro_Timetable {
 	 * @return array
 	 */
 	private function getStudentDayTimetable($externalUserId, $campusId, $dayNumber) {
+		$campus = $this->getCampusMapper()->findById($campusId);
+
 		$vars = array(
 			'sbGetStudentDayTimetable',
 			array(
 				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
 				array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
-				array('@pCampusID', $campusId, SQLINT4, false, false, -1),
+				array('@pCampusID', $campus->getExtTimetableCode(), SQLINT4, false, false, -1),
 				array('@pDayNumber', $dayNumber, SQLINT4, false, false, -1),
 			)
 		);
@@ -369,5 +386,23 @@ class External_SchoolPro_Timetable {
 	 */
 	private function getDb() {
 		return $this->db;
+	}
+
+	/**
+	 * Set campus mapper
+	 *
+	 * @param null $campusMapper
+	 */
+	private function setCampusMapper($campusMapper) {
+		$this->campusMapper = $campusMapper;
+	}
+
+	/**
+	 * Get campus mapper
+	 *
+	 * @return null
+	 */
+	private function getCampusMapper() {
+		return $this->campusMapper;
 	}
 }
