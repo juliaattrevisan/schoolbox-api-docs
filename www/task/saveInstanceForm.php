@@ -43,10 +43,20 @@ else {
     }
     elseif ($_POST['action'] === 'reorder') {
         $i = 1;
+        $update_collection = new \Schoolbox\Collection();
         foreach ($_POST['id'] as $id) {
+            // Ensure that this task is within the requested unit
+            /** @var Task\Instance $instance */
             $instance = Task\InstanceMapper::getInstance()->findById($id);
+            if ($instance->getUnitInstance()->getId() != $course_instance_id) {
+                $permission_denied = true;
+                break;
+            }
             $instance->setOrder($i++);
-            Task\InstanceMapper::getInstance()->save($instance);
+            $update_collection->add($instance);
+        }
+        if (!$permission_denied) {
+            Task\InstanceMapper::getInstance()->save($update_collection);
         }
     }
     else {
