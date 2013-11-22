@@ -629,25 +629,24 @@ $existingShowcasedItem = $showcaseMapper->findByColumnList(array(
 /* If it has either a recent submission or recent return, and hasn't been published,
  * allow it to be published
  */
-if (isset($recent_submission) || isset($recent_return)) {
+if ($user['eportfolio_enabled'] && (isset($recent_submission) || isset($recent_return))) {
 	if (!$existingShowcasedItem->count()) {
-
         $this->setVar(array(
-                        'PUBLISH_TYPE'    => 'boxId',
-                        'PUBLISH_ID'      => $submission->getId(),
-                        'PUBLISH_USER_ID' => $user['uid'],
-                        'PUBLISH_ACTION'  => 'publish',
-                        'PUBLISH_BUTTON'  => 'Publish Work'));
-
-
+			'PUBLISH_TYPE'    => 'boxId',
+			'PUBLISH_ID'      => $submission->getId(),
+			'PUBLISH_USER_ID' => $user['uid'],
+			'PUBLISH_ACTION'  => 'publish',
+			'PUBLISH_BUTTON'  => 'Publish Work'
+		));
 	}
 	else {
         $this->setVar(array(
-                'PUBLISH_TYPE'    => 'showcaseItemId',
-                'PUBLISH_ID'      => $existingShowcasedItem->first()->getId(),
-                'PUBLISH_USER_ID' => $user['uid'],
-                'PUBLISH_ACTION'  => 'unpublish',
-                'PUBLISH_BUTTON'  => 'Unpublish Work'));
+			'PUBLISH_TYPE'    => 'showcaseItemId',
+			'PUBLISH_ID'      => $existingShowcasedItem->first()->getId(),
+			'PUBLISH_USER_ID' => $user['uid'],
+			'PUBLISH_ACTION'  => 'unpublish',
+			'PUBLISH_BUTTON'  => 'Unpublish Work'
+		));
 	}
 
     $this->parse('action_publish_block', 'action_publish');
