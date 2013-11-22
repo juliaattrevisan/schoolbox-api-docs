@@ -88,6 +88,32 @@ $j(function () {
         }
     });
 
+    // Update the start date to be not less than the end date
+    var startDateInput = $j('input#startDate');
+    var endDateInput   = $j('input#endDate');
+    var makeDate = function(dateString) {
+        var parts = dateString.split('/')
+        return new Date(parts[2], parts[1], parts[0], 0, 0, 0)
+    }
+    var changeInputs = function(inputToChange) {
+        var startDate = makeDate(startDateInput.val());
+        var endDate   = makeDate(endDateInput.val());
+        if (endDate < startDate) {
+            if (inputToChange === startDateInput) {
+                startDateInput.val(endDateInput.val())
+            }
+            else {
+                endDateInput.val(startDateInput.val())
+            }
+        }
+    }
+    startDateInput.change(function() {
+        changeInputs(endDateInput)
+    });
+    endDateInput.change(function() {
+        changeInputs(startDateInput)
+    });
+
     //greenerising the checkboxes if they're ticked.
     $j(':checkbox').each(function () {
         if ($j(this).is(':checked')) {
