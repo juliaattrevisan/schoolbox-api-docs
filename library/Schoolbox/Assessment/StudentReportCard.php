@@ -534,6 +534,9 @@ class StudentReportCard {
 
 
 		if(count($work)) {
+			$userMapper = new \Schoolbox\UserMapper();
+			$user = $userMapper->findById($this->targetUserId);
+
 			foreach($work as $w) {
 
 				$object = $w['object'];
@@ -553,8 +556,11 @@ class StudentReportCard {
 				if($object instanceof SubmissionBox) {
 					$page->setVar($this->outputDueWorkRow($object, $marks));
 
+					/* Hide related buttons if eportfolio is not enabled
+					 */
+
 					// is the viewing user allowed to [un]publish?
-					if($this->checkPermission(self::CAN_PUBLISH)) {
+					if ($user->getEportfolioEnable() && $this->checkPermission(self::CAN_PUBLISH)) {
 						// allowed to perform publish actions
 
 						// retrieve any publishing of this SB
