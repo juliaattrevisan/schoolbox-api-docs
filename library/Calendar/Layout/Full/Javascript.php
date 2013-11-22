@@ -32,6 +32,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Week_Abstract {
 
 		$this->getPage()->setVar(array(
 			'USER_CALENDAR_ID' => $this->getUser()->getId(),
+			'USER_FULLNAME' => $this->getUser()->getFullname(),
 		));
 
         $this->setupSelectedDayMonthYear();
