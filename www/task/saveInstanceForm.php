@@ -41,6 +41,14 @@ else {
             )
         );
     }
+    elseif ($_POST['action'] === 'reorder') {
+        $i = 1;
+        foreach ($_POST['id'] as $id) {
+            $instance = Task\InstanceMapper::getInstance()->findById($id);
+            $instance->setOrder($i++);
+            Task\InstanceMapper::getInstance()->save($instance);
+        }
+    }
     else {
         $task_instance_id = $_POST['id'];
         if ($task_instance_id) {
