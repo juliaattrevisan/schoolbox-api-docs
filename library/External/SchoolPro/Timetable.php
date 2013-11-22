@@ -51,6 +51,7 @@ class External_SchoolPro_Timetable {
 	 */
 	public function getTimetableDefinition($campusId, $day=0) {
 		$campus = $this->getCampusMapper()->findById($campusId);
+		$this->setCycleLength($campus->getTimetableDay());
 
 		$vars = array(
 			'sbGetTimetableDefinition',
@@ -99,6 +100,7 @@ class External_SchoolPro_Timetable {
 	 */
 	public function getDayNumber($campusId, $date = 0) {
 		$campus = $this->getCampusMapper()->findById($campusId);
+		$this->setCycleLength($campus->getTimetableDay());
 
 		/* Convert from timestamp to datetime
 		 */
@@ -297,6 +299,9 @@ class External_SchoolPro_Timetable {
 	 * @return array
 	 */
 	public function getFullTimetable($externalUserId, $userId, $campusId) {
+		$campus = $this->getCampusMapper()->findById($campusId);
+		$this->setCycleLength($campus->getTimetableDay());
+
 		$allDayTimetables = array();
 
 		/* Get all the days' timetables first
