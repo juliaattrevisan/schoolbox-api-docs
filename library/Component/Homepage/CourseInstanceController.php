@@ -31,7 +31,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     /**
      * @var array
      */
-    protected $student_list;
+    protected $student_list = array();
 
     /**
      * @var bool
