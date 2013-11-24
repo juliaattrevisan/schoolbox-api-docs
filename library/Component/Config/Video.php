@@ -8,9 +8,8 @@
 class Component_Config_Video extends Component_Config_Abstract {
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
-
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
-        $vidList = $videoMapper->findByCategory($allConfigs['src']['value'] ?: $this->getCategory('id'));
+        $vidList = $videoMapper->findByCategory($allConfigs['src']['value'] ?: $this->getCategory('id'), array());
 
         $page->setBlock($keyblock, 'video_select', 'video_select_block');
         $page->setVar('video_select_block', '');

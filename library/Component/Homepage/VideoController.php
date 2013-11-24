@@ -31,6 +31,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
      */
     public function execute() {
 
+		/* Sort order
+		 */
+		$this->sortFields = array('name', 'date');
     }
 
     /**
@@ -51,10 +54,10 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         }
         $this->source_category_id = $source;
         if ($this->getConfig('size') > 1) {
-            $this->outputList = $videoResourceMapper->findByCategory($source, $this->getConfig('size')-1);
+            $this->outputList = $videoResourceMapper->findByCategory($source, array(), $this->getConfig('size')-1);
         }
         elseif ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByCategory($source);
+            $this->outputList = $videoResourceMapper->findByCategory($source, array());
         }
         else {
             $this->outputList = new \Schoolbox\Collection(array());
