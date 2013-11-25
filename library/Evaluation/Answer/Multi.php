@@ -244,7 +244,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 
             /* Set up data object in accordance with $this->create();
              */
-            $answer['description'] = trim((string)$currentAnswer->text);
+            $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE|ENT_QUOTES);
             $answer['value'] = trim((string)$currentAnswer->value);
             $answer['correct'] = 0;
 
