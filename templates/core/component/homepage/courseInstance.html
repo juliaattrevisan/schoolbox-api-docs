@@ -224,6 +224,15 @@
 
     </div>
 
+    <!-- Form for reodering tasks -->
+    <div class="hide">
+        <form action="/task/saveInstanceForm.php" method="post" class="reorder_form">
+            <input type="hidden" name="action"    value="reorder"/>
+            <input type="hidden" name="category"  value="{ID}"/>
+            <input type="hidden" name="unit_id" value=""/>
+        </form>
+    </div>
+
     <!-- Dialog for file browser -->
     <div class="file_uploader hide">
         If you upload a file, its URL will appear in the Link section.

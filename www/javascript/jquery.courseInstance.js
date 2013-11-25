@@ -264,10 +264,36 @@
         var postCallback = function(form, data) {
             var container = form.closest('.form_container');
             container.slideUp('fast', function() {
-                component.find('.box > .information-list').replaceWith(
-                    $(data.html).find('.box > .information-list')
-                );
+                reloadTaskList(data);
             });
         }
+
+        // Reloads the task list, setting up drag/drop again too.
+        var reloadTaskList = function(data) {
+            var new_tasks = $(data.html).find('.task-list');
+            component.find('.task-list').replaceWith(new_tasks);
+            initTaskList();
+        }
+
+        var initTaskList = function() {
+            var task_list = component.find('.task-list');
+            task_list.sortable({
+                handle: '.icon',
+                cursor: 'move'
+            });
+            task_list.bind('sortstop', function(event, ui) {
+                // Calculate ordering of all items
+                var form    = component.find('form.reorder_form');
+                var unit_id = ui.item.closest('.unit').data('unit_id')
+                form.find('input[name="unit_id"]').val(unit_id)
+                var params = form.serializeArray();
+                task_list.find('.unit-task').each(function() {
+                    // Switch dark on/off
+                    params.push({name: 'id[]', value: $(this).data('unit_task_id')});
+                });
+                $.post(form.attr('action'), params, reloadTaskList, 'json');
+            })
+        };
+        initTaskList();
     }
 })(jQuery);

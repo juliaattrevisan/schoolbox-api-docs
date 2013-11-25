@@ -41,6 +41,24 @@ else {
             )
         );
     }
+    elseif ($_POST['action'] === 'reorder') {
+        $i = 1;
+        $update_collection = new \Schoolbox\Collection();
+        foreach ($_POST['id'] as $id) {
+            // Ensure that this task is within the requested unit
+            /** @var Task\Instance $instance */
+            $instance = Task\InstanceMapper::getInstance()->findById($id);
+            if ($instance->getUnitInstance()->getId() != $course_instance_id) {
+                $permission_denied = true;
+                break;
+            }
+            $instance->setOrder($i++);
+            $update_collection->add($instance);
+        }
+        if (!$permission_denied) {
+            Task\InstanceMapper::getInstance()->save($update_collection);
+        }
+    }
     else {
         $task_instance_id = $_POST['id'];
         if ($task_instance_id) {
