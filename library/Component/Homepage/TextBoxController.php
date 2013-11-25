@@ -66,9 +66,10 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             }
             elseif($this->sitepage->arg[1] == 'textBoxCreate') {
                 $output = array(
-                    'TEXTBOX_HEADING' => '',
-                    'TEXTBOX_BODY'    => '',
-                    'TEXTBOX_ID'      => '',
+					'TEXTBOX_HEADING' => '',
+					'TEXTBOX_BODY' => '',
+					'TEXTBOX_ID' => '',
+					'TEXTBOX_CATEGORY_ID' => $this->sitepage->arg[0],
                 );
             }
             $this->setVar($output);

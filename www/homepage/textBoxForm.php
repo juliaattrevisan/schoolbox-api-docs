@@ -13,7 +13,6 @@ $groupHandler = new Group();
 $textBoxHandler = new TextBox();
 
 if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
-
 	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
 		error(19);
 	}
@@ -46,7 +45,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
         ->setValue($textBox['textBoxID']);
     $ccm->save($config);
 
-    SitePage::localRedir('/homepage/' . $_POST['categoryID']);
+    SitePage::localRedir('/homepage/' . $_POST['originID']);
 }
 else if (is_numeric($_GET['delete'])) {
 	$textBox = $textBoxHandler->getByID($_GET['delete']);
@@ -61,5 +60,5 @@ else if (is_numeric($_GET['delete'])) {
 
 	$textBoxHandler->delete($_GET['delete']);
 
-	SitePage::localRedir('/homepage/' . $textBox['categoryID']);
+	SitePage::localRedir('/homepage/' . $textBox['originID']);
 }
