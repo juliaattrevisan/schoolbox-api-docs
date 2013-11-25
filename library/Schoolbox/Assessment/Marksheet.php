@@ -474,6 +474,8 @@ class Marksheet {
 			'return_count'      => 'Returned',
 		);
 
+		$page->setVar('work_header_block', '');
+
 		// stats that can be edited inline
 		$writeable = array('weight');
 
