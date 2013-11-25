@@ -91,8 +91,16 @@ function getFolderMeta($folderId) {
 	$groupHandler = new Group();
 
     $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+
 	try {
-		$cat = $categoryMapper->findById($folderId);
+
+		/* Only throw error exception if a folderId is specified
+		 * and it can't be found; $folderId 0 is used to add a
+		 * folder to the root node
+		 */
+		if ($folderId) {
+			$cat = $categoryMapper->findById($folderId);
+		}
 	}
 	catch (Schoolbox\Mapper\Exception $e) {
 		sendError('No folder with specified ID exists');
