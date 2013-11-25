@@ -40,10 +40,15 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             unset($textBox);
         }
 
+		/* Remember where the texbox came from - if you modify a streamed
+		 * textbox which comes from another homepage, you were able to
+		 * inadvertently steal ownership of it
+		 */
         $output = array(
-            'TEXTBOX_HEADING' => !empty($textBox['heading']) ? Scrub::text($textBox['heading']) : 'Text Box',
-            'TEXTBOX_BODY'    => Scrub::html($textBox['body']),
-            'TEXTBOX_ID'      => $textBox['textBoxID'],
+			'TEXTBOX_HEADING' => !empty($textBox['heading']) ? Scrub::text($textBox['heading']) : 'Text Box',
+			'TEXTBOX_BODY' => Scrub::html($textBox['body']),
+			'TEXTBOX_ID' => $textBox['textBoxID'],
+			'TEXTBOX_CATEGORY_ID' => $textBox['categoryID'],
 
             'text_editable_block' => '',
             'modify_text_block'   => '',
