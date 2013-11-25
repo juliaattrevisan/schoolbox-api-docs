@@ -112,7 +112,7 @@ if (Cfg::get('external_enable')) {
     $synHandler = new External_Class();
 }
 
-if (is_array($subList)) {
+if (!empty($subList) && is_array($subList)) {
     $i = 0;
 
     foreach ($subList as $sub) {
