@@ -24,7 +24,6 @@
 @logo-height: 					55px;
 
 
-
 // Generic colors
 @body-background: 				#FFFFFF; // Body, but not the content area
 @content-background: 			#FFFFFF; // Used for forms
@@ -39,7 +38,7 @@
 @link-hover: 					#00adef;
 
 // Main banner
-@banner-background: 			#013A63;
+@banner-background: 			#00adef;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 @banner-height:     			72px;
@@ -81,11 +80,19 @@ body{
   background: url('../../images/tintern/bg.jpg') bottom left repeat-x;
 }
 
+.submit-btn-plain{ background: @link-hover; }
+.submit-btn-plain:hover{ background: #142f79; }
+.login h1{ color: @link-hover; }
+
 #tabs {
   position: relative;
 }
 
-#header, .login #header{
+.login #header{
+  background: transparent;
+}
+
+#header{
   background: #008fcb; /* Old browsers */
   background: -moz-linear-gradient(left,  #008fcb 0%, #142f79 40%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, right top, color-stop(0%,#008fcb), color-stop(40%,#142f79)); /* Chrome,Safari4+ */
@@ -93,8 +100,30 @@ body{
   background: -o-linear-gradient(left,  #008fcb 0%,#142f79 40%); /* Opera 11.10+ */
   background: -ms-linear-gradient(left,  #008fcb 0%,#142f79 40%); /* IE10+ */
   background: linear-gradient(to right,  #008fcb 0%,#142f79 40%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#008fcb', endColorstr='#142f79',GradientType=1 ); /* IE6-9 */
+//  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#008fcb', endColorstr='#142f79',GradientType=1 ); /* IE6-9 */
 }
+
+body.login{
+  background: #00aeef; /* Old browsers */
+  background: -moz-linear-gradient(-45deg,  #00aeef 0%, #142f79 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#00aeef), color-stop(100%,#142f79)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(-45deg,  #00aeef 0%,#142f79 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(-45deg,  #00aeef 0%,#142f79 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(-45deg,  #00aeef 0%,#142f79 100%); /* IE10+ */
+  background: linear-gradient(135deg,  #00aeef 0%,#142f79 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00aeef', endColorstr='#142f79',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+#login-wings{
+  background: url('../../images/tintern/login-wings.png') top right no-repeat;
+  position: absolute;
+  height: 298px;
+  width: 290px;
+  top: 0;
+  right: 0;
+  z-index: -1;
+}
+
 
 #header #search{
   background: transparent url('../../images/tintern/wings.png') top right no-repeat;
