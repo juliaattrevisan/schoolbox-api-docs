@@ -57,28 +57,55 @@ class ResourceVideoMapper extends Mapper {
         ));
 	}
 
-	public function findByCategory($category, $limit = false) {
-
+	/**
+	 * Find videos for a particular category
+	 *
+	 * @param $category
+	 * @param $options
+	 * @param bool $limit
+	 * @return Collection
+	 */
+	public function findByCategory($category, $options, $limit = false) {
 		$videoList = new Collection(array());
 		$fileMapper = new FileMapper;
 
 		$query = "
             SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('user')->getColumnString('u')}
-                    FROM `{$this->getTable()}` vq
-                    JOIN {$this->getJoinSQL('file','vq','f')}
-                    JOIN {$fileMapper->getJoinSQL('user','f','u')}
-            WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0'
-            ";
+			FROM `{$this->getTable()}` vq
+			JOIN {$this->getJoinSQL('file','vq','f')}
+			JOIN {$fileMapper->getJoinSQL('user','f','u')}
+			WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0'
+		";
 
-		if($limit != false) {
+		/* Sort order
+		 */
+		$sortFields = array(
+			'name' => 'f.description',
+			'date' => 'f.submitted'
+		);
+
+		/* Really?
+		 * http://stackoverflow.com/questions/2542410/how-do-i-set-order-by-params-using-prepared-pdo-statement
+		 */
+		if (in_array($options['sort'], array_keys($sortFields))) {
+			if (in_array(strtoupper($options['sortdir']), array('DESC', 'ASC'))) {
+				$query .= "
+					ORDER BY {$sortFields[$options['sort']]} {$options['sortdir']}
+				";
+			}
+		}
+
+		if ($limit != false) {
 			$query .= "LIMIT 0,:lim";
 		}
 
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(':cat',$category);
-		if($limit != false) {
+
+		if ($limit != false) {
 			$statement->bindParam(':lim', $limit, \PDO::PARAM_INT);
 		}
+
 		$statement->execute();
 
 		foreach($statement as $row) {
@@ -88,8 +115,8 @@ class ResourceVideoMapper extends Mapper {
 
 			$videoList->add($video);
 		}
-		return $videoList;
 
+		return $videoList;
 	}
 
 	public function findByFileId($id) {
