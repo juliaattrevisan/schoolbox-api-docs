@@ -84,14 +84,13 @@ class ResourceVideoMapper extends Mapper {
 			'date' => 'f.submitted'
 		);
 
-		$hasOrdering = false;
-
+		/* Really?
+		 * http://stackoverflow.com/questions/2542410/how-do-i-set-order-by-params-using-prepared-pdo-statement
+		 */
 		if (in_array($options['sort'], array_keys($sortFields))) {
 			if (in_array(strtoupper($options['sortdir']), array('DESC', 'ASC'))) {
-				$hasOrdering = true;
-
 				$query .= "
-					ORDER BY :sort :sortdir
+					ORDER BY {$sortFields[$options['sort']]} {$options['sortdir']}
 				";
 			}
 		}
@@ -102,13 +101,6 @@ class ResourceVideoMapper extends Mapper {
 
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(':cat',$category);
-
-		/* Bind sort order params
-		 */
-		if ($hasOrdering) {
-			$statement->bindParam(':sort', $options['sort']);
-			$statement->bindParam(':sortdir', $options['sortdir']);
-		}
 
 		if ($limit != false) {
 			$statement->bindParam(':lim', $limit, \PDO::PARAM_INT);
@@ -123,8 +115,8 @@ class ResourceVideoMapper extends Mapper {
 
 			$videoList->add($video);
 		}
-		return $videoList;
 
+		return $videoList;
 	}
 
 	public function findByFileId($id) {
