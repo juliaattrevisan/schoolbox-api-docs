@@ -72,7 +72,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
             $page->setVar(
                 array(
                     'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => Scrub::text($currentAnswer['answer']),
+                    'ANSWER' => $currentAnswer['answer'],
                 )
             );
         } else {

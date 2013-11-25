@@ -104,15 +104,15 @@ class Evaluation_Import_Xml {
 		$this->setTitle(html_entity_decode(Scrub::text($xml->title)));
 
 		$assess_id = $this->getAssessHandler()->create(array(
-			'category_id' => Scrub::text($this->getCategoryId()),
+			'category_id' => $this->getCategoryId(),
 			'user_id' => $_SESSION['id'],
 			'title' => $this->getTitle(),
-			'description' => html_entity_decode(Scrub::text($description)),
-			'start' => Scrub::text($xml->start),
-			'finish' => Scrub::text($xml->finish),
-			'duration' => Scrub::text($xml->duration),
+			'description' => $description,
+			'start' => $xml->start,
+			'finish' => $xml->finish,
+			'duration' => $xml->duration,
 			'max_attempts' => $max_attempts,
-			'availability' => Scrub::text($xml->availability),
+			'availability' => $xml->availability,
 			'created_at' => 'NOW()',
 		));
 
