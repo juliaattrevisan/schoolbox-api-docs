@@ -18,7 +18,6 @@ class Component_Config_Textbox extends Component_Config_Abstract {
 
 		/* Select a textbox from some other homepage
 		 */
-		new \Alaress_Probe($allConfigs);
 		if (is_numeric($allConfigs['src']['value']) && $allConfigs['src']['value']) {
 			$boxList = $handler->getAllByCategory($allConfigs['src']['value']);
 		}
