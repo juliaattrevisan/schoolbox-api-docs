@@ -41,7 +41,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
     $config = new Component_Config();
     $config
         ->setInstanceId($instance->getId())
-        ->setConfigDefinitionId($instance->getConfig()->first()->getId())
+        ->setConfigDefinitionId($instance->getConfig('textbox')->getBy('key', 'textbox')->getId())
         ->setValue($textBox['textBoxID']);
     $ccm->save($config);
 
