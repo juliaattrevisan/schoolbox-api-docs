@@ -245,8 +245,9 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
             /* Set up data object in accordance with $this->create();
              */
-            $answer['answerLeft'] = trim((string)$currentAnswer->text);
-            $answer['answerRight'] = trim((string)$currentAnswer->answer);
+
+            $answer['answerLeft'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE|ENT_QUOTES);
+            $answer['answerRight'] = html_entity_decode(trim((string)$currentAnswer->answer), ENT_IGNORE|ENT_QUOTES);
 
             $allAnswers[] = $answer;
         }
