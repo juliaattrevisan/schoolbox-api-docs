@@ -245,7 +245,12 @@ class CommentMapper extends Mapper {
 		$mail = Swift_Message::newInstance();
 
 		// set sender
-		$mail->setFrom($commenter->getEmail(), $commenter->formatName());
+		try {
+			$mail->setFrom($commenter->getEmail(), $commenter->formatName());
+		}
+		catch(Swift_SwiftException $e) {
+			$mail->setFrom($cfg->get('mail_from_address'), $commenter->formatName());
+		}
 
 		$plainBody = sprintf('%s commented in %s.'."<br/>\n",
 			$commenter->formatName(),
@@ -288,17 +293,13 @@ class CommentMapper extends Mapper {
 
 			$mail->setSubject(sprintf($subjectFormat, $pronoun, $category->getName()));
 
-			// add recipient
-			$mail->setTo($user->getEmail(), $user->formatName());
-
 			try {
+				// add recipient
+				$mail->setTo($user->getEmail(), $user->formatName());
 				Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
 			}
 			catch (Swift_SwiftException $e) {
-				// log this
-				Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send(
-					Swift_Message::newInstance('Comment mail error', $e->getMessage() . "\n\n" . print_r($e->getTrace(), true), 'text/plain', 'utf-8')->addTo('matt.day+commentmail@alaress.com.au', 'Debug')
-				);
+				// if we had somewhere to log this, we might log this
 			}
 
 		}
