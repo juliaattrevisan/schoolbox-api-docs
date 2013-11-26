@@ -68,6 +68,7 @@ do
 			exit 1;
 		else
 			head -n `expr $tline - 1` $tfile > $tempfile;
+			echo "        php_flag session.cookie_httponly On" >> $tempfile;
 			echo "        php_value session.save_handler redis" >> $tempfile;
 			echo "        php_value session.save_path \"tcp://127.0.0.1:6379\"" >> $tempfile;
 			echo "        php_value newrelic.appname \"Schoolbox Dev\"" >> $tempfile;
@@ -150,6 +151,7 @@ do
 		else
 			head -n `expr $tline - 1` $tfile > $tempfile;
 			echo "        php_value session.gc_maxlifetime 43200" >> $tempfile;
+			echo "        php_flag session.cookie_httponly On" >> $tempfile;
 			echo "        php_value session.save_handler redis" >> $tempfile;
 			echo "        php_value session.save_path \"tcp://127.0.0.1:6379\"" >> $tempfile;
 			echo "        php_value newrelic.appname \"Schoolbox Dev\"" >> $tempfile;
