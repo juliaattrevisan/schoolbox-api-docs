@@ -26,13 +26,13 @@
             settings.startDate = $(settings.startDate);
         }
         else {
-            settings.startDate = $(this);
+            settings.startDate = this;
         }
         if (settings.endDate) {
             settings.endDate = $(settings.endDate);
         }
         else {
-            settings.endDate = $(this);
+            settings.endDate = this;
         }
 
         // Set up startDate and endDate change events
@@ -54,5 +54,6 @@
         settings.endDate.bind('change.syncDates', function() {
             changeInputs($(this))
         });
+        return this;
     }
 })(jQuery);
