@@ -8,8 +8,6 @@
  */
 class Component_Config_Textbox extends Component_Config_Abstract {
 
-	protected $is_shown_on_template = false;
-
     public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 
         $handler = new TextBox();
