@@ -79,7 +79,13 @@ class API extends Generic\API {
 		$workData = $dueAPI->getUpcomingWork();
 
 		// yeah, that's right, we just disregarded the contents of that retrieval!
-		$profile['workcount'] = count($workData);
+		$profile['workcount'] = 0;
+
+		foreach($workData as $d) {
+			if(!isset($d['type'])) {
+				++$profile['workcount'];
+			}
+		}
 
 		// first article: user photo and name
 		$articles[] = array(
@@ -192,6 +198,13 @@ class API extends Generic\API {
 		$works = $sidebar->getUpcomingWork();
 		$articles = array();
 
+		$articles[0] = array(
+			'title'   => 'No work',
+			'class'   => 'wide',
+			'icon'    => '',
+			'content' => 'No upcoming work'
+		);
+
 		$i = -1;
 		foreach($works as $work) {
 			if(isset($work['type'])) {
@@ -203,9 +216,7 @@ class API extends Generic\API {
 					'content' => array()
 				);
 			}
-			else {
-				$articles[$i]['content'][] = $work;
-			}
+			$articles[$i]['content'][] = $work;
 		}
 
 		$response = new Response_HTTP();

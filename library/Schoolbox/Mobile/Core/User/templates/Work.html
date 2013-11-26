@@ -1,14 +1,16 @@
-{% if not title %}
+{% if content[0].type %}
 <ul id="work-list">
-  {% for work in content %}
+{% for work in content %}
+  {% if not work.type %}
   <li>
     <a href="{{ work.href }}">
       {{ work.value }}
       <p>{{ work.date }}</p>
     </a>
   </li>
-  {% endfor %}
+  {% endif %}
+{% endfor %}
 </ul>
 {% else %}
-<p>No upcoming work.</p>
+<p>{{ content }}</p>
 {% endif %}
