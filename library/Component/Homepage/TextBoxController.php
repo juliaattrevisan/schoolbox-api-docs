@@ -58,22 +58,43 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $this->setVar($output);
 
-        if($this->permission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
-            if($this->sitepage->arg[1] == 'textBoxModify') {
-                $output = array(
-                    'TEXTBOX_BODY' => $textBox['body'],
-                );
-            }
-            elseif($this->sitepage->arg[1] == 'textBoxCreate') {
-                $output = array(
-					'TEXTBOX_HEADING' => '',
-					'TEXTBOX_BODY' => '',
-					'TEXTBOX_ID' => '',
-					'TEXTBOX_CATEGORY_ID' => $this->sitepage->arg[0],
-                );
-            }
-            $this->setVar($output);
-            $this->parse('text_editable_block', 'text_editable');
+		/* To edit someone else's textbox, you need write access to both homepages.
+		 * To just edit one homepage's textbox, you need write access to that homepage.
+		 */
+        if ($this->permission >= WRITE_ACCESS) {
+
+			/* If you are editing a textbox which belongs to this homepage
+			 * (you need write access for this)
+			 */
+			if ($this->sitepage->arg[2] == $this->instance->getId()) {
+				if ($this->sitepage->arg[1] == 'textBoxModify') {
+					$this->setVar(array(
+						'TEXTBOX_BODY' => $textBox['body'],
+					));
+				}
+				else if($this->sitepage->arg[1] == 'textBoxCreate') {
+					$this->setVar(array(
+						'TEXTBOX_HEADING' => '',
+						'TEXTBOX_BODY' => '',
+						'TEXTBOX_ID' => '',
+						'TEXTBOX_CATEGORY_ID' => $this->sitepage->arg[0],
+					));
+				}
+
+				$this->parse('text_editable_block', 'text_editable');
+			}
+			/* If you are editing a textbox which belongs to someone else's
+			 * homepage (you need write access for this)
+			 */
+			else {
+				$groupHandler = new Group();
+
+				if ($textBox['textBoxID'] && ($groupHandler->getPermission($textBox['categoryID']) >= WRITE_ACCESS)) {
+					$this->parse('modify_text_block', 'modify_text');
+				}
+
+				$this->parse('text_locked_block', 'text_locked');
+			}
         }
         else {
             // modify links
@@ -91,7 +112,5 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         }
 
         return true; // everything went according to plan
-
     }
-
 }
