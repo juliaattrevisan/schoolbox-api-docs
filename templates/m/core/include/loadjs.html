@@ -56,23 +56,6 @@ function debug(msg){
     }
 }
 
-function getCookie(c) {
-    var i, x, y, cookies=document.cookie.split(";");
-    for (i = 0; i < cookies.length; ++i) {
-        x = cookies[i].substr(0, cookies[i].indexOf("="));
-        y = cookies[i].substr(cookies[i].indexOf("=") + 1);
-        x = x.replace(/^\s+|\s+$/g,"");
-        if (x == c) {
-            return decodeURI(y);
-        }
-    }
-    return null;
-}
-
-function killCookie(c) {
-    document.cookie = c + '=; expires=Thu, 01-Jan-70 00:00:01 GMT; path=/';
-}
-
 function killScroll(o) {
     if(o != null) {
         o.destroy();
@@ -272,7 +255,6 @@ $("#page").on(clickEvent, '#wipeCache', function(){
 $("#page,#menu").on(clickEvent, '#logout', function(){
     localStorage.clear();
     sessionStorage.clear();
-    killCookie('PHPSESSID');
     window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
 });
 
