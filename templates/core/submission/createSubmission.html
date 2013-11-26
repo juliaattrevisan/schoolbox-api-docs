@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
 <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 
 <script type="text/javascript">
         tinyMCE.init({
@@ -54,12 +55,14 @@
     $j(function () {
 
         // setup datepickers
-        $j('#open_date, #due_date, #late_date').datepicker({
+        var openDate = $j('#open_date');
+        var dueDate  = $j('#due_date');
+        var lateDate = $j('#late_date');
+        openDate.add(dueDate).add(lateDate).datepicker({
             dateFormat:'dd/mm/yy',
             showOn:'both',
             buttonImage:'/images/core/calendar/calendar-click.png',
             buttonImageOnly:true,
-//            constrainInput:false,
             onClose:function (string) {
                 var input = $j(this);
 
@@ -68,6 +71,8 @@
                 })
             }
         });
+        openDate.syncDates({endDate: dueDate});
+        dueDate.syncDates({endDate: lateDate});
 
         var marktype = {
             total:$j('#marktype-total'),
