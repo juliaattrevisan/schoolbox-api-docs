@@ -20,12 +20,16 @@
         init: 0,
         lastPage: (localStorage.getItem('lastPage')) ? localStorage.getItem('lastPage') : null,
         online: function () {
-            var onLine = false;
             var xhr = new XMLHttpRequest();
-                xhr.open('GET', '/m/manifest.php', false); // E.T. Phone Home
-                xhr.send(null);
-            onLine = (xhr.status === 200);
-            return onLine;
+            // Cache breaking request
+            xhr.open('GET', '/m/manifest.php?q='+String(Date.now()), false); // E.T. Phone Home
+            try {
+                xhr.send();
+            }
+            catch (e) {
+                return false;
+            }
+            return (xhr.status === 200);
         },
         isCurrentlyLoggedIn: function() {
             return env.loggedIn;
@@ -83,10 +87,6 @@
     }
 
     var page = document.getElementById('app');
-
-    if(settings.offline){
-        $('html').attr('manifest','manifest.php');
-    }
 
     $.fx.off = false
 </script>
