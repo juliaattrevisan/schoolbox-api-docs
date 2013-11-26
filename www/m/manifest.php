@@ -1,6 +1,7 @@
 <?php
 // Bootstrap is needed so I can get site_location
 require_once __DIR__ . '/../../include/Bootstrap.php';
+$location = Config::get('site_location');
 
 header('Content-Type: text/cache-manifest');
 header('Cache-Control: no-cache');
@@ -13,25 +14,28 @@ $hashes = '';
 echo "CACHE MANIFEST\n";
 
 $includes = array(
-    '/../templates/core/include/head.html',
-    '/../templates/core/include/hercules.html',
-    '/../templates/core/include/loadjs.html',
-    '/../templates/core/include/loadstyle.html',
-    '/../templates/core/include/main.html',
-    '/../templates/core/include/js/cache.html',
-    '/../templates/core/include/js/init.html',
-    '/../templates/core/include/js/loadfile.html',
-    '/../templates/core/include/js/menu.html',
-    '/../templates/core/include/js/render.html',
-    '/../templates/core/include/js/variables.html'
+    '/templates/m/core/include/_hercules.html',
+    '/templates/m/core/include/head.html',
+    '/templates/m/core/include/loadjs.html',
+    '/templates/m/core/include/loadstyle.html',
+    '/templates/m/core/include/main.html',
+    '/templates/m/core/include/js/cache.html',
+    '/templates/m/core/include/js/init.html',
+    '/templates/m/core/include/js/loadfile.html',
+    '/templates/m/core/include/js/menu.html',
+    '/templates/m/core/include/js/qtap.html',
+    '/templates/m/core/include/js/render.html',
+    '/templates/m/core/include/js/variables.html',
+    "/templates/$location/m/hercules.html",
+    "/templates/$location/m/loading.html",
 );
 foreach($includes as $file){
-    if (is_readable('.'.$file)) {
-        $hashes .= md5_file('.'.$file);
+    $actual_file = __DIR__.'/../..'.$file;
+    if (is_readable($actual_file)) {
+        $hashes .= md5_file($actual_file);
     }
 }
 
-$location = Config::get('site_location');
 $files = array(
     # Styles
     "/css/$location/mchrome.css",
@@ -40,6 +44,7 @@ $files = array(
     '/m/inc/js/libs/iscroll-lite.js',
     # Images
     "/images/$location/favicon.ico",
+    "/images/$location/hercules.png",
     "/images/$location/apple-touch-icon-precomposed.png",
     # Fonts
     '/m/inc/font/sil.ttf'
