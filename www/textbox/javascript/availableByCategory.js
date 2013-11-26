@@ -99,7 +99,13 @@ $j(function() {
 
 				var select = '<select name="textbox">' + allOptions + '</select>';
 
-				config.target.html(select);
+				/* If the target exists, replace it - since Resource Browser
+				 * is shared by everything, if the textbox target doesn't exist,
+				 * just do nowt
+				 */
+				if (config.target.length) {
+					config.target.replaceWith(select);
+				}
 			});
 		}
 	}
