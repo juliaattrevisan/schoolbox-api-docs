@@ -148,7 +148,15 @@ localCache.get = function(url) {
         // check that either the expected response, or a not-found, came back from the server
         if (xhr.status != 200 && xhr.status != 404) {
             env.status(4); // Error
-            return null;
+            // Some sort of error message
+            return
+                "<section>" +
+                    "<header>ERROR</header>" +
+                    "<article data-icon=\"error\" class=\"giza-error wide\">" +
+                        "<h1>Error loading resource</h1>" +
+                        "<ul><li>Please try again later.</li></ul>" +
+                    "</article>" +
+                "</section>";
         }
         // check headers: use content-disposition as trigger for file download
         if(xhr.getResponseHeader('Content-Disposition')) {
