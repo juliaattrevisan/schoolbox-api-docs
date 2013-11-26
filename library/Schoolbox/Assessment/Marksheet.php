@@ -147,6 +147,9 @@ class Marksheet {
 
 		if($this->category->getCodes()->count() && $this->conf->get('external_enable')) {
 			$studentList = $this->synergyHandler->getStudents($this->category->getCodes()->first()->getCode());
+			if (!is_array($studentList)) {
+				$studentList = array();
+			}
 		}
 
 		$groupList = $this->groupHandler->getMemberList($this->category->getId());
