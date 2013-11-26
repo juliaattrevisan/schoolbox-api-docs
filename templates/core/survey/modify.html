@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.json2.js"></script>
 <script type="text/javascript">
@@ -48,6 +49,7 @@ $j(document).ready(function() {
 			})
 		}
 	});
+	$j('#start_date').syncDates({endDate: $j('#finish_date')});
 	/* date picker */
 
 

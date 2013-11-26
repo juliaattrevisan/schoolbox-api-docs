@@ -44,9 +44,13 @@
             }
         });
 
-        // Open date validation
+        // Open date validation and sync
         form.find('input.open_date').each(function() {
-            $(this).rules('add', {
+            var element = $(this)
+            if ('syncDates' in $.fn) {
+                element.syncDates({endDate: element.closest('[data-type="unit_row"]').find('input.due_date')})
+            }
+            element.rules('add', {
                 datepickerDate: true,
                 messages: {
                     datepickerDate: 'Please enter a valid date.'

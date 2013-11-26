@@ -1,6 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
-<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
 tinyMCE.init({
@@ -87,6 +87,9 @@ $j(function () {
             })
         }
     });
+
+    // Update the start date to be not less than the end date
+    $j('input#startDate').syncDates({endDate: $j('input#endDate')})
 
     //greenerising the checkboxes if they're ticked.
     $j(':checkbox').each(function () {
