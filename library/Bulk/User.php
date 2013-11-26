@@ -107,8 +107,8 @@ class Bulk_User extends Bulk_Abstract {
 						'year' => $user[9],
 						'password' => $user[10],
 						'local_email' => $user[11],
-						'mail_handler' => $user[11],
-						'alt_email' => $user[12],
+						'mail_handler' => $user[12],
+						'alt_email' => $user[13],
 					);
 
 					if (empty($userCampus)) {
