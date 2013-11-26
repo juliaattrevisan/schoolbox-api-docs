@@ -36,7 +36,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $textBox = $textBoxHandler->getByID((int)$this->getConfig('textbox'));
 
         $sourceCategory = $textBox['categoryID'] ? $textBox['categoryID'] : $this->getContext('id');
-        print $sourceCategory;
+
         // Don't show deleted items
         if ($textBox['deleted'] == 'true') {
             unset($textBox);
