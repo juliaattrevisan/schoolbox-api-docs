@@ -9,7 +9,35 @@
  */
 require_once('../../../../include/Bootstrap.php');
 
+/* avviare la sessione con il solito sitepage
+ */
+$page = new SitePage();
 $externalClass = new External_Class();
-$allStudents = $externalClass->getStudents($_POST['code']);
+$externalHandler = new External_User();
 
-new \Alaress_Probe($_POST);
+$ids = array();
+$emailString = array();
+
+/* Find all the students whose parents we'll need to contact
+ */
+$allStudents = $externalClass->getStudents($_POST['classCode']);
+
+if ($allStudents && count($allStudents)) {
+	foreach ($allStudents as $currentStudent) {
+		if (in_array($currentStudent['synergy_id'], $_POST['allIds'])) {
+			$ids[] = $currentStudent['synergy_id'];
+		}
+	}
+}
+
+/* Now get the parents of the students
+ */
+$allParents = $externalHandler->getParentEmails($ids);
+
+if ($allStudents && count($allParents)) {
+	foreach ($allParents as $currentParent) {
+		$emailString[] = $currentParent;
+	}
+}
+
+echo json_encode($emailString);
