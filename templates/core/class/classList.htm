@@ -19,7 +19,7 @@
         <tbody>
         <!-- BEGIN student_list -->
         <tr class="no-bdr {ON_OFF}">
-            <td class="check">{SELECT}</td>
+            <td class="check"><input type="checkbox" name="selected[]" value="{SYNERGYID}" /></td>
             <td rowspan="2"><img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
             <!-- BEGIN name_with_link -->
             <td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
@@ -77,11 +77,28 @@
     </div>
     <!-- END email_class -->
 </form>
+
+<script type="text/javascript" src="/subject/classList/javascript/emailSelected.js"></script>
+<script type="text/javascript">
+	$j(function() {
+		$j('#email-selected-parents').emailSelected({
+			sourceForm: $j('#contact-table'),
+			url: '/subject/classList/ajax/emailParentsById.php'
+		});
+	});
+</script>
+
 <!-- BEGIN parent_email -->
 <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
     <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
     <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
     <input type="submit" class="submit-btn-plain" value="Email All Parents"/>
 </form>
+<form action="#" method="post" class="clearfix" id="email-selected-parents">
+	<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
+	<input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+	<input type="submit" class="submit-btn-plain" value="Email Parents of selected students"/>
+</form>
 <!-- END parent_email -->
 </div>
+
