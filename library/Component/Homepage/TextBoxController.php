@@ -13,7 +13,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
      * @return void
      */
     public function execute() {
-
+        $this->groupHandler = new Group();
     }
 
     /**
@@ -35,6 +35,8 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $textBoxHandler = new TextBox;
         $textBox = $textBoxHandler->getByID((int)$this->getConfig('textbox'));
 
+        $sourceCategory = $textBox['categoryID'] ? $textBox['categoryID'] : $this->getContext('id');
+        print $sourceCategory;
         // Don't show deleted items
         if ($textBox['deleted'] == 'true') {
             unset($textBox);
@@ -61,44 +63,26 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 		/* To edit someone else's textbox, you need write access to both homepages.
 		 * To just edit one homepage's textbox, you need write access to that homepage.
 		 */
-        if ($this->permission >= WRITE_ACCESS) {
+        if ($this->groupHandler->getPermission($sourceCategory) >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
 
-			/* If you are editing a textbox which belongs to this homepage
-			 * (you need write access for this)
-			 */
-			if ($this->sitepage->arg[2] == $this->instance->getId()) {
-				if ($this->sitepage->arg[1] == 'textBoxModify') {
-					$this->setVar(array(
-						'TEXTBOX_BODY' => $textBox['body'],
-					));
-				}
-				else if($this->sitepage->arg[1] == 'textBoxCreate') {
-					$this->setVar(array(
-						'TEXTBOX_HEADING' => '',
-						'TEXTBOX_BODY' => '',
-						'TEXTBOX_ID' => '',
-						'TEXTBOX_CATEGORY_ID' => $this->sitepage->arg[0],
-					));
-				}
-
-				$this->parse('text_editable_block', 'text_editable');
-			}
-			/* If you are editing a textbox which belongs to someone else's
-			 * homepage (you need write access for this)
-			 */
-			else {
-				$groupHandler = new Group();
-
-				if ($textBox['textBoxID'] && ($groupHandler->getPermission($textBox['categoryID']) >= WRITE_ACCESS)) {
-					$this->parse('modify_text_block', 'modify_text');
-				}
-
-				$this->parse('text_locked_block', 'text_locked');
-			}
+            if ($this->sitepage->arg[1] == 'textBoxModify') {
+                $this->setVar(array(
+                    'TEXTBOX_BODY' => $textBox['body'],
+                ));
+            }
+            else if($this->sitepage->arg[1] == 'textBoxCreate') {
+                $this->setVar(array(
+                    'TEXTBOX_HEADING' => '',
+                    'TEXTBOX_BODY' => '',
+                    'TEXTBOX_ID' => '',
+                    'TEXTBOX_CATEGORY_ID' => $sourceCategory,
+                ));
+            }
+            $this->parse('text_editable_block', 'text_editable');
         }
         else {
             // modify links
-            if ($this->permission >= WRITE_ACCESS) {
+            if ($this->groupHandler->getPermission($sourceCategory) >= WRITE_ACCESS) {
                 if($textBox['textBoxID']) {
                     $this->parse('modify_text_block', 'modify_text');
                 }

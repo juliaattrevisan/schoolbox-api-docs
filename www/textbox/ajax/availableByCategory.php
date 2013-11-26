@@ -19,7 +19,7 @@ $allElements = array();
 /* Check permissions
  */
 if (is_numeric($_GET['categoryId'])) {
-	if ($groupHandler->getPermission($_GET['categoryId']) >= WRITE_ACCESS) {
+	if ($groupHandler->getPermission($_GET['categoryId']) >= READ_ACCESS) {
 		$allTextboxes = $textboxHandler->getAllByCategory($_GET['categoryId']);
 
 		if (is_array($allTextboxes) && count($allTextboxes)) {
