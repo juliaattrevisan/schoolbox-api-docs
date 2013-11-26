@@ -210,13 +210,13 @@ class Server {
 		}
 		$transport = $protocol == 'https' ? 'ssl' : 'tcp';
 
-		$opts[$protocol] = array(
+		$opts['http'] = array(
 			'proxy' => $transport . '://' . $this->getURI(),
 			'request_fulluri' => true
 		);
 
 		if($this->isAuthenticated()) {
-			$opts[$protocol]['header'] = array(
+			$opts['http']['header'] = array(
 				'Proxy-Authorization: ' . self::PROXY_AUTH_STRING . ' ' . $this->getUserPwd(true)
 			);
 		}
