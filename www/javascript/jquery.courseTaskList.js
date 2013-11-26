@@ -37,8 +37,8 @@
         var initTaskList = function() {
             var task_list = component.find('.task-list');
             task_list.sortable({
-                handle: '.icon',
-                cursor: 'move'
+				placeholder: "sortable-placeholder",
+				forcePlaceholderSize: true
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
