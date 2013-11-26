@@ -20,7 +20,8 @@
 		function init(options, element) {
 			var defaults = {
 				sourceForm: null,
-				url: ''
+				url: '',
+				classCode: ''
 			}
 
 			var derived = {
@@ -52,7 +53,8 @@
 		 */
 		function fetchEmails() {
 			var payload = {
-				allIds: gatherSelectedIds()
+				allIds: gatherSelectedIds(),
+				classCode: config.classCode
 			}
 
 			var allEmails = '';

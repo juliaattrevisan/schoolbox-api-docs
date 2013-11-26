@@ -9,4 +9,7 @@
  */
 require_once('../../../../include/Bootstrap.php');
 
-echo 'test response';
+$externalClass = new External_Class();
+$allStudents = $externalClass->getStudents($_POST['code']);
+
+new \Alaress_Probe($_POST);
