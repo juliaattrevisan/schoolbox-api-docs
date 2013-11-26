@@ -1046,6 +1046,7 @@ Notifications
     .task-list .icon {
         top: 0;
         margin-top: 10px;
+        margin-left: 12px;
     }
     .course_definition {
         padding: 7px 16px;
@@ -1129,6 +1130,11 @@ Notifications
 
 // Course outline forms
 .course_instance {
+	.task-list .icon {
+		top: 0;
+		margin-top: 10px;
+		margin-left: 12px;
+	}
     h3, h4 {
         float: none;
     }
@@ -1164,7 +1170,6 @@ Notifications
         }
     }
 }
-
 /*--------------------------------------------------------------
  Information List - Displays summary info with minimal actions
 --------------------------------------------------------------*/
@@ -3374,8 +3379,7 @@ fieldset.edit-duration {
 }
 
 .evaluation-menu .question-list li {
-    padding: 7px 16px;
-    border-top: 1px solid @lgrey;
+    padding: 7px 16px 7px 21px;
     position: relative;
     overflow: hidden
 }
@@ -3397,10 +3401,6 @@ fieldset.edit-duration {
     border-right: 11px solid transparent;
     z-index: 3;
     display: block;
-}
-
-.evaluation-menu .question-list li:first-child {
-    border: 0;
 }
 
 .evaluation-menu #countdown {
@@ -3763,7 +3763,7 @@ ul.section-options a.drop-arrow {
 }
 
 .evaluation-content.take-test  ul li.right-answer {
-    background: lighten(@neutral-color,@lighten-value);
+    background-color: lighten(@neutral-color,@lighten-value);
 }
 
 .evaluation-content.take-test  ul li.right-answer.drophover strong {
@@ -3828,8 +3828,8 @@ ul.section-options a.drop-arrow {
     border: 1px solid @lgrey;
     display: block;
     font-weight: normal;
-    background: #e3f2fa url(/images/core/assess/drag-drop.gif) 100% 50% no-repeat;
-    padding: 5px;
+    background: lighten(@neutral-color, @lighten-value) url(/images/core/tablesorter/sort.gif) left center no-repeat;
+    padding: 5px 5px 5px 21px;
 }
 
 .evaluation-content.take-test .option {
@@ -7826,6 +7826,11 @@ label {
 ul.task-list,
 ul.activity-list,
 ul.submission-list {
+	&.ui-sortable {
+		li {
+			padding-left: 45px;
+		}
+	}
     li {
         padding: 8px 4px;
         position: relative;
@@ -9649,7 +9654,7 @@ table img { max-width: none; }
 .right .listing .dark,
 .left .listing .dark
 {
-	background: @dark;
+	background-color: @dark;
 }
 
 .calendar .table thead th,
@@ -10242,6 +10247,30 @@ th.rotate {
 		}
 		.marks-amount {
 			width: 110px;
+		}
+	}
+}
+
+.ui-sortable {
+	&> li {
+		background: #fff;
+		background-image: url('/images/core/tablesorter/sort.gif');
+		background-repeat: no-repeat;
+		background-position: left center;
+		border-bottom: 1px solid @border-color;
+		cursor: move;
+		padding-left: 21px;
+		&.ui-sortable-helper {
+			border: 1px solid @border-color;
+			box-shadow: 1px 1px 2px @border-color;
+		}
+		&.sortable-placeholder {
+			border: 1px dashed @positive-color;
+			text-shadow: 0 1px 1px @white;
+			-moz-background-clip: padding;
+			-webkit-background-clip: padding-box;
+			background-clip: padding-box;
+			.gradient(lighten(@positive-color,@lighten-value * 2),lighten(@positive-color,@lighten-value));
 		}
 	}
 }

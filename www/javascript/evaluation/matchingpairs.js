@@ -36,7 +36,8 @@
 
 			rightList.disableSelection();
 			rightList.sortable({
-				containment: 'parent',
+				placeholder: "sortable-placeholder",
+				forcePlaceholderSize: true,
 				stop: function() {
 					$.fn.evaluationMatchingPairs.saveOne(config.questionForm);
 				}

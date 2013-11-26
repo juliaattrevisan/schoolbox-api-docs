@@ -31,6 +31,8 @@ $j(function() {
 	/* Make questions sortable
 	 */
 	$j(".question-list").sortable({
+		placeholder: "sortable-placeholder",
+		forcePlaceholderSize: true,
 		stop: function(event, ui) {
 			var allQuestions = $j(this).find('li');
 			var section = $j(this).attr('id');
