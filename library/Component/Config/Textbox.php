@@ -8,14 +8,21 @@
  */
 class Component_Config_Textbox extends Component_Config_Abstract {
 
-	protected $is_shown_on_template = false;
-
     public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 
         $handler = new TextBox();
 
         // has an internal block for the select element
-        $boxList = $handler->getAllByCategory($this->getCategory('id'));
+
+		/* Select a textbox from some other homepage
+		 */
+		if (is_numeric($allConfigs['src']['value']) && $allConfigs['src']['value']) {
+			$boxList = $handler->getAllByCategory($allConfigs['src']['value']);
+		}
+		else {
+
+			$boxList = $handler->getAllByCategory($this->getCategory('id'));
+		}
 
         $page->setBlock($keyblock, 'textbox_select', 'textbox_select_block');
         $page->setVar('textbox_select_block', '');

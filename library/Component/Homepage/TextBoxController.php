@@ -13,7 +13,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
      * @return void
      */
     public function execute() {
-
+        $this->groupHandler = new Group();
     }
 
     /**
@@ -35,15 +35,22 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $textBoxHandler = new TextBox;
         $textBox = $textBoxHandler->getByID((int)$this->getConfig('textbox'));
 
+        $sourceCategory = $textBox['categoryID'] ? $textBox['categoryID'] : $this->getContext('id');
+
         // Don't show deleted items
         if ($textBox['deleted'] == 'true') {
             unset($textBox);
         }
 
+		/* Remember where the texbox came from - if you modify a streamed
+		 * textbox which comes from another homepage, you were able to
+		 * inadvertently steal ownership of it
+		 */
         $output = array(
-            'TEXTBOX_HEADING' => !empty($textBox['heading']) ? Scrub::text($textBox['heading']) : 'Text Box',
-            'TEXTBOX_BODY'    => Scrub::html($textBox['body']),
-            'TEXTBOX_ID'      => $textBox['textBoxID'],
+			'TEXTBOX_HEADING' => !empty($textBox['heading']) ? Scrub::text($textBox['heading']) : 'Text Box',
+			'TEXTBOX_BODY' => Scrub::html($textBox['body']),
+			'TEXTBOX_ID' => $textBox['textBoxID'],
+			'TEXTBOX_CATEGORY_ID' => $textBox['categoryID'],
 
             'text_editable_block' => '',
             'modify_text_block'   => '',
@@ -53,25 +60,29 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $this->setVar($output);
 
-        if($this->permission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
-            if($this->sitepage->arg[1] == 'textBoxModify') {
-                $output = array(
+		/* To edit someone else's textbox, you need write access to both homepages.
+		 * To just edit one homepage's textbox, you need write access to that homepage.
+		 */
+        if ($this->groupHandler->getPermission($sourceCategory) >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
+
+            if ($this->sitepage->arg[1] == 'textBoxModify') {
+                $this->setVar(array(
                     'TEXTBOX_BODY' => $textBox['body'],
-                );
+                ));
             }
-            elseif($this->sitepage->arg[1] == 'textBoxCreate') {
-                $output = array(
+            else if($this->sitepage->arg[1] == 'textBoxCreate') {
+                $this->setVar(array(
                     'TEXTBOX_HEADING' => '',
-                    'TEXTBOX_BODY'    => '',
-                    'TEXTBOX_ID'      => '',
-                );
+                    'TEXTBOX_BODY' => '',
+                    'TEXTBOX_ID' => '',
+                    'TEXTBOX_CATEGORY_ID' => $sourceCategory,
+                ));
             }
-            $this->setVar($output);
             $this->parse('text_editable_block', 'text_editable');
         }
         else {
             // modify links
-            if ($this->permission >= WRITE_ACCESS) {
+            if ($this->groupHandler->getPermission($sourceCategory) >= WRITE_ACCESS) {
                 if($textBox['textBoxID']) {
                     $this->parse('modify_text_block', 'modify_text');
                 }
@@ -85,7 +96,5 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         }
 
         return true; // everything went according to plan
-
     }
-
 }
