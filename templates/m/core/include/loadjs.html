@@ -105,7 +105,7 @@ localCache.get = function(url) {
 
     debug('loadjs.html:85 > localCache() url should have no extension: ' + url);
 
-    // Load the
+    // Load the locally stored version and its expiry if possible
     var r = {}
     try {
         r = JSON.parse(localStorage[url])
@@ -268,9 +268,9 @@ $("body").on(clickEvent, '#grid', function(){
 
 // register the cache-wipe listener
 $("#page").on(clickEvent, '#wipeCache', function(){
+    // Obsolete the cache
     $('html').attr('manifest','manifest_obsolete.php');
-    document.cookie = 'PHPSESSID' + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
-    appCache.OBSOLETE;
+    appCache.update();
     localStorage.clear();
     localStorage.setItem('lastPage', '/');
     window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
