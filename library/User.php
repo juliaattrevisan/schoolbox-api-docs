@@ -727,35 +727,39 @@ class User extends DeprecatedModel {
 
 		$user['key'] = substr(md5(uniqid() . time()), 0, 25);
 
-		$id = parent::create($user);
+		if (is_array($campusArray) && count($campusArray)) {
+			$id = parent::create($user);
 
-		if ($password) {
-			$this->setPasswordInternal($id, $password);
-		}
-
-		if (is_array($campusArray) && $id) {
-			foreach ($campusArray as $campus) {
-				$insertCampus = array(
-					'uid' => $id,
-					'campus' => $campus,
-					'defaultCampus' => $campus == $defaultCampus ? 1 : 0
-				);
-				$this->db->insert('userCampus', $insertCampus);
+			if ($password) {
+				$this->setPasswordInternal($id, $password);
 			}
-		} else {
-			if ($id && $campusArray) {
-				$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusArray')";
-				$this->db->query($campusquery);
+
+			if (is_array($campusArray) && $id) {
+				foreach ($campusArray as $campus) {
+					$insertCampus = array(
+						'uid' => $id,
+						'campus' => $campus,
+						'defaultCampus' => $campus == $defaultCampus ? 1 : 0
+					);
+					$this->db->insert('userCampus', $insertCampus);
+				}
+			} else {
+				if ($id && $campusArray) {
+					$campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusArray')";
+					$this->db->query($campusquery);
+				}
 			}
+
+			/* If ticked, add the new user into the Superusers table as well.
+			 */
+			if ($su) {
+				$this->db->insert('superusers', array('id' => $id));
+			}
+
+			return $id;
 		}
 
-		/* If ticked, add the new user into the Superusers table as well.
-		 */
-		if ($su) {
-			$this->db->insert('superusers', array('id' => $id));
-		}
-
-		return $id;
+		return false;
 	}
 
 
