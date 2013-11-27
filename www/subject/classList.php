@@ -83,10 +83,7 @@ if ($groupHandler->isStaff()) {
 					'SYNERGYID' => $student['synergy_id'],
 					'EMAIL' => $emailaddr ? $emaillink : '',
 					'EMAIL_ADDRESS' => $emailaddr,
-					'EMAIL_BTN' => $emailaddr ? sprintf(
-							'<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>',
-							$_SESSION['mailhandle'], $emailaddr
-						) : '',
+					'EMAIL_BTN' => $emailaddr ? sprintf('<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>',$_SESSION['mailhandle'], $emailaddr) : '',
 					'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
 					'ON_OFF' => ++$j % 2 ? '' : 'dark',
 					'SELECT' => $emailaddr ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
@@ -99,13 +96,15 @@ if ($groupHandler->isStaff()) {
 
 				if (!empty($student['StudentMedicalAlert']) && Cfg::get('protect_medicalspecial') == 0) {
 					$this->parse('medical_block', 'medical');
-				} else {
+				}
+				else {
 					$this->setVar('medical_block', '');
 				}
 
 				if (!empty($student['StudentSpecialNeedsFlag']) && Cfg::get('protect_medicalspecial') == 0) {
 					$this->parse('special_block', 'special');
-				} else {
+				}
+				else {
 					$this->setVar('special_block', '');
 				}
 
@@ -113,7 +112,8 @@ if ($groupHandler->isStaff()) {
 				 */
 				if ($user['eportfolio_enabled']) {
 					$this->parse('eportfolio_block', 'eportfolio');
-				} else {
+				}
+				else {
 					$this->setVar('eportfolio_block', '');
 				}
 
@@ -124,7 +124,8 @@ if ($groupHandler->isStaff()) {
 					$this->parse('name_with_link_block', 'name_with_link');
 					$this->setVar('name_without_link_block', '');
 					$this->parse('actions_block', 'actions');
-				} else {
+				}
+				else {
 					$this->parse('name_without_link_block', 'name_without_link');
 					$this->setVar('name_with_link_block', '');
 					$this->setVar('actions_block', '');
@@ -140,7 +141,8 @@ if ($groupHandler->isStaff()) {
 				$this->setVar("REPLYTO", $email);
 				$this->setVar("CLASSEMAIL", $classEmail);
 				$this->parse('email_class_block', 'email_class');
-			} else {
+			}
+			else {
 				$this->setVar('email_class_block', '');
 			}
 
@@ -161,23 +163,26 @@ if ($groupHandler->isStaff()) {
 					)
 				);
 
+				/* Emailing parents is a configuration
+				 */
 				if (Cfg::get('email_all_parents') == 1) {
 					$this->parse('parent_email_block', 'parent_email');
-				} else {
+				}
+				else {
 					$this->setVar('parent_email_block', '');
 				}
 			}
-		} else {
+		}
+		else {
 			$this->setVar('student_list_block', '');
 			$this->setVar('parent_email_block', '');
 			$this->setVar('email_class_block', '');
 		}
-	} else {
+	}
+	else {
 		$this->error(18);
 	}
-
-
-} else {
+}
+else {
 	error(19);
 }
-?>
