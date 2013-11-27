@@ -84,10 +84,10 @@ $this->t_body->set_block("mgroup", "mgroup_block", "my_groups");
 
 $query = "SELECT category.name, userAccess.sid, userAccess.type
 		  FROM userAccess, category
+		  JOIN homepage_config ON homepage_config.cid = category.id
 		  WHERE userAccess.uid = '" . $_SESSION['id'] . "'
 		  AND userAccess.sid = category.id
 		  AND userAccess.type > 0
-		  AND category.template <> 0
 	";
 $db->dbDoQuery($query);
 if ($db->dbCountRows() > 0) {
