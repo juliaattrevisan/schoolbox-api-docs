@@ -7,7 +7,7 @@
 
 			config = init(options, this);
 
-			var allEmails = fetchEmails();
+			fetchEmails();
 		});
 
 		/**
@@ -19,12 +19,31 @@
 		 */
 		function init(options, element) {
 			var defaults = {
+
+				/* The email form belonging to this plugin instance
+				 */
+				element: null,
+
+				/* The element containing all the checkboxes
+				 */
 				sourceForm: null,
+
+				/* The url to access, to provide a list of recipient emails
+				 */
 				url: '',
-				classCode: ''
+
+				/* The class code for the current list of people
+				 */
+				classCode: '',
+
+				/* A jquery-selected element in the form. All the
+				 * emails get rammed into here
+				 */
+				target: null
 			}
 
 			var derived = {
+				element: element
 			}
 
 			var merged = $j.extend(defaults, derived, options);
@@ -57,14 +76,19 @@
 				classCode: config.classCode
 			}
 
-			var allEmails = '';
-
 			$j.post(config.url, payload, function(responseText) {
 				var response = new Function('return ' + responseText);
 				var allEmails = response();
-			});
 
-			return allEmails;
+				inject(allEmails);
+			});
+		}
+
+		/**
+		 * Inject emails into target form element
+		 */
+		function inject(allEmails) {
+			config.target.val(allEmails.join(','));
 		}
 	}
 }(jQuery));
