@@ -75,13 +75,13 @@ class Mediator {
         }
         // if authentication fails
         catch(Exception_Schoolbox_AccessDenied $e) {
-            // create a dynamic reroute to substitute the destination page contents with the login page
-            $router->registerReroute($this->getClassName(false), array('Core\\Auth', 'Login'));
-            $router->reroute();
-
-            $this->parseRoute($router);
-
-            //$response->addInternalRedirectHeader('mobile/core/auth/login');
+            // Perform an actual redirect, not an internal one.
+            // Reason: if a login page is returned by /m/actual-mobile-page, it
+            // could get cached - then when you ARE logged in, you get the login
+            // page, because that was what was cached.
+            $response = new Response_HTTP(Response_HTTP::HTTP_UNAUTHORIZED);
+            $response->addInternalRedirectHeader('core/auth/login');
+            $this->setResponse($response);
             $this->setResponseCode(Response_HTTP::HTTP_UNAUTHORIZED);
             return;
         }
