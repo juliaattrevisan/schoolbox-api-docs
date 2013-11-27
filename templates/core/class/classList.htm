@@ -25,52 +25,52 @@
 		</tr>
 	</thead>
 	<tbody>
-	<!-- BEGIN student_list -->
-	<tr class="no-bdr {ON_OFF}">
-		<td class="check"><input type="checkbox" name="selected[]" value="{SYNERGYID}" /></td>
-		<td rowspan="2"><img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
-		<!-- BEGIN name_with_link -->
-		<td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
-		<!-- END name_with_link -->
-		<!-- BEGIN name_without_link -->
-		<td class="firstrow">{SURNAME}, {FIRSTNAME}</td>
-		<!-- END name_without_link -->
-		<td class="firstrow">{SYNERGYID}</td>
-		<td class="firstrow">{YEARLEVEL}</td>
-		<td class="firstrow">{HOUSE}</td>
-		<td class="firstrow" nowrap="nowrap">{LASTVISIT}</td>
-	</tr>
-	<tr class="{ON_OFF}">
-		<td>&nbsp;</td>
-		<td colspan="4" valign="top" style="vertical-align:top;">
-			<!-- BEGIN actions -->
-			<div class="clearfix action-wrap">
-				<!-- BEGIN eportfolio -->
-				<a href="/eportfolio/{ID}/profile" title="View ePortfolio" class="btn eportfolio float-left">
-					<span></span>ePortfolio
-				</a>
-				<!-- END eportfolio -->
-				<a href="/submission/dueWork/{ID}" title="View due work" class="btn due-work float-left">
-					<span></span>Due Work
-				</a>
-				<a href="/submission/allWork/{ID}" class="btn tick float-left" title="View grades" ><span></span>Grades</a>
+		<!-- BEGIN student_list -->
+		<tr class="no-bdr {ON_OFF}">
+			<td class="check"><input type="checkbox" name="selected[]" value="{SYNERGYID}" /></td>
+			<td rowspan="2"><img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
+			<!-- BEGIN name_with_link -->
+			<td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
+			<!-- END name_with_link -->
+			<!-- BEGIN name_without_link -->
+			<td class="firstrow">{SURNAME}, {FIRSTNAME}</td>
+			<!-- END name_without_link -->
+			<td class="firstrow">{SYNERGYID}</td>
+			<td class="firstrow">{YEARLEVEL}</td>
+			<td class="firstrow">{HOUSE}</td>
+			<td class="firstrow" nowrap="nowrap">{LASTVISIT}</td>
+		</tr>
+		<tr class="{ON_OFF}">
+			<td>&nbsp;</td>
+			<td colspan="4" valign="top" style="vertical-align:top;">
+				<!-- BEGIN actions -->
+				<div class="clearfix action-wrap">
+					<!-- BEGIN eportfolio -->
+					<a href="/eportfolio/{ID}/profile" title="View ePortfolio" class="btn eportfolio float-left">
+						<span></span>ePortfolio
+					</a>
+					<!-- END eportfolio -->
+					<a href="/submission/dueWork/{ID}" title="View due work" class="btn due-work float-left">
+						<span></span>Due Work
+					</a>
+					<a href="/submission/allWork/{ID}" class="btn tick float-left" title="View grades" ><span></span>Grades</a>
 
-				{EMAIL_BTN}
-			</div>
-			<!-- END actions -->
-		</td>
-		<td valign="top" style="vertical-align:top;">
-			<div class="alert-wrap">
-				<!-- BEGIN special -->
-				<img src="/images/famicons/bell.png" title="Special Needs"/>
-				<!-- END special -->
-				<!-- BEGIN medical -->
-				<img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
-				<!-- END medical -->
-			</div>
-		</td>
-	</tr>
-	<!-- END student_list -->
+					{EMAIL_BTN}
+				</div>
+				<!-- END actions -->
+			</td>
+			<td valign="top" style="vertical-align:top;">
+				<div class="alert-wrap">
+					<!-- BEGIN special -->
+					<img src="/images/famicons/bell.png" title="Special Needs"/>
+					<!-- END special -->
+					<!-- BEGIN medical -->
+					<img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
+					<!-- END medical -->
+				</div>
+			</td>
+		</tr>
+		<!-- END student_list -->
 	</tbody>
 </table>
 
@@ -85,7 +85,7 @@
 		});
 	});
 </script>
-<form id="email-selected-students" action="/mail/createMail.php" method="post" class="clearfix">
+<form id="email-selected-students" action="/mail/createMail.php" method="post">
 	<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
 	<input type="hidden" name="bcc" value=""/>
 	<input type="submit" class="submit-btn-plain" value="Email Selected Students"/>
@@ -103,7 +103,7 @@
 		});
 	});
 </script>
-<form id="email-selected-parents" action="/mail/createMail.php" method="post" class="clearfix">
+<form id="email-selected-parents" action="/mail/createMail.php" method="post">
 	<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
 	<input type="hidden" name="bcc" value="" />
 	<input type="submit" class="submit-btn-plain" value="Email Parents of selected students"/>
