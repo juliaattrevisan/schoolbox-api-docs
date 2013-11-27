@@ -10,12 +10,7 @@ ul li h3 {
         {% if content[i].header %}
         <h3>{{ content[i].header }}</h3>
         {% endif %}
-        <a href="/m/calendar/event/{{ content[i].event.eventId }}/{{content[i].event.connectorId}}">
-            {% if not content[i].event.startTime.allDay %}
-            <time>{{ content[i].event.startTime.timeOnly }}</time>
-            {% endif %}
-            <p class="event-title">{{ content[i].event.note|raw }}</p>
-        </a>
+        {% include 'calendar/event.html' with {event: content[i].event} %}
     </li>
     {% endfor %}
 {% else %}

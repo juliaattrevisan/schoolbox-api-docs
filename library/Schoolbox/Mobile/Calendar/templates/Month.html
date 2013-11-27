@@ -24,19 +24,10 @@
         {% endif %}
         {% if content[i].events %}
             <ul>
-            {% for j in content[i].events|keys %}
-                <li class="{{ content[i].events[j].eventType }}{% if j > 2 %} excess{% endif %}">
-                {% if content[i].events[j].eventId and content[i].events[j].eventId != -1 %}
-                    <a href="/m/calendar/event/{{ content[i].events[j].eventId }}/{{content[i].events[j].connectorId}}">
-                    {% if not content[i].events[j].allDay %}
-                        <time>{{ content[i].events[j].startTime.timeOnly }}</time>
-                    {% endif %}
-                        {{ content[i].events[j].note|raw }}
-                    </a>
+            {% for event in content[i].events %}
+                <li class="{{ event.eventType }}{% if j > 2 %} excess{% endif %}">
+                    {% include 'calendar/event.html' with {event: event} %}
                 </li>
-                {% else %}
-                    {{ content[i].events[j].note|raw }}
-                {% endif %}
             {% endfor %}
             </ul>
         {% elseif content[i] != '_blank' %}
