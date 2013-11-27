@@ -1,6 +1,7 @@
 <?php
 /**
- * ${NAME}
+ * Get a list of parents' email addresses, for a given classCode
+ * and set of externalIds
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
