@@ -22,7 +22,7 @@
 
 				/* The email form belonging to this plugin instance
 				 */
-				element: null,
+				element: element,
 
 				/* The element containing all the checkboxes
 				 */
@@ -43,7 +43,6 @@
 			}
 
 			var derived = {
-				element: element
 			}
 
 			var merged = $j.extend(defaults, derived, options);
@@ -80,7 +79,10 @@
 				var response = new Function('return ' + responseText);
 				var allEmails = response();
 
+				/* Inject and redirect
+				 */
 				inject(allEmails);
+				redirect();
 			});
 		}
 
@@ -89,6 +91,14 @@
 		 */
 		function inject(allEmails) {
 			config.target.val(allEmails.join(','));
+		}
+
+		/**
+		 * Submit the form as originally intended
+		 */
+		function redirect() {
+			$j(config.element).unbind('submit');
+			config.element.submit();
 		}
 	}
 }(jQuery));

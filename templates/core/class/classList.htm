@@ -79,6 +79,8 @@
 </form>
 
 <script type="text/javascript" src="/subject/classList/javascript/emailSelected.js"></script>
+
+<!-- BEGIN parent_email -->
 <script type="text/javascript">
 	$j(function() {
 		$j('#email-selected-parents').emailSelected({
@@ -90,13 +92,7 @@
 	});
 </script>
 
-<!-- BEGIN parent_email -->
-<form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-    <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
-    <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
-    <input type="submit" class="submit-btn-plain" value="Email All Parents"/>
-</form>
-<form action="#" method="post" class="clearfix" id="email-selected-parents">
+<form action="/mail/createMail.php" method="post" class="clearfix" id="email-selected-parents">
 	<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
 	<input type="hidden" name="bcc" value="" />
 	<input type="submit" class="submit-btn-plain" value="Email Parents of selected students"/>
