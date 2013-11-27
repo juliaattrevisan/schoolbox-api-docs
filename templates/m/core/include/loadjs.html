@@ -274,8 +274,8 @@ $("body").on(clickEvent, '#grid', function(){
 // register the cache-wipe listener
 $("#page").on(clickEvent, '#wipeCache', function(){
     // Obsolete the cache
-//    $('html').attr('manifest','manifest_obsolete.php');
-//    appCache.update();
+    $('html').attr('manifest','manifest_obsolete.php');
+    appCache.update();
     localStorage.clear();
     localStorage.setItem('lastPage', '/');
     window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
