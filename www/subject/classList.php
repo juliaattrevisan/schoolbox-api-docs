@@ -51,11 +51,6 @@ if ($groupHandler->isStaff()) {
 
 		if (is_array($classList) && !empty($classList)) {
 			foreach ($classList as $student) {
-
-				/* Accumulate this for a giant parent-based bcc
-				 */
-				$synergyIds[] = $student['synergy_id'];
-
 				$email = '';
 				$emailaddr = '';
 
@@ -67,7 +62,6 @@ if ($groupHandler->isStaff()) {
 
 					if ($emailaddr) {
 						$emaillink = "<a href=\"" . $_SESSION['mailhandle'] . $emailaddr . "\">Email</a>";
-						$classEmail .= $emailaddr . ", ";
 					}
 				}
 
@@ -146,31 +140,17 @@ if ($groupHandler->isStaff()) {
 				$this->setVar('email_class_block', '');
 			}
 
-			/* Parent bulk email
+			/* Emailing parents is a configuration
 			 */
-			if (count($synergyIds)) {
-				$externalHandler = new External_User();
-				$allParents = $externalHandler->getParentEmails($synergyIds);
+			if (Cfg::get('email_all_parents') == 1) {
+				$this->setVar(array(
+					'REPLY_TO' => $emailObj->formatEmailFromArray($_SESSION),
+				));
 
-				/* Uniquify emails
-				*/
-				$emailAllParents = implode(', ', array_filter(array_unique($allParents)));
-
-				$this->setVar(
-					array(
-						'REPLY_TO' => $emailObj->formatEmailFromArray($_SESSION),
-						'EMAIL_ALL_PARENTS' => $emailAllParents,
-					)
-				);
-
-				/* Emailing parents is a configuration
-				 */
-				if (Cfg::get('email_all_parents') == 1) {
-					$this->parse('parent_email_block', 'parent_email');
-				}
-				else {
-					$this->setVar('parent_email_block', '');
-				}
+				$this->parse('parent_email_block', 'parent_email');
+			}
+			else {
+				$this->setVar('parent_email_block', '');
 			}
 		}
 		else {
