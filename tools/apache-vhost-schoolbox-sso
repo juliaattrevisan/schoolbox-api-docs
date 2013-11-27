@@ -1,125 +1,126 @@
 <VirtualHost *:80>
-	ServerName schoolbox-sso.schoolname.edu
-	DocumentRoot /usr/share/schoolbox/www
+        ServerName schoolbox-sso.schoolname.edu
+        DocumentRoot /usr/share/schoolbox/www
 
-	<Directory /usr/share/schoolbox>
-		Options FollowSymLinks
-		AllowOverride None
-		Order allow,deny
-		Allow from all
-		Satisfy all
-		<LimitExcept GET POST HEAD>
-            Order Allow,Deny
-            Deny from all
-            Satisfy all
-        </LimitExcept>
-	</Directory>
+        <Directory /usr/share/schoolbox>
+                Options FollowSymLinks
+                AllowOverride None
+                Order allow,deny
+                Allow from all
+                Satisfy all
+                <LimitExcept GET POST HEAD>
+                        Order Allow,Deny
+                        Deny from all
+                        Satisfy all
+                </LimitExcept>
+        </Directory>
 
-	<Directory /usr/share/schoolbox/www>
-		AuthType Kerberos
-		AuthName "Schoolbox SSO"
-		KrbAuthRealm SCHOOL.LOCAL
-		KrbServiceName HTTP
-		Krb5KeyTab /etc/apache2/all.HTTP.keytab
-		KrbMethodNegotiate On
-		KrbMethodK5Passwd Off
-		require valid-user
-	</Directory>
+        <Directory /usr/share/schoolbox/www>
+                AuthType Kerberos
+                AuthName "Schoolbox SSO"
+                KrbAuthRealm SCHOOL.LOCAL
+                KrbServiceName HTTP
+                Krb5KeyTab /etc/apache2/all.HTTP.keytab
+                KrbMethodNegotiate On
+                KrbMethodK5Passwd Off
+                require valid-user
+        </Directory>
 
-	ErrorLog /var/log/apache2/schoolbox_error.log
-	LogLevel warn
-	CustomLog /var/log/apache2/schoolbox_access.log combined
+        ErrorLog /var/log/apache2/schoolbox_error.log
+        LogLevel warn
+        CustomLog /var/log/apache2/schoolbox_access.log combined
 
-	# Minify Exceptions
-	<Directory /usr/share/schoolbox/www/min>
-		RewriteEngine on
-		RewriteRule ^([a-z]=.*)  index.php?$1  [L,NE]
-	</Directory>
+        # Minify Exceptions
+        <Directory /usr/share/schoolbox/www/min>
+                RewriteEngine on
+                RewriteRule ^([a-z]=.*)  index.php?$1  [L,NE]
+        </Directory>
 
-	# MGS Sport Module Exceptions
-	<Directory /usr/share/schoolbox/www/modules/sport>
-		php_flag apc.enabled off
-	</Directory>
+        # MGS Sport Module Exceptions
+        <Directory /usr/share/schoolbox/www/modules/sport>
+                php_flag apc.enabled off
+        </Directory>
 
-	# Force IE to not use compatibility mode
-	<IfModule mod_headers.c>
-  		Header set X-UA-Compatible "IE=Edge,chrome=1"
-  		# mod_headers can't match by content-type, but we don't want to send this header on *everything*...
-  		<FilesMatch "\.(appcache|crx|css|eot|gif|htc|ico|jpe?g|js|m4a|m4v|manifest|mp4|oex|oga|ogg|ogv|otf|pdf|png|safariextz|svg|svgz|ttf|vcf|webm|webp|woff|xml|xpi)$">
-    			Header unset X-UA-Compatible
-  		</FilesMatch>
-	</IfModule>
+        # Force IE to not use compatibility mode
+        <IfModule mod_headers.c>
+                  Header set X-UA-Compatible "IE=Edge,chrome=1"
+                  # mod_headers can't match by content-type, but we don't want to send this header on *everything*...
+                  <FilesMatch "\.(appcache|crx|css|eot|gif|htc|ico|jpe?g|js|m4a|m4v|manifest|mp4|oex|oga|ogg|ogv|otf|pdf|png|safariextz|svg|svgz|ttf|vcf|webm|webp|woff|xml|xpi)$">
+                            Header unset X-UA-Compatible
+                  </FilesMatch>
+        </IfModule>
 
 
-	ErrorDocument 404 /index.php?page=common/404
+        ErrorDocument 404 /index.php?page=common/404
 
-	Options +FollowSymLinks
-	Options -Multiviews
+        Options +FollowSymLinks
+        Options -Multiviews
 
-	RewriteEngine on
+        RewriteEngine on
 
-	# PHP Error handling
-	php_flag display_startup_errors off
-	php_flag display_errors off
-	php_flag html_errors off
-	php_flag log_errors on
-	php_value error_reporting 30711
-	php_flag auto_detect_line_endings On
-	php_value docref_root 0
-	php_value docref_ext 0
-	php_value upload_max_filesize 512M
-	php_value post_max_size 512M
-	php_flag session.use_trans_sid on
-	php_value session.gc_maxlifetime 43200
-	php_value session.save_handler redis
-	php_value session.save_path "tcp://127.0.0.1:6379"
-	php_value newrelic.appname "Schoolbox 13.5"
+        # PHP Error handling
+        php_flag display_startup_errors off
+        php_flag display_errors off
+        php_flag html_errors off
+        php_flag log_errors on
+        php_value error_reporting 30711
+        php_flag auto_detect_line_endings On
+        php_value docref_root 0
+        php_value docref_ext 0
+        php_value upload_max_filesize 512M
+        php_value post_max_size 512M
+        php_flag session.use_trans_sid on
+        php_value session.gc_maxlifetime 43200
+        php_flag session.cookie_httponly On
+        php_value session.save_handler redis
+        php_value session.save_path "tcp://127.0.0.1:6379"
+        php_value newrelic.appname "Schoolbox 13.5"
 
-	# Assess uses JSON arrays to transfer data in multi-choice/matching pairs
-	# JSON arrays don't like being escaped!!
-	php_flag magic_quotes_gpc off
+        # Assess uses JSON arrays to transfer data in multi-choice/matching pairs
+        # JSON arrays don't like being escaped!!
+        php_flag magic_quotes_gpc off
 
-	RewriteCond  %{REQUEST_URI} login.php$
-	RewriteRule ^(.*)$ http://%{HTTP_HOST}/ [R,L]
+        RewriteCond  %{REQUEST_URI} login.php$
+        RewriteRule ^(.*)$ http://%{HTTP_HOST}/ [R,L]
 
-	# Force SSL
-	#RewriteCond %{SERVER_PORT} !^443$
-	#RewriteCond %{REQUEST_URI} ^/$ [OR]
-	#RewriteCond %{REQUEST_URI} ^/saml [OR]
-	#RewriteCond %{REQUEST_URI} ^/saml/.* [OR]
-	#RewriteCond %{REQUEST_URI} ^/account/modify [OR]
-	#RewriteCond %{REQUEST_URI} ^/account/modify/.*
-	#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
+        # Force SSL
+        #RewriteCond %{SERVER_PORT} !^443$
+        #RewriteCond %{REQUEST_URI} ^/$ [OR]
+        #RewriteCond %{REQUEST_URI} ^/saml [OR]
+        #RewriteCond %{REQUEST_URI} ^/saml/.* [OR]
+        #RewriteCond %{REQUEST_URI} ^/account/modify [OR]
+        #RewriteCond %{REQUEST_URI} ^/account/modify/.*
+        #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
 
-	# Force non-secure
-	#RewriteCond %{SERVER_PORT} ^443$
-	#RewriteCond %{REQUEST_URI} !^/$
-	#RewriteCond %{REQUEST_URI} !^/saml
-	#RewriteCond %{REQUEST_URI} !^/saml/.*
-	#RewriteCond %{REQUEST_URI} !^/account/modify
-	#RewriteCond %{REQUEST_URI} !^/account/modify/.*
-	#RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
-	#RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
+        # Force non-secure
+        #RewriteCond %{SERVER_PORT} ^443$
+        #RewriteCond %{REQUEST_URI} !^/$
+        #RewriteCond %{REQUEST_URI} !^/saml
+        #RewriteCond %{REQUEST_URI} !^/saml/.*
+        #RewriteCond %{REQUEST_URI} !^/account/modify
+        #RewriteCond %{REQUEST_URI} !^/account/modify/.*
+        #RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
+        #RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
 
-	RewriteCond %{SCRIPT_FILENAME}/ -d
-	RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
+        RewriteCond %{SCRIPT_FILENAME}/ -d
+        RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
 
-	# Required to bypass central authentication for RSS feeds
-	RewriteCond %{REQUEST_URI} /homepage/rss/[0-9]*
-	RewriteRule ^(.*)$ /homepage/rss.php?page=$1 [L]
+        # Required to bypass central authentication for RSS feeds
+        RewriteCond %{REQUEST_URI} /homepage/rss/[0-9]*
+        RewriteRule ^(.*)$ /homepage/rss.php?page=$1 [L]
 
-	# Mobile Edition
-	RewriteCond %{REQUEST_URI} /m/.*
-	RewriteCond %{REQUEST_URI} !/m/inc/.*
-	RewriteCond %{REQUEST_URI} !/m/img/.*
-	RewriteCond %{REQUEST_URI} !/m/manifest.php
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteRule ^(.*)$ /m/index.php?url=$1 [L,QSA]
+        # Mobile Edition
+        RewriteCond %{REQUEST_URI} /m/.*
+        RewriteCond %{REQUEST_URI} !/m/inc/.*
+        RewriteCond %{REQUEST_URI} !/m/img/.*
+        RewriteCond %{REQUEST_URI} !/m/manifest.php
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ /m/index.php?url=$1 [L,QSA]
 
-	RewriteCond %{REQUEST_URI} !/dav/.*
-	RewriteCond %{REQUEST_URI} !/m/.*
-	RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
-	RewriteRule ^(.*)$ /index.php?page=$1 [L,QSA]
+        RewriteCond %{REQUEST_URI} !/dav/.*
+        RewriteCond %{REQUEST_URI} !/m/.*
+        RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
+        RewriteRule ^(.*)$ /index.php?page=$1 [L,QSA]
 
 </VirtualHost>
