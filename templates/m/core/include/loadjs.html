@@ -105,7 +105,7 @@ localCache.get = function(url) {
 
     debug('loadjs.html:85 > localCache() url should have no extension: ' + url);
 
-    // Load the
+    // Load the locally stored version and its expiry if possible
     var r = {}
     try {
         r = JSON.parse(localStorage[url])
@@ -116,7 +116,8 @@ localCache.get = function(url) {
 
     // If online, refresh resource (if cached result has expired)
     // Current timeout: 1 minute, can of course expand this
-    var isCached = (r != null && r.timestamp >= (Date.now() - 60000))
+    var isLoggedIn = Boolean(env.loggedIn);
+    var isCached   = (isLoggedIn && r != null && r.timestamp >= (Date.now() - 60000))
     if(!isCached){
         env.status(1); // Loading
         var xhr = new XMLHttpRequest();
@@ -155,7 +156,11 @@ localCache.get = function(url) {
             return '';
         }
 
-        localStorage.setItem(url, JSON.stringify({response: xhr.responseText, timestamp: Date.now()}));
+        // Not logged in? Don't cache this, because it's probably a login page
+        // and I don't want to show that to logged-in users.
+        if (isLoggedIn) {
+            localStorage.setItem(url, JSON.stringify({response: xhr.responseText, timestamp: Date.now()}));
+        }
         env.status(2); // Loaded
         return xhr.responseText;
     }
@@ -268,9 +273,9 @@ $("body").on(clickEvent, '#grid', function(){
 
 // register the cache-wipe listener
 $("#page").on(clickEvent, '#wipeCache', function(){
+    // Obsolete the cache
     $('html').attr('manifest','manifest_obsolete.php');
-    document.cookie = 'PHPSESSID' + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
-    appCache.OBSOLETE;
+    appCache.update();
     localStorage.clear();
     localStorage.setItem('lastPage', '/');
     window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
@@ -280,7 +285,6 @@ $("#page").on(clickEvent, '#wipeCache', function(){
 $("#page,#menu").on(clickEvent, '#logout', function(){
     localStorage.clear();
     sessionStorage.clear();
-    window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
 });
 
 // register the 'send report' listener

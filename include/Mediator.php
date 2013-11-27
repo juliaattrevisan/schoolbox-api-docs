@@ -75,13 +75,13 @@ class Mediator {
         }
         // if authentication fails
         catch(Exception_Schoolbox_AccessDenied $e) {
-            // create a dynamic reroute to substitute the destination page contents with the login page
-            $router->registerReroute($this->getClassName(false), array('Core\\Auth', 'Login'));
-            $router->reroute();
-
-            $this->parseRoute($router);
-
-            //$response->addInternalRedirectHeader('mobile/core/auth/login');
+            // Perform an actual redirect, not an internal one.
+            // Reason: if a login page is returned by /m/actual-mobile-page, it
+            // could get cached - then when you ARE logged in, you get the login
+            // page, because that was what was cached.
+            $response = new Response_HTTP(Response_HTTP::HTTP_UNAUTHORIZED);
+            $response->addInternalRedirectHeader('core/auth/login');
+            $this->setResponse($response);
             $this->setResponseCode(Response_HTTP::HTTP_UNAUTHORIZED);
             return;
         }
@@ -343,14 +343,14 @@ class Mediator {
         // Caution: any method added to this will bypass authentication checks.
         // This could probably be some kind of class registration, or listener, or something like that...
         $AUTH_EXCEPTION = array(
-            'Core\\Auth\\API::Login',
-            'Core\\Auth\\API::ForgotPassword',
-            'Core\\Auth\\API::Logout',
-            'Core\\Auth\\API::AmILoggedIn',
-            'Core\\Settings\\API::Skin'
+            'core\\auth\\api::login',
+            'core\\auth\\api::forgotpassword',
+            'core\\auth\\api::logout',
+            'core\\auth\\api::amiloggedin',
+            'core\\settings\\api::skin'
         );
 
-        if( in_array("{$this->getClassName()}::{$this->getMethodName()}", $AUTH_EXCEPTION) ) {
+        if (in_array(strtolower("{$this->getClassName()}::{$this->getMethodName()}"), $AUTH_EXCEPTION)) {
             return true;
         }
         return false;
