@@ -116,7 +116,8 @@ localCache.get = function(url) {
 
     // If online, refresh resource (if cached result has expired)
     // Current timeout: 1 minute, can of course expand this
-    var isCached = (r != null && r.timestamp >= (Date.now() - 60000))
+    var isLoggedIn = Boolean(env.loggedIn);
+    var isCached   = (isLoggedIn && r != null && r.timestamp >= (Date.now() - 60000))
     if(!isCached){
         env.status(1); // Loading
         var xhr = new XMLHttpRequest();
@@ -155,7 +156,11 @@ localCache.get = function(url) {
             return '';
         }
 
-        localStorage.setItem(url, JSON.stringify({response: xhr.responseText, timestamp: Date.now()}));
+        // Not logged in? Don't cache this, because it's probably a login page
+        // and I don't want to show that to logged-in users.
+        if (isLoggedIn) {
+            localStorage.setItem(url, JSON.stringify({response: xhr.responseText, timestamp: Date.now()}));
+        }
         env.status(2); // Loaded
         return xhr.responseText;
     }
@@ -269,8 +274,8 @@ $("body").on(clickEvent, '#grid', function(){
 // register the cache-wipe listener
 $("#page").on(clickEvent, '#wipeCache', function(){
     // Obsolete the cache
-    $('html').attr('manifest','manifest_obsolete.php');
-    appCache.update();
+//    $('html').attr('manifest','manifest_obsolete.php');
+//    appCache.update();
     localStorage.clear();
     localStorage.setItem('lastPage', '/');
     window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
