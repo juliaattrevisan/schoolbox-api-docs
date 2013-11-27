@@ -343,14 +343,14 @@ class Mediator {
         // Caution: any method added to this will bypass authentication checks.
         // This could probably be some kind of class registration, or listener, or something like that...
         $AUTH_EXCEPTION = array(
-            'Core\\Auth\\API::Login',
-            'Core\\Auth\\API::ForgotPassword',
-            'Core\\Auth\\API::Logout',
-            'Core\\Auth\\API::AmILoggedIn',
-            'Core\\Settings\\API::Skin'
+            'core\\auth\\api::login',
+            'core\\auth\\api::forgotpassword',
+            'core\\auth\\api::logout',
+            'core\\auth\\api::amiloggedin',
+            'core\\settings\\api::skin'
         );
 
-        if( in_array("{$this->getClassName()}::{$this->getMethodName()}", $AUTH_EXCEPTION) ) {
+        if (in_array(strtolower("{$this->getClassName()}::{$this->getMethodName()}"), $AUTH_EXCEPTION)) {
             return true;
         }
         return false;
