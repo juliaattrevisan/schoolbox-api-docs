@@ -5,7 +5,7 @@
 	 */
 	$j(function() {
 		$j('#select-all').addSelectAll({
-			sourceForm: $j('#contact-table')
+			source: $j('#contact-table')
 		});
 	});
 </script>
@@ -78,7 +78,7 @@
 <script type="text/javascript">
 	$j(function() {
 		$j('#email-selected-students').emailSelected({
-			sourceForm: $j('#contact-table'),
+			source: $j('#contact-table'),
 			url: '/subject/classList/ajax/emailStudentsById.php',
 			classCode: '{CLASS_CODE}',
 			target: $j(this).find('input[name=bcc]')
@@ -96,7 +96,7 @@
 <script type="text/javascript">
 	$j(function() {
 		$j('#email-selected-parents').emailSelected({
-			sourceForm: $j('#contact-table'),
+			source: $j('#contact-table'),
 			url: '/subject/classList/ajax/emailParentsById.php',
 			classCode: '{CLASS_CODE}',
 			target: $j(this).find('input[name=bcc]')

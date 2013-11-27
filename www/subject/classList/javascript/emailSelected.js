@@ -20,7 +20,7 @@
 
 				/* The element containing all the checkboxes
 				 */
-				sourceForm: null
+				source: null
 			}
 
 			var derived = {
@@ -36,7 +36,7 @@
 		 */
 		function addSelectAll() {
 			config.element.click(function() {
-				var elements = config.sourceForm.find('input[name="selected[]"]');
+				var elements = config.source.find('input[name="selected[]"]');
 
 				if ($j(this).is(':checked')) {
 					elements.prop('checked', true);
@@ -80,7 +80,7 @@
 
 				/* The element containing all the checkboxes
 				 */
-				sourceForm: null,
+				source: null,
 
 				/* The url to access, to provide a list of recipient emails
 				 */
@@ -108,7 +108,7 @@
 		 * Get a list of checked checkboxes containing externalIds
 		 */
 		function gatherSelectedIds() {
-			var allSelected = config.sourceForm.find('input[name="selected[]"]:checked');
+			var allSelected = config.source.find('input[name="selected[]"]:checked');
 			var ids = [];
 
 			for (var i = 0; i < allSelected.length; i++) {
