@@ -13,7 +13,6 @@ if ($groupHandler->isStaff()) {
 	$categoryHandler = new Category;
 	$synergeticClass = new External_Class;
 
-
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
 	$this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
@@ -35,7 +34,8 @@ if ($groupHandler->isStaff()) {
 	if (stristr($code, ',')) {
 		$codeArray = explode(',', $code);
 		$category = $categoryHandler->getByCode($codeArray[0]);
-	} else {
+	}
+	else {
 		$category = $categoryHandler->getByCode($code);
 	}
 
