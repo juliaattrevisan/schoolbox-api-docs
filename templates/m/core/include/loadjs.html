@@ -280,7 +280,6 @@ $("#page").on(clickEvent, '#wipeCache', function(){
 $("#page,#menu").on(clickEvent, '#logout', function(){
     localStorage.clear();
     sessionStorage.clear();
-    window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
 });
 
 // register the 'send report' listener
