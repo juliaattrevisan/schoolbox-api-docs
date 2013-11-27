@@ -1,12 +1,21 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/subject/classList/javascript/emailSelected.js"></script>
+<script type="text/javascript">
+	/* Add "select all" functionality
+	 */
+	$j(function() {
+		$j('#select-all').addSelectAll({
+			sourceForm: $j('#contact-table')
+		});
+	});
+</script>
 <!-- END custom_head -->
 
 <h1>{SUBJECTNAME}</h1>
 <table id='contact-table' class="table">
 	<thead>
 		<tr>
-			<th width="16px"></th>
+			<th width="16px"><input type="checkbox" id='select-all' value="" /></th>
 			<th width="60px"></th>
 			<th>Name</th>
 			<th>Student ID</th>

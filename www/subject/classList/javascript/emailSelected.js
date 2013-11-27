@@ -1,4 +1,53 @@
 (function($j) {
+	$j.fn.addSelectAll = function(options) {
+		var config = init(options, this);
+
+		addSelectAll();
+
+		/**
+		 * Init
+		 *
+		 * @param options
+		 * @param element
+		 * @returns {*|void|Function|extend|extend|extend}
+		 */
+		function init(options, element) {
+			var defaults = {
+
+				/* The checkbox which selects/deselects everything
+				 */
+				element: element,
+
+				/* The element containing all the checkboxes
+				 */
+				sourceForm: null
+			}
+
+			var derived = {
+			}
+
+			var merged = $j.extend(defaults, derived, options);
+
+			return merged;
+		}
+
+		/**
+		 * Add select-all functionality to a checkbox
+		 */
+		function addSelectAll() {
+			config.element.click(function() {
+				var elements = config.sourceForm.find('input[name="selected[]"]');
+
+				if ($j(this).is(':checked')) {
+					elements.prop('checked', true);
+				}
+				else {
+					elements.prop('checked', false);
+				}
+			});
+		}
+	}
+
 	$j.fn.emailSelected = function(options) {
 		var config;
 
