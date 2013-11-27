@@ -31,21 +31,29 @@ class YourNews extends Generic {
 
         $homepageNewsHandler = new CategoryNews();
 
+		$i = 0;
         foreach($cats as $cat) {
             $catNews = $homepageNewsHandler->getAllForCategory($cat['id']);
 
-            if($catNews) {
+            if ($catNews) {
                 foreach($catNews as $item) {
+					if (!$i) {
+						$first = $cat;
+					}
+
                     if(isset($newsList[$cat['name']]) && count($newsList[$cat['name']]) >= $limit) {
                         continue;
                     }
+
                     $newsList[$cat['name']][] = $item;
+
+					$i++;
                 }
             }
         }
 
         return array(
-            'title'   => 'My News',
+            'title'   => 'My News <span>' . $first['name'] . '</span>',
             'aside'   => '',
             'class'   => 'dashboard-news',
             'icon'    => 'news',
