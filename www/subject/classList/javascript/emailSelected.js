@@ -2,6 +2,11 @@
 	$j.fn.emailSelected = function(options) {
 		var config;
 
+		/* Stop the form submitting so we can do some
+		 * special manipulation, inject the results,
+		 * and then submit normally. This submit handler
+		 * is cleared in redirect();
+		 */
 		$j(this).submit(function(event) {
 			event.preventDefault();
 
