@@ -2,8 +2,13 @@
 
     function renderMenu(data){
         var cache = localCache.get(data);
-        var json = JSON.parse(cache);
-        data = json;
+        // If not logged in, then localCache.get may return something unexpected
+        try {
+            data = JSON.parse(cache);
+        }
+        catch (e) {
+            data = {}
+        }
 
         if(data) {
             if(!data.menu) {
