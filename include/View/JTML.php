@@ -72,7 +72,14 @@ class View_JTML implements View_Interface {
             }
         }
 
-        $tdir = Config::get('siteRoot') . '/library/Schoolbox/Mobile/' . str_replace('\\', '/', $response->getCore('className'));
+        $siteRoot = Config::get('siteRoot');
+        $dirs = array(
+            $siteRoot . "/templates/m/core/include/",
+            $siteRoot . "/templates/m/$skin/include/",
+            $siteRoot . "/templates/$skin/m/",
+        );
+        // Search in the SB mobile root
+        $tdir = $siteRoot . '/library/Schoolbox/Mobile/' . str_replace('\\', '/', $response->getCore('className'));
         $dirs[] = "$tdir/../Component/templates/";
         $dirs[] = "$tdir/templates/$skin/";
         $dirs[] = "$tdir/templates/core/";

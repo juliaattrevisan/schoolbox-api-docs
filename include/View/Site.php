@@ -74,7 +74,8 @@ class View_Site implements View_Interface {
 
         // use template override
         else {
-            $tdir = Config::get('siteRoot') . '/app/' . str_replace('_', '/', $response->getCore('className'));
+            $siteRoot = Config::get('siteRoot');
+            $tdir = $siteRoot . '/library/Schoolbox/Mobile/' . str_replace('_', '/', $response->getCore('className'));
             $dirs[] = "$tdir/templates/$skin/";
             $dirs[] = "$tdir/templates/core/";
             $dirs[] = "$tdir/templates/";
