@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
  
-class External_Timetable {
+class External_Timetable implements External_TimetableInterface {
 	private $database;
 
 	/**
@@ -41,7 +41,7 @@ class External_Timetable {
 	 * @param Integer $campusId
 	 * @return Array
 	 */
-	function getTimetableDefinition ($campusId, $day) {
+	function getTimetableDefinition ($campusId, $day = 0) {
 		return $this->getDatabase()->getTimetableDefinition($campusId, $day);
 	}
 
