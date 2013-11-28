@@ -141,11 +141,15 @@ HTML
 	header ("Cache-control: ");
 	header ("Content-Type: $mime");
 	header ("Content-Disposition: $attach filename=\"".$filename."\"");
-	header ("Content-Length: ".$size);
 	if (isset($contents)) {
+        header ("Content-Length: ".$size);
         echo $contents;
     }
     elseif (is_readable($file)) {
+        if (empty($size)) {
+            $size = filesize($file);
+        }
+        header ("Content-Length: ".$size);
         readfile($file);
     }
 	die(); // just in case
