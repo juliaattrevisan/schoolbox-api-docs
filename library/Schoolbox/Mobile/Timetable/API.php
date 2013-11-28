@@ -140,24 +140,28 @@ class API {
                     $period['highlight'] = '1';
                 }
                 foreach($period['day'] as $day => &$class) {
-                    if($day == $today) {
+                    if ($day == $today) {
                         $class['today'] = '1';
                     }
-                    if(isset($class['staffID'])) {
 
-	                    if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
-                            if (!$colourList->offsetExists($colourIndex)) {
-                                $colourIndex = 0;
-                            }
-		                    $subjectColourMap[$class['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
-		                    $colourIndex++;
-	                    }
+                    if (!$class['periodOn']) {
+                        continue;
+                    }
 
+                    if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
+                        if (!$colourList->offsetExists($colourIndex)) {
+                            $colourIndex = 0;
+                        }
+                        $subjectColourMap[$class['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
+                        $colourIndex++;
+                    }
+                    $class['colour'] = '#' . $subjectColourMap[$class['code']];
+                    $class['room'] = trim($class['room']);
+
+                    if (isset($class['staffID'])) {
 	                    try {
-		                    $class['colour'] = '#' . $subjectColourMap[$class['code']];
                             $user = $this->readData($uMap, $class['staffID']);
                             $class['teacherName'] = $user->formatName();
-                            $class['room'] = trim($class['room']);
                         }
                         catch (Exception_Schoolbox $e) {
                             $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}': {$e->getErrorMessage()}";
@@ -165,18 +169,18 @@ class API {
                         catch (\Exception $e) {
 	                        $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}'";
                         }
-
-                        try {
-                            $response->setResponse('debug', array($class));
-                            $class['catID'] = $this->readData($cMap, $class['code'])->getId();
-                        }
-                        catch (Exception_Schoolbox $e) {
-                            $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
-                        }
-                        catch (\Exception $e) {
-	                        $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}'";
-                        }
                     }
+
+                    try {
+                        $class['catID'] = $this->readData($cMap, $class['code'])->getId();
+                    }
+                    catch (Exception_Schoolbox $e) {
+                        $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
+                    }
+                    catch (\Exception $e) {
+                        $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}'";
+                    }
+                    $response->setResponse('debug', array($class));
                 }
 				unset($class);
             }
@@ -224,7 +228,8 @@ class API {
         // read category from cache or db
         elseif($mapper instanceof CategoryMapper) {
             if(!isset($this->data_cache['cat'][$id])) {
-                $this->data_cache['cat'][$id] = $mapper->findOneByColumn('code', $id);
+                // Need to search on category code, not category.
+                $this->data_cache['cat'][$id] = $mapper->findByCode($id);
             }
             return $this->data_cache['cat'][$id];
         }
