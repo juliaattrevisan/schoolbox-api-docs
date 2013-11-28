@@ -30,12 +30,6 @@ $userHandler = new User();
 $returnHandler = new SubmissionReturn();
 $submissionHandler = new Submission();
 
-/* Hide Due Work link from parents, if Due Work access is restricted
- */
-if ($groupHandler->isParent() && Config::get('restrict_parent_duework_access')) {
-	error(19);
-}
-
 //
 // Default visibility: parent/student
 // If student: allow student
@@ -118,7 +112,7 @@ if ($groupHandler->isStudent()) {
     if ($userID != $_SESSION['id']) {
         error(19);
     }
-} elseif (!($groupHandler->isStaff() || $groupHandler->isParentOfChild($userID))) {
+} elseif (!($groupHandler->isStaff() || ($groupHandler->isParentOfChild($userID) && !Config::get('restrict_parent_duework_access')))) {
     error(19);
 }
 
