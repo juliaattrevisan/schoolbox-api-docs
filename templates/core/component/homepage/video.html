@@ -44,7 +44,6 @@
             $j("#schoolbox_video{COMPONENT_INSTANCE_ID}_html5_api").attr('poster', $poster);
             $j("#component{COMPONENT_INSTANCE_ID} .vjs-poster").css( { "background-image": "url("+$poster+")"});
             this.src({ type: "video/mp4", src: $target});
-            this.bigPlayButton.show();
         });
         return false;
     });
