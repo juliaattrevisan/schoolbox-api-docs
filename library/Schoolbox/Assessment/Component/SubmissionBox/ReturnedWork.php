@@ -397,6 +397,19 @@ class ReturnedWork {
 	}
 
 	/**
+	 * Loads the file size for this file, based on the temp location.
+	 *
+	 * @return bool
+	 */
+	public function loadFilesizeFromTempLocation() {
+		if (file_exists($temp_location = $this->getTempLocation())) {
+			$this->setFilesize(filesize($temp_location));
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Copies file from its temp location to permanent upload location.
 	 *
 	 * @todo Traits would be great here.
