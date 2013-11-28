@@ -152,11 +152,13 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             $this->parse('surveyNoLink_block', 'surveyNoLink');
                             $this->setVar('surveyLink_block', '');
                             $this->setVar('resumeLink_block', '');
+							$this->setVar('reviewLink_block', '');
                         }
 						else {
                             $this->parse('surveyLink_block', 'surveyLink');
                             $this->setVar('surveyNoLink_block', '');
                             $this->setVar('resumeLink_block', '');
+							$this->setVar('reviewLink_block', '');
                         }
                     }
 
