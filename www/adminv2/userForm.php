@@ -82,10 +82,17 @@ else if ($_POST['modusername']) {
 		'enabled' => $_POST['account_enabled']
 	);
 
-	$id = $userHandler->create($user);
+	/* Users require a campus array before they can be created successfully
+	 */
+	if (is_array($_POST['campus']) && count($_POST['campus'])) {
+		$id = $userHandler->create($user);
 
-	if (!$id) {
-		error(138);
+		if (!$id) {
+			error(138);
+		}
+	}
+	else {
+		error(158);
 	}
 
 	SitePage::localRedir('/adminv2/modify-user/' . $id);
