@@ -130,8 +130,7 @@
 			}
 
 			$j.post(config.url, payload, function(responseText) {
-				var response = new Function('return ' + responseText);
-				var allEmails = response();
+				var allEmails = JSON.parse(responseText);
 
 				/* Inject and redirect
 				 */
