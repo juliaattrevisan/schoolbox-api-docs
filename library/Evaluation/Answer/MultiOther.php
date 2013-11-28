@@ -418,7 +418,13 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-            $page->setVar(array(
+			$other = new StdClass();
+			$other->description = 'Other';
+			$other->value = $this->otherLetterIndex($allAnswers);;
+
+			$allAnswers[] = $other;
+
+			$page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],
                 'RESPONSE_ID' => $existing['response_id'],
                 'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
@@ -456,32 +462,55 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                          */
                         if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
                             $page->setVar(array(
+								'OTHER_DESCRIPTION' => '',
                                 'CORRECT' => $this->getCorrectClass(),
                             ));
-                        } else if (in_array($currentAnswer->value, $existingAnswer)) {
+                        }
+						else if (in_array($currentAnswer->value, $existingAnswer)) {
+
+							/* Render "Other" response
+							 */
+							if ($currentAnswer->value == $other->value) {
+								$page->setVar(array(
+									'OTHER_DESCRIPTION' => ': ' . $existingAnswer['other']
+								));
+							}
+							else {
+								$page->setVar(array(
+									'OTHER_DESCRIPTION' => ''
+								));
+							}
+
                             $page->setVar(array(
                                 'CORRECT' => $this->getIncorrectClass(),
                             ));
-                        } else {
+                        }
+						else {
                             $page->setVar(array(
+								'OTHER_DESCRIPTION' => '',
                                 'CORRECT' => ''
                             ));
                         }
-                    } else {
+                    }
+					else {
                         $page->setVar(array(
+							'OTHER_DESCRIPTION' => '',
                             'ANSWER_CHECKED' => '',
                             'CORRECT' => ''
                         ));
                     }
-                } else {
+                }
+				else {
                     $page->setVar(array(
+						'OTHER_DESCRIPTION' => '',
                         'CORRECT' => ''
                     ));
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
             }
-        } else {
+        }
+		else {
             $page->setVar('answerOption_block', '');
         }
     }

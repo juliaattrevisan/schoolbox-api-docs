@@ -4,23 +4,30 @@
 	<ul class="information-list">
 		<!-- BEGIN survey -->
 		<li class="{ON_OFF}">
-			<!-- BEGIN teacherLink -->
 			<span class="actions">
+				<!-- BEGIN teacherLink -->
 				<a class="btn go-to no-text" href="/survey/results/{SURVEY_ASSESS_ID}" title="View Results"><span></span></a>
 				<a class="btn modify no-text" href="/survey/modify/{SURVEY_ASSESS_ID}" title="Modify Survey"><span></span></a>
+				<!-- END teacherLink -->
+
+				<!-- BEGIN reviewLink -->
+				<a class="btn no-text go-to" href="/survey/studentReview/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}/{SURVEY_ATTEMPT_ID}" title="Review"><span></span></a>
+				<!-- END reviewLink -->
 			</span>
-			<!-- END teacherLink -->
 
 			<!-- BEGIN surveyLink -->
 			<h4><a href="/survey/intro/{SURVEY_ASSESS_ID}">{SURVEY_TITLE}</a></h4>
 			<!-- END surveyLink -->
+
 			<!-- BEGIN resumeLink -->
 			<h4><a href="/survey/attempt/{SURVEY_ASSESS_ID}/{SURVEY_SECTION_ID}">{SURVEY_TITLE}</a></h4>
 			<!-- END resumeLink -->
+
 			<!-- BEGIN surveyNoLink -->
 			<h4>{SURVEY_TITLE}</h4>
 			<!-- END surveyNoLink -->
-			<p class="meta">Due {SURVEY_FINISH_DATE}</p>
+
+			<p class="meta">{SURVEY_FINISH_DATE}</p>
 			<div class="wysiwyg {COMPONENT_COMPACTMODE}">{SURVEY_DESCRIPTION}</div>
 			<p class="footnote {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{SURVEY_USER_ID}'>{SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}</a> {SURVEY_CREATED}</p>
 		</li>
