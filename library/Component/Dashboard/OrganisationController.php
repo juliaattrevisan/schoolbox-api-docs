@@ -30,14 +30,18 @@ class Component_Dashboard_OrganisationController extends Component_Dashboard_Con
 		}
 
         $this->setBlock($templateHandle, 'extras_staff', 'extras_staff_block');
+        $this->setBlock($templateHandle, 'extras_staff_student', 'extras_staff_student_block');
 
-        if ( $this->group->isStaff() ) {
+        $isStaff   = $this->group->isStaff();
+        $isStudent = $this->group->isStudent();
+        $this->setVar('extras_staff_block', '');
+        $this->setVar('extras_staff_student_block', '');
+        if ($isStaff) {
             $this->parse('extras_staff_block', 'extras_staff');
         }
-        else {
-            $this->setVar('extras_staff_block', '');
+        if ($isStaff || $isStudent) {
+            $this->parse('extras_staff_student_block', 'extras_staff_student');
         }
-
         return true;
     }
 
