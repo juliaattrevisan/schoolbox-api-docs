@@ -43,8 +43,10 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
         $this->setBlock('survey', 'resumeLink', 'resumeLink_block');
 		$this->setBlock('survey', 'reviewLink', 'reviewLink_block');
 
-        // Remove resumeLink by default
+        /* Initial state of various blocks
+         */
         $this->setVar('resumeLink_block', '');
+		$this->setVar('reviewLink_block', '');
 
         $surveyHandler = new Survey_Main();
         $attemptHandler = new Survey_Attempt();
@@ -55,7 +57,8 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
         if ($this->permission >= WRITE_ACCESS) {
             $this->parse('createSurvey_block', 'createSurvey');
-        } else {
+        }
+		else {
             $this->setVar('createSurvey_block', '');
         }
 

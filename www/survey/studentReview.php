@@ -83,7 +83,6 @@ $this->setVar(array(
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
     'SECTION_TITLE' => Scrub::text($section['title']),
     'SECTION_DESCRIPTION' => Scrub::text($section['description']),
-
 ));
 
 /* Load all the questions for this section.
@@ -97,7 +96,6 @@ if ($allQuestions) {
     foreach ($allQuestions as $currentQuestion) {
         $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
-		new \Alaress_Probe($factory->getQuestionType($currentQuestion['type_id']));
         /* Load answer template into answerOption block
          */
         $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/studentReview.html');
@@ -114,7 +112,7 @@ if ($allQuestions) {
         ));
 
         /* If this is a randomised section, number each question incrementally
-           */
+         */
         if ($section['random'] == 1) {
             $this->setVar(array(
                 'QUESTION_SEQUENCE' => $randomQuestionNumber
@@ -129,13 +127,14 @@ if ($allQuestions) {
         $this->parse('question_block', 'question', true);
 
         /* Clear child blocks after parsing out the parent
-           */
+         */
         $answerHandler->cleanupParse($this);
 
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
     }
-} else {
+}
+else {
     $this->setVar('question_block', '');
 }
 
@@ -150,7 +149,8 @@ $prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
 if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section_id'])) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
-} /* If there is no next section, then provide the finish link and parse out the
+}
+/* If there is no next section, then provide the finish link and parse out the
  * previous button if applicable
  */
 else {
@@ -160,7 +160,8 @@ else {
         ));
 
         $this->parse('nextSection_block', 'nextSection');
-    } else {
+    }
+	else {
         $this->setVar('nextSection_block', '');
     }
 
@@ -172,7 +173,8 @@ else {
         ));
 
         $this->parse('prevSection_block', 'prevSection');
-    } else {
+    }
+	else {
         $this->setVar('prevSection_block', '');
     }
 }
