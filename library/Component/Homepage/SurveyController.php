@@ -79,7 +79,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 						'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
 						'SURVEY_TITLE' => Scrub::text($currentSurvey['title']),
 						'SURVEY_START_DATE' => date('jS M Y', strtotime($currentSurvey['start'])),
-						'SURVEY_FINISH_DATE' => date('jS M Y', strtotime($currentSurvey['finish'])),
+						'SURVEY_FINISH_DATE' => 'Due ' . date('jS M Y', strtotime($currentSurvey['finish'])),
 						'SURVEY_DESCRIPTION' => Scrub::html($currentSurvey['description']),
 						'SURVEY_CREATED' => $createdTime->getRelativeTime(),
 						'SURVEY_USER_ID' => $author['uid'],
