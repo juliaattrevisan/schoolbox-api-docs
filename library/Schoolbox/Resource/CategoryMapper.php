@@ -139,6 +139,78 @@ class CategoryMapper extends Mapper {
 		return $collection;
 	}
 
+    /**
+     * Helper method for creating a search query with codes, homepage config and
+     * group all built in.
+     *
+     * You can add a WHERE statement at the end if you want.
+     *
+     * @return string
+     */
+    protected function getFindQuery() {
+        $code_mapper = $this->getJoinMapper('codes');
+        $homepageConfig_mapper = $this->getJoinMapper('homepages');
+        $group_mapper = $this->getJoinMapper('groups');
+        return "
+            SELECT
+                {$this->getColumnString('c')},
+                {$code_mapper->getColumnString('cc')},
+                {$homepageConfig_mapper->getColumnString('hp')},
+                {$group_mapper->getColumnString('ug')}
+            FROM {$this->getTable()} c
+            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
+            LEFT JOIN {$this->getJoinSql('groups', 'c','ug')}
+        ";
+    }
+
+    /**
+     * Helper method for hydrating a result from a query created by getFindQuery().
+     *
+     * @param  \PDOStatement $statement
+     * @throws \Schoolbox\Mapper\Exception if statement returned no category
+     * @return Category
+     */
+    protected function hydrateFromFindQuery($statement) {
+        $code_mapper = $this->getJoinMapper('codes');
+        $homepageConfig_mapper = $this->getJoinMapper('homepages');
+        $group_mapper = $this->getJoinMapper('groups');
+        $category = null;
+        foreach ($statement as $row) {
+            if (!$category instanceof $this->model) {
+                $category = $this->hydrate($row, 'c');
+            }
+            $code = $code_mapper->hydrate($row, 'cc');
+            if ($code->getCategory()->getId()) {
+                $category->addCode($code);
+            }
+            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+            $category->setHomepage($homepageConfig);
+
+            $group = $group_mapper->hydrate($row, 'ug');
+            $category->setGroup($group);
+        }
+        if (!($category instanceof Category)) {
+            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+        }
+        return $category;
+    }
+
+    /**
+     * Finds a single category based on the category code passed in.
+     *
+     * @param  string $code
+     * @throws \Schoolbox\Mapper\Exception if statement returned no category
+     * @return Category
+     */
+    public function findByCode($code) {
+        $query = $this->getFindQuery();
+        $query .= 'WHERE cc.code=?';
+        $statement = $this->database->prepare($query);
+        $statement->execute(array($code));
+        return $this->hydrateFromFindQuery($statement);
+    }
+
 	public function findById($id) {
 		$code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
