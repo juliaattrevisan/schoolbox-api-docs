@@ -43,6 +43,6 @@ if ($allStudents && count($allParents)) {
 
 /* Uniqueify emails
  */
-$emailString = array_filter(array_unique($emailString));
+$emailString = array_values(array_filter(array_unique($emailString)));
 
 echo json_encode($emailString);
