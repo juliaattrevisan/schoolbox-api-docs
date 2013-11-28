@@ -22,38 +22,42 @@ class YourNews extends Generic {
      * @return array
      */
     public function render(User $user) {
-
         $limit = 3;
 
         // get categories involved in
-        $subjects = $user->getSubjects()->asArray();
-        $groups = $user->getGroups()->asArray();
-        $cats = array_merge($subjects, $groups);
-
+		$groupHandler = new \Group;
+		$cats = $groupHandler->involvedInCategoryList($user->getId(), true);
         $newsList = array();
 
         $homepageNewsHandler = new CategoryNews();
 
+		$i = 0;
         foreach($cats as $cat) {
-            $catNews = $homepageNewsHandler->getAllForCategory($cat->get('id'));
+            $catNews = $homepageNewsHandler->getAllForCategory($cat['id']);
 
-            if($catNews) {
+            if ($catNews) {
                 foreach($catNews as $item) {
-                    if(isset($newsList[$cat->get('name')]) && count($newsList[$cat->get('name')]) >= $limit) {
+					if (!$i) {
+						$first = $cat;
+					}
+
+                    if(isset($newsList[$cat['name']]) && count($newsList[$cat['name']]) >= $limit) {
                         continue;
                     }
-                    $newsList[$cat->get('name')][] = $item;
+
+                    $newsList[$cat['name']][] = $item;
+
+					$i++;
                 }
             }
         }
 
         return array(
-            'title'   => 'My News',
+            'title'   => 'My News <span>' . $first['name'] . '</span>',
             'aside'   => '',
             'class'   => 'dashboard-news',
             'icon'    => 'news',
             'content' => $newsList,
         );
     }
-
 }
