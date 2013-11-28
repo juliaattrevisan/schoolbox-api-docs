@@ -19,7 +19,8 @@ if (is_numeric($_GET['id'])) {
 	$page = new SitePage;
 
 	//
-	// File contents, size and mime type
+	// File name and/or contents, size and mime type
+	$file     = null;
 	$contents = null;
 	$size     = null;
 	$mime     = null;
@@ -51,7 +52,6 @@ if (is_numeric($_GET['id'])) {
 			error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
 		}
 
-		$contents = file_get_contents($file);
 		$size     = $return->getFilesize();
 		$filename = $return->getFilename();
 	}
@@ -102,8 +102,7 @@ if (is_numeric($_GET['id'])) {
 		$name = $studentSub->getFilename();
 		$mime = $studentSub->getMimetype()->getMime();
 		if (is_readable($file)) {
-			$contents = file_get_contents($file);
-			$size     = $studentSub->getFilesize();
+			$size = $studentSub->getFilesize();
 		}
 		else {
 			//
@@ -143,7 +142,12 @@ HTML
 	header ("Content-Type: $mime");
 	header ("Content-Disposition: $attach filename=\"".$filename."\"");
 	header ("Content-Length: ".$size);
-	echo $contents;
+	if (isset($contents)) {
+        echo $contents;
+    }
+    elseif (is_readable($file)) {
+        readfile($file);
+    }
 	die(); // just in case
 }
 else {
