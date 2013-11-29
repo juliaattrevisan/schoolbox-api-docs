@@ -205,9 +205,12 @@ class CategoryMapper extends Mapper {
      */
     public function findByCode($code) {
         $query = $this->getFindQuery();
-        $query .= 'WHERE cc.code=?';
+        $query .= 'WHERE cc.code=:code OR cc.code LIKE :codeLike';
         $statement = $this->database->prepare($query);
-        $statement->execute(array($code));
+        $statement->execute(array(
+            'code'     => $code,
+            'codeLike' => '%/'.$this->database->quoteForLike($code),
+        ));
         return $this->hydrateFromFindQuery($statement);
     }
 
