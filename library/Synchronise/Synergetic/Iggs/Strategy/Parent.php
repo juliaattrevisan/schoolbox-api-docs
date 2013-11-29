@@ -14,9 +14,38 @@ class Synchronise_Synergetic_Iggs_Strategy_Parent extends Synchronise_Base_Strat
     protected $title = "Update Schoolbox Parent Details Synchronisation";
 
     /**
+     * Instance of Synchronise_Synergetic_Iggs_Strategy_Student used as a helper
+     * for retrieving campus from user input.
+     *
+     * @var Synchronise_Synergetic_Iggs_Strategy_Student
+     */
+    protected $studentStrategy;
+
+    /**
      * Setup verbose output
      */
     protected function setup() {
         $this->verbose_filter = new Synchronise_Synergetic_Iggs_Verbose();
+        $this->studentStrategy = new Synchronise_Synergetic_Iggs_Strategy_Student();
+    }
+
+    /**
+     * Overridden to retrieve campus list from student sync
+     *
+     * @param  array $currentUser
+     * @return array
+     */
+    public function getCampusListFromUser($currentUser) {
+        return $this->studentStrategy->getCampusListFromUser($currentUser);
+    }
+
+    /**
+     * Overridden to retrieve campus list from student sync
+     *
+     * @param  array $currentUser
+     * @return array
+     */
+    public function getSpouseCampusListFromUser($currentUser) {
+        return $this->studentStrategy->getCampusListFromUser($currentUser);
     }
 }
