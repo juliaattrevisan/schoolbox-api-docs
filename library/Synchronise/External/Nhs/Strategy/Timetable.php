@@ -112,9 +112,18 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
         }
         catch (Exception $e) {}
         if (!($class instanceof ClassEntry)) {
-            $this->verbose_filter->outputSkipMessage($class_message.', because it was not found');
-            $this->verbose_filter->incrementSkipped();
-            return 0;
+
+            if ($this->perform_update) {
+                //Create this weird class we just found.
+                $class = new ClassEntry();
+                $class->setName($new_item['class']);
+                $class->setCode($new_item['class']);
+                ClassEntryMapper::getInstance()->save($class);
+            }
+
+            //$this->verbose_filter->outputSkipMessage($class_message.', because it was not found');
+            //$this->verbose_filter->incrementSkipped();
+            //return 0;
         }
 
         // First delete all classes for this cycle and campus.
@@ -129,9 +138,10 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                     array(
                         'cycle_id' => $this->cycle->getId(),
                         'day'      => $period['day'],
-                        'sequence' => $period['period'],
+                        'title' => $period['period'],
                     )
                 );
+
                 foreach ($period_list as $period_object) {
                     ClassPeriodMapper::getInstance()->deleteForClassAndPeriod($class, $period_object);
                     $class_period
@@ -145,10 +155,15 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                         $teacher = UserMapper::getInstance()->findOneByColumn(
                             'synergy_id', $period['teacher']
                         );
+
                     }
-                    catch (Exception $e) {}
+                    catch (Exception $e) {print "teacher not found";}
                     if ($teacher instanceof User) {
+                        //print_R($teacher);
                         $class_period->setTeacher($teacher);
+                    }
+                    if($new_item['class'] == 'Duty.Library'){
+                        print_R($class_period);
                     }
                     ClassPeriodMapper::getInstance()->save($class_period);
                     // Break because we only want one row per period.

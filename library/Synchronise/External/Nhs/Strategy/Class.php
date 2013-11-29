@@ -70,7 +70,7 @@ class Synchronise_External_Nhs_Strategy_Class extends Synchronise_Base_Strategy_
         $class = array(
             'name'         => $list_item['Subject'],
             'code'         => $list_item['Code'],
-            'teacher_list' => explode(';', $list_item['Teacher']),
+            'teacher'      => $list_item['Assigned Teacher'],
         );
         // Enrolment gets figured out as part of separate export.
         return $class;
@@ -118,16 +118,14 @@ class Synchronise_External_Nhs_Strategy_Class extends Synchronise_Base_Strategy_
 
         // Teacher connections:
         // Delete all old ones for this class, then put in the new ones.
-        $teacher_message = count($new_item['teacher_list']).' teacher(s) to '.$class_message;
+        $teacher_message = count($new_item['teacher']).' teacher(s) to '.$class_message;
         if ($this->perform_update) {
             $this->verbose_filter->outputPerformLinkMessage($teacher_message);
             ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STAFF_GROUP_TYPE);
-            $teacher_list = UserMapper::getInstance()->findIn('synergy_id', $new_item['teacher_list']);
-            foreach ($teacher_list as $teacher) {
-                $class_involvement = new ClassInvolvement();
-                $class_involvement->setClass($class)->setUser($teacher);
-                ClassInvolvementMapper::getInstance()->save($class_involvement);
-            }
+            $teacher = UserMapper::getInstance()->findOneByColumn('synergy_id', $new_item['teacher']);
+            $class_involvement = new ClassInvolvement();
+            $class_involvement->setClass($class)->setUser($teacher);
+            ClassInvolvementMapper::getInstance()->save($class_involvement);
         }
         else {
             $this->verbose_filter->outputPlanLinkMessage($teacher_message);
