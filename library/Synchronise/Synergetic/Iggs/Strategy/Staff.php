@@ -21,6 +21,20 @@ class Synchronise_Synergetic_Iggs_Strategy_Staff extends Synchronise_Base_Strate
     }
 
     /**
+     * Allows user to be created if the staff member has a campus and a username
+     *
+     * @param  $currentUser
+     * @return bool
+     */
+    protected function hasUsername($currentUser) {
+        if (parent::hasUsername($currentUser)) {
+            $campusList = array_filter($currentUser['campus']);
+            return !empty($campusList);
+        }
+        return false;
+    }
+
+    /**
      * Staff member's username is based on their username if it's there.
      * Otherwise, it's generated from the first letter of their first name, then
      * their surname (all lower cased)

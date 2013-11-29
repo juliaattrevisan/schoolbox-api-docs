@@ -21,6 +21,20 @@ class Synchronise_Synergetic_Iggs_Strategy_Student extends Synchronise_Base_Stra
     }
 
     /**
+     * Allows user to be created if the student has a campus and a username
+     *
+     * @param  $currentUser
+     * @return bool
+     */
+    protected function hasUsername($currentUser) {
+        if (parent::hasUsername($currentUser)) {
+            $campusList = array_filter($currentUser['campus']);
+            return !empty($campusList);
+        }
+        return false;
+    }
+
+    /**
      * Houses:
      * * Ashby:      20
      * * Locksley:   21
