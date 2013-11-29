@@ -312,18 +312,23 @@ class External_SchoolPro_Timetable {
 
 		$timetable = array();
 
+		/* If the $row has values and the definition hasn't already been rendered,
+		 * subst those vars - otherwise do nothing. Sometimes it can be overwritten
+		 * with empty values, like on chub where there were days, but no subjects
+		 * in them, producing and empty $row and thus empty definitions
+		 */
 		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
 			for ($day = 0; $day < $this->getCycleLength(); $day++) {
 				$timetable[$period]['day'][$day] = $allDayTimetables[$day][$period];
 
 				/* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
 				 */
-				$start = substr($allDayTimetables[$day][$period]['periodStart'], 0,5);
-				$end = substr($allDayTimetables[$day][$period]['periodEnd'], 0,5);
+				$start = substr($allDayTimetables[0][$period]['periodStart'], 0,5);
+				$end = substr($allDayTimetables[0][$period]['periodEnd'], 0,5);
 
 				/* Port across some values
 				 */
-				$timetable[$period]['periodName'] = $allDayTimetables[$day][$period]['periodName'];
+				$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
 				$timetable[$period]['periodStart'] = $start;
 				$timetable[$period]['periodEnd'] = $end;
 			}
