@@ -32,6 +32,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $this->setBlock($templateHandle, "student_block", "student_subjects");
         $this->setBlock("student_block", "subject_block", "subject_item");
 		$this->setBlock('student_block', 'eportfolio', 'eportfolio_block');
+		$this->setBlock('student_block', 'due_work', 'due_work_block');
+
+		$groupHandler = new Group();
+		$isParent = $groupHandler->isParent();
 
         $i = 0;
 
@@ -53,6 +57,15 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                     }
                 }
 
+				/* Hide Due Work link from parents, if Due Work access is restricted
+ 				*/
+				if ($isParent && Config::get('restrict_parent_duework_access')) {
+					$this->setVar('due_work_block', '');
+				}
+				else {
+					$this->parse('due_work_block', 'due_work');
+				}
+
 				/* ePortfolio link
 				 */
 				$authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $child['id'], 'profile');
@@ -66,6 +79,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
                 $this->parse("student_subjects", "student_block", true);
                 $this->setVar('subject_item', '');
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->setVar('due_work_block', '');
             }
         }
 

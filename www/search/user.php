@@ -214,13 +214,19 @@ if (is_numeric($this->arg[0])) {
 		            $this->parse("portrait_block", "portrait");
 		            $this->parse("timetable_link_block", "timetable_link");
 
+					/* Hide Due Work link from parents, if Due Work access is restricted
+					 */
+					if ($groupHandler->isParent() && Config::get('restrict_parent_duework_access')) {
+						$this->setVar('due_work_block', '');
+					}
 	                /* Allow students, staff and parents of the student to see information about
 	                * due work. Also allow the current user if they view themselves in the
 	                * search results.
 	                */
-	                if ($groupHandler->isParent() && Cfg::get('site_location') == 'shore') {
+	                else if ($groupHandler->isParent() && Cfg::get('site_location') == 'shore') {
 	                    $this->setVar('due_work_block', '');
-	                } else {
+	                }
+					else {
 	                    $this->parse('due_work_block', 'due_work');
 	                }
 

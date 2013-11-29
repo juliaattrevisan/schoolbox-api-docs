@@ -112,10 +112,9 @@ if ($groupHandler->isStudent()) {
     if ($userID != $_SESSION['id']) {
         error(19);
     }
-} elseif (!($groupHandler->isStaff() || $groupHandler->isParentOfChild($userID))) {
+} elseif (!($groupHandler->isStaff() || ($groupHandler->isParentOfChild($userID) && !Config::get('restrict_parent_duework_access')))) {
     error(19);
 }
-
 
 if (!isset($targetDate)) {
     $targetDate = new Alaress_Date_Format(time(), 'U');
