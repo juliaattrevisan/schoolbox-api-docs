@@ -53,18 +53,18 @@ class Synchronise_Synergetic_Iggs_Strategy_Student extends Synchronise_Base_Stra
     /**
      * Gets campus according to the following map:
      *
-     * * SEN (Senior) => 1
-     * * JUN (Junior) => 2
-     * * E (ELC)      => 3
+     * * S (Senior) => 1
+     * * J (Junior) => 2
+     * * E (ELC)    => 3
      *
      * @param  array $currentUser
      * @return int
      */
     public function getDefaultCampusFromUser($currentUser) {
         switch (strtoupper($currentUser['StudentCampus'])) {
-            case 'SEN':
+            case 'S':
                 return 1;
-            case 'JUN':
+            case 'J':
                 return 2;
             case 'E':
                 return 3;
