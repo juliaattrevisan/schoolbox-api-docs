@@ -196,10 +196,19 @@ class Calendar extends DeprecatedModel {
 
         switch ($event['access']) {
 
-			/* Allow people to post events on your behalf, such as parents, staff, superuser
-			 */
+            /* Allow people to post events on your behalf, such as parents, staff, superuser
+             * However, this depends on the author of the event?
+             * If I'm a student or parent, I only have read access to events I
+             * didn't create.
+             */
             case self::ACCESS_PERSONAL:
-                return (($event['owner'] == $_SESSION['id']) || ($event['author_id'] == $_SESSION['id'])) ? 2 : 0;
+                if ($event['author_id'] == $_SESSION['id']) {
+                    return 2;
+                }
+                if ($event['owner'] == $_SESSION['id']) {
+                    return $_SESSION['user']->getRole()->getType() === 'staff' ? 2 : 1;
+                }
+                return 0;
 
             case self::ACCESS_GROUP:
                 $this->groupHandler->setService(HOMEPAGE_SERVICE);
