@@ -3,6 +3,92 @@
             ('__proto__' in {} ? 'zepto' : 'jquery') +
             '.min.js><\/script>')
 
+
+    /**
+     * Dummy storage class to mimic lStorage if it's unavailable
+     * @constructor
+     */
+    function LStore() {
+      this.storage = {}
+    }
+
+    LStore.prototype = {
+      getItem: function(key) {
+        return this.storage[key];
+      },
+      setItem: function(key, value) {
+        this.storage[key] = value;
+        // did setting that actually work?
+        return this.storage[key] === value;
+      },
+      removeItem: function(key) {
+        this.storage[key] = undefined;
+        // did unsetting that actually work?
+        return typeof this.storage[key] === "undefined";
+      },
+      clear: function() {
+        this.storage = {}
+        // did clearing that actually work?
+        return this.storage.length === 0;
+      }
+
+    }
+
+    /**
+     * Returns window.localStorage if available, otherwise a dummy class to mimic it
+     */
+    function getLocalStore() {
+
+      try {
+
+        if(typeof window.localStorage == "undefined") {
+          return new LStore();
+        }
+
+        var tk = '_zx';
+
+        window.localStorage.setItem(tk, '1');
+        window.localStorage.removeItem(tk);
+        return window.localStorage;
+      }
+      catch(error) {
+        // quota exceeded error (ie. not available)
+        if (error.code === DOMException.QUOTA_EXCEEDED_ERR && window.localStorage.length === 0) {
+          return new LStore();
+        }
+        // ios safari hates storage
+        if(error.code === DOMException.SECURITY_ERR) {
+          return new LStore();
+        }
+        // unexpected error
+        throw error;
+      }
+    }
+
+    function getSessionStore() {
+      try {
+        if(typeof window.sessionStorage == "undefined") {
+          return new LStore();
+        }
+        var tk = '_zx';
+        window.sessionStorage.setItem(tk, '1');
+        window.sessionStorage.removeItem(tk);
+        return window.sessionStorage;
+      }
+      catch(error) {
+        // quota exceeded error (ie. not available)
+        if (error.code === DOMException.QUOTA_EXCEEDED_ERR && window.localStorage.length === 0) {
+          return new LStore();
+        }
+        // expected on safari
+        if(error.code === DOMException.SECURITY_ERR) {
+          return new LStore();
+        }
+        // unexpected
+        throw error;
+      }
+    }
+
     /**
      * http://kangax.github.com/iseventsupported/
      * @param eventName
@@ -28,6 +114,10 @@
         element = null;
         return isSupported;
     }
+
+  // set storage
+  lStorage = getLocalStore();
+  sStorage = getSessionStore();
 
 </script>
 {# include all the embedded js scripts that can't be linked #}
@@ -100,7 +190,7 @@ $('body').on('longTap','[title]',function() {
 <script>
 
 // Resource getter
-// Get response to HTTP request and save it to localStorage
+// Get response to HTTP request and save it to lStorage
 localCache.get = function(url) {
 
     debug('loadjs.html:85 > localCache() url should have no extension: ' + url);
@@ -108,10 +198,10 @@ localCache.get = function(url) {
     // Load the locally stored version and its expiry if possible
     var r = {}
     try {
-        r = JSON.parse(localStorage[url])
+        r = JSON.parse(lStorage[url])
     }
     catch (e) {
-        debug('loadjs.html:131 > localStorage value was not JSON: ' + url);
+        debug('loadjs.html:131 > lStorage value was not JSON: ' + url);
     }
 
     // If online, refresh resource (if cached result has expired)
@@ -158,7 +248,7 @@ localCache.get = function(url) {
         // Not logged in? Don't cache this, because it's probably a login page
         // and I don't want to show that to logged-in users.
         if (isLoggedIn) {
-            localStorage.setItem(url, JSON.stringify({response: xhr.responseText, timestamp: Date.now()}));
+            lStorage.setItem(url, JSON.stringify({response: xhr.responseText, timestamp: Date.now()}));
         }
         env.status(2); // Loaded
         return xhr.responseText;
@@ -237,12 +327,12 @@ $("#header").on(clickEvent, '#currentPage', scrollTop)
 
 $("#bubble").on(clickEvent, '.close', function(e){
     $('#bubble').remove();
-    localStorage.setItem('pinned', true);
+    lStorage.setItem('pinned', true);
     return false;
 });
 
 $("#bubble").on(clickEvent, '.wp', function(e){
-    localStorage.setItem('pinned', true);
+    lStorage.setItem('pinned', true);
     $('body').load('/m/ie.html');
     return false;
 });
@@ -274,15 +364,15 @@ $("#page").on(clickEvent, '#wipeCache', function(){
     // Obsolete the cache
     $('html').attr('manifest','manifest_obsolete.php');
     appCache.update();
-    localStorage.clear();
-    localStorage.setItem('lastPage', '/');
+    lStorage.clear();
+    lStorage.setItem('lastPage', '/');
     window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
 });
 
 // register the logout listener
 $("#page,#menu").on(clickEvent, '#logout', function(){
-    localStorage.clear();
-    sessionStorage.clear();
+    lStorage.clear();
+    sStorage.clear();
 });
 
 // register the 'send report' listener
@@ -311,11 +401,11 @@ function debug_storage(){
     // Request storage usage and capacity left
     if(navigator.userAgent.indexOf('Chrome') > -1){
         window.webkitStorageInfo.queryUsageAndQuota(webkitStorageInfo.PERSISTANT,function(used, remaining) {
-            debug('Local storage   : '+size_format(JSON.stringify(localStorage).length) +
-                  ' ('+localStorage.length+' entries)');
+            debug('Local storage   : '+size_format(JSON.stringify(lStorage).length) +
+                  ' ('+lStorage.length+' entries)');
             debug('AppCache size   : ' + size_format(used));
-            debug('Total storage   : ' + size_format(used + JSON.stringify(localStorage).length));
-            debug('Remaining quota : ' + size_format(5242880 - (used + JSON.stringify(localStorage).length)) + ' (actual: ' + size_format(remaining)+')');
+            debug('Total storage   : ' + size_format(used + JSON.stringify(lStorage).length));
+            debug('Remaining quota : ' + size_format(5242880 - (used + JSON.stringify(lStorage).length)) + ' (actual: ' + size_format(remaining)+')');
         });
     }
 }

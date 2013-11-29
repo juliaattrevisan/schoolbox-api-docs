@@ -26,17 +26,17 @@
     }
 
     function getSkin() {
-        if(localStorage.getItem('skin') == null || localStorage.getItem('skin') == 'undefined') {
+        if(lStorage.getItem('skin') == null || lStorage.getItem('skin') == 'undefined') {
             $.ajax({
                 url: '/m/core/settings/skin.json',
                 dataType: 'json',
                 async: false,
                 success: function(data) {
-                    localStorage.setItem('skin', data.skin);
+                    lStorage.setItem('skin', data.skin);
                 }
             });
         }
-        return localStorage.getItem('skin');
+        return lStorage.getItem('skin');
     }
 
     loadFile("/m/inc/js/libs/iscroll.js",'js');

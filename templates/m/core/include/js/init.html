@@ -1,23 +1,23 @@
 <script>
 function init() {
-    var session_stored = sessionStorage.getItem('session');
+    var session_stored = sStorage.getItem('session');
     if (!session_stored && env.isCurrentlyLoggedIn()) {
         env.loggedIn = true;
     }
     if(session_stored) {
-          sessionStorage.removeItem('session');
-          localStorage.removeItem('lastPage');
-          localStorage.removeItem('skin');
-          localStorage.removeItem('/m/core/nav/sidebar.json');
+          sStorage.removeItem('session');
+          lStorage.removeItem('lastPage');
+          lStorage.removeItem('skin');
+          lStorage.removeItem('/m/core/nav/sidebar.json');
     }
     else {
-        localStorage.removeItem('lastPage');
-        localStorage.removeItem('skin');
-        localStorage.removeItem('/m/core/nav/sidebar.json');
+        lStorage.removeItem('lastPage');
+        lStorage.removeItem('skin');
+        lStorage.removeItem('/m/core/nav/sidebar.json');
     }
 
     // Install-a-bubble
-    env.fullscreen = (window.navigator.standalone) ? window.navigator.standalone : localStorage.getItem('pinned');
+    env.fullscreen = (window.navigator.standalone) ? window.navigator.standalone : lStorage.getItem('pinned');
     if(!env.fullscreen && (env.ios || env.wp )) {
         var style,
             instruction = '';
@@ -52,7 +52,7 @@ function init() {
             $('#bubble').addClass('active');
         }, 5000);
     } else if (env.fullscreen) {
-        localStorage.setItem('pinned', true);
+        lStorage.setItem('pinned', true);
     }
 
     // clear any kind of message timeout that might be lurking around
@@ -116,7 +116,7 @@ function init() {
 
                     if(data.session) {
                         // success
-                        sessionStorage.setItem('session', data.session);
+                        sStorage.setItem('session', data.session);
                         env.loggedIn = data.session;
                         e.preventDefault();
                         init();
