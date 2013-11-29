@@ -194,11 +194,13 @@ class Grades {
 
 		foreach ($weightedGrades as $userId => $works) {
 			$userWeightSum = array_sum($applicableWeightsArray[$userId]);
-			foreach($works as $workId => $weightedMark) {
-				$returnGrades[$userId]['grades'][$workId] = $weightedMark / $userWeightSum * 100;
-			}
+            if($userWeightSum > 0) {
+                foreach($works as $workId => $weightedMark) {
+                    $returnGrades[$userId]['grades'][$workId] = $weightedMark / $userWeightSum * 100;
+                }
 
-			$avgSum = array_sum($works) / $userWeightSum * 100;
+                $avgSum = array_sum($works) / $userWeightSum * 100;
+            }
 
 			// how do you want this data presented?
 			$availableFormats = array('float', 'int', 'letter');
