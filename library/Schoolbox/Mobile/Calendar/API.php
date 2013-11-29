@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Mobile\Calendar;
 
+use Schoolbox\UserMapper;
 use Scrub;
 use Schoolbox\Mobile\Generic;
 use Response_HTTP;
@@ -22,7 +23,24 @@ use ClientDevice;
 
 class API extends Generic\API {
 
-    public function Month($date = '') {
+    public function Month($date = '', $user = null) {
+
+	    try {
+		    $user = $user ? UserMapper::getInstance()->findById($user) : $_SESSION['user'];
+
+		    // visibility check
+		    $gHandler = new \Group();
+		    if($gHandler->isStudent() && $user->getId() != $_SESSION['user']) {
+			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+		    }
+		    if($gHandler->isParent() && !$gHandler->isParentOfChild($user->getId())) {
+			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+		    }
+	    }
+	    catch(\Schoolbox\Mapper\Exception $e) {
+		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+	    }
+
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
 
@@ -33,8 +51,8 @@ class API extends Generic\API {
         $nextMonth = mktime(0, 0, 0, $selected['month'] + 1, 1, $selected['year']);
         $prevMonth = mktime(0, 0, 0, $selected['month'] - 1, 1, $selected['year']);
 
-        $nextMonthSlug = date('d-m-Y', $nextMonth);
-        $prevMonthSlug = date('d-m-Y', $prevMonth);
+        $nextMonthSlug = date('d-m-Y', $nextMonth) . ($_SESSION['user']->getId() == $user->getId() ? '' : '/'.$user->getId());
+        $prevMonthSlug = date('d-m-Y', $prevMonth) . ($_SESSION['user']->getId() == $user->getId() ? '' : '/'.$user->getId());
 
 		/* $eventMap is an array of empty event containers
 		 * Each array element maps to a day of the month
@@ -50,7 +68,7 @@ class API extends Generic\API {
 			$blankStart[] = '_blank';
 		}
 
-        $groupedEventList = $this->getEventsForTimespan($month['start'], $month['end']);
+        $groupedEventList = $this->getEventsForTimespan($month['start'], $month['end'], $user);
 
 		/* Prefill containers for each day of the month
 		 */
@@ -113,9 +131,25 @@ class API extends Generic\API {
 
     }
 
-    public function Week($date = '') {
+    public function Week($date = '', $user = null) {
 
-        $response = new Response_HTTP();
+	    try {
+		    $user = $user ? UserMapper::getInstance()->findById($user) : $_SESSION['user'];
+
+		    // visibility check
+		    $gHandler = new \Group();
+		    if($gHandler->isStudent() && $user->getId() != $_SESSION['user']) {
+			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+		    }
+		    if($gHandler->isParent() && !$gHandler->isParentOfChild($user->getId())) {
+			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+		    }
+	    }
+	    catch(\Schoolbox\Mapper\Exception $e) {
+		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+	    }
+
+	    $response = new Response_HTTP();
         $selected = $this->parseDate($date);
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
@@ -131,7 +165,7 @@ class API extends Generic\API {
 
         $calendar = array();
 
-        $groupedEventList = $this->getEventsForTimespan($startOfWeek, $endOfWeek-1);
+        $groupedEventList = $this->getEventsForTimespan($startOfWeek, $endOfWeek-1, $user);
 
         for($i = 0; $i < 7; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
@@ -152,7 +186,24 @@ class API extends Generic\API {
         return $response;
     }
 
-    public function Agenda($date = '', $limit = 7) {
+    public function Agenda($date = '', $limit = 7, $user = null) {
+
+	    try {
+		    $user = $user ? UserMapper::getInstance()->findById($user) : $_SESSION['user'];
+
+		    // visibility check
+		    $gHandler = new \Group();
+		    if($gHandler->isStudent() && $user->getId() != $_SESSION['user']) {
+			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+		    }
+		    if($gHandler->isParent() && !$gHandler->isParentOfChild($user->getId())) {
+			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+		    }
+	    }
+	    catch(\Schoolbox\Mapper\Exception $e) {
+		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+	    }
+
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
 
@@ -163,7 +214,8 @@ class API extends Generic\API {
 
         $groupedEventList = $this->getEventsForTimespan(
             $startOfWeek,
-            strtotime("+$limit day - 1 second", $startOfWeek)
+            strtotime("+$limit day - 1 second", $startOfWeek),
+	        $user
         );
 
         for($i = 0; $i < $limit; $i++) {
@@ -267,7 +319,7 @@ class API extends Generic\API {
         }
 
         $calendar = array();
-        $groupedEventList = $this->getEventsForTimespan($startOfWeek, $endOfWeek-1);
+        $groupedEventList = $this->getEventsForTimespan($startOfWeek, $endOfWeek-1, $user);
 
         for($i = 0; $i < 7; $i++) {
             $currentDay = strtotime("+$i day", $startOfWeek);
@@ -318,7 +370,7 @@ class API extends Generic\API {
             $calData[] = '_blank';
         }
 
-        $groupedEventList = $this->getEventsForTimespan($month['start'], $month['end']);
+        $groupedEventList = $this->getEventsForTimespan($month['start'], $month['end'], $user);
         for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
             $currentDay = strtotime("+1 day", $currentDay);
 
@@ -359,11 +411,14 @@ class API extends Generic\API {
      *
      * @param  int    $start       Timestamp of start of search bracket
      * @param  int    $end         Timestamp of end of search bracket
+     * @param  User   $user        The ID of the user being retrieved
      * @param  string $groupFormat Format to group retrieved event list by
      * @return array
      */
-    protected function getEventsForTimespan($start, $end, $groupFormat = 'Ymd') {
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
+    protected function getEventsForTimespan($start, $end, $user = null, $groupFormat = 'Ymd') {
+	    // grab the session user if one wasn't supplied
+	    $user = $user ?: $_SESSION['user'];
+        $calFactory = new Calendar_Api_Factory($user);
         $calendarHandler = $calFactory->produce();
         /** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $eventList */
         $eventList = $calendarHandler->getEvents($start, $end);
