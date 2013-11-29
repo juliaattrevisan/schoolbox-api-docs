@@ -110,10 +110,7 @@ class Synchronise_Synergetic_Iggs_Strategy_Student extends Synchronise_Base_Stra
     public function getGroupIDFromUser($currentUser) {
         $year  = strtoupper($this->getYearFromUser($currentUser));
         $group = 0;
-        if (in_array($year, range(1, 12))) {
-            $group = intval($year) + 5;
-        }
-        elseif ($year == 'PREP') {
+        if ($year == 'PREP') {
             $group = 18;
         }
         elseif ($year == '4YO') {
@@ -121,6 +118,9 @@ class Synchronise_Synergetic_Iggs_Strategy_Student extends Synchronise_Base_Stra
         }
         elseif ($year == '3YO') {
             $group = 20;
+        }
+        elseif (in_array($year, range(1, 12))) {
+            $group = intval($year) + 5;
         }
         return $group;
     }
