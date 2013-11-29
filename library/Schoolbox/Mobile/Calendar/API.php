@@ -418,7 +418,7 @@ class API extends Generic\API {
     protected function getEventsForTimespan($start, $end, $user = null, $groupFormat = 'Ymd') {
 	    // grab the session user if one wasn't supplied
 	    $user = $user ?: $_SESSION['user'];
-        $calFactory = new Calendar_Api_Factory($_SESSION['user']);
+        $calFactory = new Calendar_Api_Factory($user);
         $calendarHandler = $calFactory->produce();
         /** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $eventList */
         $eventList = $calendarHandler->getEvents($start, $end);
