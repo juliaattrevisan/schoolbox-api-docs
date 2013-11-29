@@ -414,6 +414,10 @@ class Sidebar {
 					'value' => 'Subjects',
 					'href'  => '/m/core/user/profile/' . $child['id']
 				);
+				$this->children[] = array(
+					'value' => 'Calendar',
+					'href'  => '/m/calendar/month/' . date('d-m-Y') . '/' . $child['id']
+				);
 			}
 		}
 	}
