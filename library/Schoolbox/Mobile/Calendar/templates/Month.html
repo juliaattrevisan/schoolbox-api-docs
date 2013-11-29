@@ -24,8 +24,8 @@
         {% endif %}
         {% if content[i].events %}
             <ul>
-            {% for event in content[i].events %}
-                <li class="{{ event.eventType }}{% if j > 2 %} excess{% endif %}">
+            {% for j, event in content[i].events %}
+                <li class="{{ event.eventType }}{% if j > 2 %} excess{% endif %}" style="background-color: {{ event.colour }}">
                     {% include 'calendar/event.html' with {event: event} %}
                 </li>
             {% endfor %}

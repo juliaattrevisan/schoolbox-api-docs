@@ -1,7 +1,7 @@
 <ul class="calendar-day">
 {% if content %}
     {% for event in content %}
-    <li class="calendar-event {{ event.eventType }}">
+    <li class="calendar-event {{ event.eventType }}" style="background-color: {{ event.colour }}">
         {% include 'calendar/event.html' with {event: event} %}
     </li>
     {% endfor %}
