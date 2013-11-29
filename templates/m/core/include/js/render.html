@@ -8,15 +8,15 @@
         if(data) {
             if(!data.menu) {
                 if(data.redirect) {
-                    sessionStorage.clear();
+                    sStorage.clear();
                     return;
                 }
             }
         }
         else {
             // if we attempt to render the menu and have no data, we're not logged in, so clear storage
-            sessionStorage.clear();
-            localStorage.clear();
+            sStorage.clear();
+            lStorage.clear();
             return;
         }
 
@@ -129,7 +129,7 @@
             // (which shows a login form), unless there's already a login page
             // available.
             if (page.find('#login_frm').length > 0 && $('#login_frm').length == 0) {
-                sessionStorage.clear();
+                sStorage.clear();
                 window.location.reload();
                 return;
             }
@@ -187,7 +187,7 @@
         if(push && location.pathname != data && data != '/') {
             history.pushState(null, null, data);
             debug('pushed '+data);
-            localStorage.setItem('lastPage', data)
+            lStorage.setItem('lastPage', data)
         }
         else {
             debug('suppressed push of '+data);
