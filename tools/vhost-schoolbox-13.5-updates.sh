@@ -128,7 +128,9 @@ do
 			rm -f $tempfile;
 		fi;
 		
-		cp -vf $tfile $vfile;
+		cp -vf $tfile "/etc/apache2/sites-available/$i";
+		rm -f $vfile;
+		a2ensite $i;
 		rm -f $tfile;
 	else
 		# Webdav vhost fixes
@@ -159,7 +161,9 @@ do
 			rm -f $tempfile;
 		fi;
 		
-		cp -vf $tfile $vfile;
+		cp -vf $tfile "/etc/apache2/sites-available/$i";
+		rm -f $vfile;
+		a2ensite $i;
 		rm -f $tfile;
 	fi;
 done;
