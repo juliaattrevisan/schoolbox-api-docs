@@ -112,34 +112,30 @@ class CurrentPeriod extends Generic {
 	        $colourIndex = 0;
 
             foreach($ttable as &$period) {
-                if(isset($period['staffID'])) {
-
-	                if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
-                        if (!$colourList->offsetExists($colourIndex)) {
-                            $colourIndex = 0;
-                        }
-		                $subjectColourMap[$period['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
-		                $colourIndex++;
-	                }
-
+                if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
+                    if (!$colourList->offsetExists($colourIndex)) {
+                        $colourIndex = 0;
+                    }
+                    $subjectColourMap[$period['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
+                    $colourIndex++;
+                }
+                $period['colour'] = '#' . $subjectColourMap[$period['code']];
+                $period['room']   = trim($period['room']);
+                if (isset($period['staffID'])) {
                     try {
                         /** @var User $teacher */
-	                    $period['colour'] = '#' . $subjectColourMap[$period['code']];
                         $teacher = $uMap->findOneByColumn('synergy_id', $period['staffID']);
                         $period['staffName'] = $teacher->formatName();
-                        $period['room'] = trim($period['room']);
-
                     }
                     catch (\Exception $e) {
                         $cell['err'][] = 'Failed to read teacher details';
                     }
-
-                    try {
-                        $period['catID'] = $cMap->findOneByColumn('code', $period['code'])->getId();
-                    }
-                    catch (\Exception $e) {
-                        $cell['err'][] = 'Failed to read category details';
-                    }
+                }
+                try {
+                    $period['catID'] = $cMap->findByCode($period['code'])->getId();
+                }
+                catch (\Exception $e) {
+                    $cell['err'][] = 'Failed to read category details';
                 }
             }
 
