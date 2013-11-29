@@ -57,6 +57,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                     }
                 }
 
+                /* Output calendar date to show */
+                $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+                $this->setVar('CAL_TODAY_DATE', $now->getUsingFormat('d-m-Y'));
+
 				/* Hide Due Work link from parents, if Due Work access is restricted
  				*/
 				if ($isParent && Config::get('restrict_parent_duework_access')) {
