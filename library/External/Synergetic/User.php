@@ -528,7 +528,14 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 	}
 
-	function getSubjectList($synergyID, $userID) {
+	/**
+	 * Get a list of subjects and their types
+	 *
+	 * @param $synergyID
+	 * @param $userID
+	 * @return array|bool
+	 */
+	public function getSubjectList($synergyID, $userID) {
 		if (empty($synergyID)) {
 			return false;
 		}
@@ -537,23 +544,29 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 
 		if ($this->getGroup()->isStudent($userID)) {
-			$sql = "SELECT StudentClasses.ClassCode, SubjectClasses.ClassCampus, SubjectClasses.Description as name
-					FROM StudentClasses, SubjectClasses
-					WHERE
-					StudentClasses.FileType = SubjectClasses.FileType AND
-					StudentClasses.FileYear = SubjectClasses.FileYear AND
-					StudentClasses.FileSemester = SubjectClasses.FileSemester AND
-					StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
-					StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-					StudentClasses.FileSemester=" . $_SESSION['FileSemester'] . " AND
-					StudentClasses.FileYear=" . $_SESSION['FileYear'] . " AND
-					StudentClasses.ID=$synergyID
-					AND StudentClasses.StartDate <= getdate()
-					AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-					ORDER BY SubjectClasses.FileType ASC, SubjectClasses.Description ASC
-					";
-		} else {
-
+			$sql = "
+			SELECT
+				StudentClasses.ClassCode,
+				SubjectClasses.ClassCampus, SubjectClasses.Description as name,
+				luFileType.Description as classType
+			FROM StudentClasses
+			INNER JOIN SubjectClasses ON
+				StudentClasses.FileType = SubjectClasses.FileType AND
+				StudentClasses.FileYear = SubjectClasses.FileYear AND
+				StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+				StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+				StudentClasses.ClassCode = SubjectClasses.ClassCode AND
+				StudentClasses.FileSemester=" . $_SESSION['FileSemester'] . " AND
+				StudentClasses.FileYear=" . $_SESSION['FileYear'] . " AND
+				StudentClasses.ID=$synergyID
+			LEFT JOIN luFileType ON StudentClasses.FileType = luFileType.Code
+			WHERE
+				StudentClasses.StartDate <= getdate()
+				AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+			ORDER BY SubjectClasses.FileType ASC, SubjectClasses.Description ASC
+			";
+		}
+		else {
 			$sql = "SELECT DISTINCT(c1.ClassCode), c1.ClassCampus, c2.description as name
 					FROM SubjectClassStaff c1, SubjectClasses c2
 					WHERE
@@ -569,7 +582,12 @@ class External_Synergetic_User implements External_UserInterface {
 
 		$this->getDatabase()->query($sql);
 		while ($subject = $this->getDatabase()->getNextArray()) {
-			$subjectList[] = array('code' => $subject['ClassCode'], 'name' => $subject['name'], 'campusCode' => $subject['ClassCampus']);
+			$subjectList[] = array(
+				'code' => $subject['ClassCode'],
+				'name' => $subject['name'],
+				'classType' => $subject['classType'],
+				'campusCode' => $subject['ClassCampus']
+			);
 		}
 
 		if (is_array($subjectList)) {
