@@ -162,6 +162,7 @@ function saveReturn($return, $rubric = null, $file = null) {
         $returned_work
             ->setFilename($file['name'])
             ->setTempLocation($file['tmp_name'])
+            ->loadFilesizeFromTempLocation();
         ;
     }
     $return_mapper->save($returned_work);
