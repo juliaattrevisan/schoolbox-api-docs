@@ -522,7 +522,6 @@ class Category extends DeprecatedModel {
         }
 
         /* Insert synergetic subject code */
-        $codeList = explode(",", $data['code']);
         if (is_array($codeList)) {
             $codeList = array_map('trim', $codeList);
             $codeList = array_unique($codeList);
