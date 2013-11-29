@@ -328,10 +328,18 @@ if (is_numeric($this->arg[0])) {
 					$allSubjectLists = array();
 
 					/* Group them up into manageable chunks because of phplib
+					 * Dump subjects without a defined classType into a generic
+					 * "Subjects" array element, otherwise use their provided
+					 * classTypes instead
 					 */
 					if (is_array($subjectList) && count($subjectList)) {
 						foreach($subjectList as $currentSubject) {
-							$allSubjectLists[$currentSubject['classType']][] = $currentSubject;
+							if (!strlen($currentSubject['classType'])) {
+								$allSubjectLists['Subjects'][] = $currentSubject;
+							}
+							else {
+								$allSubjectLists[$currentSubject['classType']][] = $currentSubject;
+							}
 						}
 					}
 

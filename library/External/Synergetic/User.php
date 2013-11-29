@@ -581,6 +581,7 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 
 		$this->getDatabase()->query($sql);
+
 		while ($subject = $this->getDatabase()->getNextArray()) {
 			$subjectList[] = array(
 				'code' => $subject['ClassCode'],
@@ -592,7 +593,8 @@ class External_Synergetic_User implements External_UserInterface {
 
 		if (is_array($subjectList)) {
 			return $subjectList;
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
