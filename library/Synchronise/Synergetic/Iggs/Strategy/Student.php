@@ -73,12 +73,36 @@ class Synchronise_Synergetic_Iggs_Strategy_Student extends Synchronise_Base_Stra
     }
 
     /**
+     * Adjust student's year in following cases:
+     *
+     * * 0:  Prep
+     * * 40: 4YO
+     * * 30: 3YO
+     *
+     * @param  array $currentUser
+     *
+     * @return int
+     */
+    public function getYearFromUser($currentUser) {
+        $year = $currentUser['StudentYearLevel'];
+        switch ($year) {
+            case 0:
+                return 'Prep';
+            case 30:
+                return '3YO';
+            case 40:
+                return '4YO';
+        }
+        return $year;
+    }
+
+    /**
      * Groups for students:
      *
-     * * 1-12: Year+5
-     * * Prep: 18
-     * * 4YO:  19
-     * * 3YO:  20
+     * * 1-12:     Year+5
+     * * 0 (Prep): 18
+     * * 40 (4YO): 19
+     * * 30 (3YO): 20
      *
      * @param  array $currentUser
      * @return int
