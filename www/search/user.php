@@ -120,10 +120,11 @@ if (is_numeric($this->arg[0])) {
 
 	//Format email address link
     $emailObj = new Email();
-    $emailAddress = $emailObj->formatEmailFromArray($user);
+    $emailAddress = trim($emailObj->formatEmailFromArray($user));
 
     /* Dont display emails of students to parents
       */
+    $email = '';
     if ($emailAddress) {
         if ($groupHandler->isStudent($user['uid']) && $groupHandler->isParent() && !$groupHandler->isParentOfChild($user['uid'])) {
             $email = '';
