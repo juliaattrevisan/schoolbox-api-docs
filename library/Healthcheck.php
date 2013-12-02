@@ -64,6 +64,11 @@ class Healthcheck {
         $this->MssqlConnection();
     }
 
+	private function SchoolproCheckConnection(){
+		echo "\nSchoolPro Connnection Check\n";
+		$this->MssqlConnection();
+	}
+
     private function SynergeticCheckTables(){
         echo "\nSynergetic Permission Check - Tables\n";
         $list[] = 'Addresses';
@@ -77,6 +82,7 @@ class Healthcheck {
         $list[] = 'luAbsenceType';
         $list[] = 'luBuilding';
         $list[] = 'luDepartment';
+		$list[] = 'luFileType';
         $list[] = 'luForm';
         $list[] = 'luHouse';
         $list[] = 'luTutor';
@@ -149,7 +155,8 @@ class Healthcheck {
                 array('@ID','1',SQLINT1,false,false, -1),
             )
         );
-        foreach($splist as $sp){
+
+		foreach($splist as $sp){
             $result = $db->executeProcedure($sp[0],$sp[1]);
             echo "  ".$sp[0]." : ";
             if($result['success']){
@@ -160,4 +167,144 @@ class Healthcheck {
         }
     }
 
+	/**
+	 * Test chub
+	 */
+	private function SchoolproCheckStoredProcedures() {
+		echo "\nSchoolPro Permission Check - Stored Procedures\n";
+		$db = new MSSQL();
+		$db->debug = true;
+
+		$splist[] = array(
+			'sbGetParent',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetStudent',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetStudentSubjectList',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetStaffSubjectList',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetEnrolledStudents',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetTimetableDefinition',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pCampusID', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetDayNumber',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pCampusID', 1, SQLINT4, false, false, -1),
+				array('@pDateToUse', '2013-12-02 12:12:12', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetPeriodNumber',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pCampusID', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetStaffDayTimetable',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+				array('@pCampusID', 1, SQLINT4, false, false, -1),
+				array('@pDayNumber', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetStudentDayTimetable',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+				array('@pCampusID', 1, SQLINT4, false, false, -1),
+				array('@pDayNumber', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetStudents',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pClassID', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetTeacherName',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pClassID', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetTimetableDefinition',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pCampusID', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		foreach($splist as $sp){
+			$result = $db->executeProcedure($sp[0],$sp[1]);
+			echo "  ".$sp[0]." : ";
+			if($result['success']){
+				echo "OK\n";
+			}else{
+				echo "\n    Failed - ".mssql_get_last_message()."\n";
+			}
+		}
+	}
 }
