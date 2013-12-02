@@ -256,10 +256,10 @@ class MSSQL {
 		try {
 			$result  = mssql_execute($proc);
 			$message = mssql_get_last_message();
+			
 			if (is_resource($result)) {
-                $return[] = mssql_fetch_assoc($result);
-				while (mssql_next_result($result)) {
-                    $return[] = mssql_fetch_assoc($result);
+				while ($row = mssql_fetch_assoc($result)) {
+                    $return[] = $row;
 				}
 			}
 			elseif ($result === false) {
@@ -447,5 +447,18 @@ class MSSQL {
 	 */
 	public function quote($value) {
 		return str_replace("'", "''", $value);
+	}
+
+	/**
+	 * Check whether a db resource was spawned
+	 *
+	 * @return bool
+	 */
+	public function isConnected() {
+		if ($this->dbf !== null) {
+			return true;
+		}
+
+		return false;
 	}
 }

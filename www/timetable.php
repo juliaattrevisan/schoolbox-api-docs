@@ -233,7 +233,8 @@ if (is_array($outputList)) {
                             $cat = $categoryHandler->getByCode($period['code']);
                             $catCache[$period['code']] = $cat['id'];
                         }
-                    } else {
+                    }
+					else {
                         $outputPeriod = array(
                             'PERIOD_DESC' => '',
                             'PERIOD_CODE' => '',
@@ -264,14 +265,12 @@ if (is_array($outputList)) {
 
                     $this->setVar($outputPeriod);
 
-                    if ($catCache[$period['code']] && $groupHandler->getPermission(
-                        $catCache[$period['code']]
-                    ) >= READ_ACCESS
-                    ) {
-                        $this->setVar('PERIOD_URL', '/homepage/' . $period['code']);
+                    if ($catCache[$period['code']] && $groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS) {
+                        $this->setVar('PERIOD_URL', '/homepage/code/' . $period['code']);
                         $this->parse('period_class_link_block', 'period_class_link');
                         $this->setVar('period_class_block', '');
-                    } else {
+                    }
+					else {
                         $this->setVar('period_class_link_block', '');
                         $this->parse('period_class_block', 'period_class');
                     }
