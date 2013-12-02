@@ -229,7 +229,7 @@ class Scrub {
      * Cleans crap out of input using HTMLPurifier.
      * Now caches previous calls in Redis!
      *
-     * @param  $html
+     * @param  string $html
      *
      * @return mixed
      */
@@ -241,7 +241,7 @@ class Scrub {
                 $purifier = call_user_func(array($classname, 'getHtmlPurifierInstance'));
                 return $purifier->purify($param);
             },
-            $html,
+            "$html",
             Config::get('scrub_html_cache_timeout')
         );
     }
