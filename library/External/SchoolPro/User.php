@@ -162,14 +162,55 @@ class External_SchoolPro_User implements External_UserInterface {
 	}
 
 	/**
-	 * TODO: Not specified in a stored proc
-	 *
 	 * Get a list of student contacts (parents) and their contact information
 	 *
 	 * @param $externalUserId
 	 * @return mixed
 	 */
 	public function getStudentContactList($externalUserId) {
+		$vars = array(
+			'sbGetStudentContact',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
+			)
+		);
+
+		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		if ($result['success'] && count($result['result'])) {
+			$currentStudentContact = $result['result'][0];
+
+			$studentContact = array(
+
+				/* This should be separated into constituent parts
+				 */
+				'StudentContactPreferred' => $currentStudentContact['FullName'],
+				'StudentContactSpousePreferred' => $currentStudentContact['SpouseName'],
+				'StudentContactAddress1' => $currentStudentContact['LocationLine'],
+
+				'StudentContactID' => $currentStudentContact['ID'],
+				'StudentContactDefaultEmail' => $currentStudentContact['email'],
+				'StudentContactSuburb' => $currentStudentContact['Suburb'],
+				'StudentContactPostCode' => $currentStudentContact['Postcode'],
+				'StudentContactState' => $currentStudentContact['State'],
+				'StudentContactPhoneActual' => $currentStudentContact['HomePhone'],
+				'StudentContactMobilePhone' => $currentStudentContact['Mobile'],
+				'StudentContactOccupPhone' => $currentStudentContact['BusinessPhone'],
+				'StudentContactRelation' => '',
+				'StudentContactSpouseID' => $currentStudentContact['SpouseID'],
+				'StudentContactSpouseMobilePhone' => $currentStudentContact['SpouseMobile'],
+				'StudentContactSpouseOccupPhone' => $currentStudentContact['SpouseBusinessPhone'],
+				'StudentContactSpouseDefaultEmail' => '',
+				'StudentContactType' => '',
+				'StudentContactSpouseRelation' => '',
+			);
+
+			return array($studentContact);
+		}
+
+		return false;
 	}
 
 	/**
