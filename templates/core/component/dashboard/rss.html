@@ -1,5 +1,5 @@
 <div class="box">
-    <h2><a href="/redir.php?url={RSS_LINK}">{RSS_NAME}</a></h2>
+	<h2><a href="/redir.php?url={RSS_LINK}">{RSS_NAME}</a></h2>
 
 	<ul class="information-list">
 		<!-- BEGIN rss_stories -->
@@ -8,9 +8,9 @@
 			<!-- BEGIN rss_date -->
 				<p class="meta">{RSS_POSTED_DATE}</p>
 			<!-- END rss_date -->
-			<div class='wysiwyg {COMPONENT_COMPACTMODE}'>
-				{RSS_BRIEF}
-			</div>
+			<!-- BEGIN rss_brief_output -->
+				<div class='wysiwyg'>{RSS_BRIEF}</div>
+			<!-- END rss_brief_output -->
 		</li>
 		<!-- END rss_stories -->
 	</ul>
