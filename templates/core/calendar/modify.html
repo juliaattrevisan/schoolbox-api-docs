@@ -129,15 +129,22 @@ $j(function () {
         }
     });
 
-    var form = document.getElementById('#eventForm');
-
+    // Campus selection validation - only required if eventType === Campus
+    var validateCampusSelected = function() {
+        return $j('select#level').val() == 3;
+    }
     $j('#eventForm').validate({
-		rules: {
-			'campus[]': {
-				required: true,
-				minlength: 1
-			}
-		},
+        rules: {
+            'campus[]': {
+                required: {
+                    depends: validateCampusSelected
+                },
+                minlength: {
+                    param: 1,
+                    depends: validateCampusSelected
+                }
+            }
+        },
 		submitHandler:function (form) {
 
             // the desired action, and if this is a series event or not
