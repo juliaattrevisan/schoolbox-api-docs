@@ -172,7 +172,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 					array(
 						'DATE' => $currentDay->getUsingFormat('l jS F'),
 						'EVENT_ID' => $currentEvent->getEventId(),
-						'TIME' => $currentEvent->getTime(),
+						'TIME' => $currentEvent->getEventSpan(),
 						'FULL_TIME' => $currentEvent->getFullDate(),
 						'NOTE' => Scrub::text($currentEvent->getNote()),
 						'LOCATION' => Scrub::text($currentEvent->getLocation()),
