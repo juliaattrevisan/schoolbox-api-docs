@@ -89,8 +89,8 @@ class Healthcheck {
         $list[] = 'tAttendances';
         $list[] = 'Timetable';
         $list[] = 'TimetableDefinition';
-	$list[] = 'luTimetableGroup';
-	$list[] = 'luFileType';
+        $list[] = 'luTimetableGroup';
+        $list[] = 'luFileType';
         sort($list);
 
         foreach($list as $table){
