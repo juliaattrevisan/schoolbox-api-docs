@@ -34,7 +34,7 @@
 
 		/* Show or hide the View More link contextually
 		 */
-		updateViewMoreLinkSlow();
+		updateViewMoreLink();
 
 		/* Allow View More to load more stuff
 		 */
@@ -82,7 +82,7 @@
 
 				/* The url to stream from
 				 */
-				streamUrl: generateStreamUrlSlow(options.instanceId, options.homepageId, options.end, options.offset),
+				streamUrl: generateStreamUrl(options.instanceId, options.homepageId, options.start, options.offset),
 
 				/* The element which allows you to make comments and replies
 				 */
@@ -194,11 +194,11 @@
 				/* Update offsets, hiding View More if there were none left
 				 * after streaming
 				 */
-				updateStreamUrlSlow();
+				updateStreamUrl();
 
 				/* Show or hide the View More link
 				 */
-				updateViewMoreLinkSlow();
+				updateViewMoreLink();
 
 				/* Clear out any loading div indicators
 				 */
@@ -216,7 +216,7 @@
 			 * @param html
 			 */
 			function addThreads(html) {
-				config.threadContainer.html(html);
+				config.threadContainer.append(html);
 			}
 
 			/**
