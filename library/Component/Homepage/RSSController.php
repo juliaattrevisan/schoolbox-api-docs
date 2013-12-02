@@ -30,6 +30,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 
         $this->setBlock($templateHandle, 'rss_stories', 'rss_block');
         $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
+        $this->setBlock('rss_stories', 'rss_brief_output', 'rss_brief_output_block');
 
         // Initialise feed
         $rss = new Alaress_Rss_Stream($this->getConfig('url'));
@@ -46,7 +47,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 
         // Process each item in feed
         $allRss = $rss->getOutput();
-
+        $compactMode = $this->getConfig('compactMode');
         if (count($allRss)) {
             $j = 0;
 
@@ -57,8 +58,11 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                     'RSS_TITLE' => Scrub::text($currentRss['title']),
                     'RSS_URL'   => urlencode(base64_encode($currentRss['link'])),
                     'RSS_BRIEF' => Scrub::html( $currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
+                    'rss_brief_output_block' => '',
                 ));
-
+                if (!$compactMode) {
+                    $this->parse('rss_brief_output_block', 'rss_brief_output');
+                }
                 // If the item has a pubDate
                 if (strlen($currentRss['pubDate'])) {
                     $postedDate = new Alaress_Date_Relative(strtotime($currentRss['pubDate']), 'U');
