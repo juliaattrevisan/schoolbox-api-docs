@@ -238,7 +238,7 @@ class Threads {
 		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
 		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
 		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video', 'socialstream_comment_has_video_block');
-		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video_pending', 'socialstream_comment_has_video_pending_pending_block');
+		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video_pending', 'socialstream_comment_has_video_pending_block');
 		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_metadata', 'socialstream_comment_has_metadata_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_add', 'socialstream_comment_has_add_block');
 		$page->setBlock('socialstream_comment', 'socialstream_comment_has_delete', 'socialstream_comment_has_delete_block');
