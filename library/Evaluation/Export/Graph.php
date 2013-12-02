@@ -77,9 +77,8 @@ class Evaluation_Export_Graph {
 			 */
 			$currentResponse = $answerHandler->exportResponseToArray($currentAttempt['attempt_id'], $currentQuestion['question_id']);
 
-			unset($currentResponse['other']);
-
 			if (is_array($currentResponse)) {
+				unset($currentResponse['other']);
 				foreach($currentResponse as $individualResponse) {
 
 					/* Find out if you need to extract the response text for the
