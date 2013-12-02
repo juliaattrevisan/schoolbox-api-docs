@@ -68,7 +68,11 @@ $this->setBlock('layout', 'position_right', 'position_right_block');
 
 $componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this, true);
 
-$cid = $templateList[0]['id'];
+$cid = null;
+$firstTemplate = $homepageTemplateList->first();
+if ($firstTemplate instanceof \Schoolbox\Resource\HomepageTemplate) {
+    $cid = $homepageTemplateList->first()->getId();
+}
 $componentCollection = $componentFactory->buildComponentList($cid);
 
 $occupiedPositionList = array();
