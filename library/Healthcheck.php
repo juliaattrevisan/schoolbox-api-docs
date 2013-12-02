@@ -90,6 +90,7 @@ class Healthcheck {
         $list[] = 'Timetable';
         $list[] = 'TimetableDefinition';
         $list[] = 'luTimetableGroup';
+        $list[] = 'luFileType';
         sort($list);
 
         foreach($list as $table){
