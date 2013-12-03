@@ -361,8 +361,9 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 
 			$page->setVar(array(
 				'ANSWER_ID' => $currentAnswer['answer_id'],
-				'ANSWER' => preg_replace($pattern, $replace, Scrub::text($currentAnswer['answer'])),
+				'ANSWER' => preg_replace($pattern, $replace, Scrub::html($currentAnswer['answer'])),
 				'RESPONSE_ID' => $existing['response_id'],
+				'REVIEWED_COMMENT' => '',
 				'REVIEWED_MARKS' => 0,
 			));
 		}
