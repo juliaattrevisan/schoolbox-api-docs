@@ -303,9 +303,13 @@ class External_Synergetic_User implements External_UserInterface {
 		$student = $this->getDatabase()->getRow($query);
 
 		if (is_array($student)) {
-			preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
-			$student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
-
+			if ($student['StudentBirthDate']) {
+				preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
+				$student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+			}
+			else {
+				$student['StudentBirthDate'] = false;
+			}
 			return $student;
 		}
 
