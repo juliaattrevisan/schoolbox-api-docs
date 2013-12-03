@@ -83,8 +83,12 @@ class External_Tass_User implements External_UserInterface {
 		";
 		$student = $this->getDatabase()->getRow($query);
 
-		preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
-		$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
+		if (preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
+			$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
+		}
+		else {
+			$student['StudentBirthDate'] = false;
+		}
 		return $student;
 
 	}
