@@ -75,7 +75,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Week_Abstract {
         $this->getPage()->setVar(array(
 			'CALENDAR_USER_ID' => $this->getUser()->getId(),
             'CALENDAR_VIEW' => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
-            'USER_TOKEN'    => $_SESSION['key'],
+            'USER_TOKEN'    => $this->getUser()->getKey(),
         ));
 
 		/* Render event types to chooze from
