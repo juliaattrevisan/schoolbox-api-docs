@@ -20,6 +20,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	protected $database;
 	protected $databaseTime;
 	protected $timestamp;
+	protected $calendarDate;
 
 	/**
 	 * Get the preferred local format
@@ -118,5 +119,14 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	 */
 	public function timestampFormat() {
 		return $this->timestamp;
+	}
+
+	/**
+	 * Get the calendar date format
+	 *
+	 * @return mixed
+	 */
+	public function calendarDate() {
+		return $this->calendarDate;
 	}
 }

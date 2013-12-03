@@ -35,4 +35,8 @@ class Alaress_Date_Locale_Australian extends Alaress_Date_Locale_Abstract {
 	protected $databaseDate = 'Y-m-d';
 	protected $databaseTime = 'H:i:s';
 	protected $timestamp = 'U';
+
+	/* Calendar date
+	 */
+	protected $calendarDate = 'jS M';
 }
