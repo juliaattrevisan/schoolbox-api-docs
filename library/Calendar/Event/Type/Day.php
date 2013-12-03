@@ -107,14 +107,14 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
 	public function getEventSpan() {
 		if ($this->getStartTime()->getDatabaseDate() != $this->getEndTime()->getDatabaseDate()) {
 			if ($this->getAllDay()) {
-				return $this->getStartTime()->getDateOnly() . '&ndash;' . $this->getEndTime()->getDateOnly();
+				return $this->getStartTime()->getCalendarDate() . '&ndash;' . $this->getEndTime()->getCalendarDate();
 			}
 
-			return $this->getStartTime()->getShort() . '&ndash;' . $this->getEndTime()->getShort();
+			return $this->getStartTime()->getCalendarDateTime() . '&ndash;' . $this->getEndTime()->getCalendarDateTime();
 		}
 		else {
 			if ($this->getAllDay()) {
-				return '';
+				return 'All Day';
 			}
 
 			return $this->getStartTime()->getTimeOnly() . '&ndash;' . $this->getEndTime()->getTimeOnly();

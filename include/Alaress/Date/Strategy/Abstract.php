@@ -584,6 +584,15 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	}
 
 	/**
+	 * Transform the datetime into a calendar date format
+	 *
+	 * @return string
+	 */
+	public function getCalendarDateTime() {
+		return $this->getUsingFormat($this->getLocale()->calendarDateTime());
+	}
+
+	/**
 	 * Compare function for comparing with another date object.
 	 *
 	 * @param Alaress_Date_Format_Interface $other

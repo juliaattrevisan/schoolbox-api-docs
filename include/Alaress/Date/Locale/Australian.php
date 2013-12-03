@@ -39,4 +39,5 @@ class Alaress_Date_Locale_Australian extends Alaress_Date_Locale_Abstract {
 	/* Calendar date
 	 */
 	protected $calendarDate = 'jS M';
+	protected $calendarDateTime = 'jS M g:ia';
 }

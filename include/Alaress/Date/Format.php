@@ -230,6 +230,15 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	}
 
 	/**
+	 * Get calendar datetime format
+	 *
+	 * @return mixed
+	 */
+	public function getCalendarDateTime() {
+		return $this->getStrategy()->getCalendarDateTime();
+	}
+
+	/**
 	 * Set strategy object
 	 *
 	 * @param  $val

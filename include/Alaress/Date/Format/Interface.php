@@ -35,7 +35,9 @@ interface Alaress_Date_Format_Interface extends IComparable {
 	public function getDatabaseTime();
 	public function getWeekDayNumber();
 	public function getUsingFormat($format);
+
 	public function getCalendarDate();
+	public function getCalendarDateTime();
 
 	/**
 	 * Gets datetime object out of this object
