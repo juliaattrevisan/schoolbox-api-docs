@@ -283,11 +283,11 @@
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
-                var form    = component.find('form.reorder_form');
-                var unit_id = ui.item.closest('.unit').data('unit_id')
-                form.find('input[name="unit_id"]').val(unit_id)
+                var form = component.find('form.reorder_form');
+                var unit = ui.item.closest('.unit');
+                form.find('input[name="unit_id"]').val(unit.data('unit_id'))
                 var params = form.serializeArray();
-                task_list.find('.unit-task').each(function() {
+                unit.find('.unit-task').each(function() {
                     // Switch dark on/off
                     params.push({name: 'id[]', value: $(this).data('unit_task_id')});
                 });
