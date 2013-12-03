@@ -58,6 +58,34 @@ abstract class Calendar_Layout_Week_Abstract {
 		$this->setupBlocks();
 	}
 
+	/**
+	 * Does the current user have permission to view this calendar page?
+	 *
+	 * @param  int            $userId
+	 * @param  Schoolbox\User $currentUser
+	 * @param  Group          $groupHandler
+	 * @throws Exception if user doesn't have permission to view calendar.
+	 *                   The exception's code matches a Schoolbox error code.
+	 * @return bool
+	 */
+	public static function permissionCheck($userId, Schoolbox\User $currentUser, Group $groupHandler) {
+		if ($currentUser->getId() != $userId) {
+			try {
+				\Schoolbox\UserMapper::getInstance()->findById($userId);
+			}
+			catch (Exception $e) {
+				throw new \Exception('User does not exist', 31, $e);
+			}
+			if (!$currentUser->getSuperuser() &&
+				!$groupHandler->isStaff() &&
+				!$groupHandler->isParentOfChild($userId)
+			) {
+				throw new \Exception('Current user does not have permission to view calendar for this user', 125);
+			}
+		}
+		return true;
+	}
+
 	abstract protected function setupTemplateFile();
 	abstract protected function setupBlocks();
 	abstract protected function render();
@@ -74,7 +102,7 @@ abstract class Calendar_Layout_Week_Abstract {
 		 * i.e. /calendar/week/. In that case, just use now
 		 */
 		if ($selectedDate <= 0) {
-		    $selectedDate = time();
+			$selectedDate = time();
 		}
 
 		$this->setSelectedDate($selectedDate);
