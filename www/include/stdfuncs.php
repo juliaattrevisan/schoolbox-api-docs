@@ -76,7 +76,7 @@ function shutdown_safely(Exception $e = null) {
             // explain that something went cataclysmically wrong.
             $output =
                  "<p><b>$message $info</b></p>" .
-                 '<ul style="list-style:none;padding:0;margin:0;color:#444;font-size:0.7em;">' .
+                 '<ul>' .
                  '<li>Datetime: '.date('Y-m-d H:i:s').'</li>' .
                  '<li>URL: http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'</li>' .
                  "<li>{$error['message']} in {$error['file']} on line {$error['line']}.</li>" .
