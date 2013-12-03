@@ -52,7 +52,7 @@ abstract class Calendar_Layout_Week_Abstract {
 		$this->setSubStuHandler(new SubmissionStudent());
 		$this->setPage($page);
 		$this->setDate($date);
-		$this->setCategoryList($this->getGroupHandler()->involvedInCategoryList($_SESSION['id']));
+		$this->setCategoryList($this->getGroupHandler()->involvedInCategoryList($user->getId()));
 
 		$this->setupTemplateFile();
 		$this->setupBlocks();
@@ -140,7 +140,7 @@ abstract class Calendar_Layout_Week_Abstract {
 		$this->setSelected($selected);
 
 		$category_list = $this->getCategoryList();
-		$campus_list   = $this->getCalendarHandler()->getFilterCampusList($_SESSION['id']);
+		$campus_list   = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
 		$this->getPage()->dropDown(
 			'export_group',
 			$category_list,
