@@ -84,7 +84,7 @@ function shutdown_safely(Exception $e = null) {
 
             // Use Sitepage to output an error message in the school's design.
             $page = new SitePage(false);
-            $page->error($output, null, $code);
+            $page->error(null, $output, $code);
         }
     }
 }

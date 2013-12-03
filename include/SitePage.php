@@ -342,22 +342,18 @@ class SitePage extends Page {
      *
      * @param mixed  $ec
      *   Integer: retrieves error text from code from database
-     *   String:  outputs this string as the error message
+     *   null:    outputs whatever's in $message as error
      * @param string $message Replaces '%MESSAGE%' in $ec
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
      */
     function error($ec, $message = "", $code = 400) {
-        $error = array();
         if (!isset($ec)) {
-            $error['message'] = '%MESSAGE%';
-        }
-        elseif (is_numeric($ec)) {
             $db = DeprecatedDatabase::getInstance();
             $query = "SELECT message FROM error WHERE id = '$ec'";
             $error = $db->getRow($query);
         }
-        else {
-            $error['message'] = $ec;
+        if (empty($error)) {
+            $error = array('message' => '%MESSAGE%',);
         }
 
         $output = str_replace("%MESSAGE%", $message, $error['message']);
