@@ -214,7 +214,7 @@
                 // Is this a new form?
                 var is_new = !(form.find('input[name="id"]').val());
                 $.post(form.attr('action'), form.serialize(), function(data) {
-                    // Do validation stuff here eventually, but for now validate.
+                    // Do validation stuff here eventually.
                     if (is_new) {
                         form.get(0).reset();
                     }
@@ -270,14 +270,14 @@
 
         // Reloads the task list, setting up drag/drop again too.
         var reloadTaskList = function(data) {
-            var new_tasks = $(data.html).find('.task-list');
+            var unit_list = $(data.html).find('.unit');
             // Multiple task lists exist, inject the task list for each unit in
             // data into the matching task list on the page.
-            component.find('.task-list').each(function() {
+            component.find('.unit').each(function() {
                 var element = $(this);
                 var unit_id = element.data('unit_id');
                 if (unit_id) {
-                    var replacement = new_tasks.filter(function() {
+                    var replacement = unit_list.filter(function() {
                         return $(this).data('unit_id') === unit_id;
                     });
                     if (replacement.length) {
