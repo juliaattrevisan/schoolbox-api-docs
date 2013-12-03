@@ -75,7 +75,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				 * Event's start time is before end time of span: ignore
 				 */
 				return (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp));
-			}
+			},
+			$startTimestamp, $endTimestamp
 		);
 	}
 
@@ -94,7 +95,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				/** @var Sabre\VObject\Component\VEvent $currentEvent */
 				return $eventId == "{$currentEvent->UID}";
 			},
-			1
+			null, null, 1
 		);
 	}
 
@@ -105,10 +106,17 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 	 *                                    Sabre\VObject\Component\VEvent: event to add
 	 *                                    Calendar_Api_Config_Connector_Vcal: event retriever's configuration
 	 *                                    Returns true if this event is accepted
+	 * @param  int      $startTimestamp   If set, only events after this are returned
+	 * @param  int      $endTimestamp     If set, only events before this are returned
 	 * @param  int      $limit            If set, only this many events are returned
 	 * @return Calendar_Event_Collection
 	 */
-	protected function getFilteredEventCollection($filterFunction, $limit = null) {
+	protected function getFilteredEventCollection(
+		$filterFunction,
+		$startTimestamp = null,
+		$endTimestamp = null,
+		$limit = null
+	) {
 
 		$collection = new Calendar_Event_Collection();
 
@@ -138,6 +146,9 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				 */
 				try {
 					$allEvents = Sabre\VObject\Reader::read($source, Sabre\VObject\Reader::OPTION_FORGIVING);
+					if ($startTimestamp && $endTimestamp) {
+						$allEvents->expand(new DateTime('@'.$startTimestamp), new DateTime('@'.$endTimestamp));
+					}
 				}
 				catch(Exception $e) {
 
