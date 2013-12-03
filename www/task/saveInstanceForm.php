@@ -139,6 +139,7 @@ if ($page->detectAjax()) {
         }
     }
 
+    header(':', true, $result['error']);
     echo json_encode($result);
     exit;
 }
