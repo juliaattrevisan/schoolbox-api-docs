@@ -53,6 +53,22 @@ class Calendar_Api_EventType_Timetable_Schoolbox_Default extends Calendar_Api_Ev
                         $campusId,
                         $dayNumber
                     );
+                    // Load teacher and homepage for each class.
+                    foreach ($dayTimetable[$dayNumber][$campusId] as &$period) {
+                        $period['staff']    = null;
+                        $period['category'] = null;
+                        try {
+                            $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
+                                'synergy_id', $period['staffID']
+                            );
+                        }
+                        catch (Exception $e) {}
+                        try {
+                            $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode($period['code']);
+                        }
+                        catch (Exception $e) {}
+                    }
+                    unset($period);
                 }
                 // Load events for this campus
                 foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
@@ -69,6 +85,14 @@ class Calendar_Api_EventType_Timetable_Schoolbox_Default extends Calendar_Api_Ev
                         $event->setPublishDate($event->getStartTime());
                         $event->setNote($period['description']);
                         $event->setCampusList($campusId);
+                        if ($period['staff'] instanceof Schoolbox\User) {
+                            $event->setAuthorId($period['staff']->getId());
+                            $event->setAuthorName($period['staff']->formatName());
+                        }
+                        if ($period['category'] instanceof Schoolbox\Resource\Category) {
+                            $event->setCategoryId($period['category']->getId());
+                            $event->setCategoryName($period['category']->getName());
+                        }
                         $stack->add($event);
                     }
                 }
