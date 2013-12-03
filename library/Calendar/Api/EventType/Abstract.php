@@ -24,7 +24,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
 	/**
 	 * An instance of User
 	 *
-	 * @var int
+	 * @var Schoolbox\User
 	 */
 	protected $user = null;
 
@@ -52,7 +52,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
 	/**
 	 * Set user
 	 *
-	 * @param $user
+	 * @param  Schoolbox\User $user
 	 * @return $this
 	 */
 	public function setUser($user) {
@@ -62,7 +62,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
 	}
 
 	/**
-	 * @return int
+	 * @return Schoolbox\User
 	 */
 	protected function getUser() {
 		return $this->user;
