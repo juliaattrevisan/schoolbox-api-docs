@@ -356,26 +356,34 @@ if (is_numeric($this->arg[0])) {
 					/* Expel each subject grouped by its type
 					 */
 					foreach($allSubjectLists as $key => $currentSubjectList) {
+						$emailAll = array();
+
+						$this->setVar(array(
+							'SUBJECT_CLASSTYPE' => $key
+						));
+
+						/* For all the classes in the current subject
+						 */
 						if (is_array($currentSubjectList) && count($currentSubjectList)) {
-							$this->setVar(array(
-								'SUBJECT_CLASSTYPE' => $key
-							));
+							$listItems = count($currentSubjectList)>1 ? ceil(count($currentSubjectList)/2) : 1;
+							$i = 1;
 
-							$emailAll = array();
-							$listItems = count($currentSubjectList)>1 ? floor(count($currentSubjectList)/2) : 1;
-
-							/* Render all the subjects in this classType
-							 */
-							foreach ($currentSubjectList as $subject) {
+							foreach($currentSubjectList as $subject) {
 								$category = $catHandler->getByCode($subject['code']);
+								$cat_name = is_array($category) ? $category['name'] : $subject['name'];
 
 								$this->setVar(array(
-									'subject_teacher_block' => '',
+									'subject_teacher_block' => ''
 								));
 
 								if ((Cfg::get('show_all_subjects') == 1) || $category['id'] ) {
+									$this->setVar(array(
+										'SUBJECT_NAME' => Scrub::text($cat_name),
+										'SUBJECT_URL' => is_array($category) && $groupHandler->getPermission($category['id']  ) >= READ_ACCESS ? "/homepage/{$subject['code']}": '#',
+									));
 
-									/* Fetch teacher names */
+									/* Fetch teacher names
+									 */
 									if ($subject['campusCode']) {
 										$code = $subject['campusCode'].'/'.$subject['code'];
 									}
@@ -386,11 +394,9 @@ if (is_numeric($this->arg[0])) {
 									$teacherList = $synClass->getTeacherName($code);
 									$teacherOutput = array();
 
-									if (is_array($teacherList)) {
+									if (is_array($teacherList) && count($teacherList)) {
 										foreach ($teacherList as $teacherSynID) {
-											$teacher = $userHandler->getBySynergyAndGroup(
-												$teacherSynID, $groupHandler->getStaffGroupTypeIds()
-											);
+											$teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $groupHandler->getStaffGroupTypeIds());
 
 											if (is_array($teacher)) {
 												$teacherName = $userHandler->formatName($teacher);
@@ -411,27 +417,31 @@ if (is_numeric($this->arg[0])) {
 										}
 									}
 
-									$cat_name = is_array($category) ? $category['name'] : $subject['name'];
-
-									$output = array(
-										'SUBJECT_NAME' => Scrub::Text($cat_name),
-										'SUBJECT_URL' => is_array($category) && $groupHandler->getPermission($category['id']  ) >= READ_ACCESS ? "/homepage/{$subject['code']}": '#',
-									);
-
-									$this->setVar($output);
 									$this->parse('subject_item_block', 'subject_item', true);
 
+									/* Clear children after parsing out the parent
+									 */
+									$this->setVar(array(
+										'subject_teacher_block' => ''
+									));
+
+									/* Distribute half n' half
+									 */
 									if ($i % $listItems == 0) {
 										$this->parse('subject_row_block', 'subject_row', true);
-										$this->setVar('subject_item_block', '');
+
+										/* Clear children after parsing out the parent
+										 */
+										$this->setVar(array(
+											'subject_item_block' => ''
+										));
+
+										$i = 0;
 									}
-
-									$i++;
+									else {
+										$i++;
+									}
 								}
-							}
-
-							if (($i - 1) % $listItems != 0) {
-								$this->parse('subject_row_block', 'subject_row', true);
 							}
 
 							/* Output email all subject teachers */
@@ -443,18 +453,16 @@ if (is_numeric($this->arg[0])) {
 							else {
 								$this->setVar('subject_mail_block', '');
 							}
-
-							$this->parse('subject_block', 'subject', true);
-
-							/* Clear children after parsing out the parent
-							 */
-							$this->setVar(array(
-								'subject_teacher_block' => '',
-								'subject_item_block' => '',
-								'subject_mail_block' => '',
-								'subject_row_block' => ''
-							));
 						}
+
+						$this->parse('subject_block', 'subject', true);
+
+						/* Clear children after parsing out the parent
+						 */
+						$this->setVar(array(
+							'subject_row_block' => '',
+							'subject_item_block' => '',
+						));
 					}
 
 		            /* Output group list */
