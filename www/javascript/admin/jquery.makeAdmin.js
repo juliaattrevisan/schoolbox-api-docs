@@ -17,7 +17,7 @@
 		/* For every makeAdmin element, allow functionality
 		 */
 		$j.each(this, function(index, element) {
-			$j(element).click(function() {
+			$j(element).click(function(event) {
 				event.preventDefault();
 
 				config = init($j(this), options);
