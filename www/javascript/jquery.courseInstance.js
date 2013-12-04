@@ -214,7 +214,7 @@
                 // Is this a new form?
                 var is_new = !(form.find('input[name="id"]').val());
                 $.post(form.attr('action'), form.serialize(), function(data) {
-                    // Do validation stuff here eventually, but for now validate.
+                    // Do validation stuff here eventually.
                     if (is_new) {
                         form.get(0).reset();
                     }
@@ -270,8 +270,21 @@
 
         // Reloads the task list, setting up drag/drop again too.
         var reloadTaskList = function(data) {
-            var new_tasks = $(data.html).find('.task-list');
-            component.find('.task-list').replaceWith(new_tasks);
+            var unit_list = $(data.html).find('.unit');
+            // Multiple task lists exist, inject the task list for each unit in
+            // data into the matching task list on the page.
+            component.find('.unit').each(function() {
+                var element = $(this);
+                var unit_id = element.data('unit_id');
+                if (unit_id) {
+                    var replacement = unit_list.filter(function() {
+                        return $(this).data('unit_id') === unit_id;
+                    });
+                    if (replacement.length) {
+                        element.replaceWith(replacement)
+                    }
+                }
+            });
             initTaskList();
         }
 
@@ -283,11 +296,11 @@
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
-                var form    = component.find('form.reorder_form');
-                var unit_id = ui.item.closest('.unit').data('unit_id')
-                form.find('input[name="unit_id"]').val(unit_id)
+                var form = component.find('form.reorder_form');
+                var unit = ui.item.closest('.unit');
+                form.find('input[name="unit_id"]').val(unit.data('unit_id'))
                 var params = form.serializeArray();
-                task_list.find('.unit-task').each(function() {
+                unit.find('.unit-task').each(function() {
                     // Switch dark on/off
                     params.push({name: 'id[]', value: $(this).data('unit_task_id')});
                 });
