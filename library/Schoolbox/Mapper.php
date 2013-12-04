@@ -484,6 +484,7 @@ class Mapper {
 	 */
 	public function hardDelete($object) {
 		$identifierName = $this->identifier['column'];
+		$identifierProperty = $this->identifier['property'];
 
 		$collection = $this->getModelAsCollection($object);
 
@@ -503,7 +504,7 @@ class Mapper {
 		$this->database->beginTransaction();
 
 		foreach ($collection as $model) {
-			$statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName));
+			$statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierProperty));
 
 			if (!$statement->execute()) {
 
