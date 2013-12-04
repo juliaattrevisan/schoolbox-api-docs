@@ -344,11 +344,27 @@ if (is_numeric($this->arg[0])) {
 					 */
 					if (is_array($subjectList) && count($subjectList)) {
 						foreach($subjectList as $currentSubject) {
-							if (!strlen($currentSubject['classType'])) {
-								$allSubjectLists['Subjects'][] = $currentSubject;
-							}
-							else {
-								$allSubjectLists[$currentSubject['classType']][] = $currentSubject;
+							$category = $catHandler->getByCode($currentSubject['code']);
+
+							/* If the homepage doesn't exist or can't be found, don't
+							 * link it in the Subject list
+							 */
+							if (is_numeric($category['id'])) {
+								$childElement = array(
+									'subject' => $currentSubject,
+									'category' => $category,
+									'categoryName' => is_array($category) ? $category['name'] : $currentSubject['name']
+								);
+
+								/* Subjects without a parent just get thrown together into
+								 * a generic container
+								 */
+								if (!strlen($currentSubject['classType'])) {
+									$allSubjectLists['Subjects'][] = $childElement;
+								}
+								else {
+									$allSubjectLists[$currentSubject['classType']][] = $childElement;
+								}
 							}
 						}
 					}
@@ -368,27 +384,26 @@ if (is_numeric($this->arg[0])) {
 							$listItems = count($currentSubjectList)>1 ? ceil(count($currentSubjectList)/2) : 1;
 							$i = 1;
 
-							foreach($currentSubjectList as $subject) {
-								$category = $catHandler->getByCode($subject['code']);
-								$cat_name = is_array($category) ? $category['name'] : $subject['name'];
+							foreach($currentSubjectList as $currentSubject) {
+
 
 								$this->setVar(array(
 									'subject_teacher_block' => ''
 								));
 
-								if ((Cfg::get('show_all_subjects') == 1) || $category['id'] ) {
+								if ((Cfg::get('show_all_subjects') == 1) || $currentSubject['category']['id'] ) {
 									$this->setVar(array(
-										'SUBJECT_NAME' => Scrub::text($cat_name),
-										'SUBJECT_URL' => is_array($category) && $groupHandler->getPermission($category['id']  ) >= READ_ACCESS ? "/homepage/{$subject['code']}": '#',
+										'SUBJECT_NAME' => Scrub::text($currentSubject['categoryName']),
+										'SUBJECT_URL' => is_array($currentSubject['category']) && $groupHandler->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
 									));
 
 									/* Fetch teacher names
 									 */
 									if ($subject['campusCode']) {
-										$code = $subject['campusCode'].'/'.$subject['code'];
+										$code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
 									}
 									else {
-										$code = $subject['code'];
+										$code = $currentSubject['subject']['code'];
 									}
 
 									$teacherList = $synClass->getTeacherName($code);
