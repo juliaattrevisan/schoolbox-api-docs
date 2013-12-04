@@ -56,7 +56,17 @@ if ($_POST['name']) {
 			SitePage::localRedir('/resources/' . $category['id']);
 		}
 		else {
-			$page->backToTheFuture(2);
+
+			/* If a category code exists, just go back to where you came from
+			 */
+			if (strlen(trim($category['code']))) {
+				$page->backToTheFuture(2);
+			}
+
+			/* Otherwise if you deleted the category code, redirect to
+			 * categoryId link instead
+			 */
+			SitePage::localRedir('/homepage/' . $category['id']);
 		}
 	}
 }
