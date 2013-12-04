@@ -80,14 +80,8 @@ class Session
 
 
             if (Cfg::get('external_enable')) {
-
-				new Alaress_Probe('gruber');
-
                 $this->setSynergyInfo($userHandler);
 			}
-			new \Alaress_Probe($_SESSION);
-			die('fox');
-
 
             /* Log successful */
             $loginlogquery = "INSERT INTO login_log (username, date, ip, login)

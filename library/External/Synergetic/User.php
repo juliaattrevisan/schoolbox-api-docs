@@ -628,8 +628,6 @@ class External_Synergetic_User implements External_UserInterface {
 			AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD')
 			ORDER BY Community.BirthDate
 		";
-new Alaress_Probe($query);
-new Alaress_Probe($this->getDatabase()->getAll($query));
 
 		return $this->getDatabase()->getAll($query);
 	}
