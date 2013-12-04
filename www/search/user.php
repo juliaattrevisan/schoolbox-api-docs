@@ -350,7 +350,7 @@ if (is_numeric($this->arg[0])) {
 								$childElement = array(
 									'subject' => $currentSubject,
 									'category' => $category,
-									'categoryName' => is_array($category) ? $currentSubject['category']['name'] : $currentSubject['subject']['name']
+									'categoryName' => is_array($category) ? $category['name'] : $currentSubject['name']
 								);
 
 								/* Subjects without a parent just get thrown together into
