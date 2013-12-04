@@ -59,7 +59,7 @@ if ($_POST['name']) {
 
 			/* If a category code exists, just go back to where you came from
 			 */
-			if (strlen($category['code'])) {
+			if (strlen(trim($category['code']))) {
 				$page->backToTheFuture(2);
 			}
 
