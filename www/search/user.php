@@ -318,11 +318,14 @@ if (is_numeric($this->arg[0])) {
 	                    'FORM_STAFF' => $formTeacher,
 	                    'YCOORD' => $coordTeacher,
 	                    'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
-	                    'BIRTHDATE' => date('j F Y', $synInfo['StudentBirthDate']),
+	                    'BIRTHDATE' => '',
 	                    'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
 	                    'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
 	                    'STUDENT_TYPE' => $synUserHandler->determineBoarderType($synInfo['StudentBoarder']),
 	                );
+                    if ($synInfo['StudentBirthDate']) {
+                        $output['BIRTHDATE'] = date('j F Y', $synInfo['StudentBirthDate']);
+                    }
 
 	                $this->setVar($output);
 	                $synClass = new External_Class;
