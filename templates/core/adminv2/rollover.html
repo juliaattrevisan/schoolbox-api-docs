@@ -1,0 +1,170 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
+<style type="text/css">
+  #traversal-window, #confirmation-window {
+    padding: 20px;
+  }
+  #traversal-window.error {
+    background: #fff7f7;
+    color: #800;
+  }
+  #traversal-window.loading {
+    background: #f7f7f7;
+    color: #777;
+  }
+  #traversal-window li {
+    text-align: left;
+    list-style-type: disc;
+    margin: 4px 0;
+  }
+  #confirmation-window form {
+    text-align: center;
+  }
+</style>
+<script type="text/javascript" src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript">
+
+  $j(function() {
+    /* left tree navigation */
+    $j('#tree').tree({
+      type: 'table',
+      node: 'tr',
+      onOff: 'dark',
+      sequencing: false
+    });
+
+    var traversalWindow = $j('#traversal-window');
+    var confirmationWindow = $j('#confirmation-window');
+
+    $j('#tree tr:not(.server)').live('click', function () {
+      /* select folder */
+      $j('#tree .selected').removeClass('selected');
+      $j(this).addClass('selected');
+
+      traversalWindow.addClass('loading').html('Searching...');
+      confirmationWindow.html('');
+
+      var content = $j('<div/>');
+
+      var parent = this.id.split('-')[1];
+
+      $j.post('/adminv2/rolloverForm.php', { traverse: parent }, null, 'json')
+          .always(function() {
+            traversalWindow
+                .removeClass('loading');
+          })
+          .done(function(data) {
+
+            var len = Object.keys(data).length;
+
+            if(len) {
+              var list = $j('<ul/>');
+              $j.each(data, function(k, v) {
+                list.append(
+                    $j('<li/>').html(v.name + ' (' + v.code + ')')
+                );
+              });
+              content
+                  .append($j('<h3/>').html(len + ' classes found.'))
+                  .append(list);
+
+              var confirmation = $j('<form/>').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
+              confirmation.append($j('<input type="hidden" />').attr('name', 'rollover').val(parent));
+              confirmation.append($j('<p/>').html('Rollover these ' + len + ' classes?<br/><em>You cannot undo this.</em>'));
+              confirmation.append(
+                  $j('<input type="submit" value="Rollover" class="submit-btn-plain" />')
+              );
+
+              confirmationWindow.html(confirmation);
+
+            }
+            else {
+              content.html('No classes found.');
+            }
+
+            traversalWindow.removeClass('error').html(content);
+          })
+          .fail(function(e) {
+            var errString = '';
+            try {
+              errString = JSON.parse(e.responseText)
+            }
+            catch(e) {
+              errString = 'Failed to retrieve class listing.';
+            }
+
+            traversalWindow
+                .addClass('error')
+                .html(errString);
+
+          });
+    });
+
+  });
+</script>
+<!-- END custom_head -->
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+  <!-- BEGIN admin_nav_item -->
+  <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+  <!-- END admin_nav_item -->
+</ul>
+
+<div class="admin-contents clearfix">
+  <h2>Rollover</h2>
+
+  <p>
+    Rollover will look through all subfolders of the selected folder, and detach them from their class codes.
+    The codes will be appended to the folder title for ease of archiving.<br/>This function is irreversible, so only do
+    this if you are <strong>absolutely certain</strong> that you want to.
+  </p>
+  <p>Select a folder to rollover:</p>
+
+
+  <div class="template3">
+    <div class="left">
+      <div id="category-window">
+        <div class="loading"></div>
+        <table id="category-head" class="table">
+          <thead>
+          <th>Folders</th>
+          </thead>
+        </table>
+        <div class="scroller">
+          <table id="tree" class="table">
+            <tbody>
+            <tr id="node-0" class="server expanded loaded {FULL} {WRITE}">
+              <td><span class="server label">Resources</span></td>
+            </tr>
+            <!-- BEGIN category_list -->
+            <tr id="node-{CATEGORY_ID}" class="{CLASS}">
+              <td><span class="elbow"></span><span class="label">{CATEGORY_NAME}</span></td>
+            </tr>
+            <!-- END category_list -->
+            </tbody>
+            <tfoot>
+            <tr id="node-template">
+              <td><span class="elbow"></span><span class="label"></span></td>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="center">
+      <div id="traversal-window">
+        <ul></ul>
+      </div>
+    </div>
+
+    <div class="right">
+      <div id="confirmation-window"></div>
+    </div>
+
+
+  </div>
+
+
+
+</div>
