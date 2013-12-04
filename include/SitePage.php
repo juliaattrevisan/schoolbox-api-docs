@@ -347,7 +347,7 @@ class SitePage extends Page {
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
      */
     function error($ec, $message = "", $code = 400) {
-        if (!isset($ec)) {
+        if (isset($ec)) {
             $db = DeprecatedDatabase::getInstance();
             $query = "SELECT message FROM error WHERE id = '$ec'";
             $error = $db->getRow($query);
