@@ -337,16 +337,28 @@ class SitePage extends Page {
 
     }
 
-    function error($ec, $message = "") {
-
-        $db = DeprecatedDatabase::getInstance();
-
-        $query = "SELECT message FROM error WHERE id = '$ec'";
-        $error = $db->getRow($query);
+    /**
+     * Outputs an error message.
+     *
+     * @param mixed  $ec
+     *   Integer: retrieves error text from code from database
+     *   null:    outputs whatever's in $message as error
+     * @param string $message Replaces '%MESSAGE%' in $ec
+     * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
+     */
+    function error($ec, $message = "", $code = 400) {
+        if (!isset($ec)) {
+            $db = DeprecatedDatabase::getInstance();
+            $query = "SELECT message FROM error WHERE id = '$ec'";
+            $error = $db->getRow($query);
+        }
+        if (empty($error)) {
+            $error = array('message' => '%MESSAGE%',);
+        }
 
         $output = str_replace("%MESSAGE%", $message, $error['message']);
 
-        header("HTTP/1.0 400 Bad Request");
+        header(':', true, $code);
         $this->setVar(TEMPLATE_content, '');
 
         $this->setFile(TEMPLATE_content, 'common/error.html');
