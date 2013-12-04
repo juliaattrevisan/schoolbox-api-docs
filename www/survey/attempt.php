@@ -72,6 +72,13 @@ if ($assessHandler->isOwner($this->arg[0])) {
 }
 */
 
+/* Redirect back to the homepage if you've reached the end, or had
+ * your attempt_id cleared from the session
+ */
+if (!is_numeric($_SESSION['attempt_id'])) {
+	SitePage::localRedir('/homepage/' . $assess['category_id']);
+}
+
 /* Check if you have completed an assessment already
  *
  * Set up Attempt vars
@@ -87,21 +94,6 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  */
 if ($attempt) {
     $_SESSION['attempt_id'] = $attempt['attempt_id'];
-} /* Otherwise start a new attempt if there is a limit
- */
-else {
-    if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
-
-        /* Clear and exit when you attempt to make more than is allowed
-           */
-        $_SESSION['attempt_id'] = '';
-
-        error(146);
-    } else {
-        $_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
-
-        $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
-    }
 }
 
 /* Check if Attempt ran out of time
@@ -126,19 +118,16 @@ $this->setTitle('Assessment: ' . $assess['title']);
 $attemptStart = new Alaress_Date_Format($attemptStartTime, 'U');
 $attemptEnd = new Alaress_Date_Format($attemptEndTime, 'U');
 
-$this->setVar(
-    array(
-        'ASSESS_ASSESS_ID' => $assess['assess_id'],
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
-        'ATTEMPT_START' => $attemptStart->getShort(),
-        'ATTEMPT_END' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(
-        ),
-        'SECTION_TITLE' => Scrub::text($section['title']),
-        'SECTION_DESCRIPTION' => Scrub::text($section['description']),
-        'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
-    )
-);
+$this->setVar(array(
+	'ASSESS_ASSESS_ID' => $assess['assess_id'],
+	'ASSESS_TITLE' => Scrub::text($assess['title']),
+	'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
+	'ATTEMPT_START' => $attemptStart->getShort(),
+	'ATTEMPT_END' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
+	'SECTION_TITLE' => Scrub::text($section['title']),
+	'SECTION_DESCRIPTION' => Scrub::text($section['description']),
+	'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
+));
 
 /* Load all the questions for this section. This saves stubs for each response
  * and also the questions that were attempted, allowing an overview of which
@@ -148,7 +137,8 @@ if (!$responseHandler->numStubResponsesInSection($_SESSION['attempt_id'], $secti
     if ($section['random'] == 1) {
         $pool = $section['pool'];
         $randomise = Survey_Response::RANDOMISE_QUESTIONS;
-    } else {
+    }
+	else {
         $pool = 0;
         $randomise = Survey_Response::ORDERED_QUESTIONS;
     }

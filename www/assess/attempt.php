@@ -72,6 +72,13 @@ if ($assessHandler->isOwner($this->arg[0])) {
 }
 */
 
+/* Redirect back to the start if you've reached the end, or had
+ * your attempt_id cleared from the session
+ */
+if (!is_numeric($_SESSION['attempt_id'])) {
+	SitePage::localRedir('/assess/intro/' . $assess['assess_id']);
+}
+
 /* Check if you have completed an assessment already
  *
  * Set up Attempt vars
@@ -87,21 +94,6 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  */
 if ($attempt) {
     $_SESSION['attempt_id'] = $attempt['attempt_id'];
-} /* Otherwise start a new attempt if there is a limit
- */
-else {
-    if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
-
-        /* Clear and exit when you attempt to make more than is allowed
-           */
-        $_SESSION['attempt_id'] = '';
-
-        error(146);
-    } else {
-        $_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
-
-        $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
-    }
 }
 
 /* Check if Attempt ran out of time
