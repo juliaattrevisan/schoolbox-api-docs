@@ -112,6 +112,7 @@ if (Cfg::get('external_enable')) {
     $synHandler = new External_Class();
 }
 
+$this->setVar('category_block', 'No submissions found.');
 if (!empty($subList) && is_array($subList)) {
     $i = 0;
 
@@ -249,30 +250,34 @@ if (!empty($subList) && is_array($subList)) {
 
     /* Get full student list of class to show those who have not submitted
       */
-    $curCategory = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($prevCat['category']);
-    if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
-        /* If synergy code, get synergy students
-           */
-        $studentList = $synHandler->getStudents($curCategory->getCodeString());
-    } else {
-        /* Retrieve student list from group membership
-           */
-        $studentList = $groupHandler->getMemberList($curCategory->getId());
+    try {
+        $curCategory = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($prevCat['category']);
+        if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
+            /* If synergy code, get synergy students
+               */
+            $studentList = $synHandler->getStudents($curCategory->getCodeString());
+        } else {
+            /* Retrieve student list from group membership
+               */
+            $studentList = $groupHandler->getMemberList($curCategory->getId());
+        }
+
+        $this->setVar('STUDENTS', count($studentList));
+
+        if (count($curCategory->getCodes()) > 0) {
+            $this->setVar("CATEGORY", Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
+        } else {
+            $this->setVar("CATEGORY", Scrub::text($curCategory->getName()));
+        }
+
+        $this->setVar('CATEGORY_ID', $prevCat['category']);
+
+        $this->parse("category_block", "category_listing", true);
     }
-
-    $this->setVar('STUDENTS', count($studentList));
-
-    if (count($curCategory->getCodes()) > 0) {
-        $this->setVar("CATEGORY", Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
-    } else {
-        $this->setVar("CATEGORY", Scrub::text($curCategory->getName()));
+    catch (Exception $e) {
+        // Couldn't find category, probably as it wasn't set.
     }
-
-    $this->setVar('CATEGORY_ID', $prevCat['category']);
-
-    $this->parse("category_block", "category_listing", true);
 } else {
-    $this->setVar('category_block', 'No submissions found.');
 
     // pre-emptively clear the blocks that might not get rendered
     $this->setVar(array(
