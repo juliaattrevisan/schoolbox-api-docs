@@ -375,7 +375,7 @@ if (is_numeric($this->arg[0])) {
 
 								if ((Cfg::get('show_all_subjects') == 1) || $category['id'] ) {
 									$this->setVar(array(
-										'SUBJECT_NAME' => Scrub::Text($cat_name),
+										'SUBJECT_NAME' => Scrub::text($cat_name),
 										'SUBJECT_URL' => is_array($category) && $groupHandler->getPermission($category['id']  ) >= READ_ACCESS ? "/homepage/{$subject['code']}": '#',
 									));
 
@@ -390,7 +390,6 @@ if (is_numeric($this->arg[0])) {
 
 									$teacherList = $synClass->getTeacherName($code);
 									$teacherOutput = array();
-
 
 									if (is_array($teacherList) && count($teacherList)) {
 										foreach ($teacherList as $teacherSynID) {
