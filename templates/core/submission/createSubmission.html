@@ -292,8 +292,8 @@
         });
 
         $j('#rubric-criteria ul').sortable({
-            handle:'span',
-            placeholder:'ui-state-highlight'
+            placeholder:'sortable-placeholder',
+            forcePlaceholderSize: true
         });
 
         function showHideMarktype(timeout) {
@@ -503,7 +503,7 @@
         <td id="rubric">
 
             <div id="rubric-results">
-                <em>Result set:</em>
+                <em>Result set</em>
                 <!-- BEGIN resultset -->
                 <p>
                     <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}"{RS_CHECKED} />
@@ -516,7 +516,7 @@
                 <!-- END resultset -->
                 <p>
                     <input id="rs-0" type="radio" name="resultset" value="0"{RS_0_CHECKED} />
-                    <label for="rs-0" class="result">Use descriptors:
+                    <label for="rs-0" class="result">Assessment specific descriptors:
                         <select id="descriptor-count" name="descrip-count">
                             <!-- BEGIN des_count -->
                             <option value="{DES_COUNT_VALUE}"
@@ -530,7 +530,7 @@
             <div class="clearfix"></div>
 
             <div id="rubric-criteria">
-                <em>Criteria being assessed:</em>
+                <em>Criteria being assessed</em>
 
                 {COURSE_CRITERIA}
                 {CLASS_CRITERIA}
