@@ -79,8 +79,14 @@ class Session
                 $_SESSION['su'] = 1;
 
 
-            if (Cfg::get('external_enable'))
+            if (Cfg::get('external_enable')) {
+
+				new Alaress_Probe('gruber');
+
                 $this->setSynergyInfo($userHandler);
+			}
+			new \Alaress_Probe($_SESSION);
+			die('fox');
 
 
             /* Log successful */
@@ -340,8 +346,7 @@ class Session
     /**
      * @param User $userHandler
      */
-    function setSynergyInfo($userHandler)
-    {
+    function setSynergyInfo($userHandler) {
         $synUser = new External_User;
         $groupHandler = new Group;
         $catHandler = new Category;
