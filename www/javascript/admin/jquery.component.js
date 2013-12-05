@@ -92,7 +92,7 @@ setupCustomise = {
             });
 
 
-            $j(".add-component a").live('click', function(event) {
+            $j(document).on('click', ".add-component a", function(event) {
                 event.preventDefault();
                 var $this = $j(this);
 
@@ -555,7 +555,8 @@ setupCustomise = {
                 $this.children('em').removeClass('show-it' );
             }
 
-        }).live('click', function(event) {
+        });
+        $j(document).on('click', 'a.config-this', function(event) {
             var $this = $j(this);
             event.preventDefault();
 
@@ -578,7 +579,7 @@ setupCustomise = {
 
         });
 
-        $j('.delete-this').live('click', function(event){
+        $j(document).on('click', '.delete-this', function(event){
             event.preventDefault();
             var $this = $j(this);
 
@@ -591,13 +592,13 @@ setupCustomise = {
             $this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
         });
 
-        $j('.delete-accept').live('click',function(event) {
+        $j(document).on('click', '.delete-accept', function(event) {
 
             $this = homepageControl;
 
             // console.log($this);
 
-            $j('.delete-this').live('click',function() {
+            $j(document).on('click', '.delete-this', function() {
                 var $instanceId = $j(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
 
                 $j(this).parent().slideUp(100,function() {
@@ -638,7 +639,7 @@ setupCustomise = {
 
         });
 
-        $j('.delete-reject').live('click',function(event) {
+        $j(document).on('click', '.delete-reject', function(event) {
             event.preventDefault();
             $j(this).closest('.delete-it').slideUp();
         });

@@ -92,7 +92,7 @@ setupCustomise = {
 			});
 
 
-			$j(".add-component a").live('click', function(event) {
+			$j(document).on('click', ".add-component a", function(event) {
 				event.preventDefault();
 				var $this = $j(this);
 
@@ -577,7 +577,8 @@ setupCustomise = {
 					$this.children('em').removeClass('show-it' );
 				}
 
-		}).live('click', function(event) {
+		});
+		$j(document).on('click', "a.edit", function(event) {
 			var $this = $j(this);
 			event.preventDefault();
 
@@ -591,7 +592,7 @@ setupCustomise = {
 
 		});
 
-		$j('.close-delete').live('click', function(event){
+		$j(document).on('click', '.close-delete', function(event){
 			event.preventDefault();
 			var $this = $j(this);
 
@@ -604,7 +605,7 @@ setupCustomise = {
 			$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
 		});
 
-		$j('.delete-accept').live('click',function(event) {
+		$j(document).on('click', '.delete-accept', function(event){
 			event.preventDefault();
 			//update with an ajax call here.
 			$j.post(setupCustomise.ajaxURL, $j(this).closest('form').serialize());
@@ -627,7 +628,7 @@ setupCustomise = {
 
 		});
 
-		$j('.delete-reject').live('click',function(event) {
+		$j(document).on('click','.delete-reject',function(event) {
 			event.preventDefault();
 			$j(this).closest('.delete-it').slideUp();
 		});

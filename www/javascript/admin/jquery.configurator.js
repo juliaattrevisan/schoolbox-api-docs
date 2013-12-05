@@ -48,8 +48,8 @@ $j.fn.configurator = function(opts) {
             });
         });
 
-        // We'll encapsulate our .qtip() call in your .live() handler method
-        $j('.disabled').live('mouseover', function(event) {
+        // We'll encapsulate our .qtip() call in your .on() handler method
+        $j(document).on('mouseover', '.disabled', function(event) {
             // Bind the qTip within the event handler
             $j(this).qtip({
                 overwrite: false,
@@ -219,7 +219,7 @@ $j.fn.configurator = function(opts) {
     };
 
     this.deleteComponent = function() {
-        $j('.delete-this').live('click', function() {
+        $j(document).on('click', '.delete-this', function() {
             var self = $j(this);
             var component = self.parents('.component').first();
             var $instanceId = component.attr('id').match(/^instance\-id\-(\d+)$/)[1];
@@ -246,7 +246,7 @@ $j.fn.configurator = function(opts) {
         // The controls for the individual components ie. edit, delete
         setupCustomise.activeComponents();
 
-        $j('#'+options.context+'-layout form').live('submit', function(event) {
+        $j(document).on('submit', '#'+options.context+'-layout form', function(event) {
             var self = $j(this);
             var panel = self.parent('.editPanel');
             var component = panel.parent('.component');

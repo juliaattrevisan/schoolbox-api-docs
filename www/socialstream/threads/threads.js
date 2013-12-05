@@ -86,7 +86,7 @@
 
 				/* The element which allows you to make comments and replies
 				 */
-				addPostLink: $j(element).find('.addPostLink'),
+				addPostLink: '.addPostLink',
 
 				/* The form which spawns when making comments and replies
 				 */
@@ -133,7 +133,7 @@
 		 * Allow input forms to be spawned
 		 */
 		function initPostForm() {
-			config.addPostLink.live('click', function(e) {
+			config.element.on('click', config.addPostLink, function(e) {
 				// Does this have a post form already? If so, don't add it back
 				// after it gets removed.
 				var body = $j(this).closest('li').find('> .body');
