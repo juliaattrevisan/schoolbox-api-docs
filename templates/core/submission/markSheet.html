@@ -78,17 +78,22 @@
 
 <!-- BEGIN CUSTOM_JAVASCRIPT -->
 <script>
-	// Hide averages rows
-	$j('.sub-table-row').hide();
+    // Hide averages rows
+    var subTableRow = $j('.sub-table-row');
+    subTableRow.hide();
 
-	// Toggle averages rows and change arrow direction
-	$j('.toggle-averages').toggle(function(){
-		$j(this).html('&#x25B2;');
-		$j('.sub-table-row').show();
-	}, function(){
-		$j(this).html('&#x25BC;');
-		$j('.sub-table-row').hide();
-	});
+    // Toggle averages rows and change arrow direction
+    $j('.toggle-averages').click(function(event){
+        event.preventDefault();
+        if (subTableRow.is(':visible')) {
+            $j(this).html('&#x25BC;');
+            $j('.sub-table-row').hide();
+        }
+        else {
+            $j(this).html('&#x25B2;');
+            $j('.sub-table-row').show();
+        }
+    });
 
   var table = $j('#content').children('table.mark-sheet');
 
