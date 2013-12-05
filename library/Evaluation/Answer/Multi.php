@@ -125,11 +125,23 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
+			shuffle($allAnswers);
+			shuffle($allAnswers);
+			shuffle($allAnswers);
+			shuffle($allAnswers);
+
+			/* A
+			 */
+			$i = 65;
+
             foreach ($allAnswers as $currentAnswer) {
+				$valueFacade = chr($i);
+
                 $page->setVar(array(
 					'QUESTION_ID' => $question_id,
 					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $answerGroup['answer_id'],
+					'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
@@ -141,20 +153,25 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
-                    } else {
+                    }
+					else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
                         ));
                     }
-                } else {
+                }
+				else {
                     $page->setVar(array(
                         'ANSWER_CHECKED' => '',
                     ));
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
+
+				$i++;
             }
-        } else {
+        }
+		else {
             $page->setVar('answerOption_block', '');
         }
     }
