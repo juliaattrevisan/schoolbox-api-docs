@@ -1,13 +1,13 @@
 <?php
 /**
- * Calendar_Layout_Week_Abstract
+ * Calendar_Layout_Full_Abstract
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Calendar_Layout_Week_Abstract {
+abstract class Calendar_Layout_Full_Abstract {
 	protected $calendarHandler = null;
 	protected $groupHandler = null;
 	protected $subStuHandler = null;
