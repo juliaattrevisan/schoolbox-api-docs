@@ -1,4 +1,6 @@
-var $j = jQuery.noConflict();
+// We used to use another library which consumed the $ variable.
+// That library is long gone, so no need to release $ anymore.
+var $j = jQuery;
 
 $j(function() {
 	/*
