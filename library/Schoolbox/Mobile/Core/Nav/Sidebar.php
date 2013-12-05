@@ -256,7 +256,8 @@ class Sidebar {
 
         $noWork = array(array(
             'value' => '<i>No upcoming work</i>',
-            'href' => '#'
+            'href' => '#',
+	        'type' => false,
         ));
 
         if(!count($upcoming)) {
