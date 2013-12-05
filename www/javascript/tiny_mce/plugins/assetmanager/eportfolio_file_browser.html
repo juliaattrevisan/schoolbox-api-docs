@@ -80,7 +80,7 @@ $(function () {
 	});
 
 	/* select image */
-	$('#file-list li').live('click', function () {
+	$(document).on('click', '#file-list li', function () {
 		var win = tinyMCEPopup.getWindowArg("window"), input = tinyMCEPopup.getWindowArg("input");
 		var src = $(this).find('img').attr('src');
 
@@ -119,7 +119,7 @@ $(function () {
 	});
 
 	/* open dir */
-	$('#tree li').live('click', function () {
+	$(document).on('click', '#tree li', function () {
 		var categoryID = $(this).attr('id').substring(5);
 		$('#tree li.selected').removeClass('selected');
 		$(this).addClass('selected');
