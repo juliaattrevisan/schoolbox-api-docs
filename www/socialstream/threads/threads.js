@@ -286,7 +286,7 @@
 		 * @param offset
 		 */
 		function generateStreamUrl(instanceId, homepageId, start, offset) {
-			return '/socialstream/threads.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=' + start + '&offset=' + offset;
+			return '/socialstream/threads/threads.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=' + start + '&offset=' + offset;
 		}
 
 		/**
@@ -298,7 +298,7 @@
 		 * @param offset
 		 */
 		function generateStreamUrlSlow(instanceId, homepageId, end, offset) {
-			return '/socialstream/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
+			return '/socialstream/threads/threadsSlow.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=0&end=' + (parseInt(end) + parseInt(offset));
 		}
 
 		/**
