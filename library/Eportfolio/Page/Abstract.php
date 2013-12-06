@@ -211,7 +211,7 @@ abstract class Eportfolio_Page_Abstract {
 	protected function getLatestSubmission($userId, $boxId) {
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 
-		$history = $mapper->getSubmissionHistory($userId, $boxId);
+		$history = $mapper->getHistory($userId, $boxId);
 
 		if ($history->count()) {
 			return $history->first()->getSubmission();
@@ -228,7 +228,7 @@ abstract class Eportfolio_Page_Abstract {
 	protected function getLatestReturn($userId, $boxId) {
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 
-		$history = $mapper->getSubmissionHistory($userId, $boxId);
+		$history = $mapper->getHistory($userId, $boxId);
 
 		if ($history->count()) {
 			return $history->first()->getReturnedWork();

@@ -260,7 +260,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 	 *
 	 * @return ActivityCollection
 	 */
-	public function getSubmissionHistory($user_id, $box_id) {
+	public function getHistory($user_id, $box_id) {
 		$collection    = new ActivityCollection();
 		$factory       = new ActivityFactory();
 		$box_join      = $this->getJoinMapper('submission_box');

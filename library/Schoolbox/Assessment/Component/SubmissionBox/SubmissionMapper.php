@@ -194,7 +194,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 	 *
 	 * @return ActivityCollection
 	 */
-	public function getSubmissionHistory($user_id, $box_id) {
+	public function getHistory($user_id, $box_id) {
 		//
 		// Needs filter on submission box number.
 		// getActivities($user_id, array('box' => $box_id)

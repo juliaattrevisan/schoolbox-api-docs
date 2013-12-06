@@ -156,13 +156,13 @@ $dueDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 $createdDate = new Alaress_Date_Relative($submission->getCreated(), 'y-m-d');
 
 $submit_mapper = new Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-$submission_history = $submit_mapper->getSubmissionHistory($userID, $this->arg[0]);
+$submission_history = $submit_mapper->getHistory($userID, $this->arg[0]);
 if ($is_mark_shown) {
 	$return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 	//
 	// Filter out items with a mark, instead of showing this way?
 	// Returns probably should not show at all if marks aren't shown?
-	$submission_history->merge($return_mapper->getSubmissionHistory($userID, $this->arg[0]));
+	$submission_history->merge($return_mapper->getHistory($userID, $this->arg[0]));
 }
 $submission_history->sortBy('date', 'desc');
 
