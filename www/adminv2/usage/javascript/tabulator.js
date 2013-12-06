@@ -49,7 +49,8 @@
 		 */
 		function applySortorder() {
 			$j.each(config.element.find('a.control'), function(index, element) {
-				$j(element).click(function() {
+				$j(element).click(function(event) {
+					event.preventDefault();
 
 					/* Toggle ordering upon click
 					 */
@@ -62,6 +63,7 @@
 
 					config.element.usageTabulator({
 						url: config.url,
+						title: config.title,
 						columns: config.columns,
 						orderBy: $j(this).attr('rel'),
 						order: order,
