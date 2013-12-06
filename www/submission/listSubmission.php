@@ -112,7 +112,6 @@ if (Cfg::get('external_enable')) {
     $synHandler = new External_Class();
 }
 
-$this->setVar('category_block', 'No submissions found.');
 if (!empty($subList) && is_array($subList)) {
     $i = 0;
 
@@ -277,10 +276,11 @@ if (!empty($subList) && is_array($subList)) {
     catch (Exception $e) {
         // Couldn't find category, probably as it wasn't set.
     }
-} else {
-
+}
+else {
     // pre-emptively clear the blocks that might not get rendered
     $this->setVar(array(
+		'category_block' => 'No submissions found.',
         'writable_assess_block' => '',
         'writable_duework_block' => '',
     ));
