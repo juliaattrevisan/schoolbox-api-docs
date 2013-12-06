@@ -140,7 +140,7 @@
 
         /* Add a new answer option
          */
-        $j('#makeNewAnswer').live('click', function () {
+        $j(document).on('click', '#makeNewAnswer', function () {
             var thing = $j('.hidden-clone li:first-child').clone();
             $j('ul#answerCollection').append(thing);
             refreshList();
@@ -150,14 +150,14 @@
 
         /* Remove an answer option
          */
-        $j('div.delete').live('click', function () {
+        $j(document).on('click', 'div.delete', function () {
             if (($j('.inputs').length) !== 3) {
                 $j(this).parent().remove();
             }
             refreshList();
         });
 
-        $j('.answerCorrect').live('click', function () {
+        $j(document).on('click', '.answerCorrect', function () {
             refreshList();
             $j(this).parent().parent().toggleClass("highlight");
         });

@@ -19,7 +19,7 @@ $j(function() {
 	});
 
 	/* load right panel file list */
-	$j('#tree tr:not(.server)').live('click', function () {
+	$j(document).on('click', '#tree tr:not(.server)', function () {
 
 		/* select folder */
 		$j('#tree .selected').removeClass('selected');
@@ -92,7 +92,7 @@ $j(function() {
 	});
 
   // explicit case for server node
-  $j('#tree tr.server').live('click', function () {
+  $j(document).on('click', '#tree tr.server', function () {
     threePanel.getMeta(0);
     $j('#tree .selected').removeClass('selected');
     $j(this).addClass('selected');

@@ -2,7 +2,7 @@
 	<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
     <script type='text/javascript'>
         $j(function () {
-            $j('a.{CALENDAR_PREFIX}-attendance-request').live('click', function (event) {
+            $j(document).on('click', 'a.{CALENDAR_PREFIX}-attendance-request', function (event) {
                 event.preventDefault();
 
                 var button = $j(this);

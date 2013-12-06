@@ -79,7 +79,7 @@
             });
         });
 
-        $j('.delete-from-list').live('click', function (event) {
+        $j(document).on('click', '.delete-from-list', function (event) {
             event.preventDefault();
             $j(this).parent().remove();
             $j('#addUser').val("").focus();

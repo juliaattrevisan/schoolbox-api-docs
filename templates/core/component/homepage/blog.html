@@ -14,7 +14,7 @@
             }
         });
 
-        $j("#component{COMPONENT_INSTANCE_ID} a.show-comments").live('click', function(e) {
+        $j(document).on('click', "#component{COMPONENT_INSTANCE_ID} a.show-comments", function(e) {
             $j(this).siblings('ul.comments').show(100);
             $j(this).siblings('form').show(100);
             $j(this).hide();

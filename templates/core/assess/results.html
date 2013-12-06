@@ -20,7 +20,7 @@
             }
         })
 
-        $j('.submission-dropdown').live('click', function () {
+        $j(document).on('click', '.submission-dropdown', function () {
             var currentUnicode = $j(this).html().charCodeAt(0);
 
             if (currentUnicode == '9660') {

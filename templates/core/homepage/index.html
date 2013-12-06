@@ -120,7 +120,7 @@
         /* Activate socialstream browser for comments/replies (clones)
          * One resource browser per socialstream component
          */
-        $j('.socialstream-browser-button').live('click', function() {
+        $j(document).on('click', '.socialstream-browser-button', function() {
             var self = $j(this);
 
             $j('#socialstream-browser').socialstreamBrowser({

@@ -131,7 +131,7 @@
             return this.optional(element) || (parseFloat(value) > 0);
         }, "Amount must be greater than zero");
 
-        $j('div.delete').live('click', function (e) {
+        $j(document).on('click', 'div.delete', function (e) {
             if (($j('.inputs').length) !== 3) {
                 $j(this).parent().remove();
                 refreshList();
@@ -140,7 +140,7 @@
         });
 
 
-        $j('.makeNewAnswer').live('click', function (e) {
+        $j(document).on('click', '.makeNewAnswer', function (e) {
             e.preventDefault();
             var thing = $j('.hidden-clone ul:first-child').clone();
             $j('ul#answerCollection').append(thing);

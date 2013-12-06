@@ -14,7 +14,7 @@
         });
 
         /* Folder click event */
-        $j('#tree tr:not(.server)').live('click', function () {
+        $j(document).on('click', '#tree tr:not(.server)', function () {
 
             /* select folder */
             $j('#tree .selected').removeClass('selected');

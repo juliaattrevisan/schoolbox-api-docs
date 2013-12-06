@@ -20,7 +20,7 @@ $j(function() {
     });
 
     /* load right panel file list */
-    $j('#tree tr').live('click', function () {
+    $j(document).on('click', '#tree tr', function () {
 
         /* select folder */
         $j('#tree .selected').removeClass('selected');

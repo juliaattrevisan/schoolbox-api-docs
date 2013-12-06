@@ -61,7 +61,7 @@
 
         /* Remove someone from list
          */
-        $j('.individualPermissionRemove').live('change', function(event) {
+        $j(document).on('change', '.individualPermissionRemove', function(event) {
             added.splice($j.inArray($j(this).closest('li').find('input[name="individual_permission[]"]').val(), added), 1 );
 
             $j(this).closest('li').fadeOut("slow",function(){

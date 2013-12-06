@@ -33,7 +33,7 @@
         $j('.allowed-files tr:first th:nth-child(6)').qtip({
             content:'Determines if file will be opened in the browser or by a third party application'});
 
-        $j('.modify').live('click', function () {
+        $j(document).on('click', '.modify', function () {
             var trigger = 0;
 
             level = $j(this).parent().parent()
