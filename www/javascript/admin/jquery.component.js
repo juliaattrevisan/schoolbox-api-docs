@@ -541,14 +541,14 @@ setupCustomise = {
             $j("#tooltip").hide();
         });
 
-        $j("a.config-this").hover(function() {
+        $j("a.config-this").mouseenter(function() {
             var $this = $j(this);
 
             if(!$this.children('em').data('pinned')) {
                 $this.children('em').addClass('show-it');
             }
 
-        }, function() {
+        }).mouseleave(function() {
             var $this = $j(this);
 
             if(!$this.children('em').data('pinned')) {

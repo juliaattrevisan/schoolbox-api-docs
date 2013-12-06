@@ -17,16 +17,17 @@ $j(function() {
 		return false;
 	});
 
-	$j(".show-assess-options, .show-section-options").hover(
-	function () { $j(this).children('span').stop(true, true).fadeIn("fast");
-		$j(this).css('background-image', "none");
-	},
-	function () {
-		var $this = $j(this)
-		$this.children('span').stop(true, true).fadeOut("fast", function() {
-			$this.removeAttr('style');
-		});
-	});
+	$j(".show-assess-options, .show-section-options")
+        .mouseenter(function () {
+            $j(this).children('span').stop(true, true).fadeIn("fast");
+            $j(this).css('background-image', "none");
+        })
+        .mouseleave(function () {
+            var $this = $j(this)
+            $this.children('span').stop(true, true).fadeOut("fast", function() {
+                $this.removeAttr('style');
+            });
+        });
 
 	/* Make questions sortable
 	 */

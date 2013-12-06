@@ -563,19 +563,19 @@ setupCustomise = {
 			$j("#tooltip").hide();
 		});
 
-		$j("a.edit").hover(function() {
+		$j("a.edit").mouseenter(function() {
 			var $this = $j(this);
 
 			if(!$this.children('em').data('pinned')) {
 				$this.children('em').addClass('show-it');
 			}
 
-			}, function() {
-				var $this = $j(this);
+        }).mouseleave(function() {
+            var $this = $j(this);
 
-				if(!$this.children('em').data('pinned')) {
-					$this.children('em').removeClass('show-it' );
-				}
+            if(!$this.children('em').data('pinned')) {
+                $this.children('em').removeClass('show-it' );
+            }
 
 		});
 		$j(document).on('click', "a.edit", function(event) {

@@ -20,10 +20,10 @@ $j(function() {
     /*
      * Main Navigation dropdown
      * */
-    $j("#nav li").hover(function(){
+    $j("#nav li").mouseenter(function(){
         $j(this).addClass("hover");
         $j('ul:first',this).toggle()
-    }, function(){
+    }).mouseleave(function(){
         $j(this).removeClass("hover");
         $j('ul:first',this).toggle();
     });
