@@ -1,6 +1,6 @@
 <?php
 /**
- * ${NAME}
+ * Usage for all users
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd

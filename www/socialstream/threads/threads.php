@@ -10,11 +10,11 @@
 
 namespace SocialStream;
 
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../../include/Bootstrap.php';
 
 $instanceId = intval($_GET['instanceId']);
 $homepageId = intval($_GET['homepageId']);
-$end = intval($_GET['end']);
+$start = intval($_GET['start']);
 $offset = intval($_GET['offset']);
 
 $instanceArray = \Component_InstanceMapper::getInstance()->findByInstanceId($instanceId);
@@ -23,7 +23,7 @@ $instance = $instanceArray[$instanceId];
 /* Sew thread if instance exists
  */
 if ($instance) {
-	$thread = new ThreadsSlow($instance, $homepageId, $end, $offset);
+	$thread = new Threads($instance, $homepageId, $start, $offset);
 	$output = $thread->generate()->render();
 
 	echo $output;

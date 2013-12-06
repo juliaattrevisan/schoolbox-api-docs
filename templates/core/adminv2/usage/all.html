@@ -3,31 +3,31 @@
 <script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
 <script type='text/javascript' src='/javascript/flot/jquery.flot.stack.js'></script>
 <script type='text/javascript' src='/javascript/flot/jquery.flot.pie.js'></script>
-<script type='text/javascript' src='/javascript/usage/total.js'></script>
-<script type='text/javascript' src='/javascript/usage/group.js'></script>
-<script type='text/javascript' src='/javascript/usage/type.js'></script>
-<script type='text/javascript' src='/javascript/usage/tabulator.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/total.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/group.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/type.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>
 
 <script type='text/javascript'>
 	$j(function() {
 		$j('#global-usage').usageTotal({
-			url: '/adminv2/usage/allAjax?type=total',
+			url: '/adminv2/usage/ajax/allAjax?type=total',
 			title: 'Total'
 		});
 
 		$j('#group-usage').usageGroup({
-			url: '/adminv2/usage/allAjax?type=group',
+			url: '/adminv2/usage/ajax/allAjax?type=group',
 			title: 'Group'
 
 		});
 
 		$j('#type-usage').usageType({
-			url: '/adminv2/usage/allAjax?type=type',
+			url: '/adminv2/usage/ajax/allAjax?type=type',
 			title: 'Category'
 		});
 
 		$j('#user-usage').usageTabulator({
-			url: '/adminv2/usage/allAjax?type=user',
+			url: '/adminv2/usage/ajax/allAjax?type=user',
 			title: 'Users',
 			orderBy: 'bytes',
 			order: 'DESC',
