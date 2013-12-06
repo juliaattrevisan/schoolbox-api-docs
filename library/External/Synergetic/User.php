@@ -604,7 +604,13 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 	}
 
-	function getEnrolledStudents($synergyID) {
+	/**
+	 * Get the students belonging to you
+	 *
+	 * @param $synergyID
+	 * @return array|bool
+	 */
+	public function getEnrolledStudents($synergyID) {
 		//
 		// Valid Relations:
 		// SN/DR:       Son/Daughter
@@ -612,16 +618,18 @@ class External_Synergetic_User implements External_UserInterface {
 		// WD:          Ward
 		// GRASN/GRADR: Grandson/Granddaughter
 		// FOCD:        Foster child
-		$query = "SELECT Relationships.RelatedID
-				FROM SynergyOne.dbo.Constituencies Constituencies, SynergyOne.dbo.Relationships Relationships
-				WHERE Relationships.RelatedID = Constituencies.ID AND
-				Relationships.ID = $synergyID AND
-				Constituencies.ConstitCode='@SC'
-				AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD')";
-
+		$query = "
+			SELECT Relationships.RelatedID
+			FROM SynergyOne.dbo.Constituencies Constituencies
+			LEFT JOIN SynergyOne.dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
+			LEFT JOIN SynergyOne.dbo.Community Community ON Relationships.RelatedID = Community.ID
+			WHERE Relationships.ID = {$synergyID}
+			AND Constituencies.ConstitCode='@SC'
+			AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD')
+			ORDER BY Community.BirthDate
+		";
 
 		return $this->getDatabase()->getAll($query);
-
 	}
 
 	function getEmail($id) {

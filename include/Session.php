@@ -79,9 +79,9 @@ class Session
                 $_SESSION['su'] = 1;
 
 
-            if (Cfg::get('external_enable'))
+            if (Cfg::get('external_enable')) {
                 $this->setSynergyInfo($userHandler);
-
+			}
 
             /* Log successful */
             $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
@@ -340,8 +340,7 @@ class Session
     /**
      * @param User $userHandler
      */
-    function setSynergyInfo($userHandler)
-    {
+    function setSynergyInfo($userHandler) {
         $synUser = new External_User;
         $groupHandler = new Group;
         $catHandler = new Category;
