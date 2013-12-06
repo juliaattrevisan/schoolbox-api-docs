@@ -20,12 +20,12 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					162px;
-@logo-height: 					133px;
+@logo-width: 					236px;
+@logo-height: 					71px;
 
 // Generic colors
 @body-background: 				#E6E6E6; // Body, but not the content area
-@content-background: 			#F0F7FE; // Used for forms
+@content-background: 			#F7F7F7; // Used for forms
 @dark: 							#F7F7F7; // Alternate tigerstriping color
 @border-color: 					#EEEEEE; // Bordering @dark
 @alternate-background: 			#EEEEEE; // Sections such as admin
@@ -33,37 +33,38 @@
 // Basic type
 @body-text: 					@black;
 @secondary-text: 				#797979;
-@link: 							#004B87;
+@link: 							#2F5992;
 @link-hover: 					#1F234D;
 
 // Main banner
 @banner-background: 			#FFFFFF;
 @banner-color:      			#2F5992;
 @banner-links:      			@banner-color;
-@banner-height:     			165px;
+@banner-height:     			72px;
 
 // Modules
-@module-heading: 				#FFFFFF;
-@module-background: 			#1f234D;
+@module-heading: 				#013a63;
+@module-background: 			#e4ebf7;
 
 // Refers to the left navigation
-@navigation-width:				175px;
-@navigation-padding:			9px;
+@navigation-width:				190px;
+@navigation-padding:			16px;
 @navigation-background:  		transparent;
 @navigation-color:  			#000000;
-@navigation-links:  			@link;
+@navigation-links:  			#305991;
 @navigation-hover-background: 	#1F234D;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
+@submit-btn:					@navigation-hover-background;
 
 // Main "Tab" Navigation
 @tab-background:				#1F234D;
 @tab-color:						#FFFFFF;
-@tab-hover-background:			@tab-background;
+@tab-hover-background:			#897000;
 @tab-hover-color:				@tab-color;
 
 // Footer text
-@footer-color:					#2F5992;
+@footer-color:					#929292;
 @footer-links:					@footer-color;
 
 // Optional features
@@ -73,6 +74,6 @@
 // 3. Load core
 // =============================================================================
 @import "../core/core.less";
-@import "../core/legacy.less";
+//@import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
