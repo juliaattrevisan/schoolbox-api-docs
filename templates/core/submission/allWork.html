@@ -421,7 +421,7 @@
               editForm.find('label[for='+v+']').attr('for', v+'-'+commentId);
             });
             editForm.prepend(
-                $j('<input type="hidden" />').attr('name', 'commentId').attr('value', commentId)
+                $j('<input type="hidden" />').attr('name', 'commentId').val(commentId)
             );
 
             // safety check

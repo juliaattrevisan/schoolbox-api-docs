@@ -130,7 +130,7 @@ $j(function() {
                 if (self.find('optgroup').length == 0) {
                     // find the first error (non-numeric) option
                     self.children('option').each(function() {
-                        if(!isNumber($j(this).attr('value'))) {
+                        if(!isNumber($j(this).val())) {
                             // insert before me
                             $j(this).before('<optgroup></optgroup>');
                             // break the loop
