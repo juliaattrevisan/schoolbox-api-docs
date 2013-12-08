@@ -145,8 +145,8 @@
 
 				/* Get the ids for this node
 				 */
-				var parentId = $j(this).attr('data-parentid');
-				var rootId = $j(this).attr('data-rootid');
+				var parentId = $j(this).data('parentid');
+				var rootId = $j(this).data('rootid');
 
 				/* Clone an instance of .addPostForm and inject ids
 				 */

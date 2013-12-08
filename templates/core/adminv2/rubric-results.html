@@ -5,7 +5,7 @@
         $j(document).on('change', '#rubric-results input', function(e) {
             var self = $j(this);
             var anchor = self.siblings('a').first();
-            if(self.val() == anchor.attr('data-label')) {
+            if(self.val() == anchor.data('label')) {
                 anchor.addClass('hidden');
             } else {
                 anchor.removeClass('hidden');
@@ -19,7 +19,7 @@
         $j(document).on('click', '#rubric-results li a:not(.btn)', function(e) {
             var self = $j(this);
             var input = self.siblings('input').first();
-            input.val(self.attr('data-label'));
+            input.val(self.data('label'));
             input.trigger('change');
             self.addClass('hidden');
             e.preventDefault();
