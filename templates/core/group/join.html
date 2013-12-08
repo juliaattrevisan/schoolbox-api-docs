@@ -7,14 +7,14 @@
                     join:$j(this).attr('rel')
                 }
 
-                $j(this).attr('checked', true);
+                $j(this).prop('checked', true);
             }
             else {
                 var data = {
                     leave:$j(this).attr('rel')
                 }
 
-                $j(this).attr('checked', false);
+                $j(this).prop('checked', false);
             }
 
             $j.get('/group/joinForm.php', data);

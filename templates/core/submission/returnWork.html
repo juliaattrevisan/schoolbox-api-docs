@@ -14,7 +14,7 @@
 
         $j(document).ready(function() {
             $j('#rubric-tbody td').click(function(){
-                $j(this).find(':radio').attr('checked','checked');
+                $j(this).find(':radio').prop('checked',true);
                 updateRadio();
             });
             updateRadio();

@@ -11,7 +11,7 @@
     function validatePoll () {
         var valid = false;
         $j('input.pollOption').each(function () {
-            if ($j(this).attr('checked'))
+            if ($j(this).prop('checked'))
                 valid = true;
         });
         if (valid)

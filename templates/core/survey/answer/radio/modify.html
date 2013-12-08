@@ -3,7 +3,7 @@
     $j(document).ready(function () {
 
         //add in one clone to start with
-        $j('.answerCorrect').attr('checked', false);
+        $j('.answerCorrect').prop('checked', false);
         refreshList();
 
         var validator = $j("#createQuestionForm").submit(function () {

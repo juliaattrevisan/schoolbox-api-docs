@@ -55,7 +55,7 @@ $j(document).ready(function() {
 		$j(this).mouseup(function () {
 			var node = $j(this);
 			$j("input." + $j(this).attr("id")).each(function () {
-				$j(this).attr("checked",  !(node.attr("checked")));
+				$j(this).prop("checked",  !(node.prop("checked")));
 			});
 		});
 	});

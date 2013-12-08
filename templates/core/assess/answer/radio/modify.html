@@ -32,7 +32,7 @@ $j(document).ready(function() {
 					answerCollection.push({
 						description: description,
 						value: code,
-						correct: elem.find('.answerCorrect').attr('checked')
+						correct: elem.find('.answerCorrect').prop('checked')
 					});
 				}
 			});

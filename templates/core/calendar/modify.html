@@ -43,7 +43,7 @@ $j(function () {
         if ($j('#level').val() == '1') {
             var attendance_input = $j('#attendance input');
 
-			attendance_input.removeAttr('checked');
+			attendance_input.prop('checked', false);
 
             if (attendance_input.parent().hasClass('active-checkbox')) {
                 attendance_input.parent().removeClass('active-checkbox')
@@ -61,7 +61,7 @@ $j(function () {
     });
 
     if ($j('#level').val() == '1') {
-        $j('#attendance input').removeAttr('checked');
+        $j('#attendance input').prop('checked', false);
     }
     else if ($j('#level').val() == "2") {
         $j('#groupDrop, #attendance').show()

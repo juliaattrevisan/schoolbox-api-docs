@@ -430,17 +430,17 @@
               var pvis = editForm.find('input[name=visibility\\[parent\\]]');
 
               if(data.visibility.student) {
-                svis.attr('checked', 'checked');
+                svis.prop('checked', true);
               }
               else {
-                svis.removeAttr('checked');
+                svis.prop('checked', false);
               }
 
               if(data.visibility.parent) {
-                pvis.attr('checked', 'checked');
+                pvis.prop('checked', true);
               }
               else {
-                pvis.removeAttr('checked');
+                pvis.prop('checked', false);
               }
             }
 

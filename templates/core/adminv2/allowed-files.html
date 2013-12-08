@@ -262,7 +262,7 @@
         $j('input[type=checkbox]').change(function () {
             var name = 'input[name=' + $j(this).attr('name') + ']';
 
-            if ($j(this).attr('checked')) {
+            if ($j(this).prop('checked')) {
                 $j(name).val('true');
             }
             else {

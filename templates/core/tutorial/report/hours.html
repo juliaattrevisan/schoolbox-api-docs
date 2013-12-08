@@ -5,7 +5,7 @@ $j(document).ready(function () {
 	$j('#processAll').click(function () {
 		var node = $j(this);
 		$j('.processed').each(function () {
-			$j(this).attr("checked", node.attr("checked"));
+			$j(this).prop("checked", node.prop("checked"));
 		});
 		
 	});

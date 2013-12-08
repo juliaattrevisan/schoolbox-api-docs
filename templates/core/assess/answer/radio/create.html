@@ -3,7 +3,7 @@
 $j(document).ready(function() {
 
 	//add in one clone to start with
-	$j('.answerCorrect').attr('checked', false);
+	$j('.answerCorrect').prop('checked', false);
 	var thing = $j('.hidden-clone li:first-child').clone();
 	$j('ul#answerCollection').append(thing);
 	refreshList();
@@ -38,7 +38,7 @@ $j(document).ready(function() {
 					answerCollection.push({
 						description: description,
 						value: code,
-						correct: elem.find('.answerCorrect').attr('checked')
+						correct: elem.find('.answerCorrect').prop('checked')
 					});
 				}
 			});
