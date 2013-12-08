@@ -2,18 +2,18 @@
 <script type="text/javascript">
 
 $j(function() {
-	if ($j('.checkbox').attr("checked")) {
+	if ($j('.checkbox').prop("checked")) {
 		$j('.hide-questions').show();
-		$j('.hide-questions :input').removeAttr('disabled');
+		$j('.hide-questions :input').prop('disabled', false);
 	}
 
 	$j('.checkbox').click(function() {
 		if ($j('.hide-questions').css("display") == "block") {
 			$j('.hide-questions').hide();
-			$j('.hide-questions :input').attr('disabled', 'true');
+			$j('.hide-questions :input').prop('disabled', true);
 		} else {
 			$j('.hide-questions').show();
-			$j('.hide-questions :input').removeAttr('disabled');
+			$j('.hide-questions :input').prop('disabled', false);
 		}
 	});
 

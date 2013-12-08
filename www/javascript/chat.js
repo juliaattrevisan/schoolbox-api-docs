@@ -299,9 +299,9 @@ $.widget("ui.chat",  {
 
                 /* Act on new config */
                 if ($data.config.muted_users != undefined && $.inArray($self.options.user_id, $data.config.muted_users) > -1) {
-                    $self.options.body_el.attr('disabled', 'disabled');
+                    $self.options.body_el.prop('disabled', true);
                 } else {
-                    $self.options.body_el.removeAttr('disabled');
+                    $self.options.body_el.prop('disabled', false);
                 }
 
                 /* Change state */
@@ -311,7 +311,7 @@ $.widget("ui.chat",  {
                 } else {
                     $j('.light', $self.element).css('background-position', "top");
 
-                    $self.options.body_el.attr('disabled', 'disabled');
+                    $self.options.body_el.prop('disabled', true);
                 }
 
                 var componentID = 'component' + $self.options.component_id;

@@ -29,7 +29,7 @@ $j(document).ready(function () {
 	
 	// disable all elements in forms with class disabled
 	$j(".disabled input, .disabled select").each(function () {
-		$j(this).attr("disabled", "disabled");
+		$j(this).prop("disabled", true);
 	});	
 	
 });

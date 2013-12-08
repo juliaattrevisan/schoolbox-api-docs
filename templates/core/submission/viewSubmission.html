@@ -19,10 +19,10 @@
             callback:function (e) {
                 var btns = $j('#returnWorkForm').find('input.submit-btn-plain');
                 if ($j('.btn.tick').length) {
-                  btns.removeAttr('disabled');
+                  btns.prop('disabled', false);
                 }
                 else {
-                  btns.attr('disabled', 'disabled');
+                  btns.prop('disabled', true);
                 }
             }
         });
