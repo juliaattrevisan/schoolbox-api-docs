@@ -312,7 +312,7 @@
 			form.find('.socialstream-attachment-url').click(function() {
 				form.find('input[name=socialstreamAttachment]').val('url');
 
-				form.find('input[name=url]').val('').removeAttr('readonly', '').closest('li').show();
+				form.find('input[name=url]').val('').prop('readonly', false).closest('li').show();
 				form.find('input[name=file]').closest('li').hide();
 				form.find('.socialstream-selected-file').html('').closest('li').hide();
 
@@ -333,7 +333,7 @@
 			form.find('.socialstream-attachment-resource').click(function() {
 				form.find('input[name=socialstreamAttachment]').val('resource');
 
-				form.find('input[name=url]').val('').attr('readonly', 'readonly').closest('li').show();
+				form.find('input[name=url]').val('').prop('readonly', true).closest('li').show();
 				form.find('input[name=file]').closest('li').hide();
 				form.find('.socialstream-selected-file').html('').closest('li').show();
 			});
