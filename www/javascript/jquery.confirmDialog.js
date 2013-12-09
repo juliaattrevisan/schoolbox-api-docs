@@ -20,7 +20,12 @@
             text: 'Are you sure?',
             dialogOptions: {
                 modal: true,
-                title: 'Confirm'
+                title: 'Confirm',
+                close: function() {
+                    if (settings.destroyDialog) {
+                        $(this).dialog('destroy');
+                    }
+                }
             },
             confirmLabel: 'Yes',
             confirmEvent: function() {
@@ -33,24 +38,18 @@
             destroyDialog: true
         };
         var settings = $.extend(true, {}, defaults, options);
-        var closeDialog = function(dialog) {
-            dialog.dialog('close');
-            if (settings.destroyDialog) {
-                dialog.dialog('destroy');
-            }
-        }
         settings.dialogOptions.buttons = [
             {
                 text:  settings.confirmLabel,
                 click: function() {
                     settings.confirmEvent();
-                    closeDialog($(this));
+                    $(this).dialog('close');
                 }
             },
             {
                 text:  settings.cancelLabel,
                 click: function() {
-                    closeDialog($(this));
+                    $(this).dialog('close');
                 }
             }
         ];
