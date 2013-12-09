@@ -1,11 +1,11 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
-<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type='text/javascript'>
     $j(function () {
 
         $j('#deleteButton').click(
-                function () {
+                function (event) {
                     var allQuestions = $j('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
 
                     if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
@@ -14,23 +14,15 @@
                             location.reload();
                         });
                     }
-                }).confirm({
-                    buttons:{
-                        wrapper:'<button></button>',
-                        separator:'  '
-                    }
+                    event.preventDefault();
+                    $j(this).confirmDialog();
                 });
 
 
-        $j('a.delete').click(
-                function () {
-                    location.href = $j(this).attr('href');
-                }).confirm({
-                    buttons:{
-                        wrapper:'<button></button>',
-                        separator:'  '
-                    }
-                });
+        $j('a.delete').click(function(event) {
+            event.preventDefault();
+            $j(this).confirmDialog();
+        });
 
         $j('input[type=checkbox]').click(function () {
             $j(this).closest('.question').toggleClass('checked')
