@@ -1,13 +1,13 @@
 <?php
 
-require_once __DIR__.'/../../include/Bootstrap.php';
+require_once __DIR__.'/../../../include/Bootstrap.php';
 
 if (Config::get('site_location') === 'bialik') {
     $component = array(
         'name'               => 'Library Search',
         'module'             => 'homepage',
         'component_category' => '5',
-        'class'              => 'Component_Homepage_BlankController',
+        'class'              => 'Component_Homepage_BialikSearchController',
         'description'        => 'Library Search',
         'multiple'           => 'false',
         'visible'            => 'false',
