@@ -30,12 +30,6 @@
         LogLevel warn
         CustomLog /var/log/apache2/schoolbox_access.log combined
 
-        # Minify Exceptions
-        <Directory /usr/share/schoolbox/www/min>
-                RewriteEngine on
-                RewriteRule ^([a-z]=.*)  index.php?$1  [L,NE]
-        </Directory>
-
         # MGS Sport Module Exceptions
         <Directory /usr/share/schoolbox/www/modules/sport>
                 php_flag apc.enabled off
