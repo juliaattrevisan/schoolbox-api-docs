@@ -1,18 +1,12 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $j(function(){
 
-        $j('a.delete-comment').click(function(){
-            location.href = $j(this).attr('href');
-        }).confirm({
-            msg: 'Delete this comment? ',
-            wrapper: '<span class="confirm"></span>',
-            buttons: {
-                wrapper:'<button></button>',
-                separator:'  '
-            }
-        });
+        $j('a.delete-comment').click(function(event) {
+            event.preventDefault();
+            $j(this).confirmDialog({text:'Delete this comment?'});
+        })
 
         $j(document).on('click', "#component{COMPONENT_INSTANCE_ID} a.show-comments", function(e) {
             $j(this).siblings('ul.comments').show(100);
