@@ -32,11 +32,21 @@
 ----------------------------------*/
 
 /* states and images */
-.ui-icon { width: 16px; height: 16px; .threshold_icons(@content-background); }
-.ui-widget-content .ui-icon { .threshold_icons(@content-background); }
+.ui-icon, .ui-widget-content .ui-icon { .threshold_icons(@content-background); }
 .ui-widget-header .ui-icon { .threshold_icons(@module-background); }
 .ui-state-default .ui-icon { .threshold_icons(@content-background); }
 .ui-state-hover .ui-icon, .ui-state-focus .ui-icon { .threshold_icons(@link); }
 .ui-state-active .ui-icon { .threshold_icons(@link); }
 .ui-state-highlight .ui-icon { .threshold_icons(@content-background); }
 .ui-state-error .ui-icon, .ui-state-error-text .ui-icon { .threshold_icons(@content-background); }
+
+/* Overlays */
+.ui-widget-overlay {
+    background-image: none;
+}
+.ui-widget-shadow {
+    background-image: none;
+}
+.ui-progressbar .ui-progressbar-overlay {
+    background-image: url(/images/core/jqueryui/animated-overlay.gif);
+}
