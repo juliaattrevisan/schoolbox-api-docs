@@ -6,33 +6,27 @@
 
 /* Component containers
 ----------------------------------*/
-.ui-widget { font-size: 1.1em; }
-.ui-widget .ui-widget { font-size: 1em; }
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-size: 1em; }
-.ui-widget-content { border: 1px solid @border-color; background: @content-background; color: @body-text; }
+.ui-widget-content { border-color: @border-color; background: @content-background; color: @body-text; }
 .ui-widget-content a { color: @link; }
-.ui-widget-header { border: none; background: @module-background; color: @module-heading; font-weight: bold; }
+.ui-widget-header { background: @module-background; color: @module-heading; }
 .ui-widget-header a { color: @module-heading; }
 
 /* Interaction states
 ----------------------------------*/
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid @border-color; background: @content-background; font-weight: bold; color: @body-text; }
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: @body-text; text-decoration: none; }
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid @border-color; background: @link; font-weight: bold; .threshold_neg(@link); }
-.ui-state-hover a, .ui-state-hover a:hover, .ui-state-hover a:link, .ui-state-hover a:visited { .threshold_neg(@link); text-decoration: none; }
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid @border-color; background: @banner-background; font-weight: bold; color: @banner-color; }
-.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { .threshold_neg(@link); text-decoration: none; }
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border-color: @border-color; background: @content-background; color: @body-text; }
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: @body-text; }
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border-color: @border-color; background: @link; .threshold_neg(@link); }
+.ui-state-hover a, .ui-state-hover a:hover, .ui-state-hover a:link, .ui-state-hover a:visited { .threshold_neg(@link); }
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border-color: @border-color; background: @banner-background; color: @banner-color; }
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { .threshold_neg(@link); }
 
 /* Interaction Cues
 ----------------------------------*/
-.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight  {border: 1px solid darken(@highlight-color,@darken-value); background: @highlight-color; color: @body-text; }
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight  {border-color: darken(@highlight-color,@darken-value); background: @highlight-color; color: @body-text; }
 .ui-state-highlight a, .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: @body-text; }
-.ui-state-error, .ui-widget-content .ui-state-error, .ui-widget-header .ui-state-error {border: 1px solid darken(@highlight-color,@darken-value); background: @highlight-color; color: @negative-color; }
+.ui-state-error, .ui-widget-content .ui-state-error, .ui-widget-header .ui-state-error {border-color: darken(@highlight-color,@darken-value); background: @highlight-color; color: @negative-color; }
 .ui-state-error a, .ui-widget-content .ui-state-error a, .ui-widget-header .ui-state-error a { color: @negative-color; }
 .ui-state-error-text, .ui-widget-content .ui-state-error-text, .ui-widget-header .ui-state-error-text { color: @negative-color; }
-.ui-priority-primary, .ui-widget-content .ui-priority-primary, .ui-widget-header .ui-priority-primary { font-weight: bold; }
-.ui-priority-secondary, .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
-.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
 
 /* Icons
 ----------------------------------*/
