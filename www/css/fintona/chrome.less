@@ -24,7 +24,7 @@
 @logo-height: 					23px;
 
 // Generic colors
-@body-background: 				#f3f4f3; // Body, but not the content area
+@body-background: 				#eff0f0; // Body, but not the content area
 @content-background: 			#FFFFFF; // Used for forms
 @dark: 							#FAFAFA; // Alternate tigerstriping color
 @border-color: 					#EEEEEE; // Bordering @dark
@@ -37,29 +37,29 @@
 @link-hover: 					#FF5A00;
 
 // Main banner
-@banner-background: 			#5ac2f1;
-@banner-color:      			#404041;
+@banner-background: 			#00adef;
+@banner-color:      			#ffffff;
 @banner-links:      			@banner-color;
 @banner-height:     			72px;
 
 // Modules
-@module-heading: 				@banner-color;
-@module-background: 			#cff0fc;
+@module-heading: 				#373b3b;
+@module-background: 			#dbf3fd;
 
 // Refers to the left navigation
 @navigation-width:				200px;
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
-@navigation-color:  			@banner-color;
-@navigation-links:  			#606d65;
-@navigation-hover-background: 	#acb6af;
+@navigation-color:  			@module-heading;
+@navigation-links:  			#6d7073;
+@navigation-hover-background: 	@navigation-links;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
 
 // Main "Tab" Navigation
 @tab-background:				#FFFFFF;
 @tab-color:						@banner-background;
-@tab-hover-background:			#7d8a82;
+@tab-hover-background:			#6d7073;
 @tab-hover-color:				@tab-background;
 
 // Footer text
@@ -75,48 +75,123 @@
 // 4. Any overrides for styles can be specified below
 // =============================================================================
 
+body.login{
+  background: transparent;
+
+  #bg-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    top: 0;
+    left: 0;
+  }
+
+  #header{ background: transparent; }
+
+  #container.login{
+    background: rgb(0, 173, 239); /* Le Fallback */
+    background: rgba(0, 173, 239, 0.7);
+    width: 312px;
+    padding: 24px;
+
+    a{
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    p.error{
+      color: #ffffff;
+      margin: 25px 0 16px 0;
+    }
+
+    #loginForm{
+      color: #373b3b;
+      font-weight: bold;
+
+      input{
+        width: 94%;
+        height: 26px;
+        padding: 7px 3%;
+      }
+      ::-webkit-input-placeholder { color: #373b3b; font-weight: bold; }
+      :-moz-placeholder { color: #373b3b; font-weight: bold; } /* Firefox 18- */
+      ::-moz-placeholder { color: #373b3b; font-weight: bold; } /* Firefox 19+ */
+      :-ms-input-placeholder { color: #373b3b; font-weight: bold; }
+
+      .submit-btn-plain{
+        background: #373b3b url('/images/fintona/chevron.png') 105px 11px no-repeat;
+        font-weight: bold;
+        font-size: 13px;
+        float: left;
+        width: 128px;
+        height: 40px;
+        padding: 0 3%;
+        text-align: left;
+        &:hover{ background-color: #355056; }
+      }
+    }
+  }
+  #footer{
+    background: url('/images/fintona/infinite.png') top right no-repeat;
+    height: 30px;
+    padding: 65px 0 0 0;
+
+    #infinte-line{
+      background: url('/images/fintona/infinite-line.png') top right repeat-x;
+      margin-right: 367px;
+      position: relative;
+      height: 1px;
+      top: -40px;
+    }
+  }
+}
+
 body{
-  background: #f3f4f3 url('../../images/fintona/content-bg.png') bottom left no-repeat;
+  background: #eff0f0 url('../../images/fintona/content-bg.png') bottom left no-repeat;
 }
 
 #header{
-  background: #5ac2f1 url('../../images/fintona/flower-bg.png') 200px 0px no-repeat;
+  background: #00adef url('../../images/fintona/flower-bg.png') 200px 0px no-repeat;
+
+  .logo {
+    left: 18px;
+    top: 24px;
+  }
+
+  #search-field {
+    background: #FFFFFF;
+    color: #606d65;
+    padding: 6px 0 0 8px;
+    width: 248px;
+  }
+
+  #search-button{
+    background: url("/images/fintona/search-button.png") 1px 9px no-repeat;
+    float: left;
+    left: auto;
+    right: 0;
+  }
+
+  #tabs li a{
+    border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+  }
 }
 
-#header .logo {
-  left: 18px;
-  top: 24px;
-}
-
-#search-field {
-  background: #FFFFFF;
-  color: #606d65;
-  padding: 6px 0 0 8px;
-  width: 248px;
-}
-
-#search-button{
-  background: url("/images/fintona/search-button.png") 1px 9px no-repeat;
-  float: left;
-  left: auto;
-  right: 0;
-}
-
-#tabs li a{
-  border-radius: 4px 4px 0 0;
-  -moz-border-radius: 4px 4px 0 0;
-  -webkit-border-radius: 4px 4px 0 0;
+h1{
+  color: @module-heading;
 }
 
 #category li a.current{
-  background: #acb6af;
+  background: #6d7073;
   color: #FFFFFF;
 }
 
 /*
  * Demo Dashboards
  */
-
 .demo-dash{
 	li{ float: left;
 		padding: 7px 4px !important;
