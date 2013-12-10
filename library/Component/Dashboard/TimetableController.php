@@ -103,9 +103,22 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $this->setVar("campus_timetable_block", '');
         $now             = new Alaress_Date_Format(time(), 'U');
         $attendance_date = $now->getDatabaseDate();
-        foreach ($this->timetable as $campus_id => $timetable) {
 
-            if (is_array($timetable) && !empty($timetable)) {
+        foreach ($this->timetable as $campus_id => $timetable) {
+			$classCount = 0;
+
+			/* Find out if the current campus timetable has any classes associated
+			 * with the timetable definition. If not, skip its rendering altogether
+			 */
+			if (is_array($timetable) && count($timetable)) {
+				foreach($timetable as $currentPeriod) {
+					if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
+						$classCount++;
+					}
+				}
+			}
+
+            if (is_array($timetable) && !empty($timetable) && $classCount) {
                 if ($timetable_count > 1) {
                     $this->setVar("CAMPUS_NAME", $campus_list[$campus_id]->getName());
                     $this->parse('timetable_campus_name_block', 'timetable_campus_name');
