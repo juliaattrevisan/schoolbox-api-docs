@@ -70,8 +70,16 @@ $contextSelector->render($this, 'CONTEXT_SELECTOR', array(
 /* Use provided ID, or check for the subjects the user is involved with */
 if(isset($this->arg[2]) && is_numeric($this->arg[2])){
     $subjectList[] = $this->arg[2];
+
+	$this->setVar(array(
+		'SEMESTER_CONTEXT_CATEGORY_ID' => '/' . $this->arg[2]
+	));
 }
 else {
+	$this->setVar(array(
+		'SEMESTER_CONTEXT_CATEGORY_ID' => '',
+	));
+
     $involvedIn = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
     if(is_array($involvedIn)) {
         foreach($involvedIn as $subject) {
