@@ -38,12 +38,33 @@ if (!empty($_POST)) {
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
     $answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
-    $questionHandler->update($_POST);
+	/* If configuration was provided
+	 */
+	$configuration = null;
+
+	if (isset($_POST['configuration'])) {
+		$allConfiguration = json_decode($_POST['configuration']);
+
+		$config = array();
+
+		/* Compress checkboxes
+		 */
+		foreach($allConfiguration as $currentConfiguration) {
+			$config[$currentConfiguration->name] = $currentConfiguration->value;
+		}
+	}
+
+	/* Put that data in the question
+	 */
+	$data = $_POST;
+	$data['config'] = json_encode($config);
+
+    $questionHandler->update($data);
     $answerHandler->update($_POST);
 
     /* Find the assess summary page
      */
-    SitePage::localRedir('/assess/summary/' . $section['assess_id']);
+//    SitePage::localRedir('/assess/summary/' . $section['assess_id']);
 } else {
     if (!is_numeric($this->arg[0])) {
         error(115);
