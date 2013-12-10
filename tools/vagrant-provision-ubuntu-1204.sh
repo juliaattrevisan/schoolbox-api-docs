@@ -116,14 +116,6 @@ then
 	fi
 	apt-get -y install nodejs
 
-	echo "$vag Checking if Bower is installed";
-	# Only attempt to install bower if it isn't installed already
-	`bower -v > /dev/null 2>&1`
-	if [ $? -ne 0 ];
-	then
-	    echo "$vag Installing Bower";
-		npm install -g bower;
-	fi;
 	echo "$vag Installing JS submodules with Bower";
 	/vagrant/tools/bower.sh;
 
