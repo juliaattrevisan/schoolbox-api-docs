@@ -136,7 +136,24 @@ if (is_array($outputList)) {
 			error(22);
 	    }
 
-        if (is_array($timetable) && !empty($timetable)) {
+		$classCount = 0;
+
+		/* Find out if the current campus timetable has any classes associated
+		 * with the timetable definition. If not, skip its rendering altogether
+		 */
+		if (is_array($timetable) && count($timetable)) {
+			foreach($timetable as $currentDay) {
+				if (is_array($currentDay['day']) && count($currentDay['day'])) {
+					foreach($currentDay['day'] as $currentPeriod) {
+						if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
+							$classCount++;
+						}
+					}
+				}
+			}
+		}
+
+        if (is_array($timetable) && !empty($timetable) && $classCount) {
             $days = count($timetable[1]['day']);
 
             $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));
