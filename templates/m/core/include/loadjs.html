@@ -315,7 +315,7 @@ window.addEventListener("popstate", function(e) {
 })
 
 // back button listener
-$('#nav').delegate('#nav_back', clickEvent, function(e) {
+$('#nav').on(clickEvent, '#nav_back', function(e) {
     history.go(-1)
 });
 

@@ -12,14 +12,14 @@ $j(function() {
     /**
      * Click event for selecting a folder - triggers the actual select node event.
      */
-    $j('#tree').delegate('tr:not(.server)', 'click.tree', function() {
+    $j('#tree').on('click.tree', 'tr:not(.server)', function() {
         $j(this).trigger('selectNode.tree');
     });
 
     /**
      * Select node event
      */
-    $j('#tree').delegate('tr:not(.server)', 'selectNode.tree', function() {
+    $j('#tree').on('selectNode.tree', 'tr:not(.server)', function() {
         /* select folder */
         $j('#tree .selected').removeClass('selected');
         $j(this).addClass('selected');

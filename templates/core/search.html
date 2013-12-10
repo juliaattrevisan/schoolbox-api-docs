@@ -24,7 +24,7 @@ $j(function() {
 	}
 
     $j(document).ready(function() {
-        $j('#content div.results').delegate('a.more', 'click', function() {
+        $j('#content div.results').on('click', 'a.more', function() {
             var type = $j(this).attr('rel');
             var selector = '#type a[rel='+type+']';
             $j(selector).trigger('click');

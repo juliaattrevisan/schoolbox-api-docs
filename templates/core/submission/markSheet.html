@@ -97,7 +97,7 @@
 
   var table = $j('#content').children('table.mark-sheet');
 
-  table.delegate('input', 'change', function(e) {
+  table.on('change', 'input', function(e) {
     var self = $j(this);
 
     // disable self

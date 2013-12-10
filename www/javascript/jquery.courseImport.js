@@ -29,7 +29,7 @@
             inputs.prop('disabled', !is_now_enabled);
             row.data('enabled', is_now_enabled);
         }
-        form.delegate('input[data-interaction="enable"]', 'click.courseImport', function() {
+        form.on('click.courseImport', 'input[data-interaction="enable"]', function() {
             enableUnitClickEvent($(this));
             form.valid();
         });

@@ -396,7 +396,7 @@
       return false;
     })
 
-    $j('#comment-table').delegate('a.btn.no-text', 'click', function() {
+    $j('#comment-table').on('click', 'a.btn.no-text', function() {
       // if a button on the table is clicked, find out its context and function, and execute
       var btn = $j(this);
       var row = btn.closest('tr');
@@ -479,7 +479,7 @@
       }
     });
 
-    $j('#comment-table').delegate('form.edit-comment a.submit-this', 'click', function() {
+    $j('#comment-table').on('click', 'form.edit-comment a.submit-this', function() {
       var form = $j(this).closest('form');
       var commentId = form.closest('tr').data('id');
 
