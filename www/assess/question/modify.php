@@ -57,6 +57,9 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 
+	$this->setBlock(TEMPLATE_content, 'has_answer_configuration', 'has_answer_configuration_block');
+	$this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
+
     $questionHandler = new Assess_Question();
     $question = $questionHandler->getByID($this->arg[0]);
 
@@ -85,6 +88,32 @@ if (!empty($_POST)) {
     /* Show question type options. For the Modify, preselect whichever it was
      */
     $currentQuestionType = $questionHandler->getQuestionType($question['type_id']);
+
+	/* Question-specific answer configuration
+	 */
+	$hasAnswerConfiguration = false;
+
+	if ($currentQuestionType['classname'] == 'Multi') {
+		$hasAnswerConfiguration = true;
+	}
+
+	/* Load answer configurations template into answer_configuration_form_fragment
+	 * block if there are configuration options available
+	 */
+	if ($hasAnswerConfiguration) {
+		$this->setFile('answer_configuration_fragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/configuration.html');
+		$this->setBlock('answer_configuration_fragment', 'answer_configuration_form_fragment', 'answer_configuration_form_fragment_block');
+
+		$this->setVar(array());
+
+		$this->parse('answer_configuration_block', 'answer_configuration_fragment');
+		$this->parse('has_answer_configuration_block', 'has_answer_configuration');
+	}
+	else {
+		$this->setVar(array(
+			'has_answer_configuration_block' => ''
+		));
+	}
 
     /* Load answer template into answerOption block
      */
