@@ -39,9 +39,9 @@ foreach($includes as $file){
 $files = array(
     # Styles
     "/css/$location/mchrome.css",
-    # Scripts
-    '/m/inc/js/libs/zepto.min.js',
-    '/m/inc/js/libs/iscroll-lite.js',
+    # Scripts - will eventually bower all of these.
+    '/javascript/components/jquery/jquery.min.js',
+    '/javascript/iscroll/iscroll.js',
     # Images
     "/images/$location/favicon.ico",
     "/images/$location/hercules.png",
