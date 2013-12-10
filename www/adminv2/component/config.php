@@ -115,7 +115,12 @@ function writeConfig($vars) {
     // config values
     $cclass = $instance->getDefinition()->getClass();
     /** @var Component_ControllerAbstract $controller */
-    $controller = new $cclass($instance, new \Schoolbox\User(), new SitePage());
+
+	/* CalendarController has a different interface to be compatible elsewhere
+	 * It has been that way since January 2012?
+	 */
+	$controller = new $cclass($instance, new \Schoolbox\User(), new SitePage());
+
     $controller->execute();
 
     /** @var Component_ConfigDefinition $confD */
