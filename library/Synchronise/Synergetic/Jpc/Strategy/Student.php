@@ -54,6 +54,7 @@ class Synchronise_Synergetic_Jpc_Strategy_Student extends Synchronise_Synergetic
         $newUser['synergy_id'] = $currentUser['StudentID'];
         $newUser['local_email'] = 1;
         $newUser['eportfolio_enabled'] = 0;
+        $newUser['webmail'] = 1;
 
 
 		/* Year level
