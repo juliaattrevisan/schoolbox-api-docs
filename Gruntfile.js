@@ -49,8 +49,8 @@ module.exports = function(grunt) {
                     'www/javascript/components/jquery.ui/ui/jquery.ui.tabs.js',
                     'www/javascript/components/jquery.ui/ui/jquery.ui.tooltip.js'
                 ],
-                dest: 'www/javascript/<%= pkg.name %>.min.js',
-                sourceMap: 'www/javascript/<%= pkg.name %>.map.js'
+                dest: 'www/javascript/components/<%= pkg.name %>.min.js',
+                sourceMap: 'www/javascript/components/<%= pkg.name %>.map.js'
             }
         }
     });
