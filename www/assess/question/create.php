@@ -40,7 +40,28 @@ if (!empty($_POST)) {
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
     $answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
-    $question_id = $questionHandler->create($_POST);
+	/* If configuration was provided
+	 */
+	$configuration = null;
+
+	if (isset($_POST['configuration'])) {
+		$allConfiguration = json_decode($_POST['configuration']);
+
+		$config = array();
+
+		/* Compress checkboxes
+		 */
+		foreach($allConfiguration as $currentConfiguration) {
+			$config[$currentConfiguration->name] = $currentConfiguration->value;
+		}
+	}
+
+	/* Put that data in the question
+	 */
+	$data = $_POST;
+	$data['config'] = json_encode($config);
+
+    $question_id = $questionHandler->create($data);
     $answer_id = $answerHandler->create($_POST, $question_id);
 
     if (!$question_id) {
@@ -81,9 +102,15 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
-    $this->setTitle('Create Question');
+	$this->setBlock(TEMPLATE_content, 'has_answer_configuration', 'has_answer_configuration_block');
+	$this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
 
-    $this->setVar('question_block', '');
+	$this->setTitle('Create Question');
+
+    $this->setVar(array(
+		'question_block' => '',
+		'has_answer_configuration_block' => ''
+	));
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
@@ -136,6 +163,26 @@ if (!empty($_POST)) {
             $answerHandler->modify($this);
 
             $this->parse('answerInputs_block', 'answerFormFragment', true);
+
+			/* Question-specific answer configuration
+			 *
+			 * Load answer configurations template into answer_configuration_form_fragment
+			 * block if there are configuration options available
+			 */
+			if ($currentQuestionType['has_config'] == 'true') {
+				$this->setFile('answer_configuration_fragment', 'assess/answer/' . $factory->getQuestionType($this->arg[1]) . '/configuration.html');
+				$this->setBlock('answer_configuration_fragment', 'answer_configuration_form_fragment', 'answer_configuration_form_fragment_block');
+
+				$answerHandler->configure($this, json_encode(array()));
+
+				$this->parse('answer_configuration_block', 'answer_configuration_fragment');
+				$this->parse('has_answer_configuration_block', 'has_answer_configuration');
+			}
+			else {
+				$this->setVar(array(
+					'has_answer_configuration_block' => ''
+				));
+			}
 
             /* We've set the template, so remember this
              */
