@@ -12,7 +12,7 @@
 #
 #
 
-lessversion='1.3.3'
+lessversion='1.5.1'
 
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
