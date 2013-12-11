@@ -60,7 +60,8 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
             'type_id' => $typeID,
             'question' => $question['question'],
             'answer' => $answer['answer'],
-            'marks' => $marks
+            'marks' => $marks,
+			'config' => $question['config'],
         ));
     }
 }
