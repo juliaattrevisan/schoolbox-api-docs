@@ -192,4 +192,36 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
 			));
 		}
 	}
+
+	/**
+	 * Configure question/configure answer
+	 *
+	 * @param $page
+	 * @param $config
+	 */
+	public function configureXml($page, $config) {
+		$options = json_decode($config);
+
+		/* std objects cast as arrays -_- since json.stringify
+		 * compiles them into anonymous objects
+		 */
+		$keys = array_keys((array)$options);
+
+		if (is_array($keys) && count($keys)) {
+
+			foreach($keys as $currentConfigOption) {
+				$page->setVar(array(
+					'ANSWER_CONFIGURATION_NAME' => $currentConfigOption,
+					'ANSWER_CONFIGURATION_VALUE' => $options->$currentConfigOption
+				));
+
+				$page->parse('answer_configuration_block', 'answer_configuration', true);
+			}
+		}
+		else {
+			$page->setVar(array(
+				'answer_configuration_block' => ''
+			));
+		}
+	}
 }

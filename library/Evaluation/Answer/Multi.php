@@ -114,6 +114,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 	public function configure() {
 	}
 
+	/**
+	 * Configure question/configure answers, in xml format
+	 */
+	public function configureXml() {
+	}
+
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.

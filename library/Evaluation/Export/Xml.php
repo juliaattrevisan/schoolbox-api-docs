@@ -10,6 +10,14 @@
 abstract class Evaluation_Export_Xml {
 	protected $assess = array();
 	protected $sectionHandler = null;
+
+	/**
+	 * An instance of Evaluation_Question_Handler
+	 *
+	 * @var null
+	 */
+	protected $questionHandler = null;
+
 	protected $factory = null;
 	protected $page = null;
 
@@ -26,11 +34,13 @@ abstract class Evaluation_Export_Xml {
 	 * @param $assess
 	 * @param $factory
 	 * @param $sectionHandler
+	 * @param $questionHandler
 	 * @param $page
 	 */
-	public function __construct($assess, $factory, $sectionHandler, $page) {
+	public function __construct($assess, $factory, $sectionHandler, $questionHandler, $page) {
 		$this->setAssess($assess);
 		$this->setSectionHandler($sectionHandler);
+		$this->setQuestionHandler($questionHandler);
 		$this->setFactory($factory);
 		$this->setPage($page);
 
@@ -54,6 +64,7 @@ abstract class Evaluation_Export_Xml {
 		$this->getPage()->setBlock('xml', 'section', 'section_block');
 		$this->getPage()->setBlock('section', 'answerInputs', 'answerInputs_block');
 		$this->getPage()->setBlock('section', 'question', 'question_block');
+		$this->getPage()->setBlock('question', 'answer_configuration', 'answer_configuration_block');
 
 		$assess = $this->getAssess();
 
@@ -104,6 +115,20 @@ abstract class Evaluation_Export_Xml {
 								'QUESTION_TYPE_MOODLE' => $this->getFactory()->getMoodleQuestionType($currentQuestion['type_id']),
 							));
 
+							/* Question-specific answer configuration
+							 *
+							 * Load answer configurations template into answer_configuration_form_fragment
+							 * block if there are configuration options available
+							 */
+							$currentQuestionType = $this->getQuestionHandler()->getQuestionType($currentQuestion['type_id']);
+
+							if ($currentQuestionType['has_config'] == 'true') {
+								$answerHandler->configureXml($this->getPage(), $currentQuestion['config']);
+							}
+							else {
+
+							}
+
 							/* Load individual answers
 							 */
 							$answerHandler->exportMoodleAnswer($this->getPage(), $currentQuestion['question_id']);
@@ -133,8 +158,8 @@ abstract class Evaluation_Export_Xml {
 	 * Render headers and xml data
 	 */
 	public function render() {
-		header('Content-type: text/xml');
-		header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
+//		header('Content-type: text/xml');
+//		header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
 
 		$this->getPage()->template->pparse('finaloutput', 'xml');
 
@@ -271,5 +296,23 @@ abstract class Evaluation_Export_Xml {
 	 */
 	protected function getAllSections() {
 		return $this->allSections;
+	}
+
+	/**
+	 * Set question handler
+	 *
+	 * @param null $questionHandler
+	 */
+	protected function setQuestionHandler($questionHandler) {
+		$this->questionHandler = $questionHandler;
+	}
+
+	/**
+	 * Get question handler
+	 *
+	 * @return null
+	 */
+	protected function getQuestionHandler() {
+		return $this->questionHandler;
 	}
 }

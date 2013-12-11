@@ -13,6 +13,7 @@ $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $groupHandler = new Group();
+$questionHandler = new Assess_Question();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -34,5 +35,5 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 
 /* Export xml
  */
-$xml = new Assess_Export_Xml($assess, $factory, $sectionHandler, $this);
+$xml = new Assess_Export_Xml($assess, $factory, $sectionHandler, $questionHandler, $this);
 $xml->render();
