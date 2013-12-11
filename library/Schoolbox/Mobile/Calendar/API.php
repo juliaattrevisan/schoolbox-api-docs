@@ -24,22 +24,21 @@ use ClientDevice;
 class API extends Generic\API {
 
     public function Month($date = '', $user = null) {
-
-	    try {
-		    $user = $user ? UserMapper::getInstance()->findById($user) : $_SESSION['user'];
-
-		    // visibility check
-		    $gHandler = new \Group();
-		    if($gHandler->isStudent() && $user->getId() != $_SESSION['user']) {
-			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
-		    }
-		    if($gHandler->isParent() && !$gHandler->isParentOfChild($user->getId())) {
-			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
-		    }
-	    }
-	    catch(\Schoolbox\Mapper\Exception $e) {
-		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
-	    }
+        try {
+            $user = $this->getUserForCalendar($user);
+        }
+        catch (\Exception_Schoolbox_NotAuthenticated $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_UNAUTHORIZED);
+        }
+        catch (\Exception_Schoolbox_AccessDenied $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+        }
+        catch (\Exception_Schoolbox_NotFound $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+        }
+        catch (\Exception $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_SERVER_ERROR);
+        }
 
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
@@ -132,24 +131,23 @@ class API extends Generic\API {
     }
 
     public function Week($date = '', $user = null) {
+        try {
+            $user = $this->getUserForCalendar($user);
+        }
+        catch (\Exception_Schoolbox_NotAuthenticated $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_UNAUTHORIZED);
+        }
+        catch (\Exception_Schoolbox_AccessDenied $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+        }
+        catch (\Exception_Schoolbox_NotFound $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+        }
+        catch (\Exception $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_SERVER_ERROR);
+        }
 
-	    try {
-		    $user = $user ? UserMapper::getInstance()->findById($user) : $_SESSION['user'];
-
-		    // visibility check
-		    $gHandler = new \Group();
-		    if($gHandler->isStudent() && $user->getId() != $_SESSION['user']) {
-			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
-		    }
-		    if($gHandler->isParent() && !$gHandler->isParentOfChild($user->getId())) {
-			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
-		    }
-	    }
-	    catch(\Schoolbox\Mapper\Exception $e) {
-		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
-	    }
-
-	    $response = new Response_HTTP();
+        $response = new Response_HTTP();
         $selected = $this->parseDate($date);
 
         $dayOfWeek = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
@@ -187,22 +185,21 @@ class API extends Generic\API {
     }
 
     public function Agenda($date = '', $limit = 7, $user = null) {
-
-	    try {
-		    $user = $user ? UserMapper::getInstance()->findById($user) : $_SESSION['user'];
-
-		    // visibility check
-		    $gHandler = new \Group();
-		    if($gHandler->isStudent() && $user->getId() != $_SESSION['user']) {
-			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
-		    }
-		    if($gHandler->isParent() && !$gHandler->isParentOfChild($user->getId())) {
-			    return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
-		    }
-	    }
-	    catch(\Schoolbox\Mapper\Exception $e) {
-		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
-	    }
+        try {
+            $user = $this->getUserForCalendar($user);
+        }
+        catch (\Exception_Schoolbox_NotAuthenticated $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_UNAUTHORIZED);
+        }
+        catch (\Exception_Schoolbox_AccessDenied $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
+        }
+        catch (\Exception_Schoolbox_NotFound $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+        }
+        catch (\Exception $e) {
+            return new Response_HTTP(Response_HTTP::HTTP_SERVER_ERROR);
+        }
 
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
@@ -524,5 +521,39 @@ class API extends Generic\API {
 		}
 
         return $response;
+    }
+
+    /**
+     * Retrieves the user to return a calendar for.
+     *
+     * @param mixed $userId
+     *
+     * @return \Schoolbox\User
+     * @throws \Exception_Schoolbox_NotAuthenticated if user isn't logged in
+     * @throws \Exception_Schoolbox_AccessDenied     if authd user can't see $userId's calendar
+     * @throws \Exception_Schoolbox_NotFound         if $userId wasn't found
+     */
+    protected function getUserForCalendar($userId) {
+        $currentUser = $_SESSION['user'];
+        if (!($currentUser instanceof \Schoolbox\User)) {
+            throw new \Exception_Schoolbox_NotAuthenticated();
+        }
+        try {
+            $user = $userId ? UserMapper::getInstance()->findById($userId) : $currentUser;
+            if ($user->getId() != $currentUser->getId()) {
+                // visibility check
+                $gHandler = new \Group();
+                if ($gHandler->isStudent() && $user->getId() != $_SESSION['user']) {
+                    throw new \Exception_Schoolbox_AccessDenied();
+                }
+                if ($gHandler->isParent() && !$gHandler->isParentOfChild($user->getId())) {
+                    throw new \Exception_Schoolbox_AccessDenied();
+                }
+            }
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+            throw new \Exception_Schoolbox_NotFound();
+        }
+        return $user;
     }
 }
