@@ -4,7 +4,11 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                sourceMap: 'www/javascript/components/<%= pkg.name %>.map.js',
+                sourceMapRoot: '/',
+                sourceMapPrefix: 1,
+                sourceMappingURL: '<%= pkg.name %>.map.js'
             },
             build: {
                 // Bower files
@@ -49,8 +53,7 @@ module.exports = function(grunt) {
                     'www/javascript/components/jquery.ui/ui/jquery.ui.tabs.js',
                     'www/javascript/components/jquery.ui/ui/jquery.ui.tooltip.js'
                 ],
-                dest: 'www/javascript/components/<%= pkg.name %>.min.js',
-                sourceMap: 'www/javascript/components/<%= pkg.name %>.map.js'
+                dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
         }
     });
