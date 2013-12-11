@@ -122,8 +122,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id)
-    {
+    public function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -131,10 +130,18 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-			shuffle($allAnswers);
-			shuffle($allAnswers);
-			shuffle($allAnswers);
-			shuffle($allAnswers);
+			/* Only shuffle on request
+			 */
+			$question = $this->questionHandler->getByID($question_id);
+
+			$config = json_decode($question['config']);
+
+			if ($config->randomiseOptionOrder) {
+				shuffle($allAnswers);
+				shuffle($allAnswers);
+				shuffle($allAnswers);
+				shuffle($allAnswers);
+			}
 
 			/* A
 			 */

@@ -18,6 +18,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
         parent::__construct();
 
         $this->responseHandler = new Assess_Response();
+		$this->questionHandler = new Assess_Question();
     }
 
     /**
