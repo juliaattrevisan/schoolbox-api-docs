@@ -208,7 +208,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
 		$keys = array_keys((array)$options);
 
 		if (is_array($keys) && count($keys)) {
-
 			foreach($keys as $currentConfigOption) {
 				$page->setVar(array(
 					'ANSWER_CONFIGURATION_NAME' => $currentConfigOption,

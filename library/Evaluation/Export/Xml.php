@@ -136,8 +136,11 @@ abstract class Evaluation_Export_Xml {
 							$this->getPage()->parse('answerInputs_block', 'answerFormFragment', true);
 							$this->getPage()->parse('question_block', 'question', true);
 
+							/* Clear children after parsing out the parent
+							 */
 							$this->getPage()->setVar('answerFormFragment', '');
 							$this->getPage()->setVar('answerInputs_block', '');
+							$this->getPage()->setVar('answer_configuration_block', '');
 						}
 					}
 				}
