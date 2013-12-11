@@ -81,14 +81,23 @@ module.exports = function(grunt) {
                     ext: '.css'
                 }]
             }
+        },
+        clean: {
+            js: ['www/javascript/components/*'],
+            css: [
+                'www/css/*/chrome.css',
+                'www/css/*/mchrome.css'
+            ]
         }
     });
 
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-bower-task');
 
     grunt.registerTask('build-js',  ['bower', 'uglify']);
     grunt.registerTask('build-css', ['bower', 'less']);
-    grunt.registerTask('default',   ['build-js', 'build-css']);
+    grunt.registerTask('build',     ['bower', 'uglify', 'less']);
+    grunt.registerTask('default',   ['build']);
 };
