@@ -115,7 +115,7 @@ if (!empty($_POST)) {
 	 * Load answer configurations template into answer_configuration_form_fragment
 	 * block if there are configuration options available
 	 */
-	if ($question['config'] !== null) {
+	if ($currentQuestionType['has_config'] == 'true') {
 		$this->setFile('answer_configuration_fragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/configuration.html');
 		$this->setBlock('answer_configuration_fragment', 'answer_configuration_form_fragment', 'answer_configuration_form_fragment_block');
 
