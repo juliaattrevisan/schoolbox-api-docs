@@ -8,6 +8,7 @@
         "maximebf/debugbar": "1.5.*",
         "shareworks/xml-security": "dev-master",
         "predis/predis": "0.8.*",
+        "monolog/monolog": "1.7.*",
         "html2text/html2text": "1.0.*"
     },
     "require-dev": {
