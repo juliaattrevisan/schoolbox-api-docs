@@ -10,7 +10,7 @@ module.exports = function(grunt) {
                 sourceMapPrefix: 1,
                 sourceMappingURL: '<%= pkg.name %>.map.js'
             },
-            build: {
+            main: {
                 // Bower files
                 src:  [
                     // jQuery
@@ -55,12 +55,42 @@ module.exports = function(grunt) {
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
+        },
+        less: {
+            options: {
+//                compress: true,
+//                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+//                sourceMap: 'www/css/components/<%= pkg.name %>.map.less',
+//                sourceMapRoot: '/',
+//                sourceMapPrefix: 1,
+//                sourceMappingURL: '<%= pkg.name %>.map.js'
+            },
+            chrome: {
+                files: [{
+                    expand: true,
+                    cwd: 'www/css',
+                    src: ['*/chrome.less', '!core/chrome.less'],
+                    dest: 'www/css/',
+                    ext: '.css'
+                }]
+            },
+            mchrome: {
+                files: [{
+                    expand: true,
+                    cwd: 'www/css',
+                    src: ['*/mchrome.less', '!core/mchrome.less'],
+                    dest: 'www/css/',
+                    ext: '.css'
+                }]
+            }
         }
     });
 
-    // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-less');
+//    grunt.loadNpmTasks('grunt-contrib-mincss');
 
-    // Default task(s).
-    grunt.registerTask('default', ['uglify']);
+    grunt.registerTask('build-js',  ['bower', 'uglify']);
+    grunt.registerTask('build-css', ['bower', 'less', 'mincss']);
+    grunt.registerTask('default',   ['build-js', 'build-css']);
 };
