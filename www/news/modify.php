@@ -93,13 +93,7 @@ if (is_numeric($this->arg[0])) {
 		'name' => 'TOPIC_NAME'
 	));
 
-	if (count($campusList) > 1) {
-		$this->parse('campus_row_block', 'campus_row');
-	}
-	else
-	{
-		$this->setVar('campus_row_block', '');
-	}
+	$this->parse('campus_row_block', 'campus_row');
 
 	$this->parse("delete_button_block", "delete_button");
 }
@@ -145,12 +139,7 @@ else {
 		'name' => 'TOPIC_NAME'
 	));
 
-	if (count($campusList) > 1) {
-		$this->parse('campus_row_block', 'campus_row');
-	}
-	else {
-		$this->setVar('campus_row_block', '');
-	}
+	$this->parse('campus_row_block', 'campus_row');
 
     $this->setVar('image_block','');
     

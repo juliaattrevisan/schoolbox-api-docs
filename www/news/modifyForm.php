@@ -13,6 +13,17 @@ if ($_POST['heading']) {
     $publishedDate = new Alaress_Date_Format($_POST['item_datetime_published'], 'd/m/y');
     $expiryDate = new Alaress_Date_Format($_POST['item_datetime_expires'], 'd/m/y');
 
+    // Error out if there's campi that this user can't post to in $_POST[campus]
+    $campusList = array();
+    foreach ($newsHandler->getCampusList() as $campus) {
+        $campusList[] = $campus['CAMPUS_ID'];
+    }
+    foreach ($_POST['campus'] as $campus) {
+        if (!in_array($campus, $campusList)) {
+            error(19);
+        }
+    }
+
     $news = array(
         'item_heading' => $_POST['heading'],
         'item_body' => $_POST['body'],

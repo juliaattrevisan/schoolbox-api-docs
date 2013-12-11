@@ -56,6 +56,12 @@ class News extends DeprecatedModel {
 
     function getCampusList() {
         $query = "SELECT id, name FROM luCampus";
+        /** @var Schoolbox\User $user */
+        $user = $_SESSION['user'];
+        if (!$user->isSuperuser()) {
+            $query .= ", userAccess WHERE (luCampus.id = userAccess.sid OR userAccess.sid = 0) AND
+                userAccess.service = '".NEWS_SERVICE."' AND uid = " . $user->getId();
+        }
         $campusList = $this->db->getAll($query);
         if (is_array($campusList)) {
             $i = 0;
