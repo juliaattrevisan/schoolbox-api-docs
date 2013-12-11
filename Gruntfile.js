@@ -2,6 +2,12 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        bower: {
+            options: {
+                copy: false
+            },
+            install: {}
+        },
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
@@ -80,6 +86,7 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-bower-task');
 
     grunt.registerTask('build-js',  ['bower', 'uglify']);
     grunt.registerTask('build-css', ['bower', 'less']);
