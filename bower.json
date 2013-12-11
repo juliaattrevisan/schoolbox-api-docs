@@ -12,6 +12,7 @@
     "jquery":    "2.0.3",
     "jquery.ui": "1.10.3",
     "jqueryui-touch-punch-improved": "0.3.1",
+    "jquery.cookie": "1.4.0",
     "flot": "0.8.2",
     "farbtastic": "1.3u"
   },
