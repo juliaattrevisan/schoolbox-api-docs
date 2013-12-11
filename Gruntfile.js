@@ -57,7 +57,9 @@ module.exports = function(grunt) {
                     'www/javascript/components/jquery.ui/ui/jquery.ui.slider.js',
                     'www/javascript/components/jquery.ui/ui/jquery.ui.spinner.js',
                     'www/javascript/components/jquery.ui/ui/jquery.ui.tabs.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.tooltip.js'
+                    'www/javascript/components/jquery.ui/ui/jquery.ui.tooltip.js',
+                    // jQueryUI Touch Punch
+                    'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js'
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
