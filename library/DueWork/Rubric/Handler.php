@@ -537,7 +537,7 @@ class DueWork_Rubric_Handler {
             LEFT JOIN `rubric_usage` u ON sb.id = u.`submission_box_id`
             LEFT JOIN rubric_criterion c ON c.id = u.`criterion_id`
             LEFT JOIN rubric_descriptor d ON d.`submission_box_id` = sb.id AND d.`criterion_id` = c.id AND sb.`rubric_result_set` = 0
-            LEFT JOIN rubric_result r ON r.`resultset_id` = sb.`rubric_result_set` AND sb.`rubric_result_set` > 1
+            LEFT JOIN rubric_result r ON r.`resultset_id` = sb.`rubric_result_set` AND sb.`rubric_result_set` > 0
             WHERE (d.valid = 1 OR sb.rubric_result_set > 0)
             AND (d.value > 0 OR r.value > 0)
             AND sb.id = :sbid
