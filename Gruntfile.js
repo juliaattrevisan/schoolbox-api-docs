@@ -11,7 +11,7 @@ module.exports = function(grunt) {
                 src:  [
                     // jQuery
                     'www/javascript/components/jquery/jquery.js',
-                    'www/javascript/components/jquery/jquery.migrate.js',
+                    'www/javascript/components/jquery/jquery-migrate.js',
                     // jQueryUI core
                     'www/javascript/components/jquery.ui/ui/jquery.ui.core.js',
                     'www/javascript/components/jquery.ui/ui/jquery.ui.widget.js',
