@@ -125,9 +125,6 @@ abstract class Evaluation_Export_Xml {
 							if ($currentQuestionType['has_config'] == 'true') {
 								$answerHandler->configureXml($this->getPage(), $currentQuestion['config']);
 							}
-							else {
-
-							}
 
 							/* Load individual answers
 							 */
