@@ -108,6 +108,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         }
     }
 
+	/**
+	 * Configure question/configure answers
+	 */
+	public function configure() {
+	}
+
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.

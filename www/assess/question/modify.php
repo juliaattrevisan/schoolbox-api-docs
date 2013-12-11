@@ -111,21 +111,15 @@ if (!empty($_POST)) {
     $currentQuestionType = $questionHandler->getQuestionType($question['type_id']);
 
 	/* Question-specific answer configuration
-	 */
-	$hasAnswerConfiguration = false;
-
-	if ($currentQuestionType['classname'] == 'Multi') {
-		$hasAnswerConfiguration = true;
-	}
-
-	/* Load answer configurations template into answer_configuration_form_fragment
+	 *
+	 * Load answer configurations template into answer_configuration_form_fragment
 	 * block if there are configuration options available
 	 */
-	if ($hasAnswerConfiguration) {
+	if ($question['config'] !== null) {
 		$this->setFile('answer_configuration_fragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/configuration.html');
 		$this->setBlock('answer_configuration_fragment', 'answer_configuration_form_fragment', 'answer_configuration_form_fragment_block');
 
-		$this->setVar(array());
+		$answerHandler->configure($this, $question['config']);
 
 		$this->parse('answer_configuration_block', 'answer_configuration_fragment');
 		$this->parse('has_answer_configuration_block', 'has_answer_configuration');
