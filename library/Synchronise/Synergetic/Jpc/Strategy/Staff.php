@@ -54,6 +54,7 @@ class Synchronise_Synergetic_Jpc_Strategy_Staff extends Synchronise_Synergetic_J
         $newUser['synergy_id'] = $currentUser['StaffID'];
 		$newUser['alt_email'] = $currentUser['OccupEmail'];
         $newUser['local_email'] = 0;
+        $newUser['webmail'] = 1;
 
 		/* Campus config: needs to map to a campus id
 		 */
