@@ -25,16 +25,31 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
 }
 else {
     if ($_POST['action'] === 'delete') {
-        $task        = TaskMapper::getInstance()->findById($_POST['id']);
-        $category_id = $task->getCategory()->getId();
-        TaskMapper::getInstance()->delete($task);
+        TaskMapper::getInstance()->delete(
+            TaskMapper::getInstance()->findByColumnList(
+                array(
+                    'id'          => $_POST['id'],
+                    'category_id' => $category_id,
+                )
+            )
+        );
     }
     elseif ($_POST['action'] === 'reorder') {
         $i = 1;
+        $update_collection = new \Schoolbox\Collection();
         foreach ($_POST['id'] as $id) {
+            // Ensure that this task is within the requested unit
+            /** @var Task $task */
             $task = TaskMapper::getInstance()->findById($id);
+            if ($task->getCategory()->getId() != $category_id) {
+                $permission_denied = true;
+                break;
+            }
             $task->setOrder($i++);
-            TaskMapper::getInstance()->save($task);
+            $update_collection->add($task);
+        }
+        if (!$permission_denied) {
+            TaskMapper::getInstance()->save($update_collection);
         }
     }
     else {
