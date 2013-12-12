@@ -52,9 +52,10 @@ class Synchronise_Synergetic_Mggs_Strategy_Staff extends Synchronise_Synergetic_
 		$newUser['title'] = $currentUser['StaffTitle'];
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
-        $newUser['synergy_id'] = $currentUser['StaffID'];
+		$newUser['synergy_id'] = $currentUser['StaffID'];
 		$newUser['alt_email'] = $currentUser['OccupEmail'];
-        $newUser['local_email'] = 0;
+		$newUser['local_email'] = 0;
+		$newUser['webmail'] = 1;
 
 		/* Campus config: needs to map to a campus id
 		 */
