@@ -73,22 +73,43 @@ class Mediator {
                 $this->authenticate();
             }
         }
-        // if authentication fails
-        catch(Exception_Schoolbox_AccessDenied $e) {
-            // Perform an actual redirect, not an internal one.
-            // Reason: if a login page is returned by /m/actual-mobile-page, it
-            // could get cached - then when you ARE logged in, you get the login
-            // page, because that was what was cached.
-            $response = new Response_HTTP(Response_HTTP::HTTP_UNAUTHORIZED);
-            $response->addInternalRedirectHeader('core/auth/login');
-            $this->setResponse($response);
-            $this->setResponseCode(Response_HTTP::HTTP_UNAUTHORIZED);
+        catch (Exception_Schoolbox_AccessDenied $e) {
+            $this->redirectToLoginPage('Your username or password is incorrect.');
+            return;
+        }
+        catch (Exception_Schoolbox_NotFound $e) {
+            $this->redirectToLoginPage('Your username or password is incorrect.');
+            return;
+        }
+        catch (Exception_Schoolbox_AccountDisabled $e) {
+            $this->redirectToLoginPage('This account is currently disabled.');
             return;
         }
         catch(Exception_Schoolbox $e) {
             echo $e->getTraceAsString();
             die("SBException: {$e->getErrorMessage()}");
         }
+    }
+
+    /**
+     * Outputs a redirect if authentication fails. this performs an actual
+     * redirect, not an internal reroute.
+     * Reason: if a login page is returned by /m/actual-mobile-page, it could
+     * get cached - then when you ARE logged in, you get the login page, because
+     * that was what was cached.
+     *
+     * @param string $message
+     */
+    protected function redirectToLoginPage($message = '') {
+        // Build response
+        $response = new Response_HTTP(Response_HTTP::HTTP_UNAUTHORIZED);
+        $response->setError('message', $message);
+        $response->addInternalRedirectHeader('core/auth/login');
+        $this->setResponse($response);
+        // and output it
+        $view = View_Factory::build($this->getViewName());
+        $this->generatePage($view);
+        $this->setResponseCode(Response_HTTP::HTTP_UNAUTHORIZED);
     }
 
     /**
