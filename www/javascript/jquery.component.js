@@ -207,8 +207,8 @@ setupCustomise = {
             }
 
 			$j('#top_head_font').parent().addClass('active-box');
-			var instantColour = new RGBColor($j('#top_head_font').css('background-color'));
-			var initialColour = instantColour.toHex();
+			var instantColour = new tinycolor($j('#top_head_font').css('background-color'));
+			var initialColour = instantColour.toHexString();
 			$j('#currentColour').css('background-color',initialColour);
 			$j('#currentColour').val(initialColour);
 			checkTextColour();
@@ -316,9 +316,9 @@ setupCustomise = {
 				$j(this).children('.colorBox').addClass('selected');
 				$j(this).next().next('p').addClass('selected');
 
-				var color = new RGBColor($j(this).children('.colorBox').css('background-color'));
+				var color = new tinycolor($j(this).children('.colorBox').css('background-color'));
 
-				colorpicker.setColor(color.toHex());
+				colorpicker.setColor(color.toHexString());
 				checkTextColour()
 				return false;
 			});
@@ -333,7 +333,7 @@ setupCustomise = {
                     // update pickers config
                     pickers['left_' + suffix]
                         = pickers['right_' + suffix]
-                        = (new RGBColor($j(this).css('background-color'))).toHex();
+                        = (new tinycolor($j(this).css('background-color'))).toHexString();
 
                     // update left/right colours
                     $j('#left_'+suffix+', #right_'+suffix)

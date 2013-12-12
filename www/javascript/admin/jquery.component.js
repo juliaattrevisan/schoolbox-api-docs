@@ -192,8 +192,8 @@ setupCustomise = {
             }
 
             $j('#head_font').parent().addClass('active-box');
-            var instantColour = new RGBColor($j('#left_head_font').css('background-color'));
-            var initialColour = instantColour.toHex();
+            var instantColour = new tinycolor($j('#left_head_font').css('background-color'));
+            var initialColour = instantColour.toHexString();
             checkTextColour();
             $j('#currentColour').css('background-color',initialColour);
             $j('#currentColour').val(initialColour);
@@ -301,9 +301,9 @@ setupCustomise = {
                 $j(this).children('.colorBox').addClass('selected');
                 $j(this).next().next('p').addClass('selected');
 
-                var color = new RGBColor($j(this).children('.colorBox').css('background-color'));
+                var color = new tinycolor($j(this).children('.colorBox').css('background-color'));
 
-                f.setColor(color.toHex());
+                f.setColor(color.toHexString());
                 checkTextColour()
                 return false;
             });
