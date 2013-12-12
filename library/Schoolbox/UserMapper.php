@@ -153,7 +153,7 @@ class UserMapper extends Mapper {
 			LEFT JOIN `groups` g ON group_id = g.`id`
 			LEFT JOIN userCampus uc ON uc.`uid`=u.id
 			LEFT JOIN superusers su ON su.id = u.id
-			INNER JOIN luCampus c ON c.id = uc.`campus`
+			LEFT JOIN luCampus c ON c.id = uc.`campus`
 			WHERE u.id = ?
 			" );
 
@@ -169,7 +169,14 @@ class UserMapper extends Mapper {
 
 			$campus = $campusMapper->hydrate($row, 'c');
 
-			$user->getCampusCollection()->add($campus);
+			/* If the campus object has no id, then it spawned a campus
+			 * object from nonexistent data (e.g. a user with no campus)
+			 * In this case, the campus object will be totally empty but
+			 * still occupy slots in the user's campus collection stack
+			 */
+			if ($campus->getId()) {
+				$user->getCampusCollection()->add($campus);
+			}
 
 			if($row['uc.defaultCampus'] == 1) {
 				$user->setDefaultCampus($campus);
