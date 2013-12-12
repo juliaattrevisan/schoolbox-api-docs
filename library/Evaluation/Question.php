@@ -15,7 +15,7 @@ abstract class Evaluation_Question extends DeprecatedModel
     public $_table = 'assess_question';
     public $_index = 'question_id';
 
-    private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'deleted_at');
+    private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'config', 'deleted_at');
 
     /**
      * Constructor

@@ -145,6 +145,21 @@ class Evaluation_Import_Xml {
 				$questionHandler = $this->getFactory()->createQuestionModel(Scrub::text($currentQuestion->typeid));
 				$answerHandler = $this->getFactory()->createAnswerModel(Scrub::text($currentQuestion->typeid));
 
+				/* Only json-encode if there are config elements
+				 *
+				 * When you cast the std obj to an array, you can possibly
+				 * end up with an empty config if the tags are separated
+				 */
+				if (count(array_keys((array)$currentQuestion->config))) {
+					$config = json_encode((array)$currentQuestion->config);
+				}
+				else {
+
+					/* -_-
+					 */
+					$config = 'NULL';
+				}
+
 				$question_id = $questionHandler->create(array(
 					'question_id' => '',
 					'section_id' => $section_id,
@@ -152,6 +167,7 @@ class Evaluation_Import_Xml {
 					'type_id' => $currentQuestion->typeid,
 					'marks' => $currentQuestion->marks,
 					'question' => trim((string) $currentQuestion->questiontext->text),
+					'config' => $config,
 				));
 
 				if (method_exists($answerHandler, 'importMoodleAnswer')) {

@@ -108,6 +108,18 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         }
     }
 
+	/**
+	 * Configure question/configure answers
+	 */
+	public function configure() {
+	}
+
+	/**
+	 * Configure question/configure answers, in xml format
+	 */
+	public function configureXml() {
+	}
+
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
@@ -116,8 +128,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id)
-    {
+    public function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -125,11 +136,31 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
+			/* Only shuffle on request
+			 */
+			$question = $this->questionHandler->getByID($question_id);
+
+			$config = json_decode($question['config']);
+
+			if ($config->randomiseOptionOrder) {
+				shuffle($allAnswers);
+				shuffle($allAnswers);
+				shuffle($allAnswers);
+				shuffle($allAnswers);
+			}
+
+			/* A
+			 */
+			$i = 65;
+
             foreach ($allAnswers as $currentAnswer) {
+				$valueFacade = chr($i);
+
                 $page->setVar(array(
 					'QUESTION_ID' => $question_id,
 					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $answerGroup['answer_id'],
+					'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
@@ -141,20 +172,25 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
-                    } else {
+                    }
+					else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
                         ));
                     }
-                } else {
+                }
+				else {
                     $page->setVar(array(
                         'ANSWER_CHECKED' => '',
                     ));
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
+
+				$i++;
             }
-        } else {
+        }
+		else {
             $page->setVar('answerOption_block', '');
         }
     }

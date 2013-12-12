@@ -24,6 +24,7 @@ use Schoolbox\Resource\CategoryMapper;
 // while this is handler-related, it works.
 use Assess_Main;
 use Assess_Factory;
+use Assess_Question;
 use Assess_Section;
 use Assess_Export_Xml;
 use Assess_Import_Xml;
@@ -72,16 +73,18 @@ class Cloner {
     public function cloneAssessment() {
         $assess_id = $this->task_instance->getTask()->getAssessment()->getId();
         if ($assess_id) {
-            $handler = new Assess_Main();
-            $section = new Assess_Section();
-            $factory = new Assess_Factory();
-            $assess  = $handler->getByID($assess_id);
+            $handler  = new Assess_Main();
+            $section  = new Assess_Section();
+            $factory  = new Assess_Factory();
+            $question = new Assess_Question();
+            $assess   = $handler->getByID($assess_id);
 
             // Export, then import
             $export = new Assess_Export_Xml(
                 $assess,
                 $factory,
                 $section,
+                $question,
                 new \SitePage(false)
             );
             $output = $export->retrieveContents();
