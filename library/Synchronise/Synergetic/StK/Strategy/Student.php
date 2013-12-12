@@ -53,6 +53,7 @@ class Synchronise_Synergetic_StK_Strategy_Student extends Synchronise_Synergetic
 		}
 		$newUser['synergy_id']  = $currentUser['StudentID'];
 		$newUser['local_email'] = 0;
+		$newUser['webmail']     = 1;
 		$newUser['year']        = $currentUser['StudentYearLevel'];
 		//
 		// Campus: could be C (college), G (girls?), B (boys?), P (parents?)

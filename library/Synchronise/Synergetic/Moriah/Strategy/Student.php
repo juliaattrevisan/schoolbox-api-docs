@@ -42,9 +42,10 @@ class Synchronise_Synergetic_Moriah_Strategy_Student extends Synchronise_Synerge
 		$newUser['title'] = '';
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname'] = $currentUser['StudentSurname'];
-        $newUser['alt_email'] = $currentUser['StudentOccupEmail'] ?: $currentUser['StudentEmail'];
-        $newUser['synergy_id'] = $currentUser['StudentID'];
-        $newUser['local_email'] = 0;
+		$newUser['alt_email'] = $currentUser['StudentOccupEmail'] ?: $currentUser['StudentEmail'];
+		$newUser['synergy_id'] = $currentUser['StudentID'];
+		$newUser['local_email'] = 0;
+		$newUser['webmail'] = 1;
 
 		/* Year level
 		 */
