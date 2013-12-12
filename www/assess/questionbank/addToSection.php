@@ -52,7 +52,8 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
                 'type_id' => $questionBank['type_id'],
                 'sequence' => $questionHandler->getNextSequence($section_id),
                 'marks' => $questionBank['marks'],
-                'question' => $questionBank['question']
+                'question' => $questionBank['question'],
+				'config' => $questionBank['config'],
             ));
 
             $answer_id = $answerHandler->create(array(
