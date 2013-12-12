@@ -109,25 +109,40 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             }
 
             $box_id = $submission->getId();
-            $dateHTML = $submission->getDueDate()->getDateOnly();
+
+            $displayActions = false;
+            $displayResults = false;
+            $displayDueDate = !$isTask;
 
             /* Actions Block */
 
             $actionURL = null;
+            $nameHTML  = null;
+            $dateHTML  = null;
+            $dueActionName = '';
+            $dueActionIcon = '';
+            if ($submission->getTask()->getId()) {
+                $nameHTML = Scrub::text($submission->getName());
+                $dateHTML = '';
+            }
+            else {
+                $nameHTML = ($actionURL ? '<a href="'.$actionURL.'">' : "") . Scrub::text($submission->getName()) . ($actionURL ? '</a>' : "");
+                $dateHTML = $submission->getDueDate()->getDateOnly();
+            }
 
             // what to display if student
             $this->setVar('duework_result_link_block', '');
+            $this->setVar('duework_actions_block', '');
+            $this->setVar('duework_due_date_block', '');
             if ($this->groupHandler->isStudent()) {
-                if ($isTask) {
-                    $this->setVar('duework_actions_block', '');
-                }
-                else {
+                if (!$isTask) {
+                    $displayActions = true;
                     $actionURL = '/submission/submissionHistory/' . $box_id .'/'. $_SESSION['id'];
 
                     // if a mark has been given, regardless of all other detail, display "View Mark"
                     if (!empty($return_counts[$box_id])) {
-                        $this->setVar('DUE_ACTION_NAME', 'View Mark');
-                        $this->setVar('DUE_ACTION_ICON', 'go-to');
+                        $dueActionName = 'View Mark';
+                        $dueActionIcon = 'go-to';
                     }
                     // no mark has been given
                     else {
@@ -135,8 +150,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                         if ($submission->getAcceptOnline()) {
                             // if something has been submitted
                             if (!empty($submission_counts[$box_id])) {
-                                $this->setVar('DUE_ACTION_NAME', 'Awaiting Mark');
-                                $this->setVar('DUE_ACTION_ICON', 'go-to');
+                                $dueActionName = 'Awaiting Mark';
+                                $dueActionIcon = 'go-to';
                             }
                             // nothing has been submitted
                             else {
@@ -145,70 +160,66 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                                 if ($time->getDateTimeObject() > $submission->getOpenDate()->getDateTimeObject()
                                     && $time->getDateTimeObject() < $submission->getLateDate()->getDateTimeObject()
                                 ) {
-                                    $this->setVar('DUE_ACTION_NAME', 'Submit Work');
-                                    $this->setVar('DUE_ACTION_ICON', 'go-to');
+                                    $dueActionName = 'Submit Work';
+                                    $dueActionIcon = 'go-to';
                                 }
                                 // if submission box is closed
                                 else {
-                                    $this->setVar('DUE_ACTION_NAME', 'View Details');
-                                    $this->setVar('DUE_ACTION_ICON', 'go-to');
+                                    $dueActionName = 'View Details';
+                                    $dueActionIcon = 'go-to';
                                 }
                             }
                         }
                         // dueWork not accepting submissions
                         else {
-                            $this->setVar('DUE_ACTION_NAME', 'View Details');
-                            $this->setVar('DUE_ACTION_ICON', 'go-to');
+                            $dueActionName = 'View Details';
+                            $dueActionIcon = 'go-to';
                         }
                     }
-
-                    $this->setVar('DUE_ACTION', $actionURL);
-                    $this->parse('duework_actions_block', 'duework_actions');
                 }
             }
 
             // what to display if staff
             elseif ($this->groupHandler->isSuperuser() || $submission->getOwner()->getId() == $_SESSION['id']) {
                 if (!$isTask) {
-                    $this->parse('duework_result_link_block', 'duework_result_link');
+                    $displayResults = true;
                 }
-                $this->setVar('DUE_ACTION', '/submission/createSubmission/modify/'.$box_id);
-                $this->setVar('DUE_ACTION_NAME', 'Modify');
-                $this->setVar('DUE_ACTION_ICON', 'modify');
-                $this->parse('duework_actions_block', 'duework_actions');
-            }
-            // if anybody else, don't display anything
-            else {
-                $this->setVar('duework_actions_block', '');
-            }
-
-            // Show due date only if this is not a task.
-            if ($isTask) {
-                $this->setVar('duework_due_date_block', '');
-            }
-            else {
-                $this->parse('duework_due_date_block', 'duework_due_date');
-            }
-
-            if ($submission->getTask()->getId()) {
-                $nameHTML = Scrub::text($submission->getName());
-                $dateHTML = '';
-            }
-            else {
-                $nameHTML = ($actionURL ? '<a href="'.$actionURL.'">' : "") . Scrub::text($submission->getName()) . ($actionURL ? '</a>' : "");
+                $actionURL = '/submission/createSubmission/modify/'.$box_id;
+                $dueActionName = 'Modify';
+                $dueActionIcon = 'modify';
+                $displayActions = true;
             }
 
             $output = array(
                 'DUE_ID'      => $box_id,
                 'DUE_ACTION'  => $actionURL,
+                'DUE_ACTION_NAME' => $dueActionName,
+                'DUE_ACTION_ICON' => $dueActionIcon,
                 'DUE_NAME'    => $nameHTML,
                 'DUE_TYPE'    => Scrub::text($submission->getWorkType()->getName()),
                 'DUE_DATE'    => $dateHTML,
                 'DUE_COMMENT' => Scrub::html($submission->getDescription()),
                 'ON_OFF'      => ++$j % 2 ? '' : 'dark',
             );
-
             $this->setVar($output);
+            if ($displayDueDate) {
+                $this->parse('duework_due_date_block', 'duework_due_date');
+            }
+            else {
+                $this->setVar('duework_due_date_block', '');
+            }
+            if ($displayActions) {
+                $this->parse('duework_actions_block', 'duework_actions');
+            }
+            else {
+                $this->setVar('duework_actions_block', '');
+            }
+            if ($displayResults) {
+                $this->parse('duework_result_link_block', 'duework_result_link');
+            }
+            else {
+                $this->setVar('duework_result_link_block', '');
+            }
             $this->parse("duework_block", "duework", true);
         }
 
