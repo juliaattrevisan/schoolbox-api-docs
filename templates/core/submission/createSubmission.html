@@ -397,6 +397,12 @@
                 'json'
             );
         });
+
+		$j('#deleteBox').click(function() {
+			if (confirm('Are you sure you want to delete this submission box?')) {
+				window.location = '/submission/submissionForm.php?deleteBox={ID}';
+			}
+		});
     });
 </script>
 <!-- END custom_head -->
@@ -641,4 +647,9 @@
 <input type="hidden" name='fileId' value="{FILEID}"/>
 <input type="hidden" name="id" value="{ID}"/></td>
 <input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
+
+<!-- BEGIN delete_button -->
+<input id='deleteBox' type="button" class="submit-btn-plain"  value="Delete File" />
+<!-- END delete_button -->
+
 </form>

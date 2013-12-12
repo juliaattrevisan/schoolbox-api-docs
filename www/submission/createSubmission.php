@@ -35,6 +35,8 @@ $this->setVar('existing_marks_warning_block', '');
 $this->setVar('COURSE_CRITERIA', '');
 $this->setVar('CLASS_CRITERIA', '');
 
+$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -77,8 +79,16 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $task_id          = $submission->getTask()->getId();
     $is_task          = (bool)$task_id;
     $task_instance_id = $submission->getTaskInstance()->getId();
+
+	/* Allow deletion of the submission box from modify screen
+	 */
+	$this->parse('delete_button_block', 'delete_button');
 }
 elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+	$this->setVar(array(
+		'delete_button_block' => ''
+	));
+
     // IF NEW
     // Args:
     // 1: category ID
