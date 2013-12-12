@@ -74,6 +74,13 @@
         // Upload button for link items
         component.find('form a[data-function="upload"]').bind('click.courseTaskList', function(event) {
             event.preventDefault();
+
+			/* Toggle the input
+			 * Toggle the label
+			 */
+			$('#link-new_task').toggle();
+			$(this).closest('dd').prev('dt').toggle();
+			
             // Set the form that this dialog was triggered from.
             var source_form = $(this).closest('form');
             dialog.ajaxUploadDialog('open', function(output) {
