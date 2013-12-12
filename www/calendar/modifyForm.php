@@ -184,7 +184,15 @@ switch($_POST['action']) {
 		 * get stuffed around by time travel's one-index-offset rip in
 		 * the space-time continuum
 		 */
-		if (($event['author_id'] != $event['owner']) && ($event['author_id'] == $_SESSION['user']->getId())) {
+
+		/* Superuser modifying some arbitrary event
+		 */
+		if (!in_array($_SESSION['user']->getId(), array($event['author_id'], $event['owner']))) {
+			$page->backToTheFuture(3);
+		}
+		/* Teacher modifying some arbitrary event
+		 */
+		else if (($event['author_id'] != $event['owner']) && ($event['author_id'] == $_SESSION['user']->getId())) {
 			$page->backToTheFuture(3);
 		}
         else if (!empty($_POST['return'])) {
