@@ -54,6 +54,23 @@
         };
         initTaskList();
 
+		/* Link button which shows the Link input field
+		 * Hide the input
+		 * Hide the label
+		 */
+		$('#link-new_task').hide();
+		$('form a[data-function="link"]').closest('dd').prev('dt').hide();
+
+		component.find('form a[data-function="link"]').bind('click.courseTaskList', function(event) {
+			event.preventDefault();
+
+			/* Toggle the input
+			 * Toggle the label
+			 */
+			$('#link-new_task').toggle();
+			$(this).closest('dd').prev('dt').toggle();
+		});
+
         // Upload button for link items
         component.find('form a[data-function="upload"]').bind('click.courseTaskList', function(event) {
             event.preventDefault();
