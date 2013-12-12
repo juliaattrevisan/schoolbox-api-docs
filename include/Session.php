@@ -100,6 +100,22 @@ class Session
         @session_destroy();
     }
 
+    /**
+     * Is this user authenticated?
+     *
+     * Error types:
+     * * User not found
+     * * User found, but disabled
+     * * User found, password is wrong
+     *
+     * @param string $username
+     * @param string $password
+     *
+     * @return bool Was the user authenticated?
+     * @throws Exception_Schoolbox_NotFound        if user doesn't exist
+     * @throws Exception_Schoolbox_AccountDisabled if user account is disabled
+     * @throws Exception_Schoolbox_AccessDenied    if password doesn't match
+     */
     public function authenticate($username, $password)
     {
 
@@ -109,11 +125,11 @@ class Session
         try {
             $user = $uMap->findOneByColumn('username', $username);
         }
-        catch (Schoolbox\Mapper\Exception $e) {}
+        catch (Schoolbox\Mapper\Exception $e) {
+            throw new Exception_Schoolbox_NotFound();
+        }
         if(!($user instanceof \Schoolbox\User && $user->getEnabled())) {
-            $page = new SitePage(false);
-            $page->goLoginPage("This account is currently disabled.");
-            return false;
+            throw new Exception_Schoolbox_AccountDisabled();
         }
 
         $result = false;
@@ -126,8 +142,9 @@ class Session
             $password = stripslashes($password);
         }
 
-        if (empty($username) || empty($password))
-            return false;
+        if (empty($username) || empty($password)) {
+            throw new Exception_Schoolbox_AccessDenied();
+        }
 
         // Function to check username exists and password is correct
         if (Cfg::get('ldap_enable')) {
@@ -150,6 +167,7 @@ class Session
             $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
                         VALUES ('" . mysql_real_escape_string($username) . "', NOW(), '$ip', '0')";
             $this->db->query($loginlogquery);
+            throw new Exception_Schoolbox_AccessDenied();
         } else {
             // Store password as hash for DAV authentication later
             $this->db->update('user', 'username', array('username' => $username, 'hash' => md5($username . ':' . Cfg::get('site_location') . ':' . $password)));
