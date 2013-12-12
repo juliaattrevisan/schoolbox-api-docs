@@ -49,11 +49,13 @@ else {
 $updatedEvent = array();
 $updatedEvent['id']        = $event['id'];
 $updatedEvent['owner']     = $event['owner'];
+$updatedEvent['author_id'] = $event['author_id'];
 $updatedEvent['access']    = $event['access'];
 $updatedEvent['startDate'] = $startTime->getDatabaseDate();
 $updatedEvent['startTime'] = $startTime->getDatabaseTime();
 $updatedEvent['endDate']   = $endTime->getDatabaseDate();
 $updatedEvent['endTime']   = $endTime->getDatabaseTime();
+
 if (isset($_POST['allDay'])) {
 	//
 	// String 'false' is not and never will be a boolean! FFS
