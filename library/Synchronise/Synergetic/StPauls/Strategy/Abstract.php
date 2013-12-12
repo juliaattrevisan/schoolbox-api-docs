@@ -108,18 +108,27 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
 			case '0':
 			case '1':
 			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
 				return 3;
+			case '3':
+				return 8;
+			case '4':
+				return 9;
+			case '5':
+				return 10;
+			case '6':
+				return 11;
 			case '7':
-			case '8':
-			case '9':
-			case '10':
-			case '11':
-			case '12':
 				return 6;
+			case '8':
+				return 13;
+			case '9':
+				return 14;
+			case '10':
+				return 15;
+			case '11':
+				return 16;
+			case '12':
+				return 17;
 			default:
 				return false;
 		}
