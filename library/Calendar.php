@@ -325,7 +325,7 @@ class Calendar extends DeprecatedModel {
     public function getByID($eventID) {
         $query = "
 			SELECT
-				e.id, e.series_id, e.owner, e.access, e.sid, e.type, e.note, e.startDate, e.endDate,
+				e.id, e.series_id, e.owner, e.author_id, e.access, e.sid, e.type, e.note, e.startDate, e.endDate,
 				e.location, e.attendance, e.detail, e.publish_date, e.allday,
 				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
@@ -711,7 +711,7 @@ class Calendar extends DeprecatedModel {
 				eventType, eventColour,
 				event.publish_date,
 				category.id AS categoryId, category.name AS categoryName,
-				event.completed
+				event.completed, author_id
 			FROM event
 			LEFT JOIN user ON event.author_id = user.id
 			LEFT JOIN luEventType ON type = eventTypeID
@@ -764,6 +764,8 @@ class Calendar extends DeprecatedModel {
                 $event->setSid($currentEvent['sid']);
                 $event->setAllDay(!empty($currentEvent['allday']));
 
+				/* If you have write access to the event
+				 */
 				if ($this->getPerm($currentEvent) > 1) {
                     $event->setIsEditable(true);
                 }
@@ -962,7 +964,6 @@ class Calendar extends DeprecatedModel {
     function update($event) {
 
         $cleanEvent = $this->getByID($event['id']);
-
 
         /* Check perms on existing event */
         if ($this->getPerm($event['id']) < WRITE_ACCESS) {

@@ -46,6 +46,7 @@ if (is_numeric($_GET['eventID'])) {
         'FUNCTION' => 'Update',
         'EVENT_ID' => $event['id'],
         'EVENT_USER_ID' => $event['owner'],
+		'EVENT_AUTHOR_ID' => $event['author_id'],
         'START_DATE' => $startDate->getusingFormat('d/m/Y'),
         'START_HOUR' => $event['allday'] ? '' : $startDate->getUsingFormat('h'),
         'START_MIN' => $event['allday'] ? '' :$startDate->getUsingFormat('i'),

@@ -55,6 +55,7 @@ switch($_POST['action']) {
         $event = array(
             'owner' => null,
             'access' => $_POST['level'],
+			'author_id' => $_POST['author_id'],
             'sid' => null,
             'campusList' => null,
             'groupList' => null,
@@ -179,7 +180,22 @@ switch($_POST['action']) {
             }
         }
 
-        if (!empty($_POST['return'])) {
+		/* If you were editing an event on someone else's calendar, don't
+		 * get stuffed around by time travel's one-index-offset rip in
+		 * the space-time continuum
+		 */
+
+		/* Superuser modifying some arbitrary event
+		 */
+		if (!in_array($_SESSION['user']->getId(), array($event['author_id'], $event['owner']))) {
+			$page->backToTheFuture(3);
+		}
+		/* Teacher modifying self-created event for some arbitrary person
+		 */
+		else if (($event['author_id'] != $event['owner']) && ($event['author_id'] == $_SESSION['user']->getId())) {
+			$page->backToTheFuture(3);
+		}
+        else if (!empty($_POST['return'])) {
             $page->localRedir($_POST['return']);
         }
         else {
