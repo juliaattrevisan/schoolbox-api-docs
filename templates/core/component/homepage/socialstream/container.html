@@ -3,21 +3,26 @@
 	<script type='text/javascript' src='/socialstream/browser/browser.js'></script>
 
 	<script type='text/javascript'>
-		/* Using document.ready causes javascript to run twice
-		 * http://stackoverflow.com/questions/13017890/ajaxsuccess-being-called-twice
+		/* Use flag to prevent double loading :(
 		 */
-		$j(window).load(function() {
-			$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
-				instanceId: '{COMPONENT_INSTANCE_ID}',
-				homepageId: '{HOMEPAGE_ID}',
+		var hasLoaded{COMPONENT_INSTANCE_ID};
 
-				/* Slow
-				 */
-				start: 0,
+		$j(function() {
+			if (hasLoaded{COMPONENT_INSTANCE_ID} !== true) {
+				$j('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
+					instanceId: '{COMPONENT_INSTANCE_ID}',
+					homepageId: '{HOMEPAGE_ID}',
 
-				offset: '{SOCIALSTREAM_AJAX_LIMIT}',
-				numPosts: '{SOCIALSTREAM_NUM_POSTS}'
-			});
+					/* Slow
+					 */
+					start: 0,
+
+					offset: '{SOCIALSTREAM_AJAX_LIMIT}',
+					numPosts: '{SOCIALSTREAM_NUM_POSTS}'
+				});
+
+				hasLoaded{COMPONENT_INSTANCE_ID} = true;
+			}
 		});
 	</script>
 
