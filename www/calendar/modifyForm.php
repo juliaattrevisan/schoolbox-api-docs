@@ -55,6 +55,7 @@ switch($_POST['action']) {
         $event = array(
             'owner' => null,
             'access' => $_POST['level'],
+			'author_id' => $_POST['author_id'],
             'sid' => null,
             'campusList' => null,
             'groupList' => null,
