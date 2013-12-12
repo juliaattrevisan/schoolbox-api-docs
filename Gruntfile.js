@@ -22,6 +22,8 @@ module.exports = function(grunt) {
                     // jQuery
                     'www/javascript/components/jquery/jquery.js',
                     'www/javascript/components/jquery/jquery-migrate.js',
+                    // jQuery Validation
+                    'www/javascript/components/jquery-validation/jquery.validate.js',
                     // jQuery Cookie
                     'www/javascript/components/jquery.cookie/jquery.cookie.js',
                     // jQueryUI core
