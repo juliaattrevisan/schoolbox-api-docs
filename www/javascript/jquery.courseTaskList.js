@@ -67,8 +67,8 @@
 			/* Toggle the input
 			 * Toggle the label
 			 */
-			$('#link-new_task').toggle();
-			$(this).closest('dd').prev('dt').toggle();
+			$('#link-new_task').show();
+			$(this).closest('dd').prev('dt').show();
 		});
 
         // Upload button for link items
@@ -78,8 +78,8 @@
 			/* Toggle the input
 			 * Toggle the label
 			 */
-			$('#link-new_task').toggle();
-			$(this).closest('dd').prev('dt').toggle();
+			$('#link-new_task').show();
+			$(this).closest('dd').prev('dt').show();
 			
             // Set the form that this dialog was triggered from.
             var source_form = $(this).closest('form');
@@ -94,6 +94,13 @@
         var socialstream_browser = component.find('.resource_browser');
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
             component.delegate('form a[data-function="browse"]', 'click.courseTaskList', {}, function(event) {
+
+				/* Toggle the input
+				 * Toggle the label
+				 */
+				$('#link-new_task').hide();
+				$(this).closest('dd').prev('dt').hide();
+
                 var form = $(this).closest('form');
                 event.preventDefault();
                 socialstream_browser.socialstreamBrowser({
