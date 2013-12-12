@@ -80,7 +80,7 @@
 		 */
 		function applyPaginator() {
 			$j.each(config.element.find('li a'), function(index, element) {
-				$j(element).click(function() {
+				$j(element).click(function(event) {
 					event.preventDefault();
 
 					config.element.usageTabulator({
