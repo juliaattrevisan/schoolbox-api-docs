@@ -246,8 +246,8 @@ else {
     if ($is_task) {
         outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true, $is_task);
     }
+    $this->parse('marktype_block', 'marktype');
 }
-$this->parse('marktype_block', 'marktype');
 
 // this block exists so that if a config variable needs to be introduced, this can be blanked out
 $this->parse('mark_weight_block', 'mark_weight');
