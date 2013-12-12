@@ -53,9 +53,10 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
 		$newUser['title'] = $currentUser['StaffTitle'];
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
-        $newUser['synergy_id'] = $currentUser['StaffID'];
+		$newUser['synergy_id'] = $currentUser['StaffID'];
 		$newUser['alt_email'] = $currentUser['OccupEmail'];
-        $newUser['local_email'] = 0;
+		$newUser['local_email'] = 0;
+		$newUser['webmail'] = 1;
 
 		/* Retrieve campuses from timetable definition (dirty hack)
 		 */
