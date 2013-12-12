@@ -190,7 +190,7 @@ switch($_POST['action']) {
 		if (!in_array($_SESSION['user']->getId(), array($event['author_id'], $event['owner']))) {
 			$page->backToTheFuture(3);
 		}
-		/* Teacher modifying some arbitrary event
+		/* Teacher modifying self-created event for some arbitrary person
 		 */
 		else if (($event['author_id'] != $event['owner']) && ($event['author_id'] == $_SESSION['user']->getId())) {
 			$page->backToTheFuture(3);
