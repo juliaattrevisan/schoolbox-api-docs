@@ -14,15 +14,15 @@ module.exports = function(grunt) {
                 stederr: true,
                 failOnError: true
             },
-//            "jqueryui.install": {
-//                command: 'npm install',
-//                tasks: ['build'],
-//                options: {
-//                    execOptions: {
-//                        cwd: 'www/javascript/components/jquery.ui/'
-//                    }
-//                }
-//            },
+            "jqueryui.install": {
+                command: 'npm install',
+                tasks: ['build'],
+                options: {
+                    execOptions: {
+                        cwd: 'www/javascript/components/jquery.ui/'
+                    }
+                }
+            },
             "videojs.install": {
                 command: 'npm install',
                 options: {
@@ -33,10 +33,10 @@ module.exports = function(grunt) {
             }
         },
         hub: {
-//            jqueryui: {
-//                src: ['www/javascript/components/jquery.ui/Gruntfile.js'],
-//                tasks: ['build']
-//            },
+            jqueryui: {
+                src: ['www/javascript/components/jquery.ui/Gruntfile.js'],
+                tasks: ['build']
+            },
             videojs: {
                 src: ['www/javascript/components/videojs/Gruntfile.js']
             }
@@ -59,42 +59,8 @@ module.exports = function(grunt) {
                     'www/javascript/components/jquery-validation/jquery.validate.js',
                     // jQuery Cookie
                     'www/javascript/components/jquery.cookie/jquery.cookie.js',
-                    // jQueryUI core
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.core.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.widget.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.mouse.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.draggable.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.droppable.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.resizable.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.selectable.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.sortable.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect.js',
-                    // jQueryUI addons
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.accordion.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.autocomplete.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.button.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.datepicker.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.dialog.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-blind.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-bounce.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-clip.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-drop.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-explode.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-fade.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-fold.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-highlight.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-pulsate.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-scale.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-shake.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-slide.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.effect-transfer.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.menu.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.position.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.progressbar.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.slider.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.spinner.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.tabs.js',
-                    'www/javascript/components/jquery.ui/ui/jquery.ui.tooltip.js',
+                    // jQueryUI
+                    'www/javascript/components/jquery.ui/dist/jquery-ui.js',
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js'
                 ],
@@ -138,10 +104,11 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-shell');
 
     // Build tasks
-//    grunt.registerTask('build-jqueryui', ['shell:jqueryui.install', 'hub:jqueryui']);
-    grunt.registerTask('build.videojs', ['shell:videojs.install', 'hub:videojs']);
-    grunt.registerTask('build.js',  ['bower', 'build.videojs', 'uglify']);
-    grunt.registerTask('build.css', ['bower', 'less']);
+    grunt.registerTask('build.jqueryui', ['shell:jqueryui.install', 'hub:jqueryui']);
+    grunt.registerTask('build.videojs',  ['shell:videojs.install',  'hub:videojs']);
+    grunt.registerTask('build.js',  ['bower', 'build.jqueryui', 'build.videojs', 'uglify']);
+    // CSS build depends on JQUI
+    grunt.registerTask('build.css', ['bower', 'build.jqueryui', 'less']);
     grunt.registerTask('build',     ['bower', 'uglify', 'less']);
     grunt.registerTask('default',   ['build']);
 };
