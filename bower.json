@@ -17,7 +17,8 @@
     "jquery.cookie": "1.4.0",
     "flot": "0.8.2",
     "farbtastic": "1.3u",
-    "tinycolor": "0.9.16"
+    "tinycolor": "0.9.16",
+    "videojs": "4.3.0"
   },
   "ignore": [
     "**/.*",
