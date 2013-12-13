@@ -8,6 +8,39 @@ module.exports = function(grunt) {
             },
             install: {}
         },
+        shell: {
+            options: {
+                stdout: true,
+                stederr: true,
+                failOnError: true
+            },
+//            "jqueryui.install": {
+//                command: 'npm install',
+//                tasks: ['build'],
+//                options: {
+//                    execOptions: {
+//                        cwd: 'www/javascript/components/jquery.ui/'
+//                    }
+//                }
+//            },
+            "videojs.install": {
+                command: 'npm install',
+                options: {
+                    execOptions: {
+                        cwd: 'www/javascript/components/jquery.ui/'
+                    }
+                }
+            }
+        },
+        hub: {
+//            jqueryui: {
+//                src: ['www/javascript/components/jquery.ui/Gruntfile.js'],
+//                tasks: ['build']
+//            },
+            videojs: {
+                src: ['www/javascript/components/videojs/Gruntfile.js']
+            }
+        },
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
@@ -101,9 +134,14 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-hub');
+    grunt.loadNpmTasks('grunt-shell');
 
-    grunt.registerTask('build-js',  ['bower', 'uglify']);
-    grunt.registerTask('build-css', ['bower', 'less']);
+    // Build tasks
+//    grunt.registerTask('build-jqueryui', ['shell:jqueryui.install', 'hub:jqueryui']);
+    grunt.registerTask('build.videojs', ['shell:videojs.install', 'hub:videojs']);
+    grunt.registerTask('build.js',  ['bower', 'build.videojs', 'uglify']);
+    grunt.registerTask('build.css', ['bower', 'less']);
     grunt.registerTask('build',     ['bower', 'uglify', 'less']);
     grunt.registerTask('default',   ['build']);
 };
