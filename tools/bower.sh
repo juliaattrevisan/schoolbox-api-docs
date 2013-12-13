@@ -7,4 +7,4 @@
 
 # Packages are now handled by NPM
 npm install
-grunt build-js
+grunt build.js

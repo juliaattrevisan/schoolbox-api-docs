@@ -12,4 +12,4 @@
 
 # Packages are now handled by NPM
 npm install
-grunt build-css
+grunt build.css
