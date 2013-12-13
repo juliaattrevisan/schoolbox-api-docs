@@ -42,7 +42,7 @@ $j(function() {
 	/*
 	* Autoclear the main site search field
 	* */
-	$j('#search-field').autoclear();
+	$j('#search-field').placeholder();
 
  	/*
 	* Remove the border from the bottom of the last row of any table.

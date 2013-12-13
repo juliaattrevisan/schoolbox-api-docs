@@ -3,7 +3,7 @@
 
 $j(function() {
 	//autoclear the catalogue search
-	$j('#library-search-field').autoclear();
+	$j('#library-search-field').placeholder();
 	$j('#galleryCycle').children('div:not(:first-child)').each(function() {
 		$j(this).hide();
 	});
@@ -38,7 +38,7 @@ $j(window).resize(function() {
 			<div class="clearfix">
 				<form id="library-search" action="http://library.mggs.vic.edu.au/oliver/opac/search.do" method="get">
 					<fieldset>
-						<input id="library-search-field" type="text" title="Catalogue Search" name="queryTerm" />
+						<input id="library-search-field" type="text" placeholder="Catalogue Search" name="queryTerm" />
 						<input id="library-search-button" type="submit" value="Search" />
                         
                         <input type="hidden" name="mode" value="BASIC" />
