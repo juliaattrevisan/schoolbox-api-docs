@@ -19,7 +19,8 @@
     "flot": "0.8.2",
     "farbtastic": "1.3u",
     "tinycolor": "0.9.16",
-    "videojs": "4.3.0"
+    "videojs": "4.3.0",
+    "swfobject": "2.2"
   },
   "ignore": [
     "**/.*",
