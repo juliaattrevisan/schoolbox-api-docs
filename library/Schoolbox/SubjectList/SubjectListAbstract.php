@@ -112,6 +112,24 @@ abstract class SubjectListAbstract {
 	 */
 
 	/**
+	 * Set page
+	 *
+	 * @param null $page
+	 */
+	protected function setPage($page) {
+		$this->page = $page;
+	}
+
+	/**
+	 * Get page
+	 *
+	 * @return null
+	 */
+	protected function getPage() {
+		return $this->page;
+	}
+
+	/**
 	 * Set all subjects
 	 *
 	 * @param array $allSubjects
@@ -164,24 +182,4 @@ abstract class SubjectListAbstract {
 	protected function getAllSubjectLists() {
 		return $this->allSubjectLists;
 	}
-
-	/**
-	 * Set page
-	 *
-	 * @param null $page
-	 */
-	protected function setPage($page) {
-		$this->page = $page;
-	}
-
-	/**
-	 * Get page
-	 *
-	 * @return null
-	 */
-	protected function getPage() {
-		return $this->page;
-	}
-
-
 }

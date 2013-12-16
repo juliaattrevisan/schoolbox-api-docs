@@ -14,11 +14,24 @@ namespace Schoolbox\SubjectList;
 class SideNav extends SubjectListAbstract {
 
 	/**
+	 * An instance of groupHandler
+	 *
+	 * @var null
+	 */
+	private $groupHandler = null;
+
+	/**
+	 * Hook method
+	 */
+	protected function setup() {
+		$this->setGroupHandler(new \Group());
+	}
+
+	/**
 	 * Expel each subject grouped by its type
 	 */
 	public function render() {
-		$groupHandler = new \Group();
-
+		new \Alaress_Probe($this->getAllSubjectLists());
 		foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
 			$this->getPage()->setVar(array(
 				'SUBJECT_CLASSTYPE' => $key
@@ -33,7 +46,7 @@ class SideNav extends SubjectListAbstract {
 				foreach($currentSubjectList as $currentSubject) {
 					$this->getPage()->setVar(array(
 						'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
-						'SUBJECT_URL' => is_array($currentSubject['category']) && $groupHandler->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
+						'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
 					));
 
 					$this->getPage()->parse('subject_item_block', 'subject_item', true);
@@ -67,4 +80,21 @@ class SideNav extends SubjectListAbstract {
 			));
 		}
 	}
-} 
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * @param null $groupHandler
+	 */
+	private function setGroupHandler($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * @return null
+	 */
+	private function getGroupHandler() {
+		return $this->groupHandler;
+	}
+}
