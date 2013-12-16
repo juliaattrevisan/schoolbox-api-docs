@@ -41,17 +41,11 @@
 				endTime.setSeconds(endTime.getSeconds()+config.timeLeft);
 				config.element.countdown(endTime)
 					.on('update.countdown', function(event) {
-						var element = $(this);
-						element.parent().show();
-						element.html(event.strftime('%H : %M : %S'));
+						$(this).html(event.strftime('%H : %M : %S'));
 					})
 					.on('finish.countdown', function() {
 						window.location = config.endUrl;
 					})
-			}
-
-			if (config.element.html() == '') {
-				config.element.parent().hide();
 			}
 		}
 	}
