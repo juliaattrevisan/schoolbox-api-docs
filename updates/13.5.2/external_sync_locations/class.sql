@@ -3,9 +3,9 @@ INSERT INTO `config`(
   `value`,
   `title`,
   `description`,
-  `field`,
+  `field_id`,
   `options`,
-  `type`,
+  `type_id`,
   `editable`,
   `hidden`,
   `required`
@@ -15,9 +15,9 @@ VALUES (
   '/home/alaress/classes.csv',
   'External Sync Class CSV Location',
   'External Sync Class CSV Location',
-  'input',
+  1,
   NULL,
-  'External DB',
+  7,
   'true',
   'false',
   'false'
