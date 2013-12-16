@@ -20,7 +20,10 @@
     "farbtastic": "1.3u",
     "tinycolor": "0.9.16",
     "videojs": "4.3.0",
-    "swfobject": "2.2"
+    "swfobject": "2.2",
+    "imagesloaded": "3.0.4",
+    "eventEmitter": "4.2.6",
+    "eventie": "1.0.3"
   },
   "ignore": [
     "**/.*",
