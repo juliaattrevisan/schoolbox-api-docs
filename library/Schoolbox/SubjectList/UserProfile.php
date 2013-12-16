@@ -21,12 +21,28 @@ class UserProfile extends SubjectListAbstract{
 	private $groupHandler = null;
 
 	/**
+	 * An instance of External_Class
+	 *
+	 * @var null
+	 */
+	private $externalClassHandler = null;
+
+	/**
+	 * An instance of userHandler
+	 *
+	 * @var null
+	 */
+	private $userHandler = null;
+
+	/**
 	 * Hook method
 	 *
 	 * Set up blocks and stuff
 	 */
 	protected function setup() {
 		$this->setGroupHandler(new \Group());
+		$this->setExternalClassHandler(new \External_Class());
+		$this->setUserHandler(new \User());
 
 		$this->getPage()->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 		$this->getPage()->setBlock('subject', 'subject_row', 'subject_row_block');
@@ -47,8 +63,6 @@ class UserProfile extends SubjectListAbstract{
 	 * Expel each subject grouped by its type
 	 */
 	public function render() {
-		$synClass = new \External_Class();
-		$userHandler = new \User();
 
 		/* Expel each subject grouped by its type
 		 */
@@ -85,14 +99,14 @@ class UserProfile extends SubjectListAbstract{
 							$code = $currentSubject['subject']['code'];
 						}
 
-						$teacherList = $synClass->getTeacherName($code);
+						$teacherList = $this->getExternalClassHandler()->getTeacherName($code);
 
 						if (is_array($teacherList) && count($teacherList)) {
 							foreach ($teacherList as $teacherSynID) {
-								$teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $this->getGroupHandler()->getStaffGroupTypeIds());
+								$teacher = $this->getUserHandler()->getBySynergyAndGroup($teacherSynID, $this->getGroupHandler()->getStaffGroupTypeIds());
 
 								if (is_array($teacher)) {
-									$teacherName = $userHandler->formatName($teacher);
+									$teacherName = $this->getUserHandler()->formatName($teacher);
 
 									$emailObj = new \Email();
 									$emailAddress = $emailObj->formatEmailFromArray($teacher);
@@ -178,5 +192,41 @@ class UserProfile extends SubjectListAbstract{
 	 */
 	private function getGroupHandler() {
 		return $this->groupHandler;
+	}
+
+	/**
+	 * Set external class handler
+	 *
+	 * @param null $externalClassHandler
+	 */
+	private function setExternalClassHandler($externalClassHandler) {
+		$this->externalClassHandler = $externalClassHandler;
+	}
+
+	/**
+	 * Get external class handler
+	 *
+	 * @return null
+	 */
+	private function getExternalClassHandler() {
+		return $this->externalClassHandler;
+	}
+
+	/**
+	 * Set user handler
+	 *
+	 * @param null $userHandler
+	 */
+	private function setUserHandler($userHandler) {
+		$this->userHandler = $userHandler;
+	}
+
+	/**
+	 * Get user handler
+	 *
+	 * @return null
+	 */
+	private function getUserHandler() {
+		return $this->userHandler;
 	}
 }
