@@ -11,7 +11,7 @@
 namespace Schoolbox\SubjectList;
 
 
-class UserProfile extends SubjectListAbstract{
+class UserProfile extends SubjectListAbstract {
 
 	/**
 	 * An instance of groupHandler
