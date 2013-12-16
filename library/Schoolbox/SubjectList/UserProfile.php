@@ -47,46 +47,12 @@ class UserProfile extends SubjectListAbstract{
 	 * Expel each subject grouped by its type
 	 */
 	public function render() {
-		$allSubjectLists = array();
-
-		/* Group them up into manageable chunks because of phplib
-		 * Dump subjects without a defined classType into a generic
-		 * "Subjects" array element, otherwise use their provided
-		 * classTypes instead
-		 */
-		if (is_array($this->getAllSubjectLists()) && count($this->getAllSubjectLists())) {
-			foreach($this->getAllSubjectLists() as $currentSubject) {
-				$category = $this->getCategoryHandler()->getByCode($currentSubject['code']);
-
-				/* If the homepage doesn't exist or can't be found, don't
-				 * link it in the Subject list
-				 */
-				if (is_numeric($category['id'])) {
-					$childElement = array(
-						'subject' => $currentSubject,
-						'category' => $category,
-						'categoryName' => is_array($category) ? $category['name'] : $currentSubject['name']
-					);
-
-					/* Subjects without a parent just get thrown together into
-					 * a generic container
-					 */
-					if (!strlen($currentSubject['classType'])) {
-						$allSubjectLists['Subjects'][] = $childElement;
-					}
-					else {
-						$allSubjectLists[$currentSubject['classType']][] = $childElement;
-					}
-				}
-			}
-		}
-
 		$synClass = new \External_Class();
 		$userHandler = new \User();
 
 		/* Expel each subject grouped by its type
 		 */
-		foreach($allSubjectLists as $key => $currentSubjectList) {
+		foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
 			$emailAll = array();
 
 			$this->getPage()->setVar(array(
@@ -104,7 +70,7 @@ class UserProfile extends SubjectListAbstract{
 						'subject_teacher_block' => ''
 					));
 
-					if ((Cfg::get('show_all_subjects') == 1) || $currentSubject['category']['id'] ) {
+					if ((\Config::get('show_all_subjects') == 1) || $currentSubject['category']['id'] ) {
 						$this->getPage()->setVar(array(
 							'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
 							'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
@@ -178,7 +144,7 @@ class UserProfile extends SubjectListAbstract{
 					$this->getPage()->parse("subject_mail_block", "subject_mail");
 				}
 				else {
-					$this->vsetVar('subject_mail_block', '');
+					$this->getPage()->setVar('subject_mail_block', '');
 				}
 			}
 
