@@ -30,10 +30,8 @@ class SideNav extends SubjectListAbstract {
 
 		$this->getPage()->setBlock('navTpl', 'has_msubject', 'has_msubject_block');
 		$this->getPage()->setBlock('has_msubject', 'msubject', 'msubject_block');
-		$this->getPage()->setBlock('msubject', 'msubject_row', 'msubject_row_block');
-		$this->getPage()->setBlock('msubject', 'msubject_mail', 'msubject_mail_block');
-		$this->getPage()->setBlock('msubject_row', 'msubject_item', 'msubject_item_block');
-		$this->getPage()->setBlock('msubject_item', 'msubject_teacher', 'msubject_teacher_block');
+		$this->getPage()->setBlock('msubject', 'msubject_classtype', 'msubject_classtype_block');
+		$this->getPage()->setBlock('msubject', 'msubject_item', 'msubject_item_block');
 	}
 
 	/**
@@ -42,9 +40,21 @@ class SideNav extends SubjectListAbstract {
 	public function render() {
 		if (count(array_keys($this->getAllSubjectLists()))) {
 			foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
-				$this->getPage()->setVar(array(
-					'SUBJECT_CLASSTYPE' => $key
-				));
+
+				/* Respect thy authority
+				 */
+				if (\Config::get('mysubjects_split')) {
+					$this->getPage()->setVar(array(
+						'SUBJECT_CLASSTYPE' => $key
+					));
+
+					$this->getPage()->parse('msubject_classtype_block', 'msubject_classtype');
+				}
+				else {
+					$this->getPage()->setVar(array(
+						'msubject_classtype_block' => ''
+					));
+				}
 
 				/* For all the classes in the current subject
 				 */
@@ -56,13 +66,6 @@ class SideNav extends SubjectListAbstract {
 						));
 
 						$this->getPage()->parse('msubject_item_block', 'msubject_item', true);
-						$this->getPage()->parse('msubject_row_block', 'msubject_row', true);
-
-						/* Clear children after parsing out the parent
-						 */
-						$this->getPage()->setVar(array(
-							'msubject_item_block' => ''
-						));
 					}
 				}
 
@@ -71,7 +74,6 @@ class SideNav extends SubjectListAbstract {
 				/* Clear children after parsing out the parent
 				 */
 				$this->getPage()->setVar(array(
-					'msubject_row_block' => '',
 					'msubject_item_block' => '',
 				));
 			}
