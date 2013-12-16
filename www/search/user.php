@@ -41,11 +41,7 @@ if (is_numeric($this->arg[0])) {
 	    $this->setBlock('spouse_details', 'spouse_mobile', 'spouse_mobile_block');
 	    $this->setBlock('spouse_details', 'spouse_phone', 'spouse_phone_block');
         $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
-        $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
-        $this->setBlock('subject', 'subject_row', 'subject_row_block');
-        $this->setBlock('subject', 'subject_mail', 'subject_mail_block');
-        $this->setBlock('subject_row', 'subject_item', 'subject_item_block');
-	    $this->setBlock('subject_item', 'subject_teacher', 'subject_teacher_block');
+
 	    $this->setBlock(TEMPLATE_content, 'group', 'group_block');
 	    $this->setBlock('group', 'group_row', 'group_row_block');
 	    $this->setBlock('group', 'group_mail', 'group_mail_block');
@@ -92,8 +88,6 @@ if (is_numeric($this->arg[0])) {
         'parent_synergy_form_block' => '',
         'parent_spouse_block' => '',
         'staff_synergy_block' => '',
-        'subject_block' => '',
-        'subject_row_block' => '',
 	    'group_block' => '',
 	    'group_row_block' => '',
 		'user_calendar_block' => ''
@@ -335,150 +329,8 @@ if (is_numeric($this->arg[0])) {
 	                /*Output subject list */
 	                $subjectList = $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']);
 
-					$allSubjectLists = array();
-
-					/* Group them up into manageable chunks because of phplib
-					 * Dump subjects without a defined classType into a generic
-					 * "Subjects" array element, otherwise use their provided
-					 * classTypes instead
-					 */
-					if (is_array($subjectList) && count($subjectList)) {
-						foreach($subjectList as $currentSubject) {
-							$category = $catHandler->getByCode($currentSubject['code']);
-
-							/* If the homepage doesn't exist or can't be found, don't
-							 * link it in the Subject list
-							 */
-							if (is_numeric($category['id'])) {
-								$childElement = array(
-									'subject' => $currentSubject,
-									'category' => $category,
-									'categoryName' => is_array($category) ? $category['name'] : $currentSubject['name']
-								);
-
-								/* Subjects without a parent just get thrown together into
-								 * a generic container
-								 */
-								if (!strlen($currentSubject['classType'])) {
-									$allSubjectLists['Subjects'][] = $childElement;
-								}
-								else {
-									$allSubjectLists[$currentSubject['classType']][] = $childElement;
-								}
-							}
-						}
-					}
-
-					/* Expel each subject grouped by its type
-					 */
-					foreach($allSubjectLists as $key => $currentSubjectList) {
-						$emailAll = array();
-
-						$this->setVar(array(
-							'SUBJECT_CLASSTYPE' => $key
-						));
-
-						/* For all the classes in the current subject
-						 */
-						if (is_array($currentSubjectList) && count($currentSubjectList)) {
-							$listItems = count($currentSubjectList)>1 ? ceil(count($currentSubjectList)/2) : 1;
-							$i = 1;
-
-							foreach($currentSubjectList as $currentSubject) {
-
-
-								$this->setVar(array(
-									'subject_teacher_block' => ''
-								));
-
-								if ((Cfg::get('show_all_subjects') == 1) || $currentSubject['category']['id'] ) {
-									$this->setVar(array(
-										'SUBJECT_NAME' => Scrub::text($currentSubject['categoryName']),
-										'SUBJECT_URL' => is_array($currentSubject['category']) && $groupHandler->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
-									));
-
-									/* Fetch teacher names
-									 */
-									if ($subject['campusCode']) {
-										$code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
-									}
-									else {
-										$code = $currentSubject['subject']['code'];
-									}
-
-									$teacherList = $synClass->getTeacherName($code);
-									$teacherOutput = array();
-
-									if (is_array($teacherList) && count($teacherList)) {
-										foreach ($teacherList as $teacherSynID) {
-											$teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $groupHandler->getStaffGroupTypeIds());
-
-											if (is_array($teacher)) {
-												$teacherName = $userHandler->formatName($teacher);
-
-												$emailObj = new Email();
-												$emailAddress = $emailObj->formatEmailFromArray($teacher);
-												$emailAll[] = $emailAddress;
-
-												$this->setVar(array(
-													'SUBJECT_TEACHER_ID' => $teacher['uid'],
-													'SUBJECT_TEACHER_EXTERNAL_ID' => $teacher['synergy_id'],
-													'SUBJECT_TEACHER_NAME' => $teacherName,
-													'SUBJECT_TEACHER_EMAIL' => $_SESSION['mailhandle'] . $emailAddress,
-												));
-
-												$this->parse('subject_teacher_block', 'subject_teacher', true);
-											}
-										}
-									}
-
-									$this->parse('subject_item_block', 'subject_item', true);
-
-									/* Clear children after parsing out the parent
-									 */
-									$this->setVar(array(
-										'subject_teacher_block' => ''
-									));
-
-									/* Distribute half n' half
-									 */
-									if ($i % $listItems == 0) {
-										$this->parse('subject_row_block', 'subject_row', true);
-
-										/* Clear children after parsing out the parent
-										 */
-										$this->setVar(array(
-											'subject_item_block' => ''
-										));
-
-										$i = 0;
-									}
-									else {
-										$i++;
-									}
-								}
-							}
-
-							/* Output email all subject teachers */
-							if ($groupHandler->isStaff()) {
-								$this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-								$this->setVar("EMAILALL", implode(',', $emailAll));
-								$this->parse("subject_mail_block", "subject_mail");
-							}
-							else {
-								$this->setVar('subject_mail_block', '');
-							}
-						}
-
-						$this->parse('subject_block', 'subject', true);
-
-						/* Clear children after parsing out the parent
-						 */
-						$this->setVar(array(
-							'subject_row_block' => '',
-							'subject_item_block' => '',
-						));
-					}
+					$renderer = new \Schoolbox\SubjectList\UserProfile($this, $subjectList);
+					$renderer->render();
 
 		            /* Output group list */
 		            $groupList = $groupHandler->involvedInCategoryList($user['uid'], false);
