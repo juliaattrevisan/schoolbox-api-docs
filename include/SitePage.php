@@ -634,8 +634,8 @@ class SitePage extends Page {
 	 * (not to be confused with "My Groups")
 	 */
 	public function renderSubjectList() {
-		$this->setBlock('navTpl', 'msubject', 'msubject_section');
-		$this->setBlock('msubject', 'msubject_block', 'my_subjects');
+//		$this->setBlock('navTpl', 'msubject', 'msubject_section');
+//		$this->setBlock('msubject', 'msubject_block', 'my_subjects');
 
 		$renderer = new \Schoolbox\SubjectList\SideNav($this, $_SESSION['subjects']);
 		$renderer->render();

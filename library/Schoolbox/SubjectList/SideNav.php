@@ -22,61 +22,65 @@ class SideNav extends SubjectListAbstract {
 
 	/**
 	 * Hook method
+	 *
+	 * Set up blocks and stuff
 	 */
 	protected function setup() {
 		$this->setGroupHandler(new \Group());
+
+		$this->getPage()->setBlock('navTpl', 'has_msubject', 'has_msubject_block');
+		$this->getPage()->setBlock('has_msubject', 'msubject', 'msubject_block');
+		$this->getPage()->setBlock('msubject', 'msubject_row', 'msubject_row_block');
+		$this->getPage()->setBlock('msubject', 'msubject_mail', 'msubject_mail_block');
+		$this->getPage()->setBlock('msubject_row', 'msubject_item', 'msubject_item_block');
+		$this->getPage()->setBlock('msubject_item', 'msubject_teacher', 'msubject_teacher_block');
 	}
 
 	/**
 	 * Expel each subject grouped by its type
 	 */
 	public function render() {
-		new \Alaress_Probe($this->getAllSubjectLists());
-		foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
-			$this->getPage()->setVar(array(
-				'SUBJECT_CLASSTYPE' => $key
-			));
+		if (count(array_keys($this->getAllSubjectLists()))) {
+			foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
+				$this->getPage()->setVar(array(
+					'SUBJECT_CLASSTYPE' => $key
+				));
 
-			/* For all the classes in the current subject
-			 */
-			if (is_array($currentSubjectList) && count($currentSubjectList)) {
-				$listItems = count($currentSubjectList)>1 ? ceil(count($currentSubjectList)/2) : 1;
-				$i = 1;
+				/* For all the classes in the current subject
+				 */
+				if (is_array($currentSubjectList) && count($currentSubjectList)) {
+					foreach($currentSubjectList as $currentSubject) {
+						$this->getPage()->setVar(array(
+							'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
+							'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
+						));
 
-				foreach($currentSubjectList as $currentSubject) {
-					$this->getPage()->setVar(array(
-						'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
-						'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
-					));
-
-					$this->getPage()->parse('subject_item_block', 'subject_item', true);
-
-					/* Distribute half n' half
-					 */
-					if ($i % $listItems == 0) {
-						$this->getPage()->parse('subject_row_block', 'subject_row', true);
+						$this->getPage()->parse('msubject_item_block', 'msubject_item', true);
+						$this->getPage()->parse('msubject_row_block', 'msubject_row', true);
 
 						/* Clear children after parsing out the parent
 						 */
 						$this->getPage()->setVar(array(
-							'subject_item_block' => ''
+							'msubject_item_block' => ''
 						));
-
-						$i = 0;
-					}
-					else {
-						$i++;
 					}
 				}
+
+				$this->getPage()->parse('msubject_block', 'msubject', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->getPage()->setVar(array(
+					'msubject_row_block' => '',
+					'msubject_item_block' => '',
+				));
 			}
 
-			$this->getPage()->parse('subject_block', 'subject', true);
-
-			/* Clear children after parsing out the parent
-			 */
+			$this->getPage()->parse('has_msubject_block', 'has_msubject');
+		}
+		else {
 			$this->getPage()->setVar(array(
-				'subject_row_block' => '',
-				'subject_item_block' => '',
+				'has_msubject_block' => ''
 			));
 		}
 	}
