@@ -629,27 +629,36 @@ class SitePage extends Page {
         }
     }
 
-    function renderSubjectList() {
-        //this section handles the mysubjects section in the template
-        $this->setBlock("navTpl", "msubject", "msubject_section");
-        $this->setBlock("msubject", "msubject_block", "my_subjects");
+	/**
+	 * Render "My Subjects" list in the side navigation
+	 * (not to be confused with "My Groups")
+	 */
+	public function renderSubjectList() {
+		$this->setBlock('navTpl', 'msubject', 'msubject_section');
+		$this->setBlock('msubject', 'msubject_block', 'my_subjects');
 
-        if (is_array($_SESSION['subjects'])) {
-            foreach ($_SESSION['subjects'] as $subject) {
-                if ($this->groupHandler->isStaff()) {
-                    $this->setVar("MSUBJECT", $subject['name'] . " (" . $subject['code'] . ")");
-                } else {
-                    $this->setVar("MSUBJECT", $subject['name']);
-                }
+		$renderer = new \Schoolbox\SubjectList\SideNav($this, $_SESSION['subjects']);
+		$renderer->render();
 
-                $this->setVar("MSUBCODE", urlencode(urlencode($subject['code'])));
-                $this->parse("my_subjects", "msubject_block", true);
-            }
-            $this->parse("msubject_section", "msubject");
-        } else {
-            $this->setVar("msubject_section", "");
-        }
-    }
+//		if (is_array($_SESSION['subjects'])) {
+//			foreach ($_SESSION['subjects'] as $subject) {
+//				if ($this->groupHandler->isStaff()) {
+//					$this->setVar('MSUBJECT', $subject['name'] . ' (' . $subject['code'] . ')');
+//				}
+//				else {
+//					$this->setVar('MSUBJECT', $subject['name']);
+//				}
+//
+//				$this->setVar('MSUBCODE', urlencode(urlencode($subject['code'])));
+//				$this->parse('my_subjects', 'msubject_block', true);
+//			}
+//
+//			$this->parse('msubject_section', 'msubject');
+//		}
+//		else {
+//			$this->setVar('msubject_section', '');
+//		}
+	}
 
     function renderLinkList() {
         $this->setBlock("navTpl", "mlink_block", "my_links");
