@@ -1,14 +1,26 @@
 <div id="nav">
 	<h3>My eVI</h3>
   {MCSSMENU}
-	<!-- BEGIN msubject -->
+
+	<!-- BEGIN has_msubject -->
 	<h3>My Subjects</h3>
-  <ul>
-    <!-- BEGIN msubject_block --> 
-    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
-    <!-- END msubject_block -->
-  </ul>
-  <!-- END msubject -->
+	<ul>
+		<!-- BEGIN msubject -->
+		<!-- BEGIN msubject_classtype -->
+		<li><h3>{SUBJECT_CLASSTYPE}</h3></li>
+		<!-- END msubject_classtype -->
+
+		<!-- BEGIN msubject_item -->
+		<li>
+			<a href="{SUBJECT_URL}">{SUBJECT_NAME}</a>
+		</li>
+		<!-- END msubject_item -->
+
+		<!-- END msubject -->
+	</ul>
+	<!-- END msubject -->
+	<!-- END has_msubject -->
+
   <!-- BEGIN mstudent -->
 	<h3>My Students</h3>
   <ul>

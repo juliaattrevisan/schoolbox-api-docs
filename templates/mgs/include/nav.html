@@ -11,14 +11,26 @@
       <div class="float-fix"></div>
     </li>
   </ul>
-    <!-- BEGIN msubject -->
+
+	<!-- BEGIN has_msubject -->
 	<h3>&raquo; My Subjects</h3>
-  <ul class="clearfix">
-    <!-- BEGIN msubject_block --> 
-    <li><a href="/homepage/{MSUBCODE}/"><span>{MSUBJECT}</span></a></li> 
-    <!-- END msubject_block -->
-  </ul>
-  <!-- END msubject -->
+	<ul class="clearfix">
+		<!-- BEGIN msubject -->
+		<!-- BEGIN msubject_classtype -->
+		<li><h3>{SUBJECT_CLASSTYPE}</h3></li>
+		<!-- END msubject_classtype -->
+
+		<!-- BEGIN msubject_item -->
+		<li>
+			<a href="{SUBJECT_URL}">{SUBJECT_NAME}</a>
+		</li>
+		<!-- END msubject_item -->
+
+		<!-- END msubject -->
+	</ul>
+	<!-- END msubject -->
+	<!-- END has_msubject -->
+
   <!-- BEGIN mstudent -->
 	<h3>&raquo; My Students</h3>
   <ul class="clearfix">
