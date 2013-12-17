@@ -45,17 +45,17 @@
 // DP
 // Density-independent pixel
 @dp:                48px;
-@dp2-3:             @dp * ( 2 / 3); // 32
-@dp2:               @dp / 2;        // 24
-@dp3:               @dp / 3;        // 16
-@dp5-16:            @dp * (5 / 16); // 15
-@dp4:               @dp / 4;        // 12
-@dp5-24:            @dp * (5 / 24); // 10
-@dp6:               @dp / 6;        //  8
-@dp8:               @dp / 8;        //  6
-@dp12:              @dp / 12;       //  4
-@dp16:              @dp / 16;       //  3
-@dp24:              @dp / 24;       //  2
+@dp2-3:             (@dp * 2/3);      // 32
+@dp2:               (@dp / 2);        // 24
+@dp3:               (@dp / 3);        // 16
+@dp5-16:            (@dp * 5/16);     // 15
+@dp4:               (@dp / 4);        // 12
+@dp5-24:            (@dp * 5/24);     // 10
+@dp6:               (@dp / 6);        //  8
+@dp8:               (@dp / 8);        //  6
+@dp12:              (@dp / 12);       //  4
+@dp16:              (@dp / 16);       //  3
+@dp24:              (@dp / 24);       //  2
 
 // default rouding
 @radius:            @dp12;          //  4
@@ -68,7 +68,7 @@
 @bigfont:           1.2em;          // 18 - big fontsize
 @iconfont:          1.6em;          // 24 - icon fontsize
 
-@font:              ~`'@{basefont}'+'/'+'@{baseline}'+' '+'@{font-family}'`;
+@font:              @basefont/@baseline @font-family;
 
 @linepx:			18;
 @line:				1.4;
