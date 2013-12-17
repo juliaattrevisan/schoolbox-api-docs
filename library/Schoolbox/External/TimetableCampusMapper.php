@@ -82,7 +82,9 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
      * @return TimetableCampus
      */
     public function findCurrentTimetable(Campus $campus, $date = 'now') {
+        /** @var TimetableCycleMapper $cycle_mapper */
         $cycle_mapper  = $this->getJoinMapper('cycle');
+        /** @var Schoolbox\CampusMapper $cycle_mapper */
         $campus_mapper = $this->getJoinMapper('campus');
         $query = "
             SELECT
@@ -104,7 +106,7 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
 
         if ($row = $statement->fetch()) {
             /** @var TimetableCampus $timetable_campus **/
-            $timetable_campus = $this->hydrate('tc');
+            $timetable_campus = $this->hydrate($row, 'tc');
             $timetable_campus
                 ->setCycle($cycle_mapper->hydrate($row, 'ty'))
                 ->setCampus($campus_mapper->hydrate($row, 'ca'))
