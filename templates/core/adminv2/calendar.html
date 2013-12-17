@@ -1,7 +1,8 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 
 $j(function() {
@@ -17,29 +18,19 @@ $j(function() {
 		}
 	});
 
-	$j.fn.qtip.defaults.position.corner = {
-		target: 'topLeft',
-		tooltip: 'bottomLeft'
-	}
-	
-	$j.fn.qtip.defaults.style = {
-		tip: 'bottomLeft',
-		name: 'green'
-	}
-	
-	$j('h3 span').each(function() {
-		activeContent = $j(this).siblings('em').html();
-
-		$j(this).qtip({
-			content: activeContent,
-			api: {
-				// Retrieve the content when tooltip is first rendered
-				onRender: function() {
-					var self = this;
-				}
-			}
-		});
-	});
+    $j('h3 span').each(function() {
+        var activeContent = $j(this).siblings('em').html();
+        $j(this).qtip({
+            content: activeContent,
+            style: {
+                classes: 'qtip-green qtip-shadow qtip-rounded'
+            },
+            position: {
+                my: 'bottom left',
+                at: 'top left'
+            }
+        });
+    });
 });
 </script>
 <!-- END custom_head-->
