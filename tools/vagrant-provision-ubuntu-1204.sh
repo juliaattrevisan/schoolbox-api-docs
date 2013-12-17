@@ -28,8 +28,6 @@ then
 	echo "$vag Creating Schoolbox conf file";
 	cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
 	sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
-	echo "$vag Building css files via less";
-	/vagrant/tools/build-less-css.sh;
 	echo "$vag Installing git if not present (may be required for composer modules)";
 	apt-get -y install git
 	echo "$vag Installing vendor submodules with composer";
@@ -116,8 +114,14 @@ then
 	fi
 	apt-get -y install nodejs
 
-	echo "$vag Installing JS submodules with Bower";
-	/vagrant/tools/bower.sh;
+	echo "$vag Installing NPM dependencies";
+	npm install
+	echo "$vag Installing Bower submodules";
+	grunt bower
+	echo "$vag Building JS files via UglifyJS";
+	grunt build.js
+	echo "$vag Building CSS files via LessCSS";
+	grunt build.css
 
 	echo "$vag Installing PHP packages";
 	apt-get -y install libpspell-dev php5-pspell aspell-en php5 php5-dev php-pear > /dev/null 2>&1;

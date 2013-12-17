@@ -108,9 +108,9 @@ module.exports = function(grunt) {
     // Build tasks
     grunt.registerTask('build.jqueryui', ['shell:jqueryui.install', 'hub:jqueryui']);
     grunt.registerTask('build.videojs',  ['shell:videojs.install',  'hub:videojs']);
-    grunt.registerTask('build.js',  ['bower', 'build.jqueryui', 'build.videojs', 'uglify']);
+    grunt.registerTask('build.js',  ['build.jqueryui', 'build.videojs', 'uglify']);
     // CSS build depends on JQUI
-    grunt.registerTask('build.css', ['bower', 'build.jqueryui', 'less']);
-    grunt.registerTask('build',     ['bower', 'uglify', 'less']);
+    grunt.registerTask('build.css', ['build.jqueryui', 'less']);
+    grunt.registerTask('build',     ['bower', 'build.js', 'build.css']);
     grunt.registerTask('default',   ['build']);
 };
