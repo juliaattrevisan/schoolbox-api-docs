@@ -61,35 +61,17 @@ setupCustomise = {
 					howManyInstances = '<strong>' + howManyInstances + '</strong> instances '
 				}
 
-				$j(this).qtip({
-					content: 'You have '+ howManyInstances +'of this component currently active',
-					show: 'mouseover',
-					hide: 'mouseout',
-					position: {
-						corner: {
-							tooltip: 'bottomLeft',
-							target: 'topright'
-						}
-					},
-					api: {
-							// Retrieve the content when tooltip is first rendered
-							 onRender: function()
-							 {
-								var self = this;
-							 }
-						 },
-					style: {
-						background: '#fffde9',
-						color: 'black',
-						border: {
-							width: 3,
-							radius: 4,
-							color: '#fff9bf'
-						},
-						name: 'green' // Inherit from preset style
-				   }
-				});
-			});
+                $j(this).qtip({
+                    content: 'You have '+ howManyInstances +'of this component currently active',
+                    style: {
+                        classes: 'qtip-default qtip-shadow qtip-rounded'
+                    },
+                    position: {
+                        my: 'bottom left',
+                        at: 'top right'
+                    }
+                });
+            });
 
 
 			$j(document).on('click', ".add-component a", function(event) {

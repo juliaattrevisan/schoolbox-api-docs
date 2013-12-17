@@ -26,24 +26,16 @@ $j.fn.configurator = function(opts) {
 
 
     this.help = function() {
-        $j.fn.qtip.defaults.position.corner = {
-            target: 'topLeft',
-            tooltip: 'bottomLeft'
-        };
-        $j.fn.qtip.defaults.style = {
-            tip: 'bottomLeft',
-            name: 'green'
-        };
-
         $j('h3 span').each(function() {
             var activeContent = $j(this).siblings('em').html();
             $j(this).qtip({
                 content: activeContent,
-                api: {
-                    // Retrieve the content when tooltip is first rendered
-                    onRender: function() {
-                        // if you want to use this hook for something, feel free
-                    }
+                style: {
+                    classes: 'qtip-green qtip-shadow qtip-rounded'
+                },
+                position: {
+                    my: 'bottom left',
+                    at: 'top left'
                 }
             });
         });
@@ -57,6 +49,13 @@ $j.fn.configurator = function(opts) {
                 show: {
                     event: event.type,
                     ready: true
+                },
+                style: {
+                    classes: 'qtip-green qtip-shadow qtip-rounded'
+                },
+                position: {
+                    my: 'bottom left',
+                    at: 'top left'
                 }
             }, event); // Pass through our original event to qTip
         });
