@@ -23,6 +23,7 @@ class AdminV2_Nav {
         'list' => 'Lists',
         'cleanup' => 'Cleanup',
 		'usage' => 'Usage',
+	    'rollover' => 'Rollover',
     );
 
     public function parse(SitePage $page, $currentPage = 'home') {
