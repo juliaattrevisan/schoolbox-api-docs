@@ -3,7 +3,6 @@
 <script type="text/javascript">
 	var date1 = new Date;
 </script>
-<script type="text/javascript" src="/javascript/jquery.simplemodal.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
@@ -253,27 +252,15 @@ $j(function() {
         var path = '/cms/properties.php?' + kind + 'ID=' + id
         $j.get(path, function(data) {
 
-          $j(data).modal({
-            position: ["15%"],
-            overlayId: 'properties-overlay',
-            containerId: 'properties-container',
-            containerCss: {height: 'auto'},
-            onOpen: function (dialog) {
-              dialog.overlay.fadeIn(200, function () {
-                dialog.container.fadeIn(200, function () {
-                  dialog.data.show()
-                })
-              })
-            },
-            onClose: function (dialog) {
-              dialog.container.fadeOut(200, function () {
-                dialog.overlay.fadeOut(200, function () {
-                  $j.modal.close()
-                })
-              })
-            }
-          })
-
+          $j('<div />').append(data).dialog({
+              modal:  true,
+              title:  'Properties',
+              width:  'auto',
+              height: 'auto',
+              close:  function() {
+                  $(this).dialog('destroy');
+              }
+          });
         })
       }
     },
