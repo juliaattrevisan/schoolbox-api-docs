@@ -1,7 +1,6 @@
-<script type="text/javascript"
-        src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
-<script type="text/javascript"
-        src="/javascript/jquery.tablesorter.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
     $j(function () {
 
@@ -9,24 +8,13 @@
             var largerImage = $j(this).siblings('.larger-image').html()
             $j(this).qtip({
                 content:largerImage,
-                position:{
-                    corner:{
-                        tooltip:'leftMiddle',
-                        target:'topRight'
-                    }
-
+                style: {
+                    classes: 'qtip-light qtip-shadow qtip-rounded',
+                    tip: {corner: false}
                 },
-                style:{
-                    background:'#fefefe',
-                    color:'black',
-                    border:{
-                        width:3,
-                        radius:4,
-                        color:'#f1f1f1'
-                    },
-                    width:200,
-                    height:200,
-                    name:'green'
+                position: {
+                    my: 'middle left',
+                    at: 'top right'
                 }
             });
         });
