@@ -1,6 +1,7 @@
 <?php
 
 $groupHandler = new Group();
+$userHandler = new User();
 
 if (!$groupHandler->isSuperuser()) {
     error(19);
@@ -179,8 +180,13 @@ UNION
 (SELECT `time` occurred, `action`, object, title, firstname, lastname FROM cmsLog JOIN `user` ON `user`.id=`user` ORDER BY `time` DESC LIMIT 0,40)
 ORDER BY occurred DESC LIMIT 0,20";
 $recentLog = $this->db->getAll($query);
+
+
 if(is_array($recentLog) ) {
     foreach($recentLog as $log) {
+
+        $action = '';
+
         switch($log['login']) {
             case '1' :
                 $action = 'Logged in';
@@ -191,6 +197,9 @@ if(is_array($recentLog) ) {
             case 'modify':
                 $action = 'Modified '.$log['ip'];
             break;
+            case 'access':
+                $action = 'Accessed '.$log['ip'];
+            break;
             case 'create' :
              $action = 'Added '.$log['ip'];
             break;
@@ -198,15 +207,17 @@ if(is_array($recentLog) ) {
              $action = 'Deleted '.$log['ip'];
             break;
 
+            default:  //If unknown, skip output
+                continue;
         }
 
-		$userHandler = new User();
-
-        $output = array('LOG_DATE'      => date(Cfg::get('date_short'), strtotime($log['occurred'])),
-                        'LOG_ACTION'    => $action,
-                        'LOG_NAME'      => $userHandler->formatName($log));
-        $this->setVar($output);
-        $this->parse('recent_log_block','recent_log',true);
+        if($action != '') {
+            $output = array('LOG_DATE'      => date(Cfg::get('date_short'), strtotime($log['occurred'])),
+                            'LOG_ACTION'    => $action,
+                            'LOG_NAME'      => $userHandler->formatName($log));
+            $this->setVar($output);
+            $this->parse('recent_log_block','recent_log',true);
+        }
     }
 }
 
