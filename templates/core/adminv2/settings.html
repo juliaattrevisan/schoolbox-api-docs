@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript">
@@ -33,27 +34,17 @@
 
 $j(function() {
 
-    $j.fn.qtip.defaults.position.corner = {
-        target: 'topLeft',
-        tooltip: 'bottomLeft'
-    }
-
-    $j.fn.qtip.defaults.style = {
-        tip: 'bottomLeft',
-        name: 'green'
-    }
-
     $j('label span').each(function() {
-        activeContent = $j(this).siblings('em').html();
+        var activeContent = $j(this).siblings('em').html();
         $j(this).qtip({
             content: activeContent,
-            api: {
-                    // Retrieve the content when tooltip is first rendered
-                     onRender: function()
-                     {
-                        var self = this;
-                     }
-                 }
+            style: {
+                classes: 'qtip-green qtip-shadow qtip-rounded'
+            },
+            position: {
+                my: 'bottom left',
+                at: 'top right'
+            }
         });
     });
 
