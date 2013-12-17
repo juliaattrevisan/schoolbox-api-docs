@@ -1,28 +1,21 @@
 <style type="text/css">@page{size:portrait}
  .private{ display:none; }
 </style>
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 $j(function(){
-	$j('.private h2').qtip({
-		content: 'Details have not been made available',
-		position: {
-			corner: {
-				tooltip: 'bottomLeft',
-				target: 'topleft'
-			}
-		},
-		style: {
-			background: '#fffde9',
-			color: 'black',
-			border: {
-				width: 3,
-				radius: 4,
-				color: '#fff9bf'
-			},
-			name: 'green'
-	   }
-	});
+    $j('.private h2').qtip({
+        content: 'Details have not been made available',
+        style: {
+            classes: 'qtip-default qtip-shadow qtip-rounded',
+            tip: {corner: false}
+        },
+        position: {
+            my: 'bottom left',
+            at: 'top left'
+        }
+    });
 
 	$j('.print').click(function() {
 		window.print();
