@@ -54,9 +54,33 @@
         };
         initTaskList();
 
+		/* Link button which shows the Link input field
+		 * Hide the input
+		 * Hide the label
+		 */
+		$('#link-new_task').hide();
+		$('form a[data-function="link"]').closest('dd').prev('dt').hide();
+
+		component.find('form a[data-function="link"]').bind('click.courseTaskList', function(event) {
+			event.preventDefault();
+
+			/* Toggle the input
+			 * Toggle the label
+			 */
+			$('#link-new_task').show();
+			$(this).closest('dd').prev('dt').show();
+		});
+
         // Upload button for link items
         component.find('form a[data-function="upload"]').bind('click.courseTaskList', function(event) {
             event.preventDefault();
+
+			/* Toggle the input
+			 * Toggle the label
+			 */
+			$('#link-new_task').show();
+			$(this).closest('dd').prev('dt').show();
+			
             // Set the form that this dialog was triggered from.
             var source_form = $(this).closest('form');
             dialog.ajaxUploadDialog('open', function(output) {
@@ -70,6 +94,13 @@
         var socialstream_browser = component.find('.resource_browser');
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
             component.delegate('form a[data-function="browse"]', 'click.courseTaskList', {}, function(event) {
+
+				/* Toggle the input
+				 * Toggle the label
+				 */
+				$('#link-new_task').hide();
+				$(this).closest('dd').prev('dt').hide();
+
                 var form = $(this).closest('form');
                 event.preventDefault();
                 socialstream_browser.socialstreamBrowser({
