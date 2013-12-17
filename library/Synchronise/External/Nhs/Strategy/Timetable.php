@@ -155,16 +155,16 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                         $teacher = UserMapper::getInstance()->findOneByColumn(
                             'synergy_id', $period['teacher']
                         );
-
-                    }
-                    catch (Exception $e) {print "teacher not found";}
-                    if ($teacher instanceof User) {
-                        //print_R($teacher);
                         $class_period->setTeacher($teacher);
                     }
-                    if($new_item['class'] == 'Duty.Library'){
-                        print_R($class_period);
+                    catch (Exception $e) {
+                        $this->verbose_filter->outputMessage(
+                            sprintf('Teacher "%s" not found for class "%s".', $period['teacher'], $class->getCode())
+                        );
                     }
+//                    if($new_item['class'] == 'Duty.Library'){
+////                        print_R($class_period);
+//                    }
                     ClassPeriodMapper::getInstance()->save($class_period);
                     // Break because we only want one row per period.
                     break;

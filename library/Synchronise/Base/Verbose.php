@@ -184,6 +184,18 @@ class Synchronise_Base_Verbose {
         }
     }
 
+    /**
+     * Outputs a message
+     *
+     * @param $message
+     * @param $prefix
+     */
+    public function outputMessage($message, $prefix = '') {
+        if ($this->getVerbose() === true) {
+            printf("% -2s %s\n", $prefix, $message);
+        }
+    }
+
 	/**
 	 * Create a verbose summary string containing data about the
 	 * current user being examined
