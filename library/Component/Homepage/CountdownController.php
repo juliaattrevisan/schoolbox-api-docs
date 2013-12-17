@@ -27,18 +27,17 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
             return false;
         }
         $this->parseConfig();
-        if (strlen($this->getConfig('date')) && strlen($this->getConfig('time'))) {
-            $deadline = new Alaress_Date_Format(strtotime($this->getConfig('date') . ' ' . $this->getConfig('time')), 'U');
+
+        // Date/time: assume today/12:00 am respectively if not provided
+        $date = $this->getConfig('date');
+        $time = $this->getConfig('time');
+        if (strlen($date) === 0) {
+            $date = date('Y-m-d');
         }
-        /* Default to now if no countdown date is specified
-        * i.e. when creating component for the first time
-        *
-        * Use +1 seconds to offset some js rendering weirdness
-        * This way it initialises at 00/00/00/00/00
-        */
-        else {
-            $deadline = new Alaress_Date_Format(time()+1, 'U');
+        if (strlen($time) === 0) {
+            $time = '00:00:00';
         }
+        $deadline = new Alaress_Date_Format(new DateTime($date.' '.$time));
 
         $this->setVar(array(
             'DEADLINE_YEAR' => $deadline->getUsingFormat('Y'),
