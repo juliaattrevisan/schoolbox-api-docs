@@ -120,12 +120,18 @@ class Synchronise_External_Nhs_Strategy_Class extends Synchronise_Base_Strategy_
         // Delete all old ones for this class, then put in the new ones.
         $teacher_message = count($new_item['teacher']).' teacher(s) to '.$class_message;
         if ($this->perform_update) {
-            $this->verbose_filter->outputPerformLinkMessage($teacher_message);
             ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STAFF_GROUP_TYPE);
-            $teacher = UserMapper::getInstance()->findOneByColumn('synergy_id', $new_item['teacher']);
-            $class_involvement = new ClassInvolvement();
-            $class_involvement->setClass($class)->setUser($teacher);
-            ClassInvolvementMapper::getInstance()->save($class_involvement);
+            try {
+                $teacher = UserMapper::getInstance()->findOneByColumn('synergy_id', $new_item['teacher']);
+                $class_involvement = new ClassInvolvement();
+                $class_involvement->setClass($class)->setUser($teacher);
+                ClassInvolvementMapper::getInstance()->save($class_involvement);
+                $this->verbose_filter->outputPerformLinkMessage($teacher_message);
+            }
+            catch (Exception $e) {
+                // class involvement not found
+                $this->verbose_filter->outputSkipMessage(' teachers to '.$class_message.' because class was not found.');
+            }
         }
         else {
             $this->verbose_filter->outputPlanLinkMessage($teacher_message);
