@@ -26,13 +26,13 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
                 && $sessionHandler->create($_POST['username']);
         }
         catch (Exception_Schoolbox_NotFound $e) {
-            $message = 'The username or password you typed is incorrect, please try again';
+            $message = 'The username or password you typed is incorrect, please try again.';
         }
         catch (Exception_Schoolbox_AccountDisabled $e) {
-            $message = 'This account is currently disabled';
+            $message = 'This account is currently disabled.';
         }
         catch (Exception_Schoolbox_AccessDenied $e) {
-            $message = 'The username or password you typed is incorrect, please try again';
+            $message = 'The username or password you typed is incorrect, please try again.';
         }
         if ($authenticated) {
             if (isset($_POST['page']) && $_POST['page'] && $_POST['page'] != '/') {
@@ -46,7 +46,9 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
         else {
             //get rid of session started earlier to stop it conflicting with next login
             $sessionHandler->destroy();
-            $message = 'The username or password you typed is incorrect, please try again';
+            if (empty($message)) {
+                $message = 'The username or password you typed is incorrect, please try again.';
+            }
         }
     }
 
