@@ -12,25 +12,28 @@ namespace Schoolbox\Notif\Handler;
 
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+use Schoolbox\Notif\MQ\Connector as MQConnector;
 
 class AMQPHandler extends AbstractProcessingHandler {
-
-	const EXCHANGE = 'topic_logs';
-	const TYPE = 'topic';
 
 	protected $connection;
 
 	/**
-	 * @param AMQPStreamConnection $connection
+	 * @param MQConnector $connection
 	 * @param bool|int $level
 	 * @param bool $bubble
 	 */
-	function __construct($connection, $level = Logger::DEBUG, $bubble = true) {
+	public function __construct($connection, $level = Logger::DEBUG, $bubble = true) {
 		parent::__construct($level, $bubble);
 		$this->connection = $connection;
-		$this->connection->channel()->exchange_declare(self::EXCHANGE, self::TYPE, false, false, false);
+	}
+
+	public function getMQConnector() {
+		return $this->connection;
+	}
+
+	public function getChannel() {
+		return $this->connection->getChannel();
 	}
 
 	/**
@@ -41,8 +44,6 @@ class AMQPHandler extends AbstractProcessingHandler {
 	 */
 	protected function write(array $record) {
 
-		$msg = new AMQPMessage($record["formatted"]);
-
 		// key in the form of [severity].[namespace](.[namespace])*
 		$routingKey = sprintf(
 			'%s.%s',
@@ -50,7 +51,7 @@ class AMQPHandler extends AbstractProcessingHandler {
 			$record['channel'] ?: 'system'
 		);
 
-		$this->connection->channel()->basic_publish($msg, self::EXCHANGE, $routingKey);
+		$this->connection->publish($record["formatted"], $routingKey);
 
 	}
 

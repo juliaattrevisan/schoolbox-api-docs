@@ -10,10 +10,17 @@
 namespace Schoolbox\Notif;
 
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
-use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
+use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
+use Schoolbox\ConfigLoader;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Handler\AMQPHandler;
+use Schoolbox\Notif\MQ\Connector as MQConnector;
 
 /**
  * This class is intentionally not a Singleton. It should be instantiated once only, yes, but then DI'd around.
@@ -23,15 +30,59 @@ use Schoolbox\Notif\Handler\AMQPHandler;
  */
 class Notif implements LoggerInterface {
 
+	const CHANNEL_SYSTEM       = 'sys';     // notifications about top-level events
+	const CHANNEL_NOTIFICATION = 'notif';   //     "           "   the notification system
+	const CHANNEL_DATABASE     = 'db';      //     "           "   internal database events
+	const CHANNEL_APPLICATION  = 'sb';      //     "           "   Schoolbox application events
+	const CHANNEL_SYNERGY      = 'syn';     //     "           "   synergy database events
+	const CHANNEL_ADMIN        = 'admin';   //     "           "   superuser events (includes assumption)
+	const CHANNEL_AUTH         = 'login';   //     "           "   authentication events
+
+	/** @var IConfigLoader */
+	protected $conf;
+
 	/** @var string */
 	protected $channel;
 
 	/** @var AMQPHandler */
 	protected $amqp;
 
-	public function __construct($channel = 'system') {
-		$this->amqp = new AMQPHandler(new AMQPConnection('localhost', 5672, 'guest', 'guest'));
+	/** @var SwiftMailerHandler  */
+	protected $mail;
+
+	/** @var StreamHandler */
+	protected $syslog;
+
+	public function __construct($channel = self::CHANNEL_SYSTEM, $configLoader = null) {
 		$this->channel = $channel;
+
+		$this->conf = $configLoader ?: new ConfigLoader();
+
+		$this->instantiateHandlers();
+	}
+
+	/**
+	 * Generates handlers for the various kinds of notifying
+	 */
+	protected function instantiateHandlers() {
+		// message queue handling
+		try {
+			$this->amqp = new AMQPHandler(new MQConnector);
+		}
+		catch(AMQPRuntimeException $e) {
+			$this->amqp = false;
+		}
+
+		// email handling
+		$this->mail = new SwiftMailerHandler(
+			new \Swift_Mailer(\Mailer::getSwiftTransport()),
+			\Swift_Message::newInstance('Schoolbox Log', null, 'text/plain', 'utf-8')
+				->addFrom('notif@' . $this->conf->get('site_hostname') . '.' . $this->conf->get('site_domain'))
+				->addTo('matt.day+notif@alaress.com.au')
+		);
+
+		$this->syslog = new StreamHandler(fopen($this->conf->get('logs_dir') . '/mono.log', 'a'), Logger::NOTICE);
+
 	}
 
 	public function getChannel() {
@@ -41,6 +92,44 @@ class Notif implements LoggerInterface {
 	public function setChannel($channel) {
 		$this->channel = $channel;
 		return $this;
+	}
+
+	/**
+	 * Returns the contents of the named queue
+	 * @param $queueName
+	 * @param bool $markAsRead
+	 * @return Collection
+	 */
+	public function readQueue($queueName, $markAsRead = true) {
+
+		$conn = $this->amqp->getMQConnector();
+		$conn->declareQueue($queueName);
+
+		$msgs = new Collection();
+
+		while($m = $conn->readQueue($queueName, $markAsRead)) {
+			/** @var AMQPMessage $m */
+			$msgs->add(array_merge($m->delivery_info, array('body' => $m->body)));
+		}
+
+		return $msgs;
+	}
+
+	/**
+	 * @param Logger $logger
+	 */
+	protected function appendHandlers($logger) {
+
+		$logger->pushHandler($this->syslog);
+
+		// the notification system shouldn't attempt to publish to itself (or try if it's down)
+		if($this->channel == self::CHANNEL_NOTIFICATION || $this->amqp === false) {
+			$logger->pushHandler($this->mail);
+		}
+		else {
+			$logger->pushHandler($this->amqp);
+		}
+
 	}
 
 	/**
@@ -60,7 +149,7 @@ class Notif implements LoggerInterface {
 
 	public function log($level, $message, array $context = array()) {
 		$log = new Logger($this->channel);
-		$log->pushHandler($this->amqp);
+		$this->appendHandlers($log);
 		return $log->addRecord($level, $message, $context);
 	}
 
