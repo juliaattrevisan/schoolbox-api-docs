@@ -35,8 +35,5 @@
     "www/javascript/components/",
     "test",
     "tests"
-  ],
-  "resolutions": {
-    "jquery": "2.0.3"
-  }
+  ]
 }
