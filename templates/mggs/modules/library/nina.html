@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-cycle/jquery.cycle.all.js"></script>
 <script type="text/javascript">
 
 $j(function() {
@@ -14,6 +14,7 @@ $j(function() {
 $j(window).load(function(){	
 	$j('#galleryCycle').cycle({
         cleartype: true,
+        cleartypeNoBg: true,
         before: function() {
             $j('#galleryCycle span').slideUp();
         },
