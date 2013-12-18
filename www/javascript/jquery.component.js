@@ -64,7 +64,7 @@ setupCustomise = {
                 $j(this).qtip({
                     content: 'You have '+ howManyInstances +'of this component currently active',
                     style: {
-                        classes: 'qtip-default qtip-shadow qtip-rounded'
+                        classes: 'qtip-green qtip-shadow qtip-rounded'
                     },
                     position: {
                         my: 'bottom left',
