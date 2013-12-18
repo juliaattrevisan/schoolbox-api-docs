@@ -114,6 +114,8 @@ then
 	fi
 	apt-get -y install nodejs
 
+	echo "$vag Installing grunt-cli if not already installed";
+	/vagrant/tools/grunt.sh;
 	echo "$vag Installing NPM dependencies";
 	npm install
 	echo "$vag Installing Bower submodules";
