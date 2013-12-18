@@ -61,12 +61,6 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		$this->eventList = $composite->getEvents($this->start->getUnixTimestamp(), $this->end->getUnixTimestamp());
 
-		/* Today's date (default set so no {VARIABLES} show when there's no events)
-		 */
-		$this->setVar(array(
-			'DATE' => $now->getUsingFormat('l jS F')
-		));
-
 		return true;
 	}
 
@@ -87,7 +81,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 		$this->setBlock("note_block", "attendance_list_button", "attendance_list_button_block");
 
 
-		/* Initialise
+		/* Initialise, with date default set so no {VARIABLES} show when there's no events
 		 */
 		$this->setVar(
 			array(
@@ -96,6 +90,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				'attendance_request_button_block' => '',
 				'attendance_list_button_block' => '',
 				'has_category_block' => '',
+				'DATE' => date('l jS F', $_SERVER['REQUEST_TIME']),
 			)
 		);
 
