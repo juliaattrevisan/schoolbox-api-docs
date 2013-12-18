@@ -26,7 +26,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 	protected $end;
 
 	/**
-	 * @var Calendar_Event_Collection
+	 * @var Calendar_Event_Collection|Calendar_Event_Type_Abstract[]
 	 */
 	protected $eventList;
 
@@ -79,6 +79,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 		$this->setBlock("note_block", "attendance_status", "attendance_status_block");
 		$this->setBlock("note_block", "attendance_request_button", "attendance_request_button_block");
 		$this->setBlock("note_block", "attendance_list_button", "attendance_list_button_block");
+		$this->setBlock("note_block", "modify_button", "modify_button_block");
 
 
 		/* Initialise, with date default set so no {VARIABLES} show when there's no events
@@ -89,6 +90,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				'attendance_status_block' => '',
 				'attendance_request_button_block' => '',
 				'attendance_list_button_block' => '',
+				'modify_button_block' => '',
 				'has_category_block' => '',
 				'DATE' => date('l jS F', $_SERVER['REQUEST_TIME']),
 			)
@@ -116,26 +118,21 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 
 			if ($currentEvent instanceof Calendar_Event_Type_Submission) {
-
 				if ($this->getGroup()->isStudent($_SESSION['id'])) {
-					$action = 'View Details';
+					$this->setVar('MODIFY_ACTION', 'View Details');
 					$this->setVar(
-						'MODIFY',
-						'<a class="btn go-to float-left" href="/submission/submissionHistory/' .
-						$currentEvent->getSubmissionBoxId() . '/' . $_SESSION['id'] .
-						'"><span></span>' . $action . '</a>'
+						'MODIFY_HREF',
+						'/submission/submissionHistory/'.$currentEvent->getSubmissionBoxId().'/'. $_SESSION['id']
 					);
+					$this->parse('modify_button_block', 'modify_button');
 				}
 				elseif ($this->getGroup()->isStaff($_SESSION['id'])) {
+					$this->setVar('MODIFY_ACTION', 'View Submissions');
 					$this->setVar(
-						'MODIFY',
-						'<a class="btn go-to float-left" href="/submission/viewSubmission/' .
-						$currentEvent->getSubmissionBoxId() .
-						'"><span></span>View Submissions</a>'
+						'MODIFY_HREF',
+						'/submission/viewSubmission/'.$currentEvent->getSubmissionBoxId()
 					);
-				}
-				else {
-					$this->setVar('MODIFY', '');
+					$this->parse('modify_button_block', 'modify_button');
 				}
 
 				$this->setVar(
@@ -181,16 +178,13 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 					)
 				);
 
-				/* Modify link. Should be templated...
-					*/
 				if ($currentEvent->getIsEditable()) {
+					$this->setVar('MODIFY_ACTION', 'Modify');
 					$this->setVar(
-						'MODIFY',
-						'<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
-						) . '&returnTo=dashboard"><span></span>Modify</a>'
+						'MODIFY_HREF',
+						'/calendar/modify.php?eventID=' . $currentEvent->getEventId()
 					);
-				} else {
-					$this->setVar('MODIFY', '');
+					$this->parse('modify_button_block', 'modify_button');
 				}
 
 				/* Event attendance

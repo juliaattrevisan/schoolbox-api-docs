@@ -607,4 +607,13 @@ abstract class Calendar_Event_Type_Abstract {
 		return $formattedTime;
 	}
 
+	/**
+	 * Can someone attend this event? Defaults to false, subclasses can override.
+	 *
+	 * @return bool
+	 */
+	public function canAttend() {
+		return false;
+	}
+
 }
