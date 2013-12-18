@@ -115,7 +115,33 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 			$this->setVar('LIST_DATE', $currentDay->getDateOnly());
 
-
+			$eventOutput = array(
+				'DATE' => $currentDay->getUsingFormat('l jS F'),
+				'TIME' => $currentEvent->getEventSpan(),
+				'FULL_TIME' => $currentEvent->getFullDate(),
+				'LOCATION' => Scrub::text($currentEvent->getLocation()),
+				'DETAIL' => Scrub::html($currentEvent->getDetail()),
+				'COLOUR' => $currentEvent->getColour(),
+				'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
+				'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
+				'TYPE' => $currentEvent->getEventType(),
+				'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
+				'AUTHOR_ID' => $currentEvent->getAuthorId(),
+				'ON_OFF' => ++$j % 2 ? 'dark' : '',
+				'EVENT_VISIBLE' => '',
+				'EVENT_LEVEL'   => '',
+			);
+			if ($currentEvent instanceof Calendar_Event_Type_Submission) {
+				$eventOutput['EVENT_ID']   = '';
+				$eventOutput['EVENT_TYPE'] = 'submission';
+				$eventOutput['NOTE']       = $currentEvent->getNote();
+			}
+			else {
+				$eventOutput['EVENT_ID']   = $currentEvent->getEventId();
+				$eventOutput['EVENT_TYPE'] = 'type' . $currentEvent->getType();
+				$eventOutput['NOTE']       = Scrub::text($currentEvent->getNote());
+			}
+			$this->setVar($eventOutput);
 
 			if ($currentEvent instanceof Calendar_Event_Type_Submission) {
 				if ($this->getGroup()->isStudent($_SESSION['id'])) {
@@ -134,50 +160,9 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 					);
 					$this->parse('modify_button_block', 'modify_button');
 				}
-
-				$this->setVar(
-					array(
-						'EVENT_ID' => '',
-						'DATE' => $currentDay->getUsingFormat('l jS F'),
-						'TIME' => $currentEvent->getTime(),
-						'FULL_TIME' => $currentEvent->getFullDate(),
-						'NOTE' => $currentEvent->getNote(),
-						'COLOUR' => $currentEvent->getColour(),
-						'LOCATION' => '',
-						'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
-						'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
-						'DETAIL' => Scrub::html($currentEvent->getSubmissionBoxDetail()),
-						/* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
-						 */
-						'EVENT_TYPE' => 'submission',
-						'TYPE' => $currentEvent->getEventType(),
-						'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
-						'AUTHOR_ID' => $currentEvent->getAuthorId(),
-						'EVENT_VISIBLE' => '',
-						'EVENT_LEVEL' => '',
-					)
-				);
 				$this->parse('has_category_block', 'has_category');
 			}
 			else {
-				$this->setVar(
-					array(
-						'DATE' => $currentDay->getUsingFormat('l jS F'),
-						'EVENT_ID' => $currentEvent->getEventId(),
-						'TIME' => $currentEvent->getEventSpan(),
-						'FULL_TIME' => $currentEvent->getFullDate(),
-						'NOTE' => Scrub::text($currentEvent->getNote()),
-						'LOCATION' => Scrub::text($currentEvent->getLocation()),
-						'DETAIL' => Scrub::html($currentEvent->getDetail()),
-						'COLOUR' => $currentEvent->getColour(),
-						'EVENT_TYPE' => 'type' . $currentEvent->getType(),
-						'TYPE' => $currentEvent->getEventType(),
-						'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
-						'AUTHOR_ID' => $currentEvent->getAuthorId(),
-						'ON_OFF' => ++$j % 2 ? 'dark' : '',
-					)
-				);
-
 				if ($currentEvent->getIsEditable()) {
 					$this->setVar('MODIFY_ACTION', 'Modify');
 					$this->setVar(
