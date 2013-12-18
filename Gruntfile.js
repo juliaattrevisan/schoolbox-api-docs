@@ -10,13 +10,12 @@ module.exports = function(grunt) {
         },
         shell: {
             options: {
-                stdout: true,
+                stdout: false,
                 stederr: true,
                 failOnError: true
             },
             "jqueryui.install": {
                 command: 'npm install',
-                tasks: ['build'],
                 options: {
                     execOptions: {
                         cwd: 'www/javascript/components/jquery.ui/'
@@ -27,7 +26,7 @@ module.exports = function(grunt) {
                 command: 'npm install',
                 options: {
                     execOptions: {
-                        cwd: 'www/javascript/components/jquery.ui/'
+                        cwd: 'www/javascript/components/videojs/'
                     }
                 }
             }
