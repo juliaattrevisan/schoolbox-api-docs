@@ -322,6 +322,27 @@ class PortfolioWebDAV
             }
 
         }
+        else if ($site_location == 'tintern'){
+        
+            $settings = array(
+                'userName' =>  'tintern/'.$_SESSION['username'],
+                'password' => $_SESSION['password'],
+                'baseUri' => 'http://tnvmfs01/',
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    '/Staff/' . $_SESSION['username'] . '/'
+                );
+            } else if ($groupHandler->isStudent()) {
+                $paths = array(
+                    '/Student/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
+                );
+            } else {
+                return false;
+            }
+
+        }
         else if (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
