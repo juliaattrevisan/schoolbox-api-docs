@@ -118,8 +118,8 @@ then
 	/vagrant/tools/grunt.sh;
 	echo "$vag Installing NPM dependencies";
 	npm install
-	echo "$vag Installing Bower submodules";
-	grunt bower
+	echo "$vag Installing and building Bower submodules";
+	grunt bower build.deps
 	echo "$vag Building JS files via UglifyJS";
 	grunt build.js
 	echo "$vag Building CSS files via LessCSS";

@@ -22,6 +22,14 @@ module.exports = function(grunt) {
                     }
                 }
             },
+            "jqueryui.build": {
+                command: 'grunt build',
+                options: {
+                    execOptions: {
+                        cwd: 'www/javascript/components/jquery.ui/'
+                    }
+                }
+            },
             "videojs.install": {
                 command: 'npm install',
                 options: {
@@ -29,15 +37,14 @@ module.exports = function(grunt) {
                         cwd: 'www/javascript/components/videojs/'
                     }
                 }
-            }
-        },
-        hub: {
-            jqueryui: {
-                src: ['www/javascript/components/jquery.ui/Gruntfile.js'],
-                tasks: ['build']
             },
-            videojs: {
-                src: ['www/javascript/components/videojs/Gruntfile.js']
+            "videojs.build": {
+                command: 'grunt',
+                options: {
+                    execOptions: {
+                        cwd: 'www/javascript/components/videojs/'
+                    }
+                }
             }
         },
         uglify: {
@@ -101,15 +108,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-bower-task');
-    grunt.loadNpmTasks('grunt-hub');
     grunt.loadNpmTasks('grunt-shell');
 
     // Build tasks
-    grunt.registerTask('build.jqueryui', ['shell:jqueryui.install', 'hub:jqueryui']);
-    grunt.registerTask('build.videojs',  ['shell:videojs.install',  'hub:videojs']);
-    grunt.registerTask('build.js',  ['build.jqueryui', 'build.videojs', 'uglify']);
-    // CSS build depends on JQUI
-    grunt.registerTask('build.css', ['build.jqueryui', 'less']);
-    grunt.registerTask('build',     ['bower', 'build.js', 'build.css']);
-    grunt.registerTask('default',   ['build']);
+    grunt.registerTask('build.deps', ['shell:videojs.install', 'shell:videojs.build', 'shell:jqueryui.install', 'shell:jqueryui.build']);
+    grunt.registerTask('build.js',   ['uglify']);
+    grunt.registerTask('build.css',  ['less']);
+    grunt.registerTask('build',      ['bower', 'build.deps', 'build.js', 'build.css']);
+    grunt.registerTask('default',    ['build']);
 };
