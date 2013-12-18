@@ -100,21 +100,12 @@ function init() {
             $('#loading').css('min-height', $('#login_frm').offset().top + $('#login_frm').height() + 96);
 
             $('#loading').on('submit', '#login_frm', function(e) {
-//          $('#login_frm').append('<input type="hidden" name="env" value="'+env+'" />')
 
                 var postdata = $('#login_frm').serialize() + '&env=' + JSON.stringify(env);
-
-                $.post('/m/core/auth/login_form.json', postdata, function(data) {
-
+                var successCallback = function(data) {
                     debug($('#login_frm').serialize());
-
-                    if($.zepto) {
-                        data = JSON.parse(data);
-                    }
-
                     debug(data);
-
-                    if(data.session) {
+                    if (data.session) {
                         // success
                         sStorage.setItem('session', data.session);
                         env.loggedIn = data.session;
@@ -123,9 +114,20 @@ function init() {
                     }
                     else {
                         // failure
-                        toast('Your username or password is incorrect.', 'error');
-                        // window.location = "/m/";
+                        toast((data.message || 'Your username or password is incorrect.'), 'error');
                     }
+                }
+                var errorCallback = function(xhr) {
+                    var data = JSON.parse(xhr.responseText);
+                    toast((data.message || 'Your username or password is incorrect.'), 'error');
+                };
+                $.ajax({
+                    url: '/m/core/auth/login_form.json',
+                    type: 'POST',
+                    data: postdata,
+                    dataType: 'json',
+                    success: successCallback,
+                    error: errorCallback
                 });
                 e.preventDefault();
 
