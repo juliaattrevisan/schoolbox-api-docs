@@ -301,8 +301,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
 
 ThreePanelView.prototype.actionBind = function(actions) {
 
-    // note: if jquery ever gets updated, .delegate() will probably need to be replaced with .on()
-    this.detailsContainer.delegate('a.btn', 'click', function(event) {
+    this.detailsContainer.on('click', 'a.btn', function(event) {
         var a = $j(this)
         var context = a.parent()
 

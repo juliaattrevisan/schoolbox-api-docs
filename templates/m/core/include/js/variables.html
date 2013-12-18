@@ -56,7 +56,7 @@
                     case 3: msg = "cache"; break;
                     case 4: msg = "error"; break;
                 }
-                $('#status').attr("data-icon",msg);
+                $('#status').data("icon",msg);
                 $('#status').html(html);
                 return x;
             }
@@ -80,9 +80,10 @@
     // Make clicks eat-my-dust fast, and touch when possible
     var clickEvent = 'click';
     var touchEvent = 'click';
-    var clickEnded = 'mouseup';
-    if(isEventSupported('touchstart', document)) {
+    if(isEventSupported('tap', document)) {
         clickEvent = 'tap';
+    }
+    if(isEventSupported('touchstart', document)) {
         touchEvent = 'touchstart';
     }
 

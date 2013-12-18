@@ -28,8 +28,6 @@ then
 	echo "$vag Creating Schoolbox conf file";
 	cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
 	sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
-	echo "$vag Building css files via less";
-	/vagrant/tools/build-less-css.sh;
 	echo "$vag Installing git if not present (may be required for composer modules)";
 	apt-get -y install git
 	echo "$vag Installing vendor submodules with composer";
@@ -73,13 +71,13 @@ then
 	sed -i 's/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
 	sed -i 's/www-data/root/g' /home/vagrant/schoolboxdemo-latest-cron
 	cp -f /home/vagrant/schoolboxdemo-latest-cron /etc/cron.d/vagrant
+
 	echo "$vag Installing Redis";
 	keycheck=`apt-key list | grep BC45BCB5 | wc -l`;
 	if [ $keycheck -eq 0 ];
 	then
 		apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BC45BCB5
 	fi
-
 	keycheck=`apt-key list | grep BC45BCB5 | wc -l`;
 	if [ $keycheck -eq 0 ];
 	then
@@ -93,8 +91,41 @@ then
 			apt-get -y update > /dev/null 2>&1;
 		fi
 	fi
-
 	apt-get -y install php5-redis redis-server
+
+	echo "$vag Installing NodeJS";
+	keycheck=`apt-key list | grep C7917B12 | wc -l`;
+	if [ $keycheck -eq 0 ];
+	then
+		apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C7917B12
+	fi
+	keycheck=`apt-key list | grep C7917B12 | wc -l`;
+	if [ $keycheck -eq 0 ];
+	then
+		echo "$vag Error installing NodeJS keys";
+		exit 1;
+	else
+		if [ ! -f /etc/apt/sources.list.d/chris-lea-node_js-precise.list ];
+		then
+			echo 'deb     http://ppa.launchpad.net/chris-lea/node.js/ubuntu precise main' >> /etc/apt/sources.list.d/chris-lea-node_js-precise.list;
+			echo 'deb-src http://ppa.launchpad.net/chris-lea/node.js/ubuntu precise main' >> /etc/apt/sources.list.d/chris-lea-node_js-precise.list
+			apt-get -y update > /dev/null 2>&1;
+		fi
+	fi
+	apt-get -y install nodejs
+
+	echo "$vag Installing grunt-cli if not already installed";
+	/vagrant/tools/grunt.sh;
+	echo "$vag Installing NPM dependencies";
+	npm install
+	echo "$vag Installing and building Bower submodules";
+	grunt bower build.deps
+	echo "$vag Building JS files via UglifyJS";
+	grunt build.js
+	echo "$vag Building CSS files via LessCSS";
+	grunt build.css
+
+	echo "$vag Installing PHP packages";
 	apt-get -y install libpspell-dev php5-pspell aspell-en php5 php5-dev php-pear > /dev/null 2>&1;
 	echo "$vag Loading all demo data complete";
 fi

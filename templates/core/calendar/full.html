@@ -326,12 +326,12 @@
         })
 
         // hide bubbles if any header buttons are clicked
-        $j('#calendar .fc-header').delegate('span.fc-button', 'click', function(e) {
+        $j('#calendar .fc-header').on('click', 'span.fc-button', function(e) {
             c.bubble.hide()
         })
 
         // AJAX update attendance when the attendance toggle-button is clicked
-        c.getForm('editEvent').delegate('.attendanceRequestButton', 'click', function(e) {
+        c.getForm('editEvent').on('click', '.attendanceRequestButton', function(e) {
             var postData = {
                 event: {id: c.getForm('editEvent').find('input[name="eventId"]').val()}
             };
@@ -349,7 +349,7 @@
         })
 
         // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
-        c.getForm('editTask').delegate('input[name=completed]', 'change', function(e) {
+        c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
             var self = $j(this)
             var eventId = self.closest('form').find('input[name=eventId]').val()
             var chk = c.dom.find('#t'+eventId)
@@ -357,7 +357,7 @@
             chk.trigger('change')
         })
 
-        c.getForm('editTask').delegate('.deleteTask', 'click', function(e) {
+        c.getForm('editTask').on('click', '.deleteTask', function(e) {
             var id = $j(this).siblings('input[name=eventId]').val()
             c.cdelete({eventId: id})
             c.bubble.hide()
@@ -382,7 +382,7 @@
         });
 
         // if a checkbox on the calendar is interacted, ajax
-        c.dom.delegate('input[type=checkbox]', 'change', function(e) {
+        c.dom.on('change', 'input[type=checkbox]', function(e) {
 
             var self = $j(this)
             var ttl = self.siblings('.fc-event-title')

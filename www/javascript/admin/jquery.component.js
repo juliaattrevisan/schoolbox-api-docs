@@ -63,36 +63,18 @@ setupCustomise = {
 
                 $j(this).qtip({
                     content: 'You have '+ howManyInstances +'of this component currently active',
-                    show: 'mouseover',
-                    hide: 'mouseout',
-                    position: {
-                        corner: {
-                            tooltip: 'bottomLeft',
-                            target: 'topright'
-                        }
-                    },
-                    api: {
-                        // Retrieve the content when tooltip is first rendered
-                        onRender: function()
-                        {
-                            var self = this;
-                        }
-                    },
                     style: {
-                        background: '#fffde9',
-                        color: 'black',
-                        border: {
-                            width: 3,
-                            radius: 4,
-                            color: '#fff9bf'
-                        },
-                        name: 'green' // Inherit from preset style
+                        classes: 'qtip-green qtip-shadow qtip-rounded'
+                    },
+                    position: {
+                        my: 'bottom left',
+                        at: 'top right'
                     }
                 });
             });
 
 
-            $j(".add-component a").live('click', function(event) {
+            $j(document).on('click', ".add-component a", function(event) {
                 event.preventDefault();
                 var $this = $j(this);
 
@@ -192,8 +174,8 @@ setupCustomise = {
             }
 
             $j('#head_font').parent().addClass('active-box');
-            var instantColour = new RGBColor($j('#left_head_font').css('background-color'));
-            var initialColour = instantColour.toHex();
+            var instantColour = new tinycolor($j('#left_head_font').css('background-color'));
+            var initialColour = instantColour.toHexString();
             checkTextColour();
             $j('#currentColour').css('background-color',initialColour);
             $j('#currentColour').val(initialColour);
@@ -301,9 +283,9 @@ setupCustomise = {
                 $j(this).children('.colorBox').addClass('selected');
                 $j(this).next().next('p').addClass('selected');
 
-                var color = new RGBColor($j(this).children('.colorBox').css('background-color'));
+                var color = new tinycolor($j(this).children('.colorBox').css('background-color'));
 
-                f.setColor(color.toHex());
+                f.setColor(color.toHexString());
                 checkTextColour()
                 return false;
             });
@@ -541,21 +523,22 @@ setupCustomise = {
             $j("#tooltip").hide();
         });
 
-        $j("a.config-this").hover(function() {
+        $j("a.config-this").mouseenter(function() {
             var $this = $j(this);
 
             if(!$this.children('em').data('pinned')) {
                 $this.children('em').addClass('show-it');
             }
 
-        }, function() {
+        }).mouseleave(function() {
             var $this = $j(this);
 
             if(!$this.children('em').data('pinned')) {
                 $this.children('em').removeClass('show-it' );
             }
 
-        }).live('click', function(event) {
+        });
+        $j(document).on('click', 'a.config-this', function(event) {
             var $this = $j(this);
             event.preventDefault();
 
@@ -578,7 +561,7 @@ setupCustomise = {
 
         });
 
-        $j('.delete-this').live('click', function(event){
+        $j(document).on('click', '.delete-this', function(event){
             event.preventDefault();
             var $this = $j(this);
 
@@ -591,13 +574,13 @@ setupCustomise = {
             $this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
         });
 
-        $j('.delete-accept').live('click',function(event) {
+        $j(document).on('click', '.delete-accept', function(event) {
 
             $this = homepageControl;
 
             // console.log($this);
 
-            $j('.delete-this').live('click',function() {
+            $j(document).on('click', '.delete-this', function() {
                 var $instanceId = $j(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
 
                 $j(this).parent().slideUp(100,function() {
@@ -638,7 +621,7 @@ setupCustomise = {
 
         });
 
-        $j('.delete-reject').live('click',function(event) {
+        $j(document).on('click', '.delete-reject', function(event) {
             event.preventDefault();
             $j(this).closest('.delete-it').slideUp();
         });

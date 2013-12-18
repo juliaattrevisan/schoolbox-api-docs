@@ -93,7 +93,7 @@
         // Set up the same resource browser as is used in the social stream.
         var socialstream_browser = component.find('.resource_browser');
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
-            component.delegate('form a[data-function="browse"]', 'click.courseTaskList', {}, function(event) {
+            component.on('click.courseTaskList', 'form a[data-function="browse"]', {}, function(event) {
 
 				/* Toggle the input
 				 * Toggle the label
@@ -112,7 +112,7 @@
         }
 
         // AJAX form submissions
-        component.delegate('form.edit_task_form, form.create_task_form', 'submit.courseTaskList', {}, function(event) {
+        component.on('submit.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
             var form = $(this);
             event.preventDefault();
             // Is this a new form?
@@ -128,7 +128,7 @@
 
         // Modify task: if there's a modify form inline, show/hide it.
         // (Delegate because extra elements can be added via AJAX)
-        component.delegate('.interact a.modify', 'click.courseTaskList', {}, function(event) {
+        component.on('click.courseTaskList', '.interact a.modify', {}, function(event) {
             // Show the form instead
             var edit_form = $(this).closest('.task').find('.edit_task_form_container');
             if (edit_form.length) {
@@ -138,14 +138,14 @@
         });
 
         // Delete task: "are you sure?"
-        component.delegate('a.delete, .delete_task_form_container a.delete-reject', 'click.courseTaskList', {}, function(event) {
+        component.on('click.courseTaskList', 'a.delete, .delete_task_form_container a.delete-reject', {}, function(event) {
             event.preventDefault();
             var delete_form = $(this).closest('.task').find('.delete_task_form_container');
             delete_form.slideToggle('fast');
         });
 
         // "why, yes I am"
-        component.delegate('.delete_form', 'submit.courseTaskList', {}, function(event) {
+        component.on('submit.courseTaskList', '.delete_form', {}, function(event) {
             event.preventDefault();
             var form = $(this);
             $.post(form.attr('action'), form.serialize(), function(data) {

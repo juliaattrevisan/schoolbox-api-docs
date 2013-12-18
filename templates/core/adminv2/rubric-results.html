@@ -2,10 +2,10 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $j(function() {
-        $j('#rubric-results input').live('change', function(e) {
+        $j(document).on('change', '#rubric-results input', function(e) {
             var self = $j(this);
             var anchor = self.siblings('a').first();
-            if(self.val() == anchor.attr('data-label')) {
+            if(self.val() == anchor.data('label')) {
                 anchor.addClass('hidden');
             } else {
                 anchor.removeClass('hidden');
@@ -16,15 +16,15 @@
                 self.parent('li').removeClass('err');
             }
         });
-        $j('#rubric-results li a:not(.btn)').live('click', function(e) {
+        $j(document).on('click', '#rubric-results li a:not(.btn)', function(e) {
             var self = $j(this);
             var input = self.siblings('input').first();
-            input.val(self.attr('data-label'));
+            input.val(self.data('label'));
             input.trigger('change');
             self.addClass('hidden');
             e.preventDefault();
         });
-        $j('#rubric-results li.new-item input').live('change', function(e) {
+        $j(document).on('change', '#rubric-results li.new-item input', function(e) {
             var self = $j(this);
             var li = self.parent('li');
             var newli = li.clone();
@@ -36,10 +36,10 @@
             li.find('code').removeClass('prompt');
             li.parent('ul').append(newli);
         });
-        $j('#add-set').live('click', function(e) {
+        $j(document).on('click', '#add-set', function(e) {
             e.preventDefault();
         });
-        $j('#save-changes').live('click', function(e) {
+        $j(document).on('click', '#save-changes', function(e) {
             var valid = true;
             var frm = $j('#rubricForm');
             var method = frm.attr('method');

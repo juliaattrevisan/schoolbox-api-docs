@@ -1,8 +1,7 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <!-- BEGIN custom_head -->
-    <script type='text/javascript' src='/javascript/flot/excanvas.min.js'></script>
-    <script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
-    <script type='text/javascript' src='/javascript/flot/jquery.flot.resize.js'></script>
+    <script type='text/javascript' src='/javascript/components/flot/jquery.flot.js'></script>
+    <script type='text/javascript' src='/javascript/components/flot/jquery.flot.resize.js'></script>
     <!-- END custom_head-->
     <h2>{POLL_TITLE}</h2>
     {CONFIGURATION}
@@ -11,7 +10,7 @@
     function validatePoll () {
         var valid = false;
         $j('input.pollOption').each(function () {
-            if ($j(this).attr('checked'))
+            if ($j(this).prop('checked'))
                 valid = true;
         });
         if (valid)

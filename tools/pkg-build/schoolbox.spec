@@ -27,6 +27,8 @@ Epoch:		1
 BuildRequires:	php-cli
 BuildRequires:	php-xml
 BuildRequires:	php-mbstring
+# Required NodeJS version for Bower
+BuildRequires:	nodejs >= 0.8.0
 Requires:	httpd
 Requires:	mod_ssl
 Requires:	php
@@ -126,6 +128,9 @@ rm -rf tools/logrotate
 
 # Install submodules using composer
 tools/composer.sh --no-dev
+
+# Install JS modules using Bower
+tools/bower.sh
 
 cp -a tools %{buildroot}%{_datadir}/%{name}
 

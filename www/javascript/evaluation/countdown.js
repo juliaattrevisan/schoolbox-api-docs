@@ -37,18 +37,15 @@
 		 */
 		function renderCountdown() {
 			if (config.timeLeft > 0) {
-				config.element.countdown({
-					until: '+' + config.timeLeft,
-					layout: '{hn} : {mn} : {sn}',
-					alwaysExpire: true,
-					onExpiry: function() {
+				var endTime = new Date();
+				endTime.setSeconds(endTime.getSeconds()+config.timeLeft);
+				config.element.countdown(endTime)
+					.on('update.countdown', function(event) {
+						$(this).html(event.strftime('%H : %M : %S'));
+					})
+					.on('finish.countdown', function() {
 						window.location = config.endUrl;
-					}
-				});
-			}
-
-			if (config.element.html() == '') {
-				config.element.parent().hide();
+					})
 			}
 		}
 	}

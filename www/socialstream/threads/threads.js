@@ -86,7 +86,7 @@
 
 				/* The element which allows you to make comments and replies
 				 */
-				addPostLink: $j(element).find('.addPostLink'),
+				addPostLink: '.addPostLink',
 
 				/* The form which spawns when making comments and replies
 				 */
@@ -133,7 +133,7 @@
 		 * Allow input forms to be spawned
 		 */
 		function initPostForm() {
-			config.addPostLink.live('click', function(e) {
+			config.element.on('click', config.addPostLink, function(e) {
 				// Does this have a post form already? If so, don't add it back
 				// after it gets removed.
 				var body = $j(this).closest('li').find('> .body');
@@ -145,8 +145,8 @@
 
 				/* Get the ids for this node
 				 */
-				var parentId = $j(this).attr('data-parentid');
-				var rootId = $j(this).attr('data-rootid');
+				var parentId = $j(this).data('parentid');
+				var rootId = $j(this).data('rootid');
 
 				/* Clone an instance of .addPostForm and inject ids
 				 */
@@ -312,7 +312,7 @@
 			form.find('.socialstream-attachment-url').click(function() {
 				form.find('input[name=socialstreamAttachment]').val('url');
 
-				form.find('input[name=url]').val('').removeAttr('readonly', '').closest('li').show();
+				form.find('input[name=url]').val('').prop('readonly', false).closest('li').show();
 				form.find('input[name=file]').closest('li').hide();
 				form.find('.socialstream-selected-file').html('').closest('li').hide();
 
@@ -333,7 +333,7 @@
 			form.find('.socialstream-attachment-resource').click(function() {
 				form.find('input[name=socialstreamAttachment]').val('resource');
 
-				form.find('input[name=url]').val('').attr('readonly', 'readonly').closest('li').show();
+				form.find('input[name=url]').val('').prop('readonly', true).closest('li').show();
 				form.find('input[name=file]').closest('li').hide();
 				form.find('.socialstream-selected-file').html('').closest('li').show();
 			});

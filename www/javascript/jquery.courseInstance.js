@@ -40,9 +40,9 @@
         }
 
         // Event for displaying the homepage selector.
-        component.delegate(
-            'a[data-interaction="homepage_selector"]',
+        component.on(
             'click.courseInstance',
+            'a[data-interaction="homepage_selector"]',
             function(event) {
                 event.preventDefault();
                 browser.load(
@@ -55,9 +55,9 @@
 
         // Event for opening the import page - tied to change event of input
         // that gets changed by resource selector, instead of a button.
-        component.delegate(
-            'input[name="homepage"]',
+        component.on(
             'change.courseInstance',
+            'input[name="homepage"]',
             function() {
                 var homepage_id = this.value.replace(/.*?(\d+$)/, '$1')
                 // Strip trailing / off of the import base URL
@@ -67,9 +67,9 @@
         );
 
         // Expand/collapse of units
-        component.delegate(
-            'a[data-interaction="toggle-expanded"]',
+        component.on(
             'click.courseInstance',
+            'a[data-interaction="toggle-expanded"]',
             function(event) {
                 event.preventDefault();
                 var element = $(this);
@@ -91,9 +91,9 @@
 
         // Delete unit - "are you sure?"
         // (write the expand/collapse stuff into its own plugin)
-        component.delegate(
-            'a[data-interaction="open_delete_unit_form"]',
+        component.on(
             'click.courseInstance',
+            'a[data-interaction="open_delete_unit_form"]',
             function(event) {
                 event.preventDefault();
                 var element      = $(this);
@@ -104,9 +104,9 @@
         );
 
         // "Yes, I am"
-        component.delegate(
-            'form[data-form_type="delete_unit"]',
+        component.on(
             'submit.courseInstance',
+            'form[data-form_type="delete_unit"]',
             function(event) {
                 event.preventDefault();
                 // Submit form via Ajax
@@ -125,9 +125,9 @@
         );
 
         // "No, I am not"
-        component.delegate(
-            'form[data-form_type="delete_unit"] [data-interaction="delete_reject"]',
+        component.on(
             'click.courseInstance',
+            'form[data-form_type="delete_unit"] [data-interaction="delete_reject"]',
             function(event) {
                 event.preventDefault();
                 var container = $(this).closest('[data-interaction="delete_unit_container"]');
@@ -136,9 +136,9 @@
         );
 
         // Delete task - are you sure?
-        component.delegate(
-            'a[data-interaction="open_delete_task_form"]',
+        component.on(
             'click.courseInstance',
+            'a[data-interaction="open_delete_task_form"]',
             function(event) {
                 event.preventDefault();
                 var element      = $(this);
@@ -148,9 +148,9 @@
             }
         );
         // Yes
-        component.delegate(
-            'form[data-form_type="delete_task"]',
+        component.on(
             'submit.courseInstance',
+            'form[data-form_type="delete_task"]',
             function(event) {
                 event.preventDefault();
                 // Submit form via Ajax
@@ -161,9 +161,9 @@
             }
         );
         // No
-        component.delegate(
-            'form[data-form_type="delete_task"] [data-interaction="delete_reject"]',
+        component.on(
             'click.courseInstance',
+            'form[data-form_type="delete_task"] [data-interaction="delete_reject"]',
             function(event) {
                 event.preventDefault();
                 var container = $(this).closest('[data-interaction="delete_task_container"]');
@@ -172,9 +172,9 @@
         );
 
         // Create new tasks: show inline form if there is one.
-        component.delegate(
-            '.add_buttons .btn',
+        component.on(
             'click.courseInstance',
+            '.add_buttons .btn',
             function(event) {
                 var create_forms = $(this).closest('.unit').find('.form_container');
                 var form_class   = $(this).data('form_class');
@@ -190,9 +190,9 @@
         );
 
         // show/hide the edit task dialog (if it exists?)
-        component.delegate(
-            'a[data-interaction="open_edit_task_form"]',
+        component.on(
             'click.courseInstance',
+            'a[data-interaction="open_edit_task_form"]',
             function(event) {
                 var element      = $(this);
                 var unit_element = element.closest('.unit-task');
@@ -205,9 +205,9 @@
         );
 
         // Create/edit task form submission
-        component.delegate(
-            'form[data-form_type="task"]',
+        component.on(
             'submit.courseInstance',
+            'form[data-form_type="task"]',
             function(event) {
                 var form = $(this);
                 event.preventDefault();
@@ -224,9 +224,9 @@
         );
 
         // Create/edit task upload file
-        component.delegate(
-            'form a[data-function="upload"]',
+        component.on(
             'click.courseInstance',
+            'form a[data-function="upload"]',
             function(event) {
                 event.preventDefault();
                 // Set the form that this dialog was triggered from.
@@ -242,7 +242,7 @@
         // Set up the same resource browser as is used in the social stream.
         var socialstream_browser = component.find('.resource_browser');
         if (socialstream_browser.length && $.fn.socialstreamBrowser) {
-            component.delegate('form a[data-function="browse"]', 'click.courseTaskList', {}, function(event) {
+            component.on('click.courseTaskList','form a[data-function="browse"]' , {}, function(event) {
                 var form = $(this).closest('form');
                 event.preventDefault();
                 socialstream_browser.socialstreamBrowser({

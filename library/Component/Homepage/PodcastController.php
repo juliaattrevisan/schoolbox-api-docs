@@ -27,7 +27,6 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-        $this->setJavascript('/javascript/swfobject.js');
         $this->setBlock($templateHandle, 'podcast_list', 'podcast_list_block');
         $this->setVar('podcast_list_block', '');
 

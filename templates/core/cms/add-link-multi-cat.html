@@ -12,7 +12,7 @@ function verify()
 	}
 	var ok = false;
 	$j('input.category').each(function () {
-		if ($j(this).attr("checked"))
+		if ($j(this).prop("checked"))
 			ok = true;
 	});
 	if (!ok)

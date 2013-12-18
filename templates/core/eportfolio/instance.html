@@ -1,11 +1,12 @@
 <!-- BEGIN custom_head -->
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/eportfolio/rss/{ID}/{USER_TOKEN}" />
 <!-- BEGIN modify_layout -->
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
-<script type="text/javascript" src="/javascript/color-conversion.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+<script type="text/javascript" src="/javascript/components/tinycolor/tinycolor.js"></script>
 <script type="text/javascript" src="/javascript/jquery.component.js"></script>
-<link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
-<script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
+<link rel="stylesheet" type="text/css" href="/javascript/components/farbtastic/farbtastic.css" />
+<script type="text/javascript" src="/javascript/components/farbtastic/farbtastic.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
@@ -195,7 +196,7 @@
 
 		/* Remove someone from list
 		 */
-        $j('.individualPermissionRemove').live('change', function(event) {
+        $j(document).on('change', '.individualPermissionRemove', function(event) {
             added.splice($j.inArray($j(this).closest('li').find('input[name="individual_permission[]"]').val(), added), 1 );
 
             $j(this).closest('li').fadeOut("slow",function(){

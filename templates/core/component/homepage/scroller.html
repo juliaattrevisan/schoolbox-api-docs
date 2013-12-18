@@ -1,6 +1,8 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
-    <script type="text/javascript" src="/javascript/imagesloaded.pkgd.min.js"></script>
+    <script type="text/javascript" src="/javascript/components/jquery-cycle/jquery.cycle.all.js"></script>
+    <script type="text/javascript" src="/javascript/components/eventie/eventie.js"></script>
+    <script type="text/javascript" src="/javascript/components/eventEmitter/EventEmitter.js"></script>
+    <script type="text/javascript" src="/javascript/components/imagesloaded/imagesloaded.js"></script>
     <script type="text/javascript">
         $j(function () {
             //
@@ -48,7 +50,7 @@
 
                     container.cycle({
                         timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
-                        cleartype:true,
+                        cleartypeNoBg:true,
                         height:'auto',
                         width: Math.min(width, container.width()),
                         fit: true,

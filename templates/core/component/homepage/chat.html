@@ -1,5 +1,3 @@
-<script type="text/javascript" src="/javascript/jquery.color.js"></script>
-<script type="text/javascript" src="/javascript/jquery.ui.js"></script>
 <script type="text/javascript" src="/javascript/chat.js"></script>
 <script type="text/javascript">
     $j(function () {
@@ -22,7 +20,7 @@
         });
 
         /* IE : defer focus to the chat message box */
-        $j('#component{COMPONENT_INSTANCE_ID}').live('focus', function() {
+        $j(document).on('focus', '#component{COMPONENT_INSTANCE_ID}', function() {
             var msgbox = document.getElementById('component{COMPONENT_INSTANCE_ID}-chatmessage');
             if(msgbox.setActive) {
                 msgbox.setActive();

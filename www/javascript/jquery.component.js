@@ -61,38 +61,20 @@ setupCustomise = {
 					howManyInstances = '<strong>' + howManyInstances + '</strong> instances '
 				}
 
-				$j(this).qtip({
-					content: 'You have '+ howManyInstances +'of this component currently active',
-					show: 'mouseover',
-					hide: 'mouseout',
-					position: {
-						corner: {
-							tooltip: 'bottomLeft',
-							target: 'topright'
-						}
-					},
-					api: {
-							// Retrieve the content when tooltip is first rendered
-							 onRender: function()
-							 {
-								var self = this;
-							 }
-						 },
-					style: {
-						background: '#fffde9',
-						color: 'black',
-						border: {
-							width: 3,
-							radius: 4,
-							color: '#fff9bf'
-						},
-						name: 'green' // Inherit from preset style
-				   }
-				});
-			});
+                $j(this).qtip({
+                    content: 'You have '+ howManyInstances +'of this component currently active',
+                    style: {
+                        classes: 'qtip-green qtip-shadow qtip-rounded'
+                    },
+                    position: {
+                        my: 'bottom left',
+                        at: 'top right'
+                    }
+                });
+            });
 
 
-			$j(".add-component a").live('click', function(event) {
+			$j(document).on('click', ".add-component a", function(event) {
 				event.preventDefault();
 				var $this = $j(this);
 
@@ -207,8 +189,8 @@ setupCustomise = {
             }
 
 			$j('#top_head_font').parent().addClass('active-box');
-			var instantColour = new RGBColor($j('#top_head_font').css('background-color'));
-			var initialColour = instantColour.toHex();
+			var instantColour = new tinycolor($j('#top_head_font').css('background-color'));
+			var initialColour = instantColour.toHexString();
 			$j('#currentColour').css('background-color',initialColour);
 			$j('#currentColour').val(initialColour);
 			checkTextColour();
@@ -316,9 +298,9 @@ setupCustomise = {
 				$j(this).children('.colorBox').addClass('selected');
 				$j(this).next().next('p').addClass('selected');
 
-				var color = new RGBColor($j(this).children('.colorBox').css('background-color'));
+				var color = new tinycolor($j(this).children('.colorBox').css('background-color'));
 
-				colorpicker.setColor(color.toHex());
+				colorpicker.setColor(color.toHexString());
 				checkTextColour()
 				return false;
 			});
@@ -333,7 +315,7 @@ setupCustomise = {
                     // update pickers config
                     pickers['left_' + suffix]
                         = pickers['right_' + suffix]
-                        = (new RGBColor($j(this).css('background-color'))).toHex();
+                        = (new tinycolor($j(this).css('background-color'))).toHexString();
 
                     // update left/right colours
                     $j('#left_'+suffix+', #right_'+suffix)
@@ -563,21 +545,22 @@ setupCustomise = {
 			$j("#tooltip").hide();
 		});
 
-		$j("a.edit").hover(function() {
+		$j("a.edit").mouseenter(function() {
 			var $this = $j(this);
 
 			if(!$this.children('em').data('pinned')) {
 				$this.children('em').addClass('show-it');
 			}
 
-			}, function() {
-				var $this = $j(this);
+        }).mouseleave(function() {
+            var $this = $j(this);
 
-				if(!$this.children('em').data('pinned')) {
-					$this.children('em').removeClass('show-it' );
-				}
+            if(!$this.children('em').data('pinned')) {
+                $this.children('em').removeClass('show-it' );
+            }
 
-		}).live('click', function(event) {
+		});
+		$j(document).on('click', "a.edit", function(event) {
 			var $this = $j(this);
 			event.preventDefault();
 
@@ -591,7 +574,7 @@ setupCustomise = {
 
 		});
 
-		$j('.close-delete').live('click', function(event){
+		$j(document).on('click', '.close-delete', function(event){
 			event.preventDefault();
 			var $this = $j(this);
 
@@ -604,7 +587,7 @@ setupCustomise = {
 			$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
 		});
 
-		$j('.delete-accept').live('click',function(event) {
+		$j(document).on('click', '.delete-accept', function(event){
 			event.preventDefault();
 			//update with an ajax call here.
 			$j.post(setupCustomise.ajaxURL, $j(this).closest('form').serialize());
@@ -627,7 +610,7 @@ setupCustomise = {
 
 		});
 
-		$j('.delete-reject').live('click',function(event) {
+		$j(document).on('click','.delete-reject',function(event) {
 			event.preventDefault();
 			$j(this).closest('.delete-it').slideUp();
 		});

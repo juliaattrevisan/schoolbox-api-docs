@@ -1,4 +1,5 @@
-@import url("jquery-ui.less");
+@import (less) url("../../javascript/components/jquery.ui/dist/jquery-ui.css");
+@import url("jquery-ui.customisation.less");
 
 /*
 Le Reset
@@ -723,11 +724,11 @@ Notifications
 	color: @black;
 }
 
-#tabs-homepage li.ui-tabs-selected a {
+#tabs-homepage li.ui-tabs-active a {
 	background: none repeat scroll 0 0 @module-background;
 	color: @black;
 }
-#tabs-homepage #tabs-sub li.ui-tabs-selected a{
+#tabs-homepage #tabs-sub li.ui-tabs-active a{
 	background:@lgrey
 }
 #tabs-sub .ui-tabs-nav li a {
@@ -3124,7 +3125,7 @@ HOMEPAGE TEMPLATES
     .ui-draggable-dragging {
 		.component-draggable;
     }
-	(~'#@{context}-layout') {
+    #@{context}-layout {
         float: right;
         width: 78%;
         .component {
@@ -3229,13 +3230,13 @@ HOMEPAGE TEMPLATES
 
 .admin-contents {
     &.homepage {
-        .template-configurator('homepage');
+        .template-configurator(homepage);
     }
     &.dashboard {
-        .template-configurator('dashboard');
+        .template-configurator(dashboard);
     }
     &.eportfolio {
-      .template-configurator('eportfolio');
+        .template-configurator(eportfolio);
     }
 }
 
@@ -5733,7 +5734,7 @@ HOMEPAGE CUSTOMISE
     color: @link;
 }
 
-#tabs-homepage li.ui-tabs-selected a {
+#tabs-homepage li.ui-tabs-active a {
     background: @content-background;
     color: @link;
 }
@@ -5773,7 +5774,7 @@ HOMEPAGE CUSTOMISE
     background: @white;
 }
 
-#tabs-homepage #tabs-sub li.ui-tabs-selected a {
+#tabs-homepage #tabs-sub li.ui-tabs-active a {
     background: lighten(@highlight-color, @lighten-value);
 }
 
@@ -5875,18 +5876,6 @@ HOMEPAGE CUSTOMISE
     height: 12px;
     width: 14px;
     border: 0;
-}
-
-.qtip-content {
-    line-height: 16px;
-    padding: 16px !important;
-}
-
-.qtip {
-    -moz-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
-    -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
-    z-index: 120;
-    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
 }
 
 .add-component.disabled {
@@ -7569,11 +7558,8 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .dash .digit {
     font-size: 35pt;
     font-weight: bold;
-    float: left;
     text-align: center;
     position: relative;
-    width: 30%;
-    left: 20%;
 }
 
 .dash_title {
@@ -8137,14 +8123,14 @@ td.name {
 
 // Brace yourself - loop for the index of colorX, outputting a the class 'gradient-index' each time, adding the rules for 'color'
 .colorX (@index) when (@index > 0) {
-    (~".gradient-@{index}") { .color(@index); }
-    (~".gradient-@{index}-bg") { .colorbg(@index); }
+    .gradient-@{index} { .color(@index); }
+    .gradient-@{index}-bg { .colorbg(@index); }
     .colorX(@index - 1);
 }
 // final iteration
 .colorX (0) {
-  (~".gradient-0") { .color(0); }
-  (~".gradient-0-bg") { .colorbg(0); }
+  .gradient-0 { .color(0); }
+  .gradient-0-bg { .colorbg(0); }
 }
 
 .color (@index) {
@@ -9644,7 +9630,7 @@ table img { max-width: none; }
 .search-item:nth-child(2n){
 	background: none repeat scroll 0 0 @dark;
 }
-#tabs-sub li.ui-tabs-selected a {
+#tabs-sub li.ui-tabs-active a {
 	background:@tab-background; color:@white; font-weight: normal;
 }
 
@@ -9690,6 +9676,7 @@ ul.activity-list li,
 .ui-widget {
 	tr { border: 0; }
 	td { background: none; }
+	font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Socialstream */

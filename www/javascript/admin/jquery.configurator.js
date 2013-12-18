@@ -26,30 +26,22 @@ $j.fn.configurator = function(opts) {
 
 
     this.help = function() {
-        $j.fn.qtip.defaults.position.corner = {
-            target: 'topLeft',
-            tooltip: 'bottomLeft'
-        };
-        $j.fn.qtip.defaults.style = {
-            tip: 'bottomLeft',
-            name: 'green'
-        };
-
         $j('h3 span').each(function() {
             var activeContent = $j(this).siblings('em').html();
             $j(this).qtip({
                 content: activeContent,
-                api: {
-                    // Retrieve the content when tooltip is first rendered
-                    onRender: function() {
-                        // if you want to use this hook for something, feel free
-                    }
+                style: {
+                    classes: 'qtip-green qtip-shadow qtip-rounded'
+                },
+                position: {
+                    my: 'bottom left',
+                    at: 'top left'
                 }
             });
         });
 
-        // We'll encapsulate our .qtip() call in your .live() handler method
-        $j('.disabled').live('mouseover', function(event) {
+        // We'll encapsulate our .qtip() call in your .on() handler method
+        $j(document).on('mouseover', '.disabled', function(event) {
             // Bind the qTip within the event handler
             $j(this).qtip({
                 overwrite: false,
@@ -57,6 +49,13 @@ $j.fn.configurator = function(opts) {
                 show: {
                     event: event.type,
                     ready: true
+                },
+                style: {
+                    classes: 'qtip-green qtip-shadow qtip-rounded'
+                },
+                position: {
+                    my: 'bottom left',
+                    at: 'top left'
                 }
             }, event); // Pass through our original event to qTip
         });
@@ -219,7 +218,7 @@ $j.fn.configurator = function(opts) {
     };
 
     this.deleteComponent = function() {
-        $j('.delete-this').live('click', function() {
+        $j(document).on('click', '.delete-this', function() {
             var self = $j(this);
             var component = self.parents('.component').first();
             var $instanceId = component.attr('id').match(/^instance\-id\-(\d+)$/)[1];
@@ -246,7 +245,7 @@ $j.fn.configurator = function(opts) {
         // The controls for the individual components ie. edit, delete
         setupCustomise.activeComponents();
 
-        $j('#'+options.context+'-layout form').live('submit', function(event) {
+        $j(document).on('submit', '#'+options.context+'-layout form', function(event) {
             var self = $j(this);
             var panel = self.parent('.editPanel');
             var component = panel.parent('.component');

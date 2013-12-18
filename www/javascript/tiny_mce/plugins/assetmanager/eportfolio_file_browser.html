@@ -4,7 +4,8 @@
 <link rel="stylesheet" type="text/css" href="css/screen.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="css/tree.css" media="screen" />
 <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
-<script type="text/javascript" src="/javascript/jquery.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery/jquery-migrate.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <style type="text/css">
 span.file {
@@ -79,7 +80,7 @@ $(function () {
 	});
 
 	/* select image */
-	$('#file-list li').live('click', function () {
+	$(document).on('click', '#file-list li', function () {
 		var win = tinyMCEPopup.getWindowArg("window"), input = tinyMCEPopup.getWindowArg("input");
 		var src = $(this).find('img').attr('src');
 
@@ -118,7 +119,7 @@ $(function () {
 	});
 
 	/* open dir */
-	$('#tree li').live('click', function () {
+	$(document).on('click', '#tree li', function () {
 		var categoryID = $(this).attr('id').substring(5);
 		$('#tree li.selected').removeClass('selected');
 		$(this).addClass('selected');

@@ -1,19 +1,25 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 
     $j(function () {
         $j('.row-holder:nth-child(2n)').css("background-color", "#ffffff");
 
-        $j.fn.qtip.defaults.position.corner = {
-            target:'topLeft',
-            tooltip:'bottomLeft'
-        }
-
-        $j.fn.qtip.defaults.style = {
-            tip:'bottomLeft',
-            name:'green'
-        }
+        $j.extend(
+            true,
+            $j.fn.qtip.defaults,
+            {
+                style: {
+                    classes: 'qtip-green qtip-shadow qtip-rounded',
+                    tip: { corner: false }
+                },
+                position: {
+                    my: 'bottom left',
+                    at: 'top left'
+                }
+            }
+        );
 
         $j('.allowed-files tr:first th:first').qtip({
             content:'Controls if files of this type can be uploaded'});
@@ -33,7 +39,7 @@
         $j('.allowed-files tr:first th:nth-child(6)').qtip({
             content:'Determines if file will be opened in the browser or by a third party application'});
 
-        $j('.modify').live('click', function () {
+        $j(document).on('click', '.modify', function () {
             var trigger = 0;
 
             level = $j(this).parent().parent()
@@ -262,7 +268,7 @@
         $j('input[type=checkbox]').change(function () {
             var name = 'input[name=' + $j(this).attr('name') + ']';
 
-            if ($j(this).attr('checked')) {
+            if ($j(this).prop('checked')) {
                 $j(name).val('true');
             }
             else {

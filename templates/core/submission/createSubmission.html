@@ -109,7 +109,7 @@
             }
         });
 
-        if (!(acceptSubmit.is('checked') || acceptSubmit.attr('checked') == 'checked')) {
+        if (!(acceptSubmit.prop('checked'))) {
             acceptHide.hide();
         }
 
@@ -239,8 +239,8 @@
             // show them if checked
             else {
                 $j('#rubric-criteria div').each(function () {
-                    var checked = $j(this).children(':checkbox').attr('checked');
-                    descriptor(checked === undefined ? 'hide' : 'show', this, 100)
+                    var checked = $j(this).children(':checkbox').prop('checked');
+                    descriptor(checked ? 'hide' : 'show', this, 100)
                 });
             }
         });
@@ -249,7 +249,7 @@
             var act = 'hide';
 
             // show if and only if both the descriptors radio and myself are checked
-            var x = $j('#rs-0').attr('checked') !== undefined,
+            var x = $j('#rs-0').prop('checked'),
                     y = this.checked;
 
             if (x && y) {

@@ -1,4 +1,6 @@
-var $j = jQuery.noConflict();
+// We used to use another library which consumed the $ variable.
+// That library is long gone, so no need to release $ anymore.
+var $j = jQuery;
 
 $j(function() {
 	/*
@@ -18,10 +20,10 @@ $j(function() {
     /*
      * Main Navigation dropdown
      * */
-    $j("#nav li").hover(function(){
+    $j("#nav li").mouseenter(function(){
         $j(this).addClass("hover");
         $j('ul:first',this).toggle()
-    }, function(){
+    }).mouseleave(function(){
         $j(this).removeClass("hover");
         $j('ul:first',this).toggle();
     });
@@ -40,7 +42,7 @@ $j(function() {
 	/*
 	* Autoclear the main site search field
 	* */
-	$j('#search-field').autoclear();
+	$j('#search-field').placeholder();
 
  	/*
 	* Remove the border from the bottom of the last row of any table.

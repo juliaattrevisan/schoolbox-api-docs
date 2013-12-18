@@ -1,37 +1,3 @@
-<!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
-<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
-<script type="text/javascript">
-
-$j(function() {
-	$j.fn.qtip.defaults.position.corner = {
-		target: 'topLeft',
-		tooltip: 'bottomLeft'
-	}
-
-	$j.fn.qtip.defaults.style = {
-		tip: 'bottomLeft',
-		name: 'green'
-	}
-
-	$j('.one-third:first h3 span').qtip({
-		content: 'Controls if files of this type can be uploaded'
-	});
-
-	$j('.one-third:nth-child(2) h3 span').qtip({
-		content: 'A simple name for the type of file'
-	});
-
-	$j('.one-third:nth-child(3) h3 span').qtip({
-		content: 'The mime type for a file can be found by searching google'
-	});
-})
-
-</script>
-
-<!-- END custom_head-->
-
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
     <!-- BEGIN admin_nav_item -->

@@ -1,13 +1,8 @@
 <!-- BEGIN custom_head -->
-<script type='text/javascript' src='/javascript/excanvas.compiled.js'></script>
-<script type='text/javascript' src='/javascript/flot/jquery.flot.js'></script>
-<script type='text/javascript' src='/javascript/flot/jquery.flot.pie.js'></script>
-<script type='text/javascript' src='/javascript/jquery.qtip-1.0.0-rc3.min.js'></script>
+<script type='text/javascript' src='/javascript/components/flot/jquery.flot.js'></script>
+<script type='text/javascript' src='/javascript/components/flot/jquery.flot.pie.js'></script>
 <script type="text/javascript">
 $j(function() {
-	$j.fn.qtip.defaults.position.corner = {target: 'topLeft',tooltip: 'bottomLeft'};
-	$j.fn.qtip.defaults.style = {tip: 'bottomLeft',name: 'green'};
-
 	if ($j('.evaluation-legend').length > 0) {
 		$j('.information-notification.hide').removeClass('hide');
 	}

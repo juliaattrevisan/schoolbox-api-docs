@@ -1,13 +1,11 @@
 <!-- BEGIN custom_head -->
-
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript">
 
 $j(function() {
 		
 	$j('table tr:nth-child(2n)').addClass('dark')
 	//remove the notifications
-	$j('.notifications a.remove').live('click', function() {
+	$j(document).on('click', '.notifications a.remove', function() {
 		$j(this).parent().animate({opacity: 0},200, function() {
 			$j(this).slideUp(200, function() {
 				//ajax call
@@ -22,7 +20,7 @@ $j(function() {
 	});
 	
 	//remove the entire notification box.
-	$j('.dismiss').live('click', function() {
+	$j(document).on('click', '.dismiss', function() {
 		$j('.notifications').animate({opacity: 0},200, function() {
 			notificationsRemove()
 		});

@@ -1,6 +1,5 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript">
 $j(function () {
@@ -21,34 +20,36 @@ $j(function () {
         return false;
     });
 
+    var templateAssess  = doT.template($j('script#assess-popup-template').html().trim());
+    var templateDueWork = doT.template($j('script#duework-popup-template').html().trim());
+
     /* Calendar Popup */
-	$j('.calendarTable ul li span').live("click", function(){
-		$j('.duework-popup.cal-bubble.cal-bubble').remove();
-		var position = $j(this).parent().offset();
-		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
+    $j(document).on("click", '.calendarTable ul li span', function(){
+        $j('.duework-popup.cal-bubble.cal-bubble').remove();
+        var position = $j(this).parent().offset();
+        var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
 
-		var is_assess = 0;
-		if (ev.match(/^assess-/)) {
-			ev = ev.substring(7);
-			is_assess = 1;
-		}
+        var is_assess = 0;
+        if (ev.match(/^assess-/)) {
+            ev = ev.substring(7);
+            is_assess = 1;
+        }
 
-		$j.post('/ajax/submission.php', { id : ev , uid : {WORK_USER_ID}, is_assess: is_assess}, function (data) {
+        $j.post('/ajax/submission.php', { id : ev , uid : {WORK_USER_ID}, is_assess: is_assess}, function (data) {
 
             if (data !== null) {
-				var template = is_assess ? $j('#assess-popup-template') : $j('#duework-popup-template');
-				var output = template.tmpl(data);
-				output.find('.comment').html(data.description);
-				output.appendTo('body');
+                var template = is_assess ? templateAssess : templateDueWork;
+                var output   = $j(template(data));
+                output.appendTo('body');
                 movePopup(position);
             }
 
-		}, "json");
+        }, "json");
 
-		return false;
-	});
+        return false;
+    });
 
-    $j('.close').live("click", function() {
+    $j(document).on("click", '.close', function() {
         $j('.duework-popup.cal-bubble.cal-bubble').remove();
     });
 
@@ -124,13 +125,13 @@ $j(function () {
     <div class="duework-popup cal-bubble wysiwyg">
         <div class="middle">
             <div class="close">x</div>
-            <div class="js-data clearfix"><h3><a href="/submission/submissionHistory/${id}/${uid}">${name}</a></h3>
-                <p class="bubble-name"><span><a href="/homepage/${cid}">${category}</a></span> - <em>${typeName}</em></p>
-                {{if description}}
-                    <p class="comment">${description}</p>
-                {{/if}}
+            <div class="js-data clearfix"><h3><a href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}">{{=it.name}}</a></h3>
+                <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
+                {{? (it.description||'').length}}
+                    <p class="comment">{{=it.description}}</p>
+                {{?}}
                 <p class="details clearfix">
-                <a class="btn modify float-left" href="/submission/submissionHistory/${id}/${uid}"><span></span>${action}</a>
+                <a class="btn modify float-left" href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}"><span></span>{{=it.action}}</a>
                 </p>
             </div>
             <div class="bottom"><strong></strong></div>
@@ -143,13 +144,13 @@ $j(function () {
     <div class="duework-popup cal-bubble wysiwyg">
         <div class="middle">
             <div class="close">x</div>
-            <div class="js-data clearfix"><h3>${name}</h3>
-                <p class="bubble-name"><span><a href="/homepage/${cid}">${category}</a></span> - <em>${typeName}</em></p>
-                {{if description}}
-                    <p class="comment">${description}</p>
-                {{/if}}
+            <div class="js-data clearfix"><h3>{{=it.name}}</h3>
+                <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
+                {{? (it.description||'').length}}
+                    <p class="comment">{{=it.description}}</p>
+                {{?}}
                 <p class="details clearfix">
-                    <a class="btn up-arrow float-left" href="/assess/intro/${id}"><span></span>${action}</a>
+                    <a class="btn up-arrow float-left" href="/assess/intro/{{=it.id}}"><span></span>{{=it.action}}</a>
                 </p>
             </div>
             <div class="bottom"><strong></strong></div>

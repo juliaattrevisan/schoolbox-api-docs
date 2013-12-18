@@ -4,9 +4,9 @@ $j(function() {
 
 	$j('.checkbox').click(function() {	
 		if ($j('.hide-questions').is(":visible")) {
-			$j('.hide-questions :input').attr('disabled', 'true');
+			$j('.hide-questions :input').prop('disabled', true);
 		} else {
-			$j('.hide-questions :input').removeAttr('disabled');	
+			$j('.hide-questions :input').prop('disabled', false);
 		}
 		$j('.hide-questions').toggle();
 	});

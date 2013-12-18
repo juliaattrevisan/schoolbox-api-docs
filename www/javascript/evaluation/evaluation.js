@@ -29,15 +29,13 @@
 		 */
 		$j('.evaluation-finish').click(function(event) {
 			event.preventDefault();
-
-			$j.fn.evaluation.saveAll();
-
-			location.href = $j(this).attr('href');
-		}).confirm({
-			buttons: {
-				wrapper:'<button></button>',
-				separator:'  '
-			}
+			var href = $(this).attr('href');
+			$j(this).confirmDialog({
+				confirmEvent: function() {
+					$j.fn.evaluation.saveAll();
+					location.href = href;
+				}
+			});
 		});
 	}
 

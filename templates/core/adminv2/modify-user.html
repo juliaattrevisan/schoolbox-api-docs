@@ -1,6 +1,6 @@
 <!-- BEGIN custom_head -->
-
-<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 
 $j(function() {
@@ -52,22 +52,19 @@ $j(function() {
 		$j(this).addClass('dark');
 	})
 
-	$j('h3 span').qtip({
-		content: 'Edit the user\'s details.',
-		show: 'mouseover',
-		hide: 'mouseout',
-		style: {
-			tip: 'bottomLeft',
-			name: 'green'
-		},
-		position: {
-			corner: {
-				target: 'topRight',
-				tooltip: 'bottomLeft'
-			}
-  		}
-	});
-	
+    $j('h3 span').each(function() {
+        $j(this).qtip({
+            content: 'Edit the user\'s details.',
+            style: {
+                classes: 'qtip-green qtip-shadow qtip-rounded'
+            },
+            position: {
+                my: 'bottom left',
+                at: 'top left'
+            }
+        });
+    });
+
 	$j('a.show-pass').click(function() {
 
         $j(this).siblings('em').show().css('display', 'block');

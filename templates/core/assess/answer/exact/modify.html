@@ -1,7 +1,7 @@
 <script type="text/javascript">
 $j(function() {
 	
-	$j('#create').live('click',function() {
+	$j(document).on('click', '#create', function() {
 		var content = tinyMCE.activeEditor.getContent(); // get the content
    		$j('#question').val(content); // put it in the textarea
 	});

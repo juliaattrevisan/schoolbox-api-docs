@@ -15,3 +15,6 @@ dr.css
 *.log
 screen.css
 vendor/
+# Bower install directory
+www/javascript/components/
+node_modules/

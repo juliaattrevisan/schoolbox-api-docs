@@ -78,21 +78,26 @@
 
 <!-- BEGIN CUSTOM_JAVASCRIPT -->
 <script>
-	// Hide averages rows
-	$j('.sub-table-row').hide();
+    // Hide averages rows
+    var subTableRow = $j('.sub-table-row');
+    subTableRow.hide();
 
-	// Toggle averages rows and change arrow direction
-	$j('.toggle-averages').toggle(function(){
-		$j(this).html('&#x25B2;');
-		$j('.sub-table-row').show();
-	}, function(){
-		$j(this).html('&#x25BC;');
-		$j('.sub-table-row').hide();
-	});
+    // Toggle averages rows and change arrow direction
+    $j('.toggle-averages').click(function(event){
+        event.preventDefault();
+        if (subTableRow.is(':visible')) {
+            $j(this).html('&#x25BC;');
+            $j('.sub-table-row').hide();
+        }
+        else {
+            $j(this).html('&#x25B2;');
+            $j('.sub-table-row').show();
+        }
+    });
 
   var table = $j('#content').children('table.mark-sheet');
 
-  table.delegate('input', 'change', function(e) {
+  table.on('change', 'input', function(e) {
     var self = $j(this);
 
     // disable self
@@ -109,7 +114,7 @@
       // callbacks
       success : function(data) {
         self.addClass('ajax-response win');
-        self.removeAttr('disabled');
+        self.prop('disabled', false);
         self.attr('title', '');
 
         var tbody = table.children('tbody');
@@ -132,7 +137,7 @@
       error : function(xhr) {
         self.addClass('ajax-response fail');
         self.attr('title', 'Value failed to save.')
-        self.removeAttr('disabled');
+        self.prop('disabled', false);
         setTimeout(function() { self.removeClass('ajax-response fail') }, 2000);
       }
     });

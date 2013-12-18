@@ -1,8 +1,5 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/jquery.countdown.css" media="screen" />
-<script type="text/javascript" src="/javascript/jquery.countdown.js"></script>
-<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
-<script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
 
@@ -74,13 +71,9 @@ $j(document).ready(function() {
 		}
 	}
 
-	$j('a.finish-review').click(function() {
-		location.href = $j(this).attr('href');
-	}).confirm({
-		buttons: {
-			wrapper:'<button></button>',
-			separator:'  '
-  		}
+	$j('a.finish-review').click(function(event) {
+		event.preventDefault();
+		$j(this).confirmDialog();
 	});
 
 

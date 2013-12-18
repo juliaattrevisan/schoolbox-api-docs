@@ -128,7 +128,7 @@ var validator = $j("#createQuestionForm").submit(function() {
 
 	/* Add a new answer option
 	 */
-	$j('#makeNewAnswer').live('click', function() {
+	$j(document).on('click', '#makeNewAnswer', function() {
 		var thing = $j('.hidden-clone li:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		placeErrors()
@@ -137,7 +137,7 @@ var validator = $j("#createQuestionForm").submit(function() {
 	
 	/* Remove an answer option
 	 */
-	$j('.delete').live('click', function(){
+	$j(document).on('click', '.delete', function(){
 		if (($j('.inputs').length) !== 2) {
 			$j(this).parent().remove();
 		}	

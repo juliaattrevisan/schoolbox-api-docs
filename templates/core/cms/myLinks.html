@@ -16,7 +16,7 @@ $j(function() {
 
 	/* Dropdown inline editor for rows
 	 */
-	$j('.modify').live('click',function() {
+	$j(document).on('click', '.modify', function() {
 
         $j(this).closest('.row-holder').siblings('.row-holder').show();
         $j(this).closest('.row-holder').hide();

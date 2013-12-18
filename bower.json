@@ -1,0 +1,40 @@
+{
+  "name": "schoolbox",
+  "version": "14.0.0",
+  "homepage": "https://github.com/alaress/schoolbox",
+  "description": "Schoolbox LMS Bower Components",
+  "authors": [
+    "Alaress"
+  ],
+  "license": "Commercial",
+  "private": true,
+  "dependencies": {
+    "jquery": "2.0.3",
+    "jquery.ui": "1.10.3",
+    "jquery-timepicker-jt": "1.2.13",
+    "jquery-validation": "1.11.1",
+    "jqueryui-touch-punch-improved": "0.3.1",
+    "jquery.cookie": "1.4.0",
+    "jquery-placeholder": "2.0.7",
+    "jquery.countdown": "2.0.2",
+    "jquery-cycle": "3.0.3",
+    "flot": "0.8.2",
+    "farbtastic": "1.3u",
+    "tinycolor": "0.9.16",
+    "video.js": "4.3.0",
+    "swfobject": "2.2",
+    "imagesloaded": "3.0.4",
+    "eventEmitter": "4.2.6",
+    "eventie": "1.0.3",
+    "doT": "1.0.1",
+    "qtip2": "2.2.0"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "www/javascript/components/",
+    "test",
+    "tests"
+  ]
+}

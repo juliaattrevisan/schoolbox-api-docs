@@ -21,7 +21,8 @@
     text-align: center;
   }
 </style>
-<script type="text/javascript" src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript">
 
   $j(function() {
@@ -36,7 +37,7 @@
     var traversalWindow = $j('#traversal-window');
     var confirmationWindow = $j('#confirmation-window');
 
-    $j('#tree tr:not(.server)').live('click', function () {
+    $j('#tree').on('click', 'tr:not(.server)', function () {
       /* select folder */
       $j('#tree .selected').removeClass('selected');
       $j(this).addClass('selected');

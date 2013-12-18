@@ -3,7 +3,7 @@
 $j(document).ready(function() {
 
 	//add in one clone to start with
-	//$j('.answerCorrect').attr('checked', false);
+	//$j('.answerCorrect').prop('checked', false);
 	//var thing = $j('.hidden-clone li:first-child').clone();
 	//$j('ul#answerCollection').append(thing);
 	//refreshList();
@@ -30,7 +30,7 @@ $j(document).ready(function() {
 				var elem = $j(element);
 
 				var description = elem.find('.answerDescription').val();
-				var code = elem.find('.answerCode').attr('value');
+				var code = elem.find('.answerCode').val();
 
 				/* Ignore empty answers that weren't removed
 				 */
@@ -38,7 +38,7 @@ $j(document).ready(function() {
 					answerCollection.push({
 						description: description,
 						value: code,
-						correct: elem.find('.answerCorrect').attr('checked')
+						correct: elem.find('.answerCorrect').prop('checked')
 					});
 				}
 			});
@@ -99,7 +99,7 @@ $j(document).ready(function() {
             var elem = $j(element);
 
             var description = elem.find('.answerDescription').val();
-            var code = elem.find('.answerCode').attr('value');
+            var code = elem.find('.answerCode').val();
 
             /* Ignore empty answers that weren't removed
              */
@@ -142,7 +142,7 @@ $j(document).ready(function() {
 
     /* Add a new answer option
      */
-    $j('#makeNewAnswer').live('click', function() {
+    $j(document).on('click', '#makeNewAnswer', function() {
 		var thing = $j('.hidden-clone li:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		refreshList();
@@ -152,14 +152,14 @@ $j(document).ready(function() {
 
 	/* Remove an answer option
 	 */
-	$j('.delete').live('click', function(){
+	$j(document).on('click', '.delete', function(){
 		if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
 		}
 		refreshList();
     });
 
-	$j('.answerCorrect').live('click', function() {
+	$j(document).on('click', '.answerCorrect', function() {
 		refreshList();
 		$j(this).parent().parent().toggleClass("highlight");
 	});

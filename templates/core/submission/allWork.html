@@ -144,8 +144,7 @@
   }
 
 </style>
-<script type="text/javascript" src="/javascript/excanvas.compiled.js"></script>
-<script type="text/javascript" src="/javascript/flot/jquery.flot.js"></script>
+<script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
 <!-- END custom_head -->
 <div id="all-work">
   <h1>Grades &ndash; {RC_TITLE}</h1>
@@ -396,7 +395,7 @@
       return false;
     })
 
-    $j('#comment-table').delegate('a.btn.no-text', 'click', function() {
+    $j('#comment-table').on('click', 'a.btn.no-text', function() {
       // if a button on the table is clicked, find out its context and function, and execute
       var btn = $j(this);
       var row = btn.closest('tr');
@@ -421,7 +420,7 @@
               editForm.find('label[for='+v+']').attr('for', v+'-'+commentId);
             });
             editForm.prepend(
-                $j('<input type="hidden" />').attr('name', 'commentId').attr('value', commentId)
+                $j('<input type="hidden" />').attr('name', 'commentId').val(commentId)
             );
 
             // safety check
@@ -430,17 +429,17 @@
               var pvis = editForm.find('input[name=visibility\\[parent\\]]');
 
               if(data.visibility.student) {
-                svis.attr('checked', 'checked');
+                svis.prop('checked', true);
               }
               else {
-                svis.removeAttr('checked');
+                svis.prop('checked', false);
               }
 
               if(data.visibility.parent) {
-                pvis.attr('checked', 'checked');
+                pvis.prop('checked', true);
               }
               else {
-                pvis.removeAttr('checked');
+                pvis.prop('checked', false);
               }
             }
 
@@ -479,7 +478,7 @@
       }
     });
 
-    $j('#comment-table').delegate('form.edit-comment a.submit-this', 'click', function() {
+    $j('#comment-table').on('click', 'form.edit-comment a.submit-this', function() {
       var form = $j(this).closest('form');
       var commentId = form.closest('tr').data('id');
 
