@@ -69,7 +69,7 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
             }
         }
 
-        $colors = $this->colours;
+        $colorList = array();
         foreach($data as $groupname => $series) {
             $groupdata = array();
             $k = array_keys($series);
@@ -79,12 +79,13 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
                 }
             }
 
-            $this->colours[] = $colors[$groupname];
+            $colorList[] = $this->colours[$groupname];
             $this->graphData[] = array(
                 'label' => ucfirst($groupname),
                 'data' => $groupdata
             );
         }
+        $this->colours = $colorList;
 
 		/* Always return something. If you don't, the graph won't render
 		 * axes, labels, the major/minor lines etc. It'll just be blank.
