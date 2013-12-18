@@ -201,19 +201,19 @@
             </select></td>
         </tr>
         <tr>
-            <td class="formLabelWidth"><h4>Groups</h4>
-                <em>This news item will only be visible to the groups you select.</em></td>
+            <td class="formLabelWidth"><h4>Roles</h4>
+                <em>This news item will only be visible to the roles you select.</em></td>
             <td>
                 <div class="clearfix checkboxes groups">
-					<label class="float-left clear">
-						<input type="checkbox" value="{GROUP_ID}" name="" class="select_all" />Select all
-					</label>
-					<!-- BEGIN group_selection -->
+                    <!-- BEGIN group_selection -->
                     <label class="float-left clear">
                         <input type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>{GROUP_NAME}
                     </label>
                     <!-- END group_selection -->
-				</div>
+                    <label class="float-left clear">
+                        <input type="checkbox" value="{GROUP_ID}" name="" class="select_all" /> Select all
+                    </label>
+                </div>
             </td>
         </tr>
         <!-- BEGIN campus_row -->
@@ -222,14 +222,14 @@
                 <em>This news item will only be visible to users that are within this campus.</em></td>
             <td>
                 <div class="clearfix checkboxes">
-					<label class="float-left clear">
-						<input type="checkbox" value="{GROUP_ID}" name="" class="select_all" />Select all
-					</label>
 					<!-- BEGIN campus_selection -->
                     <label class="float-left clear">
                         <input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}
 					</label>
                     <!-- END campus_selection -->
+                    <label class="float-left clear">
+                        <input type="checkbox" value="{GROUP_ID}" name="" class="select_all" /> Select all
+                    </label>
 				</div>
             </td>
         </tr>
