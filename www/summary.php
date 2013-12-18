@@ -26,7 +26,7 @@ if (is_numeric($_GET['group']))
 else
 	$group = array(1,2,3,4,5,12,13);
 
-$myNews = new news($topic);
+$myNews = new News($topic);
 
 if ($_GET['news'] == 'all') {
 	$dNotice = '';
