@@ -37,7 +37,7 @@
     var traversalWindow = $j('#traversal-window');
     var confirmationWindow = $j('#confirmation-window');
 
-    $j('#tree tr:not(.server)').live('click', function () {
+    $j('#tree').on('click', 'tr:not(.server)', function () {
       /* select folder */
       $j('#tree .selected').removeClass('selected');
       $j(this).addClass('selected');
