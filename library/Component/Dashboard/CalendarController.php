@@ -73,6 +73,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		$this->setBlock($templateHandle, 'day', 'day_block');
 		$this->setBlock('day', "note_block", "note_listing");
+		$this->setBlock('day', "no_events", "no_events_block");
 
 		$this->setBlock("note_block", "has_category", "has_category_block");
 		$this->setBlock("note_block", "attendance_icon", "attendance_icon_block");
@@ -99,8 +100,12 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 		$prevDay = false;
 
 		$j = 0;
+		if (count($this->eventList) === 0) {
+			$this->parse('no_events_block', 'no_events');
+		}
 		foreach ($this->eventList as $currentEvent) {
 			$this->setVar('has_category_block', '');
+			$this->setVar('no_events_block', '');
 
 			//
 			// Current day: will never be before the start time
