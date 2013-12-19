@@ -92,6 +92,7 @@ if (!empty($_POST)) {
     $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
+	$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Manage Assessment');
 
     $this->setVar('question_block', '');
