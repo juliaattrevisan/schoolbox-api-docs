@@ -12,7 +12,7 @@ $output = array(
 	'TITLE' => HEADING . ' - Calendar',
 	'DESCRIPTION' => 'Today\'s events',
 	'DATE' => date('r'),
-	'LINK' => SITE_address . '/calendar/week/',
+	'LINK' => $page->conType() . $_SERVER['HTTP_HOST'] . '/calendar/week/',
 );
 $page->setVar($output);
 
@@ -41,7 +41,7 @@ if (is_array($calendarList)) {
 			'ITEM_TITLE'		=> $calendar['note'],
 			'ITEM_DESCRIPTION'	=> $time,
 			'ITEM_DATE'			=> $itemDate->getShort(),
-			'ITEM_LINK'			=> SITE_address . '/calendar/week/',
+			'ITEM_LINK'			=> $page->conType() . $_SERVER['HTTP_HOST'] . '/calendar/week/',
 		);
 
 		$page->setVar($output);
