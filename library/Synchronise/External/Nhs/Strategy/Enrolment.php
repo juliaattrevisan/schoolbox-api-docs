@@ -55,9 +55,9 @@ class Synchronise_External_Nhs_Strategy_Enrolment extends Synchronise_Base_Strat
         foreach ($reader as $row) {
             // Study classes (free preiods?) exist, these have a space afterward.
             // These aren't separate classes
-            list($code) = explode(' ', $row['Class']);
+            list($code) = explode(' ', $row['Course']);
             $this->list[$code]['code']           = $code;
-            $this->list[$code]['student_list'][] = $row['Student'];
+            $this->list[$code]['student_list'][] = $row['StudentCode'];
         }
     }
 
