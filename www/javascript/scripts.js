@@ -42,7 +42,10 @@ $j(function() {
     $("a[rel^='lightbox']").magnificPopup({
         type: 'image',
         removalDelay: 300,
-        mainClass: 'mfp-fade'
+        mainClass: 'mfp-fade',
+        gallery:{
+            enabled:true
+        }
     });
 
     /**
