@@ -94,6 +94,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				'modify_button_block' => '',
 				'has_category_block' => '',
 				'DATE' => date('l jS F', $_SERVER['REQUEST_TIME']),
+                'CALENDAR_DATE' => date('d-m-Y', $_SERVER['REQUEST_TIME']),
 			)
 		);
 
@@ -122,6 +123,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 			$eventOutput = array(
 				'DATE' => $currentDay->getUsingFormat('l jS F'),
+                'CALENDAR_DATE' => $currentDay->getUsingFormat('d-m-Y'),
 				'TIME' => $currentEvent->getEventSpan(),
 				'FULL_TIME' => $currentEvent->getFullDate(),
 				'LOCATION' => Scrub::text($currentEvent->getLocation()),
