@@ -104,4 +104,16 @@ class Synchronise_Base_Strategy_Student extends Synchronise_Base_Strategy {
 	public function getYearFromUser($currentUser) {
 		return $currentUser['StudentYearLevel'];
 	}
+
+	/**
+	 * Overridden to use getBySynergy() method - students often switch groups.
+	 *
+	 * @param  array $user
+	 *
+	 * @return array
+	 */
+	protected function userExists($user) {
+		return $this->user_handler->getBySynergy($user['synergy_id']);
+	}
+
 }
