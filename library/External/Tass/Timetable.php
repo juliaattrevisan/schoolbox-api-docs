@@ -15,46 +15,47 @@ class External_Tass_Timetable implements External_TimetableInterface {
 	private $database;
 
 	function __construct() {
-		define('TASS_tt_id', 13);
-
 		$this->setDatabase(MSSQL::getInstance());
 		$this->getDatabase()->setConvertEncoding(false);
-
-		$this->days = $this->getDays();
 
 		$this->groupHandler = new Group;
 		$this->campusMapper = new \Schoolbox\CampusMapper();
 	}
 
+
+    function getCampus($campus) {
+        return $this->campusMapper->findByID($campus);
+    }
 	function getCampusCode($campus) {
-
-		$campus = $this->campusMapper->findByID($campus);
-		return $campus->getExtTimetableCode();
-
+        list($campusCode,$timetableCode) = explode('-',$this->getCampus($campus)->getExtTimetableCode());
+        return $campusCode;
 	}
 
-	function getDays() {
-		$query = "SELECT cmpy_code, COUNT(*) as dayCount FROM ttdays WHERE tt_id = " . TASS_tt_id . " GROUP BY cmpy_code";
-		$this->getDatabase()->query($query);
+    function getTimetableCode($campus) {
+        list($campusCode,$timetableCode) = explode('-',$this->getCampus($campus)->getExtTimetableCode());
+        return $timetableCode;
+    }
 
-		while ($campus = $this->getDatabase()->getNextArray()) {
-			$days[$campus['cmpy_code']] = $campus['dayCount'];
-		}
-		return $days;
+	function getDays($campus) {
+
+        $campus = $this->campusMapper->findByID($campus);
+        return $campus->getTimetableDay();
 	}
 
 	function getTimetableDefinition($campus, $day = 0) {
 
 		$campusCode = $this->getCampusCode($campus);
+        $timetableCode = $this->getTimetableCode($campus);
+
 		/* Fetch the longest day to use as our day template...  */
 		if($day == 0) {
-            $query = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
+            $query = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = '".$timetableCode." ' AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
 		    $longestDay = $this->getDatabase()->getRow($query);
             $day = $longestDay['day_code'];
         }
 
 		$query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
-                WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = '$campusCode' AND day_code='$day'
+                WHERE tt_id = '".$timetableCode."' AND cmpy_code = '$campusCode' AND day_code='$day'
                 ORDER BY prd_code";
 
 		$this->getDatabase()->query($query);
@@ -71,7 +72,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
 		}
 
 		$timetableDef['periodCount'] = $longestDay['prd_num'];
-		$timetableDef['dayCount'] = $this->days[$campusCode];
+		$timetableDef['dayCount'] = $this->getDays($campus);
 		return $timetableDef;
 
 	}
@@ -83,35 +84,28 @@ class External_Tass_Timetable implements External_TimetableInterface {
 			$date = mktime();
 		}
 
-		$campusCode = $this->getCampusCode($campus);
-
 		if (date('w', $date) == 0 || date('w', $date) == 6) {
 			return false;
 		}
 
 		//get day count
-		if ($this->days[$campusCode] == 5) {
+		if ($this->getDays($campus)== 5) {
 			return date("w", $date);
 		}
-		else {
-			if ($this->days[$campusCode] == 7) {
-				return 0;
+		else if ($this->getDays($campus) == 7) {
+				return 0; //Not implemented
+		}
+		else if ($this->getDays($campus) == 10) {
+
+			if ((date('W', $date) % 2) == 0) {
+				return date('w', $date);
 			}
 			else {
-				if ($this->days[$campusCode] == 10) {
-
-					if ((date('W', $date) % 2) == 0) {
-						return date('w', $date);
-					}
-					else {
-						return date('w', $date) + 5;
-					}
-				}
-				else //unknown day number
-				{
-					return 0;
-				}
+				return date('w', $date) + 5;
 			}
+		}
+		else { //unknown day number
+			return 0;
 		}
 	}
 
@@ -215,7 +209,6 @@ class External_Tass_Timetable implements External_TimetableInterface {
 
 		$periodCount = $timetabledef['periodCount'];
 		$dayCount = $timetabledef['dayCount'];
-
 		$result = $this->getDatabase()->query($query);
 
 		//get first period
@@ -243,6 +236,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
 					$timetable[$x]['day'][$y]['code'] = trim($desc['year_grp'] . '-' . $desc['sub_code'] . '-' . $desc['class']);
 					$timetable[$x]['day'][$y]['room'] = $desc['room_code'];
                     $timetable[$x]['day'][$y]['staffCode'] = $desc['tch_code'];
+
 					$desc = $this->getDatabase()->getNextArray();
 
 					//bad data in synergetic.. why..??
