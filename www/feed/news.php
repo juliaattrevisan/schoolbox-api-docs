@@ -11,7 +11,7 @@ $page->setBlock(TEMPLATE_body, 'rss_item', 'rss_item_block');
 $output = array('TITLE'			=> HEADING . ' - News',
 				'DESCRIPTION'	=> 'Recent news items from the portal',
 				'DATE'			=> date('r'),
-				'LINK'			=> SITE_address . '/news/',
+				'LINK'			=> $page->conType() . $_SERVER['HTTP_HOST'] . '/news/',
 				);
 $page->setVar($output);
 
@@ -26,7 +26,7 @@ if (is_array($newsList)) {
 		$output = array('ITEM_TITLE'		=> $news['item_heading'],
 						'ITEM_DESCRIPTION'	=> "<![CDATA[" . $news['item_body'] ."]]>",
 						'ITEM_DATE'			=> $itemDate->getShort(),
-						'ITEM_LINK'			=> SITE_address . '/news/item/' . $news['item_id'],
+						'ITEM_LINK'			=> $page->conType() . $_SERVER['HTTP_HOST'] . '/news/item/' . $news['item_id'],
 						);
 		$page->setVar($output);
 		$page->parse('rss_item_block', 'rss_item', true);
