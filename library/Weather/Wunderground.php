@@ -162,6 +162,7 @@ class Weather_Wunderground implements Weather_Interface {
         $strats = array(
             'ip' => "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}",
             'geo' => "(\-?[0-9]+\.[0-9]+)[, /]*(\-?[0-9]+\.[0-9]+)",
+            'pws' => "^pws:([A-Za-z0-9]+)$",
             'airport' => "([A-Z]+){3,4}",
             'city' => "([A-Za-z \.-]+)/([A-Za-z \.-]+)"
         );
@@ -211,6 +212,16 @@ class Weather_Wunderground implements Weather_Interface {
             'airport' => $matches[0][0]
         );
     }
+    
+    /**
+     * @param array $matches
+     * @return array
+     */
+    private function render_pws($matches) {
+        return array(
+            'pws' => str_replace('pws:', '', $matches[0][0])
+        );
+    }
 
     /**
      * @param array $matches
@@ -240,6 +251,9 @@ class Weather_Wunderground implements Weather_Interface {
         }
         elseif(isset($location['airport'])) {
             $this->location = strtoupper($location['airport']);
+        }
+        elseif(isset($location['pws'])) {
+            $this->location = 'pws:' . strtoupper($location['pws']);
         }
         elseif(isset($location['ip'])) {
             $this->location = 'autoip';
