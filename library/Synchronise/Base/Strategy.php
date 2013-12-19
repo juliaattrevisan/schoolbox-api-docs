@@ -156,12 +156,12 @@ abstract class Synchronise_Base_Strategy {
 	 * Retrieves the user that exists in Schoolbox for this user account, or
 	 * an empty value if they don't.
 	 *
-	 * @param  array c$user
+	 * @param  array $user
 	 *
 	 * @return array
 	 */
 	protected function userExists($user) {
-		return $this->user_handler->getBySynergy($user['synergy_id']);
+		return $this->user_handler->getBySynergyAndGroup($user['synergy_id'], $user['group_id']);
 	}
 
 	/**
