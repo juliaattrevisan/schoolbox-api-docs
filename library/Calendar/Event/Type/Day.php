@@ -100,42 +100,6 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
         return $formattedTime;
     }
 
-	/**
-	 * Get a string representing the full span of time for this event
-	 * This is used in the calendar dashboard
-	 */
-	public function getEventSpan() {
-		if ($this->getStartTime()->getDatabaseDate() != $this->getEndTime()->getDatabaseDate()) {
-			if ($this->getAllDay()) {
-				return $this->getStartTime()->getCalendarDate() . '&ndash;' . $this->getEndTime()->getCalendarDate();
-			}
-
-			return $this->getStartTime()->getCalendarDateTime() . '&ndash;' . $this->getEndTime()->getCalendarDateTime();
-		}
-		else {
-			if ($this->getAllDay()) {
-				return 'All Day';
-			}
-
-			return $this->getStartTime()->getTimeOnly() . '&ndash;' . $this->getEndTime()->getTimeOnly();
-		}
-	}
-
-
-    public function getFullDate() {
-
-        $formattedTime = $this->getTime();
-        $startDate = $this->getStartTime()->getUsingFormat('l, jS F');
-        if ($formattedTime) {
-            $formattedTime = $startDate . ', ' . $formattedTime;
-        } else {
-            $formattedTime = $startDate;
-        }
-
-        return $formattedTime;
-
-    }
-
     /* Getters/Setters
      */
 

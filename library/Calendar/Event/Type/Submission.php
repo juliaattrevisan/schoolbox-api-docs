@@ -91,31 +91,6 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
 		return 'personal';
 	}
 
-    /**
-     * Special time formattng
-     *
-     * @return string
-     */
-    public function getTime() {
-
-	    if($this->getAllDay() )
-		    return false;
-		else
-			return $this->getStartTime()->getUsingFormat('g:iA');
-
-    }
-
-    public function getFullDate() {
-        $startDate = $this->getStartTime()->getUsingFormat('l, jS F');
-        if (!$this->getAllDay()) {
-            $formattedTime = $startDate . ', ' . $this->getTime();
-        } else {
-            $formattedTime = $startDate;
-        }
-
-        return $formattedTime;
-    }
-
     /* Getters/Setters
      */
 

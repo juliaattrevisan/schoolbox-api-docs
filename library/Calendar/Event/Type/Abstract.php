@@ -554,4 +554,66 @@ abstract class Calendar_Event_Type_Abstract {
 	public function getPublishDate() {
 		return $this->publishDate;
 	}
+
+	/**
+	 * Special time formattng
+	 *
+	 * @return string
+	 */
+	public function getTime() {
+		if ($this->getAllDay()) {
+			return false;
+		}
+		else {
+			return $this->getStartTime()->getUsingFormat('g:iA');
+		}
+	}
+
+	/**
+	 * Get a string representing the full span of time for this event
+	 * This is used in the calendar dashboard
+	 *
+	 * @return string
+	 */
+	public function getEventSpan() {
+		if ($this->getStartTime()->getDatabaseDate() != $this->getEndTime()->getDatabaseDate()) {
+			if ($this->getAllDay()) {
+				return $this->getStartTime()->getCalendarDate() . '&ndash;' . $this->getEndTime()->getCalendarDate();
+			}
+
+			return $this->getStartTime()->getCalendarDateTime() . '&ndash;' . $this->getEndTime()->getCalendarDateTime();
+		}
+		else {
+			if ($this->getAllDay()) {
+				return 'All Day';
+			}
+			return $this->getStartTime()->getTimeOnly() . '&ndash;' . $this->getEndTime()->getTimeOnly();
+		}
+	}
+
+	/**
+	 * Gets date of event in format like this: Thursday, 19th December, 2:00AM
+	 *
+	 * @return string
+	 */
+	public function getFullDate() {
+		$startDate = $this->getStartTime()->getUsingFormat('l, jS F');
+		if (!$this->getAllDay()) {
+			$formattedTime = $startDate . ', ' . $this->getTime();
+		}
+		else {
+			$formattedTime = $startDate;
+		}
+		return $formattedTime;
+	}
+
+	/**
+	 * Can someone attend this event? Defaults to false, subclasses can override.
+	 *
+	 * @return bool
+	 */
+	public function canAttend() {
+		return false;
+	}
+
 }

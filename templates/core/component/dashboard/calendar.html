@@ -37,13 +37,22 @@
                         <a class="btn groups float-left"
                            href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
                         <!-- END attendance_list_button -->
-                        {MODIFY}
+
+                        <!-- BEGIN modify_button -->
+                        <a class="btn groups float-left"
+                           href="{MODIFY_HREF}"><span></span>{MODIFY_ACTION}</a>
+                        <!-- END modify_button -->
                     </div>
                 </div>
             </li>
             <!-- END note_block -->
         </ul>
 
+        <!-- BEGIN no_events -->
+        <div class="no_events">
+            <em>There is no recent upcoming events.</em>
+        </div>
+        <!-- END no_events -->
     </div>
     <!-- END day -->
 </div>

@@ -16,7 +16,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Event_Collection implements Iterator {
+class Calendar_Event_Collection implements Iterator, Countable {
 
 	/* A bunch of Calendar_Event_Type_Abstract subclasses
 	 */
@@ -299,7 +299,13 @@ class Calendar_Event_Collection implements Iterator {
 		return isset($this->stack[$this->position]);
 	}
 
-
-
+	/**
+	 * Count
+	 *
+	 * @return int
+	 */
+	public function count() {
+		return count($this->stack);
+	}
 
 }
