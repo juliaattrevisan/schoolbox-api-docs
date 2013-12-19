@@ -38,6 +38,13 @@ $j(function() {
         $(this).attr('target','_blank')
     })
 
+    // Set up lightboxes globally.
+    $("a[rel^='lightbox']").magnificPopup({
+        type: 'image',
+        removalDelay: 300,
+        mainClass: 'mfp-fade'
+    });
+
     /**
      * Each skin does NOT have a slightly different header height or a different left navigation.
      * From now on, it's always placed relative to the clicked element.
