@@ -233,7 +233,7 @@ class Weather_Wunderground implements Weather_Interface {
      */
     public function setLocation(array $location) {
         if(isset($location['lat']) && isset($location['long'])) {
-            $this->location = sprintf('%0.1d,%0.1d', $location['lat'], $location['long']);
+            $this->location = sprintf('%0.6f,%0.6f', $location['lat'], $location['long']);
         }
         elseif(isset($location['country']) && isset($location['city'])) {
             $this->location = sprintf('%s/%s', str_replace(' ', '_', $location['country']), str_replace(' ', '_', $location['city']));
