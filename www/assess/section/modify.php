@@ -71,7 +71,7 @@ if (!empty($_POST)) {
         'DESCRIPTION' => Scrub::text($section['description']),
         'SEQUENCE' => $section['sequence'],
         'RANDOM_SELECTED' => $section['random'] == 0 ? '' : 'checked=\'checked\'',
-        'POOL' => $section['pool'],
+        'POOL' => $section['pool'] > 0 ? $section['pool'] : ''
     ));
 
     /* Show this Assess' contents
