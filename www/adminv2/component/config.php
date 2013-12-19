@@ -113,14 +113,8 @@ function writeConfig($vars) {
 
     // Create a controller object for the config class to use when dehydrating
     // config values
-    $cclass = $instance->getDefinition()->getClass();
-    /** @var Component_ControllerAbstract $controller */
-
-	/* CalendarController has a different interface to be compatible elsewhere
-	 * It has been that way since January 2012?
-	 */
-	$controller = new $cclass($instance, new \Schoolbox\User(), new SitePage());
-
+    $factory    = new Component_Dashboard_Factory(new \Schoolbox\User(), new SitePage());
+    $controller = $factory->buildComponent($instance);
     $controller->execute();
 
     /** @var Component_ConfigDefinition $confD */
