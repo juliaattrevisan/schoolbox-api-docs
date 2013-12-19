@@ -11,6 +11,34 @@
 
     // once the DOM has loaded, punch a fancy calendar into it
     $j(document).ready(function() {
+        // Allow checking of anchor for view to display
+        var anchor = '';
+        var parts  = location.href.split('#');
+        if (parts.length > 1) {
+            anchor = parts[1];
+            switch (anchor) {
+                case 'month':
+                    anchor = 'month';
+                    break;
+                case 'week':
+                case 'agendaWeek':
+                    anchor = 'agendaWeek';
+                    break;
+                case 'day':
+                case 'agendaDay':
+                    anchor = 'agendaDay';
+                    break;
+                case 'basicWeek':
+                    anchor = 'basicWeek';
+                    break;
+                case 'basicDay':
+                    anchor = 'basicDay';
+                    break;
+                default:
+                    anchor = '';
+                    break;
+            }
+        }
         c = new Calendar('calendar', 'calendar-bubble', {
 			userId: '{CALENDAR_USER_ID}',
 
@@ -30,7 +58,7 @@
                 month: '{SELECTED_MONTH}',
                 year: '{SELECTED_YEAR}',
                 columnFormat: 'ddd d/M',
-                defaultView: '{CALENDAR_VIEW}',
+                defaultView: anchor || '{CALENDAR_VIEW}',
                 timeFormat: { month: 'h(:mm)tt' },
 
                 /**
