@@ -34,7 +34,7 @@ if (!empty($_POST)) {
      */
     $duration = ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60;
 
-    if ($duration == 0) {
+	if ((!$_POST['durationSelected']) || ($duration == 0)) {
         $duration = Assess_Main::UNLIMITED_DURATION;
     }
 
