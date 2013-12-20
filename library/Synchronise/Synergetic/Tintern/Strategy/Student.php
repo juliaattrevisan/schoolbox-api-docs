@@ -40,22 +40,66 @@ class Synchronise_Synergetic_Tintern_Strategy_Student extends Synchronise_Base_S
      * @return int
      */
     public function getDefaultCampusFromUser($currentUser) {
-		new Alaress_Probe($currentUser);
-
 		$map = array();
 
-		switch ($currentUser['StudentYearLevel']) {
-			case 0:
-				return 'P';
-			case 30:
-			case 32:
-			case 33:
-			case 40:
-			case 50:
-				return 'ELC';
-			default:
-				return $currentUser['StudentYearLevel'];
-		}
+		/* ELC for everyone
+		 */
+		$map[30]['F'] = 6;
+		$map[32]['F'] = 6;
+		$map[33]['F'] = 6;
+		$map[40]['F'] = 6;
+		$map[50]['F'] = 6;
+		$map[30]['M'] = 6;
+		$map[32]['M'] = 6;
+		$map[33]['M'] = 6;
+		$map[40]['M'] = 6;
+		$map[50]['M'] = 6;
+
+		/* Junior School Girls
+		 */
+		$map[0]['F'] = 5;
+		$map[1]['F'] = 5;
+		$map[2]['F'] = 5;
+		$map[3]['F'] = 5;
+		$map[4]['F'] = 5;
+		$map[5]['F'] = 5;
+		$map[6]['F'] = 5;
+
+		/* Junior School Boys
+		 */
+		$map[0]['M'] = 4;
+		$map[1]['M'] = 4;
+		$map[2]['M'] = 4;
+		$map[3]['M'] = 4;
+		$map[4]['M'] = 4;
+		$map[5]['M'] = 4;
+		$map[6]['M'] = 4;
+
+		/* Middle School Girls aka Secondary School Girls
+		 */
+		$map[7]['F'] = 3;
+		$map[8]['F'] = 3;
+		$map[9]['F'] = 3;
+
+		/* Middle School Boys aka Secondary School Boys
+		 */
+		$map[7]['M'] = 2;
+		$map[8]['M'] = 2;
+		$map[9]['M'] = 2;
+
+		/* Senior School for everyone
+		 */
+		$map[10]['F'] = 1;
+		$map[11]['F'] = 1;
+		$map[12]['F'] = 1;
+		$map[10]['M'] = 1;
+		$map[11]['M'] = 1;
+		$map[12]['M'] = 1;
+
+		$yearLevel = $currentUser['StudentYearLevel'];
+		$gender = $currentUser['StudentGender'];
+
+		return $map[$yearLevel][$gender];
     }
 
     /**
