@@ -71,11 +71,8 @@ module.exports = function(grunt) {
             }
         },
         clean: {
-            js: ['www/javascript/components/*'],
-            css: [
-                'www/css/*/chrome.css',
-                'www/css/*/mchrome.css'
-            ]
+            js: ['www/javascript/components/schoolbox.{min,map}.js'],
+            css: ['www/css/*/{chrome,mchrome}.css']
         }
     });
 
