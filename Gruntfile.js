@@ -60,20 +60,11 @@ module.exports = function(grunt) {
             }
         },
         less: {
-            chrome: {
+            main: {
                 files: [{
                     expand: true,
                     cwd: 'www/css',
-                    src: ['*/chrome.less', '!core/chrome.less'],
-                    dest: 'www/css/',
-                    ext: '.css'
-                }]
-            },
-            mchrome: {
-                files: [{
-                    expand: true,
-                    cwd: 'www/css',
-                    src: ['*/mchrome.less', '!core/mchrome.less'],
+                    src: ['*/{chrome,mchrome}.less', '!core/{chrome,mchrome}.less'],
                     dest: 'www/css/',
                     ext: '.css'
                 }]
