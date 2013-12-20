@@ -27,7 +27,7 @@ class Synchronise_Synergetic_Tintern_Strategy_Student extends Synchronise_Base_S
      * @return string
      */
     public function getAltEmailFromUser($currentUser) {
-        return $this->getUsernameFromUser($currentUser).'@alaress.com.au';
+        return $this->getUsernameFromUser($currentUser).'@tintern.vic.edu.au';
     }
 
     /**
