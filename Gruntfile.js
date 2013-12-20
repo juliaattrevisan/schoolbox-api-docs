@@ -88,7 +88,18 @@ module.exports = function(grunt) {
     // Build tasks
     grunt.registerTask('build.deps', ['shell:jqueryui.install', 'shell:jqueryui.build']);
     grunt.registerTask('build.js',   ['uglify']);
-    grunt.registerTask('build.css',  ['less']);
+    grunt.registerTask('build.css', 'Builds CSS (build.css:$skin builds for $skin only)', function(skin) {
+        // Run less:main task.
+        // For skin-specific builds: run less:main, but for that skin only.
+        var task   = 'less';
+        var config = grunt.config.get('less.main');
+        if (skin) {
+            task               += ':'+skin;
+            config.files[0].src = [skin+'/{chrome,mchrome}.less'];
+            grunt.config.set('less.'+skin, config);
+        }
+        grunt.task.run(task)
+    });
     grunt.registerTask('build',      ['bower', 'build.deps', 'build.js', 'build.css']);
     grunt.registerTask('default',    ['build']);
 };
