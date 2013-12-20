@@ -128,6 +128,7 @@ abstract class Evaluation_Response extends DeprecatedModel
         if ($randomise === self::RANDOMISE_QUESTIONS) {
             shuffle($allQuestions);
             shuffle($allQuestions);
+			shuffle($allQuestions);
         }
 
         /* Insert selected questions for this attempt

@@ -18,26 +18,11 @@ $j(function() {
 
 	});
 
-	jQuery.validator.addMethod(
-		"combo",
-		function(value, element) {
-			if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == "")) {
-				return false;
-			}
-
-			return true;
-		},
-		"You've selected random selection of questions. Please enter the amount of questions to put in the pool."
-	);
-
 	$j('#modifySection').validate({
 		rules: {
 			title: {
 				required: true,
 				minlength: 2
-			},
-			pool: {
-				combo: true
 			}
 		},
 
