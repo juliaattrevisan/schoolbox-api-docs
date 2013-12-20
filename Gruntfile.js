@@ -1,4 +1,50 @@
+var glob = require('glob');
+
 module.exports = function(grunt) {
+
+    // Core watch task: builds CSS for all schools
+    var cssDirs = glob.sync('www/css/*/');
+    var watchTasks = {
+        core: {
+            options: {
+                spawn: false,
+                interrupt: true
+            },
+            files: ['www/css/core/*.less'],
+            tasks: ['build.css']
+        }
+    };
+    var buildTasks = {};
+
+    // Create watch and build tasks for each CSS directory.
+    for (var i in cssDirs) {
+        var dir     = cssDirs[i];
+        var matches = dir.match(/^www\/css\/(.*?)\/$/)
+        if (!matches) {
+            continue;
+        }
+        var cssDir = matches[1];
+        if (cssDir === 'core') {
+            continue;
+        }
+        watchTasks[cssDir] = {
+            options: {
+                spawn: false
+            },
+            files: ['www/css/'+cssDir+'/*.less'],
+            tasks: ['build.css:'+cssDir]
+        }
+        buildTasks[cssDir] = {
+            files: [{
+                expand: true,
+                cwd: 'www/css',
+                src: [cssDir+'/{chrome,mchrome}.less'],
+                dest: 'www/css/',
+                ext: '.css'
+            }]
+        }
+    }
+
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -59,33 +105,12 @@ module.exports = function(grunt) {
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
         },
-        less: {
-            chrome: {
-                files: [{
-                    expand: true,
-                    cwd: 'www/css',
-                    src: ['*/chrome.less', '!core/chrome.less'],
-                    dest: 'www/css/',
-                    ext: '.css'
-                }]
-            },
-            mchrome: {
-                files: [{
-                    expand: true,
-                    cwd: 'www/css',
-                    src: ['*/mchrome.less', '!core/mchrome.less'],
-                    dest: 'www/css/',
-                    ext: '.css'
-                }]
-            }
-        },
         clean: {
-            js: ['www/javascript/components/*'],
-            css: [
-                'www/css/*/chrome.css',
-                'www/css/*/mchrome.css'
-            ]
-        }
+            js: ['www/javascript/components/schoolbox.{min,map}.js'],
+            css: ['www/css/*/{chrome,mchrome}.css']
+        },
+        less: buildTasks,
+        watch: watchTasks
     });
 
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -93,11 +118,20 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-shell');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Build tasks
     grunt.registerTask('build.deps', ['shell:jqueryui.install', 'shell:jqueryui.build']);
     grunt.registerTask('build.js',   ['uglify']);
-    grunt.registerTask('build.css',  ['less']);
+    grunt.registerTask('build.css', 'Builds CSS (build.css:$skin builds for $skin only)', function(skin) {
+        // Run less:main task.
+        // For skin-specific builds: run less:main, but for that skin only.
+        var task = 'less';
+        if (skin) {
+            task += ':'+skin;
+        }
+        grunt.task.run(task)
+    });
     grunt.registerTask('build',      ['bower', 'build.deps', 'build.js', 'build.css']);
     grunt.registerTask('default',    ['build']);
 };

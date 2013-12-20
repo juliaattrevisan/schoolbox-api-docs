@@ -124,6 +124,10 @@ then
 	grunt build.js
 	echo "$vag Building CSS files via LessCSS";
 	grunt build.css
+	echo "$vag Starting watcher for changes to CSS files";
+	# Kill all old grunt processes, they're probably watches
+	pkill grunt
+	grunt --no-color watch > /vagrant/data/watch.output.txt &
 
 	echo "$vag Installing PHP packages";
 	apt-get -y install libpspell-dev php5-pspell aspell-en php5 php5-dev php-pear > /dev/null 2>&1;
