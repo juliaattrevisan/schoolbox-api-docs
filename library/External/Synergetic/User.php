@@ -645,7 +645,8 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getStudentUserAccountInfo() {
 		$query = "
 			SELECT
-				vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname, StudentEmail, StudentOccupEmail,
+				vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname, StudentGender,
+				StudentEmail, StudentOccupEmail,
 				vStudents.StudentYearLevel, vStudents.StudentHouse, StudentCampus
 			FROM SynergyOne.dbo.vStudents vStudents
 			LEFT JOIN Community ON Community.ID = StudentID
