@@ -9,7 +9,14 @@
  */
 namespace Crocodoc;
 
-class Loader extends Base {
+class Loader {
+
+	/**
+	 * Contains API keys
+	 *
+	 * @var null
+	 */
+	private $authenticator = null;
 
 	/**
 	 * The user doing the marking
@@ -31,6 +38,7 @@ class Loader extends Base {
 	 * @param \Schoolbox\User $user
 	 */
 	public function __construct($uuid, \Schoolbox\User $user) {
+		$this->setAuthenticator(new Authenticator());
 		$this->setUuid($uuid);
 		$this->setUser($user);
 	}
@@ -44,7 +52,7 @@ class Loader extends Base {
 		$curl = new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create');
 
 		$curl->addOptions(array(
-			CURLOPT_POSTFIELDS => "token={$this->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}",
+			CURLOPT_POSTFIELDS => "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}",
 			CURLOPT_POST => true,
 		));
 
@@ -99,5 +107,23 @@ class Loader extends Base {
 	 */
 	private function getUuid() {
 		return $this->uuid;
+	}
+
+	/**
+	 * Set authenticator
+	 *
+	 * @param null $authenticator
+	 */
+	private function setAuthenticator($authenticator) {
+		$this->authenticator = $authenticator;
+	}
+
+	/**
+	 * Get authenticator
+	 *
+	 * @return null
+	 */
+	private function getAuthenticator() {
+		return $this->authenticator;
 	}
 }

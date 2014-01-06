@@ -11,7 +11,7 @@
 namespace Crocodoc;
 
 
-abstract class Base {
+class Authenticator {
 
 	/**
 	 * Registered api token at crocodoc
@@ -37,7 +37,7 @@ abstract class Base {
 	 *
 	 * @return string
 	 */
-	protected function getApiToken() {
+	public function getApiToken() {
 		return $this->apiToken;
 	}
 } 
