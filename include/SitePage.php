@@ -807,7 +807,8 @@ class SitePage extends Page {
      * Usage - SitePage::localRedir($url)
      *
      * @static
-     * @param  $file
+     * @param  string $file
+     * @param  bool   $keepProcessing True if processing continues in background
      * @return void
      */
     static public function localRedir($file, $keepProcessing = false, $responseCode = null) {
@@ -815,19 +816,31 @@ class SitePage extends Page {
         self::disableXssProtectionAfterForm();
         // don't quit
         if ($keepProcessing) {
-            ob_end_clean();
-            header("Connection: close\r\n");
-            ignore_user_abort();
-            ob_start();
-            // header("Content-Encoding: none\r\n"); // might be required to prevent gzip encoding header
-            header("Content-Length: 0");
-            ob_end_flush();
-            flush();
-            session_write_close();
+            self::keepProcessingInBackground();
         } // quit
         else {
             exit;
         }
+    }
+
+    /**
+     * Keeps the script running in the background, and switches off the ability
+     * for the user to terminate the script. After this, no more output is sent.
+     *
+     * @param string $output Final output to send, if any
+     */
+    public static function keepProcessingInBackground($output = '') {
+        ob_end_clean();
+        header("Connection: close\r\n");
+        ignore_user_abort();
+        ob_start();
+        echo $output;
+        $size = ob_get_length();
+        header("Content-Length: $size");
+//        // header("Content-Encoding: none\r\n"); // might be required to prevent gzip encoding header
+        ob_end_flush();
+        flush();
+        session_write_close();
     }
 
     /**
