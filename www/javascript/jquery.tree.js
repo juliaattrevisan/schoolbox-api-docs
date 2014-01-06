@@ -479,41 +479,47 @@
 				out: function() {
 					/* clearTimeout($(this).closest('tr').data('timeout')); */
 				},
-				drop: function(e, ui) { 
+				drop: function(e, ui) {
 					var node = $(ui.draggable).closest("tr"), destination = $(this).closest('tr');
 
 					if ($(ui.draggable).hasClass('file')) {
-						
-						var link = node.hasClass('link'), id = node.attr('id').substring(5);
-						/* move file */		
-						
-						/* remove current category class */
-						node.removeClass(node[0].className.match(/category-[\d]+/).toString());
-						
-						if ($('tr.category-' + destination.attr('id').substring(5) + ':not(.empty)').length > 0) {
-							
-							/* add new category class */
-							node.addClass('category-' + destination.attr('id').substring(5));
-							
-							/* remove empty message */
-							var empty = $(options.node + '.category-' + destination.attr('id').substring(5) + '.empty').remove();
-							
-						} 
-						
-						node.hide();
-						
-						if (options.stripeRows) 
-							stripeRows(node.closest('table'));
-						
-						var url = options.fileAjax;
-						if (link)
-							url = '/cms/linkForm.php';
-							
-						$.post(url, {move: id, categoryID: destination.attr('id').substring(5)}, function (data) {
-							if (data && data.result != 'success')
-								alert(data.result);
-						}, 'json');
-						
+
+						// Move all files, not just the one directly selected
+						var nodeList = node.add(node.parent().find('tr.selected'));
+						nodeList.each(function(){
+
+							var node = $(this);
+
+							var link = node.hasClass('link'), id = node.attr('id').substring(5);
+							/* move file */
+
+							/* remove current category class */
+							node.removeClass(node[0].className.match(/category-[\d]+/).toString());
+
+							if ($('tr.category-' + destination.attr('id').substring(5) + ':not(.empty)').length > 0) {
+
+								/* add new category class */
+								node.addClass('category-' + destination.attr('id').substring(5));
+
+								/* remove empty message */
+								var empty = $(options.node + '.category-' + destination.attr('id').substring(5) + '.empty').remove();
+
+							}
+
+							node.hide();
+
+							if (options.stripeRows)
+								stripeRows(node.closest('table'));
+
+							var url = options.fileAjax;
+							if (link)
+								url = '/cms/linkForm.php';
+
+							$.post(url, {move: id, categoryID: destination.attr('id').substring(5)}, function (data) {
+								if (data && data.result != 'success')
+									alert(data.result);
+							}, 'json');
+						});
 					} else {
 						/* append branch */
 						if (destination.hasClass('collapsed') && !destination.hasClass('loaded')) {
