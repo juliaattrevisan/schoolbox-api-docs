@@ -52,4 +52,34 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
 
         return strlen(trim($currentUser['username'])) > 0;
     }
+
+	/**
+	 * Webmail setting
+	 *
+	 * @param $currentUser
+	 * @return int|void
+	 */
+	public function getWebmailFromUser($currentUser) {
+		return 0;
+	}
+
+	/**
+	 * External mail setting
+	 *
+	 * @param $currentUser
+	 * @return int|void
+	 */
+	public function getExternalMailFromUser($currentUser) {
+		return 0;
+	}
+
+	/**
+	 * Eportfolio Enabled setting
+	 *
+	 * @param array $currentUser
+	 * @return bool|int
+	 */
+	public function getEportfolioEnabledFromUser($currentUser) {
+		return 0;
+	}
 }
