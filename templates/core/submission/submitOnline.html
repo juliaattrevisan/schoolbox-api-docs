@@ -10,20 +10,27 @@
 	// Method for setting up autosave - clears existing event, and creates new one.
 	var initAutosave = function() {
 		clearTimeout(autosaveTimeout)
-		autosaveTimeout = setTimeout(autosaveSubmit, 5*1000)
+		autosaveTimeout = setTimeout(autosavePresubmit, 5*1000)
 	}
 
-	// The autosave submit method
-	var autosaveSubmit = function() {
+	// The autosave pre-submit method - called by the autosave method.
+	// Calls the actual submit method if the textbox has changed.
+	var autosavePresubmit = function() {
 		// Has the text box changed? If not check again later
 		// (re-init the autosave counter)
-		var form = $j('form#textBoxForm')
 		var currentContent = tinyMCE.get('textBoxBody').getContent()
 		if (currentContent === textBoxContent) {
 			initAutosave()
-			return
 		}
-		textBoxContent = currentContent
+		else {
+			textBoxContent = currentContent
+			autosaveAjaxSubmit()
+		}
+	}
+
+	// The autosave submit method
+	var autosaveAjaxSubmit = function() {
+		var form = $j('form#textBoxForm')
 
 		// Change button's text, but keep its width the same.
 		// Change it back once done.
@@ -35,7 +42,7 @@
 		// Submit form via AJAX
 		var formContents = form.serializeArray()
 		formContents.push({name: 'save_draft', value: '1'})
-		formContents.push({name: 'body',       value: currentContent})
+		formContents.push({name: 'body',       value: tinyMCE.get('textBoxBody').getContent()})
 		$.ajax({
 			type: "POST",
 			url:  form.attr('action'),
@@ -57,6 +64,7 @@
 			dataType: 'json'
 		});
 	}
+
 	tinyMCE.init({
 		mode : "exact",
 		elements: "textBoxBody",
@@ -84,14 +92,14 @@
 		setup: function(ed) {
 			initAutosave()
 			ed.onChange.add(function() {
-				autosaveSubmit()
+				autosavePresubmit()
 			})
 		}
 	});
 	$j(function() {
 		$j('form#textBoxForm input[name="save_draft"]').click(function(event) {
 			event.preventDefault()
-			autosaveSubmit()
+			autosaveAjaxSubmit()
 		})
 		$j('form#textBoxForm input[name="save"]').click(function(event) {
 			if (!confirm('Are you sure you are ready to send this submission for assessment?')) {
