@@ -151,7 +151,14 @@ $j(function() {
 				cursor: 'move',
 				cursorAt: {top: 5, left: 5},
 				helper: function (event) {
-					return $j(event.currentTarget).clone().addClass('accept').css('z-index', 100);
+					// How many items are selected?
+					// More than one - show the number of files, not the name.
+					var length = $j('#file-list tr.selected').length;
+					var node   = $j(event.currentTarget).clone().addClass('accept').css('z-index', 100);
+					if (length > 1) {
+						node.text('('+String(length)+' files)');
+					}
+					return node;
 				},
 				opacity: 1,
 				revert: "invalid",
