@@ -2,7 +2,6 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
-use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
@@ -12,23 +11,32 @@ $page = new SitePage();
 
 $box_mapper        = new SubmissionBoxMapper();
 $submission_mapper = new SubmissionMapper();
-$user_mapper       = new UserMapper();
-
-$user = $user_mapper->findById($_SESSION['id']);
+/** @var Schoolbox\User $user */
+$user  = $_SESSION['user'];
+$boxId = $_POST['box_id'];
 if (!empty($_POST['submission_id'])) {
-	$submission     = $submission_mapper->findById($_POST['submission_id']);
-	$submission_box = $submission->getSubmissionBox();
+	$submission = $submission_mapper->findById($_POST['submission_id']);
+	$boxId      = $submission->getSubmissionBox()->getId();
 }
 else {
-	$submission     = new Submission();
-	$submission_box = $box_mapper->findById($_POST['box_id']);
-	$submission
-		->setFilename('Online Submission')
-		->setSubmissionBox($submission_box)
-		->setOwner($user)
-		->setMimetype('text/html')
-	;
+	// Find a submission for this box and user.
+	try {
+		$submission = $submission_mapper->findOneByColumnList(
+			array('box_id' => $_POST['box_id'], 'owner' => $user->getId(),),
+			array(array('submitted', 'desc'))
+		);
+		$boxId = $submission->getSubmissionBox()->getId();
+	}
+	catch (Schoolbox\Mapper\Exception $e) {
+		$submission = new Submission();
+		$submission
+			->setFilename('Online Submission')
+			->setMimetype('text/html')
+		;
+	}
+	$submission->setOwner($user);
 }
+$submission->setSubmissionBox($box_mapper->findById($boxId));
 
 //
 // Why wouldn't I be able to edit this item?
