@@ -36,53 +36,78 @@ else {
 // * I don't have permission to submit to this box
 // * It's past the box's expiry
 // * Hey, all this should be in SubmissionMapper->checkUploadablity
+$permission_denied = false;
 try {
 	$submission_mapper->checkUploadability($submission);
 }
 catch (Schoolbox\Resource\Exception $e) {
 	//
 	// what's access denied error?
-	error(17);
+	$permission_denied = true;
 }
-$body     = $_POST['body'];
-$is_draft = isset($_POST['save_draft']);
-$submission
-	->loadIsLate()
-	->setSubmitted(new Alaress_Date_Format(new DateTime('now'), 'U'))
-	->setBody($body)
-	->setDraft($is_draft)
-;
-$submission_mapper->save($submission);
+if (!$permission_denied) {
+	$body     = $_POST['body'];
+	$is_draft = isset($_POST['save_draft']);
+	$submission
+		->loadIsLate()
+		->setSubmitted(new Alaress_Date_Format(new DateTime('now'), 'U'))
+		->setBody($body)
+		->setDraft($is_draft)
+	;
+	$submission_mapper->save($submission);
 
-//
-// Draft? don't send to Plagscan yet.
-if (!$is_draft) {
-	$plagscanApiKey   = Config::get('plagscan_api_key');
-	$plagscanUsername = Config::get('plagscan_username');
-	$submission_id    = $submission->getId();
+	//
+	// Draft? don't send to Plagscan yet.
+	if (!$is_draft) {
+		$plagscanApiKey   = Config::get('plagscan_api_key');
+		$plagscanUsername = Config::get('plagscan_username');
+		$submission_id    = $submission->getId();
 
-	if (!empty($plagscanApiKey) && !empty($plagscanUsername) && !empty($submission_id)) {
-		$document = new Plagscan_Document();
-		$document->setFileId($submission_id);
+		if (!empty($plagscanApiKey) && !empty($plagscanUsername) && !empty($submission_id)) {
+			$document = new Plagscan_Document();
+			$document->setFileId($submission_id);
 
-		//
-		// Make a temp file for Plagscan to work with.
-		// Molest the filename so that Plagscan always accepts the document as
-		// scannable.
-		$tempfile = tempnam(sys_get_temp_dir(), 'sb_pgs');
-		file_put_contents($tempfile, $body);
-		$document->setFile(array(
-			'id'   => $submission_id,
-			'name' => $submission->getFilename().'.html',
-			'file' => $tempfile,
-		));
+			//
+			// Make a temp file for Plagscan to work with.
+			// Molest the filename so that Plagscan always accepts the document as
+			// scannable.
+			$tempfile = tempnam(sys_get_temp_dir(), 'sb_pgs');
+			file_put_contents($tempfile, $body);
+			$document->setFile(array(
+				'id'   => $submission_id,
+				'name' => $submission->getFilename().'.html',
+				'file' => $tempfile,
+			));
 
-		// argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
-		$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);
-		Plagscan_DocumentMapper::getInstance()->save($document);
-		exit;
+			// argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
+			if (!$page->detectAjax()) {
+				$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);
+			}
+			Plagscan_DocumentMapper::getInstance()->save($document);
+			exit;
+		}
 	}
 }
 
-
-$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id']);
+if ($page->detectAjax()) {
+	$result = array(
+		'success' => false,
+		'error'   => 500,
+		'message' => 'Unknown Error',
+	);
+	if ($permission_denied) {
+		$result['error']   = 403;
+		$result['message'] = 'Permission Denied';
+	}
+	else {
+		$result['success'] = true;
+		$result['error']   = 200;
+		$result['message'] = 'OK';
+		$result['id']      = $submission->getId();
+	}
+	echo json_encode($result);
+	exit;
+}
+else {
+	$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id']);
+}
