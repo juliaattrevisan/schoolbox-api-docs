@@ -19,11 +19,15 @@ if (!empty($_POST['submission_id'])) {
 	$boxId      = $submission->getSubmissionBox()->getId();
 }
 else {
-	// Find a submission for this box and user.
+	// Find a draft submission for this box and user - override it if possible.
 	try {
 		$submission = $submission_mapper->findOneByColumnList(
-			array('box_id' => $_POST['box_id'], 'owner' => $user->getId(),),
-			array(array('submitted', 'desc'))
+			array(
+				'box_id' => $_POST['box_id'],
+				'owner'  => $user->getId(),
+				'draft'  => true,
+			),
+			array('submitted' => 'desc')
 		);
 		$boxId = $submission->getSubmissionBox()->getId();
 	}
