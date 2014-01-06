@@ -9,14 +9,7 @@
  */
 namespace Crocodoc;
 
-class Loader {
-
-	/**
-	 * Registered api token at crocodoc
-	 *
-	 * @var string
-	 */
-	private $apiToken = 'D4t65GknNUXFev8HJlTWpf2V';
+class Loader extends Base {
 
 	/**
 	 * The user doing the marking
@@ -71,24 +64,6 @@ class Loader {
 
 	/* Getters/Setters
 	 */
-
-	/**
-	 * Set api token
-	 *
-	 * @param string $apiToken
-	 */
-	private function setApiToken($apiToken) {
-		$this->apiToken = $apiToken;
-	}
-
-	/**
-	 * Get api token
-	 *
-	 * @return string
-	 */
-	private function getApiToken() {
-		return $this->apiToken;
-	}
 
 	/**
 	 * SEt user
