@@ -382,6 +382,29 @@ abstract class Synchronise_Base_Strategy {
 	}
 
 	/**
+	 * Gets user's webmail status from external data set
+	 *
+	 * @param $currentUser
+	 * @return int
+	 */
+	public function getWebmailFromUser($currentUser) {
+		return 0;
+	}
+
+	/**
+	 * Gets user's external mail handling status from external data set
+	 *
+	 * This is known as mail_handler and corresponds to the 'Use External Mail'
+	 * checkbox when editing a user
+	 *
+	 * @param $currentUser
+	 * @return int
+	 */
+	public function getExternalMailFromUser($currentUser) {
+		return 0;
+	}
+
+	/**
 	 * Creates an array for insertion into the Schoolbox users table.
 	 *
 	 * @param  array $external_user
@@ -405,6 +428,8 @@ abstract class Synchronise_Base_Strategy {
 		$newUser['house']                = $this->getHouseFromUser($external_user);
 		$newUser['residential_house_id'] = $this->getResidentialHouseFromUser($external_user);
 		$newUser['eportfolio_enabled']   = $this->getEportfolioEnabledFromUser($external_user);
+		$newUser['webmail']				 = $this->getWebmailFromUser($external_user);
+		$newUser['mail_handler']		 = $this->getExternalMailFromUser($external_user);
 		return $this->clearFields($newUser);
 	}
 
@@ -418,7 +443,6 @@ abstract class Synchronise_Base_Strategy {
 	protected function clearFields($new_user) {
 		return array_filter($new_user, function($v) { return isset($v); });
 	}
-
 
 	/**
 	 * Abstract methods
