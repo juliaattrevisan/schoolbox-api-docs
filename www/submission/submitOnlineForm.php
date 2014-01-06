@@ -66,7 +66,14 @@ if (!$permission_denied) {
 		->setBody($body)
 		->setDraft($is_draft)
 	;
-	$submission_mapper->save($submission);
+	// Is this a final copy? always create a new entry, don't save over an
+	// existing draft.
+	if ($is_draft) {
+		$submission_mapper->create($submission);
+	}
+	else {
+		$submission_mapper->save($submission);
+	}
 
 	//
 	// Draft? don't send to Plagscan yet.
