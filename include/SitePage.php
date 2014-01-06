@@ -184,6 +184,24 @@ class SitePage extends Page {
         return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
     }
 
+    /**
+     * Outputs a JSON response, with appropriate header.
+     *
+     * @param mixed $output         Variable contents to output
+     * @param bool  $keepProcessing True if processing continues after output.
+     *                              Exits after output if false.
+     */
+    public function outputJson($output, $keepProcessing = false) {
+        header('Content-Type: application/json');
+        $jsonOutput = json_encode($output);
+        if (!$keepProcessing) {
+            echo $jsonOutput;
+        }
+        else {
+            $this->keepProcessingInBackground($jsonOutput);
+        }
+    }
+
     function outputPage($lite = false) {
         if ($this->ajax) {
             return true;
