@@ -47,8 +47,6 @@ class Loader {
 	 * Get the url used to produce the crocodoc document for annotation
 	 */
 	private function getDocumentUrl() {
-		new \Alaress_Probe("Loading uuid {$this->getUuid()}");
-
 		$userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
 
 		$curl = new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create');
@@ -69,14 +67,14 @@ class Loader {
 	public function render() {
 		$result = $this->getDocumentUrl();
 
-		echo "https://crocodoc.com/view/{$result->session}";
+		header("Location: https://crocodoc.com/view/{$result->session}");
 	}
 
 	/* Getters/Setters
 	 */
 
 	/**
-	 * SEt user
+	 * Set user
 	 *
 	 * @param null $user
 	 */
