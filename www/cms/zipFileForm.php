@@ -22,7 +22,8 @@ if ($groupHandler->isSuperuser()) {
 
 	/* Extract files
 	 */
-	$archive = new PclZip($_FILES['file']['tmp_name']);
+	$archive = new ZipArchive();
+	$archive->open($_FILES['file']['tmp_name']);
 
 	$zipFileUploadHandler = new ZipFileUpload();
 	$zipFileUploadHandler->extract($archive);

@@ -62,8 +62,8 @@ class ZipFileUpload extends DeprecatedModel {
 	 * Extract files to the path specified. Returns a dirhandle if successfully
 	 * extracted files.
 	 */
-	public function extract($archive) {
-		$extractedFiles = $archive->extract(PCLZIP_OPT_PATH, $this->getPath());
+	public function extract(ZipArchive $archive) {
+		$extractedFiles = $archive->extractTo($this->getPath());
 
 		if (!$extractedFiles) {
 			die('Could not extract files.');
