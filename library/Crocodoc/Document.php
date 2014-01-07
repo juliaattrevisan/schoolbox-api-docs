@@ -43,8 +43,7 @@ class Document {
 
 		$postfields = array();
 		$postfields['token'] = $this->getAuthenticator()->getApiToken();
-		$postfields['file'] = '@' . $this->getUrl();
-		$postfields['filename'] = 'mort.pdf';
+		$postfields['file'] = '@' . $this->getUrl() . ';filename=mort.pdf';
 
 		$curl->addOptions(array(
 			CURLOPT_HTTPHEADER => array('Content-Type: multipart/form-data'),

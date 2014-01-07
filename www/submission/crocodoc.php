@@ -8,13 +8,18 @@
  * @version     SVN: $Id$
  */
 
-$document = new \Crocodoc\Document(Cfg::get('submission_dir') . '/18.pdf');
+$document = new \Crocodoc\Document(Cfg::get('submission_dir') . '/18.dat');
 $result = $document->upload();
-new \Alaress_Probe($result);
 
 /* TODO: Add error check here, if $result->error exists
  */
+if (isset($result->error)) {
+	throw new Exception($result->error);
+}
 
-$crocodoc = new \Crocodoc\Loader($result->uuid, $_SESSION['user']);
-$crocodoc->render();
+if (isset($result->uuid)) {
+	$crocodoc = new \Crocodoc\Loader($result->uuid, $_SESSION['user']);
+	$crocodoc->render();
+}
+
 exit();
