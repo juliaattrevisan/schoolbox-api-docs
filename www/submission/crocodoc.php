@@ -9,7 +9,7 @@
  */
 
 $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-$submission = $submissionMapper->findById(18);
+$submission = $submissionMapper->findById($_GET['submissionId']);
 
 $document = new \Crocodoc\Document($submission);
 $result = $document->upload();
