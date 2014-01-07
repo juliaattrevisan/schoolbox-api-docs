@@ -28,6 +28,13 @@ class Document {
 	private $url = '';
 
 	/**
+	 * The url to upload to
+	 *
+	 * @var string
+	 */
+	private $uploadUrl = 'https://crocodoc.com/api/v2/document/upload';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct($url) {
@@ -39,11 +46,12 @@ class Document {
 	 * Upload a file to crocodoc
 	 */
 	public function upload() {
-		$curl = new \Alaress_Curl_Url('https://crocodoc.com/api/v2/document/upload');
+		$curl = new \Alaress_Curl_Url($this->getUploadUrl());
 
-		$postfields = array();
-		$postfields['token'] = $this->getAuthenticator()->getApiToken();
-		$postfields['file'] = '@' . $this->getUrl() . ';filename=mort.pdf';
+		$postfields = array(
+			'token' => $this->getAuthenticator()->getApiToken(),
+			'file' => '@' . $this->getUrl() . ';filename=mort.pdf',
+		);
 
 		$curl->addOptions(array(
 			CURLOPT_HTTPHEADER => array('Content-Type: multipart/form-data'),
@@ -95,5 +103,23 @@ class Document {
 	 */
 	private function getUrl() {
 		return $this->url;
+	}
+
+	/**
+	 * Set upload url
+	 *
+	 * @param string $uploadUrl
+	 */
+	private function setUploadUrl($uploadUrl) {
+		$this->uploadUrl = $uploadUrl;
+	}
+
+	/**
+	 * Get upload url
+	 *
+	 * @return string
+	 */
+	private function getUploadUrl() {
+		return $this->uploadUrl;
 	}
 }
