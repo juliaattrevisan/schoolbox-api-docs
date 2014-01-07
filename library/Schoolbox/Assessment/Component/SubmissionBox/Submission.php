@@ -90,6 +90,13 @@ class Submission {
 	protected $mimetype_loader;
 
 	/**
+	 * Unique identifier for crocodoc
+	 *
+	 * @var
+	 */
+	protected $uuid;
+
+	/**
 	 * Creates object and sets up related objects.
 	 */
 	public function __construct() {
@@ -410,6 +417,24 @@ class Submission {
 	 */
 	public function getMimetypeLoader() {
 		return $this->mimetype_loader;
+	}
+
+	/**
+	 * Set uuid
+	 *
+	 * @param mixed $uuid
+	 */
+	public function setUuid($uuid) {
+		$this->uuid = $uuid;
+	}
+
+	/**
+	 * Get uuid
+	 *
+	 * @return mixed
+	 */
+	public function getUuid() {
+		return $this->uuid;
 	}
 
 	/**

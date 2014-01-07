@@ -57,6 +57,11 @@ class Facade {
 		if (isset($result->uuid)) {
 			$loader = new Loader($result->uuid, $this->getUser());
 			$loader->render();
+
+			/* Allow resuming of marking
+			 */
+			$submission->setUuid($result->uuid);
+			$submissionMapper->save($submission);
 		}
 	}
 
