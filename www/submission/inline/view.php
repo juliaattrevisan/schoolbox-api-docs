@@ -13,3 +13,28 @@ $this->setFile(TEMPLATE_content, 'submission/inline/view.html');
 $this->setVar(array(
 	'SUBMISSION_ID' => $this->arg[0],
 ));
+
+$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+$submission = $submissionMapper->findById($this->arg[0]);
+$submissionBoxId = $submission->getSubmissionBox()->getId();
+
+$submissionHandler = new Submission();
+$submissionBox = $submissionHandler->getById($submissionBoxId);
+
+$studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
+
+/* Trim out only this student
+ */
+$singleStudent = array();
+
+foreach($studentList as $currentStudent) {
+	if ($currentStudent['uid'] == $submission->getOwner()->getId()) {
+		$singleStudent[] = $currentStudent;
+
+		break;
+	}
+}
+
+$dueWorkDetail = new DueWork_Detail($submissionBoxId);
+$dueWorkDetail->processStudents($singleStudent);
+$dueWorkDetail->renderDetails($this);
