@@ -69,6 +69,7 @@ class Loader {
 
 		echo json_encode(array(
 			'url' => "https://crocodoc.com/view/{$result->session}",
+			'uuid' => $this->getUuid(),
 		));
 	}
 

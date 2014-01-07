@@ -8,4 +8,5 @@
  * @version     SVN: $Id$
  */
 
-die('download file');
+$downloader = new Crocodoc\Download($this->arg[0]);
+$downloader->start();

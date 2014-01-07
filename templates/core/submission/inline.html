@@ -6,14 +6,15 @@
 </style>
 <script type='text/javascript'>
 	$(function() {
-
 		$.getJSON('/submission/crocodoc?submissionId={SUBMISSION_ID}', function(data) {
 			$('#crocodoc').attr('src', data.url);
+			$('#crocodoc-download').attr('href', '/submission/inline-download/' + data.uuid);
 		});
 	});
 </script>
+
 <iframe id="crocodoc" style="width:75%;height:800px"></iframe>
 
 <p>
-	<a href='/submission/inline-download/{SUBMISSION_ID}'>Download as PDF</a>
+	<a id='crocodoc-download' href='#'>Download as PDF</a>
 </p>
