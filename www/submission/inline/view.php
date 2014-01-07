@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$this->setFile(TEMPLATE_content, 'submission/inline.html');
+$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
 
 $this->setVar(array(
 	'SUBMISSION_ID' => $this->arg[0],

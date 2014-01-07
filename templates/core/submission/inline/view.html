@@ -1,4 +1,4 @@
-<h1>Inline marking</h1>
+<h1>Inline marking sdf</h1>
 
 <style type="text/css">
 	#crocodoc {
@@ -6,9 +6,9 @@
 </style>
 <script type='text/javascript'>
 	$(function() {
-		$.getJSON('/submission/crocodoc?submissionId={SUBMISSION_ID}', function(data) {
+		$.getJSON('/submission/inline/iframe?submissionId={SUBMISSION_ID}', function(data) {
 			$('#crocodoc').attr('src', data.url);
-			$('#crocodoc-download').attr('href', '/submission/inline-download/' + data.uuid);
+			$('#crocodoc-download').attr('href', '/submission/inline/download/{SUBMISSION_ID}');
 		});
 	});
 </script>

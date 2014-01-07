@@ -28,26 +28,38 @@ class Download {
 	private $uuid = '';
 
 	/**
+	 * Submission id
+	 *
+	 * @var string
+	 */
+	private $submissionId = '';
+
+	/**
 	 * Constructor
 	 *
-	 * @param $uuid
+	 * @param $submissionId
 	 */
-	public function __construct($uuid) {
+	public function __construct($submissionId) {
 		$this->setAuthenticator(new Authenticator());
-		$this->setUuid($uuid);
+		$this->setSubmissionId($submissionId);
 	}
 
 	/**
-	 * Download file and provide link to it
+	 * Download scribbled-on file and provide link to it
 	 */
 	public function start() {
-		$curl = new \Alaress_Curl_Url("https://crocodoc.com/api/v2/download/document?token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&annotated=true");
+		$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+		$submission = $submissionMapper->findById($this->getSubmissionId());
+
+		$curl = new \Alaress_Curl_Url("https://crocodoc.com/api/v2/download/document?token={$this->getAuthenticator()->getApiToken()}&uuid={$submission->getUuid()}&annotated=true");
 
 		$curl->exec();
 
 		$data = $curl->getResult();
 
-		$path = \Cfg::get('submission_upload_tmp_dir') . '/mort.pdf';
+		/* Download to a temp dir
+		 */
+		$path = \Cfg::get('submission_upload_tmp_dir') . '/' . $submission->getId() . '_' . $submission->getFilename();
 
 		file_put_contents($path, $data);
 
@@ -93,5 +105,23 @@ class Download {
 	 */
 	private function getAuthenticator() {
 		return $this->authenticator;
+	}
+
+	/**
+	 * Set submission id
+	 *
+	 * @param string $submissionId
+	 */
+	private function setSubmissionId($submissionId) {
+		$this->submissionId = $submissionId;
+	}
+
+	/**
+	 * Get submission id
+	 *
+	 * @return string
+	 */
+	private function getSubmissionId() {
+		return $this->submissionId;
 	}
 }
