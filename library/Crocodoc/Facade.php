@@ -47,21 +47,30 @@ class Facade {
 		$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 		$submission = $submissionMapper->findById($this->getSubmissionId());
 
-		$document = new Document($submission);
-		$result = $document->upload();
-
-		if (isset($result->error)) {
-			throw new \Exception($result->error);
-		}
-
-		if (isset($result->uuid)) {
-			$loader = new Loader($result->uuid, $this->getUser());
+		/* If this was previously uploaded in the past, resume scribbling
+		 * Otherwise upload it and start a new scribble
+		 */
+		if (strlen($submission->getUuid())) {
+			$loader = new Loader($submission->getUuid(), $this->getUser());
 			$loader->render();
+		}
+		else {
+			$document = new Document($submission);
+			$result = $document->upload();
 
-			/* Allow resuming of marking
-			 */
-			$submission->setUuid($result->uuid);
-			$submissionMapper->save($submission);
+			if (isset($result->error)) {
+				throw new \Exception($result->error);
+			}
+
+			if (isset($result->uuid)) {
+				$loader = new Loader($result->uuid, $this->getUser());
+				$loader->render();
+
+				/* Allow resuming of marking
+				 */
+				$submission->setUuid($result->uuid);
+				$submissionMapper->save($submission);
+			}
 		}
 	}
 
