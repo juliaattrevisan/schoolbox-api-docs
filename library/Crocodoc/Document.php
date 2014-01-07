@@ -52,9 +52,12 @@ class Document {
 
 		/* Decide where to load the file from
 		 */
-		$url = \Cfg::get('submission_dir') . '/' . $submission->getId() . '.dat';
+		$source = \Cfg::get('submission_dir') . '/' . $submission->getId() . '.dat';
+		$destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId() . '_' . $this->getSubmission()->getFilename();
 
-		$this->setUrl($url);
+		if (copy($source, $destination)) {
+			$this->setUrl($destination);
+		}
 	}
 
 	/**
@@ -65,7 +68,7 @@ class Document {
 
 		$postfields = array(
 			'token' => $this->getAuthenticator()->getApiToken(),
-			'file' => '@' . $this->getUrl() . ';filename=\"' . $this->getSubmission()->getFilename() . '\"',
+			'file' => '@' . $this->getUrl(),
 		);
 
 		$curl->addOptions(array(
@@ -77,9 +80,12 @@ class Document {
 
 		$curl->exec();
 
+		/* Unlink copied file after uploading
+		 */
+		unlink($this->getUrl());
+
 		return json_decode($curl->getResult());
 	}
-
 
 	/* Getters/Setters
 	 */
