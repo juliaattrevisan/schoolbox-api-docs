@@ -8,19 +8,9 @@
  * @version     SVN: $Id$
  */
 
-$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-$submission = $submissionMapper->findById($_GET['submissionId']);
-
-$document = new \Crocodoc\Document($submission);
-$result = $document->upload();
-
-if (isset($result->error)) {
-	throw new Exception($result->error);
-}
-
-if (isset($result->uuid)) {
-	$crocodoc = new \Crocodoc\Loader($result->uuid, $_SESSION['user']);
-	$crocodoc->render();
-}
+/* This is intended to load in an iframe
+ */
+$crocodoc = new \Crocodoc\Facade($_GET['submissionId'], $_SESSION['user']);
+$crocodoc->start();
 
 exit();
