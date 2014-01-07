@@ -8,7 +8,10 @@
  * @version     SVN: $Id$
  */
 
-$document = new \Crocodoc\Document(Cfg::get('submission_dir') . '/18.dat');
+$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+$submission = $submissionMapper->findById(18);
+
+$document = new \Crocodoc\Document($submission);
 $result = $document->upload();
 
 /* TODO: Add error check here, if $result->error exists

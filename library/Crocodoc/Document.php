@@ -28,6 +28,13 @@ class Document {
 	private $url = '';
 
 	/**
+	 * An instance of Schoolbox\Assessment\Component\SubmissionBox\Submission
+	 *
+	 * @var null
+	 */
+	private $submission = null;
+
+	/**
 	 * The url to upload to
 	 *
 	 * @var string
@@ -36,9 +43,17 @@ class Document {
 
 	/**
 	 * Constructor
+	 *
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
 	 */
-	public function __construct($url) {
+	public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission) {
 		$this->setAuthenticator(new Authenticator());
+		$this->setSubmission($submission);
+
+		/* Decide where to load the file from
+		 */
+		$url = \Cfg::get('submission_dir') . '/' . $submission->getId() . '.dat';
+
 		$this->setUrl($url);
 	}
 
@@ -50,7 +65,7 @@ class Document {
 
 		$postfields = array(
 			'token' => $this->getAuthenticator()->getApiToken(),
-			'file' => '@' . $this->getUrl() . ';filename=mort.pdf',
+			'file' => '@' . $this->getUrl() . ';filename=\"' . $this->getSubmission()->getFilename() . '\"',
 		);
 
 		$curl->addOptions(array(
@@ -121,5 +136,23 @@ class Document {
 	 */
 	private function getUploadUrl() {
 		return $this->uploadUrl;
+	}
+
+	/**
+	 * Set submission
+	 *
+	 * @param null $submission
+	 */
+	private function setSubmission($submission) {
+		$this->submission = $submission;
+	}
+
+	/**
+	 * Get submission
+	 *
+	 * @return null
+	 */
+	private function getSubmission() {
+		return $this->submission;
 	}
 }
