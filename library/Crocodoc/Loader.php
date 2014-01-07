@@ -67,7 +67,9 @@ class Loader {
 	public function render() {
 		$result = $this->getDocumentUrl();
 
-		header("Location: https://crocodoc.com/view/{$result->session}");
+		echo json_encode(array(
+			'url' => "https://crocodoc.com/view/{$result->session}",
+		));
 	}
 
 	/* Getters/Setters
