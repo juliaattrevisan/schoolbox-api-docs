@@ -13,23 +13,31 @@ namespace Schoolbox\Notif\MQ;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Message\AMQPMessage;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
 
 class Connector {
 
-	const EXCHANGE = 'sb_notifier';
-	const TYPE     = 'topic';
+	const PRIMARY_EXCHANGE      = 'sb.tx';
+	const PRIMARY_TYPE          = 'topic';
+
+	const SECONDARY_NAME_PREFIX = 'sb.ux.';
+	const SECONDARY_TYPE        = 'fanout';
 
 	const PASSIVE     = false;
-	const DURABLE     = true;
-	const AUTO_DELETE = false;
+	const DURABLE     = true;  // exchanges and queues survive server restart
+	const AUTO_DELETE = false; // exchanges and queues are not deleted when final client disconnects
 	const INTERNAL    = false;
-	const EXCLUSIVE   = false;
+	const EXCLUSIVE   = false; // more than one connection allowed per queue
 
 	const NO_LOCAL    = false;
 	const NO_ACK      = false;
 	const NO_WAIT     = false;
+
+	const MESSAGE_PERSIST = 2; // save to disk
+	const MESSAGE_EXPIRY  = '1209600000'; // 1000 * 60 * 60 * 24 * 14 = 2 weeks in millis
 
 	/**
 	 * @var AMQPConnection
@@ -79,10 +87,24 @@ class Connector {
 			$this->channels[$idkey] = $this->connection()->channel($id);
 
 			$this->channels[$idkey]->exchange_declare(
-				self::EXCHANGE, self::TYPE, self::PASSIVE, self::DURABLE, self::AUTO_DELETE, self::INTERNAL
+				self::PRIMARY_EXCHANGE, self::PRIMARY_TYPE, self::PASSIVE, self::DURABLE, self::AUTO_DELETE, self::INTERNAL
 			);
 		}
 		return $this->channels[$idkey];
+	}
+
+	/**
+	 * Declare an exchange
+	 *
+	 * @param string $name
+	 * @param string $channelId
+	 * @return AMQPChannel
+	 */
+	public function declareExchange($name, $channelId = null) {
+
+		return $this->getChannel($channelId)->exchange_declare(
+			$name, self::SECONDARY_TYPE, self::PASSIVE, self::DURABLE, self::AUTO_DELETE, self::INTERNAL
+		);
 	}
 
 	/**
@@ -112,15 +134,27 @@ class Connector {
 	}
 
 	/**
+	 * @param string $exchangeName
+	 * @param string $routingKey
+	 * @param string $channelId
+	 * @return AMQPChannel
+	 */
+	public function bindExchange($exchangeName, $routingKey, $channelId = null) {
+		return $this->getChannel($channelId)->exchange_bind($exchangeName, self::PRIMARY_EXCHANGE, $routingKey);
+	}
+
+
+	/**
 	 * Bind a routing key to a particular queue.
 	 *
 	 * @param $queueName
 	 * @param $routingKey
+	 * @param $exchange
 	 * @param string $channelId
 	 * @return AMQPChannel
 	 */
-	public function bindQueue($queueName, $routingKey, $channelId = null) {
-		$this->getChannel($channelId)->queue_bind($queueName, self::EXCHANGE, $routingKey);
+	public function bindQueue($queueName, $routingKey, $exchange = self::PRIMARY_EXCHANGE, $channelId = null) {
+		$this->getChannel($channelId)->queue_bind($queueName, $exchange, $routingKey);
 		return $this->getChannel($channelId);
 	}
 
@@ -134,7 +168,20 @@ class Connector {
 	 * @return AMQPChannel
 	 */
 	public function unbindQueue($queueName, $routingKey, $channelId = null) {
-		$this->getChannel($channelId)->queue_unbind($queueName, self::EXCHANGE, $routingKey);
+		$this->getChannel($channelId)->queue_unbind($queueName, self::PRIMARY_EXCHANGE, $routingKey);
+		return $this->getChannel($channelId);
+	}
+
+	/**
+	 * Unbind a routing key from a particular exchange.
+	 *
+	 * @param string $exchangeName
+	 * @param string $routingKey
+	 * @param string $channelId
+	 * @return AMQPChannel
+	 */
+	public function unbindExchange($exchangeName, $routingKey, $channelId = null) {
+		$this->getChannel($channelId)->exchange_unbind(self::PRIMARY_EXCHANGE, $exchangeName, $routingKey);
 		return $this->getChannel($channelId);
 	}
 
@@ -154,6 +201,62 @@ class Connector {
 	}
 
 	/**
+	 * Sit. and. Listen.
+	 *
+	 * @param string $channelId
+	 */
+	public function listen($channelId = null) {
+		$c = $this->getChannel($channelId);
+		while(count($c->callbacks)) {
+			$c->wait();
+		}
+		$c->close();
+	}
+
+	/**
+	 * Mark the message identified by the given delivery tag as ACK.
+	 *
+	 * @param AMQPMessage $message
+	 * @param null $channelId
+	 */
+	public function acceptMessage($message, $channelId = null) {
+		$this->getChannel($channelId)->basic_ack($message->delivery_info['delivery_tag']);
+	}
+
+	/**
+	 * @param AMQPMessage[] $messages
+	 * @param string $channelId
+	 */
+	public function acceptMessages($messages, $channelId = null) {
+		foreach($messages as $m) {
+			$this->acceptMessage($m, $channelId);
+		}
+	}
+
+	/**
+	 * @param AMQPMessage[] $messages
+	 * @param bool $requeue
+	 * @param string $channelId
+	 */
+	public function rejectMessages($messages, $requeue = true, $channelId = null) {
+		foreach($messages as $m) {
+			$this->rejectMessage($m, $requeue, $channelId);
+		}
+	}
+
+
+	/**
+	 * Mark the message identified by the given delivery tag as rejected.
+	 *
+	 * @param AMQPMessage $message
+	 * @param bool $requeue
+	 * @param string $channelId
+	 */
+	public function rejectMessage($message, $requeue = true, $channelId = null) {
+		$this->getChannel($channelId)->basic_reject($message->delivery_info['delivery_tag'], $requeue);
+	}
+
+	/**
 	 * Publish a message to a particular routing key.
 	 *
 	 * @param AMQPMessage|string $message
@@ -164,44 +267,29 @@ class Connector {
 	public function publish($message, $routingKey, $channelId = null) {
 		// wrap message in object if it's not already
 		if(!$message instanceof AMQPMessage) {
-			$message = new AMQPMessage($message);
+
+			$properties = array(
+				'message_id'    => sha1(sprintf('msg-%s-%s-%s', $routingKey, time(), rand())),
+				'delivery_mode' => self::MESSAGE_PERSIST,
+				'timestamp'     => time(),
+				'expiration'    => self::MESSAGE_EXPIRY
+			);
+
+			$message = new AMQPMessage($message, $properties);
 		}
-		$this->getChannel($channelId)->basic_publish($message, self::EXCHANGE, $routingKey);
+		$this->getChannel($channelId)->basic_publish($message, self::PRIMARY_EXCHANGE, $routingKey);
 		return $this->getChannel($channelId);
 	}
 
 	/**
-	 * Internal function for returning the top message from a queue
-	 *
-	 * @param string $queueName
-	 * @param bool $markAsRead
-	 * @param string $channelId
-	 * @return AMQPMessage
-	 */
-	public function readQueue($queueName, $markAsRead, $channelId = null) {
-		return $this->getChannel($channelId)->basic_get($queueName, !$markAsRead);
-	}
-
-	/**
-	 * Retrieve the top message from a queue without dequeuing it
+	 * Internal function for returning the top message from a queue. Messages are set to unacknowledged.
 	 *
 	 * @param string $queueName
 	 * @param string $channelId
 	 * @return AMQPMessage
 	 */
-	public function peekQueue($queueName, $channelId = null) {
-		return $this->readQueue($queueName, false, $channelId);
-	}
-
-	/**
-	 * Retrieve the top message from a queue and dequeue it
-	 *
-	 * @param $queueName
-	 * @param null $channelId
-	 * @return AMQPMessage
-	 */
-	public function popQueue($queueName, $channelId = null) {
-		return $this->readQueue($queueName, true, $channelId);
+	public function readFromQueue($queueName, $channelId = null) {
+		return $this->getChannel($channelId)->basic_get($queueName, false);
 	}
 
 } 

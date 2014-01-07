@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif;
 
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
@@ -55,9 +56,7 @@ class Notif implements LoggerInterface {
 
 	public function __construct($channel = self::CHANNEL_SYSTEM, $configLoader = null) {
 		$this->channel = $channel;
-
 		$this->conf = $configLoader ?: new ConfigLoader();
-
 		$this->instantiateHandlers();
 	}
 
@@ -67,7 +66,8 @@ class Notif implements LoggerInterface {
 	protected function instantiateHandlers() {
 		// message queue handling
 		try {
-			$this->amqp = new AMQPHandler(new MQConnector);
+			$this->amqp = new AMQPHandler(new MQConnector());
+			$this->amqp->setFormatter(new JsonFormatter());
 		}
 		catch(AMQPRuntimeException $e) {
 			$this->amqp = false;
