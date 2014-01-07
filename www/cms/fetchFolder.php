@@ -13,10 +13,6 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-require_once('../include/pclzip.lib.php');
-
 $page = new SitePage();
 $zip = new ZipFolder($_GET['folder']);
 $zip->sendZip();
-
-?>
