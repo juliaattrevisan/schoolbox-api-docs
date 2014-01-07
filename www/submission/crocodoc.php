@@ -8,9 +8,13 @@
  * @version     SVN: $Id$
  */
 
-new \Alaress_Probe($_SESSION);
+$document = new \Crocodoc\Document(Cfg::get('submission_dir') . '/18.pdf');
+$result = $document->upload();
+new \Alaress_Probe($result);
 
-$crocodoc = new \Crocodoc\Loader('cbad641e-cfa4-4a57-83e7-168956f208a0', $_SESSION['user']);
+/* TODO: Add error check here, if $result->error exists
+ */
+
+$crocodoc = new \Crocodoc\Loader($result->uuid, $_SESSION['user']);
 $crocodoc->render();
-
-
+exit();
