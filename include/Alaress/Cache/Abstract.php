@@ -415,7 +415,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @return null
 	 */
-	protected function getCachedTime() {
+	public function getCachedTime() {
 		return $this->cachedTime;
 	}
 
