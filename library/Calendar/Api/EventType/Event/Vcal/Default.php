@@ -139,16 +139,35 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 			if ($is_superuser || $decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
 
 				/* Load calendar from locker cache
+				 * Cache step 1: cache load of VCAL file from URL
 				 */
 				$cache = new Calendar_Api_Cache();
 				$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
 				/* Parse it all
 				 */
 				try {
-					$allEvents = Sabre\VObject\Reader::read($source, Sabre\VObject\Reader::OPTION_FORGIVING);
-					if ($startTimestamp && $endTimestamp) {
-						$allEvents->expand(new DateTime('@'.$startTimestamp), new DateTime('@'.$endTimestamp));
-					}
+					// Cache step 2: Expand VCAL into event collection.
+					// The expanded events depend on the start and end time, not
+					// just the VCAL file.
+					$serializedEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
+						'vcal.'.$decodedConfig->getUrl(),
+						function($params) {
+							list($source, $startTimestamp, $endTimestamp) = $params;
+							$allEvents = Sabre\VObject\Reader::read(
+								$source, Sabre\VObject\Reader::OPTION_FORGIVING
+							);
+							if ($startTimestamp && $endTimestamp) {
+								$allEvents->expand(
+									new DateTime('@'.$startTimestamp),
+									new DateTime('@'.$endTimestamp)
+								);
+							}
+							return serialize($allEvents);
+						},
+						array($source, $startTimestamp, $endTimestamp),
+						$cache->getCachedTime()
+					);
+					$allEvents = unserialize($serializedEvents);
 				}
 				catch(Exception $e) {
 
