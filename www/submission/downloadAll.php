@@ -19,13 +19,24 @@ class ZipFolder {
    }
 
    function createZip() {
-      $archive = new PclZip($this->tmpZip);
-
-      mkdir($this->tmpFolder);
-      $this->createDirectory($this->tmpFolder, $this->folder, $this->fileList);
-      $archive->create($this->tmpFolder.'/',PCLZIP_OPT_REMOVE_PATH, $this->tmpFolder);
-
-      return true;
+       $archive = new ZipArchive();
+       $archive->open($this->tmpZip, ZipArchive::CREATE);
+       mkdir($this->tmpFolder);
+       $this->createDirectory($this->tmpFolder, $this->folder, $this->fileList);
+       $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
+       foreach (new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST) as $file) {
+           /** @var SplFileInfo $file */
+           // Chop parts of path that match $this->tmpFolder
+           $filePath = $file->getPath() . '/' . $file->getFilename();
+           $zipPath  = substr($filePath, strlen($this->tmpFolder)+1);
+           if ($file->isDir()) {
+               $archive->addEmptyDir($zipPath);
+           }
+           elseif ($file->isFile()) {
+               $archive->addFile($filePath, $zipPath);
+           }
+       }
+       return true;
    }
 
     function createDirectory($currentDir, $folderID, $fileList, $depth = 0) {
