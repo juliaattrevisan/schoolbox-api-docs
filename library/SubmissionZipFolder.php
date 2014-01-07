@@ -1,0 +1,123 @@
+<?php
+/**
+ * Zips a list of file submissions.
+ * Moved out of /www/downloadAll.php
+ */
+class SubmissionZipFolder {
+    function __construct($folder, $fileList) {
+        $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
+        $this->tmpZip = $this->tmpName.'.zip';
+        $this->tmpFolder = $this->tmpName.'dir';
+        $this->folder = $folder;
+        $this->fileList = $fileList;
+        $this->allowedChars = "[^0-9a-zA-Z()_-]";
+        $this->size = 0;
+        $this->maxDepth = 5;
+        $this->maxSize = 262144000; //250MB
+    }
+
+    function createZip() {
+        $archive = new ZipArchive();
+        $archive->open($this->tmpZip, ZipArchive::CREATE);
+        mkdir($this->tmpFolder);
+        $this->createDirectory($this->tmpFolder, $this->folder, $this->fileList);
+        $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
+        foreach (new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST) as $file) {
+            /** @var SplFileInfo $file */
+            // Chop parts of path that match $this->tmpFolder
+            $filePath = $file->getPath() . '/' . $file->getFilename();
+            $zipPath  = substr($filePath, strlen($this->tmpFolder)+1);
+            if ($file->isDir()) {
+                $archive->addEmptyDir($zipPath);
+            }
+            elseif ($file->isFile()) {
+                $archive->addFile($filePath, $zipPath);
+            }
+        }
+        return true;
+    }
+
+    function createDirectory($currentDir, $folderID, $fileList, $depth = 0) {
+        if(is_array($fileList)) {
+            foreach($fileList as $file) {
+                $dataFile = $file['id'].'.dat';
+
+                $fileLocation = Cfg::get('submission_dir') . '/' . $dataFile;
+
+                if(is_file($fileLocation)) {
+                    $this->size = $this->size + filesize($fileLocation);
+
+                    $fileName = $currentDir . '/' . sprintf("%s-%s_%s_%s",
+                            $file['lastname'], $file['firstname'],          // student name
+                            date("md-Hi", strtotime($file['submitted'])),   // datetime
+                            $file['realname']                               // filename
+                        );
+
+                    $fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
+
+                    copy(Cfg::get('submission_dir') .'/'.$dataFile, $fileName);
+                }
+            }
+        }
+    }
+
+    function uniqueFileName($fileName, $depth=1) {
+        if(is_file($fileName)) {
+            $pathParts = pathinfo($fileName);
+            $newName = sprintf("%s/%s_%s.%s", $pathParts['dirname'], $pathParts['filename'], $depth, $pathParts['extension']);
+            return $this->uniqueFileName($newName, ++$depth);
+        }
+        else
+            return $fileName;
+    }
+
+    function cleanUp() {
+        unlink($this->tmpName);
+        unlink($this->tmpZip);
+        $this->removeDir($this->tmpFolder);
+    }
+
+    function removeDir($path) {
+        // Add trailing slash to $path if one is not there
+        if (substr($path, -1, 1) != "/") {
+            $path .= "/";
+        }
+        foreach (glob($path . "*") as $file) {
+            if (is_file($file) === TRUE) {
+                // Remove each file in this Directory
+                unlink($file);
+            }
+            else if (is_dir($file) === TRUE) {
+                // If this Directory contains a Subdirectory, run this Function on it
+                $this->removeDir($file);
+            }
+        }
+        // Remove Directory once Files have been removed (If Exists)
+        if (is_dir($path) === TRUE) {
+            rmdir($path);
+        }
+    }
+
+    function sendZip() {
+        if($this->createZip()) {
+            $filename = $this->cleanName($this->folder);
+            $filesize = filesize($this->tmpZip);
+            header ("Pragma: ");
+            header ("Cache-control: ");
+            header ("Content-Type: application/x-zip-compressed");
+            header ("Content-Disposition: attachment; filename=\"".$filename.".zip\"");
+            header ("Content-Length: $filesize");
+            readfile($this->tmpZip);
+
+            $this->cleanUp();
+        }
+        else {
+            error(49);
+        }
+    }
+
+    function cleanName($name, $delim = "_") {
+        $filename = preg_replace("/{$this->allowedChars}/", $delim, $name);
+        return $filename;
+    }
+}
