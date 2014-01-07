@@ -8,9 +8,10 @@
         "maximebf/debugbar": "1.5.*",
         "shareworks/xml-security": "dev-master",
         "predis/predis": "0.8.*",
-        "monolog/monolog": "1.7.*",
-        "videlalvaro/php-amqplib": "v2.2.4",
-        "cboden/ratchet": "0.3.*",
+        "monolog/monolog": "1.7.0",
+        "videlalvaro/php-amqplib": "2.2.5",
+        "cboden/ratchet": "0.3.0",
+        "react/stomp": "0.2.*@dev",
         "html2text/html2text": "1.0.*"
     },
     "require-dev": {
