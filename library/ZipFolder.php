@@ -102,7 +102,7 @@ class ZipFolder {
                         $folderName = $this->cleanName($folder['name']);
                         $folderLocation = $currentDir . '/' . $folderName;
                         @mkdir($folderLocation);
-                        $this->createDirectory($folderLocation, $folder['id'], ++$depth);
+                        $this->createDirectory($folderLocation, $folder['id'], $depth+1);
                     }
                 }
             }
