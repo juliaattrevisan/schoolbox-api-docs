@@ -59,7 +59,7 @@ class Download {
 
 		/* Download to a temp dir
 		 */
-		$path = \Cfg::get('submission_upload_tmp_dir') . '/' . $submission->getId() . '_' . $submission->getFilename();
+		$path = \Cfg::get('submission_upload_tmp_dir') . '/' . $submission->getId() . '.pdf';
 
 		file_put_contents($path, $data);
 
