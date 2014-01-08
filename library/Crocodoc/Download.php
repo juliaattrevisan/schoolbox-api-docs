@@ -42,6 +42,8 @@ class Download {
 	 */
 	public function start() {
 		$returnHandler = new \SubmissionReturn();
+		$returnHandler->securityCheck($this->getSubmission()->getSubmissionBox()->getId());
+
 		$result = $returnHandler->getByUser($this->getSubmission()->getOwner()->getId(), $this->getSubmission()->getSubmissionBox()->getId(), 1);
 
 		/* Update the latest return found for a submission
