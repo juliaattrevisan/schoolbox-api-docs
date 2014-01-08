@@ -68,15 +68,21 @@ if (is_numeric($this->arg[0])) {
                             'ADV_OFF'       => ' style="display:none"',
                             'ADV_ON'        => ''));
 
+        $userOut = array();
 		foreach ($userList as $user) {
-			$userOut = array(
-				'USER_ID' => $user['id'],
-				'USER_NAME' => $userHandler->formatName($user),
-			);
-
-			$this->setVar($userOut);
-			$this->parse('current_users_block', 'current_users', true);
+            $userOut[] = array(
+                'id'   => intval($user['id']),
+                'name' => $userHandler->formatName($user),
+            );
+//			$userOut = array(
+//				'USER_ID' => $user['id'],
+//				'USER_NAME' => $userHandler->formatName($user),
+//			);
+//
+//			$this->setVar($userOut);
+//			$this->parse('current_users_block', 'current_users', true);
 		}
+        $this->setVar('USER_LIST', json_encode($userOut));
 	}
 	else
 	{
@@ -85,7 +91,8 @@ if (is_numeric($this->arg[0])) {
                             'OPAC_ADVANCED' => '',
                             'ADV_OFF'       => '',
                             'ADV_ON'        => ' style="display:none"'));
-		$this->setVar('current_users_block', '');
+//		$this->setVar('current_users_block', '');
+        $this->setVar('USER_LIST', '[]');
 	}
 
 	$this->dropDown('topic_list', $newsHandler->getTopicList(), $news['item_topic_id'], TEMPLATE_content, array(

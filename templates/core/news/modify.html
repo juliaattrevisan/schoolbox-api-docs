@@ -1,8 +1,7 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css"/>
-
+<link rel="stylesheet" href="/javascript/components/magicsuggest/bin/magicsuggest-1.3.1-min.css" type="text/css"/>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
 <script type="text/javascript">
     tinyMCE.init({
         mode:"textareas",
@@ -54,23 +53,26 @@
             }
         });
 
-        $j('#addUser').autocomplete({
-            serviceUrl:'/ajax/user.php?groupID=0',
-            minChars:2,
-            maxHeight:400,
-            width:200,
-            onSelect:function (value, data) {
-                if ($j('#userList').val()) {
-                    $j('.visible-users').empty()
-                }
-                ;
-
-                $j('.visible-users')
-                        .append('<li><input type="hidden" name="userList[]" value="' + data + '"><span>' + value + '</span><a href="#" class="delete-from-list">delete</a></li>');
-                $j('#addUser').val("").focus();
-                $j('.groups input').valid();
-            }
-        });
+        // Write an objectSelector plugin that wraps around magicSuggest
+        var options = {
+            data:'/ajax/user.php?groupID=0',
+            allowFreeEntries: false,
+            hideTrigger: true,
+            minChars: 2,
+            width: 200,
+            value: {USER_LIST}
+        }
+        console.log(options)
+        var ms = $j('#addUser').magicSuggest(options)
+//        $j(ms).on('selectionchange', function(event, combo, selection) {
+//            // Stick a new name item in the container
+//            var name      = combo.getName()+'[]'
+//            var container = combo.container;
+//            container.find('input[name="'+name+'"]').remove();
+//            $j.each(selection, function(i,v) {
+//                container.append($j('<input type="hidden" />').attr('name', name).val(v.id))
+//            })
+//        });
 
         $j('#type_form input').each(function () {
             $j(this).click(function () {
@@ -243,14 +245,7 @@
             remove users</em></td>
         <td
         {OPAC_ADVANCED} >
-        <input id="addUser" type="text" size="30"/>
-        <ul class="visible-users">
-            <!-- BEGIN current_users -->
-            <li>
-                <input type="hidden" value="{USER_ID}" name="userList[]">
-                <span>{USER_NAME}</span> <a class="delete-from-list" href="#">delete</a></li>
-            <!-- END current_users -->
-        </ul>
+        <input id="addUser" name="userList" type="text" size="30" value="{USER_LIST}"/>
         </td>
         </tr>
 
