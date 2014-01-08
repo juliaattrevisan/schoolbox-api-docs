@@ -127,6 +127,7 @@ class ZipFolder {
                 $archive->addFile($filePath, $zipPath);
             }
         }
+        $archive->close();
         return true;
 
     }
