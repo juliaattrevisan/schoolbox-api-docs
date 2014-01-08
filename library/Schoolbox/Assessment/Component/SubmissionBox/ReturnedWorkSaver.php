@@ -14,6 +14,12 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 class ReturnedWorkSaver {
 
 	/**
+	 * TODO: refactor this to somwhere else, not sure where it should live though
+	 * IT NOW LIVES HERE
+	 */
+	private $updateWindow = 21600; // 60 * 60 * 6 seconds = 6 hours
+
+	/**
 	 * An instance of ReturnedWork
 	 *
 	 * @var null
@@ -42,7 +48,7 @@ class ReturnedWorkSaver {
 
 			// Is this outside of the update window? if so, create a new one.
 			$return_time = $returned_work->getReturned();
-			$window_ago  = new \Alaress_Date_Format(time() - update_window, 'U');
+			$window_ago  = new \Alaress_Date_Format(time() - $this->getUpdateWindow(), 'U');
 			if ($return_time->getUnixTimestamp() < $window_ago->getUnixTimestamp()) {
 				$returned_work = new ReturnedWork();
 			}
@@ -111,5 +117,23 @@ class ReturnedWorkSaver {
 	 */
 	public function getReturnedWork() {
 		return $this->returnedWork;
+	}
+
+	/**
+	 * Set update window
+	 *
+	 * @param mixed $updateWindow
+	 */
+	private function setUpdateWindow($updateWindow) {
+		$this->updateWindow = $updateWindow;
+	}
+
+	/**
+	 * Get update window
+	 *
+	 * @return mixed
+	 */
+	private function getUpdateWindow() {
+		return $this->updateWindow;
 	}
 }

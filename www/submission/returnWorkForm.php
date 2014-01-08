@@ -12,9 +12,6 @@ $returnHandler = new SubmissionReturn;
 $subHandler = new Submission();
 $rubricHandler = new DueWork_Rubric_Handler();
 
-// TODO: refactor this to somwhere else, not sure where it should live though
-const update_window = 21600; // 60 * 60 * 6 seconds = 6 hours
-
 // Ajax from mark sheet
 if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) */ && isset($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
     $response = array();
