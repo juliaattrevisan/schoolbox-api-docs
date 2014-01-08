@@ -62,7 +62,9 @@
 		 */
 		var config = init(options, this);
 
+		renderPrevious();
 		renderSelect();
+		renderNext();
 
 		/**
 		 * Initialise various configured params and determine a bunch
@@ -86,12 +88,30 @@
 			}
 
 			var derived = {
+				items: [],
+				direct: []
 			}
 
 			var merged = $j.extend(defaults, derived, options);
-			merged.items = jQuery.parseJSON(merged.items)
+			merged.items = jQuery.parseJSON(merged.items);
+			merged.direct = jQuery.parseJSON(merged.direct);
 
 			return merged;
+		}
+
+		/**
+		 * Render previous link
+		 */
+		function renderPrevious() {
+			if (config.direct.previous !== null) {
+				var label = config.direct.previous.navigation.label;
+				var value = config.direct.previous.navigation.value;
+
+				var option = '<a href="'+ value +'">'+ label +'</a>';
+
+				config.element.append(option);
+				config.previousItemCallback();
+			}
 		}
 
 		/**
@@ -120,8 +140,22 @@
 			var select = '<select class="context-select">' + allOptions + '</select>';
 
 			config.element.append(select);
-
 			config.selectItemCallback();
+		}
+
+		/**
+		 * Render next link
+		 */
+		function renderNext() {
+			if (config.direct.next !== null) {
+				var label = config.direct.next.navigation.label;
+				var value = config.direct.next.navigation.value;
+
+				var option = '<a href="'+ value +'">'+ label +'</a>';
+
+				config.element.append(option);
+				config.nextItemCallback();
+			}
 		}
 	}
 }(jQuery));
