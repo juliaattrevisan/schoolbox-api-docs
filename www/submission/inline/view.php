@@ -48,7 +48,6 @@ for ($i=0; $i < count($stack); $i++) {
 	$currentStudent = $stack[$i];
 
 	if ($currentStudent['uid'] == $this->arg[1]) {
-
 		$collection = $submissionMapper->getHistory($currentStudent['uid'], $submissionBoxId);
 
 		/* Get the latest submission, if one exists
@@ -104,5 +103,5 @@ $this->setVar(array(
 ));
 
 $dueWorkDetail = new DueWork_Detail($submissionBoxId);
-$dueWorkDetail->processStudents(array($singleStudent));
+$dueWorkDetail->processStudents(array($currentStudent));
 $dueWorkDetail->renderDetails($this);
