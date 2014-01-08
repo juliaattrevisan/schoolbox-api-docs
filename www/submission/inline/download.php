@@ -8,5 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$downloader = new Crocodoc\Download($this->arg[0]);
+$returnHandler = new SubmissionReturn();
+
+$downloader = new Crocodoc\Download($this->arg[0], $returnHandler);
 $downloader->start();
