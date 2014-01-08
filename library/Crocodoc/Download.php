@@ -66,50 +66,50 @@ class Download {
 		$returnCollection = $this->getReturnHandler()->getByUser($submission->getOwner()->getId(), $submission->getSubmissionBox()->getId(), 1);
 
 		/* Update the latest return found for a submission
+		 * Either recycle an existing record or spawn a new one
 		 */
-		if (count($returnCollection)) {
+		if ($returnCollection && count($returnCollection)) {
 			$return = array_shift($returnCollection);
-
-			$returnSaver = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
-			$returnSaver->saveReturn($return);
-
-			/* This should either reuse the $latestReturn record, or spawn
-			 * a new one instead
-			 */
-			$latestReturn = $returnSaver->getReturnedWork();
-
-			/* Crocodoc always downloads a pdf to you with annotations turned on
-			 */
-			$curl = new \Alaress_Curl_Url("https://crocodoc.com/api/v2/download/document?token={$this->getAuthenticator()->getApiToken()}&uuid={$submission->getUuid()}&annotated=true");
-			$curl->exec();
-
-			$data = $curl->getResult();
-
-			/* Download to a temp dir
-			 */
-			$path = \Cfg::get('returns_dir') . '/' . $latestReturn['id'] . '.dat';
-
-			file_put_contents($path, $data);
-
-			/* Update the return with some extra info
-			 */
-			$updatedReturn = array(
-				'id' => $latestReturn['id'],
-				'box_id' => $latestReturn['box_id'],
-				'marker' => $latestReturn['marker'],
-				'owner' => $latestReturn['owner'],
-				'comment' => $latestReturn['comment'],
-				'mark' => $latestReturn['mark'],
-				'norm_mark' => $latestReturn['norm_mark'],
-				'filename' => 'return_' . $submission->getFilename() . '.pdf',
-				'filesize' => filesize($path),
-				'mime_type' => 'application/pdf',
-				'deleted' => $latestReturn['deleted'],
-				'returned' => $latestReturn['returned'],
-			);
-
-			$this->getReturnHandler()->update($updatedReturn);
 		}
+		else {
+			$return = array(
+				'box_id' => $submission->getSubmissionBox()->getId(),
+				'marker' => $_SESSION['user']->getId(),
+				'owner' => $submission->getOwner()->getId(),
+			);
+		}
+
+		/* Do what returnWorkForm usually does
+		 */
+		$returnSaver = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
+		$returnSaver->saveReturn($return);
+
+		/* This should either reuse the $latestReturn record, or spawn
+		 * a new one instead
+		 */
+		$latestReturn = $returnSaver->getReturnedWork();
+
+		/* Crocodoc always downloads a pdf to you with annotations turned on
+		 */
+		$curl = new \Alaress_Curl_Url("https://crocodoc.com/api/v2/download/document?token={$this->getAuthenticator()->getApiToken()}&uuid={$submission->getUuid()}&annotated=true");
+		$curl->exec();
+
+		$data = $curl->getResult();
+
+		/* Download to a temp dir
+		 */
+		$path = \Cfg::get('returns_dir') . '/' . $latestReturn->getId() . '.dat';
+
+		file_put_contents($path, $data);
+
+		/* Update the return with some extra info
+		 */
+		$latestReturn->setFilename('return_' . $submission->getFilename() . '.pdf');
+		$latestReturn->setFilesize(filesize($path));
+		$latestReturn->setMimeType('application/pdf');
+
+		$returnMapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
+		$returnMapper->save($latestReturn);
 	}
 
 	/* Getters/Setters
