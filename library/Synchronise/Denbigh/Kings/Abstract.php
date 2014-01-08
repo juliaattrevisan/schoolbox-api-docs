@@ -123,7 +123,7 @@ abstract class Synchronise_Denbigh_Kings_Abstract extends Synchronise_Denbigh_Ab
         $this->getVerboseFilter()->setNewUser($existingUser);
         if($this->getPerformUpdate()) {
             // actually do it
-            $this->getUserHandler()->delete($existingUser['uid']);
+            $this->getUserHandler()->delete($existingUser['id']);
             $this->getVerboseFilter()->performDelete();
             $this->getVerboseFilter()->incrementDeleted();
 
