@@ -15,6 +15,9 @@ then
 	service mysql restart > /dev/null 2>&1;
 	echo "$vag Stopping Apache";
 	service apache2 stop > /dev/null 2>&1;
+	# Kill all old grunt processes, they're probably watches
+	echo "$vag Stopping background Grunt processes";
+	pkill grunt
 	echo "$vag Removing current Schoolbox MySQL database";
 	mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 	echo "$vag Loading Schoolbox MySQL Demo data";
@@ -125,8 +128,6 @@ then
 	echo "$vag Building CSS files via LessCSS";
 	grunt build.css
 	echo "$vag Starting watcher for changes to CSS files";
-	# Kill all old grunt processes, they're probably watches
-	pkill grunt
 	grunt --no-color watch > /vagrant/data/watch.output.txt &
 
 	echo "$vag Installing PHP packages";
