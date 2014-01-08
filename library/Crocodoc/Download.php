@@ -50,7 +50,6 @@ class Download {
 	public function __construct($submissionId, \SubmissionReturn $returnHandler) {
 		$this->setAuthenticator(new Authenticator());
 		$this->setSubmissionId($submissionId);
-
 		$this->setReturnHandler($returnHandler);
 	}
 
@@ -66,11 +65,18 @@ class Download {
 		 */
 		$returnCollection = $this->getReturnHandler()->getByUser($submission->getOwner()->getId(), $submission->getSubmissionBox()->getId(), 1);
 
-		/* TODO: Steal usage of saveReturn()
-		 * Update the latest return found for a submission
+		/* Update the latest return found for a submission
 		 */
 		if (count($returnCollection)) {
-			$latestReturn = array_shift($returnCollection);
+			$return = array_shift($returnCollection);
+
+			$returnSaver = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
+			$returnSaver->saveReturn($return);
+
+			/* This should either reuse the $latestReturn record, or spawn
+			 * a new one instead
+			 */
+			$latestReturn = $returnSaver->getReturnedWork();
 
 			/* Crocodoc always downloads a pdf to you with annotations turned on
 			 */
