@@ -10,10 +10,6 @@
 
 $this->setFile(TEMPLATE_content, 'submission/inline/view.html');
 
-$this->setVar(array(
-	'SUBMISSION_ID' => $this->arg[0],
-));
-
 $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 $submission = $submissionMapper->findById($this->arg[0]);
 $submissionBoxId = $submission->getSubmissionBox()->getId();
@@ -38,3 +34,11 @@ foreach($studentList as $currentStudent) {
 $dueWorkDetail = new DueWork_Detail($submissionBoxId);
 $dueWorkDetail->processStudents($singleStudent);
 $dueWorkDetail->renderDetails($this);
+
+$userMapper = new \Schoolbox\UserMapper();
+$user = $userMapper->findById($submission->getOwner()->getId());
+
+$this->setVar(array(
+	'SUBMISSION_ID' => $this->arg[0],
+	'STUDENT_FULL_NAME' => $user->getFullName()
+));

@@ -1,10 +1,12 @@
-<h1>Inline marking</h1>
+<h1>Mark work for {STUDENT_FULL_NAME}</h1>
 <script src="/javascript/jquery.viewSubmission.js" type="text/javascript"></script>
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
 
 <style type="text/css">
 	#crocodoc {
+		width:75%;
+		height:700px;
 	}
 </style>
 <script type='text/javascript'>
@@ -59,7 +61,7 @@
 	});
 </script>
 
-<iframe id="crocodoc" style="width:75%;height:800px"></iframe>
+<iframe id="crocodoc"></iframe>
 
 <h2>Assign marks</h2>
 
@@ -93,8 +95,7 @@
 				<td class="marking">
 					<div>{OWNER_MARKING}</div>
 					<div class="button-set">
-						<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View
-							History</a>
+						<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View History</a>
 						<input type="file" name="file-return-{OWNER_ID}" class="prettify"/>
 					</div>
 				</td>
@@ -130,5 +131,5 @@
 
 <h2>Return Marked Work</h2>
 <p>
-	<a id='crocodoc-download' href='#'>Return marked work as PDF</a>
+	<a id='crocodoc-download' href='#' class="btn"><span></span>Return marked work as PDF</a>
 </p>
