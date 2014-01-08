@@ -8,11 +8,10 @@
  * @version     SVN: $Id$
  */
 
-$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
-
-$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-$submission = $submissionMapper->findById($this->arg[0]);
-$submissionBoxId = $submission->getSubmissionBox()->getId();
+/* /submission/inline/view/<box_id>/<user_id>
+ */
+$submissionBoxId = $this->arg[0];
+$currentUid = $this->arg[1];
 
 $submissionHandler = new Submission();
 $submissionBox = $submissionHandler->getById($submissionBoxId);
@@ -35,49 +34,48 @@ foreach ($studentList as $currentStudent) {
 /* Trim out only this student
  */
 $singleStudent = array();
+$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 
 for ($i=0; $i < count($stack); $i++) {
 	$currentStudent = $stack[$i];
 
-	if ($currentStudent['uid'] == $submission->getOwner()->getId()) {
+	if ($currentStudent['uid'] == $this->arg[1]) {
+
 		$collection = $submissionMapper->getHistory($currentStudent['uid'], $submissionBoxId);
-		$currentStudent['submission'] = $collection->first();
+
+		/* Get the latest submission, if one exists
+		 */
+		if ($collection->count()) {
+			$currentStudent['submission'] = $collection->first()->getSubmission();
+		}
 
 		$singleStudent[] = $currentStudent;
 
 		/* For navigation purposes
-		 * Get their latest submissions, if any exist
 		 */
 		$previousStudent = $stack[$i-1];
-
-		if ($previousStudent !== null) {
-			$collection = $submissionMapper->getHistory($previousStudent['uid'], $submissionBoxId);
-			$previousStudent['submission'] = $collection->first();
-		}
-
 		$nextStudent = $stack[$i+1];
-
-		if ($nextStudent !== null) {
-			$collection = $submissionMapper->getHistory($nextStudent['uid'], $submissionBoxId);
-			$nextStudent['submission'] = $collection->first();
-		}
 
 		break;
 	}
 }
 
-$dueWorkDetail = new DueWork_Detail($submissionBoxId);
-$dueWorkDetail->processStudents($singleStudent);
-$dueWorkDetail->renderDetails($this);
-
+/* Rendering things out
+ */
 $userMapper = new \Schoolbox\UserMapper();
-$user = $userMapper->findById($submission->getOwner()->getId());
+$user = $userMapper->findById($this->arg[1]);
+
+$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
+
+if ($currentStudent['submission'] != null) {
+	$submissionId = $currentStudent['submission']->getId();
+}
 
 $this->setVar(array(
-	'SUBMISSION_ID' => $this->arg[0],
+	'SUBMISSION_ID' => $submissionId,
 	'STUDENT_FULL_NAME' => $user->getFullName()
 ));
 
-new \Alaress_Probe($currentStudent);
-new \Alaress_Probe($previousStudent);
-new \Alaress_Probe($nextStudent);
+$dueWorkDetail = new DueWork_Detail($submissionBoxId);
+$dueWorkDetail->processStudents($singleStudent);
+$dueWorkDetail->renderDetails($this);
