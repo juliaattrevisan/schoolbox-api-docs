@@ -6,9 +6,9 @@ $userHandler = new User();
 $groupHandler = new Group();
 $pageHandler = new SitePage();
 
-$result = $suggestions = $data = array();
+$result = $suggestions = $data = $return = array();
 
-$keyword = $_GET['query'];
+$keyword = $_POST['query'];
 $groupID = $_GET['groupID'];
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strlen($groupID)) {
@@ -49,6 +49,10 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strl
 
                 $suggestions[] = html_entity_decode(Scrub::text($person), ENT_QUOTES);
                 $data[] = $user['uid'];
+                $return[] = array(
+                    'name' => $person,
+                    'id'   => intval($user['uid']),
+                );
             }
         }
     }
@@ -61,4 +65,4 @@ $result = array(
 );
 
 header('Content-type: application/json');
-echo json_encode($result);
+echo json_encode($return);
