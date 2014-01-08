@@ -76,6 +76,11 @@ $user = $userMapper->findById($this->arg[1]);
 
 if ($currentStudent['submission'] != null) {
 	$submissionId = $currentStudent['submission']->getId();
+
+	$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
+}
+else {
+	$this->setFile(TEMPLATE_content, 'submission/inline/none.html');
 }
 
 /* Data for the navigation selector
@@ -88,7 +93,7 @@ $navigationDirect = json_encode(array(
 	'next' => $nextStudent,
 ));
 
-$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
+
 
 $this->setVar(array(
 	'SUBMISSION_ID' => $submissionId,
