@@ -2,7 +2,7 @@
 <script src="/javascript/jquery.viewSubmission.js" type="text/javascript"></script>
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
-
+<script src="/javascript/crocodoc/crocodoc.js" type="text/javascript"></script>
 <style type="text/css">
 	#crocodoc {
 		border: 1px solid #eee;
@@ -16,11 +16,9 @@
 <script type='text/javascript'>
 	$(function() {
 
-		/* Load crocodoc
-		 */
-		$.getJSON('/submission/inline/iframe?submissionId={SUBMISSION_ID}', function(data) {
-			$('#crocodoc').attr('src', data.url);
-			$('#crocodoc-download').attr('href', '/submission/inline/download/{SUBMISSION_ID}');
+		$('#crocodoc').crocodoc({
+			submissionId: '{SUBMISSION_ID}',
+			downloadElement: '#crocodoc-download'
 		});
 
 		// Add the dark class only to even rows that are visible (skip over the hidden ones)
