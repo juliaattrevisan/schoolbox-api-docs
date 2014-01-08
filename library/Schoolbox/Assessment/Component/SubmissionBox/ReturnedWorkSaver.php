@@ -53,7 +53,7 @@ class ReturnedWorkSaver {
 		catch (\Schoolbox\Mapper\Exception $e) {}
 		if (!$update_existing) {
 			$returned_work
-				->setOwner(\UserMapper::getInstance()->findById($student_id))
+				->setOwner(\Schoolbox\UserMapper::getInstance()->findById($student_id))
 				->setSubmissionBox(\Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findById($box_id))
 				->setReturned(new \Alaress_Date_Format(new \DateTime('now')))
 			;
