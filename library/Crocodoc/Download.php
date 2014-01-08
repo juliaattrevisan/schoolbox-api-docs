@@ -41,6 +41,8 @@ class Download {
 	 * Download scribbled-on file and provide link to it
 	 */
 	public function start() {
+		$returnHandler = new \SubmissionReturn();
+		$result = $returnHandler->getByUser($this->getSubmission()->getOwner()->getId(), $this->getSubmission()->getSubmissionBox()->getId(), 1);
 
 		/* Update the latest return found for a submission
 		 * Either recycle an existing record or spawn a new one
@@ -49,6 +51,9 @@ class Download {
 			'box_id' => $this->getSubmission()->getSubmissionBox()->getId(),
 			'marker' => $_SESSION['user']->getId(),
 			'owner' => $this->getSubmission()->getOwner()->getId(),
+			'comment' => $result[0]['comment'],
+			'mark' => (!empty($result[0]) ? $result[0]['mark'] : null),
+			'norm_mark' => (!empty($result[0]) ? $result[0]['norm_mark'] : null),
 		);
 
 		/* Do what returnWorkForm usually does
@@ -79,6 +84,9 @@ class Download {
 		$latestReturn->setFilename('return_' . $this->getSubmission()->getFilename() . '.pdf');
 		$latestReturn->setFilesize(filesize($path));
 		$latestReturn->setMimeType('application/pdf');
+		$latestReturn->setMark($return['mark']);
+		$latestReturn->setNormalizedMark($return['norm_mark']);
+		$latestReturn->setComment($return['comment']);
 
 		$returnMapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
 		$returnMapper->save($latestReturn);
