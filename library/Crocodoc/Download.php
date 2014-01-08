@@ -21,13 +21,6 @@ class Download {
 	private $authenticator = null;
 
 	/**
-	 * The uuid of the crocodoc document
-	 *
-	 * @var string
-	 */
-	private $uuid = '';
-
-	/**
 	 * An instance of \Schoolbox\Assessment\Component\SubmissionBox\Submission
 	 *
 	 * @var null
@@ -93,24 +86,6 @@ class Download {
 
 	/* Getters/Setters
 	 */
-
-	/**
-	 * Set uuid
-	 *
-	 * @param string $uuid
-	 */
-	private function setUuid($uuid) {
-		$this->uuid = $uuid;
-	}
-
-	/**
-	 * Get uuid
-	 *
-	 * @return string
-	 */
-	private function getUuid() {
-		return $this->uuid;
-	}
 
 	/**
 	 * Set authenticator
