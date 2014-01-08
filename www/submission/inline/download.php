@@ -10,5 +10,8 @@
 
 $returnHandler = new SubmissionReturn();
 
-$downloader = new Crocodoc\Download($this->arg[0], $returnHandler);
+$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+$submission = $submissionMapper->findById($this->arg[0]);
+
+$downloader = new Crocodoc\Download($submission);
 $downloader->start();

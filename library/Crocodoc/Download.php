@@ -28,45 +28,34 @@ class Download {
 	private $uuid = '';
 
 	/**
-	 * Submission id
-	 *
-	 * @var string
-	 */
-	private $submissionId = '';
-
-	/**
-	 * An instance of SubmissionReturn
+	 * An instance of \Schoolbox\Assessment\Component\SubmissionBox\Submission
 	 *
 	 * @var null
 	 */
-	private $returnHandler = null;
+	private $submission = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @param $submissionId
-	 * @param \SubmissionReturn $returnHandler
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
 	 */
-	public function __construct($submissionId, \SubmissionReturn $returnHandler) {
+	public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission) {
 		$this->setAuthenticator(new Authenticator());
-		$this->setSubmissionId($submissionId);
-		$this->setReturnHandler($returnHandler);
+		$this->setSubmission($submission);
 	}
 
 	/**
 	 * Download scribbled-on file and provide link to it
 	 */
 	public function start() {
-		$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-		$submission = $submissionMapper->findById($this->getSubmissionId());
 
 		/* Update the latest return found for a submission
 		 * Either recycle an existing record or spawn a new one
 		 */
 		$return = array(
-			'box_id' => $submission->getSubmissionBox()->getId(),
+			'box_id' => $this->getSubmission()->getSubmissionBox()->getId(),
 			'marker' => $_SESSION['user']->getId(),
-			'owner' => $submission->getOwner()->getId(),
+			'owner' => $this->getSubmission()->getOwner()->getId(),
 		);
 
 		/* Do what returnWorkForm usually does
@@ -81,7 +70,7 @@ class Download {
 
 		/* Crocodoc always downloads a pdf to you with annotations turned on
 		 */
-		$curl = new \Alaress_Curl_Url("https://crocodoc.com/api/v2/download/document?token={$this->getAuthenticator()->getApiToken()}&uuid={$submission->getUuid()}&annotated=true");
+		$curl = new \Alaress_Curl_Url("https://crocodoc.com/api/v2/download/document?token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getSubmission()->getUuid()}&annotated=true");
 		$curl->exec();
 
 		$data = $curl->getResult();
@@ -94,7 +83,7 @@ class Download {
 
 		/* Update the return with some extra info
 		 */
-		$latestReturn->setFilename('return_' . $submission->getFilename() . '.pdf');
+		$latestReturn->setFilename('return_' . $this->getSubmission()->getFilename() . '.pdf');
 		$latestReturn->setFilesize(filesize($path));
 		$latestReturn->setMimeType('application/pdf');
 
@@ -142,38 +131,20 @@ class Download {
 	}
 
 	/**
-	 * Set submission id
+	 * Set submission
 	 *
-	 * @param string $submissionId
+	 * @param null $submission
 	 */
-	private function setSubmissionId($submissionId) {
-		$this->submissionId = $submissionId;
+	private function setSubmission($submission) {
+		$this->submission = $submission;
 	}
 
 	/**
-	 * Get submission id
-	 *
-	 * @return string
-	 */
-	private function getSubmissionId() {
-		return $this->submissionId;
-	}
-
-	/**
-	 * Set return handler
-	 *
-	 * @param null $returnHandler
-	 */
-	private function setReturnHandler($returnHandler) {
-		$this->returnHandler = $returnHandler;
-	}
-
-	/**
-	 * Get return handler
+	 * Get submission
 	 *
 	 * @return null
 	 */
-	private function getReturnHandler() {
-		return $this->returnHandler;
+	private function getSubmission() {
+		return $this->submission;
 	}
 }
