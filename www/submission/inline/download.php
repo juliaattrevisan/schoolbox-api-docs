@@ -15,3 +15,7 @@ $submission = $submissionMapper->findById($this->arg[0]);
 
 $downloader = new Crocodoc\Download($submission);
 $downloader->start();
+
+/* Get out of here
+ */
+$this->backToTheFuture(1);
