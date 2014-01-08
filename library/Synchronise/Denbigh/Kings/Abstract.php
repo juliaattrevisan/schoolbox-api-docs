@@ -113,6 +113,28 @@ abstract class Synchronise_Denbigh_Kings_Abstract extends Synchronise_Denbigh_Ab
         }
     }
 
+    /**
+     * Delete a user from the Schoolbox DB.
+     *
+     * @param  array $existingUser array of user attributes
+     * @return void
+     */
+    protected function executeDelete($existingUser) {
+        $this->getVerboseFilter()->setNewUser($existingUser);
+        if($this->getPerformUpdate()) {
+            // actually do it
+            $this->getUserHandler()->delete($existingUser['uid']);
+            $this->getVerboseFilter()->performDelete();
+            $this->getVerboseFilter()->incrementDeleted();
+
+        }
+        else {
+            // test only
+            $this->getVerboseFilter()->planDelete();
+            $this->getVerboseFilter()->incrementDeleted();
+
+        }
+    }
 
     /**
      * @param $username
