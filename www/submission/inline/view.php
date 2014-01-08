@@ -13,6 +13,10 @@
 $submissionBoxId = $this->arg[0];
 $currentUid = $this->arg[1];
 
+/* This is an optional argument
+ */
+$submissionId = $this->arg[2];
+
 $submissionHandler = new Submission();
 $submissionBox = $submissionHandler->getById($submissionBoxId);
 
@@ -48,12 +52,24 @@ for ($i=0; $i < count($stack); $i++) {
 	$currentStudent = $stack[$i];
 
 	if ($currentStudent['uid'] == $this->arg[1]) {
-		$collection = $submissionMapper->getHistory($currentStudent['uid'], $submissionBoxId);
 
-		/* Get the latest submission, if one exists
+		/* Load a specific submission for this box/person
 		 */
-		if ($collection->count()) {
-			$currentStudent['submission'] = $collection->first()->getSubmission();
+		if (is_numeric($this->arg[2])) {
+			$submission = $submissionMapper->findById($this->arg[2]);
+
+			if ($submission) {
+				$currentStudent['submission'] = $submission;
+			}
+		}
+		else {
+			$collection = $submissionMapper->getHistory($currentStudent['uid'], $submissionBoxId);
+
+			/* Get the latest submission, if one exists
+			 */
+			if ($collection->count()) {
+				$currentStudent['submission'] = $collection->first()->getSubmission();
+			}
 		}
 
 		/* Previous
@@ -92,13 +108,11 @@ $navigationDirect = json_encode(array(
 	'next' => $nextStudent,
 ));
 
-
-
 $this->setVar(array(
-	'SUBMISSION_ID' => $submissionId,
-	'SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
-	'SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
-	'SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
+	'CROCODOC_SUBMISSION_ID' => $submissionId,
+	'CROCODOC_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
+	'CROCODOC_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
+	'CROCODOC_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
 	'STUDENT_FULL_NAME' => $user->getFullName(),
 ));
 
