@@ -22,7 +22,16 @@ class SubmissionZipFolder {
         mkdir($this->tmpFolder);
         $this->createDirectory($this->tmpFolder, $this->folder, $this->fileList);
         $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
+
+        $i      = 0;
+        $ulimit = 250;
         foreach (new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST) as $file) {
+            // Close/open archive after 250 additions, to avoid ulimit issues
+            if ($i++ % $ulimit === ($ulimit-1)) {
+                $archive->close();
+                $archive->open($this->tmpZip);
+            }
+
             /** @var SplFileInfo $file */
             // Chop parts of path that match $this->tmpFolder
             $filePath = $file->getPath() . '/' . $file->getFilename();
