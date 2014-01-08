@@ -100,7 +100,9 @@ module.exports = function(grunt) {
                     // jQueryUI
                     'www/javascript/components/jquery.ui/dist/jquery-ui.js',
                     // jQueryUI Touch Punch
-                    'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js'
+                    'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
+                    // Fullcalendar
+                    'www/javascript/components/fullcalendar/fullcalendar.js'
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }

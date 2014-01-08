@@ -27,7 +27,8 @@
     "eventEmitter": "4.2.6",
     "eventie": "1.0.3",
     "doT": "1.0.1",
-    "qtip2": "2.2.0"
+    "qtip2": "2.2.0",
+    "fullcalendar": "~1.6.4"
   },
   "ignore": [
     "**/.*",
@@ -36,5 +37,8 @@
     "www/javascript/components/",
     "test",
     "tests"
-  ]
+  ],
+  "resolutions": {
+    "jquery": ">=1.6"
+  }
 }
