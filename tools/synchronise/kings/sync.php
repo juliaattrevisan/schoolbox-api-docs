@@ -14,7 +14,7 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 $strategyList = array(
     'Synchronise_Denbigh_Kings_Student',
     //'Synchronise_Denbigh_Kings_Staff',
-    //'Synchronise_Denbigh_Kings_Parent'
+    'Synchronise_Denbigh_Kings_Parent'
 );
 
 foreach($strategyList as $currentStrategy) {
