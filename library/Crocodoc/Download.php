@@ -60,24 +60,14 @@ class Download {
 		$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 		$submission = $submissionMapper->findById($this->getSubmissionId());
 
-		/* Find out if a return record exists
-		 * "get the most recent return, or null if it doesn't exist."
-		 */
-		$returnCollection = $this->getReturnHandler()->getByUser($submission->getOwner()->getId(), $submission->getSubmissionBox()->getId(), 1);
-
 		/* Update the latest return found for a submission
 		 * Either recycle an existing record or spawn a new one
 		 */
-		if ($returnCollection && count($returnCollection)) {
-			$return = array_shift($returnCollection);
-		}
-		else {
-			$return = array(
-				'box_id' => $submission->getSubmissionBox()->getId(),
-				'marker' => $_SESSION['user']->getId(),
-				'owner' => $submission->getOwner()->getId(),
-			);
-		}
+		$return = array(
+			'box_id' => $submission->getSubmissionBox()->getId(),
+			'marker' => $_SESSION['user']->getId(),
+			'owner' => $submission->getOwner()->getId(),
+		);
 
 		/* Do what returnWorkForm usually does
 		 */
