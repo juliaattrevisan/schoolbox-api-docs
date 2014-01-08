@@ -21,6 +21,13 @@
 			downloadElement: '#crocodoc-download'
 		});
 
+		$('#navigator').crocodocNavigator({
+			box: '{SUBMISSION_BOX_ID}',
+			current: '{SUBMISSION_NAVIGATION_CURRENT_USER}',
+			direct: '{SUBMISSION_NAVIGATION_DIRECT}',
+			items: '{SUBMISSION_NAVIGATION_ITEMS}'
+		});
+
 		// Add the dark class only to even rows that are visible (skip over the hidden ones)
 		$j('tbody tr:visible:even').addClass('dark');
 
@@ -62,10 +69,11 @@
 		$j('.combobox').combobox({COMBO_OPTIONS});
 	});
 </script>
-
+<div id="navigator"></div>
 <iframe id="crocodoc"></iframe>
 
 <h2>Assign marks</h2>
+
 
 <span class="header_option">
     <!-- BEGIN download_btn -->

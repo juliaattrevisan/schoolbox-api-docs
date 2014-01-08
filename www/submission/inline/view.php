@@ -27,6 +27,13 @@ foreach ($studentList as $currentStudent) {
 	if (!in_array($currentStudent['uid'], $processed)) {
 		$processed[] = $currentStudent['uid'];
 
+		/* Augment navigation data
+		 */
+		$currentStudent['navigation'] = array(
+			'label' => $currentStudent['lastname'] . ', ' . $currentStudent['firstname'],
+			'value' => '/submission/inline/view/' . $submissionBoxId . '/' . $currentStudent['uid']
+		);
+
 		$stack[] = $currentStudent;
 	}
 }
@@ -49,11 +56,12 @@ for ($i=0; $i < count($stack); $i++) {
 			$currentStudent['submission'] = $collection->first()->getSubmission();
 		}
 
-		$singleStudent[] = $currentStudent;
-
-		/* For navigation purposes
+		/* Previous
 		 */
 		$previousStudent = $stack[$i-1];
+
+		/* Next
+		 */
 		$nextStudent = $stack[$i+1];
 
 		break;
@@ -65,17 +73,29 @@ for ($i=0; $i < count($stack); $i++) {
 $userMapper = new \Schoolbox\UserMapper();
 $user = $userMapper->findById($this->arg[1]);
 
-$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
-
 if ($currentStudent['submission'] != null) {
 	$submissionId = $currentStudent['submission']->getId();
 }
 
+/* Data for the navigation selector
+ */
+$navigationItems = json_encode($stack);
+
+$navigationDirect = json_encode(array(
+	'previous' => $previousStudent,
+	'current' => $currentStudent,
+	'next' => $nextStudent,
+));
+
+$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
+
 $this->setVar(array(
 	'SUBMISSION_ID' => $submissionId,
-	'STUDENT_FULL_NAME' => $user->getFullName()
+	'SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
+	'SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
+	'STUDENT_FULL_NAME' => $user->getFullName(),
 ));
 
 $dueWorkDetail = new DueWork_Detail($submissionBoxId);
-$dueWorkDetail->processStudents($singleStudent);
+$dueWorkDetail->processStudents(array($singleStudent));
 $dueWorkDetail->renderDetails($this);
