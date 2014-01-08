@@ -76,7 +76,13 @@
 			var defaults = {
 				element: element,
 				items: [],
-				currentId: 0
+				currentId: 0,
+
+				/* Callbacks
+				 */
+				selectItemCallback: function() {},
+				previousItemCallback: function() {},
+				nextItemCallback: function() {}
 			}
 
 			var derived = {
@@ -98,14 +104,24 @@
 				var label = config.items[i].navigation.label;
 				var value = config.items[i].navigation.value;
 
-				var option = '<option value="'+ value +'">'+ label +'</option>';
+				/* Preselected dropdown element
+				 */
+				var selected = '';
+
+				if (config.currentId == config.items[i].navigation.id) {
+					var selected = 'selected="selected"';
+				}
+
+				var option = '<option value="'+ value +'"'+ selected +'>'+ label +'</option>';
 
 				allOptions += option;
 			}
 
-			var select = '<select class="context-selector">' + allOptions + '</select>';
+			var select = '<select class="context-select">' + allOptions + '</select>';
 
 			config.element.append(select);
+
+			config.selectItemCallback();
 		}
 	}
 }(jQuery));

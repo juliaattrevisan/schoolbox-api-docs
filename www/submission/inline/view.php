@@ -30,6 +30,7 @@ foreach ($studentList as $currentStudent) {
 		/* Augment navigation data
 		 */
 		$currentStudent['navigation'] = array(
+			'id' => $currentStudent['uid'],
 			'label' => $currentStudent['lastname'] . ', ' . $currentStudent['firstname'],
 			'value' => '/submission/inline/view/' . $submissionBoxId . '/' . $currentStudent['uid']
 		);
@@ -91,6 +92,7 @@ $this->setFile(TEMPLATE_content, 'submission/inline/view.html');
 
 $this->setVar(array(
 	'SUBMISSION_ID' => $submissionId,
+	'SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
 	'SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
 	'SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
 	'STUDENT_FULL_NAME' => $user->getFullName(),

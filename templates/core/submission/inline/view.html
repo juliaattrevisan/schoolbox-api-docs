@@ -23,9 +23,21 @@
 
 		$('#navigator').crocodocNavigator({
 			box: '{SUBMISSION_BOX_ID}',
-			current: '{SUBMISSION_NAVIGATION_CURRENT_USER}',
+			currentId: '{SUBMISSION_NAVIGATION_CURRENT_ID}',
 			direct: '{SUBMISSION_NAVIGATION_DIRECT}',
-			items: '{SUBMISSION_NAVIGATION_ITEMS}'
+			items: '{SUBMISSION_NAVIGATION_ITEMS}',
+
+			/* Callback methods
+			 */
+			selectItemCallback: function() {
+				$('.context-select').change(function() {
+					window.location.href = $(this).val();
+				});
+			},
+			previousItemCallback: function() {
+			},
+			nextItemCallback: function() {
+			}
 		});
 
 		// Add the dark class only to even rows that are visible (skip over the hidden ones)
