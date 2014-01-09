@@ -8,10 +8,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Crocodoc;
+namespace Crocodoc\Template;
 
 
-class TemplateFactory {
+class Factory {
 
 	/**
 	 * An instance of Submission
@@ -32,30 +32,40 @@ class TemplateFactory {
 	);
 
 	/**
+	 * An instance of SitePage
+	 *
+	 * @var null
+	 */
+	private $page = null;
+
+	/**
 	 * Force a submission object, or null
 	 * (silly php)
 	 *
+	 * @param $page
 	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
 	 */
-	public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null) {
+	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null) {
+		$this->setPage($page);
 		$this->setSubmission($submission);
 	}
 
 	/**
 	 * Decide which template file to load based on the submission contents
+	 * Spawn a renderer
 	 */
 	public function produce() {
 		if ($this->getSubmission() === null) {
-			return 'submission/inline/none.html';
+			return new Renderer\None($this->getPage());
 		}
 		else if (in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
-			return 'submission/inline/view.html';
+			return new Renderer\View($this->getPage());
 		}
 		else {
-			return 'submission/inline/download.html';
+			return new Renderer\Download($this->getPage());
 		}
 
-		return 'submission/inline/none.html';
+		return new Renderer\None($this->getPage());
 	}
 
 	/* Getters/Setters
@@ -95,5 +105,23 @@ class TemplateFactory {
 	 */
 	private function getAllowedFileTypes() {
 		return $this->allowedFileTypes;
+	}
+
+	/**
+	 * Set page
+	 *
+	 * @param null $page
+	 */
+	private function setPage($page) {
+		$this->page = $page;
+	}
+
+	/**
+	 * Get page
+	 *
+	 * @return null
+	 */
+	private function getPage() {
+		return $this->page;
 	}
 }
