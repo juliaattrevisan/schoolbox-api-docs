@@ -91,11 +91,6 @@ $user = $userMapper->findById($this->arg[1]);
 
 if ($currentStudent['submission'] != null) {
 	$submissionId = $currentStudent['submission']->getId();
-
-	$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
-}
-else {
-	$this->setFile(TEMPLATE_content, 'submission/inline/none.html');
 }
 
 /* Data for the navigation selector
@@ -107,6 +102,11 @@ $navigationDirect = json_encode(array(
 	'current' => $currentStudent,
 	'next' => $nextStudent,
 ));
+
+$templateFactory = new \Crocodoc\TemplateFactory($currentStudent['submission']);
+$templateFile = $templateFactory->produce();
+
+$this->setFile(TEMPLATE_content, $templateFile);
 
 $this->setVar(array(
 	'CROCODOC_SUBMISSION_ID' => $submissionId,

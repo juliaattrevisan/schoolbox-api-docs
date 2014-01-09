@@ -454,6 +454,15 @@ class Submission {
 		return $this;
 	}
 
+	/**
+	 * Get the file extension of the thing that was uploaded
+	 *
+	 * @return string
+	 */
+	public function getFileExtension() {
+		$filename = $this->getFilename();
 
+		return substr(strrchr($filename, '.'), 1);
+	}
 }
 
