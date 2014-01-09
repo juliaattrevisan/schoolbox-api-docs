@@ -6193,16 +6193,16 @@ STUDENT AND PARENT DIRECTORIES
     }
 }
 
-.directory .directory-sorter {
+.directory .directory-sorter:not(.sorter-false) {
     background: darken(@dark,@darken-value / 4) url(/images/core/tablesorter/sort.gif) no-repeat 100% 50%;
     padding-right: 21px;
 }
 
-.directory .directory-sorter.headerSortDown {
+.directory .directory-sorter.tablesorter-headerAsc {
     background-image: url(/images/core/tablesorter/sort-ascending.gif);
 }
 
-.directory .directory-sorter.headerSortUp {
+.directory .directory-sorter.tablesorter-headerDesc {
     background-image: url(/images/core/tablesorter/sort-descending.gif);
 }
 
