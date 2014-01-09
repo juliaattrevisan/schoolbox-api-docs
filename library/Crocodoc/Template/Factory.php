@@ -39,15 +39,28 @@ class Factory {
 	private $page = null;
 
 	/**
+	 * An array of previous, current and next students
+	 *
+	 * @var array
+	 */
+	private $navigationElements = array();
+
+	/**
 	 * Force a submission object, or null
 	 * (silly php)
 	 *
+	 * navigationElements is an array of previous, current and next students
+	 * This is used in the Return Work control html, to determine where to go
+	 * (some submissions don't use crocodoc)
+	 *
 	 * @param $page
 	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
+	 * @param $navigationElements
 	 */
-	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null) {
+	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null, $navigationElements) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
+		$this->setNavigationElements($navigationElements);
 	}
 
 	/**
@@ -56,16 +69,16 @@ class Factory {
 	 */
 	public function produce() {
 		if ($this->getSubmission() === null) {
-			return new Renderer\None($this->getPage(), $this->getSubmission());
+			return new Renderer\None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		else if (in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
-			return new Renderer\Crocodoc($this->getPage(), $this->getSubmission());
+			return new Renderer\Crocodoc($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		else {
-			return new Renderer\Download($this->getPage(), $this->getSubmission());
+			return new Renderer\Download($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 
-		return new Renderer\None($this->getPage(), $this->getSubmission());
+		return new Renderer\None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 	}
 
 	/* Getters/Setters
@@ -123,5 +136,23 @@ class Factory {
 	 */
 	private function getPage() {
 		return $this->page;
+	}
+
+	/**
+	 * Set navigation elements
+	 *
+	 * @param array $navigationElements
+	 */
+	private function setNavigationElements($navigationElements) {
+		$this->navigationElements = $navigationElements;
+	}
+
+	/**
+	 * Get navigation elements
+	 *
+	 * @return array
+	 */
+	private function getNavigationElements() {
+		return $this->navigationElements;
 	}
 }

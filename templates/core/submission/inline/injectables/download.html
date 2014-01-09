@@ -17,7 +17,35 @@
 				<!-- BEGIN overdue -->(Overdue)<!-- END overdue -->
 			</span>
 			<span class="icon"></span>
+
 		</a>
 	</li>
 </ul>
 
+<h2>Upload File</h2>
+<p>
+	Upload the marked submission.
+</p>
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$j('.prettify').prettyFileInput({
+			inputHolderClass:'file-input not-static',
+			buttonClass:'btn up-arrow',
+			buttonActiveClass:'tick no-text',
+			defaultText:'<span></span>Select marked work',
+			defaultFileSelectedText:'<span></span>'
+		});
+	});
+</script>
+<div>
+	<form action='/submission/returnWorkForm.php' id='#returnWorkUpload' method="post" enctype="multipart/form-data">
+		<input type="hidden" name='uid[]' value="{OWNER_ID}"/>
+		<input type="hidden" name='box_id' value="{BOX_ID}"/>
+		<input type="file" name="file-return-{OWNER_ID}" class="prettify"/>
+		<input type="hidden" class="mark-update" name="markUpdate" value="false">
+		<input type="hidden" name="redirect" value="/submission/inline/view/{BOX_ID}/{OWNER_ID}" />
+		<input type="submit" class='submit-btn-plain' value="Upload Returned Work" />
+	</form>
+	<div class="clearfix"></div>
+</div>

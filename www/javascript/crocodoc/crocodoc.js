@@ -12,7 +12,7 @@
 		 */
 		var config = init(options, this);
 
-		returnLink();
+//		returnLink();
 		crocodoc();
 
 		/**
@@ -26,19 +26,16 @@
 		function init(options, element) {
 			var defaults = {
 				viewElement: element,
+				boxId: 0,
 				submissionId: 0,
-				view: '',
-				download: '',
-				downloadElement: null,
 				direct: [],
-				listUrl: ''
+				downloadElement: null
 			}
 
 			var derived = {
 				submissionId: parseInt(options.submissionId),
 				url: {
-					view: '/submission/inline/iframe?submissionId=' + parseInt(options.submissionId),
-					download: '/submission/inline/download/' + parseInt(options.submissionId)
+					view: '/submission/inline/iframe?submissionId=' + parseInt(options.submissionId)
 				},
 				listUrl: '/submission/viewSubmission/' + parseInt(options.boxId)
 			}
@@ -49,42 +46,21 @@
 			return merged;
 		}
 
-		/**
-		 * Return work
-		 */
-		function returnLink() {
-
-			/* If the student hasn't submitted anything, they shouldn't get a download
-			 * link - instead, redirect them to the next person (if one exists)
-			 */
-			var downloadUrl = config.url.download;
-
-			if (config.submissionId <= 0) {
-
-				/* If there is someone coming up, go to their latest submission
-				 */
-				if (config.direct.next !== undefined) {
-					downloadUrl = config.direct.next.navigation.value;
-				}
-				/* Otherwise, list screen
-				 */
-				else {
-					downloadUrl = config.listUrl;
-				}
-			}
-
-			$(config.downloadElement).attr('action', downloadUrl);
-
-			/* Go back to the list screen if you fell off the end of the list
-			 */
-			var nextUrl = config.listUrl;
-
-			if ((config.direct.next !== undefined) && (config.direct.next !== null)) {
-				var nextUrl = config.direct.next.navigation.value;
-			}
-
-			$(config.downloadElement).find('input[name=nextUrl]').val(nextUrl);
-		}
+//		/**
+//		 * Return work
+//		 */
+//		function returnLink() {
+//
+//			/* Go back to the list screen if you fell off the end of the list
+//			 */
+//			var nextUrl = config.listUrl;
+//
+//			if ((config.direct.next !== undefined) && (config.direct.next !== null)) {
+//				var nextUrl = config.direct.next.navigation.value;
+//			}
+//
+//			$(config.downloadElement).find('input[name=nextUrl]').val(nextUrl);
+//		}
 
 		/**
 		 * Start crocodoc inline marking

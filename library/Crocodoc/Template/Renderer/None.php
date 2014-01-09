@@ -19,6 +19,13 @@ class None extends Base {
 	protected $templateFile = 'submission/inline/injectables/none.html';
 
 	/**
+	 * Control file, to determine how to return work
+	 *
+	 * @var string
+	 */
+	protected $controlFile = 'submission/inline/injectables/redirect-return-control.html';
+
+	/**
 	 * Render injectable
 	 *
 	 * @return mixed|void
@@ -26,5 +33,8 @@ class None extends Base {
 	public function render() {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
+
+		$this->getPage()->setFile('injectableControl', $this->getControlFile());
+		$this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');
 	}
 } 

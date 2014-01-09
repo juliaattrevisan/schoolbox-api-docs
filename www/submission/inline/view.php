@@ -97,15 +97,17 @@ if ($currentStudent['submission'] != null) {
  */
 $navigationItems = json_encode($stack);
 
-$navigationDirect = json_encode(array(
+$navigationElements = array(
 	'previous' => $previousStudent,
 	'current' => $currentStudent,
 	'next' => $nextStudent,
-));
+);
+
+$navigationDirect = json_encode($navigationElements);
 
 $this->setFile(TEMPLATE_content, 'submission/inline/view.html');
 
-$templateFactory = new \Crocodoc\Template\Factory($this, $currentStudent['submission']);
+$templateFactory = new \Crocodoc\Template\Factory($this, $currentStudent['submission'], $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
 

@@ -21,6 +21,13 @@ class Crocodoc extends Base {
 	protected $templateFile = 'submission/inline/injectables/crocodoc.html';
 
 	/**
+	 * Control file, to determine how to return work
+	 *
+	 * @var string
+	 */
+	protected $controlFile = 'submission/inline/injectables/crocodoc-return-control.html';
+
+	/**
 	 * Render injectable
 	 *
 	 * @return mixed|void
@@ -28,5 +35,25 @@ class Crocodoc extends Base {
 	public function render() {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
+
+		$this->getPage()->setFile('injectableControl', $this->getControlFile());
+
+		/* Determine download url
+		 * This downloads it from crocodoc to Schoolbox
+		 */
+		$downloadUrl = '/submission/inline/download/' . $this->getSubmission()->getId();
+
+		/* Determine next url
+		 */
+		$navigationElements = $this->getNavigationElements();
+
+		$nextUrl = $navigationElements['next']['navigation']['value'];
+
+		$this->getPage()->setVar(array(
+			'INJECTABLE_CONTROL_URL' => $downloadUrl,
+			'INJECTABLE_CONTROL_NEXT_URL' => $nextUrl,
+		));
+
+		$this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');
 	}
-} 
+}

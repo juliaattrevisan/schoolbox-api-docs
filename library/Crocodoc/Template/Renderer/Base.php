@@ -28,6 +28,13 @@ abstract class Base {
 	protected $submission = null;
 
 	/**
+	 * An array of previous, current and next students
+	 *
+	 * @var array
+	 */
+	private $navigationElements = array();
+
+	/**
 	 * The template file to inject
 	 *
 	 * @var string
@@ -39,10 +46,12 @@ abstract class Base {
 	 *
 	 * @param $page
 	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
+	 * @param $navigationElements
 	 */
-	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null) {
+	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null, $navigationElements) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
+		$this->setNavigationElements($navigationElements);
 	}
 
 	/**
@@ -107,5 +116,41 @@ abstract class Base {
 	 */
 	protected function getSubmission() {
 		return $this->submission;
+	}
+
+	/**
+	 * Set control file
+	 *
+	 * @param string $controlFile
+	 */
+	protected function setControlFile($controlFile) {
+		$this->controlFile = $controlFile;
+	}
+
+	/**
+	 * Get control file
+	 *
+	 * @return string
+	 */
+	public function getControlFile() {
+		return $this->controlFile;
+	}
+
+	/**
+	 * Set navigation elements
+	 *
+	 * @param array $navigationElements
+	 */
+	protected function setNavigationElements($navigationElements) {
+		$this->navigationElements = $navigationElements;
+	}
+
+	/**
+	 * Get navigation elements
+	 *
+	 * @return array
+	 */
+	protected function getNavigationElements() {
+		return $this->navigationElements;
 	}
 }

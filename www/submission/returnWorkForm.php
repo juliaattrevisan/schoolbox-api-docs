@@ -75,7 +75,15 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
             }
         }
     }
-    $page->localRedir('/submission/viewSubmission/' . $_POST['box_id']);
+
+	/* Redirect back to crocodoc marking screen
+	 */
+	if (strlen($_POST['redirect'])) {
+		$page->localRedir($_POST['redirect']);
+	}
+	else {
+	    $page->localRedir('/submission/viewSubmission/' . $_POST['box_id']);
+	}
 }
 
 
