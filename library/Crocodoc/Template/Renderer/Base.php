@@ -40,7 +40,7 @@ abstract class Base {
 	 * @param $page
 	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
 	 */
-	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission) {
+	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
 	}
