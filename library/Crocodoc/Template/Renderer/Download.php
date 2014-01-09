@@ -21,6 +21,13 @@ class Download extends Base {
 	protected $templateFile = 'submission/inline/injectables/download.html';
 
 	/**
+	 * Control file, to determine how to return work
+	 *
+	 * @var string
+	 */
+	protected $controlFile = 'submission/inline/injectables/redirect-return-control.html';
+
+	/**
 	 * Render injectable
 	 *
 	 * @return mixed|void
@@ -41,6 +48,27 @@ class Download extends Base {
 		));
 
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
+
+		/* Control how Return Work is done
+		 */
+		$this->getPage()->setFile('injectableControl', $this->getControlFile());
+
+		/* Determine next url
+		 */
+		$navigationElements = $this->getNavigationElements();
+
+		if (is_array($navigationElements['next'])) {
+			$nextUrl = $navigationElements['next']['navigation']['value'];
+		}
+		else {
+			$nextUrl = '/submission/viewSubmission/' . $this->getSubmission()->getSubmissionBox()->getId();
+		}
+
+		$this->getPage()->setVar(array(
+			'INJECTABLE_CONTROL_NEXT_URL' => $nextUrl,
+		));
+
+		$this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');
 	}
 
 	/**

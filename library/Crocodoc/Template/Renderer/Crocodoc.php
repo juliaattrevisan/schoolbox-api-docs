@@ -36,6 +36,8 @@ class Crocodoc extends Base {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
+		/* Control how Return Work is done
+		 */
 		$this->getPage()->setFile('injectableControl', $this->getControlFile());
 
 		/* Determine download url
@@ -47,7 +49,12 @@ class Crocodoc extends Base {
 		 */
 		$navigationElements = $this->getNavigationElements();
 
-		$nextUrl = $navigationElements['next']['navigation']['value'];
+		if (is_array($navigationElements['next'])) {
+			$nextUrl = $navigationElements['next']['navigation']['value'];
+		}
+		else {
+			$nextUrl = '/submission/viewSubmission/' . $this->getSubmission()->getSubmissionBox()->getId();
+		}
 
 		$this->getPage()->setVar(array(
 			'INJECTABLE_CONTROL_URL' => $downloadUrl,
