@@ -85,29 +85,80 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		return $currentDay;
 	}
 
-	public function getPeriodNumber ($campusId) {
+    /**
+     * Gets a statement for fetching the periods for a given campus. Has
+     * parameters :campusId (and :day if $single_day is true).
+     *
+     * @param bool $single_day True if fetching only a single day's timetable.
+     *
+     * @return PDOStatement
+     */
+    protected function getPeriodStatement($single_day = false) {
+        $query = "
+            SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
+            FROM timetable_campus tc
+            LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+            LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
+            WHERE tc.campus_id = :campusId
+            AND tc.start < NOW()
+            AND tc.finish > NOW()
+        ";
+        if ($single_day) {
+            $query .= ' AND tp.day = :day ';
+        }
+        return $this->getDatabase()->prepare($query);
+    }
+
+    /**
+     * Gets a statement for fetching a user's classes.
+     *
+     * @return PDOStatement
+     */
+    protected function getClassUserStatement() {
+        return $this->getDatabase()->prepare("
+            SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id
+            FROM class_user cl
+            LEFT JOIN class c ON c.id = cl.class_id
+            LEFT JOIN class_period cp ON cp.class_id = c.id
+            WHERE cl.user_id = :userId
+        ");
+    }
+
+    /**
+     * Hilariously this method doesn't return a number at all!
+     *
+     * @param int $campusId
+     *
+     * @return array
+     */
+    public function getPeriodNumber ($campusId) {
+        // Surely this should take a day number????
+
         if ( !$definition = $this->getTimetableDefinition($campusId) ) {
             return false;
         }
 
-		if ( empty($definition['regular']) ) {
-			return false;
-		}
-	}
+        if ( empty($definition['regular']) ) {
+            return false;
+        }
+
+        $periodStatement = $this->getPeriodStatement(false);
+        $periodStatement->execute(array(':campusId' => $campusId,));
+        $current_time = date('H:i:s');
+        foreach ($periodStatement as $item) {
+            if ($item['start'] <= $current_time && $item['finish'] >= $current_time) {
+                return array(
+                    'PeriodNumber'    => $item['sequence'],
+                    'PeriodNumberSeq' => 1,
+                );
+            }
+        }
+        return false;
+    }
 
 	public function getFullTimetable ($externalUserId, $userId, $campusId) {
 		/* Get current campus timetable */
-		$periodStatement = $this->getDatabase()->prepare("
-			SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
-			FROM timetable_campus tc
-			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-			LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
-			WHERE tc.campus_id = :campusId
-                AND tc.start < NOW()
-			    AND tc.finish > NOW()
-			ORDER BY tp.day ASC, tp.sequence ASC
-		");
-
+		$periodStatement = $this->getPeriodStatement(false);
 		$periodStatement->execute( array(
 			':campusId' => $campusId,
 		) );
@@ -115,14 +166,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
 
 		/* Get user's classes */
-		$classStatement = $this->getDatabase()->prepare("
-			SELECT c.name, c.code, c.description, cp.period_id
-			FROM class_user cl
-			LEFT JOIN class c ON c.id = cl.class_id
-			LEFT JOIN class_period cp ON cp.class_id = c.id
-			WHERE cl.user_id = :userId
-		");
-
+		$classStatement = $this->getClassUserStatement();
 		$classStatement->execute( array(
 			':userId' => $userId,
 		) );
@@ -153,7 +197,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 				if ( $class['period_id'] == $period['id'] ) {
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['description'] = $class['name'];
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['code'] = $class['code'];
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['room'] = '';
+					$periodListAdaption[$periodSequence]['day'][$dayNumber]['room'] = $class['room'];
 
 					unset($classList[$i]);
 				}
@@ -165,18 +209,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
 		/* Get current campus timetable */
-		$periodStatement = $this->getDatabase()->prepare("
-			SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
-			FROM timetable_campus tc
-			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-			LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
-			WHERE tc.campus_id = :campusId
-                AND tc.start < NOW()
-			    AND tc.finish > NOW()
-				AND tp.day = :day
-			ORDER BY tp.day ASC, tp.sequence ASC
-		");
-
+		$periodStatement = $this->getPeriodStatement(true);
 		$periodStatement->execute( array(
 			':campusId' => $campusId,
 		    ':day' => $dayNumber
@@ -185,14 +218,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
 
 		/* Get user's classes */
-		$classStatement = $this->getDatabase()->prepare("
-			SELECT c.name, c.code, c.description, cp.period_id
-			FROM class_user cl
-			LEFT JOIN class c ON c.id = cl.class_id
-			LEFT JOIN class_period cp ON cp.class_id = c.id
-			WHERE cl.user_id = :userId
-		");
-
+		$classStatement = $this->getClassUserStatement();
 		$classStatement->execute( array(
 			':userId' => $userId,
 		) );

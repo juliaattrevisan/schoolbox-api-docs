@@ -1,0 +1,92 @@
+<?php
+/**
+ * Mapper for class objects.
+ *
+ * This is only used by the Schoolbox connector.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright 2013 Alaress Pty Ltd
+ * @link      http://www.alaress.com.au
+ */
+
+namespace Schoolbox\External;
+use Schoolbox;
+
+class ClassPeriodMapper extends Schoolbox\External\Mapper {
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function mapping() {
+        $this->hasTable('class_period');
+        $this->hasModel('\\Schoolbox\\External\\ClassPeriod');
+        $this->hasMap(array(
+            'column'     => 'id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true
+        ));
+        $this->hasMap(array(
+            'column'   => 'class_id',
+            'property' => 'class',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'class',
+        ));
+        $this->hasMap(array(
+            'column'   => 'period_id',
+            'property' => 'period',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'period',
+        ));
+        $this->hasMap(array(
+            'column'   => 'teacher_id',
+            'property' => 'teacher',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'teacher',
+        ));
+        $this->hasMap(array(
+            'column'   => 'room',
+            'property' => 'room',
+            'type'     => self::TYPE_STRING,
+        ));
+        $this->hasJoin(
+            'class',
+            array(
+                'mapper'    => '\\Schoolbox\\External\\ClassEntryMapper',
+                'this_key'  => 'class_id',
+                'other_key' => 'id',
+            )
+        );
+        $this->hasJoin(
+            'period',
+            array(
+                'mapper'    => '\\Schoolbox\\External\\TimetablePeriodMapper',
+                'this_key'  => 'period_id',
+                'other_key' => 'id',
+            )
+        );
+        $this->hasJoin(
+            'teacher',
+            array(
+                'mapper'    => '\\Schoolbox\\UserMapper',
+                'this_key'  => 'teacher_id',
+                'other_key' => 'id',
+            )
+        );
+    }
+
+    /**
+     * Clears all timetable period entries for this class.
+     *
+     * @param ClassEntry      $class
+     * @param TimetablePeriod $period
+     *
+     * @return int
+     */
+    public function deleteForClassAndPeriod(ClassEntry $class, TimetablePeriod $period) {
+        $query = "DELETE FROM `{$this->getTable()}` WHERE `class_id` = :class AND `period_id` = :cycle";
+        $statement = $this->database->prepare($query);
+        $statement->execute(array('class' => $class->getId(), 'cycle' => $period->getId()));
+        return $statement->rowCount();
+    }
+}
