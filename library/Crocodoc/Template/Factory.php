@@ -59,7 +59,7 @@ class Factory {
 			return new Renderer\None($this->getPage());
 		}
 		else if (in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
-			return new Renderer\View($this->getPage());
+			return new Renderer\Crocodoc($this->getPage());
 		}
 		else {
 			return new Renderer\Download($this->getPage());
