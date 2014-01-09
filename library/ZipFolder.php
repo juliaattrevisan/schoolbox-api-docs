@@ -102,7 +102,7 @@ class ZipFolder {
                         $folderName = $this->cleanName($folder['name']);
                         $folderLocation = $currentDir . '/' . $folderName;
                         @mkdir($folderLocation);
-                        $this->createDirectory($folderLocation, $folder['id'], ++$depth);
+                        $this->createDirectory($folderLocation, $folder['id'], $depth+1);
                     }
                 }
             }
@@ -110,11 +110,33 @@ class ZipFolder {
     }
 
     function createZip() {
-
-        $archive = new PclZip($this->tmpZip);
+        $archive = new ZipArchive();
+        $archive->open($this->tmpZip, ZipArchive::CREATE);
         mkdir($this->tmpFolder);
         $this->createDirectory($this->tmpFolder, $this->folder);
-        $archive->create($this->tmpFolder . '/', PCLZIP_OPT_REMOVE_PATH, $this->tmpFolder);
+        $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
+
+        $i      = 0;
+        $ulimit = 250;
+        foreach (new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST) as $file) {
+            // Close/open archive after 250 additions, to avoid ulimit issues
+            if ($i++ % $ulimit === ($ulimit-1)) {
+                $archive->close();
+                $archive->open($this->tmpZip);
+            }
+
+            /** @var SplFileInfo $file */
+            // Chop parts of path that match $this->tmpFolder
+            $filePath = $file->getPath() . '/' . $file->getFilename();
+            $zipPath  = substr($filePath, strlen($this->tmpFolder)+1);
+            if ($file->isDir()) {
+                $archive->addEmptyDir($zipPath);
+            }
+            elseif ($file->isFile()) {
+                $archive->addFile($filePath, $zipPath);
+            }
+        }
+        $archive->close();
         return true;
 
     }
