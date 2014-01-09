@@ -67,6 +67,7 @@ $contextSelector->render($this, 'CONTEXT_SELECTOR', array(
 ));
 
 
+$subjectList = array();
 /* Use provided ID, or check for the subjects the user is involved with */
 if(isset($this->arg[2]) && is_numeric($this->arg[2])){
     $subjectList[] = $this->arg[2];
