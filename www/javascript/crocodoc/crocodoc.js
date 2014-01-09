@@ -12,6 +12,7 @@
 		 */
 		var config = init(options, this);
 
+		returnLink();
 		crocodoc();
 
 		/**
@@ -28,7 +29,9 @@
 				submissionId: 0,
 				view: '',
 				download: '',
-				downloadElement: null
+				downloadElement: null,
+				direct: [],
+				listUrl: ''
 			}
 
 			var derived = {
@@ -36,12 +39,51 @@
 				url: {
 					view: '/submission/inline/iframe?submissionId=' + parseInt(options.submissionId),
 					download: '/submission/inline/download/' + parseInt(options.submissionId)
-				}
+				},
+				listUrl: '/submission/viewSubmission/' + parseInt(options.boxId)
 			}
 
 			var merged = $j.extend(defaults, derived, options);
+			merged.direct = jQuery.parseJSON(merged.direct);
 
 			return merged;
+		}
+
+		/**
+		 * Return work
+		 */
+		function returnLink() {
+
+			/* If the student hasn't submitted anything, they shouldn't get a download
+			 * link - instead, redirect them to the next person (if one exists)
+			 */
+			var downloadUrl = config.url.download;
+
+			if (config.submissionId <= 0) {
+
+				/* If there is someone coming up, go to their latest submission
+				 */
+				if (config.direct.next !== undefined) {
+					downloadUrl = config.direct.next.navigation.value;
+				}
+				/* Otherwise, list screen
+				 */
+				else {
+					downloadUrl = config.listUrl;
+				}
+			}
+
+			$(config.downloadElement).attr('action', downloadUrl);
+
+			/* Go back to the list screen if you fell off the end of the list
+			 */
+			var nextUrl = config.listUrl;
+
+			if ((config.direct.next !== undefined) && (config.direct.next !== null)) {
+				var nextUrl = config.direct.next.navigation.value;
+			}
+
+			$(config.downloadElement).find('input[name=nextUrl]').val(nextUrl);
 		}
 
 		/**
@@ -50,7 +92,6 @@
 		function crocodoc() {
 			$.getJSON(config.url.view, function(data) {
 				$(config.viewElement).attr('src', data.url);
-				$(config.downloadElement).attr('href', config.url.download);
 			});
 		}
 	}

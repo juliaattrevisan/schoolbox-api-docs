@@ -18,4 +18,4 @@ $downloader->start();
 
 /* Get out of here
  */
-$this->backToTheFuture(1);
+$this->localRedir($_POST['nextUrl']);

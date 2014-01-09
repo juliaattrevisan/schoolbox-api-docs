@@ -8,8 +8,10 @@
 <script type='text/javascript'>
 	$(function() {
 		$('#crocodoc').crocodoc({
+			boxId: '{CROCODOC_SUBMISSION_BOX_ID}',
 			submissionId: '{CROCODOC_SUBMISSION_ID}',
-			downloadElement: '#crocodoc-download'
+			direct: '{CROCODOC_SUBMISSION_NAVIGATION_DIRECT}',
+			downloadElement: '#return-work'
 		});
 
 		$('#navigator').crocodocNavigator({
@@ -108,7 +110,7 @@
 	</table>
 </form>
 
-<h2>Return Marked Work</h2>
-<p>
-	<a id='crocodoc-download' href='#' class="btn"><span></span>Return marked work as PDF</a>
-</p>
+<form id="return-work" method="post">
+	<input type="hidden" name="nextUrl" value="" />
+	<input type="submit" class='submit-btn-plain' value="Return Marked Work" />
+</form>

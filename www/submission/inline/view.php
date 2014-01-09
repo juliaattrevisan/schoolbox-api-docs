@@ -111,6 +111,7 @@ $renderer->render();
 
 $this->setVar(array(
 	'CROCODOC_SUBMISSION_ID' => $submissionId,
+	'CROCODOC_SUBMISSION_BOX_ID' => $submissionBox['id'],
 	'CROCODOC_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
 	'CROCODOC_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
 	'CROCODOC_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
