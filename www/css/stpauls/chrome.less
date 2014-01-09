@@ -77,3 +77,39 @@
 }
 
 
+// Junior School Dashboard
+.box.junior-dashboard {
+    .item {
+        display: inline-block;
+        width: 128px;
+        height: 128px;
+        margin: 0 12px 12px 0;
+        cursor: pointer;
+
+        // Text shouldn't show
+        font: 0/0 a;
+        text-shadow: none;
+        color: transparent;
+
+        background-repeat: no-repeat;
+        background-position: 0 0;
+        &.myclass-dash {
+            background-image: url(/images/stpauls/junior-dashboard/class.png);
+        }
+        &.pyp-dash {
+            background-image: url(/images/stpauls/junior-dashboard/pyp.png);
+        }
+        &.inquiry-dash {
+            background-image: url(/images/stpauls/junior-dashboard/inquiry-centre.png);
+        }
+        &.chinese-dash {
+            background-image: url(/images/stpauls/junior-dashboard/chinese.png);
+        }
+        &.music-dash {
+            background-image: url(/images/stpauls/junior-dashboard/music.png);
+        }
+        &.pe-dash {
+            background-image: url(/images/stpauls/junior-dashboard/pe.png);
+        }
+    }
+}
