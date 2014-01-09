@@ -16,6 +16,7 @@ class Synchronise_Denbigh_Kings_Verbose {
     // Stats
     private $numCreated = 0;
     private $numUpdated = 0;
+    private $numDeleted = 0;
     private $numSkipped = 0;
 
 
@@ -68,6 +69,26 @@ class Synchronise_Denbigh_Kings_Verbose {
     public function performUpdate() {
         if ($this->getVerbose() === true) {
             echo "^  Performing update of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+        }
+    }
+
+    /**
+     * Echo message about planning delete
+     * @return void
+     */
+    public function planDelete() {
+        if ($this->getVerbose() === true) {
+            echo "-  Planning delete of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+        }
+    }
+
+    /**
+     * Echo message about performing delete
+     * @return void
+     */
+    public function performDelete() {
+        if ($this->getVerbose() === true) {
+            echo "-  Performing delete of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
         }
     }
 
@@ -131,6 +152,7 @@ class Synchronise_Denbigh_Kings_Verbose {
         echo "\n";
         echo "Created: {$this->getNumCreated()}, ";
         echo "Updated: {$this->getNumUpdated()}, ";
+        echo "Deleted: {$this->getNumDeleted()}, ";
         echo "Skipped: {$this->getNumSkipped()}";
         echo "\n\n";
     }
@@ -225,5 +247,22 @@ class Synchronise_Denbigh_Kings_Verbose {
      */
     public function getNumSkipped() {
         return $this->numSkipped;
+    }
+
+    /**
+     * Increment the number of items deleted
+     */
+    public function incrementDeleted() {
+        $this->numDeleted++;
+        return $this;
+    }
+
+    /**
+     * Get the number of items deleted
+     *
+     * @return int
+     */
+    public function getNumDeleted() {
+        return $this->numDeleted;
     }
 }

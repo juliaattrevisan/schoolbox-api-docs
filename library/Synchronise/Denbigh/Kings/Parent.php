@@ -22,8 +22,19 @@ class Synchronise_Denbigh_Kings_Parent extends Synchronise_Denbigh_Kings_Abstrac
 
         $this->getVerboseFilter()->intro();
 
+        $parentList = array();
         foreach($this->getList() as $currentParent) {
             $this->executeCreateUpdate($this->generateUserAttributes($currentParent));
+            $parentList[$currentParent['denbighID']] = true;
+        }
+
+        // Remove all parents not in Denbigh parent list
+        /** @var User $handler */
+        $handler = $this->getUserHandler();
+        foreach ($handler->getByGroup(self::PARENT_GROUP_ID) as $existingParent) {
+            if (empty($parentList[$existingParent['synergy_id']])) {
+                $this->executeDelete($existingParent);
+            }
         }
 
         $this->getVerboseFilter()->summary();
