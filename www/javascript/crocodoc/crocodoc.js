@@ -12,7 +12,6 @@
 		 */
 		var config = init(options, this);
 
-//		returnLink();
 		crocodoc();
 
 		/**
@@ -27,40 +26,22 @@
 			var defaults = {
 				viewElement: element,
 				boxId: 0,
-				submissionId: 0,
-				direct: [],
-				downloadElement: null
+				submissionId: 0
 			}
 
 			var derived = {
 				submissionId: parseInt(options.submissionId),
 				url: {
 					view: '/submission/inline/iframe?submissionId=' + parseInt(options.submissionId)
-				},
-				listUrl: '/submission/viewSubmission/' + parseInt(options.boxId)
+				}
 			}
 
 			var merged = $j.extend(defaults, derived, options);
-			merged.direct = jQuery.parseJSON(merged.direct);
+			merged.boxId = parseInt(merged.boxId);
+			merged.submissionId = parseInt(merged.submissionId);
 
 			return merged;
 		}
-
-//		/**
-//		 * Return work
-//		 */
-//		function returnLink() {
-//
-//			/* Go back to the list screen if you fell off the end of the list
-//			 */
-//			var nextUrl = config.listUrl;
-//
-//			if ((config.direct.next !== undefined) && (config.direct.next !== null)) {
-//				var nextUrl = config.direct.next.navigation.value;
-//			}
-//
-//			$(config.downloadElement).find('input[name=nextUrl]').val(nextUrl);
-//		}
 
 		/**
 		 * Start crocodoc inline marking

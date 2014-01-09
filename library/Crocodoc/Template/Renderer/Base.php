@@ -85,7 +85,7 @@ abstract class Base {
 
 		return $nextUrl;
 	}
-	
+
 	/* Getters/Setters
 	 */
 
