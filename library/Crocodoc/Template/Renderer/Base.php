@@ -21,6 +21,13 @@ abstract class Base {
 	protected $page = null;
 
 	/**
+	 * The submission
+	 *
+	 * @var null
+	 */
+	protected $submission = null;
+
+	/**
 	 * The template file to inject
 	 *
 	 * @var string
@@ -31,9 +38,11 @@ abstract class Base {
 	 * Constructor
 	 *
 	 * @param $page
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
 	 */
-	public function __construct($page) {
+	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission) {
 		$this->setPage($page);
+		$this->setSubmission($submission);
 	}
 
 	/**
@@ -80,5 +89,23 @@ abstract class Base {
 	 */
 	protected function getTemplateFile() {
 		return $this->templateFile;
+	}
+
+	/**
+	 * Set submission
+	 *
+	 * @param null $submission
+	 */
+	protected function setSubmission($submission) {
+		$this->submission = $submission;
+	}
+
+	/**
+	 * Get submission
+	 *
+	 * @return null
+	 */
+	protected function getSubmission() {
+		return $this->submission;
 	}
 }

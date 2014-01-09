@@ -103,11 +103,10 @@ $navigationDirect = json_encode(array(
 	'next' => $nextStudent,
 ));
 
-$templateFactory = new \Crocodoc\Template\Factory($this, $currentStudent['submission']);
-$renderer = $templateFactory->produce();
-
 $this->setFile(TEMPLATE_content, 'submission/inline/view.html');
 
+$templateFactory = new \Crocodoc\Template\Factory($this, $currentStudent['submission']);
+$renderer = $templateFactory->produce();
 $renderer->render();
 
 $this->setVar(array(

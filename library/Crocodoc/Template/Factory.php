@@ -56,16 +56,16 @@ class Factory {
 	 */
 	public function produce() {
 		if ($this->getSubmission() === null) {
-			return new Renderer\None($this->getPage());
+			return new Renderer\None($this->getPage(), $this->getSubmission());
 		}
 		else if (in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
-			return new Renderer\Crocodoc($this->getPage());
+			return new Renderer\Crocodoc($this->getPage(), $this->getSubmission());
 		}
 		else {
-			return new Renderer\Download($this->getPage());
+			return new Renderer\Download($this->getPage(), $this->getSubmission());
 		}
 
-		return new Renderer\None($this->getPage());
+		return new Renderer\None($this->getPage(), $this->getSubmission());
 	}
 
 	/* Getters/Setters
