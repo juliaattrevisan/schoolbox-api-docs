@@ -15,7 +15,6 @@
 </style>
 <script type='text/javascript'>
 	$(function() {
-
 		$('#crocodoc').crocodoc({
 			submissionId: '{CROCODOC_SUBMISSION_ID}',
 			downloadElement: '#crocodoc-download'
@@ -80,11 +79,13 @@
 		$j('.combobox').combobox({COMBO_OPTIONS});
 	});
 </script>
+
 <div id="navigator"></div>
+<a class='btn go-back' href="/submission/viewSubmission/{BOX_ID}"><span></span>Return to List</a>
+
 <iframe id="crocodoc"></iframe>
 
 <h2>Assign marks</h2>
-
 
 <span class="header_option">
     <!-- BEGIN download_btn -->
