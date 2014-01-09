@@ -53,19 +53,8 @@ class Download extends Base {
 		 */
 		$this->getPage()->setFile('injectableControl', $this->getControlFile());
 
-		/* Determine next url
-		 */
-		$navigationElements = $this->getNavigationElements();
-
-		if (is_array($navigationElements['next'])) {
-			$nextUrl = $navigationElements['next']['navigation']['value'];
-		}
-		else {
-			$nextUrl = '/submission/viewSubmission/' . $this->getSubmission()->getSubmissionBox()->getId();
-		}
-
 		$this->getPage()->setVar(array(
-			'INJECTABLE_CONTROL_NEXT_URL' => $nextUrl,
+			'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
 		));
 
 		$this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');

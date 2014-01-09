@@ -68,6 +68,24 @@ abstract class Base {
 	 */
 	abstract public function render();
 
+	/**
+	 * Determine what the next person's url is
+	 *
+	 * @return string
+	 */
+	protected function getNextUrl() {
+		$navigationElements = $this->getNavigationElements();
+
+		if (is_array($navigationElements['next'])) {
+			$nextUrl = $navigationElements['next']['navigation']['value'];
+		}
+		else {
+			$nextUrl = '/submission/viewSubmission/' . $this->getSubmission()->getSubmissionBox()->getId();
+		}
+
+		return $nextUrl;
+	}
+	
 	/* Getters/Setters
 	 */
 
