@@ -6,9 +6,9 @@
 <script type='text/javascript'>
 	$(function() {
 		$('#navigator').crocodocNavigator({
-			currentId: '{SUBMISSION_NAVIGATION_CURRENT_ID}',
-			direct: '{SUBMISSION_NAVIGATION_DIRECT}',
-			items: '{SUBMISSION_NAVIGATION_ITEMS}',
+			currentId: '{CROCODOC_SUBMISSION_NAVIGATION_CURRENT_ID}',
+			direct: '{CROCODOC_SUBMISSION_NAVIGATION_DIRECT}',
+			items: '{CROCODOC_SUBMISSION_NAVIGATION_ITEMS}',
 
 			/* Callback methods
 			 */
@@ -65,6 +65,7 @@
 	});
 </script>
 <div id="navigator"></div>
+<a class='btn go-back' href="/submission/viewSubmission/{BOX_ID}"><span></span>Return to List</a>
 
 <h1>No submission here</h1>
 
