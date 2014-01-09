@@ -28,7 +28,8 @@
     "eventie": "1.0.3",
     "doT": "1.0.1",
     "qtip2": "2.2.0",
-    "fullcalendar": "~1.6.4"
+    "fullcalendar": "1.6.4",
+    "jquery.tablesorter": "2.14.5"
   },
   "ignore": [
     "**/.*",
