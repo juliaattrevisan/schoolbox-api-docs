@@ -27,6 +27,72 @@ class Download extends Base {
 	 */
 	public function render() {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
+		$this->getPage()->setBlock('injectable', 'plag_score', 'plag_score_block');
+
+		$recentSubmissionDate = new \Alaress_Date_Relative($this->getSubmission()->getSubmitted(), 'U');
+		$this->plag();
+
+		$this->getPage()->setVar(array(
+			'MOST_RECENT_SUBMISSION_FILE_ID' => $this->getSubmission()->getId(),
+			'MOST_RECENT_SUBMISSION_FILE_NAME' => $this->getSubmission()->getFilename(),
+			'MOST_RECENT_SUBMISSION_FILE_SIZE' => $this->getSubmission()->getFilesize(),
+			'MOST_RECENT_SUBMISSION_FILE_THUMB' => $this->getSubmission()->getMimeType()->getIconFile(),
+			'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
+		));
+
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 	}
-} 
+
+	/**
+	 * Plag it
+	 */
+	private function plag() {
+		$isStaff = $_SESSION['user']->getRole()->isStaff();
+		$isOwner = $this->getSubmission()->getOwner()->getId() == $_SESSION['user']->getId();
+
+		if ($isStaff || ($isOwner && Config::get('plagscan_student_visible'))) {
+
+			// retrieve plagiarism score, if available
+			$docMapper = \Plagscan_DocumentMapper::getInstance();
+			$plagDoc = null;
+
+			try {
+				/* @var $plagDoc Plagscan_Document */
+				$plagDoc = $docMapper->findOneByColumn('file_id', $this->getSubmission()->getId());
+
+				if ($plagDoc->getId() && $plagDoc->getStatus() == \Plagscan_Document::STATUS_COMPLETE) {
+
+					// what colour should the plagiarism text be, and what should the tooltip say?
+					if($plagDoc->getScore() > 60) {
+						$status = 'critical';
+						$tooltip = 'Your submission is extremely similar to other documents scanned.';
+					}
+					elseif($plagDoc->getScore() > 20) {
+						$status = 'warn';
+						$tooltip = 'Your submission is somewhat similar to other documents scanned.';
+					}
+					else {
+						$status = 'ok';
+						$tooltip = 'Your submission is quite different to other documents scanned.';
+					}
+
+					$this->getPage()->setVar(array(
+						'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
+						'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => $plagDoc->getScore(),
+						'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
+					));
+					$this->getPage()->parse('plag_score_block', 'plag_score');
+				}
+				else {
+					$this->getPage()->setVar('plag_score_block', '');
+				}
+			}
+			catch (\Schoolbox\Mapper\Exception $e) {
+				$this->getPage()->setVar('plag_score_block', '');
+			}
+		}
+		else {
+			$this->getPage()->setVar('plag_score_block', '');
+		}
+	}
+}
