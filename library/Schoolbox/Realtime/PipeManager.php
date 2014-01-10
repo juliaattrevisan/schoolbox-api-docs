@@ -105,6 +105,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 				'error' => 'Unauthorized',
 				'code'  => 401,
 			)));
+
+			$pipe->close();
 		}
 
 	}
@@ -117,7 +119,16 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	function onClose(ConnectionInterface $conn) {
 		$this->v('Received socket closure');
 		// TODO: Implement onClose() method.
-		$this->unregisterPipe(new Pipe($conn));
+
+		$socketKey = Pipe::getSocketKeyForConnection($conn);
+
+		if(array_key_exists($socketKey, $this->pipesBySocketKey)) {
+			$this->unregisterPipe($this->pipesBySocketKey[$socketKey]);
+		}
+		else {
+			$this->v("Ignoring closure of '$socketKey'");
+		}
+
 	}
 
 	/**
@@ -154,6 +165,32 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 		$this->v(sprintf('Received message: %s (%s:%s) > %s', $username, $socketKey, $sessionId, $msg), '>');
 
+
+		// we'll just ignore messages that are of unknown origin
+		if(!$user) {
+			return;
+		}
+
+		$data = json_decode($msg, true);
+
+		// and we'll also ignore it if it doesn't parse as json in a way we expect
+		if(is_null($data) || count($data) != 1) {
+			return;
+		}
+
+		$request = each($data);
+
+		$command = $request['key'];
+		$arguments = $request['value'];
+
+		$method = 'doPipe' . ucfirst($command);
+
+		// process the command that's been sent from the client
+		if(method_exists($this, $method)) {
+			$this->v("Executing $method for $username [$socketKey]", '*');
+			$this->$method($pipe, $arguments);
+		}
+
 		// TODO: Implement onMessage() method.
 	}
 
@@ -162,6 +199,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * Register this pipe connection
 	 *
 	 * @param Pipe $pipe
+	 * @throws \Schoolbox\Mapper\Exception
 	 */
 	protected function registerPipe($pipe) {
 		$socketKey = $pipe->getSocketKey();
@@ -315,6 +353,17 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 
 
+	public function doPipe_($pipe, $arguments) {
+		$this->v('STUB!', 'd');
+	}
+
+	public function doPipeSubscribe($pipe, $arguments) {
+
+	}
+
+	public function doPipeUnsubscribe($pipe, $arguments) {
+
+	}
 
 
 	// noop
