@@ -54,7 +54,8 @@
 				 * Otherwise it's got errors in
 				 */
 				if (data.errors !== undefined && data.errors.length) {
-					$(config.errorElement).html(generateErrorString(data.errors));
+					$(config.errorElement).append(generateErrorString(data.errors));
+					$(config.errorElement).show();
 					$(config.viewElement).remove();
 				}
 				else {

@@ -10,7 +10,7 @@
 		$('#crocodoc').crocodoc({
 			boxId: '{CROCODOC_SUBMISSION_BOX_ID}',
 			submissionId: '{CROCODOC_SUBMISSION_ID}',
-			errorElement: '#errors'
+			errorElement: '#crocodoc-error-container'
 		});
 
 		$('#navigator').crocodocNavigator({
@@ -34,15 +34,18 @@
 		$j('.combobox').combobox({COMBO_OPTIONS});
 	});
 </script>
-
+<style type="text/css">
+	#crocodoc-error-container {
+		display: none;
+	}
+</style>
 <div class="clearfix">
 	<div id="navigator"></div>
 	<a class='btn go-back' href="/submission/viewSubmission/{BOX_ID}"><span></span>Return to List</a>
 </div>
 
 <div id="crocodoc-error-container">
-	<strong>Had a problem</strong>
-	<div id="errors"></div>
+	<strong>There were errors downloading document for inline grading:</strong>
 </div>
 
 {INJECTED_INTERFACE_TEMPLATE}
