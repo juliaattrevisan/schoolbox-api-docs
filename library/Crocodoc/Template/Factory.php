@@ -68,12 +68,28 @@ class Factory {
 	 * Spawn a renderer
 	 */
 	public function produce() {
+
+		/* No submission
+		 */
 		if ($this->getSubmission() === null) {
 			return new Renderer\None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
+		/* Crocodoc-friendly file types
+		 */
 		else if (in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
 			return new Renderer\Crocodoc($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
+		/* Other special presentation methods for inline viewing of media
+		 * such as images and videos
+		 */
+		else if (preg_match('#^image/*#',($this->getSubmission()->getMimeType()->getMime()))) {
+			return new Renderer\Image($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+		}
+		else if (preg_match('#^video/*#',($this->getSubmission()->getMimeType()->getMime()))) {
+			return new Renderer\Video($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+		}
+		/* Otherwise just download the file
+		 */
 		else {
 			return new Renderer\Download($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
