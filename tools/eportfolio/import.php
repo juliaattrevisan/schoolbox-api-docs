@@ -87,9 +87,13 @@ foreach ($destUserList as $destUser) {
             Eportfolio\PageMapper::getInstance()->create($newPage);
 
             // copy each component and its config to the new page.
+            // Ensure that they're in sequence though.
+            $i = 0;
             foreach ($componentList as $component) {
                 $newInstance = clone $component->getInstance();
-                $newInstance->setIdentifier($newPage->getPageId());
+                $newInstance
+                    ->setIdentifier($newPage->getPageId())
+                    ->setSequence($i++);
                 Component_InstanceMapper::getInstance()->create($newInstance);
 
                 // Copy each config
