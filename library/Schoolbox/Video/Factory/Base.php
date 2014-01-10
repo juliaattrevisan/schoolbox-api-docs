@@ -67,7 +67,7 @@ abstract class Base {
 				return $video;
 
 			case QueueMapper::FILE_TYPE_SUBMISSION:
-				$video = $videoMapper->findBySubmissionID($this->getId());
+				$video = $videoMapper->findBySubmissionId($this->getId());
 				return $video;
 
 			default: break;
