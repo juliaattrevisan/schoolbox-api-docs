@@ -39,6 +39,7 @@ class Image extends Base {
 		$this->getPage()->setFile('injectableControl', $this->getControlFile());
 
 		$this->getPage()->setVar(array(
+			'INJECTABLE_SUBMISSION_ID' => $this->getSubmission()->getId(),
 			'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
 		));
 
