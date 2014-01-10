@@ -23,6 +23,7 @@ class QueueMapper extends Mapper {
     /* Possible video types */
     const FILE_TYPE_SBFS = 'sbfs';
     const FILE_TYPE_STORAGE = 'storage';
+	const FILE_TYPE_SUBMISSION = 'submission';
 
     protected function mapping () {
         $this->hasTable('video_queue');
