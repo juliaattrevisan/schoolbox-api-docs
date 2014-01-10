@@ -1,0 +1,138 @@
+<?php
+/**
+ * Factory
+ *
+ * Spawn a video object based on its type and identifier
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Video\Factory;
+
+
+abstract class Base {
+
+	/**
+	 * An instance of group handler
+	 *
+	 * @var null
+	 */
+	protected $groupHandler = null;
+
+	/**
+	 * The type of video (submission, sbfs, storage etc)
+	 *
+	 * @var string
+	 */
+	protected $type = '';
+
+	/**
+	 * The identifier of the file (could be a hash or numeric index)
+	 *
+	 * @var string
+	 */
+	protected $id = '';
+
+	/**
+	 * Constructor
+	 *
+	 * @param $type
+	 * @param $id
+	 */
+	public function __construct($type, $id) {
+		$this->setGroupHandler(new Group());
+		$this->setType($type);
+		$this->setId($id);
+	}
+
+	/**
+	 * Spawn a video object
+	 *
+	 * @return null|object|ResourceVideo
+	 * @throws \Exception
+	 */
+	public function produce() {
+		$videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
+
+		switch($this->getType()) {
+			case QueueMapper::FILE_TYPE_STORAGE:
+				return $videoMapper->findByStorageHash($this->getId());
+
+			case QueueMapper::FILE_TYPE_SBFS:
+				$video = $videoMapper->findByFileId($this->getId());
+				$this->permissionCheck($video);
+				return $video;
+
+			case QueueMapper::FILE_TYPE_SUBMISSION:
+				$video = $videoMapper->findBySubmissionID($this->getId());
+				return $video;
+
+			default: break;
+		}
+	}
+
+	/**
+	 * Permission check prior to instantiation
+	 */
+	abstract protected function permissionCheck($video);
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set group handler
+	 *
+	 * @param null $groupHandler
+	 */
+	protected function setGroupHandler($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * Get group handler
+	 *
+	 * @return null
+	 */
+	protected function getGroupHandler() {
+		return $this->groupHandler;
+	}
+
+	/**
+	 * Set id
+	 *
+	 * @param string $id
+	 */
+	protected function setId($id) {
+		$this->id = $id;
+	}
+
+	/**
+	 * Get id
+	 *
+	 * @return string
+	 */
+	protected function getId() {
+		return $this->id;
+	}
+
+	/**
+	 * Set type
+	 *
+	 * @param string $type
+	 */
+	protected function setType($type) {
+		$this->type = $type;
+	}
+
+	/**
+	 * Get type
+	 *
+	 * @return string
+	 */
+	protected function getType() {
+		return $this->type;
+	}
+}
