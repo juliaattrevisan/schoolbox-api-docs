@@ -55,6 +55,11 @@ class ResourceVideoMapper extends Mapper {
                 'this_key'  => 'file_id',
                 'other_key' => 'storage_id',
         ));
+		$this->hasJoin('student_submission', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
+			'this_key'  => 'file_id',
+			'other_key' => 'id',
+		));
 	}
 
 	/**
@@ -200,4 +205,32 @@ class ResourceVideoMapper extends Mapper {
         return $video;
     }
 
+	/**
+	 * @param $id
+	 * @return null|object
+	 * @throws \Schoolbox\Mapper\Exception
+	 */
+	public function findBySubmissionId($id) {
+		$studentSubmissionMapper = $this->getJoinMapper('student_submission');
+		$statement = $this->database->prepare("
+            SELECT {$studentSubmissionMapper->getColumnString('s')}, {$this->getColumnString('vq')}
+            FROM `{$this->getTable()}` vq
+            INNER JOIN {$this->getJoinSQL('student_submission','vq','s')}
+            WHERE s.id = ? AND vq.status = 'completed' AND vq.type='submission'
+        ");
+
+		$statement->execute(array($id));
+
+		$video = null;
+		if (($row = $statement->fetch())) {
+			$video = $this->hydrate($row, 'vq');
+			$video->setFile($studentSubmissionMapper->hydrate($row, 's'));
+		}
+
+		if (!($video instanceof ResourceVideo)) {
+			throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+		}
+
+		return $video;
+	}
 }
