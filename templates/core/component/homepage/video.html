@@ -7,7 +7,7 @@
 <!-- BEGIN default_video -->
 <div class="videoWrapper">
     <video id="schoolbox_video{COMPONENT_INSTANCE_ID}" class="video-js vjs-default-skin" controls="true" preload="auto"
-           poster="/cms/videoThumb.php?id={DEFAULT_VIDEO_ID}&type=poster">
+           poster="/cms/videoThumb.php?id={DEFAULT_VIDEO_ID}&size=poster">
       <source src="/cms/sendVideo.php?id={DEFAULT_VIDEO_ID}" type='video/mp4'>
     </video>
     <script> var video = _V_("schoolbox_video{COMPONENT_INSTANCE_ID}", {width: '100%', height: '400px'}); </script>
@@ -36,7 +36,7 @@
 <script type="text/javascript">
     $j('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function() {
         var $target = "/cms/sendVideo.php?id="+$j(this).attr("rel");
-        var $poster = "/cms/videoThumb.php?id="+$j(this).attr("rel")+"&type=poster";
+        var $poster = "/cms/videoThumb.php?id="+$j(this).attr("rel")+"&size=poster";
         var $video = _V_("schoolbox_video{COMPONENT_INSTANCE_ID}", {width: '100%', height: '400px'});
 
         $video.ready(function(){

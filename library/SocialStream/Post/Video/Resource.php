@@ -53,7 +53,7 @@ class Resource extends Player {
 			}
 			catch (Mapper\Exception $e) {}
 			return array(
-				'poster' => "/cms/videoThumb.php?id={$bits['id']}&type=poster",
+				'poster' => "/cms/videoThumb.php?id={$bits['id']}&size=poster",
 				'src'    => "/cms/sendVideo.php?id={$bits['id']}",
 				'status' => $status,
 			);
