@@ -53,7 +53,7 @@
 				/* If data is empty, everything is ok
 				 * Otherwise it's got errors in
 				 */
-				if (data.errors.length) {
+				if (data.errors !== undefined && data.errors.length) {
 					$(config.errorElement).html(generateErrorString(data.errors));
 					$(config.viewElement).remove();
 				}

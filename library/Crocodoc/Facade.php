@@ -52,7 +52,7 @@ class Facade {
 		 */
 		if (strlen($submission->getUuid())) {
 			$loader = new Loader($submission->getUuid(), $this->getUser());
-			$loader->render();
+			echo $loader->render();
 		}
 		else {
 			$document = new Document($submission);

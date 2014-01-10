@@ -44,9 +44,9 @@ class Loader {
 	}
 
 	/**
-	 * Get the url used to produce the crocodoc document for annotation
+	 * Spawn an iframe
 	 */
-	private function getDocumentUrl() {
+	public function render() {
 		$userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
 
 		$curl = new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create');
@@ -58,17 +58,11 @@ class Loader {
 
 		$curl->exec();
 
-		return json_decode($curl->getResult());
-	}
-
-	/**
-	 * Spawn an iframe
-	 */
-	public function render() {
-		$result = $this->getDocumentUrl();
+		$result = json_decode($curl->getResult());
 
 		return json_encode(array(
-			'url' => "https://crocodoc.com/view/{$result->session}",
+			'url' => "https://crocodoc.com/view/{$result['result']->session}",
+			'errors' => $curl->getErrors()
 		));
 	}
 
