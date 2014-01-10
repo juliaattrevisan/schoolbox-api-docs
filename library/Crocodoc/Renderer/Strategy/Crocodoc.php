@@ -1,29 +1,31 @@
 <?php
 /**
- * None
+ * Crocodoc
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Crocodoc\Renderer;
 
-class None extends Base {
+namespace Crocodoc\Renderer\Strategy;
+
+
+class Crocodoc extends Base {
 
 	/**
 	 * The template file to inject
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/none.html';
+	protected $templateFile = 'submission/inline/injectables/crocodoc.html';
 
 	/**
 	 * Control file, to determine how to return work
 	 *
 	 * @var string
 	 */
-	protected $controlFile = 'submission/inline/injectables/redirect-return-control.html';
+	protected $controlFile = 'submission/inline/injectables/crocodoc-return-control.html';
 
 	/**
 	 * Render injectable
@@ -38,7 +40,13 @@ class None extends Base {
 		 */
 		$this->getPage()->setFile('injectableControl', $this->getControlFile());
 
+		/* Determine download url
+		 * This downloads it from crocodoc to Schoolbox
+		 */
+		$downloadUrl = '/submission/inline/download/' . $this->getSubmission()->getId();
+
 		$this->getPage()->setVar(array(
+			'INJECTABLE_CONTROL_URL' => $downloadUrl,
 			'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
 		));
 

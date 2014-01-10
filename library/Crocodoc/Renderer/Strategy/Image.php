@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Crocodoc\Renderer;
+namespace Crocodoc\Renderer\Strategy;
 
 class Image extends Base {
 

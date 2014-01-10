@@ -72,29 +72,29 @@ class Factory {
 		/* No submission
 		 */
 		if ($this->getSubmission() === null) {
-			return new None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		/* Crocodoc-friendly file types
 		 */
 		else if (in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
-			return new Crocodoc($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Crocodoc($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		/* Other special presentation methods for inline viewing of media
 		 * such as images and videos
 		 */
 		else if (preg_match('#^image/*#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Image($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Image($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		else if (preg_match('#^video/*#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Video($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Video($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		/* Otherwise just download the file
 		 */
 		else {
-			return new Download($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Download($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 
-		return new None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+		return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 	}
 
 	/* Getters/Setters

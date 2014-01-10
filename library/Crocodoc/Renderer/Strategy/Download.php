@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Crocodoc\Renderer;
+namespace Crocodoc\Renderer\Strategy;
 
 
 class Download extends Base {

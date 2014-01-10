@@ -7,16 +7,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Crocodoc\Renderer;
+namespace Crocodoc\Renderer\Strategy;
 
-class Video extends Base {
+class None extends Base {
 
 	/**
 	 * The template file to inject
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/video.html';
+	protected $templateFile = 'submission/inline/injectables/none.html';
 
 	/**
 	 * Control file, to determine how to return work
