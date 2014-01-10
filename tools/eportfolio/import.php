@@ -15,10 +15,12 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
-// First param: userId, second: $roleId
-list(, $userId, $roleId) = $argv;
+$options        = getopt('u:r:', array('skip-duplicates'));
+$userId         = $options['u'];
+$roleId         = $options['r'];
+$skipDuplicates = isset($options['skip-duplicates']);
 if (!(isset($userId) && isset($roleId))) {
-    echo "Usage: import.php [userId] [roleId]\n";
+    echo "Usage: import.php -u[userId] -r[roleId] [--skip-duplicates]\n";
     exit(1);
 }
 
@@ -79,6 +81,22 @@ foreach ($destUserList as $destUser) {
             /** @var Eportfolio\Page $page */
             /** @var Component_ControllerAbstract[] $componentList */
             list($page, $componentList) = $eportfolio;
+
+            if ($skipDuplicates) {
+                // Check this user doesn't already have this page.
+                $existingPageList = Eportfolio\PageMapper::getInstance()->
+                    findByColumnList(
+                        array(
+                            'uid'        => $destUserId,
+                            'page_title' => $page->getPageTitle(),
+                        )
+                    );
+                if (count($existingPageList) > 0) {
+                    printf("    skipping page \"%s\" as it already exists.\n", $page->getPageTitle());
+                    continue;
+                }
+            }
+            printf("    importing page \"%s\"...\n", $page->getPageTitle());
 
             // Create a new ePortfolio page.
             // Does this user already have a page of this name? Skip unless prompted otherwise
