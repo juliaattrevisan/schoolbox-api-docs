@@ -11,7 +11,7 @@
 namespace Schoolbox\Video\Factory;
 
 
-class Thumbnail extends Factory {
+class Thumbnail extends Base {
 
 	/**
 	 * Check perms

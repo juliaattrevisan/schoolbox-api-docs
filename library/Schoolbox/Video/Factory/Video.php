@@ -11,7 +11,7 @@
 namespace Schoolbox\Video\Factory;
 
 
-class Video extends Factory {
+class Video extends Base {
 
 	/**
 	 * Check perms
