@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Crocodoc\Template\Renderer;
+namespace Crocodoc\Renderer;
 
 
 abstract class Base {

@@ -107,7 +107,7 @@ $navigationDirect = json_encode($navigationElements);
 
 $this->setFile(TEMPLATE_content, 'submission/inline/view.html');
 
-$templateFactory = new \Crocodoc\Template\Renderer\Factory($this, $currentStudent['submission'], $navigationElements);
+$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentStudent['submission'], $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
