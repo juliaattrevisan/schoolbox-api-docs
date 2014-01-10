@@ -8,11 +8,13 @@
 	$.fn.crocodoc = function(options) {
 
 		/* Store the config in this instance so private methods
-		 * can access it
+		 * can access it, only if the chosen element exists
 		 */
-		var config = init(options, this);
+		if ($(this).length) {
+			var config = init(options, this);
 
-		crocodoc();
+			crocodoc();
+		}
 
 		/**
 		 * Initialise various configured params and determine a bunch
