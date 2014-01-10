@@ -16,16 +16,8 @@ if (is_numeric($_GET['id']) || isset($_GET['hash'])) {
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
-        if (isset($_GET['hash'])) {
-            $video = $videoQueueMapper->findByStorageHash($_GET['hash']);
-        }
-        else {
-            $video = $videoQueueMapper->findByFileId($_GET['id']);
-
-            //Check permissions on video
-            if ($groupHandler->getPermission($video->getFile()->getFolder()) < READ_ACCESS)
-                SitePage::redirectToBrokenImageOfSize(64, 64, 403);
-        }
+		$videoFactory = new \Schoolbox\Video\Factory\Thumbnail($_GET['type'], $_GET['id']);
+		$video = $thumbnailFactory->produce();
     }
     catch (Schoolbox\Mapper\Exception $e) {
         /* Video not found */
@@ -33,7 +25,7 @@ if (is_numeric($_GET['id']) || isset($_GET['hash'])) {
     }
 
 
-	if($_GET['type'] == 'poster') {
+	if($_GET['size'] == 'poster') {
 		$filename = $video->getPosterLocation();
 	}
 	else {
