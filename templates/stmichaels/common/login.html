@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2013 Alaress Pty Ltd, Schoolbox -->
+<!--  Visit us at www.schoolbox.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="Alaress Pty Ltd"/>
+<link rel="Shortcut Icon" href="/images/{SITE_LOCATION}/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/chrome.css" />
+<script type="text/javascript">
+window.onload = init;
+function init(){
+	document.getElementById('username').focus();
+}
+</script>
+</head>
+<body class="login">
+<div id="container-login">
+    <div id="login-bg">
+        <div id="login-bg-inner" style="position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;min-width:50%;min-height:50%;background-position:center center;background-size:cover;"></div>
+    </div>
+	<div id="content" class="clearfix">
+        <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/schol.png" alt="{SITE_NAME}" /></a>
+		<p class="error">{ERROR}</p>
+		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php">
+			<fieldset>
+                <!--[if lt IE 10]>Login Name:<![endif]-->
+				<input type="text" name="username" id="username" placeholder="Login Name" />
+			</fieldset>
+			<fieldset>
+                <!--[if lt IE 10]>Password:<![endif]-->
+				<input type="password" name="password" id="password" placeholder="Password" />
+			</fieldset>
+			<input type="hidden" name="page" value="{HIDDEN}" />
+
+			<input class="login submit-btn-plain" type="submit" name="Submit" value="Login" alt="Login" />
+            <div id="error-msg"></div>
+            <p>
+                <label for="tandc" class="tandc">
+                <input class="required" id="tandc" name="tandc" type="checkbox" title="You must agree to the Terms and Conditions before proceeding" />I agree to be legally bound by the <a href="/policy.php"> Terms and Conditions</a> of use for this website.</label>
+            </p>
+		</form>
+		<p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
+	</div>
+</div>
+<div id="footer" class="clearfix login">
+	<ul>
+		<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+		<li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+        <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
+        <!-- BEGIN mobile_switch -->
+		<li><a href="/switch.php?v=mobile">Switch to Mobile</a></li>
+		<!-- END mobile_switch -->
+        <li><a href="http://alaress.com.au" title="Web Development Melbourne">Web Development</a> by <a href="http://alaress.com.au">Alaress</a></li>
+		<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
+	</ul>
+</div>
+<script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-validation/jquery.validate.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var images = ['login-1.jpg',
+            'login-2.jpg',
+            'login-3.jpg',
+            'login-4.jpg',
+            'login-5.jpg'];
+
+        $('#login-bg-inner')
+            .css({
+                'background-image': 'url(/images/{SITE_LOCATION}/' + images[Math.floor(Math.random() * images.length)] + ')'
+            });
+
+        $(document).ready(function(){
+            $('#loginForm').validate({
+                errorPlacement: function(error, element) {
+                    if (element.attr("name") == "tandc"  ) {
+                        error.appendTo("#error-msg");
+                    } else {
+                        error.appendTo(element);
+                    }
+                }
+            });
+        })
+    });
+</script>
+<script> (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','//www.google-analytics.com/analytics.js','ga'); ga('create', 'UA-11554928-1', 'stmichaels.vic.edu.au'); ga('send', 'pageview'); </script>
+</body>
+</html>
