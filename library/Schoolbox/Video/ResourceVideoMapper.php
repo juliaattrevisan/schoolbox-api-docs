@@ -212,12 +212,14 @@ class ResourceVideoMapper extends Mapper {
 	 */
 	public function findBySubmissionId($id) {
 		$studentSubmissionMapper = $this->getJoinMapper('student_submission');
-		$statement = $this->database->prepare("
+		$query = "
             SELECT {$studentSubmissionMapper->getColumnString('s')}, {$this->getColumnString('vq')}
             FROM `{$this->getTable()}` vq
             INNER JOIN {$this->getJoinSQL('student_submission','vq','s')}
             WHERE s.id = ? AND vq.status = 'completed' AND vq.type='submission'
-        ");
+		";
+
+		$statement = $this->database->prepare($query);
 
 		$statement->execute(array($id));
 

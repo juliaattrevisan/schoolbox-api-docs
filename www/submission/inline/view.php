@@ -98,6 +98,7 @@ if ($currentStudent['submission'] != null) {
 $navigationItems = json_encode($stack);
 
 $navigationElements = array(
+	'boxId' => $submissionBox['id'],
 	'previous' => $previousStudent,
 	'current' => $currentStudent,
 	'next' => $nextStudent,

@@ -80,7 +80,7 @@ abstract class Base {
 			$nextUrl = $navigationElements['next']['navigation']['value'];
 		}
 		else {
-			$nextUrl = '/submission/viewSubmission/' . $this->getSubmission()->getSubmissionBox()->getId();
+			$nextUrl = '/submission/viewSubmission/' . $navigationElements['boxId'];
 		}
 
 		return $nextUrl;
