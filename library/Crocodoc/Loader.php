@@ -67,7 +67,7 @@ class Loader {
 	public function render() {
 		$result = $this->getDocumentUrl();
 
-		echo json_encode(array(
+		return json_encode(array(
 			'url' => "https://crocodoc.com/view/{$result->session}",
 		));
 	}

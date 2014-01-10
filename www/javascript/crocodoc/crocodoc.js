@@ -25,6 +25,7 @@
 		function init(options, element) {
 			var defaults = {
 				viewElement: element,
+				errorElement: null,
 				boxId: 0,
 				submissionId: 0
 			}
@@ -48,8 +49,34 @@
 		 */
 		function crocodoc() {
 			$.getJSON(config.url.view, function(data) {
-				$(config.viewElement).attr('src', data.url);
+
+				/* If data is empty, everything is ok
+				 * Otherwise it's got errors in
+				 */
+				if (data.errors.length) {
+					$(config.errorElement).html(generateErrorString(data.errors));
+					$(config.viewElement).remove();
+				}
+				else {
+					$(config.viewElement).attr('src', data.url);
+				}
 			});
+		}
+
+		/**
+		 * A generic return of errors
+		 *
+		 * @param data
+		 * @returns {string}
+		 */
+		function generateErrorString(data) {
+			var errorString = '';
+
+			for (var i = 0; i < data.length; i++) {
+				errorString += '<li>' + data[i] + '</li>';
+			}
+
+			return '<ul>' + errorString + '</ul>';
 		}
 	}
 

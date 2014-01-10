@@ -9,7 +9,8 @@
 	$(function() {
 		$('#crocodoc').crocodoc({
 			boxId: '{CROCODOC_SUBMISSION_BOX_ID}',
-			submissionId: '{CROCODOC_SUBMISSION_ID}'
+			submissionId: '{CROCODOC_SUBMISSION_ID}',
+			errorElement: '#errors'
 		});
 
 		$('#navigator').crocodocNavigator({
@@ -38,7 +39,12 @@
 	<div id="navigator"></div>
 	<a class='btn go-back' href="/submission/viewSubmission/{BOX_ID}"><span></span>Return to List</a>
 </div>
-		
+
+<div id="crocodoc-error-container">
+	<strong>Had a problem</strong>
+	<div id="errors"></div>
+</div>
+
 {INJECTED_INTERFACE_TEMPLATE}
 
 <h2>Assign marks</h2>

@@ -56,23 +56,38 @@ class Facade {
 		}
 		else {
 			$document = new Document($submission);
-			$result = $document->upload();
+			$response = $document->upload();
 
-			if (isset($result->error)) {
-				throw new \Exception($result->error);
+			/* Crocodoc-related errors, when a file dies in crocodoc
+			 */
+			if (isset($response['result']->error)) {
+				echo json_encode(array(
+					'errors' => $response['result']->error
+				));
 			}
-
-			if (isset($result->uuid)) {
-				$loader = new Loader($result->uuid, $this->getUser());
-				$loader->render();
+			/* If crocodoc is unreachable, or curl/network-related errors
+			 */
+			else if (count($response['errors'])) {
+				echo json_encode(array(
+					'errors' => $response['errors']
+				));
+			}
+			/* Otherwise everything went okay, thump out the url to the crocodoc
+			 */
+			else if (isset($response['result']->uuid)) {
+				$loader = new Loader($response['result']->uuid, $this->getUser());
+				echo $loader->render();
 
 				/* Allow resuming of marking
 				 */
-				$submission->setUuid($result->uuid);
+				$submission->setUuid($response['result']->uuid);
 				$submissionMapper->save($submission);
 			}
 		}
 	}
+
+	/* Getters/Setters
+	 */
 
 	/**
 	 * Set submission id

@@ -84,7 +84,10 @@ class Document {
 		 */
 		unlink($this->getUrl());
 
-		return json_decode($curl->getResult());
+		return array(
+			'result' => json_decode($curl->getResult()),
+			'errors' => $curl->getErrors()
+		);
 	}
 
 	/* Getters/Setters
