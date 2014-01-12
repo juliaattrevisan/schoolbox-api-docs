@@ -1,5 +1,5 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/javascript/components/magicsuggest/bin/magicsuggest-1.3.1-min.css" type="text/css"/>
+<link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
 <script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
@@ -18,7 +18,7 @@ $j(function() {
     $j(ms).on('selectionchange', function(event, combo, selection) {
         if (selection.length) {
             $j('#user-to-mod').val(selection[0].id);
-            $j('#modify-user-button').removeClass('disabled');
+            $j('#modify-user-button').removeClass('disabled').focus();
         }
         else {
             $j('#modify-user-button').addClass('disabled');
