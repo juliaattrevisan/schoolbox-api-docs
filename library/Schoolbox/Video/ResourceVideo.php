@@ -68,6 +68,29 @@ class ResourceVideo {
 		return $this->status;
 	}
 
+	/**
+	 * Get the full path to the image used in statuses
+	 *
+	 * @return string
+	 */
+	public function getStatusImage() {
+		return "/images/core/component/video-thumbnail-".strtolower($this->getStatus()).".gif";
+	}
+
+	/**
+	 * Is this video processing completed?
+	 *
+	 * @return bool
+	 */
+	public function isComplete() {
+		if ($this->getStatus() == QueueMapper::STATUS_COMPLETED) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public function setType($type) {
 		$this->type = $type;
 	}
@@ -99,5 +122,4 @@ class ResourceVideo {
 	public function getId() {
 		return $this->id;
 	}
-
 }
