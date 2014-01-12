@@ -43,7 +43,7 @@ abstract class Base {
 	 * @param $id
 	 */
 	public function __construct($type, $id) {
-		$this->setGroupHandler(new Group());
+		$this->setGroupHandler(new \Group());
 		$this->setType($type);
 		$this->setId($id);
 	}
@@ -58,15 +58,15 @@ abstract class Base {
 		$videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
 		switch($this->getType()) {
-			case QueueMapper::FILE_TYPE_STORAGE:
+			case \Schoolbox\Video\QueueMapper::FILE_TYPE_STORAGE:
 				return $videoMapper->findByStorageHash($this->getId());
 
-			case QueueMapper::FILE_TYPE_SBFS:
+			case \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS:
 				$video = $videoMapper->findByFileId($this->getId());
 				$this->permissionCheck($video);
 				return $video;
 
-			case QueueMapper::FILE_TYPE_SUBMISSION:
+			case \Schoolbox\Video\QueueMapper::FILE_TYPE_SUBMISSION:
 				$video = $videoMapper->findBySubmissionId($this->getId());
 				return $video;
 
