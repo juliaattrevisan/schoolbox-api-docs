@@ -12,4 +12,8 @@ namespace Schoolbox\Notif\Queue;
 
 class ReadMessage extends AbstractMessage {
 
+	public function isRead() {
+		return true;
+	}
+
 } 

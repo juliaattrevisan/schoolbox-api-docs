@@ -78,4 +78,22 @@ abstract class AbstractMessage {
 		return $this->msg;
 	}
 
+
+	public function toArray() {
+		return array(
+			'id' => $this->getId(),
+			'timestamp' => (int)$this->getTimestamp(),
+			'expiry' => (int)$this->getExpiry(),
+			'body' => json_decode($this->getBody(), true),
+			'status' => $this->isRead() ? 'read' : 'unread'
+		);
+	}
+
+	/**
+	 * Returns whether or not this message is marked as read.
+	 *
+	 * @return bool
+	 */
+	public abstract function isRead();
+
 } 
