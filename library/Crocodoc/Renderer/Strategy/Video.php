@@ -34,6 +34,36 @@ class Video extends Base {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
+		/* Set up blocks and stuff
+		 */
+		$this->getPage()->setBlock('INJECTED_INTERFACE_TEMPLATE', 'injectable_video_player', 'injectable_video_player_block');
+		$this->getPage()->setBlock('INJECTED_INTERFACE_TEMPLATE', 'injectable_video_status', 'injectable_video_status_block');
+
+		try {
+			$videoMapper = new \Schoolbox\Video\Factory\Video('submission', $this->getSubmission()->getId());
+			$video = $videoMapper->produce();
+		}
+		catch (\Exception $e) {
+		}
+
+		/* If video is finished processing, show it in a player
+		 * Otherwise, if no video, then render a thumbnail instead
+		 */
+		if ($video->isComplete()) {
+			$this->getPage()->parse('injectable_video_player_block', 'injectable_video_player');
+			$this->getPage()->setVar(array(
+				'injectable_video_status_block' => ''
+			));
+		}
+		else {
+			$this->getPage()->setVar(array(
+				'INJECTABLE_VIDEO_STATUS_SRC' => $video->getStatusImage(),
+				'injectable_video_player_block' => ''
+			));
+
+			$this->getPage()->parse('injectable_video_status_block', 'injectable_video_status');
+		}
+
 		/* Control how Return Work is done
 		 */
 		$this->getPage()->setFile('injectableControl', $this->getControlFile());

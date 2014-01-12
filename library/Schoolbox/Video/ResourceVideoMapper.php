@@ -206,20 +206,20 @@ class ResourceVideoMapper extends Mapper {
     }
 
 	/**
+	 * Gets a video for a submission, regardless of the video's processing status
+	 *
 	 * @param $id
 	 * @return null|object
 	 * @throws \Schoolbox\Mapper\Exception
 	 */
 	public function findBySubmissionId($id) {
 		$studentSubmissionMapper = $this->getJoinMapper('student_submission');
-		$query = "
+		$statement = $this->database->prepare("
             SELECT {$studentSubmissionMapper->getColumnString('s')}, {$this->getColumnString('vq')}
             FROM `{$this->getTable()}` vq
             INNER JOIN {$this->getJoinSQL('student_submission','vq','s')}
-            WHERE s.id = ? AND vq.status = 'completed' AND vq.type='submission'
-		";
-
-		$statement = $this->database->prepare($query);
+            WHERE s.id = ? AND vq.type='submission'
+        ");
 
 		$statement->execute(array($id));
 
