@@ -1,12 +1,21 @@
 <h2>Video</h2>
 
-		<!-- BEGIN injectable_video_player -->
-		Video player in here
-		<!-- END injectable_video_player -->
+<!-- BEGIN injectable_video_player -->
+<link href="/javascript/components/video.js/video-js.css" rel="stylesheet">
+<link href="/css/core/video-js/video-js.overrides.css" rel="stylesheet">
+<script src="/javascript/components/video.js/video.js"></script>
 
-		<!-- BEGIN injectable_video_status -->
-		<img src="{INJECTABLE_VIDEO_STATUS_SRC}" />
-		<!-- END injectable_video_status -->
+<div class="videoWrapper">
+	<video id="schoolbox_video_submission" class="video-js vjs-default-skin" controls="true" preload="auto" poster="/cms/videoThumb.php?type=submission&id={VIDEO_ID}&size=poster">
+		<source src="/cms/sendVideo.php?type=submission&id={VIDEO_ID}" type='video/mp4'>
+	</video>
+	<script> var video = _V_("schoolbox_video_submission", {width: '100%', height: '400px'}); </script>
+</div>
+<!-- END injectable_video_player -->
+
+<!-- BEGIN injectable_video_status -->
+<img src="{INJECTABLE_VIDEO_STATUS_SRC}" />
+<!-- END injectable_video_status -->
 
 <h2>Upload File</h2>
 <p>

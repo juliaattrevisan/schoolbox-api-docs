@@ -10,7 +10,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-if (is_numeric($_GET['id']) || isset($_GET['hash'])) {
+if (isset($_GET['type']) && isset($_GET['id'])) {
 
 	$page = new SitePage;
 	$groupHandler = new Group;
@@ -18,10 +18,11 @@ if (is_numeric($_GET['id']) || isset($_GET['hash'])) {
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
 	try {
-		$videoFactory = new \Schoolbox\Video\Factory($_GET['type'], $_GET['id']);
+		$videoFactory = new \Schoolbox\Video\Factory\Video($_GET['type'], $_GET['id']);
 		$video = $videoFactory->produce();
 	}
 	catch (Schoolbox\Mapper\Exception $e) {
+
 		/* Video not found */
         exit;
 	}

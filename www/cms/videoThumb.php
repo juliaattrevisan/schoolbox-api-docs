@@ -9,14 +9,14 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-if (is_numeric($_GET['id']) || isset($_GET['hash'])) {
+if (isset($_GET['type']) && is_numeric($_GET['id'])) {
 	$page = new SitePage;
 	$groupHandler = new Group;
 
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
-		$videoFactory = new \Schoolbox\Video\Factory\Thumbnail($_GET['type'], $_GET['id']);
+		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($_GET['type'], $_GET['id']);
 		$video = $thumbnailFactory->produce();
     }
     catch (Schoolbox\Mapper\Exception $e) {
