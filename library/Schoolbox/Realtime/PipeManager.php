@@ -423,7 +423,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function doPipeSubscribe($pipe, $null) {
 		if($user = $pipe->getUser()) {
-			$this->subscriptionManager->subscribe($user);
+			$this->subscriptionManager->subscribe($user, $pipe);
 			// this is "you are subscribed" not "the subscription action just worked"
 		}
 	}

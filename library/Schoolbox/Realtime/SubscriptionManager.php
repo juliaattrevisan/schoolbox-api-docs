@@ -34,12 +34,21 @@ class SubscriptionManager {
 	}
 
 	/**
+	 * Add a subscription for the given user. If a pipe is provided, it will be notified upon success.
+	 *
 	 * @param User $user
+	 * @param Pipe $pipe
 	 * @return bool
 	 */
-	public function subscribe($user) {
+	public function subscribe($user, $pipe = null) {
 		if($this->userHasSubscription($user)) {
 			$this->pipeManager->v("User {$user->getUsername()} is already subscribed");
+
+			// notify the pipe if it was supplied
+			if($pipe instanceof Pipe) {
+				$this->getPipeManager()->sendToPipe($pipe, json_encode(array('subscribe' => true)));
+			}
+
 			return false;
 		}
 
@@ -56,10 +65,15 @@ class SubscriptionManager {
 		$self = $this;
 		$destination = $this->userSubscriptionDestination($user);
 
-		$client->connect()->then(function($client) use ($destination, $self, $user) {
+		$client->connect()->then(function($client) use ($destination, $self, $user, $pipe) {
 			/** @var Client $client */
 			// this closure is executed when a stomp client connection is established
 			$self->putSubscription($destination, new Subscription($destination, $client, $user, $self->getPipeManager()));
+
+			// if a pipe is provided, use it as a callback for success
+			if($pipe instanceof Pipe) {
+				$self->getPipeManager()->sendToPipe($pipe, json_encode(array('subscribe' => true)));
+			}
 		});
 
 		return true;
