@@ -75,23 +75,27 @@ class UserQueue {
 	 * Retrieve messages from the queue
 	 * @param int $limit - how many messages to retrieve, from most recent backward
 	 * @param bool $forceRefresh - whether or not the list of messages should be repopulated
-	 * @return AbstractMessage[]
+	 * @param bool $preserveKeys - whether or not to keep the message ID as the array key
+	 * @return ReadMessage[]
 	 */
-	public function getMessages($limit = 10, $forceRefresh = false) {
+	public function getMessages($limit = 10, $forceRefresh = false, $preserveKeys = false) {
 
 		// retrieve messages and sort
 		if(!count($this->messages) || $forceRefresh) {
 			$this->retrieveMessages();
 		}
 
-		return array_slice($this->messages, 0, $limit, false);
+		return array_slice($this->messages, 0, $limit, $preserveKeys);
 	}
 
 
 	/**
-	 * Populate this user's notification list
+	 * Populate this user's notification list (idempotent)
 	 */
 	protected function retrieveMessages() {
+
+		// this method replaces the entire array with the entire set of unexpired messages
+		$this->messages = array();
 
 		$nacks = array();
 
