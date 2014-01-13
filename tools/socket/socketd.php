@@ -19,6 +19,19 @@ $opts = getopt('vp::');
 $verbose = isset($opts['v']);
 $port = isset($opts['p']) ? $opts['p'] : 8080;
 
+
+if($verbose) {
+	echo <<<EOL
+
+ ||
+ || Schoolbox WebSocket Daemon
+ ||
+
+
+EOL;
+
+}
+
 // vhost has no power here, manually define the redis sessionhandler
 // but I'm not actually sure that this does anything
 ini_set('session.gc_maxlife', 43200);
