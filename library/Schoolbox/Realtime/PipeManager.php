@@ -62,6 +62,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param PredisClientInterface $predisClient
 	 * @param UserMapper $userMapper
 	 * @param Verboser $verboser
+	 * @param IConfigLoader $iConfigLoader
 	 */
 	public function __construct($reactLoop, $predisClient, $userMapper, $verboser, $iConfigLoader = null) {
 		$this->pipes = array();
@@ -198,7 +199,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		if(method_exists($this, $method)) {
 			$this->v("Executing $method for $username [$socketKey]", '*');
 			$response = $this->$method($pipe, $arguments);
-			$this->sendToPipe($pipe, json_encode(array($command => $response)));
+
+			if(!is_null($response)) {
+				$this->sendToPipe($pipe, json_encode(array($command => $response)));
+			}
 		}
 		else {
 			$this->sendToPipe($pipe, "Cannot understand command '$command'");
@@ -421,9 +425,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		if($user = $pipe->getUser()) {
 			$this->subscriptionManager->subscribe($user);
 			// this is "you are subscribed" not "the subscription action just worked"
-			return true;
 		}
-		return false;
 	}
 
 
