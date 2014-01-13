@@ -214,7 +214,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param User $user
 	 */
 	public function onAMQP($message, $user) {
-		$this->v("Received new message to send to ".$user->getUsername());
+//		$this->v("Received new message to send to ".$user->getUsername());
 		$this->sendToUser($user, json_encode(array(
 			'push' => array(
 				$message->getId() => $message->toArray()
@@ -353,7 +353,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param string $data
 	 */
 	public function sendToPipe($pipe, $data) {
-		$this->v("Sending '$data' to {$pipe->getSocketKey()}");
+		$bytes = strlen($data);
+		$this->v("Sending $bytes bytes to {$pipe->getSocketKey()}");
 		$pipe->send($data);
 	}
 
