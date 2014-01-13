@@ -5,6 +5,7 @@ require_once SITE_root . '/www/include/stdfuncs.php';
 $userHandler = new User();
 $groupHandler = new Group();
 $pageHandler = new SitePage();
+$emailObj = new Email();
 
 $result = $suggestions = $data = $return = array();
 
@@ -30,12 +31,13 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strl
         foreach ($userList as $user) {
 
             if ($_GET['email']) {
-                $emailObj = new Email();
                 $email = $emailObj->formatEmailFromArray($user);
 
                 if ($email) {
-                    $suggestions[] = Scrub::text($user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>');
-                    $data[] = Scrub::text($user['firstname'] . " " . $user['lastname']) . ' <' . $email . '>';
+                    $return[] = array(
+                        'name' => Scrub::text($user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>'),
+                        'id'   => $user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>',
+                    );
                 }
             } else {
 
@@ -46,9 +48,6 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strl
                 }
 
                 $person .= $user['gname'];
-
-                $suggestions[] = html_entity_decode(Scrub::text($person), ENT_QUOTES);
-                $data[] = $user['uid'];
                 $return[] = array(
                     'name' => $person,
                     'id'   => intval($user['uid']),
@@ -57,12 +56,6 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strl
         }
     }
 }
-
-$result = array(
-    'query' => $_GET['query'],
-    'suggestions' => $suggestions,
-    'data' => $data,
-);
 
 header('Content-type: application/json');
 echo json_encode($return);
