@@ -30,8 +30,10 @@ $loop = \React\EventLoop\Factory::create();
 // CREATE WEB SOCKET ASYNC
 $redis = Alaress\Redis::getClientInstance();
 
+$verboser = new \Schoolbox\Realtime\Verboser($verbose ? STDOUT : null);
+
 $pipeManager = new PipeManager(
-	$loop, $redis, UserMapper::getInstance(), $verbose ? STDOUT : null
+	$loop, $redis, UserMapper::getInstance(), $verboser
 );
 
 $session = new \Ratchet\Session\SessionProvider(
