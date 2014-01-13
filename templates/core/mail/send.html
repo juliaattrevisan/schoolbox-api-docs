@@ -18,6 +18,7 @@ $j(document).ready(function () {
         return function() {
             var suggest = this
             if (!suggest._dataSet) {
+                suggest.container.find('input[name="'+suggest.getName()+'"]').prop('disabled', true)
                 suggest._dataSet = true
                 $j.each(initValue, function(k,v) {
                     suggest.addToSelection({id: v, name: v})
@@ -26,20 +27,22 @@ $j(document).ready(function () {
         }
     }
 
-    $j($j('#to').magicSuggest(options)).on('load', initWithValue({REPLYTO}))
-    $j('#cc').magicSuggest(options)
-    $j($j('#bcc').magicSuggest(options)).on('load', initWithValue({BCC}))
+    var to  = $j('#to').magicSuggest(options)
+    var cc  = $j('#cc').magicSuggest(options)
+    var bcc = $j('#bcc').magicSuggest(options)
+    $j(to).on('load', initWithValue({REPLYTO}))
+    $j(cc).on('load', initWithValue({}))
+    $j(bcc).on('load', initWithValue({BCC}))
 
-//    // Use an array of values instead of a single JSON value
-//    $j(suggests).on('selectionchange', function() {
-//        var suggest = this;
-//        var name    = suggest.getName()+'[]'
-//        suggest.container.find('input[name="'+name+'"]').prop('disabled', true)
-//        suggest.container.find('input[name="'+name+'[]"]').remove()
-//        $j.each(suggest.getValue(), function(i,v){
-//            suggest.container.append($j('<input type="hidden" />').attr('name', name+'[]').val(v))
-//        })
-//    })
+    // Use an array of values instead of a single JSON value
+    $j([to, cc, bcc]).on('selectionchange', function() {
+        var suggest = this;
+        var name    = suggest.getName()+'[]'
+        suggest.container.find('input[name="'+name+'"]').remove()
+        $j.each(suggest.getValue(), function(i,v){
+            suggest.container.append($j('<input type="hidden" />').attr('name', name).val(v))
+        })
+    })
 });
 
 tinyMCE.init({

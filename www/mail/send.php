@@ -127,9 +127,9 @@ if(isset($_POST['to']) && $_POST['to'] && Cfg::get('mail_enable'))
 {
     // MagicSuggest passes emails as JSON-encoded values, I should make it pass
     // array values
-    $to  = implode(",", json_decode($_POST['to']));
-    $cc  = implode(",", json_decode($_POST['cc']));
-    $bcc = implode(",", json_decode($_POST['bcc']));
+    $to  = implode(",", $_POST['to']  ?: array());
+    $cc  = implode(",", $_POST['cc']  ?: array());
+    $bcc = implode(",", $_POST['bcc'] ?: array());
     sendMail($to, $cc, $bcc, $_POST['subject'], $_POST['message']);
 
     //output code to send the browser to where it came from
