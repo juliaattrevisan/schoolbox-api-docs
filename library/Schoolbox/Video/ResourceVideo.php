@@ -13,11 +13,12 @@ use Schoolbox\ConfigLoader;
 use Schoolbox\Resource\File;
 
 class ResourceVideo {
-	private $id;
-	private $type;
-	private $status;
-	private $duration;
-	private $file;
+	protected $id;
+	protected $type;
+	protected $status;
+	protected $duration;
+	protected $file;
+	protected $fileID;
 
 	/**
 	 * Creates object and sets up sub-objects.
@@ -28,15 +29,15 @@ class ResourceVideo {
 
 
 	public function getVideoLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFile()->getId() . '.mp4';
+		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
 	}
 
 	public function getThumbnailLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFile()->getId() . '-64.jpg';
+		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
 	}
 
 	public function getPosterLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFile()->getId() . '-poster.jpg';
+		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-poster.jpg';
 	}
 
 
@@ -121,5 +122,13 @@ class ResourceVideo {
 	 */
 	public function getId() {
 		return $this->id;
+	}
+
+	public function setFileID($fileID) {
+		$this->fileID = $fileID;
+	}
+
+	public function getFileID() {
+		return $this->fileID;
 	}
 }

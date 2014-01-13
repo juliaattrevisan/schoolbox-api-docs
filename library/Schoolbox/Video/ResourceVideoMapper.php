@@ -43,6 +43,12 @@ class ResourceVideoMapper extends Mapper {
 			              'property'   => 'duration',
 			              'type'       => self::TYPE_INTEGER,
 		              ));
+		$this->hasMap(array(
+			'column'     => 'file_id',
+			'property'   => 'fileID',
+			'type'       => self::TYPE_INTEGER,
+		));
+
 
 		$this->hasJoin('file', array(
                          'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
