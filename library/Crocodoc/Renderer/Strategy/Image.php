@@ -34,6 +34,11 @@ class Image extends Base {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
+		/* Upload file
+		 */
+		$this->getPage()->setFile('injectableUpload', 'submission/inline/injectables/upload-file.html');
+		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
+
 		/* Control how Return Work is done
 		 */
 		$this->getPage()->setFile('injectableControl', $this->getControlFile());
