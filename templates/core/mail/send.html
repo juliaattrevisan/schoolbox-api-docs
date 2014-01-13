@@ -1,33 +1,28 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 $j(document).ready(function () {
-	$j('#to').autocomplete({
-		serviceUrl: '/ajax/user.php?groupID=0&email=1',
-        delimiter: /(,|;)\s*/, // regex or character
-		minChars: 2,
-		maxHeight: 400,
-		width: $j('#addUser').width()
+    var options = {
+        data:'/ajax/user.php?groupID=0&email=1',
+        hideTrigger: true,
+        minChars: 2
+    }
+    $j('#to').magicSuggest(options)
+    $j('#cc').magicSuggest(options)
+    $j('#bcc').magicSuggest(options)
 
-	});
-
-	$j('#cc').autocomplete({
-		serviceUrl: '/ajax/user.php?groupID=0&email=1',
-        delimiter: /(,|;)\s*/, // regex or character
-		minChars: 2,
-		maxHeight: 400,
-		width: $j('#addUser').width()
-	});
-
-	$j('#bcc').autocomplete({
-		serviceUrl: '/ajax/user.php?groupID=0&email=1',
-                delimiter: /(,|;)\s*/, // regex or character
-		minChars: 2,
-		maxHeight: 400,
-		width: $j('#addUser').width()
-	});
+//    // Use an array of values instead of a single JSON value
+//    $j(suggests).on('selectionchange', function() {
+//        var suggest = this;
+//        var name    = suggest.getName()+'[]'
+//        suggest.container.find('input[name="'+name+'"]').prop('disabled', true)
+//        suggest.container.find('input[name="'+name+'[]"]').remove()
+//        $j.each(suggest.getValue(), function(i,v){
+//            suggest.container.append($j('<input type="hidden" />').attr('name', name+'[]').val(v))
+//        })
+//    })
 });
 
 tinyMCE.init({
