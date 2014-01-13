@@ -1,0 +1,77 @@
+/**
+ * User selector, makes use of the MagicSuggest jQuery plugin
+ */
+(function($){
+    // require(magicsuggest.js, magicsuggest.css)
+    $.fn.userSelector = function(options) {
+        var element  = this;
+        var defaults = {
+            plugin: {
+                data:'/ajax/user.php?groupID=0',
+                hideTrigger: true,
+                minChars: 2,
+                allowFreeEntries: false,
+                selectionRenderer: function(a) {
+                    // HTML-escape the user's name
+                    return $('<span />').text(a.name).html();
+                }
+            },
+            value: [],
+            multiple: false
+        }
+        var settings = $.extend(true, {}, defaults, options)
+
+        if (!settings.multiple) {
+            settings.plugin.maxSelection = 1
+        }
+
+        // Load value from the element if it's there and not in settings
+        if (!settings.value) {
+            var value = element.val()
+            if (value) {
+                settings.value = JSON.parse(value)
+            }
+        }
+        if (!$.isArray(settings.value)) {
+            settings.value = [settings.value]
+        }
+
+        // The plugin object
+        var ms = $(element.magicSuggest(settings.plugin))
+        element.data('magicsuggest', ms)
+
+        // Add all values to selection
+        ms.one('load', function() {
+            var suggest = this
+            $.each(settings.value, function(k,v) {
+                var id   = v
+                var name = v
+                if ($.isPlainObject(v)) {
+                    id   = v.id
+                    name = v.name
+                }
+                suggest.addToSelection({id: id, name: name})
+            })
+        })
+
+        // Singles: overwrite input value
+        // Multiples: Disable magicsuggest's JSON input and build an array of inputs
+        ms.on('selectionchange', function() {
+            var suggest   = this;
+            var name      = suggest.getName()
+            var value     = suggest.getValue()
+            var baseInput = suggest.selectionContainer.find('input[name="'+name+'"]')
+            if (settings.multiple) {
+                baseInput.prop('disabled', true)
+                suggest.selectionContainer.find('input[name="'+name+'[]"]').remove()
+                $j.each(value, function(i,v){
+                    suggest.selectionContainer.append($j('<input type="hidden" />').attr('name', name+'[]').val(v))
+                })
+            }
+            else {
+                baseInput.val(value.pop() || '')
+            }
+        })
+    };
+}(jQuery));
+

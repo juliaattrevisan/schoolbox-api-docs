@@ -1,48 +1,20 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
 <script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
 $j(document).ready(function () {
     var options = {
-        data:'/ajax/user.php?groupID=0&email=1',
-        hideTrigger: true,
-        minChars: 2,
-        selectionRenderer: function(a) {
-            // HTML-escape the user's name
-            return $j('<span />').text(a.name).html();
-        }
+        plugin: {
+            data:'/ajax/user.php?groupID=0&email=1',
+            allowFreeEntries: true
+        },
+        multiple: true
     }
-
-    var initWithValue = function(initValue) {
-        return function() {
-            var suggest = this
-            if (!suggest._dataSet) {
-                suggest.container.find('input[name="'+suggest.getName()+'"]').prop('disabled', true)
-                suggest._dataSet = true
-                $j.each(initValue, function(k,v) {
-                    suggest.addToSelection({id: v, name: v})
-                })
-            }
-        }
-    }
-
-    var to  = $j('#to').magicSuggest(options)
-    var cc  = $j('#cc').magicSuggest(options)
-    var bcc = $j('#bcc').magicSuggest(options)
-    $j(to).on('load', initWithValue({REPLYTO}))
-    $j(cc).on('load', initWithValue({}))
-    $j(bcc).on('load', initWithValue({BCC}))
-
-    // Use an array of values instead of a single JSON value
-    $j([to, cc, bcc]).on('selectionchange', function() {
-        var suggest = this;
-        var name    = suggest.getName()+'[]'
-        suggest.container.find('input[name="'+name+'"]').remove()
-        $j.each(suggest.getValue(), function(i,v){
-            suggest.container.append($j('<input type="hidden" />').attr('name', name).val(v))
-        })
-    })
+    var to  = $j('#to').userSelector($j.extend({}, options, {value: {REPLYTO}}))
+    var cc  = $j('#cc').userSelector(options)
+    var bcc = $j('#bcc').userSelector($j.extend({}, options, {value: {BCC}}))
 });
 
 tinyMCE.init({
