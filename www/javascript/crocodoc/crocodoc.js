@@ -135,7 +135,7 @@
 				var label = config.direct.previous.navigation.label;
 				var value = config.direct.previous.navigation.value;
 
-				var option = '<a href="'+ value +'">'+ label +'</a>';
+				var option = '<a class="previous-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&lsaquo;</a>';
 
 				config.element.append(option);
 				config.previousItemCallback();
@@ -179,7 +179,7 @@
 				var label = config.direct.next.navigation.label;
 				var value = config.direct.next.navigation.value;
 
-				var option = '<a href="'+ value +'">'+ label +'</a>';
+				var option = '<a class="next-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&rsaquo;</a>';
 
 				config.element.append(option);
 				config.nextItemCallback();

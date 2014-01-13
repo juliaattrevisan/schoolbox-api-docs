@@ -6859,11 +6859,23 @@ table.subjectList {
     submission/viewSubmission
 --------------------------- */
 
+
 form.context {
   height: 36px;
   line-height: 36px;
   text-align: right;
 
+	.sem-back, .sem-fwd {
+		border: solid 1px #ccc;
+		color: #555;
+		padding: 1px 8px 5px;
+		font-size: 1.6em;
+
+		&:hover {
+		  background: #eee;
+		  text-decoration: none;
+		}
+	}
   select {
     padding: 5px;
   }
@@ -6871,17 +6883,6 @@ form.context {
     line-height: 20px;
   }
 
-  .sem-back, .sem-fwd {
-    border: solid 1px #ccc;
-    color: #555;
-    padding: 1px 8px 5px;
-    font-size: 1.6em;
-
-    &:hover {
-      background: #eee;
-      text-decoration: none;
-    }
-  }
   .elbow {
     position: absolute;
     right: 74%;
@@ -10534,4 +10535,21 @@ textarea.event-detail {
 
 .inline-grading-column-right {
 	width: 39%;
+}
+
+.dropdown-navigator {
+	select {
+		padding: 5px;
+	}
+	.previous-item, .next-item {
+		border: solid 1px #ccc;
+		color: #555;
+		padding: 1px 8px 5px;
+		font-size: 1.6em;
+
+		&:hover {
+			background: #eee;
+			text-decoration: none;
+		}
+	}
 }

@@ -13,7 +13,7 @@
 			errorElement: '#crocodoc-error-container'
 		});
 
-		$('#navigator').crocodocNavigator({
+		$('.dropdown-navigator').crocodocNavigator({
 			currentId: '{CROCODOC_SUBMISSION_NAVIGATION_CURRENT_ID}',
 			direct: '{CROCODOC_SUBMISSION_NAVIGATION_DIRECT}',
 			items: '{CROCODOC_SUBMISSION_NAVIGATION_ITEMS}',
@@ -40,7 +40,7 @@
 	}
 </style>
 <div class="clearfix">
-	<div id="navigator"></div>
+	<div class="dropdown-navigator"></div>
 	<a class='btn go-back' href="/submission/viewSubmission/{BOX_ID}"><span></span>Return to List</a>
 	<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View History</a>
 </div>
