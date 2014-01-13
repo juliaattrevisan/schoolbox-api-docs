@@ -75,6 +75,15 @@ class Pipe {
 
 	}
 
+	/**
+	 * Returns the remote address of the connection of this pipe.
+	 *
+	 * @return string
+	 */
+	public function getRemoteAddress() {
+		return $this->socketConnection->remoteAddress ?: '0.0.0.0';
+	}
+
 	public function close() {
 		$this->socketConnection->close();
 	}
