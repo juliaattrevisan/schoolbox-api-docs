@@ -18,6 +18,8 @@ use Ratchet\Wamp\WampServerInterface;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
+use Schoolbox\ConfigLoader;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\NotifException;
 use Schoolbox\Notif\Queue\UnreadMessage;
 use Schoolbox\Notif\Queue\UserQueueFactory;
@@ -52,6 +54,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	/** @var Verboser */
 	protected $verboser;
 
+	/** @var IConfigLoader  */
+	protected $conf;
 
 	/**
 	 * @param LoopInterface $reactLoop
@@ -59,13 +63,14 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param UserMapper $userMapper
 	 * @param Verboser $verboser
 	 */
-	public function __construct($reactLoop, $predisClient, $userMapper, $verboser = null) {
+	public function __construct($reactLoop, $predisClient, $userMapper, $verboser, $iConfigLoader = null) {
 		$this->pipes = array();
 		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
 		$this->predisClient = $predisClient;
 		$this->userMapper = $userMapper;
 		$this->verboser = $verboser;
+		$this->conf = $iConfigLoader ?: new ConfigLoader();
 
 		$this->v('Instantiated PipeManager');
 	}
@@ -304,9 +309,11 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * null if the user cannot be located.
 	 *
 	 * @param string $sessionId
-	 * @return User|null
+	 * @param string $pipeIp
+	 * @throws \Schoolbox\Mapper\Exception
+	 * @return User
 	 */
-	protected function findUserBySession($sessionId) {
+	protected function findUserBySession($sessionId, $pipeIp = null) {
 		if(!$sessionId) {
 			return null;
 		}
@@ -315,12 +322,25 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			$this->predisClient->createCommand('get', array('PHPREDIS_SESSION:'.$sessionId))
 		);
 
-		preg_match('`id\|s:[0-9]+:"([0-9]+)";`', $redisResponse, $matches);
+		if(!preg_match('`id\|s:[0-9]+:"([0-9]+)";`', $redisResponse, $matches)) {
+			throw new MapperException("User not found");
+		}
+
+		$userId = $matches[1];
+
+		preg_match('`lasttime\|i:([0-9]+);`', $redisResponse, $matches);
+		$lastTime = $matches[1];
+
+		preg_match('`ip\|s:[0-9]+:"([0-9\.]+)";`', $redisResponse, $matches);
+		$sessionIp = $matches[1];
+
+		// the following mirrors SitePage::initSession() - unfortunately it can't hook into it
+		$trackIp = $this->conf->get('track_ip');
+		$remember = $this->conf->get('remember');
 
 		// TODO triple-check validity of session. If it's invalid, please throw an exception.
 		// TODO Any exception will do, but the message string will be sent to the client
 
-		$userId = $matches[1];
 
 		/** @var User $user */
 		return $this->userMapper->findById($userId);
