@@ -19,6 +19,7 @@ use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
 use Schoolbox\Notif\NotifException;
+use Schoolbox\Notif\Queue\UnreadMessage;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Stomp\Subscription;
 use Schoolbox\User;
@@ -60,7 +61,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function __construct($reactLoop, $predisClient, $userMapper, $verboser = null) {
 		$this->pipes = array();
-		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $verboser);
+		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
 		$this->predisClient = $predisClient;
 		$this->userMapper = $userMapper;
@@ -76,7 +77,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param  ConnectionInterface $conn The socket/connection that just connected to your application
 	 * @throws \Exception
 	 */
-	function onOpen(ConnectionInterface $conn) {
+	public function onOpen(ConnectionInterface $conn) {
 
 		$this->v('Received socket connection');
 
@@ -116,7 +117,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param  ConnectionInterface $conn The socket/connection that is closing/closed
 	 * @throws \Exception
 	 */
-	function onClose(ConnectionInterface $conn) {
+	public function onClose(ConnectionInterface $conn) {
 		$this->v('Received socket closure');
 		// TODO: Implement onClose() method.
 
@@ -140,7 +141,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param  \Exception $e
 	 * @throws \Exception
 	 */
-	function onError(ConnectionInterface $conn, \Exception $e) {
+	public function onError(ConnectionInterface $conn, \Exception $e) {
 		$this->v(sprintf('Exception! %s: "%s" - %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()), '!');
 		// TODO: Implement onError() method.
 	}
@@ -153,7 +154,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param  string $msg The message received
 	 * @throws \Exception
 	 */
-	function onMessage(ConnectionInterface $from, $msg) {
+	public function onMessage(ConnectionInterface $from, $msg) {
 		$socketKey = Pipe::getSocketKeyForConnection($from);
 
 		if(!array_key_exists($socketKey, $this->pipesBySocketKey)) {
@@ -198,6 +199,22 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			$this->sendToPipe($pipe, "Cannot understand command '$command'");
 		}
 
+	}
+
+
+	/**
+	 * This is the method called from within a Subscription object for notifying attached sockets of a new message.
+	 *
+	 * @param UnreadMessage $message
+	 * @param User $user
+	 */
+	public function onAMQP($message, $user) {
+		$this->v("Received new message to send to ".$user->getUsername());
+		$this->sendToUser($user, json_encode(array(
+			'push' => array(
+				$message->getId() => $message->toArray()
+			)
+		)));
 	}
 
 
@@ -341,8 +358,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param string $data
 	 */
 	public function sendToUser($user, $data) {
-		if(array_key_exists($user->getId(), $this->pipesBySessionId)) {
-			foreach($this->pipesBySessionId[$user->getId()] as $pipe) {
+		if(array_key_exists($user->getId(), $this->pipesByUser)) {
+			foreach($this->pipesByUser[$user->getId()] as $pipe) {
 				$this->sendToPipe($pipe, $data);
 			}
 		}
@@ -389,6 +406,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	public function doPipeFetch($pipe, $count) {
 		if(($user = $pipe->getUser()) && is_numeric($count)) {
 
+			$messages = array();
 
 			// get a queue to retrieve read messages synchronously
 			$mqf = new UserQueueFactory();
@@ -396,8 +414,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 			$allMessages = $queue->getMessages($count, true);
 			$unreadMessages = $this->subscriptionManager->getUserSubscription($user, true)->getMessages();
-
-			$messages = array();
 
 			foreach($allMessages as $read) {
 				$messages[$read->getId()] = $read->toArray();
@@ -423,7 +439,12 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	public function doPipeAck($pipe, $messageIds) {
 		if($user = $pipe->getUser()) {
 			if($subscription = $this->subscriptionManager->getUserSubscription($user, true)) {
-				return $subscription->acceptMessages($messageIds);
+				$markAsRead = $subscription->acceptMessages($messageIds);
+				// if there are messages to mark as read, notify all sockets attached for this user
+				if(count($markAsRead)) {
+					$this->sendToUser($user, json_encode(array('mark_as_read' => $markAsRead)));
+				}
+				return true;
 			}
 		}
 		return false;
@@ -431,13 +452,13 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 
 	// noop
-	function onCall(ConnectionInterface $conn, $id, $topic, array $params) { }
-	function onSubscribe(ConnectionInterface $conn, $topic) { }
-	function onUnSubscribe(ConnectionInterface $conn, $topic) { }
-	function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) { }
+	public function onCall(ConnectionInterface $conn, $id, $topic, array $params) { }
+	public function onSubscribe(ConnectionInterface $conn, $topic) { }
+	public function onUnSubscribe(ConnectionInterface $conn, $topic) { }
+	public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) { }
 
 
-	function v($msg, $char = ' ') {
+	public function v($msg, $char = ' ') {
 		$this->verboser->v($msg, $char);
 	}
 }

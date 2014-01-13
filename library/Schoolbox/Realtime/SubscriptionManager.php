@@ -18,8 +18,8 @@ use Schoolbox\User;
 
 class SubscriptionManager {
 
-	/** @var Verboser */
-	public $verboser;
+	/** @var PipeManager */
+	protected $pipeManager;
 
 	/** @var Factory */
 	protected $stompFactory;
@@ -27,10 +27,10 @@ class SubscriptionManager {
 	/** @var Subscription[] */
 	protected $subscriptions;
 
-	public function __construct($stompFactory, $verboser) {
+	public function __construct($stompFactory, $pipeManager) {
 		$this->stompFactory = $stompFactory;
 		$this->subscriptions = array();
-		$this->verboser = $verboser;
+		$this->pipeManager = $pipeManager;
 	}
 
 	/**
@@ -38,13 +38,12 @@ class SubscriptionManager {
 	 * @return bool
 	 */
 	public function subscribe($user) {
-
 		if($this->userHasSubscription($user)) {
-			$this->verboser->v("User {$user->getUsername()} is already subscribed");
+			$this->pipeManager->v("User {$user->getUsername()} is already subscribed");
 			return false;
 		}
 
-		$this->verboser->v('SUBSCRIBE', '+');
+		$this->pipeManager->v('SUBSCRIBE', '+');
 
 		$client = $this->stompFactory->createClient(array(
 			'host'      => '127.0.0.1',
@@ -57,10 +56,10 @@ class SubscriptionManager {
 		$self = $this;
 		$destination = $this->userSubscriptionDestination($user);
 
-		$client->connect()->then(function($client) use ($destination, $self) {
+		$client->connect()->then(function($client) use ($destination, $self, $user) {
 			/** @var Client $client */
 			// this closure is executed when a stomp client connection is established
-			$self->putSubscription($destination, new Subscription($destination, $client, $self->verboser));
+			$self->putSubscription($destination, new Subscription($destination, $client, $user, $self->getPipeManager()));
 		});
 
 		return true;
@@ -71,27 +70,28 @@ class SubscriptionManager {
 	 * @param Subscription $subscription
 	 */
 	public function putSubscription($destination, $subscription) {
-		$this->verboser->v("Adding subscription to $destination (id:{$subscription->getId()})");
+		$this->pipeManager->v("Adding subscription to $destination (id:{$subscription->getId()})");
 		$this->subscriptions[$destination] = $subscription;
 	}
 
 	/**
 	 * @param User $user
-	 * @param $generateIfAbsent
+	 * @param bool $generateIfAbsent
 	 * @throws Stomp\SubscriptionException
 	 * @return Subscription
 	 */
-	public function getUserSubscription($user, $generateIfAbsent) {
+	public function getUserSubscription($user, $generateIfAbsent = true) {
 
 		$dest = $this->userSubscriptionDestination($user);
 
 		if(!array_key_exists($dest, $this->subscriptions)) {
 			if($generateIfAbsent) {
 				$this->subscribe($user);
+				if(array_key_exists($dest, $this->subscriptions)) {
+					return $this->subscriptions[$dest];
+				}
 			}
-			else {
-				throw new SubscriptionException("No subscription for {$user->getUsername()}");
-			}
+			throw new SubscriptionException("No subscription for {$user->getUsername()}");
 		}
 		return $this->subscriptions[$dest];
 	}
@@ -113,4 +113,11 @@ class SubscriptionManager {
 		return array_key_exists($this->userSubscriptionDestination($user), $this->subscriptions);
 	}
 
+
+	/**
+	 * @return PipeManager
+	 */
+	public function getPipeManager() {
+		return $this->pipeManager;
+	}
 } 
