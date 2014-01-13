@@ -16,7 +16,7 @@ class Video extends Base {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/video.html';
+	protected $templateFile = 'submission/inline/injectables/views/video.html';
 
 	/**
 	 * Control file, to determine how to return work

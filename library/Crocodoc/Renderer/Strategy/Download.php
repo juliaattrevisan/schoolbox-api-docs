@@ -18,7 +18,7 @@ class Download extends Base {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/download.html';
+	protected $templateFile = 'submission/inline/injectables/views/download.html';
 
 	/**
 	 * Control file, to determine how to return work

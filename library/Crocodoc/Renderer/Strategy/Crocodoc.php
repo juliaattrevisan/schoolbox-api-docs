@@ -18,7 +18,7 @@ class Crocodoc extends Base {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/crocodoc.html';
+	protected $templateFile = 'submission/inline/injectables/views/crocodoc.html';
 
 	/**
 	 * Control file, to determine how to return work

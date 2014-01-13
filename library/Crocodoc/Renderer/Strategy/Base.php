@@ -39,14 +39,14 @@ abstract class Base {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/none.html';
+	protected $templateFile = 'submission/inline/injectables/views/none.html';
 
 	/**
 	 * Control file, to determine how to return work
 	 *
 	 * @var string
 	 */
-	protected $controlFile = 'submission/inline/injectables/redirect-return-control.html';
+	protected $controlFile = 'submission/inline/injectables/controls/redirect-return-control.html';
 
 	/**
 	 * Upload file

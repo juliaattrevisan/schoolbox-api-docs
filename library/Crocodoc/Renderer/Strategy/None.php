@@ -16,7 +16,7 @@ class None extends Base {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/none.html';
+	protected $templateFile = 'submission/inline/injectables/views/none.html';
 
 	/**
 	 * Control file, to determine how to return work

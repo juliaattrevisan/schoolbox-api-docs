@@ -16,7 +16,7 @@ class Image extends Base {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/image.html';
+	protected $templateFile = 'submission/inline/injectables/views/image.html';
 
 	/**
 	 * Control file, to determine how to return work
