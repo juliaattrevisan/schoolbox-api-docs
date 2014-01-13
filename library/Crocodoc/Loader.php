@@ -61,7 +61,7 @@ class Loader {
 		$result = json_decode($curl->getResult());
 
 		return json_encode(array(
-			'url' => "https://crocodoc.com/view/{$result['result']->session}",
+			'url' => "https://crocodoc.com/view/{$result->session}",
 			'errors' => $curl->getErrors()
 		));
 	}

@@ -74,7 +74,9 @@ class Alaress_Curl_Url {
 	 * @param $error
 	 */
 	private function addErrors($error) {
-		$this->errors[] = $error;
+		if (strlen($error)) {
+			$this->errors[] = $error;
+		}
 	}
 
 	/* Getters/Setters
