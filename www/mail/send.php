@@ -45,8 +45,6 @@ function sendMail($to, $cc, $bcc, $subject, $message)
         }
     }
     else {
-        //if emails have ; seperator account for it
-        $to = str_replace(";",",",$to);
         foreach (Mailer::parseAddressString($to) as $address => $name) {
             try {
                 $mail->addTo($address, $name);
@@ -79,7 +77,6 @@ function sendMail($to, $cc, $bcc, $subject, $message)
     $mail->setSubject($subject);
 
     if (strrchr($cc, '@')) {
-        $cc = str_replace(";",",",$cc);
         foreach (Mailer::parseAddressString($cc) as $address => $name) {
             try {
                 $mail->addCc($address, $name);
@@ -91,7 +88,6 @@ function sendMail($to, $cc, $bcc, $subject, $message)
     }
 
     if (strrchr($bcc, '@')) {
-        $bcc = str_replace(";",",",$bcc);
         foreach (Mailer::parseAddressString($bcc) as $address => $name) {
             try {
                 $mail->addBcc($address, $name);
@@ -129,7 +125,12 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 //if form has been submitted
 if(isset($_POST['to']) && $_POST['to'] && Cfg::get('mail_enable'))
 {
-    sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
+    // MagicSuggest passes emails as JSON-encoded values, I should make it pass
+    // array values
+    $to  = implode(",", json_decode($_POST['to']));
+    $cc  = implode(",", json_decode($_POST['cc']));
+    $bcc = implode(",", json_decode($_POST['bcc']));
+    sendMail($to, $cc, $bcc, $_POST['subject'], $_POST['message']);
 
     //output code to send the browser to where it came from
     $back = -2;
