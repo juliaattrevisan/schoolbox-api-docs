@@ -52,7 +52,7 @@ class Video extends Base {
 		if ($video->isComplete()) {
 			$this->getPage()->parse('injectable_video_player_block', 'injectable_video_player');
 			$this->getPage()->setVar(array(
-				'VIDEO_ID' => $video->getId(),
+				'VIDEO_ID' => $video->getFile()->getId(),
 				'injectable_video_status_block' => ''
 			));
 		}
