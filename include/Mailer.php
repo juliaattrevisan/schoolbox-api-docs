@@ -258,4 +258,17 @@ class Mailer {
         return $return_list;
     }
 
+    /**
+     * Builds an RFC822-compliant email address from an address and a name.
+     *
+     * @param string $address
+     * @param string $name
+     *
+     * @return string
+     */
+    public static function buildAddress($address, $name = '') {
+        list($mailbox, $host) = explode('@', $address, 2);
+        return imap_rfc822_write_address($mailbox, $host, $name);
+    }
+
 }
