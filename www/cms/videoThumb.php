@@ -9,7 +9,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-if (isset($_GET['type']) && is_numeric($_GET['id'])) {
+if (isset($_GET['type']) && is_numeric($_GET['id']) && isset($_GET['size'])) {
 	$page = new SitePage;
 	$groupHandler = new Group;
 
