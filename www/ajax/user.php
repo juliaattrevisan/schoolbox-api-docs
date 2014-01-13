@@ -34,9 +34,10 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strl
                 $email = $emailObj->formatEmailFromArray($user);
 
                 if ($email) {
+                    $fullEmail = $user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>';
                     $return[] = array(
-                        'name' => Scrub::text($user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>'),
-                        'id'   => $user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>',
+                        'name' => $fullEmail,
+                        'id'   => $fullEmail,
                     );
                 }
             } else {
