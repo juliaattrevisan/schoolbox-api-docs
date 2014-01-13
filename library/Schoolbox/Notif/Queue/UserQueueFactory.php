@@ -55,12 +55,11 @@ class UserQueueFactory {
 	}
 
 	/**
-	 * Build the queue for the given User, including binding generation
-	 *
-	 * @param User|int $user
+	 * Creates bindings for a User's queue, but doesn't actually attempt message retrieval.
+	 * @param $user
 	 * @return UserQueue
 	 */
-	public function buildUserQueue($user) {
+	public function bindUserQueue($user) {
 		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
 
 		$bindings = array(
@@ -78,11 +77,18 @@ class UserQueueFactory {
 			$bindings['category'][] = $cat->getId();
 		}
 
+		return new UserQueue($bindings, $this->mqConnector);
+	}
 
-		$q = new UserQueue($bindings, $this->mqConnector);
-
+	/**
+	 * Build the queue for the given User, including binding generation
+	 *
+	 * @param User|int $user
+	 * @return UserQueue
+	 */
+	public function buildUserQueue($user) {
+		$q = $this->bindUserQueue($user);
 		$q->getMessages();
-
 		return $q;
 	}
 
@@ -92,10 +98,10 @@ class UserQueueFactory {
 	 * @param User|int $user
 	 */
 	public function destoryUserBindings($user) {
-		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
-		$exchange = MQConnector::SECONDARY_NAME_PREFIX . $user->getUsername();
+//		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
+//		$exchange = MQConnector::SECONDARY_NAME_PREFIX . $user->getUsername();
 
 		// unbind all routes
-		$this->mqConnector->deleteExchange($exchange);
+//		$this->mqConnector->deleteExchange($exchange);
 	}
 } 

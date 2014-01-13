@@ -21,6 +21,9 @@ use Schoolbox\User;
  */
 class UserQueue {
 
+	const QUEUE_ALL_MESSAGES = 'u.%s.all';
+	const QUEUE_UNREAD_MESSAGES = 'u.%s.unread';
+
 	/** @var AbstractMessage[] */
 	protected $messages = array();
 
@@ -28,7 +31,7 @@ class UserQueue {
 	protected $conn;
 
 	/** @var string */
-	protected $queuePrefix;
+	protected $username;
 
 	/**
 	 * @param array $bindings
@@ -36,19 +39,17 @@ class UserQueue {
 	 */
 	public function __construct($bindings, $mqConnector) {
 		$this->conn = $mqConnector;
-		$username = $bindings['user']['username'];
+		$this->username = $bindings['user']['username'];
 		$userId = $bindings['user']['id'];
 
 		unset($bindings['user']);
 
-		$exchange = MQConnector::SECONDARY_NAME_PREFIX . $username;
-
-		$this->queuePrefix = "u.$username.";
+		$exchange = MQConnector::SECONDARY_NAME_PREFIX . $this->username;
 
 		// one connection to declare them all...
 		$this->conn->declareExchange($exchange);
-		$this->conn->declareQueue($this->queuePrefix . "unread");
-		$this->conn->declareQueue($this->queuePrefix . "read");
+		$this->conn->declareQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, $this->username));
+		$this->conn->declareQueue(sprintf(self::QUEUE_ALL_MESSAGES, $this->username));
 
 		// the user's personal routing key
 		$keys = array("*.notify.user.$userId");
@@ -64,8 +65,8 @@ class UserQueue {
 		foreach($keys as $key) {
 			$this->conn->bindExchange($exchange, $key);
 		}
-		$this->conn->bindQueue($this->queuePrefix . "unread", '', $exchange);
-		$this->conn->bindQueue($this->queuePrefix . "read",   '', $exchange);
+		$this->conn->bindQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, $this->username), '', $exchange);
+		$this->conn->bindQueue(sprintf(self::QUEUE_ALL_MESSAGES, $this->username),   '', $exchange);
 
 	}
 
@@ -73,15 +74,14 @@ class UserQueue {
 	/**
 	 * Retrieve messages from the queue
 	 * @param int $limit - how many messages to retrieve, from most recent backward
-	 * @param bool $markAsRead - whether or not the retrieved messages should be marked read
 	 * @param bool $forceRefresh - whether or not the list of messages should be repopulated
 	 * @return AbstractMessage[]
 	 */
-	public function getMessages($limit = 10, $markAsRead = true, $forceRefresh = false) {
+	public function getMessages($limit = 10, $forceRefresh = false) {
 
 		// retrieve messages and sort
 		if(!count($this->messages) || $forceRefresh) {
-			$this->retrieveMessages($markAsRead ? $limit : 0);
+			$this->retrieveMessages();
 		}
 
 		return array_slice($this->messages, 0, $limit, false);
@@ -91,18 +91,15 @@ class UserQueue {
 	/**
 	 * Populate this user's notification list
 	 */
-	protected function retrieveMessages($markAsReadCount) {
+	protected function retrieveMessages() {
 
-		while($m = $this->conn->readFromQueue($this->queuePrefix . "unread")) {
-			$msg = new UnreadMessage($m);
-			$this->messages[$msg->getId()] = $msg;
-		}
+		$nacks = array();
 
-		// hold onto these ones
-		while($m = $this->conn->readFromQueue($this->queuePrefix . "read")) {
+		while($m = $this->conn->readFromQueue(sprintf(self::QUEUE_ALL_MESSAGES, $this->username))) {
 			$msg = new ReadMessage($m);
 			if(!array_key_exists($msg->getId(), $this->messages)) {
 				$this->messages[$msg->getId()] = $msg;
+				$nacks[] = $msg->getAmqpMessage();
 			}
 		}
 
@@ -113,28 +110,8 @@ class UserQueue {
 			return $at == $bt ? 0 : $at > $bt ? -1 : 1;
 		});
 
-		$count = count($this->messages);
-
-		$acks  = array();
-		$nacks = array();
-
-		// iterate and flag appropriate messages as read
-		for($i = 0; $i < $count; ++$i) {
-			// if within count, and unread, ACCEPT this message (dequeuing it)
-			if($i < $markAsReadCount && $this->messages[$i] instanceof UnreadMessage) {
-				$acks[] = $this->messages[$i]->getAmqpMessage();
-			}
-			// if not within count, or is read, REJECT this message (so as not to dequeue it)
-			else {
-				$nacks[] = $this->messages[$i]->getAmqpMessage();
-			}
-		}
-
-		// reject the messages in the read queue and requeue them.
-		$this->conn->acceptMessages($acks);
+		// now we've collected messages, reject all
 		$this->conn->rejectMessages($nacks);
-
-
 
 	}
 
