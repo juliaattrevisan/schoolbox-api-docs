@@ -240,7 +240,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			$this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
 			$this->v("LINK       '$socketKey' -> SESSION '$sessionId'");
 
-			if($user = $this->findUserBySession($sessionId)) {
+			if($user = $this->findUserBySession($sessionId, $pipe->getRemoteAddress())) {
 				$pipe->setUser($user);
 				$this->pipesByUser[$user->getId()][$socketKey] = $pipe;
 				$this->v("LINK       '$socketKey' -> USER    '{$user->getUsername()}'");
@@ -311,6 +311,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param string $sessionId
 	 * @param string $pipeIp
 	 * @throws \Schoolbox\Mapper\Exception
+	 * @throws \Schoolbox\Notif\NotifException
 	 * @return User
 	 */
 	protected function findUserBySession($sessionId, $pipeIp = null) {
@@ -337,9 +338,18 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		// the following mirrors SitePage::initSession() - unfortunately it can't hook into it
 		$trackIp = $this->conf->get('track_ip');
 		$remember = $this->conf->get('remember');
+		$sessionLength = $this->conf->get('session_length');
 
-		// TODO triple-check validity of session. If it's invalid, please throw an exception.
-		// TODO Any exception will do, but the message string will be sent to the client
+		// check remote address, if appropriate
+		if($trackIp && ($sessionIp != $pipeIp)) {
+			throw new NotifException("Changed IP address, log in again");
+		}
+
+		// check session timeout length
+		if (!$remember && (($lastTime + $sessionLength) < time())) {
+			throw new NotifException("Session has expired, log in again");
+		}
+
 
 
 		/** @var User $user */
