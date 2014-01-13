@@ -7,11 +7,28 @@ $j(document).ready(function () {
     var options = {
         data:'/ajax/user.php?groupID=0&email=1',
         hideTrigger: true,
-        minChars: 2
+        minChars: 2,
+        selectionRenderer: function(a) {
+            // HTML-escape the user's name
+            return $j('<span />').text(a.name).html();
+        }
     }
-    $j('#to').magicSuggest(options)
+
+    var initWithValue = function(initValue) {
+        return function() {
+            var suggest = this
+            if (!suggest._dataSet) {
+                suggest._dataSet = true
+                $j.each(initValue, function(k,v) {
+                    suggest.addToSelection({id: v, name: v})
+                })
+            }
+        }
+    }
+
+    $j($j('#to').magicSuggest(options)).on('load', initWithValue({REPLYTO}))
     $j('#cc').magicSuggest(options)
-    $j('#bcc').magicSuggest(options)
+    $j($j('#bcc').magicSuggest(options)).on('load', initWithValue({BCC}))
 
 //    // Use an array of values instead of a single JSON value
 //    $j(suggests).on('selectionchange', function() {
@@ -70,7 +87,7 @@ function verify()
   <table class="table">
     <tr>
       <td class="formLabelWidth"><h4>To:</h4></td>
-	  <td><input type="text" name="to" id="to" size="90" value="{REPLYTO}" /></td>
+	  <td><input type="text" name="to" id="to" size="90" value="" /></td>
     </tr>
     <tr>
       <td><h4>CC:</h4></td>
@@ -79,7 +96,7 @@ function verify()
     <tr>
       <td><h4>BCC:</h4>
 	  </td>
-	  <td><input type="text" name="bcc" id="bcc" size="90" value="{BCC}" /></td>
+	  <td><input type="text" name="bcc" id="bcc" size="90" value="" /></td>
     </tr>
     <tr>
       <td><h4>Subject:</h4>
