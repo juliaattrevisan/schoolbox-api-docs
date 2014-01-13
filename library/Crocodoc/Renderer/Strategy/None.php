@@ -23,7 +23,7 @@ class None extends Base {
 	 *
 	 * @var string
 	 */
-	protected $controlFile = 'submission/inline/injectables/redirect-return-control.html';
+	protected $controlFile = 'submission/inline/injectables/controls/redirect-return-control.html';
 
 	/**
 	 * Render injectable

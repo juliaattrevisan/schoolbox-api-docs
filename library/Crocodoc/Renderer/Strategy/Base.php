@@ -49,6 +49,13 @@ abstract class Base {
 	protected $controlFile = 'submission/inline/injectables/redirect-return-control.html';
 
 	/**
+	 * Upload file
+	 *
+	 * @var string
+	 */
+	protected $uploadFile = 'submission/inline/injectables/controls/upload-file.html';
+
+	/**
 	 * Constructor
 	 *
 	 * @param $page
@@ -177,5 +184,23 @@ abstract class Base {
 	 */
 	protected function getNavigationElements() {
 		return $this->navigationElements;
+	}
+
+	/**
+	 * Get upload file
+	 *
+	 * @param string $uploadFile
+	 */
+	protected function setUploadFile($uploadFile) {
+		$this->uploadFile = $uploadFile;
+	}
+
+	/**
+	 * Set upload file
+	 *
+	 * @return string
+	 */
+	protected function getUploadFile() {
+		return $this->uploadFile;
 	}
 }

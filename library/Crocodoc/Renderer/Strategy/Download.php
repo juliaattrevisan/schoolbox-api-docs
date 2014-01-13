@@ -25,7 +25,7 @@ class Download extends Base {
 	 *
 	 * @var string
 	 */
-	protected $controlFile = 'submission/inline/injectables/redirect-return-control.html';
+	protected $controlFile = 'submission/inline/injectables/controls/redirect-return-control.html';
 
 	/**
 	 * Render injectable
@@ -51,7 +51,7 @@ class Download extends Base {
 
 		/* Upload file
 		 */
-		$this->getPage()->setFile('injectableUpload', 'submission/inline/injectables/upload-file.html');
+		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
 		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
 
 		/* Control how Return Work is done
