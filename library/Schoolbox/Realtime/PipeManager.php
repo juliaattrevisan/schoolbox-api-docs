@@ -19,6 +19,8 @@ use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
 use Schoolbox\Notif\NotifException;
+use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Realtime\Stomp\Subscription;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -34,9 +36,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	/** @var Pipe[][] */
 	protected $pipesByUser;
 
-
-	/** @var StompFactory */
-	protected $stompFactory;
+	/** @var SubscriptionManager */
+	protected $subscriptionManager;
 
 	/** @var LoopInterface */
 	protected $reactLoop;
@@ -47,22 +48,23 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	/** @var \Schoolbox\UserMapper */
 	protected $userMapper;
 
-	/** @var resource */
-	protected $debugStream;
+	/** @var Verboser */
+	protected $verboser;
+
 
 	/**
 	 * @param LoopInterface $reactLoop
 	 * @param PredisClientInterface $predisClient
 	 * @param UserMapper $userMapper
-	 * @param resource $debugStream
+	 * @param Verboser $verboser
 	 */
-	public function __construct($reactLoop, $predisClient, $userMapper, $debugStream = null) {
+	public function __construct($reactLoop, $predisClient, $userMapper, $verboser = null) {
 		$this->pipes = array();
-		$this->stompFactory = new StompFactory($reactLoop);
+		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $verboser);
 		$this->reactLoop = $reactLoop;
 		$this->predisClient = $predisClient;
 		$this->userMapper = $userMapper;
-		$this->debugStream = $debugStream;
+		$this->verboser = $verboser;
 
 		$this->v('Instantiated PipeManager');
 	}
@@ -70,16 +72,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 	/**
 	 * When a new connection is opened it will be passed to this method
+	 *
 	 * @param  ConnectionInterface $conn The socket/connection that just connected to your application
 	 * @throws \Exception
 	 */
 	function onOpen(ConnectionInterface $conn) {
-		// TODO: Implement onOpen() method.
 
 		$this->v('Received socket connection');
 
 		// receive new connection, register a pipe based on it
-
 		$pipe = new Pipe($conn);
 
 		try {
@@ -87,7 +88,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		}
 		catch(CommunicationException $e) {
 			// Redis baulked: signal a retry
-
 			$this->v($e->getMessage(), '!');
 
 			$this->sendToPipe($pipe, json_encode(array(
@@ -98,21 +98,21 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		}
 		catch(MapperException $e) {
 			// user not found, not logged in: signal authentication required
-
 			$this->v('Client not authenticated', '!');
 
 			$this->sendToPipe($pipe, json_encode(array(
 				'error' => 'Unauthorized',
 				'code'  => 401,
 			)));
-
 			$pipe->close();
 		}
-
 	}
 
+
 	/**
-	 * This is called before or after a socket is closed (depends on how it's closed).  SendMessage to $conn will not result in an error if it has already been closed.
+	 * This is called before or after a socket is closed (depends on how it's closed).
+	 * SendMessage to $conn will not result in an error if it has already been closed.
+	 *
 	 * @param  ConnectionInterface $conn The socket/connection that is closing/closed
 	 * @throws \Exception
 	 */
@@ -131,9 +131,11 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 	}
 
+
 	/**
 	 * If there is an error with one of the sockets, or somewhere in the application where an Exception is thrown,
 	 * the Exception is sent back down the stack, handled by the Server and bubbled back up the application through this method
+	 *
 	 * @param  ConnectionInterface $conn
 	 * @param  \Exception $e
 	 * @throws \Exception
@@ -143,14 +145,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		// TODO: Implement onError() method.
 	}
 
+
 	/**
 	 * Triggered when a client sends data through the socket
+	 *
 	 * @param  \Ratchet\ConnectionInterface $from The socket/connection that sent the message to your application
 	 * @param  string $msg The message received
 	 * @throws \Exception
 	 */
 	function onMessage(ConnectionInterface $from, $msg) {
-
 		$socketKey = Pipe::getSocketKeyForConnection($from);
 
 		if(!array_key_exists($socketKey, $this->pipesBySocketKey)) {
@@ -188,10 +191,13 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		// process the command that's been sent from the client
 		if(method_exists($this, $method)) {
 			$this->v("Executing $method for $username [$socketKey]", '*');
-			$this->$method($pipe, $arguments);
+			$response = $this->$method($pipe, $arguments);
+			$this->sendToPipe($pipe, json_encode(array($command => $response)));
+		}
+		else {
+			$this->sendToPipe($pipe, "Cannot understand command '$command'");
 		}
 
-		// TODO: Implement onMessage() method.
 	}
 
 
@@ -206,25 +212,21 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$sessionId = $pipe->getSession();
 
 		$this->pipesBySocketKey[$socketKey] = $pipe;
-
 		$this->v("REGISTER   '$socketKey'", '+');
 
 		if($sessionId) {
 			$this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
-
 			$this->v("LINK       '$socketKey' -> SESSION '$sessionId'");
 
 			if($user = $this->findUserBySession($sessionId)) {
 				$pipe->setUser($user);
 				$this->pipesByUser[$user->getId()][$socketKey] = $pipe;
-
 				$this->v("LINK       '$socketKey' -> USER    '{$user->getUsername()}'");
 			}
 		}
 		else {
 			throw new MapperException("No session, no user.");
 		}
-
 	}
 
 	/**
@@ -249,9 +251,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$this->pipesBySocketKey[$socketKey]->close();
 
 		$this->v("UNREGISTER '$socketKey'", '-');
-
 		unset($this->pipesBySocketKey[$socketKey]);
-
 	}
 
 	/**
@@ -349,20 +349,84 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	}
 
 
-
-
-
-
+	/**
+	 * Message from client: stub (test connectivity).
+	 *
+	 * @param Pipe $pipe
+	 * @param mixed $arguments
+	 * @return bool
+	 */
 	public function doPipe_($pipe, $arguments) {
-		$this->v('STUB!', 'd');
+		$this->v('STUB', 'd');
+		return true;
 	}
 
-	public function doPipeSubscribe($pipe, $arguments) {
 
+	/**
+	 * Message from client: ensure STOMP subscription exists for user.
+	 *
+	 * @param Pipe $pipe
+	 * @param mixed $null
+	 * @return bool
+	 */
+	public function doPipeSubscribe($pipe, $null) {
+		if($user = $pipe->getUser()) {
+			$this->subscriptionManager->subscribe($user);
+			// this is "you are subscribed" not "the subscription action just worked"
+			return true;
+		}
+		return false;
 	}
 
-	public function doPipeUnsubscribe($pipe, $arguments) {
 
+	/**
+	 * Message from client: retrieve n messages, both read and unread.
+	 *
+	 * @param Pipe $pipe
+	 * @param int $count
+	 * @return bool
+	 */
+	public function doPipeFetch($pipe, $count) {
+		if(($user = $pipe->getUser()) && is_numeric($count)) {
+
+
+			// get a queue to retrieve read messages synchronously
+			$mqf = new UserQueueFactory();
+			$queue = $mqf->buildUserQueue($user);
+
+			$allMessages = $queue->getMessages($count, true);
+			$unreadMessages = $this->subscriptionManager->getUserSubscription($user, true)->getMessages();
+
+			$messages = array();
+
+			foreach($allMessages as $read) {
+				$messages[$read->getId()] = $read->toArray();
+			}
+
+			foreach($unreadMessages as $unread) {
+				$messages[$unread->getId()] = $unread->toArray();
+			}
+
+			return $messages;
+
+		}
+		return array();
+	}
+
+	/**
+	 * Message from client: mark the given messages as read.
+	 *
+	 * @param Pipe $pipe
+	 * @param array $messageIds
+	 * @return bool
+	 */
+	public function doPipeAck($pipe, $messageIds) {
+		if($user = $pipe->getUser()) {
+			if($subscription = $this->subscriptionManager->getUserSubscription($user, true)) {
+				return $subscription->acceptMessages($messageIds);
+			}
+		}
+		return false;
 	}
 
 
@@ -374,8 +438,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 
 	function v($msg, $char = ' ') {
-		if($this->debugStream) {
-			fputs($this->debugStream, "[$char] $msg\n");
-		}
+		$this->verboser->v($msg, $char);
 	}
 }
