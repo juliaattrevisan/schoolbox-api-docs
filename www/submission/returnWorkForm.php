@@ -11,7 +11,7 @@ $page = new SitePage;
 $returnHandler = new SubmissionReturn;
 $subHandler = new Submission();
 $rubricHandler = new DueWork_Rubric_Handler();
-
+print_r($_POST);
 // Ajax from mark sheet
 if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) */ && isset($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
     $response = array();

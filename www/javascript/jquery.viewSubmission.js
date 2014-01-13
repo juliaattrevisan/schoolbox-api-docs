@@ -75,20 +75,11 @@ $j(function() {
                         if ($j(form).find('div.inline-submit').length) {
                             // perform ajax update of work, no file upload
                             var submitDiv = $j(form).find('div.inline-submit');
-                            var submitForm = submitDiv.clone();
 
-                            // if there's a select, align the values
-                            submitForm.find('select').val(submitDiv.find('select').val());
+                            var notification = submitDiv.find('input, select, textarea');
 
-                            var notification = submitDiv.find('input, select');
+                            $j.post('/submission/returnWorkForm.php', submitDiv.find('input, select, textarea').serialize(), function(data) {
 
-                            // remove all the [] from all the elements
-                            submitForm.find('input, select').each(function() {
-                                var self = $j(this);
-                                self.attr('name', self.attr('name').replace(/\[[0-9]*\]/,''));
-                            });
-
-                            $j.post('/submission/returnWorkForm.php', submitForm.find('input, select').serialize(), function(data) {
                                 // Why don't I have a class for this?
                                 notification.addClass('ajax-updated');
                                 setTimeout(function() {

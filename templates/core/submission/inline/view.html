@@ -42,6 +42,7 @@
 <div class="clearfix">
 	<div id="navigator"></div>
 	<a class='btn go-back' href="/submission/viewSubmission/{BOX_ID}"><span></span>Return to List</a>
+	<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View History</a>
 </div>
 
 <div id="crocodoc-error-container">
@@ -57,44 +58,24 @@
 
 	<h2>Assign marks</h2>
 
-	<span class="header_option">
-		<!-- BEGIN download_btn -->
+	<span class="student-status {OWNER_CLASS}">{OWNER_STATUS}</span>
 
-		<!-- END download_btn -->
-		<!-- BEGIN modify_btn -->
-
-		<!-- END modify_btn -->
-	</span>
 	<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" name="returnWorkForm" id="returnWorkForm">
 		<table class="table">
 			<colgroup>
-				<col width="40px"/>
-				<col width="200px"/>
+				<col width="100px"/>
 				<col/>
 			</colgroup>
 			<tbody>
 				<!-- BEGIN student_row -->
 				<tr class="user_{OWNER_ID} user submission">
-					<td></td>
-					<td class="nowrap student">
-						<img class="student-icon" src="{OWNER_IMG}" alt="{OWNER_NAME}"/>
-
-						<p>
-							<a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a>
-							<span class="student-status {OWNER_CLASS}">{OWNER_STATUS}</span>
-						</p>
-					</td>
+					<td class="nowrap student"></td>
 					<td class="marking">
-						<div>{OWNER_MARKING}</div>
-						<div class="button-set">
-							<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View History</a>
-							<input type="file" name="file-return-{OWNER_ID}" class="prettify"/>
-						</div>
+						{OWNER_MARKING}
 					</td>
 				</tr>
 				<!-- BEGIN submission_row -->
 				<tr class="user_{OWNER_ID} submission file {SUBMISSION_EXPANDABLE} sub-table-row">
-					<td></td>
 					<td class="{SUBMISSION_CLASS}">{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
 					<td>
 						<div class="table-wrap">
@@ -124,3 +105,11 @@
 
 	{INJECTED_INTERFACE_CONTROL}
 </div>
+
+<!-- BEGIN download_btn -->
+
+<!-- END download_btn -->
+
+<!-- BEGIN modify_btn -->
+
+<!-- END modify_btn -->

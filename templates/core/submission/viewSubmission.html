@@ -1,36 +1,11 @@
 <!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
 <script src="/javascript/jquery.viewSubmission.js" type="text/javascript"></script>
-<script type="text/javascript">
-    $j(function () {
-        // setup prettifier
-        $j('.prettify').prettyFileInput({
-            inputHolderClass:'file-input not-static',
-            buttonClass:'btn up-arrow',
-            buttonActiveClass:'tick no-text',
-            defaultText:'<span></span>Select marked work',
-            defaultFileSelectedText:'<span></span>',
-            callback:function (e) {
-                var btns = $j('#returnWorkForm').find('input.submit-btn-plain');
-                if ($j('.btn.tick').length) {
-                  btns.prop('disabled', false);
-                }
-                else {
-                  btns.prop('disabled', true);
-                }
-            }
-        });
-
-		$j('.combobox').combobox({COMBO_OPTIONS});
-    });
-</script>
 <!-- END custom_head -->
 
 <h1>{DUEWORK_DESCRIPTION}</h1>
@@ -49,21 +24,13 @@
     <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" name="returnWorkForm" id="returnWorkForm">
         <table class="table">
             <colgroup>
-                <col width="40px"/>
                 <col width="200px"/>
-                <col/>
+                <col />
+				<col width="160px"/>
             </colgroup>
-            <thead>
-            <tr>
-				<td colspan="3">
-                    <input id="upload-returns-submit-north" type="submit" class="submit-btn-plain up-arrow" disabled="disabled" value="Upload all"/>
-                </td>
-            </tr>
-            </thead>
             <tbody>
             <!-- BEGIN student_row -->
-            <tr class="user_{OWNER_ID} user submission">
-                <td></td>
+            <tr class="user_{OWNER_ID} user">
                 <td class="nowrap student">
                     <img class="student-icon" src="{OWNER_IMG}" alt="{OWNER_NAME}"/>
 
@@ -74,17 +41,14 @@
                 </td>
                 <td class="marking">
                     <div>{OWNER_MARKING}</div>
-                    <div class="button-set">
-						<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View History</a>
-						<a href="/submission/inline/view/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>Mark work</a>
-						<input type="file" name="file-return-{OWNER_ID}" class="prettify"/>
-                    </div>
                 </td>
+				<td>
+					<a href="/submission/inline/view/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>Mark work</a>
+				</td>
             </tr>
 
             <!-- BEGIN submission_row -->
             <tr class="user_{OWNER_ID} submission file {SUBMISSION_EXPANDABLE} sub-table-row">
-                <td></td>
                 <td class="{SUBMISSION_CLASS}">{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
                 <td>
 					<div class="table-wrap">
@@ -104,14 +68,11 @@
 					</div>
 					</div>
 				</td>
+				<td>
+				</td>
             </tr>
             <!-- END submission_row -->
             <!-- END student_row -->
-            <tr>
-              <td colspan="3">
-                <input id="upload-returns-submit-south" type="submit" class="submit-btn-plain up-arrow" disabled="disabled" value="Upload all"/>
-              </td>
-            </tr>
             </tbody>
         </table>
     </form>
