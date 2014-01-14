@@ -60,6 +60,7 @@ class Renderer {
 	 * Set up blocks and stuff
 	 */
 	private function setup() {
+		$this->getPage()->setBlock(TEMPLATE_content, 'mark_type_rubric', 'mark_type_rubric_block');
 		$this->getPage()->setBlock('mark_type_rubric', 'rubric_rating', 'rubric_rating_block');
 		$this->getPage()->setBlock('mark_type_rubric', 'rubric_crit', 'rubric_crit_block');
 		$this->getPage()->setBlock('rubric_crit', 'rubric_crit_rating', 'rubric_crit_rating_block');

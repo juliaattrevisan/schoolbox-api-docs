@@ -124,3 +124,8 @@ $this->setVar(array(
 $dueWorkDetail = new DueWork_Detail($submissionBoxId);
 $dueWorkDetail->processStudents(array($currentStudent));
 $dueWorkDetail->renderDetails($this);
+
+/* Rubric's Cube
+ */
+$rubricsRenderer = new \Rubric\Renderer($this, $submissionBox, $user);
+$rubricsRenderer->render();
