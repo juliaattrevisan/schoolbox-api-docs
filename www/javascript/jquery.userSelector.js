@@ -1,5 +1,12 @@
 /**
  * User selector, makes use of the MagicSuggest jQuery plugin
+ *
+ * Options:
+ * * value:       initial selected value. If not supplied, can be read from
+ *                value of element
+ * * multiple:    whether multiple selections can be made
+ * * formElement: A separate form element to update with the selected value
+ * * plugin:      options for magicsuggest
  */
 (function($){
     // require(magicsuggest.js, magicsuggest.css)
@@ -8,6 +15,7 @@
         var defaults = {
             plugin: {
                 data:'/ajax/user.php?groupID=0',
+                displayField: 'name',
                 hideTrigger: true,
                 minChars: 2,
                 allowFreeEntries: false,
@@ -17,7 +25,8 @@
                 }
             },
             value: [],
-            multiple: false
+            multiple: false,
+            formElement: null
         }
         var settings = $.extend(true, {}, defaults, options)
 
@@ -29,6 +38,7 @@
         if (!settings.value) {
             var value = element.val()
             if (value) {
+                // Maybe it's a scalar, if so then reverse-lookup?
                 settings.value = JSON.parse(value)
             }
         }
@@ -41,7 +51,7 @@
         element.data('magicsuggest', ms)
 
         // Add all values to selection
-        ms.one('load', function() {
+        ms.one('load.userSelector', function() {
             var suggest = this
             $.each(settings.value, function(k,v) {
                 var id   = v
@@ -50,13 +60,15 @@
                     id   = v.id
                     name = v.name
                 }
-                suggest.addToSelection({id: id, name: name})
+                var selection = {id: id}
+                selection[settings.plugin.displayField] = name
+                suggest.addToSelection(selection)
             })
         })
 
         // Singles: overwrite input value
         // Multiples: Disable magicsuggest's JSON input and build an array of inputs
-        ms.on('selectionchange', function() {
+        ms.on('selectionchange.userSelector', function() {
             var suggest   = this;
             var name      = suggest.getName()
             var value     = suggest.getValue()
@@ -69,9 +81,16 @@
                 })
             }
             else {
-                baseInput.val(value.pop() || '')
+                var singleValue = value.pop() || ''
+                baseInput.val(singleValue)
+                if (settings.formElement) {
+                    settings.formElement.val(singleValue)
+                }
             }
         })
+
+        // Chain me
+        return this;
     };
 }(jQuery));
 
