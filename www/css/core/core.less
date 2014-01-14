@@ -554,8 +554,88 @@ Notifications
 	a {
 		color: @banner-links;
 		text-decoration: underline;
+		&.socket {
+			border-bottom: solid 4px @std-grey;
+			display: block;
+			height: 14px;
+			&.connected {
+				border-bottom-color: darken(@positive-color, @darken-value);
+			}
+			img {
+				clip: rect(0, 32px, 28px, 0);
+			}
+		}
 	}
-	img { 	margin-top: -14px; }
+	img {
+		margin-top: -14px;
+		position: absolute;
+		overflow: hidden;
+	}
+}
+#infoPanel #message-list {
+	position: absolute;
+	border: solid 1px @navigation-hover-background;
+	background: #fff;
+	right: 0;
+	top: 22px;
+	&:before {
+		content: " ";
+		display: block;
+		width: 0;
+		height: 0;
+		border-left: 5px solid transparent;
+		border-right: 5px solid transparent;
+		border-bottom: 5px solid @navigation-hover-background;
+		position: absolute;
+		top: -5px;
+		right: 10px;
+	}
+	#messages {
+		margin: 0 8px 0 0;
+		padding: 0;
+		h4 {
+			font-weight: bold;
+			color: #000;
+			padding: 8px 0 4px 8px;
+		}
+		li.message {
+			position: relative;
+			width: 100%;
+			margin: 0 0 0 -32px;
+			padding: 0 0 0 32px;
+			a {
+				display: block;
+				width: 100%;
+				padding: 8px 0 18px 8px;
+				border-bottom: solid 1px #d7d7d7;
+				text-decoration: none;
+				&:hover {
+					text-decoration: underline;
+					background: #cde;
+				}
+			}
+			img {
+				width: 32px;
+				height: 32px;
+				margin: 0;
+				position: static;
+			}
+			p {
+				margin: -36px 0 6px 0;
+				padding: 0 0 0 38px;
+			}
+			time {
+				position: absolute;
+				bottom: 6px;
+				right: 0;
+				color: #bbb;
+				font-style: italic;
+			}
+			&.unread a {
+				background: #EAEEFF;
+			}
+		}
+	}
 }
 
 /*--------------------------------------------------------------
