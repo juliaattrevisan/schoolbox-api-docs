@@ -12,7 +12,7 @@
 
 <script type='text/javascript'>
 	$(function() {
-		$('#crocodoc').crocodoc({
+		$('#inline-grading').crocodoc({
 			boxId: '{CROCODOC_SUBMISSION_BOX_ID}',
 			submissionId: '{CROCODOC_SUBMISSION_ID}',
 			errorElement: '#crocodoc-error-container'
@@ -39,15 +39,10 @@
 		$j('.combobox').combobox({COMBO_OPTIONS});
 	});
 </script>
-<style type="text/css">
-	#crocodoc-error-container {
-		display: none;
-	}
-</style>
 
 <div class="dropdown-navigator"></div>
 
-<div id="crocodoc-error-container">
+<div id="inline-grading-error-container">
 	<strong>There were errors downloading document for inline grading:</strong>
 </div>
 
