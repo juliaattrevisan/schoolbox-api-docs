@@ -10,7 +10,7 @@
 
 /* This is intended to load in an iframe
  */
-$crocodoc = new \Crocodoc\Facade($_GET['submissionId'], $_SESSION['user']);
+$crocodoc = new \Crocodoc\Facade($this->arg[0], $_SESSION['user']);
 $crocodoc->start();
 
 exit();
