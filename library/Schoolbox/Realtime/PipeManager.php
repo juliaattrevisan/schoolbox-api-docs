@@ -219,6 +219,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function onAMQP($message, $user) {
 //		$this->v("Received new message to send to ".$user->getUsername());
+
+		// if traffic gets high enough, we may need to look at micro-caching and batching these pushes
+
 		$this->sendToUser($user, json_encode(array(
 			'push' => array(
 				$message->getId() => $message->toArray()
@@ -368,7 +371,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function sendToPipe($pipe, $data) {
 		$bytes = strlen($data);
-		$this->v("Sending $bytes bytes to {$pipe->getSocketKey()}");
+		$this->v("Sending $bytes bytes to {$pipe->getSocketKey()}", '<');
 		$pipe->send($data);
 	}
 
