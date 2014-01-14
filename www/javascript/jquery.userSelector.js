@@ -5,6 +5,8 @@
  * * value:       initial selected value. If not supplied, can be read from
  *                value of element
  * * multiple:    whether multiple selections can be made
+ * * onePerLine:  whether selections show as blocks (one per line). Otherwise,
+ *                they are displayed inline
  * * formElement: A separate form element to update with the selected value
  * * plugin:      options for magicsuggest
  */
@@ -21,6 +23,8 @@
                 minChars: 2,
                 allowFreeEntries: false,
                 maxSelection: null,
+                cls: 'no-trigger',
+                selectionCls: '',
                 selectionRenderer: function(a) {
                     // HTML-escape the user's name
                     return $('<span />').text(a.name).html();
@@ -28,12 +32,16 @@
             },
             value: [],
             multiple: false,
+            onePerLine: true,
             formElement: null
         }
         var settings = $.extend(true, {}, defaults, options)
 
         if (!settings.multiple) {
             settings.plugin.maxSelection = 1
+        }
+        if (settings.onePerLine) {
+            settings.plugin.selectionCls += ' one-per-line'
         }
 
         // Load value from the element if it's there and not in settings
