@@ -33,13 +33,13 @@ $this->setVar('newSelect_block', '');
 $tableList = array(
     array(
         'name' => 'groups',
-        'title' => 'Groups',
+        'title' => 'Roles',
         'index' => 'id',
         'fields' => array(
             'id'         => array('readonly' => '1'),
             'name'       => array('caption' => 'Name'),
-            'group_type' => array('caption' => 'Group Type'),
-            'can_change_password' => array('caption' => 'Can Change Password'),
+            'group_type' => array('caption' => 'Role Type'),
+            'can_change_password' => array('caption' => 'Allow Password Change'),
             'digest_schedule'     => array(
                 'caption' => 'Digest Schedule',
                 'options' => array(

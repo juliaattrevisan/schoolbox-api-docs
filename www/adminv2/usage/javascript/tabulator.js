@@ -23,7 +23,7 @@
 				columns: [
 					{column: 'firstname', label: 'Firstname'},
 					{column: 'lastname', label: 'Lastname'},
-					{column: 'name', label: 'Group'},
+					{column: 'name', label: 'Role'},
 					{column: 'bytes', label: 'Usage'}
 				],
 				ascendingHtml:  '<img src="/images/core/tablesorter/sort-ascending.gif">',
