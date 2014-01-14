@@ -19,6 +19,7 @@
                 hideTrigger: true,
                 minChars: 2,
                 allowFreeEntries: false,
+                maxSelection: null,
                 selectionRenderer: function(a) {
                     // HTML-escape the user's name
                     return $('<span />').text(a.name).html();
