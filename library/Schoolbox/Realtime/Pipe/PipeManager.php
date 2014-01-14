@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime;
+namespace Schoolbox\Realtime\Pipe;
 
 
 use Predis\ClientInterface as PredisClientInterface;
@@ -23,20 +23,28 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\NotifException;
 use Schoolbox\Notif\Queue\UnreadMessage;
 use Schoolbox\Notif\Queue\UserQueueFactory;
-use Schoolbox\Realtime\Stomp\Subscription;
+use Schoolbox\Realtime\ProcessManager;
+use Schoolbox\Realtime\Stomp\SubscriptionManager;
+use Schoolbox\Realtime\Verboser;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
+/**
+ * This is the main "app" of our React loop.
+ *
+ * Class PipeManager
+ * @package Schoolbox\Realtime
+ */
 class PipeManager implements WampServerInterface, MessageComponentInterface {
 
-	/** @var Pipe[] */
+	/** @var PipeInterface[] */
 	protected $pipesBySocketKey;
 
-	/** @var Pipe[][] */
+	/** @var PipeInterface[][] */
 	protected $pipesBySessionId;
 
-	/** @var Pipe[][] */
+	/** @var PipeInterface[][] */
 	protected $pipesByUser;
 
 	/** @var SubscriptionManager */
@@ -85,10 +93,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function onOpen(ConnectionInterface $conn) {
 
-		$this->v('Received socket connection');
-
 		// receive new connection, register a pipe based on it
 		$pipe = new Pipe($conn);
+
+		$this->v('Received socket connection from ' . $pipe->getRemoteAddress());
 
 		try {
 			$this->registerPipe($pipe);
@@ -102,6 +110,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 				'code'  => 503,
 				'retry' => true
 			)));
+			$pipe->close();
 		}
 		catch(MapperException $e) {
 			// user not found, not logged in: signal authentication required
@@ -229,6 +238,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		)));
 	}
 
+	/**
+	 * Commit this pipe to its own process... NOT THREAD
+	 * BEWARE: FORKING!
+	 *
+	 * @param Pipe $pipe
+	 */
+	protected function commit($pipe) {
+		$this->processManager->fork($pipe);
+	}
 
 	/**
 	 * Register this pipe connection
@@ -256,6 +274,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		else {
 			throw new MapperException("No session, no user.");
 		}
+
+		$this->commit($pipe);
 	}
 
 	/**

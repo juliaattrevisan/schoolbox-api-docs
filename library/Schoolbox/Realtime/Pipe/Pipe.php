@@ -7,7 +7,8 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime;
+namespace Schoolbox\Realtime\Pipe;
+
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Ratchet\ConnectionInterface;
 use Schoolbox\User;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
  * Class Pipe
  * @package Schoolbox\Realtime
  */
-class Pipe {
+class Pipe implements PipeInterface {
 
 	/**
 	 * @param ConnectionInterface $conn

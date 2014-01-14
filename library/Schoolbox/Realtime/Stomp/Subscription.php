@@ -15,7 +15,7 @@ use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Notif\Queue\UnreadMessage;
-use Schoolbox\Realtime\PipeManager;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Verboser;
 use Schoolbox\User;
 

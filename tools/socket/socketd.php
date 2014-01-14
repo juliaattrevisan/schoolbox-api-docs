@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-use Schoolbox\Realtime\PipeManager;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\UserMapper;
 
 /**

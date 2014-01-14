@@ -7,13 +7,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime;
+namespace Schoolbox\Realtime\Stomp;
 
 
 use React\Stomp\Client;
 use React\Stomp\Factory;
-use Schoolbox\Realtime\Stomp\Subscription;
-use Schoolbox\Realtime\Stomp\SubscriptionException;
+use Schoolbox\Realtime\Pipe\Pipe;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
 
 class SubscriptionManager {
@@ -91,7 +91,7 @@ class SubscriptionManager {
 	/**
 	 * @param User $user
 	 * @param bool $generateIfAbsent
-	 * @throws Stomp\SubscriptionException
+	 * @throws SubscriptionException
 	 * @return Subscription
 	 */
 	public function getUserSubscription($user, $generateIfAbsent = true) {
