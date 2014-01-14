@@ -15,10 +15,18 @@ class Authenticator {
 
 	/**
 	 * Registered api token at crocodoc
+	 * This is Steve's api token, for his account
 	 *
 	 * @var string
 	 */
 	protected $apiToken = 'D4t65GknNUXFev8HJlTWpf2V';
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setApiToken(\Cfg::get('crocodoc_api_token'));
+	}
 
 	/* Getters/Setters
 	 */
