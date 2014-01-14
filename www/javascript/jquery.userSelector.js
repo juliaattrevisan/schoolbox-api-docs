@@ -9,6 +9,7 @@
  * * plugin:      options for magicsuggest
  */
 (function($){
+    "use strict";
     // require(magicsuggest.js, magicsuggest.css)
     $.fn.userSelector = function(options) {
         var element  = this;
