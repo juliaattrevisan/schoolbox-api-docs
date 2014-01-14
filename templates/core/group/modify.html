@@ -36,7 +36,7 @@ $j(document).ready(function() {
             data:'/ajax/user.php?groupID=0',
             width: 275
         },
-        formElement: $j('userID')
+        multiple: true
     })
 
 	$j('#type_form input').each(function () {
@@ -75,9 +75,8 @@ $j(document).ready(function() {
 				</td>
 			<td>
 				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
-					<input id="addUser" type="text" size="30" />
-					<input type="hidden" name="userID" id="userID" />
-					<input type="submit" value="Add User" class="submit-btn-plain" />
+					<input id="addUser" name="userID" type="text" size="30" />
+					<input type="submit" value="Add Users" class="submit-btn-plain" />
 				</form>
 
 

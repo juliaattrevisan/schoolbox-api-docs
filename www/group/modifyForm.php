@@ -66,14 +66,11 @@ else if (isset($_REQUEST['accept'])) {
 /* Add user
  */
 else if (isset($_POST['userID'])) {
-	$userHandler = new User();
-	$user = $userHandler->getByID($_POST['userID']);
-
-	if (isset($user['uid'])) {
-		$groupHandler->addUser($_GET['categoryID'], $user['uid']);
-	}
-
-	SitePage::localRedir('/group/modify/' . $_GET['categoryID']);
+    $userList = \Schoolbox\UserMapper::getInstance()->findByColumn('id', $_POST['userID']);
+    foreach ($userList as $userObject) {
+        $groupHandler->addUser($_GET['categoryID'], $userObject->getId());
+    }
+    SitePage::localRedir('/group/modify/' . $_GET['categoryID']);
 }
 else if (is_numeric($_GET['owner'])) {
 	$category = $categoryHandler->getByID($_REQUEST['categoryID']);
