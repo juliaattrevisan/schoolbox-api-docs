@@ -12,6 +12,14 @@
         <input id="search-button" type="submit" value="Search"/>
     </fieldset>
 </form>
+<script type="text/javascript">
+  $j(function() {
+    // launch the notifier
+    $j('#infoPanel').find('img').closest('a').notifier({
+      host: '{SERVER_ADDRESS}'
+    });
+  });
+</script>
 <!-- END banner_logged_in -->
 <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}"/></a>
 
