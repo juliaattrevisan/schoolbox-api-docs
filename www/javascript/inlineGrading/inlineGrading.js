@@ -5,7 +5,7 @@
 	 *
 	 * @param options
 	 */
-	$.fn.crocodoc = function(options) {
+	$.fn.inlineGrading = function(options) {
 
 		/* Store the config in this instance so private methods
 		 * can access it, only if the chosen element exists
@@ -13,7 +13,7 @@
 		if ($(this).length) {
 			var config = init(options, this);
 
-			crocodoc();
+			inlineGrading();
 		}
 
 		/**
@@ -49,7 +49,7 @@
 		/**
 		 * Start crocodoc inline marking
 		 */
-		function crocodoc() {
+		function inlineGrading() {
 			$.getJSON(config.url.view, function(data) {
 
 				/* If data is empty, everything is ok
@@ -83,7 +83,7 @@
 		}
 	}
 
-	$.fn.crocodocNavigator = function(options) {
+	$.fn.inlineGradingNavigator = function(options) {
 
 		/* Store the config in this instance so private methods
 		 * can access it
