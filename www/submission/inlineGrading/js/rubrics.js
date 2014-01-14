@@ -19,6 +19,10 @@
 		if ($(this).length) {
 			var config = init(options, this);
 
+			/* Set up data and objects for optional graph
+			 */
+			setupGraph();
+			renderGraph();
 			/* Preselect existing values
 			 */
 			updateSelections();
@@ -42,7 +46,20 @@
 
 				/* Tallied score goes here
 				 */
-				sum: '#sum'
+				score: '#sum',
+
+				/* Option to render graph
+				 */
+				renderGraph: false,
+
+				/* Optional graphing data
+				 */
+				graph: {
+					container: '#rubric-chart',
+					data: [],
+					legs: [],
+					max: 0
+				}
 			}
 
 			var derived = {
@@ -52,6 +69,40 @@
 			var merged = $j.extend(defaults, derived, options);
 
 			return merged;
+		}
+
+		/**
+		 * Boolean to determine if a graph should be spawned
+		 *
+		 * @returns {boolean}
+		 */
+		function isGraph() {
+			if (config.renderGraph === true) {
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
+		 * Set up optional graph
+		 */
+		function setupGraph() {
+			if (isGraph()) {
+				config.rubricData = setupRubricChart(config.graph.data, config.graph.legs, config.graph.max);
+				config.plot = $.plot($(config.graph.container), config.rubricData.spidata.points, config.rubricData.options);
+
+				renderGraph();
+			}
+		}
+
+		/**
+		 * Render optional graph
+		 */
+		function renderGraph() {
+			if (isGraph()) {
+				config.plot.draw();
+			}
 		}
 
 		/**
@@ -87,11 +138,21 @@
 				$(element).parent('.criterion-value').addClass('focused');
 
 				sum += parseInt($(element).val());
+
+				/* Update graph
+				 */
+				if (isGraph()) {
+					config.rubricData.spidata.points[0].data[$(element).data('index')] = [$(element).data('index'), parseInt($(element).val())];
+				}
 			});
 
 			/* Update total marks assigned by rubrics
 			 */
-			$('#sum').html(sum);
+			$(config.score).html(sum);
+
+			/* Update graph
+			 */
+			renderGraph();
 		}
 	}
 }(jQuery));
