@@ -128,4 +128,5 @@ $dueWorkDetail->renderDetails($this);
 /* Rubric's Cube
  */
 $rubricsRenderer = new \Rubric\Renderer($this, $submissionBox, $user);
-$rubricsRenderer->render();
+$rubricsRenderer->render()->parseBlock();
+

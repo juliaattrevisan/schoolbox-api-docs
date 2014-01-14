@@ -144,6 +144,15 @@ class Renderer {
 			'RUBRIC_GRADE_SUM' => $sum,
 			'RUBRIC_GRADE_MAX' => $max
 		));
+
+		return $this;
+	}
+
+	/**
+	 * An additional step, to retain compatibility with returnWork.php
+	 */
+	public function parseBlock() {
+		$this->getPage()->parse("mark_type_rubric_block", "mark_type_rubric");
 	}
 
 	/* Getters/Setters
