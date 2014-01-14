@@ -119,6 +119,7 @@ $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
 	'STUDENT_FULL_NAME' => $user->getFullName(),
+	'INLINE_GRADING_STUDENT_ID' => $user->getId(),
 ));
 
 $dueWorkDetail = new DueWork_Detail($submissionBoxId);

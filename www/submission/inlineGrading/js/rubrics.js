@@ -1,3 +1,17 @@
+/**
+ * Example usage:
+ *
+$('#rubric-tbody').inlineGradingRubrics({
+	score: '#sum',
+	renderGraph: false
+	graph: {
+		container: '#rubric-chart',
+		data: [[0,"9"],[1,"9"],[2,"9"]],
+		legs: [{"label":"moxy"},{"label":"gronk"},{"label":"hmmm"}],
+		max: 9
+	}
+});
+ */
 (function($) {
 
 	/**
