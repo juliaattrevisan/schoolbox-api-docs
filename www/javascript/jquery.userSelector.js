@@ -68,16 +68,18 @@
 
         // Singles: overwrite input value
         // Multiples: Disable magicsuggest's JSON input and build an array of inputs
-        ms.on('selectionchange.userSelector', function() {
+        ms.on('selectionchange.userSelector blur.userSelector', function() {
             var suggest   = this;
             var name      = suggest.getName()
             var value     = suggest.getValue()
-            var baseInput = suggest.selectionContainer.find('input[name="'+name+'"]')
+            var baseInput = suggest.container.find('input[name="'+name+'"]')
             if (settings.multiple) {
                 baseInput.prop('disabled', true)
-                suggest.selectionContainer.find('input[name="'+name+'[]"]').remove()
+                // Place new items within container, to ensure that they are
+                // included after the base input (which gets added and removed)
+                suggest.container.find('input[name="'+name+'[]"]').remove()
                 $j.each(value, function(i,v){
-                    suggest.selectionContainer.append($j('<input type="hidden" />').attr('name', name+'[]').val(v))
+                    suggest.container.append($j('<input type="hidden" />').attr('name', name+'[]').val(v))
                 })
             }
             else {
