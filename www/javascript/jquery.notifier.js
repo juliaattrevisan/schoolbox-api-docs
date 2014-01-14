@@ -4,8 +4,10 @@
 
     $.fn.notifier = function(options) {
         var settings = $.extend({
+            secure: false,
             host: '192.168.1.1',
-            port: '8080'
+            port: '8080',
+            prefetch: 5
         }, options);
 
         return this.each(function() {
@@ -49,6 +51,29 @@
              */
             function updateDOM() {
 
+                var dom = $(self);
+
+                // if the avatar doesn't have a listener attached, do initialisation
+                if(typeof dom.data("events") === 'undefined' || typeof dom.data("events").click === 'undefined') {
+
+                    dom.attr('title', 'View Messages');
+
+                    var msgs = $('<ul/>').attr('id', 'messages');
+                    var ml = $('<li/>').attr('id','message-list').addClass('hide');
+
+                    ml.append(msgs);
+
+                    var ul = dom.closest('ul').append(ml);
+
+
+                    dom.click(function(e) {
+                        e.preventDefault();
+                        $('#message-list').toggleClass('hide');
+                    });
+                }
+
+                // do the following on every DOM update request
+
                 var newlist = $('<ul/>').attr('id', 'messages'),
                     toInsert = [],
                     id;
@@ -65,15 +90,31 @@
 
                 var i;
 
+                var msgLiTpl = $('<li/>').addClass('message').append(
+                    $('<a/>').addClass('action').attr('href', '#').append(
+                        $('<img/>').attr('width', '32').attr('height', '32')
+                    ).append(
+                        $('<p/>').addClass('descript')
+                    ).append(
+                        $('<time/>').addClass('time')
+                    )
+                );
+
+                newlist.append('<li/>').append($('<h4/>').text('Notifications'));
+
                 for(i = toInsert.length - 1; i >= 0; --i) {
                     id = toInsert[i].id;
+
                     var status = toInsert[i].status;
                     var body = toInsert[i].body;
                     var message = body.message;
                     var humanTime = body.datetime.date;
-                    var li = $('<li/>').addClass('message').addClass(status).attr('id', 'm-'+id).attr('title', id);
-                    li.append($('<p/>').html(message));
-                    li.append($('<p/>').html(humanTime));
+
+                    var li = msgLiTpl.clone();
+
+                    li.attr('id', 'm-'+id).addClass(status);
+                    li.find('p').html(message);
+                    li.find('time').html(humanTime);
                     newlist.append(li);
                 }
 
@@ -88,6 +129,7 @@
              */
             var onOpen = function() {
                 send({subscribe : true});
+                $(self).addClass('socket connected');
             }
 
             /**
@@ -96,6 +138,7 @@
              * @param e
              */
             var onError = function(e) {
+                $(self).removeClass('connected');
                 var data;
                 try {
                     data = JSON.parse(e.data)
@@ -137,6 +180,7 @@
              * @param e
              */
             var onClose = function(e) {
+                $(self).removeClass('connected');
                 pollReconnect();
             }
 
@@ -147,7 +191,10 @@
              * @param data
              */
             this.pipeSubscribe = function(data) {
-                send({fetch : 15});
+                // don't try a fetch if the subscription came back false
+                if(data === true) {
+                    send({fetch : settings.prefetch});
+                }
             }
 
             /**
@@ -224,7 +271,7 @@
             /* constructor method execution starts here */
 
             var self = this;
-            var url = 'ws://' + settings.host + ':' + settings.port;
+            var url = (settings.secure ? 'wss' : 'ws') + '://' + settings.host + ':' + settings.port;
             var conn;
             var messages = {};
             var attemptReconnect = true;
