@@ -62,7 +62,7 @@ class SideNav extends SubjectListAbstract {
 					foreach($currentSubjectList as $currentSubject) {
 						$this->getPage()->setVar(array(
 							'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
-							'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
+							'SUBJECT_URL' =>  "/homepage/{$currentSubject['subject']['code']}",
 						));
 
 						$this->getPage()->parse('msubject_item_block', 'msubject_item', true);
