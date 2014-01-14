@@ -16,8 +16,8 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strl
 
     /* Allow for multiple groups search via autocompletes
      */
-    if (strstr($groupID, ',')) {
-        $groupID = explode(',', $groupID);
+    if (strstr($groupID, ';')) {
+        $groupID = explode(';', $groupID);
     }
 
     // requires session to know which group we're in
