@@ -108,20 +108,14 @@ $navigationDirect = json_encode($navigationElements);
 
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
+/* Render injectable views
+ */
 $templateFactory = new \Crocodoc\Renderer\Factory($this, $currentStudent['submission'], $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
-$this->setVar(array(
-	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
-	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox['id'],
-	'INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
-	'INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
-	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
-	'STUDENT_FULL_NAME' => $user->getFullName(),
-	'INLINE_GRADING_STUDENT_ID' => $user->getId(),
-));
-
+/* Assign marks
+ */
 $dueWorkDetail = new DueWork_Detail($submissionBoxId);
 $dueWorkDetail->processStudents(array($currentStudent));
 $dueWorkDetail->renderDetails($this);
@@ -130,4 +124,14 @@ $dueWorkDetail->renderDetails($this);
  */
 $rubricsRenderer = new \Rubric\Renderer($this, $submissionBox, $user);
 $rubricsRenderer->render()->parseBlock();
+
+$this->setVar(array(
+	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
+	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox['id'],
+	'INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
+	'INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
+	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
+	'INLINE_GRADING_STUDENT_FULL_NAME' => $user->getFullName(),
+	'INLINE_GRADING_STUDENT_ID' => $user->getId(),
+));
 
