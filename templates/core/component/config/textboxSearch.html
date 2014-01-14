@@ -1,17 +1,15 @@
-<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css"/>
-<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <script type="text/javascript">
 
     $j(function () {
-        $j('#textbox_search{COMPONENT_TEXTBOX_ID}').autocomplete({
-            serviceUrl:'/ajax/textbox.php',
-            minChars:2,
-            maxHeight:300,
-            width:275,
-            noCache:true,
-            onSelect:function (element, data) {
-                $j('#textboxSearch{COMPONENT_TEXTBOX_ID}').val(data);
+        $j('#textbox_search{COMPONENT_TEXTBOX_ID}').userSelector({
+            plugin: {
+                data:'/ajax/textbox.php',
+                width:275
             },
+            formElement: $j('#textboxSearch{COMPONENT_TEXTBOX_ID}')
         });
     });
 </script>
