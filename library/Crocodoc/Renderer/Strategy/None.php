@@ -16,14 +16,14 @@ class None extends Base {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/views/none.html';
+	protected $templateFile = 'submission/inlineGrading/injectables/views/none.html';
 
 	/**
 	 * Control file, to determine how to return work
 	 *
 	 * @var string
 	 */
-	protected $controlFile = 'submission/inline/injectables/controls/redirect-return-control.html';
+	protected $controlFile = 'submission/inlineGrading/injectables/controls/redirect-return-control.html';
 
 	/**
 	 * Render injectable

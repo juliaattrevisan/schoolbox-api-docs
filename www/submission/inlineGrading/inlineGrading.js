@@ -35,7 +35,7 @@
 			var derived = {
 				submissionId: parseInt(options.submissionId),
 				url: {
-					view: '/submission/inline/iframe?submissionId=' + parseInt(options.submissionId)
+					view: '/submission/inlineGrading/iframe?submissionId=' + parseInt(options.submissionId)
 				}
 			}
 

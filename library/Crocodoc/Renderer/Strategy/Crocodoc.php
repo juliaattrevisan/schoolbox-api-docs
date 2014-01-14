@@ -18,14 +18,14 @@ class Crocodoc extends Base {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'submission/inline/injectables/views/crocodoc.html';
+	protected $templateFile = 'submission/inlineGrading/injectables/views/crocodoc.html';
 
 	/**
 	 * Control file, to determine how to return work
 	 *
 	 * @var string
 	 */
-	protected $controlFile = 'submission/inline/injectables/controls/crocodoc-return-control.html';
+	protected $controlFile = 'submission/inlineGrading/injectables/controls/crocodoc-return-control.html';
 
 	/**
 	 * Render injectable
@@ -49,7 +49,7 @@ class Crocodoc extends Base {
 		/* Determine download url
 		 * This downloads it from crocodoc to Schoolbox
 		 */
-		$downloadUrl = '/submission/inline/download/' . $this->getSubmission()->getId();
+		$downloadUrl = '/submission/inlineGrading/download/' . $this->getSubmission()->getId();
 
 		$this->getPage()->setVar(array(
 			'INJECTABLE_CONTROL_URL' => $downloadUrl,

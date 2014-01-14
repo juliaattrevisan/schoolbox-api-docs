@@ -36,7 +36,7 @@ foreach ($studentList as $currentStudent) {
 		$currentStudent['navigation'] = array(
 			'id' => $currentStudent['uid'],
 			'label' => $currentStudent['lastname'] . ', ' . $currentStudent['firstname'],
-			'value' => '/submission/inline/view/' . $submissionBoxId . '/' . $currentStudent['uid']
+			'value' => '/submission/inlineGrading/view/' . $submissionBoxId . '/' . $currentStudent['uid']
 		);
 
 		$stack[] = $currentStudent;
@@ -106,7 +106,7 @@ $navigationElements = array(
 
 $navigationDirect = json_encode($navigationElements);
 
-$this->setFile(TEMPLATE_content, 'submission/inline/view.html');
+$this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
 $templateFactory = new \Crocodoc\Renderer\Factory($this, $currentStudent['submission'], $navigationElements);
 $renderer = $templateFactory->produce();
