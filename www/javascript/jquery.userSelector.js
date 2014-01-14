@@ -24,7 +24,6 @@
                 allowFreeEntries: false,
                 maxSelection: null,
                 cls: 'no-trigger',
-                selectionCls: '',
                 selectionRenderer: function(a) {
                     // HTML-escape the user's name
                     return $('<span />').text(a.name).html();
@@ -41,7 +40,7 @@
             settings.plugin.maxSelection = 1
         }
         if (settings.onePerLine) {
-            settings.plugin.selectionCls += ' one-per-line'
+            settings.plugin.cls += ' one-per-line'
         }
 
         // Load value from the element if it's there and not in settings

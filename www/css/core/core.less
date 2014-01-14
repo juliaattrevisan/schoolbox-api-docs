@@ -10268,12 +10268,16 @@ th.rotate {
 
 // Overrides for MagicSuggest settings
 // Remove the padding for the trigger if it's hidden. (why the plugin doesn't do this I don't know)
-.ms-ctn.no-trigger .ms-sel-ctn {
-    padding-right: 0;
+.ms-ctn.no-trigger {
+    .ms-sel-ctn {
+        padding-right: 0;
+    }
 }
 // This option shows each selection on a new line.
-.ms-ctn .ms-sel-item.one-per-line {
-    clear: both;
+.ms-ctn.one-per-line {
+    input, .ms-sel-item {
+        clear: both;
+    }
 }
 // Make sure that highlighted text shows inline at all times (instead of as a block)
 .ms-res-ctn .ms-res-item em {
