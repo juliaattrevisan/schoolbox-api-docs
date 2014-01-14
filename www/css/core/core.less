@@ -10265,3 +10265,14 @@ th.rotate {
 		}
 	}
 }
+
+// Overrides for MagicSuggest settings
+// This option removes the float from selected items, therefore showing each
+// selection on a new line.
+.ms-ctn .ms-sel-item.block {
+    float: none;
+}
+// Make sure that highlighted text shows inline at all times (instead of as a block)
+.ms-res-ctn .ms-res-item em {
+    display: inline;
+}
