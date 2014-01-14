@@ -29,7 +29,7 @@ if ($_POST['heading']) {
         'item_body' => $_POST['body'],
         'groupList' => $_POST['group'],
         'campusList' => $_POST['campus'],
-        'userList' => $_POST['userList'],
+        'userList' => (is_array($_POST['userList']) ? $_POST['userList'] : array()),
         'item_topic_id' => $_POST['item_topic_id'],
         'item_datetime_published' => $publishedDate->getDatabase(),
         'item_datetime_expires' => $expiryDate->getDatabase()
