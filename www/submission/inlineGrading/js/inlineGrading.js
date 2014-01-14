@@ -1,6 +1,8 @@
 (function($) {
 
 	/**
+	 * Add something to crocodoc for annotations
+	 *
 	 * Constructor
 	 *
 	 * @param options
@@ -83,6 +85,13 @@
 		}
 	}
 
+	/**
+	 * A navigator that rotates you between people
+	 *
+	 * Constructor
+	 * 
+	 * @param options
+	 */
 	$.fn.inlineGradingNavigator = function(options) {
 
 		/* Store the config in this instance so private methods
