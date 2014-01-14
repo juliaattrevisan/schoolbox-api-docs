@@ -1,5 +1,10 @@
 <h1>Mark work for {STUDENT_FULL_NAME}</h1>
 
+<span class="header_option">
+	<a class='btn go-back' href="/submission/viewSubmission/{BOX_ID}"><span></span>Return to List</a>
+	<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View History</a>
+</span>
+
 <script src="/javascript/components/qtip2/jquery.qtip.js" type="text/javascript"></script>
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
 <script src="/javascript/jquery.viewSubmission.js" type="text/javascript"></script>
@@ -39,11 +44,8 @@
 		display: none;
 	}
 </style>
-<div class="clearfix">
-	<div class="dropdown-navigator"></div>
-	<a class='btn go-back' href="/submission/viewSubmission/{BOX_ID}"><span></span>Return to List</a>
-	<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View History</a>
-</div>
+
+<div class="dropdown-navigator"></div>
 
 <div id="crocodoc-error-container">
 	<strong>There were errors downloading document for inline grading:</strong>
@@ -52,13 +54,10 @@
 <div class='left inline-grading-column-left'>
 	{INJECTED_INTERFACE_TEMPLATE}
 </div>
-
 <div class='right inline-grading-column-right'>
 	{INJECTED_MARK_TEMPLATE}
 
-	<h2>Assign marks</h2>
-
-	<span class="student-status {OWNER_CLASS}">{OWNER_STATUS}</span>
+	<h2>Assign marks ({OWNER_STATUS})</h2>
 
 	<div class="view-submission">
 		<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" name="returnWorkForm" id="returnWorkForm">
