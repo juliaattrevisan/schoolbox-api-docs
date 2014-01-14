@@ -16,7 +16,8 @@
   $j(function() {
     // launch the notifier
     $j('#infoPanel').find('img').closest('a').notifier({
-      host: '{SERVER_ADDRESS}'
+      host: '{SERVER_ADDRESS}',
+      secure: '{PAGE_SECURE}'
     });
   });
 </script>

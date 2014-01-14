@@ -4,11 +4,15 @@
 
     $.fn.notifier = function(options) {
         var settings = $.extend({
-            secure: false,
+            secure: 'false',
             host: '192.168.1.1',
             port: '8080',
+            sslport: '8081',
             prefetch: 5
         }, options);
+
+        // cast boolean from potential string
+        settings.secure = (settings.secure === 'true' || settings.secure === true);
 
         return this.each(function() {
 
@@ -271,7 +275,11 @@
             /* constructor method execution starts here */
 
             var self = this;
-            var url = (settings.secure ? 'wss' : 'ws') + '://' + settings.host + ':' + settings.port;
+            var url = (settings.secure ? 'wss' : 'ws')
+                + '://'
+                + settings.host
+                + ':'
+                + (settings.secure ? settings.sslport : settings.port);
             var conn;
             var messages = {};
             var attemptReconnect = true;
