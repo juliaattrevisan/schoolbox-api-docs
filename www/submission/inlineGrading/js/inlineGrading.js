@@ -89,7 +89,7 @@
 	 * A navigator that rotates you between people
 	 *
 	 * Constructor
-	 * 
+	 *
 	 * @param options
 	 */
 	$.fn.inlineGradingNavigator = function(options) {
