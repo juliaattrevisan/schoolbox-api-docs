@@ -143,41 +143,41 @@ $j(function() {
  */
 $(function() {
 
-	// Add the dark class only to even rows that are visible (skip over the hidden ones)
-	$j('tbody tr:visible:even').addClass('dark');
-
-	// Add another, darker class to th
-	$j('tbody tr:hidden').addClass('sub-table-row');
-
-	$j('tr.submission').each(function () {
-		if ($j(this).next().hasClass('expandable') && !$j(this).hasClass('expandable')) {
-			$j(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown" title="Show submissions">&#9660;</a>');
-		}
-	});
-
-	$j(document).on('click', '.submission-dropdown', function () {
-		var currentUnicode = $j(this).html().charCodeAt(0);
-
-		if (currentUnicode == '9660') {
-			$j(this).html('&#9650;')
-		}
-		else {
-			$j(this).html('&#9660;')
-		}
-
-		var matchingClasses = $j(this).parents('tr').attr('class').toString().match(/user_(\d+)/);
-		var expandables = '.' + matchingClasses[0] + '.expandable';
-
-		// Clear queue and complete animation
-		$j(this).parents('tbody').find(expandables).stop(true, true).fadeToggle();
-
-		return false;
-	});
-
-	$j('.submission td span.alert').qtip({
-		content:"Submission received after mark given",
-		style: {
-			classes: 'qtip-light qtip-shadow qtip-rounded'
-		}
-	});
+//	// Add the dark class only to even rows that are visible (skip over the hidden ones)
+//	$j('tbody tr:visible:even').addClass('dark');
+//
+//	// Add another, darker class to th
+//	$j('tbody tr:hidden').addClass('sub-table-row');
+//
+//	$j('tr.submission').each(function () {
+//		if ($j(this).next().hasClass('expandable') && !$j(this).hasClass('expandable')) {
+//			$j(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown" title="Show submissions">&#9660;</a>');
+//		}
+//	});
+//
+//	$j(document).on('click', '.submission-dropdown', function () {
+//		var currentUnicode = $j(this).html().charCodeAt(0);
+//
+//		if (currentUnicode == '9660') {
+//			$j(this).html('&#9650;')
+//		}
+//		else {
+//			$j(this).html('&#9660;')
+//		}
+//
+//		var matchingClasses = $j(this).parents('tr').attr('class').toString().match(/user_(\d+)/);
+//		var expandables = '.' + matchingClasses[0] + '.expandable';
+//
+//		// Clear queue and complete animation
+//		$j(this).parents('tbody').find(expandables).stop(true, true).fadeToggle();
+//
+//		return false;
+//	});
+//
+//	$j('.submission td span.alert').qtip({
+//		content:"Submission received after mark given",
+//		style: {
+//			classes: 'qtip-light qtip-shadow qtip-rounded'
+//		}
+//	});
 });

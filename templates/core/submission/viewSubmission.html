@@ -29,51 +29,32 @@
 				<col width="160px"/>
             </colgroup>
             <tbody>
-            <!-- BEGIN student_row -->
-            <tr class="user_{OWNER_ID} user">
-                <td class="nowrap student">
-                    <img class="student-icon" src="{OWNER_IMG}" alt="{OWNER_NAME}"/>
+				<!-- BEGIN student_row -->
+				<tr class="user_{OWNER_ID} user">
+					<td class="nowrap student">
+						<img class="student-icon" src="{OWNER_IMG}" alt="{OWNER_NAME}"/>
 
-                    <p>
-                        <a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a>
-                        <span class="student-status {OWNER_CLASS}">{OWNER_STATUS}</span>
-                    </p>
-                </td>
-                <td class="marking">
-                    <div>{OWNER_MARKING}</div>
-                </td>
-				<td>
-					<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View work</a>
-				</td>
-            </tr>
+						<p>
+							<a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a>
+							<span class="student-status {OWNER_CLASS}">{OWNER_STATUS}</span>
+						</p>
+					</td>
+					<td class="marking">
+						<div>{OWNER_MARKING}</div>
+					</td>
+					<td>
+						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View work</a>
+					</td>
+				</tr>
 
-            <!-- BEGIN submission_row -->
-            <tr class="user_{OWNER_ID} submission file {SUBMISSION_EXPANDABLE} sub-table-row">
-                <td class="{SUBMISSION_CLASS}">{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
-                <td>
-					<div class="table-wrap">
-                    <p>
-						<img class="mimetype" src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/>
-						<!-- BEGIN plag_enabled -->
-						<span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
-						<!-- END plag_enabled -->
-						<span class="submit-filename">{SUBMISSION_FILENAME}</span>
-					</p>
-
-					<div class="button-set">
-						<a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="btn no-text download" title="Download submission"><span></span></a>
-						<!-- BEGIN delete_action -->
-						<a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn no-text delete" title="Delete submission"><span></span></a>
-						<!-- END delete_action -->
-					</div>
-					</div>
-				</td>
-				<td>
-				</td>
-            </tr>
-            <!-- END submission_row -->
-            <!-- END student_row -->
-            </tbody>
+				<!-- BEGIN submission_row -->
+				<!-- BEGIN plag_enabled -->
+				<!-- END plag_enabled -->
+				<!-- BEGIN delete_action -->
+				<!-- END delete_action -->
+				<!-- END submission_row -->
+    	        <!-- END student_row -->
+			</tbody>
         </table>
     </form>
 </div>

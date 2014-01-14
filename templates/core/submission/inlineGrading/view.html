@@ -56,46 +56,40 @@
 
 	<div class="view-submission">
 		<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" name="returnWorkForm" id="returnWorkForm">
+			<!-- BEGIN student_row -->
+			{OWNER_MARKING}
+
 			<table class="table">
 				<colgroup>
 					<col width="100px"/>
+					<col width="44px" />
+					<col/>
 					<col/>
 				</colgroup>
+				<thead></thead>
 				<tbody>
-					<!-- BEGIN student_row -->
-					<tr class="user_{OWNER_ID} user submission">
-						<td class="nowrap student"></td>
-						<td class="marking">
-							{OWNER_MARKING}
-						</td>
-					</tr>
 					<!-- BEGIN submission_row -->
-					<tr class="user_{OWNER_ID} submission file {SUBMISSION_EXPANDABLE} sub-table-row">
-						<td class="{SUBMISSION_CLASS}">{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
+					<tr>
+						<td>{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
+						<td><img src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/></td>
 						<td>
-							<div class="table-wrap">
-								<p>
-									<img class="mimetype" src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/>
-									<!-- BEGIN plag_enabled -->
-									<span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
-									<!-- END plag_enabled -->
-									<span class="submit-filename">{SUBMISSION_FILENAME}</span>
-								</p>
-
-								<div class="button-set">
-									<a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="btn no-text download" title="Download submission"><span></span></a>
-									<!-- BEGIN delete_action -->
-									<a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn no-text delete" title="Delete submission"><span></span></a>
-									<!-- END delete_action -->
-									<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="btn no-text goto" title="Mark"><span></span></a>
-								</div>
-							</div>
+							{SUBMISSION_FILENAME}
+							<!-- BEGIN plag_enabled -->
+							<span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
+							<!-- END plag_enabled -->
+						</td>
+						<td>
+							<a href="/submission/send.php?id={SUBMISSION_ID}&save=1" class="btn no-text download" title="Download submission"><span></span></a>
+							<!-- BEGIN delete_action -->
+							<a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn no-text delete" title="Delete submission"><span></span></a>
+							<!-- END delete_action -->
+							<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="btn no-text goto" title="Mark"><span></span></a>
 						</td>
 					</tr>
 					<!-- END submission_row -->
-					<!-- END student_row -->
 				</tbody>
 			</table>
+			<!-- END student_row -->
 		</form>
 	</div>
 
