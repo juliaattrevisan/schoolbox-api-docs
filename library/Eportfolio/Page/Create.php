@@ -91,7 +91,7 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	 */
 	private function renderIndividualPermissions() {
 		$this->getPage()->setVar(array(
-			'STUDENT_GROUP_IDS' => implode(',', $this->getGroupHandler()->getStudentGroupTypeIds())
+			'STUDENT_GROUP_IDS' => implode(';', $this->getGroupHandler()->getStudentGroupTypeIds())
 		));
 	}
 }

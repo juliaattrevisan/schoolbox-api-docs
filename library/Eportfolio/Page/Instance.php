@@ -514,7 +514,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 */
 	private function renderIndividualPermissions() {
 		$this->getPage()->setVar(array(
-			'STUDENT_GROUP_IDS' => implode(',', $this->getGroupHandler()->getStudentGroupTypeIds())
+			'STUDENT_GROUP_IDS' => implode(';', $this->getGroupHandler()->getStudentGroupTypeIds())
 		));
 
 		/* Find all the guys who were allowed to see this page
