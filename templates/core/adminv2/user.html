@@ -1,23 +1,21 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
 <script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 $j(function() {
-    var options = {
-        // Can i use a resolvable promise here?
-        data:'/ajax/user.php?groupID=0',
-        allowFreeEntries: false,
-        hideTrigger: true,
-        minChars: 2,
-        width: 200,
-        maxSelection: 1
-    }
-    var ms = $j('#modify').magicSuggest(options)
-    $j(ms).on('selectionchange', function(event, combo, selection) {
+
+    $j('#modify').userSelector({
+        plugin: {
+            data:'/ajax/user.php?groupID=0',
+            width: 200
+        },
+        formElement: $j('#user-to-mod')
+    })
+    .data('magicsuggest').on('selectionchange', function(event, combo, selection) {
         if (selection.length) {
-            $j('#user-to-mod').val(selection[0].id);
             $j('#modify-user-button').removeClass('disabled').focus();
         }
         else {
