@@ -47,6 +47,17 @@
 </div>
 
 <!-- BEGIN mark_type_rubric -->
+<script src='/submission/inlineGrading/js/rubrics.js' type="text/javascript"></script>
+<script type='text/javascript'>
+
+	$(function() {
+		$('#rubric-tbody').inlineGradingRubrics({
+			score: '#sum'
+		});
+	});
+
+</script>
+<div id="sum"></div>
 <table class="rubric table">
 	<colgroup>
 		<col class="criterion-label" />
@@ -57,24 +68,24 @@
 	</colgroup>
 	<tbody id="rubric-tbody">
 	<!-- BEGIN rubric_crit -->
-	<!-- BEGIN rubric_grouping -->
-	<tr>
-		<td class="criterion-label pad span" colspan="{RUBRIC_GROUP_SPAN}">{RUBRIC_GROUP_LABEL}</td>
-		<td class="warning"></td>
-	</tr>
-	<!-- END rubric_grouping -->
-	<tr>
-		<td class="criterion-label pad">{RUBRIC_CRIT_LABEL}</td>
-		<!-- BEGIN rubric_crit_rating -->
-		<td class="criterion-value {RUBRIC_CRIT_RATING_CLASS}">
-			<input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio" name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
-			<label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}"><span>{RUBRIC_CRIT_RATING_LABEL}</span></label>
-		</td>
-		<!-- END rubric_crit_rating -->
-		<td class="warning">
-			<div title="Please select a result for this criterion"><span>!</span></div>
-		</td>
-	</tr>
+		<!-- BEGIN rubric_grouping -->
+		<tr>
+			<td class="criterion-label pad span" colspan="{RUBRIC_GROUP_SPAN}">{RUBRIC_GROUP_LABEL}</td>
+			<td class="warning"></td>
+		</tr>
+		<!-- END rubric_grouping -->
+		<tr>
+			<td class="criterion-label pad">{RUBRIC_CRIT_LABEL}</td>
+			<!-- BEGIN rubric_crit_rating -->
+			<td class="criterion-value {RUBRIC_CRIT_RATING_CLASS}">
+				<input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio" name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
+				<label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}"><span>{RUBRIC_CRIT_RATING_LABEL}</span></label>
+			</td>
+			<!-- END rubric_crit_rating -->
+			<td class="warning">
+				<div title="Please select a result for this criterion"><span>!</span></div>
+			</td>
+		</tr>
 	<!-- END rubric_crit -->
 	</tbody>
 </table>
