@@ -13,15 +13,15 @@
 <script type='text/javascript'>
 	$(function() {
 		$('#inline-grading').inlineGrading({
-			boxId: '{CROCODOC_SUBMISSION_BOX_ID}',
-			submissionId: '{CROCODOC_SUBMISSION_ID}',
-			errorElement: '#crocodoc-error-container'
+			boxId: '{INLINE_GRADING_SUBMISSION_BOX_ID}',
+			submissionId: '{INLINE_GRADING_SUBMISSION_ID}',
+			errorElement: '#inline-grading-error-container'
 		});
 
 		$('.dropdown-navigator').inlineGradingNavigator({
-			currentId: '{CROCODOC_SUBMISSION_NAVIGATION_CURRENT_ID}',
-			direct: '{CROCODOC_SUBMISSION_NAVIGATION_DIRECT}',
-			items: '{CROCODOC_SUBMISSION_NAVIGATION_ITEMS}',
+			currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
+			direct: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT}',
+			items: '{INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS}',
 
 			/* Callback methods
 			 */

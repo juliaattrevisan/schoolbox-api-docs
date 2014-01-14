@@ -113,11 +113,11 @@ $renderer = $templateFactory->produce();
 $renderer->render();
 
 $this->setVar(array(
-	'CROCODOC_SUBMISSION_ID' => $submissionId,
-	'CROCODOC_SUBMISSION_BOX_ID' => $submissionBox['id'],
-	'CROCODOC_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
-	'CROCODOC_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
-	'CROCODOC_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
+	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
+	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox['id'],
+	'INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
+	'INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
+	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
 	'STUDENT_FULL_NAME' => $user->getFullName(),
 ));
 
