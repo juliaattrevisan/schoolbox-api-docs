@@ -10,6 +10,7 @@ $j(document).ready(function () {
             data:'/ajax/user.php?groupID=0&email=1',
             allowFreeEntries: true
         },
+        onePerLine: false,
         multiple: true
     }
     var to  = $j('#to').userSelector($j.extend({}, options, {value: {REPLYTO}}))
