@@ -19,11 +19,11 @@ class Renderer {
 	private $page = null;
 
 	/**
-	 * An array, born of user handler
+	 * An instance of Schoolbox\User
 	 *
-	 * @var array
+	 * @var null
 	 */
-	private $user = array();
+	private $user = null;
 
 	/**
 	 * An array, born of rubric handler
@@ -31,13 +31,6 @@ class Renderer {
 	 * @var array
 	 */
 	private $rubric = array();
-
-	/**
-	 * An instance of user handler
-	 *
-	 * @var null
-	 */
-	private $userHandler = null;
 
 	/**
 	 * An instance of rubric handler
@@ -57,8 +50,6 @@ class Renderer {
 		$this->setPage($page);
 		$this->setUser($user);
 
-		$this->setUserHandler(new \User());
-
 		$this->setRubricHandler(new \DueWork_Rubric_Handler());
 		$this->setRubric($this->getRubricHandler()->getRubric($submissionBox['id']));
 
@@ -75,13 +66,12 @@ class Renderer {
 		$this->getPage()->setBlock('rubric_crit', 'rubric_grouping', 'rubric_grouping_block');
 	}
 
+	/**
+	 * Draw cube
+	 */
 	public function render() {
-		$user = $this->getUser();
-
-		/* RUBRIC LOGICZ */
-
 		$rubricMark = new \DueWork_Rubric_Mark($this->getRubric());
-		$rubricMark->populateMarks($user['uid']);
+		$rubricMark->populateMarks($this->getUser()->getId());
 
 		$data = $rubricMark->toArray();
 
@@ -192,24 +182,6 @@ class Renderer {
 	 */
 	private function getUser() {
 		return $this->user;
-	}
-
-	/**
-	 * Set user handler
-	 *
-	 * @param null $userHandler
-	 */
-	private function setUserHandler($userHandler) {
-		$this->userHandler = $userHandler;
-	}
-
-	/**
-	 * Get user handler
-	 *
-	 * @return null
-	 */
-	private function getUserHandler() {
-		return $this->userHandler;
 	}
 
 	/**
