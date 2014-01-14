@@ -8,7 +8,8 @@
             host: '192.168.1.1',
             port: '8080',
             sslport: '8081',
-            prefetch: 5
+            prefetch: 5,
+            debug: false
         }, options);
 
         // cast boolean from potential string
@@ -19,6 +20,7 @@
             // detect websocket support
             var support = "MozWebSocket" in window ? 'MozWebSocket' : ("WebSocket" in window ? 'WebSocket' : null);
             if (support == null) {
+                if(settings.debug) { console.error('Websockets are not supported'); }
                 return;
             }
 
@@ -32,10 +34,13 @@
                 conn.onerror = onError;
                 conn.onmessage = onMessage;
                 conn.onclose = onClose;
+
+                if(settings.debug) { console.log('Created new socket connection'); }
             }
 
             function pollReconnect() {
                 if(attemptReconnect) {
+                    if(settings.debug) { console.log('Polling for connection'); }
                     setTimeout(establishConnection, 2000);
                 }
             }
@@ -46,7 +51,11 @@
              */
             function send(data) {
                 if(conn) {
+                    if(settings.debug) { console.log('Sending data to server'); }
                     conn.send(JSON.stringify(data));
+                }
+                else {
+                    if(settings.debug) { console.log('No connection: not sending data'); }
                 }
             }
 
@@ -55,10 +64,14 @@
              */
             function updateDOM() {
 
+                if(settings.debug) { console.log('Updating DOM'); }
+
                 var dom = $(self);
 
                 // if the avatar doesn't have a listener attached, do initialisation
                 if(typeof dom.data("events") === 'undefined' || typeof dom.data("events").click === 'undefined') {
+
+                    if(settings.debug) { console.log('Attaching click listener (btw, update your jQuery!)'); }
 
                     dom.attr('title', 'View Messages');
 
@@ -94,6 +107,7 @@
 
                 var i;
 
+                // template for message list items
                 var msgLiTpl = $('<li/>').addClass('message').append(
                     $('<a/>').addClass('action').attr('href', '#').append(
                         $('<img/>').attr('width', '32').attr('height', '32')
@@ -104,22 +118,34 @@
                     )
                 );
 
-                newlist.append('<li/>').append($('<h4/>').text('Notifications'));
+                newlist.append('<li/>').append($('<h4/>').text('Messages'));
 
-                for(i = toInsert.length - 1; i >= 0; --i) {
-                    id = toInsert[i].id;
+                if(toInsert.length > 0) {
+                    // append the list of messages
+                    for(i = toInsert.length - 1; i >= 0; --i) {
+                        id = toInsert[i].id;
+                        var status = toInsert[i].status;
+                        var body = toInsert[i].body;
+                        var message = body.message;
+                        var humanTime = body.datetime.date;
 
-                    var status = toInsert[i].status;
-                    var body = toInsert[i].body;
-                    var message = body.message;
-                    var humanTime = body.datetime.date;
+                        var li = msgLiTpl.clone();
 
-                    var li = msgLiTpl.clone();
+                        li.attr('id', 'm-'+id).addClass(status);
+                        li.find('p').html(message);
+                        li.find('time').html(humanTime);
+                        newlist.append(li);
+                    }
 
-                    li.attr('id', 'm-'+id).addClass(status);
-                    li.find('p').html(message);
-                    li.find('time').html(humanTime);
-                    newlist.append(li);
+                    // append a "see all" item
+                    newlist.append(
+                        $('<li/>').append(
+                            $('<a/>').attr('href', '#').html('See all')
+                        )
+                    );
+                }
+                else {
+                    newlist.append($('<li/>').html('No messages'));
                 }
 
                 $('#messages').replaceWith(newlist);
@@ -132,6 +158,7 @@
              * @private
              */
             var onOpen = function() {
+                if(settings.debug) { console.log('onOpen() triggered'); }
                 send({subscribe : true});
                 $(self).addClass('socket connected');
             }
@@ -142,6 +169,7 @@
              * @param e
              */
             var onError = function(e) {
+                if(settings.debug) { console.log('onError() triggered'); }
                 $(self).removeClass('connected');
                 var data;
                 try {
@@ -160,6 +188,7 @@
              * @param e
              */
             var onMessage = function(e) {
+                if(settings.debug) { console.log('onMessage() triggered'); }
                 var data;
                 try {
                     data = JSON.parse(e.data)
@@ -184,6 +213,7 @@
              * @param e
              */
             var onClose = function(e) {
+                if(settings.debug) { console.log('onClose() triggered'); }
                 $(self).removeClass('connected');
                 pollReconnect();
             }
@@ -195,6 +225,7 @@
              * @param data
              */
             this.pipeSubscribe = function(data) {
+                if(settings.debug) { console.log('Message from server: parsing subscribe'); }
                 // don't try a fetch if the subscription came back false
                 if(data === true) {
                     send({fetch : settings.prefetch});
@@ -207,11 +238,12 @@
              * @param data
              */
             this.pipeFetch = function(data) {
+                if(settings.debug) { console.log('Message from server: parsing fetch'); }
                 $.each(data, function(msgId, amqpMsg) {
                     // put message in messages object, override if message already existed (ensure uniqueness)
                     messages[msgId] = amqpMsg;
-                    updateDOM();
                 });
+                updateDOM();
             }
 
             /**
@@ -220,13 +252,14 @@
              * @param data
              */
             this.pipePush = function(data) {
+                if(settings.debug) { console.log('Message from server: parsing push'); }
                 $.each(data, function(msgId, amqpMsg) {
                     // put message in messages object, override if message already existed (ensure uniqueness)
                     if(!messages[msgId] || messages[msgId].status == 'read') {
                         messages[msgId] = amqpMsg;
                     }
-                    updateDOM();
                 });
+                updateDOM();
             }
 
             /**
@@ -235,6 +268,7 @@
              * @param data
              */
             this.pipeMarkAsRead = function(data) {
+                if(settings.debug) { console.log('Message from server: parsing mark_as_read'); }
                 $.each(data, function(i, msgId) {
                     // if we haven't seen this message, ignore this notification
                     if(typeof messages[msgId] === 'undefined') {
@@ -243,11 +277,10 @@
                     }
 
                     messages[msgId].status = 'read';
-                    updateDOM();
 
                     return true;
-
                 });
+                updateDOM();
             }
 
             /**
@@ -256,23 +289,23 @@
              * @param data
              */
             this.pipeError = function(data) {
+                if(settings.debug) { console.log('Message from server: parsing error'); }
                 switch(data.code) {
                     case 401:
-                        alert('You need to log in');
+                        console.warn('Either no session, or does not match parent.');
                         attemptReconnect = false;
                         break;
+                    case 503:
+                        console.warn('Service is unavailable: ' + !!data.retry ? 'cannot retry' : 'can retry');
+                        attemptReconnect = !!data.retry;
+                        break;
                 }
-                if(typeof data.retry !== 'undefined' && data.retry === true) {
-                    attemptReconnect = true;
-                    conn.close();
-                }
-                else {
-                    conn.close(1011, data.error);
-                }
+                conn.close();
             }
 
 
             /* constructor method execution starts here */
+            if(settings.debug) { console.log('Constructing Notifier on', this); }
 
             var self = this;
             var url = (settings.secure ? 'wss' : 'ws')
