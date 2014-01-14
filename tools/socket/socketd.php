@@ -17,7 +17,7 @@ require_once('../../include/Bootstrap.php');
 $opts = getopt('vp::');
 
 $verbose = isset($opts['v']);
-$port = isset($opts['p']) ? $opts['p'] : 8080;
+$port = $opts['p'] ?: 8080;
 
 
 if($verbose) {
@@ -31,12 +31,6 @@ if($verbose) {
 EOL;
 
 }
-
-// vhost has no power here, manually define the redis sessionhandler
-// but I'm not actually sure that this does anything
-ini_set('session.gc_maxlife', 43200);
-ini_set('session.save_handler', 'redis');
-ini_set('session.save_path', 'tcp://127.0.0.1:6379');
 
 $loop = \React\EventLoop\Factory::create();
 
