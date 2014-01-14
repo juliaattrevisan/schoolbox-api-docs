@@ -21,23 +21,22 @@
     <span class="disabled">N/A</span>
     <!-- END mark_type_none -->
     <!-- BEGIN mark_type_rubric -->
-    <div class="rubric-inline">
-        <select id="rubricmark" class="mark-input" name="mark">
-            <!-- BEGIN rubric_marked -->
-            <option value="0">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
-        <!-- <a class="view" id="launchlightbox-{OWNER_ID}" title="View Rubric" href="#">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a> -->
-            <!-- END rubric_marked -->
-            <!-- BEGIN rubric_unmarked -->
-            <option value="-1">(none)</option>
-        <!-- <a class="view" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a> -->
-            <!-- END rubric_unmarked -->
-            <!-- BEGIN rubric_grade_drop -->
-            <option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
-            <!-- END rubric_grade_drop -->
-        </select>
+	<select id="rubricmark" class="mark-input" name="mark">
+		<!-- BEGIN rubric_marked -->
+		<option value="0">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
+	<!-- <a class="view" id="launchlightbox-{OWNER_ID}" title="View Rubric" href="#">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a> -->
+		<!-- END rubric_marked -->
+		<!-- BEGIN rubric_unmarked -->
+		<option value="-1">(none)</option>
+	<!-- <a class="view" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a> -->
+		<!-- END rubric_unmarked -->
+		<!-- BEGIN rubric_grade_drop -->
+		<option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
+		<!-- END rubric_grade_drop -->
+	</select>
 
-        <a class="edit" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
-    </div>
+	<a class="rubric-edit" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
+
     <!-- END mark_type_rubric -->
 	<textarea class="comment" name="comment">{COMMENT}</textarea>
     <input type="hidden" class="uid" name="uid" value="{OWNER_ID}" />
