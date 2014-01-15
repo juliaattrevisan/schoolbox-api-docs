@@ -97,11 +97,19 @@ class Renderer {
 		}
 
 		for($i = 0; $i < count($data['criteria']); ++$i) {
+
+			/* Render a group value so all the criterion labels are tied to the
+			 * criteria themselves on the frontend, regardless of html structure
+			 */
+			$this->getPage()->setVar(array(
+				'RUBRIC_GROUP_CLASS' => 'criteria-group-' . $i,
+			));
+
 			// display a grouping row
 			if($i == 0 || $data['criteria'][$i]['group'] != $data['criteria'][$i - 1]['group']) {
 				$this->getPage()->setVar(array(
 					'RUBRIC_GROUP_SPAN' => $colCount + 1,
-					'RUBRIC_GROUP_LABEL' => $data['criteria'][$i]['group']
+					'RUBRIC_GROUP_LABEL' => $data['criteria'][$i]['group'],
 				));
 
 				$this->getPage()->parse('rubric_grouping_block','rubric_grouping', false);
@@ -122,8 +130,12 @@ class Renderer {
 				$this->getPage()->setVar(array(
 					'RUBRIC_CRIT_RATING_LABEL' => $data['criteria'][$i]['results'][$j],
 					'RUBRIC_CRIT_RATING_VALUE' => $j,
-					'RUBRIC_CRIT_RATING_CLASS' => 'lol',
 					'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $j ? 'checked="checked"' : '',
+
+					/* Render a group value so all the criterion labels are tied to the
+					 * criteria themselves on the frontend, regardless of html structure
+					 */
+					'RUBRIC_CRIT_RATING_CLASS' => 'criteria-group-' . $i,
 				));
 				$this->getPage()->parse('rubric_crit_rating_block', 'rubric_crit_rating', true);
 			}

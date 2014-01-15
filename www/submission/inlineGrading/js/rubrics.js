@@ -44,6 +44,10 @@ $('#rubric-tbody').inlineGradingRubrics({
 			/* Add ability to change selections
 			 */
 			initSelectables();
+
+			/* Set up validation rules for altering rubrics
+			 */
+			initForm();
 		}
 
 		/**
@@ -60,7 +64,11 @@ $('#rubric-tbody').inlineGradingRubrics({
 
 				/* Tallied score goes here
 				 */
-				score: '#sum',
+				scoreElement: '#sum',
+
+				/* The form which submits rubrics data
+				 */
+				formElement: '#rubricsForm',
 
 				/* Option to render graph
 				 */
@@ -162,11 +170,53 @@ $('#rubric-tbody').inlineGradingRubrics({
 
 			/* Update total marks assigned by rubrics
 			 */
-			$(config.score).html(sum);
+			$(config.scoreElement).html(sum);
 
 			/* Update graph
 			 */
 			renderGraph();
+		}
+
+		/**
+		 * Set up validation behaviours for rubrics form
+		 */
+		function initForm() {
+			$j(config.formElement).validate({
+				submitHandler: function(form) {
+					var success = true;
+
+					$j(config.element).find('.criterion-label-group').each(function() {
+						var groupName = $(this).data('class');
+
+						var container = $(config.element).find('td[data-class="'+groupName+'"]')
+						var allRadios = container.find('input');
+						var selectedRadios = container.find(':checked');
+
+						/* If radios exist for a particular criteria group but
+						 * nothing was selected, invalidate
+						 */
+						if (allRadios.length) {
+							if (!selectedRadios.length) {
+								success = false;
+								return false;
+							}
+							else {
+								container.find('.warning').removeClass('hide');
+							}
+						}
+						else {
+							container.find('.warning').removeClass('hide');
+						}
+					});
+
+					if (success) {
+						form.submit();
+					}
+					else {
+						$j('#errnotif').removeClass('hide');
+					}
+				}
+			});
 		}
 	}
 }(jQuery));
