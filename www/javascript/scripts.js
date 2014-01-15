@@ -60,11 +60,10 @@ $j(function() {
         $j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
         var position = currentObject.offset();
         bubble.show();
-        var annoyingHeight = (
-            $j('.cal-bubble .middle').outerHeight()
-                + $j('.cal-bubble .top').outerHeight()
-                + $j('.cal-bubble .bottom').outerHeight()
-            )
+        var annoyingHeight =
+            bubble.find('.middle').outerHeight()
+            + bubble.find('.top').outerHeight()
+            + bubble.find('.bottom').outerHeight()
 
         // right edge lines up with right edge of currentObject
         // bottom edge lines up with top edge of currentObject, hide pointer if it's at top of screen
