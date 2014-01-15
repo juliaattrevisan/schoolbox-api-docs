@@ -601,14 +601,16 @@ Notifications
                 text-decoration: none;
                 background: @tab-hover-color;
             }
-            span strong {
-                position: absolute;
-                right: 16px;
-                top: 3px;
-            }
         }
         &:hover > ul:first-of-type {
             display: block;
+        }
+        &.parent > a span:after {
+            font-weight: bold;
+            content: "›";
+            position: absolute;
+            right: 16px;
+            top: 3px;
         }
     }
 
