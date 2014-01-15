@@ -31,7 +31,8 @@
     "doT": "1.0.1",
     "qtip2": "2.2.0",
     "fullcalendar": "1.6.4",
-    "jquery.tablesorter": "2.14.5"
+    "jquery.tablesorter": "2.14.5",
+    "jstree": "3.0.0-beta3"
   },
   "ignore": [
     "**/.*",
@@ -42,6 +43,6 @@
     "tests"
   ],
   "resolutions": {
-    "jquery": ">=1.6"
+    "jquery": "2.0.3"
   }
 }
