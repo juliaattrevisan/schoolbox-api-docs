@@ -529,8 +529,8 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 		/* ...and get their records
 		 */
+		$individualList = array();
 		if (count($selectedIndividualIds)) {
-			$individualList = array();
 
 			// Load each user and their role
 			$userMapper = \Schoolbox\UserMapper::getInstance();
@@ -548,8 +548,8 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 					'name' => $person,
 				);
 			}
-			$this->getPage()->setVar('USER_LIST', json_encode($individualList));
 		}
+		$this->getPage()->setVar('USER_LIST', json_encode($individualList));
 	}
 
 	/* Getters/Setters
