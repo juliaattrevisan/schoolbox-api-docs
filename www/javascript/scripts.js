@@ -40,14 +40,9 @@ $j(function() {
 
 
 	/*
-	* Autoclear the main site search field
+	* Autoclear the main site search field (works without polyfill in all but IE9)
 	* */
 	$j('#search-field').placeholder();
-
- 	/*
-	* Remove the border from the bottom of the last row of any table.
-	* */
-	$j('.standardForm tr:last td').css("border", "0") 
 
 	/*
 	* Submit the form with a href links with the classes below
