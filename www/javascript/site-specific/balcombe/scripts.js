@@ -8,10 +8,6 @@ $j(function() {
         calendarPos($j(this),0,50);
     })
 
-    $j('#nav li.parent > a span').each(function() {
-        $j(this).append('<strong>&rsaquo;</strong>');
-    });
-
     $j('#tabs li.navthis').prev().css('border', '0');
 
 });
