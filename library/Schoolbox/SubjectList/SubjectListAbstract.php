@@ -75,16 +75,14 @@ abstract class SubjectListAbstract {
 		 */
 		if (is_array($this->getAllSubjects()) && count($this->getAllSubjects())) {
 			foreach($this->getAllSubjects() as $currentSubject) {
-				$category = $this->getCategoryHandler()->getByCode($currentSubject['code']);
-
 				/* If the homepage doesn't exist or can't be found, don't
 				 * link it in the Subject list
 				 */
-				if (is_numeric($category['id'])) {
+				if (is_numeric($currentSubject['id'])) {
 					$childElement = array(
 						'subject' => $currentSubject,
-						'category' => $category,
-						'categoryName' => is_array($category) ? $category['name'] : $currentSubject['name']
+						'category' => $currentSubject['id'],
+						'categoryName' => $currentSubject['name']
 					);
 
 					/* Subjects without a parent just get thrown together into
