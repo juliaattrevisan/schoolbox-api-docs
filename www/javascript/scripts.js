@@ -3,9 +3,9 @@
 var $j = jQuery;
 
 $j(function() {
-	/*
-	* Remove the layerX and layerY console log reports from Webkit.
-	* */
+    /**
+     * Remove the layerX and layerY console log reports from Webkit.
+     */
     var all = $j.event.props,
         len = all.length,
         res = [];
@@ -15,39 +15,30 @@ $j(function() {
     }
     $j.event.props = res
 
-	/*
-	* Close the calendar popup no matter what!
-	* */
-	$j('.cal-bubble .close').click(function(){
-		$j('.cal-bubble').hide();
-	})
+    /**
+     * Autoclear the main site search field (works without polyfill in all but IE9)
+     */
+    $j('#search-field').placeholder();
 
+    /**
+     * Submit the form with a href links with the classes below
+     */
+    $j(document).on('click', '.submit, .submit-this', function(event) {
+        var form = $j(this).closest('form');
+        if (form.length > 0) {
+            event.preventDefault();
+            form.submit();
+        }
+    });
 
-	/*
-	* Autoclear the main site search field (works without polyfill in all but IE9)
-	* */
-	$j('#search-field').placeholder();
+    /**
+     * Open rel="external" links in a new tab.
+     */
+    $j(document).on('click', 'a[rel=external]', function() {
+        $(this).attr('target','_blank')
+    })
 
-	/*
-	* Submit the form with a href links with the classes below
-	* */
-	$j(document).on('click', '.submit, .submit-this', function(event) {
-		var form = $j(this).closest('form');
-		if (form.length > 0) {
-			event.preventDefault();
-			form.submit();
-		}
-	});
-
-	/*
-	 * Open rel="external" links in a new tab.
-	 */
-	$j(document).on('click', 'a[rel=external]', function() {
-		$(this).attr('target','_blank')
-	})
-
-
-    /*
+    /**
      * Each skin does NOT have a slightly different header height or a different left navigation.
      * From now on, it's always placed relative to the clicked element.
      */
@@ -75,4 +66,11 @@ $j(function() {
         bubble.css("left", left);
         bubble.css("top",  top);
     });
+
+    /**
+     * Close the calendar popup no matter what!
+     */
+    $j(document).on('click', '.cal-bubble .close', function() {
+        $j(this).closest('.cal-bubble').hide();
+    })
 });
