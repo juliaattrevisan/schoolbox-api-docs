@@ -32,6 +32,8 @@ class External_Synergetic_Class implements External_ClassInterface
 			SELECT *
 			FROM SynergyOne.dbo.SubjectClasses
 			WHERE ClassCode = '$classCode'
+			AND FileYear='" . $_SESSION['FileYear'] . "'
+			AND FileSemester='" . $_SESSION['FileSemester'] . "'
 		";
 
 		return $this->getDatabase()->getRow($query);
