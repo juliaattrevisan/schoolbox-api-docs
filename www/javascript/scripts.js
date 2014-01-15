@@ -28,9 +28,6 @@ $j(function() {
         $j('ul:first',this).toggle();
     });
 
-    $j('#nav li:last-child').addClass('lastChild');
-
-
 	/*
 	* Close the calendar popup no matter what!
 	* */
