@@ -52,7 +52,7 @@ $j(function() {
 	/*
 	* Submit the form with a href links with the classes below
 	* */
-	$j('.submit, .submit-this').click(function(event) {
+	$j(document).on('click', '.submit, .submit-this', function(event) {
 		var form = $j(this).closest('form');
 		if (form.length > 0) {
 			event.preventDefault();
