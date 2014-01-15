@@ -48,7 +48,7 @@ $j(function() {
         bubble.find('.bottom, .bottom strong').removeAttr("style");
         bubble.find('.bottom').show();
         var dynamicHTML = currentObject.children('.hidden-fields').html();
-        $j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
+        bubble.find('.middle').children('.js-data').html(dynamicHTML);
         var position = currentObject.offset();
         bubble.show();
         var annoyingHeight =
