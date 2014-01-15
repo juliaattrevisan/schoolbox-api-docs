@@ -105,6 +105,16 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 		 *
 		 * This can be encapsulated further in a Factory
 		*/
+
+        $attendanceMaster = new Attendance_Synergetic_AttendanceMaster_New($class, $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database);
+        $this->setAttendanceMaster($attendanceMaster);
+
+        $attendanceMaster->setupWork();
+
+        print $attendanceMaster->getAttendanceMasterSeq();
+
+
+        /*
 		$attendanceMaster = new Attendance_Synergetic_AttendanceMaster_Existing($class, $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database);
 
 		if (!$attendanceMaster->hasAttendanceMasterSeq()) {
@@ -112,7 +122,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 		}
 
 		$this->setAttendanceMaster($attendanceMaster);
-
+        */
 		/* Hook method which should be protected if this class becomes subclassed
 		 */
 		$this->setup();

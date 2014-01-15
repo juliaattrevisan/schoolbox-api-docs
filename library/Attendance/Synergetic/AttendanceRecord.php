@@ -29,7 +29,7 @@ class Attendance_Synergetic_AttendanceRecord {
 	 * @param $data
 	 */
 	public function create($data) {
-		$query = "
+		/*$query = "
 			INSERT INTO SynergyOne.dbo.tAttendances (
 				AttendanceMasterSeq, ID,
 				PossibleAbsenceCode, PossibleDescription,
@@ -54,7 +54,7 @@ class Attendance_Synergetic_AttendanceRecord {
 				'{$data['AbsenceEventsSeq']}',
 				'{$data['NonAttendCreatedAbsenceEventsFlag']}'
 			)
-		";
+		";*/
 
 		$this->getDatabase()->query($query);
 	}

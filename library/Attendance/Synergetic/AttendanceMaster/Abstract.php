@@ -159,8 +159,74 @@ abstract class Attendance_Synergetic_AttendanceMaster_Abstract {
 	/**
 	 * Insert that stub row
 	 */
-	public function insertStub() {
+	public function setupWork() {
 		$data = $this->getData();
+
+$value =    array(
+    array('@FileType', $data['FileType'], SQLVARCHAR),
+    array('@FileYear', $data['FileYear'], SQLINT4 ),
+    array('@FileSemester', $data['FileSemester'], SQLINT4 ),
+    array('@ClassCampus', $data['ClassCampus'], SQLVARCHAR ),
+    array('@ClassCode', $data['ClassCode'], SQLVARCHAR ),
+    array('@AttendanceDate', $data['AttendanceDate'], SQLVARCHAR ),
+    array('@AttendancePeriod', $data['AttendancePeriod'], SQLINT4),
+    array('@AttendanceDayNumber', $data['AttendanceDayNumber'], SQLINT4 ),
+    array('@StaffID', $data['StaffID'], SQLINT4 ),
+    array('@AttendedFlag', 1, SQLINT4),
+    array('@NewDataInsertedFlag', false, SQLINT4, true),
+    array('@wkAttendanceMasterSeq', 'seq',                               SQLINT4,    true,  false, -1),
+    array('@TimeTableGroup', $data['TimetableGroup'], SQLVARCHAR),
+    array('@IsOnHoldFlag', false, SQLINT4, true),
+    array('@SynWebFlag', 1, SQLINT4),
+);
+
+        $result = $this->getDatabase()->executeProcedure(
+                       'spiwkAttendances', $value
+
+        );
+        print_r($value);
+        print_r($result);
+
+        if ($result['success'] && isset($result['output']['@wkAttendanceMasterSeq'])) {
+            $this->setAttendanceMasterSeq( $result['output']['@wkAttendanceMasterSeq']);
+        }
+        else {
+            print_r($result);
+        }
+
+
+        $result = $this->getDatabase()->executeProcedure(
+                       'spswkAttendances_ws', array(
+                               array('@wkAttendanceMasterSeq', 514, SQLINT4 ),
+                               array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
+                               array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
+                           )dwasaw
+        );
+
+        print_r($result);
+
+/*
+        DECLARE @NewDataInsertedFlag BIT, @wkAttendanceMasterSeq INTEGER, @IsOnHoldFlag BIT
+
+EXEC  dbo.spiwkAttendances
+          @FileType = 'A',
+  @FileYear = 2010,
+  @FileSemester = 1,
+  @ClassCampus = 'S',
+  @ClassCode = 'CH123',
+  @AttendanceDate = '2014-01-15',
+  @AttendancePeriod = 2,
+  @AttendanceDayNumber = 4,
+  @StaffID = 165,
+  @AttendedFlag = 1,
+  @ExitIfAttendancesExistFlag = 0,
+  @NewDataInsertedFlag = @NewDataInsertedFlag OUTPUT,
+  @wkAttendanceMasterSeq = @wkAttendanceMasterSeq OUTPUT,
+  @TimetableGroup = 'SEN',
+  @IsOnHoldFlag = @IsOnHoldFlag OUTPUT,
+  @SynWebFlag = 1
+
+
 
 		$query = "
 			INSERT INTO SynergyOne.dbo.AttendanceMaster (
@@ -182,11 +248,12 @@ abstract class Attendance_Synergetic_AttendanceMaster_Abstract {
 			SELECT LAST_INSERT_ID=@@IDENTITY
 		";
 
-		/* Get the new inserted id
-		 */
+		// Get the new inserted id
+
 		$r = mssql_fetch_assoc($this->getDatabase()->query($query));
 
 		$this->setAttendanceMasterSeq($r['LAST_INSERT_ID']);
+*/
 	}
 
 	/**
