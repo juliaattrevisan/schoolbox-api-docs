@@ -40,10 +40,11 @@ $j(function() {
 	});
 
 	/*
-	* Open rel="external" links ion a new tab.
-	* */
-	$j('a[rel=external]').attr('target','_blank');
-
+	 * Open rel="external" links in a new tab.
+	 */
+	$j(document).on('click', 'a[rel=external]', function() {
+		$(this).attr('target','_blank')
+	})
 });
 
 /*
