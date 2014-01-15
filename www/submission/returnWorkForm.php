@@ -13,7 +13,7 @@ $subHandler = new Submission();
 $rubricHandler = new DueWork_Rubric_Handler();
 print_r($_POST);
 // Ajax from mark sheet
-if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) */ && isset($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
+if(isset($_POST['uid']) && isset($_POST['comment']) && isset($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
     $response = array();
 
     if(is_numeric($_POST['uid']) && is_numeric($_POST['box_id'])) {
@@ -75,6 +75,26 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
             }
         }
     }
+	else {
+		// posting from returnWork
+		// test that the rubric is given
+		if(is_array($_POST['rubric']) && count($_POST['rubric'])) {
+			$mark = $marksheet->normaliseMark($_POST['rubric'], $subbox);
+
+			$return = array(
+				'box_id'    => $_POST['box_id'],
+				'marker'    => $_SESSION['id'],
+				'owner'     => $_POST['uid'],
+				'comment'   => $_POST['comment'],
+				'mark'      => $mark['mark'],
+				'norm_mark' => $mark['norm_mark']
+			);
+
+			$saveReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
+			$saveReturn->saveReturn($return, $_POST['rubric']);
+		}
+
+	}
 
 	/* Redirect back to crocodoc marking screen
 	 */
@@ -87,29 +107,7 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
 }
 
 
-// posting from returnWork
-// test that the rubric is given
-elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
-    $returnHandler->securityCheck($_POST['box_id']);
 
-    $subbox = $subHandler->getByID($_POST['box_id']);
-    $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
-    $mark = $marksheet->normaliseMark($_POST['rubric'], $subbox);
-
-    $return = array(
-        'box_id'    => $_POST['box_id'],
-        'marker'    => $_SESSION['id'],
-        'owner'     => $_POST['uid'],
-        'mark'      => $mark['mark'],
-        'norm_mark' => $mark['norm_mark']
-    );
-
-	$saveReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
-	$saveReturn->saveReturn($return, $_POST['rubric']);
-
-    // in all possible scenarios, *something* happened above, so redirect the user
-	$page->backToTheFuture(2);
-}
 
 
 /* Exceeded PHP max file size */

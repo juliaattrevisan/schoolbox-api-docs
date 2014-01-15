@@ -78,7 +78,7 @@ $j(function() {
 
                             var notification = submitDiv.find('input, select, textarea');
 
-                            $j.post('/submission/returnWorkForm.php', submitDiv.find('input, select, textarea').serialize(), function(data) {
+                            $j.post('/submission/returnWorkForm2.php', submitDiv.find('input, select, textarea').serialize(), function(data) {
 
                                 // Why don't I have a class for this?
                                 notification.addClass('ajax-updated');
