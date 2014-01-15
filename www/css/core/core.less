@@ -576,7 +576,7 @@ Notifications
 	ul, li, li a {
 		width: @navigation-width - @navigation-padding * 2;
 	}
-	li.hover > a,
+	li:hover > a,
 	ul li a:hover,
 	li li a:hover {
 		color: @navigation-hover-color;
@@ -606,6 +606,9 @@ Notifications
                 right: 16px;
                 top: 3px;
             }
+        }
+        &:hover > ul:first-of-type {
+            display: block;
         }
     }
 

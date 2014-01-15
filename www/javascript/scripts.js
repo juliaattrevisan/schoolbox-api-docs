@@ -15,19 +15,6 @@ $j(function() {
     }
     $j.event.props = res
 
-
-
-    /*
-     * Main Navigation dropdown
-     * */
-    $j("#nav li").mouseenter(function(){
-        $j(this).addClass("hover");
-        $j('ul:first',this).toggle()
-    }).mouseleave(function(){
-        $j(this).removeClass("hover");
-        $j('ul:first',this).toggle();
-    });
-
 	/*
 	* Close the calendar popup no matter what!
 	* */
