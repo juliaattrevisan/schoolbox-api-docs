@@ -31,13 +31,13 @@ if (is_numeric($_POST['id']) && $_POST['id'] && $_POST['txt']) {
 	$menuHandler->update($menuItem);
 	SitePage::localRedir('/adminv2/side-menu/');
 }
-else if ($_POST['txt']) {
+elseif ($_POST['txt']) {
 	$menuHandler->create($menuItem);
 	SitePage::localRedir('/adminv2/side-menu/');
 }
 /* Ajax drag and drop request
  */
-else if ($_GET['pos'] && isset($_GET['tid']) && $_GET['oid']) {
+elseif (isset($_GET['pos']) && isset($_GET['tid']) && isset($_GET['oid'])) {
 	switch ($_GET['pos']) {
 		case 'before' :
 			$menuHandler->moveItemBefore($_GET['oid'], $_GET['tid']);
@@ -48,6 +48,10 @@ else if ($_GET['pos'] && isset($_GET['tid']) && $_GET['oid']) {
 		case 'last' :
 			$menuHandler->moveItemLast($_GET['oid'], $_GET['tid']);
 			break;
+        default:
+            // move this node to that position within the parent.
+            $menuHandler->moveItemToPosition($_GET['oid'], $_GET['tid'], intval($_GET['pos']));
+            break;
 	}
 }
 else {
