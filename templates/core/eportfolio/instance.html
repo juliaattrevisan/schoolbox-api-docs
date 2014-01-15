@@ -139,13 +139,22 @@
 <script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <script type='text/javascript'>
     $j(function() {
-        $j('#addIndividualPermission').userSelector({
+        var selector = $j('#addIndividualPermission')
+        selector.userSelector({
             plugin: {
                 data:  '/eportfolio/search.php?groupID={STUDENT_GROUP_IDS}',
                 width: 275
             },
             multiple: true,
             value: {USER_LIST}
+        });
+        // Resize the individual permission selector when the permissions page
+        // gets switched to (otherwise, it's zero)
+        $j('#tabs-homepage').on('tabsactivate', function(event, ui) {
+            if (ui.newPanel.is('#tabs-4')) {
+                var suggest = selector.data('magicSuggest')
+                suggest.container.height(suggest.selectionContainer.height())
+            }
         });
     });
 </script>
