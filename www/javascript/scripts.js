@@ -45,28 +45,35 @@ $j(function() {
 	$j(document).on('click', 'a[rel=external]', function() {
 		$(this).attr('target','_blank')
 	})
+
+
+    /*
+     * Each skin does NOT have a slightly different header height or a different left navigation.
+     * From now on, it's always placed relative to the clicked element.
+     */
+    $j(document).on('click', 'ul.js_happening li', function() {
+        var currentObject = $(this);
+        var bubble = $j('.cal-bubble');
+        bubble.find('.bottom, .bottom strong').removeAttr("style");
+        bubble.find('.bottom').show();
+        var dynamicHTML = currentObject.children('.hidden-fields').html();
+        $j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
+        var position = currentObject.offset();
+        bubble.show();
+        var annoyingHeight = (
+            $j('.cal-bubble .middle').outerHeight()
+                + $j('.cal-bubble .top').outerHeight()
+                + $j('.cal-bubble .bottom').outerHeight()
+            )
+
+        // right edge lines up with right edge of currentObject
+        // bottom edge lines up with top edge of currentObject, hide pointer if it's at top of screen
+        var left = Math.max(0, position.left + currentObject.outerWidth() - bubble.outerWidth());
+        var top  = Math.max(0, position.top  - annoyingHeight);
+        if (top === 0) {
+            bubble.find('.bottom').hide();
+        }
+        bubble.css("left", left);
+        bubble.css("top",  top);
+    });
 });
-
-/*
-* Each skin has a slightly different header height or a different left navigation.
-* This function allows us to position the calendar popup at the right place.
-* */
-
-function calendarPos(currentObject, leftNegative, heightNegative) {
-	$j('.cal-bubble').find('.bottom, .bottom strong').removeAttr("style");
-	$j('.cal-bubble').find('.bottom').show();
-	var dynamicHTML = $j(currentObject).children('.hidden-fields').html();
-	$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
-	var position = $j(currentObject).offset();
-	$j('.cal-bubble').show();
-	var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
-	$j('.cal-bubble').css("left", (position.left - leftNegative));
-	$j('.cal-bubble').css("top", (position.top - annoyingHeight - heightNegative));
-	if (($j('.cal-bubble').css("left")) < '0px') {
-			$j('.cal-bubble').css("left", '0');	
-	}
-	if (($j('.cal-bubble').css("top")) < '0px') {
-			$j('.cal-bubble').css("top", '0');	
-			$j('.cal-bubble').find('.bottom').hide();
-	}
-}
