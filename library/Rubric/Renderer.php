@@ -26,6 +26,13 @@ class Renderer {
 	private $user = null;
 
 	/**
+	 * A submission box, born of submission handler
+	 *
+	 * @var array
+	 */
+	private $submissionBox = array();
+
+	/**
 	 * An array, born of rubric handler
 	 *
 	 * @var array
@@ -49,6 +56,7 @@ class Renderer {
 	public function __construct($page, $submissionBox, $user) {
 		$this->setPage($page);
 		$this->setUser($user);
+		$this->setSubmissionBox($submissionBox);
 
 		$this->setRubricHandler(new \DueWork_Rubric_Handler());
 		$this->setRubric($this->getRubricHandler()->getRubric($submissionBox['id']));
@@ -164,7 +172,17 @@ class Renderer {
 	 * An additional step, to retain compatibility with returnWork.php
 	 */
 	public function parseBlock() {
-		$this->getPage()->parse("mark_type_rubric_block", "mark_type_rubric");
+		$submissionBox = $this->getSubmissionBox();
+
+		if ($submissionBox['mark_type_slug'] == 'rubric') {
+			$this->getPage()->parse("mark_type_rubric_block", "mark_type_rubric");
+		}
+		else {
+
+			$this->getPage()->setVar(array(
+				'mark_type_rubric_block' => ''
+			));
+		}
 	}
 
 	/* Getters/Setters
@@ -240,5 +258,23 @@ class Renderer {
 	 */
 	private function getRubric() {
 		return $this->rubric;
+	}
+
+	/**
+	 * Set submission box
+	 *
+	 * @param array $submissionBox
+	 */
+	private function setSubmissionBox($submissionBox) {
+		$this->submissionBox = $submissionBox;
+	}
+
+	/**
+	 * Get submission box
+	 *
+	 * @return array
+	 */
+	private function getSubmissionBox() {
+		return $this->submissionBox;
 	}
 }
