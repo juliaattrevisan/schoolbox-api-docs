@@ -7,7 +7,6 @@ module.exports = function(grunt) {
     var watchTasks = {
         core: {
             options: {
-                spawn: false,
                 interrupt: true
             },
             files: ['www/css/core/*.less'],
