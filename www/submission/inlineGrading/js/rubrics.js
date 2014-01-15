@@ -172,9 +172,47 @@ $('#rubric-tbody').inlineGradingRubrics({
 			 */
 			$(config.scoreElement).html(sum);
 
+			/* Update warning element
+			 */
+			updateWarningElements();
+
 			/* Update graph
 			 */
 			renderGraph();
+		}
+
+		/**
+		 * Update warning elements
+		 * 
+		 * @returns {boolean}
+		 */
+		function updateWarningElements() {
+			var success = true;
+
+			$j(config.element).find('.criterion-label-group').each(function() {
+				var groupName = $(this).data('class');
+
+				var container = $(config.element).find('td[data-class="'+groupName+'"]')
+				var allRadios = container.find('input');
+				var selectedRadios = container.find(':checked');
+
+				/* If radios exist for a particular criteria group but
+				 * nothing was selected, invalidate
+				 */
+				if (allRadios.length) {
+					if (!selectedRadios.length) {
+						success = false;
+					}
+					else {
+						$(config.element).find('td.warning[data-class="'+groupName+'"]').parent().addClass('hide');
+					}
+				}
+				else {
+					$(config.element).find('td.warning[data-class="'+groupName+'"]').parent().removeClass('hide');
+				}
+			});
+
+			return success;
 		}
 
 		/**
@@ -183,31 +221,32 @@ $('#rubric-tbody').inlineGradingRubrics({
 		function initForm() {
 			$j(config.formElement).validate({
 				submitHandler: function(form) {
-					var success = true;
-
-					$j(config.element).find('.criterion-label-group').each(function() {
-						var groupName = $(this).data('class');
-
-						var container = $(config.element).find('td[data-class="'+groupName+'"]')
-						var allRadios = container.find('input');
-						var selectedRadios = container.find(':checked');
-
-						/* If radios exist for a particular criteria group but
-						 * nothing was selected, invalidate
-						 */
-						if (allRadios.length) {
-							if (!selectedRadios.length) {
-								success = false;
-								return false;
-							}
-							else {
-								container.find('.warning').removeClass('hide');
-							}
-						}
-						else {
-							container.find('.warning').removeClass('hide');
-						}
-					});
+					var success = updateWarningElements();
+//					var success = true;
+//
+//					$j(config.element).find('.criterion-label-group').each(function() {
+//						var groupName = $(this).data('class');
+//
+//						var container = $(config.element).find('td[data-class="'+groupName+'"]')
+//						var allRadios = container.find('input');
+//						var selectedRadios = container.find(':checked');
+//
+//						/* If radios exist for a particular criteria group but
+//						 * nothing was selected, invalidate
+//						 */
+//						if (allRadios.length) {
+//							if (!selectedRadios.length) {
+//								success = false;
+//								return false;
+//							}
+//							else {
+//								container.find('.warning').removeClass('hide');
+//							}
+//						}
+//						else {
+//							container.find('.warning').removeClass('hide');
+//						}
+//					});
 
 					if (success) {
 						form.submit();
