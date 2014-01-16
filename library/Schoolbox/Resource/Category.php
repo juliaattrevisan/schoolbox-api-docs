@@ -83,10 +83,15 @@ class Category {
      * @return string
      */
     public function getCodeString() {
-        foreach($this->codes as $code) {
-            $codeSet[] = $code->getCode();
-        }
-        return implode(',',$codeSet);
+		if (count($this->codes)) {
+			foreach($this->codes as $code) {
+				$codeSet[] = $code->getCode();
+			}
+			
+			return implode(',',$codeSet);
+		}
+
+		return '';
     }
 
     /**
