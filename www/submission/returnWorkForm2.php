@@ -44,5 +44,34 @@ $file = $_FILES['file'];
  */
 $redirect = $_POST['redirect'];
 
+/* Process the return's comments, marks, rubrics and uploads
+ */
 $returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $file, $redirect);
 $returnedWorkFactory->start();
+
+/* An array of crocodoc-specific controls
+ array(
+	'isCrocodoc' => true
+	'submissionId' => ...
+	'nextUrl' => ...
+ );
+
+ */
+/* Deal with crocodoc specifically
+ */
+if (isset($_POST['crocodoc'])) {
+	try {
+		$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+		$submission = $submissionMapper->findById($_POST['crocodoc']['submissionId']);
+
+		$downloader = new Crocodoc\Download($submission);
+		$downloader->start();
+	}
+	catch(\Exception $e) {
+		new \Alaress_Probe($_POST);
+		echo $e->getMessage();
+	}
+}
+
+/* Go to St. Albans when finished
+ */

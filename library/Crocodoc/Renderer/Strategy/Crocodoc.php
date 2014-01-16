@@ -54,6 +54,7 @@ class Crocodoc extends Base {
 		$this->getPage()->setVar(array(
 			'INJECTABLE_CONTROL_URL' => $downloadUrl,
 			'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
+			'INJECTABLE_CONTROL_SUBMISSION_ID' => $this->getSubmission()->getId(),
 		));
 
 		$this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');
