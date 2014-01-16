@@ -42,6 +42,14 @@ Scenario: Create, login and modify a new user
   Then	I follow "Logout"
   And	log in as "stevetest" with password "password2"
   Then	I should see ", Prof Steve Test"
+  And	I should see "Webmail"
+  When	I follow "Prof Steve Test"
+  Then	I should see "webmaster@alaress.com.au"
+  And	I should not see "mailto:"
+  And	I should not see "Student ID"
+  And	I should not see "Grades"
+  And	I should not see "Due Work"
+  And	I should see "ePortfolio"
 
 Scenario: Disable a user
   When	I follow "Logout"
