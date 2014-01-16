@@ -60,8 +60,8 @@ class Renderer {
 
 		$this->setRubricHandler(new \DueWork_Rubric_Handler());
 
-		if ($this->isRubric()) {
-			$this->setRubric($this->getRubricHandler()->getRubric($submissionBox['id']));
+		if ($this->getSubmissionBox()->isRubric()) {
+			$this->setRubric($this->getRubricHandler()->getRubric($submissionBox->getId()));
 		}
 
 		$this->setup();
@@ -83,9 +83,7 @@ class Renderer {
 	 * Draw cube
 	 */
 	public function render() {
-		$submissionBox = $this->getSubmissionBox();
-
-		if ($submissionBox['mark_type_slug'] == 'rubric') {
+		if ($this->getSubmissionBox()->isRubric()) {
 			$rubricMark = new \DueWork_Rubric_Mark($this->getRubric());
 			$rubricMark->populateMarks($this->getUser()->getId());
 
@@ -177,26 +175,10 @@ class Renderer {
 	}
 
 	/**
-	 * Determine whether this submissionBox is a rubric one or not
-	 * If it isn't, skip the entire rendering process altogether
-	 *
-	 * @return bool
-	 */
-	private function isRubric() {
-		$submissionBox = $this->getSubmissionBox();
-
-		if ($submissionBox['mark_type_slug'] == 'rubric') {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * An additional step, to retain compatibility with returnWork.php
 	 */
 	public function parseBlock() {
-		if ($this->isRubric()) {
+		if ($this->getSubmissionBox()->isRubric()) {
 			$this->getPage()->parse("mark_type_rubric_block", "mark_type_rubric");
 			$this->getPage()->parse('INJECTED_MARK_RUBRIC', 'rubric');
 		}
