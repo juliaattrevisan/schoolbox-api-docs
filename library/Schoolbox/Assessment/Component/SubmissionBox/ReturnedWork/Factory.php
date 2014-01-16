@@ -105,6 +105,7 @@ class Factory {
 	public function start() {
 
 		/* Figure out which returned work record to use
+		 * Assign marks, normalised marks, ownerships etc
 		 */
 		$returnedWork = $this->processReturnedWork();
 
