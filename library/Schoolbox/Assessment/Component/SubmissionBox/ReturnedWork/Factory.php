@@ -166,9 +166,13 @@ class Factory {
 				$returnedWork->setReturned(new \Alaress_Date_Format(new \DateTime('now')));
 			}
 		}
+		/* Spawn a new one with the appropriate ownerships
+		 */
 		catch (\Schoolbox\Mapper\Exception $e) {
 			$returnedWork = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
 			$returnedWork->setReturned(new \Alaress_Date_Format(new \DateTime('now')));
+			$returnedWork->setOwner($this->getUser());
+			$returnedWork->setSubmissionBox($this->getSubmissionBox());
 		}
 
 		return $returnedWork;
@@ -181,11 +185,6 @@ class Factory {
 	 */
 	private function processReturnedWork() {
 		$returnedWork = $this->retrieveReturnedWorkRecord();
-
-		/* Assign ownerships
-		 */
-		$returnedWork->setOwner($this->getUser());
-		$returnedWork->setSubmissionBox($this->getSubmissionBox());
 
 		/* Update the existing Returned Work record with new data
 		 */
