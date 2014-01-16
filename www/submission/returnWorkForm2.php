@@ -17,7 +17,11 @@ $user = $userMapper->findById($_POST['uid']);
 $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($_POST['box_id']);
 
-$mark = $_POST['mark'];
+/* Some weird format that's built in javascript for some reason
+ * See jquery.viewSubmission.js
+ */
+$mark = $_POST['mark'][$_POST['uid']];
+
 $comment = $_POST['comment'];
 $redirect = $_POST['redirect'];
 

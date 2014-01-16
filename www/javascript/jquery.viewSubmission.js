@@ -13,7 +13,12 @@ $j(function() {
                 var self = $j(this);
                 var pInline = self.closest('.inlineform');
                 var uid = pInline.find('input.uid');
-                self.attr('name', self.attr('name').substring(0, self.attr('name').length - 2) + '[' + uid.val() + ']');
+
+				/* wat?
+				 self.attr('name', self.attr('name').substring(0, self.attr('name').length - 2) + '[' + uid.val() + ']');
+				 */
+				self.attr('name', self.attr('name') + '[' + uid.val() + ']');
+
             });
         },
 

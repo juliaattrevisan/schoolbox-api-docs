@@ -110,11 +110,17 @@ class Factory {
 
 		/* If there was a file upload, attach it
 		 */
-		$returnedWork = $this->addFile($returnedWork);
+//		$returnedWork = $this->addFile($returnedWork);
 
 		/* Ram it home
 		 */
-//		$this->getReturnedWorkMapper()->save($returnedWork);
+		try {
+		$this->getReturnedWorkMapper()->save($returnedWork);
+		}
+		catch(\Exception $e) {
+			echo $e->getMessage();
+		}
+
 //			$saveReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
 //			$saveReturn->saveReturn($returnedWork, null, $file);
 	}
@@ -128,6 +134,8 @@ class Factory {
 	private function retrieveReturnedWorkRecord() {
 		$returnedWork = null;
 
+		/* If you can't find an existing record, spawn a new one
+		 */
 		try {
 			/** @var ReturnedWork $returned_work */
 			$returnedWork = $this->getReturnedWorkMapper()->findOneByColumnList(
@@ -140,26 +148,27 @@ class Factory {
 				)
 			);
 
+			/* Resume modification of an existing returned work record that was
+			 * found a few moments ago, rather than spawn a new one
+			 *
+			 * This fixes the scenario where marks were entered into one record
+			 * and the comments (added shortly thereafter) were put into a new
+			 * record unintentionally
+			 */
 			// Is this outside of the update window? if so, create a new one.
 			$return_time = $returnedWork->getReturned();
 			$window_ago  = new \Alaress_Date_Format(time() - $this->getUpdateWindow(), 'U');
 
-			if ($return_time->getUnixTimestamp() < $window_ago->getUnixTimestamp()) {
-				$returnedWork = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
-			}
-			else {
-				$updateExisting = true;
+			/* This is a new returned work record, so pump in a returned date
+			 * otherwise leave it alone, since it's being updated for comments/marks
+			 */
+			if ($return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()) {
+				$returnedWork->setReturned(new \Alaress_Date_Format(new \DateTime('now')));
 			}
 		}
 		catch (\Schoolbox\Mapper\Exception $e) {
-		}
-
-		if (!$updateExisting) {
-			$returnedWork
-				->setOwner(\Schoolbox\UserMapper::getInstance()->findById($this->getUser()->getId()))
-				->setSubmissionBox(\Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findById($this->getSubmissionBox()->getId()))
-				->setReturned(new \Alaress_Date_Format(new \DateTime('now')))
-			;
+			$returnedWork = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
+			$returnedWork->setReturned(new \Alaress_Date_Format(new \DateTime('now')));
 		}
 
 		return $returnedWork;
@@ -172,6 +181,11 @@ class Factory {
 	 */
 	private function processReturnedWork() {
 		$returnedWork = $this->retrieveReturnedWorkRecord();
+
+		/* Assign ownerships
+		 */
+		$returnedWork->setOwner($this->getUser());
+		$returnedWork->setSubmissionBox($this->getSubmissionBox());
 
 		/* Update the existing Returned Work record with new data
 		 */
