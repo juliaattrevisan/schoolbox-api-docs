@@ -17,9 +17,12 @@ $currentUid = $this->arg[1];
  */
 $submissionId = $this->arg[2];
 
-$submissionHandler = new Submission();
-$submissionBox = $submissionHandler->getById($submissionBoxId);
+$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 
+/* Crappy handler
+ */
+$submissionHandler = new Submission();
 $studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
 
 /* Uniqueify list (why this returns dupes, I'm not entirely sure)
@@ -98,7 +101,7 @@ if ($currentStudent['submission'] != null) {
 $navigationItems = json_encode($stack);
 
 $navigationElements = array(
-	'boxId' => $submissionBox['id'],
+	'boxId' => $submissionBox->getId(),
 	'previous' => $previousStudent,
 	'current' => $currentStudent,
 	'next' => $nextStudent,
@@ -127,7 +130,7 @@ $rubricsRenderer->render()->parseBlock();
 
 $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
-	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox['id'],
+	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox->getId(),
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
