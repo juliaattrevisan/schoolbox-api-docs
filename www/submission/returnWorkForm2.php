@@ -9,11 +9,17 @@
  */
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+/* Start a session -_-
+ */
 $page = new SitePage();
 
+/* Get the owner object
+ */
 $userMapper = new \Schoolbox\UserMapper();
 $user = $userMapper->findById($_POST['uid']);
 
+/* Get the submission box object
+ */
 $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($_POST['box_id']);
 
@@ -22,10 +28,21 @@ $submissionBox = $submissionBoxMapper->findById($_POST['box_id']);
  */
 $mark = $_POST['mark'][$_POST['uid']];
 
-$comment = $_POST['comment'];
-$redirect = $_POST['redirect'];
+/* Optional rubric
+ */
+$rubric = $_POST['rubric'];
 
+/* The usual comment
+ */
+$comment = $_POST['comment'];
+
+/* Optional file upload
+ */
 $file = $_FILES;
 
-$returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $file, $redirect);
+/* A url to visit after submitting
+ */
+$redirect = $_POST['redirect'];
+
+$returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $file, $redirect);
 $returnedWorkFactory->start();
