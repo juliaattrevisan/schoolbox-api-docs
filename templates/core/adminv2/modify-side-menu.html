@@ -2,48 +2,34 @@
 <link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
 <script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
 <script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
-<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
 
     $j(function () {
 
         // setup tree structure
-        $j("#side-menu").jstree({
-            "animation":50,
-            "core":{ "initially_open":[ "node_0" ] },
-            "plugins":[ "themes", "html_data"],
-            "themes":{
-                "theme":"schoolbox",
-                "dots":true,
-                "icons":false
-            }
-        });
-
-        /*
-         * Ascertain the currently active element
-         *
-         * */
-        $j('.jstree').find('a#0').addClass('active');
-
-        $j(".jstree a").click(function () {
-            $this = $j(this);
-            var idToInput = $this.attr('ID');
-            $j(".jstree a").removeClass('active');
-            $this.addClass('active');
-            $j('#prent').val(idToInput);
-            $j('.parent-selection').text($this.text());
-            return false;
-        });
-
-        $j('#form').validate();
-
-        $j('#url').userSelector({
-            plugin: {
-                data:'/ajax/findCategory.php',
-                allowFreeEntries: true
-            },
-            formElement: $j('#form input[name=url]')
-        });
+        $j("#side-menu")
+            .on('ready.jstree', function(event, jstree) {
+                jstree.instance.open_node(jstree.instance.get_node('node_0'));
+            })
+            .on('select_node.jstree', function(event, jstree) {
+                $j('#prent').val(jstree.selected[0].replace(/^node_/, ''));
+            })
+            .on('deselect_node.jstree', function() {
+                $j('#prent').val('');
+            })
+            .jstree({
+                "animation":50,
+                "core":{
+                    multiple:false,
+                    "themes": {
+                        "variant" : "schoolbox",
+                        "dots" : true,
+                        "icons" : false
+                    }
+                }
+            });
 
         /*
          * Modal for URL homepage selection

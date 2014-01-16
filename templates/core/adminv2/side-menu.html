@@ -3,45 +3,34 @@
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
 $j(function () {
-
-    $j("#side-menu").jstree({
-        "animation": 50,
-        "core" : {
-            check_callback: true,
-            "themes" : {
-                "variant" : "schoolbox",
-                "dots" : true,
-                "icons" : false
+    $j("#side-menu")
+        .on('ready.jstree', function(event, jstree) {
+            jstree.instance.open_node(jstree.instance.get_node('node_0'));
+        })
+        .jstree({
+            "animation": 50,
+            "core" : {
+                check_callback: true,
+                "themes" : {
+                    "variant" : "schoolbox",
+                    "dots" : true,
+                    "icons" : false
+                }
+            },
+            "plugins" : ["dnd", 'state'],
+            dnd: {
+                copy: false
             }
-        },
-        "plugins" : ["dnd", 'state'],
-        dnd: {
-            copy: false
-        }
-
-    }).bind('move_node.jstree', function(e, data) {
-        var pos = data.position;
-        var tid = data.parent.split('_').pop();
-        var oid = data.node.id.split('_').pop();
-        $j.ajax({
-            url: '/adminv2/side-menuForm.php',
-            data: {pos:pos, tid:tid, oid:oid}
+        })
+        .on('move_node.jstree', function(e, data) {
+            var pos = data.position;
+            var tid = data.parent.split('_').pop();
+            var oid = data.node.id.split('_').pop();
+            $j.ajax({
+                url: '/adminv2/side-menuForm.php',
+                data: {pos:pos, tid:tid, oid:oid}
+            });
         });
-    });
-
-    $j("#side-menu").bind('open_node.jstree close_node.jstree', function() {
-        setCookie();
-    });
-
-    function setCookie() {
-        $j.cookie("open-tree-nodes", null);
-        var openNodes = "";
-        $j('.jstree-open').each(function() {
-            openNodes += ($j(this).attr('id').substr(5)+',')
-        });
-        $j.cookie('open-tree-nodes', openNodes, { expires: 1 });
-    }
-
 });
 
 </script>
