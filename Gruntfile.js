@@ -28,7 +28,7 @@ module.exports = function(grunt) {
         }
         watchTasks[cssDir] = {
             options: {
-                spawn: false
+                interrupt: true
             },
             files: ['www/css/'+cssDir+'/*.less'],
             tasks: ['build.css:'+cssDir]
