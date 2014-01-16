@@ -15,21 +15,20 @@ class Marksheet_Rubric extends Marksheet_Abstract {
         $this->rubricHandler = new DueWork_Rubric_Handler();
     }
 
-
-    /**
-     * Take a UI-formatted mark and normalise it
-     *
-     * @param $mark
-     * @param $subbox
-     * @return mixed
-     */
-    public function normaliseMark($rubric, $subbox) {
+	/**
+	 * Take a UI-formatted mark and normalise it
+	 *
+	 * @param $rubric
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
+	 * @return array|mixed
+	 */
+	public function normaliseMark($rubric, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
         $mark = 0;
         foreach($rubric as $i) {
             $mark += $i;
         }
 
-        $max = $subbox['max_mark'];
+        $max = $subbox->getMaxMark();
         $normalised = (($mark / $max) * 100);
 
         // validation: must be inside bounds

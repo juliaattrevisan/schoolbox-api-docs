@@ -8,7 +8,7 @@
  */
 class Marksheet_Letter extends Marksheet_Abstract {
 
-    public function normaliseMark($mark, $subbox) {
+    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
         $grade = $this->getSubmissionHandler()->getLetterGradeByID($mark);
         return array(
             'norm_mark' => $grade['lower_bound'],
