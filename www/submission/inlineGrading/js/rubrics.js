@@ -205,11 +205,11 @@ $('#rubric-tbody').inlineGradingRubrics({
 						success = false;
 					}
 					else {
-						$(config.element).find('td.warning[data-class="'+groupName+'"]').parent().addClass('hide');
+						$(config.element).find('td.warning[data-class="'+groupName+'"]').hide();
 					}
 				}
 				else {
-					$(config.element).find('td.warning[data-class="'+groupName+'"]').parent().removeClass('hide');
+					$(config.element).find('td.warning[data-class="'+groupName+'"]').hide();
 				}
 			});
 
