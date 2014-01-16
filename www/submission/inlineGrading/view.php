@@ -128,6 +128,17 @@ $dueWorkDetail->renderDetails($this);
 $rubricsRenderer = new \Rubric\Renderer\Vertical($this, $submissionBox, $user);
 $rubricsRenderer->render()->parseBlock();
 
+/* Determine redirect based on whether you're at the end of the list or not
+ * Personally I think it'd be better to wrap back to the start, instead of
+ * getting kicked out - then you can review the marks in a 'horizontal' manner
+ */
+if (is_array($nextStudent)) {
+	$nextUrl = '/submission/inlineGrading/view/' . $submissionBox->getId() . '/' . $nextStudent['uid'];
+}
+else {
+	$nextUrl = '/submission/viewSubmission/' . $submissionBox->getId();
+}
+
 $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
 	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox->getId(),
@@ -136,5 +147,6 @@ $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
 	'INLINE_GRADING_STUDENT_FULL_NAME' => $user->getFullName(),
 	'INLINE_GRADING_STUDENT_ID' => $user->getId(),
+	'INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL' => $nextUrl
 ));
 

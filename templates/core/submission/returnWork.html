@@ -25,7 +25,8 @@
 <form action="/submission/returnWorkForm2.php" method="post" enctype="multipart/form-data" class="clearfix" name="returnWorkForm" id="returnWorkForm" >
     <input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
     <input name="uid" type="hidden" id="uid" value="{UID}" />
-
+	<input name="redirect" type="hidden" value="/submission/returnWork/{BOX_ID}/{UID}" />
+	
     <table class="standardForm table">
         <tr>
             <td class="formLabelWidth"><h4>Student</h4>
