@@ -16,19 +16,20 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 
 	$subReturn->securityCheck($this->arg[0]);
 
-    $subbox = $subHandler->getByID($this->arg[0]);
+	$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+	$submissionBox = $submissionBoxMapper->findById($this->arg[0]);
 
 	$this->setVar(array(
-		'CATEGORY'  => \Scrub::text($subbox['categoryName']),
-		'ASSNAME' => \Scrub::text($subbox['name']),
-		'BOX_ID' => $subbox['id'],
+		'CATEGORY'  => \Scrub::text($submissionBox->getCategory()->getName()),
+		'ASSNAME' => \Scrub::text($submissionBox->getName()),
+		'BOX_ID' => $submissionBox->getId(),
 		'NAME' => $user->formatName(),
 		'SYN_ID' => $user->getExternalId(),
 		'UID' => $user->getId(),
 	));
 
-	$marksheet = \Marksheet_Factory::build($subbox['mark_type_slug']);
-	$mark = $marksheet->retrieveMark($user->getId(), $subbox['id'], false, false);
+	$marksheet = \Marksheet_Factory::build($submissionBox->getMarkType()->getSlug());
+	$mark = $marksheet->retrieveMark($user->getId(), $submissionBox->getId(), false, false);
 
 	$this->setVar('MARK_TYPE_COMMENT', $marksheet->getComment());
 
@@ -40,7 +41,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 
 	/* Render rubrics
 	 */
-	$renderer = new \Rubric\Renderer($this, $subbox, $user);
+	$renderer = new \Rubric\Renderer($this, $submissionBox, $user);
 	$renderer->render();
 
 	/* Parse out everything
