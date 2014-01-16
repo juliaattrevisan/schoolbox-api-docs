@@ -41,6 +41,13 @@ class Factory {
 	private $comment = '';
 
 	/**
+	 * An array of rubric values selected by the marker
+	 *
+	 * @var array
+	 */
+	private $rubric = array();
+
+	/**
 	 * A $_FILES array element
 	 *
 	 * @var null
@@ -84,14 +91,16 @@ class Factory {
 	 * @param \Schoolbox\Assessment\Component\SubmissionBox $submissionBox
 	 * @param $mark
 	 * @param $comment
+	 * @param $rubric
 	 * @param $file
 	 * @param $redirect
 	 */
-	public function __construct(\Schoolbox\User $user, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox, $mark, $comment, $file, $redirect) {
+	public function __construct(\Schoolbox\User $user, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox, $mark, $comment, $rubric, $file, $redirect) {
 		$this->setUser($user);
 		$this->setSubmissionBox($submissionBox);
 		$this->setMark($mark);
 		$this->setComment($comment);
+		$this->setRubric($rubric);
 		$this->setFile($file);
 		$this->setRedirect($redirect);
 
@@ -116,7 +125,18 @@ class Factory {
 		/* Ram it home
 		 */
 		try {
-		$this->getReturnedWorkMapper()->save($returnedWork);
+			$this->getReturnedWorkMapper()->save($returnedWork);
+
+			new \Alaress_Probe($this->getRubric());
+			// Rubrics have no mappers yet, so handle them the old-fashioned way.
+//			if (!empty($returnedWork->getId()) && $rubric) {
+//				$rubric_handler = new \DueWork_Rubric_Handler();
+//				$stamp          = null;
+//				if ($update_existing) {
+//					$stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
+//				}
+//				$rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
+//			}
 		}
 		catch(\Exception $e) {
 			echo $e->getMessage();
@@ -180,6 +200,19 @@ class Factory {
 	}
 
 	/**
+	 * Determine whether a submissionBox is a rubric one or not
+	 *
+	 * @return bool
+	 */
+	private function isRubric() {
+		if ($this->getSubmissionBox()->getMarkType()->getSlug() == 'rubric') {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Apply updates to the returned work record
 	 *
 	 * @return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
@@ -187,9 +220,18 @@ class Factory {
 	private function processReturnedWork() {
 		$returnedWork = $this->retrieveReturnedWorkRecord();
 
-		/* Normalise
+		/* Normalise - rubrics do it in a whole different way
 		 */
-		$normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark(), $this->getSubmissionBox());
+		if ($this->isRubric()) {
+			$normalisePayload = $this->getRubric();
+		}
+		else {
+			$normalisePayload = $this->getMark();
+		}
+
+		/* Fire.
+		 */
+		$normalisedMarkArray = $this->getMarksheet()->normaliseMark($normalisePayload, $this->getSubmissionBox());
 
 		/* Update the existing Returned Work record with new data
 		 */
@@ -386,5 +428,23 @@ class Factory {
 	 */
 	private function getUpdateWindow() {
 		return $this->updateWindow;
+	}
+
+	/**
+	 * Set rubric
+	 *
+	 * @param array $rubric
+	 */
+	private function setRubric($rubric) {
+		$this->rubric = $rubric;
+	}
+
+	/**
+	 * Get rubric
+	 *
+	 * @return array
+	 */
+	private function getRubric() {
+		return $this->rubric;
 	}
 }
