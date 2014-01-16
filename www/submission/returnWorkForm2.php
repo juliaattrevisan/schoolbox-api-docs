@@ -38,7 +38,7 @@ $comment = $_POST['comment'];
 
 /* Optional file upload
  */
-$file = $_FILES;
+$file = $_FILES['file'];
 
 /* A url to visit after submitting
  */

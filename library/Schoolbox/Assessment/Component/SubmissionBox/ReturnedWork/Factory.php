@@ -123,7 +123,7 @@ class Factory {
 
 		/* If there was a file upload, attach it
 		 */
-//		$returnedWork = $this->addFile($returnedWork);
+		$returnedWork = $this->addFile($returnedWork);
 
 		/* Ram it home
 		 */
@@ -252,7 +252,7 @@ class Factory {
 	private function addFile($returnedWork) {
 		$file = $this->getFile();
 
-		if ($file && strlen($file['name'])) {
+		if (is_array($file) && strlen($file['name'])) {
 			$allowedFileHandler = new \AllowedFile();
 			$allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($file));
 
@@ -260,6 +260,12 @@ class Factory {
 			 */
 			$returnedWork->setFilesize($file['size']);
 			$returnedWork->setMimeType($file['type']);
+
+			$returnedWork
+				->setFilename($file['name'])
+				->setTempLocation($file['tmp_name'])
+				->loadFilesizeFromTempLocation();
+			;
 		}
 
 		return $returnedWork;
