@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
     tinyMCE.init({
@@ -67,26 +68,24 @@
 
 		/* Category tree
 		 */
-		$j("#categoryTree").jstree({
-			"animation": 50,
-			"plugins":["themes", "html_data", "dnd", "crrm"],
-			"themes":{
-				"theme":"schoolbox",
-				"dots":true,
-				"icons":false
-			}
-		});
-
-        $j(".jstree a").click(function() {
-            $this = $j(this),
-            categoryFullID = $this.closest('li').attr('ID'),
-            categoryStrippedID = parseInt(categoryFullID.substr(5));
-            $j('#question_category').val(categoryStrippedID);
-            $j(".jstree a").removeClass('active');
-            $this.addClass('active');
-            return false;
-        });
-
+        $j("#categoryTree")
+            .on('select_node.jstree', function(event, jstree) {
+                $j('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
+            })
+            .on('deselect_node.jstree', function() {
+                $j('#question_category').val('');
+            })
+            .jstree({
+                "animation":50,
+                "core":{
+                    multiple:false,
+                    "themes": {
+                        "variant" : "schoolbox",
+                        "dots" : true,
+                        "icons" : false
+                    }
+                }
+            });
     });
 </script>
 <!-- END custom_head -->
