@@ -29,6 +29,38 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
     }
 
     /**
+     * Overloaded to insert password for parents
+     * @param array $currentUser
+     * @return array
+     */
+    public function setupUserDetails($currentUser) {
+        $newUser = parent::setupUserDetails($currentUser);
+        $newUser['password'] = $this->getPassword($currentUser);
+        return $newUser;
+    }
+
+    /**
+     * Overload these for the purpose of setting the password up for parents
+     * @param array $currentUser
+     * @return array
+     */
+    public function setupSpouseDetails($currentUser) {
+        $newUser = parent::setupUserDetails($currentUser);
+        $newUser['password'] = $this->getPassword($currentUser);
+        return $newUser;
+    }
+
+    /**
+     * Set password based on the following rules
+     * First 4 chars of surname, padded with - if not enough, last 3 digits of synergy id.
+     * @param $currentUser
+     * @return string
+     */
+    public function getPassword($currentUser) {
+        return  str_pad(substr($this->getSpouseLastNameFromUser($currentUser),0,4),4,'-') . substr($this->getSpouseExternalIdFromUser($currentUser),-3);
+    }
+
+    /**
      * Gets default campus in same method as it's retrieved from student.
      *
      * @param  array $currentUser
