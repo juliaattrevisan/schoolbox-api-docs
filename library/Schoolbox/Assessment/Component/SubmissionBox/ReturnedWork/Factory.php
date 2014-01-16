@@ -52,7 +52,7 @@ class Factory {
 	 *
 	 * @var null
 	 */
-	private $file = null;
+	private $file = array();
 
 	/**
 	 * A url to visit after processing everything
