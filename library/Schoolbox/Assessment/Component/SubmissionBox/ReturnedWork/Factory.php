@@ -186,11 +186,16 @@ class Factory {
 	private function processReturnedWork() {
 		$returnedWork = $this->retrieveReturnedWorkRecord();
 
+		/* Normalise
+		 */
+		$normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark(), $this->getSubmissionBox());
+
 		/* Update the existing Returned Work record with new data
 		 */
 		$returnedWork->setMark($this->getMark());
 		$returnedWork->setComment($this->getComment());
 		$returnedWork->setMarker($_SESSION['user']->getId());
+		$returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
 
 		return $returnedWork;
 	}
@@ -207,8 +212,6 @@ class Factory {
 		if ($file && strlen($file['name'])) {
 			$allowedFileHandler = new \AllowedFile();
 			$allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($file));
-
-			$mark = $this->getMarksheet()->normaliseMark($this->getMark(), $this->getSubmissionBox());
 
 			/* Save filesize in db
 			 */
