@@ -128,7 +128,7 @@ class Factory {
 			$this->getReturnedWorkMapper()->save($returnedWork);
 
 			// Rubrics have no mappers yet, so handle them the old-fashioned way.
-			if (!$returnedWork->getId() && is_array($this->getRubric())) {
+			if (is_array($this->getRubric())) {
 				$rubric_handler = new \DueWork_Rubric_Handler();
 				$rubric_handler->saveMarks($this->getRubric(), $this->getUser()->getId(), $this->getSubmissionBox()->getId(), $returnedWork->getReturned()->getDatabase());
 
@@ -208,8 +208,6 @@ class Factory {
 
 		return $returnedWork;
 	}
-
-
 
 	/**
 	 * Apply updates to the returned work record
