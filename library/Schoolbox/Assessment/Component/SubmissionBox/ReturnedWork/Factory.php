@@ -111,6 +111,9 @@ class Factory {
 		$this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug()));
 	}
 
+	/**
+	 * Start processing the Returned Work
+	 */
 	public function start() {
 
 		/* Figure out which returned work record to use
