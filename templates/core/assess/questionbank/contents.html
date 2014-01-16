@@ -54,6 +54,7 @@
             .jstree({
                 "animation":50,
                 "core":{
+                    check_callback: true,
                     multiple:false,
                     "themes": {
                         "variant" : "schoolbox",
@@ -61,7 +62,10 @@
                         "icons" : false
                     }
                 },
-                "plugins":["dnd", "state"]
+                "plugins":["dnd", "state"],
+                dnd: {
+                    copy: false
+                }
             });
 
         $j('#subcategoryForm').validate();
@@ -179,7 +183,7 @@
     <div id='categoryTree'>
         <!-- BEGIN category_list_start -->
         <ul>
-            <li id="node-0">
+            <li id="node_0">
                 <a href="#">Base</a>
                 <ul>
         <!-- END category_list_start -->
