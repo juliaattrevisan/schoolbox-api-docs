@@ -127,16 +127,26 @@ class Factory {
 		try {
 			$this->getReturnedWorkMapper()->save($returnedWork);
 
-			new \Alaress_Probe($this->getRubric());
 			// Rubrics have no mappers yet, so handle them the old-fashioned way.
-//			if (!empty($returnedWork->getId()) && $rubric) {
-//				$rubric_handler = new \DueWork_Rubric_Handler();
-//				$stamp          = null;
-//				if ($update_existing) {
-//					$stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
-//				}
-//				$rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
-//			}
+			if (!$returnedWork->getId() && is_array($this->getRubric())) {
+				$rubric_handler = new \DueWork_Rubric_Handler();
+				$rubric_handler->saveMarks($this->getRubric(), $this->getUser()->getId(), $this->getSubmissionBox()->getId(), $returnedWork->getReturned()->getDatabase());
+
+				/* wat...?
+				 *
+				 * What is the point of this? Why isn't it just the same as the $returnedWork->getReturned()
+				 * value (that is, the timestamp when the Returned Work was last modified)
+				 *
+				 * Why would you want to preserve the timestamp for when this rubric_mark value
+				 * was first created?
+				 *
+					$stamp = null;
+					if ($update_existing) {
+						$stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
+					}
+					$rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
+				 */
+			}
 		}
 		catch(\Exception $e) {
 			echo $e->getMessage();
@@ -191,9 +201,9 @@ class Factory {
 		 */
 		catch (\Schoolbox\Mapper\Exception $e) {
 			$returnedWork = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
-			$returnedWork->setReturned(new \Alaress_Date_Format(new \DateTime('now')));
 			$returnedWork->setOwner($this->getUser());
 			$returnedWork->setSubmissionBox($this->getSubmissionBox());
+			$returnedWork->setReturned(new \Alaress_Date_Format(new \DateTime('now')));
 		}
 
 		return $returnedWork;
