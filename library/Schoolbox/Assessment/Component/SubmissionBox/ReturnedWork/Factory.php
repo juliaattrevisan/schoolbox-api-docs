@@ -209,18 +209,7 @@ class Factory {
 		return $returnedWork;
 	}
 
-	/**
-	 * Determine whether a submissionBox is a rubric one or not
-	 *
-	 * @return bool
-	 */
-	private function isRubric() {
-		if ($this->getSubmissionBox()->getMarkType()->getSlug() == 'rubric') {
-			return true;
-		}
 
-		return false;
-	}
 
 	/**
 	 * Apply updates to the returned work record
@@ -232,7 +221,7 @@ class Factory {
 
 		/* Normalise - rubrics do it in a whole different way
 		 */
-		if ($this->isRubric()) {
+		if ($this->getSubmissionBox()->isRubric()) {
 			$normalisePayload = $this->getRubric();
 		}
 		else {
