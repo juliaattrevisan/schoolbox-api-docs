@@ -41,7 +41,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 
 	/* Render rubrics
 	 */
-	$renderer = new \Rubric\Renderer($this, $submissionBox, $user);
+	$renderer = new \Rubric\Renderer\Horizontal($this, $submissionBox, $user);
 	$renderer->render();
 
 	/* Parse out everything

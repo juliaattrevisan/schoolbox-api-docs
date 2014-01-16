@@ -125,7 +125,7 @@ $dueWorkDetail->renderDetails($this);
 
 /* Rubric's Cube
  */
-$rubricsRenderer = new \Rubric\Renderer($this, $submissionBox, $user);
+$rubricsRenderer = new \Rubric\Renderer\Vertical($this, $submissionBox, $user);
 $rubricsRenderer->render()->parseBlock();
 
 $this->setVar(array(

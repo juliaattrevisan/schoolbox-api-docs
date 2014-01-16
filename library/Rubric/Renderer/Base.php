@@ -7,44 +7,44 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Rubric;
+namespace Rubric\Renderer;
 
-class Renderer {
+abstract class Base {
 
 	/**
 	 * An instance of sitepage
 	 *
 	 * @var null
 	 */
-	private $page = null;
+	protected $page = null;
 
 	/**
 	 * An instance of Schoolbox\User
 	 *
 	 * @var null
 	 */
-	private $user = null;
+	protected $user = null;
 
 	/**
 	 * A submission box, born of submission handler
 	 *
 	 * @var array
 	 */
-	private $submissionBox = array();
+	protected $submissionBox = array();
 
 	/**
 	 * An array, born of rubric handler
 	 *
 	 * @var array
 	 */
-	private $rubric = array();
+	protected $rubric = array();
 
 	/**
 	 * An instance of rubric handler
 	 *
 	 * @var null
 	 */
-	private $rubricHandler = null;
+	protected $rubricHandler = null;
 
 	/**
 	 * Constructor
@@ -65,14 +65,21 @@ class Renderer {
 		}
 
 		$this->setup();
+		$this->setupCommonBlocks();
 	}
 
 	/**
-	 * Set up blocks and stuff
+	 * Set up scheme-specific blocks and stuff
+	 *
+	 * Horizontal and vertical have different contexts and thus different
+	 * phplib settings
+s	 */
+	abstract protected function setup();
+
+	/**
+	 * Blocks common to both vertical and horizontal scheme
 	 */
-	private function setup() {
-		$this->getPage()->setFile('rubric', 'submission/inlineGrading/injectables/views/rubric.html');
-		$this->getPage()->setBlock('rubric', 'mark_type_rubric', 'mark_type_rubric_block');
+	protected function setupCommonBlocks() {
 		$this->getPage()->setBlock('mark_type_rubric', 'rubric_rating', 'rubric_rating_block');
 		$this->getPage()->setBlock('mark_type_rubric', 'rubric_crit', 'rubric_crit_block');
 		$this->getPage()->setBlock('rubric_crit', 'rubric_crit_rating', 'rubric_crit_rating_block');
@@ -198,7 +205,7 @@ class Renderer {
 	 *
 	 * @param null $page
 	 */
-	private function setPage($page) {
+	protected function setPage($page) {
 		$this->page = $page;
 	}
 
@@ -207,7 +214,7 @@ class Renderer {
 	 *
 	 * @return null
 	 */
-	private function getPage() {
+	protected function getPage() {
 		return $this->page;
 	}
 
@@ -216,7 +223,7 @@ class Renderer {
 	 *
 	 * @param array $user
 	 */
-	private function setUser($user) {
+	protected function setUser($user) {
 		$this->user = $user;
 	}
 
@@ -225,7 +232,7 @@ class Renderer {
 	 *
 	 * @return array
 	 */
-	private function getUser() {
+	protected function getUser() {
 		return $this->user;
 	}
 
@@ -234,7 +241,7 @@ class Renderer {
 	 *
 	 * @param null $rubricHandler
 	 */
-	private function setRubricHandler($rubricHandler) {
+	protected function setRubricHandler($rubricHandler) {
 		$this->rubricHandler = $rubricHandler;
 	}
 
@@ -243,7 +250,7 @@ class Renderer {
 	 *
 	 * @return null
 	 */
-	private function getRubricHandler() {
+	protected function getRubricHandler() {
 		return $this->rubricHandler;
 	}
 
@@ -252,7 +259,7 @@ class Renderer {
 	 *
 	 * @param array $rubric
 	 */
-	private function setRubric($rubric) {
+	protected function setRubric($rubric) {
 		$this->rubric = $rubric;
 	}
 
@@ -261,7 +268,7 @@ class Renderer {
 	 *
 	 * @return array
 	 */
-	private function getRubric() {
+	protected function getRubric() {
 		return $this->rubric;
 	}
 
@@ -270,7 +277,7 @@ class Renderer {
 	 *
 	 * @param array $submissionBox
 	 */
-	private function setSubmissionBox($submissionBox) {
+	protected function setSubmissionBox($submissionBox) {
 		$this->submissionBox = $submissionBox;
 	}
 
@@ -279,7 +286,7 @@ class Renderer {
 	 *
 	 * @return array
 	 */
-	private function getSubmissionBox() {
+	protected function getSubmissionBox() {
 		return $this->submissionBox;
 	}
 }
