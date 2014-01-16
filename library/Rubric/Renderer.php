@@ -60,7 +60,7 @@ class Renderer {
 
 		$this->setRubricHandler(new \DueWork_Rubric_Handler());
 
-		if ($submissionBox['mark_type_slug'] == 'rubric') {
+		if ($this->isRubric()) {
 			$this->setRubric($this->getRubricHandler()->getRubric($submissionBox['id']));
 		}
 
@@ -71,7 +71,8 @@ class Renderer {
 	 * Set up blocks and stuff
 	 */
 	private function setup() {
-		$this->getPage()->setBlock(TEMPLATE_content, 'mark_type_rubric', 'mark_type_rubric_block');
+		$this->getPage()->setFile('rubric', 'submission/inlineGrading/injectables/views/rubric.html');
+		$this->getPage()->setBlock('rubric', 'mark_type_rubric', 'mark_type_rubric_block');
 		$this->getPage()->setBlock('mark_type_rubric', 'rubric_rating', 'rubric_rating_block');
 		$this->getPage()->setBlock('mark_type_rubric', 'rubric_crit', 'rubric_crit_block');
 		$this->getPage()->setBlock('rubric_crit', 'rubric_crit_rating', 'rubric_crit_rating_block');
@@ -176,18 +177,33 @@ class Renderer {
 	}
 
 	/**
-	 * An additional step, to retain compatibility with returnWork.php
+	 * Determine whether this submissionBox is a rubric one or not
+	 * If it isn't, skip the entire rendering process altogether
+	 *
+	 * @return bool
 	 */
-	public function parseBlock() {
+	private function isRubric() {
 		$submissionBox = $this->getSubmissionBox();
 
 		if ($submissionBox['mark_type_slug'] == 'rubric') {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * An additional step, to retain compatibility with returnWork.php
+	 */
+	public function parseBlock() {
+		if ($this->isRubric()) {
 			$this->getPage()->parse("mark_type_rubric_block", "mark_type_rubric");
+			$this->getPage()->parse('INJECTED_MARK_RUBRIC', 'rubric');
 		}
 		else {
-
 			$this->getPage()->setVar(array(
-				'mark_type_rubric_block' => ''
+				'mark_type_rubric_block' => '',
+				'INJECTED_MARK_RUBRIC' => ''
 			));
 		}
 	}

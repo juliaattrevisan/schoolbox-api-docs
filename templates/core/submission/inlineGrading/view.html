@@ -50,66 +50,15 @@
 	{INJECTED_INTERFACE_TEMPLATE}
 </div>
 <div class='right inline-grading-column-right'>
-	{INJECTED_MARK_TEMPLATE}
 
-	<!-- BEGIN mark_type_rubric -->
-	<h2>Rubrics</h2>
-	<script src='/submission/inlineGrading/js/rubrics.js' type="text/javascript"></script>
-	<script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
-	<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
-	<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
-	<script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
-	<script type='text/javascript'>
-		$(function() {
-			$('#rubric-tbody').inlineGradingRubrics({
-				scoreElement: '#sum',
-				formElement: '#rubricsForm',
-				renderGraph: false
-			});
-		});
-	</script>
-	<form action="/submission/returnWorkForm2.php" method="post" enctype="multipart/form-data" class="clearfix" name="returnWorkForm" id="rubricsForm" >
-		<input name="box_id" type="hidden" id="box_id" value="{INLINE_GRADING_SUBMISSION_BOX_ID}" />
-		<input name="uid" type="hidden" id="uid" value="{INLINE_GRADING_STUDENT_ID}" />
+	<!-- One Giant Form -->
+	<form action="/submission/returnWorkForm2.php" method="post" enctype="multipart/form-data" class="clearfix">
+		{INJECTED_MARK_TEMPLATE}
 
-		<table class="rubric table">
-			<!-- BEGIN rubric_rating -->
-			<!-- END rubric_rating -->
-			<tbody id="rubric-tbody">
-				<!-- BEGIN rubric_crit -->
-				<!-- BEGIN rubric_grouping -->
-				<tr>
-					<td class="criterion-label pad span">{RUBRIC_GROUP_LABEL}</td>
-				</tr>
-				<!-- END rubric_grouping -->
-				<tr>
-					<td class="criterion-label criterion-label-group pad" data-class="{RUBRIC_GROUP_CLASS}">{RUBRIC_CRIT_LABEL}</td>
-				</tr>
-				<!-- BEGIN rubric_crit_rating -->
-				<tr>
-					<td class="criterion-value" data-class="{RUBRIC_CRIT_RATING_CLASS}">
-						<input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio" name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
-						<label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}"><span>{RUBRIC_CRIT_RATING_LABEL}</span></label>
-					</td>
-				</tr>
-				<!-- END rubric_crit_rating -->
-				<tr>
-					<td class="warning" data-class="{RUBRIC_CRIT_RATING_CLASS}">
-						<div title="Please select a result for this criterion"><span>!</span></div>
-					</td>
-				</tr>
-				<!-- END rubric_crit -->
-			</tbody>
-		</table>
+		{INJECTED_MARK_RUBRIC}
 
-		<p id="errnotif" class="float-left err hide">Ensure you have selected a mark for every criterion.</p>
-		<input name="Submit" type="submit" id="Submit" value="Submit" class="submit-btn-plain" />
-	</form>
-	<!-- END mark_type_rubric -->
+		<h2>Assign marks ({OWNER_STATUS})</h2>
 
-	<h2>Assign marks ({OWNER_STATUS})</h2>
-
-	<form action="/submission/returnWorkForm2.php" method="post" enctype="multipart/form-data" name="returnWorkForm" id="returnWorkForm">
 		<!-- BEGIN student_row -->
 		<div class="inline-grading-marking">
 			{OWNER_MARKING}
@@ -146,9 +95,9 @@
 			</tbody>
 		</table>
 		<!-- END student_row -->
-	</form>
 
-	{INJECTED_INTERFACE_CONTROL}
+		{INJECTED_INTERFACE_CONTROL}
+	</form>
 </div>
 
 <!-- BEGIN download_btn -->
