@@ -173,11 +173,9 @@ $value =    array(
     array('@AttendanceDayNumber', $data['AttendanceDayNumber'], SQLINT4 ),
     array('@StaffID', $data['StaffID'], SQLINT4 ),
     array('@AttendedFlag', 1, SQLINT4),
-    array('@NewDataInsertedFlag', false, SQLINT4, true),
-    array('@wkAttendanceMasterSeq', 'seq',                               SQLINT4,    true,  false, -1),
     array('@TimeTableGroup', $data['TimetableGroup'], SQLVARCHAR),
-    array('@IsOnHoldFlag', false, SQLINT4, true),
     array('@SynWebFlag', 1, SQLINT4),
+    array('@wkAttendanceMasterSeq', 'day', SQLINT4, true, ),
 );
 
         $result = $this->getDatabase()->executeProcedure(
@@ -200,7 +198,7 @@ $value =    array(
                                array('@wkAttendanceMasterSeq', 514, SQLINT4 ),
                                array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
                                array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
-                           )dwasaw
+                           )
         );
 
         print_r($result);
