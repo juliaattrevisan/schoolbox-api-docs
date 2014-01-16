@@ -59,7 +59,10 @@ class Renderer {
 		$this->setSubmissionBox($submissionBox);
 
 		$this->setRubricHandler(new \DueWork_Rubric_Handler());
-		$this->setRubric($this->getRubricHandler()->getRubric($submissionBox['id']));
+
+		if ($submissionBox['mark_type_slug'] == 'rubric') {
+			$this->setRubric($this->getRubricHandler()->getRubric($submissionBox['id']));
+		}
 
 		$this->setup();
 	}
@@ -79,91 +82,95 @@ class Renderer {
 	 * Draw cube
 	 */
 	public function render() {
-		$rubricMark = new \DueWork_Rubric_Mark($this->getRubric());
-		$rubricMark->populateMarks($this->getUser()->getId());
+		$submissionBox = $this->getSubmissionBox();
 
-		$data = $rubricMark->toArray();
+		if ($submissionBox['mark_type_slug'] == 'rubric') {
+			$rubricMark = new \DueWork_Rubric_Mark($this->getRubric());
+			$rubricMark->populateMarks($this->getUser()->getId());
 
-		$json = array();
-		$legs = array();
+			$data = $rubricMark->toArray();
 
-		for($i = 0; $i < count($data['criteria']); ++$i) {
-			$json[] = array($i, $data['criteria'][$i]['value'] < 0 ? 0 : $data['criteria'][$i]['value']);
-			$legs[] = array('label' => $data['criteria'][$i]['label']);
-		}
+			$json = array();
+			$legs = array();
 
-		$this->getPage()->setVar(array(
-			'GRAPH_DATA' => json_encode($json),
-			'GRAPH_LEGS' => json_encode($legs),
-			'GRAPH_MAX'  => count($data['criteria'][0]['results']) - 1
-		));
-
-		$colCount = count($data['criteria'][0]['results']);
-
-		for($i = 0; $i < $colCount; ++$i) {
-			$this->getPage()->parse('rubric_rating_block', 'rubric_rating', true);
-		}
-
-		for($i = 0; $i < count($data['criteria']); ++$i) {
-
-			/* Render a group value so all the criterion labels are tied to the
-			 * criteria themselves on the frontend, regardless of html structure
-			 */
-			$this->getPage()->setVar(array(
-				'RUBRIC_GROUP_CLASS' => 'criteria-group-' . $i,
-			));
-
-			// display a grouping row
-			if($i == 0 || $data['criteria'][$i]['group'] != $data['criteria'][$i - 1]['group']) {
-				$this->getPage()->setVar(array(
-					'RUBRIC_GROUP_SPAN' => $colCount + 1,
-					'RUBRIC_GROUP_LABEL' => $data['criteria'][$i]['group'],
-				));
-
-				$this->getPage()->parse('rubric_grouping_block','rubric_grouping', false);
-			}
-			else {
-				$this->getPage()->setVar('rubric_grouping_block', '');
+			for($i = 0; $i < count($data['criteria']); ++$i) {
+				$json[] = array($i, $data['criteria'][$i]['value'] < 0 ? 0 : $data['criteria'][$i]['value']);
+				$legs[] = array('label' => $data['criteria'][$i]['label']);
 			}
 
 			$this->getPage()->setVar(array(
-				'rubric_crit_rating_block' => '',
-				'RUBRIC_CRIT_LABEL' => $data['criteria'][$i]['label'],
-				'RUBRIC_CRIT_NAME' => preg_replace("#[^a-z0-9\-]#is", '', strtolower($data['criteria'][$i]['label'])),
-				'RUBRIC_CRIT_INDEX' => $i,
-				'RUBRIC_CRIT_ID' => $data['criteria'][$i]['id']
+				'GRAPH_DATA' => json_encode($json),
+				'GRAPH_LEGS' => json_encode($legs),
+				'GRAPH_MAX'  => count($data['criteria'][0]['results']) - 1
 			));
 
-			for($j = 0; $j < count($data['criteria'][0]['results']); ++$j) {
-				$this->getPage()->setVar(array(
-					'RUBRIC_CRIT_RATING_LABEL' => $data['criteria'][$i]['results'][$j],
-					'RUBRIC_CRIT_RATING_VALUE' => $j,
-					'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $j ? 'checked="checked"' : '',
+			$colCount = count($data['criteria'][0]['results']);
 
-					/* Render a group value so all the criterion labels are tied to the
-					 * criteria themselves on the frontend, regardless of html structure
-					 */
-					'RUBRIC_CRIT_RATING_CLASS' => 'criteria-group-' . $i,
-				));
-				$this->getPage()->parse('rubric_crit_rating_block', 'rubric_crit_rating', true);
+			for($i = 0; $i < $colCount; ++$i) {
+				$this->getPage()->parse('rubric_rating_block', 'rubric_rating', true);
 			}
 
-			$this->getPage()->parse('rubric_crit_block', 'rubric_crit', true);
+			for($i = 0; $i < count($data['criteria']); ++$i) {
+
+				/* Render a group value so all the criterion labels are tied to the
+				 * criteria themselves on the frontend, regardless of html structure
+				 */
+				$this->getPage()->setVar(array(
+					'RUBRIC_GROUP_CLASS' => 'criteria-group-' . $i,
+				));
+
+				// display a grouping row
+				if($i == 0 || $data['criteria'][$i]['group'] != $data['criteria'][$i - 1]['group']) {
+					$this->getPage()->setVar(array(
+						'RUBRIC_GROUP_SPAN' => $colCount + 1,
+						'RUBRIC_GROUP_LABEL' => $data['criteria'][$i]['group'],
+					));
+
+					$this->getPage()->parse('rubric_grouping_block','rubric_grouping', false);
+				}
+				else {
+					$this->getPage()->setVar('rubric_grouping_block', '');
+				}
+
+				$this->getPage()->setVar(array(
+					'rubric_crit_rating_block' => '',
+					'RUBRIC_CRIT_LABEL' => $data['criteria'][$i]['label'],
+					'RUBRIC_CRIT_NAME' => preg_replace("#[^a-z0-9\-]#is", '', strtolower($data['criteria'][$i]['label'])),
+					'RUBRIC_CRIT_INDEX' => $i,
+					'RUBRIC_CRIT_ID' => $data['criteria'][$i]['id']
+				));
+
+				for($j = 0; $j < count($data['criteria'][0]['results']); ++$j) {
+					$this->getPage()->setVar(array(
+						'RUBRIC_CRIT_RATING_LABEL' => $data['criteria'][$i]['results'][$j],
+						'RUBRIC_CRIT_RATING_VALUE' => $j,
+						'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $j ? 'checked="checked"' : '',
+
+						/* Render a group value so all the criterion labels are tied to the
+						 * criteria themselves on the frontend, regardless of html structure
+						 */
+						'RUBRIC_CRIT_RATING_CLASS' => 'criteria-group-' . $i,
+					));
+					$this->getPage()->parse('rubric_crit_rating_block', 'rubric_crit_rating', true);
+				}
+
+				$this->getPage()->parse('rubric_crit_block', 'rubric_crit', true);
+			}
+
+			// calculate scores
+			$sum = 0;
+			$max = 0;
+
+			for($i = 0; $i < count($data['criteria']); ++$i) {
+				$sum += $data['criteria'][$i]['value'];
+				$max += count($data['criteria'][0]['results']) - 1;
+			}
+
+			$this->getPage()->setVar(array(
+				'RUBRIC_GRADE_SUM' => $sum,
+				'RUBRIC_GRADE_MAX' => $max
+			));
 		}
-
-		// calculate scores
-		$sum = 0;
-		$max = 0;
-
-		for($i = 0; $i < count($data['criteria']); ++$i) {
-			$sum += $data['criteria'][$i]['value'];
-			$max += count($data['criteria'][0]['results']) - 1;
-		}
-
-		$this->getPage()->setVar(array(
-			'RUBRIC_GRADE_SUM' => $sum,
-			'RUBRIC_GRADE_MAX' => $max
-		));
 
 		return $this;
 	}
