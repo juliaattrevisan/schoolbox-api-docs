@@ -70,21 +70,6 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
         return $this->student_strategy->getDefaultCampusFromUser($currentUser);
     }
 
-    /**
-     * Use this method to determine if the parent sync should continue - by
-     * default, parents are not created if they don't already exist.
-     *
-     * @param  $currentUser
-     * @return bool
-     */
-    protected function hasUsername($currentUser) {
-        if (!($this->userExists($currentUser))) {
-            return false;
-        }
-
-        return strlen(trim($currentUser['username'])) > 0;
-    }
-
 	/**
 	 * Webmail setting
 	 *
@@ -114,4 +99,23 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
 	public function getEportfolioEnabledFromUser($currentUser) {
 		return 0;
 	}
+
+    /**
+     * Set default parent group
+     * @param array $currentUser
+     * @return int
+     */
+    public function getGroupIDFromUser($currentUser) {
+        return 19;
+    }
+
+    /**
+     * Set default parent group
+     * @param array $currentUser
+     * @return int
+     */
+    public function getSpouseGroupIDFromUser($currentUser) {
+        return 19;
+    }
+
 }

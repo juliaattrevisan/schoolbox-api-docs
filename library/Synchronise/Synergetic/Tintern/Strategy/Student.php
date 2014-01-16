@@ -179,4 +179,8 @@ class Synchronise_Synergetic_Tintern_Strategy_Student extends Synchronise_Base_S
                 return intval($year)+6;
         }
     }
+
+    protected function userExists($user) {
+        return $this->user_handler->getBySynergy($user['synergy_id'], $user['group_id']);
+    }
 }
