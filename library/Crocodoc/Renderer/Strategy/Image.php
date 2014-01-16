@@ -34,6 +34,12 @@ class Image extends Base {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
+		/* Make the image display
+		 */
+		$this->getPage()->setVar(array(
+			'INJECTABLE_SUBMISSION_ID' => $this->getSubmission()->getId(),
+		));
+
 		/* Upload file
 		 */
 		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
@@ -41,13 +47,8 @@ class Image extends Base {
 
 		/* Control how Return Work is done
 		 */
-		$this->getPage()->setFile('injectableControl', $this->getControlFile());
-
 		$this->getPage()->setVar(array(
-			'INJECTABLE_SUBMISSION_ID' => $this->getSubmission()->getId(),
-			'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
+			'INJECTED_INTERFACE_CONTROL' => ''
 		));
-
-		$this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');
 	}
 }

@@ -72,12 +72,8 @@ class Video extends Base {
 
 		/* Control how Return Work is done
 		 */
-		$this->getPage()->setFile('injectableControl', $this->getControlFile());
-
 		$this->getPage()->setVar(array(
-			'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
+			'INJECTED_INTERFACE_CONTROL' => ''
 		));
-
-		$this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');
 	}
 }
