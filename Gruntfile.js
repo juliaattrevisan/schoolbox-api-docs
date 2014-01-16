@@ -7,7 +7,6 @@ module.exports = function(grunt) {
     var watchTasks = {
         core: {
             options: {
-                spawn: false,
                 interrupt: true
             },
             files: ['www/css/core/*.less'],
@@ -115,12 +114,7 @@ module.exports = function(grunt) {
         watch: watchTasks
     });
 
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.loadNpmTasks('grunt-bower-task');
-    grunt.loadNpmTasks('grunt-shell');
-    grunt.loadNpmTasks('grunt-contrib-watch');
+    require('jit-grunt')(grunt, {bower: 'grunt-bower-task'})
 
     // Build tasks
     grunt.registerTask('build.deps', ['shell:jqueryui.install', 'shell:jqueryui.build']);
