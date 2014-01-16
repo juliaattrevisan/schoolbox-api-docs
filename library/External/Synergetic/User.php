@@ -677,7 +677,8 @@ class External_Synergetic_User implements External_UserInterface {
 				StudentContactSpouseSurname,
 				StudentContactSpouseDefaultEmail,
 				StudentYearLevel,
-				StudentCampus
+				StudentCampus,
+				StudentGender
 			FROM SynergyOne.dbo.vStudentContactAllAddress
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 			AND FileSemester = '{$_SESSION['FileSemester']}'
