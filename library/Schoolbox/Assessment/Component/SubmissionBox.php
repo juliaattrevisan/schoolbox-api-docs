@@ -150,6 +150,50 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
+	 * Determine whether a submissionBox is a rubric one or not
+	 *
+	 * @return bool
+	 */
+	public function isRubric() {
+		if ($this->getMarkType()->getSlug() == 'rubric') {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param Notification $notification
+	 */
+	public function addNotification(Notification $notification) {
+		$this->notifications->add($notification);
+	}
+
+	/**
+	 * Is this mark shown to students?
+	 *
+	 * @return bool
+	 */
+	public function isMarkShownToStudents() {
+		return in_array(
+			$this->getMarkVisibility(),
+			array(self::MARK_VISIBILITY_STUDENT, self::MARK_VISIBILITY_PARENT_STUDENT)
+		);
+	}
+
+	/**
+	 * Is this mark shown to parents?
+	 *
+	 * @return bool
+	 */
+	public function isMarkShownToParents() {
+		return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
 	 * @param  Category $category
 	 * @return $this
 	 */
@@ -477,13 +521,6 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * @param Notification $notification
-	 */
-	public function addNotification(Notification $notification) {
-		$this->notifications->add($notification);
-	}
-
-	/**
 	 * @param  int $mark_visibility
 	 * @return $this
 	 */
@@ -523,27 +560,6 @@ class SubmissionBox implements ISoftDeletable {
 	 */
 	public function isDeleted() {
 		return $this->getDeleted();
-	}
-
-	/**
-	 * Is this mark shown to students?
-	 *
-	 * @return bool
-	 */
-	public function isMarkShownToStudents() {
-		return in_array(
-			$this->getMarkVisibility(),
-			array(self::MARK_VISIBILITY_STUDENT, self::MARK_VISIBILITY_PARENT_STUDENT)
-		);
-	}
-
-	/**
-	 * Is this mark shown to parents?
-	 *
-	 * @return bool
-	 */
-	public function isMarkShownToParents() {
-		return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
 	}
 
 	/**
