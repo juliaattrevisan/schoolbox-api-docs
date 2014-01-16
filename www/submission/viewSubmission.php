@@ -5,27 +5,27 @@ if (!isset($this)) {
     SitePage::localRedir('/submission/viewSubmission');
 }
 
+$submissionBoxId = $this->arg[0];
+
 // check the ID is valid
-if (!is_numeric($this->arg[0])) {
+if (!is_numeric($submissionBoxId)) {
     error(2);
 }
 
-$submissionBoxID = $this->arg[0];
-
-$submissionHandler = new Submission();
 $studentRetHandler = new SubmissionReturn();
-
-
-$subBox = $submissionHandler->getByID($this->arg[0]);
-$studentRetHandler->securityCheck($this->arg[0]);
+$studentRetHandler->securityCheck($submissionBoxId);
 
 // we log the viewing of this page, I know not why
-$submissionHandler->logPageView(3, $this->arg[0]);
+$submissionHandler = new Submission();
+$submissionHandler->logPageView(3, $submissionBoxId);
 
 // compile the list of students over which we will iterate
-$studentList = $submissionHandler->getAllStudentsForSubmission($subBox);
+$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 
-$dueWorkDetail = new DueWork_Detail($submissionBoxID);
+$studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
+
+$dueWorkDetail = new DueWork_Detail($submissionBox->getId());
 $dueWorkDetail->processStudents($studentList);
 $dueWorkDetail->renderDetails($this);
 
