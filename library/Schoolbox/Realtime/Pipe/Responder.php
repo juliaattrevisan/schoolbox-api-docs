@@ -81,7 +81,6 @@ class Responder extends EventEmitter {
 	}
 
 	public function notify($string) {
-		echo "[ ] NOTIFY\n";
 		fwrite($this->socketStream, $string);
 	}
 
@@ -97,16 +96,6 @@ class Responder extends EventEmitter {
 	 * @return null
 	 */
 	public function subscribe($user, $null) {
-		echo "[f] Foo.";
-
-		for($i = 0; $i < 2; ++$i) {
-			sleep(1);
-			echo ".";
-			$this->notify("Sleep #$i done. ");
-		}
-
-		echo "\n[b] Bar.\n";
-
 		$this->subscriptionManager->subscribe($user, $this);
 	}
 
