@@ -17,7 +17,7 @@ require_once('../../include/Bootstrap.php');
 $opts = getopt('vp::');
 
 $verbose = isset($opts['v']);
-$port = $opts['p'] ?: 8080;
+$port = empty($opts['p']) ? 8080 : $opts['p'];
 
 
 if($verbose) {
