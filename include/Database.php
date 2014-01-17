@@ -92,7 +92,7 @@ class Database {
                 PDO::ATTR_PERSISTENT => empty($options['debug']),
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
             );
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $exception) {
 	        if($options['throw']) {
 		        throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);
@@ -102,6 +102,29 @@ class Database {
 
         return true;
     }
+
+	/**
+	 * Re-establishes a lost database connection if the reason supplied by $e is acceptable.
+	 *
+	 * @param PDOException $e
+	 * @throws PDOException
+	 * @return bool
+	 */
+	public function reconnect($e) {
+
+		// the argument CAN be null, but you have to explicitly pass it
+		if(!is_null($e)) {
+			// only acceptable error is that the connection closed unexpectedly
+			if($e->getCode() != 'HY000' || !stristr($e->getMessage(), 'server has gone away')) {
+				// nope, don't want to handle this
+				throw $e;
+			}
+		}
+
+		// try to call some sort of PDO destructor
+		unset($this->connection);
+		return $this->connect($this->dsn, $this->username, $this->password, $this->options);
+	}
 
     /**
      * Retrieves the query collector from this connection.

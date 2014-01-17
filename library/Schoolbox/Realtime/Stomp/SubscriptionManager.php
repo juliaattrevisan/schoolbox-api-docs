@@ -14,6 +14,7 @@ use React\Stomp\Client;
 use React\Stomp\Factory;
 use Schoolbox\Realtime\Pipe\Pipe;
 use Schoolbox\Realtime\Pipe\PipeManager;
+use Schoolbox\Realtime\Pipe\Responder;
 use Schoolbox\User;
 
 class SubscriptionManager {
@@ -37,16 +38,16 @@ class SubscriptionManager {
 	 * Add a subscription for the given user. If a pipe is provided, it will be notified upon success.
 	 *
 	 * @param User $user
-	 * @param Pipe $pipe
+	 * @param Responder $responder
 	 * @return bool
 	 */
-	public function subscribe($user, $pipe = null) {
+	public function subscribe($user, $responder = null) {
 		if($this->userHasSubscription($user)) {
 			$this->pipeManager->v("User {$user->getUsername()} is already subscribed");
 
 			// notify the pipe if it was supplied
-			if($pipe instanceof Pipe) {
-				$this->getPipeManager()->sendToPipe($pipe, json_encode(array('subscribe' => true)));
+			if($responder instanceof Responder) {
+				$responder->notify(json_encode(array('subscribe' => true)));
 			}
 
 			return false;
@@ -65,14 +66,13 @@ class SubscriptionManager {
 		$self = $this;
 		$destination = $this->userSubscriptionDestination($user);
 
-		$client->connect()->then(function($client) use ($destination, $self, $user, $pipe) {
+		$client->connect()->then(function($client) use ($destination, $self, $user, $responder) {
 			/** @var Client $client */
 			// this closure is executed when a stomp client connection is established
 			$self->putSubscription($destination, new Subscription($destination, $client, $user, $self->getPipeManager()));
-
-			// if a pipe is provided, use it as a callback for success
-			if($pipe instanceof Pipe) {
-				$self->getPipeManager()->sendToPipe($pipe, json_encode(array('subscribe' => true)));
+			// if a responder is provided, use it as a callback for success
+			if($responder instanceof Responder) {
+				$responder->notify(json_encode(array('subscribe' => true)));
 			}
 		});
 

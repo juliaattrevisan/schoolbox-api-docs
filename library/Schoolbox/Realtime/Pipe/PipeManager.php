@@ -38,6 +38,8 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class PipeManager implements WampServerInterface, MessageComponentInterface {
 
+	const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
+
 	/** @var PipeInterface[] */
 	protected $pipesBySocketKey;
 
@@ -114,7 +116,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		}
 		catch(MapperException $e) {
 			// user not found, not logged in: signal authentication required
-			$this->v('Client not authenticated', '!');
+			$this->v('Failed to fully register pipe: '.$e->getMessage(), '!');
 
 			$this->sendToPipe($pipe, json_encode(array(
 				'error' => 'Unauthorized',
@@ -134,7 +136,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function onClose(ConnectionInterface $conn) {
 		$this->v('Received socket closure');
-		// TODO: Implement onClose() method.
 
 		$socketKey = Pipe::getSocketKeyForConnection($conn);
 
@@ -197,25 +198,48 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			return;
 		}
 
+		// BEWARE: THIS FORKS!
+		$responder = new Responder($this->subscriptionManager);
+
+		// as a parent, we want to let the child perform the action
+		if($responder->isParentProcess()) {
+			$this->attachResponder($responder);
+			return;
+		}
+
+		// YOU ARE IN CHILD CONTEXT RIGHT NOW
+
 		$request = each($data);
 
 		$command = $request['key'];
 		$arguments = $request['value'];
 
-		$method = 'doPipe' . ucfirst($command);
+		try {
+			if(method_exists($responder, $command)) {
+				// process the command that's been sent from the client
+				$this->v("Executing $command for $username [$socketKey]", '*');
 
-		// process the command that's been sent from the client
-		if(method_exists($this, $method)) {
-			$this->v("Executing $method for $username [$socketKey]", '*');
-			$response = $this->$method($pipe, $arguments);
+				// the command executed could take several seconds, depending on what it is
+				$response = $responder->$command($user, $arguments);
+			}
+			else {
+				$response = "Cannot understand command '$command'";
+			}
 
+			// send a socket message back to the parent...but is it listening?
 			if(!is_null($response)) {
-				$this->sendToPipe($pipe, json_encode(array($command => $response)));
+				$responder->notify($response);
 			}
 		}
-		else {
-			$this->sendToPipe($pipe, "Cannot understand command '$command'");
+		catch(\Exception $e) {
+			// catch any and all exceptions here, this MUST exit
+			$this->v($e->getMessage(), '!');
 		}
+
+		fclose($responder->getSocketStream());
+
+		// child termination
+		exit;
 
 	}
 
@@ -236,16 +260,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 				$message->getId() => $message->toArray()
 			)
 		)));
-	}
-
-	/**
-	 * Commit this pipe to its own process... NOT THREAD
-	 * BEWARE: FORKING!
-	 *
-	 * @param Pipe $pipe
-	 */
-	protected function commit($pipe) {
-		$this->processManager->fork($pipe);
 	}
 
 	/**
@@ -275,7 +289,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			throw new MapperException("No session, no user.");
 		}
 
-		$this->commit($pipe);
 	}
 
 	/**
@@ -338,16 +351,18 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param string $sessionId
 	 * @param string $pipeIp
 	 * @throws \Schoolbox\Mapper\Exception
+	 * @throws \Exception
+	 * @throws \PDOException
 	 * @throws \Schoolbox\Notif\NotifException
 	 * @return User
 	 */
 	protected function findUserBySession($sessionId, $pipeIp = null) {
 		if(!$sessionId) {
-			return null;
+			throw new MapperException("No sessionID provided on which to search.");
 		}
 
 		$redisResponse = $this->predisClient->executeCommand(
-			$this->predisClient->createCommand('get', array('PHPREDIS_SESSION:'.$sessionId))
+			$this->predisClient->createCommand('get', array(self::REDIS_SESSION_PREFIX.$sessionId))
 		);
 
 		if(!preg_match('`id\|s:[0-9]+:"([0-9]+)";`', $redisResponse, $matches)) {
@@ -378,10 +393,47 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		}
 
 
-
-		/** @var User $user */
-		return $this->userMapper->findById($userId);
+		try {
+			return $this->userMapper->findById($userId);
+		}
+		catch(\PDOException $e) {
+			// I should not have to do this here...but apparently...
+			if($this->userMapper->getDatabase()->reconnect($e)) {
+				return $this->userMapper->findById($userId);
+			}
+			throw $e;
+		}
 	}
+
+	/**
+	 * @param Responder $responder
+	 */
+	protected function attachResponder($responder) {
+
+		// YOU NEED TO LISTEN TO THIS
+		$socketStream = $responder->getSocketStream();
+
+		$this->v('As parent, attaching responder');
+
+		$rSock = new \React\Stream\Stream($socketStream, $this->reactLoop);
+
+		$rSock->on('connection', function($conn) {
+			echo "Connection acknowledged within React\n";
+		});
+
+		$rSock->on('data', function($data, $socketStream) {
+			/**
+			 * @var string $data
+			 * @var \React\Stream\Stream $socketStream
+			 */
+
+			echo " ^$data$ \n";
+
+		});
+
+
+	}
+
 
 	/**
 	 * Send data to a specific pipe.
@@ -435,77 +487,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$this->v('STUB', 'd');
 		return true;
 	}
-
-
-	/**
-	 * Message from client: ensure STOMP subscription exists for user.
-	 *
-	 * @param Pipe $pipe
-	 * @param mixed $null
-	 * @return bool
-	 */
-	public function doPipeSubscribe($pipe, $null) {
-		if($user = $pipe->getUser()) {
-			$this->subscriptionManager->subscribe($user, $pipe);
-			// this is "you are subscribed" not "the subscription action just worked"
-		}
-	}
-
-
-	/**
-	 * Message from client: retrieve n messages, both read and unread.
-	 *
-	 * @param Pipe $pipe
-	 * @param int $count
-	 * @return bool
-	 */
-	public function doPipeFetch($pipe, $count) {
-		if(($user = $pipe->getUser()) && is_numeric($count)) {
-
-			$messages = array();
-
-			// get a queue to retrieve read messages synchronously
-			$mqf = new UserQueueFactory();
-			$queue = $mqf->buildUserQueue($user);
-
-			$allMessages = $queue->getMessages($count, true);
-			$unreadMessages = $this->subscriptionManager->getUserSubscription($user, true)->getMessages();
-
-			foreach($allMessages as $read) {
-				$messages[$read->getId()] = $read->toArray();
-			}
-
-			foreach($unreadMessages as $unread) {
-				$messages[$unread->getId()] = $unread->toArray();
-			}
-
-			return $messages;
-
-		}
-		return array();
-	}
-
-	/**
-	 * Message from client: mark the given messages as read.
-	 *
-	 * @param Pipe $pipe
-	 * @param array $messageIds
-	 * @return bool
-	 */
-	public function doPipeAck($pipe, $messageIds) {
-		if($user = $pipe->getUser()) {
-			if($subscription = $this->subscriptionManager->getUserSubscription($user, true)) {
-				$markAsRead = $subscription->acceptMessages($messageIds);
-				// if there are messages to mark as read, notify all sockets attached for this user
-				if(count($markAsRead)) {
-					$this->sendToUser($user, json_encode(array('mark_as_read' => $markAsRead)));
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-
 
 	// noop
 	public function onCall(ConnectionInterface $conn, $id, $topic, array $params) { }
