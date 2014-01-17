@@ -59,7 +59,6 @@
 
 			// the validator doesn't seem to be able to handle two inputs with the same name, so they need to be
 			// uniqu-ified, then ajax submitted
-			console.log(config.element);
 			var inputs = config.element.find('input.mark-input');
 			inputs.each(function() {
 				var self = $j(this);
