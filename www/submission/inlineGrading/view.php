@@ -141,6 +141,7 @@ else {
 $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
 	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox->getId(),
+	'INLINE_GRADING_SUBMISSION_BOX_NAME' => $submissionBox->getName(),
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
