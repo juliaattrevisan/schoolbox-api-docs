@@ -24,7 +24,7 @@ $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper()
 $submissionBox = $submissionBoxMapper->findById($_POST['box_id']);
 
 /* Some weird format that's built in javascript for some reason
- * See jquery.viewSubmission.js
+ * See jquery.marksheet.js
  */
 $mark = $_POST['mark'][$_POST['uid']];
 
