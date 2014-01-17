@@ -48,7 +48,6 @@ foreach ($studentList as $currentStudent) {
 
 /* Trim out only this student
  */
-$singleStudent = array();
 $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 
 for ($i=0; $i < count($stack); $i++) {
