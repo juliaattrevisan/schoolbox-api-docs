@@ -39,7 +39,7 @@
 
 				/* The url to submit data
 				 */
-				submitUrl: '/submission/returnWorkForm2.php',
+				submitUrl: '/submission/returnWorkForm.php',
 
 				/* wat? This didn't do anything other than change to false
 				 * when something is cilcked
