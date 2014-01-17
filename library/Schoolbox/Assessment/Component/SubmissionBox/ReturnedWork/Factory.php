@@ -193,21 +193,38 @@ class Factory {
 			$return_time = $returnedWork->getReturned();
 			$window_ago  = new \Alaress_Date_Format(time() - $this->getUpdateWindow(), 'U');
 
-			/* This is a new returned work record, so pump in a returned date
-			 * otherwise leave it alone, since it's being updated for comments/marks
+			/* Use the existing returned work record - it was created a short time ago
 			 */
 			if ($return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()) {
 				$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			}
+			/* Spawn a new returned work record, so pump in a returned date
+			 * and all the ownsership stuff
+			 */
+			else {
+				$returnedWork = $this->spawnNewReturnedWork();
+			}
 		}
-		/* Spawn a new one with the appropriate ownerships
+		/* Spawn a new one with the appropriate ownerships when returning work
+		 * for the fiiiiirrst tiiiimee
 		 */
 		catch (\Schoolbox\Mapper\Exception $e) {
-			$returnedWork = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
-			$returnedWork->setOwner($this->getUser());
-			$returnedWork->setSubmissionBox($this->getSubmissionBox());
-			$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+			$returnedWork = $this->spawnNewReturnedWork();
 		}
+
+		return $returnedWork;
+	}
+
+	/**
+	 * Spawn a new returned work record with appropriate ownerships
+	 *
+	 * @return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
+	 */
+	private function spawnNewReturnedWork() {
+		$returnedWork = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
+		$returnedWork->setOwner($this->getUser());
+		$returnedWork->setSubmissionBox($this->getSubmissionBox());
+		$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
 		return $returnedWork;
 	}
