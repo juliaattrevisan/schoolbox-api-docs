@@ -8297,11 +8297,10 @@ td.name {
 #returnWorkForm {
     .mark-input {
         text-align: right;
-        width: 85px;
         font-size: 12px;
     }
     select {
-        float: left;
+    	float: left;
     }
     &.error {
         border-color: @negative-color !important;
@@ -8311,11 +8310,6 @@ td.name {
         position: absolute;
         width: 300px;
     }
-}
-#upload-returns-submit-north,
-#upload-returns-submit-south {
-    float: right;
-    margin-right: 132px;
 }
 
 /* submission/rubricCriteria */
@@ -8401,21 +8395,23 @@ td.name {
 /* submission/markSheet */
 .inlineform {
     position: relative;
-	.rubric-edit {
-		display: block;
-		float: left;
-		height: 14px;
-		width: 14px;
-		position: relative;
-		top: -2px;
-		left: 8px;
-		background: url(/images/core/icons/btn-icons.png) no-repeat;
-		background-position: 0 -308px;
-		&:hover {
-			background-position: 0 -322px;
-		}
-	}
+
+    .rubric-edit {
+    	display: block;
+    	float: left;
+    	height: 14px;
+    	width: 14px;
+    	position: relative;
+    	top: 0px;
+    	left: 6px;
+    	background: url(/images/core/icons/btn-icons.png) no-repeat;
+    	background-position: 0 -308px;
+    	&:hover {
+    		background-position: 0 -322px;
+    	}
+    }
 }
+
 /*.mark-sheet {
     tr {
         td.mark-average {
