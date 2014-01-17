@@ -197,7 +197,7 @@ class Factory {
 			 * otherwise leave it alone, since it's being updated for comments/marks
 			 */
 			if ($return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()) {
-				$returnedWork->setReturned(new \Alaress_Date_Format(new \DateTime('now')));
+				$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			}
 		}
 		/* Spawn a new one with the appropriate ownerships
@@ -206,7 +206,7 @@ class Factory {
 			$returnedWork = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
 			$returnedWork->setOwner($this->getUser());
 			$returnedWork->setSubmissionBox($this->getSubmissionBox());
-			$returnedWork->setReturned(new \Alaress_Date_Format(new \DateTime('now')));
+			$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 		}
 
 		return $returnedWork;
