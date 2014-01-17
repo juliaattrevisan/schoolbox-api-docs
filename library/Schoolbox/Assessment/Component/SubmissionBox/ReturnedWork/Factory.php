@@ -265,7 +265,6 @@ class Factory {
 				->setFilename($file['name'])
 				->setTempLocation($file['tmp_name'])
 				->loadFilesizeFromTempLocation();
-			;
 		}
 
 		return $returnedWork;
