@@ -426,6 +426,16 @@ abstract class Synchronise_Base_Strategy {
 	}
 
 	/**
+	 * Gets whether user is enabled from external data set.
+	 *
+	 * @param  array $currentUser
+	 * @return bool  Currently returns null so its value isn't overridden.
+	 */
+	public function getAccountEnabledFromUser($currentUser) {
+		return null;
+	}
+
+	/**
 	 * Creates an array for insertion into the Schoolbox users table.
 	 *
 	 * @param  array $external_user
@@ -449,8 +459,9 @@ abstract class Synchronise_Base_Strategy {
 		$newUser['house']                = $this->getHouseFromUser($external_user);
 		$newUser['residential_house_id'] = $this->getResidentialHouseFromUser($external_user);
 		$newUser['eportfolio_enabled']   = $this->getEportfolioEnabledFromUser($external_user);
-		$newUser['webmail']              = $this->getWebmailFromUser($external_user);
-		$newUser['mail_handler']         = $this->getExternalMailFromUser($external_user);
+		$newUser['webmail']				 = $this->getWebmailFromUser($external_user);
+		$newUser['mail_handler']		 = $this->getExternalMailFromUser($external_user);
+		$newUser['enabled']              = $this->getAccountEnabledFromUser($external_user);
 		return $this->clearFields($newUser);
 	}
 
