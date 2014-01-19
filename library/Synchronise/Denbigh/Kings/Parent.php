@@ -45,7 +45,7 @@ class Synchronise_Denbigh_Kings_Parent extends Synchronise_Denbigh_Kings_Abstrac
         $newUser = array();
 
         // set attributes
-        $newUser['username']            = $currentUser['denbighID'];
+        $newUser['username']            = $currentUser['loginID'];
      // $newUser['password']            = 'abc123';
         $newUser['group_id']            = self::PARENT_GROUP_ID;
 
