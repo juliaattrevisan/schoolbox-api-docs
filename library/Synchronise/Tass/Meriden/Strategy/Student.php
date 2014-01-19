@@ -11,110 +11,94 @@
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
 class Synchronise_Tass_Meriden_Strategy_Student extends Synchronise_Base_Strategy_Student {
-	protected $title = "Update Schoolbox Student Details Synchronisation";
+    protected $title = "Update Schoolbox Student Details Synchronisation";
 
-	/**
-	 * Setup verbose output
-	 */
-	protected function setup() {
-		$this->verbose_filter = new Synchronise_Tass_Meriden_Verbose();
-	}
+    /**
+     * Get a list of students to sync
+     *
+     * @return void
+     */
+    public function generateList() {
+        $this->list = $this->external_user_handler->getStudentUserAccountInfo();
+    }
 
-	/**
-	 * Student's username is always the student ID, unless the NetworkLogin
-	 * field value is defined.
-	 *
-	 * @param  array  $currentUser
-	 * @return string
-	 */
-	public function getUsernameFromUser($currentUser) {
-		$username = parent::getUsernameFromUser($currentUser);
-		if (!(strlen($username) > 0)) {
-			$username = $this->getExternalIdFromUser($currentUser);
-		}
-		return $username;
-	}
+    /**
+     * Setup verbose output
+     */
+    protected function setup() {
+        $this->verbose_filter = new Synchronise_Tass_Meriden_Verbose();
+    }
 
-	/**
-	 * Alt email (if not set) is based off of the student's username (which for
-	 * St. Kevins is also their ID).
-	 *
-	 * @param  array  $currentUser
-	 * @return string
-	 */
-	public function getAltEmailFromUser($currentUser) {
-		$email = parent::getAltEmailFromUser($currentUser);
-		if (!isset($email)) {
-			$email = $this->getUsernameFromUser($currentUser).'@student.Meriden.vic.edu.au';
-		}
-		return $email;
-	}
+    /**
+     * Gets campus according to the following map:
+     *
+     * * SS => 1 (Senior School)
+     * * JS => 2 (Junior School)
+     *
+     * @param  array $currentUser
+     * @return int
+     */
+    public function getDefaultCampusFromUser($currentUser) {
+        switch (strtoupper(trim($currentUser['StudentCampus']))) {
+            case 'JS':
+                return 1;
+            case 'SS':
+                return 2;
+            default:
+                break;
+        }
+        return 0;
+    }
 
-	/**
-	 * Gets campus according to the following map:
-	 *
-	 * * J (Glendalough) => 1
-	 * * W (Waterford)   => 2
-	 * * S (Heyington)   => 3
-	 *
-	 * @param  array $currentUser
-	 * @return int
-	 */
-	public function getDefaultCampusFromUser($currentUser) {
-		$campus_code = strtoupper($currentUser['StudentCampus']);
-		switch ($campus_code) {
-			case 'J':
-				return 1;
-			case 'W':
-				return 2;
-			case 'S':
-				return 3;
-			default:
-				break;
-		}
-		return 0;
-	}
+    /**
+     * Gets house according to the following map:
+     *
+     * * S => 20 (Sussex)
+     * * C => 21 (Cumberland)
+     * * K => 22 (Kent)
+     * * W => 23 (Warwick)
+     *
+     * @param  array $currentUser
+     * @return int
+     */
+    public function getHouseFromUser($currentUser) {
+        switch (strtoupper(trim($currentUser['StudentHouse']))) {
+            case 'S':
+                return 20;
+            case 'C':
+                return 21;
+            case 'K':
+                return 22;
+            case 'W':
+                return 23;
+            default:
+                break;
+        }
+        return 0;
+    }
 
-	/**
-	 * Groups for St. Kevins students:
-	 *
-	 * * 7  (Years 3-6)
-	 * * 8  (Year 7)
-	 * * 9  (Year 8)
-	 * * 10 (Year 9)
-	 * * 11 (Year 10-12)
-	 *
-	 * @param  array $currentUser
-	 * @return int
-	 */
-	public function getGroupIDFromUser($currentUser) {
-		$year  = $this->getYearFromUser($currentUser);
-		$group = 0;
-		if (in_array($year, array(3, 4, 5, 6,))) {
-			$group = 7;
-		}
-		elseif ($year == 7) {
-			$group = 8;
-		}
-		elseif ($year == 8) {
-			$group = 9;
-		}
-		elseif ($year == 9) {
-			$group = 10;
-		}
-		elseif (in_array($year, array(10, 11, 12,))) {
-			$group = 11;
-		}
-		return $group;
-	}
-
-	/**
-	 * St. Kevins doesn't currently enable eportfolio for students.
-	 *
-	 * @param  array $currentUser
-	 * @return bool
-	 */
-	public function getEportfolioEnabledFromUser($currentUser) {
-		return false;
-	}
+    /**
+     * Groups for Meriden students are based on year level:
+     *
+     * * 0,-1 => 6    (Pre-school)
+     * * 1-6  => 3    (Junior School)
+     * * 7-12 => 7-12 (same as year level)
+     *
+     * @param  array $currentUser
+     * @return int
+     */
+    public function getGroupIDFromUser($currentUser) {
+        $year  = $this->getYearFromUser($currentUser);
+        $group = 0;
+        if (in_array($year, array(0, -1,))) {
+            $group = 6;
+        }
+        if (in_array($year, array(1, 2, 3, 4, 5, 6,))) {
+            $group = 3;
+        }
+        elseif (in_array($year, array(7, 8, 9, 10, 11, 12,))) {
+            $group = $year;
+        }
+        return $group;
+    }
 }
