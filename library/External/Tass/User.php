@@ -260,8 +260,35 @@ class External_Tass_User implements External_UserInterface {
 	public function getStaffUserAccountInfo () {
 	}
 
-	public function getStudentUserAccountInfo () {
-	}
+    public function getStudentUserAccountInfo () {
+        // Get all students who have a campus, and don't have a leaving date?
+        // (Maybe students who do have a leaving date should be deactivated instead)
+        $query = "
+            SELECT
+                s.stud_code AS StudentID,
+                '' AS NetworkLogin,
+                '' AS StudentTitle,
+                s.preferred_name AS StudentPreferred,
+                s.surname AS StudentSurname,
+                s.e_mail AS StudentEmail,
+                '' AS StudentOccupEmail,
+                s.year_grp AS StudentYearLevel,
+                s.house AS StudentHouse,
+                s.campus_code AS StudentCampus
+                -- s.dol AS StudentLeavingDate
+            FROM student AS s
+            WHERE s.campus_code IS NOT NULL
+            AND s.dol IS NULL
+        ";
+        $studentList = $this->getDatabase()->getAll($query);
+        foreach ($studentList as $student) {
+            foreach ($student as $key => $value) {
+                printf("%- 20s: %s\n", $key, $value);
+            }
+            echo "\n";
+        }
+        return $studentList;
+    }
 
 	public function getStudentContactListExtended ($yearlevel, $name, $boardingStatus, $form) {
 	}
@@ -285,6 +312,3 @@ class External_Tass_User implements External_UserInterface {
 
 
 }
-
-
-?>
