@@ -576,7 +576,7 @@ Notifications
 	ul, li, li a {
 		width: @navigation-width - @navigation-padding * 2;
 	}
-	li.hover > a,
+	li:hover > a,
 	ul li a:hover,
 	li li a:hover {
 		color: @navigation-hover-color;
@@ -601,11 +601,16 @@ Notifications
                 text-decoration: none;
                 background: @tab-hover-color;
             }
-            span strong {
-                position: absolute;
-                right: 16px;
-                top: 3px;
-            }
+        }
+        &:hover > ul:first-of-type {
+            display: block;
+        }
+        &.parent > a span:after {
+            font-weight: bold;
+            content: "›";
+            position: absolute;
+            right: 16px;
+            top: 3px;
         }
     }
 
@@ -1918,6 +1923,10 @@ fieldset {
     .delCheck,
     .acceptCheck {
         top: 0;
+    }
+
+    tr:last-of-type td {
+        border: 0;
     }
 }
 

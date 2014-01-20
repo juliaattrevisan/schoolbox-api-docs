@@ -200,7 +200,16 @@ ul.balcombe{
     height: 46px;
 }
 #tabs li{
-    border-right: 1px solid #fff;
+    border-left: 1px solid #fff;
+    &:first-child {
+        border-left: 0px;
+    }
+    &:last-child {
+        border-right: 1px solid #fff;
+    }
+    &.navthis + li {
+        border-left: 0px;
+    }
     float:left;
     margin: 8px 0;
     top: 0px;
@@ -268,7 +277,7 @@ ul.balcombe{
 
 #nav li ul a{ color: #696B73; }
 
-#nav li.hover > a, #nav ul li a:hover, #nav li li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
+#nav li:hover > a, #nav ul li a:hover, #nav li li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
     background-color: #696B73;
     color: #ffffff;
 }

@@ -3,9 +3,9 @@
 var $j = jQuery;
 
 $j(function() {
-	/*
-	* Remove the layerX and layerY console log reports from Webkit.
-	* */
+    /**
+     * Remove the layerX and layerY console log reports from Webkit.
+     */
     var all = $j.event.props,
         len = all.length,
         res = [];
@@ -15,78 +15,62 @@ $j(function() {
     }
     $j.event.props = res
 
+    /**
+     * Autoclear the main site search field (works without polyfill in all but IE9)
+     */
+    $j('#search-field').placeholder();
 
-
-    /*
-     * Main Navigation dropdown
-     * */
-    $j("#nav li").mouseenter(function(){
-        $j(this).addClass("hover");
-        $j('ul:first',this).toggle()
-    }).mouseleave(function(){
-        $j(this).removeClass("hover");
-        $j('ul:first',this).toggle();
+    /**
+     * Submit the form with a href links with the classes below
+     */
+    $j(document).on('click', '.submit, .submit-this', function(event) {
+        var form = $j(this).closest('form');
+        if (form.length > 0) {
+            event.preventDefault();
+            form.submit();
+        }
     });
 
-    $j('#nav li:last-child').addClass('lastChild');
+    /**
+     * Open rel="external" links in a new tab.
+     */
+    $j(document).on('click', 'a[rel=external]', function() {
+        $(this).attr('target','_blank')
+    })
 
+    /**
+     * Each skin does NOT have a slightly different header height or a different left navigation.
+     * From now on, it's always placed relative to the clicked element.
+     */
+    $j(document).on('click', 'ul.js_happening li', function() {
+        var currentObject = $(this);
+        var bubble = $j('.cal-bubble');
+        bubble.find('.bottom, .bottom strong').removeAttr("style");
+        bubble.find('.bottom').show();
+        var dynamicHTML = currentObject.children('.hidden-fields').html();
+        bubble.find('.middle').children('.js-data').html(dynamicHTML);
+        var position = currentObject.offset();
+        bubble.show();
+        var annoyingHeight =
+            bubble.find('.middle').outerHeight()
+            + bubble.find('.top').outerHeight()
+            + bubble.find('.bottom').outerHeight()
 
-	/*
-	* Close the calendar popup no matter what!
-	* */
-	$j('.cal-bubble .close').click(function(){
-		$j('.cal-bubble').hide();
-	})
+        // right edge lines up with right edge of currentObject
+        // bottom edge lines up with top edge of currentObject, hide pointer if it's at top of screen
+        var left = Math.max(0, position.left + currentObject.outerWidth() - bubble.outerWidth());
+        var top  = Math.max(0, position.top  - annoyingHeight);
+        if (top === 0) {
+            bubble.find('.bottom').hide();
+        }
+        bubble.css("left", left);
+        bubble.css("top",  top);
+    });
 
-
-	/*
-	* Autoclear the main site search field
-	* */
-	$j('#search-field').placeholder();
-
- 	/*
-	* Remove the border from the bottom of the last row of any table.
-	* */
-	$j('.standardForm tr:last td').css("border", "0") 
-
-	/*
-	* Submit the form with a href links with the classes below
-	* */
-	$j(document).on('click', '.submit, .submit-this', function(event) {
-		var form = $j(this).closest('form');
-		if (form.length > 0) {
-			event.preventDefault();
-			form.submit();
-		}
-	});
-
-	/*
-	* Open rel="external" links ion a new tab.
-	* */
-	$j('a[rel=external]').attr('target','_blank');
-
+    /**
+     * Close the calendar popup no matter what!
+     */
+    $j(document).on('click', '.cal-bubble .close', function() {
+        $j(this).closest('.cal-bubble').hide();
+    })
 });
-
-/*
-* Each skin has a slightly different header height or a different left navigation.
-* This function allows us to position the calendar popup at the right place.
-* */
-
-function calendarPos(currentObject, leftNegative, heightNegative) {
-	$j('.cal-bubble').find('.bottom, .bottom strong').removeAttr("style");
-	$j('.cal-bubble').find('.bottom').show();
-	var dynamicHTML = $j(currentObject).children('.hidden-fields').html();
-	$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
-	var position = $j(currentObject).offset();
-	$j('.cal-bubble').show();
-	var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
-	$j('.cal-bubble').css("left", (position.left - leftNegative));
-	$j('.cal-bubble').css("top", (position.top - annoyingHeight - heightNegative));
-	if (($j('.cal-bubble').css("left")) < '0px') {
-			$j('.cal-bubble').css("left", '0');	
-	}
-	if (($j('.cal-bubble').css("top")) < '0px') {
-			$j('.cal-bubble').css("top", '0');	
-			$j('.cal-bubble').find('.bottom').hide();
-	}
-}
