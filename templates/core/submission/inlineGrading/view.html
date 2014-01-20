@@ -1,14 +1,9 @@
 <script src="/javascript/components/qtip2/jquery.qtip.js" type="text/javascript"></script>
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
-<script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>
 <script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
 
 <script type='text/javascript'>
 	$(function() {
-		$('#returnWorkForm').marksheet({
-			submitOnChange: false
-		});
-
 		$('#inline-grading').inlineGrading({
 			boxId: '{INLINE_GRADING_SUBMISSION_BOX_ID}',
 			submissionId: '{INLINE_GRADING_SUBMISSION_ID}',
