@@ -8,6 +8,13 @@
  */
 class Synchronise_Tass_Meriden_Hydrator_Campus implements Synchronise_Base_IHydrator {
     /**
+     * The field to retrieve the campus from.
+     *
+     * @var string
+     */
+    protected $field = 'StudentCampus';
+
+    /**
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
@@ -29,10 +36,7 @@ class Synchronise_Tass_Meriden_Hydrator_Campus implements Synchronise_Base_IHydr
      * @return int
      */
     public function getDefaultCampusFromUser($externalUser) {
-        // Is this a staff or student user?
-        // For staff, it's in StaffCampus, for parents and students it's in
-        // StudentCampus.
-        switch (strtoupper(trim($externalUser['StudentCampus']))) {
+        switch (strtoupper(trim($externalUser[$this->field]))) {
             case 'JS':
                 return 1;
             case 'SS':
