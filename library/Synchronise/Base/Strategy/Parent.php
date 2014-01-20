@@ -12,6 +12,43 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
 	/**
+	 * List of hydrators to apply for creating a set of spouse user details.
+	 *
+	 * @var Synchronise_Base_Strategy_IHydrator[]
+	 */
+	protected $spouseHydratorList = array();
+
+	/**
+	 * @see $this->addHydrator()
+	 */
+	protected function addSpouseHydrator(Synchronise_Base_Strategy_IHydrator $hydrator) {
+		$this->spouseHydratorList[] = $hydrator;
+		return $this;
+	}
+
+	/**
+	 * @see $this->clearHydratorList()
+	 */
+	protected function clearSpouseHydratorList() {
+		$this->spouseHydratorList = array();
+		return $this;
+	}
+
+	/**
+	 * @see $this->hasHydrator()
+	 */
+	protected function hasSpouseHydrator() {
+		return !empty($this->spouseHydratorList);
+	}
+
+	/**
+	 * @see $this->getHydratorList()
+	 */
+	protected function getSpouseHydratorList() {
+		return $this->spouseHydratorList;
+	}
+
+	/**
 	 * Get a list of users' Synergy IDs to sync
 	 *
 	 * @return void
@@ -27,6 +64,13 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	 * @return array
 	 */
 	public function setupSpouseDetails($external_user) {
+		$newUser = array();
+		if ($this->hasSpouseHydrator()) {
+			foreach ($this->getSpouseHydratorList() as $hydrator) {
+				$newUser = $hydrator->hydrate($external_user, $newUser);
+			}
+			return $newUser;
+		}
 		$newUser = array();
 		$newUser['username']             = $this->getSpouseUsernameFromUser($external_user);
 		$newUser['title']                = $this->getSpouseTitleFromUser($external_user);

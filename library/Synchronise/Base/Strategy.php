@@ -44,6 +44,14 @@ abstract class Synchronise_Base_Strategy {
 	protected $list = array();
 
 	/**
+	 * List of hydrators to apply for converting details from external to
+	 * Schoolbox database.
+	 *
+	 * @var Synchronise_Base_Strategy_IHydrator[]
+	 */
+	protected $hydratorList = array();
+
+	/**
 	 * @var Synchronise_Base_Verbose
 	 */
 	protected $verbose_filter;
@@ -81,6 +89,44 @@ abstract class Synchronise_Base_Strategy {
 	 * By default does nothing.
 	 */
 	protected function setup() {}
+
+	/**
+	 * Adds a hydrator for converting data from external database to data for
+	 * this school.
+	 *
+	 * @param  Synchronise_Base_Strategy_IHydrator $hydrator
+	 * @return $this
+	 */
+	protected function addHydrator(Synchronise_Base_Strategy_IHydrator $hydrator) {
+		$this->hydratorList[] = $hydrator;
+		return $this;
+	}
+
+	/**
+	 * Clears all hydrators added in addHydrator().
+	 *
+	 * @return $this
+	 */
+	protected function clearHydratorList() {
+		$this->hydratorList = array();
+		return $this;
+	}
+
+	/**
+	 * Does this strategy have any hydrators set?
+	 *
+	 * @return bool
+	 */
+	protected function hasHydrator() {
+		return !empty($this->hydratorList);
+	}
+
+	/**
+	 * @return Synchronise_Base_Strategy_IHydrator[]
+	 */
+	protected function getHydratorList() {
+		return $this->hydratorList;
+	}
 
 	/**
 	 * If the users exist in Synergy but not in Schoolbox, create an account for
@@ -444,6 +490,12 @@ abstract class Synchronise_Base_Strategy {
 	 */
 	public function setupUserDetails($external_user) {
 		$newUser = array();
+		if ($this->hasHydrator()) {
+			foreach ($this->getHydratorList() as $hydrator) {
+				$newUser = $hydrator->hydrate($external_user, $newUser);
+			}
+			return $newUser;
+		}
 		$newUser['username']             = $this->getUsernameFromUser($external_user);
 		$newUser['title']                = $this->getTitleFromUser($external_user);
 		$newUser['firstname']            = $this->getFirstNameFromUser($external_user);
