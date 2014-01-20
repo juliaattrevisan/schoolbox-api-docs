@@ -11,16 +11,6 @@
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
 class Synchronise_Tass_Meriden_Strategy_Student extends Synchronise_Base_Strategy_Student {
-
-    /**
-     * Get a list of students to sync
-     *
-     * @return void
-     */
-    public function generateList() {
-        $this->list = $this->external_user_handler->getStudentUserAccountInfo();
-    }
-
     /**
      * Setup verbose output and hydrator classes.
      */
