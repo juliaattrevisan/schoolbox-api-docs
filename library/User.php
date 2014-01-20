@@ -617,15 +617,9 @@ class User extends DeprecatedModel {
 		/* eportfolio */
 		$query = "DELETE eportfolio_blog, eportfolio_blogComment FROM eportfolio_blog, eportfolio_blogComment WHERE eportfolio_blogComment.bid = eportfolio_blog.id AND eportfolio_blog.owner = '$id'";
 		$this->db->query($query);
-		$query = "DELETE FROM eportfolio_comp_location WHERE uid = '$id'";
-		$this->db->query($query);
 		$query = "DELETE FROM eportfolio_config WHERE uid = '$id'";
 		$this->db->query($query);
 		$query = "DELETE FROM eportfolio_link WHERE owner = '$id'";
-		$this->db->query($query);
-		$query = "DELETE FROM eportfolio_privateNotes WHERE uid= '$id' ";
-		$this->db->query($query);
-		$query = "DELETE FROM eportfolio_textBox WHERE userID = '$id'";
 		$this->db->query($query);
 
 		$this->db->delete('userCampus', 'uid', $id);
