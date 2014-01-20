@@ -281,6 +281,11 @@ class External_Tass_User implements External_UserInterface {
             AND s.dol IS NULL
         ";
         $studentList = $this->getDatabase()->getAll($query);
+        // TASS uses fixed-length char fields instead of varchars.
+        foreach ($studentList as &$student) {
+            $student = array_map('trim', $student);
+        }
+        unset($student);
         return $studentList;
     }
 
