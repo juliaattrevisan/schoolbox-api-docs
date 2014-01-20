@@ -2,8 +2,6 @@
 /**
  * Default hydrator definition for spouses.
  *
- * Don't extend this - instead, stack hydrators on top of it.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/

@@ -2,8 +2,6 @@
 /**
  * Default hydrator definition.
  *
- * Usage: in s
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -24,15 +22,4 @@ class Synchronise_Base_Strategy_Hydrator_Student implements Synchronise_Base_Str
         }
         return $newUser;
     }
-
-//    /**
-//     * Overridden to use getBySynergy() method - students often switch groups.
-//     *
-//     * @param  array $user
-//     *
-//     * @return array
-//     */
-//    protected function userExists($user) {
-//        return $this->user_handler->getBySynergy($user['synergy_id']);
-//    }
 }

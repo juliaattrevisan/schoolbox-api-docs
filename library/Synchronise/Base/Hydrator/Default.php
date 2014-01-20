@@ -2,7 +2,19 @@
 /**
  * Default hydrator definition.
  *
- * Please don't extend this - instead, use
+ * Please don't extend this class - instead, define a new hydrator which
+ * overrides the fields that need to be overridden per user, and add it in the
+ * sync's setup() method:
+ *
+ * <code>
+ * protected function setup() {
+ *     $this
+ *         ->addHydrator(new Synchronise_Base_Strategy_Hydrator_Default())
+ *         ->addHydrator(new Synchronise_Base_Strategy_Hydrator_Student())
+ *         ->addHydrator(instanceof Synchronise_Base_Strategy_IHydrator)
+ *     ;
+ * }
+ * </code>
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -30,18 +42,5 @@ class Synchronise_Base_Strategy_Hydrator_Default implements Synchronise_Base_Str
         $newUser['eportfolio_enabled']   = true;
         $newUser['enabled']              = null;
         return $newUser;
-//        return $this->clearFields($newUser);
     }
-
-
-//    /**
-//     * Filters fields with a null value out of user details.
-//     *
-//     * @param  array $new_user
-//     *
-//     * @return array
-//     */
-//    protected function clearFields($new_user) {
-//        return array_filter($new_user, function($v) { return isset($v); });
-//    }
 }
