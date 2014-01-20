@@ -121,6 +121,16 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 	}
 
     /**
+     * Gets answers out of the answer group array.
+     *
+     * @param  array $answerGroup an answer group from $this->getByQuestionId()
+     * @return array
+     */
+    protected function getAnswersFromAnswerGroup($answerGroup) {
+        return unserialize($answerGroup['answer']);
+    }
+
+    /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
@@ -134,20 +144,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
-            $allAnswers = unserialize($answerGroup['answer']);
-
-			/* Only shuffle on request
-			 */
-			$question = $this->questionHandler->getByID($question_id);
-
-			$config = json_decode($question['config']);
-
-			if ($config->randomiseOptionOrder) {
-				shuffle($allAnswers);
-				shuffle($allAnswers);
-				shuffle($allAnswers);
-				shuffle($allAnswers);
-			}
+            $allAnswers = $this->getAnswersFromAnswerGroup($answerGroup);
 
 			/* A
 			 */
