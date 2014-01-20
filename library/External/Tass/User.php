@@ -281,12 +281,6 @@ class External_Tass_User implements External_UserInterface {
             AND s.dol IS NULL
         ";
         $studentList = $this->getDatabase()->getAll($query);
-        foreach ($studentList as $student) {
-            foreach ($student as $key => $value) {
-                printf("%- 20s: %s\n", $key, $value);
-            }
-            echo "\n";
-        }
         return $studentList;
     }
 
