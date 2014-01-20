@@ -645,7 +645,8 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getStudentUserAccountInfo() {
 		$query = "
 			SELECT
-				vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname, StudentEmail, StudentOccupEmail,
+				vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname, StudentGender,
+				StudentEmail, StudentOccupEmail,
 				vStudents.StudentYearLevel, vStudents.StudentHouse, StudentCampus
 			FROM SynergyOne.dbo.vStudents vStudents
 			LEFT JOIN Community ON Community.ID = StudentID
@@ -676,7 +677,8 @@ class External_Synergetic_User implements External_UserInterface {
 				StudentContactSpouseSurname,
 				StudentContactSpouseDefaultEmail,
 				StudentYearLevel,
-				StudentCampus
+				StudentCampus,
+				StudentGender
 			FROM SynergyOne.dbo.vStudentContactAllAddress
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 			AND FileSemester = '{$_SESSION['FileSemester']}'
@@ -695,13 +697,14 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getStaffUserAccountInfo() {
 		$query = "
 			SELECT
-				StaffID, NetworkLogin, ActiveFlag,
-				StaffTitle, StaffPreferredName, StaffSurname,
+				vStaff.StaffID, NetworkLogin, ActiveFlag,
+				vStaff.StaffTitle, vStaff.StaffPreferredName, vStaff.StaffSurname,
 				DefaultEmailCode, OccupEmail, Email,
-				StaffCampus, StaffCategoryType, StaffCategory
+				vStaff.StaffCampus, StaffCategoryType, StaffCategory,
+				vStaff.StaffDepartment
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN Community ON Community.ID = StaffID
-			WHERE ActiveFlag = 1 AND StaffRegistrationType != 'STDNT'
+		  WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
 		";
 
 		return $this->getDatabase()->getAll($query);
