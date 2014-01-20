@@ -68,7 +68,7 @@
 				/* wat?
 				 self.attr('name', self.attr('name').substring(0, self.attr('name').length - 2) + '[' + uid.val() + ']');
 				 */
-				self.attr('name', self.attr('name') + '[' + uid.val() + ']');
+//				self.attr('name', self.attr('name') + '[' + uid.val() + ']');
 			});
 		}
 
