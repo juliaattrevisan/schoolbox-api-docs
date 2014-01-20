@@ -11,7 +11,6 @@
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
 class Synchronise_Tass_Meriden_Strategy_Student extends Synchronise_Base_Strategy_Student {
-    protected $title = "Update Schoolbox Student Details Synchronisation";
 
     /**
      * Get a list of students to sync

@@ -77,25 +77,4 @@ class Synchronise_Tass_Meriden_Strategy_Staff extends Synchronise_Base_Strategy_
 		}
 		return 0;
 	}
-
-	/**
-	 * Eportfolio is disabled (for now)
-	 *
-	 * @param  array $currentUser
-	 * @return bool
-	 */
-	public function getEportfolioEnabledFromUser($currentUser) {
-		return false;
-	}
-
-	/**
-	 * St. Kevins staff have local email on.
-	 *
-	 * @param array $currentUser
-	 *
-	 * @return int
-	 */
-	public function getLocalEmailFromUser($currentUser) {
-		return 1;
-	}
 }
