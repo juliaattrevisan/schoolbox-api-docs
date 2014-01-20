@@ -57,7 +57,7 @@ class Synchronise_Synergetic_Tintern_Strategy_Student extends Synchronise_Base_S
 	 * @return bool|int
 	 */
 	public function getEportfolioEnabledFromUser($currentUser) {
-		return 1;
+		return 0;
 	}
 
     /**

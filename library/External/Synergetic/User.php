@@ -697,19 +697,14 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getStaffUserAccountInfo() {
 		$query = "
 			SELECT
-				StaffID, NetworkLogin, ActiveFlag,
-				StaffTitle, StaffPreferredName, StaffSurname,
+				vStaff.StaffID, NetworkLogin, ActiveFlag,
+				vStaff.StaffTitle, vStaff.StaffPreferredName, vStaff.StaffSurname,
 				DefaultEmailCode, OccupEmail, Email,
-				StaffCampus, StaffCategoryType, StaffCategory,
-				JobPositions.StaffDepartmentDescription AS StaffDepartment, JobPositions.JobPositionDescription
+				vStaff.StaffCampus, StaffCategoryType, StaffCategory,
+				vStaff.StaffDepartment
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN Community ON Community.ID = StaffID
-		    LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-			WHERE ActiveFlag = 1 AND StaffRegistrationType != 'STDNT'
-			AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
-			OR    JobPositions.StaffJobPositionStartDate IS NULL )
-			AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
-			OR    JobPositions.StaffJobPositionEndDate IS NULL )
+		  WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
 		";
 
 		return $this->getDatabase()->getAll($query);

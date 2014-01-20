@@ -121,6 +121,6 @@ class Synchronise_Synergetic_Tintern_Strategy_Staff extends Synchronise_Base_Str
 	 * @return bool|int
 	 */
 	public function getEportfolioEnabledFromUser($currentUser) {
-		return 1;
+		return 0;
 	}
 }
