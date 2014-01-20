@@ -155,8 +155,7 @@ class Factory {
 			echo $e->getMessage();
 		}
 
-//			$saveReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
-//			$saveReturn->saveReturn($returnedWork, null, $file);
+		return $returnedWork;
 	}
 
 	/**

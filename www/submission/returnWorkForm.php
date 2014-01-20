@@ -47,7 +47,7 @@ $redirect = $_POST['redirect'];
 /* Process the return's comments, marks, rubrics and uploads
  */
 $returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $file, $redirect);
-$returnedWorkFactory->start();
+$returnedWork = $returnedWorkFactory->start();
 
 /* An array of crocodoc-specific controls
  array(
@@ -64,12 +64,13 @@ if (isset($_POST['crocodoc'])) {
 		$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 		$submission = $submissionMapper->findById($_POST['crocodoc']['submissionId']);
 
-		$downloader = new Crocodoc\Download($submission);
+		/* Feed it a returnedWork record to which the downloaded file
+		 * should be attached
+		 */
+		$downloader = new Crocodoc\Download($submission, $returnedWork);
 		$downloader->start();
 	}
 	catch(\Exception $e) {
-		new \Alaress_Probe($_POST);
-		echo $e->getMessage();
 	}
 }
 

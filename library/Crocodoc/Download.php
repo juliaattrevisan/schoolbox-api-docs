@@ -28,45 +28,28 @@ class Download {
 	private $submission = null;
 
 	/**
+	 * An instance of \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
+	 *
+	 * @var null
+	 */
+	private $returnedWork = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
 	 */
-	public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission) {
+	public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission, \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork) {
 		$this->setAuthenticator(new Authenticator());
 		$this->setSubmission($submission);
+		$this->setReturnedWork($returnedWork);
 	}
 
 	/**
 	 * Download scribbled-on file and provide link to it
 	 */
 	public function start() {
-		$returnHandler = new \SubmissionReturn();
-		$returnHandler->securityCheck($this->getSubmission()->getSubmissionBox()->getId());
-
-		$result = $returnHandler->getByUser($this->getSubmission()->getOwner()->getId(), $this->getSubmission()->getSubmissionBox()->getId(), 1);
-
-		/* Update the latest return found for a submission
-		 * Either recycle an existing record or spawn a new one
-		 */
-		$return = array(
-			'box_id' => $this->getSubmission()->getSubmissionBox()->getId(),
-			'marker' => $_SESSION['user']->getId(),
-			'owner' => $this->getSubmission()->getOwner()->getId(),
-			'comment' => $result[0]['comment'],
-			'mark' => (!empty($result[0]) ? $result[0]['mark'] : null),
-			'norm_mark' => (!empty($result[0]) ? $result[0]['norm_mark'] : null),
-		);
-
-		/* Do what returnWorkForm usually does
-		 */
-		$returnSaver = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
-		$returnSaver->saveReturn($return);
-
-		/* This should either reuse the $latestReturn record, or spawn
-		 * a new one instead
-		 */
-		$latestReturn = $returnSaver->getReturnedWork();
 
 		/* Crocodoc always downloads a pdf to you with annotations turned on
 		 */
@@ -77,21 +60,18 @@ class Download {
 
 		/* Download to a temp dir
 		 */
-		$path = \Cfg::get('returns_dir') . '/' . $latestReturn->getId() . '.dat';
+		$path = \Cfg::get('returns_dir') . '/' . $this->getReturnedWork()->getId() . '.dat';
 
 		file_put_contents($path, $data);
 
 		/* Update the return with some extra info
 		 */
-		$latestReturn->setFilename('return_' . $this->getSubmission()->getFilename() . '.pdf');
-		$latestReturn->setFilesize(filesize($path));
-		$latestReturn->setMimeType('application/pdf');
-		$latestReturn->setMark($return['mark']);
-		$latestReturn->setNormalizedMark($return['norm_mark']);
-		$latestReturn->setComment($return['comment']);
+		$this->getReturnedWork()->setFilename('return_' . $this->getSubmission()->getFilename() . '.pdf');
+		$this->getReturnedWork()->setFilesize(filesize($path));
+		$this->getReturnedWork()->setMimeType('application/pdf');
 
 		$returnMapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-		$returnMapper->save($latestReturn);
+		$returnMapper->save($this->getReturnedWork());
 	}
 
 	/* Getters/Setters
@@ -131,5 +111,23 @@ class Download {
 	 */
 	private function getSubmission() {
 		return $this->submission;
+	}
+
+	/**
+	 * Set returned work
+	 *
+	 * @param null $returnedWork
+	 */
+	private function setReturnedWork($returnedWork) {
+		$this->returnedWork = $returnedWork;
+	}
+
+	/**
+	 * Get returned work
+	 *
+	 * @return null
+	 */
+	private function getReturnedWork() {
+		return $this->returnedWork;
 	}
 }
