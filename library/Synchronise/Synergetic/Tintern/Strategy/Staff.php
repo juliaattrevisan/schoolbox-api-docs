@@ -29,7 +29,43 @@ class Synchronise_Synergetic_Tintern_Strategy_Staff extends Synchronise_Base_Str
      * @return int
      */
     public function getDefaultCampusFromUser($currentUser) {
-		return 1;
+        switch($currentUser['StaffDepartment']) {
+            case 'JSO':
+                return 4;
+                break;
+
+            case 'JSSPEC':
+                return 4;
+                break;
+
+            case 'JSTEACH':
+                return 4;
+                break;
+
+            default:
+                return 1;
+              break;
+        }
+    }
+
+    public function getCampusListFromUser($currentUser) {
+        switch($currentUser['StaffDepartment']) {
+            case 'JSO':
+                return array(4,5);
+            break;
+
+            case 'JSSPEC':
+                return array(4,5);
+            break;
+
+            case 'JSTEACH':
+                return array(4,5);
+            break;
+
+            default:
+                return array(1,2,3);
+            break;
+        }
     }
 
     /**
@@ -39,7 +75,23 @@ class Synchronise_Synergetic_Tintern_Strategy_Staff extends Synchronise_Base_Str
      * @return int
      */
     public function getGroupIDFromUser($currentUser) {
-		return 3;
+        switch($currentUser['StaffDepartment']) {
+            case 'JSO':
+                return 2;
+                break;
+
+            case 'JSSPEC':
+                return 2;
+                break;
+
+            case 'JSTEACH':
+                return 2;
+                break;
+
+            default:
+                return 3;
+                break;
+        }
     }
 
 	/**

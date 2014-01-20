@@ -700,10 +700,16 @@ class External_Synergetic_User implements External_UserInterface {
 				StaffID, NetworkLogin, ActiveFlag,
 				StaffTitle, StaffPreferredName, StaffSurname,
 				DefaultEmailCode, OccupEmail, Email,
-				StaffCampus, StaffCategoryType, StaffCategory
+				StaffCampus, StaffCategoryType, StaffCategory,
+				JobPositions.StaffDepartmentDescription AS StaffDepartment, JobPositions.JobPositionDescription
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN Community ON Community.ID = StaffID
+		    LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
 			WHERE ActiveFlag = 1 AND StaffRegistrationType != 'STDNT'
+			AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
+			OR    JobPositions.StaffJobPositionStartDate IS NULL )
+			AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
+			OR    JobPositions.StaffJobPositionEndDate IS NULL )
 		";
 
 		return $this->getDatabase()->getAll($query);

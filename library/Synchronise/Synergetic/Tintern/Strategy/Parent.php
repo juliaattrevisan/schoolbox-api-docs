@@ -35,7 +35,7 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
      */
     public function setupUserDetails($currentUser) {
         $newUser = parent::setupUserDetails($currentUser);
-        $newUser['password'] = $this->getPassword($currentUser);
+        $newUser['password'] = $this->getPassword($newUser);
         return $newUser;
     }
 
@@ -45,19 +45,19 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
      * @return array
      */
     public function setupSpouseDetails($currentUser) {
-        $newUser = parent::setupUserDetails($currentUser);
-        $newUser['password'] = $this->getPassword($currentUser);
+        $newUser = parent::setupSpouseDetails($currentUser);
+        $newUser['password'] = $this->getPassword($newUser);
         return $newUser;
     }
 
     /**
      * Set password based on the following rules
      * First 4 chars of surname, padded with - if not enough, last 3 digits of synergy id.
-     * @param $currentUser
+     * @param array $newUser
      * @return string
      */
-    public function getPassword($currentUser) {
-        return  str_pad(substr($this->getSpouseLastNameFromUser($currentUser),0,4),4,'-') . substr($this->getSpouseExternalIdFromUser($currentUser),-3);
+    public function getPassword($newUser) {
+        return  str_pad(substr($newUser['lastname'],0,4),4,'-') . substr($newUser['synergy_id'],-3);
     }
 
     /**
