@@ -14,14 +14,14 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	/**
 	 * List of hydrators to apply for creating a set of spouse user details.
 	 *
-	 * @var Synchronise_Base_Strategy_IHydrator[]
+	 * @var Synchronise_Base_IHydrator[]
 	 */
 	protected $spouseHydratorList = array();
 
 	/**
 	 * @see $this->addHydrator()
 	 */
-	protected function addSpouseHydrator(Synchronise_Base_Strategy_IHydrator $hydrator) {
+	protected function addSpouseHydrator(Synchronise_Base_IHydrator $hydrator) {
 		$this->spouseHydratorList[] = $hydrator;
 		return $this;
 	}

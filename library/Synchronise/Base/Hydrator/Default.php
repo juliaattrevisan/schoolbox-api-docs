@@ -9,9 +9,9 @@
  * <code>
  * protected function setup() {
  *     $this
- *         ->addHydrator(new Synchronise_Base_Strategy_Hydrator_Default())
- *         ->addHydrator(new Synchronise_Base_Strategy_Hydrator_Student())
- *         ->addHydrator(instanceof Synchronise_Base_Strategy_IHydrator)
+ *         ->addHydrator(new Synchronise_Base_Hydrator_Default())
+ *         ->addHydrator(new Synchronise_Base_Hydrator_Student())
+ *         ->addHydrator(instanceof Synchronise_Base_IHydrator)
  *     ;
  * }
  * </code>
@@ -20,7 +20,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Base_Strategy_Hydrator_Default implements Synchronise_Base_Strategy_IHydrator {
+class Synchronise_Base_Hydrator_Default implements Synchronise_Base_IHydrator {
     /**
      * {@inheritdoc}
      */

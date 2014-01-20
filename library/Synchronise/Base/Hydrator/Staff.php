@@ -6,7 +6,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Base_Strategy_Hydrator_Staff implements Synchronise_Base_Strategy_IHydrator {
+class Synchronise_Base_Hydrator_Staff implements Synchronise_Base_IHydrator {
     /**
      * {@inheritdoc}
      */

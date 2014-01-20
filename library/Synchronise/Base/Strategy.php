@@ -47,7 +47,7 @@ abstract class Synchronise_Base_Strategy {
 	 * List of hydrators to apply for converting details from external to
 	 * Schoolbox database.
 	 *
-	 * @var Synchronise_Base_Strategy_IHydrator[]
+	 * @var Synchronise_Base_IHydrator[]
 	 */
 	protected $hydratorList = array();
 
@@ -94,10 +94,11 @@ abstract class Synchronise_Base_Strategy {
 	 * Adds a hydrator for converting data from external database to data for
 	 * this school.
 	 *
-	 * @param  Synchronise_Base_Strategy_IHydrator $hydrator
-	 * @return $this
+	 * @param  Synchronise_Base_IHydrator $hydrator
+	 *
+*@return $this
 	 */
-	protected function addHydrator(Synchronise_Base_Strategy_IHydrator $hydrator) {
+	protected function addHydrator(Synchronise_Base_IHydrator $hydrator) {
 		$this->hydratorList[] = $hydrator;
 		return $this;
 	}
@@ -122,7 +123,7 @@ abstract class Synchronise_Base_Strategy {
 	}
 
 	/**
-	 * @return Synchronise_Base_Strategy_IHydrator[]
+	 * @return Synchronise_Base_IHydrator[]
 	 */
 	protected function getHydratorList() {
 		return $this->hydratorList;

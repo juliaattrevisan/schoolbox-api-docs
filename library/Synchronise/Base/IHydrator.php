@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-interface Synchronise_Base_Strategy_IHydrator {
+interface Synchronise_Base_IHydrator {
     const DEFAULT_CAMPUS        = 1;
     const DEFAULT_ADMIN_GROUP   = 1;
     const DEFAULT_STAFF_GROUP   = 2;
