@@ -29,6 +29,9 @@ class Synchronise_Tass_Meriden_Hydrator_Campus implements Synchronise_Base_Strat
      * @return int
      */
     public function getDefaultCampusFromUser($externalUser) {
+        // Is this a staff or student user?
+        // For staff, it's in StaffCampus, for parents and students it's in
+        // StudentCampus.
         switch (strtoupper(trim($externalUser['StudentCampus']))) {
             case 'JS':
                 return 1;
