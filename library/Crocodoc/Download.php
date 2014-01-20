@@ -58,20 +58,26 @@ class Download {
 
 		$data = $curl->getResult();
 
-		/* Download to a temp dir
+		/* If there were no errors, download/attach/save
+		 * Otherwise, ignore altogether
 		 */
-		$path = \Cfg::get('returns_dir') . '/' . $this->getReturnedWork()->getId() . '.dat';
+		if (!count($curl->getErrors())) {
 
-		file_put_contents($path, $data);
+			/* Download to a temp dir
+			 */
+			$path = \Cfg::get('returns_dir') . '/' . $this->getReturnedWork()->getId() . '.dat';
 
-		/* Update the return with some extra info
-		 */
-		$this->getReturnedWork()->setFilename('return_' . $this->getSubmission()->getFilename() . '.pdf');
-		$this->getReturnedWork()->setFilesize(filesize($path));
-		$this->getReturnedWork()->setMimeType('application/pdf');
+			file_put_contents($path, $data);
 
-		$returnMapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-		$returnMapper->save($this->getReturnedWork());
+			/* Update the return with some extra info
+			 */
+			$this->getReturnedWork()->setFilename('return_' . $this->getSubmission()->getFilename() . '.pdf');
+			$this->getReturnedWork()->setFilesize(filesize($path));
+			$this->getReturnedWork()->setMimeType('application/pdf');
+
+			$returnMapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
+			$returnMapper->save($this->getReturnedWork());
+		}
 	}
 
 	/* Getters/Setters
