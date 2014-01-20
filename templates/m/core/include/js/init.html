@@ -18,40 +18,7 @@ function init() {
 
     // Install-a-bubble
     env.fullscreen = (window.navigator.standalone) ? window.navigator.standalone : lStorage.getItem('pinned');
-    if(!env.fullscreen && (env.ios || env.wp )) {
-        var style,
-            instruction = '';
-
-        // load up bubble for iOS
-        if (env.ios) {
-            style = 'ios';
-            var device = '';
-            if (env.ipad) {
-                style += ' ipad';
-                device = 'iPad';
-            } else {
-                style  += ' iphone';
-                device += 'iPhone';
-            }
-            instruction = 'Install this web app on your ' + device + ': tap &lsquo;<span>Share</span>&rsquo; ' +
-                          'and then <br />&lsquo;<strong>Add to Home Screen</strong>.&rsquo;';
-        }
-        // load up bubble for Win (odd, since we don't officially support winmobile)
-        else if (env.wp) {
-            style       = 'wp';
-            instruction = '<a href="#" class="wp">Click here to install this web app to your Windows Phone</a>';
-        }
-
-        var bubble  = '<div id="bubble" class="' + style + '">' + instruction +
-                      '<a href="#" class="close">&times;</a></div>';
-
-
-        $('body').append(bubble);
-
-        setTimeout(function() {
-            $('#bubble').addClass('active');
-        }, 5000);
-    } else if (env.fullscreen) {
+    if (env.fullscreen) {
         lStorage.setItem('pinned', true);
     }
 
