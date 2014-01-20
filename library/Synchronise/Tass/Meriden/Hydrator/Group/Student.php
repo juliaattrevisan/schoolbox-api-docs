@@ -6,7 +6,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Meriden_Hydrator_Student_Group implements Synchronise_Base_Strategy_IHydrator {
+class Synchronise_Tass_Meriden_Hydrator_Group_Student implements Synchronise_Base_Strategy_IHydrator {
     /**
      * {@inheritdoc}
      */
