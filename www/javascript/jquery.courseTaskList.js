@@ -128,7 +128,7 @@
 
         // Modify task: if there's a modify form inline, show/hide it.
         // (Delegate because extra elements can be added via AJAX)
-        component.on('click.courseTaskList', '.interact a.modify', {}, function(event) {
+        component.on('click.courseTaskList', '.actions a.modify', {}, function(event) {
             // Show the form instead
             var edit_form = $(this).closest('.task').find('.edit_task_form_container');
             if (edit_form.length) {
