@@ -79,6 +79,7 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
      * @param Campus $campus
      * @param string $date   The date to get the campus for, defaults to now.
      *
+     * @throws Schoolbox\Mapper\Exception if no timetable is found
      * @return TimetableCampus
      */
     public function findCurrentTimetable(Campus $campus, $date = 'now') {
@@ -113,6 +114,6 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
             ;
             return $timetable_campus;
         }
-        return false;
+        throw new Schoolbox\Mapper\Exception('Instance of object not found');
     }
 }
