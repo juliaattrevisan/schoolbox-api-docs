@@ -25,7 +25,7 @@ MAILTO="support@schoolbox.com.au"
 
 # Digest notifications
 # -- also not to be run for dev
-#00 06 * * 1-4 root    php /usr/share/schoolboxdev/tools/digest/daily.php  >> /var/log/schoolboxdev-digest-daily.log 2>/dev/null
+#00 06 * * 1-5 root    php /usr/share/schoolboxdev/tools/digest/daily.php  >> /var/log/schoolboxdev-digest-daily.log 2>/dev/null
 #00 11 * * 5   root    php /usr/share/schoolboxdev/tools/digest/weekly.php >> /var/log/schoolboxdev-digest-weekly.log 2>/dev/null
 
 # Plagscan callback - every hour
