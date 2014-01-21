@@ -55,18 +55,11 @@ class Factory {
 	private $file = array();
 
 	/**
-	 * A url to visit after processing everything
-	 *
-	 * @var string
-	 */
-	private $redirect = '';
-
-	/**
 	 * An instance of \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper
 	 *
 	 * @var null
 	 */
-	private $returnedWorKMapper = null;
+	private $returnedWorkMapper = null;
 
 	/**
 	 * A thing that came out of Marksheet_Factory
@@ -76,8 +69,8 @@ class Factory {
 	private $marksheet = null;
 
 	/**
-	 * TODO: refactor this to somwhere else, not sure where it should live though
-	 * IT NOW LIVES HERE
+	 * The time differential between using an old ReturnedWork record and spawning
+	 * a whole new one
 	 */
 	private $updateWindow = 21600; // 60 * 60 * 6 seconds = 6 hours
 
@@ -101,20 +94,19 @@ class Factory {
 	 * @param $comment
 	 * @param $rubric
 	 * @param $file
-	 * @param $redirect
 	 */
-	public function __construct(\Schoolbox\User $user, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox, $mark, $comment, $rubric, $file, $redirect) {
+	public function __construct(\Schoolbox\User $user, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox, $mark, $comment, $rubric, $file) {
 		$this->setUser($user);
 		$this->setSubmissionBox($submissionBox);
 		$this->setMark($mark);
 		$this->setComment($comment);
 		$this->setRubric($rubric);
 		$this->setFile($file);
-		$this->setRedirect($redirect);
 
 		/* Internally used instances
 		 */
 		$this->setReturnedWorkMapper(new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper());
+		$this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug()));
 
 		/* Sometimes you don't submit numeric values - this mainly consists
 		 * of possibilities like Absent, Not Submitted, etc. These cause an error
@@ -124,7 +116,17 @@ class Factory {
 		 *
 		 * Adapted from the old returnWork.php in ajaxUpdate
 		 */
-		$this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug()));
+		$this->setErrors($this->detectErrors());
+	}
+
+	/**
+	 * This actually translates string Mark values into numeric ones, despite the name.
+	 * This occurs because MarkSheets all use normaliseMark, assuming a numeric value.
+	 * So you use DueWork_Errors to translate
+	 *
+	 * @return DueWork_Error[]
+	 */
+	private function detectErrors() {
 
 		// retrieve error codes
 		$allErrors = \DueWork_ErrorMapper::getInstance()->findAll();
@@ -138,7 +140,7 @@ class Factory {
 			$errors[$currentError->getDisplayAs()] = $currentError;
 		}
 
-		$this->setErrors($errors);
+		return $errors;
 	}
 
 	/**
@@ -182,7 +184,6 @@ class Factory {
 			}
 		}
 		catch(\Exception $e) {
-			echo $e->getMessage();
 		}
 
 		return $returnedWork;
@@ -406,24 +407,6 @@ class Factory {
 	}
 
 	/**
-	 * Set redirect
-	 *
-	 * @param string $redirect
-	 */
-	private function setRedirect($redirect) {
-		$this->redirect = $redirect;
-	}
-
-	/**
-	 * Get redirect
-	 *
-	 * @return string
-	 */
-	private function getRedirect() {
-		return $this->redirect;
-	}
-
-	/**
 	 * Set file
 	 *
 	 * @param null $file
@@ -444,10 +427,10 @@ class Factory {
 	/**
 	 * Set returned work mapper
 	 *
-	 * @param null $returnedWorKMapper
+	 * @param null $returnedWorkMapper
 	 */
-	private function setReturnedWorKMapper($returnedWorKMapper) {
-		$this->returnedWorKMapper = $returnedWorKMapper;
+	private function setReturnedWorkMapper($returnedWorkMapper) {
+		$this->returnedWorkMapper = $returnedWorkMapper;
 	}
 
 	/**
@@ -455,8 +438,8 @@ class Factory {
 	 *
 	 * @return null
 	 */
-	private function getReturnedWorKMapper() {
-		return $this->returnedWorKMapper;
+	private function getReturnedWorkMapper() {
+		return $this->returnedWorkMapper;
 	}
 
 	/**
