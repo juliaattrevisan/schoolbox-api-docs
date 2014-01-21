@@ -53,7 +53,7 @@ switch($_POST['action']) {
         $endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
         $event = array(
-            'owner' => null,
+            'owner' => $ownerId,
             'access' => $_POST['level'],
 			'author_id' => $_POST['author_id'],
             'sid' => null,
@@ -89,9 +89,6 @@ switch($_POST['action']) {
         }
         elseif ($_POST['level'] == Calendar::ACCESS_GROUP) {
             $event['sid'] = $_POST['group'];
-        }
-        elseif ($_POST['level'] == Calendar::ACCESS_PERSONAL) {
-            $event['owner'] = $ownerId;
         }
 
         $validRepeat = array(
