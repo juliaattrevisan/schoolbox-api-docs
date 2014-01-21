@@ -12,7 +12,11 @@ VALUES
 (1, 'Term 1 2013', 10, 5, 1),
 (2, 'Term 2 2013', 10, 5, 1),
 (3, 'Term 3 2013', 10, 5, 1),
-(4, 'Term 4 2013', 10, 5, 1);
+(4, 'Term 4 2013', 10, 5, 1),
+(5, 'Term 1 2014', 10, 5, 1),
+(6, 'Term 2 2014', 10, 5, 1),
+(7, 'Term 3 2014', 10, 5, 1),
+(8, 'Term 4 2014', 10, 5, 1);
 
 -- Add start and end dates for campuses
 INSERT INTO `timetable_campus`
