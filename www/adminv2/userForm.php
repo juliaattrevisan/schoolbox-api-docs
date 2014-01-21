@@ -79,7 +79,7 @@ else if ($_POST['modusername']) {
 		'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
         'house' => $_POST['house'],
         'residential_house_id' => $_POST['residential_house'],
-		'enabled' => $_POST['account_enabled']
+		'enabled' => true,
 	);
 
 	/* Users require a campus array before they can be created successfully
