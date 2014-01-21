@@ -41,11 +41,11 @@ class Component_Dashboard_ParentHelpdeskController extends Component_Dashboard_C
         $this->setBlock("student_helpdesk_block", "student_job_block", "student_job");
 
             foreach ( $this->children as $child ) {
-                $query = "SELECT title, firstname, lastname, year FROM `" . SQL_db . "`.user WHERE id = {$child['id']}";
-                $user = DeprecatedDatabase::getInstance()->getRow($query);
-                $this->setVar("STUDENT_ID", $child['id']);
-                $this->setVar("STUDENT_NAME", $this->user->formatName($user, '{firstname} {lastname}'));
-                $this->setVar("STUDENT_YEAR", $user['year']);
+                /** @var Schoolbox\User $user */
+                $user = \Schoolbox\UserMapper::getInstance()->findById($child['id']);
+                $this->setVar("STUDENT_ID",   $user->getId());
+                $this->setVar("STUDENT_NAME", $user->formatName('{firstname} {lastname}'));
+                $this->setVar("STUDENT_YEAR", $user->getYear());
 
                 $jobs = $this->helpdesk->openHelpdeskJobs($child['id']);
                 if ( is_array($jobs) ) {
