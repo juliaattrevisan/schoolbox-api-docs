@@ -38,11 +38,11 @@ class AjaxFlot {
 		$result = array(
 			array(
 				'label' => 'Used',
-				'data' => (int)$currentData['Used'],
+				'data' => $currentData['Used'],
 			),
 			array(
 				'label' => 'Available',
-				'data' => (int)$currentData['Available']
+				'data' => $currentData['Available'],
 			)
 		);
 
