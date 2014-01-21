@@ -38,6 +38,7 @@ class SideNav extends SubjectListAbstract {
 	 * Expel each subject grouped by its type
 	 */
 	public function render() {
+		$isStaff = $this->getGroupHandler()->isStaff();
 		if (count(array_keys($this->getAllSubjectLists()))) {
 			foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
 
@@ -60,8 +61,12 @@ class SideNav extends SubjectListAbstract {
 				 */
 				if (is_array($currentSubjectList) && count($currentSubjectList)) {
 					foreach($currentSubjectList as $currentSubject) {
+						$name = $currentSubject['categoryName'];
+						if ($isStaff && !empty($currentSubject['subject']['code'])) {
+							$name .= ' ('.$currentSubject['subject']['code'].')';
+						}
 						$this->getPage()->setVar(array(
-							'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
+							'SUBJECT_NAME' => \Scrub::text($name),
 							'SUBJECT_URL' =>  "/homepage/{$currentSubject['subject']['code']}",
 						));
 
