@@ -206,7 +206,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['description'] = $class['name'];
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['code'] = $class['code'];
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['room'] = $class['room'];
-
+					$periodListAdaption[$periodSequence]['day'][$dayNumber]['staffCode'] = $class['synergy_id'];
 					unset($classList[$i]);
 				}
 			}
@@ -249,7 +249,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 					$periodAdaption['description'] = $class['name'];
 					$periodAdaption['code'] = $class['code'];
 					$periodAdaption['room'] = '';
-
+					$periodAdaption['staffCode'] = $class['synergy_id'];
 					unset($classList[$i]);
 				}
 			}
