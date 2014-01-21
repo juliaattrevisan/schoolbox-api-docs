@@ -170,7 +170,7 @@ class External_Tass_Timetable implements External_TimetableInterface
 
             if ($timetabledef['sequence'][$x] != 2 && $desc['prd_code'] == $timetable[$x]['periodNumber']) {
                 $timetable[$x]['description'] = $desc['sub_desc'];
-                $timetable[$x]['code'] = trim($desc['year_grp'] . '-' . $desc['sub_code'] . '-' . $desc['class']);
+                $timetable[$x]['code'] = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
                 $timetable[$x]['room'] = $desc['room_code'];
                 $desc = $this->getDatabase()->getNextArray();
 
@@ -239,9 +239,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                 if ($timetabledef['sequence'][$x] != 2 && $desc['prd_code'] == $timetable[$x]['periodNumber'] && $desc['day_code'] == $y) {
                     $timetable[$x]['day'][$y]['periodOn'] = 1;
                     $timetable[$x]['day'][$y]['description'] = $desc['sub_desc'];
-                    $timetable[$x]['day'][$y]['code'] = trim(
-                        $desc['year_grp'] . '-' . $desc['sub_code'] . '-' . $desc['class']
-                    );
+                    $timetable[$x]['day'][$y]['code'] = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
                     $timetable[$x]['day'][$y]['room'] = $desc['room_code'];
                     $timetable[$x]['day'][$y]['staffCode'] = $desc['tch_code'];
 
