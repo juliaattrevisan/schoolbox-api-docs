@@ -82,6 +82,14 @@ class Factory {
 	private $updateWindow = 21600; // 60 * 60 * 6 seconds = 6 hours
 
 	/**
+	 * A list of 'errors' which help translate non-numeric values for
+	 * Absent, Submitted, Not Submitted etc. into numeric ones
+	 *
+	 * @var array
+	 */
+	private $errors = array();
+
+	/**
 	 * Constructor
 	 *
 	 * $user is the person who submitted the item for marking
@@ -108,7 +116,29 @@ class Factory {
 		 */
 		$this->setReturnedWorkMapper(new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper());
 
+		/* Sometimes you don't submit numeric values - this mainly consists
+		 * of possibilities like Absent, Not Submitted, etc. These cause an error
+		 * due to an assumed number formatting in Marksheet/Abstract
+		 *
+		 * This translates the non-numeric values into numeric ones
+		 *
+		 * Adapted from the old returnWork.php in ajaxUpdate
+		 */
 		$this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug()));
+
+		// retrieve error codes
+		$allErrors = \DueWork_ErrorMapper::getInstance()->findAll();
+
+		// make associative by label (since that's what's being transmitted)
+		/* @var DueWork_Error[] $errors */
+		$errors = array();
+
+		foreach($allErrors as $currentError) {
+			/* @var $e DueWork_Error */
+			$errors[$currentError->getDisplayAs()] = $currentError;
+		}
+
+		$this->setErrors($errors);
 	}
 
 	/**
@@ -198,7 +228,7 @@ class Factory {
 				$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			}
 			/* Spawn a new returned work record, so pump in a returned date
-			 * and all the ownsership stuff
+			 * and all the ownership stuff
 			 */
 			else {
 				$returnedWork = $this->spawnNewReturnedWork();
@@ -236,25 +266,39 @@ class Factory {
 	private function processReturnedWork() {
 		$returnedWork = $this->retrieveReturnedWorkRecord();
 
-		/* Normalise - rubrics do it in a whole different way
+		/* Empty mark (not zero) - treat as null
 		 */
-		if ($this->getSubmissionBox()->isRubric()) {
-			$normalisePayload = $this->getRubric();
+		if (trim($this->getMark()) === '') {
+			$returnedWork->setMark(null);
+			$returnedWork->setNormalizedMark(null);
 		}
-		else {
-			$normalisePayload = $this->getMark();
+		/* A string mark was submitted (Absent, Not Submitted, etc)
+		 */
+		elseif (isset($errors[$this->getMark()])) {
+			$returnedWork->setMark($errors[$this->getMark()]->getDisplayAs());
+			$returnedWork->setNormalisedMark($errors[$this->getMark()]->getNormaliseAs());
 		}
+		/* If it's a rubric, it normalises in a special way
+		 */
+		else if ($this->getSubmissionBox()->isRubric()) {
+			$normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getRubric(), $this->getSubmissionBox());
 
-		/* Fire.
+			$returnedWork->setMark($this->getMark());
+			$returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
+		}
+		/* Just do it in the normal way
 		 */
-		$normalisedMarkArray = $this->getMarksheet()->normaliseMark($normalisePayload, $this->getSubmissionBox());
+		else {
+			$normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark(), $this->getSubmissionBox());
+
+			$returnedWork->setMark($this->getMark());
+			$returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
+		}
 
 		/* Update the existing Returned Work record with new data
 		 */
-		$returnedWork->setMark($this->getMark());
 		$returnedWork->setComment($this->getComment());
 		$returnedWork->setMarker($_SESSION['user']->getId());
-		$returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
 
 		return $returnedWork;
 	}
@@ -467,5 +511,23 @@ class Factory {
 	 */
 	private function getRubric() {
 		return $this->rubric;
+	}
+
+	/**
+	 * Set errors
+	 *
+	 * @param array $errors
+	 */
+	private function setErrors($errors) {
+		$this->errors = $errors;
+	}
+
+	/**
+	 * Get errors
+	 *
+	 * @return array
+	 */
+	private function getErrors() {
+		return $this->errors;
 	}
 }
