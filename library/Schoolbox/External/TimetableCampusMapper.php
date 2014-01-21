@@ -87,6 +87,7 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
         $cycle_mapper  = $this->getJoinMapper('cycle');
         /** @var Schoolbox\CampusMapper $cycle_mapper */
         $campus_mapper = $this->getJoinMapper('campus');
+        // Find first timetable whose end is after $date.
         $query = "
             SELECT
                 {$this->getColumnString('tc')},
@@ -95,7 +96,8 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
             FROM `{$this->getTable()}` `tc`
             INNER JOIN {$this->getJoinSql('cycle',  'tc', 'ty')}
             INNER JOIN {$this->getJoinSql('campus', 'tc', 'ca')}
-            WHERE `tc`.`start` <= :date AND `tc`.`finish` >= :date AND `tc`.`campus_id` = :campus
+            WHERE `tc`.`finish` >= :date AND `tc`.`campus_id` = :campus
+            ORDER BY `tc`.`finish` ASC
         ";
         $statement = $this->database->prepare($query);
 
