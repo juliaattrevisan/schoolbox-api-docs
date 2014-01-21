@@ -21,6 +21,8 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\ClassInvolvement;
+use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
@@ -120,16 +122,15 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                 $class->setCode($new_item['class']);
                 ClassEntryMapper::getInstance()->save($class);
             }
-
-            //$this->verbose_filter->outputSkipMessage($class_message.', because it was not found');
-            //$this->verbose_filter->incrementSkipped();
-            //return 0;
         }
 
-        // First delete all classes for this cycle and campus.
+        $classInvolvements = array();
+
+        // First delete all classes and involvements for this cycle and campus.
         // Then restore them.
         $timetable_message = count($new_item['period_list']).' period(s) for '.$class_message;
         if ($this->perform_update) {
+            ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STAFF_GROUP_TYPE);
             $this->verbose_filter->outputPerformUpdateMessage($timetable_message);
             foreach ($new_item['period_list'] as $period) {
                 $class_period = new ClassPeriod();
@@ -142,6 +143,28 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                     )
                 );
 
+                // Get teacher for this class, and set it into class involvement
+                // and period.
+                $teacher = null;
+                try {
+                    $teacher = UserMapper::getInstance()->findOneByColumn(
+                        'synergy_id', $period['teacher']
+                    );
+                    $class_period->setTeacher($teacher);
+                }
+                catch (Exception $e) {
+                    $this->verbose_filter->outputMessage(
+                        sprintf('Teacher "%s" not found for class "%s".', $period['teacher'], $class->getCode())
+                    );
+                    continue;
+                }
+
+                if (!array_key_exists($classInvolvements, $teacher->getId())) {
+                    $classInvolvement = new ClassInvolvement();
+                    $classInvolvement->setClass($class)->setUser($teacher);
+                    $classInvolvements[$teacher->getId()] = $classInvolvement;
+                }
+
                 foreach ($period_list as $period_object) {
                     ClassPeriodMapper::getInstance()->deleteForClassAndPeriod($class, $period_object);
                     $class_period
@@ -150,25 +173,17 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                         ->setRoom($period['room'])
                     ;
                     // Attach teacher
-                    $teacher = null;
-                    try {
-                        $teacher = UserMapper::getInstance()->findOneByColumn(
-                            'synergy_id', $period['teacher']
-                        );
-                        $class_period->setTeacher($teacher);
-                    }
-                    catch (Exception $e) {
-                        $this->verbose_filter->outputMessage(
-                            sprintf('Teacher "%s" not found for class "%s".', $period['teacher'], $class->getCode())
-                        );
-                    }
-//                    if($new_item['class'] == 'Duty.Library'){
-////                        print_R($class_period);
-//                    }
+                    $class_period->setTeacher($teacher);
                     ClassPeriodMapper::getInstance()->save($class_period);
                     // Break because we only want one row per period.
                     break;
                 }
+            }
+
+            // Save any class involvements
+            if (!empty($classInvolvements)) {
+                $this->verbose_filter->outputPerformLinkMessage(count($classInvolvements).' teacher(s) to '.$class_message);
+                ClassInvolvementMapper::getInstance()->save($classInvolvements);
             }
         }
         else {
