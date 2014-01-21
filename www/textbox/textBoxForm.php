@@ -60,5 +60,5 @@ else if (is_numeric($_GET['delete'])) {
 
 	$textBoxHandler->delete($_GET['delete']);
 
-	SitePage::localRedir('/homepage/' . $textBox['originID']);
+	SitePage::localRedir('/homepage/' . $_GET['originID']);
 }
