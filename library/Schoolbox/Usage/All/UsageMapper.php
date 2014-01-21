@@ -45,7 +45,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 		return array(
 			'Used' => $used,
-			'Available' => disk_total_space(\Cfg::get('file_dir')) - $used
+			'Available' => $free,
 		);
 	}
 
