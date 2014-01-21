@@ -51,9 +51,7 @@ $returnedWork = $returnedWorkFactory->start();
 
 /* An array of crocodoc-specific controls
  array(
-	'isCrocodoc' => true
 	'submissionId' => ...
-	'nextUrl' => ...
  );
 
  */
