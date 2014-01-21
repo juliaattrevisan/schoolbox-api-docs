@@ -68,6 +68,7 @@ class UserProfile extends SubjectListAbstract {
 		 */
 		foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
 			$emailAll = array();
+            $emailObj = new \Email();
 
 			$this->getPage()->setVar(array(
 				'SUBJECT_CLASSTYPE' => $key
@@ -108,7 +109,7 @@ class UserProfile extends SubjectListAbstract {
 								if (is_array($teacher)) {
 									$teacherName = $this->getUserHandler()->formatName($teacher);
 
-									$emailObj = new \Email();
+
 									$emailAddress = $emailObj->formatEmailFromArray($teacher);
 									$emailAll[] = $emailAddress;
 

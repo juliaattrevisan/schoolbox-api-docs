@@ -148,7 +148,7 @@ class External_Tass_User implements External_UserInterface {
 				$subject['year_grp'] = '';
             }
 
-			$subjectList[] = array('code'=>trim($subject['year_grp'].'-'.$subject['sub_code'].'-'.$subject['class']), 'name'=>$subject['class']);
+			$subjectList[] = array('code'=>trim($subject['year_grp'].'-'.trim($subject['sub_code']).'-'.$subject['class']), 'name'=>$subject['class']);
 		}
 
 		if(is_array($subjectList))
