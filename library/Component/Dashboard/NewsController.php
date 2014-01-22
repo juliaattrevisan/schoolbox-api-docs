@@ -141,7 +141,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 $url = new Url($topic);
 
                 $output = array(
-                    'NEWS_TOPIC' => Scrub::text($topic),
+                    'NEWS_TOPIC'  => $topic,
                     'TOPIC_CLEAN' => $url->getSlug(),
                 );
                 $this->setVar($output);
