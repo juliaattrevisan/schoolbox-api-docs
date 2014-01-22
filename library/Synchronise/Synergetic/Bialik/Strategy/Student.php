@@ -46,7 +46,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Student extends Synchronise_Synerge
 		$newUser['alt_email'] = $newUser['username'].'@students.bialik.vic.edu.au';
 		$newUser['synergy_id'] = $currentUser['StudentID'];
 		$newUser['local_email'] = 0;
-		$newUser['webmail'] = 1;
+		$newUser['webmail'] = 0;
 
 		/* Year level
 		 */
