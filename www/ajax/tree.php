@@ -30,7 +30,7 @@ if (is_numeric($_POST['relationID'])) {
 				if($category['code'] != '' && $category['code'] != $category['name'])
 					$name .= ' ('.Scrub::text($category['code']).')';
 
-				$category['name'] = $name;
+				$category['name'] = TextFormatter::cutString($name, 32);
 
 				$output[] = $category;
 			}

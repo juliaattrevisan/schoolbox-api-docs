@@ -144,6 +144,9 @@ if (is_array($categoryList)) {
 			if ($category['code'] != '' && $category['code'] != $category['name']) {
 				$name .= ' (' . Scrub::text($category['code']) . ')';
 			}
+			// This is duplicated in ajax/tree.php - wouldn't it be nice to have
+			// it not be duplicated?
+			$name = TextFormatter::cutString($name, 32);
 
 			$output = array(
 				'CATEGORY_ID' => $category['id'],
