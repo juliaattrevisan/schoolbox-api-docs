@@ -3,12 +3,37 @@
 <script type="text/javascript">
 	var date1 = new Date;
 </script>
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
 $j(function() {
+
+    $j('#test-tree').jstree({
+        animation: 50,
+        core: {
+            data: {
+                url: '/ajax/jstree.php',
+                data: function(node) {
+                    // how far would you like to expand?
+                    return { parent: node.id }
+                }
+            },
+            multiple: false,
+            check_callback: true,
+            themes: {
+                dots: true,
+                icons: true
+            }
+        },
+        plugins : ["dnd", 'state'],
+        dnd: {
+            copy: false
+        }
+    });
 
   var relationID = '{OPEN}';
 
@@ -575,3 +600,4 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
   </div>
 </div>
 
+<div id="test-tree" style="clear:both"></div>
