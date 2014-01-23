@@ -82,14 +82,13 @@ class Healthcheck {
         $list[] = 'luAbsenceType';
         $list[] = 'luBuilding';
         $list[] = 'luDepartment';
-		$list[] = 'luFileType';
+        $list[] = 'luFileType';
         $list[] = 'luForm';
         $list[] = 'luHouse';
         $list[] = 'luTutor';
         $list[] = 'luYearLevel';
         $list[] = 'Relationships';
         $list[] = 'StudentClasses';
-        $list[] = 'Students';
         $list[] = 'SubjectClasses';
         $list[] = 'SubjectClassStaff';
         $list[] = 'tAttendances';
