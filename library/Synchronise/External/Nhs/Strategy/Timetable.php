@@ -159,7 +159,7 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                     continue;
                 }
 
-                if (!array_key_exists($classInvolvements, $teacher->getId())) {
+                if (!array_key_exists($teacher->getId(), $classInvolvements)) {
                     $classInvolvement = new ClassInvolvement();
                     $classInvolvement->setClass($class)->setUser($teacher);
                     $classInvolvements[$teacher->getId()] = $classInvolvement;
