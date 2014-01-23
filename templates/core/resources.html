@@ -12,13 +12,46 @@
 <script type="text/javascript">
 $j(function() {
 
-    $j('#test-tree').jstree({
+    // Select a node: update the second and third panels.
+    $j('#test-tree')
+        .on('select_node.jstree', function(event, jstree) {
+            $j(this).trigger('selectFolder.threepanel', {folderId: jstree.selected[0]})
+        })
+        .on('selectFolder.threepanel', function(event, params) {
+            // update 2nd panel
+            $j.ajax(
+                '/ajax/file.php', {
+                    type: 'POST',
+                    data: {categoryID: params.folderId},
+                    dataType: 'json'
+                }
+            )
+            .then(function(data) {
+                var files = $j('#test-tree-files').empty();
+                $j.each(data, function(i,v) {
+                    files.append($j('<li />').text(v.description));
+                })
+            })
+
+            // update 3rd panel
+            $j.ajax(
+                '/ajax/resource/meta.php', {
+                    type: 'POST',
+                    data: {folderId: params.folderId},
+                    dataType: 'json'
+                }
+            )
+            .then(function(data) {
+                $j('#test-tree-meta').text(data.name);
+            })
+        })
+        .jstree({
         animation: 50,
         core: {
             data: {
                 url: '/ajax/jstree.php',
+                    type: 'GET',
                 data: function(node) {
-                    // how far would you like to expand?
                     return { parent: node.id }
                 }
             },
@@ -601,3 +634,5 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
 </div>
 
 <div id="test-tree" style="clear:both"></div>
+<h3 id="test-tree-meta"></h3>
+<ul id="test-tree-files"></ul>
