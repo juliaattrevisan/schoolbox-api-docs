@@ -32,6 +32,7 @@ class Synchronise_Base_Hydrator_Default implements Synchronise_Base_IHydrator {
         $newUser['synergy_id']           = '';
         $newUser['alt_email']            = null;
         $newUser['local_email']          = 0;
+        $newUser['webmail']              = null;
         $newUser['year']                 = null;
         $newUser['defaultCampus']        = self::DEFAULT_CAMPUS;
         $newUser['campus']               = array(self::DEFAULT_CAMPUS);
