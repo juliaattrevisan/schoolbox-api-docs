@@ -366,7 +366,7 @@ abstract class Synchronise_Base_Strategy {
 	 * @return bool
 	 */
 	public function getIsSuperuserFromUser($currentUser) {
-		return false;
+		return null;
 	}
 
 	/**
@@ -399,7 +399,7 @@ abstract class Synchronise_Base_Strategy {
 	 * @return bool
 	 */
 	public function getEportfolioEnabledFromUser($currentUser) {
-		return true;
+		return null;
 	}
 
 	/**
@@ -449,8 +449,8 @@ abstract class Synchronise_Base_Strategy {
 		$newUser['house']                = $this->getHouseFromUser($external_user);
 		$newUser['residential_house_id'] = $this->getResidentialHouseFromUser($external_user);
 		$newUser['eportfolio_enabled']   = $this->getEportfolioEnabledFromUser($external_user);
-		$newUser['webmail']				 = $this->getWebmailFromUser($external_user);
-		$newUser['mail_handler']		 = $this->getExternalMailFromUser($external_user);
+		$newUser['webmail']              = $this->getWebmailFromUser($external_user);
+		$newUser['mail_handler']         = $this->getExternalMailFromUser($external_user);
 		return $this->clearFields($newUser);
 	}
 
