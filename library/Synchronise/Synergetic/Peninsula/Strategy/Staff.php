@@ -13,11 +13,16 @@
 class Synchronise_Synergetic_Peninsula_Strategy_Staff extends Synchronise_Base_Strategy_Staff {
     protected $title = "Update Schoolbox Staff Details Synchronisation";
 
+    protected $campusList = array();
+
     /**
      * Setup verbose output
      */
     protected function setup() {
         $this->verbose_filter = new Synchronise_Synergetic_Peninsula_Verbose();
+        foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
+            $this->campusList[] = $campus->getId();
+        }
     }
 
     /**
@@ -49,6 +54,16 @@ class Synchronise_Synergetic_Peninsula_Strategy_Staff extends Synchronise_Base_S
                 break;
         }
         return 1;
+    }
+
+    /**
+     * Just add staff members to all campuses.
+     *
+     * @param  array $currentUser
+     * @return array
+     */
+    public function getCampusListFromUser($currentUser) {
+        return $this->campusList;
     }
 
     /**
