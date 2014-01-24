@@ -31,13 +31,13 @@ class CalendarEventMapper extends Schoolbox\External\Mapper {
 		$this->hasMap(array(
 			'column' => 'owner',
 			'property' => 'owner',
-			'type' => self::TYPE_INTEGER,
+			'type' => self::TYPE_MODEL,
 			'join' => 'owner',
 		));
 		$this->hasMap(array(
 			'column' => 'author_id',
 			'property' => 'author',
-			'type' => self::TYPE_INTEGER,
+			'type' => self::TYPE_MODEL,
 			'join' => 'author',
 		));
 		$this->hasMap(array(
@@ -117,8 +117,52 @@ class CalendarEventMapper extends Schoolbox\External\Mapper {
 		));
 		$this->hasJoin('author', array(
 			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'author',
+			'this_key'  => 'author_id',
 			'other_key' => 'id',
 		));
+
+		parent::mapping();
+	}
+
+	/**
+	 * Custom findById
+	 *
+	 * @param mixed $identifier
+	 * @return object|Model
+	 * @throws \Exception
+	 */
+	public function findById($identifier) {
+		$ownerMapper = $this->getJoinMapper('owner');
+		$authorMapper = $this->getJoinMapper('author');
+
+		$query = "
+			SELECT
+				{$this->getColumnString('e')},
+				{$ownerMapper->getColumnString('o')},
+				{$authorMapper->getColumnString('a')}
+			FROM `{$this->table}` e
+			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
+			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+			WHERE e.id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $identifier);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		if ($row != false) {
+			$ownerItem = $ownerMapper->hydrate($row, 'o');
+			$authorItem = $authorMapper->hydrate($row, 'a');
+
+			$eventItem = $this->hydrate($row, 'e');
+			$eventItem->setOwner($ownerItem);
+			$eventItem->setAuthor($authorItem);
+
+			return $eventItem;
+		}
+
+		throw new \Exception('Instance of object not found');
 	}
 }

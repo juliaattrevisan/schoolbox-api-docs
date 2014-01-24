@@ -8,6 +8,6 @@
  * @version     SVN: $Id$
  */
 $mapper = new \EOTC\CalendarEventMapper();
-$event = $mapper->findById(1);
+$event = $mapper->findById(2391);
 
 new \Alaress_Probe($event);
