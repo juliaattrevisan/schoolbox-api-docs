@@ -50,16 +50,6 @@ class Synchronise_Synergetic_Tintern_Strategy_Student extends Synchronise_Base_S
 		return 0;
 	}
 
-	/**
-	 * Eportfolio Enabled setting
-	 *
-	 * @param array $currentUser
-	 * @return bool|int
-	 */
-	public function getEportfolioEnabledFromUser($currentUser) {
-		return 0;
-	}
-
     /**
      * Gets campus according to the following map:
 	 *

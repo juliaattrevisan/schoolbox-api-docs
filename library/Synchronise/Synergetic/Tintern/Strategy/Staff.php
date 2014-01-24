@@ -113,14 +113,4 @@ class Synchronise_Synergetic_Tintern_Strategy_Staff extends Synchronise_Base_Str
 	public function getExternalMailFromUser($currentUser) {
 		return 0;
 	}
-
-	/**
-	 * Eportfolio Enabled setting
-	 *
-	 * @param array $currentUser
-	 * @return bool|int
-	 */
-	public function getEportfolioEnabledFromUser($currentUser) {
-		return 0;
-	}
 }
