@@ -79,16 +79,6 @@ class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_St
 	}
 
 	/**
-	 * Eportfolio is disabled (for now)
-	 *
-	 * @param  array $currentUser
-	 * @return bool
-	 */
-	public function getEportfolioEnabledFromUser($currentUser) {
-		return false;
-	}
-
-	/**
 	 * St. Kevins staff have local email on.
 	 *
 	 * @param array $currentUser

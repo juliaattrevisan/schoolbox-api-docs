@@ -90,16 +90,6 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
 		return 0;
 	}
 
-	/**
-	 * Eportfolio Enabled setting
-	 *
-	 * @param array $currentUser
-	 * @return bool|int
-	 */
-	public function getEportfolioEnabledFromUser($currentUser) {
-		return 0;
-	}
-
     /**
      * Set default parent group
      * @param array $currentUser

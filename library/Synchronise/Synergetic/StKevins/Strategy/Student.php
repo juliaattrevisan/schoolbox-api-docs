@@ -107,14 +107,4 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 		}
 		return $group;
 	}
-
-	/**
-	 * St. Kevins doesn't currently enable eportfolio for students.
-	 *
-	 * @param  array $currentUser
-	 * @return bool
-	 */
-	public function getEportfolioEnabledFromUser($currentUser) {
-		return false;
-	}
 }
