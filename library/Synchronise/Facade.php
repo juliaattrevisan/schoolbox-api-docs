@@ -105,13 +105,14 @@ class Synchronise_Facade {
             }
         }
     }
-
-    private function lookupSynergeticTimetableCodes() {
+ 
+    private function lookupSynergeticTimetableDefinition() {
         $db = new MSSQL();
-        $codes = $db->getAll("SELECT DISTINCT ( TimetableGroup ) FROM Timetable WHERE FileYear='".date('Y')."'");
-        echo "Timetable Codes in Synergetic (Current Year)\n";
+        $codes = $db->getAll("SELECT * FROM luTimetableGroup");
+        echo "Timetable Definition in Synergetic\n";
+        echo "  Code\tCycle\tPeriods\tActive\tDescription\n";
         foreach ($codes as $c) {
-            echo "  '" . $c['TimetableGroup'] . "'\n";
+            echo "  '" . $c['Code'] ."'\t'" . $c['CycleDays'] . "'\t'" . $c['Periods'] . "'\t'" . $c['ActiveFlag'] . "'\t'" . $c['Description'] . "'\n";
         }
     }
     
