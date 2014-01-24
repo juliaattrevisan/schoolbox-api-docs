@@ -152,14 +152,29 @@ class CalendarEventMapper extends Schoolbox\External\Mapper {
 
 		$row = $statement->fetch();
 
+		/* Hydrate or die
+		 */
 		if ($row != false) {
-			$ownerItem = $ownerMapper->hydrate($row, 'o');
-			$authorItem = $authorMapper->hydrate($row, 'a');
-
 			$eventItem = $this->hydrate($row, 'e');
+
+			/* Owner
+			 */
+			$ownerItem = $ownerMapper->hydrate($row, 'o');
 			$eventItem->setOwner($ownerItem);
+
+			/* Author
+			 */
+			$authorItem = $authorMapper->hydrate($row, 'a');
 			$eventItem->setAuthor($authorItem);
 
+			/* Convert dates ;(
+			 */
+			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+			$eventItem->setStartDateTime($startDateTime);
+
+			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
+			$eventItem->setEndDateTime($endDateTime);
+			
 			return $eventItem;
 		}
 
