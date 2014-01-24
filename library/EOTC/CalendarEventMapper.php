@@ -120,8 +120,6 @@ class CalendarEventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'author_id',
 			'other_key' => 'id',
 		));
-
-		parent::mapping();
 	}
 
 	/**
