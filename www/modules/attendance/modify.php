@@ -75,9 +75,9 @@ if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
  */
 $groupHandler = new Group();
 
-if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode'])) && !$groupHandler->isSuperuser()) {
+/*if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode'])) && !$groupHandler->isSuperuser()) {
 	error(19);
-}
+}*/
 
 /* Attendance Period
  */
@@ -90,7 +90,7 @@ if ($class) {
 	/* Get the attendance record for this class
 	 */
 	$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
-	$attendanceHandler->findAttendanceRecords();
+//	$attendanceHandler->findAttendanceRecords();
 
 	/* If the roll has been marked before, just show the students that were originally
 	 * in that roll. Otherwise load all the students in the class.
@@ -98,12 +98,12 @@ if ($class) {
 	 * Students could be added to a class and could unexpectedly make an
 	 * appearance in history if you don't do this.
 	 */
-	if ($attendanceHandler->getAttendanceMaster()->hasAttendanceMasterSeq()) {
-		$allStudents = $attendanceHandler->getStudents($attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq());
-	}
-	else {
-		$allStudents = $externalClass->getStudents($class['ClassCode']);
-	}
+//	if ($attendanceHandler->getAttendanceMaster()->hasAttendanceMasterSeq()) {
+//		$allStudents = $attendanceHandler->getStudents($attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq());
+//	}
+//	else {
+//		$allStudents = $externalClass->getStudents($class['ClassCode']);
+//	}
 
 	/* Dish out each row
 	 */

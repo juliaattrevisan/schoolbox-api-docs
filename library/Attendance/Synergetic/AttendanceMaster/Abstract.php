@@ -161,29 +161,28 @@ abstract class Attendance_Synergetic_AttendanceMaster_Abstract {
 	 */
 	public function setupWork() {
 		$data = $this->getData();
+        $value =    array(
+            array('@FileType', $data['FileType'], SQLVARCHAR),
+            array('@FileYear', $data['FileYear'], SQLINT4 ),
+            array('@FileSemester', $data['FileSemester'], SQLINT4 ),
+            array('@ClassCampus', $data['ClassCampus'], SQLVARCHAR ),
+            array('@ClassCode', $data['ClassCode'], SQLVARCHAR ),
+            array('@AttendanceDate', $data['AttendanceDate'], SQLVARCHAR ),
+            array('@AttendancePeriod', $data['AttendancePeriod'], SQLINT4),
+            array('@AttendanceDayNumber', $data['AttendanceDayNumber'], SQLINT4 ),
+            array('@StaffID', $data['StaffID'], SQLINT4 ),
+            array('@AttendedFlag', 1, SQLINT4),
+            array('@TimeTableGroup', $data['TimetableGroup'], SQLVARCHAR),
+            array('@SynWebFlag', 1, SQLINT4),
+            array('@wkAttendanceMasterSeq', $var, SQLINT4, true, true, -1 ),
+        );
 
-$value =    array(
-    array('@FileType', $data['FileType'], SQLVARCHAR),
-    array('@FileYear', $data['FileYear'], SQLINT4 ),
-    array('@FileSemester', $data['FileSemester'], SQLINT4 ),
-    array('@ClassCampus', $data['ClassCampus'], SQLVARCHAR ),
-    array('@ClassCode', $data['ClassCode'], SQLVARCHAR ),
-    array('@AttendanceDate', $data['AttendanceDate'], SQLVARCHAR ),
-    array('@AttendancePeriod', $data['AttendancePeriod'], SQLINT4),
-    array('@AttendanceDayNumber', $data['AttendanceDayNumber'], SQLINT4 ),
-    array('@StaffID', $data['StaffID'], SQLINT4 ),
-    array('@AttendedFlag', 1, SQLINT4),
-    array('@TimeTableGroup', $data['TimetableGroup'], SQLVARCHAR),
-    array('@SynWebFlag', 1, SQLINT4),
-    array('@wkAttendanceMasterSeq', 'day', SQLINT4, true, ),
-);
+
 
         $result = $this->getDatabase()->executeProcedure(
                        'spiwkAttendances', $value
 
         );
-        print_r($value);
-        print_r($result);
 
         if ($result['success'] && isset($result['output']['@wkAttendanceMasterSeq'])) {
             $this->setAttendanceMasterSeq( $result['output']['@wkAttendanceMasterSeq']);
@@ -192,13 +191,12 @@ $value =    array(
             print_r($result);
         }
 
-
-        $result = $this->getDatabase()->executeProcedure(
-                       'spswkAttendances_ws', array(
-                               array('@wkAttendanceMasterSeq', 514, SQLINT4 ),
-                               array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
-                               array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
-                           )
+       $result = $this->getDatabase()->executeProcedure(
+                   'spswkAttendances_ws', array(
+                           array('@wkAttendanceMasterSeq', $this->getAttendanceMasterSeq(), SQLINT4 ),
+                           array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
+                           array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
+                       )
         );
 
         print_r($result);
