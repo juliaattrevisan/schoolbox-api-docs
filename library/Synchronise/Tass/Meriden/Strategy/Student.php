@@ -23,6 +23,7 @@ class Synchronise_Tass_Meriden_Strategy_Student extends Synchronise_Base_Strateg
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Campus())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Group_Student())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Username_Student())
+            ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }
