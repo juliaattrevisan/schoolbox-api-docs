@@ -95,8 +95,7 @@ abstract class Synchronise_Base_Strategy {
 	 * this school.
 	 *
 	 * @param  Synchronise_Base_IHydrator $hydrator
-	 *
-*@return $this
+	 * @return $this
 	 */
 	protected function addHydrator(Synchronise_Base_IHydrator $hydrator) {
 		$this->hydratorList[] = $hydrator;
