@@ -13,9 +13,12 @@ interface Synchronise_Base_IHydrator {
     const DEFAULT_STAFF_GROUP   = 2;
     const DEFAULT_STUDENT_GROUP = 3;
     const DEFAULT_PARENT_GROUP  = 4;
+
     /**
      * Converts data from the format from external database to the format used
      * in Schoolbox.
+     *
+     * This method should modify and return $newUser.
      *
      * @param  array $externalUser A result from the external database.
      * @param  array $newUser      The current result that will be inserted into
@@ -23,7 +26,7 @@ interface Synchronise_Base_IHydrator {
      *                             This result could have come from a hydrate()
      *                             call on another class that implements this
      *                             interface.
-     * @return array
+     * @return array The result to insert into Schoolbox,
      */
     public function hydrate($externalUser, $newUser);
 }
