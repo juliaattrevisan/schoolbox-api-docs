@@ -66,6 +66,13 @@ class Database {
         return self::$instance;
     }
 
+	/**
+	 * Explicitly dis- and re-connect the singleton database connection
+	 */
+	static public function reinitialise() {
+		self::$instance->reconnect(null);
+	}
+
     /**
      * Establishes the database connection
      *
@@ -89,10 +96,11 @@ class Database {
         /* Create PDO connection */
         try {
             $this->connection = new PDO($dsn, $username, $password, array(
-                PDO::ATTR_PERSISTENT => empty($options['debug']),
+                PDO::ATTR_PERSISTENT => false,
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	        $this->connection->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('DatabaseStatement', array()));
         } catch (PDOException $exception) {
 	        if($options['throw']) {
 		        throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);
@@ -122,6 +130,7 @@ class Database {
 		}
 
 		// try to call some sort of PDO destructor
+		$this->connection = null;
 		unset($this->connection);
 		return $this->connect($this->dsn, $this->username, $this->password, $this->options);
 	}
@@ -147,9 +156,14 @@ class Database {
      * @return Integer
      */
     public function exec($statement) {
-
-        return $this->connection->exec($statement);
-
+		try {
+			return $this->connection->exec($statement);
+		}
+		catch(PDOException $e) {
+			$this->reconnect($e);
+			// this is safe to reattempt, because reconnect() will re-throw $e for anything other than connection loss
+			return $this->connection->exec($statement);
+		}
     }
 
     /**
@@ -161,8 +175,13 @@ class Database {
      * @return PDOStatement
      */
     public function prepare($statement, $driverOptions = array()) {
-
-        return $this->connection->prepare($statement, $driverOptions);
+		try {
+			return $this->connection->prepare($statement, $driverOptions);
+		}
+		catch(PDOException $e) {
+			$this->reconnect($e);
+			return $this->connection->prepare($statement, $driverOptions);
+		}
 
     }
 
@@ -175,9 +194,14 @@ class Database {
      * @return PDOStatement
      */
     public function query($statement) {
-
-        return $this->connection->query($statement);
-
+		try {
+			return $this->connection->query($statement);
+		}
+		catch(PDOException $e) {
+			$this->reconnect($e);
+			// this is safe to reattempt, because reconnect() will re-throw $e for anything other than connection loss
+			return $this->connection->query($statement);
+		}
     }
 
     /**
@@ -188,7 +212,13 @@ class Database {
      * @return string
      */
     public function quote($string, $parameter_type = PDO::PARAM_STR) {
-        return $this->connection->quote($string, $parameter_type);
+	    try {
+		    return $this->connection->quote($string, $parameter_type);
+	    }
+	    catch(PDOException $e) {
+		    $this->reconnect($e);
+		    return $this->connection->quote($string, $parameter_type);
+	    }
     }
 
     /**
@@ -253,9 +283,13 @@ class Database {
      * @return String
      */
     public function lastInsertId($name = null) {
-
-        return $this->connection->lastInsertId($name);
-
+		try {
+			return $this->connection->lastInsertId($name);
+		}
+		catch(PDOException $e) {
+			$this->reconnect($e);
+			return $this->connection->lastInsertId($name);
+		}
     }
 
     /**
@@ -264,7 +298,13 @@ class Database {
      * @return bool true on success or false on failure.
      */
     public function beginTransaction() {
-        return $this->connection->beginTransaction();
+	    try {
+		    return $this->connection->beginTransaction();
+	    }
+	    catch(PDOException $e) {
+		    $this->reconnect($e);
+		    return $this->connection->beginTransaction();
+	    }
     }
 
     /**

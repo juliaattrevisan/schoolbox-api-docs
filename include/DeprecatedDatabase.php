@@ -58,7 +58,19 @@ static public function getInstance() {
         return self::$instance;
 }
 
-/* Estabilishes a connection to the database */
+static public function reinitialise() {
+	self::$instance->reconnect();
+}
+
+function reconnect()
+{
+	$closure = mysql_close($this->dbf);
+	unset($this->dbf);
+	$this->connect();
+	return $closure;
+}
+
+	/* Estabilishes a connection to the database */
 function connect()
 {
 	if(!isset($this->dbf)) {
