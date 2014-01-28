@@ -4,11 +4,11 @@
 	 *
 	 * @param options
 	 */
-	$j.fn.eventModify = function(options) {
+	$.fn.eventModify = function(options) {
 
 		/* Optional parameter
 		 */
-		options = options | {}
+		options = options || {}
 
 		/* Store the config in this instance so private methods
 		 * can access it
@@ -43,6 +43,11 @@
 		setupSelectAll();
 		setupOptionVariance();
 
+		/* Form validator
+		 */
+		setupFormActions();
+		setupEventValidation();
+
 		/**
 		 * Initialise various configured params and determine a bunch
 		 * of ids and stuff that we'll probably use elsewhere
@@ -53,7 +58,8 @@
 		 */
 		function init(options, element) {
 			var defaults = {
-				element: element
+				element: element,
+				functionLabel: ''
 			}
 
 			var derived = {
@@ -78,7 +84,7 @@
 					buttonImageOnly: true,
 					constrainInput: false,
 					onClose: function(string) {
-						$j.getJSON('/ajax/strtotime.php', {string: string}, function(data) {
+						$.getJSON('/ajax/strtotime.php', {string: string}, function(data) {
 							$(element).val(data.time);
 						});
 					}
@@ -144,11 +150,11 @@
 
 				/* Alternate between button texts
 				 */
-				$j(this).children('span').toggle();
+				$(this).children('span').toggle();
 
 				/* Alternate between option visibility
 				 */
-				$j('.advanced').toggle();
+				$('.advanced').toggle();
 			});
 		}
 
@@ -173,11 +179,11 @@
 		 */
 		function setupSelectAll() {
 			config.element.find('[data-selectall="true"]').change(function(){
-				if ($j(this).is(':checked')) {
-					$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+				if ($(this).is(':checked')) {
+					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
 				}
 				else {
-					$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
 				}
 			});
 		}
@@ -186,21 +192,21 @@
 		 * Set up checkbox styles upon click
 		 */
 		function setupCheckboxStyles() {
-			$j(':checkbox').each(function () {
-				if ($j(this).is(':checked')) {
-					$j(this).parent().addClass('active-checkbox');
+			$(':checkbox').each(function () {
+				if ($(this).is(':checked')) {
+					$(this).parent().addClass('active-checkbox');
 				}
 			});
 
-			$j(':checkbox').click(function () {
-				if ($j(this).parent().hasClass('active-checkbox')) {
-					$j(this).parent().removeClass('active-checkbox')
-					if($j(this).closest('.checkboxes').find('.select_all').is(':checked')){
-						$j(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+			$(':checkbox').click(function () {
+				if ($(this).parent().hasClass('active-checkbox')) {
+					$(this).parent().removeClass('active-checkbox')
+					if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
+						$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
 					}
 				}
 				else {
-					$j(this).parent().addClass('active-checkbox');
+					$(this).parent().addClass('active-checkbox');
 				}
 			});
 		}
@@ -210,7 +216,7 @@
 		 * available to you
 		 */
 		function setupOptionVariance() {
-			$('select[name=level]').change(function () {
+			$('select[name="level"]').change(function() {
 				$('#groupDrop, #campusList, #groupList, #attendance').hide();
 
 				/* Personal
@@ -241,15 +247,30 @@
 
 			/* Defaults, I guess
 			 */
-			if ($(this).val() == '1') {
+			if ($('select[name="level"]').val() == '1') {
 				$('#attendance input').prop('checked', false);
 			}
-			else if ($(this).val() == "2") {
+			else if ($('select[name="level"]').val() == "2") {
 				$('#groupDrop, #attendance').show()
 			}
-			else if ($(this).val() == "3") {
+			else if ($('select[name="level"]').val() == "3") {
 				$('#campusList, #groupList, #attendance').show()
 			}
+		}
+
+		/**
+		 * Apply button actions
+		 */
+		function setupFormActions() {
+			var key = '#b' + config.functionLabel;
+
+			$(key).click(function() {
+				$('#action').val(config.functionLabel);
+			});
+
+			$('#bDelete').click(function() {
+				$('#action').val('Delete');
+			});
 		}
 
 		/**
@@ -358,6 +379,7 @@
 						}
 						else {
 							// add
+							console.log(form);
 							form.submit();
 						}
 					}
