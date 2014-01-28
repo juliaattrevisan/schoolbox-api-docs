@@ -22,9 +22,13 @@ else {
 	$this->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
 
 	/* Miscellaneous setvarring
+	 * Hide advanced options by default
 	 */
 	$this->setVar(array(
 		'FUNCTION' => 'Add',
+		'SHOW_ADVANCED' => '',
+		'ADVANCED_SHOW' => '',
+		'ADVANCED_CLOSE' => 'hidden',
 	));
 
 	$this->setVar(array(
@@ -45,14 +49,6 @@ else {
 		'EVENT_ALLDAY_CHECKED' => '',
 		'EVENT_PUBLISH_DATE' => '',
 		'EVENT_LOCATION' => '',
-	));
-
-	/* Hide advanced options by default
-	 */
-	$this->setVar(array(
-		'SHOW_ADVANCED' => '',
-		'ADVANCED_SHOW' => '',
-		'ADVANCED_CLOSE' => 'hidden',
 	));
 
 	/* Event Types
