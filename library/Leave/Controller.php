@@ -221,6 +221,8 @@ class Leave_Controller extends Controller {
      */
     public function renderCreateRequest($data) {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
+        $this->getPage()->setBlock(TEMPLATE_content, 'student_selector', 'student_selector_block');
+        $this->getPage()->setBlock('student_selector', 'student_drop', 'student_drop_block');
         $this->getPage()->setBlock(
             'custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block'
         );
@@ -244,8 +246,14 @@ class Leave_Controller extends Controller {
             )
         );
 
-        /* Apply autocomplete if appropriate - staff can submit on someone else's behalf
+        /* Apply autocomplete if appropriate:
+           staff can submit on someone else's behalf
+           parents can submit on behalf of their students
+           Everyone else submits as themselves
            */
+        $this->getPage()->setVar('student_selector_block', '');
+        $this->getPage()->setVar('student_autocomplete_block', '');
+        $this->getPage()->setVar('student_autocomplete_javascript_block', '');
         if ($this->getGroup()->getPermission(null)) {
             $this->getPage()->setVar(
                 array(
@@ -255,11 +263,19 @@ class Leave_Controller extends Controller {
 
             $this->getPage()->parse('student_autocomplete_block', 'student_autocomplete');
             $this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
-        } /* Everyone else submits as themselves
-         */
-        else {
-            $this->getPage()->setVar('student_autocomplete_block', '');
-            $this->getPage()->setVar('student_autocomplete_javascript_block', '');
+        }
+        elseif ($this->getGroup()->isParent()) {
+            $this->getPage()->dropDown(
+                'student_drop',
+                $_SESSION['children'],
+                null,
+                'student_selector',
+                array(
+                    'name' => 'STUDENT_DROP_NAME',
+                    'id'   => 'STUDENT_DROP_VALUE',
+                )
+            );
+            $this->getPage()->parse('student_selector_block', 'student_selector');
         }
     }
 
@@ -1203,7 +1219,7 @@ class Leave_Controller extends Controller {
     /**
      * Set group handler
      *
-     * @param $group
+     * @param Group $group
      */
     private function setGroup($group) {
         $this->group = $group;
@@ -1212,7 +1228,7 @@ class Leave_Controller extends Controller {
     /**
      * Get group handler
      *
-     * @return mixed
+     * @return Group
      */
     private function getGroup() {
         return $this->group;
