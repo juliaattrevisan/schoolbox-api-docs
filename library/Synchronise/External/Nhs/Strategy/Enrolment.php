@@ -100,7 +100,7 @@ class Synchronise_External_Nhs_Strategy_Enrolment extends Synchronise_Base_Strat
         // Delete all old ones for this class, then put in the new ones.
         $enrolment_message = count($new_item['student_list']).' enrolment(s) for '.$class_message;
         if ($this->perform_update) {
-            ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STUDENT_GROUP_TYPE);
+            ClassInvolvementMapper::getInstance()->deleteInvolvementsForClass($class);
             $student_list = UserMapper::getInstance()->findIn('synergy_id', $new_item['student_list']);
             foreach ($student_list as $student) {
                 $class_involvement = new ClassInvolvement();

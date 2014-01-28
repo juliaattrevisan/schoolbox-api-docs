@@ -21,8 +21,6 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\ClassInvolvement;
-use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
@@ -130,18 +128,16 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
         // Then restore them.
         $timetable_message = count($new_item['period_list']).' period(s) for '.$class_message;
         if ($this->perform_update) {
-            ClassInvolvementMapper::getInstance()->deleteInvolvementsForClassAndGroupType($class, Group::STAFF_GROUP_TYPE);
             $this->verbose_filter->outputPerformUpdateMessage($timetable_message);
             foreach ($new_item['period_list'] as $period) {
                 $class_period = new ClassPeriod();
                 // Period: whatever the period for this cycle, day and sequence is
-                $period_list = TimetablePeriodMapper::getInstance()->findByColumnList(
-                    array(
-                        'cycle_id' => $this->cycle->getId(),
-                        'day'      => $period['day'],
-                        'title' => $period['period'],
-                    )
+                $params = array(
+                    'cycle_id' => $this->cycle->getId(),
+                    'day'      => $period['day'],
+                    'title'    => $period['period'],
                 );
+                $period_list = TimetablePeriodMapper::getInstance()->findByColumnList($params);
 
                 // Get teacher for this class, and set it into class involvement
                 // and period.
@@ -159,12 +155,6 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                     continue;
                 }
 
-                if (!array_key_exists($teacher->getId(), $classInvolvements)) {
-                    $classInvolvement = new ClassInvolvement();
-                    $classInvolvement->setClass($class)->setUser($teacher);
-                    $classInvolvements[$teacher->getId()] = $classInvolvement;
-                }
-
                 foreach ($period_list as $period_object) {
                     ClassPeriodMapper::getInstance()->deleteForClassAndPeriod($class, $period_object);
                     $class_period
@@ -178,12 +168,6 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                     // Break because we only want one row per period.
                     break;
                 }
-            }
-
-            // Save any class involvements
-            if (!empty($classInvolvements)) {
-                $this->verbose_filter->outputPerformLinkMessage(count($classInvolvements).' teacher(s) to '.$class_message);
-                ClassInvolvementMapper::getInstance()->save($classInvolvements);
             }
         }
         else {

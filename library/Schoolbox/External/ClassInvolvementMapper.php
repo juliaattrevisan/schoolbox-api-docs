@@ -57,22 +57,15 @@ class ClassInvolvementMapper extends Schoolbox\External\Mapper {
     }
 
     /**
-     * Removes all involvements for a given user type (staff, parents, teachers)
-     * from the given class.
+     * Removes all involvements from the given class.
      *
      * @param  ClassEntry $class
-     * @param  string     $group_type
      * @return int        The number of rows deleted.
      */
-    public function deleteInvolvementsForClassAndGroupType(ClassEntry $class, $group_type) {
-        $query = "
-            DELETE `ui` FROM `{$this->getTable()}` `ui`
-            INNER JOIN {$this->getJoinSql('user', 'ui', 'u')}
-            INNER JOIN `groups` `g` ON `u`.`group_id` = `g`.`id`
-            WHERE `g`.`group_type` = :group_type AND `ui`.`class_id` = :class
-        ";
+    public function deleteInvolvementsForClass(ClassEntry $class) {
+        $query = "DELETE FROM `{$this->getTable()}` `ui` WHERE `ui`.`class_id` = :class";
         $statement = $this->database->prepare($query);
-        $statement->execute(array('class' => $class->getId(), 'group_type' => $group_type));
+        $statement->execute(array('class' => $class->getId()));
         return $statement->rowCount();
     }
 
