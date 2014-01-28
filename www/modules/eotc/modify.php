@@ -65,12 +65,53 @@ else {
 		'type' => 'EVENT_EVENTTYPE_NAME'
 	));
 
-	/* Event Access Levels
+	/* Only provide Group option if groups have been defined
 	 */
-	$this->dropDown('eventlevel_drop', new \EOTC\Calendar\EventLevelCollection(), '', TEMPLATE_content, array(
+	$groupHandler = new \Group();
+	$groupList = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), true, WRITE_ACCESS);
+
+	/* Only provide Campus options if campuses have been defined
+	 */
+	$calendarHandler = new \Calendar();
+	$campusList = $calendarHandler->getCampusList();
+
+	/* Roles, when Campus Event Level is used
+	 */
+	$roleList = $calendarHandler->getGroupList();
+
+	/* Render all the dropdowns
+	 */
+
+	/* Event Access Levels
+	 * Requires both $groupList and $campusList for optional values
+	 */
+	$this->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), '', TEMPLATE_content, array(
 		'id' => 'EVENT_EVENTLEVEL_ID',
 		'name' => 'EVENT_EVENTLEVEL_NAME',
 	));
 
-	
+	/* Group dropdown when using Group Event Level
+	 */
+	$this->dropDown('event_group_drop', $groupList, $_GET['sid'], TEMPLATE_content, array(
+		'id' => 'EVENT_GROUP_ID',
+		'name' => 'EVENT_GROUP_NAME'
+	));
+
+	/* Campus Checkbox Array when using Campus Event Level
+	 */
+	if (count($campusList) > 0) {
+		$this->checkList('campus_list', $campusList, array($_SESSION['campus'][0]));
+	}
+	else {
+		$this->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
+		$this->setVar('campus_list_block', '');
+	}
+
+	/* Roles checkbox array when using Campus Event Level
+	 * This really needs to be updated
+	 */
+	$this->checkList('event_role_list', $roleList, '', TEMPLATE_content, array(
+		'GROUP_ID' => 'EVENT_ROLE_ID',
+		'GROUP_NAME' => 'EVENT_ROLE_NAME'
+	));
 }

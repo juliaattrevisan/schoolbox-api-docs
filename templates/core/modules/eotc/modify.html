@@ -309,10 +309,44 @@
 				</td>
 				<td>
 					<select name="level" id="level">
-						<!-- BEGIN eventlevel_drop -->
+						<!-- BEGIN event_level_drop -->
 						<option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>
-						<!-- END eventlevel_drop -->
+						<!-- END event_level_drop -->
 					</select>
+				</td>
+			</tr>
+			<tr id="groupDrop" class="hidden">
+				<td>
+					<h4>Group</h4>
+					<em>Select the group which will be able to view this event</em>
+				</td>
+				<td>
+					<select name="group">
+						<!-- BEGIN event_group_drop -->
+						<option value="{EVENT_GROUP_ID}"{EVENT_GROUP_ID_SELECTED} />{EVENT_GROUP_NAME}</option>
+						<!-- END event_group_drop -->
+					</select>
+				</td>
+			</tr>
+			<tr id="groupList" class="hidden">
+				<td>
+					<h4>Roles</h4>
+					<em>Select the roles which will be able to view this event</em>
+				</td>
+				<td>
+					<div class="clearfix checkboxes">
+
+						<!-- BEGIN event_role_list -->
+						<label class="float-left clear">
+							<input type="checkbox" name="groupCheck[]" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
+							{EVENT_ROLE_NAME}
+						</label>
+						<!-- END event_role_list -->
+
+						<label class="float-left clear">
+							<input type="checkbox" class="select_all" /> Select all
+						</label>
+					</div>
 				</td>
 			</tr>
 		</tbody>
@@ -326,42 +360,8 @@
 
 
 
-		<tr id="groupDrop" style="display:none;">
-			<td>
-				<h4>Group</h4>
-				<em>Select the group which will be able to view this event</em>
-			</td>
-			<td>
-				<select name="group">
-					<!-- BEGIN group_drop -->
-					<option value="{UGROUP_ID}"
-					{UGROUP_ID_SELECTED} />
-					{UGROUP_NAME}
-					</option>
-					<!-- END group_drop -->
-				</select>
-			</td>
-		</tr>
-		<tr id="groupList" style="display:none;">
-			<td>
-				<h4>Roles</h4>
-				<em>Select the roles which will be able to view this event</em>
-			</td>
-			<td>
-				<div class="clearfix checkboxes">
 
-					<!-- BEGIN group_list -->
-					<label class="float-left clear">
-						<input type="checkbox" name="groupCheck[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />
-						{GROUP_NAME}
-					</label>
-					<!-- END group_list -->
-					<label class="float-left clear">
-						<input type="checkbox" value="{GROUP_ID}" name="" class="select_all" /> Select all
-					</label>
-				</div>
-			</td>
-		</tr>
+
 		<tr id="campusList" style="display:none;">
 			<td>
 				<h4>Campus</h4>
