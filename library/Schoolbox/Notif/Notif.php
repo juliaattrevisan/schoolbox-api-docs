@@ -21,6 +21,7 @@ use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Handler\AMQPHandler;
+use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 
 /**
@@ -128,6 +129,14 @@ class Notif implements LoggerInterface {
 		}
 		else {
 			$logger->pushHandler($this->amqp);
+		}
+
+		switch($this->channel) {
+			case self::CHANNEL_AUTH:
+				$sqlh = new MySQLHandler(Logger::INFO);
+				$sqlh->setQuery("INSERT INTO login_log (username, date, ip, login) VALUES (:username, NOW(), :ip, :login)");
+				$logger->pushHandler($sqlh);
+				break;
 		}
 
 	}
