@@ -17,28 +17,76 @@ class CampusMapper extends Mapper {
         $this->hasTable('luCampus');
         $this->hasModel('\Schoolbox\Campus');
 
-        $this->hasMap(array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            ));
+		$this->hasMap(array(
+			'column' => 'id',
+			'property' => 'id',
+			'type' => Mapper::TYPE_INTEGER,
+			'identifier' => true
+		));
 
-        $this->hasMap(array(
-                'column'     => 'name',
-                'property'   => 'name',
-                'type'       => Mapper::TYPE_STRING,
-            ));
-	    $this->hasMap(array(
-		                  'column'     => 'ext_timetable_code',
-		                  'property'   => 'extTimetableCode',
-		                  'type'       => Mapper::TYPE_STRING,
-	                  ));
-	    $this->hasMap(array(
-		                  'column'     => 'timetable_day',
-		                  'property'   => 'timetableDay',
-		                  'type'       => Mapper::TYPE_STRING,
-	                  ));
+		$this->hasMap(array(
+			'column' => 'name',
+			'property' => 'name',
+			'type' => Mapper::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column' => 'ext_timetable_code',
+			'property' => 'extTimetableCode',
+			'type' => Mapper::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column' => 'timetable_day',
+			'property' => 'timetableDay',
+			'type' => Mapper::TYPE_STRING,
+		));
     }
 
+	/**
+	 * Get a list of campuses that is accessible by $user
+	 *
+	 * According to the pipe:
+	 * "I know what this is. This allows you to control which campuses you can post events to.
+	 * No idea what userAccess.sid = 0 means.
+	 * $type actually means Read/Write/Moderate, but contextually could mean anything."
+	 *
+	 * @param User $user
+	 * @param int $accessType
+	 * @return array
+	 */
+	public function getAvailableCampusesForUser(\Schoolbox\User $user, $accessType = 1) {
+		$calendarService = CALENDAR_SERVICE;
+
+		/* Superusers get access to all campuses
+		 */
+		if ($_SESSION['su'] && false) {
+			$collection = $this->findAll();
+		}
+		else {
+			$query = "
+				SELECT *
+				FROM luCampus
+				INNER JOIN userAccess ON luCampus.id = userAccess.sid
+				WHERE userAccess.service = :calendarService
+				AND userAccess.uid = :userId
+				AND type > :accessType
+			";
+
+			$statement = $this->database->prepare($query);
+
+			$statement->bindParam(':calendarService', $calendarService);
+			$statement->bindParam(':userId', $user->getId());
+			$statement->bindParam(':accessType', $accessType);
+			$statement->execute();
+
+			$collection = new \Schoolbox\Collection();
+
+			foreach ($statement as $row) {
+				$campus = $this->hydrate($row);
+
+				$collection->add($campus);
+			}
+		}
+
+		return $collection;
+	}
 }

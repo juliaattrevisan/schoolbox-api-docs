@@ -75,6 +75,9 @@ else {
 	$calendarHandler = new \Calendar();
 	$campusList = $calendarHandler->getCampusList();
 
+	$campusMapper = new \Schoolbox\CampusMapper();
+	$campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
+
 	/* Render all the dropdowns
 	 */
 
@@ -95,12 +98,22 @@ else {
 
 	/* Campus Checkbox Array when using Campus Event Level
 	 */
-	if (count($campusList) > 0) {
-		$this->checkList('campus_list', $campusList, array($_SESSION['campus'][0]));
+	if ($campusList->count()) {
+		foreach($campusList as $current) {
+			$allCampuses[] = array(
+				'id' => $current->getId(),
+				'name' => $current->getName()
+			);
+		}
+
+		$this->checkList('event_campus_list', $allCampuses, array($_SESSION['campus'][0]), TEMPLATE_content, array(
+			'id' => 'EVENT_CAMPUS_ID',
+			'name' => 'EVENT_CAMPUS_NAME',
+		));
 	}
 	else {
-		$this->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
-		$this->setVar('campus_list_block', '');
+		$this->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
+		$this->setVar('event_campus_list_block', '');
 	}
 
 	/* Roles, when Campus Event Level is used

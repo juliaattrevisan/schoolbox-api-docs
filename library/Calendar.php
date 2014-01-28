@@ -249,7 +249,8 @@ class Calendar extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getCampusList($type = 1) {
+
+	function getCampusList($type = 1) {
         $query = "SELECT id, name FROM luCampus";
         if (!$_SESSION['su']) {
             $query .= ", userAccess WHERE (luCampus.id = userAccess.sid OR userAccess.sid = 0) AND
