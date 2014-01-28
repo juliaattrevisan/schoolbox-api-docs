@@ -9,6 +9,14 @@
  * @link      http://www.alaress.com.au/
  */
 class Leave_Request_TravelType {
+
+    const TYPE_NONE  = 0;
+    const TYPE_CAR   = 1;
+    const TYPE_TAXI  = 2;
+    const TYPE_TRAIN = 3;
+    const TYPE_BUS   = 4;
+    const TYPE_WALK  = 5;
+
     /**
      * @var int
      */
