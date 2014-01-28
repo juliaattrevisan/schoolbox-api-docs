@@ -60,8 +60,17 @@ else {
 	$calendarEventTypeMapper = new \EOTC\Calendar\EventTypeMapper();
 	$allEventTypes = $calendarEventTypeMapper->findAll();
 
-	$this->dropDown(
-		'type_drop', $allEventTypes, '', TEMPLATE_content,
-		array('id' => 'EVENT_EVENTTYPE_ID', 'type' => 'EVENT_EVENTTYPE_NAME')
-	);
+	$this->dropDown('type_drop', $allEventTypes, '', TEMPLATE_content, array(
+		'id' => 'EVENT_EVENTTYPE_ID',
+		'type' => 'EVENT_EVENTTYPE_NAME'
+	));
+
+	/* Event Access Levels
+	 */
+	$this->dropDown('eventlevel_drop', new \EOTC\Calendar\EventLevelCollection(), '', TEMPLATE_content, array(
+		'id' => 'EVENT_EVENTLEVEL_ID',
+		'name' => 'EVENT_EVENTLEVEL_NAME',
+	));
+
+	
 }
