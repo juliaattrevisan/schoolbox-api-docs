@@ -11,7 +11,7 @@
 /* Modify existing event
  */
 if (is_numeric($this->arg[0])) {
-	$mapper = new \EOTC\CalendarEventMapper();
+	$mapper = new \EOTC\Calendar\EventMapper();
 	$event = $mapper->findById($this->arg[0]);
 
 	new \Alaress_Probe($event);
@@ -57,7 +57,7 @@ else {
 
 	/* Event Types
 	 */
-	$calendarEventTypeMapper = new \EOTC\CalendarEventTypeMapper();
+	$calendarEventTypeMapper = new \EOTC\Calendar\EventTypeMapper();
 	$allEventTypes = $calendarEventTypeMapper->findAll();
 
 	$this->dropDown(

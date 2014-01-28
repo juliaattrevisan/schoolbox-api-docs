@@ -8,10 +8,10 @@
  * @version     SVN: $Id$
  */
 
-namespace EOTC;
+namespace EOTC\Calendar;
 
 
-class CalendarEvent {
+class Event {
 
 	/**
 	 * Event id
@@ -514,6 +514,4 @@ class CalendarEvent {
 	public function getStartTime() {
 		return $this->startTime;
 	}
-
-
 }

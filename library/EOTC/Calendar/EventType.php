@@ -8,10 +8,10 @@
  * @version     SVN: $Id$
  */
 
-namespace EOTC;
+namespace EOTC\Calendar;
 
 
-class CalendarEventType {
+class EventType {
 
 	/**
 	 * Event type id
