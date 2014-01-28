@@ -28,9 +28,10 @@ class SubscriptionManager {
 	/** @var Subscription[] */
 	protected $subscriptions;
 
-	public function __construct($pipeManager) {
+	public function __construct($stompFactory, $pipeManager) {
 		// this factory requires its own loop to work
 		$this->subscriptions = array();
+		$this->stompFactory = $stompFactory;
 		$this->pipeManager = $pipeManager;
 	}
 
@@ -55,10 +56,7 @@ class SubscriptionManager {
 
 		$this->pipeManager->v('SUBSCRIBE', '+');
 
-		$loop = \React\EventLoop\Factory::create();
-		$stompFactory = new Factory($loop);
-
-		$client = $stompFactory->createClient(array(
+		$client = $this->stompFactory->createClient(array(
 			'host'      => '127.0.0.1',
 			'port'      => 61613,
 			'vhost'     => '/',
@@ -69,7 +67,7 @@ class SubscriptionManager {
 		$self = $this;
 		$destination = $this->userSubscriptionDestination($user);
 
-		$client->connect()->then(function($client) use ($destination, $self, $user, $responder, $loop) {
+		$client->connect()->then(function($client) use ($destination, $self, $user, $responder) {
 			/** @var Client $client */
 			// this closure is executed when a stomp client connection is established
 			$self->putSubscription($destination, new Subscription($destination, $client, $user, $self->getPipeManager()));
@@ -77,11 +75,7 @@ class SubscriptionManager {
 			if($responder instanceof Responder) {
 				$responder->notifyPipe(json_encode(array('subscribe' => true)));
 			}
-
-			$loop->stop();
 		});
-
-		$loop->run();
 
 		return true;
 	}

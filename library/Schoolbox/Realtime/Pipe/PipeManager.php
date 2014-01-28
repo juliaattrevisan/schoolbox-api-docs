@@ -74,7 +74,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function __construct($reactLoop, $predisClient, $userMapper, $verboser, $iConfigLoader = null) {
 		$this->pipes = array();
-		$this->subscriptionManager = new SubscriptionManager($this);
+		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
 		$this->predisClient = $predisClient;
 		$this->userMapper = $userMapper;
@@ -191,7 +191,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 		$data = json_decode($msg, true);
 
-		// and we'll also ignore it if it doesn't parse as json in a way we expect
+		// and we'll also ignore it if it doesn't parse as json in a way we expect (which is key => data)
 		if(is_null($data) || count($data) != 1) {
 			return;
 		}
@@ -428,8 +428,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		});
 
 		$pipeManager = $this;
+		$subscriptionManager = $this->subscriptionManager;
 
-		$rSock->on('close', function($stream) use(&$buffer, $pipeManager, $pipe) {
+		$rSock->on('close', function($stream) use(&$buffer, $pipeManager, $pipe, $responder, $subscriptionManager) {
 			// received EOF, time to send the result to the client
 
 			// don't attempt to split if the data came through badly
@@ -454,6 +455,13 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 					break;
 				case Responder::CONTEXT_SESSION:
 					$pipeManager->sendToSession($pipe->getSession(), $data);
+					break;
+				case Responder::CONTEXT_SELF:
+					// this is a bounceback so the subscription is registered in the parent
+					if($data == 'subscribe') {
+						$subscriptionManager->subscribe($pipe->getUser(), new SelfResponder($pipeManager, $pipe));
+
+					}
 					break;
 			}
 		});

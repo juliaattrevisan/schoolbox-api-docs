@@ -12,6 +12,8 @@ use Schoolbox\UserMapper;
  * @version     SVN: $Id$
  */
 
+pcntl_signal(SIGCHLD, SIG_IGN);
+
 require_once('../../include/Bootstrap.php');
 
 $opts = getopt('vp::');

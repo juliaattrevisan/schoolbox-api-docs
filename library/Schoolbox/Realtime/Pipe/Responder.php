@@ -121,14 +121,23 @@ class Responder extends EventEmitter {
 	}
 
 	protected function notify($string) {
+		$close = true;
 		for($written = 0; $written < strlen($string); $written += $fwrite) {
 			$fwrite = fwrite($this->socketStream, substr($string, $written), self::STREAM_BUFFER);
+			// we're finished early
 			if($fwrite === false) {
-				// we're finished early
+				break;
+			}
+			// call a plumber: busted pipe
+			elseif($fwrite === 0) {
+				$close = false;
 				break;
 			}
 		}
-		fclose($this->socketStream);
+
+		if($close) {
+			fclose($this->socketStream);
+		}
 	}
 
 	public function getSocketStream() {
@@ -143,7 +152,9 @@ class Responder extends EventEmitter {
 	 * @return null
 	 */
 	public function subscribe($user, $null) {
-		$this->subscriptionManager->subscribe($user, $this);
+		// this is just a bounceback, since subscription has to happen in the parent process.
+		// but rather than call in a blocking way from the server, this adds it to the event loop
+		$this->notifyServer('subscribe');
 	}
 
 
