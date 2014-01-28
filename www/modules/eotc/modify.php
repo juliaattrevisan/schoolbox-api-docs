@@ -55,5 +55,13 @@ else {
 		'ADVANCED_CLOSE' => 'hidden',
 	));
 
+	/* Event Types
+	 */
+	$calendarEventTypeMapper = new \EOTC\CalendarEventTypeMapper();
+	$allEventTypes = $calendarEventTypeMapper->findAll();
 
+	$this->dropDown(
+		'type_drop', $allEventTypes, '', TEMPLATE_content,
+		array('id' => 'EVENT_EVENTTYPE_ID', 'type' => 'EVENT_EVENTTYPE_NAME')
+	);
 }

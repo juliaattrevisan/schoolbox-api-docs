@@ -289,6 +289,19 @@
 					<input name="location" type="text" size="50" value="{EVENT_LOCATION}"/>
 				</td>
 			</tr>
+			<tr>
+				<td>
+					<h4>Type</h4>
+					<em>Select the type of event. This will be represented via different colours</em>
+				</td>
+				<td>
+					<select name="type">
+						<!-- BEGIN type_drop -->
+						<option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_NUMBER_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
+						<!-- END type_drop -->
+					</select>
+				</td>
+			</tr>
 		</tbody>
 	</table>
 </form>
@@ -298,20 +311,7 @@
 
 	<table class="standardForm table">
 
-		<tr>
-			<td>
-				<h4>Type</h4>
-				<em>Select the type of event, this will be represented via different colours</em>
-			</td>
-			<td>
-				<select name="type">
-					<!-- BEGIN type_drop -->
-					<option value="{TYPE_NUMBER}"
-					{TYPE_NUMBER_SELECTED}>{TYPE_NAME}</option>
-					<!-- END type_drop -->
-				</select>
-			</td>
-		</tr>
+
 		<tr>
 			<td>
 				<h4>Level</h4>
