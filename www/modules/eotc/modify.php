@@ -49,6 +49,7 @@ else {
 		'EVENT_ALLDAY_CHECKED' => '',
 		'EVENT_PUBLISH_DATE' => '',
 		'EVENT_LOCATION' => '',
+		'EVENT_DETAIL' => ''
 	));
 
 	/* Event Types
