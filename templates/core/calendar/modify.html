@@ -242,33 +242,33 @@ $j(function () {
         $j('#action').val('Delete');
     });
 
-//    $j('.customise').click(function (event) {
-//        event.preventDefault();
-//        $j(this).children('span').toggle();
-//        $j('.adv_hide').toggle();
-//
-//        if ($j('.adv_hide').is(':visible')) {
-//            $j('.adv_hide').children('td').delay(1000).animate({opacity:'1'});
-//        }
-//		else {
-//            $j('.adv_hide').queue('fx', []);
-//        }
-//    });
-//
-//    $j('#allday').click(function()  {
-//        if($j(this).is(':checked')) {
-//            $j('.timeInputs').each(function () {
-//                $j(this).hide();
-//            });
-//
-//        }
-//        else{
-//
-//            $j('.timeInputs').each(function () {
-//                $j(this).show();
-//            });
-//        }
-//    });
+    $j('.customise').click(function (event) {
+        event.preventDefault();
+        $j(this).children('span').toggle();
+        $j('.adv_hide').toggle();
+
+        if ($j('.adv_hide').is(':visible')) {
+            $j('.adv_hide').children('td').delay(1000).animate({opacity:'1'});
+        }
+		else {
+            $j('.adv_hide').queue('fx', []);
+        }
+    });
+
+    $j('#allday').click(function()  {
+        if($j(this).is(':checked')) {
+            $j('.timeInputs').each(function () {
+                $j(this).hide();
+            });
+
+        }
+        else{
+
+            $j('.timeInputs').each(function () {
+                $j(this).show();
+            });
+        }
+    });
 });
 </script>
 <!-- END custom_head -->
