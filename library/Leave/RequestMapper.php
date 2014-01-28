@@ -568,16 +568,20 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 		if (empty($callback)) {
 			$callback = function ($mapper, $request, $row) {
+				/** @var self $mapper */
+				/** @var Leave_Request $request */
 				/* Hydrate user */
 				if (!empty($row['u.id'])) {
 					$request->setUser($mapper->getUserMapper()->hydrate($row, 'u'));
 				}
-
 				/* Hydrate authorized user */
 				if (!empty($row['au.id'])) {
 					$request->setAuthorisationUser($mapper->getUserMapper()->hydrate($row, 'au'));
 				}
-
+				/* Hydrate travel type */
+				if (!empty($row['tt.id'])) {
+					$request->setTravelType($mapper->getJoinMapper('travelType')->hydrate($row, 'tt'));
+				}
 				return $request;
 			};
 		}
