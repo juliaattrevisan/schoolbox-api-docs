@@ -44,6 +44,7 @@ else {
 		'EVENT_END_PM' => '',
 		'EVENT_ALLDAY_CHECKED' => '',
 		'EVENT_PUBLISH_DATE' => '',
+		'EVENT_LOCATION' => '',
 	));
 
 	/* Hide advanced options by default
