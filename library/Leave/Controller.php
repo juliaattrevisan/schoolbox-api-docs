@@ -280,6 +280,35 @@ class Leave_Controller extends Controller {
     }
 
     /**
+     * Does this user have permission to view requests for a given user?
+     *
+     * The user has permission if:
+     * * They have housemaster privileges
+     * * They are the parent of the child the request is for
+     * * They made the request
+     *
+     * @param  int  $userId The user's ID
+     * @return bool
+     */
+    protected function hasViewPermission($userId) {
+        return $_SESSION['user']->getId() == $userId
+            || $this->getGroup()->getPermission(null)
+            || $this->getGroup()->isParentOfChild($userId);
+    }
+
+    /**
+     * Does this user have permission to modify or approve a request?
+     *
+     * The user has permission if:
+     * * They have housemaster privileges
+     *
+     * @return bool
+     */
+    protected function hasApprovePermission() {
+        return $this->getGroup()->getPermission(null);
+    }
+
+    /**
      * Processes form data submitted from renderCreateRequest
      *
      * @param Array $data
@@ -299,11 +328,8 @@ class Leave_Controller extends Controller {
         /* Use the userId field when submitting on someone else's behalf,
            * otherwise just your own id
            */
-        if ($this->getGroup()->getPermission(null)) {
-            $request->setUserId($data['userId']);
-        } else {
-            $request->setUserId($_SESSION['id']);
-        }
+        $userId = $data['userId'];
+        $request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
 
         $request->setStart($start->getDatabase());
         $request->setFinish($finish->getDatabase());
@@ -350,10 +376,7 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if the requester's house doesn't exist.
      */
     public function renderModifyRequest($data) {
-
-        /* Only allow Teachers/Staff to modify requests
-             */
-        if ($this->getGroup()->getPermission(null)) {
+        if ($this->hasApprovePermission()) {
             /** @var Leave_Request $request */
             $request = $data['request'];
             $user = $request->getUser();
@@ -460,7 +483,7 @@ class Leave_Controller extends Controller {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
 
-        if ($this->getGroup()->getPermission(null) || $_SESSION['id'] == $user->getId()) {
+        if ($this->hasViewPermission($user->getId())) {
 
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewRequest.html');
 
@@ -764,8 +787,9 @@ class Leave_Controller extends Controller {
      * @param $data
      */
     public function exportUserRequestList($data) {
-        if ($this->getGroup()->getPermission(null)) {
-            $user = $data['user'];
+        $user = $data['user'];
+        if ($this->hasViewPermission($user->getId())) {
+            /** @var Leave_Request[] $requestList */
             $requestList = $data['requestList'];
             $allRows = array();
 
@@ -819,11 +843,8 @@ class Leave_Controller extends Controller {
         /* Only allow students to see their own leave requests
            * Allow staff/superusers to see anyone's
            */
-
-
-
-        if ($this->getGroup()->getPermission(null) || $_SESSION['id'] == $data['user']->getId()) {
-            $user = $data['user'];
+        $user = $data['user'];
+        if ($this->hasViewPermission($user->getId())) {
             $house = $data['house'];
             $requestList = $data['requestList'];
 
@@ -839,7 +860,7 @@ class Leave_Controller extends Controller {
             $this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
             $this->getPage()->setBlock('previous_request_list', 'export', 'export_block');
 
-            if ($this->getGroup()->getPermission(null)) {
+            if ($this->hasApprovePermission()) {
                 $this->getPage()->parse('export_block', 'export');
             } else {
                 $this->getPage()->setVar('export_block', '');
@@ -851,7 +872,7 @@ class Leave_Controller extends Controller {
                     'USER_NAME' => $user->formatName(),
                     'HOUSE_NAME' => $house->getHouse(),
                     'HOUSE_ID' => $house->getId(),
-                    'ALLOWED_ACTION' => $this->getGroup()->getPermission(null) ? 'modify' : 'view',
+                    'ALLOWED_ACTION' => $this->hasApprovePermission() ? 'modify' : 'view',
                 )
             );
 
@@ -938,7 +959,7 @@ class Leave_Controller extends Controller {
 
         /* Only allow Teachers/Staff to approve/reject requests
            */
-        if ($this->getGroup()->getPermission(null)) {
+        if ($this->hasApprovePermission()) {
             $user = $data['user'];
             $requestList = $data['requestList'];
 
@@ -992,7 +1013,7 @@ class Leave_Controller extends Controller {
 
         /* Iterate through options
            */
-        if ($this->getGroup()->getPermission(null)) {
+        if ($this->hasApprovePermission()) {
             foreach ($request->getConfirmedByMap() as $value => $label) {
                 if ($request->getConfirmedBy() == $value) {
                     $selected = 'checked=\'checked\'';
