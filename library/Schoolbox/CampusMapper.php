@@ -58,7 +58,7 @@ class CampusMapper extends Mapper {
 
 		/* Superusers get access to all campuses
 		 */
-		if ($_SESSION['su'] && false) {
+		if ($_SESSION['su']) {
 			$collection = $this->findAll();
 		}
 		else {

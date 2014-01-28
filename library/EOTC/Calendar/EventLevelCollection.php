@@ -26,7 +26,7 @@ class EventLevelCollection extends \Schoolbox\Collection {
 			$this->add(new EventLevel(2, 'Group'));
 		}
 
-		if (is_array($campusList) && count($campusList)) {
+		if ($campusList->count()) {
 			$this->add(new EventLevel(3, 'Campus'));
 		}
 	}

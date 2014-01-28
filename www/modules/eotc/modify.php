@@ -72,9 +72,6 @@ else {
 
 	/* Only provide Campus options if campuses have been defined
 	 */
-	$calendarHandler = new \Calendar();
-	$campusList = $calendarHandler->getCampusList();
-
 	$campusMapper = new \Schoolbox\CampusMapper();
 	$campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
 
