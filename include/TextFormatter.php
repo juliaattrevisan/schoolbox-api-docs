@@ -97,7 +97,7 @@ class TextFormatter {
 	 * @param string $enclosure
 	 * @return string
 	 */
-	public function outputCSV($line, $delimiter=',', $enclosure='"') {
+	public static function outputCSV($line, $delimiter=',', $enclosure='"') {
 		// No leading delimiter
 		$writeDelimiter = FALSE;
 		$string = '';
