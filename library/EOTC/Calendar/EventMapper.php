@@ -13,6 +13,9 @@ use Schoolbox;
 
 
 class EventMapper extends Schoolbox\External\Mapper {
+	const ACCESS_PERSONAL = 1;
+	const ACCESS_GROUP = 2;
+	const ACCESS_CAMPUS = 3;
 
 	protected function mapping() {
 		$this->hasTable('event');

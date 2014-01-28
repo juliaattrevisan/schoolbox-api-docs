@@ -20,14 +20,14 @@ class EventLevelCollection extends \Schoolbox\Collection {
 	 * @param $campusList
 	 */
 	public function __construct($groupList, $campusList) {
-		$this->add(new EventLevel(1, 'Personal'));
+		$this->add(new EventLevel(\EOTC\Calendar\EventMapper::ACCESS_PERSONAL, 'Personal'));
 
 		if (is_array($groupList) && count($groupList)) {
-			$this->add(new EventLevel(2, 'Group'));
+			$this->add(new EventLevel(\EOTC\Calendar\EventMapper::ACCESS_GROUP, 'Group'));
 		}
 
 		if ($campusList->count()) {
-			$this->add(new EventLevel(3, 'Campus'));
+			$this->add(new EventLevel(\EOTC\Calendar\EventMapper::ACCESS_CAMPUS, 'Campus'));
 		}
 	}
 } 
