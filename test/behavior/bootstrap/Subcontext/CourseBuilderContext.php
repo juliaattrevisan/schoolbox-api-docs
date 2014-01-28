@@ -34,7 +34,10 @@ class Subcontext_CourseBuilderContext extends BaseContext {
         $this->delayUntilVisible($form);
         $form->fillField('title', $name);
         // Somehow be able to use this for file uploads too.
-        $form->fillField('link',  $url);
+        if ($url) {
+            $form->find('css', 'a[data-function="link"]')->click();
+            $form->fillField('link',  $url);
+        }
         // Requires confirmation field: now labeled "self-assess", and the other
         // way around (checked = doesn't require confirmation)
         if ($self_assess) {

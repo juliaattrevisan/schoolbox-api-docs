@@ -35,6 +35,7 @@
         self.element  = element;
         self.settings = {};
         self.uploadCallback = function(output) {};
+        var formButton = self.element.find('form :submit[data-action="upload"]').hide();
         var defaults  = {
             session: {
                 id:   '',
@@ -54,6 +55,8 @@
                 auto:             false,
                 descriptionField: false,
                 removeCompleted:  true,
+                onCancel:         function() { formButton.hide(); },
+                onSelect:         function() { formButton.show(); },
                 onComplete:       function(event, code, file, output) {
                     self.uploadCallback(output);
                     self.element.dialog('close');
