@@ -75,10 +75,6 @@ else {
 	$calendarHandler = new \Calendar();
 	$campusList = $calendarHandler->getCampusList();
 
-	/* Roles, when Campus Event Level is used
-	 */
-	$roleList = $calendarHandler->getGroupList();
-
 	/* Render all the dropdowns
 	 */
 
@@ -107,11 +103,24 @@ else {
 		$this->setVar('campus_list_block', '');
 	}
 
-	/* Roles checkbox array when using Campus Event Level
-	 * This really needs to be updated
+	/* Roles, when Campus Event Level is used
 	 */
-	$this->checkList('event_role_list', $roleList, '', TEMPLATE_content, array(
-		'GROUP_ID' => 'EVENT_ROLE_ID',
-		'GROUP_NAME' => 'EVENT_ROLE_NAME'
+	$roleMapper = new \Schoolbox\RoleMapper();
+	$roleList = $roleMapper->findAll();
+
+	/* Roles checkbox array when using Campus Event Level
+	 * This really needs to be updated - why is checkList behaviour different to
+	 * the dropDown one when it comes to collections?
+	 */
+	foreach($roleList as $current) {
+		$allRoles[] = array(
+			'id' => $current->getId(),
+			'name' => $current->getName()
+		);
+	}
+
+	$this->checkList('event_role_list', $allRoles, '', TEMPLATE_content, array(
+		'id' => 'EVENT_ROLE_ID',
+		'name' => 'EVENT_ROLE_NAME'
 	));
 }
