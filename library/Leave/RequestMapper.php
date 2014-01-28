@@ -395,19 +395,23 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		");
 		*/
 
-		$statement = $this->database->prepare(
-			"
+		// Why does this query have extra filters on its join?
+		// My guess is to filter out users from leave requests, while preserving
+		// the returned leave request?
+		$statement = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('lr')},
 				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')}
+				{$this->getUserMapper()->getColumnString('au')},
+				{$this->getJoinColumnString('travelType', 'tt')}
 			FROM `user` u
-			LEFT JOIN groups g ON g.id = u.group_id
-			LEFT JOIN `{$this->table}` lr ON lr.user_id = u.id
-			AND lr.start < :finish
-			AND lr.finish > :start
-			AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+			-- LEFT JOIN groups g ON g.id = u.group_id
+			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+				AND lr.start < :finish
+				AND lr.finish > :start
+				AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
+			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
+			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
 			WHERE u.residential_house_id = :houseId
 			ORDER BY LENGTH(u.year), u.year, u.lastname
 		"
