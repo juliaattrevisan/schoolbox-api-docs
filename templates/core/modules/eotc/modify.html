@@ -26,6 +26,10 @@
 			var endDateElement = config.element.find('input[name=endDate]');
 			setupDateSync(startDateElement, endDateElement);
 
+			/* All Day checkbox should hide the time fields
+			 */
+			setupAllDay();
+
 			/**
 			 * Initialise various configured params and determine a bunch
 			 * of ids and stuff that we'll probably use elsewhere
@@ -103,6 +107,20 @@
 					}
 				}
 			}
+
+			/**
+			 * Allow All Day checkbox to toggle visibility of time fields
+			 */
+			function setupAllDay() {
+				config.element.find('input[name=allday]').change(function() {
+					if ($(this).is(':checked')) {
+						config.element.find('.timeInputs').show();
+					}
+					else {
+						config.element.find('.timeInputs').hide();
+					}
+				});
+			}
 		}
 	})(jQuery);
 
@@ -158,7 +176,7 @@
 
 				<br />
 
-				<label for="allday" class="float-left clear">
+				<label for="allday">
 					<input id="allday" name="allday" class="allday" type="checkbox" value="1" {ALLDAY_CHECKED} />All Day
 				</label>
 			</td>
