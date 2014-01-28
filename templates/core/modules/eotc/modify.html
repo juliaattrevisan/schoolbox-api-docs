@@ -30,6 +30,10 @@
 			 */
 			setupAllDay();
 
+			/* Show/hide advanced options
+			 */
+			setupAdvancedOptions();
+
 			/**
 			 * Initialise various configured params and determine a bunch
 			 * of ids and stuff that we'll probably use elsewhere
@@ -142,6 +146,15 @@
 		$('#eventForm').eventModify();
 	});
 </script>
+
+<h1>
+	<span>{FUNCTION} Event</span>
+	<a class="customise" href="#">
+		<span {ADVANCED_SHOW}>Show Advanced Options</span>
+		<span {ADVANCED_CLOSE}>Close Advanced Options</span>
+	</a>
+</h1>
+
 <form id="eventForm" method="post" action="/calendar/modifyForm.php">
 	<input name="id" type="hidden" value="{EVENT_ID}"/>
 	<input name="userId" type="hidden" value="{EVENT_USER_ID}"/>
@@ -197,14 +210,14 @@
 				</td>
 			</tr>
 			<tr class="advanced {SHOW_ADVANCED}">
-				<td class="formLabelWidth" valign="top" {OPAC_ADVANCED}>
+				<td class="formLabelWidth">
 					<h4>Publish Date</h4>
 					<em>
 						This event will only be visible to the public after this date. Leave blank to publish
 						immediately.
 					</em>
 				</td>
-				<td {OPAC_ADVANCED}>
+				<td>
 					<input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
 				</td>
 			</tr>

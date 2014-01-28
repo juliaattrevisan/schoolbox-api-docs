@@ -39,4 +39,12 @@ else {
 		'EVENT_ALLDAY_CHECKED' => '',
 		'EVENT_PUBLISH_DATE' => '',
 	));
+
+	/* Hide advanced options by default
+	 */
+	$this->setVar(array(
+		'SHOW_ADVANCED' => '',
+		'ADVANCED_SHOW' => '',
+		'ADVANCED_CLOSE' => 'hidden',
+	));
 }
