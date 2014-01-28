@@ -29,8 +29,14 @@ else {
 		'EVENT_START_DATE' => '',
 		'EVENT_START_HOUR' => '',
 		'EVENT_START_MIN' => '',
+		'EVENT_START_AM' => '',
+		'EVENT_START_PM' => '',
 		'EVENT_END_DATE' => '',
 		'EVENT_END_HOUR' => '',
 		'EVENT_END_MIN' => '',
+		'EVENT_END_AM' => '',
+		'EVENT_END_PM' => '',
+		'EVENT_ALLDAY_CHECKED' => '',
+		'EVENT_PUBLISH_DATE' => '',
 	));
 }

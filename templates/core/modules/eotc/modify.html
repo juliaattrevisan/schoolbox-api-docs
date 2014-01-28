@@ -64,7 +64,7 @@
 						buttonImage: '/images/core/calendar/calendar-click.png',
 						buttonImageOnly: true,
 						constrainInput: false,
-						onClose: function (string) {
+						onClose: function(string) {
 							$j.getJSON('/ajax/strtotime.php', {string: string}, function(data) {
 								$(element).val(data.time);
 							});
@@ -80,11 +80,11 @@
 			 * @param endDate
 			 */
 			function setupDateSync(startDateElement, endDateElement) {
-				$(startDateElement).change(function() {
+				$(startDateElement).change(function(event) {
 					sync(startDateElement, endDateElement);
 				});
 
-				$(endDateElement).change(function() {
+				$(endDateElement).change(function(event) {
 					sync(startDateElement, endDateElement);
 				});
 
@@ -121,6 +121,20 @@
 					}
 				});
 			}
+
+			function setupAdvancedOptions() {
+				$('.customise').click(function(event) {
+					event.preventDefault();
+
+					/* Alternate between button texts
+					 */
+					$j(this).children('span').toggle();
+
+					/* Alternate between option visibility
+					 */
+					$j('.advanced').toggle();
+				});
+			}
 		}
 	})(jQuery);
 
@@ -129,58 +143,72 @@
 	});
 </script>
 <form id="eventForm" method="post" action="/calendar/modifyForm.php">
-	<input name="id" type="text" value="{EVENT_ID}"/>
-	<input name="userId" type="text" value="{EVENT_USER_ID}"/>
-	<input name="authorId" type="text" value="{EVENT_AUTHOR_ID}">
+	<input name="id" type="hidden" value="{EVENT_ID}"/>
+	<input name="userId" type="hidden" value="{EVENT_USER_ID}"/>
+	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}">
 	<input name="allday" type="hidden" value="0" />
 
 	<table class="standardForm">
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Title</h4>
-			</td>
-			<td>
-				<label>
-					<input name="note" class="required" type="text" size="50" maxlength="100" value="{EVENT_NOTE}" />
-				</label>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>When</h4>
-				<em>Uncheck all day to enter times as well.</em>
-			</td>
-			<td>
-				<input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
-				<span class="timeInputs {TIME_OFF}">
-					<input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" /> :
-					<input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
-					<select name="startPeriod">
-						<option value="am" {START_AM} >AM</option>
-						<option value="pm" {START_PM} >PM</option>
-					</select>
-				</span>
+		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Title</h4>
+				</td>
+				<td>
+					<label>
+						<input name="note" class="required" type="text" size="50" maxlength="100" value="{EVENT_NOTE}" />
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>When</h4>
+					<em>Uncheck all day to enter times as well.</em>
+				</td>
+				<td>
+					<input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+					<span class="timeInputs {EVENT_TIME_OFF}">
+						<input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" /> :
+						<input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+						<select name="startPeriod">
+							<option value="am" {EVENT_START_AM} >AM</option>
+							<option value="pm" {EVENT_START_PM} >PM</option>
+						</select>
+					</span>
 
-				to
+					to
 
-				<input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
-				<span class="timeInputs {TIME_OFF}">
-					<input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" /> :
-					<input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+					<input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+					<span class="timeInputs {EVENT_TIME_OFF}">
+						<input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" /> :
+						<input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
 
-					<select name="endPeriod">
-						<option value="am" {END_AM}>AM</option>
-						<option value="pm" {END_PM}>PM</option>
-					</select>
-				</span>
+						<select name="endPeriod">
+							<option value="am" {EVENT_END_AM}>AM</option>
+							<option value="pm" {EVENT_END_PM}>PM</option>
+						</select>
+					</span>
 
-				<br />
+					<br />
 
-				<label for="allday">
-					<input id="allday" name="allday" class="allday" type="checkbox" value="1" {ALLDAY_CHECKED} />All Day
-				</label>
-			</td>
-		</tr>
+					<label for="allday">
+						<input id="allday" name="allday" class="allday" type="checkbox" value="1" {EVENT_ALLDAY_CHECKED} />All Day
+					</label>
+				</td>
+			</tr>
+			<tr class="advanced {SHOW_ADVANCED}">
+				<td class="formLabelWidth" valign="top" {OPAC_ADVANCED}>
+					<h4>Publish Date</h4>
+					<em>
+						This event will only be visible to the public after this date. Leave blank to publish
+						immediately.
+					</em>
+				</td>
+				<td {OPAC_ADVANCED}>
+					<input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
+				</td>
+			</tr>
+		</tbody>
 	</table>
 </form>
 
@@ -188,18 +216,7 @@
 
 
 	<table class="standardForm table">
-		<tr class="advanced adv_hide" {SHOW_ADVANCED}>
-			<td class="formLabelWidth" valign="top" {OPAC_ADVANCED}>
-				<h4>Publish Date</h4>
-				<em>
-					This event will only be visible to the public after this date. Leave blank to publish
-					immediately.
-				</em>
-			</td>
-			<td {OPAC_ADVANCED}>
-				<input name="publishDate" id="publishDate" type="text" size="15" maxlength="30" value="{PUBLISH_DATE}"/>
-			</td>
-		</tr>
+
 		<!-- BEGIN recurring_dates -->
 		<tr class="advanced adv_hide" {SHOW_ADVANCED}>
 			<td class="formLabelWidth" valign="top" {OPAC_ADVANCED}>
