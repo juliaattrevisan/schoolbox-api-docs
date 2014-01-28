@@ -293,6 +293,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	private function getAllLeaveRequests($houseId) {
 		$statement = $this->database->prepare("
 			{$this->getBaseQuery()}
+			WHERE u.residential_house_id = :houseId
 			AND lr.status = :status
 			AND lr.created >= :limit
 			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
