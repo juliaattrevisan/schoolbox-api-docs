@@ -22,8 +22,6 @@ use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\NotifException;
 use Schoolbox\Notif\Queue\UnreadMessage;
-use Schoolbox\Notif\Queue\UserQueueFactory;
-use Schoolbox\Realtime\ProcessManager;
 use Schoolbox\Realtime\Stomp\SubscriptionManager;
 use Schoolbox\Realtime\Verboser;
 use Schoolbox\User;
@@ -76,7 +74,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function __construct($reactLoop, $predisClient, $userMapper, $verboser, $iConfigLoader = null) {
 		$this->pipes = array();
-		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
+		$this->subscriptionManager = new SubscriptionManager($this);
 		$this->reactLoop = $reactLoop;
 		$this->predisClient = $predisClient;
 		$this->userMapper = $userMapper;
@@ -203,7 +201,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 		// as a parent, we want to let the child perform the action
 		if($responder->isParentProcess()) {
-			$this->attachResponder($responder);
+			$this->attachResponder($responder, $pipe);
 			return;
 		}
 
@@ -225,18 +223,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			else {
 				$response = "Cannot understand command '$command'";
 			}
-
-			// send a socket message back to the parent...but is it listening?
-			if(!is_null($response)) {
-				$responder->notify($response);
-			}
 		}
 		catch(\Exception $e) {
 			// catch any and all exceptions here, this MUST exit
 			$this->v($e->getMessage(), '!');
 		}
 
-		fclose($responder->getSocketStream());
+		// since we're about to terminate, we don't really care if this doesn't work,
+		// it just means it was closed earlier
+		@fclose($responder->getSocketStream());
 
 		// child termination
 		exit;
@@ -407,8 +402,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 	/**
 	 * @param Responder $responder
+	 * @param Pipe $pipe
 	 */
-	protected function attachResponder($responder) {
+	protected function attachResponder($responder, $pipe) {
 
 		// YOU NEED TO LISTEN TO THIS
 		$socketStream = $responder->getSocketStream();
@@ -417,18 +413,49 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 		$rSock = new \React\Stream\Stream($socketStream, $this->reactLoop);
 
-		$rSock->on('connection', function($conn) {
-			echo "Connection acknowledged within React\n";
-		});
+		$buffer = '';
 
-		$rSock->on('data', function($data, $socketStream) {
+		$rSock->on('data', function($data, $socketStream) use (&$buffer) {
 			/**
 			 * @var string $data
 			 * @var \React\Stream\Stream $socketStream
 			 */
 
-			echo " ^$data$ \n";
+			if($data) {
+				$buffer .= $data;
+			}
 
+		});
+
+		$pipeManager = $this;
+
+		$rSock->on('close', function($stream) use(&$buffer, $pipeManager, $pipe) {
+			// received EOF, time to send the result to the client
+
+			// don't attempt to split if the data came through badly
+			if(strpos($buffer, Responder::CONTEXT_DELIMITER) === false) {
+				return;
+			}
+
+			list($context, $data) = explode(Responder::CONTEXT_DELIMITER, $buffer, 2);
+
+			// validate data given for debugging
+			if(is_null(json_decode($data, true))) {
+				$pipeManager->v("Data piped is not JSON: $data", '?');
+			}
+
+			// depending on what context was supplied, send the data to the appropriate pipes
+			switch($context) {
+				case Responder::CONTEXT_PIPE:
+					$pipeManager->sendToPipe($pipe, $data);
+					break;
+				case Responder::CONTEXT_USER:
+					$pipeManager->sendToUser($pipe->getUser(), $data);
+					break;
+				case Responder::CONTEXT_SESSION:
+					$pipeManager->sendToSession($pipe->getSession(), $data);
+					break;
+			}
 		});
 
 

@@ -28,8 +28,8 @@ class SubscriptionManager {
 	/** @var Subscription[] */
 	protected $subscriptions;
 
-	public function __construct($stompFactory, $pipeManager) {
-		$this->stompFactory = $stompFactory;
+	public function __construct($pipeManager) {
+		// this factory requires its own loop to work
 		$this->subscriptions = array();
 		$this->pipeManager = $pipeManager;
 	}
@@ -47,7 +47,7 @@ class SubscriptionManager {
 
 			// notify the pipe if it was supplied
 			if($responder instanceof Responder) {
-				$responder->notify(json_encode(array('subscribe' => true)));
+				$responder->notifyPipe(json_encode(array('subscribe' => true)));
 			}
 
 			return false;
@@ -55,7 +55,10 @@ class SubscriptionManager {
 
 		$this->pipeManager->v('SUBSCRIBE', '+');
 
-		$client = $this->stompFactory->createClient(array(
+		$loop = \React\EventLoop\Factory::create();
+		$stompFactory = new Factory($loop);
+
+		$client = $stompFactory->createClient(array(
 			'host'      => '127.0.0.1',
 			'port'      => 61613,
 			'vhost'     => '/',
@@ -66,15 +69,19 @@ class SubscriptionManager {
 		$self = $this;
 		$destination = $this->userSubscriptionDestination($user);
 
-		$client->connect()->then(function($client) use ($destination, $self, $user, $responder) {
+		$client->connect()->then(function($client) use ($destination, $self, $user, $responder, $loop) {
 			/** @var Client $client */
 			// this closure is executed when a stomp client connection is established
 			$self->putSubscription($destination, new Subscription($destination, $client, $user, $self->getPipeManager()));
 			// if a responder is provided, use it as a callback for success
 			if($responder instanceof Responder) {
-				$responder->notify(json_encode(array('subscribe' => true)));
+				$responder->notifyPipe(json_encode(array('subscribe' => true)));
 			}
+
+			$loop->stop();
 		});
+
+		$loop->run();
 
 		return true;
 	}

@@ -102,14 +102,14 @@ class UserQueueFactory {
 		// house bindings
 		if($house = $user->getSchoolHouse()) {
 			// *.notify.house.{id}
-//			$bindings['house'] = array($house);
+			$bindings['house'] = array($house);
 		}
 
 
 		// residential house bindings
 		if($resHouse = $user->getResidentialHouse()) {
 			// *.notify.reshouse.{id}
-//			$bindings['reshouse'] = array($resHouse);
+			$bindings['reshouse'] = array($resHouse);
 		}
 
 
@@ -126,7 +126,7 @@ class UserQueueFactory {
 			// *.notify.category.{id}.admin
 			$catOwner = $this->_DEPRECATED_GROUP->getOwner($cat->getId());
 
-			if($catOwner['id'] == $user->getId()) {
+			if($catOwner['uid'] == $user->getId()) {
 				$bindings['category'][] = $cat->getId() . ".admin";
 			}
 

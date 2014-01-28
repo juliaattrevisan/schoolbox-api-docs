@@ -26,6 +26,14 @@ class Responder extends EventEmitter {
 	const TIMEOUT_SUBSCRIBE = 3;
 	const TIMEOUT_FETCH = 10;
 
+	const CONTEXT_USER = 'user';
+	const CONTEXT_SESSION = 'session';
+	const CONTEXT_PIPE = 'pipe';
+	const CONTEXT_SELF = 'self';
+	const CONTEXT_DELIMITER = "\037"; // nonprintable unit separator character
+
+	const STREAM_BUFFER = 512;
+
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
 
@@ -60,6 +68,10 @@ class Responder extends EventEmitter {
 				break;
 		}
 
+		// reset our DB connections
+		\Database::reinitialise();
+		\DeprecatedDatabase::reinitialise();
+
 	}
 
 	/**
@@ -80,8 +92,43 @@ class Responder extends EventEmitter {
 		return $this->pid;
 	}
 
-	public function notify($string) {
-		fwrite($this->socketStream, $string);
+	/**
+	 * @param $data
+	 */
+	public function notifyServer($data) {
+		$this->notify(self::CONTEXT_SELF . self::CONTEXT_DELIMITER . $data);
+	}
+
+	/**
+	 * @param $data
+	 */
+	public function notifyPipe($data) {
+		$this->notify(self::CONTEXT_PIPE . self::CONTEXT_DELIMITER . $data);
+	}
+
+	/**
+	 * @param $data
+	 */
+	public function notifySession($data) {
+		$this->notify(self::CONTEXT_SESSION . self::CONTEXT_DELIMITER . $data);
+	}
+
+	/**
+	 * @param $data
+	 */
+	public function notifyUser($data) {
+		$this->notify(self::CONTEXT_USER . self::CONTEXT_DELIMITER . $data);
+	}
+
+	protected function notify($string) {
+		for($written = 0; $written < strlen($string); $written += $fwrite) {
+			$fwrite = fwrite($this->socketStream, substr($string, $written), self::STREAM_BUFFER);
+			if($fwrite === false) {
+				// we're finished early
+				break;
+			}
+		}
+		fclose($this->socketStream);
 	}
 
 	public function getSocketStream() {
@@ -126,7 +173,9 @@ class Responder extends EventEmitter {
 			$messages[$unread->getId()] = $unread->toArray();
 		}
 
-		return $messages;
+		$this->notifyPipe(json_encode(array(
+			'fetch' => $messages
+		)));
 
 	}
 
@@ -140,63 +189,12 @@ class Responder extends EventEmitter {
 	public function ack($user, $messageIds) {
 		if($subscription = $this->subscriptionManager->getUserSubscription($user, true)) {
 			$markAsRead = $subscription->acceptMessages($messageIds);
-			// if there are messages to mark as read, notify all sockets attached for this user
-//				if(count($markAsRead)) {
-//					$this->sendToUser($user, json_encode(array('mark_as_read' => $markAsRead)));
-//				}
-			return true;
+			$this->notifyUser(json_encode(array(
+				'ack' => $markAsRead
+			)));
 		}
-		return false;
 	}
 
 
-
-
-
-
-
-
-
-	/**
-	 * Use promises to perform an async task.
-	 *
-	 * @param string $on
-	 * @param int $timeout
-	 * @param callable $taskCallback
-	 * @param callable $failureCallback
-	 * @return \React\Promise\DeferredPromise
-	 */
-	protected function defer($on, $timeout, $taskCallback, $failureCallback) {
-		if($this->deferrals[$on]) {
-			return $this->deferrals[$on]->promise();
-		}
-
-		$promise = new Deferred();
-		$responder = $this;
-
-		$this->deferrals[$on] = $promise;
-		$this->deferrals[$on]->then($taskCallback);
-
-		$timer = $this->reactLoop->addTimer($timeout, function() use ($promise, $on, $responder) {
-			$promise->reject(new ConnectionException('Connection Timeout'));
-			$responder->dismiss($on);
-		});
-
-		$this->on($on, function($responder) use ($timer, $promise) {
-			/**
-			 * @var Timer $timer
-			 * @var Deferred $promise
-			 */
-			$timer->cancel();
-			$promise->resolve($responder);
-		});
-
-		return $this->deferrals[$on]->promise();
-	}
-
-
-	public function dismiss($on) {
-		unset($this->deferrals[$on]);
-	}
 
 }
