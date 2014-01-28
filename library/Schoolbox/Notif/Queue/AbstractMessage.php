@@ -79,14 +79,39 @@ abstract class AbstractMessage {
 	}
 
 
-	public function toArray() {
-		return array(
+	/**
+	 * Convert this message to an array
+	 *
+	 * @param bool $detailed
+	 * @return array
+	 */
+	public function toArray($detailed = false) {
+		$body = json_decode($this->getBody(), true);
+		$relative = new \Alaress_Date_Relative($body['datetime']['date']);
+
+		$self = array(
 			'id' => $this->getId(),
 			'timestamp' => (int)$this->getTimestamp(),
-			'expiry' => (int)$this->getExpiry(),
-			'body' => json_decode($this->getBody(), true),
+			'body' => array(
+				'message' => $body['message'],
+				'context' => array(
+					'icon' => isset($body['context']['icon']) ? $body['context']['icon'] : '',
+					'href' => isset($body['context']['href']) ? $body['context']['href'] : '',
+				),
+			),
 			'status' => $this->isRead() ? 'read' : 'unread'
 		);
+
+		if($detailed) {
+			$self['expiry'] = (int)$this->getExpiry();
+			// just include everything in the body
+			$self['body'] = $body;
+		}
+
+		// relative time here regardless
+		$self['body']['datetime']['date'] = $relative->getRelativeTime();
+
+		return $self;
 	}
 
 	/**

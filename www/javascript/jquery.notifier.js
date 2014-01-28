@@ -128,12 +128,16 @@
                         var body = toInsert[i].body;
                         var message = body.message;
                         var humanTime = body.datetime.date;
+                        var icon = body.context.icon;
+                        var href = body.context.href;
 
                         var li = msgLiTpl.clone();
 
                         li.attr('id', 'm-'+id).addClass(status);
+                        li.find('a').attr('href', href);
                         li.find('p').html(message);
                         li.find('time').html(humanTime);
+                        li.find('img').attr('src', icon);
                         newlist.append(li);
                     }
 
