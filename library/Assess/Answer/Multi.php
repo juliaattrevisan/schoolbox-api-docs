@@ -79,6 +79,23 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
     }
 
     /**
+     * Gets answers out of the answer group array, and shuffles answers if the
+     * question's configuration calls for them to be shuffled.
+     *
+     * @param  array $answerGroup an answer group from $this->getByQuestionId()
+     * @return array
+     */
+    protected function getAnswersFromAnswerGroup($answerGroup) {
+        $allAnswers = parent::getAnswersFromAnswerGroup($answerGroup);
+        $question   = $this->questionHandler->getByID($answerGroup['question_id']);
+        $config     = json_decode($question['config']);
+        if ($config->randomiseOptionOrder) {
+            shuffle($allAnswers);
+        }
+        return $allAnswers;
+    }
+
+    /**
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
