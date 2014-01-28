@@ -99,6 +99,8 @@ else {
 	/* Campus Checkbox Array when using Campus Event Level
 	 */
 	if ($campusList->count()) {
+		$allCampuses = array();
+
 		foreach($campusList as $current) {
 			$allCampuses[] = array(
 				'id' => $current->getId(),
@@ -125,6 +127,8 @@ else {
 	 * This really needs to be updated - why is checkList behaviour different to
 	 * the dropDown one when it comes to collections?
 	 */
+	$allRoles = array();
+
 	foreach($roleList as $current) {
 		$allRoles[] = array(
 			'id' => $current->getId(),
