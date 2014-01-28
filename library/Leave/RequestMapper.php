@@ -126,6 +126,15 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 		$this->hasMap(
 			array(
+				'column' => 'travel_type_id',
+				'property' => 'travelType',
+				'type' => self::TYPE_MODEL,
+				'join' => 'travelType',
+			)
+		);
+
+		$this->hasMap(
+			array(
 				'column' => 'notes',
 				'property' => 'notes',
 				'type' => self::TYPE_STRING,
@@ -153,6 +162,14 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			array(
 				'mapper'    => '\\Schoolbox\\UserMapper',
 				'this_key'  => 'user_id',
+				'other_key' => 'id',
+			)
+		);
+		$this->hasJoin(
+			'travelType',
+			array(
+				'mapper'    => 'Leave_Request_TravelTypeMapper',
+				'this_key'  => 'travel_type_id',
 				'other_key' => 'id',
 			)
 		);

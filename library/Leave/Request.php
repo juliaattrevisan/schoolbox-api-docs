@@ -48,6 +48,11 @@ class Leave_Request {
     protected $confirmedBy;
 
     /**
+     * @var Leave_Request_TravelType
+     */
+    protected $travelType;
+
+    /**
      * @param $created
      */
     public function setCreated($created) {
@@ -485,5 +490,21 @@ class Leave_Request {
      */
     public function getConfirmedByMapIndex($index) {
         return $this->confirmedByMap[$index];
+    }
+
+    /**
+     * @param  \Leave_Request_TravelType $travelType
+     * @return $this
+     */
+    public function setTravelType($travelType) {
+        $this->travelType = $travelType;
+        return $this;
+    }
+
+    /**
+     * @return \Leave_Request_TravelType
+     */
+    public function getTravelType() {
+        return $this->travelType;
     }
 }
