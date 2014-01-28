@@ -176,25 +176,40 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Helper method for getting a base query (includes SELECT part).
+	 *
+	 * It joins this table against the user, authorisationUser and travelType
+	 * joins.
+	 *
+	 * @return string
+	 */
+	protected function getBaseQuery() {
+		return "
+			SELECT
+				{$this->getColumnString('lr')},
+				{$this->getJoinColumnString('user', 'u')},
+				{$this->getJoinColumnString('authorisationUser', 'au')},
+				{$this->getJoinColumnString('travelType', 'tt')}
+			FROM `{$this->table}` lr
+			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
+			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
+		";
+	}
+
+	/**
 	 * Returns a collection of requests by user id
 	 *
 	 * @param $userId
 	 * @return \Schoolbox\Collection
 	 */
 	public function findAllByUserId($userId) {
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString('lr')},
-			{$this->getJoinColumnString('user', 'u')},
-			{$this->getJoinColumnString('authorisationUser', 'au')}
-			FROM `{$this->table}` lr
-			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
-			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE lr.user_id = :userId
 			AND lr.status != :status
 			ORDER BY lr.start
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -236,21 +251,13 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		  ");
 		  */
 
-		$statement = $this->database->prepare(
-			"
-			SELECT
-				{$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE u.residential_house_id = :houseId
 			AND lr.created >= :limit
 			AND lr.status != :deleted
 			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -284,19 +291,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * @return \Schoolbox\Collection
 	 */
 	private function getAllLeaveRequests($houseId) {
-		$statement = $this->database->prepare(
-			"
-			SELECT
-				{$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			WHERE u.residential_house_id = :houseId
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			AND lr.status = :status
 			AND lr.created >= :limit
 			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -504,17 +504,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	}
 
 	public function findById($id) {
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE lr.id = :id
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -534,17 +527,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	}
 
 	public function findAllByDateRange($start, $finish) {
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE lr.start < :finish AND lr.finish > :start AND lt.status != :deleted
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
