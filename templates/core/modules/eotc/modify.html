@@ -38,6 +38,11 @@
 			 */
 			setupRepeat();
 
+			/* Checkbox behaviours
+			 */
+			setupCheckboxStyles();
+			setupSelectAll();
+
 			/**
 			 * Initialise various configured params and determine a bunch
 			 * of ids and stuff that we'll probably use elsewhere
@@ -159,6 +164,43 @@
 					else {
 						$('#repeatUntil').hide();
 						config.element.find('input[name=repeat_until]').rules('remove', 'required');
+					}
+				});
+			}
+
+			/**
+			 * Add "select all" capability to checkboxes
+			 */
+			function setupSelectAll() {
+				config.element.find('[data-selectall="true"]').change(function(){
+					if ($j(this).is(':checked')) {
+						$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+					}
+					else {
+						$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+					}
+				});
+			}
+
+			/**
+			 * Set up checkbox styles upon click
+			 */
+			function setupCheckboxStyles() {
+				$j(':checkbox').each(function () {
+					if ($j(this).is(':checked')) {
+						$j(this).parent().addClass('active-checkbox');
+					}
+				});
+
+				$j(':checkbox').click(function () {
+					if ($j(this).parent().hasClass('active-checkbox')) {
+						$j(this).parent().removeClass('active-checkbox')
+						if($j(this).closest('.checkboxes').find('.select_all').is(':checked')){
+							$j(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+						}
+					}
+					else {
+						$j(this).parent().addClass('active-checkbox');
 					}
 				});
 			}
@@ -344,7 +386,7 @@
 						<!-- END event_role_list -->
 
 						<label class="float-left clear">
-							<input type="checkbox" class="select_all" /> Select all
+							<input type="checkbox" data-selectall="true" /> Select all
 						</label>
 					</div>
 				</td>
