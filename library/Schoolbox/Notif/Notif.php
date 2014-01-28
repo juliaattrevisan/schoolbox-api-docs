@@ -39,6 +39,7 @@ class Notif implements LoggerInterface {
 	const CHANNEL_SYNERGY      = 'syn';     //     "           "   synergy database events
 	const CHANNEL_ADMIN        = 'admin';   //     "           "   superuser events (includes assumption)
 	const CHANNEL_AUTH         = 'login';   //     "           "   authentication events
+	const CHANNEL_CMS          = 'cms';     //     "           "   cms events to be logged
 
 	/** @var IConfigLoader */
 	protected $conf;
@@ -135,6 +136,16 @@ class Notif implements LoggerInterface {
 			case self::CHANNEL_AUTH:
 				$sqlh = new MySQLHandler(Logger::INFO);
 				$sqlh->setQuery("INSERT INTO login_log (username, date, ip, login) VALUES (:username, NOW(), :ip, :login)");
+				$logger->pushHandler($sqlh);
+				break;
+			case self::CHANNEL_CMS:
+				$sqlh = new MySQLHandler(Logger::INFO);
+				$sqlh->setQuery("
+					INSERT INTO cmsLog
+						(`object`, `objectId`, `action`, `user`)
+					VALUES
+						(:object, :objectId, :action, :user)
+				");
 				$logger->pushHandler($sqlh);
 				break;
 		}
