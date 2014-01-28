@@ -58,10 +58,11 @@ class News extends DeprecatedModel {
         $query = "SELECT id, name FROM luCampus";
         /** @var Schoolbox\User $user */
         $user = $_SESSION['user'];
-        if (!$user->isSuperuser()) {
+        if (!($user->isSuperuser() || ($user->getRole()->isStaff() && Config::get('news_staff_post_enabled')))) {
             $query .= ", userAccess WHERE (luCampus.id = userAccess.sid OR userAccess.sid = 0) AND
                 userAccess.service = '".NEWS_SERVICE."' AND uid = " . $user->getId();
         }
+        $output = array();
         $campusList = $this->db->getAll($query);
         if (is_array($campusList)) {
             $i = 0;
