@@ -21,6 +21,12 @@ if (is_numeric($this->arg[0])) {
 else {
 	$this->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
 
+	/* Miscellaneous setvarring
+	 */
+	$this->setVar(array(
+		'FUNCTION' => 'Add',
+	));
+
 	$this->setVar(array(
 		'EVENT_ID' => '',
 		'EVENT_USER_ID' => $_SESSION['user']->getId(),
@@ -47,4 +53,6 @@ else {
 		'ADVANCED_SHOW' => '',
 		'ADVANCED_CLOSE' => 'hidden',
 	));
+
+
 }
