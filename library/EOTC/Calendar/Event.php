@@ -207,8 +207,8 @@ class Event {
 			$selectedDate = time();
 		}
 
-		$startDate = new Alaress_Date_Format($selectedDate, 'U');
-		$endDate = new Alaress_Date_Format($selectedDate, 'U');
+		$startDate = new \Alaress_Date_Format($selectedDate, 'U');
+		$endDate = new \Alaress_Date_Format($selectedDate, 'U');
 
 		$this->setStartDate($startDate);
 		$this->setEndDate($endDate);
