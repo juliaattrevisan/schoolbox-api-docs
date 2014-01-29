@@ -47,7 +47,7 @@ if (is_numeric($_GET['eventID'])) {
 	));
 
 	$page->setVar(array(
-		'EVENT_ID' => '',
+		'EVENT_ID' => $event->getId(),
 		'EVENT_USER_ID' => $_SESSION['user']->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
@@ -104,7 +104,7 @@ if (is_numeric($_GET['eventID'])) {
 	/* Event Access Levels
 	 * Requires both $groupList and $campusList for optional values
 	 */
-	$page->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), '', TEMPLATE_content, array(
+	$page->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), $event->getAccess(), TEMPLATE_content, array(
 		'id' => 'EVENT_EVENTLEVEL_ID',
 		'name' => 'EVENT_EVENTLEVEL_NAME',
 	));
@@ -156,7 +156,7 @@ if (is_numeric($_GET['eventID'])) {
 		);
 	}
 
-	$page->checkList('event_role_list', $allRoles, '', TEMPLATE_content, array(
+	$page->checkList('event_role_list', $allRoles, $event->getSid(), TEMPLATE_content, array(
 		'id' => 'EVENT_ROLE_ID',
 		'name' => 'EVENT_ROLE_NAME'
 	));
