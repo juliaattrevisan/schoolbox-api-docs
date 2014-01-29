@@ -213,9 +213,13 @@ class Event {
 		$this->setStartDate($startDate);
 		$this->setEndDate($endDate);
 	}
+
 	/**
 	 * Ensure that the user hasn't modified the URL in an untoward manner.
 	 * If they have, or it's somehow absent, default to week view.
+	 *
+	 * Really, the redirect should be passed as a base-64 encoded paramter
+	 * (or similar) rather than having to implicitly "guess" where to go next
 	 *
 	 * @param string $returnView
 	 * @param string $returnDate
@@ -244,6 +248,7 @@ class Event {
 
 			return $return;
 		}
+
 		// Otherwise - guess using Back to the future!
 		return '';
 	}
