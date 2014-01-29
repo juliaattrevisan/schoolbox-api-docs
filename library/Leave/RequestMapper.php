@@ -396,18 +396,16 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		");
 		*/
 
-		// Why does this query have extra filters on its join?
-		// My guess is to filter out users from leave requests, while preserving
-		// the returned leave request?
+		// Right Join with filters onto users - I want all users in this
+		// res.house, regardless of whether they have a leave request or not.
 		$statement = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('lr')},
 				{$this->getUserMapper()->getColumnString('u')},
 				{$this->getUserMapper()->getColumnString('au')},
 				{$this->getJoinColumnString('travelType', 'tt')}
-			FROM `user` u
-			-- LEFT JOIN groups g ON g.id = u.group_id
-			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+			FROM {$this->getTable()} `lr`
+			RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
 				AND lr.start < :finish
 				AND lr.finish > :start
 				AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
@@ -415,8 +413,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
 			WHERE u.residential_house_id = :houseId
 			ORDER BY LENGTH(u.year), u.year, u.lastname
-		"
-		);
+		");
 
 		$args = array(
 			':houseId' => $houseId,
