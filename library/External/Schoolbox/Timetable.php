@@ -112,22 +112,18 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
     /**
      * Gets a statement for fetching a user's classes.
      *
-     * @param bool $isTeacher True if fetching timetable for teacher.
-     *
      * @return PDOStatement
      */
-    protected function getClassUserStatement($isTeacher) {
+    protected function getClassUserStatement() {
+        // Get classes for which this user is involved, or is a teacher.
         $query = "
             SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id, u.synergy_id
             FROM class_user cl
             LEFT JOIN class c ON c.id = cl.class_id
             LEFT JOIN class_period cp ON cp.class_id = c.id
             LEFT JOIN user u ON cp.teacher_id = u.id
-            WHERE cl.user_id = :userId
+            WHERE cp.teacher_id = :userId OR cl.user_id = :userId
         ";
-        if ($isTeacher) {
-            $query .= ' AND cp.teacher_id = :userId';
-        }
         return $this->getDatabase()->prepare($query);
     }
 
@@ -174,7 +170,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 		/* Get user's classes */
 		// Is this a teacher? If so only get classes for which I'm a teacher
-		$classStatement = $this->getClassUserStatement($this->getGroup()->isStaff($userId));
+		$classStatement = $this->getClassUserStatement();
 		$classStatement->execute( array(
 			':userId' => $userId,
 		) );
@@ -226,7 +222,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
 
 		/* Get user's classes */
-		$classStatement = $this->getClassUserStatement($this->getGroup()->isStaff($userId));
+		$classStatement = $this->getClassUserStatement();
 		$classStatement->execute( array(
 			':userId' => $userId,
 		) );
