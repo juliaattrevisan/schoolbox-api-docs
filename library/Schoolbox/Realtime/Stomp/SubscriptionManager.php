@@ -11,7 +11,9 @@ namespace Schoolbox\Realtime\Stomp;
 
 
 use React\Stomp\Client;
+use React\Stomp\Exception\ConnectionException;
 use React\Stomp\Factory;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Pipe\Pipe;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Pipe\Responder;
@@ -56,28 +58,37 @@ class SubscriptionManager {
 
 		$this->pipeManager->v('SUBSCRIBE', '+');
 
-		$client = $this->stompFactory->createClient(array(
-			'host'      => '127.0.0.1',
-			'port'      => 61613,
-			'vhost'     => '/',
-			'login'     => 'guest',
-			'passcode'  => 'guest',
-		));
+		try {
+			$client = $this->stompFactory->createClient(array(
+				'host'      => '127.0.0.1',
+				'port'      => 61613,
+				'vhost'     => '/',
+				'login'     => 'guest',
+				'passcode'  => 'guest',
+			));
 
-		$self = $this;
-		$destination = $this->userSubscriptionDestination($user);
+			$self = $this;
+			$destination = $this->userSubscriptionDestination($user);
 
-		$client->connect()->then(function($client) use ($destination, $self, $user, $responder) {
-			/** @var Client $client */
-			// this closure is executed when a stomp client connection is established
-			$self->putSubscription($destination, new Subscription($destination, $client, $user, $self->getPipeManager()));
-			// if a responder is provided, use it as a callback for success
-			if($responder instanceof Responder) {
-				$responder->notifyPipe(json_encode(array('subscribe' => true)));
-			}
-		});
+			$client->connect()->then(function($client) use ($destination, $self, $user, $responder) {
+				/** @var Client $client */
+				// this closure is executed when a stomp client connection is established
+				$self->putSubscription($destination, new Subscription($destination, $client, $user, $self->getPipeManager()));
+				// if a responder is provided, use it as a callback for success
+				if($responder instanceof Responder) {
+					$responder->notifyPipe(json_encode(array('subscribe' => true)));
+				}
+			});
 
-		return true;
+			return true;
+		}
+		// the rabbit is probably offline
+		catch(ConnectionException $e) {
+			$notif = new Notif(Notif::CHANNEL_NOTIFICATION);
+			$notif->critical("Cannot bind to messaging system: check your STOMP bindings and that RabbitMQ is running.");
+			$this->pipeManager->v('Rabbitmq is offline or STOMP misconfigured!', '!');
+			return false;
+		}
 	}
 
 	/**

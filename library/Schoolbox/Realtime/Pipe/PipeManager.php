@@ -20,6 +20,7 @@ use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
 use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
 use Schoolbox\Notif\Queue\UnreadMessage;
 use Schoolbox\Realtime\Stomp\SubscriptionManager;
@@ -213,12 +214,12 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$arguments = $request['value'];
 
 		try {
-			if(method_exists($responder, $command)) {
+			if(method_exists($responder, $command) && in_array($command, array('subscribe', 'fetch', 'ack'))) {
 				// process the command that's been sent from the client
-				$this->v("Executing $command for $username [$socketKey]", '*');
+				$this->v("Executing $command for $username [$socketKey]");
 
 				// the command executed could take several seconds, depending on what it is
-				$response = $responder->$command($user, $arguments);
+				 $response = $responder->$command($user, $arguments);
 			}
 			else {
 				$response = "Cannot understand command '$command'";
@@ -227,6 +228,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		catch(\Exception $e) {
 			// catch any and all exceptions here, this MUST exit
 			$this->v($e->getMessage(), '!');
+			$notif = new Notif(Notif::CHANNEL_NOTIFICATION);
+			$notif->critical("Messaging error: $e");
 		}
 
 		// since we're about to terminate, we don't really care if this doesn't work,

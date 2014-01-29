@@ -75,13 +75,14 @@ class Notif implements LoggerInterface {
 			$this->amqp = false;
 		}
 
+		$from = 'notif@' . $this->conf->get('site_hostname') . '.' . $this->conf->get('site_domain');
+
+		$m = new \Swift_Message('Schoolbox Log', null, 'text/plain','utf-8');
+		$m->setTo($this->conf->get('mail_support_address'));
+		$m->setFrom($from);
+
 		// email handling
-		$this->mail = new SwiftMailerHandler(
-			new \Swift_Mailer(\Mailer::getSwiftTransport()),
-			\Swift_Message::newInstance('Schoolbox Log', null, 'text/plain', 'utf-8')
-				->addFrom('notif@' . $this->conf->get('site_hostname') . '.' . $this->conf->get('site_domain'))
-				->addTo('matt.day+notif@alaress.com.au')
-		);
+		$this->mail = new SwiftMailerHandler(new \Swift_Mailer(\Mailer::getSwiftTransport(true)), $m);
 
 		$this->syslog = new StreamHandler(fopen($this->conf->get('logs_dir') . '/mono.log', 'a'), Logger::NOTICE);
 
@@ -170,7 +171,13 @@ class Notif implements LoggerInterface {
 	public function log($level, $message, array $context = array()) {
 		$log = new Logger($this->channel);
 		$this->appendHandlers($log);
-		return $log->addRecord($level, $message, $context);
+		try {
+			return $log->addRecord($level, $message, $context);
+		}
+		catch(\Swift_TransportException $e) {
+			// rabbit failed... email failed... at least it's logged to file
+			return false;
+		}
 	}
 
 	/**
