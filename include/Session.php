@@ -169,8 +169,8 @@ class Session
         if (!$result) {
             /* Log failure */
 	        $notif = new Notif(Notif::CHANNEL_AUTH);
-	        $notif->info("Login failure for $username", array(
-		        'username' => $user['username'],
+	        $notif->info("Login failure for ".$user->getUsername(), array(
+		        'username' => $user->getUsername(),
 		        'ip'       => $ip,
 		        'login'    => 0,
 	        ));
