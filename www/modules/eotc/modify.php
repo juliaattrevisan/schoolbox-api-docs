@@ -20,6 +20,9 @@ if (is_numeric($this->arg[0])) {
  */
 else {
 	$this->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
+	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+	$this->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+	$this->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -51,6 +54,14 @@ else {
 		'EVENT_LOCATION' => '',
 		'EVENT_DETAIL' => ''
 	));
+
+	/* Recurrence
+	 */
+	$this->setVar(array(
+		'recurring_reminder_block' => ''
+	));
+
+	$this->parse('recurring_dates_block', 'recurring_dates');
 
 	/* Event Types
 	 */
