@@ -35,7 +35,6 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 	 */
 	protected function getGroupIDFromYearLevel($year) {
 		switch ($year) {
-			case '01':
 			case '02':
 			case '03':
 			case '04':
@@ -54,6 +53,7 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 				return 6;
 				break;
 			case '00':
+			case '01':
 			case '30':
 			case '40':
 				return 9;
