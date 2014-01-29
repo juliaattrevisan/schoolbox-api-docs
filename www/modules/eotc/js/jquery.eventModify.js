@@ -133,10 +133,10 @@
 		function setupAllDay() {
 			config.element.find('input[name=allday]').change(function() {
 				if ($(this).is(':checked')) {
-					config.element.find('.timeInputs').show();
+					config.element.find('.timeInputs').hide();
 				}
 				else {
-					config.element.find('.timeInputs').hide();
+					config.element.find('.timeInputs').show();
 				}
 			});
 		}

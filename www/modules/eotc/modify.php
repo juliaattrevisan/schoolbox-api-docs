@@ -39,6 +39,8 @@ else {
 		'EVENT_USER_ID' => $_SESSION['user']->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => '',
+		'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
+		'EVENT_TIMEINPUTS' => 'hide',
 		'EVENT_START_DATE' => '',
 		'EVENT_START_HOUR' => '',
 		'EVENT_START_MIN' => '',
@@ -49,7 +51,6 @@ else {
 		'EVENT_END_MIN' => '',
 		'EVENT_END_AM' => '',
 		'EVENT_END_PM' => '',
-		'EVENT_ALLDAY_CHECKED' => '',
 		'EVENT_PUBLISH_DATE' => '',
 		'EVENT_LOCATION' => '',
 		'EVENT_DETAIL' => ''
