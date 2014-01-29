@@ -75,9 +75,21 @@ if (is_numeric($_GET['eventID'])) {
 
 	/* Recurrence
 	 */
-	$page->setVar(array(
-		'recurring_reminder_block' => '',
-	));
+	// Is there a recurrence? If so don't show the repeat selector.
+	if ($event->getSeriesId() == null) {
+		$page->setVar('recurring_reminder_block', '');
+		$page->parse('recurring_dates_block', 'recurring_dates');
+	}
+	else {
+		$calendarHandler = new Calendar();
+		$recurrence = $calendarHandler->getSeriesRecurrence($event->getSeriesId());
+
+		$page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
+		$page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
+		$page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
+		$page->parse('recurring_reminder_block', 'recurring_reminder');
+		$page->setVar('recurring_dates_block', '');
+	}
 
 	$page->parse('delete_button_block', 'delete_button');
 	$page->parse('recurring_dates_block', 'recurring_dates');
