@@ -20,7 +20,23 @@ class Verboser {
 
 	public function v($message, $char = ' ') {
 		if(!is_null($this->stream)) {
-			fputs($this->stream, sprintf("[$char] $message\n"));
+
+			$c = '';
+
+			switch($char) {
+				case '!': $c = '1;31'; break;
+				case '?': $c = '0;33'; break;
+				case '+': $c = '0;32'; break;
+				case '-': $c = '0;34'; break;
+				case '*': $c = '0;31'; break;
+				case '>':
+				case '<': $c = '1;37'; break;
+			}
+
+			fputs($this->stream, sprintf(
+				"%s[$char] $message%s\n",
+				$c ? "\033[{$c}m" : '',
+				$c ? "\033[0m" : ''));
 		}
 	}
 

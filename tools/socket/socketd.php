@@ -59,7 +59,5 @@ $webSock->listen($port, '0.0.0.0');
 
 $webServer = new Ratchet\Server\IoServer($https, $webSock, $loop);
 
-if($verbose) {
-	echo "[ ] Listening for incoming websockets on port $port...\n";
-}
+$verboser->v("Listening for incoming websockets on port $port...", '+');
 $loop->run();
