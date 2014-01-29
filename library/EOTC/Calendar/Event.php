@@ -121,11 +121,17 @@ class Event {
 
 	/**
 	 * The date when the event was published (made visible to users)
-	 * An instance Alaress_Date_Format()
 	 *
 	 * @var null
 	 */
 	protected $publishDate = null;
+
+	/**
+	 * An instance Alaress_Date_Format()
+	 *
+	 * @var null
+	 */
+	protected $publishDateTime = null;
 
 	/**
 	 * If this is a task, whether it's completed or not
@@ -210,8 +216,8 @@ class Event {
 		$startDate = new \Alaress_Date_Format($selectedDate, 'U');
 		$endDate = new \Alaress_Date_Format($selectedDate, 'U');
 
-		$this->setStartDate($startDate);
-		$this->setEndDate($endDate);
+		$this->setStartDateTime($startDate);
+		$this->setEndDateTime($endDate);
 	}
 
 	/**
@@ -576,5 +582,19 @@ class Event {
 	 */
 	public function getStartTime() {
 		return $this->startTime;
+	}
+
+	/**
+	 * @param null $publishDateTime
+	 */
+	public function setPublishDateTime($publishDateTime) {
+		$this->publishDateTime = $publishDateTime;
+	}
+
+	/**
+	 * @return null
+	 */
+	public function getPublishDateTime() {
+		return $this->publishDateTime;
 	}
 }

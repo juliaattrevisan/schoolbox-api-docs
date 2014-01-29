@@ -13,6 +13,11 @@
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 $page = new SitePage();
 
+$page->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
+$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+
 /* Modify existing event
  */
 if (is_numeric($_GET['eventID'])) {
@@ -20,14 +25,55 @@ if (is_numeric($_GET['eventID'])) {
 	$event = $mapper->findById($_GET['eventID']);
 
 	new \Alaress_Probe($event);
+
+	/* Only provide publish date if one was provided and if it
+	 * wasn't useless somehow
+	 */
+	if ($event->getPublishDate() != null && !preg_match('/^0000-00-00/', $event->getPublishDate())) {
+		$publishDate = $event->getPublishDateTime()->getLocalShort();
+	}
+	else {
+		$publishDate = '';
+	}
+
+	/* Miscellaneous setvarring
+	 * Hide advanced options by default
+	 */
+	$page->setVar(array(
+		'FUNCTION' => 'Update',
+		'SHOW_ADVANCED' => '',
+		'ADVANCED_SHOW' => '',
+		'ADVANCED_CLOSE' => 'hidden',
+	));
+
+	$page->setVar(array(
+		'EVENT_ID' => '',
+		'EVENT_USER_ID' => $_SESSION['user']->getId(),
+		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
+		'EVENT_NOTE' => $event->getNote(),
+		'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
+		'EVENT_TIMEINPUTS' => $event->getAllDay() ? 'hide' : '',
+		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
+		'EVENT_START_HOUR' => $event->getStartDateTime()->getUsingFormat('H'),
+		'EVENT_START_MIN' => $event->getStartDateTime()->getUsingFormat('i'),
+		'EVENT_START_AM' => $event->getStartDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
+		'EVENT_START_PM' => $event->getStartDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+		'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
+		'EVENT_END_HOUR' => $event->getEndDateTime()->getUsingFormat('H'),
+		'EVENT_END_MIN' => $event->getEndDateTime()->getUsingFormat('i'),
+		'EVENT_END_AM' => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
+		'EVENT_END_PM' => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+		'EVENT_PUBLISH_DATE' => $publishDate,
+		'EVENT_LOCATION' => $event->getLocation(),
+		'EVENT_DETAIL' => $event->getDetail(),
+		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+	));
+
+	$page->outputPage();
 }
 /* Create new event
  */
 else {
-	$page->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
-	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
-	$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
 
 	/* Set up default dates
 	 */
@@ -51,12 +97,12 @@ else {
 		'EVENT_NOTE' => '',
 		'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
 		'EVENT_TIMEINPUTS' => 'hide',
-		'EVENT_START_DATE' => $event->getStartDate()->getUsingFormat('d/m/Y'),
+		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
 		'EVENT_START_HOUR' => '',
 		'EVENT_START_MIN' => '',
 		'EVENT_START_AM' => '',
 		'EVENT_START_PM' => '',
-		'EVENT_END_DATE' => $event->getEndDate()->getUsingFormat('d/m/Y'),
+		'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
 		'EVENT_END_HOUR' => '',
 		'EVENT_END_MIN' => '',
 		'EVENT_END_AM' => '',
@@ -64,7 +110,7 @@ else {
 		'EVENT_PUBLISH_DATE' => '',
 		'EVENT_LOCATION' => '',
 		'EVENT_DETAIL' => '',
-		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDate()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
 	));
 
 	/* Recurrence
