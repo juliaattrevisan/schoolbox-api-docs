@@ -63,7 +63,7 @@ class ClassInvolvementMapper extends Schoolbox\External\Mapper {
      * @return int        The number of rows deleted.
      */
     public function deleteInvolvementsForClass(ClassEntry $class) {
-        $query = "DELETE FROM `{$this->getTable()}` `ui` WHERE `ui`.`class_id` = :class";
+        $query = "DELETE FROM `{$this->getTable()}` WHERE `class_id` = :class";
         $statement = $this->database->prepare($query);
         $statement->execute(array('class' => $class->getId()));
         return $statement->rowCount();
