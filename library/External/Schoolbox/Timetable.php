@@ -118,10 +118,10 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
         // Get classes for which this user is involved, or is a teacher.
         $query = "
             SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id, u.synergy_id
-            FROM class_user cl
-            LEFT JOIN class c ON c.id = cl.class_id
-            LEFT JOIN class_period cp ON cp.class_id = c.id
-            LEFT JOIN user u ON cp.teacher_id = u.id
+            FROM class c
+            LEFT JOIN class_user   cl ON c.id = cl.class_id
+            LEFT JOIN class_period cp ON c.id = cp.class_id
+            LEFT JOIN user          u ON cp.teacher_id = u.id
             WHERE cp.teacher_id = :userId OR cl.user_id = :userId
         ";
         return $this->getDatabase()->prepare($query);
