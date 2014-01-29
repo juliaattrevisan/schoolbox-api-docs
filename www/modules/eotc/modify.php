@@ -24,7 +24,7 @@ if (is_numeric($_GET['eventID'])) {
 	$mapper = new \EOTC\Calendar\EventMapper();
 	$event = $mapper->findById($_GET['eventID']);
 
-//	new \Alaress_Probe($event);
+	new \Alaress_Probe($event);
 
 	/* Only provide publish date if one was provided and if it
 	 * wasn't useless somehow
@@ -67,6 +67,98 @@ if (is_numeric($_GET['eventID'])) {
 		'EVENT_LOCATION' => $event->getLocation(),
 		'EVENT_DETAIL' => $event->getDetail(),
 		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+	));
+
+	/* Recurrence
+	 */
+	$page->setVar(array(
+		'recurring_reminder_block' => '',
+	));
+
+	$page->parse('delete_button_block', 'delete_button');
+	$page->parse('recurring_dates_block', 'recurring_dates');
+
+	/* Event Types
+	 */
+	$calendarEventTypeMapper = new \EOTC\Calendar\EventTypeMapper();
+	$allEventTypes = $calendarEventTypeMapper->findAll();
+
+	$page->dropDown('type_drop', $allEventTypes, $event->getEventType()->getId(), TEMPLATE_content, array(
+		'id' => 'EVENT_EVENTTYPE_ID',
+		'type' => 'EVENT_EVENTTYPE_NAME'
+	));
+
+	/* Only provide Group option if groups have been defined
+	 */
+	$groupHandler = new \Group();
+	$groupList = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), true, WRITE_ACCESS);
+
+	/* Only provide Campus options if campuses have been defined
+	 */
+	$campusMapper = new \Schoolbox\CampusMapper();
+	$campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
+
+	/* Render all the dropdowns
+	 */
+
+	/* Event Access Levels
+	 * Requires both $groupList and $campusList for optional values
+	 */
+	$page->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), '', TEMPLATE_content, array(
+		'id' => 'EVENT_EVENTLEVEL_ID',
+		'name' => 'EVENT_EVENTLEVEL_NAME',
+	));
+
+	/* Group dropdown when using Group Event Level
+	 */
+	$page->dropDown('event_group_drop', $groupList, $_GET['sid'], TEMPLATE_content, array(
+		'id' => 'EVENT_GROUP_ID',
+		'name' => 'EVENT_GROUP_NAME'
+	));
+
+	/* Campus Checkbox Array when using Campus Event Level
+	 */
+	if ($campusList->count()) {
+		$allCampuses = array();
+
+		foreach($campusList as $current) {
+			$allCampuses[] = array(
+				'id' => $current->getId(),
+				'name' => $current->getName()
+			);
+		}
+
+		$page->checkList('event_campus_list', $allCampuses, array($_SESSION['campus'][0]), TEMPLATE_content, array(
+			'id' => 'EVENT_CAMPUS_ID',
+			'name' => 'EVENT_CAMPUS_NAME',
+		));
+	}
+	else {
+		$page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
+		$page->setVar('event_campus_list_block', '');
+	}
+
+	/* Roles, when Campus Event Level is used
+	 */
+	$roleMapper = new \Schoolbox\RoleMapper();
+	$roleList = $roleMapper->findAll();
+
+	/* Roles checkbox array when using Campus Event Level
+	 * This really needs to be updated - why is checkList behaviour different to
+	 * the dropDown one when it comes to collections?
+	 */
+	$allRoles = array();
+
+	foreach($roleList as $current) {
+		$allRoles[] = array(
+			'id' => $current->getId(),
+			'name' => $current->getName()
+		);
+	}
+
+	$page->checkList('event_role_list', $allRoles, '', TEMPLATE_content, array(
+		'id' => 'EVENT_ROLE_ID',
+		'name' => 'EVENT_ROLE_NAME'
 	));
 
 	$page->outputPage();
