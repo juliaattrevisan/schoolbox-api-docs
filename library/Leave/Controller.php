@@ -37,6 +37,13 @@ class Leave_Controller extends Controller {
     protected $externalUser;
     protected $group;
 
+    /**
+     * Travel methods for a leave request.
+     *
+     * @var array
+     */
+    protected $travelTypes;
+
     /* Time map array
       * A map of actual time values => presentation information
       * used in the Leave Time/Return Time dropdowns
@@ -104,6 +111,14 @@ class Leave_Controller extends Controller {
         $this->setHouseMapper(HouseResidentialMapper::getInstance());
         $this->setExternalUser(new External_User());
         $this->setGroup(new Group(HOUSEMASTER_SERVICE));
+        // Create a phantom "Not Specified" travel type (it doesn't exist in the DB)
+        $emptyTravelType = new Leave_Request_TravelType();
+        $emptyTravelType->setName('Not specified');
+        $travelMethods = array(0 => $emptyTravelType);
+        foreach (Leave_Request_TravelTypeMapper::getInstance()->findAll() as $method) {
+            $travelMethods[$method->getId()] = $method;
+        }
+        $this->setTravelTypes($travelMethods);
     }
 
     /**
@@ -241,7 +256,7 @@ class Leave_Controller extends Controller {
 
         $this->getPage()->dropDown(
             'travel_drop',
-            Leave_Request_TravelTypeMapper::getInstance()->findAll(),
+            $this->getTravelTypes(),
             null,
             TEMPLATE_content,
             array(
@@ -408,7 +423,7 @@ class Leave_Controller extends Controller {
             $this->getPage()->setBlock(TEMPLATE_content, 'travel_drop', 'travel_drop_block');
             $this->getPage()->dropDown(
                 'travel_drop',
-                Leave_Request_TravelTypeMapper::getInstance()->findAll(),
+                $this->getTravelTypes(),
                 $request->getTravelType()->getId(),
                 TEMPLATE_content,
                 array(
@@ -510,7 +525,8 @@ class Leave_Controller extends Controller {
 
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewRequest.html');
 
-
+            $travelTypes = $this->getTravelTypes();
+            $travelType  = $travelTypes[$request->getTravelType()->getId()] ?: $travelTypes[0];
             $this->getPage()->setVar(
                 array(
                     'REQUEST_ID' => $request->getId(),
@@ -530,7 +546,7 @@ class Leave_Controller extends Controller {
                     'REQUEST_USER_PHONE' => $request->getUserPhone(),
                     'REQUEST_DESCRIPTION' => $request->getDescription(),
                     'REQUEST_NOTES' => $request->getNotes(),
-                    'REQUEST_TRAVEL_TYPE' => $request->getTravelType()->getName() ?: 'Not Specified',
+                    'REQUEST_TRAVEL_TYPE' => $travelType->getName(),
                 )
             );
         } else {
@@ -1355,5 +1371,21 @@ class Leave_Controller extends Controller {
      */
     private function getTimeMap() {
         return $this->timeMap;
+    }
+
+    /**
+     * @param  array $travelTypes
+     * @return $this
+     */
+    public function setTravelTypes($travelTypes) {
+        $this->travelTypes = $travelTypes;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTravelTypes() {
+        return $this->travelTypes;
     }
 }
