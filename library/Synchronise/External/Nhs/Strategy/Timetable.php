@@ -77,13 +77,15 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
         foreach ($reader as $row) {
             // Group by class
             $class = $row['Class'];
-            $this->list[$class]['class']         = $class;
-            $this->list[$class]['period_list'][] = array(
-                'day'     => $this->convertDay($row['Day']),
-                'period'  => $row['Period'],
-                'teacher' => $row['Teacher'],
-                'room'    => $row['Room'],
-            );
+            if (isset($class)) {
+                $this->list[$class]['class']         = $class;
+                $this->list[$class]['period_list'][] = array(
+                    'day'     => $this->convertDay($row['Day']),
+                    'period'  => $row['Period'],
+                    'teacher' => $row['Teacher'],
+                    'room'    => $row['Room'],
+                );
+            }
         }
     }
 
@@ -147,15 +149,12 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
             $class = ClassEntryMapper::getInstance()->findOneByColumn('code', $new_item['class']);
         }
         catch (Exception $e) {}
-        if (!($class instanceof ClassEntry)) {
-
-            if ($this->perform_update) {
-                //Create this weird class we just found.
-                $class = new ClassEntry();
-                $class->setName($new_item['class']);
-                $class->setCode($new_item['class']);
-                ClassEntryMapper::getInstance()->save($class);
-            }
+        if (!($class instanceof ClassEntry) && $this->perform_update) {
+            //Create this weird class we just found, as long as it has a name.
+            $class = new ClassEntry();
+            $class->setName($new_item['class']);
+            $class->setCode($new_item['class']);
+            ClassEntryMapper::getInstance()->save($class);
         }
 
         $classInvolvements = array();
