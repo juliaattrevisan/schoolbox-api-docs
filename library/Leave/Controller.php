@@ -222,6 +222,7 @@ class Leave_Controller extends Controller {
     public function renderCreateRequest($data) {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'student_selector', 'student_selector_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'travel_drop', 'travel_drop_block');
         $this->getPage()->setBlock('student_selector', 'student_drop', 'student_drop_block');
         $this->getPage()->setBlock(
             'custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block'
@@ -237,6 +238,17 @@ class Leave_Controller extends Controller {
         $this->renderHostTypeDropdown($request);
 
         $this->getPage()->setVar($data);
+
+        $this->getPage()->dropDown(
+            'travel_drop',
+            Leave_Request_TravelTypeMapper::getInstance()->findAll(),
+            null,
+            TEMPLATE_content,
+            array(
+                'name' => 'TRAVEL_DROP_NAME',
+                'id'   => 'TRAVEL_DROP_VALUE',
+            )
+        );
 
         /* Add terms and conditions
            */

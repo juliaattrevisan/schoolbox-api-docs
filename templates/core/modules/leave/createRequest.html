@@ -242,10 +242,22 @@ $j(function() {
             </td>
             <td class="formLabelWidth">
                 <h4>Host Phone</h4>
-                <em></em>
             </td>
             <td>
                 <input type="text" name="request[hostPhone]" size="16" class="required" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Travel Method</h4>
+            </td>
+            <td colspan="3">
+                <select name="request[travelType]">
+                    <option value="">Not specified</option>
+                    <!-- BEGIN travel_drop -->
+                    <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_SELECTED}>{TRAVEL_DROP_NAME}</option>
+                    <!-- END travel_drop -->
+                </select>
             </td>
         </tr>
         <tr>
@@ -261,7 +273,6 @@ $j(function() {
         <tr>
             <td class="formLabelWidth">
                 <h4>Terms and Conditions</h4>
-                <em></em>
             </td>
             <td colspan="3">
                 {TERMS_AND_CONDITIONS}
