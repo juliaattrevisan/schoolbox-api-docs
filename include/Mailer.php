@@ -215,18 +215,19 @@ class Mailer {
         return true;
     }
 
-    /**
-     * Creates a Swift mailer transport instance, or gets last one created if it
-     * has already been created.
-     *
-     * The exact transport used depends on configuration settings - if a SMTP
-     * host and port are configured, it returns a Swift_SmtpTransport, otherwise
-     * a Swift_MailTransport object.
-     *
-     * @return Swift_Transport
-     */
-    public static function getSwiftTransport() {
-        if (!(self::$transport instanceof Swift_Transport)) {
+	/**
+	 * Creates a Swift mailer transport instance, or gets last one created if it
+	 * has already been created.
+	 *
+	 * The exact transport used depends on configuration settings - if a SMTP
+	 * host and port are configured, it returns a Swift_SmtpTransport, otherwise
+	 * a Swift_MailTransport object.
+	 *
+	 * @param bool $reinitialise
+	 * @return Swift_Transport
+	 */
+    public static function getSwiftTransport($reinitialise = false) {
+        if (!(self::$transport instanceof Swift_Transport) || $reinitialise) {
             if (Cfg::get('mail_smtp_host') && Cfg::get('mail_smtp_port') ){
                 self::$transport = new Swift_SmtpTransport(
                     Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port')
