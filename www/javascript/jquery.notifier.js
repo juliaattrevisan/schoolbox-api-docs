@@ -85,7 +85,19 @@
 
                     dom.click(function(e) {
                         e.preventDefault();
-                        $('#message-list').toggleClass('hide');
+                        e.stopImmediatePropagation();
+                        $('#message-list').removeClass('hide');
+
+                        updateRelativeTimes();
+                        var ii = setInterval(updateRelativeTimes, 9000);
+
+                        if(settings.debug) { console.log('Open list'); }
+
+                        $('body').one('click', function(e) {
+                            $('#message-list').addClass('hide');
+                            clearInterval(ii);
+                            if(settings.debug) { console.log('Close list', this); }
+                        });
                     });
                 }
 
@@ -154,6 +166,19 @@
 
                 $('#messages').replaceWith(newlist);
 
+            }
+
+            /**
+             * @private
+             */
+            function updateRelativeTimes() {
+                $('#messages').children('li.message').each(function(k, v) {
+                    var msgId = this.id.split('-')[1];
+                    if(typeof messages[msgId] !== 'undefined') {
+                        var timestamp = messages[msgId].timestamp;
+                        $(this).find('time').text(moment.unix(timestamp).fromNow());
+                    }
+                });
             }
 
 
