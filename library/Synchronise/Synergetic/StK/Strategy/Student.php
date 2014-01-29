@@ -42,7 +42,7 @@ class Synchronise_Synergetic_StK_Strategy_Student extends Synchronise_Synergetic
 		//
 		// Username: always network login
 		$newUser['username']  = $currentUser['NetworkLogin'];
-		$newUser['title']     = $currentUser['StudentTitle'];
+		$newUser['title']     = '';
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname']  = $currentUser['StudentSurname'];
 		//
