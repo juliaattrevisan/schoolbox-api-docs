@@ -209,11 +209,16 @@ then
 	umount -f $backup_dir;
 fi
 
-# On error, email logfile
+# Detect permission denied errors
 if [ `grep -i "Permission denied" $logfile | wc -l` -ne 0 ];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Error: permission denied errors detected" >> $logfile;
 fi
+
+# Create facter fact directory if missing
+mkdir -p /etc/facter/facts.d >>$logfile 2>&1;
+
+# On error, email logfile and log fact
 if [ `grep -i error $logfile | wc -l` -ne 0 ];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Sending Email to support@schoolbox.com.au" >> $logfile;
@@ -223,7 +228,10 @@ then
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Sending Email to $backup_failure_email" >> $logfile;
 		mail -s "[`date +%Y-%m-%d\ %H:%M:%S`] Schoolbox Backup on '$HOSTNAME'" $backup_failure_email < $logfile 2>>$logfile;
 	fi
+	echo "$package""_last_backup=failed" > "/etc/facter/facts.d/$package""_last_backup.txt" 2>/dev/null;
 	exit 1;
+else
+	echo "$package""_last_backup=success" > "/etc/facter/facts.d/$package""_last_backup.txt" 2>/dev/null;
 fi
 
 echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Backup Completed" >> $logfile;
