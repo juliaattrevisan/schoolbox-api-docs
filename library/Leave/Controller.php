@@ -368,6 +368,12 @@ class Leave_Controller extends Controller {
         $request->setStatus(Leave_Request::STATUS_PENDING);
         $request->setCreated($created->getDatabase());
 
+        $travelType  = $data['request']['travelType'];
+        $travelTypes = $this->getTravelTypes();
+        if ($travelType && array_key_exists($travelType, $travelTypes)) {
+            $request->setTravelType($travelTypes[$travelType]);
+        }
+
         $this->getRequestMapper()->save($request);
 
         $request = $this->getRequestMapper()->findById($request->getId());
@@ -581,6 +587,15 @@ class Leave_Controller extends Controller {
         $request->setDescription($data['request']['description']);
         $request->setNotes($data['request']['notes']);
         $request->setConfirmedBy($data['request']['confirmedBy']);
+
+        $travelType  = $data['request']['travelType'];
+        $travelTypes = $this->getTravelTypes();
+        if ($travelType && array_key_exists($travelType, $travelTypes)) {
+            $request->setTravelType($travelTypes[$travelType]);
+        }
+        else {
+            $request->setTravelType(null);
+        }
 
         if (isset($data['approve']) || isset($data['reject'])) {
             $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
