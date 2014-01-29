@@ -24,12 +24,12 @@ if (is_numeric($_GET['eventID'])) {
 	$mapper = new \EOTC\Calendar\EventMapper();
 	$event = $mapper->findById($_GET['eventID']);
 
-	new \Alaress_Probe($event);
+//	new \Alaress_Probe($event);
 
 	/* Only provide publish date if one was provided and if it
 	 * wasn't useless somehow
 	 */
-	if (strlen($event->getPublishDateTime()->getDatabase())) {
+	if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
 		$publishDate = $event->getPublishDateTime()->getLocalShort();
 	}
 	else {
