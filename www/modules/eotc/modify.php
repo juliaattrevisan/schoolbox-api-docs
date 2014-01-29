@@ -8,69 +8,80 @@
  * @version     SVN: $Id$
  */
 
+/* Direct access to modify.php -_-
+ */
+require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+$page = new SitePage();
+
 /* Modify existing event
  */
-if (is_numeric($this->arg[0])) {
+if (is_numeric($_GET['eventID'])) {
 	$mapper = new \EOTC\Calendar\EventMapper();
-	$event = $mapper->findById($this->arg[0]);
+	$event = $mapper->findById($_GET['eventID']);
 
 	new \Alaress_Probe($event);
 }
 /* Create new event
  */
 else {
-	$this->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
-	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-	$this->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
-	$this->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+	$page->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
+	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+	$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+
+	/* Set up default dates
+	 */
+	$event = new \EOTC\Calendar\Event();
+	$event->setupDates($_GET['date']);
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
 	 */
-	$this->setVar(array(
+	$page->setVar(array(
 		'FUNCTION' => 'Add',
 		'SHOW_ADVANCED' => '',
 		'ADVANCED_SHOW' => '',
 		'ADVANCED_CLOSE' => 'hidden',
 	));
 
-	$this->setVar(array(
+	$page->setVar(array(
 		'EVENT_ID' => '',
 		'EVENT_USER_ID' => $_SESSION['user']->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => '',
 		'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
 		'EVENT_TIMEINPUTS' => 'hide',
-		'EVENT_START_DATE' => '',
+		'EVENT_START_DATE' => $event->getStartDate()->getUsingFormat('d/m/Y'),
 		'EVENT_START_HOUR' => '',
 		'EVENT_START_MIN' => '',
 		'EVENT_START_AM' => '',
 		'EVENT_START_PM' => '',
-		'EVENT_END_DATE' => '',
+		'EVENT_END_DATE' => $event->getEndDate()->getUsingFormat('d/m/Y'),
 		'EVENT_END_HOUR' => '',
 		'EVENT_END_MIN' => '',
 		'EVENT_END_AM' => '',
 		'EVENT_END_PM' => '',
 		'EVENT_PUBLISH_DATE' => '',
 		'EVENT_LOCATION' => '',
-		'EVENT_DETAIL' => ''
+		'EVENT_DETAIL' => '',
+		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDate()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
 	));
 
 	/* Recurrence
 	 */
-	$this->setVar(array(
+	$page->setVar(array(
 		'recurring_reminder_block' => '',
 		'delete_button_block' => ''
 	));
 
-	$this->parse('recurring_dates_block', 'recurring_dates');
+	$page->parse('recurring_dates_block', 'recurring_dates');
 
 	/* Event Types
 	 */
 	$calendarEventTypeMapper = new \EOTC\Calendar\EventTypeMapper();
 	$allEventTypes = $calendarEventTypeMapper->findAll();
 
-	$this->dropDown('type_drop', $allEventTypes, '', TEMPLATE_content, array(
+	$page->dropDown('type_drop', $allEventTypes, '', TEMPLATE_content, array(
 		'id' => 'EVENT_EVENTTYPE_ID',
 		'type' => 'EVENT_EVENTTYPE_NAME'
 	));
@@ -91,14 +102,14 @@ else {
 	/* Event Access Levels
 	 * Requires both $groupList and $campusList for optional values
 	 */
-	$this->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), '', TEMPLATE_content, array(
+	$page->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), '', TEMPLATE_content, array(
 		'id' => 'EVENT_EVENTLEVEL_ID',
 		'name' => 'EVENT_EVENTLEVEL_NAME',
 	));
 
 	/* Group dropdown when using Group Event Level
 	 */
-	$this->dropDown('event_group_drop', $groupList, $_GET['sid'], TEMPLATE_content, array(
+	$page->dropDown('event_group_drop', $groupList, $_GET['sid'], TEMPLATE_content, array(
 		'id' => 'EVENT_GROUP_ID',
 		'name' => 'EVENT_GROUP_NAME'
 	));
@@ -115,14 +126,14 @@ else {
 			);
 		}
 
-		$this->checkList('event_campus_list', $allCampuses, array($_SESSION['campus'][0]), TEMPLATE_content, array(
+		$page->checkList('event_campus_list', $allCampuses, array($_SESSION['campus'][0]), TEMPLATE_content, array(
 			'id' => 'EVENT_CAMPUS_ID',
 			'name' => 'EVENT_CAMPUS_NAME',
 		));
 	}
 	else {
-		$this->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
-		$this->setVar('event_campus_list_block', '');
+		$page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
+		$page->setVar('event_campus_list_block', '');
 	}
 
 	/* Roles, when Campus Event Level is used
@@ -143,8 +154,10 @@ else {
 		);
 	}
 
-	$this->checkList('event_role_list', $allRoles, '', TEMPLATE_content, array(
+	$page->checkList('event_role_list', $allRoles, '', TEMPLATE_content, array(
 		'id' => 'EVENT_ROLE_ID',
 		'name' => 'EVENT_ROLE_NAME'
 	));
+
+	$page->outputPage();
 }

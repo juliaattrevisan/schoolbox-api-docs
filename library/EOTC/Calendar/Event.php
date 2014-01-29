@@ -190,6 +190,64 @@ class Event {
 	public function __construct() {
 	}
 
+	/* Auxiliary methods which don't belong anywhere else
+	 */
+
+	/**
+	 * Derive start and end dates
+	 *
+	 * @param $date
+	 */
+	public function setupDates($date) {
+		list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $date);
+
+		$selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
+
+		if ($selectedDate <= 0) {
+			$selectedDate = time();
+		}
+
+		$startDate = new Alaress_Date_Format($selectedDate, 'U');
+		$endDate = new Alaress_Date_Format($selectedDate, 'U');
+
+		$this->setStartDate($startDate);
+		$this->setEndDate($endDate);
+	}
+	/**
+	 * Ensure that the user hasn't modified the URL in an untoward manner.
+	 * If they have, or it's somehow absent, default to week view.
+	 *
+	 * @param string $returnView
+	 * @param string $returnDate
+	 * @param int    $groupId
+	 * @param int    $userId
+	 *
+	 * @return string
+	 * @internal param $returnTo
+	 */
+	public function setupRedirect($returnView, $returnDate = "", $groupId = null, $userId = null) {
+		if ($returnView === 'dashboard') {
+			return '/';
+		}
+		else if ($returnView === 'upcomingEventAttendance') {
+			return '/calendar/attendance/upcomingEvents/';
+		}
+		else if ($returnView === 'homepage') {
+			return '/homepage/'.$groupId;
+		}
+		else if ($returnView === 'calendar') {
+			$return = "/calendar/full/$returnDate";
+
+			if ($userId) {
+				$return .= '/'.$userId;
+			}
+
+			return $return;
+		}
+		// Otherwise - guess using Back to the future!
+		return '';
+	}
+
 	/* Getters/Setters
 	 */
 
