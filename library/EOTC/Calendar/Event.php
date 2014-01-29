@@ -121,12 +121,6 @@ class Event {
 
 	/**
 	 * The date when the event was published (made visible to users)
-	 *
-	 * @var null
-	 */
-	protected $publishDate = null;
-
-	/**
 	 * An instance Alaress_Date_Format()
 	 *
 	 * @var null
@@ -456,20 +450,6 @@ class Event {
 	 */
 	public function getOwner() {
 		return $this->owner;
-	}
-
-	/**
-	 * @param null $publishDate
-	 */
-	public function setPublishDate($publishDate) {
-		$this->publishDate = $publishDate;
-	}
-
-	/**
-	 * @return null
-	 */
-	public function getPublishDate() {
-		return $this->publishDate;
 	}
 
 	/**

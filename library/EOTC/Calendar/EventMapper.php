@@ -110,11 +110,6 @@ class EventMapper extends Schoolbox\External\Mapper {
 		));
 		$this->hasMap(array(
 			'column' => 'publish_date',
-			'property' => 'publishDate',
-			'type' => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column' => 'publish_date',
 			'property' => 'publishDateTime',
 			'type' => self::TYPE_DATETIME,
 		));
@@ -193,9 +188,6 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
 			$eventItem->setEndDateTime($endDateTime);
-
-			$publishDateTime = new \Alaress_Date_Format($eventItem->getPublishDate(), 'y-m-d h:i:s');
-			$eventItem->setPublishDateTime($publishDateTime);
 
 			return $eventItem;
 		}

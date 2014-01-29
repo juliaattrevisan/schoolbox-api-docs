@@ -29,7 +29,7 @@ if (is_numeric($_GET['eventID'])) {
 	/* Only provide publish date if one was provided and if it
 	 * wasn't useless somehow
 	 */
-	if ($event->getPublishDate() != null && !preg_match('/^0000-00-00/', $event->getPublishDate())) {
+	if (strlen($event->getPublishDateTime()->getDatabase())) {
 		$publishDate = $event->getPublishDateTime()->getLocalShort();
 	}
 	else {
