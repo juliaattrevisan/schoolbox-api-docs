@@ -405,6 +405,17 @@ class Leave_Controller extends Controller {
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
             $this->getPage()->setBlock(TEMPLATE_content, 'next_pending', 'next_pending_block');
             $this->getPage()->setBlock(TEMPLATE_content, 'prev_pending', 'prev_pending_block');
+            $this->getPage()->setBlock(TEMPLATE_content, 'travel_drop', 'travel_drop_block');
+            $this->getPage()->dropDown(
+                'travel_drop',
+                Leave_Request_TravelTypeMapper::getInstance()->findAll(),
+                $request->getTravelType()->getId(),
+                TEMPLATE_content,
+                array(
+                    'name' => 'TRAVEL_DROP_NAME',
+                    'id'   => 'TRAVEL_DROP_VALUE',
+                )
+            );
 
             /* Render dropdowns
                 */
