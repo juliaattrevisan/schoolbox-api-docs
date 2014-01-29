@@ -79,11 +79,47 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
             $class = $row['Class'];
             $this->list[$class]['class']         = $class;
             $this->list[$class]['period_list'][] = array(
-                'day'     => $row['Day'],
+                'day'     => $this->convertDay($row['Day']),
                 'period'  => $row['Period'],
                 'teacher' => $row['Teacher'],
                 'room'    => $row['Room'],
             );
+        }
+    }
+
+    /**
+     * Mangles day from timetable CSV file into a timetable day that Schoolbox
+     * recognises.
+     *
+     * MonA => 1, TueA => 2, through to FriB => 10
+     *
+     * @param  string $day
+     * @return int
+     */
+    protected function convertDay($day) {
+        switch ($day) {
+            case 'MonA':
+                return 1;
+            case 'TueA':
+                return 2;
+            case 'WedA':
+                return 3;
+            case 'ThuA':
+                return 4;
+            case 'FriA':
+                return 5;
+            case 'MonB':
+                return 6;
+            case 'TueB':
+                return 7;
+            case 'WedB':
+                return 8;
+            case 'ThuB':
+                return 9;
+            case 'FriB':
+                return 10;
+            default:
+                return 0;
         }
     }
 
