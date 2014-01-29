@@ -58,7 +58,8 @@ else {
 	/* Recurrence
 	 */
 	$this->setVar(array(
-		'recurring_reminder_block' => ''
+		'recurring_reminder_block' => '',
+		'delete_button_block' => ''
 	));
 
 	$this->parse('recurring_dates_block', 'recurring_dates');
