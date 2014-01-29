@@ -519,6 +519,7 @@ class Leave_Controller extends Controller {
                     'REQUEST_USER_PHONE' => $request->getUserPhone(),
                     'REQUEST_DESCRIPTION' => $request->getDescription(),
                     'REQUEST_NOTES' => $request->getNotes(),
+                    'REQUEST_TRAVEL_TYPE' => $request->getTravelType()->getName() ?: 'Not Specified',
                 )
             );
         } else {
