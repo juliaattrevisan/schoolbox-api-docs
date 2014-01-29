@@ -111,7 +111,7 @@ if (is_numeric($_GET['eventID'])) {
 
 	/* Group dropdown when using Group Event Level
 	 */
-	$page->dropDown('event_group_drop', $groupList, $_GET['sid'], TEMPLATE_content, array(
+	$page->dropDown('event_group_drop', $groupList, $event->getSid(), TEMPLATE_content, array(
 		'id' => 'EVENT_GROUP_ID',
 		'name' => 'EVENT_GROUP_NAME'
 	));

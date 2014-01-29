@@ -55,7 +55,7 @@ switch($_POST['action']) {
         $event = array(
             'owner' => $ownerId,
             'access' => $_POST['level'],
-			'authorId' => $_POST['authorId'],
+			'author_id' => $_POST['authorId'],
             'sid' => null,
             'campusList' => null,
             'groupList' => null,
@@ -74,7 +74,7 @@ switch($_POST['action']) {
 
         // New event? save the author
         if (empty($_POST['id'])) {
-            $event['authorId'] = $_SESSION['user']->getId();
+            $event['author_id'] = $_SESSION['user']->getId();
         }
 
         // Force events to have at least one campus value selected (if a group event)
@@ -184,12 +184,12 @@ switch($_POST['action']) {
 
 		/* Superuser modifying some arbitrary event
 		 */
-		if (!in_array($_SESSION['user']->getId(), array($event['authorId'], $event['owner']))) {
+		if (!in_array($_SESSION['user']->getId(), array($event['author_id'], $event['owner']))) {
 			$page->backToTheFuture(3);
 		}
 		/* Teacher modifying self-created event for some arbitrary person
 		 */
-		else if (($event['authorId'] != $event['owner']) && ($event['authorId'] == $_SESSION['user']->getId())) {
+		else if (($event['author_id'] != $event['owner']) && ($event['author_id'] == $_SESSION['user']->getId())) {
 			$page->backToTheFuture(3);
 		}
         else if (!empty($_POST['return'])) {
