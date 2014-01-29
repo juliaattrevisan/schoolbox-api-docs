@@ -111,7 +111,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$this->hasMap(array(
 			'column' => 'publish_date',
 			'property' => 'publishDate',
-			'type' => self::TYPE_DATE,
+			'type' => self::TYPE_DATETIME,
 		));
 		$this->hasJoin('owner', array(
 			'mapper'    => '\\Schoolbox\\UserMapper',
@@ -122,6 +122,11 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'mapper'    => '\\Schoolbox\\UserMapper',
 			'this_key'  => 'author_id',
 			'other_key' => 'id',
+		));
+		$this->hasJoin('eventType', array(
+			'mapper'    => '\\EOTC\\Calendar\\EventTypeMapper',
+			'this_key'  => 'type',
+			'other_key' => 'eventTypeID',
 		));
 	}
 
@@ -135,15 +140,18 @@ class EventMapper extends Schoolbox\External\Mapper {
 	public function findById($identifier) {
 		$ownerMapper = $this->getJoinMapper('owner');
 		$authorMapper = $this->getJoinMapper('author');
+		$eventTypeMapper = $this->getJoinMapper('eventType');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('e')},
 				{$ownerMapper->getColumnString('o')},
-				{$authorMapper->getColumnString('a')}
+				{$authorMapper->getColumnString('a')},
+				{$eventTypeMapper->getColumnString('t')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
 			WHERE e.id = :eventId
 		";
 
@@ -168,6 +176,11 @@ class EventMapper extends Schoolbox\External\Mapper {
 			$authorItem = $authorMapper->hydrate($row, 'a');
 			$eventItem->setAuthor($authorItem);
 
+			/* Event Type
+			 */
+			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+			$eventItem->setEventType($eventTypeItem);
+
 			/* Convert dates ;(
 			 */
 			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
@@ -175,7 +188,10 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
 			$eventItem->setEndDateTime($endDateTime);
-			
+
+			$publishDate = new \Alaress_Date_Format($eventItem->getPublishDate(), 'y-m-d h:i:s');
+			$eventItem->setPublishDate($publishDate);
+
 			return $eventItem;
 		}
 
