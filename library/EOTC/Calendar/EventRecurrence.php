@@ -1,0 +1,242 @@
+<?php
+/**
+ * EventRecurrence
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace EOTC\Calendar;
+
+
+class EventRecurrence {
+
+	/**
+	 * Possible values for recurrence
+	 *
+	 * @var array
+	 */
+	private $validRepeat = array(
+		'daily' => '+1 day',
+		'weekly' => '+1 week',
+		'fortnightly' => '+2 weeks',
+		'monthly' => '+1 month'
+	);
+
+	/**
+	 * A calendar handler
+	 *
+	 * @var null
+	 */
+	private $calendarHandler = null;
+
+	/**
+	 * Maximum number of times an event can recurrrrr
+	 *
+	 * @var int
+	 */
+	private $maxNumRecurring = 100;
+
+	/**
+	 * Series id
+	 *
+	 * @var int
+	 */
+	private $seriesId = -1;
+
+	/**
+	 * The chosen frequency of event recurrence (daily, weekly, etc)
+	 * as selected by the user
+	 *
+	 * @var string
+	 */
+	private $repeatSetting = '';
+
+	/**
+	 * An array of Alaress_Date_Format objects which indicate when a
+	 * recurring event incident begins and ends
+	 *
+	 * @var array
+	 */
+	private $dateCollection = array();
+
+	/**
+	 * Constructor
+	 *
+	 * @param $repeatSetting
+	 */
+	public function __construct($repeatSetting) {
+		$this->setCalendarHandler(new Calendar());
+		$this->setDateCollection(new \Schoolbox\Collection());
+		$this->setRepeatSetting($repeatSetting);
+	}
+
+	/**
+	 * Set up recurring events
+	 * Return an array of Alaress_Date_Format instances
+	 *
+	 * @param $until
+	 * @param \Alaress_Date_Format $startDate
+	 * @param \Alaress_Date_Format $endDate
+	 * @return array
+	 */
+	public function setup($until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+
+		// repeat specified, and and enddate also, populate the dates to be set
+		if ($this->isValidInterval() && $until) {
+			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex() + 1);
+
+			$start_timestamp = $startDate->getUnixTimestamp();
+			$end_timestamp = $endDate->getUnixTimestamp();
+
+			// Repeat of events: repeat until the start date is after the until
+			// date (or x100, whatever is less)
+			for ($i = 0; ($start_timestamp <= $until) && ($i < $this->getMaxNumRecurring()); $i++) {
+
+				/* Increment to the next incident of the event
+				 */
+				$start_timestamp = strtotime($this->intervalValue(), $start_timestamp);
+				$end_timestamp = strtotime($this->intervalValue(), $end_timestamp);
+
+				$this_start_date = new \Alaress_Date_Format($start_timestamp, 'U');
+				$this_end_date = new \Alaress_Date_Format($end_timestamp, 'U');
+
+				$this->getDateCollection()->add(array(
+					'start' => $this_start_date->getDatabaseDate(),
+					'end'   => $this_end_date->getDatabaseDate(),
+				));
+			}
+		}
+
+		// if repeat is set, but no enddate was specified, bail out
+		// "not enough data submitted to the form"
+		else if($this->isValidInterval() && (!$until)) {
+			error(2);
+		}
+
+		// no repeat
+		else {
+			$this->getDateCollection()->add(array(
+				'start' => $startDate->getDatabaseDate(),
+				'end'   => $endDate->getDatabaseDate(),
+			));
+		}
+	}
+
+	/**
+	 * Get a strtotime interval from a chosen setting
+	 *
+	 * @return mixed
+	 */
+	private function intervalValue() {
+		return $this->validRepeat[$this->getRepeatSetting()];
+	}
+
+	/**
+	 * Whether the interval setting chosen is valid
+	 *
+	 * @return bool
+	 */
+	private function isValidInterval() {
+		if (isset($this->validRepeat[$this->getRepeatSetting()])) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set calendar handler
+	 *
+	 * @param null $calendarHandler
+	 */
+	private function setCalendarHandler($calendarHandler) {
+		$this->calendarHandler = $calendarHandler;
+	}
+
+	/**
+	 * Get calendar handler
+	 *
+	 * @return null
+	 */
+	private function getCalendarHandler() {
+		return $this->calendarHandler;
+	}
+
+	/**
+	 * Set max num recurring
+	 *
+	 * @param int $maxNumRecurring
+	 */
+	private function setMaxNumRecurring($maxNumRecurring) {
+		$this->maxNumRecurring = $maxNumRecurring;
+	}
+
+	/**
+	 * Get max num recurring
+	 *
+	 * @return int
+	 */
+	private function getMaxNumRecurring() {
+		return $this->maxNumRecurring;
+	}
+
+	/**
+	 * Set series id
+	 *
+	 * @param int $seriesId
+	 */
+	private function setSeriesId($seriesId) {
+		$this->seriesId = $seriesId;
+	}
+
+	/**
+	 * Get series id
+	 *
+	 * @return int
+	 */
+	public function getSeriesId() {
+		return $this->seriesId;
+	}
+
+	/**
+	 * Set repeat setting
+	 *
+	 * @param string $repeatSetting
+	 */
+	private function setRepeatSetting($repeatSetting) {
+		$this->repeatSetting = $repeatSetting;
+	}
+
+	/**
+	 * Get repeat setting
+	 *
+	 * @return string
+	 */
+	private function getRepeatSetting() {
+		return $this->repeatSetting;
+	}
+
+	/**
+	 * Set date collection
+	 *
+	 * @param array $dateCollection
+	 */
+	private function setDateCollection($dateCollection) {
+		$this->dateCollection = $dateCollection;
+	}
+
+	/**
+	 * Get date collection
+	 *
+	 * @return array
+	 */
+	public function getDateCollection() {
+		return $this->dateCollection;
+	}
+}

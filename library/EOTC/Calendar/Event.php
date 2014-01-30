@@ -188,6 +188,13 @@ class Event {
 	 * Constructor
 	 */
 	public function __construct() {
+		$this->setup();
+	}
+
+	/**
+	 * Hook method
+	 */
+	protected function setup() {
 	}
 
 	/* Auxiliary methods which don't belong anywhere else
