@@ -117,7 +117,7 @@ class EventRecurrence {
 	 */
 	public function __construct($eventId, $efficacy, $repeatSetting, \Alaress_Date_Format $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
 		$this->setEventId($eventId);
-		$this->setCalendarHandler(new Calendar());
+		$this->setCalendarHandler(new \Calendar());
 		$this->setDateCollection(new \Schoolbox\Collection());
 		$this->setRepeatSetting($repeatSetting);
 		$this->setUntil($until);
