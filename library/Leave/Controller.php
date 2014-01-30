@@ -843,6 +843,7 @@ class Leave_Controller extends Controller {
      * @param $data
      */
     public function exportUserRequestList($data) {
+        /** @var Schoolbox\User $user */
         $user = $data['user'];
         if ($this->hasViewPermission($user->getId())) {
             /** @var Leave_Request[] $requestList */
@@ -882,7 +883,7 @@ class Leave_Controller extends Controller {
                 }
             }
 
-            $this->dumpCSV('Leave Requests - ' . $user['firstname'] . ' ' . $user['lastname'], $allRows);
+            $this->dumpCSV('Leave Requests - ' . $user->formatName(), $allRows);
         }
 
         exit(1);
