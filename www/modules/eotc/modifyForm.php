@@ -56,15 +56,23 @@ switch($_POST['action']) {
 		 */
 		$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
 
+		/* Event ID, if provided
+		 */
+		if (is_numeric($_POST['id'])) {
+			$eventId = $_POST['id'];
+		}
+		else {
+			$eventId = null;
+		}
+
 		/* Crazy handler
 		 */
 		$event = array(
+			'id' => $eventId,
 			'owner' => $ownerId,
 			'access' => $_POST['level'],
 			'author_id' => $_POST['authorId'],
 			'sid' => null,
-			'campusList' => null,
-			'groupList' => null,
 			'type' => $_POST['type'],
 			'note' => $_POST['note'],
 			'allday' => !empty($_POST['allday']),
@@ -76,28 +84,33 @@ switch($_POST['action']) {
 			'attendance' => $_POST['attendance'],
 			'detail' => $_POST['detail'],
 			'publish_date' => $publishDate,
+
+			'campusList' => null,
+			'groupList' => null,
 		);
 
+		$groupList = array();
+		$campusList = array();
+
 		// Force events to have at least one campus value selected (if a group event)
-		if ($_POST['level'] == Calendar::ACCESS_CAMPUS) {
-			$event['groupList'] = $_POST['groupCheck'];
+		if ($event['access'] == Calendar::ACCESS_CAMPUS) {
+			$groupList = $_POST['groupCheck'];
 
 			if (is_array($_POST['campus']) && count($_POST['campus'])) {
-				$event['campusList'] = $_POST['campus'];
+				$campusList = $_POST['campus'];
 			}
 			else {
 				error(158);
 			}
 		}
-		elseif ($_POST['level'] == Calendar::ACCESS_GROUP) {
+		elseif ($event['access'] == Calendar::ACCESS_GROUP) {
 			$event['sid'] = $_POST['group'];
 		}
 
-		/* Set up recurrences, if appropriate
-		 * This is mandatory as events are saved via EventRecurrence
+		/* Save this event and any recurring incidents too
 		 */
-		$eventRecurrence = new \EOTC\Calendar\EventRecurrence($_POST['id'], $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
-		$eventRecurrence->setup()->save($event);
+		$eventMapper = new \EOTC\Calendar\EventMapper();
+		$eventMapper->save($groupList, $campusList, $event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in

@@ -194,4 +194,26 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 		throw new \Exception('Instance of object not found');
 	}
+
+	/**
+	 * Totally custom save method
+	 *
+	 * @param $groupList
+	 * @param $campusList
+	 * @param $event
+	 * @param $efficacy
+	 * @param $repeat
+	 * @param \Alaress_Date_Format $until
+	 * @param \Alaress_Date_Format $startDate
+	 * @param \Alaress_Date_Format $endDate
+	 * @return array|void
+	 */
+	public function save($groupList, $campusList, $event, $efficacy, $repeat, \Alaress_Date_Format $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+
+		/* Set up recurrences, if appropriate
+		 * This is mandatory as events are saved via EventRecurrence
+		 */
+		$eventRecurrence = new \EOTC\Calendar\EventRecurrence($event['id'], $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
+		$eventRecurrence->setup()->save($event);
+	}
 }
