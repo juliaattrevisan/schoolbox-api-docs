@@ -279,24 +279,33 @@ body{
   .fc-header{
     margin: 4px;
     padding: 0 11px;
-    background: #eaeaeb; /* Old browsers */
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2VhZWFlYiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkZGRlZGYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: -moz-linear-gradient(top,  #eaeaeb 0%, #dddedf 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eaeaeb), color-stop(100%,#dddedf)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #eaeaeb 0%,#dddedf 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #eaeaeb 0%,#dddedf 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #eaeaeb 0%,#dddedf 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #eaeaeb 0%,#dddedf 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaeaeb', endColorstr='#dddedf',GradientType=0 ); /* IE6-8 */
-
+    background: #eaeaeb url("/images/penola/h2-bg.png") bottom left repeat-x;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
     border: 1px solid #cfd0d2;
-
     -webkit-box-shadow: 0px 3px 5px 0px #e4e4e4;
     box-shadow: 0px 3px 5px 0px #e4e4e4;
+  }
 
+  .admin-contents h2 {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    text-indent: 0;
+    padding: 0;
+    font-size: 18px;
+  }
+
+  // Settings position on H2's
+  .box a.edit {
+    right: 41px;
+    top: 11px;
+  }
+  .box a.close-delete {
+    top: 11px;
+    right: 12px;
   }
 
   #category-head th,
