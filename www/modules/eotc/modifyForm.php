@@ -43,7 +43,7 @@ switch($_POST['action']) {
 			$publishDate = $pubDateObject->getDatabaseDate();
 		}
 		else {
-			$pubDateObject = 'NULL';
+			$publishDate = 'NULL';
 		}
 
 		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
