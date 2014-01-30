@@ -92,7 +92,6 @@ if (is_numeric($_GET['eventID'])) {
 	}
 
 	$page->parse('delete_button_block', 'delete_button');
-	$page->parse('recurring_dates_block', 'recurring_dates');
 }
 /* Create new event
  */
