@@ -34,10 +34,14 @@ class Collection implements \ICollection {
 	/**
 	 * Constructor
 	 *
+	 * Only set a stack parameter if it's an array
+	 *
 	 * @param array $stack
 	 */
 	public function __construct($stack = array()) {
-		$this->setStack($stack);
+		if (is_array($stack)) {
+			$this->setStack($stack);
+		}
 	}
 	
 	/**
