@@ -568,6 +568,7 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if request isn't found.
      */
     public function processModifyRequest($data) {
+        /** @var Leave_Request $request */
         try {
             $request = $this->getRequestMapper()->findById($data['request']['id']);
         }
@@ -601,7 +602,7 @@ class Leave_Controller extends Controller {
             $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
 
             $request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-            $request->setAuthorisationUserId($_SESSION['id']);
+            $request->setAuthorisationUser($_SESSION['user']);
 
             if (isset($data['approve'])) {
                 $request->setStatus(Leave_Request::STATUS_APPROVED);
@@ -1020,6 +1021,7 @@ class Leave_Controller extends Controller {
 
             if (!empty($requestList)) {
                 foreach ($requestList as $request) {
+                    /** @var Leave_Request $request */
                     try {
                         $request = $this->getRequestMapper()->findById($request['id']);
                     }
@@ -1031,7 +1033,7 @@ class Leave_Controller extends Controller {
                         $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
 
                         $request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-                        $request->setAuthorisationUserId($_SESSION['id']);
+                        $request->setAuthorisationUser($_SESSION['user']);
 
                         if (isset($data['approve'])) {
                             $request->setStatus(Leave_Request::STATUS_APPROVED);

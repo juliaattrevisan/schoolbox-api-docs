@@ -113,8 +113,8 @@ class Leave_Kings_Report_House_Web {
 
             /* Start and end of leave
                 */
-            $requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d h:i:s');
-            $requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d h:i:s');
+            $requestDateStart = new Alaress_Date_Format($request->getStart(), 'y-m-d h:i:s');
+            $requestDateFinish = new Alaress_Date_Format($request->getFinish(), 'y-m-d h:i:s');
 
             /* For each day that the person is on leave within the prescribed period of time, show an
                 * icon. If they are starting or ending their leave on this day, show the time as well
