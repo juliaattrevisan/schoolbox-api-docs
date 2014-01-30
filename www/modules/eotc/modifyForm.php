@@ -14,15 +14,16 @@ $groupHandler = new Group();
 $calendarHandler = new Calendar();
 $page = new SitePage();
 
+$userMapper = new \Schoolbox\UserMapper();
+
 /** @var Schoolbox\User $user */
-$user = $_SESSION['user'];
-$ownerId = $user->getId();
+$owner = $_SESSION['user'];
 
 /* Superuser/Staff/Parent adding event for someone else or
  * someone creating their own event
  */
-if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($_POST['userId']) || ($user->getId() == $_POST['userId'])) {
-	$ownerId = $_POST['userId'];
+if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($_POST['userId']) || ($_SESSION['user']->getId() == $_POST['userId'])) {
+	$owner = $userMapper->findById($_POST['userId']);
 }
 /* You're not supposed to be able to create events under other circumstances
  */
@@ -75,7 +76,6 @@ switch($_POST['action']) {
 		 * NO SURRENDER
 		 */
 		$userMapper = new \Schoolbox\UserMapper();
-		$owner = $userMapper->findById($ownerId);
 		$author = $userMapper->findById($_POST['authorId']);
 
 		/* Spawned further up
