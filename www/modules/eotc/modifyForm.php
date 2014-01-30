@@ -78,11 +78,6 @@ switch($_POST['action']) {
 			'publish_date' => $publishDate,
 		);
 
-		// New event? save the author
-		if (empty($_POST['id'])) {
-			$event['author_id'] = $_SESSION['user']->getId();
-		}
-
 		// Force events to have at least one campus value selected (if a group event)
 		if ($_POST['level'] == Calendar::ACCESS_CAMPUS) {
 			$event['groupList'] = $_POST['groupCheck'];
