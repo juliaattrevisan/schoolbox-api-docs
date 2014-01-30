@@ -24,42 +24,6 @@ class Attendance_Synergetic_AttendanceRecord {
 	}
 
 	/**
-	 * Insert new attendance record
-	 *
-	 * @param $data
-	 */
-	public function create($data) {
-		/*$query = "
-			INSERT INTO SynergyOne.dbo.tAttendances (
-				AttendanceMasterSeq, ID,
-				PossibleAbsenceCode, PossibleDescription,
-				AttendedFlag,
-				ModifiedDate, ModifiedByID,
-				PossibleReasonCode,
-				UserFlag1, UserFlag2, UserFlag3, UserFlag4, UserFlag5,
-				LateArrivalFlag, LateArrivalTime,
-				EarlyDepartureFlag, EarlyDepartureTime,
-				AbsenceEventsSeq,
-				NonAttendCreatedAbsenceEventsFlag
-			)
-			VALUES (
-				'{$data['AttendanceMasterSeq']}', '{$data['ID']}',
-				'{$data['PossibleAbsenceCode']}', '{$data['PossibleDescription']}',
-				'{$data['AttendedFlag']}',
-				'{$data['ModifiedDate']}', '{$data['ModifiedByID']}',
-				'{$data['PossibleReasonCode']}',
-				'{$data['UserFlag1']}', '{$data['UserFlag2']}', '{$data['UserFlag3']}', '{$data['UserFlag4']}', '{$data['UserFlag5']}',
-				'{$data['LateArrivalFlag']}', '{$data['LateArrivalTime']}',
-				'{$data['EarlyDepartureFlag']}', '{$data['EarlyDepartureTime']}',
-				'{$data['AbsenceEventsSeq']}',
-				'{$data['NonAttendCreatedAbsenceEventsFlag']}'
-			)
-		";*/
-
-		$this->getDatabase()->query($query);
-	}
-
-	/**
 	 * Update an attendance record
 	 *
 	 * @param $data
@@ -67,20 +31,33 @@ class Attendance_Synergetic_AttendanceRecord {
 	 * @return \PDOStatement
 	 */
 	public function update($data) {
-		$query = "
-			UPDATE SynergyOne.dbo.tAttendances
-			SET
-				PossibleAbsenceCode = '{$data['PossibleAbsenceCode']}',
-				PossibleDescription = \"{$data['PossibleDescription']}\",
-				PossibleReasonCode = '{$data['PossibleReasonCode']}',
-				AttendedFlag = '{$data['AttendedFlag']}',
-				ModifiedDate = GETDATE(),
-				ModifiedByID = '{$data['ModifiedByID']}'
-			WHERE AttendanceSeq = '{$data['AttendanceSeq']}'
-			AND	ID = '{$data['ID']}'
-		";
 
-		return $this->getDatabase()->query($query);
+        if(isset($data['ID']) && isset($data['AttendanceMasterSeq'])) {
+
+            $userID = $data['ID'];
+            $AttendanceMasterSeq = $data['AttendanceMasterSeq'];
+            unset($data['ID']);
+            unset($data['AttendanceMasterSeq']);
+
+            $query = "UPDATE SynergyOne.dbo.wkAttendances SET";
+
+            /* Set through all the data contained in array and set it */
+            foreach($data as $key => $value) {
+                $query .= " $key = '$value',";
+            }
+
+            $query = substr($query,0,-1);
+
+            /* Set based on two key values sequence and user id */
+            $query .= "
+                WHERE wkAttendanceMasterSeq = '$AttendanceMasterSeq'
+                AND	ID = '$userID'
+            ";
+            return $this->getDatabase()->query($query);
+        }
+        else {
+            return false;
+        }
 	}
 
 	/* Getters/Setters

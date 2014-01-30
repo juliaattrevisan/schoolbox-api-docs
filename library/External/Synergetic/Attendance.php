@@ -111,9 +111,6 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 
         $attendanceMaster->setupWork();
 
-        print $attendanceMaster->getAttendanceMasterSeq();
-
-
         /*
 		$attendanceMaster = new Attendance_Synergetic_AttendanceMaster_Existing($class, $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database);
 
@@ -134,73 +131,6 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	private function setup() {
 	}
 
-	/**
-	 * Get all the student ids for a particular AttendanceMasterSeq
-	 *
-	 * @param $attendanceMasterSeq
-	 * @return mixed
-	 */
-	private function getStudentIds($attendanceMasterSeq) {
-		$query = "
-			SELECT ID
-			FROM SynergyOne.dbo.tAttendances
-			WHERE attendanceMasterSeq = '{$attendanceMasterSeq}'
-		";
-
-		$allIds = array();
-
-		$result = $this->getDatabase()->getAll($query);
-
-		if (is_array($result) && count($result)) {
-			foreach($result as $current) {
-				$allIds[] = $current['ID'];
-			}
-		}
-
-		return $allIds;
-	}
-
-	/**
-	 * Get student data given a set of ids associated with a particular AttendanceMasterSeq
-	 * and thus associated with a particular point in time
-	 *
-	 * @param $attendanceMasterSeq
-	 *
-	 * @internal param $ids
-	 * @return mixed
-	 */
-	public function getStudents($attendanceMasterSeq) {
-		$allIds = $this->getStudentIds($attendanceMasterSeq);
-
-		if (count($allIds)) {
-			$ids = implode(',', $allIds);
-
-			$query = "
-				SELECT DISTINCT
-					StudentSurname as lastname, StudentPreferred as firstname,
-					StudentYearLevelDescription as yearlevel, StudentHouseDescription as house,
-					StudentMedicalAlert, StudentSpecialNeedsFlag,
-					StudentID as synergy_id
-				FROM
-					SynergyOne.dbo.StudentClasses StudentClasses
-				JOIN SynergyOne.dbo.vStudents vStudents ON (
-					vStudents.FileYear = StudentClasses.FileYear AND
-					vStudents.FileSemester = StudentClasses.FileSemester AND
-					vStudents.ID = StudentClasses.ID
-				)
-				WHERE StudentID IN ({$ids})
-				AND (StudentClasses.FileYear='{$this->getFileYear()}')
-				AND (StudentClasses.FileSemester='{$this->getFileSemester()}')
-				AND (StudentClasses.FileType != 'A' OR StudentClasses.StartDate <= getdate())
-				AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-				ORDER BY StudentSurname, StudentPreferred
-			";
-
-			return $this->getDatabase()->getAll($query);
-		}
-
-		return array();
-	}
 
 	/**
 	 * Get a list of attendees for a particular class, date and period
@@ -208,47 +138,19 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	 * @return mixed
 	 */
 	public function findAttendanceRecords() {
-		$query = "
-			SELECT
-				AttendanceSeq,
-				ID as synergy_id,
-				PossibleAbsenceCode,
-				Description AS PossibleAbsenceDescription,
-				PossibleReasonCode,
-				PossibleDescription AS PossibleReasonDescription,
-				AttendedFlag
-			FROM SynergyOne.dbo.tAttendances
-			LEFT JOIN SynergyOne.dbo.luAbsenceType ON SynergyOne.dbo.tAttendances.PossibleAbsenceCode = SynergyOne.dbo.luAbsenceType.Code
-			WHERE AttendanceMasterSeq = '{$this->getAttendanceMasterSeq()}'
-			ORDER BY AttendanceSeq
-		";
+        $result = $this->getDatabase()->executeProcedure(
+                       'spswkAttendances_ws', array(
+                               array('@wkAttendanceMasterSeq', $this->getAttendanceMasterSeq(), SQLINT4 ),
+                               array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
+                               array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
+                           )
+        );
 
-		$result = $this->getDatabase()->getAll($query);
-
-		if ($result) {
-			$this->setAllAttendanceRecords($result);
+		if ($result['success'] == 1) {
+			$this->setAllAttendanceRecords($result['result']);
 		}
 
 		return $this->getAllAttendanceRecords();
-	}
-
-	/**
-	 * Find the attendance record for a particular synergy_id
-	 * simply by traversing an array, rather than drumming the
-	 * db all over again
-	 *
-	 * @param $externalId
-	 *
-	 * @return array
-	 */
-	public function getAttendanceRecord($externalId) {
-		foreach ($this->getAllAttendanceRecords() as $currentAttendanceRecord) {
-			if ($currentAttendanceRecord['synergy_id'] == $externalId) {
-				return $currentAttendanceRecord;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -288,7 +190,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	 * @param $externalId
 	 * @return bool
 	 */
-	public function existingRecord($externalId) {
+	/*public function existingRecord($externalId) {
 		$query = "
 			SELECT *
 			FROM SynergyOne.dbo.tAttendances
@@ -297,7 +199,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 		";
 
 		return $this->getDatabase()->getRow($query);
-	}
+	}*/
 
 	/**
 	 * Determine if there are attendance records for this particular

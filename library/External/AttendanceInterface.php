@@ -12,8 +12,6 @@
  */
 interface External_AttendanceInterface {
 	public function findAttendanceRecords();
-	public function getAttendanceRecord($externalId);
 	public function findAbsenceDropdownOptions();
 	public function findReasonDropdownOptions();
-	public function existingRecord($externalId);
 }

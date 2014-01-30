@@ -100,7 +100,7 @@
 			/* Send in the clones!
 			 */
 			$j.post('/modules/attendance/modifyForm', data, function(responseText) {
-				window.location.href = window.location.href;
+				//window.location.href = window.location.href;
 			});
 		});
 	});
@@ -121,15 +121,15 @@
 <table class="table">
 	<tr>
 		<th></th>
-		<th class='genericWidth'>Firstname</th>
-		<th class='genericWidth'>Surname</th>
+		<th class='genericWidth'>Name</th>
+		<th class='genericWidth'>Attendance String</th>
 		<th>Absent</th>
 	</tr>
 	<!-- BEGIN student -->
 	<tr class='{ON_OFF}'>
 		<td><img src='/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64' width='32' height='32' alt="{STUDENT_FIRSTNAME} {STUDENT_LASTNAME}" /></td>
-		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_FIRSTNAME}</a></td>
-		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_LASTNAME}</a></td>
+		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_NAME}</a></td>
+        <td><p style="font-size:12pt">{STUDENT_ATTENDANCESTRING}</p></td>
 		<td>
 			<input id='attendanceOptions_{STUDENT_SYNERGY_ID}' class='attendanceOptions' type='checkbox' name='attending[]' value='{STUDENT_SYNERGY_ID}' {IS_ABSENT} />
 			<!-- BEGIN has_attendance_options -->
@@ -171,7 +171,7 @@
 
 				<!-- BEGIN has_update -->
 				<label><br />
-					<input class='btn update' type='submit' value='update' />
+					<input class='btn' type='submit' value='Save' />
 				</label>
 				<!-- END has_update -->
 			</form>

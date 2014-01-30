@@ -14,7 +14,7 @@ class Attendance_Synergetic_AttendanceMaster_New extends Attendance_Synergetic_A
 	 */
 	protected function setup() {
 		$class = $this->getClass();
-        print_r($class);
+
 		/* Default settings for a new AttendanceMaster record
 		 */
 		$data = array(

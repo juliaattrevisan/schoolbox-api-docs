@@ -72,10 +72,6 @@ if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
 	 */
 	if (is_array($_POST['data']) && count($_POST['data'])) {
 
-		/* First generate an AttendanceMasterSeq value by ramming in a new record
-		 */
-		$attendanceHandler->getAttendanceMaster()->insertStub();
-
 		/* This is a pretty hollow shell of a class, it just contains the mssql
 		 * instance and a query to insert/update
 		 */
@@ -89,31 +85,18 @@ if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
 			 */
 			$data = array(
 				'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
-				'ID' => Scrub::text($currentPerson['externalId']),
-				'PossibleAbsenceCode' => Scrub::text(trim($currentPerson['PossibleAbsenceCode'])),
-				'PossibleReasonCode' => Scrub::text(trim($currentPerson['PossibleReasonCode'])),
-				'PossibleDescription' => Scrub::text(trim($currentPerson['PossibleReasonDescription'])),
+				'ID' => $currentPerson['externalId'],
+				'PossibleAbsenceCode' => trim($currentPerson['PossibleAbsenceCode']),
+				'PossibleReasonCode' => trim($currentPerson['PossibleReasonCode']),
+				'PossibleDescription' => trim($currentPerson['PossibleReasonDescription']),
 				'AttendedFlag' => $currentPerson['AttendedFlag'],
-				'ModifiedByID' => $_SESSION['userID'],
-
-				/* I don't know what these really do but these seem to be
-				 * the usual default values
-				 */
-				'UserFlag1' => 0,
-				'UserFlag2' => 0,
-				'UserFlag3' => 0,
-				'UserFlag4' => 0,
-				'UserFlag5' => 0,
-				'LateArrivalFlag' => 0,
-				'LatearrivalTime' => null,
-				'EarlyDepartureFlag' => 0,
-				'EarlyDepartureTime' => null,
-				'AbsenceEventsSeq' => 0,
-				'NonAttendCreatedAbsenceEventsFlag' => 0
 			);
 
-			$attendanceRecord->create($data);
+			$attendanceRecord->update($data);
+
 		}
+
+        $attendanceHandler->getAttendanceMaster()->save();
 	}
 }
 /* Update an individual person's attendance details individually
@@ -125,54 +108,56 @@ if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
  * if they do, just update it - otherwise create a new one
  */
 else if (isset($_POST['updateOne']) && is_numeric($_POST['updateOne'])) {
-	$existingRecord = $attendanceHandler->existingRecord($_POST['updateOne']);
 
 	/* Update what's already in there, leaving other settings untarnished
 	 * You'll need to scrub to allow double-quotes (mssql seems to hate those)
 	 */
-	if (is_array($existingRecord) && isset($existingRecord['AttendanceSeq']) && is_numeric($existingRecord['AttendanceSeq'])) {
-		$data = $existingRecord;
-		$data['PossibleAbsenceCode'] = Scrub::text(trim($_POST['PossibleAbsenceCode']));
-		$data['PossibleReasonCode'] = Scrub::text(trim($_POST['PossibleReasonCode']));
-		$data['PossibleDescription'] = Scrub::text(trim($_POST['PossibleReasonDescription']));
-		$data['AttendedFlag'] = 0;
-		$data['ModifiedByID'] = $_SESSION['id'];
+    $data = array(
+        'ID' => $_POST['updateOne'],
+        'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
+        'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode']),
+        'PossibleReasonCode' => trim($_POST['PossibleReasonCode']),
+        'PossibleDescription' => trim($_POST['PossibleReasonDescription']),
+        'AttendedFlag' => 0,
+    );
 
-		/* This is a pretty hollow shell of a class, it just contains the mssql
-		 * instance and a query to insert/update
-		 */
-		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
-		$attendanceRecord->update($data);
+    /* This is a pretty hollow shell of a class, it just contains the mssql
+     * instance and a query to insert/update
+     */
+    $attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
+    $attendanceRecord->update($data);
+    $attendanceHandler->getAttendanceMaster()->save();
 
-		SitePage::localRedir($redirect);
-	}
+    SitePage::localRedir($redirect);
 }
 /* Mark this person as present (non-absent)
  * Should occur when a checkbox went from ticked to unticked states.
  */
 else if (isset($_POST['present']) && is_numeric($_POST['externalId'])) {
-	$existingRecord = $attendanceHandler->existingRecord($_POST['externalId']);
 
 	/* Update what's already in there, leaving other settings untarnished
 	 */
-	if (is_array($existingRecord) && isset($existingRecord['AttendanceSeq']) && is_numeric($existingRecord['AttendanceSeq'])) {
-		$data = $existingRecord;
-		$data['PossibleDescription'] = Scrub::text($data['PossibleDescription']);
-		$data['AttendedFlag'] = 1;
+    //$data['PossibleDescription'] = $data['PossibleDescription'];
+    $data = array(
+        'ID' => $_POST['externalId'],
+        'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
+        'AttendedFlag' => 1,
+    );
 
-		/* TODO: Clear Existing Data
-		 * I don't know if you want to clear out whatever was in the PossibleAbsenceCode,
-		 * PossibleDescription and PossibleReasonCode if someone who was formerly marked
-		 * Absent gets put back into Present. At the moment it's non-destructive so you
-		 * can "undo" an accidental change in state.
-		 *
-		 * If you want to ditch it all, just set these three fields to empty string.
-		 */
+    /* TODO: Clear Existing Data
+     * I don't know if you want to clear out whatever was in the PossibleAbsenceCode,
+     * PossibleDescription and PossibleReasonCode if someone who was formerly marked
+     * Absent gets put back into Present. At the moment it's non-destructive so you
+     * can "undo" an accidental change in state.
+     *
+     * If you want to ditch it all, just set these three fields to empty string.
+     */
 
-		/* This is a pretty hollow shell of a class, it just contains the mssql
-		 * instance and a query to insert/update
-		 */
-		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
-		$attendanceRecord->update($data);
-	}
+    /* This is a pretty hollow shell of a class, it just contains the mssql
+     * instance and a query to insert/update
+     */
+    $attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
+    $attendanceRecord->update($data);
+    $attendanceHandler->getAttendanceMaster()->save();
 }
+exit;
