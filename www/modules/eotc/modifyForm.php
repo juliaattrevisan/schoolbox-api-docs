@@ -91,12 +91,17 @@ switch($_POST['action']) {
 			$event['sid'] = $_POST['group'];
 		}
 
+		/* Set up recurrences, if appropriate
+		 */
 		$eventRecurrence = new \EOTC\Calendar\EventRecurrence($_POST['repeat']);
 		$eventRecurrence->setup($until, $startDate, $endDate);
-
-		$dateArray = $eventRecurrence->getCollection();
+		$dateCollection = $eventRecurrence->getCollection();
 
 		if (is_numeric($_POST['id'])) {
+
+			/* Update details of an already-existing set of recurring event incidents
+			 * (Change details of each instance of a recurring event, for example)
+			 */
 			if ($_POST['efficacy'] == 'series') {
 				// don't override the date or seriesID
 				unset($event['startDate']);
@@ -110,27 +115,36 @@ switch($_POST['action']) {
 					$calendarHandler->update($event);
 				}
 			}
+			/* Modify an existing event and add recurring incidents
+			 */
 			else if($_POST['efficacy'] == 'self') {
 				//
 				// If there's any recurrence: update first only, and create the
 				// rest from scratch.
-				$first_date_set     = array_shift($dateArray);
-				$event['id']        = $_POST['id'];
+				$first_date_set = $dateCollection->first();
+				$event['id'] = $_POST['id'];
 				$event['startDate'] = $first_date_set['start'];
 				$event['endDate']   = $first_date_set['end'];
 				$calendarHandler->update($event);
-				foreach ($dateArray as $dates) {
+
+				/* Skip the first element, spawn new event records
+				 */
+				$dateCollection->next();
+
+				foreach ($dateCollection as $currentDate) {
 					unset($event['id']);
-					$event['startDate'] = $dates['start'];
-					$event['endDate']   = $dates['end'];
+					$event['startDate'] = $currentDate['start'];
+					$event['endDate'] = $currentDate['end'];
 					$calendarHandler->create($event);
 				}
 			}
 		}
 		else {
-			foreach ($dateArray as $dates) {
-				$event['startDate'] = $dates['start'];
-				$event['endDate']   = $dates['end'];
+			/* Create N recurring events which are wholly new
+			 */
+			foreach ($dateCollection as $currentDate) {
+				$event['startDate'] = $currentDate['start'];
+				$event['endDate'] = $currentDate['end'];
 				$calendarHandler->create($event);
 			}
 		}
