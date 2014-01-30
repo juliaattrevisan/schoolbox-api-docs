@@ -187,6 +187,7 @@ class EventRecurrence {
 	 * A pseudo-mapper
 	 */
 	public function save($event) {
+		$event['series_id'] = $this->getSeriesId();
 
 		/* Modify an existing event
 		 */
