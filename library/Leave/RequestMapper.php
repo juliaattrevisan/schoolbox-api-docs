@@ -126,6 +126,15 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 		$this->hasMap(
 			array(
+				'column' => 'travel_type_id',
+				'property' => 'travelType',
+				'type' => self::TYPE_MODEL,
+				'join' => 'travelType',
+			)
+		);
+
+		$this->hasMap(
+			array(
 				'column' => 'notes',
 				'property' => 'notes',
 				'type' => self::TYPE_STRING,
@@ -156,6 +165,36 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				'other_key' => 'id',
 			)
 		);
+		$this->hasJoin(
+			'travelType',
+			array(
+				'mapper'    => 'Leave_Request_TravelTypeMapper',
+				'this_key'  => 'travel_type_id',
+				'other_key' => 'id',
+			)
+		);
+	}
+
+	/**
+	 * Helper method for getting a base query (includes SELECT part).
+	 *
+	 * It joins this table against the user, authorisationUser and travelType
+	 * joins.
+	 *
+	 * @return string
+	 */
+	protected function getBaseQuery() {
+		return "
+			SELECT
+				{$this->getColumnString('lr')},
+				{$this->getJoinColumnString('user', 'u')},
+				{$this->getJoinColumnString('authorisationUser', 'au')},
+				{$this->getJoinColumnString('travelType', 'tt')}
+			FROM `{$this->table}` lr
+			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
+			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
+		";
 	}
 
 	/**
@@ -165,19 +204,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * @return \Schoolbox\Collection
 	 */
 	public function findAllByUserId($userId) {
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString('lr')},
-			{$this->getJoinColumnString('user', 'u')},
-			{$this->getJoinColumnString('authorisationUser', 'au')}
-			FROM `{$this->table}` lr
-			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
-			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE lr.user_id = :userId
 			AND lr.status != :status
 			ORDER BY lr.start
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -219,21 +251,13 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		  ");
 		  */
 
-		$statement = $this->database->prepare(
-			"
-			SELECT
-				{$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE u.residential_house_id = :houseId
 			AND lr.created >= :limit
 			AND lr.status != :deleted
 			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -267,19 +291,13 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * @return \Schoolbox\Collection
 	 */
 	private function getAllLeaveRequests($houseId) {
-		$statement = $this->database->prepare(
-			"
-			SELECT
-				{$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE u.residential_house_id = :houseId
 			AND lr.status = :status
 			AND lr.created >= :limit
 			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -378,23 +396,24 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		");
 		*/
 
-		$statement = $this->database->prepare(
-			"
+		// Right Join with filters onto users - I want all users in this
+		// res.house, regardless of whether they have a leave request or not.
+		$statement = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('lr')},
 				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')}
-			FROM `user` u
-			LEFT JOIN groups g ON g.id = u.group_id
-			LEFT JOIN `{$this->table}` lr ON lr.user_id = u.id
-			AND lr.start < :finish
-			AND lr.finish > :start
-			AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+				{$this->getUserMapper()->getColumnString('au')},
+				{$this->getJoinColumnString('travelType', 'tt')}
+			FROM {$this->getTable()} `lr`
+			RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+				AND lr.start < :finish
+				AND lr.finish > :start
+				AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
+			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
+			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
 			WHERE u.residential_house_id = :houseId
 			ORDER BY LENGTH(u.year), u.year, u.lastname
-		"
-		);
+		");
 
 		$args = array(
 			':houseId' => $houseId,
@@ -487,17 +506,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	}
 
 	public function findById($id) {
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE lr.id = :id
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -517,17 +529,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	}
 
 	public function findAllByDateRange($start, $finish) {
-		$statement = $this->database->prepare(
-			"
-			SELECT {$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+		$statement = $this->database->prepare("
+			{$this->getBaseQuery()}
 			WHERE lr.start < :finish AND lr.finish > :start AND lt.status != :deleted
-		"
-		);
+		");
 
 		$statement->execute(
 			array(
@@ -551,16 +556,20 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 		if (empty($callback)) {
 			$callback = function ($mapper, $request, $row) {
+				/** @var self $mapper */
+				/** @var Leave_Request $request */
 				/* Hydrate user */
 				if (!empty($row['u.id'])) {
 					$request->setUser($mapper->getUserMapper()->hydrate($row, 'u'));
 				}
-
 				/* Hydrate authorized user */
 				if (!empty($row['au.id'])) {
 					$request->setAuthorisationUser($mapper->getUserMapper()->hydrate($row, 'au'));
 				}
-
+				/* Hydrate travel type */
+				if (!empty($row['tt.id'])) {
+					$request->setTravelType($mapper->getJoinMapper('travelType')->hydrate($row, 'tt'));
+				}
 				return $request;
 			};
 		}

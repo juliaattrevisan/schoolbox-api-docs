@@ -37,6 +37,13 @@ class Leave_Controller extends Controller {
     protected $externalUser;
     protected $group;
 
+    /**
+     * Travel methods for a leave request.
+     *
+     * @var array
+     */
+    protected $travelTypes;
+
     /* Time map array
       * A map of actual time values => presentation information
       * used in the Leave Time/Return Time dropdowns
@@ -104,6 +111,14 @@ class Leave_Controller extends Controller {
         $this->setHouseMapper(HouseResidentialMapper::getInstance());
         $this->setExternalUser(new External_User());
         $this->setGroup(new Group(HOUSEMASTER_SERVICE));
+        // Create a phantom "Not Specified" travel type (it doesn't exist in the DB)
+        $emptyTravelType = new Leave_Request_TravelType();
+        $emptyTravelType->setName('Not specified');
+        $travelMethods = array(0 => $emptyTravelType);
+        foreach (Leave_Request_TravelTypeMapper::getInstance()->findAll() as $method) {
+            $travelMethods[$method->getId()] = $method;
+        }
+        $this->setTravelTypes($travelMethods);
     }
 
     /**
@@ -222,6 +237,7 @@ class Leave_Controller extends Controller {
     public function renderCreateRequest($data) {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'student_selector', 'student_selector_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'travel_drop', 'travel_drop_block');
         $this->getPage()->setBlock('student_selector', 'student_drop', 'student_drop_block');
         $this->getPage()->setBlock(
             'custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block'
@@ -237,6 +253,17 @@ class Leave_Controller extends Controller {
         $this->renderHostTypeDropdown($request);
 
         $this->getPage()->setVar($data);
+
+        $this->getPage()->dropDown(
+            'travel_drop',
+            $this->getTravelTypes(),
+            null,
+            TEMPLATE_content,
+            array(
+                'name' => 'TRAVEL_DROP_NAME',
+                'id'   => 'TRAVEL_DROP_VALUE',
+            )
+        );
 
         /* Add terms and conditions
            */
@@ -341,6 +368,12 @@ class Leave_Controller extends Controller {
         $request->setStatus(Leave_Request::STATUS_PENDING);
         $request->setCreated($created->getDatabase());
 
+        $travelType  = $data['request']['travelType'];
+        $travelTypes = $this->getTravelTypes();
+        if ($travelType && array_key_exists($travelType, $travelTypes)) {
+            $request->setTravelType($travelTypes[$travelType]);
+        }
+
         $this->getRequestMapper()->save($request);
 
         $request = $this->getRequestMapper()->findById($request->getId());
@@ -393,6 +426,17 @@ class Leave_Controller extends Controller {
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
             $this->getPage()->setBlock(TEMPLATE_content, 'next_pending', 'next_pending_block');
             $this->getPage()->setBlock(TEMPLATE_content, 'prev_pending', 'prev_pending_block');
+            $this->getPage()->setBlock(TEMPLATE_content, 'travel_drop', 'travel_drop_block');
+            $this->getPage()->dropDown(
+                'travel_drop',
+                $this->getTravelTypes(),
+                $request->getTravelType()->getId(),
+                TEMPLATE_content,
+                array(
+                    'name' => 'TRAVEL_DROP_NAME',
+                    'id'   => 'TRAVEL_DROP_VALUE',
+                )
+            );
 
             /* Render dropdowns
                 */
@@ -487,7 +531,8 @@ class Leave_Controller extends Controller {
 
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewRequest.html');
 
-
+            $travelTypes = $this->getTravelTypes();
+            $travelType  = $travelTypes[$request->getTravelType()->getId()] ?: $travelTypes[0];
             $this->getPage()->setVar(
                 array(
                     'REQUEST_ID' => $request->getId(),
@@ -507,6 +552,7 @@ class Leave_Controller extends Controller {
                     'REQUEST_USER_PHONE' => $request->getUserPhone(),
                     'REQUEST_DESCRIPTION' => $request->getDescription(),
                     'REQUEST_NOTES' => $request->getNotes(),
+                    'REQUEST_TRAVEL_TYPE' => $travelType->getName(),
                 )
             );
         } else {
@@ -541,6 +587,15 @@ class Leave_Controller extends Controller {
         $request->setDescription($data['request']['description']);
         $request->setNotes($data['request']['notes']);
         $request->setConfirmedBy($data['request']['confirmedBy']);
+
+        $travelType  = $data['request']['travelType'];
+        $travelTypes = $this->getTravelTypes();
+        if ($travelType && array_key_exists($travelType, $travelTypes)) {
+            $request->setTravelType($travelTypes[$travelType]);
+        }
+        else {
+            $request->setTravelType(null);
+        }
 
         if (isset($data['approve']) || isset($data['reject'])) {
             $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
@@ -1331,5 +1386,21 @@ class Leave_Controller extends Controller {
      */
     private function getTimeMap() {
         return $this->timeMap;
+    }
+
+    /**
+     * @param  array $travelTypes
+     * @return $this
+     */
+    public function setTravelTypes($travelTypes) {
+        $this->travelTypes = $travelTypes;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTravelTypes() {
+        return $this->travelTypes;
     }
 }

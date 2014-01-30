@@ -143,6 +143,18 @@
         </tr>
         <tr>
             <td class="formLabelWidth">
+                <h4>Travel Method</h4>
+            </td>
+            <td colspan="3">
+                <select name="request[travelType]">
+                    <!-- BEGIN travel_drop -->
+                    <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
+                    <!-- END travel_drop -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
                 <h4>Description</h4>
                 <em>Only complete for special leave information or travel arrangements</em>
             </td>

@@ -83,6 +83,7 @@ class Leave_Core_Report_House_Web {
 			$combined[$key]['request_status'][$request->getId()] = $request->getStatus(true);
 			$combined[$key]['request_host_type'][$request->getId()] = $request->getHostType(true);
 			$combined[$key]['request_description'][$request->getId()] = $request->getDescription();
+			$combined[$key]['request_travel_type'][$request->getId()] = $request->getTravelType()->getName();
 
 			/* Pending leave requests get a css class for the row
 			 * (used to decorate the spans)
