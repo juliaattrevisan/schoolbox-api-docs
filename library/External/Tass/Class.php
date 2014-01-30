@@ -24,7 +24,7 @@ class External_Tass_Class implements External_ClassInterface {
 			$subCodeArray = explode(',',$subCode);
 			foreach($subCodeArray as $code) {
 				list($year,$code,$class) = explode('-',$code);
-				$yearQuery = $year ?  "year_grp = '$year' AND" : '';
+				$yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
 				$classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND class = '$class' ) OR ";
 			}
@@ -32,7 +32,7 @@ class External_Tass_Class implements External_ClassInterface {
 		}
 		else {
 			list($year,$code,$class) = explode('-',$subCode);
-            $yearQuery = $year ?  "year_grp = '$year' AND" : '';
+            $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
 			$classQuery = " $yearQuery studsub.sub_code = '$code' AND class = '$class' ";
 		}
@@ -57,7 +57,7 @@ class External_Tass_Class implements External_ClassInterface {
 			$subCodeArray = explode(',',$subCode);
 			foreach($subCodeArray as $code) {
 				list($year,$code,$class) = explode('-',$code);
-                $yearQuery = $year ?  "year_grp = '$year' AND" : '';
+                $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
 
 				$classQuery .= " ( $yearQuery sub_code = '$code' AND class = '$class' ) OR ";
@@ -66,7 +66,7 @@ class External_Tass_Class implements External_ClassInterface {
 		}
 		else {
 			list($year,$code,$class) = explode('-',$subCode);
-            $yearQuery = $year ?  "year_grp = '$year' AND" : '';
+            $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
 			$classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
 		}
