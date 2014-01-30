@@ -473,7 +473,7 @@ class Leave_Controller extends Controller {
             if ($nextRequest) {
                 $this->getPage()->setVar(
                     array(
-                        'NEXT_PENDING_ID' => $nextRequest['id']
+                        'NEXT_PENDING_ID' => $nextRequest->getId()
                     )
                 );
 
