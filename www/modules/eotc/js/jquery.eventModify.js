@@ -379,7 +379,6 @@
 						}
 						else {
 							// add
-							console.log(form);
 							form.submit();
 						}
 					}

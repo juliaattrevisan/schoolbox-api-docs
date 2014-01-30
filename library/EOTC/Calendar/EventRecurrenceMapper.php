@@ -82,14 +82,11 @@ class EventRecurrenceMapper {
 			/* Modify an existing event and add recurring incidents
 			 */
 			else if ($efficacy == 'self') {
-				echo 'bart';
-				die();
-				//
+
 				// If there's any recurrence: update first only, and create the
 				// rest from scratch.
 				$first_date_set = $eventRecurrence->getDateCollection()->first();
 
-				$event->setSeriesId($eventRecurrence->getSeriesId());
 				$event->setStartDate($first_date_set['start']);
 				$event->setEndDate($first_date_set['end']);
 
@@ -99,7 +96,9 @@ class EventRecurrenceMapper {
 				 */
 				$eventRecurrence->getDateCollection()->next();
 
-				foreach ($eventRecurrence->getDateCollection() as $currentDate) {
+				for (; $eventRecurrence->getDateCollection()->valid(); $eventRecurrence->getDateCollection()->next()) {
+					$currentDate = $eventRecurrence->getDateCollection()->current();
+
 					$event->setId(null);
 					$event->setSeriesId($eventRecurrence->getSeriesId());
 					$event->setStartDate($currentDate['start']);

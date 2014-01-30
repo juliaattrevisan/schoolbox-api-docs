@@ -36,14 +36,18 @@ switch($_POST['action']) {
 
 		/* Default
 		 */
-		$eventId = null;
 		$publishDate = null;
 		$until = null;
 
-		/* Event ID, if provided
+		/* Spawn an existing event if id provided
+		 * Otherwise spawn a new one
 		 */
 		if (is_numeric($_POST['id'])) {
-			$eventId = $_POST['id'];
+			$eventMapper = new \EOTC\Calendar\EventMapper();
+			$event = $eventMapper->findById($_POST['id']);
+		}
+		else {
+			$event = new \EOTC\Calendar\Event();
 		}
 
 		/* Events aren't visible until this date
@@ -74,8 +78,8 @@ switch($_POST['action']) {
 		$owner = $userMapper->findById($ownerId);
 		$author = $userMapper->findById($_POST['authorId']);
 
-		$event = new \EOTC\Calendar\Event();
-		$event->setId($eventId);
+		/* Spawned further up
+		 */
 		$event->setOwner($owner);
 		$event->setAuthor($author);
 		$event->setAccess($_POST['level']);
