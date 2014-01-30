@@ -29,8 +29,9 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$this->hasMap(
 			array(
 				'column' => 'user_id',
-				'property' => 'userId',
-				'type' => self::TYPE_INTEGER,
+				'property' => 'user',
+				'type' => self::TYPE_MODEL,
+				'join' => 'user',
 			)
 		);
 
@@ -117,8 +118,9 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$this->hasMap(
 			array(
 				'column' => 'authorisation_user_id',
-				'property' => 'authorisationUserId',
-				'type' => self::TYPE_INTEGER,
+				'property' => 'authorisationUser',
+				'type' => self::TYPE_MODEL,
+				'join' => 'authorisationUser',
 			)
 		);
 
@@ -137,6 +139,23 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				'type' => self::TYPE_INTEGER,
 			)
 		);
+
+		$this->hasJoin(
+			'authorisationUser',
+			array(
+				'mapper'    => '\\Schoolbox\\UserMapper',
+				'this_key'  => 'authorisation_user_id',
+				'other_key' => 'id',
+			)
+		);
+		$this->hasJoin(
+			'user',
+			array(
+				'mapper'    => '\\Schoolbox\\UserMapper',
+				'this_key'  => 'user_id',
+				'other_key' => 'id',
+			)
+		);
 	}
 
 	/**
@@ -149,21 +168,11 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$statement = $this->database->prepare(
 			"
 			SELECT {$this->getColumnString('lr')},
-			  u.id AS 'u.id', u.username AS 'u.username', u.password AS 'u.password', u.group_id AS 'u.group_id',
-			  u.title AS 'u.title', u.firstname AS 'u.firstname', u.lastname AS 'u.lastname',
-			  u.email_pass AS 'u.email_pass',u.synergy_id AS 'u.synergy_id', u.campus AS 'u.campus', u.year AS 'u.year',
-			  u.house AS 'u.house', u.local_email AS 'u.local_email', u.alt_email AS 'u.alt_email',
-			  u.mail_handler AS 'u.mail_handler', u.hash AS 'u.hash', u.key AS 'u.key',
-			  u.eportfolio_enabled AS 'u.eportfolio_enabled',
-			  au.id AS 'au.id', au.username AS 'au.username', au.password AS 'au.password', au.group_id AS 'au.group_id',
-			  au.title AS 'au.title', au.firstname AS 'au.firstname', au.lastname AS 'au.lastname',
-			  au.email_pass AS 'au.email_pass',au.synergy_id AS 'au.synergy_id', au.campus AS 'au.campus', au.year AS 'au.year',
-			  au.house AS 'au.house', au.local_email AS 'au.local_email', au.alt_email AS 'au.alt_email',
-			  au.mail_handler AS 'au.mail_handler', au.hash AS 'au.hash', au.key AS 'au.key',
-			  au.eportfolio_enabled AS 'au.eportfolio_enabled'
+			{$this->getJoinColumnString('user', 'u')},
+			{$this->getJoinColumnString('authorisationUser', 'au')}
 			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			WHERE lr.user_id = :userId
 			AND lr.status != :status
 			ORDER BY lr.start

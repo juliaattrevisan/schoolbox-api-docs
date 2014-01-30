@@ -339,7 +339,7 @@ class Event_Attendance_Controller extends Controller
 
         $request = new Leave_Request;
 
-        $request->setUserId($attendance['user_id']);
+        $request->setUser($attendance['user_id']);
         $request->setStart( $start->getDatabase() );
         $request->setFinish( $finish->getDatabase() );
         $request->setHostType(array_search('Other', $request->getHostTypeMap()));

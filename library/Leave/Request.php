@@ -286,21 +286,12 @@ class Leave_Request {
     }
 
     /**
-     * Set user id
-     *
-     * @param $userId
-     */
-    public function setUserId($userId) {
-        $this->userId = $userId;
-    }
-
-    /**
      * Get user id
      *
      * @return mixed
      */
     public function getUserId() {
-        return $this->userId;
+        return $this->getUser()->getId();
     }
 
     /**
@@ -384,20 +375,11 @@ class Leave_Request {
     }
 
     /**
-     * Set authorisation user id
-     *
-     * @param $authorisationUserId
-     */
-    public function setAuthorisationUserId($authorisationUserId) {
-        $this->authorisationUserId = $authorisationUserId;
-    }
-
-    /**
      * Get authorisation user id
      * @return mixed
      */
     public function getAuthorisationUserId() {
-        return $this->authorisationUserId;
+        return $this->getAuthorisationUser()->getId();
     }
 
     /**

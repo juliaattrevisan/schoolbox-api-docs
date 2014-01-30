@@ -531,10 +531,11 @@ if (is_numeric($this->arg[0])) {
 	                }
 
 	                /* Display boarder leave for kings */
-	                if (Cfg::get('boarder_leave_enabled') == '1') {
-	                    if (($groupHandler->isStaff() || $_SESSION['id'] == $user['uid']) AND $user['residential_house']) {
-	                        $this->parse('boarder_leave_block', 'boarder_leave');
-	                    }
+	                if (Cfg::get('boarder_leave_enabled') == '1'
+                        && $user['residential_house']
+                        && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['uid']) || $_SESSION['id'] == $user['uid'])
+                    ) {
+                        $this->parse('boarder_leave_block', 'boarder_leave');
 	                }
 
 	                $this->parse('contact_synergy_block', 'contact_synergy');

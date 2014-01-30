@@ -221,6 +221,8 @@ class Leave_Controller extends Controller {
      */
     public function renderCreateRequest($data) {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
+        $this->getPage()->setBlock(TEMPLATE_content, 'student_selector', 'student_selector_block');
+        $this->getPage()->setBlock('student_selector', 'student_drop', 'student_drop_block');
         $this->getPage()->setBlock(
             'custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block'
         );
@@ -244,8 +246,14 @@ class Leave_Controller extends Controller {
             )
         );
 
-        /* Apply autocomplete if appropriate - staff can submit on someone else's behalf
+        /* Apply autocomplete if appropriate:
+           staff can submit on someone else's behalf
+           parents can submit on behalf of their students
+           Everyone else submits as themselves
            */
+        $this->getPage()->setVar('student_selector_block', '');
+        $this->getPage()->setVar('student_autocomplete_block', '');
+        $this->getPage()->setVar('student_autocomplete_javascript_block', '');
         if ($this->getGroup()->getPermission(null)) {
             $this->getPage()->setVar(
                 array(
@@ -255,12 +263,49 @@ class Leave_Controller extends Controller {
 
             $this->getPage()->parse('student_autocomplete_block', 'student_autocomplete');
             $this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
-        } /* Everyone else submits as themselves
-         */
-        else {
-            $this->getPage()->setVar('student_autocomplete_block', '');
-            $this->getPage()->setVar('student_autocomplete_javascript_block', '');
         }
+        elseif ($this->getGroup()->isParent()) {
+            $this->getPage()->dropDown(
+                'student_drop',
+                $_SESSION['children'],
+                null,
+                'student_selector',
+                array(
+                    'name' => 'STUDENT_DROP_NAME',
+                    'id'   => 'STUDENT_DROP_VALUE',
+                )
+            );
+            $this->getPage()->parse('student_selector_block', 'student_selector');
+        }
+    }
+
+    /**
+     * Does this user have permission to view requests for a given user?
+     *
+     * The user has permission if:
+     * * They have housemaster privileges
+     * * They are the parent of the child the request is for
+     * * They made the request
+     *
+     * @param  int  $userId The user's ID
+     * @return bool
+     */
+    protected function hasViewPermission($userId) {
+        return $_SESSION['user']->getId() == $userId
+            || $this->getGroup()->getPermission(null)
+            || $this->getGroup()->isParentOfChild($userId);
+    }
+
+    /**
+     * Does this user have permission to modify or approve a request?
+     *
+     * The user has permission if:
+     * * They have housemaster privileges
+     *
+     * @return bool
+     */
+    protected function hasApprovePermission() {
+        return $this->getGroup()->getPermission(null);
     }
 
     /**
@@ -283,11 +328,8 @@ class Leave_Controller extends Controller {
         /* Use the userId field when submitting on someone else's behalf,
            * otherwise just your own id
            */
-        if ($this->getGroup()->getPermission(null)) {
-            $request->setUserId($data['userId']);
-        } else {
-            $request->setUserId($_SESSION['id']);
-        }
+        $userId = $data['userId'];
+        $request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
 
         $request->setStart($start->getDatabase());
         $request->setFinish($finish->getDatabase());
@@ -334,10 +376,7 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if the requester's house doesn't exist.
      */
     public function renderModifyRequest($data) {
-
-        /* Only allow Teachers/Staff to modify requests
-             */
-        if ($this->getGroup()->getPermission(null)) {
+        if ($this->hasApprovePermission()) {
             /** @var Leave_Request $request */
             $request = $data['request'];
             $user = $request->getUser();
@@ -444,7 +483,7 @@ class Leave_Controller extends Controller {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
 
-        if ($this->getGroup()->getPermission(null) || $_SESSION['id'] == $user->getId()) {
+        if ($this->hasViewPermission($user->getId())) {
 
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewRequest.html');
 
@@ -748,8 +787,9 @@ class Leave_Controller extends Controller {
      * @param $data
      */
     public function exportUserRequestList($data) {
-        if ($this->getGroup()->getPermission(null)) {
-            $user = $data['user'];
+        $user = $data['user'];
+        if ($this->hasViewPermission($user->getId())) {
+            /** @var Leave_Request[] $requestList */
             $requestList = $data['requestList'];
             $allRows = array();
 
@@ -803,11 +843,8 @@ class Leave_Controller extends Controller {
         /* Only allow students to see their own leave requests
            * Allow staff/superusers to see anyone's
            */
-
-
-
-        if ($this->getGroup()->getPermission(null) || $_SESSION['id'] == $data['user']->getId()) {
-            $user = $data['user'];
+        $user = $data['user'];
+        if ($this->hasViewPermission($user->getId())) {
             $house = $data['house'];
             $requestList = $data['requestList'];
 
@@ -823,7 +860,7 @@ class Leave_Controller extends Controller {
             $this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
             $this->getPage()->setBlock('previous_request_list', 'export', 'export_block');
 
-            if ($this->getGroup()->getPermission(null)) {
+            if ($this->hasApprovePermission()) {
                 $this->getPage()->parse('export_block', 'export');
             } else {
                 $this->getPage()->setVar('export_block', '');
@@ -835,7 +872,7 @@ class Leave_Controller extends Controller {
                     'USER_NAME' => $user->formatName(),
                     'HOUSE_NAME' => $house->getHouse(),
                     'HOUSE_ID' => $house->getId(),
-                    'ALLOWED_ACTION' => $this->getGroup()->getPermission(null) ? 'modify' : 'view',
+                    'ALLOWED_ACTION' => $this->hasApprovePermission() ? 'modify' : 'view',
                 )
             );
 
@@ -922,7 +959,7 @@ class Leave_Controller extends Controller {
 
         /* Only allow Teachers/Staff to approve/reject requests
            */
-        if ($this->getGroup()->getPermission(null)) {
+        if ($this->hasApprovePermission()) {
             $user = $data['user'];
             $requestList = $data['requestList'];
 
@@ -976,7 +1013,7 @@ class Leave_Controller extends Controller {
 
         /* Iterate through options
            */
-        if ($this->getGroup()->getPermission(null)) {
+        if ($this->hasApprovePermission()) {
             foreach ($request->getConfirmedByMap() as $value => $label) {
                 if ($request->getConfirmedBy() == $value) {
                     $selected = 'checked=\'checked\'';
@@ -1203,7 +1240,7 @@ class Leave_Controller extends Controller {
     /**
      * Set group handler
      *
-     * @param $group
+     * @param Group $group
      */
     private function setGroup($group) {
         $this->group = $group;
@@ -1212,7 +1249,7 @@ class Leave_Controller extends Controller {
     /**
      * Get group handler
      *
-     * @return mixed
+     * @return Group
      */
     private function getGroup() {
         return $this->group;
