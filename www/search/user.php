@@ -515,10 +515,10 @@ if (is_numeric($this->arg[0])) {
 	                    if (trim($synInfo['StudentMedicalAlert'])) {
 	                        $this->parse('medical_block', 'medical');
 	                    }
-
-	                    if (trim($synInfo['AlertMessage'])) {
-	                        $this->parse('contact_alert_block', 'contact_alert');
-	                    }
+	                }
+	                
+	                if (trim($synInfo['AlertMessage']) && $groupHandler->isStaff()) {
+	                    $this->parse('contact_alert_block', 'contact_alert');
 	                }
 
 	                if (!$j) {
