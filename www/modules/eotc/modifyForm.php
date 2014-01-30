@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
 $groupHandler = new Group();
 $calendarHandler = new Calendar();
@@ -95,7 +95,7 @@ switch($_POST['action']) {
 		/* Set up recurrences, if appropriate
 		 */
 		$eventRecurrence = new \EOTC\Calendar\EventRecurrence($_POST['id'], $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
-		$eventRecurrence->setup()->save();
+		$eventRecurrence->setup()->save($event);
 
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in

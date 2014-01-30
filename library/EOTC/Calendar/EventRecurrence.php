@@ -179,6 +179,8 @@ class EventRecurrence {
 				'end' => $this->getEndDate()->getDatabaseDate(),
 			));
 		}
+
+		return $this;
 	}
 
 	/**
