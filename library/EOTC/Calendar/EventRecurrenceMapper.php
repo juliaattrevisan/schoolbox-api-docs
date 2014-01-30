@@ -74,7 +74,6 @@ class EventRecurrenceMapper {
 
 				foreach($series as $seriesEvent) {
 					$event->setId($seriesEvent['id']);
-					$event->setSeriesId($eventRecurrence->getSeriesId());
 
 					$this->getEventMapper()->save($event, $groupList, $campusList);
 				}
