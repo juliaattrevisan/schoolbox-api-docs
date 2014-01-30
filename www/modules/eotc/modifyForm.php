@@ -81,6 +81,7 @@ switch($_POST['action']) {
 		// Force events to have at least one campus value selected (if a group event)
 		if ($_POST['level'] == Calendar::ACCESS_CAMPUS) {
 			$event['groupList'] = $_POST['groupCheck'];
+
 			if (is_array($_POST['campus']) && count($_POST['campus'])) {
 				$event['campusList'] = $_POST['campus'];
 			}
@@ -93,6 +94,7 @@ switch($_POST['action']) {
 		}
 
 		/* Set up recurrences, if appropriate
+		 * This is mandatory as events are saved via EventRecurrence
 		 */
 		$eventRecurrence = new \EOTC\Calendar\EventRecurrence($_POST['id'], $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 		$eventRecurrence->setup()->save($event);
