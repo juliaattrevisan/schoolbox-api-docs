@@ -14,6 +14,17 @@ namespace EOTC\Calendar;
 class Event {
 
 	/**
+	 * Event Access Levels
+	 *
+	 * @var array
+	 */
+	private $accessLevels = array(
+		'personal' => 1,
+		'group' => 2,
+		'campus' => 3,
+	);
+
+	/**
 	 * Event id
 	 *
 	 * @var null
@@ -195,6 +206,45 @@ class Event {
 	 * Hook method
 	 */
 	protected function setup() {
+	}
+
+	/**
+	 * Is this event a personal-accesslevel instance?
+	 *
+	 * @return bool
+	 */
+	public function isPersonalLevel() {
+		if ($this->getAccess() == $this->accessLevels['personal']) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Is this event a group-accesslevel instance?
+	 *
+	 * @return bool
+	 */
+	public function isGroupLevel() {
+		if ($this->getAccess() == $this->accessLevels['group']) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Is this event a campus-accesslevel instance?
+	 *
+	 * @return bool
+	 */
+	public function isCampusLevel() {
+		if ($this->getAccess() == $this->accessLevels['campus']) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/* Auxiliary methods which don't belong anywhere else
