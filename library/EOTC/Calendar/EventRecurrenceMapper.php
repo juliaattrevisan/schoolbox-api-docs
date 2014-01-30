@@ -50,11 +50,11 @@ class EventRecurrenceMapper {
 	 * @param $campusList
 	 * @param $efficacy
 	 * @param $repeatSetting
-	 * @param \Alaress_Date_Format $until
+	 * @param $until
 	 * @param \Alaress_Date_Format $startDate
 	 * @param \Alaress_Date_Format $endDate
 	 */
-	public function save(Event $event, $groupList, $campusList, $efficacy, $repeatSetting, \Alaress_Date_Format $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+	public function save(Event $event, $groupList, $campusList, $efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
 
 		/* Set up recurrences, if appropriate
 		 * This is mandatory as events are saved via EventRecurrence
@@ -70,12 +70,6 @@ class EventRecurrenceMapper {
 			 * (Change details of each instance of a recurring event, for example)
 			 */
 			if ($efficacy == 'series') {
-				die();
-				// don't override the date or seriesID
-//				unset($event['startDate']);
-//				unset($event['endDate']);
-//				unset($event['series_id']);
-
 				$series = $this->getCalendarHandler()->getAllInSeriesByEventID($event->getId());
 
 				foreach($series as $seriesEvent) {
@@ -88,6 +82,7 @@ class EventRecurrenceMapper {
 			/* Modify an existing event and add recurring incidents
 			 */
 			else if ($efficacy == 'self') {
+				echo 'bart';
 				die();
 				//
 				// If there's any recurrence: update first only, and create the

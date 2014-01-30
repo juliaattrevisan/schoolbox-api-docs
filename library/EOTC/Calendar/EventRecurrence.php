@@ -103,11 +103,11 @@ class EventRecurrence {
 	 *
 	 * @param $efficacy
 	 * @param $repeatSetting
-	 * @param \Alaress_Date_Format $until
+	 * @param $until
 	 * @param \Alaress_Date_Format $startDate
 	 * @param \Alaress_Date_Format $endDate
 	 */
-	public function __construct($efficacy, $repeatSetting, \Alaress_Date_Format $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+	public function __construct($efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
 		$this->setCalendarHandler(new \Calendar());
 		$this->setDateCollection(new \Schoolbox\Collection());
 		$this->setRepeatSetting($repeatSetting);
