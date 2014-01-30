@@ -199,11 +199,18 @@ then
 	fi
 
 	# Remove old backup logfile
-	if [ -f "/var/log/schoolboxbackup_$DAYX.log" ]
+	if [ -f "$logfileprefix-$DAYX.log" ]
 	then
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of old backup logfile: $logfileprefix-$DAYX.log" >> $logfile;
 		rm -f "$logfileprefix-$DAYX.log" >> $logfile 2>&1;
 	fi
+
+	# Remove old backup logfiles older than 30 days
+	# this is just in case it get's missed by the above from a failed run
+	for oldlogfile in `find $logfileprefix*.log -mtime +30`;
+	do
+		rm -f $oldlogfile >> $logfile 2>&1
+	done
 
 	# Unmount
 	umount -f $backup_dir;
