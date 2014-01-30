@@ -93,61 +93,8 @@ switch($_POST['action']) {
 
 		/* Set up recurrences, if appropriate
 		 */
-		$eventRecurrence = new \EOTC\Calendar\EventRecurrence($_POST['repeat']);
-		$eventRecurrence->setup($until, $startDate, $endDate);
-		$dateCollection = $eventRecurrence->getCollection();
-
-		if (is_numeric($_POST['id'])) {
-
-			/* Update details of an already-existing set of recurring event incidents
-			 * (Change details of each instance of a recurring event, for example)
-			 */
-			if ($_POST['efficacy'] == 'series') {
-				// don't override the date or seriesID
-				unset($event['startDate']);
-				unset($event['endDate']);
-				unset($event['series_id']);
-
-				$series = $calendarHandler->getAllInSeriesByEventID($_POST['id']);
-
-				foreach($series as $seriesEvent) {
-					$event['id'] = $seriesEvent['id'];
-					$calendarHandler->update($event);
-				}
-			}
-			/* Modify an existing event and add recurring incidents
-			 */
-			else if($_POST['efficacy'] == 'self') {
-				//
-				// If there's any recurrence: update first only, and create the
-				// rest from scratch.
-				$first_date_set = $dateCollection->first();
-				$event['id'] = $_POST['id'];
-				$event['startDate'] = $first_date_set['start'];
-				$event['endDate']   = $first_date_set['end'];
-				$calendarHandler->update($event);
-
-				/* Skip the first element, spawn new event records
-				 */
-				$dateCollection->next();
-
-				foreach ($dateCollection as $currentDate) {
-					unset($event['id']);
-					$event['startDate'] = $currentDate['start'];
-					$event['endDate'] = $currentDate['end'];
-					$calendarHandler->create($event);
-				}
-			}
-		}
-		else {
-			/* Create N recurring events which are wholly new
-			 */
-			foreach ($dateCollection as $currentDate) {
-				$event['startDate'] = $currentDate['start'];
-				$event['endDate'] = $currentDate['end'];
-				$calendarHandler->create($event);
-			}
-		}
+		$eventRecurrence = new \EOTC\Calendar\EventRecurrence($_POST['id'], $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
+		$eventRecurrence->setup()->save();
 
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in
