@@ -105,15 +105,6 @@ class Bulk_Calendar extends Bulk_Abstract {
 				$start_time  = strlen(trim($start_time))  ? $start_time  : '00:00:00';
 				$finish_time = strlen(trim($finish_time)) ? $finish_time : '23:59:59';
 
-				/* If a publish date is specified, use it; otherwise use an empty date
-				 */
-				if (strlen(trim($publish_date))) {
-					$publish_date = new Alaress_Date_Format($publish_date, 'd/m/y');
-				}
-				else {
-					$publish_date = new Alaress_Date_Format('0000-00-00', 'y-m-d');
-				}
-
 				//
 				// All day? if "all day" flag is set.
 				// (maybe if start_time = 00:00:00 and end_time = 23:59:59 too?)
@@ -141,12 +132,16 @@ class Bulk_Calendar extends Bulk_Abstract {
 
 						'type' => $event_type,
 						'attendance' => $attendance,
-						'publish_date' => $publish_date->getDatabase(),
 						'campusList' => $campusList,
 						'groupList' => $groupList,
 					);
 
-
+					/* If a publish date is specified, use it; otherwise leave as empty
+					 */
+					if (strlen(trim($publish_date))) {
+						$pdate = new Alaress_Date_Format($publish_date, 'd/m/y');
+						$event['publish_date'] = $pdate->getDatabase();
+					}
 
 					if (empty($event_type)) {
 						$output[] = array(

@@ -180,7 +180,6 @@ class ICal_Creator {
 							'endTime' => $end->getDatabaseTime(),
 							'startDate' => $start->getDatabaseDate(),
 							'endDate' => $end->getDatabaseDate(),
-							'publish_date' => $start->getDatabaseDate(),
 						);
 
 						if ($this->getCalendarHandler()->create($event)) {
