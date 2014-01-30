@@ -34,6 +34,31 @@ switch($_POST['action']) {
 	case 'Add':
 	case 'Update':
 
+		/* Default
+		 */
+		$eventId = null;
+		$publishDate = null;
+		$until = null;
+
+		/* Event ID, if provided
+		 */
+		if (is_numeric($_POST['id'])) {
+			$eventId = $_POST['id'];
+		}
+
+		/* Events aren't visible until this date
+		 */
+		if (strlen($_POST['publishDate'])) {
+			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
+			$publishDate = $pubDateObject->getDatabaseDate();
+		}
+
+		/* Events recur until this time
+		 */
+		if (strlen($_POST['repeat_until'])) {
+			$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
+		}
+
 		/* Start and end dates
 		 */
 		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
@@ -42,75 +67,44 @@ switch($_POST['action']) {
 		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
 		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
-		/* Events aren't visible until this date
+		/* NO RETREAT
+		 * NO SURRENDER
 		 */
-		if ($_POST['publishDate']) {
-			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
-			$publishDate = $pubDateObject->getDatabaseDate();
-		}
-		else {
-			$publishDate = 'NULL';
-		}
+		$userMapper = new \Schoolbox\UserMapper();
+		$owner = $userMapper->findById($ownerId);
+		$author = $userMapper->findById($_POST['authorId']);
 
-		/* Events recur until this time
-		 */
-		$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
+		$event = new \EOTC\Calendar\Event();
+		$event->setId($eventId);
+		$event->setOwner($owner);
+		$event->setAuthor($author);
+		$event->setAccess($_POST['level']);
+		$event->setSid($_POST['group']);
+		$event->setType($_POST['type']);
+		$event->setNote($_POST['note']);
+		$event->setStartDate($startDate->getDatabaseDate());
+		$event->setStartTime($startDate->getDatabaseTime());
+		$event->setEndDate($endDate->getDatabaseDate());
+		$event->setEndTime($endDate->getDatabaseTime());
+		$event->setLocation($_POST['location']);
+		$event->setAttendance($_POST['attendance']);
+		$event->setDetail($_POST['detail']);
+		$event->setPublishDateTime($publishDate);
 
-		/* Event ID, if provided
-		 */
-		if (is_numeric($_POST['id'])) {
-			$eventId = $_POST['id'];
-		}
-		else {
-			$eventId = null;
-		}
-
-		/* Crazy handler
-		 */
-		$event = array(
-			'id' => $eventId,
-			'owner' => $ownerId,
-			'access' => $_POST['level'],
-			'author_id' => $_POST['authorId'],
-			'sid' => null,
-			'type' => $_POST['type'],
-			'note' => $_POST['note'],
-			'allday' => !empty($_POST['allday']),
-			'startDate' => $startDate->getDatabaseDate(),
-			'startTime' => $startDate->getDatabaseTime(),
-			'endDate' => $endDate->getDatabaseDate(),
-			'endTime' => $endDate->getDatabaseTime(),
-			'location' => $_POST['location'],
-			'attendance' => $_POST['attendance'],
-			'detail' => $_POST['detail'],
-			'publish_date' => $publishDate,
-
-			'campusList' => null,
-			'groupList' => null,
-		);
-
-		$groupList = array();
-		$campusList = array();
+		$groupList = new \Schoolbox\Collection($_POST['groupCheck']);
+		$campusList = new \Schoolbox\Collection($_POST['campus']);
 
 		// Force events to have at least one campus value selected (if a group event)
-		if ($event['access'] == Calendar::ACCESS_CAMPUS) {
-			$groupList = $_POST['groupCheck'];
-
-			if (is_array($_POST['campus']) && count($_POST['campus'])) {
-				$campusList = $_POST['campus'];
-			}
-			else {
+		if ($event->isCampusLevel()) {
+			if (!is_array($_POST['campus']) || !count($_POST['campus'])) {
 				error(158);
 			}
-		}
-		elseif ($event['access'] == Calendar::ACCESS_GROUP) {
-			$event['sid'] = $_POST['group'];
 		}
 
 		/* Save this event and any recurring incidents too
 		 */
-		$eventMapper = new \EOTC\Calendar\EventMapper();
-		$eventMapper->save($groupList, $campusList, $event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
+		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper();
+		$eventRecurrenceMapper->save($event, $groupList, $campusList, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in
@@ -119,12 +113,12 @@ switch($_POST['action']) {
 
 		/* Superuser modifying some arbitrary event
 		 */
-		if (!in_array($_SESSION['user']->getId(), array($event['author_id'], $event['owner']))) {
+		if (!in_array($_SESSION['user']->getId(), array($event->getAuthor()->getId(), $event->getOwner()->getId()))) {
 			$page->backToTheFuture(3);
 		}
 		/* Teacher modifying self-created event for some arbitrary person
 		 */
-		else if (($event['author_id'] != $event['owner']) && ($event['author_id'] == $_SESSION['user']->getId())) {
+		else if (($event->getAuthor()->getId() != $event->getOwner()->getId()) && ($event->getAuthor()->getId() == $_SESSION['user']->getId())) {
 			$page->backToTheFuture(3);
 		}
 		else if (!empty($_POST['return'])) {

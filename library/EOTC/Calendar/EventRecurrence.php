@@ -44,7 +44,7 @@ class EventRecurrence {
 	 *
 	 * @var int
 	 */
-	private $seriesId = -1;
+	private $seriesId = null;
 
 	/**
 	 * An array of Alaress_Date_Format objects which indicate when a
@@ -53,13 +53,6 @@ class EventRecurrence {
 	 * @var array
 	 */
 	private $dateCollection = array();
-
-	/**
-	 * The event id
-	 *
-	 * @var null
-	 */
-	private $eventId = null;
 
 	/**
 	 * Efficacy setting chosen
@@ -108,15 +101,13 @@ class EventRecurrence {
 	/**
 	 * Constructor
 	 *
-	 * @param $eventId
 	 * @param $efficacy
 	 * @param $repeatSetting
 	 * @param \Alaress_Date_Format $until
 	 * @param \Alaress_Date_Format $startDate
 	 * @param \Alaress_Date_Format $endDate
 	 */
-	public function __construct($eventId, $efficacy, $repeatSetting, \Alaress_Date_Format $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
-		$this->setEventId($eventId);
+	public function __construct($efficacy, $repeatSetting, \Alaress_Date_Format $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
 		$this->setCalendarHandler(new \Calendar());
 		$this->setDateCollection(new \Schoolbox\Collection());
 		$this->setRepeatSetting($repeatSetting);
@@ -181,70 +172,6 @@ class EventRecurrence {
 		}
 
 		return $this;
-	}
-
-	/**
-	 * A pseudo-mapper
-	 */
-	public function save($event) {
-		$event['series_id'] = $this->getSeriesId();
-
-		/* Modify an existing event
-		 */
-		if (is_numeric($this->getEventId())) {
-
-			/* Update details of an already-existing set of recurring event incidents
-			 * (Change details of each instance of a recurring event, for example)
-			 */
-			if ($this->getEfficacy() == 'series') {
-				// don't override the date or seriesID
-				unset($event['startDate']);
-				unset($event['endDate']);
-				unset($event['series_id']);
-
-				$series = $this->getCalendarHandler()->getAllInSeriesByEventID($this->getEventId());
-
-				foreach($series as $seriesEvent) {
-					$event['id'] = $seriesEvent['id'];
-					$this->getCalendarHandler()->update($event);
-				}
-			}
-			/* Modify an existing event and add recurring incidents
-			 */
-			else if($this->getEfficacy() == 'self') {
-				//
-				// If there's any recurrence: update first only, and create the
-				// rest from scratch.
-				$first_date_set = $this->getDateCollection()->first();
-				$event['id'] = $this->getEventId();
-				$event['startDate'] = $first_date_set['start'];
-				$event['endDate'] = $first_date_set['end'];
-
-				$this->getCalendarHandler()->update($event);
-
-				/* Skip the first element, spawn new event records
-				 */
-				$this->getDateCollection()->next();
-
-				foreach ($this->getDateCollection() as $currentDate) {
-					unset($event['id']);
-					$event['startDate'] = $currentDate['start'];
-					$event['endDate'] = $currentDate['end'];
-
-					$this->getCalendarHandler()->create($event);
-				}
-			}
-		}
-		else {
-			/* Create N recurring events which are wholly new
-			 */
-			foreach ($this->getDateCollection() as $currentDate) {
-				$event['startDate'] = $currentDate['start'];
-				$event['endDate'] = $currentDate['end'];
-
-				$this->getCalendarHandler()->create($event);
-			}
-		}
 	}
 
 	/**
@@ -396,24 +323,6 @@ class EventRecurrence {
 	 */
 	private function getEfficacyValues() {
 		return $this->efficacyValues;
-	}
-
-	/**
-	 * Set event id
-	 *
-	 * @param null $eventId
-	 */
-	private function setEventId($eventId) {
-		$this->eventId = $eventId;
-	}
-
-	/**
-	 * Get event id
-	 *
-	 * @return null
-	 */
-	private function getEventId() {
-		return $this->eventId;
 	}
 
 	/**
