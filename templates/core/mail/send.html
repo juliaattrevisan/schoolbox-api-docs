@@ -1,33 +1,21 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
 $j(document).ready(function () {
-	$j('#to').autocomplete({
-		serviceUrl: '/ajax/user.php?groupID=0&email=1',
-        delimiter: /(,|;)\s*/, // regex or character
-		minChars: 2,
-		maxHeight: 400,
-		width: $j('#addUser').width()
-
-	});
-
-	$j('#cc').autocomplete({
-		serviceUrl: '/ajax/user.php?groupID=0&email=1',
-        delimiter: /(,|;)\s*/, // regex or character
-		minChars: 2,
-		maxHeight: 400,
-		width: $j('#addUser').width()
-	});
-
-	$j('#bcc').autocomplete({
-		serviceUrl: '/ajax/user.php?groupID=0&email=1',
-                delimiter: /(,|;)\s*/, // regex or character
-		minChars: 2,
-		maxHeight: 400,
-		width: $j('#addUser').width()
-	});
+    var options = {
+        plugin: {
+            data:'/ajax/user.php?groupID=0&email=1',
+            allowFreeEntries: true
+        },
+        onePerLine: false,
+        multiple: true
+    }
+    var to  = $j('#to').userSelector($j.extend({}, options, {value: {REPLYTO}}))
+    var cc  = $j('#cc').userSelector(options)
+    var bcc = $j('#bcc').userSelector($j.extend({}, options, {value: {BCC}}))
 });
 
 tinyMCE.init({
@@ -75,7 +63,7 @@ function verify()
   <table class="table">
     <tr>
       <td class="formLabelWidth"><h4>To:</h4></td>
-	  <td><input type="text" name="to" id="to" size="90" value="{REPLYTO}" /></td>
+	  <td><input type="text" name="to" id="to" size="90" value="" /></td>
     </tr>
     <tr>
       <td><h4>CC:</h4></td>
@@ -84,7 +72,7 @@ function verify()
     <tr>
       <td><h4>BCC:</h4>
 	  </td>
-	  <td><input type="text" name="bcc" id="bcc" size="90" value="{BCC}" /></td>
+	  <td><input type="text" name="bcc" id="bcc" size="90" value="" /></td>
     </tr>
     <tr>
       <td><h4>Subject:</h4>

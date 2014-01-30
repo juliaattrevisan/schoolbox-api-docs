@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
-<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
@@ -30,19 +31,13 @@ $j(document).ready(function() {
 
     }).change();
 
-
-	$j('#addUser').autocomplete({
-		serviceUrl: '/ajax/user.php?groupID=0',
-		minChars: 2,
-		maxHeight: 400,
-		width: 275,
-		onSelect: function (value, data) {
-			$j('#userID').val(data);
-			return false;
-		}
-	});
-
-
+    $j('#addUser').userSelector({
+        plugin: {
+            data:'/ajax/user.php?groupID=0',
+            width: 275
+        },
+        multiple: true
+    })
 
 	$j('#type_form input').each(function () {
 		$j(this).click(function () {
@@ -80,9 +75,8 @@ $j(document).ready(function() {
 				</td>
 			<td>
 				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
-					<input id="addUser" type="text" size="30" />
-					<input type="hidden" name="userID" id="userID" />
-					<input type="submit" value="Add User" class="submit-btn-plain" />
+					<input id="addUser" name="userID" type="text" size="30" />
+					<input type="submit" value="Add Users" class="submit-btn-plain" />
 				</form>
 
 

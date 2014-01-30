@@ -257,7 +257,7 @@ class Leave_Controller extends Controller {
         if ($this->getGroup()->getPermission(null)) {
             $this->getPage()->setVar(
                 array(
-                    'STUDENT_GROUP_IDS' => implode(',', $this->getGroup()->getStudentGroupTypeIds())
+                    'STUDENT_GROUP_IDS' => implode(';', $this->getGroup()->getStudentGroupTypeIds())
                 )
             );
 

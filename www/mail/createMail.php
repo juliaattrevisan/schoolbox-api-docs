@@ -11,18 +11,28 @@ $page = new SitePage();
 
 $groupHandler = new Group;
 
-
 if (Cfg::get('mail_enable') == 1) {
+
+    // Parse out list of emails passed
+    // The name needs to be included in both the ID and value
+    $replytoList = array();
+    $bccList     = array();
+    foreach (Mailer::parseAddressString($_REQUEST['replyto']) as $email => $name) {
+        $replytoList[] = Mailer::buildAddress($email, $name);
+    }
+    foreach (Mailer::parseAddressString($_REQUEST['bcc']) as $email => $name) {
+        $bccList[] = Mailer::buildAddress($email, $name);
+    }
 
     $page->setFile(TEMPLATE_content, 'mail/send.html');
     $page->setTitle('Webmail');
     $page->setTab('webmail');
 
-    $output = array('SUBJECT' => '',
-        'BODY' => '',
-        'REPLYTO' => Scrub::text($_REQUEST['replyto']),
-        'BCC' => Scrub::text($_REQUEST['bcc']),
-
+    $output = array(
+        'SUBJECT' => '',
+        'BODY'    => '',
+        'REPLYTO' => json_encode($replytoList),
+        'BCC'     => json_encode($bccList),
     );
 
     $page->setVar($output);

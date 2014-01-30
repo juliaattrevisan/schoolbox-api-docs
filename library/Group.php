@@ -29,7 +29,7 @@ class Group extends DeprecatedModel
 	 */
 	public function searchByName($name)
 	{
-		$query = "SELECT * FROM groups WHERE name LIKE \"%{$name}%\"";
+		$query = "SELECT * FROM groups WHERE name LIKE \"%{$this->db->quoteForLike($name)}%\"";
 
 		return $this->db->getAll($query);
 	}

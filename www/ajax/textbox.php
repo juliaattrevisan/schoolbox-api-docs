@@ -7,19 +7,16 @@ $page = new SitePage;
 
 $searchList = $textBoxHandler->search($_GET['query']);
 
+$return = array();
 if (is_array($searchList)) {
     foreach ($searchList as $textbox) {
-        $suggestions[] = $textbox['cname'] . ': ' . $textbox['heading'];
-        $data[] = $textbox['textBoxID'];
+        $return[] = array(
+            'id'   => $textbox['textBoxID'],
+            'name' => $textbox['cname'] . ': ' . $textbox['heading'],
+        );
     }
 
 }
 
-$result = array(
-    'query' => $_GET['query'],
-    'suggestions' => $suggestions,
-    'data' => $data,
-);
-
 header('Content-type: application/json');
-echo json_encode($result);
+echo json_encode($return);

@@ -1,74 +1,17 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
-<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.autocomplete.css" />
-
-<style type='text/css'>
-	#individualPermissionTemplate {
-		display: none;
-	}
-</style>
-
+<link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <script type='text/javascript'>
-	$j(function() {
-        
-        /* A list of people who've been added specifically
-         */
-        var added = [];
-
-        $j('#addIndividualPermission').autocomplete({
-            serviceUrl: '/eportfolio/search.php?groupID={STUDENT_GROUP_IDS}',
-            minChars: 2,
-            maxHeight: 300,
-            width: 275,
-            noCache: true,
-
-            /* When selected, append to a list
-             */
-            onSelect: function (value, data) {
-
-                /* First check if the person has already been added
-                 */
-                if ($j.inArray(data, added) == -1) {
-                    var individualPermission = $j('#individualPermissionTemplate').clone();
-                    individualPermission.find('input').attr('name', 'individual_permission[]');
-                    individualPermission.find('input').val(data);
-
-                    /* Snap out the group from the list
-                     */
-                    var hyphenIndex = value.indexOf('-');
-
-                    if (hyphenIndex > -1) {
-                        individualPermission.find('li').append(value.substr(0, hyphenIndex));
-                    }
-                    else {
-                        individualPermission.find('li').append(value);
-                    }
-
-                    /* Push it in
-                     */
-                    $j('#individualPermissionList').append(individualPermission.html());
-
-                    /* Stack up
-                     */
-                    added.push(data);
-                }
-
-                /* Clear and lock
-                 */
-                $j('#addIndividualPermission').val('');
-            }
+    $j(function() {
+        $j('#addIndividualPermission').userSelector({
+            plugin: {
+                data:  '/eportfolio/search.php?groupID={STUDENT_GROUP_IDS}',
+                width: 275
+            },
+            multiple: true
         });
-
-        /* Remove someone from list
-         */
-        $j(document).on('change', '.individualPermissionRemove', function(event) {
-            added.splice($j.inArray($j(this).closest('li').find('input[name="individual_permission[]"]').val(), added), 1 );
-
-            $j(this).closest('li').fadeOut("slow",function(){
-                $j(this).remove();
-            });
-        });
-	});
+    });
 </script>
 <!-- END custom_head -->
 <ul class='admin-nav'>
@@ -142,20 +85,10 @@
 			</td>
 			<td>
                 <p>
-                    <input id='addIndividualPermission' type='text' value='' />
+                    <input id='addIndividualPermission' type='text' value='' name="individual_permission" />
                 </p>
-                <ul id='individualPermissionList'>
-
-				</ul>
 			</td>
 		</tr>
 	</table>
 	<input type="submit" label="Submit" value="Create Page" class="submit-btn-plain"/>
 </form>
-
-<ul id='individualPermissionTemplate'>
-    <li>
-        <input class="individualPermissionRemove" type="checkbox" checked="checked" />
-        <input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
-    </li>
-</ul>

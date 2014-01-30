@@ -85,10 +85,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock('customise_page', 'has_group_permissions', 'has_group_permissions_block');
 		$this->getPage()->setBlock('has_group_permissions', 'group_permission', 'group_permission_block');
 
-		/* Permissions list for individuals
-		 */
-		$this->getPage()->setBlock('customise_page', 'individual_permission', 'individual_permission_block');
-
 		/* Set meta data
 		 */
 		$this->getPage()->setVar(array(
@@ -514,7 +510,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 */
 	private function renderIndividualPermissions() {
 		$this->getPage()->setVar(array(
-			'STUDENT_GROUP_IDS' => implode(',', $this->getGroupHandler()->getStudentGroupTypeIds())
+			'STUDENT_GROUP_IDS' => implode(';', $this->getGroupHandler()->getStudentGroupTypeIds())
 		));
 
 		/* Find all the guys who were allowed to see this page
@@ -531,24 +527,29 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 			$selectedIndividualIds[] = $selectedIndividual->getValue();
 		}
 
-		/* ...and get their records with phenomenal cheese factor in findIn()
+		/* ...and get their records
 		 */
+		$individualList = array();
 		if (count($selectedIndividualIds)) {
-			$allIndividuals = \Schoolbox\UserMapper::getInstance()->findIn('id', $selectedIndividualIds);
+
+			// Load each user and their role
+			$userMapper = \Schoolbox\UserMapper::getInstance();
+			$allIndividuals = $userMapper->findByColumn('id', $selectedIndividualIds);
+			$userMapper->loadJoinedModel('role', $allIndividuals);
 
 			foreach ($allIndividuals as $currentIndividual) {
-				$this->getPage()->setVar(array(
-					'INDIVIDUAL_PERMISSION_USER_ID' => $currentIndividual->getId(),
-					'INDIVDIUAL_PERMISSION_USER_FIRSTNAME' => $currentIndividual->getFirstname(),
-					'INDIVDIUAL_PERMISSION_USER_LASTNAME' => $currentIndividual->getLastname(),
-				));
-
-				$this->getPage()->parse('individual_permission_block', 'individual_permission', true);
+				$person = $currentIndividual->getFullname().' - ';
+				if (is_numeric($currentIndividual->getYear())) {
+					$person .= "Year {$currentIndividual->getYear()}, ";
+				}
+				$person .= $currentIndividual->getRole()->getName();
+				$individualList[] = array(
+					'id'   => $currentIndividual->getId(),
+					'name' => $person,
+				);
 			}
 		}
-		else {
-			$this->getPage()->setVar('individual_permission_block', '');
-		}
+		$this->getPage()->setVar('USER_LIST', json_encode($individualList));
 	}
 
 	/* Getters/Setters

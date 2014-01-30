@@ -48,7 +48,10 @@
             $j('{DESTINATION}').val(dest);
             // Trigger change on destination if it was asked for
             if ('{TRIGGER}') {
-                $j('{DESTINATION}').change();
+                $j('{DESTINATION}').trigger(
+                    'change',
+                    [{from:'resourceBrowser', name: $j('#destination-text').val()}]
+                );
             }
             if ('{DESTINATION_TEXT}') {
                 $j('{DESTINATION_TEXT}').text($j('#destination-text').val());

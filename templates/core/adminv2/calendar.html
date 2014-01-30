@@ -1,22 +1,19 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
-<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<link rel="stylesheet" href="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.css" type="text/css"/>
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 
 $j(function() {
-	
-	$j('#name').autocomplete({
-		serviceUrl: '/ajax/user.php?groupID=0',
-		minChars: 2,
-		maxHeight: 300,
-		width: 275,
-        noCache: true,
-		onSelect: function (value, data) {
-			$j('#userid').val(data);
-		}
-	});
+    $j('#name').userSelector({
+        plugin: {
+            data:'/ajax/user.php?groupID=0',
+            width: 200
+        },
+        formElement: $j('#userid')
+    })
 
     $j('h3 span').each(function() {
         var activeContent = $j(this).siblings('em').html();

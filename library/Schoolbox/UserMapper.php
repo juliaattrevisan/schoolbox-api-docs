@@ -118,6 +118,13 @@ class UserMapper extends Mapper {
 			));
 
 		$this->hasMap(array(
+			'column'     => 'group_id',
+			'property'   => 'role',
+			'type'       => Mapper::TYPE_MODEL,
+			'join'       => 'role',
+		));
+
+		$this->hasMap(array(
 			'column'     => 'enabled',
 			'property'   => 'enabled',
 			'type'       => Mapper::TYPE_BOOLEAN,
@@ -137,6 +144,14 @@ class UserMapper extends Mapper {
 		));
 		unset($this_object);
 
+		$this->hasJoin(
+			'role',
+			array(
+				'mapper'    => '\\Schoolbox\\RoleMapper',
+				'this_key'  => 'group_id',
+				'other_key' => 'id',
+			)
+		);
 	}
 
 	public function findById($id) {

@@ -9,44 +9,40 @@
  */
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-if (isset($_GET['query']) && strlen($_GET['query']) && isset($_GET['groupID']) && strlen($_GET['groupID'])) {
-	$query = $_GET['query'];
-	$groupIds = $_GET['groupID'];
+$return = array();
+if (isset($_POST['query']) && strlen($_POST['query']) && isset($_GET['groupID']) && strlen($_GET['groupID'])) {
+    $groupIds = $_GET['groupID'];
 
-	/* Allow for multiple groups search via autocompletes
- 	 */
-	if (strlen($groupIds) && strstr($groupIds, ',')) {
-		$groupIdArray = explode(',', $groupIds);
-	}
-	else if (is_numeric($_GET['groupID'])) {
-		$groupIdArray = array($_GET['groupID']);
-	}
+    /* Allow for multiple groups search via autocompletes
+     */
+    if (strlen($groupIds) && strstr($groupIds, ';')) {
+        $groupIdArray = explode(';', $groupIds);
+    }
+    else if (is_numeric($_GET['groupID'])) {
+        $groupIdArray = array($_GET['groupID']);
+    }
 
-	$userMapper = new Schoolbox\UserMapper();
+    $userMapper = new Schoolbox\UserMapper();
 
-	$allStudents = $userMapper->findByNameAndGroup($_GET['query'], $groupIdArray);
+    $allStudents = $userMapper->findByNameAndGroup($_POST['query'], $groupIdArray);
 
-	if ($allStudents->count()) {
-		foreach($allStudents as $currentStudent) {
-			$person = $currentStudent->getFullname() . ' - ';
+    if ($allStudents->count()) {
+        foreach($allStudents as $currentStudent) {
+            $person = $currentStudent->getFullname() . ' - ';
 
-			if (is_numeric($currentStudent->getYear())) {
-				$person .= "Year {$currentStudent->getYear()}, ";
-			}
+            if (is_numeric($currentStudent->getYear())) {
+                $person .= "Year {$currentStudent->getYear()}, ";
+            }
 
-			$person .= $currentStudent->getRole()->getName();
+            $person .= $currentStudent->getRole()->getName();
 
-			$suggestions[] = html_entity_decode(Scrub::text($person), ENT_QUOTES);
-			$data[] = $currentStudent->getId();
-		}
-	}
+            $return[] = array(
+                'id'   => $currentStudent->getId(),
+                'name' => $person,
+            );
+        }
+    }
 }
 
-$result = array(
-	'query' => $_GET['query'],
-	'suggestions' => $suggestions,
-	'data' => $data,
-);
-
 header('Content-type: application/json');
-echo json_encode($result);
+echo json_encode($return);

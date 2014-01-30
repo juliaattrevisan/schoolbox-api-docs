@@ -7,23 +7,17 @@ $categoryHandler = new Category();
 $suggestions = array();
 $data = array();
 
-$query = Scrub::text($_GET['query']);
+$allResults = $categoryHandler->searchByName($_GET['query']);
 
-$allResults = $categoryHandler->searchByName($query);
-
+$return = array();
 if (is_array($allResults) && count($allResults)) {
-	foreach($allResults as $currentResult) {
-		$suggestions[] = $currentResult['name'] . ' - /homepage/' . $currentResult['id'];
-		$data[] = '/homepage/' . $currentResult['id'];
-	}
+    foreach($allResults as $currentResult) {
+        $return[] = array(
+            'id'   => '/homepage/' . $currentResult['id'],
+            'name' => $currentResult['name'] . ' - /homepage/' . $currentResult['id'],
+        );
+    }
 }
 
-$result = array(
-	'query'	=> $query,
-	'suggestions' => $suggestions,
-	'data' => $data
-);
-
 header('Content-type: application/json');
-echo json_encode($result);
-
+echo json_encode($return);
