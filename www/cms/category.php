@@ -55,17 +55,17 @@ if (is_numeric($this->arg[0])) {
     $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
     $homepageTemplateList = $homepageTemplateMapper->findAll();
 
-	/* Prepend
-	 */
-    $keepExisting = new \Schoolbox\Resource\HomepageTemplate;
-    $keepExisting->setName('Keep Existing')->setId(0);
-	$homepageTemplateList->add($keepExisting);
-
-	/* Used to remove homepages
-	 */
+    /* Used to remove homepages
+     */
     $noHomepage = new \Schoolbox\Resource\HomepageTemplate;
     $noHomepage->setName('No Homepage')->setId(-1);
-    $homepageTemplateList->add($noHomepage);
+    $homepageTemplateList->prepend($noHomepage);
+
+    /* Keep existing homepage
+     */
+    $keepExisting = new \Schoolbox\Resource\HomepageTemplate;
+    $keepExisting->setName('Keep Existing')->setId(0);
+    $homepageTemplateList->prepend($keepExisting);
 
 	$this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
 
@@ -164,7 +164,7 @@ else {
          */
         $noHomepage = new \Schoolbox\Resource\HomepageTemplate;
         $noHomepage->setName('No Homepage')->setId(-1);
-        $homepageTemplateList->add($noHomepage);
+        $homepageTemplateList->prepend($noHomepage);
 
         $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
 
