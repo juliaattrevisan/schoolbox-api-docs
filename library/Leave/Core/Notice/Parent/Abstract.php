@@ -70,7 +70,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
     }
 
 //	public function send() {
-//		$parentList = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getSynergyId());
+//		$parentList = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getExternalId());
 //
 //		if (is_array($parentList)) {
 //			foreach ($parentList as $parent) {

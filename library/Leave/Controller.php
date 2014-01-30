@@ -473,7 +473,7 @@ class Leave_Controller extends Controller {
             if ($nextRequest) {
                 $this->getPage()->setVar(
                     array(
-                        'NEXT_PENDING_ID' => $nextRequest['id']
+                        'NEXT_PENDING_ID' => $nextRequest->getId()
                     )
                 );
 
@@ -568,6 +568,7 @@ class Leave_Controller extends Controller {
      * @throws Exception_Schoolbox_NotFound if request isn't found.
      */
     public function processModifyRequest($data) {
+        /** @var Leave_Request $request */
         try {
             $request = $this->getRequestMapper()->findById($data['request']['id']);
         }
@@ -601,7 +602,7 @@ class Leave_Controller extends Controller {
             $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
 
             $request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-            $request->setAuthorisationUserId($_SESSION['id']);
+            $request->setAuthorisationUser($_SESSION['user']);
 
             if (isset($data['approve'])) {
                 $request->setStatus(Leave_Request::STATUS_APPROVED);
@@ -842,6 +843,7 @@ class Leave_Controller extends Controller {
      * @param $data
      */
     public function exportUserRequestList($data) {
+        /** @var Schoolbox\User $user */
         $user = $data['user'];
         if ($this->hasViewPermission($user->getId())) {
             /** @var Leave_Request[] $requestList */
@@ -881,7 +883,7 @@ class Leave_Controller extends Controller {
                 }
             }
 
-            $this->dumpCSV('Leave Requests - ' . $user['firstname'] . ' ' . $user['lastname'], $allRows);
+            $this->dumpCSV('Leave Requests - ' . $user->formatName(), $allRows);
         }
 
         exit(1);
@@ -1020,6 +1022,7 @@ class Leave_Controller extends Controller {
 
             if (!empty($requestList)) {
                 foreach ($requestList as $request) {
+                    /** @var Leave_Request $request */
                     try {
                         $request = $this->getRequestMapper()->findById($request['id']);
                     }
@@ -1031,7 +1034,7 @@ class Leave_Controller extends Controller {
                         $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
 
                         $request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-                        $request->setAuthorisationUserId($_SESSION['id']);
+                        $request->setAuthorisationUser($_SESSION['user']);
 
                         if (isset($data['approve'])) {
                             $request->setStatus(Leave_Request::STATUS_APPROVED);

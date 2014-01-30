@@ -24,7 +24,7 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 		 */
 		$this->setExternalUser(new External_User());
 
-		$housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId($this->getRequest()->getUser()->getResidentialHouseId());
+		$housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId($this->getRequest()->getUser()->getResidentialHouse());
 
 		$userHandler = new User();
 		$housemaster = $userHandler->getByUsername($housemasterInitials);
@@ -64,7 +64,7 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 	 */
 	public function send() {
 		$allEmails = $this->getExternalUser()->getParentEmails(
-			array($this->getRequest()->getUser()->getSynergyId())
+			array($this->getRequest()->getUser()->getExternalId())
 		);
 
 		if (is_array($allEmails) && count($allEmails)) {
@@ -80,7 +80,7 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 	}
 
 //	public function send() {
-//		$parentList = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getSynergyId());
+//		$parentList = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getExternalId());
 //
 //		if (is_array($parentList)) {
 //			foreach ($parentList as $parent) {
