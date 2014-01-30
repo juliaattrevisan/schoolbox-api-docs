@@ -85,10 +85,11 @@ class EventRecurrence {
 
 	/**
 	 * Recur events until this date
+	 * An instance of Alaress_Date_Format
 	 *
 	 * @var string
 	 */
-	private $until = '';
+	private $until = null;
 
 	/**
 	 * An instance of Alaress_Date_Format
@@ -110,11 +111,11 @@ class EventRecurrence {
 	 * @param $eventId
 	 * @param $efficacy
 	 * @param $repeatSetting
-	 * @param $until
+	 * @param \Alaress_Date_Format $until
 	 * @param \Alaress_Date_Format $startDate
 	 * @param \Alaress_Date_Format $endDate
 	 */
-	public function __construct($eventId, $efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+	public function __construct($eventId, $efficacy, $repeatSetting, \Alaress_Date_Format $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
 		$this->setEventId($eventId);
 		$this->setCalendarHandler(new Calendar());
 		$this->setDateCollection(new \Schoolbox\Collection());
@@ -140,7 +141,7 @@ class EventRecurrence {
 	public function setup() {
 
 		// repeat specified, and and enddate also, populate the dates to be set
-		if ($this->isValidInterval() && $this->getUntil()) {
+		if ($this->isValidInterval() && $this->getUntil()->getUnixTimestamp()) {
 			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex() + 1);
 
 			$start_timestamp = $this->getStartDate()->getUnixTimestamp();
@@ -148,7 +149,7 @@ class EventRecurrence {
 
 			// Repeat of events: repeat until the start date is after the until
 			// date (or x100, whatever is less)
-			for ($i = 0; ($start_timestamp <= $this->getUntil()) && ($i < $this->getMaxNumRecurring()); $i++) {
+			for ($i = 0; ($start_timestamp <= $this->getUntil()->getUnixTimestamp()) && ($i < $this->getMaxNumRecurring()); $i++) {
 
 				/* Increment to the next incident of the event
 				 */
@@ -167,7 +168,7 @@ class EventRecurrence {
 
 		// if repeat is set, but no enddate was specified, bail out
 		// "not enough data submitted to the form"
-		else if($this->isValidInterval() && (!$this->getUntil())) {
+		else if($this->isValidInterval() && (!$this->getUntil()->getUnixTimestamp())) {
 			error(2);
 		}
 

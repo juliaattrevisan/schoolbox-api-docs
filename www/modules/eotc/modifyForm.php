@@ -33,12 +33,18 @@ else {
 switch($_POST['action']) {
 	case 'Add':
 	case 'Update':
-		$untilObj = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
-		$until = $untilObj->getUnixTimestamp();
+
+		/* Start and end dates
+		 */
+		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
+		$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
+
+		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
+		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
 		/* Events aren't visible until this date
-		  */
-		if($_POST['publishDate']) {
+		 */
+		if ($_POST['publishDate']) {
 			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
 			$publishDate = $pubDateObject->getDatabaseDate();
 		}
@@ -46,12 +52,12 @@ switch($_POST['action']) {
 			$publishDate = 'NULL';
 		}
 
-		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
-		$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
+		/* Events recur until this time
+		 */
+		$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
 
-		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
-		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
-
+		/* Crazy handler
+		 */
 		$event = array(
 			'owner' => $ownerId,
 			'access' => $_POST['level'],
