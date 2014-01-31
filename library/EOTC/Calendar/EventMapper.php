@@ -13,10 +13,6 @@ use Schoolbox;
 
 
 class EventMapper extends Schoolbox\External\Mapper {
-	const ACCESS_PERSONAL = 1;
-	const ACCESS_GROUP = 2;
-	const ACCESS_CAMPUS = 3;
-
 	protected function mapping() {
 		$this->hasTable('event');
 		$this->hasModel('\\EOTC\\Calendar\Event');
@@ -204,6 +200,74 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * @return array|void
 	 */
 	public function save($event, $groupList, $campusList) {
+
+		/* Call super -_-
+		 */
 		parent::save($event);
+
+		/* Deal with this uniquely for now - maybe these should be part of the
+		 * event model, but then you need to manufacture mappers, relations and
+		 * hydration methods for these two optional bits
+		 */
+		$this->postSave($event, $groupList, $campusList);
+	}
+
+	/**
+	 * Post-save hook method
+	 *
+	 * @param $event
+	 * @param $groupList
+	 * @param $campusList
+	 */
+	private function postSave($event, $groupList, $campusList) {
+
+		/* Deal with groupList and campusList separately
+		 */
+		$this->getPerm($event, $_SESSION['user']);
+		die();
+	}
+
+	/**
+	 * Get a permission level for a particular event
+	 *
+	 * @param Event $event
+	 * @param Schoolbox\User $user
+	 * @return int
+	 */
+	private function getPerm(\EOTC\Calendar\Event $event, \Schoolbox\User $user) {
+		if ($user->isSuperuser()) {
+			return FULL_ACCESS;
+		}
+
+		/* Personal events
+		 */
+		if ($event->isPersonalLevel()) {
+
+			/* If you spawned this event, you can modify it
+			 */
+			if ($event->getAuthor()->getId() == $user->getId()) {
+				return WRITE_ACCESS;
+			}
+			/* Otherwise, if this event is just related to you in some way,
+			 * you can only read it unless you are a staff member
+			 */
+			else if ($event->getOwner() == $user->getId()) {
+				return $user->getRole()->getType() === 'staff' ? WRITE_ACCESS : READ_ACCESS;
+			}
+		}
+		/* Group events
+		 */
+		else if ($event->isGroupLevel()) {
+			$groupHandler = new \Group();
+
+			return $groupHandler->getPermission($event->getSid());
+		}
+		/* Campus events
+		 */
+		else if ($event->isCampusLevel()) {
+
+			/* TODO: Need a collection of groups, and a collection of campii
+			 */
+		}
 	}
 }
