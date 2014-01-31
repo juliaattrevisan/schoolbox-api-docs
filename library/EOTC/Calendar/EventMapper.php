@@ -254,10 +254,6 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$this->deletePermissions($event);
 		$this->createRoles($event);
 		$this->createCampus($event);
-
-		new \Alaress_Probe($_POST);
-		new \Alaress_Probe($event);
-		die();
 	}
 
 	/**
