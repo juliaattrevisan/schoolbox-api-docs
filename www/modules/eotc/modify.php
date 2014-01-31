@@ -22,7 +22,13 @@ $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_bloc
  */
 if (is_numeric($_GET['eventID'])) {
 	$mapper = new \EOTC\Calendar\EventMapper();
-	$event = $mapper->findById($_GET['eventID']);
+
+	try {
+		$event = $mapper->findById($_GET['eventID']);
+	}
+	catch (\Exception $e) {
+		error(156);
+	}
 
 	/* Default values
 	 */

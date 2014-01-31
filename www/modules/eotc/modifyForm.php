@@ -45,7 +45,13 @@ switch($_POST['action']) {
 		 */
 		if (is_numeric($_POST['id'])) {
 			$eventMapper = new \EOTC\Calendar\EventMapper();
-			$event = $eventMapper->findById($_POST['id']);
+
+			try {
+				$event = $eventMapper->findById($_POST['id']);
+			}
+			catch (\Exception $e) {
+				error(156);
+			}
 		}
 		else {
 			$event = new \EOTC\Calendar\Event();
