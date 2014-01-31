@@ -124,7 +124,8 @@ class Bulk_Calendar extends Bulk_Abstract {
 
 				if ((trim($thisRow[0]) != '') && (trim($name) != '')) {
 					$event = array(
-						'owner' => $uid,
+						'owner' => $_SESSION['id'],
+                        'author_id' => $uid,
 						'access' => Calendar::ACCESS_CAMPUS,
 						'startDate' => $start->getDatabase(),
 						'endDate' => $finish->getDatabase(),
@@ -216,7 +217,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 
 			/* Process vcal events
 			 */
-			$v = new ICal_Creator($uid, $groupList, $campusList, $this->getFile());
+			$v = new ICal_Creator($uid, $_SESSION['id'], $groupList, $campusList, $this->getFile());
 			$v->load();
 
 			return $v->getOutput();

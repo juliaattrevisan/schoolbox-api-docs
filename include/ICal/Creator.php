@@ -19,6 +19,7 @@ class ICal_Creator {
 
 	/* Stuff from $_POST
 	 */
+    private $creator = null;
 	private $uid = null;
 	private $groupList = array();
 	private $campusList = array();
@@ -43,10 +44,11 @@ class ICal_Creator {
 	 * @param $campusList
 	 * @param $file
 	 */
-	public function __construct($uid, $groupList, $campusList, $file) {
+	public function __construct($uid, $creator, $groupList, $campusList, $file) {
 //		date_default_timezone_set('Australia/Melbourne');
 
 		$this->setUid($uid);
+        $this->setCreator($creator);
 		$this->setGroupList($groupList);
 		$this->setCampusList($campusList);
 		$this->setFile($file);
@@ -168,7 +170,8 @@ class ICal_Creator {
 						$end = $this->decideTimes($year, $month, $day, $dtend);
 
 						$event = array(
-							'owner' => $this->getUid(),
+							'owner' => $this->getCreator(),
+                            'author_id' => $this->getUid(),
 							'access' => 3,
 							'groupList' => array_map(array('Scrub', 'text'), $this->getGroupList()),
 							'campusList' => array_map(array('Scrub', 'text'), $this->getCampusList()),
@@ -297,6 +300,25 @@ class ICal_Creator {
 	private function getUid() {
 		return $this->uid;
 	}
+
+    /**
+     * Set creator
+     *
+     * @param $creator
+     */
+    private function setCreator($creator) {
+        $this->creator = $creator;
+    }
+
+    /**
+     * Get creator
+     *
+     * @return null
+     */
+    private function getCreator() {
+        return $this->creator;
+    }
+
 
 	/**
 	 * Set output
