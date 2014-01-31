@@ -78,7 +78,8 @@ Scenario: Delete a user
   When	I follow "Modify User"
   Then	I should see "Modify user: Prof Steve Test"
   When	I press "Delete User"
-#  And	I confirm popup
+  And   I confirm the popup
+  Then  I wait for "Modify User"
   Then  I should see "Modify User"
   And	I should see "Add User"
   When	I fill in "search-field" with "Prof Steve Test"
