@@ -44,6 +44,9 @@ class Subcontext_CoreContext extends BaseContext {
     /**
      * Logs in user.
      *
+     * This represents a successful login, and will throw exception on a failed
+     * login. For a login attempt, @see $this->loginAttempt()
+     *
      * @Given /^(?:|I am) logged in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
      * @Given /^(?:|I )log in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
      *
@@ -52,11 +55,26 @@ class Subcontext_CoreContext extends BaseContext {
      * @throws Exception if login failed
      */
     public function login($username, $password) {
+        $this->loginAttempt($username, $password);
+        $this->waitForLink('Logout', 10000);
+    }
+
+    /**
+     * Attempts to log in.
+     *
+     * This represents a successful login, and will throw exception on a failed
+     * login. For a login attempt, @see $this->loginAttempt()
+     *
+     * @Given /^(?:|I )try to log in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
+     *
+     * @param string $username
+     * @param string $password
+     */
+    public function loginAttempt($username, $password) {
         $page = $this->getSession()->getPage();
         $page->findById('username')->setValue($username);
         $page->findById('password')->setValue($password);
         $page->find('css', 'input.login')->press();
-        $this->waitForLink('Logout', 10000);
     }
 
     /**

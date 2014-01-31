@@ -65,7 +65,7 @@ Scenario: Disable a user
   Then	I should see "Account disabled"
   When	I follow "Logout"
   Then	I should see "You are currently not logged in"
-  And	log in as "stevetest" with password "password2"
+  And	try to log in as "stevetest" with password "password2"
   # This below is failing - but I can see it in the browser - javascript related?
   Then	I should see "This account is currently disabled."
 
@@ -86,5 +86,5 @@ Scenario: Delete a user
   And   I press "search-button"
   Then  I should not see "webmaster@alaress.com.au"
   When	I follow "Logout"
-  And	log in as "stevetest" with password "password2"
+  And	try to log in as "stevetest" with password "password2"
   Then	I should see "The username or password you typed is incorrect, please try again"
