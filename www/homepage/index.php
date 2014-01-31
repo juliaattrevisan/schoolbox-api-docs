@@ -248,6 +248,7 @@ if ($permission >= WRITE_ACCESS) {
 //set the page-level parameters in the template
 $categoryCodes = $catHandler->getCodeForCategory($categoryID);
 $code = $categoryCodes['codes'];
+$category['code'] = $code; /* Make sure category has all codes, not just the one requested */
 $codeArray = explode(',', $code);
 
 if(count($codeArray) > 4) {
