@@ -19,15 +19,15 @@ class Attendance_Synergetic_AttendanceMaster_New extends Attendance_Synergetic_A
 		 */
 		$data = array(
 			'CreatedDate' => 'GETDATE()',
-			'CreatedByID' => $_SESSION['id'],
+			'CreatedByID' => $_SESSION['sid'],
 			'ModifiedDate' => 'GETDATE()',
-			'ModifiedByID' => $_SESSION['id'],
+			'ModifiedByID' => $_SESSION['sid'],
 			'FileType' => 'A',
 			'FileYear' => $_SESSION['FileYear'],
 			'FileSemester' => $_SESSION['FileSemester'],
-			'ClassCampus' => $class['classCampus'],
+			'ClassCampus' => $class['ClassCampus'],
 			'ClassCode' => $this->getClassCode(),
-			'StaffID' => $_SESSION['id'],
+			'StaffID' => $_SESSION['sid'],
 			'AttendanceDate' => $this->getAttendanceDate() . ' 00:00:00.000',
 			'AttendancePeriod' => $this->getAttendancePeriod(),
 

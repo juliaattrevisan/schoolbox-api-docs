@@ -22,13 +22,11 @@ $this->setBlock('student', 'reason_options', 'reason_options_block');
  */
 $this->setBlock('student', 'has_attendance_options', 'has_attendance_options_block');
 
-/* This button only appears if the AttendanceMasterSeq existed, indicating
- * that the roll has been called and saved at least once
+/* The master sequence always exists now, but have retired this option for the moment
  */
 $this->setBlock('student', 'has_update', 'has_update_block');
 
-/* This button only appears if the AttendanceMasterSeq didn't exist, indicating
- * that the roll has not yet been called for this class, date and period
+/* This is the standard button for saving the attendance, it now is always visible
  */
 $this->setBlock(TEMPLATE_content, 'has_save_all', 'has_save_all_block');
 
@@ -90,20 +88,7 @@ if ($class) {
 	/* Get the attendance record for this class
 	 */
 	$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
-	$attendanceHandler->findAttendanceRecords();
-
-	/* If the roll has been marked before, just show the students that were originally
-	 * in that roll. Otherwise load all the students in the class.
-	 *
-	 * Students could be added to a class and could unexpectedly make an
-	 * appearance in history if you don't do this.
-	 */
-	if ($attendanceHandler->getAttendanceMaster()->hasAttendanceMasterSeq()) {
-		$allStudents = $attendanceHandler->getStudents($attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq());
-	}
-	else {
-		$allStudents = $externalClass->getStudents($class['ClassCode']);
-	}
+	$allStudents = $attendanceHandler->findAttendanceRecords();
 
 	/* Dish out each row
 	 */
@@ -118,19 +103,15 @@ if ($class) {
 		/* Iterate each guy
 		 */
 		foreach($allStudents as $currentStudent) {
-			$user = $userHandler->getBySynergy($currentStudent['synergy_id']);
-
-			/* Ram in their attendance record as well
-			 */
-			$attendanceRecord = $attendanceHandler->getAttendanceRecord($currentStudent['synergy_id']);
+			$user = $userHandler->getBySynergy($currentStudent['ID']);
 
 			/* Default setting for the checkbox and Edit link
 			 */
-			if (is_array($attendanceRecord) && ($attendanceRecord['AttendedFlag'] == 0)) {
+			if ($currentStudent['AttendedFlag'] == 0) {
 				$isAbsent = "checked='checked'";
 
 				$this->setVar(array(
-					'STUDENT_SYNERGY_ID' => $currentStudent['synergy_id']
+					'STUDENT_SYNERGY_ID' => $currentStudent['ID']
 				));
 
 				$this->parse('has_attendance_options_block', 'has_attendance_options');
@@ -149,12 +130,12 @@ if ($class) {
 			 */
 			$this->setVar(array(
 				'STUDENT_UID' => $user['uid'],
-				'STUDENT_FIRSTNAME' => $currentStudent['firstname'],
-				'STUDENT_LASTNAME' => $currentStudent['lastname'],
-				'STUDENT_SYNERGY_ID' => $currentStudent['synergy_id'],
-				'STUDENT_ABSENCE_CODE' => $attendanceRecord['PossibleAbsenceCode'],
-				'STUDENT_REASON_CODE' => $attendanceRecord['PossibleReasonCode'],
-				'STUDENT_REASON_DESCRIPTION' => Scrub::text($attendanceRecord['PossibleReasonDescription']),
+				'STUDENT_NAME' => Scrub::text($currentStudent['StudentName']),
+				'STUDENT_SYNERGY_ID' => $user['synergy_id'],
+				'STUDENT_ABSENCE_CODE' => $currentStudent['PossibleAbsenceCode'],
+				'STUDENT_REASON_CODE' => $currentStudent['PossibleReasonCode'],
+				'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['PossibleReasonDescription']),
+                'STUDENT_ATTENDANCESTRING'  => Scrub::text($currentStudent['TodaysAttendanceString']),
 				'IS_ABSENT' => $isAbsent,
 				'ON_OFF' => ++$i%2 ? 'dark' : '',
 			));
@@ -165,7 +146,7 @@ if ($class) {
 
 				/* Preselect
 				 */
-				if ($currentOption['Code'] == $attendanceRecord['PossibleAbsenceCode']) {
+				if ($currentOption['Code'] == $currentStudent['PossibleAbsenceCode']) {
 					$isSelected = "selected='selected'";
 				}
 				else {
@@ -187,7 +168,7 @@ if ($class) {
 
 				/* Preselect
 				 */
-				if ($currentOption['Code'] == $attendanceRecord['PossibleReasonCode']) {
+				if ($currentOption['Code'] == $currentStudent['PossibleReasonCode']) {
 					$isSelected = "selected='selected'";
 				}
 				else {
@@ -203,14 +184,9 @@ if ($class) {
 				$this->parse('reason_options_block', 'reason_options', true);
 			}
 
-			/* Update button in absentee reasons form
+			/* Update button in absentee reasons form, hiding for now
 			 */
-			if ($attendanceHandler->hasAttendanceMasterSeq()) {
-				$this->parse('has_update_block', 'has_update');
-			}
-			else {
-				$this->setVar('has_update_block', '');
-			}
+			$this->parse('has_update_block', 'has_update');
 
 			$this->parse('student_block', 'student', true);
 
@@ -222,14 +198,9 @@ if ($class) {
 			$this->setVar('has_update_block', '');
 		}
 
-		/* Remove special save-all
-		 */
-		if ($attendanceHandler->hasAttendanceMasterSeq()) {
-			$this->setVar('has_save_all_block', '');
-		}
-		else {
-			$this->parse('has_save_all_block', 'has_save_all');
-		}
+        /* Always show save button */
+		$this->parse('has_save_all_block', 'has_save_all');
+
 	}
 	else {
 		$this->setVar('student_block', '');

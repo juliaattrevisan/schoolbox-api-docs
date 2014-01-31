@@ -240,7 +240,6 @@ class MSSQL {
 				$maxlen = -1;
 			}
 			if ($is_output) {
-				$bound_outputs[$param_name] = $var;
 				mssql_bind($proc, $param_name, $bound_outputs[$param_name], $type, true, $is_null, $maxlen);
 			}
 			else {
@@ -256,12 +255,15 @@ class MSSQL {
 		try {
 			$result  = mssql_execute($proc);
 			$message = mssql_get_last_message();
-			
+
 			if (is_resource($result)) {
 				while ($row = mssql_fetch_assoc($result)) {
                     $return[] = $row;
 				}
-			}
+                /* This fixes issue where output params were not available after resultset was returned */
+                mssql_next_result($result);
+
+            }
 			elseif ($result === false) {
 				// Did the procedure error out? Return nothing instead.
 				$success       = false;
@@ -274,7 +276,8 @@ class MSSQL {
 			$message       = $e->getMessage();
 		}
 		mssql_free_statement($proc);
-		return array(
+
+        return array(
 			'success' => $success,
 			'output'  => $bound_outputs,
 			'result'  => $return,

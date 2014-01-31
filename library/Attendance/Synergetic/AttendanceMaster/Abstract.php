@@ -159,37 +159,60 @@ abstract class Attendance_Synergetic_AttendanceMaster_Abstract {
 	/**
 	 * Insert that stub row
 	 */
-	public function insertStub() {
+	public function setupWork() {
 		$data = $this->getData();
+        $value =    array(
+            array('@FileType', $data['FileType'], SQLVARCHAR),
+            array('@FileYear', $data['FileYear'], SQLINT4 ),
+            array('@FileSemester', $data['FileSemester'], SQLINT4 ),
+            array('@ClassCampus', $data['ClassCampus'], SQLVARCHAR ),
+            array('@ClassCode', $data['ClassCode'], SQLVARCHAR ),
+            array('@AttendanceDate', $data['AttendanceDate'], SQLVARCHAR ),
+            array('@AttendancePeriod', $data['AttendancePeriod'], SQLINT4),
+            array('@AttendanceDayNumber', $data['AttendanceDayNumber'], SQLINT4 ),
+            array('@StaffID', $data['StaffID'], SQLINT4 ),
+            array('@AttendedFlag', 1, SQLINT4),
+            array('@TimeTableGroup', $data['TimetableGroup'], SQLVARCHAR),
+            array('@SynWebFlag', 1, SQLINT4),
+            array('@wkAttendanceMasterSeq', $var, SQLINT4, true, true, -1 ),
+        );
 
-		$query = "
-			INSERT INTO SynergyOne.dbo.AttendanceMaster (
-				CreatedDate, CreatedByID,
-				ModifiedDate, ModifiedByID,
-				FileType, FileYear, FileSemester,
-				ClassCampus, ClassCode, StaffID,
-				AttendanceDate, AttendancePeriod, AttendanceDateTimeFrom, AttendanceDateTimeTo, AttendanceDayNumber,
-				TimetableGroup, ClassCancelledFlag, AttendanceOfficerModeFlag, SystemProcessNumber
-			)
-			VALUES (
-				{$data['CreatedDate']}, '{$data['CreatedByID']}',
-				{$data['ModifiedDate']}, '{$data['ModifiedByID']}',
-				'{$data['FileType']}', '{$data['FileYear']}', '{$data['FileSemester']}',
-				'{$data['ClassCampus']}', '{$data['ClassCode']}', '{$data['StaffID']}',
-				'{$data['AttendanceDate']}', '{$data['AttendancePeriod']}', '{$data['AttendanceDateTimeFrom']}', '{$data['AttendanceDateTimeTo']}', '{$data['AttendanceDayNumber']}',
-				'{$data['TimetableGroup']}', '{$data['ClassCancelledFlag']}', '{$data['AttendanceOfficerModeFlag']}', '{$data['SystemProcessNumber']}'
-			)
-			SELECT LAST_INSERT_ID=@@IDENTITY
-		";
 
-		/* Get the new inserted id
-		 */
-		$r = mssql_fetch_assoc($this->getDatabase()->query($query));
 
-		$this->setAttendanceMasterSeq($r['LAST_INSERT_ID']);
+        $result = $this->getDatabase()->executeProcedure(
+                       'spiwkAttendances', $value
+
+        );
+
+        if ($result['success'] && isset($result['output']['@wkAttendanceMasterSeq'])) {
+            $this->setAttendanceMasterSeq( $result['output']['@wkAttendanceMasterSeq']);
+        }
+        else {
+            throw new Exception_Schoolbox('Cannot setup attendance record');
+        }
+
 	}
 
-	/**
+    /**
+     * Function to transfer data from work table to live tables, this
+     * is called once the update has been done and the user wants to
+     * save data
+     *
+     * @return bool
+     */
+    public function save() {
+        $result = $this->getDatabase()->executeProcedure(
+                       'sptwkAttendances', array(
+                                                array('@wkAttendanceMasterSeq',$this->getAttendanceMasterSeq(), SQLINT4),
+                                                array('@AttendanceMasterSeq', 'seq', SQLINT4, true),
+                                            )
+
+        );
+        return $result['success'];
+    }
+
+
+    /**
 	 * Determine if there are attendance records for this particular
 	 * class, date and period by checking if the AttendanceMasterSeq
 	 * value was found
