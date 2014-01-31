@@ -1,4 +1,4 @@
-Feature: admin-user
+Feature: admin-user0
   As a logged-in superuser
   I need to be able to create users
   I need to be able to enabled specific options for users
@@ -63,9 +63,22 @@ Scenario: Disable a user
   When	I uncheck "account_enabled"
   And	I press "Update User"
   Then	I should see "Account disabled"
+  When	I follow "Logout"
+  Then	I should see "You are currently not logged in"
+  And	log in as "stevetest" with password "password2"
+  # This below is failing - but I can see it in the browser - javascript related?
+  Then	I should see "This account is currently disabled."
 
 Scenario: Delete a user
+  When	log in as "alaress" with password "alaress"
+  And	I go to homepage
+  And	I fill in "search-field" with "Prof Steve Test"
+  And	I press "search-button"
+  Then	I should see "webmaster@alaress.com.au"
+  When	I follow "Modify User"
+  Then	I should see "Modify user: Prof Steve Test"
   When	I press "Delete User"
+#  And	I confirm popup
   Then  I should see "Modify User"
   And	I should see "Add User"
   When	I fill in "search-field" with "Prof Steve Test"
