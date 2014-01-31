@@ -78,23 +78,22 @@ abstract class SubjectListAbstract {
 				/* If the homepage doesn't exist or can't be found, don't
 				 * link it in the Subject list
 				 */
-				if (is_numeric($currentSubject['id'])) {
-					$childElement = array(
-						'subject' => $currentSubject,
-						'category' => $currentSubject['id'],
-						'categoryName' => $currentSubject['name']
-					);
 
-					/* Subjects without a parent just get thrown together into
-					 * a generic container
-					 */
-					if (!strlen($currentSubject['classType'])) {
-						$allSubjectLists['Subjects'][] = $childElement;
-					}
-					else {
-						$allSubjectLists[$currentSubject['classType']][] = $childElement;
-					}
-				}
+                $childElement = array(
+                    'subject' => $currentSubject,
+                    'category' => $currentSubject['id'],
+                    'categoryName' => $currentSubject['name']
+                );
+
+                /* Subjects without a parent just get thrown together into
+                 * a generic container
+                 */
+                if (!strlen($currentSubject['classType'])) {
+                    $allSubjectLists['Subjects'][] = $childElement;
+                }
+                else {
+                    $allSubjectLists[$currentSubject['classType']][] = $childElement;
+                }
 			}
 		}
 
