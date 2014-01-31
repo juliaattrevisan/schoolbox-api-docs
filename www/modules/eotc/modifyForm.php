@@ -187,18 +187,3 @@ switch($_POST['action']) {
 		error(0);
 		break;
 }
-
-
-if (isset($_POST['date'])) {
-
-}
-else if (isset($_GET['delete'])) {
-	$calendar = $calendarHandler->getByID($_GET['delete']);
-	$calendarHandler->delete($_GET['delete']);
-
-	$date = explode("-", $calendar['date']);
-	$date = array_reverse($date);
-
-	$page->backToTheFuture(2);
-
-}
