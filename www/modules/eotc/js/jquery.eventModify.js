@@ -217,7 +217,7 @@
 		 */
 		function setupOptionVariance() {
 			$('select[name="level"]').change(function() {
-				$('#groupDrop, #campusList, #groupList, #attendance').hide();
+				$('#groupDrop, #campusList, #roleList, #attendance').hide();
 
 				/* Personal
 				 */
@@ -241,7 +241,7 @@
 				/* Campus
 				 */
 				else if ($(this).val() == "3") {
-					$('#campusList, #groupList, #attendance').show()
+					$('#campusList, #roleList, #attendance').show()
 				}
 			});
 
@@ -254,7 +254,7 @@
 				$('#groupDrop, #attendance').show()
 			}
 			else if ($('select[name="level"]').val() == "3") {
-				$('#campusList, #groupList, #attendance').show()
+				$('#campusList, #roleList, #attendance').show()
 			}
 		}
 
