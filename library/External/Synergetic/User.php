@@ -90,6 +90,11 @@ class External_Synergetic_User implements External_UserInterface {
 	 * @return Bool|String
 	 */
 	public function getPortrait($externalUserId) {
+        if(!is_numeric($externalUserId)) {
+            return false;
+        }
+
+
 		$query = "
 			SELECT vPhotos.ModifiedDate
 			FROM SynergyOne.dbo.vPhotos vPhotos
