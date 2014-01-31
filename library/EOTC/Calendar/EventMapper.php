@@ -199,8 +199,6 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * Augmentation
 	 *
 	 * @param $event
-	 * @param $groupList
-	 * @param $campusList
 	 * @return array|void
 	 */
 	public function save($event) {
@@ -225,20 +223,36 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 		/* Deal with groupList and campusList separately
 		 */
-		$this->getPerm($event, $_SESSION['user']);
+		$permissionLevel = $this->getPerm($event, $_SESSION['user']);
+
+		if ($permissionLevel < WRITE_ACCESS) {
+			error(34);
+		}
+
+		/* Clear bugalugs attendance if it has changed from true to false
+		 */
+		if ($event->getAttendanceDirty()) {
+			// $this->removeAttendanceByEvent($event);
+		}
+
+//		var_dump($event);
+		// $this->delPerms
+		// $this->createGroups
+		// $this->createCampus
 		die();
 	}
 
 	/**
-	 * Get a permission level for a particular event
+	 * Get a permission level for a particular event and user combination
 	 *
 	 * @param Event $event
 	 * @param Schoolbox\User $user
 	 * @return int
 	 */
 	private function getPerm(\EOTC\Calendar\Event $event, \Schoolbox\User $user) {
-		new \Alaress_Probe($event);
-		die();
+
+		/* Superuser exit
+		 */
 		if ($user->isSuperuser()) {
 			return FULL_ACCESS;
 		}
@@ -247,7 +261,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		 */
 		if ($event->isPersonalLevel()) {
 
-			/* If you spawned this event, you can modify it
+			/* If you personally spawned this event, you can modify it
 			 */
 			if ($event->getAuthor()->getId() == $user->getId()) {
 				return WRITE_ACCESS;
@@ -269,11 +283,26 @@ class EventMapper extends Schoolbox\External\Mapper {
 		/* Campus events
 		 */
 		else if ($event->isCampusLevel()) {
+			$groupHandler = new \Group();
 
-			new Alaress_Probe($event);
-			die();
-			/* TODO: Need a collection of groups, and a collection of campii
+			/* Find the highest permission level
 			 */
+			$maxPermission = DENY_ACCESS;
+
+			foreach ($event->getCampusCollection() as $currentCampus) {
+				$permission = $groupHandler->getPermission($currentCampus);
+
+				if ($permission > $maxPermission) {
+					$maxPermission = $permission;
+				}
+			}
+
+			return $maxPermission;
 		}
+
+		/* If you somehow don't fit into any of the above,
+		 * you just...don't get anything.
+		 */
+		return DENY_ACCESS;
 	}
 }

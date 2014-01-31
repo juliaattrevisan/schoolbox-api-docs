@@ -131,6 +131,18 @@ class Event {
 	protected $attendance = 0;
 
 	/**
+	 * Determine whether the attendance state changed prior to saving
+	 *
+	 * This saves us an extra db call in save() where it used to
+	 * load the old copy of the event, and then compare it to the
+	 * newly-constructed version of the event, to determine whether
+	 * existing attendances should be cleared or preserved.
+	 *
+	 * @var bool
+	 */
+	protected $attendanceDirty = false;
+
+	/**
 	 * If this is a task, whether it's completed or not
 	 * That should have been normalised -_-
 	 *
@@ -675,5 +687,19 @@ class Event {
 	 */
 	public function getGroupCollection() {
 		return $this->groupCollection;
+	}
+
+	/**
+	 * @param boolean $attendanceDirty
+	 */
+	public function setAttendanceDirty($attendanceDirty) {
+		$this->attendanceDirty = $attendanceDirty;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getAttendanceDirty() {
+		return $this->attendanceDirty;
 	}
 }

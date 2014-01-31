@@ -91,12 +91,21 @@ switch($_POST['action']) {
 		$event->setEndDate($endDate->getDatabaseDate());
 		$event->setEndTime($endDate->getDatabaseTime());
 		$event->setLocation($_POST['location']);
-		$event->setAttendance($_POST['attendance']);
 		$event->setDetail($_POST['detail']);
 		$event->setPublishDateTime($publishDate);
 
+		/* Collections of ids
+		 */
 		$event->setGroupCollection(new \Schoolbox\Collection($_POST['groupCheck']));
 		$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
+
+		/* Attendance dirty bit should be set to true if the attendance
+		 * setting now differs from what it previously was
+		 */
+		if ($event->getAttendance() != $_POST['attendance']) {
+			$event->setAttendance($_POST['attendance']);
+			$event->setAttendanceDirty(true);
+		}
 
 		// Force events to have at least one campus value selected (if a group event)
 		if ($event->isCampusLevel()) {
