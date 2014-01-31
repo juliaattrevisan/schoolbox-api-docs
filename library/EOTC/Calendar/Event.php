@@ -340,6 +340,8 @@ class Event {
 	 */
 
 	/**
+	 * Set access
+	 *
 	 * @param int $access
 	 */
 	public function setAccess($access) {
@@ -347,6 +349,8 @@ class Event {
 	}
 
 	/**
+	 * Get access
+	 *
 	 * @return int
 	 */
 	public function getAccess() {
@@ -354,6 +358,8 @@ class Event {
 	}
 
 	/**
+	 * Set all day
+	 *
 	 * @param int $allDay
 	 */
 	public function setAllDay($allDay) {
@@ -361,6 +367,8 @@ class Event {
 	}
 
 	/**
+	 * Get all day
+	 *
 	 * @return int
 	 */
 	public function getAllDay() {
@@ -368,6 +376,8 @@ class Event {
 	}
 
 	/**
+	 * Set attendance
+	 *
 	 * @param int $attendance
 	 */
 	public function setAttendance($attendance) {
@@ -375,6 +385,8 @@ class Event {
 	}
 
 	/**
+	 * Get attendance
+	 *
 	 * @return int
 	 */
 	public function getAttendance() {
@@ -382,6 +394,8 @@ class Event {
 	}
 
 	/**
+	 * Set author
+	 *
 	 * @param null $author
 	 */
 	public function setAuthor($author) {
@@ -389,6 +403,8 @@ class Event {
 	}
 
 	/**
+	 * Get author
+	 *
 	 * @return null
 	 */
 	public function getAuthor() {
@@ -396,6 +412,8 @@ class Event {
 	}
 
 	/**
+	 * Set category
+	 *
 	 * @param null $category
 	 */
 	public function setCategory($category) {
@@ -403,6 +421,8 @@ class Event {
 	}
 
 	/**
+	 * Get category
+	 *
 	 * @return null
 	 */
 	public function getCategory() {
@@ -410,6 +430,8 @@ class Event {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param string $colour
 	 */
 	public function setColour($colour) {
@@ -417,6 +439,8 @@ class Event {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return string
 	 */
 	public function getColour() {
@@ -424,6 +448,8 @@ class Event {
 	}
 
 	/**
+	 * Set completed
+	 *
 	 * @param int $completed
 	 */
 	public function setCompleted($completed) {
@@ -431,6 +457,8 @@ class Event {
 	}
 
 	/**
+	 * Get completed
+	 *
 	 * @return int
 	 */
 	public function getCompleted() {
@@ -438,6 +466,8 @@ class Event {
 	}
 
 	/**
+	 * Set detail
+	 *
 	 * @param string $detail
 	 */
 	public function setDetail($detail) {
@@ -445,6 +475,8 @@ class Event {
 	}
 
 	/**
+	 * Get detail
+	 *
 	 * @return string
 	 */
 	public function getDetail() {
@@ -452,6 +484,8 @@ class Event {
 	}
 
 	/**
+	 * Set end datetime
+	 *
 	 * @param null $endDateTime
 	 */
 	public function setEndDateTime($endDateTime) {
@@ -459,6 +493,8 @@ class Event {
 	}
 
 	/**
+	 * Get end datetime
+	 *
 	 * @return null
 	 */
 	public function getEndDateTime() {
@@ -466,6 +502,8 @@ class Event {
 	}
 
 	/**
+	 * Set event type
+	 *
 	 * @param string $eventType
 	 */
 	public function setEventType($eventType) {
@@ -473,6 +511,8 @@ class Event {
 	}
 
 	/**
+	 * Get event type
+	 *
 	 * @return string
 	 */
 	public function getEventType() {
@@ -480,6 +520,8 @@ class Event {
 	}
 
 	/**
+	 * Set id
+	 *
 	 * @param null $id
 	 */
 	public function setId($id) {
@@ -487,6 +529,8 @@ class Event {
 	}
 
 	/**
+	 * Get id
+	 *
 	 * @return null
 	 */
 	public function getId() {
@@ -494,6 +538,8 @@ class Event {
 	}
 
 	/**
+	 * Set location
+	 *
 	 * @param string $location
 	 */
 	public function setLocation($location) {
@@ -501,6 +547,8 @@ class Event {
 	}
 
 	/**
+	 * Get location
+	 *
 	 * @return string
 	 */
 	public function getLocation() {
@@ -508,6 +556,8 @@ class Event {
 	}
 
 	/**
+	 * Set note
+	 *
 	 * @param string $note
 	 */
 	public function setNote($note) {
@@ -515,6 +565,8 @@ class Event {
 	}
 
 	/**
+	 * Get note
+	 *
 	 * @return string
 	 */
 	public function getNote() {
@@ -522,6 +574,8 @@ class Event {
 	}
 
 	/**
+	 * Set owner
+	 *
 	 * @param null $owner
 	 */
 	public function setOwner($owner) {
@@ -529,6 +583,8 @@ class Event {
 	}
 
 	/**
+	 * Get owner
+	 *
 	 * @return null
 	 */
 	public function getOwner() {
@@ -536,6 +592,8 @@ class Event {
 	}
 
 	/**
+	 * Set series id
+	 *
 	 * @param null $seriesId
 	 */
 	public function setSeriesId($seriesId) {
@@ -543,6 +601,8 @@ class Event {
 	}
 
 	/**
+	 * Get series id
+	 *
 	 * @return null
 	 */
 	public function getSeriesId() {
@@ -550,6 +610,8 @@ class Event {
 	}
 
 	/**
+	 * Set sid
+	 *
 	 * @param int $sid
 	 */
 	public function setSid($sid) {
@@ -557,6 +619,8 @@ class Event {
 	}
 
 	/**
+	 * Get sid
+	 *
 	 * @return int
 	 */
 	public function getSid() {
@@ -564,6 +628,8 @@ class Event {
 	}
 
 	/**
+	 * Set start datetime
+	 *
 	 * @param null $startDateTime
 	 */
 	public function setStartDateTime($startDateTime) {
@@ -571,6 +637,8 @@ class Event {
 	}
 
 	/**
+	 * Get start datetime
+	 *
 	 * @return null
 	 */
 	public function getStartDateTime() {
@@ -578,6 +646,8 @@ class Event {
 	}
 
 	/**
+	 * Set type
+	 *
 	 * @param int $type
 	 */
 	public function setType($type) {
@@ -585,6 +655,8 @@ class Event {
 	}
 
 	/**
+	 * Get type
+	 *
 	 * @return int
 	 */
 	public function getType() {
@@ -592,6 +664,8 @@ class Event {
 	}
 
 	/**
+	 * Set end date
+	 *
 	 * @param string $endDate
 	 */
 	public function setEndDate($endDate) {
@@ -599,6 +673,8 @@ class Event {
 	}
 
 	/**
+	 * Get end date
+	 *
 	 * @return string
 	 */
 	public function getEndDate() {
@@ -606,6 +682,8 @@ class Event {
 	}
 
 	/**
+	 * Set end time
+	 *
 	 * @param string $endTime
 	 */
 	public function setEndTime($endTime) {
@@ -613,6 +691,8 @@ class Event {
 	}
 
 	/**
+	 * Get end time
+	 *
 	 * @return string
 	 */
 	public function getEndTime() {
@@ -620,6 +700,8 @@ class Event {
 	}
 
 	/**
+	 * Set start date
+	 *
 	 * @param string $startDate
 	 */
 	public function setStartDate($startDate) {
@@ -627,6 +709,8 @@ class Event {
 	}
 
 	/**
+	 * Get start date
+	 *
 	 * @return string
 	 */
 	public function getStartDate() {
@@ -634,6 +718,8 @@ class Event {
 	}
 
 	/**
+	 * Set start time
+	 *
 	 * @param string $startTime
 	 */
 	public function setStartTime($startTime) {
@@ -641,6 +727,8 @@ class Event {
 	}
 
 	/**
+	 * Get start time
+	 *
 	 * @return string
 	 */
 	public function getStartTime() {
@@ -648,6 +736,8 @@ class Event {
 	}
 
 	/**
+	 * Set publish datetime
+	 *
 	 * @param null $publishDateTime
 	 */
 	public function setPublishDateTime($publishDateTime) {
@@ -655,6 +745,8 @@ class Event {
 	}
 
 	/**
+	 * Get publish datetime
+	 *
 	 * @return null
 	 */
 	public function getPublishDateTime() {
@@ -662,6 +754,8 @@ class Event {
 	}
 
 	/**
+	 * Set campus collection
+	 *
 	 * @param null $campusCollection
 	 */
 	public function setCampusCollection($campusCollection) {
@@ -669,6 +763,8 @@ class Event {
 	}
 
 	/**
+	 * Get campus collection
+	 *
 	 * @return null
 	 */
 	public function getCampusCollection() {
@@ -676,6 +772,8 @@ class Event {
 	}
 
 	/**
+	 * Set role collection
+	 *
 	 * @param null $roleCollection
 	 */
 	public function setRoleCollection($roleCollection) {
@@ -683,6 +781,8 @@ class Event {
 	}
 
 	/**
+	 * Get role collection
+	 *
 	 * @return null
 	 */
 	public function getRoleCollection() {
@@ -690,6 +790,8 @@ class Event {
 	}
 
 	/**
+	 * Set attendance dirty bit
+	 *
 	 * @param boolean $attendanceDirty
 	 */
 	public function setAttendanceDirty($attendanceDirty) {
@@ -697,6 +799,8 @@ class Event {
 	}
 
 	/**
+	 * Get attendance dirty bit
+	 *
 	 * @return boolean
 	 */
 	public function getAttendanceDirty() {
