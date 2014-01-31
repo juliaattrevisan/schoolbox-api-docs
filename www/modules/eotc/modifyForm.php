@@ -144,27 +144,34 @@ switch($_POST['action']) {
 		break;
 
 	case 'Delete':
-		if(!is_numeric($_POST['id'])) {
-			error(0);
-		}
+		$eventMapper = new \EOTC\Calendar\EventMapper();
 
-		if (($sID = $calendarHandler->getSeriesID($_POST['id'])) != null) {
-			// delete all in series
-			if ($_POST['efficacy'] == 'series') {
-				$series = $calendarHandler->getAllInSeries($sID);
-				// rather than wrapping into a single query batch delete, this deletion checks individual permissions on each event
-				// (which may not necessarily be the same for each)
-				foreach($series as $event) {
-					$calendarHandler->delete($event['id']);
+		try {
+			$event = $eventMapper->findById($_POST['id']);
+
+			/* Delete an entire series, if the seriesId is not null
+			 */
+			if ($event->getSeriesId() != null) {
+				if ($_POST['efficacy'] == 'series') {
+					$allEvents = $eventMapper->getAllInSeries($event);
+
+					foreach($allEvents as $currentEvent) {
+						$eventMapper->delete($currentEvent);
+					}
+				}
+				else if ($_POST['efficacy'] == 'self') {
+					$eventMapper->delete($event);
 				}
 			}
-			else if($_POST['efficacy'] == 'self') {
-				$calendarHandler->delete($_POST['id']);
+			else {
+				$eventMapper->delete($event);
 			}
 		}
-		// delete self
-		else {
-			$calendarHandler->delete($_POST['id']);
+		catch (\Exception $e) {
+
+			/* TODO: lol this needs to be fixed
+			 */
+			error(0);
 		}
 
 		$page->backToTheFuture(2);

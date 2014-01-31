@@ -256,6 +256,12 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$this->createCampus($event);
 	}
 
+	public function getAllInSeries($event) {
+		return $this->findByColumnList(array(
+			'series_id' => $event->getSeriesId()
+		));
+	}
+
 	/**
 	 * Remove all role and campus associations to an event
 	 * Note that "eventGroup" means "eventRole"
