@@ -196,6 +196,22 @@ class EventMapper extends Schoolbox\External\Mapper {
 	}
 
 	/**
+	 * Remove all attendance relations for $event
+	 *
+	 * @param $event
+	 */
+	private function removeAttendanceByEvent($event) {
+		$query = "
+			DELETE FROM event_attendance
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+	}
+
+	/**
 	 * Augmentation
 	 *
 	 * @param $event
@@ -232,7 +248,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		/* Clear bugalugs attendance if it has changed from true to false
 		 */
 		if ($event->getAttendanceDirty()) {
-			// $this->removeAttendanceByEvent($event);
+			 $this->removeAttendanceByEvent($event);
 		}
 
 //		var_dump($event);
