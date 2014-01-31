@@ -42,7 +42,7 @@ class FeatureContext extends BaseContext {
         if ($event->hasException()) {
             // Assume screenshot is a PNG
             file_put_contents(
-                __DIR__.'/screenshots/' . date('YmdHis') . '.png',
+                dirname(__DIR__).'/screenshots/' . date('YmdHis') . '.png',
                 $this->getSession()->getDriver()->getScreenshot()
             );
         }
