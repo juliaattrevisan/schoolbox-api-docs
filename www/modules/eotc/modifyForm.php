@@ -95,8 +95,8 @@ switch($_POST['action']) {
 		$event->setDetail($_POST['detail']);
 		$event->setPublishDateTime($publishDate);
 
-		$groupList = new \Schoolbox\Collection($_POST['groupCheck']);
-		$campusList = new \Schoolbox\Collection($_POST['campus']);
+		$event->setGroupCollection(new \Schoolbox\Collection($_POST['groupCheck']));
+		$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
 
 		// Force events to have at least one campus value selected (if a group event)
 		if ($event->isCampusLevel()) {
@@ -108,7 +108,7 @@ switch($_POST['action']) {
 		/* Save this event and any recurring incidents too
 		 */
 		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper();
-		$eventRecurrenceMapper->save($event, $groupList, $campusList, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
+		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in

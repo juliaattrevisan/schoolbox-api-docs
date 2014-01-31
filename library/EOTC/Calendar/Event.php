@@ -131,14 +131,6 @@ class Event {
 	protected $attendance = 0;
 
 	/**
-	 * The date when the event was published (made visible to users)
-	 * An instance Alaress_Date_Format()
-	 *
-	 * @var null
-	 */
-	protected $publishDateTime = null;
-
-	/**
 	 * If this is a task, whether it's completed or not
 	 * That should have been normalised -_-
 	 *
@@ -152,6 +144,28 @@ class Event {
 	 * @var int
 	 */
 	protected $allDay = 0;
+
+	/**
+	 * Any associated groups ("roles")
+	 *
+	 * @var null
+	 */
+	protected $groupCollection = null;
+
+	/**
+	 * Any associated campuses
+	 *
+	 * @var null
+	 */
+	protected $campusCollection = null;
+
+	/**
+	 * The date when the event was published (made visible to users)
+	 * An instance Alaress_Date_Format()
+	 *
+	 * @var null
+	 */
+	protected $publishDateTime = null;
 
 	/**
 	 * The datetime when the event starts
@@ -633,5 +647,33 @@ class Event {
 	 */
 	public function getPublishDateTime() {
 		return $this->publishDateTime;
+	}
+
+	/**
+	 * @param null $campusCollection
+	 */
+	public function setCampusCollection($campusCollection) {
+		$this->campusCollection = $campusCollection;
+	}
+
+	/**
+	 * @return null
+	 */
+	public function getCampusCollection() {
+		return $this->campusCollection;
+	}
+
+	/**
+	 * @param null $groupCollection
+	 */
+	public function setGroupCollection($groupCollection) {
+		$this->groupCollection = $groupCollection;
+	}
+
+	/**
+	 * @return null
+	 */
+	public function getGroupCollection() {
+		return $this->groupCollection;
 	}
 }

@@ -46,15 +46,13 @@ class EventRecurrenceMapper {
 	 * Totally custom save method
 	 *
 	 * @param Event $event
-	 * @param $groupList
-	 * @param $campusList
 	 * @param $efficacy
 	 * @param $repeatSetting
 	 * @param $until
 	 * @param \Alaress_Date_Format $startDate
 	 * @param \Alaress_Date_Format $endDate
 	 */
-	public function save(Event $event, $groupList, $campusList, $efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+	public function save(Event $event, $efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
 
 		/* Set up recurrences, if appropriate
 		 * This is mandatory as events are saved via EventRecurrence
@@ -75,7 +73,7 @@ class EventRecurrenceMapper {
 				foreach($series as $seriesEvent) {
 					$event->setId($seriesEvent['id']);
 
-					$this->getEventMapper()->save($event, $groupList, $campusList);
+					$this->getEventMapper()->save($event);
 				}
 			}
 			/* Modify an existing event and add recurring incidents
@@ -89,7 +87,7 @@ class EventRecurrenceMapper {
 				$event->setStartDate($first_date_set['start']);
 				$event->setEndDate($first_date_set['end']);
 
-				$this->getEventMapper()->save($event, $groupList, $campusList);
+				$this->getEventMapper()->save($event);
 
 				/* Skip the first element, spawn new event records
 				 */
@@ -103,7 +101,7 @@ class EventRecurrenceMapper {
 					$event->setStartDate($currentDate['start']);
 					$event->setEndDate($currentDate['end']);
 
-					$this->getEventMapper()->save($event, $groupList, $campusList);
+					$this->getEventMapper()->save($event);
 				}
 			}
 		}
@@ -120,7 +118,7 @@ class EventRecurrenceMapper {
 				$event->setStartDate($currentDate['start']);
 				$event->setEndDate($currentDate['end']);
 
-				$this->getEventMapper()->save($event, $groupList, $campusList);
+				$this->getEventMapper()->save($event);
 			}
 		}
 	}

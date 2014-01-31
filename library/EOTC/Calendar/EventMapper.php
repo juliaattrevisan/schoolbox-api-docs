@@ -13,6 +13,10 @@ use Schoolbox;
 
 
 class EventMapper extends Schoolbox\External\Mapper {
+	const ACCESS_PERSONAL = 1;
+	const ACCESS_GROUP = 2;
+	const ACCESS_CAMPUS = 3;
+
 	protected function mapping() {
 		$this->hasTable('event');
 		$this->hasModel('\\EOTC\\Calendar\Event');
@@ -199,7 +203,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * @param $campusList
 	 * @return array|void
 	 */
-	public function save($event, $groupList, $campusList) {
+	public function save($event) {
 
 		/* Call super -_-
 		 */
@@ -209,17 +213,15 @@ class EventMapper extends Schoolbox\External\Mapper {
 		 * event model, but then you need to manufacture mappers, relations and
 		 * hydration methods for these two optional bits
 		 */
-		$this->postSave($event, $groupList, $campusList);
+		$this->postSave($event);
 	}
 
 	/**
 	 * Post-save hook method
 	 *
 	 * @param $event
-	 * @param $groupList
-	 * @param $campusList
 	 */
-	private function postSave($event, $groupList, $campusList) {
+	private function postSave($event) {
 
 		/* Deal with groupList and campusList separately
 		 */
@@ -235,6 +237,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * @return int
 	 */
 	private function getPerm(\EOTC\Calendar\Event $event, \Schoolbox\User $user) {
+		new \Alaress_Probe($event);
+		die();
 		if ($user->isSuperuser()) {
 			return FULL_ACCESS;
 		}
@@ -266,6 +270,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 		 */
 		else if ($event->isCampusLevel()) {
 
+			new Alaress_Probe($event);
+			die();
 			/* TODO: Need a collection of groups, and a collection of campii
 			 */
 		}
