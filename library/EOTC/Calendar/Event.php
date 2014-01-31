@@ -158,11 +158,11 @@ class Event {
 	protected $allDay = 0;
 
 	/**
-	 * Any associated groups ("roles")
+	 * Any associated roles
 	 *
 	 * @var null
 	 */
-	protected $groupCollection = null;
+	protected $roleCollection = null;
 
 	/**
 	 * Any associated campuses
@@ -676,17 +676,17 @@ class Event {
 	}
 
 	/**
-	 * @param null $groupCollection
+	 * @param null $roleCollection
 	 */
-	public function setGroupCollection($groupCollection) {
-		$this->groupCollection = $groupCollection;
+	public function setRoleCollection($roleCollection) {
+		$this->roleCollection = $roleCollection;
 	}
 
 	/**
 	 * @return null
 	 */
-	public function getGroupCollection() {
-		return $this->groupCollection;
+	public function getRoleCollection() {
+		return $this->roleCollection;
 	}
 
 	/**

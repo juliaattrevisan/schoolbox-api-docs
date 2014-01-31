@@ -96,7 +96,7 @@ switch($_POST['action']) {
 
 		/* Collections of ids
 		 */
-		$event->setGroupCollection(new \Schoolbox\Collection($_POST['groupCheck']));
+		$event->setRoleCollection(new \Schoolbox\Collection($_POST['groupCheck']));
 		$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
 
 		/* Attendance dirty bit should be set to true if the attendance

@@ -251,11 +251,77 @@ class EventMapper extends Schoolbox\External\Mapper {
 			 $this->removeAttendanceByEvent($event);
 		}
 
-//		var_dump($event);
-		// $this->delPerms
-		// $this->createGroups
-		// $this->createCampus
+		$this->deletePermissions($event);
+		$this->createRoles($event);
+		$this->createCampus($event);
+
+		new \Alaress_Probe($_POST);
+		new \Alaress_Probe($event);
 		die();
+	}
+
+	/**
+	 * Remove all role and campus associations to an event
+	 * Note that "eventGroup" means "eventRole"
+	 *
+	 * @param $event
+	 */
+	private function deletePermissions($event) {
+		$query = "
+			DELETE FROM eventGroup
+			WHERE eventID = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+
+		$query = "
+			DELETE FROM eventCampus
+			WHERE eventID = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Assign roles to an event
+	 *
+	 * @param $event
+	 */
+	private function createRoles($event) {
+		foreach ($event->getRoleCollection() as $currentGroup) {
+			$query = "
+				INSERT INTO eventGroup (eventID, groupID)
+				VALUES (:eventId, :groupId)
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":groupId", $currentGroup);
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Assign campuses to an event
+	 *
+	 * @param $event
+	 */
+	private function createCampus($event) {
+		foreach ($event->getCampusCollection() as $currentCampus) {
+			$query = "
+				INSERT INTO eventCampus (eventID, campusID)
+				VALUES (:eventId, :campusId)
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":campusId", $currentCampus);
+			$statement->execute();
+		}
 	}
 
 	/**
