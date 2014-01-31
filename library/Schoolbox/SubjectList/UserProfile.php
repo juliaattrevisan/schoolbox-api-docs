@@ -64,11 +64,14 @@ class UserProfile extends SubjectListAbstract {
 	 */
 	public function render() {
 
+        $emailObj = new \Email();
+        $categoryHandler = new \Category;
 		/* Expel each subject grouped by its type
 		 */
-		foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
+        //print_r($this->getAllSubjectLists());
+        foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
 			$emailAll = array();
-            $emailObj = new \Email();
+
 
 			$this->getPage()->setVar(array(
 				'SUBJECT_CLASSTYPE' => $key
@@ -76,7 +79,8 @@ class UserProfile extends SubjectListAbstract {
 
 			/* For all the classes in the current subject
 			 */
-			if (is_array($currentSubjectList) && count($currentSubjectList)) {
+
+            if (is_array($currentSubjectList) && count($currentSubjectList)) {
 				$listItems = count($currentSubjectList)>1 ? ceil(count($currentSubjectList)/2) : 1;
 				$i = 1;
 
@@ -84,6 +88,9 @@ class UserProfile extends SubjectListAbstract {
 					$this->getPage()->setVar(array(
 						'subject_teacher_block' => ''
 					));
+
+                    $category = $categoryHandler->getByCode($currentSubject['subject']['code']);
+                    $currentSubject['category']['id'] = $category['id'];
 
 					if ((\Config::get('show_all_subjects') == 1) || $currentSubject['category']['id'] ) {
 						$this->getPage()->setVar(array(
@@ -108,7 +115,6 @@ class UserProfile extends SubjectListAbstract {
 
 								if (is_array($teacher)) {
 									$teacherName = $this->getUserHandler()->formatName($teacher);
-
 
 									$emailAddress = $emailObj->formatEmailFromArray($teacher);
 									$emailAll[] = $emailAddress;
