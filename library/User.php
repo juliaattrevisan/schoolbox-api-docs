@@ -614,19 +614,17 @@ class User extends DeprecatedModel {
 		$query = "DELETE FROM submission_log WHERE user = '$id'";
 		$this->db->query($query);
 
-		/* eportfolio */
-		$query = "DELETE eportfolio_blog, eportfolio_blogComment FROM eportfolio_blog, eportfolio_blogComment WHERE eportfolio_blogComment.bid = eportfolio_blog.id AND eportfolio_blog.owner = '$id'";
-		$this->db->query($query);
-		$query = "DELETE FROM eportfolio_comp_location WHERE uid = '$id'";
-		$this->db->query($query);
-		$query = "DELETE FROM eportfolio_config WHERE uid = '$id'";
-		$this->db->query($query);
-		$query = "DELETE FROM eportfolio_link WHERE owner = '$id'";
-		$this->db->query($query);
-		$query = "DELETE FROM eportfolio_privateNotes WHERE uid= '$id' ";
-		$this->db->query($query);
-		$query = "DELETE FROM eportfolio_textBox WHERE userID = '$id'";
-		$this->db->query($query);
+//		/* None of these tables are still used, and all will be deleted */
+//		$query = "DELETE eportfolio_blog, eportfolio_blogComment FROM eportfolio_blog, eportfolio_blogComment WHERE eportfolio_blogComment.bid = eportfolio_blog.id AND eportfolio_blog.owner = '$id'";
+//		$this->db->query($query);
+//		$query = "DELETE FROM eportfolio_config WHERE uid = '$id'";
+//		$this->db->query($query);
+//		$query = "DELETE FROM eportfolio_link WHERE owner = '$id'";
+//		$this->db->query($query);
+
+		// Delete eportfolio pages properly
+		$mapper = Eportfolio\PageMapper::getInstance();
+		$mapper->delete($mapper->findByColumn('uid', $id));
 
 		$this->db->delete('userCampus', 'uid', $id);
 

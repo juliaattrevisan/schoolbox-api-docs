@@ -211,7 +211,7 @@ class PageMapper extends Schoolbox\Mapper {
 			'other_key' => 'page_id',
 		));
 
-		parent::mapping();
+		$this->hasSoftDeleteDateField('deleted_at');
 	}
 
 	/**
