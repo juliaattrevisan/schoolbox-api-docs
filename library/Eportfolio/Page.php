@@ -9,7 +9,9 @@
  */
 namespace Eportfolio;
 
-class Page {
+use Schoolbox\ISoftDeletable;
+
+class Page implements ISoftDeletable{
 
 	/**
 	 * The id of the page currently being viewed
@@ -793,5 +795,12 @@ class Page {
 	 */
 	public function getPermissions() {
 		return $this->permissions;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isDeleted() {
+		return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
 	}
 }
