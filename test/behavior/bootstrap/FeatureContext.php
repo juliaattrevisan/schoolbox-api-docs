@@ -32,4 +32,19 @@ class FeatureContext extends BaseContext {
     public function resetBrowser(Behat\Behat\Event\ScenarioEvent $event) {
         $this->getSession()->reset();
     }
+
+    /**
+     * Attempts to take a screenshot of the error if the test failed.
+     *
+     * @AfterStep
+     */
+    public function takeScreenshotOnFailure(Behat\Behat\Event\StepEvent $event) {
+        if ($event->hasException()) {
+            // Assume screenshot is a PNG
+            file_put_contents(
+                __DIR__.'/screenshots/' . date('YmdHis') . '.png',
+                $this->getSession()->getDriver()->getScreenshot()
+            );
+        }
+    }
 }
