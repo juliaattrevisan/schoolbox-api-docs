@@ -250,6 +250,30 @@ class Subcontext_CoreContext extends BaseContext {
     }
 
     /**
+     * Waits for text on page.
+     *
+     * Required because Selenium doesn't wait for the page to load by default
+     * when clicking a link. This isn't a bad thing to have anyway, what with
+     * AJAX requests and all that.
+     *
+     * @see MinkContext->assertElementOnPage()
+     *
+     * @Then /^(?:|I )wait for "(?P<text>(?:[^"]|\\")*)"$/
+     * @Then /^(?:|I )wait (?P<duration>\d+)ms for "(?P<text>(?:[^"]|\\")*)"$/
+     */
+    public function waitForText($text, $duration = 5000) {
+
+        $this->spin(
+            function($context) use($text) {
+                /** @param FeatureContext $context */
+                $context->getMinkContext()->assertPageContainsText($text);
+                return true;
+            },
+            ($duration/1000)
+        );
+    }
+
+    /**
      * Waits for an element with specified CSS to exist on this page.
      *
      * Required because Selenium doesn't wait for the page to load by default
