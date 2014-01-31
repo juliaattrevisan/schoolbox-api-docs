@@ -56,13 +56,7 @@ class Subcontext_CoreContext extends BaseContext {
         $page->findById('username')->setValue($username);
         $page->findById('password')->setValue($password);
         $page->find('css', 'input.login')->press();
-        $this->spin(
-            function($context) {
-                /** @param FeatureContext $context */
-                return $context->getSession()->getPage()->findLink('Logout') instanceof Element\NodeElement;
-            },
-            10
-        );
+        $this->waitForLink('Logout', 10000);
     }
 
     /**
@@ -234,6 +228,22 @@ class Subcontext_CoreContext extends BaseContext {
                 /** @param FeatureContext $context */
                 $context->getMinkContext()->assertElementOnPage($element);
                 return true;
+            },
+            ($duration/1000)
+        );
+    }
+
+    /**
+     * Waits for link on page.
+     *
+     * @Then /^(?:|I )wait for link "(?P<text>(?:[^"]|\\")*)"$/
+     * @Then /^(?:|I )wait (?P<duration>\d+)ms for link "(?P<text>(?:[^"]|\\")*)"$/
+     */
+    public function waitForLink($link, $duration = 5000) {
+        $this->spin(
+            function($context) use($link) {
+                /** @param FeatureContext $context */
+                return $context->getSession()->getPage()->findLink($link) instanceof Element\NodeElement;
             },
             ($duration/1000)
         );
