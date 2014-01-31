@@ -33,16 +33,33 @@ class UserQueue {
 	/** @var string */
 	protected $username;
 
+	/** @var array */
+	protected $bindings;
+
 	/**
 	 * @param array $bindings
 	 * @param MQConnector $mqConnector
 	 */
-	public function __construct($bindings, $mqConnector) {
+	public function __construct($bindings, $mqConnector, $simulate = false) {
 		$this->conn = $mqConnector;
 		$this->username = $bindings['user']['username'];
 		$userId = $bindings['user']['id'];
 
 		unset($bindings['user']);
+
+		// the user's personal routing key
+		$this->bindings = array("*.notify.user.$userId");
+
+		// all remaining bindings specified
+		foreach($bindings as $type => $binds) {
+			foreach($binds as $id) {
+				$this->bindings[] = "*.notify.$type.$id";
+			}
+		}
+
+		if($simulate) {
+			return;
+		}
 
 		$exchange = MQConnector::SECONDARY_NAME_PREFIX . $this->username;
 
@@ -51,23 +68,17 @@ class UserQueue {
 		$this->conn->declareQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, $this->username));
 		$this->conn->declareQueue(sprintf(self::QUEUE_ALL_MESSAGES, $this->username));
 
-		// the user's personal routing key
-		$keys = array("*.notify.user.$userId");
-
-		// all remaining bindings specified
-		foreach($bindings as $type => $binds) {
-			foreach($binds as $id) {
-				$keys[] = "*.notify.$type.$id";
-			}
-		}
-
 		// ...and in the darkness bind them.
-		foreach($keys as $key) {
+		foreach($this->bindings as $key) {
 			$this->conn->bindExchange($exchange, $key);
 		}
 		$this->conn->bindQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, $this->username), '', $exchange);
 		$this->conn->bindQueue(sprintf(self::QUEUE_ALL_MESSAGES, $this->username),   '', $exchange);
 
+	}
+
+	public function getBindings() {
+		return $this->bindings;
 	}
 
 

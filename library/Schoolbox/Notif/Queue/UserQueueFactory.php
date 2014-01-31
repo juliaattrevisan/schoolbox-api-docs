@@ -11,6 +11,7 @@ namespace Schoolbox\Notif\Queue;
 use Group;
 use Schoolbox\Campus;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
+use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\GroupMapper;
@@ -64,9 +65,9 @@ class UserQueueFactory {
 	 * @param $user
 	 * @return UserQueue
 	 */
-	public function bindUserQueue($user) {
+	public function bindUserQueue($user, $simulate = false) {
 		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
-		return new UserQueue($this->generateBindingsForUser($user), $this->mqConnector);
+		return new UserQueue($this->generateBindingsForUser($user), $this->mqConnector, $simulate);
 	}
 
 
@@ -114,6 +115,9 @@ class UserQueueFactory {
 
 
 		// category bindings
+
+		// don't forget the magic!
+		$this->categoryMapper->getExternalUser()->getCurrentSemester($user->getExternalId());
 		$cats = $this->categoryMapper->findForUser($user);
 
 		foreach($cats as $cat) {
@@ -161,15 +165,59 @@ class UserQueueFactory {
 	}
 
 	/**
-	 * Destroy all routing bindings for the given user
+	 * Destroy all routing bindings for the given user.
+	 * Returns the number of bindings deleted, or -1 on error.
 	 *
 	 * @param User|int $user
+	 * @return int
 	 */
-	public function destoryUserBindings($user) {
-//		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
-//		$exchange = MQConnector::SECONDARY_NAME_PREFIX . $user->getUsername();
+	public function destoryUserBindings($user, $simulate = false) {
 
-		// unbind all routes
-//		$this->mqConnector->deleteExchange($exchange);
+		// there's a bit of black magic in here
+		if(posix_getuid() !== 0) {
+			// this method can only succeed if the user is root - don't even try otherwise
+			return -1;
+		}
+
+		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
+
+		$userExchange = Connector::SECONDARY_NAME_PREFIX . $user->getUsername();
+
+		$bindings = `rabbitmqctl list_bindings destination_name routing_key | grep $userExchange`;
+
+		if(!$bindings) {
+			return 0;
+		}
+
+		$bindings = explode("\n", $bindings);
+
+		if(!count($bindings)) {
+			return 0;
+		}
+
+		$count = 0;
+
+		foreach($bindings as $binding) {
+
+//			echo bin2hex(print_r($binding, true));
+
+			$xpl = preg_split('/\s+/', $binding);
+
+			if(count($xpl) != 2) {
+				print_r($binding);
+				continue;
+			}
+
+			list($exchange, $routingKey) = $xpl;
+
+			if(!$simulate) {
+				$this->mqConnector->unbindExchange($exchange, $routingKey);
+			}
+
+			++$count;
+		}
+
+		return $count;
 	}
+
 } 
