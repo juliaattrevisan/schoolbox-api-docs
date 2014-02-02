@@ -156,9 +156,6 @@ switch($_POST['action']) {
 			$event = $eventMapper->findById($_POST['id']);
 		}
 		catch (\Exception $e) {
-
-			/* TODO: lol this needs to be fixed
-			 */
 			error(160);
 		}
 
