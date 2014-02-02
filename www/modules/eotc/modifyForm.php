@@ -50,7 +50,7 @@ switch($_POST['action']) {
 				$event = $eventMapper->findById($_POST['id']);
 			}
 			catch (\Exception $e) {
-				error(156);
+				error(160);
 			}
 		}
 		else {
@@ -154,30 +154,30 @@ switch($_POST['action']) {
 
 		try {
 			$event = $eventMapper->findById($_POST['id']);
-
-			/* Delete an entire series, if the seriesId is not null
-			 */
-			if ($event->getSeriesId() != null) {
-				if ($_POST['efficacy'] == 'series') {
-					$allEvents = $eventMapper->getAllInSeries($event);
-
-					foreach($allEvents as $currentEvent) {
-						$eventMapper->delete($currentEvent);
-					}
-				}
-				else if ($_POST['efficacy'] == 'self') {
-					$eventMapper->delete($event);
-				}
-			}
-			else {
-				$eventMapper->delete($event);
-			}
 		}
 		catch (\Exception $e) {
 
 			/* TODO: lol this needs to be fixed
 			 */
-			error(0);
+			error(160);
+		}
+
+		/* Delete an entire series, if the seriesId is not null
+		 */
+		if ($event->getSeriesId() != null) {
+			if ($_POST['efficacy'] == 'series') {
+				$allEvents = $eventMapper->getAllInSeries($event);
+
+				foreach($allEvents as $currentEvent) {
+					$eventMapper->delete($currentEvent);
+				}
+			}
+			else if ($_POST['efficacy'] == 'self') {
+				$eventMapper->delete($event);
+			}
+		}
+		else {
+			$eventMapper->delete($event);
 		}
 
 		$page->backToTheFuture(2);

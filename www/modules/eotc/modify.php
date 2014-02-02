@@ -27,7 +27,7 @@ if (is_numeric($_GET['eventID'])) {
 		$event = $mapper->findById($_GET['eventID']);
 	}
 	catch (\Exception $e) {
-		error(156);
+		error(160);
 	}
 
 	/* Default values
