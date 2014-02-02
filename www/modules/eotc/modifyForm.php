@@ -58,6 +58,7 @@ switch($_POST['action']) {
 		}
 
 		/* Events aren't visible until this date
+		 * TODO: Fix validator in Alaress Date Format
 		 */
 		if (strlen($_POST['publishDate'])) {
 			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
