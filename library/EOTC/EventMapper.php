@@ -63,8 +63,6 @@ class EventMapper extends Calendar\EventMapper {
 	private function findMetadata($identifier) {
 		return $this->manyManyRelation(array(
 				'name' => 'eotc_event_metadata',
-				'left' => 'event_id',
-				'right' => 'metadata_id',
 			),
 			array(
 				/* Find things to join to this...
