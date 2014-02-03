@@ -278,6 +278,7 @@ class External_Tass_User implements External_UserInterface {
                 '' AS StaffDepartment,
                 *
             FROM teacher AS t
+            WHERE t.cmpy_code='01'
         ";
         $staffList = $this->getDatabase()->getAll($query);
         foreach ($staffList as &$row) {
@@ -307,6 +308,7 @@ class External_Tass_User implements External_UserInterface {
             FROM student AS s
             WHERE s.campus_code IS NOT NULL
             AND s.dol IS NULL
+            AND s.cmpy_code='01'
         ";
         $studentList = $this->getDatabase()->getAll($query);
         // TASS uses fixed-length char fields instead of varchars.
