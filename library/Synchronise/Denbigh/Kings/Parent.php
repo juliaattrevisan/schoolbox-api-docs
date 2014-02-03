@@ -9,6 +9,9 @@
  */
 class Synchronise_Denbigh_Kings_Parent extends Synchronise_Denbigh_Kings_Abstract {
 
+    /**
+     *
+     */
     public function generateList() {
         $this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
     }
@@ -41,9 +44,14 @@ class Synchronise_Denbigh_Kings_Parent extends Synchronise_Denbigh_Kings_Abstrac
 
     }
 
+    /**
+     * @param $currentUser
+     * @return array
+     */
     public function generateUserAttributes($currentUser) {
         $newUser = array();
 
+        $campus = $this->getCampusFromStudent( $currentUser['denbighID']);
         // set attributes
         $newUser['username']            = $currentUser['loginID'];
      // $newUser['password']            = 'abc123';
@@ -55,7 +63,7 @@ class Synchronise_Denbigh_Kings_Parent extends Synchronise_Denbigh_Kings_Abstrac
 
      // $newuser['email_pass']          = 'abc123';
         $newUser['synergy_id']          = $currentUser['denbighID'];
-        $newUser['campus']              = array(self::DEFAULT_CAMPUS_ID);
+        $newUser['campus']              = $campus;
         $newUser['year']                = null;
         $newUser['house']               = null;
 
@@ -64,9 +72,36 @@ class Synchronise_Denbigh_Kings_Parent extends Synchronise_Denbigh_Kings_Abstrac
         $newUser['eportfolio_enabled']  = self::EPORTFOLIO_PARENT_ENABLED ? 1 : 0;
 
         $newUser['su']                  = false; // parents are not super-users
-        $newUser['defaultCampus']       = self::DEFAULT_CAMPUS_ID;
+        $newUser['defaultCampus']       = $campus[0];
+        $newUser['residential_house_id'] = null;
 
         return $newUser;
+    }
+
+
+    /**
+     * Function determines parent campus via inspecting the students enrolled in the school are determining their campus
+     *
+     * @param $denbighID
+     * @return array
+     */
+    public function getCampusFromStudent($denbighID) {
+
+        $campus = array();
+
+        $children = $this->getExternalUserHandler()->getEnrolledStudents($denbighID);
+
+        if(is_array($children)) {
+            foreach($children as $child) {
+                $schoolChild = $this->getuserHandler()->getBySynergy($child['RelatedID']);
+                $campus[] = $this->getCampusFromYearLevel($schoolChild['year']);
+            }
+            return $campus;
+        }
+        else {
+            return array(self::DEFAULT_CAMPUS_ID);
+        }
+
     }
 
 }
