@@ -144,6 +144,10 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setMetadata($this->findMetadata($identifier));
 
+			/* Accumulate campuses for this event
+			 */
+			$eventItem->setCampusCollection($this->findCampuses($identifier));
+
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()->count()) {
@@ -193,7 +197,8 @@ class EventMapper extends Calendar\EventMapper {
 				 */
 				'relation' => array(
 					'column' => 'metadata_id',
-					'key' => 'id'
+					'key' => 'id',
+					'mapper' => new EventMetadataMapper()
 				),
 			)
 		);
@@ -219,7 +224,7 @@ class EventMapper extends Calendar\EventMapper {
 				'relation' => array(
 					'column' => 'campus_id',
 					'key' => 'id',
-					'mapper' => new EventCampusMapper()
+					'mapper' => new \Schoolbox\CampusMapper()
 				),
 			)
 		);

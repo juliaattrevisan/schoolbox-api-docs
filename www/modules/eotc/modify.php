@@ -21,7 +21,7 @@ $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_bloc
 /* Modify existing event
  */
 if (is_numeric($_GET['eventID'])) {
-	$mapper = new \EOTC\Calendar\EventMapper();
+	$mapper = new \EOTC\EventMapper();
 
 	try {
 		$event = $mapper->findById($_GET['eventID']);
@@ -33,6 +33,7 @@ if (is_numeric($_GET['eventID'])) {
 	/* Default values
 	 */
 	$defaultTypeId = $event->getEventType()->getId();
+	$defaultCampusId = $event->getCampusCollection()->getAll();
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -90,10 +91,11 @@ else {
 
 	/* Set up default dates
 	 */
-	$event = new \EOTC\Calendar\Event();
+	$event = new \EOTC\Event();
 	$event->setupDates($_GET['date']);
 
 	$defaultTypeId = '';
+	$defaultCampusId = array($_SESSION['campus'][0]);
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -160,7 +162,7 @@ if ($campusList->count()) {
 		);
 	}
 
-	$page->checkList('event_campus_list', $allCampuses, array($_SESSION['campus'][0]), TEMPLATE_content, array(
+	$page->checkList('event_campus_list', $allCampuses, $defaultCampusId, TEMPLATE_content, array(
 		'id' => 'EVENT_CAMPUS_ID',
 		'name' => 'EVENT_CAMPUS_NAME',
 	));
