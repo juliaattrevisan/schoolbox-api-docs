@@ -596,6 +596,8 @@ class External_Synergetic_User implements External_UserInterface {
 
 		$this->getDatabase()->query($sql);
 
+		$subjectList = array();
+
 		while ($subject = $this->getDatabase()->getNextArray()) {
 			$subjectList[] = array(
 				'code' => $subject['ClassCode'],
