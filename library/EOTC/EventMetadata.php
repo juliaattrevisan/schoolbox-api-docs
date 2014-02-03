@@ -13,6 +13,11 @@ namespace EOTC;
 
 class EventMetadata {
 
+	/**
+	 * Primary key
+	 * 
+	 * @var null
+	 */
 	private $id = null;
 
 	/**
