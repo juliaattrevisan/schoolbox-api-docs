@@ -39,13 +39,12 @@ switch($_POST['action']) {
 		 */
 		$publishDate = null;
 		$until = null;
+		$eventMapper = new \EOTC\Calendar\EventMapper();
 
 		/* Spawn an existing event if id provided
 		 * Otherwise spawn a new one
 		 */
 		if (is_numeric($_POST['id'])) {
-			$eventMapper = new \EOTC\Calendar\EventMapper();
-
 			try {
 				$event = $eventMapper->findById($_POST['id']);
 			}
@@ -123,7 +122,7 @@ switch($_POST['action']) {
 
 		/* Save this event and any recurring incidents too
 		 */
-		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper();
+		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
 		/* If you were editing an event on someone else's calendar, don't

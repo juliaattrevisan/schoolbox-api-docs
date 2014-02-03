@@ -30,7 +30,9 @@ class EventRecurrenceMapper {
 	/**
 	 * Constructor
 	 */
-	public function __construct() {
+	public function __construct($eventMapper) {
+		$this->setEventMapper($eventMapper);
+
 		$this->setup();
 	}
 
@@ -38,7 +40,6 @@ class EventRecurrenceMapper {
 	 * Hook method
 	 */
 	protected function setup() {
-		$this->setEventMapper(new EventMapper());
 		$this->setCalendarHandler(new \Calendar());
 	}
 
