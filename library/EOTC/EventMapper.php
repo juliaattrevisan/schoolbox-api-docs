@@ -92,7 +92,6 @@ class EventMapper extends Calendar\EventMapper {
 
 		foreach ($statement as $row) {
 			$ids[] = $row[$join['relation']['column']];
-			new \Alaress_Probe($join['relation']);
 		}
 
 		$metadataMapper = new EventMetadataMapper();
