@@ -18,3 +18,5 @@ vendor/
 # Bower install directory
 www/javascript/components/
 node_modules/
+test/behavior/screenshots/*.png
+
