@@ -55,7 +55,7 @@ class EventMapper extends Calendar\EventMapper {
 				'column' => 'event_id',
 				'value' => $identifier,
 
-				/* ...using this relation
+				/* ...using this relation, such that column = key
 				 */
 				'relation' => array(
 					'column' => 'metadata_id',
