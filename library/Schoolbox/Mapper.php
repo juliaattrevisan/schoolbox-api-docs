@@ -8,11 +8,15 @@
  */
 
 namespace Schoolbox;
+use DebugBar\Bridge\MonologCollector;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Notif\Notif;
 
 class Mapper {
 	/**
@@ -47,6 +51,11 @@ class Mapper {
 	const TYPE_DECIMAL    = 20;
 	const TYPE_SERIALIZED = 30;
 	const TYPE_MODEL      = 40;
+
+	const METHOD_CREATE = 'create';
+	const METHOD_READ   = 'read';
+	const METHOD_UPDATE = 'update';
+	const METHOD_DELETE = 'delete';
 
 	/**
 	 * @var Database
@@ -111,6 +120,13 @@ class Mapper {
 	protected $config_loader;
 
 	/**
+	 * Notifier
+	 *
+	 * @var Notif
+	 */
+	protected $notif;
+
+	/**
 	 * Retreives the singleton instance of this class.
 	 *
 	 * @return static
@@ -133,6 +149,7 @@ class Mapper {
 		$this->setup();
 		$this->setConfigLoader(new ConfigLoader());
 		$this->setColumnFactory(new ColumnFactory());
+		$this->setNotifier(new Notif(Notif::TOPIC_APPLICATION));
 		$this->mapping();
 	}
 
@@ -218,6 +235,20 @@ class Mapper {
 	 */
 	public function getMap() {
 		return $this->map;
+	}
+
+	/**
+	 * @param LoggerInterface $notif
+	 */
+	public function setNotifier($notif) {
+		$this->notif = $notif;
+	}
+
+	/**
+	 * @return LoggerInterface
+	 */
+	public function getNotifier() {
+		return $this->notif;
 	}
 
 	/**
@@ -1016,6 +1047,15 @@ class Mapper {
 		foreach ($collection as $model) {
 			if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
 				$this->triggerCallbacks('postSave', $model, array_key_exists($id, $new_item_list));
+
+				$msg = array_key_exists($id, $new_item_list) ? self::METHOD_CREATE : self::METHOD_UPDATE;
+				$context = array(
+					'class' => get_class($model),
+					'id'    => $id,
+					'user'  => $_SESSION['id']
+				);
+
+				$this->notif->setTopic(Notif::TOPIC_APPLICATION)->notice($msg, $context);
 			}
 		}
 
