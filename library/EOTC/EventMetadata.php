@@ -42,13 +42,6 @@ class EventMetadata {
 	private $ramsRequired = false;
 
 	/**
-	 * Additional notes about the event
-	 *
-	 * @var string
-	 */
-	private $notes = '';
-
-	/**
 	 * Created at
 	 *
 	 * @var null
@@ -148,24 +141,6 @@ class EventMetadata {
 	 */
 	public function getId() {
 		return $this->id;
-	}
-
-	/**
-	 * Set notes
-	 *
-	 * @param string $notes
-	 */
-	public function setNotes($notes) {
-		$this->notes = $notes;
-	}
-
-	/**
-	 * Get notes
-	 *
-	 * @return string
-	 */
-	public function getNotes() {
-		return $this->notes;
 	}
 
 	/**

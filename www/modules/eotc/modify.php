@@ -58,10 +58,8 @@ if (is_numeric($_GET['eventID'])) {
 
 	$page->setVar(array(
 		'EVENT_ID' => $event->getId(),
-		'EVENT_USER_ID' => $_SESSION['user']->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
-		'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
 		'EVENT_TIMEINPUTS' => $event->getAllDay() ? 'hide' : '',
 		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
 		'EVENT_START_HOUR' => $event->getStartDateTime()->getUsingFormat('H'),
@@ -73,7 +71,6 @@ if (is_numeric($_GET['eventID'])) {
 		'EVENT_END_MIN' => $event->getEndDateTime()->getUsingFormat('i'),
 		'EVENT_END_AM' => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
 		'EVENT_END_PM' => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
-		'EVENT_PUBLISH_DATE' => $publishDate,
 		'EVENT_LOCATION' => $event->getLocation(),
 		'EVENT_DETAIL' => $event->getDetail(),
 		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
@@ -124,10 +121,8 @@ else {
 
 	$page->setVar(array(
 		'EVENT_ID' => '',
-		'EVENT_USER_ID' => $_SESSION['user']->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => '',
-		'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
 		'EVENT_TIMEINPUTS' => 'hide',
 		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
 		'EVENT_START_HOUR' => '',
@@ -139,7 +134,6 @@ else {
 		'EVENT_END_MIN' => '',
 		'EVENT_END_AM' => '',
 		'EVENT_END_PM' => '',
-		'EVENT_PUBLISH_DATE' => '',
 		'EVENT_LOCATION' => '',
 		'EVENT_DETAIL' => '',
 		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
@@ -165,36 +159,11 @@ $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, a
 	'type' => 'EVENT_EVENTTYPE_NAME'
 ));
 
-/* Only provide Group option if groups have been defined
- */
-$groupHandler = new \Group();
-$groupList = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), true, WRITE_ACCESS);
-
-/* Only provide Campus options if campuses have been defined
- */
-$campusMapper = new \Schoolbox\CampusMapper();
-$campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
-
-/* Render all the dropdowns
- */
-
-/* Event Access Levels
- * Requires both $groupList and $campusList for optional values
- */
-$page->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), $defaultAccessLevel, TEMPLATE_content, array(
-	'id' => 'EVENT_EVENTLEVEL_ID',
-	'name' => 'EVENT_EVENTLEVEL_NAME',
-));
-
-/* Group dropdown when using Group Event Level
- */
-$page->dropDown('event_group_drop', $groupList, $defaultSid, TEMPLATE_content, array(
-	'id' => 'EVENT_GROUP_ID',
-	'name' => 'EVENT_GROUP_NAME'
-));
 
 /* Campus Checkbox Array when using Campus Event Level
  */
+$campusList = new \Schoolbox\Collection();
+
 if ($campusList->count()) {
 	$allCampuses = array();
 
@@ -214,29 +183,6 @@ else {
 	$page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
 	$page->setVar('event_campus_list_block', '');
 }
-
-/* Roles, when Campus Event Level is used
- */
-$roleMapper = new \Schoolbox\RoleMapper();
-$roleList = $roleMapper->findAll();
-
-/* Roles checkbox array when using Campus Event Level
- * This really needs to be updated - why is checkList behaviour different to
- * the dropDown one when it comes to collections?
- */
-$allRoles = array();
-
-foreach($roleList as $current) {
-	$allRoles[] = array(
-		'id' => $current->getId(),
-		'name' => $current->getName()
-	);
-}
-
-$page->checkList('event_role_list', $allRoles, $defaultSid, TEMPLATE_content, array(
-	'id' => 'EVENT_ROLE_ID',
-	'name' => 'EVENT_ROLE_NAME'
-));
 
 $page->outputPage();
 
