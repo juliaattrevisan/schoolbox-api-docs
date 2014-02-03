@@ -33,7 +33,13 @@ if (is_numeric($_GET['eventID'])) {
 	/* Default values
 	 */
 	$defaultTypeId = $event->getEventType()->getId();
-	$defaultCampusId = $event->getCampusCollection()->getAll();
+	$defaultCampusId = array();
+
+	$allCampuses = $event->getCampusCollection()->getAll();
+
+	foreach ($allCampuses as $currentCampus) {
+		$defaultCampusId[] = $currentCampus->getId();
+	}
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default

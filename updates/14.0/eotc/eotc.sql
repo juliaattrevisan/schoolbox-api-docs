@@ -26,3 +26,7 @@ ALTER TABLE `eotc_event` DROP `publish_date`;
 ALTER TABLE `eotc_event` DROP `completed`; 
 ALTER TABLE `eotc_event` DROP `allday`;
 ALTER TABLE `eotc_event` MODIFY COLUMN id INT(11) AUTO_INCREMENT;
+
+/* Event campus relations
+ */
+CREATE TABLE `eotc_event_campus`( `event_id` INT(11), `campus_id` INT(11) );
