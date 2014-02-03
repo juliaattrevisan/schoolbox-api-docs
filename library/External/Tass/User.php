@@ -257,8 +257,36 @@ class External_Tass_User implements External_UserInterface {
     public function getEmail ($id) {
     }
 
-	public function getStaffUserAccountInfo () {
-	}
+    public function getStaffUserAccountInfo () {
+        // Include Synergetic fields, and attempt to perform data normalisation
+        // using extra fields.
+        $query = "
+            SELECT
+                t.tch_code AS StaffID,
+                '' AS NetworkLogin,
+                t.curr_flg AS ActiveFlag,
+                '' AS StaffTitle,
+                '' AS StaffPreferredName,
+                t.surname AS StaffSurname,
+                t.tch_name AS StaffFullName,
+                '' AS DefaultEmailCode,
+                '' AS OccupEmail,
+                t.e_mail AS Email,
+                '' AS StaffCampus,
+                '' AS StaffCategoryType,
+                '' AS StaffCategory,
+                '' AS StaffDepartment,
+                *
+            FROM teacher AS t
+        ";
+        $staffList = $this->getDatabase()->getAll($query);
+        foreach ($staffList as &$row) {
+            $row = array_map('trim', $row);
+            $row['ActiveFlag'] = ($row['ActiveFlag'] === 'Y');
+        }
+        unset($row);
+        return $staffList;
+    }
 
     public function getStudentUserAccountInfo () {
         // Get all students who have a campus, and don't have a leaving date?
