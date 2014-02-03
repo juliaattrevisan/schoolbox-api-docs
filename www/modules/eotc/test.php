@@ -9,6 +9,8 @@
  */
 
 $eventMapper = new \EOTC\EventMapper();
-$eventMapper->findById(1);
+$event = $eventMapper->findById(1);
+
+new \Alaress_Probe($event);
 
 exit();

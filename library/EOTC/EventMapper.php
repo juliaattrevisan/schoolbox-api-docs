@@ -34,7 +34,60 @@ class EventMapper extends Calendar\EventMapper {
 		 */
 		$eventItem->setMetadata($this->findMetadata($identifier));
 
-		new \Alaress_Probe($eventItem);
+		return $eventItem;
+	}
+
+	/**
+	 * Many-many relation table
+	 *
+	 *        $relationTable = 'eotc_event_metadata'
+	 *
+	 * Value is optional; one of the two columns must have it defined
+	 *
+	 *        $left = array('column' => 'event_id', 'value' = 1)
+	 *        $right = array('column => 'metadata_id', 'value' = 1)
+	 *
+	 * @param $relationTable
+	 * @param array $left
+	 * @param array $right
+	 * @return \Schoolbox\Collection
+	 */
+	public function manyManyRelation($relationTable, $left = array(), $right = array()) {
+		$query = "
+			SELECT {$right['column']}
+			FROM `{$relationTable}`
+		";
+
+		if (isset($left['value'])) {
+			$query .= "WHERE {$left['column']} = :value";
+
+			$selectedValue = $left['value'];
+			$column = $right['column'];
+		}
+		else if (isset($right['value'])) {
+			$query .= "WHERE {$right['column']} = :value";
+
+			$selectedValue = $right['value'];
+			$column = $left['column'];
+		}
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":value", $selectedValue);
+		$statement->execute();
+
+		/* Find all the primary keys in the relation table and objectify
+		 * them into a collection
+		 */
+		$ids = array();
+
+		foreach ($statement as $row) {
+			$ids[] = $row[$column];
+		}
+
+		$metadataMapper = new EventMetadataMapper();
+		$allMetadata = $metadataMapper->findByColumn('id', $ids);
+
+		return $allMetadata;
 	}
 
 	/**
@@ -44,28 +97,15 @@ class EventMapper extends Calendar\EventMapper {
 	 * @return \Schoolbox\Collection
 	 */
 	private function findMetadata($identifier) {
-		$query = "
-			SELECT metadata_id
-			FROM `eotc_event_metadata`
-			WHERE event_id = :eventId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $identifier);
-		$statement->execute();
-
-		/* Find all the primary keys in the relation table and objectify
-		 * them into a collection
-		 */
-		$ids = array();
-
-		foreach ($statement as $row) {
-			$ids[] = $row['metadata_id'];
-		}
-
-		$metadataMapper = new EventMetadataMapper();
-		$allMetadata = $metadataMapper->findByColumn('id', $ids);
-
-		return $allMetadata;
+		return $this->manyManyRelation(
+			'eotc_event_metadata',
+			array(
+				'column' => 'event_id',
+				'value' => $identifier
+			),
+			array(
+				'column' => 'metadata_id',
+			)
+		);
 	}
 } 
