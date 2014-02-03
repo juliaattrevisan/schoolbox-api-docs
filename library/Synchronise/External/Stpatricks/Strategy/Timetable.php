@@ -43,12 +43,12 @@ class Synchronise_External_Stpatricks_Strategy_Timetable extends Synchronise_Ext
                 SELECT `id` FROM `class` WHERE `code` = :code
             ");
             $timetableStmt = Database::getInstance()->prepare("
-                INSERT INTO `class_period` VALUES (NULL, :classID, :periodID)
+                INSERT INTO `class_period` (id, class_id, period_id, room) VALUES (NULL, :classID, :periodID, :room)
             ");
 
             foreach($this->entityData as $timetable) {
                 // check the period and class exist
-                $periodStmt->execute(array('day' => $timetable['day'], 'seq' => 'Period ' . $timetable['period']));
+                $periodStmt->execute(array('day' => trim($timetable['day']), 'seq' => 'Period ' . trim($timetable['period'])));
                 $period = $periodStmt->fetchColumn();
                 $classStmt->execute(array('code' => $timetable['classCode']));
                 $class = $classStmt->fetchColumn();
@@ -58,6 +58,7 @@ class Synchronise_External_Stpatricks_Strategy_Timetable extends Synchronise_Ext
                     $timetableStmt->execute(array(
                         'classID' => $class,
                         'periodID' => $period,
+                        'room' => $timetable['room'],
                     ));
                 }
                 elseif($this->getVerboseFilter()->getVerbose()) {
