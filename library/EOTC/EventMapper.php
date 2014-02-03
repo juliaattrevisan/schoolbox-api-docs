@@ -13,7 +13,9 @@ namespace EOTC;
 
 class EventMapper extends Calendar\EventMapper {
 
-
+	/**
+	 * Call super deliberately, to extend functionality
+	 */
 	protected function mapping() {
 		parent::mapping();
 
