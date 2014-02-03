@@ -250,12 +250,12 @@ class UnitInstanceMapper extends Mapper {
      * * if not, update existing task instances for this course.
      *
      * @param  UnitInstance $object
-     * @param  bool         $is_new
+     * @param  UnitInstance $previous
      * @return void
      */
-    protected function postSave(UnitInstance $object, $is_new = false) {
+    protected function postSave(UnitInstance $object, $previous = null) {
         // Create tasks for this item (if this item was only just saved)
-        if ($is_new) {
+        if (!$previous) {
             $task_list = TaskMapper::getInstance()->findByColumn(
                 'category_id',
                 $object->getUnitCategory()->getId()

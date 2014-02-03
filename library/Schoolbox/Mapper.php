@@ -1023,6 +1023,15 @@ class Mapper {
 
 		$identifier    = $this->getIdentifier();
 		$id_property   = $identifier['property'];
+
+		// retrieve the objects as they currently exist so we can perform a diff if we need to
+		$collectionIds = $collection->getColumnValues($id_property);
+		$existingObjects = array();
+		foreach($this->findByColumn($identifier['column'], $collectionIds) as $obj) {
+			// index by ID
+			$existingObjects[$this->getModelProperty($id_property, $obj)] = $obj;
+		}
+
 		$new_item_list = array();
 		$this->database->beginTransaction();
 		foreach ($collection as $model) {
@@ -1046,7 +1055,7 @@ class Mapper {
 
 		foreach ($collection as $model) {
 			if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
-				$this->triggerCallbacks('postSave', $model, array_key_exists($id, $new_item_list));
+				$this->triggerCallbacks('postSave', $model, array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null);
 
 				$msg = array_key_exists($id, $new_item_list) ? self::METHOD_CREATE : self::METHOD_UPDATE;
 				$context = array(

@@ -366,9 +366,9 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 	 *   the submission box.
 	 *
 	 * @param ReturnedWork $object
-	 * @param bool         $is_new
+	 * @param ReturnedWork $previous
 	 */
-	public function postSave(ReturnedWork $object, $is_new = false) {
+	public function postSave(ReturnedWork $object, $previous = null) {
 		$object->copyFromTempLocation();
 
 		// Doesn't matter whether it's new or not - only whether the mark is
