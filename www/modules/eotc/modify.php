@@ -79,6 +79,8 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('recurring_dates_block', 'recurring_dates');
 	}
 	else {
+		/* TODO: Convert to Mapper
+		 */
 		$calendarHandler = new Calendar();
 		$recurrence = $calendarHandler->getSeriesRecurrence($event->getSeriesId());
 
