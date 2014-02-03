@@ -207,7 +207,11 @@
 				/* Lightbox everything!
 				 * But only the images in a particular socialstream thread
 				 */
-				$j("a[rel='" + config.lightboxKey + "']").slimbox();
+				$j("a[rel='" + config.lightboxKey + "']").magnificPopup({
+                    type: 'image',
+                    removalDelay: 300,
+                    mainClass: 'mfp-fade'
+                });
 			});
 
 			/**

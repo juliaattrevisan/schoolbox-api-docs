@@ -38,6 +38,26 @@ $j(function() {
         $(this).attr('target','_blank')
     })
 
+	// Set up lightboxes globally, group galleries by lightbox relation.
+	var lightboxGroups = {};
+	$("a[rel^='lightbox']").each(function() {
+		var rel = $(this).attr('rel');
+		if (!lightboxGroups[rel]) {
+			lightboxGroups[rel] = [];
+		}
+		lightboxGroups[rel].push(this);
+	});
+	$.each(lightboxGroups, function(i,v) {
+		$(v).magnificPopup({
+			type: 'image',
+			removalDelay: 300,
+			mainClass: 'mfp-fade',
+			gallery:{
+				enabled:true
+			}
+		});
+	})
+
     /**
      * Each skin does NOT have a slightly different header height or a different left navigation.
      * From now on, it's always placed relative to the clicked element.

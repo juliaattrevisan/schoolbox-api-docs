@@ -101,7 +101,9 @@ module.exports = function(grunt) {
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
                     // Fullcalendar
-                    'www/javascript/components/fullcalendar/fullcalendar.js'
+                    'www/javascript/components/fullcalendar/fullcalendar.js',
+                    // Magnific Popup (lightbox)
+                    'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js'
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
