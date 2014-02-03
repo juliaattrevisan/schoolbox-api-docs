@@ -34,6 +34,21 @@ class EventMapper extends Calendar\EventMapper {
 		 */
 		$eventItem->setMetadata($this->findMetadata($identifier));
 
+		/* Determine current status
+		 */
+		if ($eventItem->getMetadata()->count()) {
+			$statusMapper = new EventStatusMapper();
+
+			foreach($eventItem->getMetadata() as $currentMetadata) {
+				try {
+					$statusItem = $statusMapper->findById($currentMetadata->getStatus());
+					$currentMetadata->setStatus($statusItem);
+				}
+				catch (\Exception $e) {
+				}
+			}
+		}
+
 		return $eventItem;
 	}
 
