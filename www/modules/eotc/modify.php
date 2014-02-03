@@ -33,18 +33,6 @@ if (is_numeric($_GET['eventID'])) {
 	/* Default values
 	 */
 	$defaultTypeId = $event->getEventType()->getId();
-	$defaultSid = $event->getSid();
-	$defaultAccessLevel = $event->getAccess();
-
-	/* Only provide publish date if one was provided and if it
-	 * wasn't useless somehow
-	 */
-	if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
-		$publishDate = $event->getPublishDateTime()->getLocalShort();
-	}
-	else {
-		$publishDate = '';
-	}
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -106,8 +94,6 @@ else {
 	$event->setupDates($_GET['date']);
 
 	$defaultTypeId = '';
-	$defaultSid = '';
-	$defaultAccessLevel = '';
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -159,7 +145,6 @@ $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, a
 	'type' => 'EVENT_EVENTTYPE_NAME'
 ));
 
-
 /* Campus Checkbox Array when using Campus Event Level
  */
 $campusList = new \Schoolbox\Collection();
@@ -185,4 +170,3 @@ else {
 }
 
 $page->outputPage();
-
