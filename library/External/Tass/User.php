@@ -318,8 +318,37 @@ class External_Tass_User implements External_UserInterface {
 	public function getParentSync ($externalUserId) {
 	}
 
-	public function getParentUserAccountInfo () {
-	}
+    public function getParentUserAccountInfo() {
+        // status of TASS support for single, gay, transgendered or polygamous
+        // parents - unknown
+        // par_code: most likely login
+        // According to getEnrolledStudents(): parent codes are prefixed with 'P'
+        // Noter
+        $query = "
+            SELECT
+                'P' + p.par_code AS StudentContactID,
+                '' AS StudentContactTitle,
+                p.f_name AS StudentContactPreferred,
+                '' AS StudentContactSurname,
+                '' AS StudentContactDefaultEmail,
+
+                '' AS StudentContactSpouseID,
+                '' AS StudentContactSpouseTitle,
+                p.m_name AS StudentContactSpousePreferred,
+                '' AS StudentContactSpouseSurname,
+                '' AS StudentContactSpouseDefaultEmail,
+
+                s.year_grp AS StudentYearLevel,
+                s.campus_code AS StudentCampus,
+                s.sex AS StudentGender,
+
+                p.*
+            FROM parent AS p
+            INNER JOIN student as s ON p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code
+            WHERE s.cmpy_code='01'
+        ";
+        $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+    }
 
 	private function setDatabase ($database) {
 		$this->database = $database;
