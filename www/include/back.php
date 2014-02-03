@@ -1,7 +1,7 @@
 <html>
 <head>
 <script type="text/javascript"><!--
-history.go(<?=$back?>); // ->
+history.go(<?php echo $back;?>); // ->
 </script>
 </head>
 <body>
