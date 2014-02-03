@@ -15,9 +15,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
-use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Handler\AMQPHandler;
@@ -32,20 +30,23 @@ use Schoolbox\Notif\MQ\Connector as MQConnector;
  */
 class Notif implements LoggerInterface {
 
-	const CHANNEL_SYSTEM       = 'sys';     // notifications about top-level events
-	const CHANNEL_NOTIFICATION = 'notif';   //     "           "   the notification system
-	const CHANNEL_DATABASE     = 'db';      //     "           "   internal database events
-	const CHANNEL_APPLICATION  = 'sb';      //     "           "   Schoolbox application events
-	const CHANNEL_SYNERGY      = 'syn';     //     "           "   synergy database events
-	const CHANNEL_ADMIN        = 'admin';   //     "           "   superuser events (includes assumption)
-	const CHANNEL_AUTH         = 'login';   //     "           "   authentication events
-	const CHANNEL_CMS          = 'cms';     //     "           "   cms events to be logged
+	const TOPIC_SYSTEM       = 'sys';     // notifications about top-level events
+	const TOPIC_NOTIFICATION = 'notif';   //     "           "   the notification system
+	const TOPIC_DATABASE     = 'db';      //     "           "   internal database events
+	const TOPIC_APPLICATION  = 'sb';      //     "           "   Schoolbox application events (ie. Mappers)
+	const TOPIC_SYNERGY      = 'syn';     //     "           "   synergy database events
+	const TOPIC_ADMIN        = 'admin';   //     "           "   superuser events (includes assumption)
+	const TOPIC_AUTH         = 'login';   //     "           "   authentication events
+	const TOPIC_CMS          = 'cms';     //     "           "   cms events to be logged
 
 	/** @var IConfigLoader */
 	protected $conf;
 
 	/** @var string */
-	protected $channel;
+	protected $topic;
+
+	/** @var TopicFactory */
+	protected $topicFactory;
 
 	/** @var AMQPHandler */
 	protected $amqp;
@@ -53,11 +54,15 @@ class Notif implements LoggerInterface {
 	/** @var SwiftMailerHandler  */
 	protected $mail;
 
+	/** @var  MySQLHandler */
+	protected $sql;
+
 	/** @var StreamHandler */
 	protected $syslog;
 
-	public function __construct($channel = self::CHANNEL_SYSTEM, $configLoader = null) {
-		$this->channel = $channel;
+	public function __construct($topic = self::TOPIC_SYSTEM, $configLoader = null) {
+		$this->topic = $topic;
+		$this->topicFactory = new TopicFactory();
 		$this->conf = $configLoader ?: new ConfigLoader();
 		$this->instantiateHandlers();
 	}
@@ -68,7 +73,9 @@ class Notif implements LoggerInterface {
 	protected function instantiateHandlers() {
 		// message queue handling
 		try {
-			$this->amqp = new AMQPHandler(new MQConnector());
+
+			// the rabbit is only interested in notices and above,
+			$this->amqp = new AMQPHandler(new MQConnector(), Logger::NOTICE, false);
 			$this->amqp->setFormatter(new JsonFormatter());
 		}
 		catch(AMQPRuntimeException $e) {
@@ -79,75 +86,152 @@ class Notif implements LoggerInterface {
 
 		$m = new \Swift_Message('Schoolbox Log', null, 'text/plain','utf-8');
 		$m->setTo($this->conf->get('mail_support_address'));
-		$m->setFrom($from);
+		$m->setFrom('notif@alaress.com.au'); // TODO restore this to $from
 
-		// email handling
-		$this->mail = new SwiftMailerHandler(new \Swift_Mailer(\Mailer::getSwiftTransport(true)), $m);
+		// digest handling
+		// $this->digest = ...?
 
-		$this->syslog = new StreamHandler(fopen($this->conf->get('logs_dir') . '/mono.log', 'a'), Logger::NOTICE);
+		// email handling (allow bubble through to rabbit)
+		$this->mail = new SwiftMailerHandler(new \Swift_Mailer(\Mailer::getSwiftTransport(true)), $m, Logger::WARNING, true);
+
+		// syslog handling (if this handles a message, it's done: no bubble)
+		$this->syslog = new StreamHandler(fopen($this->conf->get('logs_dir') . '/mono.log', 'a'), Logger::NOTICE, false);
+
+		// sql handling (allow bubble)
+		$this->sql = new MySQLHandler(Logger::INFO, true);
 
 	}
 
-	public function getChannel() {
-		return $this->channel;
+	public function getTopic() {
+		return $this->topic;
 	}
 
-	public function setChannel($channel) {
-		$this->channel = $channel;
+	public function setTopic($topic) {
+		$this->topic = $topic;
 		return $this;
 	}
 
+
+	/* Convenience methods for setting broadcast topics */
+
 	/**
-	 * Returns the contents of the named queue
-	 * @param $queueName
-	 * @param bool $markAsRead
-	 * @return Collection
+	 * @param $userId
+	 * @return self
 	 */
-	public function readQueue($queueName, $markAsRead = true) {
-
-		$conn = $this->amqp->getMQConnector();
-		$conn->declareQueue($queueName);
-
-		$msgs = new Collection();
-
-		while($m = $conn->readQueue($queueName, $markAsRead)) {
-			/** @var AMQPMessage $m */
-			$msgs->add(array_merge($m->delivery_info, array('body' => $m->body)));
-		}
-
-		return $msgs;
+	public function targetUser($userId) {
+		return $this->setTopic($this->topicFactory->targetUser($userId));
 	}
+
+	/**
+	 * @param $categoryId
+	 * @return self
+	 */
+	public function targetCategory($categoryId) {
+		return $this->setTopic($this->topicFactory->targetCategory($categoryId));
+	}
+
+	/**
+	 * @param $categoryId
+	 * @return self
+	 */
+	public function targetCategoryAdmin($categoryId) {
+		return $this->setTopic($this->topicFactory->targetCategoryAdmin($categoryId));
+	}
+
+	/**
+	 * @param $campusId
+	 * @return self
+	 */
+	public function targetCampus($campusId) {
+		return $this->setTopic($this->topicFactory->targetCampus($campusId));
+	}
+
+	/**
+	 * @param $roleId
+	 * @return self
+	 */
+	public function targetRole($roleId) {
+		return $this->setTopic($this->topicFactory->targetRole($roleId));
+	}
+
+	/**
+	 * @param $roleType
+	 * @return self
+	 */
+	public function targetRoleType($roleType) {
+		return $this->setTopic($this->topicFactory->targetRoleType($roleType));
+	}
+
+	/**
+	 * @param $topic
+	 * @return self
+	 */
+	public function targetSuperusers($topic) {
+		return $this->setTopic($this->topicFactory->targetSuperusers($topic));
+	}
+
+	/**
+	 * @param $houseId
+	 * @return self
+	 */
+	public function targetSchoolHouse($houseId) {
+		return $this->setTopic($this->topicFactory->targetSchoolHouse($houseId));
+	}
+
+	/**
+	 * @param $resId
+	 * @return self
+	 */
+	public function targetResidentialHouse($resId) {
+		return $this->setTopic($this->topicFactory->targetResidentialHouse($resId));
+	}
+
 
 	/**
 	 * @param Logger $logger
 	 */
 	protected function appendHandlers($logger) {
 
+		// the push order of handlers is important: they get executed newest to oldest
+
+		// syslog is bottom priority: other things will catch atop it
 		$logger->pushHandler($this->syslog);
 
 		// the notification system shouldn't attempt to publish to itself (or try if it's down)
-		if($this->channel == self::CHANNEL_NOTIFICATION || $this->amqp === false) {
+		if($this->topic == self::TOPIC_NOTIFICATION || $this->amqp === false) {
 			$logger->pushHandler($this->mail);
 		}
 		else {
 			$logger->pushHandler($this->amqp);
 		}
 
-		switch($this->channel) {
-			case self::CHANNEL_AUTH:
-				$sqlh = new MySQLHandler(Logger::INFO);
-				$sqlh->setQuery("INSERT INTO login_log (username, date, ip, login) VALUES (:username, NOW(), :ip, :login)");
-				$logger->pushHandler($sqlh);
+		// find out how we're logging this, based on which topic (channel) we're in
+		switch($this->topic) {
+
+			// when someone logs in, or fails to
+			case self::TOPIC_AUTH:
+				$this->sql->setQuery("
+					INSERT INTO `login_log`
+						(`username`, `date`, `ip`, `login`)
+					VALUES
+						(:username, NOW(), :ip, :login)
+				");
+				$logger->pushHandler($this->sql);
 				break;
-			case self::CHANNEL_CMS:
-				$sqlh = new MySQLHandler(Logger::INFO);
-				$sqlh->setQuery("
-					INSERT INTO cmsLog
+
+			// when cms-specific things are logged
+			case self::TOPIC_CMS:
+				$this->sql->setQuery("
+					INSERT INTO `cmsLog`
 						(`object`, `objectId`, `action`, `user`)
 					VALUES
 						(:object, :objectId, :action, :user)
 				");
-				$logger->pushHandler($sqlh);
+				$logger->pushHandler($this->sql);
+				break;
+
+			// When mappers C(r)UD, this is what happens
+			case self::TOPIC_APPLICATION:
 				break;
 		}
 
@@ -164,12 +248,12 @@ class Notif implements LoggerInterface {
 	 * @return bool
 	 */
 	public function logTo($channel, $level, $message, array $context = array()) {
-		$this->setChannel($channel);
+		$this->setTopic($channel);
 		return $this->log($level, $message, $context);
 	}
 
 	public function log($level, $message, array $context = array()) {
-		$log = new Logger($this->channel);
+		$log = new Logger($this->topic);
 		$this->appendHandlers($log);
 		try {
 			return $log->addRecord($level, $message, $context);

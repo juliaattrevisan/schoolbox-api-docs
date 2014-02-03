@@ -228,7 +228,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		catch(\Exception $e) {
 			// catch any and all exceptions here, this MUST exit
 			$this->v($e->getMessage(), '!');
-			$notif = new Notif(Notif::CHANNEL_NOTIFICATION);
+			$notif = new Notif(Notif::TOPIC_NOTIFICATION);
 			$notif->critical("Messaging error: $e");
 		}
 

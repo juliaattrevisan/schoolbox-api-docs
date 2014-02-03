@@ -84,7 +84,7 @@ class SubscriptionManager {
 		}
 		// the rabbit is probably offline
 		catch(ConnectionException $e) {
-			$notif = new Notif(Notif::CHANNEL_NOTIFICATION);
+			$notif = new Notif(Notif::TOPIC_NOTIFICATION);
 			$notif->critical("Cannot bind to messaging system: check your STOMP bindings and that RabbitMQ is running.");
 			$this->pipeManager->v('Rabbitmq is offline or STOMP misconfigured!', '!');
 			return false;

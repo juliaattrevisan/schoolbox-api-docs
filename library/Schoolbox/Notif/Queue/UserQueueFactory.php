@@ -63,6 +63,7 @@ class UserQueueFactory {
 	/**
 	 * Creates bindings for a User's queue, but doesn't actually attempt message retrieval.
 	 * @param $user
+	 * @param bool $simulate
 	 * @return UserQueue
 	 */
 	public function bindUserQueue($user, $simulate = false) {

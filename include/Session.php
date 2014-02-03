@@ -85,12 +85,15 @@ class Session
                 $this->setSynergyInfo($userHandler);
 			}
 
-	        $notif = new Notif(Notif::CHANNEL_AUTH);
+	        $notif = new Notif(Notif::TOPIC_AUTH);
 	        $notif->info("Login success for $username", array(
 		        'username' => $user['username'],
 		        'ip'       => $ip,
 		        'login'    => 1,
 	        ));
+
+	        // TODO remove this
+//	        $notif->setTopic('notify.user.'.$user['uid'])->info("You just logged in!");
 
 	        // add mobile session data
             $sbmAuth = new Authenticator();
@@ -168,7 +171,7 @@ class Session
 
         if (!$result) {
             /* Log failure */
-	        $notif = new Notif(Notif::CHANNEL_AUTH);
+	        $notif = new Notif(Notif::TOPIC_AUTH);
 	        $notif->info("Login failure for ".$user->getUsername(), array(
 		        'username' => $user->getUsername(),
 		        'ip'       => $ip,
