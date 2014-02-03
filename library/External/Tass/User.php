@@ -280,9 +280,8 @@ class External_Tass_User implements External_UserInterface {
             FROM teacher AS t
             WHERE t.cmpy_code='01'
         ";
-        $staffList = $this->getDatabase()->getAll($query);
+        $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         foreach ($staffList as &$row) {
-            $row = array_map('trim', $row);
             $row['ActiveFlag'] = ($row['ActiveFlag'] === 'Y');
         }
         unset($row);
@@ -310,13 +309,7 @@ class External_Tass_User implements External_UserInterface {
             AND s.dol IS NULL
             AND s.cmpy_code='01'
         ";
-        $studentList = $this->getDatabase()->getAll($query);
-        // TASS uses fixed-length char fields instead of varchars.
-        foreach ($studentList as &$student) {
-            $student = array_map('trim', $student);
-        }
-        unset($student);
-        return $studentList;
+        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
     }
 
 	public function getStudentContactListExtended ($yearlevel, $name, $boardingStatus, $form) {
