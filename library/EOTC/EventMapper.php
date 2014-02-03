@@ -166,6 +166,14 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
+	 * Postsave hook (do nothing);
+	 *
+	 * @param $event
+	 */
+	protected function postSave($event) {
+	}
+
+	/**
 	 * Find metadata for a particular event
 	 *
 	 * @param $identifier
