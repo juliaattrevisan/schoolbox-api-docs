@@ -147,7 +147,8 @@ $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, a
 
 /* Campus Checkbox Array when using Campus Event Level
  */
-$campusList = new \Schoolbox\Collection();
+$campusMapper = new \Schoolbox\CampusMapper();
+$campusList = $campusMapper->findAll();
 
 if ($campusList->count()) {
 	$allCampuses = array();
