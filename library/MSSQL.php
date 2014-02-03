@@ -367,6 +367,39 @@ class MSSQL {
 	}
 
 	/**
+	 * Calls trimRow() on all rows from a rowset (returned by $this->fetchAll())
+	 * @see $this->trimRow()
+	 *
+	 * @param  array $rowset
+	 * @return array
+	 */
+	public function trimAll($rowset) {
+		return array_map(array($this, 'trimRow'), $rowset);
+	}
+
+	/**
+	 * Trims all field values in a single row (returned by $this->fetchRow())
+	 *
+	 * Needed by TASS because most of its fields are CHAR instead of VARCHAR.
+	 *
+	 * @param  array $row
+	 * @return array
+	 */
+	public function trimRow($row) {
+		return array_map(array($this, 'trimField'), $row);
+	}
+
+	/**
+	 * Trims a single field value.
+	 *
+	 * @param  mixed $fieldValue
+	 * @return mixed Trimmed value if $fieldValue was set, null otherwise.
+	 */
+	public function trimField($fieldValue) {
+		return isset($fieldValue) ? trim($fieldValue) : null;
+	}
+
+	/**
 	 * Returns the number of rows returned by the query
 	 *
 	 * @param int $result
