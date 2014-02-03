@@ -14,12 +14,79 @@ namespace EOTC;
 class EventMapper extends Calendar\EventMapper {
 
 	/**
-	 * Call super deliberately, to extend functionality
+	 * This is a direct clone with less functionality
 	 */
 	protected function mapping() {
-		parent::mapping();
-
+		$this->hasTable('eotc_event');
 		$this->hasModel('\\EOTC\\Event');
+
+		$this->hasMap(array(
+			'column' => 'id',
+			'property' => 'id',
+			'type' => self::TYPE_INTEGER,
+			'identifier' => true,
+		));
+		$this->hasMap(array(
+			'column' => 'series_id',
+			'property' => 'seriesId',
+			'type' => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column' => 'author_id',
+			'property' => 'author',
+			'type' => self::TYPE_MODEL,
+			'join' => 'author',
+		));
+		$this->hasMap(array(
+			'column' => 'type',
+			'property' => 'type',
+			'type' => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column' => 'note',
+			'property' => 'note',
+			'type' => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column' => 'detail',
+			'property' => 'detail',
+			'type' => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column' => 'location',
+			'property' => 'location',
+			'type' => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'   => 'startDate',
+			'property' => 'startDate',
+			'type'     => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'   => 'startTime',
+			'property' => 'startTime',
+			'type'     => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'   => 'endDate',
+			'property' => 'endDate',
+			'type'     => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'   => 'endTime',
+			'property' => 'endTime',
+			'type'     => self::TYPE_STRING,
+		));
+		$this->hasJoin('author', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'author_id',
+			'other_key' => 'id',
+		));
+		$this->hasJoin('eventType', array(
+			'mapper'    => '\\EOTC\\Calendar\\EventTypeMapper',
+			'this_key'  => 'type',
+			'other_key' => 'eventTypeID',
+		));
 	}
 
 	/**
@@ -30,28 +97,72 @@ class EventMapper extends Calendar\EventMapper {
 	 * @throws \Exception
 	 */
 	public function findById($identifier) {
-		$eventItem = parent::findById($identifier);
+		$authorMapper = $this->getJoinMapper('author');
+		$eventTypeMapper = $this->getJoinMapper('eventType');
 
-		/* Accumulate the metadata for this event
+		$query = "
+			SELECT
+				{$this->getColumnString('e')},
+				{$authorMapper->getColumnString('a')},
+				{$eventTypeMapper->getColumnString('t')}
+			FROM `{$this->table}` e
+			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+			WHERE e.id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $identifier);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		/* Hydrate or die
 		 */
-		$eventItem->setMetadata($this->findMetadata($identifier));
+		if ($row != false) {
+			$eventItem = $this->hydrate($row, 'e');
 
-		/* Determine current status
-		 */
-		if ($eventItem->getMetadata()->count()) {
-			$statusMapper = new EventStatusMapper();
+			/* Author
+			 */
+			$authorItem = $authorMapper->hydrate($row, 'a');
+			$eventItem->setAuthor($authorItem);
 
-			foreach($eventItem->getMetadata() as $currentMetadata) {
-				try {
-					$statusItem = $statusMapper->findById($currentMetadata->getStatus());
-					$currentMetadata->setStatus($statusItem);
-				}
-				catch (\Exception $e) {
+			/* Event Type
+			 */
+			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+			$eventItem->setEventType($eventTypeItem);
+
+			/* Convert dates ;(
+			 */
+			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+			$eventItem->setStartDateTime($startDateTime);
+
+			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
+			$eventItem->setEndDateTime($endDateTime);
+
+			/* Accumulate the metadata for this event
+			 */
+			$eventItem->setMetadata($this->findMetadata($identifier));
+
+			/* Determine current status
+			 */
+			if ($eventItem->getMetadata()->count()) {
+				$statusMapper = new EventStatusMapper();
+
+				foreach($eventItem->getMetadata() as $currentMetadata) {
+					try {
+						$statusItem = $statusMapper->findById($currentMetadata->getStatus());
+						$currentMetadata->setStatus($statusItem);
+					}
+					catch (\Exception $e) {
+					}
 				}
 			}
+
+			return $eventItem;
 		}
 
-		return $eventItem;
+		throw new \Exception('Instance of object not found');
 	}
 
 	/**
