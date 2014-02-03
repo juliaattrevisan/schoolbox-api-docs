@@ -11,7 +11,7 @@
 namespace EOTC;
 
 
-class Event extends CalendarEvent {
+class Event extends Calendar\Event {
 
 	/**
 	 * Metadata for this event
@@ -35,8 +35,33 @@ class Event extends CalendarEvent {
 	protected $staffAttendees = null;
 
 	/**
-	 * Constructor
+	 * Hook method
 	 */
-	public function __construct() {
+	protected function setup() {
+
+		/* This is populated by hand
+		 */
+		$this->setMetadata(new \Schoolbox\Collection());
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set metadata
+	 *
+	 * @param null $metadata
+	 */
+	public function setMetadata($metadata) {
+		$this->metadata = $metadata;
+	}
+
+	/**
+	 * Get metadata
+	 *
+	 * @return null
+	 */
+	public function getMetadata() {
+		return $this->metadata;
 	}
 }
