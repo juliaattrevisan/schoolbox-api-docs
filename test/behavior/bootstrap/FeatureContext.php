@@ -22,6 +22,7 @@ class FeatureContext extends BaseContext {
         $this->useContext('component', new Subcontext_ComponentContext($parameters));
         $this->useContext('course_builder', new Subcontext_CourseBuilderContext($parameters));
         $this->useContext('assessment', new Subcontext_AssessmentContext($parameters));
+        $this->useContext('confirm', new Subcontext_ConfirmContext($parameters));
     }
 
     /**

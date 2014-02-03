@@ -44,6 +44,9 @@ class Subcontext_CoreContext extends BaseContext {
     /**
      * Logs in user.
      *
+     * This represents a successful login, and will throw exception on a failed
+     * login. For a login attempt, @see $this->loginAttempt()
+     *
      * @Given /^(?:|I am) logged in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
      * @Given /^(?:|I )log in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
      *
@@ -52,17 +55,26 @@ class Subcontext_CoreContext extends BaseContext {
      * @throws Exception if login failed
      */
     public function login($username, $password) {
+        $this->loginAttempt($username, $password);
+        $this->waitForLink('Logout', 10000);
+    }
+
+    /**
+     * Attempts to log in.
+     *
+     * This represents a successful login, and will throw exception on a failed
+     * login. For a login attempt, @see $this->loginAttempt()
+     *
+     * @Given /^(?:|I )try to log in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
+     *
+     * @param string $username
+     * @param string $password
+     */
+    public function loginAttempt($username, $password) {
         $page = $this->getSession()->getPage();
         $page->findById('username')->setValue($username);
         $page->findById('password')->setValue($password);
         $page->find('css', 'input.login')->press();
-        $this->spin(
-            function($context) {
-                /** @param FeatureContext $context */
-                return $context->getSession()->getPage()->findLink('Logout') instanceof Element\NodeElement;
-            },
-            10
-        );
     }
 
     /**
@@ -233,6 +245,46 @@ class Subcontext_CoreContext extends BaseContext {
             function($context) use($element) {
                 /** @param FeatureContext $context */
                 $context->getMinkContext()->assertElementOnPage($element);
+                return true;
+            },
+            ($duration/1000)
+        );
+    }
+
+    /**
+     * Waits for link on page.
+     *
+     * @Then /^(?:|I )wait for link "(?P<text>(?:[^"]|\\")*)"$/
+     * @Then /^(?:|I )wait (?P<duration>\d+)ms for link "(?P<text>(?:[^"]|\\")*)"$/
+     */
+    public function waitForLink($link, $duration = 5000) {
+        $this->spin(
+            function($context) use($link) {
+                /** @param FeatureContext $context */
+                return $context->getSession()->getPage()->findLink($link) instanceof Element\NodeElement;
+            },
+            ($duration/1000)
+        );
+    }
+
+    /**
+     * Waits for text on page.
+     *
+     * Required because Selenium doesn't wait for the page to load by default
+     * when clicking a link. This isn't a bad thing to have anyway, what with
+     * AJAX requests and all that.
+     *
+     * @see MinkContext->assertElementOnPage()
+     *
+     * @Then /^(?:|I )wait for "(?P<text>(?:[^"]|\\")*)"$/
+     * @Then /^(?:|I )wait (?P<duration>\d+)ms for "(?P<text>(?:[^"]|\\")*)"$/
+     */
+    public function waitForText($text, $duration = 5000) {
+
+        $this->spin(
+            function($context) use($text) {
+                /** @param FeatureContext $context */
+                $context->getMinkContext()->assertPageContainsText($text);
                 return true;
             },
             ($duration/1000)
