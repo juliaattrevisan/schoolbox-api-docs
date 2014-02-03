@@ -200,6 +200,32 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
+	 * Fin
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	private function findCampuses($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_event_campus',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'campus_id',
+					'key' => 'id',
+					'mapper' => new EventCampusMapper()
+				),
+			)
+		);
+	}
+
+	/**
 	 * Many-many relation table, where $relationTable is a pseudo-mapping
 	 * of column names
 	 *
@@ -228,9 +254,8 @@ class EventMapper extends Calendar\EventMapper {
 			$ids[] = $row[$join['relation']['column']];
 		}
 
-		$metadataMapper = new EventMetadataMapper();
-		$allMetadata = $metadataMapper->findByColumn($join['relation']['key'], $ids);
+		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids);
 
-		return $allMetadata;
+		return $allInstances;
 	}
 }
