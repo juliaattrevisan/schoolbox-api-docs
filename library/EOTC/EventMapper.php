@@ -38,41 +38,51 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
-	 * Many-many relation table
+	 * Find metadata for a particular event
 	 *
-	 *        $relationTable = 'eotc_event_metadata'
-	 *
-	 * Value is optional; one of the two columns must have it defined
-	 *
-	 *        $left = array('column' => 'event_id', 'value' = 1)
-	 *        $right = array('column => 'metadata_id', 'value' = 1)
-	 *
-	 * @param $relationTable
-	 * @param array $left
-	 * @param array $right
+	 * @param $identifier
 	 * @return \Schoolbox\Collection
 	 */
-	public function manyManyRelation($relationTable, $left = array(), $right = array()) {
+	private function findMetadata($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_event_metadata',
+				'left' => 'event_id',
+				'right' => 'metadata_id',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation
+				 */
+				'relation' => array(
+					'column' => 'metadata_id',
+					'key' => 'id'
+				),
+			)
+		);
+	}
+
+	/**
+	 * Many-many relation table, where $relationTable is a pseudo-mapping
+	 * of column names
+	 *
+	 * @param array $relationTableDefinition
+	 * @param array $join
+	 * @internal param array $selected
+	 * @return \Schoolbox\Collection
+	 */
+	public function manyManyRelation($relationTableDefinition = array(), $join = array()) {
 		$query = "
-			SELECT {$right['column']}
-			FROM `{$relationTable}`
+			SELECT {$join['relation']['column']}
+			FROM `{$relationTableDefinition['name']}`
+			WHERE {$join['column']} = :value
 		";
 
-		if (isset($left['value'])) {
-			$query .= "WHERE {$left['column']} = :value";
-
-			$selectedValue = $left['value'];
-			$column = $right['column'];
-		}
-		else if (isset($right['value'])) {
-			$query .= "WHERE {$right['column']} = :value";
-
-			$selectedValue = $right['value'];
-			$column = $left['column'];
-		}
-
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":value", $selectedValue);
+		$statement->bindParam(":value", $join['value']);
 		$statement->execute();
 
 		/* Find all the primary keys in the relation table and objectify
@@ -81,31 +91,13 @@ class EventMapper extends Calendar\EventMapper {
 		$ids = array();
 
 		foreach ($statement as $row) {
-			$ids[] = $row[$column];
+			$ids[] = $row[$join['relation']['column']];
+			new \Alaress_Probe($join['relation']);
 		}
 
 		$metadataMapper = new EventMetadataMapper();
-		$allMetadata = $metadataMapper->findByColumn('id', $ids);
+		$allMetadata = $metadataMapper->findByColumn($join['relation']['key'], $ids);
 
 		return $allMetadata;
 	}
-
-	/**
-	 * Find metadata for a particular event
-	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
-	 */
-	private function findMetadata($identifier) {
-		return $this->manyManyRelation(
-			'eotc_event_metadata',
-			array(
-				'column' => 'event_id',
-				'value' => $identifier
-			),
-			array(
-				'column' => 'metadata_id',
-			)
-		);
-	}
-} 
+}
