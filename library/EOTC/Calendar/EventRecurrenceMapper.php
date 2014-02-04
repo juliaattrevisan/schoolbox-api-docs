@@ -21,13 +21,6 @@ class EventRecurrenceMapper {
 	protected $eventMapper = null;
 
 	/**
-	 * An instance of calendarHandler
-	 *
-	 * @var null
-	 */
-	protected $calendarHandler = null;
-
-	/**
 	 * Constructor
 	 */
 	public function __construct($eventMapper) {
@@ -40,7 +33,6 @@ class EventRecurrenceMapper {
 	 * Hook method
 	 */
 	protected function setup() {
-		$this->setCalendarHandler(new \Calendar());
 	}
 
 	/**
@@ -183,23 +175,5 @@ class EventRecurrenceMapper {
 	 */
 	protected function getEventMapper() {
 		return $this->eventMapper;
-	}
-
-	/**
-	 * Set calendar handler
-	 *
-	 * @param null $calendarHandler
-	 */
-	protected function setCalendarHandler($calendarHandler) {
-		$this->calendarHandler = $calendarHandler;
-	}
-
-	/**
-	 * Get calendar handler
-	 *
-	 * @return null
-	 */
-	protected function getCalendarHandler() {
-		return $this->calendarHandler;
 	}
 }
