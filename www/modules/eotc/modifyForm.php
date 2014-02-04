@@ -42,6 +42,16 @@ switch($_POST['action']) {
 			$event = new \EOTC\Event();
 		}
 
+		/* Spawn and assign metadata record to event
+		 */
+		try {
+			$metadataMapper = new \EOTC\EventMetadataMapper();
+			$metadata = $metadataMapper->findByEvent($event)->first();
+		}
+		catch (\Exception $e) {
+			$metadata = new \EOTC\EventMetadata();
+		}
+
 		/* Events recur until this time
 		 */
 		if (strlen($_POST['repeat_until'])) {
@@ -61,16 +71,6 @@ switch($_POST['action']) {
 		 */
 		$userMapper = new \Schoolbox\UserMapper();
 		$author = $userMapper->findById($_POST['authorId']);
-
-		/* Spawn and assign metadata record to event
-		 */
-		try {
-			$metadataMapper = new \EOTC\EventMetadataMapper();
-			$metadata = $metadataMapper->findByEvent($event)->first();
-		}
-		catch (\Exception $e) {
-			$metadata = new \EOTC\EventMetadata();
-		}
 
 		$metadata->setEventType($_POST['type']);
 		$metadata->setRamsRequired($_POST['ramsRequired']);
