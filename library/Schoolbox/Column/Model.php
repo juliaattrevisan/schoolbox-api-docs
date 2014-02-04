@@ -82,7 +82,7 @@ class Model implements IColumnType {
 			return null;
 		}
 		if (is_scalar($value)) {
-			return $value;
+			return is_numeric($value) ? (int)$value : $value;
 		}
 		$id_property = $this->getIdentifierProperty();
 		$identifier_method  = isset($id_property) ?

@@ -1029,10 +1029,9 @@ class Mapper {
 		$existingObjects = array();
 		foreach($this->findByColumn($identifier['column'], $collectionIds) as $obj) {
 			// index by ID
-			$existingObjects[$this->getModelProperty($id_property, $obj)] = $obj;
+			$existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
 		}
 
-		$new_item_list = array();
 		$this->database->beginTransaction();
 		foreach ($collection as $model) {
 			$this->bindParamsForSave($model, $statement);
@@ -1041,7 +1040,6 @@ class Mapper {
 					if (!$this->getModelProperty($model, $id_property)) {
 						$new_id = $this->database->lastInsertId();
 						$this->setModelProperty($model, $id_property, $new_id);
-						$new_item_list[$new_id] = true;
 					}
 					$affectedIDs[] = $this->getModelProperty($model, $id_property);
 				}
@@ -1055,14 +1053,18 @@ class Mapper {
 
 		foreach ($collection as $model) {
 			if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
-				$this->triggerCallbacks('postSave', $model, array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null);
+				$previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
+				$this->triggerCallbacks('postSave', $model, $previous);
 
-				$msg = array_key_exists($id, $new_item_list) ? self::METHOD_CREATE : self::METHOD_UPDATE;
+				$msg = $previous ? self::METHOD_UPDATE : self::METHOD_CREATE;
 				$context = array(
 					'class' => get_class($model),
 					'id'    => $id,
 					'user'  => $_SESSION['id']
 				);
+				if($previous) {
+					$context['diff'] = $this->diff($model, $previous);
+				}
 
 				$this->notif->setTopic(Notif::TOPIC_APPLICATION)->notice($msg, $context);
 			}
@@ -1552,6 +1554,54 @@ class Mapper {
 			}
 		}
 		return true;
+	}
+
+
+	/**
+	 * Compares two objects mapped by this mapper and returns an array of the differences between.
+	 * Does not traverse hydrations - it explicitly dehydrates and compares ID values only.
+	 *
+	 * @param object $objectA
+	 * @param object $objectB
+	 * @throws Mapper\Exception
+	 * @return array
+	 */
+	public function diff($objectA, $objectB) {
+
+		$a = trim(get_class($objectA),'\\');
+		$b = trim(get_class($objectB),'\\');
+		$c = trim($this->getModel(),'\\');
+
+		if($a != $b) {
+			throw new Exception("Cannot diff objects of different classes: '$a' != '$b'.");
+		}
+		if($a != $c) {
+			throw new Exception("Cannot diff objects from another mapper: require '$c', got '$a'.");
+		}
+
+		$diff = array();
+
+		foreach($this->getMap() as $mapping) {
+			$property = $mapping['property'];
+
+			/** @var \Schoolbox\Column\IColumnType $hydrator */
+			$hydrator = $mapping['hydrator'];
+
+			$valueA = $this->getModelProperty($objectA, $property);
+			$valueB = $this->getModelProperty($objectB, $property);
+
+			// dehydrate the values
+			$dhA = $hydrator->dehydrate($valueA, $this);
+			$dhB = $hydrator->dehydrate($valueB, $this);
+
+			// can now do primitive comparison on the dehydrated values (should be in the same type)
+			if($dhA !== $dhB) {
+				$diff[$property] = array($dhA, $dhB);
+			}
+		}
+
+		return $diff;
+
 	}
 
 }
