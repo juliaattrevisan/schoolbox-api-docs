@@ -44,6 +44,46 @@ class EventRecurrenceMapper {
 	}
 
 	/**
+	 * Get the series recurrence settings
+	 *
+	 * @param $event
+	 * @return array
+	 */
+	public function getSeriesRecurrence($event) {
+		$series = $this->getEventMapper()->getAllInSeries($event);
+
+		$dateFirst = new \Alaress_Date_Format($series->first()->getStartDate(), 'y-m-d');
+		$dateNext = new \Alaress_Date_Format($series->next()->current()->getStartDate(), 'y-m-d');
+		$dateLast = new \Alaress_Date_Format($series->last()->getStartDate(), 'y-m-d');
+
+		$diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
+
+		$recurMap = array(
+			1 => 'daily',
+			7 => 'weekly',
+			14 => 'fortnightly',
+			28 => 'monthly',
+			29 => 'monthly',
+			30 => 'monthly',
+			31 => 'monthly',
+		);
+
+		if (isset($recurMap[$diff])) {
+			return array(
+				'freq' => $recurMap[$diff],
+				'start' => $dateFirst,
+				'end' => $dateLast
+			);
+		}
+
+		return array(
+			'freq' => 'periodically',
+			'start' => $dateFirst,
+			'end' => $dateLast
+		);
+	}
+
+	/**
 	 * Totally custom save method
 	 *
 	 * @param Event $event
