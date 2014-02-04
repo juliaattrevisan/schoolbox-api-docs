@@ -53,6 +53,7 @@ if (is_numeric($_GET['eventID'])) {
 
 	$page->setVar(array(
 		'EVENT_STATUS' => $event->getMetadata()->first()->getStatus()->getName(),
+		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->first()->getRamsRequired() ? 'checked="checked"' : '',
 		'EVENT_ID' => $event->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
@@ -119,6 +120,7 @@ else {
 
 	$page->setVar(array(
 		'EVENT_STATUS' => $status->getName(),
+		'EVENT_RAMSREQUIRED_SELECTED' => '',
 		'EVENT_ID' => '',
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => '',
