@@ -72,6 +72,8 @@ switch($_POST['action']) {
 		$userMapper = new \Schoolbox\UserMapper();
 		$author = $userMapper->findById($_POST['authorId']);
 
+		/* Spawned further up
+		 */
 		$metadata->setEventType($_POST['type']);
 		$metadata->setRamsRequired($_POST['ramsRequired']);
 		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
