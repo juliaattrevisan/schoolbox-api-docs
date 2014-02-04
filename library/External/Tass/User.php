@@ -323,7 +323,8 @@ class External_Tass_User implements External_UserInterface {
         // parents - unknown
         // par_code: most likely login
         // According to getEnrolledStudents(): parent codes are prefixed with 'P'
-        // Noter
+        // There seems to be no separate accounts for separate parents, maybe
+        // I'll have to create one.
         $query = "
             SELECT
                 'P' + p.par_code AS StudentContactID,
@@ -332,7 +333,7 @@ class External_Tass_User implements External_UserInterface {
                 '' AS StudentContactSurname,
                 '' AS StudentContactDefaultEmail,
 
-                '' AS StudentContactSpouseID,
+                'S' + p.par_code AS StudentContactSpouseID,
                 '' AS StudentContactSpouseTitle,
                 p.m_name AS StudentContactSpousePreferred,
                 '' AS StudentContactSpouseSurname,
@@ -344,10 +345,15 @@ class External_Tass_User implements External_UserInterface {
 
                 p.*
             FROM parent AS p
-            INNER JOIN student as s ON p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code
-            WHERE s.cmpy_code='01'
+            -- INNER JOIN pia_sfaccess AS sf
+            --    ON p.par_code = sf.par_code AND p.cmpy_code = sf.cmpy_code
+            INNER JOIN student as s
+                ON p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code
+            WHERE p.cmpy_code='01'
+            ORDER BY p.par_code ASC
         ";
-        $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        $list = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        return $list;
     }
 
 	private function setDatabase ($database) {

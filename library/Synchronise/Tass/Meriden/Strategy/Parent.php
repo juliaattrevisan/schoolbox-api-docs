@@ -11,23 +11,22 @@
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
 class Synchronise_Tass_Meriden_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
-	protected $title = "Update Schoolbox Parent Details Synchronisation";
+    protected $title = "Update Schoolbox Parent Details Synchronisation";
 
-	/**
-	 * Setup verbose output
-	 */
-	protected function setup() {
-		$this->verbose_filter = new Synchronise_Tass_Meriden_Verbose();
-	}
-
-	/**
-	 * St. Kevins parents have local email on.
-	 *
-	 * @param array $currentUser
-	 *
-	 * @return int
-	 */
-	public function getLocalEmailFromUser($currentUser) {
-		return 1;
-	}
+    /**
+     * Setup verbose output
+     */
+    protected function setup() {
+        $this->verbose_filter = new Synchronise_Tass_Meriden_Verbose();
+        $this
+            ->addHydrator(new Synchronise_Base_Hydrator_Default())
+            ->addHydrator(new Synchronise_Base_Hydrator_Parent())
+            ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Name_Parent())
+            ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Campus())
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
+            ->addSpouseHydrator(new Synchronise_Tass_Meriden_Hydrator_Name_Spouse())
+            ->addSpouseHydrator(new Synchronise_Tass_Meriden_Hydrator_Campus())
+        ;
+    }
 }
