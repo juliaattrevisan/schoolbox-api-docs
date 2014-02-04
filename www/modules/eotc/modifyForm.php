@@ -133,14 +133,17 @@ switch($_POST['action']) {
 
 				foreach($allEvents as $currentEvent) {
 					$eventMapper->delete($currentEvent);
+					$eventMapper->deleteCampusRelations($currentEvent);
 				}
 			}
 			else if ($_POST['efficacy'] == 'self') {
 				$eventMapper->delete($event);
+				$eventMapper->deleteCampusRelations($event);
 			}
 		}
 		else {
 			$eventMapper->delete($event);
+			$eventMapper->deleteCampusRelations($event);
 		}
 
 		$page->backToTheFuture(2);

@@ -175,19 +175,20 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $event
 	 */
 	protected function postSave($event) {
-		$this->deletePermissions($event);
+		$this->deleteCampusRelations($event);
 		$this->createCampus($event);
 	}
 
 	/**
-	 * Remove all role and campus associations to an event
-	 * Note that "eventGroup" means "eventRole"
+	 * Deletes metadata and campus relations if there are no remaining
+	 * events in the series
 	 *
 	 * @param $event
+	 * @return bool|void
 	 */
-	private function deletePermissions($event) {
+	public function deleteCampusRelations($event) {
 		$query = "
-			DELETE FROM eotc_event_campus
+			DELETE FROM `eotc_event_campus`
 			WHERE event_id = :eventId
 		";
 
@@ -196,17 +197,15 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->execute();
 	}
 
-
 	/**
 	 * Assign campuses to an event
 	 *
 	 * @param $event
 	 */
 	private function createCampus($event) {
-
 		foreach ($event->getCampusCollection() as $currentCampus) {
 			$query = "
-				INSERT INTO eotc_event_campus (event_id, campus_id)
+				INSERT INTO `eotc_event_campus` (event_id, campus_id)
 				VALUES (:eventId, :campusId)
 			";
 
