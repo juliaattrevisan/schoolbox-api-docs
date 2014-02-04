@@ -14,6 +14,13 @@ namespace EOTC;
 class EventStatusMapper extends \Schoolbox\Mapper {
 
 	/**
+	 * Default status id
+	 *
+ 	 * @var int
+	 */
+	private $defaultStatusId = 1;
+
+	/**
 	 * Mapping
 	 */
 	public function mapping() {
@@ -30,5 +37,35 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 			'property' => 'name',
 			'type' => self::TYPE_STRING,
 		));
+	}
+
+	/**
+	 * Find default status object
+	 *
+	 * @return object
+	 */
+	public function findDefaultStatus() {
+		return $this->findById($this->getDefaultStatusId());
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set default status id
+	 * 
+	 * @param int $defaultStatusId
+	 */
+	private function setDefaultStatusId($defaultStatusId) {
+		$this->defaultStatusId = $defaultStatusId;
+	}
+
+	/**
+	 * Get default status id
+	 *
+	 * @return int
+	 */
+	private function getDefaultStatusId() {
+		return $this->defaultStatusId;
 	}
 }
