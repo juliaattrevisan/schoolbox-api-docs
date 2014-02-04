@@ -52,7 +52,7 @@ if (is_numeric($_GET['eventID'])) {
 	));
 
 	$page->setVar(array(
-		'EVENT_STATUS' => 'galck',
+		'EVENT_STATUS' => $event->getMetadata()->first()->getStatus()->getName(),
 		'EVENT_ID' => $event->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
