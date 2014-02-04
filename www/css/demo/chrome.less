@@ -20,7 +20,7 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					173px;
+@logo-width: 					172px;
 @logo-height: 					35px;
 
 // Generic colors
@@ -37,7 +37,7 @@
 @link-hover: 					#FF5A00;
 
 // Main banner
-@banner-background: 			#013A63;
+@banner-background: 			@link;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 @banner-height:     			72px;
@@ -51,16 +51,16 @@
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
 @navigation-color:  			#000000;
-@navigation-links:  			#0066B0;
-@navigation-hover-background: 	@navigation-links;
+@navigation-links:  			@navigation-color;
+@navigation-hover-background: 	@link;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
 
 // Main "Tab" Navigation
-@tab-background:				#0066B0;
+@tab-background:				transparent;
 @tab-color:						#FFFFFF;
-@tab-hover-background:			@tab-color;
-@tab-hover-color:				@tab-background;
+@tab-hover-background:		    @tab-color;
+@tab-hover-color:				@link;
 
 // Footer text
 @footer-color:					#797979;

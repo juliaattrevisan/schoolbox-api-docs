@@ -35,7 +35,7 @@
 
 // Dimensions
 @search-width: 					256px;
-@logo-width: 					173px;
+@logo-width: 					172px;
 @logo-height: 					35px;
 @banner-height:     			72px;
 @navigation-width:				200px;
@@ -48,7 +48,7 @@
 @link-hover: 					#FF5A00;
 
 // Main banner
-@banner-background: 			#013A63;
+@banner-background: 			@link;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 
@@ -59,17 +59,17 @@
 // Refers to the left navigation
 @navigation-background:  		transparent;
 @navigation-color:  			#000000;
-@navigation-links:  			#0066B0;
-@navigation-hover-background: 	@navigation-links;
+@navigation-links:  			@navigation-color;
+@navigation-hover-background: 	@link;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
 @submit-btn:                    @banner-background;
 
 // Main "Tab" Navigation
-@tab-background:				#0066B0;
+@tab-background:				transparent;
 @tab-color:						#FFFFFF;
-@tab-hover-background:			@tab-color;
-@tab-hover-color:				@tab-background;
+@tab-hover-background:		    @tab-color;
+@tab-hover-color:				@link;
 
 // Footer text
 @footer-color:					#797979;
