@@ -91,18 +91,22 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Custom save method
 	 *
+	 * Only save relations if one doesn't already exist
+	 *
 	 * @param Event $event
 	 * @return array|void
 	 */
 	public function saveRelation(Event $event) {
-		$query = "
-			INSERT INTO `eotc_event_metadata` (event_id, metadata_id)
-			VALUES (:eventId, :metadataId)
-		";
+		if (!is_numeric($event->getMetadata()->getId())) {
+			$query = "
+				INSERT INTO `eotc_event_metadata` (event_id, metadata_id)
+				VALUES (:eventId, :metadataId)
+			";
 
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
-		$statement->execute();
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":metadataId", $event->getMetadata()->getId());
+			$statement->execute();
+		}
 	}
 } 

@@ -16,6 +16,8 @@ class Event extends Calendar\Event {
 	/**
 	 * Metadata for this event
 	 *
+	 * An instance of EventMetadata
+	 *
 	 * @var null
 	 */
 	protected $metadata = null;

@@ -78,7 +78,6 @@ switch($_POST['action']) {
 		$metadata->setRamsRequired($_POST['ramsRequired']);
 		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 		$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-		$metadataMapper->save($metadata);
 
 		/* Spawned further up
 		 */
