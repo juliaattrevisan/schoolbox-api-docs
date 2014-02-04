@@ -32,6 +32,11 @@ if (is_numeric($_POST['relationID'])) {
 
 				$category['name'] = TextFormatter::cutString($name, 32);
 
+				// Clear template totally if it's zero
+				if (!intval($category['template'])) {
+					$category['template'] = null;
+				}
+
 				$output[] = $category;
 			}
 		}
