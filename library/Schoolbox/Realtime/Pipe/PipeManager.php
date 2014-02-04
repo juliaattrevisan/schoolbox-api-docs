@@ -463,7 +463,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 					// this is a bounceback so the subscription is registered in the parent
 					if($data == 'subscribe') {
 						$subscriptionManager->subscribe($pipe->getUser(), new SelfResponder($pipeManager, $pipe));
-
+						break;
+					}
+					$data = json_decode($data, true);
+					// this is also a bounceback, because you can only ack from the subscription you started
+					if(isset($data['ack'])) {
+						if($subscription = $subscriptionManager->getUserSubscription($pipe->getUser(), true)) {
+							$markAsRead = $subscription->acceptMessages($data['ack']);
+							$pipeManager->sendToUser($pipe->getUser(), json_encode(array('ack' => $markAsRead)));
+						}
 					}
 					break;
 			}

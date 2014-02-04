@@ -198,12 +198,7 @@ class Responder extends EventEmitter {
 	 * @return bool
 	 */
 	public function ack($user, $messageIds) {
-		if($subscription = $this->subscriptionManager->getUserSubscription($user, true)) {
-			$markAsRead = $subscription->acceptMessages($messageIds);
-			$this->notifyUser(json_encode(array(
-				'ack' => $markAsRead
-			)));
-		}
+		$this->notifyServer(json_encode(array('ack' => $messageIds)));
 	}
 
 

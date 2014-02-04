@@ -82,10 +82,19 @@
 
                     var ul = dom.closest('ul').append(ml);
 
+                    // setup mark-as-read
+                    ml.delegate('a.pip', 'click', function(ev) {
+                        ev.stopPropagation();
+                        ev.stopImmediatePropagation();
+                        var msgId = $(this).closest('li.message').attr('id').split('-')[1];
+                        send({ack : msgId});
+                        return false;
+                    });
 
-                    dom.click(function(e) {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
+
+                    dom.click(function(ev) {
+                        ev.preventDefault();
+                        ev.stopImmediatePropagation();
                         $('#message-list').removeClass('hide');
 
                         updateRelativeTimes();
@@ -122,6 +131,8 @@
                 // template for message list items
                 var msgLiTpl = $('<li/>').addClass('message').append(
                     $('<a/>').addClass('action').attr('href', '#').append(
+                        $('<a/>').addClass('pip').attr('title', 'Mark as read')
+                    ).append(
                         $('<img/>').attr('width', '32').attr('height', '32')
                     ).append(
                         $('<p/>').addClass('descript')
@@ -223,11 +234,11 @@
                     data = JSON.parse(e.data)
 
                     // is there a better way to do this? there may be multiple commands within a single message
-                    if(data.subscribe)      { self.pipeSubscribe(data.subscribe); }
-                    if(data.fetch)          { self.pipeFetch(data.fetch); }
-                    if(data.push)           { self.pipePush(data.push); }
-                    if(data.mark_as_read)   { self.pipeMarkAsRead(data.mark_as_read); }
-                    if(data.error)          { self.pipeError(data); }
+                    if(data.subscribe) { self.pipeSubscribe(data.subscribe); }
+                    if(data.fetch)     { self.pipeFetch(data.fetch); }
+                    if(data.push)      { self.pipePush(data.push); }
+                    if(data.ack)       { self.pipeMarkAsRead(data.ack); }
+                    if(data.error)     { self.pipeError(data); }
                 }
                 catch(err) {
                     data = e.data;
