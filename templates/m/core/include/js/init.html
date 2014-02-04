@@ -77,7 +77,8 @@ function init() {
                         sStorage.setItem('session', data.session);
                         env.loggedIn = data.session;
                         e.preventDefault();
-                        init();
+                        // Go directly to the dashboard
+                        window.location = '/m/'
                     }
                     else {
                         // failure
