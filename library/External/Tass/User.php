@@ -169,8 +169,8 @@ class External_Tass_User implements External_UserInterface {
 		 * someone in the split-parent scenario.
 		 */
 
-        // id has to have a [P]arent prefix
-        if(!preg_match('#P[0-9]+#s', $tassID)) {
+        // id has to have a [P]arent prefix (or [S]pouse)
+        if(!preg_match('#(?:P|S)[0-9]+#s', $tassID)) {
             return array();
         }
 
@@ -327,13 +327,13 @@ class External_Tass_User implements External_UserInterface {
         // I'll have to create one.
         $query = "
             SELECT
-                'P' + p.par_code AS StudentContactID,
+                p.par_code AS StudentContactID,
                 '' AS StudentContactTitle,
                 p.f_name AS StudentContactPreferred,
                 '' AS StudentContactSurname,
                 '' AS StudentContactDefaultEmail,
 
-                'S' + p.par_code AS StudentContactSpouseID,
+                '' AS StudentContactSpouseID,
                 '' AS StudentContactSpouseTitle,
                 p.m_name AS StudentContactSpousePreferred,
                 '' AS StudentContactSpouseSurname,
