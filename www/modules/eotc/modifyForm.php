@@ -85,6 +85,17 @@ switch($_POST['action']) {
 		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
+		/* Save metadata record
+		 */
+		$metadata = new \EOTC\EventMetadata();
+		$metadata->setEventType($_POST['type']);
+		$metadata->setRamsRequired($_POST['ramsRequired']);
+		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+		$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+		$metadataMapper = new \EOTC\EventMetadataMapper();
+		$metadataMapper->save($event, $metadata);
+
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in
 		 * the space-time continuum

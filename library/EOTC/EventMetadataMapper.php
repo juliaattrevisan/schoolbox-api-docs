@@ -56,4 +56,27 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			'type'     => self::TYPE_DATETIME,
 		));
 	}
+
+	/**
+	 * Custom save method
+	 *
+	 * @param Event $event
+	 * @param EventMetadata $metadata
+	 * @return array|void
+	 */
+	public function save(Event $event, EventMetadata $metadata) {
+		parent::save($metadata);
+
+		/* Save relation
+		 */
+		$query = "
+			INSERT INTO `eotc_event_metadata` (event_id, metadata_id)
+			VALUES (:eventId, :metadataId)
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->execute();
+	}
 } 

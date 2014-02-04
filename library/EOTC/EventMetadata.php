@@ -32,7 +32,7 @@ class EventMetadata {
 	 *
 	 * @var int
 	 */
-	private $status = -1;
+	private $status = 1;
 
 	/**
 	 * Whether RAMS is selected for this event
