@@ -10,8 +10,6 @@
 
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
-$groupHandler = new Group();
-$calendarHandler = new Calendar();
 $page = new SitePage();
 
 $userMapper = new \Schoolbox\UserMapper();
@@ -64,6 +62,22 @@ switch($_POST['action']) {
 		$userMapper = new \Schoolbox\UserMapper();
 		$author = $userMapper->findById($_POST['authorId']);
 
+		/* Spawn and assign metadata record to event
+		 */
+		try {
+			$metadataMapper = new \EOTC\EventMetadataMapper();
+			$metadata = $metadataMapper->findByEvent($event)->first();
+		}
+		catch (\Exception $e) {
+			$metadata = new \EOTC\EventMetadata();
+		}
+
+		$metadata->setEventType($_POST['type']);
+		$metadata->setRamsRequired($_POST['ramsRequired']);
+		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+		$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+		$metadataMapper->save($metadata);
+
 		/* Spawned further up
 		 */
 		$event->setAuthor($author);
@@ -80,21 +94,14 @@ switch($_POST['action']) {
 		 */
 		$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
 
+		/* Store metadata
+		 */
+		$event->setMetadata($metadata);
+
 		/* Save this event and any recurring incidents too
 		 */
-		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($eventMapper);
+		$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
-
-		/* Save metadata record
-		 */
-		$metadata = new \EOTC\EventMetadata();
-		$metadata->setEventType($_POST['type']);
-		$metadata->setRamsRequired($_POST['ramsRequired']);
-		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-		$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-
-		$metadataMapper = new \EOTC\EventMetadataMapper();
-		$metadataMapper->save($event, $metadata);
 
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in
@@ -108,7 +115,7 @@ switch($_POST['action']) {
 		break;
 
 	case 'Delete':
-		$eventMapper = new \EOTC\Calendar\EventMapper();
+		$eventMapper = new \EOTC\EventMapper();
 
 		try {
 			$event = $eventMapper->findById($_POST['id']);

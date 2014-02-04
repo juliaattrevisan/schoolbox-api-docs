@@ -58,17 +58,43 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	}
 
 	/**
+	 * Find out if a relation exists before inserting a new one
+	 *
+	 * @param Event $event
+	 * @throws \Exception
+	 * @return \Schoolbox\Collection
+	 */
+	public function findByEvent(Event $event) {
+		$query = "
+			SELECT metadata_id
+			FROM `eotc_event_metadata`
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+
+		$allMetadataIds = array();
+
+		foreach($statement as $row) {
+			$allMetadataIds[] = $row['metadata_id'];
+		}
+
+		if (count($allMetadataIds)) {
+			return $this->findByColumn('id', $allMetadataIds);
+		}
+
+		throw new \Exception('No metadata for this event exists.');
+	}
+
+	/**
 	 * Custom save method
 	 *
 	 * @param Event $event
-	 * @param EventMetadata $metadata
 	 * @return array|void
 	 */
-	public function save(Event $event, EventMetadata $metadata) {
-		parent::save($metadata);
-
-		/* Save relation
-		 */
+	public function saveRelation(Event $event) {
 		$query = "
 			INSERT INTO `eotc_event_metadata` (event_id, metadata_id)
 			VALUES (:eventId, :metadataId)
@@ -76,7 +102,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(":eventId", $event->getId());
-		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 		$statement->execute();
 	}
 } 

@@ -107,6 +107,7 @@ class EventRecurrenceMapper {
 					$event->setId($seriesEvent->getId());
 
 					$this->getEventMapper()->save($event);
+					$this->saveHook($event);
 				}
 			}
 			/* Modify an existing event and add recurring incidents
@@ -121,6 +122,7 @@ class EventRecurrenceMapper {
 				$event->setEndDate($first_date_set['end']);
 
 				$this->getEventMapper()->save($event);
+				$this->saveHook($event);
 
 				/* Skip the first element, spawn new event records
 				 */
@@ -135,6 +137,7 @@ class EventRecurrenceMapper {
 					$event->setEndDate($currentDate['end']);
 
 					$this->getEventMapper()->save($event);
+					$this->saveHook($event);
 				}
 			}
 		}
@@ -152,8 +155,17 @@ class EventRecurrenceMapper {
 				$event->setEndDate($currentDate['end']);
 
 				$this->getEventMapper()->save($event);
+				$this->saveHook($event);
 			}
 		}
+	}
+
+	/**
+	 * Post-event save hook, for augmentation by subclasses
+	 *
+	 * @param Event $event
+	 */
+	protected function saveHook(Event $event) {
 	}
 
 	/* Getters/Setters
