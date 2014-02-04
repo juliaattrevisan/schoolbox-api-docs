@@ -20,8 +20,7 @@ class EventRecurrenceMapper extends Calendar\EventRecurrenceMapper {
 	 */
 	protected function saveHook(Event $event) {
 		$eventMetadataMapper = new EventMetadataMapper();
-		$eventMetadataMapper->saveRelation($event);
-
 		$eventMetadataMapper->save($event->getMetadata());
+		$eventMetadataMapper->saveRelation($event);
 	}
 }
