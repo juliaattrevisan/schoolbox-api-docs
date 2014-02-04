@@ -182,11 +182,27 @@ class Collection implements \ICollection {
 		return null;
 	}
 
+	/**
+	 * Get the last item in the collection
+	 *
+	 * @throws \Exception
+	 * @return mixed
+	 */
+	public function last() {
+		if ($this->count()) {
+			return $this->stack[count($this->stack)-1];
+		}
+
+		return null;
+	}
+
     /**
      * Next
      */
     public function next() {
         ++$this->position;
+
+		return $this;
     }
 
     /**
