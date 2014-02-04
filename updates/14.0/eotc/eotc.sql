@@ -6,6 +6,10 @@ CREATE TABLE `eotc_metadata`( `id` INT(11) NOT NULL AUTO_INCREMENT, `event_type_
 CREATE TABLE `eotc_event_metadata`( `event_id` INT(11), `metadata_id` INT(11) );
 ALTER TABLE `eotc_metadata` CHANGE `rams_required` `rams_required` TINYINT(1) NULL;
 
+/* Unique index, so I can use insert ignore to prevent dupes
+ */
+ALTER TABLE `eotc_event_metadata` ADD UNIQUE INDEX `event_metadata` (`event_id`, `metadata_id`);
+
 /* Event statuses
  */
 CREATE TABLE `eotc_status`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), PRIMARY KEY (`id`) );
