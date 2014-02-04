@@ -87,11 +87,8 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('recurring_dates_block', 'recurring_dates');
 	}
 	else {
-
-		/* TODO: Convert to Mapper
-		 */
-		$calendarHandler = new Calendar();
-		$recurrence = $calendarHandler->getSeriesRecurrence($event->getSeriesId());
+		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($mapper);
+		$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
 
 		$page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
 		$page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
