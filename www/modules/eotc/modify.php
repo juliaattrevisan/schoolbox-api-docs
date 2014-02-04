@@ -52,6 +52,7 @@ if (is_numeric($_GET['eventID'])) {
 	));
 
 	$page->setVar(array(
+		'EVENT_STATUS' => 'galck',
 		'EVENT_ID' => $event->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
@@ -113,7 +114,11 @@ else {
 		'ADVANCED_CLOSE' => 'hidden',
 	));
 
+	$statusMapper = new \EOTC\EventStatusMapper();
+	$status = $statusMapper->findDefaultStatus();
+
 	$page->setVar(array(
+		'EVENT_STATUS' => $status->getName(),
 		'EVENT_ID' => '',
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => '',
