@@ -109,10 +109,10 @@ class EventRecurrenceMapper {
 			 * (Change details of each instance of a recurring event, for example)
 			 */
 			if ($efficacy == 'series') {
-				$series = $this->getCalendarHandler()->getAllInSeriesByEventID($event->getId());
+				$series = $this->getEventMapper()->getAllInSeries($event);
 
 				foreach($series as $seriesEvent) {
-					$event->setId($seriesEvent['id']);
+					$event->setId($seriesEvent->getId());
 
 					$this->getEventMapper()->save($event);
 				}
