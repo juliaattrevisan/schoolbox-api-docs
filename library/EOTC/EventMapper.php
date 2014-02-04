@@ -170,11 +170,51 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
-	 * Postsave hook (do nothing);
+	 * Postsave hook
 	 *
 	 * @param $event
 	 */
 	protected function postSave($event) {
+		$this->deletePermissions($event);
+		$this->createCampus($event);
+	}
+
+	/**
+	 * Remove all role and campus associations to an event
+	 * Note that "eventGroup" means "eventRole"
+	 *
+	 * @param $event
+	 */
+	private function deletePermissions($event) {
+		$query = "
+			DELETE FROM eotc_event_campus
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+	}
+
+
+	/**
+	 * Assign campuses to an event
+	 *
+	 * @param $event
+	 */
+	private function createCampus($event) {
+
+		foreach ($event->getCampusCollection() as $currentCampus) {
+			$query = "
+				INSERT INTO eotc_event_campus (event_id, campus_id)
+				VALUES (:eventId, :campusId)
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":campusId", $currentCampus);
+			$statement->execute();
+		}
 	}
 
 	/**
