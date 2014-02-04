@@ -22,10 +22,12 @@ class Synchronise_Tass_Meriden_Strategy_Parent extends Synchronise_Base_Strategy
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Name_Parent())
+            ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Username_Parent())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Campus())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
             ->addSpouseHydrator(new Synchronise_Tass_Meriden_Hydrator_Name_Spouse())
+            ->addSpouseHydrator(new Synchronise_Tass_Meriden_Hydrator_Username_Spouse())
             ->addSpouseHydrator(new Synchronise_Tass_Meriden_Hydrator_Campus())
         ;
     }
