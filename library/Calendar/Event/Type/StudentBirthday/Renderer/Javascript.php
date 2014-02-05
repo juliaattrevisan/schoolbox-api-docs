@@ -124,7 +124,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 	 *
 	 * @return bool
 	 */
-	private function isVisible($currentEvent) {
+	protected function isVisible($currentEvent) {
 		$isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
 		$isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
 

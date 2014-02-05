@@ -135,7 +135,7 @@ class Calendar_Event_Type_Day_Renderer_Default extends Calendar_Event_Type_Rende
      * @param $currentEvent
      * @return bool
      */
-    private function isVisible($currentEvent) {
+    protected function isVisible($currentEvent) {
 
         $isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
         $isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
