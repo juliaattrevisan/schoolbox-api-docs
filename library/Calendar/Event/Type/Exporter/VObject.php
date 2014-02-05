@@ -57,58 +57,10 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
                 $end_time->setTimezone($utc_timezone);
                 $e->add('DTSTART', $start_time);
                 $e->add('DTEND',   $end_time);
-//                $properties['DTSTART'] = $start_time;
-//                $properties['DTEND']   = $end_time;
-//                $e->setProperty(
-//                    'dtstart',
-//                    $start_time->format('Y'),
-//                    $start_time->format('m'),
-//                    $start_time->format('d'),
-//                    $start_time->format('H'),
-//                    $start_time->format('i'),
-//                    $start_time->format('s'),
-//                    'Z'
-//                );
-//                $e->setProperty(
-//                    'dtend',
-//                    $end_time->format('Y'),
-//                    $end_time->format('m'),
-//                    $end_time->format('d'),
-//                    $end_time->format('H'),
-//                    $end_time->format('i'),
-//                    $end_time->format('s'),
-//                    'Z'
-//                );
             }
             else {
-//                $e->setProperty(
-//                    'dtstart',
-//                    $start_time->format('Y'),
-//                    $start_time->format('m'),
-//                    $start_time->format('d'),
-//                    false,
-//                    false,
-//                    false,
-//                    false,
-//                    array('VALUE' => 'DATE')
-//                );
                 $e->add('DTSTART', array('DATE' => $start_time->format('Ymd')));
-                //
-                // Schoolbox stores all day end time as the same day.
-                // VCAL expects it as start of next, so add a day to SB value.
                 $end_time->add(new DateInterval('P1D'));
-//                $e->setProperty(
-//                    'dtend',
-//                    $end_time->format('Y'),
-//                    $end_time->format('m'),
-//                    $end_time->format('d'),
-//                    false,
-//                    false,
-//                    false,
-//                    false,
-//                    array('VALUE' => 'DATE')
-//                );
-//                $properties['DTEND']   = $end_time;
                 $e->add('DTEND', array('DATE' => $end_time->format('Ymd')));
             }
 
