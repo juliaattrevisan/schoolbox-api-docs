@@ -15,6 +15,8 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\GroupMapper;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -35,14 +37,22 @@ class UserQueueFactory {
 	/** @var CategoryMapper */
 	protected $categoryMapper;
 
+	/** @var RoleMapper */
+	protected $roleMapper;
+
 	/** @var \Group */
 	protected $_DEPRECATED_GROUP;
+
+	/** @var \External_User */
+	protected $_DEPRECATED_EXT_USER;
 
 	public function __construct($mqConnector = null) {
 		$this->mqConnector = $mqConnector ?: new MQConnector();
 		$this->userMapper = UserMapper::getInstance();
 		$this->categoryMapper = CategoryMapper::getInstance();
+		$this->roleMapper = RoleMapper::getInstance();
 		$this->_DEPRECATED_GROUP = new \Group();
+		$this->_DEPRECATED_EXT_USER = new \External_User();
 	}
 
 	public function setMessageQueueConnector($mqConnector) {
@@ -87,6 +97,8 @@ class UserQueueFactory {
 			),
 		);
 
+		$roleType = $user->getRole()->getType();
+
 		// superuser bindings
 		if($user->isSuperuser()) {
 			// *.notify.superuser.#
@@ -96,22 +108,31 @@ class UserQueueFactory {
 		// campus bindings
 		foreach($user->getCampusCollection() as $campus) {
 			// *.notify.campus.{id}
-
+			// *.notify.campus.{id}.{roletype}
 			/** @var Campus $campus */
 			$bindings['campus'][] = $campus->getId();
+			$bindings['campus'][] = $campus->getId() . ".$roleType";
 		}
 
 		// house bindings
 		if($house = $user->getSchoolHouse()) {
 			// *.notify.house.{id}
-			$bindings['house'] = array($house);
+			// *.notify.house.{id}.{roletype}
+			$bindings['house'] = array(
+				$house,
+				$house . ".$roleType"
+			);
 		}
 
 
 		// residential house bindings
 		if($resHouse = $user->getResidentialHouse()) {
 			// *.notify.reshouse.{id}
-			$bindings['reshouse'] = array($resHouse);
+			// *.notify.reshouse.{id}.{roletype}
+			$bindings['reshouse'] = array(
+				$resHouse,
+				$resHouse . ".$roleType"
+			);
 		}
 
 
@@ -125,7 +146,9 @@ class UserQueueFactory {
 			/** @var Category $cat */
 			// category general participation
 			// *.notify.category.{id}
+			// *.notify.category.{id}.{roletype}
 			$bindings['category'][] = $cat->getId();
+			$bindings['category'][] = $cat->getId() . ".$roleType";
 
 			// category admin
 			// *.notify.category.{id}.admin
@@ -141,13 +164,29 @@ class UserQueueFactory {
 
 		}
 
+		// parental bindings TODO can this be more lightweight
+		if($roleType == Role::PARENT) {
+			$childrenArray = $this->_DEPRECATED_EXT_USER->getEnrolledStudents($user->getExternalId());
+			if(is_array($childrenArray)) {
+				$childIds = array();
+				foreach($childrenArray as $childArray) {
+					$childIds[] = $childArray['RelatedID'];
+				}
+				$childCollection = $this->userMapper->findByColumnList(array(
+					'synergy_id' => $childIds,
+					'group_id' => $this->roleMapper->findByColumn('group_type', Role::STUDENT)->getColumnValues('id')
+				));
+				$bindings['parent'] = $childCollection->getColumnValues('id');
+			}
+		}
+
 		// role bindings
 		// *.notify.role.{id}
 		$bindings['role'] = array($user->getRole()->getId());
 
 		// role-type bindings
 		// *.notify.roletype.{name}
-		$bindings['roletype'] = array($user->getRole()->getType());
+		$bindings['roletype'] = array($roleType);
 
 		return $bindings;
 	}

@@ -38,7 +38,23 @@ class TopicFactory {
 	 * @return string
 	 */
 	public function targetCategoryAdmin($categoryId) {
-		return "notify.category.$categoryId.admin";
+		return $this->targetCategory($categoryId) .".admin";
+	}
+
+	/**
+	 * @param $categoryId
+	 * @return string
+	 */
+	public function targetCategoryStaff($categoryId) {
+		return $this->targetCategory($categoryId) .".staff";
+	}
+
+	/**
+	 * @param $categoryId
+	 * @return string
+	 */
+	public function targetCategoryStudents($categoryId) {
+		return $this->targetCategory($categoryId) .".student";
 	}
 
 	/**
@@ -47,6 +63,30 @@ class TopicFactory {
 	 */
 	public function targetCampus($campusId) {
 		return "notify.campus.$campusId";
+	}
+
+	/**
+	 * @param $campusId
+	 * @return string
+	 */
+	public function targetCampusStaff($campusId) {
+		return $this->targetCampus($campusId) . ".staff";
+	}
+
+	/**
+	 * @param $campusId
+	 * @return string
+	 */
+	public function targetCampusStudents($campusId) {
+		return $this->targetCampus($campusId) . ".student";
+	}
+
+	/**
+	 * @param $campusId
+	 * @return string
+	 */
+	public function targetCampusParents($campusId) {
+		return $this->targetCampus($campusId) . ".parent";
 	}
 
 	/**
@@ -82,6 +122,22 @@ class TopicFactory {
 	}
 
 	/**
+	 * @param $houseId
+	 * @return string
+	 */
+	public function targetSchoolHouseStaff($houseId) {
+		return $this->targetSchoolHouse($houseId) . ".staff";
+	}
+
+	/**
+	 * @param $houseId
+	 * @return string
+	 */
+	public function targetSchoolHouseStudents($houseId) {
+		return $this->targetSchoolHouse($houseId) . ".student";
+	}
+
+	/**
 	 * @param $resId
 	 * @return string
 	 */
@@ -89,5 +145,28 @@ class TopicFactory {
 		return "notify.reshouse.$resId";
 	}
 
+	/**
+	 * @param $resId
+	 * @return string
+	 */
+	public function targetResidentialHouseStaff($resId) {
+		return $this->targetResidentialHouse($resId) . ".staff";
+	}
+
+	/**
+	 * @param $resId
+	 * @return string
+	 */
+	public function targetResidentialHouseStudents($resId) {
+		return $this->targetResidentialHouse($resId) . ".student";
+	}
+
+	/**
+	 * @param $userId
+	 * @return string
+	 */
+	public function targetParentsOfStudent($userId) {
+		return "notify.parent.$userId";
+	}
 
 } 
