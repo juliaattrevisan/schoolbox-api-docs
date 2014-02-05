@@ -330,7 +330,7 @@ class External_Tass_User implements External_UserInterface {
                 p.par_code AS StudentContactID,
                 '' AS StudentContactTitle,
                 p.f_name AS StudentContactPreferred,
-                '' AS StudentContactSurname,
+                p.surname AS StudentContactSurname,
                 '' AS StudentContactDefaultEmail,
 
                 '' AS StudentContactSpouseID,
