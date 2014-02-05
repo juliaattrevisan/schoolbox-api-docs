@@ -7,23 +7,22 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+
+use Sabre\VObject\Component\VCalendar;
+
 class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Renderer {
 
 	/**
 	 * Set up the V
 	 *
-	 * @return \vcalendar
+	 * @return VCalendar
 	 */
 	private function setupVcal() {
-		$v = new vcalendar();
-		$v->setConfig('unique_id', Cfg::get('mail_address'));
-		$v->setProperty('calscale', 'GREGORIAN');
-		$v->setProperty('method', 'PUBLISH');
-
-		$v->setProperty('X-WR-CALNAME', 'Calendar export');
-		$v->setProperty('X-WR-CALDESC', 'The portal school calendar');
-
-		return $v;
+		$calendar = new VCalendar();
+		$calendar->add('method', 'PUBLISH');
+		$calendar->add('X-WR-CALNAME', 'Calendar export');
+		$calendar->add('X-WR-CALDESC', 'The portal school calendar');
+		return $calendar;
 	}
 
 	/**
@@ -43,25 +42,25 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 	public function renderAll() {
 		$v = $this->setupVcal();
 
+		/** @var Calendar_Event_Type_Abstract[] $collection */
 		$collection = $this->getAllEvents();
+		$renderer   = new Calendar_Event_Type_Exporter_VObject(null);
+		$renderer->setVCalendar($v);
 
 		foreach ($collection as $currentEvent) {
-			$currentEvent->setRendererClass('Calendar_Event_Type_Exporter');
-
-			//
-			// Only add valid components, because exporter's visitor can return null.
-			$classname = $currentEvent->getRendererClass();
-			$component = $currentEvent->accept(new $classname(null));
-			if ($component instanceof calendarComponent) {
-				$v->addComponent($component);
-			}
+			$currentEvent->accept($renderer);
+//			$component = $currentEvent->accept($renderer);
+//			if ($component instanceof calendarComponent) {
+//				$v->addComponent($component);
+//			}
 		}
 
 		//
 		// Add timezone AFTER adding all events. Hooray, IcalCreator is smart
 		// enough to add them for me!
-		iCalUtilityFunctions::createTimezone($v, Cfg::get('date_timezone'));
-		$str = $v->createCalendar();
-		echo $str;
+//		iCalUtilityFunctions::createTimezone($v, Cfg::get('date_timezone'));
+//		$str = $v->output();
+//		echo $str;
+		echo $v->serialize();
 	}
 }
