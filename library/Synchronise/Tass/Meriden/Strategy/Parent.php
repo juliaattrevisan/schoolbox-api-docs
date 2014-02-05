@@ -24,8 +24,9 @@ class Synchronise_Tass_Meriden_Strategy_Parent extends Synchronise_Base_Strategy
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Name_Parent())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Username_Parent())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Campus())
+            ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
-            // No separate spouse hydrator
+            // No separate spouse hydrator, so just add a clear one.
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }
