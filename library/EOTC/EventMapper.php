@@ -178,7 +178,7 @@ class EventMapper extends Calendar\EventMapper {
 		$this->deleteCampusRelations($event);
 		$this->createCampus($event);
 
-//		$this->deleteStaffAttendeesRelations($event);
+		$this->deleteStaffAttendeesRelations($event);
 		$this->createStaffAttendees($event);
 	}
 
@@ -308,6 +308,24 @@ class EventMapper extends Calendar\EventMapper {
 			$statement->bindParam(":userId", $currentStaff->getId());
 			$statement->execute();
 		}
+	}
+
+	/**
+	 * Deletes staff attendee relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $event
+	 * @return bool|void
+	 */
+	public function deleteStaffAttendeesRelations($event) {
+		$query = "
+			DELETE FROM `eotc_event_staff`
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
 	}
 
 	/**
