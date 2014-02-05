@@ -31,12 +31,9 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
         /* Show visible events only, in export
          */
         if ($this->isVisible($currentEvent)) {
-
-            $properties = array();
-            // Generate a UID based on $currentEvent->getEventId()
-            $properties['CATEGORIES'] = array('SCHOOL');
-
             $e = array();
+            // Generate a UID based on $currentEvent->getEventId()
+            $e['UID']        = $currentEvent->getEventId().'/'.$currentEvent->getConnectorId();
             $e['DTSTAMP']    = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
             $e['CATEGORIES'] = array('SCHOOL');
 
@@ -59,8 +56,7 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
             }
 
             $e['SUMMARY'] = $currentEvent->getNote();
-            $this->getVCalendar()->add('VEVENT', $e);
-            return null;
+            return $this->getVCalendar()->add('VEVENT', $e);
         }
     }
 
