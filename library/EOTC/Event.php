@@ -66,4 +66,22 @@ class Event extends Calendar\Event {
 	public function getMetadata() {
 		return $this->metadata;
 	}
+
+	/**
+	 * Set staff attendees
+	 *
+	 * @param null $staffAttendees
+	 */
+	public function setStaffAttendees($staffAttendees) {
+		$this->staffAttendees = $staffAttendees;
+	}
+
+	/**
+	 * Get staff attendees
+	 *
+	 * @return null
+	 */
+	public function getStaffAttendees() {
+		return $this->staffAttendees;
+	}
 }

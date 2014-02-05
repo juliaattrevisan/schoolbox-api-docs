@@ -79,6 +79,14 @@ switch($_POST['action']) {
 		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 		$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
+		/* All the staff that were selected
+		 */
+		$staffCollection = new \Schoolbox\Collection();
+
+		if (is_array($_POST['staff']) && count($_POST['staff'])) {
+			$staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
+		}
+
 		/* Spawned further up
 		 */
 		$event->setAuthor($author);
@@ -94,6 +102,7 @@ switch($_POST['action']) {
 		/* Collections of ids
 		 */
 		$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
+		$event->setStaffAttendees($staffCollection);
 
 		/* Store metadata
 		 */
