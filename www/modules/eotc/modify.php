@@ -41,6 +41,17 @@ if (is_numeric($_GET['eventID'])) {
 		$defaultCampusId[] = $currentCampus->getId();
 	}
 
+	/* Default magicsuggest values
+	 */
+	$staffSelected = array();
+
+	foreach ($event->getStaffAttendees() as $currentStaff) {
+		$staffSelected[] = array(
+			'id' => $currentStaff->getId(),
+			'name' => $currentStaff->getFullname()
+		);
+	}
+
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
 	 */
@@ -52,6 +63,7 @@ if (is_numeric($_GET['eventID'])) {
 	));
 
 	$page->setVar(array(
+		'EVENT_STAFF' => json_encode($staffSelected),
 		'EVENT_STATUS' => $event->getMetadata()->first()->getStatus()->getName(),
 		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->first()->getRamsRequired() ? 'checked="checked"' : '',
 		'EVENT_ID' => $event->getId(),
