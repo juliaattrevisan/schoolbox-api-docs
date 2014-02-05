@@ -7,6 +7,11 @@ $j(function () {
         .on('ready.jstree', function(event, jstree) {
             jstree.instance.open_node(jstree.instance.get_node('node_0'));
         })
+        .on('click', 'a[href]', function() {
+            // Listen on click, instead of select_node, because select_node
+            // fires on initial page load.
+            window.location.href = this.href;
+        })
         .jstree({
             "animation": 50,
             "core" : {
