@@ -148,6 +148,10 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setCampusCollection($this->findCampuses($identifier));
 
+			/* Accumulate staff attendees for this event
+			 */
+			$eventItem->setStaffAttendees($this->findStaffAttendees($identifier));
+
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()->count()) {
@@ -310,6 +314,32 @@ class EventMapper extends Calendar\EventMapper {
 			$statement->bindParam(":userId", $currentStaff->getId());
 			$statement->execute();
 		}
+	}
+
+	/**
+	 * Find metadata for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	private function findStaffAttendees($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_event_staff',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'user_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\UserMapper()
+				),
+			));
 	}
 
 	/**
