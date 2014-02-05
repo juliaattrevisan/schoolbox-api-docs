@@ -122,7 +122,6 @@ class EventRecurrenceMapper {
 				$event->setEndDate($first_date_set['end']);
 
 				$this->getEventMapper()->save($event);
-				$this->saveHook($event);
 
 				/* Skip the first element, spawn new event records
 				 */
@@ -137,7 +136,6 @@ class EventRecurrenceMapper {
 					$event->setEndDate($currentDate['end']);
 
 					$this->getEventMapper()->save($event);
-					$this->saveHook($event);
 				}
 			}
 		}
@@ -155,7 +153,6 @@ class EventRecurrenceMapper {
 				$event->setEndDate($currentDate['end']);
 
 				$this->getEventMapper()->save($event);
-				$this->saveHook($event);
 			}
 		}
 	}

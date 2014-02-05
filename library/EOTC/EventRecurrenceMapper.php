@@ -13,14 +13,4 @@ namespace EOTC;
 
 class EventRecurrenceMapper extends Calendar\EventRecurrenceMapper {
 
-	/**
-	 * After saving an event, do this
-	 *
-	 * @param Event $event
-	 */
-	protected function saveHook(Event $event) {
-		$eventMetadataMapper = new EventMetadataMapper();
-		$eventMetadataMapper->save($event->getMetadata());
-		$eventMetadataMapper->saveRelation($event);
-	}
 }

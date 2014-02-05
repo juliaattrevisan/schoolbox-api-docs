@@ -175,6 +175,10 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $event
 	 */
 	protected function postSave($event) {
+		$eventMetadataMapper = new EventMetadataMapper();
+		$eventMetadataMapper->save($event->getMetadata());
+		$eventMetadataMapper->saveRelation($event);
+
 		$this->deleteCampusRelations($event);
 		$this->createCampus($event);
 
