@@ -19,11 +19,26 @@ catch (\Exception $e) {
 
 $this->setFile(TEMPLATE_content, 'modules/eotc/attendance/list.html');
 $this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
+$this->setBlock(TEMPLATE_content, 'filetype', 'filetype_block');
 
 $this->setVar(array(
 	'EVENT_ID' => $event->getId(),
 	'EVENT_NAME' => $event->getNote(),
 ));
+
+$externalHandler = new \External_Synergetic_Class();
+$allFiletypes = $externalHandler->findFiletypes();
+
+if (is_array($allFiletypes) && count($allFiletypes)) {
+	foreach($allFiletypes as $currentFiletype) {
+		$this->setVar(array(
+			'FILETYPE_ID' => $currentFiletype['Code'],
+			'FILETYPE_NAME' => $currentFiletype['Description']
+		));
+
+		$this->parse('filetype_block', 'filetype', true);
+	}
+}
 
 if ($event->getStudentAttendees()->count()) {
 	$roleMapper = new \Schoolbox\RoleMapper();

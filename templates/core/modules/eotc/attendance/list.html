@@ -34,6 +34,30 @@
 
 <div class="clearfix"></div>
 
+<form action="/modules/eotc/attendance/add" method="post">
+	<input type="hidden" name="eventId" value="{EVENT_ID}" />
+
+	<fieldset>
+		<label>"Category"
+			<select name="filetype">
+				<!-- BEGIN filetype -->
+				<option value="{FILETYPE_ID}">{FILETYPE_NAME}</option>
+				<!-- END filetype -->
+			</select>
+		</label>
+	</fieldset>
+	<fieldset>
+		<label>Class Code
+			<select name="courseCode" disabled>
+				<option value="">Select a filetype</option>
+			</select>
+		</label>
+	</fieldset>
+	<input type="submit" class='submit-btn-plain' value="Add" />
+</form>
+
+<div class="clearfix"></div>
+
 <form action="/modules/eotc/attendance/remove" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 	<table class="table">
