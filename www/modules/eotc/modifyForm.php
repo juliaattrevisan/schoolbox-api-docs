@@ -117,6 +117,7 @@ switch($_POST['action']) {
 
 	case 'Delete':
 		$eventMapper = new \EOTC\EventMapper();
+		$metadataMapper = new \EOTC\EventMetadataMapper();
 
 		try {
 			$event = $eventMapper->findById($_POST['id']);
@@ -131,19 +132,33 @@ switch($_POST['action']) {
 			if ($_POST['efficacy'] == 'series') {
 				$allEvents = $eventMapper->getAllInSeries($event);
 
+				/* Delete the metadata relations, then delete the
+				 * metadata record itself
+				 */
+				$metadataMapper->delete($event->getMetadata());
+
 				foreach($allEvents as $currentEvent) {
-					$eventMapper->delete($currentEvent);
 					$eventMapper->deleteCampusRelations($currentEvent);
+					$eventMapper->deleteMetadataRelations($currentEvent);
+					$eventMapper->delete($currentEvent);
 				}
 			}
+			/* Delete a metadata relation for an event that is part
+			 * of a series
+			 */
 			else if ($_POST['efficacy'] == 'self') {
-				$eventMapper->delete($event);
 				$eventMapper->deleteCampusRelations($event);
+				$eventMapper->deleteMetadataRelations($event);
+				$eventMapper->delete($event);
 			}
 		}
+		/* Just a single event all on its lonesome
+		 */
 		else {
 			$eventMapper->delete($event);
 			$eventMapper->deleteCampusRelations($event);
+			$eventMapper->deleteMetadataRelations($event);
+			$metadataMapper->delete($event->getMetadata());
 		}
 
 		$page->backToTheFuture(2);

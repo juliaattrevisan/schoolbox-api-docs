@@ -180,7 +180,7 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
-	 * Deletes metadata and campus relations if there are no remaining
+	 * Deletes campus relations if there are no remaining
 	 * events in the series
 	 *
 	 * @param $event
@@ -189,6 +189,24 @@ class EventMapper extends Calendar\EventMapper {
 	public function deleteCampusRelations($event) {
 		$query = "
 			DELETE FROM `eotc_event_campus`
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Deletes metadata relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $event
+	 * @return bool|void
+	 */
+	public function deleteMetadataRelations($event) {
+		$query = "
+			DELETE FROM `eotc_event_metadata`
 			WHERE event_id = :eventId
 		";
 
