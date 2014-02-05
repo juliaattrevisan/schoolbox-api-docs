@@ -11,7 +11,6 @@
  */
 
 use Sabre\VObject\Component\VCalendar;
-use Sabre\VObject\Component\VEvent;
 use Sabre\VObject\Property\ICalendar;
 
 class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_Abstract {
@@ -34,10 +33,12 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
         if ($this->isVisible($currentEvent)) {
 
             $properties = array();
+            // Generate a UID based on $currentEvent->getEventId()
             $properties['CATEGORIES'] = array('SCHOOL');
 
-            $e = new VEvent($this->getVCalendar(), '');
-            $e->add('CATEGORIES', array('SCHOOL'));
+            $e = array();
+            $e['DTSTAMP']    = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
+            $e['CATEGORIES'] = array('SCHOOL');
 
             $start_time = $currentEvent->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
@@ -48,24 +49,17 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
                 $end_time = new DateTime($currentEvent->getEndTime()->getDatabase());
             }
             if (!$currentEvent->getAllday()) {
-
-                //
-                // Assume that start/end are set up with current timezone.
-                // Convert them to UTC.
-                $utc_timezone = new DateTimeZone('UTC');
-                $start_time->setTimezone($utc_timezone);
-                $end_time->setTimezone($utc_timezone);
-                $e->add('DTSTART', $start_time);
-                $e->add('DTEND',   $end_time);
+                $e['DTSTART'] = $start_time;
+                $e['DTEND']   = $end_time;
             }
             else {
-                $e->add('DTSTART', array('DATE' => $start_time->format('Ymd')));
                 $end_time->add(new DateInterval('P1D'));
-                $e->add('DTEND', array('DATE' => $end_time->format('Ymd')));
+                $e['DTSTART'] = array('DATE' => $start_time->format('Ymd'));
+                $e['DTEND']   = array('DATE' => $end_time->format('Ymd'));
             }
 
-            $e->add('SUMMARY', $currentEvent->getNote());
-            $this->getVCalendar()->add($e);
+            $e['SUMMARY'] = $currentEvent->getNote();
+            $this->getVCalendar()->add('VEVENT', $e);
             return null;
         }
     }
