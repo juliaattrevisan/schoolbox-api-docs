@@ -34,6 +34,29 @@
 		});
 	});
 </script>
+<link href="/modules/eotc/js/magicsuggest/magicsuggest-1.3.1.css" rel="stylesheet" />
+<script type="text/javascript" src="/modules/eotc/js/magicsuggest/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript">
+	$(function() {
+//		$('#staff-suggest').magicSuggest({
+//			data: [{id:1, name: 'red'}, {id: 2, name: 'blue'}, {id: 3, name: 'green'}],
+//			data: '/modules/eotc/staff',
+//			name: 'staff'
+//			value: '/modules/eotc/staff/selected'
+//		});
+
+		$('#staff-suggest').userSelector({
+			plugin: {
+				data:'/ajax/user.php?groupID=2',
+				allowFreeEntries: false,
+				name: 'staff'
+			},
+			onePerLine: false,
+			multiple: true
+		});
+	});
+</script>
 <h1>
 	<span>{FUNCTION} Event</span>
 	<a class="customise" href="#">
@@ -53,6 +76,15 @@
 
 	<table class="standardForm">
 		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Staff Members</h4>
+					<em>Add staff members</em>
+				</td>
+				<td>
+					<div id="staff-suggest"></div>
+				</td>
+			</tr>
 			<tr>
 				<td class="formLabelWidth">
 					<h4>Title</h4>
