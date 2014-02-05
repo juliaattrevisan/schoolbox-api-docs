@@ -21,7 +21,8 @@ $this->setFile(TEMPLATE_content, 'modules/eotc/attendance/list.html');
 $this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 
 $this->setVar(array(
-	'EVENT_ID' => $event->getId()
+	'EVENT_ID' => $event->getId(),
+	'EVENT_NAME' => $event->getNote(),
 ));
 
 if ($event->getStudentAttendees()->count()) {
