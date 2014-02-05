@@ -131,6 +131,7 @@ else {
 	$status = $statusMapper->findDefaultStatus();
 
 	$page->setVar(array(
+		'EVENT_STAFF' => json_encode(array()),
 		'EVENT_STATUS' => $status->getName(),
 		'EVENT_RAMSREQUIRED_SELECTED' => '',
 		'EVENT_ID' => '',
