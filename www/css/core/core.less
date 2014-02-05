@@ -581,6 +581,7 @@ Notifications
 		top: 22px;
 		padding-left: 0;
 		min-width: 300px;
+		box-shadow: 0 3px 6px #888;
 		&:before {
 			content: " ";
 			display: block;
@@ -605,11 +606,27 @@ Notifications
 		li {
 			padding: 0;
 		}
+		li.more {
+			position: relative;
+			width: 100%;
+			margin: 0;
+			a {
+				display: block;
+				width: 100%;
+				padding: 8px;
+				text-decoration: none;
+				color: @navigation-links;
+				font-weight: bold;
+				text-align: center;
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
 		li.message {
 			position: relative;
 			width: 100%;
 			margin: 0;
-			padding: 0;
 			&.unread a {
 				background: #EAEEFF;
 				a.pip {
@@ -629,6 +646,9 @@ Notifications
 						border-color: @navigation-links;
 					}
 				}
+			}
+			&.read b {
+				font-weight: normal;
 			}
 			a {
 				display: block;
