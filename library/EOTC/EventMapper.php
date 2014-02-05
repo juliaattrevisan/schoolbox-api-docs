@@ -450,6 +450,30 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
+	 * Add specific relations for a particular event
+	 *
+	 * @param $event
+	 * @param $ids
+	 */
+	public function addStudentAttendeesRelationsSpecific($event, $ids) {
+		if (is_array($ids) && count($ids)) {
+			$query = "
+				INSERT IGNORE INTO `eotc_event_student` (event_id, user_id)
+				VALUES (:eventId, :userId)
+			";
+
+			foreach($ids as $currentId) {
+				if (preg_match('/[0-9]+/', $currentId)) {
+					$statement = $this->database->prepare($query);
+					$statement->bindParam(":eventId", $event->getId());
+					$statement->bindParam(":userId", $currentId);
+					$statement->execute();
+				}
+			}
+		}
+	}
+
+	/**
 	 * Delete specific relations for a particular event
 	 *
 	 * @param $event

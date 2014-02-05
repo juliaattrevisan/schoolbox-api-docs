@@ -7,8 +7,32 @@
 		});
 	});
 </script>
+<link href="/modules/eotc/js/magicsuggest/magicsuggest-1.3.1.css" rel="stylesheet" />
+<script type="text/javascript" src="/modules/eotc/js/magicsuggest/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('#student-suggest').userSelector({
+			plugin: {
+				data:'/ajax/user.php?groupID=3;5',
+				allowFreeEntries: false,
+				name: 'selected'
+			},
+			onePerLine: false,
+			multiple: true
+		});
+	});
+</script>
 
 <h1>People attending {EVENT_NAME}</h1>
+
+<form action="/modules/eotc/attendance/add" method="post">
+	<input type="hidden" name="eventId" value="{EVENT_ID}" />
+	<div id="student-suggest"></div>
+	<input type="submit" class='submit-btn-plain' value="Add" />
+</form>
+
+<div class="clearfix"></div>
 
 <form action="/modules/eotc/attendance/remove" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />

@@ -17,7 +17,6 @@ catch (\Exception $e) {
 }
 
 if (is_array($_POST['selected']) && count($_POST['selected'])) {
-	$eventMapper = new \EOTC\EventMapper();
 	$eventMapper->deleteStudentAttendeesRelationsSpecific($event, $_POST['selected']);
 }
 
