@@ -126,6 +126,11 @@ class UserQueue {
 				continue;
 			}
 
+			// intercept the serialisation
+			$message = unserialize($body['message']);
+
+			$m->setBody("$message");
+
 			$msg = new ReadMessage($m);
 			if(!array_key_exists($msg->getId(), $this->messages)) {
 				$this->messages[$msg->getId()] = $msg;

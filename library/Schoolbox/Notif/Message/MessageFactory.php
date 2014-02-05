@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif\Message;
 
 
+use DateTime;
 use Monolog\Logger;
 use Schoolbox\Notif\Notif;
 use Schoolbox\User;
@@ -91,10 +92,11 @@ class MessageFactory {
 
 	/**
 	 * @param string $method
+	 * @param array $context
 	 * @return Internal
 	 */
-	public function generateInternalMessage($method) {
-		return new Internal(
+	public function generateInternalMessage($method, $context = array()) {
+		$msg = new Internal(
 			// the what
 			$this->object,
 			$this->diff,
@@ -107,13 +109,29 @@ class MessageFactory {
 			$this->topic,
 			$this->notif
 		);
+		$msg->setContext($context);
+		return $msg;
 	}
 
 	/**
+	 * @param string $text
+	 * @param string $href
+	 * @param string $icon
+	 * @param array $context
 	 * @return External
 	 */
-	public function generateExternalMessage() {
-
+	public function generateExternalMessage($text, $href, $icon, $context = array()) {
+		$msg = new External(
+			$this->notif,
+			$this->topic,
+			$this->severity,
+			$text,
+			$href,
+			new DateTime(),
+			$icon
+		);
+		$msg->setContext($context);
+		return $msg;
 	}
 
 	/**

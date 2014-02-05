@@ -177,11 +177,11 @@ class Responder extends EventEmitter {
 		$unreadMessages = $this->subscriptionManager->getUserSubscription($user, true)->getMessages();
 
 		foreach($allMessages as $read) {
-			$messages[$read->getId()] = $read->toArray();
+			$messages[$read->getId()] = $read->getBody();
 		}
 
 		foreach($unreadMessages as $unread) {
-			$messages[$unread->getId()] = $unread->toArray();
+			$messages[$unread->getId()] = $unread->getBody();
 		}
 
 		$this->notifyPipe(json_encode(array(

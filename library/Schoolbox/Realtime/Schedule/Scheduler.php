@@ -19,6 +19,7 @@ use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Message\CompressionException;
+use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Message\MessageInterface;
@@ -207,6 +208,7 @@ class Scheduler {
 		 * This closure will be called from the EventLoop at the appointed time
 		 *
 		 * @param TimerInterface $timer
+		 * @throws \Exception
 		 */
 		$publish = function($timer) use (&$notif, $trigger, $v) {
 
@@ -215,29 +217,39 @@ class Scheduler {
 				 * dynamic message construction for broadcast.
 				 * different people can receive different messages from the one event
 				 * $callback will be a trigger method from an implementation of ModuleInterface
+				 *    - by default, is in the form "notify{Roletype}{Trigger}"
 				 */
 
-				$broadcast = call_user_func($callback, $trigger->getModel(), $trigger->getUser(), $trigger->getDiff());
+				try {
 
-				if(!count($broadcast)) {
-					continue;
-				}
+					/** @var External[] $externalMessages */
+					$externalMessages = call_user_func($callback,
+						$trigger->getModel(), $trigger->getUser(), $trigger->getDiff()
+					);
 
-				$context = array('user' => $trigger->getUser()->getId());
-
-				$count = 0;
-
-				foreach($broadcast as $msg => $topics) {
-					foreach($topics as $topic) {
-
-						// TODO figure out what level this is meant to be logged at
-						$notif->setTopic($topic)->log(Logger::NOTICE, $msg, $context);
-						$count++;
-
+					if(!count($externalMessages)) {
+						continue;
 					}
-				}
 
-				$v->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'));
+					$count = 0;
+
+					foreach($externalMessages as $message) {
+						// send them all!
+						if($message instanceof External) {
+							$message->setContext(array('user' => $trigger->getUser()->getId()));
+							$sent = $message->send();
+							$count += $sent ? 1 :0;
+						}
+					}
+
+					$v->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'));
+
+				}
+				catch(\Exception $e) {
+					// don't know what exceptions will be thrown here, so for now, acknowledge and rethrow
+					$v->v(sprintf("%s -> %s",get_class($e), $e->getMessage()), '!');
+					throw $e;
+				}
 			}
 		};
 
@@ -298,7 +310,7 @@ class Scheduler {
 		if(!class_exists($class)) {
 			throw new ScheduleException("No notifier for model '$modelClass'.");
 		}
-		$instance = new $class($this->conf);
+		$instance = new $class($this->conf, new MessageFactory($this->notif));
 		if(!$instance instanceof ModuleNotifierInterface) {
 			throw new ScheduleException("Notifer class '$class' found, but not an instance of ModuleNotifierInterface.");
 		}

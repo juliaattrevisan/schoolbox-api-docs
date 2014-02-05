@@ -114,11 +114,13 @@
 
                 var newlist = $('<ul/>').attr('id', 'messages'),
                     toInsert = [],
+                    toId = [],
                     id;
 
                 for(id in messages) {
                     // insert into temp array
                     toInsert.push(messages[id]);
+                    toId.push(id);
                 }
 
                 toInsert.sort(function(a,b) {
@@ -146,20 +148,23 @@
                 if(toInsert.length > 0) {
                     // append the list of messages
                     for(i = toInsert.length - 1; i >= 0; --i) {
-                        id = toInsert[i].id;
-                        var status = toInsert[i].status;
-                        var body = toInsert[i].body;
-                        var message = body.message;
-                        var humanTime = body.datetime.date;
-                        var icon = body.context.icon;
-                        var href = body.context.href;
+                        id = toId[i];
+                        var body = toInsert[i];
+
+                        var status = body.status;
+                        var message = body.text;
+                        var timestamp = body.timestamp;
+                        var icon = body.icon;
+                        var href = body.href;
 
                         var li = msgLiTpl.clone();
+
+                        var now = moment.unix(timestamp);
 
                         li.attr('id', 'm-'+id).addClass(status);
                         li.find('a').attr('href', href);
                         li.find('p').html(message);
-                        li.find('time').html(humanTime);
+                        li.find('time').html(now.fromNow()).attr('title', now.format('LLLL'));
                         li.find('img').attr('src', icon);
                         newlist.append(li);
                     }

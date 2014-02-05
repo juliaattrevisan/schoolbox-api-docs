@@ -15,14 +15,22 @@ use Schoolbox\User;
 
 class Internal implements MessageInterface {
 
-
+	/** @var \Schoolbox\Notif\Notif  */
 	protected $notif;
+	/** @var array  */
 	protected $topics;
+	/** @var int  */
 	protected $severity;
+	/** @var array  */
+	protected $context = array();
 
+	/** @var object  */
 	protected $object;
+	/** @var array  */
 	protected $diff;
+	/** @var string  */
 	protected $method;
+	/** @var \Schoolbox\User  */
 	protected $initiator;
 
 
@@ -60,7 +68,7 @@ class Internal implements MessageInterface {
 		}
 		foreach($this->topics as $topic) {
 			$self = serialize($this);
-			$this->notif->setTopic($topic)->log($this->severity, $self);
+			$this->notif->setTopic($topic)->log($this->severity, $self, $this->context);
 		}
 		return true;
 	}
@@ -131,5 +139,14 @@ class Internal implements MessageInterface {
 	public function getInitiator() {
 		return $this->initiator;
 	}
+
+	/**
+	 * @param array $context
+	 * @return void
+	 */
+	public function setContext($context = array()) {
+		$this->context = $context;
+	}
+
 
 } 

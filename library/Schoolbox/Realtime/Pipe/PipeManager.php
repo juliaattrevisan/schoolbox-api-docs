@@ -255,7 +255,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 		$this->sendToUser($user, json_encode(array(
 			'push' => array(
-				$message->getId() => $message->toArray()
+				$message->getId() => $message->getBody()
 			)
 		)));
 	}

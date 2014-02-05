@@ -25,4 +25,11 @@ interface MessageInterface extends Serializable {
 	 * @return string
 	 */
 	public function __toString();
+
+
+	/**
+	 * @param array $context
+	 * @return void
+	 */
+	public function setContext($context = array());
 } 

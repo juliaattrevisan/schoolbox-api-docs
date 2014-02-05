@@ -13,6 +13,7 @@ namespace Schoolbox\Realtime\Schedule\Module;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Internal;
+use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger;
 
@@ -25,8 +26,9 @@ interface ModuleNotifierInterface {
 
 	/**
 	 * @param IConfigLoader $configLoader
+	 * @param MessageFactory $messageFactory
 	 */
-	public function __construct($configLoader);
+	public function __construct($configLoader, $messageFactory);
 
 	/**
 	 * Generate a set of events to be scheduled, based on the given message.

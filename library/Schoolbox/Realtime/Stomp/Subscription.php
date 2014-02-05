@@ -138,8 +138,13 @@ class Subscription {
 		// STOMP likes to do things its own way...
 		$properties['message_id'] = $properties['amqp-message-id'];
 
+		$body = $stompFrame->body;
+		$data = json_decode($body, true);
+
+		$msg = unserialize($data['message']);
+
 		return new UnreadMessage(new AMQPMessage(
-			$stompFrame->body, $properties
+			"$msg", $properties
 		));
 	}
 

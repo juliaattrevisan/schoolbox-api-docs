@@ -63,10 +63,12 @@ abstract class AbstractMessage {
 	/**
 	 * The body text of this message.
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function getBody() {
-		return $this->msg->body;
+		$body = json_decode($this->msg->body, true);
+		$body['status'] = $this->isRead() ? 'read' : 'unread';
+		return $body;
 	}
 
 	/**

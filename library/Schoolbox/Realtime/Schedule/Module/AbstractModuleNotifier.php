@@ -12,25 +12,33 @@ namespace Schoolbox\Realtime\Schedule\Module;
 
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\TopicFactory;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Role;
 
 abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 
-
+	/** @var callable[] */
 	protected $closures = array();
 
+	/** @var IConfigLoader */
 	protected $conf;
 
+	/** @var TopicFactory */
 	protected $topics;
+
+	/** @var MessageFactory */
+	protected $fMessage;
 
 	/**
 	 * @param IConfigLoader $configLoader
+	 * @param MessageFactory $messageFactory
 	 */
-	public function __construct($configLoader) {
+	public function __construct($configLoader, $messageFactory) {
 		$this->conf = $configLoader;
 		$this->topics = new TopicFactory();
+		$this->fMessage = $messageFactory;
 	}
 
 
