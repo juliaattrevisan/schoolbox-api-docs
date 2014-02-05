@@ -49,7 +49,7 @@ foreach($userCollection as $user) {
 
 	if($verbose) {
 		printf(
-			"[%13.8f][%0{$countLen}d / %0{$countLen}d] Rebinding queues for %s...",
+			"[%13.8f][%0{$countLen}d / %0{$countLen}d] Rebinding queues for %-16s ",
 			microtime(true) - $start, ++$i, $userCount, $user->getUsername()
 		);
 	}
@@ -64,13 +64,13 @@ foreach($userCollection as $user) {
 	}
 
 	if($verbose) {
-		echo "$deleted removed, ";
+		printf("%02d removed", $deleted);
 	}
 
 	$uq = $qFactory->bindUserQueue($user, $dryRun);
 
 	if($verbose) {
-		echo count($uq->getBindings()) . " added.\n";
+		printf("  %02d added\n", count($uq->getBindings()));
 	}
 }
 

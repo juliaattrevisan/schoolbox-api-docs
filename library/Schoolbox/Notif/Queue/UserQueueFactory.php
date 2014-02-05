@@ -46,6 +46,12 @@ class UserQueueFactory {
 	/** @var \External_User */
 	protected $_DEPRECATED_EXT_USER;
 
+	/** @var array */
+	protected $roleCache;
+
+	/** @var array */
+	protected $existingBindings = null;
+
 	public function __construct($mqConnector = null) {
 		$this->mqConnector = $mqConnector ?: new MQConnector();
 		$this->userMapper = UserMapper::getInstance();
@@ -53,6 +59,16 @@ class UserQueueFactory {
 		$this->roleMapper = RoleMapper::getInstance();
 		$this->_DEPRECATED_GROUP = new \Group();
 		$this->_DEPRECATED_EXT_USER = new \External_User();
+
+		// cache roles
+		$this->roleCache = $this->roleMapper->findAll()->groupBy('type')->getAll();
+		foreach($this->roleCache as $roleType => $roleCollection) {
+			$this->roleCache[$roleType] = $roleCollection->getColumnValues('id');
+		}
+
+		// don't forget the magic!
+		$this->_DEPRECATED_EXT_USER->getCurrentSemester(/*$user->getExternalId()*/);
+
 	}
 
 	public function setMessageQueueConnector($mqConnector) {
@@ -138,8 +154,6 @@ class UserQueueFactory {
 
 		// category bindings
 
-		// don't forget the magic!
-		$this->categoryMapper->getExternalUser()->getCurrentSemester($user->getExternalId());
 		$cats = $this->categoryMapper->findForUser($user);
 
 		foreach($cats as $cat) {
@@ -172,11 +186,13 @@ class UserQueueFactory {
 				foreach($childrenArray as $childArray) {
 					$childIds[] = $childArray['RelatedID'];
 				}
-				$childCollection = $this->userMapper->findByColumnList(array(
-					'synergy_id' => $childIds,
-					'group_id' => $this->roleMapper->findByColumn('group_type', Role::STUDENT)->getColumnValues('id')
-				));
-				$bindings['parent'] = $childCollection->getColumnValues('id');
+				if(array_key_exists(Role::STUDENT, $this->roleCache)) {
+					$childCollection = $this->userMapper->findByColumnList(array(
+						'synergy_id' => $childIds,
+						'group_id' => $this->roleCache[Role::STUDENT]
+					));
+					$bindings['parent'] = $childCollection->getColumnValues('id');
+				}
 			}
 		}
 
@@ -213,23 +229,52 @@ class UserQueueFactory {
 	 */
 	public function destoryUserBindings($user, $simulate = false) {
 
+		if(!$this->existingBindings) {
+			$this->cacheExistingBindings();
+		}
+
+		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
+		$username = $user->getUsername();
+
+		if(!isset($this->existingBindings[$username])) {
+			return 0;
+		}
+
+		$count = 0;
+
+		if(!$simulate) {
+			$userExchange = Connector::SECONDARY_NAME_PREFIX . $username;
+
+			foreach($this->existingBindings[$username] as $routingKey) {
+				$this->mqConnector->unbindExchange($userExchange, $routingKey);
+				++$count;
+			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Retrieve all existing bindings from RabbitMQ and cache into an array, indexed by username
+	 *
+	 * @return int
+	 */
+	protected function cacheExistingBindings() {
+		$this->existingBindings = array();
+
 		// there's a bit of black magic in here
 		if(posix_getuid() !== 0) {
 			// this method can only succeed if the user is root - don't even try otherwise
 			return -1;
 		}
 
-		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
+		$allBindings = `rabbitmqctl list_bindings destination_name routing_key`;
 
-		$userExchange = Connector::SECONDARY_NAME_PREFIX . $user->getUsername();
-
-		$bindings = `rabbitmqctl list_bindings destination_name routing_key | grep $userExchange`;
-
-		if(!$bindings) {
+		if(!$allBindings) {
 			return 0;
 		}
 
-		$bindings = explode("\n", $bindings);
+		$bindings = explode("\n", $allBindings);
 
 		if(!count($bindings)) {
 			return 0;
@@ -239,25 +284,28 @@ class UserQueueFactory {
 
 		foreach($bindings as $binding) {
 
-//			echo bin2hex(print_r($binding, true));
-
 			$xpl = preg_split('/\s+/', $binding);
 
 			if(count($xpl) != 2) {
-				print_r($binding);
 				continue;
 			}
 
 			list($exchange, $routingKey) = $xpl;
 
-			if(!$simulate) {
-				$this->mqConnector->unbindExchange($exchange, $routingKey);
+			$prefix = Connector::SECONDARY_NAME_PREFIX;
+
+			// only parse line if this is a user exchange
+			if(substr($exchange, 0, strlen($prefix)) != $prefix) {
+				continue;
 			}
+
+			$username = substr($exchange, strlen($prefix));
+
+			$this->existingBindings[$username][] = $routingKey;
 
 			++$count;
 		}
 
 		return $count;
 	}
-
-} 
+}
