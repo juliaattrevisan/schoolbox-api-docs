@@ -154,6 +154,8 @@ class External_Synergetic_Class implements External_ClassInterface
 			SELECT *
 			FROM SynergyOne.dbo.StudentClasses
 			WHERE FileType = '{$filetype}'
+			AND FileYear = '{$_SESSION['FileYear']}'
+			AND FileSemester = '{$_SESSION['FileSemester']}'
 			ORDER BY ClassCode
 		";
 

@@ -23,7 +23,14 @@
 		});
 	});
 </script>
-
+<script type="text/javascript" src="/modules/eotc/js/jquery.courseCodes.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('select[name=filetype]').externalClassCodes({
+			output: $('select[name=courseCode]')
+		});
+	});
+</script>
 <h1>People attending {EVENT_NAME}</h1>
 
 <form action="/modules/eotc/attendance/add" method="post">
@@ -39,7 +46,8 @@
 
 	<fieldset>
 		<label>"Category"
-			<select name="filetype">
+			<select data-selector name="filetype">
+				<option value="">Please select</option>
 				<!-- BEGIN filetype -->
 				<option value="{FILETYPE_ID}">{FILETYPE_NAME}</option>
 				<!-- END filetype -->
@@ -49,7 +57,7 @@
 	<fieldset>
 		<label>Class Code
 			<select name="courseCode" disabled>
-				<option value="">Select a filetype</option>
+				<option value="">Please select</option>
 			</select>
 		</label>
 	</fieldset>
@@ -84,4 +92,4 @@
 	</table>
 
 	<input type="submit" class='submit-btn-plain' value="Remove Selected" />
-</form>
+</form
