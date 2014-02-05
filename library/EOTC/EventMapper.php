@@ -38,6 +38,12 @@ class EventMapper extends Calendar\EventMapper {
 			'join' => 'author',
 		));
 		$this->hasMap(array(
+			'column' => 'teacher_in_charge_id',
+			'property' => 'teacherInCharge',
+			'type' => self::TYPE_MODEL,
+			'join' => 'teacherInCharge',
+		));
+		$this->hasMap(array(
 			'column' => 'type',
 			'property' => 'type',
 			'type' => self::TYPE_INTEGER,
@@ -87,6 +93,11 @@ class EventMapper extends Calendar\EventMapper {
 			'this_key'  => 'type',
 			'other_key' => 'eventTypeID',
 		));
+		$this->hasJoin('teacherInCharge', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'teacher_in_charge_id',
+			'other_key' => 'id',
+		));
 	}
 
 	/**
@@ -99,14 +110,17 @@ class EventMapper extends Calendar\EventMapper {
 	public function findById($identifier) {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
+		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('e')},
 				{$authorMapper->getColumnString('a')},
+				{$teacherInChargeMapper->getColumnString('c')},
 				{$eventTypeMapper->getColumnString('t')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
 			WHERE e.id = :eventId
 		";
@@ -126,6 +140,11 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$authorItem = $authorMapper->hydrate($row, 'a');
 			$eventItem->setAuthor($authorItem);
+
+			/* Teacher In Charge
+			 */
+			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
+			$eventItem->setTeacherInCharge($teacherInChargeItem);
 
 			/* Event Type
 			 */

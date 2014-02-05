@@ -52,6 +52,26 @@ switch($_POST['action']) {
 			$metadata = new \EOTC\EventMetadata();
 		}
 
+		/* NO RETREAT
+		 * NO SURRENDER
+		 */
+		$userMapper = new \Schoolbox\UserMapper();
+
+		try {
+			$author = $userMapper->findById($_POST['authorId']);
+		}
+		catch (\Exception $e) {
+		}
+
+		try {
+			/* -_- magicsuggest sends this back at you in json_encoded format
+			 */
+			$wtf = json_decode($_POST['teacherInCharge']);
+			$teacherInCharge = $userMapper->findById($wtf[0]);
+		}
+		catch (\Exception $e) {
+		}
+
 		/* Events recur until this time
 		 */
 		if (strlen($_POST['repeat_until'])) {
@@ -65,12 +85,6 @@ switch($_POST['action']) {
 
 		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
 		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
-
-		/* NO RETREAT
-		 * NO SURRENDER
-		 */
-		$userMapper = new \Schoolbox\UserMapper();
-		$author = $userMapper->findById($_POST['authorId']);
 
 		/* Spawned further up
 		 */
@@ -90,6 +104,7 @@ switch($_POST['action']) {
 		/* Spawned further up
 		 */
 		$event->setAuthor($author);
+		$event->setTeacherInCharge($teacherInCharge);
 		$event->setType($_POST['type']);
 		$event->setNote($_POST['note']);
 		$event->setStartDate($startDate->getDatabaseDate());

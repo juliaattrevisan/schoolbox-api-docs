@@ -31,6 +31,7 @@ ALTER TABLE `eotc_event` DROP `publish_date`;
 ALTER TABLE `eotc_event` DROP `completed`; 
 ALTER TABLE `eotc_event` DROP `allday`;
 ALTER TABLE `eotc_event` MODIFY COLUMN id INT(11) AUTO_INCREMENT;
+ALTER TABLE `eotc_event` ADD COLUMN `teacher_in_charge_id` INT(11) NULL AFTER `author_id`;
 
 /* Event campus relations
  */

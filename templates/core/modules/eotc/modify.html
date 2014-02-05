@@ -49,6 +49,17 @@
 			onePerLine: false,
 			multiple: true
 		});
+
+		$('#teacher-in-charge-suggest').userSelector({
+			plugin: {
+				data:'/ajax/user.php?groupID=2',
+				allowFreeEntries: false,
+				name: 'teacherInCharge'
+			},
+			value: {EVENT_TEACHER_IN_CHARGE},
+			onePerLine: false,
+			multiple: false
+		});
 	});
 </script>
 <h1>
@@ -216,6 +227,15 @@
 	<h2>People</h2>
 	<table class="standardForm">
 		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Teacher In Charge</h4>
+					<em>The teacher in charge of this event</em>
+				</td>
+				<td>
+					<div id="teacher-in-charge-suggest"></div>
+				</td>
+			</tr>
 			<tr>
 				<td class="formLabelWidth">
 					<h4>Staff Members</h4>

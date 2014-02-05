@@ -52,6 +52,18 @@ if (is_numeric($_GET['eventID'])) {
 		);
 	}
 
+	/* Teacher in charge
+	 */
+	if ($event->getTeacherInCharge()->getId()) {
+		$teacherInCharge = array(
+			'id' => $event->getTeacherInCharge()->getId(),
+			'name' => $event->getTeacherInCharge()->getFullname(),
+		);
+	}
+	else {
+		$teacherInCharge = array();
+	}
+
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
 	 */
@@ -63,6 +75,7 @@ if (is_numeric($_GET['eventID'])) {
 	));
 
 	$page->setVar(array(
+		'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
 		'EVENT_STAFF' => json_encode($staffSelected),
 		'EVENT_STATUS' => $event->getMetadata()->first()->getStatus()->getName(),
 		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->first()->getRamsRequired() ? 'checked="checked"' : '',
@@ -131,6 +144,7 @@ else {
 	$status = $statusMapper->findDefaultStatus();
 
 	$page->setVar(array(
+		'EVENT_TEACHER_IN_CHARGE' => json_encode(array()),
 		'EVENT_STAFF' => json_encode(array()),
 		'EVENT_STATUS' => $status->getName(),
 		'EVENT_RAMSREQUIRED_SELECTED' => '',
