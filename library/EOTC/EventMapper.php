@@ -187,70 +187,6 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
-	 * Find campuses for a particular event
-	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
-	 */
-	private function findCampuses($identifier) {
-		return $this->manyManyRelation(array(
-				'name' => 'eotc_event_campus',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'event_id',
-				'value' => $identifier,
-
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'campus_id',
-					'key' => 'id',
-					'mapper' => new \Schoolbox\CampusMapper()
-				),
-			)
-		);
-	}
-
-	/**
-	 * Assign campuses to an event
-	 *
-	 * @param $event
-	 */
-	private function createCampus($event) {
-		foreach ($event->getCampusCollection() as $currentCampus) {
-			$query = "
-				INSERT INTO `eotc_event_campus` (event_id, campus_id)
-				VALUES (:eventId, :campusId)
-			";
-
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
-			$statement->bindParam(":campusId", $currentCampus);
-			$statement->execute();
-		}
-	}
-
-	/**
-	 * Deletes campus relations if there are no remaining
-	 * events in the series
-	 *
-	 * @param $event
-	 * @return bool|void
-	 */
-	public function deleteCampusRelations($event) {
-		$query = "
-			DELETE FROM `eotc_event_campus`
-			WHERE event_id = :eventId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->execute();
-	}
-
-	/**
 	 * Find metadata for a particular event
 	 *
 	 * @param $identifier
@@ -296,17 +232,81 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
+	 * Assign campuses to an event
+	 *
+	 * @param $event
+	 */
+	private function createCampus($event) {
+		$query = "
+			INSERT INTO `eotc_event_campus` (event_id, campus_id)
+			VALUES (:eventId, :campusId)
+		";
+
+		foreach ($event->getCampusCollection() as $currentCampus) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":campusId", $currentCampus);
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Find campuses for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	private function findCampuses($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_event_campus',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'campus_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\CampusMapper()
+				),
+			)
+		);
+	}
+
+	/**
+	 * Deletes campus relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $event
+	 * @return bool|void
+	 */
+	public function deleteCampusRelations($event) {
+		$query = "
+			DELETE FROM `eotc_event_campus`
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+	}
+
+	/**
 	 * Assign staff to an event
 	 *
 	 * @param $event
 	 */
 	private function createStaffAttendees($event) {
-		foreach ($event->getStaffAttendees() as $currentStaff) {
-			$query = "
-				INSERT IGNORE INTO `eotc_event_staff` (event_id, user_id)
-				VALUES (:eventId, :userId)
-			";
+		$query = "
+			INSERT IGNORE INTO `eotc_event_staff` (event_id, user_id)
+			VALUES (:eventId, :userId)
+		";
 
+		foreach ($event->getStaffAttendees() as $currentStaff) {
 			$statement = $this->database->prepare($query);
 			$statement->bindParam(":eventId", $event->getId());
 			$statement->bindParam(":userId", $currentStaff->getId());
