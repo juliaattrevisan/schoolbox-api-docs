@@ -194,23 +194,22 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	private function findMetadata($identifier) {
 		return $this->manyManyRelation(array(
-				'name' => 'eotc_event_metadata',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'event_id',
-				'value' => $identifier,
+			'name' => 'eotc_event_metadata',
+		),
+		array(
+			/* Find things to join to this...
+			 */
+			'column' => 'event_id',
+			'value' => $identifier,
 
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'metadata_id',
-					'key' => 'id',
-					'mapper' => new EventMetadataMapper()
-				),
-			)
-		);
+			/* ...using this relation, such that column = key
+			 */
+			'relation' => array(
+				'column' => 'metadata_id',
+				'key' => 'id',
+				'mapper' => new EventMetadataMapper()
+			),
+		));
 	}
 
 	/**
@@ -258,23 +257,22 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	private function findCampuses($identifier) {
 		return $this->manyManyRelation(array(
-				'name' => 'eotc_event_campus',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'event_id',
-				'value' => $identifier,
+			'name' => 'eotc_event_campus',
+		),
+		array(
+			/* Find things to join to this...
+			 */
+			'column' => 'event_id',
+			'value' => $identifier,
 
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'campus_id',
-					'key' => 'id',
-					'mapper' => new \Schoolbox\CampusMapper()
-				),
-			)
-		);
+			/* ...using this relation, such that column = key
+			 */
+			'relation' => array(
+				'column' => 'campus_id',
+				'key' => 'id',
+				'mapper' => new \Schoolbox\CampusMapper()
+			),
+		));
 	}
 
 	/**
