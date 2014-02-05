@@ -149,6 +149,7 @@ switch($_POST['action']) {
 				foreach($allEvents as $currentEvent) {
 					$eventMapper->deleteCampusRelations($currentEvent);
 					$eventMapper->deleteMetadataRelations($currentEvent);
+					$eventMapper->deleteStaffAttendeesRelations($currentEvent);
 					$eventMapper->delete($currentEvent);
 				}
 			}
@@ -158,6 +159,7 @@ switch($_POST['action']) {
 			else if ($_POST['efficacy'] == 'self') {
 				$eventMapper->deleteCampusRelations($event);
 				$eventMapper->deleteMetadataRelations($event);
+				$eventMapper->deleteStaffAttendeesRelations($currentEvent);
 				$eventMapper->delete($event);
 			}
 		}
@@ -167,6 +169,7 @@ switch($_POST['action']) {
 			$eventMapper->delete($event);
 			$eventMapper->deleteCampusRelations($event);
 			$eventMapper->deleteMetadataRelations($event);
+			$eventMapper->deleteStaffAttendeesRelations($currentEvent);
 			$metadataMapper->delete($event->getMetadata());
 		}
 
