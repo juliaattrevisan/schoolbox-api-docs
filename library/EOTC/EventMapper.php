@@ -448,6 +448,37 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->bindParam(":eventId", $event->getId());
 		$statement->execute();
 	}
+
+	/**
+	 * Delete specific relations for a particular event
+	 *
+	 * @param $event
+	 * @param $ids
+	 */
+	public function deleteStudentAttendeesRelationsSpecific($event, $ids) {
+		if (is_array($ids) && count($ids)) {
+			$allIds = array();
+
+			foreach($ids as $currentId) {
+				if (preg_match('/[0-9]+/', $currentId)) {
+					$allIds[] = $currentId;
+				}
+			}
+
+			$allIds = implode(',', $allIds);
+
+			$query = "
+				DELETE FROM `eotc_event_student`
+				WHERE event_id = :eventId
+				AND user_id IN ({$allIds})
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->execute();
+		}
+	}
+
 	/**
 	 * Many-many relation table, where $relationTable is a pseudo-mapping
 	 * of column names

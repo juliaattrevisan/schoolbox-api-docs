@@ -7,7 +7,8 @@
 		});
 	});
 </script>
-<form action="/modules/eotc/attendance" method="post">
+<form action="/modules/eotc/attendance/remove" method="post">
+	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 	<table class="table">
 		<thead>
 			<tr>
@@ -30,4 +31,6 @@
 			<!-- END student_attendee -->
 		</tbody>
 	</table>
+
+	<input type="submit" class='submit-btn-plain' value="Remove Selected" />
 </form>
