@@ -31,6 +31,14 @@
                 }
             });
 
+        $j('#url').userSelector({
+            plugin: {
+                data:'/ajax/findCategory.php',
+                allowFreeEntries: true
+            },
+            formElement: $j('#form input[name=url]')
+        });
+
         /*
          * Modal for URL homepage selection
          * */
