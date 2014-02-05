@@ -18,6 +18,7 @@ use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Handler\AMQPHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
@@ -76,7 +77,6 @@ class Notif implements LoggerInterface {
 
 			// the rabbit is only interested in notices and above,
 			$this->amqp = new AMQPHandler(new MQConnector(), Logger::NOTICE, false);
-			$this->amqp->setFormatter(new JsonFormatter());
 		}
 		catch(AMQPRuntimeException $e) {
 			$this->amqp = false;
@@ -111,6 +111,12 @@ class Notif implements LoggerInterface {
 		return $this;
 	}
 
+	public function selectFormatter() {
+		if($this->topic == self::TOPIC_APPLICATION) {
+			return new CompressedFormatter();
+		}
+		return new JsonFormatter();
+	}
 
 	/* Convenience methods for setting broadcast topics */
 
@@ -202,7 +208,7 @@ class Notif implements LoggerInterface {
 			$logger->pushHandler($this->mail);
 		}
 		else {
-			$logger->pushHandler($this->amqp);
+			$logger->pushHandler($this->amqp->setFormatter($this->selectFormatter()));
 		}
 
 		// find out how we're logging this, based on which topic (channel) we're in
@@ -216,6 +222,7 @@ class Notif implements LoggerInterface {
 					VALUES
 						(:username, NOW(), :ip, :login)
 				");
+				$logger->pushHandler($this->amqp);
 				$logger->pushHandler($this->sql);
 				break;
 
@@ -227,10 +234,11 @@ class Notif implements LoggerInterface {
 					VALUES
 						(:object, :objectId, :action, :user)
 				");
+				$logger->pushHandler($this->amqp);
 				$logger->pushHandler($this->sql);
 				break;
 
-			// When mappers C(r)UD, this is what happens
+			// When mappers CRUD, this is what happens
 			case self::TOPIC_APPLICATION:
 				break;
 		}

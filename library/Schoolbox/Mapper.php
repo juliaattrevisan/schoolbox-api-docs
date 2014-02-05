@@ -16,7 +16,9 @@ use \Database;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\TopicFactory;
 
 class Mapper {
 	/**
@@ -1056,17 +1058,20 @@ class Mapper {
 				$previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
 				$this->triggerCallbacks('postSave', $model, $previous);
 
-				$msg = $previous ? self::METHOD_UPDATE : self::METHOD_CREATE;
-				$context = array(
-					'class' => get_class($model),
-					'id'    => $id,
-					'user'  => $_SESSION['id']
-				);
+				$method = $previous ? self::METHOD_UPDATE : self::METHOD_CREATE;
+
+				$fMessage = new MessageFactory($this->notif);
+				$fMessage
+					->setObject($model)
+					->setInitiator($_SESSION['user'])
+					->setSeverity(Logger::NOTICE)
+					->setTopic(Notif::TOPIC_APPLICATION);
+
 				if($previous) {
-					$context['diff'] = $this->diff($model, $previous);
+					$fMessage->setDiff($this->diff($model, $previous));
 				}
 
-				$this->notif->setTopic(Notif::TOPIC_APPLICATION)->notice($msg, $context);
+				$fMessage->generateInternalMessage($method)->send();
 			}
 		}
 

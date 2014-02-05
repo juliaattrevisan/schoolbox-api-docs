@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Alaress_Date_Format;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
+use Schoolbox\User;
 
 class Trigger {
 
@@ -19,21 +20,24 @@ class Trigger {
 	protected $notifier;
 	protected $label;
 	protected $model;
-	protected $userId;
+	protected $user;
+	protected $diff;
 
 	/**
 	 * @param Alaress_Date_Format|int $timestamp - the time at which this event is to be fired
 	 * @param ModuleNotifierInterface $notifier  - an implementation of ModuleNotifierInterface and a trigger label to invoke
 	 * @param string $triggerLabel               - the label associated with the triggers that will be retrieved
 	 * @param object $model                      - the Model object on which the action was performed
-	 * @param int $userId                        - the ID of the user that performed the action
+	 * @param User $user                         - the User that performed the action
+	 * @param array $diff                        - an array representing how the object has changed, or null
 	 */
-	public function __construct($timestamp, $notifier, $triggerLabel, $model, $userId) {
+	public function __construct($timestamp, $notifier, $triggerLabel, $model, $user, $diff = null) {
 		$this->timestamp = $timestamp;
 		$this->notifier = $notifier;
 		$this->label = $triggerLabel;
 		$this->model = $model;
-		$this->userId = $userId;
+		$this->user = $user;
+		$this->diff = $diff;
 	}
 
 	/**
@@ -69,10 +73,10 @@ class Trigger {
 	/**
 	 * Return the ID of the user that caused this trigger
 	 *
-	 * @return int
+	 * @return User
 	 */
-	public function getUserId() {
-		return $this->userId;
+	public function getUser() {
+		return $this->user;
 	}
 
 	/**
@@ -81,7 +85,7 @@ class Trigger {
 	 * @return ModuleNotifierInterface
 	 */
 	public function getModuleNotifier() {
-		return $this->model;
+		return $this->notifier;
 	}
 
 	/**
@@ -91,6 +95,15 @@ class Trigger {
 	 */
 	public function getLabel() {
 		return $this->label;
+	}
+
+	/**
+	 * Return the diff of the object represented by this trigger, or null if it's new
+	 *
+	 * @return array|null
+	 */
+	public function getDiff() {
+		return $this->diff;
 	}
 
 }

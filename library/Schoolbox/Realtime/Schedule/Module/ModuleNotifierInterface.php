@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule\Module;
 
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger;
 
@@ -28,25 +29,13 @@ interface ModuleNotifierInterface {
 	public function __construct($configLoader);
 
 	/**
-	 * Link a callable to an event
+	 * Generate a set of events to be scheduled, based on the given message.
 	 *
-	 * @param string $roleType
-	 * @param string $event
-	 * @param callable $callable
-	 * @return void
-	 */
-//	public function registerCallback($roleType, $event, $callable);
-
-	/**
-	 * Generate a set of events to be scheduled, based on the given trigger.
-	 *
-	 * @param $crud     - one of CREATE, READ, UPDATE or DELETE
-	 * @param $objectId - the ID of the object being manipulated
-	 * @param $userId   - the user that performed the action
+	 * @param Internal $internalMessage - the message received on which to base our triggers.
 	 * @throws ScheduleException
 	 * @return Trigger[]
 	 */
-	public function generateTriggers($crud, $objectId, $userId);
+	public function generateTriggers($internalMessage);
 
 	/**
 	 * Return a list of callables that are associated with this trigger.

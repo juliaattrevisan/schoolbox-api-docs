@@ -18,6 +18,10 @@ use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Notif\Message\CompressionException;
+use Schoolbox\Notif\Message\Internal;
+use Schoolbox\Notif\Message\MessageFactory;
+use Schoolbox\Notif\Message\MessageInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
@@ -88,9 +92,10 @@ class Scheduler {
 
 		$v = $this->verboser;
 		$self = $this;
+		$fMsg = new MessageFactory(null);
 
 		/** Connect to stomp via the provided loop */
-		$this->stompClient->connect()->then(function($client) use ($v, $self) {
+		$this->stompClient->connect()->then(function($client) use ($v, $self, $fMsg) {
 			// this closure is called when stomp successfully connects
 			/** @var Client $client */
 			$v->v("Schedule connected to STOMP, checking for messages");
@@ -102,41 +107,39 @@ class Scheduler {
 
 			/** Subscribe to the queue set aside for the scheduler */
 			$client->subscribeWithAck('/amq/queue/'.Scheduler::QUEUE_SCHEDULE, 'client',
-				function($frame, $ackResolver) use ($v, $self) {
+				function($frame, $ackResolver) use ($v, $self, $fMsg) {
 					// this closure is called when a message is received in the defined queue
 					/**
 					 * @var Frame $frame
 					 * @var AckResolver $ackResolver
 					 */
 
-					$body = json_decode($frame->body, true);
+					try {
 
-					// we can't do squat if the Mapper didn't send us a message in JSON
-					if(is_null($body)) {
-						$v->v("Could not decode '$frame->body' to schedule event", '!');
-						// this message is unparseable, so we ACK it to make it go away
-						$ackResolver->ack();
-						return;
-					}
+						$message = $fMsg->reconstitute($frame->body);
 
-					// the body should contain the CRUD action taken
-					$crudAction = strtoupper($body['message']);
-
-					// the context of the message from the Mapper should be these three data
-					list($modelClass, $modelId, $userId) = array_values($body['context']);
+						// we can't do squat if the Mapper didn't send us a message in the right format
+						if(!$message instanceof Internal) {
+							$v->v("Could not decode '$frame->body' to schedule event", '!');
+							// this message is unparseable, so we ACK it to make it go away
+							$ackResolver->ack();
+							return;
+						}
 
 					// only a few Models actually have schedule strategies, failure is ok
-					try {
 						// each module strategy knows how to deal with its own events
-						$instance = $self->getModule($modelClass);
+						$instance = $self->getModule(get_class($message->getObject()));
 
 						// give me a list of things to schedule
-						$self->scheduleNotifications($instance->generateTriggers($crudAction, $modelId, $userId));
+						$self->scheduleNotifications($instance->generateTriggers($message));
 					}
 					catch(ScheduleException $e) {
 						// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-						$v->v($e->getMessage(), '!');
+						$v->v($e->getMessage(), '*');
 						// this message is unparseable, so we'll eventually ACK it to make it go away
+					}
+					catch(CompressionException $e) {
+						$v->v($e->getMessage(), '!');
 					}
 
 					// handled. away with you.
@@ -193,18 +196,19 @@ class Scheduler {
 
 		$timestamp = $trigger->getTimestamp();
 		$model = $trigger->getModel();
-		$module = $trigger->getModuleNotifier();
+		$module = get_class($trigger->getModuleNotifier());
 		$label = $trigger->getLabel();
 
 		$interval = $timestamp - time();
 		$notif = $this->notif;
+		$v = $this->verboser;
 
 		/**
 		 * This closure will be called from the EventLoop at the appointed time
 		 *
 		 * @param TimerInterface $timer
 		 */
-		$publish = function($timer) use (&$notif, $trigger) {
+		$publish = function($timer) use (&$notif, $trigger, $v) {
 
 			foreach($trigger->getCallbacks() as $callback) {
 				/*
@@ -213,22 +217,27 @@ class Scheduler {
 				 * $callback will be a trigger method from an implementation of ModuleInterface
 				 */
 
-				$broadcast = call_user_func($callback, $trigger->getModel());
+				$broadcast = call_user_func($callback, $trigger->getModel(), $trigger->getUser(), $trigger->getDiff());
 
 				if(!count($broadcast)) {
 					continue;
 				}
 
-				$context = array('user' => $trigger->getUserId());
+				$context = array('user' => $trigger->getUser()->getId());
+
+				$count = 0;
 
 				foreach($broadcast as $msg => $topics) {
 					foreach($topics as $topic) {
 
 						// TODO figure out what level this is meant to be logged at
 						$notif->setTopic($topic)->log(Logger::NOTICE, $msg, $context);
+						$count++;
 
 					}
 				}
+
+				$v->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'));
 			}
 		};
 
