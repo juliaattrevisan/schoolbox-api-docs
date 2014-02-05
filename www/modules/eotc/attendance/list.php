@@ -17,12 +17,11 @@ catch (\Exception $e) {
 	error(160);
 }
 
-$this->setFile(TEMPLATE_content, 'modules/eotc/attendance.html');
+$this->setFile(TEMPLATE_content, 'modules/eotc/attendance/list.html');
 $this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 
 if ($event->getStudentAttendees()->count()) {
 	$roleMapper = new \Schoolbox\RoleMapper();
-
 
 	foreach ($event->getStudentAttendees() as $currentStudent) {
 		$role = $roleMapper->findById($currentStudent->getRole()->getId());
