@@ -407,8 +407,12 @@ private $enabled;               //Bool
 
 		if(is_array($contactArray)) {
 			foreach($contactArray as $c) {
-				$this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactID']));
-				$this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactSpouseID']));
+                if($c['StudentContactID']) {
+				    $this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactID']));
+                }
+				if($c['StudentContactSpouseID']) {
+                    $this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactSpouseID']));
+                }
 			}
 		}
 	}
