@@ -112,7 +112,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         // bypass handlers because I need access to the mysql pointer resource
         $query = "
             SELECT `u`.*,
-            GROUP_CONCAT(`c`.`name` ORDER BY `uc`.`defaultCampus` DESC, `c`.`name` ASC SEPARATOR ', ') AS `campus_name`
+            GROUP_CONCAT(`c`.`name` ORDER BY `uc`.`defaultCampus` DESC, `c`.`name` ASC SEPARATOR ', ') AS `campus`
             FROM `user` `u`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
@@ -171,7 +171,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
                     'USER_SYNERGY_ID' => $user['synergy_id'],
                     'USER_EMAIL'      => $email,
                     'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
-                    'USER_CAMPUS'     => stristr($user['group_name'], $user['campus_name'])?'':$user['campus_name'],
+                    'USER_CAMPUS'     => $user['campus'],
                 ));
 
                 if(!$_SESSION['su'])
