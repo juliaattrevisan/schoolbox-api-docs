@@ -44,13 +44,23 @@ class Event extends Calendar\Event {
 	protected $teacherInCharge = null;
 
 	/**
+	 * A collection of brownhole files
+	 *
+	 * @var null
+	 */
+	protected $ramsFiles = null;
+
+	/**
 	 * Hook method
 	 */
 	protected function setup() {
 
 		/* This is populated by hand
 		 */
+		$this->setStudentAttendees(new \Schoolbox\Collection());
+		$this->setStaffAttendees(new \Schoolbox\Collection());
 		$this->setMetadata(new \Schoolbox\Collection());
+		$this->setRamsFiles(new \Schoolbox\Collection());
 	}
 
 	/* Getters/Setters
@@ -126,5 +136,23 @@ class Event extends Calendar\Event {
 	 */
 	public function getStudentAttendees() {
 		return $this->studentAttendees;
+	}
+
+	/**
+	 * Set rams files
+	 *
+	 * @param null $ramsFiles
+	 */
+	public function setRamsFiles($ramsFiles) {
+		$this->ramsFiles = $ramsFiles;
+	}
+
+	/**
+	 * Get rams files
+	 *
+	 * @return null
+	 */
+	public function getRamsFiles() {
+		return $this->ramsFiles;
 	}
 }
