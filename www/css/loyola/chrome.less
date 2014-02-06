@@ -1,0 +1,482 @@
+@charset "utf-8";
+// =============================================================================
+// Default v2 Schoolbox skin
+// =============================================================================
+//*
+//*   Ride The Whale                         ~777IIIIIIIIIII7~_
+//*                            7I       =%#%%%%7 @ %# /========
+//*                         ]7II7I###########%%%%%%%%777777
+//*                                ~I7###########777=
+//*                                     ##7      ]/
+//*                                     #/
+//*/
+// =============================================================================
+// 1. Load dependencies
+// =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@logo-width: 					121px;
+@logo-height: 					120px;
+
+// Generic colors
+@body-background: 				#EEEEEE; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FAF9F5; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#5099de;
+@link-hover: 					#4685c1;
+
+// Main banner
+@banner-background: 			#013A63;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@banner-height:     			152px;
+
+// Modules
+@module-heading: 				#000000;
+@module-background: 			#E5EFF7;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			#032d55;
+@navigation-links:  			#0e649f;
+@navigation-hover-background: 	#f7941d;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@body-background;
+
+// Main "Tab" Navigation
+@tab-background:				#ab0e16;
+@tab-color:						#FFFFFF;
+@tab-hover-background:			@tab-color;
+@tab-hover-color:				#000000;
+
+// Footer text
+@footer-color:					#797979;
+@footer-links:					@footer-color;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+body{
+  background: #f4f5f5 url("/images/loyola/bg-2.png") bottom left repeat;
+  background: url("/images/loyola/bg.png") bottom left no-repeat, #f4f5f5 url("/images/loyola/bg-2.png") bottom left repeat;
+
+  #wrap-inner{ padding: 0; }
+}
+
+body.login{
+  #container.login{
+    background-color: transparent;
+    width: 704px;
+    height: 352px;
+    padding: 0;
+    position: relative;
+    top: 142px;
+  }
+
+  #login-logo{
+    width: 352px;
+    height: 352px;
+    float: left;
+  }
+
+  #content{
+    padding: 24px;
+    color: #ffffff;
+    width: 304px;
+    height: 304px;
+    float: left;
+    background: #0e649f; /* Old browsers */
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzBlNjQ5ZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNzc2YWMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top,  #0e649f 0%, #1776ac 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#0e649f), color-stop(100%,#1776ac)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #0e649f 0%,#1776ac 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #0e649f 0%,#1776ac 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #0e649f 0%,#1776ac 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #0e649f 0%,#1776ac 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0e649f', endColorstr='#1776ac',GradientType=0 ); /* IE6-8 */
+
+
+    .error{ margin: 15px 0; }
+
+    h1{
+      color: #ccecf9 ;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: left;
+      margin-bottom: 19px;
+    }
+
+    #loginForm{
+      input[type="password"],
+      input[type="text"]{
+        width: 93%;
+        height: 14px;
+        padding: 14px 10px;
+        color: #000000;
+        font-weight: bold;
+        font-size: 16px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        background: #cfcfcf; /* Old browsers */
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2NmY2ZjZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
+        background: -moz-linear-gradient(top,  #cfcfcf 0%, #ffffff 50%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cfcfcf), color-stop(50%,#ffffff)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  #cfcfcf 0%,#ffffff 50%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  #cfcfcf 0%,#ffffff 50%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  #cfcfcf 0%,#ffffff 50%); /* IE10+ */
+        background: linear-gradient(to bottom,  #cfcfcf 0%,#ffffff 50%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cfcfcf', endColorstr='#ffffff',GradientType=0 ); /* IE6-8 */
+      }
+      .submit-btn-plain{
+        float: right;
+        margin: 0;
+        height: 42px;
+        width: 122px;
+        background: url("/images/loyola/signin.png") top left no-repeat;
+        text-indent: -90000px;
+        &:hover{ background: url("/images/loyola/signin.png") bottom left no-repeat; }
+      }
+
+      ::-webkit-input-placeholder {color: #000000; font-weight: bold; font-size: 16px;}
+      :-moz-placeholder { /* Firefox 18- */color: #000000; font-weight: bold; font-size: 16px;}
+      ::-moz-placeholder { /* Firefox 19+ */ color: #000000; font-weight: bold; font-size: 16px;}
+      :-ms-input-placeholder {color: #000000; font-weight: bold; font-size: 16px;}
+    }
+    .forgotten a{ color: #ffffff; text-decoration: underline; }
+  }
+
+  #login-bg {
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: -1;
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      min-width: 50%;
+      min-height: 50%;
+    }
+  }
+}
+
+#header{
+  background: #03498e; /* Old browsers */
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAzNDk4ZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMzJkNTUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top,  #03498e 0%, #032d55 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#03498e), color-stop(100%,#032d55)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #03498e 0%,#032d55 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #03498e 0%,#032d55 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #03498e 0%,#032d55 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #03498e 0%,#032d55 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#03498e', endColorstr='#032d55',GradientType=0 ); /* IE6-8 */
+  position: relative;
+  border-bottom: 4px solid #ffffff;
+
+  .companion{
+    position: absolute;
+    top: 20px;
+    left: 200px;
+
+    a{
+      background: url("/images/loyola/companion.png") top left no-repeat;
+      display: block;
+      font: 0/0 a;
+      text-shadow: none;
+      color: transparent;
+      width: 263px;
+      height: 19px;
+    }
+  }
+
+  .header-inner{
+    background: url("/images/loyola/header-bg.png") top right no-repeat;
+    float: right;
+    width: 765px;
+  }
+
+  .logo {
+    left: 37px;
+    top: 17px;
+  }
+
+  #tabs{
+    position: absolute;
+    top: 58px;
+
+    li{
+      margin-right: 4px;
+
+      a{
+        padding: 8px 13px;
+        background: #ab0e16; /* Old browsers */
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2FiMGUxNiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM2OTA5MGUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+        background: -moz-linear-gradient(top,  #ab0e16 0%, #69090e 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ab0e16), color-stop(100%,#69090e)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  #ab0e16 0%,#69090e 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  #ab0e16 0%,#69090e 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  #ab0e16 0%,#69090e 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  #ab0e16 0%,#69090e 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ab0e16', endColorstr='#69090e',GradientType=0 ); /* IE6-8 */
+
+        font-weight: bold;
+        font-size: 14px;
+
+        -webkit-border-top-left-radius: 4px;
+        -webkit-border-top-right-radius: 4px;
+        -moz-border-radius-topleft: 4px;
+        -moz-border-radius-topright: 4px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+
+        -webkit-box-shadow: 0px -1px 1px 0px #033b72;
+        box-shadow: 0px -1px 1px 0px #033b72;
+
+        &:hover{
+          background: #6ab1dc; /* Old browsers */
+          background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzZhYjFkYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMzMTdiYWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+          background: -moz-linear-gradient(top,  #6ab1dc 0%, #317bad 100%); /* FF3.6+ */
+          background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#6ab1dc), color-stop(100%,#317bad)); /* Chrome,Safari4+ */
+          background: -webkit-linear-gradient(top,  #6ab1dc 0%,#317bad 100%); /* Chrome10+,Safari5.1+ */
+          background: -o-linear-gradient(top,  #6ab1dc 0%,#317bad 100%); /* Opera 11.10+ */
+          background: -ms-linear-gradient(top,  #6ab1dc 0%,#317bad 100%); /* IE10+ */
+          background: linear-gradient(to bottom,  #6ab1dc 0%,#317bad 100%); /* W3C */
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6ab1dc', endColorstr='#317bad',GradientType=0 ); /* IE6-8 */
+        }
+      }
+    }
+
+    .navthis a{
+      background: #ffffff; /* Old browsers */
+      background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3RvcC1jb2xvcj0iI2VhZWFlYiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+      background: -moz-linear-gradient(top,  #ffffff 0%, #eaeaeb 50%, #ffffff 100%); /* FF3.6+ */
+      background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(50%,#eaeaeb), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+      background: -webkit-linear-gradient(top,  #ffffff 0%,#eaeaeb 50%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+      background: -o-linear-gradient(top,  #ffffff 0%,#eaeaeb 50%,#ffffff 100%); /* Opera 11.10+ */
+      background: -ms-linear-gradient(top,  #ffffff 0%,#eaeaeb 50%,#ffffff 100%); /* IE10+ */
+      background: linear-gradient(to bottom,  #ffffff 0%,#eaeaeb 50%,#ffffff 100%); /* W3C */
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-8 */
+    }
+  }
+
+  #search{
+    #search-button{
+      background: url("/images/penola/search-button.png") no-repeat 0px 8px;
+      left: auto;
+      right: 0;
+    }
+    #search-field{
+      width: 250px;
+      padding: 6px 0 0 6px;
+      background: rgb(0, 0, 0);
+      background: rgba(0, 0, 0, 0.3);
+
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      border-radius: 3px;
+    }
+    ::-webkit-input-placeholder { color: @banner-color; }
+    :-moz-placeholder { /* Firefox 18- */ color: @banner-color; }
+    ::-moz-placeholder {  /* Firefox 19+ */ color: @banner-color; }
+    :-ms-input-placeholder { color: @banner-color; }
+  }
+}
+
+#container{
+  position: relative;
+  top: -58px;
+  -webkit-box-shadow: -1px 0px 4px 0px rgba(50, 50, 50, 0.25);
+  -moz-box-shadow:    -1px 0px 4px 0px rgba(50, 50, 50, 0.25);
+  box-shadow:         -1px 0px 4px 0px rgba(50, 50, 50, 0.25);
+
+  h2{
+    color: #5bba52;
+    margin: 4px;
+    padding: 0 11px;
+    background: #ecf5f9 url("/images/loyola/h2-bg.png") bottom left repeat-x;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid #c0d2de;
+    -webkit-box-shadow: 0px 3px 5px 0px #e4e4e4;
+    box-shadow: 0px 3px 5px 0px #e4e4e4;
+    font-family: Georgia, Times, "Times New Roman", serif;
+    font-size: 19px;
+    font-weight: normal;
+
+    a{ color: #5bba52; }
+  }
+
+  #category-head th, #file-head th {
+    background: #ecf5f9 !important;
+  }
+
+  .admin-contents h2 {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    color: #000000;
+    text-indent: 0;
+    padding: 0;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  // Settings position on H2's
+  .box a.edit {
+    right: 41px;
+    top: 11px;
+  }
+  .box a.close-delete {
+    top: 11px;
+    right: 12px;
+  }
+
+  #category-head th,
+  #file-head th{
+    background: #eaeaeb;
+  }
+
+  .admin-nav{
+    background: transparent;
+    li{
+      a{
+        background: #ffffff; /* Old browsers */
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmM2YzZjQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+        background: -moz-linear-gradient(top,  #ffffff 0%, #f3f3f4 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f3f3f4)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  #ffffff 0%,#f3f3f4 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  #ffffff 0%,#f3f3f4 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  #ffffff 0%,#f3f3f4 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  #ffffff 0%,#f3f3f4 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f3f3f4',GradientType=0 ); /* IE6-8 */
+        border: 1px solid #e9e9ea;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        color: #666666;
+
+      }
+      .current{
+        border: 1px solid #666666;
+        color: #ffffff;
+        background: #989da0; /* Old browsers */
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzk4OWRhMCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM2OTY5NjkiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+        background: -moz-linear-gradient(top,  #989da0 0%, #696969 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#989da0), color-stop(100%,#696969)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  #989da0 0%,#696969 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  #989da0 0%,#696969 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  #989da0 0%,#696969 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  #989da0 0%,#696969 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#989da0', endColorstr='#696969',GradientType=0 ); /* IE6-8 */
+      }
+    }
+  }
+}
+
+/*
+ * Quicklinks
+ */
+ul.quicklinks{
+  margin: 0;
+  li{
+    float: left;
+    padding: 7px 4px;
+    height: 150px;
+    list-style: none;
+    margin: 0 8px !important;
+
+    a{
+      display: block;
+      float: left;
+      text-align: center;
+      padding: 112px 0 0 0;
+      font-weight: bold;
+      width: 107px;
+      -webkit-transition: opacity 0.5s;
+      -moz-transition: opacity 0.5s;
+      -ms-transition: opacity 0.5s;
+      -o-transition: opacity 0.5s;
+      transition: opacity 0.5s;
+      &:hover{
+        cursor: pointer;
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .synergetic{ background: url('/images/loyola/quicklinks.png') 0px 0px no-repeat; }
+  .booking{ background: url('/images/loyola/quicklinks.png') -115px 0px no-repeat; }
+  .e-mail{ background: url('/images/loyola/quicklinks.png') -221px 0px no-repeat; }
+  .daily-org{ background: url('/images/loyola/quicklinks.png') -320px 0px no-repeat; }
+  .calendar{ background: url('/images/loyola/quicklinks.png') -429px 0px no-repeat; }
+}
+
+
+/*
+ * Demo Dashboards
+ */
+
+.demo-dash{
+	li{ float: left;
+		padding: 7px 4px !important;
+		height: 135px;
+		list-style: none;
+	}
+	a{  display: block;
+		float: left;
+		text-align: center;
+		padding: 92px 0 0 0;
+		font-weight: bold;
+		width: 88px;
+		-webkit-transition: opacity 0.5s;
+		-moz-transition: opacity 0.5s;
+		-ms-transition: opacity 0.5s;
+		-o-transition: opacity 0.5s;
+		transition: opacity 0.5s;
+		&:hover{
+			cursor: pointer;
+			opacity: 0.8;
+		}
+	}
+	.parents-friends{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.due-work{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+	.manage-users{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.timetable{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+	.synergetic{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+	.admin{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+	.eportfolio{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+	.hr{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.services{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+	.leave{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+	.parent-dir{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+	.payments{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+	.online-forms{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+}
