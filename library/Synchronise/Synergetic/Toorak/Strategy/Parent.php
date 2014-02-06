@@ -36,7 +36,7 @@ class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synerget
 		$newUser['title']      = $currentUser['StudentContactTitle'];
 		$newUser['firstname']  = $currentUser['StudentContactPreferred'];
 		$newUser['lastname']   = $currentUser['StudentContactSurname'];
-		$newUser['alt_email']  = $parent['DirectoryIncludeFlag'] ? $currentUser['StudentContactDefaultEmail'] : '';
+		$newUser['alt_email']  = $currentUser['StudentContactDefaultEmail'];
 
 		// get campuses of attached children
 		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
@@ -64,7 +64,7 @@ class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synerget
 		$newUser['title']      = $currentUser['StudentContactSpouseTitle'];
 		$newUser['firstname']  = $currentUser['StudentContactSpousePreferred'];
 		$newUser['lastname']   = $currentUser['StudentContactSpouseSurname'];
-		$newUser['alt_email']  = $parent['DirectoryIncludeFlag'] ? $currentUser['StudentContactSpouseDefaultEmail'] : '';
+		$newUser['alt_email']  = $currentUser['StudentContactSpouseDefaultEmail'];
 
 		// get campuses of kids
 		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
