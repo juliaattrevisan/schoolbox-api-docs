@@ -75,6 +75,8 @@ class User extends DeprecatedModel {
 
 	function getUserCampus($id) {
 
+        $campusList = array();
+
 		$campusquery = "SELECT campus FROM userCampus WHERE uid = '$id' ORDER BY defaultCampus DESC";
 
 		$this->db->query($campusquery);

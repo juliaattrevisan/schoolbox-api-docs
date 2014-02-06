@@ -82,62 +82,45 @@ class Synchronise_Synergetic_Seymour_Strategy_Parent extends Synchronise_Synerge
 			}
 
 			// Update Portal with Synergetic data if there is something different contained in Synergetic db
-			$user = $this->getUserHandler()->getBySynergy($currentSynergyId);
+			$user = $this->getUserHandler()->getBySynergyAndGroup($currentSynergyId, 4);
 
             if($user) {
-                // parent exists in schoolbox, update or skip
-                if(
-                    ($user['title'] != $currentParent['Title']) ||
-                    ($user['firstname'] != $currentParent['Preferred']) ||
-                    ($user['lastname'] != $currentParent['Surname']) ||
-                    ($user['alt_email'] != $preferredEmail)
-                ) {
-                    // data mismatch, update
-                    // use the original data rather than the reloaded for the password
-                    $newUser['id'] = $user['uid'];
-                    $newUser['username'] = $user['username'];
-                    $newUser['title'] = trim($currentParent['Title']);
-                    $newUser['firstname'] = trim($currentParent['Preferred']);
-                    $newUser['lastname'] = trim($currentParent['Surname']);
+                // data mismatch, update
+                // use the original data rather than the reloaded for the password
+                $newUser['id'] = $user['uid'];
+                $newUser['username'] = $user['username'];
 
-                    $newUser['campus'] = $this->getUserHandler()->getUserCampus($user['uid']);
-                    $newUser['defaultCampus'] = array();
-
-                    // Clear email address in Portal if the user is not meant to be publicly listed
-                    if ($this->isPubliclyListed($currentParent)) {
-                        $newUser['alt_email'] = trim($preferredEmail);
-                    }
-                    else {
-                        $newUser['alt_email'] = '';
-                    }
-                }
-                // parent exists, does not need updating
-                else {
-                    $this->getVerboseFilter()->skip($user, $currentSynergyId);
-                    $this->getVerboseFilter()->incrementSkipped();
-                    return;
-                }
             }
             // does not exist in schoolbox: create
             else {
-                $newUser = array(
-                    'username' => trim($currentParent['ID']),
-                    'title' => trim($currentParent['Title']),
-                    'firstname' => trim($currentParent['Preferred']),
-                    'lastname' => trim($currentParent['Surname']),
-                    'campus' => array($this->getCampusFromCode($currentUser['StudentYearLevel'])),
-                    'defaultCampus' => array(),
-                );
-
-                // Clear email address in Portal if the user is not meant to be publicly listed
-                if ($this->isPubliclyListed($currentParent)) {
-                    $newUser['alt_email'] = trim($preferredEmail);
-                }
-                else {
-                    $newUser['alt_email'] = '';
-                }
-
+                $newUser['username'] = trim($currentParent['ID']);
             }
+
+            /* Set all user data */
+            $newUser['title'] = trim($currentParent['Title']);
+            $newUser['firstname'] = trim($currentParent['Preferred']);
+            $newUser['lastname'] = trim($currentParent['Surname']);
+
+            $newUser['campus'] = array();
+            $students = $this->getExternalUserHandler()->getEnrolledStudents($currentSynergyId);
+            if(is_array($students)) {
+                foreach($students as $child) {
+                    $childUser = $this->getUserHandler()->getBySynergy($child['RelatedID']);
+                    $campuses = $this->getUserHandler()->getUserCampus($childUser['uid']);
+                    $newUser['campus'] = array_merge($newUser['campus'], $campuses);
+                }
+                $newUser['campus'] = array_unique($newUser['campus']);
+            }
+            $newUser['defaultCampus'] = $newUser['campus'][0];
+
+            // Clear email address in Portal if the user is not meant to be publicly listed
+            if ($this->isPubliclyListed($currentParent)) {
+                $newUser['alt_email'] = trim($preferredEmail);
+            }
+            else {
+                $newUser['alt_email'] = '';
+            }
+
             $newUser['synergy_id'] = $currentSynergyId;
 
             // Prepare verbosity
