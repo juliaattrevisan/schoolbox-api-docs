@@ -413,27 +413,27 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	private function findStudentAttendees($identifier) {
 		return $this->manyManyRelation(array(
-				'name' => 'eotc_event_student',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'event_id',
-				'value' => $identifier,
+			'name' => 'eotc_event_student',
+		),
+		array(
+			/* Find things to join to this...
+			 */
+			'column' => 'event_id',
+			'value' => $identifier,
 
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'user_id',
-					'key' => 'id',
-					'mapper' => new \Schoolbox\UserMapper(),
-					'options' => array(
-						'order' => array(
-							'lastname' => 'ASC'
-						)
+			/* ...using this relation, such that column = key
+			 */
+			'relation' => array(
+				'column' => 'user_id',
+				'key' => 'id',
+				'mapper' => new \Schoolbox\UserMapper(),
+				'options' => array(
+					'order' => array(
+						'lastname' => 'ASC'
 					)
-				),
-			));
+				)
+			),
+		));
 	}
 
 	/**
