@@ -107,7 +107,6 @@ class EventRecurrenceMapper {
 					$event->setId($seriesEvent->getId());
 
 					$this->getEventMapper()->save($event);
-					$this->saveHook($event);
 				}
 			}
 			/* Modify an existing event and add recurring incidents
