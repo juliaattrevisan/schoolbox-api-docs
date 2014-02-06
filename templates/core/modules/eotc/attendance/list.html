@@ -66,6 +66,15 @@
 
 <div class="clearfix"></div>
 
+<form action="/modules/eotc/attendance/addByImport" method="post">
+	<input type="hidden" name="eventId" value="{EVENT_ID}" />
+
+	<textarea name="selected" style="width:100%;height:48px"></textarea>
+	<input type="submit" class='submit-btn-plain' value="Add" />
+</form>
+
+<div class="clearfix"></div>
+
 <form action="/modules/eotc/attendance/remove" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 	<table class="table">
