@@ -10,8 +10,6 @@
 
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
-$groupHandler = new Group();
-$calendarHandler = new Calendar();
 $page = new SitePage();
 
 $userMapper = new \Schoolbox\UserMapper();
@@ -19,33 +17,20 @@ $userMapper = new \Schoolbox\UserMapper();
 /** @var Schoolbox\User $user */
 $owner = $_SESSION['user'];
 
-/* Superuser/Staff/Parent adding event for someone else or
- * someone creating their own event
- */
-if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($_POST['userId']) || ($_SESSION['user']->getId() == $_POST['userId'])) {
-	$owner = $userMapper->findById($_POST['userId']);
-}
-/* You're not supposed to be able to create events under other circumstances
- */
-else {
-	error(19);
-}
-
 switch($_POST['action']) {
 	case 'Add':
 	case 'Update':
 
 		/* Default
 		 */
-		$publishDate = null;
 		$until = null;
+
+		$eventMapper = new \EOTC\EventMapper();
 
 		/* Spawn an existing event if id provided
 		 * Otherwise spawn a new one
 		 */
 		if (is_numeric($_POST['id'])) {
-			$eventMapper = new \EOTC\Calendar\EventMapper();
-
 			try {
 				$event = $eventMapper->findById($_POST['id']);
 			}
@@ -54,15 +39,17 @@ switch($_POST['action']) {
 			}
 		}
 		else {
-			$event = new \EOTC\Calendar\Event();
+			$event = new \EOTC\Event();
 		}
 
-		/* Events aren't visible until this date
-		 * TODO: Fix validator in Alaress Date Format
+		/* Spawn and assign metadata record to event
 		 */
-		if (strlen($_POST['publishDate'])) {
-			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
-			$publishDate = $pubDateObject->getDatabaseDate();
+		try {
+			$metadataMapper = new \EOTC\EventMetadataMapper();
+			$metadata = $metadataMapper->findByEvent($event)->first();
+		}
+		catch (\Exception $e) {
+			$metadata = new \EOTC\EventMetadata();
 		}
 
 		/* Events recur until this time
@@ -87,10 +74,14 @@ switch($_POST['action']) {
 
 		/* Spawned further up
 		 */
-		$event->setOwner($owner);
+		$metadata->setEventType($_POST['type']);
+		$metadata->setRamsRequired($_POST['ramsRequired']);
+		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+		$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+		/* Spawned further up
+		 */
 		$event->setAuthor($author);
-		$event->setAccess($_POST['level']);
-		$event->setSid($_POST['group']);
 		$event->setType($_POST['type']);
 		$event->setNote($_POST['note']);
 		$event->setStartDate($startDate->getDatabaseDate());
@@ -99,31 +90,18 @@ switch($_POST['action']) {
 		$event->setEndTime($endDate->getDatabaseTime());
 		$event->setLocation($_POST['location']);
 		$event->setDetail($_POST['detail']);
-		$event->setPublishDateTime($publishDate);
 
 		/* Collections of ids
 		 */
-		$event->setRoleCollection(new \Schoolbox\Collection($_POST['roles']));
 		$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
 
-		/* Attendance dirty bit should be set to true if the attendance
-		 * setting now differs from what it previously was
+		/* Store metadata
 		 */
-		if ($event->getAttendance() != $_POST['attendance']) {
-			$event->setAttendance($_POST['attendance']);
-			$event->setAttendanceDirty(true);
-		}
-
-		// Force events to have at least one campus value selected (if a group event)
-		if ($event->isCampusLevel()) {
-			if (!is_array($_POST['campus']) || !count($_POST['campus'])) {
-				error(158);
-			}
-		}
+		$event->setMetadata($metadata);
 
 		/* Save this event and any recurring incidents too
 		 */
-		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper();
+		$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
 		/* If you were editing an event on someone else's calendar, don't
@@ -133,25 +111,13 @@ switch($_POST['action']) {
 
 		/* Superuser modifying some arbitrary event
 		 */
-		if (!in_array($_SESSION['user']->getId(), array($event->getAuthor()->getId(), $event->getOwner()->getId()))) {
-			$page->backToTheFuture(3);
-		}
-		/* Teacher modifying self-created event for some arbitrary person
-		 */
-		else if (($event->getAuthor()->getId() != $event->getOwner()->getId()) && ($event->getAuthor()->getId() == $_SESSION['user']->getId())) {
-			$page->backToTheFuture(3);
-		}
-		else if (!empty($_POST['return'])) {
-			$page->localRedir($_POST['return']);
-		}
-		else {
-			$page->backToTheFuture(2);
-		}
+		$page->backToTheFuture(1);
 
 		break;
 
 	case 'Delete':
-		$eventMapper = new \EOTC\Calendar\EventMapper();
+		$eventMapper = new \EOTC\EventMapper();
+		$metadataMapper = new \EOTC\EventMetadataMapper();
 
 		try {
 			$event = $eventMapper->findById($_POST['id']);
@@ -166,22 +132,39 @@ switch($_POST['action']) {
 			if ($_POST['efficacy'] == 'series') {
 				$allEvents = $eventMapper->getAllInSeries($event);
 
+				/* Delete the metadata relations, then delete the
+				 * metadata record itself
+				 */
+				$metadataMapper->delete($event->getMetadata());
+
 				foreach($allEvents as $currentEvent) {
+					$eventMapper->deleteCampusRelations($currentEvent);
+					$eventMapper->deleteMetadataRelations($currentEvent);
 					$eventMapper->delete($currentEvent);
 				}
 			}
+			/* Delete a metadata relation for an event that is part
+			 * of a series
+			 */
 			else if ($_POST['efficacy'] == 'self') {
+				$eventMapper->deleteCampusRelations($event);
+				$eventMapper->deleteMetadataRelations($event);
 				$eventMapper->delete($event);
 			}
 		}
+		/* Just a single event all on its lonesome
+		 */
 		else {
 			$eventMapper->delete($event);
+			$eventMapper->deleteCampusRelations($event);
+			$eventMapper->deleteMetadataRelations($event);
+			$metadataMapper->delete($event->getMetadata());
 		}
 
 		$page->backToTheFuture(2);
 		break;
 
 	default:
-		error(0);
+		error(160);
 		break;
 }

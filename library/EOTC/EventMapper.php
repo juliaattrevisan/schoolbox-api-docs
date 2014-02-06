@@ -11,19 +11,313 @@
 namespace EOTC;
 
 
-class EventMapper extends CalendarEventMapper {
+class EventMapper extends Calendar\EventMapper {
 
+	/**
+	 * This is a direct clone with less functionality
+	 */
 	protected function mapping() {
-//		$this->hasMap(array(
-//			'column' => 'metadata',
-//			'property' => 'metadata',
-//			'type' => self::TYPE_INTEGER,
-//			'join' => 'metadata',
-//		));
-//		$this->hasJoin('metadata', array(
-//			'mapper'    => '\\EOTC\\EventMetadataMapper',
-//			'this_key'  => 'metadata',
-//			'other_key' => 'id',
-//		));
+		$this->hasTable('eotc_event');
+		$this->hasModel('\\EOTC\\Event');
+
+		$this->hasMap(array(
+			'column' => 'id',
+			'property' => 'id',
+			'type' => self::TYPE_INTEGER,
+			'identifier' => true,
+		));
+		$this->hasMap(array(
+			'column' => 'series_id',
+			'property' => 'seriesId',
+			'type' => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column' => 'author_id',
+			'property' => 'author',
+			'type' => self::TYPE_MODEL,
+			'join' => 'author',
+		));
+		$this->hasMap(array(
+			'column' => 'type',
+			'property' => 'type',
+			'type' => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column' => 'note',
+			'property' => 'note',
+			'type' => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column' => 'detail',
+			'property' => 'detail',
+			'type' => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column' => 'location',
+			'property' => 'location',
+			'type' => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'   => 'startDate',
+			'property' => 'startDate',
+			'type'     => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'   => 'startTime',
+			'property' => 'startTime',
+			'type'     => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'   => 'endDate',
+			'property' => 'endDate',
+			'type'     => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'   => 'endTime',
+			'property' => 'endTime',
+			'type'     => self::TYPE_STRING,
+		));
+		$this->hasJoin('author', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'author_id',
+			'other_key' => 'id',
+		));
+		$this->hasJoin('eventType', array(
+			'mapper'    => '\\EOTC\\Calendar\\EventTypeMapper',
+			'this_key'  => 'type',
+			'other_key' => 'eventTypeID',
+		));
 	}
-} 
+
+	/**
+	 * Custom findById
+	 *
+	 * @param mixed $identifier
+	 * @return object|Model
+	 * @throws \Exception
+	 */
+	public function findById($identifier) {
+		$authorMapper = $this->getJoinMapper('author');
+		$eventTypeMapper = $this->getJoinMapper('eventType');
+
+		$query = "
+			SELECT
+				{$this->getColumnString('e')},
+				{$authorMapper->getColumnString('a')},
+				{$eventTypeMapper->getColumnString('t')}
+			FROM `{$this->table}` e
+			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+			WHERE e.id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $identifier);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		/* Hydrate or die
+		 */
+		if ($row != false) {
+			$eventItem = $this->hydrate($row, 'e');
+
+			/* Author
+			 */
+			$authorItem = $authorMapper->hydrate($row, 'a');
+			$eventItem->setAuthor($authorItem);
+
+			/* Event Type
+			 */
+			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+			$eventItem->setEventType($eventTypeItem);
+
+			/* Convert dates ;(
+			 */
+			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+			$eventItem->setStartDateTime($startDateTime);
+
+			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
+			$eventItem->setEndDateTime($endDateTime);
+
+			/* Accumulate the metadata for this event
+			 */
+			$eventItem->setMetadata($this->findMetadata($identifier));
+
+			/* Accumulate campuses for this event
+			 */
+			$eventItem->setCampusCollection($this->findCampuses($identifier));
+
+			/* Determine current status
+			 */
+			if ($eventItem->getMetadata()->count()) {
+				$statusMapper = new EventStatusMapper();
+
+				foreach($eventItem->getMetadata() as $currentMetadata) {
+					try {
+						$statusItem = $statusMapper->findById($currentMetadata->getStatus());
+						$currentMetadata->setStatus($statusItem);
+					}
+					catch (\Exception $e) {
+					}
+				}
+			}
+
+			return $eventItem;
+		}
+
+		throw new \Exception('Instance of object not found');
+	}
+
+	/**
+	 * Postsave hook
+	 *
+	 * @param $event
+	 */
+	protected function postSave($event) {
+		$this->deleteCampusRelations($event);
+		$this->createCampus($event);
+	}
+
+	/**
+	 * Deletes campus relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $event
+	 * @return bool|void
+	 */
+	public function deleteCampusRelations($event) {
+		$query = "
+			DELETE FROM `eotc_event_campus`
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Deletes metadata relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $event
+	 * @return bool|void
+	 */
+	public function deleteMetadataRelations($event) {
+		$query = "
+			DELETE FROM `eotc_event_metadata`
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Assign campuses to an event
+	 *
+	 * @param $event
+	 */
+	private function createCampus($event) {
+		foreach ($event->getCampusCollection() as $currentCampus) {
+			$query = "
+				INSERT INTO `eotc_event_campus` (event_id, campus_id)
+				VALUES (:eventId, :campusId)
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":campusId", $currentCampus);
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Find metadata for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	private function findMetadata($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_event_metadata',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'metadata_id',
+					'key' => 'id',
+					'mapper' => new EventMetadataMapper()
+				),
+			)
+		);
+	}
+
+	/**
+	 * Fin
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	private function findCampuses($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_event_campus',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'campus_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\CampusMapper()
+				),
+			)
+		);
+	}
+
+	/**
+	 * Many-many relation table, where $relationTable is a pseudo-mapping
+	 * of column names
+	 *
+	 * @param array $relationTableDefinition
+	 * @param array $join
+	 * @internal param array $selected
+	 * @return \Schoolbox\Collection
+	 */
+	public function manyManyRelation($relationTableDefinition = array(), $join = array()) {
+		$query = "
+			SELECT {$join['relation']['column']}
+			FROM `{$relationTableDefinition['name']}`
+			WHERE {$join['column']} = :value
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":value", $join['value']);
+		$statement->execute();
+
+		/* Find all the primary keys in the relation table and objectify
+		 * them into a collection
+		 */
+		$ids = array();
+
+		foreach ($statement as $row) {
+			$ids[] = $row[$join['relation']['column']];
+		}
+
+		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids);
+
+		return $allInstances;
+	}
+}

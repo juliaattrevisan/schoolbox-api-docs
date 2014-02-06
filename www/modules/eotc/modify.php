@@ -21,7 +21,7 @@ $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_bloc
 /* Modify existing event
  */
 if (is_numeric($_GET['eventID'])) {
-	$mapper = new \EOTC\Calendar\EventMapper();
+	$mapper = new \EOTC\EventMapper();
 
 	try {
 		$event = $mapper->findById($_GET['eventID']);
@@ -33,17 +33,12 @@ if (is_numeric($_GET['eventID'])) {
 	/* Default values
 	 */
 	$defaultTypeId = $event->getEventType()->getId();
-	$defaultSid = $event->getSid();
-	$defaultAccessLevel = $event->getAccess();
+	$defaultCampusId = array();
 
-	/* Only provide publish date if one was provided and if it
-	 * wasn't useless somehow
-	 */
-	if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
-		$publishDate = $event->getPublishDateTime()->getLocalShort();
-	}
-	else {
-		$publishDate = '';
+	$allCampuses = $event->getCampusCollection()->getAll();
+
+	foreach ($allCampuses as $currentCampus) {
+		$defaultCampusId[] = $currentCampus->getId();
 	}
 
 	/* Miscellaneous setvarring
@@ -57,11 +52,11 @@ if (is_numeric($_GET['eventID'])) {
 	));
 
 	$page->setVar(array(
+		'EVENT_STATUS' => $event->getMetadata()->first()->getStatus()->getName(),
+		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->first()->getRamsRequired() ? 'checked="checked"' : '',
 		'EVENT_ID' => $event->getId(),
-		'EVENT_USER_ID' => $_SESSION['user']->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
-		'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
 		'EVENT_TIMEINPUTS' => $event->getAllDay() ? 'hide' : '',
 		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
 		'EVENT_START_HOUR' => $event->getStartDateTime()->getUsingFormat('H'),
@@ -73,7 +68,6 @@ if (is_numeric($_GET['eventID'])) {
 		'EVENT_END_MIN' => $event->getEndDateTime()->getUsingFormat('i'),
 		'EVENT_END_AM' => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
 		'EVENT_END_PM' => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
-		'EVENT_PUBLISH_DATE' => $publishDate,
 		'EVENT_LOCATION' => $event->getLocation(),
 		'EVENT_DETAIL' => $event->getDetail(),
 		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
@@ -87,8 +81,8 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('recurring_dates_block', 'recurring_dates');
 	}
 	else {
-		$calendarHandler = new Calendar();
-		$recurrence = $calendarHandler->getSeriesRecurrence($event->getSeriesId());
+		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($mapper);
+		$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
 
 		$page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
 		$page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
@@ -105,12 +99,11 @@ else {
 
 	/* Set up default dates
 	 */
-	$event = new \EOTC\Calendar\Event();
+	$event = new \EOTC\Event();
 	$event->setupDates($_GET['date']);
 
 	$defaultTypeId = '';
-	$defaultSid = '';
-	$defaultAccessLevel = '';
+	$defaultCampusId = array($_SESSION['campus'][0]);
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -122,12 +115,15 @@ else {
 		'ADVANCED_CLOSE' => 'hidden',
 	));
 
+	$statusMapper = new \EOTC\EventStatusMapper();
+	$status = $statusMapper->findDefaultStatus();
+
 	$page->setVar(array(
+		'EVENT_STATUS' => $status->getName(),
+		'EVENT_RAMSREQUIRED_SELECTED' => '',
 		'EVENT_ID' => '',
-		'EVENT_USER_ID' => $_SESSION['user']->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => '',
-		'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
 		'EVENT_TIMEINPUTS' => 'hide',
 		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
 		'EVENT_START_HOUR' => '',
@@ -139,7 +135,6 @@ else {
 		'EVENT_END_MIN' => '',
 		'EVENT_END_AM' => '',
 		'EVENT_END_PM' => '',
-		'EVENT_PUBLISH_DATE' => '',
 		'EVENT_LOCATION' => '',
 		'EVENT_DETAIL' => '',
 		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
@@ -165,36 +160,11 @@ $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, a
 	'type' => 'EVENT_EVENTTYPE_NAME'
 ));
 
-/* Only provide Group option if groups have been defined
- */
-$groupHandler = new \Group();
-$groupList = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), true, WRITE_ACCESS);
-
-/* Only provide Campus options if campuses have been defined
- */
-$campusMapper = new \Schoolbox\CampusMapper();
-$campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
-
-/* Render all the dropdowns
- */
-
-/* Event Access Levels
- * Requires both $groupList and $campusList for optional values
- */
-$page->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), $defaultAccessLevel, TEMPLATE_content, array(
-	'id' => 'EVENT_EVENTLEVEL_ID',
-	'name' => 'EVENT_EVENTLEVEL_NAME',
-));
-
-/* Group dropdown when using Group Event Level
- */
-$page->dropDown('event_group_drop', $groupList, $defaultSid, TEMPLATE_content, array(
-	'id' => 'EVENT_GROUP_ID',
-	'name' => 'EVENT_GROUP_NAME'
-));
-
 /* Campus Checkbox Array when using Campus Event Level
  */
+$campusMapper = new \Schoolbox\CampusMapper();
+$campusList = $campusMapper->findAll();
+
 if ($campusList->count()) {
 	$allCampuses = array();
 
@@ -205,7 +175,7 @@ if ($campusList->count()) {
 		);
 	}
 
-	$page->checkList('event_campus_list', $allCampuses, array($_SESSION['campus'][0]), TEMPLATE_content, array(
+	$page->checkList('event_campus_list', $allCampuses, $defaultCampusId, TEMPLATE_content, array(
 		'id' => 'EVENT_CAMPUS_ID',
 		'name' => 'EVENT_CAMPUS_NAME',
 	));
@@ -215,28 +185,4 @@ else {
 	$page->setVar('event_campus_list_block', '');
 }
 
-/* Roles, when Campus Event Level is used
- */
-$roleMapper = new \Schoolbox\RoleMapper();
-$roleList = $roleMapper->findAll();
-
-/* Roles checkbox array when using Campus Event Level
- * This really needs to be updated - why is checkList behaviour different to
- * the dropDown one when it comes to collections?
- */
-$allRoles = array();
-
-foreach($roleList as $current) {
-	$allRoles[] = array(
-		'id' => $current->getId(),
-		'name' => $current->getName()
-	);
-}
-
-$page->checkList('event_role_list', $allRoles, $defaultSid, TEMPLATE_content, array(
-	'id' => 'EVENT_ROLE_ID',
-	'name' => 'EVENT_ROLE_NAME'
-));
-
 $page->outputPage();
-

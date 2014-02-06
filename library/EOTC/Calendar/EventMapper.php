@@ -235,7 +235,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 *
 	 * @param $event
 	 */
-	private function postSave($event) {
+	protected function postSave($event) {
 
 		/* Deal with groupList and campusList separately
 		 */
@@ -256,9 +256,20 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$this->createCampus($event);
 	}
 
+	/**
+	 * Get all the events in the series
+	 *
+	 * @param $event
+	 * @return Schoolbox\Collection
+	 */
 	public function getAllInSeries($event) {
 		return $this->findByColumnList(array(
-			'series_id' => $event->getSeriesId()
+			'series_id' => $event->getSeriesId(),
+		),
+		array(
+			'order' => array(
+				'startDate' => 'ASC'
+			)
 		));
 	}
 

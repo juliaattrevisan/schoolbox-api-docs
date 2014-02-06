@@ -21,16 +21,11 @@ class EventRecurrenceMapper {
 	protected $eventMapper = null;
 
 	/**
-	 * An instance of calendarHandler
-	 *
-	 * @var null
-	 */
-	protected $calendarHandler = null;
-
-	/**
 	 * Constructor
 	 */
-	public function __construct() {
+	public function __construct($eventMapper) {
+		$this->setEventMapper($eventMapper);
+
 		$this->setup();
 	}
 
@@ -38,8 +33,46 @@ class EventRecurrenceMapper {
 	 * Hook method
 	 */
 	protected function setup() {
-		$this->setEventMapper(new EventMapper());
-		$this->setCalendarHandler(new \Calendar());
+	}
+
+	/**
+	 * Get the series recurrence settings
+	 *
+	 * @param $event
+	 * @return array
+	 */
+	public function getSeriesRecurrence($event) {
+		$series = $this->getEventMapper()->getAllInSeries($event);
+
+		$dateFirst = new \Alaress_Date_Format($series->first()->getStartDate(), 'y-m-d');
+		$dateNext = new \Alaress_Date_Format($series->next()->current()->getStartDate(), 'y-m-d');
+		$dateLast = new \Alaress_Date_Format($series->last()->getStartDate(), 'y-m-d');
+
+		$diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
+
+		$recurMap = array(
+			1 => 'daily',
+			7 => 'weekly',
+			14 => 'fortnightly',
+			28 => 'monthly',
+			29 => 'monthly',
+			30 => 'monthly',
+			31 => 'monthly',
+		);
+
+		if (isset($recurMap[$diff])) {
+			return array(
+				'freq' => $recurMap[$diff],
+				'start' => $dateFirst,
+				'end' => $dateLast
+			);
+		}
+
+		return array(
+			'freq' => 'periodically',
+			'start' => $dateFirst,
+			'end' => $dateLast
+		);
 	}
 
 	/**
@@ -68,12 +101,13 @@ class EventRecurrenceMapper {
 			 * (Change details of each instance of a recurring event, for example)
 			 */
 			if ($efficacy == 'series') {
-				$series = $this->getCalendarHandler()->getAllInSeriesByEventID($event->getId());
+				$series = $this->getEventMapper()->getAllInSeries($event);
 
 				foreach($series as $seriesEvent) {
-					$event->setId($seriesEvent['id']);
+					$event->setId($seriesEvent->getId());
 
 					$this->getEventMapper()->save($event);
+					$this->saveHook($event);
 				}
 			}
 			/* Modify an existing event and add recurring incidents
@@ -88,6 +122,7 @@ class EventRecurrenceMapper {
 				$event->setEndDate($first_date_set['end']);
 
 				$this->getEventMapper()->save($event);
+				$this->saveHook($event);
 
 				/* Skip the first element, spawn new event records
 				 */
@@ -102,6 +137,7 @@ class EventRecurrenceMapper {
 					$event->setEndDate($currentDate['end']);
 
 					$this->getEventMapper()->save($event);
+					$this->saveHook($event);
 				}
 			}
 		}
@@ -119,8 +155,17 @@ class EventRecurrenceMapper {
 				$event->setEndDate($currentDate['end']);
 
 				$this->getEventMapper()->save($event);
+				$this->saveHook($event);
 			}
 		}
+	}
+
+	/**
+	 * Post-event save hook, for augmentation by subclasses
+	 *
+	 * @param Event $event
+	 */
+	protected function saveHook(Event $event) {
 	}
 
 	/* Getters/Setters
@@ -142,23 +187,5 @@ class EventRecurrenceMapper {
 	 */
 	protected function getEventMapper() {
 		return $this->eventMapper;
-	}
-
-	/**
-	 * Set calendar handler
-	 *
-	 * @param null $calendarHandler
-	 */
-	protected function setCalendarHandler($calendarHandler) {
-		$this->calendarHandler = $calendarHandler;
-	}
-
-	/**
-	 * Get calendar handler
-	 *
-	 * @return null
-	 */
-	protected function getCalendarHandler() {
-		return $this->calendarHandler;
 	}
 }
