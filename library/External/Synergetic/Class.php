@@ -151,11 +151,12 @@ class External_Synergetic_Class implements External_ClassInterface
 	 */
 	public function findSubjectsWithFiletype($filetype) {
 		$query = "
-			SELECT *
+			SELECT ClassCode
 			FROM SynergyOne.dbo.StudentClasses
 			WHERE FileType = '{$filetype}'
 			AND FileYear = '{$_SESSION['FileYear']}'
 			AND FileSemester = '{$_SESSION['FileSemester']}'
+			GROUP BY ClassCode
 			ORDER BY ClassCode
 		";
 
