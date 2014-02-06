@@ -52,6 +52,26 @@ switch($_POST['action']) {
 			$metadata = new \EOTC\EventMetadata();
 		}
 
+		/* NO RETREAT
+		 * NO SURRENDER
+		 */
+		$userMapper = new \Schoolbox\UserMapper();
+
+		try {
+			$author = $userMapper->findById($_POST['authorId']);
+		}
+		catch (\Exception $e) {
+		}
+
+		try {
+			/* -_- magicsuggest sends this back at you in json_encoded format
+			 */
+			$wtf = json_decode($_POST['teacherInCharge']);
+			$teacherInCharge = $userMapper->findById($wtf[0]);
+		}
+		catch (\Exception $e) {
+		}
+
 		/* Events recur until this time
 		 */
 		if (strlen($_POST['repeat_until'])) {
@@ -66,12 +86,6 @@ switch($_POST['action']) {
 		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
 		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
-		/* NO RETREAT
-		 * NO SURRENDER
-		 */
-		$userMapper = new \Schoolbox\UserMapper();
-		$author = $userMapper->findById($_POST['authorId']);
-
 		/* Spawned further up
 		 */
 		$metadata->setEventType($_POST['type']);
@@ -79,9 +93,18 @@ switch($_POST['action']) {
 		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 		$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
+		/* All the staff that were selected
+		 */
+		$staffCollection = new \Schoolbox\Collection();
+
+		if (is_array($_POST['staff']) && count($_POST['staff'])) {
+			$staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
+		}
+
 		/* Spawned further up
 		 */
 		$event->setAuthor($author);
+		$event->setTeacherInCharge($teacherInCharge);
 		$event->setType($_POST['type']);
 		$event->setNote($_POST['note']);
 		$event->setStartDate($startDate->getDatabaseDate());
@@ -94,6 +117,7 @@ switch($_POST['action']) {
 		/* Collections of ids
 		 */
 		$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
+		$event->setStaffAttendees($staffCollection);
 
 		/* Store metadata
 		 */
@@ -140,6 +164,7 @@ switch($_POST['action']) {
 				foreach($allEvents as $currentEvent) {
 					$eventMapper->deleteCampusRelations($currentEvent);
 					$eventMapper->deleteMetadataRelations($currentEvent);
+					$eventMapper->deleteStaffAttendeesRelations($currentEvent);
 					$eventMapper->delete($currentEvent);
 				}
 			}
@@ -149,6 +174,7 @@ switch($_POST['action']) {
 			else if ($_POST['efficacy'] == 'self') {
 				$eventMapper->deleteCampusRelations($event);
 				$eventMapper->deleteMetadataRelations($event);
+				$eventMapper->deleteStaffAttendeesRelations($currentEvent);
 				$eventMapper->delete($event);
 			}
 		}
@@ -158,6 +184,7 @@ switch($_POST['action']) {
 			$eventMapper->delete($event);
 			$eventMapper->deleteCampusRelations($event);
 			$eventMapper->deleteMetadataRelations($event);
+			$eventMapper->deleteStaffAttendeesRelations($currentEvent);
 			$metadataMapper->delete($event->getMetadata());
 		}
 

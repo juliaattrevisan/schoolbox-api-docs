@@ -34,6 +34,34 @@
 		});
 	});
 </script>
+<link href="/modules/eotc/js/magicsuggest/magicsuggest-1.3.1.css" rel="stylesheet" />
+<script type="text/javascript" src="/modules/eotc/js/magicsuggest/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('#staff-suggest').userSelector({
+			plugin: {
+				data:'/ajax/user.php?groupID=2',
+				allowFreeEntries: false,
+				name: 'staff'
+			},
+			value: {EVENT_STAFF},
+			onePerLine: false,
+			multiple: true
+		});
+
+		$('#teacher-in-charge-suggest').userSelector({
+			plugin: {
+				data:'/ajax/user.php?groupID=2',
+				allowFreeEntries: false,
+				name: 'teacherInCharge'
+			},
+			value: {EVENT_TEACHER_IN_CHARGE},
+			onePerLine: false,
+			multiple: false
+		});
+	});
+</script>
 <h1>
 	<span>{FUNCTION} Event</span>
 	<a class="customise" href="#">
@@ -49,8 +77,16 @@
 	<input id="efficacy" name="efficacy" type="hidden" value="self" />
 	<input id="action" name="action" type="hidden" value="" />
 
-	<h2>Current status: {EVENT_STATUS}</h2>
+	<h2>Current status</h2>
+	<table class="standardForm">
+		<tbody>
+			<tr>
+				<td>{EVENT_STATUS}</td>
+			</tr>
+		</tbody>
+	</table>
 
+	<h2>Details</h2>
 	<table class="standardForm">
 		<tbody>
 			<tr>
@@ -183,6 +219,30 @@
 				</td>
 				<td>
 					<textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>People</h2>
+	<table class="standardForm">
+		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Teacher In Charge</h4>
+					<em>The teacher in charge of this event</em>
+				</td>
+				<td>
+					<div id="teacher-in-charge-suggest"></div>
+				</td>
+			</tr>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Staff Members</h4>
+					<em>Add staff members</em>
+				</td>
+				<td>
+					<div id="staff-suggest"></div>
 				</td>
 			</tr>
 		</tbody>

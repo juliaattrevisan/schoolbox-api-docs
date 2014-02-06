@@ -37,6 +37,13 @@ class Event extends Calendar\Event {
 	protected $staffAttendees = null;
 
 	/**
+	 * A User object
+	 *
+	 * @var null
+	 */
+	protected $teacherInCharge = null;
+
+	/**
 	 * Hook method
 	 */
 	protected function setup() {
@@ -65,5 +72,41 @@ class Event extends Calendar\Event {
 	 */
 	public function getMetadata() {
 		return $this->metadata;
+	}
+
+	/**
+	 * Set staff attendees
+	 *
+	 * @param null $staffAttendees
+	 */
+	public function setStaffAttendees($staffAttendees) {
+		$this->staffAttendees = $staffAttendees;
+	}
+
+	/**
+	 * Get staff attendees
+	 *
+	 * @return null
+	 */
+	public function getStaffAttendees() {
+		return $this->staffAttendees;
+	}
+
+	/**
+	 * Set teacher in charge
+	 *
+	 * @param null $teacherInCharge
+	 */
+	public function setTeacherInCharge($teacherInCharge) {
+		$this->teacherInCharge = $teacherInCharge;
+	}
+
+	/**
+	 * Get teacher in charge
+	 *
+	 * @return null
+	 */
+	public function getTeacherInCharge() {
+		return $this->teacherInCharge;
 	}
 }
