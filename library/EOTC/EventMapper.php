@@ -175,6 +175,10 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setStudentAttendees($this->findStudentAttendees($identifier));
 
+			/* Accumulate RAMS files for this event
+			 */
+			$eventItem->setRamsFiles($this->findFiles($identifier));
+
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()->count()) {
@@ -214,6 +218,9 @@ class EventMapper extends Calendar\EventMapper {
 
 		$this->deleteStudentAttendeesRelations($event);
 		$this->createStudentAttendees($event);
+
+		$this->deleteFilesRelations($event);
+		$this->createFiles($event);
 	}
 
 	/**
@@ -343,7 +350,7 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
-	 * Find metadata for a particular event
+	 * Find staff for a particular event
 	 *
 	 * @param $identifier
 	 * @return \Schoolbox\Collection
@@ -454,7 +461,7 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->execute();
 	}
 
-	/**safeIframe
+	/**
 	 * Add specific relations for a particular event
 	 *
 	 * @param $event
@@ -506,6 +513,69 @@ class EventMapper extends Calendar\EventMapper {
 			$statement->bindParam(":eventId", $event->getId());
 			$statement->execute();
 		}
+	}
+
+	/**
+	 * Assign files to an event
+	 *
+	 * @param $event
+	 */
+	private function createFiles($event) {
+		$query = "
+			INSERT IGNORE INTO `eotc_event_file` (event_id, storage_id)
+			VALUES (:eventId, :storageId)
+		";
+
+		foreach ($event->getRamsFiles() as $currentFile) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":storageId", $currentFile->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Find files for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	private function findFiles($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_event_file',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'storage_id',
+					'key' => 'storage_id',
+					'mapper' => new \Schoolbox\StorageMapper()
+				),
+			));
+	}
+
+	/**
+	 * Deletes file relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $event
+	 * @return bool|void
+	 */
+	public function deleteFilesRelations($event) {
+		$query = "
+			DELETE FROM `eotc_event_file`
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
 	}
 
 	/**
