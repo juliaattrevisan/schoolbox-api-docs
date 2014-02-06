@@ -55,6 +55,9 @@ switch($_POST['action']) {
 		/* NO RETREAT
 		 * NO SURRENDER
 		 */
+
+		/* Author
+		 */
 		$userMapper = new \Schoolbox\UserMapper();
 
 		try {
@@ -63,11 +66,22 @@ switch($_POST['action']) {
 		catch (\Exception $e) {
 		}
 
+		/* Teacher in charge
+		 */
 		try {
 			/* -_- magicsuggest sends this back at you in json_encoded format
+			 * or as an int - i.e. there are two formats:
+			 *
+			 * [151]
+			 * 151
 			 */
-			$wtf = json_decode($_POST['teacherInCharge']);
-			$teacherInCharge = $userMapper->findById($wtf[0]);
+			if (is_numeric($_POST['teacherInCharge'])) {
+				$teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
+			}
+			else {
+				$wtf = json_decode($_POST['teacherInCharge']);
+				$teacherInCharge = $userMapper->findById($wtf[0]);
+			}
 		}
 		catch (\Exception $e) {
 		}
