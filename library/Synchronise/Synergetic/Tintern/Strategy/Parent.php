@@ -57,7 +57,7 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
      * @return string
      */
     public function getPassword($newUser) {
-        return  str_pad(substr($newUser['lastname'],0,4),4,'-') . substr($newUser['synergy_id'],-3);
+        return  str_pad(substr(preg_replace('/[^\w\d]/ui','',strtolower($newUser['lastname'])),0,4),4,'-') . substr($newUser['synergy_id'],-3);
     }
 
     /**
