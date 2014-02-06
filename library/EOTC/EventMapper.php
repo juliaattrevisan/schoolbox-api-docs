@@ -426,7 +426,12 @@ class EventMapper extends Calendar\EventMapper {
 				'relation' => array(
 					'column' => 'user_id',
 					'key' => 'id',
-					'mapper' => new \Schoolbox\UserMapper()
+					'mapper' => new \Schoolbox\UserMapper(),
+					'options' => array(
+						'order' => array(
+							'lastname' => 'ASC'
+						)
+					)
 				),
 			));
 	}
@@ -449,7 +454,7 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->execute();
 	}
 
-	/**
+	/**safeIframe
 	 * Add specific relations for a particular event
 	 *
 	 * @param $event
@@ -532,7 +537,7 @@ class EventMapper extends Calendar\EventMapper {
 			$ids[] = $row[$join['relation']['column']];
 		}
 
-		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids);
+		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids, $join['relation']['options']);
 
 		return $allInstances;
 	}
