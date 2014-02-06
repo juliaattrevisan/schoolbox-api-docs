@@ -56,7 +56,7 @@
 				var allOptions = '';
 
 				for (var i = 0; i < data.length; i++) {
-					var option = '<option value="'+ data[i].ID +'">'+ data[i].ClassCode +'</option>';
+					var option = '<option value="'+ data[i].ClassCode +'">'+ data[i].ClassCode +'</option>';
 					allOptions += option;
 				}
 
