@@ -17,12 +17,9 @@ function init(){
 </script>
 </head>
 <body class="login">
-<div id="header">
-	<a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}" /></a>
-</div>
 <div id="container" class=" login">
 	<div id="content" class="clearfix">
-		<h1 style="text-transform:capitalize">{SITE_NAME}</h1>
+        <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}" /></a>
 		<p class="error">{ERROR}</p>
 		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php">
 			<fieldset>
@@ -50,6 +47,9 @@ function init(){
         <li><a href="http://alaress.com.au" title="Web Development Melbourne">Web Development</a> by <a href="http://alaress.com.au">Alaress</a></li>
 		<li class="last"><a href="/feedback.php" title="Get support">Feedback and Support</a></li>
 	</ul>
+</div>
+<div id="login-bg">
+    <img src="/images/bialik/login-bg.jpg" alt="">
 </div>
 </body>
 </html>

@@ -74,12 +74,18 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // =============================================================================
-body, body.login{
-  background: #ffffff url('/images/bialik/bg.png') top left repeat-x;
-}
+
+body{ background: #ffffff url('/images/bialik/bg.png') top left repeat-x; }
 
 body.login{
-  #header{ background: transparent; }
+  #container{
+    top: 120px;
+    position: relative;
+
+    .logo img{
+      margin: 6px 0 15px 0;
+    }
+  }
 
   .submit-btn-plain{
     background: @module-heading;
@@ -87,7 +93,27 @@ body.login{
   }
 
   #footer{
-    ul li, ul li a{ color: #929292; }
+    ul li, ul li a{ color: #fff; }
+  }
+
+  #login-bg {
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: -1;
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      min-width: 50%;
+      min-height: 50%;
+    }
   }
 }
 
