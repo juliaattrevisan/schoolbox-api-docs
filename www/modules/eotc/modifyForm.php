@@ -170,7 +170,7 @@ switch($_POST['action']) {
 
 		/* Superuser modifying some arbitrary event
 		 */
-		$page->backToTheFuture(1);
+		$page->localRedir('/modules/eotc/modify.php?eventID=' . $event->getId());
 
 		break;
 
