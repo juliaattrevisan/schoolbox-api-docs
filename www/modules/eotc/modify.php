@@ -17,6 +17,9 @@ $page->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
 $page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+$page->setBlock(TEMPLATE_content, 'has_activity_log', 'has_activity_log_block');
+$page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
+
 
 /* Modify existing event
  */
@@ -125,6 +128,42 @@ if (is_numeric($_GET['eventID'])) {
 		$page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
 		$page->parse('recurring_reminder_block', 'recurring_reminder');
 		$page->setVar('recurring_dates_block', '');
+	}
+
+	/* Activity log
+	 */
+	$page->setVar(array(
+		'activity_log_block' => '',
+		'has_activity_log_block' => ''
+	));
+
+	$i = 0;
+
+	foreach($event->getActivityLog() as $currentLog) {
+
+		/* If there are no activityLog items, mappers will spawn a single
+		 * object where every property is null
+		 *
+		 * TODO: Mappers probably shouldn't spawn you such objects
+		 */
+		if ($currentLog->getId()) {
+			$page->setVar(array(
+				'ACTIVITY_LOG_CREATED_AT' => $currentLog->getCreatedAt()->getShort(),
+				'ACTIVITY_LOG_MESSAGE' => $currentLog->getMessage()
+			));
+
+			$page->parse('activity_log_block', 'activity_log', true);
+
+			/* SB-3911
+			 */
+			$i++;
+		}
+	}
+
+	/* SB-3911
+	 */
+	if ($i) {
+		$page->parse('has_activity_log_block', 'has_activity_log');
 	}
 
 	$page->parse('delete_button_block', 'delete_button');
