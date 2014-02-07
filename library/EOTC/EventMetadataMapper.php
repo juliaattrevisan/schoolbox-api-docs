@@ -88,7 +88,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		}
 
 		if (count($allMetadataIds)) {
-			return $this->findByColumn('id', $allMetadataIds);
+			return $this->findByColumn('id', $allMetadataIds)->first();
 		}
 
 		throw new \Exception('No metadata for this event exists.');

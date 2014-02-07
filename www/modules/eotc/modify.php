@@ -33,6 +33,12 @@ if (is_numeric($_GET['eventID'])) {
 		error(160);
 	}
 
+	/* Do a check for missing metadata
+	 */
+	if (!$event->getMetadata()) {
+		throw new \Exception('No metadata record found for this event.');
+	}
+
 	/* Default values
 	 */
 	$defaultTypeId = $event->getEventType()->getId();

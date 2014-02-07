@@ -46,7 +46,7 @@ switch($_POST['action']) {
 		 */
 		try {
 			$metadataMapper = new \EOTC\EventMetadataMapper();
-			$metadata = $metadataMapper->findByEvent($event)->first();
+			$metadata = $metadataMapper->findByEvent($event);
 		}
 		catch (\Exception $e) {
 			$metadata = new \EOTC\EventMetadata();
