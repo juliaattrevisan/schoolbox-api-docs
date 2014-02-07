@@ -42,6 +42,13 @@ class EventMetadata {
 	private $ramsRequired = false;
 
 	/**
+	 * The latest comment about the event
+	 *
+	 * @var string
+	 */
+	private $comment = '';
+
+	/**
 	 * Created at
 	 *
 	 * @var null
@@ -195,5 +202,23 @@ class EventMetadata {
 	 */
 	public function getUpdatedAt() {
 		return $this->updatedAt;
+	}
+
+	/**
+	 * Set comment
+	 *
+	 * @param string $comment
+	 */
+	public function setComment($comment) {
+		$this->comment = $comment;
+	}
+
+	/**
+	 * Get comment
+	 *
+	 * @return string
+	 */
+	public function getComment() {
+		return $this->comment;
 	}
 }

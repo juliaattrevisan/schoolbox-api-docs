@@ -9,6 +9,7 @@ ALTER TABLE `eotc_metadata` CHANGE `rams_required` `rams_required` TINYINT(1) NU
 /* Unique index, so I can use insert ignore to prevent dupes
  */
 ALTER TABLE `eotc_event_metadata` ADD UNIQUE INDEX `event_metadata` (`event_id`, `metadata_id`);
+ALTER TABLE `eotc_metadata` CHANGE `notes` `comment` TEXT CHARSET utf8 COLLATE utf8_general_ci NULL COMMENT 'iAdditional notes';
 
 /* Event statuses
  */
