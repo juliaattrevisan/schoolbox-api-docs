@@ -138,7 +138,10 @@ class Cloner {
             SubmissionBoxMapper::getInstance()->create($box);
 
             // Clone rubrix too
-            SubmissionBox\Rubric\UsageMapper::getInstance()->copyFromCopiedSubmissionBox($box_id, $box->getId());
+            SubmissionBox\Rubric\UsageMapper::getInstance()
+                ->copyFromCopiedSubmissionBox($box_id, $box->getId());
+            SubmissionBox\Rubric\DescriptorMapper::getInstance()
+                ->copyFromCopiedSubmissionBox($box_id, $box->getId());
             return $box;
         }
         throw new ClonerException('No submission box is attached to this task');
