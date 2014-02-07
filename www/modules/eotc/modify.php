@@ -139,7 +139,7 @@ if (is_numeric($_GET['eventID'])) {
 
 	$i = 0;
 
-	foreach($event->getActivityLog() as $currentLog) {
+	foreach($event->getMetadata()->first()->getActivityLog() as $currentLog) {
 
 		/* If there are no activityLog items, mappers will spawn a single
 		 * object where every property is null

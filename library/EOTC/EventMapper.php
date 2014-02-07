@@ -98,11 +98,6 @@ class EventMapper extends Calendar\EventMapper {
 			'this_key'  => 'teacher_in_charge_id',
 			'other_key' => 'id',
 		));
-		$this->hasJoin('activityLog', array(
-			'mapper'    => '\\EOTC\\ActivityLog\\Mapper',
-			'this_key'  => 'id',
-			'other_key' => 'event_id',
-		));
 	}
 
 	/**
@@ -116,7 +111,6 @@ class EventMapper extends Calendar\EventMapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
-//		$activityLogMapper = $this->getJoinMapper('activityLog');
 
 		$query = "
 			SELECT
@@ -161,9 +155,6 @@ class EventMapper extends Calendar\EventMapper {
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
 			$eventItem->setEventType($eventTypeItem);
 
-//			$activityLog = $activityLogMapper->hydrate($row, 'l');
-//			$allActivityLogs->add($activityLog);
-
 			/* Convert dates ;(
 			 */
 			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
@@ -197,11 +188,24 @@ class EventMapper extends Calendar\EventMapper {
 			if ($eventItem->getMetadata()->count()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+
+				/* Activity logs
+				 */
+				$activityLogMapper = new ActivityLog\Mapper();
+
+				foreach($eventItem->getMetadata() as $currentMetadata) {
+					$allActivityLogs = $activityLogMapper->findByColumn('metadata_id', $currentMetadata->getId(), array(
+						'order' => array(
+							'created_at' => 'DESC'
+						)
+					));
+
+					$currentMetadata->setActivityLog($allActivityLogs);
+				}
 			}
 		}
 
 		if ($eventItem) {
-			$eventItem->setActivityLog($allActivityLogs);
 			return $eventItem;
 		}
 

@@ -49,6 +49,13 @@ class EventMetadata {
 	private $comment = '';
 
 	/**
+	 * A collection of ActivityLog
+	 *
+	 * @var null
+	 */
+	protected $activityLog = null;
+
+	/**
 	 * Created at
 	 *
 	 * @var null
@@ -220,5 +227,23 @@ class EventMetadata {
 	 */
 	public function getComment() {
 		return $this->comment;
+	}
+
+	/**
+	 * Set activity log
+	 *
+	 * @param null $activityLog
+	 */
+	public function setActivityLog($activityLog) {
+		$this->activityLog = $activityLog;
+	}
+
+	/**
+	 * Get activity log
+	 *
+	 * @return null
+	 */
+	public function getActivityLog() {
+		return $this->activityLog;
 	}
 }
