@@ -92,6 +92,24 @@ switch($_POST['action']) {
 			$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
 		}
 
+		/* Set up activity log
+		 */
+		$registry = new \EOTC\ActivityLog\Registry();
+
+		/* If a status changed, log it
+		 */
+		if ($event->getId()) {
+			if ($metadata->getStatus()->getId() != $_POST['status_id']) {
+				$registry->add(new \EOTC\ActivityLog\StatusChange($event, $_SESSION['user']));
+			}
+
+			/* If a comment change, log it
+			 */
+			if ($metadata->getComment() != $_POST['comment']) {
+				$registry->add(new \EOTC\ActivityLog\CommentChange($event, $_SESSION['user']));
+			}
+		}
+
 		/* Start and end dates
 		 */
 		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
@@ -102,6 +120,8 @@ switch($_POST['action']) {
 
 		/* Spawned further up
 		 */
+		// $metadata->setStatus($_POST['status_id']);
+		// $metadata->setComment($_POST['comment']);
 		$metadata->setEventType($_POST['type']);
 		$metadata->setRamsRequired($_POST['ramsRequired']);
 		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
@@ -172,10 +192,9 @@ switch($_POST['action']) {
 		$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
-		/* If you were editing an event on someone else's calendar, don't
-		 * get stuffed around by time travel's one-index-offset rip in
-		 * the space-time continuum
+		/* Notify everyone
 		 */
+		$registry->notify();
 
 		/* Superuser modifying some arbitrary event
 		 */
