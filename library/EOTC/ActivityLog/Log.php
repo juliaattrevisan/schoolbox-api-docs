@@ -11,7 +11,7 @@
 namespace EOTC\ActivityLog;
 
 
-class Base {
+class Log {
 
 	/**
 	 * Log id

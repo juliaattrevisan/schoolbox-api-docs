@@ -56,7 +56,7 @@ class Factory {
 				break;
 		}
 
-		$log = new Base();
+		$log = new Log();
 		$log->setActioner($this->getActioner());
 		$log->setEvent($this->getEvent());
 		$log->setMessage($str);
