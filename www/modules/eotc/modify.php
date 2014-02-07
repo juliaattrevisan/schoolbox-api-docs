@@ -77,7 +77,7 @@ if (is_numeric($_GET['eventID'])) {
 		'ADVANCED_CLOSE' => 'hidden',
 	));
 
-	if ($event->getMetadata()->first()->getRamsRequired()) {
+	if ($event->getMetadata()->getRamsRequired()) {
 		if ($event->getRamsFiles()->first()) {
 			$filename = $event->getRamsFiles()->first()->getFilename();
 		}
@@ -91,8 +91,8 @@ if (is_numeric($_GET['eventID'])) {
 		'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
 		'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
 		'EVENT_STAFF' => json_encode($staffSelected),
-		'EVENT_STATUS' => $event->getMetadata()->first()->getStatus()->getName(),
-		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->first()->getRamsRequired() ? 'checked="checked"' : '',
+		'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
+		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->getRamsRequired() ? 'checked="checked"' : '',
 		'EVENT_ID' => $event->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
@@ -139,7 +139,7 @@ if (is_numeric($_GET['eventID'])) {
 
 	$i = 0;
 
-	foreach($event->getMetadata()->first()->getActivityLog() as $currentLog) {
+	foreach($event->getMetadata()->getActivityLog() as $currentLog) {
 
 		/* If there are no activityLog items, mappers will spawn a single
 		 * object where every property is null
@@ -227,6 +227,13 @@ else {
 	));
 
 	$page->parse('recurring_dates_block', 'recurring_dates');
+
+	/* Activity Logs
+	 */
+	$page->setVar(array(
+		'has_activity_log_block' => '',
+		'activity_log_block' => ''
+	));
 }
 
 /* Event Types

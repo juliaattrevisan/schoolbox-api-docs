@@ -164,8 +164,9 @@ class EventMapper extends Calendar\EventMapper {
 			$eventItem->setEndDateTime($endDateTime);
 
 			/* Accumulate the metadata for this event
+			 * Only use the first record
 			 */
-			$eventItem->setMetadata($this->findMetadata($identifier));
+			$eventItem->setMetadata($this->findMetadata($identifier)->first());
 
 			/* Accumulate campuses for this event
 			 */
@@ -185,7 +186,7 @@ class EventMapper extends Calendar\EventMapper {
 
 			/* Determine current status
 			 */
-			if ($eventItem->getMetadata()->count()) {
+			if ($eventItem->getMetadata()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
@@ -193,15 +194,13 @@ class EventMapper extends Calendar\EventMapper {
 				 */
 				$activityLogMapper = new ActivityLog\Mapper();
 
-				foreach($eventItem->getMetadata() as $currentMetadata) {
-					$allActivityLogs = $activityLogMapper->findByColumn('metadata_id', $currentMetadata->getId(), array(
-						'order' => array(
-							'created_at' => 'DESC'
-						)
-					));
+				$allActivityLogs = $activityLogMapper->findByColumn('metadata_id', $eventItem->getMetadata()->getId(), array(
+					'order' => array(
+						'created_at' => 'DESC'
+					)
+				));
 
-					$currentMetadata->setActivityLog($allActivityLogs);
-				}
+				$eventItem->getMetadata()->setActivityLog($allActivityLogs);
 			}
 		}
 
