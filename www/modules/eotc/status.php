@@ -23,6 +23,7 @@ $this->setBlock(TEMPLATE_content, 'event_student', 'event_student_block');
 $this->setBlock(TEMPLATE_content, 'has_rams', 'has_rams_block');
 $this->setBlock(TEMPLATE_content, 'has_event_activity_log', 'has_event_activity_log_block');
 $this->setBlock('has_event_activity_log', 'event_activity_log', 'event_activity_log_block');
+$this->setBlock(TEMPLATE_content, 'event_status', 'event_status_block');
 
 $this->setVar(array(
 	'EVENT_ID' => $event->getId(),
@@ -149,4 +150,26 @@ if ($i) {
 	$this->parse('has_event_activity_log_block', 'has_event_activity_log');
 }
 
-new \Alaress_Probe($event);
+/* Status Dropdown
+ */
+$eventStatusMapper = new \EOTC\EventStatusMapper();
+$allEventStatus = $eventStatusMapper->findAll();
+
+foreach($allEventStatus as $currentStatus) {
+	$this->setVar(array(
+		'EVENT_STATUS_ID' => $currentStatus->getId(),
+		'EVENT_STATUS_NAME' => $currentStatus->getName(),
+		'EVENT_STATUS_SELECTED' => '',
+	));
+
+	/* Preselect
+	 */
+	if ($currentStatus->getId() == $event->getMetadata()->getStatus()->getId()) {
+		$this->setVar(array(
+			'EVENT_STATUS_SELECTED' => 'selected="selected"',
+		));
+	}
+
+	$this->parse('event_status_block', 'event_status', true);
+}
+//new \Alaress_Probe($event);
