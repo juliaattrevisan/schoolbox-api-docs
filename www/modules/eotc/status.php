@@ -29,17 +29,9 @@ $this->setVar(array(
 	'EVENT_NOTE' => $event->getNote(),
 	'EVENT_LOCATION' => $event->getLocation(),
 	'EVENT_DETAIL' => $event->getDetail(),
-	'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
-	'EVENT_START_HOUR' => $event->getStartDateTime()->getUsingFormat('H'),
-	'EVENT_START_MIN' => $event->getStartDateTime()->getUsingFormat('i'),
-	'EVENT_START_AM' => $event->getStartDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
-	'EVENT_START_PM' => $event->getStartDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
-	'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
-	'EVENT_END_HOUR' => $event->getEndDateTime()->getUsingFormat('H'),
-	'EVENT_END_MIN' => $event->getEndDateTime()->getUsingFormat('i'),
-	'EVENT_END_AM' => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
-	'EVENT_END_PM' => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
 	'EVENT_CREATED_AT' => $event->getMetadata()->getCreatedAt()->getShort(),
+	'EVENT_START' => $event->getStartDateTime()->getShort(),
+	'EVENT_END' => $event->getEndDateTime()->getShort(),
 
 	'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
 	'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
@@ -161,4 +153,4 @@ if ($i) {
 	$this->parse('has_event_activity_log_block', 'has_event_activity_log');
 }
 
-//new \Alaress_Probe($event);
+new \Alaress_Probe($event);
