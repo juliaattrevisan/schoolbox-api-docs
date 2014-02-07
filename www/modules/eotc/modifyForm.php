@@ -207,8 +207,7 @@ switch($_POST['action']) {
 		if ($statusChanged) {
 			$registry->add($factory->produce('StatusChange'));
 		}
-//	new \EOTC\ActivityLog\StatusChange($event, $_SESSION['user'])
-//	new \EOTC\ActivityLog\CommentChange($event, $_SESSION['user'])
+
 		if ($commentChanged) {
 			$registry->add($factory->produce('CommentChange'));
 		}
