@@ -59,10 +59,5 @@ class Mapper extends \Schoolbox\Mapper {
 			'this_key'  => 'actioner_id',
 			'other_key' => 'id',
 		));
-		$this->hasJoin('teacherInCharge', array(
-			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'teacher_in_charge_id',
-			'other_key' => 'id',
-		));
 	}
 } 

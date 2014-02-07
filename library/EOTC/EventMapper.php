@@ -160,7 +160,6 @@ class EventMapper extends Calendar\EventMapper {
 			$eventItem->setEventType($eventTypeItem);
 
 			$activityLog = $activityLogMapper->hydrate($row, 'l');
-
 			$allActivityLogs->add($activityLog);
 
 			/* Convert dates ;(
