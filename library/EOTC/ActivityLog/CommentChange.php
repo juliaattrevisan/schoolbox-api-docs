@@ -18,14 +18,14 @@ class CommentChange extends Base {
 	 *
 	 * @var string
 	 */
-	protected $message = ' commented: ';
+	protected $text = ' commented: ';
 
 	/**
 	 * Construct message
 	 */
 	protected function setup() {
-		$str = $this->getActioner()->getFullname() . $this->getMessage() . $this->getEvent()->getMetadata()->first()->getComment();
+		$str = $this->getActioner()->getFullname() . $this->getText() . $this->getEvent()->getMetadata()->first()->getComment();
 
-		$this->setResult($str);
+		$this->setMessage($str);
 	}
 }

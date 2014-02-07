@@ -18,14 +18,14 @@ class StatusChange extends Base {
 	 *
 	 * @var string
 	 */
-	protected $message = ' updated status to ';
+	protected $text = ' updated status to ';
 
 	/**
 	 * Construct message
 	 */
 	protected function setup() {
-		$str = $this->getActioner()->getFullname() . $this->getMessage() . $this->getEvent()->getMetadata()->first()->getStatus()->getName();
+		$str = $this->getActioner()->getFullname() . $this->getText() . $this->getEvent()->getMetadata()->getStatus()->getName();
 
-		$this->setResult($str);
+		$this->setMessage($str);
 	}
 }
