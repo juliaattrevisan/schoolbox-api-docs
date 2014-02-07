@@ -110,4 +110,24 @@ class Synchronise_Synergetic_Peninsula_Strategy_Staff extends Synchronise_Base_S
                 return 3;
         }
     }
+    
+    /**
+    * Webmail setting
+    *
+    * @param $currentUser
+    * @return int|void
+    */
+    public function getWebmailFromUser($currentUser) {
+            return 1;
+    }
+
+    /**
+    * External mail setting
+    *
+    * @param $currentUser
+    * @return int|void
+    */
+    public function getExternalMailFromUser($currentUser) {
+            return 0;
+    }
 }
