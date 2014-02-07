@@ -92,22 +92,21 @@ switch($_POST['action']) {
 			$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
 		}
 
-		/* Set up activity log
-		 */
-		$registry = new \EOTC\ActivityLog\Registry();
-
 		/* If a status changed, log it
 		 */
+		$statusChanged = false;
+		$commentChanged = false;
+
 		if ($event->getId()) {
-//			if ($metadata->getStatus()->getId() != $_POST['status_id']) {
-				$registry->add(new \EOTC\ActivityLog\StatusChange($event, $_SESSION['user']));
-//			}
+			if ($metadata->getStatus()->getId() != $_POST['status_id']) {
+				$statusChanged = true;
+			}
 
 			/* If a comment change, log it
 			 */
-//			if ($metadata->getComment() != $_POST['comment']) {
-				$registry->add(new \EOTC\ActivityLog\CommentChange($event, $_SESSION['user']));
-//			}
+			if ($metadata->getComment() != $_POST['comment']) {
+				$commentChanged = true;
+			}
 		}
 
 		/* Start and end dates
@@ -120,8 +119,16 @@ switch($_POST['action']) {
 
 		/* Spawned further up
 		 */
-		// $metadata->setStatus($_POST['status_id']);
-		// $metadata->setComment($_POST['comment']);
+
+		// $_POST['status_id']
+		$eventStatusMapper = new \EOTC\EventStatusMapper();
+		$eventStatus = $eventStatusMapper->findById(1);
+
+		// $_POST['comment']
+		$comment = 'mort';
+
+		$metadata->setStatus($eventStatus);
+		$metadata->setComment($comment);
 		$metadata->setEventType($_POST['type']);
 		$metadata->setRamsRequired($_POST['ramsRequired']);
 		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
@@ -191,6 +198,18 @@ switch($_POST['action']) {
 		 */
 		$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
+
+		/* Set up activity log
+		 */
+		$registry = new \EOTC\ActivityLog\Registry();
+
+		if ($statusChanged) {
+			$registry->add(new \EOTC\ActivityLog\StatusChange($event, $_SESSION['user']));
+		}
+
+		if ($commentChanged) {
+			$registry->add(new \EOTC\ActivityLog\CommentChange($event, $_SESSION['user']));
+		}
 
 		/* Notify everyone
 		 */
