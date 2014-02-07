@@ -1,0 +1,101 @@
+<div style="width:50%;float:left;">
+	<h1>{EVENT_NOTE}</h1>
+	<p>
+		{EVENT_END_DATE} {EVENT_END_HOUR}:{EVENT_END_MIN}&ndash;{EVENT_END_DATE} {EVENT_END_HOUR}:{EVENT_END_MIN}
+	</p>
+	<p>
+		Location: {EVENT_LOCATION}
+	</p>
+	<p>
+		{EVENT_DETAIL}
+	</p>
+	<p>
+		Created by <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
+		on {EVENT_CREATED_AT}
+	</p>
+
+	<a href="/modules/eotc/modify.php?eventID={EVENT_ID}" class="btn modify"><span></span>Modify Event</a>
+</div>
+<div style="width:50%;float:right;">
+	<h2>Related Campuses</h2>
+	<ul>
+		<!-- BEGIN event_campus -->
+		<li>{EVENT_CAMPUS_NAME}</li>
+		<!-- END event_campus -->
+	</ul>
+
+	<!-- BEGIN has_rams -->
+	<h2>RAMS Requirement</h2>
+	<p>
+		<a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}">{EVENT_RAMS_FILE}</a>
+	</p>
+	<!-- END has_rams -->
+</div>
+
+<div style="width:100%;float:left;clear:both">
+	<h2>Teacher In Charge</h2>
+	<p>
+		<a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
+			<img width="32" height="32" src="/portrait.php?userId={EVENT_TEACHER_IN_CHARGE_EXTERNAL_ID}&size=square32" />
+			{EVENT_TEACHER_IN_CHARGE_NAME}
+		</a>
+	</p>
+
+	<div class="clearfix"></div>
+
+	<h2>Staff Attendees ({EVENT_STAFF_COUNT})</h2>
+
+	<ul class="information-list grid">
+		<!-- BEGIN event_staff -->
+		<li>
+			<a href="/search/user/{EVENT_STAFF_ID}">
+				<img width="32" height="32" src="/portrait.php?userId={EVENT_STAFF_EXTERNAL_ID}&size=square32" />
+				{EVENT_STAFF_NAME}
+			</a>
+		</li>
+		<!-- END event_staff -->
+	</ul>
+
+	<div class="clearfix"></div>
+
+	<h2>Student Attendees ({EVENT_STUDENT_COUNT})</h2>
+	<ul class="information-list grid">
+		<!-- BEGIN event_student -->
+		<li>
+			<a href="/search/user/{EVENT_STUDENT_ID}">
+				<img width="32" height="32" src="/portrait.php?userId={EVENT_STUDENT_EXTERNAL_ID}&size=square32" />
+				{EVENT_STUDENT_NAME}
+			</a>
+		</li>
+		<!-- END event_student -->
+	</ul>
+</div>
+
+<div class='clearfix'></div>
+
+<!-- BEGIN has_event_activity_log -->
+<h2>Activity Log</h2>
+<table class="standardForm">
+	<tbody>
+	<!-- BEGIN event_activity_log -->
+	<tr>
+		<td class="formLabelWidth">{EVENT_ACTIVITY_LOG_CREATED_AT}</td>
+		<td>{EVENT_ACTIVITY_LOG_MESSAGE}</td>
+	</tr>
+	<!-- END event_activity_log -->
+	</tbody>
+</table>
+<!-- END has_event_activity_log -->
+
+<div class='clearfix'></div>
+
+<h2>Current status</h2>
+<table class="standardForm">
+	<tbody>
+	<tr>
+		<td>{EVENT_STATUS}</td>
+	</tr>
+	</tbody>
+</table>
+
+
