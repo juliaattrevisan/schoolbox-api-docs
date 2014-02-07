@@ -28,11 +28,11 @@ class Log {
 	protected $actioner = null;
 
 	/**
-	 * An instance of Event
+	 * Metadata record
 	 *
 	 * @var null
 	 */
-	protected $event = null;
+	protected $metadataId = -1;
 
 	/**
 	 * Partial message
@@ -150,24 +150,6 @@ class Log {
 	}
 
 	/**
-	 * Set event
-	 *
-	 * @param null $event
-	 */
-	public function setEvent($event) {
-		$this->event = $event;
-	}
-
-	/**
-	 * Get event
-	 *
-	 * @return null
-	 */
-	public function getEvent() {
-		return $this->event;
-	}
-
-	/**
 	 * Set id
 	 *
 	 * @param string $id
@@ -237,5 +219,23 @@ class Log {
 	 */
 	public function getText() {
 		return $this->text;
+	}
+
+	/**
+	 * Set metadata id
+	 *
+	 * @param null $metadataId
+	 */
+	public function setMetadataId($metadataId) {
+		$this->metadataId = $metadataId;
+	}
+
+	/**
+	 * Get metadata id
+	 *
+	 * @return null
+	 */
+	public function getMetadataId() {
+		return $this->metadataId;
 	}
 }

@@ -116,20 +116,18 @@ class EventMapper extends Calendar\EventMapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
-		$activityLogMapper = $this->getJoinMapper('activityLog');
+//		$activityLogMapper = $this->getJoinMapper('activityLog');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('e')},
 				{$authorMapper->getColumnString('a')},
 				{$teacherInChargeMapper->getColumnString('c')},
-				{$eventTypeMapper->getColumnString('t')},
-				{$activityLogMapper->getColumnString('l')}
+				{$eventTypeMapper->getColumnString('t')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			LEFT JOIN {$this->getJoinSql('activityLog', 'e', 'l')}
 			WHERE e.id = :eventId
 		";
 
@@ -137,11 +135,15 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->bindParam(":eventId", $identifier);
 		$statement->execute();
 
+		$row = $statement->fetch();
+
 		/* Hydrate or die
 		 */
-		$allActivityLogs = new \Schoolbox\Collection();
+		if ($row != false) {
+			/* Hydrate or die
+			 */
+			$allActivityLogs = new \Schoolbox\Collection();
 
-		foreach($statement as $row) {
 			$eventItem = $this->hydrate($row, 'e');
 
 			/* Author
@@ -159,8 +161,8 @@ class EventMapper extends Calendar\EventMapper {
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
 			$eventItem->setEventType($eventTypeItem);
 
-			$activityLog = $activityLogMapper->hydrate($row, 'l');
-			$allActivityLogs->add($activityLog);
+//			$activityLog = $activityLogMapper->hydrate($row, 'l');
+//			$allActivityLogs->add($activityLog);
 
 			/* Convert dates ;(
 			 */

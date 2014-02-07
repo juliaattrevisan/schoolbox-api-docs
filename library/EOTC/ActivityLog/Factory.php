@@ -58,7 +58,7 @@ class Factory {
 
 		$log = new Log();
 		$log->setActioner($this->getActioner());
-		$log->setEvent($this->getEvent());
+		$log->setMetadataId($this->getEvent()->getMetadata()->getId());
 		$log->setMessage($str);
 		$log->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 		$log->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));

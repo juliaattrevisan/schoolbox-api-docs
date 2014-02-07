@@ -30,10 +30,9 @@ class Mapper extends \Schoolbox\Mapper {
 			'join' => 'actioner',
 		));
 		$this->hasMap(array(
-			'column' => 'event_id',
-			'property' => 'event',
-			'type' => self::TYPE_MODEL,
-			'join' => 'event'
+			'column' => 'metadata_id',
+			'property' => 'metadataId',
+			'type' => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(
 			'column' => 'message',
@@ -58,11 +57,6 @@ class Mapper extends \Schoolbox\Mapper {
 		$this->hasJoin('actioner', array(
 			'mapper'    => '\\Schoolbox\\UserMapper',
 			'this_key'  => 'actioner_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('event', array(
-			'mapper'    => '\\EOTC\\EventMapper',
-			'this_key'  => 'event_id',
 			'other_key' => 'id',
 		));
 	}
