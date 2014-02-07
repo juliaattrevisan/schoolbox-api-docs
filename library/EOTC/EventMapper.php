@@ -180,20 +180,10 @@ class EventMapper extends Calendar\EventMapper {
 			$eventItem->setRamsFiles($this->findFiles($identifier));
 
 			/* Determine current status
-			 * TODO: Can probably hydrate this better in findMetadata()
-			 * (I shouldn't have to do it like this)
 			 */
 			if ($eventItem->getMetadata()->count()) {
-				$statusMapper = new EventStatusMapper();
-
-				foreach($eventItem->getMetadata() as $currentMetadata) {
-					try {
-						$statusItem = $statusMapper->findById($currentMetadata->getStatus()->getId());
-						$currentMetadata->setStatus($statusItem);
-					}
-					catch (\Exception $e) {
-					}
-				}
+				$metadataMapper = new EventMetadataMapper();
+				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 			}
 
 			return $eventItem;
