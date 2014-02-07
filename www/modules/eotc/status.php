@@ -32,11 +32,7 @@ $this->setVar(array(
 	'EVENT_CREATED_AT' => $event->getMetadata()->getCreatedAt()->getShort(),
 	'EVENT_START' => $event->getStartDateTime()->getShort(),
 	'EVENT_END' => $event->getEndDateTime()->getShort(),
-
-	'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
 	'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
-
-	'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
 ));
 
 /* RAMS file requirement
