@@ -24,7 +24,7 @@ class CommentChange extends Base {
 	 * Construct message
 	 */
 	protected function setup() {
-		$str = $this->getActioner()->getFullname() . $this->getText() . $this->getEvent()->getMetadata()->first()->getComment();
+		$str = $this->getActioner()->getFullname() . $this->getText() . $this->getEvent()->getMetadata()->getComment();
 
 		$this->setMessage($str);
 	}
