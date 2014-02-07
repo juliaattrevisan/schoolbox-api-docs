@@ -51,16 +51,23 @@ class Event extends Calendar\Event {
 	protected $ramsFiles = null;
 
 	/**
+	 * A collection of ActivityLog
+	 *
+	 * @var null
+	 */
+	protected $activityLog = null;
+
+	/**
 	 * Hook method
+	 *
+	 * Initialise collections all over the place
 	 */
 	protected function setup() {
-
-		/* This is populated by hand
-		 */
 		$this->setStudentAttendees(new \Schoolbox\Collection());
 		$this->setStaffAttendees(new \Schoolbox\Collection());
 		$this->setMetadata(new \Schoolbox\Collection());
 		$this->setRamsFiles(new \Schoolbox\Collection());
+		$this->setActivityLog(new \Schoolbox\Collection());
 	}
 
 	/* Getters/Setters
@@ -154,5 +161,23 @@ class Event extends Calendar\Event {
 	 */
 	public function getRamsFiles() {
 		return $this->ramsFiles;
+	}
+
+	/**
+	 * Set activity log
+	 *
+	 * @param null $activityLog
+	 */
+	public function setActivityLog($activityLog) {
+		$this->activityLog = $activityLog;
+	}
+
+	/**
+	 * Get activity log
+	 *
+	 * @return null
+	 */
+	public function getActivityLog() {
+		return $this->activityLog;
 	}
 }

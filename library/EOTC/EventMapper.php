@@ -98,6 +98,11 @@ class EventMapper extends Calendar\EventMapper {
 			'this_key'  => 'teacher_in_charge_id',
 			'other_key' => 'id',
 		));
+		$this->hasJoin('activityLog', array(
+			'mapper'    => '\\EOTC\\ActivityLog\\Mapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
 	}
 
 	/**
@@ -111,17 +116,20 @@ class EventMapper extends Calendar\EventMapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+		$activityLogMapper = $this->getJoinMapper('activityLog');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('e')},
 				{$authorMapper->getColumnString('a')},
 				{$teacherInChargeMapper->getColumnString('c')},
-				{$eventTypeMapper->getColumnString('t')}
+				{$eventTypeMapper->getColumnString('t')},
+				{$activityLogMapper->getColumnString('l')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+			LEFT JOIN {$this->getJoinSql('activityLog', 'e', 'l')}
 			WHERE e.id = :eventId
 		";
 
@@ -129,11 +137,11 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->bindParam(":eventId", $identifier);
 		$statement->execute();
 
-		$row = $statement->fetch();
-
 		/* Hydrate or die
 		 */
-		if ($row != false) {
+		$allActivityLogs = new \Schoolbox\Collection();
+
+		foreach($statement as $row) {
 			$eventItem = $this->hydrate($row, 'e');
 
 			/* Author
@@ -150,6 +158,10 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
 			$eventItem->setEventType($eventTypeItem);
+
+			$activityLog = $activityLogMapper->hydrate($row, 'l');
+
+			$allActivityLogs->add($activityLog);
 
 			/* Convert dates ;(
 			 */
@@ -185,7 +197,10 @@ class EventMapper extends Calendar\EventMapper {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 			}
+		}
 
+		if ($eventItem) {
+			$eventItem->setActivityLog($allActivityLogs);
 			return $eventItem;
 		}
 

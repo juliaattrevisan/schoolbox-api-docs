@@ -202,13 +202,15 @@ switch($_POST['action']) {
 		/* Set up activity log
 		 */
 		$registry = new \EOTC\ActivityLog\Registry();
+		$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
 
 		if ($statusChanged) {
-			$registry->add(new \EOTC\ActivityLog\StatusChange($event, $_SESSION['user']));
+			$registry->add($factory->produce('StatusChange'));
 		}
-
+//	new \EOTC\ActivityLog\StatusChange($event, $_SESSION['user'])
+//	new \EOTC\ActivityLog\CommentChange($event, $_SESSION['user'])
 		if ($commentChanged) {
-			$registry->add(new \EOTC\ActivityLog\CommentChange($event, $_SESSION['user']));
+			$registry->add($factory->produce('CommentChange'));
 		}
 
 		/* Notify everyone
