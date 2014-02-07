@@ -275,7 +275,17 @@ class Marksheet {
 			$this->displayOrder = $order;
 		}
 
-		if($studentCollection->count()) {
+		if ($studentCollection->count()) {
+			// Students are always sorted by surname, then first name
+			$studentCollection->sortByCallback(function($a, $b) {
+				/** @var User $a */
+				/** @var User $b */
+				$cmp = strcmp($a->getLastname(), $b->getLastname());
+				if ($cmp === 0) {
+					$cmp = strcmp($a->getFirstname(), $b->getFirstname());
+				}
+				return $cmp;
+			});
 
 			$studentGrades = Grades::getInstance()->getStudentGradesForSubject(
 				$studentCollection, $this->category, $this->year, $this->semester
