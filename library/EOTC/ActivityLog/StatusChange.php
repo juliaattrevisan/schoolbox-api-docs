@@ -24,7 +24,7 @@ class StatusChange extends Base {
 	 * Construct message
 	 */
 	protected function setup() {
-		$str = $this->getActioner()->getFullname() . $this->getMessage() . $this->getEvent()->getMetadata()->getStatus()->getName();
+		$str = $this->getActioner()->getFullname() . $this->getMessage() . $this->getEvent()->getMetadata()->first()->getStatus()->getName();
 
 		$this->setResult($str);
 	}
