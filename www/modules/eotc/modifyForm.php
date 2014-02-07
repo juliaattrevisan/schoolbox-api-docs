@@ -99,15 +99,15 @@ switch($_POST['action']) {
 		/* If a status changed, log it
 		 */
 		if ($event->getId()) {
-			if ($metadata->getStatus()->getId() != $_POST['status_id']) {
+//			if ($metadata->getStatus()->getId() != $_POST['status_id']) {
 				$registry->add(new \EOTC\ActivityLog\StatusChange($event, $_SESSION['user']));
-			}
+//			}
 
 			/* If a comment change, log it
 			 */
-			if ($metadata->getComment() != $_POST['comment']) {
+//			if ($metadata->getComment() != $_POST['comment']) {
 				$registry->add(new \EOTC\ActivityLog\CommentChange($event, $_SESSION['user']));
-			}
+//			}
 		}
 
 		/* Start and end dates
