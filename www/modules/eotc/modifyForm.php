@@ -117,9 +117,7 @@ switch($_POST['action']) {
 		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
 		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
-		/* Spawned further up
-		 */
-
+		// TODO: These are linked up in View EOTC Event
 		// $_POST['status_id']
 		$eventStatusMapper = new \EOTC\EventStatusMapper();
 		$eventStatus = $eventStatusMapper->findById(1);
@@ -127,6 +125,8 @@ switch($_POST['action']) {
 		// $_POST['comment']
 		$comment = 'mort';
 
+		/* Spawned further up
+		 */
 		$metadata->setStatus($eventStatus);
 		$metadata->setComment($comment);
 		$metadata->setEventType($_POST['type']);
