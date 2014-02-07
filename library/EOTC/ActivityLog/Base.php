@@ -35,6 +35,13 @@ abstract class Base {
 	protected $event = null;
 
 	/**
+	 * Partial message
+	 *
+	 * @var string
+	 */
+	protected $text = '';
+
+	/**
 	 * The message to display
 	 *
 	 * @var string
@@ -225,20 +232,20 @@ abstract class Base {
 	}
 
 	/**
-	 * Set result
+	 * Set text
 	 *
-	 * @param string $result
+	 * @param string $text
 	 */
-	public function setResult($result) {
-		$this->result = $result;
+	public function setText($text) {
+		$this->text = $text;
 	}
 
 	/**
-	 * Get result
+	 * Get text
 	 *
 	 * @return string
 	 */
-	public function getResult() {
-		return $this->result;
+	public function getText() {
+		return $this->text;
 	}
 }
