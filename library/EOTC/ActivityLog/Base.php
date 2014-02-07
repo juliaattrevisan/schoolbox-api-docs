@@ -83,6 +83,9 @@ abstract class Base {
 		$this->setEvent($event);
 		$this->setActioner($actioner);
 
+		$this->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+		$this->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
 		$this->setup();
 	}
 
