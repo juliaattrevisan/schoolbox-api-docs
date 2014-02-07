@@ -11,7 +11,7 @@
 namespace EOTC\ActivityLog;
 
 
-abstract class Base {
+class Base {
 
 	/**
 	 * Log id
@@ -75,19 +75,6 @@ abstract class Base {
 	 * @var string
 	 */
 	protected $result = '';
-
-	/**
-	 * Constructor
-	 */
-	public function __construct($event, $actioner) {
-		$this->setEvent($event);
-		$this->setActioner($actioner);
-
-		$this->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-		$this->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-
-		$this->setup();
-	}
 
 	/**
 	 * Hook method
