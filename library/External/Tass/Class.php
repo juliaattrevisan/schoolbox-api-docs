@@ -81,7 +81,7 @@ class External_Tass_Class implements External_ClassInterface {
 			$teachers[] = $synrow['tch_code'];
 		}
 
-		return $teachers;
+		return array_unique($teachers);
 	}
 
 	private function setDatabase ($database) {

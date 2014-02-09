@@ -115,7 +115,7 @@ class External_Synergetic_Class implements External_ClassInterface
             }
         }
 
-        return $teachers;
+        return array_unique($teachers);
     }
 
     private function setDatabase($database)

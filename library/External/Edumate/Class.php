@@ -70,16 +70,10 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // manipulate
         $teachers = array();
-        $i = 0;
         while($teacher = $stmt->fetchColumn()) {
-            if(is_numeric($teacher)) {
-                $teachers[$teacher] = array(
-                    'StaffID' => $teacher['STAFFID'],
-                    'StaffSeq' => $i++
-                );
-            }
+            $teachers[] = $teacher;
         }
 
-        return array_values($teachers);
+        return array_unique($teachers);
     }
 }
