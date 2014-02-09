@@ -94,7 +94,7 @@ class External_SchoolPro_Class implements External_ClassInterface {
 			}
 		}
 
-		return $allTeachers;
+		return array_unique($allTeachers);
 	}
 
 	/* Getters/Setters
