@@ -274,7 +274,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         }
         if($this->getGroupHandler()->isStaff($userId)) {
             $sql = "
-                SELECT c.class_code AS code, class AS name
+                SELECT c.class_code AS code, class AS name, class_type as classType
                 FROM db2inst1.schoolbox_teacherclass tc
                 LEFT JOIN db2inst1.schoolbox_classes c ON tc.class_code = c.class_code
                 WHERE tc.staff_number = :id
@@ -282,7 +282,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         }
         elseif($this->getGroupHandler()->isStudent($userId)) {
             $sql = "
-                SELECT c.class_code AS code, class AS name
+                SELECT c.class_code AS code, class AS name, class_type as classType
                 FROM db2inst1.schoolbox_studentclass sc
                 LEFT JOIN db2inst1.schoolbox_classes c ON sc.class_code = c.class_code
                 WHERE sc.student_number = :id
@@ -301,7 +301,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $classes = array();
 
         while($class = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $classes[$class['CODE']] = array_change_key_case($class, CASE_LOWER);
+            $classes[$class['CODE']] =  array(  'code'=>$class['CODE'],
+                                                'name'=>$class['NAME'],
+                                                'classType'=>$class['CLASSTYPE']);
         }
 
         return array_values($classes);
