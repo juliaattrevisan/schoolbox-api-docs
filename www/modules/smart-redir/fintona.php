@@ -171,6 +171,41 @@ switch($to)
         $formArray['pass'] = 'fintona';
         break;
 
+    case "gtav":
+        $form="form";
+        $action="http://www.gtav.asn.au/index.php";
+        $method="POST";
+        $formArray['loginformused'] = '1';
+        $formArray['username'] = 'mgilbert@fintona.vic.edu.au';
+        $formArray['password'] = 'rcbj37';
+        break;
+
+    case "htav":
+        $form="form";
+        $action="http://www.htav.asn.au/member-centre";
+        $method="POST";
+        $formArray['command'] = 'login';
+        $formArray['loginusername'] = 'SueWoolley';
+        $formArray['loginpassword'] = 'Victoria';
+        break;
+
+    case "petaa":
+        $form="form";
+        $action="http://www.petaa.edu.au/Login";
+        $method="POST";
+        $formArray['command'] = 'login';
+        $formArray['ctl00$ContentPlaceHolder$ctl00$txtUsername'] = '100916';
+        $formArray['ctl00$ContentPlaceHolder$ctl00$txtPassword'] = '100916@petaa';
+        break;
+
+    case "ceramics":
+        $form="form";
+        $action="http://australianceramics.realviewdigital.com/login.secure";
+        $method="GET";
+        $formArray['user'] = 'fgs@fintona.vic.edu.au';
+        $formArray['password'] = 'Pword313';
+        break;
+
 default:
 	echo "Did not recognise the site";
 break;
