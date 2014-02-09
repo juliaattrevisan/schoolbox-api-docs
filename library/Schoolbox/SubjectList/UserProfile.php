@@ -68,7 +68,7 @@ class UserProfile extends SubjectListAbstract {
         $categoryHandler = new \Category;
 		/* Expel each subject grouped by its type
 		 */
-        //print_r($this->getAllSubjectLists());
+
         foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
 			$emailAll = array();
 
@@ -81,7 +81,7 @@ class UserProfile extends SubjectListAbstract {
 			 */
 
             if (is_array($currentSubjectList) && count($currentSubjectList)) {
-
+                $finalSubjectList = array();
                 /* preprocess list and remove items that should not exist if we cannot link to them */
                 foreach($currentSubjectList as $currentSubject) {
 
@@ -100,94 +100,98 @@ class UserProfile extends SubjectListAbstract {
                 $listItems = count($currentSubjectList)>1 ? ceil(count($currentSubjectList)/2) : 1;
                 $i = 1;
 
-				foreach($currentSubjectList as $currentSubject) {
-					$this->getPage()->setVar(array(
-						'subject_teacher_block' => ''
-					));
+                if (is_array($currentSubjectList) && count($currentSubjectList)) {
 
-                    $this->getPage()->setVar(array(
-                        'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
-                        'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
-                    ));
+                    foreach($currentSubjectList as $currentSubject) {
+                        $this->getPage()->setVar(array(
+                            'subject_teacher_block' => ''
+                        ));
 
-                    /* Fetch teacher names
-                     */
-                    if ($currentSubject['campusCode']) {
-                        $code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
-                    }
-                    else {
-                        $code = $currentSubject['subject']['code'];
-                    }
+                        $this->getPage()->setVar(array(
+                            'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
+                            'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/{$currentSubject['subject']['code']}": '#',
+                        ));
 
-                    $teacherList = $this->getExternalClassHandler()->getTeacherName($code);
+                        /* Fetch teacher names
+                         */
+                        if ($currentSubject['campusCode']) {
+                            $code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
+                        }
+                        else {
+                            $code = $currentSubject['subject']['code'];
+                        }
 
-                    if (is_array($teacherList) && count($teacherList)) {
-                        foreach ($teacherList as $teacherSynID) {
-                            $teacher = $this->getUserHandler()->getBySynergyAndGroup($teacherSynID, $this->getGroupHandler()->getStaffGroupTypeIds());
+                        $teacherList = $this->getExternalClassHandler()->getTeacherName($code);
 
-                            if (is_array($teacher)) {
-                                $teacherName = $this->getUserHandler()->formatName($teacher);
+                        if (is_array($teacherList) && count($teacherList)) {
+                            foreach ($teacherList as $teacherSynID) {
+                                $teacher = $this->getUserHandler()->getBySynergyAndGroup($teacherSynID, $this->getGroupHandler()->getStaffGroupTypeIds());
 
-                                $emailAddress = $emailObj->formatEmailFromArray($teacher);
-                                $emailAll[] = $emailAddress;
+                                if (is_array($teacher)) {
+                                    $teacherName = $this->getUserHandler()->formatName($teacher);
 
-                                $this->getPage()->setVar(array(
-                                    'SUBJECT_TEACHER_ID' => $teacher['uid'],
-                                    'SUBJECT_TEACHER_EXTERNAL_ID' => $teacher['synergy_id'],
-                                    'SUBJECT_TEACHER_NAME' => $teacherName,
-                                    'SUBJECT_TEACHER_EMAIL' => $_SESSION['mailhandle'] . $emailAddress,
-                                ));
+                                    $emailAddress = $emailObj->formatEmailFromArray($teacher);
+                                    $emailAll[] = $emailAddress;
 
-                                $this->getPage()->parse('subject_teacher_block', 'subject_teacher', true);
+                                    $this->getPage()->setVar(array(
+                                        'SUBJECT_TEACHER_ID' => $teacher['uid'],
+                                        'SUBJECT_TEACHER_EXTERNAL_ID' => $teacher['synergy_id'],
+                                        'SUBJECT_TEACHER_NAME' => $teacherName,
+                                        'SUBJECT_TEACHER_EMAIL' => $_SESSION['mailhandle'] . $emailAddress,
+                                    ));
+
+                                    $this->getPage()->parse('subject_teacher_block', 'subject_teacher', true);
+                                }
                             }
                         }
-                    }
 
-                    $this->getPage()->parse('subject_item_block', 'subject_item', true);
-
-                    /* Clear children after parsing out the parent
-                     */
-                    $this->getPage()->setVar(array(
-                        'subject_teacher_block' => ''
-                    ));
-
-                    /* Distribute half n' half
-                     */
-                    if ($i % $listItems == 0) {
-                        $this->getPage()->parse('subject_row_block', 'subject_row', true);
+                        $this->getPage()->parse('subject_item_block', 'subject_item', true);
 
                         /* Clear children after parsing out the parent
                          */
                         $this->getPage()->setVar(array(
-                            'subject_item_block' => ''
+                            'subject_teacher_block' => ''
                         ));
 
-                        $i = 0;
+                        /* Distribute half n' half
+                         */
+                        if ($i % $listItems == 0) {
+                            $this->getPage()->parse('subject_row_block', 'subject_row', true);
+
+                            /* Clear children after parsing out the parent
+                             */
+                            $this->getPage()->setVar(array(
+                                'subject_item_block' => ''
+                            ));
+
+                            $i = 0;
+                        }
+                        else {
+                            $i++;
+                        }
+                    }
+
+                    /* Output email all subject teachers */
+                    if ($this->getGroupHandler()->isStaff()) {
+                        $this->getPage()->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
+                        $this->getPage()->setVar("EMAILALL", implode(',', $emailAll));
+                        $this->getPage()->parse("subject_mail_block", "subject_mail");
                     }
                     else {
-                        $i++;
+                        $this->getPage()->setVar('subject_mail_block', '');
                     }
-				}
 
-				/* Output email all subject teachers */
-				if ($this->getGroupHandler()->isStaff()) {
-					$this->getPage()->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-					$this->getPage()->setVar("EMAILALL", implode(',', $emailAll));
-					$this->getPage()->parse("subject_mail_block", "subject_mail");
-				}
-				else {
-					$this->getPage()->setVar('subject_mail_block', '');
-				}
-			}
 
-			$this->getPage()->parse('subject_block', 'subject', true);
+                    $this->getPage()->parse('subject_block', 'subject', true);
 
-			/* Clear children after parsing out the parent
-			 */
-			$this->getPage()->setVar(array(
-				'subject_row_block' => '',
-				'subject_item_block' => '',
-			));
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->getPage()->setVar(array(
+                        'subject_row_block' => '',
+                        'subject_item_block' => '',
+                    ));
+                }
+            }
 		}
 	}
 

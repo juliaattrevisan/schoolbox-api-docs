@@ -91,6 +91,7 @@ if (is_numeric($this->arg[0])) {
 	    'group_block' => '',
 	    'group_row_block' => '',
 		'user_calendar_block' => ''
+
     );
 
     $this->setVar($blank);
@@ -214,13 +215,6 @@ if (is_numeric($this->arg[0])) {
 					if ($groupHandler->isParent() && Config::get('restrict_parent_duework_access')) {
 						$this->setVar('due_work_block', '');
 					}
-	                /* Allow students, staff and parents of the student to see information about
-	                * due work. Also allow the current user if they view themselves in the
-	                * search results.
-	                */
-	                else if ($groupHandler->isParent() && Cfg::get('site_location') == 'shore') {
-	                    $this->setVar('due_work_block', '');
-	                }
 					else {
 	                    $this->parse('due_work_block', 'due_work');
 	                }
@@ -548,6 +542,11 @@ if (is_numeric($this->arg[0])) {
 	                    $this->setVar('student_synergy_form_block', '');
 	                }
 	            }
+                else {
+                    //Remove subjects from output
+                    $renderer = new \Schoolbox\SubjectList\UserProfile($this, array());
+                    $renderer->render();
+                }
             } else if ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
 
                 $this->parse("timetable_link_block", "timetable_link");
@@ -570,6 +569,12 @@ if (is_numeric($this->arg[0])) {
                 }
             }
         }
+    }
+    else {
+
+        //Remove subjects from output
+        $renderer = new \Schoolbox\SubjectList\UserProfile($this, array());
+        $renderer->render();
     }
 
 	/* ePortfolio link
