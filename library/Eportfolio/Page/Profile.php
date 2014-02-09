@@ -79,15 +79,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_cover_photo', 'has_cover_photo_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'no_cover_photo', 'no_cover_photo_block');
 
-		/* User details
-		 */
-		$user = $this->getUser();
-
-		$this->getPage()->setVar(array(
-			'USER_FIRSTNAME' => $user->getFirstname(),
-			'USER_LASTNAME' => $user->getLastname(),
-		));
-
 		/* Render mime types
 		 */
 		$this->renderMimeTypes();
@@ -112,19 +103,15 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render personal details
 	 */
 	private function renderPersonal() {
-		$houseName = '';
-		try {
-			$house = HouseMapper::getInstance()->findById($this->getUserHouse());
-			$houseName = $house->getHouse();
-		}
-		catch (Schoolbox\Mapper\Exception $e) {}
+
+        $house = $this->getUserHouse();
 
 		$this->getPage()->setVar(array(
 			'USER_EXTERNAL_ID' => $this->getExternalUserId(),
-			'USER_FULLNAME' => $this->getUserName(),
-			'USER_CAMPUS' => $this->getUserCampusName(),
-			'USER_YEAR' => $this->getUserYear(),
-			'USER_HOUSE' => $houseName,
+			'USER_FULLNAME' => Scrub::text($this->getUserName()),
+			'USER_CAMPUS' => Scrub::text(' '.$this->getUserCampusName()),
+			'USER_YEAR' => $this->getUserYear() != '' ? Scrub::text('Year '.$this->getUserYear()) : '',
+			'USER_HOUSE' => $house != '' ? Scrub::text(', '.$this->getUserHouse()) : '' ,
 		));
 	}
 
@@ -371,12 +358,20 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 
 	/**
-	 * Get a user's house id
+	 * Get a user's house name
 	 *
 	 * @return mixed
 	 */
 	private function getUserHouse() {
-		return $this->user->getSchoolHouse();
+
+        $houseName = '';
+        try {
+            $house = HouseMapper::getInstance()->findById($this->user->getSchoolHouse());
+            $houseName = $house->getHouse();
+        }
+        catch (Schoolbox\Mapper\Exception $e) {}
+
+		return $houseName;
 	}
 
 	/**
