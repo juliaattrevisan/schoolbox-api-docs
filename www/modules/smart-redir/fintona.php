@@ -206,6 +206,14 @@ switch($to)
         $formArray['password'] = 'Pword313';
         break;
 
+    case "maths300":
+        $form="form";
+        $action="http://www.maths300.esa.edu.au/index.php/component/user/";
+        $method="POST";
+        $formArray['username'] = '330385';
+        $formArray['passwd'] = 'fintona2007';
+        break;
+
 default:
 	echo "Did not recognise the site";
 break;
