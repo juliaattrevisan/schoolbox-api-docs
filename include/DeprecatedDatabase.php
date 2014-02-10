@@ -46,8 +46,8 @@ static public function getInstance() {
 function connect()
 {
 	if(!isset($this->dbf)) {
-		$this->dbf = mysql_connect($this->host, $this->user, $this->passwd);
-		mysql_set_charset('UTF8', $this->dbf);
+		$this->dbf = mysqli_connect($this->host, $this->user, $this->passwd);
+		mysqli_set_charset('UTF8', $this->dbf);
 	}
 	if(!isset($this->dbf)){
 		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db;
@@ -60,13 +60,13 @@ function connect()
 /* Closes the connection to the database */
 function close()
 {
-	return mysql_close ($this->dbf);
+	return mysqli_close($this->dbf);
 }
 
 /* Changes the current selected database */
 function changeDb($db)
 {
-	if(mysql_select_db($db, $this->dbf))
+	if(mysqli_select_db($db, $this->dbf))
 	{
 		$this->db = $db;
 		return true;
@@ -83,7 +83,7 @@ function query($sql_q)
 		$this->result = $this->collector->query($sql_q);
 	}
 	else {
-		$this->result = mysql_query($sql_q, $this->dbf) or $mysql_eval_error = mysql_error();
+		$this->result = mysqli_query($sql_q, $this->dbf) or $mysql_eval_error = mysqli_error($this->dbf);
 
 		if (isset($mysql_eval_error)) {
 			if ($this->debug) {
@@ -118,7 +118,7 @@ function getRow($sql_q)
 function getOne($sql_q)
 {
 	$result = $this->query($sql_q);
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	return $row[0];
 }
 
@@ -146,9 +146,9 @@ function getAll($sql_q)
 function getNextArray($result = 0)
 {
 	if($result)
-	        $return_array = mysql_fetch_assoc($result);
+	        $return_array = mysqli_fetch_assoc($result);
 	else if($this->result)
-		$return_array = mysql_fetch_assoc($this->result);
+		$return_array = mysqli_fetch_assoc($this->result);
 	else
 		return false;
 
@@ -160,9 +160,9 @@ function getNextArray($result = 0)
 function countRows($result = 0)
 {
 	if($result)
-		$return_count = mysql_num_rows($result);
+		$return_count = mysqli_num_rows($result);
 	else if($this->result)
-		$return_count = mysql_num_rows($this->result);
+		$return_count = mysqli_num_rows($this->result);
 	else
 		return false;
 	return $return_count;
@@ -288,14 +288,14 @@ function delete($table, $identifier, $value)
 /* Returns the id of the last record inserted */
 function insertID()
 {
-	$return_id = mysql_insert_id($this->dbf);
+	$return_id = mysqli_insert_id($this->dbf);
 	return $return_id;
 }
 
 /* Returns the number of rows affected by the last update */
 function affectedRows()
 {
-	$return_count = mysql_affected_rows($this->dbf);
+	$return_count = mysqli_affected_rows($this->dbf);
 	return $return_count;
 }
 
@@ -303,9 +303,9 @@ function affectedRows()
 function endQuery($result = 0)
 {
 	if ($result)
-		mysql_free_result($result);
+		mysqli_free_result($result);
 	else if($this->result)
-		mysql_free_result($this->result);
+		mysqli_free_result($this->result);
 	else
 		return false;
 }
@@ -344,7 +344,7 @@ function smartQuote($value) {
 	 */
 	// Quote if not integer or special
     if (!in_array($value, $mysqlFuncs) ) {
-        $value = "'" . mysql_real_escape_string($value) . "'";
+        $value = "'" . mysqli_real_escape_string($this->dbf, $value) . "'";
     }
 
 	return $value;
@@ -358,7 +358,7 @@ function smartQuote($value) {
  * @return string
  */
 public function quote($string) {
-    return mysql_real_escape_string($string);
+    return mysqli_real_escape_string($this->dbf, $string);
 }
 
 /**
