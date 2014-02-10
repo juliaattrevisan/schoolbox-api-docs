@@ -172,4 +172,11 @@ foreach($allEventStatus as $currentStatus) {
 
 	$this->parse('event_status_block', 'event_status', true);
 }
+
+/* Status Comment
+ */
+$this->setVar(array(
+	'EVENT_COMMENT' => $event->getMetadata()->getComment(),
+));
+
 //new \Alaress_Probe($event);

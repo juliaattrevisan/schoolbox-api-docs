@@ -99,8 +99,16 @@
 </table>
 
 <h2>Change Event Status</h2>
-<select name="eventStatus">
-	<!-- BEGIN event_status -->
-	<option value="{EVENT_STATUS_ID}" {EVENT_STATUS_SELECTED}>{EVENT_STATUS_NAME}</option>
-	<!-- END event_status -->
-</select>
+<form action="/modules/eotc/statusForm.php" method="post">
+	<input name='id' type="hidden" value="{EVENT_ID}">
+
+	<select name="status">
+		<!-- BEGIN event_status -->
+		<option value="{EVENT_STATUS_ID}" {EVENT_STATUS_SELECTED}>{EVENT_STATUS_NAME}</option>
+		<!-- END event_status -->
+	</select>
+
+	<textarea name="comment">{EVENT_COMMENT}</textarea>
+
+	<input type="submit" value="Update" />
+</form>
