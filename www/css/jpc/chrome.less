@@ -36,15 +36,17 @@
 @link: 							#0066B0;
 @link-hover: 					#176D76;
 
-// Main banner
+// Main banner & Search
 @banner-background: 			#1E125E;
 @banner-color:      			#FFFFFF;
 @banner-links:      			#FAEDC3;
 @banner-height:     			94px;
+@search-color:                  @banner-color;
 
 // Modules
 @module-heading: 				#000000;
 @module-background: 			#F7E19B;
+@admin-nav:                     @link;
 
 // Refers to the left navigation
 @navigation-width:				200px;
@@ -76,3 +78,5 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
+
+.admin-nav li a.current { border: none; }

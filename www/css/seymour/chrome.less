@@ -36,11 +36,12 @@
 @link: 							#002C76;
 @link-hover: 					#002C76;
 
-// Main banner
+// Main banner & Search
 @banner-background: 			#002C76;
 @banner-color:      			#B2C5D6;
 @banner-links:      			#FFFFFF;
 @banner-height:     			108px;
+@search-color:                  #404040;
 
 // Modules
 @module-heading: 				#FFFFFF;
@@ -76,3 +77,7 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
+
+.admin-nav li a.current {
+  border: 1px solid @content-background;
+}

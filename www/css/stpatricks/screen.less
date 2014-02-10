@@ -122,14 +122,15 @@ laber.error,
     -moz-border-radius: 0 7px 7px 7px;
     -webkit-border-radius: 0 7px 7px 7px;
     border-radius: 0 7px 7px 7px;
+    margin-left: 208px;
 }
 
-.admin-nav
-{
-    -moz-border-radius: 8px 8px 0 0;
-    -webkit-border-radius: 8px 8px 0 0;
-    border-radius: 8px 8px 0 0;
-}
+//.admin-nav
+//{
+//    -moz-border-radius: 8px 8px 0 0;
+//    -webkit-border-radius: 8px 8px 0 0;
+//    border-radius: 8px 8px 0 0;
+//}
 
 .rubric .warning span
 {
@@ -167,25 +168,21 @@ a:hover, h2 a:hover{color:#007fdb;}
     height:105px;
     background:#006461 url('/images/stpatricks/header-bg.png') -9px 0px no-repeat;
     border-bottom: 1px solid #f0b600;
-	.logo{padding:0; width:228px; height:67px; left:16px; top:11px}
+	.logo{padding:0; width:71px; height:82px; left:16px; top:11px}
 }
+
 #tabs{
-
-}
-
-ul.stpatricks{
-
     right: auto !important;
-    left: 270px !important;
-    min-width: auto !important;
+    left: 223px !important;
 }
 
 #tabs li{
-    float:right;
+    float:left;
     margin: 0 1px;
     top: 1px;
 }
-#tabs li a{color:#003f77;
+#tabs li a{
+    color:#0066b0;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
@@ -195,7 +192,7 @@ ul.stpatricks{
 }
 
 #tabs li.navthis a{
-    color:#054b93;
+    color:#0066b0;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
@@ -205,13 +202,18 @@ ul.stpatricks{
     height: 33px;
 }
 
-#nav{top:152px;}
+#nav{ top:118px; }
+#nav, #nav ul{ width: 190px; }
+#nav h3{ padding: 0 0 0 16px; }
+#nav li a{ margin: 0; }
 #nav h3,
 #nav h3.my-links{background: #fff;}
 
 #nav .nav-wrapper, #nav ul ul,.colours-buttons, #nav .nav-wrapper.my-links {background:#fff;}
 
-#nav ul ul{border-color:#6faff9;}
+#nav ul ul{border-color:#6faff9; left: 192px; top: -6px; width: 192px;}
+
+#nav ul ul ul { left: 192px; top: -6px; }
 
 #tabs-homepage li.ui-state-default a {
     background: none repeat scroll 0 0 #eee;
@@ -312,9 +314,7 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 ADMIN!
 */
 .admin-contents{background:#F0F7FE;}
-.admin-nav li a{background:#eee; color:#054B93; font-weight:normal;    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0;}
+.admin-nav li a{background:#eee; color:#054B93; font-weight:normal;}
 .admin-nav li a.current{background:#F0F7FE;color:#054B93; font-weight:bold;}
 #search-button{
     background: url('/images/stpatricks/search-btn.png') 6px 7px no-repeat !important;
