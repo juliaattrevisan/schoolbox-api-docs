@@ -83,7 +83,7 @@ function query($sql_q)
 		$this->result = $this->collector->query($sql_q);
 	}
 	else {
-		$this->result = mysqli_query($sql_q, $this->dbf) or $mysql_eval_error = mysqli_error($this->dbf);
+		$this->result = mysqli_query($this->dbf, $sql_q) or $mysql_eval_error = mysqli_error($this->dbf);
 
 		if (isset($mysql_eval_error)) {
 			if ($this->debug) {
