@@ -1131,7 +1131,7 @@ class Submission extends DeprecatedModel {
         $result = $this->db->query($sql);
 
         // rather than user getAll(), we want this as an ordinal array, not associative, so iterate manually
-        while ($y = mysql_fetch_assoc($result)) {
+        while ($y = mysqli_fetch_assoc($result)) {
             $years[] = $y['year'];
         }
 

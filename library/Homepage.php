@@ -334,7 +334,7 @@ class Homepage {
         $queries[] = $sql;
 
         $result = $this->db->query($sql);
-        while ($r = mysql_fetch_assoc($result)) {
+        while ($r = mysqli_fetch_assoc($result)) {
             // hack at the data, then flick it back in
             unset($r[$indexField]);
 

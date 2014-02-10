@@ -178,7 +178,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
                       ORDER BY $orderBy $orderDir";
 
         $this->dataResource = $handler->query($dataQuery);
-        $this->dataCount = mysql_num_rows($this->dataResource);
+        $this->dataCount = mysqli_num_rows($this->dataResource);
 
         if(!$this->dataCount) {
             return 0;

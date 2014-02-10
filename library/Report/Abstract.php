@@ -54,13 +54,13 @@ abstract class Report_Abstract {
 		}
 
 		// fforward to the desired offset
-		mysql_data_seek($resource, max($offset, 0));
+		mysqli_data_seek($resource, max($offset, 0));
 
 		// collect a page of data
 		$set = array();
 
 		for ($i = 0; $i < $limit; $i++) {
-			if (!($datum = mysql_fetch_assoc($resource))) {
+			if (!($datum = mysqli_fetch_assoc($resource))) {
 				break;
 			}
 
@@ -68,7 +68,7 @@ abstract class Report_Abstract {
 		}
 
 		// rewind the data cursor so if export is being called it won't miss the first opage of results
-		mysql_data_seek($resource, 0);
+		mysqli_data_seek($resource, 0);
 
 		return $set;
 	}

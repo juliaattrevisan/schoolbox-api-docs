@@ -179,7 +179,7 @@ $sqlFilter
 ORDER BY $orderBy $orderDir";
 
         $this->dataResource = $handler->db->query($query);
-        $this->dataCount = mysql_num_rows($this->dataResource);
+        $this->dataCount = mysqli_num_rows($this->dataResource);
 
         if(!$this->dataCount) {
             return 0;
