@@ -17,6 +17,9 @@ $page->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
 $page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+$page->setBlock(TEMPLATE_content, 'has_activity_log', 'has_activity_log_block');
+$page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
+
 
 /* Modify existing event
  */
@@ -28,6 +31,12 @@ if (is_numeric($_GET['eventID'])) {
 	}
 	catch (\Exception $e) {
 		error(160);
+	}
+
+	/* Do a check for missing metadata
+	 */
+	if (!$event->getMetadata()) {
+		throw new \Exception('No metadata record found for this event.');
 	}
 
 	/* Default values
@@ -74,7 +83,7 @@ if (is_numeric($_GET['eventID'])) {
 		'ADVANCED_CLOSE' => 'hidden',
 	));
 
-	if ($event->getMetadata()->first()->getRamsRequired()) {
+	if ($event->getMetadata()->getRamsRequired()) {
 		if ($event->getRamsFiles()->first()) {
 			$filename = $event->getRamsFiles()->first()->getFilename();
 		}
@@ -88,8 +97,8 @@ if (is_numeric($_GET['eventID'])) {
 		'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
 		'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
 		'EVENT_STAFF' => json_encode($staffSelected),
-		'EVENT_STATUS' => $event->getMetadata()->first()->getStatus()->getName(),
-		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->first()->getRamsRequired() ? 'checked="checked"' : '',
+		'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
+		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->getRamsRequired() ? 'checked="checked"' : '',
 		'EVENT_ID' => $event->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
@@ -125,6 +134,42 @@ if (is_numeric($_GET['eventID'])) {
 		$page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
 		$page->parse('recurring_reminder_block', 'recurring_reminder');
 		$page->setVar('recurring_dates_block', '');
+	}
+
+	/* Activity log
+	 */
+	$page->setVar(array(
+		'activity_log_block' => '',
+		'has_activity_log_block' => ''
+	));
+
+	$i = 0;
+
+	foreach($event->getMetadata()->getActivityLog() as $currentLog) {
+
+		/* If there are no activityLog items, mappers will spawn a single
+		 * object where every property is null
+		 *
+		 * TODO: Mappers probably shouldn't spawn you such objects
+		 */
+		if ($currentLog->getId()) {
+			$page->setVar(array(
+				'ACTIVITY_LOG_CREATED_AT' => $currentLog->getCreatedAt()->getShort(),
+				'ACTIVITY_LOG_MESSAGE' => $currentLog->getMessage()
+			));
+
+			$page->parse('activity_log_block', 'activity_log', true);
+
+			/* SB-3911
+			 */
+			$i++;
+		}
+	}
+
+	/* SB-3911
+	 */
+	if ($i) {
+		$page->parse('has_activity_log_block', 'has_activity_log');
 	}
 
 	$page->parse('delete_button_block', 'delete_button');
@@ -188,6 +233,13 @@ else {
 	));
 
 	$page->parse('recurring_dates_block', 'recurring_dates');
+
+	/* Activity Logs
+	 */
+	$page->setVar(array(
+		'has_activity_log_block' => '',
+		'activity_log_block' => ''
+	));
 }
 
 /* Event Types

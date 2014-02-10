@@ -46,7 +46,7 @@ switch($_POST['action']) {
 		 */
 		try {
 			$metadataMapper = new \EOTC\EventMetadataMapper();
-			$metadata = $metadataMapper->findByEvent($event)->first();
+			$metadata = $metadataMapper->findByEvent($event);
 		}
 		catch (\Exception $e) {
 			$metadata = new \EOTC\EventMetadata();
@@ -92,6 +92,23 @@ switch($_POST['action']) {
 			$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
 		}
 
+		/* If a status changed, log it
+		 */
+		$statusChanged = false;
+		$commentChanged = false;
+
+		if ($event->getId()) {
+			if ($metadata->getStatus()->getId() != $_POST['status_id']) {
+				$statusChanged = true;
+			}
+
+			/* If a comment change, log it
+			 */
+			if ($metadata->getComment() != $_POST['comment']) {
+				$commentChanged = true;
+			}
+		}
+
 		/* Start and end dates
 		 */
 		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
@@ -100,8 +117,18 @@ switch($_POST['action']) {
 		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
 		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
+		// TODO: These are linked up in View EOTC Event
+		// $_POST['status_id']
+		$eventStatusMapper = new \EOTC\EventStatusMapper();
+		$eventStatus = $eventStatusMapper->findById(1);
+
+		// $_POST['comment']
+		$comment = 'mort';
+
 		/* Spawned further up
 		 */
+		$metadata->setStatus($eventStatus);
+		$metadata->setComment($comment);
 		$metadata->setEventType($_POST['type']);
 		$metadata->setRamsRequired($_POST['ramsRequired']);
 		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
@@ -172,10 +199,22 @@ switch($_POST['action']) {
 		$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
-		/* If you were editing an event on someone else's calendar, don't
-		 * get stuffed around by time travel's one-index-offset rip in
-		 * the space-time continuum
+		/* Set up activity log
 		 */
+		$registry = new \EOTC\ActivityLog\Registry();
+		$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
+
+		if ($statusChanged) {
+			$registry->add($factory->produce('StatusChange'));
+		}
+
+		if ($commentChanged) {
+			$registry->add($factory->produce('CommentChange'));
+		}
+
+		/* Notify everyone
+		 */
+		$registry->notify();
 
 		/* Superuser modifying some arbitrary event
 		 */

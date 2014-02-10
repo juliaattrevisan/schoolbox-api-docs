@@ -134,6 +134,10 @@ class EventMapper extends Calendar\EventMapper {
 		/* Hydrate or die
 		 */
 		if ($row != false) {
+			/* Hydrate or die
+			 */
+			$allActivityLogs = new \Schoolbox\Collection();
+
 			$eventItem = $this->hydrate($row, 'e');
 
 			/* Author
@@ -160,8 +164,9 @@ class EventMapper extends Calendar\EventMapper {
 			$eventItem->setEndDateTime($endDateTime);
 
 			/* Accumulate the metadata for this event
+			 * Only use the first record
 			 */
-			$eventItem->setMetadata($this->findMetadata($identifier));
+			$eventItem->setMetadata($this->findMetadata($identifier)->first());
 
 			/* Accumulate campuses for this event
 			 */
@@ -181,19 +186,25 @@ class EventMapper extends Calendar\EventMapper {
 
 			/* Determine current status
 			 */
-			if ($eventItem->getMetadata()->count()) {
-				$statusMapper = new EventStatusMapper();
+			if ($eventItem->getMetadata()) {
+				$metadataMapper = new EventMetadataMapper();
+				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
-				foreach($eventItem->getMetadata() as $currentMetadata) {
-					try {
-						$statusItem = $statusMapper->findById($currentMetadata->getStatus());
-						$currentMetadata->setStatus($statusItem);
-					}
-					catch (\Exception $e) {
-					}
-				}
+				/* Activity logs
+				 */
+				$activityLogMapper = new ActivityLog\Mapper();
+
+				$allActivityLogs = $activityLogMapper->findByColumn('metadata_id', $eventItem->getMetadata()->getId(), array(
+					'order' => array(
+						'created_at' => 'DESC'
+					)
+				));
+
+				$eventItem->getMetadata()->setActivityLog($allActivityLogs);
 			}
+		}
 
+		if ($eventItem) {
 			return $eventItem;
 		}
 

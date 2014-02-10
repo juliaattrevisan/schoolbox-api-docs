@@ -52,11 +52,10 @@ class Event extends Calendar\Event {
 
 	/**
 	 * Hook method
+	 *
+	 * Initialise collections all over the place
 	 */
 	protected function setup() {
-
-		/* This is populated by hand
-		 */
 		$this->setStudentAttendees(new \Schoolbox\Collection());
 		$this->setStaffAttendees(new \Schoolbox\Collection());
 		$this->setMetadata(new \Schoolbox\Collection());

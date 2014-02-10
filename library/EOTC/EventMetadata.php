@@ -42,6 +42,20 @@ class EventMetadata {
 	private $ramsRequired = false;
 
 	/**
+	 * The latest comment about the event
+	 *
+	 * @var string
+	 */
+	private $comment = '';
+
+	/**
+	 * A collection of ActivityLog
+	 *
+	 * @var null
+	 */
+	protected $activityLog = null;
+
+	/**
 	 * Created at
 	 *
 	 * @var null
@@ -195,5 +209,41 @@ class EventMetadata {
 	 */
 	public function getUpdatedAt() {
 		return $this->updatedAt;
+	}
+
+	/**
+	 * Set comment
+	 *
+	 * @param string $comment
+	 */
+	public function setComment($comment) {
+		$this->comment = $comment;
+	}
+
+	/**
+	 * Get comment
+	 *
+	 * @return string
+	 */
+	public function getComment() {
+		return $this->comment;
+	}
+
+	/**
+	 * Set activity log
+	 *
+	 * @param null $activityLog
+	 */
+	public function setActivityLog($activityLog) {
+		$this->activityLog = $activityLog;
+	}
+
+	/**
+	 * Get activity log
+	 *
+	 * @return null
+	 */
+	public function getActivityLog() {
+		return $this->activityLog;
 	}
 }

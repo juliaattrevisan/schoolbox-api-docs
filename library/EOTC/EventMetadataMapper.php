@@ -33,7 +33,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column' => 'status_id',
 			'property' => 'status',
-			'type' => self::TYPE_INTEGER,
+			'type' => self::TYPE_MODEL,
+			'join' => 'status',
 		));
 		$this->hasMap(array(
 			'column' => 'rams_required',
@@ -54,6 +55,11 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			'column'   => 'deleted_at',
 			'property' => 'deletedAt',
 			'type'     => self::TYPE_DATETIME,
+		));
+		$this->hasJoin('status', array(
+			'mapper'    => '\\EOTC\\EventStatusMapper',
+			'this_key'  => 'status_id',
+			'other_key' => 'id',
 		));
 	}
 
@@ -82,7 +88,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		}
 
 		if (count($allMetadataIds)) {
-			return $this->findByColumn('id', $allMetadataIds);
+			return $this->findByColumn('id', $allMetadataIds)->first();
 		}
 
 		throw new \Exception('No metadata for this event exists.');
