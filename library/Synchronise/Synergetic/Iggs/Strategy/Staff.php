@@ -103,4 +103,15 @@ class Synchronise_Synergetic_Iggs_Strategy_Staff extends Synchronise_Base_Strate
         }
         return 0;
     }
+    
+    /**
+        * Webmail setting
+        *
+        * @param $currentUser
+        * @return int|void
+        */
+    public function getWebmailFromUser($currentUser) {
+            return 1;
+    }
+
 }
