@@ -17,9 +17,9 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
     protected $widget_name = 'oldDatabase';
 
     /**
-     * The MySQL database connection, created by mysql_connect
+     * The MySQL database connection, created by mysqli_connect
      *
-     * @var resource
+     * @var \mysqli
      */
     protected $connection;
 
@@ -87,7 +87,7 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
         if ($result === true) {
             return mysqli_affected_rows($this->connection);
         }
-        elseif (is_resource($result)) {
+        elseif ($result instanceof \mysqli_result) {
             return mysqli_num_rows($result);
         }
         return null;

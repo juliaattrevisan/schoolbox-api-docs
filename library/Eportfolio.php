@@ -705,7 +705,7 @@ class Eportfolio {
 //		$queries[] = $sql;
 //
 //		$result = $this->db->query($sql);
-//		while ($r = mysql_fetch_assoc($result)) {
+//		while ($r = mysqli_fetch_assoc($result)) {
 //			// hack at the data, then flick it back in
 //			unset($r[$indexField]);
 //
@@ -733,7 +733,7 @@ class Eportfolio {
 //	 * @return int
 //	 */
 //	function removeAllComponentsFromEportfolio() {
-//		$userId = mysql_real_escape_string($this->getUserId(), $this->db->dbf);
+//		$userId = $this->db->quote($this->getUserId());
 //
 //		// locate all the component instances associated with this homepage, and clear them out
 //		$cim = Component_InstanceMapper::getInstance();

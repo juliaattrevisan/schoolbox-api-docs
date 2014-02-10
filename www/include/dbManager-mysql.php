@@ -76,16 +76,16 @@ function changeDb($db)
 /* Returns the result resource for the query, also saves the result resource as a object var */
 function query($sql_q)
 {
-	$this->result = mysqli_query($this->dbf, $sql_q) or $mysql_eval_error = mysqli_error($this->dbf);
+	$this->result = mysqli_query($this->dbf, $sql_q) or $mysqli_eval_error = mysqli_error($this->dbf);
 	
-	if (isset($mysql_eval_error)) {
+	if (isset($mysqli_eval_error)) {
 		if($this->debug)
 		{
 			print "<b>Query:</b> $sql_q<br />";
-			print "<b>Error:</b> $mysql_eval_error";
+			print "<b>Error:</b> $mysqli_eval_error";
 		}
 		else
-			error(4, $mysql_eval_error);
+			error(4, $mysqli_eval_error);
 	}
 	
 	return $this->result;

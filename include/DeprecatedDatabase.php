@@ -99,14 +99,14 @@ function query($sql_q)
 		$this->result = $this->collector->query($sql_q);
 	}
 	else {
-		$this->result = mysqli_query($this->dbf, $sql_q) or $mysql_eval_error = mysqli_error($this->dbf);
+		$this->result = mysqli_query($this->dbf, $sql_q) or $mysqli_eval_error = mysqli_error($this->dbf);
 
-		if (isset($mysql_eval_error)) {
+		if (isset($mysqli_eval_error)) {
 			if ($this->debug) {
-				trigger_error(sprintf('Query: "%s" triggered error: "%s"', $sql_q, $mysql_eval_error), E_USER_WARNING);
+				trigger_error(sprintf('Query: "%s" triggered error: "%s"', $sql_q, $mysqli_eval_error), E_USER_WARNING);
 			}
 			else {
-				error(21, $mysql_eval_error);
+				error(21, $mysqli_eval_error);
 			}
 		}
 	}

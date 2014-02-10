@@ -194,7 +194,7 @@ class Mediator {
                 $db = DeprecatedDatabase::getInstance();
                 $dbProf = $db->query('SHOW profiles');
 
-                while($row = mysql_fetch_assoc($dbProf))
+                while($row = mysqli_fetch_assoc($dbProf))
                     $a[] = $row;
 
                 $this->getResponse()->setResponse('sqldump', $a);
