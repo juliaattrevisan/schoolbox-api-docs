@@ -72,7 +72,7 @@ class TextBox extends DeprecatedModel {
         $query = "SELECT textBoxID, categoryID, heading, body, category.name as cname
                      FROM " . $this->_table . "
                     JOIN category ON categoryID = category.id
-                  WHERE textBox.deleted = 'false' AND heading like '%" . mysql_real_escape_string($keyword) . "%'
+                  WHERE textBox.deleted = 'false' AND heading like '%" . $this->db->quote($keyword) . "%'
                   ORDER BY $sort_by $sort_dir
                   LIMIT $offset, $limit";
 

@@ -51,7 +51,7 @@ class User extends DeprecatedModel {
 					LEFT JOIN userCampus ON user.id = userCampus.uid
 					LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
 					LEFT JOIN superusers ON user.id = superusers.id
-				WHERE user.id = '" . mysql_real_escape_string($id) . "' ORDER BY userCampus.defaultCampus DESC";
+				WHERE user.id = '" . $this->db->quote($id) . "' ORDER BY userCampus.defaultCampus DESC";
 		return $this->db->getRow($query);
 	}
 
@@ -155,7 +155,7 @@ class User extends DeprecatedModel {
 			return $this->searchExact($keyword, $offset, $limit, $count, $sort_by, $sort_dir);
 		}
 
-		$keyword = mysql_real_escape_string($keyword);
+		$keyword = $this->db->quote($keyword);
 
 		// retreive results
 
@@ -188,7 +188,7 @@ class User extends DeprecatedModel {
 	}
 
 	function searchExact($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC') {
-		$keyword = mysql_real_escape_string($keyword);
+		$keyword = $this->db->quote($keyword);
 
 		// retrieve results
 		$query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
@@ -334,8 +334,8 @@ class User extends DeprecatedModel {
 	 * @return bool Does the user ID have this password?
 	 */
 	protected function checkPassword($user_id, $password) {
-		$esc_user_id  = mysql_real_escape_string($user_id);
-		$esc_password = mysql_real_escape_string($password);
+		$esc_user_id  = $this->db->quote($user_id);
+		$esc_password = $this->db->quote($password);
 		$query        =
 			"SELECT `" . $this->_index . "` FROM `" . $this->_table . '` ' .
 				"WHERE `" . $this->_index . "` = $esc_user_id AND password = PASSWORD('$esc_password')";
@@ -354,7 +354,7 @@ class User extends DeprecatedModel {
 	 * @return bool
 	 */
 	function setPasswordInternal($userID, $newPassword) {
-		$newPassword = mysql_real_escape_string($newPassword);
+		$newPassword = $this->db->quote($newPassword);
 		$query       = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID";
 		$this->db->query($query);
 

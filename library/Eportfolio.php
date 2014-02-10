@@ -267,8 +267,8 @@ class Eportfolio {
 	 * @param $templateID
 	 */
 	public function createEportfolioFromTemplate($pageTitle, $templateID) {
-		$userId = mysql_real_escape_string($this->getUserId(), $this->db->dbf);
-		$templateID = mysql_real_escape_string($templateID, $this->db->dbf);
+		$userId = $this->db->quote($this->getUserId());
+		$templateID = $this->db->quote($templateID);
 
 		/* Retrieve template data
 		 */
@@ -428,8 +428,8 @@ class Eportfolio {
 		$stack = array();
 
 		foreach($listColor as $key => $color) {
-			$field = mysql_real_escape_string($key);
-			$value = mysql_real_escape_string($color);
+			$field = $this->db->quote($key);
+			$value = $this->db->quote($color);
 
 			$stack[] = "`{$field}` = '{$value}'";
 		}

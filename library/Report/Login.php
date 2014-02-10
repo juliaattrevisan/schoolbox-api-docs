@@ -141,8 +141,8 @@ class Report_Login extends Report_Abstract implements Report_IReport {
 
         foreach($resultFilter as $key => $value) {
             if(in_array($key, $this->getFilterFields())) {
-                $key = mysql_real_escape_string($key);
-                $value = mysql_real_escape_string($value);
+                $key = $this->db->quote($key);
+                $value = $this->db->quote($value);
 
                 // custom filter by user
                 if($key == 'user') {

@@ -10,7 +10,7 @@ class MyLinks extends DeprecatedModel {
 	}
 
     function linkExists($uid, $link) {
-        $query = "SELECT id FROM bookmarks WHERE owner='$uid' AND url = '".mysql_real_escape_string($link)."'";
+        $query = "SELECT id FROM bookmarks WHERE owner='$uid' AND url = '".$this->db->quote($link)."'";
         return $this->db->getOne($query);
     }
 }

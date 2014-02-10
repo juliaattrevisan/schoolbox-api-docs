@@ -686,7 +686,7 @@ class Category extends DeprecatedModel {
      * @return array|bool
      */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'id', $sort_dir = 'desc') {
-        $keyword = mysql_real_escape_string($keyword);
+        $keyword = $this->db->quote($keyword);
 
         $query = "SELECT SQL_CALC_FOUND_ROWS `category`.*, GROUP_CONCAT(categoryCode.code) as code,
 						MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `score`,

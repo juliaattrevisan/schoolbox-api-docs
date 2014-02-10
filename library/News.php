@@ -636,7 +636,7 @@ class News extends DeprecatedModel {
     }
 
     function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-        $keyword = mysql_real_escape_string($keyword);
+        $keyword = $this->db->quote($keyword);
         /*
                 $query = "SELECT `subject_news`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                                 MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
