@@ -47,7 +47,7 @@ function connect()
 {
 	if(!isset($this->dbf)) {
 		$this->dbf = mysqli_connect($this->host, $this->user, $this->passwd);
-		mysqli_set_charset('UTF8', $this->dbf);
+		mysqli_set_charset($this->dbf, 'UTF8');
 	}
 	if(!isset($this->dbf)){
 		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db;
@@ -66,7 +66,7 @@ function close()
 /* Changes the current selected database */
 function changeDb($db)
 {
-	if(mysqli_select_db($db, $this->dbf))
+	if(mysqli_select_db($this->dbf, $db))
 	{
 		$this->db = $db;
 		return true;
