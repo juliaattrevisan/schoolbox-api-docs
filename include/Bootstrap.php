@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 
+use Aura\Di;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 
@@ -28,6 +29,17 @@ set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include
 /* Load the Autoloader */
 require_once dirname(__FILE__) . '/Autoloader.php';
 Autoloader::initialise();
+
+// Do dependency injection stuff
+// How do I get this container elsewhere without using a global?
+$di = new Di\Container(new Di\Factory());
+$di->set(
+    'router',
+    function() {
+        $factory = new Aura\Router\RouterFactory();
+        return $factory->newInstance();
+    }
+);
 
 //
 // Set up the debug bar, and add listeners for various parts of the debug bar
