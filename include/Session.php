@@ -85,7 +85,7 @@ class Session
 
             /* Log successful */
             $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
-                    VALUES ('" . mysql_real_escape_string($username) . "', NOW(), '$ip', '1')";
+                    VALUES ('" . $this->db->quote($username) . "', NOW(), '$ip', '1')";
             $this->db->query($loginlogquery);
 
             // add mobile session data
@@ -165,7 +165,7 @@ class Session
         if (!$result) {
             /* Log failure */
             $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
-                        VALUES ('" . mysql_real_escape_string($username) . "', NOW(), '$ip', '0')";
+                        VALUES ('" . $this->db->quote($username) . "', NOW(), '$ip', '0')";
             $this->db->query($loginlogquery);
             throw new Exception_Schoolbox_AccessDenied();
         } else {
@@ -284,8 +284,8 @@ class Session
     {
         // Function to check username exists and password is correct
 
-        $query = "SELECT user.id FROM user WHERE username = '" . mysql_real_escape_string($username) . "'
-        AND password = PASSWORD('" . mysql_real_escape_string($password) . "') AND `enabled` IS TRUE";
+        $query = "SELECT user.id FROM user WHERE username = '" . $this->db->quote($username) . "'
+        AND password = PASSWORD('" . $this->db->quote($password) . "') AND `enabled` IS TRUE";
         $this->db->query($query);
         $result = $this->db->countRows();
         //$user = $db->getNextArray();
