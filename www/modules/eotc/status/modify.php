@@ -16,7 +16,7 @@ catch (\Exception $e) {
 	error(160);
 }
 
-$this->setFile(TEMPLATE_content, 'modules/eotc/status.html');
+$this->setFile(TEMPLATE_content, 'modules/eotc/status/modify.html');
 $this->setBlock(TEMPLATE_content, 'event_campus', 'event_campus_block');
 $this->setBlock(TEMPLATE_content, 'event_staff', 'event_staff_block');
 $this->setBlock(TEMPLATE_content, 'event_student', 'event_student_block');

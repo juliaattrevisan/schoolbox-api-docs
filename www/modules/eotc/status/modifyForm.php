@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
@@ -63,4 +63,4 @@ $registry->notify();
 
 /* Redirect back to status screen
  */
-$page->localRedir('/modules/eotc/status/' . $event->getId());
+$page->localRedir('/modules/eotc/status/modify/' . $event->getId());
