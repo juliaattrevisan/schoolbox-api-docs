@@ -43,8 +43,8 @@ class Synchronise_Synergetic_Mgs_Strategy_Student extends Synchronise_Synergetic
         $newUser['local_email']   = self::STUDENT_LOCAL_EMAIL;
         $newUser['year']          = $currentUser['StudentYearLevel'];
         $newUser['house']         = $this->getHouseFromCode($currentUser['StudentHouse']);
-        $newUser['defaultCampus'] = self::STUDENT_DEFAULT_CAMPUS;
         $newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $newUser['defaultCampus'] = $newUser['campus'][0];
         $newUser['group_id']      = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
         $newUser['webmail']       = 1;
         $newUser['eportfolio_enabled'] = self::STUDENT_EPORTFOLIO;

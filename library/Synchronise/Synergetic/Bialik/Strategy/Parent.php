@@ -73,8 +73,8 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 
 		/* Campus config: needs to map to a campus id
 		 */
-		$newUser['defaultCampus'] = 1;
 		$newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $newUser['defaultCampus'] = $newUser['campus'][0];
 
 		/* Staff Group ID
 		 */

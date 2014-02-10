@@ -37,8 +37,8 @@ class Synchronise_Synergetic_Mgs_Strategy_Staff extends Synchronise_Synergetic_M
         $newUser['synergy_id']    = $currentUser['StaffID'];
         $newUser['alt_email']     = $currentUser['OccupEmail'];
         $newUser['local_email']   = self::STAFF_LOCAL_EMAIL;
-        $newUser['defaultCampus'] = self::STAFF_DEFAULT_CAMPUS;
         $newUser['campus']        = array($this->getCampusFromCode($currentUser['StaffCampus']));
+        $newUser['defaultCampus'] = $newUser['campus'][0];
         $newUser['group_id']      = $this->getGroupIDFromCategory($currentUser['StaffCategory']);
         $newUser['eportfolio_enabled'] = self::STAFF_EPORTFOLIO;
         $newUser['webmail']       = 1;

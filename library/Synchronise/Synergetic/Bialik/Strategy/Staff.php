@@ -54,10 +54,11 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
         $campusList = $this->getCampus($currentUser['StaffID']);
 
         if(is_array($campusList)) {
-            $newUser['defaultCampus'] = $campusList[0]['campus'];
             foreach( $campusList as $campus) {
                 $newUser['campus'][] = $this->getCampusFromCode($campus['campus']);
             }
+            $newUser['defaultCampus'] = $newUser['campus'][0];
+
         }
         else {
             //Just put staff in main if no campus retrieved from timetable

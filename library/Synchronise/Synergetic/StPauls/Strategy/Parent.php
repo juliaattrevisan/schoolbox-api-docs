@@ -96,7 +96,7 @@ class Synchronise_Synergetic_StPauls_Strategy_Parent extends Synchronise_Synerge
 				$updatedUser['lastname'] = trim($currentParent['Surname']);
 
 				$updatedUser['campus'] = $this->getUserHandler()->getUserCampus($user['uid']);
-				$updatedUser['defaultCampus'] = array();
+				$updatedUser['defaultCampus'] = $updatedUser['campus'][0];
 				$updatedUser['password'] = 'password';
 
 				/* Clear email address in Portal if the user is not meant to be
