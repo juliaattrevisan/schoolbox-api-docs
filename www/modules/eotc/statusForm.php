@@ -48,14 +48,12 @@ $factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
 /* If a status changed, log it
  */
 if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
-	echo 'mort';
 	$registry->add($factory->produce('StatusChange'));
 }
 
 /* If a comment changed, log it
  */
 if ($originalComment != $event->getMetadata()->getComment()) {
-	echo 'bart';
 	$registry->add($factory->produce('CommentChange'));
 }
 
