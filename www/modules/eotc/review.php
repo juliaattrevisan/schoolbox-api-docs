@@ -9,15 +9,26 @@
  */
 
 $this->setFile(TEMPLATE_content, 'modules/eotc/review.html');
-$this->setBlock(TEMPLATE_content, 'event_status', 'event_status_block');
-$this->setBlock('event_status', 'event', 'event_block');
+$this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
+$this->setBlock('event_list_group', 'event', 'event_block');
 
 $eventMapper = new \EOTC\EventMapper();
-$allStatus = $eventMapper->findAll();
+$allListGroups = $eventMapper->findAllByListGroups();
 
-foreach ($allStatus as $currentStatus) {
-	if ($currentStatus->count()) {
-		foreach ($currentStatus as $currentEvent) {
+$listGroupMapping = array_keys(array(
+	'Urgent' => 0,
+	'Pending Final Review' => 1,
+	'Pending RAMS Review' => 2,
+	'Pending Initial Review' => 3
+));
+
+foreach ($allListGroups as $index => $currentListGroup) {
+	if ($currentListGroup->count()) {
+		$this->setVar(array(
+			'EVENT_LIST_GROUP_NAME' => $listGroupMapping[$index]
+		));
+
+		foreach ($currentListGroup as $currentEvent) {
 			$this->setVar(array(
 				'EVENT_ID' => $currentEvent->getId(),
 				'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),
@@ -33,7 +44,7 @@ foreach ($allStatus as $currentStatus) {
 			$this->parse('event_block', 'event', true);
 		}
 
-		$this->parse('event_status_block', 'event_status', true);
+		$this->parse('event_list_group_block', 'event_list_group', true);
 
 		/* Clear children after parsing out the parent
 		 */

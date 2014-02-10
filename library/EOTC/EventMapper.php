@@ -212,12 +212,12 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
-	 * Custom findAll
+	 * Custom findAllByListGroups
 	 *
 	 * @return object|Model
 	 * @throws \Exception
 	 */
-	public function findAll() {
+	public function findAllByListGroups() {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
@@ -295,10 +295,19 @@ class EventMapper extends Calendar\EventMapper {
 
 		$types = new \Schoolbox\Collection();
 
-		/* Install a Collection for every statusId
+		/* List groups on Review screen
 		 */
-		foreach($allStatus as $currentStatus) {
-			$types->offsetSet($currentStatus->getId(), new \Schoolbox\Collection());
+		$listGroupMapping = array(
+			'Urgent' => 0,
+			'Pending Final Review' => 1,
+			'Pending RAMS Review' => 2,
+			'Pending Initial Review' => 3
+		);
+
+		$listGroups = new \Schoolbox\Collection();
+
+		foreach($listGroupMapping as $current) {
+			$listGroups->add(new \Schoolbox\Collection());
 		}
 
 		/* Ignore recurring instances and assign events to a $type collectino
@@ -310,19 +319,18 @@ class EventMapper extends Calendar\EventMapper {
 			if (is_numeric($currentEvent->getSeriesId())) {
 				if (!in_array($currentEvent->getSeriesId(), $seriesIds)) {
 					$seriesIds[] = $currentEvent->getSeriesId();
-					$types->offsetGet($currentEvent->getMetadata()->getStatus()->getId())->add($currentEvent);
+
+					// $this->determineListGroup($event);
+					$listGroups->offsetGet(2)->add($currentEvent);
 				}
 			}
 			else {
-				$types->offsetGet($currentEvent->getMetadata()->getStatus()->getId())->add($currentEvent);
+				// $this->determineListGroup($event);
+				$listGroups->offsetGet(1)->add($currentEvent);
 			}
 		}
 
-		/* Reindex for iteration
-		 */
-		$types->reindex();
-
-		return $types;
+		return $listGroups;
 	}
 
 	/**
