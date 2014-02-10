@@ -102,13 +102,32 @@
 <form action="/modules/eotc/statusForm.php" method="post">
 	<input name='eventId' type="hidden" value="{EVENT_ID}">
 
-	<select name="statusId">
-		<!-- BEGIN event_status -->
-		<option value="{EVENT_STATUS_ID}" {EVENT_STATUS_SELECTED}>{EVENT_STATUS_NAME}</option>
-		<!-- END event_status -->
-	</select>
+	<table class="standardForm">
+		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Change Status</h4>
+					<em>Change the status of the event</em>
+				</td>
+				<td>
+					<select name="statusId">
+						<!-- BEGIN event_status -->
+						<option value="{EVENT_STATUS_ID}" {EVENT_STATUS_SELECTED}>{EVENT_STATUS_NAME}</option>
+						<!-- END event_status -->
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Comment</h4>
+					<em>Add a comment</em>
+				</td>
+				<td>
+					<textarea name="comment">{EVENT_COMMENT}</textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 
-	<textarea name="comment">{EVENT_COMMENT}</textarea>
-
-	<input type="submit" value="Update" />
+	<input class='submit-btn-plain' type="submit" value="Update" />
 </form>
