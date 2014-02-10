@@ -109,4 +109,22 @@ class Event extends Calendar\Event {
 	public function getTeacherInCharge() {
 		return $this->teacherInCharge;
 	}
+
+	/**
+	 * Set student attendees
+	 *
+	 * @param null $studentAttendees
+	 */
+	public function setStudentAttendees($studentAttendees) {
+		$this->studentAttendees = $studentAttendees;
+	}
+
+	/**
+	 * Get student attendees
+	 *
+	 * @return null
+	 */
+	public function getStudentAttendees() {
+		return $this->studentAttendees;
+	}
 }

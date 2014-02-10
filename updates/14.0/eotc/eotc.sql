@@ -41,3 +41,8 @@ CREATE TABLE `eotc_event_campus`( `event_id` INT(11), `campus_id` INT(11) );
  */
 CREATE TABLE `eotc_event_staff`( `event_id` INT(11), `user_id` INT(11) );
 ALTER TABLE `eotc_event_staff` ADD UNIQUE INDEX `event_staff` (`event_id`, `user_id`);
+
+/* Event student relations
+ */
+CREATE TABLE `eotc_event_student`( `event_id` INT(11), `user_id` INT(11) );
+ALTER TABLE `eotc_event_student` ADD UNIQUE INDEX `event_student` (`event_id`, `user_id`);

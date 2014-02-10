@@ -171,6 +171,10 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setStaffAttendees($this->findStaffAttendees($identifier));
 
+			/* Accumulate student attendees for this event
+			 */
+			$eventItem->setStudentAttendees($this->findStudentAttendees($identifier));
+
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()->count()) {
@@ -207,6 +211,9 @@ class EventMapper extends Calendar\EventMapper {
 
 		$this->deleteStaffAttendeesRelations($event);
 		$this->createStaffAttendees($event);
+
+		$this->deleteStudentAttendeesRelations($event);
+		$this->createStudentAttendees($event);
 	}
 
 	/**
@@ -380,6 +387,128 @@ class EventMapper extends Calendar\EventMapper {
 	}
 
 	/**
+	 * Assign students to an event
+	 *
+	 * @param $event
+	 */
+	private function createStudentAttendees($event) {
+		$query = "
+			INSERT IGNORE INTO `eotc_event_student` (event_id, user_id)
+			VALUES (:eventId, :userId)
+		";
+
+		foreach ($event->getStudentAttendees() as $currentStaff) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":userId", $currentStaff->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Find students for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	private function findStudentAttendees($identifier) {
+		return $this->manyManyRelation(array(
+			'name' => 'eotc_event_student',
+		),
+		array(
+			/* Find things to join to this...
+			 */
+			'column' => 'event_id',
+			'value' => $identifier,
+
+			/* ...using this relation, such that column = key
+			 */
+			'relation' => array(
+				'column' => 'user_id',
+				'key' => 'id',
+				'mapper' => new \Schoolbox\UserMapper(),
+				'options' => array(
+					'order' => array(
+						'lastname' => 'ASC'
+					)
+				)
+			),
+		));
+	}
+
+	/**
+	 * Deletes student attendee relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $event
+	 * @return bool|void
+	 */
+	public function deleteStudentAttendeesRelations($event) {
+		$query = "
+			DELETE FROM `eotc_event_student`
+			WHERE event_id = :eventId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $event->getId());
+		$statement->execute();
+	}
+
+	/**safeIframe
+	 * Add specific relations for a particular event
+	 *
+	 * @param $event
+	 * @param $ids
+	 */
+	public function addStudentAttendeesRelationsSpecific($event, $ids) {
+		if (is_array($ids) && count($ids)) {
+			$query = "
+				INSERT IGNORE INTO `eotc_event_student` (event_id, user_id)
+				VALUES (:eventId, :userId)
+			";
+
+			foreach($ids as $currentId) {
+				if (preg_match('/[0-9]+/', $currentId)) {
+					$statement = $this->database->prepare($query);
+					$statement->bindParam(":eventId", $event->getId());
+					$statement->bindParam(":userId", $currentId);
+					$statement->execute();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Delete specific relations for a particular event
+	 *
+	 * @param $event
+	 * @param $ids
+	 */
+	public function deleteStudentAttendeesRelationsSpecific($event, $ids) {
+		if (is_array($ids) && count($ids)) {
+			$allIds = array();
+
+			foreach($ids as $currentId) {
+				if (preg_match('/[0-9]+/', $currentId)) {
+					$allIds[] = $currentId;
+				}
+			}
+
+			$allIds = implode(',', $allIds);
+
+			$query = "
+				DELETE FROM `eotc_event_student`
+				WHERE event_id = :eventId
+				AND user_id IN ({$allIds})
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":eventId", $event->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
 	 * Many-many relation table, where $relationTable is a pseudo-mapping
 	 * of column names
 	 *
@@ -408,7 +537,7 @@ class EventMapper extends Calendar\EventMapper {
 			$ids[] = $row[$join['relation']['column']];
 		}
 
-		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids);
+		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids, $join['relation']['options']);
 
 		return $allInstances;
 	}

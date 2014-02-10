@@ -75,6 +75,7 @@ if (is_numeric($_GET['eventID'])) {
 	));
 
 	$page->setVar(array(
+		'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
 		'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
 		'EVENT_STAFF' => json_encode($staffSelected),
 		'EVENT_STATUS' => $event->getMetadata()->first()->getStatus()->getName(),
@@ -144,6 +145,7 @@ else {
 	$status = $statusMapper->findDefaultStatus();
 
 	$page->setVar(array(
+		'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
 		'EVENT_TEACHER_IN_CHARGE' => json_encode(array()),
 		'EVENT_STAFF' => json_encode(array()),
 		'EVENT_STATUS' => $status->getName(),

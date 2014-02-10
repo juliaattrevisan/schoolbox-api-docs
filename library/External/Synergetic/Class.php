@@ -127,4 +127,39 @@ class External_Synergetic_Class implements External_ClassInterface
     {
         return $this->database;
     }
+
+	/**
+	 * Get all the filetypes in Synergetic
+	 *
+	 * @return mixed
+	 */
+	public function findFiletypes() {
+		$query = "
+			SELECT *
+			FROM SynergyOne.dbo.luFileType
+			WHERE Code != ''
+		";
+
+		return $this->getDatabase()->getAll($query);
+	}
+
+	/**
+	 * Get all the subjects with a particular filetype
+	 *
+	 * @param $filetype
+	 * @return mixed
+	 */
+	public function findSubjectsWithFiletype($filetype) {
+		$query = "
+			SELECT ClassCode
+			FROM SynergyOne.dbo.StudentClasses
+			WHERE FileType = '{$filetype}'
+			AND FileYear = '{$_SESSION['FileYear']}'
+			AND FileSemester = '{$_SESSION['FileSemester']}'
+			GROUP BY ClassCode
+			ORDER BY ClassCode
+		";
+
+		return $this->getDatabase()->getAll($query);
+	}
 }
