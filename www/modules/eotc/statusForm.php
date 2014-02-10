@@ -18,24 +18,51 @@ $eventMapper = new \EOTC\EventMapper();
  * Otherwise spawn a new one
  */
 try {
-	$event = $eventMapper->findById($_POST['id']);
+	$event = $eventMapper->findById($_POST['eventId']);
 }
 catch (\Exception $e) {
 	error(160);
 }
 
-/* Update values
+/* Remember original states so we know which obs to spawn
  */
-$event->getMetadata()->setStatus($_POST['status']);
+$originalStatus = $event->getMetadata()->getStatus()->getId();
+$originalComment = $event->getMetadata()->getComment();
+
+/* Update with values
+ */
+$statusMapper = new \EOTC\EventStatusMapper();
+$status = $statusMapper->findById($_POST['statusId']);
+
+$event->getMetadata()->setStatus($status);
 $event->getMetadata()->setComment($_POST['comment']);
 
-/* Notifications
- */
-
-/* Save it
- */
 $metadataMapper = new \EOTC\EventMetadataMapper();
 $metadataMapper->save($event->getMetadata());
 
-new \Alaress_Probe($_POST);
-die();
+/* Activity Log
+ */
+$registry = new \EOTC\ActivityLog\Registry();
+$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
+
+/* If a status changed, log it
+ */
+if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
+	echo 'mort';
+	$registry->add($factory->produce('StatusChange'));
+}
+
+/* If a comment changed, log it
+ */
+if ($originalComment != $event->getMetadata()->getComment()) {
+	echo 'bart';
+	$registry->add($factory->produce('CommentChange'));
+}
+
+/* Notify everyone
+ */
+$registry->notify();
+
+/* Redirect back to status screen
+ */
+$page->localRedir('/modules/eotc/status/' . $event->getId());
