@@ -19,7 +19,7 @@ catch (\Exception $e) {
 	error(160);
 }
 
-$this->setFile(TEMPLATE_content, 'modules/eotc/attendance/status.html');
+$this->setFile(TEMPLATE_content, 'modules/eotc/status/attendance.html');
 $this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 
 $this->setVar(array(
