@@ -34,7 +34,7 @@
 <h1>People attending {EVENT_NAME}</h1>
 
 <h2>Add individual students</h2>
-<form action="/modules/eotc/attendance/add" method="post">
+<form action="/modules/eotc/manage/attendance/add" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 	<div id="student-suggest"></div>
 	<input type="submit" class='submit-btn-plain' value="Add" />
@@ -43,7 +43,7 @@
 <div class="clearfix"></div>
 
 <h2>Add by a particular course code</h2>
-<form action="/modules/eotc/attendance/addByCourseCode" method="post">
+<form action="/modules/eotc/manage/attendance/addByCourseCode" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 
 	<fieldset>
@@ -69,7 +69,7 @@
 <div class="clearfix"></div>
 
 <h2>Add by user ID or username</h2>
-<form action="/modules/eotc/attendance/addByImport" method="post">
+<form action="/modules/eotc/manage/attendance/addByImport" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 
 	<textarea name="selected" cols="300" rows="4"></textarea>
@@ -79,7 +79,7 @@
 <div class="clearfix"></div>
 
 <h2>Current Attendees</h2>
-<form action="/modules/eotc/attendance/remove" method="post">
+<form action="/modules/eotc/manage/attendance/remove" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 	<table class="table">
 		<thead>
@@ -109,5 +109,5 @@
 
 <div class="clearfix"></div>
 
-<a href="/modules/eotc/modify.php?eventID={EVENT_ID}" class="btn goto"><span></span>Back</a>
+<a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="btn goto"><span></span>Back</a>
 

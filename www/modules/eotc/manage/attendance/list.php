@@ -17,7 +17,7 @@ catch (\Exception $e) {
 	error(160);
 }
 
-$this->setFile(TEMPLATE_content, 'modules/eotc/attendance/list.html');
+$this->setFile(TEMPLATE_content, 'modules/eotc/manage/attendance/list.html');
 $this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 $this->setBlock(TEMPLATE_content, 'filetype', 'filetype_block');
 

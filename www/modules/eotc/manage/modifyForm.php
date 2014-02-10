@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
@@ -174,7 +174,7 @@ switch($_POST['action']) {
 
 		/* Superuser modifying some arbitrary event
 		 */
-		$page->localRedir('/modules/eotc/modify.php?eventID=' . $event->getId());
+		$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $event->getId());
 
 		break;
 
