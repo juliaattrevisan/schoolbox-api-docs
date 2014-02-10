@@ -114,11 +114,11 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
     /**
      * Gets whether result from getResult() is successful
      *
-     * @param  resource|bool $result
+     * @param  \mysqli_result|bool $result
      * @return bool
      */
     protected function isSuccessful($result) {
-        return $result === true || is_resource($result);
+        return $result === true || $result instanceof \mysqli_result;
     }
 
     /**
