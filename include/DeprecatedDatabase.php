@@ -16,6 +16,22 @@ use Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector;
 class DeprecatedDatabase
 {
 
+    /**
+     * MySQLi connection, should not be public but has a history of being
+     * accessed outside of its class
+     *
+     * @var mysqli
+     */
+    public $dbf;
+
+    /**
+     * MySQLi result, connection, should not be public but has a history of being
+     * accessed outside of its class
+     *
+     * @var mysqli_result
+     */
+    public $result;
+
 
 static private $instance = false;
 
