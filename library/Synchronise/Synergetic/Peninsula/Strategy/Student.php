@@ -102,5 +102,25 @@ class Synchronise_Synergetic_Peninsula_Strategy_Student extends Synchronise_Base
                 return intval($year)+6;
         }
     }
+    
+    /**
+    * Webmail setting
+    *
+    * @param $currentUser
+    * @return int|void
+    */
+    public function getWebmailFromUser($currentUser) {
+            return 1;
+    }
+
+    /**
+    * External mail setting
+    *
+    * @param $currentUser
+    * @return int|void
+    */
+    public function getExternalMailFromUser($currentUser) {
+            return 0;
+    }
 
 }
