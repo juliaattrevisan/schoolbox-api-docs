@@ -10,7 +10,7 @@ class External_Tass_SSO {
 
     private $output = false;
 
-    private $server = 'http://tass-server/tassweb/external/sso_gateway.cfm';
+    private $server = 'https://tassportal.cathedral.qld.edu.au/tassweb/external/sso_gateway.cfm';
 
     private $configuration = array(
         'method' => 'createSSOToken',
