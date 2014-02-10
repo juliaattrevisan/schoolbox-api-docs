@@ -43,11 +43,17 @@ $this->setVar(array(
 ));
 
 if ($event->getMetadata()->getRamsRequired()) {
+	$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
+	$mimetype = $mimetypeMapper->getByFilename($event->getRamsFiles()->first()->getFilename());
+
 	$this->setVar(array(
 		'EVENT_RAMS_FILE' => $event->getRamsFiles()->first()->getFilename(),
+		'EVENT_RAMS_FILESIZE' => $event->getRamsFiles()->first()->getFilesize(),
+		'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
 		'EVENT_RAMS_HASH' => $event->getRamsFiles()->first()->getHash(),
 	));
 
+//	var_dump($event->getRamsFiles()->first());
 	$this->parse('has_rams_block', 'has_rams');
 }
 
