@@ -24,6 +24,7 @@ $this->setBlock(TEMPLATE_content, 'has_rams', 'has_rams_block');
 $this->setBlock(TEMPLATE_content, 'has_event_activity_log', 'has_event_activity_log_block');
 $this->setBlock('has_event_activity_log', 'event_activity_log', 'event_activity_log_block');
 $this->setBlock(TEMPLATE_content, 'event_status', 'event_status_block');
+$this->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
 
 $this->setVar(array(
 	'EVENT_ID' => $event->getId(),
@@ -35,6 +36,27 @@ $this->setVar(array(
 	'EVENT_END' => $event->getEndDateTime()->getShort(),
 	'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
 ));
+
+/* Recurrence
+ */
+// Is there a recurrence? If so don't show the repeat selector.
+if ($event->getSeriesId() == null) {
+	$this->setVar(array(
+		'recurring_reminder_block' => ''
+	));
+}
+else {
+	$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($mapper);
+	$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
+
+	$this->setVar(array(
+		'EVENT_REC_FREQ' => ucfirst($recurrence['freq']),
+		'EVENT_REC_START' => $recurrence['start']->getLongDateOnly(),
+		'EVENT_REC_END' => $recurrence['end']->getLongDateOnly(),
+	));
+
+	$this->parse('recurring_reminder_block', 'recurring_reminder');
+}
 
 /* RAMS file requirement
  */
