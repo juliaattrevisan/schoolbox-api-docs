@@ -46,3 +46,9 @@ ALTER TABLE `eotc_event_staff` ADD UNIQUE INDEX `event_staff` (`event_id`, `user
  */
 CREATE TABLE `eotc_event_student`( `event_id` INT(11), `user_id` INT(11) );
 ALTER TABLE `eotc_event_student` ADD UNIQUE INDEX `event_student` (`event_id`, `user_id`);
+
+/* Event file relations
+ */
+CREATE TABLE `eotc_event_file`( `event_id` INT(11), `storage_id` INT(11) );
+ALTER TABLE `eotc_event_file` ADD UNIQUE INDEX `event_file` (`event_id`, `storage_id`);
+INSERT INTO `error` (`id`, `message`) VALUES ('161', 'Please upload a RAMS file.');

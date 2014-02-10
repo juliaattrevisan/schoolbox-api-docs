@@ -74,7 +74,17 @@ if (is_numeric($_GET['eventID'])) {
 		'ADVANCED_CLOSE' => 'hidden',
 	));
 
+	if ($event->getMetadata()->first()->getRamsRequired()) {
+		if ($event->getRamsFiles()->first()) {
+			$filename = $event->getRamsFiles()->first()->getFilename();
+		}
+		else {
+			$filename = '';
+		}
+	}
+
 	$page->setVar(array(
+		'EVENT_RAMS_FILE' => $filename,
 		'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
 		'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
 		'EVENT_STAFF' => json_encode($staffSelected),
@@ -145,6 +155,7 @@ else {
 	$status = $statusMapper->findDefaultStatus();
 
 	$page->setVar(array(
+		'EVENT_RAMS_FILE' => '',
 		'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
 		'EVENT_TEACHER_IN_CHARGE' => json_encode(array()),
 		'EVENT_STAFF' => json_encode(array()),

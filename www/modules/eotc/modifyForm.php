@@ -137,6 +137,36 @@ switch($_POST['action']) {
 		 */
 		$event->setMetadata($metadata);
 
+		/* If RAMS file is required and one hasn't been uploaded yet,
+		 * save it; otherwise ignore it
+		 */
+		if ($event->getMetadata()->getRamsRequired()) {
+
+			/* A RAMS file doesn't exist, nor uploaded, but was required
+			 */
+			if (!$event->getRamsFiles()->count() && !strlen($_FILES['ramsFile']['name'])) {
+				error(161);
+			}
+			/* A RAMS file was uploaded; replace all existing ones
+			 */
+			else if (strlen($_FILES['ramsFile']['name'])) {
+
+				/* Empty old RAMS objects and put the new one in
+				 */
+				$ramsFile = \Schoolbox\StorageMapper::getInstance()->upload(\Cfg::get('storage_dir') . '/' . $_FILES['ramsFile']['name'], $_FILES['ramsFile']['tmp_name'], $author->getId());
+
+				$event->setRamsFiles(new \Schoolbox\Collection());
+				$event->getRamsFiles()->add($ramsFile);
+			}
+			/* Otherwise just keep the current RAMS file
+			 */
+		}
+		/* RAMS file not needed - remove all existing ones
+		 */
+		else {
+			$event->setRamsFiles(new \Schoolbox\Collection());
+		}
+
 		/* Save this event and any recurring incidents too
 		 */
 		$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
@@ -149,7 +179,7 @@ switch($_POST['action']) {
 
 		/* Superuser modifying some arbitrary event
 		 */
-		$page->backToTheFuture(1);
+		$page->localRedir('/modules/eotc/modify.php?eventID=' . $event->getId());
 
 		break;
 
