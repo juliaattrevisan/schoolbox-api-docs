@@ -276,7 +276,7 @@ class EventMapper extends Calendar\EventMapper {
 
 			/* Accumulate student attendees for this event
 			 */
-			$eventItem->setStudentAttendees($this->findStudentAttendees($identifier));
+			$eventItem->setStudentAttendees($this->findStudentAttendees($eventItem->getId()));
 
 			/* Determine current status
 			 */

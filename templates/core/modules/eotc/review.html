@@ -1,0 +1,41 @@
+<!-- BEGIN event_status -->
+<h2>{EVENT_STATUS_NAME}</h2>
+<table class="standardForm">
+	<colgroup>
+		<col width="180" />
+		<col />
+		<col width="200" />
+		<col width="180" />
+		<col width="30" />
+		<col width="120" />
+		<col width="130" />
+		<col width="30" />
+	</colgroup>
+	<thead>
+		<tr>
+			<td>Date</td>
+			<td>Title</td>
+			<td>Teacher In Charge</td>
+			<td>Created</td>
+			<td align="center">Students</td>
+			<td align="center">RAMS Required</td>
+			<td>Status</td>
+			<td>View</td>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN event -->
+		<tr>
+			<td>{EVENT_START_DATETIME}</td>
+			<td>{EVENT_NOTE}</td>
+			<td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
+			<td>{EVENT_CREATED_AT}</td>
+			<td align="center">{EVENT_STUDENTS}</td>
+			<td align="center">{EVENT_RAMS_REQUIRED}</td>
+			<td>{EVENT_STATUS_NAME}</td>
+			<td><a href="/modules/eotc/status/modify/{EVENT_ID}">View</a></td>
+		</tr>
+		<!-- END event -->
+	</tbody>
+</table>
+<!-- END event_status -->
