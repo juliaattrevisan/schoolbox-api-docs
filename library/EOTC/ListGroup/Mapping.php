@@ -76,4 +76,16 @@ class Mapping {
 	public function getPendingInitialReviewIndex() {
 		return 3;
 	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Get mapping
+	 *
+	 * @return array
+	 */
+	public function getMapping() {
+		return $this->mapping;
+	}
 }
