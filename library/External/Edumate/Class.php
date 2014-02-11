@@ -18,23 +18,36 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
      */
     public function getStudents($classCode) {
 
+
+
+
         // fully qualified table names
         $studentClass = 'db2inst1.schoolbox_studentclass';
         $students = 'db2inst1.schoolbox_students';
+
+
+        // Setup handling multiple codes
+        $codes = explode(',', $classCode);
+        if (empty($codes)) {
+            return false;
+        }
+        array_walk($codes, function(&$n) {
+            $n = "'".$this->getDatabase()->quote($n)."'";
+        });
+
+
 
         // prepare
         $stmt = $this->getDatabase()->prepare("
             SELECT firstname, surname AS lastname, $studentClass.student_number AS synergy_id, year_level AS yearlevel, house
             FROM  $studentClass
             LEFT JOIN $students ON $studentClass.student_number = $students.student_number
-            WHERE $studentClass.class_code = :code
+            WHERE $studentClass.class_code IN (".implode(',',$codes).")
             ORDER BY surname ASC
         ");
 
         // retrieve
-        $stmt->execute(array(
-            'code' => $classCode
-        ));
+        $stmt->execute();
 
         // manipulate
         $students = array();
@@ -56,17 +69,27 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
      * @return array
      */
     public function getTeacherName($classCode) {
+
+        // Setup handling multiple codes
+        $codes = explode(',', $classCode);
+        if (empty($codes)) {
+            return false;
+        }
+
+        array_walk($codes, function(&$n) {
+                $n = "'".$this->getDatabase()->quote($n)."'";
+            });
+
+
         // prepare
         $stmt = $this->getDatabase()->prepare("
             SELECT staff_number AS StaffID
                 FROM db2inst1.schoolbox_teacherclass
-                WHERE class_code = :code
+                WHERE class_code IN (".implode(',',$codes).")
         ");
 
         // retrieve
-        $stmt->execute(array(
-            'code' => $classCode
-        ));
+        $stmt->execute();
 
         // manipulate
         $teachers = array();
