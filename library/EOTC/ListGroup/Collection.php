@@ -14,7 +14,7 @@ namespace EOTC\ListGroup;
 class Collection extends \Schoolbox\Collection {
 
 	/**
-	 * Event grouping mappnig
+	 * Event grouping mapping
 	 *
 	 * @var array
 	 */
@@ -46,8 +46,9 @@ class Collection extends \Schoolbox\Collection {
 	/**
 	 * Assign an event to an Event List Group
 	 *
-	 * Ignore recurring instances and assign events to a $type collectino
-	 * based on the event's status id
+	 * Ignore recurring instances and assign events to a collection
+	 * based on the event's status id and RAMS requirements (or any
+	 * other determination as defined in Chain)
 	 *
 	 * @param $event
 	 */
