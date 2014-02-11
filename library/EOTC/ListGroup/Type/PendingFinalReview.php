@@ -14,6 +14,13 @@ namespace EOTC\ListGroup\Type;
 class PendingFinalReview extends Base {
 
 	/**
+	 * Next status id
+	 *
+	 * @var int
+	 */
+	protected $nextStatusId = 4;
+
+	/**
 	 * Determine where to go next
 	 *
 	 * @return $this|mixed
@@ -23,12 +30,11 @@ class PendingFinalReview extends Base {
 		/* If this requires RAMS and RAMS has been approved,
 		 * or if it doesn't require RAMS at all
 		 */
-		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->getId() == 3)) {
-			return new \EOTC\ListGroup\Response(4, $this->getMapping()->getPendingFinalReviewIndex());
+		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isRamsApproved())) {
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalReviewIndex());
 		}
-
-		if ($this->getEvent()->getMetadata()->getStatus()->getId() == 2) {
-			return new \EOTC\ListGroup\Response(4, $this->getMapping()->getPendingFinalReviewIndex());
+		else if ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

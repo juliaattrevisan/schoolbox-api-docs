@@ -14,6 +14,13 @@ namespace EOTC\ListGroup\Type;
 class PendingRamsReview extends Base {
 
 	/**
+	 * Next status id
+	 *
+	 * @var int
+	 */
+	protected $nextStatusId = 3;
+
+	/**
 	 * Determine where to go next
 	 *
 	 * @return $this|mixed
@@ -23,8 +30,8 @@ class PendingRamsReview extends Base {
 		/* If this requires RAMS and RAMS has been approved,
 		 * or if it doesn't require RAMS at all
 		 */
-		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->getId() == 2)) {
-			return new \EOTC\ListGroup\Response(3, $this->getMapping()->getPendingRamsReviewIndex());
+		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple())) {
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingRamsReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it
@@ -33,4 +40,4 @@ class PendingRamsReview extends Base {
 			return $this->getNext()->determine();
 		}
 	}
-} 
+}

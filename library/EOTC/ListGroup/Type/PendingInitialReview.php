@@ -14,6 +14,13 @@ namespace EOTC\ListGroup\Type;
 class PendingInitialReview extends Base {
 
 	/**
+	 * Next status id
+	 *
+	 * @var int
+	 */
+	protected $nextStatusId = 2;
+
+	/**
 	 * Determine where to go next
 	 *
 	 * @return $this|mixed
@@ -23,8 +30,8 @@ class PendingInitialReview extends Base {
 		/* If this requires RAMS and RAMS has been approved,
 		 * or if it doesn't require RAMS at all
 		 */
-		if (($this->getEvent()->getMetadata()->getStatus()->getId() == 1)) {
-			return new \EOTC\ListGroup\Response(2, $this->getMapping()->getPendingInitialReviewIndex());
+		if (($this->getEvent()->getMetadata()->getStatus()->isDraft())) {
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingInitialReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

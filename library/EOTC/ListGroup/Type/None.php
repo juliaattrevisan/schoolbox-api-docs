@@ -24,6 +24,13 @@ namespace EOTC\ListGroup\Type;
 class None {
 
 	/**
+	 * Next status id
+	 *
+	 * @var int
+	 */
+	protected $nextStatusId = 5;
+
+	/**
 	 * Determine where to go next
 	 *
 	 * @throws \Exception

@@ -28,11 +28,22 @@ abstract class Base {
 	protected $mapping = null;
 
 	/**
+	 * eotc_status primary key
+	 *
+	 * This is the next status in the sequence
+	 *
+	 * @var int
+	 */
+	protected $nextStatusId = 2;
+
+	/**
 	 * @param \EOTC\Event $event
 	 */
 	public function __construct(\EOTC\Event $event) {
 		$this->setEvent($event);
 		$this->setMapping(new \EOTC\ListGroup\Mapping());
+
+		$this->setup();
 	}
 
 	/**
@@ -42,6 +53,12 @@ abstract class Base {
 	 * @return mixed
 	 */
 	abstract public function determine();
+
+	/**
+	 * Hook method
+	 */
+	protected function setup() {
+	}
 
 	/* Getters/Setters
  	 */
@@ -98,5 +115,23 @@ abstract class Base {
 	 */
 	protected function getMapping() {
 		return $this->mapping;
+	}
+
+	/**
+	 * Set next status id
+	 *
+	 * @param int $nextStatusId
+	 */
+	protected function setNextStatusId($nextStatusId) {
+		$this->nextStatusId = $nextStatusId;
+	}
+
+	/**
+	 * Get next status id
+	 *
+	 * @return int
+	 */
+	protected function getNextStatusId() {
+		return $this->nextStatusId;
 	}
 }
