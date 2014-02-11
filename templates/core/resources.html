@@ -26,8 +26,8 @@ $j(function() {
 		$j('#tree .selected').removeClass('selected');
 		$j(this).addClass('selected');
 
-		/* hide all files */
-		$j('#file-list tbody tr').hide();
+		/* hide and deselect all files */
+		$j('#file-list tbody tr').removeClass('selected').hide();
 
 		var relationID = $j(this).attr('id').substring(5);
 		var files = $j('tr.category-' + relationID);
