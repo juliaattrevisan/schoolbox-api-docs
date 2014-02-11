@@ -115,13 +115,16 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
      * @return PDOStatement
      */
     protected function getClassUserStatement() {
-        return $this->getDatabase()->prepare("
-            SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id
-            FROM class_user cl
-            LEFT JOIN class c ON c.id = cl.class_id
-            LEFT JOIN class_period cp ON cp.class_id = c.id
-            WHERE cl.user_id = :userId
-        ");
+        // Get classes for which this user is involved, or is a teacher.
+        $query = "
+            SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id, u.synergy_id
+            FROM class c
+            LEFT JOIN class_user   cl ON c.id = cl.class_id
+            LEFT JOIN class_period cp ON c.id = cp.class_id
+            LEFT JOIN user          u ON cp.teacher_id = u.id
+            WHERE cp.teacher_id = :userId OR cl.user_id = :userId
+        ";
+        return $this->getDatabase()->prepare($query);
     }
 
     /**
@@ -166,6 +169,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
 
 		/* Get user's classes */
+		// Is this a teacher? If so only get classes for which I'm a teacher
 		$classStatement = $this->getClassUserStatement();
 		$classStatement->execute( array(
 			':userId' => $userId,
@@ -198,7 +202,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['description'] = $class['name'];
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['code'] = $class['code'];
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['room'] = $class['room'];
-
+					$periodListAdaption[$periodSequence]['day'][$dayNumber]['staffCode'] = $class['synergy_id'];
 					unset($classList[$i]);
 				}
 			}
@@ -212,7 +216,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		$periodStatement = $this->getPeriodStatement(true);
 		$periodStatement->execute( array(
 			':campusId' => $campusId,
-		    ':day' => $dayNumber
+			':day' => $dayNumber
 		) );
 
 		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
@@ -241,7 +245,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 					$periodAdaption['description'] = $class['name'];
 					$periodAdaption['code'] = $class['code'];
 					$periodAdaption['room'] = '';
-
+					$periodAdaption['staffCode'] = $class['synergy_id'];
 					unset($classList[$i]);
 				}
 			}

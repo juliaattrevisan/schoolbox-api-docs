@@ -224,12 +224,11 @@ if (is_array($outputList)) {
                                     );
                                     break;
                                 case 'tass':
+                                case 'schoolbox':
                                     $period_staff = $period['staffCode'];
                                     break;
                                 case 'denbigh':
-                                case 'schoolbox':
                                 default:
-                                    $period_staff = '';
                                     break;
                             }
                         } // staff, or external_db is disabled

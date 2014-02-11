@@ -77,13 +77,51 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
         foreach ($reader as $row) {
             // Group by class
             $class = $row['Class'];
-            $this->list[$class]['class']         = $class;
-            $this->list[$class]['period_list'][] = array(
-                'day'     => $row['Day'],
-                'period'  => $row['Period'],
-                'teacher' => $row['Teacher'],
-                'room'    => $row['Room'],
-            );
+            if (isset($class)) {
+                $this->list[$class]['class']         = $class;
+                $this->list[$class]['period_list'][] = array(
+                    'day'     => $this->convertDay($row['Day']),
+                    'period'  => $row['Period'],
+                    'teacher' => $row['Teacher'],
+                    'room'    => $row['Room'],
+                );
+            }
+        }
+    }
+
+    /**
+     * Mangles day from timetable CSV file into a timetable day that Schoolbox
+     * recognises.
+     *
+     * MonA => 1, TueA => 2, through to FriB => 10
+     *
+     * @param  string $day
+     * @return int
+     */
+    protected function convertDay($day) {
+        switch ($day) {
+            case 'MonA':
+                return 1;
+            case 'TueA':
+                return 2;
+            case 'WedA':
+                return 3;
+            case 'ThuA':
+                return 4;
+            case 'FriA':
+                return 5;
+            case 'MonB':
+                return 6;
+            case 'TueB':
+                return 7;
+            case 'WedB':
+                return 8;
+            case 'ThuB':
+                return 9;
+            case 'FriB':
+                return 10;
+            default:
+                return 0;
         }
     }
 
@@ -111,22 +149,17 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
             $class = ClassEntryMapper::getInstance()->findOneByColumn('code', $new_item['class']);
         }
         catch (Exception $e) {}
-        if (!($class instanceof ClassEntry)) {
-
-            if ($this->perform_update) {
-                //Create this weird class we just found.
-                $class = new ClassEntry();
-                $class->setName($new_item['class']);
-                $class->setCode($new_item['class']);
-                ClassEntryMapper::getInstance()->save($class);
-            }
-
-            //$this->verbose_filter->outputSkipMessage($class_message.', because it was not found');
-            //$this->verbose_filter->incrementSkipped();
-            //return 0;
+        if (!($class instanceof ClassEntry) && $this->perform_update) {
+            //Create this weird class we just found, as long as it has a name.
+            $class = new ClassEntry();
+            $class->setName($new_item['class']);
+            $class->setCode($new_item['class']);
+            ClassEntryMapper::getInstance()->save($class);
         }
 
-        // First delete all classes for this cycle and campus.
+        $classInvolvements = array();
+
+        // First delete all classes and involvements for this cycle and campus.
         // Then restore them.
         $timetable_message = count($new_item['period_list']).' period(s) for '.$class_message;
         if ($this->perform_update) {
@@ -134,13 +167,28 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
             foreach ($new_item['period_list'] as $period) {
                 $class_period = new ClassPeriod();
                 // Period: whatever the period for this cycle, day and sequence is
-                $period_list = TimetablePeriodMapper::getInstance()->findByColumnList(
-                    array(
-                        'cycle_id' => $this->cycle->getId(),
-                        'day'      => $period['day'],
-                        'title' => $period['period'],
-                    )
+                $params = array(
+                    'cycle_id' => $this->cycle->getId(),
+                    'day'      => $period['day'],
+                    'title'    => $period['period'],
                 );
+                $period_list = TimetablePeriodMapper::getInstance()->findByColumnList($params);
+
+                // Get teacher for this class, and set it into class involvement
+                // and period.
+                $teacher = null;
+                try {
+                    $teacher = UserMapper::getInstance()->findOneByColumn(
+                        'synergy_id', $period['teacher']
+                    );
+                    $class_period->setTeacher($teacher);
+                }
+                catch (Exception $e) {
+                    $this->verbose_filter->outputMessage(
+                        sprintf('Teacher "%s" not found for class "%s".', $period['teacher'], $class->getCode())
+                    );
+                    continue;
+                }
 
                 foreach ($period_list as $period_object) {
                     ClassPeriodMapper::getInstance()->deleteForClassAndPeriod($class, $period_object);
@@ -150,21 +198,7 @@ class Synchronise_External_Nhs_Strategy_Timetable extends Synchronise_Base_Strat
                         ->setRoom($period['room'])
                     ;
                     // Attach teacher
-                    $teacher = null;
-                    try {
-                        $teacher = UserMapper::getInstance()->findOneByColumn(
-                            'synergy_id', $period['teacher']
-                        );
-                        $class_period->setTeacher($teacher);
-                    }
-                    catch (Exception $e) {
-                        $this->verbose_filter->outputMessage(
-                            sprintf('Teacher "%s" not found for class "%s".', $period['teacher'], $class->getCode())
-                        );
-                    }
-//                    if($new_item['class'] == 'Duty.Library'){
-////                        print_R($class_period);
-//                    }
+                    $class_period->setTeacher($teacher);
                     ClassPeriodMapper::getInstance()->save($class_period);
                     // Break because we only want one row per period.
                     break;
