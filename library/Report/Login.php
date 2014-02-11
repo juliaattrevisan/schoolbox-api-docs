@@ -141,8 +141,8 @@ class Report_Login extends Report_Abstract implements Report_IReport {
 
         foreach($resultFilter as $key => $value) {
             if(in_array($key, $this->getFilterFields())) {
-                $key = mysql_real_escape_string($key);
-                $value = mysql_real_escape_string($value);
+                $key = $this->db->quote($key);
+                $value = $this->db->quote($value);
 
                 // custom filter by user
                 if($key == 'user') {
@@ -178,7 +178,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
                       ORDER BY $orderBy $orderDir";
 
         $this->dataResource = $handler->query($dataQuery);
-        $this->dataCount = mysql_num_rows($this->dataResource);
+        $this->dataCount = mysqli_num_rows($this->dataResource);
 
         if(!$this->dataCount) {
             return 0;

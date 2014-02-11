@@ -242,8 +242,8 @@ class Homepage {
         $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
         $cim->delete($collection);
 
-        $categoryID = mysql_real_escape_string($categoryID, $this->db->dbf);
-        $templateID = mysql_real_escape_string($templateID, $this->db->dbf);
+        $categoryID = $this->db->quote($categoryID);
+        $templateID = $this->db->quote($templateID);
 
         $sql = "
             SELECT id AS template, left_column_width, right_column_width
@@ -334,7 +334,7 @@ class Homepage {
         $queries[] = $sql;
 
         $result = $this->db->query($sql);
-        while ($r = mysql_fetch_assoc($result)) {
+        while ($r = mysqli_fetch_assoc($result)) {
             // hack at the data, then flick it back in
             unset($r[$indexField]);
 
@@ -362,7 +362,7 @@ class Homepage {
      * @return int
      */
     function removeAllComponentsFromHomepage() {
-        $categoryID = mysql_real_escape_string($this->cid, $this->db->dbf);
+        $categoryID = $this->db->quote($this->cid);
 
         // locate all the component instances associated with this homepage, and clear them out
         $cim = Component_InstanceMapper::getInstance();
@@ -570,7 +570,7 @@ class Homepage {
 		$query = "UPDATE homepage_config SET ";
 		foreach($listColor as $key => $color)
 		{
-			$query .= "`".mysql_real_escape_string($key)."` = '".mysql_real_escape_string($color)."', ";
+			$query .= "`".$this->db->quote($key)."` = '".$this->db->quote($color)."', ";
 		}
 		$query = substr($query, 0, -2);
 		$query .= " WHERE cid = '".$this->cid."'";

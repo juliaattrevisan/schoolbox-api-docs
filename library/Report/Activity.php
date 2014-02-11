@@ -129,8 +129,8 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
 
         foreach($resultFilter as $key => $value) {
             if(in_array($key, $this->filterable)) {
-                $key = mysql_real_escape_string($key);
-                $value = mysql_real_escape_string($value);
+                $key = $this->db->quote($key);
+                $value = $this->db->quote($value);
                 $sqlFilter .= $sqlFilter == "" ? " WHERE" : " AND";
                 // custom filter by user
                 if($key == 'user') {
@@ -179,7 +179,7 @@ $sqlFilter
 ORDER BY $orderBy $orderDir";
 
         $this->dataResource = $handler->db->query($query);
-        $this->dataCount = mysql_num_rows($this->dataResource);
+        $this->dataCount = mysqli_num_rows($this->dataResource);
 
         if(!$this->dataCount) {
             return 0;

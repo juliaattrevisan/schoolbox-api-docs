@@ -255,7 +255,7 @@ class File extends DeprecatedModel {
     }
 
     function search ($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
-        $keyword = mysql_real_escape_string($keyword);
+        $keyword = $this->db->quote($keyword);
 
         $query = "SELECT `file`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname, `allowedFileTypes`.iconFile,
                             `perms`.type AS perms_type, `userAccess`.type AS userAccess_type,

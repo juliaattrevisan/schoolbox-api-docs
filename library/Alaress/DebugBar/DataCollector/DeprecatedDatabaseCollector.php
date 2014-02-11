@@ -17,9 +17,9 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
     protected $widget_name = 'oldDatabase';
 
     /**
-     * The MySQL database connection, created by mysql_connect
+     * The MySQL database connection, created by mysqli_connect
      *
-     * @var resource
+     * @var \mysqli
      */
     protected $connection;
 
@@ -74,7 +74,7 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
      * @return resource|bool
      */
     protected function getResult($query) {
-        return mysql_query($query, $this->connection);
+        return mysqli_query($this->connection, $query);
     }
 
     /**
@@ -85,10 +85,10 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
      */
     protected function getRowCount($result) {
         if ($result === true) {
-            return mysql_affected_rows($this->connection);
+            return mysqli_affected_rows($this->connection);
         }
-        elseif (is_resource($result)) {
-            return mysql_num_rows($result);
+        elseif ($result instanceof \mysqli_result) {
+            return mysqli_num_rows($result);
         }
         return null;
     }
@@ -99,7 +99,7 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
      * @return int
      */
     protected function getErrorCode() {
-        return mysql_errno($this->connection);
+        return mysqli_errno($this->connection);
     }
 
     /**
@@ -108,17 +108,17 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
      * @return string
      */
     protected function getErrorMessage() {
-        return mysql_error($this->connection);
+        return mysqli_error($this->connection);
     }
 
     /**
      * Gets whether result from getResult() is successful
      *
-     * @param  resource|bool $result
+     * @param  \mysqli_result|bool $result
      * @return bool
      */
     protected function isSuccessful($result) {
-        return $result === true || is_resource($result);
+        return $result === true || $result instanceof \mysqli_result;
     }
 
     /**

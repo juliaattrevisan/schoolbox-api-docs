@@ -75,17 +75,17 @@ class Submission extends DeprecatedModel {
     function getByField($field, $value) {
 
         // "securitae"
-        $field = mysql_real_escape_string($field);
+        $field = $this->db->quote($field);
 
         if (is_array($value) && !empty($value)) {
             foreach ($value as &$v) {
-                $v = "'".mysql_real_escape_string($v)."'";
+                $v = "'".$this->db->quote($v)."'";
             }
             unset($v);
             $conditional = 'IN (' . implode(',', $value) . ')';
         }
         else {
-            $conditional = "= '".mysql_real_escape_string($value)."'";
+            $conditional = "= '".$this->db->quote($value)."'";
         }
 
         // general extraction query for submission boxes
@@ -1131,7 +1131,7 @@ class Submission extends DeprecatedModel {
         $result = $this->db->query($sql);
 
         // rather than user getAll(), we want this as an ordinal array, not associative, so iterate manually
-        while ($y = mysql_fetch_assoc($result)) {
+        while ($y = mysqli_fetch_assoc($result)) {
             $years[] = $y['year'];
         }
 

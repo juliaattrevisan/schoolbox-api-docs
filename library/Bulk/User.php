@@ -128,7 +128,7 @@ class Bulk_User extends Bulk_Abstract {
 					 * Check username and synergy already exists
 					 */
 					if (!$result) {
-						$query = "SELECT id FROM user WHERE username = '".mysql_real_escape_string($newUser['username'])."' AND synergy_id = '{$newUser['synergy_id']}'";
+						$query = "SELECT id FROM user WHERE username = '".$userHandler->db->quote($newUser['username'])."' AND synergy_id = '{$newUser['synergy_id']}'";
 
 						$updateUser = $userHandler->db->getRow($query);
 

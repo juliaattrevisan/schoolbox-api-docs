@@ -267,8 +267,8 @@ class Eportfolio {
 	 * @param $templateID
 	 */
 	public function createEportfolioFromTemplate($pageTitle, $templateID) {
-		$userId = mysql_real_escape_string($this->getUserId(), $this->db->dbf);
-		$templateID = mysql_real_escape_string($templateID, $this->db->dbf);
+		$userId = $this->db->quote($this->getUserId());
+		$templateID = $this->db->quote($templateID);
 
 		/* Retrieve template data
 		 */
@@ -428,8 +428,8 @@ class Eportfolio {
 		$stack = array();
 
 		foreach($listColor as $key => $color) {
-			$field = mysql_real_escape_string($key);
-			$value = mysql_real_escape_string($color);
+			$field = $this->db->quote($key);
+			$value = $this->db->quote($color);
 
 			$stack[] = "`{$field}` = '{$value}'";
 		}
@@ -705,7 +705,7 @@ class Eportfolio {
 //		$queries[] = $sql;
 //
 //		$result = $this->db->query($sql);
-//		while ($r = mysql_fetch_assoc($result)) {
+//		while ($r = mysqli_fetch_assoc($result)) {
 //			// hack at the data, then flick it back in
 //			unset($r[$indexField]);
 //
@@ -733,7 +733,7 @@ class Eportfolio {
 //	 * @return int
 //	 */
 //	function removeAllComponentsFromEportfolio() {
-//		$userId = mysql_real_escape_string($this->getUserId(), $this->db->dbf);
+//		$userId = $this->db->quote($this->getUserId());
 //
 //		// locate all the component instances associated with this homepage, and clear them out
 //		$cim = Component_InstanceMapper::getInstance();
