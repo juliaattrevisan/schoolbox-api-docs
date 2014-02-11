@@ -33,6 +33,7 @@ ALTER TABLE `eotc_event` DROP `completed`;
 ALTER TABLE `eotc_event` DROP `allday`;
 ALTER TABLE `eotc_event` MODIFY COLUMN id INT(11) AUTO_INCREMENT;
 ALTER TABLE `eotc_event` ADD COLUMN `teacher_in_charge_id` INT(11) NULL AFTER `author_id`;
+TRUNCATE eotc_event;
 
 /* Event campus relations
  */
@@ -58,3 +59,4 @@ INSERT INTO `error` (`id`, `message`) VALUES ('161', 'Please upload a RAMS file.
  */
 CREATE TABLE `eotc_activitylog`( `id` INT(11) AUTO_INCREMENT, `actioner_id` INT(11), `event_id` INT(11), `message` TEXT, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, KEY(`id`) );
 ALTER TABLE `eotc_activitylog` CHANGE `event_id` `metadata_id` INT(11) NULL;
+
