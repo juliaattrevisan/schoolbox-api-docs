@@ -33,5 +33,5 @@ if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($su
 
 /* Export xml
  */
-$xml = new Survey_Export_Xml($survey, $factory, new Survey_Section(), $this);
+$xml = new Survey_Export_Xml($survey, $factory, new Survey_Section(), new Survey_Question(), $this);
 $xml->render();
