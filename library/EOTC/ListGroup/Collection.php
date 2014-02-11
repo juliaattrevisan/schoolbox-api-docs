@@ -26,12 +26,19 @@ class Collection extends \Schoolbox\Collection {
 	private $processedSeriesIds = array();
 
 	/**
+	 * An instance of Mapping
+	 *
+	 * @var null
+	 */
+	private $mapping = null;
+
+	/**
 	 * No setup hook in \Schoolbox\Collection?
 	 */
 	public function setup() {
-		$mapping = new Mapping();
+		$this->setMapping(new Mapping());
 
-		foreach ($mapping->getMapping() as $current) {
+		foreach ($this->getMapping()->getMapping() as $current) {
 			$this->add(new \Schoolbox\Collection());
 		}
 	}
@@ -73,6 +80,15 @@ class Collection extends \Schoolbox\Collection {
 	}
 
 	/**
+	 * The name of the Event List Group currently being processed
+	 *
+	 * @return mixed
+	 */
+	public function getCurrentName() {
+		return $this->getMapping()->getName($this->key());
+	}
+
+	/**
 	 * Mark this series id as having been processed
 	 *
 	 * @param $seriesId
@@ -100,5 +116,23 @@ class Collection extends \Schoolbox\Collection {
 	 */
 	private function getProcessedSeriesIds() {
 		return $this->processedSeriesIds;
+	}
+
+	/**
+	 * Set mapping
+	 *
+	 * @param null $mapping
+	 */
+	private function setMapping($mapping) {
+		$this->mapping = $mapping;
+	}
+
+	/**
+	 * Get mapping
+	 *
+	 * @return null
+	 */
+	private function getMapping() {
+		return $this->mapping;
 	}
 }

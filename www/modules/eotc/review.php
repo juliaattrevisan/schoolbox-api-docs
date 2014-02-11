@@ -27,7 +27,7 @@ for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) 
 
 	if ($currentListGroup->count()) {
 		$this->setVar(array(
-			'EVENT_LIST_GROUP_NAME' => $allListGroups->getName()
+			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName()
 		));
 
 		foreach ($currentListGroup as $currentEvent) {
