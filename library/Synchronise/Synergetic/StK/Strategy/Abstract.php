@@ -181,13 +181,6 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 				// admin group
 				return self::ADMIN_GROUP_ID;
 
-			case 'maternity':
-			case '':
-				//
-				// on mat leave - could be either type. blank - probably former
-				// staff member. Leave group blank.
-				return false;
-
 			default:
 				//
 				// teacher by default
