@@ -27,7 +27,7 @@ class PendingRamsReview extends Base {
 	 */
 	public function determine() {
 
-		/* If this requires RAMS and RAMS has been approved,
+		/* If this requires RAMS and is In Principle,
 		 * or if it doesn't require RAMS at all
 		 */
 		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple())) {
