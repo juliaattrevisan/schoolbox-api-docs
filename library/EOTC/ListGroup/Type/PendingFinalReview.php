@@ -26,14 +26,14 @@ class PendingFinalReview extends Base {
 		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->getId() == 3)) {
 			return array(
 				'nextStatus' => 4,
-				'listGroupIndex' => 1
+				'listGroupIndex' => $this->getMapping()->getPendingFinalReviewIndex()
 			);
 		}
 
 		if ($this->getEvent()->getMetadata()->getStatus()->getId() == 2) {
 			return array(
 				'nextStatus' => 4,
-				'listGroupIndex' => 1
+				'listGroupIndex' => $this->getMapping()->getPendingFinalReviewIndex()
 			);
 		}
 

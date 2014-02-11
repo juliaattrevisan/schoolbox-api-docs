@@ -26,7 +26,7 @@ class PendingRamsReview extends Base {
 		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->getId() == 2)) {
 			return array(
 				'nextStatus' => 3,
-				'listGroupIndex' => 2
+				'listGroupIndex' => $this->getMapping()->getPendingRamsReviewIndex()
 			);
 		}
 

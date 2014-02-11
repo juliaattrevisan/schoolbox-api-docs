@@ -21,10 +21,18 @@ abstract class Base {
 	protected $event = null;
 
 	/**
+	 * An instance of \EOTC\ListGroup\Mapping
+	 *
+	 * @var null
+	 */
+	protected $mapping = null;
+
+	/**
 	 * @param \EOTC\Event $event
 	 */
 	public function __construct(\EOTC\Event $event) {
 		$this->setEvent($event);
+		$this->setMapping(new \EOTC\ListGroup\Mapping());
 	}
 
 	/**
@@ -73,4 +81,22 @@ abstract class Base {
 	public function getNext() {
 		return $this->next;
 	}
-} 
+
+	/**
+	 * Set mapping
+	 *
+	 * @param null $mapping
+	 */
+	protected function setMapping($mapping) {
+		$this->mapping = $mapping;
+	}
+
+	/**
+	 * Get mapping
+	 *
+	 * @return null
+	 */
+	protected function getMapping() {
+		return $this->mapping;
+	}
+}

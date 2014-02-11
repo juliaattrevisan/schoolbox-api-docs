@@ -26,7 +26,7 @@ class PendingInitialReview extends Base {
 		if (($this->getEvent()->getMetadata()->getStatus()->getId() == 1)) {
 			return array(
 				'nextStatus' => 2,
-				'listGroupIndex' => 3
+				'listGroupIndex' => $this->getMapping()->getPendingInitialReviewIndex()
 			);
 		}
 
