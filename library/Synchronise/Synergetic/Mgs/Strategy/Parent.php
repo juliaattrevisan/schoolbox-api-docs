@@ -37,10 +37,9 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         $newUser['firstname'] = $currentUser['StudentContactPreferred'];
         $newUser['lastname'] = $currentUser['StudentContactSurname'];
         $newUser['alt_email'] = $currentUser['StudentContactDefaultEmail'];
-        $newUser['defaultCampus'] = self::PARENT_DEFAULT_CAMPUS;
-
         // get campuses of attached children
         $newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $newUser['defaultCampus'] =$newUser['campus'][0];
         $newUser['group_id'] = self::PARENT_GROUP_ID;
 
         // parents are not superusers

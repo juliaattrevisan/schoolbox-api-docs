@@ -191,11 +191,13 @@ class UserMapper extends Mapper {
 			 */
 			if ($campus->getId()) {
 				$user->getCampusCollection()->add($campus);
+
+                if($row['uc.defaultCampus'] == 1) {
+                    $user->setDefaultCampus($campus);
+                }
 			}
 
-			if($row['uc.defaultCampus'] == 1) {
-				$user->setDefaultCampus($campus);
-			}
+
 		}
 		if (!($user instanceof User)) {
 			throw new Schoolbox\Mapper\Exception('Instance of object not found');
