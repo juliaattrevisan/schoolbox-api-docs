@@ -2,6 +2,11 @@
 /**
  * EventListGroup
  *
+ * All the events whose statuses can be modified appear in a mega
+ * Collection of Collections called Event List Group. These have
+ * events corresponding to Pending Final Approval etc. on the
+ * Review screen.
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/

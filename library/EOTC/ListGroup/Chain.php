@@ -2,6 +2,12 @@
 /**
  * Chain
  *
+ * This figures out which Event List Group and event belongs to and
+ * what its next status is
+ *
+ * This can be used to a) populate the Review screen and b) limit the
+ * options available in select dropdowns
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
