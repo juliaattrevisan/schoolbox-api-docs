@@ -113,14 +113,7 @@ class Synchronise_Synergetic_Seymour_Strategy_Parent extends Synchronise_Synerge
             }
             $newUser['defaultCampus'] = $newUser['campus'][0];
 
-            // Clear email address in Portal if the user is not meant to be publicly listed
-            if ($this->isPubliclyListed($currentParent)) {
-                $newUser['alt_email'] = trim($preferredEmail);
-            }
-            else {
-                $newUser['alt_email'] = '';
-            }
-
+            $newUser['alt_email'] = trim($preferredEmail);
             $newUser['synergy_id'] = $currentSynergyId;
 
             // Prepare verbosity
@@ -169,19 +162,5 @@ class Synchronise_Synergetic_Seymour_Strategy_Parent extends Synchronise_Synerge
             }
 
         }
-	}
-
-	/**
-	 * Determine whether the $currentParent is supposed to be listed publicly
-	 *
-	 * @param  $currentParent
-	 * @return bool
-	 */
-	private function isPubliclyListed($currentParent) {
-		if ($currentParent['DirectoryIncludeFlag'] == 0) {
-			return false;
-		}
-
-		return true;
 	}
 }
