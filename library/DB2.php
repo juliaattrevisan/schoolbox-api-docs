@@ -99,4 +99,14 @@ class DB2 {
         return $stmt->rowCount();
     }
 
+    /**
+     * Quote input for safety
+     *
+     * @param $value string
+     * @return string
+     */
+    public function quote($value) {
+        return db2_escape_string($value);
+    }
+
 }

@@ -32,7 +32,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
             return false;
         }
         array_walk($codes, function(&$n) {
-            $n = "'$n'";
+            $n = "'".$this->getDatabase()->quote($n)."'";
         });
 
 
@@ -77,7 +77,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         }
 
         array_walk($codes, function(&$n) {
-                $n = "'$n'";
+                $n = "'".$this->getDatabase()->quote($n)."'";
             });
 
 
@@ -85,7 +85,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         $stmt = $this->getDatabase()->prepare("
             SELECT staff_number AS StaffID
                 FROM db2inst1.schoolbox_teacherclass
-                WHERE class_code IN (.implode(',',$codes).)
+                WHERE class_code IN (".implode(',',$codes).")
         ");
 
         // retrieve
