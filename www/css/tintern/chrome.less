@@ -37,15 +37,17 @@
 @link: 							#142f79;
 @link-hover: 					#00adef;
 
-// Main banner
+// Main banner & Search
 @banner-background: 			#00adef;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 @banner-height:     			72px;
+@search-color:                  @link;
 
 // Modules
 @module-heading: 				#FFFFFF;
 @module-background: 			#00adef;
+@admin-nav:                     @module-background;
 
 // Refers to the left navigation
 @navigation-width:				200px;
@@ -66,6 +68,10 @@
 // Footer text
 @footer-color:					#797979;
 @footer-links:					@footer-color;
+
+// Optional features
+@login-version: 				1;
+@header-version: 				1;
 
 // =============================================================================
 // 3. Load core
@@ -143,6 +149,7 @@ body.login{
       height: 29px;
     }
     #search-button{
+      background: url("/images/tintern/search-button.png") no-repeat 8px 12px;
       top: 7px;
       left: auto;
       right: 11px;
@@ -170,43 +177,45 @@ body.login{
   margin: 0;
 }
 
-/*
- * Demo Dashboards
- */
+.admin-nav li a{ color: #797979; }
 
-.demo-dash{
-	li{ float: left;
-		padding: 7px 4px !important;
-		height: 135px;
-		list-style: none;
-	}
-	a{  display: block;
-		float: left;
-		text-align: center;
-		padding: 92px 0 0 0;
-		font-weight: bold;
-		width: 88px;
-		-webkit-transition: opacity 0.5s;
-		-moz-transition: opacity 0.5s;
-		-ms-transition: opacity 0.5s;
-		-o-transition: opacity 0.5s;
-		transition: opacity 0.5s;
-		&:hover{
-			cursor: pointer;
-			opacity: 0.8;
-		}
-	}
-	.parents-friends{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
-	.due-work{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
-	.manage-users{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
-	.timetable{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
-	.synergetic{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
-	.admin{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
-	.eportfolio{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
-	.hr{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
-	.services{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
-	.leave{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
-	.parent-dir{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
-	.payments{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
-	.online-forms{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+body.login{
+
+  #header {
+    height: @logo-height + 100px;
+    .logo {
+      left: 50%;
+      top: 50px;
+      margin-left: 0 - @logo-width / 2;
+    }
+  }
+  #container {
+    padding: 16px;
+    margin: 0 50px;
+    text-align: left;
+    h1 {
+      text-align: center;
+    }
+    &.login{
+      text-align: center;
+      min-width: 0;
+      width: 300px;
+      margin: 0 auto;
+    }
+  }
+  #content {
+    min-width: 0;
+  }
+  #footer {
+    text-align: center;
+    .absolute(auto,0,0,0);
+    ul {
+      float: none;
+    }
+  }
+  #loginForm label {
+    text-align: left;
+  }
+  #footer ul li { color: @banner-color; }
+  #footer ul li a { color: @banner-links; }
 }

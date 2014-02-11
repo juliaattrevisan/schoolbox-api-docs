@@ -20,10 +20,11 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					173px;
+@logo-width: 					172px;
 @logo-height: 					35px;
 
 // Generic colors
+@dark-blue:                     #013A63; // Dark Schoolbox Blue
 @body-background: 				#EEEEEE; // Body, but not the content area
 @content-background: 			#FFFFFF; // Used for forms
 @dark: 							#FAFAFA; // Alternate tigerstriping color
@@ -36,35 +37,40 @@
 @link: 							#0066B0;
 @link-hover: 					#FF5A00;
 
-// Main banner
-@banner-background: 			#013A63;
+// Main banner & Search
+@banner-background: 			@link;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
+@search-color:                  @banner-color;
 @banner-height:     			72px;
 
 // Modules
 @module-heading: 				#000000;
 @module-background: 			#E5EFF7;
+@admin-nav:                     @link;
 
 // Refers to the left navigation
 @navigation-width:				200px;
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
 @navigation-color:  			#000000;
-@navigation-links:  			#0066B0;
-@navigation-hover-background: 	@navigation-links;
+@navigation-links:  			@navigation-color;
+@navigation-hover-background: 	@link;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
 
 // Main "Tab" Navigation
-@tab-background:				#0066B0;
+@tab-background:				transparent;
 @tab-color:						#FFFFFF;
-@tab-hover-background:			@tab-color;
-@tab-hover-color:				@tab-background;
+@tab-hover-background:		    @tab-color;
+@tab-hover-color:				@link;
 
 // Footer text
 @footer-color:					#797979;
 @footer-links:					@footer-color;
+
+// Optional features
+//@header-version: 				2;
 
 // =============================================================================
 // 3. Load core

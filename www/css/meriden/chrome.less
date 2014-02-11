@@ -38,15 +38,17 @@
 @link-hover: 					#002971;
 @secondary-text: 				@link;
 
-// Main banner
+// Main banner 7 Search
 @banner-background: 			#00215b;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 @banner-height:     			72px;
+@search-color:                  @white;
 
 // Modules
 @module-heading: 				#000000;
 @module-background: 			#a4d7f4;
+@admin-nav:                     @tab-background;
 
 // Refers to the left navigation
 @navigation-width:				200px;
@@ -68,6 +70,9 @@
 @footer-color:					#797979;
 @footer-links:					@footer-color;
 
+// Optional features
+@login-version: 				1;
+@header-version: 				1;
 // =============================================================================
 // 3. Load core
 // =============================================================================
@@ -78,6 +83,48 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // ============================================================================
+
+body.login{
+background: @banner-background;
+
+  #header {
+    height: @logo-height + 100px;
+    .logo {
+      left: 50%;
+      top: 50px;
+      margin-left: 0 - @logo-width / 2;
+    }
+  }
+  #container {
+    padding: 16px;
+    margin: 0 50px;
+    text-align: left;
+    h1 {
+      text-align: center;
+    }
+    &.login{
+      text-align: center;
+      min-width: 0;
+      width: 300px;
+      margin: 0 auto;
+    }
+  }
+  #content {
+    min-width: 0;
+  }
+  #footer {
+    text-align: center;
+    .absolute(auto,0,0,0);
+    ul {
+      float: none;
+    }
+  }
+  #loginForm label {
+    text-align: left;
+  }
+  #footer ul li { color: @banner-color; }
+  #footer ul li a { color: @banner-links; }
+}
 
 #header .logo{
   left: 19px;
