@@ -155,11 +155,11 @@ class External_Synergetic_Gateway {
 		$input_doc->normalizeDocument();
 		$input_element = $input_doc->createElement('InputXML');
 		if ($add_vendor_id) {
-			$input_element->appendChild($input_doc->createElement('VendorTokenGUID', $this->getVendorTokenGUID()));
-			$input_element->appendChild($input_doc->createElement('VendorPassword',  $this->getVendorPassword()));
+			$input_element->appendChild($input_doc->createElement('VendorTokenGUID', Scrub::text($this->getVendorTokenGUID())));
+			$input_element->appendChild($input_doc->createElement('VendorPassword',  Scrub::text($this->getVendorPassword())));
 		}
 		foreach ($params as $key => $value) {
-			$input_element->appendChild($input_doc->createElement($key, $value));
+			$input_element->appendChild($input_doc->createElement($key, Scrub::text($value)));
 		}
 		return array(
 			'aInputParamObj' => array(
