@@ -304,9 +304,7 @@ abstract class Eportfolio_Page_Abstract {
 	 * @return string
 	 */
 	protected function getUserName() {
-		$user = $this->getUser();
-
-		return Scrub::text($user->getFirstname() . ' ' . $user->getLastname());
+		return $this->getUser()->formatName();
 	}
 
 	/**

@@ -88,7 +88,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		/* Set meta data
 		 */
 		$this->getPage()->setVar(array(
-			'HEADING' => $this->getUserName(),
+			'HEADING' => Scrub::text($this->getUserName()),
 			'ID' => $this->getUserId(),
 			'USER_TOKEN' => $_SESSION['key'],
 			'PAGE_TITLE' => $this->getEportfolioHandler()->getSettingsPageTitle(),
