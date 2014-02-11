@@ -387,6 +387,7 @@ class Session
                     foreach ($children as $child) {
                         $portal = $userHandler->getBySynergyAndGroup($child['RelatedID'], $groupHandler->getStudentGroupTypeIds());
                         $subjects = array();
+                        $subjectIDList = array();
 
                         if ($portal['uid']) {
                             $subjectList = $synUser->getSubjectList($child['RelatedID'], $portal['uid']);
@@ -398,9 +399,12 @@ class Session
 
                                     if (is_array($cat) && is_numeric($cat['id'])) {
                                         if ($groupHandler->getPermission($cat['id']) >= READ_ACCESS) {
-                                            $subject['id'] = $cat['categoryID'];
-                                            $subject['name'] = $cat['name'];
-                                            $subjects[] = $subject;
+                                            if(!in_array($cat['id'], $subjectIDList)) {
+                                                $subject['id'] = $cat['id'];
+                                                $subject['name'] = $cat['name'];
+                                                $subjects[] = $subject;
+                                                $subjectIDList[] = $cat['id']; //dont dupe ids in this list
+                                            }
                                         }
                                     }
                                 }
