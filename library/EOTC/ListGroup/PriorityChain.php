@@ -1,0 +1,56 @@
+<?php
+/**
+ * PriorityChain
+ *
+ * Almost identical to Chain, but instead of putting an event into a
+ * particular Event List Group, it has a special check on the start
+ * datetime to force it into a special Event List Group called Urgent
+ *
+ * Otherwise it proceeds ordinarily
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace EOTC\ListGroup;
+
+
+class PriorityChain {
+
+	/**
+	 * Constructor
+	 *
+	 * @param \EOTC\Event $event
+	 */
+	public function __construct(\EOTC\Event $event) {
+
+		/* Set up chain of responsibility
+ 		 */
+		$urgent = new Type\Urgent($event);
+
+		/* Start motor
+		 */
+		$this->setResult($urgent->determine());
+	}
+
+	/* Getters/Setters
+ 	 */
+
+	/**
+	 * Set result
+	 *
+	 * @param string $result
+	 */
+	private function setResult($result) {
+		$this->result = $result;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getResult() {
+		return $this->result;
+	}
+} 

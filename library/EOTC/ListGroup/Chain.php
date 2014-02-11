@@ -28,7 +28,6 @@ class Chain {
 
 		/* Set up chain of responsibility
  		 */
-		$urgent = new Type\Urgent($event);
 		$pendingFinalReview = new Type\PendingFinalReview($event);
 		$pendingRamsReview = new Type\PendingRamsReview($event);
 		$pendingInitialReview = new Type\PendingInitialReview($event);
@@ -39,11 +38,10 @@ class Chain {
 		$pendingInitialReview->setNext($none);
 		$pendingRamsReview->setNext($pendingInitialReview);
 		$pendingFinalReview->setNext($pendingRamsReview);
-		$urgent->setNext($pendingFinalReview);
 
 		/* Start motor
 		 */
-		$this->setResult($urgent->determine());
+		$this->setResult($pendingFinalReview->determine());
 	}
 
 	/* Getters/Setters

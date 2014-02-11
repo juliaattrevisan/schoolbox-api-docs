@@ -63,7 +63,7 @@ class Collection extends \Schoolbox\Collection {
 				$this->finish($event->getSeriesId());
 
 				try {
-					$chain = new Chain($event);
+					$chain = new PriorityChain($event);
 					$location = $chain->getResult();
 
 					$this->getOffset($location['listGroupIndex'])->add($event);
@@ -74,7 +74,7 @@ class Collection extends \Schoolbox\Collection {
 		}
 		else {
 			try {
-				$chain = new Chain($event);
+				$chain = new PriorityChain($event);
 				$location = $chain->getResult();
 
 				$this->getOffset($location['listGroupIndex'])->add($event);
