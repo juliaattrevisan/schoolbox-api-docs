@@ -11,7 +11,6 @@
 
 $factory = new Survey_Factory();
 $surveyHandler = new Survey_Main();
-$sectionHandler = new Survey_Section();
 $groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
@@ -34,5 +33,5 @@ if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($su
 
 /* Export xml
  */
-$xml = new Survey_Export_Xml($survey, $factory, $sectionHandler, $this);
+$xml = new Survey_Export_Xml($survey, $factory, new Survey_Section(), new Survey_Question(), $this);
 $xml->render();
