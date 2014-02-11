@@ -663,7 +663,7 @@ function calendarDate(datetime) {
 function calendarDateOnly(datetime) {
     var S, p = datetime.toString().split(/[ :]/)
 
-    if(p[2] == 11 || p[2] == 12) { S = 'th'; }
+    if(p[2] == 11 || p[2] == 12 || p[2] == 13) { S = 'th'; }
     else { var i = p[2].charAt(p[2].length - 1)
         if(i == 1) { S = 'st' }
         else if(i == 2) { S = 'nd' }
