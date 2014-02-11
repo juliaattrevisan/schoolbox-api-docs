@@ -405,12 +405,17 @@ private $enabled;               //Bool
 		$DEPRECATED_EXTERNAL_USER = new \External_User();
 		$contactArray = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
 
-		if(is_array($contactArray)) {
-			foreach($contactArray as $c) {
-				$this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactID']));
-				$this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactSpouseID']));
-			}
-		}
+        if(is_array($contactArray)) {
+            foreach($contactArray as $c) {
+                if($c['StudentContactID']) {
+                    $this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactID']));
+                }
+
+                if($c['StudentContactSpouseID']) {
+                    $this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactSpouseID']));
+                }
+            }
+        }
 	}
 
 	/**
