@@ -66,7 +66,7 @@ class Collection extends \Schoolbox\Collection {
 					$chain = new PriorityChain($event);
 					$location = $chain->getResult();
 
-					$this->getOffset($location['listGroupIndex'])->add($event);
+					$this->getOffset($location->getListGroupIndex())->add($event);
 				}
 				catch (\Exception $e) {
 				}
@@ -77,7 +77,7 @@ class Collection extends \Schoolbox\Collection {
 				$chain = new PriorityChain($event);
 				$location = $chain->getResult();
 
-				$this->getOffset($location['listGroupIndex'])->add($event);
+				$this->getOffset($location->getListGroupIndex())->add($event);
 			}
 			catch (\Exception $e) {
 			}

@@ -24,10 +24,7 @@ class PendingInitialReview extends Base {
 		 * or if it doesn't require RAMS at all
 		 */
 		if (($this->getEvent()->getMetadata()->getStatus()->getId() == 1)) {
-			return array(
-				'nextStatus' => 2,
-				'listGroupIndex' => $this->getMapping()->getPendingInitialReviewIndex()
-			);
+			return new \EOTC\ListGroup\Response(2, $this->getMapping()->getPendingInitialReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

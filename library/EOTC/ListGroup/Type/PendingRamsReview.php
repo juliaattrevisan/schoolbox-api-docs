@@ -24,10 +24,7 @@ class PendingRamsReview extends Base {
 		 * or if it doesn't require RAMS at all
 		 */
 		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->getId() == 2)) {
-			return array(
-				'nextStatus' => 3,
-				'listGroupIndex' => $this->getMapping()->getPendingRamsReviewIndex()
-			);
+			return new \EOTC\ListGroup\Response(3, $this->getMapping()->getPendingRamsReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

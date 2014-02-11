@@ -24,17 +24,11 @@ class PendingFinalReview extends Base {
 		 * or if it doesn't require RAMS at all
 		 */
 		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->getId() == 3)) {
-			return array(
-				'nextStatus' => 4,
-				'listGroupIndex' => $this->getMapping()->getPendingFinalReviewIndex()
-			);
+			return new \EOTC\ListGroup\Response(4, $this->getMapping()->getPendingFinalReviewIndex());
 		}
 
 		if ($this->getEvent()->getMetadata()->getStatus()->getId() == 2) {
-			return array(
-				'nextStatus' => 4,
-				'listGroupIndex' => $this->getMapping()->getPendingFinalReviewIndex()
-			);
+			return new \EOTC\ListGroup\Response(4, $this->getMapping()->getPendingFinalReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

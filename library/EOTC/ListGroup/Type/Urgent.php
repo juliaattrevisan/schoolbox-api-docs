@@ -38,10 +38,7 @@ class Urgent extends Base {
 		 * regardless of what its current status is
 		 */
 		if ($this->isWithinThreshold($difference)) {
-			return array(
-				'nextStatus' => $location['nextStatus'],
-				'listGroupIndex' => $this->getMapping()->getUrgentIndex(),
-			);
+			return new \EOTC\ListGroup\Response($location->getNextStatus(), $this->getMapping()->getUrgentIndex());
 		}
 
 		/* Not urgent; proceed as normal
