@@ -12,20 +12,22 @@ $this->setFile(TEMPLATE_content, 'modules/eotc/review.html');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
 
+$this->setVar(array(
+	'event_list_group_block' => ''
+));
+
 $eventMapper = new \EOTC\EventMapper();
 $allListGroups = $eventMapper->findAllByListGroups();
 
-$listGroupMapping = array_keys(array(
-	'Urgent' => 0,
-	'Pending Final Review' => 1,
-	'Pending RAMS Review' => 2,
-	'Pending Initial Review' => 3
-));
+/* using foreach() won't increment the $position, which I use to get the name
+ * of the collection currently being iterated
+ */
+for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) {
+	$currentListGroup = $allListGroups->current();
 
-foreach ($allListGroups as $index => $currentListGroup) {
 	if ($currentListGroup->count()) {
 		$this->setVar(array(
-			'EVENT_LIST_GROUP_NAME' => $listGroupMapping[$index]
+			'EVENT_LIST_GROUP_NAME' => $allListGroups->getName()
 		));
 
 		foreach ($currentListGroup as $currentEvent) {

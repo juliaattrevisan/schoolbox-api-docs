@@ -247,7 +247,11 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->bindParam(":eventId", $identifier);
 		$statement->execute();
 
-		$allEvents = new \Schoolbox\Collection();
+		/* Postprocess this list of events based on status and
+		 * organise them into a collection of collections
+		 */
+		$listGroup = new ListGroup\Collection();
+		$listGroup->setup();
 
 		/* Hydrate or die
 		 */
@@ -285,52 +289,12 @@ class EventMapper extends Calendar\EventMapper {
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 			}
 
-			$allEvents->add($eventItem);
+			/* Assign it to an Event List Group
+			 */
+			$listGroup->assign($eventItem);
 		}
 
-		/* Postprocess this list based on status
-		 */
-		$statusMapper = new \EOTC\EventStatusMapper();
-		$allStatus = $statusMapper->findAll();
-
-		$types = new \Schoolbox\Collection();
-
-		/* List groups on Review screen
-		 */
-		$listGroupMapping = array(
-			'Urgent' => 0,
-			'Pending Final Review' => 1,
-			'Pending RAMS Review' => 2,
-			'Pending Initial Review' => 3
-		);
-
-		$listGroups = new \Schoolbox\Collection();
-
-		foreach($listGroupMapping as $current) {
-			$listGroups->add(new \Schoolbox\Collection());
-		}
-
-		/* Ignore recurring instances and assign events to a $type collectino
-		 * based on the event's status id
-		 */
-		$seriesIds = array();
-
-		foreach($allEvents as $currentEvent) {
-			if (is_numeric($currentEvent->getSeriesId())) {
-				if (!in_array($currentEvent->getSeriesId(), $seriesIds)) {
-					$seriesIds[] = $currentEvent->getSeriesId();
-
-					// $this->determineListGroup($event);
-					$listGroups->offsetGet(2)->add($currentEvent);
-				}
-			}
-			else {
-				// $this->determineListGroup($event);
-				$listGroups->offsetGet(1)->add($currentEvent);
-			}
-		}
-
-		return $listGroups;
+		return $listGroup;
 	}
 
 	/**

@@ -1,0 +1,35 @@
+<?php
+/**
+ * None
+ *
+ * When an event does not fall into any Event List Grouping
+ * such as when it's finally approved, rejected
+ *
+ * This also is used when an event enters RAMS Approved state
+ * but not needing RAMS (perhaps when an author changes the RAMS
+ * requirement while it's already in RAMS Approved state)
+ *
+ * Whatever the case, if you end up here, the event won't appear
+ * on the Review screen
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace EOTC\ListGroup\Type;
+
+
+class None {
+
+	/**
+	 * Determine where to go next
+	 *
+	 * @throws \Exception
+	 * @return $this|mixed
+	 */
+	public function determine() {
+		throw new \Exception('Cannot assign event to a list group.');
+	}
+} 
