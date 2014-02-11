@@ -29,23 +29,8 @@ class Synchronise_Synergetic_Tintern_Strategy_Staff extends Synchronise_Base_Str
      * @return int
      */
     public function getDefaultCampusFromUser($currentUser) {
-        switch($currentUser['StaffDepartment']) {
-            case 'JSO':
-                return 4;
-                break;
-
-            case 'JSSPEC':
-                return 4;
-                break;
-
-            case 'JSTEACH':
-                return 4;
-                break;
-
-            default:
-                return 1;
-              break;
-        }
+        $campusList = $this->getCampusListFromUser($currentUser);
+        return $campusList[0];
     }
 
     public function getCampusListFromUser($currentUser) {
@@ -60,6 +45,10 @@ class Synchronise_Synergetic_Tintern_Strategy_Staff extends Synchronise_Base_Str
 
             case 'JSTEACH':
                 return array(4,5);
+            break;
+
+            case 'ELC':
+                return array(6);
             break;
 
             default:
