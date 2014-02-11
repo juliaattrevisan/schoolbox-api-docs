@@ -123,13 +123,13 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
                 unset($targetNode['deleted_at']);
 
                 $this->update($targetNode);
-            } /* Move target so that destination is the parent of target
-			*/
-            else if ($position == 'last') {
-
+            }
+            /* Move target so that destination is the parent of target
+             */
+            else {
                 /* If you don't unset deleted_at, it gets rendered as 0000-00-00 00:00:00
-                     * in the db
-                     */
+                 * in the db
+                 */
                 $targetNode['parent_id'] = $destinationNode['question_category_id'];
                 unset($targetNode['deleted_at']);
 

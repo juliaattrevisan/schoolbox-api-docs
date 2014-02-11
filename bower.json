@@ -14,7 +14,6 @@
     "jquery-timepicker-jt": "1.2.13",
     "jquery-validation": "1.11.1",
     "jqueryui-touch-punch-improved": "0.3.1",
-    "jquery.cookie": "1.4.0",
     "jquery-placeholder": "2.0.7",
     "jquery.countdown": "2.0.2",
     "jquery-cycle": "3.0.3",
@@ -31,7 +30,8 @@
     "doT": "1.0.1",
     "qtip2": "2.2.0",
     "fullcalendar": "1.6.4",
-    "jquery.tablesorter": "2.14.5"
+    "jquery.tablesorter": "2.14.5",
+    "jstree": "3.0.0-beta3"
   },
   "ignore": [
     "**/.*",
@@ -42,6 +42,6 @@
     "tests"
   ],
   "resolutions": {
-    "jquery": ">=1.6"
+    "jquery": "2.0.3"
   }
 }

@@ -1,53 +1,41 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
 $j(function () {
-
-    var nodeArray = new Array();
-
-    if ($j.cookie("open-tree-nodes") == null) {
-        nodeArray = [ "node_0" ]
-    } else {
-        var originalArray = $j.cookie("open-tree-nodes").split(',');
-        for (i=0; i < originalArray.length; i++) {
-            nodeArray.push("node_" + originalArray[i])
-        }
-    }
-
-	$j("#side-menu").jstree({
-		"animation": 50,
-        "core" : { "initially_open" : nodeArray },
-		"plugins" : [ "themes", "html_data", "dnd","crrm"],
-        "themes" : {
-			"theme" : "schoolbox",
-			"dots" : true,
-			"icons" : false
-		}
-        
-	}).bind('move_node.jstree', function(e, data) {
-        var pos = data.rslt.p;
-        var tid = data.rslt.r[0].id.split('_').pop();
-        var oid = data.rslt.o[0].id.split('_').pop();
-          $j.ajax({ url: '/adminv2/side-menuForm.php',
-                    data: {pos:pos, tid:tid, oid:oid}});
-
-    });
-
-    console.log($j("#side-menu").jstree("get_theme"), "egg")
-
-    $j("#side-menu").bind('open_node.jstree close_node.jstree', function() {
-        setCookie();
-    });
-
-    function setCookie() {
-        $j.cookie("open-tree-nodes", null);
-        var openNodes = "";
-        $j('.jstree-open').each(function() {
-            openNodes += ($j(this).attr('id').substr(5)+',')
+    $j("#side-menu")
+        .on('ready.jstree', function(event, jstree) {
+            jstree.instance.open_node(jstree.instance.get_node('node_0'));
+        })
+        .on('click', 'a[href]', function() {
+            // Listen on click, instead of select_node, because select_node
+            // fires on initial page load.
+            window.location.href = this.href;
+        })
+        .jstree({
+            "animation": 50,
+            "core" : {
+                check_callback: true,
+                "themes" : {
+                    "variant" : "schoolbox",
+                    "dots" : true,
+                    "icons" : false
+                }
+            },
+            "plugins" : ["dnd", 'state'],
+            dnd: {
+                copy: false
+            }
+        })
+        .on('move_node.jstree', function(e, data) {
+            var pos = data.position;
+            var tid = data.parent.split('_').pop();
+            var oid = data.node.id.split('_').pop();
+            $j.ajax({
+                url: '/adminv2/side-menuForm.php',
+                data: {pos:pos, tid:tid, oid:oid}
+            });
         });
-        $j.cookie('open-tree-nodes', openNodes, { expires: 1 });
-    }
-
 });
 
 </script>

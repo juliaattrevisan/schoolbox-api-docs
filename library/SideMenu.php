@@ -108,6 +108,43 @@ class SideMenu extends DeprecatedModel {
         $this->resequenceMenu($itemCur['parent']);
     }
 
+    /**
+     * Moves a menu item into a given position.
+     *
+     * @todo move all of this into mappers
+     *
+     * @param int $id       The item to move
+     * @param int $parentId The parent element to move item into
+     * @param int $position The position to which menu item is moved.
+     *                      0 = top, 1 = below first item, etc.
+     *
+     * @return bool Was the item moved?
+     */
+    public function moveItemToPosition($id, $parentId, $position) {
+        $parentId = intval($parentId);
+        $position = intval($position);
+        $query = "
+            SELECT id FROM sideMenu
+            WHERE parent = %d
+            ORDER BY sequence, txt
+        ";
+        $list = $this->db->getAll(sprintf($query, $parentId));
+        if (empty($list)) {
+            return false;
+        }
+        if ($position === 0) {
+            $this->moveItemBefore($id, $list[0]['id']);
+        }
+        else {
+            $key = $position;
+            if (!array_key_exists($key, $list)) {
+                return false;
+            }
+            $this->moveItemAfter($id, $list[$key]['id']);
+        }
+        return true;
+    }
+
     function moveItemAfter($id, $pid) {
         /* Place item after $pid in sequence */
         $item = $this->getByID($pid);

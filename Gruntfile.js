@@ -94,8 +94,6 @@ module.exports = function(grunt) {
                     'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
                     // jQuery Validation
                     'www/javascript/components/jquery-validation/jquery.validate.js',
-                    // jQuery Cookie
-                    'www/javascript/components/jquery.cookie/jquery.cookie.js',
                     // jQueryUI
                     'www/javascript/components/jquery.ui/dist/jquery-ui.js',
                     // jQueryUI Touch Punch
