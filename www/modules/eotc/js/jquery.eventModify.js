@@ -282,6 +282,14 @@
 				return $('select[name="level"]').val() == 3;
 			}
 
+			/* For EOTC
+			 */
+			var validateRamsFile = function() {
+				if ($('input[name=ramsRequired]').length && $('input[name=ramsRequired]').is(':checked')) {
+					return true;
+				}
+			}
+
 			$(config.element).validate({
 				rules: {
 					'campus[]': {
@@ -291,6 +299,14 @@
 						minlength: {
 							param: 1,
 							depends: validateCampusSelected
+						}
+					},
+					'ramsFile': {
+						required: {
+							depends: validateRamsFile
+						},
+						minlength: {
+							param: 1
 						}
 					}
 				},
