@@ -1,0 +1,59 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+  .day {
+    margin-bottom: 24px;
+  }
+  .event a {
+    padding: 11px 16px;
+    color: #000;
+    line-height: 36px;
+  }
+  .event time {
+    color: #888;
+    font-size: 0.85em;
+    margin-left: 4px;
+  }
+  .event span {
+    margin-left: 8px;
+  }
+  .event a:hover {
+    text-decoration: none;
+  }
+  .event a:hover span {
+    text-decoration: underline;
+  }
+  ul.events {
+    margin: 0;
+  }
+  .event img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: -8px;
+  }
+
+</style>
+<!-- END custom_head -->
+
+<h1>Messages</h1>
+<!-- BEGIN days -->
+<ul class="days">
+  <!-- BEGIN day -->
+  <li class="day">
+    <h2>{DAY}</h2>
+    <!-- BEGIN events -->
+    <ul class="events">
+      <!-- BEGIN event -->
+      <li class="event {EVENT_DARK}">
+        <a href="{EVENT_HREF}">
+          <img src="{EVENT_ICON}" alt="" width="24" height="24" />
+          <span>{EVENT_BODY}</span>
+          <time>{EVENT_TIME}</time>
+        </a>
+      </li>
+      <!-- END event -->
+    </ul>
+    <!-- END events -->
+  </li>
+  <!-- END day -->
+</ul>
+<!-- END days -->
