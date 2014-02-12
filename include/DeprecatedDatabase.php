@@ -64,7 +64,7 @@ static public function reinitialise() {
 
 function reconnect()
 {
-	$closure = mysql_close($this->dbf);
+	$closure = mysqli_close($this->dbf);
 	unset($this->dbf);
 	$this->connect();
 	return $closure;
