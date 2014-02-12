@@ -70,6 +70,22 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 	}
 
 	/**
+	 * Delete all the permissions for a user
+	 *
+	 * @param \Schoolbox\User $user
+	 */
+	public function deleteForUser(\Schoolbox\User $user) {
+		$query = "
+			DELETE FROM `{$this->table}`
+			WHERE user_id = :userId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":userId", $user->getId());
+		$statement->execute();
+	}
+
+	/**
 	 * A unique list of user ids with permissions,
 	 * ordered by surname
 	 *
