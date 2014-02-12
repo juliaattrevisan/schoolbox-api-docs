@@ -19,43 +19,49 @@
 <h1>Manage EOTC Permissions</h1>
 
 <h2>Add User</h2>
-<table class="standardForm">
-	<thead>
-	<tr>
-		<td class="formLabelWidth">
-			<h4>User</h4>
-			The user to whom you are giving permissions.
-		</td>
-		<td>
-			<div id="staff-suggest"></div>
-		</td>
-	</tr>
+<form action="/modules/eotc/permission/modifyForm.php" method="post">
+	<table class="standardForm">
+		<thead>
 		<tr>
 			<td class="formLabelWidth">
-				<h4>Campus</h4>
-				The campuses to which permissions apply.
+				<h4>User</h4>
+				The user to whom you are giving permissions.
 			</td>
 			<td>
-				<!-- BEGIN campus -->
-				<input name='campus[]' type="checkbox" value="{CAMPUS_ID}" {CAMPUS_SELECTED} />{CAMPUS_NAME}<br />
-				<!-- END campus -->
+				<div id="staff-suggest"></div>
 			</td>
 		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Statuses</h4>
-				<em>The user will be able to perform actions on events which have the selected statuses.</em>
-			</td>
-			<td>
-				<!-- BEGIN status -->
-				<input name='status[]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />{STATUS_NAME}<br />
-				<!-- END status -->
-			</td>
-		</tr>
-	</tbody>
-</table>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Campus</h4>
+					The campuses to which permissions apply.
+				</td>
+				<td>
+					<!-- BEGIN campus -->
+					<input name='campus[]' type="checkbox" value="{CAMPUS_ID}" {CAMPUS_SELECTED} />{CAMPUS_NAME}<br />
+					<!-- END campus -->
+				</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Statuses</h4>
+					<em>The user will be able to perform actions on events which have the selected statuses.</em>
+				</td>
+				<td>
+					<!-- BEGIN status -->
+					<input name='status[]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />{STATUS_NAME}<br />
+					<!-- END status -->
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<input type="submit" class='submit-btn-plain' value="Assign Permissions" />
+</form>
+
+<div class="clearfix"></div>
 
 <h2>Current EOTC Admins</h2>
 <table class="standardForm">
