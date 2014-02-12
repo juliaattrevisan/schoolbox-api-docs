@@ -278,7 +278,7 @@ class External_Tass_User implements External_UserInterface {
                 '' AS StaffDepartment,
                 *
             FROM teacher AS t
-            WHERE t.cmpy_code='01'
+            WHERE t.curr_flg = 'Y'
         ";
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         foreach ($staffList as &$row) {
@@ -302,14 +302,16 @@ class External_Tass_User implements External_UserInterface {
                 '' AS StudentOccupEmail,
                 s.year_grp AS StudentYearLevel,
                 s.house AS StudentHouse,
-                s.campus_code AS StudentCampus
+                s.campus_code AS StudentCampus, *
                 -- s.dol AS StudentLeavingDate
             FROM student AS s
             WHERE s.campus_code IS NOT NULL
             AND s.dol IS NULL
             AND s.cmpy_code='01'
         ";
-        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+
+        $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        return $result;
     }
 
 	public function getStudentContactListExtended ($yearlevel, $name, $boardingStatus, $form) {

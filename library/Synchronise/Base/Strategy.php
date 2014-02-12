@@ -492,7 +492,12 @@ abstract class Synchronise_Base_Strategy {
 		$newUser = array();
 		if ($this->hasHydrator()) {
 			foreach ($this->getHydratorList() as $hydrator) {
-				$newUser = $hydrator->hydrate($external_user, $newUser);
+                try {
+				    $newUser = $hydrator->hydrate($external_user, $newUser);
+                }catch (Exception $e) {
+                    // Skip user as something is not good
+                    return false;
+                }
 			}
 			return $newUser;
 		}

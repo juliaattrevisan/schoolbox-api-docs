@@ -23,6 +23,10 @@ class Synchronise_Tass_Meriden_Hydrator_Campus implements Synchronise_Base_IHydr
             $newUser['campus']        = array($campus);
             $newUser['defaultCampus'] = $campus;
         }
+
+        if($externalUser['StudentYearLevel'] < 8 ||$externalUser['StudentYearLevel'] > 12)
+            throw new Exception('Not active user');
+
         return $newUser;
     }
 
