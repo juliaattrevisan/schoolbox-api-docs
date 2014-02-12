@@ -27,11 +27,22 @@ if (is_numeric($this->arg[0])) {
 	}
 
 	$allPermissions = $eventPermissionMapper->findByUser($user);
+
+	$this->setVar(array(
+		'EVENT_STAFF' => json_encode(array(
+			'id' => $user->getId(),
+			'name' => $user->getFullname()
+		)),
+	));
 }
 /* Create new permissions for someone
  */
 else {
 	$allPermissions = new \Schoolbox\Collection();
+
+	$this->setVar(array(
+		'EVENT_STAFF' => json_encode(array()),
+	));
 }
 
 /* Accumulate all the campus names and remove dupes
