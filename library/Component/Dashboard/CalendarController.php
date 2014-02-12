@@ -151,11 +151,14 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 			$this->setVar($eventOutput);
 
 			if ($currentEvent instanceof Calendar_Event_Type_Submission) {
+				$isAssessment = $currentEvent->getIsAssessment();
 				if ($this->getGroup()->isStudent($_SESSION['id'])) {
 					$this->setVar('MODIFY_ACTION', 'View Details');
 					$this->setVar(
 						'MODIFY_HREF',
-						'/submission/submissionHistory/'.$currentEvent->getSubmissionBoxId().'/'. $_SESSION['id']
+						$isAssessment ?
+							('/assess/intro/'.$currentEvent->getSubmissionBoxId()):
+							('/submission/submissionHistory/'.$currentEvent->getSubmissionBoxId() . '/' . $_SESSION['id'])
 					);
 					$this->parse('modify_button_block', 'modify_button');
 				}
@@ -163,7 +166,9 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 					$this->setVar('MODIFY_ACTION', 'View Submissions');
 					$this->setVar(
 						'MODIFY_HREF',
-						'/submission/viewSubmission/'.$currentEvent->getSubmissionBoxId()
+						$isAssessment ?
+							('/assess/results/'.$currentEvent->getSubmissionBoxId()):
+							('/submission/viewSubmission/'.$currentEvent->getSubmissionBoxId())
 					);
 					$this->parse('modify_button_block', 'modify_button');
 				}
