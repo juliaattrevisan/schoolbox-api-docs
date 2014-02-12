@@ -60,3 +60,6 @@ INSERT INTO `error` (`id`, `message`) VALUES ('161', 'Please upload a RAMS file.
 CREATE TABLE `eotc_activitylog`( `id` INT(11) AUTO_INCREMENT, `actioner_id` INT(11), `event_id` INT(11), `message` TEXT, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, KEY(`id`) );
 ALTER TABLE `eotc_activitylog` CHANGE `event_id` `metadata_id` INT(11) NULL;
 
+/* Permissions
+ */
+CREATE TABLE `eotc_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `user_id` INT(11), `campus_id` INT(11), `status_id` INT(11), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
