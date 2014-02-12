@@ -83,6 +83,12 @@ foreach($msgsByDay as $day => $timestamps) {
 	$this->parse('day_block', 'day', true);
 
 }
-$this->parse('days_block', 'days');
+
+if(count($messageArray)) {
+	$this->parse('days_block', 'days');
+}
+else {
+	$this->setVar('days_block', 'You have no messages.');
+}
 
 
