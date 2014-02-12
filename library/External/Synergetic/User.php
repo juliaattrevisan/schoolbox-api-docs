@@ -222,6 +222,9 @@ class External_Synergetic_User implements External_UserInterface {
 
 		$emailList = array();
 		$id_list   = implode(',', array_map('intval', $synergyIds));
+		if (empty($id_list)) {
+			return array();
+		}
 
 		$query = "
 			SELECT
