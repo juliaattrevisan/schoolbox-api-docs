@@ -72,6 +72,19 @@ class EventStatus {
 		return false;
 	}
 
+	/**
+	 * Determine whether this event is Final Approved
+	 *
+	 * @return bool
+	 */
+	public function isApproved() {
+		if ($this->getId() == 4) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/* Getters/Setters
 	 */
 

@@ -27,15 +27,20 @@ class Chain {
 	public function __construct(\EOTC\Event $event) {
 
 		/* Set up chain of responsibility
+		 * Checks occur in this order:
+		 *
+		 * Urgent, Pending Final, Pending RAMS, Pending Initial, Approved, Rejected, None
  		 */
 		$pendingFinalReview = new Type\PendingFinalReview($event);
 		$pendingRamsReview = new Type\PendingRamsReview($event);
 		$pendingInitialReview = new Type\PendingInitialReview($event);
+		$approved = new Type\Approved($event);
 		$none = new Type\None($event);
 
 		/* Try until one of them matches
 		 */
-		$pendingInitialReview->setNext($none);
+		$approved->setNext($none);
+		$pendingInitialReview->setNext($approved);
 		$pendingRamsReview->setNext($pendingInitialReview);
 		$pendingFinalReview->setNext($pendingRamsReview);
 

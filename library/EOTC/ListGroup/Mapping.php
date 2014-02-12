@@ -23,6 +23,7 @@ class Mapping {
 		'Pending Final Review',
 		'Pending RAMS Review',
 		'Pending Initial Review',
+		'Approved',
 	);
 
 	/**
@@ -75,6 +76,15 @@ class Mapping {
 	 */
 	public function getPendingInitialReviewIndex() {
 		return 3;
+	}
+
+	/**
+	 * Index of Pending Initial Review events
+	 *
+	 * @return int
+	 */
+	public function getApprovedIndex() {
+		return 4;
 	}
 
 	/* Getters/Setters
