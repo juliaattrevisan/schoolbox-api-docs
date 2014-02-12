@@ -120,6 +120,7 @@
                 for(id in messages) {
                     // insert into temp array
                     toInsert.push(messages[id]);
+                    // TODO if an acknowledgement bug surfaces, these two arrays being misaligned is possible the cause
                     toId.push(id);
                 }
 
@@ -171,13 +172,15 @@
 
                     // append a "see all" item
                     newlist.append(
-                        $('<li/>').append(
-                            $('<a/>').attr('href', '#').html('See all')
+                        $('<li/>').addClass("more").append(
+                            $('<a/>').attr('href', '/messages').html('See all')
                         )
                     );
                 }
                 else {
-                    newlist.append($('<li/>').html('No messages'));
+                    newlist.append($('<li/>').addClass('more').append(
+                        $('<a/>').html('No messages').attr('href', '/messages')
+                    ));
                 }
 
                 $('#messages').replaceWith(newlist);
