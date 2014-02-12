@@ -56,6 +56,27 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	}
 
 	/**
+	 * The list of statuses that can be assigned via permissions
+	 */
+	public function findPermissionStatuses() {
+		$allStatuses = $this->findAll();
+
+		/* Ignore Approved and Rejected statuses
+		 */
+		$exclusions = array(5, 6);
+
+		$collection = new \Schoolbox\Collection();
+
+		foreach($allStatuses as $currentStatus) {
+			if (!in_array($currentStatus->getId(), $exclusions)) {
+				$collection->add($currentStatus);
+			}
+		}
+
+		return $collection;
+	}
+
+	/**
 	 * Find the available statuses for a given event and its
 	 * configuration - there should on be the current status,
 	 * the next status, and Rejected

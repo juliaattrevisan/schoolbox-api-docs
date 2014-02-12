@@ -10,10 +10,13 @@
 
 $this->setFile(TEMPLATE_content, 'modules/eotc/permission/modify.html');
 $this->setBlock(TEMPLATE_content, 'permission', 'permission_block');
+$this->setBlock(TEMPLATE_content, 'campus', 'campus_block');
+$this->setBlock(TEMPLATE_content, 'status', 'status_block');
 
 /* Edit existing permissions for someone
  */
 $userMapper = new \Schoolbox\UserMapper();
+$eventPermissionMapper = new \EOTC\EventPermissionMapper();
 
 try {
 	$user = $userMapper->findById($this->arg[0]);
@@ -23,8 +26,65 @@ catch (\Exception $e) {
 }
 
 if (is_numeric($this->arg[0])) {
+	$allPermissions = $eventPermissionMapper->findByUser($user);
 
+	/* Accumulate all the campus names and remove dupes
+	 */
+	$campusIds = array();
 
+	foreach ($allPermissions as $currentPermission) {
+		$campusIds[] = $currentPermission->getCampusId()->getId();
+	}
+
+	$campusMapper = new \Schoolbox\CampusMapper();
+	$allCampuses = $campusMapper->findAll();
+
+	foreach ($allCampuses as $currentCampus) {
+		if (in_array($currentCampus->getId(), $campusIds)) {
+			$selected = 'checked="checked"';
+		}
+		else {
+			$selected = '';
+		}
+
+		$this->setVar(array(
+			'CAMPUS_ID' => $currentCampus->getId(),
+			'CAMPUS_NAME' => $currentCampus->getName(),
+			'CAMPUS_SELECTED' => $selected
+		));
+
+		$this->parse('campus_block', 'campus', true);
+	}
+
+	/* Accumulate all the status names and remove dupes
+	 */
+	$statusIds = array();
+
+	foreach ($allPermissions as $currentPermission) {
+		$statusIds[] = $currentPermission->getStatusId()->getId();
+	}
+
+	$statusMapper = new \EOTC\EventStatusMapper();
+	$allStatuses = $statusMapper->findPermissionStatuses();
+
+	/* Ignore Rejected and Approved
+	 */
+	foreach ($allStatuses as $currentStatus) {
+		if (in_array($currentStatus->getId(), $statusIds)) {
+			$selected = 'checked="checked"';
+		}
+		else {
+			$selected = '';
+		}
+
+		$this->setVar(array(
+			'STATUS_ID' => $currentStatus->getId(),
+			'STATUS_NAME' => $currentStatus->getName(),
+			'STATUS_SELECTED' => $selected
+		));
+
+		$this->parse('status_block', 'status', true);
+	}
 }
 /* Create new permissions for someone
  */
@@ -33,7 +93,6 @@ else {
 
 /* Render everything else
  */
-$eventPermissionMapper = new \EOTC\EventPermissionMapper();
 $allUserIds = $eventPermissionMapper->findUserIds();
 
 foreach ($allUserIds as $currentUserId) {

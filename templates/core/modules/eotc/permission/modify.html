@@ -9,6 +9,9 @@
 				The campuses to which permissions apply.
 			</td>
 			<td>
+				<!-- BEGIN campus -->
+				<input name='campus[]' type="checkbox" value="{CAMPUS_ID}" {CAMPUS_SELECTED} />{CAMPUS_NAME}<br />
+				<!-- END campus -->
 			</td>
 		</tr>
 	</thead>
@@ -19,6 +22,9 @@
 				<em>The user will be able to perform actions on events which have the selected statuses.</em>
 			</td>
 			<td>
+				<!-- BEGIN status -->
+				<input name='status[]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />{STATUS_NAME}<br />
+				<!-- END status -->
 			</td>
 		</tr>
 	</tbody>
