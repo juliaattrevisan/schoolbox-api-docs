@@ -11,7 +11,7 @@ class Synchronise_Tass_Meriden_Hydrator_Username_Staff implements Synchronise_Ba
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
-        $newUser['username'] = $externalUser['tch_code'];
+        $newUser['username'] = preg_replace('/@.*$/', '', $externalUser['Email']);
         return $newUser;
     }
 }
