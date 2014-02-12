@@ -35,7 +35,22 @@ class External_Tass_User implements External_UserInterface {
      * @return array Currently returns empty list, not yet implemented.
      */
     public function getParentEmails($synergyIds) {
-		return array();
+        $emailList = array();
+        $idList    = implode(',', array_map('intval', $synergyIds));
+        if (empty($idList)) {
+            return array();
+        }
+        $query = "
+            SELECT pa.e_mail
+            FROM paraddress pa
+            INNER JOIN parent p ON pa.par_code=p.par_code AND pa.cmpy_code=p.cmpy_code
+            INNER JOIN student s ON p.par_code=s.par_code AND p.cmpy_code=s.cmpy_code
+            WHERE s.stud_code IN ($idList)";
+        $this->getDatabase()->query($query);
+        while ($row = $this->getDatabase()->getNextArray()) {
+            $emailList[] = trim($row['e_mail']);
+        }
+        return $emailList;
     }
 
 	function getStudent($tassID)

@@ -42,6 +42,9 @@ class External_Schoolbox_User implements External_UserInterface {
 
 		$emailList = array();
 		$id_list   = implode(',', array_map('intval', $synergyIds));
+		if (empty($id_list)) {
+			return array();
+		}
 
 		$statement = $this->getDatabase()->prepare("
 			SELECT
