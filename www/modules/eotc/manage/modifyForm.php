@@ -205,6 +205,7 @@ switch($_POST['action']) {
 					$eventMapper->deleteMetadataRelations($currentEvent);
 					$eventMapper->deleteStaffAttendeesRelations($currentEvent);
 					$eventMapper->deleteStudentAttendeesRelations($currentEvent);
+					$eventMapper->deleteFilesRelations($currentEvent);
 					$eventMapper->delete($currentEvent);
 				}
 			}
@@ -216,6 +217,7 @@ switch($_POST['action']) {
 				$eventMapper->deleteMetadataRelations($event);
 				$eventMapper->deleteStaffAttendeesRelations($event);
 				$eventMapper->deleteStudentAttendeesRelations($event);
+				$eventMapper->deleteFilesRelations($event);
 				$eventMapper->delete($event);
 			}
 		}
@@ -227,6 +229,7 @@ switch($_POST['action']) {
 			$eventMapper->deleteMetadataRelations($event);
 			$eventMapper->deleteStaffAttendeesRelations($event);
 			$eventMapper->deleteStudentAttendeesRelations($event);
+			$eventMapper->deleteFilesRelations($event);
 			$metadataMapper->delete($event->getMetadata());
 		}
 
