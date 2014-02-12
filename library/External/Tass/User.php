@@ -48,7 +48,7 @@ class External_Tass_User implements External_UserInterface {
             WHERE s.stud_code IN ($idList)";
         $this->getDatabase()->query($query);
         while ($row = $this->getDatabase()->getNextArray()) {
-            $emailList[] = $row['e_mail'];
+            $emailList[] = trim($row['e_mail']);
         }
         return $emailList;
     }
