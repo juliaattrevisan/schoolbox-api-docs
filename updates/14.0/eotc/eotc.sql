@@ -18,6 +18,7 @@ INSERT INTO `eotc_status` (`name`) VALUES ('Draft');
 INSERT INTO `eotc_status` (`name`) VALUES ('In Principle'); 
 INSERT INTO `eotc_status` (`name`) VALUES ('RAMS Approved'); 
 INSERT INTO `eotc_status` (`name`) VALUES ('Final Approval'); 
+INSERT INTO `eotc_status` (`name`) VALUES ('Approved');
 INSERT INTO `eotc_status` (`name`) VALUES ('Rejected');
 
 /* Clone out the event table

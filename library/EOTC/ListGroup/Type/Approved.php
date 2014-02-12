@@ -18,7 +18,7 @@ class Approved extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 4;
+	protected $nextStatusId = 5;
 
 	/**
 	 * Determine where to go next
