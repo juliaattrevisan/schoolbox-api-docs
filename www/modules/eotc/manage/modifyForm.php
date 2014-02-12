@@ -213,7 +213,7 @@ switch($_POST['action']) {
 			else if ($_POST['efficacy'] == 'self') {
 				$eventMapper->deleteCampusRelations($event);
 				$eventMapper->deleteMetadataRelations($event);
-				$eventMapper->deleteStaffAttendeesRelations($currentEvent);
+				$eventMapper->deleteStaffAttendeesRelations($event);
 				$eventMapper->delete($event);
 			}
 		}
@@ -223,7 +223,7 @@ switch($_POST['action']) {
 			$eventMapper->delete($event);
 			$eventMapper->deleteCampusRelations($event);
 			$eventMapper->deleteMetadataRelations($event);
-			$eventMapper->deleteStaffAttendeesRelations($currentEvent);
+			$eventMapper->deleteStaffAttendeesRelations($event);
 			$metadataMapper->delete($event->getMetadata());
 		}
 
