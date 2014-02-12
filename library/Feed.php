@@ -55,13 +55,24 @@ class Feed {
         return $feedList;
     }
 
+    /**
+     * Generic filter function for get* methods.
+     *
+     * @param  mixed  $cid Either a number string, or an array of IDs
+     * @return string
+     */
+    protected function getFilterFromCategoryId($cid) {
+        if (is_array($cid) && !empty($cid)) {
+            return ' IN (' . implode(',', array_map('intval', $cid)) . ') ';
+        }
+        else {
+            return " = ".intval($cid);
+        }
+    }
+
     function getFiles($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
 						af.description as type, inline, c.name as cat_name, c.id as cat_id
@@ -109,11 +120,7 @@ class Feed {
 
     function getLinks($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
 				  FROM link l
@@ -169,11 +176,7 @@ class Feed {
      */
     public function getOnlineAssessments($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "
           SELECT
@@ -227,11 +230,7 @@ class Feed {
      */
     public function getSurveys($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "
           SELECT
@@ -279,11 +278,7 @@ class Feed {
 
     function getNews($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM subject_news sn
@@ -320,11 +315,7 @@ class Feed {
 
     function getFolders($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "SELECT c.id, name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM cmsLog
@@ -363,11 +354,7 @@ class Feed {
 
     function getForum($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM forumThread f
@@ -411,11 +398,7 @@ class Feed {
 
     function getWiki($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM wikiRevision r
@@ -462,11 +445,7 @@ class Feed {
      */
     public function getBlog($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created) AS submitted, c.name as cat_name, c.id as cat_id
 			FROM user u
@@ -514,11 +493,7 @@ class Feed {
      */
     public function getBlogComments($cid, $limit) {
 
-        if (is_array($cid)) {
-            $where = ' IN (' . implode(',', $cid) . ') ';
-        } else {
-            $where = " = $cid ";
-        }
+        $where = $this->getFilterFromCategoryId($cid);
 
         $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, UNIX_TIMESTAMP(bc.created) AS submitted, b.id AS blogID, heading, cid, c.name as cat_name, c.id as cat_id
 			FROM `user` u
