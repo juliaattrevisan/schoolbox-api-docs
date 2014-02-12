@@ -40,4 +40,4 @@ if (strlen($_POST['courseCode'])) {
 	}
 }
 
-$this->localRedir('/modules/eotc/attendance/list/' . $event->getId());
+$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());

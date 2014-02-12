@@ -59,4 +59,4 @@ if (isset($_POST['selected']) && strlen($_POST['selected'])) {
 	$eventMapper->addStudentAttendeesRelationsSpecific($event, $allIds);
 }
 
-$this->localRedir('/modules/eotc/attendance/list/' . $event->getId());
+$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());

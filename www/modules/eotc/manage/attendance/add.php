@@ -20,4 +20,4 @@ if (is_array($_POST['selected']) && count($_POST['selected'])) {
 	$eventMapper->addStudentAttendeesRelationsSpecific($event, $_POST['selected']);
 }
 
-$this->localRedir('/modules/eotc/attendance/list/' . $event->getId());
+$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());

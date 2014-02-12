@@ -70,7 +70,7 @@
 	</a>
 </h1>
 
-<form id="eventForm" method="post" action="/modules/eotc/modifyForm.php" enctype="multipart/form-data">
+<form id="eventForm" method="post" action="/modules/eotc/manage/modifyForm.php" enctype="multipart/form-data">
 	<input name="id" type="hidden" value="{EVENT_ID}" />
 	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
 	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />
@@ -249,6 +249,7 @@
 					<div id="staff-suggest"></div>
 				</td>
 			</tr>
+			<!-- BEGIN can_add_students -->
 			<tr>
 				<td class="formLabelWidth">
 					<h4>Students</h4>
@@ -256,9 +257,10 @@
 				</td>
 				<td>
 					{EVENT_CURRENT_STUDENTS}
-					<a href="/modules/eotc/attendance/list/{EVENT_ID}" class="btn modify"><span></span>Manage Attendances</a>
+					<a href="/modules/eotc/manage/attendance/list/{EVENT_ID}" class="btn modify"><span></span>Manage Attendances</a>
 				</td>
 			</tr>
+			<!-- END can_add_students -->
 		</tbody>
 	</table>
 

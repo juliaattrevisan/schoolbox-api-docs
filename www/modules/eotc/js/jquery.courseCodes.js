@@ -23,7 +23,7 @@
 			 */
 			var defaults = {
 				element: element,
-				url: '/modules/eotc/attendance/courseCodes',
+				url: '/modules/eotc/manage/attendance/courseCodes',
 				output: null
 			}
 

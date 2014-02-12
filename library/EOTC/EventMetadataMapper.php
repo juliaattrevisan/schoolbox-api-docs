@@ -42,6 +42,11 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			'type' => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
+			'column' => 'comment',
+			'property' => 'comment',
+			'type' => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
 			'column'   => 'created_at',
 			'property' => 'createdAt',
 			'type'     => self::TYPE_DATETIME,
