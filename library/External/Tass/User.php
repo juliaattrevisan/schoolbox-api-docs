@@ -279,6 +279,7 @@ class External_Tass_User implements External_UserInterface {
                 *
             FROM teacher AS t
             WHERE t.curr_flg = 'Y'
+            AND t.cmpy_code='01'
         ";
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         foreach ($staffList as &$row) {
