@@ -12,7 +12,7 @@ $this->setFile(TEMPLATE_content, 'modules/eotc/myReview.html');
 $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
 $this->setVar(array(
-	'event_list_group_block' => ''
+	'event_block' => ''
 ));
 
 $eventMapper = new \EOTC\EventMapper();
