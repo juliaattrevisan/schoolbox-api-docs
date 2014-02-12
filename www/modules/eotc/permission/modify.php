@@ -9,9 +9,15 @@
  */
 
 $this->setFile(TEMPLATE_content, 'modules/eotc/permission/modify.html');
-$this->setBlock(TEMPLATE_content, 'permission', 'permission_block');
 $this->setBlock(TEMPLATE_content, 'campus', 'campus_block');
 $this->setBlock(TEMPLATE_content, 'status', 'status_block');
+$this->setBlock(TEMPLATE_content, 'permission', 'permission_block');
+
+$this->setVar(array(
+	'campus_block' => '',
+	'status_block' => '',
+	'permission_block' => ''
+));
 
 /* Edit existing permissions for someone
  */
@@ -27,22 +33,11 @@ if (is_numeric($this->arg[0])) {
 	}
 
 	$allPermissions = $eventPermissionMapper->findByUser($user);
-
-	$this->setVar(array(
-		'EVENT_STAFF' => json_encode(array(
-			'id' => $user->getId(),
-			'name' => $user->getFullname()
-		)),
-	));
 }
 /* Create new permissions for someone
  */
 else {
 	$allPermissions = new \Schoolbox\Collection();
-
-	$this->setVar(array(
-		'EVENT_STAFF' => json_encode(array()),
-	));
 }
 
 /* Accumulate all the campus names and remove dupes
@@ -133,6 +128,7 @@ foreach ($allUserIds as $currentUserId) {
 	$allStatuses = implode(', ', array_keys($statusNames));
 
 	$this->setVar(array(
+		'PERMISSION_USER_ID' => $user->getId(),
 		'PERMISSION_USER_FIRSTNAME' => $user->getFirstname(),
 		'PERMISSION_USER_LASTNAME' => $user->getLastname(),
 		'PERMISSION_CAMPUS_NAMES' => $allCampuses,

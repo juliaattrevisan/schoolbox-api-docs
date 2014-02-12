@@ -9,7 +9,7 @@
 				allowFreeEntries: false,
 				name: 'staff'
 			},
-			value: {EVENT_STAFF},
+			value: [],
 			onePerLine: false,
 			multiple: false
 		});
@@ -95,10 +95,10 @@
 		<!-- BEGIN permission -->
 		<tr>
 			<td>
-				{PERMISSION_USER_FIRSTNAME}
+				<a href="/modules/eotc/permission/modify/{PERMISSION_USER_ID}">{PERMISSION_USER_FIRSTNAME}</a>
 			</td>
 			<td>
-				{PERMISSION_USER_LASTNAME}
+				<a href="/modules/eotc/permission/modify/{PERMISSION_USER_ID}">{PERMISSION_USER_LASTNAME}</a>
 			</td>
 			<td>
 				{PERMISSION_CAMPUS_NAMES}
@@ -107,7 +107,7 @@
 				{PERMISSION_STATUS_NAMES}
 			</td>
 			<td>
-				<a href="/modules/eotc/permission/delete/{PERMISSION_ID}">Remove</a>
+				<a href="/modules/eotc/permission/delete/{PERMISSION_USER_ID}">Remove</a>
 			</td>
 		</tr>
 		<!-- END permission -->
