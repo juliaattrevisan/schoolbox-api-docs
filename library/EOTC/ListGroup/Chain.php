@@ -35,11 +35,13 @@ class Chain {
 		$pendingRamsReview = new Type\PendingRamsReview($event);
 		$pendingInitialReview = new Type\PendingInitialReview($event);
 		$approved = new Type\Approved($event);
+		$rejected = new Type\Rejected($event);
 		$none = new Type\None($event);
 
 		/* Try until one of them matches
 		 */
-		$approved->setNext($none);
+		$rejected->setNext($none);
+		$approved->setNext($rejected);
 		$pendingInitialReview->setNext($approved);
 		$pendingRamsReview->setNext($pendingInitialReview);
 		$pendingFinalReview->setNext($pendingRamsReview);

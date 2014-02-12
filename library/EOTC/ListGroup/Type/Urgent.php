@@ -35,9 +35,13 @@ class Urgent extends Base {
 		$location = $chain->getResult();
 
 		/* 3 days before start of event: throw it into the Urgent category
-		 * regardless of what its current status is
+		 * regardless of what its current status is (unless it's already
+		 * Approved/Rejected, at which point no further action is necessary)
 		 */
-		if ($this->isWithinThreshold($difference) && !$this->getEvent()->getMetadata()->getStatus()->isApproved()) {
+		$isApproved = $this->getEvent()->getMetadata()->getStatus()->isApproved();
+		$isRejected = $this->getEvent()->getMetadata()->getStatus()->isRejected();
+
+		if ($this->isWithinThreshold($difference) && !$isApproved && !$isRejected) {
 			return new \EOTC\ListGroup\Response($location->getNextStatus(), $this->getMapping()->getUrgentIndex());
 		}
 
