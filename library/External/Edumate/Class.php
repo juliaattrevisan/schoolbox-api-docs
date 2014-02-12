@@ -31,10 +31,10 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         if (empty($codes)) {
             return false;
         }
-        array_walk($codes, function(&$n) {
-            $n = "'".$this->getDatabase()->quote($n)."'";
+        $db = $this->getDatabase();
+        array_walk($codes, function(&$n) use($db) {
+            $n = "'".$db->quote($n)."'";
         });
-
 
 
         // prepare
@@ -75,10 +75,10 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         if (empty($codes)) {
             return false;
         }
-
-        array_walk($codes, function(&$n) {
-                $n = "'".$this->getDatabase()->quote($n)."'";
-            });
+        $db = $this->getDatabase();
+        array_walk($codes, function(&$n) use($db) {
+            $n = "'".$db->quote($n)."'";
+        });
 
 
         // prepare
