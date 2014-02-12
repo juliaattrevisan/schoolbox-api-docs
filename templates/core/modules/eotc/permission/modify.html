@@ -1,0 +1,77 @@
+<h1>Manage EOTC Permissions</h1>
+
+<h2>Add User</h2>
+<table class="standardForm">
+	<thead>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Campus</h4>
+				The campuses to which permissions apply.
+			</td>
+			<td>
+			</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Statuses</h4>
+				<em>The user will be able to perform actions on events which have the selected statuses.</em>
+			</td>
+			<td>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<h2>Current EOTC Admins</h2>
+<table class="standardForm">
+	<colgroup>
+		<col width="200"/>
+		<col width="200"/>
+		<col width="200"/>
+		<col width="200"/>
+		<col width="100" />
+	</colgroup>
+	<thead>
+		<tr>
+			<th>
+				Firstname
+			</th>
+			<th>
+				Lastname
+			</th>
+			<th>
+				Campus
+			</th>
+			<th>
+				Status
+			</th>
+			<th>
+				Remove
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN permission -->
+		<tr>
+			<td>
+				{PERMISSION_USER_FIRSTNAME}
+			</td>
+			<td>
+				{PERMISSION_USER_LASTNAME}
+			</td>
+			<td>
+				{PERMISSION_CAMPUS_NAMES}
+			</td>
+			<td>
+				{PERMISSION_STATUS_NAMES}
+			</td>
+			<td>
+				<a href="/modules/eotc/permission/delete/{PERMISSION_ID}">Remove</a>
+			</td>
+		</tr>
+		<!-- END permission -->
+	</tbody>
+</table>
+

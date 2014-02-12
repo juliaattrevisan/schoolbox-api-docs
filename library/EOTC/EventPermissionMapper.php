@@ -29,11 +29,13 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 			'column' => 'user_id',
 			'property' => 'userId',
 			'type' => self::TYPE_INTEGER,
+			'join' => 'user',
 		));
 		$this->hasMap(array(
 			'column' => 'campus_id',
 			'property' => 'campusId',
-			'type' => self::TYPE_INTEGER,
+			'type' => self::TYPE_MODEL,
+			'join' => 'campus',
 		));
 		$this->hasMap(array(
 			'column' => 'status_id',
@@ -55,16 +57,6 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 			'property' => 'deletedAt',
 			'type'     => self::TYPE_DATETIME,
 		));
-		$this->hasJoin('user', array(
-			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'user_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('metadata', array(
-			'mapper'    => '\\EOTC\\EventMetadataMapper',
-			'this_key'  => 'metadata_id',
-			'other_key' => 'id',
-		));
 		$this->hasJoin('campus', array(
 			'mapper'    => '\\Schoolbox\\CampusMapper',
 			'this_key'  => 'campus_id',
@@ -75,5 +67,75 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 			'this_key'  => 'status_id',
 			'other_key' => 'id',
 		));
+	}
+
+	/**
+	 * A unique list of user ids with permissions,
+	 * ordered by surname
+	 *
+	 * @return array
+	 */
+	public function findUserIds() {
+		$query = "
+			SELECT `user_id`
+			FROM `{$this->table}` p
+			LEFT JOIN user ON p.user_id = user.id
+			GROUP BY user_id
+			ORDER BY lastname
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$userIds = array();
+
+		foreach ($statement as $row) {
+			$userIds[] = $row['user_id'];
+		}
+
+		return $userIds;
+	}
+
+	/**
+	 * Find all the permissions for a particular user
+	 *
+	 * @param \Schoolbox\User
+	 * @return \Schoolbox\Collection
+	 */
+	public function findByUser(\Schoolbox\User $user) {
+		$campus_mapper = $this->getJoinMapper('campus');
+		$status_mapper = $this->getJoinMapper('status');
+
+		$query = "
+			SELECT
+				{$this->getColumnString('p')},
+				{$campus_mapper->getColumnString('c')},
+				{$status_mapper->getColumnString('s')}
+			FROM `{$this->table}` p
+			LEFT JOIN {$this->getJoinSql('campus', 'p', 'c')}
+			LEFT JOIN {$this->getJoinSql('status', 'p', 's')}
+			WHERE p.user_id = :userId
+			ORDER BY p.campus_id, p.status_id
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":userId", $user->getId());
+		$statement->execute();
+
+		$allPermissions = new \Schoolbox\Collection();
+
+		foreach($statement as $row) {
+			$permissionItem = $this->hydrate($row, 'p');
+
+			$campusItem = $campus_mapper->hydrate($row, 'c');
+			$permissionItem->setCampusId($campusItem);
+
+			$statusItem = $status_mapper->hydrate($row, 's');
+			$permissionItem->setStatusId($statusItem);
+
+			$allPermissions->add($permissionItem);
+		}
+
+		return $allPermissions;
 	}
 }
