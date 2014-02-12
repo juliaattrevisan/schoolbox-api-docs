@@ -403,19 +403,38 @@ private $enabled;               //Bool
 
 		// TODO remove handler dependency
 		$DEPRECATED_EXTERNAL_USER = new \External_User();
-		$contactArray = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
+		$emailArray = $DEPRECATED_EXTERNAL_USER->getParentEmails(array($this->externalId));
 
-        if(is_array($contactArray)) {
-            foreach($contactArray as $c) {
-                if($c['StudentContactID']) {
-                    $this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactID']));
-                }
+		$parentRoles = RoleMapper::getInstance()->findByColumn('group_type', Role::PARENT)->getColumnValues('id');
 
-                if($c['StudentContactSpouseID']) {
-                    $this->parent_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $c['StudentContactSpouseID']));
-                }
-            }
-        }
+		if(is_array($emailArray)) {
+			foreach($emailArray as $synergyId => $emailAddress) {
+				$parentCollection = new Collection();
+
+				// if a synergy ID is available, and a valid user can be obtained from it, use that
+				if($synergyId) {
+					$parentCollection = UserMapper::getInstance()->findByColumnList(array(
+						'synergy_id' => $synergyId,
+						'group_id'   => $parentRoles
+					));
+				}
+
+				// parent successfully retrieved
+				if($parentCollection->count()) {
+					$parent = $parentCollection->first();
+				}
+				// generate a dummy user object (which will still have a correct email address)
+				else {
+					$parent = new User();
+					$parent->setId(-1);
+				}
+
+				// override any email retrieved from schoolbox with the one from synergy
+				$parent->setAltEmail($emailAddress);
+				$this->parent_collection->add($parent);
+			}
+		}
+
 	}
 
 	/**
