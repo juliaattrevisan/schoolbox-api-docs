@@ -215,7 +215,6 @@ class EventMapper extends Calendar\EventMapper {
 	 * Custom findAllByListGroups
 	 *
 	 * @return object|Model
-	 * @throws \Exception
 	 */
 	public function findAllByListGroups() {
 		$authorMapper = $this->getJoinMapper('author');
@@ -244,7 +243,6 @@ class EventMapper extends Calendar\EventMapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $identifier);
 		$statement->execute();
 
 		/* Postprocess this list of events based on status and
@@ -295,6 +293,103 @@ class EventMapper extends Calendar\EventMapper {
 		}
 
 		return $listGroup;
+	}
+
+	/**
+	 * Custom findAllByListGroups for a particular user
+	 *
+	 * This is used on the My EOTC screen
+	 *
+	 * @param \Schoolbox\User $user
+	 * @return ListGroup\Collection
+	 */
+	public function findAllByListGroupsForUser(\Schoolbox\User $user) {
+		$authorMapper = $this->getJoinMapper('author');
+		$eventTypeMapper = $this->getJoinMapper('eventType');
+		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+
+		/* Looked for a way to convince GROUP BY to group records with
+		 * integer series_id's, but leave NULL ones individual
+		 *
+		 * Thought about using GROUP BY IFNULL(e.series_id, e.id) but it
+		 * didn't really work very well
+		 *
+		 * I'll just postprocess them
+		 */
+		$query = "
+			SELECT
+				{$this->getColumnString('e')},
+				{$authorMapper->getColumnString('a')},
+				{$teacherInChargeMapper->getColumnString('c')},
+				{$eventTypeMapper->getColumnString('t')}
+			FROM `{$this->table}` e
+			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
+			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+			WHERE e.author_id = :userId
+			ORDER BY e.startDate, e.startTime
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":userId", $user->getId());
+		$statement->execute();
+
+		$allEvents = new \Schoolbox\Collection();
+		$processedSeriesIds = array();
+
+		/* Hydrate or die
+		 */
+		foreach($statement as $row) {
+			$eventItem = $this->hydrate($row, 'e');
+
+			/* Teacher In Charge
+			 */
+			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
+			$eventItem->setTeacherInCharge($teacherInChargeItem);
+
+			/* Event Type
+			 */
+			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+			$eventItem->setEventType($eventTypeItem);
+
+			/* Convert dates ;(
+			 */
+			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+			$eventItem->setStartDateTime($startDateTime);
+
+			/* Accumulate the metadata for this event
+			 * Only use the first record
+			 */
+			$eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
+
+			/* Accumulate student attendees for this event
+			 */
+			$eventItem->setStudentAttendees($this->findStudentAttendees($eventItem->getId()));
+
+			/* Determine current status
+			 */
+			if ($eventItem->getMetadata()) {
+				$metadataMapper = new EventMetadataMapper();
+				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+			}
+
+			/* Only add the first in a series; ignore the others
+			 */
+			if (is_numeric($eventItem->getSeriesId())) {
+				if (!in_array($eventItem->getSeriesId(), $processedSeriesIds)) {
+					$processedSeriesIds[] = $eventItem->getSeriesId();
+
+					$allEvents->add($eventItem);
+				}
+			}
+			/* Otherwise just add the one-off event
+			 */
+			else {
+				$allEvents->add($eventItem);
+			}
+		}
+
+		return $allEvents;
 	}
 
 	/**
