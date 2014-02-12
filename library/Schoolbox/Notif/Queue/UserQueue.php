@@ -101,7 +101,11 @@ class UserQueue {
 			$this->retrieveMessages();
 		}
 
-		return array_slice($this->messages, 0, $limit, $preserveKeys);
+		if($limit) {
+			return array_slice($this->messages, 0, $limit, $preserveKeys);
+		}
+		return $this->messages;
+
 	}
 
 
