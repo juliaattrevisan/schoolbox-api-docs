@@ -204,6 +204,8 @@ switch($_POST['action']) {
 					$eventMapper->deleteCampusRelations($currentEvent);
 					$eventMapper->deleteMetadataRelations($currentEvent);
 					$eventMapper->deleteStaffAttendeesRelations($currentEvent);
+					$eventMapper->deleteStudentAttendeesRelations($currentEvent);
+					$eventMapper->deleteFilesRelations($currentEvent);
 					$eventMapper->delete($currentEvent);
 				}
 			}
@@ -213,7 +215,9 @@ switch($_POST['action']) {
 			else if ($_POST['efficacy'] == 'self') {
 				$eventMapper->deleteCampusRelations($event);
 				$eventMapper->deleteMetadataRelations($event);
-				$eventMapper->deleteStaffAttendeesRelations($currentEvent);
+				$eventMapper->deleteStaffAttendeesRelations($event);
+				$eventMapper->deleteStudentAttendeesRelations($event);
+				$eventMapper->deleteFilesRelations($event);
 				$eventMapper->delete($event);
 			}
 		}
@@ -223,7 +227,9 @@ switch($_POST['action']) {
 			$eventMapper->delete($event);
 			$eventMapper->deleteCampusRelations($event);
 			$eventMapper->deleteMetadataRelations($event);
-			$eventMapper->deleteStaffAttendeesRelations($currentEvent);
+			$eventMapper->deleteStaffAttendeesRelations($event);
+			$eventMapper->deleteStudentAttendeesRelations($event);
+			$eventMapper->deleteFilesRelations($event);
 			$metadataMapper->delete($event->getMetadata());
 		}
 
