@@ -33,6 +33,45 @@ class EventStatus {
 	public function __construct() {
 	}
 
+	/**
+	 * Determine whether this event is in Draft
+	 *
+	 * @return bool
+	 */
+	public function isDraft() {
+		if ($this->getId() == 1) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine whether this event is In Principle
+	 *
+	 * @return bool
+	 */
+	public function isInPrinciple() {
+		if ($this->getId() == 2) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine whether this event is RAMS Approved
+	 *
+	 * @return bool
+	 */
+	public function isRamsApproved() {
+		if ($this->getId() == 3) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/* Getters/Setters
 	 */
 

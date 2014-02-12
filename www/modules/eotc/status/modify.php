@@ -184,9 +184,10 @@ if ($i) {
 }
 
 /* Status Dropdown
+ * Limited to the current status and the next one
  */
 $eventStatusMapper = new \EOTC\EventStatusMapper();
-$allEventStatus = $eventStatusMapper->findAll();
+$allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
 
 foreach($allEventStatus as $currentStatus) {
 	$this->setVar(array(
