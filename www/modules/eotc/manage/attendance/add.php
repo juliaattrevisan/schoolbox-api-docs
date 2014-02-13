@@ -8,7 +8,9 @@
  * @version     SVN: $Id$
  */
 
-if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
+$authenticator = new \EOTC\Authenticator();
+
+if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$eventMapper = new \EOTC\EventMapper();
 
 	try {

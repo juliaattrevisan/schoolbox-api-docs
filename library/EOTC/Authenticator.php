@@ -38,6 +38,20 @@ class Authenticator {
 	}
 
 	/**
+	 * Determine whether the specified user can spawn an ETOC event
+	 *
+	 * @param \Schoolbox\User $user
+	 * @return bool
+	 */
+	public function isEOTCCreator(\Schoolbox\User $user) {
+		if ($user->getRole()->isStaff() || $user->isSuperuser()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine whether the specified user is an EOTC Administrator
 	 * (a staff user with at least one valid EOTC Permission assigned)
 	 *

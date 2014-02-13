@@ -13,7 +13,9 @@
 require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 $page = new SitePage();
 
-if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
+$authenticator = new \EOTC\Authenticator();
+
+if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$page->setFile(TEMPLATE_content, 'modules/eotc/manage/modify.html');
 	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');

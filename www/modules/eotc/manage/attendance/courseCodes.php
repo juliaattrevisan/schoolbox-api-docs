@@ -8,9 +8,13 @@
  * @version     SVN: $Id$
  */
 
-$externalHandler = new \External_Synergetic_Class();
-$allCodes = $externalHandler->findSubjectsWithFiletype($_POST['id']);
+$authenticator = new \EOTC\Authenticator();
 
-echo json_encode($allCodes);
+if ($authenticator->isEOTCCreator($_SESSION['user'])) {
+	$externalHandler = new \External_Synergetic_Class();
+	$allCodes = $externalHandler->findSubjectsWithFiletype($_POST['id']);
+
+	echo json_encode($allCodes);
+}
 
 exit();

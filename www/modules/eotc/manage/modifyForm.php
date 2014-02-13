@@ -12,7 +12,9 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
-if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
+$authenticator = new \EOTC\Authenticator();
+
+if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$userMapper = new \Schoolbox\UserMapper();
 
 	/** @var Schoolbox\User $user */

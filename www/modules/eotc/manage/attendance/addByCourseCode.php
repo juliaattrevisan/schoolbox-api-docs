@@ -7,8 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+$authenticator = new \EOTC\Authenticator();
 
-if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
+if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$eventMapper = new \EOTC\EventMapper();
 
 	try {
