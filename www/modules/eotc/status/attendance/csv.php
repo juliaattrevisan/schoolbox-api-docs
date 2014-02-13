@@ -9,6 +9,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+/* Only EOTC Administrators can view this page
+ */
+$eventPermissionMapper = new \EOTC\EventPermissionMapper();
+$allPermissions = $eventPermissionMapper->findByUser($_SESSION['user']);
+
+/* If you aren't an EOTC administrator, go away
+ */
+if (!$allPermissions->count()) {
+	error(19);
+}
 
 $eventMapper = new \EOTC\EventMapper();
 $csv = '';
