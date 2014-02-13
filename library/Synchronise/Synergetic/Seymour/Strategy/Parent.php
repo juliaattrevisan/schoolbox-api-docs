@@ -13,6 +13,8 @@
 class Synchronise_Synergetic_Seymour_Strategy_Parent extends Synchronise_Synergetic_Seymour_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
+
+
 	/**
 	 * Setup
 	 */
@@ -29,138 +31,109 @@ class Synchronise_Synergetic_Seymour_Strategy_Parent extends Synchronise_Synerge
         $this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
 	}
 
-	/**
-	 * If the users exist in Synergy but not in Schoolbox, create an account for
-	 * them
-	 *
-	 * @return void
-	 */
-	public function createIfExists() {
-		$this->getVerboseFilter()->intro();
 
-		foreach($this->getList() as $currentUser) {
+    /**
+     * Set up the new user's details
+     *
+     * @param  $currentUser
+     * @return array
+     */
+    public function setupUserDetails($currentUser) {
+        $newUser = array();
 
-			/* Generate details about the new user
-			 */
-			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
-		}
+        // User details
+        $newUser['username']   = $currentUser['StudentContactID'];
+        $newUser['synergy_id'] = $currentUser['StudentContactID'];
+        $newUser['title']      = $currentUser['StudentContactTitle'];
+        $newUser['firstname']  = $currentUser['StudentContactPreferred'];
+        $newUser['lastname']   = $currentUser['StudentContactSurname'];
+        $newUser['alt_email']  = $currentUser['StudentContactDefaultEmail'];
 
-		$this->getVerboseFilter()->summary();
-	}
+        // get campuses of attached children
+        $newUser['campus']        = $this->getParentCampus($currentUser['StudentContactID']);
+        $newUser['defaultCampus'] = $newUser['campus'][0];
+        $newUser['group_id']      = self::PARENT_GROUP_ID;
+        $newUser['su']            = false;
 
-	/**
-	 * Set up the new user's details
-	 *
-	 * @param  $currentUser
-	 * @return array
-	 */
-	public function setupUserDetails($currentUser) {
-		return $currentUser;
-	}
+        return $newUser;
+    }
 
-	/**
-	 * Identical algorithm used to create/update a user
-	 *
-	 * @param $currentUser
-	 */
-	public function executeCreateUpdate($currentUser) {
-//        print_r($currentUser);
-		$currentSynergyId = $currentUser['StudentContactID'];
-		$currentParent = $this->getExternalUserHandler()->getParentSync($currentSynergyId);
+    /**
+     * Set up the new user's spouse's details
+     *
+     * @param $currentUser
+     * @return array
+     */
+    public function setupSpouseDetails($currentUser) {
+        $newUser = array();
 
-//        print_r($currentParent);
+        if($currentUser['StudentContactSpouseID']) {
+            // User details
+            $newUser['username']   = $currentUser['StudentContactSpouseID'];
+            $newUser['synergy_id'] = $currentUser['StudentContactSpouseID'];
+            $newUser['title']      = $currentUser['StudentContactSpouseTitle'];
+            $newUser['firstname']  = $currentUser['StudentContactSpousePreferred'];
+            $newUser['lastname']   = $currentUser['StudentContactSpouseSurname'];
+            $newUser['alt_email']  = $currentUser['StudentContactSpouseDefaultEmail'];
 
-		// If the parent could be found, try updating him in Synergetic
-		if ($currentParent['ID']) {
-
-			// The drop down in synergetic's Phone and Occupation tabs indicates which email the person prefers to use.
-			if ($currentParent['DefaultEmailCode'] == 'O') {
-				$preferredEmail = $currentParent['OccupEmail'];
-			}
-			else {
-				$preferredEmail = $currentParent['Email'];
-			}
-
-			// Update Portal with Synergetic data if there is something different contained in Synergetic db
-			$user = $this->getUserHandler()->getBySynergyAndGroup($currentSynergyId, 4);
-
-            if($user) {
-                // data mismatch, update
-                // use the original data rather than the reloaded for the password
-                $newUser['id'] = $user['uid'];
-                $newUser['username'] = $user['username'];
-
-            }
-            // does not exist in schoolbox: create
-            else {
-                $newUser['username'] = trim($currentParent['ID']);
-            }
-
-            /* Set all user data */
-            $newUser['title'] = trim($currentParent['Title']);
-            $newUser['firstname'] = trim($currentParent['Preferred']);
-            $newUser['lastname'] = trim($currentParent['Surname']);
-
-            $newUser['campus'] = array();
-            $students = $this->getExternalUserHandler()->getEnrolledStudents($currentSynergyId);
-            if(is_array($students)) {
-                foreach($students as $child) {
-                    $childUser = $this->getUserHandler()->getBySynergy($child['RelatedID']);
-                    $campuses = $this->getUserHandler()->getUserCampus($childUser['uid']);
-                    $newUser['campus'] = array_merge($newUser['campus'], $campuses);
-                }
-                $newUser['campus'] = array_unique($newUser['campus']);
-            }
+            // get campuses of kids
+            $newUser['campus']        = $this->getParentCampus($currentUser['StudentContactSpouseID']);
             $newUser['defaultCampus'] = $newUser['campus'][0];
-
-            $newUser['alt_email'] = trim($preferredEmail);
-            $newUser['synergy_id'] = $currentSynergyId;
-
-            // Prepare verbosity
-            $this->getVerboseFilter()->setNewUser($newUser);
-
-            // Does this person have a username? If not, skip them
-            if ($this->hasUsername($newUser)) {
-                $existing = $this->userExists($newUser);
-
-                // If the current user exists in Schoolbox, update them
-                if ($existing) {
-
-                    // Perform action; report what happened
-                    if ($this->getPerformUpdate() === true) {
-                        $newUser['id'] = $existing['uid'];
-
-                        $this->getUserHandler()->update($newUser);
-                        $this->getVerboseFilter()->performUpdate($user, $currentSynergyId, $newUser, $currentParent);
-                        $this->getVerboseFilter()->incrementUpdated();
-                    }
-                    // Report intentions
-                    else {
-                        $this->getVerboseFilter()->planUpdate($user, $currentSynergyId, $newUser, $currentParent);
-                        $this->getVerboseFilter()->incrementUpdated();
-                    }
-                }
-                // Otherwise create them
-                else {
-                    // Perform action; report what happened
-                    if ($this->getPerformUpdate() === true) {
-                        $this->getUserHandler()->create($newUser);
-                        $this->getVerboseFilter()->performCreation($user, $currentSynergyId, $newUser, $currentParent);
-                        $this->getVerboseFilter()->incrementCreated();
-                    }
-                    // Report intentions
-                    else {
-                        $this->getVerboseFilter()->planCreation($user, $currentSynergyId, $newUser, $currentParent);
-                        $this->getVerboseFilter()->incrementCreated();
-                    }
-                }
-            }
-            // Report intentions
-            else {
-                $this->getVerboseFilter()->skip();
-                $this->getVerboseFilter()->incrementSkipped();
-            }
-
+            $newUser['group_id']      = self::PARENT_GROUP_ID;
+            $newUser['su']            = false;
+            return $newUser;
         }
-	}
+        else {
+         return false;
+        }
+
+    }
+
+    /**
+     * Fetches an array of campus based on parents students in the school
+     *
+     * @param $parentID
+     * @return array
+     */
+    function getParentCampus($parentID) {
+        $campus = array();
+        $students = $this->getExternalUserHandler()->getEnrolledStudents($parentID);
+        if(is_array($students)) {
+            foreach($students as $child) {
+                $childUser = $this->getUserHandler()->getBySynergy($child['RelatedID']);
+                $campuses = $this->getUserHandler()->getUserCampus($childUser['uid']);
+                $campus = array_merge($campus, $campuses);
+            }
+            $campus = array_unique($campus);
+        }
+        return $campus;
+    }
+
+    /**
+     * If the users exist in Synergy but not in Schoolbox, create an account for
+     * them
+     *
+     * @return void
+     */
+    public function createIfExists() {
+        $previousUser = null;
+
+        $this->getVerboseFilter()->intro();
+
+        foreach($this->getList() as $currentUser) {
+            $newUser = $this->setupUserDetails($currentUser);
+            $newSpouse = $this->setupSpouseDetails($currentUser);
+
+            /* Update previous user
+                 */
+            if ($this->userExistsBySynergyAndGroup($newUser)) {
+                $this->executeCreateUpdate($newUser);
+            }
+            if (is_array($newSpouse) && $this->userExistsBySynergyAndGroup($newSpouse)) {
+                $this->executeCreateUpdate($newSpouse);
+            }
+    }
+
+        $this->getVerboseFilter()->summary();
+    }
 }
