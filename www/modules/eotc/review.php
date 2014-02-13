@@ -44,11 +44,11 @@ for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) 
 		$i = 0;
 
 		foreach ($currentListGroup as $currentEvent) {
-			$authenticator = new \EOTC\Authenticator($_SESSION['user'], $currentEvent);
+			$authenticator = new \EOTC\Authenticator();
 
 			/* Only list events you can manipulate
 			 */
-			if ($authenticator->canPromote()) {
+			if ($authenticator->canPromote($_SESSION['user'], $currentEvent)) {
 				$this->setVar(array(
 					'EVENT_ID' => $currentEvent->getId(),
 					'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),

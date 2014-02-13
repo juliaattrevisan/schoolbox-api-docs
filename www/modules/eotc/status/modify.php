@@ -208,9 +208,9 @@ $this->setVar(array(
 	'EVENT_COMMENT' => $event->getMetadata()->getComment(),
 ));
 
-$authenticator = new \EOTC\Authenticator($_SESSION['user'], $event);
+$authenticator = new \EOTC\Authenticator();
 
-if ($authenticator->canPromote()) {
+if ($authenticator->canPromote($_SESSION['user'], $event)) {
 	$eventStatusMapper = new \EOTC\EventStatusMapper();
 	$allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
 

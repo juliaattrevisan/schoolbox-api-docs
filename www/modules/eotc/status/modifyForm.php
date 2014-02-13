@@ -35,9 +35,9 @@ catch (\Exception $e) {
 	error(160);
 }
 
-$authenticator = new \EOTC\Authenticator($_SESSION['user'], $event);
+$authenticator = new \EOTC\Authenticator();
 
-if ($authenticator->canPromote()) {
+if ($authenticator->canPromote($_SESSION['user'], $event)) {
 
 	/* Remember original states so we know which obs to spawn
 	 */
