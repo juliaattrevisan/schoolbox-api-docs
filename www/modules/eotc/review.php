@@ -19,6 +19,7 @@ $this->setVar(array(
 $eventMapper = new \EOTC\EventMapper();
 $allListGroups = $eventMapper->findAllByListGroups();
 
+
 /* using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
  */
@@ -31,6 +32,23 @@ for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) 
 		));
 
 		foreach ($currentListGroup as $currentEvent) {
+
+			/************* test
+			 */
+			$userMapper = new \Schoolbox\UserMapper();
+			$user = $userMapper->findById(3);
+
+			$authenticator = new \EOTC\Authenticator($user, $currentEvent);
+
+			if ($authenticator->canPromote()) {
+				echo $user->getFullname() . ' has permission';
+			}
+			else {
+				echo $user->getFullname() . ' no permission';
+			}
+			/************* test
+			 */
+
 			$this->setVar(array(
 				'EVENT_ID' => $currentEvent->getId(),
 				'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),
