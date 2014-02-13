@@ -207,7 +207,15 @@ $this->setVar(array(
 
 if ($authenticator->canPromote($_SESSION['user'], $event)) {
 	$eventStatusMapper = new \EOTC\EventStatusMapper();
-	$allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
+
+	/* Soops have access to all statuses
+	 */
+	if ($_SESSION['user']->isSuperuser()) {
+		$allEventStatus = $eventStatusMapper->findAll();
+	}
+	else {
+		$allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
+	}
 
 	/* Status Dropdown
 	 *
