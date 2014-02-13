@@ -8,6 +8,17 @@
  * @version     SVN: $Id$
  */
 
+/* Only EOTC Administrators can view this page
+ */
+$eventPermissionMapper = new \EOTC\EventPermissionMapper();
+$allPermissions = $eventPermissionMapper->findByUser($_SESSION['user']);
+
+/* If you aren't an EOTC administrator, go away
+ */
+if (!$allPermissions->count()) {
+	error(19);
+}
+
 $this->setFile(TEMPLATE_content, 'modules/eotc/review.html');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
