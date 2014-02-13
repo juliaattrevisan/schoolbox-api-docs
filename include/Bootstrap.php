@@ -41,6 +41,27 @@ $di->set(
     }
 );
 
+// Set up a web factory and its request/responses
+$di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
+$di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
+
+// inject request and response into controller
+// (I may need to mangle requests in pre-processing though)
+$di->setters['Schoolbox\\Web\\BaseController'] = array(
+    'setRequest' => $di->lazy(function() use($di) {
+        return $di->get('webFactory')->newRequest();
+    }),
+    'setResponse' => $di->lazy(function() use($di) {
+        return $di->get('webFactory')->newResponse();
+    }),
+);
+
+//// inject Twig environment
+//$loader = new Twig_Loader_Filesystem($templatePaths);
+//$twig = new Twig_Environment($loader);
+//$twig->addExtension(new Twig_Extension_Debug());
+//$di->set('templateEngine');
+
 //
 // Set up the debug bar, and add listeners for various parts of the debug bar
 // (database calls, XHProf)
