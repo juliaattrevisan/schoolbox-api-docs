@@ -9,9 +9,18 @@
 				allowFreeEntries: false,
 				name: 'staff'
 			},
-			value: [],
 			onePerLine: false,
 			multiple: false
+		});
+
+		$('#assign-permissions').validate({
+			rules: {
+				'status[]': 'required',
+				'campus[]': 'required'
+			},
+			submitHandler: function(form) {
+				form.submit();
+			}
 		});
 	});
 </script>
@@ -19,7 +28,7 @@
 <h1>Manage EOTC Permissions</h1>
 
 <h2>Add User</h2>
-<form action="/modules/eotc/permission/modifyForm.php" method="post">
+<form id='assign-permissions' action="/modules/eotc/permission/modifyForm.php" method="post">
 	<table class="standardForm">
 		<thead>
 		<tr>
@@ -38,7 +47,10 @@
 				</td>
 				<td>
 					<!-- BEGIN campus -->
-					<input name='campus[]' type="checkbox" value="{CAMPUS_ID}" {CAMPUS_SELECTED} />{CAMPUS_NAME}<br />
+					<label>
+						<input name='campus[]' type="checkbox" value="{CAMPUS_ID}" {CAMPUS_SELECTED} />
+						{CAMPUS_NAME}
+					</label>
 					<!-- END campus -->
 				</td>
 			</tr>
@@ -51,7 +63,10 @@
 				</td>
 				<td>
 					<!-- BEGIN status -->
-					<input name='status[]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />{STATUS_NAME}<br />
+					<label>
+						<input name='status[]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />
+						{STATUS_NAME}
+					</label>
 					<!-- END status -->
 				</td>
 			</tr>
@@ -113,4 +128,3 @@
 		<!-- END permission -->
 	</tbody>
 </table>
-
