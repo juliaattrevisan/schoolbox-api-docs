@@ -12,231 +12,237 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
-$userMapper = new \Schoolbox\UserMapper();
+if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
 
-/** @var Schoolbox\User $user */
-$owner = $_SESSION['user'];
+	$userMapper = new \Schoolbox\UserMapper();
 
-switch($_POST['action']) {
-	case 'Add':
-	case 'Update':
+	/** @var Schoolbox\User $user */
+	$owner = $_SESSION['user'];
 
-		/* Default
-		 */
-		$until = null;
+	switch($_POST['action']) {
+		case 'Add':
+		case 'Update':
 
-		$eventMapper = new \EOTC\EventMapper();
+			/* Default
+			 */
+			$until = null;
 
-		/* Spawn an existing event if id provided
-		 * Otherwise spawn a new one
-		 */
-		if (is_numeric($_POST['id'])) {
+			$eventMapper = new \EOTC\EventMapper();
+
+			/* Spawn an existing event if id provided
+			 * Otherwise spawn a new one
+			 */
+			if (is_numeric($_POST['id'])) {
+				try {
+					$event = $eventMapper->findById($_POST['id']);
+				}
+				catch (\Exception $e) {
+					error(160);
+				}
+			}
+			else {
+				$event = new \EOTC\Event();
+			}
+
+			/* Spawn and assign metadata record to event
+			 */
+			try {
+				$metadataMapper = new \EOTC\EventMetadataMapper();
+				$metadata = $metadataMapper->findByEvent($event);
+			}
+			catch (\Exception $e) {
+				$metadata = new \EOTC\EventMetadata();
+			}
+
+			/* NO RETREAT
+			 * NO SURRENDER
+			 */
+
+			/* Author
+			 */
+			$userMapper = new \Schoolbox\UserMapper();
+
+			try {
+				$author = $userMapper->findById($_POST['authorId']);
+			}
+			catch (\Exception $e) {
+			}
+
+			/* Teacher in charge
+			 */
+			try {
+				/* -_- magicsuggest sends this back at you in json_encoded format
+				 * or as an int - i.e. there are two formats:
+				 *
+				 * [151]
+				 * 151
+				 */
+				if (is_numeric($_POST['teacherInCharge'])) {
+					$teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
+				}
+				else {
+					$wtf = json_decode($_POST['teacherInCharge']);
+					$teacherInCharge = $userMapper->findById($wtf[0]);
+				}
+			}
+			catch (\Exception $e) {
+			}
+
+			/* Events recur until this time
+			 */
+			if (strlen($_POST['repeat_until'])) {
+				$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
+			}
+
+			/* Start and end dates
+			 */
+			$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
+			$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
+
+			$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
+			$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
+
+			/* Spawned further up
+			 */
+			$metadata->setEventType($_POST['type']);
+			$metadata->setRamsRequired($_POST['ramsRequired']);
+			$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+			$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+			/* All the staff that were selected
+			 */
+			$staffCollection = new \Schoolbox\Collection();
+
+			if (is_array($_POST['staff']) && count($_POST['staff'])) {
+				$staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
+			}
+
+			/* Spawned further up
+			 */
+			$event->setAuthor($author);
+			$event->setTeacherInCharge($teacherInCharge);
+			$event->setType($_POST['type']);
+			$event->setNote($_POST['note']);
+			$event->setStartDate($startDate->getDatabaseDate());
+			$event->setStartTime($startDate->getDatabaseTime());
+			$event->setEndDate($endDate->getDatabaseDate());
+			$event->setEndTime($endDate->getDatabaseTime());
+			$event->setLocation($_POST['location']);
+			$event->setDetail($_POST['detail']);
+
+			/* Collections of ids
+			 */
+			$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
+			$event->setStaffAttendees($staffCollection);
+
+			/* Store metadata
+			 */
+			$event->setMetadata($metadata);
+
+			/* If RAMS file is required and one hasn't been uploaded yet,
+			 * save it; otherwise ignore it
+			 */
+			if ($event->getMetadata()->getRamsRequired()) {
+
+				/* A RAMS file doesn't exist, nor uploaded, but was required
+				 */
+				if (!$event->getRamsFiles()->count() && !strlen($_FILES['ramsFile']['name'])) {
+					error(161);
+				}
+				/* A RAMS file was uploaded; replace all existing ones
+				 */
+				else if (strlen($_FILES['ramsFile']['name'])) {
+
+					/* Empty old RAMS objects and put the new one in
+					 */
+					$ramsFile = \Schoolbox\StorageMapper::getInstance()->upload(\Cfg::get('storage_dir') . '/' . $_FILES['ramsFile']['name'], $_FILES['ramsFile']['tmp_name'], $author->getId());
+
+					$event->setRamsFiles(new \Schoolbox\Collection());
+					$event->getRamsFiles()->add($ramsFile);
+				}
+				/* Otherwise just keep the current RAMS file
+				 */
+			}
+			/* RAMS file not needed - remove all existing ones
+			 */
+			else {
+				$event->setRamsFiles(new \Schoolbox\Collection());
+			}
+
+			/* Save this event and any recurring incidents too
+			 */
+			$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
+			$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
+
+			/* Superuser modifying some arbitrary event
+			 */
+			$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $event->getId());
+
+			break;
+
+		case 'Delete':
+			$eventMapper = new \EOTC\EventMapper();
+			$metadataMapper = new \EOTC\EventMetadataMapper();
+
 			try {
 				$event = $eventMapper->findById($_POST['id']);
 			}
 			catch (\Exception $e) {
 				error(160);
 			}
-		}
-		else {
-			$event = new \EOTC\Event();
-		}
 
-		/* Spawn and assign metadata record to event
-		 */
-		try {
-			$metadataMapper = new \EOTC\EventMetadataMapper();
-			$metadata = $metadataMapper->findByEvent($event);
-		}
-		catch (\Exception $e) {
-			$metadata = new \EOTC\EventMetadata();
-		}
-
-		/* NO RETREAT
-		 * NO SURRENDER
-		 */
-
-		/* Author
-		 */
-		$userMapper = new \Schoolbox\UserMapper();
-
-		try {
-			$author = $userMapper->findById($_POST['authorId']);
-		}
-		catch (\Exception $e) {
-		}
-
-		/* Teacher in charge
-		 */
-		try {
-			/* -_- magicsuggest sends this back at you in json_encoded format
-			 * or as an int - i.e. there are two formats:
-			 *
-			 * [151]
-			 * 151
+			/* Delete an entire series, if the seriesId is not null
 			 */
-			if (is_numeric($_POST['teacherInCharge'])) {
-				$teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
-			}
-			else {
-				$wtf = json_decode($_POST['teacherInCharge']);
-				$teacherInCharge = $userMapper->findById($wtf[0]);
-			}
-		}
-		catch (\Exception $e) {
-		}
+			if ($event->getSeriesId() != null) {
+				if ($_POST['efficacy'] == 'series') {
+					$allEvents = $eventMapper->getAllInSeries($event);
 
-		/* Events recur until this time
-		 */
-		if (strlen($_POST['repeat_until'])) {
-			$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
-		}
+					/* Delete the metadata relations, then delete the
+					 * metadata record itself
+					 */
+					$metadataMapper->delete($event->getMetadata());
 
-		/* Start and end dates
-		 */
-		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
-		$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
-
-		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
-		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
-
-		/* Spawned further up
-		 */
-		$metadata->setEventType($_POST['type']);
-		$metadata->setRamsRequired($_POST['ramsRequired']);
-		$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-		$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-
-		/* All the staff that were selected
-		 */
-		$staffCollection = new \Schoolbox\Collection();
-
-		if (is_array($_POST['staff']) && count($_POST['staff'])) {
-			$staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
-		}
-
-		/* Spawned further up
-		 */
-		$event->setAuthor($author);
-		$event->setTeacherInCharge($teacherInCharge);
-		$event->setType($_POST['type']);
-		$event->setNote($_POST['note']);
-		$event->setStartDate($startDate->getDatabaseDate());
-		$event->setStartTime($startDate->getDatabaseTime());
-		$event->setEndDate($endDate->getDatabaseDate());
-		$event->setEndTime($endDate->getDatabaseTime());
-		$event->setLocation($_POST['location']);
-		$event->setDetail($_POST['detail']);
-
-		/* Collections of ids
-		 */
-		$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
-		$event->setStaffAttendees($staffCollection);
-
-		/* Store metadata
-		 */
-		$event->setMetadata($metadata);
-
-		/* If RAMS file is required and one hasn't been uploaded yet,
-		 * save it; otherwise ignore it
-		 */
-		if ($event->getMetadata()->getRamsRequired()) {
-
-			/* A RAMS file doesn't exist, nor uploaded, but was required
-			 */
-			if (!$event->getRamsFiles()->count() && !strlen($_FILES['ramsFile']['name'])) {
-				error(161);
-			}
-			/* A RAMS file was uploaded; replace all existing ones
-			 */
-			else if (strlen($_FILES['ramsFile']['name'])) {
-
-				/* Empty old RAMS objects and put the new one in
+					foreach($allEvents as $currentEvent) {
+						$eventMapper->deleteCampusRelations($currentEvent);
+						$eventMapper->deleteMetadataRelations($currentEvent);
+						$eventMapper->deleteStaffAttendeesRelations($currentEvent);
+						$eventMapper->deleteStudentAttendeesRelations($currentEvent);
+						$eventMapper->deleteFilesRelations($currentEvent);
+						$eventMapper->delete($currentEvent);
+					}
+				}
+				/* Delete a metadata relation for an event that is part
+				 * of a series
 				 */
-				$ramsFile = \Schoolbox\StorageMapper::getInstance()->upload(\Cfg::get('storage_dir') . '/' . $_FILES['ramsFile']['name'], $_FILES['ramsFile']['tmp_name'], $author->getId());
-
-				$event->setRamsFiles(new \Schoolbox\Collection());
-				$event->getRamsFiles()->add($ramsFile);
-			}
-			/* Otherwise just keep the current RAMS file
-			 */
-		}
-		/* RAMS file not needed - remove all existing ones
-		 */
-		else {
-			$event->setRamsFiles(new \Schoolbox\Collection());
-		}
-
-		/* Save this event and any recurring incidents too
-		 */
-		$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
-		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
-
-		/* Superuser modifying some arbitrary event
-		 */
-		$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $event->getId());
-
-		break;
-
-	case 'Delete':
-		$eventMapper = new \EOTC\EventMapper();
-		$metadataMapper = new \EOTC\EventMetadataMapper();
-
-		try {
-			$event = $eventMapper->findById($_POST['id']);
-		}
-		catch (\Exception $e) {
-			error(160);
-		}
-
-		/* Delete an entire series, if the seriesId is not null
-		 */
-		if ($event->getSeriesId() != null) {
-			if ($_POST['efficacy'] == 'series') {
-				$allEvents = $eventMapper->getAllInSeries($event);
-
-				/* Delete the metadata relations, then delete the
-				 * metadata record itself
-				 */
-				$metadataMapper->delete($event->getMetadata());
-
-				foreach($allEvents as $currentEvent) {
-					$eventMapper->deleteCampusRelations($currentEvent);
-					$eventMapper->deleteMetadataRelations($currentEvent);
-					$eventMapper->deleteStaffAttendeesRelations($currentEvent);
-					$eventMapper->deleteStudentAttendeesRelations($currentEvent);
-					$eventMapper->deleteFilesRelations($currentEvent);
-					$eventMapper->delete($currentEvent);
+				else if ($_POST['efficacy'] == 'self') {
+					$eventMapper->deleteCampusRelations($event);
+					$eventMapper->deleteMetadataRelations($event);
+					$eventMapper->deleteStaffAttendeesRelations($event);
+					$eventMapper->deleteStudentAttendeesRelations($event);
+					$eventMapper->deleteFilesRelations($event);
+					$eventMapper->delete($event);
 				}
 			}
-			/* Delete a metadata relation for an event that is part
-			 * of a series
+			/* Just a single event all on its lonesome
 			 */
-			else if ($_POST['efficacy'] == 'self') {
+			else {
+				$eventMapper->delete($event);
 				$eventMapper->deleteCampusRelations($event);
 				$eventMapper->deleteMetadataRelations($event);
 				$eventMapper->deleteStaffAttendeesRelations($event);
 				$eventMapper->deleteStudentAttendeesRelations($event);
 				$eventMapper->deleteFilesRelations($event);
-				$eventMapper->delete($event);
+				$metadataMapper->delete($event->getMetadata());
 			}
-		}
-		/* Just a single event all on its lonesome
-		 */
-		else {
-			$eventMapper->delete($event);
-			$eventMapper->deleteCampusRelations($event);
-			$eventMapper->deleteMetadataRelations($event);
-			$eventMapper->deleteStaffAttendeesRelations($event);
-			$eventMapper->deleteStudentAttendeesRelations($event);
-			$eventMapper->deleteFilesRelations($event);
-			$metadataMapper->delete($event->getMetadata());
-		}
 
-		$page->backToTheFuture(2);
-		break;
+			$page->backToTheFuture(2);
+			break;
 
-	default:
-		error(160);
-		break;
+		default:
+			error(160);
+			break;
+	}
+}
+else {
+	error(19);
 }

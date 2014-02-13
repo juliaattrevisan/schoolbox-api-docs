@@ -13,278 +13,283 @@
 require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 $page = new SitePage();
 
-$page->setFile(TEMPLATE_content, 'modules/eotc/manage/modify.html');
-$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
-$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
-$page->setBlock(TEMPLATE_content, 'has_activity_log', 'has_activity_log_block');
-$page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
-$page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
+if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
+	$page->setFile(TEMPLATE_content, 'modules/eotc/manage/modify.html');
+	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+	$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+	$page->setBlock(TEMPLATE_content, 'has_activity_log', 'has_activity_log_block');
+	$page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
+	$page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
 
-/* Modify existing event
- */
-if (is_numeric($_GET['eventID'])) {
-	$mapper = new \EOTC\EventMapper();
-
-	try {
-		$event = $mapper->findById($_GET['eventID']);
-	}
-	catch (\Exception $e) {
-		error(160);
-	}
-
-	/* Do a check for missing metadata
+	/* Modify existing event
 	 */
-	if (!$event->getMetadata()) {
-		throw new \Exception('No metadata record found for this event.');
-	}
+	if (is_numeric($_GET['eventID'])) {
+		$mapper = new \EOTC\EventMapper();
 
-	/* Default values
-	 */
-	$defaultTypeId = $event->getEventType()->getId();
-	$defaultCampusId = array();
+		try {
+			$event = $mapper->findById($_GET['eventID']);
+		}
+		catch (\Exception $e) {
+			error(160);
+		}
 
-	$allCampuses = $event->getCampusCollection()->getAll();
+		/* Do a check for missing metadata
+		 */
+		if (!$event->getMetadata()) {
+			throw new \Exception('No metadata record found for this event.');
+		}
 
-	foreach ($allCampuses as $currentCampus) {
-		$defaultCampusId[] = $currentCampus->getId();
-	}
+		/* Default values
+		 */
+		$defaultTypeId = $event->getEventType()->getId();
+		$defaultCampusId = array();
 
-	/* Default magicsuggest values
-	 */
-	$staffSelected = array();
+		$allCampuses = $event->getCampusCollection()->getAll();
 
-	foreach ($event->getStaffAttendees() as $currentStaff) {
-		$staffSelected[] = array(
-			'id' => $currentStaff->getId(),
-			'name' => $currentStaff->getFullname()
-		);
-	}
+		foreach ($allCampuses as $currentCampus) {
+			$defaultCampusId[] = $currentCampus->getId();
+		}
 
-	/* Teacher in charge
-	 */
-	if ($event->getTeacherInCharge()->getId()) {
-		$teacherInCharge = array(
-			'id' => $event->getTeacherInCharge()->getId(),
-			'name' => $event->getTeacherInCharge()->getFullname(),
-		);
-	}
-	else {
-		$teacherInCharge = array();
-	}
+		/* Default magicsuggest values
+		 */
+		$staffSelected = array();
 
-	/* Miscellaneous setvarring
-	 * Hide advanced options by default
-	 */
-	$page->setVar(array(
-		'FUNCTION' => 'Update',
-		'SHOW_ADVANCED' => '',
-		'ADVANCED_SHOW' => '',
-		'ADVANCED_CLOSE' => 'hidden',
-	));
+		foreach ($event->getStaffAttendees() as $currentStaff) {
+			$staffSelected[] = array(
+				'id' => $currentStaff->getId(),
+				'name' => $currentStaff->getFullname()
+			);
+		}
 
-	if ($event->getMetadata()->getRamsRequired()) {
-		if ($event->getRamsFiles()->first()) {
-			$filename = $event->getRamsFiles()->first()->getFilename();
+		/* Teacher in charge
+		 */
+		if ($event->getTeacherInCharge()->getId()) {
+			$teacherInCharge = array(
+				'id' => $event->getTeacherInCharge()->getId(),
+				'name' => $event->getTeacherInCharge()->getFullname(),
+			);
 		}
 		else {
-			$filename = '';
+			$teacherInCharge = array();
 		}
+
+		/* Miscellaneous setvarring
+		 * Hide advanced options by default
+		 */
+		$page->setVar(array(
+			'FUNCTION' => 'Update',
+			'SHOW_ADVANCED' => '',
+			'ADVANCED_SHOW' => '',
+			'ADVANCED_CLOSE' => 'hidden',
+		));
+
+		if ($event->getMetadata()->getRamsRequired()) {
+			if ($event->getRamsFiles()->first()) {
+				$filename = $event->getRamsFiles()->first()->getFilename();
+			}
+			else {
+				$filename = '';
+			}
+		}
+
+		$page->setVar(array(
+			'EVENT_RAMS_FILE' => $filename,
+			'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
+			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
+			'EVENT_STAFF' => json_encode($staffSelected),
+			'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
+			'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->getRamsRequired() ? 'checked="checked"' : '',
+			'EVENT_ID' => $event->getId(),
+			'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
+			'EVENT_NOTE' => $event->getNote(),
+			'EVENT_TIMEINPUTS' => $event->getAllDay() ? 'hide' : '',
+			'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
+			'EVENT_START_HOUR' => $event->getStartDateTime()->getUsingFormat('H'),
+			'EVENT_START_MIN' => $event->getStartDateTime()->getUsingFormat('i'),
+			'EVENT_START_AM' => $event->getStartDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
+			'EVENT_START_PM' => $event->getStartDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+			'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
+			'EVENT_END_HOUR' => $event->getEndDateTime()->getUsingFormat('H'),
+			'EVENT_END_MIN' => $event->getEndDateTime()->getUsingFormat('i'),
+			'EVENT_END_AM' => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
+			'EVENT_END_PM' => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+			'EVENT_LOCATION' => $event->getLocation(),
+			'EVENT_DETAIL' => $event->getDetail(),
+			'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+		));
+
+		/* Recurrence
+		 */
+		// Is there a recurrence? If so don't show the repeat selector.
+		if ($event->getSeriesId() == null) {
+			$page->setVar('recurring_reminder_block', '');
+			$page->parse('recurring_dates_block', 'recurring_dates');
+		}
+		else {
+			$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($mapper);
+			$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
+
+			$page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
+			$page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
+			$page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
+			$page->parse('recurring_reminder_block', 'recurring_reminder');
+			$page->setVar('recurring_dates_block', '');
+		}
+
+		/* Activity log
+		 */
+		$page->setVar(array(
+			'activity_log_block' => '',
+			'has_activity_log_block' => ''
+		));
+
+		$i = 0;
+
+		foreach($event->getMetadata()->getActivityLog() as $currentLog) {
+
+			/* If there are no activityLog items, mappers will spawn a single
+			 * object where every property is null
+			 *
+			 * TODO: Mappers probably shouldn't spawn you such objects
+			 */
+			if ($currentLog->getId()) {
+				$page->setVar(array(
+					'ACTIVITY_LOG_CREATED_AT' => $currentLog->getCreatedAt()->getShort(),
+					'ACTIVITY_LOG_MESSAGE' => $currentLog->getMessage()
+				));
+
+				$page->parse('activity_log_block', 'activity_log', true);
+
+				/* SB-3911
+				 */
+				$i++;
+			}
+		}
+
+		/* SB-3911
+		 */
+		if ($i) {
+			$page->parse('has_activity_log_block', 'has_activity_log');
+		}
+
+		$page->parse('delete_button_block', 'delete_button');
+
+		/* Cannot add students until an event is created
+		 */
+		$page->parse('can_add_students_block', 'can_add_students');
+	}
+	/* Create new event
+	 */
+	else {
+
+		/* Set up default dates
+		 */
+		$event = new \EOTC\Event();
+		$event->setupDates($_GET['date']);
+
+		$defaultTypeId = '';
+		$defaultCampusId = array($_SESSION['campus'][0]);
+
+		/* Miscellaneous setvarring
+		 * Hide advanced options by default
+		 */
+		$page->setVar(array(
+			'FUNCTION' => 'Add',
+			'SHOW_ADVANCED' => '',
+			'ADVANCED_SHOW' => '',
+			'ADVANCED_CLOSE' => 'hidden',
+		));
+
+		$statusMapper = new \EOTC\EventStatusMapper();
+		$status = $statusMapper->findDefaultStatus();
+
+		$page->setVar(array(
+			'EVENT_RAMS_FILE' => '',
+			'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
+			'EVENT_TEACHER_IN_CHARGE' => json_encode(array()),
+			'EVENT_STAFF' => json_encode(array()),
+			'EVENT_STATUS' => $status->getName(),
+			'EVENT_RAMSREQUIRED_SELECTED' => '',
+			'EVENT_ID' => '',
+			'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
+			'EVENT_NOTE' => '',
+			'EVENT_TIMEINPUTS' => 'hide',
+			'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
+			'EVENT_START_HOUR' => '',
+			'EVENT_START_MIN' => '',
+			'EVENT_START_AM' => '',
+			'EVENT_START_PM' => '',
+			'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
+			'EVENT_END_HOUR' => '',
+			'EVENT_END_MIN' => '',
+			'EVENT_END_AM' => '',
+			'EVENT_END_PM' => '',
+			'EVENT_LOCATION' => '',
+			'EVENT_DETAIL' => '',
+			'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+		));
+
+		/* Recurrence
+		 */
+		$page->setVar(array(
+			'recurring_reminder_block' => '',
+			'delete_button_block' => ''
+		));
+
+		$page->parse('recurring_dates_block', 'recurring_dates');
+
+		/* Activity Logs
+		 */
+		$page->setVar(array(
+			'has_activity_log_block' => '',
+			'activity_log_block' => ''
+		));
+
+		/* Cannot add students until an event is created
+		 */
+		$page->setVar(array(
+			'can_add_students_block' => ''
+		));
 	}
 
-	$page->setVar(array(
-		'EVENT_RAMS_FILE' => $filename,
-		'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
-		'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
-		'EVENT_STAFF' => json_encode($staffSelected),
-		'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
-		'EVENT_RAMSREQUIRED_SELECTED' => $event->getMetadata()->getRamsRequired() ? 'checked="checked"' : '',
-		'EVENT_ID' => $event->getId(),
-		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
-		'EVENT_NOTE' => $event->getNote(),
-		'EVENT_TIMEINPUTS' => $event->getAllDay() ? 'hide' : '',
-		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
-		'EVENT_START_HOUR' => $event->getStartDateTime()->getUsingFormat('H'),
-		'EVENT_START_MIN' => $event->getStartDateTime()->getUsingFormat('i'),
-		'EVENT_START_AM' => $event->getStartDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
-		'EVENT_START_PM' => $event->getStartDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
-		'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
-		'EVENT_END_HOUR' => $event->getEndDateTime()->getUsingFormat('H'),
-		'EVENT_END_MIN' => $event->getEndDateTime()->getUsingFormat('i'),
-		'EVENT_END_AM' => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
-		'EVENT_END_PM' => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
-		'EVENT_LOCATION' => $event->getLocation(),
-		'EVENT_DETAIL' => $event->getDetail(),
-		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+	/* Event Types
+	 */
+	$calendarEventTypeMapper = new \EOTC\Calendar\EventTypeMapper();
+	$allEventTypes = $calendarEventTypeMapper->findAll();
+
+	$page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, array(
+		'id' => 'EVENT_EVENTTYPE_ID',
+		'type' => 'EVENT_EVENTTYPE_NAME'
 	));
 
-	/* Recurrence
+	/* Campus Checkbox Array when using Campus Event Level
 	 */
-	// Is there a recurrence? If so don't show the repeat selector.
-	if ($event->getSeriesId() == null) {
-		$page->setVar('recurring_reminder_block', '');
-		$page->parse('recurring_dates_block', 'recurring_dates');
+	$campusMapper = new \Schoolbox\CampusMapper();
+	$campusList = $campusMapper->findAll();
+
+	if ($campusList->count()) {
+		$allCampuses = array();
+
+		foreach($campusList as $current) {
+			$allCampuses[] = array(
+				'id' => $current->getId(),
+				'name' => $current->getName()
+			);
+		}
+
+		$page->checkList('event_campus_list', $allCampuses, $defaultCampusId, TEMPLATE_content, array(
+			'id' => 'EVENT_CAMPUS_ID',
+			'name' => 'EVENT_CAMPUS_NAME',
+		));
 	}
 	else {
-		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($mapper);
-		$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
-
-		$page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
-		$page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
-		$page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
-		$page->parse('recurring_reminder_block', 'recurring_reminder');
-		$page->setVar('recurring_dates_block', '');
+		$page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
+		$page->setVar('event_campus_list_block', '');
 	}
 
-	/* Activity log
-	 */
-	$page->setVar(array(
-		'activity_log_block' => '',
-		'has_activity_log_block' => ''
-	));
-
-	$i = 0;
-
-	foreach($event->getMetadata()->getActivityLog() as $currentLog) {
-
-		/* If there are no activityLog items, mappers will spawn a single
-		 * object where every property is null
-		 *
-		 * TODO: Mappers probably shouldn't spawn you such objects
-		 */
-		if ($currentLog->getId()) {
-			$page->setVar(array(
-				'ACTIVITY_LOG_CREATED_AT' => $currentLog->getCreatedAt()->getShort(),
-				'ACTIVITY_LOG_MESSAGE' => $currentLog->getMessage()
-			));
-
-			$page->parse('activity_log_block', 'activity_log', true);
-
-			/* SB-3911
-			 */
-			$i++;
-		}
-	}
-
-	/* SB-3911
-	 */
-	if ($i) {
-		$page->parse('has_activity_log_block', 'has_activity_log');
-	}
-
-	$page->parse('delete_button_block', 'delete_button');
-
-	/* Cannot add students until an event is created
-	 */
-	$page->parse('can_add_students_block', 'can_add_students');
-}
-/* Create new event
- */
-else {
-
-	/* Set up default dates
-	 */
-	$event = new \EOTC\Event();
-	$event->setupDates($_GET['date']);
-
-	$defaultTypeId = '';
-	$defaultCampusId = array($_SESSION['campus'][0]);
-
-	/* Miscellaneous setvarring
-	 * Hide advanced options by default
-	 */
-	$page->setVar(array(
-		'FUNCTION' => 'Add',
-		'SHOW_ADVANCED' => '',
-		'ADVANCED_SHOW' => '',
-		'ADVANCED_CLOSE' => 'hidden',
-	));
-
-	$statusMapper = new \EOTC\EventStatusMapper();
-	$status = $statusMapper->findDefaultStatus();
-
-	$page->setVar(array(
-		'EVENT_RAMS_FILE' => '',
-		'EVENT_CURRENT_STUDENTS' => $event->getStudentAttendees()->count(),
-		'EVENT_TEACHER_IN_CHARGE' => json_encode(array()),
-		'EVENT_STAFF' => json_encode(array()),
-		'EVENT_STATUS' => $status->getName(),
-		'EVENT_RAMSREQUIRED_SELECTED' => '',
-		'EVENT_ID' => '',
-		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
-		'EVENT_NOTE' => '',
-		'EVENT_TIMEINPUTS' => 'hide',
-		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
-		'EVENT_START_HOUR' => '',
-		'EVENT_START_MIN' => '',
-		'EVENT_START_AM' => '',
-		'EVENT_START_PM' => '',
-		'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
-		'EVENT_END_HOUR' => '',
-		'EVENT_END_MIN' => '',
-		'EVENT_END_AM' => '',
-		'EVENT_END_PM' => '',
-		'EVENT_LOCATION' => '',
-		'EVENT_DETAIL' => '',
-		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
-	));
-
-	/* Recurrence
-	 */
-	$page->setVar(array(
-		'recurring_reminder_block' => '',
-		'delete_button_block' => ''
-	));
-
-	$page->parse('recurring_dates_block', 'recurring_dates');
-
-	/* Activity Logs
-	 */
-	$page->setVar(array(
-		'has_activity_log_block' => '',
-		'activity_log_block' => ''
-	));
-
-	/* Cannot add students until an event is created
-	 */
-	$page->setVar(array(
-		'can_add_students_block' => ''
-	));
-}
-
-/* Event Types
- */
-$calendarEventTypeMapper = new \EOTC\Calendar\EventTypeMapper();
-$allEventTypes = $calendarEventTypeMapper->findAll();
-
-$page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, array(
-	'id' => 'EVENT_EVENTTYPE_ID',
-	'type' => 'EVENT_EVENTTYPE_NAME'
-));
-
-/* Campus Checkbox Array when using Campus Event Level
- */
-$campusMapper = new \Schoolbox\CampusMapper();
-$campusList = $campusMapper->findAll();
-
-if ($campusList->count()) {
-	$allCampuses = array();
-
-	foreach($campusList as $current) {
-		$allCampuses[] = array(
-			'id' => $current->getId(),
-			'name' => $current->getName()
-		);
-	}
-
-	$page->checkList('event_campus_list', $allCampuses, $defaultCampusId, TEMPLATE_content, array(
-		'id' => 'EVENT_CAMPUS_ID',
-		'name' => 'EVENT_CAMPUS_NAME',
-	));
+	$page->outputPage();
 }
 else {
-	$page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
-	$page->setVar('event_campus_list_block', '');
+	error(19);
 }
-
-$page->outputPage();
