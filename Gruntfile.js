@@ -1,4 +1,5 @@
-var glob = require('glob');
+var glob  = require('glob');
+var shell = require('shelljs');
 
 module.exports = function(grunt) {
 
@@ -10,7 +11,7 @@ module.exports = function(grunt) {
                 interrupt: true
             },
             files: ['www/css/core/*.less'],
-            tasks: ['build.css']
+            tasks: ['build.css.current']
         }
     };
     var buildTasks = {};
@@ -127,6 +128,11 @@ module.exports = function(grunt) {
             task += ':'+skin;
         }
         grunt.task.run(task)
+    });
+    grunt.registerTask('build.css.current', 'Builds CSS for current skin', function() {
+        var task = 'less';
+        var currentSkin = shell.exec('./tools/switch-school.sh', {silent: true}).output
+        grunt.task.run((task+':'+currentSkin).trim())
     });
     grunt.registerTask('build',      ['bower', 'build.deps', 'build.js', 'build.css']);
     grunt.registerTask('default',    ['build']);
