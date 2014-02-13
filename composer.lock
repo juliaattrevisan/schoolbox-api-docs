@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "6c60f445afffd2254154275ac9b8b94c",
+    "hash": "aad180d4e7bea9b443fd7a8e0021f90f",
     "packages": [
         {
             "name": "aura/di",
@@ -113,6 +113,59 @@
                 "routing"
             ],
             "time": "2014-04-03 14:01:35"
+        },
+        {
+            "name": "aura/web",
+            "version": "dev-develop-2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/auraphp/Aura.Web.git",
+                "reference": "a3870d1a16ecd3ab6c4807165ac5196384da62cd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/auraphp/Aura.Web/zipball/a3870d1a16ecd3ab6c4807165ac5196384da62cd",
+                "reference": "a3870d1a16ecd3ab6c4807165ac5196384da62cd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "aura": {
+                    "type": "library",
+                    "config": {
+                        "common": "Aura\\Web\\_Config\\Common"
+                    }
+                },
+                "branch-alias": {
+                    "dev-develop-2": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Aura\\Web\\": "src/",
+                    "Aura\\Web\\_Config\\": "config/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Aura.Web Contributors",
+                    "homepage": "https://github.com/auraphp/Aura.Web/contributors"
+                }
+            ],
+            "description": "Provides web Request and Response objects for use by web controllers. These are representations of the PHP web environment, not HTTP request and response objects proper.",
+            "homepage": "https://github.com/auraphp/Aura.Web/releases",
+            "keywords": [
+                "request",
+                "response"
+            ],
+            "time": "2014-04-01 20:12:34"
         },
         {
             "name": "browscap/browscap-php",
@@ -2647,7 +2700,8 @@
         "react/stomp": 20,
         "browscap/browscap-php": 20,
         "aura/di": 20,
-        "aura/router": 20
+        "aura/router": 20,
+        "aura/web": 20
     },
     "platform": [
 
