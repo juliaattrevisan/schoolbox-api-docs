@@ -16,7 +16,7 @@ ALTER TABLE `eotc_metadata` CHANGE `notes` `comment` TEXT CHARSET utf8 COLLATE u
 CREATE TABLE `eotc_status`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), PRIMARY KEY (`id`) );
 INSERT INTO `eotc_status` (`name`) VALUES ('Draft');
 INSERT INTO `eotc_status` (`name`) VALUES ('In Principle'); 
-INSERT INTO `eotc_status` (`name`) VALUES ('RAMS Approved'); 
+INSERT INTO `eotc_status` (`name`) VALUES ('RAMS Approval');
 INSERT INTO `eotc_status` (`name`) VALUES ('Final Approval'); 
 INSERT INTO `eotc_status` (`name`) VALUES ('Approved');
 INSERT INTO `eotc_status` (`name`) VALUES ('Rejected');
