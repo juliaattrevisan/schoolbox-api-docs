@@ -28,9 +28,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	/** @var TopicFactory */
 	protected $topics;
 
-	/** @var MessageFactory */
-	protected $fMessage;
-
 	/**
 	 * @param IConfigLoader $configLoader
 	 * @param MessageFactory $messageFactory
@@ -38,7 +35,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	public function __construct($configLoader, $messageFactory) {
 		$this->conf = $configLoader;
 		$this->topics = new TopicFactory();
-		$this->fMessage = $messageFactory;
 	}
 
 
@@ -80,15 +76,15 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	/**
 	 * Retrieve all the callables associated with a particular trigger (one per role, if it exists)
 	 *
-	 * @param $trigger
+	 * @param $triggerLabel
 	 * @return array
 	 */
-	public function getCallables($trigger) {
+	public function getCallables($triggerLabel) {
 
 		$callables = array();
 
 		foreach(array(Role::STUDENT, Role::PARENT, Role::STAFF) as $role) {
-			$method = sprintf("notify%s%s", ucfirst($role), ucfirst($trigger));
+			$method = sprintf("notify%s%s", ucfirst($role), ucfirst($triggerLabel));
 			if(method_exists($this, $method)) {
 				$callables[$role] = array($this, $method);
 			}

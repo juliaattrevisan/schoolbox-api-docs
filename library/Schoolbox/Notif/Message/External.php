@@ -15,16 +15,14 @@ use Schoolbox\Notif\Notif;
 
 class External implements MessageInterface {
 
-	/** @var string  */
-	protected $text;
-	/** @var string  */
-	protected $href;
+	/** @var Message  */
+	protected $body;
 	/** @var DateTime */
 	protected $datetime;
-	/** @var string  */
-	protected $icon;
+	/** @var array */
+	protected $params;
 
-	/** @var \Schoolbox\Notif\Notif  */
+	/** @var Notif */
 	protected $notif;
 	/** @var array  */
 	protected $topics;
@@ -33,24 +31,21 @@ class External implements MessageInterface {
 	/** @var array */
 	protected $context = array();
 
-
 	/**
 	 * @param Notif $notif
 	 * @param array $topics
 	 * @param int $severity
-	 * @param string $text
-	 * @param string $href
-	 * @param DateTime $datetime
-	 * @param string $icon
+	 * @param int $timestamp
+	 * @param Message $message
+	 * @param array $params
 	 */
-	public function __construct($notif, $topics, $severity, $text, $href, $datetime, $icon) {
+	public function __construct($notif, $topics, $severity, $timestamp, $message, $params) {
 		$this->notif = $notif;
 		$this->topics = $topics;
 		$this->severity = $severity;
-		$this->text = $text;
-		$this->href = $href;
-		$this->datetime = $datetime;
-		$this->icon = $icon;
+		$this->body = $message;
+		$this->datetime = DateTime::createFromFormat('U', $timestamp);
+		$this->params = $params;
 	}
 
 	/**
@@ -89,10 +84,9 @@ class External implements MessageInterface {
 	 */
 	public function serialize() {
 		return json_encode(array(
-			'text' => $this->text,
-			'href' => $this->href,
+			'body'      => $this->body->toArray(),
 			'timestamp' => $this->datetime->format('U'),
-			'icon' => $this->icon
+			'params'    => $this->params
 		));
 	}
 
@@ -108,10 +102,8 @@ class External implements MessageInterface {
 	 */
 	public function unserialize($serialized) {
 		$data = json_decode($serialized, true);
-		$this->text = $data['text'];
-		$this->href = $data['href'];
+		$this->body = new Message($data['body']['text'],$data['body']['icon'],$data['body']['href']);
 		$this->datetime = DateTime::createFromFormat('U', $data['timestamp']);
-		$this->icon = $data['icon'];
 
 		// cannot resend a message that has been received and unserialized
 		$this->severity = null;

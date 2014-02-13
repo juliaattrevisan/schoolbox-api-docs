@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Monolog\Logger;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
@@ -21,6 +22,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Message\CompressionException;
 use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\Message\Internal;
+use Schoolbox\Notif\Message\MessageCollection;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Message\MessageInterface;
 use Schoolbox\Notif\MQ\Connector;
@@ -127,12 +129,20 @@ class Scheduler {
 							return;
 						}
 
-					// only a few Models actually have schedule strategies, failure is ok
+						// only a few Models actually have schedule strategies, failure is ok
 						// each module strategy knows how to deal with its own events
 						$instance = $self->getModule(get_class($message->getObject()));
 
-						// give me a list of things to schedule
-						$self->scheduleNotifications($instance->generateTriggers($message));
+						$fTrigger = new TriggerFactory(
+							$instance, $message->getObject(), $message->getInitiator(), $message->getDiff()
+						);
+
+						// ask the instance for a list of events for which to create triggers
+						$events = $instance->generateTriggers($message->getMethod(), $message->getObject());
+
+						// build a list of triggers out of the list of events, and schedule them
+						$self->scheduleNotifications($fTrigger->build($events));
+
 					}
 					catch(ScheduleException $e) {
 						// we're happy to ignore this, it just means no scheduling strategy exists for this Model
@@ -205,7 +215,7 @@ class Scheduler {
 		$v = $this->verboser;
 
 		/**
-		 * This closure will be called from the EventLoop at the appointed time
+		 * This closure will be called from the EventLoop at the appointed time, or immediately if the time has elapsed
 		 *
 		 * @param TimerInterface $timer
 		 * @throws \Exception
@@ -222,24 +232,37 @@ class Scheduler {
 
 				try {
 
-					/** @var External[] $externalMessages */
-					$externalMessages = call_user_func($callback,
+					/** @var MessageCollection $mCollection */
+					$mCollection = call_user_func($callback,
 						$trigger->getModel(), $trigger->getUser(), $trigger->getDiff()
 					);
 
-					if(!count($externalMessages)) {
+					/* attempt some sort of type-safety */
+
+					// method not implemented or nothing to send, this is fine
+					if(is_null($mCollection)) {
+						continue;
+					}
+
+					// check that an array was returned
+					if(!$mCollection instanceof MessageCollection) {
+						$v->v("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\MessageCollection", '!');
+						continue;
+					}
+
+					// if there are no messages, just ignore this callback and move on
+					if(!$mCollection->hasMessages()) {
 						continue;
 					}
 
 					$count = 0;
 
-					foreach($externalMessages as $message) {
+					// iterate across the messages supplied and send them
+					foreach($mCollection->generateExternalMessages($notif, $trigger->getTimestamp()) as $message) {
 						// send them all!
-						if($message instanceof External) {
-							$message->setContext(array('user' => $trigger->getUser()->getId()));
-							$sent = $message->send();
-							$count += $sent ? 1 :0;
-						}
+						$message->setContext(array('user' => $trigger->getUser()->getId()));
+						$sent = $message->send();
+						$count += $sent ? 1 :0;
 					}
 
 					$v->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'));
@@ -265,7 +288,7 @@ class Scheduler {
 
 
 	/**
-	 * Check whether or not a timer is already set for this event and model, and if not, set one for the appointed time
+	 * Set a timer for the appointed method at the appointed time, cancelling a previous timer if it exists.
 	 *
 	 * @param string $module
 	 * @param string $label
@@ -274,14 +297,14 @@ class Scheduler {
 	 * @param callable $publish
 	 */
 	protected function schedule($module, $label, $model, $interval, $publish) {
-		// check whether or not a timer has already been set for this event
-		if($this->isScheduled($module, $label, $model)) {
-			return;
+		// if a timer has already been set for this event on this object, we need to cancel the old and set the new
+		if($timer = $this->getTimer($module, $label, $model)) {
+			$this->loop->cancelTimer($timer);
 		}
 
-		// if not, register a timer
+		// register our timer
 		$timer = $this->loop->addTimer($interval, $publish);
-		$this->timers[$module][$label][sha1(serialize($model))] = $timer;
+		$this->timers[$module][$label][$this->hashModel($model)] = $timer;
 
 	}
 
@@ -292,10 +315,15 @@ class Scheduler {
 	 * @param string $module
 	 * @param string $label
 	 * @param object $model
-	 * @return bool
+	 * @return Timer|null
 	 */
-	protected function isScheduled($module, $label, $model) {
-		return isset($this->timers[$module][$label][sha1(serialize($model))]);
+	protected function getTimer($module, $label, $model) {
+		$hash = $this->hashModel($model);
+		return isset($this->timers[$module][$label][$hash]) ? $this->timers[$module][$label][$hash] : null;
+	}
+
+	protected function hashModel($model) {
+		return sha1(serialize($model));
 	}
 
 	/**

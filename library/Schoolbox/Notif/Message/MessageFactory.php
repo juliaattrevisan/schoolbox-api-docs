@@ -114,27 +114,6 @@ class MessageFactory {
 	}
 
 	/**
-	 * @param string $text
-	 * @param string $href
-	 * @param string $icon
-	 * @param array $context
-	 * @return External
-	 */
-	public function generateExternalMessage($text, $href, $icon, $context = array()) {
-		$msg = new External(
-			$this->notif,
-			$this->topic,
-			$this->severity,
-			$text,
-			$href,
-			new DateTime(),
-			$icon
-		);
-		$msg->setContext($context);
-		return $msg;
-	}
-
-	/**
 	 * Reconstitute a message that has come through in binary format
 	 *
 	 * @param $encodedCompressedSerialized
