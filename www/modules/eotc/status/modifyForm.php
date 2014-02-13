@@ -24,43 +24,51 @@ catch (\Exception $e) {
 	error(160);
 }
 
-/* Remember original states so we know which obs to spawn
- */
-$originalStatus = $event->getMetadata()->getStatus()->getId();
-$originalComment = $event->getMetadata()->getComment();
+$authenticator = new \EOTC\Authenticator($_SESSION['user'], $event);
 
-/* Update with values
- */
-$statusMapper = new \EOTC\EventStatusMapper();
-$status = $statusMapper->findById($_POST['statusId']);
+if ($authenticator->canPromote()) {
 
-$event->getMetadata()->setStatus($status);
-$event->getMetadata()->setComment($_POST['comment']);
+	/* Remember original states so we know which obs to spawn
+	 */
+	$originalStatus = $event->getMetadata()->getStatus()->getId();
+	$originalComment = $event->getMetadata()->getComment();
 
-$metadataMapper = new \EOTC\EventMetadataMapper();
-$metadataMapper->save($event->getMetadata());
+	/* Update with values
+	 */
+	$statusMapper = new \EOTC\EventStatusMapper();
+	$status = $statusMapper->findById($_POST['statusId']);
 
-/* Activity Log
- */
-$registry = new \EOTC\ActivityLog\Registry();
-$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
+	$event->getMetadata()->setStatus($status);
+	$event->getMetadata()->setComment($_POST['comment']);
 
-/* If a status changed, log it
- */
-if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
-	$registry->add($factory->produce('StatusChange'));
+	$metadataMapper = new \EOTC\EventMetadataMapper();
+	$metadataMapper->save($event->getMetadata());
+
+	/* Activity Log
+	 */
+	$registry = new \EOTC\ActivityLog\Registry();
+	$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
+
+	/* If a status changed, log it
+	 */
+	if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
+		$registry->add($factory->produce('StatusChange'));
+	}
+
+	/* If a comment changed, log it
+	 */
+	if ($originalComment != $event->getMetadata()->getComment()) {
+		$registry->add($factory->produce('CommentChange'));
+	}
+
+	/* Notify everyone
+	 */
+	$registry->notify();
+
+	/* Redirect back to status screen
+	 */
+	$page->localRedir('/modules/eotc/status/modify/' . $event->getId());
 }
-
-/* If a comment changed, log it
- */
-if ($originalComment != $event->getMetadata()->getComment()) {
-	$registry->add($factory->produce('CommentChange'));
+else {
+	error(19);
 }
-
-/* Notify everyone
- */
-$registry->notify();
-
-/* Redirect back to status screen
- */
-$page->localRedir('/modules/eotc/status/modify/' . $event->getId());
