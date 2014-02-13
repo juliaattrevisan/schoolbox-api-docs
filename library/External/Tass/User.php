@@ -140,20 +140,21 @@ class External_Tass_User implements External_UserInterface {
 		if (empty($tassCode)) {
 			return false;
 		}
-		if( $this->groupHandler->isStudent($userID) )
-		{
-			$sql ="SELECT class, studsub.cmpy_code, sub_code, year_grp
-                                FROM studsub
-                                JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
-                                WHERE studsub.stud_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND yr_study = '{$_SESSION['FileYear']}'";
+		if ($this->groupHandler->isStudent($userID)) {
+			$sql = "SELECT class, studsub.cmpy_code, sub_code, year_grp
+					FROM studsub
+					JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
+					WHERE studsub.stud_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND yr_study = '{$_SESSION['FileYear']}'
+					ORDER BY sub_code ASC, class ASC
+			";
 
-                }
-		else
-		{
-
+			}
+		else {
 			$sql = "SELECT class, cmpy_code, semester, sub_code, year_num, year_grp
-                                FROM tchsub
-                                WHERE tch_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'";
+					FROM tchsub
+					WHERE tch_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'
+					ORDER BY sub_code ASC, class ASC
+			";
 		}
 
 
