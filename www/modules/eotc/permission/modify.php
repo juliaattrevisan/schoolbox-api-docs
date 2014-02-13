@@ -8,6 +8,10 @@
  * @version     SVN: $Id$
  */
 
+if (!$_SESSION['user']->isSuperuser()) {
+	error(19);
+}
+
 $this->setFile(TEMPLATE_content, 'modules/eotc/permission/modify.html');
 $this->setBlock(TEMPLATE_content, 'campus', 'campus_block');
 $this->setBlock(TEMPLATE_content, 'status', 'status_block');

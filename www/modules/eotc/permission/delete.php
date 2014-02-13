@@ -12,6 +12,10 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
+if (!$_SESSION['user']->isSuperuser()) {
+	error(19);
+}
+
 try {
 	$userMapper = new \Schoolbox\UserMapper();
 	$user = $userMapper->findById($this->arg[0]);
