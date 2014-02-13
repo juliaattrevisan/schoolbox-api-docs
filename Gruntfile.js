@@ -131,7 +131,7 @@ module.exports = function(grunt) {
     });
     grunt.registerTask('build.css.current', 'Builds CSS for current skin', function() {
         var task = 'less';
-        var currentSkin = shell.exec('./tools/switch-school.sh', {silent: true}).output
+        var currentSkin = shell.exec('./tools/school.sh', {silent: true}).output
         grunt.task.run((task+':'+currentSkin).trim())
     });
     grunt.registerTask('build',      ['bower', 'build.deps', 'build.js', 'build.css']);
