@@ -12,9 +12,21 @@ $route = $di->get('router')->match(
     parse_url($_GET['page'], PHP_URL_PATH),
     $_SERVER
 );
-if ($route) {
+if ($route instanceof Aura\Router\Route) {
+    /** @var \Schoolbox\Web\Controller\Base $controller */
+
     // do something with the route.
-    var_dump(parse_url($_GET['page'], PHP_URL_PATH), $route);
+    // For now, I just assume the DI container knows how to get a controller
+    // named 'controller:$route->params[controller]', and this controller has a
+    // public method named $route->params[action].
+
+    $controller = $di->get('controller:'.$route->params['controller']);
+    call_user_func(array($controller, $route->params['action']), $route->params);
+
+    $output = new Schoolbox\Web\Output\Base();
+    $output->setResponse($controller->getResponse());
+    $output->output();
+    exit;
 }
 
 // we shall assume that if a specific page is requested, the user just be sent to that page regardless of device

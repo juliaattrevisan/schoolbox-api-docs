@@ -47,7 +47,7 @@ $di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
 
 // inject request and response into controller
 // (I may need to mangle requests in pre-processing though)
-$di->setters['Schoolbox\\Web\\BaseController'] = array(
+$di->setters['Schoolbox\\Web\\Controller\\Base'] = array(
     'setRequest' => $di->lazy(function() use($di) {
         return $di->get('webFactory')->newRequest();
     }),
