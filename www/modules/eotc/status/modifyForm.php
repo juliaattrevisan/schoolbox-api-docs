@@ -12,6 +12,17 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
+/* Only EOTC Administrators can view this page
+ */
+$eventPermissionMapper = new \EOTC\EventPermissionMapper();
+$allPermissions = $eventPermissionMapper->findByUser($_SESSION['user']);
+
+/* If you aren't an EOTC administrator, go away
+ */
+if (!$allPermissions->count()) {
+	error(19);
+}
+
 $eventMapper = new \EOTC\EventMapper();
 
 /* Spawn an existing event if id provided
