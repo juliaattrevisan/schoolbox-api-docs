@@ -15,7 +15,8 @@
     "grunt-shell": "~0.6.1",
     "grunt-contrib-watch": "~0.5.3",
     "glob": "~3.2.7",
-    "jit-grunt": "~0.2.0"
+    "jit-grunt": "~0.2.0",
+    "shelljs": "~0.2.6"
   },
   "license": "Commercial"
 }
