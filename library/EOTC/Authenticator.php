@@ -38,6 +38,28 @@ class Authenticator {
 	}
 
 	/**
+	 * Determine whether the specified user is an EOTC Administrator
+	 * (a staff user with at least one valid EOTC Permission assigned)
+	 *
+	 * @param \Schoolbox\User $user
+	 * @return bool
+	 */
+	public function isEOTCAdministrator(\Schoolbox\User $user) {
+		if ($user->isSuperuser()) {
+			return true;
+		}
+
+		$eventPermissionMapper = new \EOTC\EventPermissionMapper();
+		$allPermissions = $eventPermissionMapper->findByUser($user);
+
+		if ($allPermissions->count()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine whether the current user's permissions allow them
 	 * to change the status of $event
 	 *

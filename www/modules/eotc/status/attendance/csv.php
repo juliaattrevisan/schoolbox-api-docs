@@ -9,14 +9,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
 /* Only EOTC Administrators can view this page
  */
-$eventPermissionMapper = new \EOTC\EventPermissionMapper();
-$allPermissions = $eventPermissionMapper->findByUser($_SESSION['user']);
+$authenticator = new \EOTC\Authenticator();
 
-/* If you aren't an EOTC administrator, go away
- */
-if (!$allPermissions->count()) {
+if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
 	error(19);
 }
 

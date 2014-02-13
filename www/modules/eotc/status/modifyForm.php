@@ -14,12 +14,9 @@ $page = new SitePage();
 
 /* Only EOTC Administrators can view this page
  */
-$eventPermissionMapper = new \EOTC\EventPermissionMapper();
-$allPermissions = $eventPermissionMapper->findByUser($_SESSION['user']);
+$authenticator = new \EOTC\Authenticator();
 
-/* If you aren't an EOTC administrator, go away
- */
-if (!$allPermissions->count()) {
+if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
 	error(19);
 }
 
@@ -34,8 +31,6 @@ try {
 catch (\Exception $e) {
 	error(160);
 }
-
-$authenticator = new \EOTC\Authenticator();
 
 if ($authenticator->canPromote($_SESSION['user'], $event)) {
 
