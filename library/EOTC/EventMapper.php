@@ -111,6 +111,7 @@ class EventMapper extends Calendar\EventMapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+		$campusMapper = $this->getJoinMapper('campus');
 
 		$query = "
 			SELECT
@@ -270,6 +271,10 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
 			$eventItem->setStartDateTime($startDateTime);
+
+			/* Accumulate campuses for this event
+			 */
+			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
 
 			/* Accumulate the metadata for this event
 			 * Only use the first record
