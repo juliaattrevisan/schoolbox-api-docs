@@ -10,6 +10,14 @@
  * @version     SVN: $Id$
  */
 
+/* Only EOTC Administrators can view this page
+ */
+$authenticator = new \EOTC\Authenticator();
+
+if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
+	error(19);
+}
+
 $eventMapper = new \EOTC\EventMapper();
 $csv = '';
 

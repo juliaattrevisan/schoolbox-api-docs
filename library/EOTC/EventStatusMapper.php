@@ -25,7 +25,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	 *
 	 * @var int
 	 */
-	private $rejectedStatusId = 5;
+	private $rejectedStatusId = 6;
 
 	/**
 	 * Mapping
@@ -53,6 +53,27 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	 */
 	public function findDefaultStatus() {
 		return $this->findById($this->getDefaultStatusId());
+	}
+
+	/**
+	 * The list of statuses that can be assigned via permissions
+	 */
+	public function findPermissionStatuses() {
+		$allStatuses = $this->findAll();
+
+		/* Ignore Approved and Rejected statuses
+		 */
+		$exclusions = array(5, 6);
+
+		$collection = new \Schoolbox\Collection();
+
+		foreach($allStatuses as $currentStatus) {
+			if (!in_array($currentStatus->getId(), $exclusions)) {
+				$collection->add($currentStatus);
+			}
+		}
+
+		return $collection;
 	}
 
 	/**

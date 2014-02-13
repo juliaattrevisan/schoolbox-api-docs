@@ -7,56 +7,63 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-$eventMapper = new \EOTC\EventMapper();
+$authenticator = new \EOTC\Authenticator();
 
-try {
-	$event = $eventMapper->findById($_POST['eventId']);
-}
-catch (\Exception $e) {
-	error(160);
-}
+if ($authenticator->isEOTCCreator($_SESSION['user'])) {
+	$eventMapper = new \EOTC\EventMapper();
 
-/* If people were chosen, process the random input
- */
-if (isset($_POST['selected']) && strlen($_POST['selected'])) {
-
-	/* Convert commas to whitespace
-	 */
-	$items = preg_replace('/,/', ' ', $_POST['selected']);
-
-	/* Condense multiple whitespaces
-	 */
-	$items = preg_replace('/\s+/', ' ', $items);
-
-	/* Snap them out into individuals
-	 */
-	$allComponents = explode(' ', $items);
-
-	/* Spawn mapper
-	 */
-	$userMapper = new \Schoolbox\UserMapper();
-
-	foreach($allComponents as $currentComponent) {
-
-		/* Numerics are assumed as schoolbox user ids and can go into
-		 * the stack straightaway
-		 */
-		if (is_numeric($currentComponent)) {
-			$allIds[] = $currentComponent;
-		}
-		/* Otherwise they are assumed to be usernames
-		 */
-		else {
-			try {
-				$user = $userMapper->findOneByColumn('username', $currentComponent);
-				$allIds[] = $user->getId();
-			}
-			catch (\Exception $e) {
-			}
-		}
+	try {
+		$event = $eventMapper->findById($_POST['eventId']);
+	}
+	catch (\Exception $e) {
+		error(160);
 	}
 
-	$eventMapper->addStudentAttendeesRelationsSpecific($event, $allIds);
-}
+	/* If people were chosen, process the random input
+	 */
+	if (isset($_POST['selected']) && strlen($_POST['selected'])) {
 
-$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());
+		/* Convert commas to whitespace
+		 */
+		$items = preg_replace('/,/', ' ', $_POST['selected']);
+
+		/* Condense multiple whitespaces
+		 */
+		$items = preg_replace('/\s+/', ' ', $items);
+
+		/* Snap them out into individuals
+		 */
+		$allComponents = explode(' ', $items);
+
+		/* Spawn mapper
+		 */
+		$userMapper = new \Schoolbox\UserMapper();
+
+		foreach($allComponents as $currentComponent) {
+
+			/* Numerics are assumed as schoolbox user ids and can go into
+			 * the stack straightaway
+			 */
+			if (is_numeric($currentComponent)) {
+				$allIds[] = $currentComponent;
+			}
+			/* Otherwise they are assumed to be usernames
+			 */
+			else {
+				try {
+					$user = $userMapper->findOneByColumn('username', $currentComponent);
+					$allIds[] = $user->getId();
+				}
+				catch (\Exception $e) {
+				}
+			}
+		}
+
+		$eventMapper->addStudentAttendeesRelationsSpecific($event, $allIds);
+	}
+
+	$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());
+}
+else {
+	error(19);
+}

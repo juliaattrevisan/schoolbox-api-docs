@@ -107,15 +107,29 @@
 
 <div class='clearfix'></div>
 
-<h2>Current status</h2>
+<h2>Current Status</h2>
 <table class="standardForm">
 	<tbody>
-	<tr>
-		<td>{EVENT_STATUS}</td>
-	</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Current Status</h4>
+			</td>
+			<td>
+				{EVENT_STATUS}
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Comment</h4>
+			</td>
+			<td>
+				{EVENT_COMMENT}
+			</td>
+		</tr>
 	</tbody>
 </table>
 
+<!-- BEGIN has_change_event_status -->
 <h2>Change Event Status</h2>
 <form action="/modules/eotc/status/modifyForm.php" method="post">
 	<input name='eventId' type="hidden" value="{EVENT_ID}">
@@ -149,3 +163,6 @@
 
 	<input class='submit-btn-plain' type="submit" value="Update" />
 </form>
+<!-- END has_change_event_status -->
+
+<a href="/modules/eotc/review" class="btn go-to"><span></span>Back to Review EOTC Events</a>

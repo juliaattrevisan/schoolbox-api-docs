@@ -7,37 +7,43 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+$authenticator = new \EOTC\Authenticator();
 
-$eventMapper = new \EOTC\EventMapper();
+if ($authenticator->isEOTCCreator($_SESSION['user'])) {
+	$eventMapper = new \EOTC\EventMapper();
 
-try {
-	$event = $eventMapper->findById($_POST['eventId']);
-}
-catch (\Exception $e) {
-	error(160);
-}
-
-/* If a course code was provided, find all the students in it
- */
-if (strlen($_POST['courseCode'])) {
-	$externalHandler = new \External_Synergetic_Class();
-	$allStudents = $externalHandler->getStudents($_POST['courseCode']);
-
-	if (is_array($allStudents) && count($allStudents)) {
-		$userMapper = new \Schoolbox\UserMapper();
-		$ids = array();
-
-		foreach($allStudents as $currentStudent) {
-			try {
-				$user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
-				$ids[] = $user->getId();
-			}
-			catch (\Exception $e) {
-			}
-		}
-
-		$eventMapper->addStudentAttendeesRelationsSpecific($event, $ids);
+	try {
+		$event = $eventMapper->findById($_POST['eventId']);
 	}
-}
+	catch (\Exception $e) {
+		error(160);
+	}
 
-$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());
+	/* If a course code was provided, find all the students in it
+	 */
+	if (strlen($_POST['courseCode'])) {
+		$externalHandler = new \External_Synergetic_Class();
+		$allStudents = $externalHandler->getStudents($_POST['courseCode']);
+
+		if (is_array($allStudents) && count($allStudents)) {
+			$userMapper = new \Schoolbox\UserMapper();
+			$ids = array();
+
+			foreach($allStudents as $currentStudent) {
+				try {
+					$user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
+					$ids[] = $user->getId();
+				}
+				catch (\Exception $e) {
+				}
+			}
+
+			$eventMapper->addStudentAttendeesRelationsSpecific($event, $ids);
+		}
+	}
+
+	$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());
+}
+else {
+	error(19);
+}

@@ -8,6 +8,14 @@
  * @version     SVN: $Id$
  */
 
+/* Only EOTC Administrators can view this page
+ */
+$authenticator = new \EOTC\Authenticator();
+
+if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
+	error(19);
+}
+
 $this->setFile(TEMPLATE_content, 'modules/eotc/review.html');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
@@ -19,7 +27,7 @@ $this->setVar(array(
 $eventMapper = new \EOTC\EventMapper();
 $allListGroups = $eventMapper->findAllByListGroups();
 
-/* using foreach() won't increment the $position, which I use to get the name
+/* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
  */
 for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) {
@@ -30,23 +38,36 @@ for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) 
 			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName()
 		));
 
-		foreach ($currentListGroup as $currentEvent) {
-			$this->setVar(array(
-				'EVENT_ID' => $currentEvent->getId(),
-				'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),
-				'EVENT_NOTE' => $currentEvent->getNote(),
-				'EVENT_START_DATETIME' => $currentEvent->getStartDatetime()->getShort(),
-				'EVENT_TEACHER_IN_CHARGE_ID' => $currentEvent->getTeacherInCharge()->getId(),
-				'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
-				'EVENT_CREATED_AT' => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
-				'EVENT_STUDENTS' => $currentEvent->getStudentAttendees()->count(),
-				'EVENT_RAMS_REQUIRED' => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
-			));
+		$i = 0;
 
-			$this->parse('event_block', 'event', true);
+		foreach ($currentListGroup as $currentEvent) {
+
+			/* Only list events you can manipulate
+			 */
+			if ($authenticator->canPromote($_SESSION['user'], $currentEvent)) {
+				$this->setVar(array(
+					'EVENT_ID' => $currentEvent->getId(),
+					'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),
+					'EVENT_NOTE' => $currentEvent->getNote(),
+					'EVENT_START_DATETIME' => $currentEvent->getStartDatetime()->getShort(),
+					'EVENT_TEACHER_IN_CHARGE_ID' => $currentEvent->getTeacherInCharge()->getId(),
+					'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
+					'EVENT_CREATED_AT' => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
+					'EVENT_STUDENTS' => $currentEvent->getStudentAttendees()->count(),
+					'EVENT_RAMS_REQUIRED' => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
+				));
+
+				$this->parse('event_block', 'event', true);
+
+				$i++;
+			}
 		}
 
-		$this->parse('event_list_group_block', 'event_list_group', true);
+		/* Only parse if an event you can manipulate was found
+		 */
+		if ($i) {
+			$this->parse('event_list_group_block', 'event_list_group', true);
+		}
 
 		/* Clear children after parsing out the parent
 		 */

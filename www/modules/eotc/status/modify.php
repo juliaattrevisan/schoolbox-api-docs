@@ -7,6 +7,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/* Only EOTC Administrators can view this page
+ */
+$authenticator = new \EOTC\Authenticator();
+
+if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
+	error(19);
+}
+
 $mapper = new \EOTC\EventMapper();
 
 try {
@@ -23,7 +32,8 @@ $this->setBlock(TEMPLATE_content, 'event_student', 'event_student_block');
 $this->setBlock(TEMPLATE_content, 'has_rams', 'has_rams_block');
 $this->setBlock(TEMPLATE_content, 'has_event_activity_log', 'has_event_activity_log_block');
 $this->setBlock('has_event_activity_log', 'event_activity_log', 'event_activity_log_block');
-$this->setBlock(TEMPLATE_content, 'event_status', 'event_status_block');
+$this->setBlock(TEMPLATE_content, 'has_change_event_status', 'has_change_event_status_block');
+$this->setBlock('has_change_event_status', 'event_status', 'event_status_block');
 $this->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
 
 $this->setVar(array(
@@ -183,32 +193,59 @@ if ($i) {
 	$this->parse('has_event_activity_log_block', 'has_event_activity_log');
 }
 
-/* Status Dropdown
- * Limited to the current status and the next one
+/* Status section
+ *
+ * If you don't have permissions to the status of the event, you don't get
+ * access to this section anymore
  */
-$eventStatusMapper = new \EOTC\EventStatusMapper();
-$allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
-
-foreach($allEventStatus as $currentStatus) {
-	$this->setVar(array(
-		'EVENT_STATUS_ID' => $currentStatus->getId(),
-		'EVENT_STATUS_NAME' => $currentStatus->getName(),
-		'EVENT_STATUS_SELECTED' => '',
-	));
-
-	/* Preselect
-	 */
-	if ($currentStatus->getId() == $event->getMetadata()->getStatus()->getId()) {
-		$this->setVar(array(
-			'EVENT_STATUS_SELECTED' => 'selected="selected"',
-		));
-	}
-
-	$this->parse('event_status_block', 'event_status', true);
-}
 
 /* Status Comment
  */
 $this->setVar(array(
 	'EVENT_COMMENT' => $event->getMetadata()->getComment(),
 ));
+
+if ($authenticator->canPromote($_SESSION['user'], $event)) {
+	$eventStatusMapper = new \EOTC\EventStatusMapper();
+
+	/* Soops have access to all statuses
+	 */
+	if ($_SESSION['user']->isSuperuser()) {
+		$allEventStatus = $eventStatusMapper->findAll();
+	}
+	else {
+		$allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
+	}
+
+	/* Status Dropdown
+	 *
+	 * Limited to the current status and the next one
+	 *
+	 * Limited also by user's ability to set that status, as defined
+	 * in the EOTC permissions
+	 */
+	foreach($allEventStatus as $currentStatus) {
+		$this->setVar(array(
+			'EVENT_STATUS_ID' => $currentStatus->getId(),
+			'EVENT_STATUS_NAME' => $currentStatus->getName(),
+			'EVENT_STATUS_SELECTED' => '',
+		));
+
+		/* Preselect
+		 */
+		if ($currentStatus->getId() == $event->getMetadata()->getStatus()->getId()) {
+			$this->setVar(array(
+				'EVENT_STATUS_SELECTED' => 'selected="selected"',
+			));
+		}
+
+		$this->parse('event_status_block', 'event_status', true);
+	}
+
+	$this->parse('has_change_event_status_block', 'has_change_event_status');
+}
+else {
+	$this->setVar(array(
+		'has_change_event_status_block' => ''
+	));
+}

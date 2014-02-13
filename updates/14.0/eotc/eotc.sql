@@ -16,8 +16,9 @@ ALTER TABLE `eotc_metadata` CHANGE `notes` `comment` TEXT CHARSET utf8 COLLATE u
 CREATE TABLE `eotc_status`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), PRIMARY KEY (`id`) );
 INSERT INTO `eotc_status` (`name`) VALUES ('Draft');
 INSERT INTO `eotc_status` (`name`) VALUES ('In Principle'); 
-INSERT INTO `eotc_status` (`name`) VALUES ('RAMS Approved'); 
+INSERT INTO `eotc_status` (`name`) VALUES ('RAMS Approval');
 INSERT INTO `eotc_status` (`name`) VALUES ('Final Approval'); 
+INSERT INTO `eotc_status` (`name`) VALUES ('Approved');
 INSERT INTO `eotc_status` (`name`) VALUES ('Rejected');
 
 /* Clone out the event table
@@ -60,3 +61,6 @@ INSERT INTO `error` (`id`, `message`) VALUES ('161', 'Please upload a RAMS file.
 CREATE TABLE `eotc_activitylog`( `id` INT(11) AUTO_INCREMENT, `actioner_id` INT(11), `event_id` INT(11), `message` TEXT, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, KEY(`id`) );
 ALTER TABLE `eotc_activitylog` CHANGE `event_id` `metadata_id` INT(11) NULL;
 
+/* Permissions
+ */
+CREATE TABLE `eotc_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `user_id` INT(11), `campus_id` INT(11), `status_id` INT(11), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
