@@ -276,12 +276,19 @@ class Scheduler {
 			}
 		};
 
+		// an explicitly null interval is a request to unset that trigger (regardless of whether or not it exists)
+		if(is_null($interval)) {
+			$this->unschedule($module, $label, $model);
+			return;
+		}
+
 		// publish and return immediately if the event is now or in the past
 		if($interval <= ModuleNotifierInterface::IMMEDIATELY) {
 			$publish(null);
 			return;
 		}
 
+		// schedule the future event
 		$this->schedule($module, $label, $model, $interval, $publish);
 
 	}
@@ -298,14 +305,20 @@ class Scheduler {
 	 */
 	protected function schedule($module, $label, $model, $interval, $publish) {
 		// if a timer has already been set for this event on this object, we need to cancel the old and set the new
-		if($timer = $this->getTimer($module, $label, $model)) {
-			$this->loop->cancelTimer($timer);
-		}
+		$this->unschedule($module, $label, $model);
 
 		// register our timer
 		$timer = $this->loop->addTimer($interval, $publish);
 		$this->timers[$module][$label][$this->hashModel($model)] = $timer;
 
+	}
+
+	protected function unschedule($module, $label, $model) {
+		if($timer = $this->getTimer($module, $label, $model)) {
+			$this->loop->cancelTimer($timer);
+			return true;
+		}
+		return false;
 	}
 
 
