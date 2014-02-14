@@ -71,7 +71,7 @@ class Authenticator {
 		}
 		else {
 			$groupHandler = new \Group();
-			$permission = $groupHandler->getPermission($this->getInstance()->getIdentifier());
+			$permission = $groupHandler->getPermission($this->getNewPost()->getHomepageId());
 		}
 
 		return $permission;
