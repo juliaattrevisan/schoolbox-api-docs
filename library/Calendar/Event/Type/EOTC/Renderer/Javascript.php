@@ -21,12 +21,14 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 
 			/* Events not in Approved state appear translucent
 			 */
-//			if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
-//				$cssClass = 'translucent';
-//			}
-//			else {
-//				$cssClass = '';
-//			}
+			$customSettings = $currentEvent->getCustom();
+
+			if ($customSettings['approved']) {
+				$cssClass = '';
+			}
+			else {
+				$cssClass = 'translucent';
+			}
 
 			/* Modify link. Should be templated...
 			 */
