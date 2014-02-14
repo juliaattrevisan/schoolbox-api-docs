@@ -91,43 +91,79 @@ class EventConnector extends EventMapper {
 				$campusIds[] = $currentCampus->getId();
 			}
 
-			/* Translate an \EOTC\Event type into a
-			 * Calendar_Event_Type_Abstract type
+			/* Only present this event for a particular user if they are
+			 * superuser or attendee (teacher in charge, staff, student)
 			 */
-			$event = new \Calendar_Event_Type_EOTC();
-			$event->setAuthorName($eventItem->getAuthor()->getFullname());
-			$event->setAuthorId($eventItem->getAuthor()->getId());
-			$event->setEventId($eventItem->getId());
-			$event->setStartTime($eventItem->getStartDateTime());
-			$event->setEndTime($eventItem->getEndDateTime());
-			$event->setCampusList(implode(',', $campusIds));
+			$isAttendee = false;
 
-			/* EOTC Events are always of the type "EOTC" for usage
-			 * in calendar filters
-			 */
-			$event->setType($eventItem->getEventType()->getId());
-			$event->setNote($eventItem->getNote());
-			$event->setAccess($eventItem->getAccess());
-			$event->setEventType($eventItem->getEventType()->getType());
-			$event->setColour($eventItem->getEventType()->getColor());
-			$event->setDetail($eventItem->getDetail());
-			$event->setLocation($eventItem->getLocation());
-			$event->setAllDay(0);
-
-			/* If you have write access to the event. Only superusers
-			 * and authors can modify an event
-			 */
-			if ($_SESSION['user']->isSuperuser() || $_SESSION['user']->getId() == $event->getAuthorId()) {
-				$event->setIsEditable(true);
-			}
-			else {
-				$event->setIsEditable(false);
+			if (!$isAttendee) {
+				if ($user->isSuperuser()) {
+					$isAttendee = true;
+				}
 			}
 
-			$event->setAttendance(0);
-			$event->setCompleted(0);
+			if (!$isAttendee) {
+				$isAttendee = $user->getId() == $eventItem->getTeacherInCharge()->getId();
+			}
 
-			$collection->add($event);
+			if (!$isAttendee) {
+				foreach($eventItem->getStaffAttendees() as $currentStaff) {
+					if ($currentStaff->getId() == $user->getId()) {
+						$isAttendee = true;
+						break;
+					}
+				}
+			}
+
+			if (!$isAttendee) {
+				foreach($eventItem->getStudentAttendees() as $currentStudent) {
+					if ($currentStudent->getId() == $user->getId()) {
+						$isAttendee = true;
+						break;
+					}
+				}
+			}
+
+			if ($isAttendee) {
+
+				/* Translate an \EOTC\Event type into a
+				 * Calendar_Event_Type_Abstract type
+				 */
+				$event = new \Calendar_Event_Type_EOTC();
+				$event->setAuthorName($eventItem->getAuthor()->getFullname());
+				$event->setAuthorId($eventItem->getAuthor()->getId());
+				$event->setEventId($eventItem->getId());
+				$event->setStartTime($eventItem->getStartDateTime());
+				$event->setEndTime($eventItem->getEndDateTime());
+				$event->setCampusList(implode(',', $campusIds));
+
+				/* EOTC Events are always of the type "EOTC" for usage
+				 * in calendar filters
+				 */
+				$event->setType($eventItem->getEventType()->getId());
+				$event->setNote($eventItem->getNote());
+				$event->setAccess($eventItem->getAccess());
+				$event->setEventType($eventItem->getEventType()->getType());
+				$event->setColour($eventItem->getEventType()->getColor());
+				$event->setDetail($eventItem->getDetail());
+				$event->setLocation($eventItem->getLocation());
+				$event->setAllDay(0);
+
+				/* If you have write access to the event. Only superusers
+				 * and authors can modify an event
+				 */
+				if ($_SESSION['user']->isSuperuser() || $_SESSION['user']->getId() == $event->getAuthorId()) {
+					$event->setIsEditable(true);
+				}
+				else {
+					$event->setIsEditable(false);
+				}
+
+				$event->setAttendance(0);
+				$event->setCompleted(0);
+
+				$collection->add($event);
+			}
 		}
 
 		return $collection;
