@@ -107,6 +107,7 @@ class AttemptMapper extends Mapper {
 			SELECT
 				aa.attempt_id,
 				aa.assess_id,
+				aa.start,
 				a.weight,
 				SUM(ar.mark)  AS mark,
 				SUM(aq.marks) AS max_mark
