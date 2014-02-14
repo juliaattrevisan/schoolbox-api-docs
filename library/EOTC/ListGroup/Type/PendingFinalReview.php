@@ -18,7 +18,7 @@ class PendingFinalReview extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 5;
+	protected $nextStatusId = 4;
 
 	/**
 	 * Determine where to go next

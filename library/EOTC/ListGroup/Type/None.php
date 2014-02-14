@@ -28,7 +28,7 @@ class None {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 6;
+	protected $nextStatusId = 5;
 
 	/**
 	 * Determine where to go next
