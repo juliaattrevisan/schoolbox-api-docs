@@ -150,13 +150,14 @@
                     // append the list of messages
                     for(i = toInsert.length - 1; i >= 0; --i) {
                         id = toId[i];
-                        var body = toInsert[i];
+                        var data = toInsert[i];
 
-                        var status = body.status;
-                        var message = body.text;
-                        var timestamp = body.timestamp;
-                        var icon = body.icon;
-                        var href = body.href;
+                        var icon = data.body.icon;
+                        var href = data.body.href;
+
+                        var status = data.status;
+                        var message = applyTokens(data.body.body, data.params);
+                        var timestamp = data.timestamp;
 
                         var li = msgLiTpl.clone();
 
@@ -198,6 +199,22 @@
                         $(this).find('time').text(moment.unix(timestamp).fromNow());
                     }
                 });
+            }
+
+
+            /**
+             * @private
+             * @param string
+             * @param tokens
+             */
+            function applyTokens(string, tokens) {
+                $.each(tokens, function(token, value) {
+                    if(typeof value == 'object') {
+                        value = value[0];
+                    }
+                    string = string.replace(':'+token, '<b>'+value+'</b>');
+                });
+                return string;
             }
 
 

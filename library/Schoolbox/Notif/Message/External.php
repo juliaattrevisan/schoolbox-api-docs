@@ -102,8 +102,10 @@ class External implements MessageInterface {
 	 */
 	public function unserialize($serialized) {
 		$data = json_decode($serialized, true);
-		$this->body = new Message($data['body']['text'],$data['body']['icon'],$data['body']['href']);
+		$body = $data['body'];
+		$this->body = new Message($body['body'], $body['icon'], $body['href']);
 		$this->datetime = DateTime::createFromFormat('U', $data['timestamp']);
+		$this->params = $data['params'];
 
 		// cannot resend a message that has been received and unserialized
 		$this->severity = null;

@@ -67,14 +67,13 @@ foreach($msgsByDay as $day => $timestamps) {
 
 		foreach($messages as $message) {
 			/** @var \Schoolbox\Notif\Queue\AbstractMessage $message */
-			$body = $message->getBody();
 
 			$this->setVar(array(
-				'EVENT_BODY' => $body['text'],
-				'EVENT_HREF' => $body['href'],
+				'EVENT_BODY' => $message->getFormattedText(),
+				'EVENT_HREF' => $message->getHref(),
 				'EVENT_DARK' => ++$i % 2 ? '' : 'dark',
 				'EVENT_TIME' => date('g:ia', $message->getTimestamp()),
-				'EVENT_ICON'  => $body['icon']
+				'EVENT_ICON'  => $message->getIcon()
 			));
 			$this->parse('event_block', 'event', true);
 		}

@@ -3,10 +3,14 @@
   .day {
     margin-bottom: 24px;
   }
+  .event {
+    padding-left: 8px;
+  }
   .event a {
-    padding: 11px 16px;
-    color: #000;
     line-height: 36px;
+  }
+  .event a:hover {
+    text-decoration: underline;
   }
   .event time {
     color: #888;
@@ -15,9 +19,6 @@
   }
   .event span {
     margin-left: 8px;
-  }
-  .event a:hover {
-    text-decoration: none;
   }
   .event a:hover span {
     text-decoration: underline;
@@ -33,7 +34,6 @@
 
 </style>
 <!-- END custom_head -->
-
 <h1>Messages</h1>
 <!-- BEGIN days -->
 <ul class="days">
@@ -44,9 +44,9 @@
     <ul class="events">
       <!-- BEGIN event -->
       <li class="event {EVENT_DARK}">
-        <a href="{EVENT_HREF}">
           <img src="{EVENT_ICON}" alt="" width="24" height="24" />
           <span>{EVENT_BODY}</span>
+        <a href="{EVENT_HREF}">
           <time>{EVENT_TIME}</time>
         </a>
       </li>

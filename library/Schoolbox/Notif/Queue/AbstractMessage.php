@@ -71,6 +71,46 @@ abstract class AbstractMessage {
 		return $body;
 	}
 
+	public function getFormattedText() {
+		$data = $this->getBody();
+		$body = $data['body']['body'];
+		$params = $data['params'];
+
+		if(is_array($params)) {
+			foreach($params as $token => $value) {
+
+				// text and href
+				if(is_array($value) && count($value) == 2) {
+					$value = array_values($value);
+					$a = sprintf('<a href="%s">%s</a>', $value[1], $value[0]);
+				}
+				// just text
+				elseif(is_string($value)) {
+					$a = sprintf('<a>%s</a>', $value);
+				}
+				// nothing we recognise: skip dat!
+				else {
+					continue;
+				}
+
+				$match = ":$token";
+				$body = str_replace($match, $a, $body);
+			}
+		}
+
+		return $body;
+	}
+
+	public function getHref() {
+		$data = $this->getBody();
+		return $data['body']['href'];
+	}
+
+	public function getIcon() {
+		$data = $this->getBody();
+		return $data['body']['icon'];
+	}
+
 	/**
 	 * The AMQPMessage object that this class encapsulates.
 	 *
