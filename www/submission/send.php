@@ -42,7 +42,7 @@ if (is_numeric($_GET['id'])) {
 			|| $groupHandler->isParentOfChild($owner)
 			|| $groupHandler->isStaff()
 		)) {
-			error(44);
+        	error(44);
 		}
 
 		$file = $return->getFileLocation();
@@ -78,11 +78,26 @@ if (is_numeric($_GET['id'])) {
 
 		$subBox = $studentSub->getSubmissionBox();
 
-		/* Allow students to view their own submitted work
+
+        // Check if file has been published/showcased in the ePortfolio, if so anyone can download the file
+        $published = false;
+
+        try {
+            $showcase = Eportfolio\ShowcaseMapper::getInstance()->findOneByColumn('submission_box_id',$studentSub->getSubmissionBox()->getId());
+            $published = true;
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
+            $published = false;
+        }
+
+
+   		/* Allow students to view their own submitted work
 		 * Allow submission box owners to view submissions
+		 * Allow work that has been showcased to be viewed
 		 */
 		if (($studentSub->getOwner()->getId() != $_SESSION['id'])
-			&& ($subBox->getOwner()->getId() != $_SESSION['id'])
+			&& ($subBox->getOwner()->getId() != $_SESSION['id']
+            && !$published )
 		) {
 			error(44);
 		}
