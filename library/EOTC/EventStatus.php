@@ -64,7 +64,7 @@ class EventStatus {
 	 *
 	 * @return bool
 	 */
-	public function isRamsApproved() {
+	public function isRamsApproval() {
 		if ($this->getId() == 3) {
 			return true;
 		}
@@ -77,7 +77,7 @@ class EventStatus {
 	 *
 	 * @return bool
 	 */
-	public function isApproved() {
+	public function isFinalApproval() {
 		if ($this->getId() == 4) {
 			return true;
 		}
@@ -90,8 +90,21 @@ class EventStatus {
 	 *
 	 * @return bool
 	 */
-	public function isRejected() {
+	public function isApproved() {
 		if ($this->getId() == 5) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine whether this event is Final Approved
+	 *
+	 * @return bool
+	 */
+	public function isRejected() {
+		if ($this->getId() == 6) {
 			return true;
 		}
 

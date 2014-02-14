@@ -30,7 +30,7 @@ class PendingFinalReview extends Base {
 		/* If this requires RAMS and RAMS has been approved,
 		 * or if it doesn't require RAMS at all
 		 */
-		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isRamsApproved())) {
+		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isRamsApproval())) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalReviewIndex());
 		}
 		else if (!$this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
