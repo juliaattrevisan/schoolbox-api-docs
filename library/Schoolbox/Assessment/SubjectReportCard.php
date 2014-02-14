@@ -156,23 +156,16 @@ class SubjectReportCard {
 				function($grade) { return isset($grade['mark']); }
 			);
 			usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
-			$studentGrades = array_map(function($row) { return $row['mark']; }, $studentGrades);
 
-			$gradeAvg    = null;
-			$trendAmt    = null;
-			$grade_count = count($studentGrades);
-
-			// only calculate an average if there are any grades to use
-			if ($grade_count > 0) {
-				$gradeAvg = array_sum($studentGrades) / count($studentGrades);
-			}
+			$gradeAvg = $this->calculateAverageFromStudentGrades($studentGrades);
+			$trendAmt = null;
 
 			// if more than 1 assessment, can calculate trending
-			if ($grade_count > 1) {
+			if (count($studentGrades) > 1) {
 				// get previous average by removing most recent and recalculating
 				// (most recent is at head of studentGrades, not tail)
 				array_shift($studentGrades);
-				$prevAvg = array_sum($studentGrades) / count($studentGrades);
+				$prevAvg = $this->calculateAverageFromStudentGrades($studentGrades);
 				if($prevAvg != 0) {
 					$trendAmt = ($gradeAvg - $prevAvg) / $prevAvg * 100;
 				}
@@ -185,6 +178,27 @@ class SubjectReportCard {
 		}
 
 		return $this->_gradeAverage;
+	}
+
+	/**
+	 * Calculates a grade average for this set of grades. This calculation
+	 * respects weighting of each mark.
+	 *
+	 * @param  array $studentGrades
+	 * @return float The grade average, or null if there is no average.
+	 */
+	protected function calculateAverageFromStudentGrades($studentGrades) {
+		$average     = null;
+		$totalWeight = 0;
+		foreach ($studentGrades as $grade) {
+			$totalWeight += $grade['weight'];
+		}
+		if ($totalWeight) {
+			foreach ($studentGrades as $grade) {
+				$average += $grade['mark'] * $grade['weight'] / $totalWeight;
+			}
+		}
+		return $average;
 	}
 
 	public function getUserHistory() {
