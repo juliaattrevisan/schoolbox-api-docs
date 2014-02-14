@@ -122,7 +122,6 @@
                         data.date = calendarDate(calEvent.start)
                     }
 
-
                     // end time
                     if (calEvent.end != null) {
                         data.date += " &ndash; "
@@ -136,8 +135,14 @@
 
                     // Links to Modify Screen
                     if (calEvent.editable == true) {
-                        data.modifyLink = '<a class="btn modify float-right" href="/calendar/modify.php?eventID='
-                                        + calEvent.data.meta.eventId + '&returnTo=week"><span></span>Modify</a>'
+						if (calEvent.data.customModifyLink != undefined && calEvent.data.customModifyLink.length) {
+							var url = calEvent.data.customModifyLink;
+						}
+						else {
+							var url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=week';
+						}
+
+						data.modifyLink = '<a class="btn modify float-right" href="' + url + '"><span></span>Modify</a>';
                     }
                     else {
                         data.modifyLink = '';
