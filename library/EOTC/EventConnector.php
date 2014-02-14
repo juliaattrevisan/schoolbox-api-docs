@@ -15,7 +15,7 @@ class EventConnector extends EventMapper {
 
 	/**
 	 * Get events within a particular time span
-	 * 
+	 *
 	 * @param $user
 	 * @param $startTimestamp
 	 * @param $endTimestamp
