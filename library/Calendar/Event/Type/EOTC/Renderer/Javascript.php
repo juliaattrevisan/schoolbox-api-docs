@@ -114,7 +114,9 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 						'requestButton' => false,
 						'listButton' => false,
 					),
-					'customModifyLink' => '/modules/eotc/manage/modify.php?eventID=' . $currentEvent->getEventId()
+					'custom' => array(
+						'modifyLink' => '/modules/eotc/manage/modify.php?eventID=' . $currentEvent->getEventId(),
+					)
 				)
 			);
 

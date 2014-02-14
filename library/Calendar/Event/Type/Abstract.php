@@ -78,11 +78,11 @@ abstract class Calendar_Event_Type_Abstract {
 	protected $publishDate = null;
 
 	/**
-	 * A custom modify link, for frontend
+	 * A generic variable for custom stuff
 	 *
 	 * @var string
 	 */
-	protected $customModifyLink = '';
+	protected $custom = array();
 
 	/**
 	 * Is this an all day event?
@@ -624,20 +624,20 @@ abstract class Calendar_Event_Type_Abstract {
 	}
 
 	/**
-	 * Set custom modify link
+	 * Set custom
 	 *
-	 * @param string $customModifyLink
+	 * @param string $custom
 	 */
-	public function setCustomModifyLink($customModifyLink) {
-		$this->customModifyLink = $customModifyLink;
+	public function setCustom($custom) {
+		$this->custom = $custom;
 	}
 
 	/**
-	 * Get custom modify link
+	 * Get custom
 	 *
 	 * @return string
 	 */
-	public function getCustomModifyLink() {
-		return $this->customModifyLink;
+	public function getCustom() {
+		return $this->custom;
 	}
 }

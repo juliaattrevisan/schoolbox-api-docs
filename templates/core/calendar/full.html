@@ -135,8 +135,8 @@
 
                     // Links to Modify Screen
                     if (calEvent.editable == true) {
-						if (calEvent.data.customModifyLink != undefined && calEvent.data.customModifyLink.length) {
-							var url = calEvent.data.customModifyLink;
+						if ((calEvent.data.custom != undefined) && (calEvent.data.custom.modifyLink != undefined) && (calEvent.data.custom.modifyLink.length)) {
+							var url = calEvent.data.custom.modifyLink;
 						}
 						else {
 							var url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=week';
