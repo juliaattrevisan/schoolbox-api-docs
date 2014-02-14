@@ -143,48 +143,51 @@ if (is_numeric($_REQUEST['cid'])) {
 
         /** @var Component_Instance $instance */
         $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
-        $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
-        $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
-            'component_definition_id', $instance->getDefinitionId()
-        );
+        if(is_object($instance)) {
+            $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
-        unset($config['cid'], $config['type'], $config['component']);
+            $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
+                'component_definition_id', $instance->getDefinitionId()
+            );
 
-        // Create a controller object for the config class to use when
-        // dehydrating config values into database
-        $cclass = $instance->getDefinition()->getClass();
-        /** @var Component_ControllerAbstract $controller */
-        $controller = new $cclass($instance, new \Schoolbox\User(), $page);
-        $controller->execute();
+            unset($config['cid'], $config['type'], $config['component']);
 
-        /** @var Component_ConfigDefinition $confD */
-        foreach ($configDefinitionCollection as $confD) {
-            $key = $confD->getKey();
-            if (isset($config[$key])) {
+            // Create a controller object for the config class to use when
+            // dehydrating config values into database
+            $cclass = $instance->getDefinition()->getClass();
+            /** @var Component_ControllerAbstract $controller */
+            $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+            $controller->execute();
 
-                $configItem = Component_Config_Factory::build($key, $category, $config);
-                $value = $configItem->dehydrate($config[$key], $controller);
+            /** @var Component_ConfigDefinition $confD */
+            foreach ($configDefinitionCollection as $confD) {
+                $key = $confD->getKey();
+                if (isset($config[$key])) {
 
-                // this should be 1:1 relation, so return only the first instance of this definition
-                /** @var Component_Config $confI */
-                $confI = $componentConfigInstanceMapper->findByColumnList(array(
-                    'component_config_definition_id' => $confD->getId(),
-                    'component_instance_id'          => $instance->getId()
-                ))->first();
-                if (!($confI instanceof Component_Config)) {
-                    $confI = new Component_Config();
+                    $configItem = Component_Config_Factory::build($key, $category, $config);
+                    $value = $configItem->dehydrate($config[$key], $controller);
+
+                    // this should be 1:1 relation, so return only the first instance of this definition
+                    /** @var Component_Config $confI */
+                    $confI = $componentConfigInstanceMapper->findByColumnList(array(
+                        'component_config_definition_id' => $confD->getId(),
+                        'component_instance_id'          => $instance->getId()
+                    ))->first();
+                    if (!($confI instanceof Component_Config)) {
+                        $confI = new Component_Config();
+                    }
+
+                    if(!($confI->getId())) {
+                        $confI = new Component_Config();
+                        $confI->setConfigDefinitionId($confD->getId());
+                        $confI->setInstanceId($instance->getId());
+                    }
+                    $confI->setValue($value);
+
+                    $componentConfigInstanceMapper->save($confI);
+
                 }
-
-                if(!($confI->getId())) {
-                    $confI = new Component_Config();
-                    $confI->setConfigDefinitionId($confD->getId());
-                    $confI->setInstanceId($instance->getId());
-                }
-                $confI->setValue($value);
-
-                $componentConfigInstanceMapper->save($confI);
-
             }
         }
         SitePage::localRedir("/homepage/" . $_GET['cid']);
