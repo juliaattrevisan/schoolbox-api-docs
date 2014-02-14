@@ -23,7 +23,7 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 			 */
 			$customSettings = $currentEvent->getCustom();
 
-			if ($customSettings['approved']) {
+			if ($customSettings['approved'])  {
 				$cssClass = '';
 			}
 			else {
