@@ -257,7 +257,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 	/* Event Types
 	 */
-	$calendarEventTypeMapper = new \EOTC\Calendar\EventTypeMapper();
+	$calendarEventTypeMapper = new \EOTC\EventTypeMapper();
 	$allEventTypes = $calendarEventTypeMapper->findAll();
 
 	$page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, array(

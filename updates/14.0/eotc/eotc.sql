@@ -64,3 +64,7 @@ ALTER TABLE `eotc_activitylog` CHANGE `event_id` `metadata_id` INT(11) NULL;
 /* Permissions
  */
 CREATE TABLE `eotc_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `user_id` INT(11), `campus_id` INT(11), `status_id` INT(11), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
+
+/* EOTC Event Colour
+ */
+INSERT INTO `luEventType` (`eventType`, `eventColour`) VALUES ('EOTC', 'aaaaaa');
