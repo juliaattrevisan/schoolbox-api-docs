@@ -13,7 +13,11 @@ class Synchronise_Synergetic_Fintona_Strategy_Staff extends Synchronise_Base_Str
     protected function setup() {
         $this->verbose_filter = new Synchronise_Synergetic_Fintona_Verbose();
         $this
+            ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
+            ->addHydrator(new Synchronise_Base_Hydrator_AllCampus())
+            ->addHydrator(new Synchronise_Base_Hydrator_Staff_UsernameFromEmail())
+            ->addHydrator(new Synchronise_Synergetic_Fintona_Hydrator_Group_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
