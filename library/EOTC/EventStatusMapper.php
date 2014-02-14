@@ -25,7 +25,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	 *
 	 * @var int
 	 */
-	private $rejectedStatusId = 6;
+	private $rejectedStatusId = 5;
 
 	/**
 	 * Mapping
