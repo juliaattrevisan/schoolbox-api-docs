@@ -109,16 +109,30 @@ class EventConnector extends EventMapper {
 			 */
 			$isAttendee = false;
 
+			/* Superusers can always see it
+			 */
 			if (!$isAttendee) {
 				if ($user->isSuperuser()) {
 					$isAttendee = true;
 				}
 			}
 
+			/* Creators can always see it
+			 */
+			if (!$isAttendee) {
+				if ($eventItem->getAuthor()->getId() == $user->getId()) {
+					$isAttendee = true;
+				}
+			}
+
+			/* Teachers in Charge should see it in translucent form
+			 */
 			if (!$isAttendee) {
 				$isAttendee = $user->getId() == $eventItem->getTeacherInCharge()->getId();
 			}
 
+			/* Staff members should see it in translucent form
+			 */
 			if (!$isAttendee) {
 				foreach($eventItem->getStaffAttendees() as $currentStaff) {
 					if ($currentStaff->getId() == $user->getId()) {
@@ -128,11 +142,16 @@ class EventConnector extends EventMapper {
 				}
 			}
 
+			/* Students should only see this event if it's Approved and
+			 * if they are assigned to it as an attendee
+			 */
 			if (!$isAttendee) {
-				foreach($eventItem->getStudentAttendees() as $currentStudent) {
-					if ($currentStudent->getId() == $user->getId()) {
-						$isAttendee = true;
-						break;
+				if ($eventItem->getMetadata()->getStatus()->isApproved()) {
+					foreach($eventItem->getStudentAttendees() as $currentStudent) {
+						if ($currentStudent->getId() == $user->getId()) {
+							$isAttendee = true;
+							break;
+						}
 					}
 				}
 			}
