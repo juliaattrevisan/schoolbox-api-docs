@@ -170,6 +170,12 @@ class EventConnector extends EventMapper {
 				$event->setAttendance(0);
 				$event->setCompleted(0);
 
+				/* Custom data
+				 */
+				$event->setCustom(array(
+					'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
+				));
+
 				$collection->add($event);
 			}
 		}
