@@ -53,6 +53,11 @@ class EventConnector extends EventMapper {
 		foreach ($statement as $row) {
 			$eventItem = $this->hydrate($row, 'e');
 
+			/* Author
+			 */
+			$authorItem = $authorMapper->hydrate($row, 'a');
+			$eventItem->setAuthor($authorItem);
+
 			/* Teacher In Charge
 			 */
 			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
