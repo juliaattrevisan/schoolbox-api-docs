@@ -246,6 +246,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 					'mark'        => $mark,
 					'pretty_mark' => $pretty_mark,
 					'date'        => $row['returned'],
+					'weight'      => $row['weight'],
 				);
 			}
 		}

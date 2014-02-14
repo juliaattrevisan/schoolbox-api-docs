@@ -128,6 +128,7 @@ class AttemptMapper extends Mapper {
 					'mark'        => ($row['mark'] / $row['max_mark']) * 100,
 					'pretty_mark' => "{$row['mark']} / {$row['max_mark']}",
 					'date'        => $row['start'],
+					'weight'      => $row['weight'],
 				);
 			}
 		}
