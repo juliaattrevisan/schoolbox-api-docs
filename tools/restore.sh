@@ -279,8 +279,8 @@ restorepretty=`sed -n "$(echo $restoreoption)p" $sbrlp`;
 
 # Provide feedback for confirmation of what is to be done based on above questions.
 echo -e "\n $restorepretty";
-echo -e "\nIs this the correct option? (y/n): \c" && read confirm1;
-if [ $confirm != 'y' ];
+echo -e "\nIs this the correct option? (y/n): \c" && read confirm;
+if [ "$confirm" != "y" ];
 then
 	errmsg="Restore Cancelled";
 	error;
