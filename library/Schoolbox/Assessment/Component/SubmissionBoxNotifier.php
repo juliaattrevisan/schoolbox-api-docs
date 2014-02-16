@@ -104,22 +104,36 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		$events = array();
 
+		// events common to create and update
+		if($method == Mapper::METHOD_CREATE || $method == Mapper::METHOD_UPDATE) {
+			$events[self::TRIGGER_OVERDUE]  = $submissionBox->getDueDate();
+			$events[self::TRIGGER_UPCOMING] = $upcoming;
+			$events[self::TRIGGER_CLOSED]   = $submissionBox->getLateDate();
+		}
+
 		switch($method) {
 			case Mapper::METHOD_UPDATE:
 				$events[self::TRIGGER_UPDATED] = self::IMMEDIATELY;
-				// intentional fallthrough; no break
+
+				// if the submissionbox already opened, suppress open-on-update trigger
+				if($submissionBox->getOpenDate()->getUnixTimestamp() > time()) {
+					$events[self::TRIGGER_OPEN]     = $submissionBox->getOpenDate();
+				}
+
+				break;
 
 			case Mapper::METHOD_CREATE:
 				$events[self::TRIGGER_OPEN]     = $submissionBox->getOpenDate();
-				$events[self::TRIGGER_OVERDUE]  = $submissionBox->getDueDate();
-				$events[self::TRIGGER_UPCOMING] = $upcoming;
-				$events[self::TRIGGER_CLOSED]   = $submissionBox->getLateDate();
 				break;
 
 			case Mapper::METHOD_READ:
 				break;
 
 			case Mapper::METHOD_DELETE:
+				$events[self::TRIGGER_OPEN]     = null;
+				$events[self::TRIGGER_OVERDUE]  = null;
+				$events[self::TRIGGER_UPCOMING] = null;
+				$events[self::TRIGGER_CLOSED]   = null;
 				break;
 
 			default:
@@ -332,7 +346,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			$mCollection->bind($topic, Logger::WARNING, $msg, array(
 				'author' => array($authorName, "/search/user/$authorId"),
 				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-				'date' => $dateformat,
+				'date' => date($dateformat, $relative->getUnixTimestamp()),
 				'catname' => array($cat->getName(), "/homepage/$catId")
 			));
 
@@ -370,6 +384,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			$msg = new Message(":author updated :boxname in :catname", $icon, $href);
 
 			$mCollection->bind($this->topics->targetCategory($cat->getId()), Logger::NOTICE, $msg, array(
+				'author' => array($authorName, "/search/user/$authorId"),
 				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
 				'catname' => array($cat->getName(), "/homepage/$catId")
 			));
