@@ -68,11 +68,14 @@ foreach($msgsByDay as $day => $timestamps) {
 		foreach($messages as $message) {
 			/** @var \Schoolbox\Notif\Queue\AbstractMessage $message */
 
+			$tstamp = new Alaress_Date_Format($message->getTimestamp(), 'U');
+
 			$this->setVar(array(
 				'EVENT_BODY' => $message->getFormattedText(),
 				'EVENT_HREF' => $message->getHref(),
 				'EVENT_DARK' => ++$i % 2 ? '' : 'dark',
-				'EVENT_TIME' => date('g:ia', $message->getTimestamp()),
+				'EVENT_TIME' => date('g:ia', $tstamp->getUnixTimestamp()),
+				'EVENT_LONGTIME' => $tstamp->getLong(),
 				'EVENT_ICON'  => $message->getIcon()
 			));
 			$this->parse('event_block', 'event', true);

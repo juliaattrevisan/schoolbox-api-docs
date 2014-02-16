@@ -8,14 +8,10 @@
   }
   .event a {
     line-height: 36px;
+    text-decoration: none;
   }
-  .event a:hover {
+  .event a[href]:hover {
     text-decoration: underline;
-  }
-  .event time {
-    color: #888;
-    font-size: 0.85em;
-    margin-left: 4px;
   }
   .event span {
     margin-left: 8px;
@@ -31,6 +27,12 @@
     height: 24px;
     margin-bottom: -8px;
   }
+  .event a.time {
+    font-size: 0.85em;
+    margin: 0 16px 0 8px;
+    color: #888;
+
+  }
 
 </style>
 <!-- END custom_head -->
@@ -44,11 +46,11 @@
     <ul class="events">
       <!-- BEGIN event -->
       <li class="event {EVENT_DARK}">
-          <img src="{EVENT_ICON}" alt="" width="24" height="24" />
-          <span>{EVENT_BODY}</span>
-        <a href="{EVENT_HREF}">
-          <time>{EVENT_TIME}</time>
+        <a href="{EVENT_HREF}" class="time">
+          <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
         </a>
+        <img src="{EVENT_ICON}" alt="" width="24" height="24" />
+        <span>{EVENT_BODY}</span>
       </li>
       <!-- END event -->
     </ul>
