@@ -284,6 +284,7 @@ class Scheduler {
 
 		// publish and return immediately if the event is now or in the past
 		if($interval <= ModuleNotifierInterface::IMMEDIATELY) {
+			$this->verboser->v("Immediately firing trigger '$module::$label'");
 			$publish(null);
 			return;
 		}
@@ -311,10 +312,12 @@ class Scheduler {
 		$timer = $this->loop->addTimer($interval, $publish);
 		$this->timers[$module][$label][$this->hashModel($model)] = $timer;
 
+		$this->verboser->v("Scheduling trigger '$module::$label'", '+');
 	}
 
 	protected function unschedule($module, $label, $model) {
 		if($timer = $this->getTimer($module, $label, $model)) {
+			$this->verboser->v("Unscheduling trigger '$module::$label'", '-');
 			$this->loop->cancelTimer($timer);
 			return true;
 		}
