@@ -29,6 +29,12 @@
              * @private
              */
             function establishConnection() {
+
+                // put another element in!
+                $(self).append(
+                    $('<span/>').attr('id', 'msg-counter').attr('data-count', 0)
+                );
+
                 conn = new window[support](url);
                 conn.onopen = onOpen;
                 conn.onerror = onError;
@@ -183,6 +189,11 @@
                 }
 
                 $('#messages').replaceWith(newlist);
+
+                // update the counter (duplicate selector intentional)
+                var unreadTotal = $('#messages').children('li.unread').length;
+
+                $('#msg-counter').attr('data-count', unreadTotal).html(unreadTotal);
 
             }
 
