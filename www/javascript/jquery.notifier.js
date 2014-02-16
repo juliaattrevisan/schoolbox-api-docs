@@ -89,12 +89,21 @@
                     var ul = dom.closest('ul').append(ml);
 
                     // setup mark-as-read
-                    ml.delegate('a.pip', 'click', function(ev) {
-                        ev.stopPropagation();
-                        ev.stopImmediatePropagation();
-                        var msgId = $(this).closest('li.message').attr('id').split('-')[1];
-                        send({ack : msgId});
-                        return false;
+                    ml.delegate('a', 'click', function(ev) {
+
+                        var pip = $(this).hasClass('pip');
+                        var action = $(this).hasClass('action');
+
+                        if(pip || action) {
+                            var msgId = $(this).closest('li.message').attr('id').split('-')[1];
+                            send({ack : msgId});
+
+                            if(pip) {
+                                ev.stopPropagation();
+                                ev.stopImmediatePropagation();
+                                return false;
+                            }
+                        }
                     });
 
 
