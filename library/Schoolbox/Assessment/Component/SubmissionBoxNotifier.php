@@ -358,10 +358,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		// changed accepting online submissions
 		if(isset($diff['acceptOnline'])) {
 			if($submissionBox->getAcceptOnline()) {
-				$m = "You no longer need to submit online for :boxname in :catname";
+				$m = "You now need to submit online for :boxname in :catname";
 			}
 			else {
-				$m = "You now need to submit online for :boxname in :catname";
+				$m = "You no longer need to submit online for :boxname in :catname";
 			}
 
 			$msg = new Message($m, $icon, $href);
