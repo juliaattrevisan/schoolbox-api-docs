@@ -67,6 +67,7 @@ abstract class AbstractMessage {
 	 */
 	public function getBody() {
 		$body = json_decode($this->msg->body, true);
+		$body['timestamp'] = $this->getTimestamp();
 		$body['status'] = $this->isRead() ? 'read' : 'unread';
 		return $body;
 	}

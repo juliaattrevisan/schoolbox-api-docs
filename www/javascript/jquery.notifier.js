@@ -114,14 +114,12 @@
 
                 var newlist = $('<ul/>').attr('id', 'messages'),
                     toInsert = [],
-                    toId = [],
                     id;
 
                 for(id in messages) {
                     // insert into temp array
+                    messages[id].id = id;
                     toInsert.push(messages[id]);
-                    // TODO if an acknowledgement bug surfaces, these two arrays being misaligned is possible the cause
-                    toId.push(id);
                 }
 
                 toInsert.sort(function(a,b) {
@@ -149,8 +147,8 @@
                 if(toInsert.length > 0) {
                     // append the list of messages
                     for(i = toInsert.length - 1; i >= 0; --i) {
-                        id = toId[i];
                         var data = toInsert[i];
+                        id = data.id;
 
                         var icon = data.body.icon;
                         var href = data.body.href;
