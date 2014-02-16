@@ -266,8 +266,6 @@ cat $sbrlp;
 
 echo -e "\nOption: \c" && read restoreoption;
 
-echo "Your chosen option: $restoreoption";
-
 totaloptions=`wc -l $sbrl|cut -d' ' -f1`;
 if [ $restoreoption -gt $totaloptions ];
 then
@@ -276,6 +274,12 @@ then
 fi
 restore=`sed -n "$(echo $restoreoption)p" $sbrl`;
 restorepretty=`sed -n "$(echo $restoreoption)p" $sbrlp`;
+
+if [ -z $restore ];
+then
+	errmsg="That option does not exist";
+	error;
+fi
 
 # Provide feedback for confirmation of what is to be done based on above questions.
 echo -e "\n $restorepretty";
