@@ -266,9 +266,28 @@ cat $sbrlp;
 
 echo -e "\nOption: \c" && read restoreoption;
 
-echo "You chose option: $restoreoption";
-# Provide feedback for confirmation of what is to be done based on above questions.
+echo "Your chosen option: $restoreoption";
 
+totaloptions=`wc -l $sbrl|cut -d' ' -f1`;
+if [ $restoreoption -gt $totaloptions ];
+then
+	errmsg="Your selected option '$restoreoption' is not available";
+	error;
+fi
+restore=`sed -n "$(echo $restoreoption)p" $sbrl`;
+restorepretty=`sed -n "$(echo $restoreoption)p" $sbrlp`;
+
+# Provide feedback for confirmation of what is to be done based on above questions.
+echo -e "\n $restorepretty";
+echo -e "\nIs this the correct option? (y/n): \c" && read confirm1;
+if [ $confirm != 'y' ];
+then
+	errmsg="Restore Cancelled";
+	error;
+fi
+
+echo -e "\nWell you got this far. Congratulations!";
+echo -e "\nTODO - actually perform the restore";
 # Check if enough space available for the data file restore
 
 # Backup this installs database
