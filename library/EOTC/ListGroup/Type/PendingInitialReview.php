@@ -18,7 +18,7 @@ class PendingInitialReview extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 2;
+	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_INPRINCIPLE;
 
 	/**
 	 * Determine where to go next

@@ -39,7 +39,7 @@ class EventStatus {
 	 * @return bool
 	 */
 	public function isDraft() {
-		if ($this->getId() == 1) {
+		if ($this->getId() == EventStatusMapper::STATUS_DRAFT) {
 			return true;
 		}
 
@@ -52,7 +52,7 @@ class EventStatus {
 	 * @return bool
 	 */
 	public function isInPrinciple() {
-		if ($this->getId() == 2) {
+		if ($this->getId() == EventStatusMapper::STATUS_INPRINCIPLE) {
 			return true;
 		}
 
@@ -65,7 +65,7 @@ class EventStatus {
 	 * @return bool
 	 */
 	public function isRamsApproved() {
-		if ($this->getId() == 3) {
+		if ($this->getId() == EventStatusMapper::STATUS_RAMSAPPROVED) {
 			return true;
 		}
 
@@ -78,7 +78,7 @@ class EventStatus {
 	 * @return bool
 	 */
 	public function isApproved() {
-		if ($this->getId() == 4) {
+		if ($this->getId() == EventStatusMapper::STATUS_APPROVED) {
 			return true;
 		}
 
@@ -91,7 +91,7 @@ class EventStatus {
 	 * @return bool
 	 */
 	public function isRejected() {
-		if ($this->getId() == 5) {
+		if ($this->getId() == EventStatusMapper::STATUS_REJECTED) {
 			return true;
 		}
 

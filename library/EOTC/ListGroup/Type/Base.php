@@ -34,7 +34,7 @@ abstract class Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 2;
+	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_INPRINCIPLE;
 
 	/**
 	 * @param \EOTC\Event $event
