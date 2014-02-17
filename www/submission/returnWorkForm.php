@@ -136,10 +136,7 @@ function saveReturn($return, $rubric = null, $file = null) {
         // Is this outside of the update window? if so, create a new one.
         $return_time = $returned_work->getReturned();
         $window_ago  = new Alaress_Date_Format(time() - update_window, 'U');
-        if ($return_time->getUnixTimestamp() < $window_ago->getUnixTimestamp()) {
-            $returned_work = new ReturnedWork();
-        }
-        else {
+        if (!($return_time->getUnixTimestamp() < $window_ago->getUnixTimestamp())) {
             $update_existing = true;
         }
     }
@@ -152,11 +149,13 @@ function saveReturn($return, $rubric = null, $file = null) {
         ;
     }
     $returned_work
-        ->setComment($return['comment'])
         ->setMark($return['mark'])
         ->setMarker($_SESSION['user'])
         ->setNormalizedMark($return['norm_mark'])
     ;
+    if (isset($return['comment'])) {
+        $returned_work->setComment($return['comment']);
+    }
     // Is there a file? If so, upload it.
     if (!empty($file)) {
         $returned_work
@@ -165,7 +164,12 @@ function saveReturn($return, $rubric = null, $file = null) {
             ->loadFilesizeFromTempLocation();
         ;
     }
-    $return_mapper->save($returned_work);
+    if ($update_existing) {
+        $return_mapper->save($returned_work);
+    }
+    else {
+        $return_mapper->create($returned_work);
+    }
 
     // Rubrics have no mappers yet, so handle them the old-fashioned way.
     $return_id = $returned_work->getId();
