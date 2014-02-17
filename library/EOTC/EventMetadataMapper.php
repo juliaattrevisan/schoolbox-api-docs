@@ -118,4 +118,102 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 		$statement->execute();
 	}
+
+	/**
+	 * Assign files to an event
+	 *
+	 * @param $metadata
+	 */
+	public function createFiles($metadata) {
+		$query = "
+			INSERT IGNORE INTO `eotc_metadata_file` (metadata_id, storage_id)
+			VALUES (:metadataId, :storageId)
+		";
+
+		foreach ($metadata->getRamsFiles() as $currentFile) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->bindParam(":storageId", $currentFile->getId());
+			$statement->execute();
+		}
+	}
+
+
+	/**
+	 * Find files for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	public function findFiles($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_metadata_file',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'metadata_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'storage_id',
+					'key' => 'storage_id',
+					'mapper' => new \Schoolbox\StorageMapper()
+				),
+			));
+	}
+
+	/**
+	 * Deletes file relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $metadata
+	 * @return bool|void
+	 */
+	public function deleteFilesRelations($metadata) {
+		$query = "
+			DELETE FROM `eotc_metadata_file`
+			WHERE metadata_id = :metadataId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Many-many relation table, where $relationTable is a pseudo-mapping
+	 * of column names
+	 *
+	 * @param array $relationTableDefinition
+	 * @param array $join
+	 * @internal param array $selected
+	 * @return \Schoolbox\Collection
+	 */
+	public function manyManyRelation($relationTableDefinition = array(), $join = array()) {
+		$query = "
+			SELECT {$join['relation']['column']}
+			FROM `{$relationTableDefinition['name']}`
+			WHERE {$join['column']} = :value
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":value", $join['value']);
+		$statement->execute();
+
+		/* Find all the primary keys in the relation table and objectify
+		 * them into a collection
+		 */
+		$ids = array();
+
+		foreach ($statement as $row) {
+			$ids[] = $row[$join['relation']['column']];
+		}
+
+		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids, $join['relation']['options']);
+
+		return $allInstances;
+	}
 } 

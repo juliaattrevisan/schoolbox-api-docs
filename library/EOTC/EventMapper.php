@@ -184,7 +184,8 @@ class EventMapper extends Calendar\EventMapper {
 
 				/* Accumulate RAMS files for this event
 				 */
-				$eventItem->getMetadata()->setRamsFiles($this->findFiles($eventItem->getMetadata()->getId()));
+				$allFiles = $metadataMapper->findFiles($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setRamsFiles($allFiles);
 
 				/* Activity logs
 				 */
@@ -401,9 +402,9 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $event
 	 */
 	protected function postSave($event) {
-		$eventMetadataMapper = new EventMetadataMapper();
-		$eventMetadataMapper->save($event->getMetadata());
-		$eventMetadataMapper->saveRelation($event);
+		$metadataMapper = new EventMetadataMapper();
+		$metadataMapper->save($event->getMetadata());
+		$metadataMapper->saveRelation($event);
 
 		$this->deleteCampusRelations($event);
 		$this->createCampus($event);
@@ -414,8 +415,8 @@ class EventMapper extends Calendar\EventMapper {
 		$this->deleteStudentAttendeesRelations($event);
 		$this->createStudentAttendees($event);
 
-		$this->deleteFilesRelations($event);
-		$this->createFiles($event);
+		$metadataMapper->deleteFilesRelations($event->getMetadata());
+		$metadataMapper->createFiles($event->getMetadata());
 	}
 
 	/**
@@ -710,68 +711,7 @@ class EventMapper extends Calendar\EventMapper {
 		}
 	}
 
-	/**
-	 * Assign files to an event
-	 *
-	 * @param $event
-	 */
-	private function createFiles($event) {
-		$query = "
-			INSERT IGNORE INTO `eotc_metadata_file` (metadata_id, storage_id)
-			VALUES (:metadataId, :storageId)
-		";
 
-		foreach ($event->getMetadata()->getRamsFiles() as $currentFile) {
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":metadataId", $event->getMetadata()->getId());
-			$statement->bindParam(":storageId", $currentFile->getId());
-			$statement->execute();
-		}
-	}
-
-	/**
-	 * Find files for a particular event
-	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
-	 */
-	protected function findFiles($identifier) {
-		return $this->manyManyRelation(array(
-				'name' => 'eotc_metadata_file',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'metadata_id',
-				'value' => $identifier,
-
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'storage_id',
-					'key' => 'storage_id',
-					'mapper' => new \Schoolbox\StorageMapper()
-				),
-			));
-	}
-
-	/**
-	 * Deletes file relations if there are no remaining
-	 * events in the series
-	 *
-	 * @param $event
-	 * @return bool|void
-	 */
-	public function deleteFilesRelations($event) {
-		$query = "
-			DELETE FROM `eotc_metadata_file`
-			WHERE metadata_id = :metadataId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
-		$statement->execute();
-	}
 
 	/**
 	 * Many-many relation table, where $relationTable is a pseudo-mapping
