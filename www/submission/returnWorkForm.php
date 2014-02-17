@@ -219,9 +219,8 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         $errors[$e->getDisplayAs()] = $e;
     }
 
-    //
-    // Empty mark (not zero) - treat as null
-    if (trim($givenMark) === '') {
+    // Empty mark (not zero), or negative mark - treat as null
+    if (trim($givenMark) === '' || $givenMark < 0) {
         $mark['mark']      = null;
         $mark['norm_mark'] = null;
     }
