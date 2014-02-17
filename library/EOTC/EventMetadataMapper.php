@@ -146,7 +146,9 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * @return \Schoolbox\Collection
 	 */
 	public function findFiles($identifier) {
-		return $this->manyManyRelation(array(
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
 				'name' => 'eotc_metadata_file',
 			),
 			array(
@@ -162,7 +164,10 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 					'key' => 'storage_id',
 					'mapper' => new \Schoolbox\StorageMapper()
 				),
-			));
+			)
+		);
+
+		return $manyManyRelation->find();
 	}
 
 	/**
@@ -209,7 +214,9 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * @return \Schoolbox\Collection
 	 */
 	public function findStaffAttendees($identifier) {
-		return $this->manyManyRelation(array(
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
 				'name' => 'eotc_metadata_staff',
 			),
 			array(
@@ -225,7 +232,10 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 					'key' => 'id',
 					'mapper' => new \Schoolbox\UserMapper()
 				),
-			));
+			)
+		);
+
+		return $manyManyRelation->find();
 	}
 
 	/**
@@ -296,7 +306,9 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * @return \Schoolbox\Collection
 	 */
 	public function findStudentAttendees($identifier) {
-		return $this->manyManyRelation(array(
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
 				'name' => 'eotc_metadata_student',
 			),
 			array(
@@ -317,7 +329,10 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 						)
 					)
 				),
-			));
+			)
+		);
+
+		return $manyManyRelation->find();
 	}
 
 	/**
@@ -367,38 +382,4 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			$statement->execute();
 		}
 	}
-
-	/**
-	 * Many-many relation table, where $relationTable is a pseudo-mapping
-	 * of column names
-	 *
-	 * @param array $relationTableDefinition
-	 * @param array $join
-	 * @internal param array $selected
-	 * @return \Schoolbox\Collection
-	 */
-	public function manyManyRelation($relationTableDefinition = array(), $join = array()) {
-		$query = "
-			SELECT {$join['relation']['column']}
-			FROM `{$relationTableDefinition['name']}`
-			WHERE {$join['column']} = :value
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":value", $join['value']);
-		$statement->execute();
-
-		/* Find all the primary keys in the relation table and objectify
-		 * them into a collection
-		 */
-		$ids = array();
-
-		foreach ($statement as $row) {
-			$ids[] = $row[$join['relation']['column']];
-		}
-
-		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids, $join['relation']['options']);
-
-		return $allInstances;
-	}
-} 
+}

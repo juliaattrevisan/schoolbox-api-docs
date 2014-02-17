@@ -429,23 +429,28 @@ class EventMapper extends Calendar\EventMapper {
 	 * @return \Schoolbox\Collection
 	 */
 	protected function findMetadata($identifier) {
-		return $this->manyManyRelation(array(
-			'name' => 'eotc_event_metadata',
-		),
-		array(
-			/* Find things to join to this...
-			 */
-			'column' => 'event_id',
-			'value' => $identifier,
-
-			/* ...using this relation, such that column = key
-			 */
-			'relation' => array(
-				'column' => 'metadata_id',
-				'key' => 'id',
-				'mapper' => new EventMetadataMapper()
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_event_metadata',
 			),
-		));
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'metadata_id',
+					'key' => 'id',
+					'mapper' => new EventMetadataMapper()
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
 	}
 
 	/**
@@ -492,23 +497,28 @@ class EventMapper extends Calendar\EventMapper {
 	 * @return \Schoolbox\Collection
 	 */
 	protected function findCampuses($identifier) {
-		return $this->manyManyRelation(array(
-			'name' => 'eotc_event_campus',
-		),
-		array(
-			/* Find things to join to this...
-			 */
-			'column' => 'event_id',
-			'value' => $identifier,
-
-			/* ...using this relation, such that column = key
-			 */
-			'relation' => array(
-				'column' => 'campus_id',
-				'key' => 'id',
-				'mapper' => new \Schoolbox\CampusMapper()
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_event_campus',
 			),
-		));
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'campus_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\CampusMapper()
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
 	}
 
 	/**
@@ -527,39 +537,5 @@ class EventMapper extends Calendar\EventMapper {
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(":eventId", $event->getId());
 		$statement->execute();
-	}
-
-	/**
-	 * Many-many relation table, where $relationTable is a pseudo-mapping
-	 * of column names
-	 *
-	 * @param array $relationTableDefinition
-	 * @param array $join
-	 * @internal param array $selected
-	 * @return \Schoolbox\Collection
-	 */
-	public function manyManyRelation($relationTableDefinition = array(), $join = array()) {
-		$query = "
-			SELECT {$join['relation']['column']}
-			FROM `{$relationTableDefinition['name']}`
-			WHERE {$join['column']} = :value
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":value", $join['value']);
-		$statement->execute();
-
-		/* Find all the primary keys in the relation table and objectify
-		 * them into a collection
-		 */
-		$ids = array();
-
-		foreach ($statement as $row) {
-			$ids[] = $row[$join['relation']['column']];
-		}
-
-		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids, $join['relation']['options']);
-
-		return $allInstances;
 	}
 }
