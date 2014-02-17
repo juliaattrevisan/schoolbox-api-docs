@@ -57,7 +57,7 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
 	public function getEvent($eventId) {
 		$collection = $this->getCalendarHandler()->getEvent($eventId);
 
-		retyrn $collection;
+		return $collection;
 	}
 
 	/* Getters/Setters
