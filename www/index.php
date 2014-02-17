@@ -23,7 +23,10 @@ if ($route instanceof Aura\Router\Route) {
     $controller = $di->get('controller:'.$route->params['controller']);
     call_user_func(array($controller, $route->params['action']), $route->params);
 
-    $output = new Schoolbox\Web\Output\Base();
+    /** @var \Schoolbox\Web\Output\Base $output */
+    // Create a different output type (Sitepage, JSON, whatever) based on a
+    // route param
+    $output = $di->get('webOutput');
     $output->setResponse($controller->getResponse());
     $output->output();
     exit;

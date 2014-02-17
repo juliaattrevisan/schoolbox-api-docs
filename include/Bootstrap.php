@@ -56,6 +56,13 @@ $di->setters['Schoolbox\\Web\\Controller\\Base'] = array(
     }),
 );
 
+// inject web params
+//$di->params['SitePage']['login'] = false;
+$di->set('sitePage', $di->lazyNew('SitePage'));
+
+$di->setters['Schoolbox\\Web\\Output\\Sitepage']['setSitepage'] = $di->lazyGet('sitePage');
+$di->set('webOutput', $di->lazyNew('Schoolbox\\Web\\Output\\Sitepage'));
+
 //// inject Twig environment
 //$loader = new Twig_Loader_Filesystem($templatePaths);
 //$twig = new Twig_Environment($loader);
