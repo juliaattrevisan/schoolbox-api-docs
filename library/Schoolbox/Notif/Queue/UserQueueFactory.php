@@ -154,6 +154,7 @@ class UserQueueFactory {
 
 		// category bindings
 
+		// TODO REFACTOR: THIS METHOD TAKES ABOUT 400MS TO EXECUTE
 		$cats = $this->categoryMapper->findForUser($user);
 
 		foreach($cats as $cat) {
@@ -212,11 +213,21 @@ class UserQueueFactory {
 	 * Build the queue for the given User, including binding generation
 	 *
 	 * @param User|int $user
+	 * @param int $limit
+	 * @param bool $bind
 	 * @return UserQueue
 	 */
-	public function buildUserQueue($user) {
-		$q = $this->bindUserQueue($user);
-		$q->getMessages();
+	public function buildUserQueue($user, $limit = 10, $bind = true) {
+		if($bind) {
+			$q = $this->bindUserQueue($user);
+		}
+		else {
+			$q = new UserQueue(array('user' => array(
+				'username' => $user->getUsername(),
+				'id'       => $user->getId()
+			)), $this->mqConnector);
+		}
+		$q->getMessages($limit);
 		return $q;
 	}
 

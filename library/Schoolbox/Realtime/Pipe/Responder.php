@@ -171,9 +171,9 @@ class Responder extends EventEmitter {
 
 		// get a queue to retrieve read messages synchronously
 		$mqf = new UserQueueFactory();
-		$queue = $mqf->buildUserQueue($user);
+		$queue = $mqf->buildUserQueue($user, $count, false);
 
-		$allMessages = $queue->getMessages($count, true);
+		$allMessages = $queue->getMessages($count);
 		$unreadMessages = $this->subscriptionManager->getUserSubscription($user, true)->getMessages();
 
 		foreach($allMessages as $read) {
