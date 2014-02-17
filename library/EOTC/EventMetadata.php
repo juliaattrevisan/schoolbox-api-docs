@@ -56,6 +56,13 @@ class EventMetadata {
 	protected $activityLog = null;
 
 	/**
+	 * A Collection of User objects
+	 *
+	 * @var null
+	 */
+	protected $studentAttendees = null;
+
+	/**
 	 * A collection of brownhole files
 	 *
 	 * @var null
@@ -87,6 +94,7 @@ class EventMetadata {
 	 * Construtor
 	 */
 	public function __construct() {
+		$this->setStudentAttendees(new \Schoolbox\Collection());
 		$this->setRamsFiles(new \Schoolbox\Collection());
 	}
 
@@ -253,6 +261,24 @@ class EventMetadata {
 	 */
 	public function getActivityLog() {
 		return $this->activityLog;
+	}
+
+	/**
+	 * Set student attendees
+	 *
+	 * @param null $studentAttendees
+	 */
+	public function setStudentAttendees($studentAttendees) {
+		$this->studentAttendees = $studentAttendees;
+	}
+
+	/**
+	 * Get student attendees
+	 *
+	 * @return null
+	 */
+	public function getStudentAttendees() {
+		return $this->studentAttendees;
 	}
 
 	/**

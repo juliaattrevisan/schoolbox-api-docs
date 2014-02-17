@@ -30,7 +30,7 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
 			'EVENT_TEACHER_IN_CHARGE_ID' => $currentEvent->getTeacherInCharge()->getId(),
 			'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
 			'EVENT_CREATED_AT' => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
-			'EVENT_STUDENTS' => $currentEvent->getStudentAttendees()->count(),
+			'EVENT_STUDENTS' => $currentEvent->getMetadata()->getStudentAttendees()->count(),
 			'EVENT_RAMS_REQUIRED' => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
 		));
 

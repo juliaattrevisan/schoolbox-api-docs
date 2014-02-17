@@ -27,13 +27,6 @@ class Event extends Calendar\Event {
 	 *
 	 * @var null
 	 */
-	protected $studentAttendees = null;
-
-	/**
-	 * A Collection of User objects
-	 *
-	 * @var null
-	 */
 	protected $staffAttendees = null;
 
 	/**
@@ -49,7 +42,6 @@ class Event extends Calendar\Event {
 	 * Initialise collections all over the place
 	 */
 	protected function setup() {
-		$this->setStudentAttendees(new \Schoolbox\Collection());
 		$this->setStaffAttendees(new \Schoolbox\Collection());
 		$this->setMetadata(new \Schoolbox\Collection());
 	}
@@ -109,23 +101,5 @@ class Event extends Calendar\Event {
 	 */
 	public function getTeacherInCharge() {
 		return $this->teacherInCharge;
-	}
-
-	/**
-	 * Set student attendees
-	 *
-	 * @param null $studentAttendees
-	 */
-	public function setStudentAttendees($studentAttendees) {
-		$this->studentAttendees = $studentAttendees;
-	}
-
-	/**
-	 * Get student attendees
-	 *
-	 * @return null
-	 */
-	public function getStudentAttendees() {
-		return $this->studentAttendees;
 	}
 }

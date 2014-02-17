@@ -177,19 +177,18 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setStaffAttendees($this->findStaffAttendees($identifier));
 
-			/* Accumulate student attendees for this event
-			 */
-			$eventItem->setStudentAttendees($this->findStudentAttendees($identifier));
-
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
+				/* Accumulate student attendees for this event
+				 */
+				$eventItem->getMetadata()->setStudentAttendees($this->findStudentAttendees($eventItem->getMetadata()->getId()));
+
 				/* Accumulate RAMS files for this event
 				 */
-//				var_dump($this->findFiles($eventItem->getMetadata()->getId()));
 				$eventItem->getMetadata()->setRamsFiles($this->findFiles($eventItem->getMetadata()->getId()));
 
 				/* Activity logs
@@ -285,15 +284,15 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
 
-			/* Accumulate student attendees for this event
-			 */
-			$eventItem->setStudentAttendees($this->findStudentAttendees($eventItem->getId()));
-
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+
+				/* Accumulate student attendees for this event
+				 */
+				$eventItem->getMetadata()->setStudentAttendees($this->findStudentAttendees($eventItem->getMetadata()->getId()));
 			}
 
 			/* Assign it to an Event List Group
@@ -371,15 +370,15 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
 
-			/* Accumulate student attendees for this event
-			 */
-			$eventItem->setStudentAttendees($this->findStudentAttendees($eventItem->getId()));
-
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+
+				/* Accumulate student attendees for this event
+				 */
+				$eventItem->getMetadata()->setStudentAttendees($this->findStudentAttendees($eventItem->getMetadata()->getId()));
 			}
 
 			/* Only add the first in a series; ignore the others
@@ -601,13 +600,13 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	private function createStudentAttendees($event) {
 		$query = "
-			INSERT IGNORE INTO `eotc_event_student` (event_id, user_id)
-			VALUES (:eventId, :userId)
+			INSERT IGNORE INTO `eotc_metadata_student` (metadata_id, user_id)
+			VALUES (:metadataId, :userId)
 		";
 
 		foreach ($event->getStudentAttendees() as $currentStaff) {
 			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 			$statement->bindParam(":userId", $currentStaff->getId());
 			$statement->execute();
 		}
@@ -621,12 +620,12 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	protected function findStudentAttendees($identifier) {
 		return $this->manyManyRelation(array(
-			'name' => 'eotc_event_student',
+			'name' => 'eotc_metadata_student',
 		),
 		array(
 			/* Find things to join to this...
 			 */
-			'column' => 'event_id',
+			'column' => 'metadata_id',
 			'value' => $identifier,
 
 			/* ...using this relation, such that column = key
@@ -653,12 +652,12 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	public function deleteStudentAttendeesRelations($event) {
 		$query = "
-			DELETE FROM `eotc_event_student`
-			WHERE event_id = :eventId
+			DELETE FROM `eotc_metadata_student`
+			WHERE metadata_id = :metadataId
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
+		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 		$statement->execute();
 	}
 
@@ -671,14 +670,14 @@ class EventMapper extends Calendar\EventMapper {
 	public function addStudentAttendeesRelationsSpecific($event, $ids) {
 		if (is_array($ids) && count($ids)) {
 			$query = "
-				INSERT IGNORE INTO `eotc_event_student` (event_id, user_id)
-				VALUES (:eventId, :userId)
+				INSERT IGNORE INTO `eotc_metadata_student` (metadata_id, user_id)
+				VALUES (:metadataId, :userId)
 			";
 
 			foreach($ids as $currentId) {
 				if (preg_match('/[0-9]+/', $currentId)) {
 					$statement = $this->database->prepare($query);
-					$statement->bindParam(":eventId", $event->getId());
+					$statement->bindParam(":metadataId", $event->getId());
 					$statement->bindParam(":userId", $currentId);
 					$statement->execute();
 				}
@@ -705,13 +704,13 @@ class EventMapper extends Calendar\EventMapper {
 			$allIds = implode(',', $allIds);
 
 			$query = "
-				DELETE FROM `eotc_event_student`
-				WHERE event_id = :eventId
+				DELETE FROM `eotc_metadata_student`
+				WHERE metadata_id = :metadataId
 				AND user_id IN ({$allIds})
 			";
 
 			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 			$statement->execute();
 		}
 	}
