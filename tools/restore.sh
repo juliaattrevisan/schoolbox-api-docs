@@ -10,8 +10,6 @@
 #
 #
 
-versionlist="/tmp/sb_version_list";
-
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
@@ -23,8 +21,7 @@ package=${instdir##*/};
 
 curdir=`pwd`;
 
-echo "";
-echo "Schoolbox Sync/Restore";
+echo -e "\nSchoolbox Restore";
 
 if [ ! -f $conffile ];
 then
@@ -272,8 +269,8 @@ then
 	errmsg="Your selected option '$restoreoption' is not available";
 	error;
 fi
-restore=`sed -n "$(echo $restoreoption)p" $sbrl`;
-restorepretty=`sed -n "$(echo $restoreoption)p" $sbrlp`;
+restore=`sed -n "$(echo $restoreoption)p" $sbrl 2>/dev/null`;
+restorepretty=`sed -n "$(echo $restoreoption)p" $sbrlp 2>/dev/null`;
 
 if [ -z $restore ];
 then
@@ -292,13 +289,45 @@ fi
 
 echo -e "\nWell you got this far. Congratulations!";
 echo -e "\nTODO - actually perform the restore";
-# Check if enough space available for the data file restore
+
+# Details of restore source
+sourceloc=`echo $restore | cut -d',' -f1`;
+sourcetype=`echo $restore | cut -d',' -f2`;
+sourcep1=`echo $restore | cut -d',' -f3`;
+sourcep2=`echo $restore | cut -d',' -f4`;
+sourcep3=`echo $restore | cut -d',' -f5`;
+
+echo "Source Location: $sourceloc";
+echo "Source Type: $sourcetype";
+echo "Source Part 1: $sourcep1";
+echo "Source Part 2: $sourcep2";
+echo "Source Part 3: $sourcep3";
+
+# TODO Check if enough space available for the data file restore
+if [ "$sourcetype" = '[A]' ];
+then
+	echo "Full restore - TODO better check the disk space...";
+fi
 
 # Backup this installs database
+$instdir/tools/backup-database.sh;
+if [ $? -eq 1 ];
+then
+	errmsg="An error occured during the database backup";
+	error;
+fi
 
 # Sync the datafiles, with progress if possible
-## Fix data folder structure
-## Fix data and template folder permissions
+if [ "$sourcetype" = '[A]' ];
+then
+	# Full restore, sync all data files, then perform cleanup
+	echo "Full restore - TODO file transfer";
+	## Fix data folder structure
+	## Fix data and template folder permissions
+else
+	# DB only restore, sync the db backup locally
+	echo "DB only restore - TODO file transfer";
+fi
 
 # If data file sync is successfull
 ## Drop all existing database tables
