@@ -43,12 +43,17 @@ class EventConnector extends EventMapper {
 			$authorItem = $authorMapper->hydrate($row, 'a');
 			$eventItem->setAuthor($authorItem);
 
+			/* Event Type
+			 */
+			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+			$eventItem->setEventType($eventTypeItem);
+
 			/* Convert dates ;(
 			 */
 			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
 			$eventItem->setStartDateTime($startDateTime);
 
-			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
 			$eventItem->setEndDateTime($endDateTime);
 
 			/* Accumulate campuses for this event
@@ -165,7 +170,7 @@ class EventConnector extends EventMapper {
 			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
 			$eventItem->setStartDateTime($startDateTime);
 
-			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
 			$eventItem->setEndDateTime($endDateTime);
 
 			/* Accumulate campuses for this event
