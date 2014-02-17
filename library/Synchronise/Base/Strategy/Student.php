@@ -33,7 +33,7 @@ class Synchronise_Base_Strategy_Student extends Synchronise_Base_Strategy {
 	 * @return string
 	 */
 	public function getTitleFromUser($currentUser) {
-		return $currentUser['StudentTitle'];
+		return '';
 	}
 
 	/**
