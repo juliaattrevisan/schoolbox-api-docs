@@ -36,7 +36,7 @@
 			/* For typing
 			 */
 			config.questionForm.find('input').numeric({
-				allow: "e./"
+				allow: "e./-"
 			});
 
 			config.questionForm.find('input').change(function() {
@@ -44,13 +44,13 @@
 				/* For typing
 				 */
 				$(this).numeric({
-					allow: "e./"
+					allow: "e./-"
 				});
 
 				/* Clean copy/paste
 				 */
 				$(this).change(function() {
-					var str = $(this).val().toString().replace(/([^0-9e\.\/])+/g, '');
+					var str = $(this).val().toString().replace(/([^0-9e\.\/\-])+/g, '');
 
 					$(this).val(str);
 				});
