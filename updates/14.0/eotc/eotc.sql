@@ -67,3 +67,7 @@ CREATE TABLE `eotc_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `user_id` 
 /* EOTC Event Colour
  */
 INSERT INTO `luEventType` (`eventType`, `eventColour`) VALUES ('EOTC', 'aaaaaa');
+
+/* EOTC Config
+ */
+CREATE TABLE `eotc_config`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), `value` VARCHAR(255), PRIMARY KEY (`id`) );

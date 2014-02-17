@@ -14,14 +14,6 @@ namespace EOTC\ListGroup\Type;
 class Urgent extends Base {
 
 	/**
-	 * N days before the event starts causes an event to be
-	 * put into Urgent
-	 *
-	 * @var int
-	 */
-	private $threshold = 3;
-
-	/**
 	 * Determine where to go next
 	 *
 	 * @return $this|mixed
@@ -58,31 +50,16 @@ class Urgent extends Base {
 	 * @return bool
 	 */
 	private function isWithinThreshold($timeDifference) {
-		if ($timeDifference < 60 * 60 * 24 * $this->getThreshold()) {
+		$configMapper = new \EOTC\ConfigMapper();
+		$config = $configMapper->findUrgentThreshold();
+
+		/* N days before the event starts causes an event to be
+		 * put into Urgent subcategory
+		 */
+		if ($timeDifference < 60 * 60 * 24 * $config->getValue()) {
 			return true;
 		}
 
 		return false;
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set threshold
-	 *
-	 * @param int $threshold
-	 */
-	private function setThreshold($threshold) {
-		$this->threshold = $threshold;
-	}
-
-	/**
-	 * Get threshold
-	 *
-	 * @return int
-	 */
-	private function getThreshold() {
-		return $this->threshold;
 	}
 }
