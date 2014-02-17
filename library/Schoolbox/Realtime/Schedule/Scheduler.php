@@ -19,6 +19,7 @@ use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\CompressionException;
 use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\Message\Internal;
@@ -146,7 +147,7 @@ class Scheduler {
 					}
 					catch(ScheduleException $e) {
 						// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-						$v->v($e->getMessage(), '*');
+//						$v->v($e->getMessage(), '*');
 						// this message is unparseable, so we'll eventually ACK it to make it go away
 					}
 					catch(CompressionException $e) {
@@ -164,7 +165,7 @@ class Scheduler {
 			try {
 				$instance = $this->getModule($module);
 				// ok, we have a moduleinterface now
-				$this->verboser->v("Spooling triggers for $module from database");
+				$this->verboser->v("Spooling triggers for '$module' from database", '+');
 				foreach($instance->spoolTriggersFromDatabase() as $trigger) {
 					$this->scheduleNotification($trigger);
 				}
@@ -310,13 +311,23 @@ class Scheduler {
 
 		// register our timer
 		$timer = $this->loop->addTimer($interval, $publish);
-		$this->timers[$module][$label][$this->hashModel($model)] = $timer;
+		$this->putTimer($module, $label, $model, $timer);
 
 		$this->verboser->v("Scheduling trigger '$module::$label'", '+');
 	}
 
+
+	/**
+	 * Unschedule an existing timer, if it has been set.
+	 *
+	 * @param string $module
+	 * @param string $label
+	 * @param object $model
+	 * @return bool
+	 */
 	protected function unschedule($module, $label, $model) {
-		if($timer = $this->getTimer($module, $label, $model)) {
+		if($this->hasTimer($module, $label, $model)) {
+			$timer = $this->getTimer($module, $label, $model);
 			$this->verboser->v("Unscheduling trigger '$module::$label'", '-');
 			$this->loop->cancelTimer($timer);
 			return true;
@@ -326,20 +337,65 @@ class Scheduler {
 
 
 	/**
-	 * Return whether or not a timer is set for this event for this model
-	 *
 	 * @param string $module
 	 * @param string $label
 	 * @param object $model
 	 * @return Timer|null
 	 */
 	protected function getTimer($module, $label, $model) {
-		$hash = $this->hashModel($model);
-		return isset($this->timers[$module][$label][$hash]) ? $this->timers[$module][$label][$hash] : null;
+		return $this->hasTimer($module, $label, $model)
+			? $this->timers[$module][$label][$this->hashModel($model)]
+			: null;
 	}
 
+	/**
+	 * @param string $module
+	 * @param string $label
+	 * @param object $model
+	 * @param Timer $timer
+	 */
+	protected function putTimer($module, $label, $model, $timer) {
+		$hash = $this->hashModel($model);
+		$this->timers[$module][$label][$hash] = $timer;
+	}
+
+	/**
+	 * @param string $module
+	 * @param string $label
+	 * @param object $model
+	 * @return bool
+	 */
+	protected function hasTimer($module, $label, $model) {
+		$hash = $this->hashModel($model);
+		return isset($this->timers[$module][$label][$hash]);
+	}
+
+	/**
+	 * @param string $module
+	 * @param string $label
+	 * @param object $model
+	 */
+	public function removeTimer($module, $label, $model) {
+		$hash = $this->hashModel($model);
+		unset($this->timers[$module][$label][$hash]);
+	}
+
+	/**
+	 * @param object $model
+	 * @return string
+	 */
 	protected function hashModel($model) {
-		return sha1(serialize($model));
+		$modelClass = get_class($model);
+		$mapClass = $modelClass . "Mapper";
+
+		if(class_exists($mapClass)) {
+			$getId = $mapClass::getInstance()->getGetIdentifierMethodName();
+			$hash = sha1("$modelClass-".(string)$model->$getId());
+		}
+		else {
+			$hash = sha1(print_r($model, true));
+		}
+		return $hash;
 	}
 
 	/**
