@@ -101,6 +101,8 @@
                             $j(jsEvent).find('.fc-event-inner input').prop('checked', true)
                         }
                     }
+
+					$j(jsEvent).addClass(calEvent.data.styles.visible);
                 },
 
                 /**
@@ -122,7 +124,6 @@
                         data.date = calendarDate(calEvent.start)
                     }
 
-
                     // end time
                     if (calEvent.end != null) {
                         data.date += " &ndash; "
@@ -136,8 +137,14 @@
 
                     // Links to Modify Screen
                     if (calEvent.editable == true) {
-                        data.modifyLink = '<a class="btn modify float-right" href="/calendar/modify.php?eventID='
-                                        + calEvent.data.meta.eventId + '&returnTo=week"><span></span>Modify</a>'
+						if ((calEvent.data.custom != undefined) && (calEvent.data.custom.modifyLink != undefined) && (calEvent.data.custom.modifyLink.length)) {
+							var url = calEvent.data.custom.modifyLink;
+						}
+						else {
+							var url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=week';
+						}
+
+						data.modifyLink = '<a class="btn modify float-right" href="' + url + '"><span></span>Modify</a>';
                     }
                     else {
                         data.modifyLink = '';

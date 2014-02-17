@@ -18,7 +18,7 @@ class Approved extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 5;
+	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_APPROVED;
 
 	/**
 	 * Determine where to go next

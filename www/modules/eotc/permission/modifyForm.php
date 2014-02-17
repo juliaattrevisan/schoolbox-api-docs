@@ -62,4 +62,4 @@ if (is_array($_POST['campus']) && count($_POST['campus'])) {
 	}
 }
 
-$page->localRedir('/modules/eotc/permission/modify/' . $user->getId());
+$page->localRedir('/modules/eotc/permission/modify');

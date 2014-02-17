@@ -28,7 +28,7 @@ class None {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 6;
+	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_REJECTED;
 
 	/**
 	 * Determine where to go next

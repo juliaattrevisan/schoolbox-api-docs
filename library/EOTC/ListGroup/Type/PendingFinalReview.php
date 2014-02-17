@@ -18,7 +18,7 @@ class PendingFinalReview extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 4;
+	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_APPROVED;
 
 	/**
 	 * Determine where to go next
@@ -30,10 +30,10 @@ class PendingFinalReview extends Base {
 		/* If this requires RAMS and RAMS has been approved,
 		 * or if it doesn't require RAMS at all
 		 */
-		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isRamsApproved())) {
+		if (!$this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalReviewIndex());
 		}
-		else if (!$this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
+		else if ($this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isRamsApproved()) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalReviewIndex());
 		}
 

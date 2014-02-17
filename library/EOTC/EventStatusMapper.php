@@ -13,19 +13,16 @@ namespace EOTC;
 
 class EventStatusMapper extends \Schoolbox\Mapper {
 
-	/**
-	 * Default status id
-	 *
- 	 * @var int
+	/* These consts are referenced in numerous places but
+	 * for the same context.
 	 */
-	private $defaultStatusId = 1;
+	const STATUS_DEFAULT = 1;
 
-	/**
-	 * Rejected status id
-	 *
-	 * @var int
-	 */
-	private $rejectedStatusId = 6;
+	const STATUS_DRAFT = 1;
+	const STATUS_INPRINCIPLE = 2;
+	const STATUS_RAMSAPPROVED = 3;
+	const STATUS_APPROVED = 4;
+	const STATUS_REJECTED = 5;
 
 	/**
 	 * Mapping
@@ -63,7 +60,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 
 		/* Ignore Approved and Rejected statuses
 		 */
-		$exclusions = array(5, 6);
+		$exclusions = array(self::STATUS_APPROVED, self::STATUS_REJECTED);
 
 		$collection = new \Schoolbox\Collection();
 
@@ -105,30 +102,12 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	 */
 
 	/**
-	 * Set default status id
-	 * 
-	 * @param int $defaultStatusId
-	 */
-	private function setDefaultStatusId($defaultStatusId) {
-		$this->defaultStatusId = $defaultStatusId;
-	}
-
-	/**
 	 * Get default status id
 	 *
 	 * @return int
 	 */
 	private function getDefaultStatusId() {
-		return $this->defaultStatusId;
-	}
-
-	/**
-	 * Set rejected status id
-	 *
-	 * @param int $rejectedStatusId
-	 */
-	private function setRejectedStatusId($rejectedStatusId) {
-		$this->rejectedStatusId = $rejectedStatusId;
+		return self::STATUS_DEFAULT;
 	}
 
 	/**
@@ -137,6 +116,6 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	 * @return int
 	 */
 	private function getRejectedStatusId() {
-		return $this->rejectedStatusId;
+		return self::STATUS_REJECTED;
 	}
 }

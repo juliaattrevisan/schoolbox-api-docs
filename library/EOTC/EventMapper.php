@@ -272,6 +272,9 @@ class EventMapper extends Calendar\EventMapper {
 			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
 			$eventItem->setStartDateTime($startDateTime);
 
+			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
+			$eventItem->setEndDateTime($endDateTime);
+			
 			/* Accumulate campuses for this event
 			 */
 			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
@@ -426,7 +429,7 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $identifier
 	 * @return \Schoolbox\Collection
 	 */
-	private function findMetadata($identifier) {
+	protected function findMetadata($identifier) {
 		return $this->manyManyRelation(array(
 			'name' => 'eotc_event_metadata',
 		),
@@ -489,7 +492,7 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $identifier
 	 * @return \Schoolbox\Collection
 	 */
-	private function findCampuses($identifier) {
+	protected function findCampuses($identifier) {
 		return $this->manyManyRelation(array(
 			'name' => 'eotc_event_campus',
 		),
@@ -552,7 +555,7 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $identifier
 	 * @return \Schoolbox\Collection
 	 */
-	private function findStaffAttendees($identifier) {
+	protected function findStaffAttendees($identifier) {
 		return $this->manyManyRelation(array(
 				'name' => 'eotc_event_staff',
 			),
@@ -615,7 +618,7 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $identifier
 	 * @return \Schoolbox\Collection
 	 */
-	private function findStudentAttendees($identifier) {
+	protected function findStudentAttendees($identifier) {
 		return $this->manyManyRelation(array(
 			'name' => 'eotc_event_student',
 		),
@@ -737,7 +740,7 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $identifier
 	 * @return \Schoolbox\Collection
 	 */
-	private function findFiles($identifier) {
+	protected function findFiles($identifier) {
 		return $this->manyManyRelation(array(
 				'name' => 'eotc_event_file',
 			),

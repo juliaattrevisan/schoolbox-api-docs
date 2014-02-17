@@ -18,7 +18,7 @@ class PendingRamsReview extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = 3;
+	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_RAMSAPPROVED;
 
 	/**
 	 * Determine where to go next
