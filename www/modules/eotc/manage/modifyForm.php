@@ -118,6 +118,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
 			}
 
+			$metadata->setStaffAttendees($staffCollection);
+
 			/* Spawned further up
 			 */
 			$event->setAuthor($author);
@@ -134,7 +136,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* Collections of ids
 			 */
 			$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
-			$event->setStaffAttendees($staffCollection);
 
 			/* Store metadata
 			 */

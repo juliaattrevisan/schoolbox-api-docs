@@ -57,7 +57,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		 */
 		$staffSelected = array();
 
-		foreach ($event->getStaffAttendees() as $currentStaff) {
+		foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
 			$staffSelected[] = array(
 				'id' => $currentStaff->getId(),
 				'name' => $currentStaff->getFullname()

@@ -113,10 +113,10 @@ $this->setVar(array(
  */
 $this->setVar(array(
 	'event_staff_block' => '',
-	'EVENT_STAFF_COUNT' => $event->getStaffAttendees()->count()
+	'EVENT_STAFF_COUNT' => $event->getMetadata()->getStaffAttendees()->count()
 ));
 
-foreach($event->getStaffAttendees() as $currentStaff) {
+foreach($event->getMetadata()->getStaffAttendees() as $currentStaff) {
 	$this->setVar(array(
 		'EVENT_STAFF_ID' => $currentStaff->getId(),
 		'EVENT_STAFF_EXTERNAL_ID' => $currentStaff->getExternalId(),

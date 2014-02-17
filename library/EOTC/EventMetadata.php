@@ -60,6 +60,13 @@ class EventMetadata {
 	 *
 	 * @var null
 	 */
+	protected $staffAttendees = null;
+
+	/**
+	 * A Collection of User objects
+	 *
+	 * @var null
+	 */
 	protected $studentAttendees = null;
 
 	/**
@@ -94,6 +101,7 @@ class EventMetadata {
 	 * Construtor
 	 */
 	public function __construct() {
+		$this->setStaffAttendees(new \Schoolbox\Collection());
 		$this->setStudentAttendees(new \Schoolbox\Collection());
 		$this->setRamsFiles(new \Schoolbox\Collection());
 	}
@@ -261,6 +269,24 @@ class EventMetadata {
 	 */
 	public function getActivityLog() {
 		return $this->activityLog;
+	}
+
+	/**
+	 * Set staff attendees
+	 *
+	 * @param null $staffAttendees
+	 */
+	public function setStaffAttendees($staffAttendees) {
+		$this->staffAttendees = $staffAttendees;
+	}
+
+	/**
+	 * Get staff attendees
+	 *
+	 * @return null
+	 */
+	public function getStaffAttendees() {
+		return $this->staffAttendees;
 	}
 
 	/**
