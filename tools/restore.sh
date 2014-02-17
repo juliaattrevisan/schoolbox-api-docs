@@ -286,9 +286,7 @@ then
 	errmsg="Restore Cancelled";
 	error;
 fi
-
-echo -e "\nWell you got this far. Congratulations!";
-echo -e "\nTODO - actually perform the restore";
+echo "";
 
 # Details of restore source
 sourceloc=`echo $restore | cut -d',' -f1`;
@@ -297,12 +295,6 @@ sourcep1=`echo $restore | cut -d',' -f3`;
 sourcep2=`echo $restore | cut -d',' -f4`;
 sourcep3=`echo $restore | cut -d',' -f5`;
 
-echo "Source Location: $sourceloc";
-echo "Source Type: $sourcetype";
-echo "Source Part 1: $sourcep1";
-echo "Source Part 2: $sourcep2";
-echo "Source Part 3: $sourcep3";
-
 # TODO Check if enough space available for the data file restore
 if [ "$sourcetype" = '[A]' ];
 then
@@ -310,33 +302,92 @@ then
 fi
 
 # Backup this installs database
-$instdir/tools/backup-database.sh;
-if [ $? -eq 1 ];
+# TODO - perhaps need better checks, because if this fails we have no way to rollback the DB.
+echo "Performing backup of current database";
+newbackup=`$instdir/tools/backup-database.sh`;
+if [ $? -ne 0 ];
 then
 	errmsg="An error occured during the database backup";
 	error;
 fi
 
 # Sync the datafiles, with progress if possible
+backup_dir='/mnt/SchoolboxBackupRestore';
+if [ "$sourceloc" = "[B]" ];
+then
+	# Source is a CIFS Backup, ensure the share is available
+	backupsource="$sourcep1";
+	source $backupsource;
+	mkdir -p $backup_dir;
+	umount $backup_dir 2>/dev/null;
+	mount -t cifs $backup_share $backup_dir -o username=$backup_username,password=$backup_password$backup_extra_options;
+	if [ ! -f $backup_dir/$sourcep2/schoolbox-$sourcep2.sql ];
+	then
+		errmsg="Unable to locate the database in the backup";
+		umount $backup_dir 2>/dev/null;
+		error;
+	fi
+fi
+
 if [ "$sourcetype" = '[A]' ];
 then
 	# Full restore, sync all data files, then perform cleanup
-	echo "Full restore - TODO file transfer";
+	echo -e "\nFull restore - TODO file transfer";
 	## Fix data folder structure
 	## Fix data and template folder permissions
 else
 	# DB only restore, sync the db backup locally
-	echo "DB only restore - TODO file transfer";
+	echo -e "\nDB only restore - TODO file transfer";
+	sourcedb='';
+	if [ "$sourceloc" = '[L]' ];
+	then
+		# Local Source, set the file location of the db backup
+		sourcedb="$sourcep2";
+	fi
+	if [ "$sourceloc" = '[R]' ];
+	then
+		# TODO Remote Source, transfer the db file locally.
+		echo "TODO";
+	fi
+	if [ "$sourceloc" = '[B]' ];
+	then
+		# Backup Source, set the file location of the db backup
+		sourcedb="$backup_dir/$sourcep2/schoolbox-$sourcep2.sql";
+	fi
 fi
 
-# If data file sync is successfull
+## TODO Fix data directory locations
+
+# Restore the DB
+echo -e "\nStarting restore of the database\n";
 ## Drop all existing database tables
+for table in `mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SHOW TABLES"`;
+do
+	mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "DROP TABLE IF EXISTS \`$table\`";
+done;
+
 ## Restore specified database
-## Fix data directory locations
+## TODO - switch based on local/remote/backup
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $sourcedb;
+
 ## Run SQL updates to current install
+$instdir/tools/update-sql.sh;
 
 # Restart apache
+# TODO detect if ubuntu or centos for apache2/httpd
+echo -e "\nRestarting Apache\c";
+/usr/sbin/service apache2 restart >/dev/null 2>&1;
+if [ $? -ne 0 ];
+then
+	errmsg="An error occured restarting apache";
+	error;
+else
+	echo -e " - OK";
+fi
 
-# Report details of failure/success
+# Cleanup
+umount $backup_dir 2>/dev/null;
+
+# TODO Report details of failure/success
 
 exit;
