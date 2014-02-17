@@ -111,7 +111,6 @@ class EventMapper extends Calendar\EventMapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
-		$campusMapper = $this->getJoinMapper('campus');
 
 		$query = "
 			SELECT
@@ -135,10 +134,6 @@ class EventMapper extends Calendar\EventMapper {
 		/* Hydrate or die
 		 */
 		if ($row != false) {
-			/* Hydrate or die
-			 */
-			$allActivityLogs = new \Schoolbox\Collection();
-
 			$eventItem = $this->hydrate($row, 'e');
 
 			/* Author
