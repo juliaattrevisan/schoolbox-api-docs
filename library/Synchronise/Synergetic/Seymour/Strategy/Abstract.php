@@ -12,7 +12,7 @@
  */
 abstract class Synchronise_Synergetic_Seymour_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract {
 	protected $verboseFilter = null;
-
+    const PARENT_GROUP_ID = 4;
 	/**
 	 * Identical algorithm used to create/update a user
 	 *
@@ -176,4 +176,36 @@ abstract class Synchronise_Synergetic_Seymour_Strategy_Abstract extends Synchron
 	protected function userExists($newUser) {
 		return $this->getUserHandler()->getBySynergy($newUser['synergy_id']);
 	}
+
+    /**
+     * Determine if a user exists in Schoolbox in a particular group
+     *
+     * @param $newUser
+     * @return mixed
+     */
+    protected function userExistsBySynergyAndGroup($newUser)
+    {
+        $query = "
+						SELECT
+								user.id as uid, synergy_id,
+								title, firstname, lastname, username,
+								local_email, alt_email,
+								userCampus.campus, year, house,
+								eportfolio_enabled,
+								groups.name AS gname, group_id
+						FROM user
+						LEFT JOIN groups ON user.group_id = groups.id
+						LEFT JOIN userCampus ON user.id = userCampus.uid
+						WHERE user.synergy_id = '{$newUser['synergy_id']}'";
+
+        //Only lock user to group if parent account
+        if ($newUser['group_id'] == self::PARENT_GROUP_ID)
+            $query .= " AND groups.id = '{$newUser['group_id']}'";
+
+
+        $query .= " ORDER BY userCampus.defaultCampus DESC";
+
+        return $this->getUserHandler()->db->getRow($query);
+    }
+
 }
