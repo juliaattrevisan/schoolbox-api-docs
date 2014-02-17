@@ -13,6 +13,12 @@ namespace EOTC;
 
 class EventConnector extends EventMapper {
 
+	/**
+	 * Get details of a single event (used in Mobile)
+	 * 
+	 * @param $eventId
+	 * @return \Calendar_Event_Collection
+	 */
 	public function getEvent($eventId) {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
