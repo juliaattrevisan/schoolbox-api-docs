@@ -56,6 +56,27 @@ class EventMetadata {
 	protected $activityLog = null;
 
 	/**
+	 * A Collection of User objects
+	 *
+	 * @var null
+	 */
+	protected $staffAttendees = null;
+
+	/**
+	 * A Collection of User objects
+	 *
+	 * @var null
+	 */
+	protected $studentAttendees = null;
+
+	/**
+	 * A collection of brownhole files
+	 *
+	 * @var null
+	 */
+	protected $ramsFiles = null;
+
+	/**
 	 * Created at
 	 *
 	 * @var null
@@ -80,6 +101,9 @@ class EventMetadata {
 	 * Construtor
 	 */
 	public function __construct() {
+		$this->setStaffAttendees(new \Schoolbox\Collection());
+		$this->setStudentAttendees(new \Schoolbox\Collection());
+		$this->setRamsFiles(new \Schoolbox\Collection());
 	}
 
 	/* Getters/Setters
@@ -245,5 +269,59 @@ class EventMetadata {
 	 */
 	public function getActivityLog() {
 		return $this->activityLog;
+	}
+
+	/**
+	 * Set staff attendees
+	 *
+	 * @param null $staffAttendees
+	 */
+	public function setStaffAttendees($staffAttendees) {
+		$this->staffAttendees = $staffAttendees;
+	}
+
+	/**
+	 * Get staff attendees
+	 *
+	 * @return null
+	 */
+	public function getStaffAttendees() {
+		return $this->staffAttendees;
+	}
+
+	/**
+	 * Set student attendees
+	 *
+	 * @param null $studentAttendees
+	 */
+	public function setStudentAttendees($studentAttendees) {
+		$this->studentAttendees = $studentAttendees;
+	}
+
+	/**
+	 * Get student attendees
+	 *
+	 * @return null
+	 */
+	public function getStudentAttendees() {
+		return $this->studentAttendees;
+	}
+
+	/**
+	 * Set rams files
+	 *
+	 * @param null $ramsFiles
+	 */
+	public function setRamsFiles($ramsFiles) {
+		$this->ramsFiles = $ramsFiles;
+	}
+
+	/**
+	 * Get rams files
+	 *
+	 * @return null
+	 */
+	public function getRamsFiles() {
+		return $this->ramsFiles;
 	}
 }

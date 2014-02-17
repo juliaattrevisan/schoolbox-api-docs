@@ -118,6 +118,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
 			}
 
+			$metadata->setStaffAttendees($staffCollection);
+
 			/* Spawned further up
 			 */
 			$event->setAuthor($author);
@@ -134,7 +136,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* Collections of ids
 			 */
 			$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
-			$event->setStaffAttendees($staffCollection);
 
 			/* Store metadata
 			 */
@@ -147,7 +148,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 				/* A RAMS file doesn't exist, nor uploaded, but was required
 				 */
-				if (!$event->getRamsFiles()->count() && !strlen($_FILES['ramsFile']['name'])) {
+				if (!$event->getMetadata()->getRamsFiles()->count() && !strlen($_FILES['ramsFile']['name'])) {
 					error(161);
 				}
 				/* A RAMS file was uploaded; replace all existing ones
@@ -158,8 +159,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					 */
 					$ramsFile = \Schoolbox\StorageMapper::getInstance()->upload(\Cfg::get('storage_dir') . '/' . $_FILES['ramsFile']['name'], $_FILES['ramsFile']['tmp_name'], $author->getId());
 
-					$event->setRamsFiles(new \Schoolbox\Collection());
-					$event->getRamsFiles()->add($ramsFile);
+					$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
+					$event->getMetadata()->getRamsFiles()->add($ramsFile);
 				}
 				/* Otherwise just keep the current RAMS file
 				 */
@@ -167,7 +168,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* RAMS file not needed - remove all existing ones
 			 */
 			else {
-				$event->setRamsFiles(new \Schoolbox\Collection());
+				$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
 			}
 
 			/* Save this event and any recurring incidents too

@@ -38,7 +38,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				}
 			}
 
-			$eventMapper->addStudentAttendeesRelationsSpecific($event, $ids);
+			$metadataMapper = new \EOTC\EventMetadataMapper();
+			$metadataMapper->addStudentAttendeesRelationsSpecific($event->getMetadata(), $ids);
 		}
 	}
 

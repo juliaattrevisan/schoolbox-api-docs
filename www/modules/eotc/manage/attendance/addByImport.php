@@ -59,7 +59,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			}
 		}
 
-		$eventMapper->addStudentAttendeesRelationsSpecific($event, $allIds);
+		$metadataMapper = new \EOTC\EventMetadataMapper();
+		$metadataMapper->addStudentAttendeesRelationsSpecific($event->getMetadata(), $allIds);
 	}
 
 	$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());

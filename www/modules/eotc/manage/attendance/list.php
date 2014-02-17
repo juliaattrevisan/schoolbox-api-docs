@@ -43,10 +43,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		}
 	}
 
-	if ($event->getStudentAttendees()->count()) {
+	if ($event->getMetadata()->getStudentAttendees()->count()) {
 		$roleMapper = new \Schoolbox\RoleMapper();
 
-		foreach ($event->getStudentAttendees() as $currentStudent) {
+		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
 			$role = $roleMapper->findById($currentStudent->getRole()->getId());
 
 			$this->setVar(array(

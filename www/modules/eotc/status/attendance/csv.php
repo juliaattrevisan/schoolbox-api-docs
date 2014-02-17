@@ -35,7 +35,7 @@ $this->setVar(array(
 
 /* If there are attendees, pop it out
  */
-if ($event->getStudentAttendees()->count()) {
+if ($event->getMetadata()->getStudentAttendees()->count()) {
 	$roleMapper = new \Schoolbox\RoleMapper();
 
 	$row = array(
@@ -47,7 +47,7 @@ if ($event->getStudentAttendees()->count()) {
 
 	$csv .= TextFormatter::outputCSV($row) . "\n";
 
-	foreach ($event->getStudentAttendees() as $currentStudent) {
+	foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
 		$role = $roleMapper->findById($currentStudent->getRole()->getId());
 
 		$row = array(

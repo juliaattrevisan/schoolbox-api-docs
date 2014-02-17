@@ -79,15 +79,15 @@ if ($event->getMetadata()->getRamsRequired()) {
 	/* Sometimes event/file relations get recorded with a storage_id of 0
 	 * so we need to check whether one actually legitimately saved properly
 	 */
-	if ($event->getRamsFiles()->first() && $event->getRamsFiles()->first()->getId()) {
+	if ($event->getMetadata()->getRamsFiles()->first() && $event->getMetadata()->getRamsFiles()->first()->getId()) {
 		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-		$mimetype = $mimetypeMapper->getByFilename($event->getRamsFiles()->first()->getFilename());
+		$mimetype = $mimetypeMapper->getByFilename($event->getMetadata()->getRamsFiles()->first()->getFilename());
 
 		$this->setVar(array(
-			'EVENT_RAMS_FILE' => $event->getRamsFiles()->first()->getFilename(),
-			'EVENT_RAMS_FILESIZE' => $event->getRamsFiles()->first()->getFilesize(),
+			'EVENT_RAMS_FILE' => $event->getMetadata()->getRamsFiles()->first()->getFilename(),
+			'EVENT_RAMS_FILESIZE' => $event->getMetadata()->getRamsFiles()->first()->getFilesize(),
 			'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
-			'EVENT_RAMS_HASH' => $event->getRamsFiles()->first()->getHash(),
+			'EVENT_RAMS_HASH' => $event->getMetadata()->getRamsFiles()->first()->getHash(),
 		));
 
 		$this->parse('has_rams_block', 'has_rams');
@@ -113,10 +113,10 @@ $this->setVar(array(
  */
 $this->setVar(array(
 	'event_staff_block' => '',
-	'EVENT_STAFF_COUNT' => $event->getStaffAttendees()->count()
+	'EVENT_STAFF_COUNT' => $event->getMetadata()->getStaffAttendees()->count()
 ));
 
-foreach($event->getStaffAttendees() as $currentStaff) {
+foreach($event->getMetadata()->getStaffAttendees() as $currentStaff) {
 	$this->setVar(array(
 		'EVENT_STAFF_ID' => $currentStaff->getId(),
 		'EVENT_STAFF_EXTERNAL_ID' => $currentStaff->getExternalId(),
@@ -130,10 +130,10 @@ foreach($event->getStaffAttendees() as $currentStaff) {
  */
 $this->setVar(array(
 	'event_student_block' => '',
-	'EVENT_STUDENT_COUNT' => $event->getStudentAttendees()->count()
+	'EVENT_STUDENT_COUNT' => $event->getMetadata()->getStudentAttendees()->count()
 ));
 
-foreach($event->getStudentAttendees() as $currentStudent) {
+foreach($event->getMetadata()->getStudentAttendees() as $currentStudent) {
 	$this->setVar(array(
 		'EVENT_STUDENT_ID' => $currentStudent->getId(),
 		'EVENT_STUDENT_EXTERNAL_ID' => $currentStudent->getExternalId(),

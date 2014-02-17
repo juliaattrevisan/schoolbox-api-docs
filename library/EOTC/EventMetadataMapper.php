@@ -118,4 +118,268 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 		$statement->execute();
 	}
-} 
+
+	/**
+	 * Assign files to an event
+	 *
+	 * @param $metadata
+	 */
+	public function createFiles($metadata) {
+		$query = "
+			INSERT IGNORE INTO `eotc_metadata_file` (metadata_id, storage_id)
+			VALUES (:metadataId, :storageId)
+		";
+
+		foreach ($metadata->getRamsFiles() as $currentFile) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->bindParam(":storageId", $currentFile->getId());
+			$statement->execute();
+		}
+	}
+
+
+	/**
+	 * Find files for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	public function findFiles($identifier) {
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_metadata_file',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'metadata_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'storage_id',
+					'key' => 'storage_id',
+					'mapper' => new \Schoolbox\StorageMapper()
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
+	}
+
+	/**
+	 * Deletes file relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $metadata
+	 * @return bool|void
+	 */
+	public function deleteFilesRelations($metadata) {
+		$query = "
+			DELETE FROM `eotc_metadata_file`
+			WHERE metadata_id = :metadataId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Assign staff to an event
+	 *
+	 * @param $metadata
+	 */
+	public function createStaffAttendees($metadata) {
+		$query = "
+			INSERT IGNORE INTO `eotc_metadata_staff` (metadata_id, user_id)
+			VALUES (:metadataId, :userId)
+		";
+
+		foreach ($metadata->getStaffAttendees() as $currentStaff) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->bindParam(":userId", $currentStaff->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Find staff for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	public function findStaffAttendees($identifier) {
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_metadata_staff',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'metadata_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'user_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\UserMapper()
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
+	}
+
+	/**
+	 * Deletes staff attendee relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $metadata
+	 * @return bool|void
+	 */
+	public function deleteStaffAttendeesRelations($metadata) {
+		$query = "
+			DELETE FROM `eotc_metadata_staff`
+			WHERE metadata_id = :metadataId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Assign students to an event
+	 *
+	 * @param $metadata
+	 */
+	public function createStudentAttendees($metadata) {
+		$query = "
+			INSERT IGNORE INTO `eotc_metadata_student` (metadata_id, user_id)
+			VALUES (:metadataId, :userId)
+		";
+
+		foreach ($metadata->getStudentAttendees() as $currentStudent) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->bindParam(":userId", $currentStudent->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Add specific relations for a particular event
+	 *
+	 * @param $metadata
+	 * @param $ids
+	 */
+	public function addStudentAttendeesRelationsSpecific($metadata, $ids) {
+		if (is_array($ids) && count($ids)) {
+			$query = "
+				INSERT IGNORE INTO `eotc_metadata_student` (metadata_id, user_id)
+				VALUES (:metadataId, :userId)
+			";
+
+			foreach($ids as $currentId) {
+				if (preg_match('/[0-9]+/', $currentId)) {
+					$statement = $this->database->prepare($query);
+					$statement->bindParam(":metadataId", $metadata->getId());
+					$statement->bindParam(":userId", $currentId);
+					$statement->execute();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Find students for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	public function findStudentAttendees($identifier) {
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_metadata_student',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'metadata_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'user_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\UserMapper(),
+					'options' => array(
+						'order' => array(
+							'lastname' => 'ASC'
+						)
+					)
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
+	}
+
+	/**
+	 * Deletes student attendee relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $metadata
+	 * @return bool|void
+	 */
+	public function deleteStudentAttendeesRelations($metadata) {
+		$query = "
+			DELETE FROM `eotc_metadata_student`
+			WHERE metadata_id = :metadataId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Delete specific relations for a particular event
+	 *
+	 * @param $metadata
+	 * @param $ids
+	 */
+	public function deleteStudentAttendeesRelationsSpecific($metadata, $ids) {
+		if (is_array($ids) && count($ids)) {
+			$allIds = array();
+
+			foreach($ids as $currentId) {
+				if (preg_match('/[0-9]+/', $currentId)) {
+					$allIds[] = $currentId;
+				}
+			}
+
+			$allIds = implode(',', $allIds);
+
+			$query = "
+				DELETE FROM `eotc_metadata_student`
+				WHERE metadata_id = :metadataId
+				AND user_id IN ({$allIds})
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->execute();
+		}
+	}
+}

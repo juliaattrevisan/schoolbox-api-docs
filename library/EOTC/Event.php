@@ -23,20 +23,6 @@ class Event extends Calendar\Event {
 	protected $metadata = null;
 
 	/**
-	 * A Collection of User objects
-	 *
-	 * @var null
-	 */
-	protected $studentAttendees = null;
-
-	/**
-	 * A Collection of User objects
-	 *
-	 * @var null
-	 */
-	protected $staffAttendees = null;
-
-	/**
 	 * A User object
 	 *
 	 * @var null
@@ -44,22 +30,12 @@ class Event extends Calendar\Event {
 	protected $teacherInCharge = null;
 
 	/**
-	 * A collection of brownhole files
-	 *
-	 * @var null
-	 */
-	protected $ramsFiles = null;
-
-	/**
 	 * Hook method
 	 *
 	 * Initialise collections all over the place
 	 */
 	protected function setup() {
-		$this->setStudentAttendees(new \Schoolbox\Collection());
-		$this->setStaffAttendees(new \Schoolbox\Collection());
 		$this->setMetadata(new \Schoolbox\Collection());
-		$this->setRamsFiles(new \Schoolbox\Collection());
 	}
 
 	/* Getters/Setters
@@ -84,24 +60,6 @@ class Event extends Calendar\Event {
 	}
 
 	/**
-	 * Set staff attendees
-	 *
-	 * @param null $staffAttendees
-	 */
-	public function setStaffAttendees($staffAttendees) {
-		$this->staffAttendees = $staffAttendees;
-	}
-
-	/**
-	 * Get staff attendees
-	 *
-	 * @return null
-	 */
-	public function getStaffAttendees() {
-		return $this->staffAttendees;
-	}
-
-	/**
 	 * Set teacher in charge
 	 *
 	 * @param null $teacherInCharge
@@ -117,41 +75,5 @@ class Event extends Calendar\Event {
 	 */
 	public function getTeacherInCharge() {
 		return $this->teacherInCharge;
-	}
-
-	/**
-	 * Set student attendees
-	 *
-	 * @param null $studentAttendees
-	 */
-	public function setStudentAttendees($studentAttendees) {
-		$this->studentAttendees = $studentAttendees;
-	}
-
-	/**
-	 * Get student attendees
-	 *
-	 * @return null
-	 */
-	public function getStudentAttendees() {
-		return $this->studentAttendees;
-	}
-
-	/**
-	 * Set rams files
-	 *
-	 * @param null $ramsFiles
-	 */
-	public function setRamsFiles($ramsFiles) {
-		$this->ramsFiles = $ramsFiles;
-	}
-
-	/**
-	 * Get rams files
-	 *
-	 * @return null
-	 */
-	public function getRamsFiles() {
-		return $this->ramsFiles;
 	}
 }

@@ -111,7 +111,6 @@ class EventMapper extends Calendar\EventMapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
-		$campusMapper = $this->getJoinMapper('campus');
 
 		$query = "
 			SELECT
@@ -135,10 +134,6 @@ class EventMapper extends Calendar\EventMapper {
 		/* Hydrate or die
 		 */
 		if ($row != false) {
-			/* Hydrate or die
-			 */
-			$allActivityLogs = new \Schoolbox\Collection();
-
 			$eventItem = $this->hydrate($row, 'e');
 
 			/* Author
@@ -173,23 +168,26 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setCampusCollection($this->findCampuses($identifier));
 
-			/* Accumulate staff attendees for this event
-			 */
-			$eventItem->setStaffAttendees($this->findStaffAttendees($identifier));
-
-			/* Accumulate student attendees for this event
-			 */
-			$eventItem->setStudentAttendees($this->findStudentAttendees($identifier));
-
-			/* Accumulate RAMS files for this event
-			 */
-			$eventItem->setRamsFiles($this->findFiles($identifier));
-
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+
+				/* Accumulate staff attendees for this event
+				 */
+				$allStaff = $metadataMapper->findStaffAttendees($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setStaffAttendees($allStaff);
+
+				/* Accumulate student attendees for this event
+				 */
+				$allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setStudentAttendees($allStudents);
+
+				/* Accumulate RAMS files for this event
+				 */
+				$allFiles = $metadataMapper->findFiles($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setRamsFiles($allFiles);
 
 				/* Activity logs
 				 */
@@ -284,15 +282,16 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
 
-			/* Accumulate student attendees for this event
-			 */
-			$eventItem->setStudentAttendees($this->findStudentAttendees($eventItem->getId()));
-
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+
+				/* Accumulate student attendees for this event
+				 */
+				$allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setStudentAttendees($allStudents);
 			}
 
 			/* Assign it to an Event List Group
@@ -370,15 +369,15 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
 
-			/* Accumulate student attendees for this event
-			 */
-			$eventItem->setStudentAttendees($this->findStudentAttendees($eventItem->getId()));
-
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+
+				/* Accumulate student attendees for this event
+				 */
+				$eventItem->getMetadata()->setStudentAttendees($this->findStudentAttendees($eventItem->getMetadata()->getId()));
 			}
 
 			/* Only add the first in a series; ignore the others
@@ -406,21 +405,21 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param $event
 	 */
 	protected function postSave($event) {
-		$eventMetadataMapper = new EventMetadataMapper();
-		$eventMetadataMapper->save($event->getMetadata());
-		$eventMetadataMapper->saveRelation($event);
+		$metadataMapper = new EventMetadataMapper();
+		$metadataMapper->save($event->getMetadata());
+		$metadataMapper->saveRelation($event);
 
 		$this->deleteCampusRelations($event);
 		$this->createCampus($event);
 
-		$this->deleteStaffAttendeesRelations($event);
-		$this->createStaffAttendees($event);
+		$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
+		$metadataMapper->createStaffAttendees($event->getMetadata());
 
-		$this->deleteStudentAttendeesRelations($event);
-		$this->createStudentAttendees($event);
+		$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
+		$metadataMapper->createStudentAttendees($event->getMetadata());
 
-		$this->deleteFilesRelations($event);
-		$this->createFiles($event);
+		$metadataMapper->deleteFilesRelations($event->getMetadata());
+		$metadataMapper->createFiles($event->getMetadata());
 	}
 
 	/**
@@ -430,23 +429,28 @@ class EventMapper extends Calendar\EventMapper {
 	 * @return \Schoolbox\Collection
 	 */
 	protected function findMetadata($identifier) {
-		return $this->manyManyRelation(array(
-			'name' => 'eotc_event_metadata',
-		),
-		array(
-			/* Find things to join to this...
-			 */
-			'column' => 'event_id',
-			'value' => $identifier,
-
-			/* ...using this relation, such that column = key
-			 */
-			'relation' => array(
-				'column' => 'metadata_id',
-				'key' => 'id',
-				'mapper' => new EventMetadataMapper()
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_event_metadata',
 			),
-		));
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'metadata_id',
+					'key' => 'id',
+					'mapper' => new EventMetadataMapper()
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
 	}
 
 	/**
@@ -493,23 +497,28 @@ class EventMapper extends Calendar\EventMapper {
 	 * @return \Schoolbox\Collection
 	 */
 	protected function findCampuses($identifier) {
-		return $this->manyManyRelation(array(
-			'name' => 'eotc_event_campus',
-		),
-		array(
-			/* Find things to join to this...
-			 */
-			'column' => 'event_id',
-			'value' => $identifier,
-
-			/* ...using this relation, such that column = key
-			 */
-			'relation' => array(
-				'column' => 'campus_id',
-				'key' => 'id',
-				'mapper' => new \Schoolbox\CampusMapper()
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_event_campus',
 			),
-		));
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'event_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'campus_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\CampusMapper()
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
 	}
 
 	/**
@@ -528,287 +537,5 @@ class EventMapper extends Calendar\EventMapper {
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(":eventId", $event->getId());
 		$statement->execute();
-	}
-
-	/**
-	 * Assign staff to an event
-	 *
-	 * @param $event
-	 */
-	private function createStaffAttendees($event) {
-		$query = "
-			INSERT IGNORE INTO `eotc_event_staff` (event_id, user_id)
-			VALUES (:eventId, :userId)
-		";
-
-		foreach ($event->getStaffAttendees() as $currentStaff) {
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
-			$statement->bindParam(":userId", $currentStaff->getId());
-			$statement->execute();
-		}
-	}
-
-	/**
-	 * Find staff for a particular event
-	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
-	 */
-	protected function findStaffAttendees($identifier) {
-		return $this->manyManyRelation(array(
-				'name' => 'eotc_event_staff',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'event_id',
-				'value' => $identifier,
-
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'user_id',
-					'key' => 'id',
-					'mapper' => new \Schoolbox\UserMapper()
-				),
-			));
-	}
-
-	/**
-	 * Deletes staff attendee relations if there are no remaining
-	 * events in the series
-	 *
-	 * @param $event
-	 * @return bool|void
-	 */
-	public function deleteStaffAttendeesRelations($event) {
-		$query = "
-			DELETE FROM `eotc_event_staff`
-			WHERE event_id = :eventId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->execute();
-	}
-
-	/**
-	 * Assign students to an event
-	 *
-	 * @param $event
-	 */
-	private function createStudentAttendees($event) {
-		$query = "
-			INSERT IGNORE INTO `eotc_event_student` (event_id, user_id)
-			VALUES (:eventId, :userId)
-		";
-
-		foreach ($event->getStudentAttendees() as $currentStaff) {
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
-			$statement->bindParam(":userId", $currentStaff->getId());
-			$statement->execute();
-		}
-	}
-
-	/**
-	 * Find students for a particular event
-	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
-	 */
-	protected function findStudentAttendees($identifier) {
-		return $this->manyManyRelation(array(
-			'name' => 'eotc_event_student',
-		),
-		array(
-			/* Find things to join to this...
-			 */
-			'column' => 'event_id',
-			'value' => $identifier,
-
-			/* ...using this relation, such that column = key
-			 */
-			'relation' => array(
-				'column' => 'user_id',
-				'key' => 'id',
-				'mapper' => new \Schoolbox\UserMapper(),
-				'options' => array(
-					'order' => array(
-						'lastname' => 'ASC'
-					)
-				)
-			),
-		));
-	}
-
-	/**
-	 * Deletes student attendee relations if there are no remaining
-	 * events in the series
-	 *
-	 * @param $event
-	 * @return bool|void
-	 */
-	public function deleteStudentAttendeesRelations($event) {
-		$query = "
-			DELETE FROM `eotc_event_student`
-			WHERE event_id = :eventId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->execute();
-	}
-
-	/**
-	 * Add specific relations for a particular event
-	 *
-	 * @param $event
-	 * @param $ids
-	 */
-	public function addStudentAttendeesRelationsSpecific($event, $ids) {
-		if (is_array($ids) && count($ids)) {
-			$query = "
-				INSERT IGNORE INTO `eotc_event_student` (event_id, user_id)
-				VALUES (:eventId, :userId)
-			";
-
-			foreach($ids as $currentId) {
-				if (preg_match('/[0-9]+/', $currentId)) {
-					$statement = $this->database->prepare($query);
-					$statement->bindParam(":eventId", $event->getId());
-					$statement->bindParam(":userId", $currentId);
-					$statement->execute();
-				}
-			}
-		}
-	}
-
-	/**
-	 * Delete specific relations for a particular event
-	 *
-	 * @param $event
-	 * @param $ids
-	 */
-	public function deleteStudentAttendeesRelationsSpecific($event, $ids) {
-		if (is_array($ids) && count($ids)) {
-			$allIds = array();
-
-			foreach($ids as $currentId) {
-				if (preg_match('/[0-9]+/', $currentId)) {
-					$allIds[] = $currentId;
-				}
-			}
-
-			$allIds = implode(',', $allIds);
-
-			$query = "
-				DELETE FROM `eotc_event_student`
-				WHERE event_id = :eventId
-				AND user_id IN ({$allIds})
-			";
-
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
-			$statement->execute();
-		}
-	}
-
-	/**
-	 * Assign files to an event
-	 *
-	 * @param $event
-	 */
-	private function createFiles($event) {
-		$query = "
-			INSERT IGNORE INTO `eotc_event_file` (event_id, storage_id)
-			VALUES (:eventId, :storageId)
-		";
-
-		foreach ($event->getRamsFiles() as $currentFile) {
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
-			$statement->bindParam(":storageId", $currentFile->getId());
-			$statement->execute();
-		}
-	}
-
-	/**
-	 * Find files for a particular event
-	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
-	 */
-	protected function findFiles($identifier) {
-		return $this->manyManyRelation(array(
-				'name' => 'eotc_event_file',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'event_id',
-				'value' => $identifier,
-
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'storage_id',
-					'key' => 'storage_id',
-					'mapper' => new \Schoolbox\StorageMapper()
-				),
-			));
-	}
-
-	/**
-	 * Deletes file relations if there are no remaining
-	 * events in the series
-	 *
-	 * @param $event
-	 * @return bool|void
-	 */
-	public function deleteFilesRelations($event) {
-		$query = "
-			DELETE FROM `eotc_event_file`
-			WHERE event_id = :eventId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->execute();
-	}
-
-	/**
-	 * Many-many relation table, where $relationTable is a pseudo-mapping
-	 * of column names
-	 *
-	 * @param array $relationTableDefinition
-	 * @param array $join
-	 * @internal param array $selected
-	 * @return \Schoolbox\Collection
-	 */
-	public function manyManyRelation($relationTableDefinition = array(), $join = array()) {
-		$query = "
-			SELECT {$join['relation']['column']}
-			FROM `{$relationTableDefinition['name']}`
-			WHERE {$join['column']} = :value
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":value", $join['value']);
-		$statement->execute();
-
-		/* Find all the primary keys in the relation table and objectify
-		 * them into a collection
-		 */
-		$ids = array();
-
-		foreach ($statement as $row) {
-			$ids[] = $row[$join['relation']['column']];
-		}
-
-		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids, $join['relation']['options']);
-
-		return $allInstances;
 	}
 }

@@ -2,14 +2,12 @@ INSERT INTO `error` (`id`, `message`) VALUES ('160', 'This event could not be fo
 
 /* Event metadata, for eotc events
  */
-CREATE TABLE `eotc_metadata`( `id` INT(11) NOT NULL AUTO_INCREMENT, `event_type_id` INT(11) COMMENT 'FK for luEventType', `status_id` INT(11) COMMENT 'FK for eotc_status', `rams_required` ENUM('true','false') DEFAULT 'false', `notes` TEXT COMMENT 'iAdditional notes', `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
+CREATE TABLE `eotc_metadata`( `id` INT(11) NOT NULL AUTO_INCREMENT, `event_type_id` INT(11) COMMENT 'FK for luEventType', `status_id` INT(11) COMMENT 'FK for eotc_status', `rams_required` TINYINT(1), `comment` TEXT COMMENT 'iAdditional notes', `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
 CREATE TABLE `eotc_event_metadata`( `event_id` INT(11), `metadata_id` INT(11) );
-ALTER TABLE `eotc_metadata` CHANGE `rams_required` `rams_required` TINYINT(1) NULL;
 
 /* Unique index, so I can use insert ignore to prevent dupes
  */
 ALTER TABLE `eotc_event_metadata` ADD UNIQUE INDEX `event_metadata` (`event_id`, `metadata_id`);
-ALTER TABLE `eotc_metadata` CHANGE `notes` `comment` TEXT CHARSET utf8 COLLATE utf8_general_ci NULL COMMENT 'iAdditional notes';
 
 /* Event statuses
  */
@@ -41,24 +39,23 @@ CREATE TABLE `eotc_event_campus`( `event_id` INT(11), `campus_id` INT(11) );
 
 /* Event staff relations
  */
-CREATE TABLE `eotc_event_staff`( `event_id` INT(11), `user_id` INT(11) );
-ALTER TABLE `eotc_event_staff` ADD UNIQUE INDEX `event_staff` (`event_id`, `user_id`);
+CREATE TABLE `eotc_metadata_staff`( `metadata_id` INT(11), `user_id` INT(11) );
+ALTER TABLE `eotc_metadata_staff` ADD UNIQUE INDEX `metadata_staff` (`metadata_id`, `user_id`);
 
 /* Event student relations
  */
-CREATE TABLE `eotc_event_student`( `event_id` INT(11), `user_id` INT(11) );
-ALTER TABLE `eotc_event_student` ADD UNIQUE INDEX `event_student` (`event_id`, `user_id`);
+CREATE TABLE `eotc_metadata_student`( `metadata_id` INT(11), `user_id` INT(11) );
+ALTER TABLE `eotc_metadata_student` ADD UNIQUE INDEX `metadata_student` (`metadata_id`, `user_id`);
 
 /* Event file relations
  */
-CREATE TABLE `eotc_event_file`( `event_id` INT(11), `storage_id` INT(11) );
-ALTER TABLE `eotc_event_file` ADD UNIQUE INDEX `event_file` (`event_id`, `storage_id`);
+CREATE TABLE `eotc_metadata_file`( `metadata_id` INT(11), `storage_id` INT(11) );
+ALTER TABLE `eotc_metadata_file` ADD UNIQUE INDEX `metadata_storage` (`metadata_id`, `storage_id`);
 INSERT INTO `error` (`id`, `message`) VALUES ('161', 'Please upload a RAMS file.');
 
 /* Event activity log relations
  */
-CREATE TABLE `eotc_activitylog`( `id` INT(11) AUTO_INCREMENT, `actioner_id` INT(11), `event_id` INT(11), `message` TEXT, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, KEY(`id`) );
-ALTER TABLE `eotc_activitylog` CHANGE `event_id` `metadata_id` INT(11) NULL;
+CREATE TABLE `eotc_activitylog`( `id` INT(11) AUTO_INCREMENT, `actioner_id` INT(11), `metadata_id` INT(11), `message` TEXT, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, KEY(`id`) );
 
 /* Permissions
  */
