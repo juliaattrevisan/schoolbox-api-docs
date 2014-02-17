@@ -13,6 +13,98 @@ namespace EOTC;
 
 class EventConnector extends EventMapper {
 
+	public function getEvent($eventId) {
+		$authorMapper = $this->getJoinMapper('author');
+		$eventTypeMapper = $this->getJoinMapper('eventType');
+
+		$query = "
+			SELECT
+				{$this->getColumnString('e')},
+				{$authorMapper->getColumnString('a')},
+				{$eventTypeMapper->getColumnString('t')}
+			FROM `{$this->table}` e
+			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":eventId", $eventId);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		$collection = new \Calendar_Event_Collection();
+
+		if ($row) {
+			$eventItem = $this->hydrate($row, 'e');
+
+			/* Author
+			 */
+			$authorItem = $authorMapper->hydrate($row, 'a');
+			$eventItem->setAuthor($authorItem);
+
+			/* Convert dates ;(
+			 */
+			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+			$eventItem->setStartDateTime($startDateTime);
+
+			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+			$eventItem->setEndDateTime($endDateTime);
+
+			/* Accumulate campuses for this event
+			 */
+			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
+
+			/* For filters
+			 */
+			$campusIds = array();
+
+			foreach($eventItem->getCampusCollection() as $currentCampus) {
+				$campusIds[] = $currentCampus->getId();
+			}
+
+			/* Translate an \EOTC\Event type into a
+			 * Calendar_Event_Type_Abstract type
+			 */
+			$event = new \Calendar_Event_Type_EOTC();
+			$event->setAuthorName($eventItem->getAuthor()->getFullname());
+			$event->setAuthorId($eventItem->getAuthor()->getId());
+			$event->setEventId($eventItem->getId());
+			$event->setStartTime($eventItem->getStartDateTime());
+			$event->setEndTime($eventItem->getEndDateTime());
+			$event->setCampusList(implode(',', $campusIds));
+
+			/* EOTC Events are always of the type "EOTC" for usage
+			 * in calendar filters
+			 */
+			$event->setType($eventItem->getEventType()->getId());
+			$event->setNote($eventItem->getNote());
+			$event->setAccess($eventItem->getAccess());
+			$event->setEventType($eventItem->getEventType()->getType());
+			$event->setColour($eventItem->getEventType()->getColor());
+			$event->setDetail($eventItem->getDetail());
+			$event->setLocation($eventItem->getLocation());
+			$event->setAllDay(0);
+
+			/* If you have write access to the event. Only superusers
+			 * and authors can modify an event
+			 */
+			if ($_SESSION['user']->isSuperuser() || $_SESSION['user']->getId() == $event->getAuthorId()) {
+				$event->setIsEditable(true);
+			}
+			else {
+				$event->setIsEditable(false);
+			}
+
+			$event->setAttendance(0);
+			$event->setCompleted(0);
+
+			$collection->add($event);
+		}
+
+		return $collection;
+	}
+
 	/**
 	 * Get events within a particular time span
 	 *

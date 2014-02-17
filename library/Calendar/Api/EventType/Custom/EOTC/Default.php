@@ -55,53 +55,9 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvent($eventId) {
-		return new Calendar_Event_Collection();
+		$collection = $this->getCalendarHandler()->getEvent($eventId);
 
-//		$collection = new Calendar_Event_Collection();
-//
-//		$currentEvent = $this->getCalendarHandler()->getByID($eventId);
-//
-//		/* If an event was found, compose and stack a new event object
-//		 */
-//		if (is_array($currentEvent)) {
-//			$event = new Calendar_Event_Type_Day();
-//
-//			$event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
-//			$event->setAuthorId($currentEvent['uid']);
-//			$event->setEventId($currentEvent['id']);
-//			$event->setStartTime(new Alaress_Date_Format(new DateTime($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'])));
-//			$event->setEndTime(new Alaress_Date_Format(new DateTime($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'])));
-//			$event->setType($currentEvent['type']);
-//			$event->setNote($currentEvent['note']);
-//			$event->setAccess($currentEvent['access']);
-//			$event->setEventType($currentEvent['eventType']);
-//			$event->setColour($currentEvent['eventColour']);
-//			$event->setCampusList($currentEvent['campusList']);
-//			$event->setDetail($currentEvent['detail']);
-//			$event->setLocation($currentEvent['location']);
-//			$event->setPublishDate($currentEvent['publish_date']);
-//			$event->setSid($currentEvent['sid']);
-//			$event->setAllday($currentEvent['allday']);
-//
-//			if ($this->getCalendarHandler()->getPerm($currentEvent) > 1) {
-//				$event->setIsEditable(true);
-//			}
-//			else {
-//				$event->setIsEditable(false);
-//			}
-//
-//			if ($currentEvent['access'] == 2) {
-//				$event->setCategoryId($currentEvent['categoryId']);
-//				$event->setCategoryname($currentEvent['categoryName']);
-//			}
-//
-//			$event->setAttendance($currentEvent['attendance']);
-//			$event->setCompleted($currentEvent['completed']);
-//
-//			$collection->add($event);
-//		}
-//
-//		return $collection;
+		retyrn $collection;
 	}
 
 	/* Getters/Setters
