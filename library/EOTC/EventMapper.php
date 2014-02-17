@@ -377,7 +377,8 @@ class EventMapper extends Calendar\EventMapper {
 
 				/* Accumulate student attendees for this event
 				 */
-				$eventItem->getMetadata()->setStudentAttendees($this->findStudentAttendees($eventItem->getMetadata()->getId()));
+				$allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setStudentAttendees($allStudents);
 			}
 
 			/* Only add the first in a series; ignore the others
