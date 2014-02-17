@@ -21,7 +21,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	}
 
 	if (is_array($_POST['selected']) && count($_POST['selected'])) {
-		$eventMapper->deleteStudentAttendeesRelationsSpecific($event, $_POST['selected']);
+		$metadataMapper = new \EOTC\EventMetadataMapper();
+		$metadataMapper->deleteStudentAttendeesRelationsSpecific($event->getMetadata(), $_POST['selected']);
 	}
 
 	$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());

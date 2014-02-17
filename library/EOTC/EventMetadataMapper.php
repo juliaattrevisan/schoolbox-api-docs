@@ -184,6 +184,128 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	}
 
 	/**
+	 * Assign students to an event
+	 *
+	 * @param $metadata
+	 */
+	public function createStudentAttendees($metadata) {
+		$query = "
+			INSERT IGNORE INTO `eotc_metadata_student` (metadata_id, user_id)
+			VALUES (:metadataId, :userId)
+		";
+
+		foreach ($metadata->getStudentAttendees() as $currentStudent) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->bindParam(":userId", $currentStudent->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Add specific relations for a particular event
+	 *
+	 * @param $metadata
+	 * @param $ids
+	 */
+	public function addStudentAttendeesRelationsSpecific($metadata, $ids) {
+		if (is_array($ids) && count($ids)) {
+			$query = "
+				INSERT IGNORE INTO `eotc_metadata_student` (metadata_id, user_id)
+				VALUES (:metadataId, :userId)
+			";
+
+			foreach($ids as $currentId) {
+				if (preg_match('/[0-9]+/', $currentId)) {
+					$statement = $this->database->prepare($query);
+					$statement->bindParam(":metadataId", $metadata->getId());
+					$statement->bindParam(":userId", $currentId);
+					$statement->execute();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Find students for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	public function findStudentAttendees($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_metadata_student',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'metadata_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'user_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\UserMapper(),
+					'options' => array(
+						'order' => array(
+							'lastname' => 'ASC'
+						)
+					)
+				),
+			));
+	}
+
+	/**
+	 * Deletes student attendee relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $metadata
+	 * @return bool|void
+	 */
+	public function deleteStudentAttendeesRelations($metadata) {
+		$query = "
+			DELETE FROM `eotc_metadata_student`
+			WHERE metadata_id = :metadataId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->execute();
+	}
+
+	/**
+	 * Delete specific relations for a particular event
+	 *
+	 * @param $metadata
+	 * @param $ids
+	 */
+	public function deleteStudentAttendeesRelationsSpecific($metadata, $ids) {
+		if (is_array($ids) && count($ids)) {
+			$allIds = array();
+
+			foreach($ids as $currentId) {
+				if (preg_match('/[0-9]+/', $currentId)) {
+					$allIds[] = $currentId;
+				}
+			}
+
+			$allIds = implode(',', $allIds);
+
+			$query = "
+				DELETE FROM `eotc_metadata_student`
+				WHERE metadata_id = :metadataId
+				AND user_id IN ({$allIds})
+			";
+
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
 	 * Many-many relation table, where $relationTable is a pseudo-mapping
 	 * of column names
 	 *
