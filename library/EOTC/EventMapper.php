@@ -176,7 +176,8 @@ class EventMapper extends Calendar\EventMapper {
 
 				/* Accumulate staff attendees for this event
 				 */
-				$eventItem->getMetadata()->setStaffAttendees($this->findStaffAttendees($eventItem->getMetadata()->getId()));
+				$allStaff = $metadataMapper->findStaffAttendees($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setStaffAttendees($allStaff);
 
 				/* Accumulate student attendees for this event
 				 */
@@ -411,8 +412,8 @@ class EventMapper extends Calendar\EventMapper {
 		$this->deleteCampusRelations($event);
 		$this->createCampus($event);
 
-		$this->deleteStaffAttendeesRelations($event);
-		$this->createStaffAttendees($event);
+		$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
+		$metadataMapper->createStaffAttendees($event->getMetadata());
 
 		$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
 		$metadataMapper->createStudentAttendees($event->getMetadata());
@@ -525,69 +526,6 @@ class EventMapper extends Calendar\EventMapper {
 
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(":eventId", $event->getId());
-		$statement->execute();
-	}
-
-	/**
-	 * Assign staff to an event
-	 *
-	 * @param $event
-	 */
-	private function createStaffAttendees($event) {
-		$query = "
-			INSERT IGNORE INTO `eotc_metadata_staff` (metadata_id, user_id)
-			VALUES (:metadataId, :userId)
-		";
-
-		foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":metadataId", $event->getMetadata()->getId());
-			$statement->bindParam(":userId", $currentStaff->getId());
-			$statement->execute();
-		}
-	}
-
-	/**
-	 * Find staff for a particular event
-	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
-	 */
-	protected function findStaffAttendees($identifier) {
-		return $this->manyManyRelation(array(
-				'name' => 'eotc_metadata_staff',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'metadata_id',
-				'value' => $identifier,
-
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'user_id',
-					'key' => 'id',
-					'mapper' => new \Schoolbox\UserMapper()
-				),
-			));
-	}
-
-	/**
-	 * Deletes staff attendee relations if there are no remaining
-	 * events in the series
-	 *
-	 * @param $event
-	 * @return bool|void
-	 */
-	public function deleteStaffAttendeesRelations($event) {
-		$query = "
-			DELETE FROM `eotc_metadata_staff`
-			WHERE metadata_id = :metadataId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 		$statement->execute();
 	}
 

@@ -184,6 +184,69 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	}
 
 	/**
+	 * Assign staff to an event
+	 *
+	 * @param $metadata
+	 */
+	public function createStaffAttendees($metadata) {
+		$query = "
+			INSERT IGNORE INTO `eotc_metadata_staff` (metadata_id, user_id)
+			VALUES (:metadataId, :userId)
+		";
+
+		foreach ($metadata->getStaffAttendees() as $currentStaff) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->bindParam(":userId", $currentStaff->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Find staff for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	public function findStaffAttendees($identifier) {
+		return $this->manyManyRelation(array(
+				'name' => 'eotc_metadata_staff',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'metadata_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'user_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\UserMapper()
+				),
+			));
+	}
+
+	/**
+	 * Deletes staff attendee relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $metadata
+	 * @return bool|void
+	 */
+	public function deleteStaffAttendeesRelations($metadata) {
+		$query = "
+			DELETE FROM `eotc_metadata_staff`
+			WHERE metadata_id = :metadataId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->execute();
+	}
+
+	/**
 	 * Assign students to an event
 	 *
 	 * @param $metadata
