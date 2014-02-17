@@ -20,7 +20,7 @@ class Synchronise_Tass_Meriden_Strategy_Staff extends Synchronise_Base_Strategy_
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Name_Staff())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Username_Staff())
-            ->addHydrator(new Synchronise_Base_Hydrator_AllCampus())
+            ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Campus_Staff())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Group_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())

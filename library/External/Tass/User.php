@@ -275,17 +275,14 @@ class External_Tass_User implements External_UserInterface {
                 '' AS StaffCampus,
                 '' AS StaffCategoryType,
                 '' AS StaffCategory,
-                '' AS StaffDepartment,
+                td.tch_dept AS StaffDepartment,
                 *
             FROM teacher AS t
+            JOIN tchdept AS td ON t.tch_code = td.tch_code
             WHERE t.curr_flg = 'Y'
             AND t.cmpy_code='01'
         ";
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
-        foreach ($staffList as &$row) {
-            $row['ActiveFlag'] = ($row['ActiveFlag'] === 'Y');
-        }
-        unset($row);
         return $staffList;
     }
 
