@@ -87,8 +87,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		));
 
 		if ($event->getMetadata()->getRamsRequired()) {
-			if ($event->getRamsFiles()->first()) {
-				$filename = $event->getRamsFiles()->first()->getFilename();
+			if ($event->getMetadata()->getRamsFiles()->first()) {
+				$filename = $event->getMetadata()->getRamsFiles()->first()->getFilename();
 			}
 			else {
 				$filename = '';

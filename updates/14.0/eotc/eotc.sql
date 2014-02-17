@@ -51,8 +51,8 @@ ALTER TABLE `eotc_event_student` ADD UNIQUE INDEX `event_student` (`event_id`, `
 
 /* Event file relations
  */
-CREATE TABLE `eotc_event_file`( `event_id` INT(11), `storage_id` INT(11) );
-ALTER TABLE `eotc_event_file` ADD UNIQUE INDEX `event_file` (`event_id`, `storage_id`);
+CREATE TABLE `eotc_metadata_file`( `metadata_id` INT(11), `storage_id` INT(11) );
+ALTER TABLE `eotc_metadata_file` ADD UNIQUE INDEX `metadata_storage` (`metadata_id`, `storage_id`);
 INSERT INTO `error` (`id`, `message`) VALUES ('161', 'Please upload a RAMS file.');
 
 /* Event activity log relations

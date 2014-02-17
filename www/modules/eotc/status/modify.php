@@ -79,15 +79,15 @@ if ($event->getMetadata()->getRamsRequired()) {
 	/* Sometimes event/file relations get recorded with a storage_id of 0
 	 * so we need to check whether one actually legitimately saved properly
 	 */
-	if ($event->getRamsFiles()->first() && $event->getRamsFiles()->first()->getId()) {
+	if ($event->getMetadata()->getRamsFiles()->first() && $event->getMetadata()->getRamsFiles()->first()->getId()) {
 		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-		$mimetype = $mimetypeMapper->getByFilename($event->getRamsFiles()->first()->getFilename());
+		$mimetype = $mimetypeMapper->getByFilename($event->getMetadata()->getRamsFiles()->first()->getFilename());
 
 		$this->setVar(array(
-			'EVENT_RAMS_FILE' => $event->getRamsFiles()->first()->getFilename(),
-			'EVENT_RAMS_FILESIZE' => $event->getRamsFiles()->first()->getFilesize(),
+			'EVENT_RAMS_FILE' => $event->getMetadata()->getRamsFiles()->first()->getFilename(),
+			'EVENT_RAMS_FILESIZE' => $event->getMetadata()->getRamsFiles()->first()->getFilesize(),
 			'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
-			'EVENT_RAMS_HASH' => $event->getRamsFiles()->first()->getHash(),
+			'EVENT_RAMS_HASH' => $event->getMetadata()->getRamsFiles()->first()->getHash(),
 		));
 
 		$this->parse('has_rams_block', 'has_rams');

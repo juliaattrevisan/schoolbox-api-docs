@@ -56,6 +56,13 @@ class EventMetadata {
 	protected $activityLog = null;
 
 	/**
+	 * A collection of brownhole files
+	 *
+	 * @var null
+	 */
+	protected $ramsFiles = null;
+
+	/**
 	 * Created at
 	 *
 	 * @var null
@@ -80,6 +87,7 @@ class EventMetadata {
 	 * Construtor
 	 */
 	public function __construct() {
+		$this->setRamsFiles(new \Schoolbox\Collection());
 	}
 
 	/* Getters/Setters
@@ -245,5 +253,23 @@ class EventMetadata {
 	 */
 	public function getActivityLog() {
 		return $this->activityLog;
+	}
+
+	/**
+	 * Set rams files
+	 *
+	 * @param null $ramsFiles
+	 */
+	public function setRamsFiles($ramsFiles) {
+		$this->ramsFiles = $ramsFiles;
+	}
+
+	/**
+	 * Get rams files
+	 *
+	 * @return null
+	 */
+	public function getRamsFiles() {
+		return $this->ramsFiles;
 	}
 }

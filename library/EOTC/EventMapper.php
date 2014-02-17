@@ -181,15 +181,16 @@ class EventMapper extends Calendar\EventMapper {
 			 */
 			$eventItem->setStudentAttendees($this->findStudentAttendees($identifier));
 
-			/* Accumulate RAMS files for this event
-			 */
-			$eventItem->setRamsFiles($this->findFiles($identifier));
-
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+
+				/* Accumulate RAMS files for this event
+				 */
+//				var_dump($this->findFiles($eventItem->getMetadata()->getId()));
+				$eventItem->getMetadata()->setRamsFiles($this->findFiles($eventItem->getMetadata()->getId()));
 
 				/* Activity logs
 				 */
@@ -722,13 +723,13 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	private function createFiles($event) {
 		$query = "
-			INSERT IGNORE INTO `eotc_event_file` (event_id, storage_id)
-			VALUES (:eventId, :storageId)
+			INSERT IGNORE INTO `eotc_metadata_file` (metadata_id, storage_id)
+			VALUES (:metadataId, :storageId)
 		";
 
-		foreach ($event->getRamsFiles() as $currentFile) {
+		foreach ($event->getMetadata()->getRamsFiles() as $currentFile) {
 			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
+			$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 			$statement->bindParam(":storageId", $currentFile->getId());
 			$statement->execute();
 		}
@@ -742,12 +743,12 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	protected function findFiles($identifier) {
 		return $this->manyManyRelation(array(
-				'name' => 'eotc_event_file',
+				'name' => 'eotc_metadata_file',
 			),
 			array(
 				/* Find things to join to this...
 				 */
-				'column' => 'event_id',
+				'column' => 'metadata_id',
 				'value' => $identifier,
 
 				/* ...using this relation, such that column = key
@@ -769,12 +770,12 @@ class EventMapper extends Calendar\EventMapper {
 	 */
 	public function deleteFilesRelations($event) {
 		$query = "
-			DELETE FROM `eotc_event_file`
-			WHERE event_id = :eventId
+			DELETE FROM `eotc_metadata_file`
+			WHERE metadata_id = :metadataId
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
+		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
 		$statement->execute();
 	}
 
