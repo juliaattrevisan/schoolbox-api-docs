@@ -3,13 +3,13 @@
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
 // Initialise routes
-foreach (glob(SITE_root.'/conf/routes/*.php') as $route) {
-    require $route;
+foreach (glob(SITE_root.'/conf/routes/*.php') as $routePath) {
+    require $routePath;
 }
 
-// Requested route is still jammed into $_GET[page], so get it out of that
+// Run router with requested path
 $route = $di->get('router')->match(
-    parse_url($_GET['page'], PHP_URL_PATH),
+    parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
     $_SERVER
 );
 if ($route instanceof Aura\Router\Route) {
