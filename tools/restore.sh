@@ -286,7 +286,6 @@ then
 	errmsg="Restore Cancelled";
 	error;
 fi
-echo "";
 
 # Details of restore source
 sourceloc=`echo $restore | cut -d',' -f1`;
@@ -298,17 +297,7 @@ sourcep3=`echo $restore | cut -d',' -f5`;
 # TODO Check if enough space available for the data file restore
 if [ "$sourcetype" = '[A]' ];
 then
-	echo "Full restore - TODO better check the disk space...";
-fi
-
-# Backup this installs database
-# TODO - perhaps need better checks, because if this fails we have no way to rollback the DB.
-echo "Performing backup of current database";
-newbackup=`$instdir/tools/backup-database.sh`;
-if [ $? -ne 0 ];
-then
-	errmsg="An error occured during the database backup";
-	error;
+	echo -e "\nFull restore - TODO better check the disk space...";
 fi
 
 # Sync the datafiles, with progress if possible
@@ -337,7 +326,7 @@ then
 	## Fix data and template folder permissions
 else
 	# DB only restore, sync the db backup locally
-	echo -e "\nDB only restore - TODO file transfer";
+	echo -e "\nDB only restore";
 	sourcedb='';
 	if [ "$sourceloc" = '[L]' ];
 	then
@@ -346,8 +335,21 @@ else
 	fi
 	if [ "$sourceloc" = '[R]' ];
 	then
-		# TODO Remote Source, transfer the db file locally.
-		echo "TODO";
+		# Remote Source, transfer the db file locally.
+		sourcesqlfilename=${sourcep3##*/};
+		echo -e "\nTransferring database backup";
+		scp $sourcep1:$sourcep3 /tmp >/dev/null 2>&1;
+		if [ $? -ne 0 ];
+		then
+			errmsg="Unable to transfer database backup successfully";
+			error;
+		fi
+		sourcedb="/tmp/$sourcesqlfilename";
+		if [ ! -f $sourcedb ];
+		then
+			errmsg="Unable to find $sourcedb";
+			error;
+		fi
 	fi
 	if [ "$sourceloc" = '[B]' ];
 	then
@@ -356,10 +358,24 @@ else
 	fi
 fi
 
-## TODO Fix data directory locations
+if [ -z $sourcedb ];
+then
+	errmsg="No database backup provided";
+	error;
+fi
+
+# Backup this installs database
+# TODO - perhaps need better checks, because if this fails we have no way to rollback the DB.
+echo -e "\nPerforming backup of current database";
+newbackup=`$instdir/tools/backup-database.sh`;
+if [ $? -ne 0 ];
+then
+	errmsg="An error occured during the database backup";
+	error;
+fi
 
 # Restore the DB
-echo -e "\nStarting restore of the database\n";
+echo -e "\nStarting restore of the database";
 ## Drop all existing database tables
 for table in `mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SHOW TABLES"`;
 do
@@ -367,10 +383,23 @@ do
 done;
 
 ## Restore specified database
-## TODO - switch based on local/remote/backup
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $sourcedb;
 
+## Fix SQL config paths to data directory
+$instdir/tools/generate-dir-sql.sh $thisdatadir `readlink -f $thistemplatedir/../` > /tmp/schoolbox-restore-sql-paths;
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/schoolbox-restore-sql-paths;
+
+## Build SQL updates if required
+sqlupdates=`ls -1 $instdir/updates/*/scripts_list 2>/dev/null | wc -l`;
+if [ $sqlupdates -eq 0 ];
+then
+	echo -e "\nBuilding SQL updates";
+	cd $instdir;
+	$instdir/tools/build-sql-update.sh >/dev/null 2>&1;
+fi
+
 ## Run SQL updates to current install
+echo "";
 $instdir/tools/update-sql.sh;
 
 # Restart apache
