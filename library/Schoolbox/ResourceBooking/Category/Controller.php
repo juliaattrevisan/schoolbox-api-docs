@@ -60,7 +60,33 @@ class Controller extends Base {
         $model->setName($post['name']);
         $this->getMapper()->save($model);
         // Return something.
-        // If this is a JSON request, output something - maybe if this is a
+        // If this is a JSON request, output a result - maybe if this is a
+        // HTML request, redirect somewhere.
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('resourceCategory.browse', array())
+        );
+    }
+
+    public function edit($id) {
+        $item = $this->getMapper()->findById($id);
+        $this->getResponse()->content->set(
+            array(
+                'template' => __DIR__.'/templates/add.twig',
+                'data'     => array(
+                    'item' => $item,
+                ),
+            )
+        );
+    }
+
+    public function update($id) {
+        $item = $this->getMapper()->findById($id);
+        $post  = $this->getRequest()->post;
+        $model = new Model();
+        $model->setName($post['name']);
+        $this->getMapper()->save($model);
+        // Return something.
+        // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate('resourceCategory.browse', array())

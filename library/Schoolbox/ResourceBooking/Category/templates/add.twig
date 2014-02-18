@@ -1,9 +1,8 @@
-{# Need some method for adding custom_head #}
+{# I need some way of adding custom_head #}
 
-<h1>Resource Category - {% if item.id %}Add New{% else %}Edit{% endif %}</h1>
+<h1>Resource Category - {% if item.id %}Edit{% else %}Add New{% endif %}</h1>
 
-{# I'd like routeLookup in my controllers #}
-<form action="{{ routeLookup('resourceCategory.create') }}" method="post" name="form" class="clearfix">
+<form action="{% if item.id %}{{ routeLookup('resourceCategory.update', {id: item.id}) }}{% else %}{{ routeLookup('resourceCategory.create') }}{% endif %}" method="post" name="form" class="clearfix">
     <input type="hidden" name="id" value="{{ item.id }}"/>
     <table class="standardForm table">
         <tr>
@@ -14,7 +13,7 @@
 
     <input type="submit" name="{% if item.id %}Add{% else %}Save{% endif %}" class="submit-btn-plain"/>
 
-    {# I need some sort of permission check method #}
+    {# I need some sort of permission check method, because not all users can delete #}
     {% if item.id %}
     <input type="button" class="submit-btn-plain" value="Delete" />
     {% endif %}
