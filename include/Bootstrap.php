@@ -8,7 +8,6 @@
  * @version     SVN: $Id$
  */
 
-use Aura\Di;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 
@@ -30,44 +29,8 @@ set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include
 require_once dirname(__FILE__) . '/Autoloader.php';
 Autoloader::initialise();
 
-// Do dependency injection stuff
-// How do I get this container elsewhere without using a global?
-$di = new Di\Container(new Di\Factory());
-$di->set(
-    'router',
-    function() {
-        $factory = new Aura\Router\RouterFactory();
-        return $factory->newInstance();
-    }
-);
-
-// Set up a web factory and its request/responses
-$di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
-$di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
-
-// inject request and response into controller
-// (I may need to mangle requests in pre-processing though)
-$di->setters['Schoolbox\\Web\\Controller\\Base'] = array(
-    'setRequest' => $di->lazy(function() use($di) {
-        return $di->get('webFactory')->newRequest();
-    }),
-    'setResponse' => $di->lazy(function() use($di) {
-        return $di->get('webFactory')->newResponse();
-    }),
-);
-
-// inject web params
-//$di->params['SitePage']['login'] = false;
-$di->set('sitePage', $di->lazyNew('SitePage'));
-
-$di->setters['Schoolbox\\Web\\Output\\Sitepage']['setSitepage'] = $di->lazyGet('sitePage');
-$di->set('webOutput', $di->lazyNew('Schoolbox\\Web\\Output\\Sitepage'));
-
-//// inject Twig environment
-//$loader = new Twig_Loader_Filesystem($templatePaths);
-//$twig = new Twig_Environment($loader);
-//$twig->addExtension(new Twig_Extension_Debug());
-//$di->set('templateEngine');
+// Set up the dependency injector
+require_once __DIR__.'/Bootstrap/Dependencies.php';
 
 //
 // Set up the debug bar, and add listeners for various parts of the debug bar

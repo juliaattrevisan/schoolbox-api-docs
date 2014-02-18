@@ -10,6 +10,7 @@
 use Aura\Di;
 
 /** @var Di\Container $di */
+global $di;
 $router = $di->get('router');
 $router->attachResource('resourceCategory', '/resourceCategory');
 
