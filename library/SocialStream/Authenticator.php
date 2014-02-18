@@ -71,7 +71,9 @@ class Authenticator {
 		}
 		else {
 			$groupHandler = new \Group();
-			$permission = $groupHandler->getPermission($this->getNewPost()->getHomepageId());
+            //If we are dealing with a post, check its permission, else check permission of component for rendering purposes
+            $homepageID = $this->getNewPost()->getHomepageId() ? $this->getNewPost()->getHomepageId() : $this->getInstance()->getIdentifier();
+			$permission = $groupHandler->getPermission($homepageID);
 		}
 
 		return $permission;
