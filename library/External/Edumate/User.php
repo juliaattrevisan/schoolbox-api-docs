@@ -278,6 +278,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
                 FROM db2inst1.schoolbox_teacherclass tc
                 LEFT JOIN db2inst1.schoolbox_classes c ON tc.class_code = c.class_code
                 WHERE tc.staff_number = :id
+                ORDER BY c.class_code ASC, class ASC
             ";
         }
         elseif($this->getGroupHandler()->isStudent($userId)) {
@@ -286,6 +287,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
                 FROM db2inst1.schoolbox_studentclass sc
                 LEFT JOIN db2inst1.schoolbox_classes c ON sc.class_code = c.class_code
                 WHERE sc.student_number = :id
+                ORDER BY c.class_code ASC, class ASC
             ";
         }
         else {

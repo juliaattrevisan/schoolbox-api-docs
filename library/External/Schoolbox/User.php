@@ -234,6 +234,7 @@ class External_Schoolbox_User implements External_UserInterface {
 			LEFT JOIN class_user cu ON cu.user_id = u.id
 			LEFT JOIN class c ON c.id = cu.class_id
 			WHERE u.synergy_id = :externalUserId
+			ORDER BY c.code ASC, c.name ASC
 		");
 
 		$statement->execute( array(

@@ -352,6 +352,7 @@ class External_Denbigh_User implements External_UserInterface {
 				RIGHT JOIN Classes cl ON cl.staffCode = s.staffCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
 				WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
+				ORDER BY cl.classCode ASC, co.subjectName ASC
 			"
             );
         } else {
@@ -363,6 +364,7 @@ class External_Denbigh_User implements External_UserInterface {
 				RIGHT JOIN Classes cl ON cl.classCode = e.classCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
 				WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
+				ORDER BY cl.classCode ASC, co.subjectName ASC
 			"
             );
         }
