@@ -92,7 +92,7 @@
                     ml.delegate('a', 'click', function(ev) {
 
                         var pip = $(this).hasClass('pip');
-                        var action = $(this).hasClass('action');
+                        var action = $(this).hasClass('action') && $(this).closest('li').hasClass('unread');
 
                         if(pip || action) {
                             var msgId = $(this).closest('li.message').attr('id').split('-')[1];
@@ -117,7 +117,7 @@
 
                         if(settings.debug) { console.log('Open list'); }
 
-                        $('body').one('click', function(e) {
+                        $(document).one('click', function(e) {
                             $('#message-list').addClass('hide');
                             clearInterval(ii);
                             if(settings.debug) { console.log('Close list', this); }
