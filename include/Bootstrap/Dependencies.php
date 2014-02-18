@@ -49,6 +49,7 @@ $di->setters['Alaress\\Web\\Output\\Html']['setTemplateEngine'] = $di->lazyGet('
 $di->setters['Alaress\\Web\\Output\\ThemedHtml']['setSitepage'] = $di->lazyGet('sitePage');
 $di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
 $di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
+$di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
 
 $di->set(
     'templateEngine',
