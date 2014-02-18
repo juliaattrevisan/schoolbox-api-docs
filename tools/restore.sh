@@ -1,5 +1,5 @@
 #!/bin/bash
-# Sync/Restore Script
+# Schoolbox Restore
 # Description:
 #       Allows for restoring database and data files from another install or
 #       backup of Schoolbox.
