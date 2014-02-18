@@ -32,16 +32,18 @@ class Mapper extends BaseMapper {
         );
         $this->hasMap(
             array(
-                'column'   => 'created_at',
-                'property' => 'createdAt',
-                'type'     => self::TYPE_DATETIME,
+                'column'            => 'created_at',
+                'property'          => 'createdAt',
+                'type'              => self::TYPE_DATETIME,
+                'created_timestamp' => true,
             )
         );
         $this->hasMap(
             array(
-                'column'   => 'modified_at',
-                'property' => 'modifiedAt',
-                'type'     => self::TYPE_DATETIME,
+                'column'            => 'modified_at',
+                'property'          => 'modifiedAt',
+                'type'              => self::TYPE_DATETIME,
+                'updated_timestamp' => true,
             )
         );
         $this->hasMap(
