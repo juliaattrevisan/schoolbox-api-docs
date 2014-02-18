@@ -20,14 +20,21 @@ class Sitepage extends Base {
     protected $sitepage;
 
     /**
+     * @var \Twig_Environment
+     */
+    protected $templateEngine;
+
+    /**
      * Outputs the response body from the response object.
      *
-     * This method assumes the output is simply a string.
+     * This method assumes the output is an array with "template" and "data"
+     * keys.
      */
     protected function outputResponseBody() {
         $page = $this->getSitepage();
         $page->setFile(TEMPLATE_content, 'output.html');
-        $page->setVar('OUTPUT', $this->getResponse()->content->get());
+        $response = $this->getResponse()->content->get();
+        $page->setVar('OUTPUT', $this->getTemplateEngine()->render($response['template'], $response['data']));
         $page->buildPage();
         $page->outputPage(true);
     }
@@ -48,6 +55,20 @@ class Sitepage extends Base {
         return $this->sitepage;
     }
 
+    /**
+     * @param  \Twig_Environment $templateEngine
+     * @return $this
+     */
+    public function setTemplateEngine($templateEngine) {
+        $this->templateEngine = $templateEngine;
+        return $this;
+    }
 
+    /**
+     * @return \Twig_Environment
+     */
+    public function getTemplateEngine() {
+        return $this->templateEngine;
+    }
 
 } 

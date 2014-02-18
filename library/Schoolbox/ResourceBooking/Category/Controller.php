@@ -17,7 +17,11 @@ class Controller extends Base {
      */
     public function browse() {
         $response = $this->getResponse();
-        $response->content->set('Blah');
+        $response->content->set(
+            array(
+                'data'     => array(),
+                'template' => __DIR__.'/templates/browse.twig',
+            )
+        );
     }
-
 }
