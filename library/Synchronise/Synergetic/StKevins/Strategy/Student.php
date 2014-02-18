@@ -107,4 +107,14 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 		}
 		return $group;
 	}
+	
+	/**
+	* Webmail setting
+	*
+	* @param $currentUser
+	* @return int|void
+	*/
+	public function getWebmailFromUser($currentUser) {
+		return 1;
+	}
 }
