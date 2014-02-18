@@ -72,7 +72,7 @@ $di->set(
 
             $twig = new Twig_Environment(
                 $loader,
-                array('cache' => $config->get('stream_dir').'/templates/')
+                array('cache' => $config->get('stream_dir').'/templates/', 'debug' => true,)
             );
             $twig->addExtension(new Twig_Extension_Debug());
 
