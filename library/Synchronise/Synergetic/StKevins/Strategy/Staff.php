@@ -79,6 +79,16 @@ class Synchronise_Synergetic_StKevins_Strategy_Staff extends Synchronise_Base_St
 	}
 
 	/**
+	* Webmail setting
+	*
+	* @param $currentUser
+	* @return int|void
+	*/
+	public function getWebmailFromUser($currentUser) {
+		return 1;
+	}
+	
+	/**
 	 * St. Kevins staff have local email on.
 	 *
 	 * @param array $currentUser
