@@ -62,6 +62,9 @@ class Controller extends Base {
         // Return something.
         // If this is a JSON request, output something - maybe if this is a
         // HTML request, redirect somewhere.
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('resourceCategory.browse', array())
+        );
     }
 
     /**
