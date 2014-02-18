@@ -14,17 +14,12 @@ namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 
-class ThemedHtml extends Base {
+class ThemedHtml extends Html {
 
     /**
      * @var \SitePage
      */
     protected $sitepage;
-
-    /**
-     * @var \Twig_Environment
-     */
-    protected $templateEngine;
 
     /**
      * Outputs the response body from the response object.
@@ -57,20 +52,4 @@ class ThemedHtml extends Base {
         return $this->sitepage;
     }
 
-    /**
-     * @param  \Twig_Environment $templateEngine
-     * @return $this
-     */
-    public function setTemplateEngine($templateEngine) {
-        $this->templateEngine = $templateEngine;
-        return $this;
-    }
-
-    /**
-     * @return \Twig_Environment
-     */
-    public function getTemplateEngine() {
-        return $this->templateEngine;
-    }
-
-} 
+}
