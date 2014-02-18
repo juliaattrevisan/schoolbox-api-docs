@@ -52,6 +52,9 @@ $di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
 $di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
 $di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
 
+$di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
+$di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
+
 $di->set(
     'templateEngine',
     $di->lazy(
@@ -69,6 +72,14 @@ $di->set(
 
             $twig   = new Twig_Environment($loader);
             $twig->addExtension(new Twig_Extension_Debug());
+
+            // Add the route lookup method
+            $routeLookup = new Twig_SimpleFunction(
+                'routeLookup',
+                array($di->get('templateEngine:routeLookup'), 'execute')
+            );
+            $twig->addFunction($routeLookup);
+
             return $twig;
         }
     )
