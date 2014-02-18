@@ -13,8 +13,7 @@ namespace Schoolbox\Notif\Message;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
 
-// TODO RENAME THIS
-class MessageCollection {
+class Messenger {
 
 	/** @var \SplObjectStorage */
 	protected $splStore;

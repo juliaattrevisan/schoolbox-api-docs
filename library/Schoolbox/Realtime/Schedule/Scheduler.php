@@ -23,7 +23,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\CompressionException;
 use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\Message\Internal;
-use Schoolbox\Notif\Message\MessageCollection;
+use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Message\MessageInterface;
 use Schoolbox\Notif\MQ\Connector;
@@ -270,34 +270,34 @@ class Scheduler {
 						throw new ScheduleException("Uncallable callback supplied");
 					}
 
-					/** @var MessageCollection $mCollection */
-					$mCollection = call_user_func($callback,
+					/** @var Messenger $msgr */
+					$msgr = call_user_func($callback,
 						$trigger->getModel(), $trigger->getUser(), $trigger->getDiff()
 					);
 
 					/* attempt some sort of type-safety */
 
 					// method not implemented or nothing to send, this is fine
-					if(is_null($mCollection)) {
-						unset($mCollection);
+					if(is_null($msgr)) {
+						unset($msgr);
 						continue;
 					}
 
 					// check that an array was returned
-					if(!$mCollection instanceof MessageCollection) {
+					if(!$msgr instanceof Messenger) {
 						throw new ScheduleException("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\MessageCollection");
 					}
 
 					// if there are no messages, just ignore this callback and move on
-					if(!$mCollection->hasMessages()) {
-						unset($mCollection);
+					if(!$msgr->hasMessages()) {
+						unset($msgr);
 						continue;
 					}
 
 					$count = 0;
 
 					// iterate across the messages supplied and send them
-					foreach($mCollection->generateExternalMessages($notif, $trigger->getTimestamp()) as $message) {
+					foreach($msgr->generateExternalMessages($notif, $trigger->getTimestamp()) as $message) {
 						// send them all!
 						$message->setContext(array('user' => $trigger->getUser()->getId()));
 						$sent = $message->send();
@@ -308,13 +308,13 @@ class Scheduler {
 
 				}
 				catch(ScheduleException $e) {
-					unset($mCollection);
+					unset($msgr);
 					$v->v($e->getMessage(), '!');
 				}
 				catch(\Exception $e) {
 					// don't know what other exceptions will be thrown here, so for now, acknowledge and rethrow
 					$v->v(sprintf("%s -> %s",get_class($e), $e->getMessage()), '!');
-					unset($mCollection);
+					unset($msgr);
 					throw $e;
 				}
 

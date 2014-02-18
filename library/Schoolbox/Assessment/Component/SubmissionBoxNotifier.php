@@ -19,7 +19,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\MessageFactory;
-use Schoolbox\Notif\Message\MessageCollection;
+use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\PreTrigger;
 use Schoolbox\Realtime\Schedule\ScheduleException;
@@ -238,7 +238,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 * @var SubmissionBox $submissionBox
 	 * @param User $user
 	 * @param array $diff
-	 * @return MessageCollection
+	 * @return Messenger
 	 */
 	public function notifyStudentOpen($submissionBox, $user, $diff = null) {
 		// yep. self-hydration.
@@ -268,13 +268,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			'catname'  => array($catName, "/homepage/$catId")
 		);
 
-		$mCollection = new MessageCollection();
+		$msgr = new Messenger();
 
 		$topic = $this->topics->targetCategoryStudents($cat->getId());
 
-		$mCollection->bind($topic, Logger::NOTICE, $msg, $params);
+		$msgr->bind($topic, Logger::NOTICE, $msg, $params);
 
-		return $mCollection;
+		return $msgr;
 	}
 
 
@@ -284,10 +284,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 * @param SubmissionBox $submissionBox
 	 * @param User $user
 	 * @param array $diff
-	 * @return MessageCollection
+	 * @return Messenger
 	 */
 	public function notifyStudentUpdated($submissionBox, $user, $diff = null) {
-		$mCollection = new MessageCollection();
+		$msgr = new Messenger();
 
 		// discard all update notifications if the submissionbox isn't open
 		$openStamp = $submissionBox->getOpenDate()->getUnixTimestamp();
@@ -295,12 +295,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		$now = time();
 
 		if($openStamp > $now || $closeStamp < $now) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		// if there's no actual difference
 		if(!count($diff)) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		$boxId = $submissionBox->getId();
@@ -337,7 +337,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			);
 
 			// send internally to all concerned
-			$mCollection->bind($topic, Logger::NOTICE, $msg, $params);
+			$msgr->bind($topic, Logger::NOTICE, $msg, $params);
 
 			unset($diff['name']);
 		}
@@ -359,7 +359,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 			$topic = $this->topics->targetCategory($cat->getId());
 
-			$mCollection->bind($topic, Logger::WARNING, $msg, array(
+			$msgr->bind($topic, Logger::WARNING, $msg, array(
 				'author' => array($authorName, "/search/user/$authorId"),
 				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
 				'date' => date($dateformat, $relative->getUnixTimestamp()),
@@ -385,7 +385,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			// send this to students only, other staff don't need to see it
 			$topic = $this->topics->targetCategoryStudents($cat->getId());
 
-			$mCollection->bind($topic, Logger::NOTICE, $msg, array(
+			$msgr->bind($topic, Logger::NOTICE, $msg, array(
 				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
 				'catname' => array($cat->getName(), "/homepage/$catId")
 			));
@@ -396,17 +396,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 
 		// if none of the above apply, but there are changes, just be generic
-		if(count($diff) && !$mCollection->hasMessages()) {
+		if(count($diff) && !$msgr->hasMessages()) {
 			$msg = new Message(":author updated :boxname in :catname", $icon, $href);
 
-			$mCollection->bind($this->topics->targetCategory($cat->getId()), Logger::NOTICE, $msg, array(
+			$msgr->bind($this->topics->targetCategory($cat->getId()), Logger::NOTICE, $msg, array(
 				'author' => array($authorName, "/search/user/$authorId"),
 				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
 				'catname' => array($cat->getName(), "/homepage/$catId")
 			));
 		}
 
-		return $mCollection;
+		return $msgr;
 	}
 
 
@@ -416,14 +416,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 * @param SubmissionBox $submissionBox
 	 * @param User $user
 	 * @param array $diff
-	 * @return MessageCollection
+	 * @return Messenger
 	 */
 	public function notifyStudentUpcoming($submissionBox, $user, $diff = null) {
-		$mCollection = new MessageCollection();
+		$msgr = new Messenger();
 
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		$boxId = $submissionBox->getId();
@@ -446,12 +446,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			$topicArray[] = $this->topics->targetUser($user->getId());
 		}
 
-		$mCollection->bind($topicArray, Logger::WARNING, $msg, array(
+		$msgr->bind($topicArray, Logger::WARNING, $msg, array(
 			'boxname' => array($boxName, $href),
 			'catname' => array($catName, "/homepage/$catId"),
 		));
 
-		return $mCollection;
+		return $msgr;
 	}
 
 
@@ -461,14 +461,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 * @param SubmissionBox $submissionBox
 	 * @param User $user
 	 * @param array $diff
-	 * @return MessageCollection
+	 * @return Messenger
 	 */
 	public function notifyParentUpcoming($submissionBox, $user, $diff = null) {
-		$mCollection = new MessageCollection();
+		$msgr = new Messenger();
 
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		$boxName = $submissionBox->getName();
@@ -502,14 +502,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 				: array($boxName, "/submission/submissionHistory/$boxId");
 
 			// bind this user's message into the collection
-			$mCollection->bind($topic, Logger::WARNING, $msg, array(
+			$msgr->bind($topic, Logger::WARNING, $msg, array(
 				'child'     => array($childName, "/search/user/$childId"),
 				'boxname'   => $boxdata,
 				'catname'   => array($catName, "/homepage/$catId")
 			));
 		}
 
-		return $mCollection;
+		return $msgr;
 	}
 
 
@@ -519,19 +519,19 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 * @param SubmissionBox $submissionBox
 	 * @param User $user
 	 * @param array $diff
-	 * @return array
+	 * @return Messenger
 	 */
 	public function notifyStudentOverdue($submissionBox, $user, $diff = null) {
-		$mCollection = new MessageCollection();
+		$msgr = new Messenger();
 
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		// if the late date has passed, ignore this message
 		if($submissionBox->getLateDate()->getUnixTimestamp() > time()) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		$boxId = $submissionBox->getId();
@@ -553,12 +553,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			$topicArray[] = $this->topics->targetUser($user->getId());
 		}
 
-		$mCollection->bind($topicArray, Logger::ERROR, $msg, array(
+		$msgr->bind($topicArray, Logger::ERROR, $msg, array(
 			'boxname' => array($boxName, $href),
 			'catname' => array($catName, "/homepage/$catId"),
 		));
 
-		return $mCollection;
+		return $msgr;
 	}
 
 
@@ -568,14 +568,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 * @param SubmissionBox $submissionBox
 	 * @param User $user
 	 * @param array $diff
-	 * @return array
+	 * @return Messenger
 	 */
 	public function notifyParentOverdue($submissionBox, $user, $diff = null) {
-		$mCollection = new MessageCollection();
+		$msgr = new Messenger();
 
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		$boxName = $submissionBox->getName();
@@ -601,14 +601,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 			$topic = $this->topics->targetParentsOfStudent($student->getId());
 
-			$mCollection->bind($topic, Logger::ERROR, $msg, array(
+			$msgr->bind($topic, Logger::ERROR, $msg, array(
 				'child'     => array($childName, "/search/user/$childId"),
 				'boxname'   => array($boxName, "/submission/submissionHistory/$boxId"),
 				'catname'   => array($catName, "/homepage/$catId")
 			));
 		}
 
-		return $mCollection;
+		return $msgr;
 	}
 
 
@@ -618,21 +618,21 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 * @param SubmissionBox $submissionBox
 	 * @param User $user
 	 * @param array $diff
-	 * @return array
+	 * @return Messenger
 	 */
 	protected function notifyStaffClosed($submissionBox, $user, $diff = null) {
-		$mCollection = new MessageCollection();
+		$msgr = new Messenger();
 
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		$totalUnsubmitted = $this->getStudentsUnsubmittedList($submissionBox)->count();
 
 		// everyone submitted! woohoo!
 		if($totalUnsubmitted == 0) {
-			return $mCollection;
+			return $msgr;
 		}
 
 		$boxId = $submissionBox->getId();
@@ -642,12 +642,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		$msg = new Message(":boxname has closed and :number did not submit work", $icon, $href);
 
-		$mCollection->bind($this->topics->targetUser($user->getId()), Logger::ERROR, $msg, array(
+		$msgr->bind($this->topics->targetUser($user->getId()), Logger::ERROR, $msg, array(
 			'boxname' => array($submissionBox->getName(), "/submission/viewSubmission/$boxId"),
 			'number'  => sprintf("%s student%s", $totalUnsubmitted, $totalUnsubmitted == 1 ? '' : 's')
 		));
 
-		return $mCollection;
+		return $msgr;
 	}
 
 
@@ -659,7 +659,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 //	 * @param SubmissionBox $submissionBox
 //	 * @param User $user
 //	 * @param array $diff
-//	 * @return array
+//	 * @return Messenger
 //	 */
 //	public function notifyStaffSubmitted($submissionBox, $user, $diff = null) {
 //
@@ -672,7 +672,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 //	 * @param SubmissionBox $submissionBox
 //	 * @param User $user
 //	 * @param array $diff
-//	 * @return array
+//	 * @return Messenger
 //	 */
 //	protected function notifyStaffResubmitted($submissionBox, $user, $diff = null) {
 //
@@ -685,7 +685,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 //	 * @param SubmissionBox $submissionBox
 //	 * @param User $user
 //	 * @param array $diff
-//	 * @return array
+//	 * @return Messenger
 //	 */
 //	public function notifyStudentMarked($submissionBox, $user, $diff = null) {
 //
