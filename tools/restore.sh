@@ -1,8 +1,10 @@
 #!/bin/bash
 # Sync/Restore Script
 # Description:
-#       Allows for loading database and data files from a live install of Schoolbox
-#       or from  a backup source as defined in /etc/schoolbox-backup-cifs.conf
+#       Allows for restoring database and data files from another install or
+#       backup of Schoolbox.
+#       Backup source as defined in /etc/schoolbox-backup-cifs.conf
+#       Remote sources as defined in /root/.ssh/config
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   2014 Alaress Pty Ltd
