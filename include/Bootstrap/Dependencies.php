@@ -70,7 +70,10 @@ $di->set(
             $loader->addLoader($customLoader);
             $loader->addLoader(new Twig_Loader_Filesystem(array("/", $root)));
 
-            $twig   = new Twig_Environment($loader);
+            $twig = new Twig_Environment(
+                $loader,
+                array('cache' => $config->get('stream_dir').'/templates/')
+            );
             $twig->addExtension(new Twig_Extension_Debug());
 
             // Add the route lookup method
