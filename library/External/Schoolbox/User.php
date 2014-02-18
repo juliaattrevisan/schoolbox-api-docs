@@ -49,7 +49,7 @@ class External_Schoolbox_User implements External_UserInterface {
 		$statement = $this->getDatabase()->prepare("
 			SELECT
 				parent.synergy_id AS StudentContactID,
-				parent.alt_email AS StudentContactEmail,
+				parent.alt_email AS StudentContactEmail
 			FROM user
 			INNER JOIN user_relation ON user.id = user_relation.user_id
 			INNER JOIN user parent ON parent.id = user_relation.relation_id
@@ -59,7 +59,7 @@ class External_Schoolbox_User implements External_UserInterface {
 		$statement->execute();
 
 		while($row = $statement->fetch(PDO::FETCH_ASSOC) ) {
-			$emailList[] = $row['StudentContactEmail'];
+			$emailList[$row['StudentContactID']] = $row['StudentContactEmail'];
 		}
 		return $emailList;
 	}

@@ -239,13 +239,13 @@ class External_Synergetic_User implements External_UserInterface {
 		while ($row = $this->getDatabase()->getNextArray()) {
 			switch($row['UseEmail']) {
 				case 'O': //Use occupation email address
-					$emailList[] = $row['OccupEmail'];
+					$emailList[$row['RelatedID']] = $row['OccupEmail'];
 					break;
 				case 'P': //Use personal email address
-					$emailList[] = $row['Email'];
+					$emailList[$row['RelatedID']] = $row['Email'];
 					break;
 				case 'D': //Use default email address
-					$emailList[] = $row['DefaultEmail'];
+					$emailList[$row['RelatedID']] = $row['DefaultEmail'];
 					break;
 				default:
 					break;

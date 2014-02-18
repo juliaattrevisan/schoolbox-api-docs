@@ -295,7 +295,14 @@ class CommentMapper extends Mapper {
 
 			try {
 				// add recipient
-				$mail->setTo($user->getEmail(), $user->formatName());
+				$toName = $user->formatName();
+				// only include a name if it's actually known (may have been sent a dummy user)
+				if($toName == 'Unknown User' || !$toName) {
+					$mail->setTo($user->getEmail());
+				}
+				else {
+					$mail->setTo($user->getEmail(), $toName);
+				}
 				Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
 			}
 			catch (Swift_SwiftException $e) {
