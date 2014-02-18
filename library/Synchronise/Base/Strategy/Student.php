@@ -8,6 +8,7 @@
  */
 
 class Synchronise_Base_Strategy_Student extends Synchronise_Base_Strategy {
+	protected $title = "Update Schoolbox Student Details Synchronisation";
 
 	/**
 	 * Get a list of students to sync

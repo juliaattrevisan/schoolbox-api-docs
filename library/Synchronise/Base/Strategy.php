@@ -44,6 +44,14 @@ abstract class Synchronise_Base_Strategy {
 	protected $list = array();
 
 	/**
+	 * List of hydrators to apply for converting details from external to
+	 * Schoolbox database.
+	 *
+	 * @var Synchronise_Base_IHydrator[]
+	 */
+	protected $hydratorList = array();
+
+	/**
 	 * @var Synchronise_Base_Verbose
 	 */
 	protected $verbose_filter;
@@ -81,6 +89,44 @@ abstract class Synchronise_Base_Strategy {
 	 * By default does nothing.
 	 */
 	protected function setup() {}
+
+	/**
+	 * Adds a hydrator for converting data from external database to data for
+	 * this school.
+	 *
+	 * @param  Synchronise_Base_IHydrator $hydrator
+	 * @return $this
+	 */
+	protected function addHydrator(Synchronise_Base_IHydrator $hydrator) {
+		$this->hydratorList[] = $hydrator;
+		return $this;
+	}
+
+	/**
+	 * Clears all hydrators added in addHydrator().
+	 *
+	 * @return $this
+	 */
+	protected function clearHydratorList() {
+		$this->hydratorList = array();
+		return $this;
+	}
+
+	/**
+	 * Does this strategy have any hydrators set?
+	 *
+	 * @return bool
+	 */
+	protected function hasHydrator() {
+		return !empty($this->hydratorList);
+	}
+
+	/**
+	 * @return Synchronise_Base_IHydrator[]
+	 */
+	protected function getHydratorList() {
+		return $this->hydratorList;
+	}
 
 	/**
 	 * If the users exist in Synergy but not in Schoolbox, create an account for
@@ -426,6 +472,16 @@ abstract class Synchronise_Base_Strategy {
 	}
 
 	/**
+	 * Gets whether user is enabled from external data set.
+	 *
+	 * @param  array $currentUser
+	 * @return bool  Currently returns null so its value isn't overridden.
+	 */
+	public function getAccountEnabledFromUser($currentUser) {
+		return null;
+	}
+
+	/**
 	 * Creates an array for insertion into the Schoolbox users table.
 	 *
 	 * @param  array $external_user
@@ -434,6 +490,17 @@ abstract class Synchronise_Base_Strategy {
 	 */
 	public function setupUserDetails($external_user) {
 		$newUser = array();
+		if ($this->hasHydrator()) {
+			foreach ($this->getHydratorList() as $hydrator) {
+                try {
+				    $newUser = $hydrator->hydrate($external_user, $newUser);
+                }catch (Exception $e) {
+                    // Skip user as something is not good
+                    return false;
+                }
+			}
+			return $newUser;
+		}
 		$newUser['username']             = $this->getUsernameFromUser($external_user);
 		$newUser['title']                = $this->getTitleFromUser($external_user);
 		$newUser['firstname']            = $this->getFirstNameFromUser($external_user);
@@ -449,8 +516,9 @@ abstract class Synchronise_Base_Strategy {
 		$newUser['house']                = $this->getHouseFromUser($external_user);
 		$newUser['residential_house_id'] = $this->getResidentialHouseFromUser($external_user);
 		$newUser['eportfolio_enabled']   = $this->getEportfolioEnabledFromUser($external_user);
-		$newUser['webmail']              = $this->getWebmailFromUser($external_user);
-		$newUser['mail_handler']         = $this->getExternalMailFromUser($external_user);
+		$newUser['webmail']				 = $this->getWebmailFromUser($external_user);
+		$newUser['mail_handler']		 = $this->getExternalMailFromUser($external_user);
+		$newUser['enabled']              = $this->getAccountEnabledFromUser($external_user);
 		return $this->clearFields($newUser);
 	}
 
