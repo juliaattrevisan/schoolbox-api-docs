@@ -13,21 +13,36 @@ $route = $di->get('router')->match(
     $_SERVER
 );
 if ($route instanceof Aura\Router\Route) {
-    /** @var \Alaress\Web\Controller\Base $controller */
-
     // do something with the route.
     // For now, I just assume the DI container knows how to get a controller
     // named 'controller:$route->params[controller]', and this controller has a
     // public method named $route->params[action].
-
+    /** @var \Alaress\Web\Controller\Base $controller */
     $controller = $di->get('controller:'.$route->params['controller']);
     call_user_func(array($controller, $route->params['action']), $route->params);
 
-    /** @var \Alaress\Web\Output\Base $output */
+    // Figure out output type.
+    // In order of preference, output type is:
+    // * set in the response content
+    // * set in route
+    // * default to 'html'
+    /** @var \Aura\Web\Response $response */
+    $response = $controller->getResponse();
+    $content  = $response->content->get();
+    $format   = $content['format'];
+    if (empty($format)) {
+        // Strip leading . from format
+        $format = preg_replace('/^\\./', '', $route->params['format']);
+        if (empty($format)) {
+            $format = 'html';
+        }
+    }
+
     // Create a different output type (Sitepage, JSON, whatever) based on a
-    // route param
-    $output = $di->get('webOutput');
-    $output->setResponse($controller->getResponse());
+    // route param, defaulting to HTML
+    /** @var \Alaress\Web\Output\Base $output */
+    $output = $di->get("webOutput:$format");
+    $output->setResponse($response);
     $output->output();
     exit;
 }

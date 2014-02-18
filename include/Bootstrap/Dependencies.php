@@ -45,9 +45,10 @@ $di->setters['Alaress\\Web\\Controller\\Base'] = array(
 $di->set('sitePage', $di->lazyNew('SitePage'));
 
 // Web output class - currently uses Sitepage
-$di->setters['Alaress\\Web\\Output\\Sitepage']['setTemplateEngine'] = $di->lazyGet('templateEngine');
-$di->setters['Alaress\\Web\\Output\\Sitepage']['setSitepage']       = $di->lazyGet('sitePage');
-$di->set('webOutput', $di->lazyNew('Alaress\\Web\\Output\\Sitepage'));
+$di->setters['Alaress\\Web\\Output\\ThemedHtml']['setTemplateEngine'] = $di->lazyGet('templateEngine');
+$di->setters['Alaress\\Web\\Output\\ThemedHtml']['setSitepage']       = $di->lazyGet('sitePage');
+$di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
+$di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
 
 $di->set(
     'templateEngine',

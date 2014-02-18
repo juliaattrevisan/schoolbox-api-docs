@@ -1,7 +1,9 @@
 <?php
 /**
- * Output handling class - shoves Twig-rendered response body into a good old
- * Sitepage object.
+ * Output handling class that renders a Twig template and data into a theme.
+ *
+ * Currently, theming is handled by the good old Sitepage object, but this could
+ * change.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -12,7 +14,7 @@ namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 
-class Sitepage extends Base {
+class ThemedHtml extends Base {
 
     /**
      * @var \SitePage

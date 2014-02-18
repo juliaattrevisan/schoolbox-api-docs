@@ -29,11 +29,19 @@ class Base {
      * Copied from https://github.com/auraphp/Aura.Web/blob/develop-2/README-RESPONSE.md
      */
     public function output() {
+        $this->preprocessOutput();
         $this->outputResponseCode();
         $this->outputHeaders();
         $this->outputCookies();
         $this->outputResponseBody();
     }
+
+    /**
+     * Called before any output is sent.
+     *
+     * This method can be overridden to mangle the response object, headers, etc.
+     */
+    public function preprocessOutput() {}
 
     /**
      * Outputs the response code header from the response.
@@ -94,4 +102,4 @@ class Base {
         return $this->response;
     }
 
-} 
+}
