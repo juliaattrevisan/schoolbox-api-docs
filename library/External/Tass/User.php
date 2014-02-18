@@ -79,7 +79,7 @@ class External_Tass_User implements External_UserInterface {
 			LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
 			-- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
 			LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND s.cmpy_code=t.cmpy_code
-			WHERE stud_code = '$tassID' AND s.cmpy_code='01'
+			WHERE stud_code = '$tassID'
 		";
 		$student = $this->getDatabase()->getRow($query);
 
@@ -280,7 +280,6 @@ class External_Tass_User implements External_UserInterface {
             FROM teacher AS t
             JOIN tchdept AS td ON t.tch_code = td.tch_code
             WHERE t.curr_flg = 'Y'
-            AND t.cmpy_code='01'
         ";
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $staffList;
@@ -305,7 +304,6 @@ class External_Tass_User implements External_UserInterface {
             FROM student AS s
             WHERE s.campus_code IS NOT NULL
             AND s.dol IS NULL
-            AND s.cmpy_code='01'
         ";
 
         $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
@@ -349,7 +347,6 @@ class External_Tass_User implements External_UserInterface {
             --    ON p.par_code = sf.par_code AND p.cmpy_code = sf.cmpy_code
             INNER JOIN student as s
                 ON p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code
-            WHERE p.cmpy_code='01'
             ORDER BY p.par_code ASC
         ";
         $list = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
