@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Web\Controller;
+namespace Alaress\Web\Controller;
 
 use Aura\Web\Request;
 use Aura\Web\Response;

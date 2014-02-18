@@ -27,7 +27,7 @@ $di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
 
 // inject request and response into controller
 // (I may need to mangle requests in pre-processing though)
-$di->setters['Schoolbox\\Web\\Controller\\Base'] = array(
+$di->setters['Alaress\\Web\\Controller\\Base'] = array(
     'setRequest' => $di->lazy(
         function() use($di) {
             return $di->get('webFactory')->newRequest();
@@ -45,9 +45,9 @@ $di->setters['Schoolbox\\Web\\Controller\\Base'] = array(
 $di->set('sitePage', $di->lazyNew('SitePage'));
 
 // Web output class - currently uses Sitepage
-$di->setters['Schoolbox\\Web\\Output\\Sitepage']['setTemplateEngine'] = $di->lazyGet('templateEngine');
-$di->setters['Schoolbox\\Web\\Output\\Sitepage']['setSitepage']       = $di->lazyGet('sitePage');
-$di->set('webOutput', $di->lazyNew('Schoolbox\\Web\\Output\\Sitepage'));
+$di->setters['Alaress\\Web\\Output\\Sitepage']['setTemplateEngine'] = $di->lazyGet('templateEngine');
+$di->setters['Alaress\\Web\\Output\\Sitepage']['setSitepage']       = $di->lazyGet('sitePage');
+$di->set('webOutput', $di->lazyNew('Alaress\\Web\\Output\\Sitepage'));
 
 $di->set(
     'templateEngine',

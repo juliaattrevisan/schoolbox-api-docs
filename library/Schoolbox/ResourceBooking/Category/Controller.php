@@ -8,7 +8,7 @@
  */
 
 namespace Schoolbox\ResourceBooking\Category;
-use Schoolbox\Web\Controller\Base;
+use Alaress\Web\Controller\Base;
 
 class Controller extends Base {
 

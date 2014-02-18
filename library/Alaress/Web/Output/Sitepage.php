@@ -8,7 +8,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Web\Output;
+namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 

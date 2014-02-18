@@ -13,7 +13,7 @@ $route = $di->get('router')->match(
     $_SERVER
 );
 if ($route instanceof Aura\Router\Route) {
-    /** @var \Schoolbox\Web\Controller\Base $controller */
+    /** @var \Alaress\Web\Controller\Base $controller */
 
     // do something with the route.
     // For now, I just assume the DI container knows how to get a controller
@@ -23,7 +23,7 @@ if ($route instanceof Aura\Router\Route) {
     $controller = $di->get('controller:'.$route->params['controller']);
     call_user_func(array($controller, $route->params['action']), $route->params);
 
-    /** @var \Schoolbox\Web\Output\Base $output */
+    /** @var \Alaress\Web\Output\Base $output */
     // Create a different output type (Sitepage, JSON, whatever) based on a
     // route param
     $output = $di->get('webOutput');
