@@ -1,1 +1,6 @@
-Blah
+<h1>Resource Category List</h1>
+<ul>
+    {% for item in list %}
+    <li><a href="{{ routeLookup('resourceCategory.edit', {id: item.id, format:''}) }}">{{ item.name }}</a></li>
+    {% endfor %}
+</ul>
