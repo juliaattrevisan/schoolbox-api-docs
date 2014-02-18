@@ -38,6 +38,7 @@ $di->setters['Alaress\\Web\\Controller\\Base'] = array(
             return $di->get('webFactory')->newResponse();
         }
     ),
+    'setRouter' => $di->lazyGet('router'),
 );
 
 // inject web params (yep, even Sitepage!)

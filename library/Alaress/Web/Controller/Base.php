@@ -11,6 +11,7 @@ namespace Alaress\Web\Controller;
 
 use Aura\Web\Request;
 use Aura\Web\Response;
+use Aura\Router\Router;
 
 abstract class Base {
     /**
@@ -24,9 +25,9 @@ abstract class Base {
     protected $response;
 
     /**
-     * @var Response
+     * @var Router
      */
-    protected $renderer;
+    protected $router;
 
     /**
      * @param  Request $request
@@ -58,6 +59,22 @@ abstract class Base {
      */
     public function getResponse() {
         return $this->response;
+    }
+
+    /**
+     * @param  Router $router
+     * @return $this
+     */
+    public function setRouter($router) {
+        $this->router = $router;
+        return $this;
+    }
+
+    /**
+     * @return Router
+     */
+    public function getRouter() {
+        return $this->router;
     }
 
 } 
