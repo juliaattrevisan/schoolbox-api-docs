@@ -10,7 +10,6 @@
 # @copyright   2014 Alaress Pty Ltd
 # @link        http://www.alaress.com.au
 #
-#
 
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
@@ -40,6 +39,7 @@ echo "*************************************************************************"
 echo -e "\033[39m";
 
 error() {
+	# Display an error message in red then exit with error code
 	echo -e "\033[38;5;1m"
 	echo -e "Error: $errmsg\n";
 	echo -e "\033[39m";
@@ -52,10 +52,10 @@ readconf() {
 	tempsqlpasswd=`grep "\"SQL_passwd" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
 	tempsqlhost=`grep "\"SQL_host" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
 	tempsqldb=`grep "\"SQL_db" $tempconffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
-
 }
 
 readsqlver() {
+	# Retrive the Schoolbox version from MySQL using provided credentials
 	tempsqlver=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='site_version'" 2>/dev/null`;
 }
 
@@ -95,7 +95,6 @@ else
 		errmsg="Template directory '$thistemplatedir' is not a directory";
 		error;
 	fi
-	echo "Template Directory: $thistemplatedir";
 fi
 thisfiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='file_dir'"`;
 if [ -z $thisfiledir ];
@@ -109,11 +108,11 @@ else
 		errmsg="Data file directory '$thisdatadir' is not a directory";
 		error;
 	fi
-	echo "Data Directory: $thisdatadir";
 fi
 
 # Check we have correct access to this install
 echo -e "\n* Checking Permissions *";
+
 ## Check database permissions
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "CREATE TABLE testpermtest (a INT)";
 if [ $? -ne 0 ];
@@ -144,21 +143,25 @@ rm -f $thisdatadir/test.file >/dev/null 2>&1;
 
 # Detect other local installs
 echo -e "\n* Detecting Installs and Backups *";
+
 ## Wipe current detected list
 sbrl='/tmp/schoolbox-restore-list';
 searchlist='/etc/schoolbox/conf.php /etc/schoolboxdev/conf.php /vagrant/www/conf/conf.php';
 rm -f $sbrl;
-## This install - other DB backups
-thisotherdbs=`ls -1 $thisdatadir/*-*-*-*_*-*-*.sql 2>/dev/null`;
+
+## Detect database backups for this install
+thisinstall=`ls -1 $thisdatadir/*-*-*-*_*-*-*.sql 2>/dev/null`;
 echo -e "Local installs \c"
-if [ ! -z "$thisotherdbs" ];
+if [ ! -z "$thisinstall" ];
 then
-	for i in $thisotherdbs;
+	for i in $thisinstall;
 	do
 		 echo -e ".\c";
 		 echo "[L],[D],Current,`readlink -f $i`" >> $sbrl;
 	done;
 fi
+
+# Detect other local installs
 for localinstall in $searchlist;
 do
 	# Search for local installs, but ignore the current install if listed
@@ -243,8 +246,7 @@ do
 	fi
 done
 
-# Provide list of backups to recover from
-#TODO (not available from Schoolbox - Live installs for safety!!!)
+# Provide a pretty list of backups to recover from
 echo -e "\n\nPlease select a source to restore from:";
 sbrlp="$sbrl-pretty";
 cat -n $sbrl > $sbrlp;
@@ -323,12 +325,12 @@ fi
 if [ "$sourcetype" = '[A]' ];
 then
 	# Full restore, sync all data files, then perform cleanup
-	echo -e "\nFull restore - TODO file transfer";
+	echo -e "\n* Full restore * - TODO";
 	## Fix data folder structure
 	## Fix data and template folder permissions
 else
 	# DB only restore, sync the db backup locally
-	echo -e "\nDB only restore";
+	echo -e "\n* DB only restore *";
 	sourcedb='';
 	if [ "$sourceloc" = '[L]' ];
 	then
