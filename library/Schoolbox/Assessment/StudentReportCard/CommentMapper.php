@@ -236,7 +236,7 @@ class CommentMapper extends Mapper {
 
 		$cfg = $this->getConfigLoader();
 
-		$href = sprintf("http://%s.%s/allWork/%s/%s/%s/%s",
+		$href = sprintf("http://%s.%s/submission/allWork/%s/%s/%s/%s",
 			$cfg->get('site_hostname'), $cfg->get('site_domain'),
 			$student->getId(), date('Y'), date('m') > 6 ? 2 : 1, $category->getId()
 		);
