@@ -14,6 +14,7 @@ use Schoolbox\Mapper as BaseMapper;
 class Mapper extends BaseMapper {
 
     public function mapping() {
+        $this->hasTable('resource_category');
         $this->hasMap(
             array(
                 'column'     => 'id',
