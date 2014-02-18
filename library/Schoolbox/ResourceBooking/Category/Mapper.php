@@ -15,6 +15,7 @@ class Mapper extends BaseMapper {
 
     public function mapping() {
         $this->hasTable('resource_category');
+        $this->hasModel('Schoolbox\\ResourceBooking\\Category\\Model');
         $this->hasMap(
             array(
                 'column'     => 'id',
