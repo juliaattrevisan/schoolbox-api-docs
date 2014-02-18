@@ -153,11 +153,22 @@ class Node {
 		$allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), false);
 
 		foreach($allFiles as $currentFile) {
+
+			/* Use a generic default icon for unknown filetypes that
+			 * could accumulate in the schoolbox
+			 */
+			try {
+				$icon = $mimetypeMapper->getByFilename($currentFile->getFilename())->getIconFile();
+			}
+			catch (\Exception $e) {
+				$icon = 'binary.png';
+			}
+
 			$record = array(
 				'type' => 'file',
 				'fileId' => $currentFile->getId(),
 				'name' => $currentFile->getFilename(),
-				'icon' => $mimetypeMapper->getByFilename($currentFile->getFilename())->getIconFile(),
+				'icon' => $icon,
 			);
 
 			$output[] = $record;
