@@ -14,8 +14,10 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\TopicFactory;
+use Schoolbox\Realtime\Schedule\PreTrigger;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Role;
+use Schoolbox\User;
 
 abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 
@@ -28,63 +30,96 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	/** @var TopicFactory */
 	protected $topics;
 
+	/** @var Mapper */
+	protected $mapper;
+
+
 	/**
 	 * @param IConfigLoader $configLoader
-	 * @param MessageFactory $messageFactory
 	 */
-	public function __construct($configLoader, $messageFactory) {
+	public function __construct($configLoader) {
 		$this->conf = $configLoader;
 		$this->topics = new TopicFactory();
+
+		$mapperClass = str_replace('Notifier', 'Mapper', get_called_class());
+
+		if(!class_exists($mapperClass)) {
+			throw new ScheduleException("Could not find class '$mapperClass'");
+		}
+		$m = new $mapperClass();
+		if(!$m instanceof Mapper) {
+			throw new ScheduleException("Class '$mapperClass' must be an instance of Mapper");
+		}
+		$this->mapper = $m;
 	}
 
 
 	/**
-	 * Add a callable for a role, based on a specific trigger
+	 * Generate a set of events to be scheduled by retrieving a backlog from the database
 	 *
-	 * @param string $roleType
-	 * @param string $trigger
-	 * @param callable $callable
-	 * @throws ScheduleException
-	 * @return void
+	 * @return \SplObjectStorage
 	 */
-//	public function registerCallback($roleType, $trigger, $callable = null) {
-//
-//		// if no callable provided,
-//		if(is_null($callable)) {
-//			$cls = get_called_class();
-//			$method = sprintf("%s%s%s",
-//				lcfirst(substr($cls, strrpos($cls, '\\')+1)),
-//				ucfirst(strtolower($trigger)),
-//				ucfirst(strtolower($roleType))
-//			);
-//
-//			if(method_exists($this, $method)) {
-//				$callable = array($this, $method);
-//			}
-//			else {
-//				throw new ScheduleException("No valid method provided for $cls($roleType => $trigger): expected '$method'.");
-//			}
-//		}
-//		if(!is_callable($callable)) {
-//			throw new ScheduleException("Invalid method provided for $roleType => $trigger.");
-//		}
-//
-//		$this->closures[$trigger][$roleType] = $callable;
-//	}
+	public function spoolTriggersFromDatabase() {
+
+		// retrieve all the objects this mapper can find (yes, this will be heavy)
+		$collection = $this->mapper->findAll();
+		$obstore = new \SplObjectStorage();
+
+		foreach($collection as $model) {
+			// use the abstract filter method to determine what to keep or toss
+			if(!$this->filter($model)) {
+				continue;
+			}
+
+			// select the user we'll blame for the events we're generating
+			$initiator = $this->extractInitiator($model);
+
+			// call the extending class's trigger generator method for creation
+			$events = $this->generateTriggers(Mapper::METHOD_CREATE, $model);
+
+			// store the result of the above
+			$obstore->attach(new PreTrigger($model, $initiator), $events);
+		}
+
+		// SplObjectStorage[PreTrigger : array]
+		return $obstore;
+	}
 
 
 	/**
-	 * Retrieve all the callables associated with a particular trigger (one per role, if it exists)
+	 * To be implemented by extending classes.
+	 * If this method returns true, the object in question will have CREATE triggers generated for it,
+	 * otherwise it will be ignored.
 	 *
-	 * @param $triggerLabel
+	 * @param object $object
+	 * @return bool
+	 */
+	protected abstract function filter($object);
+
+
+	/**
+	 * To be implemented by extending classes.
+	 * This method should return a User object that will be considered "responsible" for the triggers that are being
+	 * created for the given object. This is typically the creator of the object.
+	 *
+	 * @param object $object
+	 * @return User
+	 */
+	protected abstract function extractInitiator($object);
+
+
+	/**
+	 * Return the list of callbacks that are associated with this trigger.
+	 *
+	 * @param $label
 	 * @return array
 	 */
-	public function getCallables($triggerLabel) {
+	public function retrieveCallbacks($label) {
 
 		$callables = array();
 
 		foreach(array(Role::STUDENT, Role::PARENT, Role::STAFF) as $role) {
-			$method = sprintf("notify%s%s", ucfirst($role), ucfirst($triggerLabel));
+			$method = sprintf("notify%s%s", ucfirst($role), ucfirst($label));
 			if(method_exists($this, $method)) {
 				$callables[$role] = array($this, $method);
 			}

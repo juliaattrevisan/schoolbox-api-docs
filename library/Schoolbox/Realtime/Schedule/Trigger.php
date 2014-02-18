@@ -67,7 +67,7 @@ class Trigger {
 	 * @return callable[]
 	 */
 	public function getCallbacks() {
-		return $this->notifier->getCallables($this->label);
+		return $this->notifier->retrieveCallbacks($this->label);
 	}
 
 	/**

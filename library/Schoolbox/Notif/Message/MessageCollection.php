@@ -13,9 +13,17 @@ namespace Schoolbox\Notif\Message;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
 
+// TODO RENAME THIS
 class MessageCollection {
 
-	protected $messages = array();
+	/** @var \SplObjectStorage */
+	protected $splStore;
+
+
+	public function __construct() {
+		$this->splStore = new \SplObjectStorage();
+	}
+
 
 	/**
 	 * Bind a message, ready for transmission to a user's queues.
@@ -33,35 +41,27 @@ class MessageCollection {
 
 		// cast string to array if required
 		$topics = (array)$topics;
-
-		$msgHash   = sha1($msg->getMessageString());
 		$paramHash = sha1(json_encode($params));
 
-
-		if(!isset($this->messages[$msgHash])) {
-			$this->messages[$msgHash] = array(
-				'message' => $msg
-			);
+		// insert the message object if it's not already in our collection
+		if(!$this->splStore->contains($msg)) {
+			$this->splStore->attach($msg, array());
 		}
 
-		$this->messages[$msgHash]['instances'][$paramHash] = array(
+		// retrieve the instances that have already been set
+		$instances = $this->splStore->offsetGet($msg);
+
+		// add this instance
+		$instances[$paramHash] = array(
 			'severity' => $severity,
 			'params'   => $params,
 			'topics'   => $topics
 		);
+
+		// reattach the message and its extended list of instances
+		$this->splStore->attach($msg, $instances);
 	}
 
-	/**
-	 * Remove a specific topic from the collection.
-	 *
-	 * @param $topic
-	 * @return bool
-	 */
-	public function unbindTopic($topic) {
-		$existed = isset($this->messages[$topic]);
-		unset($this->messages[$topic]);
-		return $existed;
-	}
 
 	/**
 	 * Whether or not this collection currently contains messages
@@ -69,8 +69,9 @@ class MessageCollection {
 	 * @return bool
 	 */
 	public function hasMessages() {
-		return !!count($this->messages);
+		return !!$this->splStore->count();
 	}
+
 
 	/**
 	 * @param Notif $notif
@@ -86,17 +87,17 @@ class MessageCollection {
 		// array that we'll be returning
 		$exts = array();
 
-		foreach($this->messages as $msg) {
-			foreach($msg['instances'] as $instance) {
+		foreach($this->splStore as $msg) {
+			/** @var Message $msg */
+			$instances = $this->splStore->offsetGet($msg);
+			foreach($instances as $instance) {
 				$exts[] = new External(
-					$notif, $instance['topics'], $instance['severity'], $timestamp, $msg['message'], $instance['params']
+					$notif, $instance['topics'], $instance['severity'], $timestamp, $msg, $instance['params']
 				);
 			}
 		}
 
 		return $exts;
-
 	}
-
 
 } 

@@ -28,9 +28,8 @@ interface ModuleNotifierInterface {
 
 	/**
 	 * @param IConfigLoader $configLoader
-	 * @param MessageFactory $messageFactory
 	 */
-	public function __construct($configLoader, $messageFactory);
+	public function __construct($configLoader);
 
 
 	/*
@@ -49,18 +48,18 @@ interface ModuleNotifierInterface {
 	public function generateTriggers($method, $object);
 
 	/**
-	 * Return a list of callables that are associated with this trigger.
+	 * Return the list of callbacks that are associated with this trigger.
 	 *
-	 * @param string $trigger
+	 * @param string $label
 	 * @return array
 	 */
-	public function getCallables($trigger);
+	public function retrieveCallbacks($label);
 
 
 	/**
 	 * Generate a set of events to be scheduled by retrieving a backlog from the database
 	 *
-	 * @return Alaress_Date_Format[]|int[]
+	 * @return \SplObjectStorage
 	 */
 	public function spoolTriggersFromDatabase();
 } 

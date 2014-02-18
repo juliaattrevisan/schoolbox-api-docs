@@ -21,6 +21,7 @@ use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Message\MessageCollection;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
+use Schoolbox\Realtime\Schedule\PreTrigger;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
@@ -53,8 +54,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	/** @var UserMapper */
 	protected $userMapper;
 
-	/** @var SubmissionMapper */
-	protected $submissionMapper;
+//	/** @var SubmissionMapper */
+//	protected $submissionMapper;
 
 	/** @var CategoryMapper */
 	protected $categoryMapper;
@@ -71,12 +72,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 	/**
 	 * @param IConfigLoader $configLoader
-	 * @param MessageFactory $messageFactory
 	 */
-	public function __construct($configLoader, $messageFactory) {
-		parent::__construct($configLoader, $messageFactory);
+	public function __construct($configLoader) {
+		parent::__construct($configLoader);
 
-		$this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
 		$this->submissionMapper = SubmissionMapper::getInstance();
 		$this->categoryMapper = CategoryMapper::getInstance();
@@ -117,13 +116,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 				// if the submissionbox already opened, suppress open-on-update trigger
 				if($submissionBox->getOpenDate()->getUnixTimestamp() > time()) {
-					$events[self::TRIGGER_OPEN]     = $submissionBox->getOpenDate();
+					$events[self::TRIGGER_OPEN] = $submissionBox->getOpenDate();
 				}
 
 				break;
 
 			case Mapper::METHOD_CREATE:
-				$events[self::TRIGGER_OPEN]     = $submissionBox->getOpenDate();
+				$events[self::TRIGGER_OPEN] = $submissionBox->getOpenDate();
 				break;
 
 			case Mapper::METHOD_READ:
@@ -145,12 +144,29 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * Generate a set of events to be scheduled by retrieving a backlog from the database
+	 * To be implemented by extending classes.
+	 * If this method returns true, the object in question will have CREATE triggers generated for it,
+	 * otherwise it will be ignored.
 	 *
-	 * @return Alaress_Date_Format[]|int[]
+	 * @param SubmissionBox $object
+	 * @return bool
 	 */
-	public function spoolTriggersFromDatabase() {
-		return array();
+	protected function filter($object) {
+		// if this box is in the past, ignore it
+		return $object->getLateDate()->getUnixTimestamp() >= time();
+	}
+
+
+	/**
+	 * To be implemented by extending classes.
+	 * This method should return a User object that will be considered "responsible" for the triggers that are being
+	 * created for the given object. This is typically the creator of the object.
+	 *
+	 * @param SubmissionBox $object
+	 * @return User
+	 */
+	protected function extractInitiator($object) {
+		return $object->getOwner();
 	}
 
 
@@ -464,23 +480,31 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		$catId = $submissionBox->getCategory()->getId();
 		$catName = $submissionBox->getCategory()->getName();
 
-		$icon = '?';
-		$href = "/submission/submissionHistory/$boxId";
-
-		$msg = new Message(":child has not yet submitted work for :boxname in :catname", $icon, $href);
-
-		// get a list of students who haven't submitted, and get their parents too
+		// get a list of students who haven't submitted
 		$unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
 		foreach($unsubmittedStudents as $student) {
 			$childName = $student->getFirstname();
 			$childId = $student->getId();
+			$childExtId = $student->getExternalId();
 
+			// target the parents of this particular student
 			$topic = $this->topics->targetParentsOfStudent($student->getId());
 
+			$icon = "/portrait?userId=$childExtId&size=square32";
+			$href = "/submission/submissionHistory/$boxId/$childId";
+
+			$msg = new Message(":child has not yet submitted work for :boxname in :catname", $icon, $href);
+
+			// don't provide a link for parents to click on if it's just going to give the a 403
+			$boxdata = $this->conf->get('restrict_student_submissions')
+				? $boxName
+				: array($boxName, "/submission/submissionHistory/$boxId");
+
+			// bind this user's message into the collection
 			$mCollection->bind($topic, Logger::WARNING, $msg, array(
 				'child'     => array($childName, "/search/user/$childId"),
-				'boxname'   => array($boxName, "/submission/submissionHistory/$boxId"),
+				'boxname'   => $boxdata,
 				'catname'   => array($catName, "/homepage/$catId")
 			));
 		}

@@ -165,9 +165,26 @@ class Scheduler {
 			try {
 				$instance = $this->getModule($module);
 				// ok, we have a moduleinterface now
-				$this->verboser->v("Spooling triggers for '$module' from database", '+');
-				foreach($instance->spoolTriggersFromDatabase() as $trigger) {
-					$this->scheduleNotification($trigger);
+				$this->verboser->v("Spooling triggers for '$module' from database");
+
+				$pretriggers = $instance->spoolTriggersFromDatabase();
+				// iterate across the events as attached to their respective Model objects
+				foreach($pretriggers as $pretrigger) {
+
+					/** @var PreTrigger $pretrigger */
+					$events = $pretriggers->offsetGet($pretrigger);
+
+					try {
+						// construct the trigger factory on a case-by-case
+						$fTrigger = new TriggerFactory(
+							$instance, $pretrigger->getObject(), $pretrigger->getUser(), null
+						);
+						// construct triggers and schedule them, disregarding any expired triggers
+						$this->scheduleNotifications($fTrigger->build($events, true));
+					}
+					catch(ScheduleException $e) {
+
+					}
 				}
 			}
 			catch(ScheduleException $e) {
@@ -216,7 +233,9 @@ class Scheduler {
 		$v = $this->verboser;
 
 		/**
-		 * This closure will be called from the EventLoop at the appointed time, or immediately if the time has elapsed
+		 * This closure will be called from the EventLoop at the appointed time, or immediately if the time has elapsed.
+		 *
+		 * TODO put this into a fork
 		 *
 		 * @param TimerInterface $timer
 		 * @throws \Exception
@@ -242,17 +261,20 @@ class Scheduler {
 
 					// method not implemented or nothing to send, this is fine
 					if(is_null($mCollection)) {
+						unset($mCollection);
 						continue;
 					}
 
 					// check that an array was returned
 					if(!$mCollection instanceof MessageCollection) {
 						$v->v("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\MessageCollection", '!');
+						unset($mCollection);
 						continue;
 					}
 
 					// if there are no messages, just ignore this callback and move on
 					if(!$mCollection->hasMessages()) {
+						unset($mCollection);
 						continue;
 					}
 
@@ -266,7 +288,9 @@ class Scheduler {
 						$count += $sent ? 1 :0;
 					}
 
-					$v->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'));
+					unset($mCollection);
+
+					$v->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), '<');
 
 				}
 				catch(\Exception $e) {
@@ -278,6 +302,7 @@ class Scheduler {
 		};
 
 		// an explicitly null interval is a request to unset that trigger (regardless of whether or not it exists)
+		// TODO fix this
 		if(is_null($interval)) {
 			$this->unschedule($module, $label, $model);
 			return;

@@ -36,12 +36,21 @@ class TriggerFactory {
 
 	/**
 	 * @param array $events
+	 * @param bool $disregardExpired
 	 * @return Trigger[]
 	 */
-	public function build($events) {
+	public function build($events, $disregardExpired = false) {
 		$triggers = array();
+		$now = time();
+
+		// iterate across the events supplied and construct triggers out of them
 		foreach($events as $label => $time) {
-			$triggers[] = new Trigger($time, $this->notifier, $label, $this->model, $this->user, $this->diff);
+			$t = new Trigger($time, $this->notifier, $label, $this->model, $this->user, $this->diff);
+
+			// if the timestamp is in the past, and we're disregarding expired, do not include in the return
+			if(!($disregardExpired && $t->getTimestamp() < $now)) {
+				$triggers[] = $t;
+			}
 		}
 		return $triggers;
 	}
