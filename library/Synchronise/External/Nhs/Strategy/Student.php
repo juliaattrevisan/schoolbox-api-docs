@@ -76,14 +76,29 @@ class Synchronise_External_Nhs_Strategy_Student extends Synchronise_Base_Strateg
     }
 
     /**
-     * Groups for Northcote High students: Student Year - 3
+     * Groups for Northcote High students: Student Year - 2, except year 7
+     * (group id = 4)
      *
      * @param  array $currentUser
      * @return int
      */
     public function getGroupIDFromUser($currentUser) {
         $year = $this->getYearFromUser($currentUser);
-        return ($year >= 7 && $year <= 12) ? ($year - 3) : 0;
+        switch ($year) {
+            case 7:
+                return 4;
+            case 8:
+                return 6;
+            case 9:
+                return 7;
+            case 10:
+                return 8;
+            case 11:
+                return 9;
+            case 12:
+                return 10;
+        }
+        return 0;
     }
 
     /**
