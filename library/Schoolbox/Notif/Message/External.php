@@ -119,7 +119,7 @@ class External implements MessageInterface {
 	 * @return void
 	 */
 	public function setContext($context = array()) {
-		$this->context = $context;
+		$this->context = array_merge($this->context, $context);
 	}
 
 

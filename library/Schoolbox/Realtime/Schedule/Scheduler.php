@@ -61,9 +61,6 @@ class Scheduler {
 	/** @var Client */
 	protected $stompClient;
 
-	/** @var Notif */
-	protected $notif;
-
 	/** @var array */
 	protected $timers;
 
@@ -77,7 +74,6 @@ class Scheduler {
 		$this->loop = $loop;
 		$this->verboser = $verboser;
 		$this->mqc = new Connector();
-		$this->notif = new Notif();
 		$this->conf = $configLoader;
 
 		// create a stomp client for listening to Mapper messages coming in
@@ -228,19 +224,37 @@ class Scheduler {
 		$module = get_class($trigger->getModuleNotifier());
 		$label = $trigger->getLabel();
 
-		$interval = $timestamp - time();
-		$notif = $this->notif;
+		$interval = is_null($timestamp) ? null : $timestamp - time();
 		$v = $this->verboser;
 
 		/**
 		 * This closure will be called from the EventLoop at the appointed time, or immediately if the time has elapsed.
-		 *
-		 * TODO put this into a fork
+		 * It will spawn a worker process, which will iterate all the callbacks in this trigger.
 		 *
 		 * @param TimerInterface $timer
 		 * @throws \Exception
 		 */
-		$publish = function($timer) use (&$notif, $trigger, $v) {
+		$publish = function($timer) use ($trigger, $v) {
+
+			// WARNING: FORK
+			$pid = pcntl_fork();
+
+			switch($pid) {
+				case -1: // fail
+					throw new ScheduleException("Unable to fork");
+				case 0: // child
+					// carry on to execute the closure
+					break;
+				default: // parent
+					// do not execute the following code
+					\Database::reinitialise();
+					\DeprecatedDatabase::reinitialise();
+					return;
+			}
+
+			// YOU ARE IN CHILD CONTEXT FROM HERE TO THE END OF THE CLOSURE
+
+			$notif = new Notif();
 
 			foreach($trigger->getCallbacks() as $callback) {
 				/*
@@ -251,6 +265,10 @@ class Scheduler {
 				 */
 
 				try {
+
+					if(!is_callable($callback)) {
+						throw new ScheduleException("Uncallable callback supplied");
+					}
 
 					/** @var MessageCollection $mCollection */
 					$mCollection = call_user_func($callback,
@@ -267,9 +285,7 @@ class Scheduler {
 
 					// check that an array was returned
 					if(!$mCollection instanceof MessageCollection) {
-						$v->v("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\MessageCollection", '!');
-						unset($mCollection);
-						continue;
+						throw new ScheduleException("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\MessageCollection");
 					}
 
 					// if there are no messages, just ignore this callback and move on
@@ -288,21 +304,24 @@ class Scheduler {
 						$count += $sent ? 1 :0;
 					}
 
-					unset($mCollection);
-
 					$v->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), '<');
 
 				}
+				catch(ScheduleException $e) {
+					unset($mCollection);
+					$v->v($e->getMessage(), '!');
+				}
 				catch(\Exception $e) {
-					// don't know what exceptions will be thrown here, so for now, acknowledge and rethrow
+					// don't know what other exceptions will be thrown here, so for now, acknowledge and rethrow
 					$v->v(sprintf("%s -> %s",get_class($e), $e->getMessage()), '!');
+					unset($mCollection);
 					throw $e;
 				}
+
 			}
 		};
 
 		// an explicitly null interval is a request to unset that trigger (regardless of whether or not it exists)
-		// TODO fix this
 		if(is_null($interval)) {
 			$this->unschedule($module, $label, $model);
 			return;
