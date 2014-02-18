@@ -118,81 +118,6 @@ class Notif implements LoggerInterface {
 		return new JsonFormatter();
 	}
 
-	/* Convenience methods for setting broadcast topics */
-
-	/**
-	 * @param $userId
-	 * @return self
-	 */
-	public function targetUser($userId) {
-		return $this->setTopic($this->topicFactory->targetUser($userId));
-	}
-
-	/**
-	 * @param $categoryId
-	 * @return self
-	 */
-	public function targetCategory($categoryId) {
-		return $this->setTopic($this->topicFactory->targetCategory($categoryId));
-	}
-
-	/**
-	 * @param $categoryId
-	 * @return self
-	 */
-	public function targetCategoryAdmin($categoryId) {
-		return $this->setTopic($this->topicFactory->targetCategoryAdmin($categoryId));
-	}
-
-	/**
-	 * @param $campusId
-	 * @return self
-	 */
-	public function targetCampus($campusId) {
-		return $this->setTopic($this->topicFactory->targetCampus($campusId));
-	}
-
-	/**
-	 * @param $roleId
-	 * @return self
-	 */
-	public function targetRole($roleId) {
-		return $this->setTopic($this->topicFactory->targetRole($roleId));
-	}
-
-	/**
-	 * @param $roleType
-	 * @return self
-	 */
-	public function targetRoleType($roleType) {
-		return $this->setTopic($this->topicFactory->targetRoleType($roleType));
-	}
-
-	/**
-	 * @param $topic
-	 * @return self
-	 */
-	public function targetSuperusers($topic) {
-		return $this->setTopic($this->topicFactory->targetSuperusers($topic));
-	}
-
-	/**
-	 * @param $houseId
-	 * @return self
-	 */
-	public function targetSchoolHouse($houseId) {
-		return $this->setTopic($this->topicFactory->targetSchoolHouse($houseId));
-	}
-
-	/**
-	 * @param $resId
-	 * @return self
-	 */
-	public function targetResidentialHouse($resId) {
-		return $this->setTopic($this->topicFactory->targetResidentialHouse($resId));
-	}
-
-
 	/**
 	 * @param Logger $logger
 	 */
@@ -361,6 +286,161 @@ class Notif implements LoggerInterface {
 	 */
 	public function emergency($message, array $context = array()) {
 		return $this->log(Logger::EMERGENCY, $message, $context);
+	}
+
+
+	/* Convenience methods for setting broadcast topics */
+
+	/**
+	 * @param $userId
+	 * @return self
+	 */
+	public function targetUser($userId) {
+		return $this->setTopic($this->topicFactory->targetUser($userId));
+	}
+
+	/**
+	 * @param $categoryId
+	 * @return self
+	 */
+	public function targetCategory($categoryId) {
+		return $this->setTopic($this->topicFactory->targetCategory($categoryId));
+	}
+
+	/**
+	 * @param $categoryId
+	 * @return self
+	 */
+	public function targetCategoryAdmin($categoryId) {
+		return $this->setTopic($this->topicFactory->targetCategoryAdmin($categoryId));
+	}
+
+	/**
+	 * @param $categoryId
+	 * @return self
+	 */
+	public function targetCategoryStaff($categoryId) {
+		return $this->setTopic($this->topicFactory->targetCategoryStaff($categoryId));
+	}
+
+	/**
+	 * @param $categoryId
+	 * @return self
+	 */
+	public function targetCategoryStudents($categoryId) {
+		return $this->setTopic($this->topicFactory->targetCategoryStudents($categoryId));
+	}
+
+	/**
+	 * @param $campusId
+	 * @return self
+	 */
+	public function targetCampus($campusId) {
+		return $this->setTopic($this->topicFactory->targetCampus($campusId));
+	}
+
+	/**
+	 * @param $campusId
+	 * @return self
+	 */
+	public function targetCampusStaff($campusId) {
+		return $this->setTopic($this->topicFactory->targetCampusStaff($campusId));
+	}
+
+	/**
+	 * @param $campusId
+	 * @return self
+	 */
+	public function targetCampusStudents($campusId) {
+		return $this->setTopic($this->topicFactory->targetCampusStudents($campusId));
+	}
+
+	/**
+	 * @param $campusId
+	 * @return self
+	 */
+	public function targetCampusParents($campusId) {
+		return $this->setTopic($this->topicFactory->targetCampusParents($campusId));
+	}
+
+	/**
+	 * @param $roleId
+	 * @return self
+	 */
+	public function targetRole($roleId) {
+		return $this->setTopic($this->topicFactory->targetRole($roleId));
+	}
+
+	/**
+	 * @param $roleType
+	 * @return self
+	 */
+	public function targetRoleType($roleType) {
+		return $this->setTopic($this->topicFactory->targetRoleType($roleType));
+	}
+
+	/**
+	 * @param $topic
+	 * @return self
+	 */
+	public function targetSuperusers($topic) {
+		return $this->setTopic($this->topicFactory->targetSuperusers($topic));
+	}
+
+	/**
+	 * @param $houseId
+	 * @return self
+	 */
+	public function targetSchoolHouse($houseId) {
+		return $this->setTopic($this->topicFactory->targetSchoolHouse($houseId));
+	}
+
+	/**
+	 * @param $houseId
+	 * @return self
+	 */
+	public function targetSchoolHouseStaff($houseId) {
+		return $this->setTopic($this->topicFactory->targetSchoolHouseStaff($houseId));
+	}
+
+	/**
+	 * @param $houseId
+	 * @return self
+	 */
+	public function targetSchoolHouseStudents($houseId) {
+		return $this->setTopic($this->topicFactory->targetSchoolHouseStudents($houseId));
+	}
+
+	/**
+	 * @param $resId
+	 * @return self
+	 */
+	public function targetResidentialHouse($resId) {
+		return $this->setTopic($this->topicFactory->targetResidentialHouse($resId));
+	}
+
+	/**
+	 * @param $resId
+	 * @return self
+	 */
+	public function targetResidentialHouseStaff($resId) {
+		return $this->setTopic($this->topicFactory->targetResidentialHouseStaff($resId));
+	}
+
+	/**
+	 * @param $resId
+	 * @return self
+	 */
+	public function targetResidentialHouseStudents($resId) {
+		return $this->setTopic($this->topicFactory->targetResidentialHouseStudents($resId));
+	}
+
+	/**
+	 * @param $userId
+	 * @return self
+	 */
+	public function targetParentsOfStudent($userId) {
+		return $this->setTopic($this->topicFactory->targetParentsOfStudent($userId));
 	}
 
 }
