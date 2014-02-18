@@ -355,7 +355,7 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 	 * @return int
 	 */
 	public function getSpouseDefaultCampusFromUser($currentUser) {
-		return 1;
+		return $this->getDefaultCampusFromUser($currentUser);
 	}
 
 	/**
