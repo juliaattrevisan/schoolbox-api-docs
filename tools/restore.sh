@@ -30,6 +30,22 @@ then
 	error;
 fi
 
+# Find the apache user
+apacheuser='';
+if [ `which apache2 | wc -l` -ne 0 ];
+then
+	apacheuser='www-data';
+fi
+if [ `which httpd | wc -l` -ne 0 ];
+then
+	apacheuser='apache';
+fi
+if [ -z $apacheuser ];
+then
+	errmsg="Unable to detect apache";
+	error;
+fi
+
 echo -e "\033[38;5;1m";
 echo "*************************************************************************";
 echo "*****                          WARNING!!!                           *****";
@@ -353,7 +369,7 @@ then
 		echo -e "\nPerforming Data Transfer";
 		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
-		$instdir/tools/set-data-dir-perms.sh $thisdatadir;
+		$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
 	fi
 	if [ "$sourceloc" = '[R]' ];
 	then
@@ -376,7 +392,7 @@ then
 		echo -e "\nPerforming Data Transfer";
 		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
-		$instdir/tools/set-data-dir-perms.sh $thisdatadir;
+		$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
 	fi
 	if [ "$sourceloc" = '[B]' ];
 	then
@@ -469,7 +485,7 @@ then
 	sourcefiledir=${sourcefiledir%/*};
 	mv -f $thisdatadir/restoredata/$sourcefiledir/* $thisdatadir/;
 	$instdir/tools/create-data-dirs.sh $thisdatadir;
-	$instdir/tools/set-data-dir-perms.sh $thisdatadir;
+	$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
 fi
 
 ## Cleanup remotely copied database
