@@ -349,14 +349,13 @@ class Calendar extends DeprecatedModel {
         }
 
         $query = "SELECT event.id, DATE_FORMAT(startDate, '%a %D %b') as outputDate,
-						startDate,
+						startDate, endDate,
 						DATE_FORMAT(startDate, '%Y') as year, DATE_FORMAT(startDate, '%c') as month, DATE_FORMAT(startDate, '%e') as day,
-						TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTimeString,
-						TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTimeString,
+						startTime, endTime,
 						type, note, location, detail,
 						user.id as uid, title, firstname, lastname,
 						eventType, eventColour,
-						attendance
+						attendance, allday
 				  FROM event
 				  LEFT JOIN user ON owner = user.id
 				  LEFT JOIN luEventType ON type = eventTypeID
