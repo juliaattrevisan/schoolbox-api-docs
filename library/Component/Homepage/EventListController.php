@@ -62,18 +62,19 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $userHandler = new User();
             $j = 0;
             foreach ($eventList as $event) {
-
                 $event['colour'] = $calendarHandler->displayColour($event['type']);
 
-                $calendarDate = new Alaress_Date_Format(strtotime($event['startDate']), 'U');
+				$eventObject = new Calendar_Event_Type_Day();
+
+				$start = $event['startDate'];
+				$end = $event['endDate'];
+
+				$eventObject->setStartTime(new Alaress_Date_Format($start, 'y-m-d'));
+				$eventObject->setEndTime(new Alaress_Date_Format($end, 'y-m-d'));
+				$eventObject->setAllday($event['allday']);
 
                 $output = array(
-                    'CAL_TIME' => rtrim(
-                        ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
-                            ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
-                        "- "
-                    ),
-                    'CAL_DATE' => $calendarDate->getDateOnly(),
+                    'CAL_DATE' => $eventObject->getEventSpan(),
                     'CAL_ID' => $event['id'],
                     'CAL_NOTE' => Scrub::text($event['note']),
                     'CAL_LOCATION' => Scrub::text($event['location']),
@@ -100,12 +101,12 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 );
 
                 /* Event attendance
-             */
+             	 */
                 if ($event['attendance']) {
                     $this->parse('attendance_icon_block', 'attendance_icon');
 
                     /* Anyone with write access can approve attendance
-                  */
+                 	 */
                     if ($groupHandler->getPermission($this->getContext('id')) >= WRITE_ACCESS) {
                         $this->parse('attendance_list_button_block', 'attendance_list_button');
                     }
