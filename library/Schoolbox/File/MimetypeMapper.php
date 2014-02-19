@@ -104,14 +104,22 @@ class MimetypeMapper extends Schoolbox\Mapper {
 			return $this->hydrate($row, 'aft');
 		}
 
-		/* For an unknown mime type return an instance with Binary Data
-		 * hardcoded in it, because people can mangle Allowed File lists in
-		 * the admin system
-		 */
+		throw new Exception('Mimetype not found', Exception::CODE_MIMETYPE_NOT_FOUND);
+	}
+
+	/**
+	 * For an unknown mime type return an instance with Binary Data
+	 * hardcoded in it, because people can mangle Allowed File lists in
+	 * the admin system
+	 */
+	public function getUnknownMime() {
 		$mimeType = new Mimetype();
 		$mimeType->setDescription('Binary Data (Unknown)');
 		$mimeType->setMime('application/octet-stream');
+		$mimeType->setInline(false);
+		$mimeType->setEnable(true);
 		$mimeType->setIconFile('binary.png');
+		$mimeType->setMaxFileSize(0);
 
 		return $mimeType;
 	}
