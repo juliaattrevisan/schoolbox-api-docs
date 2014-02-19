@@ -37,13 +37,13 @@ class Controller extends Base {
     }
 
     /**
-     * Form for adding another category
+     * Display form for adding another category
      */
     public function add() {
         $response = $this->getResponse();
         $response->content->set(
             array(
-                'template' => __DIR__.'/templates/add.twig',
+                'template' => __DIR__.'/templates/edit.twig',
                 'data'     => array(
                     'item' => new Model(),
                 ),
@@ -52,7 +52,7 @@ class Controller extends Base {
     }
 
     /**
-     * Create request destination
+     * Backend for adding a new category
      */
     public function create() {
         $post  = $this->getRequest()->post;
@@ -67,11 +67,33 @@ class Controller extends Base {
         );
     }
 
+    /**
+     * Views an existing category
+     *
+     * @param int $id
+     */
+    public function read($id) {
+        $item = $this->getMapper()->findById($id);
+        $this->getResponse()->content->set(
+            array(
+                'template' => __DIR__.'/templates/read.twig',
+                'data'     => array(
+                    'item' => $item,
+                ),
+            )
+        );
+    }
+
+    /**
+     * Displays form for editing an existing category
+     *
+     * @param int $id
+     */
     public function edit($id) {
         $item = $this->getMapper()->findById($id);
         $this->getResponse()->content->set(
             array(
-                'template' => __DIR__.'/templates/add.twig',
+                'template' => __DIR__.'/templates/edit.twig',
                 'data'     => array(
                     'item' => $item,
                 ),

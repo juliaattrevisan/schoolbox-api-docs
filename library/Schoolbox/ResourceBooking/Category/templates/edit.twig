@@ -2,7 +2,11 @@
 
 <h1>Resource Category - {% if item.id %}Edit{% else %}Add New{% endif %}</h1>
 
-<form action="{% if item.id %}{{ routeLookup('resourceCategory.update', {id: item.id}) }}{% else %}{{ routeLookup('resourceCategory.create') }}{% endif %}" method="post" name="form" class="clearfix">
+<form
+    action="{% if item.id %}{{ routeLookup('resourceCategory.updateWeb', {id: item.id}) }}{% else %}{{ routeLookup('resourceCategory.create') }}{% endif %}"
+    method="post"
+    name="form" class="clearfix"
+>
     <input type="hidden" name="id" value="{{ item.id }}"/>
     <table class="standardForm table">
         <tr>
