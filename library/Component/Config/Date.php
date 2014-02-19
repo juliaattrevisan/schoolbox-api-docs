@@ -8,18 +8,32 @@
  */
 class Component_Config_Date extends Component_Config_Abstract {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
-
-        // Coerce the config value to d/m/Y format.
-        $dateObject = DateTime::createFromFormat('d/m/Y', $configValue);
+    /**
+     * Coerce value to Y-m-d format before inserting into database.
+     *
+     * @param mixed                        $value
+     * @param Component_ControllerAbstract $controller
+     *
+     * @return string
+     */
+    public function dehydrate($value, Component_ControllerAbstract $controller) {
+        // Assume date was sent as d/m/Y, otherwise try to parse with strtotime
+        if (empty($value)) {
+            return '';
+        }
+        $dateObject = DateTime::createFromFormat('d/m/Y', $value);
         if (!($dateObject instanceof DateTime)) {
             try {
-                $dateObject  = new DateTime($configValue);
-                $configValue = $dateObject->format('d/m/Y');
+                $dateObject = new DateTime($value);
             }
-            catch (Exception $e) {}
+            catch (Exception $e) {
+                return '';
+            }
         }
+        return $dateObject->format('Y-m-d');
+    }
 
+    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
         $page->setVar('COMPONENT_CONFIG_DATE', $configValue);
     }
 
