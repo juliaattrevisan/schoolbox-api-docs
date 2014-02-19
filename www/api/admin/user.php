@@ -57,7 +57,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             'su'			 	 => $_GET['su'],
             'year'		 		 => $_GET['year'] == ''?'NULL':$_GET['year'],
             'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0,
-			'enabled'			 => $_GET['enabled'] == 1 ? 1 : 0
+			'enabled'			 => 1
         );
 
         // convert campus names into ids
