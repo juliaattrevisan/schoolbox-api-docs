@@ -101,15 +101,32 @@ class Controller extends Base {
         );
     }
 
+    /**
+     * Backend for updating an existing category
+     *
+     * @param int $id
+     */
     public function update($id) {
         $item = $this->getMapper()->findById($id);
-        $post  = $this->getRequest()->post;
-        $model = new Model();
-        $model->setName($post['name']);
-        $this->getMapper()->save($model);
+        $post = $this->getRequest()->post;
+        $item->setName($post['name']);
+        $this->getMapper()->save($item);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('resourceCategory.browse', array())
+        );
+    }
+
+    /**
+     * Backend for deleting a category
+     *
+     * @param int $id
+     */
+    public function delete($id) {
+        $item = $this->getMapper()->findById($id);
+        $this->getMapper()->delete($item);
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate('resourceCategory.browse', array())
         );
