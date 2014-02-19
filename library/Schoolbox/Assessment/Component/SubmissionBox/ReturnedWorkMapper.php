@@ -225,7 +225,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 
 
 		$query = "
-			SELECT sb.id AS box_id, sr.mark, sr.norm_mark, sr.returned
+			SELECT sb.id AS box_id, sr.mark, sr.norm_mark, sr.returned, sb.weight
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			WHERE $filters
@@ -246,6 +246,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 					'mark'        => $mark,
 					'pretty_mark' => $pretty_mark,
 					'date'        => $row['returned'],
+					'weight'      => $row['weight'],
 				);
 			}
 		}

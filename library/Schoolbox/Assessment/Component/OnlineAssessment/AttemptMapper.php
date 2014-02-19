@@ -107,6 +107,8 @@ class AttemptMapper extends Mapper {
 			SELECT
 				aa.attempt_id,
 				aa.assess_id,
+				aa.start,
+				a.weight,
 				SUM(ar.mark)  AS mark,
 				SUM(aq.marks) AS max_mark
 			FROM assess_attempt aa
@@ -127,6 +129,7 @@ class AttemptMapper extends Mapper {
 					'mark'        => ($row['mark'] / $row['max_mark']) * 100,
 					'pretty_mark' => "{$row['mark']} / {$row['max_mark']}",
 					'date'        => $row['start'],
+					'weight'      => $row['weight'],
 				);
 			}
 		}
