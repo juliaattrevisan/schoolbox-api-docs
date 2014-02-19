@@ -580,9 +580,12 @@ class External_Synergetic_User implements External_UserInterface {
 			";
 		}
 		else {
-			$sql = "SELECT DISTINCT(c1.ClassCode), c1.ClassCampus, c2.description as name
-					FROM SubjectClassStaff c1, SubjectClasses c2
-					WHERE
+			$sql = "
+				SELECT
+					DISTINCT(c1.ClassCode), c1.ClassCampus, c2.description as name,
+					luFileType.Description as classType
+				FROM SubjectClassStaff c1
+				INNER JOIN SubjectClasses c2 ON
 					c1.FileType = c2.FileType AND
 					c1.FileYear = c2.FileYear AND
 					c1.FileSemester = c2.FileSemester AND
@@ -590,7 +593,9 @@ class External_Synergetic_User implements External_UserInterface {
 					c1.ClassCode = c2.ClassCode AND
 					c1.FileSemester = " . $_SESSION['FileSemester'] . " AND
 					c1.FileYear = " . $_SESSION['FileYear'] . " AND
-					c1.StaffID = $synergyID";
+					c1.StaffID = $synergyID
+				LEFT JOIN luFileType ON c2.FileType = luFileType.Code
+			";
 		}
 
 		$this->getDatabase()->query($sql);
