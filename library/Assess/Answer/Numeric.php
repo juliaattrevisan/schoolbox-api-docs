@@ -28,7 +28,7 @@ class Assess_Answer_Numeric extends Evaluation_Answer_Numeric {
 	 * @return void
 	 */
     public function mark($currentResponse) {
-		if ($currentResponse['answer'] == $currentResponse['response']) {
+		if ((float)$currentResponse['answer'] == (float)$currentResponse['response']) {
 			$total = $currentResponse['marks'];
 		}
 		else {
