@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
 //includes
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
+$groupHandler = new Group;
 
 if (is_numeric($_GET['id'])) {
 	$page = new SitePage;
@@ -36,7 +37,6 @@ if (is_numeric($_GET['id'])) {
 		}
 
 		// Allow file return owner, parent of owner or all staff access to this file
-		$groupHandler = new Group;
 		$owner        = $return->getOwner()->getId();
 		if (!($owner == $_SESSION['id']
 			|| $groupHandler->isParentOfChild($owner)
@@ -90,14 +90,17 @@ if (is_numeric($_GET['id'])) {
             $published = false;
         }
 
+        //Check if staff has permission
+        $permission = $groupHandler->getPermission($subBox->getCategory()->getId());
 
-   		/* Allow students to view their own submitted work
-		 * Allow submission box owners to view submissions
-		 * Allow work that has been showcased to be viewed
-		 */
+
+		/* Allow students to view their own submitted work
+		* Allow staff members with write permission to this folder access
+		* Allow work that has been showcased to be viewed
+		*/
 		if (($studentSub->getOwner()->getId() != $_SESSION['id'])
-			&& ($subBox->getOwner()->getId() != $_SESSION['id']
-            && !$published )
+			&& $permission < WRITE_ACCESS
+            && !$published 
 		) {
 			error(44);
 		}
