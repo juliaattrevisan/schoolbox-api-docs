@@ -25,7 +25,6 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
                  </response>";
 
     echo $response;
-
 } else {
 
     $key = $_GET['key'];
@@ -57,7 +56,8 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             'email_pass'	     => $_GET['password'],
             'su'			 	 => $_GET['su'],
             'year'		 		 => $_GET['year'] == ''?'NULL':$_GET['year'],
-            'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0
+            'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0,
+			'enabled'			 => 1
         );
 
         // convert campus names into ids
@@ -95,7 +95,6 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
 
             echo $response;
         }
-       
     }
 
     /* Update operation */
@@ -174,6 +173,10 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             }
         }
 
+		if (is_numeric($_GET['enabled'])) {
+			$user['enabled'] = $_GET['enabled'] == 1 ? 1 : 0;
+		}
+
         /* Update user and return result */
         if ($user_handler->update($user) === false) {
             $response = "<?xml version='1.0' standalone='yes'?>
@@ -232,7 +235,6 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
                      </response>";
 
         echo $response;
-
     }
 
     else {
@@ -244,22 +246,18 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
 
         echo $response;
     }
-    
 }
 
 /*
  * Test URLs
  *
  * Create
- * http://core.portal.alaress-dev.com.au/api/admin/user.php?key=K16n8VB2j885G4bq5h73677iCJr7Sq&action=create&username=erik&firstname=Alex&lastname=Tworowsky&title=Mr&local_email=1&alt_email=aetworowsky@gmail.com&su=1&database_id=48825&year=12&eportfolio_enabled=1&password=erik&group=Administration&campus=Main,Other&default_campus=Other
+ * 192.168.36.10/api/admin/user.php?key=4357GFDSGFsdfhsufs456&action=create&username=erik&firstname=Alex&lastname=Tworowsky&title=Mr&local_email=1&alt_email=aetworowsky@gmail.com&su=1&database_id=48825&year=12&eportfolio_enabled=1&password=erik&group=Administration&campus=Senior,Junior&default_campus=Senior&enabled=1
  *
  * Update
- * http://core.portal.alaress-dev.com.au/api/admin/user.php?key=K16n8VB2j885G4bq5h73677iCJr7Sq&action=update&user_id=2&username=erik&firstname=Alex&lastname=Tworowsky&title=Mr&local_email=1&alt_email=aetworowsky@gmail.com&su=1&database_id=48825&year=12&eportfolio_enabled=1&password=erik&group=Administration&campus=Main,Other&default_campus=Other
+ * 192.168.36.10/api/admin/user.php?key=4357GFDSGFsdfhsufs456&action=update&user_id=1&username=erik&firstname=Alex&lastname=Tworowsky&title=Mr&local_email=1&alt_email=aetworowsky@gmail.com&su=1&database_id=48825&year=12&eportfolio_enabled=1&password=erik&group=Administration&campus=Senior,Junior&default_campus=Senior&enabled=0
  *
  * Delete
- * http://core.portal.alaress-dev.com.au/api/admin/user.php?key=K16n8VB2j885G4bq5h73677iCJr7Sq&action=delete&user_id=7919
+ * 192.168.36.10/api/admin/user.php?key=4357GFDSGFsdfhsufs456&action=delete&user_id=1
  *
  */
-
-
- ?>
