@@ -89,14 +89,14 @@ class External_Tass_User implements External_UserInterface {
 				'' AS StudentMedicalAlert,
 				'' AS StudentSpecialNeedsFlag,
 				'' AS AlertMessage,
-				'' AS StudentBoarder
+				boarder AS StudentBoarder
 			FROM student AS s
 			LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
 			-- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
 			LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND s.cmpy_code=t.cmpy_code
 			WHERE stud_code = '$tassID'
 		";
-		$student = $this->getDatabase()->getRow($query);
+		$student = $this->getDatabase()->trimRow($this->getDatabase()->getRow($query));
 
 		if (preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
 			$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
@@ -115,15 +115,27 @@ class External_Tass_User implements External_UserInterface {
 
 	function getStudentContactList ($tassID) {
 
-		$query = "SELECT student.par_code as StudentContactID, parent.f_name StudentContactPreferred, parent.m_name as StudentContactSpousePreferred, addr1, addr2 StudentContactAddress1, addr3, town_sub StudentContactSuburb, state_code StudentContactState, post_code StudentContactPostCode,
-						home_phone as StudentContactPhoneActual, bus_phone as StudentContactOccupPhone, mob_phone as StudentContactMobilePhone
+		$query = "SELECT  student.par_code as StudentContactID,
+                          parent.f_name StudentContactPreferred,
+                          addr1 StudentContactAddress1,
+                          addr2 StudentContactAddress2,
+                          addr3 StudentContactAddress3,
+                          town_sub StudentContactSuburb,
+                          state_code StudentContactState,
+                          post_code StudentContactPostCode,
+						  home_phone as StudentContactPhoneActual,
+						  bus_phone as StudentContactOccupPhone,
+						  mobile1 as StudentContactMobilePhone,
+						  parent.m_name as StudentContactSpousePreferred,
+                          mobile2 as StudentContactSpouseMobilePhone
 						FROM student
 						JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
 						JOIN paraddress ON parent.par_code = paraddress.par_code AND paraddress.cmpy_code = parent.cmpy_code AND add_num = 1
 						WHERE stud_code = '$tassID'
 					";
 
-		$parent = $this->getDatabase()->getAll($query);
+		$parent = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+
 		return $parent;
 	}
 
@@ -141,30 +153,32 @@ class External_Tass_User implements External_UserInterface {
 			return false;
 		}
 		if ($this->groupHandler->isStudent($userID)) {
-			$sql = "SELECT class, studsub.cmpy_code, sub_code, year_grp
+			$sql = "SELECT class, studsub.cmpy_code, semester, studsub.sub_code, year_grp, sub_desc, sub_type
 					FROM studsub
 					JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
+					JOIN subtab ON subtab.sub_code=studsub.sub_code AND subtab.cmpy_code=studsub.cmpy_code
 					WHERE studsub.stud_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND yr_study = '{$_SESSION['FileYear']}'
-					ORDER BY sub_code ASC, class ASC
+					ORDER BY studsub.sub_code ASC, studsub.class ASC
 			";
 
 			}
 		else {
-			$sql = "SELECT class, cmpy_code, semester, sub_code, year_num, year_grp
+			$sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, year_grp, sub_desc, sub_type
 					FROM tchsub
+					JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
 					WHERE tch_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'
-					ORDER BY sub_code ASC, class ASC
+					ORDER BY tchsub.sub_code ASC, tchsub.class ASC
 			";
 		}
 
 
 		$this->getDatabase()->query($sql);
-		while($subject = $this->getDatabase()->getNextArray() ) {
+		while($subject = $this->getDatabase()->trimRow($this->getDatabase()->getNextArray()) ) {
             if(Cfg::get('site_location') == 'meriden') {
 				$subject['year_grp'] = '';
             }
 
-			$subjectList[] = array('code'=>trim($subject['year_grp'].'-'.trim($subject['sub_code']).'-'.$subject['class']), 'name'=>$subject['class']);
+			$subjectList[] = array('code'=>$subject['year_grp'].'-'.$subject['sub_code'].'-'.$subject['class'], 'name'=>trim($subject['sub_desc']));
 		}
 
 		if(is_array($subjectList))
