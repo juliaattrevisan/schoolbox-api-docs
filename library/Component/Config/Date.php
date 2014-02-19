@@ -34,6 +34,9 @@ class Component_Config_Date extends Component_Config_Abstract {
     }
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+        if (!empty($configValue)) {
+            $configValue = date('d/m/Y', strtotime($configValue));
+        }
         $page->setVar('COMPONENT_CONFIG_DATE', $configValue);
     }
 
