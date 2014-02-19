@@ -24,7 +24,22 @@
 				var matches = $j(this).attr('rel').match(/^viewComments_(\d+)$/)
 				if (matches) {
 					var postId = matches[1]
-					component.find('#blogComment_'+postId+' .viewCommentThread').toggle()
+
+					var element = component.find('#blogComment_' + postId + ' .viewCommentThread');
+					element.toggle();
+
+					/* Update button text when toggling
+					 */
+					var button = component.find('a[rel=viewComments_' + postId + ']');
+
+					if ($(element).is(':visible')) {
+						var state = 'Hide';
+					}
+					else {
+						var state = 'Show';
+					}
+
+					button.html('<span></span>' + state + ' Comments');
 				}
 			});
 		});
@@ -95,8 +110,8 @@
 					</li>
 					<!-- END comment -->
 				</ul>
-
 				<!-- END has_comments -->
+
 				<form id='modify_blogcomment_form_{LIST_ITEM_ID}' class='modifyForm hide' action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
 					<input type='hidden' name='action' value='addComment' />
 					<input type='hidden' name='userId' value='{ID}' />
@@ -111,8 +126,6 @@
 					<a href="#" class="viewComments btn chat show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show comments</a>
 					<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn add'><span></span>Add Comment</a>
 				</p>
-
-
 
 				<!-- BEGIN has_modify_form -->
 				<form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post'>
