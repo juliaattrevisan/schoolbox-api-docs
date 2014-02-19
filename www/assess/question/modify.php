@@ -40,7 +40,7 @@ if (!empty($_POST)) {
 
 	/* If configuration was provided
 	 */
-	$configuration = null;
+	$config = null;
 
 	if (isset($_POST['configuration'])) {
 		$allConfiguration = json_decode($_POST['configuration']);
@@ -64,7 +64,7 @@ if (!empty($_POST)) {
 
     /* Find the assess summary page
      */
-//    SitePage::localRedir('/assess/summary/' . $section['assess_id']);
+    SitePage::localRedir('/assess/summary/' . $section['assess_id']);
 } else {
     if (!is_numeric($this->arg[0])) {
         error(115);

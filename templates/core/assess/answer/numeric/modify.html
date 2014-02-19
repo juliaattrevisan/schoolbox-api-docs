@@ -18,8 +18,12 @@ $j(function() {
 				required: true,
 				minlength: 1,
 				greaterThanZero:true
+			},
+			answer: {
+				required: true,
+				minlength: 1,
+				isNumber: true
 			}
-
 		},
 		
 		messages: {
@@ -35,6 +39,10 @@ $j(function() {
 	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
    		return this.optional(element) || (parseFloat(value) > 0);
 	}, "Amount must be greater than zero");
+
+	jQuery.validator.addMethod("isNumber", function(value, element) {
+		return !isNaN(value);
+	}, "Amount must be a number");
 });
 </script>
 
