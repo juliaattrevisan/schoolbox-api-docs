@@ -330,12 +330,6 @@ sourcep1=`echo $restore | cut -d',' -f3`;
 sourcep2=`echo $restore | cut -d',' -f4`;
 sourcep3=`echo $restore | cut -d',' -f5`;
 
-# TODO Check if enough space available for the data file restore
-if [ "$sourcetype" = '[A]' ];
-then
-	echo -e "\nFull restore - TODO better check the disk space...";
-fi
-
 # Sync the datafiles, with progress if possible
 backup_dir='/mnt/SchoolboxBackupRestore';
 if [ "$sourceloc" = "[B]" ];
