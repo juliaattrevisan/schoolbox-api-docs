@@ -136,7 +136,6 @@ class External_Tass_User implements External_UserInterface {
 
 		$parent = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 
-        //print_R($parent);
 		return $parent;
 	}
 
@@ -178,8 +177,6 @@ class External_Tass_User implements External_UserInterface {
             if(Cfg::get('site_location') == 'meriden') {
 				$subject['year_grp'] = '';
             }
-
-            //print_r($subject);
 
 			$subjectList[] = array('code'=>$subject['year_grp'].'-'.$subject['sub_code'].'-'.$subject['class'], 'name'=>trim($subject['sub_desc']));
 		}
