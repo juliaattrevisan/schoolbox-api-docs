@@ -110,7 +110,7 @@ private $enabled;               //Bool
 
     public function getEmail() {
         if($this->localEmail == true) {
-            return $this->username .'@'. $this->config_loader->get('site_domain');
+            return $this->username .'@'. $this->config_loader->get('mail_address');
         }
         return $this->altEmail;
     }
