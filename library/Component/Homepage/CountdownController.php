@@ -37,7 +37,15 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
         if (strlen($time) === 0) {
             $time = '00:00:00';
         }
-        $deadline = new Alaress_Date_Format(new DateTime($date.' '.$time));
+        try {
+            $deadline = new Alaress_Date_Format(new DateTime($date.' '.$time));
+        }
+        catch (Exception $e) {
+            // Couldn't create a date, so default to now.
+            // Use +1 seconds to offset some js rendering weirdness
+            // This way it initialises at 00/00/00/00/00
+            $deadline = new Alaress_Date_Format(time()+1, 'U');
+        }
 
         $this->setVar(array(
             'DEADLINE_YEAR' => $deadline->getUsingFormat('Y'),
