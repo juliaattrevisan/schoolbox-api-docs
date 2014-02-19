@@ -40,7 +40,7 @@ if (!empty($_POST)) {
 
 	/* If configuration was provided
 	 */
-	$configuration = null;
+	$config = null;
 
 	if (isset($_POST['configuration'])) {
 		$allConfiguration = json_decode($_POST['configuration']);
