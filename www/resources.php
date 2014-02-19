@@ -197,7 +197,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 		$file['hidden'] > 0 ? $class[] = "hidden" : null;
 
 		// icon
-		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
+		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "binary";
 
 		if (!($i++ % 2)) {
 			$class[] = 'dark';
