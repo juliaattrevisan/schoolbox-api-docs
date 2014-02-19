@@ -5,6 +5,7 @@ $location = Config::get('site_location');
 
 header('Content-Type: text/cache-manifest');
 header('Cache-Control: no-cache');
+header('Expires: Thu, 01 Dec 1969 16:00:00 GMT');
 
 $isiPad   = (bool) strpos($_SERVER['HTTP_USER_AGENT'],'iPad');
 $isiPod   = (bool) strpos($_SERVER['HTTP_USER_AGENT'],'iPod');
