@@ -15,27 +15,7 @@ use Aura\Router\Router;
 global $di;
 $router = $di->get('router');
 $router->attachResource('resourceCategory', '/resource/category');
-
-// POST aliases for update (PATCH), replace (PUT) and delete (DELETE) routes.
-// Necessary because HTML forms support only POST and GET HTTP methods.
-// I'm not keen on the RoR method of supporting extra methods (passing method
-// as a POST parameter), as this means that extra form inputs need to be added.
-$router->attach('resourceCategory', '/resource/category', function($subroute) {
-    /** @var Router $subroute */
-    $subroute->setTokens(array(
-        'id'     => '\d+',
-        'format' => '(\.[^/]+)?'
-    ));
-    $subroute
-        ->addPost('update:post', '/{id}/update')
-        ->addValues(array('action' => 'update'));
-    $subroute
-        ->addPost('replace:post', '/{id}/replace')
-        ->addValues(array('action' => 'replace'));
-    $subroute
-        ->addPost('delete:post', '/{id}/delete')
-        ->addValues(array('action' => 'delete'));
-});
+$router->attachResourcePostAlias('resourceCategory', '/resource/category');
 
 // Set up the controller
 // The injector is going to be generic to all controllers, so have some better
