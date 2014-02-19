@@ -89,6 +89,11 @@ then
 	errmsg="Unable to detect current template directory";
 	error;
 else
+	if [ -z $thistemplatedir ];
+	then
+		errmsg="Unable to locate template directory in database";
+		error;
+	fi
 	thistemplatedir=`readlink -f $thistemplatedir`
 	if [ ! -d $thistemplatedir ];
 	then
@@ -102,10 +107,21 @@ then
 	errmsg="Unable to detect current data file directory";
 	error;
 else
-	thisdatadir=`readlink -f $thisfiledir/../`;
+	if [ -z $thisfiledir ];
+	then
+		errmsg="Unable to locate data directory in database";
+		error;
+	fi
+	thisfiledir=`readlink -f $thisfiledir`;
+	if [ ! -d $thisfiledir ];
+	then
+		errmsg="Data file directory '$thisfiledir' is not a directory";
+		error;
+	fi
+	thisdatadir=${thisfiledir%/*};
 	if [ ! -d $thisdatadir ];
 	then
-		errmsg="Data file directory '$thisdatadir' is not a directory";
+		errmsg="Data directory '$thisdatadir' is not a directory";
 		error;
 	fi
 fi
@@ -188,7 +204,7 @@ do
 done
 
 # Detect other remote installs
-sshlist=`grep 'Host ' ~/.ssh/config | sed 's/Host\ //g'`;
+sshlist=`grep 'Host ' ~/.ssh/config 2>/dev/null | sed 's/Host\ //g'`;
 echo -e "\nRemote installs \c";
 for host in $sshlist;
 do
@@ -325,9 +341,61 @@ fi
 if [ "$sourcetype" = '[A]' ];
 then
 	# Full restore, sync all data files, then perform cleanup
-	echo -e "\n* Full restore * - TODO";
+	echo -e "\n* Full restore *";
 	## Fix data folder structure
 	## Fix data and template folder permissions
+	sourcedb='';
+	if [ "$sourceloc" = '[L]' ];
+	then
+		# Local Source, set the file location of the db backup
+		sourcedb="$sourcep2";
+		sourcedata=${sourcep2%/*};
+		echo -e "\nPerforming Data Transfer";
+		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
+		$instdir/tools/create-data-dirs.sh $thisdatadir;
+		$instdir/tools/set-data-dir-perms.sh $thisdatadir;
+	fi
+	if [ "$sourceloc" = '[R]' ];
+	then
+		# Remote Source, transfer the db file locally.
+		sourcedata=${sourcep3%/*};
+		sourcesqlfilename=${sourcep3##*/};
+		echo -e "\nTransferring database backup";
+		scp $sourcep1:$sourcep3 /tmp >/dev/null 2>&1;
+		if [ $? -ne 0 ];
+		then
+			errmsg="Unable to transfer database backup successfully";
+			error;
+		fi
+		sourcedb="/tmp/$sourcesqlfilename";
+		if [ ! -f $sourcedb ];
+		then
+			errmsg="Unable to find $sourcedb";
+			error;
+		fi
+		echo -e "\nPerforming Data Transfer";
+		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
+		$instdir/tools/create-data-dirs.sh $thisdatadir;
+		$instdir/tools/set-data-dir-perms.sh $thisdatadir;
+	fi
+	if [ "$sourceloc" = '[B]' ];
+	then
+		# Backup Source, set the file location of the db backup
+		sourcedb="$backup_dir/$sourcep2/schoolbox-$sourcep2.sql";
+		echo -e "\nPerforming Data Transfer";
+		source $sourcep1;
+		if [ -z $thisdatadir ];
+		then
+			errmsg="Big fail - stopping here as going further will wipe your OS $thisdatadir";
+			error;
+		fi
+		rm $thisdatadir/*/ -fR;
+		mkdir -p $thisdatadir/restoredata;
+		cd $thisdatadir/restoredata;
+		cat $backup_dir/$sourcep2/schoolboxdata-$sourcep2.tar.gz* | tar xzv
+		# Data files will be in the data directory under the folder $thisdatadir/restoredata
+		# After DB restore we will find the path and move them to the correct location
+	fi
 else
 	# DB only restore, sync the db backup locally
 	echo -e "\n* DB only restore *";
@@ -368,8 +436,12 @@ then
 	error;
 fi
 
+# Re-read the conf file to ensure safety
+tempconffile="$conffile";
+readconf;
+cd $curdir;
+
 # Backup this installs database
-# TODO - perhaps need better checks, because if this fails we have no way to rollback the DB.
 echo -e "\nPerforming backup of current database";
 newbackup=`$instdir/tools/backup-database.sh`;
 if [ $? -ne 0 ];
@@ -388,6 +460,23 @@ done;
 
 ## Restore specified database
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $sourcedb;
+
+# Move data files to correct location if restoring from backup
+if [ "$sourceloc" = '[B]' ];
+then
+	echo -e "\nMoving data files to the correct location";
+	sourcefiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='file_dir'" | cut -d'/' -f2-100`;
+	sourcefiledir=${sourcefiledir%/*};
+	mv -f $thisdatadir/restoredata/$sourcefiledir/* $thisdatadir/;
+	$instdir/tools/create-data-dirs.sh $thisdatadir;
+	$instdir/tools/set-data-dir-perms.sh $thisdatadir;
+fi
+
+## Cleanup remotely copied database
+if [ "$sourceloc" = '[R]' ];
+then
+	rm -f $sourcedb >/dev/null 2>&1;
+fi
 
 ## Fix SQL config paths to data directory
 $instdir/tools/generate-dir-sql.sh $thisdatadir `readlink -f $thistemplatedir/../` > /tmp/schoolbox-restore-sql-paths;
