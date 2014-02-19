@@ -15,7 +15,7 @@ $di->set(
     'router',
     $di->lazy(
         function() {
-            $factory = new Aura\Router\RouterFactory();
+            $factory = new Alaress\Web\Router\RouterFactory();
             return $factory->newInstance();
         }
     )

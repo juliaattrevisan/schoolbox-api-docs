@@ -1,0 +1,27 @@
+<?php
+/**
+ * Implementation of Aura\Router\RouterFactory.
+ *
+ * This creates the router with instance of Alaress\Web\Router\RouteCollection
+ * (which defines extra helper methods over Aura\Router\RouteCollection)
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Alaress\Web\Router;
+
+use Aura\Router\Router;
+use Aura\Router\RouteFactory;
+
+class RouterFactory {
+    /**
+     * Returns a new Router instance.
+     *
+     * @return Router
+     */
+    public function newInstance() {
+        return new Router(new RouteCollection(new RouteFactory()));
+    }
+}
