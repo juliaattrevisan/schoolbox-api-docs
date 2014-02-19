@@ -29,7 +29,7 @@ echo "Starting DB backup process";
 if [ ! -f $conffile ];
 then
 	echo "New installation or conf file missing";
-	exit 1;
+	exit;
 fi
 
 echo "Using db credentials from: "`readlink -f $conffile`;
@@ -46,7 +46,7 @@ sqlver=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM 
 if [ -z $sqlver ];
 then
 	echo "Unable to collect current database version. Please check your database credentials.";
-	exit 1;
+	exit;
 fi
 
 backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='file_dir' \G;" | grep 'value' | cut -d' ' -f2`;
@@ -57,4 +57,4 @@ mkdir -p $backupdir;
 mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
 
 echo "Backup of database at version $sqlver located at: $backupfile";
-exit 0;
+exit;

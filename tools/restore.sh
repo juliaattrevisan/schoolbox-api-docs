@@ -454,7 +454,7 @@ cd $curdir;
 # Backup this installs database
 echo -e "\nPerforming backup of current database";
 newbackup=`$instdir/tools/backup-database.sh`;
-if [ $? -ne 0 ];
+if [ `echo $newbackup | grep 'Backup of database at version' | wc -l` -eq 0 ];
 then
 	errmsg="An error occured during the database backup";
 	error;
