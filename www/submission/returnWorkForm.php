@@ -72,7 +72,8 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
 					$return['filesize'] = $_FILES[$uploadIndex]['size'];
 					$return['mime_type'] = $uploaded_file['type'];
 
-                    saveReturn($return, null, $uploaded_file);
+					$saveReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
+                    $saveReturn->saveReturn($return, null, $uploaded_file);
                 }
             }
         }
@@ -97,7 +98,9 @@ elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
         'mark'      => $mark['mark'],
         'norm_mark' => $mark['norm_mark']
     );
-    saveReturn($return, $_POST['rubric']);
+
+	$saveReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
+	$saveReturn->saveReturn($return, $_POST['rubric']);
 
     // in all possible scenarios, *something* happened above, so redirect the user
 	$page->backToTheFuture(2);
@@ -111,77 +114,6 @@ elseif(upload_failed()) {
 // not enough information submitted to this form
 else {
     error(2);
-}
-
-/**
- * @param array $return The returned work to save.
- * @param array $rubric The rubric data to save, if there is one.
- * @param array $file   The file to add, if there is one.
- *
- * @return bool
- */
-function saveReturn($return, $rubric = null, $file = null) {
-    $return_mapper   = ReturnedWorkMapper::getInstance();
-    $returned_work   = new ReturnedWork();
-    $box_id          = $return['box_id'];
-    $student_id      = $return['owner'];
-    $update_existing = false;
-    try {
-        /** @var ReturnedWork $returned_work */
-        $returned_work = $return_mapper->findOneByColumnList(
-            array('owner' => $student_id, 'box_id' => $box_id,),
-            array('returned' => 'desc')
-        );
-
-        // Is this outside of the update window? if so, create a new one.
-        $return_time = $returned_work->getReturned();
-        $window_ago  = new Alaress_Date_Format(time() - update_window, 'U');
-        if (!($return_time->getUnixTimestamp() < $window_ago->getUnixTimestamp())) {
-            $update_existing = true;
-        }
-    }
-    catch (\Schoolbox\Mapper\Exception $e) {}
-    if (!$update_existing) {
-        $returned_work
-            ->setOwner(UserMapper::getInstance()->findById($student_id))
-            ->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($box_id))
-            ->setReturned(new Alaress_Date_Format(new DateTime('now')))
-        ;
-    }
-    $returned_work
-        ->setMark($return['mark'])
-        ->setMarker($_SESSION['user'])
-        ->setNormalizedMark($return['norm_mark'])
-    ;
-    if (isset($return['comment'])) {
-        $returned_work->setComment($return['comment']);
-    }
-    // Is there a file? If so, upload it.
-    if (!empty($file)) {
-        $returned_work
-            ->setFilename($file['name'])
-            ->setTempLocation($file['tmp_name'])
-            ->loadFilesizeFromTempLocation();
-        ;
-    }
-    if ($update_existing) {
-        $return_mapper->save($returned_work);
-    }
-    else {
-        $return_mapper->create($returned_work);
-    }
-
-    // Rubrics have no mappers yet, so handle them the old-fashioned way.
-    $return_id = $returned_work->getId();
-    if (!empty($return_id) && $rubric) {
-        $rubric_handler = new DueWork_Rubric_Handler();
-        $stamp          = null;
-        if ($update_existing) {
-            $stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
-        }
-        $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
-    }
-    return !empty($return_id);
 }
 
 /**
@@ -245,8 +177,6 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         $mark = $marksheet->normaliseMark($givenMark, $subbox);
     }
 
-    // print_r($mark);
-
     // set up common values for the return
     $return = array(
         'box_id'    => $boxID,
@@ -255,7 +185,9 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         'norm_mark' => $mark['norm_mark'],
         'comment'   => $comment,
     );
-    saveReturn($return);
+
+	$saveReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkSaver();
+    $saveReturn->saveReturn($return);
 
     $marks = $returnHandler->getStudentMarksForCategory($subbox['category'], $studentID, $_SESSION['id'], $year, $semester);
 
@@ -263,11 +195,4 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         'id' => $studentID,
         'marks' => $marks
     );
-
-    // var_dump($success);
-
-    /*
-        INSERT INTO `submission_return` (`box_id`,`owner`,`mark`,`norm_mark`,`comment`,`filename`,`returned`) VALUES ('7','17','47','47','comment here!!!!','',NOW());
-        UPDATE `student_submission` SET `marked`='1' WHERE 1=1 AND `box_id`= '7' AND `owner`= '17';
-     */
 }
