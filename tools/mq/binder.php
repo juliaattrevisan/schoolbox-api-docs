@@ -34,6 +34,7 @@ EOL;
 $start = microtime(true);
 
 $uMap = \Schoolbox\UserMapper::getInstance();
+
 $userCollection = $uMap->findAll();
 
 $qFactory = new \Schoolbox\Notif\Queue\UserQueueFactory();
@@ -43,6 +44,8 @@ $countLen = strlen("$userCount");
 $i = 0;
 
 foreach($userCollection as $user) {
+
+	/** @var \Schoolbox\User $user */
 
 	// hydrate
 	$user = $uMap->findById($user->getId());
@@ -54,7 +57,7 @@ foreach($userCollection as $user) {
 		);
 	}
 
-	$deleted = $qFactory->destoryUserBindings($user, $dryRun);
+	$deleted = $qFactory->destoryUserBindings($user->getId(), $dryRun);
 
 	if($deleted < 0) {
 		if($verbose) {

@@ -10,8 +10,6 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
-use Schoolbox\Realtime\Stomp\SubscriptionManager;
-
 class SelfResponder extends Responder {
 
 	/** @var PipeManager */
@@ -43,7 +41,7 @@ class SelfResponder extends Responder {
 	}
 
 	public function notifyUser($data) {
-		$this->pipeManager->sendToUser($this->pipe->getUser(), $data);
+		$this->pipeManager->sendToUser($this->pipe->getUserId(), $data);
 	}
 
 

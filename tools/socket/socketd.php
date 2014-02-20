@@ -1,4 +1,5 @@
 #!/usr/bin/php
+#!/usr/bin/hhvm
 <?php
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\UserMapper;
@@ -13,14 +14,15 @@ use Schoolbox\UserMapper;
  */
 
 pcntl_signal(SIGCHLD, SIG_IGN);
+error_reporting(E_ALL ^ E_NOTICE);
 
 require_once('../../include/Bootstrap.php');
 
-$opts = getopt('vp::');
+$opts = getopt('dvp::');
 
 $verbose = isset($opts['v']);
 $port = empty($opts['p']) ? 8080 : $opts['p'];
-
+$debug = isset($opts['d']);
 
 if($verbose) {
 	echo <<<EOL
@@ -42,7 +44,7 @@ $redis = Alaress\Redis::getClientInstance();
 $verboser = new \Schoolbox\Realtime\Verboser($verbose ? STDOUT : null);
 
 $pipeManager = new PipeManager(
-	$loop, $redis, UserMapper::getInstance(), $verboser
+	$loop, $redis, $verboser
 );
 
 $session = new \Ratchet\Session\SessionProvider(

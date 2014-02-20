@@ -11,15 +11,10 @@ namespace Schoolbox\Realtime\Pipe;
 
 
 use Evenement\EventEmitter;
-use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\Timer;
-use React\Promise\Deferred;
-use React\Socket\ConnectionException;
 use React\Stomp\Client;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\Stomp\SubscriptionManager;
-use Schoolbox\User;
 
 class Responder extends EventEmitter {
 
@@ -67,11 +62,6 @@ class Responder extends EventEmitter {
 				$this->socketStream = $child;
 				break;
 		}
-
-		// reset our DB connections
-		\Database::reinitialise();
-		\DeprecatedDatabase::reinitialise();
-
 	}
 
 	/**
@@ -147,11 +137,11 @@ class Responder extends EventEmitter {
 	/**
 	 * Message from client: ensure STOMP subscription exists for user.
 	 *
-	 * @param User $user
+	 * @param int $userId
 	 * @param mixed $null
 	 * @return null
 	 */
-	public function subscribe($user, $null) {
+	public function subscribe($userId, $null) {
 		// this is just a bounceback, since subscription has to happen in the parent process.
 		// but rather than call in a blocking way from the server, this adds it to the event loop
 		$this->notifyServer('subscribe');
@@ -161,20 +151,24 @@ class Responder extends EventEmitter {
 	/**
 	 * Message from client: retrieve n messages, both read and unread.
 	 *
-	 * @param User $user
+	 * @param int $userId
 	 * @param int $count
 	 * @return bool
 	 */
-	public function fetch($user, $count) {
+	public function fetch($userId, $count) {
+
+		try {
+
+
 
 		$messages = array();
 
 		// get a queue to retrieve read messages synchronously
 		$mqf = new UserQueueFactory();
-		$queue = $mqf->buildUserQueue($user, $count, false);
+		$queue = $mqf->buildUserQueue($userId, $count, false);
 
 		$allMessages = $queue->getMessages($count);
-		$unreadMessages = $this->subscriptionManager->getUserSubscription($user, true)->getMessages();
+		$unreadMessages = $this->subscriptionManager->getUserSubscription($userId, true)->getMessages();
 
 		foreach($allMessages as $read) {
 			$messages[$read->getId()] = $read->getBody();
@@ -188,16 +182,20 @@ class Responder extends EventEmitter {
 			'fetch' => $messages
 		)));
 
+		}
+		catch(\Exception $e) {
+			echo $e->getTraceAsString();
+		}
 	}
 
 	/**
 	 * Message from client: mark the given messages as read.
 	 *
-	 * @param User $user
+	 * @param int $userId
 	 * @param array $messageIds
 	 * @return bool
 	 */
-	public function ack($user, $messageIds) {
+	public function ack($userId, $messageIds) {
 		$this->notifyServer(json_encode(array('ack' => $messageIds)));
 	}
 

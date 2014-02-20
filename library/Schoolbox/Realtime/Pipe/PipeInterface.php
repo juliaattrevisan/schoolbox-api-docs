@@ -11,7 +11,6 @@ namespace Schoolbox\Realtime\Pipe;
 
 
 use Ratchet\ConnectionInterface;
-use Schoolbox\User;
 
 interface PipeInterface {
 
@@ -40,16 +39,16 @@ interface PipeInterface {
 	 */
 	public function getSocketKey();
 
-	/**
-	 * @return User
-	 */
-	public function getUser();
 
 	/**
-	 * @param User $user
-	 * @return void
+	 * @return int
 	 */
-	public function setUser($user);
+	public function getUserId();
+
+	/**
+	 * @param int $id
+	 */
+	public function setUserId($id);
 
 	/**
 	 * @param string $data

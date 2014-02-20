@@ -34,8 +34,10 @@ class Verboser {
 			}
 
 			fputs($this->stream, sprintf(
-				"%s[$char] $message%s\n",
+				"%s[$char] [%6.2f / %6.2f] $message%s\n",
 				$c ? "\033[{$c}m" : '',
+				(int)(memory_get_usage(true))/(1024*1024),
+				(int)(memory_get_peak_usage(true))/(1024*1024),
 				$c ? "\033[0m" : ''));
 		}
 	}

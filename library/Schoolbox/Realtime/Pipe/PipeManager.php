@@ -23,10 +23,10 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
 use Schoolbox\Notif\Queue\UnreadMessage;
+use Schoolbox\Realtime\RealtimeException;
+use Schoolbox\Realtime\SessionException;
 use Schoolbox\Realtime\Stomp\SubscriptionManager;
 use Schoolbox\Realtime\Verboser;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -57,30 +57,20 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	/** @var PredisClientInterface */
 	protected $predisClient;
 
-	/** @var \Schoolbox\UserMapper */
-	protected $userMapper;
-
 	/** @var Verboser */
 	protected $verboser;
-
-	/** @var IConfigLoader  */
-	protected $conf;
 
 	/**
 	 * @param LoopInterface $reactLoop
 	 * @param PredisClientInterface $predisClient
-	 * @param UserMapper $userMapper
 	 * @param Verboser $verboser
-	 * @param IConfigLoader $iConfigLoader
 	 */
-	public function __construct($reactLoop, $predisClient, $userMapper, $verboser, $iConfigLoader = null) {
+	public function __construct($reactLoop, $predisClient, $verboser) {
 		$this->pipes = array();
 		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
 		$this->predisClient = $predisClient;
-		$this->userMapper = $userMapper;
 		$this->verboser = $verboser;
-		$this->conf = $iConfigLoader ?: new ConfigLoader();
 
 		$this->v('Instantiated PipeManager');
 	}
@@ -97,10 +87,11 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		// receive new connection, register a pipe based on it
 		$pipe = new Pipe($conn);
 
-		$this->v('Received socket connection from ' . $pipe->getRemoteAddress());
+		$this->v( sprintf( 'Received socket connection from %s', $pipe->getRemoteAddress()));
 
 		try {
 			$this->registerPipe($pipe);
+			$this->v(sprintf("PIPEREG = %s", count($this->pipesBySocketKey)), '*');
 		}
 		catch(CommunicationException $e) {
 			// Redis baulked: signal a retry
@@ -113,7 +104,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			)));
 			$pipe->close();
 		}
-		catch(MapperException $e) {
+		catch(SessionException $e) {
 			// user not found, not logged in: signal authentication required
 			$this->v('Failed to fully register pipe: '.$e->getMessage(), '!');
 
@@ -144,6 +135,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		else {
 			$this->v("Ignoring closure of '$socketKey'");
 		}
+
+		$this->v(sprintf("PIPEREG = %s", count($this->pipesBySocketKey)), '*');
 
 	}
 
@@ -178,15 +171,14 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		}
 
 		$pipe = $this->pipesBySocketKey[$socketKey];
-		$user = $pipe->getUser();
-		$username = $user ? $user->getUsername() : 'unknown user';
+		$userId = $pipe->getUserId();
 		$sessionId = $pipe->getSession() ?: 'sessionless';
 
-		$this->v(sprintf('Received message: %s (%s:%s) > %s', $username, $socketKey, $sessionId, $msg), '>');
+		$this->v(sprintf('Received message: %s (%s:%s) > %s', $userId ?: 'unknown', $socketKey, $sessionId, $msg), '>');
 
 
 		// we'll just ignore messages that are of unknown origin
-		if(!$user) {
+		if(!$userId) {
 			return;
 		}
 
@@ -207,6 +199,14 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		}
 
 		// YOU ARE IN CHILD CONTEXT RIGHT NOW
+		unset($this->pipesBySocketKey);
+		unset($this->pipesBySessionId);
+		unset($this->pipesByUser);
+		$this->reactLoop->stop();
+		unset($this->reactLoop);
+		unset($this->subscriptionManager);
+		unset($this->predisClient);
+
 
 		$request = each($data);
 
@@ -216,13 +216,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		try {
 			if(method_exists($responder, $command) && in_array($command, array('subscribe', 'fetch', 'ack'))) {
 				// process the command that's been sent from the client
-				$this->v("Executing $command for $username [$socketKey]");
+				$this->v("Executing $command for user $userId [$socketKey]");
 
 				// the command executed could take several seconds, depending on what it is
-				 $response = $responder->$command($user, $arguments);
-			}
-			else {
-				$response = "Cannot understand command '$command'";
+				 $responder->$command($userId, $arguments);
 			}
 		}
 		catch(\Exception $e) {
@@ -246,14 +243,14 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * This is the method called from within a Subscription object for notifying attached sockets of a new message.
 	 *
 	 * @param UnreadMessage $message
-	 * @param User $user
+	 * @param int $userId
 	 */
-	public function onAMQP($message, $user) {
+	public function onAMQP($message, $userId) {
 //		$this->v("Received new message to send to ".$user->getUsername());
 
 		// if traffic gets high enough, we may need to look at micro-caching and batching these pushes
 
-		$this->sendToUser($user, json_encode(array(
+		$this->sendToUser($userId, json_encode(array(
 			'push' => array(
 				$message->getId() => $message->getBody()
 			)
@@ -277,10 +274,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			$this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
 			$this->v("LINK       '$socketKey' -> SESSION '$sessionId'");
 
-			if($user = $this->findUserBySession($sessionId, $pipe->getRemoteAddress())) {
-				$pipe->setUser($user);
-				$this->pipesByUser[$user->getId()][$socketKey] = $pipe;
-				$this->v("LINK       '$socketKey' -> USER    '{$user->getUsername()}'");
+			if($userId = $this->findUserBySession($sessionId, $pipe->getRemoteAddress())) {
+				$pipe->setUserId($userId);
+				$this->pipesByUser[$userId][$socketKey] = $pipe;
+				$this->v("LINK       '$socketKey' -> USER    '$userId'");
 			}
 		}
 		else {
@@ -303,8 +300,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			unset($this->pipesBySessionId[$sessionId][$socketKey]);
 		}
 
-		if($user = $pipe->getUser()) {
-			unset($this->pipesByUser[$user->getId()][$socketKey]);
+		if($userId = $pipe->getUserId()) {
+			unset($this->pipesByUser[$userId][$socketKey]);
 		}
 
 		// send a connection-close to the client at the other end of the pipe
@@ -319,7 +316,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 *
 	 * @param string $sessionId
 	 */
-	protected function unregisterAllPipesBySession($sessionId) {
+	protected function unregisterAllPipesBySessionId($sessionId) {
 		if(array_key_exists($sessionId, $this->pipesBySessionId)) {
 			foreach($this->pipesBySessionId[$sessionId] as $pipe) {
 				$this->unregisterPipe($pipe);
@@ -331,11 +328,11 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	/**
 	 * Unregister all pipes associated with a user.
 	 *
-	 * @param User $user
+	 * @param int $userId
 	 */
-	protected function unregisterAllPipesByUser($user) {
-		if(array_key_exists($user->getId(), $this->pipesByUser)) {
-			foreach($this->pipesByUser[$user->getId()] as $pipe) {
+	protected function unregisterAllPipesByUserId($userId) {
+		if(array_key_exists($userId, $this->pipesByUser)) {
+			foreach($this->pipesByUser[$userId] as $pipe) {
 				$this->unregisterPipe($pipe);
 			}
 		}
@@ -348,15 +345,12 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 *
 	 * @param string $sessionId
 	 * @param string $pipeIp
-	 * @throws \Schoolbox\Mapper\Exception
-	 * @throws \Exception
-	 * @throws \PDOException
-	 * @throws \Schoolbox\Notif\NotifException
-	 * @return User
+	 * @throws SessionException
+	 * @return int
 	 */
 	protected function findUserBySession($sessionId, $pipeIp = null) {
 		if(!$sessionId) {
-			throw new MapperException("No sessionID provided on which to search.");
+			throw new SessionException("No sessionID provided on which to search.");
 		}
 
 		$redisResponse = $this->predisClient->executeCommand(
@@ -364,48 +358,20 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		);
 
 		if(!preg_match('`id\|s:[0-9]+:"([0-9]+)";`', $redisResponse, $matches)) {
-			throw new MapperException("User not found");
+			throw new SessionException("User not found");
 		}
 
 		$userId = $matches[1];
 
-		preg_match('`lasttime\|i:([0-9]+);`', $redisResponse, $matches);
-		$lastTime = $matches[1];
-
-		preg_match('`ip\|s:[0-9]+:"([0-9\.]+)";`', $redisResponse, $matches);
-		$sessionIp = $matches[1];
-
-		// the following mirrors SitePage::initSession() - unfortunately it can't hook into it
-		$trackIp = $this->conf->get('track_ip');
-		$remember = $this->conf->get('remember');
-		$sessionLength = $this->conf->get('session_length');
-
-		// check remote address, if appropriate
-		if($trackIp && ($sessionIp != $pipeIp)) {
-			throw new NotifException("Changed IP address, log in again");
+		if(is_numeric($userId)) {
+			return $userId;
 		}
-
-		// check session timeout length
-		if (!$remember && (($lastTime + $sessionLength) < time())) {
-			throw new NotifException("Session has expired, log in again");
-		}
-
-
-		try {
-			return $this->userMapper->findById($userId);
-		}
-		catch(\PDOException $e) {
-			// I should not have to do this here...but apparently...
-			if($this->userMapper->getDatabase()->reconnect($e)) {
-				return $this->userMapper->findById($userId);
-			}
-			throw $e;
-		}
+		throw new SessionException("User ID not found in session.");
 	}
 
 	/**
 	 * @param Responder $responder
-	 * @param Pipe $pipe
+	 * @param PipeInterface $pipe
 	 */
 	protected function attachResponder($responder, $pipe) {
 
@@ -454,7 +420,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 					$pipeManager->sendToPipe($pipe, $data);
 					break;
 				case Responder::CONTEXT_USER:
-					$pipeManager->sendToUser($pipe->getUser(), $data);
+					$pipeManager->sendToUser($pipe->getUserId(), $data);
 					break;
 				case Responder::CONTEXT_SESSION:
 					$pipeManager->sendToSession($pipe->getSession(), $data);
@@ -462,15 +428,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 				case Responder::CONTEXT_SELF:
 					// this is a bounceback so the subscription is registered in the parent
 					if($data == 'subscribe') {
-						$subscriptionManager->subscribe($pipe->getUser(), new SelfResponder($pipeManager, $pipe));
+						$subscriptionManager->subscribe($pipe->getUserId(), new SelfResponder($pipeManager, $pipe));
 						break;
 					}
 					$data = json_decode($data, true);
 					// this is also a bounceback, because you can only ack from the subscription you started
 					if(isset($data['ack'])) {
-						if($subscription = $subscriptionManager->getUserSubscription($pipe->getUser(), true)) {
+						if($subscription = $subscriptionManager->getUserSubscription($pipe->getUserId(), true)) {
 							$markAsRead = $subscription->acceptMessages($data['ack']);
-							$pipeManager->sendToUser($pipe->getUser(), json_encode(array('ack' => $markAsRead)));
+							$pipeManager->sendToUser($pipe->getUserId(), json_encode(array('ack' => $markAsRead)));
 						}
 					}
 					break;
@@ -510,12 +476,12 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	/**
 	 * Send data to all pipes associated with a specific user.
 	 *
-	 * @param User $user
+	 * @param int $userId
 	 * @param string $data
 	 */
-	public function sendToUser($user, $data) {
-		if(array_key_exists($user->getId(), $this->pipesByUser)) {
-			foreach($this->pipesByUser[$user->getId()] as $pipe) {
+	public function sendToUser($userId, $data) {
+		if(array_key_exists($userId, $this->pipesByUser)) {
+			foreach($this->pipesByUser[$userId] as $pipe) {
 				$this->sendToPipe($pipe, $data);
 			}
 		}

@@ -14,7 +14,6 @@ use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
-use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -60,12 +59,6 @@ class UserQueueFactory {
 		$this->_DEPRECATED_GROUP = new \Group();
 		$this->_DEPRECATED_EXT_USER = new \External_User();
 
-		// cache roles
-		$this->roleCache = $this->roleMapper->findAll()->groupBy('type')->getAll();
-		foreach($this->roleCache as $roleType => $roleCollection) {
-			$this->roleCache[$roleType] = $roleCollection->getColumnValues('id');
-		}
-
 		// don't forget the magic!
 		$this->_DEPRECATED_EXT_USER->getCurrentSemester(/*$user->getExternalId()*/);
 
@@ -107,7 +100,6 @@ class UserQueueFactory {
 		$bindings = array(
 			// required user information
 			'user' => array(
-				'username'  => $user->getUsername(),
 				// *.notify.user.{id}
 				'id'        => $user->getId()
 			),
@@ -187,6 +179,14 @@ class UserQueueFactory {
 				foreach($childrenArray as $childArray) {
 					$childIds[] = $childArray['RelatedID'];
 				}
+				// this is the only time we need to actually look at the role cache, so create it on demand
+				if(empty($this->roleCache)) {
+					// cache roles
+					$this->roleCache = $this->roleMapper->findAll()->groupBy('type')->getAll();
+					foreach($this->roleCache as $roleType => $roleCollection) {
+						$this->roleCache[$roleType] = $roleCollection->getColumnValues('id');
+					}
+				}
 				if(array_key_exists(Role::STUDENT, $this->roleCache)) {
 					$childCollection = $this->userMapper->findByColumnList(array(
 						'synergy_id' => $childIds,
@@ -212,19 +212,18 @@ class UserQueueFactory {
 	/**
 	 * Build the queue for the given User, including binding generation
 	 *
-	 * @param User|int $user
+	 * @param int $userId
 	 * @param int $limit
 	 * @param bool $bind
 	 * @return UserQueue
 	 */
-	public function buildUserQueue($user, $limit = 10, $bind = true) {
+	public function buildUserQueue($userId, $limit = 10, $bind = true) {
 		if($bind) {
-			$q = $this->bindUserQueue($user);
+			$q = $this->bindUserQueue($userId);
 		}
 		else {
 			$q = new UserQueue(array('user' => array(
-				'username' => $user->getUsername(),
-				'id'       => $user->getId()
+				'id'       => $userId
 			)), $this->mqConnector);
 		}
 		$q->getMessages($limit);
@@ -235,28 +234,26 @@ class UserQueueFactory {
 	 * Destroy all routing bindings for the given user.
 	 * Returns the number of bindings deleted, or -1 on error.
 	 *
-	 * @param User|int $user
+	 * @param int $userId
+	 * @param bool $simulate
 	 * @return int
 	 */
-	public function destoryUserBindings($user, $simulate = false) {
+	public function destoryUserBindings($userId, $simulate = false) {
 
 		if(!$this->existingBindings) {
 			$this->cacheExistingBindings();
 		}
 
-		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
-		$username = $user->getUsername();
-
-		if(!isset($this->existingBindings[$username])) {
+		if(!isset($this->existingBindings[$userId])) {
 			return 0;
 		}
 
 		$count = 0;
 
 		if(!$simulate) {
-			$userExchange = Connector::SECONDARY_NAME_PREFIX . $username;
+			$userExchange = Connector::SECONDARY_NAME_PREFIX . $userId;
 
-			foreach($this->existingBindings[$username] as $routingKey) {
+			foreach($this->existingBindings[$userId] as $routingKey) {
 				$this->mqConnector->unbindExchange($userExchange, $routingKey);
 				++$count;
 			}

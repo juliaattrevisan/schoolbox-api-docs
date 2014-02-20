@@ -30,6 +30,10 @@ class SubscriptionManager {
 	/** @var Subscription[] */
 	protected $subscriptions;
 
+	/**
+	 * @param Factory $stompFactory
+	 * @param PipeManager $pipeManager
+	 */
 	public function __construct($stompFactory, $pipeManager) {
 		// this factory requires its own loop to work
 		$this->subscriptions = array();
@@ -40,13 +44,13 @@ class SubscriptionManager {
 	/**
 	 * Add a subscription for the given user. If a pipe is provided, it will be notified upon success.
 	 *
-	 * @param User $user
+	 * @param int $userId
 	 * @param Responder $responder
 	 * @return bool
 	 */
-	public function subscribe($user, $responder = null) {
-		if($this->userHasSubscription($user)) {
-			$this->pipeManager->v("User {$user->getUsername()} is already subscribed");
+	public function subscribe($userId, $responder = null) {
+		if($this->userHasSubscription($userId)) {
+			$this->pipeManager->v("User $userId is already subscribed");
 
 			// notify the pipe if it was supplied
 			if($responder instanceof Responder) {
@@ -68,12 +72,12 @@ class SubscriptionManager {
 			));
 
 			$self = $this;
-			$destination = $this->userSubscriptionDestination($user);
+			$destination = $this->userSubscriptionDestination($userId);
 
-			$client->connect()->then(function($client) use ($destination, $self, $user, $responder) {
+			$client->connect()->then(function($client) use ($destination, $self, $userId, $responder) {
 				/** @var Client $client */
 				// this closure is executed when a stomp client connection is established
-				$self->putSubscription($destination, new Subscription($destination, $client, $user, $self->getPipeManager()));
+				$self->putSubscription($destination, new Subscription($destination, $client, $userId, $self->getPipeManager()));
 				// if a responder is provided, use it as a callback for success
 				if($responder instanceof Responder) {
 					$responder->notifyPipe(json_encode(array('subscribe' => true)));
@@ -101,42 +105,41 @@ class SubscriptionManager {
 	}
 
 	/**
-	 * @param User $user
+	 * @param int $userId
 	 * @param bool $generateIfAbsent
 	 * @throws SubscriptionException
 	 * @return Subscription
 	 */
-	public function getUserSubscription($user, $generateIfAbsent = true) {
+	public function getUserSubscription($userId, $generateIfAbsent = true) {
 
-		$dest = $this->userSubscriptionDestination($user);
+		$dest = $this->userSubscriptionDestination($userId);
 
 		if(!array_key_exists($dest, $this->subscriptions)) {
 			if($generateIfAbsent) {
-				$this->subscribe($user);
+				$this->subscribe($userId);
 				if(array_key_exists($dest, $this->subscriptions)) {
 					return $this->subscriptions[$dest];
 				}
 			}
-			throw new SubscriptionException("No subscription for {$user->getUsername()}");
+			throw new SubscriptionException("No subscription for user $userId");
 		}
 		return $this->subscriptions[$dest];
 	}
 
 	/**
-	 * @param User $user
+	 * @param int $userId
 	 * @return string
 	 */
-	protected function userSubscriptionDestination($user) {
-		$username = $user->getUsername();
-		return "/amq/queue/u.$username.unread";
+	protected function userSubscriptionDestination($userId) {
+		return "/amq/queue/u.$userId.unread";
 	}
 
 	/**
-	 * @param User $user
+	 * @param int $userId
 	 * @return bool
 	 */
-	public function userHasSubscription($user) {
-		return array_key_exists($this->userSubscriptionDestination($user), $this->subscriptions);
+	public function userHasSubscription($userId) {
+		return array_key_exists($this->userSubscriptionDestination($userId), $this->subscriptions);
 	}
 
 

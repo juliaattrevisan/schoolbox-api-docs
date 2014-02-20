@@ -64,6 +64,9 @@ class Scheduler {
 	/** @var array */
 	protected $timers;
 
+	/** @var Notif */
+	protected $notif;
+
 	/**
 	 * @param LoopInterface $loop
 	 * @param Verboser $verboser
@@ -75,6 +78,7 @@ class Scheduler {
 		$this->verboser = $verboser;
 		$this->mqc = new Connector();
 		$this->conf = $configLoader;
+		$this->notif = new Notif();
 
 		// create a stomp client for listening to Mapper messages coming in
 		$stompFactory = new Factory($loop);
@@ -237,20 +241,20 @@ class Scheduler {
 		$publish = function($timer) use ($trigger, $v) {
 
 			// WARNING: FORK
-			$pid = pcntl_fork();
+//			$pid = pcntl_fork();
 
-			switch($pid) {
-				case -1: // fail
-					throw new ScheduleException("Unable to fork");
-				case 0: // child
-					// carry on to execute the closure
-					break;
-				default: // parent
-					// do not execute the following code
-					\Database::reinitialise();
-					\DeprecatedDatabase::reinitialise();
-					return;
-			}
+//			switch($pid) {
+//				case -1: // fail
+//					throw new ScheduleException("Unable to fork");
+//				case 0: // child
+//					 carry on to execute the closure
+//					break;
+//				default: // parent
+//					 do not execute the following code
+//					\Database::reinitialise();
+//					\DeprecatedDatabase::reinitialise();
+//					return;
+//			}
 
 			// YOU ARE IN CHILD CONTEXT FROM HERE TO THE END OF THE CLOSURE
 
@@ -319,6 +323,9 @@ class Scheduler {
 				}
 
 			}
+
+			// CHILDUS TERMINATUS
+//			exit;
 		};
 
 		// an explicitly null interval is a request to unset that trigger (regardless of whether or not it exists)

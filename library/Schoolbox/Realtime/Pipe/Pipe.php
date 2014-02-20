@@ -11,7 +11,6 @@ namespace Schoolbox\Realtime\Pipe;
 
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Ratchet\ConnectionInterface;
-use Schoolbox\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 
@@ -38,8 +37,8 @@ class Pipe implements PipeInterface {
 	/** @var \Ratchet\ConnectionInterface */
 	protected $socketConnection;
 
-	/** @var User */
-	protected $user;
+	/** @var int */
+	protected $userId;
 
 	/**
 	 * @param ConnectionInterface $conn
@@ -100,17 +99,17 @@ class Pipe implements PipeInterface {
 
 
 	/**
-	 * @return User
+	 * @return int
 	 */
-	public function getUser() {
-		return $this->user;
+	public function getUserId() {
+		return $this->userId;
 	}
 
 	/**
-	 * @param User $user
+	 * @param int $id
 	 */
-	public function setUser($user) {
-		$this->user = $user;
+	public function setUserId($id) {
+		$this->userId = $id;
 	}
 
 } 

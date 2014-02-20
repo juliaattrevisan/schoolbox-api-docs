@@ -48,8 +48,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	const UPCOMING_WINDOW     = 2;
 
 
-	/** @var SubmissionBoxMapper */
-	protected $submissionBoxMapper;
+//	/** @var SubmissionBoxMapper */
+//	protected $submissionBoxMapper;
 
 	/** @var UserMapper */
 	protected $userMapper;
@@ -242,7 +242,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 */
 	public function notifyStudentOpen($submissionBox, $user, $diff = null) {
 		// yep. self-hydration.
-		$submissionBox = $this->submissionBoxMapper->findById($submissionBox->getId());
+		$submissionBox = $this->mapper->findById($submissionBox->getId());
 		$boxId = $submissionBox->getId();
 		$boxType = $submissionBox->getWorkType()->getName();
 		$boxName = $submissionBox->getName();
