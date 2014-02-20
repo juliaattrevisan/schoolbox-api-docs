@@ -64,7 +64,6 @@ foreach ($pendingQueue as $vid) {
 		}
 	}
 	catch (Exception $e) {
-		$this->setMessage($e->getMessage());
 		$vid->setStatus(QueueMapper::STATUS_FAILED);
 	}
 

@@ -406,11 +406,6 @@ h2 {
         border-bottom: 1px solid @border-color;
     }
 }
-.table-wrap {
-	position: relative;
-	float: left;
-	width: 100%;
-}
 /*--------------------------------------------------------------
 Notifications
 --------------------------------------------------------------*/
@@ -6508,6 +6503,7 @@ p.forgotten {
     width: 100%;
     float: left;
 	border-bottom: 1px solid @border-color;
+    //margin-bottom: 8px;
 	padding-left: 16px;
 	padding-top: 8px;
 }
@@ -6858,11 +6854,23 @@ table.subjectList {
     submission/viewSubmission
 --------------------------- */
 
+
 form.context {
   height: 36px;
   line-height: 36px;
   text-align: right;
 
+	.sem-back, .sem-fwd {
+		border: solid 1px #ccc;
+		color: #555;
+		padding: 1px 8px 5px;
+		font-size: 1.6em;
+
+		&:hover {
+		  background: #eee;
+		  text-decoration: none;
+		}
+	}
   select {
     padding: 5px;
   }
@@ -6870,17 +6878,6 @@ form.context {
     line-height: 20px;
   }
 
-  .sem-back, .sem-fwd {
-    border: solid 1px #ccc;
-    color: #555;
-    padding: 1px 8px 5px;
-    font-size: 1.6em;
-
-    &:hover {
-      background: #eee;
-      text-decoration: none;
-    }
-  }
   .elbow {
     position: absolute;
     right: 74%;
@@ -6904,8 +6901,27 @@ form.context {
       }
     }
   }
-
 }
+
+/* Steve's minimalist version of view-submission
+ */
+.inline-grading-submission-list {
+	table-layout: fixed;
+	width: 100%;
+	tr {
+		td {
+			padding: 4px 0px;
+		}
+	}
+}
+
+.inline-grading-marking {
+	textarea {
+		width: 100%;
+		height: 40px;
+	}
+}
+
 
 .view-submission {
     ul {
@@ -6934,39 +6950,14 @@ form.context {
                 .marking {
                     padding: 8px 8px 8px 0;
                     .comment {
+                    	width: 70%;
+                    	height: 40px;
                         min-width: 200px;
-                        width: 70%;
                         float: right;
                     }
                 }
                 input, select {
                     border: solid 1px @std-grey;
-                }
-            }
-            &.submission.file {
-                p {
-                    line-height: 35px;
-                    margin-right: 80px;
-                }
-                img {
-                    margin: 8px 8px 8px 0;
-                    width: 22px;
-                    height: 22px;
-                }
-                .button-set {
-                    position: absolute;
-                    bottom: 8px;
-                    right: 8px;
-                }
-                td {
-                    border-bottom: solid 1px @std-grey;
-                    position: relative;
-                }
-                .plag-score {
-                    margin-right: 8px;
-                    a {
-                        color: inherit;
-                    }
                 }
             }
             td {
@@ -8306,11 +8297,10 @@ td.name {
 #returnWorkForm {
     .mark-input {
         text-align: right;
-        width: 85px;
         font-size: 12px;
     }
     select {
-        float: left;
+    	float: left;
     }
     &.error {
         border-color: @negative-color !important;
@@ -8320,11 +8310,6 @@ td.name {
         position: absolute;
         width: 300px;
     }
-}
-#upload-returns-submit-north,
-#upload-returns-submit-south {
-    float: right;
-    margin-right: 132px;
 }
 
 /* submission/rubricCriteria */
@@ -8410,32 +8395,23 @@ td.name {
 /* submission/markSheet */
 .inlineform {
     position: relative;
-    .rubric-inline {
-        float: left;
-        position: absolute;
-        z-index: 11;
-        line-height: 14px;
-		min-width: 95px;
-        .view {
-            display: block;
-            float: left;
-        }
-        .edit {
-            display: block;
-            float: left;
-            height: 14px;
-            width: 14px;
-            position: relative;
-            top: -2px;
-            left: 8px;
-            background: url(/images/core/icons/btn-icons.png) no-repeat;
-            background-position: 0 -308px;
-            &:hover {
-                background-position: 0 -322px;
-            }
-        }
+
+    .rubric-edit {
+    	display: block;
+    	float: left;
+    	height: 14px;
+    	width: 14px;
+    	position: relative;
+    	top: 0px;
+    	left: 6px;
+    	background: url(/images/core/icons/btn-icons.png) no-repeat;
+    	background-position: 0 -308px;
+    	&:hover {
+    		background-position: 0 -322px;
+    	}
     }
 }
+
 /*.mark-sheet {
     tr {
         td.mark-average {
@@ -10513,4 +10489,44 @@ textarea.event-detail {
     .jstree-clicked {
         background-color: #ffffb2;
     }
+}
+
+/* Inline Grading
+ */
+#inline-grading {
+	border: 1px solid #eee;
+	width:100%;
+	height:700px;
+	background-image: url('/images/loading-bar.gif');
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+#inline-grading-error-container {
+	display: none;
+}
+
+.inline-grading-column-left {
+	width: 59%;
+}
+
+.inline-grading-column-right {
+	width: 39%;
+}
+
+.dropdown-navigator {
+	select {
+		padding: 5px;
+	}
+	.previous-item, .next-item {
+		border: solid 1px #ccc;
+		color: #555;
+		padding: 1px 8px 5px;
+		font-size: 1.6em;
+
+		&:hover {
+			background: #eee;
+			text-decoration: none;
+		}
+	}
 }

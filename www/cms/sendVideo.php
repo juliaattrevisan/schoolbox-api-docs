@@ -10,29 +10,22 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-if (is_numeric($_GET['id']) || isset($_GET['hash'])) {
+if (isset($_GET['type']) && isset($_GET['id'])) {
 
 	$page = new SitePage;
 	$groupHandler = new Group;
 	$fileHandler = new File;
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
-	try {
-        if (isset($_GET['hash'])) {
-            $video = $videoQueueMapper->findByStorageHash($_GET['hash']);
-        }
-        else {
-            $video = $videoQueueMapper->findByFileId($_GET['id']);
 
-            //Check permissions on video
-            if ($groupHandler->getPermission($video->getFile()->getFolder()) < READ_ACCESS)
-                exit;
-        }
+	try {
+		$videoFactory = new \Schoolbox\Video\Factory\Video($_GET['type'], $_GET['id']);
+		$video = $videoFactory->produce();
 	}
 	catch (Schoolbox\Mapper\Exception $e) {
+
 		/* Video not found */
         exit;
 	}
-
 
 	/*Close session so streaming does not prevent other requests to session due to locking
 	 *http://konrness.com/php5/how-to-prevent-blocking-php-requests/

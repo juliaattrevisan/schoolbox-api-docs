@@ -56,7 +56,7 @@ class Storage extends Player {
 			}
 			catch (Mapper\Exception $e) {}
 			return array(
-				'poster' => "/cms/videoThumb.php?hash={$bits['hash']}&type=poster",
+				'poster' => "/cms/videoThumb.php?hash={$bits['hash']}&size=poster",
 				'src'    => "/cms/sendVideo.php?hash={$bits['hash']}",
 				'status' => $status,
 			);

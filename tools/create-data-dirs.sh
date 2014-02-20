@@ -32,5 +32,6 @@ mkdir -p $datadir/cache/{minify,myfiles,portrait,purifier,stream,weather,xml,zip
 # Cache subdirs for portrait and storage images
 mkdir -p $datadir/cache/stream/{portrait,storage,socialstream}
 mkdir -p $datadir/cache/stream/socialstream/thumbnails
+mkdir -p $datadir/cache/submission_upload
 
 # End of script

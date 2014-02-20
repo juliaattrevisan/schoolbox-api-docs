@@ -1327,18 +1327,20 @@ class Submission extends DeprecatedModel {
         return 0;
     }
 
-    /**
-     * Retrieves all students that are able to submit to this submission box, or
-     * who have submitted to it already.
-     *
-     * @param  array $box A result from $this->getByID()
-     * @return array
-     */
-    public function getAllStudentsForSubmission($box) {
+	/**
+	 * Retrieves all students that are able to submit to this submission box, or
+	 * who have submitted to it already.
+	 *
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox $box
+	 * @return array
+	 */
+	public function getAllStudentsForSubmission(\Schoolbox\Assessment\Component\SubmissionBox $box) {
         $studentList = array();
-        if ($box['code'] && Cfg::get('external_enable')) {
+
+        if ($box->getCategory()->getCodeString() && Cfg::get('external_enable')) {
             $synHandler = new External_Class();
-            $studentListClassCode = $synHandler->getStudents($box['code']);
+
+            $studentListClassCode = $synHandler->getStudents($box->getCategory()->getCodeString());
             if (is_array($studentListClassCode)) {
                 $studentList = array_merge($studentList, $studentListClassCode);
             }
@@ -1346,21 +1348,21 @@ class Submission extends DeprecatedModel {
 
         // list all students from group membership
         $groupHandler = new Group();
-        $studentListFromGroup = $groupHandler->getMemberList($box['category']);
+        $studentListFromGroup = $groupHandler->getMemberList($box->getCategory()->getId());
         if (is_array($studentListFromGroup)) {
             $studentList = array_merge($studentList, $studentListFromGroup);
         }
 
         // list all students who have already submitted
         $studentSubHandler = new SubmissionStudent();
-        $studentListFromSubmissions = $studentSubHandler->getStudentListByBoxId($box['id']);
+        $studentListFromSubmissions = $studentSubHandler->getStudentListByBoxId($box->getId());
         if (is_array($studentListFromSubmissions)) {
             $studentList = array_merge($studentList, $studentListFromSubmissions);
         }
 
         // list all students who have been marked
         $studentRetHandler = new SubmissionReturn();
-        $studentListFromReturns = $studentRetHandler->getStudentListByBoxId($box['id']);
+        $studentListFromReturns = $studentRetHandler->getStudentListByBoxId($box->getId());
         if (is_array($studentListFromReturns)) {
             $studentList = array_merge($studentList, $studentListFromReturns);
         }

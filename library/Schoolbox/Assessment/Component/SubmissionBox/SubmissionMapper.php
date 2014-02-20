@@ -84,7 +84,11 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			'this_key'  => 'owner',
 			'other_key' => 'id',
 		));
-
+		$this->hasMap(array(
+			'column'     => 'uuid',
+			'property'   => 'uuid',
+			'type'       => self::TYPE_STRING,
+		));
 		/* Relation to Allowed Files
 		 */
 		$hydrator = new Schoolbox\Column\Model();

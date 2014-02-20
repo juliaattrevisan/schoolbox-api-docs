@@ -118,14 +118,15 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 				                   'ON_OFF' => ++$j % 2 ? '' : 'dark'
 			                   ));
 
-				if($video->getStatus() == "completed"){
+				if ($video->getStatus() == "completed"){
 					$this->parse('video_list_block','video_list',true);
 				}
-				else if($this->permission >= WRITE_ACCESS) {
-			        $this->setVar( array(
-				                        'VIDEO_LIST_STATUS' => $video->getStatus(),
-					                    'VIDEO_LIST_STATUSIMG' => "/images/core/component/video-thumbnail-".strtolower($video->getStatus()).".gif",
+				else if ($this->permission >= WRITE_ACCESS) {
+			        $this->setVar(array(
+						'VIDEO_LIST_STATUS' => $video->getStatus(),
+						'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
 			        ));
+
 					$this->parse('video_pending_list_block','video_pending_list',true);
 				}
 			}

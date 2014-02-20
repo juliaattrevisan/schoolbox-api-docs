@@ -9,7 +9,7 @@
  */
 class Marksheet_Free extends Marksheet_Abstract {
 
-    public function normaliseMark($mark, $subbox) {
+    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
         return array(
             'norm_mark' => $mark,
             'mark'      => $mark

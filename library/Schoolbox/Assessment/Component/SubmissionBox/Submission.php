@@ -90,6 +90,13 @@ class Submission {
 	protected $mimetype_loader;
 
 	/**
+	 * Unique identifier for crocodoc
+	 *
+	 * @var
+	 */
+	protected $uuid;
+
+	/**
 	 * Creates object and sets up related objects.
 	 */
 	public function __construct() {
@@ -413,6 +420,24 @@ class Submission {
 	}
 
 	/**
+	 * Set uuid
+	 *
+	 * @param mixed $uuid
+	 */
+	public function setUuid($uuid) {
+		$this->uuid = $uuid;
+	}
+
+	/**
+	 * Get uuid
+	 *
+	 * @return mixed
+	 */
+	public function getUuid() {
+		return $this->uuid;
+	}
+
+	/**
 	 * Loads the mime type for this file, based on the filename.
 	 *
 	 * @todo Once Schoolbox starts using PHP 5.4, implement as a trait/mixin
@@ -429,6 +454,15 @@ class Submission {
 		return $this;
 	}
 
+	/**
+	 * Get the file extension of the thing that was uploaded
+	 *
+	 * @return string
+	 */
+	public function getFileExtension() {
+		$filename = $this->getFilename();
 
+		return substr(strrchr($filename, '.'), 1);
+	}
 }
 

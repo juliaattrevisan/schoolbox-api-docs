@@ -1,64 +1,23 @@
 <!-- BEGIN custom_head -->
+<script src='/submission/inlineGrading/js/rubrics.js' type="text/javascript"></script>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
 <script type="text/javascript">
-
-    var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
-
-    $j(function() {
-        var radios = $j('#rubric-tbody :radio');
-        var plot = $j.plot($j('#rubric-chart'), rubricData.spidata.points, rubricData.options);
-
-        $j(document).ready(function() {
-            $j('#rubric-tbody td').click(function(){
-                $j(this).find(':radio').prop('checked',true);
-                updateRadio();
-            });
-            updateRadio();
-        });
-
-        function updateRadio() {
-            var sum = 0;
-            radios.removeClass('focused').parent('td').removeClass('focused');
-            $j('#rubric-tbody :checked').each(function() {
-                var self = $j(this);
-                rubricData.spidata.points[0].data[self.data('index')] = [self.data('index'), parseInt(self.val())];
-                self.closest('td').addClass('focused');
-                self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
-                sum += parseInt(self.val());
-            });
-
-            $j('#sum').html(sum);
-
-            plot.draw();
-        }
-
-        $j('#returnWorkForm').validate({
-            submitHandler: function(form) {
-                var success = true;
-                $j('#rubric-tbody').find('tr').each(function() {
-                    var tr = $j(this);
-                    var radios = $j(this).find('input');
-                    if(radios.length) {
-                        var name = radios.first().attr('name');
-                        if(tr.find('input:checked').length == 0) {
-                            success = false;
-                            return false;
-                        }
-                    }
-                });
-                if(!success) {
-                    $j('#errnotif').removeClass('hide');
-                }
-                else {
-                    form.submit();
-                }
-            }
-        });
-    });
-
+	$(function() {
+		$('#rubric-tbody').inlineGradingRubrics({
+			scoreElement: '#sum',
+			formElement: '#returnWorkForm',
+			renderGraph: true,
+			graph: {
+				container: '#rubric-chart',
+				data: {GRAPH_DATA},
+				legs: {GRAPH_LEGS},
+				max: {GRAPH_MAX}
+			}
+		});
+	});
 </script>
 <!-- END custom_head -->
 
@@ -66,6 +25,8 @@
 <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" class="clearfix" name="returnWorkForm" id="returnWorkForm" >
     <input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
     <input name="uid" type="hidden" id="uid" value="{UID}" />
+	<input name="redirect" type="hidden" value="/submission/returnWork/{BOX_ID}/{UID}" />
+	
     <table class="standardForm table">
         <tr>
             <td class="formLabelWidth"><h4>Student</h4>
@@ -89,6 +50,7 @@
                 <!-- END mark_type_free -->
                 <!-- BEGIN mark_type_none -->
                 <!-- END mark_type_none -->
+
                 <!-- BEGIN mark_type_rubric -->
                 <table class="rubric table">
                 <colgroup>
@@ -99,26 +61,26 @@
                     <col width="32px" />
                 </colgroup>
                 <tbody id="rubric-tbody">
-                <!-- BEGIN rubric_crit -->
+                	<!-- BEGIN rubric_crit -->
                     <!-- BEGIN rubric_grouping -->
                     <tr>
                         <td class="criterion-label pad span" colspan="{RUBRIC_GROUP_SPAN}">{RUBRIC_GROUP_LABEL}</td>
-                        <td class="warning"></td>
+                        <td class="warning" data-class="{RUBRIC_CRIT_RATING_CLASS}"></td>
                     </tr>
                     <!-- END rubric_grouping -->
                     <tr>
-                        <td class="criterion-label pad">{RUBRIC_CRIT_LABEL}</td>
+                        <td class="criterion-label criterion-label-group pad" data-class="{RUBRIC_GROUP_CLASS}">{RUBRIC_CRIT_LABEL}</td>
                         <!-- BEGIN rubric_crit_rating -->
-                        <td class="criterion-value {RUBRIC_CRIT_RATING_CLASS}">
+                        <td class="criterion-value {RUBRIC_CRIT_RATING_CLASS}" data-class="{RUBRIC_GROUP_CLASS}">
                             <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio" name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
                             <label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}"><span>{RUBRIC_CRIT_RATING_LABEL}</span></label>
                         </td>
                         <!-- END rubric_crit_rating -->
-                        <td class="warning">
+                        <td class="warning" data-class="{RUBRIC_CRIT_RATING_CLASS}">
                             <div title="Please select a result for this criterion"><span>!</span></div>
                         </td>
                     </tr>
-                <!-- END rubric_crit -->
+               		<!-- END rubric_crit -->
                 </tbody>
                 </table>
                 <!-- END mark_type_rubric -->

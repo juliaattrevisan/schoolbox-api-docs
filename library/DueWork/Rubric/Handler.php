@@ -395,22 +395,29 @@ class DueWork_Rubric_Handler {
         return true;
     }
 
-    public function getLatestMarkTimestamp($studentID, $boxID) {
-        $db = Database::getInstance();
-        $stmt = $db->prepare("
-            SELECT MAX(tstamp) FROM rubric_mark
-            WHERE student_id = :sid
-            AND submission_box_id = :sbid
-            AND valid = 1
-        ");
-
-        $stmt->execute(array(
-            'sid'  => $studentID,
-            'sbid' => $boxID,
-        ));
-
-        return $stmt->fetchColumn();
-    }
+//	/**
+//	 * Bin this
+//	 * @deprecated
+//	 * @param $studentID
+//	 * @param $boxID
+//	 * @return string
+//	 */
+//	public function getLatestMarkTimestamp($studentID, $boxID) {
+//        $db = Database::getInstance();
+//        $stmt = $db->prepare("
+//            SELECT MAX(tstamp) FROM rubric_mark
+//            WHERE student_id = :sid
+//            AND submission_box_id = :sbid
+//            AND valid = 1
+//        ");
+//
+//        $stmt->execute(array(
+//            'sid'  => $studentID,
+//            'sbid' => $boxID,
+//        ));
+//
+//        return $stmt->fetchColumn();
+//    }
 
     /**
      * @param $rubric DueWork_Rubric_Abstract

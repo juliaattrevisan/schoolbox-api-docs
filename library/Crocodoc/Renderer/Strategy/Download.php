@@ -1,0 +1,116 @@
+<?php
+/**
+ * Download
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Crocodoc\Renderer\Strategy;
+
+
+class Download extends Base {
+
+	/**
+	 * The template file to inject
+	 *
+	 * @var string
+	 */
+	protected $templateFile = 'submission/inlineGrading/injectables/views/download.html';
+
+	/**
+	 * Control file, to determine how to return work
+	 *
+	 * @var string
+	 */
+	protected $controlFile = 'submission/inlineGrading/injectables/controls/redirect-return-control.html';
+
+	/**
+	 * Render injectable
+	 *
+	 * @return mixed|void
+	 */
+	public function render() {
+		$this->getPage()->setFile('injectable', $this->getTemplateFile());
+		$this->getPage()->setBlock('injectable', 'plag_score', 'plag_score_block');
+
+		$recentSubmissionDate = new \Alaress_Date_Relative($this->getSubmission()->getSubmitted(), 'U');
+		$this->plag();
+
+		$this->getPage()->setVar(array(
+			'MOST_RECENT_SUBMISSION_FILE_ID' => $this->getSubmission()->getId(),
+			'MOST_RECENT_SUBMISSION_FILE_NAME' => $this->getSubmission()->getFilename(),
+			'MOST_RECENT_SUBMISSION_FILE_SIZE' => $this->getSubmission()->getFilesize(),
+			'MOST_RECENT_SUBMISSION_FILE_THUMB' => $this->getSubmission()->getMimeType()->getIconFile(),
+			'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
+		));
+
+		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
+
+		/* Upload file
+		 */
+		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
+		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
+
+		/* Control how Return Work is done
+		 */
+		$this->getPage()->setVar(array(
+			'INJECTED_INTERFACE_CONTROL' => ''
+		));
+	}
+
+	/**
+	 * Plag it
+	 */
+	private function plag() {
+		$isStaff = $_SESSION['user']->getRole()->isStaff();
+		$isOwner = $this->getSubmission()->getOwner()->getId() == $_SESSION['user']->getId();
+
+		if ($isStaff || ($isOwner && Config::get('plagscan_student_visible'))) {
+
+			// retrieve plagiarism score, if available
+			$docMapper = \Plagscan_DocumentMapper::getInstance();
+			$plagDoc = null;
+
+			try {
+				/* @var $plagDoc Plagscan_Document */
+				$plagDoc = $docMapper->findOneByColumn('file_id', $this->getSubmission()->getId());
+
+				if ($plagDoc->getId() && $plagDoc->getStatus() == \Plagscan_Document::STATUS_COMPLETE) {
+
+					// what colour should the plagiarism text be, and what should the tooltip say?
+					if($plagDoc->getScore() > 60) {
+						$status = 'critical';
+						$tooltip = 'Your submission is extremely similar to other documents scanned.';
+					}
+					elseif($plagDoc->getScore() > 20) {
+						$status = 'warn';
+						$tooltip = 'Your submission is somewhat similar to other documents scanned.';
+					}
+					else {
+						$status = 'ok';
+						$tooltip = 'Your submission is quite different to other documents scanned.';
+					}
+
+					$this->getPage()->setVar(array(
+						'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
+						'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => $plagDoc->getScore(),
+						'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
+					));
+					$this->getPage()->parse('plag_score_block', 'plag_score');
+				}
+				else {
+					$this->getPage()->setVar('plag_score_block', '');
+				}
+			}
+			catch (\Schoolbox\Mapper\Exception $e) {
+				$this->getPage()->setVar('plag_score_block', '');
+			}
+		}
+		else {
+			$this->getPage()->setVar('plag_score_block', '');
+		}
+	}
+}

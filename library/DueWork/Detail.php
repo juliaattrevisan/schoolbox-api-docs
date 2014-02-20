@@ -27,7 +27,7 @@ class DueWork_Detail {
     const CLASS_PLAG_60 = 'plag-score critical';
 
     protected $submissionHandler;
-    protected $submissinoStudentHandler;
+    protected $submissionStudentHandler;
     protected $submissionReturnHandler;
     protected $userHandler;
     protected $groupHandler;

@@ -8,9 +8,9 @@
  */
 class Marksheet_Raw extends Marksheet_Abstract {
 
-    public function normaliseMark($mark, $subbox) {
+    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
 
-        $max = $subbox['max_mark'];
+        $max = $subbox->getMaxMark();
         $normalised = (($mark / $max) * 100);
 
         // validation: must be inside bounds

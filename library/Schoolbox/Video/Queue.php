@@ -8,27 +8,18 @@
  */
 
 namespace Schoolbox\Video;
-use Schoolbox\ConfigLoader;
-use Schoolbox\Video\QueueMapper;
 
-class Queue {
+class Queue extends ResourceVideo {
 
-	private $id;
-	private $fileID;
-	private $type;
-	private $status;
-	private $message;
-	private $duration;
-	private $created;
-	private $modified;
+	protected $id;
+	protected $fileID;
+	protected $type;
+	protected $status;
+	protected $message;
+	protected $duration;
+	protected $created;
+	protected $modified;
 
-
-	/**
-	 * Creates object and sets up sub-objects.
-	 */
-	public function __construct() {
-		$this->setConfig( new ConfigLoader() );
-	}
 
 	/**
 	 * Takes existing file and transcodes into web format and creates thumbnail
@@ -38,8 +29,6 @@ class Queue {
 	 */
 
 	public function processVideo() {
-
-
         $sourceFile = $this->getSourceFile();
 
 		//
@@ -88,7 +77,7 @@ class Queue {
         if(!$errorcode) {
             $rotationCmd = 'exiftool -Rotation '.escapeshellarg($sourceFile) ."|sed 's/^[^:]*: //'";
             exec($rotationCmd, $rotationOut, $return);
-            if(!$return) {
+            if(!$return && isset($rotationOut[0])) {
                 $rotation = $rotationOut[0];
             }
 
@@ -124,7 +113,6 @@ class Queue {
 			($strict ? '-strict -2 ' : '').
 			'-ac 2 ' . escapeshellarg($this->getVideoLocation()).' 2>&1';
 
-
 		exec($processString, $message, $return);
 		$this->setMessage(implode( "\n", $message));
 
@@ -157,18 +145,6 @@ class Queue {
 
 	}
 
-	public function getVideoLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
-	}
-
-	public function getThumbnailLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
-	}
-
-	public function getPosterLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-poster.jpg';
-	}
-
     private function getSourceFile() {
         if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
             $sourceStore = $this->config->get('file_dir');
@@ -178,22 +154,14 @@ class Queue {
             $sourceStore = $this->config->get('storage_dir');
             return $sourceStore . '/' . $this->fileID . '.dat';
         }
+		else if($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
+			$sourceStore = $this->config->get('submission_dir');
+			return $sourceStore . '/' . $this->fileID . '.dat';
+		}
         else {
             throw new \Exception_Schoolbox('Processing of this type of video is not implemented');
         }
     }
-
-	private function setConfig($config) {
-		$this->config = $config;
-	}
-
-	public function isComplete() {
-		if($this->getStatus() == QueueMapper::STATUS_COMPLETED)
-			return true;
-		else
-			return false;
-	}
-
 
 
 	public function setCreated($created) {
@@ -204,30 +172,6 @@ class Queue {
 		return $this->created;
 	}
 
-	public function setFileID($fileID) {
-		$this->fileID = $fileID;
-	}
-
-	public function getFileID() {
-		return $this->fileID;
-	}
-
-	public function setId($id) {
-		$this->id = $id;
-	}
-
-	public function getId() {
-		return $this->id;
-	}
-
-	public function setMessage($message) {
-		$this->message = $message;
-	}
-
-	public function getMessage() {
-		return $this->message;
-	}
-
 	public function setModified($modified) {
 		$this->modified = $modified;
 	}
@@ -236,29 +180,8 @@ class Queue {
 		return $this->modified;
 	}
 
-	public function setStatus($status) {
-		$this->status = $status;
-	}
 
-	public function getStatus() {
-		return $this->status;
-	}
 
-	public function setType($type) {
-		$this->type = $type;
-	}
-
-	public function getType() {
-		return $this->type;
-	}
-
-	public function setDuration($duration) {
-		$this->duration = $duration;
-	}
-
-	public function getDuration() {
-		return $this->duration;
-	}
 
 
 

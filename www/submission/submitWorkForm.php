@@ -43,7 +43,19 @@ if ( isset( $_FILES['file']['name'] ) && $_FILES['file']['name'] && is_numeric($
         error(17);
     }
     $submission_mapper->save($submission);
+
     $submissionId = $submission->getId();
+
+	/* If video add to video processing queue */
+	if (stristr($_FILES['file']['type'], 'video/')) {
+		$mapper = new Schoolbox\Video\QueueMapper();
+		$videoQ = new Schoolbox\Video\Queue();
+		$videoQ->setFileID($submissionId);
+		$videoQ->setStatus(Schoolbox\Video\QueueMapper::STATUS_PENDING );
+		$videoQ->setType(Schoolbox\Video\QueueMapper::FILE_TYPE_SUBMISSION);
+
+		$mapper->save($videoQ);
+	}
 
     $plagscanApiKey = Config::get('plagscan_api_key');
     $plagscanUsername = Config::get('plagscan_username');

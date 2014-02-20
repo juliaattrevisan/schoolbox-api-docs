@@ -105,15 +105,15 @@ abstract class Marksheet_Abstract {
 
     /* Abstract functions for extending classes to implement */
 
-    /**
-     * Take a UI-formatted mark, normalise it, and insert it into the database
-     *
-     * @abstract
-     * @param $mark
-     * @param $subbox
-     * @return mixed
-     */
-    public abstract function normaliseMark($mark, $subbox);
+	/**
+	 * Take a UI-formatted mark, normalise it, and insert it into the database
+	 *
+	 * @abstract
+	 * @param $mark
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
+	 * @return mixed
+	 */
+	public abstract function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox);
 
     /**
      * Extract a normalised mark from the database, and format it for the UI
