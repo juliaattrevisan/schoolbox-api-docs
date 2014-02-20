@@ -19,6 +19,7 @@ $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $sectionHandler = new Assess_Section();
+$groupHandler = new Group;
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -52,7 +53,15 @@ if (!$attempt) {
     error(128);
 }
 
-if (!$attemptHandler->isOwner($this->arg[2])) {
+/* Check access rights:
+ * Allow owner of attempt to review
+ * Allow staff access
+ * Allow parent of child access
+ */
+
+if (!$attemptHandler->isOwner($this->arg[2])
+    && !$groupHandler->isStaff()
+    && !($groupHandler->isParentOfChild($attempt['user_id']) && !Config::get('restrict_parent_duework_access'))) {
     error(129);
 }
 
