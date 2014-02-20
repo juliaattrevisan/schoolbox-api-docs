@@ -256,22 +256,6 @@ function getSingleFileMeta($folderId, $fileId) {
 
 	$modified = new Alaress_Date_Relative($file->getModified());
 
-	/* If this hydrated as a null-filled object, fandangle around it
-	 * (SB-3911)
-	 */
-	if (!is_numeric($file->getMimetype()->getFileTypeID())) {
-		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-
-		try {
-			$mimetype = $mimetypeMapper->getByFilename($file->getFilename());
-		}
-		catch (\Exception $e) {
-			$mimetype = $mimetypeMapper->getUnknownMime();
-		}
-
-		$file->setMimeType($mimetype);
-	}
-
 	$file = array(
 		'kind' => 'file',
 		'id' => $file->getId(),

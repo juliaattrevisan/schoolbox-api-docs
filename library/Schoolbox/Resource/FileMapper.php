@@ -159,7 +159,17 @@ class FileMapper extends Mapper {
 
         if (($row = $statement->fetch()) !== false) {
             $file = $this->hydrate($row, 'file');
-            $file->setMimeType($mimeTypeMapper->hydrate($row, 'm'));
+
+			$mimeType = $mimeTypeMapper->hydrate($row, 'm');
+
+			/* If this hydrated as a null-filled object, fandangle around it
+			 * (SB-3911)
+			 */
+			if (!$mimeType->getFileTypeID()) {
+				$mimeType = $mimeTypeMapper->getUnknownMime();
+			}
+
+            $file->setMimeType($mimeType);
         }
 
         if (!($file instanceof File)) {
@@ -167,7 +177,6 @@ class FileMapper extends Mapper {
         }
 
         return $file;
-
     }
 
 	/**
