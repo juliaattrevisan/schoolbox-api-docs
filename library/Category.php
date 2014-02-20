@@ -14,23 +14,34 @@ class Category extends DeprecatedModel {
         parent::DeprecatedModel();
     }
 
-    /**
-     * Get a category by name
-     *
-     * @param  $name
-     * @return array|bool
-     */
-    public function searchByName($name, $parent = false) {
+	/**
+	 * Get a category by name
+	 *
+	 * @param $name
+	 * @param bool $userGroupsOnly
+	 * @return array|bool
+	 */
+	public function searchByName($name, $userGroupsOnly = false) {
         $quotedName = $this->db->quoteForLike($name);
-        $query = "SELECT category.*
-				  FROM category
-				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
-				  WHERE (category.name LIKE \"%{$quotedName}%\"
-				  OR categoryCode.code LIKE \"%{$quotedName}%\")";
 
-        if($parent != false && is_numeric($parent)) {
-            $query .= " AND parent = '$parent'";
-        }
+        $query = "
+			SELECT category.*
+			FROM category
+		";
+
+		/* Filter result set further by only returning records that are also
+		 * in the userGroups table
+		 */
+		if ($userGroupsOnly) {
+			$query .= "
+				INNER JOIN userGroups ON category.id = userGroups.cid
+			";
+		}
+
+		$query .= "
+			LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+			WHERE (category.name LIKE \"%{$quotedName}%\"
+			OR categoryCode.code LIKE \"%{$quotedName}%\")";
 
         return $this->db->getAll($query);
     }
