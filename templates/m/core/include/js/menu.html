@@ -164,10 +164,10 @@
             }
         }
     });
-    //
+
     // Listening on tap events? Ignore click events
     if (clickEvent !== 'click') {
-        menu.on('click', 'a', function(e) {
+        menu.on('click', 'a:not([rel="alternate"])', function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
         });
