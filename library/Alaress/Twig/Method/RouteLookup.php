@@ -19,8 +19,7 @@ class RouteLookup {
     protected $router;
 
     /**
-     * Outputs the image in $source (based in WEB_root) as a data: URL. Adds the
-     * image mime type as well.
+     * Performs a reverse lookup on the route given its name, and creates a URL.
      *
      * @param string $name
      * @param array  $data
