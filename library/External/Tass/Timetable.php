@@ -15,6 +15,11 @@ class External_Tass_Timetable implements External_TimetableInterface
      */
     private $database;
 
+    /**
+     * Keeps track of calendar day events
+     */
+    private $tassDay;
+
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
@@ -98,7 +103,6 @@ class External_Tass_Timetable implements External_TimetableInterface
         if (date('w', $date) == 0 || date('w', $date) == 6) {
             return false;
         }
-
         //get day count
         if ($this->getDays($campus) == 5) {
             return date("w", $date);
@@ -106,16 +110,55 @@ class External_Tass_Timetable implements External_TimetableInterface
             return 0; //Not implemented
         } else if ($this->getDays($campus) == 10) {
 
-            if ((date('W', $date) % 2) == 0) {
-                return date('w', $date);
-            } else {
-                return date('w', $date) + 5;
+            $startDate = $this->getLastDay($date, $campus);
+
+            if($this->tassDay[$startDate] > 5)
+                $this->tassDay[$startDate] = $this->tassDay[$startDate] + 1;  //extra days for weekend
+
+            $startDate = $startDate - ($this->tassDay[$startDate]*86400);
+
+            if(!$startDate) //Just assume the start of the year if we cannot find anything
+                $startDate = mktime(0,0,0,1,1,date('Y'));
+
+            //find number of days between both dates
+            $difference = floor(($date - $startDate) / 86400);
+            //find number of weeks between 2 dates
+            $weeks = intval(($difference) / 7);
+
+            if(($weeks % 2) == 0) {
+                $day =  date('w',$date);
+                if($day < 1) //on sundays move it forward
+                    $day = 1;
             }
+            else {
+                $day =  date('w',$date) + 5;
+                if($day < 6) //on sundays move it forward
+                    $day = 6;
+
+            }
+            return $day;
+
         } else { //unknown day number
             return 0;
         }
     }
 
+    function getLastDay($date, $campus) {
+
+        $nowmssqldate = date('Y-m-d',$date).' 00:00:00';
+
+        $query = "SELECT ttdate, day_code FROM ttcalendar
+                    WHERE ttdate <= '$nowmssqldate'
+                    AND cmpy_code = '".$this->getCampusCode($campus)."'
+                    AND tt_id = '".$this->getTimetableCode($campus)."'
+                    ORDER BY ttdate DESC";
+
+        $result= $this->getDatabase()->getRow($query);
+
+        $this->tassDay[$result['ttdate']] = $result['day_code'];
+
+        return $result['ttdate'];
+    }
 
     //returns the period number for the current time
     function getPeriodNumber($campus)
