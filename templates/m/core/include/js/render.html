@@ -28,7 +28,8 @@
         var menu = '<ul role="tablist" id="tablist">'+'\n';
             menu += '<li id="nav_back" data-icon="back"></li>'
 
-        // Each tab
+        // Each tab - ensure that data.menu is at least iterable if it's empty
+        data.menu = data.menu || {}
         $.each(data.menu,function(k,v){
             var ref = (v.href === undefined) ? '#' : v.href;
             menu += '<li role="tab" data-icon="'+k+'">' +
