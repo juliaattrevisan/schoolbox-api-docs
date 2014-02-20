@@ -164,6 +164,13 @@ class Node {
 				$mimetype = $mimetypeMapper->getUnknownMime();
 			}
 
+			/* If the mimetype table is empty, it'll spawn with a dunce object
+			 * SB-3911
+			 */
+			if (!is_numeric($mimetype->getFileTypeID())) {
+				$mimetype = $mimetypeMapper->getUnknownMime();
+			}
+
 			$record = array(
 				'type' => 'file',
 				'fileId' => $currentFile->getId(),
