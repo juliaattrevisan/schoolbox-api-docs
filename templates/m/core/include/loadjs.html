@@ -220,11 +220,14 @@ localCache.get = function(url) {
         xhr.open("GET", url, false);
 
         xhr.send(null);
+
+        // Session timed out? clear whether I'm logged in, and exit out of this method
         if (xhr.status === 401) {
             isLoggedIn = false;
             env.loggedIn = false;
             return '';
         }
+
         // check that either the expected response, or a not-found, came back from the server
         if (xhr.status != 200 && xhr.status != 404) {
             env.status(4); // Error
