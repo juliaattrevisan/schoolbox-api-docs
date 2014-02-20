@@ -269,7 +269,7 @@ class Factory {
 
 		/* Empty mark (not zero) - treat as null
 		 */
-		if (trim($this->getMark()) === '') {
+		if ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
 			$returnedWork->setMark(null);
 			$returnedWork->setNormalizedMark(null);
 		}
