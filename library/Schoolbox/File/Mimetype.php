@@ -46,14 +46,16 @@ class Mimetype {
 	private $iconFile;
 
 	/**
-	 * Inline
+	 * String true/false depending on whether the filetype can be opened
+	 * inline within the browser
 	 *
 	 * @var
 	 */
 	private $inline;
 
 	/**
-	 * Enable
+	 * String true/false depending on whether this allowed filetype is enabled
+	 * (that is, allowed to be uploaded)
 	 *
 	 * @var
 	 */

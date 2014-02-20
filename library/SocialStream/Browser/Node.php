@@ -153,11 +153,29 @@ class Node {
 		$allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), false);
 
 		foreach($allFiles as $currentFile) {
+
+			/* Use a generic default icon for unknown filetypes that
+ 			 * could accumulate in the schoolbox
+ 			 */
+			try {
+				$mimetype = $mimetypeMapper->getByFilename($currentFile->getFilename());
+			}
+			catch (\Exception $e) {
+				$mimetype = $mimetypeMapper->getUnknownMime();
+			}
+
+			/* If the mimetype table is empty, it'll spawn with a dunce object
+			 * SB-3911
+			 */
+			if (!is_numeric($mimetype->getFileTypeID())) {
+				$mimetype = $mimetypeMapper->getUnknownMime();
+			}
+
 			$record = array(
 				'type' => 'file',
 				'fileId' => $currentFile->getId(),
 				'name' => $currentFile->getFilename(),
-				'icon' => $mimetypeMapper->getByFilename($currentFile->getFilename())->getIconFile(),
+				'icon' => $mimetype->getIconFile(),
 			);
 
 			$output[] = $record;

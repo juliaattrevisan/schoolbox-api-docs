@@ -156,11 +156,18 @@ function getSingleFileMeta($folderId, $fileId) {
 
 	$postDate = new Alaress_Date_Format($file['submitted'], 'y-m-d h:i:s');
 
+	try {
+		$mimetype = $mtypeMap->getByFilename($file['realname']);
+	}
+	catch (\Exception $e) {
+		$mimetype = $mtypeMap->getUnknownMime();
+	}
+
 	$file = array(
 		'kind' => 'file',
 		'id' => $file['id'],
 		'name' => $file['description'],
-		'mime' => $mtypeMap->getByFilename($file['realname'])->getIconFile(),
+		'mime' => $mimetype->getIconFile(),
 		'filesize' => Alaress_Byte_Format::bytesToString($file['file_size']),
 		'posted_by' => 'you',
 		'posted_date' => $postDate->getDateOnly(),
