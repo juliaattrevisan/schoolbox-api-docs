@@ -35,7 +35,10 @@ Scenario: Manage resource categories
   # Delete one
   When  I follow "To be deleted"
   And   I press "resourcecategory-delete"
-  # There should be a confirm here
+  # There should be a confirm here, but currently there is not.
+  Then  I should see "Textbooks" in the ".resourcecategory-list" element
+  And   I should see "Projectors" in the ".resourcecategory-list" element
+  And   I should not see "To be deleted" in the ".resourcecategory-list" element
 
 
 #@setup-course
