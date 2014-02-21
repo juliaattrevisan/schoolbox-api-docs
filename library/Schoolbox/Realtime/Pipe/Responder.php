@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Pipe;
 
 use Evenement\EventEmitter;
 use React\Stomp\Client;
+use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\Stomp\SubscriptionManager;
@@ -29,17 +30,12 @@ class Responder extends EventEmitter {
 
 	const STREAM_BUFFER = 512;
 
-	/** @var SubscriptionManager */
-	protected $subscriptionManager;
-
 	protected $terminateOnceNotified = false;
 
 	/**
-	 * @param SubscriptionManager $subscriptionManager
 	 * @param bool $terminateOnceNotified
 	 */
-	public function __construct($subscriptionManager, $terminateOnceNotified = false) {
-		$this->subscriptionManager = $subscriptionManager;
+	public function __construct($terminateOnceNotified = false) {
 		$this->terminateOnceNotified = $terminateOnceNotified;
 	}
 
@@ -93,40 +89,30 @@ class Responder extends EventEmitter {
 	 *
 	 * @param int $userId
 	 * @param int $count
+	 * @param Connector $mq
 	 * @return bool
 	 */
-	public function fetch($userId, $count) {
+	public function fetch($userId, $count, $mq) {
 
 		try {
 
 			$messages = array();
 
-			$this->subscriptionManager->getPipeManager()->v(microtime(), 'A');
-
 			// get a queue to retrieve read messages synchronously
-			$mqf = new UserQueueFactory();
-
-			$this->subscriptionManager->getPipeManager()->v(microtime(), 'B');
+			$mqf = new UserQueueFactory($mq);
 
 			$queue = $mqf->buildUserQueue($userId, $count, false);
 			$allMessages = $queue->getMessages($count);
 
-			$this->subscriptionManager->getPipeManager()->v(microtime(), 'C');
-
 //			$unreadMessages = $this->subscriptionManager->getUserSubscription($userId, true)->getMessages();
-
 
 			foreach($allMessages as $read) {
 				$messages[$read->getId()] = $read->getBody();
 			}
 
-			$this->subscriptionManager->getPipeManager()->v(microtime(), 'D');
-
 //			foreach($unreadMessages as $unread) {
 //				$messages[$unread->getId()] = $unread->getBody();
 //			}
-
-			$this->subscriptionManager->getPipeManager()->v(microtime(), 'E');
 
 			$this->notifyPipe(json_encode(array(
 				'fetch' => $messages
@@ -148,7 +134,5 @@ class Responder extends EventEmitter {
 	public function ack($userId, $messageIds) {
 		$this->notifyServer(json_encode(array('ack' => $messageIds)));
 	}
-
-
 
 }

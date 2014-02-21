@@ -27,18 +27,13 @@ if(!in_array($command, array('subscribe','fetch','ack'))) {
 	exit(1);
 }
 
-$v = new Verboser(STDERR);
-
-$v->v("ummagunna$command");
-
-$loop = EventLoopFactory::create();
-
-$loop->run();
-
-$responder = new Responder(new SubscriptionManager(new StompFactory($loop), $v), true);
+$responder = new Responder(true);
 
 $method = array($responder, $command);
 
 if(is_callable($method)) {
+	if($command == 'fetch') {
+		array_push($args, new \Schoolbox\Notif\MQ\Connector());
+	}
 	call_user_func_array($method, $args);
 }
