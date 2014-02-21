@@ -5,3 +5,7 @@ INSERT INTO `house` (`house`) VALUES ('Cook');
 INSERT INTO `house` (`house`) VALUES ('Flinders');
 INSERT INTO `house` (`house`) VALUES ('Hume');
 INSERT INTO `house` (`house`) VALUES ('Sturt');
+
+/* Install sync patterns
+ */
+UPDATE `config` SET `value` = 'Student Staff Parent' WHERE `configID` = '114';
