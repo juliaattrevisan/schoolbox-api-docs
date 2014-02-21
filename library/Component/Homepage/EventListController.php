@@ -33,6 +33,16 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         // From updated calendar
         $groupHandler = new Group();
+        $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Group($_SESSION['user'], array());
+        $calendarApi->setGroupId($this->getContext('id'));
+        $dayCount = intval($this->getConfig('days'));
+        if ($dayCount === 0) {
+            $dayCount = 365;
+        }
+        $eventList = $calendarApi->getEvents(
+            strtotime('12am today'),
+            strtotime("12am today +$dayCount day")
+        );
 
         $this->setBlock("group_events", "attendance_icon", "attendance_icon_block");
         $this->setBlock("group_events", "attendance_status", "attendance_status_block");
@@ -46,46 +56,29 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             )
         );
 
-        $calendarHandler = new Calendar;
-        $eventList = $calendarHandler->getAllInCategory(
-            $this->getContext('id'),
-            array(
-                'size' => $this->getConfig('size'),
-                'days' => $this->getConfig('days'),
-            )
-        );
+        $calendarHandler = new Calendar();
 
         $this->setVar('CALENDAR_TITLE', 'Group Calendar');
         $this->setVar('group_events_block', '');
 
-        if (is_array($eventList)) {
-            $userHandler = new User();
+        if (count($eventList)) {
             $j = 0;
-            foreach ($eventList as $event) {
-                $event['colour'] = $calendarHandler->displayColour($event['type']);
-
-				$eventObject = new Calendar_Event_Type_Day();
-
-				$start = $event['startDate'];
-				$end = $event['endDate'];
-
-				$eventObject->setStartTime(new Alaress_Date_Format($start, 'y-m-d'));
-				$eventObject->setEndTime(new Alaress_Date_Format($end, 'y-m-d'));
-				$eventObject->setAllday($event['allday']);
-
+            foreach ($eventList as $eventObject) {
+                /** @var Calendar_Event_Type_Day $eventObject */
+                $eventId = $eventObject->getEventId();
                 $output = array(
                     'CAL_DATE' => $eventObject->getEventSpan(),
-                    'CAL_ID' => $event['id'],
-                    'CAL_NOTE' => Scrub::text($event['note']),
-                    'CAL_LOCATION' => Scrub::text($event['location']),
-                    'CAL_DETAIL' => Scrub::html($event['detail']),
-                    'CAL_COLOUR' => $event['colour'],
-                    'CAL_MODIFY' => $calendarHandler->getPerm(
-                        $event['id']
-                    ) > 1 ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>" : '',
-                    'CAL_TYPE' => $event['eventType'],
-                    'CAL_AUTHOR' => $userHandler->formatName($event),
-                    'CAL_AUTHOR_ID' => $event['owner'],
+                    'CAL_ID' => $eventId,
+                    'CAL_NOTE' => Scrub::text($eventObject->getNote()),
+                    'CAL_LOCATION' => Scrub::text($eventObject->getLocation()),
+                    'CAL_DETAIL' => Scrub::html($eventObject->getDetail()),
+                    'CAL_COLOUR' => $eventObject->getColour(),
+                    'CAL_MODIFY' => $calendarHandler->getPerm($eventId) > READ_ACCESS
+                            ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID=" . $eventId . "&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>"
+                            : '',
+                    'CAL_TYPE' => $eventObject->getEventType(),
+                    'CAL_AUTHOR' => $eventObject->getAuthorName(),
+                    'CAL_AUTHOR_ID' => $eventObject->getAuthorId(),
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 );
                 $this->setVar($output);
@@ -101,21 +94,18 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 );
 
                 /* Event attendance
-             	 */
-                if ($event['attendance']) {
+                 */
+                if ($eventObject->getAttendance()) {
                     $this->parse('attendance_icon_block', 'attendance_icon');
 
                     /* Anyone with write access can approve attendance
-                 	 */
+                     */
                     if ($groupHandler->getPermission($this->getContext('id')) >= WRITE_ACCESS) {
                         $this->parse('attendance_list_button_block', 'attendance_list_button');
                     }
 
                     if ($groupHandler->isStudent($_SESSION['id'])) {
-                        if ($attendance = $calendarHandler->getAttendanceByEventAndUser(
-                            $event['id'], $_SESSION['id']
-                        )
-                        ) {
+                        if ($attendance = $calendarHandler->getAttendanceByEventAndUser($eventId, $_SESSION['id'])) {
 
                             /* Attendance Status
                             */
@@ -146,15 +136,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     }
                 }
 
-                if ($event['startTimeString'] == "12:00AM" || $event['startTimeString'] == "") {
-                    $this->setVar("CAL_TIME", "");
-                } else {
-                    if ($event['endTimeString'] == "12:00AM") {
-                        $this->setVar("CAL_TIME", $event['startTimeString']);
-                    } else {
-                        $this->setVar("CAL_TIME", $event['startTimeString'] . "&ndash;" . $event['endTimeString']);
-                    }
-                }
+                $this->setVar("CAL_TIME", "");
 
                 $this->parse("group_events_block", "group_events", true);
 
