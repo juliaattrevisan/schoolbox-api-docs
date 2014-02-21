@@ -1,8 +1,19 @@
 {# I need some way of adding custom_head #}
+<script type="text/javascript">
+    (function($){
+        $(function(){
+            var form = $('#resourcecategory-form');
+            form.on('click', 'a#resourcecategory-delete', function(event) {
+                event.preventDefault();
+                form.attr('action', this.href).submit();
+            })
+        })
+    })(jQuery);
+</script>
 
 <h1>Resource Category - {% if item.id %}Edit{% else %}Add New{% endif %}</h1>
 
-<form
+<form id="resourcecategory-form"
     action="{% if item.id %}{{ routeLookup('resourceCategory.update:post', {id: item.id}) }}{% else %}{{ routeLookup('resourceCategory.create') }}{% endif %}"
     method="post"
     name="form" class="clearfix"
@@ -15,10 +26,10 @@
         </tr>
     </table>
 
-    <input type="submit" name="{% if item.id %}Add{% else %}Save{% endif %}" class="submit-btn-plain"/>
+    <input id="resourcecategory-save" type="submit" value="{% if item.id %}Create{% else %}Update{% endif %}" class="submit-btn-plain"/>
 
     {# I need some sort of permission check method, because not all users can delete #}
     {% if item.id %}
-    <input type="button" class="submit-btn-plain" value="Delete" />
+    <a href="{{ routeLookup('resourceCategory.delete:post', {id: item.id}) }}" id="resourcecategory-delete" class="submit-btn-plain">Delete</a>
     {% endif %}
 </form>

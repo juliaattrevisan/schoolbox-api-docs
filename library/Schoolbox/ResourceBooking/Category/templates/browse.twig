@@ -1,11 +1,16 @@
+{# rel="edit-form" and rel="create-form" - RFC 6861 #}
+
+
 <h1>Resource Category List</h1>
-<ul>
+<ul class="resourcecategory-list">
     {% for item in list %}
-    <li><a href="{{ routeLookup('resourceCategory.edit', {id: item.id}) }}">{{ item.name }}</a></li>
+    <li class="resourcecategory">
+        <a id="resourcecategory-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceCategory.edit', {id: item.id}) }}">{{ item.name }}</a>
+    </li>
     {% else %}
     <li>There are no resource categories in the system.</li>
     {% endfor %}
 </ul>
 
 {# New item: only if I have the permission to do this #}
-<a class="submit-btn-plain" href="{{ routeLookup('resourceCategory.add') }}">Add New</a>
+<a id="resourcecategory-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceCategory.add') }}">Add New</a>
