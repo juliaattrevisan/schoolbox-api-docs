@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\Notif\Queue;
+use External_User;
 use Group;
 use Schoolbox\Campus;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
@@ -42,7 +43,7 @@ class UserQueueFactory {
 	/** @var \Group */
 	protected $_DEPRECATED_GROUP;
 
-	/** @var \External_User */
+	/** @var External_User */
 	protected $_DEPRECATED_EXT_USER;
 
 	/** @var array */
@@ -53,15 +54,6 @@ class UserQueueFactory {
 
 	public function __construct($mqConnector = null) {
 		$this->mqConnector = $mqConnector ?: new MQConnector();
-		$this->userMapper = UserMapper::getInstance();
-		$this->categoryMapper = CategoryMapper::getInstance();
-		$this->roleMapper = RoleMapper::getInstance();
-		$this->_DEPRECATED_GROUP = new \Group();
-		$this->_DEPRECATED_EXT_USER = new \External_User();
-
-		// don't forget the magic!
-		$this->_DEPRECATED_EXT_USER->getCurrentSemester(/*$user->getExternalId()*/);
-
 	}
 
 	public function setMessageQueueConnector($mqConnector) {
@@ -74,10 +66,65 @@ class UserQueueFactory {
 		return $this;
 	}
 
+	/**
+	 * @return External_User
+	 */
+	public function GET_DEPRECATED_EXT_USER() {
+		if(!$this->_DEPRECATED_EXT_USER) {
+			$this->_DEPRECATED_EXT_USER = new External_User();
+			$this->_DEPRECATED_EXT_USER->getCurrentSemester();
+		}
+
+		return $this->_DEPRECATED_EXT_USER;
+	}
+
+	/**
+	 * @return \Group
+	 */
+	public function GET_DEPRECATED_GROUP() {
+		if(!$this->_DEPRECATED_GROUP) {
+			$this->_DEPRECATED_GROUP = new \Group();
+		}
+		return $this->_DEPRECATED_GROUP;
+	}
+
+	/**
+	 * @return \Schoolbox\RoleMapper
+	 */
+	public function getRoleMapper() {
+		if(!$this->roleMapper) {
+			$this->roleMapper = RoleMapper::getInstance();
+		}
+		return $this->roleMapper;
+	}
+
+
+	/**
+	 * @return \Schoolbox\UserMapper
+	 */
+	public function getUserMapper() {
+		if(!$this->userMapper) {
+			$this->userMapper = UserMapper::getInstance();
+		}
+		return $this->userMapper;
+	}
+
 	public function setCategoryMapper($categoryMapper) {
 		$this->categoryMapper = $categoryMapper;
 		return $this;
 	}
+
+	/**
+	 * @return \Schoolbox\Resource\CategoryMapper
+	 */
+	public function getCategoryMapper() {
+		if(!$this->categoryMapper) {
+			$this->categoryMapper = CategoryMapper::getInstance();
+		}
+		return $this->categoryMapper;
+	}
+
+
 
 	/**
 	 * Creates bindings for a User's queue, but doesn't actually attempt message retrieval.
@@ -86,7 +133,7 @@ class UserQueueFactory {
 	 * @return UserQueue
 	 */
 	public function bindUserQueue($user, $simulate = false) {
-		$user = $user instanceof User ? $user : $this->userMapper->findById($user);
+		$user = $user instanceof User ? $user : $this->getUserMapper()->findById($user);
 		return new UserQueue($this->generateBindingsForUser($user), $this->mqConnector, $simulate);
 	}
 
@@ -147,7 +194,7 @@ class UserQueueFactory {
 		// category bindings
 
 		// TODO REFACTOR: THIS METHOD TAKES ABOUT 400MS TO EXECUTE
-		$cats = $this->categoryMapper->findForUser($user);
+		$cats = $this->getCategoryMapper()->findForUser($user);
 
 		foreach($cats as $cat) {
 			/** @var Category $cat */
@@ -159,7 +206,7 @@ class UserQueueFactory {
 
 			// category admin
 			// *.notify.category.{id}.admin
-			$catOwner = $this->_DEPRECATED_GROUP->getOwner($cat->getId());
+			$catOwner = $this->GET_DEPRECATED_GROUP()->getOwner($cat->getId());
 
 			if($catOwner['uid'] == $user->getId()) {
 				$bindings['category'][] = $cat->getId() . ".admin";
@@ -173,7 +220,7 @@ class UserQueueFactory {
 
 		// parental bindings TODO can this be more lightweight
 		if($roleType == Role::PARENT) {
-			$childrenArray = $this->_DEPRECATED_EXT_USER->getEnrolledStudents($user->getExternalId());
+			$childrenArray = $this->GET_DEPRECATED_EXT_USER()->getEnrolledStudents($user->getExternalId());
 			if(is_array($childrenArray)) {
 				$childIds = array();
 				foreach($childrenArray as $childArray) {
@@ -182,13 +229,13 @@ class UserQueueFactory {
 				// this is the only time we need to actually look at the role cache, so create it on demand
 				if(empty($this->roleCache)) {
 					// cache roles
-					$this->roleCache = $this->roleMapper->findAll()->groupBy('type')->getAll();
+					$this->roleCache = $this->getRoleMapper()->findAll()->groupBy('type')->getAll();
 					foreach($this->roleCache as $roleType => $roleCollection) {
 						$this->roleCache[$roleType] = $roleCollection->getColumnValues('id');
 					}
 				}
 				if(array_key_exists(Role::STUDENT, $this->roleCache)) {
-					$childCollection = $this->userMapper->findByColumnList(array(
+					$childCollection = $this->getUserMapper()->findByColumnList(array(
 						'synergy_id' => $childIds,
 						'group_id' => $this->roleCache[Role::STUDENT]
 					));
