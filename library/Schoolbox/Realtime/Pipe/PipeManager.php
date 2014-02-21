@@ -51,6 +51,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
 
+	/** @var int[] */
+	protected $semaphore;
+
 	/** @var LoopInterface */
 	protected $reactLoop;
 
@@ -189,52 +192,12 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			return;
 		}
 
-		// BEWARE: THIS FORKS!
-		$responder = new Responder($this->subscriptionManager);
-
-		// as a parent, we want to let the child perform the action
-		if($responder->isParentProcess()) {
-			$this->attachResponder($responder, $pipe);
-			return;
-		}
-
-		// YOU ARE IN CHILD CONTEXT RIGHT NOW
-		unset($this->pipesBySocketKey);
-		unset($this->pipesBySessionId);
-		unset($this->pipesByUser);
-		$this->reactLoop->stop();
-		unset($this->reactLoop);
-		unset($this->subscriptionManager);
-		unset($this->predisClient);
-
-
 		$request = each($data);
 
 		$command = $request['key'];
 		$arguments = $request['value'];
 
-		try {
-			if(method_exists($responder, $command) && in_array($command, array('subscribe', 'fetch', 'ack'))) {
-				// process the command that's been sent from the client
-				$this->v("Executing $command for user $userId [$socketKey]");
-
-				// the command executed could take several seconds, depending on what it is
-				 $responder->$command($userId, $arguments);
-			}
-		}
-		catch(\Exception $e) {
-			// catch any and all exceptions here, this MUST exit
-			$this->v($e->getMessage(), '!');
-			$notif = new Notif(Notif::TOPIC_NOTIFICATION);
-			$notif->critical("Messaging error: $e");
-		}
-
-		// since we're about to terminate, we don't really care if this doesn't work,
-		// it just means it was closed earlier
-		@fclose($responder->getSocketStream());
-
-		// child termination
-		exit;
+		$this->spawnWorker($pipe, $command, $arguments);
 
 	}
 
@@ -261,7 +224,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * Register this pipe connection
 	 *
 	 * @param Pipe $pipe
-	 * @throws \Schoolbox\Mapper\Exception
+	 * @throws SessionException
 	 */
 	protected function registerPipe($pipe) {
 		$socketKey = $pipe->getSocketKey();
@@ -281,7 +244,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			}
 		}
 		else {
-			throw new MapperException("No session, no user.");
+			throw new SessionException("No session, no user.");
 		}
 
 	}
@@ -369,18 +332,39 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		throw new SessionException("User ID not found in session.");
 	}
 
+
 	/**
-	 * @param Responder $responder
+	 * @param Pipe $pipe
+	 * @param string $command
+	 * @param array $arguments
+	 */
+	protected function spawnWorker($pipe, $command, $arguments) {
+
+		$userId = $pipe->getUserId();
+
+		if(isset($this->semaphore[$userId][$command])) {
+			$this->v("Rejecting '$command' for user $userId: semaphore locked.",'*');
+			$this->sendToPipe($pipe, json_encode(array(
+				'busy' => $command
+			)));
+			return;
+		}
+
+		$this->semaphore[$userId][$command] = true;
+
+		// WARNING: THIS CREATES A WORKER PROCESS
+		$this->attachResponder(new WorkerResponder($command, array($userId, $arguments)), $pipe);
+
+
+	}
+
+	/**
+	 * @param WorkerResponder $responder
 	 * @param PipeInterface $pipe
 	 */
 	protected function attachResponder($responder, $pipe) {
 
-		// YOU NEED TO LISTEN TO THIS
-		$socketStream = $responder->getSocketStream();
-
-		$this->v('As parent, attaching responder');
-
-		$rSock = new \React\Stream\Stream($socketStream, $this->reactLoop);
+		$rSock = new \React\Stream\Stream($responder->getOutputStream(), $this->reactLoop);
 
 		$buffer = '';
 
@@ -399,11 +383,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$pipeManager = $this;
 		$subscriptionManager = $this->subscriptionManager;
 
-		$rSock->on('close', function($stream) use(&$buffer, $pipeManager, $pipe, $responder, $subscriptionManager) {
+		$rSock->on('close', function($stream) use(&$buffer, $pipeManager, $pipe, &$responder, $subscriptionManager) {
 			// received EOF, time to send the result to the client
+
+			// release this responder so more can be spawned for the user
+			$pipeManager->detachResponder($responder, $pipe);
 
 			// don't attempt to split if the data came through badly
 			if(strpos($buffer, Responder::CONTEXT_DELIMITER) === false) {
+				$pipeManager->v(str_replace("\n",'\n',$buffer), '?');
 				return;
 			}
 
@@ -413,6 +401,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			if(is_null(json_decode($data, true))) {
 				$pipeManager->v("Data piped is not JSON: $data", '?');
 			}
+
+			$pipeManager->v("$context => $data", 'd');
 
 			// depending on what context was supplied, send the data to the appropriate pipes
 			switch($context) {
@@ -443,9 +433,20 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			}
 		});
 
-
 	}
 
+
+	/**
+	 * @param WorkerResponder $responder
+	 * @param Pipe $pipe
+	 */
+	public function detachResponder($responder, $pipe) {
+		$this->v(sprintf("Worker completed in %0.5fms", 1000*(microtime(true) - $responder->launchtime)), '*');
+		$responder->stop();
+
+		// release semaphore
+		unset($this->semaphore[$pipe->getUserId()][$responder->getCommand()]);
+	}
 
 	/**
 	 * Send data to a specific pipe.

@@ -32,54 +32,15 @@ class Responder extends EventEmitter {
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
 
-	protected $socketStream;
-
-	protected $pid = null;
+	protected $terminateOnceNotified = false;
 
 	/**
 	 * @param SubscriptionManager $subscriptionManager
-	 * @throws \Schoolbox\Realtime\ProcessException
+	 * @param bool $terminateOnceNotified
 	 */
-	public function __construct($subscriptionManager) {
+	public function __construct($subscriptionManager, $terminateOnceNotified = false) {
 		$this->subscriptionManager = $subscriptionManager;
-		// we're about to fork, so we need a way to maintain communication with our parent
-		list($parent, $child) = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
-
-		// spin off a new process: you'd think forking inside a constructor might not work? totally does
-		$this->pid = pcntl_fork();
-
-		switch($this->pid) {
-			case -1: // fail
-				throw new ProcessException("Could not fork!");
-			case 0:  // child
-				fclose($child);
-				stream_set_blocking($parent, 0);
-				$this->socketStream = $parent;
-				break;
-			default: //parent
-				fclose($parent);
-				stream_set_blocking($child, 0);
-				$this->socketStream = $child;
-				break;
-		}
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isChildProcess() {
-		return $this->pid === 0;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isParentProcess() {
-		return !$this->isChildProcess();
-	}
-
-	public function getPID() {
-		return $this->pid;
+		$this->terminateOnceNotified = $terminateOnceNotified;
 	}
 
 	/**
@@ -111,37 +72,16 @@ class Responder extends EventEmitter {
 	}
 
 	protected function notify($string) {
-		$close = true;
-		for($written = 0; $written < strlen($string); $written += $fwrite) {
-			$fwrite = fwrite($this->socketStream, substr($string, $written), self::STREAM_BUFFER);
-			// we're finished early
-			if($fwrite === false) {
-				break;
-			}
-			// call a plumber: busted pipe
-			elseif($fwrite === 0) {
-				$close = false;
-				break;
-			}
+		echo $string;
+		if($this->terminateOnceNotified) {
+			exit(0);
 		}
-
-		if($close) {
-			fclose($this->socketStream);
-		}
-	}
-
-	public function getSocketStream() {
-		return $this->socketStream;
 	}
 
 	/**
 	 * Message from client: ensure STOMP subscription exists for user.
-	 *
-	 * @param int $userId
-	 * @param mixed $null
-	 * @return null
 	 */
-	public function subscribe($userId, $null) {
+	public function subscribe() {
 		// this is just a bounceback, since subscription has to happen in the parent process.
 		// but rather than call in a blocking way from the server, this adds it to the event loop
 		$this->notifyServer('subscribe');
@@ -159,32 +99,42 @@ class Responder extends EventEmitter {
 
 		try {
 
+			$messages = array();
+
+			$this->subscriptionManager->getPipeManager()->v(microtime(), 'A');
+
+			// get a queue to retrieve read messages synchronously
+			$mqf = new UserQueueFactory();
+
+			$this->subscriptionManager->getPipeManager()->v(microtime(), 'B');
+
+			$queue = $mqf->buildUserQueue($userId, $count, false);
+			$allMessages = $queue->getMessages($count);
+
+			$this->subscriptionManager->getPipeManager()->v(microtime(), 'C');
+
+//			$unreadMessages = $this->subscriptionManager->getUserSubscription($userId, true)->getMessages();
 
 
-		$messages = array();
+			foreach($allMessages as $read) {
+				$messages[$read->getId()] = $read->getBody();
+			}
 
-		// get a queue to retrieve read messages synchronously
-		$mqf = new UserQueueFactory();
-		$queue = $mqf->buildUserQueue($userId, $count, false);
+			$this->subscriptionManager->getPipeManager()->v(microtime(), 'D');
 
-		$allMessages = $queue->getMessages($count);
-		$unreadMessages = $this->subscriptionManager->getUserSubscription($userId, true)->getMessages();
+//			foreach($unreadMessages as $unread) {
+//				$messages[$unread->getId()] = $unread->getBody();
+//			}
 
-		foreach($allMessages as $read) {
-			$messages[$read->getId()] = $read->getBody();
-		}
+			$this->subscriptionManager->getPipeManager()->v(microtime(), 'E');
 
-		foreach($unreadMessages as $unread) {
-			$messages[$unread->getId()] = $unread->getBody();
-		}
-
-		$this->notifyPipe(json_encode(array(
-			'fetch' => $messages
-		)));
+			$this->notifyPipe(json_encode(array(
+				'fetch' => $messages
+			)));
 
 		}
 		catch(\Exception $e) {
-			echo $e->getTraceAsString();
+			echo get_class($e) . " " . $e->getTraceAsString();
 		}
 	}
 
