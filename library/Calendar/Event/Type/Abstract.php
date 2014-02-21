@@ -179,7 +179,7 @@ abstract class Calendar_Event_Type_Abstract {
 		}
 		else {
 			if ($this->getAllDay()) {
-				return 'All Day';
+				return $this->getStartTime()->getCalendarDate();
 			}
 			return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime()->getTimeOnly();
 		}
