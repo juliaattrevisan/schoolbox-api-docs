@@ -18,12 +18,8 @@ use Ratchet\Wamp\WampServerInterface;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
-use Schoolbox\ConfigLoader;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\NotifException;
 use Schoolbox\Notif\Queue\UnreadMessage;
-use Schoolbox\Realtime\RealtimeException;
+use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
 use Schoolbox\Realtime\Stomp\SubscriptionManager;
 use Schoolbox\Realtime\Verboser;
@@ -39,6 +35,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 	const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
 
+	// the minimum KB that must be free to permit a new process to spawn
+	const MEM_CEILING = 102400;
+
 	/** @var PipeInterface[] */
 	protected $pipesBySocketKey;
 
@@ -53,6 +52,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 	/** @var int[] */
 	protected $semaphore;
+
+	/** @var int */
+	protected $processCap = 512;
 
 	/** @var LoopInterface */
 	protected $reactLoop;
@@ -73,6 +75,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
 		$this->predisClient = $predisClient;
+		$this->predisClient->connect(); // ensure this is ACTUALLY connected
 		$this->verboser = $verboser;
 
 		$this->v('Instantiated PipeManager');
@@ -154,7 +157,11 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 */
 	public function onError(ConnectionInterface $conn, \Exception $e) {
 		$this->v(sprintf('Exception! %s: "%s" - %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()), '!');
-		// TODO: Implement onError() method.
+
+		// process exception needs to be rethrown
+		if($e instanceof ProcessException) {
+			throw $e;
+		}
 	}
 
 
@@ -337,12 +344,39 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param Pipe $pipe
 	 * @param string $command
 	 * @param array $arguments
+	 * @throws \Schoolbox\Realtime\ProcessException
 	 */
 	protected function spawnWorker($pipe, $command, $arguments) {
 
 		$userId = $pipe->getUserId();
 
-		if(isset($this->semaphore[$userId][$command])) {
+		$fp = fopen('/proc/meminfo','r');
+
+		$mem = 0;
+		while($line = fgets($fp)) {
+			if(strpos($line, 'MemFree') !== false) {
+				$mem = intval(substr($line, 16, -3));
+				break;
+			}
+		}
+
+		fclose($fp);
+
+		if($mem < self::MEM_CEILING) {
+			$this->processCap = count($this->semaphore) < $this->processCap ? count($this->semaphore) : $this->processCap;
+			$this->v("Memory ceiling reached, capping process count at $this->processCap", '!');
+
+			if($this->processCap == 0) {
+				throw new ProcessException("Fatality! Process cap has reached zero.");
+			}
+		}
+
+		if(count($this->semaphore) >= $this->processCap) {
+			$this->v("Rejecting '$command' for user $userId: process cap exceeded.",'*');
+			return;
+		}
+
+		if(isset($this->semaphore["$userId:$command"])) {
 			$this->v("Rejecting '$command' for user $userId: semaphore locked.",'*');
 			$this->sendToPipe($pipe, json_encode(array(
 				'busy' => $command
@@ -350,7 +384,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 			return;
 		}
 
-		$this->semaphore[$userId][$command] = true;
+		$this->semaphore["$userId:$command"] = true;
 
 		// WARNING: THIS CREATES A WORKER PROCESS
 		$this->attachResponder(new WorkerResponder($command, array($userId, $arguments)), $pipe);
@@ -441,11 +475,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param Pipe $pipe
 	 */
 	public function detachResponder($responder, $pipe) {
-		$this->v(sprintf("Worker completed in %0.5fms", 1000*(microtime(true) - $responder->launchtime)), '*');
+
+		$userId = $pipe->getUserId();
+		$command = $responder->getCommand();
+
+		$this->v(sprintf("Worker [%s:%s] completed in %0.5fms", $userId, $command, 1000*(microtime(true) - $responder->launchtime)), '*');
 		$responder->stop();
 
 		// release semaphore
-		unset($this->semaphore[$pipe->getUserId()][$responder->getCommand()]);
+		unset($this->semaphore["$userId:$command"]);
 	}
 
 	/**
