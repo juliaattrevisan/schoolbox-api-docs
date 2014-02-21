@@ -3,9 +3,9 @@
     (function($){
         $(function(){
             var form = $('#resourcecategory-form');
-            form.on('click', 'a#resourcecategory-delete', function(event) {
+            form.on('click', '#resourcecategory-delete', function(event) {
                 event.preventDefault();
-                form.attr('action', this.href).submit();
+                form.attr('action', $(this).data('action')).submit();
             })
         })
     })(jQuery);
@@ -26,10 +26,19 @@
         </tr>
     </table>
 
-    <input id="resourcecategory-save" type="submit" value="{% if item.id %}Create{% else %}Update{% endif %}" class="submit-btn-plain"/>
+    <input id="resourcecategory-save"
+           type="submit"
+           value="{% if item.id %}Create{% else %}Update{% endif %}"
+           class="submit-btn-plain"
+    />
 
     {# I need some sort of permission check method, because not all users can delete #}
     {% if item.id %}
-    <a href="{{ routeLookup('resourceCategory.delete:post', {id: item.id}) }}" id="resourcecategory-delete" class="submit-btn-plain">Delete</a>
+    <input id="resourcecategory-delete"
+           type="submit"
+           value="Delete"
+           class="submit-btn-plain"
+           data-action="{{ routeLookup('resourceCategory.delete:post', {id: item.id}) }}"
+    />
     {% endif %}
 </form>
