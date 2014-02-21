@@ -35,13 +35,16 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         $groupHandler = new Group();
         $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Group($_SESSION['user'], array());
         $calendarApi->setGroupId($this->getContext('id'));
-        $dayCount = intval($this->getConfig('days'));
-        if ($dayCount === 0) {
-            $dayCount = 365;
+
+        // Filter to a given number of days.
+        $eventLimit = intval($this->getConfig('size'));
+        $dayLimit   = intval($this->getConfig('days'));
+        if ($dayLimit <= 0) {
+            $dayLimit = 365;
         }
         $eventList = $calendarApi->getEvents(
-            strtotime('12am today'),
-            strtotime("12am today +$dayCount day")
+            strtotime('12am today', $_SERVER['REQUEST_TIME']),
+            strtotime("12am +$dayLimit day", $_SERVER['REQUEST_TIME'])
         );
 
         $this->setBlock("group_events", "attendance_icon", "attendance_icon_block");
@@ -64,6 +67,11 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         if (count($eventList)) {
             $j = 0;
             foreach ($eventList as $eventObject) {
+                $j++;
+                if ($eventLimit > 0 && $j > $eventLimit) {
+                    break;
+                }
+
                 /** @var Calendar_Event_Type_Day $eventObject */
                 $eventId = $eventObject->getEventId();
                 $output = array(
@@ -79,7 +87,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     'CAL_TYPE' => $eventObject->getEventType(),
                     'CAL_AUTHOR' => $eventObject->getAuthorName(),
                     'CAL_AUTHOR_ID' => $eventObject->getAuthorId(),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                    'ON_OFF' => $j % 2 ? '' : 'dark',
                 );
                 $this->setVar($output);
 
