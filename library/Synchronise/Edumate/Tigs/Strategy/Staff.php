@@ -31,8 +31,8 @@ class Synchronise_Edumate_Tigs_Strategy_Staff extends Synchronise_Edumate_Tigs_S
 		// User details
 		$newUser['username']   = $currentUser['NetworkLogin'];
 		$newUser['title']      = $currentUser['StaffTitle'];
-		$newUser['firstname']  = $currentUser['StaffPreferredName'];
-		$newUser['lastname']   = $currentUser['StaffSurname'];
+		$newUser['firstname']  = html_entity_decode($currentUser['StaffPreferredName']);
+		$newUser['lastname']   = html_entity_decode($currentUser['StaffSurname']);
 		$newUser['synergy_id'] = $currentUser['StaffID'];
 		$newUser['alt_email']  = $currentUser['Email'];
 
