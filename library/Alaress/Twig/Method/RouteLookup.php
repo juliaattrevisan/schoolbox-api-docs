@@ -26,6 +26,10 @@ class RouteLookup {
      * @return string
      */
     public function execute($name, $data = array()) {
+        // Ensure format is set to something, even if empty.
+        if (!isset($data['format'])) {
+            $data['format'] = '';
+        }
         return $this->getRouter()->generate($name, $data);
     }
 
