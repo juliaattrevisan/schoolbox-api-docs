@@ -3,11 +3,29 @@ Feature: Resource Booking Builder
   As the inventory manager
   I need to be able to create bookings for resources
 
-@resource-management
-Scenario: Manage resource categories
+@resource-administration
+Scenario: Set a resource administrator
   Given I wipe the slate clean
   And   I go to homepage
   And   I log in as "alaress" with password "alaress"
+  # Different permission for resource management service:
+  # Read, Write: currently do nothing
+  # Moderate: creates resource items and categories, can confirm bookings
+  When  I fill in "search-field" with "Walter White"
+  And   I press "search-button"
+  And   I follow "Modify User"
+  # Give "Moderate" permission to Walter
+  And   I select "Resource Booking" from "serviceSelect"
+  And   I check "Moderate"
+  And   I press "serviceSubmit"
+  Then  I should see "Resource Booking" in the "#permissions-list" element
+  And   the "Moderate" checkbox should be checked
+
+@resource-management
+Scenario: Manage resource categories
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "wwhite" with password "password"
   # Will there be a "Bookings" link?
   When  I go to "/resource/category"
   # Create some categories
@@ -40,12 +58,11 @@ Scenario: Manage resource categories
   And   I should see "Projectors" in the ".resourcecategory-list" element
   And   I should not see "To be deleted" in the ".resourcecategory-list" element
 
-
-#@setup-course
-#Scenario: Create a course rubric set
-#  Given I do not wipe the slate clean
-#  And   I go to homepage
-#  And   I log in as "wwhite" with password "password"
+@resource-management
+Scenario: Create a resource
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "wwhite" with password "password"
 #  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
 #  # Rubrics: unique for course.
 #  # When adding a task list to a unit page: rubrics from parent are copied across?
