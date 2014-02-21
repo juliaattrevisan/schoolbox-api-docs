@@ -10,18 +10,23 @@
 namespace Schoolbox\Notif;
 
 
-use Monolog\Formatter\JsonFormatter;
+use Mailer;
+use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\ConfigLoader;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Handler\AMQPHandler;
+use Schoolbox\Notif\Handler\DigestHandler;
+use Schoolbox\Notif\Handler\MessageHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
+use Swift_Mailer;
+use Swift_Message;
 
 /**
  * This class is intentionally not a Singleton. It should be instantiated once only, yes, but then DI'd around.
@@ -49,22 +54,16 @@ class Notif implements LoggerInterface {
 	/** @var TopicFactory */
 	protected $topicFactory;
 
-	/** @var AMQPHandler */
-	protected $amqp;
+	/** @var MQConnector */
+	protected $mqc = null;
 
-	/** @var SwiftMailerHandler  */
-	protected $mail;
-
-	/** @var  MySQLHandler */
-	protected $sql;
-
-	/** @var StreamHandler */
-	protected $syslog;
+	/** @var HandlerInterface[] */
+	protected $handlers;
 
 	public function __construct($topic = self::TOPIC_SYSTEM, $configLoader = null) {
 		$this->topic = $topic;
 		$this->topicFactory = new TopicFactory();
-		$this->conf = $configLoader ?: new ConfigLoader();
+		$this->conf = $configLoader ?: ConfigMapper::getInstance();
 		$this->instantiateHandlers();
 	}
 
@@ -75,16 +74,21 @@ class Notif implements LoggerInterface {
 		// message queue handling
 		try {
 
+			// if the rabbit cannot be contacted, this will throw an exception
+			$this->mqc = new MQConnector();
+
 			// the rabbit is only interested in notices and above,
-			$this->amqp = new AMQPHandler(new MQConnector(), Logger::NOTICE, false);
+			$this->amqp = new AMQPHandler($this->mqc, Logger::NOTICE, false);
 		}
 		catch(AMQPRuntimeException $e) {
 			$this->amqp = false;
 		}
 
-		$from = 'notif@' . $this->conf->get('site_hostname') . '.' . $this->conf->get('site_domain');
+		return;
 
-		$m = new \Swift_Message('Schoolbox Log', null, 'text/plain','utf-8');
+//		$from = 'notif@' . $this->conf->get('site_hostname') . '.' . $this->conf->get('site_domain');
+
+		$m = new Swift_Message('Schoolbox Log', null, 'text/plain','utf-8');
 		$m->setTo($this->conf->get('mail_support_address'));
 		$m->setFrom('notif@alaress.com.au'); // TODO restore this to $from
 
@@ -92,7 +96,7 @@ class Notif implements LoggerInterface {
 		// $this->digest = ...?
 
 		// email handling (allow bubble through to rabbit)
-		$this->mail = new SwiftMailerHandler(new \Swift_Mailer(\Mailer::getSwiftTransport(true)), $m, Logger::WARNING, true);
+		$this->mail = new SwiftMailerHandler(new Swift_Mailer(Mailer::getSwiftTransport(true)), $m, Logger::WARNING, true);
 
 		// syslog handling (if this handles a message, it's done: no bubble)
 		$this->syslog = new StreamHandler(fopen($this->conf->get('logs_dir') . '/mono.log', 'a'), Logger::NOTICE, false);
@@ -111,45 +115,124 @@ class Notif implements LoggerInterface {
 		return $this;
 	}
 
-	public function selectFormatter() {
-		if($this->topic == self::TOPIC_APPLICATION) {
-			return new CompressedFormatter();
-		}
-		return new JsonFormatter();
-	}
 
 	/**
-	 * @param Logger $logger
+	 * Return an array of handlers based on the current configuration of self, created in ascending order of priority.
+	 * Spawns handlers on demand.
+	 *
+	 * @return HandlerInterface[]
 	 */
-	protected function appendHandlers($logger) {
+	protected function getHandlers() {
+		$stack = array();
 
-		// the push order of handlers is important: they get executed newest to oldest
+		// [0] top priority: system failure
+		if(!isset($this->handlers['fatalMailer'])) {
+			$fatalEmail = new Swift_Message('Schoolbox is Down', null, 'text/plain', 'utf-8');
+			$fatalEmail->setTo($this->conf->get('mail_support_address'));
+			$fatalEmail->setFrom('notif@alaress.com.au');
 
-		// syslog is bottom priority: other things will catch atop it
-		$logger->pushHandler($this->syslog);
+			$this->handlers['fatalMailer'] = new SwiftMailerHandler(new Swift_Mailer(
+				Mailer::getSwiftTransport(true)), $fatalEmail, Logger::EMERGENCY, false
+			);
+		}
 
-		// the notification system shouldn't attempt to publish to itself (or try if it's down)
-		if($this->topic == self::TOPIC_NOTIFICATION || $this->amqp === false) {
-			$logger->pushHandler($this->mail);
+		array_push($stack, $this->handlers['fatalMailer']);
+
+
+		// [1] system warning
+		if(!isset($this->handlers['sysMailer'])) {
+			$sysEmail = new Swift_Message('Schoolbox Requires Your Attention', null, 'text/plain', 'utf-8');
+			$sysEmail->setTo($this->conf->get('mail_support_address'));
+			$sysEmail->setFrom('notif@alaress.com.au');
+
+			$this->handlers['sysMailer'] = new SwiftMailerHandler(new Swift_Mailer(
+				Mailer::getSwiftTransport(true)), $sysEmail, Logger::ALERT, false
+			);
+		}
+
+		array_push($stack, $this->handlers['sysMailer']);
+
+
+		// [2] apply system handlers if it's a recognised topic, or user-specific if not
+		if($this->isSystemTopic($this->topic)) {
+
+			// [2a] internal application message
+			if($this->topic == self::TOPIC_APPLICATION) {
+				if(!isset($this->handlers['amqp'])) {
+					$this->handlers['amqp'] = new AMQPHandler($this->mqc, Logger::NOTICE, false);
+				}
+				array_push($stack, $this->handlers['amqp']->setFormatter(new CompressedFormatter()));
+			}
+
+			// [2b] sqllog (this one doesn't get stored globally)
+			if($sqllog = $this->getSqlHandler(Logger::NOTICE, false)) {
+				array_push($stack, $sqllog);
+			}
+
+			// [2c] syslog (neither does this one)
+			$logfile = sprintf("%s/%s.log", $this->conf->get('logs_dir'), $this->topic);
+			$syslog = new StreamHandler(fopen($logfile, 'a'), Logger::INFO, false);
+
+			array_push($stack, $syslog);
 		}
 		else {
-			$logger->pushHandler($this->amqp->setFormatter($this->selectFormatter()));
+			try {
+				// [2c] instant user message (notice, warning or error)
+				if(!isset($this->handlers['instant'])) {
+					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::NOTICE, false);
+				}
+				array_push($stack, $this->handlers['instant']);
+
+				// [2d] digest user message
+				if(!isset($this->handlers['digest'])) {
+					$this->handlers['digest'] = new DigestHandler($this->mqc, Logger::INFO, false);
+				}
+				array_push($stack, $this->handlers['digest']);
+			}
+			catch(NotifException $e) {
+				// no connection to rabbit available. We should be able to safely ignore this
+			}
 		}
 
-		// find out how we're logging this, based on which topic (channel) we're in
-		switch($this->topic) {
 
+		// [3] bottom priority: debugger
+		if(!isset($this->handlers['debugMailer'])) {
+			$debugEmail = new Swift_Message('Schoolbox Debug', null, 'text/plain', 'utf-8');
+			$debugEmail->setTo($this->conf->get('mail_support_address'));
+			$debugEmail->setFrom('notif@alaress.com.au');
+
+			$this->handlers['debugMailer'] = new SwiftMailerHandler(new Swift_Mailer(
+					Mailer::getSwiftTransport(true)), $debugEmail, Logger::DEBUG, false
+			);
+		}
+
+		array_push($stack, $this->handlers['debugMailer']);
+
+		return $stack;
+	}
+
+
+	/**
+	 * Only returns an SQL handler if it's relevant to the topic
+	 *
+	 * @param string|int $level
+	 * @param bool $bubble
+	 * @return MySQLHandler
+	 */
+	protected function getSqlHandler($level, $bubble = true) {
+
+		$sql = new MySQLHandler($level, $bubble);
+
+		switch($this->topic) {
 			// when someone logs in, or fails to
 			case self::TOPIC_AUTH:
-				$this->sql->setQuery("
+				$sql->setQuery("
 					INSERT INTO `login_log`
 						(`username`, `date`, `ip`, `login`)
 					VALUES
 						(:username, NOW(), :ip, :login)
 				");
-				$logger->pushHandler($this->amqp);
-				$logger->pushHandler($this->sql);
-				break;
+				return $sql;
 
 			// when cms-specific things are logged
 			case self::TOPIC_CMS:
@@ -159,35 +242,47 @@ class Notif implements LoggerInterface {
 					VALUES
 						(:object, :objectId, :action, :user)
 				");
-				$logger->pushHandler($this->amqp);
-				$logger->pushHandler($this->sql);
-				break;
-
-			// When mappers CRUD, this is what happens
-			case self::TOPIC_APPLICATION:
-				break;
+				return $sql;
 		}
 
+		return null;
 	}
+
+
+	/**
+	 * @param string $topic
+	 * @return bool
+	 */
+	public function isSystemTopic($topic) {
+		if(!isset($this->topic_cache)) {
+			$this->topic_cache = array();
+			// use a little reflection to get the available constants
+			$rf = new \ReflectionClass($this);
+			foreach($rf->getConstants() as $name => $value) {
+				$this->topic_cache[$name] = $value;
+			}
+		}
+		return in_array($topic, $this->topic_cache);
+	}
+
 
 	/**
 	 * Logs the given message to the specified channel.
 	 * Convenience method equivalent to setChannel()->log();
 	 *
-	 * @param string $channel
+	 * @param string $topic
 	 * @param int $level
 	 * @param string $message
 	 * @param array $context
 	 * @return bool
 	 */
-	public function logTo($channel, $level, $message, array $context = array()) {
-		$this->setTopic($channel);
+	public function logTo($topic, $level, $message, array $context = array()) {
+		$this->setTopic($topic);
 		return $this->log($level, $message, $context);
 	}
 
 	public function log($level, $message, array $context = array()) {
-		$log = new Logger($this->topic);
-		$this->appendHandlers($log);
+		$log = new Logger($this->topic, $this->getHandlers());
 		try {
 			return $log->addRecord($level, $message, $context);
 		}

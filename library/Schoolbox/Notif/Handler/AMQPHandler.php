@@ -10,9 +10,11 @@
 namespace Schoolbox\Notif\Handler;
 
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
+use Schoolbox\Notif\NotifException;
 
 class AMQPHandler extends AbstractProcessingHandler {
 
@@ -22,10 +24,20 @@ class AMQPHandler extends AbstractProcessingHandler {
 	 * @param MQConnector $connection
 	 * @param bool|int $level
 	 * @param bool $bubble
+	 * @throws \Schoolbox\Notif\NotifException
 	 */
 	public function __construct($connection, $level = Logger::DEBUG, $bubble = true) {
 		parent::__construct($level, $bubble);
-		$this->connection = $connection;
+
+		if($connection instanceof MQConnector) {
+			$this->connection = $connection;
+		}
+		else {
+			throw new NotifException("connection not instance of Schoolbox\\Notif\\MQ\\Connector");
+		}
+
+		// by default, this uses a JSON formatter
+		$this->setFormatter(new JsonFormatter());
 	}
 
 	public function getMQConnector() {

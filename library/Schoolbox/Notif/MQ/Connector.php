@@ -60,6 +60,7 @@ class Connector {
 	 */
 	protected function connection() {
 		if(!$this->conn instanceof AMQPConnection) {
+			// TODO pull this hardcoding out
 			$this->conn = new AMQPConnection('localhost', 5672, 'guest', 'guest');
 		}
 		return $this->conn;
