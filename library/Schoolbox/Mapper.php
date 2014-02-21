@@ -15,6 +15,7 @@ use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Notif;
@@ -149,9 +150,8 @@ class Mapper {
 		$this->database = \Database::getInstance();
 		$this->map = new MappingCollection();
 		$this->setup();
-		$this->setConfigLoader(new ConfigLoader());
+		$this->setConfigLoader(new ConfigMapper());
 		$this->setColumnFactory(new ColumnFactory());
-		$this->setNotifier(new Notif(Notif::TOPIC_APPLICATION));
 		$this->mapping();
 	}
 
@@ -250,6 +250,11 @@ class Mapper {
 	 * @return LoggerInterface
 	 */
 	public function getNotifier() {
+		// load on demand, so that we don't get infinite loops
+		if(!$this->notif instanceof LoggerInterface) {
+			$this->setNotifier(new Notif(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
+		}
+
 		return $this->notif;
 	}
 
@@ -1060,7 +1065,7 @@ class Mapper {
 
 				$method = $previous ? self::METHOD_UPDATE : self::METHOD_CREATE;
 
-				$fMessage = new MessageFactory($this->notif);
+				$fMessage = new MessageFactory($this->getNotifier());
 				$fMessage
 					->setObject($model)
 					->setInitiator($_SESSION['user'])

@@ -10,10 +10,23 @@
 namespace Schoolbox\Config;
 
 
+use Schoolbox\Column\Factory as ColumnFactory;
+use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\MappingCollection;
 
 class ConfigMapper extends Mapper implements IConfigLoader {
+
+	public function __construct() {
+		$this->database = \Database::getInstance();
+		$this->map = new MappingCollection();
+		$this->setup();
+		$this->setConfigLoader($this); // this line will possibly blow up in my face
+		$this->setColumnFactory(new ColumnFactory());
+		$this->mapping();
+	}
+
 
 	protected function mapping() {
 		$this->hasTable('config');
