@@ -1,5 +1,5 @@
-#!/usr/bin/php
 #!/usr/bin/hhvm
+#!/usr/bin/php
 <?php
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\UserMapper;
@@ -16,7 +16,7 @@ use Schoolbox\UserMapper;
 pcntl_signal(SIGCHLD, SIG_IGN);
 error_reporting(E_ALL ^ E_NOTICE);
 
-require_once('../../include/Bootstrap.php');
+require_once "mini-bootstrap.php";
 
 $opts = getopt('dvp::');
 
@@ -39,6 +39,7 @@ EOL;
 $loop = \React\EventLoop\Factory::create();
 
 // CREATE WEB SOCKET ASYNC
+Alaress\Redis::getInstance()->connect();
 $redis = Alaress\Redis::getClientInstance();
 
 $verboser = new \Schoolbox\Realtime\Verboser($verbose ? STDOUT : null);
@@ -48,7 +49,8 @@ $pipeManager = new PipeManager(
 );
 
 $session = new \Ratchet\Session\SessionProvider(
-	$pipeManager, new Predis\Session\SessionHandler($redis)
+	$pipeManager, new Predis\Session\SessionHandler($redis), array(),
+	new \Ratchet\Session\Serialize\PhpHandler()
 );
 
 $wss = new Ratchet\WebSocket\WsServer($session);
