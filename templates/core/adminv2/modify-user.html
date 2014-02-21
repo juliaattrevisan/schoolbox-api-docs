@@ -130,7 +130,7 @@ $j(function() {
 
 		/* Exclusions
 		 */
-		if ($j(this).val() == 5 || $j(this).val() == 6) {
+		if ([5,6,7].indexOf(Number($j(this).val())) >= 0) {
 			$j('#serviceCloneForm').find('select[name=sid]').hide();
 		}
 		else {
@@ -569,6 +569,24 @@ $j(function() {
                     </td>
                 </tr>
             <!-- END user_housemaster -->
+            <!-- BEGIN user_resource_booking -->
+            <tr>
+                <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+                <td>Resource Booking</td>
+                <td></td>
+                <td>
+                    <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                        <input type="hidden" name="uid" value="{USERID}" />
+                        <input type="hidden" name="sid" value="0" />
+                        <input type="hidden" name="service" value="{SERVICE_ID}" />
+
+                        <input type="radio" name="type" value="1" {READ_CHECKED} />No
+                        <input type="radio" name="type" value="2" {WRITE_CHECKED} />Yes
+                        <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
+                    </form>
+                </td>
+            </tr>
+            <!-- END user_resource_booking -->
 			</tbody>
             </table>
 					<h4 style="margin-top:16px;">Add</h4>
@@ -597,6 +615,7 @@ $j(function() {
 								<option value="3">News</option>
 								<option value="5">CMS</option>
                                 <option value="6">Housemaster</option>
+                                <option value="7">Resource Booking</option>
 							</select>
 						</label>
 						</td>
