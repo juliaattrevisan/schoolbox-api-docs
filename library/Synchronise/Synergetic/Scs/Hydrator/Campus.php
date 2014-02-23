@@ -1,12 +1,12 @@
 <?php
 /**
- * Hydrator for campus for Fintona users.
+ * Hydrator for campus for Scs users.
  *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Synergetic_Fintona_Hydrator_Campus implements Synchronise_Base_IHydrator {
+class Synchronise_Synergetic_Scs_Hydrator_Campus implements Synchronise_Base_IHydrator {
 
 	/**
      * Hydrates user's campus and default campus.
@@ -17,8 +17,10 @@ class Synchronise_Synergetic_Fintona_Hydrator_Campus implements Synchronise_Base
 				$campus = 1; break;
 			case 'J':
 				$campus = 2; break;
-			default:
+			case 'ELC':
 				$campus = 3; break;
+			default:
+				$campus = 1; break;
 		}
 
 		$newUser['campus'] = array($campus);
