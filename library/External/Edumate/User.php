@@ -119,8 +119,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $stmt = $this->getDatabase()->prepare("
             SELECT s.student_number AS StudentID, s.firstname AS StudentGiven1, s.surname AS StudentSurname,
               s.birthdate AS StudentBirthDate, s.house AS StudentHouseDescription, s.year_level AS StudentYearLevel,
-              s.tutor_name AS StudentTutor, s.head_of_house AS StudentHeadOfHouse, s.form_name AS StudentForm,
-              s.form_staff_name AS StudentFormStaffName, p.full_name AS StudentEmergencyName,
+              s.tutor_name AS StudentFormStaffName, s.head_of_house AS StudentHeadOfHouse, s.form_name AS StudentForm,
+              s.form_staff_name AS StudentTutor, p.full_name AS StudentEmergencyName,
               p.mobile AS StudentEmergencyPhone
             FROM db2inst1.schoolbox_students s
             LEFT JOIN db2inst1.schoolbox_parent_student ps ON s.student_number = ps.student_number
