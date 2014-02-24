@@ -37,6 +37,15 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 		$this->hasMap(
 			array(
+				'column' => 'author_id',
+				'property' => 'authorId',
+				'type' => self::TYPE_MODEL,
+				'join' => 'author',
+			)
+		);
+
+		$this->hasMap(
+			array(
 				'column' => 'start',
 				'property' => 'start',
 				'type' => self::TYPE_DATETIME,
@@ -166,6 +175,14 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			)
 		);
 		$this->hasJoin(
+			'author',
+			array(
+				'mapper'    => '\\Schoolbox\\UserMapper',
+				'this_key'  => 'author_id',
+				'other_key' => 'id',
+			)
+		);
+		$this->hasJoin(
 			'travelType',
 			array(
 				'mapper'    => 'Leave_Request_TravelTypeMapper',
@@ -188,10 +205,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			SELECT
 				{$this->getColumnString('lr')},
 				{$this->getJoinColumnString('user', 'u')},
+				{$this->getJoinColumnString('author', 'a')},
 				{$this->getJoinColumnString('authorisationUser', 'au')},
 				{$this->getJoinColumnString('travelType', 'tt')}
 			FROM `{$this->table}` lr
 			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+			LEFT JOIN {$this->getJoinSql('author', 'lr', 'a')}
 			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
 		";
@@ -561,6 +580,9 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				/* Hydrate user */
 				if (!empty($row['u.id'])) {
 					$request->setUser($mapper->getUserMapper()->hydrate($row, 'u'));
+				}
+				if (!empty($row['a.id'])) {
+					$request->setAuthorId($mapper->getUserMapper()->hydrate($row, 'a'));
 				}
 				/* Hydrate authorized user */
 				if (!empty($row['au.id'])) {
