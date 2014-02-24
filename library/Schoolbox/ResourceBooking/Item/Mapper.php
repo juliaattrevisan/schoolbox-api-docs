@@ -29,9 +29,17 @@ class Mapper extends BaseMapper {
                 'column'   => 'resource_category_id',
                 'property' => 'category',
                 'type'     => self::TYPE_MODEL,
-                'join'     => 'resource_category',
+                'join'     => 'category',
             )
         );
+//        $this->hasMap(
+//            array(
+//                'column'   => 'resource_moderation_type_id',
+//                'property' => 'moderation_type',
+//                'type'     => self::TYPE_MODEL,
+//                'join'     => 'moderation_type',
+//            )
+//        );
         $this->hasMap(
             array(
                 'column'   => 'name',
@@ -95,6 +103,24 @@ class Mapper extends BaseMapper {
             )
         );
         $this->hasSoftDeleteDateField('deleted_at');
+
+        // Joins
+        $this->hasJoin(
+            'category',
+            array(
+                'mapper'    => '\\Schoolbox\\ResourceBooking\\Category\\Mapper',
+                'this_key'  => 'resource_category_id',
+                'other_key' => 'id',
+            )
+        );
+//        $this->hasJoin(
+//            'moderation_type',
+//            array(
+//                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\ModerationTypeMapper',
+//                'this_key'  => 'resource_moderation_type_id',
+//                'other_key' => 'id',
+//            )
+//        );
     }
 
 }
