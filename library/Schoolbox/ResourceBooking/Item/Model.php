@@ -12,6 +12,7 @@ namespace Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;
+use DateInterval;
 
 class Model implements ISoftDeletable {
 
@@ -38,17 +39,17 @@ class Model implements ISoftDeletable {
     /**
      * Minimum lead time, this should be a time object instead of a date format
      *
-     * @var Alaress_Date_Format
+     * @var DateInterval
      */
     protected $minLeadTime;
 
     /**
-     * @var Alaress_Date_Format
+     * @var DateInterval
      */
     protected $minReservationTime;
 
     /**
-     * @var Alaress_Date_Format
+     * @var DateInterval
      */
     protected $maxReservationTime;
 
@@ -149,7 +150,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param  Alaress_Date_Format $maxReservationTime
+     * @param  DateInterval $maxReservationTime
      * @return $this
      */
     public function setMaxReservationTime($maxReservationTime) {
@@ -158,14 +159,14 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return DateInterval
      */
     public function getMaxReservationTime() {
         return $this->maxReservationTime;
     }
 
     /**
-     * @param  Alaress_Date_Format $minLeadTime
+     * @param  DateInterval $minLeadTime
      * @return $this
      */
     public function setMinLeadTime($minLeadTime) {
@@ -174,14 +175,14 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return DateInterval
      */
     public function getMinLeadTime() {
         return $this->minLeadTime;
     }
 
     /**
-     * @param  Alaress_Date_Format $minReservationTime
+     * @param  DateInterval $minReservationTime
      * @return $this
      */
     public function setMinReservationTime($minReservationTime) {
@@ -190,7 +191,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return DateInterval
      */
     public function getMinReservationTime() {
         return $this->minReservationTime;
