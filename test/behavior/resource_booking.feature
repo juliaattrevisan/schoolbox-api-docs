@@ -75,8 +75,8 @@ Scenario: Manage resources
     | resource_category_id        | Projectors                           |
     | resource_moderation_type_id | Open                                 |
     | min_lead_time               | 00:00:00                             |
-    | min_reservation_length      | 01:00:00                             |
-    | max_reservation_length      | 02:00:00                             |
+    | min_reservation_time        | 01:00:00                             |
+    | max_reservation_time        | 02:00:00                             |
   And  I press "save"
   Then I should see "A single projector" in the ".resource-list" element
   # Create a resource with a different moderator. (I can still moderate this resource.)
@@ -88,8 +88,8 @@ Scenario: Manage resources
     | resource_category_id        | Textbooks                   |
     | resource_moderation_type_id | Moderated                   |
     | min_lead_time               | 00:00:00                    |
-    | min_reservation_length      | 00:00:00                    |
-    | max_reservation_length      | 168:00:00                   |
+    | min_reservation_time        | 00:00:00                    |
+    | max_reservation_time        | 168:00:00                   |
   # Entering a user into a autocomplete field
   And  I fill in autocomplete "moderator_id" with "Celia"
   And  I select "Celia Glenn" from autocomplete "moderator_id"
@@ -105,8 +105,8 @@ Scenario: Manage resources
     | resource_category_id        | Textbooks                |
     | resource_moderation_type_id | Moderated                |
     | min_lead_time               | 24:00:00                 |
-    | min_reservation_length      | 01:00:00                 |
-    | max_reservation_length      | 02:00:00                 |
+    | min_reservation_time        | 01:00:00                 |
+    | max_reservation_time        | 02:00:00                 |
   And  I fill in autocomplete "moderator_id" with "Jennifer"
   And  I select "Jennifer Shadbolt" from autocomplete "moderator_id"
   And  I fill in autocomplete "moderator_id" with "Lovejoy"
@@ -140,8 +140,8 @@ Scenario: Manage resources
     | resource_category_id        | Projectors    |
     | resource_moderation_type_id | Open          |
     | min_lead_time               | 00:00:00      |
-    | min_reservation_length      | 01:00:00      |
-    | max_reservation_length      | 02:00:00      |
+    | min_reservation_time        | 01:00:00      |
+    | max_reservation_time        | 02:00:00      |
   And   I press "Save"
   Then  I should see "To be deleted" in the ".resource-list" element
   And   I should see "A single projector" in the ".resource-list" element
