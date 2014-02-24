@@ -33,6 +33,21 @@ class Controller extends Base {
     }
 
     /**
+     * Display form for adding another category
+     */
+    public function add() {
+        $this->getResponse()->content->set(
+            array(
+                'template' => __DIR__.'/templates/edit.twig',
+                'data'     => array(
+                    'item'         => new Model(),
+                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
+                ),
+            )
+        );
+    }
+
+    /**
      * @param  Mapper $mapper
      * @return $this
      */
