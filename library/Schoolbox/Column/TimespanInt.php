@@ -10,7 +10,7 @@
 namespace Schoolbox\Column;
 use DateInterval;
 
-class TimespanInt extends Timespan {
+class TimespanInt implements IColumnType {
 
     /**
      * Translates a value from a database field or other data store, into a
