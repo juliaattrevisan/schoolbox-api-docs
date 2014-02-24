@@ -1,11 +1,6 @@
 <?php
 /**
- * Timespan column type.
- *
- * Stored as a TIME or VARCHAR column, and retrieved as a DateInterval object.
- * (A VARCHAR column may be needed because max value of a TIME column is
- *  838:59:59.)
- * Could store as an integer value, though I'm not sure I like that.
+ * Timespan column type, stored as an integer.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -27,10 +22,22 @@ class Timespan implements IColumnType {
      * @return DateInterval
      */
     public function hydrate($value, $mapper = null) {
-        if (preg_match('/^(?P<h>\\d+):(?P<m>\\d{2}):(?P<s>\\d{2})$/', $value, $matches)) {
-            return new DateInterval("PT{$matches['h']}H{$matches['m']}M{$matches['s']}S");
+        if (!is_numeric($value)) {
+            return null;
         }
-        return null;
+        $negative = false;
+        if ($value < 0) {
+            $negative = true;
+            $value    = abs($value);
+        }
+        $hours    = floor($value / 3600);
+        $minutes  = floor($value / 60) % 60;
+        $seconds  = $value % 60;
+        $interval = new DateInterval("PT{$hours}H{$minutes}M{$seconds}S");
+        if ($negative) {
+            $interval->invert = true;
+        }
+        return $interval;
     }
 
     /**
@@ -43,17 +50,36 @@ class Timespan implements IColumnType {
      * @return string
      */
     public function dehydrate($value, $mapper = null) {
+        $hours    = null;
+        $minutes  = null;
+        $seconds  = null;
+        $negative = false;
         if ($value instanceof DateInterval) {
-            return $value->format('%H:%I:%S');
+            $hours    = $value->format('%h');
+            $minutes  = $value->format('%i');
+            $seconds  = $value->format('%s');
+            $negative = $value->invert;
         }
-        elseif (preg_match('/^(?P<h>\\d+):(?P<m>\\d+):(?P<s>\\d+)$/', $value, $matches)) {
+        elseif (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+):(?P<s>\\d+)$/', $value, $matches)) {
             // H:MM:SS
-            return sprintf('%02d:%02d:%02d', $matches['h'], $matches['m'], $matches['s']);
+            $hours    = $matches['h'];
+            $minutes  = $matches['m'];
+            $seconds  = $matches['s'];
+            $negative = !empty($matches['i']);
         }
-        elseif (preg_match('/^(?P<h>\\d+):(?P<m>\\d+)$/', $value, $matches)) {
-            // HH:MM
-            // If a value's over 60 then what can be done?
-            return sprintf('%02d:%02d:00', $matches['h'], $matches['m']);
+        elseif (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+)$/', $value, $matches)) {
+            // H:MM
+            $hours    = $matches['h'];
+            $minutes  = $matches['m'];
+            $seconds  = 0;
+            $negative = !empty($matches['i']);
+        }
+        if (isset($hours)) {
+            $span = ($hours * 3600) + ($minutes * 60) + $seconds;
+            if ($negative) {
+                $span *= -1;
+            }
+            return $span;
         }
         return null;
     }
