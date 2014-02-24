@@ -11,7 +11,7 @@ class Synchronise_Synergetic_Scs_Strategy_Staff extends Synchronise_Base_Strateg
      * Setup verbose output
      */
     protected function setup() {
-        $this->verbose_filter = new Synchronise_Synergetic_Fintona_Verbose();
+        $this->verbose_filter = new Synchronise_Synergetic_Scs_Verbose();
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
