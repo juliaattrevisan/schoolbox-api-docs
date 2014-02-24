@@ -60,21 +60,21 @@ class Mapper extends BaseMapper {
             array(
                 'column'   => 'min_lead_time',
                 'property' => 'minLeadTime',
-                'type'     => self::TYPE_TIME,
+                'type'     => self::TYPE_TIMESPAN,
             )
         );
         $this->hasMap(
             array(
                 'column'   => 'min_reservation_time',
                 'property' => 'minReservationTime',
-                'type'     => self::TYPE_TIME,
+                'type'     => self::TYPE_TIMESPAN,
             )
         );
         $this->hasMap(
             array(
                 'column'   => 'max_reservation_time',
                 'property' => 'maxReservationTime',
-                'type'     => self::TYPE_TIME,
+                'type'     => self::TYPE_TIMESPAN,
             )
         );
 
