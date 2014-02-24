@@ -2,9 +2,12 @@
 <ul class="resource-list">
     {% for item in list %}
     <li class="resource">
-        <a id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resource.edit', {id: item.id}) }}">{{ item.name }}</a>
+        <a id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">{{ item.name }}</a>
     </li>
     {% else %}
     <li>There are no resources in the system.</li>
     {% endfor %}
 </ul>
+
+{# New item: only if I have the permission to do this #}
+<a id="resource-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceItem.add') }}">Add New</a>
