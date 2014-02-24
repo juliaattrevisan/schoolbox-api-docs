@@ -136,20 +136,24 @@ then
 		echo -e "Error: CIFS remote share not mounted correctly.\nHalting backup." >> $logfile;
 		errorcheck=1;
 	fi
+	if [ $mount_space -gt 90 ];
+	then
+		echo -e "Warning: CIFS remote share ($backup_share) reporting $mount_space% usage." >> $logfile;
+	fi
 	if [ $mount_space -gt 97 ];
 	then
-		echo -e "Error: CIFS remote share ($backup_share) reporting $mount_space% usage. Backup cannot successfully complete." >> $logfile;
 		if [ $backup_usage_override -eq 1 ];
 		then
-			echo -e "Continuing backup as override is enabled." >> $logfile;
+			echo -e "Continuing backup as usage override is enabled." >> $logfile;
 		else
+			echo -e "Error: CIFS remote share ($backup_share) reporting $mount_space% usage. Backup cannot successfully complete." >> $logfile;
 			echo -e "Halting backup." >> $logfile;
 			errorcheck=1;
 		fi
 	fi
-	if [ $mount_space -gt 90 ];
+	if [ $mount_space -eq 100 ];
 	then
-		echo -e "Warning: CIFS remote share ($backup_share) reporting $mount_space% usage." >> $logfile;
+		echo -e "Error: CIFS remote share ($backup_share) reporting $mount_space% usage. Backup still attempted." >> $logfile;
 	fi
 	# Remove backup directory if already exists
 	if [ -d $targetdir ]
