@@ -40,7 +40,7 @@ class Synchronise_Synergetic_Scs_Hydrator_Group_Student implements Synchronise_B
 			case 11: return 18;
 			case 12: return 19;
 			case 13: return 20;
-			defaut: return 0;
+			default: return 0;
         }
     }
 }
