@@ -40,9 +40,9 @@ CREATE TABLE `resource` (
   -- Could there be multiple images linked?
   `image_url` VARCHAR(250) NULL DEFAULT NULL,
   `min_lead_time` TIME NOT NULL DEFAULT '00:00:00',
-  `min_reservation_length` TIME NOT NULL DEFAULT '00:00:00',
+  `min_reservation_time` TIME NOT NULL DEFAULT '00:00:00',
   -- Max time: let's say 24 hours by default
-  `max_reservation_length` TIME NOT NULL DEFAULT '24:00:00',
+  `max_reservation_time` TIME NOT NULL DEFAULT '24:00:00',
   `created_at` DATETIME NOT NULL,
   `modified_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
