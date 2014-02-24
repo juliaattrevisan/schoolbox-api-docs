@@ -14,6 +14,9 @@ use Aura\Router\Router;
 /** @var Router $router */
 global $di;
 $router = $di->get('router');
+// attachRedirect('/resource-booking', 'resourceItem.browse')
+$router->attachResource('resourceItem', '/resource-booking/item');
+$router->attachResourcePostAlias('resourceItem', '/resource-booking/item');
 $router->attachResource('resourceCategory', '/resource-booking/category');
 $router->attachResourcePostAlias('resourceCategory', '/resource-booking/category');
 
@@ -24,6 +27,9 @@ $router->attachResourcePostAlias('resourceCategory', '/resource-booking/category
 // Shouldn't there be a controller factory?
 // I'm going to need some method of adding pre and post processors to the controller renderer
 // They may need to muddle the request and response object (example - redirect to a login or error page)
+$di->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setMapper']
+    = $di->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
+$di->set('controller:resourceItem', $di->lazyNew('Schoolbox\\ResourceBooking\\Item\\Controller'));
 $di->setters['Schoolbox\\ResourceBooking\\Category\\Controller']['setMapper']
     = $di->lazyNew('Schoolbox\\ResourceBooking\\Category\\Mapper');
 $di->set('controller:resourceCategory', $di->lazyNew('Schoolbox\\ResourceBooking\\Category\\Controller'));
