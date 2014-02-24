@@ -12,6 +12,7 @@ namespace Schoolbox\Notif;
 
 use Mailer;
 use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
@@ -64,45 +65,14 @@ class Notif implements LoggerInterface {
 		$this->topic = $topic;
 		$this->topicFactory = new TopicFactory();
 		$this->conf = $configLoader ?: ConfigMapper::getInstance();
-		$this->instantiateHandlers();
-	}
 
-	/**
-	 * Generates handlers for the various kinds of notifying
-	 */
-	protected function instantiateHandlers() {
-		// message queue handling
 		try {
-
 			// if the rabbit cannot be contacted, this will throw an exception
 			$this->mqc = new MQConnector();
-
-			// the rabbit is only interested in notices and above,
-			$this->amqp = new AMQPHandler($this->mqc, Logger::NOTICE, false);
 		}
 		catch(AMQPRuntimeException $e) {
-			$this->amqp = false;
+			$this->mqc = false;
 		}
-
-		return;
-
-//		$from = 'notif@' . $this->conf->get('site_hostname') . '.' . $this->conf->get('site_domain');
-
-		$m = new Swift_Message('Schoolbox Log', null, 'text/plain','utf-8');
-		$m->setTo($this->conf->get('mail_support_address'));
-		$m->setFrom('notif@alaress.com.au'); // TODO restore this to $from
-
-		// digest handling
-		// $this->digest = ...?
-
-		// email handling (allow bubble through to rabbit)
-		$this->mail = new SwiftMailerHandler(new Swift_Mailer(Mailer::getSwiftTransport(true)), $m, Logger::WARNING, true);
-
-		// syslog handling (if this handles a message, it's done: no bubble)
-		$this->syslog = new StreamHandler(fopen($this->conf->get('logs_dir') . '/mono.log', 'a'), Logger::NOTICE, false);
-
-		// sql handling (allow bubble)
-		$this->sql = new MySQLHandler(Logger::INFO, true);
 
 	}
 
@@ -153,10 +123,29 @@ class Notif implements LoggerInterface {
 		array_push($stack, $this->handlers['sysMailer']);
 
 
-		// [2] apply system handlers if it's a recognised topic, or user-specific if not
+		// [2] exception warning (only is NewRelic isn't loaded)
+		if(extension_loaded('newrelic')) {
+			array_push($stack, new NullHandler(Logger::CRITICAL));
+		}
+		else {
+			if(!isset($this->handlers['exceptionMailer'])) {
+				$exceptionEmail = new Swift_Message('Uncaught Exception in Schoolbox', null, 'text/plain', 'utf-8');
+				$exceptionEmail->setTo('support@alaress.com.au');
+				$exceptionEmail->setFrom('notif@alaress.com.au');
+
+				$this->handlers['exceptionMailer'] = new SwiftMailerHandler(new Swift_Mailer(
+					Mailer::getSwiftTransport(true)), $exceptionEmail, Logger::CRITICAL, false
+				);
+			}
+
+			array_push($stack, $this->handlers['exceptionMailer']);
+
+		}
+
+		// [3] apply system handlers if it's a recognised topic, or user-specific if not
 		if($this->isSystemTopic($this->topic)) {
 
-			// [2a] internal application message
+			// [3a] internal application message
 			if($this->topic == self::TOPIC_APPLICATION) {
 				if(!isset($this->handlers['amqp'])) {
 					$this->handlers['amqp'] = new AMQPHandler($this->mqc, Logger::NOTICE, false);
@@ -164,12 +153,12 @@ class Notif implements LoggerInterface {
 				array_push($stack, $this->handlers['amqp']->setFormatter(new CompressedFormatter()));
 			}
 
-			// [2b] sqllog (this one doesn't get stored globally)
+			// [3b] sqllog (this one doesn't get stored globally)
 			if($sqllog = $this->getSqlHandler(Logger::NOTICE, false)) {
 				array_push($stack, $sqllog);
 			}
 
-			// [2c] syslog (neither does this one)
+			// [3c] syslog (neither does this one)
 			$logfile = sprintf("%s/%s.log", $this->conf->get('logs_dir'), $this->topic);
 			$syslog = new StreamHandler(fopen($logfile, 'a'), Logger::INFO, false);
 
@@ -177,13 +166,13 @@ class Notif implements LoggerInterface {
 		}
 		else {
 			try {
-				// [2c] instant user message (notice, warning or error)
+				// [3d] instant user message (notice, warning or error)
 				if(!isset($this->handlers['instant'])) {
 					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::NOTICE, false);
 				}
 				array_push($stack, $this->handlers['instant']);
 
-				// [2d] digest user message
+				// [3e] digest user message
 				if(!isset($this->handlers['digest'])) {
 					$this->handlers['digest'] = new DigestHandler($this->mqc, Logger::INFO, false);
 				}
@@ -195,7 +184,7 @@ class Notif implements LoggerInterface {
 		}
 
 
-		// [3] bottom priority: debugger
+		// [4] bottom priority: debugger
 		if(!isset($this->handlers['debugMailer'])) {
 			$debugEmail = new Swift_Message('Schoolbox Debug', null, 'text/plain', 'utf-8');
 			$debugEmail->setTo($this->conf->get('mail_support_address'));
