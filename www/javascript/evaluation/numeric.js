@@ -33,6 +33,15 @@
 		 */
 		function initChange() {
 
+			/* Prevent accidental form submission via Enter key
+			 */
+			config.questionForm.find('input').keydown(function(event) {
+				if (event.keyCode == 13) {
+					event.preventDefault();
+					return false;
+				}
+			});
+
 			/* For typing
 			 */
 			config.questionForm.find('input').numeric({
