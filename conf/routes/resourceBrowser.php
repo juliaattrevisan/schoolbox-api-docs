@@ -14,8 +14,8 @@ use Aura\Router\Router;
 /** @var Router $router */
 global $di;
 $router = $di->get('router');
-$router->attachResource('resourceCategory', '/resource/category');
-$router->attachResourcePostAlias('resourceCategory', '/resource/category');
+$router->attachResource('resourceCategory', '/resource-booking/category');
+$router->attachResourcePostAlias('resourceCategory', '/resource-booking/category');
 
 // Set up the controller
 // The injector is going to be generic to all controllers, so have some better
