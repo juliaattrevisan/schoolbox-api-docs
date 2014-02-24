@@ -56,6 +56,13 @@ class TimespanTest extends TestCase {
         return array(
             array(null, null),
             array(false, null),
+            // ints and int-alikes: passed thru unmolested
+            array(0, 0),
+            array(7199, 7199),
+            array(86399, 86399),
+            array(86400, 86400),
+            array(1231200, 1231200),
+            array(-1231200, -1231200),
             // string formats: H:M:S, H:M
             array('00:00:00', 0),
             array('1:59:59', 7199),

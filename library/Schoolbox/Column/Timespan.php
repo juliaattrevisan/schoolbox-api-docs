@@ -54,6 +54,9 @@ class Timespan implements IColumnType {
         $minutes  = null;
         $seconds  = null;
         $negative = false;
+        if (is_numeric($value)) {
+            return intval($value);
+        }
         if ($value instanceof DateInterval) {
             $hours    = $value->format('%h');
             $minutes  = $value->format('%i');
