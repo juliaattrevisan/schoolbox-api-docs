@@ -10,6 +10,11 @@ class Synchronise_Synergetic_Scs_Hydrator_StaffCampus implements Synchronise_Bas
 
 	/**
      * Hydrates user's campus and default campus.
+	 *
+	 * S: Senior
+	 * J: Junior
+	 * ELC: Early Learning
+	 * A: General Staff
      */
     public function hydrate($externalUser, $newUser) {
 		switch ($externalUser['StaffCampus']) {
@@ -17,12 +22,12 @@ class Synchronise_Synergetic_Scs_Hydrator_StaffCampus implements Synchronise_Bas
 				$campus = 1; break;
 			case 'J':
 				$campus = 2; break;
-			case 'A':
-				$campus = 1; break;
 			case 'ELC':
 				$campus = 3; break;
+			case 'A':
+				$campus = 4; break;
 			default:
-				$campus = 1; break;
+				$campus = 4; break;
 		}
 
 		$newUser['campus'] = array($campus);
