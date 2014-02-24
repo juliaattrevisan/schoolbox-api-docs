@@ -25,10 +25,19 @@ class TimespanInt extends Timespan {
         if (!is_numeric($value)) {
             return null;
         }
-        $hours   = floor($value / 3600);
-        $minutes = floor($value / 60) % 60;
-        $seconds = $value % 60;
-        return new DateInterval("PT{$hours}H{$minutes}M{$seconds}S");
+        $negative = false;
+        if ($value < 0) {
+            $negative = true;
+            $value    = abs($value);
+        }
+        $hours    = floor($value / 3600);
+        $minutes  = floor($value / 60) % 60;
+        $seconds  = $value % 60;
+        $interval = new DateInterval("PT{$hours}H{$minutes}M{$seconds}S");
+        if ($negative) {
+            $interval->invert = true;
+        }
+        return $interval;
     }
 
     /**
@@ -41,28 +50,36 @@ class TimespanInt extends Timespan {
      * @return string
      */
     public function dehydrate($value, $mapper = null) {
-        $hours   = null;
-        $minutes = null;
-        $seconds = null;
+        $hours    = null;
+        $minutes  = null;
+        $seconds  = null;
+        $negative = false;
         if ($value instanceof DateInterval) {
-            $hours   = $value->format('%h');
-            $minutes = $value->format('%i');
-            $seconds = $value->format('%s');
+            $hours    = $value->format('%h');
+            $minutes  = $value->format('%i');
+            $seconds  = $value->format('%s');
+            $negative = $value->invert;
         }
-        elseif (preg_match('/^(?P<h>\\d+):(?P<m>\\d+):(?P<s>\\d+)$/', $value, $matches)) {
+        elseif (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+):(?P<s>\\d+)$/', $value, $matches)) {
             // H:MM:SS
-            $hours   = $matches['h'];
-            $minutes = $matches['m'];
-            $seconds = $matches['s'];
+            $hours    = $matches['h'];
+            $minutes  = $matches['m'];
+            $seconds  = $matches['s'];
+            $negative = !empty($matches['i']);
         }
-        elseif (preg_match('/^(?P<h>\\d+):(?P<m>\\d+)$/', $value, $matches)) {
+        elseif (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+)$/', $value, $matches)) {
             // H:MM
-            $hours   = $matches['h'];
-            $minutes = $matches['m'];
-            $seconds = 0;
+            $hours    = $matches['h'];
+            $minutes  = $matches['m'];
+            $seconds  = 0;
+            $negative = !empty($matches['i']);
         }
         if (isset($hours)) {
-            return ($hours * 3600) + ($minutes * 60) + $seconds;
+            $span = ($hours * 3600) + ($minutes * 60) + $seconds;
+            if ($negative) {
+                $span *= -1;
+            }
+            return $span;
         }
         return null;
     }

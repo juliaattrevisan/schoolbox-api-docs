@@ -23,14 +23,23 @@ class TimespanIntTest extends TestCase {
     }
 
     public function getTestHydrate() {
+        $invertedInterval1 = new DateInterval('PT23H59M59S');
+        $invertedInterval1->invert = 1;
+        $invertedInterval2 = new DateInterval('PT24H0M0S');
+        $invertedInterval2->invert = 1;
+        $invertedInterval3 = new DateInterval('PT342H0M0S');
+        $invertedInterval3->invert = 1;
         return array(
-            array(null,    null),
-            array(6023,    new DateInterval('PT1H40M23S')),
-            array(0,       new DateInterval('PT0H0M0S')),
-            array(86399,   new DateInterval('PT23H59M59S')),
-            array(86400,   new DateInterval('PT24H0M0S')),
-            array(1231200, new DateInterval('PT342H0M0S')),
-            array(4831200, new DateInterval('PT1342H0M0S')),
+            array(null,     null),
+            array(6023,     new DateInterval('PT1H40M23S')),
+            array(0,        new DateInterval('PT0H0M0S')),
+            array(86399,    new DateInterval('PT23H59M59S')),
+            array(86400,    new DateInterval('PT24H0M0S')),
+            array(1231200,  new DateInterval('PT342H0M0S')),
+            array(4831200,  new DateInterval('PT1342H0M0S')),
+            array(-86399,   $invertedInterval1),
+            array(-86400,   $invertedInterval2),
+            array(-1231200, $invertedInterval3),
         );
     }
 
@@ -42,6 +51,8 @@ class TimespanIntTest extends TestCase {
     }
 
     public function getTestDehydrate() {
+        $invertedInterval = new DateInterval('PT27H15M');
+        $invertedInterval->invert = 1;
         return array(
             array(null, null),
             array(false, null),
@@ -59,6 +70,9 @@ class TimespanIntTest extends TestCase {
             // cannot reliably be cast to hours
             array(new DateInterval('PT27H15M'), 98100),
             array(new DateInterval('PT27H15S'), 97215),
+            // Inverted intervals
+            array('-101:56', -366960),
+            array($invertedInterval, -98100),
         );
     }
 
