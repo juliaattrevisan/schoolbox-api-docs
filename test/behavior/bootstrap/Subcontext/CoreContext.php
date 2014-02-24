@@ -443,4 +443,14 @@ class Subcontext_CoreContext extends BaseContext {
             throw new Exception('Title did not match');
         }
     }
+
+    /**
+     * Triggers press of the Enter key. Commonly used for form submission,
+     * especially on search forms.
+     *
+     * @When /^(?:|I )press Enter$/
+     */
+    public function pressEnterKey() {
+        $this->getSession()->executeScript("jQuery(':focus').trigger(jQuery.Event('keypress', {which: 9}));");
+    }
 }
