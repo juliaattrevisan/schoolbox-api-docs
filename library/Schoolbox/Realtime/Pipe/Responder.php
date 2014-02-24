@@ -135,4 +135,21 @@ class Responder extends EventEmitter {
 		$this->notifyServer(json_encode(array('ack' => $messageIds)));
 	}
 
+	/**
+	 * Message from server: we've received a batch of cached push notifications, send them back via the loop.
+	 *
+	 * @param int $userId
+	 * @param string $messages
+	 */
+	public function push($userId, $messages) {
+
+		$messages = json_decode($messages, true);
+
+		$body = array();
+		foreach($messages as $id => $msg) {
+			$body[$id] = $msg;
+		}
+
+		$this->notifyUser(json_encode(array('push' => $body)));
+	}
 }

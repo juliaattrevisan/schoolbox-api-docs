@@ -22,7 +22,7 @@ $glob = array_merge($_ENV, $_SERVER);
 $command = isset($glob['c']) ? strtolower($glob['c']) : '';
 $args    = isset($glob['a']) ? (array)json_decode($glob['a'], true) : array();
 
-if(!in_array($command, array('subscribe','fetch','ack'))) {
+if(!in_array($command, array('subscribe','fetch','ack','push'))) {
 	echo Responder::CONTEXT_SELF . Responder::CONTEXT_DELIMITER . "Bad command '$command'.";
 	exit(1);
 }

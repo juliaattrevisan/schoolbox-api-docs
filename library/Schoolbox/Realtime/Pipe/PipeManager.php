@@ -16,6 +16,7 @@ use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Ratchet\Wamp\WampServerInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\Timer;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
 use Schoolbox\Notif\Queue\UnreadMessage;
@@ -38,14 +39,17 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	// the minimum KB that must be free to permit a new process to spawn
 	const MEM_CEILING = 102400;
 
-	/** @var PipeInterface[] */
+	/** @var Pipe[] */
 	protected $pipesBySocketKey;
 
-	/** @var PipeInterface[][] */
+	/** @var Pipe[][] */
 	protected $pipesBySessionId;
 
-	/** @var PipeInterface[][] */
+	/** @var Pipe[][] */
 	protected $pipesByUser;
+
+	/** @var Timer[] */
+	protected $pushTimerCache;
 
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
@@ -214,17 +218,41 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 *
 	 * @param UnreadMessage $message
 	 * @param int $userId
+	 * @return bool
+	 * @throws ProcessException
 	 */
 	public function onAMQP($message, $userId) {
-//		$this->v("Received new message to send to ".$user->getUsername());
+		if(count($this->pipesByUser[$userId])) {
+			$pipe = reset($this->pipesByUser[$userId]);
 
-		// if traffic gets high enough, we may need to look at micro-caching and batching these pushes
+			$self = $this;
 
-		$this->sendToUser($userId, json_encode(array(
-			'push' => array(
-				$message->getId() => $message->getBody()
-			)
-		)));
+			$push = function($timer) use ($self, $pipe) {
+				/** @var Timer $timer */
+				// the timer contains the data to be processed
+				$self->v("Spawning worker to push cache", '>');
+				$data = $timer->getData();
+				if(!$self->spawnWorker($pipe, 'push', json_encode($data))) {
+					$self->v("Failed to spawn push worker, deferring for another second", '*');
+					// reinsert myself because I failed at my task -_-;
+					$timer->getLoop()->addTimer($timer, 1000);
+				}
+			};
+
+			// if the timer either does not exist, or it exists but has expired, create a new timer to fire in one second's time
+			if(!(isset($this->pushTimerCache[$userId]) && $this->pushTimerCache[$userId]->isActive())) {
+				$this->pushTimerCache[$userId] = $this->reactLoop->addTimer(1, $push);
+			}
+
+			// append this message to be pushed
+			$data = (array)$this->pushTimerCache[$userId]->getData();
+			$data[$message->getId()] = $message->getBody();
+			$this->pushTimerCache[$userId]->setData($data);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -344,9 +372,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param Pipe $pipe
 	 * @param string $command
 	 * @param array $arguments
+	 * @return bool
 	 * @throws \Schoolbox\Realtime\ProcessException
 	 */
-	protected function spawnWorker($pipe, $command, $arguments) {
+	public function spawnWorker($pipe, $command, $arguments) {
 
 		$userId = $pipe->getUserId();
 
@@ -373,15 +402,18 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 		if(count($this->semaphore) >= $this->processCap) {
 			$this->v("Rejecting '$command' for user $userId: process cap exceeded.",'*');
-			return;
+			return false;
 		}
 
 		if(isset($this->semaphore["$userId:$command"])) {
 			$this->v("Rejecting '$command' for user $userId: semaphore locked.",'*');
-			$this->sendToPipe($pipe, json_encode(array(
-				'busy' => $command
-			)));
-			return;
+			// don't notify the client of busy if it's coming from the server
+			if($command != 'push') {
+				$this->sendToPipe($pipe, json_encode(array(
+					'busy' => $command
+				)));
+			}
+			return false;
 		}
 
 		$this->semaphore["$userId:$command"] = true;
@@ -389,12 +421,13 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		// WARNING: THIS CREATES A WORKER PROCESS
 		$this->attachResponder(new WorkerResponder($command, array($userId, $arguments)), $pipe);
 
+		return true;
 
 	}
 
 	/**
 	 * @param WorkerResponder $responder
-	 * @param PipeInterface $pipe
+	 * @param Pipe $pipe
 	 */
 	protected function attachResponder($responder, $pipe) {
 
@@ -420,8 +453,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$rSock->on('close', function($stream) use(&$buffer, $pipeManager, $pipe, &$responder, $subscriptionManager) {
 			// received EOF, time to send the result to the client
 
+			$userId = $pipe->getUserId();
+
 			// release this responder so more can be spawned for the user
-			$pipeManager->detachResponder($responder, $pipe);
+			$pipeManager->detachResponder($responder, $userId);
 
 			// don't attempt to split if the data came through badly
 			if(strpos($buffer, Responder::CONTEXT_DELIMITER) === false) {
@@ -436,7 +471,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 				$pipeManager->v("Data piped is not JSON: $data", '?');
 			}
 
-			$pipeManager->v("$context => $data", 'd');
+//			$pipeManager->v("$context => $data", 'd');
 
 			// depending on what context was supplied, send the data to the appropriate pipes
 			switch($context) {
@@ -444,7 +479,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 					$pipeManager->sendToPipe($pipe, $data);
 					break;
 				case Responder::CONTEXT_USER:
-					$pipeManager->sendToUser($pipe->getUserId(), $data);
+					$pipeManager->sendToUser($userId, $data);
 					break;
 				case Responder::CONTEXT_SESSION:
 					$pipeManager->sendToSession($pipe->getSession(), $data);
@@ -452,15 +487,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 				case Responder::CONTEXT_SELF:
 					// this is a bounceback so the subscription is registered in the parent
 					if($data == 'subscribe') {
-						$subscriptionManager->subscribe($pipe->getUserId(), new SelfResponder($pipeManager, $pipe));
+						$subscriptionManager->subscribe($userId, new SelfResponder($pipeManager, $pipe));
 						break;
 					}
 					$data = json_decode($data, true);
 					// this is also a bounceback, because you can only ack from the subscription you started
 					if(isset($data['ack'])) {
-						if($subscription = $subscriptionManager->getUserSubscription($pipe->getUserId(), true)) {
+						if($subscription = $subscriptionManager->getUserSubscription($userId, true)) {
 							$markAsRead = $subscription->acceptMessages($data['ack']);
-							$pipeManager->sendToUser($pipe->getUserId(), json_encode(array('ack' => $markAsRead)));
+							$pipeManager->sendToUser($userId, json_encode(array('ack' => $markAsRead)));
 						}
 					}
 					break;
@@ -472,11 +507,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 
 	/**
 	 * @param WorkerResponder $responder
-	 * @param Pipe $pipe
+	 * @param int $userId
 	 */
-	public function detachResponder($responder, $pipe) {
-
-		$userId = $pipe->getUserId();
+	public function detachResponder($responder, $userId) {
 		$command = $responder->getCommand();
 
 		$this->v(sprintf("Worker [%s:%s] completed in %0.5fms", $userId, $command, 1000*(microtime(true) - $responder->launchtime)), '*');

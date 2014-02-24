@@ -62,13 +62,24 @@ class Subscription {
 					return;
 				}
 
-				$self->addMessage($frame, $ackResolver);
-				$pipeManager->onAMQP($self->frame2msg($frame), $userId);
+
+				if($pipeManager->onAMQP($self->frame2msg($frame), $userId)) {
+					$self->addMessage($frame, $ackResolver);
+				}
+				else {
+					// failed to attach listener, which means there are no pipes, which means we should not be subscribed to this user
+					$self->unsubscribe();
+					return;
+				}
 			});
 	}
 
 	public function getId() {
 		return $this->id;
+	}
+
+	public function unsubscribe() {
+		$this->client->unsubscribe($this->id);
 	}
 
 
