@@ -75,6 +75,8 @@ class TimespanTest extends TestCase {
             // DateInterval objects:
             // note that days, weeks, years, etc. will be ignored because they
             // cannot reliably be cast to hours
+            array(new DateInterval('PT75M'), 4500),
+            array(new DateInterval('PT75S'), 75),
             array(new DateInterval('PT27H15M'), 98100),
             array(new DateInterval('PT27H15S'), 97215),
             // Inverted intervals
