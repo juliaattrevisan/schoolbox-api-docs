@@ -1,0 +1,18 @@
+<h1>Resource - View</h1>
+
+<dl>
+    <dt>ID</dt>
+    <dd>{{ item.id }}</dd>
+    <dt>Title</dt>
+    <dd>{{ item.name }}</dd>
+    <dt>Category</dt>
+    <dd>{{ item.category.name }}</dd>
+    <dt>Description</dt>
+    <dd>{{ item.description|e|nl2br }}</dd>
+    <dt>Minimum Lead Time</dt>
+    <dd>{{ item.min_lead_time }}</dd>
+    <dt>Minimum Reservation Time</dt>
+    <dd>{{ item.min_reservation_time }}</dd>
+    <dt>Maximum Reservation Time</dt>
+    <dd>{{ item.max_reservation_time }}</dd>
+</dl>
