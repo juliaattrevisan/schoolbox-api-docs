@@ -48,6 +48,10 @@ class Factory implements IFactory {
 				$column = new Timestamp();
 				break;
 
+			case Mapper::TYPE_TIMESPAN:
+				$column = new Timespan();
+				break;
+
 			case Mapper::TYPE_MODEL:
 				$column = new Model();
 				break;
