@@ -20,7 +20,7 @@ class Email {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param null $email
 	 */
 	public function __construct($email = null) {
@@ -66,7 +66,7 @@ class Email {
 	 * This creates local_email versions if specified, otherwise returns the
 	 * alt_email field
 	 *
-	 * @param  $email
+	 * @param $user
 	 * @return bool|string
 	 */
 	public function formatEmailFromArray($user) {
