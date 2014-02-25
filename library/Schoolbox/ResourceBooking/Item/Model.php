@@ -27,6 +27,11 @@ class Model implements ISoftDeletable {
     protected $category;
 
     /**
+     * @var ModerationType\Model
+     */
+    protected $moderationType;
+
+    /**
      * @var string
      */
     protected $name;
@@ -228,6 +233,22 @@ class Model implements ISoftDeletable {
      */
     public function getName() {
         return $this->name;
+    }
+
+    /**
+     * @param  ModerationType\Model $moderationType
+     * @return $this
+     */
+    public function setModerationType($moderationType) {
+        $this->moderationType = $moderationType;
+        return $this;
+    }
+
+    /**
+     * @return ModerationType\Model
+     */
+    public function getModerationType() {
+        return $this->moderationType;
     }
 
     /**
