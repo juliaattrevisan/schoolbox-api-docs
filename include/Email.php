@@ -10,8 +10,19 @@
  */
 
 class Email {
+
+	/**
+	 * The email address to analyse
+	 *
+	 * @var null
+	 */
 	private $email = null;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param null $email
+	 */
 	public function __construct($email = null) {
 		if ($email !== null) {
 			$this->setEmail($email);
