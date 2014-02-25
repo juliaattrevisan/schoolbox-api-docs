@@ -48,6 +48,30 @@ class Controller extends Base {
     }
 
     /**
+     * Backend for adding a new category
+     */
+    public function create() {
+        $post  = $this->getRequest()->post;
+        $model = new Model();
+        $model
+            ->setName($post['name'])
+            ->setDescription($post['description'])
+            ->setCategory($post['resource_category_id'])
+            // Let's just get started
+            ->setMinLeadTime(new \DateInterval('PT1H'))
+            ->setMinReservationTime(new \DateInterval('PT1H'))
+            ->setMaxReservationTime(new \DateInterval('PT24H'))
+        ;
+        $this->getMapper()->save($model);
+        // Return something.
+        // If this is a JSON request, output a result - maybe if this is a
+        // HTML request, redirect somewhere.
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('resourceItem.browse', array())
+        );
+    }
+
+    /**
      * @param  Mapper $mapper
      * @return $this
      */

@@ -21,25 +21,50 @@
     <input type="hidden" name="id" value="{{ item.id }}"/>
     <table class="standardForm table">
         <tr>
-            <td class="formLabelWidth"><h4>Title</h4></td>
+            <td class="formLabelWidth"><h4>Name</h4></td>
             <td><input class="required" name="name" type="text" value="{{ item.name }}" size="30"/></td>
         </tr>
+        {#
         <tr>
-            <td class="formLabelWidth"><h4>Description</h4></td>
-            <td><textarea name="description">{{ item.name }}</textarea></td>
+            <td class="formLabelWidth"><h4>Moderation</h4></td>
+            <td>
+                <select name="resource_moderation_type_id">
+                    {% for type in moderationTypeList %}
+                        <option {{ type.id == item.moderationType.id ? 'selected' : '' }}
+                                value="{{ type.id|e('html_attr') }}"
+                                label="{{ type.name|e('html_attr') }}"
+                                >{{ type.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
         </tr>
+        #}
         <tr>
             <td class="formLabelWidth"><h4>Category</h4></td>
             <td>
                 <select name="resource_category_id">
                     <option>-- select --</option>
                     {% for category in categoryList %}
-                        <option {{ category.id == item.category_id ? 'selected' : '' }}
+                        <option {{ category.id == item.category.id ? 'selected' : '' }}
                                 value="{{ category.id|e('html_attr') }}"
                                 label="{{ category.name|e('html_attr') }}"
                         >{{ category.name }}</option>
                     {% endfor %}
                 </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Description</h4></td>
+            <td><textarea name="description">{{ item.name }}</textarea></td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Rules</h4></td>
+            <td>
+                <p>Minimum Lead Time</p>
+                <!-- Datespan input -->
+                <input name="min_lead_time[day]"    placeholder="days"> .
+                <input name="min_lead_time[hour]"   placeholder="hours"> :
+                <input name="min_lead_time[minute]" placeholder="minutes">
             </td>
         </tr>
     </table>
