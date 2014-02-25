@@ -15,7 +15,6 @@ class Synchronise_Synergetic_Fintona_Strategy_Student extends Synchronise_Base_S
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
-            ->addHydrator(new Synchronise_Base_Hydrator_Student_UsernameFromId())
             ->addHydrator(new Synchronise_Synergetic_Fintona_Hydrator_House())
             ->addHydrator(new Synchronise_Synergetic_Fintona_Hydrator_Campus())
             ->addHydrator(new Synchronise_Synergetic_Fintona_Hydrator_Group_Student())
