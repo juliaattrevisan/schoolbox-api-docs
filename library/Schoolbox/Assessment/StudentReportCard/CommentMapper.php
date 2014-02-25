@@ -329,10 +329,14 @@ class CommentMapper extends Mapper {
 		$comment->getCategory()->loadTeachers();
 		$userCollection->merge($comment->getCategory()->getTeachers());
 
-		// if visible to parents, find the parents of the student of the comment
-		if($comment->isVisibleToParent()) {
-			$comment->getStudent()->loadParents();
-			$userCollection->merge($comment->getStudent()->getParents());
+		/* If the comment is set to be Visible To Parents, notify
+		 * all the specified people who should be emailed about the
+		 * student. These recipients are not necessarily Parents of
+		 * the student.
+		 */
+		if ($comment->isVisibleToParent()) {
+			$comment->getStudent()->loadEmailRecipients();
+			$userCollection->merge($comment->getStudent()->getEmailRecipients());
 		}
 
 		// if visible to student, find the student of the comment
@@ -342,6 +346,4 @@ class CommentMapper extends Mapper {
 
 		return $userCollection;
 	}
-
-
 }

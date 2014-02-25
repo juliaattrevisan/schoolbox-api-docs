@@ -56,11 +56,6 @@ class Conversation {
 		$this->student = $student;
 		$this->student->loadParents();
 
-		/* A list of email recipients
-		 * This could be moved to the User object itself, if preferred
-		 */
-		$this->setEmailRecipients($this->findEmailRecipients($student));
-
 		/* FInd the teachers of this particular category
 		 */
 		$this->category = $category;
@@ -80,59 +75,6 @@ class Conversation {
 
 		// retrieve the comments in this conversation
 		$this->comments = CommentMapper::getInstance()->findByStudentAndCategory($student->getId(), $category->getId());
-	}
-
-	/**
-	 * Find the email recipients for $user who should be notified whenever
-	 * a comment is made
-	 *
-	 * @param $user
-	 * @return \Schoolbox\Collection
-	 */
-	private function findEmailRecipients($user) {
-		$parentRoles = \Schoolbox\RoleMapper::getInstance()->findByColumn('group_type', Role::PARENT)->getColumnValues('id');
-		$allRecipients = new Collection();
-
-		$DEPRECATED_EXTERNAL_USER = new \External_User();
-		$emailArray = $DEPRECATED_EXTERNAL_USER->getParentEmails(array($user->getExternalId()));
-
-		if (is_array($emailArray) && count($emailArray)) {
-			foreach($emailArray as $synergyId => $emailAddress) {
-				$thisRecipient = new Collection();
-
-				// if a synergy ID is available, and a valid user can be obtained from it, use that
-				if ($synergyId) {
-					$thisRecipient = \Schoolbox\UserMapper::getInstance()->findByColumnList(array(
-						'synergy_id' => $synergyId,
-						'group_id'   => $parentRoles
-					));
-				}
-
-				/* This person has a Schoolbox account, so just use that
-				 */
-				if ($thisRecipient->count()) {
-					$recipient = $thisRecipient->first();
-				}
-				/* Generate a dummy user object (which will still have a correct email address)
-				 *
-				 * This is used when someone is specified to receive emails, but doesn't
-				 * actually have a Schoolbox account. This is actually possible.
-				 */
-				else {
-					$recipient = new User();
-					$recipient->setId(-1);
-				}
-
-				// override any email retrieved from schoolbox with the one from synergy
-				$recipient->setAltEmail($emailAddress);
-
-				/* Add him to the stack
-				 */
-				$allRecipients->add($recipient);
-			}
-		}
-
-		return $allRecipients;
 	}
 
 	/**
@@ -204,26 +146,5 @@ class Conversation {
 		else {
 			throw new \InvalidArgumentException("Not a participant of this conversation.");
 		}
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set recipients
-	 *
-	 * @param \Schoolbox\Collection $emailRecipients
-	 */
-	private function setEmailRecipients($emailRecipients) {
-		$this->emailRecipients = $emailRecipients;
-	}
-
-	/**
-	 * Get recipients
-	 *
-	 * @return \Schoolbox\Collection
-	 */
-	private function getEmailRecipients() {
-		return $this->emailRecipients;
 	}
 }
