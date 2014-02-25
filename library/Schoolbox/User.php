@@ -394,7 +394,6 @@ private $enabled;               //Bool
         return $this->config_loader;
     }
 
-
 	/**
 	 * Load parents into object from external db
 	 */
@@ -403,41 +402,41 @@ private $enabled;               //Bool
 
 		// TODO remove handler dependency
 		$DEPRECATED_EXTERNAL_USER = new \External_User();
-		$emailArray = $DEPRECATED_EXTERNAL_USER->getParentEmails(array($this->externalId));
+		$allParents = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
 
 		$parentRoles = RoleMapper::getInstance()->findByColumn('group_type', Role::PARENT)->getColumnValues('id');
 
-		if(is_array($emailArray)) {
-			foreach($emailArray as $synergyId => $emailAddress) {
-				$parentCollection = new Collection();
+		if (is_array($allParents)) {
+			foreach($allParents as $currentParent) {
 
-				// if a synergy ID is available, and a valid user can be obtained from it, use that
-				if($synergyId) {
-					$parentCollection = UserMapper::getInstance()->findByColumnList(array(
-						'synergy_id' => $synergyId,
-						'group_id'   => $parentRoles
-					));
+				/* Add parent
+				 */
+				$parentCollection = UserMapper::getInstance()->findByColumnList(array(
+					'synergy_id' => $currentParent['StudentContactID'],
+					'group_id'   => $parentRoles
+				));
+
+				if ($parentCollection->count()) {
+					$this->parent_collection->add($parentCollection->first());
 				}
 
-				// parent successfully retrieved
-				if($parentCollection->count()) {
-					$parent = $parentCollection->first();
-				}
-				// generate a dummy user object (which will still have a correct email address)
-				else {
-					$parent = new User();
-					$parent->setId(-1);
-				}
+				/* Add speece
+				 */
+				$spouseCollection = UserMapper::getInstance()->findByColumnList(array(
+					'synergy_id' => $currentParent['StudentContactSpouseID'],
+					'group_id'   => $parentRoles
+				));
 
-				// override any email retrieved from schoolbox with the one from synergy
-				$parent->setAltEmail($emailAddress);
-				$this->parent_collection->add($parent);
+				if ($spouseCollection->count()) {
+					$this->parent_collection->add($spouseCollection->first());
+				}
 			}
 		}
-
 	}
 
 	/**
+	 * Get the parents associated with this user
+	 *
 	 * @return Collection
 	 */
 	public function getParents() {

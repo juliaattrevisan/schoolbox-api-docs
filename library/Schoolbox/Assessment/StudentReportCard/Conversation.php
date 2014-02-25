@@ -33,6 +33,9 @@ class Conversation {
 	/** @var Collection[User] $participants */
 	protected $participants;
 
+	/** @var Collection[User] $recipients */
+	protected $emailRecipients = null;
+
 	/** @var Collection[Comment] $comments */
 	protected $comments;
 
@@ -48,13 +51,27 @@ class Conversation {
 			throw new \InvalidArgumentException("Invalid conversation");
 		}
 
+		/* Find the parents of this particular student
+		 */
 		$this->student = $student;
-		$this->category = $category;
-
 		$this->student->loadParents();
+
+		/* A list of email recipients
+		 * This could be moved to the User object itself, if preferred
+		 */
+		$this->setEmailRecipients($this->findEmailRecipients($student));
+
+		/* FInd the teachers of this particular category
+		 */
+		$this->category = $category;
 		$this->category->loadTeachers(true);
 
-		// generate participants: the student, their parent(s), and the category teacher(s)
+		/* Generate participants: the student, their parent(s), and the category teacher(s)
+		 *
+		 * Email recipients are not necessarily participants in the conversation,
+		 * merely acting as observers of the dialog, so they are excluded from this
+		 * list of participants
+		 */
 		$this->participants = new Collection();
 		$this->participants->add($student);
 		$this->participants
@@ -63,9 +80,60 @@ class Conversation {
 
 		// retrieve the comments in this conversation
 		$this->comments = CommentMapper::getInstance()->findByStudentAndCategory($student->getId(), $category->getId());
-
 	}
 
+	/**
+	 * Find the email recipients for $user who should be notified whenever
+	 * a comment is made
+	 *
+	 * @param $user
+	 * @return \Schoolbox\Collection
+	 */
+	private function findEmailRecipients($user) {
+		$parentRoles = \Schoolbox\RoleMapper::getInstance()->findByColumn('group_type', Role::PARENT)->getColumnValues('id');
+		$allRecipients = new Collection();
+
+		$DEPRECATED_EXTERNAL_USER = new \External_User();
+		$emailArray = $DEPRECATED_EXTERNAL_USER->getParentEmails(array($user->getExternalId()));
+
+		if (is_array($emailArray) && count($emailArray)) {
+			foreach($emailArray as $synergyId => $emailAddress) {
+				$thisRecipient = new Collection();
+
+				// if a synergy ID is available, and a valid user can be obtained from it, use that
+				if ($synergyId) {
+					$thisRecipient = \Schoolbox\UserMapper::getInstance()->findByColumnList(array(
+						'synergy_id' => $synergyId,
+						'group_id'   => $parentRoles
+					));
+				}
+
+				/* This person has a Schoolbox account, so just use that
+				 */
+				if ($thisRecipient->count()) {
+					$recipient = $thisRecipient->first();
+				}
+				/* Generate a dummy user object (which will still have a correct email address)
+				 *
+				 * This is used when someone is specified to receive emails, but doesn't
+				 * actually have a Schoolbox account. This is actually possible.
+				 */
+				else {
+					$recipient = new User();
+					$recipient->setId(-1);
+				}
+
+				// override any email retrieved from schoolbox with the one from synergy
+				$recipient->setAltEmail($emailAddress);
+
+				/* Add him to the stack
+				 */
+				$allRecipients->add($recipient);
+			}
+		}
+
+		return $allRecipients;
+	}
 
 	/**
 	 * Returns whether or not the given user is a participant in this conversation
@@ -74,14 +142,12 @@ class Conversation {
 	 * @return bool
 	 */
 	public function isParticipant($user) {
+		$exists = $this->participants->getBy('id', $user->getId());
 
-		// I feel like Collection should have a contains() method...
-		foreach($this->participants as $p) {
-			/** @var User $p */
-			if($p->getId() == $user->getId()) {
-				return true;
-			}
+		if ($exists !== null) {
+			return true;
 		}
+
 		return false;
 	}
 
@@ -140,5 +206,24 @@ class Conversation {
 		}
 	}
 
+	/* Getters/Setters
+	 */
 
+	/**
+	 * Set recipients
+	 *
+	 * @param \Schoolbox\Collection $emailRecipients
+	 */
+	private function setEmailRecipients($emailRecipients) {
+		$this->emailRecipients = $emailRecipients;
+	}
+
+	/**
+	 * Get recipients
+	 *
+	 * @return \Schoolbox\Collection
+	 */
+	private function getEmailRecipients() {
+		return $this->emailRecipients;
+	}
 }
