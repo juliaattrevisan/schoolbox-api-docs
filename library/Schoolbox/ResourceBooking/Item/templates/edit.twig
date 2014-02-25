@@ -54,17 +54,37 @@
             </td>
         </tr>
         <tr>
+            <td class="formLabelWidth"><h4>Moderation</h4></td>
+            <td>
+                <select name="resource_moderation_type_id">
+                    {% for moderation in moderationList %}
+                        <option {{ moderation.id == item.moderationType.id ? 'selected' : '' }}
+                                value="{{ moderation.id|e('html_attr') }}"
+                                label="{{ moderation.name|e('html_attr') }}"
+                        >{{ moderation.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
             <td class="formLabelWidth"><h4>Description</h4></td>
             <td><textarea name="description">{{ item.name }}</textarea></td>
         </tr>
         <tr>
             <td class="formLabelWidth"><h4>Rules</h4></td>
             <td>
-                <p>Minimum Lead Time</p>
+                <label for="min_lead_time">Minimum Lead Time</label>
+                <input id="min_lead_time" name="min_lead_time" />
+                <label for="min_reservation_time">Minimum Reservation Time</label>
+                <input id="min_reservation_time" name="min_reservation_time" />
+                <label for="max_reservation_time">Maximum Reservation Time</label>
+                <input id="max_reservation_time" name="max_reservation_time" />
+                {#
                 <!-- Datespan input -->
                 <input name="min_lead_time[day]"    placeholder="days"> .
                 <input name="min_lead_time[hour]"   placeholder="hours"> :
                 <input name="min_lead_time[minute]" placeholder="minutes">
+                #}
             </td>
         </tr>
     </table>

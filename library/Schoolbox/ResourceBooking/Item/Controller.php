@@ -40,8 +40,9 @@ class Controller extends Base {
             array(
                 'template' => __DIR__.'/templates/edit.twig',
                 'data'     => array(
-                    'item'         => new Model(),
-                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'item'           => new Model(),
+                    'categoryList'   => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'moderationList' => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                 ),
             )
         );
@@ -74,8 +75,9 @@ class Controller extends Base {
             array(
                 'template' => __DIR__.'/templates/edit.twig',
                 'data'     => array(
-                    'item'         => $this->getMapper()->findById($id),
-                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'item'           => $this->getMapper()->findById($id),
+                    'categoryList'   => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'moderationList' => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                 ),
             )
         );
@@ -91,6 +93,7 @@ class Controller extends Base {
             ->setName($post['name'])
             ->setDescription($post['description'])
             ->setCategory($post['resource_category_id'])
+            ->setModerationType($post['resource_moderation_type_id'])
             // Let's just get started
             ->setMinLeadTime(new \DateInterval('PT1H'))
             ->setMinReservationTime(new \DateInterval('PT1H'))
@@ -117,6 +120,7 @@ class Controller extends Base {
             ->setName($post['name'])
             ->setDescription($post['description'])
             ->setCategory($post['resource_category_id'])
+            ->setModerationType($post['resource_moderation_type_id'])
         ;
         $this->getMapper()->save($model);
         // Return something.
