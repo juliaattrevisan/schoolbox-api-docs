@@ -179,7 +179,6 @@ function getFolderMeta($folderId) {
 		$permissions = array();
 	}
 
-
 	// actions: if write, some; if full, all.
 	$actions = array();
 	switch($userAccess) {
@@ -190,7 +189,7 @@ function getFolderMeta($folderId) {
 			}
 			// no break
 		case WRITE_ACCESS:
-			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download'));
+			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download', 'multi'));
 			$actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
 			// no break
 		case READ_ACCESS:
