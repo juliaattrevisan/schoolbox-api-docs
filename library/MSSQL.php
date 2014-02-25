@@ -146,6 +146,10 @@ class MSSQL {
 
 		if(!$this->changeDb($this->db))
 			throw new \Schoolbox\External\Exception("External database is online, but unable to connect.");
+
+        /* Set Default NULL ON, due to stored procs requiring this */
+        mssql_query('SET ANSI_NULL_DFLT_ON ON',$this->dbf);
+        mssql_query('SET CONCAT_NULL_YIELDS_NULL ON', $this->dbf);
 	}
 
     /**
@@ -158,6 +162,7 @@ class MSSQL {
 		{
 			$this->db = $db;
 			return true;
+
 		}
 		else
 			return false;
