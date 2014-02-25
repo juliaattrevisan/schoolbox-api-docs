@@ -505,6 +505,24 @@ fi
 echo "";
 $instdir/tools/update-sql.sh;
 
+## Change the site title to include [Dev] or [Vagrant] if known
+updatetitle () {
+	tempsqltitle=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe  "SELECT value FROM config WHERE name='title'" 2>/dev/null`;
+	newtitle="$titleprefix $tempsqltitle";
+	mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "update config set value=\"$newtitle\" where name='title'";
+}
+titleprefix='';
+if [ "$package" = 'vagrant' ];
+then
+	titleprefix='[Vagrant]';
+	updatetitle;
+fi
+if [ "$package" = 'schoolboxdev' ];
+then
+	titleprefix='[Dev]';
+	updatetitle;
+fi
+
 # Restart apache
 echo -e "\nRestarting Apache\c";
 if [ `which apache2 | wc -l` -ne 0 ];
