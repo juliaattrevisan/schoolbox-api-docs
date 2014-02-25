@@ -28,15 +28,4 @@ class Leave_Core_Notice_User_Submitted extends Leave_Core_Notice_User_Abstract {
 		$this->getEmail()->setVar('authorised_by_block', '');
 		$this->getEmail()->setVar('rejected_by_block', '');
 	}
-
-	/**
-	 * Send it
-	 */
-	public function send() {
-		$email = new \Email($this->getRequest()->getUser()->getAltEmail());
-
-		if ($email->isValid()) {
-			$this->getEmail()->send();
-		}
-	}
 }
