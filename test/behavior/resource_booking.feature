@@ -64,12 +64,11 @@ Scenario: Manage resources
   And   I go to homepage
   And   I log in as "wwhite" with password "password"
   # Will there be a "Bookings" link? I guess so, because there are now resource moderators
-  When  I go to "/resource-booking"
+  When  I go to "/resource-booking/item"
   # By default, this shows all categories
   # Create some resources
-  And   I follow "create"
+  And   I follow "resource-create"
   And   I fill in the following:
-    | field                       | value                                |
     | name                        | A single projector                   |
     | description                 | A projector that can be moved around |
     | resource_category_id        | Projectors                           |
@@ -80,9 +79,8 @@ Scenario: Manage resources
   And  I press "save"
   Then I should see "A single projector" in the ".resource-list" element
   # Create a resource with a different moderator. (I can still moderate this resource.)
-  When  I follow "create"
+  When  I follow "resource-create"
   And   I fill in the following:
-    | field                       | value                       |
     | name                        | English textbook            |
     | description                 | A Unit 1/2 English textbook |
     | resource_category_id        | Textbooks                   |
@@ -97,9 +95,8 @@ Scenario: Manage resources
   Then I should see "A single projector" in the ".resource-list" element
   And  I should see "English textbook" in the ".resource-list" element
   # Create a managed resource
-  When  I follow "create"
+  When  I follow "resource-create"
   And   I fill in the following:
-    | field                       | value                    |
     | name                        | The special projector    |
     | description                 | A projector made of gold |
     | resource_category_id        | Textbooks                |
@@ -120,7 +117,6 @@ Scenario: Manage resources
   # Update a resource
   When  I follow "The special projector"
   And   I fill in the following:
-    | field                       | value                    |
     | name                        | The good projector       |
     | description                 | A projector made of gold |
     | resource_category_id        | Projectors               |
@@ -132,9 +128,8 @@ Scenario: Manage resources
   And   I should see "The good projector" in the ".resource-list" element
   And   I should not see "The good projector" in the ".resource-list" element
   # Delete a resource
-  When  I follow "create"
+  When  I follow "resource-create"
   And   I fill in the following:
-    | field                       | value         |
     | name                        | To be deleted |
     | description                 | To be deleted |
     | resource_category_id        | Projectors    |
