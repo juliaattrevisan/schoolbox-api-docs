@@ -1,12 +1,26 @@
 {# I need some way of adding custom_head #}
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <script type="text/javascript">
     (function($){
         $(function(){
+
+            // Hijack save form to allow delete
             var form = $('#resource-form');
             form.on('click', '#resource-delete', function(event) {
                 event.preventDefault();
                 form.attr('action', $(this).data('action')).submit();
             })
+
+            // Add magicsuggest for user selection
+            form.find('input[name="moderator_id"]').userSelector({
+                plugin: {
+                    data:'/ajax/user.php?groupID=0',
+                    width: 200
+                },
+                multiple: true
+            })
+
         })
     })(jQuery);
 </script>
@@ -24,21 +38,6 @@
             <td class="formLabelWidth"><h4>Name</h4></td>
             <td><input class="required" name="name" type="text" value="{{ item.name }}" size="30"/></td>
         </tr>
-        {#
-        <tr>
-            <td class="formLabelWidth"><h4>Moderation</h4></td>
-            <td>
-                <select name="resource_moderation_type_id">
-                    {% for type in moderationTypeList %}
-                        <option {{ type.id == item.moderationType.id ? 'selected' : '' }}
-                                value="{{ type.id|e('html_attr') }}"
-                                label="{{ type.name|e('html_attr') }}"
-                                >{{ type.name }}</option>
-                    {% endfor %}
-                </select>
-            </td>
-        </tr>
-        #}
         <tr>
             <td class="formLabelWidth"><h4>Category</h4></td>
             <td>
@@ -64,6 +63,12 @@
                         >{{ moderation.name }}</option>
                     {% endfor %}
                 </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Moderators</h4></td>
+            <td>
+                <input name="moderator_id" />
             </td>
         </tr>
         <tr>
