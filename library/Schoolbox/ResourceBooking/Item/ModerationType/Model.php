@@ -12,6 +12,22 @@ namespace Schoolbox\ResourceBooking\Item\ModerationType;
 class Model {
 
     /**
+     * Open resources may be booked by anyone, and are automatically confirmed.
+     */
+    const TYPE_OPEN = 1;
+
+    /**
+     * Moderated resources may be booked by anyone, but are not confirmed until
+     * a moderator confirms the booking.
+     */
+    const TYPE_MODERATED = 2;
+
+    /**
+     * Managed resources may only be booked by moderators.
+     */
+    const TYPE_MANAGED = 3;
+
+    /**
      * @var int
      */
     protected $id;
