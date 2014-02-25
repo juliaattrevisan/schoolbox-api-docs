@@ -13,13 +13,14 @@ if ($_GET['type'] == 'system') {
     /* Add from this group...
      */
     $groupID   = $_POST['systemGroupID'];
-    $allGroups = $groupHandler->searchByName($_GET['query']);
+    $allGroups = $groupHandler->searchByName($_POST['query']);
+
 }
 else {
     /* Add from this group...
      */
     $groupID   = $_POST['individualGroupID'];
-    $allGroups = $categoryHandler->searchByName($_GET['query']);
+    $allGroups = $categoryHandler->searchByName($_POST['query'], true);
 }
 
 /* Accumulate results
