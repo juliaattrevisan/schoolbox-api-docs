@@ -12,30 +12,41 @@ use Behat\Mink\Element;
 class Subcontext_AutocompleteContext extends BaseContext {
 
     /**
+     * Really convoluted process required to initialise stupid autocompletes.
+     * The hidden input I use to find the autocomplete doesn't exist until I
+     * focus on the element, and there's no other way to find it.
+     */
+    protected function preconfigureAutocompletes() {
+        foreach ($this->getSession()->getPage()->findAll('css', '.ms-ctn input') as $autocompleteInput) {
+            /** @var Element\NodeElement $autocompleteInput */
+            $autocompleteInput->focus();
+        }
+    }
+
+    /**
+     * Gets the container for this autocomplete component.
+     *
+     * @param  string $field
+     * @return Element\NodeElement
+     * @throws Exception if the container wasn't found.
+     */
+    protected function getAutocompleteContainer($field) {
+        $this->preconfigureAutocompletes();
+        $container = $this->getSession()->getPage()->find('css', 'input[name="'.$field.'"]');
+        if (!($container instanceof Element\NodeElement)) {
+            throw new Exception('Could not find autocomplete for field named "'.$field.'"');
+        }
+        return $container->getParent();
+    }
+
+    /**
      * Types into an autocomplete box. This should open a list of options, one
      * of which can be selected.
      *
      * @When /^(?:|I )fill in autocomplete "(?P<field>[^"]*)" with "(?P<value>[^"]*)"$/
      */
     public function fillInAutocomplete($field, $value) {
-
-        // Really convoluted process required to initialise stupid autocompletes.
-        // The hidden input I use to find the autocomplete doesn't exist until I
-        // focus on the element, and there's no other way to find it.
-        foreach ($this->getSession()->getPage()->findAll('css', '.ms-ctn input') as $autocompleteInput) {
-            /** @var Element\NodeElement $autocompleteInput */
-            $autocompleteInput->focus();
-        }
-
-        // Find $field
-        // Find .ms-sel-ctn above that
-        // Type into text input inside that
-        /** @var Element\NodeElement $autocompleteBase */
-        $autocompleteBase = $this->getSession()->getPage()->find('css', 'input[name="'.$field.'"]');
-        if (!($autocompleteBase instanceof Element\NodeElement)) {
-            throw new Exception('Could not find autocomplete for field named "'.$field.'"');
-        }
-        $typeInput = $autocompleteBase->getParent()->find('css', 'input[type="text"]');
+        $typeInput = $this->getAutocompleteContainer($field)->find('css', 'input[type="text"]');
         if (!($typeInput instanceof Element\NodeElement)) {
             throw new Exception('Could not find autocomplete input for field named "'.$field.'"');
         }
@@ -63,4 +74,23 @@ class Subcontext_AutocompleteContext extends BaseContext {
         throw new Exception('Could not find autocomplete option "'.$option.'" for field named "'.$field.'"');
     }
 
+    /**
+     * Removes a selected option from an autocomplete.
+     *
+     * @When /^(?:|I )remove "(?P<option>[^"]*)" from autocomplete "(?P<field>[^"]*)"$/
+     */
+    public function removeFromAutocomplete($option, $field) {
+        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.ms-sel-item') as $item) {
+            /** @var Element\NodeElement $item */
+            if (mb_strpos($item->getText(), $option) !== false) {
+                $close = $item->find('css', '.ms-close-btn');
+                if (!($close instanceof Element\NodeElement)) {
+                    throw new Exception('Could not remove button for autocomplete option "'.$option.'" for field named "'.$field.'"');
+                }
+                $item->find('css', '.ms-close-btn')->click();
+                return;
+            }
+        }
+        throw new Exception('Could not find autocomplete option "'.$option.'" for field named "'.$field.'"');
+    }
 }
