@@ -48,6 +48,40 @@ class Controller extends Base {
     }
 
     /**
+     * Views an existing category
+     *
+     * @param int $id
+     */
+    public function read($id) {
+        $item = $this->getMapper()->findById($id);
+        $this->getResponse()->content->set(
+            array(
+                'template' => __DIR__.'/templates/read.twig',
+                'data'     => array(
+                    'item' => $item,
+                ),
+            )
+        );
+    }
+
+    /**
+     * Display form for editing a category
+     *
+     * @param int $id
+     */
+    public function edit($id) {
+        $this->getResponse()->content->set(
+            array(
+                'template' => __DIR__.'/templates/edit.twig',
+                'data'     => array(
+                    'item'         => $this->getMapper()->findById($id),
+                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
+                ),
+            )
+        );
+    }
+
+    /**
      * Backend for adding a new category
      */
     public function create() {
@@ -66,6 +100,41 @@ class Controller extends Base {
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('resourceItem.browse', array())
+        );
+    }
+
+    /**
+     * Backend for updating an existing category
+     *
+     * @param int $id
+     */
+    public function update($id) {
+        $post  = $this->getRequest()->post;
+        $model = $this->getMapper()->findById($id);
+        $model
+            ->setName($post['name'])
+            ->setDescription($post['description'])
+            ->setCategory($post['resource_category_id'])
+        ;
+        $this->getMapper()->save($model);
+        // Return something.
+        // If this is a JSON request, output a result - maybe if this is a
+        // HTML request, redirect somewhere.
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('resourceItem.browse', array())
+        );
+    }
+
+    /**
+     * Deletes an item
+     *
+     * @param int $id
+     */
+    public function delete($id) {
+        $item = $this->getMapper()->findById($id);
+        $this->getMapper()->delete($item);
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate('resourceItem.browse', array())
         );
