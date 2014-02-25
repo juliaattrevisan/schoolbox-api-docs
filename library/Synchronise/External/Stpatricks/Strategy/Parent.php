@@ -44,6 +44,7 @@ class Synchronise_External_Stpatricks_Strategy_Parent extends Synchronise_Extern
         $newUser['lastname'] = trim($currentUser['lastName']);
         $newUser['synergy_id'] = $currentUser['parentID'];
         $newUser['alt_email'] = $currentUser['externalEmail'];
+        $newUser['password'] = $currentUser['password'];
         $newUser['local_email'] = 0;
 
         // there is only one campus

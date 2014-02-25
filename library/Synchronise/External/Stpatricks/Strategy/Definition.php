@@ -23,7 +23,7 @@ class Synchronise_External_Stpatricks_Strategy_Definition extends Synchronise_Ex
         );
 
         $this->setDefinition('parent',
-            array('parentID', 'title', 'firstName', 'lastName', 'networkLogin', '?', 'externalEmail')
+            array('parentID', 'title', 'firstName', 'lastName', 'networkLogin', 'password', 'externalEmail')
         );
 
         $this->setDefinition('parentrelation',
