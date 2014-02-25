@@ -126,7 +126,7 @@ Scenario: Manage resources
   Then  I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
-  And   I should not see "The good projector" in the ".resource-list" element
+  And   I should not see "The special projector" in the ".resource-list" element
   # Delete a resource
   When  I follow "resource-create"
   And   I fill in the following:
@@ -137,7 +137,7 @@ Scenario: Manage resources
     | max_reservation_time | 02:00:00      |
   And   I select "Projectors" from "resource_category_id"
   And   I select "Open" from "resource_moderation_type_id"
-  And   I press "Save"
+  And   I press "resource-save"
   Then  I should see "To be deleted" in the ".resource-list" element
   And   I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
