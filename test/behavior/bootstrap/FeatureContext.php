@@ -27,6 +27,15 @@ class FeatureContext extends BaseContext {
     }
 
     /**
+     * Ensures user is logged out before scenario starts.
+     *
+     * @BeforeScenario
+     */
+    public function logout(Behat\Behat\Event\ScenarioEvent $event) {
+        $this->getSession()->visit('/logout.php');
+    }
+
+    /**
      * Resets the browser after a scenario has run.
      *
      * @AfterScenario
