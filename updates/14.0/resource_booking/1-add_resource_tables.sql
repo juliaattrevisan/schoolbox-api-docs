@@ -35,14 +35,14 @@ CREATE TABLE `resource` (
   `name` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
   `description` text COLLATE utf8_unicode_ci NOT NULL,
   `resource_category_id` int NOT NULL,
-  `resource_moderation_type_id` tinyint NOT NULL,
+  `resource_moderation_type_id` tinyint NOT NULL DEFAULT 1,
   -- image: link to file upload? Is it a brownhole link, or just an image URL?
   -- Could there be multiple images linked?
   `image_url` VARCHAR(250) NULL DEFAULT NULL,
-  `min_lead_time` TIME NOT NULL DEFAULT '00:00:00',
-  `min_reservation_time` TIME NOT NULL DEFAULT '00:00:00',
+  `min_lead_time` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
+  `min_reservation_time` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
   -- Max time: let's say 24 hours by default
-  `max_reservation_time` TIME NOT NULL DEFAULT '24:00:00',
+  `max_reservation_time` MEDIUMINT UNSIGNED NOT NULL DEFAULT 86400,
   `created_at` DATETIME NOT NULL,
   `modified_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
