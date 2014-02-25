@@ -104,8 +104,8 @@ Scenario: Manage resources
     | max_reservation_time | 02:00:00                 |
   And  I select "Textbooks" from "resource_category_id"
   And  I select "Moderated" from "resource_moderation_type_id"
-  And  I fill in autocomplete "moderator_id" with "Jennifer"
-  And  I select "Jennifer Shadbolt" from autocomplete "moderator_id"
+  And  I fill in autocomplete "moderator_id" with "Jenifer"
+  And  I select "Jenifer Shadbolt" from autocomplete "moderator_id"
   And  I fill in autocomplete "moderator_id" with "Lovejoy"
   And  I select "Peter Lovejoy" from autocomplete "moderator_id"
   And  I fill in autocomplete "moderator_id" with "Scott"
