@@ -16,7 +16,6 @@ class Synchronise_Synergetic_Scs_Strategy_Student extends Synchronise_Base_Strat
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
-            ->addHydrator(new Synchronise_Base_Hydrator_Student_UsernameFromId())
 			->addHydrator(new Synchronise_Base_Hydrator_Webmail())
 			->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
 			->addHydrator(new Synchronise_Base_Hydrator_MailHandler())
