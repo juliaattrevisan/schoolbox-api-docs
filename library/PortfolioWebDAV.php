@@ -343,6 +343,29 @@ class PortfolioWebDAV
             }
 
         }
+        else if ($site_location == 'iggs'){
+
+            $settings = array(
+                'userName' =>  $_SESSION['username'],
+                'password' => $_SESSION['password'],
+                'baseUri' => 'https://myschool1.ivanhoegirls.vic.edu.au',
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    '/webdavstaff/' . $_SESSION['username'] . '/',
+                    '/webdavshared/'
+                );
+            } else if ($groupHandler->isStudent()) {
+                $paths = array(
+                    '/webdavstudent/' . $_SESSION['username'] . '/',
+                    '/webdavshared/'
+                );
+            } else {
+                return false;
+            }
+
+        }
         else if (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
