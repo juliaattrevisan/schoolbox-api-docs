@@ -774,7 +774,6 @@ class StudentReportCard {
 	}
 
 	protected function renderComments(\SitePage $page) {
-
 		$page->setBlock('subject', 'subject_comments', 'subject_comments_block');
 		$page->setBlock('subject_comments', 'comment', 'comment_block');
 		$page->setBlock('subject_comments', 'create_comment', 'create_comment_block');
@@ -841,7 +840,6 @@ class StudentReportCard {
 		// retrieve the comments visible to the session user
 		$comments = $conversation->getVisibleComments($sessionUser);
 
-
 		// if there are comments, output them
 		if($comments->count()) {
 			foreach($comments as $comment) {
@@ -857,7 +855,7 @@ class StudentReportCard {
 				$commentData = array(
 					'ID' => $comment->getId(),
 					'USER_NAME' => $comment->getCommenter()->formatName(),
-					'USER_BYLINE' => $comment->getCommenter()->getRole(),
+					'USER_BYLINE' => $comment->getCommenter()->getRole()->getName(),
 					'USER_EXTID' => $comment->getCommenter()->getExternalId(),
 					'DATE' => $date,
 					'DATETIME' => $adr->getDatabase(),
@@ -885,7 +883,9 @@ class StudentReportCard {
 
 				// render all comment vars
 				foreach($commentData as $k => $v) {
-					$page->setVar('COMMENT_'.$k, $v);
+					if (!is_object($v)) {
+						$page->setVar('COMMENT_'.$k, $v);
+					}
 				}
 
 				// you can only modify a comment if you made it

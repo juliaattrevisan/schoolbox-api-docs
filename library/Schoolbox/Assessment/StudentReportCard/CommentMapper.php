@@ -169,21 +169,23 @@ class CommentMapper extends Mapper {
 
 
 	public function findByStudentAndCategory($studentId, $categoryId, $includeDeletions = false) {
-
 		$categoryMapper = $this->getJoinMapper('category');
 		$studentMapper = $this->getJoinMapper('student');
 		$commenterMapper = $this->getJoinMapper('commenter');
+		$roleMapper = $commenterMapper->getJoinMapper('role');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('com')},
 				{$categoryMapper->getColumnString('cat')},
 				{$studentMapper->getColumnString('su')},
+				{$roleMapper->getColumnString('r')},
 				{$commenterMapper->getColumnString('cu')}
 			FROM {$this->getTable()} as `com`
 			LEFT JOIN {$this->getJoinSql('category','com','cat')}
 			LEFT JOIN {$this->getJoinSql('student','com','su')}
 			LEFT JOIN {$this->getJoinSql('commenter','com','cu')}
+			LEFT JOIN {$commenterMapper->getJoinSql('role','cu','r')}
 			WHERE com.student_id = ?
 			AND com.category_id = ?
 		";
@@ -205,6 +207,7 @@ class CommentMapper extends Mapper {
 			$commentObject->setCategory($categoryMapper->hydrate($record, 'cat'));
 			$commentObject->setStudent($studentMapper->hydrate($record, 'su'));
 			$commentObject->setCommenter($commenterMapper->hydrate($record, 'cu'));
+			$commentObject->getCommenter()->setRole($roleMapper->hydrate($record, 'r'));
 			$commentCollection->add($commentObject);
 		}
 
