@@ -34,7 +34,11 @@ class Leave_Core_Notice_User_Authorised extends Leave_Core_Notice_User_Abstract 
 	 * Send it
 	 */
 	public function send() {
-		$this->getEmail()->send();
+		$email = new \Email($this->getRequest()->getUser()->getAltEmail());
+
+		if ($email->isValid()) {
+			$this->getEmail()->send();
+		}
 	}
 }
 

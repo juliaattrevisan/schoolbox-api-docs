@@ -85,7 +85,15 @@ class Mailer {
     public function setFromAsCurrentUser() {
         $email_object  = new Email();
         $email_address = $email_object->formatEmailFromArray($_SESSION);
-        $this->setFrom($email_address, trim($_SESSION['firstname'].' '.$_SESSION['lastname']));
+
+		/* Assign email address only if it's valid
+		 */
+		$email = new \Email($email_address);
+
+		if ($email->isValid()) {
+        	$this->setFrom($email_address, trim($_SESSION['firstname'].' '.$_SESSION['lastname']));
+		}
+
         return $this;
     }
 
