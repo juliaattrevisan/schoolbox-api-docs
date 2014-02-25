@@ -69,60 +69,60 @@ Scenario: Manage resources
   # Create some resources
   And   I follow "resource-create"
   And   I fill in the following:
-    | name                        | A single projector                   |
-    | description                 | A projector that can be moved around |
-    | resource_category_id        | Projectors                           |
-    | resource_moderation_type_id | Open                                 |
-    | min_lead_time               | 00:00:00                             |
-    | min_reservation_time        | 01:00:00                             |
-    | max_reservation_time        | 02:00:00                             |
-  And  I press "save"
+    | name                 | A single projector                   |
+    | description          | A projector that can be moved around |
+    | min_lead_time        | 00:00:00                             |
+    | min_reservation_time | 01:00:00                             |
+    | max_reservation_time | 02:00:00                             |
+  And  I select "Projectors" from "resource_category_id"
+  And  I select "Open" from "resource_moderation_type_id"
+  And  I press "resource-save"
   Then I should see "A single projector" in the ".resource-list" element
   # Create a resource with a different moderator. (I can still moderate this resource.)
   When  I follow "resource-create"
   And   I fill in the following:
-    | name                        | English textbook            |
-    | description                 | A Unit 1/2 English textbook |
-    | resource_category_id        | Textbooks                   |
-    | resource_moderation_type_id | Moderated                   |
-    | min_lead_time               | 00:00:00                    |
-    | min_reservation_time        | 00:00:00                    |
-    | max_reservation_time        | 168:00:00                   |
+    | name                 | English textbook            |
+    | description          | A Unit 1/2 English textbook |
+    | min_lead_time        | 00:00:00                    |
+    | min_reservation_time | 00:00:00                    |
+    | max_reservation_time | 168:00:00                   |
+  And  I select "Textbooks" from "resource_category_id"
+  And  I select "Moderated" from "resource_moderation_type_id"
   # Entering a user into a autocomplete field
   And  I fill in autocomplete "moderator_id" with "Celia"
   And  I select "Celia Glenn" from autocomplete "moderator_id"
-  And  I press "save"
+  And  I press "resource-save"
   Then I should see "A single projector" in the ".resource-list" element
   And  I should see "English textbook" in the ".resource-list" element
   # Create a managed resource
   When  I follow "resource-create"
   And   I fill in the following:
-    | name                        | The special projector    |
-    | description                 | A projector made of gold |
-    | resource_category_id        | Textbooks                |
-    | resource_moderation_type_id | Moderated                |
-    | min_lead_time               | 24:00:00                 |
-    | min_reservation_time        | 01:00:00                 |
-    | max_reservation_time        | 02:00:00                 |
+    | name                 | The special projector    |
+    | description          | A projector made of gold |
+    | min_lead_time        | 24:00:00                 |
+    | min_reservation_time | 01:00:00                 |
+    | max_reservation_time | 02:00:00                 |
+  And  I select "Textbooks" from "resource_category_id"
+  And  I select "Moderated" from "resource_moderation_type_id"
   And  I fill in autocomplete "moderator_id" with "Jennifer"
   And  I select "Jennifer Shadbolt" from autocomplete "moderator_id"
   And  I fill in autocomplete "moderator_id" with "Lovejoy"
   And  I select "Peter Lovejoy" from autocomplete "moderator_id"
   And  I fill in autocomplete "moderator_id" with "Scott"
   And  I select "Scott Berryhill" from autocomplete "moderator_id"
-  And  I press "Save"
+  And  I press "resource-save"
   Then I should see "A single projector" in the ".resource-list" element
   And  I should see "English textbook" in the ".resource-list" element
   And  I should see "The special projector" in the ".resource-list" element
   # Update a resource
   When  I follow "The special projector"
   And   I fill in the following:
-    | name                        | The good projector       |
-    | description                 | A projector made of gold |
-    | resource_category_id        | Projectors               |
-    | resource_moderation_type_id | Managed                  |
+    | name        | The good projector       |
+    | description | A projector made of gold |
+  And   I select "Projectors" from "resource_category_id"
+  And   I select "Managed" from "resource_moderation_type_id"
   And   I remove "Scott Berryhill" from autocomplete "moderator_id"
-  And   I press "Save"
+  And   I press "resource-save"
   Then  I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
@@ -130,13 +130,13 @@ Scenario: Manage resources
   # Delete a resource
   When  I follow "resource-create"
   And   I fill in the following:
-    | name                        | To be deleted |
-    | description                 | To be deleted |
-    | resource_category_id        | Projectors    |
-    | resource_moderation_type_id | Open          |
-    | min_lead_time               | 00:00:00      |
-    | min_reservation_time        | 01:00:00      |
-    | max_reservation_time        | 02:00:00      |
+    | name                 | To be deleted |
+    | description          | To be deleted |
+    | min_lead_time        | 00:00:00      |
+    | min_reservation_time | 01:00:00      |
+    | max_reservation_time | 02:00:00      |
+  And   I select "Projectors" from "resource_category_id"
+  And   I select "Open" from "resource_moderation_type_id"
   And   I press "Save"
   Then  I should see "To be deleted" in the ".resource-list" element
   And   I should see "A single projector" in the ".resource-list" element
