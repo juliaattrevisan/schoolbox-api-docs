@@ -190,6 +190,9 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$event = new \EOTC\Event();
 		$event->setupDates($_GET['date']);
 
+		$metadata = new \EOTC\EventMetadata();
+		$event->setMetadata($metadata);
+
 		$defaultTypeId = '';
 		$defaultCampusId = array($_SESSION['campus'][0]);
 
@@ -208,7 +211,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 		$page->setVar(array(
 			'EVENT_RAMS_FILE' => '',
-			'EVENT_CURRENT_STUDENTS' => $event->getMetadata()->getStudentAttendees()->count(),
+			'EVENT_CURRENT_STUDENTS' => 0,
 			'EVENT_TEACHER_IN_CHARGE' => json_encode(array()),
 			'EVENT_STAFF' => json_encode(array()),
 			'EVENT_STATUS' => $status->getName(),

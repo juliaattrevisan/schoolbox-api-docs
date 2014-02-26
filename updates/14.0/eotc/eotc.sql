@@ -68,3 +68,6 @@ INSERT INTO `luEventType` (`eventType`, `eventColour`) VALUES ('EOTC', 'aaaaaa')
 /* EOTC Config
  */
 CREATE TABLE `eotc_config`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), `value` VARCHAR(255), PRIMARY KEY (`id`) );
+INSERT INTO `eotc_config` (`name`, `value`) VALUES ('first_reminder', '10');
+INSERT INTO `eotc_config` (`name`, `value`) VALUES ('daily_reminder', '3');
+INSERT INTO `eotc_config` (`name`, `value`) VALUES ('urgent_threshold', '3');
