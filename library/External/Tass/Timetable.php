@@ -154,10 +154,10 @@ class External_Tass_Timetable implements External_TimetableInterface
                     ORDER BY ttdate DESC";
 
         $result= $this->getDatabase()->getRow($query);
+        $time = strtotime($result['ttdate']);
+        $this->tassDay[$time] = $result['day_code'];
 
-        $this->tassDay[$result['ttdate']] = $result['day_code'];
-
-        return $result['ttdate'];
+        return $time;
     }
 
     //returns the period number for the current time
