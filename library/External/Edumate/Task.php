@@ -50,7 +50,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 
 					/* Ignore everything if you can't find a Schoolbox Category
 					 */
-					echo "X  Cannot find Category with code {$row['CLASS_CODE']} for task {$row['TASK_ID']} {$row['TASK']}\n";
+					echo "!  Cannot find Category with code {$row['CLASS_CODE']} for task {$row['TASK_ID']} {$row['TASK']}\n";
 					continue;
 				}
 
@@ -102,7 +102,14 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				 * from which it spawned
 				 */
 				$taskMapper->createRelation($submissionBox, $row['TASK_ID']);
+
+				/* Alert user
+				 */
+				echo "+  Added {$row['TASK_ID']} {$row['TASK']}\n";
+			}
+			else {
+				echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} because it already exists\n";
 			}
 		}
 	}
-} 
+}
