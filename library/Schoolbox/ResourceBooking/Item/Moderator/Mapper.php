@@ -49,9 +49,9 @@ class Mapper extends BaseMapper {
             )
         );
         $this->hasJoin(
-            'moderation_type',
+            'moderator',
             array(
-                'mapper'    => '\\Schoolbox\\User',
+                'mapper'    => '\\Schoolbox\\UserMapper',
                 'this_key'  => 'moderator_id',
                 'other_key' => 'id',
             )

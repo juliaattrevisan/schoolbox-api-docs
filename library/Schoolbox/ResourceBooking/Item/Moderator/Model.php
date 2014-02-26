@@ -22,12 +22,12 @@ class Model {
     /**
      * @var User
      */
-    protected $user;
+    protected $moderator;
 
     /**
      * @var Item\Model
      */
-    protected $item;
+    protected $resource;
 
     /**
      * @param  int $id
@@ -50,32 +50,32 @@ class Model {
      * @param  Item\Model $item
      * @return $this
      */
-    public function setItem($item) {
-        $this->item = $item;
+    public function setResource($item) {
+        $this->resource = $item;
         return $this;
     }
 
     /**
      * @return Item\Model
      */
-    public function getItem() {
-        return $this->item;
+    public function getResource() {
+        return $this->resource;
     }
 
     /**
      * @param  User $user
      * @return $this
      */
-    public function setUser($user) {
-        $this->user = $user;
+    public function setModerator($user) {
+        $this->moderator = $user;
         return $this;
     }
 
     /**
      * @return User
      */
-    public function getUser() {
-        return $this->user;
+    public function getModerator() {
+        return $this->moderator;
     }
 
 
