@@ -73,22 +73,6 @@ abstract class External_Edumate_Connection {
 		return $record;
 	}
 
-	/**
-	 * Show all the tables
-	 */
-	public function showSchema() {
-		$query = "
-select tabname from syscat.tables where owner = 'DB2INST1'
-		";
-
-		$statement = $this->getDatabase()->prepare($query);
-		$statement->execute();
-
-		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-			new \Alaress_Probe($row);
-		}
-	}
-
 	/* Getters/Setters
 	 */
 
