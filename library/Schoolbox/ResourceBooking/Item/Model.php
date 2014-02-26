@@ -9,10 +9,12 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 
+use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;
 use DateInterval;
+use Schoolbox\User;
 
 class Model implements ISoftDeletable {
 
@@ -72,6 +74,15 @@ class Model implements ISoftDeletable {
      * @var Alaress_Date_Format
      */
     protected $deletedAt;
+
+    /**
+     * @var Collection|User[]
+     */
+    protected $moderatorList;
+
+    public function __construct() {
+        $this->setModeratorList(new Collection());
+    }
 
     /**
      * @param  Category\Model $category
@@ -249,6 +260,30 @@ class Model implements ISoftDeletable {
      */
     public function getModerationType() {
         return $this->moderationType;
+    }
+
+    /**
+     * @param  Collection|User[] $moderatorList
+     * @return $this
+     */
+    public function setModeratorList($moderatorList) {
+        $this->moderatorList = $moderatorList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getModeratorList() {
+        return $this->moderatorList;
+    }
+
+    /**
+     * @param  User $moderator
+     * @return $this
+     */
+    public function addModerator($moderator) {
+        return $this->getModeratorList()->add($moderator);
     }
 
     /**
