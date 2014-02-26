@@ -163,7 +163,7 @@ Scenario: Check resource permissions
   # Regular users get a readonly view of resources, eventually they will be able
   # to book them
   And   I log in as "sberryhill" with password "password"
-  When  I go to "/resource-booking"
+  When  I go to "/resource-booking/item"
   Then  I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
