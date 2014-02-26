@@ -125,9 +125,9 @@ class External_Tass_User implements External_UserInterface {
                           post_code StudentContactPostCode,
 						  home_phone as StudentContactPhoneActual,
 						  bus_phone as StudentContactOccupPhone,
-						  mobile1 as StudentContactMobilePhone,
+						  '' as StudentContactMobilePhone,
 						  parent.m_name as StudentContactSpousePreferred,
-                          mobile2 as StudentContactSpouseMobilePhone
+                          '' as StudentContactSpouseMobilePhone
 						FROM student
 						JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
 						JOIN paraddress ON parent.par_code = paraddress.par_code AND paraddress.cmpy_code = parent.cmpy_code AND add_num = 1
