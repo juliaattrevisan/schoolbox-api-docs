@@ -10,6 +10,7 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Collection;
 
 class Mapper extends BaseMapper {
 
@@ -128,7 +129,72 @@ class Mapper extends BaseMapper {
                 'this_key'  => 'id',
                 'other_key' => 'resource_id',
                 'multiple'  => true,
+                // Better M2M joins:
+//                'mapper'    => '\\Schoolbox\\User',
+//                'this_key'  => 'id',
+//                'other_key' => 'id',
+//                'multiple'  => true,
+//                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
             )
+        );
+        $this->registerCallback('postSave', array($this, 'postSave'));
+    }
+
+    /**
+     * Ensures that moderators are saved after the item is loaded.
+     */
+    public function postSave(Model $object) {
+        $mapper  = $this->getJoinMapper('moderator');
+        $oldList = $mapper->findByColumn('resource_id', $object->getId());
+        $newList = new Collection();
+        foreach ($object->getModeratorList() as $moderator) {
+            $joinObject = new Moderator\Model();
+            $joinObject->setModerator($moderator)->setResource($object);
+            $newList->add($joinObject);
+        }
+
+        // Save all newList items that aren't in oldList
+        // Delete all vice versa
+        $diffMethod = function($a, $b) {
+            return $a->getModerator()->getId() == $b->getModerator()->getId();
+        };
+        $mapper->save($newList->diff($oldList, $diffMethod));
+        $mapper->delete($oldList->diff($newList, $diffMethod));
+    }
+
+    /**
+     * Overrides hydrate() to populate the list of moderators.
+     *
+     * @todo Replace with a method which doesn't involve a query per resource.
+     *
+     * @param array  $row
+     * @param string $alias
+     * @param null   $callback
+     *
+     * @return object
+     */
+    public function hydrate($row, $alias = '', $callback = null) {
+        return parent::hydrate(
+            $row,
+            $alias,
+            function($mapper, $model, $row) {
+                /** @var self $mapper */
+                /** @var Model $model */
+                $modMapper  = $mapper->getJoinMapper('moderator');
+                $userMapper = $modMapper->getJoinMapper('moderator');
+                $query     = "
+                    SELECT
+                      {$modMapper->getColumnString('m')},
+                      {$userMapper->getColumnString('u')}
+                    FROM {$modMapper->getTable()} `m`
+                    INNER JOIN {$modMapper->getJoinSql('moderator', 'm', 'u')}
+                    WHERE m.resource_id=?
+                ";
+                $statement = $userMapper->getDatabase()->prepare($query);
+                $statement->execute(array($model->getId()));
+                $model->setModeratorList($userMapper->hydrateList($statement, 'u'));
+                return $model;
+            }
         );
     }
 
