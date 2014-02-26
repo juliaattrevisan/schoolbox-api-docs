@@ -18,7 +18,6 @@ class Synchronise_Synergetic_Donvale_Strategy_Student extends Synchronise_Base_S
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
 			->addHydrator(new Synchronise_Synergetic_Donvale_Hydrator_NoWebmail())
-            ->addHydrator(new Synchronise_Base_Hydrator_Student_UsernameFromId())
             ->addHydrator(new Synchronise_Synergetic_Donvale_Hydrator_House())
             ->addHydrator(new Synchronise_Synergetic_Donvale_Hydrator_Campus())
             ->addHydrator(new Synchronise_Synergetic_Donvale_Hydrator_Group_Student())
