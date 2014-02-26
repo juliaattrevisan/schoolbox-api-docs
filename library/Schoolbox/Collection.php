@@ -369,6 +369,40 @@ class Collection implements \ICollection {
 	}
 
 	/**
+	 * Returns a new collection containing items that are in $this, but not in
+	 * $otherCollection.
+	 *
+	 * @param  Collection $otherCollection
+	 * @param  callable   $diffMethod The callback method to use for deciding
+	 *                                whether two items are the same.
+	 *                                Defaults to == comparison.
+	 * @return Collection
+	 */
+	public function diff(Collection $otherCollection, $diffMethod = null) {
+		$diff = new Collection();
+
+		if (!is_callable($diffMethod)) {
+			$diffMethod = function($a, $b) {
+				return $a == $b;
+			};
+		}
+
+		foreach ($this as $item) {
+			$inCollection = false;
+			foreach ($otherCollection as $otherItem) {
+				if (call_user_func($diffMethod, $item, $otherItem)) {
+					$inCollection = true;
+					break;
+				}
+			}
+			if (!$inCollection) {
+				$diff->add($item);
+			}
+		}
+		return $diff;
+	}
+
+	/**
 	 * Groups all results by a field value.
 	 *
 	 * @param  string $field The field to search by.
