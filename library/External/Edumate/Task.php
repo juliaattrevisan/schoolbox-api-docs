@@ -44,8 +44,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 					/* Assign submission box owner
 					 */
 					$category->loadTeachers();
-					$owner = $category->getTeachers()->first();
-					$submissionBox->setOwner($owner);
+					$submissionBox->setOwner($category->getTeachers()->first());
 				}
 				catch (\Exception $e) {
 				}
@@ -54,7 +53,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				 */
 				try {
 					$workType = $workTypeMapper->findByColumn('name', $row['TASK_TYPE']);
-					$submissionBox->setWorkType($workType);
+					$submissionBox->setWorkType($workType->first());
 				}
 				catch (\Exception $e) {
 				}
@@ -62,7 +61,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				/* Assign name, description
 				 */
 				$submissionBox->setName($row['TASK']);
-				$submissionBox->setDescription($row['DESCRIPTION']);
+				$submissionBox->setDescription('' . $row['DESCRIPTION']);
 
 				/* Assign dates
 				 */
@@ -80,7 +79,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				 */
 				try {
 					$markType = $markTypeMapper->findByColumn('slug', 'raw');
-					$submissionBox->setMarkType($markType);
+					$submissionBox->setMarkType($markType->first());
 				}
 				catch (\Exception $e) {
 				}
@@ -91,12 +90,12 @@ class External_Edumate_Task extends External_Edumate_Connection {
 
 				/* Add this submission box to the tableau
 				 */
-				$id = $submissionBoxMapper->save($submissionBox);
+				$submissionBoxMapper->save($submissionBox);
 
 				/* Create a relation between the submission box and the Task
 				 * from which it spawned
 				 */
-				new \Alaress_Probe($row);
+				$taskMapper->createRelation($submissionBox, $row['TASK_ID']);
 			}
 		}
 	}
