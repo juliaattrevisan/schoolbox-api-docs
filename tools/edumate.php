@@ -10,5 +10,5 @@
 
 require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
 
-$externalClass = new \External_Class();
-$externalClass->showSchema();
+$importer = new \External_Edumate_Task();
+$importer->importAllTasks();
