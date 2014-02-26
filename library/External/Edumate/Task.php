@@ -32,7 +32,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 		 * have submission boxes
 		 */
 		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-			if (!$taskMapper->isTaskExists($row['TASK_ID'])) {
+			if (!$taskMapper->isTaskExists($row['TASK_ID'], $row['CLASS_CODE'])) {
 				$submissionBox = new \Schoolbox\Assessment\Component\SubmissionBox();
 
 				/* Assign category if it exists in schoolbox
@@ -101,7 +101,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				/* Create a relation between the submission box and the Task
 				 * from which it spawned
 				 */
-				$taskMapper->createRelation($submissionBox, $row['TASK_ID']);
+				$taskMapper->createRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE']);
 
 				/* Alert user
 				 */

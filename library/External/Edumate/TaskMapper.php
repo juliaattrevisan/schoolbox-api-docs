@@ -14,17 +14,20 @@ class External_Edumate_TaskMapper extends \Schoolbox\Mapper {
 	 * Find out if an Edumate Task already exists as a SubmissionBox
 	 *
 	 * @param $edumateTaskId
+	 * @param $categoryCode
 	 * @return bool
 	 */
-	public function isTaskExists($edumateTaskId) {
+	public function isTaskExists($edumateTaskId, $categoryCode) {
 		$query = "
 			SELECT COUNT(*) AS num
 			FROM submission_box_edumate_task
 			WHERE task_id = :edumateTaskId
+			AND category_code = :categoryCode
 		";
 
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindParam(':edumateTaskId', $edumateTaskId);
+		$statement->bindParam(':categoryCode', $categoryCode);
 		$statement->execute();
 
 		$row = $statement->fetch();
@@ -43,16 +46,18 @@ class External_Edumate_TaskMapper extends \Schoolbox\Mapper {
 	 *
 	 * @param $submissionBox
 	 * @param $edumateTaskId
+	 * @param $categoryCode
 	 */
-	public function createRelation($submissionBox, $edumateTaskId) {
+	public function createRelation($submissionBox, $edumateTaskId, $categoryCode) {
 		$query = "
-			INSERT INTO submission_box_edumate_task (submission_box_id, task_id)
-			VALUES (:submissionBoxId, :edumateTaskId)
+			INSERT INTO submission_box_edumate_task (submission_box_id, task_id, category_code)
+			VALUES (:submissionBoxId, :edumateTaskId, :categoryCode)
 		";
 
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindParam(':submissionBoxId', $submissionBox->getId());
 		$statement->bindParam(':edumateTaskId', $edumateTaskId);
+		$statement->bindParam(':categoryCode', $categoryCode);
 		$statement->execute();
 	}
 }
