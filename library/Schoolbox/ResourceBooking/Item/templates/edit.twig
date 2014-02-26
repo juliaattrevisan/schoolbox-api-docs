@@ -18,7 +18,8 @@
                     data:'/ajax/user.php?groupID=0',
                     width: 200
                 },
-                multiple: true
+                multiple: true,
+                value: {{ moderatorList|json_encode|raw }}
             })
 
         })
