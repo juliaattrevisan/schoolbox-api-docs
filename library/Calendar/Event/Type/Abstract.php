@@ -172,16 +172,16 @@ abstract class Calendar_Event_Type_Abstract {
 	public function getEventSpan() {
 		if ($this->getStartTime()->getDatabaseDate() != $this->getEndTime()->getDatabaseDate()) {
 			if ($this->getAllDay()) {
-				return $this->getStartTime()->getCalendarDate() . '&ndash;' . $this->getEndTime()->getCalendarDate();
+				return $this->getStartTime()->getCalendarDate() . ' &ndash; ' . $this->getEndTime()->getCalendarDate();
 			}
 
-			return $this->getStartTime()->getCalendarDateTime() . '&ndash;' . $this->getEndTime()->getCalendarDateTime();
+			return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime()->getCalendarDateTime();
 		}
 		else {
 			if ($this->getAllDay()) {
-				return 'All Day';
+				return $this->getStartTime()->getCalendarDate();
 			}
-			return $this->getStartTime()->getTimeOnly() . '&ndash;' . $this->getEndTime()->getTimeOnly();
+			return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime()->getTimeOnly();
 		}
 	}
 

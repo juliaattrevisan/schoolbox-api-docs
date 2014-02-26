@@ -735,7 +735,9 @@ class Calendar extends DeprecatedModel {
 				)
 				$filter_query
 			GROUP BY id
-			ORDER BY event.startTime, event.endTime
+			ORDER BY
+				event.startDate, event.endDate,
+				event.startTime, event.endTime
 		";
 
         $allEvents = $this->db->getAll($query);
