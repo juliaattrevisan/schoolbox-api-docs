@@ -36,7 +36,8 @@ if (is_numeric($this->arg[0])) {
 	    $this->setBlock('contact_details', 'contact_mobile', 'contact_mobile_block');
 	    $this->setBlock('contact_details', 'contact_phone', 'contact_phone_block');
         $this->setBlock('contact_details', 'spouse_details', 'spouse_details_block');
-	    $this->setBlock('contact_synergy', 'emergency_contact', 'emergency_contact_block');
+        $this->setBlock('contact_synergy', 'emergency', 'emergency_block');
+        $this->setBlock('emergency', 'emergency_contact', 'emergency_contact_block');
 	    $this->setBlock('spouse_details', 'spouse_email', 'spouse_email_block');
 	    $this->setBlock('spouse_details', 'spouse_mobile', 'spouse_mobile_block');
 	    $this->setBlock('spouse_details', 'spouse_phone', 'spouse_phone_block');
@@ -383,7 +384,7 @@ if (is_numeric($this->arg[0])) {
 	                if (is_array($studentContactList)) {
 	                    $prevContact['StudentContactID'] = 1;
 	                    foreach ($studentContactList as $studentContact) {
-	                        if ($prevContact['StudentContactID'] != $studentContact['StudentContactSpouseID'] && ( (int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su'])) {
+	                        if ($prevContact['StudentContactID'] != $studentContact['StudentContactSpouseID'] && ( $studentContact['StudentContactID'] == $_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su'])) {
 	                            $j++;
 
 		                        if ($studentContact['StudentContactDefaultEmail']) {
@@ -492,6 +493,9 @@ if (is_numeric($this->arg[0])) {
 
 		            /* Output emergency contacts */
 		            $this->setVar('emergency_contact_block','');
+                    $this->setVar('emergency_block','');
+
+                    $emergencySet = false;
 		            for($x = 1; $x <= 3; $x++) {
 			            $index = $x == 1?'':$x;
 
@@ -502,8 +506,13 @@ if (is_numeric($this->arg[0])) {
 		                          'EMERGENCY_ALT_PHONE' => '<a href="tel:'.Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']).'">'.Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']).'</a>',
 				                          ));
 			                $this->parse('emergency_contact_block', 'emergency_contact', true);
+                            $emergencySet = true;
 			            }
 		            }
+                    if($emergencySet) {
+                        $this->parse('emergency_block', 'emergency');
+                    }
+
 
 	                if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild($user['uid']))) {
 	                    if (trim($synInfo['StudentMedicalAlert'])) {

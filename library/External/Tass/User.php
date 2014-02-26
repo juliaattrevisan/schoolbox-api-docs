@@ -115,7 +115,7 @@ class External_Tass_User implements External_UserInterface {
 
 	function getStudentContactList ($tassID) {
 
-		$query = "SELECT  student.par_code as StudentContactID,
+		$query = "SELECT  'P' + student.par_code as StudentContactID,
                           parent.f_name StudentContactPreferred,
                           addr1 StudentContactAddress1,
                           addr2 StudentContactAddress2,
