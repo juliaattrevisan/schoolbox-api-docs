@@ -47,6 +47,11 @@ class External_Edumate_Task extends External_Edumate_Connection {
 					$submissionBox->setOwner($category->getTeachers()->first());
 				}
 				catch (\Exception $e) {
+
+					/* Ignore everything if you can't find a Schoolbox Category
+					 */
+					echo "X  Cannot find Category with code {$row['CLASS_CODE']} for task {$row['TASK_ID']} {$row['TASK']}\n";
+					continue;
 				}
 
 				/* Assign work type
@@ -95,7 +100,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				/* Create a relation between the submission box and the Task
 				 * from which it spawned
 				 */
-				$taskMapper->createRelation($submissionBox, $row['TASK_ID']);
+//				$taskMapper->createRelation($submissionBox, $row['TASK_ID']);
 			}
 		}
 	}
