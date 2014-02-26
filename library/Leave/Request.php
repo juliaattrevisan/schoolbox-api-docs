@@ -32,6 +32,7 @@ class Leave_Request {
     protected $id;
     protected $userId;
     protected $user;
+	protected $authorId;
     protected $start;
     protected $finish;
     protected $hostType;
@@ -507,4 +508,22 @@ class Leave_Request {
     public function getTravelType() {
         return $this->travelType;
     }
+
+	/**
+	 * Set author id
+	 *
+	 * @param mixed $authorId
+	 */
+	public function setAuthorId($authorId) {
+		$this->authorId = $authorId;
+	}
+
+	/**
+	 * Get author id
+	 *
+	 * @return mixed
+	 */
+	public function getAuthorId() {
+		return $this->authorId;
+	}
 }
