@@ -9,6 +9,8 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
+use Schoolbox\User;
 
 class Controller extends Base {
 
@@ -43,6 +45,7 @@ class Controller extends Base {
                     'item'           => new Model(),
                     'categoryList'   => $this->getMapper()->getJoinMapper('category')->findAll(),
                     'moderationList' => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
+                    'moderatorList'  => array(),
                 ),
             )
         );
@@ -59,7 +62,8 @@ class Controller extends Base {
             array(
                 'template' => __DIR__.'/templates/read.twig',
                 'data'     => array(
-                    'item' => $item,
+                    'item'          => $item,
+                    'moderatorList' => array(),
                 ),
             )
         );
@@ -71,13 +75,25 @@ class Controller extends Base {
      * @param int $id
      */
     public function edit($id) {
+        // findById() ought to hydrate users as well.
+        /** @var Model $item */
+        $item = $this->getMapper()->findById($id);
+        $moderatorList = array();
+        foreach ($item->getModeratorList() as $moderator) {
+            $moderatorList[] = array(
+                'id'   => $moderator->getId(),
+                'name' => $moderator->formatName(),
+            );
+        }
+
         $this->getResponse()->content->set(
             array(
                 'template' => __DIR__.'/templates/edit.twig',
                 'data'     => array(
-                    'item'           => $this->getMapper()->findById($id),
+                    'item'           => $item,
                     'categoryList'   => $this->getMapper()->getJoinMapper('category')->findAll(),
                     'moderationList' => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
+                    'moderatorList'  => $moderatorList,
                 ),
             )
         );
@@ -99,6 +115,13 @@ class Controller extends Base {
             ->setMinReservationTime(new \DateInterval('PT1H'))
             ->setMaxReservationTime(new \DateInterval('PT24H'))
         ;
+        if (is_array($post['moderator_id'])) {
+            foreach ($post['moderator_id'] as $moderator_id) {
+                $user = new User();
+                $user->setId($moderator_id);
+                $model->addModerator($user);
+            }
+        }
         $this->getMapper()->save($model);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
@@ -122,6 +145,15 @@ class Controller extends Base {
             ->setCategory($post['resource_category_id'])
             ->setModerationType($post['resource_moderation_type_id'])
         ;
+        // Clear and create the moderator list
+        $model->setModeratorList(new Collection());
+        if (is_array($post['moderator_id'])) {
+            foreach ($post['moderator_id'] as $moderator_id) {
+                $user = new User();
+                $user->setId($moderator_id);
+                $model->addModerator($user);
+            }
+        }
         $this->getMapper()->save($model);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
