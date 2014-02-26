@@ -89,6 +89,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				catch (\Exception $e) {
 				}
 
+				$submissionBox->setRubricResultSet(0);
 				$submissionBox->setWeight($row['WEIGHTING']);
 				$submissionBox->setMaxMark($row['TOTAL_MARK']);
 				$submissionBox->setMarkVisibility($submissionBox::MARK_VISIBILITY_PRIVATE);
@@ -100,7 +101,7 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				/* Create a relation between the submission box and the Task
 				 * from which it spawned
 				 */
-//				$taskMapper->createRelation($submissionBox, $row['TASK_ID']);
+				$taskMapper->createRelation($submissionBox, $row['TASK_ID']);
 			}
 		}
 	}
