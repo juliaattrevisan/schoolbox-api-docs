@@ -190,6 +190,9 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$event = new \EOTC\Event();
 		$event->setupDates($_GET['date']);
 
+		$metadata = new \EOTC\EventMetadata();
+		$event->setMetadata($metadata);
+
 		$defaultTypeId = '';
 		$defaultCampusId = array($_SESSION['campus'][0]);
 
