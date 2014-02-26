@@ -32,6 +32,15 @@
 		 * Initialise tiny
 		 */
 		function initChange() {
+
+			/* Prevent accidental form submission via Enter key
+			 */
+			config.questionForm.find('input').keydown(function(event) {
+				if (event.keyCode == 13) {
+					event.preventDefault();
+				}
+			});
+
 			config.questionForm.find('input').change(function() {
 				$.fn.evaluationExact.saveOne(config.questionForm);
 			});

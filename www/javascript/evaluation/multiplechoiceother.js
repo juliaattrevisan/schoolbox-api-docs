@@ -65,6 +65,14 @@
 				$.fn.evaluationMultipleChoiceOther.saveOne(config.questionForm);
 			});
 
+			/* Prevent accidental form submission via Enter key
+			 */
+			config.questionForm.find('input[type=text]').keydown(function(event) {
+				if (event.keyCode == 13) {
+					event.preventDefault();
+				}
+			});
+
 			/* Detect change in Other field
 			 * If the Other has content, check the Other Checkbox, and highlight
 			 */
