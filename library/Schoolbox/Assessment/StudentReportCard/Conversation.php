@@ -33,6 +33,9 @@ class Conversation {
 	/** @var Collection[User] $participants */
 	protected $participants;
 
+	/** @var Collection[User] $recipients */
+	protected $emailRecipients = null;
+
 	/** @var Collection[Comment] $comments */
 	protected $comments;
 
@@ -48,13 +51,22 @@ class Conversation {
 			throw new \InvalidArgumentException("Invalid conversation");
 		}
 
+		/* Find the parents of this particular student
+		 */
 		$this->student = $student;
-		$this->category = $category;
-
 		$this->student->loadParents();
+
+		/* FInd the teachers of this particular category
+		 */
+		$this->category = $category;
 		$this->category->loadTeachers(true);
 
-		// generate participants: the student, their parent(s), and the category teacher(s)
+		/* Generate participants: the student, their parent(s), and the category teacher(s)
+		 *
+		 * Email recipients are not necessarily participants in the conversation,
+		 * merely acting as observers of the dialog, so they are excluded from this
+		 * list of participants
+		 */
 		$this->participants = new Collection();
 		$this->participants->add($student);
 		$this->participants
@@ -63,9 +75,7 @@ class Conversation {
 
 		// retrieve the comments in this conversation
 		$this->comments = CommentMapper::getInstance()->findByStudentAndCategory($student->getId(), $category->getId());
-
 	}
-
 
 	/**
 	 * Returns whether or not the given user is a participant in this conversation
@@ -74,14 +84,12 @@ class Conversation {
 	 * @return bool
 	 */
 	public function isParticipant($user) {
+		$exists = $this->participants->getBy('id', $user->getId());
 
-		// I feel like Collection should have a contains() method...
-		foreach($this->participants as $p) {
-			/** @var User $p */
-			if($p->getId() == $user->getId()) {
-				return true;
-			}
+		if ($exists !== null) {
+			return true;
 		}
+
 		return false;
 	}
 
@@ -139,6 +147,4 @@ class Conversation {
 			throw new \InvalidArgumentException("Not a participant of this conversation.");
 		}
 	}
-
-
 }

@@ -47,6 +47,15 @@ private $enabled;               //Bool
     private $useInternalMail;  //Controls mailto or internal schoolbox mail sending
     private $calendarView; //Controls default calendar view
 
+	/**
+	 * A Collection of User objects who should be receiving email
+	 * notifications about this User. These recipients are usually,
+	 * but not necessarily, a parent of this User instance.
+	 *
+	 * @var null
+	 */
+	private $emailRecipients = null;
+
     /**
      * Student's boarding status (only used if boarder leave module is enabled)
      */
@@ -394,7 +403,6 @@ private $enabled;               //Bool
         return $this->config_loader;
     }
 
-
 	/**
 	 * Load parents into object from external db
 	 */
@@ -403,44 +411,132 @@ private $enabled;               //Bool
 
 		// TODO remove handler dependency
 		$DEPRECATED_EXTERNAL_USER = new \External_User();
-		$emailArray = $DEPRECATED_EXTERNAL_USER->getParentEmails(array($this->externalId));
+		$allParents = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
 
 		$parentRoles = RoleMapper::getInstance()->findByColumn('group_type', Role::PARENT)->getColumnValues('id');
 
-		if(is_array($emailArray)) {
+		if (is_array($allParents)) {
+			foreach($allParents as $currentParent) {
+
+				/* Add parent
+				 */
+				$parentCollection = UserMapper::getInstance()->findByColumnList(array(
+					'synergy_id' => $currentParent['StudentContactID'],
+					'group_id'   => $parentRoles
+				));
+
+				if ($parentCollection->count()) {
+					$this->parent_collection->add($parentCollection->first());
+				}
+
+				/* Add speece
+				 */
+				$spouseCollection = UserMapper::getInstance()->findByColumnList(array(
+					'synergy_id' => $currentParent['StudentContactSpouseID'],
+					'group_id'   => $parentRoles
+				));
+
+				if ($spouseCollection->count()) {
+					$this->parent_collection->add($spouseCollection->first());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the parents associated with this user
+	 *
+	 * @return Collection
+	 */
+	public function getParents() {
+		return $this->parent_collection;
+	}
+
+	/**
+	 * Find the email recipients for this user who should be notified whenever
+	 * a comment is made, or when some other email-worthy action takes place
+	 *
+	 * At the moment it's private because nobody else is using this yet, but I
+	 * think there are other places which do a similar thing - when those are
+	 * ready to utilise findEmailRecipients, make this public or use the
+	 * loadEmailRecipients() approach
+	 *
+	 * Migrated from Conversation.php
+	 *
+	 * @param $user
+	 * @return \Schoolbox\Collection
+	 */
+	private function findEmailRecipients($user) {
+		$parentRoles = \Schoolbox\RoleMapper::getInstance()->findByColumn('group_type', Role::PARENT)->getColumnValues('id');
+		$allRecipients = new Collection();
+
+		$DEPRECATED_EXTERNAL_USER = new \External_User();
+		$emailArray = $DEPRECATED_EXTERNAL_USER->getParentEmails(array($user->getExternalId()));
+
+		if (is_array($emailArray) && count($emailArray)) {
 			foreach($emailArray as $synergyId => $emailAddress) {
-				$parentCollection = new Collection();
+				$thisRecipient = new Collection();
 
 				// if a synergy ID is available, and a valid user can be obtained from it, use that
-				if($synergyId) {
-					$parentCollection = UserMapper::getInstance()->findByColumnList(array(
+				if ($synergyId) {
+					$thisRecipient = \Schoolbox\UserMapper::getInstance()->findByColumnList(array(
 						'synergy_id' => $synergyId,
 						'group_id'   => $parentRoles
 					));
 				}
 
-				// parent successfully retrieved
-				if($parentCollection->count()) {
-					$parent = $parentCollection->first();
+				/* This person has a Schoolbox account, so just use that
+				 */
+				if ($thisRecipient->count()) {
+					$recipient = $thisRecipient->first();
 				}
-				// generate a dummy user object (which will still have a correct email address)
+				/* Generate a dummy user object (which will still have a correct email address)
+				 *
+				 * This is used when someone is specified to receive emails, but doesn't
+				 * actually have a Schoolbox account. This is actually possible.
+				 */
 				else {
-					$parent = new User();
-					$parent->setId(-1);
+					$recipient = new User();
+					$recipient->setId(-1);
 				}
 
 				// override any email retrieved from schoolbox with the one from synergy
-				$parent->setAltEmail($emailAddress);
-				$this->parent_collection->add($parent);
+				$recipient->setAltEmail($emailAddress);
+
+				/* Add him to the stack
+				 */
+				$allRecipients->add($recipient);
 			}
 		}
 
+		return $allRecipients;
 	}
 
 	/**
-	 * @return Collection
+	 * Public alias for the Report Card approach
 	 */
-	public function getParents() {
-		return $this->parent_collection;
+	public function loadEmailRecipients() {
+		$this->setEmailRecipients($this->findEmailRecipients($this));
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set recipients
+	 *
+	 * @param \Schoolbox\Collection $emailRecipients
+	 */
+	private function setEmailRecipients($emailRecipients) {
+		$this->emailRecipients = $emailRecipients;
+	}
+
+	/**
+	 * Get recipients
+	 *
+	 * @return \Schoolbox\Collection
+	 */
+	public function getEmailRecipients() {
+		return $this->emailRecipients;
 	}
 }

@@ -169,21 +169,23 @@ class CommentMapper extends Mapper {
 
 
 	public function findByStudentAndCategory($studentId, $categoryId, $includeDeletions = false) {
-
 		$categoryMapper = $this->getJoinMapper('category');
 		$studentMapper = $this->getJoinMapper('student');
 		$commenterMapper = $this->getJoinMapper('commenter');
+		$roleMapper = $commenterMapper->getJoinMapper('role');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('com')},
 				{$categoryMapper->getColumnString('cat')},
 				{$studentMapper->getColumnString('su')},
+				{$roleMapper->getColumnString('r')},
 				{$commenterMapper->getColumnString('cu')}
 			FROM {$this->getTable()} as `com`
 			LEFT JOIN {$this->getJoinSql('category','com','cat')}
 			LEFT JOIN {$this->getJoinSql('student','com','su')}
 			LEFT JOIN {$this->getJoinSql('commenter','com','cu')}
+			LEFT JOIN {$commenterMapper->getJoinSql('role','cu','r')}
 			WHERE com.student_id = ?
 			AND com.category_id = ?
 		";
@@ -205,6 +207,7 @@ class CommentMapper extends Mapper {
 			$commentObject->setCategory($categoryMapper->hydrate($record, 'cat'));
 			$commentObject->setStudent($studentMapper->hydrate($record, 'su'));
 			$commentObject->setCommenter($commenterMapper->hydrate($record, 'cu'));
+			$commentObject->getCommenter()->setRole($roleMapper->hydrate($record, 'r'));
 			$commentCollection->add($commentObject);
 		}
 
@@ -273,7 +276,9 @@ class CommentMapper extends Mapper {
 		$mail->setBody($plainBody, 'text/plain', 'utf-8');
 		$mail->addPart($htmlBody,  'text/html',  'utf-8');
 
-		$recipients = $this->findAllUsersWhoCanView($comment);
+		/* Decide who should be notified via email
+		 */
+		$recipients = $this->determineEmailRecipients($comment);
 
 		foreach($recipients as $user) {
 			/** @var $user User  */
@@ -308,28 +313,30 @@ class CommentMapper extends Mapper {
 			catch (Swift_SwiftException $e) {
 				// if we had somewhere to log this, we might log this
 			}
-
 		}
-
 	}
 
 	/**
-	 * Find all the users who can view the given comment
+	 * Determine all the users who should be notified via email
 	 *
 	 * @param Comment $comment
 	 * @return Collection
 	 */
-	public function findAllUsersWhoCanView($comment) {
+	private function determineEmailRecipients($comment) {
 		$userCollection = new Collection();
 
 		// merge in teachers
 		$comment->getCategory()->loadTeachers();
 		$userCollection->merge($comment->getCategory()->getTeachers());
 
-		// if visible to parents, find the parents of the student of the comment
-		if($comment->isVisibleToParent()) {
-			$comment->getStudent()->loadParents();
-			$userCollection->merge($comment->getStudent()->getParents());
+		/* If the comment is set to be Visible To Parents, notify
+		 * all the specified people who should be emailed about the
+		 * student. These recipients are not necessarily Parents of
+		 * the student.
+		 */
+		if ($comment->isVisibleToParent()) {
+			$comment->getStudent()->loadEmailRecipients();
+			$userCollection->merge($comment->getStudent()->getEmailRecipients());
 		}
 
 		// if visible to student, find the student of the comment
@@ -339,6 +346,4 @@ class CommentMapper extends Mapper {
 
 		return $userCollection;
 	}
-
-
 }

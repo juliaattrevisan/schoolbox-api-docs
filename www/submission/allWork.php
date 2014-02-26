@@ -113,7 +113,6 @@ if($permission == PERMISSION_DENIED) {
 }
 /* /PERMISSIONS */
 
-
 // ok. from here we're actually going to show the page, and not redirect
 $report = new StudentReportCard($userId);
 $report->setSemester($year, $semester);
