@@ -121,6 +121,15 @@ class Mapper extends BaseMapper {
                 'other_key' => 'id',
             )
         );
+        $this->hasJoin(
+            'moderator',
+            array(
+                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
+                'this_key'  => 'id',
+                'other_key' => 'resource_id',
+                'multiple'  => true,
+            )
+        );
     }
 
 }
