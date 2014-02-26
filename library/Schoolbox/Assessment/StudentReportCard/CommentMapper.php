@@ -276,7 +276,9 @@ class CommentMapper extends Mapper {
 		$mail->setBody($plainBody, 'text/plain', 'utf-8');
 		$mail->addPart($htmlBody,  'text/html',  'utf-8');
 
-		$recipients = $this->findAllUsersWhoCanView($comment);
+		/* Decide who should be notified via email
+		 */
+		$recipients = $this->determineEmailRecipients($comment);
 
 		foreach($recipients as $user) {
 			/** @var $user User  */
@@ -311,18 +313,16 @@ class CommentMapper extends Mapper {
 			catch (Swift_SwiftException $e) {
 				// if we had somewhere to log this, we might log this
 			}
-
 		}
-
 	}
 
 	/**
-	 * Find all the users who can view the given comment
+	 * Determine all the users who should be notified via email
 	 *
 	 * @param Comment $comment
 	 * @return Collection
 	 */
-	public function findAllUsersWhoCanView($comment) {
+	private function determineEmailRecipients($comment) {
 		$userCollection = new Collection();
 
 		// merge in teachers
