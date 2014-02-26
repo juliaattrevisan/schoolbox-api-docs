@@ -93,4 +93,37 @@ class Subcontext_AutocompleteContext extends BaseContext {
         }
         throw new Exception('Could not find autocomplete option "'.$option.'" for field named "'.$field.'"');
     }
+
+    /**
+     * Asserts that an autocomplete contains a given selection.
+     *
+     * @Then /^the autocomplete "(?P<field>[^"]*)" should contain "(?P<option>[^"]*)"$/
+     * @Then /^(?:|I )should see "(?P<option>[^"]*)" in the "(?P<field>[^"]*)" autocomplete"$/
+     */
+    public function assertAutocompleteOptionSelected($option, $field) {
+        // find the autocomplete
+        // Does $option exist within it?
+        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.ms-sel-item') as $item) {
+            /** @var Element\NodeElement $item */
+            if (mb_strpos($item->getText(), $option) !== false) {
+                return;
+            }
+        }
+        throw new Exception('Autocomplete option "'.$option.'" for field named "'.$field.'" does not exist');
+    }
+
+    /**
+     * Asserts that an autocomplete doesn't contain a given selection.
+     *
+     * @Then /^the autocomplete "(?P<field>[^"]*)" should not contain "(?P<option>[^"]*)"$/
+     * @Then /^(?:|I )should not see "(?P<option>[^"]*)" in the "(?P<field>[^"]*)" autocomplete"$/
+     */
+    public function assertAutocompleteOptionNotSelected($option, $field) {
+        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.ms-sel-item') as $item) {
+            /** @var Element\NodeElement $item */
+            if (mb_strpos($item->getText(), $option) !== false) {
+                throw new Exception('Autocomplete option "'.$option.'" for field named "'.$field.'" exists when it should not');
+            }
+        }
+    }
 }
