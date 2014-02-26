@@ -40,6 +40,17 @@ abstract class Leave_Kings_Notice_User_Abstract extends Leave_Notice_Abstract_No
 		$this->setEmail($email);
 	}
 
+	/**
+	 * Send it
+	 */
+	public function send() {
+		$email = new \Email($this->getRequest()->getUser()->getAltEmail());
+
+		if ($email->isValid()) {
+			$this->getEmail()->send();
+		}
+	}
+
 	/* Getters/Setters
 	 */
 

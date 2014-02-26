@@ -70,29 +70,20 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 		if (is_array($allEmails) && count($allEmails)) {
 			foreach($allEmails as $currentEmail) {
 				if (Cfg::get('debug_email_address') != '') {
-					$this->getEmail()->send(Cfg::get('debug_email_address'));
+					$email = new \Email(Cfg::get('debug_email_address'));
 				}
 				else {
-					$this->getEmail()->send($currentEmail);
+					$email =  new \Email($currentEmail);
+				}
+
+				/* Only send if the email is valid
+				 */
+				if ($email->isValid()) {
+					$this->getEmail()->send($email->getEmail());
 				}
 			}
 		}
 	}
-
-//	public function send() {
-//		$parentList = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getExternalId());
-//
-//		if (is_array($parentList)) {
-//			foreach ($parentList as $parent) {
-//				if (Cfg::get('debug_email_address') != '') {
-//					$this->getEmail()->send(Cfg::get('debug_email_address'));
-//				}
-//				else {
-//					$this->getEmail()->send($parent['StudentContactDefaultEmail']);
-//				}
-//			}
-//		}
-//	}
 
 	/* Getters/Setters
 	 */

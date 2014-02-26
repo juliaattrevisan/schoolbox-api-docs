@@ -40,6 +40,17 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
 		$this->setEmail($email);
 	}
 
+	/**
+	 * Send it
+	 */
+	public function send() {
+		$email = new \Email($this->getRequest()->getUser()->getAltEmail());
+
+		if ($email->isValid()) {
+			$this->getEmail()->send();
+		}
+	}
+
 	/* Getters/Setters
 	 */
 

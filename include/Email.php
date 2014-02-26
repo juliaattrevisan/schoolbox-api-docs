@@ -10,8 +10,19 @@
  */
 
 class Email {
+
+	/**
+	 * The email address to analyse
+	 *
+	 * @var null
+	 */
 	private $email = null;
 
+	/**
+	 * Constructor
+	 *
+	 * @param null $email
+	 */
 	public function __construct($email = null) {
 		if ($email !== null) {
 			$this->setEmail($email);
@@ -55,7 +66,7 @@ class Email {
 	 * This creates local_email versions if specified, otherwise returns the
 	 * alt_email field
 	 *
-	 * @param  $email
+	 * @param $user
 	 * @return bool|string
 	 */
 	public function formatEmailFromArray($user) {

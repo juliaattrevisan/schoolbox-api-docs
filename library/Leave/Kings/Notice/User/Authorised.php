@@ -29,12 +29,5 @@ class Leave_Kings_Notice_User_Authorised extends Leave_Kings_Notice_User_Abstrac
 		$this->getEmail()->parse('authorised_by_block', 'authorised_by');
 		$this->getEmail()->setVar('rejected_by_block', '');
 	}
-
-	/**
-	 * Send it
-	 */
-	public function send() {
-		$this->getEmail()->send();
-	}
 }
 

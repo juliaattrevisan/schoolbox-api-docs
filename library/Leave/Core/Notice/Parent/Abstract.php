@@ -21,13 +21,13 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
     public function setup() {
 
         /* For getting all the parents of a child
-           */
+         */
         $this->setExternalUser(new External_User());
 
         $subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
         /* Set destination email address in loop in send()
-           */
+         */
         $email = new Mailer($this->getEmailTemplateFile(), $subject, '');
         $email->setFromAsCurrentUser();
 
@@ -61,31 +61,23 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
         if (is_array($allParents)) {
             foreach ($allParents as $parent) {
                 if (Cfg::get('debug_email_address') != '') {
-                    $this->getEmail()->send(Cfg::get('debug_email_address'));
-                } else {
-                    $this->getEmail()->send($parent['StudentContactDefaultEmail']);
+					$email = new \Email(Cfg::get('debug_email_address'));
                 }
+				else {
+					$email =  new \Email($parent['StudentContactDefaultEmail']);
+                }
+
+				/* Only send if the email is valid
+				 */
+				if ($email->isValid()) {
+					$this->getEmail()->send($email->getEmail());
+				}
             }
         }
     }
 
-//	public function send() {
-//		$parentList = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getExternalId());
-//
-//		if (is_array($parentList)) {
-//			foreach ($parentList as $parent) {
-//				if (Cfg::get('debug_email_address') != '') {
-//					$this->getEmail()->send(Cfg::get('debug_email_address'));
-//				}
-//				else {
-//					$this->getEmail()->send($parent['StudentContactDefaultEmail']);
-//				}
-//			}
-//		}
-//	}
-
     /* Getters/Setters
-      */
+     */
 
     /**
      * Set email

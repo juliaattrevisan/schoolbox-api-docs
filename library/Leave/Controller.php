@@ -1251,7 +1251,7 @@ class Leave_Controller extends Controller {
     public function sendUserNotice($request) {
 
         /* Choose the Factory, have it produce() the notice object and send
-           */
+         */
         $leaveFactory = new Leave_Notice_Factory($request);
         $leaveFactory->produceUserFactory()->produce()->send();
     }
