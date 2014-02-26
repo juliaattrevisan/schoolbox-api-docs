@@ -11,7 +11,7 @@
 class External_Edumate_TaskMapper extends \Schoolbox\Mapper {
 
 	/**
-	 * Find out if an Edumate Task already exists as a submission box
+	 * Find out if an Edumate Task already exists as a SubmissionBox
 	 *
 	 * @param $edumateTaskId
 	 * @return bool
@@ -24,7 +24,7 @@ class External_Edumate_TaskMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->getDatabase()->prepare($query);
-		$statement->bindParam('edumateTaskId', $edumateTaskId);
+		$statement->bindParam(':edumateTaskId', $edumateTaskId);
 		$statement->execute();
 
 		$row = $statement->fetch();
@@ -38,8 +38,21 @@ class External_Edumate_TaskMapper extends \Schoolbox\Mapper {
 		return false;
 	}
 
+	/**
+	 * Create a relation between a SubmissionBox and an Edumate Task
+	 *
+	 * @param $submissionBox
+	 * @param $edumateTaskId
+	 */
 	public function createRelation($submissionBox, $edumateTaskId) {
-		$query = "";
-	}
+		$query = "
+			INSERT INTO submission_box_edumate_task (submission_box_id, task_id)
+			VALUES (:submissionBoxId, :edumateTaskId)
+		";
 
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->bindParam(':submissionBoxId', $submissionBox->getId());
+		$statement->bindParam(':edumateTaskId', $edumateTaskId);
+		$statement->execute();
+	}
 }
