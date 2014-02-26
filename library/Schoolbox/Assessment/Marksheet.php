@@ -395,11 +395,12 @@ class Marksheet {
 		if(isset($rtn[0]['mark'])) {
 			$mark = array(
 				'mark' => $rtn[0]['mark'],
-				'norm_mark' => $rtn[0]['norm_mark']
+				'norm_mark' => $rtn[0]['norm_mark'],
+				'comment' => $rtn[0]['comment'],
 			);
 		}
 		else {
-			$mark = array('mark' => null, 'norm_mark' => null);
+			$mark = array('mark' => null, 'norm_mark' => null, 'comment' => '');
 		}
 
 		if(is_null($mark['mark'])) {
