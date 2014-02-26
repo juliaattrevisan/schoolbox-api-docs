@@ -127,8 +127,14 @@ Scenario: Manage resources
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
   And   I should not see "The special projector" in the ".resource-list" element
+  # Check its users
+  When  I follow "The good projector"
+  Then  the autocomplete "moderator_id" should not contain "Scott Berryhill"
+  And   the autocomplete "moderator_id" should contain "Jenifer Shadbolt"
+  And   the autocomplete "moderator_id" should contain "Peter Lovejoy"
   # Delete a resource
-  When  I follow "resource-create"
+  When  I move backward one page
+  And   I follow "resource-create"
   And   I fill in the following:
     | name                 | To be deleted |
     | description          | To be deleted |
