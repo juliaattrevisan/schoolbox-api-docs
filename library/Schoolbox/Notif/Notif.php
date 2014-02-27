@@ -10,12 +10,15 @@
 namespace Schoolbox\Notif;
 
 
+use BadMethodCallException;
+use ConfigFallback;
 use Mailer;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
+use PDOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
@@ -64,7 +67,27 @@ class Notif implements LoggerInterface {
 	public function __construct($topic = self::TOPIC_SYSTEM, $configLoader = null) {
 		$this->topic = $topic;
 		$this->topicFactory = new TopicFactory();
-		$this->conf = $configLoader ?: ConfigMapper::getInstance();
+
+		// use the provided config
+		if($configLoader) {
+			$this->conf = $configLoader;
+		}
+		// try for a config mapper instance
+		elseif(extension_loaded('pdo')) {
+			\Database::reinitialise();
+			try {
+				$this->conf = ConfigMapper::getInstance();
+				$this->conf->get('mail_support_address');
+			}
+			catch(PDOException $e) {
+				// if something PDO-esque broke, fall back
+				$this->conf = new ConfigFallback();
+			}
+		}
+		// fallback to hardcoded config vars
+		else {
+			$this->conf = new ConfigFallback();
+		}
 
 		try {
 			// if the rabbit cannot be contacted, this will throw an exception
@@ -102,7 +125,7 @@ class Notif implements LoggerInterface {
 			$fatalEmail->setFrom('notif@alaress.com.au');
 
 			$this->handlers['fatalMailer'] = new SwiftMailerHandler(new Swift_Mailer(
-				Mailer::getSwiftTransport(true)), $fatalEmail, Logger::EMERGENCY, false
+				Mailer::getConfiguredSwiftTransport($this->conf, true)), $fatalEmail, Logger::EMERGENCY, false
 			);
 		}
 
@@ -116,7 +139,7 @@ class Notif implements LoggerInterface {
 			$sysEmail->setFrom('notif@alaress.com.au');
 
 			$this->handlers['sysMailer'] = new SwiftMailerHandler(new Swift_Mailer(
-				Mailer::getSwiftTransport(true)), $sysEmail, Logger::ALERT, false
+				Mailer::getConfiguredSwiftTransport($this->conf, true)), $sysEmail, Logger::ALERT, false
 			);
 		}
 
@@ -134,7 +157,7 @@ class Notif implements LoggerInterface {
 				$exceptionEmail->setFrom('notif@alaress.com.au');
 
 				$this->handlers['exceptionMailer'] = new SwiftMailerHandler(new Swift_Mailer(
-					Mailer::getSwiftTransport(true)), $exceptionEmail, Logger::CRITICAL, false
+					Mailer::getConfiguredSwiftTransport($this->conf, true)), $exceptionEmail, Logger::CRITICAL, false
 				);
 			}
 
@@ -166,7 +189,19 @@ class Notif implements LoggerInterface {
 		}
 		else {
 			try {
-				// [3d] instant user message (notice, warning or error)
+				// [3d] instance user email (warning or error)
+				if(!isset($this->handlers['instMailer'])) {
+					$instEmail = new Swift_Message('Uncaught Exception in Schoolbox', null, 'text/plain', 'utf-8');
+					$instEmail->setTo('support@alaress.com.au');
+					$instEmail->setFrom('notif@alaress.com.au');
+
+					$this->handlers['instMailer'] = new SwiftMailerHandler(new Swift_Mailer(
+						Mailer::getConfiguredSwiftTransport($this->conf, true)), $instEmail, Logger::WARNING, true
+					);
+				}
+				array_push($stack, $this->handlers['instMailer']);
+
+				// [3d] instant user message (notice)
 				if(!isset($this->handlers['instant'])) {
 					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::NOTICE, false);
 				}
@@ -191,7 +226,7 @@ class Notif implements LoggerInterface {
 			$debugEmail->setFrom('notif@alaress.com.au');
 
 			$this->handlers['debugMailer'] = new SwiftMailerHandler(new Swift_Mailer(
-					Mailer::getSwiftTransport(true)), $debugEmail, Logger::DEBUG, false
+				Mailer::getConfiguredSwiftTransport($this->conf, true)), $debugEmail, Logger::DEBUG, false
 			);
 		}
 
@@ -210,6 +245,11 @@ class Notif implements LoggerInterface {
 	 */
 	protected function getSqlHandler($level, $bubble = true) {
 
+		// can't give you an SQL handler if there ain't no SQL
+		if(!extension_loaded('pdo')) {
+			return null;
+		}
+
 		$sql = new MySQLHandler($level, $bubble);
 
 		switch($this->topic) {
@@ -225,7 +265,7 @@ class Notif implements LoggerInterface {
 
 			// when cms-specific things are logged
 			case self::TOPIC_CMS:
-				$this->sql->setQuery("
+				$sql->setQuery("
 					INSERT INTO `cmsLog`
 						(`object`, `objectId`, `action`, `user`)
 					VALUES
