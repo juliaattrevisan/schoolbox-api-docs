@@ -60,7 +60,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				$submissionReturn->setSubmissionBox($submissionBox);
 			}
 			catch (\Exception $e) {
-				echo "-  Skipping {$row['TASK_ID']} for {$row['STUDENT_ID']} - Submission Box not found \n";
+				echo "-  Skipping {$row['TASK_ID']} for {$row['STUDENT_ID']} - Submission Box for class code {$row['CLASS_CODE']} not found \n";
 				continue;
 			}
 
