@@ -48,7 +48,7 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 	 * @param $categoryCode
 	 * @return null
 	 */
-	public function findSubmissionReturnFromTask($edumateTaskId, $categoryCode) {
+	public function findReturnFromTask($edumateTaskId, $categoryCode) {
 		$query = "
 			SELECT submission_return_id
 			FROM submission_return_edumate_task
