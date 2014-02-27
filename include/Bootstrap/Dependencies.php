@@ -21,7 +21,17 @@ $di->set(
     )
 );
 
-// Set up a web factory and its request/responses
+// Session
+$di->set(
+    'session',
+    $di->lazy(
+        function() {
+            $factory = new Alaress\Session\Factory($_COOKIE);
+            return $factory->build();
+        }
+    )
+);
+
 $di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
 $di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
 
