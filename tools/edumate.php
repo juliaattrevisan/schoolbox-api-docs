@@ -10,6 +10,11 @@
 
 require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
 
-$importer = new \External_Edumate_Task();
-$importer->importAllTasks();
-$importer->importAllMarks();
+$allImporters = array(
+	new \External_Edumate_Import_Task(),
+	new \External_Edumate_Import_Marks()
+);
+
+foreach($allImporters as $currentImporter) {
+	$currentImporter->import();
+}
