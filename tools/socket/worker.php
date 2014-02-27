@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
-use React\EventLoop\Factory as EventLoopFactory;
-use React\Stomp\Factory as StompFactory;
-use Schoolbox\Realtime\Pipe\Responder;
-use Schoolbox\Realtime\Stomp\SubscriptionManager;
+use React\Stream\Stream;
+use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\Queue\UserQueueFactory;
+use Alaress\WorkerCrew\Pooling\DefaultStrategy;
 use Schoolbox\Realtime\Verboser;
 
 /**
@@ -16,24 +16,64 @@ use Schoolbox\Realtime\Verboser;
 
 require_once "mini-bootstrap.php";
 
-// depending on how this process is started, the vars could be in either of these globals
-$glob = array_merge($_ENV, $_SERVER);
+$loop = \React\EventLoop\Factory::create();
 
-$command = isset($glob['c']) ? strtolower($glob['c']) : '';
-$args    = isset($glob['a']) ? (array)json_decode($glob['a'], true) : array();
+// if we use this strat, we only have to make changes once to affect server and workers
+$strat = new DefaultStrategy();
 
-if(!in_array($command, array('subscribe','fetch','ack','push'))) {
-	echo Responder::CONTEXT_SELF . Responder::CONTEXT_DELIMITER . "Bad command '$command'.";
-	exit(1);
-}
+$v = new Verboser(fopen("proc_".getmypid().".log", 'w'));
 
-$responder = new Responder(true);
+// listen to STDIN for commands
+$stream = new Stream(STDIN, $loop);
 
-$method = array($responder, $command);
+$mq = new Connector();
 
-if(is_callable($method)) {
-	if($command == 'fetch') {
-		array_push($args, new \Schoolbox\Notif\MQ\Connector());
+$stream->on('data', function($data, $stream) use ($v, $strat, &$mq) {
+	try {
+		// sigterm?
+		if(strlen($data) == 1 && $data[0] == $strat::STR_CANCEL) {
+			exit;
+		}
+
+		try {
+			list($cmd, $args) = $strat->decomposeTaskString($data);
+		}
+		catch(InvalidArgumentException $e) {
+			$v->v("Rejecting data '$data'", '*');
+			echo $strat::STR_NACKNOWLEDGE;
+			return;
+		}
+
+		$data = json_decode($args, true);
+
+		// if not a supported command, reject
+		if(!in_array($cmd, $strat->getSupportedActions())) {
+			$v->v("Rejecting command '$cmd'", '*');
+			echo $strat::STR_NACKNOWLEDGE;
+			return;
+		}
+
+		list($userId, $count) = array_values($data);
+
+		// strategise when this worker does more than FETCH
+		$messages = array();
+
+		// get a queue to retrieve read messages synchronously
+		$mqf = new UserQueueFactory($mq);
+
+		$queue = $mqf->buildUserQueue($userId, $count, false);
+		$allMessages = $queue->getMessages($count);
+
+		foreach($allMessages as $read) {
+			$messages[$read->getId()] = $read->getBody();
+		}
+
+		echo $strat->formatTransmissionData($messages);
 	}
-	call_user_func_array($method, $args);
-}
+	catch(Exception $e) {
+		// all exceptions must be caught, otherwise the react loop explodes and this worker dies
+		$v->v("Worker exception: ".get_class($e)." ".$e->getMessage());
+	}
+});
+
+$loop->run();
