@@ -12,6 +12,7 @@ namespace Alaress\Web\Controller;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
+use Aura\Session\Session;
 
 abstract class Base {
     /**
@@ -28,6 +29,11 @@ abstract class Base {
      * @var Router
      */
     protected $router;
+
+    /**
+     * @var Session
+     */
+    protected $session;
 
     /**
      * @param  Request $request
@@ -77,4 +83,20 @@ abstract class Base {
         return $this->router;
     }
 
-} 
+    /**
+     * @param  Session $session
+     * @return $this
+     */
+    public function setSession($session) {
+        $this->session = $session;
+        return $this;
+    }
+
+    /**
+     * @return Session
+     */
+    public function getSession() {
+        return $this->session;
+    }
+
+}

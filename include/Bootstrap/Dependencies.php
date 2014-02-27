@@ -48,6 +48,7 @@ $di->setters['Alaress\\Web\\Controller\\Base'] = array(
             return $di->get('webFactory')->newResponse();
         }
     ),
+    'setSession' => $di->lazyGet('session'),
     'setRouter' => $di->lazyGet('router'),
 );
 
