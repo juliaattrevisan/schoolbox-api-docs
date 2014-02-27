@@ -9,30 +9,31 @@ var settings = {
     host: '127.0.0.1',
     port: '8080',
     debug: false,
-    prefetch: 5,
+    prefetch: 50,
     sessionFile: 'sessions.list',
     clientCount: 1,
     pauseAfter: 1,
     pauseFor: 0,
-    busyTimeout: 2000
+    busyTimeout: 2000,
+    limit: 0
 }
 
 process.argv.forEach(function(val,index,array) {
-  if(index < 2) {
-    return true;
-  }
+    if(index < 2) {
+        return true;
+    }
 
-  var xpl = val.split('=');
-  if(xpl.length == 2) {
-    settings[xpl[0]] = xpl[1];
-  }
+    var xpl = val.split('=');
+    if(xpl.length == 2) {
+        settings[xpl[0]] = xpl[1];
+    }
+    return true;
 });
 
-
-function attach(client) {
+function attach(client, sessionId, start) {
 
 client.on('connectFailed', function(error) {
-    console.log('Connect Error: ' + error.toString());
+    console.log('CONNECTFAIL=' + sessionId + '|msg=' + error.toString());
 });
 
 
@@ -40,15 +41,16 @@ client.on('connect', function(connection) {
 //    console.log('WebSocket client connected');
 
     var open = new Date();
+    var session = sessionId;
 
     send({subscribe: true});
 
     connection.on('error', function(error) {
-        console.log("Connection Error: " + error.toString());
+        console.log("ERROR=" +sessionId + "|msg=" + error.toString());
     });
 
     connection.on('close', function() {
-        console.log('Connection Closed');
+        console.log('DISCONNECT='+sessionId);
     });
 
     connection.on('message', function(message) {
@@ -69,11 +71,11 @@ client.on('connect', function(connection) {
 
             function send(data) {
                 if(client) {
-//                  if(settings.debug) { console.log('Sending data to server'); }
+//                  if(settings.debug) { console.error('Sending data to server'); }
                     connection.sendUTF(JSON.stringify(data));
                 }
                 else {
-                    if(settings.debug) { console.log('No connection: not sending data'); }
+                    if(settings.debug) { console.error('No connection: not sending data'); }
                 }
             }
 
@@ -85,7 +87,7 @@ client.on('connect', function(connection) {
              * @param data
              */
             var pipeSubscribe = function(data) {
-                if(settings.debug) { console.log('Message from server: parsing subscribe'); }
+                if(settings.debug) { console.error('Message from server: parsing subscribe'); }
                 // don't try a fetch if the subscription came back false
                 if(data === true) {
                     send({fetch : settings.prefetch});
@@ -98,10 +100,14 @@ client.on('connect', function(connection) {
              * @param data
              */
             var pipeFetch = function(data) {
-                if(settings.debug) { console.log('Message from server: parsing fetch'); }
+                if(settings.debug) { console.error('Message from server: parsing fetch'); }
                 var close = new Date();
 
-                console.log("Time taken to complete: "+(close - open)+"ms");
+                console.log(
+                    "COMPLETE=" + session +
+                    "|wait=" + (close - start) +
+                    "|roundtrip=" + (close - open) +
+                    "|fetch=" + Object.keys(data).length);
             }
 
             /**
@@ -111,8 +117,8 @@ client.on('connect', function(connection) {
              */
             var pipePush = function(data) {
                 if(settings.debug) {
-                    console.log('Message from server: parsing push');
-                    console.log(data);
+                    console.error('Message from server: parsing push');
+                    console.error(data);
                 }
             }
 
@@ -122,7 +128,7 @@ client.on('connect', function(connection) {
              * @param data
              */
             var pipeMarkAsRead = function(data) {
-                if(settings.debug) { console.log('Message from server: parsing mark_as_read'); }
+                if(settings.debug) { console.error('Message from server: parsing mark_as_read'); }
                 console.log(data);
             }
 
@@ -132,7 +138,7 @@ client.on('connect', function(connection) {
             * @param data
             */
             var pipeBusy = function(data) {
-               if(settings.debug) { console.log('Message from server: parsing busy'); }
+               if(settings.debug) { console.error('Message from server: parsing busy'); }
 
                var fn;
 
@@ -159,7 +165,7 @@ client.on('connect', function(connection) {
                    setTimeout(fn, parseInt(t));
                }
                catch(e) {
-                   if(settings.debug) { console.log('Could not call '+fn); }
+                   if(settings.debug) { console.error('Could not call '+fn); }
                }
 
             }
@@ -170,7 +176,7 @@ client.on('connect', function(connection) {
              * @param data
              */
             var pipeError = function(data) {
-                if(settings.debug) { console.log('Message from server: parsing error'); }
+                if(settings.debug) { console.error('Message from server: parsing error'); }
                 switch(data.code) {
                     case 401:
                         console.warn('Either no session, or does not match parent.');
@@ -213,17 +219,22 @@ var j = 0;
 rl.on('line', function(line) {
     ++j;
 
+    if(settings.limit > 0 && j > settings.limit) {
+        return true;
+    }
+
     for(i = 0; i < settings.clientCount; i++) {
         var t = getTimeout((i+1) * j, pauseFor, pauseAfter);
         setTimeout(function() {
-            if(settings.debug) { console.log("Connection with session "+line); }
+            if(settings.debug) { console.error("Connection with session "+line); }
             var client = new WebSocketClient();
-            attach(client);
+            attach(client, line, new Date());
             client.connect('ws://'+settings.host+':'+settings.port, null, null, {
                 'Cookie' : 'PHPSESSID='+line
             });
         }, t);
     }
+
 });
 
 
