@@ -12,15 +12,16 @@ namespace Schoolbox\Notif\Message;
 
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
+use SplObjectStorage;
 
 class Messenger {
 
-	/** @var \SplObjectStorage */
+	/** @var SplObjectStorage */
 	protected $splStore;
 
 
 	public function __construct() {
-		$this->splStore = new \SplObjectStorage();
+		$this->splStore = new SplObjectStorage();
 	}
 
 

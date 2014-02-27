@@ -36,6 +36,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 
 	/**
 	 * @param IConfigLoader $configLoader
+	 * @throws \Schoolbox\Realtime\Schedule\ScheduleException
 	 */
 	public function __construct($configLoader) {
 		$this->conf = $configLoader;

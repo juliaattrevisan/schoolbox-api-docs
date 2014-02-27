@@ -11,6 +11,7 @@ namespace Alaress\WorkerCrew;
 
 
 use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Exception;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use Schoolbox\Realtime\Verboser;
@@ -110,11 +111,15 @@ class Dispatcher {
 
 		// decide whether to delegate this to a Worker, or run it straight into the handler
 		if(!in_array($cmd, $this->pool->getSupportedActions())) {
-			$this->q->dequeue();
-
-			$this->v->v("Internally handling '$cmd'");
-			$this->msgHandler->handleResponse($identifier, $cmd, $args);
-
+			try {
+				$this->q->dequeue();
+				$this->v->v("Internally handling '$cmd'");
+				$this->msgHandler->handleResponse($identifier, $cmd, $args);
+			}
+			catch(Exception $e) {
+				// we need to catch any and all exception here, lest we explode our reactor
+				$this->v->v("Exception suppressed: ".get_class($e) . " ".$e->getMessage(),'*');
+			}
 			return;
 		}
 
@@ -127,8 +132,14 @@ class Dispatcher {
 		$this->v->v("Pushing command to worker", '>');
 
 		// pop the task from the queue and run the next task
-		$this->q->dequeue();
-		$this->pool->accept($identifier, $cmd, $args, $this->q->count());
+		try {
+			$this->q->dequeue();
+			$this->pool->accept($identifier, $cmd, $args, $this->q->count());
+		}
+		catch(Exception $e) {
+			// we need to catch any and all exception here, lest we explode our reactor
+			$this->v->v("Exception suppressed: ".get_class($e) . " ".$e->getMessage(),'*');
+		}
 
 	}
 } 
