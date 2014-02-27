@@ -216,6 +216,35 @@ class Mailer {
     }
 
 	/**
+	 * @param \Schoolbox\IConfigLoader $conf
+	 * @param bool $reinitialise
+	 * @return Swift_Transport
+	 */
+	public static function getConfiguredSwiftTransport($conf, $reinitialise = false) {
+		if (!(self::$transport instanceof Swift_Transport) || $reinitialise) {
+			if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port') ){
+				self::$transport = new Swift_SmtpTransport(
+					$conf->get('mail_smtp_host'), $conf->get('mail_smtp_port')
+				);
+				self::$transport->setLocalDomain(
+					$conf->get('site_hostname').'.'.$conf->get('site_domain')
+				);
+
+				//Set auth details if available
+				if($conf->get('mail_smtp_username') && $conf->get('mail_smtp_password')) {
+					self::$transport->setUsername($conf->get('mail_smtp_username'));
+					self::$transport->setPassword($conf->get('mail_smtp_password'));
+				}
+			}
+			else {
+				self::$transport = new Swift_MailTransport();
+			}
+		}
+		return self::$transport;
+
+	}
+
+	/**
 	 * Creates a Swift mailer transport instance, or gets last one created if it
 	 * has already been created.
 	 *
@@ -227,26 +256,7 @@ class Mailer {
 	 * @return Swift_Transport
 	 */
     public static function getSwiftTransport($reinitialise = false) {
-        if (!(self::$transport instanceof Swift_Transport) || $reinitialise) {
-            if (Cfg::get('mail_smtp_host') && Cfg::get('mail_smtp_port') ){
-                self::$transport = new Swift_SmtpTransport(
-                    Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port')
-                );
-                self::$transport->setLocalDomain(
-                    Cfg::get('site_hostname').'.'.Cfg::get('site_domain')
-                );
-
-                //Set auth details if available
-                if(Cfg::get('mail_smtp_username') && Cfg::get('mail_smtp_password')) {
-                    self::$transport->setUsername(Cfg::get('mail_smtp_username'));
-                    self::$transport->setPassword(Cfg::get('mail_smtp_password'));
-                }
-            }
-            else {
-                self::$transport = new Swift_MailTransport();
-            }
-        }
-        return self::$transport;
+	    return static::getConfiguredSwiftTransport(Cfg::getInstance(), $reinitialise);
     }
 
     /**
