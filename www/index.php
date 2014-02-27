@@ -19,6 +19,10 @@ if ($route instanceof Aura\Router\Route) {
     // public method named $route->params[action].
     /** @var \Alaress\Web\Controller\Base $controller */
     $controller = $di->get('controller:'.$route->params['controller']);
+    // For now, make sure the session is started before route dispatchment, so
+    // that the Sitepage in the themed controller has a session and can
+    // therefore to go to.
+    $controller->getSession()->start();
     call_user_func(array($controller, $route->params['action']), $route->params);
 
     // Figure out output type.
