@@ -129,6 +129,8 @@ class Authenticator {
         // $_SESSION['user'] = $user->get('uid');
         // -- or --
         $_SESSION['user'] = $user;
+        // Namespaced session user for Aura
+        $_SESSION['auth']['user'] = $user;
         $this->touch();
     }
 
