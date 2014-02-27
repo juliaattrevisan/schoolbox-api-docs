@@ -27,11 +27,7 @@ class Pipe implements PipeInterface {
 	 * @return string
 	 */
 	public static function getSocketKeyForConnection($conn) {
-		/** @var EntityEnclosingRequest $rq */
-		$rq = $conn->WebSocket->request;
-		$token = reset($rq->getHeader('sec-websocket-key')->toArray());
-		return (string)$token;
-
+		return static::getHeader($conn, 'sec-websocket-key');
 	}
 
 	/** @var \Ratchet\ConnectionInterface */
@@ -62,17 +58,19 @@ class Pipe implements PipeInterface {
 	 * @return string
 	 */
 	public function getSession() {
-		if(isset($this->socketConnection->Session)) {
-			/** @var Session $session */
-			$session = $this->socketConnection->Session;
+		$cookies = static::getHeader($this->socketConnection, 'cookie');
 
-			// this line is (somehow, inexplicably) necessary to cache the sessionId... -_-
-			$session->all();
-			return $session->getId() ?: '';
+		// got session
+		if(($i = strpos($cookies, PipeManager::PHP_SESSION_PREFIX)) !== false) {
+			$len = strlen(PipeManager::PHP_SESSION_PREFIX);
+			$start = $i + $len;
+			$end = strpos($cookies, ';', $start) - $len;
+			$session = substr($cookies, $start, $end);
+
+			return $session;
 		}
 
 		return '';
-
 	}
 
 	/**
@@ -110,6 +108,14 @@ class Pipe implements PipeInterface {
 	 */
 	public function setUserId($id) {
 		$this->userId = $id;
+	}
+
+	protected static function getHeader($conn, $header) {
+		/** @var EntityEnclosingRequest $rq */
+		$rq = $conn->WebSocket->request;
+		$token = reset($rq->getHeader($header)->toArray());
+		return (string)$token;
+
 	}
 
 } 
