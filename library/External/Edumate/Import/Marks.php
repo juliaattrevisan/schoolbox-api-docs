@@ -53,7 +53,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			/* Make sure the Submission Box exists first because we need to find the
 			 * teacher, who will become the owner of the marks
 			 */
-			$submissionBoxId = $taskMapper->findSubmissionBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
+			$submissionBoxId = $taskMapper->findBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
 
 			try {
 				$submissionBox = $submissionBoxMapper->findById($submissionBoxId);

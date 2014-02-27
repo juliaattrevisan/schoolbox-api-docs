@@ -17,7 +17,7 @@ class External_Edumate_Import_TaskMapper extends \Schoolbox\Mapper {
 	 * @param $categoryCode
 	 * @return bool
 	 */
-	public function isTaskExists($edumateTaskId, $categoryCode) {
+	public function isTaskBoxExists($edumateTaskId, $categoryCode) {
 		$query = "
 			SELECT COUNT(*) AS num
 			FROM submission_box_edumate_task
@@ -48,7 +48,7 @@ class External_Edumate_Import_TaskMapper extends \Schoolbox\Mapper {
 	 * @param $categoryCode
 	 * @return null
 	 */
-	public function findSubmissionBoxFromTask($edumateTaskId, $categoryCode) {
+	public function findBoxFromTask($edumateTaskId, $categoryCode) {
 		$query = "
 			SELECT submission_box_id
 			FROM submission_box_edumate_task
@@ -79,7 +79,7 @@ class External_Edumate_Import_TaskMapper extends \Schoolbox\Mapper {
 	 * @param $edumateTaskId
 	 * @param $categoryCode
 	 */
-	public function createRelation($submissionBox, $edumateTaskId, $categoryCode) {
+	public function createBoxRelation($submissionBox, $edumateTaskId, $categoryCode) {
 		$query = "
 			INSERT INTO submission_box_edumate_task (submission_box_id, task_id, category_code)
 			VALUES (:submissionBoxId, :edumateTaskId, :categoryCode)

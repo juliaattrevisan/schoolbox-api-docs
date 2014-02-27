@@ -32,7 +32,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 		 * have submission boxes
 		 */
 		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-			$exists = $taskMapper->isTaskExists($row['TASK_ID'], $row['CLASS_CODE']);
+			$exists = $taskMapper->isTaskBoxExists($row['TASK_ID'], $row['CLASS_CODE']);
 
 			/* Create a new one since it doesn't exist
 			 */
@@ -42,7 +42,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 			/* Reuse an existing Submission Box
 			 */
 			else {
-				$submissionBoxId = $taskMapper->findSubmissionBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
+				$submissionBoxId = $taskMapper->findBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
 				$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 			}
 
@@ -123,7 +123,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				 * from which it spawned
 				 */
 				if (!$exists) {
-					$taskMapper->createRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE']);
+					$taskMapper->createBoxRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE']);
 
 					echo "+  Adding {$row['TASK_ID']} {$row['TASK']}\n";
 				}
