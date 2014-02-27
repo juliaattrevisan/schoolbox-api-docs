@@ -91,4 +91,86 @@ class External_Edumate_TaskMapper extends \Schoolbox\Mapper {
 		$statement->bindParam(':categoryCode', $categoryCode);
 		$statement->execute();
 	}
+
+	/**
+	 * Find out if an Edumate Task already exists as a SubmissionBox
+	 *
+	 * @param $edumateTaskId
+	 * @param $categoryCode
+	 * @return bool
+	 */
+	public function isTaskReturnExists($edumateTaskId, $categoryCode) {
+		$query = "
+			SELECT COUNT(*) AS num
+			FROM submission_return_edumate_task
+			WHERE task_id = :edumateTaskId
+			AND category_code = :categoryCode
+		";
+
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->bindParam(':edumateTaskId', $edumateTaskId);
+		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		if ($row !== false) {
+			if ($row['num'] > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Find a Submission Return associated with a Task ID/Category Code tuple
+	 *
+	 * @param $edumateTaskId
+	 * @param $categoryCode
+	 * @return null
+	 */
+	public function findSubmissionReturnFromTask($edumateTaskId, $categoryCode) {
+		$query = "
+			SELECT submission_return_id
+			FROM submission_return_edumate_task
+			WHERE task_id = :edumateTaskId
+			AND category_code = :categoryCode
+		";
+
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->bindParam(':edumateTaskId', $edumateTaskId);
+		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		if ($row !== false) {
+			if ($row['submission_return_id']) {
+				return $row['submission_return_id'];
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Create a relation between a SubmissionReturn and an Edumate Task
+	 *
+	 * @param $submissionReturn
+	 * @param $edumateTaskId
+	 * @param $categoryCode
+	 */
+	public function createReturnRelation($submissionReturn, $edumateTaskId, $categoryCode) {
+		$query = "
+			INSERT INTO submission_return_edumate_task (submission_return_id, task_id, category_code)
+			VALUES (:submissionReturnId, :edumateTaskId, :categoryCode)
+		";
+
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->bindParam(':submissionReturnId', $submissionReturn->getId());
+		$statement->bindParam(':edumateTaskId', $edumateTaskId);
+		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->execute();
+	}
 }
