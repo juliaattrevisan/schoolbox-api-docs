@@ -32,35 +32,61 @@ class External_Edumate_Task extends External_Edumate_Connection {
 		 * have submission boxes
 		 */
 		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-			if (!$taskMapper->isTaskExists($row['TASK_ID'], $row['CLASS_CODE'])) {
+			$exists = $taskMapper->isTaskExists($row['TASK_ID'], $row['CLASS_CODE']);
+
+			/* Create a new one since it doesn't exist
+			 */
+			if (!$exists) {
 				$submissionBox = new \Schoolbox\Assessment\Component\SubmissionBox();
 
-				/* Assign category if it exists in schoolbox
+				/* Alert user
+ 				 */
+				echo "+  Adding {$row['TASK_ID']} {$row['TASK']}\n";
+			}
+			/* Reuse an existing Submission Box
+			 */
+			else {
+				$submissionBoxId = $taskMapper->findSubmissionBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
+				$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+
+				/* Alert user
+ 				 */
+				echo "^  Updating {$row['TASK_ID']} {$row['TASK']}\n";
+			}
+
+			/* Assign category if it exists in schoolbox
+			 */
+			try {
+				$category = $categoryMapper->findByCode($row['CLASS_CODE']);
+				$submissionBox->setCategory($category);
+
+				/* Assign submission box owner
 				 */
-				try {
-					$category = $categoryMapper->findByCode($row['CLASS_CODE']);
-					$submissionBox->setCategory($category);
+				$category->loadTeachers();
+				$submissionBox->setOwner($category->getTeachers()->first());
+			}
+			catch (\Exception $e) {
 
-					/* Assign submission box owner
-					 */
-					$category->loadTeachers();
-					$submissionBox->setOwner($category->getTeachers()->first());
-				}
-				catch (\Exception $e) {
+				/* Ignore everything if you can't find a Schoolbox Category
+				 */
+				echo "!  Cannot find Category with code {$row['CLASS_CODE']} for task {$row['TASK_ID']} {$row['TASK']}\n";
+				continue;
+			}
 
-					/* Ignore everything if you can't find a Schoolbox Category
-					 */
-					echo "!  Cannot find Category with code {$row['CLASS_CODE']} for task {$row['TASK_ID']} {$row['TASK']}\n";
-					continue;
-				}
+			/* Proceed if a Submission Box could be spawned
+			 */
+			if ($submissionBox instanceof \Schoolbox\Assessment\Component\SubmissionBox) {
 
 				/* Assign work type
 				 */
-				try {
-					$workType = $workTypeMapper->findByColumn('name', $row['TASK_TYPE']);
+				$workType = $workTypeMapper->findByColumn('name', $row['TASK_TYPE']);
+
+				if ($workType->count()) {
 					$submissionBox->setWorkType($workType->first());
 				}
-				catch (\Exception $e) {
+				else {
+					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} - Work Type not found \n";
+					continue;
 				}
 
 				/* Assign name, description
@@ -82,11 +108,14 @@ class External_Edumate_Task extends External_Edumate_Connection {
 
 				/* Assign marking rules
 				 */
-				try {
-					$markType = $markTypeMapper->findByColumn('slug', 'raw');
+				$markType = $markTypeMapper->findByColumn('slug', 'raw');
+
+				if ($markType->count()) {
 					$submissionBox->setMarkType($markType->first());
 				}
-				catch (\Exception $e) {
+				else {
+					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} - Mark Type not found \n";
+					continue;
 				}
 
 				$submissionBox->setRubricResultSet(0);
@@ -101,14 +130,12 @@ class External_Edumate_Task extends External_Edumate_Connection {
 				/* Create a relation between the submission box and the Task
 				 * from which it spawned
 				 */
-				$taskMapper->createRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE']);
-
-				/* Alert user
-				 */
-				echo "+  Added {$row['TASK_ID']} {$row['TASK']}\n";
+				if (!$exists) {
+					$taskMapper->createRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE']);
+				}
 			}
 			else {
-				echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} because it already exists\n";
+				echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} - Submission Box could not be instantiated \n";
 			}
 		}
 	}
