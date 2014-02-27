@@ -423,7 +423,6 @@ class Session
                 }
             } else { //user is not parent so get timetable information
                 $subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
-
                 $catList = array();
                 if (is_array($subjectList)) {
                     foreach ($subjectList as $subject) {
@@ -433,8 +432,9 @@ class Session
                             if (!in_array($result['id'], $catList)) {
                                 $subject['id'] = $result['id'];
                                 $subject['name'] = $result['name'];
-
+								$subject['code'] = $result['code'];
                                 $_SESSION['subjects'][] = $subject;
+
                                 $catList[] = $result['id']; //check for dupes
                             }
                         }
