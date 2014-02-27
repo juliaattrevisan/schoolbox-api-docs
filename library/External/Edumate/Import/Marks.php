@@ -44,6 +44,8 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 
 			if (!$exists) {
 				$submissionReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
+
+				$submissionReturn->setReturned(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			}
 			else {
 				$submissionReturnId = $marksMapper->findReturnFromTask($row['TASK_ID'], $row['CLASS_CODE']);
@@ -102,7 +104,6 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			$submissionReturn->setMimetype(null);
 			$submissionReturn->setDeleted(null);
 			$submissionReturn->setSubmitted(null);
-			$submissionReturn->setReturned(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
 			/* Save it
 			 */
