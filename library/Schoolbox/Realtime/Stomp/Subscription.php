@@ -28,6 +28,8 @@ class Subscription {
 	/** @var int */
 	protected $id;
 
+	protected $userId;
+
 	/** @var Client */
 	protected $client;
 
@@ -46,6 +48,7 @@ class Subscription {
 		$this->messages = array();
 		$this->client = $client;
 		$this->pipeManager = $pipeManager;
+		$this->userId = $userId;
 		$self = $this;
 
 		$this->id = $this->client->subscribeWithAck($destination, 'client',
@@ -66,20 +69,11 @@ class Subscription {
 				if($pipeManager->onAMQP($self->frame2msg($frame), $userId)) {
 					$self->addMessage($frame, $ackResolver);
 				}
-				else {
-					// failed to attach listener, which means there are no pipes, which means we should not be subscribed to this user
-					$self->unsubscribe();
-					return;
-				}
 			});
 	}
 
 	public function getId() {
 		return $this->id;
-	}
-
-	public function unsubscribe() {
-		$this->client->unsubscribe($this->id);
 	}
 
 
@@ -93,6 +87,17 @@ class Subscription {
 		$amqpMessageId = $frame->getHeader('amqp-message-id');
 		$this->messages[$amqpMessageId] = new Message($frame, $ackResolver);
 		$this->pipeManager->v("Attached resolver for $amqpMessageId");
+	}
+
+
+	/**
+	 * Push all the notifications currently UNACK'd by this subscription to the user
+	 */
+	public function push() {
+		foreach($this->messages as $stompMsg) {
+			// these will be buffered and forwarded to all clients for this user
+			$this->pipeManager->onAMQP($this->frame2msg($stompMsg->frame), $this->userId);
+		}
 	}
 
 	/**
