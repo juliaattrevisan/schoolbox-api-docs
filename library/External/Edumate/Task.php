@@ -139,4 +139,24 @@ class External_Edumate_Task extends External_Edumate_Connection {
 			}
 		}
 	}
+
+	/**
+	 * Import marks from Task/CategoryCode to SubmissionBox/Student combo
+	 */
+	public function importAllMarks() {
+		$query = "
+			SELECT *
+			FROM db2inst1.schoolbox_task_marks
+		";
+
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->execute();
+
+		/* Only create new Submission Boxes for tasks who don't already
+		 * have submission boxes
+		 */
+		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+			new \Alaress_Probe($row);
+		}
+	}
 }

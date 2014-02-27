@@ -12,3 +12,4 @@ require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
 
 $importer = new \External_Edumate_Task();
 $importer->importAllTasks();
+$importer->importAllMarks();
