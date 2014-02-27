@@ -42,7 +42,7 @@ $di->setters['Alaress\\Web\\Controller\\Base'] = array(
 );
 
 // inject web params (yep, even Sitepage!)
-//$di->params['SitePage']['login'] = false;
+$di->params['SitePage']['login'] = false;
 $di->set('sitePage', $di->lazyNew('SitePage'));
 
 // Web output class - currently uses Sitepage
