@@ -44,14 +44,37 @@
 @link-color: 	    #237CFF;
 @header-color:      #eeeeee;
 @background:        #F0F7FE;
-@login-color:       darken(@banner-color, 10%);
+@login-color:       #005288;
 @login-lighten:     10%;
 
 // OPTIONAL
 // any definitions in variables.less can be overridden by re-specifying here
 #loading img {
-  margin-left: -94.5px;
+  margin-left: -67.5px;
+  bottom: 65%;
 }
+
+#login_frm{ top: 37% !important; }
+#login_frm input::-webkit-input-placeholder { color: #7a7a7a !important; }
+#login_frm input:-moz-placeholder { color: #7a7a7a !important; } /* Firefox 18- */
+#login_frm input::-moz-placeholder { color: #7a7a7a !important; } /* Firefox 19+ */
+#login_frm input:-ms-input-placeholder { color: #7a7a7a !important; }
+
+#login_frm input[type="text"],
+#login_frm input[type="password"],
+#login_frm input[type="text"]:focus,
+#login_frm input[type="password"]:focus{
+  background: #fff;
+  color: #7a7a7a;
+}
+
+#login_frm input[type="submit"]{
+  background: #cb042d !important;
+  -webkit-appearance: none;
+  -webkit-border-radius:0;
+  border-radius:0;
+}
+
 // =============================================================================
 // Includes
 // =============================================================================
