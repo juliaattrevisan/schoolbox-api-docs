@@ -20,9 +20,14 @@ use React\EventLoop\Timer\Timer;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
 use Schoolbox\Notif\Queue\UnreadMessage;
+use Schoolbox\Realtime\MessageHandlerInterface;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
+use Schoolbox\Realtime\Stomp\SubscriptionException;
 use Schoolbox\Realtime\Stomp\SubscriptionManager;
+use Alaress\WorkerCrew\Dispatcher;
+use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Schoolbox\Realtime\Verboser;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -32,21 +37,13 @@ use Schoolbox\Mapper\Exception as MapperException;
  * Class PipeManager
  * @package Schoolbox\Realtime
  */
-class PipeManager implements WampServerInterface, MessageComponentInterface {
+class PipeManager implements WampServerInterface, MessageComponentInterface, TaskResponseHandlerInterface {
 
 	const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
+	const PHP_SESSION_PREFIX   = 'PHPSESSID=';
 
-	// the minimum KB that must be free to permit a new process to spawn
-	const MEM_CEILING = 102400;
-
-	/** @var Pipe[] */
-	protected $pipesBySocketKey;
-
-	/** @var Pipe[][] */
-	protected $pipesBySessionId;
-
-	/** @var Pipe[][] */
-	protected $pipesByUser;
+	/** @var PipeCollection */
+	protected $pipes;
 
 	/** @var Timer[] */
 	protected $pushTimerCache;
@@ -54,32 +51,27 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
 
-	/** @var int[] */
-	protected $semaphore;
-
-	/** @var int */
-	protected $processCap = 512;
-
 	/** @var LoopInterface */
 	protected $reactLoop;
 
-	/** @var PredisClientInterface */
-	protected $predisClient;
-
 	/** @var Verboser */
 	protected $verboser;
+
+	/** @var Dispatcher */
+	protected $taskDispatcher;
+
 
 	/**
 	 * @param LoopInterface $reactLoop
 	 * @param PredisClientInterface $predisClient
 	 * @param Verboser $verboser
+	 * @param PoolingInterface $strat
 	 */
-	public function __construct($reactLoop, $predisClient, $verboser) {
-		$this->pipes = array();
+	public function __construct($reactLoop, $predisClient, $verboser, $strat = null) {
+		$this->pipes = new PipeCollection($predisClient, $verboser);
 		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
-		$this->predisClient = $predisClient;
-		$this->predisClient->connect(); // ensure this is ACTUALLY connected
+		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $verboser, $strat);
 		$this->verboser = $verboser;
 
 		$this->v('Instantiated PipeManager');
@@ -100,11 +92,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$this->v( sprintf( 'Received socket connection from %s', $pipe->getRemoteAddress()));
 
 		try {
-			$this->registerPipe($pipe);
-			$this->v(sprintf("PIPEREG = %s", count($this->pipesBySocketKey)), '*');
+			$this->pipes->registerPipe($pipe);
 		}
 		catch(CommunicationException $e) {
-			// Redis baulked: signal a retry
+			// couldn't talk to redis, send a retry back to the client
 			$this->v($e->getMessage(), '!');
 
 			$this->sendToPipe($pipe, json_encode(array(
@@ -135,19 +126,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @throws \Exception
 	 */
 	public function onClose(ConnectionInterface $conn) {
-		$this->v('Received socket closure');
-
-		$socketKey = Pipe::getSocketKeyForConnection($conn);
-
-		if(array_key_exists($socketKey, $this->pipesBySocketKey)) {
-			$this->unregisterPipe($this->pipesBySocketKey[$socketKey]);
-		}
-		else {
-			$this->v("Ignoring closure of '$socketKey'");
-		}
-
-		$this->v(sprintf("PIPEREG = %s", count($this->pipesBySocketKey)), '*');
-
+		// explicitly close the descriptor to the temporary-file associated with the request that initiated this conn
+		$conn->WebSocket->request->getBody()->close();
+		$this->pipes->unregisterPipe(Pipe::getSocketKeyForConnection($conn));
 	}
 
 
@@ -179,20 +160,17 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	public function onMessage(ConnectionInterface $from, $msg) {
 		$socketKey = Pipe::getSocketKeyForConnection($from);
 
-		if(!array_key_exists($socketKey, $this->pipesBySocketKey)) {
-			// theoretically this is impossible...but you just never know...
+		if(!($pipe = $this->pipes->getPipeBySocketKey($socketKey))) {
 			throw new ConnectionException("Unrecognised pipe: '$socketKey'");
 		}
 
-		$pipe = $this->pipesBySocketKey[$socketKey];
 		$userId = $pipe->getUserId();
 		$sessionId = $pipe->getSession() ?: 'sessionless';
 
 		$this->v(sprintf('Received message: %s (%s:%s) > %s', $userId ?: 'unknown', $socketKey, $sessionId, $msg), '>');
 
-
 		// we'll just ignore messages that are of unknown origin
-		if(!$userId) {
+		if(!($userId && $sessionId)) {
 			return;
 		}
 
@@ -206,9 +184,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 		$request = each($data);
 
 		$command = $request['key'];
-		$arguments = $request['value'];
+		$arguments = array($userId, $request['value']);
 
-		$this->spawnWorker($pipe, $command, $arguments);
+		// don't flatly spawn a new worker: add the request to a queue
+		$this->taskDispatcher->enqueue($pipe, $command, $arguments);
 
 	}
 
@@ -222,92 +201,37 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @throws ProcessException
 	 */
 	public function onAMQP($message, $userId) {
-		if(count($this->pipesByUser[$userId])) {
-			$pipe = reset($this->pipesByUser[$userId]);
 
-			$self = $this;
-
-			$push = function($timer) use ($self, $pipe) {
-				/** @var Timer $timer */
-				// the timer contains the data to be processed
-				$self->v("Spawning worker to push cache", '>');
-				$data = $timer->getData();
-				if(!$self->spawnWorker($pipe, 'push', json_encode($data))) {
-					$self->v("Failed to spawn push worker, deferring for another second", '*');
-					// reinsert myself because I failed at my task -_-;
-					$timer->getLoop()->addTimer($timer, 1000);
-				}
-			};
-
-			// if the timer either does not exist, or it exists but has expired, create a new timer to fire in one second's time
-			if(!(isset($this->pushTimerCache[$userId]) && $this->pushTimerCache[$userId]->isActive())) {
-				$this->pushTimerCache[$userId] = $this->reactLoop->addTimer(1, $push);
-			}
-
-			// append this message to be pushed
-			$data = (array)$this->pushTimerCache[$userId]->getData();
-			$data[$message->getId()] = $message->getBody();
-			$this->pushTimerCache[$userId]->setData($data);
-
-			return true;
+		if(!$this->pipes->userPipeCount($userId)) {
+			return false;
 		}
 
-		return false;
+		// just get *a* pipe for the user, it doesn't matter which
+		$pipe = reset($this->pipes->getPipesByUserId($userId));
+
+		$self = $this;
+
+		$push = function($timer) use ($self, $pipe) {
+			/** @var Timer $timer */
+			// the timer contains the data to be processed
+			$self->v("Spawning worker to push cache", '>');
+			$data = $timer->getData();
+			$self->taskDispatcher->enqueue($pipe, 'push', $data);
+		};
+
+		// if the timer either does not exist, or it exists but has expired, create a new timer to fire in one second's time
+		if(!(isset($this->pushTimerCache[$userId]) && $this->pushTimerCache[$userId]->isActive())) {
+			$this->pushTimerCache[$userId] = $this->reactLoop->addTimer(1, $push);
+		}
+
+		// append this message to be pushed
+		$data = (array)$this->pushTimerCache[$userId]->getData();
+		$data[$message->getId()] = $message->getBody();
+		$this->pushTimerCache[$userId]->setData($data);
+
+		return true;
 	}
 
-	/**
-	 * Register this pipe connection
-	 *
-	 * @param Pipe $pipe
-	 * @throws SessionException
-	 */
-	protected function registerPipe($pipe) {
-		$socketKey = $pipe->getSocketKey();
-		$sessionId = $pipe->getSession();
-
-		$this->pipesBySocketKey[$socketKey] = $pipe;
-		$this->v("REGISTER   '$socketKey'", '+');
-
-		if($sessionId) {
-			$this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
-			$this->v("LINK       '$socketKey' -> SESSION '$sessionId'");
-
-			if($userId = $this->findUserBySession($sessionId, $pipe->getRemoteAddress())) {
-				$pipe->setUserId($userId);
-				$this->pipesByUser[$userId][$socketKey] = $pipe;
-				$this->v("LINK       '$socketKey' -> USER    '$userId'");
-			}
-		}
-		else {
-			throw new SessionException("No session, no user.");
-		}
-
-	}
-
-	/**
-	 * Unregister this pipe connection
-	 *
-	 * @param Pipe $pipe
-	 */
-	protected function unregisterPipe($pipe) {
-
-		$socketKey = $pipe->getSocketKey();
-		$sessionId = $pipe->getSession();
-
-		if($sessionId) {
-			unset($this->pipesBySessionId[$sessionId][$socketKey]);
-		}
-
-		if($userId = $pipe->getUserId()) {
-			unset($this->pipesByUser[$userId][$socketKey]);
-		}
-
-		// send a connection-close to the client at the other end of the pipe
-		$this->pipesBySocketKey[$socketKey]->close();
-
-		$this->v("UNREGISTER '$socketKey'", '-');
-		unset($this->pipesBySocketKey[$socketKey]);
-	}
 
 	/**
 	 * Unregister all pipes associated with a session.
@@ -315,10 +239,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param string $sessionId
 	 */
 	protected function unregisterAllPipesBySessionId($sessionId) {
-		if(array_key_exists($sessionId, $this->pipesBySessionId)) {
-			foreach($this->pipesBySessionId[$sessionId] as $pipe) {
-				$this->unregisterPipe($pipe);
-			}
+		foreach($this->pipes->getPipesBySessionId($sessionId) as $pipe) {
+			$this->pipes->unregisterPipe($pipe->getSocketKey());
 		}
 	}
 
@@ -329,207 +251,84 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param int $userId
 	 */
 	protected function unregisterAllPipesByUserId($userId) {
-		if(array_key_exists($userId, $this->pipesByUser)) {
-			foreach($this->pipesByUser[$userId] as $pipe) {
-				$this->unregisterPipe($pipe);
-			}
+		foreach($this->pipes->getPipesByUserId($userId) as $pipe) {
+			$this->pipes->unregisterPipe($pipe->getSocketKey());
 		}
 	}
 
 
 	/**
-	 * Extracts a user by ID from a Redis session and returns the associated User object, or
-	 * null if the user cannot be located.
+	 * Handles a response from a Worker
 	 *
-	 * @param string $sessionId
-	 * @param string $pipeIp
-	 * @throws SessionException
-	 * @return int
+	 * @param Pipe $pipe         - the identifier passed as the first argument to Dispatcher::enqueue()
+	 * @param string $command    - the command that was executed by the Worker
+	 * @param string $data       - the data with which the Worker responded
+	 * @return void              - this method does not return any value
 	 */
-	protected function findUserBySession($sessionId, $pipeIp = null) {
-		if(!$sessionId) {
-			throw new SessionException("No sessionID provided on which to search.");
-		}
-
-		$redisResponse = $this->predisClient->executeCommand(
-			$this->predisClient->createCommand('get', array(self::REDIS_SESSION_PREFIX.$sessionId))
-		);
-
-		if(!preg_match('`id\|s:[0-9]+:"([0-9]+)";`', $redisResponse, $matches)) {
-			throw new SessionException("User not found");
-		}
-
-		$userId = $matches[1];
-
-		if(is_numeric($userId)) {
-			return $userId;
-		}
-		throw new SessionException("User ID not found in session.");
-	}
-
-
-	/**
-	 * @param Pipe $pipe
-	 * @param string $command
-	 * @param array $arguments
-	 * @return bool
-	 * @throws \Schoolbox\Realtime\ProcessException
-	 */
-	public function spawnWorker($pipe, $command, $arguments) {
+	public function handleResponse($pipe, $command, $data) {
 
 		$userId = $pipe->getUserId();
 
-		$fp = fopen('/proc/meminfo','r');
+		if(is_string($data)) {
+			$this->v("Handling a worker response: $command => " .
+				(strlen($data) > 32
+					? sprintf("%s... (%d bytes)", substr($data, 0, 29), strlen($data))
+					: $data
+				)
+			, '?');
+			$response = json_decode($data, true);
+		}
+		else {
+			$this->v("Handling a worker response: $command (array provided)");
+			$response = $data;
+		}
 
-		$mem = 0;
-		while($line = fgets($fp)) {
-			if(strpos($line, 'MemFree') !== false) {
-				$mem = intval(substr($line, 16, -3));
+		switch(strtolower($command)) {
+			// deal with this yourself
+			case 'subscribe':
+				try {
+					if(!$this->subscriptionManager->subscribe($userId, new SelfResponder($this, $pipe))) {
+						// initiate a push to the client if subscribing failed (ie. they already got one)
+						$this->subscriptionManager->getUserSubscription($userId)->push();
+					}
+				}
+				catch(SubscriptionException $e) {
+					// could not subscribe the user, rabbit-offline has already been reported, just inform the user
+					$this->sendToPipe($pipe, array($command => false));
+				}
 				break;
-			}
+
+			// this was dealt with by a worker, just push the result
+			case 'fetch':
+			case 'push':
+				$this->sendToPipe($pipe, array($command => $response));
+				break;
+
+			// deal with this yourself
+			case 'ack':
+				if($subscription = $this->subscriptionManager->getUserSubscription($userId, true)) {
+					$markAsRead = $subscription->acceptMessages($response);
+					$this->sendToUser($userId, array($command => $markAsRead));
+				}
+				break;
 		}
-
-		fclose($fp);
-
-		if($mem < self::MEM_CEILING) {
-			$this->processCap = count($this->semaphore) < $this->processCap ? count($this->semaphore) : $this->processCap;
-			$this->v("Memory ceiling reached, capping process count at $this->processCap", '!');
-
-			if($this->processCap == 0) {
-				throw new ProcessException("Fatality! Process cap has reached zero.");
-			}
-		}
-
-		if(count($this->semaphore) >= $this->processCap) {
-			$this->v("Rejecting '$command' for user $userId: process cap exceeded.",'*');
-			return false;
-		}
-
-		if(isset($this->semaphore["$userId:$command"])) {
-			$this->v("Rejecting '$command' for user $userId: semaphore locked.",'*');
-			// don't notify the client of busy if it's coming from the server
-			if($command != 'push') {
-				$this->sendToPipe($pipe, json_encode(array(
-					'busy' => $command
-				)));
-			}
-			return false;
-		}
-
-		$this->semaphore["$userId:$command"] = true;
-
-		// WARNING: THIS CREATES A WORKER PROCESS
-		$this->attachResponder(new WorkerResponder($command, array($userId, $arguments)), $pipe);
-
-		return true;
 
 	}
 
-	/**
-	 * @param WorkerResponder $responder
-	 * @param Pipe $pipe
-	 */
-	protected function attachResponder($responder, $pipe) {
-
-		$rSock = new \React\Stream\Stream($responder->getOutputStream(), $this->reactLoop);
-
-		$buffer = '';
-
-		$rSock->on('data', function($data, $socketStream) use (&$buffer) {
-			/**
-			 * @var string $data
-			 * @var \React\Stream\Stream $socketStream
-			 */
-
-			if($data) {
-				$buffer .= $data;
-			}
-
-		});
-
-		$pipeManager = $this;
-		$subscriptionManager = $this->subscriptionManager;
-
-		$rSock->on('close', function($stream) use(&$buffer, $pipeManager, $pipe, &$responder, $subscriptionManager) {
-			// received EOF, time to send the result to the client
-
-			$userId = $pipe->getUserId();
-
-			// release this responder so more can be spawned for the user
-			$pipeManager->detachResponder($responder, $userId);
-
-			// don't attempt to split if the data came through badly
-			if(strpos($buffer, Responder::CONTEXT_DELIMITER) === false) {
-				$pipeManager->v(str_replace("\n",'\n',$buffer), '?');
-				return;
-			}
-
-			list($context, $data) = explode(Responder::CONTEXT_DELIMITER, $buffer, 2);
-
-			// validate data given for debugging
-			if(is_null(json_decode($data, true))) {
-				$pipeManager->v("Data piped is not JSON: $data", '?');
-			}
-
-//			$pipeManager->v("$context => $data", 'd');
-
-			// depending on what context was supplied, send the data to the appropriate pipes
-			switch($context) {
-				case Responder::CONTEXT_PIPE:
-					$pipeManager->sendToPipe($pipe, $data);
-					break;
-				case Responder::CONTEXT_USER:
-					$pipeManager->sendToUser($userId, $data);
-					break;
-				case Responder::CONTEXT_SESSION:
-					$pipeManager->sendToSession($pipe->getSession(), $data);
-					break;
-				case Responder::CONTEXT_SELF:
-					// this is a bounceback so the subscription is registered in the parent
-					if($data == 'subscribe') {
-						$subscriptionManager->subscribe($userId, new SelfResponder($pipeManager, $pipe));
-						break;
-					}
-					$data = json_decode($data, true);
-					// this is also a bounceback, because you can only ack from the subscription you started
-					if(isset($data['ack'])) {
-						if($subscription = $subscriptionManager->getUserSubscription($userId, true)) {
-							$markAsRead = $subscription->acceptMessages($data['ack']);
-							$pipeManager->sendToUser($userId, json_encode(array('ack' => $markAsRead)));
-						}
-					}
-					break;
-			}
-		});
-
-	}
-
-
-	/**
-	 * @param WorkerResponder $responder
-	 * @param int $userId
-	 */
-	public function detachResponder($responder, $userId) {
-		$command = $responder->getCommand();
-
-		$this->v(sprintf("Worker [%s:%s] completed in %0.5fms", $userId, $command, 1000*(microtime(true) - $responder->launchtime)), '*');
-		$responder->stop();
-
-		// release semaphore
-		unset($this->semaphore["$userId:$command"]);
-	}
 
 	/**
 	 * Send data to a specific pipe.
 	 *
 	 * @param Pipe $pipe
-	 * @param string $data
+	 * @param string|array $data
 	 */
 	public function sendToPipe($pipe, $data) {
+		$data = is_string($data) ? $data : json_encode($data);
 		$bytes = strlen($data);
 		$this->v("Sending $bytes bytes to {$pipe->getSocketKey()}", '<');
 		$pipe->send($data);
 	}
+
 
 	/**
 	 * Send data to all pipes associated with a specific session.
@@ -538,12 +337,11 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param string $data
 	 */
 	public function sendToSession($sessionId, $data) {
-		if(array_key_exists($sessionId, $this->pipesBySessionId)) {
-			foreach($this->pipesBySessionId[$sessionId] as $pipe) {
-				$this->sendToPipe($pipe, $data);
-			}
+		foreach($this->pipes->getPipesBySessionId($sessionId) as $pipe) {
+			$this->sendToPipe($pipe, $data);
 		}
 	}
+
 
 	/**
 	 * Send data to all pipes associated with a specific user.
@@ -552,25 +350,11 @@ class PipeManager implements WampServerInterface, MessageComponentInterface {
 	 * @param string $data
 	 */
 	public function sendToUser($userId, $data) {
-		if(array_key_exists($userId, $this->pipesByUser)) {
-			foreach($this->pipesByUser[$userId] as $pipe) {
-				$this->sendToPipe($pipe, $data);
-			}
+		foreach($this->pipes->getPipesByUserId($userId) as $pipe) {
+			$this->sendToPipe($pipe, $data);
 		}
 	}
 
-
-	/**
-	 * Message from client: stub (test connectivity).
-	 *
-	 * @param Pipe $pipe
-	 * @param mixed $arguments
-	 * @return bool
-	 */
-	public function doPipe_($pipe, $arguments) {
-		$this->v('STUB', 'd');
-		return true;
-	}
 
 	// noop
 	public function onCall(ConnectionInterface $conn, $id, $topic, array $params) { }
