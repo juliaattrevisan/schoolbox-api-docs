@@ -50,22 +50,37 @@
 // OPTIONAL
 // any definitions in variables.less can be overridden by re-specifying here
 #loading img {
-  margin-left: -67.5px;
-  bottom: 65%;
+  margin-left: -64.5px;
+  bottom: auto;
+  top: 5%;
 }
 
-#login_frm{ top: 37% !important; }
-#login_frm input::-webkit-input-placeholder { color: #7a7a7a !important; }
-#login_frm input:-moz-placeholder { color: #7a7a7a !important; } /* Firefox 18- */
-#login_frm input::-moz-placeholder { color: #7a7a7a !important; } /* Firefox 19+ */
-#login_frm input:-ms-input-placeholder { color: #7a7a7a !important; }
+#login_frm{
+  top: 14% !important;
+
+  li{ padding: 12px 5%;
+      input{
+          width: 90%;
+          height: 56px;
+          padding: 4px 5%;
+          font-size: 20px;
+      }
+  }
+}
+#login_frm input::-webkit-input-placeholder { color: #797979 !important; text-align: center; font-size: 20px; }
+#login_frm input:-moz-placeholder { color: #797979 !important; text-align: center; font-size: 20px; } /* Firefox 18- */
+#login_frm input::-moz-placeholder { color: #797979 !important; text-align: center; font-size: 20px; } /* Firefox 19+ */
+#login_frm input:-ms-input-placeholder { color: #797979 !important; text-align: center; font-size: 20px; }
 
 #login_frm input[type="text"],
 #login_frm input[type="password"],
 #login_frm input[type="text"]:focus,
 #login_frm input[type="password"]:focus{
   background: #fff;
-  color: #7a7a7a;
+  color: #797979 !important;
+  -webkit-appearance: none;
+  -webkit-border-radius:0;
+  border-radius:0;
 }
 
 #login_frm input[type="submit"]{
@@ -73,6 +88,7 @@
   -webkit-appearance: none;
   -webkit-border-radius:0;
   border-radius:0;
+  width: 100%;
 }
 
 // =============================================================================
