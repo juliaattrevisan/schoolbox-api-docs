@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "bfd7de99c8e3218f64511d67edd48dae",
+    "hash": "87b0da6e4202342b37e589fdf93b448d",
     "packages": [
         {
             "name": "aura/di",
@@ -113,6 +113,62 @@
                 "routing"
             ],
             "time": "2014-04-03 14:01:35"
+        },
+        {
+            "name": "aura/session",
+            "version": "dev-develop-2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/auraphp/Aura.Session.git",
+                "reference": "eacf54f7d576cb151f6b999dd6c7312eadc0f538"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/eacf54f7d576cb151f6b999dd6c7312eadc0f538",
+                "reference": "eacf54f7d576cb151f6b999dd6c7312eadc0f538",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "suggest": {
+                "ext-mcrypt": "Mcrypt generates the next best secure CSRF tokens.",
+                "ext-openssl": "OpenSSL generates the best secure CSRF tokens."
+            },
+            "type": "library",
+            "extra": {
+                "aura": {
+                    "type": "library"
+                },
+                "branch-alias": {
+                    "dev-develop-2": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Aura\\Session\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Aura.Session Contributors",
+                    "homepage": "https://github.com/auraphp/Aura.Session/contributors"
+                }
+            ],
+            "description": "Provides session management functionality, including session segments, read-once (flash) values, CSRF tools, and lazy session starting.",
+            "homepage": "http://auraphp.github.com/Aura.Session",
+            "keywords": [
+                "csrf",
+                "flash",
+                "flash message",
+                "session",
+                "sessions"
+            ],
+            "time": "2014-03-15 15:16:32"
         },
         {
             "name": "aura/web",
@@ -2706,7 +2762,8 @@
         "browscap/browscap-php": 20,
         "aura/di": 20,
         "aura/router": 20,
-        "aura/web": 20
+        "aura/web": 20,
+        "aura/session": 20
     },
     "platform": [
 
