@@ -14,8 +14,20 @@ class Verboser {
 
 	protected $stream;
 
-	public function __construct($stream) {
+	protected $port = 'nill';
+
+	protected $formats = array(
+		'pid'  => '{%4s}',
+		'mem'  => '[%6.2f / %6.2f]',
+		'port' => '[%4d]',
+		'time' => '[%s.%.8f]'
+	);
+
+	protected $visible = array();
+
+	public function __construct($stream, $fields = array('pid','time')) {
 		$this->stream = $stream;
+		$this->setVisibleFields($fields);
 	}
 
 	public function v($message, $char = ' ') {
@@ -33,13 +45,71 @@ class Verboser {
 				case '<': $c = '1;37'; break;
 			}
 
-			fputs($this->stream, sprintf(
-				"%s[$char] [%s] [%6.2f / %6.2f] $message%s\n",
+			$str = array(
+				'[%s]' => $char
+			);
+
+			foreach($this->visible as $field) {
+				$str[$this->formats[$field]] = $this->getValueFor($field);
+			}
+
+			$format = sprintf("%s%s => %s%s\n",
 				$c ? "\033[{$c}m" : '',
-				getmypid(),
+				implode(array_keys($str)),
+				$message,
+				$c ? "\033[0m" : ''
+			);
+
+			$args = array($format);
+
+			foreach($str as $val) {
+				if(is_array($val)) {
+					foreach($val as $v) {
+						$args[] = $v;
+					}
+				}
+				else {
+					$args[] = $val;
+				}
+			}
+
+			fputs($this->stream, call_user_func_array('sprintf', $args));
+		}
+	}
+
+	protected function getValueFor($field) {
+		switch($field) {
+			case 'pid':  return getmypid();
+			case 'mem':  return array(
 				(int)(memory_get_usage(true))/(1024*1024),
 				(int)(memory_get_peak_usage(true))/(1024*1024),
-				$c ? "\033[0m" : ''));
+			);
+			case 'port': return $this->port;
+			case 'time':
+				$time = microtime(true);
+				$intt = (int)$time;
+				$rmdr = $time - $intt;
+
+				return array(
+					date("H:i:s",$intt),
+					$rmdr
+				);
+		}
+		return '';
+	}
+
+	public function setPort($port) {
+		$this->port = $port;
+	}
+
+	public function setVisibleFields($fields) {
+		// cast that sucker
+		$valid = array_keys($this->formats);
+		$this->visible = array();
+		foreach((array)$fields as $f) {
+			if(in_array($f, $valid)) {
+				$this->visible[] = $f;
+			}
 		}
 	}
 
