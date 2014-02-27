@@ -44,18 +44,10 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 
 			if (!$exists) {
 				$submissionReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
-
-				/* Alert user
- 				 */
-				echo "+  Adding {$row['TASK_ID']} for {$row['STUDENT_ID']}\n";
 			}
 			else {
 				$submissionReturnId = $marksMapper->findSubmissionReturnFromTask($row['TASK_ID'], $row['CLASS_CODE']);
 				$submissionReturn = $submissionReturnMapper->findById($submissionReturnId);
-
-				/* Alert user
- 				 */
-				echo "^  Updating {$row['TASK_ID']} for {$row['STUDENT_ID']}\n";
 			}
 
 			/* Make sure the Submission Box exists first because we need to find the
@@ -120,6 +112,11 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			 */
 			if (!$exists) {
 				$taskMapper->createReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE']);
+
+				echo "+  Adding {$row['TASK_ID']} for {$row['STUDENT_ID']}\n";
+			}
+			else {
+				echo "^  Updating {$row['TASK_ID']} for {$row['STUDENT_ID']}\n";
 			}
 		}
 

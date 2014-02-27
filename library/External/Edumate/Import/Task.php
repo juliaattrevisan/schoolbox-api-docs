@@ -38,20 +38,12 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 			 */
 			if (!$exists) {
 				$submissionBox = new \Schoolbox\Assessment\Component\SubmissionBox();
-
-				/* Alert user
- 				 */
-				echo "+  Adding {$row['TASK_ID']} {$row['TASK']}\n";
 			}
 			/* Reuse an existing Submission Box
 			 */
 			else {
 				$submissionBoxId = $taskMapper->findSubmissionBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
 				$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
-
-				/* Alert user
- 				 */
-				echo "^  Updating {$row['TASK_ID']} {$row['TASK']}\n";
 			}
 
 			/* Assign category if it exists in schoolbox
@@ -132,6 +124,11 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				 */
 				if (!$exists) {
 					$taskMapper->createRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE']);
+
+					echo "+  Adding {$row['TASK_ID']} {$row['TASK']}\n";
+				}
+				else {
+					echo "^  Updating {$row['TASK_ID']} {$row['TASK']}\n";
 				}
 			}
 			else {
