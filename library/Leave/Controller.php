@@ -411,9 +411,6 @@ class Leave_Controller extends Controller {
 		/* Limit leave creation to a threshold
 		 */
 		if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
-			new \Alaress_Probe($_POST);
-			new \Alaress_Probe($data);
-			die();
 			$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
 			$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
 			$created = new Alaress_Date_Format(time(), 'U');
@@ -902,7 +899,7 @@ class Leave_Controller extends Controller {
             throw new Exception_Schoolbox_NotFound('User not found');
         }
         try {
-            $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
+			$house = $this->getHouseMapper()->findById($user->getResidentialHouse());
         }
         catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
