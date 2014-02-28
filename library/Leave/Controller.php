@@ -369,6 +369,14 @@ class Leave_Controller extends Controller {
 	 * @return bool
 	 */
 	private function isOutsideCreationThreshold($startDate) {
+		$thresholdHours = \Cfg::get('boarder_leave_creation_threshold');
+
+		/* Use 0 to deactivate this feature
+		 */
+		if (!$thresholdHours) {
+			return true;
+		}
+
 		$thresholdDateTime = new \Alaress_Date_Format($startDate, 'd/m/y');
 		$weekdayIndex = $thresholdDateTime->getUsingFormat('N');
 
@@ -384,7 +392,6 @@ class Leave_Controller extends Controller {
 		/* Subtract number of hours from config to determine outer limits
 		 * Measure it from high noon
 		 */
-		$thresholdHours = \Cfg::get('boarder_leave_creation_threshold');
 		$thresholdDateTime->addHours(12 - $thresholdHours);
 
 		/* If you're outside the threshold, you can create it
