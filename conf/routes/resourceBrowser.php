@@ -9,9 +9,11 @@
 
 use Aura\Di;
 use Aura\Router\Router;
+use Alaress\Authorizer;
 
 /** @var Di\Container $di */
 /** @var Router $router */
+/** @var Authorizer\Authorizer $authorizer */
 global $di;
 $router = $di->get('router');
 // attachRedirect('/resource-booking', 'resourceItem.browse')
@@ -19,6 +21,15 @@ $router->attachResource('resourceItem', '/resource-booking/item');
 $router->attachResourcePostAlias('resourceItem', '/resource-booking/item');
 $router->attachResource('resourceCategory', '/resource-booking/category');
 $router->attachResourcePostAlias('resourceCategory', '/resource-booking/category');
+
+// Set up authorization
+$authorizer = $di->get('authorizer');
+$authorizer
+    ->addRule('/^resourceItem(?:$|\.)/', new Authorizer\Rule\IsLoggedIn())
+    ->addRule('/^resourceCategory(?:$|\.)/', new Authorizer\Rule\IsLoggedIn())
+    ->addRule('/^resourceItem\.(?:create|edit|delete)/', new Authorizer\Rule\IsSuperuser())
+    ->addRule('/^resourceCategory\.(?:create|edit|delete)/', new Authorizer\Rule\IsSuperuser())
+;
 
 // Set up the controller
 // The injector is going to be generic to all controllers, so have some better
