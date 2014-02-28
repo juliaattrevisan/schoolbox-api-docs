@@ -154,10 +154,10 @@ function getSingleFileMeta($folderId, $fileId) {
 	$mtypeMap = new MimetypeMapper();
 
 	try {
-		$mime = $mtypeMap->getByFilename($file['name'])->getIconFile();
+		$mimetype = $mtypeMap->getByFilename($file['name']);
 	}
-	catch(\Schoolbox\File\Exception $e) {
-		$mime = 'binary.png';
+	catch (\Exception $e) {
+		$mimetype = $mtypeMap->getUnknownMime();
 	}
 
 	$modified = new Alaress_Date_Relative($file['submitted']);
@@ -166,7 +166,7 @@ function getSingleFileMeta($folderId, $fileId) {
 		'kind' => 'file',
 		'id' => $fileId,
 		'name' => $file['description'],
-		'mime' => $mime,
+		'mime' => $mimetype->getIconFile(),
 		'filesize' => Alaress_Byte_Format::bytesToString($file['file_size']),
 		'hidden' => 0,
 		'description' => $file['description'],

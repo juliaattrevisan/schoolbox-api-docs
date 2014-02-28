@@ -220,8 +220,10 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                     if(threePanel.context == 'eportfolio') {
                         src = '/cms/myImage.php?id='+meta.id+'&width=128&height=128'
                     }
+					/* Just use an icon
+					 */
                     else if(threePanel.context == 'network') {
-                        src = '/cms/networkImage.php?id='+meta.id+'&width=128&height=128'
+                        src = '/images/mime/128x128/' + meta.mime;
                     }
                     else {
                         src = '/cms/image.php?id='+meta.id+'&width=128&height=128'
