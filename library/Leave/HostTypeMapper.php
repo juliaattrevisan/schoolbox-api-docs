@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+namespace Leave;
 
 class HostTypeMapper extends \Schoolbox\Mapper {
 
@@ -16,7 +17,7 @@ class HostTypeMapper extends \Schoolbox\Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
-		$this->hasModel('\Leave\HostType');
+		$this->hasModel('\\Leave\\HostType');
 		$this->hasTable('lu_leave_request_host_type');
 
 		$this->hasMap(array(

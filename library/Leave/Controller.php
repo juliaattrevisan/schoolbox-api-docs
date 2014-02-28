@@ -162,19 +162,20 @@ class Leave_Controller extends Controller {
     private function renderHostTypeDropdown($request) {
         $this->getPage()->setBlock(TEMPLATE_content, 'host_type', 'host_type_block');
 
-        /* Iterate through each option and preselect
-           */
-        foreach ($request->getHostTypeMap() as $value => $label) {
-            if ($request->getHostType() == $value) {
+		/* Iterate through each option and preselect
+		 */
+		foreach($request->getAllHostTypes() as $currentHostType) {
+            if ($request->getHostType() == $currentHostType->getId()) {
                 $selected = 'selected=\'selected\'';
-            } else {
+            }
+			else {
                 $selected = '';
             }
 
             $this->getPage()->setVar(
                 array(
-                    'HOST_TYPE_VALUE' => $value,
-                    'HOST_TYPE_LABEL' => $label,
+                    'HOST_TYPE_VALUE' => $currentHostType->getId(),
+                    'HOST_TYPE_LABEL' => $currentHostType->getName(),
                     'HOST_TYPE_SELECTED' => $selected,
                 )
             );
