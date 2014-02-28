@@ -39,7 +39,8 @@ $j(function() {
         hideTrigger: true,
         minChars: 2,
         width: 200,
-        maxSelection: 1
+        maxSelection: 1,
+		name: 'user'
     }
     var ms = $j('#user').magicSuggest(options)
     $j(ms).on('selectionchange', function(event, combo, selection) {
