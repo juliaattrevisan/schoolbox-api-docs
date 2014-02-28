@@ -10,14 +10,13 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
+use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use Alaress\WorkerCrew\Worker\Worker;
-use Alaress\WorkerCrew\Worker\WorkerArray;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
-use InvalidArgumentException;
 use OutOfBoundsException;
 
 
-class VariableStrategy implements PoolingInterface {
+class VariableStrategy extends DefaultStrategy {
 
 	protected $flywheelSpins;
 
@@ -27,6 +26,7 @@ class VariableStrategy implements PoolingInterface {
 	protected $maxFlywheel;
 	protected $idleTimeout;
 
+
 	public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $idleTimeout) {
 		$this->flywheelSpins = $maxFlywheel;
 		$this->minWorkers = $minWorkers;
@@ -34,29 +34,7 @@ class VariableStrategy implements PoolingInterface {
 		$this->queueDelay = $queueDelay;
 		$this->maxFlywheel = $maxFlywheel;
 		$this->idleTimeout = $idleTimeout;
-	}
-
-
-
-
-	/**
-	 * Returns the command that will be executed each time a worker is spawned by this strategy.
-	 *
-	 * @return string
-	 */
-	public function getCommand() {
-		return SITE_root . "/tools/socket/worker.php";
-	}
-
-
-	/**
-	 * Returns whether or not a new command can be accepted.
-	 *
-	 * @param WorkerBundleInterface $workers
-	 * @return bool
-	 */
-	public function canAccept($workers) {
-		return $this->getAvailableWorker($workers, 0) != -1;
+		$this->protocol = new AlaressIPCProtocol();
 	}
 
 
@@ -95,86 +73,6 @@ class VariableStrategy implements PoolingInterface {
 
 
 	/**
-	 * Return the list of commands that can be delegated to workers
-	 *
-	 * @return array
-	 */
-	public function getSupportedActions() {
-		return array('fetch');
-	}
-
-
-	/**
-	 * Evaluate the segment of data given and return a Worker STATE based on it
-	 *
-	 * @param string $data
-	 * @return int
-	 */
-	public function checkState($data) {
-
-		if(strlen($data) == 0) {
-			return Worker::DONE;
-		}
-
-		$char = $data[0];
-
-		switch($char) {
-			case self::STR_NACKNOWLEDGE: // task rejected, give me another
-				return Worker::READY;
-			case self::STR_CANCEL:       // I got an exception -_-
-				return Worker::ERROR;
-		}
-
-		// if the record separator was included, we're at the end of a response
-		if(strpos($data, self::STR_RECORD_SEPARATOR) !== false) {
-			return Worker::DONE;
-		}
-
-		// default case is "here's a chunk of data, I'm not finished yet"
-		return Worker::BUSY;
-	}
-
-
-	/**
-	 * Combine the two given parameters into a string that can be piped as a command to the worker process
-	 *
-	 * @param string $command
-	 * @param mixed $arguments
-	 * @return string
-	 */
-	public function buildTaskString($command, $arguments) {
-		return $command . self::STR_UNIT_SEPARATOR . json_encode($arguments);
-	}
-
-
-	/**
-	 * Separate the given parameter into an array of two elements: command and args.
-	 *
-	 * @param string $taskString
-	 * @throws InvalidArgumentException
-	 * @return array
-	 */
-	public function decomposeTaskString($taskString) {
-		$xpl = explode(self::STR_UNIT_SEPARATOR, $taskString, 2);
-		if(count($xpl) != 2) {
-			throw new \InvalidArgumentException("Invalid task given: '$taskString'");
-		}
-		return $xpl;
-	}
-
-
-	/**
-	 * Converts some data to be in a format safe for socket transmission from Worker to Server
-	 *
-	 * @param mixed $data
-	 * @return string
-	 */
-	public function formatTransmissionData($data) {
-		return json_encode($data) . self::STR_RECORD_SEPARATOR;
-	}
-
-
-	/**
 	 * Returns, in millis, how long the react loop should wait between dispatches from the queue
 	 * @return int
 	 */
@@ -206,48 +104,5 @@ class VariableStrategy implements PoolingInterface {
 	public function getWorkerIdleTimeout() {
 		return $this->idleTimeout;
 	}
-
-
-	/**
-	 * Method to advise the pool that the Dispatcher is idle.
-	 *
-	 * @return void
-	 */
-	public function dispatcherIdle() {
-		// TODO: Implement dispatcherIdle() method.
-	}
-
-
-	/**
-	 * Method to advise the pool that the Dispatcher is engaged.
-	 *
-	 * @return void
-	 */
-	public function dispatcherEngage() {
-		// TODO: Implement dispatcherEngage() method.
-	}
-
-
-	/**
-	 * Returns a NEW, empty WorkerBundle.
-	 *
-	 * @return WorkerBundleInterface
-	 */
-	public function newWorkerBundle() {
-		return new WorkerArray();
-	}
-
-
-	/**
-	 * Strategically remove the workers that you want to from the given collection
-	 *
-	 * @param WorkerBundleInterface $workers
-	 * @return void
-	 */
-	public function cleanup($workers) {
-		$workers->detachWhere(Worker::ENDED);
-	}
-
-
 
 }

@@ -10,9 +10,12 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
+use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
+use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerArray;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
+use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
 
@@ -20,7 +23,7 @@ class DefaultStrategy implements PoolingInterface {
 
 	const MIN_WORKERS  = 1;
 	const MAX_WORKERS  = 4;
-	const MAX_FLYWHEEL = 250; // @1ms delay means a flywheel duration of 250ms
+	const MAX_FLYWHEEL = 0;
 	const QUEUE_DELAY  = 1;
 	const IDLE_TIMEOUT = 5;
 
@@ -29,6 +32,17 @@ class DefaultStrategy implements PoolingInterface {
 
 	public function __construct() {
 		$this->flywheelSpins = self::MAX_FLYWHEEL;
+		$this->protocol = new AlaressIPCProtocol();
+	}
+
+
+	/**
+	 * Returns the IPC protocol that this strategy employs
+	 *
+	 * @return ProtocolInterface
+	 */
+	public function getProtocol() {
+		return $this->protocol;
 	}
 
 
@@ -93,7 +107,7 @@ class DefaultStrategy implements PoolingInterface {
 	 * @return array
 	 */
 	public function getSupportedActions() {
-		return array('fetch');
+		return array('fetch', 'publish');
 	}
 
 
@@ -105,25 +119,27 @@ class DefaultStrategy implements PoolingInterface {
 	 */
 	public function checkState($data) {
 
+		// no data: finished
 		if(strlen($data) == 0) {
 			return Worker::DONE;
 		}
 
-		$char = $data[0];
-
-		switch($char) {
-			case self::STR_NACKNOWLEDGE: // task rejected, give me another
-				return Worker::READY;
-			case self::STR_CANCEL:       // I got an exception -_-
-				return Worker::ERROR;
+		// rejected: ready for more
+		if($this->protocol->isRejected($data)) {
+			return Worker::READY;
 		}
 
-		// if the record separator was included, we're at the end of a response
-		if(strpos($data, self::STR_RECORD_SEPARATOR) !== false) {
+		// cancelled: I am in error now
+		if($this->protocol->isCancelled($data)) {
+			return Worker::ERROR;
+		}
+
+		// ended: That's all your data
+		if($this->protocol->isEnded($data)) {
 			return Worker::DONE;
 		}
 
-		// default case is "here's a chunk of data, I'm not finished yet"
+		// default case: "here's a chunk of data, I'm not finished yet"
 		return Worker::BUSY;
 	}
 
@@ -135,8 +151,8 @@ class DefaultStrategy implements PoolingInterface {
 	 * @param mixed $arguments
 	 * @return string
 	 */
-	public function buildTaskString($command, $arguments) {
-		return $command . self::STR_UNIT_SEPARATOR . json_encode($arguments);
+	public function composeTaskString($command, $arguments) {
+		return $this->protocol->prepareCommand($command, $arguments);
 	}
 
 
@@ -148,9 +164,9 @@ class DefaultStrategy implements PoolingInterface {
 	 * @return array
 	 */
 	public function decomposeTaskString($taskString) {
-		$xpl = explode(self::STR_UNIT_SEPARATOR, $taskString, 2);
+		$xpl = $this->protocol->rebuild($taskString);
 		if(count($xpl) != 2) {
-			throw new \InvalidArgumentException("Invalid task given: '$taskString'");
+			throw new InvalidArgumentException("Invalid task given: '$taskString'");
 		}
 		return $xpl;
 	}
@@ -162,8 +178,19 @@ class DefaultStrategy implements PoolingInterface {
 	 * @param mixed $data
 	 * @return string
 	 */
-	public function formatTransmissionData($data) {
-		return json_encode($data) . self::STR_RECORD_SEPARATOR;
+	public function encodeRecord($data) {
+		return $this->protocol->flatten($data);
+	}
+
+
+	/**
+	 * Decode the given data as received from socket transmission
+	 *
+	 * @param string $data
+	 * @return array
+	 */
+	public function decodeRecords($data) {
+		return $this->protocol->rebuild($data);
 	}
 
 
@@ -239,6 +266,16 @@ class DefaultStrategy implements PoolingInterface {
 	 */
 	public function cleanup($workers) {
 		$workers->detachWhere(Worker::ENDED);
+	}
+
+
+	/**
+	 * @param Exception $exception
+	 * @return void
+	 */
+	public function handleException($exception) {
+		// TODO: Implement handleException() method.
+		echo $exception->getMessage();
 	}
 
 
