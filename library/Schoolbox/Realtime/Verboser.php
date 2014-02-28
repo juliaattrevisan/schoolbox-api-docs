@@ -77,6 +77,13 @@ class Verboser {
 		}
 	}
 
+	public function d($data) {
+		ob_start();
+		var_dump($data);
+		$this->v(ob_get_contents(), 'd');
+		ob_end_clean();
+	}
+
 	protected function getValueFor($field) {
 		switch($field) {
 			case 'pid':  return getmypid();
