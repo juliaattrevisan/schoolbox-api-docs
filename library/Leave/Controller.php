@@ -652,63 +652,56 @@ class Leave_Controller extends Controller {
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
 
-		/* Limit leave creation to a threshold
-		 */
-		if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
-			$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
-			$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
+		$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
+		$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
 
-			$request->setStart($start->getDatabase());
-			$request->setFinish($finish->getDatabase());
-			$request->setHostType($data['request']['hostType']);
-			$request->setHostName($data['request']['hostName']);
-			$request->setHostPhone($data['request']['hostPhone']);
-			$request->setUserPhone($data['request']['userPhone']);
-			$request->setDescription($data['request']['description']);
-			$request->setNotes($data['request']['notes']);
-			$request->setConfirmedBy($data['request']['confirmedBy']);
+		$request->setStart($start->getDatabase());
+		$request->setFinish($finish->getDatabase());
+		$request->setHostType($data['request']['hostType']);
+		$request->setHostName($data['request']['hostName']);
+		$request->setHostPhone($data['request']['hostPhone']);
+		$request->setUserPhone($data['request']['userPhone']);
+		$request->setDescription($data['request']['description']);
+		$request->setNotes($data['request']['notes']);
+		$request->setConfirmedBy($data['request']['confirmedBy']);
 
-			$travelType  = $data['request']['travelType'];
-			$travelTypes = $this->getTravelTypes();
-			if ($travelType && array_key_exists($travelType, $travelTypes)) {
-				$request->setTravelType($travelTypes[$travelType]);
-			}
-			else {
-				$request->setTravelType(null);
-			}
-
-			if (isset($data['approve']) || isset($data['reject'])) {
-				$authorisationDatetime = new Alaress_Date_Format(time(), 'U');
-
-				$request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-				$request->setAuthorisationUser($_SESSION['user']);
-
-				if (isset($data['approve'])) {
-					$request->setStatus(Leave_Request::STATUS_APPROVED);
-				} elseif (isset($data['reject'])) {
-					$request->setStatus(Leave_Request::STATUS_REJECTED);
-				}
-			} else {
-				if (isset($data['delete'])) {
-					$request->setStatus(Leave_Request::STATUS_DELETED);
-				}
-			}
-
-
-			$this->getRequestMapper()->save($request);
-
-			$request = $this->getRequestMapper()->findById($request->getId());
-
-			if (isset($data['approve']) || isset($data['reject'])) {
-				$this->sendUserNotice($request);
-				$this->sendParentNotice($request);
-			}
-
-			$this->getPage()->backToTheFuture(2);
+		$travelType  = $data['request']['travelType'];
+		$travelTypes = $this->getTravelTypes();
+		if ($travelType && array_key_exists($travelType, $travelTypes)) {
+			$request->setTravelType($travelTypes[$travelType]);
 		}
 		else {
-			error(160);
+			$request->setTravelType(null);
 		}
+
+		if (isset($data['approve']) || isset($data['reject'])) {
+			$authorisationDatetime = new Alaress_Date_Format(time(), 'U');
+
+			$request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
+			$request->setAuthorisationUser($_SESSION['user']);
+
+			if (isset($data['approve'])) {
+				$request->setStatus(Leave_Request::STATUS_APPROVED);
+			} elseif (isset($data['reject'])) {
+				$request->setStatus(Leave_Request::STATUS_REJECTED);
+			}
+		} else {
+			if (isset($data['delete'])) {
+				$request->setStatus(Leave_Request::STATUS_DELETED);
+			}
+		}
+
+
+		$this->getRequestMapper()->save($request);
+
+		$request = $this->getRequestMapper()->findById($request->getId());
+
+		if (isset($data['approve']) || isset($data['reject'])) {
+			$this->sendUserNotice($request);
+			$this->sendParentNotice($request);
+		}
+
+		$this->getPage()->backToTheFuture(2);
     }
 
     /**
