@@ -121,6 +121,29 @@ class Leave_Controller extends Controller {
         $this->setTravelTypes($travelMethods);
     }
 
+	/**
+	 * Fix values in POST array due to magicsuggest
+	 *
+	 * @return mixed
+	 */
+	public function preprocessPost() {
+
+		/* Deal with magicsuggest sometimes giving you an array of ints,
+		 * or just an int
+		 */
+		$data = $_POST;
+
+		if (is_numeric($_POST['user'])) {
+			$data['userId'] = $_POST['user'];
+		}
+		else {
+			$wtf = json_decode($_POST['user']);
+			$data['userId'] = $wtf[0];
+		}
+
+		return $data;
+	}
+
     /**
      * Test email deployments
      */
@@ -335,6 +358,44 @@ class Leave_Controller extends Controller {
         return $this->getGroup()->getPermission(null);
     }
 
+	/**
+	 * Determine whether the leave start date is inside or outside the
+	 * creation threshold. If it's outside, you can create it
+	 *
+	 * Thresholds are measured from Friday 12PM of the weekend that
+	 * leave was intended to start
+	 *
+	 * @param $startDate
+	 * @return bool
+	 */
+	private function isOutsideCreationThreshold($startDate) {
+		$thresholdDateTime = new \Alaress_Date_Format($startDate, 'd/m/y');
+		$weekdayIndex = $thresholdDateTime->getUsingFormat('N');
+
+		/* Get back to nearest Friday, which comes after furthest Thursday
+		 */
+		if ($weekdayIndex == 6) {
+			$thresholdDateTime->addDays(-1);
+		}
+		else if ($weekdayIndex == 7) {
+			$thresholdDateTime->addDays(-2);
+		}
+
+		/* Subtract number of hours from config to determine outer limits
+		 * Measure it from high noon
+		 */
+		$thresholdHours = \Cfg::get('boarder_leave_creation_threshold');
+		$thresholdDateTime->addHours(12 - $thresholdHours);
+
+		/* If you're outside the threshold, you can create it
+		 */
+		if ($_SERVER['REQUEST_TIME'] < $thresholdDateTime->getUnixTimestamp()) {
+			return true;
+		}
+
+		return false;
+	}
+
     /**
      * Processes form data submitted from renderCreateRequest
      *
@@ -347,41 +408,51 @@ class Leave_Controller extends Controller {
             $this->getPage()->error(2);
         }
 
-        $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
-        $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
-        $created = new Alaress_Date_Format(time(), 'U');
-        $request = new Leave_Request();
+		/* Limit leave creation to a threshold
+		 */
+		if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
+			new \Alaress_Probe($_POST);
+			new \Alaress_Probe($data);
+			die();
+			$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
+			$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
+			$created = new Alaress_Date_Format(time(), 'U');
+			$request = new Leave_Request();
 
-        /* Use the userId field when submitting on someone else's behalf,
-           * otherwise just your own id
-           */
-        $userId = $data['userId'];
-        $request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
-		$request->setAuthorId($_SESSION['user']);
-        $request->setStart($start->getDatabase());
-        $request->setFinish($finish->getDatabase());
-        $request->setHostType($data['request']['hostType']);
-        $request->setHostName($data['request']['hostName']);
-        $request->setHostPhone($data['request']['hostPhone']);
-        $request->setUserPhone($data['request']['userPhone']);
-        $request->setDescription($data['request']['description']);
-        $request->setStatus(Leave_Request::STATUS_PENDING);
-        $request->setCreated($created->getDatabase());
+			/* Use the userId field when submitting on someone else's behalf,
+			   * otherwise just your own id
+			   */
+			$userId = $data['userId'];
+			$request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
+			$request->setAuthorId($_SESSION['user']);
+			$request->setStart($start->getDatabase());
+			$request->setFinish($finish->getDatabase());
+			$request->setHostType($data['request']['hostType']);
+			$request->setHostName($data['request']['hostName']);
+			$request->setHostPhone($data['request']['hostPhone']);
+			$request->setUserPhone($data['request']['userPhone']);
+			$request->setDescription($data['request']['description']);
+			$request->setStatus(Leave_Request::STATUS_PENDING);
+			$request->setCreated($created->getDatabase());
 
-        $travelType  = $data['request']['travelType'];
-        $travelTypes = $this->getTravelTypes();
-        if ($travelType && array_key_exists($travelType, $travelTypes)) {
-            $request->setTravelType($travelTypes[$travelType]);
-        }
+			$travelType  = $data['request']['travelType'];
+			$travelTypes = $this->getTravelTypes();
+			if ($travelType && array_key_exists($travelType, $travelTypes)) {
+				$request->setTravelType($travelTypes[$travelType]);
+			}
 
-        $this->getRequestMapper()->save($request);
+			$this->getRequestMapper()->save($request);
 
-        $request = $this->getRequestMapper()->findById($request->getId());
+			$request = $this->getRequestMapper()->findById($request->getId());
 
-        $this->sendUserNotice($request);
-        $this->sendParentNotice($request);
+			$this->sendUserNotice($request);
+			$this->sendParentNotice($request);
 
-        SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
+			SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
+		}
+		else {
+			error(160);
+		}
     }
 
     /**
@@ -577,56 +648,63 @@ class Leave_Controller extends Controller {
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
 
-        $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
-        $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
+		/* Limit leave creation to a threshold
+		 */
+		if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
+			$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
+			$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
 
-        $request->setStart($start->getDatabase());
-        $request->setFinish($finish->getDatabase());
-        $request->setHostType($data['request']['hostType']);
-        $request->setHostName($data['request']['hostName']);
-        $request->setHostPhone($data['request']['hostPhone']);
-        $request->setUserPhone($data['request']['userPhone']);
-        $request->setDescription($data['request']['description']);
-        $request->setNotes($data['request']['notes']);
-        $request->setConfirmedBy($data['request']['confirmedBy']);
+			$request->setStart($start->getDatabase());
+			$request->setFinish($finish->getDatabase());
+			$request->setHostType($data['request']['hostType']);
+			$request->setHostName($data['request']['hostName']);
+			$request->setHostPhone($data['request']['hostPhone']);
+			$request->setUserPhone($data['request']['userPhone']);
+			$request->setDescription($data['request']['description']);
+			$request->setNotes($data['request']['notes']);
+			$request->setConfirmedBy($data['request']['confirmedBy']);
 
-        $travelType  = $data['request']['travelType'];
-        $travelTypes = $this->getTravelTypes();
-        if ($travelType && array_key_exists($travelType, $travelTypes)) {
-            $request->setTravelType($travelTypes[$travelType]);
-        }
-        else {
-            $request->setTravelType(null);
-        }
+			$travelType  = $data['request']['travelType'];
+			$travelTypes = $this->getTravelTypes();
+			if ($travelType && array_key_exists($travelType, $travelTypes)) {
+				$request->setTravelType($travelTypes[$travelType]);
+			}
+			else {
+				$request->setTravelType(null);
+			}
 
-        if (isset($data['approve']) || isset($data['reject'])) {
-            $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
+			if (isset($data['approve']) || isset($data['reject'])) {
+				$authorisationDatetime = new Alaress_Date_Format(time(), 'U');
 
-            $request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-            $request->setAuthorisationUser($_SESSION['user']);
+				$request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
+				$request->setAuthorisationUser($_SESSION['user']);
 
-            if (isset($data['approve'])) {
-                $request->setStatus(Leave_Request::STATUS_APPROVED);
-            } elseif (isset($data['reject'])) {
-                $request->setStatus(Leave_Request::STATUS_REJECTED);
-            }
-        } else {
-            if (isset($data['delete'])) {
-                $request->setStatus(Leave_Request::STATUS_DELETED);
-            }
-        }
+				if (isset($data['approve'])) {
+					$request->setStatus(Leave_Request::STATUS_APPROVED);
+				} elseif (isset($data['reject'])) {
+					$request->setStatus(Leave_Request::STATUS_REJECTED);
+				}
+			} else {
+				if (isset($data['delete'])) {
+					$request->setStatus(Leave_Request::STATUS_DELETED);
+				}
+			}
 
 
-        $this->getRequestMapper()->save($request);
+			$this->getRequestMapper()->save($request);
 
-        $request = $this->getRequestMapper()->findById($request->getId());
+			$request = $this->getRequestMapper()->findById($request->getId());
 
-        if (isset($data['approve']) || isset($data['reject'])) {
-            $this->sendUserNotice($request);
-            $this->sendParentNotice($request);
-        }
+			if (isset($data['approve']) || isset($data['reject'])) {
+				$this->sendUserNotice($request);
+				$this->sendParentNotice($request);
+			}
 
-        $this->getPage()->backToTheFuture(2);
+			$this->getPage()->backToTheFuture(2);
+		}
+		else {
+			error(160);
+		}
     }
 
     /**
