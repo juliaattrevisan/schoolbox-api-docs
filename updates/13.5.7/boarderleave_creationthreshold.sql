@@ -4,4 +4,4 @@ INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type
 
 /* Add error message
  */
-INSERT INTO `error` (`id`, `message`) VALUES ('160', 'Leave request commences too soon.');
+INSERT INTO `error` (`id`, `message`) VALUES ('162', 'Leave request commences too soon.');

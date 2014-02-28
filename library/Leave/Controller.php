@@ -455,7 +455,7 @@ class Leave_Controller extends Controller {
 			SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
 		}
 		else {
-			error(160);
+			error(162);
 		}
     }
 
