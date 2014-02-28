@@ -74,7 +74,7 @@ if (!isset($this->arg[1])) {
 else if ($this->arg[1] == 'finalise') {
 	$attemptHandler->finaliseAllLatestAttempts($assess['assess_id']);
 
-	$this->backToTheFuture(1);
+	$this->localRedir('/assess/results/' . $assess['assess_id']);
 }
 /* Reviewing attempts for a question
  */
