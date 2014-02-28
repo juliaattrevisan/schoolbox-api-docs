@@ -92,6 +92,11 @@ class Scrub {
         if (!(self::$htmlpurifier_instance instanceof HTMLPurifier)) {
 
             $config = HTMLPurifier_Config::createDefault();
+
+			/* http://htmlpurifier.org/phorum/read.php?3,6724
+			 */
+			$config->set('CSS.AllowTricky', true);
+
             $config->set('Cache.SerializerPath', Cfg::get('xml_dir') . '/../purifier/');
             $config->set('AutoFormat.Linkify', true);
 
