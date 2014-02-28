@@ -1,5 +1,11 @@
 #!/usr/bin/php
 <?php
+use PhpAmqpLib\Exception\AMQPRuntimeException;
+use React\EventLoop\Factory;
+use Schoolbox\ConfigLoader;
+use Schoolbox\Realtime\Schedule\Scheduler;
+use Schoolbox\Realtime\Verboser;
+
 /**
  * The Schedule Daemon.
  *
@@ -9,7 +15,7 @@
  * @version     SVN: $Id$
  */
 
-require_once('../../include/Bootstrap.php');
+require_once('../socket/mini-bootstrap.php');
 
 $opts = getopt('v');
 
@@ -26,12 +32,20 @@ if($verbose) {
 EOL;
 }
 
-$verboser = new \Schoolbox\Realtime\Verboser($verbose ? STDOUT : null);
+$verboser = new Verboser($verbose ? STDOUT : null);
 
-$loop = \React\EventLoop\Factory::create();
+$loop = Factory::create();
 
 // CREATE SCHEDULER
-$sched = new \Schoolbox\Realtime\Schedule\Scheduler($loop, $verboser, new \Schoolbox\ConfigLoader(), true);
+try {
+	$sched = new Scheduler($loop, $verboser, new ConfigLoader(), true);
+}
+catch(AMQPRuntimeException $e) {
+	$verboser->v("Unable to connect to RabbitMQ: server is offline.",'!');
+	$n = new \Schoolbox\Notif\Notif(\Schoolbox\Notif\Notif::TOPIC_NOTIFICATION);
+	$n->critical('RabbitMQ is offline');
+	exit;
+}
 
 $loop->run();
 
