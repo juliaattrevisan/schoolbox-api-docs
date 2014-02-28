@@ -17,7 +17,7 @@ use React\EventLoop\Timer\TimerInterface;
 use Schoolbox\Realtime\Verboser;
 use SplQueue;
 
-class Dispatcher {
+class Dispatcher implements DispatcherInterface {
 
 	/** @var SplQueue */
 	protected $q;
@@ -32,7 +32,7 @@ class Dispatcher {
 	protected $pool;
 
 	/** @var TimerInterface */
-	protected $timer;
+	protected $timer = null;
 
 
 	/**
@@ -64,10 +64,10 @@ class Dispatcher {
 	/**
 	 * @param object $identifier
 	 * @param string $command
-	 * @param mixed $arguments
+	 * @param string $data
 	 */
-	public function enqueue($identifier, $command, $arguments) {
-		$this->q->enqueue(array($identifier, $command, $arguments));
+	public function enqueue($identifier, $command, $data) {
+		$this->q->enqueue(array($identifier, $command, $data));
 
 		$this->v->v("Enqueued '$command': queue length is ".$this->q->count());
 
@@ -96,7 +96,7 @@ class Dispatcher {
 			}
 
 			$this->loop->cancelTimer($timer);
-			unset($this->timer);
+			$this->timer = null;
 
 			$this->v->v("Queue is empty: detaching timer", '-');
 
@@ -106,15 +106,19 @@ class Dispatcher {
 
 		$this->v->v("Dispatching...");
 
-		// can this task be dispatched, or does it need to be handled internally?
-		list($identifier, $cmd, $args) = $this->q->bottom();
+		/**
+		 * @var object $identifier
+		 * @var string $cmd
+		 * @var string $data
+		 */
+		list($identifier, $cmd, $data) = $this->q->bottom();
 
-		// decide whether to delegate this to a Worker, or run it straight into the handler
+		// decide whether to delegate this to a Worker, or return it straight into the handler
 		if(!in_array($cmd, $this->pool->getSupportedActions())) {
 			try {
 				$this->q->dequeue();
 				$this->v->v("Internally handling '$cmd'");
-				$this->msgHandler->handleResponse($identifier, $cmd, $args);
+				$this->msgHandler->handleResponse($identifier, $cmd, (array)$data);
 			}
 			catch(Exception $e) {
 				// we need to catch any and all exception here, lest we explode our reactor
@@ -134,7 +138,7 @@ class Dispatcher {
 		// pop the task from the queue and run the next task
 		try {
 			$this->q->dequeue();
-			$this->pool->accept($identifier, $cmd, $args, $this->q->count());
+			$this->pool->accept($identifier, $cmd, $data, $this->q->count());
 		}
 		catch(Exception $e) {
 			// we need to catch any and all exception here, lest we explode our reactor

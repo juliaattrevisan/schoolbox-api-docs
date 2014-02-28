@@ -88,7 +88,25 @@ class Worker {
 
 
 	public function write($string) {
-		fputs($this->pipes[0], $string);
+
+		$len = strlen($string);
+		$sent = 0;
+		$chunk = $this->strat->getProtocol()->chunkLength();
+
+		while($sent < $len) {
+			$shard = str_pad(substr($string, $sent, $chunk), $chunk, $this->strat->getProtocol()->end());
+			$this->v->v("Sending another ".strlen($shard)." bytes");
+			$i = fputs($this->pipes[0], $shard, $chunk);
+			if($i == 0) {
+				break;
+			}
+			$sent += $i;
+		}
+		// ensure the last chunk is sent!
+		fflush($this->pipes[0]);
+
+		$this->v->v("Sent $sent bytes");
+
 		return $this;
 	}
 
@@ -143,7 +161,7 @@ class Worker {
 			}
 		}
 
-		$this->write($this->strat->buildTaskString($cmd, $args));
+		$this->write($this->strat->composeTaskString($cmd, $args));
 		$this->setStatus(self::BUSY);
 		$this->task = new Task($identifier, $cmd, $args);
 		return $this;

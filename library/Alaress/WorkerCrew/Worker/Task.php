@@ -60,11 +60,8 @@ class Task {
 	 * @return string
 	 */
 	public function getData($clean = true) {
-		if($clean) {
-			// remove all non-printable (control) characters from the data
-			return preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $this->data);
-		}
-		return $this->data;
+		// clean will remove all non-printable (control) characters from the data
+		return $clean ? preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $this->data) : $this->data;
 	}
 
 	/**
@@ -111,8 +108,8 @@ class Task {
 
 		$duration = ($this->finish - $this->start) * 1000;
 
-		$v->v(sprintf("cmd=%s|args=%s|user=%s|time=%10.04f|data=%s",
-			$this->command, json_encode(array_slice($this->args, 1)), $this->args[0], $duration, $this->data
+		$v->v(sprintf("cmd=%s|args=%s|time=%10.04f|data=%s",
+			$this->command, json_encode($this->args), $duration, $this->data
 		));
 
 	}

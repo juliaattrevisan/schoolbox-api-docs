@@ -12,6 +12,7 @@ namespace Alaress\WorkerCrew;
 
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
+use Exception;
 use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
@@ -93,7 +94,7 @@ class Pool {
 			2 => array("file", 'err.log', 'a')  // stderr
 		);
 
-		if(!($pp = proc_open($cmd, $descriptorSpec, $pipes, null, $env))) {
+		if(!($pp = proc_open($cmd, $descriptorSpec, $pipes))) {
 			throw new RuntimeException("Cannot launch worker process");
 		}
 
@@ -172,11 +173,20 @@ class Pool {
 					->appendData($data)
 					->markTaskComplete();
 
-				$this->msgHandler->handleResponse(
-					$worker->getTask()->getIdentifier(),
-					$worker->getTask()->getCommand(),
-					$worker->getTask()->getData()
-				);
+				try {
+
+//					var_dump($worker->getTask()->getData(false));
+
+					$this->msgHandler->handleResponse(
+						$worker->getTask()->getIdentifier(),
+						$worker->getTask()->getCommand(),
+						$this->poolingStrat->decodeRecords($worker->getTask()->getData(false))
+					);
+				}
+				catch(Exception $e) {
+					// your reactor will explode if you don't catch exceptions coming from your response handler
+					$this->poolingStrat->handleException($e);
+				}
 				break;
 
 			case Worker::ENDED: // process has closed. Not sure this will ever happen

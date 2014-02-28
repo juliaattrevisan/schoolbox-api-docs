@@ -10,7 +10,9 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
+use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
+use Exception;
 use InvalidArgumentException;
 
 interface PoolingInterface {
@@ -23,6 +25,13 @@ interface PoolingInterface {
 	const STR_RECORD_SEPARATOR    = "\036";
 	const STR_UNIT_SEPARATOR      = "\037";
 
+
+	/**
+	 * Returns the IPC protocol that this strategy employs
+	 *
+	 * @return ProtocolInterface
+	 */
+	public function getProtocol();
 
 	/**
 	 * Returns a NEW, empty WorkerBundle.
@@ -85,7 +94,7 @@ interface PoolingInterface {
 	 * @param mixed $arguments
 	 * @return string
 	 */
-	public function buildTaskString($command, $arguments);
+	public function composeTaskString($command, $arguments);
 
 
 	/**
@@ -104,7 +113,15 @@ interface PoolingInterface {
 	 * @param mixed $data
 	 * @return string
 	 */
-	public function formatTransmissionData($data);
+	public function encodeRecord($data);
+
+	/**
+	 * Decode the given data as received from socket transmission
+	 *
+	 * @param string $data
+	 * @return array
+	 */
+	public function decodeRecords($data);
 
 	/**
 	 * Returns, in millis, how long the react loop should wait between dispatches from the queue
@@ -149,5 +166,11 @@ interface PoolingInterface {
 	 * @return void
 	 */
 	public function cleanup($workers);
+
+	/**
+	 * @param Exception $exception
+	 * @return void
+	 */
+	public function handleException($exception);
 
 }

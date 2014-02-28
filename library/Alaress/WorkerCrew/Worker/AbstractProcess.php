@@ -52,6 +52,7 @@ abstract class AbstractProcess {
 
 		// listen to STDIN for commands
 		$this->stream = new Stream(STDIN, $this->loop);
+		$this->stream->bufferSize = $this->strat->getProtocol()->chunkLength();
 
 		$this->stream->on('data', array($this, 'onData'));
 		$this->stream->on('close', array($this, 'onClose'));
@@ -71,7 +72,7 @@ abstract class AbstractProcess {
 	public function onData($data, $stream) {
 		try {
 			// cease and desist received
-			if(strlen($data) == 1 && $data[0] == PoolingInterface::STR_CANCEL) {
+			if($this->strat->getProtocol()->isCancelled($data)) {
 				$this->loop->stop();
 				return;
 			}
@@ -84,7 +85,7 @@ abstract class AbstractProcess {
 			$this->buffer .= $data;
 
 			// if EOT received
-			if(strpos($this->buffer, PoolingInterface::STR_END_OF_TRANSMISSION) !== false) {
+			if($this->strat->getProtocol()->isEnded($data)) {
 				$this->parseBuffer();
 				$this->buffering = false;
 			}
@@ -118,20 +119,22 @@ abstract class AbstractProcess {
 		}
 		catch(InvalidArgumentException $e) {
 			$this->v->v("Rejecting data '$this->buffer'", '*');
-			echo PoolingInterface::STR_NACKNOWLEDGE;
+//			ob_end_clean();
+			echo $this->strat->getProtocol()->reject();
 			return;
 		}
 
 		// use ob_end_clean to clear any debugging printout that might have occurred while processing
 		try {
 			$response = $this->process($cmd, $args);
-			ob_end_clean();
-			echo $this->strat->encodeRecord($response);
-			echo PoolingInterface::STR_END_OF_TRANSMISSION;
+//			ob_end_clean();
+			$this->v->v("Processing successful");
+			echo $this->strat->getProtocol()->flatten($response);
 		}
 		catch(Exception $e) {
-			ob_end_clean();
-			echo PoolingInterface::STR_NACKNOWLEDGE;
+//			ob_end_clean();
+			$this->v->v(sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage()));
+			echo $this->strat->getProtocol()->reject();
 		}
 	}
 

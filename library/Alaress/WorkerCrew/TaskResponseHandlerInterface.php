@@ -17,7 +17,7 @@ interface TaskResponseHandlerInterface {
 	 *
 	 * @param object $identifier - the identifier passed as the first argument to Dispatcher::enqueue()
 	 * @param string $command    - the command that was executed by the Worker
-	 * @param string $data       - the data with which the Worker responded
+	 * @param array  $data       - the data with which the Worker responded
 	 * @return void              - this method does not return any value
 	 */
 	public function handleResponse($identifier, $command, $data);
