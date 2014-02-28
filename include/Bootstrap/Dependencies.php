@@ -32,6 +32,9 @@ $di->set(
     )
 );
 
+// Authorization
+$di->set('authorizer', $di->lazyNew('Alaress\\Authorizer\\Authorizer'));
+
 $di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
 $di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
 
