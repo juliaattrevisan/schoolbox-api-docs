@@ -71,7 +71,6 @@ class Message implements Serializable {
 		$this->body = new MessageBody($data['body']);
 		$this->icon = $data['icon'];
 		$this->href = $data['href'];
-		$this->time = DateTime::createFromFormat('U', $data['time']);
 	}
 
 
