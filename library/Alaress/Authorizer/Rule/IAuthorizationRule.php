@@ -16,7 +16,7 @@ interface IAuthorizationRule {
      *
      * @param  User $user The user to authorize, if any. Null value assumes that
      *                    no user is logged in.
-     * @return bool
+     * @throws \Alaress\Authorizer\Failure\IFailure if the request isn't authorized.
      */
     public function authorize(User $user = null);
 }

@@ -11,11 +11,17 @@
 
 namespace Alaress\Authorizer\Rule;
 use Schoolbox\User;
+use Alaress\Authorizer\Failure\Unauthorized;
 
-class IsLoggedIn extends BaseRule {
+class IsLoggedIn implements IAuthorizationRule {
 
     public function authorize(User $user = null) {
-        return ($user instanceof User);
+        // True:  skip to next item in chain
+        // False: break chain with request that redirects somewhere
+        // These rules should define what to do on failure too.
+        if (!$user instanceof User) {
+            throw new Unauthorized();
+        }
     }
 
 }
