@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew;
 
 
+use Alaress\WorkerCrew\Pooling\DefaultStrategy;
 use Alaress\WorkerCrew\Pooling\PoolingInterface;
 use Exception;
 use React\EventLoop\LoopInterface;
@@ -34,6 +35,8 @@ class Dispatcher implements DispatcherInterface {
 	/** @var TimerInterface */
 	protected $timer = null;
 
+	/** @var PoolingInterface */
+	protected $strat;
 
 	/**
 	 * @param LoopInterface $loop
@@ -43,11 +46,13 @@ class Dispatcher implements DispatcherInterface {
 	 */
 	function __construct($loop, $msgHandler, $verboser, $strat = null) {
 
-		// create our task queue
-		$this->q = new SplQueue();
+		$this->strat = $strat ?: new DefaultStrategy();
 
 		// pool of workers
-		$this->pool = new Pool($loop, $msgHandler, $strat);
+		$this->pool = new Pool($loop, $msgHandler, $this->strat);
+
+		// build the queue, retrieving from storage if that's part of the strat
+		$this->q = $strat->buildQueue();
 
 		$this->qDelay = $this->pool->getQueueDelay();
 
@@ -58,6 +63,7 @@ class Dispatcher implements DispatcherInterface {
 		$this->msgHandler = $msgHandler;
 
 		$this->v = $verboser;
+
 	}
 
 
@@ -67,10 +73,15 @@ class Dispatcher implements DispatcherInterface {
 	 * @param string $data
 	 */
 	public function enqueue($identifier, $command, $data) {
-		$this->q->enqueue(array($identifier, $command, $data));
 
+		// call for persistence
+		$this->strat->penqueue($identifier, $command, $data);
+
+		// store the element locally
+		$this->q->enqueue(array($identifier, $command, $data));
 		$this->v->v("Enqueued '$command': queue length is ".$this->q->count());
 
+		// notify the pool that we're engaged
 		$this->pool->dispatcherEngage();
 
 		// if there's a timer, use it, otherwise create it

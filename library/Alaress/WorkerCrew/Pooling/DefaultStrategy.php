@@ -18,6 +18,7 @@ use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
+use SplQueue;
 
 class DefaultStrategy implements PoolingInterface {
 
@@ -279,4 +280,37 @@ class DefaultStrategy implements PoolingInterface {
 	}
 
 
-} 
+	/**
+	 * Returns a Queue, populated from storage if persistence is part of the strategy.
+	 *
+	 * @return SplQueue
+	 */
+	public function buildQueue() {
+		return new SplQueue();
+	}
+
+
+	/**
+	 * Persistent enqueue.
+	 *
+	 * @param object $identifier
+	 * @param string $command
+	 * @param array $data
+	 * @return void
+	 */
+	public function penqueue($identifier, $command, $data) {
+		// noop: this strategy does not use persistent queues.
+	}
+
+	/**
+	 * Persistent dequeue.
+	 *
+	 * @param object $identifier
+	 * @return void
+	 */
+	public function pdequeue($identifier) {
+		// noop: this strategy does not use persistent queues.
+	}
+
+
+}

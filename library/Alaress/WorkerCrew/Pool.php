@@ -46,9 +46,9 @@ class Pool {
 	 * @param TaskResponseHandlerInterface $msgHandler
 	 * @param PoolingInterface $strat
 	 */
-	public function __construct($loop, $msgHandler, $strat = null) {
+	public function __construct($loop, $msgHandler, $strat) {
 		$this->loop = $loop;
-		$this->poolingStrat = $strat ?: new DefaultStrategy();
+		$this->poolingStrat = $strat;
 		$this->workers = $this->poolingStrat->newWorkerBundle();
 		$this->listeners = new SplObjectStorage();
 		$this->msgHandler = $msgHandler;
@@ -174,14 +174,14 @@ class Pool {
 					->markTaskComplete();
 
 				try {
-
-//					var_dump($worker->getTask()->getData(false));
-
 					$this->msgHandler->handleResponse(
 						$worker->getTask()->getIdentifier(),
 						$worker->getTask()->getCommand(),
 						$this->poolingStrat->decodeRecords($worker->getTask()->getData(false))
 					);
+
+					$this->poolingStrat->pdequeue($worker->getTask()->getIdentifier());
+
 				}
 				catch(Exception $e) {
 					// your reactor will explode if you don't catch exceptions coming from your response handler
@@ -282,8 +282,8 @@ class Pool {
 	 * @param mixed $arguments
 	 * @return string
 	 */
-	public function buildTaskString($command, $arguments) {
-		return $this->poolingStrat->buildTaskString($command, $arguments);
+	public function composeTaskString($command, $arguments) {
+		return $this->poolingStrat->composeTaskString($command, $arguments);
 	}
 
 
@@ -305,8 +305,8 @@ class Pool {
 	 * @param mixed $data
 	 * @return string
 	 */
-	public function formatTransmissionData($data) {
-		return $this->poolingStrat->formatTransmissionData($data);
+	public function encodeRecord($data) {
+		return $this->poolingStrat->encodeRecord($data);
 	}
 
 
@@ -359,5 +359,4 @@ class Pool {
 		return $this->poolingStrat->getWorkerIdleTimeout();
 	}
 
-
-} 
+}

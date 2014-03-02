@@ -14,6 +14,7 @@ use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
+use SplQueue;
 
 interface PoolingInterface {
 
@@ -160,7 +161,7 @@ interface PoolingInterface {
 
 
 	/**
-	 * Strategically remove the workers that you want to from the given collection
+	 * Strategically removes the workers that you want to from the given collection
 	 *
 	 * @param WorkerBundleInterface $workers
 	 * @return void
@@ -173,4 +174,31 @@ interface PoolingInterface {
 	 */
 	public function handleException($exception);
 
+
+	/**
+	 * Returns a Queue, populated from storage if persistence is part of the strategy.
+	 *
+	 * @return SplQueue
+	 */
+	public function buildQueue();
+
+
+	/**
+	 * Persistent enqueue.
+	 *
+	 * @param object $identifier
+	 * @param string $command
+	 * @param array $data
+	 * @return void
+	 */
+	public function penqueue($identifier, $command, $data);
+
+
+	/**
+	 * Persistent dequeue.
+	 *
+	 * @param object $identifier
+	 * @return void
+	 */
+	public function pdequeue($identifier);
 }
