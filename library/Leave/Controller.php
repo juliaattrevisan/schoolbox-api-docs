@@ -9,9 +9,10 @@
  */
 class Leave_Controller extends Controller {
 
-    /* Unused constants which document when morning, day and night occur
-      * for Leave Reports and Catering Reports respectively
-      */
+    /**
+	 * Unused constants which document when morning, day and night occur
+     * for Leave Reports and Catering Reports respectively
+     */
     const LEAVE_THRESHOLD_MORNING = '9:59:59';
     const LEAVE_THRESHOLD_DAY = '18:59:59';
     const LEAVE_THRESHOLD_NIGHT = '21:59:59';
@@ -20,15 +21,17 @@ class Leave_Controller extends Controller {
     const CATERING_THRESHOLD_DAY = '16:59:59';
     const CATERING_THRESHOLD_NIGHT = '23:59:59';
 
-    /* Consts for days
-      */
+    /**
+	 * Consts for days
+     */
     const FRIDAY = 5;
     const SATURDAY = 6;
     const SUNDAY = 7;
 
-    /* Show leave requests over RANGE days
-      * Change
-      */
+    /**
+	 * Show leave requests over RANGE days
+     * Change
+     */
     const RANGE = 3;
 
     protected $requestMapper;
@@ -44,10 +47,11 @@ class Leave_Controller extends Controller {
      */
     protected $travelTypes;
 
-    /* Time map array
-      * A map of actual time values => presentation information
-      * used in the Leave Time/Return Time dropdowns
-      */
+    /**
+	 * Time map array
+     * A map of actual time values => presentation information
+     * used in the Leave Time/Return Time dropdowns
+     */
     private $timeMap = array(
         '00:30:00' => '12:30 AM',
         '01:00:00' => '1:00 AM',
@@ -825,18 +829,16 @@ class Leave_Controller extends Controller {
             $previousRequestCount = 0;
 
             foreach ($requestList as $request) {
-                $this->getPage()->setVar(
-                    array(
-                        'USER_ID' => $request->getUser()->getId(),
-                        'USER_NAME' => $request->getUser()->formatName(),
-                        'USER_YEAR' => $request->getUser()->getYear(),
-                        'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
-                        'REQUEST_ID' => $request->getId(),
-                        'REQUEST_START' => $request->getStart()->getAustralian(),
-                        'REQUEST_DURATION' => $request->getDuration(),
-                        'REQUEST_HOST_TYPE' => $request->getHostType(true)
-                    )
-                );
+                $this->getPage()->setVar(array(
+					'USER_ID' => $request->getUser()->getId(),
+					'USER_NAME' => $request->getUser()->formatName(),
+					'USER_YEAR' => $request->getUser()->getYear(),
+					'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
+					'REQUEST_ID' => $request->getId(),
+					'REQUEST_START' => $request->getStart()->getAustralian(),
+					'REQUEST_DURATION' => $request->getDuration(),
+					'REQUEST_HOST_TYPE' => $request->getAllHostTypes()->getBy('id', $request->getHostType())->getName()
+				));
 
                 if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
                     $this->getPage()->setVar(
