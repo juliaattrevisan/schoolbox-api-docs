@@ -60,10 +60,10 @@ class WorkerProcess extends AbstractProcess {
 
 			// push messages
 			case 'publish':
-				$data = unserialize($args);
+				$data = unserialize($args[0]);
 
 				if(!(is_array($data) && count($data) == 4)) {
-					break;
+					throw new RuntimeException("Datacount should be 4, is ".count($data));
 				}
 
 				// making a certain assumption that the callable survives the serialization process
@@ -77,7 +77,7 @@ class WorkerProcess extends AbstractProcess {
 				return serialize(call_user_func($callback, $model, $userId, $diff));
 		}
 
-		throw new InvalidArgumentException("Can't process '$command'");
+		throw new InvalidArgumentException("Can't process '$command'.");
 	}
 
 }

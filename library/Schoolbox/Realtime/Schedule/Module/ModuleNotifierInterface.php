@@ -13,13 +13,10 @@ namespace Schoolbox\Realtime\Schedule\Module;
 use Alaress_Date_Format;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Internal;
-use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Realtime\Schedule\ScheduleException;
-use Schoolbox\Realtime\Schedule\Trigger;
-use Schoolbox\User;
+use Serializable;
 
-interface ModuleNotifierInterface {
+interface ModuleNotifierInterface extends Serializable {
 
 	const IMMEDIATELY = 0;
 	const ONE_HOUR    = 3600;
@@ -31,6 +28,14 @@ interface ModuleNotifierInterface {
 	 */
 	public function __construct($configLoader);
 
+
+	/**
+	 * Instantiate all your dependencies within yourself.
+	 *
+	 * @param mixed $dependencies
+	 * @return void
+	 */
+	public function loadDependencies($dependencies = null);
 
 	/*
 	 * @param User $user            the User that performed/initiated the operation

@@ -260,28 +260,16 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/**
 	 * Handles a response from a Worker
 	 *
-	 * @param Pipe $pipe         - the identifier passed as the first argument to Dispatcher::enqueue()
+	 * @param Pipe   $pipe       - the identifier passed as the first argument to Dispatcher::enqueue()
 	 * @param string $command    - the command that was executed by the Worker
-	 * @param string $data       - the data with which the Worker responded
+	 * @param array  $data       - the data with which the Worker responded
 	 * @return void              - this method does not return any value
 	 */
 	public function handleResponse($pipe, $command, $data) {
 
 		$userId = $pipe->getUserId();
 
-		if(is_string($data)) {
-			$this->v("Handling a worker response: $command => " .
-				(strlen($data) > 32
-					? sprintf("%s... (%d bytes)", substr($data, 0, 29), strlen($data))
-					: $data
-				)
-			, '?');
-			$response = json_decode($data, true);
-		}
-		else {
-			$this->v("Handling a worker response: $command (array provided)");
-			$response = $data;
-		}
+		$this->v("Handling a worker response: $command");
 
 		switch(strtolower($command)) {
 			// deal with this yourself
@@ -301,13 +289,13 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 			// this was dealt with by a worker, just push the result
 			case 'fetch':
 			case 'push':
-				$this->sendToPipe($pipe, array($command => $response));
+				$this->sendToPipe($pipe, array($command => $data));
 				break;
 
 			// deal with this yourself
 			case 'ack':
 				if($subscription = $this->subscriptionManager->getUserSubscription($userId, true)) {
-					$markAsRead = $subscription->acceptMessages($response);
+					$markAsRead = $subscription->acceptMessages($data);
 					$this->sendToUser($userId, array($command => $markAsRead));
 				}
 				break;

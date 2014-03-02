@@ -10,7 +10,10 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
-use Monolog\Logger;
+use Alaress\WorkerCrew\Dispatcher;
+use Alaress\WorkerCrew\DispatcherInterface;
+use Alaress\WorkerCrew\TaskResponseHandlerInterface;
+use Exception;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
@@ -38,13 +41,13 @@ use Schoolbox\Realtime\Verboser;
  * Class Scheduler
  * @package Schoolbox\Realtime\Schedule
  */
-class Scheduler {
+class Scheduler implements TaskResponseHandlerInterface {
 
 	const MODULE_NS = 'Schoolbox\\Realtime\\Schedule\\Module\\';
 	const QUEUE_SCHEDULE = 'sb.sched';
 
 	/** @var array */
-	protected $knownModules = array(
+	protected static $knownModules = array(
 		'\\Schoolbox\\Assessment\\Component\\SubmissionBox',
 		 // register yo known module Notifiers here
 	);
@@ -55,17 +58,17 @@ class Scheduler {
 	/** @var Verboser */
 	protected $verboser;
 
-	/** @var Connector */
-	protected $mqc;
-
-	/** @var Client */
-	protected $stompClient;
-
 	/** @var array */
 	protected $timers;
 
 	/** @var Notif */
 	protected $notif;
+
+	/** @var DispatcherInterface */
+	protected $dispatcher;
+
+	/** @var MessageFactory */
+	protected $fMsg;
 
 	/**
 	 * @param LoopInterface $loop
@@ -79,10 +82,8 @@ class Scheduler {
 		$this->mqc = new Connector();
 		$this->conf = $configLoader;
 		$this->notif = new Notif();
-
-		// create a stomp client for listening to Mapper messages coming in
-		$stompFactory = new Factory($loop);
-		$this->stompClient = $stompFactory->createClient();
+		$this->dispatcher = new Dispatcher($loop, $this, $verboser);
+		$this->fMsg = new MessageFactory(null);
 
 		if($initialise) {
 			$this->initialise();
@@ -94,12 +95,16 @@ class Scheduler {
 	 */
 	protected function initialise() {
 
+		// create a stomp client for listening to Mapper messages coming in
+		$stompFactory = new Factory($this->loop);
+		$stompClient = $stompFactory->createClient();
+
 		$v = $this->verboser;
 		$self = $this;
-		$fMsg = new MessageFactory(null);
+
 
 		/** Connect to stomp via the provided loop */
-		$this->stompClient->connect()->then(function($client) use ($v, $self, $fMsg) {
+		$stompClient->connect()->then(function($client) use ($v, $self) {
 			// this closure is called when stomp successfully connects
 			/** @var Client $client */
 			$v->v("Schedule connected to STOMP, checking for messages");
@@ -111,57 +116,19 @@ class Scheduler {
 
 			/** Subscribe to the queue set aside for the scheduler */
 			$client->subscribeWithAck('/amq/queue/'.Scheduler::QUEUE_SCHEDULE, 'client',
-				function($frame, $ackResolver) use ($v, $self, $fMsg) {
+				function($frame, $ackResolver) use ($v, $self) {
 					// this closure is called when a message is received in the defined queue
 					/**
 					 * @var Frame $frame
 					 * @var AckResolver $ackResolver
 					 */
 
-					try {
-
-						$message = $fMsg->reconstitute($frame->body);
-
-						// we can't do squat if the Mapper didn't send us a message in the right format
-						if(!$message instanceof Internal) {
-							$v->v("Could not decode '$frame->body' to schedule event", '!');
-							// this message is unparseable, so we ACK it to make it go away
-							$ackResolver->ack();
-							return;
-						}
-
-						// only a few Models actually have schedule strategies, failure is ok
-						// each module strategy knows how to deal with its own events
-						$instance = $self->getModule(get_class($message->getObject()));
-
-						$fTrigger = new TriggerFactory(
-							$instance, $message->getObject(), $message->getInitiator(), $message->getDiff()
-						);
-
-						// ask the instance for a list of events for which to create triggers
-						$events = $instance->generateTriggers($message->getMethod(), $message->getObject());
-
-						// build a list of triggers out of the list of events, and schedule them
-						$self->scheduleNotifications($fTrigger->build($events));
-
-					}
-					catch(ScheduleException $e) {
-						// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-//						$v->v($e->getMessage(), '*');
-						// this message is unparseable, so we'll eventually ACK it to make it go away
-					}
-					catch(CompressionException $e) {
-						$v->v($e->getMessage(), '!');
-					}
-
-					// handled. away with you.
-					$ackResolver->ack();
+					$self->onAMQP($frame) ? $ackResolver->ack() : $ackResolver->nack();
 				}
 			);
-
 		});
 
-		foreach($this->knownModules as $module) {
+		foreach(self::$knownModules as $module) {
 			try {
 				$instance = $this->getModule($module);
 				// ok, we have a moduleinterface now
@@ -194,14 +161,109 @@ class Scheduler {
 
 	}
 
-	public function run() {
-		$this->loop->run();
+	/**
+	 * Handles a STOMP frame. Returns true to ACK message, or false to NACK message.
+	 *
+	 * @param Frame $frame
+	 * @return bool
+	 */
+	public function onAMQP($frame) {
+		try {
+			$message = $this->fMsg->reconstitute($frame->body);
+
+			// we can't do squat if the Mapper didn't send us a message in the right format
+			if(!$message instanceof Internal) {
+				$this->verboser->v("Could not decode '$frame->body' to schedule event", '!');
+				// this message is unparseable, so we ACK it to make it go away
+				return true;
+			}
+
+			// only a few Models actually have schedule strategies, failure is ok
+			// each module strategy knows how to deal with its own events
+			$instance = $this->getModule(get_class($message->getObject()));
+
+			$fTrigger = new TriggerFactory(
+				$instance, $message->getObject(), $message->getInitiator(), $message->getDiff()
+			);
+
+			// ask the instance for a list of events for which to create triggers
+			$events = $instance->generateTriggers($message->getMethod(), $message->getObject());
+
+			// build a list of triggers out of the list of events, and schedule them
+			$this->scheduleNotifications($fTrigger->build($events));
+
+		}
+		catch(ScheduleException $e) {
+			// we're happy to ignore this, it just means no scheduling strategy exists for this Model
+			// $this->verboser->v($e->getMessage(), '*');
+			// this message is unparseable, so we'll eventually ACK it to make it go away
+		}
+		catch(CompressionException $e) {
+			$this->verboser->v($e->getMessage(), '!');
+		}
+
+		return true;
 	}
 
-	public function stop() {
-		$this->loop->stop();
+
+	/**
+	 * Handles a response from a Worker
+	 *
+	 * @param Trigger $trigger   - the identifier passed as the first argument to Dispatcher::enqueue()
+	 * @param string $command    - the command that was executed by the Worker
+	 * @param array  $data       - the data with which the Worker responded
+	 * @throws ScheduleException
+	 * @return void              - this method does not return any value
+	 */
+	public function handleResponse($trigger, $command, $data) {
+
+		$this->verboser->v("Received worker response to handle");
+
+		/** @var Messenger $msgr */
+		$msgr = unserialize($data[0]);
+
+		/* attempt some sort of type-safety */
+
+		// method not implemented or nothing to send, this is fine
+		if(is_null($msgr)) {
+			return;
+		}
+
+		// check that an array was returned
+		if(!$msgr instanceof Messenger) {
+			throw new ScheduleException("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\MessageCollection");
+		}
+
+		// if there are no messages, just ignore this callback and move on
+		if(!$msgr->hasMessages()) {
+			return;
+		}
+
+		$count = 0;
+
+		// iterate across the messages supplied and send them
+		foreach($msgr->generateExternalMessages($this->notif, $trigger->getTimestamp()) as $message) {
+			// send them all!
+			$message->setContext(array('user' => $trigger->getUser()->getId()));
+			$sent = $message->send();
+			$count += $sent ? 1 :0;
+		}
+
+		$this->verboser->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), '<');
+
 	}
 
+
+	public static function getKnownModules() {
+		return self::$knownModules;
+	}
+
+	/**
+	 * @return DispatcherInterface
+	 */
+	public function getDispatcher() {
+		return $this->dispatcher;
+	}
 
 	/**
 	 * Convenience method for scheduling notifications for multiple triggers.
@@ -231,34 +293,15 @@ class Scheduler {
 		$interval = is_null($timestamp) ? null : $timestamp - time();
 		$v = $this->verboser;
 
+		$dispatch = $this->getDispatcher();
+
 		/**
 		 * This closure will be called from the EventLoop at the appointed time, or immediately if the time has elapsed.
-		 * It will spawn a worker process, which will iterate all the callbacks in this trigger.
 		 *
 		 * @param TimerInterface $timer
-		 * @throws \Exception
+		 * @throws Exception
 		 */
-		$publish = function($timer) use ($trigger, $v) {
-
-			// WARNING: FORK
-//			$pid = pcntl_fork();
-
-//			switch($pid) {
-//				case -1: // fail
-//					throw new ScheduleException("Unable to fork");
-//				case 0: // child
-//					 carry on to execute the closure
-//					break;
-//				default: // parent
-//					 do not execute the following code
-//					\Database::reinitialise();
-//					\DeprecatedDatabase::reinitialise();
-//					return;
-//			}
-
-			// YOU ARE IN CHILD CONTEXT FROM HERE TO THE END OF THE CLOSURE
-
-			$notif = new Notif();
+		$publish = function($timer) use ($trigger, $v, $dispatch) {
 
 			foreach($trigger->getCallbacks() as $callback) {
 				/*
@@ -274,48 +317,16 @@ class Scheduler {
 						throw new ScheduleException("Uncallable callback supplied");
 					}
 
-					/** @var Messenger $msgr */
-					$msgr = call_user_func($callback,
-						$trigger->getModel(), $trigger->getUser(), $trigger->getDiff()
-					);
-
-					/* attempt some sort of type-safety */
-
-					// method not implemented or nothing to send, this is fine
-					if(is_null($msgr)) {
-						unset($msgr);
-						continue;
-					}
-
-					// check that an array was returned
-					if(!$msgr instanceof Messenger) {
-						throw new ScheduleException("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\MessageCollection");
-					}
-
-					// if there are no messages, just ignore this callback and move on
-					if(!$msgr->hasMessages()) {
-						unset($msgr);
-						continue;
-					}
-
-					$count = 0;
-
-					// iterate across the messages supplied and send them
-					foreach($msgr->generateExternalMessages($notif, $trigger->getTimestamp()) as $message) {
-						// send them all!
-						$message->setContext(array('user' => $trigger->getUser()->getId()));
-						$sent = $message->send();
-						$count += $sent ? 1 :0;
-					}
-
-					$v->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), '<');
+					$dispatch->enqueue($trigger, 'publish', serialize(array(
+						$callback, $trigger->getModel(), $trigger->getUser(), $trigger->getDiff()
+					)));
 
 				}
 				catch(ScheduleException $e) {
 					unset($msgr);
 					$v->v($e->getMessage(), '!');
 				}
-				catch(\Exception $e) {
+				catch(Exception $e) {
 					// don't know what other exceptions will be thrown here, so for now, acknowledge and rethrow
 					$v->v(sprintf("%s -> %s",get_class($e), $e->getMessage()), '!');
 					unset($msgr);
@@ -324,8 +335,6 @@ class Scheduler {
 
 			}
 
-			// CHILDUS TERMINATUS
-//			exit;
 		};
 
 		// an explicitly null interval is a request to unset that trigger (regardless of whether or not it exists)
@@ -461,7 +470,7 @@ class Scheduler {
 		if(!class_exists($class)) {
 			throw new ScheduleException("No notifier for model '$modelClass'.");
 		}
-		$instance = new $class($this->conf, new MessageFactory($this->notif));
+		$instance = new $class($this->conf);
 		if(!$instance instanceof ModuleNotifierInterface) {
 			throw new ScheduleException("Notifer class '$class' found, but not an instance of ModuleNotifierInterface.");
 		}

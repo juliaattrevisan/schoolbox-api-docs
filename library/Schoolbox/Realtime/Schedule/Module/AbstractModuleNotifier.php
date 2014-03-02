@@ -41,7 +41,15 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	public function __construct($configLoader) {
 		$this->conf = $configLoader;
 		$this->topics = new TopicFactory();
+		$this->instantiateMapper();
+	}
 
+	/**
+	 * Helper method to figure out which Mapper we apply to, and instantiate it
+	 *
+	 * @throws \Schoolbox\Realtime\Schedule\ScheduleException
+	 */
+	protected function instantiateMapper() {
 		$mapperClass = str_replace('Notifier', 'Mapper', get_called_class());
 
 		if(!class_exists($mapperClass)) {
@@ -52,6 +60,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 			throw new ScheduleException("Class '$mapperClass' must be an instance of Mapper");
 		}
 		$this->mapper = $m;
+
 	}
 
 
@@ -129,6 +138,27 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		return $callables;
 	}
 
+	/**
+	 * String representation of object
+	 *
+	 * @return string the string representation of the object or null
+	 */
+	public function serialize() {
+		return get_class($this->conf);
+	}
+
+	/**
+	 * Constructs the object
+	 * @param string $serialized the string representation of the object.
+	 * @return void
+	 */
+	public function unserialize($serialized) {
+		// the only thing we serialize is the name of the config class
+		$this->conf = new $serialized();
+		$this->topics = new TopicFactory();
+		$this->instantiateMapper();
+		$this->loadDependencies();
+	}
 
 
-} 
+}
