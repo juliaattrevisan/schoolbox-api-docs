@@ -51,18 +51,23 @@ class Dispatcher implements DispatcherInterface {
 		// pool of workers
 		$this->pool = new Pool($loop, $msgHandler, $this->strat);
 
-		// build the queue, retrieving from storage if that's part of the strat
-		$this->q = $this->strat->buildQueue();
-		$this->qDelay = $this->strat->getQueueDelay();
-
 		// dispatcher depends on a react loop
 		$this->loop = $loop;
 
 		// need a reference to this for callback
 		$this->msgHandler = $msgHandler;
 
+		// for debugging output
 		$this->v = $verboser;
 
+		// build the queue, retrieving from storage if that's part of the strat, and execute if it contains stuff
+		$this->q = $this->strat->buildQueue();
+		$this->qDelay = $this->strat->getQueueDelay();
+
+		if($this->q->count()) {
+			$this->v->v("Queue is preloaded, draining: queue length is ".$this->q->count());
+			$this->drainQueue();
+		}
 	}
 
 
@@ -80,6 +85,15 @@ class Dispatcher implements DispatcherInterface {
 		$this->q->enqueue(array($identifier, $command, $data));
 		$this->v->v("Enqueued '$command': queue length is ".$this->q->count());
 
+		$this->drainQueue();
+	}
+
+
+	/**
+	 * Attempts to dequeue and dispatch all elements in the queue.
+	 * Nothing will happen if the queue is empty.
+	 */
+	protected function drainQueue() {
 		// notify the pool that we're engaged
 		$this->pool->dispatcherEngage();
 
@@ -119,7 +133,7 @@ class Dispatcher implements DispatcherInterface {
 		/**
 		 * @var object $identifier
 		 * @var string $cmd
-		 * @var string $data
+		 * @var array $data
 		 */
 		list($identifier, $cmd, $data) = $this->q->bottom();
 
