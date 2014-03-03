@@ -279,7 +279,18 @@
 		function setupEventValidation() {
 			// Campus selection validation - only required if eventType === Campus
 			var validateCampusSelected = function() {
-				return $('select[name="level"]').val() == 3;
+				var normalSelector = $('select[name="level"]');
+
+				/* Normal calendar selector
+				 */
+				if (normalSelector.length) {
+					return $('select[name="level"]').val() == 3;
+				}
+				/* For EOTC
+				 */
+				else {
+					return $('input[name="campus[]"]').length;
+				}
 			}
 
 			/* For EOTC
