@@ -44,7 +44,7 @@ class Authorizer {
      *                     name, which may have been determined by a route
      *                     matched by Aura\Router\Router->match().
      * @param User   $user The user to check.
-     * @throws \Alaress\Authorizer\Failure\IFailure if the request isn't authorized.
+     * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      */
     public function authorizePathForUser($path, User $user = null) {
         foreach ($this->ruleList as $rule) {

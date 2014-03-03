@@ -9,11 +9,4 @@
 
 namespace Alaress\Authorizer\Failure;
 
-
-class Forbidden extends \RuntimeException implements IFailure {
-
-    public function onFailure() {
-
-    }
-
-}
+class Forbidden extends Base {}

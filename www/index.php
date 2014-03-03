@@ -68,7 +68,7 @@ if ($route instanceof Aura\Router\Route) {
         // TODO replace the call to Sitepage::error() method
         error($e->getCode(), $e->getMessage(), 403);
     }
-    catch (\Alaress\Authorizer\Failure\IFailure $e) {
+    catch (\Alaress\Authorizer\Failure\Base $e) {
         error($e->getCode(), $e->getMessage(), 500);
     }
 

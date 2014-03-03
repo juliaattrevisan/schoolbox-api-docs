@@ -9,10 +9,4 @@
 
 namespace Alaress\Authorizer\Failure;
 
-class Unauthorized extends \RuntimeException {
-
-    public function onFailure() {
-
-    }
-
-}
+class Unauthorized extends Base {}
