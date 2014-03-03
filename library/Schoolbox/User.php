@@ -41,6 +41,9 @@ private $enabled;               //Bool
 	/** @var Collection */
 	protected $parent_collection;
 
+    /** @var Collection|UserAccess[] */
+    protected $accessList;
+
     //User config options
     private $localEmail;  //Controls if user has local domain email username@domain
     private $eportfolioEnable; //Controls if user has eportfolio
@@ -394,6 +397,22 @@ private $enabled;               //Bool
      */
     public function setConfigLoader(IConfigLoader $config_loader) {
         $this->config_loader = $config_loader;
+    }
+
+    /**
+     * @param  Collection|UserAccess[] $accessList
+     * @return $this
+     */
+    public function setAccessList($accessList) {
+        $this->accessList = $accessList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserAccess[]
+     */
+    public function getAccessList() {
+        return $this->accessList;
     }
 
     /**

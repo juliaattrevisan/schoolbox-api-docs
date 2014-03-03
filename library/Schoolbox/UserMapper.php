@@ -152,6 +152,15 @@ class UserMapper extends Mapper {
 				'other_key' => 'id',
 			)
 		);
+		$this->hasJoin(
+			'userAccess',
+			array(
+				'mapper'    => '\\Schoolbox\\UserAccessMapper',
+				'this_key'  => 'id',
+				'other_key' => 'uid',
+				'multiple'  => true,
+			)
+		);
 	}
 
 	public function findById($id) {
@@ -174,12 +183,16 @@ class UserMapper extends Mapper {
 
 		$statement->execute(array($id));
 
+		/** @var User $user */
 		foreach( $statement as $row ) {
 			if (!($user instanceof User)) {
 				$user = $this->hydrate($row, 'u');
 				$user->setSuperUser($row['u.superuser'] == 1);
-
 				$user->setRole($roleMapper->hydrate($row, 'g'));
+				$user->setAccessList(
+					$this->getJoinMapper('userAccess')
+						->findByColumn('uid', $user->getId())
+				);
 			}
 
 			$campus = $campusMapper->hydrate($row, 'c');
