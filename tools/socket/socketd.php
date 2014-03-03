@@ -1,6 +1,7 @@
 #!/usr/bin/hhvm
 #!/usr/bin/php
 <?php
+use React\Socket\ConnectionException;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Alaress\WorkerCrew\Pooling\DefaultStrategy;
 use Alaress\WorkerCrew\Pooling\VariableStrategy;
@@ -22,7 +23,7 @@ $opts = getopt('dvp::c::');
 
 $verbose = isset($opts['v']);
 $port = empty($opts['p']) ? 8080 : $opts['p'];
-$conf = empty($opts['c']) ? '' : $opts['c'];
+$conf = empty($opts['c']) ? 'socketd.conf' : $opts['c'];
 $debug = isset($opts['d']);
 
 if($verbose) {
@@ -72,7 +73,7 @@ for($i = $low; $i <= $high; ++$i) {
 	$redis = Alaress\Redis::getClientInstance();
 	$redis->connect();
 
-	if(is_readable($conf)) {
+	if(file_exists($conf) && is_readable($conf)) {
 		$fp = fopen($conf, 'r');
 		while($line = fgets($fp)) {
 			$xpl = explode('=',$line);
@@ -101,26 +102,25 @@ for($i = $low; $i <= $high; ++$i) {
 		$verboser->v("Using default strat");
 	}
 
-	$pipeManager = new PipeManager(
-		$loop, $redis, $verboser, $poolstrat
-	);
+	$pipeManager = new PipeManager($loop, $redis, $verboser, $poolstrat);
 
-	$session = new \Ratchet\Session\SessionProvider(
-		$pipeManager, new Predis\Session\SessionHandler($redis), array(),
-		new \Ratchet\Session\Serialize\PhpHandler()
-	);
-
-	$wss = new Ratchet\WebSocket\WsServer($session);
+	$wss = new Ratchet\WebSocket\WsServer($pipeManager);
 	$wss->disableVersion(0);
 
 	$https = new Ratchet\Http\HttpServer($wss);
 
-	$webSock = new React\Socket\Server($loop);
-	$webSock->listen($i, '0.0.0.0');
+	try {
+		$webSock = new React\Socket\Server($loop);
+		$webSock->listen($i, '0.0.0.0');
 
-	$webServer = new Ratchet\Server\IoServer($https, $webSock, $loop);
+		$webServer = new Ratchet\Server\IoServer($https, $webSock, $loop);
 
-	$verboser->v("Listening for incoming websockets on port $i...", '+');
-	$loop->run();
+		$verboser->v("Listening for incoming websockets on port $i...", '+');
+		$loop->run();
+	}
+	catch(ConnectionException $e) {
+		$verboser->v("Unable to launch: " . $e->getMessage(), '!');
+	}
+
 }
 
