@@ -18,47 +18,59 @@ if ($route instanceof Aura\Router\Route) {
     /** @var \Alaress\Web\Controller\Base $controller */
     $controller = $di->get('controller:'.$route->params['controller']);
 
-    // Do authorization here
-    /** @var \Alaress\Authorizer\Authorizer $authorizer */
-    /** @var \Aura\Session\Session $session */
-    /** @var \Schoolbox\User $user */
-//    $authenticator = $di->get('authenticator');
-//    $user          = $authenticator->getUser();
-    // Has the session expired or not?
-//    $_SESSION['remember'] && (($_SESSION['lasttime'] + Cfg::get('session_length')) < mktime())
-    $authorizer = $di->get('authorizer');
-    $session    = $di->get('session');
-    $user       = $session->newSegment('auth')->user;
+    /** @var \Aura\Web\Response $response */
+    $response = null;
     // Has session expired? Assume no user here then, but that should probably
     // be handled in authenticator.
     try {
+        // Do authorization here
+        // TODO Inject user getter into authorizer, and use it to determine:
+        // * if user is there
+        // * if user session is timed out or not
+        /** @var \Aura\Session\Session $session */
+        /** @var \Schoolbox\User $user */
+        $session       = $di->get('session');
+        $authSession   = $session->newSegment('auth');
+        $lastTime      = $authSession->lasttime;
+        $sessionLength = $di->get('config')->get('session_length');
+
+        // Session timed out: don't get the user.
+        if ($lastTime + $sessionLength < time()) {
+            $user = null;
+        }
+        else {
+            $user = $authSession->user;
+        }
+
+        /** @var \Alaress\Authorizer\Authorizer $authorizer */
+        $authorizer = $di->get('authorizer');
         $authorizer->authorizePathForUser($route->params['controller'], $user);
+
+        // If authorizePathForUser() threw no exception, authorization passed!
+
+        // Call the controller method.
+        // Ensure that the parameters match up with the names used.
+        $method = new ReflectionMethod($controller, $route->params['action']);
+        $args   = array();
+        foreach ($method->getParameters() as $parameter) {
+            $name   = $parameter->getName();
+            $args[] = (array_key_exists($name, $route->params)) ? $route->params[$name] : null;
+        }
+        $method->invokeArgs($controller, $args);
+        $response = $controller->getResponse();
     }
     catch (\Alaress\Authorizer\Failure\Unauthorized $e) {
-        header('Location: /?page='.urlencode($path));
-        // raise either 401 (not logged in at all) or 403 (logged in but forbidden)
-        // What could be raised?
-        // 403: raise some sort of error message - this gets passed thru the
-        //      error handler
-        // 401: redirect to login page
-        // anything else: 500 internal server error, system poops itself
+        // Really basic unauthorized response - redirect to a login page.
+        $response = $di->get('webFactory')->newResponse();
+        $response->redirect->to('/?page='.urlencode($path));
     }
     catch (\Alaress\Authorizer\Failure\Forbidden $e) {
+        // TODO replace the call to Sitepage::error() method
         error($e->getCode(), $e->getMessage(), 403);
     }
     catch (\Alaress\Authorizer\Failure\IFailure $e) {
         error($e->getCode(), $e->getMessage(), 500);
     }
-
-    // Call the controller method.
-    // Ensure that the parameters match up with the names used.
-    $method = new ReflectionMethod($controller, $route->params['action']);
-    $args   = array();
-    foreach ($method->getParameters() as $parameter) {
-        $name   = $parameter->getName();
-        $args[] = (array_key_exists($name, $route->params)) ? $route->params[$name] : null;
-    }
-    $method->invokeArgs($controller, $args);
 
     // Figure out output type.
     // In order of preference, output type is:
@@ -66,7 +78,6 @@ if ($route instanceof Aura\Router\Route) {
     // * set in route
     // * default to 'html'
     /** @var \Aura\Web\Response $response */
-    $response = $controller->getResponse();
     $content  = $response->content->get();
     $format   = $content['format'];
     if (empty($format)) {
