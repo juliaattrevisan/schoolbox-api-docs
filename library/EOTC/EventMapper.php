@@ -83,6 +83,11 @@ class EventMapper extends Calendar\EventMapper {
 			'property' => 'endTime',
 			'type'     => self::TYPE_STRING,
 		));
+		$this->hasMap(array(
+			'column' => 'allday',
+			'property' => 'allday',
+			'type' => self::TYPE_INTEGER,
+		));
 		$this->hasJoin('author', array(
 			'mapper'    => '\\Schoolbox\\UserMapper',
 			'this_key'  => 'author_id',

@@ -116,6 +116,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'EVENT_END_MIN' => $event->getEndDateTime()->getUsingFormat('i'),
 			'EVENT_END_AM' => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
 			'EVENT_END_PM' => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+			'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
 			'EVENT_LOCATION' => $event->getLocation(),
 			'EVENT_DETAIL' => $event->getDetail(),
 			'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),

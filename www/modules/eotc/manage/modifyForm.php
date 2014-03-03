@@ -132,6 +132,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$event->setEndTime($endDate->getDatabaseTime());
 			$event->setLocation($_POST['location']);
 			$event->setDetail($_POST['detail']);
+			$event->setAllDay($_POST['allday']);
 
 			/* Collections of ids
 			 */
