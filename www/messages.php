@@ -28,14 +28,14 @@ $this->setTitle('All Messages');
 $qf = new \Schoolbox\Notif\Queue\UserQueueFactory();
 $q = $qf->bindUserQueue($_SESSION['user']);
 
-$messageArray = $q->getMessages(0, true);
+$messageArray = $q->getMessages(100, true, true);
 
 $msgsByDay = array();
 
-foreach($messageArray as $message) {
+foreach($messageArray as $msgId => $message) {
 	$timestamp = $message->getTimestamp();
 	$day = date('Y-m-d', $timestamp);
-	$msgsByDay[$day][$timestamp][] = $message;
+	$msgsByDay[$day][$timestamp][$msgId] = $message;
 
 }
 
