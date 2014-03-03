@@ -1,0 +1,115 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Realtime\Schedule;
+
+
+use Schoolbox\User;
+
+class TriggerBundle {
+
+	/** @var TriggerFactory */
+	protected $factory;
+
+	/** @var string */
+	protected $method;
+
+	/** @var Trigger[] */
+	protected $triggers;
+
+
+	/**
+	 * @param TriggerFactory $factory
+	 * @param string $method
+	 */
+	public function __construct($factory, $method) {
+		$this->factory = $factory;
+		$this->method = $method;
+		$this->triggers = array();
+	}
+
+
+	/**
+	 * @return Trigger[]
+	 */
+	public function getTriggers() {
+		return $this->triggers;
+	}
+
+
+	/**
+	 * @param string $label
+	 * @param int $timestamp
+	 */
+	public function attach($label, $timestamp) {
+		$this->attachEach(array($label => $timestamp));
+	}
+
+
+	/**
+	 * @param array $array
+	 */
+	public function attachEach($array) {
+		$ts = $this->factory->build($array);
+		foreach($ts as $t) {
+			$this->triggers[$t->getLabel()] = $t;
+		}
+	}
+
+
+	/**
+	 * @param string $label
+	 */
+	public function detach($label) {
+		$this->triggers[$label] = null;
+	}
+
+
+	/**
+	 * @param array $array
+	 */
+	public function detachEach($array) {
+		foreach($array as $label) {
+			$this->triggers[$label] = null;
+		}
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getMethod() {
+		return $this->method;
+	}
+
+
+	/**
+	 * @return object
+	 */
+	public function getObject() {
+		return $this->factory->getModel();
+	}
+
+
+	/**
+	 * @return User
+	 */
+	public function getUser() {
+		return $this->factory->getUser();
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getDiff() {
+		return $this->factory->getDiff();
+	}
+
+} 

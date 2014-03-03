@@ -12,12 +12,9 @@ namespace Schoolbox\Realtime\Schedule\Module;
 
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\TopicFactory;
-use Schoolbox\Realtime\Schedule\PreTrigger;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Role;
-use Schoolbox\User;
 
 abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 
@@ -36,7 +33,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 
 	/**
 	 * @param IConfigLoader $configLoader
-	 * @throws \Schoolbox\Realtime\Schedule\ScheduleException
+	 * @throws ScheduleException
 	 */
 	public function __construct($configLoader) {
 		$this->conf = $configLoader;
@@ -44,10 +41,11 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		$this->instantiateMapper();
 	}
 
+
 	/**
 	 * Helper method to figure out which Mapper we apply to, and instantiate it
 	 *
-	 * @throws \Schoolbox\Realtime\Schedule\ScheduleException
+	 * @throws ScheduleException
 	 */
 	protected function instantiateMapper() {
 		$mapperClass = str_replace('Notifier', 'Mapper', get_called_class());
@@ -59,63 +57,9 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		if(!$m instanceof Mapper) {
 			throw new ScheduleException("Class '$mapperClass' must be an instance of Mapper");
 		}
+
 		$this->mapper = $m;
-
 	}
-
-
-	/**
-	 * Generate a set of events to be scheduled by retrieving a backlog from the database
-	 *
-	 * @return \SplObjectStorage
-	 */
-	public function spoolTriggersFromDatabase() {
-
-		// retrieve all the objects this mapper can find (yes, this will be heavy)
-		$collection = $this->mapper->findAll();
-		$obstore = new \SplObjectStorage();
-
-		foreach($collection as $model) {
-			// use the abstract filter method to determine what to keep or toss
-			if(!$this->filter($model)) {
-				continue;
-			}
-
-			// select the user we'll blame for the events we're generating
-			$initiator = $this->extractInitiator($model);
-
-			// call the extending class's trigger generator method for creation
-			$events = $this->generateTriggers(Mapper::METHOD_CREATE, $model);
-
-			// store the result of the above
-			$obstore->attach(new PreTrigger($model, $initiator), $events);
-		}
-
-		// SplObjectStorage[PreTrigger : array]
-		return $obstore;
-	}
-
-
-	/**
-	 * To be implemented by extending classes.
-	 * If this method returns true, the object in question will have CREATE triggers generated for it,
-	 * otherwise it will be ignored.
-	 *
-	 * @param object $object
-	 * @return bool
-	 */
-	protected abstract function filter($object);
-
-
-	/**
-	 * To be implemented by extending classes.
-	 * This method should return a User object that will be considered "responsible" for the triggers that are being
-	 * created for the given object. This is typically the creator of the object.
-	 *
-	 * @param object $object
-	 * @return User
-	 */
-	protected abstract function extractInitiator($object);
 
 
 	/**
@@ -138,6 +82,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		return $callables;
 	}
 
+
 	/**
 	 * String representation of object
 	 *
@@ -146,6 +91,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	public function serialize() {
 		return get_class($this->conf);
 	}
+
 
 	/**
 	 * Constructs the object
@@ -159,6 +105,5 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		$this->instantiateMapper();
 		$this->loadDependencies();
 	}
-
 
 }

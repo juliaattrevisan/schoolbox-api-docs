@@ -27,11 +27,15 @@ class TriggerFactory {
 	/** @var array */
 	protected $diff;
 
+	/** @var TriggerBundle[] */
+	protected $bundles;
+
 	public function __construct($moduleNotifier, $model, $user, $diff = null) {
 		$this->notifier = $moduleNotifier;
 		$this->model = $model;
 		$this->user = $user;
 		$this->diff = $diff;
+		$this->bundles = array();
 	}
 
 	/**
@@ -54,5 +58,39 @@ class TriggerFactory {
 		}
 		return $triggers;
 	}
+
+	/**
+	 * @param string $method
+	 * @return TriggerBundle
+	 */
+	public function getBundle($method) {
+		$method = strtolower($method);
+		if(!isset($this->bundles[$method])) {
+			$this->bundles[$method] = new TriggerBundle($this, $method);
+		}
+		return $this->bundles[$method];
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getDiff() {
+		return $this->diff;
+	}
+
+	/**
+	 * @return object
+	 */
+	public function getModel() {
+		return $this->model;
+	}
+
+	/**
+	 * @return \Schoolbox\User
+	 */
+	public function getUser() {
+		return $this->user;
+	}
+
 
 } 

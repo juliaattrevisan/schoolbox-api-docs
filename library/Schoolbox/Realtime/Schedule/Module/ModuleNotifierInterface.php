@@ -10,10 +10,9 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 
-use Alaress_Date_Format;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use Schoolbox\Realtime\Schedule\ScheduleException;
+use Schoolbox\Realtime\Schedule\TriggerBundle;
 use Serializable;
 
 interface ModuleNotifierInterface extends Serializable {
@@ -37,20 +36,13 @@ interface ModuleNotifierInterface extends Serializable {
 	 */
 	public function loadDependencies($dependencies = null);
 
-	/*
-	 * @param User $user            the User that performed/initiated the operation
-	 * @param array $diff           if $method is 'UPDATE', an array of the changes made to the object, null otherwise
-	 */
 
 	/**
-	 * Generate a set of triggers to be fired at specific times, based on the given data.
-	 *
-	 * @param string $method                the CRUD operation that was performed on the object
-	 * @param object $object                the Mappable object that was operated on
-	 * @throws ScheduleException            will be thrown if the CRUD operation is not recognised
-	 * @return Alaress_Date_Format[]|int[]  return an array of ADFs or timestamps, indexed by trigger label
+	 * @param TriggerBundle $bundle
+	 * @return void
 	 */
-	public function generateTriggers($method, $object);
+	public function buildTriggers($bundle);
+
 
 	/**
 	 * Return the list of callbacks that are associated with this trigger.
@@ -60,11 +52,4 @@ interface ModuleNotifierInterface extends Serializable {
 	 */
 	public function retrieveCallbacks($label);
 
-
-	/**
-	 * Generate a set of events to be scheduled by retrieving a backlog from the database
-	 *
-	 * @return \SplObjectStorage
-	 */
-	public function spoolTriggersFromDatabase();
-} 
+}

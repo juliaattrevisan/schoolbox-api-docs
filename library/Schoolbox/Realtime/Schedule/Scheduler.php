@@ -41,7 +41,7 @@ use Schoolbox\Realtime\Verboser;
  * Class Scheduler
  * @package Schoolbox\Realtime\Schedule
  */
-class Scheduler implements TaskResponseHandlerInterface {
+class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 	const MODULE_NS = 'Schoolbox\\Realtime\\Schedule\\Module\\';
 	const QUEUE_SCHEDULE = 'sb.sched';
@@ -82,7 +82,7 @@ class Scheduler implements TaskResponseHandlerInterface {
 		$this->mqc = new Connector();
 		$this->conf = $configLoader;
 		$this->notif = new Notif();
-		$this->dispatcher = new Dispatcher($loop, $this, $verboser);
+		$this->dispatcher = new Dispatcher($loop, $this, $verboser, new SchedulerDispatchStrategy());
 		$this->fMsg = new MessageFactory(null);
 
 		if($initialise) {
@@ -102,12 +102,11 @@ class Scheduler implements TaskResponseHandlerInterface {
 		$v = $this->verboser;
 		$self = $this;
 
-
 		/** Connect to stomp via the provided loop */
 		$stompClient->connect()->then(function($client) use ($v, $self) {
 			// this closure is called when stomp successfully connects
 			/** @var Client $client */
-			$v->v("Schedule connected to STOMP, checking for messages");
+			$v->v("Scheduler connected to STOMP", '+');
 
 			// make sure our endpoint exists
 			$mqc = new Connector();
@@ -118,48 +117,13 @@ class Scheduler implements TaskResponseHandlerInterface {
 			$client->subscribeWithAck('/amq/queue/'.Scheduler::QUEUE_SCHEDULE, 'client',
 				function($frame, $ackResolver) use ($v, $self) {
 					// this closure is called when a message is received in the defined queue
-					/**
-					 * @var Frame $frame
-					 * @var AckResolver $ackResolver
-					 */
-
+					/** @var AckResolver $ackResolver */
 					$self->onAMQP($frame) ? $ackResolver->ack() : $ackResolver->nack();
 				}
 			);
 		});
-
-		foreach(self::$knownModules as $module) {
-			try {
-				$instance = $this->getModule($module);
-				// ok, we have a moduleinterface now
-				$this->verboser->v("Spooling triggers for '$module' from database");
-
-				$pretriggers = $instance->spoolTriggersFromDatabase();
-				// iterate across the events as attached to their respective Model objects
-				foreach($pretriggers as $pretrigger) {
-
-					/** @var PreTrigger $pretrigger */
-					$events = $pretriggers->offsetGet($pretrigger);
-
-					try {
-						// construct the trigger factory on a case-by-case
-						$fTrigger = new TriggerFactory(
-							$instance, $pretrigger->getObject(), $pretrigger->getUser(), null
-						);
-						// construct triggers and schedule them, disregarding any expired triggers
-						$this->scheduleNotifications($fTrigger->build($events, true));
-					}
-					catch(ScheduleException $e) {
-
-					}
-				}
-			}
-			catch(ScheduleException $e) {
-				$this->verboser->v($e->getMessage(), '*');
-			}
-		}
-
 	}
+
 
 	/**
 	 * Handles a STOMP frame. Returns true to ACK message, or false to NACK message.
@@ -186,11 +150,10 @@ class Scheduler implements TaskResponseHandlerInterface {
 				$instance, $message->getObject(), $message->getInitiator(), $message->getDiff()
 			);
 
-			// ask the instance for a list of events for which to create triggers
-			$events = $instance->generateTriggers($message->getMethod(), $message->getObject());
-
-			// build a list of triggers out of the list of events, and schedule them
-			$this->scheduleNotifications($fTrigger->build($events));
+			// retrieve, populate, and schedule this bundle of triggers
+			$bundle = $fTrigger->getBundle($message->getMethod());
+			$instance->buildTriggers($bundle);
+			$this->scheduleNotifications($bundle->getTriggers());
 
 		}
 		catch(ScheduleException $e) {
@@ -272,7 +235,7 @@ class Scheduler implements TaskResponseHandlerInterface {
 	 */
 	public function scheduleNotifications($triggers) {
 		foreach($triggers as $trigger) {
-			$this->scheduleNotification($trigger);
+			$rtn[] = $this->scheduleNotification($trigger);
 		}
 	}
 
