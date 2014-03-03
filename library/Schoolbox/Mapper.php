@@ -129,6 +129,9 @@ class Mapper {
 	 */
 	protected $notif;
 
+	/** @var array */
+	protected $sessionData;
+
 	/**
 	 * Retreives the singleton instance of this class.
 	 *
@@ -152,6 +155,7 @@ class Mapper {
 		$this->setup();
 		$this->setConfigLoader(new ConfigMapper());
 		$this->setColumnFactory(new ColumnFactory());
+		$this->setSessionData(isset($_SESSION) ? $_SESSION : array());
 		$this->mapping();
 	}
 
@@ -257,6 +261,21 @@ class Mapper {
 
 		return $this->notif;
 	}
+
+	/**
+	 * @param array $sessionData
+	 */
+	public function setSessionData($sessionData) {
+		$this->sessionData = $sessionData;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getSessionData() {
+		return $this->sessionData;
+	}
+
 
 	/**
 	 * Gets a single object as a collection, if it isn't one already.
@@ -1063,20 +1082,24 @@ class Mapper {
 				$previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
 				$this->triggerCallbacks('postSave', $model, $previous);
 
-				$method = $previous ? self::METHOD_UPDATE : self::METHOD_CREATE;
+				// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
+				if(isset($this->sessionData['user'])) {
+					$method = $previous ? self::METHOD_UPDATE : self::METHOD_CREATE;
 
-				$fMessage = new MessageFactory($this->getNotifier());
-				$fMessage
-					->setObject($model)
-					->setInitiator($_SESSION['user'])
-					->setSeverity(Logger::NOTICE)
-					->setTopic(Notif::TOPIC_APPLICATION);
+					$fMessage = new MessageFactory($this->getNotifier());
+					$fMessage
+						->setObject($model)
+						->setInitiator($this->sessionData['user'])
+						->setSeverity(Logger::NOTICE)
+						->setTopic(Notif::TOPIC_APPLICATION);
 
-				if($previous) {
-					$fMessage->setDiff($this->diff($model, $previous));
+					if($previous) {
+						$fMessage->setDiff($this->diff($model, $previous));
+					}
+
+					$fMessage->generateInternalMessage($method)->send();
 				}
 
-				$fMessage->generateInternalMessage($method)->send();
 			}
 		}
 
