@@ -216,7 +216,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'EVENT_TEACHER_IN_CHARGE' => json_encode(array()),
 			'EVENT_STAFF' => json_encode(array()),
 			'EVENT_STATUS' => $status->getName(),
-			'EVENT_RAMSREQUIRED_SELECTED' => '',
+			'EVENT_RAMSREQUIRED_SELECTED' => 'checked="checked"',
 			'EVENT_ID' => '',
 			'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 			'EVENT_NOTE' => '',
