@@ -52,9 +52,8 @@ class Dispatcher implements DispatcherInterface {
 		$this->pool = new Pool($loop, $msgHandler, $this->strat);
 
 		// build the queue, retrieving from storage if that's part of the strat
-		$this->q = $strat->buildQueue();
-
-		$this->qDelay = $this->pool->getQueueDelay();
+		$this->q = $this->strat->buildQueue();
+		$this->qDelay = $this->strat->getQueueDelay();
 
 		// dispatcher depends on a react loop
 		$this->loop = $loop;
