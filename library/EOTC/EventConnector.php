@@ -271,6 +271,7 @@ class EventConnector extends EventMapper {
 				$event->setEventId($eventItem->getId());
 				$event->setStartTime($eventItem->getStartDateTime());
 				$event->setEndTime($eventItem->getEndDateTime());
+				$event->setAllDay($eventItem->getAllDay());
 				$event->setCampusList(implode(',', $campusIds));
 
 				/* EOTC Events are always of the type "EOTC" for usage
@@ -283,7 +284,6 @@ class EventConnector extends EventMapper {
 				$event->setColour($eventItem->getEventType()->getColor());
 				$event->setDetail($eventItem->getDetail());
 				$event->setLocation($eventItem->getLocation());
-				$event->setAllDay(0);
 
 				/* If you have write access to the event. Only superusers
 				 * and authors can modify an event
