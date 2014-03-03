@@ -18,6 +18,8 @@ use Schoolbox\MappingCollection;
 
 class ConfigMapper extends Mapper implements IConfigLoader {
 
+	protected $cache = array();
+
 	public function __construct() {
 		$this->database = \Database::getInstance();
 		$this->map = new MappingCollection();
@@ -47,7 +49,7 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 
 		$this->hasMap(array(
 			'column'     => 'value',
-			'property'   => 'name',
+			'property'   => 'value',
 			'type'       => self::TYPE_STRING,
 		));
 
@@ -55,11 +57,13 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 
 
 	public function get($var) {
-		$coll = $this->findByColumn('name', $var);
-		if($coll->count()) {
-			return $coll->first()->getValue();
+		if(!isset($this->cache[$var])) {
+			$coll = $this->findByColumn('name', $var);
+			if($coll->count()) {
+				$this->cache[$var] = $coll->first()->getValue();
+			}
 		}
-		return '';
+		return $this->cache[$var];
 	}
 
 
