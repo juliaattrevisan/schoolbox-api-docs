@@ -34,7 +34,7 @@ class WorkerProcess extends AbstractProcess {
 
 	/**
 	 * @param string $command
-	 * @param string $args
+	 * @param array $args
 	 * @throws RuntimeException
 	 * @throws InvalidArgumentException
 	 * @return mixed
@@ -44,9 +44,7 @@ class WorkerProcess extends AbstractProcess {
 
 			// retrieve messages
 			case 'fetch':
-				$data = json_decode($args, true);
-
-				list($userId, $count) = array_values($data);
+				list($userId, $count) = $args;
 
 				$messages = array();
 
@@ -56,7 +54,8 @@ class WorkerProcess extends AbstractProcess {
 				foreach($allMessages as $read) {
 					$messages[$read->getId()] = $read->getBody();
 				}
-				return $messages;
+				// wrap in an array to preserve keys
+				return array($messages);
 
 			// push messages
 			case 'publish':
