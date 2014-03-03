@@ -44,6 +44,15 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 			$start = $currentEvent->getStartTime()->getDatabase();
 			$end = $currentEvent->getEndTime()->getDatabase();
 
+			/* All-day settings
+			 */
+			if ($currentEvent->getAllDay()) {
+				$allDay = true;
+			}
+			else {
+				$allDay = false;
+			}
+
 			//
 			// Add campus list to list of classes
 			$classes = array(
@@ -75,7 +84,7 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 				/* Whether it's an all-day event or not
 				 * If allDay is true, then you can't resize it
 				 */
-				'allDay' => false,
+				'allDay' => $allDay,
 
 				/* Colour of the event
 				 */

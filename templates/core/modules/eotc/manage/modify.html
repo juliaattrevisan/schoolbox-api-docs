@@ -155,6 +155,11 @@
 							<option value="pm" {EVENT_END_PM}>PM</option>
 						</select>
 					</span>
+
+					<label for="allday">
+						<input type="hidden" name="allday" value="0" />
+						<input id="allday" name="allday" class="allday" type="checkbox" value="1" {EVENT_ALLDAY_CHECKED} />All Day
+					</label>
 				</td>
 			</tr>
 			<!-- BEGIN recurring_dates -->
