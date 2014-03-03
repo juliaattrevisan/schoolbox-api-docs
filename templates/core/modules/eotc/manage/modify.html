@@ -60,6 +60,35 @@
 			onePerLine: false,
 			multiple: false
 		});
+
+		/* Confirmation when removing RAMS requirement
+		 */
+		$('[data-ramscheckbox="true"]').change(function(event) {
+			if (!$(this).is(':checked')) {
+				var self = $(this);
+
+				$("#dialog-rams").dialog({
+					resizable: false,
+					height: 340,
+					width: 400,
+					modal: true,
+					draggable: false,
+					buttons: {
+						"OK": function() {
+							$(self).prop('checked', false);
+							$(this).dialog('close');
+						},
+						"Cancel": function() {
+							$(self).prop('checked', true);
+							$(this).dialog('close');
+						}
+					},
+					close: function() {
+						$(this).dialog('close');
+					}
+				});
+			}
+		});
 	});
 </script>
 <h1>
@@ -209,7 +238,7 @@
 				<td>
 					<label class="float-left clear">
 						<input type="hidden" name="ramsRequired" value="0" />
-						<input type="checkbox" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} /> {EVENT_RAMS_FILE}
+						<input type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} /> {EVENT_RAMS_FILE}
 
 						<div data-ramsfile="true">
 							<input type="file" name="ramsFile" />
@@ -295,6 +324,21 @@
 		<p>
 			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
 			Are you sure you want to delete this event?
+		</p>
+	</div>
+	<div id="dialog-rams" title="Remove RAMS Requirement">
+		<p>
+			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+			Warning: please confirm RAMS is not required.
+		</p>
+		<p>
+			RAMS applied to the following conditions:
+		</p>
+		<p>
+			<a href="/modules/eotc/policy">Read the full RAMS policy.</a>
+		</p>
+		<p>
+			Press OK to confirm that RAMS is not required.
 		</p>
 	</div>
 
