@@ -11,7 +11,7 @@ namespace Schoolbox\Realtime\Pipe;
 
 
 
-use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
 use RuntimeException;
@@ -23,7 +23,7 @@ class WorkerProcess extends AbstractProcess {
 
 
 	/**
-	 * @param PoolingInterface $strat
+	 * @param DispatchStrategyInterface $strat
 	 * @param Verboser $verboser
 	 */
 	public function __construct($strat = null, $verboser = null) {

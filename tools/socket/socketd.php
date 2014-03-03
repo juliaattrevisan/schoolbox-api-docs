@@ -3,8 +3,8 @@
 <?php
 use React\Socket\ConnectionException;
 use Schoolbox\Realtime\Pipe\PipeManager;
-use Alaress\WorkerCrew\Pooling\DefaultStrategy;
-use Alaress\WorkerCrew\Pooling\VariableStrategy;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategy;
 
 /**
  * The Websocket Daemon.
@@ -82,23 +82,23 @@ for($i = $low; $i <= $high; ++$i) {
 			}
 		}
 		fclose($fp);
-		$poolstrat = new VariableStrategy(
-			isset($minWorkers)  ? (int)$minWorkers  : DefaultStrategy::MIN_WORKERS,
-			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultStrategy::MAX_WORKERS,
-			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultStrategy::MAX_FLYWHEEL,
-			isset($queueDelay)  ? (int)$queueDelay  : DefaultStrategy::QUEUE_DELAY,
-			isset($idleTimeout) ? (int)$idleTimeout : DefaultStrategy::IDLE_TIMEOUT
+		$poolstrat = new ConfiguredDispatchStrategy(
+			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
+			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
+			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL,
+			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
+			isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT
 		);
 
 		$verboser->v(sprintf("Current strat: workers [%d - %d], queueing (%dms * %d)",
-			isset($minWorkers)  ? (int)$minWorkers  : DefaultStrategy::MIN_WORKERS,
-			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultStrategy::MAX_WORKERS,
-			isset($queueDelay)  ? (int)$queueDelay  : DefaultStrategy::QUEUE_DELAY,
-			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultStrategy::MAX_FLYWHEEL
+			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
+			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
+			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
+			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL
 		));
 	}
 	else {
-		$poolstrat = new DefaultStrategy();
+		$poolstrat = new DefaultDispatchStrategy();
 		$verboser->v("Using default strat");
 	}
 
