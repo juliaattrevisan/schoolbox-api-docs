@@ -210,6 +210,21 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
         'SESSION_ID'		=> session_id(),
     );
 	$this->setVar($output);
+
+	/* Allowed filetypes
+	 */
+	$extensionMapper = new \Schoolbox\File\ExtensionMapper();
+	$allExtensions = $extensionMapper->findAllowedExtensions();
+
+	$allowedFileTypes = array();
+
+	foreach($allExtensions as $currentExtension) {
+		$allowedFileTypes[] = '*.' . $currentExtension->getExtension();
+	}
+
+	$this->setVar(array(
+		'UPLOADIFY_ALL_ALLOWED_FILETYPES' => implode('; ', $allowedFileTypes)
+	));
 }
 else if($this->arg[0] == 'multicat') {
 	/* Upload a file to multiple categories */
