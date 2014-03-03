@@ -19,6 +19,7 @@ class UserAccess {
 	const SERVICE_TUTORIAL    = 4;
 	const SERVICE_CMS         = 5;
 	const SERVICE_HOUSEMASTER = 6;
+	const SERVICE_RESOURCE_BOOKING = 7;
 
 	const ACCESS_DENY  = 0;
 	const ACCESS_READ  = 1;
