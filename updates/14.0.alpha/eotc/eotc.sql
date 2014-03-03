@@ -71,3 +71,6 @@ CREATE TABLE `eotc_config`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR
 INSERT INTO `eotc_config` (`name`, `value`) VALUES ('first_reminder', '10');
 INSERT INTO `eotc_config` (`name`, `value`) VALUES ('daily_reminder', '3');
 INSERT INTO `eotc_config` (`name`, `value`) VALUES ('urgent_threshold', '3');
+
+ALTER TABLE `eotc_config` CHANGE `value` `value` TEXT CHARSET latin1 COLLATE latin1_swedish_ci NULL;
+INSERT INTO `eotc_config` (`name`) VALUES ('policy');
