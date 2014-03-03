@@ -26,7 +26,7 @@ use Schoolbox\Realtime\SessionException;
 use Schoolbox\Realtime\Stomp\SubscriptionException;
 use Schoolbox\Realtime\Stomp\SubscriptionManager;
 use Alaress\WorkerCrew\Dispatcher;
-use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Schoolbox\Realtime\Verboser;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -65,7 +65,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	 * @param LoopInterface $reactLoop
 	 * @param PredisClientInterface $predisClient
 	 * @param Verboser $verboser
-	 * @param PoolingInterface $strat
+	 * @param DispatchStrategyInterface $strat
 	 */
 	public function __construct($reactLoop, $predisClient, $verboser, $strat = null) {
 		$this->pipes = new PipeCollection($predisClient, $verboser);

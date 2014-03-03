@@ -17,8 +17,8 @@ use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
 use RuntimeException;
-use Alaress\WorkerCrew\Pooling\DefaultStrategy;
-use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Schoolbox\Realtime\Verboser;
 use SplObjectStorage;
 use UnexpectedValueException;
@@ -32,7 +32,7 @@ class Pool {
 	/** @var LoopInterface */
 	protected $loop;
 
-	/** @var PoolingInterface */
+	/** @var DispatchStrategyInterface */
 	protected $poolingStrat;
 
 	/** @var WorkerBundleInterface */
@@ -44,7 +44,7 @@ class Pool {
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
-	 * @param PoolingInterface $strat
+	 * @param DispatchStrategyInterface $strat
 	 */
 	public function __construct($loop, $msgHandler, $strat) {
 		$this->loop = $loop;

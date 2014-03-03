@@ -10,8 +10,8 @@
 namespace Alaress\WorkerCrew;
 
 
-use Alaress\WorkerCrew\Pooling\DefaultStrategy;
-use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
@@ -35,18 +35,18 @@ class Dispatcher implements DispatcherInterface {
 	/** @var TimerInterface */
 	protected $timer = null;
 
-	/** @var PoolingInterface */
+	/** @var DispatchStrategyInterface */
 	protected $strat;
 
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
 	 * @param Verboser $verboser
-	 * @param PoolingInterface $strat
+	 * @param DispatchStrategyInterface $strat
 	 */
 	function __construct($loop, $msgHandler, $verboser, $strat = null) {
 
-		$this->strat = $strat ?: new DefaultStrategy();
+		$this->strat = $strat ?: new DefaultDispatchStrategy();
 
 		// pool of workers
 		$this->pool = new Pool($loop, $msgHandler, $this->strat);

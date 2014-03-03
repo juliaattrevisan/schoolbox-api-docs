@@ -20,7 +20,7 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use SplQueue;
 
-class DefaultStrategy implements PoolingInterface {
+class DefaultDispatchStrategy implements DispatchStrategyInterface {
 
 	const MIN_WORKERS  = 1;
 	const MAX_WORKERS  = 4;

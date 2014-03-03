@@ -16,7 +16,7 @@ use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use OutOfBoundsException;
 
 
-class VariableStrategy extends DefaultStrategy {
+class ConfiguredDispatchStrategy extends DefaultDispatchStrategy {
 
 	protected $flywheelSpins;
 

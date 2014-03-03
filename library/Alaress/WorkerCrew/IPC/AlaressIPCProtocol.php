@@ -10,7 +10,7 @@
 namespace Alaress\WorkerCrew\IPC;
 
 
-use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 
 class AlaressIPCProtocol implements ProtocolInterface {
 
@@ -27,7 +27,7 @@ class AlaressIPCProtocol implements ProtocolInterface {
 	 * @return string
 	 */
 	public function prepareCommand($command, $args = null) {
-		return $command . PoolingInterface::STR_RECORD_SEPARATOR . $this->flatten($args);
+		return $command . DispatchStrategyInterface::STR_RECORD_SEPARATOR . $this->flatten($args);
 	}
 
 	/**
@@ -44,7 +44,7 @@ class AlaressIPCProtocol implements ProtocolInterface {
 		foreach($array as $k => $v) {
 			$array[$k] = base64_encode(serialize($v));
 		}
-		return implode(PoolingInterface::STR_UNIT_SEPARATOR, $array) . PoolingInterface::STR_END_OF_TRANSMISSION;
+		return implode(DispatchStrategyInterface::STR_UNIT_SEPARATOR, $array) . DispatchStrategyInterface::STR_END_OF_TRANSMISSION;
 	}
 
 	/**
@@ -56,17 +56,17 @@ class AlaressIPCProtocol implements ProtocolInterface {
 	public function rebuild($string) {
 
 		// trim the EOT character
-		$string = trim($string, PoolingInterface::STR_END_OF_TRANSMISSION);
+		$string = trim($string, DispatchStrategyInterface::STR_END_OF_TRANSMISSION);
 
 		// if there's a record separator, separate that first
-		if(strpos($string, PoolingInterface::STR_RECORD_SEPARATOR) !== false) {
-			$xpl = explode(PoolingInterface::STR_RECORD_SEPARATOR, $string);
+		if(strpos($string, DispatchStrategyInterface::STR_RECORD_SEPARATOR) !== false) {
+			$xpl = explode(DispatchStrategyInterface::STR_RECORD_SEPARATOR, $string);
 			if(count($xpl) == 2) {
 				list($command, $string) = $xpl;
 			}
 		}
 
-		$xpl = explode(PoolingInterface::STR_UNIT_SEPARATOR, $string);
+		$xpl = explode(DispatchStrategyInterface::STR_UNIT_SEPARATOR, $string);
 
 		foreach($xpl as $k => $v) {
 			$xpl[$k] = unserialize(base64_decode($v));
@@ -83,28 +83,28 @@ class AlaressIPCProtocol implements ProtocolInterface {
 	 * @return string
 	 */
 	public function reject() {
-		return PoolingInterface::STR_NACKNOWLEDGE;
+		return DispatchStrategyInterface::STR_NACKNOWLEDGE;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function accept() {
-		return PoolingInterface::STR_ACKNOWLEDGE;
+		return DispatchStrategyInterface::STR_ACKNOWLEDGE;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function cancel() {
-		return PoolingInterface::STR_CANCEL;
+		return DispatchStrategyInterface::STR_CANCEL;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function end() {
-		return PoolingInterface::STR_END_OF_TRANSMISSION;
+		return DispatchStrategyInterface::STR_END_OF_TRANSMISSION;
 	}
 
 	/**

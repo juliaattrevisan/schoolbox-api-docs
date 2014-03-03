@@ -10,8 +10,8 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
-use Alaress\WorkerCrew\Pooling\DefaultStrategy;
-use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
 use InvalidArgumentException;
 use React\EventLoop\Factory;
@@ -21,7 +21,7 @@ use Schoolbox\Realtime\Verboser;
 
 abstract class AbstractProcess {
 
-	/** @var PoolingInterface */
+	/** @var DispatchStrategyInterface */
 	protected $strat;
 
 	/** @var Verboser */
@@ -41,11 +41,11 @@ abstract class AbstractProcess {
 
 
 	/**
-	 * @param PoolingInterface $strat
+	 * @param DispatchStrategyInterface $strat
 	 * @param Verboser $verboser
 	 */
 	public function __construct($strat = null, $verboser = null) {
-		$this->strat = $strat ?: new DefaultStrategy();
+		$this->strat = $strat ?: new DefaultDispatchStrategy();
 		$this->v = $verboser ?: new Verboser(null);
 
 		$this->loop = Factory::create();

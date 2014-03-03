@@ -10,7 +10,7 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
-use Alaress\WorkerCrew\Pooling\PoolingInterface;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Schoolbox\Realtime\Verboser;
 
 class Worker {
@@ -34,7 +34,7 @@ class Worker {
 	protected $start;
 	/** @var Task */
 	protected $task;
-	/** @var PoolingInterface */
+	/** @var DispatchStrategyInterface */
 	protected $strat;
 
 	/** @var Task[] */
@@ -49,7 +49,7 @@ class Worker {
 	 * @param string $cmd
 	 * @param resource $pp
 	 * @param array $pipes
-	 * @param PoolingInterface $strat
+	 * @param DispatchStrategyInterface $strat
 	 */
 	function __construct($cmd, $pp, $pipes, $strat) {
 		$this->cmd = $cmd;

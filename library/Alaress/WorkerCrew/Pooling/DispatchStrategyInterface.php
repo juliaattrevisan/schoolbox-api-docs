@@ -16,7 +16,7 @@ use Exception;
 use InvalidArgumentException;
 use SplQueue;
 
-interface PoolingInterface {
+interface DispatchStrategyInterface {
 
 	// non-printable characters used for message stream control
 	const STR_END_OF_TRANSMISSION = "\004";
