@@ -50,7 +50,15 @@ if ($route instanceof Aura\Router\Route) {
         error($e->getCode(), $e->getMessage(), 500);
     }
 
-    call_user_func(array($controller, $route->params['action']), $route->params);
+    // Call the controller method.
+    // Ensure that the parameters match up with the names used.
+    $method = new ReflectionMethod($controller, $route->params['action']);
+    $args   = array();
+    foreach ($method->getParameters() as $parameter) {
+        $name   = $parameter->getName();
+        $args[] = (array_key_exists($name, $route->params)) ? $route->params[$name] : null;
+    }
+    $method->invokeArgs($controller, $args);
 
     // Figure out output type.
     // In order of preference, output type is:
