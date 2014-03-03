@@ -42,7 +42,7 @@ class AlaressIPCProtocol implements ProtocolInterface {
 			$array = array($array);
 		}
 		foreach($array as $k => $v) {
-			$array[$k] = base64_encode($v);
+			$array[$k] = base64_encode(serialize($v));
 		}
 		return implode(PoolingInterface::STR_UNIT_SEPARATOR, $array) . PoolingInterface::STR_END_OF_TRANSMISSION;
 	}
@@ -69,7 +69,7 @@ class AlaressIPCProtocol implements ProtocolInterface {
 		$xpl = explode(PoolingInterface::STR_UNIT_SEPARATOR, $string);
 
 		foreach($xpl as $k => $v) {
-			$xpl[$k] = base64_decode($v);
+			$xpl[$k] = unserialize(base64_decode($v));
 		}
 
 		if(isset($command)) {

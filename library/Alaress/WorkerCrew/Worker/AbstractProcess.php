@@ -130,6 +130,8 @@ abstract class AbstractProcess {
 //			ob_end_clean();
 			$this->v->v("Processing successful");
 			echo $this->strat->getProtocol()->flatten($response);
+			$this->v->d($response);
+			$this->v->d($this->strat->getProtocol()->flatten($response));
 		}
 		catch(Exception $e) {
 //			ob_end_clean();
@@ -140,7 +142,7 @@ abstract class AbstractProcess {
 
 	/**
 	 * @param string $command
-	 * @param string $args
+	 * @param array $args
 	 * @return mixed
 	 */
 	protected abstract function process($command, $args);
