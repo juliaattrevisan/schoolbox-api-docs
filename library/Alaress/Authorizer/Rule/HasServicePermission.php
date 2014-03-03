@@ -13,7 +13,21 @@ use Alaress\Authorizer\Failure\Forbidden;
 
 class HasServicePermission implements IAuthorizationRule {
 
+    /**
+     * A value of Schoolbox\UserAccess::SERVICE_*
+     *
+     * @var int
+     */
     protected $service;
+
+    /**
+     * A value of Schoolbox\UserAccess::ACCESS_*
+     *
+     * The user must have at least this access level for $this->service to pass
+     * this permission check.
+     *
+     * @var int
+     */
     protected $accessLevel;
 
     public function __construct($service, $accessLevel) {
@@ -22,12 +36,18 @@ class HasServicePermission implements IAuthorizationRule {
     }
 
     public function authorize(User $user = null) {
-        if (!$user instanceof User) {
-            throw new Forbidden();
+        if ($user instanceof User) {
+            // Check this user's permissions against this item's service and
+            // access level.
+            foreach ($user->getAccessList() as $access) {
+                if ($access->getService() == $this->service
+                    && $access->getAccessLevel() >= $this->accessLevel
+                ) {
+                    return true;
+                }
+            }
         }
-        // Check this user's permissions
-        // I dunno if user's service access level can be checked from here.
-//        var_dump($user);
+        throw new Forbidden();
     }
 
 }
