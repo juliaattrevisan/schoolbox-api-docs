@@ -20,9 +20,14 @@ use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Notif\TopicFactory;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\PreTrigger;
 use Schoolbox\Realtime\Schedule\ScheduleException;
+use Schoolbox\Realtime\Schedule\SchedulingInterface;
+use Schoolbox\Realtime\Schedule\Trigger;
+use Schoolbox\Realtime\Schedule\TriggerBundle;
+use Schoolbox\Realtime\Schedule\TriggerFactory;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -48,14 +53,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	const UPCOMING_WINDOW     = 2;
 
 
-//	/** @var SubmissionBoxMapper */
-//	protected $submissionBoxMapper;
-
 	/** @var UserMapper */
 	protected $userMapper;
 
-//	/** @var SubmissionMapper */
-//	protected $submissionMapper;
+	/** @var SubmissionMapper */
+	protected $submissionMapper;
 
 	/** @var CategoryMapper */
 	protected $categoryMapper;
@@ -72,10 +74,21 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 	/**
 	 * @param IConfigLoader $configLoader
+	 * @throws ScheduleException
 	 */
 	public function __construct($configLoader) {
 		parent::__construct($configLoader);
+		$this->loadDependencies();
+	}
 
+
+	/**
+	 * Instantiate all your dependencies within yourself.
+	 *
+	 * @param mixed $dependencies
+	 * @return void
+	 */
+	public function loadDependencies($dependencies = null) {
 		$this->userMapper = UserMapper::getInstance();
 		$this->submissionMapper = SubmissionMapper::getInstance();
 		$this->categoryMapper = CategoryMapper::getInstance();
@@ -83,90 +96,64 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		$this->_DEPRECATED_USER_HANDLER = new \User();
 		$this->_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
-
 	}
 
 
 	/**
-	 * Generate a set of triggers to be fired at specific times, based on the given data.
-	 *
-	 * @param string $method                the CRUD operation that was performed on the object
-	 * @param SubmissionBox $submissionBox  the Mappable object that was operated on
-	 * @throws ScheduleException            will be thrown if the CRUD operation is not recognised
-	 * @return Alaress_Date_Format[]|int[]  return an array of ADFs or timestamps, indexed by trigger label
+	 * @param TriggerBundle $bundle
+	 * @throws ScheduleException
 	 */
-	public function generateTriggers($method, $submissionBox) {
+	public function buildTriggers($bundle) {
 
-		// unsure if this clones the SubmissionBox or the Alaress_Date_Format, but in this use-case it doesn't matter
-		$upcoming = clone $submissionBox->getDueDate();
-		$upcoming->addHours(-1 * self::UPCOMING_WINDOW);
+		/** @var SubmissionBox $box */
+		$box = $bundle->getObject();
 
-		$events = array();
+		$open = $box->getOpenDate()->getUnixTimestamp();
+		$closed = $box->getDueDate()->getUnixTimestamp();
+		$upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
+		$late = $box->getLateDate()->getUnixTimestamp();
 
-		// events common to create and update
-		if($method == Mapper::METHOD_CREATE || $method == Mapper::METHOD_UPDATE) {
-			$events[self::TRIGGER_OVERDUE]  = $submissionBox->getDueDate();
-			$events[self::TRIGGER_UPCOMING] = $upcoming;
-			$events[self::TRIGGER_CLOSED]   = $submissionBox->getLateDate();
-		}
-
-		switch($method) {
+		switch($bundle->getMethod()) {
 			case Mapper::METHOD_UPDATE:
-				$events[self::TRIGGER_UPDATED] = self::IMMEDIATELY;
 
-				// if the submissionbox already opened, suppress open-on-update trigger
-				if($submissionBox->getOpenDate()->getUnixTimestamp() > time()) {
-					$events[self::TRIGGER_OPEN] = $submissionBox->getOpenDate();
+				// don't spawn/replace an open-on-replace if it's in the past
+				if($box->getOpenDate()->getUnixTimestamp() > time()) {
+					$bundle->attach(self::TRIGGER_OPEN, $open);
 				}
 
+				$bundle->attachEach(array(
+					self::TRIGGER_UPDATED  => self::IMMEDIATELY,
+					self::TRIGGER_OVERDUE  => $closed,
+					self::TRIGGER_UPCOMING => $upcoming,
+					self::TRIGGER_CLOSED   => $late
+				));
 				break;
 
 			case Mapper::METHOD_CREATE:
-				$events[self::TRIGGER_OPEN] = $submissionBox->getOpenDate();
+				$bundle->attachEach(array(
+					self::TRIGGER_OPEN     => $open,
+					self::TRIGGER_OVERDUE  => $closed,
+					self::TRIGGER_UPCOMING => $upcoming,
+					self::TRIGGER_CLOSED   => $late
+				));
 				break;
 
 			case Mapper::METHOD_READ:
 				break;
 
 			case Mapper::METHOD_DELETE:
-				$events[self::TRIGGER_OPEN]     = null;
-				$events[self::TRIGGER_OVERDUE]  = null;
-				$events[self::TRIGGER_UPCOMING] = null;
-				$events[self::TRIGGER_CLOSED]   = null;
+				$bundle->detachEach(array(
+					self::TRIGGER_OPEN,
+					self::TRIGGER_OVERDUE,
+					self::TRIGGER_UPCOMING,
+					self::TRIGGER_CLOSED
+				));
 				break;
 
 			default:
-				throw new ScheduleException("Unrecognised CRUD operation: '$method'.");
+				throw new ScheduleException("Unrecognised CRUD operation: '{$bundle->getMethod()}'.");
 		}
 
-		return $events;
-	}
-
-
-	/**
-	 * To be implemented by extending classes.
-	 * If this method returns true, the object in question will have CREATE triggers generated for it,
-	 * otherwise it will be ignored.
-	 *
-	 * @param SubmissionBox $object
-	 * @return bool
-	 */
-	protected function filter($object) {
-		// if this box is in the past, ignore it
-		return $object->getLateDate()->getUnixTimestamp() >= time();
-	}
-
-
-	/**
-	 * To be implemented by extending classes.
-	 * This method should return a User object that will be considered "responsible" for the triggers that are being
-	 * created for the given object. This is typically the creator of the object.
-	 *
-	 * @param SubmissionBox $object
-	 * @return User
-	 */
-	protected function extractInitiator($object) {
-		return $object->getOwner();
 	}
 
 
