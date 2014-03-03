@@ -24,11 +24,18 @@ $router->attachResourcePostAlias('resourceCategory', '/resource-booking/category
 
 // Set up authorization
 $authorizer = $di->get('authorizer');
+$resourceManageRule = new Authorizer\Rule\Any(
+    new Authorizer\Rule\IsSuperuser(),
+    new Authorizer\Rule\HasServicePermission(
+        Schoolbox\UserAccess::SERVICE_RESOURCE_BOOKING,
+        Schoolbox\UserAccess::ACCESS_FULL
+    )
+);
 $authorizer
-    ->addRule('/^resourceItem(?:$|\.)/', new Authorizer\Rule\IsLoggedIn())
-    ->addRule('/^resourceCategory(?:$|\.)/', new Authorizer\Rule\IsLoggedIn())
-    ->addRule('/^resourceItem\.(?:create|edit|delete)/', new Authorizer\Rule\IsSuperuser())
-    ->addRule('/^resourceCategory\.(?:create|edit|delete)/', new Authorizer\Rule\IsSuperuser())
+    ->addRule('/^resourceItem(?:$|\.)/',                     new Authorizer\Rule\IsLoggedIn())
+    ->addRule('/^resourceCategory(?:$|\.)/',                 new Authorizer\Rule\IsLoggedIn())
+    ->addRule('/^resourceItem\.(?:create|edit|delete)/',     $resourceManageRule)
+    ->addRule('/^resourceCategory\.(?:create|edit|delete)/', $resourceManageRule)
 ;
 
 // Set up the controller
