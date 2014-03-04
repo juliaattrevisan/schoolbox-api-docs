@@ -37,12 +37,6 @@ class Factory {
     public function build() {
         $segmentFactory   = new SegmentFactory();
         $csrfTokenFactory = new Session\CsrfTokenFactory(new Session\Randval(new Session\Phpfunc()));
-        if (function_exists('session_status')) {
-            return new Session\Session($segmentFactory, $csrfTokenFactory, $this->cookies);
-        }
-        else {
-            return new Compat53($segmentFactory, $csrfTokenFactory, $this->cookies);
-        }
+        return new Session\Session($segmentFactory, $csrfTokenFactory, $this->cookies);
     }
-
-} 
+}
