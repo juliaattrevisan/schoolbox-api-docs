@@ -87,6 +87,16 @@ class Subcontext_CoreContext extends BaseContext {
     }
 
     /**
+     * Clicks a logout link.
+     *
+     * @Given /^(?:|I am) logged out$/
+     * @Given /^(?:|I )log out$/
+     */
+    public function logout() {
+        $this->getSession()->getPage()->clickLink('Logout');
+    }
+
+    /**
      * Visits a homepage, given a folder path from the resource browser.
      *
      * @Then /^I go to homepage "(?P<homepage_path>[^"]*)"$/
