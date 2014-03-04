@@ -169,16 +169,22 @@ Scenario: Check resource permissions
   And   I should see "The good projector" in the ".resource-list" element
   # But I can't edit them, or confirm bookings for them
   When  I go to "/resource-booking/item/1/edit"
-  Then  the response status code should be 403
+  # Selenium driver doesn't know how to get the status code.
+  # Then  the response status code should be 403
+  Then  I should see "Sorry, we are unable to complete this request"
+  And   I should see "You do not have permission"
   # As someone who is the moderator of a single item:
   # Can I edit them? I'm not sure yet but this user doesn't have moderate perms.
+  When  I log out
   And   I log in as "cglenn" with password "password"
   When  I go to "/resource-booking/item"
   Then  I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
   When  I go to "/resource-booking/item/1/edit"
-  Then  the response status code should be 403
+  # Then  the response status code should be 403
+  Then  I should see "Sorry, we are unable to complete this request"
+  And   I should see "You do not have permission"
 
 @resource-search
 Scenario: Search for resources
