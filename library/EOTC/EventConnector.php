@@ -238,7 +238,7 @@ class EventConnector extends EventMapper {
 			/* Staff members should see it in translucent form
 			 */
 			if (!$isAttendee) {
-				foreach($eventItem->getStaffAttendees() as $currentStaff) {
+				foreach($eventItem->getMetadata()->getStaffAttendees() as $currentStaff) {
 					if ($currentStaff->getId() == $user->getId()) {
 						$isAttendee = true;
 						break;
@@ -251,7 +251,7 @@ class EventConnector extends EventMapper {
 			 */
 			if (!$isAttendee) {
 				if ($eventItem->getMetadata()->getStatus()->isApproved()) {
-					foreach($eventItem->getStudentAttendees() as $currentStudent) {
+					foreach($eventItem->getMetadata()->getStudentAttendees() as $currentStudent) {
 						if ($currentStudent->getId() == $user->getId()) {
 							$isAttendee = true;
 							break;
