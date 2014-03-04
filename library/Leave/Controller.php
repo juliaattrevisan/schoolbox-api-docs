@@ -127,7 +127,7 @@ class Leave_Controller extends Controller {
 	 * @return mixed
 	 */
 	public function preprocessPost() {
-
+	
 		/* Deal with magicsuggest sometimes giving you an array of ints,
 		 * or just an int
 		 */
@@ -136,13 +136,13 @@ class Leave_Controller extends Controller {
 		if (is_numeric($_POST['user'])) {
 			$data['userId'] = $_POST['user'];
 		}
-		else {
+ 		else {
 			$wtf = json_decode($_POST['user']);
 			$data['userId'] = $wtf[0];
 		}
 
-		return $data;
-	}
+ 		return $data;
+ 	}
 
     /**
      * Test email deployments
