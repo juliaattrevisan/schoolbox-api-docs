@@ -69,11 +69,20 @@ class Subcontext_CoreContext extends BaseContext {
      *
      * @param string $username
      * @param string $password
+     * @throws Exception if either username or password input aren't found
      */
     public function loginAttempt($username, $password) {
         $page = $this->getSession()->getPage();
-        $page->findById('username')->setValue($username);
-        $page->findById('password')->setValue($password);
+        $usernameInput = $page->findById('username');
+        if (!($usernameInput instanceof Element\NodeElement)) {
+            throw new Exception('Username input not found - is user already logged in?');
+        }
+        $passwordInput = $page->findById('password');
+        if (!($passwordInput instanceof Element\NodeElement)) {
+            throw new Exception('Password input not found - is user already logged in?');
+        }
+        $usernameInput->setValue($username);
+        $passwordInput->setValue($password);
         $page->find('css', 'input.login')->press();
     }
 
