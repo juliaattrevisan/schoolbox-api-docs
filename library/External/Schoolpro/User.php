@@ -1,6 +1,6 @@
 <?php
 /**
- * External_SchoolPro_User
+ * External_Schoolpro_User
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class External_SchoolPro_User implements External_UserInterface {
+class External_Schoolpro_User implements External_UserInterface {
 
 	/**
 	 * An instance of MSSQL
@@ -110,7 +110,7 @@ class External_SchoolPro_User implements External_UserInterface {
 	}
 
 	/**
-	 * Get a guy's info from SchoolPro
+	 * Get a guy's info from Schoolpro
 	 *
 	 * @param  $synId
 	 * @return array|bool
@@ -153,7 +153,7 @@ class External_SchoolPro_User implements External_UserInterface {
 	/**
 	 * TODO: Not specified in a stored proc
 	 *
-	 * Get a guy's info from SchoolPro
+	 * Get a guy's info from Schoolpro
 	 *
 	 * @param  $synId
 	 * @return array|bool

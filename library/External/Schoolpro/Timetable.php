@@ -1,6 +1,6 @@
 <?php
 /**
- * External_SchoolPro_Timetable
+ * External_Schoolpro_Timetable
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class External_SchoolPro_Timetable {
+class External_Schoolpro_Timetable {
 
 	/**
 	 * An instance of MSSQL

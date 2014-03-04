@@ -1,6 +1,6 @@
 <?php
 /**
- * External_SchoolPro_Class
+ * External_Schoolpro_Class
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class External_SchoolPro_Class implements External_ClassInterface {
+class External_Schoolpro_Class implements External_ClassInterface {
 
 	/**
 	 * An instance of MSSQL
