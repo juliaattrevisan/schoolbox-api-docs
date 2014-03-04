@@ -156,7 +156,7 @@ Scenario: Manage resources
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
 
-@resource-management
+@resource-permissions
 Scenario: Check resource permissions
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -168,19 +168,19 @@ Scenario: Check resource permissions
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
   # But I can't edit them, or confirm bookings for them
-  When  I go to "/resource-booking/resource/1/edit"
+  When  I go to "/resource-booking/item/1/edit"
   Then  the response status code should be 403
   # As someone who is the moderator of a single item:
   # Can I edit them? I'm not sure yet but this user doesn't have moderate perms.
   And   I log in as "cglenn" with password "password"
-  When  I go to "/resource-booking"
+  When  I go to "/resource-booking/item"
   Then  I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
-  When  I go to "/resource-booking/resource/1/edit"
+  When  I go to "/resource-booking/item/1/edit"
   Then  the response status code should be 403
 
-@resource-management
+@resource-search
 Scenario: Search for resources
   Given I do not wipe the slate clean
   And   I go to homepage
