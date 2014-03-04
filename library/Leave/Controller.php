@@ -953,7 +953,7 @@ class Leave_Controller extends Controller {
                     $rowData[] = $request->getUser()->getYear();
                     $rowData[] = $request->getStart()->getAustralian();
                     $rowData[] = $request->getFinish()->getAustralian();
-                    $rowData[] = $request->getHostType(true);
+                    $rowData[] = $request->getHostTypeMapIndex($request->getHostType())->getName();
                     $rowData[] = $request->getStatus(true);
                     $rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
                     $rowData[] = $request->getAuthorisationUser()->formatName();
