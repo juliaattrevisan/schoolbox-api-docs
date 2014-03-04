@@ -28,6 +28,19 @@ class EventStatus {
 	private $name = -1;
 
 	/**
+	 * A unidirectional map of css classes belong to each status
+	 *
+	 * @var array
+	 */
+	private $cssMap = array(
+		1 => 'status-draft',
+		2 => 'status-in-principle',
+		3 => 'status-rams-approved',
+		4 => 'status-approved',
+		5 => 'status-rejected',
+	);
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -96,6 +109,15 @@ class EventStatus {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get the css style associated with this status
+	 *
+	 * @return mixed
+	 */
+	public function getStyle() {
+		return $this->cssMap[$this->getId()];
 	}
 
 	/* Getters/Setters
