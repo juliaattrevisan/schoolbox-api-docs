@@ -464,7 +464,7 @@ class Leave_Request {
      * @return mixed
      */
     public function getHostTypeMapIndex($index) {
-        return $this->hostTypeMap[$index];
+		return $this->getAllHostTypes()->getBy('id', $index);
     }
 
     /**

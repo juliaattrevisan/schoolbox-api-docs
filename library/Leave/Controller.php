@@ -1029,7 +1029,7 @@ class Leave_Controller extends Controller {
                             'REQUEST_ID' => $request->getId(),
                             'REQUEST_START' => $request->getStart()->getAustralian(),
                             'REQUEST_DURATION' => $request->getDuration(),
-                            'REQUEST_HOST_TYPE' => $request->getHostType(true)
+                            'REQUEST_HOST_TYPE' => $request->getHostTypeMapIndex($request->getHostType())->getName()
                         )
                     );
 
