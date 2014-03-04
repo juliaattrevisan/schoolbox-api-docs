@@ -195,7 +195,12 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$event->setMetadata($metadata);
 
 		$defaultTypeId = '';
-		$defaultCampusId = array($_SESSION['campus'][0]);
+
+		/* This is used in the checkbox preselect outside this if/else
+		 * so we set it to null, to prevent any campuses from being
+		 * preselected
+		 */
+		$defaultCampusId = null;
 
 		/* Miscellaneous setvarring
 		 * Hide advanced options by default
