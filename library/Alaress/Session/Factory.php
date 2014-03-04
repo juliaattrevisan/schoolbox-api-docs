@@ -35,7 +35,7 @@ class Factory {
      * @return Session\Session
      */
     public function build() {
-        $segmentFactory   = new Session\SegmentFactory();
+        $segmentFactory   = new SegmentFactory();
         $csrfTokenFactory = new Session\CsrfTokenFactory(new Session\Randval(new Session\Phpfunc()));
         if (function_exists('session_status')) {
             return new Session\Session($segmentFactory, $csrfTokenFactory, $this->cookies);
