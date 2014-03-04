@@ -128,8 +128,7 @@ class Authenticator {
     public function setSessionUser($user) {
         // $_SESSION['user'] = $user->get('uid');
         // -- or --
-        // Namespaced session user for Aura
-        $_SESSION['user'] = $_SESSION['auth']['user'] = $user;
+        $_SESSION['user'] = $user;
         $this->touch();
     }
 
@@ -148,8 +147,7 @@ class Authenticator {
      * Update the latest touch of the site by the user to being now
      */
     private function touch() {
-        // Namespaced session last time for Aura
-        $_SESSION['lasttime'] = $_SESSION['auth']['lasttime'] = time();
+        $_SESSION['lasttime'] = time();
     }
 
     public function destroySession() {
