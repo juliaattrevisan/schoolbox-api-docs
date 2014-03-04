@@ -391,6 +391,7 @@ class SitePage extends Page {
 
         $this->setFile(TEMPLATE_content, 'common/error.html');
         $this->setTitle('Error Encountered');
+        $this->setVar("CODE",   $ec);
         $this->setVar("OUTPUT", $output);
         $this->buildPage(false);
         $this->outputPage(true);
