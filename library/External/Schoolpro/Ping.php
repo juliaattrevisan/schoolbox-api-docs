@@ -1,9 +1,9 @@
 <?php
 
-class External_SchoolPro_Ping implements External_PingInterface {
+class External_Schoolpro_Ping implements External_PingInterface {
 
 	/**
-	 * Connects to SchoolPro database in the same manner that the other classes
+	 * Connects to Schoolpro database in the same manner that the other classes
 	 * would, and returns whether the database is responsive.
 	 *
 	 * @return bool

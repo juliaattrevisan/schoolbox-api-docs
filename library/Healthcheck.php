@@ -65,7 +65,7 @@ class Healthcheck {
     }
 
 	private function SchoolproCheckConnection(){
-		echo "\nSchoolPro Connnection Check\n";
+		echo "\nSchoolpro Connnection Check\n";
 		$this->MssqlConnection();
 	}
 
@@ -171,7 +171,7 @@ class Healthcheck {
 	 * Test chub
 	 */
 	private function SchoolproCheckStoredProcedures() {
-		echo "\nSchoolPro Permission Check - Stored Procedures\n";
+		echo "\nSchoolpro Permission Check - Stored Procedures\n";
 		$db = new MSSQL();
 		$db->debug = true;
 
