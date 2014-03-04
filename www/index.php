@@ -30,7 +30,7 @@ if ($route instanceof Aura\Router\Route) {
         /** @var \Aura\Session\Session $session */
         /** @var \Schoolbox\User $user */
         $session       = $di->get('session');
-        $authSession   = $session->newSegment('auth');
+        $authSession   = $session->newSegment(null);
         $lastTime      = $authSession->lasttime;
         $sessionLength = $di->get('config')->get('session_length');
 
