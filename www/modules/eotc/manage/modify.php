@@ -240,7 +240,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'EVENT_LOCATION' => '',
 			'EVENT_DETAIL' => '',
 			'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
-			'EVENT_ALLDAY_CHECKED' => '',
+			'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
 			'EVENT_STATUS_CLASS' => $status->getStyle(),
 		));
 
