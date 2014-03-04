@@ -106,6 +106,10 @@
 	<input id="efficacy" name="efficacy" type="hidden" value="self" />
 	<input id="action" name="action" type="hidden" value="" />
 
+	<!-- BEGIN type_drop -->
+	<input name="type" type='hidden' value="{EVENT_EVENTTYPE_ID}" />
+	<!-- END type_drop -->
+
 	<h2>Current status</h2>
 	<table class="standardForm">
 		<tbody>
@@ -205,19 +209,6 @@
 				</td>
 				<td>
 					<input name="location" type="text" size="50" value="{EVENT_LOCATION}"/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<h4>Type</h4>
-					<em>Select the type of event. This will be represented via different colours</em>
-				</td>
-				<td>
-					<select name="type">
-						<!-- BEGIN type_drop -->
-						<option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
-						<!-- END type_drop -->
-					</select>
 				</td>
 			</tr>
 			<tr id="campusList">
