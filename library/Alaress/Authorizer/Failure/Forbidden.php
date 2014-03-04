@@ -9,4 +9,11 @@
 
 namespace Alaress\Authorizer\Failure;
 
-class Forbidden extends Base {}
+class Forbidden extends Base {
+    /**
+     * Default error code - corresponds to message "you do not have permission..."
+     *
+     * @var int
+     */
+    protected $code = 19;
+}
