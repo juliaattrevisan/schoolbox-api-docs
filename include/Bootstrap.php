@@ -30,6 +30,7 @@ require_once dirname(__FILE__) . '/Autoloader.php';
 Autoloader::initialise();
 
 // Set up the dependency injector
+require_once __DIR__.'/Bootstrap/Functions.php';
 require_once __DIR__.'/Bootstrap/Dependencies.php';
 
 //
