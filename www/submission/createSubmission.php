@@ -74,7 +74,14 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $submission_id    = $this->arg[1];
     $title            = 'Modify Submission Box';
     $heading          = 'Modify';
-    $submission       = $mapper->findById($submission_id);
+
+	try {
+		$submission = $mapper->findById($submission_id);
+	}
+	catch (\Exception $e) {
+		error(17);
+	}
+
     $category         = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
     $task_id          = $submission->getTask()->getId();
     $is_task          = (bool)$task_id;
