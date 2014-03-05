@@ -26,9 +26,10 @@ class Controller extends Base {
         $list = $this->getMapper()->findAll();
         $this->getResponse()->content->set(
             array(
-                'template' => __DIR__.'/templates/browse.twig',
+                'template' => '@resourceItem/browse.twig',
                 'data'     => array(
-                    'list' => $list,
+                    'list'         => $list,
+                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
                 ),
             )
         );
@@ -40,7 +41,7 @@ class Controller extends Base {
     public function add() {
         $this->getResponse()->content->set(
             array(
-                'template' => __DIR__.'/templates/edit.twig',
+                'template' => '@resourceItem/edit.twig',
                 'data'     => array(
                     'item'           => new Model(),
                     'categoryList'   => $this->getMapper()->getJoinMapper('category')->findAll(),
@@ -60,7 +61,7 @@ class Controller extends Base {
         $item = $this->getMapper()->findById($id);
         $this->getResponse()->content->set(
             array(
-                'template' => __DIR__.'/templates/read.twig',
+                'template' => '@resourceItem/read.twig',
                 'data'     => array(
                     'item'          => $item,
                     'moderatorList' => array(),

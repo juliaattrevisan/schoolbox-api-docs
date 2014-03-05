@@ -28,7 +28,7 @@ class Controller extends Base {
         $response = $this->getResponse();
         $response->content->set(
             array(
-                'template' => __DIR__.'/templates/browse.twig',
+                'template' => '@resourceCategory/browse.twig',
                 'data'     => array(
                     'list' => $list,
                 ),
@@ -43,7 +43,7 @@ class Controller extends Base {
         $response = $this->getResponse();
         $response->content->set(
             array(
-                'template' => __DIR__.'/templates/edit.twig',
+                'template' => '@resourceCategory/edit.twig',
                 'data'     => array(
                     'item' => new Model(),
                 ),
@@ -76,7 +76,7 @@ class Controller extends Base {
         $item = $this->getMapper()->findById($id);
         $this->getResponse()->content->set(
             array(
-                'template' => __DIR__.'/templates/read.twig',
+                'template' => '@resourceCategory/read.twig',
                 'data'     => array(
                     'item' => $item,
                 ),
@@ -93,7 +93,7 @@ class Controller extends Base {
         $item = $this->getMapper()->findById($id);
         $this->getResponse()->content->set(
             array(
-                'template' => __DIR__.'/templates/edit.twig',
+                'template' => '@resourceCategory/edit.twig',
                 'data'     => array(
                     'item' => $item,
                 ),

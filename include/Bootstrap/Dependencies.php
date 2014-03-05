@@ -66,26 +66,16 @@ $di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
 $di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
 $di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
 
+// Template engine
 $di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
 $di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
-
 $di->set(
     'templateEngine',
     $di->lazy(
         function() use($di) {
             $config = $di->get('config');
-            $root   = $config->get('siteRoot');
-            $skin   = $config->get('site_location');
-
-            $loader = new Twig_Loader_Chain();
-
-            $customLoader = new Alaress\Twig\Loader\Custom(array("$root/templates/$skin"));
-            $customLoader->setConfigLoader($config);
-            $loader->addLoader($customLoader);
-            $loader->addLoader(new Twig_Loader_Filesystem(array("/", $root)));
-
-            $twig = new Twig_Environment(
-                $loader,
+            $twig   = new Twig_Environment(
+                $di->get('templateEngine:loader'),
                 array('cache' => $config->get('stream_dir').'/templates/', 'debug' => true,)
             );
             $twig->addExtension(new Twig_Extension_Debug());
@@ -101,3 +91,4 @@ $di->set(
         }
     )
 );
+$di->set('templateEngine:loader', $di->lazyNew('Twig_Loader_Filesystem'));

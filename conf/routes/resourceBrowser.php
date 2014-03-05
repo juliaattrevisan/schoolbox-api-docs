@@ -22,6 +22,17 @@ $router->attachResourcePostAlias('resourceItem', '/resource-booking/item');
 $router->attachResource('resourceCategory', '/resource-booking/category');
 $router->attachResourcePostAlias('resourceCategory', '/resource-booking/category');
 
+// Set up template paths for this resource.
+$twigLoader = $di->get('templateEngine:loader');
+$twigLoader->addPath(
+    $di->get('config')->get('siteRoot').'/library/Schoolbox/ResourceBooking/Item/templates',
+    'resourceItem'
+);
+$twigLoader->addPath(
+    $di->get('config')->get('siteRoot').'/library/Schoolbox/ResourceBooking/Category/templates',
+    'resourceCategory'
+);
+
 // Set up authorization
 $authorizer = $di->get('authorizer');
 $resourceManageRule = new Authorizer\Rule\Any(
