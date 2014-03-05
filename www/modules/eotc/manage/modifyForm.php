@@ -213,6 +213,11 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 						$eventMapper->deleteCampusRelations($currentEvent);
 						$eventMapper->delete($currentEvent);
 					}
+
+					/* Since you deleted all the instances of a this event,
+					 * there's nowhere else to go but here
+					 */
+					$page->localRedir('/modules/eotc/myReview');
 				}
 				/* Delete a metadata relation for an event that is part
 				 * of a series
@@ -224,6 +229,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					$eventMapper->deleteMetadataRelations($event);
 					$eventMapper->deleteCampusRelations($event);
 					$eventMapper->delete($event);
+
+					/* Continue editing
+					 */
+					$page->backToTheFuture(2);
 				}
 			}
 			/* Just a single event all on its lonesome
@@ -236,9 +245,13 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$eventMapper->deleteMetadataRelations($event);
 				$eventMapper->deleteCampusRelations($event);
 				$eventMapper->delete($event);
+
+				/* Since you deleted all the instances of a this event,
+				 * there's nowhere else to go but here
+				 */
+				$page->localRedir('/modules/eotc/myReview');
 			}
 
-			$page->backToTheFuture(2);
 			break;
 
 		default:
