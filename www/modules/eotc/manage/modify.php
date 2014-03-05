@@ -222,6 +222,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$statusMapper = new \EOTC\EventStatusMapper();
 		$status = $statusMapper->findDefaultStatus();
 
+		/* -_-
+		 */
+		$groupHandler = new Group();
+
 		$page->setVar(array(
 			'EVENT_RAMS_FILE' => '',
 			'EVENT_CURRENT_STUDENTS' => 0,
