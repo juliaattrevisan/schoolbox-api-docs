@@ -1,31 +1,36 @@
-<h1>Resource List</h1>
-<ul class="resource-list">
-    {% for item in list %}
-    <li class="resource">
-        <a id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">{{ item.name }}</a>
-    </li>
-    {% else %}
-    <li>There are no resources in the system.</li>
-    {% endfor %}
-</ul>
-
-{# New item: only if I have the permission to do this #}
-<a id="resource-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceItem.add') }}">Add New</a>
-
-<h2>Search</h2>
-<form action="{{ routeLookup('resourceItem.browse') }}" method="get">
-    <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
-    <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
-</form>
-
-<h2>Filter by Category</h2>
-<ul class="resourcecategory-list">
-    <li class="resourcecategory">
-        <a href="{{ routeLookup('resourceItem.browse') }}">All Categories</a>
-    </li>
-    {% for item in categoryList %}
-        <li class="resourcecategory">
-            {% include '@resourceItem/sub/searchLink.twig' %}
+<div class="clearfix">
+    <h1>Resource List</h1>
+    <ul class="resource-list">
+        {% for item in list %}
+        <li class="resource">
+            <a id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">{{ item.name }}</a>
         </li>
-    {% endfor %}
-</ul>
+        {% else %}
+        <li>There are no resources in the system.</li>
+        {% endfor %}
+    </ul>
+    {# New item: only if I have the permission to do this #}
+    <a id="resource-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceItem.add') }}">Add New</a>
+</div>
+
+<div class="clearfix">
+    <h1>Search</h1>
+    <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
+        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
+        <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
+    </form>
+</div>
+
+<div class="clearfix">
+    <h1>Filter by Category</h1>
+    <ul class="resourcecategory-list">
+        <li class="resourcecategory">
+            <a href="{{ routeLookup('resourceItem.browse') }}">All Categories</a>
+        </li>
+        {% for item in categoryList %}
+            <li class="resourcecategory">
+                {% include '@resourceItem/sub/searchLink.twig' %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
