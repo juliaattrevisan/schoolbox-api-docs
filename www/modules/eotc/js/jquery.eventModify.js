@@ -296,7 +296,11 @@
 			/* For EOTC
 			 */
 			var validateRamsFile = function() {
-				if ($('input[name=ramsRequired]').length && $('input[name=ramsRequired]').is(':checked')) {
+				var alreadyUploaded = $('input[data-ramsuploaded="1"]').length;
+				var ramsExists = $('input[name=ramsRequired]').length;
+				var ramsRequired = $('input[name=ramsRequired]').is(':checked');
+
+				if (ramsExists && ramsRequired && !alreadyUploaded) {
 					return true;
 				}
 			}
