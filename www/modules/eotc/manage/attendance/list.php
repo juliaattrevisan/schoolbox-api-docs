@@ -20,6 +20,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		error(160);
 	}
 
+	$groupHandler = new Group();
+
 	$this->setFile(TEMPLATE_content, 'modules/eotc/manage/attendance/list.html');
 	$this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 	$this->setBlock(TEMPLATE_content, 'filetype', 'filetype_block');
@@ -27,6 +29,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$this->setVar(array(
 		'EVENT_ID' => $event->getId(),
 		'EVENT_NAME' => $event->getNote(),
+		'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
 	));
 
 	$externalHandler = new \External_Synergetic_Class();

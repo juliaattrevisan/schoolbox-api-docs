@@ -14,7 +14,7 @@
 	$(function() {
 		$('#student-suggest').userSelector({
 			plugin: {
-				data:'/ajax/user.php?groupID=3;5',
+				data:'/ajax/user.php?groupID={STUDENT_GROUP_TYPE_IDS}',
 				allowFreeEntries: false,
 				name: 'selected'
 			},

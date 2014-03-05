@@ -95,6 +95,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			}
 		}
 
+		/* -_-
+		 */
+		$groupHandler = new Group();
+
 		$page->setVar(array(
 			'EVENT_RAMS_FILE' => $filename,
 			'EVENT_CURRENT_STUDENTS' => $event->getMetadata()->getStudentAttendees()->count(),
@@ -121,6 +125,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'EVENT_LOCATION' => $event->getLocation(),
 			'EVENT_DETAIL' => $event->getDetail(),
 			'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+			'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
+			'STAFF_GROUP_TYPE_IDS' =>  implode(';', $groupHandler->getStaffGroupTypeIds()),
 		));
 
 		/* Recurrence
@@ -242,6 +248,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
 			'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
 			'EVENT_STATUS_CLASS' => $status->getStyle(),
+			'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
+			'STAFF_GROUP_TYPE_IDS' =>  implode(';', $groupHandler->getStaffGroupTypeIds()),
 		));
 
 		/* Recurrence
