@@ -107,7 +107,13 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 */
 			$metadata->setEventType($_POST['type']);
 			$metadata->setRamsRequired($_POST['ramsRequired']);
-			$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+			/* Only assign createdAt for new metadata records
+			 */
+			if (!$metadata->getId()) {
+				$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+			}
+
 			$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
 			/* All the staff that were selected
