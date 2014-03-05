@@ -2,15 +2,7 @@
 
 
 <h1>Resource Category List</h1>
-<ul class="resourcecategory-list">
-    {% for item in list %}
-    <li class="resourcecategory">
-        <a id="resourcecategory-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceCategory.edit', {id: item.id}) }}">{{ item.name }}</a>
-    </li>
-    {% else %}
-    <li>There are no resource categories in the system.</li>
-    {% endfor %}
-</ul>
+{% include '@resourceCategory/sub/list.twig' %}
 
 {# New item: only if I have the permission to do this #}
 <a id="resourcecategory-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceCategory.add') }}">Add New</a>
