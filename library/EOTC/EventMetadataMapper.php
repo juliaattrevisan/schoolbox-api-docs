@@ -92,8 +92,13 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			$allMetadataIds[] = $row['metadata_id'];
 		}
 
+		/* Include the associated files as well
+		 */
 		if (count($allMetadataIds)) {
-			return $this->findByColumn('id', $allMetadataIds)->first();
+			$metadata = $this->findByColumn('id', $allMetadataIds)->first();
+			$metadata->setRamsFiles($this->findFiles($metadata->getId()));
+
+			return $metadata;
 		}
 
 		throw new \Exception('No metadata for this event exists.');

@@ -155,7 +155,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 				/* A RAMS file doesn't exist, nor uploaded, but was required
 				 */
-				new \Alaress_Probe($event->getMetadata());die();
 				if (!$event->getMetadata()->getRamsFiles()->count() && !strlen($_FILES['ramsFile']['name'])) {
 					error(161);
 				}
