@@ -123,7 +123,16 @@ class StorageMapper extends Mapper {
 		$file->loadHashFromTempLocation();
 		$file->loadFilesizeFromTempLocation();
 
-        /* Check maximum allowed file size */
+		/* Return an existing Storage record if it already exists by hash value
+		 * I have to assume that the hash is unique enough :P
+		 */
+		$existing = $this->findByColumn('hash', $file->getHash());
+
+		if ($existing->count()) {
+			return $existing->first();
+		}
+
+		/* Check maximum allowed file size */
         if($file->getMimeType()->getMaxFileSize() < $file->getFilesize()) {
             throw new File\Exception('File too large', File\Exception::CODE_FILE_TOO_LARGE);
         }
