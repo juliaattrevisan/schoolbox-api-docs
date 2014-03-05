@@ -203,42 +203,55 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					/* Delete the metadata relations, then delete the
 					 * metadata record itself
 					 */
+					$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
+					$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
+					$metadataMapper->deleteFilesRelations($event->getMetadata());
 					$metadataMapper->delete($event->getMetadata());
 
 					foreach($allEvents as $currentEvent) {
-						$eventMapper->deleteCampusRelations($currentEvent);
 						$eventMapper->deleteMetadataRelations($currentEvent);
-						$eventMapper->deleteStaffAttendeesRelations($currentEvent);
-						$eventMapper->deleteStudentAttendeesRelations($currentEvent);
-						$eventMapper->deleteFilesRelations($currentEvent);
+						$eventMapper->deleteCampusRelations($currentEvent);
 						$eventMapper->delete($currentEvent);
 					}
+
+					/* Since you deleted all the instances of a this event,
+					 * there's nowhere else to go but here
+					 */
+					$page->localRedir('/modules/eotc/myReview');
 				}
 				/* Delete a metadata relation for an event that is part
 				 * of a series
 				 */
 				else if ($_POST['efficacy'] == 'self') {
-					$eventMapper->deleteCampusRelations($event);
+					$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
+					$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
+					$metadataMapper->deleteFilesRelations($event->getMetadata());
 					$eventMapper->deleteMetadataRelations($event);
-					$eventMapper->deleteStaffAttendeesRelations($event);
-					$eventMapper->deleteStudentAttendeesRelations($event);
-					$eventMapper->deleteFilesRelations($event);
+					$eventMapper->deleteCampusRelations($event);
 					$eventMapper->delete($event);
+
+					/* Continue editing
+					 */
+					$page->backToTheFuture(2);
 				}
 			}
 			/* Just a single event all on its lonesome
 			 */
 			else {
-				$eventMapper->delete($event);
-				$eventMapper->deleteCampusRelations($event);
-				$eventMapper->deleteMetadataRelations($event);
-				$eventMapper->deleteStaffAttendeesRelations($event);
-				$eventMapper->deleteStudentAttendeesRelations($event);
-				$eventMapper->deleteFilesRelations($event);
+				$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
+				$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
+				$metadataMapper->deleteFilesRelations($event->getMetadata());
 				$metadataMapper->delete($event->getMetadata());
+				$eventMapper->deleteMetadataRelations($event);
+				$eventMapper->deleteCampusRelations($event);
+				$eventMapper->delete($event);
+
+				/* Since you deleted all the instances of a this event,
+				 * there's nowhere else to go but here
+				 */
+				$page->localRedir('/modules/eotc/myReview');
 			}
 
-			$page->backToTheFuture(2);
 			break;
 
 		default:
