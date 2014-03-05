@@ -117,6 +117,7 @@ class EventRecurrenceMapper {
 				// rest from scratch.
 				$first_date_set = $eventRecurrence->getDateCollection()->first();
 
+				$event->setSeriesId($eventRecurrence->getSeriesId());
 				$event->setStartDate($first_date_set['start']);
 				$event->setEndDate($first_date_set['end']);
 
