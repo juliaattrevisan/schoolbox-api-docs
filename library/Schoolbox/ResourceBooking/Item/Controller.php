@@ -104,7 +104,7 @@ class Controller extends Base {
 
         $this->getResponse()->content->set(
             array(
-                'template' => __DIR__.'/templates/edit.twig',
+                'template' => '@resourceItem/edit.twig',
                 'data'     => array(
                     'item'           => $item,
                     'categoryList'   => $this->getMapper()->getJoinMapper('category')->findAll(),
