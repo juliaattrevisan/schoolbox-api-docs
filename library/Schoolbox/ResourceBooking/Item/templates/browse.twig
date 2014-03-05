@@ -12,5 +12,20 @@
 {# New item: only if I have the permission to do this #}
 <a id="resource-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceItem.add') }}">Add New</a>
 
-<h2>Filter by category</h2>
-{% include '@resourceCategory/sub/list.twig' with {list: categoryList, linkTemplate: '@resourceItem/sub/searchLink.twig'} only %}
+<h2>Search</h2>
+<form action="{{ routeLookup('resourceItem.browse') }}" method="get">
+    <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
+    <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
+</form>
+
+<h2>Filter by Category</h2>
+<ul class="resourcecategory-list">
+    <li class="resourcecategory">
+        <a href="{{ routeLookup('resourceItem.browse') }}">All Categories</a>
+    </li>
+    {% for item in categoryList %}
+        <li class="resourcecategory">
+            {% include '@resourceItem/sub/searchLink.twig' %}
+        </li>
+    {% endfor %}
+</ul>

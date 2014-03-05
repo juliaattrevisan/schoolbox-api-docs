@@ -23,13 +23,28 @@ class Controller extends Base {
      * Browses the list of items.
      */
     public function browse() {
-        $list = $this->getMapper()->findAll();
+
+        // Get the list of categories
+        $query  = array();
+        $catId  = $this->getRequest()->query['category'];
+        $search = trim($this->getRequest()->query['search']);
+        if (strlen($search) > 0) {
+            $list = $this->getMapper()->search($search);
+        }
+        else {
+            if ($catId) {
+                $query['resource_category_id'] = $catId;
+            }
+            $list = $this->getMapper()->findByColumnList($query);
+        }
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceItem/browse.twig',
                 'data'     => array(
                     'list'         => $list,
                     'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'search'       => $search,
                 ),
             )
         );

@@ -198,4 +198,23 @@ class Mapper extends BaseMapper {
         );
     }
 
+    /**
+     * Searches for a resource that matches a search term.
+     *
+     * @param string $searchTerm
+     * @return Collection
+     */
+    public function search($searchTerm) {
+        $query = "
+            SELECT {$this->getColumnString('re')}
+            FROM {$this->getTable()} `re`
+            WHERE (`re`.`name` LIKE :search OR `re`.`description` LIKE :search)
+            AND {$this->getSoftDeleteFilterSql('re')}
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($searchTerm).'%');
+        $statement->execute();
+        return $this->hydrateList($statement, 're');
+    }
+
 }
