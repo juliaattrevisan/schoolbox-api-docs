@@ -201,18 +201,24 @@ class Mapper extends BaseMapper {
     /**
      * Searches for a resource that matches a search term.
      *
-     * @param string $searchTerm
+     * @param  string $keyword
+     * @param  int    $offset
+     * @param  int    $limit
      * @return Collection
      */
-    public function search($searchTerm) {
+    public function search($keyword, $offset = 0, $limit = 20) {
         $query = "
             SELECT {$this->getColumnString('re')}
             FROM {$this->getTable()} `re`
-            WHERE (`re`.`name` LIKE :search OR `re`.`description` LIKE :search)
-            AND {$this->getSoftDeleteFilterSql('re')}
+            WHERE
+              (`re`.`name` LIKE :search OR `re`.`description` LIKE :search)
+              AND {$this->getSoftDeleteFilterSql('re')}
+            LIMIT :limit OFFSET :offset
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($searchTerm).'%');
+        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
+        $statement->bindValue('limit',  intval($limit),  \PDO::PARAM_INT);
+        $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         $statement->execute();
         return $this->hydrateList($statement, 're');
     }
