@@ -93,10 +93,12 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		}
 
 		/* Include the associated files as well
+		 * Include the associated students as well
 		 */
 		if (count($allMetadataIds)) {
 			$metadata = $this->findByColumn('id', $allMetadataIds)->first();
 			$metadata->setRamsFiles($this->findFiles($metadata->getId()));
+			$metadata->setStudentAttendees($this->findStudentAttendees($metadata->getId()));
 
 			return $metadata;
 		}
