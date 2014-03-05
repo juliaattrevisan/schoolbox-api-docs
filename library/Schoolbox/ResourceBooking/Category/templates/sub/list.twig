@@ -1,7 +1,7 @@
 <ul class="resourcecategory-list">
     {% for item in list %}
         <li class="resourcecategory">
-            <a id="resourcecategory-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceCategory.edit', {id: item.id}) }}">{{ item.name }}</a>
+            {{ include(linkTemplate|default('@resourceCategory/sub/link.twig')) }}
         </li>
     {% else %}
         <li>There are no resource categories in the system.</li>
