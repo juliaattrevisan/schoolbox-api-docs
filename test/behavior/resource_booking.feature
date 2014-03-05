@@ -196,15 +196,15 @@ Scenario: Search for resources
   And   I press "search-button"
   Then  I should see "A single projector" in the ".information-list" element
   # Search thru dedicated resource search
-  When  I go to "/resource-booking"
+  When  I go to "/resource-booking/item"
   # Filter by resource category selector
-  And   I click "Projectors" in the ".resourcecategory-list" element
-  Then  I should see "A single projector" in the ".resource-list" element
-  And   I should not see "English textbook" in the ".resource-list" element
-  And   I should see "The good projector" in the ".resource-list" element
+  And   I follow "Projectors"
+  Then  I should see "A single projector"
+  And   I should not see "English textbook"
+  And   I should see "The good projector"
   # Search thru resource search form
-  When  I fill in "resource-search" with "good projector"
-  And   I press Enter
-  Then  I should not see "A single projector" in the ".resource-list" element
-  And   I should not see "English textbook" in the ".resource-list" element
-  And   I should see "The good projector" in the ".resource-list" element
+  When  I fill in "resource-search-term" with "good projector"
+  And   I press "resource-search"
+  Then  I should not see "A single projector"
+  And   I should not see "English textbook"
+  And   I should see "The good projector"
