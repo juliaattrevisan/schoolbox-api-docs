@@ -207,12 +207,15 @@ class Database implements Serializable {
      * Escapes _ and % characters within $string, so they don't have unintended
      * effects in LIKE queries.
      *
+     * This doesn't quote $string for safe use in string-interpolated queries,
+     * it only escapes LIKE chars.
+     *
      * @param  string $string
      * @return string
      */
     public function quoteForLike($string) {
         return strtr(
-            $this->quote($string),
+            $string,
             array(
                 '_' => '\\_',
                 '%' => '\\%',
