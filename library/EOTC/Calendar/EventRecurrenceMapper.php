@@ -104,9 +104,18 @@ class EventRecurrenceMapper {
 				$series = $this->getEventMapper()->getAllInSeries($event);
 
 				foreach($series as $seriesEvent) {
-					$event->setId($seriesEvent->getId());
 
-					$this->getEventMapper()->save($event);
+					/* Copy date from $event to each thingy in the series
+					 * to preserve other series -related data
+					 */
+					$seriesEvent->setNote($event->getNote());
+					$seriesEvent->setDetail($event->getDetail());
+					$seriesEvent->setLocation($event->getLocation());
+					$seriesEvent->setAllDay($event->getAllDay());
+					$seriesEvent->setCampusCollection($event->getCampusCollection());
+					$seriesEvent->setMetadata($event->getMetadata());
+
+					$this->getEventMapper()->save($seriesEvent);
 				}
 			}
 			/* Modify an existing event and add recurring incidents
