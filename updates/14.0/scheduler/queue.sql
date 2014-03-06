@@ -5,6 +5,4 @@ CREATE TABLE `scheduleq`(
   `command` VARCHAR(32) NOT NULL,
   `data` BLOB NOT NULL,
   PRIMARY KEY (`id_hash`)
-) ENGINE=INNODB
-  DEFAULT CHARACTER SET=utf8
-  COLLATE=utf8_general_ci;
+) ENGINE=INNODB CHARSET=utf8 COLLATE=utf8_bin;
