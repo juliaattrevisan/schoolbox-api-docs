@@ -141,12 +141,6 @@ class EventRecurrence {
 			// Repeat of events: repeat until the start date is after the until
 			// date (or x100, whatever is less)
 			for ($i = 0; ($start_timestamp <= $this->getUntil()->getUnixTimestamp()) && ($i < $this->getMaxNumRecurring()); $i++) {
-
-				/* Increment to the next incident of the event
-				 */
-				$start_timestamp = strtotime($this->intervalValue(), $start_timestamp);
-				$end_timestamp = strtotime($this->intervalValue(), $end_timestamp);
-
 				$this_start_date = new \Alaress_Date_Format($start_timestamp, 'U');
 				$this_end_date = new \Alaress_Date_Format($end_timestamp, 'U');
 
@@ -154,6 +148,11 @@ class EventRecurrence {
 					'start' => $this_start_date->getDatabaseDate(),
 					'end' => $this_end_date->getDatabaseDate(),
 				));
+
+				/* Increment to the next incident of the event
+				 */
+				$start_timestamp = strtotime($this->intervalValue(), $start_timestamp);
+				$end_timestamp = strtotime($this->intervalValue(), $end_timestamp);
 			}
 		}
 
