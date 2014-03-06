@@ -20,7 +20,7 @@ preg_match('/name="(.*?)" value="Login"/', $login, $loginButton);
 preg_match('/name="(.*?)" type="text"/', $login, $loginUsername);
 preg_match('/name="(.*?)" type="password"/', $login, $loginPassword);
 
-$password = isset($_SESSION['password']) ? $_SESSION['password'] : $user['email_pass'];
+$password = $_SESSION['password'];
 $formArray['__VIEWSTATE'] = $viewState[1];
 $formArray['__EVENTVALIDATION'] = $eventValidation[1];
 $formArray['__EVENTARGUMENT'] = '';

@@ -61,7 +61,7 @@ class Session
             $_SESSION['key'] = $user['key'];
             $_SESSION['lasttime'] = mktime();
             $_SESSION['username'] = $user['username'];
-            $_SESSION['password'] = $_POST['password'] ? $_POST['password'] : $user['email_pass']; /* ALERT only works in some cases */
+            $_SESSION['password'] = $_POST['password'];
             $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];
             $_SESSION['ip'] = $ip;
             $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
