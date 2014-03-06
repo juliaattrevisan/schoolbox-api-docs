@@ -6,9 +6,11 @@
   <li class="user-profile fullname">{{ content.fullname }}</li>
   {% if content.workcount %}
   <li>
+	{% if content.duework %}
     <a href="/m/core/user/work/{{ content.id }}">
       <p>Upcoming Due Work ({{ content.workcount }})</p>
     </a>
+	{% endif %}
   </li>
   {% endif  %}
 </ul>
