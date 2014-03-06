@@ -100,13 +100,24 @@ class Dropbox {
         return $this->db->getRow($query);
     }
 
-    function getFileList($cid) {
-        $query = "SELECT d.id, d.description, u.id as uid, title, firstname, lastname,
-						submitted as subdate, iconFile
-					FROM dropbox d 
-						LEFT JOIN user u ON owner = u.id 
-						LEFT JOIN allowedFileTypes af ON d.mime_type = af.mime 
-					WHERE category = '$cid'";
+	/**
+	 * Get a list of files in the dropbox associated with $cid
+	 *
+	 * @param $cid
+	 * @return array|bool
+	 */
+	public function getFileList($cid) {
+        $query = "
+        	SELECT
+        		d.id, d.description, u.id as uid, title, firstname, lastname,
+				submitted as subdate, iconFile
+			FROM dropbox d
+			LEFT JOIN user u ON owner = u.id
+			LEFT JOIN allowedFileTypes af ON d.mime_type = af.mime
+			WHERE category = '{$cid}'
+			ORDER BY submitted DESC
+		";
+
         return $this->db->getAll($query);
     }
 
