@@ -19,6 +19,8 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
+use Schoolbox\Notif\Message\Interceptor;
+use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UnreadMessage;
 use Schoolbox\Realtime\MessageHandlerInterface;
 use Schoolbox\Realtime\ProcessException;
@@ -60,6 +62,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var Dispatcher */
 	protected $taskDispatcher;
 
+	/** @var Interceptor */
+	protected $interceptor;
+
 
 	/**
 	 * @param LoopInterface $reactLoop
@@ -72,6 +77,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
 		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $verboser, $strat);
+		$this->interceptor = new Interceptor(new Connector());
 		$this->verboser = $verboser;
 
 		$this->v('Instantiated PipeManager');
@@ -343,6 +349,14 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		foreach($this->pipes->getPipesByUserId($userId) as $pipe) {
 			$this->sendToPipe($pipe, $data);
 		}
+	}
+
+
+	/**
+	 * @return Interceptor
+	 */
+	public function getInterceptor() {
+		return $this->interceptor;
 	}
 
 
