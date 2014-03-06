@@ -194,9 +194,14 @@ class EventConnector extends EventMapper {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
+				/* Accumulate staff attendees for this event
+				 */
+				$allStaffAttendees = $metadataMapper->findStaffAttendees($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setStaffAttendees($allStaffAttendees);
+
 				/* Accumulate student attendees for this event
 				 */
-				$allStudentAttendees = $metadataMapper->findStudentAttendees($eventItem->getId());
+				$allStudentAttendees = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
 				$eventItem->getMetadata()->setStudentAttendees($allStudentAttendees);
 			}
 
