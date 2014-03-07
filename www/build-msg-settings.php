@@ -41,11 +41,13 @@ if(!isset($this)) {
 							    msg_source_id, role_id, min_level, max_level, default_level
 							) VALUES (
 							    (
-							        SELECT src.id
+							        SELECT DISTINCT src.id
 							        FROM msg_source src
 							        LEFT JOIN msg_namespace ns ON src.namespace = ns.id
+							        LEFT JOIN groups g ON src.role_type = g.group_type
 							        WHERE src.key = :key
 							        AND ns.slug = :slug
+							        AND g.id = :role_id
 							    ),
 							    :role_id, :min, :max, :default
 							)
@@ -76,8 +78,10 @@ if(!isset($this)) {
 								SELECT src.id
 								FROM msg_source src
 								LEFT JOIN msg_namespace ns ON src.namespace = ns.id
+								LEFT JOIN groups g on src.role_type = g.group_type
 								WHERE src.key = :key
 								AND ns.slug = :slug
+								AND g.id = :role_id
 							)
 							AND role_id = :role_id
 						";
@@ -117,16 +121,29 @@ $this->setFile(TEMPLATE_content, '/build-msg-settings.html');
 
 $db = Database::getInstance();
 
-$stmt = $db->prepare("
-	SELECT *
-	FROM msg_namespace ns
-	LEFT JOIN msg_source src ON ns.id = src.namespace
-	LEFT JOIN groups g ON src.role_type = g.group_type
-	LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND g.id = perm.role_id
-	ORDER BY slug, src.key, g.id
-");
-
-$stmt->execute();
+if(isset($this->arg[0]) && in_array($this->arg[0], array('parent','student','staff'))) {
+	$stmt = $db->prepare("
+		SELECT *
+		FROM msg_namespace ns
+		LEFT JOIN msg_source src ON ns.id = src.namespace
+		LEFT JOIN groups g ON src.role_type = g.group_type
+		LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND g.id = perm.role_id
+		WHERE g.group_type = ?
+		ORDER BY slug, src.key, g.id
+	");
+	$stmt->execute(array($this->arg[0]));
+}
+else {
+	$stmt = $db->prepare("
+		SELECT *
+		FROM msg_namespace ns
+		LEFT JOIN msg_source src ON ns.id = src.namespace
+		LEFT JOIN groups g ON src.role_type = g.group_type
+		LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND g.id = perm.role_id
+		ORDER BY slug, src.key, g.id
+	");
+	$stmt->execute();
+}
 
 $data = array();
 
@@ -136,7 +153,7 @@ while($r = $stmt->fetch(PDO::FETCH_NUM)) {
 
 	// identifiers
 	$slug = $r['ns']['slug'];
-	$source = $r['source']['key'] . $r['source']['role_type'];
+	$source = $r['source']['key'] . sha1($r['source']['description']);
 	$role = $r['role']['id'];
 
 
