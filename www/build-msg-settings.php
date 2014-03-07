@@ -121,7 +121,7 @@ $stmt = $db->prepare("
 	SELECT *
 	FROM msg_namespace ns
 	LEFT JOIN msg_source src ON ns.id = src.namespace
-	JOIN groups g
+	LEFT JOIN groups g ON src.role_type = g.group_type
 	LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND g.id = perm.role_id
 	ORDER BY slug, src.key, g.id
 ");
@@ -136,7 +136,7 @@ while($r = $stmt->fetch(PDO::FETCH_NUM)) {
 
 	// identifiers
 	$slug = $r['ns']['slug'];
-	$source = $r['source']['key'];
+	$source = $r['source']['key'] . $r['source']['role_type'];
 	$role = $r['role']['id'];
 
 
@@ -299,7 +299,7 @@ foreach($data['namespace'] as $namespace) {
 function slice($flat) {
 	$map = array(
 		'ns'      => array('id','slug','label'),
-		'source'  => array('id','','key','description','routing_key',''),
+		'source'  => array('id','','key','role_type','description','routing_key',''),
 		'role'    => array('id','name','','','digest_schedule'),
 		'perm'    => array('','','min_level','max_level','default_level')
 	);

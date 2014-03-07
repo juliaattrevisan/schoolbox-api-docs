@@ -10,10 +10,11 @@ CREATE TABLE `msg_source`(
   `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `namespace`     INT NOT NULL,
   `key`           VARCHAR(64) NOT NULL,
+  `role_type`     ENUM('student','parent','staff') NOT NULL,
   `description`   VARCHAR(255) NOT NULL,
   `routing_key`   VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX (`namespace`, `key`)
+  UNIQUE INDEX (`namespace`, `key`, `role_type`)
 ) CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE `msg_reroute`(
