@@ -5,13 +5,17 @@
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-class Component_Homepage_Breadcrumb extends Component_Homepage_ControllerAbstract {
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
+
+class Component_Homepage_BreadcrumbController extends Component_Homepage_ControllerAbstract {
+
 
     /**
-     * @var Group
+     * Holds source category object
+     * @var Category
      */
-    private $catHandler;
-
+    private $category;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -19,7 +23,13 @@ class Component_Homepage_Breadcrumb extends Component_Homepage_ControllerAbstrac
      * @return void
      */
     public function execute() {
-        $this->catHandler = new Category();
+
+
+        $categoryId = is_numeric($this->getConfig('src')) && $this->getConfig('src') > 0 ? $this->getConfig('src') : $this->getContext('id');
+
+        if ($categoryId > 0) {
+            $this->category = CategoryMapper::getInstance()->findById($categoryId);
+        }
     }
 
     /**
@@ -37,12 +47,19 @@ class Component_Homepage_Breadcrumb extends Component_Homepage_ControllerAbstrac
 
         $this->setVar('category_breadcrumb_block', '');
         if ($this->category instanceof Category) {
+
             foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
                 /** @var Category $parent */
-                $this->setVar('PARENT_CATEGORY_ID',   $parent->getId());
-                $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
+                $this->setVar('BREADCRUMB_CATEGORY_ID',   $parent->getId());
+                $this->setVar('BREADCRUMB_CATEGORY_NAME', $parent->getName());
+                $this->setVar('BREADCRUMB_CATEGORY_CLASS', '');
                 $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
             }
+
+            $this->setVar('BREADCRUMB_CATEGORY_ID',   $this->category->getId());
+            $this->setVar('BREADCRUMB_CATEGORY_NAME', $this->category->getName());
+            $this->setVar('BREADCRUMB_CATEGORY_CLASS', 'last');
+            $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
         }
 
         return true; // everything went according to plan
