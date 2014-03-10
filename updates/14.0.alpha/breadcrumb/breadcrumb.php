@@ -14,7 +14,7 @@ $definition = array(
     'module'             => 'homepage',
     'component_category' => '5',
     'class'              => 'Component_Homepage_BreadcrumbController',
-    'description'        => 'Display full path of parent folders about this folder',
+    'description'        => 'Display links to pages located above this page in the resource browser',
     'multiple'           => 'false',
     'config'             => array('componentname' => array('default_value' => 'Breadcrumbs', 'label' => 'Heading'),
                                   'src'           => array('default_value' => '', 'label' => 'Source'),
