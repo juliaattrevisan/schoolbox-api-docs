@@ -100,7 +100,7 @@ class External_Denbigh_User implements External_UserInterface {
             LEFT JOIN Parents ON Parents.peopleDenbighID = People.denbighID
             LEFT JOIN Parents pa ON pa.familyDenbighID = Parents.familyDenbighID
             LEFT JOIN People pe ON pe.denbighID = pa.peopleDenbighID
-            LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
+            LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID AND a.addressType = 'Residential Address'
             WHERE
                 People.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
             ORDER BY
@@ -164,7 +164,6 @@ class External_Denbigh_User implements External_UserInterface {
 				pe_sta.denbighID AS tutor_denbighID, pe_sta.surname AS tutor_surname, pe_sta.preferred_name AS tutor_preferred_name, pe_sta.title AS tutor_title,
 				pe_pa.denbighID AS parent_denbighID, pe_pa.surname AS parent_surname, pe_pa.preferred_name AS parent_preferred_name, pe_pa.title AS parent_title,
 				fa.EmergencyContact1, fa.EmergencyRelationship1, fa.EmergencyPhone1, fa.EmergencyEmail1,
-				a.telephoneHome AS parent_telephoneHome,
 				stu.boardingStatus
 			FROM People pe
 			LEFT JOIN Students stu ON stu.peopleDenbighID = pe.denbighID
@@ -175,9 +174,6 @@ class External_Denbigh_User implements External_UserInterface {
 			LEFT JOIN Parents pa ON pa.familyDenbighID = stu.familyDenbighID
 			LEFT JOIN People pe_pa ON pe_pa.denbighID = pa.peopleDenbighID
 			LEFT JOIN Family fa ON stu.familyDenbighID = fa.familyDenbighID
-			/* Parent's address */
-			LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
-				AND a.telephoneHome IS NOT NULL
 			WHERE pe.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
 			LIMIT 1
 		"
