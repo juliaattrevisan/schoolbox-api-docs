@@ -21,7 +21,20 @@ $roleId           = $options['r'];
 $skipDuplicates   = isset($options['skip-duplicates']);
 $enableEportfolio = isset($options['enable-eportfolio']);
 if (!(isset($userId) && isset($roleId))) {
-    echo "Usage: import.php -u[userId] -r[roleId] [--skip-duplicates]\n";
+    echo <<<HELP
+Copies ePortfolios from a single user into all users with a given role.
+
+Usage: import.php -u[userId] -r[roleId] [--skip-duplicates] [--no-enable-eportfolio]
+    -u:                  the ID of the user to copy ePortfolios from
+    -r:                  the ID of the role to copy ePortfolios into
+    --skip-duplicates:   if set, skips copying an ePortfolio if the destination
+                         user already has an ePortfolio page with this name.
+    --enable-eportfolio: if set, enables ePortfolio for destination users which
+                         have ePortfolios disabled, then proceeds with copy.
+                         Default behavior skips copy for users which have
+                         ePortfolio disabled.
+
+HELP;
     exit(1);
 }
 
