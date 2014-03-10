@@ -15,10 +15,11 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
-$options        = getopt('u:r:', array('skip-duplicates'));
-$userId         = $options['u'];
-$roleId         = $options['r'];
-$skipDuplicates = isset($options['skip-duplicates']);
+$options          = getopt('u:r:', array('skip-duplicates', 'enable-eportfolio'));
+$userId           = $options['u'];
+$roleId           = $options['r'];
+$skipDuplicates   = isset($options['skip-duplicates']);
+$enableEportfolio = isset($options['enable-eportfolio']);
 if (!(isset($userId) && isset($roleId))) {
     echo "Usage: import.php -u[userId] -r[roleId] [--skip-duplicates]\n";
     exit(1);
@@ -76,7 +77,18 @@ foreach ($destUserList as $destUser) {
     }
     else {
         printf("  importing into user #%d (%s)...\n", $destUser->getId(), $destUser->formatName());
-        // Run the importer
+        // Does this user have eportfolio disabled? If so then enable it
+        if (!($destUser->getEportfolioEnable())) {
+            if ($enableEportfolio) {
+                echo "    ePortfolio is disabled - enabling...";
+                $destUser->setEportfolioEnable(true);
+                UserMapper::getInstance()->save($destUser);
+            }
+            else {
+                echo "    skipping because ePortfolio is disabled and --no-enable-eportfolio is on.";
+                break;
+            }
+        }
         foreach ($eportfolioList as $eportfolio) {
             /** @var Eportfolio\Page $page */
             /** @var Component_ControllerAbstract[] $componentList */
