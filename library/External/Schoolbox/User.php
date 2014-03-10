@@ -228,22 +228,34 @@ class External_Schoolbox_User implements External_UserInterface {
 		if (empty($externalUserId)) {
 			return false;
 		}
+
+		$params = array(':externalUserId' => $externalUserId,);
+
+		// Subjects this user is a student in
 		$statement = $this->getDatabase()->prepare("
 			SELECT c.name, c.code
 			FROM user u
-			LEFT JOIN class_user cu ON cu.user_id = u.id
-			LEFT JOIN class c ON c.id = cu.class_id
+			INNER JOIN class_user cu ON cu.user_id = u.id
+			INNER JOIN class c ON c.id = cu.class_id
 			WHERE u.synergy_id = :externalUserId
 			ORDER BY c.code ASC, c.name ASC
 		");
-
-		$statement->execute( array(
-			':externalUserId' => $externalUserId,
-		) );
-
+		$statement->execute($params);
 		$classList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-		return $classList;
+		// Subjects this user is a teacher in
+		$statement = $this->getDatabase()->prepare("
+			SELECT c.name, c.code
+			FROM user u
+			INNER JOIN class_period cp ON cp.teacher_id = u.id
+			INNER JOIN class c ON c.id = cp.class_id
+			WHERE u.synergy_id = :externalUserId
+			ORDER BY c.code ASC, c.name ASC
+		");
+		$statement->execute($params);
+		$classList = array_merge($classList, $statement->fetchAll(PDO::FETCH_ASSOC));
+
+		return array_values(array_unique($classList, SORT_REGULAR));
 	}
 
 	function getEnrolledStudents ($externalUserId) {
