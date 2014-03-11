@@ -69,11 +69,10 @@ Scenario: Manage resources
   # Create some resources
   And   I follow "resource-create"
   And   I fill in the following:
-    | name                 | A single projector                   |
-    | description          | A projector that can be moved around |
-    | min_lead_time        | 00:00:00                             |
-    | min_reservation_time | 01:00:00                             |
-    | max_reservation_time | 02:00:00                             |
+    | name                      | A single projector                   |
+    | description               | A projector that can be moved around |
+    | min_reservation_time[day] | 01                                   |
+    | max_reservation_time[day] | 02                                   |
   And  I select "Projectors" from "resource_category_id"
   And  I select "Open" from "resource_moderation_type_id"
   And  I press "resource-save"
@@ -81,11 +80,9 @@ Scenario: Manage resources
   # Create a resource with a different moderator. (I can still moderate this resource.)
   When  I follow "resource-create"
   And   I fill in the following:
-    | name                 | English textbook            |
-    | description          | A Unit 1/2 English textbook |
-    | min_lead_time        | 00:00:00                    |
-    | min_reservation_time | 00:00:00                    |
-    | max_reservation_time | 168:00:00                   |
+    | name                      | English textbook            |
+    | description               | A Unit 1/2 English textbook |
+    | max_reservation_time[day] | 168                         |
   And  I select "Textbooks" from "resource_category_id"
   And  I select "Moderated" from "resource_moderation_type_id"
   # Entering a user into a autocomplete field
@@ -97,11 +94,11 @@ Scenario: Manage resources
   # Create a managed resource
   When  I follow "resource-create"
   And   I fill in the following:
-    | name                 | The special projector    |
-    | description          | A projector made of gold |
-    | min_lead_time        | 24:00:00                 |
-    | min_reservation_time | 01:00:00                 |
-    | max_reservation_time | 02:00:00                 |
+    | name                      | The special projector    |
+    | description               | A projector made of gold |
+    | min_lead_time[day]        | 24                       |
+    | min_reservation_time[day] | 01                       |
+    | max_reservation_time[day] | 02                       |
   And  I select "Textbooks" from "resource_category_id"
   And  I select "Moderated" from "resource_moderation_type_id"
   And  I fill in autocomplete "moderator_id" with "Jenifer"
@@ -138,9 +135,9 @@ Scenario: Manage resources
   And   I fill in the following:
     | name                 | To be deleted |
     | description          | To be deleted |
-    | min_lead_time        | 00:00:00      |
-    | min_reservation_time | 01:00:00      |
-    | max_reservation_time | 02:00:00      |
+    | min_lead_time[day]        | 00                       |
+    | min_reservation_time[day] | 01                       |
+    | max_reservation_time[day] | 02                       |
   And   I select "Projectors" from "resource_category_id"
   And   I select "Open" from "resource_moderation_type_id"
   And   I press "resource-save"
