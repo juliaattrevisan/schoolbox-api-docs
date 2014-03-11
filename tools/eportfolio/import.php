@@ -15,18 +15,21 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
-$options          = getopt('u:r:', array('skip-duplicates', 'enable-eportfolio'));
+$options          = getopt('u:r:', array('skip-duplicates', 'enable-eportfolio', 'dry-run'));
 $userId           = $options['u'];
 $roleId           = $options['r'];
 $skipDuplicates   = isset($options['skip-duplicates']);
 $enableEportfolio = isset($options['enable-eportfolio']);
+$dryRun           = isset($options['dry-run']);
 if (!(isset($userId) && isset($roleId))) {
     echo <<<HELP
 Copies ePortfolios from a single user into all users with a given role.
 
-Usage: import.php -u[userId] -r[roleId] [--skip-duplicates] [--no-enable-eportfolio]
+Usage: import.php -u[userId] -r[roleId] [--dry-run] [--skip-duplicates] [--enable-eportfolio]
     -u:                  the ID of the user to copy ePortfolios from
     -r:                  the ID of the role to copy ePortfolios into
+    --dry-run:           if set, don't actually update anything, but show what
+                         would be updated.
     --skip-duplicates:   if set, skips copying an ePortfolio if the destination
                          user already has an ePortfolio page with this name.
     --enable-eportfolio: if set, enables ePortfolio for destination users which
@@ -36,6 +39,13 @@ Usage: import.php -u[userId] -r[roleId] [--skip-duplicates] [--no-enable-eportfo
 
 HELP;
     exit(1);
+}
+
+if ($dryRun) {
+    print("ePortfolio Import Script - Dry Run (no updates made):\n\n");
+}
+else {
+    print("ePortfolio Import Script:\n\n");
 }
 
 // Load source user
@@ -110,9 +120,14 @@ foreach ($destUserList as $destUser) {
         // Does this user have eportfolio disabled? If so then enable it
         if (!($destUser->getEportfolioEnable())) {
             if ($enableEportfolio) {
-                print("    ePortfolio is disabled - enabling...\n");
-                $destUser->setEportfolioEnable(true);
-                UserMapper::getInstance()->save($destUser);
+                if ($dryRun) {
+                    print("    ePortfolio is disabled - would enable...\n");
+                }
+                else {
+                    print("    ePortfolio is disabled - enabling...\n");
+                    $destUser->setEportfolioEnable(true);
+                    UserMapper::getInstance()->save($destUser);
+                }
             }
             else {
                 print("    skipping because ePortfolio is disabled and --enable-eportfolio is not on.\n");
@@ -137,6 +152,10 @@ foreach ($destUserList as $destUser) {
                     printf("    skipping page \"%s\" as it already exists.\n", $page->getPageTitle());
                     continue;
                 }
+            }
+            if ($dryRun) {
+                printf("    would import page \"%s\"...\n", $page->getPageTitle());
+                continue;
             }
             printf("    importing page \"%s\"...\n", $page->getPageTitle());
 
