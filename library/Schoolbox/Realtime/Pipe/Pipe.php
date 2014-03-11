@@ -64,7 +64,7 @@ class Pipe implements PipeInterface {
 		if(($i = strpos($cookies, PipeManager::PHP_SESSION_PREFIX)) !== false) {
 			$len = strlen(PipeManager::PHP_SESSION_PREFIX);
 			$start = $i + $len;
-			$end = strpos($cookies, ';', $start) - $len;
+			$end = (strpos($cookies, ';', $start) ?: (strlen($cookies)) - $start);
 			$session = substr($cookies, $start, $end);
 
 			return $session;
