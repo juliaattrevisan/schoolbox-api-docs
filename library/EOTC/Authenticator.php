@@ -86,6 +86,12 @@ class Authenticator {
 			return true;
 		}
 
+		/* Allow all EOTC administrators to see Approved events
+		 */
+		if ($event->getMetadata()->getStatus()->isApproved()) {
+			return true;
+		}
+
 		$allPermissions = $this->getPermissionMapper()->findByUser($user);
 
 		/* Check that you have access to the campus as well as the status
