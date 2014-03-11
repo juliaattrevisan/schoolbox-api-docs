@@ -1,6 +1,6 @@
 <?php
 /**
- * Class description here
+ * Module definition for the resource booking category module.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
