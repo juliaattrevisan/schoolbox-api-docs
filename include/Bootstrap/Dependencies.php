@@ -91,4 +91,4 @@ $di->set(
         }
     )
 );
-$di->set('templateEngine:loader', $di->lazyNew('Twig_Loader_Filesystem'));
+$di->set('templateEngine:loader', $di->lazyNew('Twig_Loader_Chain'));

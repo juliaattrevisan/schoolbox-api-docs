@@ -12,7 +12,7 @@ namespace Alaress\Module;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
-use Twig_Loader_Filesystem;
+use Twig_Loader_Chain;
 
 class Module {
 
@@ -58,9 +58,9 @@ class Module {
     /**
      * Initializes template paths for this module.
      *
-     * @param Twig_Loader_Filesystem $templateLoader
+     * @param Twig_Loader_Chain $templateLoader
      */
-    public function initTemplatePaths(Twig_Loader_Filesystem $templateLoader) {}
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {}
 
     /**
      * Initializes controller classes into the dependency injector.

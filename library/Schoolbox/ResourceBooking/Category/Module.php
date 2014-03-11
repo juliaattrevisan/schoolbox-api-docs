@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\UserAccess;
 
@@ -44,8 +45,10 @@ class Module extends BaseModule {
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Filesystem $templateLoader) {
-        $templateLoader->addPath(__DIR__.'/templates', 'resourceCategory');
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
+        $loader = new Twig_Loader_Filesystem();
+        $loader->addPath(__DIR__.'/templates', 'resourceCategory');
+        $templateLoader->addLoader($loader);
     }
 
     /**
