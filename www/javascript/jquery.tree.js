@@ -359,7 +359,7 @@
 
 		/**
 		 * Indent each row as it spawns
-		 * 
+		 *
 		 * @param node
 		 */
 		this.indentRow = function (node) {
