@@ -188,10 +188,10 @@ Scenario: Search for resources
   Given I do not wipe the slate clean
   And   I go to homepage
   And   I log in as "sberryhill" with password "password"
-  # Search thru global search bar
-  When  I fill in "search-field" with "single projector"
-  And   I press "search-button"
-  Then  I should see "A single projector" in the ".information-list" element
+  # Search thru global search bar - not sure if required
+#  When  I fill in "search-field" with "single projector"
+#  And   I press "search-button"
+#  Then  I should see "A single projector" in the ".information-list" element
   # Search thru dedicated resource search
   When  I go to "/resource-booking/item"
   # Filter by resource category selector
