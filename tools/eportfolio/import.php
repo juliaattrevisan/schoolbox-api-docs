@@ -58,31 +58,48 @@ catch (MapperException $e) {
     exit(1);
 }
 
-// Load users and pages
+// Load user list - abort if there are no users in list
 /** @var User[] $destUserList */
-/** @var Eportfolio\Page[] $eportfolioPageList */
-$destUserList       = UserMapper::getInstance()->findByColumn('group_id', $roleId);
-$eportfolioPageList = Eportfolio\PageMapper::getInstance()->findPagesWithPermissions($userId);
-printf(
-    "importing %d eportfolio pages from user #%d (%s) for %d users in role #%d (%s).\n",
-    count($eportfolioPageList),
-    $userId,
-    $user->formatName(),
-    count($destUserList),
-    $roleId,
-    $role->getName()
-);
-if (count($destUserList) === 0 || count($eportfolioPageList) === 0) {
+$destUserList = UserMapper::getInstance()->findByColumn('group_id', $roleId);
+if (count($destUserList) === 0) {
+    printf(
+        "role #%d (%s) has no users - aborting.\n",
+        $roleId,
+        $role->getName()
+    );
     exit;
 }
 
 // Pre-load the component list for each page
 $factory        = new Component_Eportfolio_Factory($user, new SitePage(false));
 $eportfolioList = array();
-foreach ($eportfolioPageList as $page) {
+foreach (Eportfolio\PageMapper::getInstance()->findPagesWithPermissions($userId) as $page) {
+    /** @var Eportfolio\Page $page */
+    // Ignore deleted pages
+    if ($page->isDeleted()) {
+        continue;
+    }
     $eportfolioList[] = array($page, $factory->buildComponentList($page->getPageId()));
 }
+if (empty($eportfolioList)) {
+    printf(
+        "user #%d (%s) has no ePortfolio pages - aborting.\n",
+        $userId,
+        $user->formatName()
+    );
+    exit;
+}
 
+// We have something to import, so proceed
+printf(
+    "importing %d eportfolio pages from user #%d (%s) for %d users in role #%d (%s).\n",
+    count($eportfolioList),
+    $userId,
+    $user->formatName(),
+    count($destUserList),
+    $roleId,
+    $role->getName()
+);
 foreach ($destUserList as $destUser) {
     $destUserId = $destUser->getId();
     if ($destUserId == $userId) {
@@ -93,13 +110,13 @@ foreach ($destUserList as $destUser) {
         // Does this user have eportfolio disabled? If so then enable it
         if (!($destUser->getEportfolioEnable())) {
             if ($enableEportfolio) {
-                echo "    ePortfolio is disabled - enabling...";
+                print("    ePortfolio is disabled - enabling...\n");
                 $destUser->setEportfolioEnable(true);
                 UserMapper::getInstance()->save($destUser);
             }
             else {
-                echo "    skipping because ePortfolio is disabled and --no-enable-eportfolio is on.";
-                break;
+                print("    skipping because ePortfolio is disabled and --enable-eportfolio is not on.\n");
+                continue;
             }
         }
         foreach ($eportfolioList as $eportfolio) {
