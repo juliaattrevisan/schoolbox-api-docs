@@ -379,7 +379,10 @@ class MSSQL {
 	 * @return array
 	 */
 	public function trimAll($rowset) {
-		return array_map(array($this, 'trimRow'), $rowset);
+        if(is_array($rowset)) {
+		    return array_map(array($this, 'trimRow'), $rowset);
+        }
+        return $rowset;
 	}
 
 	/**
@@ -391,7 +394,10 @@ class MSSQL {
 	 * @return array
 	 */
 	public function trimRow($row) {
-		return array_map(array($this, 'trimField'), $row);
+        if(is_array($row)) {
+		    return array_map(array($this, 'trimField'), $row);
+        }
+        return $row;
 	}
 
 	/**
