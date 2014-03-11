@@ -15,9 +15,10 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
-$options          = getopt('u:r:', array('skip-duplicates', 'enable-eportfolio', 'dry-run'));
+$options          = getopt('u:r:p::', array('skip-duplicates', 'enable-eportfolio', 'dry-run'));
 $userId           = $options['u'];
 $roleId           = $options['r'];
+$importPageId     = $options['p'];
 $skipDuplicates   = isset($options['skip-duplicates']);
 $enableEportfolio = isset($options['enable-eportfolio']);
 $dryRun           = isset($options['dry-run']);
@@ -25,9 +26,10 @@ if (!(isset($userId) && isset($roleId))) {
     echo <<<HELP
 Copies ePortfolios from a single user into all users with a given role.
 
-Usage: import.php -u[userId] -r[roleId] [--dry-run] [--skip-duplicates] [--enable-eportfolio]
+Usage: import.php -u[userId] -r[roleId] [-p[pageId]] [--dry-run] [--skip-duplicates] [--enable-eportfolio]
     -u:                  the ID of the user to copy ePortfolios from
     -r:                  the ID of the role to copy ePortfolios into
+    -p:                  if set, import only this page ID
     --dry-run:           if set, don't actually update anything, but show what
                          would be updated.
     --skip-duplicates:   if set, skips copying an ePortfolio if the destination
@@ -87,6 +89,11 @@ foreach (Eportfolio\PageMapper::getInstance()->findPagesWithPermissions($userId)
     /** @var Eportfolio\Page $page */
     // Ignore deleted pages
     if ($page->isDeleted()) {
+        continue;
+    }
+    // ignore this page if it isn't page X
+    if (isset($importPageId) && $importPageId != $page->getPageId()) {
+        printf("Not importing page #%d (%s)\n", $page->getPageId(), $page->getPageTitle());
         continue;
     }
     $eportfolioList[] = array($page, $factory->buildComponentList($page->getPageId()));
