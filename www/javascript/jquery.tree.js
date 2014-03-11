@@ -333,7 +333,7 @@
 
 		/**
 		 * Find the depth of a particular node
-		 * 
+		 *
 		 * @param node
 		 * @param initialDepth
 		 * @returns {*}
@@ -357,6 +357,11 @@
 			}
 		}
 
+		/**
+		 * Indent each row as it spawns
+		 * 
+		 * @param node
+		 */
 		this.indentRow = function (node) {
 			var depth = this.findDepth(node, 1);
 			var margin = depth * 23;
