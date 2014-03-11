@@ -14,13 +14,18 @@ input,select,td {
     font-size:13px!important;
 }
 
-.upperBody .headerDiv {
+.upperBody .headerDiv,
+.upperBody .pageHeaderDiv {
     display:none!important;
+}
+
+.menuDiv{
+    background: #f7f7f7;
 }
 
 .floatMenuDiv {
     background: #fff;
-    height:118px;
+    height:38px;
     padding-top:11px;
 }
 
@@ -61,17 +66,67 @@ h2,.headerDiv,.heading_cell {
     border-width:3px 3px 0;
 }
 
-.lnk_btn {
+.dxmMenuItem_PortalMenu,
+.dxmMenuItem_PortalMenu a{
+    background-color: transparent !important;
+    padding: 0;
+    font-size: 14px;
+    border: none;
+    border: none !important;
+}
+
+.dxmMenuItem_PortalMenu:hover,
+.dxmMenuItem_PortalMenu a:hover{
+    border: none !important;
+    color: #002664;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.dxmSubMenuItem_PortalMenu,
+.dxmSubMenuItem_PortalMenu a{
+    background: transparent;
+    border: none;
+    color: #002664;
+}
+
+.dxmMenuItemHover_PortalMenu a,
+.dxmSubMenuItemHover_PortalMenu a,
+.dxmMenu_PortalMenu a{
     color:#002664;
     font-weight:400;
     margin:4px;
     padding:7px 16px;
 }
 
-.lnk_btn_highlight {
-    background:#c4262e;
-    color:#FFF;
+.dxmMenuItemSelected_PortalMenu{
+    border: none !important;
+}
+
+.dxmSubMenuItem_PortalMenu,
+.dxmSubMenuItemWithImage_PortalMenu,
+.dxmSubMenuItem_PortalMenu:hover,
+.dxmSubMenuItemWithImage_PortalMenu:hover{
+    padding: 7px 16px;
+}
+
+.dxmSubMenuItem_PortalMenu a,
+.dxmSubMenuItemWithImage_PortalMenu a{
+    font-weight: normal;
+    padding: 0;
+}
+
+.dxmSubMenuItem_PortalMenu a:hover,
+.dxmSubMenuItemWithImage_PortalMenu a:hover{
+    color:#002664 !important;
+}
+
+.dxmMenu_PortalMenu .dxmMenuItemSelected_PortalMenu a{
+    background-color: #c4262e !important;
+    color:#FFF !important;
     padding:7px 16px;
+    border: none;
+    font-weight: bold;
 }
 
 .lnk_btn:hover {
@@ -171,7 +226,7 @@ a,a:hover {
 }
 
 .floatUnderlay,.upperBody {
-    height:129px;
+    height:49px;
 }
 
 .mnu_btn_cell /* lnk_drk_row */,.mnu_btn_cell_top /* lnk_drk_row_top */,.time_wtc_cell,.time_wdc_cell,.fin_ReceiptDateHeader,.fin_ReceiptNumberHeader,.fin_ReceiptAmountHeader,.fin_ReceiptDescriptionHeader,.fin_ReceiptPrintHeader,.fin_StatementDateHeader,.fin_StatementNumberHeader,.fin_StatementDueDateHeader,.fin_StatementBalanceHeader,.fin_StatementDescriptionHeader,.fin_StatementPrintHeader {
