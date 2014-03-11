@@ -136,6 +136,14 @@
   }
 }
 
+#nav{
+  h3,h4{
+    border-bottom: 1px solid @border-color;
+    padding-bottom: 4px;
+    font-size: 14px;
+  }
+}
+
 #container{
   background: #f0f0f0;
   border-top: 1px solid #c6c6c6;
@@ -146,9 +154,34 @@
   #content{
     h2{ border-bottom: 1px solid @border-color; }
   }
+
 }
 
 body.login{
+
+  #container{
+    *background: rgb(255,255,255);
+    background: rgba(255,255,255,0.8);
+    border: none;
+
+    .logo{
+      width: 144px;
+      height: 46px;
+    }
+
+    #loginForm{
+
+      .submit-btn-plain{
+        background-color: #2a688f;
+        font-weight: bold;
+
+        &:hover{ background-color: #3076a2; }
+      }
+    }
+
+    p,a{ color: #2a688f; }
+  }
+
   #login-bg {
     position: fixed;
     top: 0;
