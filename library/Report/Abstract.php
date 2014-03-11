@@ -49,7 +49,7 @@ abstract class Report_Abstract {
 	 * @return array|bool
 	 */
 	protected function getRecordsFromResource(&$resource, $offset, $limit) {
-		if (!is_resource($resource)) {
+		if (!$resource instanceof mysqli_result) {
 			return false;
 		}
 

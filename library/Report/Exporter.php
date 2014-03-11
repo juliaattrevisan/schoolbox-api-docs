@@ -77,7 +77,7 @@ class Report_Exporter {
         fputcsv($outstream, $this->getHeadings());
 
         // use resource iteratively
-        if(is_resource($this->getData())) {
+        if($this->getData() instanceof mysqli_result) {
             $db = DeprecatedDatabase::getInstance();
             while($row = $db->getNextArray($this->getData())) {
                 $this->parseRow($outstream, $row);
