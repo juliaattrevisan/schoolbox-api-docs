@@ -126,10 +126,9 @@ class Controller extends Base {
             ->setDescription($post['description'])
             ->setCategory($post['resource_category_id'])
             ->setModerationType($post['resource_moderation_type_id'])
-            // Let's just get started
-            ->setMinLeadTime(new \DateInterval('PT1H'))
-            ->setMinReservationTime(new \DateInterval('PT1H'))
-            ->setMaxReservationTime(new \DateInterval('PT24H'))
+            ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time']))
+            ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
+            ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
         ;
         if (is_array($post['moderator_id'])) {
             foreach ($post['moderator_id'] as $moderator_id) {
@@ -160,6 +159,9 @@ class Controller extends Base {
             ->setDescription($post['description'])
             ->setCategory($post['resource_category_id'])
             ->setModerationType($post['resource_moderation_type_id'])
+            ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time']))
+            ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
+            ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
         ;
         // Clear and create the moderator list
         $model->setModeratorList(new Collection());
@@ -189,6 +191,20 @@ class Controller extends Base {
         $this->getMapper()->delete($item);
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate('resourceItem.browse', array())
+        );
+    }
+
+    /**
+     * Retrieves a date interval from form data
+     *
+     * @param  array $formPart An array containing "day", "hour" and "minute"
+     *                         keys.
+     * @return \DateInterval
+     * @throws \Exception if the date interval object can't be created.
+     */
+    protected function getDateIntervalFromForm($formPart) {
+        return new \DateInterval(
+            sprintf('P%dDT%dH%dM', $formPart['day'], $formPart['hour'], $formPart['minute'])
         );
     }
 
