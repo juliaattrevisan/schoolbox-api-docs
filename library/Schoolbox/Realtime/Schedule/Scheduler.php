@@ -33,6 +33,7 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Verboser;
+use SplObjectStorage;
 
 /**
  * This class is meant to hold a list of notifications that are pending for broadcast, and at the appropriate time,
@@ -44,7 +45,7 @@ use Schoolbox\Realtime\Verboser;
 class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 	const MODULE_NS = 'Schoolbox\\Realtime\\Schedule\\Module\\';
-	const QUEUE_SCHEDULE = 'sb.sched';
+	const QUEUE_SCHEDULE = '.sb.sched';
 
 	/** @var array */
 	protected static $knownModules = array(
@@ -70,6 +71,9 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	/** @var MessageFactory */
 	protected $fMsg;
 
+	/** @var SplObjectStorage */
+	protected $resolvers;
+
 	/**
 	 * @param LoopInterface $loop
 	 * @param Verboser $verboser
@@ -84,6 +88,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 		$this->notif = new Notif();
 		$this->dispatcher = new Dispatcher($loop, $this, $verboser, new SchedulerDispatchStrategy());
 		$this->fMsg = new MessageFactory(null);
+		$this->resolvers = new SplObjectStorage();
 
 		if($initialise) {
 			$this->initialise();
@@ -97,7 +102,13 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 		// create a stomp client for listening to Mapper messages coming in
 		$stompFactory = new Factory($this->loop);
-		$stompClient = $stompFactory->createClient();
+		$stompClient = $stompFactory->createClient(array(
+			'host'      => $this->conf->get('amqp_host'),
+			'port'      => $this->conf->get('amqp_stomp_host'),
+			'vhost'     => '/',
+			'login'     => $this->conf->get('amqp_user'),
+			'passcode'  => $this->conf->get('amqp_pass'),
+		));
 
 		$v = $this->verboser;
 		$self = $this;
@@ -110,17 +121,11 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 			// make sure our endpoint exists
 			$mqc = new Connector();
-			$mqc->declareQueue(Scheduler::QUEUE_SCHEDULE);
-			$mqc->bindQueue(Scheduler::QUEUE_SCHEDULE, '*.' . Notif::TOPIC_APPLICATION);
+			$mqc->declareQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE);
+			$mqc->bindQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, '*.' . Notif::TOPIC_APPLICATION);
 
 			/** Subscribe to the queue set aside for the scheduler */
-			$client->subscribeWithAck('/amq/queue/'.Scheduler::QUEUE_SCHEDULE, 'client',
-				function($frame, $ackResolver) use ($v, $self) {
-					// this closure is called when a message is received in the defined queue
-					/** @var AckResolver $ackResolver */
-					$self->onAMQP($frame) ? $ackResolver->ack() : $ackResolver->nack();
-				}
-			);
+			$client->subscribeWithAck('/amq/queue/' . INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, 'client', array($self, 'onAMQP'));
 		});
 	}
 
@@ -129,9 +134,10 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	 * Handles a STOMP frame. Returns true to ACK message, or false to NACK message.
 	 *
 	 * @param Frame $frame
+	 * @param AckResolver $ackResolver
 	 * @return bool
 	 */
-	public function onAMQP($frame) {
+	public function onAMQP($frame, $ackResolver) {
 		try {
 			$message = $this->fMsg->reconstitute($frame->body);
 
@@ -144,7 +150,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 			// only a few Models actually have schedule strategies, failure is ok
 			// each module strategy knows how to deal with its own events
-			$instance = $this->getModule(get_class($message->getObject()));
+			$instance = $this->getModule($message->getObjectClass());
 
 			$fTrigger = new TriggerFactory(
 				$instance, $message->getObject(), $message->getInitiator(), $message->getDiff()
@@ -153,16 +159,18 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 			// retrieve, populate, and schedule this bundle of triggers
 			$bundle = $fTrigger->getBundle($message->getMethod());
 			$instance->buildTriggers($bundle);
-			$this->scheduleNotifications($bundle->getTriggers());
+			$this->scheduleNotifications($bundle->getTriggers(), $ackResolver);
 
 		}
 		catch(ScheduleException $e) {
 			// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-			// $this->verboser->v($e->getMessage(), '*');
-			// this message is unparseable, so we'll eventually ACK it to make it go away
+			$this->verboser->v($e->getMessage(), '*');
+			$ackResolver->ack();
 		}
 		catch(CompressionException $e) {
+			// this message is unparseable, so we'll eventually ACK it to make it go away
 			$this->verboser->v($e->getMessage(), '!');
+			$ackResolver->ack();
 		}
 
 		return true;
@@ -181,6 +189,9 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	public function handleResponse($trigger, $command, $data) {
 
 		$this->verboser->v("Received worker response to handle");
+
+		// detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
+		$this->detachTrigger($trigger);
 
 		/** @var Messenger $msgr */
 		$msgr = unserialize($data[0]);
@@ -232,10 +243,11 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	 * Convenience method for scheduling notifications for multiple triggers.
 	 *
 	 * @param Trigger[] $triggers
+	 * @param AckResolver $ackResolver
 	 */
-	public function scheduleNotifications($triggers) {
+	public function scheduleNotifications($triggers, $ackResolver = null) {
 		foreach($triggers as $trigger) {
-			$rtn[] = $this->scheduleNotification($trigger);
+			$this->scheduleNotification($trigger, $ackResolver);
 		}
 	}
 
@@ -245,8 +257,9 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	 * Idempotent method.
 	 *
 	 * @param Trigger $trigger
+	 * @param AckResolver $ackResolver
 	 */
-	public function scheduleNotification($trigger) {
+	public function scheduleNotification($trigger, $ackResolver = null) {
 
 		$timestamp = $trigger->getTimestamp();
 		$model = $trigger->getModel();
@@ -257,6 +270,10 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 		$v = $this->verboser;
 
 		$dispatch = $this->getDispatcher();
+
+		if($ackResolver instanceof AckResolver) {
+			$this->attachResolverTrigger($ackResolver, $trigger);
+		}
 
 		/**
 		 * This closure will be called from the EventLoop at the appointed time, or immediately if the time has elapsed.
@@ -286,13 +303,11 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 				}
 				catch(ScheduleException $e) {
-					unset($msgr);
 					$v->v($e->getMessage(), '!');
 				}
 				catch(Exception $e) {
 					// don't know what other exceptions will be thrown here, so for now, acknowledge and rethrow
 					$v->v(sprintf("%s -> %s",get_class($e), $e->getMessage()), '!');
-					unset($msgr);
 					throw $e;
 				}
 
@@ -441,4 +456,47 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 	}
 
+
+	/**
+	 * @param AckResolver $ackResolver
+	 * @param Trigger $trigger
+	 */
+	protected function attachResolverTrigger($ackResolver, $trigger) {
+		if($this->resolvers->contains($ackResolver)) {
+			/** @var SplObjectStorage $triggers */
+			$triggers = $this->resolvers->offsetGet($ackResolver);
+		}
+		else {
+			$triggers = new SplObjectStorage();
+		}
+		$triggers->attach($trigger);
+		$this->resolvers->attach($ackResolver, $triggers);
+	}
+
+	/**
+	 * @param Trigger $trigger
+	 */
+	protected function detachTrigger($trigger) {
+		foreach($this->resolvers as $resolver) {
+			$triggers = $this->resolvers[$resolver];
+
+			/**
+			 * @var AckResolver $resolver
+			 * @var SplObjectStorage $triggers
+			 */
+			if($triggers->contains($trigger)) {
+				$this->verboser->v("Detaching trigger from resolver", '-');
+				$triggers->detach($trigger);
+				if($triggers->count() == 0) {
+					// this resolver's triggers have all fired, ACK the message
+					$this->verboser->v("Resolver empty, ACKnowledging", '-');
+					$resolver->ack();
+				}
+				else {
+					$this->verboser->v('Resolver still contains ' . $triggers->count() . ' triggers');
+				}
+				return;
+			}
+		}
+	}
 } 

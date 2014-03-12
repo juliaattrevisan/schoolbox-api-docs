@@ -10,20 +10,20 @@
 namespace Schoolbox\Notif\MQ;
 
 
+use EOTC\ConfigMapper;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Message\AMQPMessage;
-use Schoolbox\Notif\Notif;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\NotifException;
 
 class Connector {
 
-	const PRIMARY_EXCHANGE      = 'sb.tx';
+	const PRIMARY_EXCHANGE      = 'sb.%s.tx';
 	const PRIMARY_TYPE          = 'topic';
 
-	const SECONDARY_NAME_PREFIX = 'sb.ux.';
+	const SECONDARY_NAME_PREFIX = 'sb.%s.ux.';
 	const SECONDARY_TYPE        = 'fanout';
 
 	const PASSIVE     = false;
@@ -49,9 +49,13 @@ class Connector {
 	 */
 	protected $channels;
 
+	/** @var IConfigLoader */
+	protected $conf;
+
 	public function __construct() {
 		// will implicitly load a connection and set up an exchange-declared channel
 		$this->getChannel();
+		$this->conf = ConfigMapper::getInstance();
 	}
 
 	/**
@@ -60,8 +64,12 @@ class Connector {
 	 */
 	protected function connection() {
 		if(!$this->conn instanceof AMQPConnection) {
-			// TODO pull this hardcoding out
-			$this->conn = new AMQPConnection('localhost', 5672, 'guest', 'guest');
+			$this->conn = new AMQPConnection(
+				$this->conf->get('amqp_host'),
+				$this->conf->get('amqp_port'),
+				$this->conf->get('amqp_user'),
+				$this->conf->get('amqp_pass')
+			);
 		}
 		return $this->conn;
 	}
@@ -88,7 +96,7 @@ class Connector {
 			$this->channels[$idkey] = $this->connection()->channel($id);
 
 			$this->channels[$idkey]->exchange_declare(
-				self::PRIMARY_EXCHANGE, self::PRIMARY_TYPE, self::PASSIVE, self::DURABLE, self::AUTO_DELETE, self::INTERNAL
+				self::getPrimaryExchange(), self::PRIMARY_TYPE, self::PASSIVE, self::DURABLE, self::AUTO_DELETE, self::INTERNAL
 			);
 		}
 		return $this->channels[$idkey];
@@ -141,7 +149,7 @@ class Connector {
 	 * @return AMQPChannel
 	 */
 	public function bindExchange($exchangeName, $routingKey, $channelId = null) {
-		return $this->getChannel($channelId)->exchange_bind($exchangeName, self::PRIMARY_EXCHANGE, $routingKey);
+		return $this->getChannel($channelId)->exchange_bind($exchangeName, self::getPrimaryExchange(), $routingKey);
 	}
 
 
@@ -154,7 +162,8 @@ class Connector {
 	 * @param string $channelId
 	 * @return AMQPChannel
 	 */
-	public function bindQueue($queueName, $routingKey, $exchange = self::PRIMARY_EXCHANGE, $channelId = null) {
+	public function bindQueue($queueName, $routingKey, $exchange = '', $channelId = null) {
+		$exchange = $exchange ?: self::getPrimaryExchange();
 		$this->getChannel($channelId)->queue_bind($queueName, $exchange, $routingKey);
 		return $this->getChannel($channelId);
 	}
@@ -169,7 +178,7 @@ class Connector {
 	 * @return AMQPChannel
 	 */
 	public function unbindQueue($queueName, $routingKey, $channelId = null) {
-		$this->getChannel($channelId)->queue_unbind($queueName, self::PRIMARY_EXCHANGE, $routingKey);
+		$this->getChannel($channelId)->queue_unbind($queueName, self::getPrimaryExchange(), $routingKey);
 		return $this->getChannel($channelId);
 	}
 
@@ -182,7 +191,7 @@ class Connector {
 	 * @return AMQPChannel
 	 */
 	public function unbindExchange($exchangeName, $routingKey, $channelId = null) {
-		$this->getChannel($channelId)->exchange_unbind(self::PRIMARY_EXCHANGE, $exchangeName, $routingKey);
+		$this->getChannel($channelId)->exchange_unbind(self::getPrimaryExchange(), $exchangeName, $routingKey);
 		return $this->getChannel($channelId);
 	}
 
@@ -278,7 +287,7 @@ class Connector {
 
 			$message = new AMQPMessage($message, $properties);
 		}
-		$this->getChannel($channelId)->basic_publish($message, self::PRIMARY_EXCHANGE, $routingKey);
+		$this->getChannel($channelId)->basic_publish($message, self::getPrimaryExchange(), $routingKey);
 		return $this->getChannel($channelId);
 	}
 
@@ -291,6 +300,14 @@ class Connector {
 	 */
 	public function readFromQueue($queueName, $channelId = null) {
 		return $this->getChannel($channelId)->basic_get($queueName, false);
+	}
+
+	public static function getPrimaryExchange() {
+		return sprintf(self::PRIMARY_EXCHANGE, INSTANCE_ID);
+	}
+
+	public static function getSecondaryExchangePrefix() {
+		return sprintf(self::SECONDARY_NAME_PREFIX, INSTANCE_ID);
 	}
 
 } 

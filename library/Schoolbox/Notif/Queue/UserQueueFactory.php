@@ -298,7 +298,7 @@ class UserQueueFactory {
 		$count = 0;
 
 		if(!$simulate) {
-			$userExchange = Connector::SECONDARY_NAME_PREFIX . $userId;
+			$userExchange = Connector::getSecondaryExchangePrefix() . $userId;
 
 			foreach($this->existingBindings[$userId] as $routingKey) {
 				$this->mqConnector->unbindExchange($userExchange, $routingKey);
@@ -347,7 +347,7 @@ class UserQueueFactory {
 
 			list($exchange, $routingKey) = $xpl;
 
-			$prefix = Connector::SECONDARY_NAME_PREFIX;
+			$prefix = Connector::getSecondaryExchangePrefix();
 
 			// only parse line if this is a user exchange
 			if(substr($exchange, 0, strlen($prefix)) != $prefix) {

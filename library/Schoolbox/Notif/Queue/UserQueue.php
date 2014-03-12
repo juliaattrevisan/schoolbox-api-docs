@@ -66,7 +66,7 @@ class UserQueue {
 			return;
 		}
 
-		$exchange = MQConnector::SECONDARY_NAME_PREFIX . $this->userId;
+		$exchange = MQConnector::getSecondaryExchangePrefix() . $this->userId;
 
 		// one connection to declare them all...
 		$this->conn->declareExchange($exchange);
