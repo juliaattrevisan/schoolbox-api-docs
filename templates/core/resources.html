@@ -377,7 +377,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
 <!-- END custom_head -->
 <div class="template3">
   <div class="left">
-    <div id="category-window">
+    <div id="category-window" style="overflow:auto;">
     <div class="loading"></div>
       <table id="category-head" class="table">
       	<thead>
@@ -393,9 +393,12 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
           <!-- BEGIN category_list -->
           <tr id="node-{CATEGORY_ID}" class="{CLASS}">
             <td>
-					<div data-resourcemargin="1">
-						<span class="elbow"></span><span class="label">{CATEGORY_NAME}</span>
-					</div>
+				<div data-resourcemargin="1">
+					<span class="label">
+						<span class="elbow"></span>
+						<span class="nodeName">{CATEGORY_NAME}</span>
+					</span>
+				</div>
 			</td>
           </tr>
           <!-- END category_list -->
@@ -404,7 +407,10 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
           <tr id="node-template">
             <td>
 				<div data-resourcemargin="1">
-			  		<span class="elbow"></span><span class="label"></span>
+					<span class="label">
+						<span class="elbow"></span>
+						<span class="nodeName"></span>
+					</span>
 				</div>
 			</td>
           </tr>

@@ -3,25 +3,25 @@
 	display: none;
 }
 #tree td {
-	padding: 2px 7px 3px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 7px;
+    padding-right: 0px;
 	zoom:1;
 }
+
 #tree span {
-	margin: 0;
+    width: 23px;
+    min-height: 23px;
+    line-height: 23px;
+    margin: 0;
 	padding: 0;
-	float: left;
-	line-height: 23px;
-	width: 23px;
-	min-height: 23px;
-	background: transparent url(/images/tree/indent.gif) repeat 0 0px;
+    float: left;
 }
 #tree span.blank {
 	background: transparent;
 }
 #tree span.elbow {
-	padding: 0;
-	display: block;
-	float: left;
 	background: transparent url(/images/tree/elbow.gif) no-repeat 0 0px;
 }
 #tree tr.last span.elbow {
@@ -41,16 +41,23 @@
 #tree tr.collapsed.last span.elbow {
 	background-image: url(/images/tree/elbow-collapsed-last.gif);
 }
+
+/* A tag containing the actual name (text value) of the node
+ */
+#tree span.nodeName {
+    width: auto;
+    min-width: 200px;
+    margin-left: 22px;
+}
+
 #tree span.label {
-	display: block;
-	float: left;
-	padding-left: 23px;
-	margin: 0;
 	width: auto;
+    min-width: 300px;
 	line-height: 23px;
-	/*height: 23px;*/
-	background: transparent url(/images/icons/22x22/folder.png) no-repeat 0 0;
-	cursor: default;
+	background-color: transparent;
+    background-image: url(/images/icons/22x22/folder.png);
+    background-repeat: no-repeat;
+    background-position: 22px 0px;
 	-moz-user-select: none;
 }
 #tree tr.homepage span.label {
@@ -81,7 +88,8 @@ span.file {
 	-moz-user-select: none;
 }
 span.file.ui-draggable, #tree span.label.ui-draggable {
-	cursor: move;overflow: hidden;
+	cursor: move;
+    overflow: hidden;
     min-width: 150px;
 }
 

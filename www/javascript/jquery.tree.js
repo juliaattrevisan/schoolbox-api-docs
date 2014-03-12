@@ -88,7 +88,7 @@
 						if (Number(row.taskCount) > 0) {
 							clone.addClass('course');
 						}
-						clone.find(options.label).text(row.name);
+						clone.find(options.label).find('.nodeName').text(row.name);
 						
 						if (row.isParent == 1) {
 							clone.addClass('collapsed');
