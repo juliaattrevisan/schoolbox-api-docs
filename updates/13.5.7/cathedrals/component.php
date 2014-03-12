@@ -10,7 +10,7 @@ if (Config::get('site_location') === 'cathedral') {
         'class'              => 'Component_Homepage_DailyQuoteController',
         'description'        => 'The Daily Quote',
         'multiple'           => 'false',
-        'visible'            => 'false',
+        'visible'            => 'true',
         'config'             => array(
             'componentname'  => array(
                 'default_value' => 'Daily Quote',
