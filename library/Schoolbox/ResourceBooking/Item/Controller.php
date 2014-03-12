@@ -120,24 +120,12 @@ class Controller extends Base {
      * Backend for adding a new category
      */
     public function create() {
-        $post  = $this->getRequest()->post;
         $model = new Model();
-        $model
-            ->setName($post['name'])
-            ->setDescription($post['description'])
-            ->setCategory($post['resource_category_id'])
-            ->setModerationType($post['resource_moderation_type_id'])
-            ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time']))
-            ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
-            ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
-        ;
-        if (is_array($post['moderator_id'])) {
-            foreach ($post['moderator_id'] as $moderator_id) {
-                $user = new User();
-                $user->setId($moderator_id);
-                $model->addModerator($user);
-            }
-        }
+        $this->updateItemWithFormValues(
+            $model,
+            $this->getRequest()->post,
+            $this->getRequest()->files
+        );
         $this->getMapper()->save($model);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
@@ -153,37 +141,12 @@ class Controller extends Base {
      * @param int $id
      */
     public function update($id) {
-        $post  = $this->getRequest()->post;
         $model = $this->getMapper()->findById($id);
-        $model
-            ->setName($post['name'])
-            ->setDescription($post['description'])
-            ->setCategory($post['resource_category_id'])
-            ->setModerationType($post['resource_moderation_type_id'])
-            ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time']))
-            ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
-            ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
-        ;
-        if (($upload = $this->getRequest()->files['image'])) {
-            if (empty($upload['error'])) {
-                // upload the file and Rectify it
-                $image = StorageMapper::getInstance()->upload(
-                    $upload['name'], $upload['tmp_name'], $this->getUser()->getId()
-                );
-                $model->setImage($image);
-            }
-        }
-
-        // Clear and create the moderator list
-        $model->setModeratorList(new Collection());
-        // because of BelgianSuggest I have to check if this is even an array!
-        if (is_array($post['moderator_id'])) {
-            foreach ($post['moderator_id'] as $moderator_id) {
-                $user = new User();
-                $user->setId($moderator_id);
-                $model->addModerator($user);
-            }
-        }
+        $this->updateItemWithFormValues(
+            $model,
+            $this->getRequest()->post,
+            $this->getRequest()->files
+        );
         $this->getMapper()->save($model);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
@@ -204,6 +167,47 @@ class Controller extends Base {
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate('resourceItem.browse', array())
         );
+    }
+
+    /**
+     * Updates fields in the model with values from the form.
+     *
+     * @param Model $model The resource to update
+     * @param array $post  Data from $_POST
+     * @param array $files Data from $_FILES
+     */
+    protected function updateItemWithFormValues(Model $model, $post, $files) {
+        $model
+            ->setName($post['name'])
+            ->setDescription($post['description'])
+            ->setCategory($post['resource_category_id'])
+            ->setModerationType($post['resource_moderation_type_id'])
+            ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time']))
+            ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
+            ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
+        ;
+        if (($upload = $files['image']) && empty($upload['error'])) {
+            // Rectumize the file that was uploaded
+            $image = StorageMapper::getInstance()->upload(
+                $upload['name'], $upload['tmp_name'], $this->getUser()->getId()
+            );
+            $model->setImage($image);
+        }
+        else {
+            $model->setImage($post['image'] ?: null);
+        }
+
+        // Clear and create the moderator list
+        $model->setModeratorList(new Collection());
+        // because of BelgianSuggest I have to check if this is even an array!
+        if (is_array($post['moderator_id'])) {
+            foreach ($post['moderator_id'] as $moderator_id) {
+                $user = new User();
+                $user->setId($moderator_id);
+                $model->addModerator($user);
+            }
+        }
+
     }
 
     /**
