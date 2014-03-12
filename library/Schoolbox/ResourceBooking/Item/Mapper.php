@@ -38,7 +38,7 @@ class Mapper extends BaseMapper {
                 'column'   => 'storage_image_id',
                 'property' => 'image',
                 'type'     => self::TYPE_MODEL,
-                'join'     => 'storage_image',
+                'join'     => 'image',
             )
         );
         $this->hasMap(
@@ -179,7 +179,7 @@ class Mapper extends BaseMapper {
     }
 
     /**
-     * Overrides hydrate() to populate the list of moderators.
+     * Overrides hydrate() to populate the list of moderators, and the image.
      *
      * @todo Replace with a method which doesn't involve a query per resource.
      *
@@ -196,8 +196,8 @@ class Mapper extends BaseMapper {
             function($mapper, $model, $row) {
                 /** @var self $mapper */
                 /** @var Model $model */
-                $modMapper  = $mapper->getJoinMapper('moderator');
-                $userMapper = $modMapper->getJoinMapper('moderator');
+                $modMapper   = $mapper->getJoinMapper('moderator');
+                $userMapper  = $modMapper->getJoinMapper('moderator');
                 $query     = "
                     SELECT
                       {$modMapper->getColumnString('m')},
@@ -209,6 +209,16 @@ class Mapper extends BaseMapper {
                 $statement = $userMapper->getDatabase()->prepare($query);
                 $statement->execute(array($model->getId()));
                 $model->setModeratorList($userMapper->hydrateList($statement, 'u'));
+
+                $imageId = $model->getImage()->getId();
+                if ($imageId) {
+                    $imageMapper = $mapper->getJoinMapper('image');
+                    try {
+                        $model->setImage($imageMapper->findById($imageId));
+                    }
+                    catch (BaseMapper\Exception $ex) {}
+                }
+
                 return $model;
             }
         );
