@@ -21,8 +21,8 @@ use Schoolbox\Notif\MQ\Connector as MQConnector;
  */
 class UserQueue {
 
-	const QUEUE_ALL_MESSAGES = 'u.%s.all';
-	const QUEUE_UNREAD_MESSAGES = 'u.%s.unread';
+	const QUEUE_ALL_MESSAGES = '%s.u.%s.all';
+	const QUEUE_UNREAD_MESSAGES = '%s.u.%s.unread';
 
 	/** @var AbstractMessage[] */
 	protected $messages = array();
@@ -70,15 +70,15 @@ class UserQueue {
 
 		// one connection to declare them all...
 		$this->conn->declareExchange($exchange);
-		$this->conn->declareQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, $this->userId));
-		$this->conn->declareQueue(sprintf(self::QUEUE_ALL_MESSAGES, $this->userId));
+		$this->conn->declareQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, INSTANCE_ID, $this->userId));
+		$this->conn->declareQueue(sprintf(self::QUEUE_ALL_MESSAGES, INSTANCE_ID, $this->userId));
 
 		// ...and in the darkness bind them.
 		foreach($this->bindings as $key) {
 			$this->conn->bindExchange($exchange, $key);
 		}
-		$this->conn->bindQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, $this->userId), '', $exchange);
-		$this->conn->bindQueue(sprintf(self::QUEUE_ALL_MESSAGES, $this->userId),   '', $exchange);
+		$this->conn->bindQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, INSTANCE_ID, $this->userId), '', $exchange);
+		$this->conn->bindQueue(sprintf(self::QUEUE_ALL_MESSAGES, INSTANCE_ID, $this->userId),   '', $exchange);
 
 	}
 
@@ -119,7 +119,7 @@ class UserQueue {
 
 		$nacks = array();
 
-		while($m = $this->conn->readFromQueue(sprintf(self::QUEUE_ALL_MESSAGES, $this->userId))) {
+		while($m = $this->conn->readFromQueue(sprintf(self::QUEUE_ALL_MESSAGES, INSTANCE_ID, $this->userId))) {
 
 			// dismiss messages that aren't meant to remain in the user's 'all' queue
 			if($this->interceptor->hasReroute($this->userId, $m)) {
