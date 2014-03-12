@@ -9,14 +9,35 @@
  */
 require_once __DIR__.'/../../../include/Bootstrap.php';
 
+$dailyQuoteMapper = new \DailyQuote\QuoteMapper();
 $dailyQuoteConfigMapper = new \DailyQuote\ConfigMapper();
-$lastSelected = $dailyQuoteConfigMapper->findByColumn('name', 'last_selected')->first();
+
+$lastSelectedDate = $dailyQuoteConfigMapper->findByColumn('name', 'last_selected_date')->first();
+$lastSelectedIndex = $dailyQuoteConfigMapper->findByColumn('name', 'last_selected_index')->first();
 
 $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-if ($lastSelected != $now->getDatabase()) {
-	$dailyQuoteMapper = new \DailyQuote\QuoteMapper();
+/* Time to select a new quote and update the db
+ */
+if ($lastSelectedDate->getValue() != $now->getDatabaseDate()) {
 	$dailyQuote = $dailyQuoteMapper->findRandomQuote();
 
-	new \Alaress_Probe($dailyQuote);
+	/* Remember when the quote was last selected
+	 */
+	$lastSelectedDate->setValue($now->getDatabaseDate());
+	$dailyQuoteConfigMapper->save($lastSelectedDate);
+
+	/* Remember the quote that was last selected
+	 */
+
+	$lastSelectedIndex->setValue($dailyQuote->getId());
+	$dailyQuoteConfigMapper->save($lastSelectedIndex);
 }
+/* Reuse a previously selected quote
+ */
+else {
+	$dailyQuote = $dailyQuoteMapper->findById($lastSelectedIndex->getValue());
+}
+
+new \Alaress_Probe($dailyQuote->getDescription());
+
