@@ -4,7 +4,7 @@
  *
  * Imports each line of a csv (quote text, quote author) into a db table
  * from which stuff is randomly selected
- * 
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
