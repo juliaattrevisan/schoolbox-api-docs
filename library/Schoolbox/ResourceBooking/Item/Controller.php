@@ -216,7 +216,7 @@ class Controller extends Base {
      */
     protected function getDateIntervalFromForm($formPart) {
         return new \DateInterval(
-            sprintf('P%dDT%dH%dM', $formPart['day'], $formPart['hour'], $formPart['minute'])
+            sprintf('PT%dH%dM', ($formPart['day'] * 24 + $formPart['hour']), $formPart['minute'])
         );
     }
 
