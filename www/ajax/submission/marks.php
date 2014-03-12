@@ -131,7 +131,7 @@ function setAssessmentWeight($weights) {
 	$synergyHandler = new External_Class();
 
 	if($category->getCodes()->count() && $conf->get('external_enable')) {
-		$studentList = $synergyHandler->getStudents($category->getCodes()->first()->getCode());
+		$studentList = $synergyHandler->getStudents($category->getCodeString());
 	}
 
 	$groupList = $groupHandler->getMemberList($category->getId());
