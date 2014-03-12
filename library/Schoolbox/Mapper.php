@@ -1242,10 +1242,11 @@ class Mapper {
 	 * @param string $name The identifier for this join.
 	 *
 	 * @return Mapper
+	 * @throws Mapper\DefinitionException if join $name isn't on this mapper
 	 */
 	public function getJoinMapper($name) {
 		if (!array_key_exists($name, $this->joins)) {
-			return false;
+			throw new Mapper\DefinitionException("Join \"$name\" does not exist on class \"".__CLASS__."\"");
 		}
 		$mapper = $this->joins[$name]['mapper'];
 		if (!($mapper instanceof Mapper) && class_exists($mapper)) {
@@ -1264,10 +1265,11 @@ class Mapper {
 	 *                            join, defaults to other mapper's table name.
 	 *
 	 * @return string
+	 * @throws Mapper\DefinitionException if join $name isn't on this mapper
 	 */
 	public function getJoinSql($name, $this_alias = '', $other_alias = '') {
 		if (!array_key_exists($name, $this->joins)) {
-			return false;
+			throw new Mapper\DefinitionException("Join \"$name\" does not exist on class \"".__CLASS__."\"");
 		}
 		$join = $this->joins[$name];
 
