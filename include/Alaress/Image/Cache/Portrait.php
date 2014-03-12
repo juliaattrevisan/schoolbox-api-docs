@@ -114,43 +114,47 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      */
     private function canViewImage() {
 
-        /* Everyone can always see their own pics
-           * Otherwise implement specific policies
-           */
-        $user_id = $this->getUserId();
-        if ($_SESSION['id'] == $user_id) {
-            return true;
-        }
-
         /* Staff members can always see all portraits
            */
         if ($this->getGroupHandler()->isStaff()) {
             return true;
         }
 
-        //
-        // Student photos:
-        // always visible by their parents
-        // visible by other students if photos are not protected.
-        if ($this->getGroupHandler()->isParentOfChild($user_id)) {
-            return true;
-        }
-        if ($this->getGroupHandler()->isStudent($user_id)) {
-            if (!Cfg::get('protect_student_photo')
-                && $this->getGroupHandler()->isStudent()
-            ) {
+        // Get all users with a synergy ID, and test them against policy.
+        /** @var \Schoolbox\User[] $userList */
+        $userList = \Schoolbox\UserMapper::getInstance()->findByColumn(
+            'synergy_id', $this->getExternalUserId()
+        );
+        foreach ($userList as $user) {
+            /* Everyone can always see their own pics
+             */
+            $user_id = $user->getId();
+            if ($_SESSION['id'] == $user_id) {
                 return true;
             }
-        }
 
-        //
-        // Staff photos:
-        // visible by students and parents, if staff photos aren't protected.
-        if ($this->getGroupHandler()->isStaff($user_id)) {
-            if (!Cfg::get('protect_teacher_photo')
-                && ($this->getGroupHandler()->isStudent() || $this->getGroupHandler()->isParent())
-            ) {
+            // Student photos:
+            // always visible by their parents
+            // visible by other students if photos are not protected.
+            if ($this->getGroupHandler()->isParentOfChild($user_id)) {
                 return true;
+            }
+            if ($this->getGroupHandler()->isStudent($user_id)) {
+                if (!Cfg::get('protect_student_photo')
+                    && $this->getGroupHandler()->isStudent()
+                ) {
+                    return true;
+                }
+            }
+
+            // Staff photos:
+            // visible by students and parents, if staff photos aren't protected.
+            if ($this->getGroupHandler()->isStaff($user_id)) {
+                if (!Cfg::get('protect_teacher_photo')
+                    && ($this->getGroupHandler()->isStudent() || $this->getGroupHandler()->isParent())
+                ) {
+                    return true;
+                }
             }
         }
 
@@ -354,19 +358,6 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      */
     private function getGroupHandler() {
         return $this->groupHandler;
-    }
-
-    /**
-     * Get user id
-     *
-     * @return mixed
-     */
-    private function getUserId() {
-        if (!isset($this->user_id)) {
-            $user_details = $this->getUserHandler()->getBySynergy($this->getExternalUserId());
-            $this->user_id = $user_details['uid'];
-        }
-        return $this->user_id;
     }
 
     /**
