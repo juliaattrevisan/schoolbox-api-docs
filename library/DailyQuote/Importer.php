@@ -46,6 +46,7 @@ class Importer {
 			$quote->setAuthor(trim($row[1]));
 			$quote->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$quote->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+			$quote->setDeletedAt(null);
 
 			$this->getQuoteMapper()->save($quote);
 		}
