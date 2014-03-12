@@ -1,6 +1,7 @@
 {# I need some way of adding custom_head #}
 <script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
 <script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript">
     (function($){
         $(function(){
@@ -22,6 +23,14 @@
                 value: {{ moderatorList|json_encode|raw }}
             })
 
+
+            form.find('input[type="file"].prettify').prettyFileInput({
+                additionalButtonClasses: 'no-marg float-left',
+                buttonActiveClass: 'tick',
+                defaultText: '<span></span>Choose file',
+                defaultFileSelectedText: '<span></span>File selected'
+            });
+
         })
     })(jQuery);
 </script>
@@ -32,6 +41,7 @@
     action="{% if item.id %}{{ routeLookup('resourceItem.update:post', {id: item.id}) }}{% else %}{{ routeLookup('resourceItem.create') }}{% endif %}"
     method="post"
     name="form" class="clearfix"
+    enctype="multipart/form-data"
 >
     <input type="hidden" name="id" value="{{ item.id }}"/>
     <table class="standardForm table">
@@ -75,6 +85,16 @@
         <tr>
             <td class="formLabelWidth"><h4>Description</h4></td>
             <td><textarea name="description">{{ item.name }}</textarea></td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Image</h4></td>
+            <td>
+                {% if item.image.hash %}
+                    <img src="/storage/image.php?size=maxsize&hash={{ item.image.hash }}" />
+                    <a href="#" class="submit-btn-plain">Delete Image</a> or <input type="file" name="image" class="prettify">
+                {% endif %}
+                <input type="file" name="image" class="prettify">
+            </td>
         </tr>
         <tr>
             <td class="formLabelWidth">
