@@ -38,7 +38,7 @@ class Worker {
 	protected $strat;
 
 	/** @var Task[] */
-	protected $previousTasks;
+	protected $previousTasks = array();
 
 	protected $taskRetainCount = 0;
 
