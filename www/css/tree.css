@@ -75,6 +75,7 @@
 }
 #tree span.server {
 	background: transparent url(/images/tree/server.gif) no-repeat 0 3px;
+    padding-left: 22px;
 }
 tr.hidden td {
 	opacity: 0.5;
