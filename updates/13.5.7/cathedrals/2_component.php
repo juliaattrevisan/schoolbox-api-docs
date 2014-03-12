@@ -8,7 +8,7 @@ if (Config::get('site_location') === 'cathedral') {
         'module'             => 'homepage',
         'component_category' => '1',
         'class'              => 'Component_Homepage_DailyQuoteController',
-        'description'        => 'The Daily Quote',
+        'description'        => 'A quote that appears daily',
         'multiple'           => 'false',
         'visible'            => 'true',
         'config'             => array(
