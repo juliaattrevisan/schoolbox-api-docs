@@ -29,14 +29,17 @@ class Component_Homepage_DailyQuoteController extends Component_Homepage_Control
 	 * @return bool
 	 */
    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
+        if(!parent::loadTemplate($templateHandle, 'dailyQuote')) {
             return false;
         }
 
 	   $factory = new \DailyQuote\Factory();
 	   $dailyQuote = $factory->produce();
 
-	   new \Alaress_Probe($dailyQuote->getDescription());
+	   $this->setVar(array(
+		   'DAILYQUOTE_DESCRIPTION' => $dailyQuote->getDescription(),
+		   'DAILYQUOTE_AUTHOR' => $dailyQuote->getAuthor(),
+	   ));
 
 	   return true;
     }
