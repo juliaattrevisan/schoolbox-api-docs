@@ -15,7 +15,7 @@ use Alaress\Authorizer\Failure\Forbidden;
 class IsSuperuser implements IAuthorizationRule {
 
     public function authorize(User $user = null) {
-        if (!($user instanceof User && $user->isSuperuser())) {
+        if (!($user instanceof User && $user->getId() && $user->isSuperuser())) {
             throw new Forbidden();
         }
     }

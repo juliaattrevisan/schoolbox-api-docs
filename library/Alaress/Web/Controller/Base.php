@@ -13,6 +13,7 @@ use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
 use Aura\Session\Session;
+use Schoolbox\User;
 
 abstract class Base {
     /**
@@ -34,6 +35,13 @@ abstract class Base {
      * @var Session
      */
     protected $session;
+
+    /**
+     * The currently logged in user.
+     *
+     * @var User
+     */
+    protected $user;
 
     /**
      * @param  Request $request
@@ -97,6 +105,22 @@ abstract class Base {
      */
     public function getSession() {
         return $this->session;
+    }
+
+    /**
+     * @param  User  $user
+     * @return $this
+     */
+    public function setUser($user) {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser() {
+        return $this->user;
     }
 
 }

@@ -36,7 +36,7 @@ if ($route instanceof Aura\Router\Route) {
 
         // Session timed out: don't get the user.
         if ($lastTime + $sessionLength < time()) {
-            $user = null;
+            $user = new Schoolbox\User();
         }
         else {
             $user = $authSession->user;
@@ -50,6 +50,7 @@ if ($route instanceof Aura\Router\Route) {
 
         // Call the controller method.
         // Ensure that the parameters match up with the names used.
+        $controller->setUser($user);
         $method = new ReflectionMethod($controller, $route->params['action']);
         $args   = array();
         foreach ($method->getParameters() as $parameter) {
