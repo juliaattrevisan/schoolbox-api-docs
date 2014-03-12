@@ -11,6 +11,7 @@ namespace Schoolbox\ResourceBooking\Item;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\User;
+use Schoolbox\StorageMapper;
 
 class Controller extends Base {
 
@@ -163,8 +164,19 @@ class Controller extends Base {
             ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
             ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
         ;
+        if (($upload = $this->getRequest()->files['image'])) {
+            if (empty($upload['error'])) {
+                // upload the file and Rectify it
+                $image = StorageMapper::getInstance()->upload(
+                    $upload['name'], $upload['tmp_name'], $this->getUser()->getId()
+                );
+                $model->setImage($image);
+            }
+        }
+
         // Clear and create the moderator list
         $model->setModeratorList(new Collection());
+        // because of BelgianSuggest I have to check if this is even an array!
         if (is_array($post['moderator_id'])) {
             foreach ($post['moderator_id'] as $moderator_id) {
                 $user = new User();
