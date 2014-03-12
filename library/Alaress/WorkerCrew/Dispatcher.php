@@ -128,7 +128,7 @@ class Dispatcher implements DispatcherInterface {
 			return;
 		}
 
-		$this->v->v("Dispatching...");
+//		$this->v->v("Dispatching...");
 
 		/**
 		 * @var object $identifier
@@ -153,7 +153,7 @@ class Dispatcher implements DispatcherInterface {
 
 		// all workers are tied up and ceiling has been reached - please wait
 		if(!$this->pool->canAccept()) {
-			$this->v->v("Cannot accept right now, will try again", '*');
+//			$this->v->v("Cannot accept right now, will try again", '*');
 			return;
 		}
 
