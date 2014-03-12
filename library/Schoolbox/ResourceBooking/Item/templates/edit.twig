@@ -139,11 +139,9 @@
 
     {# I need some sort of permission check method, because not all users can delete #}
     {% if item.id %}
-    <input id="resource-delete"
-           type="submit"
-           value="Delete"
-           class="submit-btn-plain"
-           data-action="{{ routeLookup('resourceItem.delete:post', {id: item.id}) }}"
-    />
+    <a id="resource-delete"
+       class="submit-btn-plain"
+       data-action="{{ routeLookup('resourceItem.delete:post', {id: item.id}) }}"
+    >Delete</a>
     {% endif %}
 </form>
