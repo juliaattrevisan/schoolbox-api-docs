@@ -68,9 +68,11 @@ class Interceptor {
 	 * @return bool
 	 */
 	public function reroute($userId, $msg) {
-		// fail fast: if it's already been rerouted, don't try again
-		if(array_key_exists('rerouted', $msg->get('extra'))) {
-			return false;
+		if($msg->has('extra')) {
+			// fail fast: if it's already been rerouted, don't try again
+			if(array_key_exists('rerouted', $msg->get('extra'))) {
+				return false;
+			}
 		}
 
 		// yes we are "rerouting" this message...rerouting it to /dev/null! *mwa ha ha*
@@ -97,7 +99,7 @@ class Interceptor {
 		$newChannel = 'notify.user.' . $userId;
 		$newLevelName = Logger::getLevelName($newLevel);
 
-		$msg->set('extra', array_merge($msg->get('extra'), array(
+		$msg->set('extra', array_merge($msg->has('extra') ? $msg->get('extra') : array(), array(
 			'rerouted' => $msg->get('channel')
 		)));
 
