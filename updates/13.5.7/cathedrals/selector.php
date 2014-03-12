@@ -9,7 +9,14 @@
  */
 require_once __DIR__.'/../../../include/Bootstrap.php';
 
-$dailyQuoteMapper = new \DailyQuote\QuoteMapper();
-$dailyQuote = $dailyQuoteMapper->findRandomQuote();
+$dailyQuoteConfigMapper = new \DailyQuote\ConfigMapper();
+$lastSelected = $dailyQuoteConfigMapper->findByColumn('name', 'last_selected')->first();
 
-new \Alaress_Probe($dailyQuote);
+$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+if ($lastSelected != $now->getDatabase()) {
+	$dailyQuoteMapper = new \DailyQuote\QuoteMapper();
+	$dailyQuote = $dailyQuoteMapper->findRandomQuote();
+
+	new \Alaress_Probe($dailyQuote);
+}
