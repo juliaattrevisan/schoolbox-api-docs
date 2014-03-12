@@ -14,38 +14,38 @@ class Reroute {
 
 	/** @var int */
 	protected $relationId;
-	/** @var int */
+	/** @var string */
 	protected $relationType;
-	/** @var int */
+	/** @var string */
 	protected $routingKey;
-	/** @var string */
+	/** @var int */
 	protected $incomingLevel;
-	/** @var string */
+	/** @var int */
 	protected $outgoingLevel;
 
 	/**
-	 * @param string $incomingLevel
+	 * @param int $incomingLevel
 	 */
 	public function setIncomingLevel($incomingLevel) {
 		$this->incomingLevel = $incomingLevel;
 	}
 
 	/**
-	 * @return string
+	 * @return int
 	 */
 	public function getIncomingLevel() {
 		return $this->incomingLevel;
 	}
 
 	/**
-	 * @param string $outgoingLevel
+	 * @param int $outgoingLevel
 	 */
 	public function setOutgoingLevel($outgoingLevel) {
 		$this->outgoingLevel = $outgoingLevel;
 	}
 
 	/**
-	 * @return string
+	 * @return int
 	 */
 	public function getOutgoingLevel() {
 		return $this->outgoingLevel;
@@ -66,32 +66,33 @@ class Reroute {
 	}
 
 	/**
-	 * @param int $relationType
+	 * @param string $relationType
 	 */
 	public function setRelationType($relationType) {
 		$this->relationType = $relationType;
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function getRelationType() {
 		return $this->relationType;
 	}
 
 	/**
-	 * @param int $routingKey
+	 * @param string $routingKey
 	 */
 	public function setRoutingKey($routingKey) {
 		$this->routingKey = $routingKey;
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function getRoutingKey() {
 		return $this->routingKey;
 	}
+
 
 
 
