@@ -36,6 +36,9 @@ class Pipe implements PipeInterface {
 	/** @var int */
 	protected $userId;
 
+	/** @var string */
+	protected $sessionId;
+
 	/**
 	 * @param ConnectionInterface $conn
 	 */
@@ -58,19 +61,20 @@ class Pipe implements PipeInterface {
 	 * @return string
 	 */
 	public function getSession() {
-		$cookies = static::getHeader($this->socketConnection, 'cookie');
 
-		// got session
-		if(($i = strpos($cookies, PipeManager::PHP_SESSION_PREFIX)) !== false) {
-			$len = strlen(PipeManager::PHP_SESSION_PREFIX);
-			$start = $i + $len;
-			$end = (strpos($cookies, ';', $start) ?: (strlen($cookies)) - $start);
-			$session = substr($cookies, $start, $end);
+		// only do this once
+		if(!$this->sessionId) {
+			$cookieString = static::getHeader($this->socketConnection, 'cookie');
 
-			return $session;
+			preg_match_all('`([A-Za-z]+)=([^;]+)`', $cookieString, $matches);
+
+			$cookies = array_combine($matches[1], $matches[2]);
+
+			if(isset($cookies[PipeManager::PHP_SESSION_PREFIX])) {
+				$this->sessionId = $cookies[PipeManager::PHP_SESSION_PREFIX];
+			}
 		}
-
-		return '';
+		return $this->sessionId;
 	}
 
 	/**
