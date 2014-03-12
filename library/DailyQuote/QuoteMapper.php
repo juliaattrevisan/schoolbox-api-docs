@@ -17,6 +17,7 @@ class QuoteMapper extends \Schoolbox\Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
+		$this->hasModel('\\DailyQuote\\Quote');
 		$this->hasTable('dailyquote_data');
 
 		$this->hasMap(array(
@@ -76,9 +77,11 @@ class QuoteMapper extends \Schoolbox\Mapper {
 		$row = $statement->fetch();
 
 		if ($row != false) {
-			new \Alaress_Probe($row);
-		}
+			$quoteItem = $this->hydrate($row, 'q');
 
+			return $quoteItem;
+		}
+		
 		throw new \Exception('Instance of object not found');
 	}
 }
