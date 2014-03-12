@@ -29,9 +29,11 @@ class Component_Homepage_DailyQuoteController extends Component_Homepage_Control
 	 * @return bool
 	 */
    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'dailyQuote')) {
-            return false;
-        }
+		if(!parent::loadTemplate($templateHandle, 'dailyQuote')) {
+			return false;
+		}
+
+	   $this->parseConfig();
 
 	   $factory = new \DailyQuote\Factory();
 	   $dailyQuote = $factory->produce();
