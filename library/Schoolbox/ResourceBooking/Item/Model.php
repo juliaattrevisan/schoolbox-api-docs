@@ -12,6 +12,7 @@ namespace Schoolbox\ResourceBooking\Item;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Storage;
 use Alaress_Date_Format;
 use DateInterval;
 use Schoolbox\User;
@@ -27,6 +28,11 @@ class Model implements ISoftDeletable {
      * @var Category\Model
      */
     protected $category;
+
+    /**
+     * @var Storage
+     */
+    protected $image;
 
     /**
      * @var ModerationType\Model
@@ -260,6 +266,22 @@ class Model implements ISoftDeletable {
      */
     public function getModerationType() {
         return $this->moderationType;
+    }
+
+    /**
+     * @param  Storage $image
+     * @return $this
+     */
+    public function setImage($image) {
+        $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * @return Storage
+     */
+    public function getImage() {
+        return $this->image;
     }
 
     /**

@@ -35,6 +35,14 @@ class Mapper extends BaseMapper {
         );
         $this->hasMap(
             array(
+                'column'   => 'storage_image_id',
+                'property' => 'image',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'storage_image',
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'resource_moderation_type_id',
                 'property' => 'moderationType',
                 'type'     => self::TYPE_MODEL,
@@ -111,6 +119,14 @@ class Mapper extends BaseMapper {
             array(
                 'mapper'    => '\\Schoolbox\\ResourceBooking\\Category\\Mapper',
                 'this_key'  => 'resource_category_id',
+                'other_key' => 'id',
+            )
+        );
+        $this->hasJoin(
+            'image',
+            array(
+                'mapper'    => '\\Schoolbox\\StorageMapper',
+                'this_key'  => 'storage_image_id',
                 'other_key' => 'id',
             )
         );
