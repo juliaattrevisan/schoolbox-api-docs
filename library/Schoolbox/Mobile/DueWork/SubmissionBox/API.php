@@ -60,7 +60,7 @@ class API extends Generic\API {
 	    if ($cat->getCodes()->count() && Cfg::get('external_enable')) {
 
 		    $externalClassHandler = new External_Class();
-		    $listSyns = $externalClassHandler->getTeacherName($cat->getCodes()->first()->getCode());
+		    $listSyns = $externalClassHandler->getTeacherName($cat->getCodeString());
 		    $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
 		    if (is_array($listSyns)) {
