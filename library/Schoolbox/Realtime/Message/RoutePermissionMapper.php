@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Message;
 
 
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 
 class RoutePermissionMapper extends Mapper {
 
@@ -22,12 +23,14 @@ class RoutePermissionMapper extends Mapper {
 			'column'     => 'msg_source_id',
 			'property'   => 'msgSource',
 			'type'       => self::TYPE_MODEL,
+			'join'       => 'msg_source',
 			'identifier' => true,
 		));
 		$this->hasMap(array(
 			'column'     => 'role_id',
 			'property'   => 'role',
 			'type'       => self::TYPE_MODEL,
+			'join'       => 'role',
 			'identifier' => true,
 		));
 		$this->hasMap(array(
@@ -57,5 +60,13 @@ class RoutePermissionMapper extends Mapper {
 			'other_key' => 'id',
 		));
 	}
+
+	public function findById($msgSourceId, $roleId) {
+		return parent::findOneByColumnList(array(
+			'msg_source_id' => $msgSourceId,
+			'role_id'       => $roleId
+		));
+	}
+
 
 }

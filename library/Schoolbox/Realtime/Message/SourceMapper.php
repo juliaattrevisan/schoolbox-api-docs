@@ -28,6 +28,7 @@ class SourceMapper extends Mapper {
 			'column'     => 'namespace',
 			'property'   => 'namespace',
 			'type'       => self::TYPE_MODEL,
+			'join'       => 'namespace'
 		));
 		$this->hasMap(array(
 			'column'     => 'key',

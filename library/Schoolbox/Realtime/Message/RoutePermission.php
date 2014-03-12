@@ -10,12 +10,14 @@
 namespace Schoolbox\Realtime\Message;
 
 
+use Schoolbox\Role;
+
 class RoutePermission {
 
+	/** @var Source */
+	protected $msgSource;
 	/** @var int */
-	protected $msgSourceId;
-	/** @var int */
-	protected $roleId;
+	protected $role;
 	/** @var int */
 	protected $minLevel;
 	/** @var int */
@@ -65,32 +67,41 @@ class RoutePermission {
 		return $this->minLevel;
 	}
 
-	/**
-	 * @param int $msgSourceId
-	 */
-	public function setMsgSourceId($msgSourceId) {
-		$this->msgSourceId = $msgSourceId;
+	/** @return array */
+	public function getLevels() {
+		return array(
+			'max' => $this->maxLevel,
+			'default' => $this->defaultLevel,
+			'min' => $this->minLevel
+		);
 	}
 
 	/**
-	 * @return int
+	 * @param Source $msgSource
 	 */
-	public function getMsgSourceId() {
-		return $this->msgSourceId;
+	public function setMsgSource($msgSource) {
+		$this->msgSource = $msgSource;
 	}
 
 	/**
-	 * @param int $roleId
+	 * @return Source
 	 */
-	public function setRoleId($roleId) {
-		$this->roleId = $roleId;
+	public function getMsgSource() {
+		return $this->msgSource;
 	}
 
 	/**
-	 * @return int
+	 * @param Role $role
 	 */
-	public function getRoleId() {
-		return $this->roleId;
+	public function setRole($role) {
+		$this->role = $role;
+	}
+
+	/**
+	 * @return Role
+	 */
+	public function getRole() {
+		return $this->role;
 	}
 
 

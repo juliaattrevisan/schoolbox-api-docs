@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Message;
 
 
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 
 class RerouteMapper extends Mapper {
 
@@ -50,6 +51,23 @@ class RerouteMapper extends Mapper {
 
 	}
 
+
+	/**
+	 * @override base mapper findById functionality to compensate for multiKey
+	 * @param mixed $relationId
+	 * @param $relationType
+	 * @param $routingKey
+	 * @param $incomingLevel
+	 * @return Reroute
+	 */
+	public function findById($relationId, $relationType, $routingKey, $incomingLevel) {
+		return parent::findOneByColumnList(array(
+			'relation_id'    => $relationId,
+			'relation_type'  => $relationType,
+			'routing_key'    => $routingKey,
+			'incoming_level' => $incomingLevel
+		));
+	}
 
 
 }
