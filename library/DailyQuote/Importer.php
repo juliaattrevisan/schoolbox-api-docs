@@ -42,8 +42,8 @@ class Importer {
 
 		while ($row = fgetcsv($inputFile, 4096)) {
 			$quote = new \DailyQuote\Quote();
-			$quote->setDescription($row[0]);
-			$quote->setAuthor($row[1]);
+			$quote->setDescription(trim($row[0]));
+			$quote->setAuthor(trim($row[1]));
 			$quote->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$quote->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
