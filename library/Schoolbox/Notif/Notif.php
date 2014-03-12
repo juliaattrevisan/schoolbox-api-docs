@@ -112,15 +112,19 @@ class Notif implements LoggerInterface {
 	/**
 	 * @param string $title
 	 * @param string $to
-	 * @param string $from
+	 * @param string|array $from
 	 * @param int $severity
 	 * @return SwiftMailerHandler
 	 */
 	protected function createMailHandler($title, $to, $from, $severity) {
 		$mail = new Swift_Message($title, null, 'text/plain', 'utf-8');
 		$mail->setTo($to);
-		$mail->setFrom($from);
-
+		if(is_array($from)) {
+			$mail->setFrom($from[0], $from[1]);
+		}
+		else {
+			$mail->setFrom($from);
+		}
 		return new SwiftMailerHandler(new Swift_Mailer(
 			Mailer::getConfiguredSwiftTransport($this->conf, true)), $mail, $severity, false
 		);
@@ -139,7 +143,8 @@ class Notif implements LoggerInterface {
 		// [0] top priority: system failure
 		if(!isset($this->handlers['fatalMailer'])) {
 			$this->handlers['fatalMailer'] = $this->createMailHandler('Schoolbox is Down',
-				$this->conf->get('mail_support_address'), 'notif@alaress.com.au', Logger::EMERGENCY
+				$this->conf->get('mail_support_address'), array('notif@alaress.com.au', $this->conf->get('title')),
+				Logger::EMERGENCY
 			);
 		}
 
@@ -149,7 +154,8 @@ class Notif implements LoggerInterface {
 		// [1] system warning
 		if(!isset($this->handlers['sysMailer'])) {
 			$this->handlers['sysMailer'] = $this->createMailHandler('Schoolbox Requires Your Attention',
-				$this->conf->get('mail_support_address'), 'notif@alaress.com.au', Logger::ALERT
+				$this->conf->get('mail_support_address'), array('notif@alaress.com.au', $this->conf->get('title')),
+				Logger::ALERT
 			);
 		}
 
@@ -163,7 +169,8 @@ class Notif implements LoggerInterface {
 		else {
 			if(!isset($this->handlers['exceptionMailer'])) {
 				$this->handlers['exceptionMailer'] = $this->createMailHandler('Uncaught Exception in Schoolbox',
-					'support@alaress.com.au', 'notif@alaress.com.au', Logger::CRITICAL
+					'matt.day+support@alaress.com.au', array('notif@alaress.com.au', $this->conf->get('title')),
+					Logger::CRITICAL
 				);
 			}
 
