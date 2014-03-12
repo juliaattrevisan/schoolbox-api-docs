@@ -81,7 +81,7 @@ class QuoteMapper extends \Schoolbox\Mapper {
 
 			return $quoteItem;
 		}
-		
+
 		throw new \Exception('Instance of object not found');
 	}
 }
