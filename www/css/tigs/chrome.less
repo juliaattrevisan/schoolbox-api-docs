@@ -115,6 +115,7 @@
 
   #tabs{
     top: 33px;
+    margin-left: 217px;
     position: relative;
 
     li{
@@ -137,11 +138,53 @@
 }
 
 #nav{
+  width: 217px;
+
   h3,h4{
     border-bottom: 1px solid @border-color;
-    padding-bottom: 4px;
+    padding: 0 0 4px 17px;
     font-size: 14px;
   }
+  ul ul{ left: 217px; width: 217px; }
+  li{
+    a{
+      padding: 4px 16px 4px 34px;
+    }
+    // Docs - all other things
+    a[href^="/"],
+    a[href^="/"]:hover,
+    a[href^="#"],
+    a[href^="#"]:hover{
+      background-image: url(/images/tigs/file.png);
+      background-position: 15px 4px;
+      background-repeat: no-repeat;
+    }
+    // Home
+    a[href="/home.php"],
+    a[href="/home.php"]:hover{
+      background-image: url(/images/tigs/hat.png);
+      background-position: 15px 6px;
+      background-repeat: no-repeat;
+    }
+    // Information
+    a[href="/information.php"],
+    a[href="/information.php"]:hover{
+      background-image: url(/images/tigs/info.png);
+      background-position: 15px 4px;
+      background-repeat: no-repeat;
+    }
+    // logout
+    a[href="/logout.php"],
+    a[href="/logout.php"]:hover{
+      background-image: url(/images/tigs/logoff.png);
+      background-position: 15px 4px;
+      background-repeat: no-repeat;
+    }
+  }
+}
+
+#nav li:hover > a, #nav ul li a:hover, #nav li li a:hover{
+  background-color: #f0f0f0;
 }
 
 #container{
@@ -150,6 +193,7 @@
   border-left: 1px solid #c6c6c6;
   top: 32px;
   position: relative;
+  margin-left: 217px;
 
   #content{
     h2{ border-bottom: 1px solid @border-color; }
