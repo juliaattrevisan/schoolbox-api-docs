@@ -1,9 +1,6 @@
 #!/usr/bin/php
 <?php
-use React\Stream\Stream;
-use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\Queue\UserQueueFactory;
-use Alaress\WorkerCrew\Pooling\DefaultStrategy;
+
 use Schoolbox\Realtime\Verboser;
 
 /**

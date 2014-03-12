@@ -22,7 +22,7 @@ require_once "mini-bootstrap.php";
 $opts = getopt('dvp::c::');
 
 $verbose = isset($opts['v']);
-$port = empty($opts['p']) ? 8080 : $opts['p'];
+$port = empty($opts['p']) ? 9081 : $opts['p'];
 $conf = empty($opts['c']) ? 'socketd.conf' : $opts['c'];
 $debug = isset($opts['d']);
 
@@ -57,6 +57,8 @@ for($i = $low; $i <= $high; ++$i) {
 	if($pid > 0) {
 		continue;
 	}
+	// gotta do this, won't do it automatically
+	Database::reinitialise();
 
 	$verboser = new \Schoolbox\Realtime\Verboser($verbose ? fopen("p$i.log", 'w') : null);
 

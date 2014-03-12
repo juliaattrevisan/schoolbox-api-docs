@@ -15,8 +15,8 @@ use PhpAmqpLib\Message\AMQPMessage;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\Reroute\Reroute;
-use Schoolbox\Notif\Reroute\RerouteMapper;
+use Schoolbox\Realtime\Message\Reroute;
+use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 

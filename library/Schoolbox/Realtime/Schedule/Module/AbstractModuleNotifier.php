@@ -10,11 +10,14 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 
+use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\TopicFactory;
+use Schoolbox\Realtime\Message\NS;
+use Schoolbox\Realtime\Message\Source;
+use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Realtime\Schedule\ScheduleException;
-use Schoolbox\Role;
 
 abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 
@@ -29,6 +32,9 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 
 	/** @var Mapper */
 	protected $mapper;
+
+	/** @var NS */
+	protected $namespace;
 
 
 	/**
@@ -64,22 +70,33 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 
 	/**
 	 * Return the list of callbacks that are associated with this trigger.
+	 * Uses SQL lookup to determine code paths. Dirty and awful, but at the moment the best way forward.
 	 *
 	 * @param $label
 	 * @return array
 	 */
 	public function retrieveCallbacks($label) {
+		/** @var SourceMapper $m */
+		$m = SourceMapper::getInstance();
 
-		$callables = array();
+		/** @var Collection|Source[] $sourceCollection */
+		$sourceCollection = $m->findByColumnList(array(
+			'namespace' => $this->namespace->getId(),
+			'key' => $label
+		));
 
-		foreach(array(Role::STUDENT, Role::PARENT, Role::STAFF) as $role) {
-			$method = sprintf("notify%s%s", ucfirst($role), ucfirst($label));
+		$callbacks = array();
+
+		foreach($sourceCollection as $source) {
+			$method = sprintf("notify%s%s",
+				ucfirst(strtolower($source->getRoleType())),
+				ucfirst(strtolower($source->getKey()))
+			);
 			if(method_exists($this, $method)) {
-				$callables[$role] = array($this, $method);
+				$callbacks[] = array($this, $method);
 			}
 		}
-
-		return $callables;
+		return $callbacks;
 	}
 
 
@@ -105,5 +122,15 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		$this->instantiateMapper();
 		$this->loadDependencies();
 	}
+
+	/**
+	 * Return the message namespace this module conforms to.
+	 *
+	 * @return NS
+	 */
+	public function getNamespace() {
+		return $this->namespace;
+	}
+
 
 }

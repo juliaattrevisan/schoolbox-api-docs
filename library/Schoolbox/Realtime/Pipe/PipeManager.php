@@ -22,7 +22,6 @@ use React\Stomp\Factory as StompFactory;
 use Schoolbox\Notif\Message\Interceptor;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UnreadMessage;
-use Schoolbox\Realtime\MessageHandlerInterface;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
 use Schoolbox\Realtime\Stomp\SubscriptionException;
@@ -42,7 +41,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 class PipeManager implements WampServerInterface, MessageComponentInterface, TaskResponseHandlerInterface {
 
 	const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
-	const PHP_SESSION_PREFIX   = 'PHPSESSID=';
+	const PHP_SESSION_PREFIX   = 'PHPSESSID';
 
 	/** @var PipeCollection */
 	protected $pipes;

@@ -19,6 +19,7 @@ use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
+use React\Stomp\Exception\ConnectionException;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\IConfigLoader;
@@ -102,31 +103,40 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 		// create a stomp client for listening to Mapper messages coming in
 		$stompFactory = new Factory($this->loop);
-		$stompClient = $stompFactory->createClient(array(
-			'host'      => $this->conf->get('amqp_host'),
-			'port'      => $this->conf->get('amqp_stomp_host'),
-			'vhost'     => '/',
-			'login'     => $this->conf->get('amqp_user'),
-			'passcode'  => $this->conf->get('amqp_pass'),
-		));
 
-		$v = $this->verboser;
-		$self = $this;
+		try {
+			$stompClient = $stompFactory->createClient(array(
+				'host'      => $this->conf->get('amqp_host'),
+				'port'      => $this->conf->get('amqp_stomp_port'),
+				'vhost'     => '/',
+				'login'     => $this->conf->get('amqp_user'),
+				'passcode'  => $this->conf->get('amqp_pass'),
+			));
 
-		/** Connect to stomp via the provided loop */
-		$stompClient->connect()->then(function($client) use ($v, $self) {
-			// this closure is called when stomp successfully connects
-			/** @var Client $client */
-			$v->v("Scheduler connected to STOMP", '+');
+			$v = $this->verboser;
+			$self = $this;
 
-			// make sure our endpoint exists
-			$mqc = new Connector();
-			$mqc->declareQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE);
-			$mqc->bindQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, '*.' . Notif::TOPIC_APPLICATION);
+			/** Connect to stomp via the provided loop */
+			$stompClient->connect()->then(function($client) use ($v, $self) {
+				// this closure is called when stomp successfully connects
+				/** @var Client $client */
+				$v->v("Scheduler connected to STOMP", '+');
 
-			/** Subscribe to the queue set aside for the scheduler */
-			$client->subscribeWithAck('/amq/queue/' . INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, 'client', array($self, 'onAMQP'));
-		});
+				// make sure our endpoint exists
+				$mqc = new Connector();
+				$mqc->declareQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE);
+				$mqc->bindQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, '*.' . Notif::TOPIC_APPLICATION);
+
+				/** Subscribe to the queue set aside for the scheduler */
+				$client->subscribeWithAck('/amq/queue/' . INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, 'client', array($self, 'onAMQP'));
+			});
+		}
+		catch(ConnectionException $e) {
+			$notif = new Notif(Notif::TOPIC_NOTIFICATION);
+			$notif->alert("Cannot bind to messaging system: check your STOMP bindings and that RabbitMQ is running.");
+			$this->verboser->v('Rabbitmq is offline or STOMP misconfigured: '. $e->getMessage(), '!');
+		}
+
 	}
 
 

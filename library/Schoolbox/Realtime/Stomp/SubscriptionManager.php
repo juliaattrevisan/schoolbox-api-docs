@@ -13,11 +13,11 @@ namespace Schoolbox\Realtime\Stomp;
 use React\Stomp\Client;
 use React\Stomp\Exception\ConnectionException;
 use React\Stomp\Factory;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Realtime\Pipe\Pipe;
 use Schoolbox\Realtime\Pipe\PipeManager;
-use Schoolbox\Realtime\Pipe\Responder;
-use Schoolbox\User;
+use Schoolbox\Realtime\Pipe\SelfResponder;
 
 class SubscriptionManager {
 
@@ -30,6 +30,9 @@ class SubscriptionManager {
 	/** @var Subscription[] */
 	protected $subscriptions;
 
+	/** @var IConfigLoader */
+	protected $conf;
+
 	/**
 	 * @param Factory $stompFactory
 	 * @param PipeManager $pipeManager
@@ -39,13 +42,14 @@ class SubscriptionManager {
 		$this->subscriptions = array();
 		$this->stompFactory = $stompFactory;
 		$this->pipeManager = $pipeManager;
+		$this->conf = ConfigMapper::getInstance();
 	}
 
 	/**
 	 * Add a subscription for the given user. If a pipe is provided, it will be notified upon success.
 	 *
 	 * @param int $userId
-	 * @param Responder $responder
+	 * @param SelfResponder $responder
 	 * @return bool
 	 */
 	public function subscribe($userId, $responder = null) {
@@ -53,7 +57,7 @@ class SubscriptionManager {
 			$this->pipeManager->v("User $userId is already subscribed");
 
 			// notify the pipe if it was supplied
-			if($responder instanceof Responder) {
+			if($responder instanceof SelfResponder) {
 				$responder->notifyPipe(json_encode(array('subscribe' => true)));
 			}
 
@@ -64,11 +68,11 @@ class SubscriptionManager {
 
 		try {
 			$client = $this->stompFactory->createClient(array(
-				'host'      => '127.0.0.1',
-				'port'      => 61613,
+				'host'      => $this->conf->get('amqp_host'),
+				'port'      => $this->conf->get('amqp_stomp_port'),
 				'vhost'     => '/',
-				'login'     => 'guest',
-				'passcode'  => 'guest',
+				'login'     => $this->conf->get('amqp_user'),
+				'passcode'  => $this->conf->get('amqp_pass'),
 			));
 
 			$self = $this;
@@ -79,7 +83,7 @@ class SubscriptionManager {
 				// this closure is executed when a stomp client connection is established
 				$self->putSubscription($destination, new Subscription($destination, $client, $userId, $self->getPipeManager()));
 				// if a responder is provided, use it as a callback for success
-				if($responder instanceof Responder) {
+				if($responder instanceof SelfResponder) {
 					$responder->notifyPipe(json_encode(array('subscribe' => true)));
 				}
 			});
@@ -89,8 +93,8 @@ class SubscriptionManager {
 		// the rabbit is probably offline
 		catch(ConnectionException $e) {
 			$notif = new Notif(Notif::TOPIC_NOTIFICATION);
-			$notif->critical("Cannot bind to messaging system: check your STOMP bindings and that RabbitMQ is running.");
-			$this->pipeManager->v('Rabbitmq is offline or STOMP misconfigured!', '!');
+			$notif->alert("Cannot bind to messaging system: check your STOMP bindings and that RabbitMQ is running.");
+			$this->pipeManager->v('Rabbitmq is offline or STOMP misconfigured: '. $e->getMessage(), '!');
 			return false;
 		}
 	}

@@ -10,7 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
-class SelfResponder extends Responder {
+class SelfResponder {
 
 	/** @var PipeManager */
 	protected $pipeManager;

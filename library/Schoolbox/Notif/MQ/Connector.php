@@ -10,11 +10,11 @@
 namespace Schoolbox\Notif\MQ;
 
 
-use EOTC\ConfigMapper;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\NotifException;
 
@@ -53,9 +53,9 @@ class Connector {
 	protected $conf;
 
 	public function __construct() {
+		$this->conf = ConfigMapper::getInstance();
 		// will implicitly load a connection and set up an exchange-declared channel
 		$this->getChannel();
-		$this->conf = ConfigMapper::getInstance();
 	}
 
 	/**

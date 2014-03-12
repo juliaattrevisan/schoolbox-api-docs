@@ -43,7 +43,7 @@ try {
 catch(AMQPRuntimeException $e) {
 	$verboser->v("Unable to connect to RabbitMQ: server is offline.",'!');
 	$n = new \Schoolbox\Notif\Notif(\Schoolbox\Notif\Notif::TOPIC_NOTIFICATION);
-	$n->critical('RabbitMQ is offline');
+	$n->alert('RabbitMQ is offline');
 	exit;
 }
 
