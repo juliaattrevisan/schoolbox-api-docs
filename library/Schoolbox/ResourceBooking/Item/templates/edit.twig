@@ -116,7 +116,7 @@
                 <em>This item must be reserved for at least this period of time.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.minReservationTime.format('%h') // 24 }}}}" name="min_reservation_time[day]"    placeholder="days"> days,
+                <input class="interval-input" value="{{ item.minReservationTime.format('%h') // 24 }}" name="min_reservation_time[day]"    placeholder="days"> days,
                 <input class="interval-input" value="{{ item.minReservationTime.format('%h')  % 24 }}" name="min_reservation_time[hour]"   placeholder="hours"> hours,
                 <input class="interval-input" value="{{ item.minReservationTime.format('%m') }}" name="min_reservation_time[minute]" placeholder="minutes"> minutes
             </td>
