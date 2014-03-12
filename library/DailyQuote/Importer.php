@@ -1,0 +1,93 @@
+<?php
+/**
+ * Importer
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace DailyQuote;
+
+
+class Importer {
+
+	/**
+	 * Path to the csv containing quotes to import
+	 *
+	 * @var string
+	 */
+	private $inputFile = '';
+
+	/**
+	 * An instance of QuoteMapper
+	 * @var QuoteMapper
+	 */
+	private $quoteMapper = null;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct($inputFile) {
+		$this->setInputFile($inputFile);
+		$this->setQuoteMapper(new \DailyQuote\QuoteMapper());
+	}
+
+	/**
+	 * Import csv data
+	 */
+	public function import() {
+		$inputFile = fopen($this->getInputFile(), 'r');
+
+		while ($row = fgetcsv($inputFile, 4096)) {
+			$quote = new \DailyQuote\Quote();
+			$quote->setDescription($row[0]);
+			$quote->setAuthor($row[1]);
+			$quote->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+			$quote->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+			$this->getQuoteMapper()->save($quote);
+		}
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set input file
+	 *
+	 * @param string $inputFile
+	 */
+	public function setInputFile($inputFile) {
+		$this->inputFile = $inputFile;
+	}
+
+	/**
+	 * Get input file
+	 *
+	 * @return string
+	 */
+	public function getInputFile() {
+		return $this->inputFile;
+	}
+
+	/**
+	 * Set quote mapper
+	 *
+	 * @param \DailyQuote\QuoteMapper $quoteMapper
+	 */
+	public function setQuoteMapper($quoteMapper) {
+		$this->quoteMapper = $quoteMapper;
+	}
+
+	/**
+	 * Get quote mapper
+	 *
+	 * @return \DailyQuote\QuoteMapper
+	 */
+	public function getQuoteMapper() {
+		return $this->quoteMapper;
+	}
+
+} 

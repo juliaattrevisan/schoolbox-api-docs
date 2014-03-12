@@ -7,10 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+require_once __DIR__.'/../../../include/Bootstrap.php';
 
-$inputFile = fopen('./quotes.csv', 'r');
-
-while ($row = fgetcsv($inputFile, 4096)) {
-	print_r($row);
-}
+$importer = new \DailyQuote\Importer('./quotes.csv');
+$importer->import();
 
