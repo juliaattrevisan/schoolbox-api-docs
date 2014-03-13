@@ -10,7 +10,6 @@
 namespace Schoolbox\Notif\Queue;
 
 
-use Schoolbox\Notif\Message\Interceptor;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 
 /**
@@ -45,9 +44,6 @@ class UserQueue {
 	/** @var int */
 	protected $userId;
 
-	/** @var Interceptor */
-	protected $interceptor;
-
 
 	/**
 	 * @param array $bindings
@@ -57,7 +53,6 @@ class UserQueue {
 	public function __construct($bindings, $mqConnector, $simulate = false) {
 		$this->conn = $mqConnector;
 		$this->userId = $bindings['user']['id'];
-		$this->interceptor = new Interceptor($this->conn);
 
 		unset($bindings['user']);
 
@@ -136,11 +131,12 @@ class UserQueue {
 
 		$nacks = array();
 
-		while($m = $this->conn->readFromQueue($this->getUnreadQueueName())) {
+		while($m = $this->conn->readFromQueue($this->getListedQueueName())) {
 			$nacks[] = $m;
 
 			// unwrap the serialisation
-			$body = $this->interceptor->unwrapMessageBody($m);
+			$body = json_decode($m->body, true);
+			$body['message'] = unserialize($body['message']);
 			$m->setBody((string)$body['message']);
 
 			$msg = new ReadMessage($m);
