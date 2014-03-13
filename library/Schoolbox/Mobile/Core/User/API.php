@@ -65,13 +65,22 @@ class API extends Generic\API {
 
 		$response = new Response_HTTP();
 
-		// permission granted
+		/* Restrict parents' access to Due Work page depending on config setting
+		 */
+		if (!(\Cfg::get('restrict_parent_duework_access') && $sessionUser->getRole()->isParent())) {
+			$duework = true;
+		}
+		else {
+			$duework = false;
+		}
 
+		// permission granted
 
 		$profile = array(
 			'id'       => $targetUser->getId(),
 			'fullname' => $targetUser->formatName(),
-			'photouri' => '/portrait.php?userId='. $targetUser->getExternalId() .'&size=profile'
+			'photouri' => '/portrait.php?userId='. $targetUser->getExternalId() .'&size=profile',
+			'duework' => $duework,
 		);
 
 		// find out how much due work there is by using data from sidebar
