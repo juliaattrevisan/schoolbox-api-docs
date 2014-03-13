@@ -13,6 +13,7 @@ namespace Schoolbox\Notif;
 use BadMethodCallException;
 use ConfigFallback;
 use Mailer;
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
@@ -26,6 +27,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Handler\AMQPHandler;
 use Schoolbox\Notif\Handler\DigestHandler;
+use Schoolbox\Notif\Handler\InstamailHandler;
 use Schoolbox\Notif\Handler\MessageHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
@@ -114,9 +116,10 @@ class Notif implements LoggerInterface {
 	 * @param string $to
 	 * @param string|array $from
 	 * @param int $severity
+	 * @param bool $bubble
 	 * @return SwiftMailerHandler
 	 */
-	protected function createMailHandler($title, $to, $from, $severity) {
+	protected function createMailHandler($title, $to, $from, $severity, $bubble = false) {
 		$mail = new Swift_Message($title, null, 'text/plain', 'utf-8');
 		$mail->setTo($to);
 		if(is_array($from)) {
@@ -126,7 +129,7 @@ class Notif implements LoggerInterface {
 			$mail->setFrom($from);
 		}
 		return new SwiftMailerHandler(new Swift_Mailer(
-			Mailer::getConfiguredSwiftTransport($this->conf, true)), $mail, $severity, false
+			Mailer::getConfiguredSwiftTransport($this->conf, true)), $mail, $severity, $bubble
 		);
 	}
 
@@ -201,18 +204,20 @@ class Notif implements LoggerInterface {
 			array_push($stack, $syslog);
 		}
 		else {
+
+			if(!isset($this->handlers['plusmail'])) {
+
+				$this->handlers['plusmail'] = new InstamailHandler(
+					new Swift_Mailer(Mailer::getConfiguredSwiftTransport($this->conf, true)), Logger::WARNING, true);
+			}
+			array_push($stack, $this->handlers['plusmail']);
+
 			try {
 				// [3d] instant user message (notice)
 				if(!isset($this->handlers['instant'])) {
 					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::NOTICE, false);
 				}
 				array_push($stack, $this->handlers['instant']);
-
-				// [3e] digest user message
-				if(!isset($this->handlers['digest'])) {
-					$this->handlers['digest'] = new DigestHandler($this->mqc, Logger::INFO, false);
-				}
-				array_push($stack, $this->handlers['digest']);
 			}
 			catch(NotifException $e) {
 				// no connection to rabbit available. We should be able to safely ignore this
