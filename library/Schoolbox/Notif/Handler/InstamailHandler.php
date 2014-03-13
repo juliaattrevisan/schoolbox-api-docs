@@ -8,17 +8,17 @@
  */
 
 namespace Schoolbox\Notif\Handler;
+use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
-use Schoolbox\Notif\MQ\Connector as MQConnector;
 
 
 /**
- * Handler for passing messages to the email digest
+ * Handler for sending instant emails
  *
- * Class DigestHandler
+ * Class InstamailHandler
  * @package Schoolbox\Notif\Handler
  */
-class DigestHandler extends AMQPHandler {
+class InstamailHandler extends SwiftMailerHandler {
 
 	public function __construct($connection, $level = Logger::DEBUG, $bubble = true) {
 		parent::__construct($connection, $level, $bubble);
@@ -35,7 +35,6 @@ class DigestHandler extends AMQPHandler {
 
 		$routingKey = sprintf(
 			'DIGE.%s',
-			substr($record['level_name'], 0, 4),
 			$record['channel'] ?: 'system'
 		);
 
