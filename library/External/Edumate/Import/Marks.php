@@ -104,7 +104,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			 */
 			$submissionReturn->setComment('');
 			$submissionReturn->setMark($row['MARK'] . ' / ' . $submissionBox->getMaxMark());
-			$submissionReturn->setNormalizedMark($row['MARK']);
+			$submissionReturn->setNormalizedMark(100 * (float)$row['MARK']/(float)$submissionBox->getMaxMark());
 			$submissionReturn->setFilename(null);
 			$submissionReturn->setFilesize(null);
 			$submissionReturn->setMimetype(null);
