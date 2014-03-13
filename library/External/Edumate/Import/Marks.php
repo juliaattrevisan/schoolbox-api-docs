@@ -44,8 +44,19 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				$submissionReturn->setReturned(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			}
 			else {
-				$submissionReturnId = $marksMapper->findReturnFromTask($row['TASK_ID'], $row['CLASS_CODE']);
-				$submissionReturn = $submissionReturnMapper->findById($submissionReturnId);
+				/* Reuse an existing Submission Return
+				 */
+				if ($marksMapper->isNeedUpdate($row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED'])) {
+					$submissionReturnId = $marksMapper->findReturnFromTask($row['TASK_ID'], $row['CLASS_CODE']);
+					$submissionReturn = $submissionReturnMapper->findById($submissionReturnId);
+				}
+				else {
+					/* Skip everything, because this Edumate Mark hasn't been updated
+					 * since the last time we imported it
+					 */
+					echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} in {$row['CLASS_CODE']} - Nothing to update \n";
+					continue;
+				}
 			}
 
 			/* Make sure the Submission Box exists first because we need to find the
@@ -86,7 +97,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				$submissionReturn->setOwner($student->first());
 			}
 			else {
-				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} - Student not found \n";
+				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} in {$row['CLASS_CODE']} - Student not found \n";
 				continue;
 			}
 

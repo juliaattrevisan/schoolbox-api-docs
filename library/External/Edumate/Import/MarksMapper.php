@@ -42,6 +42,43 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 	}
 
 	/**
+	 * Find out if a particular Edumate Task has more recent data than the
+	 * Submission Box already in Schoolbox
+	 *
+	 * @param $edumateTaskId
+	 * @param $categoryCode
+	 * @param $lastUpdated
+	 * @return bool
+	 */
+	public function isNeedUpdate($edumateTaskId, $categoryCode, $lastUpdated) {
+		$query = "
+			SELECT COUNT(*) AS num
+			FROM submission_return_edumate_task
+			WHERE task_id = :edumateTaskId
+			AND category_code = :categoryCode
+			AND updated_at < :lastUpdated
+		";
+
+		$bits = explode('.', $lastUpdated);
+
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->bindParam(':edumateTaskId', $edumateTaskId);
+		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->bindParam(':lastUpdated', $bits[0]);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		if ($row !== false) {
+			if ($row['num'] > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Find a Submission Return associated with a Task ID/Category Code tuple
 	 *
 	 * @param $edumateTaskId
