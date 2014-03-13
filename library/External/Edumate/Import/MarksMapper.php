@@ -15,19 +15,22 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 	 *
 	 * @param $edumateTaskId
 	 * @param $categoryCode
+	 * @param $studentId
 	 * @return bool
 	 */
-	public function isTaskReturnExists($edumateTaskId, $categoryCode) {
+	public function isTaskReturnExists($edumateTaskId, $categoryCode, $studentId) {
 		$query = "
 			SELECT COUNT(*) AS num
 			FROM submission_return_edumate_task
 			WHERE task_id = :edumateTaskId
 			AND category_code = :categoryCode
+			AND student_id = :studentId
 		";
 
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindParam(':edumateTaskId', $edumateTaskId);
 		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->bindParam(':studentId', $studentId);
 		$statement->execute();
 
 		$row = $statement->fetch();
@@ -47,15 +50,17 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 	 *
 	 * @param $edumateTaskId
 	 * @param $categoryCode
+	 * @param $studentId
 	 * @param $lastUpdated
 	 * @return bool
 	 */
-	public function isNeedUpdate($edumateTaskId, $categoryCode, $lastUpdated) {
+	public function isNeedUpdate($edumateTaskId, $categoryCode, $studentId, $lastUpdated) {
 		$query = "
 			SELECT COUNT(*) AS num
 			FROM submission_return_edumate_task
 			WHERE task_id = :edumateTaskId
 			AND category_code = :categoryCode
+			AND student_id = :studentId
 			AND updated_at < :lastUpdated
 		";
 
@@ -64,6 +69,7 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindParam(':edumateTaskId', $edumateTaskId);
 		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->bindParam(':studentId', $studentId);
 		$statement->bindParam(':lastUpdated', $bits[0]);
 		$statement->execute();
 
@@ -83,19 +89,22 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 	 *
 	 * @param $edumateTaskId
 	 * @param $categoryCode
+	 * @param $studentId
 	 * @return null
 	 */
-	public function findReturnFromTask($edumateTaskId, $categoryCode) {
+	public function findReturnFromTask($edumateTaskId, $categoryCode, $studentId) {
 		$query = "
 			SELECT submission_return_id
 			FROM submission_return_edumate_task
 			WHERE task_id = :edumateTaskId
 			AND category_code = :categoryCode
+			AND student_id = :studentId
 		";
 
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindParam(':edumateTaskId', $edumateTaskId);
 		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->bindParam(':studentId', $studentId);
 		$statement->execute();
 
 		$row = $statement->fetch();
@@ -115,17 +124,23 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 	 * @param $submissionReturn
 	 * @param $edumateTaskId
 	 * @param $categoryCode
+	 * @param $studentId
+	 * @param $lastUpdated
 	 */
-	public function createReturnRelation($submissionReturn, $edumateTaskId, $categoryCode) {
+	public function createReturnRelation($submissionReturn, $edumateTaskId, $categoryCode, $studentId, $lastUpdated) {
 		$query = "
-			INSERT INTO submission_return_edumate_task (submission_return_id, task_id, category_code)
-			VALUES (:submissionReturnId, :edumateTaskId, :categoryCode)
+			INSERT INTO submission_return_edumate_task (submission_return_id, task_id, category_code, student_id, updated_at)
+			VALUES (:submissionReturnId, :edumateTaskId, :categoryCode, :studentId, :updatedAt)
 		";
+
+		$bits = explode('.', $lastUpdated);
 
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindParam(':submissionReturnId', $submissionReturn->getId());
 		$statement->bindParam(':edumateTaskId', $edumateTaskId);
 		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->bindParam(':studentId', $studentId);
+		$statement->bindParam(':updatedAt', $bits[0]);
 		$statement->execute();
 	}
 
@@ -135,15 +150,17 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 	 * @param $submissionReturn
 	 * @param $edumateTaskId
 	 * @param $categoryCode
+	 * @param $studentId
 	 * @param $lastUpdated
 	 */
-	public function updateReturnRelation($submissionReturn, $edumateTaskId, $categoryCode, $lastUpdated) {
+	public function updateReturnRelation($submissionReturn, $edumateTaskId, $categoryCode, $studentId, $lastUpdated) {
 		$query = "
 			UPDATE submission_return_edumate_task
 			SET updated_at = :updatedAt
 			WHERE submission_return_id = :submissionReturnId
 			AND task_id = :edumateTaskId
 			AND category_code = :categoryCode
+			AND student_id = :studentId
 		";
 
 		$bits = explode('.', $lastUpdated);
@@ -152,6 +169,7 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 		$statement->bindParam(':submissionReturnId', $submissionReturn->getId());
 		$statement->bindParam(':edumateTaskId', $edumateTaskId);
 		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->bindParam(':studentId', $studentId);
 		$statement->bindParam(':updatedAt', $bits[0]);
 		$statement->execute();
 	}
