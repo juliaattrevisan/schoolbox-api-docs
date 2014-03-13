@@ -54,7 +54,7 @@ class Subscription {
 		$this->userId = $userId;
 		$self = $this;
 
-		$this->destination = UserQueue::getUserUnreadQueueName($userId);
+		$this->destination = "/amq/queue/".UserQueue::getUserUnreadQueueName($userId);
 
 		// step 1: subscribe to the user's unread queue and push these immediately to the Pipe Manager
 		$this->id = $this->client->subscribeWithAck($this->destination, 'client',

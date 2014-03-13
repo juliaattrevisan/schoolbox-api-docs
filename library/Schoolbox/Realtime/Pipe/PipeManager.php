@@ -231,7 +231,16 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 		// append this message to be pushed
 		$data = (array)$this->pushTimerCache[$userId]->getData();
-		$data[$message->getId()] = $message->getBody();
+		$body = $message->getBody();
+
+		// just set this array up manually
+		$data[$message->getId()] = array(
+			'id' => $message->getId(),
+			'body' => $body['message']['body'],
+			'params' => $body['message']['params'],
+			'timestamp' => $body['timestamp'],
+			'status' => 'unread'
+		);
 		$this->pushTimerCache[$userId]->setData($data);
 
 		return true;

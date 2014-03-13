@@ -15,7 +15,6 @@ use React\Stomp\Exception\ConnectionException;
 use React\Stomp\Factory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Pipe\PipeManager;
