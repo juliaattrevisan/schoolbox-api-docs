@@ -86,8 +86,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				continue;
 			}
 
-			$category->loadTeachers();
-			$submissionReturn->setMarker($category->getTeachers()->first());
+			$submissionReturn->setMarker($submissionBox->getOwner());
 
 			/* Assign owner id
 			 */
