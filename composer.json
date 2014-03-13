@@ -7,7 +7,8 @@
         "swiftmailer/swiftmailer": "5.0.*",
         "maximebf/debugbar": "1.5.*",
         "shareworks/xml-security": "dev-master",
-        "predis/predis": "0.8.*"
+        "predis/predis": "0.8.*",
+        "html2text/html2text": "1.0.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

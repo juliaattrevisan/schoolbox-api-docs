@@ -195,7 +195,8 @@ class Mailer {
         //
         // construct body and set headers
         $body = $this->composeHTML();
-        $this->email->setBody(strip_tags($body), null, 'utf-8');
+        $converter = new \Html2Text\Html2Text($body);
+        $this->email->setBody($converter->get_text(), null, 'utf-8');
         $this->email->addPart($body, 'text/html', 'utf-8');
         foreach ($this->headers as $name => $value) {
             $this->email->getHeaders()->addTextHeader($name, $value);
