@@ -328,7 +328,7 @@
 				form.find('input[name=socialstreamAttachment]').val('upload');
 
 				form.find('input[name=url]').val('').closest('li').hide();
-				form.find('input[name=file]').closest('li').show().find('input[name=file').trigger('click');
+				form.find('input[name=file]').closest('li').show();
 				form.find('.socialstream-selected-file').html('').closest('li').hide();
 			});
 
