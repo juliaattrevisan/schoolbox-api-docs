@@ -26,14 +26,17 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\CompressionException;
 use Schoolbox\Notif\Message\External;
+use Schoolbox\Notif\Message\Interceptor;
 use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Message\MessageInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Verboser;
+use Schoolbox\UserMapper;
 use SplObjectStorage;
 
 /**
@@ -58,7 +61,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	protected $loop;
 
 	/** @var Verboser */
-	protected $verboser;
+	public $verboser;
 
 	/** @var array */
 	protected $timers;
@@ -125,6 +128,18 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 				/** Subscribe to the queue set aside for the scheduler */
 				$client->subscribeWithAck('/amq/queue/' . INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, 'client', array($self, 'onAMQP'));
+				$interceptor = new Interceptor(new Connector());
+
+				// subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
+				foreach(UserMapper::getInstance()->findAll()->getColumnValues('id') as $userId) {
+					$subn = '/amq/queue/'.UserQueue::getUserToSortQueueName($userId);
+//					$self->verboser->v("Subscribing to $subn");
+					$client->subscribe($subn, function($frame) use ($self, $interceptor, $userId) {
+						// this closure is executed every time a message is sent to the client based on the given subscription
+//						$self->verboser->v("Intercepting frame");
+						$interceptor->reroute($userId, $frame);
+					});
+				}
 			});
 		}
 		catch(ConnectionException $e) {

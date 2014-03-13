@@ -19,7 +19,6 @@ use Schoolbox\Notif\Queue\UnreadMessage;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Verboser;
-use Schoolbox\User;
 
 class Subscription {
 
@@ -56,7 +55,7 @@ class Subscription {
 
 		$this->destination = "/amq/queue/".UserQueue::getUserUnreadQueueName($userId);
 
-		// step 1: subscribe to the user's unread queue and push these immediately to the Pipe Manager
+		// subscribe to the user's unread queue and push these immediately to the Pipe Manager
 		$this->id = $this->client->subscribeWithAck($this->destination, 'client',
 			function ($frame, $ackResolver) use ($self, $pipeManager, $userId) {
 				// this closure is executed every time a message is sent to the client based on the given subscription
@@ -68,13 +67,6 @@ class Subscription {
 			}
 		);
 
-		// step 2: subscribe to the user's 'to sort' queue, and run those messages through the Interceptor
-		$this->client->subscribe(UserQueue::getUserToSortQueueName($userId),
-			function($frame) use ($self, $pipeManager, $userId) {
-				// this closure is executed every time a message is sent to the client based on the given subscription
-				$pipeManager->getInterceptor()->reroute($userId, $frame);
-			}
-		);
 	}
 
 	public function getId() {
