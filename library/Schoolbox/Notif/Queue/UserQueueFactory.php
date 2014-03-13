@@ -10,6 +10,8 @@
 namespace Schoolbox\Notif\Queue;
 use External_User;
 use Group;
+use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Campus;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Notif\MQ\Connector;
@@ -165,8 +167,8 @@ class UserQueueFactory {
 			// *.notify.campus.{id}
 			// *.notify.campus.{id}.{roletype}
 			/** @var Campus $campus */
-			$bindings['campus'][] = $campus->getId();
-			$bindings['campus'][] = $campus->getId() . ".$roleType";
+//			$bindings['campus'][] = $campus->getId();
+			$bindings['campus'][] = $campus->getId() . ".$roleType.#";
 		}
 
 		// house bindings
@@ -174,8 +176,8 @@ class UserQueueFactory {
 			// *.notify.house.{id}
 			// *.notify.house.{id}.{roletype}
 			$bindings['house'] = array(
-				$house,
-				$house . ".$roleType"
+//				$house,
+				$house . ".$roleType.#"
 			);
 		}
 
@@ -185,8 +187,8 @@ class UserQueueFactory {
 			// *.notify.reshouse.{id}
 			// *.notify.reshouse.{id}.{roletype}
 			$bindings['reshouse'] = array(
-				$resHouse,
-				$resHouse . ".$roleType"
+//				$resHouse,
+				$resHouse . ".$roleType.#"
 			);
 		}
 
@@ -201,15 +203,15 @@ class UserQueueFactory {
 			// category general participation
 			// *.notify.category.{id}
 			// *.notify.category.{id}.{roletype}
-			$bindings['category'][] = $cat->getId();
-			$bindings['category'][] = $cat->getId() . ".$roleType";
+//			$bindings['category'][] = $cat->getId();
+			$bindings['category'][] = $cat->getId() . ".$roleType.#";
 
 			// category admin
 			// *.notify.category.{id}.admin
 			$catOwner = $this->GET_DEPRECATED_GROUP()->getOwner($cat->getId());
 
 			if($catOwner['uid'] == $user->getId()) {
-				$bindings['category'][] = $cat->getId() . ".admin";
+				$bindings['category'][] = $cat->getId() . ".admin.#";
 			}
 
 			// category component bindings
@@ -246,11 +248,11 @@ class UserQueueFactory {
 
 		// role bindings
 		// *.notify.role.{id}
-		$bindings['role'] = array($user->getRole()->getId());
+		$bindings['role'] = array($user->getRole()->getId().".#");
 
 		// role-type bindings
 		// *.notify.roletype.{name}
-		$bindings['roletype'] = array($roleType);
+		$bindings['roletype'] = array("$roleType.#");
 
 		return $bindings;
 	}

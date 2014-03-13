@@ -14,15 +14,24 @@ use Schoolbox\Notif\Message\Interceptor;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 
 /**
- * This class abstracts two AMQP queues, one each for read and unread.
+ * This class abstracts several AMQP queues, one for each of 'digest', 'listed', 'unread' and 'to be sorted'.
  *
  * Class UserQueue
  * @package Schoolbox\Notif\Queue
  */
 class UserQueue {
 
-	const QUEUE_ALL_MESSAGES = '%s.u.%s.all';
+	// queue of messages that have been accepted by broadcast, but need to be filtered onto the other queues
+	const QUEUE_TOSORT_MESSAGES = '%s.u.%s.tosort';
+
+	// queue of messages that have been received by Instant but have not yet expired
+	const QUEUE_LISTED_MESSAGES = '%s.u.%s.listed';
+
+	// queue of messages that have been received by Instant and have not yet been read
 	const QUEUE_UNREAD_MESSAGES = '%s.u.%s.unread';
+
+	// queue of messages that are pending to be sent by Digest
+	const QUEUE_DIGEST_MESSAGES = '%s.u.%s.digest';
 
 	/** @var AbstractMessage[] */
 	protected $messages = array();
@@ -66,19 +75,27 @@ class UserQueue {
 			return;
 		}
 
-		$exchange = MQConnector::getSecondaryExchangePrefix() . $this->userId;
+		$exchange = $this->getExchangeName();
 
 		// one connection to declare them all...
 		$this->conn->declareExchange($exchange);
-		$this->conn->declareQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, INSTANCE_ID, $this->userId));
-		$this->conn->declareQueue(sprintf(self::QUEUE_ALL_MESSAGES, INSTANCE_ID, $this->userId));
+
+		$this->conn->declareQueue($this->getToSortQueueName());
+		$this->conn->declareQueue($this->getDigestQueueName());
+		$this->conn->declareQueue($this->getListedQueueName());
+		$this->conn->declareQueue($this->getUnreadQueueName());
 
 		// ...and in the darkness bind them.
 		foreach($this->bindings as $key) {
 			$this->conn->bindExchange($exchange, $key);
 		}
-		$this->conn->bindQueue(sprintf(self::QUEUE_UNREAD_MESSAGES, INSTANCE_ID, $this->userId), '', $exchange);
-		$this->conn->bindQueue(sprintf(self::QUEUE_ALL_MESSAGES, INSTANCE_ID, $this->userId),   '', $exchange);
+		$this->conn->bindExchange($exchange, "*.digest.user.$this->userId");
+		$this->conn->bindExchange($exchange, "*.instant.user.$this->userId");
+
+		$this->conn->bindQueue($this->getToSortQueueName(), '*.notify.#', $exchange);
+		$this->conn->bindQueue($this->getDigestQueueName(), "*.digest.user.$this->userId", $exchange);
+		$this->conn->bindQueue($this->getListedQueueName(), "*.instant.user.$this->userId", $exchange);
+		$this->conn->bindQueue($this->getUnreadQueueName(), "*.instant.user.$this->userId", $exchange);
 
 	}
 
@@ -119,15 +136,7 @@ class UserQueue {
 
 		$nacks = array();
 
-		while($m = $this->conn->readFromQueue(sprintf(self::QUEUE_ALL_MESSAGES, INSTANCE_ID, $this->userId))) {
-
-			// dismiss messages that aren't meant to remain in the user's 'all' queue
-			if($this->interceptor->hasReroute($this->userId, $m)) {
-				// we accept (but don't *perform* a reroute) because the '.unread' queue will handle the resend
-				$this->conn->acceptMessage($m);
-				continue;
-			}
-
+		while($m = $this->conn->readFromQueue($this->getUnreadQueueName())) {
 			$nacks[] = $m;
 
 			// unwrap the serialisation
@@ -150,5 +159,110 @@ class UserQueue {
 
 	}
 
+
+	/**
+	 * Returns the exchange that applies to this user
+	 *
+	 * @return string
+	 */
+	public function getExchangeName() {
+		return MQConnector::getSecondaryExchangePrefix() . $this->userId;
+	}
+
+
+	/**
+	 * Helper method to construct a queuename based on a pattern
+	 *
+	 * @param $pattern
+	 * @param $userId
+	 * @return string
+	 */
+	protected static function getQueueName($pattern, $userId) {
+		return sprintf($pattern, INSTANCE_ID, $userId);
+	}
+
+
+	/**
+	 * Returns the 'to be sorted' queuename for the given user
+	 *
+	 * @param $userId
+	 * @return string
+	 */
+	public static function getUserToSortQueueName($userId) {
+		return self::getQueueName(self::QUEUE_TOSORT_MESSAGES, $userId);
+	}
+
+
+	/**
+	 * Returns the 'listed' queuename for the given user
+	 *
+	 * @param $userId
+	 * @return string
+	 */
+	public static function getUserListedQueueName($userId) {
+		return self::getQueueName(self::QUEUE_LISTED_MESSAGES, $userId);
+	}
+
+
+	/**
+	 * Returns the 'unread' queuename for the given user
+	 *
+	 * @param $userId
+	 * @return string
+	 */
+	public static function getUserUnreadQueueName($userId) {
+		return self::getQueueName(self::QUEUE_UNREAD_MESSAGES, $userId);
+	}
+
+
+	/**
+	 * Returns the 'digest' queuename for the given user
+	 *
+	 * @param $userId
+	 * @return string
+	 */
+	public static function getUserDigestQueueName($userId) {
+		return self::getQueueName(self::QUEUE_DIGEST_MESSAGES, $userId);
+	}
+
+
+	/**
+	 * Returns the 'to be sorted' queuename for this UserQueue
+	 *
+	 * @return string
+	 */
+	public function getToSortQueueName() {
+		return self::getQueueName(self::QUEUE_TOSORT_MESSAGES, $this->userId);
+	}
+
+
+	/**
+	 * Returns the 'listed' queuename for this UserQueue
+	 *
+	 * @return string
+	 */
+	public function getListedQueueName() {
+		return self::getQueueName(self::QUEUE_LISTED_MESSAGES, $this->userId);
+	}
+
+
+	/**
+	 * Returns the 'unread' queuename for this UserQueue
+	 *
+	 * @return string
+	 */
+	public function getUnreadQueueName() {
+		return self::getQueueName(self::QUEUE_UNREAD_MESSAGES, $this->userId);
+	}
+
+
+	/**
+	 * Returns the 'digest' queuename for this UserQueue
+	 *
+	 * @return string
+	 */
+	public function getDigestQueueName() {
+		return self::getQueueName(self::QUEUE_DIGEST_MESSAGES, $this->userId);
+	}
 
 }
