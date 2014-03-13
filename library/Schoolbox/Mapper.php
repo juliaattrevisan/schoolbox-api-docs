@@ -17,6 +17,7 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\TopicFactory;
@@ -257,6 +258,7 @@ class Mapper {
 		// load on demand, so that we don't get infinite loops
 		if(!$this->notif instanceof LoggerInterface) {
 			$this->setNotifier(new Notif(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
+			var_dump(get_class($this->notif));
 		}
 
 		return $this->notif;
@@ -1084,20 +1086,14 @@ class Mapper {
 
 				// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
 				if(isset($this->sessionData['user'])) {
-					$method = $previous ? self::METHOD_UPDATE : self::METHOD_CREATE;
-
-					$fMessage = new MessageFactory($this->getNotifier());
-					$fMessage
-						->setObject($model)
-						->setInitiator($this->sessionData['user'])
-						->setSeverity(Logger::NOTICE)
-						->setTopic(Notif::TOPIC_APPLICATION);
-
-					if($previous) {
-						$fMessage->setDiff($this->diff($model, $previous));
-					}
-
-					$fMessage->generateInternalMessage($method)->send();
+					$msg = new Internal(
+						$model,
+						$previous ? $this->diff($model, $previous) : null,
+						$this->sessionData['user'],
+						$previous ? self::METHOD_UPDATE : self::METHOD_CREATE,
+						$this->getNotifier()
+					);
+					$msg->send();
 				}
 
 			}
