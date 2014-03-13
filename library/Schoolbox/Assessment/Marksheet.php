@@ -143,26 +143,30 @@ class Marksheet {
 		$this->year = $year;
 		$this->semester = $semester;
 
-		$studentList = array();
+		$studentCollection = new Collection();
 
+		// Get students from the external DB, and put into student collection
 		if($this->category->getCodes()->count() && $this->conf->get('external_enable')) {
-			$studentList = $this->synergyHandler->getStudents($this->category->getCodeString());
-			if (!is_array($studentList)) {
-				$studentList = array();
+			$externalList = $this->synergyHandler->getStudents($this->category->getCodeString());
+			if (is_array($externalList)) {
+				foreach ($externalList as $studentData) {
+					$extIds[] = $studentData['synergy_id'];
+				}
+				$studentCollection->merge($this->userMapper->findByColumn('synergy_id', $extIds));
 			}
 		}
 
-		$groupList = $this->groupHandler->getMemberList($this->category->getId());
-
-		if(is_array($groupList)) {
+		// Get all users who are in the group, and add to collection
+		$studentList = array();
+		$groupList   = $this->groupHandler->getMemberList($this->category->getId());
+		if (is_array($groupList)) {
 			$studentList = array_merge($studentList, $groupList);
 		}
-
-		$workList = $this->submissionHandler->getAllForUserCategory($catId, null, $year, $semester);
 
 		// Get list of extra users for each work item
 		// Online assessments: get all users who have attempted assessment
 		// Due work: all users who have submitted or returned work
+		$workList = $this->submissionHandler->getAllForUserCategory($catId, null, $year, $semester);
 		if (is_array($workList)) {
 			foreach ($workList as $work) {
 				if ($work['type_id'] == \Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
@@ -181,14 +185,12 @@ class Marksheet {
 			}
 		}
 
-		// extract all the synergy IDs of the students found
+		// convert student ID list to a collection of user objects
 		$extIds = array();
 		foreach($studentList as $studentData) {
-			$extIds[] = $studentData['synergy_id'];
+			$extIds[] = $studentData['uid'];
 		}
-
-		// convert to domain object collection (in 1 query, not `n`)
-		$studentCollection = $this->userMapper->findByColumn('synergy_id', $extIds);
+		$studentCollection->merge($this->userMapper->findByColumn('id', $extIds));
 
 		if(is_array($workList)) {
 			$statData = array();
