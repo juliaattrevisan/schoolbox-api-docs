@@ -98,7 +98,8 @@ function sendMail($to, $cc, $bcc, $subject, $message)
         }
     }
 
-    $mail->setBody(strip_tags($message), null, 'utf-8');
+    $converter = new \Html2Text\Html2Text($message);
+    $mail->setBody($converter->get_text(), null, 'utf-8');
     $mail->addPart($message, 'text/html', 'utf-8');
 
     if (is_array($_FILES)) {
