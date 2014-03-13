@@ -338,9 +338,7 @@
                 if(settings.debug) { console.log('Message from server: parsing push'); }
                 $.each(data, function(msgId, amqpMsg) {
                     // put message in messages object, override if message already existed (ensure uniqueness)
-                    if(!messages[msgId] || messages[msgId].status == 'read') {
-                        messages[msgId] = amqpMsg;
-                    }
+                    messages[msgId] = amqpMsg;
                 });
                 updateDOM();
             }
