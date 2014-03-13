@@ -133,7 +133,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				 * from which it spawned
 				 */
 				if (!$exists) {
-					$taskMapper->createBoxRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE']);
+					$taskMapper->createBoxRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED']);
 
 					echo "+  Adding {$row['TASK_ID']} {$row['TASK']}\n";
 				}

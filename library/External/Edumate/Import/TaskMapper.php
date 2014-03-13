@@ -78,17 +78,21 @@ class External_Edumate_Import_TaskMapper extends \Schoolbox\Mapper {
 	 * @param $submissionBox
 	 * @param $edumateTaskId
 	 * @param $categoryCode
+	 * @param $lastUpdated
 	 */
-	public function createBoxRelation($submissionBox, $edumateTaskId, $categoryCode) {
+	public function createBoxRelation($submissionBox, $edumateTaskId, $categoryCode, $lastUpdated) {
 		$query = "
-			INSERT INTO submission_box_edumate_task (submission_box_id, task_id, category_code)
-			VALUES (:submissionBoxId, :edumateTaskId, :categoryCode)
+			INSERT INTO submission_box_edumate_task (submission_box_id, task_id, category_code, updated_at)
+			VALUES (:submissionBoxId, :edumateTaskId, :categoryCode, :updatedAt)
 		";
+
+		$bits = explode('.', $lastUpdated);
 
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindParam(':submissionBoxId', $submissionBox->getId());
 		$statement->bindParam(':edumateTaskId', $edumateTaskId);
 		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->bindParam(':updatedAt', $bits[0]);
 		$statement->execute();
 	}
 }
