@@ -77,19 +77,19 @@ class Interceptor {
 		$external = unserialize($body['message']);
 
 		if(!$external instanceof External) {
-			echo "INCORRECT FORMAT: DISMISS!\n";
+//			echo "INCORRECT FORMAT: DISMISS!\n";
 			return false;
 		}
 
 		// fail fast: if it's already been rerouted, don't try again
 		if(isset($body['extra']['rerouted'])) {
-			echo "ALREADY REROUTED, SHOULDN'T HAVE ENDED UP BACK HERE!\n";
+//			echo "ALREADY REROUTED, SHOULDN'T HAVE ENDED UP BACK HERE!\n";
 			return false;
 		}
 
 		// yes we are "rerouting" this message...rerouting it to /dev/null! *mwa ha ha*
 		if($this->canDismiss($userId, $body)) {
-			echo "SELF-SEND: DISMISS!\n";
+//			echo "SELF-SEND: DISMISS!\n";
 			return true;
 		}
 
@@ -98,7 +98,7 @@ class Interceptor {
 		switch($newLevel) {
 			// total suppression
 			case 0:
-				echo "NEW LEVEL IS ZERO: DISMISS!\n";
+//				echo "NEW LEVEL IS ZERO: DISMISS!\n";
 				return true;
 
 			// digest
@@ -118,7 +118,7 @@ class Interceptor {
 				break;
 
 			default:
-				echo "UNACCEPTABLE LEVEL: DISMISS!\n";
+//				echo "UNACCEPTABLE LEVEL: DISMISS!\n";
 				return true;
 		}
 
@@ -127,7 +127,7 @@ class Interceptor {
 			$external->resend(new Notif(), $newLevel, "$method.user.$userId");
 
 			// return true to dismiss the old message
-			echo "I REROUTED YOUR MESSAGE to '$method.user.$userId' at level $newLevel!\n";
+//			echo "I REROUTED YOUR MESSAGE to '$method.user.$userId' at level $newLevel!\n";
 		}
 		catch(\Exception $e) {
 			echo $e;
@@ -144,9 +144,6 @@ class Interceptor {
 	 * @return int
 	 */
 	protected function getReroutedLevel($userId, $channel, $level) {
-
-//		print_r(func_get_args());
-
 		/** @var User $user */
 		$user = $this->userMapper->findById($userId);
 
