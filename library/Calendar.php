@@ -661,6 +661,14 @@ class Calendar extends DeprecatedModel {
                 $groupList[] = $temp['id'];
             }
 
+            // Ensure that requested group is included in filter
+            // (as long as user has at least read permission on that group)
+            if ($filter['group']) {
+                if ($this->groupHandler->getPermission($filter['group']) >= READ_ACCESS) {
+                    $groupList[] = intval($filter['group']);
+                }
+            }
+
             /* If there are no groups prevent sql error
              */
             if (count($groupList)) {
