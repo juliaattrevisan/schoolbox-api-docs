@@ -11,6 +11,14 @@
 class External_Edumate_Import_Task extends External_Edumate_Connection {
 
 	/**
+	 * The file_type associated specially with SubmissionBoxes
+	 * imported directly from Edumate
+	 *
+	 * @var string
+	 */
+	private $taskKey = 'Task from Edumate';
+
+	/**
 	 * Import all Edumate tasks as Submission Boxes
 	 */
 	public function import() {
@@ -90,7 +98,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 
 				/* Assign work type
 				 */
-				$workType = $workTypeMapper->findByColumn('name', $row['TASK_TYPE']);
+				$workType = $workTypeMapper->findByColumn('name', $this->getTaskKey());
 
 				if ($workType->count()) {
 					$submissionBox->setWorkType($workType->first());
@@ -157,5 +165,26 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 		}
 
 		echo "\n\n";
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set task key
+	 *
+	 * @param string $taskKey
+	 */
+	private function setTaskKey($taskKey) {
+		$this->taskKey = $taskKey;
+	}
+
+	/**
+	 * Get task key
+	 *
+	 * @return string
+	 */
+	private function getTaskKey() {
+		return $this->taskKey;
 	}
 }

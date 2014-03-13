@@ -13,3 +13,7 @@ CREATE TABLE `submission_return_edumate_task`( `submission_return_id` INT(11), `
 ALTER TABLE `submission_return_edumate_task` ADD COLUMN `updated_at` DATETIME NULL AFTER `category_code`;
 ALTER TABLE `submission_return_edumate_task` ADD COLUMN `student_id` INT(11) NULL AFTER `category_code`;
 ALTER TABLE `submission_return_edumate_task` ADD UNIQUE INDEX `return_task` (`task_id`, `category_code`, `submission_return_id`, `student_id`);
+
+/* Add special filetype for things imported from Edumate
+ */
+INSERT INTO `file_type` (`name`) VALUES ('Task from Edumate');
