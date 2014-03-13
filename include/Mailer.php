@@ -201,8 +201,10 @@ class Mailer {
             $this->email->getHeaders()->addTextHeader($name, $value);
         }
 
-        //
-        // create transport and send email
+        // create transport and send email, if mail is enabled
+        if (!Config::get('mail_enable')) {
+            return false;
+        }
         try {
             Swift_Mailer::newInstance(self::getSwiftTransport())->send($this->email);
         }

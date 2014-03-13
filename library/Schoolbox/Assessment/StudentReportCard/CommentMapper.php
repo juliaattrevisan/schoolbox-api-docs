@@ -222,9 +222,17 @@ class CommentMapper extends Mapper {
 	/**
 	 * Post-save callback. Send emails.
 	 *
+	 * @todo move this to pub/sub system once that is implemented
+	 *
 	 * @param Comment $comment
 	 */
 	public function postSave($comment) {
+
+		// Do nothing if mail is disabled
+		$cfg = $this->getConfigLoader();
+		if (!$cfg->get('mail_enable')) {
+			return;
+		}
 
 		// retrieve as it exists in the DB (possible body truncation, auto-generated timestamps, etc.)
 		/** @var $comment Comment */
@@ -236,8 +244,6 @@ class CommentMapper extends Mapper {
 		$category = $comment->getCategory();
 
 		$subjectFormat = 'Comment on %s grades in %s';
-
-		$cfg = $this->getConfigLoader();
 
 		$href = sprintf("http://%s.%s/submission/allWork/%s/%s/%s/%s",
 			$cfg->get('site_hostname'), $cfg->get('site_domain'),
