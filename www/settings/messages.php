@@ -97,7 +97,7 @@ foreach($data as $namespace => $routes) {
 			$onlyLevel = true;
 		}
 		else {
-			$myLevel = $r['outgoing_level'] ?: max($r['default_level'], $r['min_level']);
+			$myLevel = is_null($r['outgoing_level']) ? max($r['default_level'], $r['min_level']) : $r['outgoing_level'];
 			$onlyLevel = false;
 		}
 

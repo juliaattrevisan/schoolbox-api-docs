@@ -21,10 +21,6 @@ if(!(is_array($_POST) && count($_POST))) {
 	error(2);
 }
 
-//echo "<pre>";
-//print_r($_POST);
-//echo "\n</pre>";
-
 /** @var \Schoolbox\User $user */
 $user = $_SESSION['user'];
 
@@ -32,12 +28,12 @@ $userId = $user->getId();
 $roleId = $user->getRole()->getId();
 
 $selectstmt = Database::getInstance()->prepare("
-	SELECT 	:userId `relation_id`, 'user' `relation_type`, ms.`routing_key`,
-			mp.`default_level` `incoming_level`, :outgoingLevel `outgoing_level`, mp.min_level, mp.max_level
-	FROM `msg_source` ms
-	LEFT JOIN msg_namespace mn ON ms.namespace = mn.id
-	LEFT JOIN msg_route_perm mp ON mp.msg_source_id = ms.id AND mp.role_id = :roleId
-	WHERE mn.slug = :slug
+	SELECT 	:userId `relation_id`, 'user' `relation_type`, src.`routing_key`,
+			perm.`default_level` `incoming_level`, :outgoingLevel `outgoing_level`, perm.min_level, perm.max_level
+	FROM `msg_source` src
+	LEFT JOIN msg_namespace ns ON src.namespace = ns.id
+	LEFT JOIN msg_route_perm perm ON perm.msg_source_id = src.id AND perm.role_id = :roleId
+	WHERE ns.slug = :slug
 	AND `key` = :key
 ");
 
@@ -67,24 +63,26 @@ foreach($_POST as $ns => $options) {
 			'outgoingLevel' => $level
 		));
 
-		$foo = $selectstmt->fetch(PDO::FETCH_ASSOC);
+		$permission = $selectstmt->fetch(PDO::FETCH_ASSOC);
 
-		if($foo['outgoing_level'] > $foo['max_level']) {
-			$foo['outgoing_level'] = $foo['incoming_level'];
-		}
-		unset($foo['max_level']);
+		if(is_array($permission) && count($permission)) {
+			if($permission['outgoing_level'] > $permission['max_level']) {
+				$permission['outgoing_level'] = $permission['max_level'];
+			}
 
-		if($foo['outgoing_level'] < $foo['min_level']) {
-			$foo['outgoing_level'] = $foo['incoming_level'];
-		}
-		unset($foo['min_level']);
+			if($permission['outgoing_level'] < $permission['min_level']) {
+				$permission['outgoing_level'] = $permission['min_level'];
+			}
 
-		// the result of the previous is the args of the next
-		if(count($foo) == 5) {
-			$insertstmt->execute($foo);
+			$insertstmt->execute(array(
+				'relation_id'    => $permission['relation_id'],
+				'relation_type'  => $permission['relation_type'],
+				'routing_key'    => $permission['routing_key'],
+				'incoming_level' => $permission['incoming_level'],
+				'outgoing_level' => $permission['outgoing_level']
+			));
 		}
 	}
-
-$p->backToTheFuture(1);
-
 }
+
+$p->localRedir('/settings/messages');
