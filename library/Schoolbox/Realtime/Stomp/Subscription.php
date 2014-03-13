@@ -14,7 +14,9 @@ use PhpAmqpLib\Message\AMQPMessage;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
+use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\Queue\UnreadMessage;
+use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Verboser;
 use Schoolbox\User;
@@ -36,14 +38,15 @@ class Subscription {
 	/** @var Message[] */
 	protected $messages;
 
+	/** @var string */
+	protected $destination;
 
 	/**
-	 * @param string $destination
 	 * @param Client $client
 	 * @param int $userId
 	 * @param PipeManager $pipeManager
 	 */
-	public function __construct($destination, $client, $userId, $pipeManager) {
+	public function __construct($client, $userId, $pipeManager) {
 
 		$this->messages = array();
 		$this->client = $client;
@@ -51,27 +54,35 @@ class Subscription {
 		$this->userId = $userId;
 		$self = $this;
 
-		$this->id = $this->client->subscribeWithAck($destination, 'client',
+		$this->destination = UserQueue::getUserUnreadQueueName($userId);
+
+		// step 1: subscribe to the user's unread queue and push these immediately to the Pipe Manager
+		$this->id = $this->client->subscribeWithAck($this->destination, 'client',
 			function ($frame, $ackResolver) use ($self, $pipeManager, $userId) {
 				// this closure is executed every time a message is sent to the client based on the given subscription
 				/** @var AckResolver $ackResolver */
 
-				$int = $pipeManager->getInterceptor();
-				$m = $self->frame2amqp($frame);
-
-				if($int->reroute($userId, $m)) {
-					$ackResolver->ack();
-					return;
-				}
-
 				if($pipeManager->onAMQP($self->frame2msg($frame), $userId)) {
 					$self->addMessage($frame, $ackResolver);
 				}
-			});
+			}
+		);
+
+		// step 2: subscribe to the user's 'to sort' queue, and run those messages through the Interceptor
+		$this->client->subscribe(UserQueue::getUserToSortQueueName($userId),
+			function($frame) use ($self, $pipeManager, $userId) {
+				// this closure is executed every time a message is sent to the client based on the given subscription
+				$pipeManager->getInterceptor()->reroute($userId, $frame);
+			}
+		);
 	}
 
 	public function getId() {
 		return $this->id;
+	}
+
+	public function getDestination() {
+		return $this->destination;
 	}
 
 
@@ -156,7 +167,11 @@ class Subscription {
 
 		$msg = unserialize($data['message']);
 
-		return new AMQPMessage("$msg", $properties);
+		// $data might have been an array, or a serialized External message, depending on reroute status
+		if($msg && $msg instanceof External) {
+			$data['message'] = $msg->toArray();
+		}
+		return new AMQPMessage(json_encode($data), $properties);
 	}
 
 

@@ -15,7 +15,9 @@ use React\Stomp\Exception\ConnectionException;
 use React\Stomp\Factory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Pipe\SelfResponder;
 
@@ -76,12 +78,11 @@ class SubscriptionManager {
 			));
 
 			$self = $this;
-			$destination = $this->userSubscriptionDestination($userId);
 
-			$client->connect()->then(function($client) use ($destination, $self, $userId, $responder) {
+			$client->connect()->then(function($client) use ($self, $userId, $responder) {
 				/** @var Client $client */
 				// this closure is executed when a stomp client connection is established
-				$self->putSubscription($destination, new Subscription($destination, $client, $userId, $self->getPipeManager()));
+				$self->putSubscription(new Subscription($client, $userId, $self->getPipeManager()));
 				// if a responder is provided, use it as a callback for success
 				if($responder instanceof SelfResponder) {
 					$responder->notifyPipe(json_encode(array('subscribe' => true)));
@@ -100,10 +101,10 @@ class SubscriptionManager {
 	}
 
 	/**
-	 * @param string $destination
 	 * @param Subscription $subscription
 	 */
-	public function putSubscription($destination, $subscription) {
+	public function putSubscription($subscription) {
+		$destination = $subscription->getDestination();
 		$this->pipeManager->v("Adding subscription to $destination (id:{$subscription->getId()})");
 		$this->subscriptions[$destination] = $subscription;
 	}
@@ -135,7 +136,7 @@ class SubscriptionManager {
 	 * @return string
 	 */
 	protected function userSubscriptionDestination($userId) {
-		return "/amq/queue/u.$userId.unread";
+		return sprintf("/amq/queue/".UserQueue::QUEUE_UNREAD_MESSAGES, INSTANCE_ID, $userId);
 	}
 
 	/**
