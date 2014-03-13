@@ -12,10 +12,11 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 use Schoolbox\ConfigLoader;
 
-class ReturnedWork {
+class ReturnedWork implements ISoftDeletable {
 
 	/**
 	 * @var int
@@ -78,6 +79,13 @@ class ReturnedWork {
 	 * @var \Alaress_Date_Format
 	 */
 	protected $returned;
+
+	/**
+	 * Whether this returned work item is softdeleted or not
+	 *
+	 * @var
+	 */
+	protected $deleted;
 
 	/**
 	 * @var string
@@ -373,6 +381,23 @@ class ReturnedWork {
 		return $this->mimetype;
 	}
 
+	/**
+	 * Set deleted
+	 *
+	 * @param mixed $deleted
+	 */
+	public function setDeleted($deleted) {
+		$this->deleted = $deleted;
+	}
+
+	/**
+	 * Get deleted
+	 *
+	 * @return mixed
+	 */
+	public function getDeleted() {
+		return $this->deleted;
+	}
 
 	// File related methods
 
@@ -418,6 +443,19 @@ class ReturnedWork {
 		if (file_exists($temp_location) && $file_location) {
 			return copy($temp_location, $file_location);
 		}
+		return false;
+	}
+
+	/**
+	 * Whether or not this returned work is softdeleted
+	 *
+	 * @return bool
+	 */
+	public function isDeleted() {
+		if ($this->getDeleted()) {
+			return true;
+		}
+
 		return false;
 	}
 }
