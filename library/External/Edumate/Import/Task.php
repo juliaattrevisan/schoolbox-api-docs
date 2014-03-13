@@ -40,11 +40,20 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 			if (!$exists) {
 				$submissionBox = new \Schoolbox\Assessment\Component\SubmissionBox();
 			}
-			/* Reuse an existing Submission Box
-			 */
 			else {
-				$submissionBoxId = $taskMapper->findBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
-				$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+				/* Reuse an existing Submission Box
+				 */
+				if ($taskMapper->isNeedUpdate($row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED'])) {
+					$submissionBoxId = $taskMapper->findBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
+					$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+				}
+				else {
+					/* Skip everything, because this Edumate Task hasn't been updated
+					 * since the last time we imported it
+					 */
+					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} - Nothing to update \n";
+					continue;
+				}
 			}
 
 			/* Assign category if it exists in schoolbox
@@ -138,6 +147,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 					echo "+  Adding {$row['TASK_ID']} {$row['TASK']}\n";
 				}
 				else {
+					$taskMapper->updateBoxRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED']);
 					echo "^  Updating {$row['TASK_ID']} {$row['TASK']}\n";
 				}
 			}
