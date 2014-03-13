@@ -11,3 +11,4 @@ ALTER TABLE `submission_box_edumate_task` ADD COLUMN `updated_at` DATETIME NULL 
  */
 CREATE TABLE `submission_return_edumate_task`( `submission_return_id` INT(11), `task_id` INT(11), `category_code` VARCHAR(255) );
 ALTER TABLE `submission_return_edumate_task` ADD UNIQUE INDEX `return_task` (`task_id`, `category_code`);
+ALTER TABLE `submission_return_edumate_task` ADD COLUMN `updated_at` DATETIME NULL AFTER `category_code`;

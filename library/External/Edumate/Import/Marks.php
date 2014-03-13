@@ -113,6 +113,8 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				echo "+  Adding task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
 			}
 			else {
+				$marksMapper->updateReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED']);
+
 				echo "^  Updating task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
 			}
 		}

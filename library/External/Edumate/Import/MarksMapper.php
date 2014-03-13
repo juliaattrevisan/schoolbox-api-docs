@@ -91,4 +91,31 @@ class External_Edumate_Import_MarksMapper extends \Schoolbox\Mapper {
 		$statement->bindParam(':categoryCode', $categoryCode);
 		$statement->execute();
 	}
+
+	/**
+	 * Create a relation between a SubmissionBox and an Edumate Task
+	 *
+	 * @param $submissionReturn
+	 * @param $edumateTaskId
+	 * @param $categoryCode
+	 * @param $lastUpdated
+	 */
+	public function updateReturnRelation($submissionReturn, $edumateTaskId, $categoryCode, $lastUpdated) {
+		$query = "
+			UPDATE submission_return_edumate_task
+			SET updated_at = :updatedAt
+			WHERE submission_return_id = :submissionReturnId
+			AND task_id = :edumateTaskId
+			AND category_code = :categoryCode
+		";
+
+		$bits = explode('.', $lastUpdated);
+
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->bindParam(':submissionReturnId', $submissionReturn->getId());
+		$statement->bindParam(':edumateTaskId', $edumateTaskId);
+		$statement->bindParam(':categoryCode', $categoryCode);
+		$statement->bindParam(':updatedAt', $bits[0]);
+		$statement->execute();
+	}
 }
