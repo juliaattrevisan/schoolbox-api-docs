@@ -19,6 +19,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 		$workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
 		$markTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper();
 		$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+		$userMapper = new \Schoolbox\UserMapper();
 
 		$query = "
 			SELECT *
@@ -51,17 +52,26 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 			try {
 				$category = $categoryMapper->findByCode($row['CLASS_CODE']);
 				$submissionBox->setCategory($category);
-
-				/* Assign submission box owner
-				 */
-				$category->loadTeachers();
-				$submissionBox->setOwner($category->getTeachers()->first());
 			}
 			catch (\Exception $e) {
 
 				/* Ignore everything if you can't find a Schoolbox Category
 				 */
 				echo "!  Cannot find Category with code {$row['CLASS_CODE']} for task {$row['TASK_ID']} {$row['TASK']}\n";
+				continue;
+			}
+
+			/* Assign submission box owner
+			 */
+			try {
+				$teacher = $userMapper->findByColumn('synergy_id', $row['STAFF_NUMBER'])->first();
+				$submissionBox->setOwner($teacher);
+			}
+			catch (\Exception $e) {
+
+				/* Ignore everything if you can't find a teacher
+				 */
+				echo "!  Cannot find Teacher with externalId {$row['STAFF_NUMBER']} for task {$row['TASK_ID']} {$row['TASK']}\n";
 				continue;
 			}
 
