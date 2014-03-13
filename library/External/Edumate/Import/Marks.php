@@ -36,7 +36,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 
 			/* Spawn a Return, or reuse an existing one that was imported
 			 */
-			$exists = $marksMapper->isTaskReturnExists($row['TASK_ID'], $row['CLASS_CODE']);
+			$exists = $marksMapper->isTaskReturnExists($row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID']);
 
 			if (!$exists) {
 				$submissionReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
@@ -46,8 +46,8 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			else {
 				/* Reuse an existing Submission Return
 				 */
-				if ($marksMapper->isNeedUpdate($row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED'])) {
-					$submissionReturnId = $marksMapper->findReturnFromTask($row['TASK_ID'], $row['CLASS_CODE']);
+				if ($marksMapper->isNeedUpdate($row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID'], $row['LAST_UPDATED'])) {
+					$submissionReturnId = $marksMapper->findReturnFromTask($row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID']);
 					$submissionReturn = $submissionReturnMapper->findById($submissionReturnId);
 				}
 				else {
@@ -119,12 +119,12 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			/* Create relation
 			 */
 			if (!$exists) {
-				$marksMapper->createReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE']);
+				$marksMapper->createReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID'], $row['LAST_UPDATED']);
 
 				echo "+  Adding task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
 			}
 			else {
-				$marksMapper->updateReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED']);
+				$marksMapper->updateReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID'], $row['LAST_UPDATED']);
 
 				echo "^  Updating task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
 			}
