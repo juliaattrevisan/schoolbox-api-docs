@@ -42,7 +42,7 @@ interface ModuleNotifierInterface extends Serializable {
 	 * @param TriggerBundle $bundle
 	 * @return void
 	 */
-	public function buildTriggers($bundle);
+	public function bundleTriggers($bundle);
 
 
 	/**

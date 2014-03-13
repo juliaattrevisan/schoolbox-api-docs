@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
+use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\User;
 
@@ -30,12 +31,25 @@ class TriggerFactory {
 	/** @var TriggerBundle[] */
 	protected $bundles;
 
-	public function __construct($moduleNotifier, $model, $user, $diff = null) {
-		$this->notifier = $moduleNotifier;
-		$this->model = $model;
-		$this->user = $user;
-		$this->diff = $diff;
+	/**
+	 * @param ModuleNotifierInterface $instance
+	 * @param Internal $message
+	 */
+	public function __construct($instance, $message) {
+		$this->notifier = $instance;
+		$this->model = $message->getObject();
+		$this->user = $message->getInitiator();
+		$this->diff = $message->getDiff();
 		$this->bundles = array();
+	}
+
+	/**
+	 * @param string $method
+	 * @return TriggerBundle
+	 */
+	public function buildTriggers($method) {
+		$this->notifier->bundleTriggers($this->getBundle($method));
+		return $this->getBundle($method);
 	}
 
 	/**

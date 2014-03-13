@@ -69,9 +69,6 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	/** @var DispatcherInterface */
 	protected $dispatcher;
 
-	/** @var MessageFactory */
-	protected $fMsg;
-
 	/** @var SplObjectStorage */
 	protected $resolvers;
 
@@ -88,7 +85,6 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 		$this->conf = $configLoader;
 		$this->notif = new Notif();
 		$this->dispatcher = new Dispatcher($loop, $this, $verboser, new SchedulerDispatchStrategy());
-		$this->fMsg = new MessageFactory(null);
 		$this->resolvers = new SplObjectStorage();
 
 		if($initialise) {
@@ -141,49 +137,42 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 
 	/**
-	 * Handles a STOMP frame. Returns true to ACK message, or false to NACK message.
+	 * Handles a STOMP frame.
 	 *
 	 * @param Frame $frame
 	 * @param AckResolver $ackResolver
-	 * @return bool
 	 */
 	public function onAMQP($frame, $ackResolver) {
 		try {
-			$message = $this->fMsg->reconstitute($frame->body);
+			$message = Internal::reconstitute($frame->body);
 
 			// we can't do squat if the Mapper didn't send us a message in the right format
 			if(!$message instanceof Internal) {
 				$this->verboser->v("Could not decode '$frame->body' to schedule event", '!');
 				// this message is unparseable, so we ACK it to make it go away
-				return true;
+				$ackResolver->ack();
+				return;
 			}
 
 			// only a few Models actually have schedule strategies, failure is ok
 			// each module strategy knows how to deal with its own events
-			$instance = $this->getModule($message->getObjectClass());
-
-			$fTrigger = new TriggerFactory(
-				$instance, $message->getObject(), $message->getInitiator(), $message->getDiff()
-			);
+			$triggerFactory = new TriggerFactory($this->getModule($message->getObjectClass()), $message);
 
 			// retrieve, populate, and schedule this bundle of triggers
-			$bundle = $fTrigger->getBundle($message->getMethod());
-			$instance->buildTriggers($bundle);
-			$this->scheduleNotifications($bundle->getTriggers(), $ackResolver);
+			$this->scheduleNotifications($triggerFactory->buildTriggers($message->getMethod())->getTriggers(), $ackResolver);
+			return;
 
 		}
 		catch(ScheduleException $e) {
 			// we're happy to ignore this, it just means no scheduling strategy exists for this Model
 			$this->verboser->v($e->getMessage(), '*');
-			$ackResolver->ack();
 		}
 		catch(CompressionException $e) {
 			// this message is unparseable, so we'll eventually ACK it to make it go away
 			$this->verboser->v($e->getMessage(), '!');
-			$ackResolver->ack();
 		}
 
-		return true;
+		$ackResolver->ack();
 	}
 
 
@@ -198,7 +187,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	 */
 	public function handleResponse($trigger, $command, $data) {
 
-		$this->verboser->v("Received worker response to handle");
+		$this->verboser->v("Received worker response to handle: ".substr(json_encode($data), 0, 64)."...");
 
 		// detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
 		$this->detachTrigger($trigger);
@@ -273,8 +262,8 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 		$timestamp = $trigger->getTimestamp();
 		$model = $trigger->getModel();
-		$module = get_class($trigger->getModuleNotifier());
-		$label = $trigger->getLabel();
+		$moduleNotifierClass = get_class($trigger->getModuleNotifier());
+		$triggerLabel = $trigger->getLabel();
 
 		$interval = is_null($timestamp) ? null : $timestamp - time();
 		$v = $this->verboser;
@@ -327,19 +316,19 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 		// an explicitly null interval is a request to unset that trigger (regardless of whether or not it exists)
 		if(is_null($interval)) {
-			$this->unschedule($module, $label, $model);
+			$this->unschedule($moduleNotifierClass, $triggerLabel, $model);
 			return;
 		}
 
 		// publish and return immediately if the event is now or in the past
 		if($interval <= ModuleNotifierInterface::IMMEDIATELY) {
-			$this->verboser->v("Immediately firing trigger '$module::$label'");
+			$this->verboser->v("Immediately firing trigger '$moduleNotifierClass::$triggerLabel'");
 			$publish(null);
 			return;
 		}
 
 		// schedule the future event
-		$this->schedule($module, $label, $model, $interval, $publish);
+		$this->schedule($moduleNotifierClass, $triggerLabel, $model, $interval, $publish);
 
 	}
 
