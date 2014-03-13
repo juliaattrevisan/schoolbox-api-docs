@@ -24,7 +24,7 @@ class Connector {
 	const PRIMARY_TYPE          = 'topic';
 
 	const SECONDARY_NAME_PREFIX = 'sb.%s.ux.';
-	const SECONDARY_TYPE        = 'fanout';
+	const SECONDARY_TYPE        = 'topic';
 
 	const PASSIVE     = false;
 	const DURABLE     = true;  // exchanges and queues survive server restart
@@ -191,7 +191,7 @@ class Connector {
 	 * @return AMQPChannel
 	 */
 	public function unbindExchange($exchangeName, $routingKey, $channelId = null) {
-		$this->getChannel($channelId)->exchange_unbind(self::getPrimaryExchange(), $exchangeName, $routingKey);
+		$this->getChannel($channelId)->exchange_unbind($exchangeName, self::getPrimaryExchange(), $routingKey);
 		return $this->getChannel($channelId);
 	}
 
