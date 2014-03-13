@@ -67,6 +67,21 @@ class External implements MessageInterface {
 
 
 	/**
+	 * Explicitly resend via a new Notif to a new set of topics at a new severity
+	 *
+	 * @param Notif $notif
+	 * @param int $severity
+	 * @param array|string $topics
+	 */
+	public function resend($notif, $severity, $topics) {
+		$this->notif = $notif;
+		$this->severity = $severity;
+		$this->topics = (array)$topics;
+		$this->send();
+	}
+
+
+	/**
 	 * Return the serialized form of this message.
 	 *
 	 * @return string
@@ -83,11 +98,21 @@ class External implements MessageInterface {
 	 * @return string the string representation of the object or null
 	 */
 	public function serialize() {
-		return json_encode(array(
+		return json_encode($this->toArray());
+	}
+
+
+	/**
+	 * Return the array representation of this message.
+	 *
+	 * @return array
+	 */
+	public function toArray() {
+		return array(
 			'body'      => $this->body->toArray(),
 			'timestamp' => $this->datetime->format('U'),
 			'params'    => $this->params
-		));
+		);
 	}
 
 

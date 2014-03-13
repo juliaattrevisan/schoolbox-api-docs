@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif\Message;
 
 
+use Monolog\Logger;
 use Schoolbox\Notif\Notif;
 use Schoolbox\User;
 
@@ -39,15 +40,11 @@ class Internal implements MessageInterface {
 	 * @param array $diff
 	 * @param User $initiator
 	 * @param string $method
-	 * @param int $severity
-	 * @param array $topics
 	 * @param Notif $notif
 	 */
-	public function __construct($object, $diff, $initiator, $method, $severity, $topics, $notif) {
+	public function __construct($object, $diff, $initiator, $method, $notif) {
 		// publishing details
 		$this->notif = $notif;
-		$this->topics = $topics;
-		$this->severity = $severity;
 
 		// action details
 		$this->object = $object;
@@ -59,18 +56,17 @@ class Internal implements MessageInterface {
 	/**
 	 * Send messages.
 	 *
+	 * @param int $severity
+	 * @param string $topic
 	 * @return bool
 	 */
-	public function send() {
+	public function send($severity = Logger::NOTICE, $topic = Notif::TOPIC_APPLICATION) {
 		// cannot send if there is no notifier to pass through
 		if(is_null($this->notif)) {
 			return false;
 		}
-		foreach($this->topics as $topic) {
-			$self = serialize($this);
-			$this->notif->setTopic($topic)->log($this->severity, $self, $this->context);
-		}
-		return true;
+		$self = serialize($this);
+		return $this->notif->setTopic($topic)->log($severity, $self, $this->context);
 	}
 
 	/**
@@ -128,6 +124,10 @@ class Internal implements MessageInterface {
 		return $this->object;
 	}
 
+	public function getObjectClass() {
+		return get_class($this->object);
+	}
+
 	public function getDiff() {
 		return $this->diff;
 	}
@@ -148,5 +148,24 @@ class Internal implements MessageInterface {
 		$this->context = $context;
 	}
 
+	/**
+	 * Reconstitute a message that has come through in binary format
+	 *
+	 * @param $encodedCompressedSerialized
+	 * @throws CompressionException
+	 * @return MessageInterface
+	 */
+	public static function reconstitute($encodedCompressedSerialized) {
+
+		$compressedSerialized = base64_decode($encodedCompressedSerialized);
+		$serialized = gzuncompress($compressedSerialized);
+		if($serialized === false) {
+			throw new CompressionException("Could not decompress message data");
+		}
+		$data = unserialize($serialized);
+
+		$message = unserialize($data['message']);
+		return $message;
+	}
 
 } 
