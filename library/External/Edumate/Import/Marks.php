@@ -58,7 +58,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				$submissionReturn->setSubmissionBox($submissionBox);
 			}
 			catch (\Exception $e) {
-				echo "-  Skipping {$row['TASK_ID']} for {$row['STUDENT_ID']} - Submission Box for class code {$row['CLASS_CODE']} not found \n";
+				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} - Submission Box for class code {$row['CLASS_CODE']} not found \n";
 				continue;
 			}
 
@@ -86,7 +86,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				$submissionReturn->setOwner($student->first());
 			}
 			else {
-				echo "-  Skipping {$row['TASK_ID']} for {$row['STUDENT_ID']} - Student not found \n";
+				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} - Student not found \n";
 				continue;
 			}
 
@@ -110,10 +110,10 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			if (!$exists) {
 				$marksMapper->createReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE']);
 
-				echo "+  Adding {$row['TASK_ID']} for {$row['STUDENT_ID']}\n";
+				echo "+  Adding task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
 			}
 			else {
-				echo "^  Updating {$row['TASK_ID']} for {$row['STUDENT_ID']}\n";
+				echo "^  Updating task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
 			}
 		}
 
