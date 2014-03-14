@@ -39,7 +39,7 @@ if ($event->getMetadata()->getStudentAttendees()->count()) {
 	$roleMapper = new \Schoolbox\RoleMapper();
 
 	$row = array(
-		'ID',
+		'Synergy ID',
 		'Firstname',
 		'Surname',
 		'Group'
@@ -51,7 +51,7 @@ if ($event->getMetadata()->getStudentAttendees()->count()) {
 		$role = $roleMapper->findById($currentStudent->getRole()->getId());
 
 		$row = array(
-			$currentStudent->getId(),
+			$currentStudent->getExternalId(),
 			$currentStudent->getFirstname(),
 			$currentStudent->getLastname(),
 			$role->getName(),
