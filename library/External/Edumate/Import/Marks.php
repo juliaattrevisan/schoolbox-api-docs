@@ -125,12 +125,12 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			if (!$exists) {
 				$marksMapper->createReturnRelation($submissionReturn, $edumateMark);
 
-				echo "+  Adding task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
+				echo "+  Adding task {$edumateMark->getTaskId()} for student {$edumateMark->getStudentId()}\n";
 			}
 			else {
 				$marksMapper->updateReturnRelation($submissionReturn, $edumateMark);
 
-				echo "^  Updating task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
+				echo "^  Updating task {$edumateMark->getTaskId()} for student {$edumateMark->getStudentId()}\n";
 			}
 		}
 
