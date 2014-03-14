@@ -143,7 +143,7 @@ class EdumateTask {
 		$this->setStaffNumber($row['STAFF_NUMBER']);
 		$this->setTask($row['TASK']);
 		$this->setTaskType($row['TASK_TYPE']);
-		$this->setDescription($row['DESCRIPTION']);
+		$this->setDescription((string)$row['DESCRIPTION']);
 		$this->setSetDate($row['SET_DATE']);
 		$this->setDueDate($row['DUE_DATE']);
 		$this->setCloseDate($row['CLOSE_DATE']);
