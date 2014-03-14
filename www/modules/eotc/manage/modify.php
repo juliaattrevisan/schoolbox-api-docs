@@ -81,6 +81,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		 */
 		$page->setVar(array(
 			'FUNCTION' => 'Update',
+			'EOTC_FUNCTION' => 'Update Event',
 			'SHOW_ADVANCED' => '',
 			'ADVANCED_SHOW' => '',
 			'ADVANCED_CLOSE' => 'hidden',
@@ -216,6 +217,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		 */
 		$page->setVar(array(
 			'FUNCTION' => 'Add',
+			'EOTC_FUNCTION' => 'Submit for Initial Approval',
 			'SHOW_ADVANCED' => '',
 			'ADVANCED_SHOW' => '',
 			'ADVANCED_CLOSE' => 'hidden',
