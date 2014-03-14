@@ -54,7 +54,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 					/* Skip everything, because this Edumate Mark hasn't been updated
 					 * since the last time we imported it
 					 */
-					echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} in {$row['CLASS_CODE']} - Nothing to update \n";
+					echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} in {$row['CLASS_CODE']}: nothing to update \n";
 					continue;
 				}
 			}
@@ -69,7 +69,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				$submissionReturn->setSubmissionBox($submissionBox);
 			}
 			catch (\Exception $e) {
-				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} - Submission Box for class code {$row['CLASS_CODE']} not found \n";
+				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']}: Submission Box for class code {$row['CLASS_CODE']} not found \n";
 				continue;
 			}
 
@@ -82,7 +82,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 
 				/* Ignore everything if you can't find a Schoolbox Category
 				 */
-				echo "!  Cannot find Category with code {$row['CLASS_CODE']} for task {$row['TASK_ID']} {$row['TASK']}\n";
+				echo "!  Skipping {$row['TASK_ID']} {$row['TASK']}: cannot find Category with code {$row['CLASS_CODE']}\n";
 				continue;
 			}
 
@@ -96,7 +96,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 				$submissionReturn->setOwner($student->first());
 			}
 			else {
-				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} in {$row['CLASS_CODE']} - Student not found \n";
+				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} in {$row['CLASS_CODE']}: Student not found \n";
 				continue;
 			}
 

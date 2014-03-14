@@ -59,7 +59,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 					/* Skip everything, because this Edumate Task hasn't been updated
 					 * since the last time we imported it
 					 */
-					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} - Nothing to update \n";
+					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']}: nothing to update \n";
 					continue;
 				}
 			}
@@ -74,7 +74,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 
 				/* Ignore everything if you can't find a Schoolbox Category
 				 */
-				echo "!  Cannot find Category with code {$row['CLASS_CODE']} for task {$row['TASK_ID']} {$row['TASK']}\n";
+				echo "!  Skipping {$row['TASK_ID']} {$row['TASK']}: cannot find Category with code {$row['CLASS_CODE']}\n";
 				continue;
 			}
 
@@ -88,7 +88,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 
 				/* Ignore everything if you can't find a teacher
 				 */
-				echo "!  Cannot find Teacher with externalId {$row['STAFF_NUMBER']} for task {$row['TASK_ID']} {$row['TASK']}\n";
+				echo "!  Skipping {$row['TASK_ID']} {$row['TASK']}: cannot find Teacher with externalId {$row['STAFF_NUMBER']}\n";
 				continue;
 			}
 
@@ -104,7 +104,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 					$submissionBox->setWorkType($workType->first());
 				}
 				else {
-					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} - Work Type not found \n";
+					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']}: work Type not found \n";
 					continue;
 				}
 
@@ -133,7 +133,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 					$submissionBox->setMarkType($markType->first());
 				}
 				else {
-					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} - Mark Type not found \n";
+					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']}: Mark Type not found \n";
 					continue;
 				}
 
@@ -160,7 +160,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				}
 			}
 			else {
-				echo "-  Skipping {$row['TASK_ID']} {$row['TASK']} - Submission Box could not be instantiated \n";
+				echo "-  Skipping {$row['TASK_ID']} {$row['TASK']}: Submission Box could not be instantiated\n";
 			}
 		}
 
