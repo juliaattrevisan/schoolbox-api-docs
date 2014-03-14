@@ -3,7 +3,7 @@
  * Wrapper for a PHPLib template object and a mailer class.
  */
 
-class Mailer {
+class Mailer extends \Alaress\Mail\AbstractMailer {
 
     /**
      * Template object which is used to render the page
@@ -13,43 +13,15 @@ class Mailer {
     protected $template;
 
     /**
-     * List of headers that are added to the email that is sent.
-     *
-     * @var array
-     */
-    protected $headers = array();
-
-    /**
-     * The mailer object
-     *
-     * @var Swift_Message
-     */
-    protected $email;
-
-    /**
      * Template label
      *
      * @var string
      */
     public $t_label = 'tplBODY';
 
-    /**
-     * Instance of mail transporter.
-     *
-     * @var Swift_Transport
-     */
-    protected static $transport;
+    function __construct($template, $subject = "", $to = "", $host = '') {
 
-    function Mailer ($template, $subject = "", $to = "", $host = '') {
-
-        $this->email = new Swift_Message();
-
-        //setup header
-        $this->setFrom(Cfg::get('mail_from_address'), Cfg::get('mail_from_name'));
-        $this->headers['MessageID'] = '<' . md5(mktime()) . '@alaressmailer>';
-
-        $this->setTo($to);
-        $this->setSubject($subject);
+        parent::__construct($template, $subject, $to, $host);
 
         //setup HTML template
         $this->template = new Template( Config::get('template_dir') );
@@ -64,70 +36,6 @@ class Mailer {
         }
     }
 
-    function setFrom($email, $name = "") {
-        if ($name) {
-            $this->email->setFrom($email, $name);
-        }
-        else {
-            $this->email->setFrom($email);
-        }
-        $this->email->setReturnPath($email);
-    }
-
-    /**
-     * Convenience method for setting this mailer's From address as the
-     * currently logged in user.
-     *
-     * @todo dependency inject session instead of direct reference
-     *
-     * @return $this
-     */
-    public function setFromAsCurrentUser() {
-        $email_object  = new Email();
-        $email_address = $email_object->formatEmailFromArray($_SESSION);
-
-		/* Assign email address only if it's valid
-		 */
-		$email = new \Email($email_address);
-
-		if ($email->isValid()) {
-        	$this->setFrom($email_address, trim($_SESSION['firstname'].' '.$_SESSION['lastname']));
-		}
-
-        return $this;
-    }
-
-    function setTo ($to) {
-        if ( is_array($to) ) {
-            if ( $to['email'] ) {
-                if ( $to['name'] ) {
-                    $this->email->addTo($to['email'], $to['name']);
-                }
-                else {
-                    $this->email->addTo($to['email']);
-                }
-            }
-            else {
-
-                $this->to = '';
-                foreach ( $to as $email ) {
-                    if ( $email['name'] ) {
-                        $this->email->addTo($email['email'], $email['name']);
-                    }
-                    else {
-                        $this->email->addTo($email['email']);
-                    }
-                }
-            }
-        }
-        else {
-            $this->email->setTo(self::parseAddressString($to));
-        }
-    }
-
-    function setSubject ($subject) {
-        $this->email->setSubject($subject);
-    }
 
     function loadTemplate ($file) {
         $this->template->set_file($this->t_label, $this->getTemplate($file));
@@ -157,140 +65,18 @@ class Mailer {
         $this->template->parse($target, $handle, $append);
     }
 
-    function addFile ($file, $type = 'text/plain', $filename = '', $isFile = true) {
-        //add attachment to email
-        if ($isFile) {
-            $attachment = Swift_Attachment::fromPath($file, $type);
-        }
-        else {
-            $attachment = Swift_Attachment::newInstance($file, null, $type);
-        }
-        if ($filename) {
-            $attachment->setFilename($filename);
-        }
-        $this->email->attach($attachment);
-    }
-
-    function addImage ($file, $type = 'application/octet') {
-        //add inline image to email
-        // Returns a string so its source can be used later
-        return $this->email->embed(Swift_EmbeddedFile::fromPath($file)->setContentType($type));
-    }
-
     function composeHTML () {
         //initialise the email document
         return $this->template->parse("final", $this->t_label);
     }
 
-    function printEmail () {
-        print $this->composeHTML();
-    }
-
-    function send ($to = "") {
-
-        if ( !empty( $to ) ) {
-            $this->setTo($to);
-        }
-
-        //
-        // construct body and set headers
-        $body = $this->composeHTML();
-        $converter = new \Html2Text\Html2Text($body);
-        $this->email->setBody($converter->get_text(), null, 'utf-8');
-        $this->email->addPart($body, 'text/html', 'utf-8');
-        foreach ($this->headers as $name => $value) {
-            $this->email->getHeaders()->addTextHeader($name, $value);
-        }
-
-        // create transport and send email, if mail is enabled
-        if (!Config::get('mail_enable')) {
-            return false;
-        }
-        try {
-            Swift_Mailer::newInstance(self::getSwiftTransport())->send($this->email);
-        }
-        catch (Exception $ex) {
-            return false;
-        }
-        return true;
-    }
-
-	/**
-	 * @param \Schoolbox\IConfigLoader $conf
-	 * @param bool $reinitialise
-	 * @return Swift_Transport
-	 */
-	public static function getConfiguredSwiftTransport($conf, $reinitialise = false) {
-		if (!(self::$transport instanceof Swift_Transport) || $reinitialise) {
-			if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port') ){
-				self::$transport = new Swift_SmtpTransport(
-					$conf->get('mail_smtp_host'), $conf->get('mail_smtp_port')
-				);
-				self::$transport->setLocalDomain(
-					$conf->get('site_hostname').'.'.$conf->get('site_domain')
-				);
-
-				//Set auth details if available
-				if($conf->get('mail_smtp_username') && $conf->get('mail_smtp_password')) {
-					self::$transport->setUsername($conf->get('mail_smtp_username'));
-					self::$transport->setPassword($conf->get('mail_smtp_password'));
-				}
-			}
-			else {
-				self::$transport = new Swift_MailTransport();
-			}
-		}
-		return self::$transport;
-
+	function composePlain() {
+		$converter = new \Html2Text\Html2Text($this->composeHTML());
+		return $converter->get_text();
 	}
 
-	/**
-	 * Creates a Swift mailer transport instance, or gets last one created if it
-	 * has already been created.
-	 *
-	 * The exact transport used depends on configuration settings - if a SMTP
-	 * host and port are configured, it returns a Swift_SmtpTransport, otherwise
-	 * a Swift_MailTransport object.
-	 *
-	 * @param bool $reinitialise
-	 * @return Swift_Transport
-	 */
-    public static function getSwiftTransport($reinitialise = false) {
-	    return static::getConfiguredSwiftTransport(Cfg::getInstance(), $reinitialise);
-    }
-
-    /**
-     * Parses a list of email addresses out of a string, into a format that can
-     * be passed directly to Swift_Message->setTo().
-     *
-     * @param string $string
-     *
-     * @return array
-     */
-    public static function parseAddressString($string) {
-        $address_list = imap_rfc822_parse_adrlist($string, Cfg::get('site_hostname').'.'.Cfg::get('site_domain'));
-        $return_list  = array();
-        foreach ($address_list as $address) {
-            if ($address->host !== '.SYNTAX-ERROR.') {
-                $to    = $address->mailbox.'@'.$address->host;
-                $alias = property_exists($address, 'personal') ? $address->personal : null;
-                $return_list[$to] = $alias;
-            }
-        }
-        return $return_list;
-    }
-
-    /**
-     * Builds an RFC822-compliant email address from an address and a name.
-     *
-     * @param string $address
-     * @param string $name
-     *
-     * @return string
-     */
-    public static function buildAddress($address, $name = '') {
-        list($mailbox, $host) = explode('@', $address, 2);
-        return imap_rfc822_write_address($mailbox, $host, $name);
+    function printEmail () {
+        print $this->composeHTML();
     }
 
 }
