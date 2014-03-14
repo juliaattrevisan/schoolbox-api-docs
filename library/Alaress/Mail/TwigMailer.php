@@ -23,6 +23,9 @@ class TwigMailer extends AbstractMailer {
 	/** @var string */
 	protected $templateFilename;
 
+	/** @var string */
+	protected $rendercache = '';
+
 	/**
 	 * @param $template
 	 * @param string $subject
@@ -58,7 +61,18 @@ class TwigMailer extends AbstractMailer {
 	 * @return string
 	 */
 	protected function composeHTML() {
-		return $this->twig->render($this->templateFilename, $this->context);
+		// dump render to file
+//		$data = $this->twig->render($this->templateFilename, $this->context);
+//		$fp = fopen(SITE_root.'/data/cache/latest.html', 'w');
+//		fputs($fp, $data);
+//		fclose($fp);
+
+		// dump context to file
+//		$fp = fopen(SITE_root . '/data/cache/context.json', 'w');
+//		fputs($fp, json_encode($this->context));
+//		fclose($fp);
+
+		return $this->rendercache = $this->twig->render($this->templateFilename, $this->context);
 	}
 
 
@@ -68,6 +82,9 @@ class TwigMailer extends AbstractMailer {
 	 * @return string
 	 */
 	protected function composePlain() {
+		if($this->rendercache) {
+			return strip_tags($this->rendercache);
+		}
 		return strip_tags($this->composeHTML());
 	}
 

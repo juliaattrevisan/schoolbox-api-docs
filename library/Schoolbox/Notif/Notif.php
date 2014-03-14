@@ -206,9 +206,7 @@ class Notif implements LoggerInterface {
 		else {
 
 			if(!isset($this->handlers['plusmail'])) {
-
-				$this->handlers['plusmail'] = new InstamailHandler(
-					new Swift_Mailer(Mailer::getConfiguredSwiftTransport($this->conf, true)), Logger::WARNING, true);
+				$this->handlers['plusmail'] = new InstamailHandler(Logger::WARNING, true);
 			}
 			array_push($stack, $this->handlers['plusmail']);
 
