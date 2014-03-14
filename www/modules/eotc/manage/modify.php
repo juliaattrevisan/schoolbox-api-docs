@@ -226,6 +226,14 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$statusMapper = new \EOTC\EventStatusMapper();
 		$status = $statusMapper->findDefaultStatus();
 
+		/* You are the default teacher in charge
+		 * Even if you're not a teacher
+		 */
+		$teacherInCharge = array(
+			'id' => $_SESSION['user']->getId(),
+			'name' => $_SESSION['user']->getFullname(),
+		);
+
 		/* -_-
 		 */
 		$groupHandler = new Group();
@@ -233,7 +241,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$page->setVar(array(
 			'EVENT_RAMS_FILE' => '',
 			'EVENT_CURRENT_STUDENTS' => 0,
-			'EVENT_TEACHER_IN_CHARGE' => json_encode(array()),
+			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
 			'EVENT_STAFF' => json_encode(array()),
 			'EVENT_STATUS' => $status->getName(),
 			'EVENT_RAMSREQUIRED_SELECTED' => 'checked="checked"',
