@@ -305,6 +305,24 @@
 				}
 			}
 
+			/* For EOTC
+			 */
+			var validateTeacherInCharge = function() {
+				var ticExists = $('input[name=teacherInCharge]').length;
+
+				if (ticExists) {
+					var ticValue = $('input[name=teacherInCharge]').val()
+
+					if (ticValue == '[]' || ticValue == '') {
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			console.log($(config.element));
+
 			$(config.element).validate({
 				rules: {
 					'campus[]': {
@@ -319,6 +337,14 @@
 					'ramsFile': {
 						required: {
 							depends: validateRamsFile
+						},
+						minlength: {
+							param: 1
+						}
+					},
+					'teacherInCharge': {
+						required: {
+							depends: validateTeacherInCharge
 						},
 						minlength: {
 							param: 1
