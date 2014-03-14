@@ -33,10 +33,11 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 		 * have submission boxes
 		 */
 		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+			$edumateMark = new \External\Edumate\Import\EdumateMark($row);
 
 			/* Spawn a Return, or reuse an existing one that was imported
 			 */
-			$exists = $marksMapper->isTaskReturnExists($row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID']);
+			$exists = $marksMapper->isTaskReturnExists($edumateMark);
 
 			if (!$exists) {
 				$submissionReturn = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
@@ -46,15 +47,15 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			else {
 				/* Reuse an existing Submission Return
 				 */
-				if ($marksMapper->isNeedUpdate($row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID'], $row['LAST_UPDATED'])) {
-					$submissionReturnId = $marksMapper->findReturnFromTask($row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID']);
+				if ($marksMapper->isNeedUpdate($edumateMark)) {
+					$submissionReturnId = $marksMapper->findReturnFromTask($edumateMark);
 					$submissionReturn = $submissionReturnMapper->findById($submissionReturnId);
 				}
 				else {
 					/* Skip everything, because this Edumate Mark hasn't been updated
 					 * since the last time we imported it
 					 */
-					echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} in {$row['CLASS_CODE']}: nothing to update \n";
+					echo "-  Skipping task {$edumateMark->getTaskId()} for student {$edumateMark->getStudentId()} in {$edumateMark->getClassCode()}: nothing to update \n";
 					continue;
 				}
 			}
@@ -62,27 +63,31 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			/* Make sure the Submission Box exists first because we need to find the
 			 * teacher, who will become the owner of the marks
 			 */
-			$submissionBoxId = $taskMapper->findBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
+			$edumateTask = new \External\Edumate\Import\EdumateTask();
+			$edumateTask->setTaskId($edumateMark->getTaskId());
+			$edumateTask->setClassCode($edumateMark->getClassCode());
+
+			$submissionBoxId = $taskMapper->findBoxFromTask($edumateTask);
 
 			try {
 				$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 				$submissionReturn->setSubmissionBox($submissionBox);
 			}
 			catch (\Exception $e) {
-				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']}: Submission Box for class code {$row['CLASS_CODE']} not found \n";
+				echo "-  Skipping task {$edumateMark->getTaskId()} for student {$edumateMark->getStudentId()}: Submission Box for class code {$edumateMark->getClassCode()} not found \n";
 				continue;
 			}
 
 			/* Assign submission return marker
 			 */
 			try {
-				$category = $categoryMapper->findByCode($row['CLASS_CODE']);
+				$category = $categoryMapper->findByCode($edumateMark->getClassCode());
 			}
 			catch (\Exception $e) {
 
 				/* Ignore everything if you can't find a Schoolbox Category
 				 */
-				echo "!  Skipping {$row['TASK_ID']} {$row['TASK']}: cannot find Category with code {$row['CLASS_CODE']}\n";
+				echo "!  Skipping {$edumateMark->getTaskId()} : cannot find Category with code {$edumateMark->getClassCode()}\n";
 				continue;
 			}
 
@@ -90,21 +95,21 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 
 			/* Assign owner id
 			 */
-			$student = $userMapper->findByColumn('synergy_id', $row['STUDENT_ID']);
+			$student = $userMapper->findByColumn('synergy_id', $edumateMark->getStudentId());
 
 			if ($student->count()) {
 				$submissionReturn->setOwner($student->first());
 			}
 			else {
-				echo "-  Skipping task {$row['TASK_ID']} for student {$row['STUDENT_ID']} in {$row['CLASS_CODE']}: Student not found \n";
+				echo "-  Skipping task {$edumateMark->getTaskId()} for student {$edumateMark->getStudentId()} in {$edumateMark->getClassCode()}: Student not found \n";
 				continue;
 			}
 
 			/* Assign marks and comments
 			 */
 			$submissionReturn->setComment('');
-			$submissionReturn->setMark($row['MARK'] . ' / ' . $submissionBox->getMaxMark());
-			$submissionReturn->setNormalizedMark(100 * (float)$row['MARK']/(float)$submissionBox->getMaxMark());
+			$submissionReturn->setMark($edumateMark->getMark() . ' / ' . $submissionBox->getMaxMark());
+			$submissionReturn->setNormalizedMark(100 * (float)$edumateMark->getMark()/(float)$submissionBox->getMaxMark());
 			$submissionReturn->setFilename(null);
 			$submissionReturn->setFilesize(null);
 			$submissionReturn->setMimetype(null);
@@ -118,12 +123,12 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			/* Create relation
 			 */
 			if (!$exists) {
-				$marksMapper->createReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID'], $row['LAST_UPDATED']);
+				$marksMapper->createReturnRelation($submissionReturn, $edumateMark);
 
 				echo "+  Adding task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
 			}
 			else {
-				$marksMapper->updateReturnRelation($submissionReturn, $row['TASK_ID'], $row['CLASS_CODE'], $row['STUDENT_ID'], $row['LAST_UPDATED']);
+				$marksMapper->updateReturnRelation($submissionReturn, $edumateMark);
 
 				echo "^  Updating task {$row['TASK_ID']} for student {$row['STUDENT_ID']}\n";
 			}
