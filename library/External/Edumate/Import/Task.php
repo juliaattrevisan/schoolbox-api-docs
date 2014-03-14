@@ -41,7 +41,9 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 		 * have submission boxes
 		 */
 		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-			$exists = $taskMapper->isTaskBoxExists($row['TASK_ID'], $row['CLASS_CODE']);
+			$edumateTask = new \External\Edumate\Import\EdumateTask($row);
+
+			$exists = $taskMapper->isTaskBoxExists($edumateTask);
 
 			/* Create a new one since it doesn't exist
 			 */
@@ -51,15 +53,15 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 			else {
 				/* Reuse an existing Submission Box
 				 */
-				if ($taskMapper->isNeedUpdate($row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED'])) {
-					$submissionBoxId = $taskMapper->findBoxFromTask($row['TASK_ID'], $row['CLASS_CODE']);
+				if ($taskMapper->isNeedUpdate($edumateTask)) {
+					$submissionBoxId = $taskMapper->findBoxFromTask($edumateTask);
 					$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 				}
 				else {
 					/* Skip everything, because this Edumate Task hasn't been updated
 					 * since the last time we imported it
 					 */
-					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']}: nothing to update \n";
+					echo "-  Skipping {$edumateTask->getTaskId()} {$edumateTask->getTask()}: nothing to update \n";
 					continue;
 				}
 			}
@@ -67,28 +69,28 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 			/* Assign category if it exists in schoolbox
 			 */
 			try {
-				$category = $categoryMapper->findByCode($row['CLASS_CODE']);
+				$category = $categoryMapper->findByCode($edumateTask->getClassCode());
 				$submissionBox->setCategory($category);
 			}
 			catch (\Exception $e) {
 
 				/* Ignore everything if you can't find a Schoolbox Category
 				 */
-				echo "!  Skipping {$row['TASK_ID']} {$row['TASK']}: cannot find Category with code {$row['CLASS_CODE']}\n";
+				echo "!  Skipping {$edumateTask->getTaskId()} {$edumateTask->getTask()}: cannot find Category with code {$edumateTask->getClassCode()}\n";
 				continue;
 			}
 
 			/* Assign submission box owner
 			 */
 			try {
-				$teacher = $userMapper->findByColumn('synergy_id', $row['STAFF_NUMBER'])->first();
+				$teacher = $userMapper->findByColumn('synergy_id', $edumateTask->getStaffNumber())->first();
 				$submissionBox->setOwner($teacher);
 			}
 			catch (\Exception $e) {
 
 				/* Ignore everything if you can't find a teacher
 				 */
-				echo "!  Skipping {$row['TASK_ID']} {$row['TASK']}: cannot find Teacher with externalId {$row['STAFF_NUMBER']}\n";
+				echo "!  Skipping {$edumateTask->getTaskId()} {$edumateTask->getTask()}: cannot find Teacher with externalId {$edumateTask->getStaffNumber()}\n";
 				continue;
 			}
 
@@ -104,25 +106,25 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 					$submissionBox->setWorkType($workType->first());
 				}
 				else {
-					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']}: work Type not found \n";
+					echo "-  Skipping {$edumateTask->getTaskId()} {$edumateTask->getTask()}: work Type not found \n";
 					continue;
 				}
 
 				/* Assign name, description
 				 */
-				$submissionBox->setName($row['TASK']);
-				$submissionBox->setDescription('' . $row['DESCRIPTION']);
+				$submissionBox->setName($edumateTask->getTask());
+				$submissionBox->setDescription($edumateTask->getDescription());
 
 				/* Assign dates
 				 */
-				$submissionBox->setOpenDate(new \Alaress_Date_Format($row['SET_DATE'], 'y-m-d'));
-				$submissionBox->setDueDate(new \Alaress_Date_Format($row['DUE_DATE'], 'y-m-d'));
-				$submissionBox->setLateDate(new \Alaress_Date_Format($row['CLOSE_DATE'], 'y-m-d'));
+				$submissionBox->setOpenDate(new \Alaress_Date_Format($edumateTask->getSetDate(), 'y-m-d'));
+				$submissionBox->setDueDate(new \Alaress_Date_Format($edumateTask->getDueDate(), 'y-m-d'));
+				$submissionBox->setLateDate(new \Alaress_Date_Format($edumateTask->getCloseDate(), 'y-m-d'));
 				$submissionBox->setCreated(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
 				/* Assign submission acceptance settings
 				 */
-				$submissionBox->setAcceptOnline($row['ACCEPT_SUBMISSIONS']);
+				$submissionBox->setAcceptOnline($edumateTask->getAcceptSubmissions());
 				$submissionBox->setAcceptMultiple(false);
 
 				/* Assign marking rules
@@ -133,13 +135,13 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 					$submissionBox->setMarkType($markType->first());
 				}
 				else {
-					echo "-  Skipping {$row['TASK_ID']} {$row['TASK']}: Mark Type not found \n";
+					echo "-  Skipping {$edumateTask->getTaskId()} {$edumateTask->getTask()}: Mark Type not found \n";
 					continue;
 				}
 
 				$submissionBox->setRubricResultSet(0);
-				$submissionBox->setWeight($row['WEIGHTING']);
-				$submissionBox->setMaxMark($row['TOTAL_MARK']);
+				$submissionBox->setWeight($edumateTask->getWeighting());
+				$submissionBox->setMaxMark($edumateTask->getTotalMark());
 				$submissionBox->setMarkVisibility($submissionBox::MARK_VISIBILITY_PRIVATE);
 
 				/* Add this submission box to the tableau
@@ -150,17 +152,17 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				 * from which it spawned
 				 */
 				if (!$exists) {
-					$taskMapper->createBoxRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED']);
+					$taskMapper->createBoxRelation($submissionBox, $edumateTask);
 
-					echo "+  Adding {$row['TASK_ID']} {$row['TASK']}\n";
+					echo "+  Adding {$edumateTask->getTaskId()} {$edumateTask->getTask()}\n";
 				}
 				else {
-					$taskMapper->updateBoxRelation($submissionBox, $row['TASK_ID'], $row['CLASS_CODE'], $row['LAST_UPDATED']);
-					echo "^  Updating {$row['TASK_ID']} {$row['TASK']}\n";
+					$taskMapper->updateBoxRelation($submissionBox, $edumateTask);
+					echo "^  Updating {$edumateTask->getTaskId()} {$edumateTask->getTask()}\n";
 				}
 			}
 			else {
-				echo "-  Skipping {$row['TASK_ID']} {$row['TASK']}: Submission Box could not be instantiated\n";
+				echo "-  Skipping {$edumateTask->getTaskId()} {$edumateTask->getTask()}: Submission Box could not be instantiated\n";
 			}
 		}
 
