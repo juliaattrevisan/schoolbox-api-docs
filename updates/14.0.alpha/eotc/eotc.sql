@@ -15,6 +15,7 @@ CREATE TABLE `eotc_status`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR
 INSERT INTO `eotc_status` (`name`) VALUES ('Initial Application');
 INSERT INTO `eotc_status` (`name`) VALUES ('Approved In Principle');
 INSERT INTO `eotc_status` (`name`) VALUES ('RAMS Approved');
+INSERT INTO `eotc_status` (`name`) VALUES ('Awaiting Final Approval');
 INSERT INTO `eotc_status` (`name`) VALUES ('Approved');
 INSERT INTO `eotc_status` (`name`) VALUES ('Rejected');
 

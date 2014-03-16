@@ -34,6 +34,7 @@ class Chain {
 		$pendingFinalReview = new Type\PendingFinalReview($event);
 		$pendingRamsReview = new Type\PendingRamsReview($event);
 		$pendingInitialReview = new Type\PendingInitialReview($event);
+		$awaitingFinalApproval = new Type\AwaitingFinalApproval($event);
 		$approved = new Type\Approved($event);
 		$rejected = new Type\Rejected($event);
 		$none = new Type\None($event);
@@ -42,7 +43,8 @@ class Chain {
 		 */
 		$rejected->setNext($none);
 		$approved->setNext($rejected);
-		$pendingInitialReview->setNext($approved);
+		$awaitingFinalApproval->setNext($approved);
+		$pendingInitialReview->setNext($awaitingFinalApproval);
 		$pendingRamsReview->setNext($pendingInitialReview);
 		$pendingFinalReview->setNext($pendingRamsReview);
 
