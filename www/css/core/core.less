@@ -9556,6 +9556,7 @@ table img { max-width: none; }
   .subject-criteria   { margin-bottom: 8px;
     li li             { padding: 8px 16px;
                         border-top: solid 1px @border-color;
+                        overflow: auto;
     }
   }
   .crit-group         { padding: 12px 0 0 0;
@@ -9564,8 +9565,10 @@ table img { max-width: none; }
     > span            { font-weight: bold; }
     ul                { margin: 12px 0 0 0; }
   }
-  .crit-item .score   { position: absolute;
-                        right: 0;
+  .crit-item .name   { float: left;
+                       width: 74%;
+  }
+  .crit-item .score   { float: right;
                         width: 25%;
   }
   .semester-controls  { width: 300px;
