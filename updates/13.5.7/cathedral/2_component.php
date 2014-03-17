@@ -5,9 +5,9 @@ require_once __DIR__.'/../../../include/Bootstrap.php';
 if (Config::get('site_location') === 'cathedral') {
     $component = array(
         'name'               => 'Daily Quote',
-        'module'             => 'homepage',
+        'module'             => 'dashboard',
         'component_category' => '1',
-        'class'              => 'Component_Homepage_DailyQuoteController',
+        'class'              => 'Component_Dashboard_DailyQuoteController',
         'description'        => 'A quote that appears daily',
         'multiple'           => 'false',
         'visible'            => 'true',

@@ -11,7 +11,7 @@
  */
 
 
-class Component_Homepage_DailyQuoteController extends Component_Homepage_ControllerAbstract {
+class Component_Dashboard_DailyQuoteController extends Component_Dashboard_ControllerAbstract {
 
     /**
      * Prepares data for the render function. Business logic.
