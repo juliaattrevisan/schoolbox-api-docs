@@ -29,12 +29,17 @@ class Chain {
 		/* Set up chain of responsibility
 		 * Checks occur in this order:
 		 *
-		 * Urgent, Pending Final, Pending RAMS, Pending Initial, Approved, Rejected, None
+		 * Urgent,
+		 * Pending Awaiting Final Approval,
+		 * Pending In Principle,
+		 * Pending RAMS,
+		 * Approved,
+		 * Rejected,
+		 * None
  		 */
-		$pendingFinalReview = new Type\PendingFinalReview($event);
+		$pendingAwaitingFinalApproval = new Type\PendingAwaitingFinalApproval($event);
+		$pendingInPrincipleReview = new Type\PendingInPrincipleReview($event);
 		$pendingRamsReview = new Type\PendingRamsReview($event);
-		$pendingInitialReview = new Type\PendingInitialReview($event);
-		$awaitingFinalApproval = new Type\AwaitingFinalApproval($event);
 		$approved = new Type\Approved($event);
 		$rejected = new Type\Rejected($event);
 		$none = new Type\None($event);
@@ -43,14 +48,13 @@ class Chain {
 		 */
 		$rejected->setNext($none);
 		$approved->setNext($rejected);
-		$awaitingFinalApproval->setNext($approved);
-		$pendingInitialReview->setNext($awaitingFinalApproval);
-		$pendingRamsReview->setNext($pendingInitialReview);
-		$pendingFinalReview->setNext($pendingRamsReview);
+		$pendingRamsReview->setNext($approved);
+		$pendingInPrincipleReview->setNext($pendingRamsReview);
+		$pendingAwaitingFinalApproval->setNext($pendingInPrincipleReview);
 
 		/* Start motor
 		 */
-		$this->setResult($pendingFinalReview->determine());
+		$this->setResult($pendingAwaitingFinalApproval->determine());
 	}
 
 	/* Getters/Setters

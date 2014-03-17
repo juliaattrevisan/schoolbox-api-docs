@@ -1,6 +1,6 @@
 <?php
 /**
- * PendingFinalReview
+ * AwaitingFinalApproval
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,14 +11,14 @@
 namespace EOTC\ListGroup\Type;
 
 
-class PendingFinalReview extends Base {
+class PendingAwaitingFinalApproval extends Base {
 
 	/**
 	 * Next status id
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL;
+	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_APPROVED;
 
 	/**
 	 * Determine where to go next
@@ -31,10 +31,10 @@ class PendingFinalReview extends Base {
 		 * or if it doesn't require RAMS at all
 		 */
 		if (!$this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalReviewIndex());
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingAwaitingFinalApprovalReviewIndex());
 		}
 		else if ($this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isRamsApproved()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalReviewIndex());
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingAwaitingFinalApprovalReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it
