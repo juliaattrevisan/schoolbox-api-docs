@@ -24,7 +24,7 @@
             })
             form.find('input[name="related_resource_id"]').userSelector({
                 plugin: {
-                    data: {{ routeLookup('resourceItem.search', {id: item.id, format:'.json'})|json_encode|raw }},
+                    data: {{ (routeLookup('resourceItem.search', {id: item.id, format:'.json'}) ~ "?thisId=" ~ item.id) | json_encode|raw }},
                     width: 200
                 },
                 multiple: true

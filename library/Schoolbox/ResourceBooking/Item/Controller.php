@@ -57,16 +57,21 @@ class Controller extends Base {
      * @todo remove and integrate into browse() once BelgianSuggest is gone
      */
     public function search() {
-        $search = trim($this->getRequest()->post['query']);
+        $excludedId = $this->getRequest()->query['thisId'];
+        $search     = trim($this->getRequest()->post['query']);
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
-                'data'   => $this->getMapper()->search($search)->map(function($item) {
-                    return array(
-                        'id'   => $item->getId(),
-                        'name' => $item->getName(),
-                    );
-                }),
+                'data'   => $this->getMapper()->search($search)
+                    ->filter(function($item) use($excludedId) {
+                        return $item->getId() != $excludedId;
+                    })
+                    ->map(function($item) {
+                        return array(
+                            'id'   => $item->getId(),
+                            'name' => $item->getName(),
+                        );
+                    }),
             )
         );
     }
