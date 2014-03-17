@@ -210,3 +210,31 @@ Scenario: Search for resources (from the resource module)
   Then  I should not see "A single projector"
   And   I should not see "English textbook"
   And   I should see "The good projector"
+
+@resource-relations
+Scenario: Adding related resources to a resource
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "wwhite" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I follow "resource-create"
+  And   I fill in the following:
+    | name                      | Book box                       |
+    | description               | A box for the English textbook |
+    | max_reservation_time[day] | 168                            |
+  And   I select "Celia Glenn" from autocomplete "moderator_id"
+  And   I select "English textbook" from autocomplete "resource_relation_id"
+  And   I press "resource-save"
+
+@resource-booking
+Scenario: Booking a resource
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "wwhite" with password "password"
+  # Book a resource: test against its min and max reserve time, and its lead time
+  # Test repeated booking of resources
+  # Test booking on a timetable
+  # Test booking of conflicting times
+  # Test confirming of booking
+  # Test cancellation of booking
+  #
