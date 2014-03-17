@@ -133,11 +133,11 @@ Scenario: Manage resources
   When  I move backward one page
   And   I follow "resource-create"
   And   I fill in the following:
-    | name                 | To be deleted |
-    | description          | To be deleted |
-    | min_lead_time[day]        | 00                       |
-    | min_reservation_time[day] | 01                       |
-    | max_reservation_time[day] | 02                       |
+    | name                      | To be deleted |
+    | description               | To be deleted |
+    | min_lead_time[day]        | 00            |
+    | min_reservation_time[day] | 01            |
+    | max_reservation_time[day] | 02            |
   And   I select "Projectors" from "resource_category_id"
   And   I select "Open" from "resource_moderation_type_id"
   And   I press "resource-save"
@@ -146,7 +146,7 @@ Scenario: Manage resources
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
   When  I follow "To be deleted"
-  And   I press "Delete"
+  And   I follow "Delete"
   # There should be a confirm here, but currently there is not.
   Then  I should not see "To be deleted" in the ".resource-list" element
   And   I should see "A single projector" in the ".resource-list" element
