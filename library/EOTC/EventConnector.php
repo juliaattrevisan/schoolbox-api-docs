@@ -194,6 +194,13 @@ class EventConnector extends EventMapper {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
+				/* Skip over rejected events so they don't display in the calendar grid,
+				 * obscuring your vision, occupying your real estate
+				 */
+				if ($eventItem->getMetadata()->getStatus()->isRejected()) {
+					continue;
+				}
+
 				/* Accumulate staff attendees for this event
 				 */
 				$allStaffAttendees = $metadataMapper->findStaffAttendees($eventItem->getMetadata()->getId());

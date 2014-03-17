@@ -61,10 +61,6 @@ CREATE TABLE `eotc_activitylog`( `id` INT(11) AUTO_INCREMENT, `actioner_id` INT(
  */
 CREATE TABLE `eotc_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `user_id` INT(11), `campus_id` INT(11), `status_id` INT(11), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
 
-/* EOTC Event Colour
- */
-INSERT INTO `luEventType` (`eventType`, `eventColour`) VALUES ('EOTC', 'aaaaaa');
-
 /* EOTC Config
  */
 CREATE TABLE `eotc_config`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), `value` VARCHAR(255), PRIMARY KEY (`id`) );
