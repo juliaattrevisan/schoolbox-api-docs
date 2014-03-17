@@ -153,6 +153,15 @@ class Mapper extends BaseMapper {
 //                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
             )
         );
+        $this->hasJoin(
+            'related_resource',
+            array(
+                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\RelatedResource\\Mapper',
+                'this_key'  => 'id',
+                'other_key' => 'resource_id',
+                'multiple'  => true,
+            )
+        );
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
@@ -176,6 +185,8 @@ class Mapper extends BaseMapper {
         };
         $mapper->save($newList->diff($oldList, $diffMethod));
         $mapper->delete($oldList->diff($newList, $diffMethod));
+
+        // Add save of related items
     }
 
     /**
@@ -190,15 +201,20 @@ class Mapper extends BaseMapper {
      * @return object
      */
     public function hydrate($row, $alias = '', $callback = null) {
+        if (isset($callback)) {
+            return parent::hydrate($row, $alias, $callback);
+        }
         return parent::hydrate(
             $row,
             $alias,
             function($mapper, $model, $row) {
                 /** @var self $mapper */
                 /** @var Model $model */
+
+                // populate the moderator list
                 $modMapper   = $mapper->getJoinMapper('moderator');
                 $userMapper  = $modMapper->getJoinMapper('moderator');
-                $query     = "
+                $query       = "
                     SELECT
                       {$modMapper->getColumnString('m')},
                       {$userMapper->getColumnString('u')}
@@ -210,6 +226,7 @@ class Mapper extends BaseMapper {
                 $statement->execute(array($model->getId()));
                 $model->setModeratorList($userMapper->hydrateList($statement, 'u'));
 
+                // Populate image
                 $imageId = $model->getImage()->getId();
                 if ($imageId) {
                     $imageMapper = $mapper->getJoinMapper('image');
@@ -218,6 +235,21 @@ class Mapper extends BaseMapper {
                     }
                     catch (BaseMapper\Exception $ex) {}
                 }
+
+                // populate related resources
+                $relationMapper     = $mapper->getJoinMapper('related_resource');
+                $relatedModelMapper = $relationMapper->getJoinMapper('related_resource');
+                $query              = "
+                    SELECT
+                      {$relationMapper->getColumnString('r')},
+                      {$relatedModelMapper->getColumnString('m')}
+                    FROM {$relationMapper->getTable()} `r`
+                    INNER JOIN {$relationMapper->getJoinSql('related_resource', 'r', 'm')}
+                    WHERE r.resource_id=?
+                ";
+                $statement = $userMapper->getDatabase()->prepare($query);
+                $statement->execute(array($model->getId()));
+                $model->setRelatedResourceList($relatedModelMapper->hydrateList($statement, 'm', function() {}));
 
                 return $model;
             }

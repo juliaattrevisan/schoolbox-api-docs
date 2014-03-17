@@ -232,6 +232,7 @@ class Controller extends Base {
                 $model->addModerator($user);
             }
         }
+        $model->setRelatedResourceList(new Collection());
         if (is_array($post['related_resource_id'])) {
             foreach ($post['related_resource_id'] as $related_resource_id) {
                 $resource = new Model();
