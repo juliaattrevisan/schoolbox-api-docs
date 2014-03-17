@@ -92,6 +92,12 @@ class Authenticator {
 			return true;
 		}
 
+		/* Allow all EOTC administrators to see Rejected events
+		 */
+		if ($event->getMetadata()->getStatus()->isRejected()) {
+			return true;
+		}
+
 		$allPermissions = $this->getPermissionMapper()->findByUser($user);
 
 		/* Check that you have access to the campus as well as the status
