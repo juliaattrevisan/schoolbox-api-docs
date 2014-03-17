@@ -16,8 +16,9 @@ use Schoolbox\Storage;
 use Alaress_Date_Format;
 use DateInterval;
 use Schoolbox\User;
+use JsonSerializable;
 
-class Model implements ISoftDeletable {
+class Model implements ISoftDeletable, JsonSerializable {
 
     /**
      * @var int
@@ -315,6 +316,30 @@ class Model implements ISoftDeletable {
      */
     public function isDeleted() {
         return ($this->getDeletedAt() instanceof Alaress_Date_Format);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @return array
+     */
+    public function jsonSerialize() {
+        return array(
+            'id'                   => $this->getId(),
+            'name'                 => $this->getName(),
+            'description'          => $this->getDescription(),
+            'max_reservation_time' => $this->getMaxReservationTime(),
+            'min_reservation_time' => $this->getMinReservationTime(),
+            'min_lead_time'        => $this->getMinLeadTime(),
+            'moderation_type'      => $this->getModerationType(),
+            'moderator_list'       => $this->getModeratorList()->jsonSerialize(),
+            'category'             => $this->getCategory()->jsonSerialize(),
+//            'deleted'              => $this->isDeleted(),
+//            'image'                => $this->getImage()->getHash(),
+//            'created_at'           => $this->getCreatedAt(),
+//            'modified_at'          => $this->getModifiedAt(),
+//            'deleted_at'           => $this->getDeletedAt(),
+        );
     }
 
 }

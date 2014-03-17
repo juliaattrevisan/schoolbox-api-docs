@@ -11,8 +11,9 @@ namespace Schoolbox\ResourceBooking\Category;
 
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;
+use JsonSerializable;
 
-class Model implements ISoftDeletable {
+class Model implements ISoftDeletable, JsonSerializable {
 
     /**
      * @var int
@@ -127,6 +128,18 @@ class Model implements ISoftDeletable {
      */
     public function isDeleted() {
         return ($this->getDeletedAt() instanceof Alaress_Date_Format);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @return array
+     */
+    public function jsonSerialize() {
+        return array(
+            'id'   => $this->getId(),
+            'name' => $this->getName(),
+        );
     }
 
 }
