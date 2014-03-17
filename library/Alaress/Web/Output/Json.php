@@ -10,6 +10,7 @@
 namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
+use JsonSerializable;
 
 class Json extends Base {
 
@@ -27,7 +28,14 @@ class Json extends Base {
      */
     protected function outputResponseBody() {
         $response = $this->getResponse()->content->get();
-        echo json_encode($response['data']);
+
+        // Use patched JsonSerializable interface.
+        // TODO: remove once PHP >= 5.4
+        $output = array();
+        foreach ($response['data'] as $key => $value) {
+            $output[$key] = ($value instanceof JsonSerializable) ? $value->jsonSerialize() : $value;
+        }
+        echo json_encode($output);
     }
 
 }
