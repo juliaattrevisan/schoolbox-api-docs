@@ -52,24 +52,24 @@ if ($authenticator->canPromote($_SESSION['user'], $event)) {
 
 	/* Activity Log
 	 */
-	$registry = new \EOTC\ActivityLog\Registry();
-	$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
-
-	/* If a status changed, log it
-	 */
-	if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
-		$registry->add($factory->produce('StatusChange'));
-	}
-
-	/* If a comment changed, log it
-	 */
-	if ($originalComment != $event->getMetadata()->getComment()) {
-		$registry->add($factory->produce('CommentChange'));
-	}
-
-	/* Notify everyone
-	 */
-	$registry->notify();
+//	$registry = new \EOTC\ActivityLog\Registry();
+//	$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
+//
+//	/* If a status changed, log it
+//	 */
+//	if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
+//		$registry->add($factory->produce('StatusChange'));
+//	}
+//
+//	/* If a comment changed, log it
+//	 */
+//	if ($originalComment != $event->getMetadata()->getComment()) {
+//		$registry->add($factory->produce('CommentChange'));
+//	}
+//
+//	/* Notify everyone
+//	 */
+//	$registry->notify();
 
 	/* Redirect back to status screen
 	 */

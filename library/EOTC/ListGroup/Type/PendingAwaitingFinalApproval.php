@@ -18,7 +18,7 @@ class PendingAwaitingFinalApproval extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_APPROVED;
+	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL;
 
 	/**
 	 * Determine where to go next

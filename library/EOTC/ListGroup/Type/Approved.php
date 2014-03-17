@@ -27,9 +27,6 @@ class Approved extends Base {
 	 */
 	public function determine() {
 
-		/* If this requires RAMS and RAMS has been approved,
-		 * or if it doesn't require RAMS at all
-		 */
 		if (($this->getEvent()->getMetadata()->getStatus()->isApproved())) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getApprovedIndex());
 		}

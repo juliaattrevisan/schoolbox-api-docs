@@ -37,6 +37,7 @@ class Chain {
 		 * Rejected,
 		 * None (throws whacky exception)
  		 */
+		$pendingFinalApproval = new Type\PendingFinalApproval($event);
 		$pendingAwaitingFinalApproval = new Type\PendingAwaitingFinalApproval($event);
 		$pendingInPrincipleReview = new Type\PendingInPrincipleReview($event);
 		$pendingRamsReview = new Type\PendingRamsReview($event);
@@ -51,11 +52,12 @@ class Chain {
 		$pendingRamsReview->setNext($approved);
 		$pendingInPrincipleReview->setNext($pendingRamsReview);
 		$pendingAwaitingFinalApproval->setNext($pendingInPrincipleReview);
+		$pendingFinalApproval->setNext($pendingAwaitingFinalApproval);
 
 		/* Start motor
 		 */
 		try {
-			$this->setResult($pendingAwaitingFinalApproval->determine());
+			$this->setResult($pendingFinalApproval->determine());
 		}
 		catch (\Exception $e) {
 			error(163);

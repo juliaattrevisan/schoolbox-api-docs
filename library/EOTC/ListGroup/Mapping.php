@@ -24,6 +24,7 @@ class Mapping {
 	 */
 	private $mapping = array(
 		'Urgent',
+		'Pending Final Approval',
 		'Pending Awaiting Final Approval',
 		'Pending Initial Application Review',
 		'Pending RAMS Review',
@@ -57,12 +58,21 @@ class Mapping {
 	}
 
 	/**
-	 * Index of Awaiting Final Approval events
+	 * Index of Pending Final Approval events
+	 *
+	 * @return int
+	 */
+	public function getPendingFinalApprovalReviewIndex() {
+		return 1;
+	}
+
+	/**
+	 * Index of Pending Awaiting Final Approval events
 	 *
 	 * @return int
 	 */
 	public function getPendingAwaitingFinalApprovalReviewIndex() {
-		return 1;
+		return 2;
 	}
 
 	/**
@@ -71,7 +81,7 @@ class Mapping {
 	 * @return int
 	 */
 	public function getPendingInPrincipleReviewIndex() {
-		return 2;
+		return 3;
 	}
 
 	/**
@@ -80,15 +90,6 @@ class Mapping {
 	 * @return int
 	 */
 	public function getPendingRamsReviewIndex() {
-		return 3;
-	}
-
-	/**
-	 * Index of Pending Initial Review events
-	 *
-	 * @return int
-	 */
-	public function getApprovedIndex() {
 		return 4;
 	}
 
@@ -97,8 +98,17 @@ class Mapping {
 	 *
 	 * @return int
 	 */
-	public function getRejectedIndex() {
+	public function getApprovedIndex() {
 		return 5;
+	}
+
+	/**
+	 * Index of Pending Initial Review events
+	 *
+	 * @return int
+	 */
+	public function getRejectedIndex() {
+		return 6;
 	}
 
 	/* Getters/Setters
