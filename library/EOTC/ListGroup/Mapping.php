@@ -25,7 +25,7 @@ class Mapping {
 	private $mapping = array(
 		'Urgent',
 		'Pending Final Approval',
-		'Pending Awaiting Final Approval',
+		'Awaiting Final Approval',
 		'Pending Initial Application Review',
 		'Pending RAMS Review',
 		'Approved',
