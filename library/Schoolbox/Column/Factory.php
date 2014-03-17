@@ -49,7 +49,7 @@ class Factory implements IFactory {
 				break;
 
 			case Mapper::TYPE_TIMESPAN:
-				$column = new Timespan();
+				$column = new Interval();
 				break;
 
 			case Mapper::TYPE_MODEL:
