@@ -52,6 +52,23 @@ class Controller extends Base {
     }
 
     /**
+     * JSON search for resources
+     *
+     * @todo remove and integrate into browse() once BelgianSuggest is gone
+     */
+    public function search() {
+        $search = trim($this->getRequest()->post['query']);
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => array(
+                    'list' => $this->getMapper()->search($search),
+                ),
+            )
+        );
+    }
+
+    /**
      * Display form for adding another category
      */
     public function add() {

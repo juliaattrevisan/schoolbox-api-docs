@@ -26,6 +26,7 @@ class Module extends BaseModule {
     public function initRoutes(Router $router, $basePath) {
         $router->attachResource('resourceItem', $basePath);
         $router->attachResourcePostAlias('resourceItem', $basePath);
+        $router->add('resourceItem.search', $basePath.'/search');
     }
 
     /**
