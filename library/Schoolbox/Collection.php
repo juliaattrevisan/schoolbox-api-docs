@@ -11,8 +11,9 @@ namespace Schoolbox;
 use Schoolbox;
 use ArrayIterator;
 use ICollection;
+use JsonSerializable;
 
-class Collection implements \ICollection {
+class Collection implements ICollection, JsonSerializable {
 
 	protected $stack = array();
 	protected $position = 0;
@@ -480,6 +481,20 @@ class Collection implements \ICollection {
 			}
 		}
 		return new Collection($result);
+	}
+
+	/**
+	 * Specify data which should be serialized to JSON. Currently, attempts to
+	 * serialize all items within the stack.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize() {
+		$result = array();
+		foreach ($this as $key => $item) {
+			$result[$key] = ($item instanceof JsonSerializable) ? $item->jsonSerialize() : $item;
+		}
+		return $result;
 	}
 
 }
