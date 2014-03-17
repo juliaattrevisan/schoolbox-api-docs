@@ -27,6 +27,8 @@ class PendingInPrincipleReview extends Base {
 	 */
 	public function determine() {
 
+		/* All Draft (Initial Application) events get promoted to this
+		 */
 		if ($this->getEvent()->getMetadata()->getStatus()->isDraft()) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingInPrincipleReviewIndex());
 		}

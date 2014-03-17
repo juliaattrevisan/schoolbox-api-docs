@@ -27,8 +27,7 @@ class Rejected extends Base {
 	 */
 	public function determine() {
 
-		/* If this requires RAMS and RAMS has been approved,
-		 * or if it doesn't require RAMS at all
+		/* All Rejected events end up in their own feedback cycle
 		 */
 		if (($this->getEvent()->getMetadata()->getStatus()->isRejected())) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getRejectedIndex());

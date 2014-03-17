@@ -27,6 +27,8 @@ class PendingFinalApproval extends Base {
 	 */
 	public function determine() {
 
+		/* If it's Awaiting Final Approval, next status is Approved
+		 */
 		if ($this->getEvent()->getMetadata()->getStatus()->isAwaitingFinalApproval()) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalApprovalReviewIndex());
 		}

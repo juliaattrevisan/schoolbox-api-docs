@@ -27,6 +27,8 @@ class Approved extends Base {
 	 */
 	public function determine() {
 
+		/* All Approved events end up in their own feedback cycle
+		 */
 		if (($this->getEvent()->getMetadata()->getStatus()->isApproved())) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getApprovedIndex());
 		}
