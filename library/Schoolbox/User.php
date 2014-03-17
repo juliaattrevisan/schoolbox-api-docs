@@ -10,8 +10,9 @@
 
 namespace Schoolbox;
 
+use JsonSerializable;
 
-class User {
+class User implements JsonSerializable {
 
     private $id;
     private $title;
@@ -558,4 +559,20 @@ private $enabled;               //Bool
 	public function getEmailRecipients() {
 		return $this->emailRecipients;
 	}
+
+	/**
+	 * Specify data which should be serialized to JSON
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize() {
+		return array(
+			'id'        => $this->getId(),
+			'title'     => $this->getTitle(),
+			'firstname' => $this->getFirstname(),
+			'lastname'  => $this->getLastname(),
+		);
+	}
+
+
 }
