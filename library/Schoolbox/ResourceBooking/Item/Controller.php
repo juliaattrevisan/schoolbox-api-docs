@@ -61,9 +61,12 @@ class Controller extends Base {
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
-                'data'   => array(
-                    'list' => $this->getMapper()->search($search),
-                ),
+                'data'   => $this->getMapper()->search($search)->map(function($item) {
+                    return array(
+                        'id'   => $item->getId(),
+                        'name' => $item->getName(),
+                    );
+                }),
             )
         );
     }

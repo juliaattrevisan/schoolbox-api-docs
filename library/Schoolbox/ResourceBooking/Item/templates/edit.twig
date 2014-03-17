@@ -13,7 +13,7 @@
                 form.attr('action', $(this).data('action')).submit();
             })
 
-            // Add magicsuggest for user selection
+            // Add magicsuggest for user selection and selector for related items
             form.find('input[name="moderator_id"]').userSelector({
                 plugin: {
                     data:'/ajax/user.php?groupID=0',
@@ -22,7 +22,13 @@
                 multiple: true,
                 value: {{ moderatorList|json_encode|raw }}
             })
-
+            form.find('input[name="related_resource_id"]').userSelector({
+                plugin: {
+                    data: {{ routeLookup('resourceItem.search', {id: item.id, format:'.json'})|json_encode|raw }},
+                    width: 200
+                },
+                multiple: true
+            })
 
             form.find('input[type="file"].prettify').prettyFileInput({
                 additionalButtonClasses: 'no-marg float-left',
@@ -80,6 +86,12 @@
             <td class="formLabelWidth"><h4>Moderators</h4></td>
             <td>
                 <input name="moderator_id" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Related Resources</h4></td>
+            <td>
+                <input name="related_resource_id" />
             </td>
         </tr>
         <tr>
