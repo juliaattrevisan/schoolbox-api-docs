@@ -18,10 +18,9 @@ class Synchronise_Tass_Cathedral_Strategy_Student extends Synchronise_Base_Strat
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_House())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Group_Student())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Username_Student())
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Student())
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Group_Student())
+            ->addHydrator(new Synchronise_Base_Hydrator_Student_UsernameFromEmail())
             ->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
