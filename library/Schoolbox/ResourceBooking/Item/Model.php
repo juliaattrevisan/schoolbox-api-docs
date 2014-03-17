@@ -87,6 +87,11 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     protected $moderatorList;
 
+    /**
+     * @var Collection|self[]
+     */
+    protected $relatedResourceList;
+
     public function __construct() {
         $this->setModeratorList(new Collection());
     }
@@ -307,6 +312,30 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     public function addModerator($moderator) {
         return $this->getModeratorList()->add($moderator);
+    }
+
+    /**
+     * @param  Collection|self[] $relatedResourceList
+     * @return $this
+     */
+    public function setRelatedResourceList($relatedResourceList) {
+        $this->relatedResourceList = $relatedResourceList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getRelatedResourceList() {
+        return $this->relatedResourceList;
+    }
+
+    /**
+     * @param  self  $resource
+     * @return $this
+     */
+    public function addRelatedResource($resource) {
+        return $this->getModeratorList()->add($resource);
     }
 
     /**
