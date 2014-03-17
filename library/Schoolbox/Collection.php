@@ -404,6 +404,21 @@ class Collection implements ICollection, JsonSerializable {
 	}
 
 	/**
+	 * Applies a callabale to all items in this collection, and returns a new
+	 * collection with the result.
+	 *
+	 * @param  callback   $callback
+	 * @return Collection
+	 */
+	public function map($callback) {
+		$return = new Collection();
+		foreach ($this as $key => $item) {
+			$return->offsetSet($key, call_user_func($callback, $item));
+		}
+		return $return;
+	}
+
+	/**
 	 * Groups all results by a field value.
 	 *
 	 * @param  string $field The field to search by.
