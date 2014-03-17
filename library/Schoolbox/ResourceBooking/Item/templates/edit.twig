@@ -117,9 +117,9 @@
                 <em>Somebody reserving this item must give this period of notice before their reservation.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.minLeadTime.format('%h') // 24 }}" name="min_lead_time[day]"    placeholder="days"> days,
-                <input class="interval-input" value="{{ item.minLeadTime.format('%h')  % 24 }}" name="min_lead_time[hour]"   placeholder="hours"> hours,
-                <input class="interval-input" value="{{ item.minLeadTime.format('%m') }}" name="min_lead_time[minute]" placeholder="minutes"> minutes
+                <input class="interval-input" value="{{ item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"    placeholder="days"> days,
+                <input class="interval-input" value="{{ item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]"   placeholder="hours"> hours,
+                <input class="interval-input" value="{{ item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" placeholder="minutes"> minutes
             </td>
         </tr>
         <tr>
@@ -128,9 +128,9 @@
                 <em>This item must be reserved for at least this period of time.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.minReservationTime.format('%h') // 24 }}" name="min_reservation_time[day]"    placeholder="days"> days,
-                <input class="interval-input" value="{{ item.minReservationTime.format('%h')  % 24 }}" name="min_reservation_time[hour]"   placeholder="hours"> hours,
-                <input class="interval-input" value="{{ item.minReservationTime.format('%m') }}" name="min_reservation_time[minute]" placeholder="minutes"> minutes
+                <input class="interval-input" value="{{ item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"    placeholder="days"> days,
+                <input class="interval-input" value="{{ item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]"   placeholder="hours"> hours,
+                <input class="interval-input" value="{{ item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" placeholder="minutes"> minutes
             </td>
         </tr>
         <tr>
@@ -139,9 +139,9 @@
                 <em>This item cannot be reserved for longer than this period.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.maxReservationTime.format('%h') // 24 }}" name="max_reservation_time[day]"    placeholder="days"> days,
-                <input class="interval-input" value="{{ item.maxReservationTime.format('%h')  % 24 }}" name="max_reservation_time[hour]"   placeholder="hours"> hours,
-                <input class="interval-input" value="{{ item.maxReservationTime.format('%m') }}" name="max_reservation_time[minute]" placeholder="minutes"> minutes
+                <input class="interval-input" value="{{ item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]"    placeholder="days"> days,
+                <input class="interval-input" value="{{ item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]"   placeholder="hours"> hours,
+                <input class="interval-input" value="{{ item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" placeholder="minutes"> minutes
             </td>
         </tr>
     </table>
