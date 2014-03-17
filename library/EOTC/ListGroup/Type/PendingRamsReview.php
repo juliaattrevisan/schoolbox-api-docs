@@ -27,8 +27,8 @@ class PendingRamsReview extends Base {
 	 */
 	public function determine() {
 
-		/* If this requires RAMS and is In Principle,
-		 * or if it doesn't require RAMS at all
+		/* This comprises events which came from In Principle
+		 * with the RAMS Required configuration
 		 */
 		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple())) {
 			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingRamsReviewIndex());

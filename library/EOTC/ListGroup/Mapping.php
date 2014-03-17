@@ -2,6 +2,10 @@
 /**
  * Mapping
  *
+ * The ints used in getUrgentIndex() etc. don't necessarily correspond
+ * to the consts defined in EventStatusMapper. These ints are used purely
+ * within this class
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -20,9 +24,10 @@ class Mapping {
 	 */
 	private $mapping = array(
 		'Urgent',
-		'Pending Final Review',
+		'Pending Final Approval',
+		'Awaiting Final Approval',
+		'Pending Initial Application Review',
 		'Pending RAMS Review',
-		'Pending Initial Review',
 		'Approved',
 		'Rejected',
 	);
@@ -53,12 +58,30 @@ class Mapping {
 	}
 
 	/**
+	 * Index of Pending Final Approval events
+	 *
+	 * @return int
+	 */
+	public function getPendingFinalApprovalReviewIndex() {
+		return 1;
+	}
+
+	/**
+	 * Index of Pending Awaiting Final Approval events
+	 *
+	 * @return int
+	 */
+	public function getPendingAwaitingFinalApprovalReviewIndex() {
+		return 2;
+	}
+
+	/**
 	 * Index of Pending Final Review events
 	 *
 	 * @return int
 	 */
-	public function getPendingFinalReviewIndex() {
-		return 1;
+	public function getPendingInPrincipleReviewIndex() {
+		return 3;
 	}
 
 	/**
@@ -67,24 +90,6 @@ class Mapping {
 	 * @return int
 	 */
 	public function getPendingRamsReviewIndex() {
-		return 2;
-	}
-
-	/**
-	 * Index of Pending Initial Review events
-	 *
-	 * @return int
-	 */
-	public function getPendingInitialReviewIndex() {
-		return 3;
-	}
-
-	/**
-	 * Index of Pending Initial Review events
-	 *
-	 * @return int
-	 */
-	public function getApprovedIndex() {
 		return 4;
 	}
 
@@ -93,8 +98,17 @@ class Mapping {
 	 *
 	 * @return int
 	 */
-	public function getRejectedIndex() {
+	public function getApprovedIndex() {
 		return 5;
+	}
+
+	/**
+	 * Index of Pending Initial Review events
+	 *
+	 * @return int
+	 */
+	public function getRejectedIndex() {
+		return 6;
 	}
 
 	/* Getters/Setters

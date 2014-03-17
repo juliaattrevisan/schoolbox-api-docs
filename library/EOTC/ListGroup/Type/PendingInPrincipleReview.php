@@ -1,6 +1,6 @@
 <?php
 /**
- * PendingInitialReview
+ * PendingInPrincipleReview
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,7 +11,7 @@
 namespace EOTC\ListGroup\Type;
 
 
-class PendingInitialReview extends Base {
+class PendingInPrincipleReview extends Base {
 
 	/**
 	 * Next status id
@@ -27,11 +27,10 @@ class PendingInitialReview extends Base {
 	 */
 	public function determine() {
 
-		/* If this requires RAMS and RAMS has been approved,
-		 * or if it doesn't require RAMS at all
+		/* All Draft (Initial Application) events get promoted to this
 		 */
-		if (($this->getEvent()->getMetadata()->getStatus()->isDraft())) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingInitialReviewIndex());
+		if ($this->getEvent()->getMetadata()->getStatus()->isDraft()) {
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingInPrincipleReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

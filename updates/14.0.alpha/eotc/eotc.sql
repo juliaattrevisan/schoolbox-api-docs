@@ -15,6 +15,7 @@ CREATE TABLE `eotc_status`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR
 INSERT INTO `eotc_status` (`name`) VALUES ('Initial Application');
 INSERT INTO `eotc_status` (`name`) VALUES ('Approved In Principle');
 INSERT INTO `eotc_status` (`name`) VALUES ('RAMS Approved');
+INSERT INTO `eotc_status` (`name`) VALUES ('Awaiting Final Approval');
 INSERT INTO `eotc_status` (`name`) VALUES ('Approved');
 INSERT INTO `eotc_status` (`name`) VALUES ('Rejected');
 
@@ -73,3 +74,7 @@ INSERT INTO `eotc_config` (`name`, `value`) VALUES ('urgent_threshold', '3');
 
 ALTER TABLE `eotc_config` CHANGE `value` `value` TEXT CHARSET latin1 COLLATE latin1_swedish_ci NULL;
 INSERT INTO `eotc_config` (`name`) VALUES ('policy');
+
+/* Unknown event status
+ */
+INSERT INTO `error` (`id`, `message`) VALUES ('163', 'Unknown event status.');

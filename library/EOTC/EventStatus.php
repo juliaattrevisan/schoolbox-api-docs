@@ -36,8 +36,9 @@ class EventStatus {
 		1 => 'status-draft',
 		2 => 'status-in-principle',
 		3 => 'status-rams-approved',
-		4 => 'status-approved',
-		5 => 'status-rejected',
+		4 => 'status-awaiting-final-approval',
+		5 => 'status-approved',
+		6 => 'status-rejected',
 	);
 
 	/**
@@ -79,6 +80,19 @@ class EventStatus {
 	 */
 	public function isRamsApproved() {
 		if ($this->getId() == EventStatusMapper::STATUS_RAMSAPPROVED) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine whether this event is Awaiting Final Approval
+	 *
+	 * @return bool
+	 */
+	public function isAwaitingFinalApproval() {
+		if ($this->getId() == EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL) {
 			return true;
 		}
 
