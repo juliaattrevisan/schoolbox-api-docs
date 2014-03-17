@@ -419,6 +419,23 @@ class Collection implements ICollection, JsonSerializable {
 	}
 
 	/**
+	 * Filters out items that don't match $callbale, and returns a new
+	 * collection with the result.
+	 *
+	 * @param  callback   $callback
+	 * @return Collection
+	 */
+	public function filter($callback) {
+		$return = new Collection();
+		foreach ($this as $key => $item) {
+			if (call_user_func($callback, $item)) {
+				$return->offsetSet($key, $item);
+			}
+		}
+		return $return;
+	}
+
+	/**
 	 * Groups all results by a field value.
 	 *
 	 * @param  string $field The field to search by.
