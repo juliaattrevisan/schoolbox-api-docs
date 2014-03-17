@@ -9,7 +9,9 @@
  
 namespace Schoolbox\ResourceBooking\Item\ModerationType;
 
-class Model {
+use JsonSerializable;
+
+class Model implements JsonSerializable {
 
     /**
      * Open resources may be booked by anyone, and are automatically confirmed.
@@ -88,6 +90,18 @@ class Model {
      */
     public function getName() {
         return $this->name;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @return array
+     */
+    public function jsonSerialize() {
+        return array(
+            'id'   => $this->getId(),
+            'name' => $this->getName(),
+        );
     }
 
 }
