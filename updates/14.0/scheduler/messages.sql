@@ -14,7 +14,11 @@ CREATE TABLE `msg_source`(
   `description`   VARCHAR(255) NOT NULL,
   `routing_key`   VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX (`namespace`, `key`, `role_type`)
+  UNIQUE INDEX (`namespace`, `key`, `role_type`),
+  INDEX (`namespace`, `key`),
+  INDEX (`key`),
+  INDEX (`namespace`),
+  INDEX (`role_type`)
 ) CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE `msg_reroute`(
@@ -23,7 +27,8 @@ CREATE TABLE `msg_reroute`(
   `routing_key`    VARCHAR(255) NOT NULL,
   `incoming_level` INT UNSIGNED NOT NULL,
   `outgoing_level` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`relation_id`, `relation_type`, `routing_key`, `incoming_level`)
+  PRIMARY KEY (`relation_id`, `relation_type`, `routing_key`, `incoming_level`),
+  INDEX (`relation_id`, `relation_type`)
 ) CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE `msg_route_perm`(
@@ -32,7 +37,8 @@ CREATE TABLE `msg_route_perm`(
   `min_level`     INT UNSIGNED NOT NULL,
   `max_level`     INT UNSIGNED NOT NULL,
   `default_level` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`msg_source_id`, `role_id`)
+  PRIMARY KEY (`msg_source_id`, `role_id`),
+  INDEX (`role_id`)
 ) CHARSET=utf8 COLLATE=utf8_bin;
 
 
