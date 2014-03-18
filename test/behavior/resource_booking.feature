@@ -222,9 +222,18 @@ Scenario: Adding related resources to a resource
     | name                      | Book box                       |
     | description               | A box for the English textbook |
     | max_reservation_time[day] | 168                            |
-  And   I select "Celia Glenn" from autocomplete "moderator_id"
-  And   I select "English textbook" from autocomplete "resource_relation_id"
+  And   I fill in autocomplete "moderator_id" with "Jenifer"
+  And   I select "Jenifer Shadbolt" from autocomplete "moderator_id"
+  And   I fill in autocomplete "related_resource_id" with "English"
+  And   I select "English textbook" from autocomplete "related_resource_id"
   And   I press "resource-save"
+  # Check the related resources
+  When  I follow "Book box"
+  Then  the autocomplete "related_resource_id" should contain "English textbook"
+  # Relations should be reciprocal too
+  When  I move backward one page
+  And   I follow "English textbook"
+  Then  the autocomplete "related_resource_id" should contain "Book box"
 
 @resource-booking
 Scenario: Booking a resource
