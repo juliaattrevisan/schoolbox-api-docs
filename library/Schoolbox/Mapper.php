@@ -1282,20 +1282,34 @@ class Mapper {
 		if (strlen($other_alias) === 0) {
 			$other_alias = $other_table;
 		}
-		$join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
+
+		$params = array(
+			':this_alias'  => $this_alias,
+			':this_key'    => $join['this_key'],
+			':other_table' => $other_table,
+			':other_alias' => $other_alias,
+			':other_key'   => $join['other_key'],
+		);
+
+		if(isset($join['multi'])) {
+			// LEFT JOIN ...
+			$join_sql = '`:via_table`   AS `:via_alias`   ON `:this_alias`.`:this_key`   = `:via_alias`.`:via_this_key`
+			LEFT JOIN    `:other_table` AS `:other_alias` ON `:other_alias`.`:other_key` = `:via_alias`.`:via_other_key`';
+
+			$params[':via_table']     = $join['multi']['via_table'];
+			$params[':via_this_key']  = $join['multi']['this_key'];
+			$params[':via_other_key'] = $join['multi']['other_key'];
+			$params[':via_alias']     = "v_$other_alias";
+		}
+		else {
+			$join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
+		}
+
 		if (isset($join['extra']) && strlen($join['extra']) > 0) {
 			$join_sql .= ' AND ' . $join['extra'];
 		}
-		return strtr(
-			$join_sql,
-			array(
-				':this_alias'  => $this_alias,
-				':this_key'    => $join['this_key'],
-				':other_table' => $other_table,
-				':other_alias' => $other_alias,
-				':other_key'   => $join['other_key'],
-			)
-		);
+
+		return strtr($join_sql, $params);
 	}
 
 	/**
@@ -1340,30 +1354,7 @@ class Mapper {
 
 			if(empty($map['column'])) {
 				// check for multijoin
-				if(isset($map['join']) && isset($this->joins[$map['join']]['multi'])) {
-
-					$joinSchema = $this->joins[$map['join']]['multi'];
-
-					$identifier = $this->getIdentifier();
-					$identifierColumn = $identifier['column'];
-
-					$stmt = $this->database->prepare("
-						SELECT `{$joinSchema['other_key']}`
-						FROM `{$joinSchema['via_table']}`
-						WHERE `{$joinSchema['this_key']}` = :idField
-					");
-
-					$stmt->execute(array(
-						'idField' => $row[$identifierColumn]
-					));
-
-					$columnValue = array();
-					while($value = $stmt->fetchColumn()) {
-						// retrieve the other key, and pipe into an array
-						$columnValue[] = $value;
-					}
-				}
-				else {
+				if(!(isset($map['join']) && isset($this->joins[$map['join']]['multi']))) {
 					throw new Exception("Column must be declared if no multijoin set for it: ".json_encode($map));
 				}
 			}
@@ -1375,9 +1366,9 @@ class Mapper {
 				}
 
 				$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+				$this->setModelProperty($model, $propertyName, $columnValue);
 			}
 
-			$this->setModelProperty($model, $propertyName, $columnValue);
 		}
 
 		if (!empty($callback) && is_callable($callback)) {
