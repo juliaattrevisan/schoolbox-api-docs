@@ -58,6 +58,61 @@ class Mapper extends BaseMapper {
                 'other_key' => 'id',
             )
         );
+
+        $this->registerCallback('postSave',   array($this, 'postSave'));
+        $this->registerCallback('postDelete', array($this, 'postDelete'));
+    }
+
+    /**
+     * Ensure that if resource A is related to resource B, then resource B is
+     * related to resource A.
+     *
+     * @param Model $object
+     */
+    public function postSave(Model $object) {
+        $query = "
+            INSERT INTO {$this->getTable()}
+            (resource_id, extra_resource_id)
+            VALUES (:resourceId, :extraResourceId)
+            ON DUPLICATE KEY UPDATE resource_id = :resourceId
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue(
+            'resourceId',
+            intval($object->getRelatedResource()->getId()),
+            \PDO::PARAM_INT
+        );
+        $statement->bindValue(
+            'extraResourceId',
+            intval($object->getResource()->getId()),
+            \PDO::PARAM_INT
+        );
+        $statement->execute();
+    }
+
+    /**
+     * Break the relation between resource B and resource A if the relation
+     * between A and B is broken.
+     *
+     * @param Model $object
+     */
+    public function postDelete(Model $object) {
+        $query = "
+            DELETE FROM {$this->getTable()}
+            WHERE resource_id=:resourceId AND extra_resource_id=:extraResourceId
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue(
+            'resourceId',
+            intval($object->getRelatedResource()->getId()),
+            \PDO::PARAM_INT
+        );
+        $statement->bindValue(
+            'extraResourceId',
+            intval($object->getResource()->getId()),
+            \PDO::PARAM_INT
+        );
+        $statement->execute();
     }
 
 }
