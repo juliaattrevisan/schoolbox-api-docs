@@ -223,8 +223,6 @@ Scenario: Adding related resources to a resource
     | description               | A box for the English textbook |
     | max_reservation_time[day] | 168                            |
   And   I select "Textbooks" from "resource_category_id"
-  And   I fill in autocomplete "moderator_id" with "Jenifer"
-  And   I select "Jenifer Shadbolt" from autocomplete "moderator_id"
   And   I fill in autocomplete "related_resource_id" with "English"
   And   I select "English textbook" from autocomplete "related_resource_id"
   And   I press "resource-save"
