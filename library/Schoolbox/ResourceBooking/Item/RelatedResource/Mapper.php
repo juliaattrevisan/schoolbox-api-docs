@@ -70,6 +70,9 @@ class Mapper extends BaseMapper {
      * @param Model $object
      */
     public function postSave(Model $object) {
+        // I'm not sure if this covers the case where a relation's resource ID
+        // is changed or not.
+        // Oh well, links are only ever added or removed, never updated.
         $query = "
             INSERT INTO {$this->getTable()}
             (resource_id, extra_resource_id)
