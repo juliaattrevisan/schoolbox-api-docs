@@ -1071,6 +1071,52 @@ class Mapper {
 					}
 					$affectedIDs[] = $this->getModelProperty($model, $id_property);
 				}
+				// also update n:n relation tables if they exist
+				foreach($this->getMap() as $map) {
+					if(empty($map['join']) || empty($this->joins[$map['join']]['multi'])) {
+						// not interested
+						continue;
+					}
+
+					$joinSchema = $this->joins[$map['join']]['multi'];
+					$thisKey = $this->getModelProperty($model, $id_property);
+
+					// step 1: delete existing relations in join table
+					$deleteRelationStatement = $this->database->prepare("
+						DELETE FROM `{$joinSchema['via_table']}`
+						WHERE `{$joinSchema['this_key']}` = :this_key
+					");
+
+					$deleteRelationStatement->bindParam(':this_key', $thisKey);
+
+					if(!$deleteRelationStatement->execute()) {
+						$this->database->rollBack();
+						return false;
+					}
+
+					// step 2: insert new relations in join table
+					$insertRelationStatement = $this->database->prepare("
+						INSERT INTO `{$joinSchema['via_table']}`
+							(`{$joinSchema['this_key']}`,`{$joinSchema['other_key']}`)
+						VALUES
+							(:this_key, :other_key)
+					");
+
+					// should dehydrate to an array
+					$propertyValue = $this->getModelProperty($model, $map['property']);
+
+					// iterate the values given and insert into join table
+					foreach($propertyValue as $otherKey) {
+						$success = $insertRelationStatement->execute(array(
+							'this_key' => $thisKey,
+							'other_key' => $otherKey
+						));
+						if(!$success) {
+							$this->database->rollBack();
+							return false;
+						}
+					}
+				}
 			}
 			else {
 				$this->database->rollBack();
@@ -1356,6 +1402,20 @@ class Mapper {
 	 */
 	public function hydrateJoin($row, $join, $alias, $callback = null) {
 		return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
+	}
+
+
+	/**
+	 * Helper method for hydrating a collection of stub model objects.
+	 * Assumes that you have provided a collection of models that apply to this mapper
+	 *
+	 * @param Collection $collection
+	 * @param array      $identifier an optional array of 'column' and 'property' used to perform lookup
+	 * @return Collection
+	 */
+	public function hydrateCollection($collection, $identifier = null) {
+		$identifier = $identifier ?: $this->getIdentifier();
+		return $this->findByColumn($identifier['column'], $collection->getColumnValues($identifier['property']));
 	}
 
 	/**

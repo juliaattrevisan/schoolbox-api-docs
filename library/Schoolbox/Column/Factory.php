@@ -52,6 +52,10 @@ class Factory implements IFactory {
 				$column = new Model();
 				break;
 
+			case Mapper::TYPE_COLLECTION:
+				$column = new Collection();
+				break;
+
 			case Mapper::TYPE_SERIALIZED:
 				$column = new Serialized();
 				break;
