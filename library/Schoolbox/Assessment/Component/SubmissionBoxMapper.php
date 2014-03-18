@@ -278,12 +278,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			SELECT
 				{$this->getColumnString('sb')},
 				{$worktype_mapper->getColumnString('wt')},
-				{$marktype_mapper->getColumnString('mt')},
-				{$this->getJoinColumnString('category', 'cat')}
+				{$marktype_mapper->getColumnString('mt')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
-			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
 			WHERE sb.id=?
 		";
 		$statement = $this->database->prepare($query);
@@ -295,7 +293,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$submission_box = $this->hydrate($row, 'sb');
 			$submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
 			$submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
-            $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
+			$submission_box->setCategory(
+				$this->getJoinMapper('category')->findById(
+					$submission_box->getCategory()->getId()
+				)
+			);
 		}
 
 		if ($submission_box instanceof SubmissionBox) {
