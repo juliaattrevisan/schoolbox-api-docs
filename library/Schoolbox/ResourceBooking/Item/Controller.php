@@ -120,6 +120,8 @@ class Controller extends Base {
         // findById() ought to hydrate users as well.
         /** @var Model $item */
         $item = $this->getMapper()->findById($id);
+
+        // Build list of moderators and related items
         $moderatorList = array();
         foreach ($item->getModeratorList() as $moderator) {
             $moderatorList[] = array(
@@ -127,15 +129,23 @@ class Controller extends Base {
                 'name' => $moderator->formatName(),
             );
         }
+        $relatedItemList = array();
+        foreach ($item->getRelatedResourceList() as $relatedItem) {
+            $relatedItemList[] = array(
+                'id'   => $relatedItem->getId(),
+                'name' => $relatedItem->getName(),
+            );
+        }
 
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceItem/edit.twig',
                 'data'     => array(
-                    'item'           => $item,
-                    'categoryList'   => $this->getMapper()->getJoinMapper('category')->findAll(),
-                    'moderationList' => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
-                    'moderatorList'  => $moderatorList,
+                    'item'            => $item,
+                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
+                    'moderatorList'   => $moderatorList,
+                    'relatedItemList' => $relatedItemList,
                 ),
             )
         );
