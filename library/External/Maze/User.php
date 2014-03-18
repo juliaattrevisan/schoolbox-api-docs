@@ -219,8 +219,6 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Returns a local path to the user's portrait
 	 *
-	 * This indicates that Cedar needs to upload the pics manually to portrait_dir
-	 *
 	 * @param Integer $externalUserId
 	 * @return Bool|String
 	 */
