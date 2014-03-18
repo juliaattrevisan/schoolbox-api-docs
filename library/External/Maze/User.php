@@ -46,16 +46,39 @@ class External_Maze_User implements External_UserInterface {
 	 * Gets the contact info of the person who is a Student's Contact. The ID
 	 * passed is the Synergetic of the Contact, not the Student.
 	 *
+	 * In Maze, Parents aren't considered atomic units of people, so always
+	 * refer to them in a joint account.
+	 *
+	 * SynergyId is DFKEY
+	 *
 	 * @param $externalId
 	 * @return array|bool
 	 */
 	public function getParent($externalId) {
 		$query = "
-			SELECT TOP 5 *
+			SELECT
+				DFKEY AS ContactID,
+				MTITLE AS ContactTitle,
+				MNAME AS Preferred,
+				MSURNAME AS Surname,
+				M_EMAIL AS Email,
+				'' AS HomePhone,
+				MMOBILE AS MobilePhone,
+				'' AS SilentPhoneFlag,
+				'' AS DirectoryIncludeFlag,
+				DFKEY AS ContactSpouseID,
+				FTITLE AS SpouseTitle,
+				FNAME AS SpousePreferred,
+				FSURNAME AS SpouseSurname,
+				F_EMAIL AS SpouseEmail,
+				'' AS SpouseHomePhone,
+				FMOBILE AS SpouseMobilePhone,
+				'' AS SpouseDirectoryIncludeFlag
 			FROM DF
+			WHERE DFKEY = '{$externalId}'
 		";
 
-		new \Alaress_Probe($this->getDb()->getAll($query));
+		return $this->getDb()->getRow($query);
 	}
 
 	/**
@@ -85,6 +108,8 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Get a guy's info from Schoolpro
 	 *
+	 * $synId is the STKEY value.
+	 *
 	 * @param  $synId
 	 * @return array|bool
 	 */
@@ -103,7 +128,7 @@ class External_Maze_User implements External_UserInterface {
 		 */
 		$query = "
 			SELECT
-				KLPID AS StudentID,
+				STKEY AS StudentID,
 				FIRST_NAME AS StudentGiven1,
 				SURNAME AS StudentSurname,
 				CONVERT(VARCHAR, BIRTHDATE, 120) AS StudentBirthDate,
@@ -234,6 +259,40 @@ class External_Maze_User implements External_UserInterface {
 	 * Stub method, probably not used
 	 */
 	public function getParentUserAccountInfo() {
+
+//		/* Combine everything into a joint account
+//		 *
+//		 * Try to accommodate single-parent families listed as either the
+//		 * mother or the father
+//		 */
+//		$newFamily = array();
+//		$newFamily['ContactID'] = $family['ContactID'];
+//
+//		if (strlen($family['Preferred']) && strlen($family['SpousePreferred'])) {
+//			$newFamily['ContactTitle'] = "{$family['ContactTitle']} & {$family['SpouseTitle']}";
+//			$newFamily['Preferred'] = "{$family['Preferred']} & {$family['SpousePreferred']}";
+//			$newFamily['Surname'] = $family['Surname'];
+//			$newFamily['Email'] = $family['Email'];
+//			$newFamily['HomePhone'] = $family['HomePhone'];
+//			$newFamily['MobilePhone'] = $family['MobilePhone'];
+//		}
+//		else if (strlen($family['Preferred'])) {
+//			$newFamily['ContactTitle'] = $family['ContactTitle'];
+//			$newFamily['Preferred'] = $family['Preferred'];
+//			$newFamily['Surname'] = $family['Surname'];
+//			$newFamily['Email'] = $family['Email'];
+//			$newFamily['HomePhone'] = $family['HomePhone'];
+//			$newFamily['MobilePhone'] = $family['MobilePhone'];
+//		}
+//		else if (strlen($family['SpousePreferred'])) {
+//			$newFamily['ContactTitle'] = $family['SpouseTitle'];
+//			$newFamily['Preferred'] = $family['SpousePreferred'];
+//			$newFamily['Surname'] = $family['SpouseSurname'];
+//			$newFamily['Email'] = $family['SpouseEmail'];
+//			$newFamily['HomePhone'] = $family['SpouseHomePhone'];
+//			$newFamily['MobilePhone'] = $family['SpouseMobilePhone'];
+//		}
+
 	}
 
 	/**
