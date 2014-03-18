@@ -75,7 +75,8 @@ CREATE TABLE `resource_relation` (
   CONSTRAINT `resource_relation_extra_resource_id`
     FOREIGN KEY (`extra_resource_id`)
     REFERENCES `resource_category` (`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  UNIQUE KEY (`resource_id`, `extra_resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- Resources also have moderator users.
@@ -89,10 +90,11 @@ CREATE TABLE `resource_moderator` (
     FOREIGN KEY (`resource_id`)
     REFERENCES `resource` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE,
-  KEY `resource_moderator_moderator_id` (`moderator_id`)
+  KEY `resource_moderator_moderator_id` (`moderator_id`),
   -- The user table is still shitty old MYISAM so an actual FK link won't work
 #   ,CONSTRAINT `resource_moderator_resource_id`
 #     FOREIGN KEY (`moderator_id`)
 #     REFERENCES `user` (`id`)
 #     ON DELETE CASCADE ON UPDATE CASCADE
+  UNIQUE KEY (`resource_id`, `moderator_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
