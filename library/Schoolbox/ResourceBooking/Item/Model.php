@@ -14,7 +14,7 @@ use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Storage;
 use Alaress_Date_Format;
-use DateInterval;
+use Alaress\Date\Interval;
 use Schoolbox\User;
 use JsonSerializable;
 
@@ -53,17 +53,17 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * Minimum lead time, this should be a time object instead of a date format
      *
-     * @var DateInterval
+     * @var Interval
      */
     protected $minLeadTime;
 
     /**
-     * @var DateInterval
+     * @var Interval
      */
     protected $minReservationTime;
 
     /**
-     * @var DateInterval
+     * @var Interval
      */
     protected $maxReservationTime;
 
@@ -178,7 +178,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @param  DateInterval $maxReservationTime
+     * @param  Interval $maxReservationTime
      * @return $this
      */
     public function setMaxReservationTime($maxReservationTime) {
@@ -187,14 +187,14 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @return DateInterval
+     * @return Interval
      */
     public function getMaxReservationTime() {
         return $this->maxReservationTime;
     }
 
     /**
-     * @param  DateInterval $minLeadTime
+     * @param  Interval $minLeadTime
      * @return $this
      */
     public function setMinLeadTime($minLeadTime) {
@@ -203,14 +203,14 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @return DateInterval
+     * @return Interval
      */
     public function getMinLeadTime() {
         return $this->minLeadTime;
     }
 
     /**
-     * @param  DateInterval $minReservationTime
+     * @param  Interval $minReservationTime
      * @return $this
      */
     public function setMinReservationTime($minReservationTime) {
@@ -219,7 +219,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @return DateInterval
+     * @return Interval
      */
     public function getMinReservationTime() {
         return $this->minReservationTime;
@@ -353,7 +353,7 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @return array
      */
     public function jsonSerialize() {
-        return array(
+        $output = array(
             'id'                   => $this->getId(),
             'name'                 => $this->getName(),
             'description'          => $this->getDescription(),
@@ -361,14 +361,17 @@ class Model implements ISoftDeletable, JsonSerializable {
             'min_reservation_time' => $this->getMinReservationTime(),
             'min_lead_time'        => $this->getMinLeadTime(),
             'moderation_type'      => $this->getModerationType(),
-            'moderator_list'       => $this->getModeratorList()->jsonSerialize(),
-            'category'             => $this->getCategory()->jsonSerialize(),
-//            'deleted'              => $this->isDeleted(),
-//            'image'                => $this->getImage()->getHash(),
-//            'created_at'           => $this->getCreatedAt(),
-//            'modified_at'          => $this->getModifiedAt(),
-//            'deleted_at'           => $this->getDeletedAt(),
+            'moderator_list'       => $this->getModeratorList(),
+            'category'             => $this->getCategory(),
         );
+        // Fields may or may not be JsonSerializable, so check each one
+        foreach ($output as &$value) {
+            if ($value instanceof JsonSerializable) {
+                $value = $value->jsonSerialize();
+            }
+        }
+        unset($value);
+        return $output;
     }
 
 }
