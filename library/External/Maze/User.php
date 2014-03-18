@@ -217,6 +217,48 @@ class External_Maze_User implements External_UserInterface {
 	 * @return array
 	 */
 	public function getParentEmails($synergyIds) {
+		if (!count($synergyIds)) {
+			return array();
+		}
+		else {
+			$allIds = '(\'' . implode('\',\'', $synergyIds) . '\')';
+
+			$query = "
+				SELECT
+					DFKEY AS RelatedID,
+					M_EMAIL AS Email1,
+					F_EMAIL AS Email2
+				FROM ST
+				LEFT JOIN DF ON ST.FAMILY = DF.DFKEY
+				WHERE ST.STKEY IN $allIds
+			";
+
+			$allEmails = $this->getDb()->getAll($query);
+
+			$processed = array();
+
+			if (is_array($allEmails) && count($allEmails)) {
+				foreach($allEmails as $currentEmail) {
+
+					/* Choose one of two possibilities
+					 */
+					if (strlen($currentEmail['Email1'])) {
+						$newEmail = array(
+							'RelatedID' => $currentEmail['Email1']
+						);
+					}
+					else if (strlen($currentEmail['Email2'])) {
+						$newEmail = array(
+							'RelatedID' => $currentEmail['Email2']
+						);
+					}
+
+					$processed[] = $newEmail;
+				}
+			}
+
+			return $processed;
+		}
 	}
 
 	/**
