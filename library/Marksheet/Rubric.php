@@ -104,7 +104,7 @@ class Marksheet_Rubric extends Marksheet_Abstract {
         $output = array(
             'MARK'     => $mark['mark'],
             'MAX_MARK' => $mark['max_mark'],
-            'COMMENT'  => $mark['comment']
+            'COMMENT'  => Scrub::text($mark['comment'])
         );
         $page->setVar($output);
 

@@ -59,9 +59,9 @@ class Marksheet_Raw extends Marksheet_Abstract {
 
     public function outputUI(SitePage $page, $mark) {
         $output = array(
-            'MAX_MARK' => $mark['max_mark'],
-            'MARK'     => $mark['mark'],
-            'COMMENT'  => $mark['comment']
+            'MAX_MARK' => Scrub::text($mark['max_mark']),
+            'MARK'     => Scrub::text($mark['mark']),
+            'COMMENT'  => Scrub::text($mark['comment'])
         );
         $page->setVar($output);
     }
