@@ -42,16 +42,21 @@ class Json extends Base {
      */
     public static function applyJsonSerializable($var) {
         if (version_compare(PHP_VERSION, '5.4', '>=')) {
+            // PHP 5.4+ automatically applies jsonSerialize
             return $var;
         }
-        if ($var instanceof JsonSerializable) {
-            $var = $var->jsonSerialize();
-        }
-        elseif (is_array($var) || $var instanceof Traversable) {
-            foreach ($var as &$value) {
-                $value = self::applyJsonSerializable($value);
+        elseif (is_array($var) || $var instanceof \Traversable) {
+            // Iterable: apply this method to all values in the collection
+            $newVar = array();
+            foreach ($var as $key => $value) {
+                $newVar[$key] = self::applyJsonSerializable($value);
             }
-            unset($value);
+            return $newVar;
+        }
+        elseif ($var instanceof JsonSerializable) {
+            // Get serialized version if $var implements that interface, and
+            // apply this method again in case it returns an iterable.
+            return self::applyJsonSerializable($var->jsonSerialize());
         }
         return $var;
     }
