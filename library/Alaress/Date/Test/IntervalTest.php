@@ -324,4 +324,22 @@ class IntervalTest extends PHPUnit_Framework_TestCase {
     public function testFormat(Interval $interval, $format, $expectedOutput) {
         $this->assertSame($expectedOutput, $interval->format($format));
     }
+
+    /**
+     * @return array
+     */
+    public function getJsonSerializeData() {
+        return array(
+            array(new Interval(1),  1),
+            array(new Interval(0),  0),
+            array(new Interval(-1), -1),
+        );
+    }
+
+    /**
+     * @dataProvider getJsonSerializeData
+     */
+    public function testJsonSerialize(Interval $interval, $expectedOutput) {
+        $this->assertSame($expectedOutput, $interval->jsonSerialize());
+    }
 }
