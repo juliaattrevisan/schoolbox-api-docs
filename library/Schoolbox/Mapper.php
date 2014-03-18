@@ -55,6 +55,7 @@ class Mapper {
 	const TYPE_DECIMAL    = 20;
 	const TYPE_SERIALIZED = 30;
 	const TYPE_MODEL      = 40;
+	const TYPE_COLLECTION = 41;
 
 	const METHOD_CREATE = 'create';
 	const METHOD_READ   = 'read';
@@ -392,7 +393,7 @@ class Mapper {
 	 * Adds a mapping from a database column to a model property.
 	 *
 	 * @param array $map An array with any of the following keys:
-	 * * column: The database column to map from.
+	 * * column: The database column to map from, ignored if a join specified is declared 'multi'.
 	 * * property: The model property to map to. There must be a get and set
 	 *             method corresponding to the property in the model class:
 	 *             'get'.ucfirst($property)
@@ -412,6 +413,7 @@ class Mapper {
 	 *             TYPE_DECIMAL: currently, a number to 2 decimal places.
 	 *             TYPE_SERIALIZED: A PHP serialized value
 	 *             TYPE_MODEL: Another model.
+	 *             TYPE_COLLECTION: A set of another model.
 	 * * hydrator: An alternative to `type` - set this as an instance of Schoolbox\Column\IColumnType.
 	 *             Usually you won't need to set this directly, but if you have
 	 *             a hydration strategy that isn't covered by `type`, use this.
@@ -547,12 +549,10 @@ class Mapper {
 
 		$collection = $this->getModelAsCollection($object);
 
-		$statement = $this->database->prepare(
-			"
+		$statement = $this->database->prepare("
 			DELETE FROM  `{$this->table}`
 			WHERE `{$identifierName}` = :identifierValue
-		"
-		);
+		");
 
 		foreach ($collection as $model) {
 			if (!($this->triggerCallbacks('preDelete', $model))) {
@@ -1283,6 +1283,7 @@ class Mapper {
 	 *                           $model:  the model that has been hydrated
 	 *                           $row:    the row from the database
 	 *
+	 * @throws Exception
 	 * @return object
 	 */
 	public function hydrate($row, $alias = '', $callback = null) {
@@ -1290,13 +1291,46 @@ class Mapper {
 
 		foreach ($this->map as $map) {
 			$propertyName = $map['property'];
-			$columnName = $map['column'];
 
-			if (!empty($alias)) {
-				$columnName = "$alias.$columnName";
+			if(empty($map['column'])) {
+				// check for multijoin
+				if(isset($map['join']) && isset($this->joins[$map['join']]['multi'])) {
+
+					$joinSchema = $this->joins[$map['join']]['multi'];
+
+					$identifier = $this->getIdentifier();
+					$identifierColumn = $identifier['column'];
+
+					$stmt = $this->database->prepare("
+						SELECT `{$joinSchema['other_key']}`
+						FROM `{$joinSchema['via_table']}`
+						WHERE `{$joinSchema['this_key']}` = :idField
+					");
+
+					$stmt->execute(array(
+						'idField' => $row[$identifierColumn]
+					));
+
+					$columnValue = array();
+					while($value = $stmt->fetchColumn()) {
+						// retrieve the other key, and pipe into an array
+						$columnValue[] = $value;
+					}
+				}
+				else {
+					throw new Exception("Column must be declared if no multijoin set for it: ".json_encode($map));
+				}
+			}
+			else {
+				$columnName = $map['column'];
+
+				if (!empty($alias)) {
+					$columnName = "$alias.$columnName";
+				}
+
+				$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
 			}
 
-			$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
 			$this->setModelProperty($model, $propertyName, $columnValue);
 		}
 
@@ -1370,14 +1404,18 @@ class Mapper {
 	/**
 	 * Creates a new instance of class with name passed in $this->hasModel().
 	 *
+	 * @throws Mapper\Exception
 	 * @return object
 	 */
 	public function createModel() {
+		if(!$this->model) {
+			throw new Exception("Cannot create nonexistent model");
+		}
 		return new $this->model;
 	}
 
 	/**
-	 * @brief Returns an SQL fragement containing a comma separated list of column names possibly aliased
+	 * @brief Returns an SQL fragment containing a comma separated list of column names possibly aliased
 	 * @param String $alias
 	 * @param array  $whitelist If not empty, a whitelist of column names to use
 	 * @return String
@@ -1387,6 +1425,9 @@ class Mapper {
 		$columnList = array();
 
 		foreach ($this->map as $map) {
+			if(empty($map['column'])) {
+				continue;
+			}
 			if (!empty($whitelist) && !in_array($map['column'], $whitelist)) {
 				continue;
 			}
@@ -1424,6 +1465,9 @@ class Mapper {
 		$placeholderList = array();
 
 		foreach ($this->map as $map) {
+			if(empty($map['column'])) {
+				continue;
+			}
 			//
 			// Is this a create or update timestamp field?
 			// Update with now() instead of a placeholder.
@@ -1497,6 +1541,9 @@ class Mapper {
 			if (isset($map['created_timestamp'])) {
 				continue;
 			}
+			if (empty($map['column'])) {
+				continue;
+			}
 			$assignment  = "`{$this->table}`.`{$map['column']}`";
 			$placeholder = ":{$map['column']}";
 			if (isset($map['updated_timestamp'])) {
@@ -1514,10 +1561,22 @@ class Mapper {
 	 * @param object        $model     The model to get values from
 	 * @param \PDOStatement $statement The statement for inserting/updating model
 	 *
+	 * @throws Mapper\Exception if the map is not valid
 	 * @return void
 	 */
 	protected function bindParamsForSave($model, \PDOStatement $statement) {
 		foreach ($this->map as $map) {
+
+			if(empty($map['column'])) {
+				// if column is empty, ensure a join is specified, and that it is a multijoin
+				$join_name = isset($map['join']) ? $map['join'] : '';
+				if(isset($this->joins[$join_name]['multi'])) {
+					return;
+				}
+				// if the join doesn't exist, or not multijoin, failhard
+				throw new Exception("Column must be declared if no multijoin set for it: ".json_encode($map));
+			}
+
 			$propertyName = $map['property'];
 			$columnName   = $map['column'];
 			//
