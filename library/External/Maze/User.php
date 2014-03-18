@@ -50,6 +50,12 @@ class External_Maze_User implements External_UserInterface {
 	 * @return array|bool
 	 */
 	public function getParent($externalId) {
+		$query = "
+			SELECT TOP 5 *
+			FROM DF
+		";
+
+		new \Alaress_Probe($this->getDb()->getAll($query));
 	}
 
 	/**
@@ -84,19 +90,11 @@ class External_Maze_User implements External_UserInterface {
 	 */
 	public function getStudent($synId) {
 
-//		$query = "
-//			SELECT TOP 5 *
-//			FROM ST
-//		";
-//
-//		new \Alaress_Probe($this->getDb()->getAll($query));
-
 		/* The School Year is never represented as just an int, it's always a
 		 * string of some sort like "Y04" or "Year 2" or "Students In Year 3"
 		 * so you have to replace chars
-		 */
-
-		/* Student Tutor, Name and Description are Initials, Formal Name and
+		 *
+		 * Student Tutor, Name and Description are Initials, Formal Name and
 		 * Full Name respectively.
 		 *
 		 * Student Head Of House is also their full name.
@@ -140,6 +138,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentBoarder
 			FROM ST
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
+			WHERE KLPID = '{$synId}'
 		";
 
 		return $this->getDb()->getAll($query);
