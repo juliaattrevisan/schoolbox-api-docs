@@ -34,7 +34,7 @@ abstract class Synchronise_Edumate_Tigs_Strategy_Abstract extends Synchronise_Ed
 	 * @return bool|string
 	 */
 	protected function getCampusFromCode($code) {
-		$campus = null;
+		$campus = 1;
 		switch (strtolower($code)) {
 			case 'senior school':
 				$campus = 1;
