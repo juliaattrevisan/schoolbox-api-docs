@@ -146,7 +146,7 @@ Scenario: Manage resources
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
   When  I follow "To be deleted"
-  And   I follow "Delete"
+  And   I press "resource-delete"
   # There should be a confirm here, but currently there is not.
   Then  I should not see "To be deleted" in the ".resource-list" element
   And   I should see "A single projector" in the ".resource-list" element
