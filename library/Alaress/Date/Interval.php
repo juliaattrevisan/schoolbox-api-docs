@@ -13,8 +13,9 @@
 namespace Alaress\Date;
 use DateTime;
 use DateInterval;
+use JsonSerializable;
 
-class Interval {
+class Interval implements JsonSerializable {
 
     /**
      * Number of seconds in the interval.
@@ -210,5 +211,19 @@ class Interval {
                 '%r'   => ($this->isInverted() ? '-' : ''),
             )
         );
+    }
+
+    /**
+     * This class json serializes as a simple integer (the number of seconds in
+     * the interval).
+     *
+     * @return int
+     */
+    public function jsonSerialize() {
+        $seconds = $this->getSecondTotal();
+        if ($this->isInverted()) {
+            $seconds *= -1;
+        }
+        return intval($seconds);
     }
 }
