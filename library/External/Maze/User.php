@@ -82,6 +82,71 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
+	 * 1 + 1 = 1
+	 *
+	 * @param $family
+	 */
+	private function recombine($family) {
+
+		/* Combine everything into a joint account
+		 *
+		 * Try to accommodate single-parent families listed as either the
+		 * mother or the father
+		 */
+		$newFamily = array();
+		$newFamily['ContactID'] = $family['ContactID'];
+
+		if (strlen($family['Preferred']) && strlen($family['SpousePreferred'])) {
+			$newFamily['Title'] = "{$family['Title']} & {$family['SpouseTitle']}";
+			$newFamily['Preferred'] = "{$family['Preferred']} & {$family['SpousePreferred']}";
+
+			/* Decide whose surname to use
+			 */
+			$newFamily['Surname'] = $family['Surname'];
+
+			/* Decide whose email to use
+			 */
+			if (strlen($family['Email'])) {
+				$newFamily['Email'] = $family['Email'];
+			}
+			else if (strlen($family['SpouseEmail'])) {
+				$newFamily['Email'] = $family['SpouseEmail'];
+			}
+
+			/* Decide whose mobile to use
+			 */
+			if (strlen($family['MobilePhone'])) {
+				$newFamily['MobilePhone'] = $family['MobilePhone'];
+			}
+			else if (strlen($family['SpouseMobilePhone'])) {
+				$newFamily['SpouseMobilePhone'] = $family['SpouseMobilePhone'];
+			}
+
+			/* Decide whose home phone to use
+			 */
+			$newFamily['HomePhone'] = $family['HomePhone'];
+		}
+		else if (strlen($family['Preferred'])) {
+			$newFamily['Title'] = $family['Title'];
+			$newFamily['Preferred'] = $family['Preferred'];
+			$newFamily['Surname'] = $family['Surname'];
+			$newFamily['Email'] = $family['Email'];
+			$newFamily['HomePhone'] = $family['HomePhone'];
+			$newFamily['MobilePhone'] = $family['MobilePhone'];
+		}
+		else if (strlen($family['SpousePreferred'])) {
+			$newFamily['Title'] = $family['SpouseTitle'];
+			$newFamily['Preferred'] = $family['SpousePreferred'];
+			$newFamily['Surname'] = $family['SpouseSurname'];
+			$newFamily['Email'] = $family['SpouseEmail'];
+			$newFamily['HomePhone'] = $family['SpouseHomePhone'];
+			$newFamily['MobilePhone'] = $family['SpouseMobilePhone'];
+		}
+
+		return $newFamily;
+	}
+
+	/**
 	 * Gets the contact info of the person who is a Student's Contact. The ID
 	 * passed is the Synergetic of the Contact, not the Student. Anyone who is
 	 * not supposed to be having their details publicised (via the
@@ -93,6 +158,55 @@ class External_Maze_User implements External_UserInterface {
 	 * @return mixed
 	 */
 	public function getParentSync($externalId) {
+		if (is_array($externalId)) {
+			$assignation = ' IN (\'' . implode('\',\'', $externalId) . '\')';
+		}
+		else {
+			$assignation = " = '$externalId'";
+		}
+
+		$query = "
+			SELECT
+				DFKEY AS ContactID,
+				MTITLE AS Title,
+				MNAME AS Preferred,
+				MSURNAME AS Surname,
+				M_EMAIL AS Email,
+				DFKEY AS SpouseID,
+				FTITLE AS SpouseTitle,
+				FNAME AS SpousePreferred,
+				FSURNAME AS SpouseSurname,
+				F_EMAIL AS SpouseEmail,
+				'' AS OccupEmail,
+				'' AS DefaultEmailCode,
+				'' AS DirectoryIncludeFlag
+			FROM DF
+			WHERE DFKEY $assignation
+		";
+
+		if (is_array($externalId)) {
+			$families = $this->getDb()->getAll($query);
+
+			$allFamilies = array();
+
+			foreach($families as $currentFamily) {
+				$processed = $this->recombine($currentFamily);
+				$processed['ID'] = $currentFamily['ContactID'];
+
+				$allFamilies[] = $processed;
+			}
+		}
+		else {
+			$currentFamily = $this->getDb()->getRow($query);
+
+			$processed = $this->recombine($currentFamily);
+			$processed['ID'] = $currentFamily['ContactID'];
+
+			$allFamilies = $this->recombine($processed);
+
+		}
+
+		return $allFamilies;
 	}
 
 	/**
@@ -260,38 +374,7 @@ class External_Maze_User implements External_UserInterface {
 	 */
 	public function getParentUserAccountInfo() {
 
-//		/* Combine everything into a joint account
-//		 *
-//		 * Try to accommodate single-parent families listed as either the
-//		 * mother or the father
-//		 */
-//		$newFamily = array();
-//		$newFamily['ContactID'] = $family['ContactID'];
-//
-//		if (strlen($family['Preferred']) && strlen($family['SpousePreferred'])) {
-//			$newFamily['ContactTitle'] = "{$family['ContactTitle']} & {$family['SpouseTitle']}";
-//			$newFamily['Preferred'] = "{$family['Preferred']} & {$family['SpousePreferred']}";
-//			$newFamily['Surname'] = $family['Surname'];
-//			$newFamily['Email'] = $family['Email'];
-//			$newFamily['HomePhone'] = $family['HomePhone'];
-//			$newFamily['MobilePhone'] = $family['MobilePhone'];
-//		}
-//		else if (strlen($family['Preferred'])) {
-//			$newFamily['ContactTitle'] = $family['ContactTitle'];
-//			$newFamily['Preferred'] = $family['Preferred'];
-//			$newFamily['Surname'] = $family['Surname'];
-//			$newFamily['Email'] = $family['Email'];
-//			$newFamily['HomePhone'] = $family['HomePhone'];
-//			$newFamily['MobilePhone'] = $family['MobilePhone'];
-//		}
-//		else if (strlen($family['SpousePreferred'])) {
-//			$newFamily['ContactTitle'] = $family['SpouseTitle'];
-//			$newFamily['Preferred'] = $family['SpousePreferred'];
-//			$newFamily['Surname'] = $family['SpouseSurname'];
-//			$newFamily['Email'] = $family['SpouseEmail'];
-//			$newFamily['HomePhone'] = $family['SpouseHomePhone'];
-//			$newFamily['MobilePhone'] = $family['SpouseMobilePhone'];
-//		}
+
 
 	}
 
