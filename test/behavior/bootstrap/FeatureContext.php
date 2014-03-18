@@ -55,7 +55,7 @@ class FeatureContext extends BaseContext {
                 '%s/screenshots/%s-%s',
                 dirname(__DIR__),
                 date('YmdHis'),
-                preg_replace('/\\W+/', '_', strtolower($event->getStep()->getText()))
+                trim(preg_replace('/\\W+/', '_', strtolower($event->getStep()->getText())), '_')
             );
             // Assume screenshot is a PNG
             file_put_contents(
