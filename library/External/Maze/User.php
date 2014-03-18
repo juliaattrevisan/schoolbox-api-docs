@@ -244,12 +244,12 @@ class External_Maze_User implements External_UserInterface {
 					 */
 					if (strlen($currentEmail['Email1'])) {
 						$newEmail = array(
-							'RelatedID' => $currentEmail['Email1']
+							$currentEmail['RelatedID'] => $currentEmail['Email1']
 						);
 					}
 					else if (strlen($currentEmail['Email2'])) {
 						$newEmail = array(
-							'RelatedID' => $currentEmail['Email2']
+							$currentEmail['RelatedID'] => $currentEmail['Email2']
 						);
 					}
 
