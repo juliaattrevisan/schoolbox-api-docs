@@ -267,7 +267,14 @@ class Mapper extends BaseMapper {
                 ";
                 $statement = $userMapper->getDatabase()->prepare($query);
                 $statement->execute(array($model->getId()));
-                $model->setRelatedResourceList($relatedModelMapper->hydrateList($statement, 'm', function() {}));
+                $model->setRelatedResourceList(
+                    $relatedModelMapper->hydrateList(
+                        $statement, 'm',
+                        function($mapper, $model) {
+                            return $model;
+                        }
+                    )
+                );
 
                 return $model;
             }
