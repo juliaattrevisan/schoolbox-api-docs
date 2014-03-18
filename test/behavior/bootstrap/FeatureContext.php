@@ -45,21 +45,26 @@ class FeatureContext extends BaseContext {
     }
 
     /**
-     * Attempts to take a screenshot of the error if the test failed.
+     * Takes a screenshot and content dump of the error if the test failed.
      *
      * @AfterStep
      */
     public function takeScreenshotOnFailure(Behat\Behat\Event\StepEvent $event) {
         if ($event->hasException()) {
+            $baseName = sprintf(
+                '%s/screenshots/%s-%s',
+                dirname(__DIR__),
+                date('YmdHis'),
+                preg_replace('/\\W+/', '_', strtolower($event->getStep()->getText()))
+            );
             // Assume screenshot is a PNG
             file_put_contents(
-                sprintf(
-                    '%s/screenshots/%s-%s.png',
-                    dirname(__DIR__),
-                    date('YmdHis'),
-                    preg_replace('/\\W+/', '_', strtolower($event->getStep()->getText()))
-                ),
+                $baseName.'.png',
                 $this->getSession()->getDriver()->getScreenshot()
+            );
+            file_put_contents(
+                $baseName.'.html',
+                $this->getSession()->getDriver()->getContent()
             );
         }
     }
