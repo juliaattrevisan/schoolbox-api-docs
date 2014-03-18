@@ -108,7 +108,7 @@ class External_Maze_User implements External_UserInterface {
 				KLPID AS StudentID,
 				FIRST_NAME AS StudentGiven1,
 				SURNAME AS StudentSurname,
-				BIRTHDATE AS StudentBirthDate,
+				CONVERT(VARCHAR, BIRTHDATE, 120) AS StudentBirthDate,
 				'' AS StudentTutor,
 				'' AS StudentTutorName,
 				'' AS StudentTutorDescription,
