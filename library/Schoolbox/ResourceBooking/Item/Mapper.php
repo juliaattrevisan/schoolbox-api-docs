@@ -166,7 +166,8 @@ class Mapper extends BaseMapper {
     }
 
     /**
-     * Ensures that moderators are saved after the item is loaded.
+     * Ensures that moderators and related items are saved after the item is
+     * loaded.
      */
     public function postSave(Model $object) {
         $mapper  = $this->getJoinMapper('moderator');
@@ -187,6 +188,23 @@ class Mapper extends BaseMapper {
         $mapper->delete($oldList->diff($newList, $diffMethod));
 
         // Add save of related items
+        // TODO either implement Dr's M2M join or have some better way of defining this
+        $mapper  = $this->getJoinMapper('related_resource');
+        $oldList = $mapper->findByColumn('resource_id', $object->getId());
+        $newList = new Collection();
+        foreach ($object->getRelatedResourceList() as $related) {
+            $joinObject = new RelatedResource\Model();
+            $joinObject->setRelatedResource($related)->setResource($object);
+            $newList->add($joinObject);
+        }
+
+        // Save all newList items that aren't in oldList
+        // Delete all vice versa
+        $diffMethod = function($a, $b) {
+            return $a->getRelatedResource()->getId() == $b->getRelatedResource()->getId();
+        };
+        $mapper->save($newList->diff($oldList, $diffMethod));
+        $mapper->delete($oldList->diff($newList, $diffMethod));
     }
 
     /**
