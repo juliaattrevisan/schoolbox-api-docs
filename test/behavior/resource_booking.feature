@@ -225,14 +225,33 @@ Scenario: Adding related resources to a resource
   And   I select "Textbooks" from "resource_category_id"
   And   I fill in autocomplete "related_resource_id" with "English"
   And   I select "English textbook" from autocomplete "related_resource_id"
+  And   I fill in autocomplete "related_resource_id" with "projector"
+  And   I select "A single projector" from autocomplete "related_resource_id"
   And   I press "resource-save"
   # Check the related resources
   When  I follow "Book box"
   Then  the autocomplete "related_resource_id" should contain "English textbook"
+  And   the autocomplete "related_resource_id" should contain "A single projector"
   # Relations should be reciprocal too
   When  I move backward one page
   And   I follow "English textbook"
   Then  the autocomplete "related_resource_id" should contain "Book box"
+  And   the autocomplete "related_resource_id" should not contain "A single projector"
+  # And reciprocally deleted
+  When  I move backward one page
+  And   I follow "A single projector"
+  And   I remove "Book box" from autocomplete "related_resource_id"
+  And   I press "resource-save"
+  And   I follow "A single projector"
+  Then  the autocomplete "related_resource_id" should not contain "Book box"
+  When  I move backward one page
+  And   I follow "English textbook"
+  Then  the autocomplete "related_resource_id" should contain "Book box"
+  And   the autocomplete "related_resource_id" should not contain "A single projector"
+  When  I move backward one page
+  And   I follow "Book box"
+  Then  the autocomplete "related_resource_id" should contain "English textbook"
+  And   the autocomplete "related_resource_id" should not contain "A single projector"
 
 @resource-booking
 Scenario: Booking a resource
