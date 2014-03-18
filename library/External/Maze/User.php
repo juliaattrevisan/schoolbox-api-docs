@@ -25,6 +25,24 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
+	 * An index of all the tablaeus
+	 */
+	public function tableIndex() {
+		$query = "
+			SELECT Distinct TABLE_NAME
+			FROM information_schema.TABLES
+		";
+
+		new \Alaress_Probe($this->getDb()->getAll($query));
+
+		$query = "
+			SELECT DB_NAME() AS DataBaseName
+		";
+
+		new \Alaress_Probe($this->getDb()->getAll($query));
+	}
+
+	/**
 	 * Gets the contact info of the person who is a Student's Contact. The ID
 	 * passed is the Synergetic of the Contact, not the Student.
 	 *
@@ -65,6 +83,66 @@ class External_Maze_User implements External_UserInterface {
 	 * @return array|bool
 	 */
 	public function getStudent($synId) {
+
+//		$query = "
+//			SELECT TOP 5 *
+//			FROM ST
+//		";
+//
+//		new \Alaress_Probe($this->getDb()->getAll($query));
+
+		/* The School Year is never represented as just an int, it's always a
+		 * string of some sort like "Y04" or "Year 2" or "Students In Year 3"
+		 * so you have to replace chars
+		 */
+
+		/* Student Tutor, Name and Description are Initials, Formal Name and
+		 * Full Name respectively.
+		 *
+		 * Student Head Of House is also their full name.
+		 *
+		 * StudentForm is an identifier; StudentFormStaffName is their full name.
+		 */
+		$query = "
+			SELECT
+				KLPID AS StudentID,
+				FIRST_NAME AS StudentGiven1,
+				SURNAME AS StudentSurname,
+				BIRTHDATE AS StudentBirthDate,
+				'' AS StudentTutor,
+				'' AS StudentTutorName,
+				'' AS StudentTutorDescription,
+				'' AS TeacherTutorID,
+				'' AS HeadOfHouseID,
+				'' AS StudentHeadOfHouse,
+				'' AS StudentForm,
+				'' AS StudentFormStaffName,
+				'' AS TeacherFormID,
+				'' AS FormDescription,
+				ST.HOUSE AS StudentHouse,
+				KGH.DESCRIPTION AS StudentHouseDescription,
+				REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				'' AS StudentYearLevelCoordinator,
+				'' AS YearLevelCoordID,
+				'' AS StudentLockerBook,
+				EMERGENCY_ONE_NAME AS StudentEmergencyName,
+				EMERGENCY_ONE_PHONE AS StudentEmergencyPhone,
+				EMERGENCY_ONE_MOBILE AS StudentEmergencyPhoneAlt,
+				EMERGENCY_TWO_NAME AS StudentEmergency2Name,
+				EMERGENCY_TWO_PHONE AS StudentEmergency2Phone,
+				EMERGENCY_TWO_MOBILE AS StudentEmergency2PhoneAlt,
+				'' AS StudentEmergency3Name,
+				'' AS StudentEmergency3Phone,
+				'' AS StudentEmergency3PhoneAlt,
+				MEDICAL_ALERT AS StudentMedicalAlert,
+				'' AS StudentSpecialNeedsFlag,
+				'' AS AlertMessage,
+				'' AS StudentBoarder
+			FROM ST
+			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
+		";
+
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
