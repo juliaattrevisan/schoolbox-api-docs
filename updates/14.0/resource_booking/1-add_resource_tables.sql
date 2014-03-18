@@ -74,7 +74,7 @@ CREATE TABLE `resource_relation` (
   KEY `resource_relation_extra_resource_id` (`extra_resource_id`),
   CONSTRAINT `resource_relation_extra_resource_id`
     FOREIGN KEY (`extra_resource_id`)
-    REFERENCES `resource_category` (`id`)
+    REFERENCES `resource` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE KEY (`resource_id`, `extra_resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
