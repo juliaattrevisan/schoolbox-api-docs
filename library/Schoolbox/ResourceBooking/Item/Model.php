@@ -353,7 +353,7 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @return array
      */
     public function jsonSerialize() {
-        $output = array(
+        return array(
             'id'                   => $this->getId(),
             'name'                 => $this->getName(),
             'description'          => $this->getDescription(),
@@ -364,14 +364,6 @@ class Model implements ISoftDeletable, JsonSerializable {
             'moderator_list'       => $this->getModeratorList(),
             'category'             => $this->getCategory(),
         );
-        // Fields may or may not be JsonSerializable, so check each one
-        foreach ($output as &$value) {
-            if ($value instanceof JsonSerializable) {
-                $value = $value->jsonSerialize();
-            }
-        }
-        unset($value);
-        return $output;
     }
 
 }

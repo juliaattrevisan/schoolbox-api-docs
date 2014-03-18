@@ -522,11 +522,7 @@ class Collection implements ICollection, JsonSerializable {
 	 * @return array
 	 */
 	public function jsonSerialize() {
-		$result = array();
-		foreach ($this as $key => $item) {
-			$result[$key] = ($item instanceof JsonSerializable) ? $item->jsonSerialize() : $item;
-		}
-		return $result;
+		return $this->getStack();
 	}
 
 }
