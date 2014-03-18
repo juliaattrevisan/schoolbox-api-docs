@@ -246,7 +246,7 @@ class Controller extends Base {
         if (is_array($post['related_resource_id'])) {
             foreach ($post['related_resource_id'] as $related_resource_id) {
                 $resource = new Model();
-                $user->setId($related_resource_id);
+                $resource->setId($related_resource_id);
                 $model->addRelatedResource($resource);
             }
         }
