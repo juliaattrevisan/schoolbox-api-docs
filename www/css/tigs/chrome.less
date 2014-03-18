@@ -247,7 +247,11 @@
     padding: 0 0 4px 17px;
     font-size: 14px;
   }
-  ul ul{ left: 217px; width: 217px; }
+  ul ul{
+    left: 217px;
+    width: 217px;
+    border: 1px solid #c6c6c6;
+  }
   li{
     a{
       padding: 4px 16px 4px 34px;
@@ -293,6 +297,7 @@
   background: #f0f0f0;
   border-top: 1px solid #c6c6c6;
   border-left: 1px solid #c6c6c6;
+  border-bottom: 1px solid #c6c6c6;
   top: 32px;
   position: relative;
   margin-left: 217px;
@@ -312,6 +317,22 @@
 
     .btn{
       margin: 8px !important;
+    }
+
+    // This fixes profile directory
+    .directory .subjects ul:nth-child(odd) li {
+      background: #fafafa;
+    }
+
+    // Calendar background fix
+    table.fc-border-separate{
+      background: #fff;
+    }
+
+    //Timetable
+    .timetable > tbody > tr:first-of-type > th.normal > .time,
+    .timetable > thead > tr > th.normal:first-of-type > .time{
+      display:none;
     }
   }
 
