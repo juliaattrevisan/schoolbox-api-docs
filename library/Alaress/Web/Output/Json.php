@@ -28,14 +28,32 @@ class Json extends Base {
      */
     protected function outputResponseBody() {
         $response = $this->getResponse()->content->get();
+        echo json_encode($this->applyJsonSerializable($response['data']));
+    }
 
-        // Use patched JsonSerializable interface.
-        // TODO: remove once PHP >= 5.4
-        $output = array();
-        foreach ($response['data'] as $key => $value) {
-            $output[$key] = ($value instanceof JsonSerializable) ? $value->jsonSerialize() : $value;
+    /**
+     * Recursively applies jsonSerialize() to any JsonSerializable objects
+     * within $var.
+     *
+     * @todo remove once PHP >= 5.4
+     *
+     * @param  mixed $var
+     * @return mixed
+     */
+    public static function applyJsonSerializable($var) {
+        if (version_compare(PHP_VERSION, '5.4', '>=')) {
+            return $var;
         }
-        echo json_encode($output);
+        if ($var instanceof JsonSerializable) {
+            $var = $var->jsonSerialize();
+        }
+        elseif (is_array($var) || $var instanceof Traversable) {
+            foreach ($var as &$value) {
+                $value = self::applyJsonSerializable($value);
+            }
+            unset($value);
+        }
+        return $var;
     }
 
 }
