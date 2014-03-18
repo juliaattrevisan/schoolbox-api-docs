@@ -1,6 +1,6 @@
 <?php
 /**
- * Model for resource moderation types.
+ * Join model for resource relations.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -8,6 +8,7 @@
  */
  
 namespace Schoolbox\ResourceBooking\Item\RelatedResource;
+use Schoolbox\ResourceBooking\Item\Model as Resource;
 
 class Model {
 
@@ -17,30 +18,14 @@ class Model {
     protected $id;
 
     /**
-     * @var string
+     * @var Resource
      */
-    protected $name;
+    protected $resource;
 
     /**
-     * @var string
+     * @var Resource
      */
-    protected $description;
-
-    /**
-     * @param  string $description
-     * @return $this
-     */
-    public function setDescription($description) {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription() {
-        return $this->description;
-    }
+    protected $relatedResource;
 
     /**
      * @param  int   $id
@@ -59,19 +44,35 @@ class Model {
     }
 
     /**
-     * @param  string $name
+     * @param  Resource $relatedResource
      * @return $this
      */
-    public function setName($name) {
-        $this->name = $name;
+    public function setRelatedResource($relatedResource) {
+        $this->relatedResource = $relatedResource;
         return $this;
     }
 
     /**
-     * @return string
+     * @return Resource
      */
-    public function getName() {
-        return $this->name;
+    public function getRelatedResource() {
+        return $this->relatedResource;
+    }
+
+    /**
+     * @param  Resource $resource
+     * @return $this
+     */
+    public function setResource($resource) {
+        $this->resource = $resource;
+        return $this;
+    }
+
+    /**
+     * @return Resource
+     */
+    public function getResource() {
+        return $this->resource;
     }
 
 }
