@@ -2,8 +2,8 @@
 
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
-// Initialise routes
-foreach (glob(SITE_root.'/conf/routes/*.php') as $routePath) {
+// Initialise module configuration
+foreach (glob(SITE_root.'/conf/modules/*.php') as $routePath) {
     require $routePath;
 }
 

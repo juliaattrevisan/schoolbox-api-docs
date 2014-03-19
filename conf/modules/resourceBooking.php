@@ -1,19 +1,13 @@
 <?php
 /**
- * Routes for the resource browser
+ * Configuration for the resource booking system.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-use Aura\Di;
-use Aura\Router\Router;
-use Alaress\Authorizer;
-
-/** @var Di\Container $di */
-/** @var Router $router */
-/** @var Authorizer\Authorizer $authorizer */
+/** @var Aura\Di\Container $di */
 global $di;
 
 $categoryModule = new Schoolbox\ResourceBooking\Category\Module($di);
