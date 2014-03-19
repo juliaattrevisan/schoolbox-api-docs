@@ -57,7 +57,7 @@ class UserQueue {
 		unset($bindings['user']);
 
 		// the user's personal routing key
-		$this->bindings = array("*.notify.user.$this->userId");
+		$this->bindings = array("*.notify.user.$this->userId.#");
 
 		// all remaining bindings specified
 		foreach($bindings as $type => $binds) {

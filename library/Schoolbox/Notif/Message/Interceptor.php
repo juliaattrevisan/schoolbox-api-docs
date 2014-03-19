@@ -153,7 +153,7 @@ class Interceptor {
 		$checks = array(
 			'user'   => $user->getId(),
 			'role'   => $user->getRole()->getId(),
-			'campus' => $user->getDefaultCampus()->getId()
+//			'campus' => $user->getDefaultCampus()->getId()
 		);
 
 		foreach($checks as $type => $id) {
@@ -175,7 +175,7 @@ class Interceptor {
 		foreach($coll as $offset => $reroute) {
 			$regex = array(
 				'`\*`' => '[^.]+',
-				'`#`'  => '(?:[^.]+.?)*',
+				'`#.?`'  => '(?:[^.]+.?)*',
 				'`\.`' => '\.'
 			);
 
