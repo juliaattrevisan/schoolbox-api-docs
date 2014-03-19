@@ -7,16 +7,6 @@
  * To change this template use File | Settings | File Templates.
  */
 
-/* Load Configuration Files */
-// require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
-
-
-// require_once dirname(__FILE__) . '/../../www/conf/conf.php';
-
-// Load the Autoloader
+// Load the Autoloader, that's all that needs to happen
 require_once dirname(__FILE__) . '/../../include/Autoloader.php';
 Autoloader::initialise();
-
-// require_once dirname(__FILE__) . '/../../www/include/stdfuncs.php';
-
-require_once 'PHPUnit/Framework/TestCase.php';
