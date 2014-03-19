@@ -354,7 +354,10 @@ class Collection implements \ICollection {
 	 * @return mixed
 	 */
 	public function getOffset($index) {
-		return $this->stack[$index];
+		if(isset($this->stack[$index])) {
+			return $this->stack[$index];
+		}
+		return null;
 	}
 
 	/**
@@ -402,4 +405,47 @@ class Collection implements \ICollection {
 		}
 		return new Collection($result);
 	}
+
+	/**
+	 * Slice this collection to a specified size, optionally with an offset
+	 *
+	 * @param int $count
+	 * @param int $offset
+	 * @return self
+	 */
+	public function slice($count, $offset = 0) {
+		$this->stack = array_slice($this->stack, $offset, $count, false);
+		return $this;
+	}
+
+	public function filterBy($field, $value) {
+		$getField = $this->getGetMethodName($field);
+		return $this->filterByCallback(
+			function($item) use ($getField, $value) {
+				return $item->$getField() == $value;
+			}
+		);
+	}
+
+
+	/**
+	 * Filters out elements from this collection based on the given callback
+	 *
+	 * @param callable $callback {
+	 *                      param $item
+	 *                      return bool
+	 *                 }
+	 *
+	 * @return Collection
+	 */
+	public function filterByCallback($callback) {
+		$result = array();
+		foreach($this as $item) {
+			if(call_user_func($callback, $item)) {
+				$result[] = $item;
+			}
+		}
+		return new Collection($result);
+	}
+
 }
