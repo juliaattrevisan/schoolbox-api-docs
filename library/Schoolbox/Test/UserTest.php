@@ -19,7 +19,8 @@ class UserTest extends TestCase {
 	protected $object;
 
 	protected $config_vars = array(
-		array('site_domain', 'localhost')
+		array('site_domain',  'localhost'),
+		array('mail_address', 'localhost'),
 	);
 
 	public function setUp() {
@@ -32,7 +33,7 @@ class UserTest extends TestCase {
 		$this->object->setLocalEmail(true);
 		$this->object->setUsername('testuser');
 		$expected = $this->object->getUsername().'@'.$this->mock_config->get('site_domain');
-		$this->assertEquals($this->object->getEmail(), $expected);
+		$this->assertEquals($expected, $this->object->getEmail());
 	}
 
 	public function testAltEmailAddress() {
@@ -40,6 +41,6 @@ class UserTest extends TestCase {
 		$this->object->setLocalEmail(false);
 		$this->object->setUsername('testuser');
 		$this->object->setAltEmail($email);
-		$this->assertEquals($this->object->getEmail(), $email);
+		$this->assertEquals($email, $this->object->getEmail());
 	}
 }
