@@ -704,11 +704,13 @@ class External_Maze_User implements External_UserInterface {
 	 * @return Bool|String
 	 */
 	public function getPortrait($externalUserId) {
+
+		/* Students and staff store their pics in different places
+		 */
 		if ($this->getGroup()->isStudent($externalUserId)) {
 			$query = "
 				SELECT
-					STUDENT_PIC AS Photo,
-					CONVERT(VARCHAR, LW_DATE, 120) AS Modified
+					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
 				FROM ST
 				WHERE ST.STKEY = '{$externalUserId}'
 			";
@@ -716,22 +718,16 @@ class External_Maze_User implements External_UserInterface {
 		else if ($this->getGroup()->isStaff($externalUserId)) {
 			$query = "
 				SELECT
-					STAFF_PIC AS Photo,
-					CONVERT(VARCHAR, LW_DATE, 120) AS Modified
+					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
 				FROM SF
 				WHERE SF.SFKEY = '{$externalUserId}'
 			";
 		}
 
-		//
-		// SB-2063 - Don't try to convert charsets for binary fields.
-		$convert_encoding = $this->getDb()->getConvertEncoding();
-		$this->getDb()->setConvertEncoding(false);
 
 		if ($photo = $this->getDb()->getRow($query)) {
-			$this->getDb()->setConvertEncoding($convert_encoding);
-
 			$photoPath = Config::get('portrait_dir') . '/' . escapeshellcmd($externalUserId) . '.jpg';
+
 			//TODO: delete photos on rollover
 
 			/* If the cached file doesn't exist, or the synergetic image is more recent than our
@@ -744,6 +740,29 @@ class External_Maze_User implements External_UserInterface {
 			$modifiedTime = strtotime($photo['ModifiedDate']);
 
 			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
+				if ($this->getGroup()->isStudent($externalUserId) || 1) {
+					$query = "
+						SELECT
+							STUDENT_PIC AS Photo
+						FROM ST
+						WHERE ST.STKEY = '{$externalUserId}'
+					";
+				}
+				else if ($this->getGroup()->isStaff($externalUserId)) {
+					$query = "
+						SELECT
+							STAFF_PIC AS Photo
+						FROM SF
+						WHERE SF.SFKEY = '{$externalUserId}'
+					";
+				}
+
+				//
+				// SB-2063 - Don't try to convert charsets for binary fields.
+				$convert_encoding = $this->getDb()->getConvertEncoding();
+				$this->getDb()->setConvertEncoding(false);
+				$photo = $this->getDb()->getRow($query);
+				$this->getDb()->setConvertEncoding($convert_encoding);
 
 				/* Purge all previously transformed copies
 				 */
