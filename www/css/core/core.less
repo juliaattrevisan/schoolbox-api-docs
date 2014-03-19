@@ -5395,6 +5395,27 @@ CALENDAR
     margin: 5px 10px 0 5px;
 }
 
+/* The calendar loading thing */
+#calendar-loading {
+    border:1px solid #aaa;
+    width:280px;
+    height:80px;
+    background-color:#fff;
+    background-image: url('/images/loading-bar.gif');
+    background-repeat: no-repeat;
+    background-position: 50% 40px;
+    position:absolute;
+    top:100px;
+    left:100px;
+    z-index:1000;
+    -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
+    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
+    p {
+        margin-top: 15px;
+        text-align: center;
+    }
+}
+
 /*the top of the calendar*/
 .calendar-controls {
     background: @module-background;
@@ -5574,7 +5595,7 @@ CALENDAR
     }
     #ui-datepicker-div {
         display: none;
-        z-index: 99;
+        z-index: 1000;
     }
     .filter-cat {
         float: left;
