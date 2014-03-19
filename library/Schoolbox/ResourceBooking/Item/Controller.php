@@ -84,10 +84,11 @@ class Controller extends Base {
             array(
                 'template' => '@resourceItem/edit.twig',
                 'data'     => array(
-                    'item'           => new Model(),
-                    'categoryList'   => $this->getMapper()->getJoinMapper('category')->findAll(),
-                    'moderationList' => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
-                    'moderatorList'  => array(),
+                    'item'            => new Model(),
+                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
+                    'moderatorList'   => array(),
+                    'relatedItemList' => array(),
                 ),
             )
         );
@@ -104,8 +105,9 @@ class Controller extends Base {
             array(
                 'template' => '@resourceItem/read.twig',
                 'data'     => array(
-                    'item'          => $item,
-                    'moderatorList' => array(),
+                    'item'            => $item,
+                    'moderatorList'   => array(),
+                    'relatedItemList' => array(),
                 ),
             )
         );
