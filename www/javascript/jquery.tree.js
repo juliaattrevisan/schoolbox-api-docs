@@ -88,7 +88,7 @@
 						if (Number(row.taskCount) > 0) {
 							clone.addClass('course');
 						}
-						clone.find(options.label).find('.nodeName').text(row.name);
+						clone.find(options.label).text(row.name);
 						
 						if (row.isParent == 1) {
 							clone.addClass('collapsed');
@@ -331,47 +331,29 @@
 			return this;
 		};
 
-		/**
-		 * Find the depth of a particular node
-		 *
-		 * @param node
-		 * @param initialDepth
-		 * @returns {*}
-		 */
-		this.findDepth = function(node, initialDepth) {
-			var allClasses = node.attr('class');
 
-			if (allClasses !== undefined) {
-				var regex = new RegExp(/child-of-node-(\d+)/g);
-
-				var bits = regex.exec(allClasses);
-
-				var parentNode = bits[1];
-
-				if (parentNode == 0) {
-					return 0;
-				}
-				else {
-					return initialDepth + this.findDepth($j('#node-' + parentNode), initialDepth++);
-				}
-			}
-		}
-
-		/**
-		 * Indent each row as it spawns
-		 *
-		 * @param node
-		 */
 		this.indentRow = function (node) {
-			var depth = this.findDepth(node, 1);
-			var margin = depth * 23;
-
-			if (node.attr('id') != '#node-template') {
-				node.find('[data-resourceMargin=1]').css({
-					display: 'block',
-					marginLeft: margin + 'px'
-				});
-			}
+			
+			var parent = object.getParent(node), spacer = $('<span></span>');
+			
+			/* clear indent */
+			node.find('span:not(.elbow,' + options.label + ')').remove();
+			
+			if (parent.attr('id') == 'node-0')
+				return;
+			
+			/* copy parent spacers */
+			parent.find('span:not(.elbow,' + options.label + ')').each(function (i) {
+				var clone = $(this).clone();
+				clone.insertBefore(node.find('span.elbow'));	
+			});
+			
+			/* indent one more than parent */
+			if (parent.hasClass('last'))
+				spacer.addClass('blank');
+			
+			spacer.insertBefore(node.find('span.elbow'));
+		
 		};
 
 		/* private functions */
