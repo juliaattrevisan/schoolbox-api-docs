@@ -27,6 +27,11 @@ class Json {
             // PHP 5.4+ automatically applies jsonSerialize
             return $var;
         }
+        if ($var instanceof JsonSerializable) {
+            // Get serialized version if $var implements that interface, and
+            // apply this method again in case it returns an iterable.
+            return self::applyJsonSerializable($var->jsonSerialize());
+        }
         elseif (is_array($var) || $var instanceof Traversable) {
             // Iterable: apply this method to all values in the collection
             $newVar = array();
@@ -34,11 +39,6 @@ class Json {
                 $newVar[$key] = self::applyJsonSerializable($value);
             }
             return $newVar;
-        }
-        elseif ($var instanceof JsonSerializable) {
-            // Get serialized version if $var implements that interface, and
-            // apply this method again in case it returns an iterable.
-            return self::applyJsonSerializable($var->jsonSerialize());
         }
         return $var;
     }
