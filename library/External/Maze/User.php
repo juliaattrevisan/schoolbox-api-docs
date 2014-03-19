@@ -617,7 +617,7 @@ class External_Maze_User implements External_UserInterface {
 		 */
 		$ttPeriod = "{$currentYear}S{$currentSemester}";
 
-		$externalUserId = 'ABRANAT';
+		$externalUserId = 'WIGR';
 
 		if ($this->getGroup()->isStudent($userId)) {
 			$query = "
@@ -645,7 +645,7 @@ class External_Maze_User implements External_UserInterface {
 				WHERE SF.SFKEY = '{$externalUserId}'
 			";
 		}
-		
+
 		$allSubjects = $this->getDb()->getAll($query);
 
 		$subjectList = array();
@@ -654,6 +654,7 @@ class External_Maze_User implements External_UserInterface {
 		/* Uniqueify results
 		 */
 		foreach($allSubjects as $currentSubject) {
+			new \Alaress_Probe($currentSubject);
 			if (!in_array($currentSubject['ClassCode'], $processed)) {
 				$subjectList[] = array(
 					'code' => $currentSubject['ClassCode'],
