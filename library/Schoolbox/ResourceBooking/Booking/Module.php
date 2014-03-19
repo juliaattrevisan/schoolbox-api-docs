@@ -1,0 +1,59 @@
+<?php
+/**
+ * Module definition for the booking part of the resource booking module.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+ 
+namespace Schoolbox\ResourceBooking\Booking;
+
+use Alaress\Authorizer\Authorizer;
+use Alaress\Module\Module as BaseModule;
+use Alaress\Authorizer\Rule;
+use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
+use Twig_Loader_Chain;
+use Twig_Loader_Filesystem;
+
+class Module extends BaseModule {
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutes(Router $router, $basePath) {
+        $router->add('resourceBooking.book', $basePath.'/bookItem/{id}');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePermissions(Authorizer $authorizer) {
+        $authorizer
+            ->addRule('/^resourceBooking(?:$|\.)/', new Rule\IsLoggedIn())
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
+        $loader = new Twig_Loader_Filesystem(array());
+        $loader->addPath(__DIR__.'/templates', 'resourceBooking');
+        $templateLoader->addLoader($loader);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initControllers(ContainerInterface $injector) {
+        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setResourceMapper']
+            = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
+        $injector->set(
+            'controller:resourceBooking',
+            $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Controller')
+        );
+    }
+
+}

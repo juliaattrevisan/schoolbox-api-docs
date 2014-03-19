@@ -15,3 +15,6 @@ $categoryModule->init('/resource-booking/category');
 
 $itemModule = new Schoolbox\ResourceBooking\Item\Module($di);
 $itemModule->init('/resource-booking/item');
+
+$bookingModule = new Schoolbox\ResourceBooking\Booking\Module($di);
+$bookingModule->init('/resource-booking/booking');
