@@ -62,7 +62,7 @@ class Controller extends Base {
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->to(
+        $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
         );
     }
@@ -114,7 +114,7 @@ class Controller extends Base {
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
-        $this->getResponse()->redirect->to(
+        $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
         );
     }
@@ -127,7 +127,7 @@ class Controller extends Base {
     public function delete($id) {
         $item = $this->getMapper()->findById($id);
         $this->getMapper()->delete($item);
-        $this->getResponse()->redirect->to(
+        $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
         );
     }
