@@ -361,6 +361,51 @@ class External_Maze_User implements External_UserInterface {
 	 * @return mixed
 	 */
 	public function getStudentContactList($externalUserId) {
+
+		/* First find the student so you know the Family identifier
+		 */
+		$query = "
+			SELECT FAMILY
+			FROM ST
+			WHERE STKEY = '{$externalUserId}'
+		";
+
+		$student = $this->getDb()->getRow($query);
+
+		/* Get the family's data
+		 */
+		$query = "
+			SELECT
+				DFKEY AS StudentContactID,
+				MTITLE AS StudentContactTitle,
+				MNAME AS StudentContactPreferred,
+				MSURNAME AS StudentContactSurname,
+				M_EMAIL AS StudentContactDefaultEmail,
+				ADDRESS01 AS StudentContactAddress1,
+				ADDRESS02 AS StudentContactAddress2,
+				ADDRESS03 AS StudentContactAddress3,
+				SUBURB AS StudentContactSuburb,
+				POSTCODE AS StudentContactPostCode,
+				STATE AS StudentContactState,
+				'' AS StudentContactPhoneActual,
+				MMOBILE AS StudentContactMobilePhone,
+				MBUS_PHONE AS StudentContactOccupPhone,
+				'' AS StudentContactRelation,
+				DFKEY AS StudentContactSpouseID,
+				FTITLE AS StudentContactSpouseTitle,
+				FNAME AS StudentContactSpousePreferred,
+				FSURNAME AS StudentContactSpouseSurname,
+				F_EMAIL AS StudentContactSpouseDefaultEmail,
+				'' AS StudentContactSpousePhoneActual,
+				FMOBILE AS StudentContactSpouseMobilePhone,
+				FBUS_PHONE AS StudentContactSpouseOccupPhone,
+				'' AS StudentContactSpouseRelation
+			FROM DF
+			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
+			WHERE DFKEY = '{$student['FAMILY']}'
+		";
+
+		return $this->getDb()->getRow($query);
 	}
 
 	/**
