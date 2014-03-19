@@ -351,7 +351,7 @@ class External_Maze_User implements External_UserInterface {
 			WHERE SFKEY = '{$synId}'
 		";
 
-		return $this->getDb()->getAll($query);
+		return $this->getDb()->getRow($query);
 	}
 
 	/**
