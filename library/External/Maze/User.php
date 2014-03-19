@@ -425,6 +425,133 @@ class External_Maze_User implements External_UserInterface {
 	 * @return mixed
 	 */
 	public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
+
+		/* Mega select
+		 */
+		$query = "
+			SELECT
+				ST.STKEY AS StudentID,
+				ST.FIRST_NAME AS StudentGiven1,
+				ST.SURNAME AS StudentSurname,
+				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				ST.HOUSE AS StudentHouse,
+				ST.BOARDER AS StudentBoarder,
+				KGC.DESCRIPTION AS StudentForm,
+
+				DF.DFKEY AS StudentContactID,
+				DF.MTITLE AS StudentContactTitle,
+				DF.MNAME AS StudentContactPreferred,
+				'' AS StudentContactLegalFullName,
+				DF.MSURNAME AS StudentContactSurname,
+				DF.M_EMAIL AS StudentContactDefaultEmail,
+				'' AS StudentContactPhoneActual,
+				DF.MMOBILE AS StudentContactMobilePhone,
+				DF.MBUS_PHONE AS StudentContactOccupPhone,
+
+				DF.DFKEY AS StudentContactSpouseID,
+				DF.MTITLE AS StudentContactSpouseTitle,
+				DF.MNAME AS StudentContactSpousePreferred,
+				'' AS StudentContactSpouseLegalFullName,
+				DF.MSURNAME AS StudentContactSpouseSurname,
+				DF.M_EMAIL AS StudentContactSpouseDefaultEmail,
+				'' AS StudentContactPhoneActual,
+				DF.MMOBILE AS StudentContactSpouseMobilePhone,
+				DF.MBUS_PHONE AS StudentContactSpouseOccupPhone,
+
+				UM.ADDRESS01 AS StudentContactAddress1,
+				UM.ADDRESS02 AS StudentContactAddress2,
+				UM.ADDRESS03 AS StudentContactAddress3,
+				UM.SUBURB AS StudentContactSuburb,
+				UM.POSTCODE AS StudentContactPostCode,
+				UM.STATE AS StudentContactState,
+				'' AS StudentContactCountryCode,
+				UM.ADDRESS01 AS StudentContactHomeAddress1,
+				UM.ADDRESS02 AS StudentContactHomeAddress2,
+				UM.ADDRESS03 AS StudentContactHomeAddress3,
+				UM.SUBURB AS StudentContactHomeSuburb,
+				UM.POSTCODE AS StudentContactHomePostCode,
+				UM.STATE AS StudentContactHomeState,
+				'' AS StudentContactHomeCountryCode,
+
+				'' AS StudentContactType,
+				UM.SILENT_NUMBER AS StudentContactSilentPhoneFlag,
+				'' AS PrimaryDirectoryIncludeFlag,
+				'' AS SpouseDirectoryIncludeFlag,
+				'' AS StudentParentsSeparatedFlag
+			FROM ST
+			LEFT JOIN DF ON ST.FAMILY = DF.DFKEY
+			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
+			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
+			WHERE 1 = 1
+		";
+
+		/* Search for a particular year level
+		 */
+		if (strlen($yearlevel)) {
+
+			/* Translate back to Maze-specific
+			 */
+			if (is_numeric($yearlevel)) {
+				$mazeYearLevel = $yearlevel;
+
+				if ($yearlevel < 10) {
+					$mazeYearLevel = '0' . $yearlevel;
+				}
+
+				$mazeYearLevel = 'Y' . $mazeYearLevel;
+
+				$query .= "
+					AND (ST.SCHOOL_YEAR = '{$mazeYearLevel}')
+				";
+			}
+		}
+
+		/* Search for a student name
+		 */
+		if (strlen($name)) {
+			$name = $this->getDb()->quote($name);
+			$query .= "
+				AND (
+					(ST.SURNAME LIKE '%{$name}%')
+					OR
+					(ST.FIRST_NAME LIKE '%{$name}%')
+				)
+			";
+		}
+
+		/* Search for a particular boarding status
+		 */
+		if ($boardingStatus == '') {
+
+			/* No restrictions on result set
+			 */
+		}
+		else if ($boardingStatus == 'yes') {
+			$query .= "
+				AND ST.BOARDER = 'Y'
+			";
+		}
+		else {
+			$query .= "
+				AND ST.BOARDER != 'Y'
+			";
+		}
+
+		/* Search for a particular form
+		 */
+		if ($form) {
+			$form = $this->getDb()->quote($form);
+
+			$query .= "
+				AND KGC.DESCRIPTION = '{$form}'
+			";
+		}
+
+		$query .= "
+			ORDER BY StudentSurname, StudentID, StudentContactType
+		";
+
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
