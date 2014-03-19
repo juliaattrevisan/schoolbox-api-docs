@@ -284,4 +284,15 @@ class UserMapper extends Mapper {
 		$statement->execute();
 		return $statement->fetchColumn();
 	}
+
+    /**
+     * Get a user object stub, for when a user does not exist
+     *
+     * @return User
+     */
+    public function getUnknownUser() {
+        $user = new User;
+        $user->setLastname('Unkown User');
+        return $user;
+    }
 }
