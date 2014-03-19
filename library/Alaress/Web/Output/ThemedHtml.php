@@ -31,7 +31,12 @@ class ThemedHtml extends Html {
         $page = $this->getSitepage();
         $page->setFile(TEMPLATE_content, 'output.html');
         $response = $this->getResponse()->content->get();
-        $page->setVar('OUTPUT', $this->getTemplateEngine()->render($response['template'], $response['data']));
+        $page->setVar(
+            'OUTPUT',
+            $this->getTemplateEngine()->render(
+                $response['template'], ($response['data'] ?: array())
+            )
+        );
         $page->setTitle($response['title']);
         $page->buildPage();
         $page->outputPage(true);
