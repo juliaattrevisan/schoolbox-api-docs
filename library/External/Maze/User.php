@@ -677,6 +677,13 @@ class External_Maze_User implements External_UserInterface {
 	 * @return array|bool
 	 */
 	public function getEnrolledStudents($synergyID) {
+		$query = "
+			SELECT ST.STKEY AS RelatedID
+			FROM ST
+			WHERE FAMILY = '{$synergyID}'
+		";
+
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
