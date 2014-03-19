@@ -10,7 +10,12 @@ class News extends DeprecatedModel {
         parent::DeprecatedModel();
     }
 
-    function getByID($newsID) {
+	/**
+	 * @deprecated use \Schoolbox\News\ArticleMapper::findById()
+	 * @param $newsID
+	 * @return array|bool|null
+	 */
+	function getByID($newsID) {
 
         $query = "SELECT * FROM " . $this->_table . " WHERE " . $this->_index . " = ".$this->db->smartQuote($newsID)." AND item_deleted = 0";
         $news = $this->db->getRow($query);
@@ -41,7 +46,11 @@ class News extends DeprecatedModel {
         return $news;
     }
 
-    function getGroupList() {
+	/**
+	 * @deprecated use \Schoolbox\News\RoleMapper::findAll()
+	 * @return mixed
+	 */
+	function getGroupList() {
         $query = "SELECT id, name FROM groups";
         $groupList = $this->db->getAll($query);
         if (is_array($groupList)) {
@@ -74,7 +83,12 @@ class News extends DeprecatedModel {
         return $output;
     }
 
-    function getUserList($newsID) {
+	/**
+	 * @deprecated use \Schoolbox\News\ArticleMapper::findById()->getUsers()
+	 * @param $newsID
+	 * @return array|bool
+	 */
+	function getUserList($newsID) {
         $query = "SELECT id, title, firstname, lastname FROM newsUser JOIN user ON userID = id WHERE newsID = $newsID";
         return $this->db->getAll($query);
     }
@@ -90,7 +104,12 @@ class News extends DeprecatedModel {
         return false;
     }
 
-    function create($news) {
+	/**
+	 * @deprecated use \Schoolbox\News\ArticleMapper::save()
+	 * @param $news
+	 * @return int|string
+	 */
+	function create($news) {
         $groupList = $news['groupList'];
         $campusList = $news['campusList'];
         $userList = $news['userList'];
@@ -137,7 +156,12 @@ class News extends DeprecatedModel {
         return $newsID;
     }
 
-    function update($news) {
+	/**
+	 * @deprecated use \Schoolbox\News\ArticleMapper::save()
+	 * @param $news
+	 * @return bool|mysqli_result|resource|void
+	 */
+	function update($news) {
 
         if (!$this->hasWrite($news['item_id'])) {
             return;
@@ -176,7 +200,12 @@ class News extends DeprecatedModel {
 
     }
 
-    function delete($newsID) {
+	/**
+	 * @deprecated use \Schoolbox\News\ArticleMapper::delete()
+	 * @param $newsID
+	 * @return bool|mysqli_result|resource
+	 */
+	function delete($newsID) {
         $newsID = (int)$newsID;
 
         if (!$this->hasWrite($newsID)) {
@@ -570,22 +599,33 @@ class News extends DeprecatedModel {
         }
     }
 
-    function getTopicByID($newsTopicID) {
+	/**
+	 * @deprecated use \Schoolbox\News\TopicMapper::findById()
+	 * @param $newsTopicID
+	 * @return array|bool|null
+	 */
+	function getTopicByID($newsTopicID) {
         $query = "SELECT * FROM `newsTopic` WHERE `newsTopicID` = $newsTopicID";
         return $this->db->getRow($query);
     }
 
-    function getTopicList() {
+	/**
+	 * @deprecated use \Schoolbox\News\TopicMapper::findAll()
+	 * @return array|bool
+	 */
+	function getTopicList() {
         $query = "SELECT * FROM `newsTopic` ORDER BY `name`";
         return $this->db->getAll($query);
     }
 
-    /**
-     * Returns a list of years and months which have news articles
-     *
-     * @param Integer $categoryId
-     * @return Array|Bool
-     */
+	/**
+	 * Returns a list of years and months which have news articles
+	 *
+	 * @deprecated use \Schoolbox\News\ArticleMapper::findOccupiedMonths()
+	 * @param bool $archive
+	 * @param string $topicName
+	 * @return array|null
+	 */
     public function getOccupiedDateList($archive = false, $topicName = '') {
 
         // provide news listing
@@ -635,7 +675,17 @@ class News extends DeprecatedModel {
         */
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+	/**
+	 * @deprecated use \Schoolbox\News\ArticleMapper::search()
+	 * @param string $keyword
+	 * @param int $offset
+	 * @param int $limit
+	 * @param int $count
+	 * @param string $sort_by
+	 * @param string $sort_dir
+	 * @return array|bool
+	 */
+	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
         $keyword = $this->db->quote($keyword);
         /*
                 $query = "SELECT `subject_news`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
