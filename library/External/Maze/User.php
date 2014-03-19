@@ -555,6 +555,20 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
+	 * Gets a list of Contacts for all Student Boarders.
+	 *
+	 * Used in reporting.
+	 *
+	 * @return mixed
+	 */
+	public function getStudentBoarderContactListExtended() {
+
+		/* Abuse The Reuse!
+		 */
+		return $this->getStudentContactListExtended('', '', 'Y', '');
+	}
+
+	/**
 	 * @param null $externalUserId
 	 */
 	public function getCurrentSemester($externalUserId = null) {
