@@ -4,6 +4,7 @@
         {% for item in list %}
         <li class="resource">
             <a id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">{{ item.name }}</a>
+            <a id="resource-book-{{item.id}}" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">Book</a>
         </li>
         {% else %}
         <li>There are no resources in the system.</li>

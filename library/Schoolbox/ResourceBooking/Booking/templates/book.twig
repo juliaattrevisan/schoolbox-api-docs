@@ -1,3 +1,80 @@
-<h1>Book item: {{ resource.name }}</h1>
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 
 {# Show a calendar with resource bookings on it #}
+
+<script type="text/javascript">
+
+// provide page-wide access to the calendar object so the callbacks can actually use it
+//var c;
+
+// once the DOM has loaded, punch a fancy calendar into it
+$(document).ready(function() {
+    var now = new Date();
+    var c   = new Calendar('calendar', 'calendar-bubble', {
+        crud: {
+            c: '/calendar/ajax/create',
+            // r: don't need it
+            u: '/calendar/ajax/update',
+            d: '/calendar/ajax/delete'
+        },
+        filter: {
+            ajax: '/calendar/ajax/filter'
+        },
+        fullCalendar: {
+            date:  now.getDate(),
+            month: now.getMonth()+1,
+            year:  now.getFullYear(),
+            columnFormat: 'ddd d/M',
+            defaultView: 'agendaWeek',
+            timeFormat: { month: 'h(:mm)tt' },
+            events: function(start, end, callback) {
+                $.ajax({
+                    dataType: 'json',
+                    url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: resource.id})|json_encode|raw }},
+//                    url:      '/calendar/ajax/full',
+                    data: {
+                        start:  Math.round(start.getTime()/1000),
+                        end:    Math.round(end.getTime()/1000),
+                        userId: 19
+                    },
+                    success: function(data) {
+                        callback(data);
+                    },
+                    cache: false
+                });
+            },
+
+            loading: function(isLoading) {
+                if (isLoading === true) {
+                    $('#calendar-loading').css({
+                        top: ($j('#calendar').height() - $j('#calendar-loading').height())/2,
+                        left: ($j('#calendar').width() - $j('#calendar-loading').width())/2
+                    }).show();
+                }
+                else {
+                    $('#calendar-loading').hide();
+                }
+            }
+        },
+        x: false
+    }).init()
+})
+</script>
+
+<div id="calendar-loading">
+    <p><strong>Loading events...</strong></p>
+</div>
+
+<h1>Book item: {{ resource.name }}</h1>
+
+<div id="calendar"></div>
+<div id="calendar-export-dialog">
+    <div id="calendar-export-dialog-text">
+        Use the following URL as the source for your feed.
+    </div>
+    <textarea readonly id="calendar-export-dialog-url"></textarea>
+</div>
