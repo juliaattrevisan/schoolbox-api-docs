@@ -18,10 +18,18 @@ class External_Maze_User implements External_UserInterface {
 	private $db = null;
 
 	/**
+	 * A Handler of Groups
+	 *
+	 * @var
+	 */
+	private $groupHandler;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->setDb(MSSQL::getInstance());
+		$this->setGroup(new Group());
 	}
 
 	/**
@@ -562,9 +570,6 @@ class External_Maze_User implements External_UserInterface {
 	 * @return mixed
 	 */
 	public function getStudentBoarderContactListExtended() {
-
-		/* Abuse The Reuse!
-		 */
 		return $this->getStudentContactListExtended('', '', 'Y', '');
 	}
 
@@ -597,6 +602,71 @@ class External_Maze_User implements External_UserInterface {
 	 * @return array|bool
 	 */
 	public function getSubjectList($externalUserId, $userId) {
+		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+		$currentYear = $now->getUsingFormat('Y');
+		$currentSemester = $this->getCurrentSemester();
+
+		/* TODO: Hard code this for now
+		 *
+		 * CURRENT_SEMESTER is empty in the Maze db
+		 */
+		$currentSemester = 1;
+
+		/* Only get subjects that are relevant now
+		 */
+		$ttPeriod = "{$currentYear}S{$currentSemester}";
+
+		$externalUserId = 'ABRANAT';
+
+		if ($this->getGroup()->isStudent($userId)) {
+			$query = "
+				SELECT
+					STMA.MKEY AS ClassCode,
+					SU.FULLNAME AS name,
+					'' AS classType,
+					'' AS ClassCampus
+				FROM STMA
+				LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
+				WHERE SKEY = '{$externalUserId}'
+				AND TTPERIOD = '{$ttPeriod}'
+			";
+		}
+		else if ($this->getGroup()->isStaff($userId)) {
+			$query = "
+				SELECT
+					SUBJ AS ClassCode,
+					SU.FULLNAME AS name,
+					'' AS classType,
+					'' AS ClassCampus
+				FROM TTTG
+				LEFT JOIN SF ON TTTG.T1TEACH = SF.SFKEY
+				LEFT JOIN SU ON TTTG.SUBJ = SU.SUKEY
+				WHERE SF.SFKEY = '{$externalUserId}'
+			";
+		}
+		
+		$allSubjects = $this->getDb()->getAll($query);
+
+		$subjectList = array();
+		$processed = array();
+
+		/* Uniqueify results
+		 */
+		foreach($allSubjects as $currentSubject) {
+			if (!in_array($currentSubject['ClassCode'], $processed)) {
+				$subjectList[] = array(
+					'code' => $currentSubject['ClassCode'],
+					'name' => $currentSubject['name'],
+					'classType' => $currentSubject['classType'],
+					'campusCode' => $currentSubject['ClassCampus']
+				);
+
+				$processed[] = $currentSubject['ClassCode'];
+			}
+		}
+
+		return $subjectList;
 	}
 
 	/**
@@ -678,5 +748,23 @@ class External_Maze_User implements External_UserInterface {
 	 */
 	private function getDb() {
 		return $this->db;
+	}
+
+	/**
+	 * Set group
+	 *
+	 * @param Group $groupHandler
+	 */
+	private function setGroup($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * Get group
+	 *
+	 * @return Group
+	 */
+	private function getGroup() {
+		return $this->groupHandler;
 	}
 }
