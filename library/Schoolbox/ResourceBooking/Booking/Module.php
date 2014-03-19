@@ -24,6 +24,7 @@ class Module extends BaseModule {
      */
     public function initRoutes(Router $router, $basePath) {
         $router->add('resourceBooking.book', $basePath.'/bookItem/{id}');
+        $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
     }
 
     /**
