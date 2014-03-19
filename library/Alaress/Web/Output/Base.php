@@ -33,7 +33,11 @@ class Base {
         $this->outputResponseCode();
         $this->outputHeaders();
         $this->outputCookies();
-        $this->outputResponseBody();
+        // Don't send response body if there is a redirect.
+        $location = $this->getResponse()->headers->get('location');
+        if (!isset($location)) {
+            $this->outputResponseBody();
+        }
     }
 
     /**
