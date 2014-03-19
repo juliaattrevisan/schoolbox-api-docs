@@ -44,7 +44,7 @@ class External_Maze_User implements External_UserInterface {
 
 	/**
 	 * Gets the contact info of the person who is a Student's Contact. The ID
-	 * passed is the Synergetic of the Contact, not the Student.
+	 * passed is the ExternalId of the Contact, not the Student.
 	 *
 	 * In Maze, Parents aren't considered atomic units of people, so always
 	 * refer to them in a joint account.
@@ -85,6 +85,7 @@ class External_Maze_User implements External_UserInterface {
 	 * 1 + 1 = 1
 	 *
 	 * @param $family
+	 * @return array
 	 */
 	private function recombine($family) {
 
@@ -148,10 +149,10 @@ class External_Maze_User implements External_UserInterface {
 
 	/**
 	 * Gets the contact info of the person who is a Student's Contact. The ID
-	 * passed is the Synergetic of the Contact, not the Student. Anyone who is
+	 * passed is the ExternalId of the Contact, not the Student. Anyone who is
 	 * not supposed to be having their details publicised (via the
 	 * DirectoryIncludeFlag) are not included in the result set.
-	 * Accept array of Synergy IDs, or just an int
+	 * Accept array of ExternalIDs, or just an int
 	 *
 	 * @param $externalId
 	 *
@@ -262,7 +263,7 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
-	 * Get a guy's info from Schoolpro
+	 * Get a guy's info from Maze
 	 *
 	 * $synId is the STKEY value.
 	 *
@@ -326,12 +327,31 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
-	 * Get a guy's info from Schoolpro
+	 * Get a guy's info from Maze
+	 *
+	 * None of the users seem to have any value for CAMPUS
 	 *
 	 * @param  $synId
 	 * @return array|bool
 	 */
 	public function getStaff($synId) {
+		$query = "
+			SELECT
+				SFKEY AS SchoolStaffCode,
+				'' AS StaffBuilding,
+				'' AS StaffRoom,
+				'' AS StaffExtension,
+				MOBILE AS StaffMobilePhone,
+				'' AS StaffVoiceMail,
+				'' AS StaffCampusDescription,
+				SF_POSITION AS StaffCategoryDescription,
+				'' AS StaffDepartment
+			FROM SF
+			LEFT JOIN KSC ON SF.POS_CODE = KSC.KSCKEY
+			WHERE SFKEY = '{$synId}'
+		";
+
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
