@@ -398,6 +398,27 @@
                 return true;
             });
 
+
+            // testing: toggle indicator
+            if(settings.debug) {
+                var bell = $j('#infoPanel').children('li.bell');
+                var a = $j('#go-msg');
+                // test add remove count
+                $j('#header a.logo').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if(bell.attr('data-unread') == 0) {
+                        var i = parseInt(Math.random() * 26 + 1);
+                        a.html(i);
+                        bell.attr('data-unread', i);
+                    }
+                    else {
+                        a.html('');
+                        bell.attr('data-unread', '0');
+                    }
+                });
+            }
+
             // attempt a connection
             establishConnection();
         });
