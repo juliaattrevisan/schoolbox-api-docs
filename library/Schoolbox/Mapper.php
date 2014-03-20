@@ -415,6 +415,10 @@ class Mapper {
 	 *             a hydration strategy that isn't covered by `type`, use this.
 	 * * join:     Required and only used for TYPE_MODEL - defines which join
 	 *             mapper should be used to hydrate an instance of this model for.
+	 * * join_def: if 'join' is supplied, this can be used instead of defining
+	 *             join in hasJoin().
+	 *             If 'this_key' is not set here, then it defaults to the value
+	 *             for 'column'.
 	 * * identifier: if true, this map is the primary key for this table, and is
 	 *               used by mapper's getById method
 	 * created_timestamp: if true, this column is updated with the current time
@@ -436,6 +440,10 @@ class Mapper {
 			$this->identifier = $map;
 		}
 		$this->map->setOffset($map['property'], $map);
+		// Has a join definition been defined? If so create the join
+		if (isset($map['join']) && isset($map['join_def'])) {
+			$this->hasJoin($map['join'], $map['join_def']);
+		}
 		return true;
 	}
 
