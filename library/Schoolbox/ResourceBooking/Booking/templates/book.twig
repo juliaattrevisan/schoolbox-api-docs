@@ -22,7 +22,7 @@ $(document).ready(function() {
             d: '/calendar/ajax/delete'
         },
         filter: {
-            ajax: '/calendar/ajax/filter'
+            enabled: false
         },
         fullCalendar: {
             date:  now.getDate(),
@@ -35,7 +35,6 @@ $(document).ready(function() {
                 $.ajax({
                     dataType: 'json',
                     url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: resource.id})|json_encode|raw }},
-//                    url:      '/calendar/ajax/full',
                     data: {
                         start:  Math.round(start.getTime()/1000),
                         end:    Math.round(end.getTime()/1000),
