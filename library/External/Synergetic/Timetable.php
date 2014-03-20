@@ -410,6 +410,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 	function getFullTimetable($synergy_id, $userID, $campus)
 	{
+        /* Temporarily switch the filesemester to the requested user */
+        $originalFileSemester = $_SESSION['FileSemester'];
+        $originalFileYear = $_SESSION['FileYear'];
+        if($synergy_id != $_SESSION['sid']) {
+            $externalUser = new External_Synergetic_User();
+            $externalUser->getCurrentSemester($synergy_id);
+        }
+
 		$timetabledef = $this->getTimetableDefinition($campus, 1);
 
         if(!is_array($timetabledef['desc'])) {
@@ -535,10 +543,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				
 			}
 		}
+
+        /* Return filesemester to original state */
+        $_SESSION['FileSemester'] = $originalFileSemester;
+        $_SESSION['FileYear'] = $originalFileYear;
+
         if(is_array($timetable)) {
 		    usort($timetable, array($this, 'sortTimetable'));
         }
-
+        
 		return $timetable;
 
 	}
