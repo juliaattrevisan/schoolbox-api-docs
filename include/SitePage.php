@@ -208,7 +208,7 @@ class SitePage extends Page {
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
             'DEBUGBAR'      => $debug_bar_body,
             'DEBUGBAR_HEAD' => $debug_bar_head,
-            'SERVER_ADDRESS' => Cfg::get('site_hostname') . '.' . Cfg::get('site_domain'),
+            'SERVER_ADDRESS' => (Cfg::get('site_hostname') ? Cfg::get('site_hostname') . '.' : '') . Cfg::get('site_domain'),
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
 

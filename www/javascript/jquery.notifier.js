@@ -4,12 +4,15 @@
 
     $.fn.notifier = function(options) {
         var settings = $.extend({
-            secure: 'false',
-            host: '192.168.1.1',
-            port: '8080',
-            sslport: '8081',
-            prefetch: 5,
-            debug: false
+            secure:    'false',
+            host:      '192.168.1.1',
+            port:      '8080',
+            sslport:   '8081',
+            counter:   '#go-msg',
+            content:   '#msg-content',
+            list:      '#message-list',
+            prefetch:  5,
+            debug:     false
         }, options);
 
         // cast boolean from potential string
@@ -20,6 +23,7 @@
             // detect websocket support
             var support = "MozWebSocket" in window ? 'MozWebSocket' : ("WebSocket" in window ? 'WebSocket' : null);
             if (support == null) {
+                // TODO fallback to flash or polling
                 if(settings.debug) { console.error('Websockets are not supported'); }
                 return;
             }
@@ -29,12 +33,6 @@
              * @private
              */
             function establishConnection() {
-
-                // put another element in!
-                $(self).append(
-                    $('<span/>').attr('id', 'msg-counter').attr('data-count', 0)
-                );
-
                 conn = new window[support](url);
                 conn.onopen = onOpen;
                 conn.onerror = onError;
@@ -74,60 +72,10 @@
 
                 var dom = $(self);
 
-                // if the avatar doesn't have a listener attached, do initialisation
-                if(typeof dom.data("events") === 'undefined' || typeof dom.data("events").click === 'undefined') {
-
-                    if(settings.debug) { console.log('Attaching click listener (btw, update your jQuery!)'); }
-
-                    dom.attr('title', 'View Messages');
-
-                    var msgs = $('<ul/>').attr('id', 'messages');
-                    var ml = $('<li/>').attr('id','message-list').addClass('hide');
-
-                    ml.append(msgs);
-
-                    var ul = dom.closest('ul').append(ml);
-
-                    // setup mark-as-read
-                    ml.delegate('a', 'click', function(ev) {
-
-                        var pip = $(this).hasClass('pip');
-                        var action = $(this).hasClass('action') && $(this).closest('li').hasClass('unread');
-
-                        if(pip || action) {
-                            var msgId = $(this).closest('li.message').attr('id').split('-')[1];
-                            send({ack : msgId});
-
-                            if(pip) {
-                                ev.stopPropagation();
-                                ev.stopImmediatePropagation();
-                                return false;
-                            }
-                        }
-                    });
-
-
-                    dom.click(function(ev) {
-                        ev.preventDefault();
-                        ev.stopImmediatePropagation();
-                        $('#message-list').removeClass('hide');
-
-                        updateRelativeTimes();
-                        var ii = setInterval(updateRelativeTimes, 9000);
-
-                        if(settings.debug) { console.log('Open list'); }
-
-                        $(document).one('click', function(e) {
-                            $('#message-list').addClass('hide');
-                            clearInterval(ii);
-                            if(settings.debug) { console.log('Close list', this); }
-                        });
-                    });
-                }
-
                 // do the following on every DOM update request
 
-                var newlist = $('<ul/>').attr('id', 'messages'),
+                // replicate the list and delete its contents
+                var content = $(settings.content).clone(false).empty(),// $('<ul/>').attr('id', 'messages'),
                     toInsert = [],
                     id;
 
@@ -145,19 +93,19 @@
                 var i;
 
                 // template for message list items
-                var msgLiTpl = $('<li/>').addClass('message').append(
+                var msgLiTpl = $('<li/>').addClass('msg').append(
                     $('<a/>').addClass('action').attr('href', '#').append(
-                        $('<a/>').addClass('pip').attr('title', 'Mark as read')
-                    ).append(
                         $('<img/>').attr('width', '32').attr('height', '32')
                     ).append(
-                        $('<p/>').addClass('descript')
+                        $('<span/>').addClass('descript')
                     ).append(
                         $('<time/>').addClass('time')
                     )
+                ).append(
+                    $('<a/>').addClass('pip').attr('href', '#').attr('title', 'Mark as read')
                 );
 
-                newlist.append('<li/>').append($('<h4/>').text('Messages'));
+                var footerText = '';
 
                 if(toInsert.length > 0) {
                     // append the list of messages
@@ -178,31 +126,27 @@
 
                         li.attr('id', 'm-'+id).addClass(status);
                         li.find('a').attr('href', href);
-                        li.find('p').html(message);
+                        li.find('span').html(message);
                         li.find('time').html(now.fromNow()).attr('title', now.format('LLLL'));
                         li.find('img').attr('src', icon);
-                        newlist.append(li);
+                        content.append(li);
                     }
-
-                    // append a "see all" item
-                    newlist.append(
-                        $('<li/>').addClass("more").append(
-                            $('<a/>').attr('href', '/messages').html('See all')
-                        )
-                    );
+                    footerText = 'See All';
                 }
                 else {
-                    newlist.append($('<li/>').addClass('more').append(
-                        $('<a/>').html('No messages').attr('href', '/messages')
-                    ));
+                    footerText = 'No Messages'
                 }
 
-                $('#messages').replaceWith(newlist);
+                // update the actual DOM
+                $(settings.list).children('.footer').children('a').html(footerText);
+                $(settings.content).replaceWith(content);
 
                 // update the counter (duplicate selector intentional)
-                var unreadTotal = $('#messages').children('li.unread').length;
+                var unreadTotal = $(settings.content).children('li.unread').length;
 
-                $('#msg-counter').attr('data-count', unreadTotal).html(unreadTotal);
+                // set the counter
+
+                $(self).attr('data-unread', unreadTotal).children(settings.counter).html(unreadTotal ? unreadTotal : '');
 
             }
 
@@ -243,7 +187,8 @@
             var onOpen = function() {
                 if(settings.debug) { console.log('onOpen() triggered'); }
                 send({subscribe : true});
-                $(self).addClass('socket connected');
+                $(self).addClass('socket connected').data('connected', true);
+                $(settings.counter).attr('title', 'View Messages');
             }
 
             /**
@@ -253,7 +198,7 @@
              */
             var onError = function(e) {
                 if(settings.debug) { console.log('onError() triggered'); }
-                $(self).removeClass('connected');
+                $(self).removeClass('connected').data('connected', false);
                 var data;
                 try {
                     data = JSON.parse(e.data)
@@ -297,7 +242,7 @@
              */
             var onClose = function(e) {
                 if(settings.debug) { console.log('onClose() triggered'); }
-                $(self).removeClass('connected');
+                $(self).removeClass('connected').data('connected', false);
                 pollReconnect();
             }
 
@@ -311,6 +256,7 @@
                 if(settings.debug) { console.log('Message from server: parsing subscribe'); }
                 // don't try a fetch if the subscription came back false
                 if(data === true) {
+                    $(self).data('subscribed', true);
                     send({fetch : settings.prefetch});
                 }
             }
@@ -326,6 +272,7 @@
                     // put message in messages object, override if message already existed (ensure uniqueness)
                     messages[msgId] = amqpMsg;
                 });
+                $(self).data('message-count', messages.length);
                 updateDOM();
             }
 
@@ -340,6 +287,7 @@
                     // put message in messages object, override if message already existed (ensure uniqueness)
                     messages[msgId] = amqpMsg;
                 });
+                $(self).data('message-count', messages.length);
                 updateDOM();
             }
 
@@ -371,6 +319,7 @@
              */
             this.pipeError = function(data) {
                 if(settings.debug) { console.log('Message from server: parsing error'); }
+                $(self).data('connected', false);
                 switch(data.code) {
                     case 401:
                         console.warn('Either no session, or does not match parent.');
@@ -398,9 +347,59 @@
             var messages = {};
             var attemptReconnect = true;
 
+
+            // open/close listener
+            $(settings.counter).on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var ii;
+
+                // if it's *about* to be opened, set the relative times so they don't "flash"
+                if($(self).hasClass('open')) {
+                    clearInterval(ii);
+                }
+                else {
+                    updateRelativeTimes();
+                    ii = setInterval(updateRelativeTimes, 9000);
+                }
+
+                $(self).toggleClass('open');
+
+                var fn = function(e) {
+                    // if we clicked on the list, do nothing except reattach the listener
+                    if($(e.target).closest(settings.list).length == 1) {
+                        $('html').one('click', fn);
+                    }
+                    else {
+                        $(self).removeClass('open');
+                        clearInterval(ii);
+                    }
+                };
+                $('html').one('click', fn);
+            });
+
+
+            // mark-as-read listener
+            $(settings.list).on('click', 'a', function(e) {
+                var pip = $(this).hasClass('pip');
+                var action = $(this).hasClass('action') && $(this).closest('li').hasClass('unread');
+
+                if(pip || action) {
+                    var msgId = $(this).closest('li.msg').attr('id').split('-')[1];
+                    send({ack : msgId});
+
+                    if(pip) {
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        return false;
+                    }
+                }
+                return true;
+            });
+
             // attempt a connection
             establishConnection();
-
         });
     }
 } (jQuery));
