@@ -33,24 +33,6 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
-	 * An index of all the tablaeus
-	 */
-	public function tableIndex() {
-		$query = "
-			SELECT Distinct TABLE_NAME
-			FROM information_schema.TABLES
-		";
-
-		new \Alaress_Probe($this->getDb()->getAll($query));
-
-		$query = "
-			SELECT DB_NAME() AS DataBaseName
-		";
-
-		new \Alaress_Probe($this->getDb()->getAll($query));
-	}
-
-	/**
 	 * Gets the contact info of the person who is a Student's Contact. The ID
 	 * passed is the ExternalId of the Contact, not the Student.
 	 *
