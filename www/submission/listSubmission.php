@@ -66,9 +66,7 @@ for($i = 5; $i >= 0; $i--) {
 }
 $contextSelector->setYears($years);
 
-$contextSelector->render($this, 'CONTEXT_SELECTOR', array(
-	'year' => $year, 'semester' => $semester
-));
+
 
 
 $subjectList = array();
@@ -76,14 +74,16 @@ $subjectList = array();
 if(isset($this->arg[2]) && is_numeric($this->arg[2])){
     $subjectList[] = $this->arg[2];
 
-	$this->setVar(array(
-		'SEMESTER_CONTEXT_CATEGORY_ID' => '/' . $this->arg[2]
-	));
+    //Selector rendored to maintain single category link
+    $contextSelector->render($this, 'CONTEXT_SELECTOR', array(
+            'year' => $year, 'semester' => $semester, 'list'=>$this->arg[2]
+        ));
 }
 else {
-	$this->setVar(array(
-		'SEMESTER_CONTEXT_CATEGORY_ID' => '',
-	));
+    //Selector rendered without category
+    $contextSelector->render($this, 'CONTEXT_SELECTOR', array(
+            'year' => $year, 'semester' => $semester
+        ));
 
     $involvedIn = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
     if(is_array($involvedIn)) {
