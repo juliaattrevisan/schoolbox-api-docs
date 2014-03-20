@@ -90,6 +90,45 @@ class External_Maze_Class implements External_ClassInterface {
 	 * @return array
 	 */
 	public function getTeacherName($classCode) {
+		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
+
+		/* Assume classCodes are in the format: '07SCI/1' where
+		 * the 1 represents the Class which could be class 1, 2, 3 etc.
+		 * of a particular subject
+		 */
+		$classCode = '07ENG/1';
+
+		list($subject, $class) = explode('/', $classCode);
+
+		$query = "
+			SELECT T1TEACH, T2TEACH
+			FROM TT
+			LEFT JOIN TTTG ON TT.TTKEY = TTTG.GKEY
+			WHERE TT.TTPERIOD = '{$ttPeriod}'
+			AND TTTG.SUBJ = '{$subject}'
+			AND CLASS = '{$class}'
+		";
+
+		$allTeachers = $this->getDb()->getAll($query);
+
+		/* Uniqueify everything
+		 */
+		$teacherKeys = array();
+
+		if (is_array($allTeachers) && count($allTeachers)) {
+			foreach($allTeachers as $currentTeacher) {
+				$teacherKeys[$currentTeacher['T1TEACH']] = '';
+				$teacherKeys[$currentTeacher['T2TEACH']] = '';
+			}
+		}
+
+		/* Filter out empty values
+		 */
+		$teacherKeys = array_filter(array_keys($teacherKeys));
+
+		/* A list of ids
+		 */
+		return $teacherKeys;
 	}
 
 	/* Getters/Setters
