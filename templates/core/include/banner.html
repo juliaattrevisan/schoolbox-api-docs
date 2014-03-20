@@ -8,36 +8,7 @@
       <img height="32" width="32" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/>
     </a>
   </li>
-  <!-- BEGIN instantmessage_enabled -->
-  <li class="bell" data-unread="0">
-    <a id="go-msg" href="/messages"></a>
-    <ul id="message-list">
-      <li class="messages header">
-        <h4>Messages</h4>
-      </li>
-      <li class="messages content">
-        <ul id="msg-content">
-          <!-- no messages -->
-        </ul>
-      </li>
-      <li class="messages footer">
-        <a href="/messages">
-          <span class="connecting"></span>&nbsp;Connecting&hellip;
-        </a>
-      </li>
-    </ul>
-  </li>
-  <script type="text/javascript" src="/javascript/jquery.notifier.js"></script>
-  <script type="text/javascript">
-    $j(function() {
-      // launch the notifier
-      $j('#infoPanel').children('li.bell').notifier({
-        host: '{SERVER_ADDRESS}',
-        secure: '{PAGE_SECURE}'
-      });
-    });
-  </script>
-  <!-- END instantmessage_enabled -->
+  {INSTANTMESSAGE_BLOCK}
 </ul>
 <form id="search" action="/search.php" method="get">
     <fieldset>
