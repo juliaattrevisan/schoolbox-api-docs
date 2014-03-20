@@ -786,30 +786,32 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
-	 * Stub method, probably not used
+	 * Used in sync scripts
 	 */
 	public function getStudentUserAccountInfo() {
 	}
 
 	/**
-	 * Stub method, probably not used
+	 * Used in sync scripts
 	 */
 	public function getParentUserAccountInfo() {
-
-
-
 	}
 
 	/**
-	 * Stub method, probably not used
+	 * Used in sync scripts
 	 */
 	public function getStaffUserAccountInfo() {
 	}
 
 	/**
-	 * Stub method, probably not used
+	 * Determine what kind of boarder this person is
 	 */
 	public function determineBoarderType($boarderValue) {
+		if ($boarderValue == 'Y') {
+			return 'Boarder';
+		}
+
+		return 'Day';
 	}
 
 	/**
