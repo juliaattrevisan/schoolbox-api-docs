@@ -1,17 +1,18 @@
 <!-- BEGIN banner_logged_in -->
 <ul id="infoPanel">
-    <li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|</li>
-    <li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
-    <li class="portrait"><a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">
-		<img height="96" width="64" src="/portrait.php?userId={EXTERNAL_ID}&size=constrain64"/>
-	</a></li>
+    <li class="first"><a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|
+    </li>
+    <li><a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">
+		<img height="32" width="32" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/></a>
+    </li>
+    <li><a class="logout" href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
 </ul>
 <form id="search" action="/search.php" method="get">
     <fieldset>
-        <input id="search-button" type="submit" value="Search" />
         <input id="search-field" type="text" name="keyword" placeholder="Search"/>
+        <input id="search-button" type="submit" value="Search"/>
     </fieldset>
 </form>
 <!-- END banner_logged_in -->
-<a href="/" class="logo"><img src="/images/tigs/logo.png" width="208" height="84" alt="TIGS Learning Community" /></a>
-<a href="http://www.ibo.org/school/" target="_blank" class="world-school"><img src="/images/tigs/ib-logo.png" width="68" height="67" alt="TIGS Learning Community" /></a>
+<a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}"/></a>
+

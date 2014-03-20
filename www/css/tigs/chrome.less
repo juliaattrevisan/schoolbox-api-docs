@@ -1,6 +1,6 @@
 @charset "utf-8";
 // =============================================================================
-// Legacy Schoolbox skin loader
+// Default v2 Schoolbox skin
 // =============================================================================
 //*
 //*   Ride The Whale                         ~777IIIIIIIIIII7~_
@@ -20,158 +20,420 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					208px;
-@logo-height: 					84px;
+@logo-width: 					59px;
+@logo-height: 					20px;
 
 // Generic colors
-@body-background: 				#121C2D; // Body, but not the content area
-@content-background: 			#F0F7FE; // Used for forms
+@dark-blue:                     #013A63; // Dark Schoolbox Blue
+@body-background: 				#FFFFFF; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
 @dark: 							#FAFAFA; // Alternate tigerstriping color
 @border-color: 					#EEEEEE; // Bordering @dark
-@alternate-background: 			#EEEEEE; // Sections such as admin
+@alternate-background: 			#FAF9F5; // Sections such as admin
 
 // Basic type
 @body-text: 					@black;
 @secondary-text: 				#797979;
-@link: 							#006BBD;
-@link-hover: 					#006BBD;
+@link: 							#2a688f;
+@link-hover: 					#3687b9;
 
 // Main banner & Search
-@banner-background: 			#121C2D;
-@banner-color:      			#B2C5D6;
-@banner-links:      			#FFFFFF;
-@banner-height:     			120px;
-@search-color:                  @secondary-text;
+@banner-background: 			#2a688f;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@search-color:                  @banner-color;
+@banner-height:     			48px;
 
 // Modules
-@module-heading: 				#FFFFFF;
-@module-background: 			#002B5C;
-@admin-nav:                     @content-background;
+@module-heading: 				#000000;
+@module-background: 			@body-background;
+@admin-nav:                     @link;
 
 // Refers to the left navigation
-@navigation-width:				224px;
+@navigation-width:				200px;
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
-@navigation-color:  			#FFFFFF;
-@navigation-links:  			#FFFFFF;
-@navigation-hover-background: 	#0066B0;
-@navigation-hover-color:  		#FFFFFF;
-@navigation-sub-background:  	#FFFFFF;
+@navigation-color:  			#808080;
+@navigation-links:  			@navigation-color;
+@navigation-hover-background: 	#f0f0f0;
+@navigation-hover-color:  		@navigation-color;
+@navigation-sub-background:  	@body-background;
 
 // Main "Tab" Navigation
 @tab-background:				transparent;
 @tab-color:						#FFFFFF;
-@tab-hover-background:			@tab-background;
-@tab-hover-color:				@tab-color;
+@tab-hover-background:		    @tab-color;
+@tab-hover-color:				@link;
 
 // Footer text
-@footer-color:					#FFFFFF;
+@footer-color:					#797979;
 @footer-links:					@footer-color;
 
 // Optional features
-@login-version: 				1;
-@header-version: 				1;
+@header-version: 				2;
 
 // =============================================================================
 // 3. Load core
 // =============================================================================
 @import "../core/core.less";
-@import "../core/legacy.less";
-@import "screen.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
 // =============================================================================
 
 .dashboard-subject-list{
-    padding: 12px 0 0 17px;
+  padding: 12px 0 0 17px;
+
+  li{
+    float: left;
+    padding: 0 !important;
+    margin: 3px;
+
+    &[class*='KMG_'],
+    &[class*='1MG_'],
+    &[class*='2MG_'],
+    &[class*='21MG_'],  // My Class
+    &[class*='3MG_'],
+    &[class*='4MG_'],
+    &[class*='5MG_'],
+    &[class*='6MG_']{
+      background: url("/images/tigs/class-icons.png") 0px -180px no-repeat;
+    }
+
+    &[class*='KXST_'],
+    &[class*='1XST_'],
+    &[class*='2XST_'],
+    &[class*='3XST_'],  // Christian Studies
+    &[class*='4XST_'],
+    &[class*=' 5XST_'],
+    &[class*='56XST_'],
+    &[class*='6XST_']{
+      background: url("/images/tigs/class-icons.png") 0px 0px no-repeat;
+    }
+
+    &[class*='KMUS_'],
+    &[class*='1MUS_'],
+    &[class*='2MUS_'],
+    &[class*='3MUS_'],  // Performing Arts
+    &[class*='4MUS_'],
+    &[class*='5MUS_'],
+    &[class*='6MUS_']{
+      background: url("/images/tigs/class-icons.png") 0px -240px no-repeat;
+    }
+
+    &[class*='KPDH_'],
+    &[class*='1PE_'],
+    &[class*='2PE_'],
+    &[class*='3PE_'],  // Physical Education
+    &[class*='4PE_'],
+    &[class*='5PE_'],
+    &[class*='6PE_']{
+      background: url("/images/tigs/class-icons.png") 0px -300px no-repeat;
+    }
+
+    &[class*='KCRE_'],
+    &[class*='1CRE_'], // Visual Arts
+    &[class*='2CRE_']{
+      background: url("/images/tigs/class-icons.png") 0px -420px no-repeat;
+    }
+
+    &[class*='2JAP_'],
+    &[class*='3JAP_'],
+    &[class*='4JAP_'], // Japanese
+    &[class*='5JAP_'],
+    &[class*='6JAP_']{
+      background: url("/images/tigs/class-icons.png") 0px -60px no-repeat;
+    }
+
+    &[class*='KSPORT_'],
+    &[class*='1SPORT_'],
+    &[class*='2SPORT_'],
+    &[class*='3SPORT_'],
+    &[class*='4SPORT_'],  // Sport
+    &[class*='5SPORT_'],
+    &[class*='6SPORT_']{
+      background: url("/images/tigs/class-icons.png") 0px -360px no-repeat;
+    }
+
+    &[class*='KLIB_'],
+    &[class*='1LIB_'],
+    &[class*='2LIB_'],
+    &[class*='3LIB_'],  // Library
+    &[class*='4LIB_'],
+    &[class*='5LIB_'],
+    &[class*='6LIB_']{
+      background: url("/images/tigs/class-icons.png") 0px -120px no-repeat;
+    }
+
+    a{
+      display: block;
+      width: 360px;
+      height: 60px;
+      font: 0/0 a;
+      text-shadow: none;
+      color: transparent;
+    }
+  }
+
+}
+
+#header{
+  .logo{
+    left: 15px;
+    top: 14px;
+  }
+
+  .logout{
+    display: block;
+    background: url('/images/tigs/off.png') top left no-repeat;
+    width: 16px;
+    height: 16px;
+    text-indent: -90000px;
+    position: relative;
+    top: -6px;
+    left: 6px;
+  }
+
+  #search{
+    ::-webkit-input-placeholder { color: #808080; font-weight: bold; }
+    :-moz-placeholder { color: #808080; font-weight: bold; } /* Firefox 18- */
+    ::-moz-placeholder { color: #808080; font-weight: bold; } /* Firefox 19+ */
+    :-ms-input-placeholder { color: #808080; font-weight: bold; }
+    #search-field{
+      background: #fff;
+      color: #808080;
+      font-weight: bold;
+      width: 250px;
+      height: 32px;
+      line-height: 16px;
+      padding: 0 0 0 7px;
+    }
+    #search-button{
+      background: url("/images/tigs/search-button.png") no-repeat 0px 8px;
+      right: 0;
+      left: auto;
+    }
+  }
+
+  #tabs{
+    top: 33px;
+    margin-left: 217px;
+    position: relative;
 
     li{
-      float: left;
-      padding: 0 !important;
-      margin: 3px;
+      margin-right: -1px;
 
-      &[class*='KMG_'],
-      &[class*='1MG_'],
-      &[class*='2MG_'],
-      &[class*='21MG_'],  // My Class
-      &[class*='3MG_'],
-      &[class*='4MG_'],
-      &[class*='5MG_'],
-      &[class*='6MG_']{
-        background: url("/images/tigs/class-icons.png") 0px -180px no-repeat;
+      &.navthis{
+        background: #f0f0f0;
+        a{ color: #2a688f; }
       }
-
-      &[class*='KXST_'],
-      &[class*='1XST_'],
-      &[class*='2XST_'],
-      &[class*='3XST_'],  // Christian Studies
-      &[class*='4XST_'],
-      &[class*=' 5XST_'],
-      &[class*='56XST_'],
-      &[class*='6XST_']{
-        background: url("/images/tigs/class-icons.png") 0px 0px no-repeat;
-      }
-
-      &[class*='KMUS_'],
-      &[class*='1MUS_'],
-      &[class*='2MUS_'],
-      &[class*='3MUS_'],  // Performing Arts
-      &[class*='4MUS_'],
-      &[class*='5MUS_'],
-      &[class*='6MUS_']{
-        background: url("/images/tigs/class-icons.png") 0px -240px no-repeat;
-      }
-
-      &[class*='KPDH_'],
-      &[class*='1PE_'],
-      &[class*='2PE_'],
-      &[class*='3PE_'],  // Physical Education
-      &[class*='4PE_'],
-      &[class*='5PE_'],
-      &[class*='6PE_']{
-        background: url("/images/tigs/class-icons.png") 0px -300px no-repeat;
-      }
-
-      &[class*='KCRE_'],
-      &[class*='1CRE_'], // Visual Arts
-      &[class*='2CRE_']{
-        background: url("/images/tigs/class-icons.png") 0px -420px no-repeat;
-      }
-
-      &[class*='2JAP_'],
-      &[class*='3JAP_'],
-      &[class*='4JAP_'], // Japanese
-      &[class*='5JAP_'],
-      &[class*='6JAP_']{
-        background: url("/images/tigs/class-icons.png") 0px -60px no-repeat;
-      }
-
-      &[class*='KSPORT_'],
-      &[class*='1SPORT_'],
-      &[class*='2SPORT_'],
-      &[class*='3SPORT_'],
-      &[class*='4SPORT_'],  // Sport
-      &[class*='5SPORT_'],
-      &[class*='6SPORT_']{
-        background: url("/images/tigs/class-icons.png") 0px -360px no-repeat;
-      }
-
-      &[class*='KLIB_'],
-      &[class*='1LIB_'],
-      &[class*='2LIB_'],
-      &[class*='3LIB_'],  // Library
-      &[class*='4LIB_'],
-      &[class*='5LIB_'],
-      &[class*='6LIB_']{
-        background: url("/images/tigs/class-icons.png") 0px -120px no-repeat;
-      }
-
       a{
-        display: block;
-        width: 360px;
-        height: 60px;
-        font: 0/0 a;
-        text-shadow: none;
-        color: transparent;
+        background: transparent;
+        border-top: 1px solid #c6c6c6;
+        border-right: 1px solid #c6c6c6;
+        border-left: 1px solid #c6c6c6;
+        border-bottom: 0;
+        color: #808080;
+      }
+    }
+  }
+}
+
+#nav{
+  width: 217px;
+
+  h3,h4{
+    border-bottom: 1px solid @border-color;
+    padding: 0 0 4px 17px;
+    font-size: 14px;
+  }
+  ul ul{
+    left: 217px;
+    width: 217px;
+    border: 1px solid #c6c6c6;
+  }
+  li{
+    a{
+      padding: 4px 16px 4px 34px;
+    }
+    // Docs - all other things
+    a[href^="/"],
+    a[href^="/"]:hover,
+    a[href^="#"],
+    a[href^="#"]:hover{
+      background-image: url(/images/tigs/file.png);
+      background-position: 15px 4px;
+      background-repeat: no-repeat;
+    }
+    // Home
+    a[href="/home.php"],
+    a[href="/home.php"]:hover{
+      background-image: url(/images/tigs/hat.png);
+      background-position: 15px 6px;
+      background-repeat: no-repeat;
+    }
+    // Information
+    a[href="/information.php"],
+    a[href="/information.php"]:hover{
+      background-image: url(/images/tigs/info.png);
+      background-position: 15px 4px;
+      background-repeat: no-repeat;
+    }
+    // logout
+    a[href="/logout.php"],
+    a[href="/logout.php"]:hover{
+      background-image: url(/images/tigs/logoff.png);
+      background-position: 15px 4px;
+      background-repeat: no-repeat;
+    }
+  }
+}
+
+#nav li:hover > a, #nav ul li a:hover, #nav li li a:hover{
+  background-color: #f0f0f0;
+}
+
+#container{
+  background: #f0f0f0;
+  border-top: 1px solid #c6c6c6;
+  border-left: 1px solid #c6c6c6;
+  border-bottom: 1px solid #c6c6c6;
+  top: 32px;
+  position: relative;
+  margin-left: 217px;
+
+  #content{
+    h2{ border-bottom: 1px solid @border-color; }
+
+    .admin-nav li a{
+      color: @link;
+
+      &.current {
+        color: #ffffff;
+        background: @link;
+        border-color: transparent;
       }
     }
 
+    .btn{
+      margin: 8px !important;
+    }
+
+    // This fixes profile directory
+    .directory .subjects ul:nth-child(odd) li {
+      background: #fafafa;
+    }
+
+    // Calendar background fix
+    table.fc-border-separate{
+      background: #fff;
+    }
+
+    //Timetable
+    .timetable > tbody > tr:first-of-type > th.normal > .time,
+    .timetable > thead > tr > th.normal:first-of-type > .time{
+      display:none;
+    }
+  }
+
+}
+
+body.login{
+
+  #container{
+    *background: rgb(255,255,255);
+    background: rgba(255,255,255,0.8);
+    border: none;
+    padding: 24px;
+
+    .logo{
+      width: 144px;
+      height: 46px;
+    }
+
+    p.error {
+      margin: 25px 0 16px 0
+    }
+
+    #loginForm{
+      margin: 0;
+      ::-webkit-input-placeholder { color: #000000; }
+      :-moz-placeholder { color: #000000; } /* Firefox 18- */
+      ::-moz-placeholder { color: #000000; } /* Firefox 19+ */
+      :-ms-input-placeholder { color: #000000; }
+
+      input[type="text"],
+      input[type="password"] {
+        width: 94%;
+        height: 26px;
+        padding: 7px 3%;
+      }
+
+      .submit-btn-plain{
+        background: @link url('/images/tigs/arrow.png') 276px 11px no-repeat;
+        font-weight: bold;
+        text-align: left;
+        font-size: 14px;
+        float: left;
+        width: 100%;
+        height: 40px;
+        padding: 0 3%;
+        margin-top: 0;
+
+        &:hover{ background: @link-hover url('/images/tigs/arrow.png') 276px 11px no-repeat; }
+      }
+    }
+
+    p,a{ color: #2a688f; }
+  }
+
+  #login-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+}
+
+/*
+ * Demo Dashboards
+ */
+
+.demo-dash{
+	li{ float: left;
+		padding: 7px 4px !important;
+		height: 135px;
+		list-style: none;
+	}
+	a{  display: block;
+		float: left;
+		text-align: center;
+		padding: 92px 0 0 0;
+		font-weight: bold;
+		width: 88px;
+		-webkit-transition: opacity 0.5s;
+		-moz-transition: opacity 0.5s;
+		-ms-transition: opacity 0.5s;
+		-o-transition: opacity 0.5s;
+		transition: opacity 0.5s;
+		&:hover{
+			cursor: pointer;
+			opacity: 0.8;
+		}
+	}
+	.parents-friends{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.due-work{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+	.manage-users{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.timetable{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+	.synergetic{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+	.admin{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+	.eportfolio{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+	.hr{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+	.services{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+	.leave{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+	.parent-dir{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+	.payments{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+	.online-forms{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
 }
