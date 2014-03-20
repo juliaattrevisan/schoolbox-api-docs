@@ -56,6 +56,10 @@ $groupHandler = new Group();
 
 $contextSelector = new ContextSelector('submission/listSubmission');
 
+if(!$groupHandler->isStaff() ) {
+    error(19);
+}
+
 // generate a "past 6 years" array
 for($i = 5; $i >= 0; $i--) {
 	$years[] = $currentYear - $i;
