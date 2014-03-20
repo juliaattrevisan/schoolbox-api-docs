@@ -25,11 +25,19 @@ class External_Maze_User implements External_UserInterface {
 	private $groupHandler;
 
 	/**
+	 * Helper
+	 *
+	 * @var null
+	 */
+	private $helper = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->setDb(MSSQL::getInstance());
 		$this->setGroup(new Group());
+		$this->setHelper(new External_Maze_Helper());
 	}
 
 	/**
@@ -584,22 +592,7 @@ class External_Maze_User implements External_UserInterface {
 	 * @return array|bool
 	 */
 	public function getSubjectList($externalUserId, $userId) {
-		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-
-		$currentYear = $now->getUsingFormat('Y');
-		$currentSemester = $this->getCurrentSemester();
-
-		/* TODO: Hard code this for now
-		 *
-		 * CURRENT_SEMESTER is empty in the Maze db
-		 */
-		$currentSemester = 1;
-
-		/* Only get subjects that are relevant now
-		 */
-		$ttPeriod = "{$currentYear}S{$currentSemester}";
-
-		$externalUserId = 'WIGR';
+		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
 
 		if ($this->getGroup()->isStudent($userId)) {
 			$query = "
@@ -839,5 +832,23 @@ class External_Maze_User implements External_UserInterface {
 	 */
 	private function getGroup() {
 		return $this->groupHandler;
+	}
+
+	/**
+	 * Set helper
+	 *
+	 * @param null $helper
+	 */
+	private function setHelper($helper) {
+		$this->helper = $helper;
+	}
+
+	/**
+	 * Get helper
+	 *
+	 * @return null
+	 */
+	private function getHelper() {
+		return $this->helper;
 	}
 }
