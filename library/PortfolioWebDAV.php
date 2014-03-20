@@ -276,11 +276,11 @@ class PortfolioWebDAV
 
             if ($groupHandler->isStaff()) {
                 $paths = array(
-                    '/staff/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'].'staff/' . $_SESSION['username'] . '/',
                 );
             } else if ($groupHandler->isStudent()) {
                 $paths = array(
-                    '/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'] . $_SESSION['username'] . '/',
                 );
             } else {
                 return false;
