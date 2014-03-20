@@ -92,9 +92,9 @@ class External_Maze_Class implements External_ClassInterface {
 	public function getTeacherName($classCode) {
 		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
 
-		/* Assume classCodes are in the format: '07SCI/1' where
-		 * the 1 represents the Class which could be class 1, 2, 3 etc.
-		 * of a particular subject
+		/* TODO: Assume classCodes are in the format: '07SCI/1'
+		 * where the 1 represents the Class which could be
+		 * class 1, 2, 3 etc. of a particular subject
 		 */
 		$classCode = '07ENG/1';
 
