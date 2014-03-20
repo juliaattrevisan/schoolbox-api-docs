@@ -229,8 +229,14 @@ function getSingleFileMeta($folderId, $fileId) {
 	$groupHandler = new Group();
 
 	$fmap = new FileMapper();
-	$file = $fmap->findById($fileId);;
-	$owner = UserMapper::getInstance()->findById($file->getOwner()->getId());
+	$file = $fmap->findById($fileId);
+    try {
+	    $owner = UserMapper::getInstance()->findById($file->getOwner()->getId());
+    }
+    catch (Schoolbox\Mapper\Exception $e) {
+        $owner =  UserMapper::getInstance()->getUnknownUser();
+    }
+
 
 	if(!$file) {
 		sendError('No file with the specified ID exists');
