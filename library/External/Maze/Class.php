@@ -42,15 +42,45 @@ class External_Maze_Class implements External_ClassInterface {
 		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
 
 		$query = "
-			SELECT TOP 10 *
+			SELECT
+				ST.STKEY AS ID,
+				ST.FIRST_NAME AS Firstname,
+				ST.SURNAME AS Surname,
+				REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS YearLevel,
+				KGH.DESCRIPTION AS House,
+				'' AS MedicalAlert,
+				'' AS SpecialNeedsFlag,
+				'' AS ClassCampus
 			FROM STMA
 			LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 			LEFT JOIN ST ON STMA.SKEY = ST.STKEY
+			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
 			WHERE SU.SUKEY = '{$classCode}'
 			AND TTPERIOD = '{$ttPeriod}'
 		";
 
-		return $this->getDb()->getAll($query);
+		$allStudents = $this->getDb()->getAll($query);
+
+		$studentList = array();
+
+		if (is_array($allStudents) && count($allStudents)) {
+			foreach($allStudents as $currentStudent) {
+				$student = array(
+					'synergy_id' => $currentStudent['ID'],
+					'lastname' => $currentStudent['Firstname'],
+					'firstname' => $currentStudent['Surname'],
+					'yearlevel' => $currentStudent['YearLevel'],
+					'house' => $currentStudent['House'],
+					'StudentMedicalAlert' => $currentStudent['MedicalAlert'],
+					'StudentSpecialNeedsFlag' => $currentStudent['SpecialNeedsFlag'],
+					'ClassCampus' => $currentStudent['ClassCampus'],
+				);
+
+				$studentList[] = $student;
+			}
+		}
+
+		return $studentList;
 	}
 
 	/**
