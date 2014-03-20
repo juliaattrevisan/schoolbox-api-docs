@@ -31,7 +31,7 @@ class Marksheet_None extends Marksheet_Abstract {
 
     public function outputUI(SitePage $page, $mark) {
         $output = array(
-            'COMMENT'  => $mark['comment']
+            'COMMENT'  => Scrub::text($mark['comment'])
         );
         $page->setVar($output);
     }

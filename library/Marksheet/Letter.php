@@ -56,7 +56,7 @@ class Marksheet_Letter extends Marksheet_Abstract {
             'grade_id' => 'GRADE_VALUE',
             'caption'  => 'GRADE_TEXT',
         ));
-        $page->setVar('COMMENT', $mark['comment']);
+        $page->setVar('COMMENT', Scrub::text($mark['comment']));
     }
 
 }
