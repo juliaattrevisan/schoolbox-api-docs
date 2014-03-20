@@ -70,6 +70,26 @@ $(document).ready(function() {
 
 <h1>Book item: {{ resource.name }}</h1>
 
+{# booking form #}
+<form action="{{ routeLookup('resourceBooking.createBooking', {id: resource.id}) }}" method="post"></form>
+
+<form id="resource-booking-form"
+      action="{{ routeLookup('resourceBooking.createBooking', {id: resource.id}) }}"
+      method="post"
+      name="form" class="clearfix"
+>
+    from: <input name="booking-from" data-datepicker="" />
+    to: <input name="booking-to" data-datepicker="" />
+    notes: <textarea name="notes"></textarea>
+
+    <input id="resource-save"
+           type="submit"
+           value="Book"
+           class="submit-btn-plain"
+    />
+
+</form>
+
 <div id="calendar"></div>
 <div id="calendar-export-dialog">
     <div id="calendar-export-dialog-text">
