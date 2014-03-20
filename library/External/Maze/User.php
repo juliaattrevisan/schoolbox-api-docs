@@ -619,16 +619,18 @@ class External_Maze_User implements External_UserInterface {
 
 		/* Uniqueify results
 		 */
-		foreach($allSubjects as $currentSubject) {
-			if (!in_array($currentSubject['ClassCode'], $processed)) {
-				$subjectList[] = array(
-					'code' => $currentSubject['ClassCode'],
-					'name' => $currentSubject['name'],
-					'classType' => $currentSubject['classType'],
-					'campusCode' => $currentSubject['ClassCampus']
-				);
+		if (is_array($allSubjects) && count($allSubjects)) {
+			foreach($allSubjects as $currentSubject) {
+				if (!in_array($currentSubject['ClassCode'], $processed)) {
+					$subjectList[] = array(
+						'code' => $currentSubject['ClassCode'],
+						'name' => $currentSubject['name'],
+						'classType' => $currentSubject['classType'],
+						'campusCode' => $currentSubject['ClassCampus']
+					);
 
-				$processed[] = $currentSubject['ClassCode'];
+					$processed[] = $currentSubject['ClassCode'];
+				}
 			}
 		}
 
