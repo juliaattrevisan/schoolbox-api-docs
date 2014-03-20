@@ -1,10 +1,40 @@
 <!-- BEGIN banner_logged_in -->
 <ul id="infoPanel">
-    <li class="first"><a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|
-    </li>
-    <li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
-    <li><a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">
-		<img height="32" width="32" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/></a></li>
+  <li class="user first">
+    <a href="/search/user/{USER_ID}" title="View Profile">{SITE_LOGINNAME}</a>
+  </li>
+  <li class="avatar">
+    <a href="/search/user/{USER_ID}" title="View Profile">
+      <img height="32" width="32" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/>
+    </a>
+  </li>
+  <!-- BEGIN instantmessage_enabled -->
+  <li class="bell" data-unread="0">
+    <a id="go-msg" href="/messages"></a>
+    <ul id="message-list">
+      <li class="messages header">
+        <h4>Messages</h4>
+      </li>
+      <li class="messages content">
+        <ul id="msg-content">
+          <!-- no messages -->
+        </ul>
+      </li>
+      <li class="messages footer">
+        <a href="/messages">No Messages</a>
+      </li>
+    </ul>
+  </li>
+  <script type="text/javascript">
+    $j(function() {
+      // launch the notifier
+      $j('#infoPanel').children('li.bell').notifier({
+        host: '{SERVER_ADDRESS}',
+        secure: '{PAGE_SECURE}'
+      });
+    });
+  </script>
+  <!-- END instantmessage_enabled -->
 </ul>
 <form id="search" action="/search.php" method="get">
     <fieldset>
@@ -12,15 +42,6 @@
         <input id="search-button" type="submit" value="Search"/>
     </fieldset>
 </form>
-<script type="text/javascript">
-  $j(function() {
-    // launch the notifier
-    $j('#infoPanel').find('img').closest('a').notifier({
-      host: '{SERVER_ADDRESS}',
-      secure: '{PAGE_SECURE}'
-    });
-  });
-</script>
 <!-- END banner_logged_in -->
 <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}"/></a>
 
