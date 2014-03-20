@@ -11,6 +11,20 @@
 class External_Maze_Helper {
 
 	/**
+	 * An instance of MSSQL
+	 *
+	 * @var null
+	 */
+	private $db = null;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setDb(MSSQL::getInstance());
+	}
+
+	/**
 	 * Get the current timetable period eg. 2013S2
 	 */
 	public function getCurrentTTPeriod() {
@@ -31,4 +45,47 @@ class External_Maze_Helper {
 
 		return $ttPeriod;
 	}
-} 
+
+	/**
+	 * Get the current semester
+	 *
+	 * This should take the form below:
+	 * $row['CURRENT_SEMESTER'] = '1998S4';
+	 *
+	 * @param null $externalUserId
+	 * @return mixed
+	 */
+	public function getCurrentSemester($externalUserId = null) {
+		$query = "
+			SELECT CURRENT_SEMESTER
+			FROM SI
+		";
+
+		$row = $this->getDb()->getRow($query);
+
+		preg_match('/\d+S(\d+)/', $row['CURRENT_SEMESTER'], $matches);
+
+		return $matches[1];
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set db
+	 *
+	 * @param null $db
+	 */
+	private function setDb($db) {
+		$this->db = $db;
+	}
+
+	/**
+	 * Get db
+	 *
+	 * @return null
+	 */
+	private function getDb() {
+		return $this->db;
+	}
+}

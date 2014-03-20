@@ -572,16 +572,7 @@ class External_Maze_User implements External_UserInterface {
 	 * @param null $externalUserId
 	 */
 	public function getCurrentSemester($externalUserId = null) {
-		$query = "
-			SELECT CURRENT_SEMESTER
-			FROM SI
-		";
-
-		$row = $this->getDb()->getRow($query);
-
-		preg_match('/\d+S(\d+)/', $row['CURRENT_SEMESTER'], $matches);
-
-		return $matches[1];
+		return $this->getHelper()->getCurrentSemester($externalUserId);
 	}
 
 	/**

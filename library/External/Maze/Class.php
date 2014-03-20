@@ -40,11 +40,12 @@ class External_Maze_Class implements External_ClassInterface {
 	 */
 	public function getStudents($classCode) {
 		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
-		
+
 		$query = "
 			SELECT TOP 10 *
 			FROM STMA
 			LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
+			LEFT JOIN ST ON STMA.SKEY = ST.STKEY
 			WHERE SU.SUKEY = '{$classCode}'
 			AND TTPERIOD = '{$ttPeriod}'
 		";
