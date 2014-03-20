@@ -333,6 +333,12 @@ Calendar.prototype.init = function() {
 
             window.open(url, "_self");
         },
+        beforeShow: function() {
+            // Make sure the stupid datepicker shows above everything else
+            setTimeout(function() {
+                $('.ui-datepicker').css('z-index', 99999999999999);
+            }, 0);
+        },
         defaultDate: $j.datepicker.parseDate("dd-mm-yy", c.options.fullCalendar.date + '-' +
             (parseInt(c.options.fullCalendar.month) + 1) + '-' + c.options.fullCalendar.year),
         showOn: 'button',
