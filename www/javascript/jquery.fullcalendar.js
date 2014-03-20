@@ -265,21 +265,19 @@ Calendar.prototype.init = function() {
                 .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
                 .attr('id','fc-button-export')
         );
-
-        // and now make all the buttons on the header look the way they're meant to
-        var header = this.dom.children('.fc-header')
-        header.addClass('calendar-controls')
-        header.find('span.fc-button').each(function() {
-            var self = $j(this)
-            var text = self.html()
-            self.addClass('filter-change '+text).html('<span></span>'+text)
-        })
-
-        // mash in the datepicker
-        var headerCenter = this.dom.find('td.fc-header-center')
-        headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
-
     }
+    // and now make all the buttons on the header look the way they're meant to
+    var header = this.dom.children('.fc-header')
+    header.addClass('calendar-controls')
+    header.find('span.fc-button').each(function() {
+        var self = $j(this)
+        var text = self.html()
+        self.addClass('filter-change '+text).html('<span></span>'+text)
+    })
+
+    // mash in the datepicker
+    var headerCenter = this.dom.find('td.fc-header-center')
+    headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
 
 
     // Event creation form listeners
