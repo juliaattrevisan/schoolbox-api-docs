@@ -292,7 +292,7 @@ class UserMapper extends Mapper {
      */
     public function getUnknownUser() {
         $user = new User;
-        $user->setLastname('Unkown User');
+        $user->setLastname('Unknown User');
         return $user;
     }
 }
