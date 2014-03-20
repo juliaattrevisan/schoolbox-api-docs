@@ -10,13 +10,24 @@
 namespace Schoolbox\ResourceBooking\Booking;
 use Alaress\Web\Controller\Base;
 use Schoolbox\ResourceBooking\Item;
+use EOTC\Calendar\EventMapper;
 
 class Controller extends Base {
+
+    /**
+     * @var Mapper
+     */
+    protected $bookingMapper;
 
     /**
      * @var Item\Mapper
      */
     protected $resourceMapper;
+
+    /**
+     * @var EventMapper
+     */
+    protected $eventMapper;
 
     /**
      * Creates a booking for an item.
@@ -62,9 +73,41 @@ class Controller extends Base {
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
-                'data'   => $eventList,
+                'data'   => array(),
             )
         );
+    }
+
+    /**
+     * @param  Mapper $bookingMapper
+     * @return $this
+     */
+    public function setBookingMapper($bookingMapper) {
+        $this->bookingMapper = $bookingMapper;
+        return $this;
+    }
+
+    /**
+     * @return Mapper
+     */
+    public function getBookingMapper() {
+        return $this->bookingMapper;
+    }
+
+    /**
+     * @param  EventMapper $eventMapper
+     * @return $this
+     */
+    public function setEventMapper($eventMapper) {
+        $this->eventMapper = $eventMapper;
+        return $this;
+    }
+
+    /**
+     * @return EventMapper
+     */
+    public function getEventMapper() {
+        return $this->eventMapper;
     }
 
     /**

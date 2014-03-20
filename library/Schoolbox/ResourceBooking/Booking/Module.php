@@ -23,7 +23,9 @@ class Module extends BaseModule {
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath) {
-        $router->add('resourceBooking.book', $basePath.'/bookItem/{id}');
+        $router->addGet('resourceBooking.book', $basePath.'/bookItem/{id}');
+        $router->addPost('resourceBooking.createBooking', $basePath.'/bookItem/{id}')
+               ->addValues(array('action' => 'createBooking'));
         $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
     }
 
@@ -49,6 +51,10 @@ class Module extends BaseModule {
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
+        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setEventMapper']
+            = $injector->lazyNew('EOTC\\Calendar\\EventMapper');
+        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setBookingMapper']
+            = $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Mapper');
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setResourceMapper']
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
         $injector->set(
