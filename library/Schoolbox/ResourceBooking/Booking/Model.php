@@ -1,0 +1,201 @@
+<?php
+/**
+ * A representation of a bookable resource.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\ResourceBooking\Booking;
+
+use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ISoftDeletable;
+use EOTC\Calendar;
+use Alaress_Date_Format;
+use Schoolbox\User;
+//use JsonSerializable;
+
+class Model implements ISoftDeletable /*, JsonSerializable */{
+
+    /**
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * @var Item\Model
+     */
+    protected $resource;
+
+    /**
+     * @var Calendar\Event
+     */
+    protected $event;
+
+    /**
+     * @var Status\Model
+     */
+    protected $status;
+
+    /**
+     * @var User
+     */
+    protected $reviewer;
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $createdAt;
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $modifiedAt;
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $deletedAt;
+
+
+    /**
+     * @param  Alaress_Date_Format $modifiedAt
+     * @return $this
+     */
+    public function setModifiedAt($modifiedAt) {
+        $this->modifiedAt = $modifiedAt;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getModifiedAt() {
+        return $this->modifiedAt;
+    }
+
+    /**
+     * @param  Alaress_Date_Format $createdAt
+     *
+     * @return $this
+     */
+    public function setCreatedAt($createdAt) {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getCreatedAt() {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param  Alaress_Date_Format $deletedAt
+     * @return $this
+     */
+    public function setDeletedAt($deletedAt) {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getDeletedAt() {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param  int   $id
+     * @return $this
+     */
+    public function setId($id) {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /**
+     * @param  Item\Model $resource
+     * @return $this
+     */
+    public function setResource($resource) {
+        $this->resource = $resource;
+        return $this;
+    }
+
+    /**
+     * @return Item\Model
+     */
+    public function getResource() {
+        return $this->resource;
+    }
+
+    /**
+     * @param  Calendar\Event $event
+     * @return $this
+     */
+    public function setEvent($event) {
+        $this->event = $event;
+        return $this;
+    }
+
+    /**
+     * @return Calendar\Event
+     */
+    public function getEvent() {
+        return $this->event;
+    }
+
+    /**
+     * @param  User  $reviewer
+     * @return $this
+     */
+    public function setReviewer($reviewer) {
+        $this->reviewer = $reviewer;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getReviewer() {
+        return $this->reviewer;
+    }
+
+    /**
+     * @param  Status\Model $status
+     * @return $this
+     */
+    public function setStatus($status) {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @return Status\Model
+     */
+    public function getStatus() {
+        return $this->status;
+    }
+
+    /**
+     * Is this object deleted?
+     *
+     * @return bool
+     */
+    public function isDeleted() {
+        return ($this->getDeletedAt() instanceof Alaress_Date_Format);
+    }
+
+
+}
