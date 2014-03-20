@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 use Guzzle\Http\Message\EntityEnclosingRequest;
+use Guzzle\Http\Message\Header;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -117,9 +118,12 @@ class Pipe implements PipeInterface {
 	protected static function getHeader($conn, $header) {
 		/** @var EntityEnclosingRequest $rq */
 		$rq = $conn->WebSocket->request;
-		$token = reset($rq->getHeader($header)->toArray());
-		return (string)$token;
-
+		if(($value = $rq->getHeader($header)) instanceof Header) {
+			$token = reset($value->toArray());
+			return (string)$token;
+		}
+		// otherwise header not found
+		return '';
 	}
 
 } 
