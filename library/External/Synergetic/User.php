@@ -514,9 +514,10 @@ class External_Synergetic_User implements External_UserInterface {
 	function getCurrentSemester($externalUserId = null) {
 
         if($externalUserId) {
+
             $result = $this->getDatabase()->executeProcedure('spsConfigUserDefaultYearSemester',
                     array(
-                        array('@ID',$externalUserId,SQLINT1,false,false, -1),
+                        array('@ID',$externalUserId,SQLINT4,false,false, -1),
                         )
             );
 
