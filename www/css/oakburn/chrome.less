@@ -88,6 +88,8 @@
   #tabs{
     margin-left: 208px;
     li{
+      margin-right: 2px;
+
       a{
         background: @body-background;
         color: @link;
@@ -140,9 +142,53 @@
   border-top: 4px solid @link;
   margin-left: 208px;
 
+  h1 { color: #4d4d4d; }
   h2, .calendar-controls{ border-bottom: 1px solid #cdcdcd; }
+
+  .admin-nav{
+    a{
+      color: @link;
+      &.current{
+        background: @link;
+        color: @content-background;
+      }
+    }
+  }
 }
 
+body.login{
+  #container{
+    top: 40px;
+
+    background: #fff;
+    border: none;
+
+    #loginForm{
+      input[type="text"],
+      input[type="password"]{
+        border: 1px solid #cdcdcd;
+        width: 89%;
+        -webkit-box-shadow: inset 0px 5px 5px 0px rgba(0, 0, 0, 0.08);
+        -moz-box-shadow:    inset 0px 5px 5px 0px rgba(0, 0, 0, 0.08);
+        box-shadow:         inset 0px 5px 5px 0px rgba(0, 0, 0, 0.08);
+      }
+
+      .submit-btn-plain{
+        background-color: #00337d;
+        font-weight: bold;
+        &:hover{ background-color: #00398c; }
+      }
+    }
+
+    p{ color: #000; }
+    a{ color: #00337d; }
+  }
+
+  #footer{
+    ul li,
+    ul li a{ color: #000; }
+  }
+}
 
 /*
  * Demo Dashboards
