@@ -440,8 +440,11 @@ class Mapper {
 			$this->identifier = $map;
 		}
 		$this->map->setOffset($map['property'], $map);
-		// Has a join definition been defined? If so create the join
+		// Has a join definition been defined? If so create the join.
 		if (isset($map['join']) && isset($map['join_def'])) {
+			if (!isset($map['join_def']['this_key'])) {
+				$map['join_def']['this_key'] = $map['column'];
+			}
 			$this->hasJoin($map['join'], $map['join_def']);
 		}
 		return true;
