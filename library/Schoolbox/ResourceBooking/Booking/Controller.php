@@ -52,26 +52,43 @@ class Controller extends Base {
      * @param int $id The resource to create a booking for.
      */
     public function createBooking($id) {
+        /** @var Item\Model $resource */
+        $resource = $this->getResourceMapper()->findById($id);
         // Create the booking, which in turn adds an event to the calendar.
         // This action saves a connected event.
         /** @var Calendar\Event $event */
         $event = $this->getEventMapper()->createModel();
+        // Whatever the booking type is.
+        // Could probably be left unset so events show on a different event
+        // source.
+        // Possible Sources:
+        // * My bookings (shows in my elements)
+        // * Bookings for items I moderate?)
+        $event->setType(1);
         $event->setOwner($this->getUser());
         $event->setAuthor($this->getUser());
+        $event->setSid($this->getUser()->getId());
         $event->setAccess(Calendar\EventMapper::ACCESS_PERSONAL);
         // Currently role and campus must be set to empty collections.
         $event->setRoleCollection(new \Schoolbox\Collection());
         $event->setCampusCollection(new \Schoolbox\Collection());
 //        $event->setStartDateTime(new \Alaress_Date_Format($this->getRequest()->post['booking-from']));
 //        $event->setEndDateTime(new \Alaress_Date_Format($this->getRequest()->post['booking-to']);
-        $event->setStartDateTime(new \Alaress_Date_Format(new \DateTime('12am tomorrow')));
-        $event->setEndDateTime(new \Alaress_Date_Format(new \DateTime('1am tomorrow')));
+        // Currently I can't setStartDateTime() and have that propogate to
+        // startDate and startTime.
+        $date = new \DateTime('tomorrow');
+        $event->setStartDate($date->format('Y-m-d'));
+        $event->setStartTime('00:00:00');
+        $event->setEndDate($date->format('Y-m-d'));
+        $event->setEndTime('01:00:00');
+        $event->setPublishDateTime(new \Alaress_Date_Format(new \DateTime()));
+        $event->setNote("Booking for ".$resource->getName());
         $event->setDetail($this->getRequest()->post['notes']);
         $this->getEventMapper()->save($event);
         $booking = new Model();
         $booking
             ->setEvent($event)
-            ->setResource($this->getResourceMapper()->findById($id))
+            ->setResource($resource)
             ->setStatus(Status\Model::STATUS_PENDING);
         ;
         $this->getBookingMapper()->save($booking);
