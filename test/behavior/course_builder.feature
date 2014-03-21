@@ -11,11 +11,41 @@ Scenario: Set a homepage as the course home
   When  I set resource setting "Resources:Course Base Homepage" to "Faculties"
 
 @setup-course
+Scenario: Set a homepage as the course home
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "alaress" with password "alaress"
+  Then  I add a folder to "Faculties/Geography"
+  Then  I fill in "name" with "Year 10"
+  And   I select "10" from "template"
+  And   I press "submit"
+  Then  I should see "Manage Folder"
+  And   I should see "Year 10"
+  When  I add a folder to "Faculties/Geography/Year 10"
+  Then  I fill in "name" with "Chemical reactions"
+  And   I select "10" from "template"
+  And   I press "submit"
+  Then  I should see "Manage Folder"
+  And   I should see "Chemical reactions"
+  When  I add a folder to "Faculties/Geography/Year 10"
+  Then  I fill in "name" with "Atomic structure and bonding"
+  And   I select "10" from "template"
+  And   I press "submit"
+  Then  I should see "Manage Folder"
+  And   I should see "Atomic structure and bonding"
+  When  I add a folder to "Faculties/Geography/Year 10"
+  Then  I fill in "name" with "Macroscopic properties of matter"
+  And   I select "10" from "template"
+  And   I press "submit"
+  Then  I should see "Manage Folder"
+  And   I should see "Macroscopic properties of matter"
+
+@setup-course
 Scenario: Create a course rubric set
   Given I do not wipe the slate clean
   And   I go to homepage
   And   I log in as "wwhite" with password "password"
-  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
+  When  I go to homepage "Faculties/Geography/Year 10"
   # Rubrics: unique for course.
   # When adding a task list to a unit page: rubrics from parent are copied across?
   When  I add component "Learning:Rubrics"
@@ -34,7 +64,7 @@ Scenario: Create a course
   # For now:
   # * Courses: any homepage underneath course home
   # * Lessons: any homepage directly underneath selected course with a task list component
-  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  When  I go to homepage "Faculties/Geography/Year 10/Chemical reactions"
   And   add component "Learning:Course Builder"
 
   # Start adding tasks
@@ -63,7 +93,7 @@ Scenario: Create a course
   And   I add wrong answer "Answer 4" at position "4"
   And   I press "Add Question"
   # That's it for the online assessment, go back to the homepage
-  And   I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  And   I go to homepage "Faculties/Geography/Year 10/Chemical reactions"
 
   # Add a due work task
   When   I add a due work task
@@ -76,7 +106,7 @@ Scenario: Create a course
   And   I check "accept_submission"
   And   I press "Create"
   # That's it for the due work, go back to the homepage
-  And   I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  And   I go to homepage "Faculties/Geography/Year 10/Chemical reactions"
 
   # Add another due work item, this one not submittable online
   When  I add a due work task
@@ -84,7 +114,7 @@ Scenario: Create a course
   And   I select "Letter Grade" from "marktype"
   And   I uncheck "accept_submission"
   And   I press "Create"
-  And   I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Chemical reactions"
+  And   I go to homepage "Faculties/Geography/Year 10/Chemical reactions"
 
   # Create a self-assess task
   When  I add a task named "Read chapter 3"
@@ -93,7 +123,7 @@ Scenario: Create a course
   When  I add a task named "Attend 3 classes" which is not self-assess
 
   # Add more task lists
-  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Atomic structure and bonding"
+  When  I go to homepage "Faculties/Geography/Year 10/Atomic structure and bonding"
   And   add component "Learning:Course Builder"
   And   I add a task named "Read chapter 4"
   And   I add a task named "Attend a laboratory" which is not self-assess
@@ -103,7 +133,7 @@ Scenario: Create a course
   And   I check "accept_submission"
   And   I press "Create"
 
-  When  I go to homepage "Faculties/Science and Technology/Subjects/Chemistry/Year 12/Unit 1/Macroscopic properties of matter"
+  When  I go to homepage "Faculties/Geography/Year 10/Macroscopic properties of matter"
   And   add component "Learning:Course Builder"
   And   I add a task named "Read chapter 5"
   And   I add a due work task
@@ -120,7 +150,7 @@ Scenario: Add a course to a class
   # Test adding this new course to a group page. Students should be able to take this course.
   When  I follow "Duke of Edinburgh"
   And   I add component "Learning:Course Outline"
-  And   I import course "Science and Technology/Subjects/Chemistry/Year 12/Unit 1"
+  And   I import course "Geography/Year 10"
   And   I wait for a "form#importForm" element
   # Set due dates for units
   When  I set open date for course unit "Chemical reactions" as "today 12:00am"
