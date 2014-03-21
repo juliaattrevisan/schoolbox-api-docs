@@ -10,7 +10,7 @@
 namespace Schoolbox\ResourceBooking\Booking;
 use Alaress\Web\Controller\Base;
 use Schoolbox\ResourceBooking\Item;
-use EOTC\Calendar\EventMapper;
+use EOTC\Calendar;
 
 class Controller extends Base {
 
@@ -25,7 +25,7 @@ class Controller extends Base {
     protected $resourceMapper;
 
     /**
-     * @var EventMapper
+     * @var Calendar\EventMapper
      */
     protected $eventMapper;
 
@@ -47,19 +47,53 @@ class Controller extends Base {
     }
 
     /**
+     * Creates a booking for this resource.
+     *
+     * @param int $id The resource to create a booking for.
+     */
+    public function createBooking($id) {
+        // Create the booking, which in turn adds an event to the calendar.
+        // This action saves a connected event.
+        /** @var Calendar\Event $event */
+        $event = $this->getEventMapper()->createModel();
+        $event->setOwner($this->getUser());
+        $event->setAuthor($this->getUser());
+        $event->setAccess(Calendar\EventMapper::ACCESS_PERSONAL);
+        // Currently role and campus must be set to empty collections.
+        $event->setRoleCollection(new \Schoolbox\Collection());
+        $event->setCampusCollection(new \Schoolbox\Collection());
+//        $event->setStartDateTime(new \Alaress_Date_Format($this->getRequest()->post['booking-from']));
+//        $event->setEndDateTime(new \Alaress_Date_Format($this->getRequest()->post['booking-to']);
+        $event->setStartDateTime(new \Alaress_Date_Format(new \DateTime('12am tomorrow')));
+        $event->setEndDateTime(new \Alaress_Date_Format(new \DateTime('1am tomorrow')));
+        $event->setDetail($this->getRequest()->post['notes']);
+        $this->getEventMapper()->save($event);
+        $booking = new Model();
+        $booking
+            ->setEvent($event)
+            ->setResource($this->getResourceMapper()->findById($id))
+            ->setStatus(Status\Model::STATUS_PENDING);
+        ;
+        $this->getBookingMapper()->save($booking);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate('resourceBooking.book', array('id' => $id))
+        );
+    }
+
+    /**
      * Outputs the calendar for this item.
      */
     public function bookingCalendar($id) {
         // Output a calendar as JSON
         // For testing, output the calendar for current user first.
-        $calendar = new \Calendar_Api_EventType_Event_Schoolbox_Default(
-            $this->getUser(), array()
-        );
-        /** @var \Calendar_Event_Type_Abstract[] $eventList */
-        $eventList = $calendar->getEvents(
-            $this->getRequest()->query['start'],
-            $this->getRequest()->query['end']
-        );
+//        $calendar = new \Calendar_Api_EventType_Event_Schoolbox_Default(
+//            $this->getUser(), array()
+//        );
+//        /** @var \Calendar_Event_Type_Abstract[] $eventList */
+//        $eventList = $calendar->getEvents(
+//            $this->getRequest()->query['start'],
+//            $this->getRequest()->query['end']
+//        );
 //        // Feed the beast
 //        $renderer = new \Calendar_Event_Type_Day_Renderer_Javascript(new \SitePage(false));
 //        foreach ($eventList as $event) {
@@ -95,7 +129,7 @@ class Controller extends Base {
     }
 
     /**
-     * @param  EventMapper $eventMapper
+     * @param  Calendar\EventMapper $eventMapper
      * @return $this
      */
     public function setEventMapper($eventMapper) {
@@ -104,7 +138,7 @@ class Controller extends Base {
     }
 
     /**
-     * @return EventMapper
+     * @return Calendar\EventMapper
      */
     public function getEventMapper() {
         return $this->eventMapper;
