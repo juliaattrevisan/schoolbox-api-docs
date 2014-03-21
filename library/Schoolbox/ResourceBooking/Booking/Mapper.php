@@ -70,7 +70,7 @@ class Mapper extends BaseMapper {
         $this->hasMap(
             array(
                 'column'   => 'reviewer_id',
-                'property' => 'reveiwedBy',
+                'property' => 'reviewer',
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'reviewer',
                 'join_def' => array(
