@@ -53,7 +53,6 @@ class External_Maze_Timetable {
 		$timetableDef = array();
 		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-
 		if (is_array($result['result']) && count($result['result'])) {
 			foreach ($result['result'] as $currentPeriod) {
 				$periodDate = new \Alaress_Date_Format(strtotime($currentPeriod['CalDate']), 'U');
