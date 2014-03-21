@@ -1238,13 +1238,42 @@ class Mapper {
 	 *                     extra:     any extra conditions on the join
 	 *
 	 * @return bool
+	 * @throws Mapper\DefinitionException if $name contains a . symbol.
+	 *         Reason: getJoinMapper() can drill down into joined models, and .
+	 *         is the separator.
 	 */
-	protected function hasJoin($name, $join) {
-		if (!is_array($join)) {
-			return false;
+	protected function hasJoin($name, array $join) {
+		if (strpos($name, '.') !== false) {
+			throw new Mapper\DefinitionException("Join name \"$name\" may not contain . characters");
 		}
 		$this->joins[$name] = $join;
 		return true;
+	}
+
+	/**
+	 * Retrieves the definition that this join was set up with.
+	 *
+	 * @param string $name The identifier for this join.
+	 *                     Definitions can be retrieved on mappers joined to
+	 *                     this one by separating names with . characters.
+	 *
+	 * @return Mapper
+	 * @throws Mapper\DefinitionException if join $name isn't on this mapper
+	 */
+	protected function getJoinDefinition($name) {
+		$parts    = explode('.', $name, 2);
+		$basename = array_shift($parts);
+
+		if (!array_key_exists($basename, $this->joins)) {
+			throw new Mapper\DefinitionException("Join \"$basename\" does not exist on class \"".get_called_class()."\"");
+		}
+
+		if (empty($parts)) {
+			return $this->joins[$basename];
+		}
+		else {
+			return $this->getJoinMapper($basename)->getJoinDefinition(array_shift($parts));
+		}
 	}
 
 	/**
@@ -1256,14 +1285,25 @@ class Mapper {
 	 * @throws Mapper\DefinitionException if join $name isn't on this mapper
 	 */
 	public function getJoinMapper($name) {
-		if (!array_key_exists($name, $this->joins)) {
-			throw new Mapper\DefinitionException("Join \"$name\" does not exist on class \"".__CLASS__."\"");
+		$parts    = explode('.', $name, 2);
+		$basename = array_shift($parts);
+		if (!array_key_exists($basename, $this->joins)) {
+			throw new Mapper\DefinitionException("Join \"$basename\" does not exist on class \"".get_called_class()."\"");
 		}
-		$mapper = $this->joins[$name]['mapper'];
-		if (!($mapper instanceof Mapper) && class_exists($mapper)) {
-			return call_user_func(array($mapper, 'getInstance'));
+		$mapperClass = $this->joins[$basename]['mapper'];
+		if (!($mapperClass instanceof Mapper) && class_exists($mapperClass)) {
+			$mapper = call_user_func(array($mapperClass, 'getInstance'));
 		}
-		return $this->joins[$name]['mapper'];
+		else {
+			$mapper = $this->joins[$basename]['mapper'];
+		}
+
+		if (empty($parts)) {
+			return $mapper;
+		}
+		else {
+			return $mapper->getJoinMapper(array_shift($parts));
+		}
 	}
 
 	/**
@@ -1279,11 +1319,7 @@ class Mapper {
 	 * @throws Mapper\DefinitionException if join $name isn't on this mapper
 	 */
 	public function getJoinSql($name, $this_alias = '', $other_alias = '') {
-		if (!array_key_exists($name, $this->joins)) {
-			throw new Mapper\DefinitionException("Join \"$name\" does not exist on class \"".__CLASS__."\"");
-		}
-		$join = $this->joins[$name];
-
+		$join         = $this->getJoinDefinition($name);
 		$this_table   = $this->getTable();
 		$other_mapper = $this->getJoinMapper($name);
 		$other_table  = $other_mapper->getTable();
