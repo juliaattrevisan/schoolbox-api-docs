@@ -103,9 +103,17 @@ class Controller extends Base {
     public function bookingCalendar($id) {
         // Output a calendar as JSON
         // For testing, output the calendar for current user first.
-//        $calendar = new \Calendar_Api_EventType_Event_Schoolbox_Default(
-//            $this->getUser(), array()
-//        );
+        // the find method should receive:
+        // Datetime objects?
+        $bookings = $this->getBookingMapper()->findForResource(
+            $id,
+            $this->getRequest()->query['start'],
+            $this->getRequest()->query['end']
+        );
+
+        // Pass bookings through a data marshaler - converts bookings to a JSON
+        // format which FullCalendar understands.
+
 //        /** @var \Calendar_Event_Type_Abstract[] $eventList */
 //        $eventList = $calendar->getEvents(
 //            $this->getRequest()->query['start'],
@@ -124,7 +132,7 @@ class Controller extends Base {
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
-                'data'   => array(),
+                'data'   => $bookings,
             )
         );
     }
