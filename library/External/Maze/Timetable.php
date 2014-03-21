@@ -117,12 +117,13 @@ class External_Maze_Timetable {
 		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
 		if (is_array($result['result']) && count($result['result'])) {
+			if ($date) {
+				$periodDate = new \Alaress_Date_Format(strtotime($date), 'U');
+			}
+
 			foreach ($result['result'] as $currentPeriod) {
 				if (!$date) {
 					$periodDate = new \Alaress_Date_Format(strtotime($currentPeriod['CalDate']), 'U');
-				}
-				else {
-					$periodDate = new \Alaress_Date_Format(strtotime($date), 'U');
 				}
 
 				if ($periodDate->getDatabaseDate() == $now->getDatabaseDate()) {
