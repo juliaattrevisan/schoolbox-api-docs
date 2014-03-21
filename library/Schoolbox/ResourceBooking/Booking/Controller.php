@@ -105,6 +105,7 @@ class Controller extends Base {
         // For testing, output the calendar for current user first.
         // the find method should receive:
         // Datetime objects?
+        /** @var Model[] $bookings */
         $bookings = $this->getBookingMapper()->findForResource(
             $id,
             $this->getRequest()->query['start'],
@@ -113,6 +114,66 @@ class Controller extends Base {
 
         // Pass bookings through a data marshaler - converts bookings to a JSON
         // format which FullCalendar understands.
+        $output = array();
+        foreach ($bookings as $booking) {
+            $currentEvent = $booking->getEvent();
+            $event = array(
+                'title' => $currentEvent->getNote(),
+                'start' => $currentEvent->getStartDate().' '.$currentEvent->getStartTime(),
+                'end'   => $currentEvent->getEndDate().' '.$currentEvent->getEndTime(),
+
+                /* Whether you can edit this event or not
+                 */
+                'editable' => false,
+
+                /* Whether it's an all-day event or not
+                 * If allDay is true, then you can't resize it
+                 */
+                'allDay' => false,
+
+                /* Colour of the event
+                 */
+                'color' => $currentEvent->getColour(),
+
+//                /* Campus slug so you can filter events
+//                 */
+//                'className' => $classes,
+
+                /* Extra data that the Event Object doesn't directly support
+                 */
+                'data' => array(
+                    'meta' => array(
+                        'eventId' => $currentEvent->getId(),
+//                        'time' => $currentEvent->getTime(),
+                        'detail' => ($currentEvent->getDetail()),
+                        'location' => ($currentEvent->getLocation()),
+                        'eventTypeId' => $currentEvent->getType(),
+                        'eventType' => 'type' . $currentEvent->getType(),
+                        'type' => $currentEvent->getEventType(),
+                        'author' => ($currentEvent->getAuthor()->formatName()),
+                        'authorId' => $currentEvent->getAuthor()->getId(),
+//                        'level' => $currentEvent->getDerivedEventLevel(),
+//                        'completed' => $currentEvent->getCompleted(),
+                    ),
+//                    'links' => array(
+//                        'category' => array(
+//                            'id' => $categoryId,
+//                            'name' => $categoryName,
+//                        )
+//                    ),
+//                    'styles' => array(
+//                        'visible' => $cssClass,
+//                    ),
+//                    'attendance' => array(
+//                        'icon' => $hasIcon,
+//                        'status' => $hasStatus,
+//                        'requestButton' => $hasAttendanceRequestButton,
+//                        'listButton' => $hasListButton,
+//                    )
+                )
+            );
+            $output[] = $event;
+        }
 
 //        /** @var \Calendar_Event_Type_Abstract[] $eventList */
 //        $eventList = $calendar->getEvents(
@@ -132,7 +193,7 @@ class Controller extends Base {
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
-                'data'   => $bookings,
+                'data'   => $output,
             )
         );
     }
