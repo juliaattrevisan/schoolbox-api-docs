@@ -202,7 +202,7 @@ if ($i) {
 /* Status Comment
  */
 $this->setVar(array(
-	'EVENT_COMMENT' => '',
+	'EVENT_COMMENT' => $event->getMetadata()->getComment(),
 ));
 
 if ($authenticator->canPromote($_SESSION['user'], $event)) {
