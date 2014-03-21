@@ -318,7 +318,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentBoarder
 			FROM ST
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
-			WHERE KLPID = '{$synId}'
+			WHERE STKEY = '{$synId}'
 		";
 
 		return $this->getDb()->getAll($query);
