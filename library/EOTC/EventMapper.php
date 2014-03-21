@@ -304,6 +304,10 @@ class EventMapper extends Calendar\EventMapper {
 			$listGroup->assign($eventItem);
 		}
 
+		/* Sort each grouping in a special way
+		 */
+		$listGroup->sortEventsByStartDate();
+
 		return $listGroup;
 	}
 

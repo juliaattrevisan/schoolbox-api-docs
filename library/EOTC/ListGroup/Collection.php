@@ -97,6 +97,30 @@ class Collection extends \Schoolbox\Collection {
 		$this->processedSeriesIds[] = $seriesId;
 	}
 
+	/**
+	 * Sort events in each Collection in a unique way
+	 *
+	 * Approved and Rejected are reverse chronological
+	 * Everything else is chronological
+	 */
+	public function sortEventsByStartDate() {
+		$reverseOrder = array(
+			$this->getMapping()->getApprovedIndex(),
+			$this->getMapping()->getRejectedIndex()
+		);
+
+		for ($i = 0; $i < $this->count(); $i++) {
+			$currentGroup = $this->getOffset($i);
+
+			if (in_array($i, $reverseOrder)) {
+				$currentGroup->sortBy('startDateTime', 'desc');
+			}
+			else {
+				$currentGroup->sortBy('startDateTime', 'asc');
+			}
+		}
+	}
+
 	/* Getters/Setters
 	 */
 
