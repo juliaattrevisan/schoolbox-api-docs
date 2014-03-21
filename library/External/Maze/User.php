@@ -286,7 +286,7 @@ class External_Maze_User implements External_UserInterface {
 				STKEY AS StudentID,
 				FIRST_NAME AS StudentGiven1,
 				SURNAME AS StudentSurname,
-				CONVERT(VARCHAR, BIRTHDATE, 120) AS StudentBirthDate,
+				SUBSTRING(CONVERT(VARCHAR, BIRTHDATE, 120), 0, 11) AS StudentBirthDate,
 				'' AS StudentTutor,
 				'' AS StudentTutorName,
 				'' AS StudentTutorDescription,
@@ -321,7 +321,12 @@ class External_Maze_User implements External_UserInterface {
 			WHERE STKEY = '{$synId}'
 		";
 
-		return $this->getDb()->getAll($query);
+		$student = $this->getDb()->getRow($query);
+		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'y-m-d');
+
+		$student['StudentBirthDate'] = $birthday->getUnixTimestamp();
+
+		return $student;
 	}
 
 	/**
