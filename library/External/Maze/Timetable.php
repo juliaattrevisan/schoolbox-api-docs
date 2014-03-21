@@ -53,6 +53,30 @@ class External_Maze_Timetable {
 		$timetableDef = array();
 		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
+		/* Distill data
+			 [138] => Array
+                (
+                    [PeriodNo] => 139
+                    [DayName] => Day 5
+                    [PerNoDesc] => Period 7
+                    [DayIndex] => 12
+                    [DayNo] => 5
+                    [CalDate] => Mar 28 2014 12:00:00:000AM
+                    [CalRow] => 13
+                    [qrow] => 13
+                )
+
+            [139] => Array
+                (
+                    [PeriodNo] => 140
+                    [DayName] => Day 5
+                    [PerNoDesc] => Period 0
+                    [DayIndex] => 12
+                    [DayNo] => 5
+                    [CalDate] => Mar 28 2014 12:00:00:000AM
+                    [CalRow] => 14
+				)
+		*/
 		if (is_array($result['result']) && count($result['result'])) {
 			foreach ($result['result'] as $currentPeriod) {
 				$periodDate = new \Alaress_Date_Format(strtotime($currentPeriod['CalDate']), 'U');
@@ -77,13 +101,62 @@ class External_Maze_Timetable {
 	 *
 	 * @param $campusId
 	 * @param int $date
+	 * @return bool
 	 */
 	public function getDayNumber($campusId, $date = 0) {
-		new \Alaress_Probe($this->getTimetableDefinition(1, 10));
+		$vars = array(
+			'klp_GetTimetableStructure',
+			array(
+				array('@Today', date('Y-m-d'), SQLVARCHAR, false, true, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+		if (is_array($result['result']) && count($result['result'])) {
+			foreach ($result['result'] as $currentPeriod) {
+				if (!$date) {
+					$periodDate = new \Alaress_Date_Format(strtotime($currentPeriod['CalDate']), 'U');
+				}
+				else {
+					$periodDate = new \Alaress_Date_Format(strtotime($date), 'U');
+				}
+
+				if ($periodDate->getDatabaseDate() == $now->getDatabaseDate()) {
+					return $currentPeriod['DayNo'];
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public function temp() {
+
+		new \Alaress_Probe($timetableDefinition);
+
+		die();
 
 
 
+		$vars = array(
+			'klp_GetTimetable',
+			array(
+				array('@Today', date('Y-m-d'), SQLVARCHAR, false, true, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
 
+		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		if (is_array($result['result']) && count($result['result'])) {
+			foreach ($result['result'] as $currentPeriod) {
+				new \Alaress_Probe($currentPeriod);
+			}
+		}
 
 
 //		$vars = array(
