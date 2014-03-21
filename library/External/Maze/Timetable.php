@@ -37,29 +37,86 @@ class External_Maze_Timetable {
 	 *
 	 * @param $campusId
 	 * @param int $day
+	 * @return array
 	 */
 	public function getTimetableDefinition($campusId, $day=0) {
 		$vars = array(
-			'klp_GetTimetable',
+			'klp_GetTimetableStructure',
 			array(
-				array('@Today', null, SQLVARCHAR, false, false, -1),
+				array('@Today', date('Y-m-d'), SQLVARCHAR, false, true, -1),
 				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
 			)
 		);
 
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		var_dump($result);
-//
-//		$query = "
-//			SELECT *
-//			FROM TH
-//		";
-//
-//		return $this->getDb()->getAll($query);
+		$timetableDef = array();
+		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+
+		if (is_array($result['result']) && count($result['result'])) {
+			foreach ($result['result'] as $currentPeriod) {
+				$periodDate = new \Alaress_Date_Format(strtotime($currentPeriod['CalDate']), 'U');
+
+				if ($periodDate->getDatabaseDate() == $now->getDatabaseDate()) {
+					if (!$day || $day == $currentPeriod['DayNo']) {
+						$timetableDef['desc'][] = $currentPeriod['PerNoDesc'];
+						$timetableDef['start'][] = '';
+						$timetableDef['end'][] = '';
+						$timetableDef['number'][] = $currentPeriod['PeriodNo'];
+						$timetableDef['sequence'][] = $currentPeriod['PeriodNo'];
+					}
+				}
+			}
+		}
+
+		return $timetableDef;
 	}
 
-	public function getDayNumber ($campusId, $date = 0) {
+	/**
+	 * Get the current day number
+	 *
+	 * @param $campusId
+	 * @param int $date
+	 */
+	public function getDayNumber($campusId, $date = 0) {
+		new \Alaress_Probe($this->getTimetableDefinition(1, 10));
+
+
+
+
+
+
+//		$vars = array(
+//			'klp_TermDates',
+//			array(
+//				array('@CurrDate', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
+//				array('@TermStart', null, SQLVARCHAR, true, true, -1),
+//				array('@TermEnd', null, SQLVARCHAR, true, true, -1),
+//				array('@QuiltDays', null, SQLVARCHAR, true, true, -1),
+//			)
+//		);
+//
+//		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+//
+//		Array
+//		(
+//			[success] => 1
+// 			[output] => Array
+//				(
+//					[@TermStart] => J
+//		            [@TermEnd] => A
+//      		    [@QuiltDays] => *
+//      		)
+//
+//		    [result] => Array
+//			(
+//			)
+//
+//		    [message] => Changed database context to 'LoretoKirribilli'.
+//		)
+//
+//		new \Alaress_Probe($result);
 	}
 
 	public function getPeriodNumber ($campusId) {
