@@ -192,7 +192,32 @@ class External_Maze_Timetable {
 //		new \Alaress_Probe($result);
 	}
 
-	public function getPeriodNumber ($campusId) {
+	/**
+	 * Calculates the current period based on the current time
+	 *
+	 * @param $campusId
+	 * @return int
+	 */
+	public function getPeriodNumber($campusId) {
+//		$vars = array(
+//			'klp_GetTimetable',
+//			array(
+//				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, true, -1),
+//				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+//			)
+//		);
+//
+//		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+//
+//		if (is_array($result['result']) && count($result['result'])) {
+//			foreach ($result['result'] as $currentPeriod) {
+////				new \Alaress_Probe($currentPeriod);
+//			}
+//		}
+//
+//		$this->getTimetableDefinition(1);
+
+		return 0;
 	}
 
 	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
