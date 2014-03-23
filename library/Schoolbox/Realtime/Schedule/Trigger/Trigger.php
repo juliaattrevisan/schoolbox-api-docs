@@ -7,20 +7,16 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Schedule;
+namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
 use Alaress_Date_Format;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\User;
 
-class Trigger {
+class Trigger extends AbstractTrigger {
 
 	protected $timestamp;
-	protected $notifier;
-	protected $label;
-	protected $model;
-	protected $user;
 	protected $diff;
 
 	/**
@@ -53,48 +49,12 @@ class Trigger {
 	}
 
 	/**
-	 * Return the Model object on which this trigger is acting
-	 *
-	 * @return object
-	 */
-	public function getModel() {
-		return $this->model;
-	}
-
-	/**
 	 * Return an array of callables that are appropriate for this trigger
 	 *
 	 * @return callable[]
 	 */
 	public function getCallbacks() {
 		return $this->notifier->retrieveCallbacks($this->label);
-	}
-
-	/**
-	 * Return the ID of the user that caused this trigger
-	 *
-	 * @return User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
-
-	/**
-	 * Return the class of the module that this trigger is from
-	 *
-	 * @return ModuleNotifierInterface
-	 */
-	public function getModuleNotifier() {
-		return $this->notifier;
-	}
-
-	/**
-	 * Return the trigger label that this trigger is based on
-	 *
-	 * @return string
-	 */
-	public function getLabel() {
-		return $this->label;
 	}
 
 	/**
