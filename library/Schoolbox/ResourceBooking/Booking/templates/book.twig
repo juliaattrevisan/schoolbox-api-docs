@@ -60,7 +60,7 @@ $(document).ready(function() {
             month: now.getMonth(),
             year:  now.getFullYear(),
             columnFormat: 'ddd d/M',
-            defaultView: 'agendaWeek',
+            defaultView: 'month',
             timeFormat: { month: 'h(:mm)tt' },
             events: function(start, end, callback) {
                 $.ajax({
@@ -77,7 +77,6 @@ $(document).ready(function() {
                     cache: false
                 });
             },
-
             loading: function(isLoading) {
                 if (isLoading === true) {
                     $('#calendar-loading').css({
@@ -109,8 +108,8 @@ $(document).ready(function() {
       method="post"
       name="form" class="clearfix"
 >
-    from: <input name="booking-from" data-datepicker="" />
-    to: <input name="booking-to" data-datepicker="" />
+    from: <input name="start-date" data-datepicker="" />, <input name="start-time" data-timepicker="" />
+    to: <input name="end-date" data-datepicker="" />, <input name="end-time" data-timepicker="" />
     notes: <textarea name="notes"></textarea>
 
     <input id="resource-save"
