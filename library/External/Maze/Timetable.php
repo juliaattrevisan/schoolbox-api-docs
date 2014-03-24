@@ -211,15 +211,26 @@ class External_Maze_Timetable {
 	 * @param $dayNumber
 	 * @return array|bool
 	 */
-	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
+	public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber) {
+		return $this->getStudentTimetable($externalUserId, $dayNumber);
+	}
+
+	/**
+	 * Return a student's timetable for a specific day
+	 *
+	 * @param $externalUserId
+	 * @param $dayNumber
+	 * @return mixed
+	 */
+	private function getStudentTimetable($externalUserId, $dayNumber) {
 
 		/* Get all the subjects for the current ttperiod
 		 */
 		$query = "
 			SELECT *
 			FROM STMA
-			WHERE SKEY = 'ABBOMEG'
-			AND TTPERIOD = '2014S1'
+			WHERE SKEY = '{$externalUserId}'
+			AND TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
 		";
 
 		$result1 = $this->getDb()->getAll($query);
@@ -283,48 +294,49 @@ class External_Maze_Timetable {
 
 		foreach($result3['result'] as $currentTimetableStructure) {
 
-			/* Clone that guy out
+			/* Restrict to a specified Day
+			 * Otherwise skip it
 			 */
-			$structure = $currentTimetableStructure;
-			$structure['class']['subject'] = array();
-			$structure['class']['periods'] = array();
+			if ($currentTimetableStructure['DayNo'] == $dayNumber) {
 
-			/* Find the subjects which have this period number
-			 * This class occurs in $currentTimetableStructure
-			 */
-			foreach($allObjects as $currentObject) {
-				if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
+				/* Clone that guy out
+				 */
+				$structure = $currentTimetableStructure;
+				$structure['class']['subject'] = array();
+				$structure['class']['periods'] = array();
 
-					/* Assemble
-					 */
-					$class = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
+				/* Find the subjects which have this period number
+				 * This class occurs in $currentTimetableStructure
+				 */
+				foreach($allObjects as $currentObject) {
+					if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
 
-					/* Separate subject identifier
-					 */
-					$class['subject'] = $currentObject['stma']['MKEY'];
+						/* Assemble
+						 */
+						$class = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
 
-					/* Stack up
-					 */
-					$structure['class'] = $class;
+						/* Separate subject identifier
+						 */
+						$class['subject'] = $currentObject['stma']['MKEY'];
 
-					/* Remember these classes, so we can get their details later
-					 * in one query and assimilate them into the grand design
-					 */
-					$allSubjects[] = $currentObject['stma']['MKEY'];
+						/* Stack up
+						 */
+						$structure['class'] = $class;
+
+						/* Remember these classes, so we can get their details later
+						 * in one query and assimilate them into the grand design
+						 */
+						$allSubjects[] = $currentObject['stma']['MKEY'];
+					}
 				}
-			}
 
-			/* Stack up
-			 */
-			$allStructures[] = $structure;
+				/* Stack up
+				 */
+				$allStructures[] = $structure;
+			}
 		}
 
-		new \Alaress_Probe($allStructures);
-		new \Alaress_Probe($allObjects);
-		new \Alaress_ThreeProbe($result1, $result2, $result3);
-		die();
-
-		return $this->getDb()->getAll($query);
+		return $allStructures;
 	}
 
 	/**
