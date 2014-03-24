@@ -279,22 +279,38 @@ class External_Maze_Timetable {
 		/* Invert everything in the timetable definition
 		 */
 		$allStructures = array();
+		$allSubjects = array();
 
 		foreach($result3['result'] as $currentTimetableStructure) {
 
 			/* Clone that guy out
 			 */
 			$structure = $currentTimetableStructure;
-			$structure['classes']['subject'] = array();
-			$structure['classes']['periods'] = array();
+			$structure['class']['subject'] = array();
+			$structure['class']['periods'] = array();
 
 			/* Find the subjects which have this period number
 			 * This class occurs in $currentTimetableStructure
 			 */
 			foreach($allObjects as $currentObject) {
 				if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
-					$structure['classes']['subject'] = $currentObject['stma'];
-					$structure['classes']['periods'] = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
+
+					/* Assemble
+					 */
+					$class = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
+
+					/* Separate subject identifier
+					 */
+					$class['subject'] = $currentObject['stma']['MKEY'];
+
+					/* Stack up
+					 */
+					$structure['class'] = $class;
+
+					/* Remember these classes, so we can get their details later
+					 * in one query and assimilate them into the grand design
+					 */
+					$allSubjects[] = $currentObject['stma']['MKEY'];
 				}
 			}
 
