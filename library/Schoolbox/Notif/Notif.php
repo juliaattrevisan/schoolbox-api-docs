@@ -213,7 +213,7 @@ class Notif implements LoggerInterface {
 			try {
 				// [3d] instant user message (notice)
 				if(!isset($this->handlers['instant'])) {
-					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::NOTICE, false);
+					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::INFO, false);
 				}
 				array_push($stack, $this->handlers['instant']);
 			}
