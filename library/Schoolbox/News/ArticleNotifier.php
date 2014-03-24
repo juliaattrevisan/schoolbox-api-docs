@@ -14,15 +14,21 @@ use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Notif\Topic\TopicBuilder;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\TriggerBundle;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Url;
 
 class ArticleNotifier extends AbstractModuleNotifier {
 
 	const TRIGGER_POSTED = 'posted';
 
+	/** @var RoleMapper */
+	protected $roleMapper;
 
 	/**
 	 * At minimum, this method should accept the label and role for which to build a topic.
@@ -30,12 +36,13 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 * method signature.
 	 *
 	 * @param string $eventLabel
-	 * @param string $roleType
+	 * @param string $roleId
+	 * @param int $topicId
 	 * @param int $articleId
 	 * @return string
 	 */
-	protected function buildTopic($eventLabel, $roleType, $articleId = 0) {
-		return "notify.roletype.$roleType.news.$articleId.$eventLabel";
+	protected function buildTopic($eventLabel, $roleId, $topicId = 0, $articleId = 0) {
+		return "notify.role.$roleId.news.topic.$topicId.article.$articleId.$eventLabel";
 	}
 
 
@@ -46,7 +53,8 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		// noop: no dependencies
+		$this->roleMapper = RoleMapper::getInstance();
+		$this->namespace = NSMapper::getInstance()->findByColumn('slug', 'news')->first();
 	}
 
 
@@ -59,10 +67,13 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		/** @var Article $article */
 		$article = $bundle->getObject();
 
+		$stamp = $article->getPublishDate()->getUnixTimestamp();
+
 		switch($bundle->getMethod()) {
 			case Mapper::METHOD_CREATE:
+				$bundle->attach(self::TRIGGER_POSTED, $stamp);
+				break;
 			case Mapper::METHOD_UPDATE:
-				$stamp = $article->getPublishDate()->getUnixTimestamp();
 				// in the future
 				if($stamp >= time()) {
 					$bundle->attach(self::TRIGGER_POSTED, $stamp);
@@ -81,16 +92,26 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	/**
 	 * Notify a group type that news has been posted
 	 *
-	 * @param string $groupType
+	 * @param string $roleType
 	 * @param Article $article
 	 * @param User $user
 	 * @return Messenger
 	 */
-	protected function generateNotification($groupType, $article, $user) {
+	protected function generateNotification($roleType, $article, $user) {
 		$msgr = new Messenger();
 
+		// self hydration -_-
+		/** @var Article $article */
+		$article = $this->mapper->findById($article->getId());
+
+		if($article->getImage()->getId()) {
+			$icon = sprintf("/storage/image.php?hash=%s&size=square64", $article->getImage()->getHash());
+		}
+		else {
+			$icon = sprintf("/portrait.php?userId=%s&size=square32", $user->getExternalId());
+		}
+
 		$text = ":user posted :title under :topic";
-		$icon = $article->getImage()->getFilename();
 		$href = '/news/item/' . $article->getId();
 
 		$articleId = $article->getId();
@@ -100,18 +121,33 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		$authorId = $user->getId();
 
 		$topicName = $article->getTopic()->getName();
-		$url = new \Url($topicName);
+		$topicId = $article->getTopic()->getId();
+		$url = new Url($topicName);
 		$topicSlug = $url->getSlug();
 
 		$msg = new Message($text, $icon, $href);
 
-		$topic = $this->buildTopic('posted', $groupType, $articleId);
+		$roleIds = $article->getRoles()->filterBy('type', $roleType)->getColumnValues('id');
+		$campusIds = $article->getCampuses()->getColumnValues('id');
 
-		$msgr->bind($topic, Logger::INFO, $msg, array(
-			'user'  => array($authorName, "/search/user/$authorId"),
-			'title' => array($heading,    "/news/item/$articleId"),
-			'topic' => array($topicName,  "/news/$topicSlug")
-		));
+		// if there's no overlap, nobody can theoretically receive this message, so don't send it
+		if(!(count($roleIds) && count($campusIds))) {
+			return $msgr;
+		}
+
+		// tell everyone that article $articleId has been posted
+		$msgr->bindBroadcast("news.article.$articleId.posted", Logger::INFO, $msg,
+			array(
+				'user'     => array($authorName, "/search/user/$authorId"),
+				'title'    => array($heading,    "/news/item/$articleId"),
+				'topic'    => array($topicName,  "/news/$topicSlug")
+			),
+			array(
+				'role'   => $roleIds,
+				'campus' => $campusIds,
+				'topic'  => $topicId
+			)
+		);
 
 		return $msgr;
 	}
