@@ -82,7 +82,7 @@ class Collection implements IColumnType {
 		if (!isset($value)) {
 			return null;
 		}
-		if (is_scalar($value)) {
+		if (is_scalar($value) || is_array($value)) {
 			return $value;
 		}
 		if(!($id_property = $this->getIdentifierProperty())) {
