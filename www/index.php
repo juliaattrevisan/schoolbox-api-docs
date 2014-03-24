@@ -31,6 +31,7 @@ if ($route instanceof Aura\Router\Route) {
         /** @var \Schoolbox\User $user */
         $session = $di->get('session');
         $user    = $session->getUser();
+        $session->updateLastTime();
 
         /** @var \Alaress\Authorizer\Authorizer $authorizer */
         $authorizer = $di->get('authorizer');

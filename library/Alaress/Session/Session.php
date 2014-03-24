@@ -48,6 +48,15 @@ class Session extends BaseSession {
     }
 
     /**
+     * Updates the last time that the user was accessed to whatever this
+     * request's time is.
+     */
+    public function updateLastTime() {
+        $authSession           = $this->newSegment(null);
+        $authSession->lasttime = $this->getRequestTime();
+    }
+
+    /**
      * @param  IConfigLoader $config
      * @return $this
      */
