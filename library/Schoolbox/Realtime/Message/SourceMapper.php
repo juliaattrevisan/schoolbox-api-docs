@@ -62,4 +62,16 @@ class SourceMapper extends Mapper {
 			'other_key' => 'id',
 		));
 	}
+
+	public function generateTopic($nsId, $key, $roleType, $params) {
+		/** @var Source $source */
+		$source = $this->findOneByColumnList(array(
+			'namespace' => $nsId,
+			'key'       => $key,
+			'role_type' => $roleType
+		));
+
+		array_unshift($params, str_replace('*', '%s', $source->getRoutingKey()));
+		return call_user_func_array('sprintf', $params);
+	}
 }
