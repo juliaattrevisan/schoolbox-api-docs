@@ -24,16 +24,78 @@ if ($_POST['heading']) {
         }
     }
 
-    $news = array(
-        'item_heading' => $_POST['heading'],
-        'item_body' => $_POST['body'],
-        'groupList' => $_POST['group'],
-        'campusList' => $_POST['campus'],
-        'userList' => (is_array($_POST['userList']) ? $_POST['userList'] : array()),
-        'item_topic_id' => $_POST['item_topic_id'],
-        'item_datetime_published' => $publishedDate->getDatabase(),
-        'item_datetime_expires' => $expiryDate->getDatabase()
-    );
+	if(is_numeric($_POST['newsID'])) {
+		// get a pre-existing article if it exists
+		try {
+			$article = \Schoolbox\News\ArticleMapper::getInstance()->findById($_POST['newsID']);
+			// permission check
+			if($article->getOwner() != $_SESSION['id'] && $permission < FULL_ACCESS) {
+				 error(23);
+				 exit;
+			}
+		}
+		// if nothing matches, blow up
+		catch(\Schoolbox\Mapper\Exception $e) {
+//			die($e);
+			error(41);
+			exit;
+		}
+	}
+	else {
+		$article = new \Schoolbox\News\Article();
+		$article->setPostDate(new Alaress_Date_Format());
+	}
+
+
+	$topic = new \Schoolbox\News\Topic();
+	$topic->setId($_POST['item_topic_id']);
+
+	$campuses = new \Schoolbox\Collection();
+	foreach($_POST['campus'] as $c) {
+		$obj = new \Schoolbox\Campus();
+		$obj->setId($c);
+		$campuses->add($obj);
+	}
+	unset($c);
+	unset($obj);
+
+	$roles = new \Schoolbox\Collection();
+	foreach($_POST['group'] as $r) {
+		$obj = new \Schoolbox\Role();
+		$obj->setId($r);
+		$roles->add($obj);
+	}
+	unset($r);
+	unset($obj);
+
+	$users = new Schoolbox\Collection();
+	$userList = isset($_POST['userList']) ? $_POST['userList'] : array();
+	foreach($userList as $u) {
+		$obj = new \Schoolbox\User();
+		$obj->setId($u);
+		$users->add($obj);
+	}
+	unset($u);
+	unset($obj);
+
+	$article
+		->setHeading($_POST['heading'])
+		->setBody($_POST['body'])
+		->setTopic($topic)
+		->setPublishDate($publishedDate)
+		->setExpiryDate($expiryDate)
+		->setCampuses($campuses)
+		->setUsers($users)
+		->setRoles($roles);
+
+	// if this is a new article, add some extra bits
+	if(!$article->getId()) {
+		$article->setOwner($_SESSION['user']);
+		$article->setPostDate(new Alaress_Date_Format(time(), 'U'));
+	}
+	else {
+		$article->setModifiedDate(new Alaress_Date_Format(time(), 'U'));
+	}
 
     if (is_readable($_FILES['file']['tmp_name'])) {
 
@@ -45,42 +107,58 @@ if ($_POST['heading']) {
                 $imageResource = Schoolbox\StorageMapper::getInstance()->upload(
                     $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_SESSION['id']
                 );
-                $news['item_image'] = $imageResource->getHash();
+                $article->setImage($imageResource);
             }
-	        catch(Exception $e) { //Silently continue if we cannot load image
+	        catch(Exception $e) {
+	            // silently continue if we cannot load image
             }
         }
     }
 
-    /* Check user is news owner
-      */
-    if (is_numeric($_POST['newsID'])) {
-        $current = $newsHandler->getByID($_POST['newsID']);
+	$affectedIds = \Schoolbox\News\ArticleMapper::getInstance()->save($article);
+	$newsId = $affectedIds[0];
 
-        if ($current['item_owner'] != $_SESSION['id'] && $permission < FULL_ACCESS) {
-            error(23);
-        }
-
-        $newsID = $news['item_id'] = $_POST['newsID'];
-        $newsHandler->update($news);
-    } else {
-        $newsID = $newsHandler->create($news);
-    }
-
-    SitePage::localRedir("/news/item/$newsID");
-} else if (is_numeric($_GET['removeImage'])) {
-   $newsHandler->update(array('item_id'=>$_GET['removeImage'], 'item_image'=>''));
-    SitePage::localRedir('/news/item/'.$_GET['removeImage']);
-} else {
-    if (is_numeric($_GET['delete'])) {
-        $news = $newsHandler->getByID($_GET['delete']);
-
-        if ($news['item_owner'] != $_SESSION['id'] && $permission < FULL_ACCESS) {
-            error(23);
-        }
-
-        $newsHandler->delete($_GET['delete']);
-
-        SitePage::localRedir("/news/");
-    }
+    SitePage::localRedir("/news/item/$newsId");
 }
+
+// request to remove the image from a news article
+elseif (is_numeric($_GET['removeImage'])) {
+	$newsId = $_GET['removeImage'];
+	try {
+		/** @var \Schoolbox\News\Article $article */
+		$article = \Schoolbox\News\ArticleMapper::getInstance()->findById($newsId);
+	}
+	catch(\Schoolbox\Mapper\Exception $e) {
+		error(41);
+		exit;
+	}
+
+	$article->setImage(null);
+	\Schoolbox\News\ArticleMapper::getInstance()->save($article);
+
+	SitePage::localRedir("/news/item/$newsId");
+}
+
+// request to delete the news item
+elseif (is_numeric($_GET['delete'])) {
+	$newsId = $_GET['delete'];
+
+	try {
+		$article = \Schoolbox\News\ArticleMapper::getInstance()->findById($newsId);
+	}
+	catch(\Schoolbox\Mapper\Exception $e) {
+		error(41);
+		exit;
+	}
+
+	// permission check
+	if($article->getOwner() != $_SESSION['id'] && $permission < FULL_ACCESS) {
+		error(23);
+	}
+
+	\Schoolbox\News\ArticleMapper::getInstance()->delete($article);
+}
+
+// if/when we fall out the bottom, just redirect to the newsstand
+SitePage::localRedir("/news/");
+
