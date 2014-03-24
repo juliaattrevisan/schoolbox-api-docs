@@ -143,63 +143,6 @@ class External_Maze_Timetable {
 		return false;
 	}
 
-	public function temp() {
-
-		new \Alaress_Probe($timetableDefinition);
-
-		die();
-
-
-
-		$vars = array(
-			'klp_GetTimetable',
-			array(
-				array('@Today', date('Y-m-d'), SQLVARCHAR, false, true, -1),
-				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-			)
-		);
-
-		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-
-		if (is_array($result['result']) && count($result['result'])) {
-			foreach ($result['result'] as $currentPeriod) {
-				new \Alaress_Probe($currentPeriod);
-			}
-		}
-
-
-//		$vars = array(
-//			'klp_TermDates',
-//			array(
-//				array('@CurrDate', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
-//				array('@TermStart', null, SQLVARCHAR, true, true, -1),
-//				array('@TermEnd', null, SQLVARCHAR, true, true, -1),
-//				array('@QuiltDays', null, SQLVARCHAR, true, true, -1),
-//			)
-//		);
-//
-//		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-//
-//		Array
-//		(
-//			[success] => 1
-// 			[output] => Array
-//				(
-//					[@TermStart] => J
-//		            [@TermEnd] => A
-//      		    [@QuiltDays] => *
-//      		)
-//
-//		    [result] => Array
-//			(
-//			)
-//
-//		    [message] => Changed database context to 'LoretoKirribilli'.
-//		)
-//
-//		new \Alaress_Probe($result);
-	}
-
 	/**
 	 * Calculates the current period based on the current time
 	 *
