@@ -199,36 +199,111 @@ class External_Maze_Timetable {
 	 * @return int
 	 */
 	public function getPeriodNumber($campusId) {
+		return 0;
+	}
+
+	/**
+	 * Return a user's timetable for a specific day
+	 *
+	 * @param $externalUserId
+	 * @param $userId
+	 * @param $campusId int ignored
+	 * @param $dayNumber
+	 * @return array|bool
+	 */
+	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
 //		$vars = array(
 //			'klp_GetTimetable',
 //			array(
-//				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, true, -1),
+//				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
 //				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
 //			)
 //		);
 //
 //		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 //
+//		$allIdents = array();
+//
+//		/* Get all the identifiers
+//		 */
 //		if (is_array($result['result']) && count($result['result'])) {
 //			foreach ($result['result'] as $currentPeriod) {
-////				new \Alaress_Probe($currentPeriod);
+//				$allIdents[] = $currentPeriod['class'];
 //			}
 //		}
 //
-//		$this->getTimetableDefinition(1);
+//		new \Alaress_Probe($allIdents);
+//		$identifiers = implode(',', $allIdents);
+//
+//		/* Identify all the identifiers
+//		 */
+//		$query = "
+//			SELECT TOP 500 *
+//			FROM STMA
+//			WHERE IDENT IN ($identifiers)
+//		";
 
-		return 0;
+		$query = "
+			SELECT TOP 50 *
+			FROM STMA
+			WHERE SKEY = 'ABBOMEG'
+			AND TTPERIOD = '2014S1'
+		";
+
+		$result1 = $this->getDb()->getAll($query);
+
+		////////////////////////////////////
+
+		$vars = array(
+			'klp_GetTimetableStructure',
+			array(
+				array('@Today', null, SQLVARCHAR, false, true, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		$result2 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		////////////////////////////////////
+
+		
+		$result3 = null;
+
+		new \Alaress_ThreeProbe($result1, $result2, $result3);
+		die();
+
+		return $this->getDb()->getAll($query);
 	}
 
-	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
-	}
-
+	/**
+	 * Return the ENTIRE timetable for a user
+	 *
+	 * @param $externalUserId
+	 * @param $userId
+	 * @param $campusId
+	 * @return array|bool
+	 */
 	public function getFullTimetable ($externalUserId, $userId, $campusId) {
 	}
 
+	/**
+	 * Retrieve the list of subjects for a user on a particular day
+	 *
+	 * @param $externalUserId
+	 * @param $dayNumber
+	 * @return bool
+	 */
 	public function getDaySubjects ($externalUserId, $dayNumber) {
 	}
 
+	/**
+	 * give a subject code and day this function returns the period that it occurs in
+	 * Assumption made that this should be the sequence rather than period name
+	 *
+	 * @param $classCode
+	 * @param $dayNumber
+	 * @return int|bool
+	 */
 	public function getSubjectPeriod ($classCode, $dayNumber) {
 	}
 
