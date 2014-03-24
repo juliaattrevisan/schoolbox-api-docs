@@ -13,6 +13,7 @@ use Group;
 use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Campus;
+use Schoolbox\Collection;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Resource\Category;
@@ -150,8 +151,10 @@ class UserQueueFactory {
 			// required user information
 			'user' => array(
 				// *.notify.user.{id}
-				'id'        => $user->getId()
+				'id' => $user->getId()
 			),
+			// everyone subscribes to news...right...?
+			'news' => array('#')
 		);
 
 		$roleType = $user->getRole()->getType();
