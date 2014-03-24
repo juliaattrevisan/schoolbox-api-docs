@@ -349,6 +349,56 @@ class External_Maze_Timetable {
 	 * @return array|bool
 	 */
 	public function getFullTimetable($externalUserId, $userId, $campusId) {
+
+		/* TODO: CycleLength depends on campus
+		 */
+		$cycleLength = 10;
+
+		$timetable = array();
+		$allDayTimetables = array();
+
+		/* Get all the days' timetables first
+		 */
+		for ($day = 1; $day <= $cycleLength; $day++) {
+			$allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $day);
+		}
+
+//		new \Alaress_Probe($allDayTimetables);
+
+		/* Assemble into a 2D array
+		 * Each row represents a Period across each Day in the cycle
+		 *
+		 * [Period1 [Day1, Day2, Day3, DayN...]]
+		 * [Period2 [Day1, Day2, Day3, DayN...]]
+		 * [Period3 [Day1, Day2, Day3, DayN...]]
+		 * [PeriodN [Day1, Day2, Day3, DayN...]]
+		 * ...
+		 *
+		 */
+		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
+			$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['PerNoDesc'];
+			$timetable[$period]['periodStart'] = '';
+			$timetable[$period]['periodEnd'] = '';
+
+			/* Put in Day classes
+			 */
+			for ($day = 0; $day < $cycleLength; $day++) {
+				$timetable[$period]['day'][$day] = array(
+					'periodOn' => '',
+					'description' => $allDayTimetables[$day][$period]['class']['subject']['name'],
+					'code' => $allDayTimetables[$day][$period]['class']['subject']['code'],
+					'room' => $allDayTimetables[$day][$period]['class']['room'],
+					'staffID' => '',
+					'staffFirstname' => '',
+					'staffSurname' => '',
+					'staffTitle' => '',
+				);
+			}
+
+		}
+
+//		new \Alaress_Probe($timetable);
+		return $timetable;
 	}
 
 	/**
