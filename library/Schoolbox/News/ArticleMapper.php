@@ -263,14 +263,13 @@ class ArticleMapper extends Mapper implements Searchable {
 				}
 				// multi-value...this is a bit circuitous...
 				else {
-					$coll = array_flip($this->getModelProperty($mainModel, $property) ?: array());
+					$getEntity = $this->getGetMethodName($property);
 
-					$subProperty = $subIdentifier['property'];
-					$subPropertyValue = $mapper->getModelProperty($entity, $subProperty);
-
-					$coll[$subPropertyValue] = $subPropertyValue;
-
-					$this->setModelProperty($mainModel, $property, array_flip($coll));
+					if(!$mainModel->$getEntity() instanceof Collection) {
+						$setEntity = $this->getSetMethodName($property);
+						$mainModel->$setEntity(new Collection());
+					}
+					$mainModel->$getEntity()->add($entity);
 				}
 			}
 		}
