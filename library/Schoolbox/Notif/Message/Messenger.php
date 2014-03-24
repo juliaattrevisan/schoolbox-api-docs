@@ -30,12 +30,12 @@ class Messenger {
 	}
 
 	/**
-	 * @param string|array $targets
-	 * @param string|array $topics
-	 * @param int $severity
-	 * @param Message $msg
-	 * @param array $params
-	 * @param array $context
+	 * @param string|array $targets - a discreet list of intended recipients, in topic format (user.id, campus.id, etc)
+	 * @param string|array $topics  - the topic or topics on which this is to be sent
+	 * @param int $severity         - the severity at which this is to be sent
+	 * @param Message $msg          - the message to be sent
+	 * @param array $params         - the params to be bound to this message instance
+	 * @param array $context        - any additional context to be supplied
 	 */
 	public function bindTargeted($targets, $topics, $severity, $msg, $params = array(), $context = array()) {
 		$this->bind($msg, $severity, $topics, $targets, $params, $context);
@@ -44,15 +44,15 @@ class Messenger {
 	/**
 	 * Bind a message, ready for transmission to a user's queues.
 	 *
-	 * @param string|array $topics
-	 * @param int $severity
-	 * @param Message $msg
-	 * @param array $params
-	 * @param array $context
+	 * @param string|array $topics  - the topic or topics on which this is to be broadcast
+	 * @param int $severity         - the severity at which this is to be broadcast
+	 * @param Message $msg          - the message to be broadcast
+	 * @param array $params         - the params to be bound to this message instance
+	 * @param array $filter         - an optional filter for who is to receive this message
 	 * @throws \Schoolbox\Notif\NotifException
 	 */
-	public function bindBroadcast($topics, $severity, $msg, $params = array(), $context = array()) {
-		$this->bind($msg, $severity, $topics, array(), $params, $context);
+	public function bindBroadcast($topics, $severity, $msg, $params = array(), $filter = array()) {
+		$this->bind($msg, $severity, $topics, array(), $params, $filter);
 	}
 
 	/**
