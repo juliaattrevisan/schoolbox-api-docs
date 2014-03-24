@@ -121,59 +121,59 @@ class Controller extends Base {
         $output = array();
         foreach ($bookings as $booking) {
             $currentEvent = $booking->getEvent();
+
+            // Buttons: depend on whether user is moderator.
+            // Actions: approve/reject, view bookings for item
+            $buttons = array();
+            if ($booking->getStatus()->getId() == Status\Model::STATUS_PENDING) {
+                // Is approve/reject okay for this item?
+                $approveUrl = $this->getRouter()->generate(
+                    'resourceBooking.approve',
+                    array('id' => $booking->getId())
+                );
+                if ($this->getAuthorizer()->isPathAuthorizedForUser($approveUrl)) {
+                    $buttons[] = array(
+                        'label' => 'Approve',
+                        'class' => 'tick',
+                        'url'   => $approveUrl,
+                    );
+                }
+                $rejectUrl = $this->getRouter()->generate(
+                    'resourceBooking.reject',
+                    array('id' => $booking->getId())
+                );
+                if ($this->getAuthorizer()->isPathAuthorizedForUser($rejectUrl)) {
+                    $buttons[] = array(
+                        'label' => 'Reject',
+                        'class' => 'delete',
+                        'url'   => $rejectUrl,
+                    );
+                }
+            }
+
             $event = array(
-                'title' => $currentEvent->getNote(),
-                'start' => $currentEvent->getStartDate().' '.$currentEvent->getStartTime(),
-                'end'   => $currentEvent->getEndDate().' '.$currentEvent->getEndTime(),
-
-                /* Whether you can edit this event or not
-                 */
-                'editable' => false,
-
-                /* Whether it's an all-day event or not
-                 * If allDay is true, then you can't resize it
-                 */
-                'allDay' => false,
-
-                /* Colour of the event
-                 */
-                'color' => $currentEvent->getColour(),
-
-//                /* Campus slug so you can filter events
-//                 */
-//                'className' => $classes,
-
-                /* Extra data that the Event Object doesn't directly support
-                 */
+                'title'     => $currentEvent->getNote(),
+                'start'     => $currentEvent->getStartDate().' '.$currentEvent->getStartTime(),
+                'end'       => $currentEvent->getEndDate().' '.$currentEvent->getEndTime(),
+                'editable'  => true,
+                'allDay'    => false,
+                'color'     => $currentEvent->getColour(),
+                // Styles: should vary depending on booking
+                'className' => 'booking',
                 'data' => array(
                     'meta' => array(
-                        'eventId' => $currentEvent->getId(),
-//                        'time' => $currentEvent->getTime(),
-                        'detail' => ($currentEvent->getDetail()),
-                        'location' => ($currentEvent->getLocation()),
+                        'eventId'     => $currentEvent->getId(),
+                        'detail'      => $currentEvent->getDetail(),
+                        'location'    => $currentEvent->getLocation(),
                         'eventTypeId' => $currentEvent->getType(),
-                        'eventType' => 'type' . $currentEvent->getType(),
-                        'type' => $currentEvent->getEventType(),
-                        'author' => ($currentEvent->getAuthor()->formatName()),
-                        'authorId' => $currentEvent->getAuthor()->getId(),
-//                        'level' => $currentEvent->getDerivedEventLevel(),
-//                        'completed' => $currentEvent->getCompleted(),
+                        'type'        => $currentEvent->getEventType(),
+                        'author'      => $currentEvent->getAuthor()->formatName(),
+                        'authorId'    => $currentEvent->getAuthor()->getId(),
                     ),
-//                    'links' => array(
-//                        'category' => array(
-//                            'id' => $categoryId,
-//                            'name' => $categoryName,
-//                        )
-//                    ),
-//                    'styles' => array(
-//                        'visible' => $cssClass,
-//                    ),
-//                    'attendance' => array(
-//                        'icon' => $hasIcon,
-//                        'status' => $hasStatus,
-//                        'requestButton' => $hasAttendanceRequestButton,
-//                        'listButton' => $hasListButton,
-//                    )
+                    'booking' => array(
+                        'status'  => $booking->getStatus(),
+                        'buttons' => $buttons,
+                    )
                 )
             );
             $output[] = $event;
