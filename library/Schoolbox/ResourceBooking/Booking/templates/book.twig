@@ -53,7 +53,14 @@ $(document).ready(function() {
             d: '/calendar/ajax/delete'
         },
         filter: {
-            enabled: false
+            enabled: true,
+            ajax: false,
+            // This AJAX lookup should always be a GET request
+            {#ajax: {{ routeLookup('resourceBooking.bookingCalendar', {id: resource.id})|json_encode|raw }},#}
+            parentSelector: '#calendar-controls',
+            exportButtonSelector: false,
+            checkboxSelector: false,
+            applyFiltersSelector: false
         },
         fullCalendar: {
             date:  now.getDate(),
@@ -63,14 +70,14 @@ $(document).ready(function() {
             defaultView: 'month',
             timeFormat: { month: 'h(:mm)tt' },
             events: function(start, end, callback) {
+                var data = [
+                    {name: 'start', value: Math.round(start.getTime()/1000)},
+                    {name: 'end',   value: Math.round(end.getTime()/1000)},
+                ];
                 $.ajax({
+                    data:     data.concat($('#calendar-controls').find('form').serializeArray()),
                     dataType: 'json',
                     url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: resource.id})|json_encode|raw }},
-                    data: {
-                        start:  Math.round(start.getTime()/1000),
-                        end:    Math.round(end.getTime()/1000),
-                        userId: 19
-                    },
                     success: function(data) {
                         callback(data);
                     },
@@ -121,6 +128,11 @@ $(document).ready(function() {
         },
         x: false
     }).init()
+
+    // Event filter
+    $('#calendar-controls').on('click', 'a#applyFilters', function() {
+        c.calendar.fullCalendar('refetchEvents');
+    })
 })
 </script>
 
@@ -150,15 +162,7 @@ $(document).ready(function() {
 
 </form>
 
-<div id="calendar"></div>
-<div id="calendar-export-dialog">
-    <div id="calendar-export-dialog-text">
-        Use the following URL as the source for your feed.
-    </div>
-    <textarea readonly id="calendar-export-dialog-url"></textarea>
-</div>
-
-{# Forms for #}
+{# Forms for calendar bubbles #}
 <div id="calendar-bubble" class="cal-bubble">
     <div class="middle">
         <div class="close">&times;</div>
@@ -231,4 +235,46 @@ $(document).ready(function() {
         </div>
         <div class="bottom"><strong></strong></div>
     </div>
+</div>
+
+{##
+ # Calendar controls
+ # Add the popup event
+ #}
+
+<div id="calendar-controls" class="calendar-controls no-height clearfix">
+    <div class="link-case">
+        <div class="filter-drop clearfix">
+            <div class="filter-list">
+                <form class="clearfix">
+                    <div class="filter-cat groups clearfix"><span class="filter-title">Status</span>
+                        <label title="Pending">
+                            <input type="checkbox" name="status[]" value="1" class="checkbox" checked />
+                            Pending
+                        </label>
+                        <label title="Approved">
+                            <input type="checkbox" name="status[]" value="2" class="checkbox" checked />
+                            Approved
+                        </label>
+                        <label title="Rejected">
+                            <input type="checkbox" name="status[]" value="3" class="checkbox"/>
+                            Rejected
+                        </label>
+                    </div>
+                </form>
+                <p class="clearfix">
+                    <a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
+                </p>
+                <!--/filter-drop-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="calendar"></div>
+<div id="calendar-export-dialog">
+    <div id="calendar-export-dialog-text">
+        Use the following URL as the source for your feed.
+    </div>
+    <textarea readonly id="calendar-export-dialog-url"></textarea>
 </div>

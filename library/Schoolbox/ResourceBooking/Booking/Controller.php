@@ -113,7 +113,8 @@ class Controller extends Base {
         $bookings = $this->getBookingMapper()->findForResource(
             $id,
             $this->getRequest()->query['start'],
-            $this->getRequest()->query['end']
+            $this->getRequest()->query['end'],
+            $this->getRequest()->query['status']
         );
 
         // Pass bookings through a data marshaler - converts bookings to a JSON
