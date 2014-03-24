@@ -246,11 +246,23 @@ class External_Maze_Timetable {
 		$query = "
 			SELECT TOP 50 *
 			FROM STMA
-			WHERE SKEY = 'ABBOMEG'
+			WHERE SKEY = 'ABBORUB'
 			AND TTPERIOD = '2014S1'
 		";
 
 		$result1 = $this->getDb()->getAll($query);
+
+		////////////////////////////////////
+
+		$vars = array(
+			'klp_GetTimetable',
+			array(
+				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		$result2 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
 		////////////////////////////////////
 
@@ -262,13 +274,67 @@ class External_Maze_Timetable {
 			)
 		);
 
-		$result2 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+		$result3 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		////////////////////////////////////
+		/* With our powers combined?
+		 */
 
-		
-		$result3 = null;
+		/* For every STMA record, find the STMA.IDENT
+		 * Find all the GetTimetable.class records that match
+		 * Find all the PeriodNo's that GetTimetable.class belongs in
+		 */
+		$allObjects = array();
 
+		/* Reduce data sets
+		 */
+		if (is_array($result1) && count($result1)) {
+			foreach($result1 as $currentStma) {
+				$object = array();
+				$object['stma'] = $currentStma;
+				$object['period'] = array();
+
+				/* This tends to be a big data set
+				 */
+				foreach($result2['result'] as $currentPeriod) {
+					if ($currentStma['IDENT'] == $currentPeriod['class']) {
+						$object['period'][$currentPeriod['periodno']] = $currentPeriod;
+					}
+				}
+
+				$allObjects[] = $object;
+			}
+
+			/* Invert everything
+			 */
+			$allStructures = array();
+
+			foreach($result3['result'] as $currentTimetableStructure) {
+
+				/* Clone that guy out
+				 */
+				$structure = $currentTimetableStructure;
+				$structure['classes'] = array();
+
+				/* Find the subjects which have this period number
+				 */
+				foreach($allObjects as $currentObject) {
+
+					/* This class occurs in $currentTimetableStructure
+					 */
+					if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
+						$structure['classes']['subject'] = $currentObject['stma'];
+						$structure['classes']['period'] = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
+					}
+				}
+
+				/* Stack it
+				 */
+				$allStructures[] = $structure;
+			}
+		}
+
+		new \Alaress_Probe($allStructures);
+		new \Alaress_Probe($allObjects);
 		new \Alaress_ThreeProbe($result1, $result2, $result3);
 		die();
 
