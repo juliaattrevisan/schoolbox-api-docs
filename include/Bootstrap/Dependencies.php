@@ -91,12 +91,19 @@ $di->set(
             );
             $twig->addExtension(new Twig_Extension_Debug());
 
-            // Add the route lookup method
-            $routeLookup = new Twig_SimpleFunction(
-                'routeLookup',
-                array($di->get('templateEngine:routeLookup'), 'execute')
+            // Add the route lookup and authorization methods
+            $twig->addFunction(
+                new Twig_SimpleFunction(
+                    'routeLookup',
+                    array($di->get('templateEngine:routeLookup'), 'execute')
+                )
             );
-            $twig->addFunction($routeLookup);
+            $twig->addFunction(
+                new Twig_SimpleFunction(
+                    'isRouteAuthorized',
+                    array($di->get('templateEngine:isRouteAuthorized'), 'execute')
+                )
+            );
 
             return $twig;
         }
