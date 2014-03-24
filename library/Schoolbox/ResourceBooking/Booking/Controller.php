@@ -126,30 +126,58 @@ class Controller extends Base {
             // Buttons: depend on whether user is moderator.
             // Actions: approve/reject, view bookings for item
             $buttons = array();
-            if ($booking->getStatus()->getId() == Status\Model::STATUS_PENDING) {
-                // Is approve/reject okay for this item?
-                $approveUrl = $this->getRouter()->generate(
-                    'resourceBooking.approve',
-                    array('id' => $booking->getId())
+            $class   = '';
+
+            // Modify URL
+            $modifyUrl = $this->getRouter()->generate(
+                'resourceBooking.edit',
+                array('id' => $booking->getId())
+            );
+            if ($this->getAuthorizer()->isPathAuthorizedForUser($modifyUrl)) {
+                $buttons[] = array(
+                    'label' => 'Modify',
+                    'class' => 'modify',
+                    'href'  => $modifyUrl,
                 );
-                if ($this->getAuthorizer()->isPathAuthorizedForUser($approveUrl)) {
-                    $buttons[] = array(
-                        'label' => 'Approve',
-                        'class' => 'tick',
-                        'href'  => $approveUrl,
+            }
+
+            switch ($booking->getStatus()->getId()) {
+                case Status\Model::STATUS_PENDING:
+                    $class = 'pending';
+                    // Is approve/reject okay for this item?
+                    $approveUrl = $this->getRouter()->generate(
+                        'resourceBooking.approve',
+                        array('id' => $booking->getId())
                     );
-                }
-                $rejectUrl = $this->getRouter()->generate(
-                    'resourceBooking.reject',
-                    array('id' => $booking->getId())
-                );
-                if ($this->getAuthorizer()->isPathAuthorizedForUser($rejectUrl)) {
-                    $buttons[] = array(
-                        'label' => 'Reject',
-                        'class' => 'delete',
-                        'href'  => $rejectUrl,
+                    if ($this->getAuthorizer()->isPathAuthorizedForUser($approveUrl)) {
+                        $buttons[] = array(
+                            'label' => 'Approve',
+                            'class' => 'tick',
+                            'href'  => $approveUrl,
+                        );
+                    }
+                    $rejectUrl = $this->getRouter()->generate(
+                        'resourceBooking.reject',
+                        array('id' => $booking->getId())
                     );
-                }
+                    if ($this->getAuthorizer()->isPathAuthorizedForUser($rejectUrl)) {
+                        $buttons[] = array(
+                            'label' => 'Reject',
+                            'class' => 'delete',
+                            'href'  => $rejectUrl,
+                        );
+                    }
+                    break;
+
+                case Status\Model::STATUS_APPROVED:
+                    $class = 'approved';
+                    break;
+
+
+                case Status\Model::STATUS_REJECTED:
+                    $class = 'rejected';
+                    break;
+
             }
 
             $event = array(
@@ -160,7 +188,7 @@ class Controller extends Base {
                 'allDay'    => false,
                 'color'     => $currentEvent->getColour(),
                 // Styles: should vary depending on booking
-                'className' => 'booking',
+                'className' => "$class booking",
                 'data' => array(
                     'meta' => array(
                         'eventId'     => $currentEvent->getId(),
@@ -201,6 +229,15 @@ class Controller extends Base {
                 'data'   => $output,
             )
         );
+    }
+
+    /**
+     * Stub for edit action.
+     *
+     * @param int $id
+     */
+    public function edit($id) {
+        $booking = $this->getBookingMapper()->findById($id);
     }
 
     /**

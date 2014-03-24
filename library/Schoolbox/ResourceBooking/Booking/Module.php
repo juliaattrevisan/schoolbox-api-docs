@@ -26,6 +26,7 @@ class Module extends BaseModule {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
         $router->addGet('resourceBooking.book', $basePath.'/bookItem/{id}');
+        $router->addGet('resourceBooking.edit', $basePath.'/{id}/edit');
         $router->addPost('resourceBooking.createBooking', $basePath.'/bookItem/{id}')
                ->addValues(array('action' => 'createBooking'));
         $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
