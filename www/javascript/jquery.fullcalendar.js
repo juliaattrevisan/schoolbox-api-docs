@@ -76,6 +76,7 @@ function Calendar(id, bubbleId, opts) {
 
         interaction: function(cal) {
 
+            // Only set up interactions that actually exist.
             var calendarButtons = $j(cal.options.filter.btnSelector)
             var exportButtons   = $j(cal.options.filter.exportButtonSelector)
 
@@ -92,37 +93,44 @@ function Calendar(id, bubbleId, opts) {
                 return false
             })
 
-            //
-            // Show the export filter
-            cal.dom.delegate(cal.options.filter.exportButtonSelector, 'click', function() {
-                cal.bubble.hide()
-                calendarControls.find(cal.options.filter.boxSelector).hide()
-                exportControls.find(cal.options.filter.boxSelector).toggle()
-                calendarButtons.removeClass('engaged')
-                exportButtons.toggleClass('engaged')
-                return false
-            })
+            // Show the export filter, if it exists
+            if (cal.options.filter.exportButtonSelector) {
+                cal.dom.delegate(cal.options.filter.exportButtonSelector, 'click', function() {
+                    cal.bubble.hide()
+                    calendarControls.find(cal.options.filter.boxSelector).hide()
+                    exportControls.find(cal.options.filter.boxSelector).toggle()
+                    calendarButtons.removeClass('engaged')
+                    exportButtons.toggleClass('engaged')
+                    return false
+                })
+            }
 
-            // run the filter checker to show and hide the items
-            calendarControls.delegate(cal.options.filter.checkboxSelector, 'click', function() {
-                cal.filters.organise(cal, ["campus", "groups"])
-            })
+            // run the filter checker to show and hide the items, if it exists
+            if (cal.options.filter.checkboxSelector) {
+                calendarControls.delegate(cal.options.filter.checkboxSelector, 'click', function() {
+                    cal.filters.organise(cal, ["campus", "groups"])
+                })
+            }
 
-            calendarControls.delegate(cal.options.filter.applyFiltersSelector, 'click', function() {
-                cal.filters.organise(cal, ["campus", "groups"])
-                calendarControls.find(cal.options.filter.boxSelector).hide()
-                $j(cal.options.filter.btnSelector).removeClass('engaged')
-                return false
-            })
+            if (cal.options.filter.applyFiltersSelector) {
+                calendarControls.delegate(cal.options.filter.applyFiltersSelector, 'click', function() {
+                    cal.filters.organise(cal, ["campus", "groups"])
+                    calendarControls.find(cal.options.filter.boxSelector).hide()
+                    $j(cal.options.filter.btnSelector).removeClass('engaged')
+                    return false
+                })
+            }
 
             $j('body').click(function() {
                 $j(cal.options.filter.boxSelector).hide()
                 $j(cal.options.filter.btnSelector).removeClass('engaged')
             })
 
-            calendarControls.add(exportControls).delegate(cal.options.filter.boxSelector, 'click', function(e) {
-                e.stopPropagation()
-            })
+            if (cal.options.filter.boxSelector) {
+                calendarControls.add(exportControls).delegate(cal.options.filter.boxSelector, 'click', function(e) {
+                    e.stopPropagation()
+                })
+            }
 
             cal.filters.organise(cal, ["campus", "groups"])
         },
@@ -248,23 +256,27 @@ Calendar.prototype.init = function() {
     this.dom.fullCalendar(this.options.fullCalendar)
 
     if(this.options.filter.enabled) {
-        // mash the filters in
+        // mash the filters in (if they're enabled)
         var headerRight = this.dom.find('td.fc-header-right');
         var baseButton  = headerRight.children('.fc-button').first();
-        headerRight.prepend(
-            baseButton.clone()
-                .html('filters')
-                .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-                .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
-                .attr('id','fc-button-filter')
-        );
-        headerRight.append(
-            baseButton.clone()
-                .html('export')
-                .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-                .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
-                .attr('id','fc-button-export')
-        );
+        if (this.options.filter.btnSelector) {
+            headerRight.prepend(
+                baseButton.clone()
+                    .html('filters')
+                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
+                    .attr('id','fc-button-filter')
+            );
+        }
+        if (this.options.filter.exportButtonSelector) {
+            headerRight.append(
+                baseButton.clone()
+                    .html('export')
+                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
+                    .attr('id','fc-button-export')
+            );
+        }
     }
     // and now make all the buttons on the header look the way they're meant to
     var header = this.dom.children('.fc-header')
