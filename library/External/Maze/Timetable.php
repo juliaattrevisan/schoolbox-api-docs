@@ -24,11 +24,19 @@ class External_Maze_Timetable {
 	private $helper = null;
 
 	/**
+	 * An instance of CampusMapper
+	 *
+	 * @var null
+	 */
+	private $campusMapper = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->setDb(MSSQL::getInstance());
 		$this->setHelper(new External_Maze_Helper());
+		$this->setCampusMapper(new \Schoolbox\CampusMapper());
 	}
 
 	/**
@@ -349,17 +357,16 @@ class External_Maze_Timetable {
 	 * @return array|bool
 	 */
 	public function getFullTimetable($externalUserId, $userId, $campusId) {
-
-		/* TODO: CycleLength depends on campus
-		 */
-		$cycleLength = 10;
-
 		$timetable = array();
 		$allDayTimetables = array();
 
+		/* This person's campus
+		 */
+		$campus = $this->getCampusMapper()->findById($campusId);
+
 		/* Get all the days' timetables first
 		 */
-		for ($day = 1; $day <= $cycleLength; $day++) {
+		for ($day = 1; $day <= $campus->getTimetableDay(); $day++) {
 			$allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $day);
 		}
 
@@ -382,7 +389,7 @@ class External_Maze_Timetable {
 
 			/* Put in Day classes
 			 */
-			for ($day = 0; $day < $cycleLength; $day++) {
+			for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
 				$timetable[$period]['day'][$day] = array(
 					'periodOn' => '',
 					'description' => $allDayTimetables[$day][$period]['class']['subject']['name'],
@@ -481,5 +488,23 @@ class External_Maze_Timetable {
 	 */
 	private function getHelper() {
 		return $this->helper;
+	}
+
+	/**
+	 * Set campus mapper
+	 *
+	 * @param null $campusMapper
+	 */
+	private function setCampusMapper($campusMapper) {
+		$this->campusMapper = $campusMapper;
+	}
+
+	/**
+	 * Get campus mapper
+	 *
+	 * @return null
+	 */
+	private function getCampusMapper() {
+		return $this->campusMapper;
 	}
 } 
