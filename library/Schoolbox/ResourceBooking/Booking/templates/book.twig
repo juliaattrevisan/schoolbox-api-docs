@@ -117,13 +117,16 @@ $(document).ready(function() {
 
                 // setup data to be displayed
                 var data = $j.extend(true, {}, calEvent.data.meta)
-                data.note = calEvent.title
+
+                // Note: depends on whether this item is approved, rejected or
+                // pending.
+                data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
 
                 data.date = calendarDate(calEvent.start)
                 data.date += " &ndash; "
                 data.date += calendarDate(calEvent.end)
 
-                // Custom butonyes
+                // Custom butonyes for bookings
                 data.actions = []
                 $.each(calEvent.data.booking.buttons, function() {
                     data.actions.push(
