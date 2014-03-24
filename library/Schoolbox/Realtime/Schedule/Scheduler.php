@@ -25,17 +25,17 @@ use React\Stomp\Protocol\Frame;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\CompressionException;
-use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\Message\Interceptor;
 use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Notif\Message\MessageFactory;
-use Schoolbox\Notif\Message\MessageInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
+use Schoolbox\Realtime\Schedule\Trigger\CancelTrigger;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerInterface;
 use Schoolbox\Realtime\Verboser;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SplObjectStorage;
 
@@ -131,13 +131,16 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 				$interceptor = new Interceptor(new Connector());
 
 				// subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
-				foreach(UserMapper::getInstance()->findAll()->getColumnValues('id') as $userId) {
-					$subn = '/amq/queue/'.UserQueue::getUserToSortQueueName($userId);
+
+				foreach(UserMapper::getInstance()->findAll() as $user) {
+					/** @var User $user - self hydration */
+					$user = UserMapper::getInstance()->findById($user->getId());
+					$subn = '/amq/queue/'.UserQueue::getUserToSortQueueName($user->getId());
 //					$self->verboser->v("Subscribing to $subn");
-					$client->subscribe($subn, function($frame) use ($self, $interceptor, $userId) {
+					$client->subscribe($subn, function($frame) use ($self, $interceptor, $user) {
 						// this closure is executed every time a message is sent to the client based on the given subscription
 //						$self->verboser->v("Intercepting frame");
-						$interceptor->reroute($userId, $frame);
+						$interceptor->reroute($user, $frame);
 					});
 				}
 			});
@@ -194,11 +197,11 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	/**
 	 * Handles a response from a Worker
 	 *
-	 * @param Trigger $trigger   - the identifier passed as the first argument to Dispatcher::enqueue()
-	 * @param string $command    - the command that was executed by the Worker
-	 * @param array  $data       - the data with which the Worker responded
+	 * @param TriggerInterface $trigger   - the identifier passed as the first argument to Dispatcher::enqueue()
+	 * @param string $command             - the command that was executed by the Worker
+	 * @param array  $data                - the data with which the Worker responded
 	 * @throws ScheduleException
-	 * @return void              - this method does not return any value
+	 * @return void                       - this method does not return any value
 	 */
 	public function handleResponse($trigger, $command, $data) {
 
@@ -228,6 +231,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 		}
 
 		$count = 0;
+		$topicArray = array();
 
 		// iterate across the messages supplied and send them
 		foreach($msgr->generateExternalMessages($this->notif, $trigger->getTimestamp()) as $message) {
@@ -235,9 +239,12 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 			$message->setContext(array('user' => $trigger->getUser()->getId()));
 			$sent = $message->send();
 			$count += $sent ? 1 :0;
+			$topicArray = array_merge($topicArray, $message->getTopics());
 		}
 
-		$this->verboser->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), '<');
+		$topics = implode("\n    - ", $topicArray);
+
+		$this->verboser->v(sprintf("%s message%s broadcast to %s", $count, $count == 1 ? '' : 's', $topics), '<');
 
 	}
 
@@ -256,7 +263,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	/**
 	 * Convenience method for scheduling notifications for multiple triggers.
 	 *
-	 * @param Trigger[] $triggers
+	 * @param TriggerInterface[] $triggers
 	 * @param AckResolver $ackResolver
 	 */
 	public function scheduleNotifications($triggers, $ackResolver = null) {
@@ -270,24 +277,33 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	 * Schedule a notification based on the given trigger.
 	 * Idempotent method.
 	 *
-	 * @param Trigger $trigger
+	 * @param TriggerInterface $trigger
 	 * @param AckResolver $ackResolver
 	 */
 	public function scheduleNotification($trigger, $ackResolver = null) {
 
-		$timestamp = $trigger->getTimestamp();
 		$model = $trigger->getModel();
 		$moduleNotifierClass = get_class($trigger->getModuleNotifier());
 		$triggerLabel = $trigger->getLabel();
 
-		$interval = is_null($timestamp) ? null : $timestamp - time();
-		$v = $this->verboser;
-
-		$dispatch = $this->getDispatcher();
+		// fail-fast for cancelling a scheduled notification
+		if($trigger instanceof CancelTrigger) {
+			if(!$this->unschedule($moduleNotifierClass, $triggerLabel, $model)) {
+				$this->verboser->v("Couldn't unschedule '$triggerLabel' - was it set?", '*');
+				if(!$this->checkResolver($ackResolver)) {
+					$ackResolver->ack();
+					$this->verboser->v("No triggers attached to resolver, ACKnowledging", '-');
+				}
+			}
+			return;
+		}
 
 		if($ackResolver instanceof AckResolver) {
 			$this->attachResolverTrigger($ackResolver, $trigger);
 		}
+
+		$v = $this->verboser;
+		$dispatch = $this->getDispatcher();
 
 		/**
 		 * This closure will be called from the EventLoop at the appointed time, or immediately if the time has elapsed.
@@ -326,14 +342,9 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 				}
 
 			}
-
 		};
 
-		// an explicitly null interval is a request to unset that trigger (regardless of whether or not it exists)
-		if(is_null($interval)) {
-			$this->unschedule($moduleNotifierClass, $triggerLabel, $model);
-			return;
-		}
+		$interval = $trigger->getTimestamp() - time();
 
 		// publish and return immediately if the event is now or in the past
 		if($interval <= ModuleNotifierInterface::IMMEDIATELY) {
@@ -473,7 +484,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 	/**
 	 * @param AckResolver $ackResolver
-	 * @param Trigger $trigger
+	 * @param TriggerInterface $trigger
 	 */
 	protected function attachResolverTrigger($ackResolver, $trigger) {
 		if($this->resolvers->contains($ackResolver)) {
@@ -488,7 +499,8 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	}
 
 	/**
-	 * @param Trigger $trigger
+	 * @param TriggerInterface $trigger
+	 * @return int|null the number of triggers left on the associated resolver, or null if not found
 	 */
 	protected function detachTrigger($trigger) {
 		foreach($this->resolvers as $resolver) {
@@ -509,8 +521,21 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 				else {
 					$this->verboser->v('Resolver still contains ' . $triggers->count() . ' triggers');
 				}
-				return;
+				return $triggers->count();
 			}
 		}
+		return null;
+	}
+
+	/**
+	 * @param AckResolver $ackResolver
+	 * @return int|null
+	 */
+	protected function checkResolver($ackResolver) {
+		if($this->resolvers->contains($ackResolver)) {
+			$triggers = $this->resolvers->offsetGet($ackResolver);
+			return count($triggers);
+		}
+		return null;
 	}
 } 

@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
+use Schoolbox\Realtime\Schedule\Trigger\TriggerInterface;
 use Schoolbox\User;
 
 class TriggerBundle {
@@ -20,7 +21,7 @@ class TriggerBundle {
 	/** @var string */
 	protected $method;
 
-	/** @var Trigger[] */
+	/** @var TriggerInterface[] */
 	protected $triggers;
 
 
@@ -36,7 +37,7 @@ class TriggerBundle {
 
 
 	/**
-	 * @return Trigger[]
+	 * @return TriggerInterface[]
 	 */
 	public function getTriggers() {
 		return $this->triggers;
@@ -67,7 +68,7 @@ class TriggerBundle {
 	 * @param string $label
 	 */
 	public function detach($label) {
-		$this->triggers[$label] = null;
+		$this->detachEach(array($label));
 	}
 
 
@@ -75,8 +76,9 @@ class TriggerBundle {
 	 * @param array $array
 	 */
 	public function detachEach($array) {
-		foreach($array as $label) {
-			$this->triggers[$label] = null;
+		$ts = $this->factory->cancel($array);
+		foreach($ts as $t) {
+			$this->triggers[$t->getLabel()] = $t;
 		}
 	}
 

@@ -12,6 +12,8 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
+use Schoolbox\Realtime\Schedule\Trigger\CancelTrigger;
+use Schoolbox\Realtime\Schedule\Trigger\Trigger;
 use Schoolbox\User;
 
 class TriggerFactory {
@@ -69,6 +71,18 @@ class TriggerFactory {
 			if(!($disregardExpired && $t->getTimestamp() < $now)) {
 				$triggers[] = $t;
 			}
+		}
+		return $triggers;
+	}
+
+	/**
+	 * @param $events
+	 * @return CancelTrigger[]
+	 */
+	public function cancel($events) {
+		$triggers = array();
+		foreach($events as $label) {
+			$triggers[] = new CancelTrigger($this->notifier, $label, $this->model, $this->user);
 		}
 		return $triggers;
 	}
