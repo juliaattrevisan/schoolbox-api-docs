@@ -88,7 +88,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		/** @var Collection|Source[] $sourceCollection */
 		$sourceCollection = $m->findByColumnList(array(
 			'namespace' => $this->namespace->getId(),
-			'key' => $label
+			'key'       => $label
 		));
 
 		$callbacks = array();
@@ -123,10 +123,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	 */
 	public function unserialize($serialized) {
 		// the only thing we serialize is the name of the config class
-		$this->conf = new $serialized();
-		$this->topics = new TopicFactory();
-		$this->instantiateMapper();
-		$this->loadDependencies();
+		$this->__construct(new $serialized());
 	}
 
 	/**
@@ -138,5 +135,15 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		return $this->namespace;
 	}
 
+	/**
+	 * At minimum, this method should accept the label and role for which to build a topic.
+	 * If more parameters are required in an implementation, PHP will allow you to include optional parameters to the
+	 * method signature.
+	 *
+	 * @param string $eventLabel
+	 * @param string $roleType
+	 * @return string
+	 */
+	protected abstract function buildTopic($eventLabel, $roleType);
 
 }
