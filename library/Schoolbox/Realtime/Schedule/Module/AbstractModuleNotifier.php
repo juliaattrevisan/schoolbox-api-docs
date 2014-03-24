@@ -45,6 +45,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		$this->conf = $configLoader;
 		$this->topics = new TopicFactory();
 		$this->instantiateMapper();
+		$this->loadDependencies();
 	}
 
 
@@ -72,12 +73,17 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	 * Return the list of callbacks that are associated with this trigger.
 	 * Uses SQL lookup to determine code paths. Dirty and awful, but at the moment the best way forward.
 	 *
-	 * @param $label
+	 * @param string $label
+	 * @throws ScheduleException
 	 * @return array
 	 */
 	public function retrieveCallbacks($label) {
 		/** @var SourceMapper $m */
 		$m = SourceMapper::getInstance();
+
+		if(!$this->namespace instanceof NS) {
+			throw new ScheduleException("Malformed namespace in ".get_called_class());
+		}
 
 		/** @var Collection|Source[] $sourceCollection */
 		$sourceCollection = $m->findByColumnList(array(
