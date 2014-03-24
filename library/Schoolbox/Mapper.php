@@ -259,7 +259,6 @@ class Mapper {
 		// load on demand, so that we don't get infinite loops
 		if(!$this->notif instanceof LoggerInterface) {
 			$this->setNotifier(new Notif(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
-			var_dump(get_class($this->notif));
 		}
 
 		return $this->notif;
