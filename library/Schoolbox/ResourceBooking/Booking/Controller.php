@@ -135,7 +135,7 @@ class Controller extends Base {
                     $buttons[] = array(
                         'label' => 'Approve',
                         'class' => 'tick',
-                        'url'   => $approveUrl,
+                        'href'  => $approveUrl,
                     );
                 }
                 $rejectUrl = $this->getRouter()->generate(
@@ -146,7 +146,7 @@ class Controller extends Base {
                     $buttons[] = array(
                         'label' => 'Reject',
                         'class' => 'delete',
-                        'url'   => $rejectUrl,
+                        'href'  => $rejectUrl,
                     );
                 }
             }
