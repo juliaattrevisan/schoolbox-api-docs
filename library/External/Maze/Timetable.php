@@ -212,48 +212,20 @@ class External_Maze_Timetable {
 	 * @return array|bool
 	 */
 	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
-//		$vars = array(
-//			'klp_GetTimetable',
-//			array(
-//				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
-//				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-//			)
-//		);
-//
-//		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-//
-//		$allIdents = array();
-//
-//		/* Get all the identifiers
-//		 */
-//		if (is_array($result['result']) && count($result['result'])) {
-//			foreach ($result['result'] as $currentPeriod) {
-//				$allIdents[] = $currentPeriod['class'];
-//			}
-//		}
-//
-//		new \Alaress_Probe($allIdents);
-//		$identifiers = implode(',', $allIdents);
-//
-//		/* Identify all the identifiers
-//		 */
-//		$query = "
-//			SELECT TOP 500 *
-//			FROM STMA
-//			WHERE IDENT IN ($identifiers)
-//		";
 
+		/* Get all the subjects for the current ttperiod
+		 */
 		$query = "
-			SELECT TOP 50 *
+			SELECT *
 			FROM STMA
-			WHERE SKEY = 'ABBORUB'
+			WHERE SKEY = 'ABBOMEG'
 			AND TTPERIOD = '2014S1'
 		";
 
 		$result1 = $this->getDb()->getAll($query);
 
-		////////////////////////////////////
-
+		/* Get all the periods (I think this sql stored proc is somehow not working)
+		 */
 		$vars = array(
 			'klp_GetTimetable',
 			array(
@@ -264,8 +236,8 @@ class External_Maze_Timetable {
 
 		$result2 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		////////////////////////////////////
-
+		/* Get the timetable definition
+		 */
 		$vars = array(
 			'klp_GetTimetableStructure',
 			array(
@@ -276,16 +248,15 @@ class External_Maze_Timetable {
 
 		$result3 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-		/* With our powers combined?
-		 */
-
-		/* For every STMA record, find the STMA.IDENT
+		/* Manual join
+		 * For every STMA record, find the STMA.IDENT
 		 * Find all the GetTimetable.class records that match
 		 * Find all the PeriodNo's that GetTimetable.class belongs in
 		 */
 		$allObjects = array();
 
-		/* Reduce data sets
+		/* Reduce data sets. This generates a list of subjects and the periods
+		 * in which they appear stored as an array
 		 */
 		if (is_array($result1) && count($result1)) {
 			foreach($result1 as $currentStma) {
@@ -303,34 +274,33 @@ class External_Maze_Timetable {
 
 				$allObjects[] = $object;
 			}
+		}
 
-			/* Invert everything
+		/* Invert everything in the timetable definition
+		 */
+		$allStructures = array();
+
+		foreach($result3['result'] as $currentTimetableStructure) {
+
+			/* Clone that guy out
 			 */
-			$allStructures = array();
+			$structure = $currentTimetableStructure;
+			$structure['classes']['subject'] = array();
+			$structure['classes']['periods'] = array();
 
-			foreach($result3['result'] as $currentTimetableStructure) {
-
-				/* Clone that guy out
-				 */
-				$structure = $currentTimetableStructure;
-				$structure['classes'] = array();
-
-				/* Find the subjects which have this period number
-				 */
-				foreach($allObjects as $currentObject) {
-
-					/* This class occurs in $currentTimetableStructure
-					 */
-					if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
-						$structure['classes']['subject'] = $currentObject['stma'];
-						$structure['classes']['period'] = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
-					}
+			/* Find the subjects which have this period number
+			 * This class occurs in $currentTimetableStructure
+			 */
+			foreach($allObjects as $currentObject) {
+				if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
+					$structure['classes']['subject'] = $currentObject['stma'];
+					$structure['classes']['periods'] = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
 				}
-
-				/* Stack it
-				 */
-				$allStructures[] = $structure;
 			}
+
+			/* Stack up
+			 */
+			$allStructures[] = $structure;
 		}
 
 		new \Alaress_Probe($allStructures);
