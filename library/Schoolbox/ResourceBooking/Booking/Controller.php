@@ -74,15 +74,19 @@ class Controller extends Base {
         $event->setCampusCollection(new \Schoolbox\Collection());
 //        $event->setStartDateTime(new \Alaress_Date_Format($this->getRequest()->post['booking-from']));
 //        $event->setEndDateTime(new \Alaress_Date_Format($this->getRequest()->post['booking-to']);
+
         // Currently I can't setStartDateTime() and have that propogate to
         // startDate and startTime.
-        $date = new \DateTime('tomorrow');
-        $event->setStartDate($date->format('Y-m-d'));
-        $event->setStartTime('00:00:00');
-        $event->setEndDate($date->format('Y-m-d'));
-        $event->setEndTime('01:00:00');
+        // Event doesn't currently take Alaress_Date_Format objects either.
+        $startDate = new \Alaress_Date_Format($this->getRequest()->post['start-date'], 'd/m/y');
+        $endDate   = new \Alaress_Date_Format($this->getRequest()->post['end-date'], 'd/m/y');
+        $event->setStartDate($startDate->getDatabaseDate());
+        $event->setStartTime($this->getRequest()->post['start-time']);
+        $event->setEndDate($endDate->getDatabaseDate());
+        $event->setEndTime($this->getRequest()->post['end-time']);
         $event->setPublishDateTime(new \Alaress_Date_Format(new \DateTime()));
-        $event->setNote("Booking for ".$resource->getName());
+
+        $event->setNote("Booking: ".$resource->getName());
         $event->setDetail($this->getRequest()->post['notes']);
         $this->getEventMapper()->save($event);
         $booking = new Model();
