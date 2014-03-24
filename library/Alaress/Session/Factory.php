@@ -2,8 +2,8 @@
 /**
  * A factory method which builds the session handler.
  *
- * Implemented because PHP 5.3 doesn't support session_status, which Aura's
- * handler does.
+ * Implemented because Aura's segment handler doesn't retrieve session fields
+ * without a namespace, and that is where the user session is currently stored.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -11,7 +11,7 @@
  */
 
 namespace Alaress\Session;
-use Aura\Session;
+use Aura\Session as SessionLibrary;
 
 class Factory {
 
@@ -32,11 +32,11 @@ class Factory {
     /**
      * Creates session handler.
      *
-     * @return Session\Session
+     * @return Session
      */
     public function build() {
         $segmentFactory   = new SegmentFactory();
-        $csrfTokenFactory = new Session\CsrfTokenFactory(new Session\Randval(new Session\Phpfunc()));
-        return new Session\Session($segmentFactory, $csrfTokenFactory, $this->cookies);
+        $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(new SessionLibrary\Randval(new SessionLibrary\Phpfunc()));
+        return new Session($segmentFactory, $csrfTokenFactory, $this->cookies);
     }
 }

@@ -12,7 +12,7 @@ namespace Alaress\Web\Controller;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
-use Aura\Session\Session;
+use Alaress\Session\Session;
 use Schoolbox\User;
 
 abstract class Base {

@@ -25,9 +25,14 @@ $di->set(
 $di->set(
     'session',
     $di->lazy(
-        function() {
+        function() use($di) {
             $factory = new Alaress\Session\Factory($_COOKIE);
-            return $factory->build();
+            $session = $factory->build();
+            $session
+                ->setConfig($di->get('config'))
+                ->setRequestTime($_SERVER['REQUEST_TIME'])
+            ;
+            return $session;
         }
     )
 );
@@ -66,9 +71,15 @@ $di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
 $di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
 $di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
 
-// Template engine
+// Template engine and functions
 $di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
 $di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
+
+$di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setRouter']     = $di->lazyGet('router');
+$di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setAuthorizer'] = $di->lazyGet('authorizer');
+$di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setSession']    = $di->lazyGet('session');
+$di->set('templateEngine:isRouteAuthorized', $di->lazyNew('Alaress\\Twig\\Method\\IsRouteAuthorized'));
+
 $di->set(
     'templateEngine',
     $di->lazy(
