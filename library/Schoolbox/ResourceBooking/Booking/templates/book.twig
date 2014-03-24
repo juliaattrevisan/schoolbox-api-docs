@@ -1,6 +1,17 @@
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+
+<style type="text/css">
+    .fc .fc-event.booking.approved .fc-event-inner:before {
+        content: '✓';
+    }
+    .fc .fc-event.booking.rejected {
+        font-style: italic;
+        text-decoration: line-through;
+    }
+</style>
+
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 
