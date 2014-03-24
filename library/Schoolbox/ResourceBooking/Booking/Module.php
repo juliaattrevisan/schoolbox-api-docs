@@ -23,10 +23,16 @@ class Module extends BaseModule {
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath) {
+        // All of these URLs relate to the resource ID, not a booking ID.
+        // Therefore, they should probably be moved to the item module.
         $router->addGet('resourceBooking.book', $basePath.'/bookItem/{id}');
         $router->addPost('resourceBooking.createBooking', $basePath.'/bookItem/{id}')
                ->addValues(array('action' => 'createBooking'));
         $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
+
+        // Approving or rejecting a single booking
+        $router->add('resourceBooking.approve', $basePath.'/{id}/approve');
+        $router->add('resourceBooking.reject',  $basePath.'/{id}/reject');
     }
 
     /**

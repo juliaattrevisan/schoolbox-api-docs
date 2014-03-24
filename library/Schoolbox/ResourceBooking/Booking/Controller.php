@@ -199,6 +199,42 @@ class Controller extends Base {
     }
 
     /**
+     * Marks a booking as approved.
+     *
+     * @param int $id The ID of the booking to approve.
+     */
+    public function approve($id) {
+        $booking = $this->getBookingMapper()->findById($id);
+        $booking->setStatus(Status\Model::STATUS_APPROVED);
+        $this->getBookingMapper()->save($booking);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate('resourceBooking.book', array('id' => $id))
+        );
+        // HTML: redirect somewhere, JSON: output a response.
+        // Showing HTML validation errors: use session flash variables to store.
+//        $this->buildFormResponse(
+//            array(
+//                'location' => $this->getRouter()->generate('resourceBooking.book', array('id' => $id)),
+//                'errors'   => array(),
+//            )
+//        );
+    }
+
+    /**
+     * Marks a booking as rejected.
+     *
+     * @param int $id The ID of the booking to reject.
+     */
+    public function reject($id) {
+        $booking = $this->getBookingMapper()->findById($id);
+        $booking->setStatus(Status\Model::STATUS_REJECTED);
+        $this->getBookingMapper()->save($booking);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate('resourceBooking.book', array('id' => $id))
+        );
+    }
+
+    /**
      * @param  Mapper $bookingMapper
      * @return $this
      */
