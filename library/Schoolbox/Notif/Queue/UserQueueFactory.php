@@ -152,9 +152,7 @@ class UserQueueFactory {
 			'user' => array(
 				// *.notify.user.{id}
 				'id' => $user->getId()
-			),
-			// everyone subscribes to news...right...?
-			'news' => array('#')
+			)
 		);
 
 		$roleType = $user->getRole()->getType();
