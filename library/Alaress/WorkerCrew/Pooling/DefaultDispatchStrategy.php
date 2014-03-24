@@ -275,8 +275,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	 * @return void
 	 */
 	public function handleException($exception) {
-		// TODO: Implement handleException() method.
-		echo $exception->getMessage();
+		echo '[!] ' . $exception->getMessage() . "\n";
 	}
 
 
