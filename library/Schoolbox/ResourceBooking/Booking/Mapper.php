@@ -111,13 +111,16 @@ class Mapper extends BaseMapper {
     /**
      * Retrieves all bookings for the given resource.
      *
-     * @param int $resourceId
-     * @param int $fromTimestamp
-     * @param int $toTimestamp
+     * @param int   $resourceId
+     * @param int   $fromTimestamp
+     * @param int   $toTimestamp
+     * @param array $statusIds     Status IDs of events to fetch. By default,
+     *                             gets Status\Model::STATUS_PENDING and
+     *                             Status\Model::STATUS_APPROVED only.
      *
      * @return Collection
      */
-    public function findForResource($resourceId, $fromTimestamp, $toTimestamp) {
+    public function findForResource($resourceId, $fromTimestamp, $toTimestamp, $statusIds = array()) {
         // If using Aura:sql_query
 //        $this->queryFactory->newSelect()
 //            ->cols($this->getColumnArray('x'))
@@ -133,6 +136,10 @@ class Mapper extends BaseMapper {
 //            ->andWhere('y.endTime   >= :toTimestamp')
 //        ;
 
+        if (empty($statusIds)) {
+            $statusIds = array(Status\Model::STATUS_PENDING, Status\Model::STATUS_APPROVED);
+        }
+
         // Just search on date for now.
         // Events: any event whose start <= endWindow, or end >= startWindow
         $params = array(
@@ -140,6 +147,7 @@ class Mapper extends BaseMapper {
             'startWindow' => date('Y-m-d', $fromTimestamp),
             'endWindow'   => date('Y-m-d', $toTimestamp),
         );
+        $params = array_merge($params, $this->getArrayParameters($statusIds, 'status'));
         $query = "
             SELECT
                 {$this->getColumnString('b')},
@@ -156,6 +164,7 @@ class Mapper extends BaseMapper {
             LEFT JOIN {$this->getJoinSql('reviewer',     'b', 'r')}
             WHERE b.resource_id = :resource
             AND NOT (e.endDate < :startWindow OR e.startDate > :endWindow)
+            AND s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
