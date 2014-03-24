@@ -58,6 +58,7 @@ $di->setters['Alaress\\Web\\Controller\\Base'] = array(
     ),
     'setSession' => $di->lazyGet('session'),
     'setRouter' => $di->lazyGet('router'),
+    'setAuthorizer' => $di->lazyGet('authorizer'),
 );
 
 // inject web params (yep, even Sitepage!)

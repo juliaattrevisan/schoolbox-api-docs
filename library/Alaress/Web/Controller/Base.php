@@ -13,6 +13,7 @@ use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
 use Alaress\Session\Session;
+use Alaress\Authorizer\Authorizer;
 use Schoolbox\User;
 
 abstract class Base {
@@ -35,6 +36,11 @@ abstract class Base {
      * @var Session
      */
     protected $session;
+
+    /**
+     * @var Authorizer
+     */
+    protected $authorizer;
 
     /**
      * @param  Request $request
@@ -98,6 +104,22 @@ abstract class Base {
      */
     public function getSession() {
         return $this->session;
+    }
+
+    /**
+     * @param  Authorizer $authorizer
+     * @return $this
+     */
+    public function setAuthorizer($authorizer) {
+        $this->authorizer = $authorizer;
+        return $this;
+    }
+
+    /**
+     * @return Authorizer
+     */
+    public function getAuthorizer() {
+        return $this->authorizer;
     }
 
     /**
