@@ -56,4 +56,26 @@ class Authorizer {
         }
     }
 
+    /**
+     * Quick boolean check for whether a path is authorized for a user.
+     *
+     * This method doesn't get any information about why the path isn't
+     * authorized - if you need that use authorizePathForUser() and catch the
+     * exception it throws.
+     *
+     * @see    $this->authorizePathForUser()
+     * @param  string $path
+     * @param  User   $user
+     * @return bool
+     */
+    public function isPathAuthorizedForUser($path, User $user = null) {
+        try {
+            $this->authorizePathForUser($path, $user);
+        }
+        catch (\Alaress\Authorizer\Failure\Base $e) {
+            return false;
+        }
+        return true;
+    }
+
 }
