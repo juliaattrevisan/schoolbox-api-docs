@@ -37,13 +37,6 @@ abstract class Base {
     protected $session;
 
     /**
-     * The currently logged in user.
-     *
-     * @var User
-     */
-    protected $user;
-
-    /**
      * @param  Request $request
      * @return $this
      */
@@ -108,19 +101,12 @@ abstract class Base {
     }
 
     /**
-     * @param  User  $user
-     * @return $this
-     */
-    public function setUser($user) {
-        $this->user = $user;
-        return $this;
-    }
-
-    /**
+     * Gets the current user out of the session.
+     *
      * @return User
      */
     public function getUser() {
-        return $this->user;
+        return $this->getSession()->getUser();
     }
 
 }

@@ -27,20 +27,10 @@ if ($route instanceof Aura\Router\Route) {
         // TODO Inject user getter into authorizer, and use it to determine:
         // * if user is there
         // * if user session is timed out or not
-        /** @var \Aura\Session\Session $session */
+        /** @var \Alaress\Session\Session $session */
         /** @var \Schoolbox\User $user */
-        $session       = $di->get('session');
-        $authSession   = $session->newSegment(null);
-        $lastTime      = $authSession->lasttime;
-        $sessionLength = $di->get('config')->get('session_length');
-
-        // Session timed out: don't get the user.
-        if ($lastTime + $sessionLength < time()) {
-            $user = new Schoolbox\User();
-        }
-        else {
-            $user = $authSession->user;
-        }
+        $session = $di->get('session');
+        $user    = $session->getUser();
 
         /** @var \Alaress\Authorizer\Authorizer $authorizer */
         $authorizer = $di->get('authorizer');
@@ -50,7 +40,6 @@ if ($route instanceof Aura\Router\Route) {
 
         // Call the controller method.
         // Ensure that the parameters match up with the names used.
-        $controller->setUser($user);
         $method = new ReflectionMethod($controller, $route->params['action']);
         $args   = array();
         foreach ($method->getParameters() as $parameter) {
