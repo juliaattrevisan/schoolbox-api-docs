@@ -129,9 +129,10 @@ $(document).ready(function() {
         x: false
     }).init()
 
-    // Event filter
-    $('#calendar-controls').on('click', 'a#applyFilters', function() {
-        c.calendar.fullCalendar('refetchEvents');
+    // Event filter - reload events when the filter button is pressed.
+    $('#calendar-controls').on('click', 'a#applyFilters', function(event) {
+        event.preventDefault()
+        c.dom.fullCalendar('refetchEvents')
     })
 })
 </script>
