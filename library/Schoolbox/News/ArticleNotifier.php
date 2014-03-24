@@ -136,7 +136,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		}
 
 		// tell everyone that article $articleId has been posted
-		$msgr->bindBroadcast("news.article.$articleId.posted", Logger::INFO, $msg,
+		$msgr->broadcastToRoleType($roleType, $msg, "news.article.$articleId.posted", Logger::INFO,
 			array(
 				'user'     => array($authorName, "/search/user/$authorId"),
 				'title'    => array($heading,    "/news/item/$articleId"),

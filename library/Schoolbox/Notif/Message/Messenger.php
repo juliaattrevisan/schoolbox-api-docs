@@ -37,9 +37,9 @@ class Messenger {
 	 * @param array $params         - the params to be bound to this message instance
 	 * @param array $context        - any additional context to be supplied
 	 */
-	public function bindTargeted($targets, $topics, $severity, $msg, $params = array(), $context = array()) {
-		$this->bind($msg, $severity, $topics, $targets, $params, $context);
-	}
+//	public function bindTargeted($targets, $topics, $severity, $msg, $params = array(), $context = array()) {
+//		$this->bind($msg, $severity, $topics, $targets, $params, $context);
+//	}
 
 	/**
 	 * Bind a message, ready for transmission to a user's queues.
@@ -51,9 +51,9 @@ class Messenger {
 	 * @param array $filter         - an optional filter for who is to receive this message
 	 * @throws \Schoolbox\Notif\NotifException
 	 */
-	public function bindBroadcast($topics, $severity, $msg, $params = array(), $filter = array()) {
-		$this->bind($msg, $severity, $topics, array(), $params, $filter);
-	}
+//	public function bindBroadcast($topics, $severity, $msg, $params = array(), $filter = array()) {
+//		$this->bind($msg, $severity, $topics, array(), $params, $filter);
+//	}
 
 	/**
 	 * @param Message $message
@@ -95,6 +95,42 @@ class Messenger {
 		$this->splStore->attach($message, $instances);
 	}
 
+
+	public function broadcastToCategory($catId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "category.$catId", $params, $filter);
+	}
+
+	public function broadcastToCampus($campusId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "campus.$campusId", $params, $filter);
+	}
+
+	public function broadcastToRole($roleId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "role.$roleId", $params, $filter);
+	}
+
+	public function broadcastToRoleType($roleType, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "roletype.$roleType", $params, $filter);
+	}
+
+	public function broadcastToHouse($houseId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "house.$houseId", $params, $filter);
+	}
+
+	public function broadcastToResidentialHouse($resHouseId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "reshouse.$resHouseId", $params, $filter);
+	}
+
+	public function broadcastToSuperusers($message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "superuser", $params, $filter);
+	}
+
+	public function targetToParent($studentId, $message, $topic, $severity, $params = array()) {
+		$this->bind($message, $severity, $topic, "parent.$studentId", $params);
+	}
+
+	public function targetToUser($userId, $message, $topic, $severity, $params = array()) {
+		$this->bind($message, $severity, $topic, "user.$userId", $params);
+	}
 
 	/**
 	 * Whether or not this collection currently contains messages

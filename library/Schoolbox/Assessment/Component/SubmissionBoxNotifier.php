@@ -264,9 +264,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		$msgr = new Messenger();
 
-		$topic = $this->buildTopic('open', 'student', $catId, $boxId);
-
-		$msgr->bindBroadcast($topic, Logger::NOTICE, $msg, $params, array('roletype' => Role::STUDENT));
+		$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.open", Logger::NOTICE, $params,
+			array('roletype' => Role::STUDENT)
+		);
 
 		return $msgr;
 	}
@@ -316,9 +316,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		// renamed
 		if(isset($diff['name'])) {
 
-			// tell everyone in this category
-			$topic = $this->buildTopic('renamed', 'student', $catId, $boxId);
-
 			// parameterised text, link and icon
 			$msg = new Message(":author renamed :oldname to :newname in :catname", $icon, $href);
 
@@ -330,9 +327,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 				'catname' => array($cat->getName(), "/homepage/$catId")
 			);
 
-			// send internally to all concerned
-			$msgr->bindBroadcast(
-				$this->buildTopic('renamed', Role::STUDENT, $catId, $boxId), Logger::NOTICE, $msg, $params,
+			$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.renamed", Logger::NOTICE, $params,
 				array('roletype' => Role::STUDENT)
 			);
 
@@ -353,10 +348,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 			$msg = new Message(":author $verb :boxname to :date in :catname", $icon, $href);
 
-			$topic = $this->buildTopic('datechanged', Role::STUDENT, $catId, $boxId);
-
-			$msgr->bindBroadcast($topic, Logger::WARNING, $msg,
-				array(
+			$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.datechanged", Logger::NOTICE, array(
 					'author' => array($authorName, "/search/user/$authorId"),
 					'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
 					'date' => date($dateformat, $relative->getUnixTimestamp()),
@@ -383,13 +375,15 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 			$msg = new Message($m, $icon, $href);
 
-			// send this to students only, other staff don't need to see it
-			$topic = $this->buildTopic('updated', 'student', $catId, $boxId);
-
-			$msgr->bindBroadcast($topic, Logger::NOTICE, $msg, array(
-				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-				'catname' => array($cat->getName(), "/homepage/$catId")
-			), array('roletype' => Role::STUDENT));
+			$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.updated", Logger::NOTICE,
+				array(
+					'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
+					'catname' => array($cat->getName(), "/homepage/$catId")
+				),
+				array(
+					'roletype' => Role::STUDENT
+				)
+			);
 
 			unset($diff['acceptOnline']);
 		}
@@ -399,13 +393,16 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		if(count($diff) && !$msgr->hasMessages()) {
 			$msg = new Message(":author updated :boxname in :catname", $icon, $href);
 
-			$topic = $this->buildTopic('updated', Role::STUDENT, $catId, $boxId);
-
-			$msgr->bindBroadcast($topic, Logger::NOTICE, $msg, array(
-				'author' => array($authorName, "/search/user/$authorId"),
-				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-				'catname' => array($cat->getName(), "/homepage/$catId")
-			), array('roletype' => Role::STUDENT));
+			$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.updated", Logger::NOTICE,
+				array(
+					'author' => array($authorName, "/search/user/$authorId"),
+					'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
+					'catname' => array($cat->getName(), "/homepage/$catId")
+				),
+				array(
+					'roletype' => Role::STUDENT
+				)
+			);
 		}
 
 		return $msgr;
@@ -443,18 +440,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		$unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
-		$targets = array();
 		foreach($unsubmittedStudents->getColumnValues('id') as $id) {
-			$targets[] = "user.$id";
+			$msgr->targetToUser($id, $msg, "duework.$boxId.upcoming", Logger::WARNING, array(
+				'boxname' => array($boxName, $href),
+				'catname' => array($catName, "/homepage/$catId"),
+			));
 		}
-
-		$topic = $this->buildTopic('upcoming', Role::STUDENT, $catId, $boxId);
-
-		$msgr->bindTargeted($targets, $topic, Logger::WARNING, $msg, array(
-			'boxname' => array($boxName, $href),
-			'catname' => array($catName, "/homepage/$catId"),
-		));
-
 		return $msgr;
 	}
 
@@ -493,7 +484,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			$childExtId = $student->getExternalId();
 
 			// target the parents of this particular student
-			$topic = $this->buildTopic('upcoming', Role::PARENT, $catId, $boxId);
+//			$topic = $this->buildTopic('upcoming', Role::PARENT, $catId, $boxId);
 
 			$icon = "/portrait?userId=$childExtId&size=square32";
 			$href = "/submission/submissionHistory/$boxId/$childId";
@@ -505,8 +496,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 				? $boxName
 				: array($boxName, "/submission/submissionHistory/$boxId");
 
-			// bind this user's message into the collection
-			$msgr->bindTargeted("parent.$childId", $topic, Logger::WARNING, $msg, array(
+			$msgr->targetToParent($childId, $msg, "duework.$boxId.upcoming", Logger::WARNING, array(
 				'child'     => array($childName, "/search/user/$childId"),
 				'boxname'   => $boxdata,
 				'catname'   => array($catName, "/homepage/$catId")
@@ -555,8 +545,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		$unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
 		foreach($unsubmittedStudents as $user) {
-
-			$msgr->bindTargeted("user.{$user->getId()}", $topic, Logger::ERROR, $msg, array(
+			$msgr->targetToUser($user->getId(), $msg, "duework.$boxId.overdue", Logger::ERROR, array(
 				'boxname' => array($boxName, $href),
 				'catname' => array($catName, "/homepage/$catId"),
 			));
@@ -603,9 +592,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			$childName = $student->getFirstname();
 			$childId = $student->getId();
 
-			$topic = $this->buildTopic('upcoming', Role::PARENT, $catId, $boxId);
-
-			$msgr->bindTargeted("parent.$childId", $topic, Logger::ERROR, $msg, array(
+			$msgr->targetToParent($childId, $msg, "duework.$boxId.overdue", Logger::ERROR, array(
 				'child'     => array($childName, "/search/user/$childId"),
 				'boxname'   => array($boxName, "/submission/submissionHistory/$boxId"),
 				'catname'   => array($catName, "/homepage/$catId")
@@ -646,7 +633,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		$msg = new Message(":boxname has closed and :number did not submit work", $icon, $href);
 
-		$msgr->bindTargeted("user.{$user->getId()}", "duework.$boxId.closed", Logger::ERROR, $msg, array(
+		$msgr->targetToUser($user->getId(), $msg, "duework.$boxId.closed", Logger::ERROR, array(
 			'boxname' => array($submissionBox->getName(), "/submission/viewSubmission/$boxId"),
 			'number'  => sprintf("%s student%s", $totalUnsubmitted, $totalUnsubmitted == 1 ? '' : 's')
 		));
