@@ -72,6 +72,8 @@ class Messenger {
 		// cast string to array if required
 		$topics = (array)$topics;
 		$targets = (array)$targets;
+		$context = (array)$context;
+
 		$paramHash = sha1(json_encode($params));
 
 		// insert the message object if it's not already in our collection
