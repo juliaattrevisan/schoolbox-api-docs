@@ -10,11 +10,16 @@
 namespace Schoolbox\Notif\Message;
 
 
+use Schoolbox\Notif\Message\External\BroadcastMessage;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
 use SplObjectStorage;
 
 class Messenger {
+
+	const TYPE_BROADCAST = 'broadcast';
+	const TYPE_TARGETED  = 'targeted';
 
 	/** @var SplObjectStorage */
 	protected $splStore;
@@ -24,6 +29,17 @@ class Messenger {
 		$this->splStore = new SplObjectStorage();
 	}
 
+	/**
+	 * @param string|array $targets
+	 * @param string|array $topics
+	 * @param int $severity
+	 * @param Message $msg
+	 * @param array $params
+	 * @param array $context
+	 */
+	public function bindTargeted($targets, $topics, $severity, $msg, $params = array(), $context = array()) {
+		$this->bind($msg, $severity, $topics, $targets, $params, $context);
+	}
 
 	/**
 	 * Bind a message, ready for transmission to a user's queues.
@@ -32,34 +48,51 @@ class Messenger {
 	 * @param int $severity
 	 * @param Message $msg
 	 * @param array $params
+	 * @param array $context
 	 * @throws \Schoolbox\Notif\NotifException
 	 */
-	public function bind($topics, $severity, $msg, $params = array()) {
-		if(count(array_diff(array_keys($params), $msg->getTokenList()))) {
+	public function bindBroadcast($topics, $severity, $msg, $params = array(), $context = array()) {
+		$this->bind($msg, $severity, $topics, array(), $params, $context);
+	}
+
+	/**
+	 * @param Message $message
+	 * @param int $severity
+	 * @param array $topics
+	 * @param array $targets
+	 * @param array $params
+	 * @param array $context
+	 * @throws \Schoolbox\Notif\NotifException
+	 */
+	protected function bind($message, $severity, $topics = array(), $targets = array(), $params = array(), $context = array()) {
+		if(count(array_diff(array_keys($params), $message->getTokenList()))) {
 			throw new NotifException("Parameters supplied must exactly match the :tokens in the message string.");
 		}
 
 		// cast string to array if required
 		$topics = (array)$topics;
+		$targets = (array)$targets;
 		$paramHash = sha1(json_encode($params));
 
 		// insert the message object if it's not already in our collection
-		if(!$this->splStore->contains($msg)) {
-			$this->splStore->attach($msg, array());
+		if(!$this->splStore->contains($message)) {
+			$this->splStore->attach($message, array());
 		}
 
 		// retrieve the instances that have already been set
-		$instances = $this->splStore->offsetGet($msg);
+		$instances = $this->splStore->offsetGet($message);
 
 		// add this instance
 		$instances[$paramHash] = array(
 			'severity' => $severity,
 			'params'   => $params,
-			'topics'   => $topics
+			'topics'   => $topics,
+			'context'  => $context,
+			'targets'  => empty($targets) ? false : $targets
 		);
 
 		// reattach the message and its extended list of instances
-		$this->splStore->attach($msg, $instances);
+		$this->splStore->attach($message, $instances);
 	}
 
 
@@ -85,19 +118,26 @@ class Messenger {
 		}
 
 		// array that we'll be returning
-		$exts = array();
+		$externalMessages = array();
 
 		foreach($this->splStore as $msg) {
 			/** @var Message $msg */
 			$instances = $this->splStore->offsetGet($msg);
 			foreach($instances as $instance) {
-				$exts[] = new External(
-					$notif, $instance['topics'], $instance['severity'], $timestamp, $msg, $instance['params']
-				);
+
+				if($instance['targets'] === false) {
+					$e = new BroadcastMessage($notif, $instance['topics'], $instance['severity'], $timestamp, $msg, $instance['params']);
+				}
+				else {
+					$e = new TargetedMessage($notif, $instance['topics'], $instance['severity'], $timestamp, $msg, $instance['params']);
+					$e->setTargets($instance['targets']);
+				}
+				$e->setContext($instance['context']);
+				$externalMessages[] = $e;
 			}
 		}
 
-		return $exts;
+		return $externalMessages;
 	}
 
 } 
