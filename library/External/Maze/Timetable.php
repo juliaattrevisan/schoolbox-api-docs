@@ -317,7 +317,8 @@ class External_Maze_Timetable {
 
 						/* Separate subject identifier
 						 */
-						$class['subject'] = $currentObject['stma']['MKEY'];
+						$class['subject']['code'] = $currentObject['stma']['MKEY'];
+						$class['subject']['name'] = $this->getSubjectName($currentObject['stma']['MKEY']);
 
 						/* Stack up
 						 */
@@ -347,7 +348,7 @@ class External_Maze_Timetable {
 	 * @param $campusId
 	 * @return array|bool
 	 */
-	public function getFullTimetable ($externalUserId, $userId, $campusId) {
+	public function getFullTimetable($externalUserId, $userId, $campusId) {
 	}
 
 	/**
@@ -357,7 +358,7 @@ class External_Maze_Timetable {
 	 * @param $dayNumber
 	 * @return bool
 	 */
-	public function getDaySubjects ($externalUserId, $dayNumber) {
+	public function getDaySubjects($externalUserId, $dayNumber) {
 	}
 
 	/**
@@ -368,7 +369,7 @@ class External_Maze_Timetable {
 	 * @param $dayNumber
 	 * @return int|bool
 	 */
-	public function getSubjectPeriod ($classCode, $dayNumber) {
+	public function getSubjectPeriod($classCode, $dayNumber) {
 	}
 
 	/**
