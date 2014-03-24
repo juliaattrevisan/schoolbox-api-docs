@@ -13,7 +13,7 @@ namespace Schoolbox\Notif\Message;
 use DateTime;
 use Schoolbox\Notif\Notif;
 
-class External implements MessageInterface {
+abstract class External implements MessageInterface {
 
 	/** @var Message  */
 	protected $body;
@@ -30,6 +30,8 @@ class External implements MessageInterface {
 	protected $severity;
 	/** @var array */
 	protected $context = array();
+
+	protected $topicPrepend = 'notify.';
 
 	/**
 	 * @param Notif $notif
@@ -59,7 +61,7 @@ class External implements MessageInterface {
 
 		foreach($this->topics as $topic) {
 			$self = serialize($this);
-			$this->notif->setTopic($topic)->log($this->severity, $self, $this->context);
+			$this->notif->setTopic($this->topicPrepend . $topic)->log($this->severity, $self, $this->context);
 		}
 		return true;
 
@@ -147,5 +149,24 @@ class External implements MessageInterface {
 		$this->context = array_merge($this->context, $context);
 	}
 
+	/**
+	 * Return the array of topics on which this message will be sent
+	 *
+	 * @return array
+	 */
+	public function getTopics() {
+		return $this->topics;
+	}
+
+	/**
+	 * Don't forget the trailing dot!
+	 *
+	 * @param string $string
+	 * @return self
+	 */
+	public function setTopicPrepend($string) {
+		$this->topicPrepend = $string;
+		return $this;
+	}
 
 }
