@@ -679,10 +679,12 @@ class External_Maze_User implements External_UserInterface {
 	 * @return Bool|String
 	 */
 	public function getPortrait($externalUserId) {
+		$userMapper = new \Schoolbox\UserMapper();
+		$user = $userMapper->findByColumn('synergy_id', $externalUserId);
 
 		/* Students and staff store their pics in different places
 		 */
-		if ($this->getGroup()->isStudent($externalUserId)) {
+		if ($this->getGroup()->isStudent($user->first()->getId())) {
 			$query = "
 				SELECT
 					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
@@ -690,7 +692,7 @@ class External_Maze_User implements External_UserInterface {
 				WHERE ST.STKEY = '{$externalUserId}'
 			";
 		}
-		else if ($this->getGroup()->isStaff($externalUserId)) {
+		else if ($this->getGroup()->isStaff($user->first()->getId())) {
 			$query = "
 				SELECT
 					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
@@ -698,7 +700,6 @@ class External_Maze_User implements External_UserInterface {
 				WHERE SF.SFKEY = '{$externalUserId}'
 			";
 		}
-
 
 		if ($photo = $this->getDb()->getRow($query)) {
 			$photoPath = Config::get('portrait_dir') . '/' . escapeshellcmd($externalUserId) . '.jpg';
@@ -715,7 +716,7 @@ class External_Maze_User implements External_UserInterface {
 			$modifiedTime = strtotime($photo['ModifiedDate']);
 
 			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-				if ($this->getGroup()->isStudent($externalUserId) || 1) {
+				if ($this->getGroup()->isStudent($user->first()->getId())) {
 					$query = "
 						SELECT
 							STUDENT_PIC AS Photo
@@ -723,7 +724,7 @@ class External_Maze_User implements External_UserInterface {
 						WHERE ST.STKEY = '{$externalUserId}'
 					";
 				}
-				else if ($this->getGroup()->isStaff($externalUserId)) {
+				else if ($this->getGroup()->isStaff($user->first()->getId())) {
 					$query = "
 						SELECT
 							STAFF_PIC AS Photo
