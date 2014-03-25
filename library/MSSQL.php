@@ -14,9 +14,7 @@ use Alaress\DebugBar\DataCollector\MssqlDatabaseCollector;
 class MSSQL {
 
 	/**
-	 * This database's default encoding.
-	 *
-	 * Referenced when converting strings from database to UTF-8.
+	 * This used to store this database's default encoding, now does nothing.
 	 *
 	 * @deprecated use ini setting mssql.encoding instead
 	 *
@@ -25,7 +23,8 @@ class MSSQL {
 	protected $encoding = 'ISO-8859-1';
 
 	/**
-	 * Is encoding converted or not for calls to getAll/Row/One?
+	 * This used to control whether encoding was converted or not for calls to
+	 * getAll/Row/One, now does nothing.
 	 *
 	 * @deprecated use ini setting mssql.encoding instead
 	 *
