@@ -31,12 +31,20 @@ class External_Maze_Timetable {
 	private $campusMapper = null;
 
 	/**
+	 * An instance of Group
+	 *
+	 * @var Group
+	 */
+	private $groupHandler = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->setDb(MSSQL::getInstance());
 		$this->setHelper(new External_Maze_Helper());
 		$this->setCampusMapper(new \Schoolbox\CampusMapper());
+		$this->setGroupHandler(new Group());
 	}
 
 	/**
@@ -163,10 +171,21 @@ class External_Maze_Timetable {
 	 * @return array|bool
 	 */
 	public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber) {
-		return $this->getStaffTimetable($externalUserId, $dayNumber);
-		return $this->getStudentTimetable($externalUserId, $dayNumber);
+		if ($this->getGroupHandler()->isStudent($userId)) {
+			return $this->getStudentTimetable($externalUserId, $dayNumber);
+		}
+		else if ($this->getGroupHandler()->isStaff($userId)) {
+			return $this->getStaffTimetable($externalUserId, $dayNumber);
+		}
 	}
 
+	/**
+	 * Spawn a staff timetbale for a particular user and day number
+	 *
+	 * @param $externalUserId
+	 * @param $dayNumber
+	 * @return array
+	 */
 	public function getStaffTimetable($externalUserId, $dayNumber) {
 
 		/* Get staff member's KLPID
@@ -434,8 +453,6 @@ class External_Maze_Timetable {
 			$allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $day);
 		}
 
-//		new \Alaress_Probe($allDayTimetables);
-
 		/* Assemble into a 2D array
 		 * Each row represents a Period across each Day in the cycle
 		 *
@@ -468,7 +485,6 @@ class External_Maze_Timetable {
 
 		}
 
-//		new \Alaress_Probe($timetable);
 		return $timetable;
 	}
 
@@ -566,9 +582,27 @@ class External_Maze_Timetable {
 	/**
 	 * Get campus mapper
 	 *
-	 * @return null
+	 * @return \Schoolbox\CampusMapper
 	 */
 	private function getCampusMapper() {
 		return $this->campusMapper;
 	}
-} 
+
+	/**
+	 * Set group handler
+	 *
+	 * @param \Group $groupHandler
+	 */
+	private function setGroupHandler($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * Get group handler
+	 *
+	 * @return \Group
+	 */
+	private function getGroupHandler() {
+		return $this->groupHandler;
+	}
+}
