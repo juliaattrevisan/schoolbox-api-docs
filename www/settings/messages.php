@@ -19,7 +19,8 @@ $stmt = Database::getInstance()->prepare("
 	SELECT  ns.slug, ns.label, src.key, src.description, perm.min_level, perm.max_level,
 			perm.default_level, reroute.outgoing_level
 	FROM msg_source src
-	LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id
+	LEFT JOIN groups g ON g.`group_type` = src.`role_type`
+	LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND g.`id` = perm.`role_id`
 	LEFT JOIN msg_namespace ns ON ns.id = src.namespace
 	LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
 	WHERE perm.role_id = :role_id
