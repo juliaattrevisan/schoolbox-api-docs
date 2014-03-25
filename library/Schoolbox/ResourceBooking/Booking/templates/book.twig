@@ -156,7 +156,8 @@ $(document).ready(function() {
                     eventData.startTime = $.fullCalendar.formatDate(date, 'HH:mm')
                 }
                 c.bubble.display('create', eventData, jsEvent, this)
-            }
+            },
+            eventStartEditable: false
         },
         x: false
     }).init()
