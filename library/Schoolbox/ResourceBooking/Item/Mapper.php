@@ -31,6 +31,10 @@ class Mapper extends BaseMapper {
                 'property' => 'category',
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'category',
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\ResourceBooking\\Category\\Mapper',
+                    'other_key' => 'id',
+                )
             )
         );
         $this->hasMap(
@@ -39,6 +43,10 @@ class Mapper extends BaseMapper {
                 'property' => 'image',
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'image',
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\StorageMapper',
+                    'other_key' => 'id',
+                )
             )
         );
         $this->hasMap(
@@ -47,6 +55,11 @@ class Mapper extends BaseMapper {
                 'property' => 'moderationType',
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'moderation_type',
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\ModerationType\\Mapper',
+                    'this_key'  => 'resource_moderation_type_id',
+                    'other_key' => 'id',
+                )
             )
         );
         $this->hasMap(
@@ -114,30 +127,6 @@ class Mapper extends BaseMapper {
         $this->hasSoftDeleteDateField('deleted_at');
 
         // Joins
-        $this->hasJoin(
-            'category',
-            array(
-                'mapper'    => '\\Schoolbox\\ResourceBooking\\Category\\Mapper',
-                'this_key'  => 'resource_category_id',
-                'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'image',
-            array(
-                'mapper'    => '\\Schoolbox\\StorageMapper',
-                'this_key'  => 'storage_image_id',
-                'other_key' => 'id',
-            )
-        );
-        $this->hasJoin(
-            'moderation_type',
-            array(
-                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\ModerationType\\Mapper',
-                'this_key'  => 'resource_moderation_type_id',
-                'other_key' => 'id',
-            )
-        );
         $this->hasJoin(
             'moderator',
             array(
