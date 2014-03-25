@@ -28,8 +28,8 @@ $userId = $user->getId();
 $roleId = $user->getRole()->getId();
 
 $selectstmt = Database::getInstance()->prepare("
-	SELECT 	:userId `relation_id`, 'user' `relation_type`, src.`routing_key`,
-			perm.`default_level` `incoming_level`, :outgoingLevel `outgoing_level`, perm.min_level, perm.max_level
+	SELECT 	:userId `user_id`, src.id `msg_source_id`,
+			:outgoingLevel `outgoing_level`, perm.min_level, perm.max_level
 	FROM `msg_source` src
 	LEFT JOIN msg_namespace ns ON src.namespace = ns.id
 	LEFT JOIN msg_route_perm perm ON perm.msg_source_id = src.id AND perm.role_id = :roleId
@@ -39,9 +39,9 @@ $selectstmt = Database::getInstance()->prepare("
 
 $insertstmt = Database::getInstance()->prepare("
 	INSERT INTO `msg_reroute` (
-		`relation_id`, `relation_type`, `routing_key`, `incoming_level`, `outgoing_level`
+		`user_id`, `msg_source_id`, `outgoing_level`
 	) VALUES (
-		:relation_id, :relation_type, :routing_key, :incoming_level, :outgoing_level
+		:user_id, :msg_source_id, :outgoing_level
 	) ON DUPLICATE KEY UPDATE
 		`outgoing_level` = :outgoing_level
 ");
@@ -74,13 +74,10 @@ foreach($_POST as $ns => $options) {
 				$permission['outgoing_level'] = $permission['min_level'];
 			}
 
-			$insertstmt->execute(array(
-				'relation_id'    => $permission['relation_id'],
-				'relation_type'  => $permission['relation_type'],
-				'routing_key'    => $permission['routing_key'],
-				'incoming_level' => $permission['incoming_level'],
-				'outgoing_level' => $permission['outgoing_level']
-			));
+			unset($permission['min_level']);
+			unset($permission['max_level']);
+
+			$insertstmt->execute($permission);
 		}
 	}
 }

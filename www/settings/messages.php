@@ -16,13 +16,13 @@ use Schoolbox\User;
 /* DATA RETRIEVAL AND PARSING */
 
 $stmt = Database::getInstance()->prepare("
-	SELECT  m_ns.slug, m_ns.label, m_src.key, m_src.description, m_perm.min_level, m_perm.max_level,
-			m_perm.default_level, m_rr.incoming_level, m_rr.outgoing_level
-	FROM msg_source m_src
-	LEFT JOIN msg_route_perm m_perm ON m_src.id = m_perm.msg_source_id
-	LEFT JOIN msg_namespace m_ns ON m_ns.id = m_src.namespace
-	LEFT JOIN msg_reroute m_rr ON m_src.routing_key = m_rr.routing_key AND m_rr.relation_type = 'user' AND m_rr.relation_id = :user_id
-	WHERE m_perm.role_id = :role_id
+	SELECT  ns.slug, ns.label, src.key, src.description, perm.min_level, perm.max_level,
+			perm.default_level, reroute.outgoing_level
+	FROM msg_source src
+	LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id
+	LEFT JOIN msg_namespace ns ON ns.id = src.namespace
+	LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
+	WHERE perm.role_id = :role_id
 	ORDER BY min_level < max_level DESC, `key` ASC
 ");
 
