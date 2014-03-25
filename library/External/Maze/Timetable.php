@@ -607,37 +607,6 @@ class External_Maze_Timetable {
 		return false;
 	}
 
-	public function calendar() {
-		$query = "
-			SELECT TOP 500 *
-			FROM TCTD
-		";
-
-		$result1 = $this->getDb()->getAll($query);
-
-		$query = "
-			SELECT TOP 500 *
-			FROM TCTQ
-		";
-
-		$result2 = $this->getDb()->getAll($query);
-
-
-		/* Get the timetable definition
-		 */
-		$vars = array(
-			'klp_GetTimetableStructure',
-			array(
-				array('@Today', null, SQLVARCHAR, false, true, -1),
-				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-			)
-		);
-
-		$result3 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-
-		new \Alaress_ThreeProbe($result1, $result2, $result3);
-	}
-
 	/* Getters/Setters
 	 */
 
