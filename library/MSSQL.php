@@ -34,16 +34,6 @@ class MSSQL {
 	protected $convert_encoding = false;
 
 	/**
-	 * If encoding has been switched on or off for a single request, the
-	 * previous value of $this->convert_encoding is here.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @var bool
-	 */
-	protected $previous_encoding = null;
-
-	/**
 	 * @var MssqlDatabaseCollector
 	 */
 	protected $collector = null;
@@ -480,31 +470,6 @@ class MSSQL {
 	public function setConvertEncoding($convert)
 	{
 		$this->convert_encoding = $convert;
-	}
-
-
-	/**
-	 * Sets whether character set conversion was enabled for previous request.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @param $previous_encoding
-	 */
-	protected function setPreviousEncoding($previous_encoding)
-	{
-		$this->previous_encoding = $previous_encoding;
-	}
-
-	/**
-	 * Gets whether character set conversion was enabled for previous request.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @return bool
-	 */
-	protected function getPreviousEncoding()
-	{
-		return $this->previous_encoding;
 	}
 
 	/**
