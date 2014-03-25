@@ -306,6 +306,8 @@ class External_Maze_Timetable {
 		/* Postprocess for Dashboard compatibility
 		 */
 		$finalTimetable = array();
+		$times = $this->getPeriodTimes();
+		$i = 0;
 
 		foreach($allStructures as $currentStructure) {
 
@@ -313,8 +315,8 @@ class External_Maze_Timetable {
 			 */
 			$finalTimetable[] = array(
 				'periodName' => $currentStructure['PerNoDesc'],
-				'periodStart' => '',
-				'periodEnd' => '',
+				'periodStart' => $times[$i]['startTime']->getTimeOnly(),
+				'periodEnd' => $times[$i]['endTime']->getTimeOnly(),
 				'periodNumber' => $currentStructure['CalRow'],
 				'periodSequence' => 1,
 				'description' => $currentStructure['class']['subject']['name'],
@@ -322,6 +324,8 @@ class External_Maze_Timetable {
 				'room' => $currentStructure['class']['room'],
 				'staffID' => '',
 			);
+
+			$i++;
 		}
 
 		return $finalTimetable;
@@ -402,7 +406,6 @@ class External_Maze_Timetable {
 		/* Invert everything in the timetable definition
 		 */
 		$allStructures = array();
-		$allSubjects = array();
 
 		foreach($result3['result'] as $currentTimetableStructure) {
 
@@ -434,12 +437,8 @@ class External_Maze_Timetable {
 
 						/* Stack up
 						 */
+						$structure['stmaIdent'] = $currentObject['stma']['IDENT'];
 						$structure['class'] = $class;
-
-						/* Remember these classes, so we can get their details later
-						 * in one query and assimilate them into the grand design
-						 */
-						$allSubjects[] = $currentObject['stma']['MKEY'];
 					}
 				}
 
@@ -451,7 +450,9 @@ class External_Maze_Timetable {
 
 		/* Postprocess for Dashboard compatibility
  		 */
+		$times = $this->getPeriodTimes();
 		$finalTimetable = array();
+		$i = 0;
 
 		foreach($allStructures as $currentStructure) {
 
@@ -459,8 +460,8 @@ class External_Maze_Timetable {
 			 */
 			$finalTimetable[] = array(
 				'periodName' => $currentStructure['PerNoDesc'],
-				'periodStart' => '',
-				'periodEnd' => '',
+				'periodStart' => $times[$i]['startTime']->getTimeOnly(),
+				'periodEnd' => $times[$i]['endTime']->getTimeOnly(),
 				'periodNumber' => $currentStructure['CalRow'],
 				'periodSequence' => 1,
 				'description' => $currentStructure['class']['subject']['name'],
@@ -468,9 +469,41 @@ class External_Maze_Timetable {
 				'room' => $currentStructure['class']['room'],
 				'staffID' => '',
 			);
+
+			$i++;
 		}
 
 		return $finalTimetable;
+	}
+
+	/**
+	 * Get times for when periods begin and end
+	 *
+	 * @return array|bool
+	 */
+	private function getPeriodTimes() {
+		$query = "
+			SELECT TOP 14
+				CONVERT(VARCHAR, TIME_START, 120) AS startTime,
+				CONVERT(VARCHAR, TIME_END, 120) AS endTime
+			FROM TCTD
+			WHERE QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+		";
+
+		$result = $this->getDb()->getAll($query);
+
+		$processed = array();
+
+		if (is_array($result) && count($result)) {
+			foreach($result as $currentResult) {
+				$processed[] = array(
+					'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'y-m-d h:i:s'),
+					'endTime' => new \Alaress_Date_Format($currentResult['endTime'], 'y-m-d h:i:s'),
+				);
+			}
+		}
+
+		return $processed;
 	}
 
 	/**
@@ -506,9 +539,10 @@ class External_Maze_Timetable {
 		 *
 		 */
 		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
+
 			$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
-			$timetable[$period]['periodStart'] = '1am';
-			$timetable[$period]['periodEnd'] = '2am';
+			$timetable[$period]['periodStart'] = $allDayTimetables[0][$period]['periodStart'];
+			$timetable[$period]['periodEnd'] = $allDayTimetables[0][$period]['periodEnd'];
 
 			/* Put in Day classes
 			 */
@@ -571,6 +605,37 @@ class External_Maze_Timetable {
 		}
 
 		return false;
+	}
+
+	public function calendar() {
+		$query = "
+			SELECT TOP 500 *
+			FROM TCTD
+		";
+
+		$result1 = $this->getDb()->getAll($query);
+
+		$query = "
+			SELECT TOP 500 *
+			FROM TCTQ
+		";
+
+		$result2 = $this->getDb()->getAll($query);
+
+
+		/* Get the timetable definition
+		 */
+		$vars = array(
+			'klp_GetTimetableStructure',
+			array(
+				array('@Today', null, SQLVARCHAR, false, true, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		$result3 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		new \Alaress_ThreeProbe($result1, $result2, $result3);
 	}
 
 	/* Getters/Setters
