@@ -93,14 +93,38 @@ class Model implements JsonSerializable {
     }
 
     /**
+     * @return bool
+     */
+    public function isOpen() {
+        return $this->id == self::TYPE_OPEN;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isModerated() {
+        return $this->id == self::TYPE_MODERATED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isManaged() {
+        return $this->id == self::TYPE_MANAGED;
+    }
+
+    /**
      * Specify data which should be serialized to JSON
      *
      * @return array
      */
     public function jsonSerialize() {
         return array(
-            'id'   => $this->getId(),
-            'name' => $this->getName(),
+            'id'          => $this->getId(),
+            'name'        => $this->getName(),
+            'isOpen'      => $this->isOpen(),
+            'isModerated' => $this->isModerated(),
+            'isManaged'   => $this->isManaged(),
         );
     }
 
