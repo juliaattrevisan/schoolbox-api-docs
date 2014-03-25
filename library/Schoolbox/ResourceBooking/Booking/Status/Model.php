@@ -70,14 +70,23 @@ class Model implements JsonSerializable {
         return $this->name;
     }
 
+    /**
+     * @return bool
+     */
     public function isPending() {
         return $this->getId() == self::STATUS_PENDING;
     }
 
+    /**
+     * @return bool
+     */
     public function isApproved() {
         return $this->getId() == self::STATUS_APPROVED;
     }
 
+    /**
+     * @return bool
+     */
     public function isRejected() {
         return $this->getId() == self::STATUS_REJECTED;
     }
@@ -89,8 +98,11 @@ class Model implements JsonSerializable {
      */
     public function jsonSerialize() {
         return array(
-            'id'   => $this->getId(),
-            'name' => $this->getName(),
+            'id'         => $this->getId(),
+            'name'       => $this->getName(),
+            'isPending'  => $this->isPending(),
+            'isApproved' => $this->isApproved(),
+            'isRejected' => $this->isRejected(),
         );
     }
 
