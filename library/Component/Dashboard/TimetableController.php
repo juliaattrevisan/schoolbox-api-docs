@@ -135,6 +135,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 //for each period set result
                 $this->setVar("timetable_header_block", "");
                 $this->setVar("timetable_period_block", "");
+				new \Alaress_Probe($timetable);
                 foreach ($timetable as $period) {
                     if ($period['periodSequence'] == 1) {
                         $this->setVar('period_class_block', '');

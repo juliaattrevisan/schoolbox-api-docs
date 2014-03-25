@@ -280,13 +280,13 @@ class External_Maze_Timetable {
 				foreach($allObjects as $currentObject) {
 					if ($currentTimetableStructure['PeriodNo'] == $currentObject['periodno']) {
 
-						/* Assemble
-						 */
-						$class = $currentObject;
-
 						/* Separate subject identifier
 						 */
 						$subjectData = $processedStma[$currentObject['class']];
+
+						/* Assemble
+						 */
+						$class = $currentObject;
 
 						$class['subject']['code'] = $this->getHelper()->generateClassCode($subjectData['MKEY'], $subjectData['CLASS']);
 						$class['subject']['name'] = $this->getSubjectName($subjectData['MKEY']);
@@ -303,7 +303,28 @@ class External_Maze_Timetable {
 			}
 		}
 
-		return $allStructures;
+		/* Postprocess for Dashboard compatibility
+		 */
+		$finalTimetable = array();
+
+		foreach($allStructures as $currentStructure) {
+
+			/* For the dashboard which alternates between heading and data
+			 */
+			$finalTimetable[] = array(
+				'periodName' => $currentStructure['PerNoDesc'],
+				'periodStart' => '',
+				'periodEnd' => '',
+				'periodNumber' => $currentStructure['CalRow'],
+				'periodSequence' => 1,
+				'description' => $currentStructure['class']['subject']['name'],
+				'code' => $this->getHelper()->generateClassCode($subjectData['MKEY'], $subjectData['CLASS']),
+				'room' => $currentStructure['class']['room'],
+				'staffID' => '',
+			);
+		}
+
+		return $finalTimetable;
 	}
 
 	/**
@@ -465,17 +486,17 @@ class External_Maze_Timetable {
 		 */
 		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
 			$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['PerNoDesc'];
-			$timetable[$period]['periodStart'] = '';
-			$timetable[$period]['periodEnd'] = '';
+			$timetable[$period]['periodStart'] = '1am';
+			$timetable[$period]['periodEnd'] = '2am';
 
 			/* Put in Day classes
 			 */
 			for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
 				$timetable[$period]['day'][$day] = array(
 					'periodOn' => '',
-					'description' => $allDayTimetables[$day][$period]['class']['subject']['name'],
-					'code' => $allDayTimetables[$day][$period]['class']['subject']['code'],
-					'room' => $allDayTimetables[$day][$period]['class']['room'],
+					'description' => $allDayTimetables[$day][$period]['description'],
+					'code' => $allDayTimetables[$day][$period]['code'],
+					'room' => $allDayTimetables[$day][$period]['room'],
 					'staffID' => '',
 					'staffFirstname' => '',
 					'staffSurname' => '',
