@@ -9,6 +9,8 @@
 
 namespace Schoolbox\ResourceBooking\Booking;
 use Alaress\Web\Controller\Base;
+use DateTime;
+use Alaress_Date_Format;
 use Schoolbox\ResourceBooking\Item;
 use EOTC\Calendar;
 
@@ -33,14 +35,31 @@ class Controller extends Base {
      * Creates a booking for an item.
      */
     public function book($id) {
+        /** @var Model $item */
         /** @var Item\Model $resource */
         $resource = $this->getResourceMapper()->findById($id);
-        $response = $this->getResponse();
-        $response->content->set(
+        $item     = $this->getBookingMapper()->createModel();
+        $item
+            ->setResource($resource)
+            ->setEvent(new Calendar\Event());
+        // Was the time set here? If so set it into the item.
+        if (($date = $this->getRequest()->query['startDate'])) {
+            // Convert format of startDate and startTime
+            if ($date = DateTime::createFromFormat('Y-m-d', $date)) {
+                $item->getEvent()->setStartDate($date->format('d/m/Y'));
+            }
+        }
+        if (($time = $this->getRequest()->query['startTime'])) {
+            // Time: Only hours and minutes
+            if ($time = DateTime::createFromFormat('H:i', $time)) {
+                $item->getEvent()->setStartTime($time->format('H:i'));
+            }
+        }
+        $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
-                    'resource' => $resource,
+                    'item' => $item,
                 ),
             )
         );
@@ -78,13 +97,13 @@ class Controller extends Base {
         // Currently I can't setStartDateTime() and have that propogate to
         // startDate and startTime.
         // Event doesn't currently take Alaress_Date_Format objects either.
-        $startDate = new \Alaress_Date_Format($this->getRequest()->post['start-date'], 'd/m/y');
-        $endDate   = new \Alaress_Date_Format($this->getRequest()->post['end-date'], 'd/m/y');
+        $startDate = new Alaress_Date_Format($this->getRequest()->post['start-date'], 'd/m/y');
+        $endDate   = new Alaress_Date_Format($this->getRequest()->post['end-date'], 'd/m/y');
         $event->setStartDate($startDate->getDatabaseDate());
         $event->setStartTime($this->getRequest()->post['start-time']);
         $event->setEndDate($endDate->getDatabaseDate());
         $event->setEndTime($this->getRequest()->post['end-time']);
-        $event->setPublishDateTime(new \Alaress_Date_Format(new \DateTime()));
+        $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
 
         $event->setNote("Booking: ".$resource->getName());
         $event->setDetail($this->getRequest()->post['notes']);
