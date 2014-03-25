@@ -15,7 +15,6 @@ class External_Tass_Class implements External_ClassInterface {
 
 	function __construct () {
 		$this->setDatabase(MSSQL::getInstance());
-		$this->getDatabase()->setConvertEncoding(false);
 	}
 	
 	function getStudents($subCode) {

@@ -23,7 +23,6 @@ class External_Tass_Timetable implements External_TimetableInterface
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->getDatabase()->setConvertEncoding(false);
 
         $this->groupHandler = new Group;
         $this->campusMapper = new \Schoolbox\CampusMapper();

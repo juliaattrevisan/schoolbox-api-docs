@@ -17,7 +17,6 @@ class External_Tass_User implements External_UserInterface {
 
 	function __construct () {
 		$this->setDatabase(MSSQL::getInstance());
-		$this->getDatabase()->setConvertEncoding(false);
 
 		$this->groupHandler = new Group;
     }
