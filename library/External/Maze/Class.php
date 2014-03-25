@@ -41,7 +41,7 @@ class External_Maze_Class implements External_ClassInterface {
 	public function getStudents($classCode) {
 		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
 
-		list($subjectCode, $classNumber) = explode('-', $classCode);
+		$ingredients = $this->getHelper()->degenerateClassCode($classCode);
 
 		$query = "
 			SELECT
@@ -57,8 +57,8 @@ class External_Maze_Class implements External_ClassInterface {
 			LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 			LEFT JOIN ST ON STMA.SKEY = ST.STKEY
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
-			WHERE SU.SUKEY = '{$subjectCode}'
-			AND STMA.CLASS = '{$classNumber}'
+			WHERE SU.SUKEY = '{$ingredients['ClassCode']}'
+			AND STMA.CLASS = '{$ingredients['ClassNumber']}'
 			AND TTPERIOD = '{$ttPeriod}'
 		";
 
@@ -95,21 +95,19 @@ class External_Maze_Class implements External_ClassInterface {
 	public function getTeacherName($classCode) {
 		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
 
-		/* TODO: Assume classCodes are in the format: '07SCI/1'
+		/* Assume Schoolbox $classCodes are in the format: '07SCI-1'
 		 * where the 1 represents the Class which could be
 		 * class 1, 2, 3 etc. of a particular subject
 		 */
-		$classCode = '07ENG-1';
-
-		list($subject, $class) = explode('-', $classCode);
+		$ingredients = $this->getHelper()->degenerateClassCode($classCode);
 
 		$query = "
 			SELECT T1TEACH, T2TEACH
 			FROM TT
 			LEFT JOIN TTTG ON TT.TTKEY = TTTG.GKEY
 			WHERE TT.TTPERIOD = '{$ttPeriod}'
-			AND TTTG.SUBJ = '{$subject}'
-			AND CLASS = '{$class}'
+			AND TTTG.SUBJ = '{$ingredients['ClassCode']}'
+			AND CLASS = '{$ingredients['ClassNumber']}'
 		";
 
 		$allTeachers = $this->getDb()->getAll($query);

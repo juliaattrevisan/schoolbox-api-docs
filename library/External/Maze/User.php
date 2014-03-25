@@ -630,7 +630,7 @@ class External_Maze_User implements External_UserInterface {
 			foreach($allSubjects as $currentSubject) {
 				if (!in_array($currentSubject['ClassCode'], $processed)) {
 					$subjectList[] = array(
-						'code' => $currentSubject['ClassCode'] . '-' . $currentSubject['ClassNumber'],
+						'code' => $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']),
 						'name' => $currentSubject['name'],
 						'classType' => $currentSubject['classType'],
 						'campusCode' => $currentSubject['ClassCampus']
