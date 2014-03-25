@@ -16,6 +16,7 @@ use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\NotifException;
 
 class Connector {
@@ -279,7 +280,7 @@ class Connector {
 		if(!$message instanceof AMQPMessage) {
 
 			$properties = array(
-				'message_id'    => sha1(sprintf('msg-%s-%s-%s', $routingKey, time(), rand())),
+				'message_id'    => $this->calculateMessageHash($message, $channelId),
 				'delivery_mode' => self::MESSAGE_PERSIST,
 				'timestamp'     => time(),
 				'expiration'    => self::MESSAGE_EXPIRY
@@ -310,4 +311,25 @@ class Connector {
 		return sprintf(self::SECONDARY_NAME_PREFIX, INSTANCE_ID);
 	}
 
+
+	protected function calculateMessageHash($message, $channelId) {
+		// cast null to 0
+		$bits = array(is_null($channelId) ? 0 : $channelId);
+
+		// attempt to extract the message body, so as to efficiently de-dupe resent messages
+		if($data = json_decode($message, true)) {
+			$string = ($data['message']);
+			if($obj = unserialize($string)) {
+				if($obj instanceof External) {
+					$body = $obj->getBody()->toArray();
+					$bits[] = $body['body'].$body['href'];
+				}
+			}
+		}
+		else {
+			$bits[] = $message;
+		}
+
+		return sha1(implode('.', $bits));
+	}
 } 

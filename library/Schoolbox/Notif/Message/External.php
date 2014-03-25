@@ -118,6 +118,10 @@ abstract class External implements MessageInterface {
 		);
 	}
 
+	public function getBody() {
+		return $this->body;
+	}
+
 
 	/**
 	 * (PHP 5 &gt;= 5.1.0)<br/>
