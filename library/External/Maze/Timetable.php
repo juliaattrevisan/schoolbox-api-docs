@@ -449,7 +449,28 @@ class External_Maze_Timetable {
 			}
 		}
 
-		return $allStructures;
+		/* Postprocess for Dashboard compatibility
+ 		 */
+		$finalTimetable = array();
+
+		foreach($allStructures as $currentStructure) {
+
+			/* For the dashboard which alternates between heading and data
+			 */
+			$finalTimetable[] = array(
+				'periodName' => $currentStructure['PerNoDesc'],
+				'periodStart' => '',
+				'periodEnd' => '',
+				'periodNumber' => $currentStructure['CalRow'],
+				'periodSequence' => 1,
+				'description' => $currentStructure['class']['subject']['name'],
+				'code' => $currentStructure['class']['subject']['code'],
+				'room' => $currentStructure['class']['room'],
+				'staffID' => '',
+			);
+		}
+
+		return $finalTimetable;
 	}
 
 	/**
