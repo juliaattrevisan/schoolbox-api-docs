@@ -431,8 +431,11 @@ class MSSQL {
 	}
 
 	/**
-	 * Converts $value's encoding to UTF-8, based on whatever this connection's
-	 * encoding is (ISO-8859-1 if not specified).
+	 * Used to converts $value's encoding to UTF-8, based on whatever this
+	 * connection's encoding was (ISO-8859-1 if not specified).
+	 *
+	 * Now does nothing, because mssql.encoding handles charset conversion
+	 * properly and transparently.
 	 *
 	 * @deprecated use ini setting mssql.encoding instead
 	 *
@@ -442,7 +445,8 @@ class MSSQL {
 	 */
 	protected function convertEncoding($value)
 	{
-		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
+		return $value;
+//		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
 	}
 
 
