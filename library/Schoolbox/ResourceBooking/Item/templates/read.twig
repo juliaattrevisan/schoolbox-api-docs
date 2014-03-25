@@ -1,7 +1,9 @@
 <h1>Resource - {{ item.name }}</h1>
 
 <p class="description">
-    <img style="float:left" src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
+    {% if item.image.hash %}
+        <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
+    {% endif %}
     {{ item.description|e|nl2br }}
 </p>
 
