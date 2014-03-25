@@ -31,7 +31,7 @@ class MSSQL {
 	 *
 	 * @var bool
 	 */
-	protected $convert_encoding = true;
+	protected $convert_encoding = false;
 
 	/**
 	 * If encoding has been switched on or off for a single request, the
