@@ -268,7 +268,7 @@ class External_Maze_Timetable {
 
 						/* Separate subject identifier
 						 */
-						$class['subject']['code'] = $currentObject['stma']['MKEY'];
+						$class['subject']['code'] = $currentObject['stma']['MKEY'] . '-' . $currentObject['stma']['CLASS'];
 						$class['subject']['name'] = $this->getSubjectName($currentObject['stma']['MKEY']);
 
 						/* Stack up

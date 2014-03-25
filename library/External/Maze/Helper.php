@@ -68,6 +68,33 @@ class External_Maze_Helper {
 		return $matches[1];
 	}
 
+	/**
+	 * Glue a class code and class number together into a unique
+	 * Schoolbox ClassCode
+	 *
+	 * @param $classCode
+	 * @param $classNumber
+	 * @return string
+	 */
+	public function generateClassCode($classCode, $classNumber) {
+		return $classCode . '-' . $classNumber;
+	}
+
+	/**
+	 * Deglue a unique Schoolbox ClassCode into its original constituents
+	 *
+	 * @param $schoolboxClassCode
+	 * @return array
+	 */
+	public function degenerateClassCode($schoolboxClassCode) {
+		list($classCode, $classNumber) = explode('-', $schoolboxClassCode);
+
+		return array(
+			'ClassCode' => $classCode,
+			'ClassNumber' => $classNumber,
+		);
+	}
+
 	/* Getters/Setters
 	 */
 

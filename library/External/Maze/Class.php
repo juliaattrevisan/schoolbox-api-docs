@@ -41,6 +41,8 @@ class External_Maze_Class implements External_ClassInterface {
 	public function getStudents($classCode) {
 		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
 
+		list($subjectCode, $classNumber) = explode('-', $classCode);
+
 		$query = "
 			SELECT
 				ST.STKEY AS ID,
@@ -55,7 +57,8 @@ class External_Maze_Class implements External_ClassInterface {
 			LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 			LEFT JOIN ST ON STMA.SKEY = ST.STKEY
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
-			WHERE SU.SUKEY = '{$classCode}'
+			WHERE SU.SUKEY = '{$subjectCode}'
+			AND STMA.CLASS = '{$classNumber}'
 			AND TTPERIOD = '{$ttPeriod}'
 		";
 
@@ -96,9 +99,9 @@ class External_Maze_Class implements External_ClassInterface {
 		 * where the 1 represents the Class which could be
 		 * class 1, 2, 3 etc. of a particular subject
 		 */
-		$classCode = '07ENG/1';
+		$classCode = '07ENG-1';
 
-		list($subject, $class) = explode('/', $classCode);
+		list($subject, $class) = explode('-', $classCode);
 
 		$query = "
 			SELECT T1TEACH, T2TEACH

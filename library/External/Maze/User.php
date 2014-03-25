@@ -594,6 +594,7 @@ class External_Maze_User implements External_UserInterface {
 			$query = "
 				SELECT
 					STMA.MKEY AS ClassCode,
+					STMA.CLASS AS ClassNumber,
 					SU.FULLNAME AS name,
 					'' AS classType,
 					'' AS ClassCampus
@@ -606,7 +607,8 @@ class External_Maze_User implements External_UserInterface {
 		else if ($this->getGroup()->isStaff($userId)) {
 			$query = "
 				SELECT
-					SUBJ AS ClassCode,
+					TTTG.SUBJ AS ClassCode,
+					TTTG.CLASS AS ClassNumber,
 					SU.FULLNAME AS name,
 					'' AS classType,
 					'' AS ClassCampus
@@ -628,7 +630,7 @@ class External_Maze_User implements External_UserInterface {
 			foreach($allSubjects as $currentSubject) {
 				if (!in_array($currentSubject['ClassCode'], $processed)) {
 					$subjectList[] = array(
-						'code' => $currentSubject['ClassCode'],
+						'code' => $currentSubject['ClassCode'] . '-' . $currentSubject['ClassNumber'],
 						'name' => $currentSubject['name'],
 						'classType' => $currentSubject['classType'],
 						'campusCode' => $currentSubject['ClassCampus']
