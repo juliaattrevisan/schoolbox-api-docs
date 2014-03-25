@@ -163,7 +163,128 @@ class External_Maze_Timetable {
 	 * @return array|bool
 	 */
 	public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber) {
+		return $this->getStaffTimetable($externalUserId, $dayNumber);
 		return $this->getStudentTimetable($externalUserId, $dayNumber);
+	}
+
+	public function getStaffTimetable($externalUserId, $dayNumber) {
+
+		/* Get staff member's KLPID
+		 */
+		$query = "
+			SELECT KLPID
+			FROM SF
+			WHERE SFKEY = '{$externalUserId}'
+		";
+
+		$result1 = $this->getDb()->getRow($query);
+
+		$klpId = $result1['KLPID'];
+
+		/* Get all the periods (I think this sql stored proc is somehow not working)
+ 		 */
+		$vars = array(
+			'klp_GetTimetable',
+			array(
+				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		$result2 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		/* A list of all the class values, which are stma.idents
+		 */
+		$allSubjects = array();
+
+		if (is_array($result2['result']) && count($result2['result'])) {
+			foreach($result2['result'] as $currentPeriod) {
+				if ($currentPeriod['staffid'] == $klpId) {
+					$allObjects[] = $currentPeriod;
+
+					$allSubjects[] = $currentPeriod['class'];
+				}
+			}
+		}
+
+		$allSubjects = '(\'' . implode('\',\'', $allSubjects) . '\')';
+
+		/* Find all the STMAs that are in $allSubjects and rearrange
+		 */
+		$query = "
+			SELECT *
+			FROM STMA
+			WHERE STMA.IDENT IN {$allSubjects}
+		";
+
+		$allStma = $this->getDb()->getAll($query);
+
+		$processedStma = array();
+
+		if (is_array($allStma) && count($allStma)) {
+			foreach($allStma as $currentStma) {
+				$processedStma[$currentStma['IDENT']] = $currentStma;
+			}
+		}
+
+		/* Get the timetable definition
+		 */
+		$vars = array(
+			'klp_GetTimetableStructure',
+			array(
+				array('@Today', null, SQLVARCHAR, false, true, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		$result3 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		/* Invert everything in the timetable definition
+		 */
+		$allStructures = array();
+
+		foreach($result3['result'] as $currentTimetableStructure) {
+
+			/* Restrict to a specified Day
+			 * Otherwise skip it
+			 */
+			if ($currentTimetableStructure['DayNo'] == $dayNumber) {
+
+				/* Clone that guy out
+				 */
+				$structure = $currentTimetableStructure;
+				$structure['class']['subject'] = array();
+
+				/* Find the subjects which have this period number
+				 * This class occurs in $currentTimetableStructure
+				 */
+				foreach($allObjects as $currentObject) {
+					if ($currentTimetableStructure['PeriodNo'] == $currentObject['periodno']) {
+
+						/* Assemble
+						 */
+						$class = $currentObject;
+
+						/* Separate subject identifier
+						 */
+						$subjectData = $processedStma[$currentObject['class']];
+
+						$class['subject']['code'] = $this->getHelper()->generateClassCode($subjectData['MKEY'], $subjectData['CLASS']);
+						$class['subject']['name'] = $this->getSubjectName($subjectData['MKEY']);
+
+						/* Stack up
+						 */
+						$structure['class'] = $class;
+					}
+				}
+
+				/* Stack up
+				 */
+				$allStructures[] = $structure;
+			}
+		}
+
+		return $allStructures;
 	}
 
 	/**
@@ -173,7 +294,7 @@ class External_Maze_Timetable {
 	 * @param $dayNumber
 	 * @return mixed
 	 */
-	private function getStudentTimetable($externalUserId, $dayNumber) {
+	public function getStudentTimetable($externalUserId, $dayNumber) {
 
 		/* Get all the subjects for the current ttperiod
 		 */
