@@ -67,7 +67,6 @@ $(document).ready(function() {
             enabled: true,
             ajax: false,
             // This AJAX lookup should always be a GET request
-            {#ajax: {{ routeLookup('resourceBooking.bookingCalendar', {id: resource.id})|json_encode|raw }},#}
             parentSelector: '#calendar-controls',
             exportButtonSelector: false,
             checkboxSelector: false,
@@ -88,7 +87,7 @@ $(document).ready(function() {
                 $.ajax({
                     data:     data.concat($('#calendar-controls').find('form').serializeArray()),
                     dataType: 'json',
-                    url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: resource.id})|json_encode|raw }},
+                    url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: item.resource.id})|json_encode|raw }},
                     success: function(data) {
                         callback(data);
                     },
@@ -138,6 +137,25 @@ $(document).ready(function() {
                     )
                 })
                 c.bubble.display('edit', data, jsEvent, this)
+            },
+
+            /**
+             * Event that is triggered when clicking on a calendar day or time.
+             *
+             * @param date
+             * @param allDay
+             * @param jsEvent
+             */
+            dayClick: function(date, allDay, jsEvent) {
+                var dateFormat = allDay ? 'ddd d MMMM' : 'h(:mm)tt, ddd d MMMM';
+                var eventData  = {
+                    startDate:   $.fullCalendar.formatDate(date, 'yyyy-MM-dd'),
+                    displayDate: $.fullCalendar.formatDate(date, dateFormat)
+                }
+                if (!allDay) {
+                    eventData.startTime = $.fullCalendar.formatDate(date, 'HH:mm')
+                }
+                c.bubble.display('create', eventData, jsEvent, this)
             }
         },
         x: false
@@ -155,19 +173,23 @@ $(document).ready(function() {
     <p><strong>Loading events...</strong></p>
 </div>
 
-<h1>Book item: {{ resource.name }}</h1>
+<h1>Book item: {{ item.resource.name }}</h1>
 
 {# booking form #}
-<form action="{{ routeLookup('resourceBooking.createBooking', {id: resource.id}) }}" method="post"></form>
+<form action="{{ routeLookup('resourceBooking.createBooking', {id: item.resource.id}) }}" method="post"></form>
 
 <form id="resource-booking-form"
-      action="{{ routeLookup('resourceBooking.createBooking', {id: resource.id}) }}"
+      action="{{ routeLookup('resourceBooking.createBooking', {id: item.resource.id}) }}"
       method="post"
       name="form" class="clearfix"
 >
-    from: <input name="start-date" data-datepicker="" />, <input name="start-time" data-timepicker="" />
-    to: <input name="end-date" data-datepicker="" />, <input name="end-time" data-timepicker="" />
-    notes: <textarea name="notes"></textarea>
+    from:
+    <input name="start-date" data-datepicker="" value="{{ item.event.startDate }}" />,
+    <input name="start-time" data-timepicker="" value="{{ item.event.startTime }}" />
+    to:
+    <input name="end-date" data-datepicker="" value="{{ item.event.endDate }}" />,
+    <input name="end-time" data-timepicker="" value="{{ item.event.endDate }}" />
+    notes: <textarea name="notes">{{ item.event.detail }}</textarea>
 
     <input id="resource-save"
            type="submit"
@@ -183,43 +205,20 @@ $(document).ready(function() {
         <div class="close">&times;</div>
         <div class="js-data clearfix">
 
-            {# Create Event Form - may use later #}
             {#
-            <form id="createEvent" method="post" action="#">
-                <ul class="createSwitch">
-                    <li><a href="#" class="selected">Event</a></li>
-                    <li><a href="#" id="showCreateTaskForm">Task</a></li>
-                </ul>
-                <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
-                <input name="date" type="hidden" value="" />
-                <label>When<span class="displayDate"><!-- Date gets shoved in here --></span></label>
-                <label>Event Title<input name="note" type="text" value="" /></label>
-                <label>Event Type<select name="type">
-                        <!-- BEGIN event_type -->
-                        <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
-                        <!-- END event_type -->
-                    </select></label>
-                <a href="#" id="edit-full">Edit event &raquo;</a>
-                <input class="btn modify float-right no-icon" type="submit" value="Create Event" />
+             # Create Event Form
+             # calendar adds a form listener, which I don't want.
+             #}
+            <form id="createEvent" data-no-calendar-listener="" method="get" action="{{ routeLookup('resourceBooking.book', {id: item.resource.id}) }}">
+                <input type="hidden" name="startDate" />
+                <input type="hidden" name="startTime" />
+                {# In this case, item ID is preset #}
+                Create booking for: <span class="displayDate"></span>
+                <div class="actions">
+                    <input class="btn float-right modify no-icon" type="submit" value="Continue" />
+                </div>
             </form>
 
-            <!-- Create Task Form -->
-            <form id="createTask" method="post" action="#">
-                <ul class="createSwitch">
-                    <li><a href="#" id="showCreateEventForm">Event</a></li>
-                    <li><a href="#" class="selected">Task</a></li>
-                </ul>
-                <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
-                <input name="date" type="hidden" value="" />
-                <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
-                <label>Task<input name="note" type="text" value="" /></label>
-                <label>Due Date<span class="displayDate"><!-- Date gets shoved in here --></span></label>
-                <label class="detail">Note<textarea name="detail"></textarea></label>
-                <input class="btn modify float-right no-icon" type="submit" value="Create Task" />
-            </form>
-            #}
-
-            <!-- Edit Event Form -->
             <form id="editEvent">
                 <input type="hidden" name="eventId" />
                 <dl>
@@ -232,21 +231,6 @@ $(document).ready(function() {
                 <div class="actions">
                 </div>
             </form>
-
-            {#
-            <!-- Modify Task Form -->
-            <form id="editTask">
-                <h3>Task</h3>
-                <input type="hidden" name="eventId" />
-                <label style="font-weight: bold;">Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
-                <label>Complete<input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" /></label>
-                <label>Task<input id="modifyTaskBubbleNote" name="note" type="text" value="" /></label>
-                <label class="detail">Note<textarea id="modifyTaskBubbleDetail" name="detail"></textarea></label>
-                <input type="submit" class="btn float-right no-icon" value="Update Task" />
-                <a href="#" class="deleteTask btn no-icon float-right">Delete</a>
-            </form>
-            #}
-
         </div>
         <div class="bottom"><strong></strong></div>
     </div>
@@ -256,7 +240,6 @@ $(document).ready(function() {
  # Calendar controls
  # Add the popup event
  #}
-
 <div id="calendar-controls" class="calendar-controls no-height clearfix">
     <div class="link-case">
         <div class="filter-drop clearfix">
