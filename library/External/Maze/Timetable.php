@@ -506,7 +506,7 @@ class External_Maze_Timetable {
 		 *
 		 */
 		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
-			$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['PerNoDesc'];
+			$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
 			$timetable[$period]['periodStart'] = '1am';
 			$timetable[$period]['periodEnd'] = '2am';
 
