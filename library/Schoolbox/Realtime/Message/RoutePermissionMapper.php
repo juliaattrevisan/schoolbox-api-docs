@@ -68,5 +68,41 @@ class RoutePermissionMapper extends Mapper {
 		));
 	}
 
+	public function findLevelsByTopic($topic, $roleId, $userId = 0) {
+		$stmt = $this->database->prepare("
+			SELECT
+				CONCAT('#.', ns.slug, '.*.', src.key) routing_key,
+				perm.min_level, perm.default_level, reroute.outgoing_level, perm.max_level
+			FROM msg_source src
+			LEFT JOIN msg_namespace ns ON src.namespace = ns.id
+			LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND perm.role_id = :role_id
+			LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
+			WHERE role_id IS NOT NULL
+		");
+
+		$stmt->execute(array(
+			'role_id' => $roleId,
+			'user_id' => $userId
+		));
+
+		$regex = array(
+			'`\*`'   => '[^.]+',
+			'`#.?`'  => '(?:[^.]+.?)*',
+			'`\.`'   => '\.'
+		);
+
+		$result = array();
+
+		while($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+			$routingRegex = '`^' . preg_replace(array_keys($regex), array_values($regex), $r['routing_key']) . '$`';
+			if(preg_match($routingRegex, $topic)) {
+				$result[] = $r;
+			}
+		}
+
+		return $result;
+
+	}
+
 
 }

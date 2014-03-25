@@ -12,7 +12,6 @@ CREATE TABLE `msg_source`(
   `key`           VARCHAR(64) NOT NULL,
   `role_type`     ENUM('student','parent','staff') NOT NULL,
   `description`   VARCHAR(255) NOT NULL,
-  `routing_key`   VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`namespace`, `key`, `role_type`),
   INDEX (`namespace`, `key`),
@@ -22,13 +21,10 @@ CREATE TABLE `msg_source`(
 ) CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE `msg_reroute`(
-  `relation_id`    INT UNSIGNED NOT NULL,
-  `relation_type`  ENUM('user','role','campus') NOT NULL,
-  `routing_key`    VARCHAR(255) NOT NULL,
-  `incoming_level` INT UNSIGNED NOT NULL,
+  `user_id`        INT UNSIGNED NOT NULL,
+  `msg_source_id`  VARCHAR(255) NOT NULL,
   `outgoing_level` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`relation_id`, `relation_type`, `routing_key`, `incoming_level`),
-  INDEX (`relation_id`, `relation_type`)
+  PRIMARY KEY (`user_id`, `msg_source_id`)
 ) CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE `msg_route_perm`(

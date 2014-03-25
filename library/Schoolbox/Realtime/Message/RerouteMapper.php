@@ -20,52 +20,41 @@ class RerouteMapper extends Mapper {
 		$this->hasModel('\\Schoolbox\\Realtime\\Message\\Reroute');
 
 		$this->hasMap(array(
-			'column'     => 'relation_id',
-			'property'   => 'relationId',
+			'column'     => 'user_id',
+			'property'   => 'user',
 			'type'       => self::TYPE_INTEGER,
 			'identifier' => true,
+			'join'       => 'user'
 		));
 		$this->hasMap(array(
-			'column'     => 'relation_type',
-			'property'   => 'relationType',
-			'type'       => self::TYPE_STRING,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'routing_key',
-			'property'   => 'routingKey',
-			'type'       => self::TYPE_STRING,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'incoming_level',
-			'property'   => 'incomingLevel',
+			'column'     => 'msg_source_id',
+			'property'   => 'source',
 			'type'       => self::TYPE_INTEGER,
 			'identifier' => true,
+			'join'       => 'source'
 		));
-		$this->hasMap(array(
-			'column'     => 'outgoing_level',
-			'property'   => 'outgoingLevel',
-			'type'       => self::TYPE_INTEGER,
+		$this->hasJoin('source', array(
+			'mapper'     => '\\Schoolbox\\Realtime\\Message\\SourceMapper',
+			'this_key'   => 'msg_source_id',
+			'other_key'  => 'id'
 		));
-
+		$this->hasJoin('user', array(
+			'mapper'     => '\\Schoolbox\\UserMapper',
+			'this_key'   => 'user_id',
+			'other_key'  => 'id'
+		));
 	}
 
 
 	/**
-	 * @override base mapper findById functionality to compensate for multiKey
-	 * @param mixed $relationId
-	 * @param $relationType
-	 * @param $routingKey
-	 * @param $incomingLevel
+	 * @param int $userId
+	 * @param int $msgSrcId
 	 * @return Reroute
 	 */
-	public function findById($relationId, $relationType, $routingKey, $incomingLevel) {
+	public function findById($userId, $msgSrcId) {
 		return parent::findOneByColumnList(array(
-			'relation_id'    => $relationId,
-			'relation_type'  => $relationType,
-			'routing_key'    => $routingKey,
-			'incoming_level' => $incomingLevel
+			'user_id'        => $userId,
+			'msg_source_id'  => $msgSrcId,
 		));
 	}
 

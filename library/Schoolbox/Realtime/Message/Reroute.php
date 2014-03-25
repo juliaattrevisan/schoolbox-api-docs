@@ -10,32 +10,16 @@
 namespace Schoolbox\Realtime\Message;
 
 
+use Schoolbox\User;
+
 class Reroute {
 
-	/** @var int */
-	protected $relationId;
-	/** @var string */
-	protected $relationType;
-	/** @var string */
-	protected $routingKey;
-	/** @var int */
-	protected $incomingLevel;
+	/** @var User */
+	protected $userId;
+	/** @var Source */
+	protected $source;
 	/** @var int */
 	protected $outgoingLevel;
-
-	/**
-	 * @param int $incomingLevel
-	 */
-	public function setIncomingLevel($incomingLevel) {
-		$this->incomingLevel = $incomingLevel;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getIncomingLevel() {
-		return $this->incomingLevel;
-	}
 
 	/**
 	 * @param int $outgoingLevel
@@ -52,48 +36,31 @@ class Reroute {
 	}
 
 	/**
-	 * @param int $relationId
+	 * @param \Schoolbox\Realtime\Message\Source $source
 	 */
-	public function setRelationId($relationId) {
-		$this->relationId = $relationId;
+	public function setSource($source) {
+		$this->source = $source;
 	}
 
 	/**
-	 * @return int
+	 * @return \Schoolbox\Realtime\Message\Source
 	 */
-	public function getRelationId() {
-		return $this->relationId;
+	public function getSource() {
+		return $this->source;
 	}
 
 	/**
-	 * @param string $relationType
+	 * @param \Schoolbox\User $userId
 	 */
-	public function setRelationType($relationType) {
-		$this->relationType = $relationType;
+	public function setUserId($userId) {
+		$this->userId = $userId;
 	}
 
 	/**
-	 * @return string
+	 * @return \Schoolbox\User
 	 */
-	public function getRelationType() {
-		return $this->relationType;
+	public function getUserId() {
+		return $this->userId;
 	}
-
-	/**
-	 * @param string $routingKey
-	 */
-	public function setRoutingKey($routingKey) {
-		$this->routingKey = $routingKey;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getRoutingKey() {
-		return $this->routingKey;
-	}
-
-
-
 
 } 

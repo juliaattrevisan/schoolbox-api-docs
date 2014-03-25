@@ -45,33 +45,11 @@ class SourceMapper extends Mapper {
 			'property'   => 'description',
 			'type'       => self::TYPE_STRING,
 		));
-		$this->hasMap(array(
-			'column'     => 'routing_key',
-			'property'   => 'routingKey',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'default_level',
-			'property'   => 'defaultLevel',
-			'type'       => self::TYPE_INTEGER,
-		));
 
 		$this->hasJoin('namespace', array(
 			'mapper'    => '\\Schoolbox\\Realtime\\Message\\NSMapper',
 			'this_key'  => 'namespace',
 			'other_key' => 'id',
 		));
-	}
-
-	public function generateTopic($nsId, $key, $roleType, $params) {
-		/** @var Source $source */
-		$source = $this->findOneByColumnList(array(
-			'namespace' => $nsId,
-			'key'       => $key,
-			'role_type' => $roleType
-		));
-
-		array_unshift($params, str_replace('*', '%s', $source->getRoutingKey()));
-		return call_user_func_array('sprintf', $params);
 	}
 }

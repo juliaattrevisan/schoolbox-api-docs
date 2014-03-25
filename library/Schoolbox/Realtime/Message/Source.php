@@ -22,24 +22,7 @@ class Source {
 	protected $roleType;
 	/** @var string */
 	protected $description;
-	/** @var string */
-	protected $routingKey;
-	/** @var int */
-	protected $defaultLevel;
 
-	/**
-	 * @param int $defaultLevel
-	 */
-	public function setDefaultLevel($defaultLevel) {
-		$this->defaultLevel = $defaultLevel;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getDefaultLevel() {
-		return $this->defaultLevel;
-	}
 
 	/**
 	 * @param string $description
@@ -111,20 +94,4 @@ class Source {
 		return $this->roleType;
 	}
 
-	/**
-	 * @param string $routingKey
-	 */
-	public function setRoutingKey($routingKey) {
-		$this->routingKey = $routingKey;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getRoutingKey() {
-		return $this->routingKey;
-	}
-
-
-
-} 
+}
