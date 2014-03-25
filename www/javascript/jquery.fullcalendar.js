@@ -294,39 +294,40 @@ Calendar.prototype.init = function() {
 
     // Event creation form listeners
     $j.each(this.getForms(), function(k, v) {
+        if (typeof this.data('no-calendar-listener') === 'undefined') {
+            if(k.slice(0, 6) == 'create') {
+                this.submit(function(event) {
+                    event.preventDefault();
+                    var data = $j(this).serialize()
 
-        if(k.slice(0, 6) == 'create') {
-            this.submit(function() {
-                var data = $j(this).serialize()
+                    c.ccreate(data, function(responseText) {
+                        if (responseText.length) {
+                            var responseData = new Function('return ' + responseText)
+                            var newEvent = responseData()
 
-                c.ccreate(data, function(responseText) {
-                    if (responseText.length) {
-                        var responseData = new Function('return ' + responseText)
-                        var newEvent = responseData()
-
-                        c.dom.fullCalendar('renderEvent', newEvent)
-                    }
+                            c.dom.fullCalendar('renderEvent', newEvent)
+                        }
+                    })
+                    c.clearForms()
+                    c.bubble.hide()
                 })
-                c.clearForms()
-                c.bubble.hide()
-                return false
-            })
-        }
-        else {
-            this.submit(function() {
-                var data = $j(this).serialize()
+            }
+            else {
+                this.submit(function(event) {
+                    event.preventDefault();
+                    var data = $j(this).serialize()
 
-                c.cupdate(data, function(responseText) {
-                    if (responseText.length) {
-                        var responseData = new Function('return ' + responseText)
-                        var newEvent = responseData()
+                    c.cupdate(data, function(responseText) {
+                        if (responseText.length) {
+                            var responseData = new Function('return ' + responseText)
+                            var newEvent = responseData()
 
-                        c.dom.fullCalendar('renderEvent', newEvent)
-                    }
+                            c.dom.fullCalendar('renderEvent', newEvent)
+                        }
+                    })
+                    c.bubble.hide()
                 })
-                c.bubble.hide()
-                return false
-            })
+            }
         }
     })
 
