@@ -144,14 +144,21 @@ class MSSQL {
      * @throws Schoolbox\External\Exception
      */
     function connect() {
-		if(!isset($this->dbf))
+		if (!isset($this->dbf)) {
+			// mssql.charset not already set? set it to UTF-8 here.
+			if (strlen(ini_get('mssql.charset')) === 0) {
+				ini_set('mssql.charset', 'UTF-8');
+			}
 			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd);
+		}
 
-		if($this->dbf == false)
+		if ($this->dbf == false) {
 			throw new \Schoolbox\External\Exception("External database is offline.");
+		}
 
-		if(!$this->changeDb($this->db))
+		if (!$this->changeDb($this->db)) {
 			throw new \Schoolbox\External\Exception("External database is online, but unable to connect.");
+		}
 
         /* Set Default NULL ON, due to stored procs requiring this */
         mssql_query('SET ANSI_NULL_DFLT_ON ON',$this->dbf);
