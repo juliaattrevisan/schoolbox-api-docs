@@ -285,7 +285,7 @@ $j(function() {
       },
       f_delete_all : function(id) {
         var name = $j('#folder-detail h3.name').html()
-        if(confirm("Are you sure you want to delete " + name + "? This will also delte all its contents.")) {
+        if(confirm("Are you sure you want to delete " + name + "? This will also delete all subfolders and their contents.")) {
           var path = '/cms/categoryForm.php?deleteAll=' + id
           window.open(path, "_self")
         }
