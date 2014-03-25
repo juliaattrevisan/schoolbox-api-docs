@@ -150,7 +150,7 @@ class UserQueueFactory {
 		$bindings = array(
 			// required user information
 			'user' => array(
-				// *.notify.user.{id}
+				// *.notify.user.{id}.#
 				'id' => $user->getId()
 			)
 		);
@@ -165,31 +165,25 @@ class UserQueueFactory {
 
 		// campus bindings
 		foreach($user->getCampusCollection() as $campus) {
-			// *.notify.campus.{id}
-			// *.notify.campus.{id}.{roletype}
+			// *.notify.campus.{id}.#
 			/** @var Campus $campus */
-//			$bindings['campus'][] = $campus->getId();
-			$bindings['campus'][] = $campus->getId() . ".$roleType.#";
+			$bindings['campus'][] = $campus->getId() . ".#";
 		}
 
 		// house bindings
 		if($house = $user->getSchoolHouse()) {
-			// *.notify.house.{id}
-			// *.notify.house.{id}.{roletype}
+			// *.notify.house.{id}.#
 			$bindings['house'] = array(
-//				$house,
-				$house . ".$roleType.#"
+				"$house.#"
 			);
 		}
 
 
 		// residential house bindings
 		if($resHouse = $user->getResidentialHouse()) {
-			// *.notify.reshouse.{id}
-			// *.notify.reshouse.{id}.{roletype}
+			// *.notify.reshouse.{id}.#
 			$bindings['reshouse'] = array(
-//				$resHouse,
-				$resHouse . ".$roleType.#"
+				"$resHouse.#"
 			);
 		}
 
@@ -202,10 +196,8 @@ class UserQueueFactory {
 		foreach($cats as $cat) {
 			/** @var Category $cat */
 			// category general participation
-			// *.notify.category.{id}
-			// *.notify.category.{id}.{roletype}
-//			$bindings['category'][] = $cat->getId();
-			$bindings['category'][] = $cat->getId() . ".$roleType.#";
+			// *.notify.category.{id}.#
+			$bindings['category'][] = $cat->getId() . ".#";
 
 			// category admin
 			// *.notify.category.{id}.admin
@@ -242,17 +234,19 @@ class UserQueueFactory {
 						'synergy_id' => $childIds,
 						'group_id' => $this->roleCache[Role::STUDENT]
 					));
+					// parent bindings
+					// *.notify.parent.{childId}.#
 					$bindings['parent'] = $childCollection->getColumnValues('id');
 				}
 			}
 		}
 
 		// role bindings
-		// *.notify.role.{id}
+		// *.notify.role.{id}.#
 		$bindings['role'] = array($user->getRole()->getId().".#");
 
 		// role-type bindings
-		// *.notify.roletype.{name}
+		// *.notify.roletype.{name}.#
 		$bindings['roletype'] = array("$roleType.#");
 
 		return $bindings;

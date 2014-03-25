@@ -84,13 +84,13 @@ class UserQueue {
 		foreach($this->bindings as $key) {
 			$this->conn->bindExchange($exchange, $key);
 		}
-		$this->conn->bindExchange($exchange, "*.digest.user.$this->userId");
-		$this->conn->bindExchange($exchange, "*.instant.user.$this->userId");
+		$this->conn->bindExchange($exchange, "*.digest.user.$this->userId.#");
+		$this->conn->bindExchange($exchange, "*.instant.user.$this->userId.#");
 
 		$this->conn->bindQueue($this->getToSortQueueName(), '*.notify.#', $exchange);
-		$this->conn->bindQueue($this->getDigestQueueName(), "*.digest.user.$this->userId", $exchange);
-		$this->conn->bindQueue($this->getListedQueueName(), "*.instant.user.$this->userId", $exchange);
-		$this->conn->bindQueue($this->getUnreadQueueName(), "*.instant.user.$this->userId", $exchange);
+		$this->conn->bindQueue($this->getDigestQueueName(), "*.digest.user.$this->userId.#", $exchange);
+		$this->conn->bindQueue($this->getListedQueueName(), "*.instant.user.$this->userId.#", $exchange);
+		$this->conn->bindQueue($this->getUnreadQueueName(), "*.instant.user.$this->userId.#", $exchange);
 
 	}
 
