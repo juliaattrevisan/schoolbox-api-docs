@@ -15,6 +15,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Message\Reroute;
@@ -129,17 +130,26 @@ class Interceptor {
 		}
 
 		try {
-			// aaand republish our modified message
-			$external->setTopicPrepend("$method.")->resend($this->notif, $newLevel, "user.{$user->getId()}");
+			// change case in event of targeted message (which is possibly always...)
+			if($external instanceof TargetedMessage) {
+				/** @var TargetedMessage $external */
+				$external->setTopicPrepend('');
+				$external->setTargets(array($method));
+			}
+			else {
+				$external->setTopicPrepend("$method.");
+			}
+
+			return $external->resend($this->notif, $newLevel, "user.{$user->getId()}");
 
 			// return true to dismiss the old message
 //			echo "I REROUTED YOUR MESSAGE to '$method.user.$userId' at level $newLevel!\n";
 		}
 		catch(\Exception $e) {
 			echo $e;
+			return false;
 		}
 
-		return true;
 	}
 
 
@@ -157,7 +167,6 @@ class Interceptor {
 		$checks = array(
 			'user'   => $user->getId(),
 			'role'   => $user->getRole()->getId(),
-//			'campus' => $user->getDefaultCampus()->getId()
 		);
 
 		foreach($checks as $type => $id) {
@@ -167,7 +176,6 @@ class Interceptor {
 			$coll->merge($this->rerouteMapper->findByColumnList(array(
 				'relation_id'    => $id,
 				'relation_type'  => $type,
-//				'incoming_level' => $level
 			)));
 		}
 
@@ -178,9 +186,9 @@ class Interceptor {
 
 		foreach($coll as $offset => $reroute) {
 			$regex = array(
-				'`\*`' => '[^.]+',
+				'`\*`'   => '[^.]+',
 				'`#.?`'  => '(?:[^.]+.?)*',
-				'`\.`' => '\.'
+				'`\.`'   => '\.'
 			);
 
 			$routingRegex = '`' . preg_replace(

@@ -74,12 +74,13 @@ abstract class External implements MessageInterface {
 	 * @param Notif $notif
 	 * @param int $severity
 	 * @param array|string $topics
+	 * @return bool
 	 */
-	public function resend($notif, $severity, $topics) {
+	public function resend($notif, $severity, $topics = null) {
 		$this->notif = $notif;
 		$this->severity = $severity;
-		$this->topics = (array)$topics;
-		$this->send();
+		$this->topics = $topics ? (array)$topics : $this->topics;
+		return $this->send();
 	}
 
 
