@@ -197,6 +197,41 @@ class Mapper extends BaseMapper {
     }
 
     /**
+     * Gets item with this ID.
+     *
+     * @param int $id
+     *
+     * @return Model
+     * @throws BaseMapper\Exception         if item with $id wasn't found
+     * @throws BaseMapper\Exception\Deleted if item with $id is soft-deleted
+     */
+    public function findById($id) {
+        $query = "
+            SELECT
+                {$this->getColumnString('r')},
+                {$this->getJoinColumnString('category', 'c')}
+            FROM {$this->getTable()} `r`
+            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
+            WHERE r.id = ?
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array($id));
+
+        // Hydration:
+        // progress through each join that was passed.
+        /** @var Model $item */
+        foreach ($statement as $row) {
+            $item = $this->hydrate($row, 'r');
+            if ($item->getCategory()->getId()) {
+                $item->setCategory($this->hydrateJoin($row, 'category', 'c'));
+            }
+            $this->throwIfDeleted($item);
+            return $item;
+        }
+        throw new BaseMapper\Exception('Instance of object not found');
+    }
+
+    /**
      * Overrides hydrate() to populate the list of moderators, and the image.
      *
      * @todo Replace with a method which doesn't involve a query per resource.
