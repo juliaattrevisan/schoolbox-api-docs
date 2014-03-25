@@ -409,7 +409,7 @@ class External_Maze_Timetable {
 	/**
 	 * Get db
 	 *
-	 * @return null
+	 * @return MSSQL
 	 */
 	private function getDb() {
 		return $this->db;
@@ -427,7 +427,7 @@ class External_Maze_Timetable {
 	/**
 	 * Get helper
 	 *
-	 * @return null
+	 * @return External_Maze_Helper
 	 */
 	private function getHelper() {
 		return $this->helper;
