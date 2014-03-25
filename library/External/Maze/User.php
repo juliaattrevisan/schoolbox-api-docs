@@ -312,7 +312,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentEmergency3Name,
 				'' AS StudentEmergency3Phone,
 				'' AS StudentEmergency3PhoneAlt,
-				MEDICAL_ALERT AS StudentMedicalAlert,
+				MEDICAL AS StudentMedicalAlert,
 				'' AS StudentSpecialNeedsFlag,
 				'' AS AlertMessage,
 				'' AS StudentBoarder
