@@ -14,7 +14,6 @@ use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Notif\Topic\TopicBuilder;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\TriggerBundle;
@@ -136,7 +135,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		}
 
 		// tell everyone that article $articleId has been posted
-		$msgr->broadcastToRoleType($roleType, $msg, "news.topic.$topicId.article.$articleId.posted", Logger::INFO,
+		$msgr->broadcastToRoleType($roleType, $msg, "news.$articleId.posted", Logger::INFO,
 			array(
 				'user'     => array($authorName, "/search/user/$authorId"),
 				'title'    => array($heading,    "/news/item/$articleId"),
