@@ -18,12 +18,16 @@ class MSSQL {
 	 *
 	 * Referenced when converting strings from database to UTF-8.
 	 *
+	 * @deprecated use ini setting mssql.encoding instead
+	 *
 	 * @var string
 	 */
 	protected $encoding = 'ISO-8859-1';
 
 	/**
 	 * Is encoding converted or not for calls to getAll/Row/One?
+	 *
+	 * @deprecated use ini setting mssql.encoding instead
 	 *
 	 * @var bool
 	 */
@@ -32,6 +36,8 @@ class MSSQL {
 	/**
 	 * If encoding has been switched on or off for a single request, the
 	 * previous value of $this->convert_encoding is here.
+	 *
+	 * @deprecated use ini setting mssql.encoding instead
 	 *
 	 * @var bool
 	 */
@@ -432,6 +438,8 @@ class MSSQL {
 	 * Converts $value's encoding to UTF-8, based on whatever this connection's
 	 * encoding is (ISO-8859-1 if not specified).
 	 *
+	 * @deprecated use ini setting mssql.encoding instead
+	 *
 	 * @param $value
 	 *
 	 * @return string
@@ -445,6 +453,8 @@ class MSSQL {
 	/**
 	 * Gets whether character set conversion is enabled.
 	 *
+	 * @deprecated use ini setting mssql.encoding instead
+	 *
 	 * @return bool
 	 */
 	public function getConvertEncoding()
@@ -455,6 +465,8 @@ class MSSQL {
 
 	/**
 	 * Sets whether character set conversion is enabled.
+	 *
+	 * @deprecated use ini setting mssql.encoding instead
 	 *
 	 * @param $convert
 	 */
@@ -467,6 +479,8 @@ class MSSQL {
 	/**
 	 * Sets whether character set conversion was enabled for previous request.
 	 *
+	 * @deprecated use ini setting mssql.encoding instead
+	 *
 	 * @param $previous_encoding
 	 */
 	protected function setPreviousEncoding($previous_encoding)
@@ -476,6 +490,8 @@ class MSSQL {
 
 	/**
 	 * Gets whether character set conversion was enabled for previous request.
+	 *
+	 * @deprecated use ini setting mssql.encoding instead
 	 *
 	 * @return bool
 	 */
