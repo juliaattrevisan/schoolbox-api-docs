@@ -322,7 +322,7 @@ class External_Maze_Timetable {
 				'periodNumber' => $currentStructure['CalRow'],
 				'periodSequence' => 1,
 				'description' => $currentStructure['class']['subject']['name'],
-				'code' => $this->getHelper()->generateClassCode($subjectData['MKEY'], $subjectData['CLASS']),
+				'code' => $currentStructure['class']['subject']['code'],
 				'room' => $currentStructure['class']['room'],
 				'staffID' => '',
 			);
