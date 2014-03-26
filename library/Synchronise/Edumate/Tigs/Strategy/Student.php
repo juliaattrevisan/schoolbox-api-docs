@@ -49,7 +49,8 @@ class Synchronise_Edumate_Tigs_Strategy_Student extends Synchronise_Edumate_Tigs
 
 		// Preserve ePortfolio setting for existing students.
 		if (!$this->userExists($newUser)) {
-			$newUser['eportfolio_enabled'] = false;
+			// Enable Junior students (campus 2) by default, disable for others.
+			$newUser['eportfolio_enabled'] = ($campus == 2);
 		}
 		else {
 			unset($newUser['eportfolio_enabled']);
