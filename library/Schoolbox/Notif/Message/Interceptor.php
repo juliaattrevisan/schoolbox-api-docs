@@ -10,64 +10,90 @@
 namespace Schoolbox\Notif\Message;
 
 
+use Alaress\WorkerCrew\Dispatcher;
+use Alaress\WorkerCrew\TaskResponseHandlerInterface;
+use Alaress\WorkerCrew\Transaction\Transaction;
 use Monolog\Logger;
 use PhpAmqpLib\Message\AMQPMessage;
+use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\Timer;
+use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\External\TargetedMessage;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Realtime\Message\Reroute;
 use Schoolbox\Realtime\Message\RerouteMapper;
+use Schoolbox\Realtime\Message\RoutePermissionMapper;
+use Schoolbox\Realtime\Verboser;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Interceptor {
-
-	/** @var Connector */
-	protected $conn;
+class Interceptor implements TaskResponseHandlerInterface {
 
 	/** @var UserMapper */
 	protected $userMapper;
 
-	/** @var Mapper */
+	/** @var RerouteMapper */
 	protected $rerouteMapper;
+
+	/** @var RoutePermissionMapper */
+	protected $permissionMapper;
 
 	/** @var Notif */
 	protected $notif;
 
+	/** @var Dispatcher */
+	protected $dispatcher;
+
+	/** @var Verboser  */
+	protected $v;
+
 	/**
-	 * @param Connector $connector
+	 * @param Verboser $verboser
+	 * @param LoopInterface $loop
 	 */
-	function __construct($connector) {
-		$this->conn = $connector;
+	function __construct($verboser, $loop = null) {
+		$this->loop = $loop;
+		$this->v = $verboser;
+
 		$this->rerouteMapper = RerouteMapper::getInstance();
+		$this->permissionMapper = RoutePermissionMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
 		$this->notif = new Notif();
-	}
 
+		// optional construction in case null was passed for $loop
+		if($loop instanceof LoopInterface) {
+			$d = $this->dispatcher = new Dispatcher($loop, $this, $verboser, new InterceptorDispatchStrategy());
+			$this->transaction = new Transaction($loop, function($timer) use ($d) {
+				/** @var $timer TimerInterface */
+				$d->enqueue($timer, InterceptorDispatchStrategy::TASK_INTERCEPT, $timer->getData());
+			}, 0.5);
+		}
+	}
 
 	/**
-	 * @param User $user
-	 * @param AMQPMessage $msg
-	 * @return bool
+	 * Handles a response from a Worker
+	 *
+	 * @param Timer $identifier  - the identifier passed as the first argument to Dispatcher::enqueue()
+	 * @param string $command    - the command that was executed by the Worker
+	 * @param array $data        - the data with which the Worker responded
+	 * @return void              - this method does not return any value
 	 */
-	public function hasReroute($user, $msg) {
-
-		$body = $this->unwrapMessageBody($msg);
-		$level = $body['level'];
-
-		// try this test first, save ourselves some db calls
-		if($this->canDismiss($user, $msg)) {
-			return true;
-		}
-
-		$newLevel = $this->getReroutedLevel($user, $body['channel'], $level);
-
-		return $level != $newLevel;
+	public function handleResponse($identifier, $command, $data) {
+		// TODO possibly nothing, the worker did the work
+		$this->v->v("Reroute count: $data[0]");
 	}
 
+	/**
+	 * Adds the frame to a loop cache, and dispatches appropriately
+	 *
+	 * @param User $user
+	 * @param Frame $frame
+	 * @return bool
+	 */
+	public function process($user, $frame) {
+		$this->transaction->put(sha1($frame->dump()), array($user, $frame));
+	}
 
 	/**
 	 * @param User $user
@@ -139,14 +165,13 @@ class Interceptor {
 			else {
 				$external->setTopicPrepend("$method.");
 			}
+//			echo "I REROUTED YOUR MESSAGE to '$method.user.{$user->getId()}' at level $newLevel!\n";
 
 			return $external->resend($this->notif, $newLevel, "user.{$user->getId()}");
 
-			// return true to dismiss the old message
-//			echo "I REROUTED YOUR MESSAGE to '$method.user.$userId' at level $newLevel!\n";
 		}
 		catch(\Exception $e) {
-			echo $e;
+//			echo $e;
 			return false;
 		}
 
@@ -160,54 +185,27 @@ class Interceptor {
 	 * @return int
 	 */
 	protected function getReroutedLevel($user, $channel, $level) {
+		$levels = $this->permissionMapper->findRouteLevels($channel, $user->getRole()->getId(), $user->getId());
 
-		/** @var Collection|Reroute[] $coll */
-		$coll = new Collection();
-
-		$checks = array(
-			'user'   => $user->getId(),
-			'role'   => $user->getRole()->getId(),
-		);
-
-		foreach($checks as $type => $id) {
-			if(!$id) {
-				continue;
-			}
-			$coll->merge($this->rerouteMapper->findByColumnList(array(
-				'relation_id'    => $id,
-				'relation_type'  => $type,
-			)));
-		}
-
-		if(!$coll->count()) {
-			// just return the old level if there are no reroutes
+		if(!count($levels)) {
+			// if in doubt, return the original level
 			return $level;
 		}
 
-		foreach($coll as $offset => $reroute) {
-			$regex = array(
-				'`\*`'   => '[^.]+',
-				'`#.?`'  => '(?:[^.]+.?)*',
-				'`\.`'   => '\.'
-			);
+		$finishLevels = array();
 
-			$routingRegex = '`' . preg_replace(
-				array_keys($regex), array_values($regex),
-				$reroute->getRoutingKey()
-			) . '`';
+		// in theory, $levels could have multiple entries
+		foreach($levels as $l) {
+			// ensure bounds checking
+			$intent = is_null($l['outgoing_level']) ? $l['default_level'] : $l['outgoing_level'];
+			$intent = max($intent, $l['min_level']);
+			$intent = min($intent, $l['max_level']);
 
-			if(!preg_match($routingRegex, $channel)) {
-				$coll->offsetUnset($offset);
-			}
+			$finishLevels[] = $intent;
 		}
 
-		if($coll->count()) {
-			// set the new level to the highest value found in the reroute
-			return max($coll->getColumnValues('outgoingLevel'));
-		}
-
-		// if in doubt, return the original level
-		return $level;
+		// return the highest value found from the resultset
+		return max($finishLevels);
 	}
 
 
