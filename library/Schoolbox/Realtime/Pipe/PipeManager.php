@@ -10,6 +10,8 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
+use Alaress\WorkerCrew\Transaction\ResponseHandlerInterface;
+use Alaress\WorkerCrew\Transaction\Transaction;
 use Predis\ClientInterface as PredisClientInterface;
 use Predis\CommunicationException;
 use Ratchet\ConnectionInterface;
@@ -17,6 +19,7 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\Wamp\WampServerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
+use React\EventLoop\Timer\TimerInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
 use Schoolbox\Notif\Message\Interceptor;
@@ -46,9 +49,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var PipeCollection */
 	protected $pipes;
 
-	/** @var Timer[] */
-	protected $pushTimerCache;
-
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
 
@@ -61,9 +61,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var Dispatcher */
 	protected $taskDispatcher;
 
-	/** @var Interceptor */
-	protected $interceptor;
-
+	/** @var Transaction[] */
+	protected $pushTransactions;
 
 	/**
 	 * @param LoopInterface $reactLoop
@@ -76,7 +75,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
 		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $verboser, $strat);
-		$this->interceptor = new Interceptor(new Connector());
 		$this->verboser = $verboser;
 
 		$this->v('Instantiated PipeManager');
@@ -213,35 +211,29 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 		// just get *a* pipe for the user, it doesn't matter which
 		$pipe = reset($this->pipes->getPipesByUserId($userId));
-
 		$self = $this;
 
-		$push = function($timer) use ($self, $pipe) {
-			/** @var Timer $timer */
-			// the timer contains the data to be processed
-			$self->v("Spawning worker to push cache", '>');
-			$data = $timer->getData();
-			$self->taskDispatcher->enqueue($pipe, 'push', $data);
-		};
-
-		// if the timer either does not exist, or it exists but has expired, create a new timer to fire in one second's time
-		if(!(isset($this->pushTimerCache[$userId]) && $this->pushTimerCache[$userId]->isActive())) {
-			$this->pushTimerCache[$userId] = $this->reactLoop->addTimer(1, $push);
+		if(empty($this->pushTransactions[$userId])) {
+			$this->pushTransactions[$userId] = new Transaction($this->reactLoop,
+				function($timer) use ($self, $pipe) {
+					/** @var Timer $timer */
+					// the timer contains the data to be processed
+					$self->v("Spawning worker to push cache", '>');
+					$data = $timer->getData();
+					$self->taskDispatcher->enqueue($pipe, 'push', $data);
+				}
+			);
 		}
 
-		// append this message to be pushed
-		$data = (array)$this->pushTimerCache[$userId]->getData();
 		$body = $message->getBody();
 
-		// just set this array up manually
-		$data[$message->getId()] = array(
+		$this->pushTransactions[$userId]->put($message->getId(), array(
 			'id' => $message->getId(),
 			'body' => $body['message']['body'],
 			'params' => $body['message']['params'],
 			'timestamp' => $body['timestamp'],
 			'status' => 'unread'
-		);
-		$this->pushTimerCache[$userId]->setData($data);
+		));
 
 		return true;
 	}
