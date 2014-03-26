@@ -417,6 +417,19 @@ class StudentReportCard {
 	}
 
 	protected function renderClassGraph(\SitePage $page) {
+		// Not showing graph? Output dummy data
+		if (!\Config::get('display_grade_graph')) {
+			$page->setVar(array(
+				'GRAPH_IS_DISPLAYED' => 0,
+				'GRAPH_JSON'         => json_encode(array()),
+				'GRAPH_COLOURS'      => json_encode(array()),
+				'GRAPH_XMIN'         => 0,
+				'GRAPH_XMAX'         => 100
+			));
+			return;
+		}
+
+		// Otherwise calculate graph data
 		$colours = array(
 			'user'    => '#579DCF',
 			'average' => '#E99D12',
@@ -475,10 +488,11 @@ class StudentReportCard {
 		$end = $start + ((365 / 2 - 1) * 86400000);
 
 		$page->setVar(array(
-			'GRAPH_JSON'    => json_encode($graph),
-			'GRAPH_COLOURS' => json_encode(array_values($colours)),
-			'GRAPH_XMIN'    => $start,
-			'GRAPH_XMAX'    => $end
+			'GRAPH_IS_DISPLAYED' => 1,
+			'GRAPH_JSON'         => json_encode($graph),
+			'GRAPH_COLOURS'      => json_encode(array_values($colours)),
+			'GRAPH_XMIN'         => $start,
+			'GRAPH_XMAX'         => $end
 		));
 	}
 

@@ -344,7 +344,7 @@
 </div>
 
 <script type="text/javascript">
-  var data = {GRAPH_JSON};
+  var displayGraph = {GRAPH_IS_DISPLAYED};
   var options = {
     series: {
       points: {
@@ -376,8 +376,14 @@
   $j(function() {
 
     // ensure there's a graph to plot
-    if($j('#subject-graph').length) {
-      $j.plot($j('#subject-graph'), data, options);
+    var graphElement = $j('#subject-graph');
+    if (graphElement.length) {
+        if (displayGraph) {
+            $j.plot(graphElement, {GRAPH_JSON}, options);
+        }
+        else {
+            graphElement.hide();
+        }
     }
 
     $j('#enrolled-subjects').bind('change', function () {
