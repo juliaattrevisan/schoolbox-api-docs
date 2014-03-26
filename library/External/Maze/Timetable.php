@@ -277,23 +277,25 @@ class External_Maze_Timetable {
 				/* Find the subjects which have this period number
 				 * This class occurs in $currentTimetableStructure
 				 */
-				foreach($allObjects as $currentObject) {
-					if ($currentTimetableStructure['PeriodNo'] == $currentObject['periodno']) {
+				if (is_array($allObjects) && count($allObjects)) {
+					foreach($allObjects as $currentObject) {
+						if ($currentTimetableStructure['PeriodNo'] == $currentObject['periodno']) {
 
-						/* Separate subject identifier
-						 */
-						$subjectData = $processedStma[$currentObject['class']];
+							/* Separate subject identifier
+							 */
+							$subjectData = $processedStma[$currentObject['class']];
 
-						/* Assemble
-						 */
-						$class = $currentObject;
+							/* Assemble
+							 */
+							$class = $currentObject;
 
-						$class['subject']['code'] = $this->getHelper()->generateClassCode($subjectData['MKEY'], $subjectData['CLASS']);
-						$class['subject']['name'] = $this->getSubjectName($subjectData['MKEY']);
+							$class['subject']['code'] = $this->getHelper()->generateClassCode($subjectData['MKEY'], $subjectData['CLASS']);
+							$class['subject']['name'] = $this->getSubjectName($subjectData['MKEY']);
 
-						/* Stack up
-						 */
-						$structure['class'] = $class;
+							/* Stack up
+							 */
+							$structure['class'] = $class;
+						}
 					}
 				}
 
