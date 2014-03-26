@@ -355,6 +355,11 @@ class External_Maze_Timetable {
 			$i++;
 		}
 
+		/* Truncate the final Period 0, last in the $finalTimetable.
+		 * It follows Period 7 right out of the stored proc
+		 */
+		array_pop($finalTimetable);
+
 		return $finalTimetable;
 	}
 
@@ -500,6 +505,11 @@ class External_Maze_Timetable {
 			$i++;
 		}
 
+		/* Truncate the final Period 0, last in the $finalTimetable.
+		 * It follows Period 7 right out of the stored proc
+		 */
+		array_pop($finalTimetable);
+
 		return $finalTimetable;
 	}
 
@@ -563,10 +573,8 @@ class External_Maze_Timetable {
 		 * [Period3 [Day1, Day2, Day3, DayN...]]
 		 * [PeriodN [Day1, Day2, Day3, DayN...]]
 		 * ...
-		 *
 		 */
 		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
-
 			$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
 			$timetable[$period]['periodStart'] = $allDayTimetables[0][$period]['periodStart'];
 			$timetable[$period]['periodEnd'] = $allDayTimetables[0][$period]['periodEnd'];
