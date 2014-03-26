@@ -122,7 +122,13 @@ class Eportfolio_Authenticator {
 				$pageMapper = new \Eportfolio\PageMapper();
 
 				try {
-					$exists = $pageMapper->findById($this->getPageId());
+					// Check the page actually exists for the owner.
+					$exists = $pageMapper->findOneByColumnList(
+						array(
+							'uid'     => $this->getOwner(),
+							'page_id' => $this->getPageId(),
+						)
+					);
 					if ($exists && ($exists->getDeletedAt() == null)) {
 						return true;
 					}

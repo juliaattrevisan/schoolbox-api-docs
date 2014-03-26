@@ -544,7 +544,7 @@ class Eportfolio {
 	 *
 	 * @return \Eportfolio\Page
 	 */
-	private function getPageInstance() {
+	public function getPageInstance() {
 		return $this->pageInstance;
 	}
 
