@@ -28,6 +28,10 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	const QUEUE_DELAY  = 1;
 	const IDLE_TIMEOUT = 5;
 
+	const TASK_FETCH     = 'fetch';
+	const TASK_PUBLISH   = 'publish';
+	const TASK_INTERCEPT = 'intercept';
+
 	protected $flywheelSpins;
 
 
@@ -108,7 +112,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	 * @return array
 	 */
 	public function getSupportedActions() {
-		return array('fetch', 'publish');
+		return array(self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_INTERCEPT);
 	}
 
 

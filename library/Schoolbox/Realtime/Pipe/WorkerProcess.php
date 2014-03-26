@@ -11,15 +11,25 @@ namespace Schoolbox\Realtime\Pipe;
 
 
 
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
+use React\Stomp\Protocol\Frame;
 use RuntimeException;
+use Schoolbox\Notif\Message\Interceptor;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Verboser;
+use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess {
+
+	/** @var \Schoolbox\Notif\Queue\UserQueueFactory  */
+	protected $mqf;
+
+	/** @var \Schoolbox\Notif\Message\Interceptor  */
+	protected $interceptor;
 
 
 	/**
@@ -29,6 +39,7 @@ class WorkerProcess extends AbstractProcess {
 	public function __construct($strat = null, $verboser = null) {
 		parent::__construct($strat, $verboser);
 		$this->mqf = new UserQueueFactory(new Connector());
+		$this->interceptor = new Interceptor($verboser);
 	}
 
 
@@ -43,7 +54,7 @@ class WorkerProcess extends AbstractProcess {
 		switch($command) {
 
 			// retrieve messages
-			case 'fetch':
+			case DefaultDispatchStrategy::TASK_FETCH:
 				list($userId, $count) = $args;
 
 				$messages = array();
@@ -58,7 +69,7 @@ class WorkerProcess extends AbstractProcess {
 				return array($messages);
 
 			// push messages
-			case 'publish':
+			case DefaultDispatchStrategy::TASK_PUBLISH:
 				$data = unserialize($args[0]);
 
 				if(!(is_array($data) && count($data) == 4)) {
@@ -74,6 +85,18 @@ class WorkerProcess extends AbstractProcess {
 
 				// this call SHOULD return a Messenger object
 				return serialize(call_user_func($callback, $model, $userId, $diff));
+
+			// process interceptions
+			case DefaultDispatchStrategy::TASK_INTERCEPT:
+				$count = 0;
+				foreach($args as $v) {
+					list($user, $frame) = $v;
+					ob_start();
+					$count += $this->interceptor->reroute($user, $frame) ? 1 : 0;
+					$this->v->v(ob_get_contents());
+					ob_end_clean();
+				}
+				return $count;
 		}
 
 		throw new InvalidArgumentException("Can't process '$command'.");
