@@ -153,6 +153,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						'vcal.'.$decodedConfig->getUrl(),
 						function($params) {
 							list($source, $startTimestamp, $endTimestamp) = $params;
+							// Screw you if you added a UTF8 BOM
+							$source = preg_replace('/^\\xEF\\xBB\\xBF/', '', $source);
 							$allEvents = Sabre\VObject\Reader::read(
 								$source, Sabre\VObject\Reader::OPTION_FORGIVING
 							);
