@@ -9,6 +9,7 @@
  */
 require_once __DIR__ . '/../../../include/Bootstrap.php';
 
-$importer = new \DailyQuote\Importer('./quotes.csv');
-$importer->import();
-
+if (Config::get('site_location') === 'cathedral') {
+    $importer = new \DailyQuote\Importer('./quotes.csv');
+    $importer->import();
+}
