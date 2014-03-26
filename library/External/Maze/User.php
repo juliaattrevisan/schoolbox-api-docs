@@ -613,31 +613,26 @@ class External_Maze_User implements External_UserInterface {
 					'' AS classType,
 					'' AS ClassCampus
 				FROM TTTG
-				LEFT JOIN SF ON TTTG.T1TEACH = SF.SFKEY
-				LEFT JOIN SU ON TTTG.SUBJ = SU.SUKEY
-				WHERE SF.SFKEY = '{$externalUserId}'
+				INNER JOIN TT ON TTTG.GKEY = TT.TTKEY
+				INNER JOIN SU ON TTTG.SUBJ = SU.SUKEY
+				WHERE (T1TEACH = '{$externalUserId}' OR T2TEACH = '{$externalUserId}')
+				AND TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
 			";
 		}
 
 		$allSubjects = $this->getDb()->getAll($query);
-
 		$subjectList = array();
-		$processed = array();
 
-		/* Uniqueify results
+		/* Format it in a schoolbox-friendly way
 		 */
 		if (is_array($allSubjects) && count($allSubjects)) {
 			foreach($allSubjects as $currentSubject) {
-				if (!in_array($currentSubject['ClassCode'], $processed)) {
-					$subjectList[] = array(
-						'code' => $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']),
-						'name' => $currentSubject['name'],
-						'classType' => $currentSubject['classType'],
-						'campusCode' => $currentSubject['ClassCampus']
-					);
-
-					$processed[] = $currentSubject['ClassCode'];
-				}
+				$subjectList[] = array(
+					'code' => $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']),
+					'name' => $currentSubject['name'],
+					'classType' => $currentSubject['classType'],
+					'campusCode' => $currentSubject['ClassCampus']
+				);
 			}
 		}
 
