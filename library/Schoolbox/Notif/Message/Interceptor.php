@@ -21,7 +21,10 @@ use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\External\TargetedMessage;
+use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Queue\ReadMessage;
+use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Verboser;
@@ -80,7 +83,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 	 * @return void              - this method does not return any value
 	 */
 	public function handleResponse($identifier, $command, $data) {
-		// TODO possibly nothing, the worker did the work
+		// nothing to do, the worker did the work
 		$this->v->v("Reroute count: $data[0]");
 	}
 
@@ -247,6 +250,20 @@ class Interceptor implements TaskResponseHandlerInterface {
 		// if roletype set, must be of role specified
 		if(isset($context['roletype'])) {
 			if(!$this->testContextValue($context['roletype'], $user->getRole()->getType())) {
+				return true;
+			}
+		}
+
+		// TODO refactor this - performance penalty is way too high
+		$m = new AMQPMessage('');
+		$body['message'] = unserialize($body['message']);
+		$m->setBody((string)$body['message']);
+		$compare = new ReadMessage($m);
+
+		$q = new UserQueue(array('user' => array('id' => $user->getId())), new Connector());
+		foreach($q->getMessages(0, true) as $msg) {
+			if($compare->getFormattedText() == $msg->getFormattedText()) {
+				// already seen, suppress
 				return true;
 			}
 		}
