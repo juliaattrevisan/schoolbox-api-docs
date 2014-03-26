@@ -154,11 +154,36 @@ class External_Maze_Timetable {
 	/**
 	 * Calculates the current period based on the current time
 	 *
+	 * The returned data structure is required for Dashboard Timetable Controller
+	 *
 	 * @param $campusId
 	 * @return int
 	 */
 	public function getPeriodNumber($campusId) {
-		return 0;
+		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+		$allTimes = $this->getPeriodTimes();
+
+		if (is_array($allTimes) && count($allTimes)) {
+			$i = 1;
+
+			foreach($allTimes as $currentTime) {
+				if ($currentTime['startTime']->getTimeOnly() <= $now->getTimeOnly()) {
+					if ($currentTime['endTime']->getTimeOnly() > $now->getTimeOnly()) {
+
+						return array(
+							'PeriodNumber' => $i
+						);
+					}
+				}
+
+				$i++;
+			}
+		}
+
+		return array(
+			'PeriodNumber' => 0
+		);
 	}
 
 	/**
