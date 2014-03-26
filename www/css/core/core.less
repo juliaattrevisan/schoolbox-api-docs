@@ -10787,3 +10787,50 @@ textarea.event-detail {
 	font-style: italic;
 	margin-left: 32px;
 }
+
+.message-list {
+	ul.events {
+		margin: 0;
+	}
+	.day {
+		margin-bottom: 24px;
+	}
+	.event {
+		padding: 0;
+		margin: 0;
+		position: relative;
+		> span {
+			padding: 8px;
+			display: block;
+		}
+		a {
+			line-height: 16px;
+			text-decoration: none;
+			&.time {
+				font-size: 0.85em;
+				margin: 5px 8px 0 0;
+				color: #888;
+				float: left;
+				width: 40px;
+				text-align: right;
+			}
+			&[href]:hover {
+				text-decoration: underline;
+			}
+			&:hover span {
+				text-decoration: underline;
+			}
+		}
+		img {
+			width: 24px;
+			height: 24px;
+			margin-bottom: -8px;
+			position: static;
+		}
+		.body {
+			display: block;
+			margin: -15px 0 4px 0;
+			padding: 0 0 0 80px;
+		}
+	}
+}

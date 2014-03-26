@@ -1,46 +1,6 @@
-<!-- BEGIN custom_head -->
-<style type="text/css">
-  .day {
-    margin-bottom: 24px;
-  }
-  .event {
-    padding-left: 8px;
-  }
-  .event a {
-    line-height: 36px;
-    text-decoration: none;
-  }
-  .event a[href]:hover {
-    text-decoration: underline;
-  }
-  .event span {
-    margin-left: 8px;
-  }
-  .event a:hover span {
-    text-decoration: underline;
-  }
-  ul.events {
-    margin: 0;
-  }
-  .event img {
-    width: 24px;
-    height: 24px;
-    margin-bottom: -8px;
-  }
-  .event a.time {
-    font-size: 0.85em;
-    margin: 0 16px 0 8px;
-    color: #888;
-    float: left;
-    width: 40px;
-    text-align: right;
-  }
-
-</style>
-<!-- END custom_head -->
 <h1>Messages</h1>
 <!-- BEGIN days -->
-<ul class="days">
+<ul class="message-list days">
   <!-- BEGIN day -->
   <li class="day">
     <h2>{DAY}</h2>
@@ -48,11 +8,13 @@
     <ul class="events">
       <!-- BEGIN event -->
       <li class="event {EVENT_DARK}">
-        <a href="{EVENT_HREF}" class="time">
-          <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
-        </a>
-        <img src="{EVENT_ICON}" alt="" width="24" height="24" />
-        <span>{EVENT_BODY}</span>
+        <span>
+          <a href="{EVENT_HREF}" class="time">
+            <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
+          </a>
+          <img src="{EVENT_ICON}" alt="" width="24" height="24" />
+          <span class="body">{EVENT_BODY}</span>
+        </span>
       </li>
       <!-- END event -->
     </ul>
