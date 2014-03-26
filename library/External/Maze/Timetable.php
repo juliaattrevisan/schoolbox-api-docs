@@ -240,6 +240,7 @@ class External_Maze_Timetable {
 		/* A list of all the class values, which are stma.idents
 		 */
 		$allSubjects = array();
+		$allObjects = array();
 
 		if (is_array($result2['result']) && count($result2['result'])) {
 			foreach($result2['result'] as $currentPeriod) {
@@ -355,7 +356,8 @@ class External_Maze_Timetable {
 			$i++;
 		}
 
-		/* Truncate the final Period 0, last in the $finalTimetable.
+		/* TODO: Some serious assumption about final period 0
+		 * Truncate the final Period 0, last in the $finalTimetable.
 		 * It follows Period 7 right out of the stored proc
 		 */
 		array_pop($finalTimetable);
@@ -455,22 +457,24 @@ class External_Maze_Timetable {
 				/* Find the subjects which have this period number
 				 * This class occurs in $currentTimetableStructure
 				 */
-				foreach($allObjects as $currentObject) {
-					if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
+				if (is_array($allObjects) && count($allObjects)) {
+					foreach($allObjects as $currentObject) {
+						if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
 
-						/* Assemble
-						 */
-						$class = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
+							/* Assemble
+							 */
+							$class = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
 
-						/* Separate subject identifier
-						 */
-						$class['subject']['code'] = $this->getHelper()->generateClassCode($currentObject['stma']['MKEY'], $currentObject['stma']['CLASS']);
-						$class['subject']['name'] = $this->getSubjectName($currentObject['stma']['MKEY']);
+							/* Separate subject identifier
+							 */
+							$class['subject']['code'] = $this->getHelper()->generateClassCode($currentObject['stma']['MKEY'], $currentObject['stma']['CLASS']);
+							$class['subject']['name'] = $this->getSubjectName($currentObject['stma']['MKEY']);
 
-						/* Stack up
-						 */
-						$structure['stmaIdent'] = $currentObject['stma']['IDENT'];
-						$structure['class'] = $class;
+							/* Stack up
+							 */
+							$structure['stmaIdent'] = $currentObject['stma']['IDENT'];
+							$structure['class'] = $class;
+						}
 					}
 				}
 
@@ -505,7 +509,8 @@ class External_Maze_Timetable {
 			$i++;
 		}
 
-		/* Truncate the final Period 0, last in the $finalTimetable.
+		/* TODO: Some serious assumption about final period 0
+		 * Truncate the final Period 0, last in the $finalTimetable.
 		 * It follows Period 7 right out of the stored proc
 		 */
 		array_pop($finalTimetable);
