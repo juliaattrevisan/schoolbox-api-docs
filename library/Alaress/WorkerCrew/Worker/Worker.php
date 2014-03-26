@@ -88,24 +88,24 @@ class Worker {
 
 
 	public function write($string) {
-
-		$len = strlen($string);
-		$sent = 0;
 		$chunk = $this->strat->getProtocol()->chunkLength();
+		$strlen = strlen($string);
+		$end = $this->strat->getProtocol()->end();
 
-		while($sent < $len) {
-			$shard = str_pad(substr($string, $sent, $chunk), $chunk, $this->strat->getProtocol()->end());
-			$this->v->v("Sending another ".strlen($shard)." bytes");
-			$i = fputs($this->pipes[0], $shard, $chunk);
-			if($i == 0) {
+		for ($written = 0; $written < $strlen; $written += $fwrite) {
+			$shard = str_pad(substr($string, $written, $chunk), $chunk, $end);
+			$fwrite = fwrite($this->pipes[0], $shard);
+			if ($fwrite === false) {
+				$this->v->v("Broken pipe, could not write to worker", '!');
 				break;
 			}
-			$sent += $i;
 		}
-		// ensure the last chunk is sent!
-		fflush($this->pipes[0]);
 
-		$this->v->v("Sent $sent bytes");
+		$this->v->v("Sent $written bytes");
+
+		if($written < $strlen) {
+			$this->v->v("Worker pipe communication terminated prematurely after $written bytes, ", $strlen - $written, " unsent", '!');
+		}
 
 		return $this;
 	}
