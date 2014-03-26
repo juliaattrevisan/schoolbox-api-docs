@@ -93,6 +93,36 @@ class Subcontext_CoreContext extends BaseContext {
     }
 
     /**
+     * Visits the add a folder page, given a folder path from the resource browser.
+     *
+     * @Then /^I add a folder to "(?P<homepage_path>[^"]*)"$/
+     *
+     * @param string $homepage_path
+     * @throws Exception if the folder was not found.
+     */
+    public function addFolderToHomepage($homepage_path) {
+        $this->getMinkContext()->visit('/resources/');
+        $this->traverseTree($this->getSession()->getPage()->find('css', '#category-window'), $homepage_path);
+        $this->getCoreContext()->waitForAjax();
+        $this->getSession()->getPage()->find('css', '#detail-window a.add')->click();
+    }
+
+    /**
+     * Visits the modify folder page, given a folder path from the resource browser.
+     *
+     * @Then /^I modify folder "(?P<homepage_path>[^"]*)"$/
+     *
+     * @param string $homepage_path
+     * @throws Exception if the folder was not found.
+     */
+    public function modifyFolder($homepage_path) {
+        $this->getMinkContext()->visit('/resources/');
+        $this->traverseTree($this->getSession()->getPage()->find('css', '#category-window'), $homepage_path);
+        $this->getCoreContext()->waitForAjax();
+        $this->getSession()->getPage()->find('css', '#detail-window a.modify')->click();
+    }
+
+    /**
      * Traverses a tree structure (examples: resource browser)
      *
      * @param Element\NodeElement $tree The element which contains the tree.
