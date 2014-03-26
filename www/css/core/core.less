@@ -3463,6 +3463,29 @@ EVALUATION
     border: none;
 }
 
+.evaluation-saving {
+  border:1px solid #aaa;
+  width:280px;
+  height:80px;
+  background-color:#fff;
+  background-image: url('/images/loading-bar.gif');
+  background-repeat: no-repeat;
+  background-position: 50% 40px;
+  margin: 0 auto;
+  -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
+  display: none;
+}
+
+.evaluation-saving p {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.evaluation-selected {
+  background-color: @neutral-color;
+}
+
 fieldset.edit-duration {
     padding-top: 7px;
     margin-bottom: 10px;
@@ -3946,8 +3969,6 @@ ul.section-options a.drop-arrow {
 .evaluation-content.take-test  label.radio-buttons,
 .evaluation-content.take-test  label.checkboxes {
     padding: 15px 40px 15px 10px;
-    background: @white;
-    background: @white;
     border: 1px solid @lgrey;
     margin-bottom: 10px;
     width: auto;
