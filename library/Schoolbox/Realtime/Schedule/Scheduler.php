@@ -102,6 +102,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 		// create a stomp client for listening to Mapper messages coming in
 		$stompFactory = new Factory($this->loop);
+		$interceptor  = new Interceptor($this->verboser, $this->loop);
 
 		try {
 			$stompClient = $stompFactory->createClient(array(
@@ -116,7 +117,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 			$self = $this;
 
 			/** Connect to stomp via the provided loop */
-			$stompClient->connect()->then(function($client) use ($v, $self) {
+			$stompClient->connect()->then(function($client) use ($v, $self, $interceptor) {
 				// this closure is called when stomp successfully connects
 				/** @var Client $client */
 				$v->v("Scheduler connected to STOMP", '+');
@@ -128,19 +129,15 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 				/** Subscribe to the queue set aside for the scheduler */
 				$client->subscribeWithAck('/amq/queue/' . INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, 'client', array($self, 'onAMQP'));
-				$interceptor = new Interceptor(new Connector());
 
 				// subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
-
 				foreach(UserMapper::getInstance()->findAll() as $user) {
 					/** @var User $user - self hydration */
 					$user = UserMapper::getInstance()->findById($user->getId());
 					$subn = '/amq/queue/'.UserQueue::getUserToSortQueueName($user->getId());
-//					$self->verboser->v("Subscribing to $subn");
-					$client->subscribe($subn, function($frame) use ($self, $interceptor, $user) {
+					$client->subscribe($subn, function($frame) use ($interceptor, $user) {
 						// this closure is executed every time a message is sent to the client based on the given subscription
-//						$self->verboser->v("Intercepting frame");
-						$interceptor->reroute($user, $frame);
+						$interceptor->process($user, $frame);
 					});
 				}
 			});
