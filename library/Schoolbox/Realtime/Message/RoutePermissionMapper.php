@@ -10,10 +10,14 @@
 namespace Schoolbox\Realtime\Message;
 
 
+use DatabaseStatement;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 
 class RoutePermissionMapper extends Mapper {
+
+	/** @var DatabaseStatement[] */
+	protected $prepared = array();
 
 	protected function mapping() {
 		$this->hasTable('msg_route_perm');
@@ -68,10 +72,10 @@ class RoutePermissionMapper extends Mapper {
 		));
 	}
 
-	public function findLevelsByTopic($topic, $roleId, $userId = 0) {
-		$stmt = $this->database->prepare("
+	public function findRouteLevels($topic, $roleId, $userId = 0) {
+		$stmt = $this->prepare("
 			SELECT
-				CONCAT('#.', ns.slug, '.*.', src.key) routing_key,
+				ns.slug, src.key,
 				perm.min_level, perm.default_level, reroute.outgoing_level, perm.max_level
 			FROM msg_source src
 			LEFT JOIN msg_namespace ns ON src.namespace = ns.id
@@ -85,23 +89,32 @@ class RoutePermissionMapper extends Mapper {
 			'user_id' => $userId
 		));
 
-		$regex = array(
-			'`\*`'   => '[^.]+',
-			'`#.?`'  => '(?:[^.]+.?)*',
-			'`\.`'   => '\.'
-		);
-
 		$result = array();
+		$topic = explode('.', $topic);
 
 		while($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-			$routingRegex = '`^' . preg_replace(array_keys($regex), array_values($regex), $r['routing_key']) . '$`';
-			if(preg_match($routingRegex, $topic)) {
+			$test = array($r['slug'], $r['key']);
+			if(!count(array_diff($test, $topic))) {
 				$result[] = $r;
 			}
 		}
 
 		return $result;
 
+	}
+
+	/**
+	 * Transparently cache prepared statements rather than creating new ones
+	 *
+	 * @param $queryString
+	 * @return DatabaseStatement
+	 */
+	public function prepare($queryString) {
+		$hash = sha1($queryString);
+		if(empty($this->prepared[$hash])) {
+			$this->prepared[$hash] = $this->database->prepare($queryString);
+		}
+		return $this->prepared[$hash];
 	}
 
 
