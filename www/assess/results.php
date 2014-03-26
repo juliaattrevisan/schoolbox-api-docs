@@ -159,7 +159,7 @@ $this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 $this->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
-$this->setBlock('modify_btn', 'has_attempt', 'has_attempt_block');
+$this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
 
 $this->setTitle('Results for: ' . $assess['title']);
 
