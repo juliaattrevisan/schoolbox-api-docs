@@ -15,13 +15,11 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
-use React\Stomp\Protocol\Frame;
 use RuntimeException;
 use Schoolbox\Notif\Message\Interceptor;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Verboser;
-use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess {
 
@@ -93,7 +91,9 @@ class WorkerProcess extends AbstractProcess {
 					list($user, $frame) = $v;
 					ob_start();
 					$count += $this->interceptor->reroute($user, $frame) ? 1 : 0;
-					$this->v->v(ob_get_contents());
+					if($output = ob_get_contents()) {
+						$this->v->v($output);
+					}
 					ob_end_clean();
 				}
 				return $count;

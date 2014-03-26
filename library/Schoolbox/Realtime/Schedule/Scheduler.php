@@ -202,7 +202,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 	 */
 	public function handleResponse($trigger, $command, $data) {
 
-		$this->verboser->v("Received worker response to handle: ".substr(json_encode($data), 0, 64)."...");
+		$this->verboser->v("Received worker response to handle: '$command' -> ".substr(json_encode($data), 0, 64)."...");
 
 		// detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
 		$this->detachTrigger($trigger);
@@ -214,6 +214,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 		// method not implemented or nothing to send, this is fine
 		if(is_null($msgr)) {
+			$this->verboser->v("No messages to broadcast");
 			return;
 		}
 
@@ -224,6 +225,7 @@ class Scheduler implements SchedulingInterface, TaskResponseHandlerInterface {
 
 		// if there are no messages, just ignore this callback and move on
 		if(!$msgr->hasMessages()) {
+			$this->verboser->v("No messages to broadcast");
 			return;
 		}
 
