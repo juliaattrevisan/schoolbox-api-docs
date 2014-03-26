@@ -29,10 +29,6 @@ $folderId = $_POST['folderId'];
 
 // check 2: user logged in an has at minimum read access
 $groupHandler = new Group();
-$access = $groupHandler->getPermission($folderId);
-if($access < READ_ACCESS) {
-	sendError('User does not have access to this folder');
-}
 
 // check 3: if no files specified, return folder
 if(!isset($_POST['files'])) {
@@ -105,6 +101,7 @@ function getFolderMeta($folderId) {
 	// take the fist entry from the list of directories
 	$folderList = $davFolderHandler->getFolderNode($folderId);
 
+
 	foreach($folderList as $f) {
 		if($f['id'] == $folderId) {
 			$folder = $f;
@@ -160,18 +157,20 @@ function getSingleFileMeta($folderId, $fileId) {
 		$mimetype = $mtypeMap->getUnknownMime();
 	}
 
-	$modified = new Alaress_Date_Relative($file['submitted']);
+
+	$modified = new Alaress_Date_Relative(strtotime($file['submitted']));
+    $created = new Alaress_Date_Relative($file['ctime']);
 
 	$file = array(
 		'kind' => 'file',
 		'id' => $fileId,
-		'name' => $file['description'],
+		'name' => urldecode($file['description']),
 		'mime' => $mimetype->getIconFile(),
 		'filesize' => Alaress_Byte_Format::bytesToString($file['file_size']),
 		'hidden' => 0,
-		'description' => $file['description'],
+		'description' => urldecode($file['description']),
 		'posted_by' => 'you',
-		'posted_date' => $file['ctime'],
+		'posted_date' => $created->getRelativeTime(),
 		'modified' => $modified->getRelativeTime(),
 		'actions' => $actions
 	);
