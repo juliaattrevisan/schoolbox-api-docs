@@ -123,6 +123,14 @@
             }
         }, "Please enter a numeric mark amount");
 
+        jQuery.validator.addMethod('markTypeRubricCriteriaExists', function(value, element) {
+            if(marktype.rubric.is(':visible')) {
+                return $j('#rubric-criteria').find('input[type="checkbox"]').length > 1;
+            }
+            else {
+                return true;
+            }
+        }, 'Please ensure at least two criteria exist');
         jQuery.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
                 return $j('#rubric-criteria').find('input:checked').length > 1;
@@ -170,6 +178,7 @@
                     markTypeRubricResultsetCheck: true
                 },
                 criteria: {
+                    markTypeRubricCriteriaExists: true,
                     markTypeRubricCriteriaCheck: true
                 },
                 open_date:   open_date_valid,
@@ -531,6 +540,8 @@
                         </select> levels
                     </label>
                 </p>
+
+                <!-- required for jQuery validate -->
                 <input type="hidden" name="result_set" />
             </div>
             <div class="clearfix"></div>
@@ -541,6 +552,8 @@
                 {COURSE_CRITERIA}
                 {CLASS_CRITERIA}
 
+                <!-- required for jQuery validate -->
+                <input type="hidden" name="criteria" />
             </div>
         </td>
     </tr>
