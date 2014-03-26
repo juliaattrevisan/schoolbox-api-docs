@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once __DIR__.'/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $importer = new \DailyQuote\Importer('./quotes.csv');
 $importer->import();

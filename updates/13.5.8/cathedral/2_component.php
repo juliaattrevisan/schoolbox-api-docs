@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 if (Config::get('site_location') === 'cathedral') {
     $component = array(
