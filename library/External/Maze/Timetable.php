@@ -519,6 +519,9 @@ class External_Maze_Timetable {
 	 * @return array|bool
 	 */
 	private function getPeriodTimes() {
+
+		/* TODO: Some serious assumption about 14 here
+		 */
 		$query = "
 			SELECT TOP 14
 				CONVERT(VARCHAR, TIME_START, 120) AS startTime,
