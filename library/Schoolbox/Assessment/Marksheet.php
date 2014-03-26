@@ -402,7 +402,11 @@ class Marksheet {
 			);
 		}
 		else {
-			$mark = array('mark' => null, 'norm_mark' => null, 'comment' => '');
+			$mark = array(
+				'mark' => null,
+				'norm_mark' => null,
+				'comment' => ($rtn[0]['comment'] ?: ''),
+			);
 		}
 
 		if(is_null($mark['mark'])) {
