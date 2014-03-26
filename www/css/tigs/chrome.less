@@ -319,9 +319,23 @@
       margin: 8px !important;
     }
 
-    // This fixes profile directory
-    .directory .subjects ul:nth-child(odd) li {
+    // Profile page overrides
+    .directory li,
+    .profile-detail dt,
+    .profile-detail dd{
+      background: #fff;
+    }
+
+    .directory .subjects ul:nth-child(odd) li,
+    .directory .subjects ul li:nth-child(even),
+    .profile-detail dt.dark,
+    .profile-detail dd.dark{
       background: #fafafa;
+    }
+
+    .profile-info dl dt {
+      width: 19%;
+      padding: 5px 0 5px 1%;
     }
 
     // Calendar background fix
@@ -334,6 +348,7 @@
     .timetable > thead > tr > th.normal:first-of-type > .time{
       display:none;
     }
+
   }
 
 }
