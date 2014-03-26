@@ -157,12 +157,12 @@ class Dispatcher implements DispatcherInterface {
 			return;
 		}
 
-		$this->v->v("Pushing command to worker", '>');
 
 		// pop the task from the queue and run the next task
 		try {
 			$this->q->dequeue();
-			$this->pool->accept($identifier, $cmd, $data, $this->q->count());
+			$pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
+			$this->v->v("Command '$cmd' pushed to worker {{$pid}}", '>');
 		}
 		catch(Exception $e) {
 			// we need to catch any and all exception here, lest we explode our reactor

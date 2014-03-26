@@ -56,11 +56,14 @@ class Pool {
 
 
 	/**
+	 * Request to the pool to accept the given command. Returns the PID of the process to which the task was assigned.
+	 *
 	 * @param object $identifier
 	 * @param string $cmd
 	 * @param string $args
 	 * @param int $remainingTaskCount
 	 * @throws RuntimeException
+	 * @return int
 	 */
 	public function accept($identifier, $cmd, $args, $remainingTaskCount) {
 		$pid = $this->poolingStrat->getAvailableWorker($this->workers, $remainingTaskCount);
@@ -76,6 +79,7 @@ class Pool {
 		}
 
 		$this->assignTask($pid, $cmd, $args, $identifier);
+		return $pid;
 	}
 
 
