@@ -295,9 +295,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 			// this was dealt with by a worker, just push the result
 			case 'fetch':
 				$data = $data[0];
-				// no break;
-			case 'push':
 				$this->sendToPipe($pipe, array($command => $data));
+				break;
+			case 'push':
+				$this->sendToUser($userId, array($command => $data));
 				break;
 
 			// deal with this yourself
