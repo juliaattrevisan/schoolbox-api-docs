@@ -300,6 +300,17 @@ class SitePage extends Page {
             $this->goLoginPage();
         }
 
+        // If we've fallen through to this point, the user must be logged in.
+        // Is this a URL in the form of /?page=urlencode($url)?
+        // If so, redirect to $url.
+        $url = parse_url($_SERVER['REQUEST_URI']);
+        if ($url['path'] === '' || $url['path'] === '/') {
+            parse_str($url['query'], $query);
+            if (count($query) === 1 && isset($query['page']) && preg_match('|^/|', $query['page'])) {
+                $this->localRedir($query['page']);
+            }
+        }
+
         //reset session timer
         $_SESSION['lasttime'] = mktime();
     }
