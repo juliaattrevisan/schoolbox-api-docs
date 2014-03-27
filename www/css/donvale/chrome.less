@@ -41,6 +41,7 @@
 @banner-links:      			@link;
 @banner-height:     			136px;
 @search-color:                  @secondary-text;
+@infopanel-height:				32px;
 
 // Modules
 @module-heading: 				#FFFFFF;
@@ -78,3 +79,16 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
+
+#infoPanel .bell {
+	background-image: url('/images/donvale/bell.png');
+	border-radius: 3px;
+	&.open {
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+}
+#message-list {
+	border-radius: 3px;
+	border-top-right-radius: 0;
+}
