@@ -14,28 +14,23 @@ use Alaress\DebugBar\DataCollector\MssqlDatabaseCollector;
 class MSSQL {
 
 	/**
-	 * This database's default encoding.
+	 * This used to store this database's default encoding, now does nothing.
 	 *
-	 * Referenced when converting strings from database to UTF-8.
+	 * @deprecated use ini setting mssql.encoding instead
 	 *
 	 * @var string
 	 */
 	protected $encoding = 'ISO-8859-1';
 
 	/**
-	 * Is encoding converted or not for calls to getAll/Row/One?
+	 * This used to control whether encoding was converted or not for calls to
+	 * getAll/Row/One, now does nothing.
+	 *
+	 * @deprecated use ini setting mssql.encoding instead
 	 *
 	 * @var bool
 	 */
-	protected $convert_encoding = true;
-
-	/**
-	 * If encoding has been switched on or off for a single request, the
-	 * previous value of $this->convert_encoding is here.
-	 *
-	 * @var bool
-	 */
-	protected $previous_encoding = null;
+	protected $convert_encoding = false;
 
 	/**
 	 * @var MssqlDatabaseCollector
@@ -138,14 +133,21 @@ class MSSQL {
      * @throws Schoolbox\External\Exception
      */
     function connect() {
-		if(!isset($this->dbf))
+		if (!isset($this->dbf)) {
+			// mssql.charset not already set? set it to UTF-8 here.
+			if (strlen(ini_get('mssql.charset')) === 0) {
+				ini_set('mssql.charset', 'UTF-8');
+			}
 			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd);
+		}
 
-		if($this->dbf == false)
+		if ($this->dbf == false) {
 			throw new \Schoolbox\External\Exception("External database is offline.");
+		}
 
-		if(!$this->changeDb($this->db))
+		if (!$this->changeDb($this->db)) {
 			throw new \Schoolbox\External\Exception("External database is online, but unable to connect.");
+		}
 
         /* Set Default NULL ON, due to stored procs requiring this */
         mssql_query('SET ANSI_NULL_DFLT_ON ON',$this->dbf);
@@ -429,8 +431,13 @@ class MSSQL {
 	}
 
 	/**
-	 * Converts $value's encoding to UTF-8, based on whatever this connection's
-	 * encoding is (ISO-8859-1 if not specified).
+	 * Used to converts $value's encoding to UTF-8, based on whatever this
+	 * connection's encoding was (ISO-8859-1 if not specified).
+	 *
+	 * Now does nothing, because mssql.encoding handles charset conversion
+	 * properly and transparently.
+	 *
+	 * @deprecated use ini setting mssql.encoding instead
 	 *
 	 * @param $value
 	 *
@@ -438,12 +445,15 @@ class MSSQL {
 	 */
 	protected function convertEncoding($value)
 	{
-		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
+		return $value;
+//		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
 	}
 
 
 	/**
 	 * Gets whether character set conversion is enabled.
+	 *
+	 * @deprecated use ini setting mssql.encoding instead
 	 *
 	 * @return bool
 	 */
@@ -456,32 +466,13 @@ class MSSQL {
 	/**
 	 * Sets whether character set conversion is enabled.
 	 *
+	 * @deprecated use ini setting mssql.encoding instead
+	 *
 	 * @param $convert
 	 */
 	public function setConvertEncoding($convert)
 	{
 		$this->convert_encoding = $convert;
-	}
-
-
-	/**
-	 * Sets whether character set conversion was enabled for previous request.
-	 *
-	 * @param $previous_encoding
-	 */
-	protected function setPreviousEncoding($previous_encoding)
-	{
-		$this->previous_encoding = $previous_encoding;
-	}
-
-	/**
-	 * Gets whether character set conversion was enabled for previous request.
-	 *
-	 * @return bool
-	 */
-	protected function getPreviousEncoding()
-	{
-		return $this->previous_encoding;
 	}
 
 	/**

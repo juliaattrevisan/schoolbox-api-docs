@@ -121,12 +121,7 @@ class External_Synergetic_User implements External_UserInterface {
 					WHERE vPhotos.ID = '".$this->getDatabase()->quote($externalUserId)."'
 				";
 
-				//
-				// SB-2063 - Don't try to convert charsets for binary fields.
-				$convert_encoding = $this->getDatabase()->getConvertEncoding();
-				$this->getDatabase()->setConvertEncoding(false);
 				$photo = $this->getDatabase()->getRow($query);
-				$this->getDatabase()->setConvertEncoding($convert_encoding);
 
 				/* Purge all previously transformed copies
 				 */
