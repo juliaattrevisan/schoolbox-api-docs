@@ -23,8 +23,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Queue\ReadMessage;
-use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Verboser;
@@ -50,6 +49,9 @@ class Interceptor implements TaskResponseHandlerInterface {
 
 	/** @var Verboser  */
 	protected $v;
+
+	/** @var bool */
+	protected $patient = true;
 
 	/**
 	 * @param Verboser $verboser
@@ -85,6 +87,11 @@ class Interceptor implements TaskResponseHandlerInterface {
 	public function handleResponse($identifier, $command, $data) {
 		// nothing to do, the worker did the work
 		$this->v->v("Reroute count: $data[0]");
+		// after receiving the first batch, disable patience
+		if($this->isPatient()) {
+			$this->v->v("Moving out of patient mode");
+			$this->setPatience(false);
+		}
 	}
 
 	/**
@@ -254,21 +261,10 @@ class Interceptor implements TaskResponseHandlerInterface {
 			}
 		}
 
-		// TODO refactor this - performance penalty is way too high
-		$m = new AMQPMessage('');
-		$body['message'] = unserialize($body['message']);
-		$m->setBody((string)$body['message']);
-		$compare = new ReadMessage($m);
+		$uqf = new UserQueueFactory(new Connector());
 
-		$q = new UserQueue(array('user' => array('id' => $user->getId())), new Connector());
-		foreach($q->getMessages(0, true) as $msg) {
-			if($compare->getFormattedText() == $msg->getFormattedText()) {
-				// already seen, suppress
-				return true;
-			}
-		}
-
-		return false;
+		// only perform extra dedupe checks if we're in patient (aka boot) mode
+		return $this->isPatient() ? $uqf->userHasSeen($user->getId(), unserialize($body['message'])) : false;
 	}
 
 
@@ -303,6 +299,28 @@ class Interceptor implements TaskResponseHandlerInterface {
 			return in_array($contextValue, $comparisonValue);
 		}
 		return $contextValue == $comparisonValue;
+	}
+
+
+
+	/**
+	 * Are we being patient and doing extra dedupe checks?
+	 *
+	 * @return bool
+	 */
+	public function isPatient() {
+		return $this->patient;
+	}
+
+	/**
+	 * Set patience.
+	 *
+	 * @param bool
+	 * @return self
+	 */
+	protected function setPatience($patient) {
+		$this->patient = $patient;
+		return $this;
 	}
 
 }

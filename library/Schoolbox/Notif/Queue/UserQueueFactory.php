@@ -14,6 +14,7 @@ use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Resource\Category;
@@ -359,5 +360,37 @@ class UserQueueFactory {
 		}
 
 		return $count;
+	}
+
+	/**
+	 * Returns whether or not a given message is sitting in the given user's listed and digest queues
+	 *
+	 * @param int $userId
+	 * @param External $external
+	 * @return bool
+	 */
+	public function userHasSeen($userId, $external) {
+
+		$result = false;
+
+		$nack = array();
+		while($m = $this->mqConnector->readFromQueue(UserQueue::getUserListedQueueName($userId))) {
+			$nack[] = $m;
+
+			$unjson = json_decode($m->body, true);
+
+			/** @var External $compare */
+			$compare = unserialize($unjson['message']);
+
+			if($compare->toArray() == $external->toArray()) {
+				$result = true;
+				// break out
+				break;
+			}
+		}
+		// push any messages we retrieved back on the the queue
+		$this->mqConnector->rejectMessages($nack);
+
+		return $result;
 	}
 }
