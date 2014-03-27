@@ -13,9 +13,9 @@ INSERT INTO `config`(
 VALUES (
   'display_grade_graph',
   (IF ((SELECT COUNT(*)
-        FROM `config`
-        WHERE `name` = 'site_location'
-              AND `value` IN ('mgs', 'mgs-staff', 'mgs-senior', 'grimwade', 'wadhurst')),
+        FROM `config` `c`
+        WHERE `c`.`name` = 'site_location'
+              AND `c`.`value` IN ('mgs', 'mgs-staff', 'mgs-senior', 'grimwade', 'wadhurst')),
        '0', '1')),
   'Display Grade Graph',
   'Should the Grades graph be displayed in All Work view?',
