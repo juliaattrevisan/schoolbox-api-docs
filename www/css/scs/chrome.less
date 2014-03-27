@@ -58,6 +58,10 @@
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@tab-background;
 
+// infopanel and messages
+@infopanel-height:				32px;
+@flyout-color:					@tab-background;
+
 // Main "Tab" Navigation
 @tab-background:				#6caddf;
 @tab-color:						#FFFFFF;
@@ -80,6 +84,21 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // =============================================================================
+
+#infoPanel {
+	margin: 8px 16px 26px 0;
+	.bell {
+		background-image: url('/images/scs/bell.png');
+	}
+}
+// allow message to be seen over top of current-tab
+#tabs li.navthis {
+	z-index: 1;
+}
+#message-list a {
+	color: #6caddf;
+}
+
 /*
  * Demo Dashboards
  */
