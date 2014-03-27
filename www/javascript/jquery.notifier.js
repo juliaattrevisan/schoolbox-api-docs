@@ -12,7 +12,8 @@
             content:   '#msg-content',
             list:      '#message-list',
             prefetch:  5,
-            debug:     false
+            debug:     false,
+            domwait:   1000
         }, options);
 
         // cast boolean from potential string
@@ -273,7 +274,8 @@
                     messages[msgId] = amqpMsg;
                 });
                 $(self).data('message-count', messages.length);
-                updateDOM();
+                clearTimeout(domTimeout);
+                domTimeout = setTimeout(updateDOM, settings.domwait);
             }
 
             /**
@@ -288,7 +290,8 @@
                     messages[msgId] = amqpMsg;
                 });
                 $(self).data('message-count', messages.length);
-                updateDOM();
+                clearTimeout(domTimeout);
+                domTimeout = setTimeout(updateDOM, settings.domwait);
             }
 
             /**
@@ -346,6 +349,7 @@
             var conn;
             var messages = {};
             var attemptReconnect = true;
+            var domTimeout;
 
 
             // open/close listener
