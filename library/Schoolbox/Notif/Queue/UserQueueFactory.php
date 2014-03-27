@@ -363,7 +363,8 @@ class UserQueueFactory {
 	}
 
 	/**
-	 * Returns whether or not a given message is sitting in the given user's listed and digest queues
+	 * Returns whether or not a given message is sitting in the given user's listed and digest queues.
+	 * Use this method shrewdly - its expense is proportional to the length of the given user's queues.
 	 *
 	 * @param int $userId
 	 * @param External $external
@@ -373,23 +374,41 @@ class UserQueueFactory {
 
 		$result = false;
 
-		$nack = array();
-		while($m = $this->mqConnector->readFromQueue(UserQueue::getUserListedQueueName($userId))) {
-			$nack[] = $m;
+		$qs = array(
+			UserQueue::getUserListedQueueName($userId),
+			UserQueue::getUserDigestQueueName($userId),
+		);
 
-			$unjson = json_decode($m->body, true);
+		$source = $external->toArray();
 
-			/** @var External $compare */
-			$compare = unserialize($unjson['message']);
+		foreach($qs as $q) {
+			$nack = array();
+			while($m = $this->mqConnector->readFromQueue($q)) {
+				$nack[] = $m;
 
-			if($compare->toArray() == $external->toArray()) {
-				$result = true;
-				// break out
+				$unjson = json_decode($m->body, true);
+
+				/** @var External $compare */
+				$compare = unserialize($unjson['message']);
+				$target = $compare->toArray();
+
+				if($source['body']['body'] == $target['body']['body']) {
+					if($source['params'] == $target['params']) {
+						$result = true;
+						// break out
+						break;
+					}
+				}
+
+			}
+			// push any messages we retrieved back on the the queue
+			$this->mqConnector->rejectMessages($nack);
+
+			// if we returned true, don't bother continuing
+			if($result) {
 				break;
 			}
 		}
-		// push any messages we retrieved back on the the queue
-		$this->mqConnector->rejectMessages($nack);
 
 		return $result;
 	}
