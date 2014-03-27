@@ -69,7 +69,27 @@ function Calendar(id, bubbleId, opts) {
             month: null,
             year: null
         },
-        datepickerIcon: "/images/core/calendar/calendar-click.png",
+        datepicker: {
+            dateFormat: 'dd-mm-yy',
+            onSelect: function(dateText, inst) {
+                // Default: load the URL for this user
+                var url = location.pathname.match(/^[^0-9]+/g).toString().replace(/\/*$/g, '') + '/' + dateText;
+                /* Append user id
+                 */
+                url += '/' + self.options.userId;
+                window.open(url, "_self");
+            },
+            beforeShow: function() {
+                // Make sure the stupid datepicker shows above everything else
+                setTimeout(function() {
+                    $('.ui-datepicker').css('z-index', 99999999999999);
+                }, 0);
+            },
+            showOn: 'button',
+            buttonImage: "/images/core/calendar/calendar-click.png",
+            buttonImageOnly: true,
+            showAnim: 'slideDown'
+        },
         x: true
     }
     this.filters = {
@@ -233,6 +253,7 @@ function Calendar(id, bubbleId, opts) {
     // preserve the filter and fullCalendar specs
     var filter = $j.extend({}, this.options.filter, opts.filter)
     var fullCalendar = $j.extend({}, this.options.fullCalendar, opts.fullCalendar)
+    var datepicker   = $j.extend({}, this.options.datepicker,   opts.datepicker)
 
     // perform the merge
     $j.extend(this.options,opts)
@@ -240,6 +261,7 @@ function Calendar(id, bubbleId, opts) {
     // rewrite the preserved submerge back into the options
     this.options.filter = filter
     this.options.fullCalendar = fullCalendar
+    this.options.datepicker   = datepicker
 
     if(this.options.filter.enabled) {
         this.filters.interaction(this)
@@ -331,32 +353,18 @@ Calendar.prototype.init = function() {
         }
     })
 
-	var self = this;
-	
-    $j('#datepicker').datepicker({
-        dateFormat: 'dd-mm-yy',
-        onSelect: function(dateText, inst) {
-            var url = location.pathname.match(/^[^0-9]+/g).toString().replace(/\/*$/g, '') + '/' + dateText;
-
-			/* Append user id
-			 */
-			url += '/' + self.options.userId;
-
-            window.open(url, "_self");
-        },
-        beforeShow: function() {
-            // Make sure the stupid datepicker shows above everything else
-            setTimeout(function() {
-                $('.ui-datepicker').css('z-index', 99999999999999);
-            }, 0);
-        },
-        defaultDate: $j.datepicker.parseDate("dd-mm-yy", c.options.fullCalendar.date + '-' +
-            (parseInt(c.options.fullCalendar.month) + 1) + '-' + c.options.fullCalendar.year),
-        showOn: 'button',
-        buttonImage: c.options.datepickerIcon,
-        buttonImageOnly: true,
-        showAnim: 'slideDown'
-    });
+    // Allow datepicker options to be set in options, too.
+    // (Get default date out of full calendar.)
+    $j('#datepicker').datepicker(c.options.datepicker);
+    $j('#datepicker').datepicker(
+        'setDate',
+        $j.datepicker.parseDate(
+            "dd-mm-yy",
+            c.options.fullCalendar.date + '-'
+            + (parseInt(c.options.fullCalendar.month) + 1)
+            + '-' + c.options.fullCalendar.year
+        )
+    )
 
     return this
 }
