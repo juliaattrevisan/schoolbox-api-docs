@@ -364,7 +364,7 @@ class Creational extends AbstractFactory {
 		/* Set up video thumbnails
 		 */
 		if ($uploadedFile->getMimeType()->isVideo()) {
-			$url = "/cms/sendVideo.php?type=storage&hash={$uploadedFile->getHash()}";
+			$url = "/cms/sendVideo.php?type=storage&id={$uploadedFile->getHash()}";
 
 			$this->getProduct()->setUrl($url);
 		}
