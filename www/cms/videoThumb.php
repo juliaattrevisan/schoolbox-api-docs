@@ -9,14 +9,22 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-if (isset($_GET['type']) && is_numeric($_GET['id']) && isset($_GET['size'])) {
+$type = $_GET['type'];
+$id   = $_GET['id'];
+$size = $_GET['size'];
+if (isset($_GET['hash'])) {
+	// Old-style fetching of brownhole videos: ?hash={brownholeHash}
+	$type = 'storage';
+	$id   = $_GET['hash'];
+}
+if (isset($type) && isset($id) && isset($size)) {
 	$page = new SitePage;
 	$groupHandler = new Group;
 
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
-		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($_GET['type'], $_GET['id']);
+		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($type, $id);
 		$video = $thumbnailFactory->produce();
     }
     catch (Schoolbox\Mapper\Exception $e) {
@@ -25,7 +33,7 @@ if (isset($_GET['type']) && is_numeric($_GET['id']) && isset($_GET['size'])) {
     }
 
 
-	if($_GET['size'] == 'poster') {
+	if($size == 'poster') {
 		$filename = $video->getPosterLocation();
 	}
 	else {
