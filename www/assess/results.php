@@ -156,10 +156,9 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
-$this->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
-$this->setBlock('modify_btn', 'has_attempt', 'has_attempt_block');
+$this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
 
 $this->setTitle('Results for: ' . $assess['title']);
 
@@ -199,13 +198,13 @@ if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
  */
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
-/* If there are no attempts, hide the Review Horizontal button
+/* If there are no attempts, hide the Review Horizontal and download buttons
  */
 if (is_array($allAttempts) && count($allAttempts)) {
-	$this->parse('has_attempt_block', 'has_attempt');
+    $this->parse('has_attempt_block', 'has_attempt');
 }
 else {
-	$this->setVar('has_attempt_block', '');
+    $this->setVar('has_attempt_block', '');
 }
 
 /* Process everyone
@@ -275,17 +274,12 @@ if (is_array($allStudents) && count($allStudents)) {
             );
 
             $this->parse('attempt_block', 'attempt', true);
-            $this->setVar('download_btn_block', '');
-        } else {
-            // display bulk download
-            $this->parse('download_btn_block', 'download_btn', false);
         }
 
         $numAttempts = 0;
     }
 } else {
     $this->setVar('attempt_block', '');
-    $this->setVar('download_btn_block', '');
     $this->setVar('assess_delete_block', '');
 }
 
