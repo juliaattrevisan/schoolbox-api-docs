@@ -29,8 +29,11 @@ function init() {
 
     // logged in? good. create the sidebar
     if(env.loggedIn) {
+        // If this request returns a 401 unauthorized, env.loggedIn gets set to false
         renderMenu('/m/core/nav/sidebar.json');
+    }
 
+    if(env.loggedIn) {
         debug(env.lastPage);
 
         var push = true;
