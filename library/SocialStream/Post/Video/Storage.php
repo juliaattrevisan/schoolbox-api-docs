@@ -40,12 +40,23 @@ class Storage extends Player {
 			$stuff = parse_url($matches[0]);
 			parse_str($stuff['query'], $bits);
 
+			// New style: hash is in $bits['id']
+			// Old style: it's in $bits['hash']
+			if (isset($bits['id'])) {
+				$key  = 'id';
+				$hash = $bits['id'];
+			}
+			else {
+				$key  = 'hash';
+				$hash = $bits['hash'];
+			}
+
 			// Figure out status of video
 			$status = 'failed';
 			try {
 				/** @var \Schoolbox\Storage $storage */
 				/** @var ResourceVideo      $video */
-				$storage = StorageMapper::getInstance()->findOneByColumn('hash', $bits['hash']);
+				$storage = StorageMapper::getInstance()->findOneByColumn('hash', $hash);
 				$video   = ResourceVideoMapper::getInstance()->findOneByColumnList(
 					array(
 						'file_id' => $storage->getId(),
@@ -56,8 +67,8 @@ class Storage extends Player {
 			}
 			catch (Mapper\Exception $e) {}
 			return array(
-				'poster' => "/cms/videoThumb.php?hash={$bits['hash']}&size=poster",
-				'src'    => "/cms/sendVideo.php?hash={$bits['hash']}",
+				'poster' => "/cms/videoThumb.php?{$key}={$hash}&type=storage&size=poster",
+				'src'    => "/cms/sendVideo.php?{$key}={$hash}&type=storage",
 				'status' => $status,
 			);
 		}
