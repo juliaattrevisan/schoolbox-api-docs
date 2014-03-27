@@ -576,7 +576,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					AND sb.open_date < NOW()
 					AND sb.deleted IS FALSE
 					AND sb.task_id IS NULL
-					AND sb.accept_submission = 1
 					ORDER BY sb.open_date DESC
 					LIMIT :limit
 				",
