@@ -13,9 +13,13 @@ $type = $_GET['type'];
 $id   = $_GET['id'];
 $size = $_GET['size'];
 if (isset($_GET['hash'])) {
-	// Old-style fetching of brownhole videos: ?hash={brownholeHash}
-	$type = 'storage';
-	$id   = $_GET['hash'];
+	// Old URL for brownhole videos: ?hash={brownholeHash}&size={whatever}
+	// If you get one of these, permanent redirect to the new one.
+	$params = $_GET;
+	$params['type'] = 'storage';
+	$params['id']   = $_GET['hash'];
+	unset($params['hash']);
+	SitePage::localRedir('/cms/videoThumb.php?'.http_build_query($params), false, 301);
 }
 if (isset($type) && isset($id) && isset($size)) {
 	$page = new SitePage;
