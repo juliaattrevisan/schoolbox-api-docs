@@ -11,6 +11,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Collection;
 use EOTC\Calendar;
 use Alaress_Date_Format;
 use Schoolbox\User;
@@ -58,6 +59,14 @@ class Model implements ISoftDeletable /*, JsonSerializable */{
      */
     protected $deletedAt;
 
+    /**
+     * @var Collection|self[]
+     */
+    protected $relatedResourceList;
+
+    public function __construct() {
+        $this->setRelatedResourceList(new Collection());
+    }
 
     /**
      * @param  Alaress_Date_Format $modifiedAt
@@ -186,6 +195,22 @@ class Model implements ISoftDeletable /*, JsonSerializable */{
      */
     public function getStatus() {
         return $this->status;
+    }
+
+    /**
+     * @param  Collection|self[] $relatedResourceList
+     * @return $this
+     */
+    public function setRelatedResourceList($relatedResourceList) {
+        $this->relatedResourceList = $relatedResourceList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getRelatedResourceList() {
+        return $this->relatedResourceList;
     }
 
     /**
