@@ -71,7 +71,7 @@ class EdumateMark {
 	public function hydrate($row) {
 		$this->setTaskId($row['TASK_ID']);
 		$this->setClassCode($row['CLASS_CODE']);
-		$this->setStudentId($row['STUDENT_ID']);
+		$this->setStudentId($row['STUDENT_NUMBER']);
 		$this->setMark($row['MARK']);
 		$this->setLastUpdated($row['LAST_UPDATED']);
 	}
