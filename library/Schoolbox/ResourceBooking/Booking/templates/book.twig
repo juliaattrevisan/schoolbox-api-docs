@@ -44,17 +44,47 @@ $(document).ready(function() {
       method="post"
       name="form" class="clearfix"
 >
-    from:
-    <input name="start-date" data-datepicker="" value="{{ item.event.startDate }}" />,
-    <input name="start-time" data-timepicker="" value="{{ item.event.startTime }}" />
-    to:
-    <input name="end-date" data-datepicker="" value="{{ item.event.endDate }}" />,
-    <input name="end-time" data-timepicker="" value="{{ item.event.endTime }}" />
-    notes: <textarea name="notes">{{ item.event.detail }}</textarea>
+    <input type="hidden" name="id" value="{{ item.id }}"/>
+    <table class="standardForm table">
+        <tr>
+            <td class="formLabelWidth"><h4>Begin</h4></td>
+            <td>
+                <input name="start-date" data-datepicker="" value="{{ item.event.startDate }}" />,
+                <input name="start-time" data-timepicker="" value="{{ item.event.startTime }}" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>End</h4></td>
+            <td>
+                <input name="end-date" data-datepicker="" value="{{ item.event.endDate }}" />,
+                <input name="end-time" data-timepicker="" value="{{ item.event.endTime }}" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Notes</h4></td>
+            <td><textarea name="notes">{{ item.event.detail }}</textarea></td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Related Resources</h4></td>
+            <td>
+                {# Related resources #}
+                <ul>
+                {% for relatedItem in item.resource.relatedResourceList %}
+                    <li>
+                        <input id="related-item-{{ relatedItem.id }}" type="checkbox" name="relatedItem[]" value="{{ relatedItem.id }}" />
+                        <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
+                    </li>
+                {% else %}
+                    <li>This resource has no related resources.</li>
+                {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    </table>
 
-    <input id="resource-save"
+    <input id="resource-booking-save"
            type="submit"
-           value="Book"
+           value="{% if item.id %}Update Booking{% else %}Book{% endif %}"
            class="submit-btn-plain"
     />
 
