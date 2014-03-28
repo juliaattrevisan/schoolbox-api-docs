@@ -92,8 +92,11 @@ class Controller extends Base {
             foreach ($resource->getRelatedResourceList() as $relatedResource) {
                 if (in_array($relatedResource->getId(), $relatedSelections)) {
                     $relatedBooking = $this->createBookingFromPostData($relatedResource);
-                    // and link it back to the base one.
+                    $booking->addRelatedBooking($relatedBooking);
                 }
+            }
+            if (count($booking->getRelatedBookingList())) {
+                $this->getBookingMapper()->saveRelatedBookings($booking);
             }
         }
 
@@ -145,6 +148,8 @@ class Controller extends Base {
         $event->setNote("Booking: ".$resource->getName());
         $event->setDetail($this->getRequest()->post['notes']);
         $this->getEventMapper()->save($event);
+
+        // And create a new booking with the event attached.
         $booking = new Model();
         $booking
             ->setEvent($event)
