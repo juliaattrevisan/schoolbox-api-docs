@@ -1,3 +1,41 @@
+<!-- BEGIN custom_header -->
+{# Datepicker is always included. Load the timepicker, because it isn't. #}
+<script type='text/javascript' src='/javascript/components/jquery-timepicker-jt/jquery.timepicker.js'></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    // Datepickers
+    $('input[data-datepicker]').datepicker({
+        dateFormat:'dd/mm/yy',
+        showOn:'both',
+        buttonImage:'/images/core/calendar/calendar-click.png',
+        buttonImageOnly:true,
+        constrainInput:false,
+        minDate: 0,
+        beforeShow: function() {
+            // Make sure the stupid datepicker shows above everything else,
+            // because it doesn't respect any CSS datepicker setting I give it
+            setTimeout(function() {
+                $('.ui-datepicker').css('z-index', 99999999999999);
+            }, 0);
+        }
+//        onClose:function (string) {
+//            var input = $j(this);
+//            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+//                input.val(data.time);
+//            })
+//        }
+    });
+
+    // Timepickers
+    $('input[data-timepicker]').timepicker({
+        timeFormat:'H:i',
+        step:15
+    });
+})
+</script>
+<!-- END custom_header -->
+
 <h1>Book item: {{ item.resource.name }}</h1>
 
 {# booking form #}
