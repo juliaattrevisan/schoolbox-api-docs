@@ -147,7 +147,7 @@ abstract class AbstractScheduler implements SchedulingInterface, TaskResponseHan
 		$self = $this;
 
 		// schedule the future event
-		$this->schedule($moduleNotifierClass, $triggerLabel, $model, $interval, function($timer) use ($self) {
+		$this->schedule($trigger, $interval, function($timer) use ($self) {
 			/** @var TimerInterface $timer */
 
 			if(!$timer->getData() instanceof TriggerInterface) {
