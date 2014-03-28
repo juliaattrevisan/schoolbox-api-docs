@@ -243,8 +243,6 @@ Scenario: Adding related resources to a resource
   And   I remove "Book box" from autocomplete "related_resource_id"
   And   I press "resource-save"
   And   I follow "A single projector"
-  # For whatever reason the autocomplete isn't detected!
-#  Then  the autocomplete "related_resource_id" should not contain "Book box"
   Then  I should not see "Book box"
   When  I move backward one page
   And   I follow "English textbook"
