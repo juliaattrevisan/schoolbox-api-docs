@@ -32,8 +32,7 @@
            class="submit-btn-plain"
     />
 
-    {# I need some sort of permission check method, because not all users can delete #}
-    {% if item.id %}
+    {% if item.id and isRouteAuthorized('resourceCategory.delete:post', {id: item.id}) %}
     <input id="resourcecategory-delete"
            type="submit"
            value="Delete"

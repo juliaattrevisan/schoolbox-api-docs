@@ -5,4 +5,6 @@
 {% include '@resourceCategory/sub/list.twig' %}
 
 {# New item: only if I have the permission to do this #}
-<a id="resourcecategory-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceCategory.add') }}">Add New</a>
+{% if isRouteAuthorized('resourceCategory.add') %}
+    <a id="resourcecategory-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceCategory.add') }}">Add New</a>
+{% endif %}
