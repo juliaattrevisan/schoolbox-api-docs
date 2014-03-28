@@ -17,7 +17,7 @@ class Subcontext_AutocompleteContext extends BaseContext {
      * focus on the element, and there's no other way to find it.
      */
     protected function preconfigureAutocompletes() {
-        foreach ($this->getSession()->getPage()->findAll('css', '.ms-ctn input') as $autocompleteInput) {
+        foreach ($this->getSession()->getPage()->findAll('css', 'input[type="text"]') as $autocompleteInput) {
             /** @var Element\NodeElement $autocompleteInput */
             $autocompleteInput->focus();
         }
