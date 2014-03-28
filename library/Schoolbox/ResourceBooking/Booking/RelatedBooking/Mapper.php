@@ -30,7 +30,7 @@ class Mapper extends BaseMapper {
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'booking',
                 'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\ResourceBooking\\Booking\\Model',
+                    'mapper'    => '\\Schoolbox\\ResourceBooking\\Booking\\Mapper',
                     'other_key' => 'id',
                 ),
             )
@@ -42,7 +42,7 @@ class Mapper extends BaseMapper {
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'related_booking',
                 'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\ResourceBooking\\Booking\\Model',
+                    'mapper'    => '\\Schoolbox\\ResourceBooking\\Booking\\Mapper',
                     'other_key' => 'id',
                 ),
             )
