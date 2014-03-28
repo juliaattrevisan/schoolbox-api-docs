@@ -65,6 +65,12 @@
 @tab-hover-background:			@tab-background;
 @tab-hover-color:				@tab-color;
 
+@infopanel-height:				32px;
+@infopanel-bellsprite:			'/images/toorak/bell.png';
+@notify-text-color:				@banner-background;
+@flyout-header-color:			@tab-color;
+@flyout-hover-background:		@navigation-color;
+
 // Footer text
 @footer-color:					#888888;
 @footer-links:					@footer-color;
@@ -108,6 +114,23 @@ body.toorak-login {
 	top: 15px;
 }
 
+#infoPanel {
+	.bell {
+		border: solid 1px transparent;
+		&.open {
+			border-color: @banner-color;
+			> a {
+				color: #69953a;
+			}
+		}
+	}
+}
+#message-list {
+	right: -17px;
+	top: 33px;
+	border: solid 1px @banner-color;
+}
+
 // Footer
  .login #footer ul li,
  .login #footer ul li a {
@@ -134,10 +157,14 @@ body.toorak-login {
 }
 
 // Tabs
-#tabs li.navthis a {
-	background: @navigation-color;
-	color: @white;
+#tabs li.navthis {
+	z-index: 1;
+	a {
+		background: @navigation-color;
+		color: @white;
+	}
 }
+
 
 // Topic-list
 .topic-list li a {
