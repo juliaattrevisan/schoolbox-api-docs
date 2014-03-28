@@ -66,8 +66,9 @@ class WorkerProcess extends AbstractProcess {
 				// wrap in an array to preserve keys
 				return array($messages);
 
-			// push messages
+			// push or digest messages
 			case DefaultDispatchStrategy::TASK_PUBLISH:
+			case DefaultDispatchStrategy::TASK_DIGEST:
 				$data = unserialize($args[0]);
 
 				if(!(is_array($data) && count($data) == 4)) {
