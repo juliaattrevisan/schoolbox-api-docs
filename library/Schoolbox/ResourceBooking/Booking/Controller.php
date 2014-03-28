@@ -46,13 +46,24 @@ class Controller extends Base {
         if (($date = $this->getRequest()->query['startDate'])) {
             // Convert format of startDate and startTime
             if ($date = DateTime::createFromFormat('Y-m-d', $date)) {
+                // Was a time set? If so, add that time to the start date.
+                $setTime = false;
+                if (($time = $this->getRequest()->query['startTime'])) {
+                    if ($time = DateTime::createFromFormat('H:i', $time)) {
+                        $setTime = true;
+                        $date->setTime($time->format('H'), $time->format('i'));
+                    }
+                }
+                // Set the start and end date (and time, if required)
                 $item->getEvent()->setStartDate($date->format('d/m/Y'));
-            }
-        }
-        if (($time = $this->getRequest()->query['startTime'])) {
-            // Time: Only hours and minutes
-            if ($time = DateTime::createFromFormat('H:i', $time)) {
-                $item->getEvent()->setStartTime($time->format('H:i'));
+                if ($setTime) {
+                    $item->getEvent()->setStartTime($date->format('H:i'));
+                }
+                $date->setTimestamp($date->getTimestamp() + $resource->getMinReservationTime()->getSecondTotal());
+                $item->getEvent()->setEndDate($date->format('d/m/Y'));
+                if ($setTime) {
+                    $item->getEvent()->setEndTime($date->format('H:i'));
+                }
             }
         }
         $this->getResponse()->content->set(
