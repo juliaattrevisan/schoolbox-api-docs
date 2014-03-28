@@ -335,7 +335,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @return $this
      */
     public function addRelatedResource($resource) {
-        return $this->getRelatedResourceList()->add($resource);
+        $this->getRelatedResourceList()->add($resource);
+        return $this;
     }
 
     /**
