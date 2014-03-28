@@ -49,15 +49,15 @@ $(document).ready(function() {
         <tr>
             <td class="formLabelWidth"><h4>Begin</h4></td>
             <td>
-                <input name="start-date" data-datepicker="" value="{{ item.event.startDate }}" />,
-                <input name="start-time" data-timepicker="" value="{{ item.event.startTime }}" />
+                <input name="start_date" data-datepicker="" value="{{ item.event.startDate }}" />,
+                <input name="start_time" data-timepicker="" value="{{ item.event.startTime }}" />
             </td>
         </tr>
         <tr>
             <td class="formLabelWidth"><h4>End</h4></td>
             <td>
-                <input name="end-date" data-datepicker="" value="{{ item.event.endDate }}" />,
-                <input name="end-time" data-timepicker="" value="{{ item.event.endTime }}" />
+                <input name="end_date" data-datepicker="" value="{{ item.event.endDate }}" />,
+                <input name="end_time" data-timepicker="" value="{{ item.event.endTime }}" />
             </td>
         </tr>
         <tr>
@@ -74,7 +74,7 @@ $(document).ready(function() {
                 <ul>
                 {% for relatedItem in item.resource.relatedResourceList %}
                     <li>
-                        <input id="related-item-{{ relatedItem.id }}" type="checkbox" name="relatedItem[]" value="{{ relatedItem.id }}" />
+                        <input id="related-item-{{ relatedItem.id }}" type="checkbox" name="related_item[]" value="{{ relatedItem.id }}" />
                         <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
                     </li>
                 {% else %}

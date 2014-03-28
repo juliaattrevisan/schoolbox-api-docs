@@ -108,12 +108,12 @@ class Controller extends Base {
         // Currently I can't setStartDateTime() and have that propogate to
         // startDate and startTime.
         // Event doesn't currently take Alaress_Date_Format objects either.
-        $startDate = new Alaress_Date_Format($this->getRequest()->post['start-date'], 'd/m/y');
-        $endDate   = new Alaress_Date_Format($this->getRequest()->post['end-date'], 'd/m/y');
+        $startDate = new Alaress_Date_Format($this->getRequest()->post['start_date'], 'd/m/y');
+        $endDate   = new Alaress_Date_Format($this->getRequest()->post['end_date'], 'd/m/y');
         $event->setStartDate($startDate->getDatabaseDate());
-        $event->setStartTime($this->getRequest()->post['start-time']);
+        $event->setStartTime($this->getRequest()->post['start_time']);
         $event->setEndDate($endDate->getDatabaseDate());
-        $event->setEndTime($this->getRequest()->post['end-time']);
+        $event->setEndTime($this->getRequest()->post['end_time']);
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
 
         $event->setNote("Booking: ".$resource->getName());
