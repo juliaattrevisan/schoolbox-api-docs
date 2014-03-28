@@ -63,6 +63,10 @@
 @tab-hover-background:			@tab-background;
 @tab-hover-color:				@tab-color;
 
+@infopanel-height:				32px;
+@notify-text-color:				@banner-links;
+@flyout-header-color:			@banner-background;
+
 // Footer text
 @footer-color:					#5D5D5D;
 @footer-links:					@footer-color;
@@ -78,3 +82,12 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
+
+#infoPanel {
+	margin: 8px 16px 0 0;
+	.bell {
+		margin: 0;
+		background-image: url('/images/stk/bell.png');
+	}
+
+}
