@@ -134,6 +134,8 @@
 		 */
 		function initPostForm() {
 			config.element.on('click', config.addPostLink, function(e) {
+				e.preventDefault();
+
 				// Does this have a post form already? If so, don't add it back
 				// after it gets removed.
 				var body = $j(this).closest('li').find('> .body');
@@ -152,7 +154,7 @@
 				 */
 				var clone = config.defaultForm.clone();
 				clone.attr('id', '');
-				clone.find('input[name=body]').val('').focus();
+				clone.find('input[name=body]').val('');
 				clone.find('input[name=parentId]').val(parentId);
 				clone.find('input[name=rootId]').val(rootId);
 				clone.find('input[name=url]').val('');
@@ -170,7 +172,10 @@
 				if (!hasPostForm) {
 					body.append(clone);
 				}
-				e.preventDefault();
+
+				/* Steal focus
+				 */
+				$(this).closest('li').find('.addPostForm').find('.socialstream-form').find('textarea').focus();
 			});
 		}
 
