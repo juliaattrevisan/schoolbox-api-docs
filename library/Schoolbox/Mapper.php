@@ -934,7 +934,7 @@ class Mapper {
 
 		// Retrieve a list of column values for the join for $object
 		// (the column: whatever the key is in this model.)
-		$join_identifier = $this->joins[$join];
+		$join_identifier = $this->getJoinDefinition($join);
 		$mapping         = $this->map->getOffsetByColumn($join_identifier['this_key']);
 		$key_value_list  = $this->getModelAsCollection($object)->getColumnValues($mapping['property']);
 
@@ -966,7 +966,7 @@ class Mapper {
 		$joined_model_list = $this->findJoinedModelList($join, $collection, $options);
 
 		$join_mapper     = $this->getJoinMapper($join);
-		$join_identifier = $this->joins[$join];
+		$join_identifier = $this->getJoinDefinition($join);
 		$this_mapping    = $this->getMap()->getOffsetByColumn($join_identifier['this_key']);
 		$other_mapping   = $join_mapper->getMap()->getOffsetByColumn($join_identifier['other_key']);
 
