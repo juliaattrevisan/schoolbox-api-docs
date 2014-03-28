@@ -62,10 +62,10 @@ class Model implements ISoftDeletable /*, JsonSerializable */{
     /**
      * @var Collection|self[]
      */
-    protected $relatedResourceList;
+    protected $relatedBookingList;
 
     public function __construct() {
-        $this->setRelatedResourceList(new Collection());
+        $this->setRelatedBookingList(new Collection());
     }
 
     /**
@@ -198,19 +198,28 @@ class Model implements ISoftDeletable /*, JsonSerializable */{
     }
 
     /**
-     * @param  Collection|self[] $relatedResourceList
+     * @param  Collection|self[] $relatedBookingList
      * @return $this
      */
-    public function setRelatedResourceList($relatedResourceList) {
-        $this->relatedResourceList = $relatedResourceList;
+    public function setRelatedBookingList($relatedBookingList) {
+        $this->relatedBookingList = $relatedBookingList;
         return $this;
     }
 
     /**
      * @return Collection|self[]
      */
-    public function getRelatedResourceList() {
-        return $this->relatedResourceList;
+    public function getRelatedBookingList() {
+        return $this->relatedBookingList;
+    }
+
+    /**
+     * @param  self  $booking
+     * @return $this
+     */
+    public function addRelatedBooking($booking) {
+        $this->getRelatedBookingList()->add($booking);
+        return $this;
     }
 
     /**
