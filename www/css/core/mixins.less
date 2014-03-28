@@ -20,6 +20,16 @@
 	-o-border-image: @border-image;
 	border-image: @border-image;
 }
+.border-radius(@radius) {
+	border-radius: @radius;
+	-moz-border-radius: @radius;
+	-webkit-border-radius: @radius;
+}
+.box-shadow(@x-offset, @y-offset, @blur, @color) {
+	-moz-box-shadow: @x-offset @y-offset @blur @color;
+	-webkit-box-shadow: @x-offset @y-offset @blur @color;
+	box-shadow: @x-offset @y-offset @blur @color;
+}
 .box-sizing (@box-sizing) {
 	-moz-box-sizing: @box-sizing; // FF is still catching up with IE8, apparently
 	box-sizing: @box-sizing;
@@ -163,3 +173,20 @@
 .ir 								{ text-indent: -999em; text-align: left; direction: ltr;
 	display: block; overflow: hidden; }
 
+
+// =============================================================================
+// Schoolbox Presets
+// =============================================================================
+
+// the shadowing used in pre-2013 skins
+.shadow-12() {
+
+}
+// the shadowing used in 2013-14 skins
+.shadow-14() {
+	.box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+}
+
+.bell-sprite(@filename) {
+	background-image: url(@filename);
+}

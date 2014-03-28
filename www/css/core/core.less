@@ -566,13 +566,13 @@ Notifications
 		height: @infopanel-height;
 		padding: 0;
 		background-color: @notify-color;
-		background-image: url('/images/core/icons/bell.png');
-		background-position: 0 (-1 * @infopanel-height);
+		background-image: url(@infopanel-bellsprite);
+		background-position: 0 (-32 - ((32 - @infopanel-height) / 2));
 		background-repeat: no-repeat;
 		transition: background-color 0.1s;
 		position: relative;
 		&[data-unread="0"] {
-			background-position: 0 0;
+			background-position: 0 (0 - ((32 - @infopanel-height) / 2));
 			background-color: transparent;
 			> a {
 				width: 4px;
@@ -581,16 +581,17 @@ Notifications
 		}
 		&.open {
 			background-color: @flyout-background;
-			background-position: 0 (-2 * @infopanel-height);
+			background-position: 0 (-64 - ((32 - @infopanel-height) / 2));
 			&:after {
 				content: " ";
 				background: @flyout-background;
 				display: block;
 				width: 100%;
-				height: 2px;
+				height: @flyout-pad-height;
 				position: absolute;
-				bottom: -2px;
+				bottom: -1 * @flyout-pad-height;
 				right: 0px;
+				z-index: 61;
 			}
 			> a {
 				color: @banner-background;
@@ -620,23 +621,21 @@ Notifications
 }
 
 #message-list {
+	.shadow-14();
 	line-height: 1.3em;
 	display: none;
 	position: absolute;
 	border: solid 1px rgba(0, 0, 0, 0.1);
 	border-top-width: 0;
 	border-right-width: 0;
-	background: @content-background;
+	background: @flyout-background;
 	right: -16px;
-	top: 34px;
+	top: @infopanel-height + @flyout-pad-height;
 	padding-left: 0;
 	min-width: 300px;
-	-moz-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.1);
-	-webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.1);
-	box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.1);
 	h4 {
 		font-weight: bold;
-		color: @navigation-color;
+		color: @flyout-header-color;
 		padding: 8px 0 4px 8px;
 	}
 	img {
@@ -653,7 +652,7 @@ Notifications
 				width: 100%;
 				padding: 8px;
 				text-decoration: none;
-				color: @navigation-links;
+				color: @flyout-color;
 				font-weight: bold;
 				text-align: center;
 				&:hover {
@@ -675,7 +674,7 @@ Notifications
 			margin: 0;
 			&.unread {
 				a {
-					background: @dark;
+					background: @flyout-highlight;
 					&.pip {
 						display: inline;
 						position: absolute;
@@ -702,7 +701,7 @@ Notifications
 				display: block;
 				padding: 8px 8px 18px 8px;
 				border-bottom: solid 1px @border-color;
-				color: @navigation-links;
+				color: @flyout-color;
 				text-decoration: none;
 				&.pip {
 					display: none;
@@ -9737,7 +9736,7 @@ table img { max-width: none; }
 	margin-bottom: 40px;
 	#add-coverphoto {
 		position: absolute; top: 8px; right: 8px;
-		z-index: 99;
+		z-index: 3;
 		margin-top: 0;
 	}
 }
