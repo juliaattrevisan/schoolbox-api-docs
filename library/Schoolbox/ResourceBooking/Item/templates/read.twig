@@ -24,12 +24,12 @@
     $(document).ready(function() {
         var now = new Date();
         var c   = new Calendar('calendar', 'calendar-bubble', {
-//        crud: {
-//            c: '/calendar/ajax/create',
-//            // r: don't need it
-//            u: '/calendar/ajax/update',
-//            d: '/calendar/ajax/delete'
-//        },
+//            crud: {
+//                c: '/calendar/ajax/create',
+//                // r: don't need it
+//                u: '/calendar/ajax/update',
+//                d: '/calendar/ajax/delete'
+//            },
             filter: {
                 enabled: true,
                 ajax: false,
@@ -40,6 +40,8 @@
                 applyFiltersSelector: false
             },
             fullCalendar: {
+                firstHour: 9,
+                allDaySlot: false,
                 date:  now.getDate(),
                 month: now.getMonth(),
                 year:  now.getFullYear(),
@@ -114,6 +116,7 @@
                  * @param jsEvent
                  */
                 dayClick: function(date, allDay, jsEvent) {
+                    // Bookings may not be made in the past.
                     var dateFormat = allDay ? 'ddd d MMMM' : 'h(:mm)tt, ddd d MMMM';
                     var eventData  = {
                         startDate:   $.fullCalendar.formatDate(date, 'yyyy-MM-dd'),
@@ -320,4 +323,5 @@
     </div>
 </div>
 
+<h2>Bookings - click the calendar to add a booking for that time</h2>
 <div id="calendar"></div>
