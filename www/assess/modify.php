@@ -63,8 +63,12 @@ if (!empty($_POST)) {
         $start  = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/y');
         $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/y');
 
-        /* Check that finish time cannot be before start time
-          */
+		if (!$start->isValid() || !$finish->isValid()) {
+			error(15);
+		}
+
+		/* Check that finish time cannot be before start time
+		  */
         if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
             error(145);
         }
@@ -83,12 +87,7 @@ if (!empty($_POST)) {
      */
     $this->setFile(TEMPLATE_content,   'assess/modify.html');
     $this->setBlock(TEMPLATE_content,  'assess_timespan', 'assess_timespan_block');
-    $this->setBlock('assess_timespan', 'startHour', 'startHour_block');
-    $this->setBlock('assess_timespan', 'startHour', 'startHour_block');
-    $this->setBlock('assess_timespan', 'startMinute', 'startMinute_block');
     $this->setBlock('assess_timespan', 'startMeridiem', 'startMeridiem_block');
-    $this->setBlock('assess_timespan', 'finishHour', 'finishHour_block');
-    $this->setBlock('assess_timespan', 'finishMinute', 'finishMinute_block');
     $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
@@ -128,25 +127,12 @@ if (!empty($_POST)) {
 
     /* Render starting times
      */
-    for ($i = 1; $i <= 12; $i++) {
-        $this->setVar(array(
-            'START_HOUR_VALUE' => $i,
-            'START_HOUR_SELECTED' => $i == $assessStartDate->getUsingFormat('g') ? 'selected=\'selected\'' : '',
-        ));
+	$this->setVar(array(
+		'START_HOUR_VALUE' => $assessStartDate->getUsingFormat('g'),
+		'START_MINUTE_VALUE' => $assessStartDate->getUsingFormat('i'),
+	));
 
-        $this->parse('startHour_block', 'startHour', true);
-    }
-
-    for ($i = 0; $i <= 45; $i += 15) {
-        $this->setVar(array(
-            'START_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
-            'START_MINUTE_SELECTED' => $i == $assessStartDate->getUsingFormat('i') ? 'selected=\'selected\'' : '',
-        ));
-
-        $this->parse('startMinute_block', 'startMinute', true);
-    }
-
-    foreach (array('am', 'pm') as $meridiem) {
+    foreach (array('AM', 'PM') as $meridiem) {
         $this->setVar(array(
             'START_MERIDIEM_VALUE' => $meridiem,
             'START_MERIDIEM_SELECTED' => $meridiem == $assessStartDate->getUsingFormat('a') ? 'selected=\'selected\'' : '',
@@ -157,25 +143,12 @@ if (!empty($_POST)) {
 
     /* Render finish times
      */
-    for ($i = 1; $i <= 12; $i++) {
-        $this->setVar(array(
-            'FINISH_HOUR_VALUE' => $i,
-            'FINISH_HOUR_SELECTED' => $i == $assessFinishDate->getUsingFormat('g') ? 'selected=\'selected\'' : '',
-        ));
+	$this->setVar(array(
+		'FINISH_HOUR_VALUE' => $assessFinishDate->getUsingFormat('g'),
+		'FINISH_MINUTE_VALUE' => $assessFinishDate->getUsingFormat('i'),
+	));
 
-        $this->parse('finishHour_block', 'finishHour', true);
-    }
-
-    for ($i = 0; $i <= 45; $i += 15) {
-        $this->setVar(array(
-            'FINISH_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
-            'FINISH_MINUTE_SELECTED' => $i == $assessFinishDate->getUsingFormat('i') ? 'selected=\'selected\'' : '',
-        ));
-
-        $this->parse('finishMinute_block', 'finishMinute', true);
-    }
-
-    foreach (array('am', 'pm') as $meridiem) {
+	foreach (array('AM', 'PM') as $meridiem) {
         $this->setVar(array(
             'FINISH_MERIDIEM_VALUE' => $meridiem,
             'FINISH_MERIDIEM_SELECTED' => $meridiem == $assessFinishDate->getUsingFormat('a') ? 'selected=\'selected\'' : '',
