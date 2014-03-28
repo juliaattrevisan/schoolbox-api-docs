@@ -72,12 +72,8 @@ function Calendar(id, bubbleId, opts) {
         datepicker: {
             dateFormat: 'dd-mm-yy',
             onSelect: function(dateText, inst) {
-                // Default: load the URL for this user
-                var url = location.pathname.match(/^[^0-9]+/g).toString().replace(/\/*$/g, '') + '/' + dateText;
-                /* Append user id
-                 */
-                url += '/' + self.options.userId;
-                window.open(url, "_self");
+                // Use fullcalendar to load events instead of redirecting to a new page.
+                self.dom.fullCalendar('gotoDate', inst.currentYear, inst.currentMonth, inst.currentDay)
             },
             beforeShow: function() {
                 // Make sure the stupid datepicker shows above everything else

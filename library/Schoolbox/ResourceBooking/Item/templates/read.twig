@@ -73,13 +73,6 @@
                 checkboxSelector: false,
                 applyFiltersSelector: false
             },
-            datepicker: {
-                onSelect: function(dateText, inst) {
-                    // Update the full calendar with the selected date.
-                    // (This should probably be the default event)
-                    c.dom.fullCalendar('gotoDate', inst.currentYear, inst.currentMonth, inst.currentDay)
-                }
-            },
             fullCalendar: {
                 date:  now.getDate(),
                 month: now.getMonth(),
