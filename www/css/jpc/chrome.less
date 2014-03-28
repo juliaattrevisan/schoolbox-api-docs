@@ -42,6 +42,8 @@
 @banner-links:      			#FAEDC3;
 @banner-height:     			94px;
 @search-color:                  @banner-color;
+@search-width:					288px;
+@infopanel-height:				32px;
 
 // Modules
 @module-heading: 				#000000;
@@ -57,6 +59,12 @@
 @navigation-hover-background: 	#FAEDC3;
 @navigation-hover-color:  		#0066B0;
 @navigation-sub-background:  	#FFFFFF;
+
+// Notifications
+@notify-color:					@module-background;
+@flyout-background:				@content-background;
+@flyout-highlight:				#FEFCF5;
+@flyout-hover-background:		@navigation-hover-background;
 
 // Main "Tab" Navigation
 @tab-background:				transparent;
@@ -80,3 +88,32 @@
 // =============================================================================
 
 .admin-nav li a.current { border: none; }
+
+// wrest control back from legacy.css -_-
+#infoPanel {
+	margin: 13px 32px 0 0px;
+	height: 32px;
+	position: relative;
+	img {
+		margin: 0;
+	}
+	.bell {
+		background-image: url('/images/jpc/bell.png');
+		> a {
+			color: @banner-background;
+		}
+	}
+}
+#message-list {
+	border-color: @flyout-hover-background;
+	h4 {
+		color: @banner-background;
+	}
+	.msg a.action {
+		border-bottom-color: @flyout-hover-background;
+	}
+}
+
+#search {
+	top: -48px;
+}
