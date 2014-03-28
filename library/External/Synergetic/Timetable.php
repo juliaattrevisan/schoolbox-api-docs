@@ -425,15 +425,20 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
             $timetabledef = $this->getTimetableDefinition($campus, 5);
 
             if(!is_array($timetabledef['desc'])){
+                $_SESSION['FileSemester'] = $originalFileSemester;
+                $_SESSION['FileYear'] = $originalFileYear;
                 return false;
             }
         }
 
-		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
-		if (!($campusModel instanceof \Schoolbox\Campus)) {
-			return false;
-		}
-		$campusString = $campusModel->getExtTimetableCode();
+        try{
+		    $campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+            $campusString = $campusModel->getExtTimetableCode();
+        } catch (Exception $e ) {
+            $_SESSION['FileSemester'] = $originalFileSemester;
+            $_SESSION['FileYear'] = $originalFileYear;
+            return false;
+        }
 
 		if( $this->groupHandler->isStudent($userID))
 		{

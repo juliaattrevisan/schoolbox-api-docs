@@ -567,6 +567,9 @@ class External_Synergetic_User implements External_UserInterface {
         }
 
 		if (!isset($_SESSION['FileSemester']) || !isset($_SESSION['FileYear'])) {
+            /* Return filesemester to original state */
+            $_SESSION['FileSemester'] = $originalFileSemester;
+            $_SESSION['FileYear'] = $originalFileYear;
 			return false;
 		}
 
