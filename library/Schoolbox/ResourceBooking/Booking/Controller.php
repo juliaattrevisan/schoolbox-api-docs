@@ -84,6 +84,32 @@ class Controller extends Base {
     public function createBooking($id) {
         /** @var Item\Model $resource */
         $resource = $this->getResourceMapper()->findById($id);
+        $booking  = $this->createBookingFromPostData($resource);
+
+        // Create a related booking for any related items that were chosen.
+        $relatedSelections = $this->getRequest()->post['related_item'] ?: array();
+        if (!empty($relatedSelections)) {
+            foreach ($resource->getRelatedResourceList() as $relatedResource) {
+                if (in_array($relatedResource->getId(), $relatedSelections)) {
+                    $relatedBooking = $this->createBookingFromPostData($relatedResource);
+                    // and link it back to the base one.
+                }
+            }
+        }
+
+        // and redirect somewhere.
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate('resourceItem.read', array('id' => $id))
+        );
+    }
+
+    /**
+     * Helper for creating a booking out of a resource item and post data.
+     *
+     * @param  Item\Model $resource
+     * @return Model      The model that was created.
+     */
+    protected function createBookingFromPostData(Item\Model $resource) {
         // Create the booking, which in turn adds an event to the calendar.
         // This action saves a connected event.
         /** @var Calendar\Event $event */
@@ -126,9 +152,7 @@ class Controller extends Base {
             ->setStatus(Status\Model::STATUS_PENDING);
         ;
         $this->getBookingMapper()->save($booking);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceBooking.book', array('id' => $id))
-        );
+        return $booking;
     }
 
     /**
