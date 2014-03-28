@@ -43,7 +43,7 @@ class IsRouteAuthorized {
      * @param  User   $user If not set, defaults to the current user.
      * @return bool
      */
-    public function execute($name, User $user = null, $data = array()) {
+    public function execute($name, $data = array(), User $user = null) {
         if (!($user instanceof User)) {
             $user = $this->getSession()->getUser();
         }
