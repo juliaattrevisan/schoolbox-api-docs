@@ -44,11 +44,18 @@ interface TriggerInterface {
 	public function getUser();
 
 	/**
-	 * Return the class of the module that this trigger is from
+	 * Return the module that this trigger is from
 	 *
 	 * @return ModuleNotifierInterface
 	 */
 	public function getModuleNotifier();
+
+	/**
+	 * Return the class of the module that this trigger is from
+	 *
+	 * @return string
+	 */
+	public function getModuleNotifierClass();
 
 	/**
 	 * Return the trigger label that this trigger is based on

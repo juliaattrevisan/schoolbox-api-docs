@@ -39,12 +39,21 @@ abstract class AbstractTrigger implements TriggerInterface {
 	}
 
 	/**
-	 * Return the class of the module that this trigger is from
+	 * Return the module that this trigger is from
 	 *
 	 * @return ModuleNotifierInterface
 	 */
 	public function getModuleNotifier() {
 		return $this->notifier;
+	}
+
+	/**
+	 * Return the class of the module that this trigger is from
+	 *
+	 * @return string
+	 */
+	public function getModuleNotifierClass() {
+		return get_class($this->notifier);
 	}
 
 	/**
