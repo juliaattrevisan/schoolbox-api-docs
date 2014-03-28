@@ -64,6 +64,12 @@
 @tab-hover-background:			@tab-background;
 @tab-hover-color:				@tab-color;
 
+// messages
+@infopanel-height:				28px;
+@infopanel-bellsprite:			'/images/stpatricks/bell.png';
+@notify-text-color:				@banner-links;
+@flyout-background:				@body-background;
+
 // Footer text
 @footer-color:					#C9C9C9;
 @footer-links:					@footer-color;
@@ -79,3 +85,10 @@
 @import "../core/legacy.less";
 @import "screen.less";
 // =============================================================================
+
+#infoPanel {
+	margin: 6px 16px -2px 0;
+	.bell {
+		margin: 0;
+	}
+}
