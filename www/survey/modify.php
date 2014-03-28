@@ -95,7 +95,7 @@ if (!empty($_POST)) {
      */
     $assessStartHour = $assessStartDate->getUsingFormat('h');
     $assessStartMinute = $assessStartDate->getUsingFormat('i');
-    $assessStartMeridiem = $assessStartDate->getUsingFormat('a');
+    $assessStartMeridiem = $assessStartDate->getUsingFormat('A');
 
 	$this->setVar(array(
 		'START_HOUR_VALUE' => $assessStartHour,
@@ -115,7 +115,7 @@ if (!empty($_POST)) {
      */
     $assessFinishHour = $assessFinishDate->getUsingFormat('h');
     $assessFinishMinute = $assessFinishDate->getUsingFormat('i');
-    $assessFinishMeridiem = $assessFinishDate->getUsingFormat('a');
+    $assessFinishMeridiem = $assessFinishDate->getUsingFormat('A');
 
 	/* Render finish times
 	 */
