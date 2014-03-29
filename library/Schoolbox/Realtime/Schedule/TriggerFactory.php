@@ -10,10 +10,10 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
+use Alaress\Schedule\Trigger\CancelTrigger;
+use Alaress\Schedule\Trigger\Trigger;
 use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
-use Schoolbox\Realtime\Schedule\Trigger\CancelTrigger;
-use Schoolbox\Realtime\Schedule\Trigger\Trigger;
 use Schoolbox\User;
 
 class TriggerFactory {
@@ -114,7 +114,7 @@ class TriggerFactory {
 	}
 
 	/**
-	 * @return \Schoolbox\User
+	 * @return User
 	 */
 	public function getUser() {
 		return $this->user;

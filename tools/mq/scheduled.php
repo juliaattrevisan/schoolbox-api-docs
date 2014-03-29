@@ -1,9 +1,10 @@
 #!/usr/bin/php
 <?php
+
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use React\EventLoop\Factory;
-use Schoolbox\ConfigLoader;
 use Schoolbox\Realtime\Schedule\Scheduler;
+use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
 use Schoolbox\Realtime\Verboser;
 
 /**
@@ -38,7 +39,7 @@ $loop = Factory::create();
 
 // CREATE SCHEDULER
 try {
-	$sched = new Scheduler($loop, $verboser, new ConfigLoader(), true);
+	$sched = new Scheduler($loop, new SchedulerDispatchStrategy(), $verboser);
 }
 catch(AMQPRuntimeException $e) {
 	$verboser->v("Unable to connect to RabbitMQ: server is offline.",'!');

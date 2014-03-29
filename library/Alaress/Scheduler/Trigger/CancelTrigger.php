@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Schedule\Trigger;
+namespace Alaress\Schedule\Trigger;
 
 
 /**

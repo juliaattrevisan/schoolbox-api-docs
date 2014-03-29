@@ -10,35 +10,28 @@
 namespace Schoolbox\Realtime\Digest;
 
 
+use Alaress\Scheduler\CronScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
+use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
-use Schoolbox\Realtime\Schedule\AbstractScheduler;
-use Schoolbox\Realtime\Schedule\Recurrence\Recurrence;
-use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
+use Schoolbox\Realtime\Schedule\DigestTrigger;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
-class DigestScheduler extends AbstractScheduler {
+class DigestScheduler extends CronScheduler {
 
-	/**
-	 * Return the method that Workers will use to process this task
-	 *
-	 * @return string
-	 */
-	protected function getMethod() {
-		return DefaultDispatchStrategy::TASK_DIGEST;
-	}
+    /**
+     * @param LoopInterface $loop
+     * @param DispatchStrategyInterface $dispatchStrategy
+     * @param \Alaress\Cli\Debug $cli
+     */
+    public function __construct($loop, $dispatchStrategy, $cli) {
+        parent::__construct($loop, $dispatchStrategy, $cli);
+        $this->method = DefaultDispatchStrategy::TASK_DIGEST;
 
-
-	/**
-	 * Set up this scheduler
-	 */
-	protected function initialise() {
-
-		// this Scheduler is initialised by reading a config (WHERE?) and scheduling the FIRST of each type
-		// which will subsequently spawn their future events
-
+        // read each role entry, and schedule a cron based on it
 		foreach(RoleMapper::getInstance()->findAll() as $role) {
 			/** @var Role $role */
 
@@ -60,31 +53,12 @@ class DigestScheduler extends AbstractScheduler {
 			}
 
 			try {
-				$this->scheduleNotification(new DigestTrigger(new Recurrence($schedule), $role));
+				$this->scheduleNotification(new DigestTrigger($schedule, $role));
 			}
 			catch(InvalidArgumentException $e) {
 				echo $e->getMessage(), "\n";
 			}
 		}
 	}
-
-	/**
-	 * Handles a response from a Worker
-	 *
-	 * @param DigestTrigger $trigger - the identifier passed as the first argument to Dispatcher::enqueue()
-	 * @param string $command        - the command that was executed by the Worker
-	 * @param array $data            - the data with which the Worker responded
-	 * @return void                  - this method does not return any value
-	 */
-	public function handleResponse($trigger, $command, $data) {
-		$data = unserialize($data['0']);
-
-		// worker did the work, advise of the outcome
-		$this->verboser->v("Emails sent: $data");
-
-		// and reschedule the trigger to go again
-		$this->scheduleNotification($trigger);
-	}
-
 
 } 

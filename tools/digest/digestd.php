@@ -1,8 +1,9 @@
 #!/usr/bin/php
 <?php
+
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use React\EventLoop\Factory;
-use Schoolbox\ConfigLoader;
 use Schoolbox\Realtime\Digest\DigestScheduler;
 use Schoolbox\Realtime\Verboser;
 
@@ -38,7 +39,7 @@ $loop = Factory::create();
 
 // CREATE SCHEDULER
 try {
-	$sched = new DigestScheduler($loop, $verboser, new ConfigLoader(), true);
+	$sched = new DigestScheduler($loop, new DefaultDispatchStrategy(), $verboser);
 }
 catch(AMQPRuntimeException $e) {
 	$verboser->v("Unable to connect to RabbitMQ: server is offline.",'!');

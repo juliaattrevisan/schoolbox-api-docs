@@ -10,7 +10,7 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
-use Schoolbox\Realtime\Schedule\Trigger\TriggerInterface;
+use Alaress\Schedule\Trigger\TriggerInterface;
 use Schoolbox\User;
 
 class TriggerBundle {

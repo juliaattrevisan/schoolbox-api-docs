@@ -7,38 +7,39 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Schedule\Trigger;
+namespace Schoolbox\Realtime\Schedule;
 
 
+use Alaress\Schedule\Trigger\AbstractTrigger;
+use Cron\CronExpression;
 use Schoolbox\Realtime\Digest\MailNotifier;
-use Schoolbox\Realtime\Schedule\Recurrence\Recurrence;
 use Schoolbox\Role;
 
 class DigestTrigger extends AbstractTrigger {
 
 
-	/** @var Recurrence */
-	protected $recurrence;
+	/** @var CronExpression */
+	protected $cron;
 
 
 	/**
-	 * @param Recurrence $recurrence
+	 * @param string $schedule
 	 * @param Role $role
 	 */
-	function __construct($recurrence, $role) {
-		$this->recurrence = $recurrence;
+	function __construct($schedule, $role) {
+		$this->cron = CronExpression::factory($schedule);
 		$this->notifier = new MailNotifier();
 		$this->label = $role->getName();
 		$this->model = $role;
 	}
 
 	/**
-	 * Return the timestamp at which this trigger should fire (can be in the past)
+	 * Return the timestamp at which this trigger will NEXT fire
 	 *
 	 * @return int
 	 */
 	public function getTimestamp() {
-		return $this->recurrence->getNextTimestamp();
+		return $this->cron->getNextRunDate()->getTimestamp();
 	}
 
 	/**

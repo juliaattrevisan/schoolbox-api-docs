@@ -12,6 +12,7 @@
         "videlalvaro/php-amqplib": "2.2.5",
         "cboden/ratchet": "0.3.0",
         "react/stomp": "0.2.*@dev",
+        "mtdowling/cron-expression": "1.0.*",
         "html2text/html2text": "1.0.*"
     },
     "require-dev": {

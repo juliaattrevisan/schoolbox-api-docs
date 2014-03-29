@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif\Message;
 
 
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
@@ -26,7 +27,6 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
-use Schoolbox\Realtime\Verboser;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -47,19 +47,19 @@ class Interceptor implements TaskResponseHandlerInterface {
 	/** @var Dispatcher */
 	protected $dispatcher;
 
-	/** @var Verboser  */
+	/** @var Debug  */
 	protected $v;
 
 	/** @var bool */
 	protected $patient = true;
 
 	/**
-	 * @param Verboser $verboser
+	 * @param Debug $debug
 	 * @param LoopInterface $loop
 	 */
-	function __construct($verboser, $loop = null) {
+	function __construct($debug, $loop = null) {
 		$this->loop = $loop;
-		$this->v = $verboser;
+		$this->v = $debug;
 
 		$this->rerouteMapper = RerouteMapper::getInstance();
 		$this->permissionMapper = RoutePermissionMapper::getInstance();
