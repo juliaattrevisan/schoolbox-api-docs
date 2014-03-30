@@ -40,18 +40,19 @@ class Authorizer {
     /**
      * Authorizes whether a user may access a given path.
      *
-     * @param string $path The path to check. Often, this refers to a controller
-     *                     name, which may have been determined by a route
-     *                     matched by Aura\Router\Router->match().
-     * @param User   $user The user to check.
+     * @param string $path   The path to check. Often, this refers to a controller
+     *                       name, which may have been determined by a route
+     *                       matched by Aura\Router\Router->match().
+     * @param array  $params Any params to pass as part of the route.
+     * @param User   $user   The user to check.
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      */
-    public function authorizePathForUser($path, User $user = null) {
+    public function authorizePathForUser($path, $params = array(), User $user = null) {
         foreach ($this->ruleList as $rule) {
             if (preg_match($rule['path'], $path)) {
                 /** @var Rule\IAuthorizationRule $authRule */
                 $authRule = $rule['rule'];
-                $authRule->authorize($user);
+                $authRule->authorize($params, $user);
             }
         }
     }
@@ -65,12 +66,13 @@ class Authorizer {
      *
      * @see    $this->authorizePathForUser()
      * @param  string $path
+     * @param  array  $params
      * @param  User   $user
      * @return bool
      */
-    public function isPathAuthorizedForUser($path, User $user = null) {
+    public function isPathAuthorizedForUser($path, $params = array(), User $user = null) {
         try {
-            $this->authorizePathForUser($path, $user);
+            $this->authorizePathForUser($path, $params, $user);
         }
         catch (\Alaress\Authorizer\Failure\Base $e) {
             return false;

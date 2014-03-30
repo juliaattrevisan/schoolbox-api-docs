@@ -15,7 +15,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 
 class IsLoggedIn implements IAuthorizationRule {
 
-    public function authorize(User $user = null) {
+    public function authorize(array $params = array(), User $user = null) {
         // True:  skip to next item in chain
         // False: break chain with request that redirects somewhere
         // These rules should define what to do on failure too.

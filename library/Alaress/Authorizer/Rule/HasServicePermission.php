@@ -35,7 +35,7 @@ class HasServicePermission implements IAuthorizationRule {
         $this->accessLevel = $accessLevel;
     }
 
-    public function authorize(User $user = null) {
+    public function authorize(array $params = array(), User $user = null) {
         if ($user instanceof User) {
             // Check this user's permissions against this item's service and
             // access level.

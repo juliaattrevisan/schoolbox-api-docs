@@ -35,7 +35,7 @@ if ($route instanceof Aura\Router\Route) {
 
         /** @var \Alaress\Authorizer\Authorizer $authorizer */
         $authorizer = $di->get('authorizer');
-        $authorizer->authorizePathForUser($route->name, $user);
+        $authorizer->authorizePathForUser($route->name, $route->params, $user);
 
         // If authorizePathForUser() threw no exception, authorization passed!
 

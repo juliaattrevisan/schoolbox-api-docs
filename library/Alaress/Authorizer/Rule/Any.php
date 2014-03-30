@@ -17,6 +17,9 @@ use InvalidArgumentException;
 
 class Any implements IAuthorizationRule {
 
+    /**
+     * @var array|IAuthorizationRule[]
+     */
     protected $subRuleList = array();
 
     public function __construct() {
@@ -30,11 +33,11 @@ class Any implements IAuthorizationRule {
         }
     }
 
-    public function authorize(User $user = null) {
+    public function authorize(array $params = array(), User $user = null) {
         $lastException = null;
         foreach ($this->subRuleList as $subRule) {
             try {
-                $subRule->authorize($user);
+                $subRule->authorize($params, $user);
                 return true;
             }
             catch (Base $e) {
