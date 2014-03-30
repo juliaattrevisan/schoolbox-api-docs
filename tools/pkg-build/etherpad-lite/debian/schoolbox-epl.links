@@ -1,0 +1,3 @@
+etc/schoolbox-epl/settings.json usr/share/schoolbox-epl/settings.json
+etc/schoolbox-epl/settings.json.template usr/share/schoolbox-epl/settings.json.template
+etc/schoolbox-epl/APIKEY.txt usr/share/schoolbox-epl/APIKEY.txt
