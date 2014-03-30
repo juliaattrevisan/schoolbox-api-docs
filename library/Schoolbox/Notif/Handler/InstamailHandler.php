@@ -9,13 +9,12 @@
 
 namespace Schoolbox\Notif\Handler;
 
-use Alaress\Mail\TwigMailer;
 use Monolog\Handler\MailHandler;
 use Monolog\Logger;
-use PhpAmqpLib\Message\AMQPMessage;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mail\TwigEmail;
 use Schoolbox\Notif\Message\External;
-use Schoolbox\Notif\Queue\UnreadMessage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -28,9 +27,14 @@ use Schoolbox\UserMapper;
  */
 class InstamailHandler extends MailHandler {
 
+    /** @var IConfigLoader */
 	protected $conf;
+
+    /** @var UserMapper */
 	protected $userMapper;
-	protected $coreContext;
+
+    /** @var TwigEmail */
+    protected $email;
 
 	/**
 	 * We don't accept a Swift_Message in this constructor, the entire message will be generated on the fly.
@@ -42,107 +46,20 @@ class InstamailHandler extends MailHandler {
 		parent::__construct($level, $bubble);
 		$this->conf = ConfigMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
-
-		// config context setup
-
-		$neededConfigs = array(
-			'title',
-			'school_name',
-			'site_hostname',
-			'site_location',
-			'site_domain',
-		);
-
-		foreach($neededConfigs as $key) {
-			$this->coreContext['config'][$key] = $this->conf->get($key);
-		}
-
-		$this->coreContext['config']['year'] = date('Y');
-		$this->coreContext['config']['padding'] = 4;
-
-		$site = $this->coreContext['config']['site_location'];
-
-		$possibleLogos = array(
-			'email-logo',
-			"$site-logo",
-			'hercules',
-			'logo'
-		);
-
-		foreach($possibleLogos as $filename) {
-			if(file_exists(SITE_root . "/www/images/$site/$filename.png")) {
-				$this->coreContext['config']['logo'] = $filename;
-				break;
-			}
-		}
-
-		if(!isset($this->coreContext['config']['logo'])) {
-			$this->coreContext['config']['logo'] = 'logo';
-		}
-
-
-		// extract colours
-		$colours = $this->parseLess(SITE_root . "/www/css/core/variables.less");
-		$colours = $this->parseLess(SITE_root . "/www/css/$site/chrome.less", $colours);
-		$this->coreContext['colours'] = $colours;
+        $this->email = new TwigEmail('instamail.twig');
 	}
 
 
-	/**
-	 * @param string $filename
-	 * @param array $colours
-	 * @return array
-	 */
-	protected function parseLess($filename, $colours = array()) {
+    /**
+     * TODO refactor this method
+     *
+     * @param string $content
+     * @param array $records
+     */
+    protected function send($content, array $records) {
 
-		$fp = @fopen($filename, 'r');
-		if($fp === false) {
-			return $colours;
-		}
-		// iterate and extract colour vars
-		while($line = fgets($fp)) {
+        $coreContext = $this->email->getCoreContext();
 
-			$regex = '`
-				@                       # vars start with an at
-				([a-z\-]+)              # get the varname
-				:                       # delimited by a colon
-				\s+                     # miscellaneous amounts of whitespace
-				(?:                     # $1
-					(\#[0-9A-Fa-f]+)    # colour declaration
-				|                       # OR
-					@([a-z\-]+)         # alternative var reference
-				)                       # /$1
-				;                       # trailing semicolon delimiter
-			`x';
-
-			if(!preg_match($regex, $line, $matches)) {
-				continue;
-			}
-
-			$matches[1] = str_replace('-','_', $matches[1]);
-
-			if(count($matches) == 3) {
-				$colours[$matches[1]] = strtoupper($matches[2]);
-			}
-			elseif(count($matches) == 4) {
-				$matches[3] = str_replace('-','_', $matches[3]);
-				if(isset($colours[$matches[3]])) {
-					$colours[$matches[1]] = $colours[$matches[3]];
-				}
-				else {
-					$colours[$matches[1]] = '{'.$matches[3].'}';
-				}
-			}
-
-		}
-		fclose($fp);
-		return $colours;
-	}
-
-
-	protected function send($content, array $records) {
-
-		$mailer = new TwigMailer('instamail.twig');
 		$contexts = array();
 
 		// index records by user and filter inappropriate ones
@@ -193,17 +110,17 @@ class InstamailHandler extends MailHandler {
 				continue;
 			}
 
-			$mailContext = $this->coreContext;
-
-			$uribase = "http://" . $mailContext['config']['site_domain'];
+			$uribase = "http://" . $this->conf->get('site_domain');
 
 			if(count($userContexts) == 1) {
 				// the plaintext of the message
-				$mailer->setSubject($userContexts[0][1]);
+				$this->email->setSubject($userContexts[0][1]);
 			}
 			else {
-				$mailer->setSubject("Here's What You've Been Missing");
+                $this->email->setSubject("Here's What You've Been Missing");
 			}
+
+            $mailContext = array();
 
 			foreach($userContexts as $values) {
 				/** @var User $user */
@@ -212,9 +129,6 @@ class InstamailHandler extends MailHandler {
 				/** @var External $external */
 				$external = $context['message'];
 				$context['message'] = json_decode($external->serialize(), true);
-
-
-
 
 				$formatted = $context['message'];
 
@@ -229,7 +143,7 @@ class InstamailHandler extends MailHandler {
 						if(is_array($value) && count($value) == 2) {
 							$value = array_values($value);
 							$text = sprintf('<a href="%s%s" style="color:%s;">%s</a>',
-								$uribase, $value[1], $mailContext['colours']['link'], $value[0]
+                                    $uribase, $value[1], $coreContext['colours']['link'], $value[0]
 							);
 						}
 						// just text
@@ -254,14 +168,13 @@ class InstamailHandler extends MailHandler {
 				);
 			}
 
-			$mailer->setContext($mailContext);
-			$success = $mailer->send(array(
-				'name' => $user->formatName(),
-				'email' => $user->getEmail()
-			));
-
-//			echo ($success ?"":"have not ") . "sent an email to ".$user->getEmail()."\n";
-
+            if(isset($user)) {
+                $this->email->setContext($mailContext);
+                $this->email->send(array(
+                    'name' => $user->formatName(),
+                    'email' => $user->getEmail()
+                ));
+            }
 		}
 	}
 

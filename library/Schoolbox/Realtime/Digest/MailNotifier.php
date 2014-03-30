@@ -10,12 +10,27 @@
 namespace Schoolbox\Realtime\Digest;
 
 
+use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mail\TwigEmail;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class MailNotifier {
+
+    /** @var IConfigLoader */
+    protected $conf;
+
+    /**
+     * @param IConfigLoader $configLoader
+     */
+    public function __construct($configLoader = null) {
+        $this->conf = $configLoader ?: ConfigMapper::getInstance();
+    }
 
 	/**
 	 * This method is executed by a worker using the 'digest' command
@@ -31,16 +46,16 @@ class MailNotifier {
 		$conn = new Connector();
 
 		// get a list of users
+        /** @var Collection|User[] $users */
 		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
-
-		// get their IDs
-		$userIds = $users->getColumnValues('id');
 
 		$result = 0;
 
+        $email = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
+
 		// iterate and digest
-		foreach($userIds as $id) {
-			$q = UserQueue::getUserDigestQueueName($id);
+		foreach($users as $user) {
+			$q = UserQueue::getUserDigestQueueName($user->getId());
 			$acks = array();
 
 			// collate list of messages
@@ -48,10 +63,13 @@ class MailNotifier {
 				$acks[] = $m;
 			}
 
-			// pass into mailer
-			$sent = false;
+            $email->setTo(array('name' => $user->formatName(), 'email' => $user->getEmail()));
+            $email->setContext($this->convertMessagesToContext($acks));
 
-			// if email sent successfully, ACK, otherwise NACK
+			// away she goes
+			$sent = $email->send();
+
+            // if email sent successfully, ACK, otherwise NACK
 			if($sent) {
 				$conn->acceptMessages($acks);
 				++$result;
@@ -64,5 +82,11 @@ class MailNotifier {
 		// return the number of emails successfully sent
 		return $result;
 	}
+
+
+    protected function convertMessagesToContext($messages) {
+        // TODO rearrange data to be more twig-friendly
+        return $messages;
+    }
 
 } 
