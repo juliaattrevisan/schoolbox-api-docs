@@ -9,10 +9,19 @@
 
 namespace Alaress\Schedule\Trigger;
 
+use Alaress\Schedule\Event\EventInterface;
 
-use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
-use Schoolbox\User;
 
+/**
+ * At its most basic, a Trigger is a "what, when, how, why":
+ * what: a label that defines this trigger
+ * when: a timestamp of when this trigger is to be fired
+ * how:  one or more callbacks to be executed when the timestamp arrives
+ * why:  the event that precipitated this trigger
+ *
+ * Interface TriggerInterface
+ * @package Alaress\Schedule\Trigger
+ */
 interface TriggerInterface {
 
 	/**
@@ -23,39 +32,11 @@ interface TriggerInterface {
 	public function getTimestamp();
 
 	/**
-	 * Return the Model object on which this trigger is acting
-	 *
-	 * @return object
-	 */
-	public function getModel();
-
-	/**
 	 * Return an array of callables that are appropriate for this trigger
 	 *
 	 * @return callable[]
 	 */
 	public function getCallbacks();
-
-	/**
-	 * Return the ID of the user that caused this trigger
-	 *
-	 * @return User
-	 */
-	public function getUser();
-
-	/**
-	 * Return the module that this trigger is from
-	 *
-	 * @return ModuleNotifierInterface
-	 */
-	public function getModuleNotifier();
-
-	/**
-	 * Return the class of the module that this trigger is from
-	 *
-	 * @return string
-	 */
-	public function getModuleNotifierClass();
 
 	/**
 	 * Return the trigger label that this trigger is based on
@@ -64,11 +45,11 @@ interface TriggerInterface {
 	 */
 	public function getLabel();
 
-	/**
-	 * Return the diff of the object represented by this trigger, or null if it's new
-	 *
-	 * @return array|null
-	 */
-	public function getDiff();
+    /**
+     * Return the event that precipitated this trigger
+     *
+     * @return EventInterface
+     */
+    public function getEvent();
 
 } 

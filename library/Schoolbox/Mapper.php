@@ -21,6 +21,7 @@ use Schoolbox\Notif\Message\Internal;
 use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\TopicFactory;
+use Schoolbox\Realtime\Schedule\Event;
 
 class Mapper {
 	/**
@@ -1131,14 +1132,17 @@ class Mapper {
 
 				// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
 				if(isset($this->sessionData['user'])) {
-					$msg = new Internal(
-						$model,
-						$previous ? $this->diff($model, $previous) : null,
-						$this->sessionData['user'],
-						$previous ? self::METHOD_UPDATE : self::METHOD_CREATE,
-						$this->getNotifier()
-					);
-					$msg->send();
+
+                    // create a new event, and send it to the scheduler
+                    $event = new Event(
+                        $this->sessionData['user'],
+                        $previous ? self::METHOD_UPDATE : self::METHOD_CREATE,
+                        $model,
+                        $previous ? $this->diff($model, $previous) : null
+                    );
+
+                    $this->notif->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
+
 				}
 
 			}

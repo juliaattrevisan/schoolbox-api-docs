@@ -16,7 +16,7 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
-use Schoolbox\Realtime\Schedule\DigestTrigger;
+use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 

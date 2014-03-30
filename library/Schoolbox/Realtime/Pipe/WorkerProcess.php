@@ -10,23 +10,22 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
-
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
 use RuntimeException;
-use Schoolbox\Notif\Message\Interceptor;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Realtime\Interceptor\Interceptor;
 use Schoolbox\Realtime\Verboser;
 
 class WorkerProcess extends AbstractProcess {
 
-	/** @var \Schoolbox\Notif\Queue\UserQueueFactory  */
+	/** @var UserQueueFactory  */
 	protected $mqf;
 
-	/** @var \Schoolbox\Notif\Message\Interceptor  */
+	/** @var Interceptor */
 	protected $interceptor;
 
 
@@ -55,16 +54,10 @@ class WorkerProcess extends AbstractProcess {
 			case DefaultDispatchStrategy::TASK_FETCH:
 				list($userId, $count) = $args;
 
-				$messages = array();
-
 				$queue = $this->mqf->buildUserQueue($userId, $count, false);
-				$allMessages = $queue->getMessages($count);
 
-				foreach($allMessages as $read) {
-					$messages[$read->getId()] = $read->getBody();
-				}
 				// wrap in an array to preserve keys
-				return array($messages);
+                return array($queue->getMessages($count, false, true));
 
 			// push or digest messages
 			case DefaultDispatchStrategy::TASK_PUBLISH:

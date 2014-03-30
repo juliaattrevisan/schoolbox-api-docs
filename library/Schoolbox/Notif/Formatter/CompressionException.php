@@ -7,11 +7,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Notif\Message\External;
+namespace Schoolbox\Notif\Formatter;
 
+use Schoolbox\Notif\NotifException;
 
-use Schoolbox\Notif\Message\External;
-
-class BroadcastMessage extends External {
+class CompressionException extends NotifException {
 
 } 

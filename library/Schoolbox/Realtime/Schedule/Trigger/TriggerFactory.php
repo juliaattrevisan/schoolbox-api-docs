@@ -7,43 +7,36 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Schedule;
+namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
 use Alaress\Schedule\Trigger\CancelTrigger;
-use Alaress\Schedule\Trigger\Trigger;
-use Schoolbox\Notif\Message\Internal;
+use Alaress\Schedule\Trigger\TriggerInterface;
+use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
-use Schoolbox\User;
 
 class TriggerFactory {
 
 	/** @var ModuleNotifierInterface */
 	protected $notifier;
 
-	/** @var object */
-	protected $model;
-
-	/** @var User */
-	protected $user;
-
-	/** @var array */
-	protected $diff;
+	/** @var Event */
+	protected $event;
 
 	/** @var TriggerBundle[] */
 	protected $bundles;
 
+
 	/**
 	 * @param ModuleNotifierInterface $instance
-	 * @param Internal $message
+	 * @param Event $event
 	 */
-	public function __construct($instance, $message) {
+	public function __construct($instance, $event) {
 		$this->notifier = $instance;
-		$this->model = $message->getObject();
-		$this->user = $message->getInitiator();
-		$this->diff = $message->getDiff();
+        $this->event = $event;
 		$this->bundles = array();
 	}
+
 
 	/**
 	 * @param string $method
@@ -54,10 +47,11 @@ class TriggerFactory {
 		return $this->getBundle($method);
 	}
 
+
 	/**
 	 * @param array $events
 	 * @param bool $disregardExpired
-	 * @return Trigger[]
+	 * @return TriggerInterface[]
 	 */
 	public function build($events, $disregardExpired = false) {
 		$triggers = array();
@@ -65,7 +59,7 @@ class TriggerFactory {
 
 		// iterate across the events supplied and construct triggers out of them
 		foreach($events as $label => $time) {
-			$t = new Trigger($time, $this->notifier, $label, $this->model, $this->user, $this->diff);
+			$t = new InstantTrigger($label, $time, $this->event, $this->notifier);
 
 			// if the timestamp is in the past, and we're disregarding expired, do not include in the return
 			if(!($disregardExpired && $t->getTimestamp() < $now)) {
@@ -75,17 +69,19 @@ class TriggerFactory {
 		return $triggers;
 	}
 
+
 	/**
-	 * @param $events
+	 * @param string[] $events
 	 * @return CancelTrigger[]
 	 */
 	public function cancel($events) {
 		$triggers = array();
 		foreach($events as $label) {
-			$triggers[] = new CancelTrigger($this->notifier, $label, $this->model, $this->user);
+			$triggers[] = new CancelTrigger($label, $this->event);
 		}
 		return $triggers;
 	}
+
 
 	/**
 	 * @param string $method
@@ -98,27 +94,5 @@ class TriggerFactory {
 		}
 		return $this->bundles[$method];
 	}
-
-	/**
-	 * @return array
-	 */
-	public function getDiff() {
-		return $this->diff;
-	}
-
-	/**
-	 * @return object
-	 */
-	public function getModel() {
-		return $this->model;
-	}
-
-	/**
-	 * @return User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
-
 
 } 

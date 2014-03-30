@@ -1,0 +1,87 @@
+<?php
+ /**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+
+namespace Schoolbox\Realtime\Schedule;
+
+
+use Alaress\Schedule\Event\EventInterface;
+use Schoolbox\User;
+
+class Event implements EventInterface {
+
+    /** @var User */
+    protected $effector;
+
+    /** @var string */
+    protected $action;
+
+    /** @var object */
+    protected $object;
+
+    /** @var array|null */
+    protected $diff;
+
+
+    /**
+     * @param User $subject
+     * @param string $verb
+     * @param object $object
+     * @param array $diff
+     */
+    function __construct($subject, $verb, $object, $diff = null) {
+        $this->effector = $subject;
+        $this->action   = $verb;
+        $this->object   = $object;
+        $this->diff     = $diff;
+    }
+
+
+    /**
+     * Returns the principal that caused this event
+     *
+     * @return User
+     */
+    public function getEffector() {
+        return $this->effector;
+    }
+
+
+    /**
+     * Returns the name of the action that was taken by the effector against the object
+     *
+     * @return string
+     */
+    public function getAction() {
+        return $this->action;
+    }
+
+
+    /**
+     * Returns the object that is being acted upon
+     *
+     * @return object
+     */
+    public function getObject() {
+        return $this->object;
+    }
+
+
+    /**
+     * Returns an array that represents the difference between the object in its current state
+     * and its previous state (empty array means "no change"), or null if not applicable for the given action.
+     *
+     * @return array|null
+     */
+    public function getDiff() {
+        return $this->diff;
+    }
+
+
+} 

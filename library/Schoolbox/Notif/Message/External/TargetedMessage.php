@@ -10,26 +10,74 @@
 namespace Schoolbox\Notif\Message\External;
 
 
-use DateTime;
+use Alaress\Schedule\Trigger\TriggerInterface;
 use Schoolbox\Notif\Message\External;
+use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Message\Message;
+use Schoolbox\Notif\Notif;
+use Serializable;
 
-class TargetedMessage extends External {
+class TargetedMessage implements Serializable {
 
-	protected $targets = array();
+    const MATCH_PARAMS     = 0;
+    const MATCH_COMPELTELY = 1;
+
+    /** @var Message  */
+    protected $body;
+    /** @var int */
+    protected $timestamp;
+    /** @var Notif */
+    protected $notif;
+    /** @var string */
+    protected $topicPrepend = 'notify.';
+    /** @var Instance */
+    protected $instance;
+
+
+    /**
+     * @param Notif $notif
+     * @param Message $body
+     * @param Instance $instance
+     * @param TriggerInterface $trigger
+     */
+    public function __construct($notif, $body, $instance, $trigger = null) {
+        $this->body = $body;
+        $this->notif = $notif;
+        $this->instance = $instance;
+        $this->timestamp = $trigger instanceof TriggerInterface ? $trigger->getTimestamp() : null;
+    }
+
+    public function getTimestamp() {
+        return $this->timestamp;
+    }
 
 	/**
 	 * Set the targets of this message.
 	 *
 	 * @param $array
+     * @return self
 	 */
 	public function setTargets($array) {
-		$this->targets = $array;
+		$this->instance->setTargets($array);
+        return $this;
 	}
 
-	public function getTargets() {
-		return $this->targets;
+
+    /**
+     * @return array
+     */
+    public function getTargets() {
+		return $this->instance->getTargets();
 	}
+
+
+    /**
+     * @return array
+     */
+    public function getParams() {
+        return $this->instance->getParams();
+    }
+
 
 	/**
 	 * @return bool
@@ -40,11 +88,13 @@ class TargetedMessage extends External {
 			return false;
 		}
 
-		foreach($this->targets as $target) {
-			foreach($this->topics as $topic) {
+		foreach($this->instance->getTargets() as $target) {
+			foreach($this->instance->getTopics() as $topic) {
 				$self = serialize($this);
 				$topicString = sprintf('%s%s.%s', $this->topicPrepend, $target, $topic);
-				$this->notif->setTopic($topicString)->log($this->severity, $self, $this->context);
+				$this->notif
+                    ->setTopic($topicString)
+                    ->log($this->instance->getSeverity(), $self, $this->instance->getContext());
 			}
 		}
 
@@ -52,45 +102,60 @@ class TargetedMessage extends External {
 	}
 
 
-
-	/**
-	 * Return the array representation of this message.
-	 *
-	 * @return array
-	 */
-	public function toArray() {
-		return array(
-			'body'      => $this->body->toArray(),
-			'timestamp' => $this->datetime->format('U'),
-			'params'    => $this->params,
-			'targets'   => $this->targets,
-		);
-	}
+    /**
+     * @param array $context
+     * @return self
+     */
+    public function setContext($context = array()) {
+        $this->instance->setContext($context);
+        return $this;
+    }
 
 
-	/**
-	 * (PHP 5 &gt;= 5.1.0)<br/>
-	 * Constructs the object
-	 * @link http://php.net/manual/en/serializable.unserialize.php
-	 * @param string $serialized <p>
-	 * The string representation of the object.
-	 * </p>
-	 * @return void
-	 */
-	public function unserialize($serialized) {
-		$data = json_decode($serialized, true);
-		$body = $data['body'];
-		$this->body = new Message($body['body'], $body['icon'], $body['href']);
-		$this->datetime = DateTime::createFromFormat('U', $data['timestamp']);
-		$this->params = $data['params'];
-		$this->targets = $data['targets'];
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize() {
+        return serialize(array($this->body, $this->timestamp, $this->instance));
+    }
 
-		// cannot resend a message that has been received and unserialized
-		$this->severity = null;
-		$this->topics = array();
-		$this->notif = null;
 
-	}
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized) {
+        list($this->body, $this->timestamp, $this->instance) = unserialize($serialized);
+        $this->notif = null;
+    }
 
+
+    /**
+     * Returns whether or not the given message matches this one, to varying strictness of comparison
+     *
+     * @param self $compare
+     * @param int $strength
+     * @return bool
+     */
+    public function matches($compare, $strength = self::MATCH_PARAMS) {
+        if(!$compare instanceof self) {
+            return false;
+        }
+        switch($strength) {
+            case self::MATCH_PARAMS:
+                return $compare->getParams() == $this->getParams();
+            case self::MATCH_COMPELTELY:
+                return $compare == $this;
+        }
+        return false;
+    }
 
 }

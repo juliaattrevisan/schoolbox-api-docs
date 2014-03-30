@@ -7,11 +7,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Notif\Message;
+namespace Schoolbox\Realtime\Interceptor;
 
 
-use Schoolbox\Notif\NotifException;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 
-class CompressionException extends NotifException {
+class InterceptorDispatchStrategy extends DefaultDispatchStrategy {
 
-} 
+}

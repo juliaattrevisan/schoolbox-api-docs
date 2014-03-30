@@ -10,7 +10,10 @@
 namespace Schoolbox\Notif\Message;
 
 
-use DateTime;
+use Alaress\Schedule\Trigger\TriggerInterface;
+use Schoolbox\Notif\Message\External\TargetedMessage;
+use Schoolbox\Notif\Message\Instance\Instance;
+use Schoolbox\Notif\Notif;
 use Serializable;
 
 class Message implements Serializable {
@@ -73,5 +76,16 @@ class Message implements Serializable {
 		$this->href = $data['href'];
 	}
 
+    /**
+     * Wraps self inside a format that can be sent to a user
+     *
+     * @param Instance $instance
+     * @param Notif $notif
+     * @param TriggerInterface $trigger
+     * @return TargetedMessage
+     */
+    public function applyInstance($instance, $notif, $trigger = null) {
+        return new TargetedMessage($notif, $this, $instance, $trigger);
+    }
 
 }

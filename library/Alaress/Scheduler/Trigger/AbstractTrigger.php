@@ -10,59 +10,34 @@
 namespace Alaress\Schedule\Trigger;
 
 
-use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
-use Schoolbox\User;
+use Alaress\Schedule\Event\EventInterface;
 
 abstract class AbstractTrigger implements TriggerInterface {
 
-	protected $notifier;
+    /** @var string */
 	protected $label;
-	protected $model;
-	protected $user;
 
-	/**
-	 * Return the Model object on which this trigger is acting
-	 *
-	 * @return object
-	 */
-	public function getModel() {
-		return $this->model;
-	}
+    /** @var EventInterface */
+    protected $event;
 
-	/**
-	 * Return the ID of the user that caused this trigger
-	 *
-	 * @return User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
 
-	/**
-	 * Return the module that this trigger is from
-	 *
-	 * @return ModuleNotifierInterface
-	 */
-	public function getModuleNotifier() {
-		return $this->notifier;
-	}
+    /**
+     * Return the trigger label that this trigger is based on
+     *
+     * @return string
+     */
+    public function getLabel() {
+        return $this->label;
+    }
 
-	/**
-	 * Return the class of the module that this trigger is from
-	 *
-	 * @return string
-	 */
-	public function getModuleNotifierClass() {
-		return get_class($this->notifier);
-	}
 
-	/**
-	 * Return the trigger label that this trigger is based on
-	 *
-	 * @return string
-	 */
-	public function getLabel() {
-		return $this->label;
-	}
+    /**
+     * Return the event that precipitated this trigger
+     *
+     * @return EventInterface
+     */
+    public function getEvent() {
+        return $this->event;
+    }
 
-} 
+}

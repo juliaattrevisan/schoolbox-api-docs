@@ -23,18 +23,7 @@ class CompressedFormatter implements FormatterInterface {
 	 * @return mixed The formatted record
 	 */
 	public function format(array $record) {
-		// serialize the message contents
-		$uncompressed = serialize($record);
-
-		// compress the resultant string
-		$compressed = gzcompress($uncompressed, self::COMPRESSION_LEVEL);
-
-		// base64 encode so it survives transport
-		$encoded = base64_encode($compressed);
-
-		// return the result
-		return $encoded;
-
+		return self::compress($record);
 	}
 
 	/**
@@ -47,5 +36,47 @@ class CompressedFormatter implements FormatterInterface {
 		return $this->format($records);
 	}
 
+
+    /**
+     * @param mixed $data
+     * @return string
+     */
+    public static function compress($data) {
+        // serialize the message contents
+        $uncompressed = serialize($data);
+
+        // compress the resultant string
+        $compressed = gzcompress($uncompressed, self::COMPRESSION_LEVEL);
+
+        // base64 encode so it survives transport
+        $encoded = base64_encode($compressed);
+
+        // return the result
+        return $encoded;
+    }
+
+
+    /**
+     * @param string $data
+     * @throws CompressionException
+     * @return mixed
+     */
+    public static function uncompress($data) {
+        // base64-decode the data
+        if(($decoded = base64_decode($data)) === false) {
+            throw new CompressionException("Could not decode data");
+        }
+
+        // uncompress the resultant binary
+        if(($uncompressed = gzuncompress($decoded)) === false) {
+            throw new CompressionException("Could not uncompress data");
+        }
+
+        // unserialize the resultant string
+        $unserialized = unserialize($uncompressed);
+
+        // return the result
+        return $unserialized;
+    }
 
 } 

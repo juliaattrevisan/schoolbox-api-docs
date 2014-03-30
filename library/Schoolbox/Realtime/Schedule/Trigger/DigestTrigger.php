@@ -7,19 +7,15 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Schedule;
+namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
-use Alaress\Schedule\Trigger\AbstractTrigger;
+use Alaress\Schedule\Trigger\RecurringTrigger;
 use Cron\CronExpression;
 use Schoolbox\Realtime\Digest\MailNotifier;
 use Schoolbox\Role;
 
-class DigestTrigger extends AbstractTrigger {
-
-
-	/** @var CronExpression */
-	protected $cron;
+class DigestTrigger extends RecurringTrigger {
 
 
 	/**
@@ -34,15 +30,6 @@ class DigestTrigger extends AbstractTrigger {
 	}
 
 	/**
-	 * Return the timestamp at which this trigger will NEXT fire
-	 *
-	 * @return int
-	 */
-	public function getTimestamp() {
-		return $this->cron->getNextRunDate()->getTimestamp();
-	}
-
-	/**
 	 * Return an array of callables that are appropriate for this trigger
 	 *
 	 * @return callable[]
@@ -50,15 +37,5 @@ class DigestTrigger extends AbstractTrigger {
 	public function getCallbacks() {
 		return array(array($this->notifier, 'processDigest'));
 	}
-
-	/**
-	 * Return the diff of the object represented by this trigger, or null if it's new
-	 *
-	 * @return array|null
-	 */
-	public function getDiff() {
-		return null;
-	}
-
 
 } 

@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Notif\Message;
+namespace Schoolbox\Realtime\Interceptor;
 
 
 use Alaress\Cli\Debug;
@@ -68,7 +68,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 
 		// optional construction in case null was passed for $loop
 		if($loop instanceof LoopInterface) {
-			$d = $this->dispatcher = new Dispatcher($loop, $this, $verboser, new InterceptorDispatchStrategy());
+			$d = $this->dispatcher = new Dispatcher($loop, $this, $debug, new InterceptorDispatchStrategy());
 			$this->transaction = new Transaction($loop, function($timer) use ($d) {
 				/** @var $timer TimerInterface */
 				$d->enqueue($timer, InterceptorDispatchStrategy::TASK_INTERCEPT, $timer->getData());
@@ -106,11 +106,14 @@ class Interceptor implements TaskResponseHandlerInterface {
 	}
 
 	/**
+     * @apc called from WorkerProcess::process()
 	 * @param User $user
 	 * @param Frame $frame
 	 * @return bool
 	 */
 	public function reroute($user, $frame) {
+
+        $data = $frame->body;
 
 //		echo "Received frame $frame->body\n";
 
@@ -269,6 +272,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 
 
 	/**
+     * @deprecated
 	 * @param AMQPMessage $m
 	 * @return array
 	 */

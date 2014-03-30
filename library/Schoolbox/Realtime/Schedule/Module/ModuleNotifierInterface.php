@@ -13,7 +13,7 @@ namespace Schoolbox\Realtime\Schedule\Module;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NS;
-use Schoolbox\Realtime\Schedule\TriggerBundle;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Serializable;
 
 interface ModuleNotifierInterface extends Serializable {

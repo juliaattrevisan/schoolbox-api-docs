@@ -10,11 +10,8 @@
 namespace Schoolbox\Notif\Queue;
 use External_User;
 use Group;
-use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Campus;
-use Schoolbox\Collection;
-use Schoolbox\Notif\Message\External;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Resource\Category;
@@ -367,10 +364,10 @@ class UserQueueFactory {
 	 * Use this method shrewdly - its expense is proportional to the length of the given user's queues.
 	 *
 	 * @param int $userId
-	 * @param External $external
+	 * @param TargetedMessage $message
 	 * @return bool
 	 */
-	public function userHasSeen($userId, $external) {
+	public function userHasSeen($userId, $message) {
 
 		$result = false;
 
@@ -379,8 +376,6 @@ class UserQueueFactory {
 			UserQueue::getUserDigestQueueName($userId),
 		);
 
-		$source = $external->toArray();
-
 		foreach($qs as $q) {
 			$nack = array();
 			while($m = $this->mqConnector->readFromQueue($q)) {
@@ -388,18 +383,14 @@ class UserQueueFactory {
 
 				$unjson = json_decode($m->body, true);
 
-				/** @var External $compare */
+				/** @var TargetedMessage $compare */
 				$compare = unserialize($unjson['message']);
-				$target = $compare->toArray();
 
-				if($source['body']['body'] == $target['body']['body']) {
-					if($source['params'] == $target['params']) {
-						$result = true;
-						// break out
-						break;
-					}
-				}
-
+                if($message->matches($compare, TargetedMessage::MATCH_PARAMS)) {
+                    $result = true;
+                    // break out
+                    break;
+                }
 			}
 			// push any messages we retrieved back on the the queue
 			$this->mqConnector->rejectMessages($nack);

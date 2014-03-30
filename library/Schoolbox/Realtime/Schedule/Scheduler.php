@@ -21,14 +21,15 @@ use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\CompressionException;
-use Schoolbox\Notif\Message\Interceptor;
-use Schoolbox\Notif\Message\Internal;
+use Schoolbox\Notif\Formatter\CompressedFormatter;
+use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Realtime\Interceptor\Interceptor;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SplObjectStorage;
@@ -81,7 +82,6 @@ class Scheduler extends StompScheduler {
      * @param Client $client
      */
     public function onConnect($client) {
-
         // make sure our endpoint exists
         $mqc = new Connector();
         $mqc->declareQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE);
@@ -97,8 +97,8 @@ class Scheduler extends StompScheduler {
         foreach(UserMapper::getInstance()->findAll() as $user) {
             /** @var User $user - self hydration */
             $user = UserMapper::getInstance()->findById($user->getId());
-            $subn = '/amq/queue/'.UserQueue::getUserToSortQueueName($user->getId());
-            $client->subscribe($subn, function($frame) use ($interceptor, $user) {
+            $queue = UserQueue::getUserToSortQueueName($user->getId());
+            $client->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user) {
                 // this closure is executed every time a message is sent to the client based on the given subscription
                 $interceptor->process($user, $frame);
             });
@@ -123,22 +123,23 @@ class Scheduler extends StompScheduler {
      */
     public function onMessage($frame, $resolver) {
 		try {
-			$message = Internal::reconstitute($frame->body);
+            $data = $frame->body;
 
-			// we can't do squat if the Mapper didn't send us a message in the right format
-			if(!$message instanceof Internal) {
-				$this->debug->v("Could not decode '$frame->body' to schedule event", '!');
-				// this message is unparseable, so we ACK it to make it go away
-				$resolver->ack();
-				return;
-			}
+            $event = unserialize(CompressedFormatter::uncompress($data));
+
+            if(!$event instanceof Event) {
+                $this->debug->v("Could not decode '$frame->body' to schedule event", '!');
+                // this message is unparseable, so we ACK it to make it go away
+                $resolver->ack();
+                return;
+            }
 
 			// only a few Models actually have schedule strategies, failure is ok
 			// each module strategy knows how to deal with its own events
-			$triggerFactory = new TriggerFactory($this->getModule($message->getObjectClass()), $message);
+			$triggerFactory = new TriggerFactory($this->getModule($event->getObject()), $event);
 
 			// retrieve, populate, and schedule this bundle of triggers
-			$this->scheduleNotifications($triggerFactory->buildTriggers($message->getMethod())->getTriggers(), $resolver);
+			$this->scheduleNotifications($triggerFactory->buildTriggers($event->getAction())->getTriggers(), $resolver);
 			return;
 
 		}
@@ -155,7 +156,30 @@ class Scheduler extends StompScheduler {
 	}
 
 
-	/**
+    /**
+     * @param TriggerInterface[] $triggers
+     * @param AckResolver $resolver
+     */
+    public function scheduleNotifications($triggers, $resolver = null) {
+        foreach($triggers as $trigger) {
+            $this->scheduleNotification($trigger, $resolver);
+        }
+    }
+
+
+    /**
+     * @param TriggerInterface $trigger
+     * @param AckResolver $resolver
+     */
+    public function scheduleNotification($trigger, $resolver = null) {
+        parent::scheduleNotification($trigger);
+        if($resolver instanceof AckResolver) {
+            $this->attachResolverTrigger($resolver, $trigger);
+        }
+    }
+
+
+    /**
 	 * Handles a response from a Worker
 	 *
 	 * @param TriggerInterface $trigger   - the identifier passed as the first argument to Dispatcher::enqueue()
@@ -165,7 +189,6 @@ class Scheduler extends StompScheduler {
 	 * @return void                       - this method does not return any value
 	 */
 	public function handleResponse($trigger, $command, $data) {
-
 		$this->debug->v("Received worker response to handle: '$command' -> ".substr(json_encode($data), 0, 64)."...");
 
 		// detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
@@ -193,33 +216,26 @@ class Scheduler extends StompScheduler {
 			return;
 		}
 
-		$count = 0;
-		$topicArray = array();
+        $count = $msgr->send($this->notif, $trigger);
 
-		// iterate across the messages supplied and send them
-		foreach($msgr->generateExternalMessages($this->notif, $trigger->getTimestamp()) as $message) {
-			// send them all!
-			$message->setContext(array('user' => $trigger->getUser()->getId()));
-			$sent = $message->send();
-			$count += $sent ? 1 :0;
-			$topicArray = array_merge($topicArray, $message->getTopics());
-		}
+        if(is_null($count)) {
+            $this->debug->d("No messages to broadcast");
+            return;
+        }
 
-		$topics = implode("\n    - ", $topicArray);
-
-		$this->debug->v(sprintf("%s message%s broadcast to %s", $count, $count == 1 ? '' : 's', $topics), '<');
-
+		$this->debug->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), '<');
 	}
 
 
     /**
      * Return the module to be working with, based on the model class (with additional safety checks)
      *
-     * @param string $modelClass
+     * @param object|string $modelClass
      * @throws ScheduleException
      * @return ModuleNotifierInterface
      */
     public function getModule($modelClass) {
+        $modelClass = is_object($modelClass) ? get_class($modelClass) : $modelClass;
         $class = $modelClass . "Notifier";
         if(!class_exists($class)) {
             throw new ScheduleException("No notifier for model '$modelClass'.");
@@ -228,8 +244,8 @@ class Scheduler extends StompScheduler {
         if(!$instance instanceof ModuleNotifierInterface) {
             throw new ScheduleException("Notifer class '$class' found, but not an instance of ModuleNotifierInterface.");
         }
-        return $instance;
 
+        return $instance;
     }
 
 
@@ -275,6 +291,7 @@ class Scheduler extends StompScheduler {
                 return $triggers->count();
             }
         }
+
         return null;
     }
 
@@ -287,8 +304,8 @@ class Scheduler extends StompScheduler {
             $triggers = $this->resolvers->offsetGet($ackResolver);
             return count($triggers);
         }
+
         return null;
     }
-
 
 } 

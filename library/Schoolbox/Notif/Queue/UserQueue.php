@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif\Queue;
 
 
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 
 /**
@@ -32,7 +33,7 @@ class UserQueue {
 	// queue of messages that are pending to be sent by Digest
 	const QUEUE_DIGEST_MESSAGES = '%s.u.%s.digest';
 
-	/** @var AbstractMessage[] */
+	/** @var TargetedMessage[] */
 	protected $messages = array();
 
 	/** @var MQConnector */
@@ -104,7 +105,7 @@ class UserQueue {
 	 * @param int $limit - how many messages to retrieve, from most recent backward
 	 * @param bool $forceRefresh - whether or not the list of messages should be repopulated
 	 * @param bool $preserveKeys - whether or not to keep the message ID as the array key
-	 * @return ReadMessage[]
+	 * @return TargetedMessage[]
 	 */
 	public function getMessages($limit = 10, $forceRefresh = false, $preserveKeys = false) {
 
@@ -134,13 +135,13 @@ class UserQueue {
 		while($m = $this->conn->readFromQueue($this->getListedQueueName())) {
 			$nacks[] = $m;
 
-			// unwrap the serialisation
-			$body = json_decode($m->body, true);
-			$body['message'] = unserialize($body['message']);
-			$m->setBody((string)$body['message']);
+            $msgId = $m->get('message_id');
 
-			$msg = new ReadMessage($m);
-			$this->messages[$msg->getId()] = $msg;
+			// unwrap the formatting
+			$body = json_decode($m->body, true);
+
+            // insert the unserialized TargetedMessage into our list
+			$this->messages[$msgId] = unserialize($body['message']);
 		}
 
 		// now we've collected messages, reject all
@@ -148,7 +149,11 @@ class UserQueue {
 
 		// sort descending
 		usort($this->messages, function($a, $b) {
-			$at = $a->getTimestamp();
+            /**
+             * @var TargetedMessage $a
+             * @var TargetedMessage $b
+             */
+            $at = $a->getTimestamp();
 			$bt = $b->getTimestamp();
 			return $at == $bt ? 0 : $at > $bt ? -1 : 1;
 		});

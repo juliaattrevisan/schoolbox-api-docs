@@ -7,11 +7,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Schedule;
+namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
 use Alaress\Schedule\Trigger\TriggerInterface;
-use Schoolbox\User;
 
 class TriggerBundle {
 
@@ -88,30 +87,6 @@ class TriggerBundle {
 	 */
 	public function getMethod() {
 		return $this->method;
-	}
-
-
-	/**
-	 * @return object
-	 */
-	public function getObject() {
-		return $this->factory->getModel();
-	}
-
-
-	/**
-	 * @return User
-	 */
-	public function getUser() {
-		return $this->factory->getUser();
-	}
-
-
-	/**
-	 * @return array
-	 */
-	public function getDiff() {
-		return $this->factory->getDiff();
 	}
 
 } 

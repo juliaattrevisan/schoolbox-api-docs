@@ -8,24 +8,29 @@
  */
 
 namespace Alaress\Schedule\Trigger;
+use Alaress\Schedule\Event\EventInterface;
 
 
 /**
- * A specific type of trigger to unset a previously-scheduled event
+ * A specific type of trigger to unset a previously-scheduled event. Implements timestamp and callbacks as empty.
  *
  * Class CancelTrigger
  * @package Schoolbox\Realtime\Schedule\Trigger
  */
 class CancelTrigger extends AbstractTrigger {
 
-	public function __construct($notifier, $triggerLabel, $model, $user) {
-		$this->notifier = $notifier;
-		$this->label = $triggerLabel;
-		$this->model = $model;
-		$this->user = $user;
-	}
 
-	/**
+    /**
+     * @param string $label
+     * @param EventInterface $event
+     */
+    function __construct($label, $event) {
+        $this->label = $label;
+        $this->event = $event;
+    }
+
+
+    /**
 	 * Return the timestamp at which this trigger should fire (can be in the past)
 	 *
 	 * @return int
@@ -34,6 +39,7 @@ class CancelTrigger extends AbstractTrigger {
 		return null;
 	}
 
+
 	/**
 	 * Return an array of callables that are appropriate for this trigger
 	 *
@@ -41,15 +47,6 @@ class CancelTrigger extends AbstractTrigger {
 	 */
 	public function getCallbacks() {
 		return array();
-	}
-
-	/**
-	 * Return the diff of the object represented by this trigger, or null if it's new
-	 *
-	 * @return array|null
-	 */
-	public function getDiff() {
-		return null;
 	}
 
 } 

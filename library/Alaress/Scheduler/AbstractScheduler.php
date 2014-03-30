@@ -108,9 +108,10 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
      * @param TriggerInterface $trigger
      */
     public function dispatchTrigger($trigger) {
+        $event = $trigger->getEvent();
         foreach($trigger->getCallbacks() as $callback) {
             $this->getDispatcher()->enqueue($trigger, $this->method, serialize(array(
-                $callback, $trigger->getModel(), $trigger->getUser(), $trigger->getDiff()
+                $callback, $event->getObject(), $event->getEffector(), $event->getDiff()
             )));
         }
     }
@@ -124,22 +125,24 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
      * @return bool
      */
     protected function schedule($trigger, $callable) {
+        // can't schedule a cancel trigger
         if($trigger instanceof CancelTrigger) {
             return false;
         }
+
         // firstly, remove any existing timer for this trigger
         $this->unschedule($trigger);
 
-        $model = $trigger->getModel();
-        $module = get_class($trigger->getModuleNotifier());
+        $model = $trigger->getEvent()->getObject();
+        $class = get_class($model);
         $label = $trigger->getLabel();
 
         /** @var TimerInterface $timer */
         $timer = $this->loop->addTimer($trigger->getTimestamp() - time(), $callable);
         $timer->setData($trigger);
-        $this->putTimer($module, $label, $model, $timer);
+        $this->putTimer($model, $label, $timer);
 
-        $this->debug->v("Scheduling trigger '$module::$label'", '+');
+        $this->debug->v("Scheduling trigger '$class::$label'", '+');
 
         return true;
     }
@@ -152,13 +155,13 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
      * @return bool
      */
     protected function unschedule($trigger) {
-        $model = $trigger->getModel();
-        $module = get_class($trigger->getModuleNotifier());
+        $model = $trigger->getEvent()->getObject();
+        $class = get_class($model);
         $label = $trigger->getLabel();
 
-        if($this->hasTimer($module, $label, $model)) {
-            $timer = $this->getTimer($module, $label, $model);
-            $this->debug->v("Unscheduling trigger '$module::$label'", '-');
+        if($this->hasTimer($model, $label)) {
+            $timer = $this->getTimer($model, $label);
+            $this->debug->v("Unscheduling trigger '$class::$label'", '-');
             $this->loop->cancelTimer($timer);
             return true;
         }
@@ -168,50 +171,50 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
 
 
     /**
-     * @param string $module
-     * @param string $label
      * @param object $model
+     * @param string $label
      * @return TimerInterface|null
      */
-    protected function getTimer($module, $label, $model) {
-        return $this->hasTimer($module, $label, $model)
-            ? $this->timers[$module][$label][$this->hashObject($model)]
+    protected function getTimer($model, $label) {
+        $class = get_class($model);
+        return $this->hasTimer($model, $label)
+            ? $this->timers[$class][$label][$this->hashObject($model)]
             : null;
     }
 
 
     /**
-     * @param string $module
-     * @param string $label
      * @param object $model
+     * @param string $label
      * @param TimerInterface $timer
      */
-    protected function putTimer($module, $label, $model, $timer) {
+    protected function putTimer($model, $label, $timer) {
+        $class = get_class($model);
         $hash = $this->hashObject($model);
-        $this->timers[$module][$label][$hash] = $timer;
+        $this->timers[$class][$label][$hash] = $timer;
     }
 
 
     /**
-     * @param string $module
-     * @param string $label
      * @param object $model
+     * @param string $label
      * @return bool
      */
-    protected function hasTimer($module, $label, $model) {
+    protected function hasTimer($model, $label) {
+        $class = get_class($model);
         $hash = $this->hashObject($model);
-        return isset($this->timers[$module][$label][$hash]);
+        return isset($this->timers[$class][$label][$hash]);
     }
 
 
     /**
-     * @param string $module
-     * @param string $label
      * @param object $model
+     * @param string $label
      */
-    public function removeTimer($module, $label, $model) {
+    public function removeTimer($model, $label) {
+        $class = get_class($model);
         $hash = $this->hashObject($model);
-        unset($this->timers[$module][$label][$hash]);
+        unset($this->timers[$class][$label][$hash]);
     }
 
 
@@ -222,6 +225,7 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
      * @return string
      */
     public function hashObject($object) {
+        // use json rather than serialize to avoid any side-effects
         return sha1(json_encode($object));
     }
 

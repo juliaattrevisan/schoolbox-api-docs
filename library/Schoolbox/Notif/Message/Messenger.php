@@ -10,22 +10,20 @@
 namespace Schoolbox\Notif\Message;
 
 
-use Schoolbox\Notif\Message\External\BroadcastMessage;
-use Schoolbox\Notif\Message\External\TargetedMessage;
+use Alaress\Schedule\Trigger\TriggerInterface;
+use Schoolbox\Notif\Message\Instance\Instance;
+use Schoolbox\Notif\Message\Instance\InstanceBundle;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
 use SplObjectStorage;
 
 class Messenger {
 
-	const TYPE_BROADCAST = 'broadcast';
-	const TYPE_TARGETED  = 'targeted';
-
 	/** @var SplObjectStorage */
 	protected $splStore;
 
 
-	public function __construct() {
+    public function __construct() {
 		$this->splStore = new SplObjectStorage();
 	}
 
@@ -48,27 +46,14 @@ class Messenger {
 		$targets = (array)$targets;
 		$context = (array)$context;
 
-		$paramHash = sha1(json_encode($params));
-
 		// insert the message object if it's not already in our collection
 		if(!$this->splStore->contains($message)) {
-			$this->splStore->attach($message, array());
+			$this->splStore->attach($message, new InstanceBundle());
 		}
 
-		// retrieve the instances that have already been set
+        /** @var InstanceBundle $instances */
 		$instances = $this->splStore->offsetGet($message);
-
-		// add this instance
-		$instances[$paramHash] = array(
-			'severity' => $severity,
-			'params'   => $params,
-			'topics'   => $topics,
-			'context'  => $context,
-			'targets'  => empty($targets) ? false : $targets
-		);
-
-		// reattach the message and its extended list of instances
-		$this->splStore->attach($message, $instances);
+        $instances->attach(new Instance($params, $severity, $topics, $targets, $context));
 	}
 
 
@@ -108,6 +93,7 @@ class Messenger {
 		$this->bind($message, $severity, $topic, "user.$userId", $params);
 	}
 
+
 	/**
 	 * Whether or not this collection currently contains messages
 	 *
@@ -118,38 +104,38 @@ class Messenger {
 	}
 
 
-	/**
-	 * @param Notif $notif
-	 * @param int $timestamp
-	 * @return External[]
-	 */
-	public function generateExternalMessages($notif, $timestamp) {
-		// don't even try if there's nothing there
-		if(!$this->hasMessages()) {
-			return array();
-		}
+    /**
+     *
+     * @param Notif $notif
+     * @param TriggerInterface $trigger
+     * @return array
+     */
+    public function send($notif, $trigger = null) {
+        if(!$this->hasMessages()) {
+            return null;
+        }
+        $result = 0;
 
-		// array that we'll be returning
-		$externalMessages = array();
+        foreach($this->splStore as $msg) {
+            /**
+             * @var Message $msg
+             * @var InstanceBundle $instanceBundle
+             */
+            $instanceBundle = $this->splStore->offsetGet($msg);
 
-		foreach($this->splStore as $msg) {
-			/** @var Message $msg */
-			$instances = $this->splStore->offsetGet($msg);
-			foreach($instances as $instance) {
+            foreach($instanceBundle->getInstances() as $instance) {
+                $messageInstance = $msg
+                    ->applyInstance($instance, $notif, $trigger)
+                    ->setTargets($instance['targets'])
+                    ->setContext($instance['context']);
 
-				if($instance['targets'] === false) {
-					$e = new BroadcastMessage($notif, $instance['topics'], $instance['severity'], $timestamp, $msg, $instance['params']);
-				}
-				else {
-					$e = new TargetedMessage($notif, $instance['topics'], $instance['severity'], $timestamp, $msg, $instance['params']);
-					$e->setTargets($instance['targets']);
-				}
-				$e->setContext($instance['context']);
-				$externalMessages[] = $e;
-			}
-		}
+                if($messageInstance->send()) {
+                    $result++;
+                }
+            }
+        }
 
-		return $externalMessages;
-	}
+        return $result;
+    }
 
 } 

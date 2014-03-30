@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew;
 
 
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
@@ -41,7 +42,7 @@ class Dispatcher implements DispatcherInterface {
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
-	 * @param Verboser $verboser
+	 * @param Debug $verboser
 	 * @param DispatchStrategyInterface $strat
 	 */
 	function __construct($loop, $msgHandler, $verboser, $strat = null) {
