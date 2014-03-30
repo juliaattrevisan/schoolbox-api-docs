@@ -7,12 +7,12 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Schedule\Trigger;
+namespace Alaress\Scheduler\Trigger;
 
 
 
 
-use Alaress\Schedule\Event\EventInterface;
+use Alaress\Scheduler\Event\EventInterface;
 
 abstract class OnetimeTrigger extends AbstractTrigger {
 

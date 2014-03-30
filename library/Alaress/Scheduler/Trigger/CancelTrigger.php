@@ -7,8 +7,8 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Schedule\Trigger;
-use Alaress\Schedule\Event\EventInterface;
+namespace Alaress\Scheduler\Trigger;
+use Alaress\Scheduler\Event\EventInterface;
 
 
 /**

@@ -11,13 +11,15 @@
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
-use Alaress\Schedule\Event\EventInterface;
-use Alaress\Schedule\Trigger\OnetimeTrigger;
+use Alaress\Scheduler\Event\EventInterface;
+use Alaress\Scheduler\Trigger\OnetimeTrigger;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 
 class InstantTrigger extends OnetimeTrigger {
 
+	/** @var ModuleNotifierInterface */
     protected $notifier;
+
 
     /**
      * @param string $what                  - label describing the trigger
@@ -38,7 +40,7 @@ class InstantTrigger extends OnetimeTrigger {
      * @return callable[]
      */
     public function getCallbacks() {
-        $this->notifier->retrieveCallbacks($this->label);
+        return $this->notifier->retrieveCallbacks($this->label);
     }
 
 

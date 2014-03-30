@@ -10,23 +10,23 @@
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
-use Alaress\Schedule\Trigger\RecurringTrigger;
-use Cron\CronExpression;
+use Alaress\Scheduler\Trigger\RecurringTrigger;
 use Schoolbox\Realtime\Digest\MailNotifier;
+use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Role;
 
 class DigestTrigger extends RecurringTrigger {
 
+	/** @var MailNotifier */
+	protected $notifier;
 
 	/**
 	 * @param string $schedule
 	 * @param Role $role
 	 */
 	function __construct($schedule, $role) {
-		$this->cron = CronExpression::factory($schedule);
+		parent::__construct($role->getName(), $schedule, new Event(null, '', $role));
 		$this->notifier = new MailNotifier();
-		$this->label = $role->getName();
-		$this->model = $role;
 	}
 
 	/**

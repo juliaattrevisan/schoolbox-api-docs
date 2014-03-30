@@ -10,7 +10,8 @@
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
-use Alaress\Schedule\Trigger\TriggerInterface;
+use Alaress\Scheduler\Trigger\TriggerInterface;
+use Schoolbox\Realtime\Schedule\Event;
 
 class TriggerBundle {
 
@@ -87,6 +88,13 @@ class TriggerBundle {
 	 */
 	public function getMethod() {
 		return $this->method;
+	}
+
+	/**
+	 * @return Event
+	 */
+	public function getEvent() {
+		return $this->factory->getEvent();
 	}
 
 } 

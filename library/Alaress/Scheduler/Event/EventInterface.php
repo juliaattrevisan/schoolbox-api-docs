@@ -8,7 +8,7 @@
  */
 
 
-namespace Alaress\Schedule\Event;
+namespace Alaress\Scheduler\Event;
 
 
 interface EventInterface {

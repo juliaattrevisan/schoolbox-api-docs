@@ -10,8 +10,8 @@
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
 
-use Alaress\Schedule\Trigger\CancelTrigger;
-use Alaress\Schedule\Trigger\TriggerInterface;
+use Alaress\Scheduler\Trigger\CancelTrigger;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 
@@ -95,4 +95,10 @@ class TriggerFactory {
 		return $this->bundles[$method];
 	}
 
+	/**
+	 * @return Event
+	 */
+	public function getEvent() {
+		return $this->event;
+	}
 } 

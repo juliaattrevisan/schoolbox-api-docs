@@ -10,7 +10,7 @@
 namespace Alaress\Scheduler;
 
 
-use Alaress\Schedule\Trigger\TriggerInterface;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 
 /**
  * A scheduler for recurring tasks; handling of a response is simply to reschedule it

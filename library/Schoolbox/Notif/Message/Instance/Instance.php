@@ -34,29 +34,71 @@ class Instance {
         $this->context = $context;
     }
 
-    public function getParams() {
+	/**
+	 * @return array
+	 */
+	public function getParams() {
         return $this->params;
     }
 
-    public function setTargets($targets) {
+	/**
+	 * @param $targets
+	 * @return self
+	 */
+	public function setTargets($targets) {
         $this->targets = $targets;
+		return $this;
     }
 
-    public function getTargets() {
+	/**
+	 * @return array
+	 */
+	public function getTargets() {
         return $this->targets;
     }
 
-    public function getTopics() {
+	/**
+	 * @return array
+	 */
+	public function getTopics() {
         return $this->topics;
     }
 
-    public function getSeverity() {
+	/**
+	 * @return int
+	 */
+	public function getSeverity() {
         return $this->severity;
     }
 
-    public function getContext() {
+	/**
+	 * @return array
+	 */
+	public function getContext() {
         return $this->context;
     }
+
+	/**
+	 * @param int $severity
+	 * @return self
+	 */
+	public function setSeverity($severity) {
+		$this->severity = $severity;
+		return $this;
+	}
+
+	/**
+	 * @param array $topics
+	 * @return self
+	 */
+	public function setTopics($topics) {
+		$this->topics = $topics;
+		return $this;
+	}
+
+
+
+
 
     /**
      * @param array $context

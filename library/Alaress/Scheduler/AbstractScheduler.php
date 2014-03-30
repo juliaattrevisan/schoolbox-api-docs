@@ -11,8 +11,9 @@ namespace Alaress\Scheduler;
 
 
 use Alaress\Cli\Debug;
-use Alaress\Schedule\Trigger\CancelTrigger;
-use Alaress\Schedule\Trigger\TriggerInterface;
+use Alaress\Scheduler\Trigger\CancelTrigger;
+use Alaress\Scheduler\Trigger\RecurringTrigger;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
@@ -155,6 +156,9 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
      * @return bool
      */
     protected function unschedule($trigger) {
+	    if($trigger instanceof RecurringTrigger) {
+
+	    }
         $model = $trigger->getEvent()->getObject();
         $class = get_class($model);
         $label = $trigger->getLabel();

@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\Notif\Queue;
+
 use External_User;
 use Group;
 use Schoolbox\Campus;

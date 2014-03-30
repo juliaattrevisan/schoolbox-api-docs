@@ -15,7 +15,6 @@ use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Collection;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
@@ -23,7 +22,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
-use Schoolbox\Realtime\Schedule\TriggerBundle;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -112,7 +111,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	public function bundleTriggers($bundle) {
 
 		/** @var SubmissionBox $box */
-		$box = $bundle->getObject();
+		$box = $bundle->getEvent()->getObject();
 
 		$open = $box->getOpenDate()->getUnixTimestamp();
 		$closed = $box->getDueDate()->getUnixTimestamp();

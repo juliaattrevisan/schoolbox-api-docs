@@ -16,7 +16,7 @@ use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\TriggerBundle;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -64,7 +64,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	public function bundleTriggers($bundle) {
 
 		/** @var Article $article */
-		$article = $bundle->getObject();
+		$article = $bundle->getEvent()->getObject();
 
 		$stamp = $article->getPublishDate()->getUnixTimestamp();
 
@@ -120,7 +120,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		$authorId = $user->getId();
 
 		$topicName = $article->getTopic()->getName();
-		$topicId = $article->getTopic()->getId();
+//		$topicId = $article->getTopic()->getId();
 		$url = new Url($topicName);
 		$topicSlug = $url->getSlug();
 

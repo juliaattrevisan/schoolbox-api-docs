@@ -8,8 +8,6 @@
  */
 
 namespace Schoolbox;
-use DebugBar\Bridge\MonologCollector;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
@@ -17,10 +15,7 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Notif\Message\Internal;
-use Schoolbox\Notif\Message\MessageFactory;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\TopicFactory;
 use Schoolbox\Realtime\Schedule\Event;
 
 class Mapper {
@@ -254,7 +249,7 @@ class Mapper {
 	}
 
 	/**
-	 * @return LoggerInterface
+	 * @return LoggerInterface|Notif
 	 */
 	public function getNotifier() {
 		// load on demand, so that we don't get infinite loops
@@ -1141,7 +1136,7 @@ class Mapper {
                         $previous ? $this->diff($model, $previous) : null
                     );
 
-                    $this->notif->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
+                    $this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
 
 				}
 

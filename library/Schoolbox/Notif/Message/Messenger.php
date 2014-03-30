@@ -10,7 +10,7 @@
 namespace Schoolbox\Notif\Message;
 
 
-use Alaress\Schedule\Trigger\TriggerInterface;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Message\Instance\InstanceBundle;
 use Schoolbox\Notif\Notif;
@@ -126,8 +126,8 @@ class Messenger {
             foreach($instanceBundle->getInstances() as $instance) {
                 $messageInstance = $msg
                     ->applyInstance($instance, $notif, $trigger)
-                    ->setTargets($instance['targets'])
-                    ->setContext($instance['context']);
+                    ->setTargets($instance->getTargets())
+                    ->setContext($instance->getContext());
 
                 if($messageInstance->send()) {
                     $result++;

@@ -10,7 +10,7 @@
 namespace Alaress\Scheduler;
 
 
-use Alaress\Schedule\Trigger\TriggerInterface;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 
 interface SchedulerInterface {
 

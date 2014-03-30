@@ -8,10 +8,10 @@
  */
 
 
-namespace Alaress\Schedule\Trigger;
+namespace Alaress\Scheduler\Trigger;
 
 
-use Alaress\Schedule\Event\EventInterface;
+use Alaress\Scheduler\Event\EventInterface;
 use Cron\CronExpression;
 
 abstract class RecurringTrigger extends AbstractTrigger {

@@ -11,7 +11,7 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
-use Alaress\Schedule\Event\EventInterface;
+use Alaress\Scheduler\Event\EventInterface;
 use Schoolbox\User;
 
 class Event implements EventInterface {

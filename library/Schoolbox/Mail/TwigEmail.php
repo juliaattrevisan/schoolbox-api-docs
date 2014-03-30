@@ -12,17 +12,12 @@ namespace Schoolbox\Mail;
 
 
 use Alaress\Mail\TwigMailer;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 
 class TwigEmail extends TwigMailer {
 
     /** @var array */
     protected $coreContext;
-
-    /** @var IConfigLoader */
-    protected $conf;
 
     /** @var UserMapper */
     protected $userMapper;
@@ -38,8 +33,6 @@ class TwigEmail extends TwigMailer {
      */
     public function __construct($template, $subject = "", $to = "", $host = "") {
         parent::__construct($template, $subject, $to, $host);
-
-        $this->conf = ConfigMapper::getInstance();
         $this->userMapper = UserMapper::getInstance();
 
         // config context setup
@@ -53,7 +46,7 @@ class TwigEmail extends TwigMailer {
         );
 
         foreach($neededConfigs as $key) {
-            $this->coreContext['config'][$key] = $this->conf->get($key);
+            $this->coreContext['config'][$key] = self::getConfig()->get($key);
         }
 
         $this->coreContext['config']['year'] = date('Y');

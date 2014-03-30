@@ -11,7 +11,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 
 use Alaress\Cli\Debug;
-use Alaress\Schedule\Trigger\TriggerInterface;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\Scheduler\StompScheduler;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
@@ -20,6 +20,8 @@ use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
@@ -52,14 +54,21 @@ class Scheduler extends StompScheduler {
     /** @var SplObjectStorage */
     protected $resolvers;
 
+	/** @var IConfigLoader */
+	protected $conf;
+
+
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param Debug $debug
+     * @param IConfigLoader $conf
      */
-    public function __construct($loop, $dispatchStrategy, $debug) {
+    public function __construct($loop, $dispatchStrategy, $debug, $conf = null) {
+	    $this->conf = $conf ?: ConfigMapper::getInstance();
         parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.Scheduler::QUEUE_SCHEDULE, $debug);
         $this->notif = new Notif();
+	    $this->resolvers = new SplObjectStorage();
     }
 
 
@@ -123,12 +132,13 @@ class Scheduler extends StompScheduler {
      */
     public function onMessage($frame, $resolver) {
 		try {
-            $data = $frame->body;
 
-            $event = unserialize(CompressedFormatter::uncompress($data));
+			$formatted = CompressedFormatter::uncompress($frame->body);
+            $event = unserialize($formatted['message']);
 
             if(!$event instanceof Event) {
-                $this->debug->v("Could not decode '$frame->body' to schedule event", '!');
+	            $truncated = substr($frame->body, 0, 64);
+                $this->debug->v("Could not decode '$truncated...' to schedule event", '!');
                 // this message is unparseable, so we ACK it to make it go away
                 $resolver->ack();
                 return;
