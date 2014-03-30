@@ -38,8 +38,8 @@ class Module extends BaseModule {
             new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
         );
         $authorizer
-            ->addRule('/^resourceItem(?:$|\.)/',                 new Rule\IsLoggedIn())
-            ->addRule('/^resourceItem\.(?:create|edit|delete)/', $resourceManageRule)
+            ->addRule('/^resourceItem(?:$|\.)/',              new Rule\IsLoggedIn())
+            ->addRule('/^resourceItem\.(?:add|edit|delete)/', $resourceManageRule)
         ;
     }
 
