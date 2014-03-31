@@ -61,8 +61,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
 
     /**
      * Starts creating a booking for a resource, by clicking on a time slot.
-     * Currently only works on month view (as that's the only view that has
-     * date data on calendar elements) and only if that day is on the calendar.
+     * Currently switches to calendar's month view to do this, because that's
+     * the only view that stores a reference to the date.
      *
      * @When /^(?:|I )start booking resource$/
      * @When /^(?:|I )start booking resource for "(?P<timeString>[^"]*)"$/
@@ -70,20 +70,9 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @param string $timeString A valid date time format string
      */
     public function startBookingResource($timeString = 'today') {
-        $date   = new DateTime($timeString);
-        $format = $date->format('Y-m-d');
-        // Find this day on the full calendar
-        $this->getSession()->executeScript(
-            sprintf(
-                'jQuery("#calendar").fullCalendar("changeView", "month").fullCalendar("gotoDate", %s)',
-                json_encode($format)
-            )
-        );
-        $this->getCoreContext()->waitForAjax();
         $this
-            ->getSession()->getPage()
-            ->find('css', "#calendar .fc-day[data-date=\"$format\"]")
-            ->click();
+            ->getMainContext()->getSubcontext('calendar')
+            ->clickDate('#calendar', $timeString);
         $this
             ->getSession()->getPage()
             ->find('css', "#createEvent .actions input.btn[value=\"Continue\"]")
