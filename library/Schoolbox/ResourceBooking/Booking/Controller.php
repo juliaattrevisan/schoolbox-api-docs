@@ -43,26 +43,31 @@ class Controller extends Base {
             ->setResource($resource)
             ->setEvent(new Calendar\Event());
         // Was the time set here? If so set it into the item.
-        if (($date = $this->getRequest()->query['startDate'])) {
+        if (($startDate = $this->getRequest()->query['startDate'])) {
             // Convert format of startDate and startTime
-            if ($date = DateTime::createFromFormat('Y-m-d', $date)) {
+            if ($startDate = DateTime::createFromFormat('Y-m-d', $startDate)) {
                 // Was a time set? If so, add that time to the start date.
                 // Otherwise, default to start of next hour.
                 if (($time = $this->getRequest()->query['startTime'])
                     && ($time = DateTime::createFromFormat('H:i', $time))
                 ) {
-                    $date->setTime($time->format('H'), $time->format('i'));
+                    $startDate->setTime($time->format('H'), $time->format('i'));
                 }
                 else {
-                    $date->modify('+1 hour');
-                    $date->setTime($date->format('H'), 0);
+                    $startDate->modify('+1 hour');
+                    $startDate->setTime($startDate->format('H'), 0);
                 }
-                // Set the start and end date (and time, if required)
-                $item->getEvent()->setStartDate($date->format('d/m/Y'));
-                $item->getEvent()->setStartTime($date->format('H:i'));
-                $date->setTimestamp($date->getTimestamp() + $resource->getMinReservationTime()->getSecondTotal());
-                $item->getEvent()->setEndDate($date->format('d/m/Y'));
-                $item->getEvent()->setEndTime($date->format('H:i'));
+
+                // Set the start and end date and time
+                $item->getEvent()->setStartDate($startDate->format('d/m/Y'));
+                $item->getEvent()->setStartTime($startDate->format('H:i'));
+                $item->getEvent()->setStartDateTime($startDate);
+
+                $endDate = new DateTime();
+                $endDate->setTimestamp($startDate->getTimestamp() + $resource->getMinReservationTime()->getSecondTotal());
+                $item->getEvent()->setEndDate($endDate->format('d/m/Y'));
+                $item->getEvent()->setEndTime($endDate->format('H:i'));
+                $item->getEvent()->setEndDateTime($endDate);
             }
         }
         $this->getResponse()->content->set(
