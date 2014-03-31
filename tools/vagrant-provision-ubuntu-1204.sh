@@ -2,17 +2,21 @@
 vag="[schoolbox]";
 cd /home/vagrant;
 
-echo "$vag Downloading Schoolbox demo data";
-rm -f *latest*;
-
-echo "$vag Demo Data Files";
-curl -L --progress-bar http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.tar.gz > schoolboxdemo-latest.tar.gz
-
-echo "$vag Demo Database";
-curl -L --progress-bar http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.sql > schoolboxdemo-latest.sql
-
-echo "$vag Demo DB Vagrant Fixes";
-curl -L --progress-bar http://vagrant.alaress-dev.com.au/schoolboxdemo-vagrant-latest.sql > schoolboxdemo-vagrant-latest.sql
+echo "$vag Retrieving latest Demo Data files";
+curl -L --progress-bar http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-sha1.txt > schoolboxdemo-latest-sha1.txt;
+while read line;
+do
+	demofile=`echo "$line" | awk {'print $2'}`;
+	demosha1=`echo "$line" | awk {'print $1'}`;
+	currentsha1=`sha1sum $demofile 2>/dev/null || echo 'false'`;
+	if [ "$line" == "$currentsha1" ];
+	then
+		echo "$vag No change to $demofile";
+	else
+		echo "$vag Downloading $demofile";
+		curl -L --progress-bar http://vagrant.alaress-dev.com.au/$demofile > $demofile;
+	fi
+done < schoolboxdemo-latest-sha1.txt;
 
 echo "$vag Restarting MySQL";
 service mysql restart > /dev/null 2>&1;
