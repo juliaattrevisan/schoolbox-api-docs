@@ -71,6 +71,7 @@ Scenario: Manage resources
   And   I fill in the following:
     | name                      | A single projector                   |
     | description               | A projector that can be moved around |
+    | min_lead_time[day]        | 01                                   |
     | min_reservation_time[day] | 01                                   |
     | max_reservation_time[day] | 02                                   |
   And  I select "Projectors" from "resource_category_id"
@@ -260,7 +261,7 @@ Scenario: Booking an open resource
   And   I log in as "sberryhill" with password "password"
   # "A single projector":
   # Anyone can book this resource.
-  # Lead time: none
+  # Lead time: 1 day
   # Min reservation time: 1 day
   # Max reservation time: 2 days
   # All standard rules regarding bookings apply.
@@ -268,12 +269,173 @@ Scenario: Booking an open resource
   # Current link: "Book" next to resource name
   And   I view details for resource "A single projector"
   # Book a resource: test against its min and max reserve time, and its lead time
-  And   I start booking resource
+  And   I start booking resource for "+2 days"
+  Then  the datepicker "start_datetime[date]" should contain "+2 days"
+  And   the datepicker "end_datetime[date]" should contain "+3 days"
+  # Make the booking for 2:00pm tomorrow, for 1 day
+  When  I fill in "start_datetime[hour]" with "2"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "PM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "2"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  Then  I should see confirmed booking at "2:00pm +2 days"
+
+Scenario: Booking a moderated resource
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "English textbook"
+  And   I start booking resource for "+1 days"
+  When  I fill in "start_datetime[hour]" with "2"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "PM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "2"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  Then  I should see pending booking at "2:00pm +1 days"
+  And   I should not be able to confirm booking at "2:00pm +1 days"
+  # Log in as someone who can confirm and reject this booking
+  Given I log out
+  And   I log in as "cglenn" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "English textbook"
+  Then  I should see pending booking at "2:00pm +1 days"
+  And   I should be able to reject booking at "2:00pm +1 days"
+  When  I reject booking at "3pm +3 days"
+  Then  I should see rejected booking at "2:00pm +1 days"
+  # I changed my mind
+  When  I confirm booking at "3pm +3 days"
+  Then  I should see confirmed booking at "2:00pm +1 days"
 
 
-  # Test repeated booking of resources
-  # Test booking on a timetable
-  # Test booking of conflicting times
-  # Test confirming of booking
-  # Test cancellation of booking
-  #
+#Scenario: Booking a managed resource
+#  Given I do not wipe the slate clean
+#  And   I go to homepage
+#  And   I log in as "sberryhill" with password "password"
+
+@resource-booking
+Scenario: Cancelling a booking
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "A single projector"
+  And   I start booking resource for "+3 days"
+  When  I fill in "start_datetime[hour]" with "3"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "PM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "3"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  Then  I should see confirmed booking at "3pm +3 days"
+  # And cancel it
+  When  I cancel booking at "3pm +3 days"
+  Then  I should not see confirmed booking at "3pm +3 days"
+
+@resource-booking
+@resource-booking-errors
+Scenario: Double-booking an item - end time overlaps another
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "A single projector"
+  And   I start booking resource for "+2 days"
+  When  I fill in "start_datetime[hour]" with "12"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "AM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "10"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  Then  I should not see confirmed booking at "12am +2 days"
+  And   I should receive an error for double booking
+
+@resource-booking
+@resource-booking-errors
+Scenario: Double-booking an item - start time overlaps another
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "A single projector"
+  And   I start booking resource for "+3 days"
+  When  I fill in datepicker "start_datetime[date]" with "+3 days"
+  And   I fill in datepicker "end_datetime[date]" with "+4 days"
+  And   I fill in "start_datetime[hour]" with "1"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "AM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "10"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  Then  I should not see confirmed booking at "1am +3 days"
+  And   I should receive an error for double booking
+
+@resource-booking
+@resource-booking-errors
+Scenario: Booking an item for before the min lead time
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "A single projector"
+  And   I start booking resource for "+1 days"
+  When  I fill in "start_datetime[hour]" with "12"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "AM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "12"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "AM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  Then  I should not see confirmed booking at "3pm +3 days"
+  And   I should receive an error for not enough lead time
+
+@resource-booking
+@resource-booking-errors
+Scenario: Booking an item for less than min booking time
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "A single projector"
+  And   I start booking resource for "+3 days"
+  When  I fill in datepicker "start_datetime[date]" with "+3 days"
+  And   I fill in datepicker "end_datetime[date]" with "+3 days"
+  And   I fill in "start_datetime[hour]" with "3"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "PM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "10"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  Then  I should not see confirmed booking at "3pm +3 days"
+  And   I should receive an error for short booking
+
+@resource-booking
+@resource-booking-errors
+Scenario: Booking an item for more than max booking time
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "sberryhill" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "A single projector"
+  When  I fill in datepicker "start_datetime[date]" with "+3 days"
+  And   I fill in datepicker "end_datetime[date]" with "+5 days"
+  And   I fill in "start_datetime[hour]" with "3"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "PM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "10"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  Then  I should not see confirmed booking at "3pm +3 days"
+  And   I should receive an error for long booking
+
+# Test booking on a timetable
+# Test confirming of booking
