@@ -47,23 +47,22 @@ class Controller extends Base {
             // Convert format of startDate and startTime
             if ($date = DateTime::createFromFormat('Y-m-d', $date)) {
                 // Was a time set? If so, add that time to the start date.
-                $setTime = false;
-                if (($time = $this->getRequest()->query['startTime'])) {
-                    if ($time = DateTime::createFromFormat('H:i', $time)) {
-                        $setTime = true;
-                        $date->setTime($time->format('H'), $time->format('i'));
-                    }
+                // Otherwise, default to start of next hour.
+                if (($time = $this->getRequest()->query['startTime'])
+                    && ($time = DateTime::createFromFormat('H:i', $time))
+                ) {
+                    $date->setTime($time->format('H'), $time->format('i'));
+                }
+                else {
+                    $date->modify('+1 hour');
+                    $date->setTime($date->format('H'), 0);
                 }
                 // Set the start and end date (and time, if required)
                 $item->getEvent()->setStartDate($date->format('d/m/Y'));
-                if ($setTime) {
-                    $item->getEvent()->setStartTime($date->format('H:i'));
-                }
+                $item->getEvent()->setStartTime($date->format('H:i'));
                 $date->setTimestamp($date->getTimestamp() + $resource->getMinReservationTime()->getSecondTotal());
                 $item->getEvent()->setEndDate($date->format('d/m/Y'));
-                if ($setTime) {
-                    $item->getEvent()->setEndTime($date->format('H:i'));
-                }
+                $item->getEvent()->setEndTime($date->format('H:i'));
             }
         }
         $this->getResponse()->content->set(
