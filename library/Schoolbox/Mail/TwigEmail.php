@@ -141,7 +141,7 @@ class TwigEmail extends TwigMailer {
      */
     protected function composeHTML() {
         return $this->rendercache = $this->twig->render($this->templateFilename,
-            array_merge($this->coreContext, $this->context)
+            array_merge_recursive($this->coreContext, $this->context)
         );
     }
 

@@ -50,9 +50,11 @@ class TwigMailer extends AbstractMailer {
 
 	/**
 	 * @param array $context
+	 * @return self
 	 */
 	public function setContext($context) {
 		$this->context = $context;
+		return $this;
 	}
 
 	/**

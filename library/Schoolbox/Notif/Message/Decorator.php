@@ -31,6 +31,7 @@ class Decorator {
 	/** @var int */
 	protected $timestamp;
 
+
 	/**
 	 * @param TargetedMessage $targetedMessage
 	 */
@@ -39,6 +40,7 @@ class Decorator {
 			$this->setMessage($targetedMessage);
 		}
 	}
+
 
 	/**
 	 * @param TargetedMessage $targetedMessage
@@ -49,6 +51,7 @@ class Decorator {
 		$this->timestamp = $targetedMessage->getTimestamp();
 	}
 
+
 	/**
 	 * @return Alaress_Date_Format
 	 */
@@ -56,10 +59,62 @@ class Decorator {
 		return new Alaress_Date_Format($this->timestamp, 'U');
 	}
 
+
 	/**
 	 * @return string
 	 */
 	public function formatHtml() {
+		return $this->formatMarkup(
+			function($text, $href) {
+				return sprintf('<a href="%s">%s</a>', $href, $text);
+			},
+			function($text) {
+				return sprintf('<a>%s</a>', $text);
+			}
+		);
+	}
+
+
+	/**
+	 * @param string $uriBase
+	 * @param string $linkColor
+	 * @return string
+	 */
+	public function formatMail($uriBase, $linkColor) {
+		return $this->formatMarkup(
+			function($text, $href) use ($uriBase, $linkColor) {
+				return sprintf('<a href="%s%s" style="color:%s;">%s</a>', $uriBase, $href, $linkColor, $text);
+			},
+			function($text) {
+				return sprintf('<a>%s</a>', $text);
+			}
+		);
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function formatPlain() {
+		return $this->formatMarkup(
+			function($text) {
+				return $text;
+			},
+			function($text) {
+				return $text;
+			}
+		);
+	}
+
+
+	/**
+	 * Base method for turning a message into a string of markup
+	 *
+	 * @param callable $hrefCallback
+	 * @param callable $noHrefCallback
+	 * @return string
+	 */
+	public function formatMarkup($hrefCallback, $noHrefCallback) {
 		$params = $this->instance->getParams();
 		$msgString = $this->message->getMessageString();
 
@@ -72,11 +127,11 @@ class Decorator {
 			// text and href
 			if(is_array($value) && count($value) == 2) {
 				$value = array_values($value);
-				$a = sprintf('<a href="%s">%s</a>', $value[1], $value[0]);
+				$a = call_user_func($hrefCallback, $value[1], $value[0]);
 			}
 			// just text
 			elseif(is_string($value)) {
-				$a = sprintf('<a>%s</a>', $value);
+				$a = call_user_func($noHrefCallback, $value);
 			}
 			// nothing we recognise: skip dat!
 			else {
@@ -90,6 +145,7 @@ class Decorator {
 		return $msgString;
 	}
 
+
 	/**
 	 * @param bool $unread
 	 * @return string
@@ -97,6 +153,7 @@ class Decorator {
 	public function formatJson($unread = false) {
 		return json_encode($this->formatArray($unread));
 	}
+
 
 	/**
 	 * @param bool $unread
@@ -111,6 +168,7 @@ class Decorator {
 		);
 	}
 
+
 	/**
 	 * @return string
 	 */
@@ -119,6 +177,7 @@ class Decorator {
 		return $array['href'];
 	}
 
+
 	/**
 	 * @return string
 	 */
@@ -126,4 +185,5 @@ class Decorator {
 		$array = $this->message->toArray();
 		return $array['icon'];
 	}
+
 }

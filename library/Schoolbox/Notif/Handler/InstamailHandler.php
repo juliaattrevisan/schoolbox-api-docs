@@ -14,6 +14,8 @@ use Monolog\Logger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
+use Schoolbox\Notif\Message\Decorator;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -50,8 +52,6 @@ class InstamailHandler extends MailHandler {
 
 
     /**
-     * TODO refactor this method
-     *
      * @param string $content
      * @param array $records
      */
@@ -59,121 +59,43 @@ class InstamailHandler extends MailHandler {
 
         $coreContext = $this->email->getCoreContext();
 
-		$contexts = array();
+//		$contexts = array();
+	    $uribase = "http://" . $this->conf->get('site_domain');
+
+	    $decor = new Decorator(null);
 
 		// index records by user and filter inappropriate ones
 		foreach($records as $record) {
-			if(!preg_match('`^(?:instant|digest).user.([0-9]+)$`', $record['channel'], $matches)) {
+			// channel must indicate instant user notification
+			if(strpos($record['channel'], 'instant.user.') !== 0) {
 				continue;
 			}
 
-			$user = $this->userMapper->findById($matches[1]);
+			$user = $this->userMapper->findById(substr($record['channel'], strrpos($record['channel'], '.')));
 
-			$record['message'] = unserialize($record['message']);
-			unset($record['formatted']);
-
-			$data = json_decode($record['message']->serialize(), true);
-
-			// extract title
-			$params = $data['params'];
-			$title = $data['body']['body'];
-
-			if(is_array($params)) {
-				foreach($params as $token => $value) {
-
-					// text and href
-					if(is_array($value) && count($value) == 2) {
-						$value = array_values($value);
-						$text = $value[0];
-					}
-					// just text
-					elseif(is_string($value)) {
-						$text = $value;
-					}
-					// nothing we recognise: skip dat!
-					else {
-						continue;
-					}
-
-					$title = str_replace(":$token", $text, $title);
-				}
+			if(isset($record['context']['user'])) {
+				/** @var User $sender */
+				$sender = $this->userMapper->findById($record['context']['user']);
+				$this->email->setFrom($sender->getEmail(), $sender->formatName());
 			}
 
-			$contexts[$user->getId()][] = array($user, $title, $record);
+			/** @var TargetedMessage $message */
+			$message = unserialize($record['message']);
+			$decor->setMessage($message);
 
-		}
+			$this->email->setSubject($decor->formatPlain());
 
-		foreach($contexts as $userId => $userContexts) {
-			// need some user context to keep going
-			if(!count($userContexts)) {
-				continue;
-			}
+			$context = array(
+				'text' => $decor->formatMail($uribase, $coreContext['colours']['link']),
+				'date' => $decor->getAlaressDateFormat()->getAustralian(),
+				'icon' => $uribase . $decor->getIcon(),
+				'href' => $uribase . $decor->getHref(),
+			);
 
-			$uribase = "http://" . $this->conf->get('site_domain');
-
-			if(count($userContexts) == 1) {
-				// the plaintext of the message
-				$this->email->setSubject($userContexts[0][1]);
-			}
-			else {
-                $this->email->setSubject("Here's What You've Been Missing");
-			}
-
-            $mailContext = array();
-
-			foreach($userContexts as $values) {
-				/** @var User $user */
-				list($user, $title, $context) = $values;
-
-				/** @var External $external */
-				$external = $context['message'];
-				$context['message'] = json_decode($external->serialize(), true);
-
-				$formatted = $context['message'];
-
-				// extract title
-				$params = $formatted['params'];
-				$messageString = $formatted['body']['body'];
-
-				if(is_array($params)) {
-					foreach($params as $token => $value) {
-
-						// text and href
-						if(is_array($value) && count($value) == 2) {
-							$value = array_values($value);
-							$text = sprintf('<a href="%s%s" style="color:%s;">%s</a>',
-                                    $uribase, $value[1], $coreContext['colours']['link'], $value[0]
-							);
-						}
-						// just text
-						elseif(is_string($value)) {
-							$text = $value;
-						}
-						// nothing we recognise: skip dat!
-						else {
-							continue;
-						}
-
-						$messageString = str_replace(":$token", $text, $messageString);
-					}
-				}
-
-
-				$mailContext['messages'][] = array(
-					'text' => $messageString,
-					'timestamp' => $context['datetime'],
-					'icon' => $uribase . $context['message']['body']['icon'],
-					'href' => $uribase . $context['message']['body']['href'],
-				);
-			}
-
-            if(isset($user)) {
-                $this->email->setContext($mailContext);
-                $this->email->send(array(
-                    'name' => $user->formatName(),
-                    'email' => $user->getEmail()
-                ));
-            }
+			$this->email->setContext($context)->send(array(
+				'name' => $user->formatName(),
+				'email' => $user->getEmail()
+			));
 		}
 	}
 
