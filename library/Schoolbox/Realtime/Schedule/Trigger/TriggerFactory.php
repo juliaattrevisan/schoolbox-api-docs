@@ -59,7 +59,7 @@ class TriggerFactory {
 
 		// iterate across the events supplied and construct triggers out of them
 		foreach($events as $label => $time) {
-			$t = new InstantTrigger($label, $time, $this->event, $this->notifier);
+			$t = new InstantTrigger($label, $time ?: $now, $this->event, $this->notifier);
 
 			// if the timestamp is in the past, and we're disregarding expired, do not include in the return
 			if(!($disregardExpired && $t->getTimestamp() < $now)) {
