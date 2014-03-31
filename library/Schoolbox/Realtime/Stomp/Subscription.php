@@ -14,8 +14,6 @@ use PhpAmqpLib\Message\AMQPMessage;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Notif\Message\External;
-use Schoolbox\Notif\Queue\UnreadMessage;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Verboser;
@@ -29,6 +27,7 @@ class Subscription {
 	/** @var int */
 	protected $id;
 
+	/** @var int */
 	protected $userId;
 
 	/** @var Client */
@@ -61,7 +60,7 @@ class Subscription {
 				// this closure is executed every time a message is sent to the client based on the given subscription
 				/** @var AckResolver $ackResolver */
 
-				if($pipeManager->onAMQP($self->frame2msg($frame), $userId)) {
+				if($pipeManager->onAMQP($self->frame2amqp($frame), $userId)) {
 					$self->addMessage($frame, $ackResolver);
 				}
 			}
@@ -69,10 +68,22 @@ class Subscription {
 
 	}
 
+
+	/**
+	 * Returns the STOMP ID of this subscription
+	 *
+	 * @return int
+	 */
 	public function getId() {
 		return $this->id;
 	}
 
+
+	/**
+	 * Returns the endpoint to which this subscription is attached
+	 *
+	 * @return string
+	 */
 	public function getDestination() {
 		return $this->destination;
 	}
@@ -97,9 +108,10 @@ class Subscription {
 	public function push() {
 		foreach($this->messages as $stompMsg) {
 			// these will be buffered and forwarded to all clients for this user
-			$this->pipeManager->onAMQP($this->frame2msg($stompMsg->frame), $this->userId);
+			$this->pipeManager->onAMQP($this->frame2amqp($stompMsg->frame), $this->userId);
 		}
 	}
+
 
 	/**
 	 * ACK messages
@@ -153,39 +165,20 @@ class Subscription {
 		$properties = $stompFrame->headers;
 		// STOMP likes to do things its own way...
 		$properties['message_id'] = $properties['amqp-message-id'];
-
-		$body = $stompFrame->body;
-		$data = json_decode($body, true);
-
-		$msg = unserialize($data['message']);
-
-		// $data might have been an array, or a serialized External message, depending on reroute status
-		if($msg && $msg instanceof External) {
-			$data['message'] = $msg->toArray();
-		}
-		return new AMQPMessage(json_encode($data), $properties);
-	}
-
-
-	/**
-	 * @param Frame $stompFrame
-	 * @return UnreadMessage
-	 */
-	public function frame2msg($stompFrame) {
-		return new UnreadMessage($this->frame2amqp($stompFrame));
+		return new AMQPMessage($stompFrame->body, $properties);
 	}
 
 
 	/**
 	 * Returns the list of messages currently UNACK'd in this subscription.
 	 *
-	 * @return UnreadMessage[]
+	 * @return AMQPMessage[]
 	 */
 	public function getMessages() {
 		$messages = array();
 
 		foreach($this->messages as $amqpMessageId => $stompMessage) {
-			$messages[$amqpMessageId] = $this->frame2msg($stompMessage->frame);
+			$messages[$amqpMessageId] = $this->frame2amqp($stompMessage->frame);
 		}
 
 		return $messages;

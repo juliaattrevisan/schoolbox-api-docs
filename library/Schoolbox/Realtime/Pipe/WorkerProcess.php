@@ -15,6 +15,7 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
 use RuntimeException;
+use Schoolbox\Notif\Message\Decorator;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Interceptor\Interceptor;
@@ -53,11 +54,20 @@ class WorkerProcess extends AbstractProcess {
 			// retrieve messages
 			case DefaultDispatchStrategy::TASK_FETCH:
 				list($userId, $count) = $args;
+				$decor = new Decorator(null);
 
 				$queue = $this->mqf->buildUserQueue($userId, $count, false);
+				$output = array();
+
+				// make messages pretty
+				foreach($queue->getMessages($count, false, true) as $msgId => $targetedMessage) {
+					$decor->setMessage($targetedMessage);
+					$output[$msgId] = $decor->formatArray(false);
+					$output[$msgId]['id'] = $msgId;
+				}
 
 				// wrap in an array to preserve keys
-                return array($queue->getMessages($count, false, true));
+				return array($output);
 
 			// push or digest messages
 			case DefaultDispatchStrategy::TASK_PUBLISH:

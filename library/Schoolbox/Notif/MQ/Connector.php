@@ -16,7 +16,7 @@ use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Message\External;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\NotifException;
 
 class Connector {
@@ -312,6 +312,13 @@ class Connector {
 	}
 
 
+	/**
+	 * Accepts a string representation of a message and calculates a hash for it
+	 *
+	 * @param string $message
+	 * @param string $channelId
+	 * @return string
+	 */
 	protected function calculateMessageHash($message, $channelId) {
 		// cast null to 0
 		$bits = array(is_null($channelId) ? 0 : $channelId);
@@ -320,7 +327,7 @@ class Connector {
 		if($data = json_decode($message, true)) {
 			$string = ($data['message']);
 			if($obj = unserialize($string)) {
-				if($obj instanceof External) {
+				if($obj instanceof TargetedMessage) {
 					$body = $obj->getBody()->toArray();
 					$bits[] = $body['body'].$body['href'];
 				}

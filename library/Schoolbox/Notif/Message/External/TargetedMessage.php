@@ -11,7 +11,6 @@ namespace Schoolbox\Notif\Message\External;
 
 
 use Alaress\Scheduler\Trigger\TriggerInterface;
-use Schoolbox\Notif\Message\External;
 use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Notif;
@@ -46,6 +45,21 @@ class TargetedMessage implements Serializable {
         $this->instance = $instance;
         $this->timestamp = $trigger instanceof TriggerInterface ? $trigger->getTimestamp() : null;
     }
+
+	/**
+	 * @return \Schoolbox\Notif\Message\Message
+	 */
+	public function getBody() {
+		return $this->body;
+	}
+
+	/**
+	 * @return \Schoolbox\Notif\Message\Instance\Instance
+	 */
+	public function getInstance() {
+		return $this->instance;
+	}
+
 
 	/**
 	 * @return int|null

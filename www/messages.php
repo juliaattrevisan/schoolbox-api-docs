@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Notif\Message\External\TargetedMessage;
+
 /**
  * 
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -42,6 +44,9 @@ foreach($messageArray as $msgId => $message) {
 krsort($msgsByDay);
 
 $this->setVar('day_block', '');
+
+$decor = new \Schoolbox\Notif\Message\Decorator(null);
+
 foreach($msgsByDay as $day => $timestamps) {
 	$i = 0;
 	krsort($timestamps);
@@ -66,17 +71,16 @@ foreach($msgsByDay as $day => $timestamps) {
 		$this->setVar('event_block', '');
 
 		foreach($messages as $message) {
-			/** @var \Schoolbox\Notif\Queue\AbstractMessage $message */
-
-			$tstamp = new Alaress_Date_Format($message->getTimestamp(), 'U');
+			/** @var TargetedMessage $message */
+			$decor->setMessage($message);
 
 			$this->setVar(array(
-				'EVENT_BODY' => $message->getFormattedText(),
-				'EVENT_HREF' => $message->getHref(),
+				'EVENT_BODY' => $decor->formatHtml(),
+				'EVENT_HREF' => $decor->getHref(),
 				'EVENT_DARK' => ++$i % 2 ? '' : 'dark',
-				'EVENT_TIME' => date('g:ia', $tstamp->getUnixTimestamp()),
-				'EVENT_LONGTIME' => $tstamp->getLong(),
-				'EVENT_ICON'  => $message->getIcon()
+				'EVENT_TIME' =>  $decor->getAlaressDateFormat()->getUsingFormat('g:ia'),
+				'EVENT_LONGTIME' => $decor->getAlaressDateFormat()->getLong(),
+				'EVENT_ICON'  => $decor->getIcon()
 			));
 			$this->parse('event_block', 'event', true);
 		}

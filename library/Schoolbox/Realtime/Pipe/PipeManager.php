@@ -10,8 +10,8 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
-use Alaress\WorkerCrew\Transaction\ResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
+use PhpAmqpLib\Message\AMQPMessage;
 use Predis\ClientInterface as PredisClientInterface;
 use Predis\CommunicationException;
 use Ratchet\ConnectionInterface;
@@ -19,12 +19,9 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\Wamp\WampServerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
-use React\EventLoop\Timer\TimerInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
-use Schoolbox\Notif\Message\Interceptor;
-use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\Queue\UnreadMessage;
+use Schoolbox\Notif\Message\Decorator;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
 use Schoolbox\Realtime\Stomp\SubscriptionException;
@@ -198,7 +195,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/**
 	 * This is the method called from within a Subscription object for notifying attached sockets of a new message.
 	 *
-	 * @param UnreadMessage $message
+	 * @param AMQPMessage $message
 	 * @param int $userId
 	 * @return bool
 	 * @throws ProcessException
@@ -225,15 +222,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 			);
 		}
 
-		$body = $message->getBody();
+		$formatted = json_decode($message->body, true);
 
-		$this->pushTransactions[$userId]->put($message->getId(), array(
-			'id' => $message->getId(),
-			'body' => $body['message']['body'],
-			'params' => $body['message']['params'],
-			'timestamp' => $body['timestamp'],
-			'status' => 'unread'
-		));
+		$targeted = unserialize($formatted['message']);
+		$decor = new Decorator($targeted);
+
+		$output = $decor->formatArray(true);
+		$output['id'] = $message->get('message_id');
+
+		$this->pushTransactions[$userId]->put($output['id'], $output);
 
 		return true;
 	}
@@ -350,14 +347,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		foreach($this->pipes->getPipesByUserId($userId) as $pipe) {
 			$this->sendToPipe($pipe, $data);
 		}
-	}
-
-
-	/**
-	 * @return Interceptor
-	 */
-	public function getInterceptor() {
-		return $this->interceptor;
 	}
 
 

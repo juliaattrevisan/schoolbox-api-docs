@@ -148,7 +148,7 @@ class UserQueue {
 		$this->conn->rejectMessages($nacks);
 
 		// sort descending
-		usort($this->messages, function($a, $b) {
+		uasort($this->messages, function($a, $b) {
             /**
              * @var TargetedMessage $a
              * @var TargetedMessage $b

@@ -14,7 +14,6 @@ use Monolog\Logger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
-use Schoolbox\Notif\Message\External;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 

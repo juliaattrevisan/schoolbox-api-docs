@@ -45,10 +45,10 @@ class DigestScheduler extends CronScheduler {
 			// convert old DAILY and WEEKLY enum into crontab
 			switch($schedule) {
 				case Role::DIGEST_DAILY:
-					$schedule = '0 9 * * *'; // daily, 9am
+					$schedule = '0 6 * * 1-5'; // weekdaily, 6am
 					break;
 				case Role::DIGEST_WEEKLY:
-					$schedule = '0 9 * * 1'; // Monday, 9am
+					$schedule = '0 11 * * 5'; // Friday, 11am
 					break;
 			}
 
