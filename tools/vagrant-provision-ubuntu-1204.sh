@@ -3,7 +3,7 @@ vag="[schoolbox]";
 cd /home/vagrant;
 
 echo "$vag Retrieving latest Demo Data files";
-curl -L --progress-bar http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-sha1.txt > schoolboxdemo-latest-sha1.txt;
+wget -c http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-sha1.txt 2>/dev/null || echo "$vag Unable to retrive latest sha1 list, continuing with current";
 while read line;
 do
 	demofile=`echo "$line" | awk {'print $2'}`;
