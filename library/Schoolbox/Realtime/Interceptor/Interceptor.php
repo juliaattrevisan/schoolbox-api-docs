@@ -32,6 +32,9 @@ use Schoolbox\UserMapper;
 
 class Interceptor implements TaskResponseHandlerInterface {
 
+	const TRANSACTION_CACHE_TIMEOUT = 0.5;
+	const TRANSACTION_COUNT_LIMIT   = 80;
+
 	/** @var UserMapper */
 	protected $userMapper;
 
@@ -72,7 +75,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 			$this->transaction = new Transaction($loop, function($timer) use ($d) {
 				/** @var $timer TimerInterface */
 				$d->enqueue($timer, InterceptorDispatchStrategy::TASK_INTERCEPT, $timer->getData());
-			}, 0.5);
+			}, self::TRANSACTION_CACHE_TIMEOUT);
 		}
 	}
 
@@ -87,10 +90,11 @@ class Interceptor implements TaskResponseHandlerInterface {
 	public function handleResponse($identifier, $command, $data) {
 		// nothing to do, the worker did the work
 		$this->v->v("Reroute count: $data[0]");
-		// after receiving the first batch, disable patience
+		// after receiving the first batch, disable patience and enforce cache limits
 		if($this->isPatient()) {
 			$this->v->v("Moving out of patient mode");
 			$this->setPatience(false);
+			$this->transaction->setSize(self::TRANSACTION_COUNT_LIMIT);
 		}
 	}
 

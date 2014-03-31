@@ -27,6 +27,8 @@ class Transaction {
 	/** @var TimerInterface */
 	protected $timer = null;
 
+	/** @var int */
+	protected $size = 0;
 
 	/**
 	 * Create a new Transaction
@@ -34,11 +36,14 @@ class Transaction {
 	 * @param LoopInterface $loop
 	 * @param callable $callback
 	 * @param int $cacheInterval - how long to cache for, in seconds
+	 * @param int $size          - the max size of the cache, or 0 for no limit. If this limit is reached, the
+	 *                             transaction will execute prematurely
 	 */
-	function __construct($loop, $callback, $cacheInterval = 1) {
+	function __construct($loop, $callback, $cacheInterval = 1, $size = 0) {
 		$this->loop = $loop;
 		$this->callback = $callback;
 		$this->cacheInterval = $cacheInterval;
+		$this->size = $size;
 	}
 
 
@@ -78,6 +83,14 @@ class Transaction {
 		$data = $this->timer->getData() ?: array();
 		$data[$key] = $value;
 		$this->timer->setData($data);
+
+		// if we've reached our caching limit, fire and reset
+		if($this->size && count($data) >= $this->size) {
+			call_user_func($this->callback, $this->timer);
+			$this->timer->cancel();
+			$this->timer = null;
+		}
+
 		return $this;
 	}
 
@@ -102,4 +115,26 @@ class Transaction {
 		return isset($this->timer) && $this->timer->isActive();
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getSize() {
+		return $this->size;
+	}
+
+	/**
+	 * @param $size
+	 * @return self
+	 */
+	public function setSize($size) {
+		$this->size = $size;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getCount() {
+		return count($this->timer->getData());
+	}
 }
