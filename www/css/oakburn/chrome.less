@@ -145,12 +145,24 @@
   h1 { color: #4d4d4d; }
   h2, .calendar-controls{ border-bottom: 1px solid #cdcdcd; }
 
+  .submit-btn-plain,
+  .btn.submit{
+    background: @link;
+    &:hover{ text-decoration: underline; }
+  }
+
   .admin-nav{
     a{
       color: @link;
       &.current{
         background: @link;
         color: @content-background;
+      }
+      &:hover{
+        background: @navigation-hover-color;
+        border: 1px solid @navigation-hover-color;
+        color: @content-background;
+        text-decoration: none;
       }
     }
   }
