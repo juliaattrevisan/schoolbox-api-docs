@@ -21,8 +21,8 @@ class RouteLookup {
     /**
      * Performs a reverse lookup on the route given its name, and creates a URL.
      *
-     * @param string $name
-     * @param array  $data
+     * @param  string $name The name of the route to look up.
+     * @param  array  $data Any params to pass as part of the route.
      * @return string
      */
     public function execute($name, $data = array()) {

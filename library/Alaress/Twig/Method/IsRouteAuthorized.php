@@ -38,21 +38,17 @@ class IsRouteAuthorized {
      * Performs a reverse lookup on the route given its name, and checks if that
      * path is accessible to the given user.
      *
-     * @param  string $name
-     * @param  array  $data
-     * @param  User   $user If not set, defaults to the current user.
+     * @param  string $name   The name of the route to look up.
+     * @param  array  $params Any params to pass as part of the route.
+     * @param  User   $user   The user to authorize. If not set, defaults to the
+     *                        currently logged in user.
      * @return bool
      */
-    public function execute($name, $data = array(), User $user = null) {
+    public function execute($name, $params = array(), User $user = null) {
         if (!($user instanceof User)) {
             $user = $this->getSession()->getUser();
         }
-        // Ensure format is set to something, even if empty.
-        if (!isset($data['format'])) {
-            $data['format'] = '';
-        }
-        $route = $this->getRouter()->generate($name, $data);
-        return $this->getAuthorizer()->isPathAuthorizedForUser($route, $user);
+        return $this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $user);
     }
 
     /**
