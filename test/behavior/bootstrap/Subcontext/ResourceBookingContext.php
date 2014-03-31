@@ -1,0 +1,61 @@
+<?php
+/**
+ * Contains test steps for the resource booking system.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+use Behat\Mink\Element;
+
+class Subcontext_ResourceBookingContext extends BaseContext {
+
+    /**
+     * Helper method for finding a resource.
+     *
+     * @param  string $name        The name of the resource to find.
+     * @return Element\NodeElement The base element for the resource.
+     * @throws Exception           if the resource list is not on the page, or
+     *                             the named resource is not found.
+     */
+    protected function findResource($name) {
+        $list = $this->getSession()->getPage()->find('css', '.resource-list');
+        if (!($list instanceof Element\NodeElement)) {
+            throw new Exception('Resource list not found on page');
+        }
+        foreach ($list->findAll('css', '.resource') as $resource) {
+            /** @var Element\NodeElement $resource */
+            $nameElement = $resource->find('css', '.resource-name');
+            if ($nameElement instanceof Element\NodeElement && $nameElement->getText() === $name) {
+                return $resource;
+            }
+        }
+        throw new Exception(sprintf('Resource with name "%s" not found', $name));
+    }
+
+    /**
+     * Views details for a resource, provided the user is on the resource
+     * booking page.
+     *
+     * @When /^(?:|I )view details for resource "(?P<name>[^"]*)"$/
+     *
+     * @param string $name
+     */
+    public function viewResource($name) {
+        $resource = $this->findResource($name);
+        $resource->find('css', '.resource-read-link')->click();
+    }
+
+    /**
+     * Edits a resource, provided the user is on the resource booking page.
+     *
+     * @When /^(?:|I )edit resource "(?P<name>[^"]*)"$/
+     *
+     * @param string $name
+     */
+    public function editResource($name) {
+        $resource = $this->findResource($name);
+        $resource->find('css', '.resource-edit-link')->click();
+    }
+}

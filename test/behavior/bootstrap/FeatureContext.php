@@ -24,6 +24,7 @@ class FeatureContext extends BaseContext {
         $this->useContext('assessment', new Subcontext_AssessmentContext($parameters));
         $this->useContext('confirm', new Subcontext_ConfirmContext($parameters));
         $this->useContext('autocomplete', new Subcontext_AutocompleteContext($parameters));
+        $this->useContext('resource_booking', new Subcontext_ResourceBookingContext($parameters));
     }
 
     /**
