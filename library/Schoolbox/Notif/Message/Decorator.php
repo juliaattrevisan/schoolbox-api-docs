@@ -65,7 +65,7 @@ class Decorator {
 	 */
 	public function formatHtml() {
 		return $this->formatMarkup(
-			function($text, $href) {
+			function($href, $text) {
 				return sprintf('<a href="%s">%s</a>', $href, $text);
 			},
 			function($text) {
@@ -82,7 +82,7 @@ class Decorator {
 	 */
 	public function formatMail($uriBase, $linkColor) {
 		return $this->formatMarkup(
-			function($text, $href) use ($uriBase, $linkColor) {
+			function($href, $text) use ($uriBase, $linkColor) {
 				return sprintf('<a href="%s%s" style="color:%s;">%s</a>', $uriBase, $href, $linkColor, $text);
 			},
 			function($text) {
