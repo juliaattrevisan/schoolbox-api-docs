@@ -254,11 +254,23 @@ Scenario: Adding related resources to a resource
   And   the autocomplete "related_resource_id" should not contain "A single projector"
 
 @resource-booking
-Scenario: Booking a resource
+Scenario: Booking an open resource
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "wwhite" with password "password"
+  And   I log in as "sberryhill" with password "password"
+  # "A single projector":
+  # Anyone can book this resource.
+  # Lead time: none
+  # Min reservation time: 1 day
+  # Max reservation time: 2 days
+  # All standard rules regarding bookings apply.
+  When  I go to "/resource-booking/item"
+  # Current link: "Book" next to resource name
+  And   I view details for resource "A single projector"
   # Book a resource: test against its min and max reserve time, and its lead time
+  And   I start booking resource
+
+
   # Test repeated booking of resources
   # Test booking on a timetable
   # Test booking of conflicting times
