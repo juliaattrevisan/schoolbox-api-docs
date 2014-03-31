@@ -33,7 +33,11 @@ class FeatureContext extends BaseContext {
      * @BeforeScenario
      */
     public function logout(Behat\Behat\Event\ScenarioEvent $event) {
-        $this->getSession()->visit('/logout.php');
+        // Session may not be initialised yet, so silently swallow
+        try {
+            $this->getSession()->visit('/logout.php');
+        }
+        catch (Exception $e) {}
     }
 
     /**
