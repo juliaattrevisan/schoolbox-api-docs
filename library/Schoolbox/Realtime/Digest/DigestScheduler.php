@@ -16,6 +16,7 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
+use RuntimeException;
 use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -37,8 +38,8 @@ class DigestScheduler extends CronScheduler {
 
 			$schedule = $role->getDigestSchedule();
 
-			// not digesting, ignore and move on
-			if($schedule == Role::DIGEST_NEVER) {
+			// cast 0 to "0", because loose typing equality because PHP -_-
+			if($schedule == (string)Role::DIGEST_NEVER) {
 				continue;
 			}
 
