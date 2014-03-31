@@ -14,6 +14,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
+use RuntimeException;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Verboser;
@@ -63,7 +64,7 @@ class Subscription {
 				if($pipeManager->onAMQP($self->frame2amqp($frame), $userId)) {
 					$self->addMessage($frame, $ackResolver);
 				}
-			}
+			}, array('persistent' => true)
 		);
 
 	}
@@ -133,13 +134,20 @@ class Subscription {
 		}
 
 		foreach($this->messages as $msgId => $stompMessage) {
-
-			if(in_array($msgId, $amqpMessageIds)) {
-				$stompMessage->ack();
-				$success[$msgId] = true;
+			try {
+				if(in_array($msgId, $amqpMessageIds)) {
+					$this->pipeManager->v("Attempting ACK");
+					$stompMessage->ack();
+					$success[$msgId] = true;
+				}
+				else {
+					$this->pipeManager->v("Attempting NACK");
+					$stompMessage->nack();
+				}
 			}
-			else {
-				$stompMessage->nack();
+			catch(RuntimeException $e) {
+				// the message in question has already been [N]ACK'd
+				$this->pipeManager->v("Caught Runtime Exception, message '$msgId' already N/ACK'd", '*');
 			}
 		}
 
