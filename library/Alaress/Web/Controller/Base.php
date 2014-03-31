@@ -131,4 +131,23 @@ abstract class Base {
         return $this->getSession()->getUser();
     }
 
+    /**
+     * Attempts to authorize a route for a user. Returns the URL for that route
+     * if authorized, and false if not.
+     *
+     * @param  string $name   The name of the route to authorize and generate.
+     * @param  array  $params Any params to pass to the route generator.
+     * @param  User   $user   The user to authorize the route for. Defaults to
+     *                        currently authenticated user.
+     * @return string|bool    The URL for the route if authorized, false if not.
+     */
+    public function getRouteIfAuthorized($name, array $params = array(), User $user = null) {
+        if (!($user instanceof User)) {
+            $user = $this->getUser();
+        }
+        if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $user)) {
+            return $this->getRouter()->generate($name, $params);
+        }
+        return false;
+    }
 }

@@ -188,15 +188,15 @@ class Controller extends Base {
             $class   = '';
 
             // Modify URL
-            $modifyUrl = $this->getRouter()->generate(
-                'resourceBooking.edit',
-                array('id' => $booking->getId())
-            );
-            if ($this->getAuthorizer()->isPathAuthorizedForUser($modifyUrl)) {
+            $editUrl = $this->getRouteIfAuthorized('resourceBooking.edit', array('id' => $booking->getId()));
+            if ($editUrl !== false) {
                 $buttons[] = array(
                     'label' => 'Modify',
                     'class' => 'modify',
-                    'href'  => $modifyUrl,
+                    'href'  => $this->getRouter()->generate(
+                        'resourceBooking.edit',
+                        array('id' => $booking->getId())
+                    ),
                 );
             }
 
@@ -204,22 +204,22 @@ class Controller extends Base {
                 case Status\Model::STATUS_PENDING:
                     $class = 'pending';
                     // Is approve/reject okay for this item?
-                    $approveUrl = $this->getRouter()->generate(
+                    $approveUrl = $this->getRouteIfAuthorized(
                         'resourceBooking.approve',
                         array('id' => $booking->getId())
                     );
-                    if ($this->getAuthorizer()->isPathAuthorizedForUser($approveUrl)) {
+                    if ($approveUrl !== false) {
                         $buttons[] = array(
                             'label' => 'Approve',
                             'class' => 'tick',
                             'href'  => $approveUrl,
                         );
                     }
-                    $rejectUrl = $this->getRouter()->generate(
+                    $rejectUrl = $this->getRouteIfAuthorized(
                         'resourceBooking.reject',
                         array('id' => $booking->getId())
                     );
-                    if ($this->getAuthorizer()->isPathAuthorizedForUser($rejectUrl)) {
+                    if ($rejectUrl !== false) {
                         $buttons[] = array(
                             'label' => 'Reject',
                             'class' => 'delete',
