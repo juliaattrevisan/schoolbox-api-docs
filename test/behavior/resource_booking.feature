@@ -337,8 +337,7 @@ Scenario: Cancelling a booking
   When  I cancel booking at "3pm +3 days"
   Then  I should not see confirmed booking at "3pm +3 days"
 
-@resource-booking
-@resource-booking-errors
+@resource-booking @resource-booking-errors
 Scenario: Double-booking an item - end time overlaps another
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -356,8 +355,7 @@ Scenario: Double-booking an item - end time overlaps another
   Then  I should not see confirmed booking at "12am +2 days"
   And   I should receive an error for double booking
 
-@resource-booking
-@resource-booking-errors
+@resource-booking @resource-booking-errors
 Scenario: Double-booking an item - start time overlaps another
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -377,8 +375,7 @@ Scenario: Double-booking an item - start time overlaps another
   Then  I should not see confirmed booking at "1am +3 days"
   And   I should receive an error for double booking
 
-@resource-booking
-@resource-booking-errors
+@resource-booking @resource-booking-errors
 Scenario: Booking an item for before the min lead time
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -396,8 +393,7 @@ Scenario: Booking an item for before the min lead time
   Then  I should not see confirmed booking at "3pm +3 days"
   And   I should receive an error for not enough lead time
 
-@resource-booking
-@resource-booking-errors
+@resource-booking @resource-booking-errors
 Scenario: Booking an item for less than min booking time
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -417,14 +413,14 @@ Scenario: Booking an item for less than min booking time
   Then  I should not see confirmed booking at "3pm +3 days"
   And   I should receive an error for short booking
 
-@resource-booking
-@resource-booking-errors
+@resource-booking @resource-booking-errors
 Scenario: Booking an item for more than max booking time
   Given I do not wipe the slate clean
   And   I go to homepage
   And   I log in as "sberryhill" with password "password"
   When  I go to "/resource-booking/item"
   And   I view details for resource "A single projector"
+  And   I start booking resource for "+3 days"
   When  I fill in datepicker "start_datetime[date]" with "+3 days"
   And   I fill in datepicker "end_datetime[date]" with "+5 days"
   And   I fill in "start_datetime[hour]" with "3"
