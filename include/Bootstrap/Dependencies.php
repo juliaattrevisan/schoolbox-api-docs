@@ -73,6 +73,23 @@ $di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
 $di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
 
 // Template engine and functions
+// Template loader: sets up link to templates without a namespace.
+$di->set(
+    'templateEngine:loader',
+    $di->lazy(
+        function() use($di) {
+            $config      = $di->get('config');
+            $chainLoader = new Twig_Loader_Chain();
+            $baseLoader  = new Twig_Loader_Filesystem();
+            // Paths: prefer templates/{site_location} over templates/core
+            $baseLoader->addPath($config->get('siteRoot').'/templates/'.$config->get('site_location'));
+            $baseLoader->addPath($config->get('siteRoot').'/templates/core');
+            $chainLoader->addLoader($baseLoader);
+            return $chainLoader;
+        }
+    )
+);
+
 $di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
 $di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
 
@@ -110,4 +127,3 @@ $di->set(
         }
     )
 );
-$di->set('templateEngine:loader', $di->lazyNew('Twig_Loader_Chain'));
