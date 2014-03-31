@@ -1,0 +1,15 @@
+{# Implementation of a standard datetime picker. #}
+<input name="{{ name }}[date]"
+       data-datepicker=""
+       value="{{ value is empty ? "" : value|date('d/m/Y') }}" />
+<input name="{{ name }}[hour]"
+       class="timeField"
+       value="{{ value is empty ? "" : value|date("h") }}" /> :
+<input name="{{ name }}[minute]"
+       class="timeField"
+       value="{{ value is empty ? "" : value|date("i") }}" />
+<select name="{{ name }}[meridien]">
+    <option value="">--</option>
+    <option value="am" {% if value is not empty and value|date('A') == 'AM' %}selected{% endif %}>AM</option>
+    <option value="pm" {% if value is not empty and value|date('A') == 'PM' %}selected{% endif %}>PM</option>
+</select>
