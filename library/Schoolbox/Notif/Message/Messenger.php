@@ -129,6 +129,11 @@ class Messenger {
                     ->setTargets($instance->getTargets())
                     ->setContext($instance->getContext());
 
+	            // if we can filter out the user who effected this event in the first place, do so
+	            if($trigger) {
+		            $messageInstance->setContext(array('user' => $trigger->getEvent()->getEffector()->getId()));
+	            }
+
                 if($messageInstance->send()) {
                     $result++;
                 }
