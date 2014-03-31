@@ -21,7 +21,9 @@
   $j(function() {
     // launch the notifier
     $j('#infoPanel').children('li.bell').notifier({
-      host: '{SERVER_ADDRESS}',
+      host:   '{WEBSOCKET_HOST}',
+      port:   '{WEBSOCKET_PORT}',
+      path:   '{WEBSOCKET_PATH}',
       secure: '{PAGE_SECURE}'
     });
   });

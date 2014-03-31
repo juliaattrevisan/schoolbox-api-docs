@@ -208,7 +208,9 @@ class SitePage extends Page {
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
             'DEBUGBAR'      => $debug_bar_body,
             'DEBUGBAR_HEAD' => $debug_bar_head,
-            'SERVER_ADDRESS' => (Cfg::get('site_hostname') ? Cfg::get('site_hostname') . '.' : '') . Cfg::get('site_domain'),
+            'WEBSOCKET_HOST' => $_SERVER['HTTP_HOST'] ?: parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST),
+            'WEBSOCKET_PORT' => Cfg::get('websocket_port') ?: (empty($_SERVER['HTTPS']) ? 8080 : 8081),
+            'WEBSOCKET_PATH' => Cfg::get('websocket_path') ? '/' . Cfg::get('websocket_path') : '',
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
 

@@ -8,9 +8,12 @@
             host:      '192.168.1.1',
             port:      '8080',
             sslport:   '8081',
+            path:      '',
+
             counter:   '#go-msg',
             content:   '#msg-content',
             list:      '#message-list',
+
             prefetch:  5,
             debug:     false,
             domwait:   1000
