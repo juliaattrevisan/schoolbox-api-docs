@@ -16,6 +16,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
+use Schoolbox\UserAccess;
 
 class Module extends BaseModule {
 
@@ -40,8 +41,14 @@ class Module extends BaseModule {
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer) {
+        // Authorizer: will need to check the resource's moderation rule.
+        $resourceManageRule = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
+        );
         $authorizer
             ->addRule('/^resourceBooking(?:$|\.)/', new Rule\IsLoggedIn())
+            ->addRule('/^resourceBooking\.(?:approve|reject)/', $resourceManageRule)
         ;
     }
 
