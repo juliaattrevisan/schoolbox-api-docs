@@ -49,15 +49,19 @@ $(document).ready(function() {
         <tr>
             <td class="formLabelWidth"><h4>Begin</h4></td>
             <td>
-                <input name="start_date" data-datepicker="" value="{{ item.event.startDate }}" />,
-                <input name="start_time" data-timepicker="" value="{{ item.event.startTime }}" />
+                {% include 'sub/datetimeInput.twig' with {
+                    value: item.event.startDateTime,
+                    name:  'start_datetime'
+                } %}
             </td>
         </tr>
         <tr>
             <td class="formLabelWidth"><h4>End</h4></td>
             <td>
-                <input name="end_date" data-datepicker="" value="{{ item.event.endDate }}" />,
-                <input name="end_time" data-timepicker="" value="{{ item.event.endTime }}" />
+                {% include 'sub/datetimeInput.twig' with {
+                    value: item.event.endDateTime,
+                    name:  'end_datetime'
+                } %}
             </td>
         </tr>
         <tr>
