@@ -34,6 +34,30 @@ class Subcontext_CalendarContext extends BaseContext {
     }
 
     /**
+     * Retrieves a date element from the calendar.
+     *
+     * @param $locator
+     * @param $timeString
+     *
+     * @return Element\NodeElement
+     * @throws Exception if either calendar or date cannot be found.
+     */
+    public function getDateElement($locator, $timeString) {
+        $this->goToDate($locator, $timeString);
+        $date   = new DateTime($timeString);
+        $format = $date->format('Y-m-d');
+        $calendar = $this->getSession()->getPage()->find('css', $locator);
+        if (!($calendar instanceof Element\NodeElement)) {
+            throw new Exception("Calendar \"$calendar\" not found");
+        }
+        $dateElement = $calendar->find('css', ".fc-day[data-date=\"$format\"]");
+        if (!($dateElement instanceof Element\NodeElement)) {
+            throw new Exception("Element for date \"$locator\" on \"$calendar\" not found");
+        }
+        return $dateElement;
+    }
+
+    /**
      * Clicks a day on the given calendar, possibly bringing up a button.
      *
      * @When /^(?:|I )click on date "(?P<timeString>[^"]*)" on calendar "(?P<locator>[^"]*)"$/
@@ -42,13 +66,7 @@ class Subcontext_CalendarContext extends BaseContext {
      * @param string $timeString
      */
     public function clickDate($locator, $timeString) {
-        $this->goToDate($locator, $timeString);
-        $date   = new DateTime($timeString);
-        $format = $date->format('Y-m-d');
-        $this
-            ->getSession()->getPage()
-            ->find('css', "$locator .fc-day[data-date=\"$format\"]")
-            ->click();
+        $this->getDateElement($locator, $timeString)->click();
     }
 
 }
