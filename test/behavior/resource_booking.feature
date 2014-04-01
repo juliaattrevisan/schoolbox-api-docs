@@ -282,6 +282,7 @@ Scenario: Booking an open resource
   And   I press "resource-booking-save"
   Then  I should see confirmed booking at "2:00pm +2 days"
 
+@resource-booking
 Scenario: Booking a moderated resource
   Given I do not wipe the slate clean
   And   I go to homepage
