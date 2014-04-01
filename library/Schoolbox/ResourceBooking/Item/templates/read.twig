@@ -74,7 +74,44 @@
                         $('#calendar-loading').hide();
                     }
                 },
-
+                /**
+                 * Event rendering: put the event's start and end time into data
+                 */
+                eventRender: function(event, element) {
+                    // formatDate has no timezone support, and ISO 8601 outputs
+                    // a Z as timezone always. Fail!
+                    var getTimeWithTimezone = function(date) {
+                        var offset = date.getTimezoneOffset()
+                        var sign   = '';
+                        if (offset === 0) {
+                            return 'Z'
+                        }
+                        if (offset < 0) {
+                            // < 0 actually means +xxxx
+                            sign   = '+'
+                            offset = offset * -1
+                        }
+                        else {
+                            sign = '-'
+                        }
+                        var hours = String(Math.floor(offset / 60))
+                        if (hours.length === 1) {
+                            hours = '0' + hours;
+                        }
+                        var minutes = String(offset % 60)
+                        if (minutes.length === 1) {
+                            minutes = '0' + minutes;
+                        }
+                        return $.fullCalendar.formatDate(date, "yyyy-MM-dd'T'HH:mm:ss") + sign + hours + ':' + minutes
+                    }
+                    // Set data as attributes, that way selectors can query them
+                    element.attr({
+                        'data-start':  getTimeWithTimezone(event.start),
+                        'data-end':    getTimeWithTimezone(event.end),
+                        'data-allday': event.allDay ? 1 : 0
+                    })
+                    return element
+                },
                 /**
                  * When an event is clicked
                  *
