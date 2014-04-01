@@ -82,4 +82,26 @@ class Subcontext_CalendarContext extends BaseContext {
         $this->getDateElement($locator, $timeString)->click();
     }
 
+    /**
+     * Retrieves events starting at a given time from the calendar.
+     *
+     * @param $locator
+     * @param $timeString
+     *
+     * @return Element\NodeElement
+     * @throws Exception if either calendar or date cannot be found.
+     */
+    public function getEventsStartingAtTime($locator, $timeString) {
+        $time      = new DateTime($timeString);
+        $timestamp = $time->getTimestamp();
+        $calendar  = $this->getCalendar($locator);
+        return array_filter(
+            $calendar->findAll('css', '.fc-event'),
+            function($event) use($timestamp) {
+                /** @var Element\NodeElement $event */
+                $startTime = new DateTime($event->getAttribute('data-start'));
+                return $startTime->getTimestamp() === $timestamp;
+            }
+        );
+    }
 }

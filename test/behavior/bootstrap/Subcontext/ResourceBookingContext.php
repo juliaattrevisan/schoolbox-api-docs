@@ -78,4 +78,24 @@ class Subcontext_ResourceBookingContext extends BaseContext {
             ->find('css', "#createEvent .actions input.btn[value=\"Continue\"]")
             ->click();
     }
+
+    /**
+     * Asserts that there's a approved booking starting at this time.
+     *
+     * @Then /^(?:|I )should see approved booking at "(?P<timeString>[^"]*)"$/
+     *
+     * @param  string $timeString When should the booking be for?
+     * @throws Exception if no confirmed booking was found
+     */
+    public function assertBookingApproved($timeString) {
+        /** @var Subcontext_CalendarContext $calendarContext */
+        $calendarContext = $this->getMainContext()->getSubcontext('calendar');
+        $calendarContext->clickDate('#calendar', $timeString);
+        foreach ($calendarContext->getEventsStartingAtTime('#calendar', $timeString) as $eventElement) {
+            if ($eventElement->hasClass('approved')) {
+                return;
+            }
+        }
+        throw new Exception("No confirmed booking found in calendar for time \"$timeString\"");
+    }
 }
