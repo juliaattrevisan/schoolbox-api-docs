@@ -69,7 +69,7 @@ function ipInCIDR ($ip, $cidr) {
 function ipInCIDRList ($ip, $cidr_list) {
     $cidr_array = array();
 
-    if (is_string($cidr_list)) {
+    if (is_string($cidr_list) && strlen(trim($cidr_list))>0) {
         $cidr_array = array_map('trim', explode(',',$cidr_list));
     } else if (is_array($cidr_list)) {
         $cidr_array = array_map('trim', $cidr_list);
@@ -88,7 +88,8 @@ function ipInCIDRList ($ip, $cidr_list) {
 
     return $returnval;
 }
- 
-$settings->useKerberos = ipInCIDRList($_SESSION['ip'], Config::get('saml_krb_whitelist'));
+
+// TODO: replace $_SERVER['REMOTE_ADDR'] with one of the prebuilt GetIP() functions
+$settings->useKerberos = ipInCIDRList($_SERVER['REMOTE_ADDR'], Config::get('saml_krb_whitelist'));
 
 return $settings;
