@@ -214,6 +214,21 @@ class Interval implements JsonSerializable {
     }
 
     /**
+     * Creates a DateInterval instance out of this object.
+     *
+     * You might want this when checking across DST changes, because this object
+     *
+     * DateInterval object interprets days as a
+     *
+     * @return DateInterval
+     */
+    public function getAsDateInterval() {
+        $interval = new DateInterval($this->format('P%DDT%hH%iM%sS'));
+        $interval->invert = $this->invert;
+        return $interval;
+    }
+
+    /**
      * This class json serializes as a simple integer (the number of seconds in
      * the interval).
      *
