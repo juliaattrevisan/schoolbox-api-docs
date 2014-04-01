@@ -181,6 +181,11 @@ class Controller extends Base {
             ->setResource($resource)
             ->setStatus(Status\Model::STATUS_PENDING);
         ;
+        // What about the resource? If it's an open resource, confirm the
+        // booking immediately.
+        if ($resource->getModerationType()->getId() === Item\ModerationType\Model::TYPE_OPEN) {
+            $booking->setStatus(Status\Model::STATUS_APPROVED);
+        }
         $this->getBookingMapper()->save($booking);
         return $booking;
     }
