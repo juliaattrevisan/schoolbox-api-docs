@@ -114,7 +114,7 @@
         }
 
         // validation rules
-        jQuery.validator.addMethod("markTypeTotalCheck", function(value, element) {
+        $j.validator.addMethod("markTypeTotalCheck", function(value, element) {
             if(marktype.total.is(':visible')) {
                 return value != '';
             }
@@ -123,7 +123,15 @@
             }
         }, "Please enter a numeric mark amount");
 
-        jQuery.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
+        $j.validator.addMethod('markTypeRubricCriteriaExists', function(value, element) {
+            if(marktype.rubric.is(':visible')) {
+                return $j('#rubric-criteria').find('input[type="checkbox"]').length > 1;
+            }
+            else {
+                return true;
+            }
+        }, 'Please ensure at least two criteria exist');
+        $j.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
                 return $j('#rubric-criteria').find('input:checked').length > 1;
             }
@@ -132,7 +140,7 @@
             }
         }, 'Please select at least two criteria');
 
-        jQuery.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
+        $j.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
                 return $j('#rubric-results').find('input:checked').length == 1;
             }
@@ -170,6 +178,7 @@
                     markTypeRubricResultsetCheck: true
                 },
                 criteria: {
+                    markTypeRubricCriteriaExists: true,
                     markTypeRubricCriteriaCheck: true
                 },
                 open_date:   open_date_valid,
@@ -240,7 +249,7 @@
             else {
                 $j('#rubric-criteria div').each(function () {
                     var checked = $j(this).children(':checkbox').prop('checked');
-                    descriptor(checked ? 'hide' : 'show', this, 100)
+                    descriptor(checked ? 'show' : 'hide', this, 100)
                 });
             }
         });
@@ -531,7 +540,9 @@
                         </select> levels
                     </label>
                 </p>
-                <input type="hidden" name="result_set" />
+
+                <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
+                <input type="text" style="visibility: hidden; height: 0" name="result_set" />
             </div>
             <div class="clearfix"></div>
 
@@ -541,6 +552,8 @@
                 {COURSE_CRITERIA}
                 {CLASS_CRITERIA}
 
+                <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
+                <input type="text" style="visibility: hidden; height: 0" name="criteria" />
             </div>
         </td>
     </tr>
