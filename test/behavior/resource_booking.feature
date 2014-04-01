@@ -254,7 +254,7 @@ Scenario: Adding related resources to a resource
   Then  the autocomplete "related_resource_id" should contain "English textbook"
   And   the autocomplete "related_resource_id" should not contain "A single projector"
 
-@resource-booking
+@resource-booking @resource-booking-open
 Scenario: Booking an open resource
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -280,9 +280,9 @@ Scenario: Booking an open resource
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should see confirmed booking at "2:00pm +2 days"
+  Then  I should see approved booking at "2:00pm +2 days"
 
-@resource-booking
+@resource-booking @resource-booking-moderated
 Scenario: Booking a moderated resource
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -308,10 +308,9 @@ Scenario: Booking a moderated resource
   And   I should be able to reject booking at "2:00pm +1 days"
   When  I reject booking at "3pm +3 days"
   Then  I should see rejected booking at "2:00pm +1 days"
-  # I changed my mind
+  # I changed my mind, approve it after all
   When  I confirm booking at "3pm +3 days"
-  Then  I should see confirmed booking at "2:00pm +1 days"
-
+  Then  I should see approved booking at "2:00pm +1 days"
 
 #Scenario: Booking a managed resource
 #  Given I do not wipe the slate clean
