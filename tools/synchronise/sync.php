@@ -26,9 +26,9 @@ if (Cfg::get('external_sync_data') == 1) {
 
     $sync = new Synchronise_Facade(ucfirst($siteLocation), isset($options['v']), isset($options['perform-update']));
 
-    $stategies = explode(' ', Cfg::get('sync_patterns'));
+    $strategies = explode(' ', Cfg::get('sync_patterns'));
 
-    $sync->setStrategies($stategies);
+    $sync->setStrategies($strategies);
 
     if (isset($options['diagnostic'])) {
         $sync->diagnose();
