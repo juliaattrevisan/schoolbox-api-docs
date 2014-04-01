@@ -52,25 +52,36 @@ class FeatureContext extends BaseContext {
     /**
      * Takes a screenshot and content dump of the error if the test failed.
      *
+     * Now ignores UndefinedException and PendingException, as these aren't
+     * raised by errors in test cases.
+     *
      * @AfterStep
      */
     public function takeScreenshotOnFailure(Behat\Behat\Event\StepEvent $event) {
         if ($event->hasException()) {
-            $baseName = sprintf(
-                '%s/screenshots/%s-%s',
-                dirname(__DIR__),
-                date('YmdHis'),
-                trim(preg_replace('/\\W+/', '_', strtolower($event->getStep()->getText())), '_')
-            );
-            // Assume screenshot is a PNG
-            file_put_contents(
-                $baseName.'.png',
-                $this->getSession()->getDriver()->getScreenshot()
-            );
-            file_put_contents(
-                $baseName.'.html',
-                $this->getSession()->getDriver()->getContent()
-            );
+            if (!in_array(
+                get_class($event->getException()),
+                array(
+                    'Behat\Behat\Exception\UndefinedException',
+                    'Behat\Behat\Exception\PendingException',
+                )
+            )) {
+                $baseName = sprintf(
+                    '%s/screenshots/%s-%s',
+                    dirname(__DIR__),
+                    date('YmdHis'),
+                    trim(preg_replace('/\\W+/', '_', strtolower($event->getStep()->getText())), '_')
+                );
+                // Assume screenshot is a PNG
+                file_put_contents(
+                    $baseName.'.png',
+                    $this->getSession()->getDriver()->getScreenshot()
+                );
+                file_put_contents(
+                    $baseName.'.html',
+                    $this->getSession()->getDriver()->getContent()
+                );
+            }
         }
     }
 }
