@@ -30,8 +30,10 @@ if ($route instanceof Aura\Router\Route) {
         /** @var \Alaress\Session\Session $session */
         /** @var \Schoolbox\User $user */
         $session = $di->get('session');
-        $user    = $session->getUser();
-        $session->updateLastTime();
+        $user    = $session->getAuthUser();
+        if ($session->isAuthSessionAlive()) {
+            $session->updateLastTime();
+        }
 
         /** @var \Alaress\Authorizer\Authorizer $authorizer */
         $authorizer = $di->get('authorizer');

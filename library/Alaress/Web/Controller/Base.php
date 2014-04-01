@@ -123,12 +123,12 @@ abstract class Base {
     }
 
     /**
-     * Gets the current user out of the session.
+     * Gets the current authenticated user out of the session.
      *
      * @return User
      */
     public function getUser() {
-        return $this->getSession()->getUser();
+        return $this->getSession()->getAuthUser();
     }
 
     /**

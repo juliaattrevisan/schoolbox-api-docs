@@ -46,7 +46,7 @@ class IsRouteAuthorized {
      */
     public function execute($name, $params = array(), User $user = null) {
         if (!($user instanceof User)) {
-            $user = $this->getSession()->getUser();
+            $user = $this->getSession()->getAuthUser();
         }
         return $this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $user);
     }

@@ -34,15 +34,10 @@ class Session extends BaseSession {
      *
      * @return User
      */
-    public function getUser() {
-        $authSession   = $this->newSegment(null);
-        $lastTime      = $authSession->lasttime;
-        $sessionLength = $this->getConfig()->get('session_length');
-
-        // Session timed out: don't get the user.
+    public function getAuthUser() {
         $user = null;
-        if (!($lastTime + $sessionLength < $this->getRequestTime())) {
-            $user = $authSession->user;
+        if ($this->isAuthSessionAlive()) {
+            $user = $this->newSegment(null)->user;
         }
         return ($user instanceof User) ? $user : new User();
     }
@@ -54,6 +49,21 @@ class Session extends BaseSession {
     public function updateLastTime() {
         $authSession           = $this->newSegment(null);
         $authSession->lasttime = $this->getRequestTime();
+    }
+
+    /**
+     * Is the current user authentication session alive (does it exist, and has
+     * it not expired?)
+     *
+     * @return bool
+     */
+    public function isAuthSessionAlive() {
+        $authSession   = $this->newSegment(null);
+        $lastTime      = $authSession->lasttime;
+        $sessionLength = $this->getConfig()->get('session_length');
+
+        // Session timed out: don't get the user.
+        return (!($lastTime + $sessionLength < $this->getRequestTime()));
     }
 
     /**
