@@ -88,26 +88,139 @@ class Controller extends Base {
     public function createBooking($id) {
         /** @var Item\Model $resource */
         $resource = $this->getResourceMapper()->findById($id);
-        $booking  = $this->createBookingFromPostData($resource);
+        $booking  = null;
 
-        // Create a related booking for any related items that were chosen.
-        $relatedSelections = $this->getRequest()->post['related_item'] ?: array();
-        if (!empty($relatedSelections)) {
-            foreach ($resource->getRelatedResourceList() as $relatedResource) {
-                if (in_array($relatedResource->getId(), $relatedSelections)) {
-                    $relatedBooking = $this->createBookingFromPostData($relatedResource);
-                    $booking->addRelatedBooking($relatedBooking);
+        // Validate this item.
+        $code   = 200;
+        $errors = $this->validateBookingFromPostData($resource);
+        if (empty($errors)) {
+            $booking = $this->createBookingFromPostData($resource);
+            $relatedSelections = $this->getRequest()->post['related_item'] ?: array();
+            if (!empty($relatedSelections)) {
+                foreach ($resource->getRelatedResourceList() as $relatedResource) {
+                    if (in_array($relatedResource->getId(), $relatedSelections)) {
+                        $relatedBooking = $this->createBookingFromPostData($relatedResource);
+                        $booking->addRelatedBooking($relatedBooking);
+                    }
+                }
+                if (count($booking->getRelatedBookingList())) {
+                    $this->getBookingMapper()->saveRelatedBookings($booking);
                 }
             }
-            if (count($booking->getRelatedBookingList())) {
-                $this->getBookingMapper()->saveRelatedBookings($booking);
+        }
+        else {
+            $code = 400;
+        }
+
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->setCode($code);
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => array(
+                        'item'   => $booking,
+                        'errors' => $errors,
+                    ),
+                )
+            );
+        }
+        else {
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouter()->generate('resourceItem.read', array('id' => $id))
+            );
+        }
+
+        // Create a related booking for any related items that were chosen.
+
+        // and redirect somewhere.
+        // Was a JSON request made instead? If so return JSON with:
+        // * response code: 200=ok, 400=not ok
+        // * item: item if it was successfully created
+        // * errors: empty if there are no errors, a list of errors otherwise.
+    }
+
+    /**
+     * Attempts to validate the creation of a booking from post data.
+     *
+     * @param  Item\Model $resource
+     * @return array
+     */
+    protected function validateBookingFromPostData(Item\Model $resource) {
+        // Check:
+        // Beginning and end of booking are valid datetime
+        $errors    = array();
+        $startDate = null;
+        $endDate   = null;
+        try {
+            $startDate = $this->getDateFromForm('start_datetime');
+        }
+        catch (\UnexpectedValueException $e) {
+            $errors['start_datetime'][] = 'invalid';
+        }
+        try {
+            $endDate = $this->getDateFromForm('end_datetime');
+        }
+        catch (\UnexpectedValueException $e) {
+            $errors['end_datetime'][] = 'invalid';
+        }
+
+        // As long as I have startTime, I can check leadtime.
+        if (isset($startDate)) {
+            $interval = $resource->getMinLeadTime()->getAsDateInterval();
+            $earliest = new DateTime();
+            $earliest->add($interval);
+            if ($earliest > $startDate) {
+                $errors['start_datetime'][] = 'too_early';
             }
         }
 
-        // and redirect somewhere.
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.read', array('id' => $id))
+        // I need both start and end to check reservation span..
+        if (isset($startDate, $endDate)) {
+            $minInterval = $resource->getMinReservationTime()->getAsDateInterval();
+            $maxInterval = $resource->getMaxReservationTime()->getAsDateInterval();
+
+            $start = clone $startDate;
+            $start->add($minInterval);
+            if ($start < $endDate) {
+                $errors['end_datetime'][] = 'too_short';
+            }
+            $start = clone $startDate;
+            $start->add($maxInterval);
+            if ($start > $endDate) {
+                $errors['end_datetime'][] = 'too_long';
+            }
+        }
+
+        // Check conflicting bookings
+        return $errors;
+
+        // If there's any related resources: validate for those too.
+        // Ensure that the user has the right to book this page
+        // (though that's an authentication issue, not a data integrity one)
+    }
+
+    /**
+     * Creates a date object out of the datepicker and inputs.
+     *
+     * @param  string $paramName
+     * @return DateTime
+     * @throws \UnexpectedValueException if creating the date doesn't work
+     */
+    protected function getDateFromForm($paramName) {
+        $datetime = DateTime::createFromFormat(
+            'd/m/Y g:iA',
+            sprintf(
+                '%s %02d:%02d%s',
+                $this->getRequest()->post[$paramName]['date'],
+                $this->getRequest()->post[$paramName]['hour'],
+                $this->getRequest()->post[$paramName]['minute'],
+                $this->getRequest()->post[$paramName]['meridien']
+            )
         );
+        if (!($datetime instanceof DateTime)) {
+            throw new \UnexpectedValueException('Could not build date out of form inputs');
+        }
+        return $datetime;
     }
 
     /**
@@ -141,10 +254,12 @@ class Controller extends Base {
         // Currently I can't setStartDateTime() and have that propogate to
         // startDate and startTime.
         // Event doesn't currently take Alaress_Date_Format objects either.
-        $startDate = new Alaress_Date_Format($this->getRequest()->post['start_datetime']['date'], 'd/m/y');
-        $endDate   = new Alaress_Date_Format($this->getRequest()->post['end_datetime']['date'], 'd/m/y');
-        $event->setStartDate($startDate->getDatabaseDate());
-        $event->setEndDate($endDate->getDatabaseDate());
+        $startDate = $this->getDateFromForm('start_datetime');
+        $endDate   = $this->getDateFromForm('end_datetime');
+        $event->setStartDate($startDate->format('Y-m-d'));
+        $event->setStartTime($startDate->format('H:i:s'));
+        $event->setEndDate($endDate->format('Y-m-d'));
+        $event->setEndTime($endDate->format('H:i:s'));
 
         // Convert time inputs to datetimes.
         $startTime = DateTime::createFromFormat(
