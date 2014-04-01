@@ -71,6 +71,11 @@ AUTHNREQUEST;*/
 </samlp:AuthnRequest>
 AUTHNREQUEST;*/
 
+        $authncontext = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport';
+        if ($this->_settings->useKerberos) {
+            $authncontext = 'urn:federation:authentication:windows';
+        }
+
 // Working Web Form
 $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
@@ -83,7 +88,7 @@ $request = <<<AUTHNREQUEST
     AssertionConsumerServiceURL="{$this->_settings->spReturnUrl}">
     <saml:Issuer>{$this->_settings->spIssuer}</saml:Issuer>
     <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+        <saml:AuthnContextClassRef>{$authncontext}</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>
 </samlp:AuthnRequest>
 AUTHNREQUEST;
