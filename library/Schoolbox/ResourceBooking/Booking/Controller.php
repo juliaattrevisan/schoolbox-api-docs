@@ -147,7 +147,7 @@ class Controller extends Base {
         $event->setEndDate($endDate->getDatabaseDate());
 
         // Convert time inputs to datetimes.
-        $startTime = \DateTime::createFromFormat(
+        $startTime = DateTime::createFromFormat(
             'g:iA',
             sprintf(
                 '%02d:%02d%s',
@@ -156,7 +156,10 @@ class Controller extends Base {
                 $this->getRequest()->post['start_datetime']['meridien']
             )
         );
-        $endTime = \DateTime::createFromFormat(
+        if ($startTime instanceof DateTime) {
+            $event->setStartTime($startTime->format('H:i'));
+        }
+        $endTime = DateTime::createFromFormat(
             'g:iA',
             sprintf(
                 '%02d:%02d%s',
@@ -165,8 +168,9 @@ class Controller extends Base {
                 $this->getRequest()->post['end_datetime']['meridien']
             )
         );
-        $event->setStartTime($startTime->format('H:i'));
-        $event->setEndTime($endTime->format('H:i'));
+        if ($endTime instanceof DateTime) {
+            $event->setEndTime($endTime->format('H:i'));
+        }
 
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
 
