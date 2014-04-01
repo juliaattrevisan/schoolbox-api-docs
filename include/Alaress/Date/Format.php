@@ -286,4 +286,19 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 		
 		return $this->getStrategy()->compare($other->getStrategy());
 	}
+
+	/**
+	 * Compares dates of two Alaress_Date_Format objects, ignoring the time
+	 * component completely.
+	 *
+	 * @param Alaress_Date_Format $other
+	 *
+	 * @return int
+	 */
+	public function compareDateOnly($other) {
+		if (!($other instanceof Alaress_Date_Format)) {
+			return 0;
+		}
+		return strcmp($this->getDatabaseDate(), $other->getDatabaseDate());
+	}
 }

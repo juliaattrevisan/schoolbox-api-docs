@@ -234,7 +234,7 @@ class UnitInstance implements ISoftDeletable {
      */
     public function isBeforeOpenDate() {
         $date = new Alaress_Date_Format(new \DateTime());
-        return $date->compare($this->getOpenDate()) < 0;
+        return $date->compareDateOnly($this->getOpenDate()) < 0;
     }
 
     /**
@@ -244,6 +244,6 @@ class UnitInstance implements ISoftDeletable {
      */
     public function isAfterDueDate() {
         $date = new Alaress_Date_Format(new \DateTime());
-        return $date->compare($this->getDueDate()) > 0;
+        return $date->compareDateOnly($this->getDueDate()) > 0;
     }
 }
