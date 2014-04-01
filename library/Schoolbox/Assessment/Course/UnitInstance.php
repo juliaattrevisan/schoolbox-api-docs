@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress_Date_Format;
+use Alaress_Date_Relative;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
@@ -245,5 +246,31 @@ class UnitInstance implements ISoftDeletable {
     public function isAfterDueDate() {
         $date = new Alaress_Date_Format(new \DateTime());
         return $date->compareDateOnly($this->getDueDate()) > 0;
+    }
+
+    /**
+     * Retrieves a time relative to whenever the course unit opens.
+     *
+     * It opens on 12am of the open date.
+     *
+     * @return Alaress_Date_Relative
+     */
+    public function getRelativeOpenDate() {
+        $date = clone $this->getOpenDate()->getDateTimeObject();
+        $date->modify('00:00:00');
+        return new Alaress_Date_Relative($date);
+    }
+
+    /**
+     * Retrieves a time relative to whenever the course unit closes.
+     *
+     * It closes on 12am of the day after the due date.
+     *
+     * @return Alaress_Date_Relative
+     */
+    public function getRelativeDueDate() {
+        $date = clone $this->getDueDate()->getDateTimeObject();
+        $date->modify('00:00:00 +1 day');
+        return new Alaress_Date_Relative($date);
     }
 }
