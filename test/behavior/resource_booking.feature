@@ -10,7 +10,7 @@ Scenario: Set a resource administrator
   And   I log in as "alaress" with password "alaress"
   # Different permission for resource management service:
   # Read, Write: currently do nothing
-  # Moderate: creates resource items and categories, can confirm bookings
+  # Moderate: creates resource items and categories, can approve bookings
   When  I fill in "search-field" with "Walter White"
   And   I press "search-button"
   And   I follow "Modify User"
@@ -53,7 +53,7 @@ Scenario: Manage resource categories
   # Delete one
   When  I follow "To be deleted"
   And   I press "resourcecategory-delete"
-  # There should be a confirm here, but currently there is not.
+  # There should be a approve here, but currently there is not.
   Then  I should see "Textbooks" in the ".resourcecategory-list" element
   And   I should see "Projectors" in the ".resourcecategory-list" element
   And   I should not see "To be deleted" in the ".resourcecategory-list" element
@@ -165,7 +165,7 @@ Scenario: Check resource permissions
   Then  I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
-  # But I can't edit them, or confirm bookings for them
+  # But I can't edit them, or approve bookings for them
   When  I go to "/resource-booking/item/1/edit"
   # Selenium driver doesn't know how to get the status code.
   # Then  the response status code should be 403
@@ -298,8 +298,8 @@ Scenario: Booking a moderated resource
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
   Then  I should see pending booking at "2:00pm +1 days"
-  And   I should not be able to confirm booking at "2:00pm +1 days"
-  # Log in as someone who can confirm and reject this booking
+  And   I should not be able to approve booking at "2:00pm +1 days"
+  # Log in as someone who can approve and reject this booking
   Given I log out
   And   I log in as "cglenn" with password "password"
   When  I go to "/resource-booking/item"
@@ -309,7 +309,7 @@ Scenario: Booking a moderated resource
   When  I reject booking at "3pm +3 days"
   Then  I should see rejected booking at "2:00pm +1 days"
   # I changed my mind, approve it after all
-  When  I confirm booking at "3pm +3 days"
+  When  I approve booking at "3pm +3 days"
   Then  I should see approved booking at "2:00pm +1 days"
 
 #Scenario: Booking a managed resource
@@ -332,10 +332,10 @@ Scenario: Cancelling a booking
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should see confirmed booking at "3pm +3 days"
+  Then  I should see approved booking at "3pm +3 days"
   # And cancel it
   When  I cancel booking at "3pm +3 days"
-  Then  I should not see confirmed booking at "3pm +3 days"
+  Then  I should not see approved booking at "3pm +3 days"
 
 @resource-booking @resource-booking-errors
 Scenario: Double-booking an item - end time overlaps another
@@ -352,7 +352,7 @@ Scenario: Double-booking an item - end time overlaps another
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see confirmed booking at "12am +2 days"
+  Then  I should not see approved booking at "12am +2 days"
   And   I should receive an error for double booking
 
 @resource-booking @resource-booking-errors
@@ -372,7 +372,7 @@ Scenario: Double-booking an item - start time overlaps another
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see confirmed booking at "1am +3 days"
+  Then  I should not see approved booking at "1am +3 days"
   And   I should receive an error for double booking
 
 @resource-booking @resource-booking-errors
@@ -390,7 +390,7 @@ Scenario: Booking an item for before the min lead time
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "AM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see confirmed booking at "3pm +3 days"
+  Then  I should not see approved booking at "3pm +3 days"
   And   I should receive an error for not enough lead time
 
 @resource-booking @resource-booking-errors
@@ -410,7 +410,7 @@ Scenario: Booking an item for less than min booking time
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see confirmed booking at "3pm +3 days"
+  Then  I should not see approved booking at "3pm +3 days"
   And   I should receive an error for short booking
 
 @resource-booking @resource-booking-errors
@@ -430,8 +430,8 @@ Scenario: Booking an item for more than max booking time
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see confirmed booking at "3pm +3 days"
+  Then  I should not see approved booking at "3pm +3 days"
   And   I should receive an error for long booking
 
 # Test booking on a timetable
-# Test confirming of booking
+# Test approving of booking

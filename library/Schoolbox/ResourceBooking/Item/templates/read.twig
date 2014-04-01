@@ -105,9 +105,11 @@
                         return $.fullCalendar.formatDate(date, "yyyy-MM-dd'T'HH:mm:ss") + sign + hours + ':' + minutes
                     }
                     // Set data as attributes, that way selectors can query them
+                    // End of event might not be defined if it's the same as
+                    // start, too.
                     element.attr({
                         'data-start':  getTimeWithTimezone(event.start),
-                        'data-end':    getTimeWithTimezone(event.end),
+                        'data-end':    getTimeWithTimezone(event.end || event.start),
                         'data-allday': event.allDay ? 1 : 0
                     })
                     return element
@@ -128,18 +130,20 @@
                     data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
 
                     data.date = calendarDate(calEvent.start)
-                    data.date += " &ndash; "
-                    data.date += calendarDate(calEvent.end)
+                    if (calEvent.end) {
+                        data.date += " &ndash; "
+                        data.date += calendarDate(calEvent.end)
+                    }
 
                     // Custom butonyes for bookings
                     data.actions = []
                     $.each(calEvent.data.booking.buttons, function() {
                         data.actions.push(
-                                $('<a class="btn float-right" />')
-                                        .addClass(this.class)
-                                        .attr('href', this.href)
-                                        .text(this.label)
-                                        .prepend('<span />')
+                            $('<a class="btn float-right" />')
+                                .addClass(this.class)
+                                .attr('href', this.href)
+                                .text(this.label)
+                                .prepend('<span />')
                         )
                     })
                     c.bubble.display('edit', data, jsEvent, this)
