@@ -34,6 +34,22 @@ class Subcontext_CalendarContext extends BaseContext {
     }
 
     /**
+     * Gets the calendar element out of the page.
+     *
+     * @param $locator
+     *
+     * @return Element\NodeElement
+     * @throws Exception
+     */
+    public function getCalendar($locator) {
+        $calendar = $this->getSession()->getPage()->find('css', $locator);
+        if (!($calendar instanceof Element\NodeElement)) {
+            throw new Exception("Calendar \"$calendar\" not found");
+        }
+        return $calendar;
+    }
+
+    /**
      * Retrieves a date element from the calendar.
      *
      * @param $locator
@@ -46,10 +62,7 @@ class Subcontext_CalendarContext extends BaseContext {
         $this->goToDate($locator, $timeString);
         $date   = new DateTime($timeString);
         $format = $date->format('Y-m-d');
-        $calendar = $this->getSession()->getPage()->find('css', $locator);
-        if (!($calendar instanceof Element\NodeElement)) {
-            throw new Exception("Calendar \"$calendar\" not found");
-        }
+        $calendar = $this->getCalendar($locator);
         $dateElement = $calendar->find('css', ".fc-day[data-date=\"$format\"]");
         if (!($dateElement instanceof Element\NodeElement)) {
             throw new Exception("Element for date \"$locator\" on \"$calendar\" not found");
