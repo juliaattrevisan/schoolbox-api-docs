@@ -3,74 +3,22 @@
     {% if item.minLeadTime.minuteTotal %}
         <li>
             Must be booked
-            {# Piece together a format - %D days, %H hours, %I minutes #}
-            {% spaceless %}
-                {% if item.minLeadTime.dayTotal %}
-                    {{ item.minLeadTime.dayTotal }} day(s)
-                    {%- if item.minLeadTime.hourRemainder -%}
-                        , {{ item.minLeadTime.hourRemainder }} hour(s)
-                    {%- endif -%}
-                    {%- if item.minLeadTime.minuteRemainder -%}
-                        , {{ item.minLeadTime.minuteRemainder }} minute(s)
-                    {%- endif -%}
-                {% elseif item.minLeadTime.hourTotal %}
-                    {{ item.minLeadTime.hourTotal }} hour(s)
-                    {%- if item.minLeadTime.minuteRemainder -%}
-                        , {{ item.minLeadTime.minuteRemainder }} minute(s)
-                    {%- endif -%}
-                {% elseif item.minLeadTime.minuteRemainder %}
-                    {{ item.minLeadTime.minuteRemainder }} minute(s)
-                {% endif %}
-                in advance.
-            {% endspaceless %}
+            {% include 'sub/interval.twig' with {interval: item.minLeadTime} %}
+            in advance.
         </li>
     {% endif %}
 
     {% if item.minReservationTime.minuteTotal %}
         <li>
-            {% spaceless %}
-                Must be booked for at least
-                {% if item.minReservationTime.dayTotal %}
-                    {{ item.minReservationTime.dayTotal }} day(s)
-                    {%- if item.minReservationTime.hourRemainder -%}
-                        , {{ item.minReservationTime.hourRemainder }} hour(s)
-                    {%- endif -%}
-                    {%- if item.minReservationTime.minuteRemainder -%}
-                        , {{ item.minReservationTime.minuteRemainder }} minute(s)
-                    {%- endif -%}
-                {% elseif item.minReservationTime.hourTotal %}
-                    {{ item.minReservationTime.hourTotal }} hour(s)
-                    {% if item.minReservationTime.minuteRemainder %}
-                        , {{ item.minReservationTime.minuteRemainder }} minute(s)
-                    {% endif %}
-                {% elseif item.minReservationTime.minuteRemainder %}
-                    {{ item.minReservationTime.minuteRemainder }} minute(s)
-                {% endif %}.
-            {% endspaceless %}
+            Must be booked for at least
+            {% include 'sub/interval.twig' with {interval: item.minReservationTime} %}.
         </li>
     {% endif %}
 
     {% if item.maxReservationTime.minuteTotal %}
         <li>
-            {% spaceless %}
-                May not be booked for more than
-                {% if item.maxReservationTime.dayTotal %}
-                    {{ item.maxReservationTime.dayTotal }} day(s)
-                    {%- if item.maxReservationTime.hourRemainder -%}
-                        , {{ item.maxReservationTime.hourRemainder }} hour(s)
-                    {%- endif -%}
-                    {%- if item.maxReservationTime.minuteRemainder -%}
-                        , {{ item.maxReservationTime.minuteRemainder }} minute(s)
-                    {%- endif -%}
-                {% elseif item.maxReservationTime.hourTotal %}
-                    {{ item.maxReservationTime.hourTotal }} hour(s)
-                    {%- if item.maxReservationTime.minuteRemainder -%}
-                        , {{ item.maxReservationTime.minuteRemainder }} minute(s)
-                    {%- endif -%}
-                {% elseif item.maxReservationTime.minuteRemainder %}
-                    {{ item.maxReservationTime.minuteRemainder }} minute(s)
-                {% endif %}.
-            {% endspaceless %}
+            May not be booked for more than
+            {% include 'sub/interval.twig' with {interval: item.maxReservationTime} %}.
         </li>
     {% endif %}
 
