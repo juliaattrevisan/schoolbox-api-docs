@@ -117,6 +117,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
     /**
      * Asserts that there's no booking with the given status starting at this time.
      *
+     * This expects that the calendar actually exists.
+     *
      * @Then /^(?:|I )should not see (?P<status>approved|pending|rejected) booking at "(?P<timeString>[^"]*)"$/
      *
      * @param  string $timeString When should the booking be for?
