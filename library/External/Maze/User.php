@@ -364,19 +364,6 @@ class External_Maze_User implements External_UserInterface {
 	 * @return mixed
 	 */
 	public function getStudentContactList($externalUserId) {
-
-		/* First find the student so you know the Family identifier
-		 */
-		$query = "
-			SELECT FAMILY
-			FROM ST
-			WHERE STKEY = '{$externalUserId}'
-		";
-
-		$student = $this->getDb()->getRow($query);
-
-		/* Get the family's data
-		 */
 		$query = "
 			SELECT
 				DFKEY AS StudentContactID,
@@ -405,7 +392,8 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentContactSpouseRelation
 			FROM DF
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
-			WHERE DFKEY = '{$student['FAMILY']}'
+			LEFT JOIN ST ON DF.DFKEY = ST.FAMILY
+			WHERE ST.STKEY = '{$externalUserId}'
 		";
 
 		return $this->getDb()->getAll($query);
