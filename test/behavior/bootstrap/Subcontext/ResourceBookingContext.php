@@ -80,22 +80,53 @@ class Subcontext_ResourceBookingContext extends BaseContext {
     }
 
     /**
-     * Asserts that there's a approved booking starting at this time.
-     *
-     * @Then /^(?:|I )should see approved booking at "(?P<timeString>[^"]*)"$/
+     * Is there a booking with the given status starting at this time?
      *
      * @param  string $timeString When should the booking be for?
-     * @throws Exception if no confirmed booking was found
+     * @param  string $status     The status (approved, pending or rejected)
+     * @return bool
      */
-    public function assertBookingApproved($timeString) {
+    public function bookingExists($timeString, $status) {
         /** @var Subcontext_CalendarContext $calendarContext */
         $calendarContext = $this->getMainContext()->getSubcontext('calendar');
         $calendarContext->clickDate('#calendar', $timeString);
         foreach ($calendarContext->getEventsStartingAtTime('#calendar', $timeString) as $eventElement) {
-            if ($eventElement->hasClass('approved')) {
-                return;
+            /** @var Element\NodeElement $eventElement */
+            if ($eventElement->hasClass($status)) {
+                return true;
             }
         }
-        throw new Exception("No confirmed booking found in calendar for time \"$timeString\"");
+        return false;
     }
+
+    /**
+     * Asserts that there's a booking with the given status starting at this time.
+     *
+     * @Then /^(?:|I )should see (?P<status>approved|pending|rejected) booking at "(?P<timeString>[^"]*)"$/
+     *
+     * @param  string $timeString When should the booking be for?
+     * @param  string $status     The status (approved, pending or rejected)
+     * @throws Exception if no booking was found
+     */
+    public function assertBookingExists($timeString, $status) {
+        if (!$this->bookingExists($timeString, $status)) {
+            throw new Exception("No $status booking found in calendar for time \"$timeString\"");
+        }
+    }
+
+    /**
+     * Asserts that there's no booking with the given status starting at this time.
+     *
+     * @Then /^(?:|I )should not see (?P<status>approved|pending|rejected) booking at "(?P<timeString>[^"]*)"$/
+     *
+     * @param  string $timeString When should the booking be for?
+     * @param  string $status     The status (approved, pending or rejected)
+     * @throws Exception if a booking was found
+     */
+    public function assertBookingNotExists($timeString, $status) {
+        if ($this->bookingExists($timeString, $status)) {
+            throw new Exception("A $status booking was found in calendar for time \"$timeString\"");
+        }
+    }
+
 }
