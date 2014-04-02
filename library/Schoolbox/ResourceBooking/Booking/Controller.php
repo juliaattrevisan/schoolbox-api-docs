@@ -63,8 +63,10 @@ class Controller extends Base {
                 $item->getEvent()->setStartTime($startDate->format('H:i'));
                 $item->getEvent()->setStartDateTime($startDate);
 
-                $endDate = new DateTime();
-                $endDate->setTimestamp($startDate->getTimestamp() + $resource->getMinReservationTime()->getSecondTotal());
+                // Use the DateInterval object to adjust datetimes, to make days
+                // behave as expected over DST changes.
+                $endDate = clone $startDate;
+                $endDate->add($resource->getMinReservationTime()->getAsDateInterval());
                 $item->getEvent()->setEndDate($endDate->format('d/m/Y'));
                 $item->getEvent()->setEndTime($endDate->format('H:i'));
                 $item->getEvent()->setEndDateTime($endDate);
