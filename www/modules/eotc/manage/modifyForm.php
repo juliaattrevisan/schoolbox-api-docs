@@ -150,17 +150,15 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* If RAMS file is required and one hasn't been uploaded yet,
 			 * save it; otherwise ignore it
+			 *
+			 * As of SB-4367 RAMs files are no longer mandatory, even if
+			 * the checkbox setting declares that one must exist
 			 */
 			if ($event->getMetadata()->getRamsRequired()) {
 
-				/* A RAMS file doesn't exist, nor uploaded, but was required
-				 */
-				if (!$event->getMetadata()->getRamsFiles()->count() && !strlen($_FILES['ramsFile']['name'])) {
-					error(161);
-				}
 				/* A RAMS file was uploaded; replace all existing ones
 				 */
-				else if (strlen($_FILES['ramsFile']['name'])) {
+				if (strlen($_FILES['ramsFile']['name'])) {
 
 					/* Empty old RAMS objects and put the new one in
 					 */
