@@ -33,7 +33,10 @@ class Alaress_Rss_Stream {
 	 */
 	public function __construct($source = null) {
 		if ($source !== null) {
-			$this->setSource($source);
+
+			/* Silently enforce http:// protocol
+			 */
+			$this->setSource(str_replace('feed://', 'http://', $source));
 		}
 	}
 
