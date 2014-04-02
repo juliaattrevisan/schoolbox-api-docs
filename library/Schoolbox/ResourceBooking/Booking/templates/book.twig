@@ -52,8 +52,15 @@ $(document).ready(function() {
     <input type="hidden" name="id" value="{{ item.id }}"/>
     <table class="standardForm table">
         <tr>
+            <td class="formLabelWidth"><h4>Rules</h4></td>
+            <td>
+                {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
+            </td>
+        </tr>
+        <tr>
             <td class="formLabelWidth"><h4>Begin</h4></td>
             <td>
+                {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
                 {% include 'sub/datetimeInput.twig' with {
                     value: item.event.startDateTime,
                     name:  'start_datetime'

@@ -1,0 +1,87 @@
+{# Booking rules for a resource. #}
+<ul>
+    {% if item.minLeadTime.minuteTotal %}
+        <li>
+            Must be booked
+            {# Piece together a format - %D days, %H hours, %I minutes #}
+            {% spaceless %}
+                {% if item.minLeadTime.dayTotal %}
+                    {{ item.minLeadTime.dayTotal }} day(s)
+                    {%- if item.minLeadTime.hourRemainder -%}
+                        , {{ item.minLeadTime.hourRemainder }} hour(s)
+                    {%- endif -%}
+                    {%- if item.minLeadTime.minuteRemainder -%}
+                        , {{ item.minLeadTime.minuteRemainder }} minute(s)
+                    {%- endif -%}
+                {% elseif item.minLeadTime.hourTotal %}
+                    {{ item.minLeadTime.hourTotal }} hour(s)
+                    {%- if item.minLeadTime.minuteRemainder -%}
+                        , {{ item.minLeadTime.minuteRemainder }} minute(s)
+                    {%- endif -%}
+                {% elseif item.minLeadTime.minuteRemainder %}
+                    {{ item.minLeadTime.minuteRemainder }} minute(s)
+                {% endif %}
+                in advance.
+            {% endspaceless %}
+        </li>
+    {% endif %}
+
+    {% if item.minReservationTime.minuteTotal %}
+        <li>
+            {% spaceless %}
+                Must be booked for at least
+                {% if item.minReservationTime.dayTotal %}
+                    {{ item.minReservationTime.dayTotal }} day(s)
+                    {%- if item.minReservationTime.hourRemainder -%}
+                        , {{ item.minReservationTime.hourRemainder }} hour(s)
+                    {%- endif -%}
+                    {%- if item.minReservationTime.minuteRemainder -%}
+                        , {{ item.minReservationTime.minuteRemainder }} minute(s)
+                    {%- endif -%}
+                {% elseif item.minReservationTime.hourTotal %}
+                    {{ item.minReservationTime.hourTotal }} hour(s)
+                    {% if item.minReservationTime.minuteRemainder %}
+                        , {{ item.minReservationTime.minuteRemainder }} minute(s)
+                    {% endif %}
+                {% elseif item.minReservationTime.minuteRemainder %}
+                    {{ item.minReservationTime.minuteRemainder }} minute(s)
+                {% endif %}.
+            {% endspaceless %}
+        </li>
+    {% endif %}
+
+    {% if item.maxReservationTime.minuteTotal %}
+        <li>
+            {% spaceless %}
+                May not be booked for more than
+                {% if item.maxReservationTime.dayTotal %}
+                    {{ item.maxReservationTime.dayTotal }} day(s)
+                    {%- if item.maxReservationTime.hourRemainder -%}
+                        , {{ item.maxReservationTime.hourRemainder }} hour(s)
+                    {%- endif -%}
+                    {%- if item.maxReservationTime.minuteRemainder -%}
+                        , {{ item.maxReservationTime.minuteRemainder }} minute(s)
+                    {%- endif -%}
+                {% elseif item.maxReservationTime.hourTotal %}
+                    {{ item.maxReservationTime.hourTotal }} hour(s)
+                    {%- if item.maxReservationTime.minuteRemainder -%}
+                        , {{ item.maxReservationTime.minuteRemainder }} minute(s)
+                    {%- endif -%}
+                {% elseif item.maxReservationTime.minuteRemainder %}
+                    {{ item.maxReservationTime.minuteRemainder }} minute(s)
+                {% endif %}.
+            {% endspaceless %}
+        </li>
+    {% endif %}
+
+    {# Booking moderation status #}
+    {% if item.moderationType.open %}
+        <li>This item may be booked by anybody, and the booking will be automatically confirmed.</li>
+    {% endif %}
+    {% if item.moderationType.moderated %}
+        <li>This item may be booked by anybody, but the booking must be confirmed by a moderator.</li>
+    {% endif %}
+    {% if item.moderationType.managed %}
+        <li>This item may only be booked by its moderators.</li>
+    {% endif %}
+</ul>
