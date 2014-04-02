@@ -326,7 +326,7 @@ Scenario: Cancelling a booking
   And   I log in as "sberryhill" with password "password"
   When  I go to "/resource-booking/item"
   And   I view details for resource "A single projector"
-  And   I start booking resource for "+3 days"
+  And   I start booking resource for "+6 days"
   When  I fill in "start_datetime[hour]" with "3"
   And   I fill in "start_datetime[minute]" with "00"
   And   I select "PM" from "start_datetime[meridien]"
@@ -335,10 +335,10 @@ Scenario: Cancelling a booking
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
   And   wait for a "#calendar" element
-  Then  I should see approved booking at "3pm +3 days"
+  Then  I should see approved booking at "3pm +6 days"
   # And cancel it
-  When  I cancel booking at "3pm +3 days"
-  Then  I should not see approved booking at "3pm +3 days"
+  When  I cancel booking at "3pm +6 days"
+  Then  I should not see approved booking at "3pm +6 days"
 
 @resource-booking @resource-booking-errors
 Scenario: Double-booking an item - end time overlaps another
