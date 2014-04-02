@@ -69,6 +69,11 @@ class Healthcheck {
 		$this->MssqlConnection();
 	}
 
+	private function MazeCheckConnection(){
+		echo "\nMaze Connnection Check\n";
+		$this->MssqlConnection();
+	}
+
     private function SynergeticCheckTables(){
         echo "\nSynergetic Permission Check - Tables\n";
         $list[] = 'Addresses';
@@ -152,7 +157,7 @@ class Healthcheck {
         $splist[] = array(
             'spsConfigUserDefaultYearSemester',
             array(
-                array('@ID','1',SQLINT1,false,false, -1),
+                array('@ID','1',SQLINT4,false,false, -1),
             )
         );
 
@@ -166,6 +171,41 @@ class Healthcheck {
             }
         }
     }
+
+	/**
+	 * Test maze
+	 */
+	private function MazeCheckStoredProcedures() {
+		echo "\nSchoolpro Permission Check - Stored Procedures\n";
+		$db = new MSSQL();
+		$db->debug = true;
+
+		$splist[] = array(
+			'klp_GetTimetableStructure',
+			array(
+				array('@Today', date('Y-m-d'), SQLVARCHAR, false, true, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'klp_GetTimetable',
+			array(
+				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
+				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
+			)
+		);
+
+		foreach($splist as $sp){
+			$result = $db->executeProcedure($sp[0],$sp[1]);
+			echo "  ".$sp[0]." : ";
+			if($result['success']){
+				echo "OK\n";
+			}else{
+				echo "\n    Failed - ".mssql_get_last_message()."\n";
+			}
+		}
+	}
 
 	/**
 	 * Test chub
