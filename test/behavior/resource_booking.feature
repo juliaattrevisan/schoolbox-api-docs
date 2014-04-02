@@ -280,6 +280,7 @@ Scenario: Booking an open resource
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
+  And   wait for a "#calendar" element
   Then  I should see approved booking at "2:00pm +2 days"
 
 @resource-booking @resource-booking-moderated
@@ -297,6 +298,7 @@ Scenario: Booking a moderated resource
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
+  And   wait for a "#calendar" element
   Then  I should see pending booking at "2:00pm +1 days"
   And   I should not be able to approve booking at "2:00pm +1 days"
   # Log in as someone who can approve and reject this booking
@@ -332,6 +334,7 @@ Scenario: Cancelling a booking
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
+  And   wait for a "#calendar" element
   Then  I should see approved booking at "3pm +3 days"
   # And cancel it
   When  I cancel booking at "3pm +3 days"
@@ -352,7 +355,7 @@ Scenario: Double-booking an item - end time overlaps another
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see approved booking at "12am +2 days"
+  And   wait for a ".error" element
   And   I should receive an error for double booking
 
 @resource-booking @resource-booking-errors
@@ -372,7 +375,7 @@ Scenario: Double-booking an item - start time overlaps another
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see approved booking at "1am +3 days"
+  And   wait for a ".error" element
   And   I should receive an error for double booking
 
 @resource-booking @resource-booking-errors
@@ -390,7 +393,7 @@ Scenario: Booking an item for before the min lead time
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "AM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see approved booking at "3pm +3 days"
+  And   wait for a ".error" element
   And   I should receive an error for not enough lead time
 
 @resource-booking @resource-booking-errors
@@ -410,7 +413,7 @@ Scenario: Booking an item for less than min booking time
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see approved booking at "3pm +3 days"
+  And   wait for a ".error" element
   And   I should receive an error for short booking
 
 @resource-booking @resource-booking-errors
@@ -430,7 +433,7 @@ Scenario: Booking an item for more than max booking time
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
-  Then  I should not see approved booking at "3pm +3 days"
+  And   wait for a ".error" element
   And   I should receive an error for long booking
 
 # Test booking on a timetable
