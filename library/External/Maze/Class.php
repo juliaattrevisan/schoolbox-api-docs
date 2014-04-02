@@ -50,7 +50,7 @@ class External_Maze_Class implements External_ClassInterface {
 				ST.SURNAME AS Surname,
 				REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS YearLevel,
 				KGH.DESCRIPTION AS House,
-				'' AS MedicalAlert,
+				MEDICAL AS MedicalAlert,
 				'' AS SpecialNeedsFlag,
 				'' AS ClassCampus
 			FROM STMA
