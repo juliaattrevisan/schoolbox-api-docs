@@ -30,7 +30,8 @@ class Chain {
 		 * Checks occur in this order:
 		 *
 		 * Urgent,
-		 * Pending Awaiting Final Approval,
+		 * Pending Final Approval
+		 * Confirm RAMs,
 		 * Pending In Principle,
 		 * Pending RAMS,
 		 * Approved,
@@ -38,7 +39,7 @@ class Chain {
 		 * None (throws whacky exception)
  		 */
 		$pendingFinalApproval = new Type\PendingFinalApproval($event);
-		$pendingAwaitingFinalApproval = new Type\PendingAwaitingFinalApproval($event);
+		$pendingConfirmRAMs = new Type\PendingConfirmRAMs($event);
 		$pendingInPrincipleReview = new Type\PendingInPrincipleReview($event);
 		$pendingRamsReview = new Type\PendingRamsReview($event);
 		$approved = new Type\Approved($event);
@@ -51,8 +52,8 @@ class Chain {
 		$approved->setNext($rejected);
 		$pendingRamsReview->setNext($approved);
 		$pendingInPrincipleReview->setNext($pendingRamsReview);
-		$pendingAwaitingFinalApproval->setNext($pendingInPrincipleReview);
-		$pendingFinalApproval->setNext($pendingAwaitingFinalApproval);
+		$pendingConfirmRAMs->setNext($pendingInPrincipleReview);
+		$pendingFinalApproval->setNext($pendingConfirmRAMs);
 
 		/* Start motor
 		 */
