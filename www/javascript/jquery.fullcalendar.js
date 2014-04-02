@@ -682,16 +682,7 @@ function calendarDate(datetime) {
  * @return {String}
  */
 function calendarDateOnly(datetime) {
-    var S, p = datetime.toString().split(/[ :]/)
-
-    if(p[2] == 11 || p[2] == 12 || p[2] == 13) { S = 'th'; }
-    else { var i = p[2].charAt(p[2].length - 1)
-        if(i == 1) { S = 'st' }
-        else if(i == 2) { S = 'nd' }
-        else if(i == 3) { S = 'rd' }
-        else { S = 'th' }
-    }
-    return p[0] + ', ' + parseInt(p[2], 10) + S + ' ' + p[1]
+    return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
 }
 
 /**
@@ -700,21 +691,5 @@ function calendarDateOnly(datetime) {
  * @return {String}
  */
 function calendarTime(datetime) {
-    var hours   = datetime.getHours();
-    var meridian = '';
-    if (hours <= 12) {
-        meridian = 'am';
-        if (hours === 0) {
-            hours = 12;
-        }
-    }
-    else {
-        hours   -= 12;
-        meridian = 'pm';
-    }
-    var minutes = datetime.getMinutes().toString();
-    if (minutes.length === 1) {
-        minutes = '0'+minutes;
-    }
-    return (hours.toString() + ':' + minutes + meridian);
+    return $j.fullCalendar.formatDate(datetime, 'h:mmtt')
 }
