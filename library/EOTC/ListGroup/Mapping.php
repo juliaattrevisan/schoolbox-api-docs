@@ -24,8 +24,8 @@ class Mapping {
 	 */
 	private $mapping = array(
 		'Urgent',
-		'Pending Final Approval',
 		'Awaiting Final Approval',
+		'Confirm RAMs',
 		'Pending Initial Application Review',
 		'Pending RAMS Review',
 		'Approved',
@@ -67,11 +67,11 @@ class Mapping {
 	}
 
 	/**
-	 * Index of Pending Awaiting Final Approval events
+	 * Index of Pending Confirm RAMs events
 	 *
 	 * @return int
 	 */
-	public function getPendingAwaitingFinalApprovalReviewIndex() {
+	public function getPendingConfirmRAMsReviewIndex() {
 		return 2;
 	}
 

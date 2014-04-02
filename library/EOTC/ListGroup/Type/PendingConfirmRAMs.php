@@ -11,7 +11,7 @@
 namespace EOTC\ListGroup\Type;
 
 
-class PendingAwaitingFinalApproval extends Base {
+class PendingConfirmRAMs extends Base {
 
 	/**
 	 * Next status id
@@ -33,10 +33,10 @@ class PendingAwaitingFinalApproval extends Base {
 		 * RAMS Approved (RAMS Required)
 		 */
 		if (!$this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingAwaitingFinalApprovalReviewIndex());
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingConfirmRAMsReviewIndex());
 		}
 		else if ($this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isRamsApproved()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingAwaitingFinalApprovalReviewIndex());
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingConfirmRAMsReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it
