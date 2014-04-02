@@ -716,12 +716,7 @@ class External_Maze_User implements External_UserInterface {
 					";
 				}
 
-				//
-				// SB-2063 - Don't try to convert charsets for binary fields.
-				$convert_encoding = $this->getDb()->getConvertEncoding();
-				$this->getDb()->setConvertEncoding(false);
 				$photo = $this->getDb()->getRow($query);
-				$this->getDb()->setConvertEncoding($convert_encoding);
 
 				/* Purge all previously transformed copies
 				 */
