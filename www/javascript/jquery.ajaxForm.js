@@ -30,10 +30,10 @@
             params.data = self.form.serializeArray()
             $.ajax(params)
             .done(function(data, textStatus, jqXHR) {
-                self.form.trigger('ajaxForm.done', data, textStatus, jqXHR)
+                self.form.trigger('ajaxForm.done', [data, textStatus, jqXHR])
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
-                self.form.trigger('ajaxForm.fail', jqXHR, textStatus, errorThrown)
+                self.form.trigger('ajaxForm.fail', [jqXHR, textStatus, errorThrown])
             })
         })
     }
