@@ -294,15 +294,10 @@
 			}
 
 			/* For EOTC
+			 * Disabled need for files to be uploaded, regardless of the setting
 			 */
 			var validateRamsFile = function() {
-				var alreadyUploaded = $('input[data-ramsuploaded="1"]').length;
-				var ramsExists = $('input[name=ramsRequired]').length;
-				var ramsRequired = $('input[name=ramsRequired]').is(':checked');
-
-				if (ramsExists && ramsRequired && !alreadyUploaded) {
-					return true;
-				}
+				return false;
 			}
 
 			/* For EOTC
