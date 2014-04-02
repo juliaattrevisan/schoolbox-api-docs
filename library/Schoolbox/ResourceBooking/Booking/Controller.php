@@ -166,37 +166,51 @@ class Controller extends Base {
 
         // As long as I have startTime, I can check leadtime.
         if (isset($startDate)) {
-            $interval = $resource->getMinLeadTime()->getAsDateInterval();
+            // Start date before present gets covered by too_early
+            // Start time before earliest possible time
             $earliest = new DateTime();
-            $earliest->add($interval);
-            if ($earliest > $startDate) {
+            $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
+            if ($startDate < $earliest) {
                 $errors['start_datetime'][] = 'too_early';
             }
         }
 
-        // I need both start and end to check reservation span..
+        // I need both start and end to check reservation span.
         if (isset($startDate, $endDate)) {
-            $minInterval = $resource->getMinReservationTime()->getAsDateInterval();
-            $maxInterval = $resource->getMaxReservationTime()->getAsDateInterval();
-
-            $start = clone $startDate;
-            $start->add($minInterval);
-            if ($start < $endDate) {
+            // Obviously start must be before end (gets covered by too_short too)
+            if ($startDate > $endDate) {
+                $errors['end_datetime'][] = 'before_start';
+            }
+            // End date before earliest possible end
+            $earliestEnd = clone $startDate;
+            $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
+            if ($endDate < $earliestEnd) {
                 $errors['end_datetime'][] = 'too_short';
             }
-            $start = clone $startDate;
-            $start->add($maxInterval);
-            if ($start > $endDate) {
+            // End date after latest possible end
+            $latestEnd = clone $startDate;
+            $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
+            if ($endDate > $latestEnd) {
                 $errors['end_datetime'][] = 'too_long';
             }
+            // Check conflicting bookings as well for this item.
+            // Only check approved bookings. Wow, the calendar population method
+            // can do exactly that!
+            $conflictingBookings = $this->getBookingMapper()->findForResource(
+                $resource->getId(),
+                $startDate->getTimestamp(),
+                $endDate->getTimestamp(),
+                array(Status\Model::STATUS_APPROVED)
+            );
+            if (count($conflictingBookings)) {
+                $errors['start_datetime'][] = 'conflict';
+            }
         }
-
-        // Check conflicting bookings
-        return $errors;
 
         // If there's any related resources: validate for those too.
         // Ensure that the user has the right to book this page
         // (though that's an authentication issue, not a data integrity one)
+        return $errors;
     }
 
     /**
