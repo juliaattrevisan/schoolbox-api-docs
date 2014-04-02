@@ -119,6 +119,7 @@ abstract class Evaluation_Response extends DeprecatedModel
         $query = "SELECT question_id
                   FROM assess_question
                   WHERE section_id = " . $this->db->smartQuote($section_id) . "
+                  AND deleted_at IS NULL
                   ORDER BY sequence";
 
         $allQuestions = $this->db->getAll($query);
