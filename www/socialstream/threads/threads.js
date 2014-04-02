@@ -175,7 +175,7 @@
 
 				/* Steal focus
 				 */
-				$(this).closest('li').find('.addPostForm').find('.socialstream-form').find('textarea').focus();
+				$(this).closest('li').find('.socialstream-form').find('textarea').focus();
 			});
 		}
 
