@@ -18,7 +18,7 @@ use Alaress\Scheduler\Trigger\TriggerInterface;
  * Class CronScheduler
  * @package Alaress\Scheduler
  */
-class CronScheduler extends AbstractScheduler {
+abstract class CronScheduler extends AbstractScheduler {
 
 
     /**
@@ -31,8 +31,17 @@ class CronScheduler extends AbstractScheduler {
      */
     public function handleResponse($trigger, $command, $data) {
         // and reschedule the trigger to go again
-        $this->scheduleNotification($trigger);
+        $this->report($data);
+	    $this->debug->v("Rescheduling trigger");
+	    $this->scheduleNotification($trigger);
     }
 
+	/**
+	 * Report in an appropriate way, based on the data returned by the worker
+	 *
+	 * @param $data
+	 * @return mixed
+	 */
+	protected abstract function report($data);
 
 } 
