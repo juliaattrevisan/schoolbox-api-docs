@@ -375,32 +375,36 @@ class Controller extends Base {
                 );
             }
 
+            $status = $booking->getStatus()->getId();
+            if ($status != Status\Model::STATUS_APPROVED) {
+                $approveUrl = $this->getRouteIfAuthorized(
+                    'resourceBooking.approve',
+                    array('id' => $booking->getId())
+                );
+                if ($approveUrl !== false) {
+                    $buttons[] = array(
+                        'label' => 'Approve',
+                        'class' => 'tick booking-approve',
+                        'href'  => $approveUrl,
+                    );
+                }
+            }
+            if ($status != Status\Model::STATUS_REJECTED) {
+                $rejectUrl = $this->getRouteIfAuthorized(
+                    'resourceBooking.reject',
+                    array('id' => $booking->getId())
+                );
+                if ($rejectUrl !== false) {
+                    $buttons[] = array(
+                        'label' => 'Reject',
+                        'class' => 'reply booking-reject',
+                        'href'  => $rejectUrl,
+                    );
+                }
+            }
             switch ($booking->getStatus()->getId()) {
                 case Status\Model::STATUS_PENDING:
                     $class = 'pending';
-                    // Is approve/reject okay for this item?
-                    $approveUrl = $this->getRouteIfAuthorized(
-                        'resourceBooking.approve',
-                        array('id' => $booking->getId())
-                    );
-                    if ($approveUrl !== false) {
-                        $buttons[] = array(
-                            'label' => 'Approve',
-                            'class' => 'tick booking-approve',
-                            'href'  => $approveUrl,
-                        );
-                    }
-                    $rejectUrl = $this->getRouteIfAuthorized(
-                        'resourceBooking.reject',
-                        array('id' => $booking->getId())
-                    );
-                    if ($rejectUrl !== false) {
-                        $buttons[] = array(
-                            'label' => 'Reject',
-                            'class' => 'reply booking-reject',
-                            'href'  => $rejectUrl,
-                        );
-                    }
                     break;
 
                 case Status\Model::STATUS_APPROVED:
