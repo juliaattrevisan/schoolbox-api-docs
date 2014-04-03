@@ -190,7 +190,9 @@ abstract class AbstractMailer implements IMailer {
 
 		// create transport and send email
 		try {
-			Swift_Mailer::newInstance(self::getSwiftTransport())->send($this->email);
+			$mailer = Swift_Mailer::newInstance(self::getSwiftTransport());
+			$this->configureSwiftMailer($mailer);
+			$mailer->send($this->email);
 		}
 		catch (Exception $ex) {
 			return false;
@@ -198,6 +200,15 @@ abstract class AbstractMailer implements IMailer {
 		return true;
 	}
 
+
+	/**
+	 * Configure the given Swift_Mailer object prior to sending the email
+	 *
+	 * @param Swift_Mailer $mailer
+	 */
+	protected function configureSwiftMailer($mailer) {
+		// noop - to be overridden
+	}
 
 
 
