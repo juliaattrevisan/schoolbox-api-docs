@@ -80,23 +80,47 @@ class Subcontext_ResourceBookingContext extends BaseContext {
     }
 
     /**
-     * Is there a booking with the given status starting at this time?
+     * Is there a booking with the given status starting at this time? If so
+     * return it.
      *
      * @param  string $timeString When should the booking be for?
-     * @param  string $status     The status (approved, pending or rejected)
-     * @return bool
+     * @param  string $status     The status (approved, pending or rejected),
+     *                            if any. If not supplied, doesn't filter on
+     *                            status.
+     * @return Element\NodeElement
+     * @throws Exception if no booking was found
      */
-    public function bookingExists($timeString, $status) {
+    public function getBooking($timeString, $status = null) {
         /** @var Subcontext_CalendarContext $calendarContext */
         $calendarContext = $this->getMainContext()->getSubcontext('calendar');
         $calendarContext->clickDate('#calendar', $timeString);
         foreach ($calendarContext->getEventsStartingAtTime('#calendar', $timeString) as $eventElement) {
             /** @var Element\NodeElement $eventElement */
-            if ($eventElement->hasClass($status)) {
-                return true;
+            if (!isset($status) || $eventElement->hasClass($status)) {
+                return $eventElement;
             }
         }
-        return false;
+        throw new Exception("No ".($status?"$status ":"")."booking found in calendar for time \"$timeString\"");
+    }
+
+    /**
+     * Is there a booking with the given status starting at this time? If so
+     * return it.
+     *
+     * @param  string $timeString When should the booking be for?
+     * @param  string $action     The status action (approve, reject, cancel).
+     * @return Element\NodeElement
+     * @throws Exception if no booking was found
+     * @throws Exception if button wasn't found
+     */
+    public function getActionButton($timeString, $action = null) {
+        $booking = $this->getBooking($timeString);
+        $booking->click();
+        $button = $this->getSession()->getPage()->find('css', "#calendar-bubble .actions a.btn.booking-$action");
+        if ($button instanceof Element\NodeElement) {
+            return $button;
+        }
+        throw new Exception("Button for $action booking was not found in calendar for event at time \"$timeString\"");
     }
 
     /**
@@ -109,9 +133,7 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @throws Exception if no booking was found
      */
     public function assertBookingExists($timeString, $status) {
-        if (!$this->bookingExists($timeString, $status)) {
-            throw new Exception("No $status booking found in calendar for time \"$timeString\"");
-        }
+        $this->getBooking($timeString, $status);
     }
 
     /**
@@ -126,9 +148,50 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @throws Exception if a booking was found
      */
     public function assertBookingNotExists($timeString, $status) {
-        if ($this->bookingExists($timeString, $status)) {
-            throw new Exception("A $status booking was found in calendar for time \"$timeString\"");
+        try {
+            $this->getBooking($timeString, $status);
         }
+        catch (Exception $e) {
+            return;
+        }
+        throw new Exception("A $status booking was found in calendar for time \"$timeString\"");
+    }
+
+    /**
+     * Asserts that there's no booking with the given status starting at this time.
+     *
+     * This expects that the calendar actually exists.
+     *
+     * @Then /^(?:|I )(?P<action>approve|reject|cancel) booking at "(?P<timeString>[^"]*)"$/
+     *
+     * @param  string $timeString When should the booking be for?
+     * @param  string $action     The status action (approve, reject, cancel)
+     * @throws Exception if no booking was found
+     * @throws Exception if button was not found
+     */
+    public function changeBookingStatus($timeString, $action) {
+        $button = $this->getActionButton($timeString, $action);
+        $button->click();
+    }
+
+
+    /**
+     * Asserts that the given action is not possible for the given event.
+     *
+     * @Then /^(?:|I )should not be able to (?P<action>approve|reject|cancel) booking at "(?P<timeString>[^"]*)"$/
+     *
+     * @param  string $timeString When should the booking be for?
+     * @param  string $action     The status action (approve, reject, cancel)
+     * @throws Exception if button was found
+     */
+    public function assertCannotChangeBookingStatus($timeString, $action) {
+        try {
+            $this->getActionButton($timeString, $action);
+        }
+        catch (Exception $e) {
+            return;
+        }
+        throw new Exception("A $action button was found for event at time \"$timeString\"");
     }
 
 }
