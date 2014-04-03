@@ -12,6 +12,7 @@ namespace Schoolbox\Mail;
 
 
 use Alaress\Mail\TwigMailer;
+use FM\CSSIN;
 use Schoolbox\UserMapper;
 
 class TwigEmail extends TwigMailer {
@@ -22,6 +23,8 @@ class TwigEmail extends TwigMailer {
     /** @var UserMapper */
     protected $userMapper;
 
+	/** @var CSSIN */
+	protected $cssIn;
 
     /**
      * Prepares the email by importing various configurations from the system
@@ -34,12 +37,14 @@ class TwigEmail extends TwigMailer {
     public function __construct($template, $subject = "", $to = "", $host = "") {
         parent::__construct($template, $subject, $to, $host);
         $this->userMapper = UserMapper::getInstance();
+	    $this->cssIn = new CSSIN();
 
         // config context setup
 
         $neededConfigs = array(
             'title',
             'school_name',
+	        'school_address',
             'site_hostname',
             'site_location',
             'site_domain',
@@ -48,6 +53,10 @@ class TwigEmail extends TwigMailer {
         foreach($neededConfigs as $key) {
             $this->coreContext['config'][$key] = self::getConfig()->get($key);
         }
+
+	    $this->coreContext['config']['fqdn'] = trim(
+	        $this->coreContext['config']['site_hostname'].".".$this->coreContext['config']['site_domain']
+	    ,'.');
 
         $this->coreContext['config']['year'] = date('Y');
         $this->coreContext['config']['padding'] = 4;
@@ -139,10 +148,11 @@ class TwigEmail extends TwigMailer {
      *
      * @return string
      */
-    protected function composeHTML() {
-        return $this->rendercache = $this->twig->render($this->templateFilename,
-            array_merge_recursive($this->coreContext, $this->context)
+    public function composeHTML() {
+        $preformat = $this->twig->render($this->templateFilename,
+	        array_merge_recursive($this->coreContext, $this->context)
         );
+	    return $this->rendercache = $this->cssIn->inlineCSS('', $preformat);
     }
 
     public function getCoreContext() {

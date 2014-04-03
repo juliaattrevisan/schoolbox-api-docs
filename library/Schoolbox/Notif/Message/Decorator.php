@@ -12,7 +12,7 @@ namespace Schoolbox\Notif\Message;
 
 use Alaress_Date_Format;
 use Schoolbox\Notif\Message\External\TargetedMessage;
-use Schoolbox\Notif\Message\Instance\Instance;
+use Schoolbox\Notif\MQ\Connector;
 
 /**
  * Helper class to assist with extracting information in an easily-digestible way from a TargetedMessage
@@ -22,14 +22,8 @@ use Schoolbox\Notif\Message\Instance\Instance;
  */
 class Decorator {
 
-	/** @var Message */
+	/** @var TargetedMessage */
 	protected $message;
-
-	/** @var Instance */
-	protected $instance;
-
-	/** @var int */
-	protected $timestamp;
 
 
 	/**
@@ -44,11 +38,11 @@ class Decorator {
 
 	/**
 	 * @param TargetedMessage $targetedMessage
+	 * @return self
 	 */
 	public function setMessage($targetedMessage) {
-		$this->message = $targetedMessage->getBody();
-		$this->instance = $targetedMessage->getInstance();
-		$this->timestamp = $targetedMessage->getTimestamp();
+		$this->message = $targetedMessage;
+		return $this;
 	}
 
 
@@ -56,7 +50,7 @@ class Decorator {
 	 * @return Alaress_Date_Format
 	 */
 	public function getAlaressDateFormat() {
-		return new Alaress_Date_Format($this->timestamp, 'U');
+		return new Alaress_Date_Format($this->message->getTimestamp(), 'U');
 	}
 
 
@@ -77,13 +71,12 @@ class Decorator {
 
 	/**
 	 * @param string $uriBase
-	 * @param string $linkColor
 	 * @return string
 	 */
-	public function formatMail($uriBase, $linkColor) {
+	public function formatMail($uriBase) {
 		return $this->formatMarkup(
-			function($href, $text) use ($uriBase, $linkColor) {
-				return sprintf('<a href="%s%s" style="color:%s;">%s</a>', $uriBase, $href, $linkColor, $text);
+			function($href, $text) use ($uriBase) {
+				return sprintf('<a href="%s%s">%s</a>', $uriBase, $href, $text);
 			},
 			function($text) {
 				return sprintf('<a>%s</a>', $text);
@@ -115,8 +108,8 @@ class Decorator {
 	 * @return string
 	 */
 	public function formatMarkup($hrefCallback, $noHrefCallback) {
-		$params = $this->instance->getParams();
-		$msgString = $this->message->getMessageString();
+		$params = $this->message->getInstance()->getParams();
+		$msgString = $this->message->getBody()->getMessageString();
 
 		// no params, raw text
 		if(!(is_array($params) && count($params))) {
@@ -161,19 +154,68 @@ class Decorator {
 	 */
 	public function formatArray($unread = false) {
 		return array(
-			'body'      => $this->message->toArray(),
-			'params'    => $this->instance->getParams(),
-			'timestamp' => $this->timestamp,
+			'body'      => $this->message->getBody()->toArray(),
+			'params'    => $this->message->getInstance()->getParams(),
+			'timestamp' => $this->message->getTimestamp(),
 			'status'    => $unread ? 'unread' : 'read'
 		);
 	}
 
+	/**
+	 * Formats the message appropriate for Twig context. Uses strategies based on the message namespace.
+	 *
+	 * @param array $coreContext
+	 * @return array
+	 */
+	public function formatContext($coreContext) {
+
+		// consolidate assessable namespaces
+		if(in_array($this->message->getNamespace(), array('duework', 'assess'))) {
+			$ns = 'work';
+		}
+		else {
+			$ns = $this->message->getNamespace();
+		}
+
+		$href = $this->getHref();
+		$icon = $this->getIcon();
+
+		// icon cannot be a protected link
+		if(!strlen($icon) || strpos($icon, '/portrait') === 0) {
+			// change to be the generic icon for the namespace
+			$icon = '/images/icon.php?size=48&icon='.$ns;
+		}
+
+		$msgArray = array(
+			'pretty'    => $this->formatMail("http://".$coreContext['config']['fqdn']),
+			'href'      => $href ? ("http://".$coreContext['config']['fqdn'] . $href) : '',
+			'icon'      => $icon ? ("http://".$coreContext['config']['fqdn'] . $icon) : '',
+			'timestamp' => $this->message->getTimestamp(),
+			'meta'      => $this->message->getBody()->getMeta(),
+		);
+
+		// cast time to day
+		$day = ((int)floor($msgArray['timestamp'] * 0.000011574)) * 86400;
+
+
+		switch($ns) {
+			case 'work':
+				// don't use numeric keys (recursive merge does it wrong), but group by day
+				$context['groups'][$ns]["dates"]["d-$day"][Connector::deriveMessageId($this->message)] = $msgArray;
+				break;
+			default:
+				$context['groups'][$ns]['messages'][Connector::deriveMessageId($this->message)] = $msgArray;
+				break;
+		}
+
+		return $context;
+	}
 
 	/**
 	 * @return string
 	 */
 	public function getHref() {
-		$array = $this->message->toArray();
+		$array = $this->message->getBody()->toArray();
 		return $array['href'];
 	}
 
@@ -182,7 +224,7 @@ class Decorator {
 	 * @return string
 	 */
 	public function getIcon() {
-		$array = $this->message->toArray();
+		$array = $this->message->getBody()->toArray();
 		return $array['icon'];
 	}
 
