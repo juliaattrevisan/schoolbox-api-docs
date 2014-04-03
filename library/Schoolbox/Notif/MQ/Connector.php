@@ -320,23 +320,30 @@ class Connector {
 	 * @return string
 	 */
 	protected function calculateMessageHash($message, $channelId) {
-		// cast null to 0
-		$bits = array(is_null($channelId) ? 0 : $channelId);
-
 		// attempt to extract the message body, so as to efficiently de-dupe resent messages
 		if($data = json_decode($message, true)) {
 			$string = ($data['message']);
 			if($obj = unserialize($string)) {
-				if($obj instanceof TargetedMessage) {
-					$body = $obj->getBody()->toArray();
-					$bits[] = $body['body'].$body['href'];
-				}
+				return self::deriveMessageId($obj, $channelId);
 			}
 		}
-		else {
-			$bits[] = $message;
-		}
 
+		// cast null to 0
+		$bits = array(is_null($channelId) ? 0 : $channelId);
+		$bits[] = $message;
+		return sha1(implode('.', $bits));
+	}
+
+
+	/**
+	 * @param TargetedMessage $msg
+	 * @param int $channelId
+	 * @return string
+	 */
+	public static function deriveMessageId($msg, $channelId = null) {
+		$body = $msg->getBody()->toArray();
+		$bits = array($channelId);
+		$bits[] = $body['body'].$body['href'];
 		return sha1(implode('.', $bits));
 	}
 } 
