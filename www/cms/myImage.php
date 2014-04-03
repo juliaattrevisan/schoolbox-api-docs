@@ -46,7 +46,7 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 	 */
 	$imageProcessor = new Alaress_Image_Processor_Freeform($cache, new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']));
 	try {
-		$imageProcessor->load()->transformAll()->stream();
+		$imageProcessor->load()->stream();
 	}
 	catch (Exception_Schoolbox_NotFound $e) {
 		SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
@@ -66,7 +66,7 @@ else {
 	 */
 	$imageProcessor = new Alaress_Image_Processor_Standard($cache, new Alaress_Image_Transformation_Storage());
 	try {
-		$imageProcessor->load()->transformAll()->stream();
+		$imageProcessor->load()->stream();
 	}
 	catch (Exception_Schoolbox_NotFound $e) {
 		//

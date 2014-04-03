@@ -28,6 +28,6 @@ class Alaress_Image_Menclone {
 		/* Process and stream image
 		 */
 		$imageProcessor = new Alaress_Image_Processor_Standard($cache, $transformations);
-		$imageProcessor->load()->transformAll()->stream();
+		$imageProcessor->load()->stream();
 	}
 }

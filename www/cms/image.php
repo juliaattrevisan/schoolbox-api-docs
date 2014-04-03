@@ -45,7 +45,7 @@ $cache = new Alaress_Image_Cache_Image($_GET['id'], $key);
  */
 $imageProcessor = new Alaress_Image_Processor_Freeform($cache, new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']));
 try {
-	$imageProcessor->load()->transformAll()->stream();
+	$imageProcessor->load()->stream();
 }
 catch (Exception_Schoolbox_NotFound $e) {
 	SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
