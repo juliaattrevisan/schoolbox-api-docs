@@ -101,14 +101,15 @@ class EventRecurrence {
 	/**
 	 * Constructor
 	 *
+	 * @param $mapper
 	 * @param $efficacy
 	 * @param $repeatSetting
 	 * @param $until
 	 * @param \Alaress_Date_Format $startDate
 	 * @param \Alaress_Date_Format $endDate
 	 */
-	public function __construct($efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
-		$this->setCalendarHandler(new \Calendar());
+	public function __construct($mapper, $efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+		$this->setCalendarHandler($mapper);
 		$this->setDateCollection(new \Schoolbox\Collection());
 		$this->setRepeatSetting($repeatSetting);
 		$this->setUntil($until);
@@ -133,7 +134,7 @@ class EventRecurrence {
 
 		// repeat specified, and and enddate also, populate the dates to be set
 		if ($this->isValidInterval() && $this->getUntil()->getUnixTimestamp()) {
-			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex() + 1);
+			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex());
 
 			$start_timestamp = $this->getStartDate()->getUnixTimestamp();
 			$end_timestamp = $this->getEndDate()->getUnixTimestamp();

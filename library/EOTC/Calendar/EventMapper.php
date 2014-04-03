@@ -400,4 +400,23 @@ class EventMapper extends Schoolbox\External\Mapper {
 		 */
 		return DENY_ACCESS;
 	}
+
+	/**
+	 * Prevent overlap on default event table
+	 *
+	 * @return mixed
+	 */
+	public function getUpperSeriesIndex() {
+		$query = "
+			SELECT COALESCE(MAX(series_id), 0)+1 AS series_id
+			FROM `{$this->table}` e
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$row = $statement->fetch();
+
+		return $row['series_id'];
+	}
 }

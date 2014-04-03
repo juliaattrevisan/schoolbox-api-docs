@@ -90,7 +90,7 @@ class EventRecurrenceMapper {
 		/* Set up recurrences, if appropriate
 		 * This is mandatory as events are saved via EventRecurrence
 		 */
-		$eventRecurrence = new EventRecurrence($efficacy, $repeatSetting, $until, $startDate, $endDate);
+		$eventRecurrence = new EventRecurrence($this->getEventMapper(), $efficacy, $repeatSetting, $until, $startDate, $endDate);
 		$eventRecurrence->setup();
 
 		/* Modify an existing event
