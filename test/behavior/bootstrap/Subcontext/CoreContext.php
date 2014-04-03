@@ -472,4 +472,14 @@ class Subcontext_CoreContext extends BaseContext {
     public function pressEnterKey() {
         $this->getSession()->executeScript("jQuery(':focus').trigger(jQuery.Event('keypress', {which: 9}));");
     }
+
+    /**
+     * Clicks something. I can't believe this doesn't exist in the Mink context!
+     *
+     * @When /^(?:|I )click "(?P<link>[^"]*)"$/
+     */
+    public function clickLink($link) {
+        $node = $this->getSession()->getPage()->find('css', $link);
+        $node->click();
+    }
 }
