@@ -105,16 +105,23 @@ foreach(\Schoolbox\RoleMapper::getInstance()->findAll() as $role) {
 		$this->parse('day_check_block', 'day_check', true);
 	}
 
-	foreach($timeTests as $time) {
-		$timeDatetime->setTime($time[0], $time[1]);
+	try {
+		$nextTime = $timecron->getNextRunDate();
+		$hr = $nextTime->format('H');
+		$mi = $nextTime->format('i');
+		$valid = true;
+	}
+	catch(RuntimeException $e) {
+		$valid = false;
+	}
 
-		try {
-			$selected = $timecron->isDue($timeDatetime);
+
+	foreach($timeTests as $time) {
+		if($valid) {
+			$selected = ($hr == $time[0] && $mi == $time[1]);
 		}
-		catch(RuntimeException $e) {
+		else {
 			$selected = false;
-//			print_r($timecron->getExpression());
-//			echo $e;
 		}
 
 		$this->setVar(array(
