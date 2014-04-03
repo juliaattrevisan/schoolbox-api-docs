@@ -17,6 +17,7 @@ use Aura\Router\Router;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\UserAccess;
+//use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 
 class Module extends BaseModule {
 
@@ -43,13 +44,22 @@ class Module extends BaseModule {
      */
     public function initRoutePermissions(Authorizer $authorizer) {
         // Authorizer: will need to check the resource's moderation rule.
-        $resourceManageRule = new Rule\Any(
+        $baseManageRule = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
         );
+        $isItemModeratorRule = new Auth\CanModerateBooking();
+        $isItemModeratorRule->setMapper(Mapper::getInstance());
+        $isOwnerRule = new Auth\UserOwnsBooking();
+        $isOwnerRule->setMapper(Mapper::getInstance());
+
+        $resourceManageRule = new Rule\Any($baseManageRule, $isItemModeratorRule);
+        $bookingCancelRule  = new Rule\Any($baseManageRule, $isOwnerRule);
+
         $authorizer
             ->addRule('/^resourceBooking(?:$|\.)/', new Rule\IsLoggedIn())
             ->addRule('/^resourceBooking\.(?:approve|reject)/', $resourceManageRule)
+            ->addRule('/^resourceBooking\.cancel/', $bookingCancelRule)
         ;
     }
 
