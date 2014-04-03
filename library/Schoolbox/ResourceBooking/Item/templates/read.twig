@@ -214,7 +214,19 @@
 
 {# Resource manager: could be set in the edit form, or the default resource manager #}
 <p class="management">
-    Resource managed by: somebody
+    Resource managed by:
+    <ul>
+        {% if defaultModeratorList is empty and item.moderatorList is empty %}
+            <li>Nobody</li>
+        {% else %}
+            {% for moderator in defaultModeratorList %}
+                <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
+            {% endfor %}
+            {% for moderator in item.moderatorList %}
+                <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
+            {% endfor %}
+        {% endif %}
+    </ul>
 </p>
 
 <h2>Rules</h2>
