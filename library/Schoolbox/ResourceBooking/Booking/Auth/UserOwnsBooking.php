@@ -1,0 +1,62 @@
+<?php
+/**
+ * Authorization class: verifies that the user owns this booking.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\ResourceBooking\Booking\Auth;
+
+use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Failure;
+use Schoolbox\User;
+use Schoolbox\ResourceBooking\Booking\Model;
+use Schoolbox\ResourceBooking\Booking\Mapper;
+
+class UserOwnsBooking implements Rule\IAuthorizationRule {
+
+    /**
+     * @var Mapper
+     */
+    protected $mapper;
+
+    /**
+     * Authorizes that this user owns this booking.
+     *
+     * @param  array $params Any parameters passed as part of the route.
+     * @param  User  $user   The user to authorize, if any. Null value assumes
+     *                       that no user is logged in.
+     *
+     * @throws Failure\Forbidden if the request isn't authorized.
+     */
+    public function authorize(array $params = array(), User $user = null) {
+        // Booking owner: same person as event owner
+        /** @var Model $item */
+        // findById() should hydrate the event join as well
+        $item  = $this->getMapper()->findById($params['id']);
+        $event = $this->getMapper()->getJoinMapper('event')->findById($item->getEvent()->getId());
+        if ($user->getId() == $event->getOwner()->getId()) {
+            return;
+        }
+        throw new Failure\Forbidden();
+    }
+
+    /**
+     * @param  Mapper $mapper
+     * @return $this
+     */
+    public function setMapper($mapper) {
+        $this->mapper = $mapper;
+        return $this;
+    }
+
+    /**
+     * @return Mapper
+     */
+    public function getMapper() {
+        return $this->mapper;
+    }
+
+}
