@@ -406,6 +406,85 @@ class External_Schoolpro_User implements External_UserInterface {
 	}
 
 	/**
+	 * TODO: Replace existing getPortrait()
+	 *
+	 * @param $externalUserId
+	 * @return bool|string
+	 */
+	public function getPortrait2($externalUserId) {
+		if (!is_numeric($externalUserId)) {
+			return false;
+		}
+
+		$vars = array(
+			'sbGetPortraitLastUpdated',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
+			)
+		);
+
+		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+		/* Find the last updated datetime
+		 */
+		if ($result['success'] && count($result['result'])) {
+			new \Alaress_Probe($result['result']);
+
+			$photoPath = Config::get('portrait_dir') . '/' . escapeshellcmd($externalUserId) . '.jpg';
+
+			//TODO: delete photos on rollover
+
+			/* If the cached file doesn't exist, or the synergetic image is more recent than our
+			 * last known cached version, regenerate cached version.
+			 *
+			 * Separate the queries out, fetching the photo data only if it's newer than the cached
+			 * version, or if the cache version doesn't already exist.
+			 */
+			$cacheTime = @filemtime($photoPath);
+			$modifiedTime = strtotime($result['result']['ModifiedDate']);
+
+			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
+				$vars = array(
+					'sbGetPortraitFile',
+					array(
+						array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+						array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+						array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
+					)
+				);
+
+				$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+				/* Get the binary data and dump it into a file
+				 */
+				if ($result['success'] && count($result['result'])) {
+					new \Alaress_Probe($result['result']);
+
+					/* Purge all previously transformed copies
+					 */
+					$pattern = Config::get('stream_dir') . "/portrait/" . escapeshellcmd($externalUserId) . '-*.dat';
+
+					foreach (glob($pattern) as $oldCacheFile) {
+						unlink($oldCacheFile);
+					}
+
+					/* Save the image
+					 */
+					$photoHandle = fopen($photoPath, "w");
+					fwrite($photoHandle, $result['result']['Photo']);
+					fclose($photoHandle);
+				}
+			}
+
+			return $photoPath;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Stub method, probably not used
 	 */
 	public function getStudentUserAccountInfo() {
