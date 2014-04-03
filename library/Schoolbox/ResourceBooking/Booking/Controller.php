@@ -387,7 +387,7 @@ class Controller extends Base {
                     if ($rejectUrl !== false) {
                         $buttons[] = array(
                             'label' => 'Reject',
-                            'class' => 'delete',
+                            'class' => 'reply',
                             'href'  => $rejectUrl,
                         );
                     }
