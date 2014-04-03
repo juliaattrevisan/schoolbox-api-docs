@@ -340,61 +340,56 @@ Scenario: Cancelling a booking
   When  I cancel booking at "3pm +6 days"
   Then  I should not see approved booking at "3pm +6 days"
 
-@resource-booking @resource-booking-errors
-Scenario: Double-booking an item - end time overlaps another
+@resource-booking @resource-booking-errors @resource-booking-errors-conflict
+Scenario: Double-booking an item
   Given I do not wipe the slate clean
   And   I go to homepage
   And   I log in as "sberryhill" with password "password"
   When  I go to "/resource-booking/item"
   And   I view details for resource "A single projector"
-  And   I start booking resource for "+2 days"
-  When  I fill in "start_datetime[hour]" with "12"
-  And   I fill in "start_datetime[minute]" with "00"
-  And   I select "AM" from "start_datetime[meridien]"
-  And   I fill in "end_datetime[hour]" with "10"
-  And   I fill in "end_datetime[minute]" with "00"
-  And   I select "PM" from "end_datetime[meridien]"
-  And   I press "resource-booking-save"
-  And   wait for a ".error" element
-  And   I should receive an error for double booking
-
-@resource-booking @resource-booking-errors
-Scenario: Double-booking an item - start time overlaps another
-  Given I do not wipe the slate clean
-  And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
-  When  I go to "/resource-booking/item"
-  And   I view details for resource "A single projector"
-  And   I start booking resource for "+3 days"
-  When  I fill in datepicker "start_datetime[date]" with "+3 days"
-  And   I fill in datepicker "end_datetime[date]" with "+4 days"
-  And   I fill in "start_datetime[hour]" with "1"
-  And   I fill in "start_datetime[minute]" with "00"
-  And   I select "AM" from "start_datetime[meridien]"
-  And   I fill in "end_datetime[hour]" with "10"
-  And   I fill in "end_datetime[minute]" with "00"
-  And   I select "PM" from "end_datetime[meridien]"
-  And   I press "resource-booking-save"
-  And   wait for a ".error" element
-  And   I should receive an error for double booking
-
-@resource-booking @resource-booking-errors
-Scenario: Booking an item for before the min lead time
-  Given I do not wipe the slate clean
-  And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
-  When  I go to "/resource-booking/item"
-  And   I view details for resource "A single projector"
-  And   I start booking resource for "+1 days"
-  When  I fill in "start_datetime[hour]" with "12"
+  # Create a booking for this item for others to conflict with
+  And   I start booking resource for "+30 days"
+  When  I fill in datepicker "start_datetime[date]" with "+30 days"
+  And   I fill in datepicker "end_datetime[date]" with "+31 days"
+  And   I fill in "start_datetime[hour]" with "12"
   And   I fill in "start_datetime[minute]" with "00"
   And   I select "AM" from "start_datetime[meridien]"
   And   I fill in "end_datetime[hour]" with "12"
   And   I fill in "end_datetime[minute]" with "00"
   And   I select "AM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
+  And   wait for a "#calendar" element
+  # There's already a booking for +30 days 12AM - +31 days 12AM
+  # Try creating one that starts at +30 days 11PM
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "A single projector"
+  And   I start booking resource for "+30 days"
+  When  I fill in datepicker "start_datetime[date]" with "+30 days"
+  And   I fill in datepicker "end_datetime[date]" with "+31 days"
+  And   I fill in "start_datetime[hour]" with "11"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "PM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "11"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
   And   wait for a ".error" element
-  And   I should receive an error for not enough lead time
+  Then  I should see "This item has already been booked for this time" in the "label.error" element
+  # Try creating one that ends at +30 days 1am
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "A single projector"
+  And   I start booking resource for "+30 days"
+  When  I fill in datepicker "start_datetime[date]" with "+29 days"
+  And   I fill in datepicker "end_datetime[date]" with "+30 days"
+  And   I fill in "start_datetime[hour]" with "1"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "AM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "1"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "AM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  And   wait for a ".error" element
+  Then  I should see "This item has already been booked for this time" in the "label.error" element
 
 @resource-booking @resource-booking-errors
 Scenario: Booking an item for less than min booking time
@@ -414,7 +409,7 @@ Scenario: Booking an item for less than min booking time
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
   And   wait for a ".error" element
-  And   I should receive an error for short booking
+  Then  I should see "This item must be booked for at least 1 day" in the "label.error" element
 
 @resource-booking @resource-booking-errors
 Scenario: Booking an item for more than max booking time
@@ -434,7 +429,7 @@ Scenario: Booking an item for more than max booking time
   And   I select "PM" from "end_datetime[meridien]"
   And   I press "resource-booking-save"
   And   wait for a ".error" element
-  And   I should receive an error for long booking
+  Then  I should see "This item may not be booked for more than 2 days" in the "label.error" element
 
 # Test booking on a timetable
 # Test approving of booking
