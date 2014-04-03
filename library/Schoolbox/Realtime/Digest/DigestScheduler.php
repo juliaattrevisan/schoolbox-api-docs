@@ -23,6 +23,9 @@ use Schoolbox\RoleMapper;
 
 class DigestScheduler extends CronScheduler {
 
+	const NEVER  = '0 1 31 2 *'; // 1am, Feb 31st (good luck)
+	const DAILY  = '0 6 * * 1-5'; // 6am, weekdays
+	const WEEKLY = '0 11 * * 5'; // 11am, Fridays
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
@@ -46,10 +49,10 @@ class DigestScheduler extends CronScheduler {
 			// convert old DAILY and WEEKLY enum into crontab
 			switch($schedule) {
 				case Role::DIGEST_DAILY:
-					$schedule = '0 6 * * 1-5'; // weekdaily, 6am
+					$schedule = self::DAILY; // weekdaily, 6am
 					break;
 				case Role::DIGEST_WEEKLY:
-					$schedule = '0 11 * * 5'; // Friday, 11am
+					$schedule = self::WEEKLY; // Friday, 11am
 					break;
 			}
 
@@ -59,7 +62,22 @@ class DigestScheduler extends CronScheduler {
 			catch(InvalidArgumentException $e) {
 				echo $e->getMessage(), "\n";
 			}
+			catch(RuntimeException $e) {
+				echo $e->getMessage(), "\n";
+			}
 		}
 	}
+
+
+	/**
+	 * Report in an appropriate way, based on the data returned by the worker
+	 *
+	 * @param $data
+	 * @return mixed
+	 */
+	protected function report($data) {
+		$this->debug->v("Emails sent: ".unserialize($data[0]));
+	}
+
 
 } 
