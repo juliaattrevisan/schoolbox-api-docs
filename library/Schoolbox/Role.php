@@ -16,9 +16,9 @@ class Role {
 
     /**
      * What's the digest schedule for this group?
-     * Always one of self::DIGEST_NEVER, self::DIGEST_DAILY, self::DIGEST_WEEKLY
+     * One of self::DIGEST_NEVER, self::DIGEST_DAILY, self::DIGEST_WEEKLY, or a cron schedule
      *
-     * @var int
+     * @var string
      */
     protected $digestSchedule;
 
@@ -91,7 +91,7 @@ class Role {
     }
 
     /**
-     * @param  int   $digestSchedule
+     * @param  string   $digestSchedule
      * @return $this
      */
     public function setDigestSchedule($digestSchedule) {
@@ -100,7 +100,7 @@ class Role {
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getDigestSchedule() {
         return $this->digestSchedule;

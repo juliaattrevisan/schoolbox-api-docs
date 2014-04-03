@@ -45,7 +45,7 @@ class RoleMapper extends Mapper {
         $this->hasMap(array(
             'column'   => 'digest_schedule',
             'property' => 'digestSchedule',
-            'type'     => self::TYPE_INTEGER,
+            'type'     => self::TYPE_STRING,
         ));
     }
 
