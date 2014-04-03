@@ -2,7 +2,7 @@
 <ul>
     {% if item.minLeadTime.minuteTotal %}
         <li>
-            Must be booked
+            Must be booked at least
             {% include 'sub/interval.twig' with {interval: item.minLeadTime} %}
             in advance.
         </li>

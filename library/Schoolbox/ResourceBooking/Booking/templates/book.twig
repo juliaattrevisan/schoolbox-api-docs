@@ -43,7 +43,7 @@ $(document).ready(function() {
     $.validator.addMethod(
         'remote.invalidStart',
         getValidatorRemoteMethod('invalid', 'start_datetime'),
-        'This date is invalid.'
+        'Please enter a valid date.'
     )
     $.validator.addMethod(
         'remote.conflict',
@@ -53,29 +53,29 @@ $(document).ready(function() {
     $.validator.addMethod(
         'remote.tooEarly',
         getValidatorRemoteMethod('too_early', 'start_datetime'),
-        'This item cannot be booked with this little lead time.'
+        'This item must be booked at least ' + {{ include('sub/interval.twig', {interval: item.resource.minLeadTime})|json_encode|raw }} + ' in advance.'
     )
 
     // Remote rules for end date
     $.validator.addMethod(
         'remote.invalidEnd',
         getValidatorRemoteMethod('invalid', 'end_datetime'),
-        'This date is invalid.'
+        'Please enter a valid date.'
     )
     $.validator.addMethod(
         'remote.beforeStart',
         getValidatorRemoteMethod('before_start', 'end_datetime'),
-        'The start must be before the end.'
+        'The booking start time must be before the end time.'
     )
     $.validator.addMethod(
         'remote.tooShort',
         getValidatorRemoteMethod('too_short', 'end_datetime'),
-        'This item cannot be booked for this little time.'
+        'This item must be booked for at least ' + {{ include('sub/interval.twig', {interval: item.resource.minReservationTime})|json_encode|raw }} + '.'
     )
     $.validator.addMethod(
         'remote.tooLong',
         getValidatorRemoteMethod('too_long', 'end_datetime'),
-        'This item cannot be booked for this long.'
+        'This item may not be booked for more than ' + {{ include('sub/interval.twig', {interval: item.resource.maxReservationTime})|json_encode|raw }} + '.'
     )
 
     // Submit resource booking form via AJAX
@@ -140,7 +140,8 @@ $(document).ready(function() {
                 {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
                 {% include 'sub/datetimeInput.twig' with {
                     value: item.event.startDateTime,
-                    name:  'start_datetime'
+                    name:  'start_datetime',
+                    id:    'start_datetime'
                 } %}
             </td>
         </tr>
@@ -149,7 +150,8 @@ $(document).ready(function() {
             <td>
                 {% include 'sub/datetimeInput.twig' with {
                     value: item.event.endDateTime,
-                    name:  'end_datetime'
+                    name:  'end_datetime',
+                    id:    'start_datetime'
                 } %}
             </td>
         </tr>
