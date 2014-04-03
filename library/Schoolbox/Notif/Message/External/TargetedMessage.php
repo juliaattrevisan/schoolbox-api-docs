@@ -14,6 +14,7 @@ use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Realtime\Schedule\Trigger\InstantTrigger;
 use Serializable;
 
 class TargetedMessage implements Serializable {
@@ -31,7 +32,8 @@ class TargetedMessage implements Serializable {
     protected $topicPrepend = 'notify.';
     /** @var Instance */
     protected $instance;
-
+	/** @var string */
+	protected $namespace = 'activity';
 
     /**
      * @param Notif $notif
@@ -43,8 +45,17 @@ class TargetedMessage implements Serializable {
         $this->body = $body;
         $this->notif = $notif;
         $this->instance = $instance;
-        $this->timestamp = $trigger instanceof TriggerInterface ? $trigger->getTimestamp() : null;
+
+	    if($trigger) {
+		    if($trigger instanceof TriggerInterface) {
+			    $this->timestamp = $trigger->getTimestamp();
+			    if($trigger instanceof InstantTrigger) {
+				    $this->namespace = $trigger->getModuleNotifier()->getNamespace()->getSlug();
+			    }
+		    }
+	    }
     }
+
 
 	/**
 	 * @return \Schoolbox\Notif\Message\Message
@@ -95,6 +106,13 @@ class TargetedMessage implements Serializable {
         return $this->instance->getParams();
     }
 
+
+	/**
+	 * @return string
+	 */
+	public function getNamespace() {
+		return $this->namespace;
+	}
 
 	/**
 	 * @return bool

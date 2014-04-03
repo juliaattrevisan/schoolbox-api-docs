@@ -27,16 +27,21 @@ class Message implements Serializable {
 	/** @var string */
 	protected $href;
 
+	/** @var string */
+	protected $meta;
+
 
 	/**
 	 * @param string $text
 	 * @param string $icon
 	 * @param string $href
+	 * @param array  $meta
 	 */
-	public function __construct($text, $icon, $href) {
+	public function __construct($text, $icon, $href, $meta = array()) {
 		$this->body = new MessageBody($text);
 		$this->icon = $icon;
 		$this->href = $href;
+		$this->meta = $meta;
 	}
 
 	public function getMessageString() {
@@ -45,6 +50,19 @@ class Message implements Serializable {
 
 	public function getTokenList() {
 		return $this->body->getTokenList();
+	}
+
+	/**
+	 * Return metadata from this message
+	 *
+	 * @param string $field
+	 * @return string
+	 */
+	public function getMeta($field = '') {
+		if($field) {
+			return isset($this->meta[$field]) ? $this->meta[$field] : '';
+		}
+		return $this->meta;
 	}
 
 	/**
@@ -60,6 +78,7 @@ class Message implements Serializable {
 			'body' => $this->body->getMessageString(),
 			'icon' => $this->icon,
 			'href' => $this->href,
+			'abstract' => $this->abstract
 		);
 	}
 
@@ -74,6 +93,7 @@ class Message implements Serializable {
 		$this->body = new MessageBody($data['body']);
 		$this->icon = $data['icon'];
 		$this->href = $data['href'];
+		$this->abstract = $data['abstract'];
 	}
 
     /**
