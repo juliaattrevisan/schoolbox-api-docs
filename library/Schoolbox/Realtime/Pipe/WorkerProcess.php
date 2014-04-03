@@ -82,7 +82,7 @@ class WorkerProcess extends AbstractProcess {
 				list($callback, $model, $userId, $diff) = $data;
 
 				if(!is_callable($callback)) {
-					throw new RuntimeException("Unable to execute callback");
+					throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
 				}
 
 				// this call SHOULD return a Messenger object

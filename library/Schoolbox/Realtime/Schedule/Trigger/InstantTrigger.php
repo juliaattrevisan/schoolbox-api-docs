@@ -43,5 +43,12 @@ class InstantTrigger extends OnetimeTrigger {
         return $this->notifier->retrieveCallbacks($this->label);
     }
 
+	/**
+	 * @return ModuleNotifierInterface
+	 */
+	public function getModuleNotifier() {
+		return $this->notifier;
+	}
+
 
 } 
