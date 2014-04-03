@@ -187,6 +187,7 @@ class Mapper extends BaseMapper {
             LEFT JOIN {$this->getJoinSql('status',       'b', 's')}
             LEFT JOIN {$this->getJoinSql('reviewer',     'b', 'r')}
             WHERE b.resource_id = :resource
+            AND b.deleted_at IS NULL
             AND NOT (e.endDate < :startWindow OR e.startDate > :endWindow)
             AND s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}
         ";
