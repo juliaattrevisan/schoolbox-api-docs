@@ -134,7 +134,7 @@ class EventRecurrence {
 
 		// repeat specified, and and enddate also, populate the dates to be set
 		if ($this->isValidInterval() && $this->getUntil()->getUnixTimestamp()) {
-			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex() + 1);
+			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex());
 
 			$start_timestamp = $this->getStartDate()->getUnixTimestamp();
 			$end_timestamp = $this->getEndDate()->getUnixTimestamp();
