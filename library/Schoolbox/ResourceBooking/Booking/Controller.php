@@ -353,15 +353,25 @@ class Controller extends Base {
             $class   = '';
 
             // Modify URL
-            $editUrl = $this->getRouteIfAuthorized('resourceBooking.edit', array('id' => $booking->getId()));
+            $editUrl = $this->getRouteIfAuthorized(
+                'resourceBooking.edit', array('id' => $booking->getId())
+            );
             if ($editUrl !== false) {
                 $buttons[] = array(
                     'label' => 'Modify',
                     'class' => 'modify',
-                    'href'  => $this->getRouter()->generate(
-                        'resourceBooking.edit',
-                        array('id' => $booking->getId())
-                    ),
+                    'href'  => $editUrl,
+                );
+            }
+            $cancelUrl = $this->getRouteIfAuthorized(
+                'resourceBooking.cancel',
+                array('id' => $booking->getId())
+            );
+            if ($cancelUrl !== false) {
+                $buttons[] = array(
+                    'label' => 'Cancel',
+                    'class' => 'delete',
+                    'href'  => $cancelUrl,
                 );
             }
 
