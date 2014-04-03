@@ -308,4 +308,38 @@ class UserMapper extends Mapper {
         $user->setLastname('Unknown User');
         return $user;
     }
+
+    /**
+     * Retrieves all users who have the given level of access (or higher) to the
+     * requested service.
+     *
+     * @param  int $service           The service level. A UserAccess::SERVICE_*
+     *                                constant.
+     * @param  int $accessLevel       The access level. A UserAccess::ACCESS_*
+     *                                constant.
+     * @param  int $serviceIdentifier If provided, the campus or homepage that
+     *                                $service is for.
+     * @return Collection|User[] A list of users who have this level of access
+     *                           to the given service.
+     */
+    public function findByAccess($service, $accessLevel, $serviceIdentifier = null) {
+        $query = "
+            SELECT DISTINCT {$this->getColumnString('u')}
+            FROM {$this->getTable()} u
+            INNER JOIN {$this->getJoinSql('userAccess', 'u', 'ua')}
+            WHERE ua.service=:service
+            AND ua.type >=:accessLevel
+        ";
+        $params = array(
+            'service'     => $service,
+            'accessLevel' => $accessLevel,
+        );
+        if (isset($serviceIdentifier)) {
+            $query .= 'AND ua.sid=:serviceIdentifier';
+            $params['serviceIdentifier'] = $serviceIdentifier;
+        }
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+        return $this->hydrateList($statement, 'u');
+    }
 }
