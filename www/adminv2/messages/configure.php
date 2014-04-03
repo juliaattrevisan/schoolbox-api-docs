@@ -11,12 +11,18 @@ use Schoolbox\Role;
  */
 
 if(!isset($this)) {
-	require_once '../include/Bootstrap.php';
+	require_once '../../../include/Bootstrap.php';
 	if(!isset($_POST)) {
-		SitePage::localRedir('/build-msg-settings');
+		SitePage::localRedir('/adminv2/messages/configure');
 	}
 
 	// you gotst permishunz?
+	session_start();
+	$groupHandler = new Group();
+	if(!$groupHandler->isSuperuser()) {
+		error(19);
+	}
+
 
 	header('Content-Type: application/json');
 	// do ajax
@@ -109,7 +115,8 @@ if(!isset($this)) {
 }
 
 
-if(Cfg::get('site_hostname') != 'demo') {
+$groupHandler = new Group();
+if(!$groupHandler->isSuperuser()) {
 	error(19);
 }
 
@@ -117,7 +124,7 @@ if(Cfg::get('site_hostname') != 'demo') {
 
 $editable = isset($this->arg[0]) && $this->arg[0] == 'edit';
 
-$this->setFile(TEMPLATE_content, '/build-msg-settings.html');
+$this->setFile(TEMPLATE_content, '/adminv2/messages/configure.html');
 
 $db = Database::getInstance();
 
@@ -316,7 +323,7 @@ foreach($data['namespace'] as $namespace) {
 function slice($flat) {
 	$map = array(
 		'ns'      => array('id','slug','label'),
-		'source'  => array('id','','key','role_type','description','routing_key',''),
+		'source'  => array('id','','key','role_type','description'),
 		'role'    => array('id','name','','','digest_schedule'),
 		'perm'    => array('','','min_level','max_level','default_level')
 	);
