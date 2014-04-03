@@ -480,20 +480,15 @@ class Controller extends Base {
      * @param int $id The ID of the booking to approve.
      */
     public function approve($id) {
+        /** @var Model $booking */
         $booking = $this->getBookingMapper()->findById($id);
         $booking->setStatus(Status\Model::STATUS_APPROVED);
         $this->getBookingMapper()->save($booking);
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceBooking.book', array('id' => $id))
+            $this->getRouter()->generate(
+                'resourceItem.read', array('id' => $booking->getResource()->getId())
+            )
         );
-        // HTML: redirect somewhere, JSON: output a response.
-        // Showing HTML validation errors: use session flash variables to store.
-//        $this->buildFormResponse(
-//            array(
-//                'location' => $this->getRouter()->generate('resourceBooking.book', array('id' => $id)),
-//                'errors'   => array(),
-//            )
-//        );
     }
 
     /**
@@ -502,11 +497,14 @@ class Controller extends Base {
      * @param int $id The ID of the booking to reject.
      */
     public function reject($id) {
+        /** @var Model $booking */
         $booking = $this->getBookingMapper()->findById($id);
         $booking->setStatus(Status\Model::STATUS_REJECTED);
         $this->getBookingMapper()->save($booking);
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceBooking.book', array('id' => $id))
+            $this->getRouter()->generate(
+                'resourceItem.read', array('id' => $booking->getResource()->getId())
+            )
         );
     }
 
@@ -523,9 +521,13 @@ class Controller extends Base {
      * @param int $id The ID of the booking to reject.
      */
     public function cancel($id) {
-        $this->getBookingMapper()->delete($this->getBookingMapper()->findById($id));
+        /** @var Model $booking */
+        $booking = $this->getBookingMapper()->findById($id);
+        $this->getBookingMapper()->delete($booking);
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceBooking.book', array('id' => $id))
+            $this->getRouter()->generate(
+                'resourceItem.read', array('id' => $booking->getResource()->getId())
+            )
         );
     }
 
