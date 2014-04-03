@@ -1,20 +1,48 @@
 {% extends 'schoolmail.twig' %}
 {% block content %}
-  <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
-  {% for msg in messages %}
-      <tr><td valign="top" height="{{ config.padding }}"><img src="{{ spacer }}" height="{{ config.padding }}" width="1" border="0" /></td></tr>
+<table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
+    <tr>{{ fn.spacer(16, 0) }}</tr>
     <tr>
-      <td width="640">
-        {{ msg.text | raw }}
-      </td>
-    </tr>
-      <tr><td valign="top" height="24"><img src="{{ spacer }}" height="24" width="1" border="0" /></td></tr>
-      <tr>
-        <td>
-          <a bgcolor="{{ colours.submit_btn }}" style="background:{{ colours.submit_btn }};padding:4px 8px 6px;text-decoration:none;color:{{ colours.white }};" href="{{ msg.href }}">View in {{ config.title }}</a>
+        <td width="640" colspan="2">
+            <p>Hi {{ recipient }},</p>
         </td>
-      </tr>
-      <tr><td valign="top" height="{{ config.padding }}"><img src="{{ spacer }}" height="{{ config.padding }}" width="1" border="0" /></td></tr>
-  {% endfor %}
-  </table>
+    </tr>
+    <tr>{{ fn.spacer(8, 0) }}</tr>
+    <tr>
+        {% if msg.icon %}
+        <td width="72" height="48" valign="top">
+            <table>
+                <tr>
+                    {{ fn.spacer(0, 8) }}
+                    <td><img src="{{ msg.icon }}" width="48" height="48" /></td>
+                    {{ fn.spacer(0, 8) }}
+                </tr>
+            </table>
+        </td>
+        {% else %}
+        {{ fn.spacer(36, 0, 2) }}
+        {% endif %}
+        <td valign="middle">
+            <table>
+                <tr>
+                    <td>{{ msg.pretty | raw }}</td>
+                </tr>
+                {% if msg.abstract %}
+                <tr class="underline">{{ fn.spacer(8, 0) }}</tr>
+                <tr>{{ fn.spacer(4, 0) }}</tr>
+                <tr>
+                    <td>{{ msg.abstract | raw }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </td>
+    </tr>
+    <tr>{{ fn.spacer(24, 0, 2) }}</tr>
+    <tr>
+        <td width="640" colspan="2">
+          <a class="cta" href="http://{{ config.fqdn }}{{ msg.href }}">View in {{ config.title }}</a>
+        </td>
+    </tr>
+    <tr>{{ fn.spacer(16, 0, 2) }}</tr>
+</table>
 {% endblock %}

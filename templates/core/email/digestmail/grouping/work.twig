@@ -1,0 +1,57 @@
+{# parent DOM: you are in <td/> context here #}
+<table width="624">
+{% for datestamp, date in group.dates %}
+    <tr>{{ fn.spacer(4, 0, 2) }}</tr>
+    <tr role="dateholder"{# unique date #}>
+        <td valign="top" width="72">
+            <table width="72" align="center">
+                <tr>{{ fn.spacer(8, 0, 3) }}</tr>
+                <tr>
+                    {{ fn.spacer(0, 8) }}
+                    <td class="work-month">{{ datestamp|slice(2)|date('M') }}</td>
+                    {{ fn.spacer(0, 8) }}
+                </tr>
+                <tr>
+                    {{ fn.spacer(0, 8) }}
+                    <td class="work-day">{{ datestamp|slice(2)|date('j') }}</td>
+                    {{ fn.spacer(0, 8) }}
+                </tr>
+                {#<tr>{{ fn.spacer(8, 0, 3) }}</tr>#}
+            </table>
+        </td>
+        <td valign="top">
+            <table role="list"{# list of items due this day #}>
+                <tr>{{ fn.spacer(8, 0) }}</tr>
+                {% for msg in date %}
+                <tr>
+                    <td><p>{{ msg.pretty | raw }}</p></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+    <tr>{{ fn.spacer(4, 0, 2) }}</tr>
+{% endfor %}
+</table>
+
+
+{#
+    <tr>
+        {{ fn.spacer(0, 8) }}
+        <td valign="bottom">
+            <a href="http://{{ config.fqdn }}/{UPCOMING_HREF}{UPCOMING_ID}"
+               style="color:{{ colours.link }};text-decoration:none;font-weight:bold;">
+                {UPCOMING_TITLE}
+            </a>
+            <br>
+            <a href="http://{{ config.fqdn }}/homepage/{UPCOMING_SUBJ_ID}"
+               style="color:{{ colours.link }};text-decoration:none;">
+                {UPCOMING_SUBJ_NAME}
+            </a>
+            {UPCOMING_TYPE}
+        </td>
+        <td valign="bottom">
+            <span style="color:{{ colours.negative_color }};">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}
+        </td>
+    </tr>
+#}
