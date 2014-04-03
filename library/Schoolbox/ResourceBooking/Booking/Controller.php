@@ -257,6 +257,8 @@ class Controller extends Base {
         // * My bookings (shows in my elements)
         // * Bookings for items I moderate?)
         $event->setType(1);
+        // Owner and author could be separate - as a moderator I could create
+        // bookings for other people.
         $event->setOwner($this->getUser());
         $event->setAuthor($this->getUser());
         $event->setSid($this->getUser()->getId());
@@ -264,8 +266,6 @@ class Controller extends Base {
         // Currently role and campus must be set to empty collections.
         $event->setRoleCollection(new \Schoolbox\Collection());
         $event->setCampusCollection(new \Schoolbox\Collection());
-//        $event->setStartDateTime(new \Alaress_Date_Format($this->getRequest()->post['booking-from']));
-//        $event->setEndDateTime(new \Alaress_Date_Format($this->getRequest()->post['booking-to']);
 
         // Currently I can't setStartDateTime() and have that propogate to
         // startDate and startTime.
