@@ -11,6 +11,8 @@ namespace Schoolbox\ResourceBooking\Item;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\User;
+use Schoolbox\UserAccess;
+use Schoolbox\UserMapper;
 use Schoolbox\StorageMapper;
 
 class Controller extends Base {
@@ -19,6 +21,11 @@ class Controller extends Base {
      * @var Mapper
      */
     protected $mapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
 
     /**
      * Browses the list of items.
@@ -100,14 +107,18 @@ class Controller extends Base {
      * @param int $id
      */
     public function read($id) {
+        // Loading default moderators:
+        //
         $item = $this->getMapper()->findById($id);
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceItem/read.twig',
                 'data'     => array(
-                    'item'            => $item,
-                    'moderatorList'   => array(),
-                    'relatedItemList' => array(),
+                    'item'                 => $item,
+                    'defaultModeratorList' => $this->getUserMapper()->findByAccess(
+                        UserAccess::SERVICE_RESOURCE_BOOKING,
+                        UserAccess::ACCESS_FULL
+                    ),
                 ),
             )
         );
@@ -123,7 +134,7 @@ class Controller extends Base {
         /** @var Model $item */
         $item = $this->getMapper()->findById($id);
 
-        // Build list of moderators and related items
+        // Build list of moderators and related items (for BelgianSuggest)
         $moderatorList = array();
         foreach ($item->getModeratorList() as $moderator) {
             $moderatorList[] = array(
@@ -283,6 +294,22 @@ class Controller extends Base {
      */
     public function getMapper() {
         return $this->mapper;
+    }
+
+    /**
+     * @param  UserMapper $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
     }
 
 }

@@ -58,6 +58,8 @@ class Module extends BaseModule {
     public function initControllers(ContainerInterface $injector) {
         $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setMapper']
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
+        $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setUserMapper']
+            = $injector->lazyNew('Schoolbox\\UserMapper');
         $injector->set(
             'controller:resourceItem',
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Controller')
