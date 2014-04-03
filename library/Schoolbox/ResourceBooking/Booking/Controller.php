@@ -501,6 +501,25 @@ class Controller extends Base {
     }
 
     /**
+     * Cancels a booking.
+     *
+     * For now, it does this by deleting the booking, but could later do this by
+     * setting a status.
+     *
+     * Permissions:
+     * * Users may cancel their own bookings
+     * * Moderators for an object may cancel anyone's bookings
+     *
+     * @param int $id The ID of the booking to reject.
+     */
+    public function cancel($id) {
+        $this->getBookingMapper()->delete($this->getBookingMapper()->findById($id));
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate('resourceBooking.book', array('id' => $id))
+        );
+    }
+
+    /**
      * @param  Mapper $bookingMapper
      * @return $this
      */

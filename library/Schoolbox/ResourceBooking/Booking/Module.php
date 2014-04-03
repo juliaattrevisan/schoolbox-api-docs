@@ -35,6 +35,7 @@ class Module extends BaseModule {
         // Approving or rejecting a single booking
         $router->add('resourceBooking.approve', $basePath.'/{id}/approve');
         $router->add('resourceBooking.reject',  $basePath.'/{id}/reject');
+        $router->add('resourceBooking.cancel',  $basePath.'/{id}/cancel');
     }
 
     /**
