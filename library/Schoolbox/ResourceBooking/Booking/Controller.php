@@ -359,7 +359,7 @@ class Controller extends Base {
             if ($editUrl !== false) {
                 $buttons[] = array(
                     'label' => 'Modify',
-                    'class' => 'modify',
+                    'class' => 'modify booking-modify',
                     'href'  => $editUrl,
                 );
             }
@@ -370,7 +370,7 @@ class Controller extends Base {
             if ($cancelUrl !== false) {
                 $buttons[] = array(
                     'label' => 'Cancel',
-                    'class' => 'delete',
+                    'class' => 'delete booking-cancel',
                     'href'  => $cancelUrl,
                 );
             }
@@ -386,7 +386,7 @@ class Controller extends Base {
                     if ($approveUrl !== false) {
                         $buttons[] = array(
                             'label' => 'Approve',
-                            'class' => 'tick',
+                            'class' => 'tick booking-approve',
                             'href'  => $approveUrl,
                         );
                     }
@@ -397,7 +397,7 @@ class Controller extends Base {
                     if ($rejectUrl !== false) {
                         $buttons[] = array(
                             'label' => 'Reject',
-                            'class' => 'reply',
+                            'class' => 'reply booking-reject',
                             'href'  => $rejectUrl,
                         );
                     }
@@ -484,11 +484,7 @@ class Controller extends Base {
         $booking = $this->getBookingMapper()->findById($id);
         $booking->setStatus(Status\Model::STATUS_APPROVED);
         $this->getBookingMapper()->save($booking);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'resourceItem.read', array('id' => $booking->getResource()->getId())
-            )
-        );
+        $this->outputUpdateStatusResponse($booking);
     }
 
     /**
@@ -501,11 +497,7 @@ class Controller extends Base {
         $booking = $this->getBookingMapper()->findById($id);
         $booking->setStatus(Status\Model::STATUS_REJECTED);
         $this->getBookingMapper()->save($booking);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'resourceItem.read', array('id' => $booking->getResource()->getId())
-            )
-        );
+        $this->outputUpdateStatusResponse($booking);
     }
 
     /**
@@ -524,11 +516,31 @@ class Controller extends Base {
         /** @var Model $booking */
         $booking = $this->getBookingMapper()->findById($id);
         $this->getBookingMapper()->delete($booking);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'resourceItem.read', array('id' => $booking->getResource()->getId())
-            )
-        );
+        $this->outputUpdateStatusResponse($booking);
+    }
+
+    /**
+     * Processes a redirect after a booking's status is updated.
+     *
+     * @param Model $booking
+     */
+    protected function outputUpdateStatusResponse(Model $booking) {
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->setCode(200);
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => array('item' => $booking,),
+                )
+            );
+        }
+        else {
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouter()->generate(
+                    'resourceItem.read', array('id' => $booking->getResource()->getId())
+                )
+            );
+        }
     }
 
     /**

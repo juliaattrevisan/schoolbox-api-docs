@@ -178,6 +178,21 @@
             event.preventDefault()
             c.dom.fullCalendar('refetchEvents')
         })
+
+        // Approve, Reject, Cancel: all AJAX events
+        // Modify: not AJAX
+        $('#calendar-bubble').find('#editEvent').on(
+            'click',
+            'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
+            function(event) {
+                event.preventDefault()
+                c.bubble.hide()
+                $.ajax(this.href)
+                    .done(function() {
+                        c.dom.fullCalendar('refetchEvents')
+                    })
+            }
+        )
     })
 </script>
 
