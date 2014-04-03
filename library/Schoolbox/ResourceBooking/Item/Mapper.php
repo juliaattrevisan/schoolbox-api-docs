@@ -330,4 +330,19 @@ class Mapper extends BaseMapper {
         return $this->hydrateList($statement, 're');
     }
 
+    /**
+     * Is the user a moderator of this item?
+     *
+     * @param  int $itemId
+     * @param  int $userId
+     * @return bool
+     */
+    public function isUserModerator($itemId, $userId) {
+        $list = $this->getJoinMapper('moderator')->findByColumnList(
+            array('resource_id' => $itemId, 'moderator_id' => $userId),
+            array('limit' => 1)
+        );
+        return count($list) >= 1;
+    }
+
 }

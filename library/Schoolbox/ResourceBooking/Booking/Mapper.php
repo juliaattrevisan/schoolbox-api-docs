@@ -236,4 +236,26 @@ class Mapper extends BaseMapper {
         $mapper->save($newList->diff($oldList, $diffMethod));
         $mapper->delete($oldList->diff($newList, $diffMethod));
     }
+
+    /**
+     * Is the user a moderator of the item this booking is for?
+     *
+     * @param  int $bookingId
+     * @param  int $userId
+     * @return bool
+     */
+    public function isUserModeratorOfBookingItem($bookingId, $userId) {
+        $query = "
+            SELECT COUNT(*)
+            FROM {$this->getTable()} b
+            INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
+            INNER JOIN {$this->getJoinSql('resource.moderator', 'r', 'rm')}
+            WHERE b.id=:bookingId AND rm.moderator_id=:userId
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('bookingId', $bookingId);
+        $statement->bindValue('userId',    $userId);
+        $statement->execute();
+        return $statement->fetchColumn() > 0;
+    }
 }
