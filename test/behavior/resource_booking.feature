@@ -307,11 +307,17 @@ Scenario: Booking a moderated resource
   When  I go to "/resource-booking/item"
   And   I view details for resource "English textbook"
   Then  I should see pending booking at "2:00pm +1 days"
-  And   I should be able to reject booking at "2:00pm +1 days"
-  When  I reject booking at "3pm +3 days"
+  # In order to see rejected items, I need to enable them in the filter
+  When  I click "#fc-button-filter"
+  And   I check "Rejected"
+  And   I click "#applyFilters"
+  And   I wait for AJAX to finish
+  And   I reject booking at "2:00pm +1 days"
+  And   I wait for AJAX to finish
   Then  I should see rejected booking at "2:00pm +1 days"
   # I changed my mind, approve it after all
-  When  I approve booking at "3pm +3 days"
+  When  I approve booking at "2:00pm +1 days"
+  And   I wait for AJAX to finish
   Then  I should see approved booking at "2:00pm +1 days"
 
 #Scenario: Booking a managed resource
@@ -338,6 +344,7 @@ Scenario: Cancelling a booking
   Then  I should see approved booking at "3pm +6 days"
   # And cancel it
   When  I cancel booking at "3pm +6 days"
+  And   I wait for AJAX to finish
   Then  I should not see approved booking at "3pm +6 days"
 
 @resource-booking @resource-booking-errors @resource-booking-errors-conflict
