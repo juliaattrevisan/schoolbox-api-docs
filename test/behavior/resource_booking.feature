@@ -113,7 +113,7 @@ Scenario: Manage resources
   And  I should see "English textbook" in the ".resource-list" element
   And  I should see "The special projector" in the ".resource-list" element
   # Update a resource
-  When  I follow "The special projector"
+  When  I edit resource "The special projector"
   And   I fill in the following:
     | name        | The good projector       |
     | description | A projector made of gold |
@@ -126,7 +126,7 @@ Scenario: Manage resources
   And   I should see "The good projector" in the ".resource-list" element
   And   I should not see "The special projector" in the ".resource-list" element
   # Check its users
-  When  I follow "The good projector"
+  When  I edit resource "The good projector"
   Then  the autocomplete "moderator_id" should not contain "Scott Berryhill"
   And   the autocomplete "moderator_id" should contain "Jenifer Shadbolt"
   And   the autocomplete "moderator_id" should contain "Peter Lovejoy"
@@ -146,7 +146,7 @@ Scenario: Manage resources
   And   I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
   And   I should see "The good projector" in the ".resource-list" element
-  When  I follow "To be deleted"
+  When  I edit resource "To be deleted"
   And   I press "resource-delete"
   # There should be a confirm here, but currently there is not.
   Then  I should not see "To be deleted" in the ".resource-list" element
@@ -230,27 +230,27 @@ Scenario: Adding related resources to a resource
   And   I select "A single projector" from autocomplete "related_resource_id"
   And   I press "resource-save"
   # Check the related resources
-  When  I follow "Book box"
+  When  I edit resource "Book box"
   Then  the autocomplete "related_resource_id" should contain "English textbook"
   And   the autocomplete "related_resource_id" should contain "A single projector"
   # Relations should be reciprocal too
   When  I move backward one page
-  And   I follow "English textbook"
+  And   I edit resource "English textbook"
   Then  the autocomplete "related_resource_id" should contain "Book box"
   And   the autocomplete "related_resource_id" should not contain "A single projector"
   # And reciprocally deleted
   When  I move backward one page
-  And   I follow "A single projector"
+  And   I edit resource "A single projector"
   And   I remove "Book box" from autocomplete "related_resource_id"
   And   I press "resource-save"
-  And   I follow "A single projector"
+  And   I edit resource "A single projector"
   Then  I should not see "Book box"
   When  I move backward one page
-  And   I follow "English textbook"
+  And   I edit resource "English textbook"
   Then  the autocomplete "related_resource_id" should contain "Book box"
   And   the autocomplete "related_resource_id" should not contain "A single projector"
   When  I move backward one page
-  And   I follow "Book box"
+  And   I edit resource "Book box"
   Then  the autocomplete "related_resource_id" should contain "English textbook"
   And   the autocomplete "related_resource_id" should not contain "A single projector"
 
