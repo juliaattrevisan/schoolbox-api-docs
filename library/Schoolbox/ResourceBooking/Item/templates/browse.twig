@@ -7,12 +7,11 @@
             Is there some more semantically correct way of saying that this is a
             resource, apart from adding classes?
             #}
-            {% if isRouteAuthorized('resourceItem.edit', {id: item.id}) %}
-                <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">{{ item.name }}</a>
-            {% else %}
-                <span class="resource-name">{{ item.name }}</span>
-            {% endif %}
+            <span class="resource-name">{{ item.name }}</span>
             <a class="resource-read-link" id="resource-read-{{item.id}}" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">Book</a>
+            {% if isRouteAuthorized('resourceItem.edit', {id: item.id}) %}
+                <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">Edit</a>
+            {% endif %}
         </li>
         {% else %}
         <li>There are no resources in the system.</li>
