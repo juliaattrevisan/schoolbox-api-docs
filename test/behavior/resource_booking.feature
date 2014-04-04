@@ -188,7 +188,7 @@ Scenario: Check resource permissions
 Scenario: Search for resources (from the global search)
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
+  And   I log in as "rvollmer" with password "password"
   # Search thru global search bar - not sure if required
   When  I fill in "search-field" with "single projector"
   And   I press "search-button"
@@ -198,7 +198,7 @@ Scenario: Search for resources (from the global search)
 Scenario: Search for resources (from the resource module)
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
+  And   I log in as "rvollmer" with password "password"
   When  I go to "/resource-booking/item"
   # Filter by resource category selector
   And   I follow "Projectors"
@@ -258,7 +258,7 @@ Scenario: Adding related resources to a resource
 Scenario: Booking an open resource
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
+  And   I log in as "rvollmer" with password "password"
   # "A single projector":
   # Anyone can book this resource.
   # Lead time: 1 day
@@ -287,7 +287,7 @@ Scenario: Booking an open resource
 Scenario: Booking a moderated resource
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
+  And   I log in as "rvollmer" with password "password"
   When  I go to "/resource-booking/item"
   And   I view details for resource "English textbook"
   And   I start booking resource for "+1 days"
@@ -320,16 +320,18 @@ Scenario: Booking a moderated resource
   And   I wait for AJAX to finish
   Then  I should see approved booking at "2:00pm +1 days"
 
+#Scenario: Booking a resource for someone else (if I have moderator perms on item)
+
 #Scenario: Booking a managed resource
 #  Given I do not wipe the slate clean
 #  And   I go to homepage
-#  And   I log in as "sberryhill" with password "password"
+#  And   I log in as "rvollmer" with password "password"
 
 @resource-booking
 Scenario: Cancelling a booking
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
+  And   I log in as "rvollmer" with password "password"
   When  I go to "/resource-booking/item"
   And   I view details for resource "A single projector"
   And   I start booking resource for "+6 days"
@@ -351,7 +353,7 @@ Scenario: Cancelling a booking
 Scenario: Double-booking an item
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
+  And   I log in as "rvollmer" with password "password"
   When  I go to "/resource-booking/item"
   And   I view details for resource "A single projector"
   # Create a booking for this item for others to conflict with
@@ -402,7 +404,7 @@ Scenario: Double-booking an item
 Scenario: Booking an item for less than min booking time
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
+  And   I log in as "rvollmer" with password "password"
   When  I go to "/resource-booking/item"
   And   I view details for resource "A single projector"
   And   I start booking resource for "+3 days"
@@ -422,7 +424,7 @@ Scenario: Booking an item for less than min booking time
 Scenario: Booking an item for more than max booking time
   Given I do not wipe the slate clean
   And   I go to homepage
-  And   I log in as "sberryhill" with password "password"
+  And   I log in as "rvollmer" with password "password"
   When  I go to "/resource-booking/item"
   And   I view details for resource "A single projector"
   And   I start booking resource for "+3 days"
