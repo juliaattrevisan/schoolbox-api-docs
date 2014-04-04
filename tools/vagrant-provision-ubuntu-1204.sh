@@ -63,10 +63,11 @@ rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -R /var/lib/vagrant > /dev/null;
 
 echo "$vag Generating data dir sql fixes";
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /home/vagrant/schoolboxdemo-vagrant-latest.sql;
+cp /home/vagrant/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-latest.sql;
 
 echo "$vag Applying vagrant SQL fixes";
-mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-vagrant-latest.sql
+mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-latest.sql
 
 echo "$vag Removing existing apache vhosts";
 rm -f /etc/apache2/sites-enabled/10*;
