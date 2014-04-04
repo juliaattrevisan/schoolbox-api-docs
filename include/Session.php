@@ -327,7 +327,7 @@ class Session
     }
 
 
-    private function ldap_escape($str, $for_dn = false)
+    public function ldap_escape($str, $for_dn = false)
     {
 
         // see:
