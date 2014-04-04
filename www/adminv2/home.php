@@ -133,7 +133,7 @@ if(Cfg::get('ldap_enable')) {
                         'LDAP_ALT_STATUS'    => 'Online');
         }
         else {
-            $ldap2 = array('LDAP_LIGHT'    => '',
+            $ldap2 = array('LDAP_ALT_LIGHT'    => '',
                         'LDAP_ALT_STATUS'    => 'Offline');
         }
         unset($ds,$ldapbind);
