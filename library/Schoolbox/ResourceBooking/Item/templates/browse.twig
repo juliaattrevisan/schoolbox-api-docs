@@ -8,7 +8,10 @@
             resource, apart from adding classes?
             #}
             <span class="resource-name">{{ item.name }}</span>
-            <a class="resource-read-link" id="resource-read-{{item.id}}" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">Book</a>
+            <a class="resource-read-link" id="resource-read-{{item.id}}" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">View</a>
+            {% if isRouteAuthorized('resourceBooking.book', {id: item.id}) %}
+                <a class="resource-book-link" id="resource-book-{{item.id}}" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">Book</a>
+            {% endif %}
             {% if isRouteAuthorized('resourceItem.edit', {id: item.id}) %}
                 <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">Edit</a>
             {% endif %}
