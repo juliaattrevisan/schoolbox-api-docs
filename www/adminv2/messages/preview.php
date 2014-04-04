@@ -28,45 +28,34 @@ if(empty($this->arg[0])) {
 $decor = new \Schoolbox\Notif\Message\Decorator(null);
 $msgFactory = new \Schoolbox\Notif\Message\Factory();
 
+/** @var \Schoolbox\Notif\Message\External\TargetedMessage[] $msgs */
+$msgs = array();
+
 switch($this->arg[0]) {
 	case 'instant':
 		$email = new \Schoolbox\Mail\TwigEmail('instantmail.twig');
+		$email->setContext(array(
+			'recipient' => $_SESSION['user']->getFirstname()
+		));
+
 		$cctx = $email->getCoreContext();
 
-		$decor->setMessage(
-			$msgFactory
+		$msgs[] = $msgFactory
 			->setMsgBody(':author posted a Lab Report :name in :subj')
 				->bindParam('author', 'Mr Walter White', '#')
 				->bindParam('name', 'REDUX', '#')
 				->bindParam('subj','Yr 11 Chemistry B', '#')
 			->setTimestamp(strtotime('today'))
+			->setMeta('subtitle', 'Due 24th April, 2014')
+			->setMeta('abstract', 'You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
 			->setNotifier(new \Schoolbox\Assessment\Component\SubmissionBoxNotifier(null))
-			->build()
-		);
-
-		$ctx = $decor->formatContext($cctx);
-		$date = array_values($ctx['groups']['work']['dates']);
-		$msg = array_values($date[0]);
-		$msg[0]['abstract'] = <<< EOT
-<p><em>Due 24th April, 2014</em></p>
-<p>You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.</p>
-EOT;
-
-//		unset($msg[0]['abstract']);
-
-		$context = array(
-			'recipient' => $_SESSION['user']->getFirstname(),
-			'msg'       => $msg[0]
-		);
+			->build();
 		break;
 
 	case 'digest':
 	default:
 		$email = new \Schoolbox\Mail\TwigEmail('digestmail.twig');
 		$cctx = $email->getCoreContext();
-
-		/** @var \Schoolbox\Notif\Message\External\TargetedMessage[] $msgs */
-		$msgs = array();
 
 		$msgs[] = $msgFactory
 			->setMsgBody(':author posted a Lab Report :name in :subj')
@@ -101,7 +90,7 @@ EOT;
 			->build();
 
 		/** @var \Schoolbox\News\Article[] $articles */
-		$articles = \Schoolbox\News\ArticleMapper::getInstance()->findAll(array('limit' => 10));
+		$articles = \Schoolbox\News\ArticleMapper::getInstance()->findAll(array('limit' => 3));
 
 		foreach($articles as $article) {
 
@@ -124,63 +113,16 @@ EOT;
 				->setNotifier(new \Schoolbox\News\ArticleNotifier(null))
 				->build();
 		}
-
-		$context = array();
-
-		foreach($msgs as $msg) {
-			$ns = in_array($msg->getNamespace(), array('duework', 'assess')) ? 'work' : $msg->getNamespace();
-			$context = array_merge_recursive($context, $decor->setMessage($msg)->formatContext($cctx));
-		}
-
-		$headings = array(
-			'work' => 'Schoolwork',
-			'news' => 'News'
-		);
-
-		foreach($headings as $ns => $heading) {
-			if(isset($context['groups'][$ns])) {
-				$context['groups'][$ns]['heading'] = $heading;
-			}
-		}
-
-		$oldestFirst = Cfg::get('digest_oldest_first');
-
-		// sorting
-		foreach($context['groups'] as $ns => &$group) {
-			switch($ns) {
-				case 'work':
-					// $group is prefixed dates
-					if($oldestFirst) {
-						ksort($group['dates']);
-					}
-					else {
-						krsort($group['dates']);
-					}
-					break;
-				default:
-					if(isset($group['messages'])) {
-						usort($group['messages'], function($a, $b) use ($oldestFirst) {
-							$i = $oldestFirst ? 1 : -1;
-							return $a['timestamp'] == $b['timestamp']
-								? 0
-								: $a > $b ? ($i) : ($i * -1);
-						});
-					}
-					break;
-			}
-		}
-
 		break;
-
 }
+
+$email->buildContextFromMessageList($msgs);
 
 if(isset($this->arg[1]) && $this->arg[1] == 'context') {
 	header('Content-Type: text/plain');
-	print_r($context);
+	print_r($email->getContext());
 	die();
 }
-
-$email->setContext($context);
 
 echo $email->composeHTML();
 die();
