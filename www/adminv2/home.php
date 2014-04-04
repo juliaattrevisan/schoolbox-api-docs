@@ -129,12 +129,12 @@ if(Cfg::get('ldap_enable')) {
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
         $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user_alt')), utf8_encode(Cfg::get('ldap_pass'))); 
         if($ldapbind) {
-            $ldap2 = array('LDAP_LIGHT'    => 'on',
-                        'LDAP_STATUS'    => 'Online');
+            $ldap2 = array('LDAP_ALT_LIGHT'    => 'on',
+                        'LDAP_ALT_STATUS'    => 'Online');
         }
         else {
             $ldap2 = array('LDAP_LIGHT'    => '',
-                        'LDAP_STATUS'    => 'Offline');
+                        'LDAP_ALT_STATUS'    => 'Offline');
         }
         unset($ds,$ldapbind);
     }
