@@ -63,7 +63,7 @@ rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -R /var/lib/vagrant > /dev/null;
 
 echo "$vag Generating data dir sql fixes";
-cp /home/vagrant/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
+cp -f /home/vagrant/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
 /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-latest.sql;
 
 echo "$vag Applying vagrant SQL fixes";
