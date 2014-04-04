@@ -13,7 +13,11 @@
                 <table width="624">
                     <tr>
                         <td>
-                            {% include "digestmail/grouping/#{ns}.twig" %}
+                            <table width="624">
+                            {% for row in group.rows %}
+                                {% include "digestmail/grouping/#{ns}.twig" %}
+                            {% endfor %}
+                            </table>
                         </td>
                     </tr>
                     <tr>{{ fn.spacer(4, 0) }}</tr>

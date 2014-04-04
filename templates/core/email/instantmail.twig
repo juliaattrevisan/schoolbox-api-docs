@@ -1,6 +1,11 @@
 {% extends 'schoolmail.twig' %}
 {% block content %}
-<table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
+    {# dig into the context #}
+    {% set ns = groups|first %}
+    {% set row = ns.rows|first %}
+    {% set msg = row.messages|first %}
+
+    <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
     <tr>{{ fn.spacer(16, 0) }}</tr>
     <tr>
         <td width="640" colspan="2">
@@ -27,12 +32,19 @@
                 <tr>
                     <td>{{ msg.pretty | raw }}</td>
                 </tr>
-                {% if msg.abstract %}
+                {% if msg.meta %}
                 <tr class="underline">{{ fn.spacer(8, 0) }}</tr>
                 <tr>{{ fn.spacer(4, 0) }}</tr>
                 <tr>
-                    <td>{{ msg.abstract | raw }}</td>
+                    <td>
+                        <p>
+                            <em>{{ msg.meta.subtitle | raw }}</em>
+                        </p>
+                    </td>
                 </tr>
+                    <td>
+                        <p>{{ msg.meta.abstract | raw }}</p>
+                    </td>
                 {% endif %}
             </table>
         </td>

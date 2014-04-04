@@ -1,45 +1,33 @@
-{# parent DOM: you are in <td/> context here #}
-<table width="624">
-    {% for msg in group.messages %}
-        <tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(12, 0, 4) }}</tr>
-        <tr class="{{ loop.index is even ? 'dark' : '' }}">
-            {% if msg.icon %}
-            <td width="64" height="56" valign="top">
-                    <table>
-                        <tr>
-                            {{ fn.spacer(0, 8) }}
-                            <td><img src="{{ msg.icon }}" width="56" height="56" /></td>
-                        </tr>
-                    </table>
-                </td>
-            {{ fn.spacer(0, 8) }}
-            {% else %}
-                {{ fn.spacer(36, 8, 3) }}
-            {% endif %}
-            <td valign="middle">
-                <table width="100%">
-                    <tr>
-                        <td><strong>{{ msg.pretty | raw }}</strong></td>
-                    </tr>
-                    {% if msg.meta %}
-                    <tr class="underline">{{ fn.spacer(8, 0) }}</tr>
-                    <tr>{{ fn.spacer(4, 0) }}</tr>
-                    <tr>
-                        <td><p><em>
-                            {% if msg.meta.topic %}
-                                {{ msg.meta.topic }} |
-                            {% endif %}
-                                {{ msg.timestamp|date('jS M Y') }} by {{ msg.meta.author }}
-                        </em></p></td>
-                    </tr>
-                    <tr>
-                        <td><p>{{ msg.meta.abstract | raw }}</p></td>
-                    </tr>
-                    {% endif %}
-                </table>
-            </td>
-            {{ fn.spacer(0, 8) }}
-        </tr>
-        <tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(12, 0, 4) }}</tr>
-    {% endfor %}
-</table>
+{% extends "schoolmail/row.twig" %}
+
+{% block image %}
+    {% set msg = row.messages | first %}
+    <img src="{{ msg.icon }}" width="56" height="56" />
+{% endblock %}
+
+{% block pretty %}
+    {% set msg = row.messages | first %}
+    <strong>{{ msg.pretty | raw }}</strong>
+{% endblock %}
+
+{% block meta %}
+    {% set msg = row.messages | first %}
+    {% if msg.meta %}
+    {{ parent() }}
+    <tr>
+        <td>
+            <p>
+                <em>
+                {% if msg.meta.topic %}
+                    {{ msg.meta.topic }} |
+                {% endif %}
+                    {{ msg.timestamp|date('jS M Y') }} by {{ msg.meta.author }}
+                </em>
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td><p>{{ msg.meta.abstract | raw }}</p></td>
+    </tr>
+    {% endif %}
+{% endblock %}
