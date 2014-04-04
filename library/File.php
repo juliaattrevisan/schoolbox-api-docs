@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Notif\Notif;
+
 class File extends DeprecatedModel {
 
     function File () {
@@ -134,8 +136,8 @@ class File extends DeprecatedModel {
         $logEntry = array(
             'object' => 'file', 'objectId' => $fileID, 'action' => $action, 'user' => $_SESSION['id'],
         );
-
-        $this->db->insert('cmsLog', $logEntry);
+	    $notif = new Notif(Notif::TOPIC_CMS);
+	    $notif->info("CRUD", $logEntry);
     }
 
     function create ($data, $file = '') {

@@ -1,10 +1,14 @@
 <!-- BEGIN banner_logged_in -->
 <ul id="infoPanel">
-    <li class="first"><a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|
-    </li>
-    <li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
-    <li><a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">
-		<img height="32" width="32" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/></a></li>
+  <li class="user first">
+    <a href="/search/user/{USER_ID}" title="View Profile">{SITE_LOGINNAME}</a>
+  </li>
+  <li class="avatar">
+    <a href="/search/user/{USER_ID}" title="View Profile">
+      <img height="32" width="32" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/>
+    </a>
+  </li>
+  {INSTANTMESSAGE_BLOCK}
 </ul>
 <form id="search" action="/search.php" method="get">
     <fieldset>

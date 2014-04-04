@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Notif\Notif;
+
 class MyFolder extends DeprecatedModel {
 
 	function MyFolder ($owner = 0) {
@@ -100,7 +102,8 @@ class MyFolder extends DeprecatedModel {
 							'user'		=> $_SESSION['id'],
 							);
 
-		$this->db->insert('cmsLog', $logEntry);
+		$notif = new Notif(Notif::TOPIC_CMS);
+		$notif->info("CRUD", $logEntry);
 	}
 
 	function create ($data) {

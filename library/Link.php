@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Notif\Notif;
+
 class Link extends DeprecatedModel
 {
 
@@ -84,7 +86,9 @@ class Link extends DeprecatedModel
             'user' => $_SESSION['id'],
         );
 
-        $this->db->insert('cmsLog', $logEntry);
+	    $notif = new Notif(Notif::TOPIC_CMS);
+	    $notif->info("CRUD", $logEntry);
+
     }
 
     function update($data)

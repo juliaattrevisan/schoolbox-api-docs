@@ -47,6 +47,7 @@ rm -rf /vagrant/data/cache;
 echo "$vag Creating Schoolbox conf file";
 cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
 sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
+sed -i 's/xxxxxxxx/vagrantx/g' /vagrant/www/conf/conf.php;
 
 echo "$vag Installing vendor submodules with composer";
 /vagrant/tools/composer.sh;

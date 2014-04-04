@@ -1,0 +1,57 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Realtime\Message;
+
+
+use Schoolbox\Mapper;
+
+class NSMapper extends Mapper {
+
+	const NS_DUEWORK        = 'duework';
+	const NS_ONLINE_ASSESS  = 'assess';
+	const NS_BLOG           = 'blog';
+	const NS_FORUM          = 'forum';
+	const NS_NEWS           = 'news';
+	const NS_CALENDAR       = 'calendar';
+	const NS_BOARDER_LEAVE  = 'leave';
+	const NS_WIKI           = 'wiki';
+
+	protected function mapping() {
+		$this->hasTable('msg_namespace');
+		$this->hasModel('\\Schoolbox\\Realtime\\Message\\NS');
+
+		$this->hasMap(array(
+			'column'     => 'id',
+			'property'   => 'id',
+			'type'       => self::TYPE_INTEGER,
+			'identifier' => true,
+		));
+		$this->hasMap(array(
+			'column'     => 'slug',
+			'property'   => 'slug',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'label',
+			'property'   => 'label',
+			'type'       => self::TYPE_STRING,
+		));
+	}
+
+	/**
+	 * @param string $slug
+	 * @param array $options
+	 * @return \Schoolbox\Collection
+	 */
+	public function findOneBySlug($slug, $options = array()) {
+		return $this->findByColumn('slug', $slug, $options)->first();
+	}
+
+}

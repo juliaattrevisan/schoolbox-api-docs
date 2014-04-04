@@ -1,0 +1,35 @@
+{% extends "schoolmail/row.twig" %}
+
+{% block image %}
+    {% set msg = row.messages | first %}
+    <table width="72" align="center">
+        <tr>{{ fn.spacer(8, 0, 3) }}</tr>
+        <tr>
+            {{ fn.spacer(0, 8) }}
+            <td class="work-month">{{ msg.timestamp|date('M') }}</td>
+            {{ fn.spacer(0, 8) }}
+        </tr>
+        <tr>
+            {{ fn.spacer(0, 8) }}
+            <td class="work-day">{{ msg.timestamp|date('j') }}</td>
+            {{ fn.spacer(0, 8) }}
+        </tr>
+        {#<tr>{{ fn.spacer(8, 0, 3) }}</tr>#}
+    </table>
+{% endblock %}
+
+{% block pretty %}
+    <table>
+        <tr>{{ fn.spacer(8, 0) }}</tr>
+        {% for msg in row.messages %}
+            <tr>
+                <td><p>{{ msg.pretty | raw }}</p></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block meta %}
+    {# no meta #}
+{% endblock %}
+

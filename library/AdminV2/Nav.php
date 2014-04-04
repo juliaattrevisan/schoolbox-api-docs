@@ -20,6 +20,7 @@ class AdminV2_Nav {
         'calendar' => 'Calendar',
         'folder' => 'Folder',
         'rubric-results' => 'Rubrics',
+	    'messages' => 'Messages',
         'list' => 'Lists',
         'cleanup' => 'Cleanup',
 		'usage' => 'Usage',

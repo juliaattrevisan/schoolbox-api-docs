@@ -1,0 +1,24 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Alaress\WorkerCrew;
+
+
+interface DispatcherInterface {
+
+	/**
+	 * Accepts a task to be dispatched.
+	 *
+	 * @param object $identifier
+	 * @param string $command
+	 * @param string $data
+	 */
+	public function enqueue($identifier, $command, $data);
+
+} 

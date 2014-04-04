@@ -1,0 +1,146 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Notif\Message;
+
+
+use Alaress\Scheduler\Trigger\TriggerInterface;
+use Schoolbox\Notif\Message\Instance\Instance;
+use Schoolbox\Notif\Message\Instance\InstanceBundle;
+use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\NotifException;
+use SplObjectStorage;
+
+class Messenger {
+
+	/** @var SplObjectStorage */
+	protected $splStore;
+
+
+    public function __construct() {
+		$this->splStore = new SplObjectStorage();
+	}
+
+	/**
+	 * @param Message $message
+	 * @param int $severity
+	 * @param array $topics
+	 * @param array $targets
+	 * @param array $params
+	 * @param array $context
+	 * @throws \Schoolbox\Notif\NotifException
+	 */
+	protected function bind($message, $severity, $topics = array(), $targets = array(), $params = array(), $context = array()) {
+		if(count(array_diff(array_keys($params), $message->getTokenList()))) {
+			throw new NotifException("Parameters supplied must exactly match the :tokens in the message string.");
+		}
+
+		// cast string to array if required
+		$topics = (array)$topics;
+		$targets = (array)$targets;
+		$context = (array)$context;
+
+		// insert the message object if it's not already in our collection
+		if(!$this->splStore->contains($message)) {
+			$this->splStore->attach($message, new InstanceBundle());
+		}
+
+        /** @var InstanceBundle $instances */
+		$instances = $this->splStore->offsetGet($message);
+        $instances->attach(new Instance($params, $severity, $topics, $targets, $context));
+	}
+
+
+	public function broadcastToCategory($catId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "category.$catId", $params, $filter);
+	}
+
+	public function broadcastToCampus($campusId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "campus.$campusId", $params, $filter);
+	}
+
+	public function broadcastToRole($roleId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "role.$roleId", $params, $filter);
+	}
+
+	public function broadcastToRoleType($roleType, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "roletype.$roleType", $params, $filter);
+	}
+
+	public function broadcastToHouse($houseId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "house.$houseId", $params, $filter);
+	}
+
+	public function broadcastToResidentialHouse($resHouseId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "reshouse.$resHouseId", $params, $filter);
+	}
+
+	public function broadcastToSuperusers($message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "superuser", $params, $filter);
+	}
+
+	public function targetToParent($studentId, $message, $topic, $severity, $params = array()) {
+		$this->bind($message, $severity, $topic, "parent.$studentId", $params);
+	}
+
+	public function targetToUser($userId, $message, $topic, $severity, $params = array()) {
+		$this->bind($message, $severity, $topic, "user.$userId", $params);
+	}
+
+
+	/**
+	 * Whether or not this collection currently contains messages
+	 *
+	 * @return bool
+	 */
+	public function hasMessages() {
+		return !!$this->splStore->count();
+	}
+
+
+    /**
+     *
+     * @param Notif $notif
+     * @param TriggerInterface $trigger
+     * @return array
+     */
+    public function send($notif, $trigger = null) {
+        if(!$this->hasMessages()) {
+            return null;
+        }
+        $result = 0;
+
+        foreach($this->splStore as $msg) {
+            /**
+             * @var Message $msg
+             * @var InstanceBundle $instanceBundle
+             */
+            $instanceBundle = $this->splStore->offsetGet($msg);
+
+            foreach($instanceBundle->getInstances() as $instance) {
+                $messageInstance = $msg
+                    ->applyInstance($instance, $notif, $trigger)
+                    ->setTargets($instance->getTargets())
+                    ->setContext($instance->getContext());
+
+	            // if we can filter out the user who effected this event in the first place, do so
+	            if($trigger) {
+		            $messageInstance->setContext(array('user' => $trigger->getEvent()->getEffector()->getId()));
+	            }
+
+                if($messageInstance->send()) {
+                    $result++;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+} 

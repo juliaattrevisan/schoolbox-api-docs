@@ -8,11 +8,15 @@
  */
 
 namespace Schoolbox;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Notif\Notif;
+use Schoolbox\Realtime\Schedule\Event;
 
 class Mapper {
 	/**
@@ -47,6 +51,12 @@ class Mapper {
 	const TYPE_DECIMAL    = 20;
 	const TYPE_SERIALIZED = 30;
 	const TYPE_MODEL      = 40;
+	const TYPE_COLLECTION = 41;
+
+	const METHOD_CREATE = 'create';
+	const METHOD_READ   = 'read';
+	const METHOD_UPDATE = 'update';
+	const METHOD_DELETE = 'delete';
 
 	/**
 	 * @var Database
@@ -111,6 +121,16 @@ class Mapper {
 	protected $config_loader;
 
 	/**
+	 * Notifier
+	 *
+	 * @var Notif
+	 */
+	protected $notif;
+
+	/** @var array */
+	protected $sessionData;
+
+	/**
 	 * Retreives the singleton instance of this class.
 	 *
 	 * @return static
@@ -131,8 +151,9 @@ class Mapper {
 		$this->database = \Database::getInstance();
 		$this->map = new MappingCollection();
 		$this->setup();
-		$this->setConfigLoader(new ConfigLoader());
+		$this->setConfigLoader(new ConfigMapper());
 		$this->setColumnFactory(new ColumnFactory());
+		$this->setSessionData(isset($_SESSION) ? $_SESSION : array());
 		$this->mapping();
 	}
 
@@ -219,6 +240,40 @@ class Mapper {
 	public function getMap() {
 		return $this->map;
 	}
+
+	/**
+	 * @param LoggerInterface $notif
+	 */
+	public function setNotifier($notif) {
+		$this->notif = $notif;
+	}
+
+	/**
+	 * @return LoggerInterface|Notif
+	 */
+	public function getNotifier() {
+		// load on demand, so that we don't get infinite loops
+		if(!$this->notif instanceof LoggerInterface) {
+			$this->setNotifier(new Notif(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
+		}
+
+		return $this->notif;
+	}
+
+	/**
+	 * @param array $sessionData
+	 */
+	public function setSessionData($sessionData) {
+		$this->sessionData = $sessionData;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getSessionData() {
+		return $this->sessionData;
+	}
+
 
 	/**
 	 * Gets a single object as a collection, if it isn't one already.
@@ -333,7 +388,7 @@ class Mapper {
 	 * Adds a mapping from a database column to a model property.
 	 *
 	 * @param array $map An array with any of the following keys:
-	 * * column: The database column to map from.
+	 * * column: The database column to map from, ignored if a join specified is declared 'multi'.
 	 * * property: The model property to map to. There must be a get and set
 	 *             method corresponding to the property in the model class:
 	 *             'get'.ucfirst($property)
@@ -353,6 +408,7 @@ class Mapper {
 	 *             TYPE_DECIMAL: currently, a number to 2 decimal places.
 	 *             TYPE_SERIALIZED: A PHP serialized value
 	 *             TYPE_MODEL: Another model.
+	 *             TYPE_COLLECTION: A set of another model.
 	 * * hydrator: An alternative to `type` - set this as an instance of Schoolbox\Column\IColumnType.
 	 *             Usually you won't need to set this directly, but if you have
 	 *             a hydration strategy that isn't covered by `type`, use this.
@@ -488,12 +544,10 @@ class Mapper {
 
 		$collection = $this->getModelAsCollection($object);
 
-		$statement = $this->database->prepare(
-			"
+		$statement = $this->database->prepare("
 			DELETE FROM  `{$this->table}`
 			WHERE `{$identifierName}` = :identifierValue
-		"
-		);
+		");
 
 		foreach ($collection as $model) {
 			if (!($this->triggerCallbacks('preDelete', $model))) {
@@ -992,7 +1046,15 @@ class Mapper {
 
 		$identifier    = $this->getIdentifier();
 		$id_property   = $identifier['property'];
-		$new_item_list = array();
+
+		// retrieve the objects as they currently exist so we can perform a diff if we need to
+		$collectionIds = $collection->getColumnValues($id_property);
+		$existingObjects = array();
+		foreach($this->findByColumn($identifier['column'], $collectionIds) as $obj) {
+			// index by ID
+			$existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+		}
+
 		$this->database->beginTransaction();
 		foreach ($collection as $model) {
 			$this->bindParamsForSave($model, $statement);
@@ -1001,9 +1063,54 @@ class Mapper {
 					if (!$this->getModelProperty($model, $id_property)) {
 						$new_id = $this->database->lastInsertId();
 						$this->setModelProperty($model, $id_property, $new_id);
-						$new_item_list[$new_id] = true;
 					}
 					$affectedIDs[] = $this->getModelProperty($model, $id_property);
+				}
+				// also update n:n relation tables if they exist
+				foreach($this->getMap() as $map) {
+					if(empty($map['join']) || empty($this->joins[$map['join']]['multi'])) {
+						// not interested
+						continue;
+					}
+
+					$joinSchema = $this->joins[$map['join']]['multi'];
+					$thisKey = $this->getModelProperty($model, $id_property);
+
+					// step 1: delete existing relations in join table
+					$deleteRelationStatement = $this->database->prepare("
+						DELETE FROM `{$joinSchema['via_table']}`
+						WHERE `{$joinSchema['this_key']}` = :this_key
+					");
+
+					$deleteRelationStatement->bindParam(':this_key', $thisKey);
+
+					if(!$deleteRelationStatement->execute()) {
+						$this->database->rollBack();
+						return false;
+					}
+
+					// step 2: insert new relations in join table
+					$insertRelationStatement = $this->database->prepare("
+						INSERT INTO `{$joinSchema['via_table']}`
+							(`{$joinSchema['this_key']}`,`{$joinSchema['other_key']}`)
+						VALUES
+							(:this_key, :other_key)
+					");
+
+					// should dehydrate to an array
+					$propertyValue = $this->getModelProperty($model, $map['property']);
+
+					// iterate the values given and insert into join table
+					foreach($propertyValue as $otherKey) {
+						$success = $insertRelationStatement->execute(array(
+							'this_key' => $thisKey,
+							'other_key' => $otherKey
+						));
+						if(!$success) {
+							$this->database->rollBack();
+							return false;
+						}
+					}
 				}
 			}
 			else {
@@ -1015,7 +1122,24 @@ class Mapper {
 
 		foreach ($collection as $model) {
 			if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
-				$this->triggerCallbacks('postSave', $model, array_key_exists($id, $new_item_list));
+				$previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
+				$this->triggerCallbacks('postSave', $model, $previous);
+
+				// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
+				if(isset($this->sessionData['user'])) {
+
+                    // create a new event, and send it to the scheduler
+                    $event = new Event(
+                        $this->sessionData['user'],
+                        $previous ? self::METHOD_UPDATE : self::METHOD_CREATE,
+                        $model,
+                        $previous ? $this->diff($model, $previous) : null
+                    );
+
+                    $this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
+
+				}
+
 			}
 		}
 
@@ -1156,20 +1280,34 @@ class Mapper {
 		if (strlen($other_alias) === 0) {
 			$other_alias = $other_table;
 		}
-		$join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
+
+		$params = array(
+			':this_alias'  => $this_alias,
+			':this_key'    => $join['this_key'],
+			':other_table' => $other_table,
+			':other_alias' => $other_alias,
+			':other_key'   => $join['other_key'],
+		);
+
+		if(isset($join['multi'])) {
+			// LEFT JOIN ...
+			$join_sql = '`:via_table`   AS `:via_alias`   ON `:this_alias`.`:this_key`   = `:via_alias`.`:via_this_key`
+			LEFT JOIN    `:other_table` AS `:other_alias` ON `:other_alias`.`:other_key` = `:via_alias`.`:via_other_key`';
+
+			$params[':via_table']     = $join['multi']['via_table'];
+			$params[':via_this_key']  = $join['multi']['this_key'];
+			$params[':via_other_key'] = $join['multi']['other_key'];
+			$params[':via_alias']     = "v_$other_alias";
+		}
+		else {
+			$join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
+		}
+
 		if (isset($join['extra']) && strlen($join['extra']) > 0) {
 			$join_sql .= ' AND ' . $join['extra'];
 		}
-		return strtr(
-			$join_sql,
-			array(
-				':this_alias'  => $this_alias,
-				':this_key'    => $join['this_key'],
-				':other_table' => $other_table,
-				':other_alias' => $other_alias,
-				':other_key'   => $join['other_key'],
-			)
-		);
+
+		return strtr($join_sql, $params);
 	}
 
 	/**
@@ -1203,6 +1341,7 @@ class Mapper {
 	 *                           $model:  the model that has been hydrated
 	 *                           $row:    the row from the database
 	 *
+	 * @throws Exception
 	 * @return object
 	 */
 	public function hydrate($row, $alias = '', $callback = null) {
@@ -1210,14 +1349,24 @@ class Mapper {
 
 		foreach ($this->map as $map) {
 			$propertyName = $map['property'];
-			$columnName = $map['column'];
 
-			if (!empty($alias)) {
-				$columnName = "$alias.$columnName";
+			if(empty($map['column'])) {
+				// check for multijoin
+				if(!(isset($map['join']) && isset($this->joins[$map['join']]['multi']))) {
+					throw new Exception("Column must be declared if no multijoin set for it: ".json_encode($map));
+				}
+			}
+			else {
+				$columnName = $map['column'];
+
+				if (!empty($alias)) {
+					$columnName = "$alias.$columnName";
+				}
+
+				$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+				$this->setModelProperty($model, $propertyName, $columnValue);
 			}
 
-			$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
-			$this->setModelProperty($model, $propertyName, $columnValue);
 		}
 
 		if (!empty($callback) && is_callable($callback)) {
@@ -1242,6 +1391,20 @@ class Mapper {
 	 */
 	public function hydrateJoin($row, $join, $alias, $callback = null) {
 		return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
+	}
+
+
+	/**
+	 * Helper method for hydrating a collection of stub model objects.
+	 * Assumes that you have provided a collection of models that apply to this mapper
+	 *
+	 * @param Collection $collection
+	 * @param array      $identifier an optional array of 'column' and 'property' used to perform lookup
+	 * @return Collection
+	 */
+	public function hydrateCollection($collection, $identifier = null) {
+		$identifier = $identifier ?: $this->getIdentifier();
+		return $this->findByColumn($identifier['column'], $collection->getColumnValues($identifier['property']));
 	}
 
 	/**
@@ -1290,14 +1453,18 @@ class Mapper {
 	/**
 	 * Creates a new instance of class with name passed in $this->hasModel().
 	 *
+	 * @throws Mapper\Exception
 	 * @return object
 	 */
 	public function createModel() {
+		if(!$this->model) {
+			throw new Exception("Cannot create nonexistent model");
+		}
 		return new $this->model;
 	}
 
 	/**
-	 * @brief Returns an SQL fragement containing a comma separated list of column names possibly aliased
+	 * @brief Returns an SQL fragment containing a comma separated list of column names possibly aliased
 	 * @param String $alias
 	 * @param array  $whitelist If not empty, a whitelist of column names to use
 	 * @return String
@@ -1307,6 +1474,9 @@ class Mapper {
 		$columnList = array();
 
 		foreach ($this->map as $map) {
+			if(empty($map['column'])) {
+				continue;
+			}
 			if (!empty($whitelist) && !in_array($map['column'], $whitelist)) {
 				continue;
 			}
@@ -1344,6 +1514,9 @@ class Mapper {
 		$placeholderList = array();
 
 		foreach ($this->map as $map) {
+			if(empty($map['column'])) {
+				continue;
+			}
 			//
 			// Is this a create or update timestamp field?
 			// Update with now() instead of a placeholder.
@@ -1417,6 +1590,9 @@ class Mapper {
 			if (isset($map['created_timestamp'])) {
 				continue;
 			}
+			if (empty($map['column'])) {
+				continue;
+			}
 			$assignment  = "`{$this->table}`.`{$map['column']}`";
 			$placeholder = ":{$map['column']}";
 			if (isset($map['updated_timestamp'])) {
@@ -1434,10 +1610,22 @@ class Mapper {
 	 * @param object        $model     The model to get values from
 	 * @param \PDOStatement $statement The statement for inserting/updating model
 	 *
+	 * @throws Mapper\Exception if the map is not valid
 	 * @return void
 	 */
 	protected function bindParamsForSave($model, \PDOStatement $statement) {
 		foreach ($this->map as $map) {
+
+			if(empty($map['column'])) {
+				// if column is empty, ensure a join is specified, and that it is a multijoin
+				$join_name = isset($map['join']) ? $map['join'] : '';
+				if(isset($this->joins[$join_name]['multi'])) {
+					return;
+				}
+				// if the join doesn't exist, or not multijoin, failhard
+				throw new Exception("Column must be declared if no multijoin set for it: ".json_encode($map));
+			}
+
 			$propertyName = $map['property'];
 			$columnName   = $map['column'];
 			//
@@ -1503,6 +1691,54 @@ class Mapper {
 			}
 		}
 		return true;
+	}
+
+
+	/**
+	 * Compares two objects mapped by this mapper and returns an array of the differences between.
+	 * Does not traverse hydrations - it explicitly dehydrates and compares ID values only.
+	 *
+	 * @param object $objectA
+	 * @param object $objectB
+	 * @throws Mapper\Exception
+	 * @return array
+	 */
+	public function diff($objectA, $objectB) {
+
+		$a = trim(get_class($objectA),'\\');
+		$b = trim(get_class($objectB),'\\');
+		$c = trim($this->getModel(),'\\');
+
+		if($a != $b) {
+			throw new Exception("Cannot diff objects of different classes: '$a' != '$b'.");
+		}
+		if($a != $c) {
+			throw new Exception("Cannot diff objects from another mapper: require '$c', got '$a'.");
+		}
+
+		$diff = array();
+
+		foreach($this->getMap() as $mapping) {
+			$property = $mapping['property'];
+
+			/** @var \Schoolbox\Column\IColumnType $hydrator */
+			$hydrator = $mapping['hydrator'];
+
+			$valueA = $this->getModelProperty($objectA, $property);
+			$valueB = $this->getModelProperty($objectB, $property);
+
+			// dehydrate the values
+			$dhA = $hydrator->dehydrate($valueA, $this);
+			$dhB = $hydrator->dehydrate($valueB, $this);
+
+			// can now do primitive comparison on the dehydrated values (should be in the same type)
+			if($dhA !== $dhB) {
+				$diff[$property] = array($dhA, $dhB);
+			}
+		}
+
+		return $diff;
+
 	}
 
 }

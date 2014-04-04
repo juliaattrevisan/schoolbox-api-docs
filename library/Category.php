@@ -1,6 +1,7 @@
 <?php
 
 
+use Schoolbox\Notif\Notif;
 
 class Category extends DeprecatedModel {
 
@@ -400,7 +401,8 @@ class Category extends DeprecatedModel {
             'user' => $_SESSION['id'],
         );
 
-        $this->db->insert('cmsLog', $logEntry);
+	    $notif = new Notif(Notif::TOPIC_CMS);
+	    $notif->info("CRUD", $logEntry);
     }
 
     function deletePerms($cid) {

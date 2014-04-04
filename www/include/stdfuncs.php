@@ -59,6 +59,10 @@ function shutdown_safely(Exception $e = null) {
                 $code    = 500;
                 $message = 'Schoolbox is currently down due to an internal service being inactive.';
             }
+            elseif($e instanceof PDOException) {
+	            $code = 500;
+	            $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+            }
             else {
                 // decide what to tell the user based on where this error came from
                 switch($cause) {

@@ -1,0 +1,25 @@
+<h1>Messages</h1>
+<!-- BEGIN days -->
+<ul class="message-list days">
+  <!-- BEGIN day -->
+  <li class="day">
+    <h2>{DAY}</h2>
+    <!-- BEGIN events -->
+    <ul class="events">
+      <!-- BEGIN event -->
+      <li class="event {EVENT_DARK}">
+        <span>
+          <a href="{EVENT_HREF}" class="time">
+            <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
+          </a>
+          <img src="{EVENT_ICON}" alt="" width="24" height="24" />
+          <span class="body">{EVENT_BODY}</span>
+        </span>
+      </li>
+      <!-- END event -->
+    </ul>
+    <!-- END events -->
+  </li>
+  <!-- END day -->
+</ul>
+<!-- END days -->

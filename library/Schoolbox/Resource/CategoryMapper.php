@@ -311,6 +311,10 @@ class CategoryMapper extends Mapper {
 	 * @return \External_UserInterface
 	 */
 	public function getExternalUser() {
+		// JIT-instantiation (is that really the way it should be?)
+		if(!$this->external_user instanceof External_UserInterface) {
+			$this->external_user = new \External_User();
+		}
 		return $this->external_user;
 	}
 

@@ -20,7 +20,8 @@ define("SQL_passwd", "xxxxxx");
 define("SQL_db", "schoolbox");
 define("SQL_dsn", "mysql:host=".SQL_host.";dbname=".SQL_db);
 
-
+//Instance ID
+define('INSTANCE_ID', 'xxxxxxxx');
 
 //module config options
 define('HELPDESK_enable', false);

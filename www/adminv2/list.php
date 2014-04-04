@@ -40,14 +40,6 @@ $tableList = array(
             'name'       => array('caption' => 'Name'),
             'group_type' => array('caption' => 'Role Type'),
             'can_change_password' => array('caption' => 'Allow Password Change'),
-            'digest_schedule'     => array(
-                'caption' => 'Digest Schedule',
-                'options' => array(
-                    Schoolbox\Role::DIGEST_NEVER  => 'No Digest',
-                    Schoolbox\Role::DIGEST_DAILY  => 'Daily',
-                    Schoolbox\Role::DIGEST_WEEKLY => 'Weekly',
-                )
-            ),
         ),
     ),
     array(

@@ -208,6 +208,10 @@ class SitePage extends Page {
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
             'DEBUGBAR'      => $debug_bar_body,
             'DEBUGBAR_HEAD' => $debug_bar_head,
+            'WEBSOCKET_HOST' => $_SERVER['HTTP_HOST'] ?: parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST),
+            'WEBSOCKET_PORT' => Cfg::get('websocket_port') ?: (empty($_SERVER['HTTPS']) ? 8080 : 8081),
+            'WEBSOCKET_PATH' => Cfg::get('websocket_path') ? '/' . Cfg::get('websocket_path') : '',
+            'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
 
         $this->setVar($templateVar);
@@ -231,6 +235,7 @@ class SitePage extends Page {
         $this->setFile('bannerTpl', 'include/banner.html');
         $this->setFile('navTpl', 'include/nav.html');
         $this->setFile('tabTpl', 'include/tab.html');
+	    $this->setFile('instantTpl', 'include/instant.html');
 
         $this->renderScriptIncludes();
         $this->renderSideNav();
@@ -246,6 +251,12 @@ class SitePage extends Page {
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
         $this->setBlock('bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
+	    if(Cfg::get('instant_enabled') || 1) {
+		    $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
+	    }
+	    else {
+		    $this->setVar('INSTANTMESSAGE_BLOCK', '');
+	    }
 
         if ($_SESSION['id']) {
 

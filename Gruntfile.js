@@ -104,7 +104,11 @@ module.exports = function(grunt) {
                     // Fullcalendar
                     'www/javascript/components/fullcalendar/fullcalendar.js',
                     // Magnific Popup (lightbox)
-                    'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js'
+                    'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
+                    // Moment
+                    'www/javascript/components/momentjs/moment.js',
+                    // Notifier
+                    'www/javascript/jquery.notifier.js'
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }

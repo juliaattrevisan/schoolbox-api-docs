@@ -1,0 +1,425 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+  #content li > ul {
+    margin: 0 0 0 32px;
+  }
+  ul.standardForm {
+    padding: 8px 0 1px;
+  }
+  label {
+    margin: 2px 0;
+  }
+  label input[type=text] {
+    width: auto;
+    display: inline;
+    font-size: 1em;
+    padding: 3px;
+  }
+  label, li {
+    display: inline;
+  }
+  h2 {
+    font-size: 1.25em;
+    font-weight: bold;
+    background: none;
+    color: #000;
+  }
+  h3 {
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+  form {
+    line-height: 28px;
+  }
+  table {
+    margin: 0 0 16px 0;
+  }
+  tr.role > td {
+    vertical-align: middle;
+  }
+  td, th {
+    padding: 0 8px;
+  }
+  .source > form {
+    margin: 8px 24px 24px 0;
+  }
+  .perms {
+    width: 300px;
+  }
+  .perms * {
+    transition: opacity 0.1s;
+  }
+  .perms.disabled * {
+    opacity: 0;
+  }
+  .perms div {
+    border-bottom: solid 1px #eee;
+  }
+  .perms div:last-child {
+    border-bottom: none;
+  }
+  .perms span {
+    width: 50px;
+    display: inline-block;
+  }
+  .role td, .role th {
+    padding: 3px 24px;
+  }
+  div.indent {
+    margin-left: 36px;
+    font-family: monospace;
+    font-size: 10px;
+  }
+  div.indent input {
+    font-family: monospace;
+  }
+  a.exp:hover {
+    text-decoration: none;
+    color: #0066b0;
+    border-color: #0066b0;
+  }
+  a.exp {
+    color: #444;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: solid 1px #999;
+    line-height: 24px;
+    text-align: center;
+    padding: 0 1px 0 0;
+    background: #f0f0f0;
+  }
+  h3 em {
+    display: block;
+    font-size: 12px;
+    font-weight: normal;
+    margin: -3px 32px 0 42px;
+    line-height: 18px;
+  }
+  .source table.standardForm {
+    background: #f7f7f7;
+  }
+  .perms div.slide {
+    margin: 0 36px;
+  }
+  .perms div.slide.default {
+    background: transparent;
+    border: none;
+  }
+
+  .perms div.slide.default a.ui-slider-handle {
+    border-color: transparent;
+    background: transparent;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #f00;
+    position: relative;
+    top: 12px;
+    z-index: 3;
+  }
+  ul.ticks {
+    margin: 0;
+  }
+  ul.ticks > li {
+    width: 24%;
+    overflow: hidden;
+    display: inline-block;
+    height: 1.5em;
+    text-align: center;
+  }
+
+</style>
+<!-- END custom_head -->
+<h1>Global Message Settings</h1>
+<p>
+  Adjust message delivery throughout the system.
+</p>
+<p><em>
+  Note: if email digest is disabled for a particular role, any messages set to Digest for that role will be
+  automatically be escalated to Instant. If this is undesirable in a particular instance, change the setting to Off.
+</em></p>
+<ul class="namespaces table standardForm">
+  <!-- BEGIN namespace -->
+  <li class="namespace">
+    <h2>{NAMESPACE_LABEL}</h2>
+    <ul class="sources">
+      <!-- BEGIN source -->
+      <li class="source">
+        <form method="post" action="/adminv2/messages/configure.php">
+          <!-- BEGIN source_editable -->
+          <h3>
+            <label>"Send a message when
+              <input name="data[{NAMESPACE_SLUG}][{SOURCE_KEY}][description]"
+                     type="text"
+                     value="{SOURCE_DESCRIPTION}"
+                     size="75" />."
+            </label>
+          </h3>
+          <div class="indent">
+            <label>
+              {NAMESPACE_SLUG}.<input name="data[{NAMESPACE_SLUG}][{SOURCE_KEY}][key]"
+                                      type="text"
+                                      value="{SOURCE_KEY}"
+                                      size="10" />
+            </label>
+            <label>routing key
+              <input name="data[{NAMESPACE_SLUG}][{SOURCE_KEY}][routing_key]"
+                     type="text"
+                     value="{SOURCE_ROUTING_KEY}"
+                     size="40" />
+            </label>
+          </div>
+          <!-- END source_editable -->
+          <!-- BEGIN source_readonly -->
+          <h3>
+            <a class="exp darr" href="#">&#9660;</a>
+            <span class="label">"Send a message when {SOURCE_DESCRIPTION}."</span>
+            <em class="summary">&nbsp;</em>
+          </h3>
+          <!-- END source_readonly -->
+          <!-- BEGIN existing_source -->
+        </form>
+        <form method="post" action="/adminv2/messages/configure.php" style="display: none;">
+          <table class="roles table standardForm">
+            <tr>
+              <th>Role</th>
+              <th>Enabled</th>
+              <th>Settings</th>
+            </tr>
+            <!-- BEGIN role -->
+            <tr class="role">
+              <th>{ROLE_NAME}</th>
+              <td>
+                <!-- BEGIN perm_enabled -->
+                <label>{PERM_TOGGLE_LABEL}
+                  <input name="data[{NAMESPACE_SLUG}][{SOURCE_KEY}][{ROLE_ID}][enabled]"
+                         class="toggle" type="radio" value="{PERM_TOGGLE_VALUE}" {PERM_TOGGLE_SELECTED}
+                  />
+                </label>
+                <!-- END perm_enabled -->
+              </td>
+              <td class="perms">
+                <!-- BEGIN perm -->
+                <input name="data[{NAMESPACE_SLUG}][{SOURCE_KEY}][{ROLE_ID}][level][{PERM_LABEL}]"
+                       data-ns="{NAMESPACE_SLUG}" data-src="{SOURCE_KEY}" data-role="{ROLE_NAME}"
+                       data-perm="{PERM_LABEL}" type="hidden" value="{PERM_OPTION_VALUE}"
+                    />
+                <!-- END perm -->
+
+                <div class="slide default"></div>
+                <div class="slide range"></div>
+
+                <ul class="ticks">
+                  <!-- BEGIN perm_option -->
+                  <li>{PERM_OPTION_LABEL}</li>
+                  <!-- END perm_option -->
+                </ul>
+
+              </td>
+            </tr>
+            <!-- END role -->
+          </table>
+          <!-- END existing_source -->
+        </form>
+      </li>
+      <!-- END source -->
+    </ul>
+  </li>
+  <!-- END namespace -->
+</ul>
+
+
+<script type="text/javascript">
+
+  var desc = {
+    0:   'off',
+    200: 'digest',
+    250: 'instant',
+    300: 'instant and email'
+  };
+
+  function update(sources) {
+    sources.each(function() {
+      var source = $j(this);
+
+      source.find('input.toggle:checked').each(function() {
+        var self = $j(this);
+        var v = self.val();
+
+        if(typeof v === 'undefined') {
+          return;
+        }
+
+        var perms = self.closest('tr').find('td.perms');
+
+        if(v == 0) {
+          perms.addClass('disabled').find('input').removeAttr('checked').attr('disabled', 'disabled');
+        }
+        else {
+          perms.removeClass('disabled').find('input').removeAttr('disabled');
+        }
+      });
+    });
+  }
+
+  function describe(sources) {
+    sources.each(function() {
+      var source = $j(this);
+
+      var summary = source.find('h3 em.summary');
+      var table = source.find('table.roles');
+      var inputs = table.find('input[type=hidden][data-perm=default]');
+
+      var text = 'Sent to ';
+      var count = 0;
+
+      inputs.each(function() {
+        var i = $j(this);
+
+        var role = i.data('role');
+        var lbl = desc[i.val()];
+
+        if(typeof lbl === 'undefined' || lbl === 'off') {
+          return;
+        }
+
+        text += role + ' via ' + lbl + '; ';
+        count++;
+      });
+
+      if(count == 0) {
+        text += 'nobody';
+      }
+      else {
+        text = text.slice(0, text.length - 2);
+      }
+
+      summary.text(text + '.');
+    });
+  }
+
+  function slide(sources) {
+
+    var map = {
+      0   : 0,
+      200 : 1,
+      250 : 2,
+      300 : 3
+    };
+
+    var unmap = {
+      0 : 0,
+      1 : 200,
+      2 : 250,
+      3 : 300
+    };
+
+    sources.find('tr').each(function() {
+      var row = $j(this);
+
+      var hiddens = row.find('input[type=hidden]');
+
+      var min = map[hiddens.filter('[data-perm=min]').val()] || 0,
+          max = map[hiddens.filter('[data-perm=max]').val()] || 0,
+          def = map[hiddens.filter('[data-perm=default]').val()] || 0;
+
+//      console.log(min, def, max);
+
+      row.find('div.slide.default').slider({
+        range: false,
+        min: 0,
+        max: 3,
+        value: def,
+        slide: function(event, ui) {
+          hiddens.filter('[data-perm=default]').val(unmap[ui.value]).trigger('change');
+
+
+
+        }
+      });
+
+      row.find('div.slide.range').slider({
+        range: true,
+        min: 0,
+        max: 3,
+        values: [min, max],
+        slide: function(event, ui) {
+          hiddens.filter('[data-perm=min]').val(unmap[ui.values[0]]);
+          hiddens.filter('[data-perm=max]').val(unmap[ui.values[1]]).trigger('change');
+        }
+      });
+
+    });
+  }
+
+  function submit(self) {
+    var form = self.closest('form');
+    var data = form.serialize();
+    $j.post(form.attr('action'), data, function() {
+      describe(form.closest('li.source'));
+    });
+  }
+
+
+  $j('#content').on('click', 'a.exp', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var self = $j(this);
+
+    if(self.hasClass('darr')) {
+      // change to uarr, expand content
+      self.removeClass('darr').addClass('uarr').html("&#9650;");
+      self.closest('form').siblings('form').show(200);
+    }
+    else {
+      // change to darr, contract content
+      self.removeClass('uarr').addClass('darr').html("&#9660;");
+      self.closest('form').siblings('form').hide(200);
+    }
+
+    return false;
+  });
+
+  $j('#content').on('change', 'input.toggle', function() {
+    var self = $j(this);
+    update(self.closest('li.source'));
+    if(self.val() == 0 && self.is(':checked')) {
+      submit(self);
+    }
+  });
+
+  $j('#content').on('change', 'input[type=hidden]', function() {
+
+    // validate, and if passes, ajax form
+
+    var cell = $j(this).closest('td.perms');
+
+//    console.log(cell);
+
+    var min = cell.children('input[data-perm=min]').val();
+    var def = cell.children('input[data-perm=default]').val();
+    var max = cell.children('input[data-perm=max]').val();
+
+//    console.log(min, def, max);
+
+    if(typeof min === 'undefined' || typeof def === 'undefined' || typeof max === 'undefined' ||
+       min > def || def > max || min > max ) {
+      return true;
+    }
+
+    submit(cell);
+    return true;
+  });
+
+  $j(document).ready(function() {
+    var sources = $j('#content').find('li.source');
+
+    update(sources);
+    describe(sources);
+    slide(sources);
+  });
+
+</script>

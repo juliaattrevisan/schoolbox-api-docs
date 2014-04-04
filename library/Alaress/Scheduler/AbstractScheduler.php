@@ -1,0 +1,236 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Alaress\Scheduler;
+
+
+use Alaress\Cli\Debug;
+use Alaress\Scheduler\Trigger\CancelTrigger;
+use Alaress\Scheduler\Trigger\RecurringTrigger;
+use Alaress\Scheduler\Trigger\TriggerInterface;
+use Alaress\WorkerCrew\Dispatcher;
+use Alaress\WorkerCrew\DispatcherInterface;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Alaress\WorkerCrew\TaskResponseHandlerInterface;
+use InvalidArgumentException;
+use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
+
+abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHandlerInterface {
+
+    /** @var LoopInterface */
+    protected $loop;
+
+    /** @var Debug */
+    public $debug;
+
+    /** @var array */
+    protected $timers;
+
+    /** @var DispatcherInterface */
+    protected $dispatcher;
+
+    /** @var \Schoolbox\IConfigLoader */
+    protected $conf;
+
+    /** @var string */
+    protected $method = '';
+
+
+    /**
+     * @param LoopInterface $loop
+     * @param DispatchStrategyInterface $dispatchStrategy
+     * @param \Alaress\Cli\Debug $cli
+     */
+    public function __construct($loop, $dispatchStrategy, $cli) {
+        $this->loop = $loop;
+        $this->debug = $cli;
+        $this->dispatcher = new Dispatcher($loop, $this, $cli, $dispatchStrategy);
+    }
+
+
+    /**
+     * Convenience method to schedule an array of triggers
+     *
+     * @param TriggerInterface[] $triggers
+     */
+    public function scheduleNotifications($triggers) {
+        foreach($triggers as $trigger) {
+            $this->scheduleNotification($trigger);
+        }
+    }
+
+
+    /**
+     * Schedule a trigger for deferred execution
+     *
+     * @param TriggerInterface $trigger
+     * @return void
+     */
+    public function scheduleNotification($trigger) {
+        if($trigger instanceof CancelTrigger) {
+            $this->unschedule($trigger);
+            return;
+        }
+        $interval = $trigger->getTimestamp() - time();
+
+        if($interval <= self::IMMEDIATELY) {
+            $this->dispatchTrigger($trigger);
+            return;
+        }
+
+        $self = $this;
+
+        $this->schedule($trigger, function($timer) use ($self) {
+            /** @var TimerInterface $timer */
+            if(!$timer->getData() instanceof TriggerInterface) {
+                throw new InvalidArgumentException("Trigger must be provided to publish data");
+            }
+            $self->dispatchTrigger($timer->getData());
+        });
+    }
+
+
+    /**
+     * @return DispatcherInterface
+     */
+    public function getDispatcher() {
+        return $this->dispatcher;
+    }
+
+
+    /**
+     * @param TriggerInterface $trigger
+     */
+    public function dispatchTrigger($trigger) {
+        $event = $trigger->getEvent();
+        foreach($trigger->getCallbacks() as $callback) {
+            $this->getDispatcher()->enqueue($trigger, $this->method, serialize(array(
+                $callback, $event->getObject(), $event->getEffector(), $event->getDiff()
+            )));
+        }
+    }
+
+
+    /**
+     * Schedules a trigger for deferred execution. Returns success or failure.
+     *
+     * @param TriggerInterface $trigger
+     * @param callable $callable
+     * @return bool
+     */
+    protected function schedule($trigger, $callable) {
+        // can't schedule a cancel trigger
+        if($trigger instanceof CancelTrigger) {
+            return false;
+        }
+
+        // firstly, remove any existing timer for this trigger
+        $this->unschedule($trigger);
+
+        $model = $trigger->getEvent()->getObject();
+        $class = get_class($model);
+        $label = $trigger->getLabel();
+
+        /** @var TimerInterface $timer */
+        $timer = $this->loop->addTimer($trigger->getTimestamp() - time(), $callable);
+        $timer->setData($trigger);
+        $this->putTimer($model, $label, $timer);
+
+        $this->debug->v("Scheduling trigger '$class::$label'", '+');
+
+        return true;
+    }
+
+
+    /**
+     * Unschedules a trigger that was previously set for deferred execution.
+     *
+     * @param TriggerInterface $trigger
+     * @return bool
+     */
+    protected function unschedule($trigger) {
+	    if($trigger instanceof RecurringTrigger) {
+
+	    }
+        $model = $trigger->getEvent()->getObject();
+        $class = get_class($model);
+        $label = $trigger->getLabel();
+
+        if($this->hasTimer($model, $label)) {
+            $timer = $this->getTimer($model, $label);
+            $this->debug->v("Unscheduling trigger '$class::$label'", '-');
+            $this->loop->cancelTimer($timer);
+            return true;
+        }
+        return false;
+
+    }
+
+
+    /**
+     * @param object $model
+     * @param string $label
+     * @return TimerInterface|null
+     */
+    protected function getTimer($model, $label) {
+        $class = get_class($model);
+        return $this->hasTimer($model, $label)
+            ? $this->timers[$class][$label][$this->hashObject($model)]
+            : null;
+    }
+
+
+    /**
+     * @param object $model
+     * @param string $label
+     * @param TimerInterface $timer
+     */
+    protected function putTimer($model, $label, $timer) {
+        $class = get_class($model);
+        $hash = $this->hashObject($model);
+        $this->timers[$class][$label][$hash] = $timer;
+    }
+
+
+    /**
+     * @param object $model
+     * @param string $label
+     * @return bool
+     */
+    protected function hasTimer($model, $label) {
+        $class = get_class($model);
+        $hash = $this->hashObject($model);
+        return isset($this->timers[$class][$label][$hash]);
+    }
+
+
+    /**
+     * @param object $model
+     * @param string $label
+     */
+    public function removeTimer($model, $label) {
+        $class = get_class($model);
+        $hash = $this->hashObject($model);
+        unset($this->timers[$class][$label][$hash]);
+    }
+
+
+    /**
+     * Returns a hash of the given object
+     *
+     * @param object $object
+     * @return string
+     */
+    public function hashObject($object) {
+        // use json rather than serialize to avoid any side-effects
+        return sha1(json_encode($object));
+    }
+
+} 

@@ -66,15 +66,23 @@ class Database {
         return self::$instance;
     }
 
-    /**
-     * Establishes the database connection
-     *
-     * @param String $dsn
-     * @param String $username
-     * @param String $password
-     * @param Array $options
-     * @return Bool
-     */
+	/**
+	 * Explicitly dis- and re-connect the singleton database connection
+	 */
+	static public function reinitialise() {
+		self::$instance->reconnect();
+	}
+
+	/**
+	 * Establishes the database connection
+	 *
+	 * @param String $dsn
+	 * @param String $username
+	 * @param String $password
+	 * @param Array $options
+	 * @throws Schoolbox\External\Exception
+	 * @return Bool
+	 */
     public function connect($dsn, $username, $password, $options = array()) {
         if (empty($dsn) || !is_string($dsn)) {
             return false;
@@ -92,7 +100,7 @@ class Database {
                 PDO::ATTR_PERSISTENT => empty($options['debug']),
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
             );
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $exception) {
 	        if($options['throw']) {
 		        throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);
@@ -102,6 +110,19 @@ class Database {
 
         return true;
     }
+
+	/**
+	 * Re-establishes a lost database connection if the reason supplied by $e is acceptable.
+	 *
+	 * @throws PDOException
+	 * @return bool
+	 */
+	public function reconnect() {
+		// try to call some sort of PDO destructor
+		$this->connection = null;
+		unset($this->connection);
+		return $this->connect($this->dsn, $this->username, $this->password, $this->options);
+	}
 
     /**
      * Retrieves the query collector from this connection.

@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Notif\Notif;
+
 class Session
 {
     function  __construct()
@@ -83,12 +85,14 @@ class Session
                 $this->setSynergyInfo($userHandler);
 			}
 
-            /* Log successful */
-            $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
-                    VALUES ('" . $this->db->quote($username) . "', NOW(), '$ip', '1')";
-            $this->db->query($loginlogquery);
+	        $notif = new Notif(Notif::TOPIC_AUTH);
+	        $notif->notice("Login success for $username", array(
+		        'username' => $user['username'],
+		        'ip'       => $ip,
+		        'login'    => 1,
+	        ));
 
-            // add mobile session data
+	        // add mobile session data
             $sbmAuth = new Authenticator();
             return $sbmAuth->appendSession($username);
         } else
@@ -164,10 +168,13 @@ class Session
 
         if (!$result) {
             /* Log failure */
-            $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
-                        VALUES ('" . $this->db->quote($username) . "', NOW(), '$ip', '0')";
-            $this->db->query($loginlogquery);
-            throw new Exception_Schoolbox_AccessDenied();
+	        $notif = new Notif(Notif::TOPIC_AUTH);
+	        $notif->notice("Login failure for ".$user->getUsername(), array(
+		        'username' => $user->getUsername(),
+		        'ip'       => $ip,
+		        'login'    => 0,
+	        ));
+	        throw new Exception_Schoolbox_AccessDenied();
         } else {
             // Store password as hash for DAV authentication later
             $this->db->update('user', 'username', array('username' => $username, 'hash' => md5($username . ':' . Cfg::get('site_location') . ':' . $password)));

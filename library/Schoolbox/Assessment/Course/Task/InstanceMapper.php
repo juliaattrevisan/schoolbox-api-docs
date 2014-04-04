@@ -168,11 +168,11 @@ class InstanceMapper extends Mapper {
      * assessment that is a part of the task.
      *
      * @param  Instance $object
-     * @param  bool     $is_new
+     * @param  Instance $previous
      * @return void
      */
-    public function postSave(Instance $object, $is_new = false) {
-        if ($is_new) {
+    public function postSave(Instance $object, $previous = null) {
+        if (!$previous) {
             $task = $object->getTask();
             if ($task instanceof Task && $task->getId()) {
                 $cloner = new Cloner($object);

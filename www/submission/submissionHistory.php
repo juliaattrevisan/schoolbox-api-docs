@@ -37,7 +37,7 @@ $this->setBlock('work', 'work_grade', 'work_grade_block');
 $this->setBlock('history_marked', 'history_marked_hascomment', 'history_marked_hascomment_block');
 $this->setVar('teacher_block', '');
 
-if($this->arg[0] == false || $this->arg[1] == false) {
+if($this->arg[0] == false) {
 	error(2);
 }
 
@@ -50,6 +50,11 @@ $groupHandler = new Group;
 $submissionHandler = new Submission;
 $returnHandler = new SubmissionReturn;
 $allowedHandler = new AllowedFile;
+
+// if no second argument supplied and student, assume current user rather than just dying
+if($this->arg[1] == false && $groupHandler->isStudent()) {
+	SitePage::localRedir("/submission/submissionHistory/{$this->arg[0]}/{$_SESSION['id']}");
+}
 
 if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) || $groupHandler->isStaff() || $_SESSION['id'] == $this->arg[1])) {
 	$userID = $this->arg[1];

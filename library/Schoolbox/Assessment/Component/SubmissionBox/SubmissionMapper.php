@@ -279,11 +279,11 @@ class SubmissionMapper extends Schoolbox\Mapper {
 	 *   related to this submission box.
 	 *
 	 * @param Submission $object
-	 * @param bool       $is_new
+	 * @param Submission $previous
 	 */
-	public function postSave(Submission $object, $is_new = false) {
+	public function postSave(Submission $object, $previous = null) {
 		$object->copyFromTempLocation();
-		if ($is_new && !$object->getDraft()) {
+		if (!$previous && !$object->getDraft()) {
 			// Attempt to save a task instance entry for this item.
 			$submission_box   = $this->getJoinMapper('submission_box')->findById($object->getSubmissionBox()->getId());
 			$task_instance_id = $submission_box->getTaskInstance()->getId();
