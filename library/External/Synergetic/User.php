@@ -179,6 +179,7 @@ class External_Synergetic_User implements External_UserInterface {
             $parent['SpouseEmail'] = $parent['SpouseOccupEmail'];
         }
 
+        return $parent;
 	}
 
 	/**
