@@ -80,6 +80,29 @@ class Subcontext_ResourceBookingContext extends BaseContext {
     }
 
     /**
+     * Asserts creating a booking for a resource, by clicking on a time slot.
+     * Currently switches to calendar's month view to do this, because that's
+     * the only view that stores a reference to the date.
+     *
+     * @When /^(?:|I )should not be able to book resource$/
+     * @When /^(?:|I )should not be able to book resource for "(?P<timeString>[^"]*)"$/
+     *
+     * @param string $timeString A valid date time format string
+     * @throws Exception if user can book resource
+     */
+    public function assertCannotBookResource($timeString = 'today') {
+        $this
+            ->getMainContext()->getSubcontext('calendar')
+            ->clickDate('#calendar', $timeString);
+        $button = $this
+            ->getSession()->getPage()
+            ->find('css', "#createEvent .actions input.btn[value=\"Continue\"]");
+        if ($button instanceof Element\NodeElement) {
+            throw new Exception('User was able to book resource');
+        }
+    }
+
+    /**
      * Is there a booking with the given status starting at this time? If so
      * return it.
      *

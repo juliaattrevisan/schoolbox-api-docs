@@ -322,10 +322,35 @@ Scenario: Booking a moderated resource
 
 #Scenario: Booking a resource for someone else (if I have moderator perms on item)
 
-#Scenario: Booking a managed resource
-#  Given I do not wipe the slate clean
-#  And   I go to homepage
-#  And   I log in as "rvollmer" with password "password"
+@resource-booking @resource-booking-managed
+Scenario: Booking a managed resource
+  Given I do not wipe the slate clean
+  And   I go to homepage
+  And   I log in as "rvollmer" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "The good projector"
+  Then  I should not be able to book resource
+  # Log in as someone who can book this resource
+  Given I log out
+  And   I log in as "wwhite" with password "password"
+  When  I go to "/resource-booking/item"
+  And   I view details for resource "The good projector"
+  # "The good projector":
+  # Anyone can book this resource.
+  # Lead time: 24 days
+  # Min reservation time: 1 day
+  # Max reservation time: 2 days
+  And   I start booking resource for "+30 days"
+  When  I fill in "start_datetime[hour]" with "2"
+  And   I fill in "start_datetime[minute]" with "00"
+  And   I select "PM" from "start_datetime[meridien]"
+  And   I fill in "end_datetime[hour]" with "2"
+  And   I fill in "end_datetime[minute]" with "00"
+  And   I select "PM" from "end_datetime[meridien]"
+  And   I press "resource-booking-save"
+  And   wait for a "#calendar" element
+  Then  I should see pending booking at "2:00pm +30 days"
+  And   I should be able to approve booking at "2:00pm +31 days"
 
 @resource-booking
 Scenario: Cancelling a booking
