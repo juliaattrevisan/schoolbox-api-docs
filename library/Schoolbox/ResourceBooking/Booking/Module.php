@@ -75,10 +75,10 @@ class Module extends BaseModule {
         $bookingCancelRule = new Rule\Any($baseManageRule, $isOwnerRule);
 
         $authorizer
-            ->addRule('/^resourceBooking(?:$|\.)/',                 new Rule\IsLoggedIn())
-            ->addRule('/^resourceBooking\.(?:book|createBooking)/', $bookingCreateRule)
-            ->addRule('/^resourceBooking\.(?:approve|reject)/',     $baseManageRule)
-            ->addRule('/^resourceBooking\.cancel/',                 $bookingCancelRule)
+            ->addRule('/^resourceBooking(?:$|\.)/',                  new Rule\IsLoggedIn())
+            ->addRule('/^resourceBooking\.(?:book|createBooking)$/', $bookingCreateRule)
+            ->addRule('/^resourceBooking\.(?:approve|reject)$/',     $baseManageRule)
+            ->addRule('/^resourceBooking\.cancel$/',                 $bookingCancelRule)
         ;
     }
 
