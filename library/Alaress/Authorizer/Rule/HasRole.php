@@ -34,7 +34,7 @@ class HasRole implements IAuthorizationRule {
      */
     public function authorize(array $params = array(), User $user = null) {
         if ($user instanceof User) {
-            if ($user->getRole()->getId() == $this->role) {
+            if ($user->getRole()->getType() == $this->role) {
                 return;
             }
         }
