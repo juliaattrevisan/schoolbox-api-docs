@@ -38,6 +38,11 @@ $settings->spIssuer = 'schoolbox';
 #$settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_EMAIL_ADDRESS;
 $settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_TRANSIENT;
 
+/**
+* Checks an if an IP address is in a CIDR range or matches an individual address
+*
+* @return boolean
+*/
 function ipInCIDR ($ip, $cidr) {
     $cidr = trim($cidr);
 
@@ -65,7 +70,12 @@ function ipInCIDR ($ip, $cidr) {
 
     return $result;
 }
-  
+
+/**
+* Checks an IP address against a comma separated list of IPs/CIDR ranges
+*
+* @return boolean
+*/
 function ipInCIDRList ($ip, $cidr_list) {
     $cidr_array = array();
 
@@ -104,10 +114,11 @@ function useSAMLKerberos() {
     }
 
     // Check if the user is in the IP whitelist
-    //// TODO: replace $_SERVER['REMOTE_ADDR'] with one of the prebuilt GetIP() functions
-    if (!ipInCIDRList($_SERVER['REMOTE_ADDR'], Config::get('saml_krb_whitelist'))) {
+    $tempsession = new Session;
+    if (!ipInCIDRList($tempsession->getIP(), Config::get('saml_krb_whitelist'))) {
         return false;
     }
+    unset($tempsession);
 
     /**
     * Check if the users platform/browser supports kerberos
