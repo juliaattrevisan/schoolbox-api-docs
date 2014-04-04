@@ -8,7 +8,8 @@ module.exports = function(grunt) {
     var watchTasks = {
         core: {
             options: {
-                interrupt: true
+                interrupt: true,
+		interval: 5007
             },
             files: ['www/css/core/*.less'],
             tasks: ['build.css.current']
@@ -29,7 +30,8 @@ module.exports = function(grunt) {
         }
         watchTasks[cssDir] = {
             options: {
-                interrupt: true
+                interrupt: true,
+		interval: 5007
             },
             files: ['www/css/'+cssDir+'/*.less'],
             tasks: ['build.css:'+cssDir]
