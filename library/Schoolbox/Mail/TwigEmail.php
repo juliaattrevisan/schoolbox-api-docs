@@ -85,11 +85,72 @@ class TwigEmail extends TwigMailer {
 
 
         // extract colours
-        $colours = $this->parseLess(SITE_root . "/www/css/core/variables.less");
-        $colours = $this->parseLess(SITE_root . "/www/css/$site/chrome.less", $colours);
-        $this->coreContext['colours'] = $colours;
+        $this->coreContext['colours'] = $this->compileLess(array(
+	        SITE_root . "/www/css/core/variables.less",
+	        SITE_root . "/www/css/$site/chrome.less"
+        ));
     }
 
+
+	/**
+	 * Accepts names of LESS files and parses them as a group for colour variables
+	 *
+	 * @param array $sources
+	 * @return array
+	 */
+	protected function compileLess($sources) {
+
+		// build list (which leaves references intact
+		$colours = array();
+		foreach($sources as $file) {
+			$colours = $this->parseLess($file, $colours);
+		}
+
+//		ksort($colours);
+
+//		echo " -- INITIAL SET -- \n";
+//		print_r($colours);
+
+//		echo "\n -- REFERENCES --\n";
+		$unresolved = array();
+
+		// collate references
+		foreach($colours as $key => $value) {
+			if($value[0] == '@') {
+				$ref = substr($value, 1);
+				$unresolved[$key] = $ref;
+//				echo "$key references $ref\n";
+			}
+		}
+
+		// resolve
+		while(count($unresolved)) {
+
+//			$count = count($unresolved);
+//			echo "\n -- RESOLVE $count REFERENCES --\n";
+//			print_r($unresolved);
+
+			foreach($unresolved as $key => $true) {
+
+				$ref = substr($colours[$key], 1);
+				if(isset($colours[$ref])) {
+					$colours[$key] = $colours[$ref];
+					if($colours[$key][0] != '@') {
+						unset($unresolved[$key]);
+					}
+				}
+				else {
+					$colours[$key] = '';
+					unset($unresolved[$key]);
+				}
+			}
+		}
+
+//		print_r($colours);
+//		exit;
+
+		return $colours;
+	}
 
     /**
      * Accepts the filename of a LESS file and parses it for colour variables
@@ -108,35 +169,32 @@ class TwigEmail extends TwigMailer {
         while($line = fgets($fp)) {
 
             $regex = '`
-				@                       # vars start with an at
-				([a-z\-]+)              # get the varname
-				:                       # delimited by a colon
-				\s+                     # miscellaneous amounts of whitespace
-				(?:                     # $1
-					(\#[0-9A-Fa-f]+)    # colour declaration
-				|                       # OR
-					@([a-z\-]+)         # alternative var reference
-				)                       # /$1
-				;                       # trailing semicolon delimiter
+				@                                                                            # vars start with an at
+				([a-z\-]+)                                                                   # get the varname
+				:                                                                            # delimited by a colon
+				\s+                                                                          # miscellaneous amounts of whitespace
+				(?:                                                                          # $1
+					(\#[0-9A-Fa-f]+|rgba?\([0-9]{1,3},[0-9]{1,3},[0-9]{1,3}(?:,[0-9\.])\)?)  # colour declaration
+				|                                                                            # OR
+					(@[a-z\-]+)                                                              # alternative var reference
+				)                                                                            # /$1
+				;                                                                            # trailing semicolon delimiter
 			`x';
 
             if(!preg_match($regex, $line, $matches)) {
                 continue;
             }
 
+	        // @varname: drop hyphens to underscores for compatibility
             $matches[1] = str_replace('-','_', $matches[1]);
 
+	        // if 3 matches, is a colour declaration
             if(count($matches) == 3) {
-                $colours[$matches[1]] = strtoupper($matches[2]);
+                $colours[$matches[1]] = strtolower($matches[2]);
             }
+            // if 4 matches, is a reference
             elseif(count($matches) == 4) {
-                $matches[3] = str_replace('-','_', $matches[3]);
-                if(isset($colours[$matches[3]])) {
-                    $colours[$matches[1]] = $colours[$matches[3]];
-                }
-                else {
-                    $colours[$matches[1]] = '{'.$matches[3].'}';
-                }
+                $colours[$matches[1]] = str_replace('-','_', $matches[3]);
             }
 
         }
