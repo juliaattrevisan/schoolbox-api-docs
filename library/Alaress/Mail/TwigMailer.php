@@ -10,6 +10,7 @@
 namespace Alaress\Mail;
 
 
+use Html2Text\Html2Text;
 use Twig_Environment;
 
 class TwigMailer extends AbstractMailer {
@@ -53,8 +54,20 @@ class TwigMailer extends AbstractMailer {
 	 * @return self
 	 */
 	public function setContext($context) {
-		$this->context = $context;
+		if($context) {
+			$this->context = array_merge_recursive($this->context, $context);
+		}
+		else {
+			$this->context = array();
+		}
 		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getContext() {
+		return $this->context;
 	}
 
 	/**
@@ -85,9 +98,11 @@ class TwigMailer extends AbstractMailer {
 	 */
 	protected function composePlain() {
 		if($this->rendercache) {
-			return strip_tags($this->rendercache);
+			$converter = new Html2Text($this->rendercache);
+			return $converter->get_text();
 		}
-		return strip_tags($this->composeHTML());
+		$converter = new Html2Text($this->composeHTML());
+		return $converter->get_text();
 	}
 
 
