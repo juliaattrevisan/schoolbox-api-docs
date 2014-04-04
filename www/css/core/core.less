@@ -3331,6 +3331,77 @@ fieldset.calendarOptions fieldset {
 }
 
 /*--------------------------------------------------------------
+ADMINV2/MESSAGES
+--------------------------------------------------------------*/
+#digest-settings {
+	border-collapse: collapse;
+	&:hover {
+		td, th {
+			opacity: 0.3;
+		}
+	}
+	tr {
+		&:hover {
+			td, th {
+				opacity: 1;
+				background-color: @dark;
+			}
+			input + label {
+				background: @dark;
+			}
+		}
+		td input:focus {
+			+ label {
+				background: @lgrey;
+			}
+			&:checked + label {
+				background: lighten(@submit-btn, 10%);
+			}
+		}
+	}
+	td, th {
+		transition: opacity 0.1s linear;
+		position: relative;
+	}
+	th {
+		padding: 4px 32px 4px 8px;
+		white-space: nowrap;
+	}
+	td {
+		padding: 4px 0;
+		width: 2em;
+		&:last-child {
+			width: 100%;
+			text-align: left;
+		}
+		input:checked + label {
+			background: @submit-btn;
+			color: #fff;
+		}
+	}
+	label {
+		margin: 0 4px;
+		width: 2em;
+		height: 2em;
+		line-height: 2em;
+		text-align: center;
+		transition: background-color 0.1s linear;
+	}
+	input[type=checkbox] {
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		z-index: -1;
+		opacity: 0;
+	}
+	.timeselect {
+		margin-left: 16px;
+		width: auto;
+		text-align: left;
+	}
+}
+
+/*--------------------------------------------------------------
 HOMEPAGE TEMPLATES
 --------------------------------------------------------------*/
 
