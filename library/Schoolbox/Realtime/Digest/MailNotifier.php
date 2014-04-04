@@ -10,17 +10,21 @@
 namespace Schoolbox\Realtime\Digest;
 
 
+use PhpAmqpLib\Message\AMQPMessage;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
+use Schoolbox\Notif\Message\Decorator;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Serializable;
 
-class MailNotifier {
+class MailNotifier implements Serializable {
 
     /** @var IConfigLoader */
     protected $conf;
@@ -56,6 +60,7 @@ class MailNotifier {
 		// iterate and digest
 		foreach($users as $user) {
 			$q = UserQueue::getUserDigestQueueName($user->getId());
+			$sent = false;
 			$acks = array();
 
 			// collate list of messages
@@ -63,30 +68,75 @@ class MailNotifier {
 				$acks[] = $m;
 			}
 
-            $email->setTo(array('name' => $user->formatName(), 'email' => $user->getEmail()));
-            $email->setContext($this->convertMessagesToContext($acks));
+			if(!count($acks)) {
+				// this user has nothing to digest
+				continue;
+			}
 
-			// away she goes
-			$sent = $email->send();
+			$email->buildContextFromMessageList($this->amqp2targeted($acks));
+
+			if(count($email->getContext())) {
+				// explicitly an rfc822 email spec, so it sets, not adds
+				$email->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
+				// away she goes
+				$sent = $email->send();
+			}
 
             // if email sent successfully, ACK, otherwise NACK
-			if($sent) {
+			if($sent && false) {
 				$conn->acceptMessages($acks);
 				++$result;
 			}
 			else {
 				$conn->rejectMessages($acks);
 			}
+			break;
 		}
 
 		// return the number of emails successfully sent
 		return $result;
 	}
 
+	/**
+	 * Convert a batch of AMQPMessages to TargetedMessages
+	 * @param AMQPMessage[] $messages
+	 * @return TargetedMessage[]
+	 */
+	protected function amqp2targeted($messages) {
+		$result = array();
 
-    protected function convertMessagesToContext($messages) {
-        // TODO rearrange data to be more twig-friendly
-        return $messages;
-    }
+		foreach($messages as $amqp) {
+			$formatted = json_decode($amqp->body, true);
 
-} 
+			/** @var TargetedMessage $message */
+			$result[] = unserialize($formatted['message']);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * (PHP 5 &gt;= 5.1.0)<br/>
+	 * String representation of object
+	 * @link http://php.net/manual/en/serializable.serialize.php
+	 * @return string the string representation of the object or null
+	 */
+	public function serialize() {
+		// no serialization
+		return 'mailnotifier';
+	}
+
+	/**
+	 * (PHP 5 &gt;= 5.1.0)<br/>
+	 * Constructs the object
+	 * @link http://php.net/manual/en/serializable.unserialize.php
+	 * @param string $serialized <p>
+	 * The string representation of the object.
+	 * </p>
+	 * @return void
+	 */
+	public function unserialize($serialized) {
+		// no serialization
+		$this->__construct();
+	}
+}
