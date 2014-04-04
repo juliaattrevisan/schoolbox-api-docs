@@ -396,22 +396,6 @@ class External_Schoolpro_User implements External_UserInterface {
 	 * @return Bool|String
 	 */
 	public function getPortrait($externalUserId) {
-		$portraitPath = realpath(Config::get('portrait_dir') ) . '/' .strtolower($externalUserId) . '.jpg';
-
-		if (is_readable($portraitPath)) {
-			return $portraitPath;
-		}
-
-		return false;
-	}
-
-	/**
-	 * TODO: Replace existing getPortrait()
-	 *
-	 * @param $externalUserId
-	 * @return bool|string
-	 */
-	public function getPortrait2($externalUserId) {
 		if (!is_numeric($externalUserId)) {
 			return false;
 		}
@@ -430,8 +414,6 @@ class External_Schoolpro_User implements External_UserInterface {
 		/* Find the last updated datetime
 		 */
 		if ($result['success'] && count($result['result'])) {
-			new \Alaress_Probe($result['result']);
-
 			$photoPath = Config::get('portrait_dir') . '/' . escapeshellcmd($externalUserId) . '.jpg';
 
 			//TODO: delete photos on rollover
@@ -443,7 +425,7 @@ class External_Schoolpro_User implements External_UserInterface {
 			 * version, or if the cache version doesn't already exist.
 			 */
 			$cacheTime = @filemtime($photoPath);
-			$modifiedTime = strtotime($result['result']['ModifiedDate']);
+			$modifiedTime = strtotime($result['result'][0]['CaptureDate']);
 
 			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
 				$vars = array(
@@ -460,7 +442,6 @@ class External_Schoolpro_User implements External_UserInterface {
 				/* Get the binary data and dump it into a file
 				 */
 				if ($result['success'] && count($result['result'])) {
-					new \Alaress_Probe($result['result']);
 
 					/* Purge all previously transformed copies
 					 */
@@ -473,7 +454,7 @@ class External_Schoolpro_User implements External_UserInterface {
 					/* Save the image
 					 */
 					$photoHandle = fopen($photoPath, "w");
-					fwrite($photoHandle, $result['result']['Photo']);
+					fwrite($photoHandle, $result['result'][0]['RawData']);
 					fclose($photoHandle);
 				}
 			}
