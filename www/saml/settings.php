@@ -89,7 +89,65 @@ function ipInCIDRList ($ip, $cidr_list) {
     return $returnval;
 }
 
-// TODO: replace $_SERVER['REMOTE_ADDR'] with one of the prebuilt GetIP() functions
-$settings->useKerberos = ipInCIDRList($_SERVER['REMOTE_ADDR'], Config::get('saml_krb_whitelist'));
+/**
+* Checks if the user is in the correct IP range (by the whitelist)
+* and also of a supported browser / platform that supports Kerberos Auth
+*
+* @return boolean
+*/
+use phpbrowscap\Browscap;
+function useSAMLKerberos() {
+
+    // If whitelist not in use, don't use kerberos at all
+    if (trim(Config::get('saml_krb_whitelist'))==''){
+        return false;
+    }
+
+    // Check if the user is in the IP whitelist
+    //// TODO: replace $_SERVER['REMOTE_ADDR'] with one of the prebuilt GetIP() functions
+    if (!ipInCIDRList($_SERVER['REMOTE_ADDR'], Config::get('saml_krb_whitelist'))) {
+        return false;
+    }
+
+    /**
+    * Check if the users platform/browser supports kerberos
+    *
+    * Acceptance matrix:
+    * via: (http://en.wikipedia.org/wiki/Integrated_Windows_Authentication#Supported_web_browsers)
+    *  - Must be Desktop/Laptop
+    *  - IE on Windows
+    *  - Chrome on Windows and MacOSX
+    *  - Safari on MacOSX
+    *  - Firefox on Windows (if enabled in the Firefox install)
+    * 
+    * Errs on the side of kerberos than non-kerberos
+    */
+    $bc = new Browscap(Config::get('stream_dir'));
+    $current_browser = $bc->getBrowser();
+    if ($current_browser->Device_Type == 'Desktop') {
+        if (substr($current_browser->Platform,0,3)=='Win' || $current_browser->Platform == 'MacOSX') {
+            switch($current_browser->Browser) {
+                case 'IE':
+                case 'Chrome':
+                    return true;
+
+                case 'Safari':
+                    if (Config::get('saml_krb_safari')) { return true; } else { return false; }
+
+                case 'Firefox':
+                    if (Config::get('saml_krb_firefox')) { return true; } else { return false; }
+
+                default:
+                    return false;
+            }
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+$settings->useKerberos = useSAMLKerberos();
 
 return $settings;
