@@ -96,7 +96,9 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
          * done them at some point in the past
          */
         if (!$this->getCache()->isLoadedFromCache()) {
-            $allTransformations = $this->getTransformations()->retrieve($this->getCache()->getKey());
+
+            $allTransformations = array(array('method'=>'RotateOrientation','args'=>array('FilePath'=>$this->getFilePath())));
+            $allTransformations = array_merge($allTransformations,$this->getTransformations()->retrieve($this->getCache()->getKey()));
 
             /* Do it
              */
