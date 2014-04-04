@@ -74,7 +74,7 @@ try {
 	if (isset($transform_key)) {
 		$imageProcessor->setTransformKey($transform_key);
 	}
-	$imageProcessor->load()->transformAll()->stream();
+	$imageProcessor->load()->stream();
 }
 catch (Exception $e) {
 	SitePage::localRedir($path);
