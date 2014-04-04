@@ -13,26 +13,12 @@
 namespace Alaress\Authorizer\Rule;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Base;
-use InvalidArgumentException;
 
-class Any implements IAuthorizationRule {
+class Any extends Composite {
 
     /**
-     * @var array|IAuthorizationRule[]
+     * {@inheritdoc}
      */
-    protected $subRuleList = array();
-
-    public function __construct() {
-        foreach (func_get_args() as $subRule) {
-            if (!($subRule instanceof IAuthorizationRule)) {
-                throw new InvalidArgumentException(
-                    'Sub-rules passed to Alaress\\Authorizer\\Rule\\Any must implement Alaress\\Authorizer\\Rule\\IAuthorizationRule'
-                );
-            }
-            $this->subRuleList[] = $subRule;
-        }
-    }
-
     public function authorize(array $params = array(), User $user = null) {
         $lastException = null;
         foreach ($this->subRuleList as $subRule) {
