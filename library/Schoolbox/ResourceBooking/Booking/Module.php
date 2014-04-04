@@ -17,7 +17,7 @@ use Aura\Router\Router;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\UserAccess;
-//use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 
 class Module extends BaseModule {
 
@@ -43,23 +43,42 @@ class Module extends BaseModule {
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer) {
-        // Authorizer: will need to check the resource's moderation rule.
+        // Base management rule:
+        // Any superuser or user with moderate access to resource booking
+        // Resource management rule:
+        // Base management rule, or has moderate perms on the item.
+        // Create booking rule:
+        // is staff member, and has booking rights on the item.
+
+
+        // Approve/reject booking:
+        // only moderators can do this.
         $baseManageRule = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
         );
         $isItemModeratorRule = new Auth\CanModerateBooking();
         $isItemModeratorRule->setMapper(Mapper::getInstance());
+        $baseManageRule->addRule($isItemModeratorRule);
+
+        // Create booking:
+        // This depends on the the item - managed items can only be booked by
+        // moderators, otherwise they may be booked by any staff member.
+        $canBookRule = new Auth\CanBookItem();
+        $canBookRule->setMapper(ItemMapper::getInstance());
+        $bookingCreateRule = new Rule\Any($baseManageRule, $canBookRule);
+
+        // Cancel rule:
+        // booking can be cancelled by a moderator, or the owner of the booking.
         $isOwnerRule = new Auth\UserOwnsBooking();
         $isOwnerRule->setMapper(Mapper::getInstance());
-
-        $resourceManageRule = new Rule\Any($baseManageRule, $isItemModeratorRule);
-        $bookingCancelRule  = new Rule\Any($baseManageRule, $isOwnerRule);
+        $bookingCancelRule = new Rule\Any($baseManageRule, $isOwnerRule);
 
         $authorizer
-            ->addRule('/^resourceBooking(?:$|\.)/', new Rule\IsLoggedIn())
-            ->addRule('/^resourceBooking\.(?:approve|reject)/', $resourceManageRule)
-            ->addRule('/^resourceBooking\.cancel/', $bookingCancelRule)
+            ->addRule('/^resourceBooking(?:$|\.)/',                 new Rule\IsLoggedIn())
+            ->addRule('/^resourceBooking\.(?:book|createBooking)/', $bookingCreateRule)
+            ->addRule('/^resourceBooking\.(?:approve|reject)/',     $baseManageRule)
+            ->addRule('/^resourceBooking\.cancel/',                 $bookingCancelRule)
         ;
     }
 
