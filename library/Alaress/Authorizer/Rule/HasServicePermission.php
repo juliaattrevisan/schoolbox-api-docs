@@ -1,6 +1,7 @@
 <?php
 /**
- * Base authorization method - contains a session object.
+ * Authorization method - checks whether the user has certain permissions on a
+ * given service.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
