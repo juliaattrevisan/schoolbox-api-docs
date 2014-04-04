@@ -194,17 +194,15 @@ class Decorator {
 			'meta'      => $this->message->getBody()->getMeta(),
 		);
 
-		// cast time to day
-		$day = ((int)floor($msgArray['timestamp'] * 0.000011574)) * 86400;
-
-
 		switch($ns) {
 			case 'work':
-				// don't use numeric keys (recursive merge does it wrong), but group by day
-				$context['groups'][$ns]["dates"]["d-$day"][Connector::deriveMessageId($this->message)] = $msgArray;
+				// cast time to day
+				$rowId = date('Y-m-d', $msgArray['timestamp']);
+				$context['groups'][$ns]['rows'][$rowId]['messages'][Connector::deriveMessageId($this->message)] = $msgArray;
 				break;
 			default:
-				$context['groups'][$ns]['messages'][Connector::deriveMessageId($this->message)] = $msgArray;
+				// numeric index will be appended, not merged
+				$context['groups'][$ns]['rows'][0]['messages'][Connector::deriveMessageId($this->message)] = $msgArray;
 				break;
 		}
 
