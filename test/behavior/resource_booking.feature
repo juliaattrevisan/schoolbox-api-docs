@@ -350,7 +350,9 @@ Scenario: Booking a managed resource
   And   I press "resource-booking-save"
   And   wait for a "#calendar" element
   Then  I should see pending booking at "2:00pm +30 days"
-  And   I should be able to approve booking at "2:00pm +31 days"
+  When  I approve booking at "2:00pm +30 days"
+  And   I wait for AJAX to finish
+  Then  I should see approved booking at "2:00pm +30 days"
 
 @resource-booking
 Scenario: Cancelling a booking
