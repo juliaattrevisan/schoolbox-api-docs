@@ -353,6 +353,8 @@ class Controller extends Base {
             $class   = '';
 
             // Modify URL
+            // TODO consider injecting $booking into auth check
+            // (so that it does not need to be fetched again)
             $editUrl = $this->getRouteIfAuthorized(
                 'resourceBooking.edit', array('id' => $booking->getId())
             );
