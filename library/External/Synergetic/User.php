@@ -155,10 +155,10 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getParent($synID) {
 		$query = "
 			SELECT
-				Contact.Title, Contact.Preferred, Contact.Surname, Contact.Email, Addresses.Phone as HomePhone,
+				Contact.Title, Contact.Preferred, Contact.Surname, Contact.Email, Contact.OccupEmail, Contact.DefaultEmailCode, Addresses.Phone as HomePhone,
 				Addresses.SilentPhoneFlag, Contact.MobilePhone, Contact.DirectoryIncludeFlag, Contact.SpouseID,
 				Spouse.Title SpouseTitle, Spouse.Preferred SpousePreferred, Spouse.Surname SpouseSurname,
-				Spouse.Email SpouseEmail, Spouse.MobilePhone SpouseMobilePhone,
+				Spouse.Email SpouseEmail, Spouse.OccupEmail SpouseOccupEmail, Spouse.DefaultEmailCode SpouseDefaultEmailCode, Spouse.MobilePhone SpouseMobilePhone,
 				Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
 			FROM
 				SynergyOne.dbo.Community Contact
@@ -169,7 +169,16 @@ class External_Synergetic_User implements External_UserInterface {
 			WHERE
 				Contact.ID = '$synID'";
 
-		return $this->getDatabase()->getRow($query);
+		$parent = $this->getDatabase()->getRow($query);
+
+        if ($parent['DefaultEmailCode'] == 'O') {
+            $parent['Email'] = $parent['OccupEmail'];
+        }
+
+        if ($parent['SpouseDefaultEmailCode'] == 'O') {
+            $parent['SpouseEmail'] = $parent['SpouseOccupEmail'];
+        }
+
 	}
 
 	/**
