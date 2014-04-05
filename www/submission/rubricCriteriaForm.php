@@ -10,6 +10,7 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 
 
 // this is a script and not to be SitePage'd
@@ -48,51 +49,28 @@ foreach($criteria as $group) {
     }
 }
 
-
-// get pre-existing criteria details
-$rubricHandler = new DueWork_Rubric_Handler();
-$dbcriteria = $rubricHandler->getAvailableCriteria($catID, 'category', true);
-
-// create a list of criteria that we cannot permit changes to
-$locked = array();
-$existing = array();
-if(count($dbcriteria)) {
-    foreach($dbcriteria as $groupname => $groupitems) {
-        foreach($groupitems as $id => $details) {
-            if($details['count']) {
-                $locked[] = $id;
-            }
-            $existing[] = $id;
-        }
-    }
-}
-
 $criterionMapper = CriterionMapper::getInstance();
 
 /* @var $criterionMapper CriteriaMapper */
 
 // iterate through list of provided criteria changes
 foreach($data as $critID => $critData) {
-
-    // don't edit locked criteria
-    if(in_array($critID, $locked)) {
-        continue; // possibly throw an error of some kind
-    }
-
-    if(in_array($critID, $existing)) {
-        // perform update
+    try {
         $criteria = $criterionMapper->findByID($critID);
         $criteria->setGrouping($critData['group']);
         $criteria->setName($critData['name']);
+
+        //Do not edit criteria that are in use
+        $usage = UsageMapper::getInstance()->findByColumnList(array('criterion_id' => $critID));
+        if(count($usage)) {
+            continue; // possibly throw an error of some kind
+        }
     }
-    else {
-
+    catch(Exception $e) {
         $criteria = new Criterion();
-
         $criteria->setParentId($catID);
         $criteria->setGrouping($critData['group']);
         $criteria->setName($critData['name']);
-
     }
 
     $criterionMapper->save($criteria);
@@ -100,9 +78,21 @@ foreach($data as $critID => $critData) {
 
 // finally, work out the diff and delete unnecessary criteria
 $found = array_keys($data);
-foreach($existing as $eID) {
-    if(!(in_array($eID, $found) || in_array($eID, $locked))) {
-        $criterionMapper->delete($criterionMapper->findByID($eID));
+
+$criterionCollection = $criterionMapper->findByColumnList(
+                                      array(
+                                          'parent_id'   => $catID,
+                                          'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                                      )
+);
+
+foreach($criterionCollection as $crit) {
+    if(!in_array($crit->getID(), $found)) {
+        try {
+            $criterionMapper->delete($criterionMapper->findByID($crit->getID()));
+        } catch (Exception $e) {
+            die('Criteria not found');
+        }
     }
 }
 

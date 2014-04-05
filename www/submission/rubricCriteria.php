@@ -10,6 +10,7 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Resource\CategoryMapper;
 
 // not in SitePage context, redirect to equivalent
@@ -83,16 +84,28 @@ if(count($criterionCollection)) {
             'CRITGROUP_DISABLED' => ''
         ));
         foreach($crits as $crit) {
+            /* @var $crit Criterion */
             $topID = max($topID, $crit->getID());
             $this->setVar(array(
                 'CRITERION_ID'   => $crit->getID(),
                 'CRITERION_NAME' => $crit->getName(),
             ));
 
-            /* TODO: Check if criterion is being used */
+            $usage = UsageMapper::getInstance()->findByColumnList(array('criterion_id' => $crit->getID()));
+            $usageCount = count($usage);
+            if($usageCount > 0) {
+                $this->setVar('CRITERION_USAGE', $usageCount);
+                $this->setVar('criterion_enabled_block', '');
+                $this->parse('criterion_disabled_block', 'criterion_disabled');
 
-            $this->setVar('criterion_disabled_block', '');
-            $this->parse('criterion_enabled_block', 'criterion_enabled');
+
+            }
+            else {
+                $this->setVar('criterion_disabled_block', '');
+                $this->parse('criterion_enabled_block', 'criterion_enabled');
+            }
+
+
 
             $this->parse('criterion_block', 'criterion', true);
         }
