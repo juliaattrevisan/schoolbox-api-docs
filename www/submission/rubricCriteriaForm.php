@@ -7,6 +7,11 @@
  * @version     SVN: $Id$
  */
 
+
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+
+
 // this is a script and not to be SitePage'd
 if(isset($this)) {
     error(4);
@@ -62,27 +67,9 @@ if(count($dbcriteria)) {
     }
 }
 
-// to be refactored
-$db = Database::getInstance();
+$criterionMapper = CriterionMapper::getInstance();
 
-$stmt['insert'] = $db->prepare("
-    INSERT INTO rubric_criterion
-      (`grouping`, `name`, `parent_id`)
-    VALUES
-      (:group, :name, :pid)
-");
-$stmt['update'] = $db->prepare("
-    UPDATE rubric_criterion
-    SET
-      `grouping` = :group,
-      `name` = :name
-    WHERE id = :cid
-");
-$stmt['delete'] = $db->prepare("
-    DELETE FROM rubric_criterion
-    WHERE id = :cid
-");
-
+/* @var $criterionMapper CriteriaMapper */
 
 // iterate through list of provided criteria changes
 foreach($data as $critID => $critData) {
@@ -94,24 +81,28 @@ foreach($data as $critID => $critData) {
 
     if(in_array($critID, $existing)) {
         // perform update
-        $exec = array_merge($critData, array('cid' => $critID));
-        $method = 'update';
+        $criteria = $criterionMapper->findByID($critID);
+        $criteria->setGrouping($critData['group']);
+        $criteria->setName($critData['name']);
     }
     else {
-        // perform insert
-        $exec = array_merge($critData, array('pid' => $catID));
-        $method = 'insert';
+
+        $criteria = new Criterion();
+
+        $criteria->setParentId($catID);
+        $criteria->setGrouping($critData['group']);
+        $criteria->setName($critData['name']);
+
     }
 
-    $stmt[$method]->execute($exec);
-
+    $criterionMapper->save($criteria);
 }
 
 // finally, work out the diff and delete unnecessary criteria
 $found = array_keys($data);
 foreach($existing as $eID) {
     if(!(in_array($eID, $found) || in_array($eID, $locked))) {
-        $stmt['delete']->execute(array('cid' => $eID));
+        $criterionMapper->delete($criterionMapper->findByID($eID));
     }
 }
 
