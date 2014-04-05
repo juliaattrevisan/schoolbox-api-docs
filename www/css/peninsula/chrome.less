@@ -65,6 +65,8 @@
 @tab-hover-background:			#897000;
 @tab-hover-color:				@tab-color;
 
+@notify-text-color:				@tab-color;
+
 // Footer text
 @footer-color:					#929292;
 @footer-links:					@footer-color;
@@ -83,4 +85,21 @@
 
 .admin-nav li a {
   color: #929292;
+}
+
+#infoPanel {
+	margin-bottom: 14px;
+	.bell {
+		background-image: url('/images/peninsula/bell.png');
+		&.open > a {
+			color: @tab-background;
+		}
+	}
+}
+#tabs li.navthis {
+	z-index: 1;
+}
+
+#message-list {
+	border: none;
 }

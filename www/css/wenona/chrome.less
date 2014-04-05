@@ -62,6 +62,12 @@
 @tab-hover-background:			@tab-background;
 @tab-hover-color:				@tab-color;
 
+// messages
+@infopanel-height:				24px;
+@flyout-header-color:			@banner-background;
+@flyout-color:					@link;
+@flyout-border:					#00458C;
+
 // Footer text
 @footer-color:					#797979;
 @footer-links:					@footer-color;
@@ -75,3 +81,29 @@
 @import "../core/core.less";
 @import "screen.less";
 // =============================================================================
+
+#infoPanel {
+	margin: 10px 0px 8px 0;
+	.bell {
+		.border-radius(3px);
+		&.open:after {
+			width: 0;
+			height: 0;
+			bottom: -10px;
+			right: 30%;
+			position: absolute;
+			border-left: 6px solid transparent;
+			border-right: 6px solid transparent;
+			border-bottom: 6px solid @flyout-border;
+			background-color: transparent;
+		}
+	}
+}
+#message-list {
+	.box-shadow(0,0,0,transparent);
+	border: solid 1px @flyout-border;
+	top: 33px;
+}
+#tabs {
+	z-index: 1;
+}

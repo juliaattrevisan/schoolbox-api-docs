@@ -53,6 +53,11 @@
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
 
+@infopanel-height:				32px;
+@notify-color:					#FF0039;
+@notify-text-color:				@banner-links;
+@flyout-color:					@link;
+
 // Main "Tab" Navigation
 @tab-background:				#B81237;
 @tab-color:						#FFFFFF;
@@ -74,3 +79,17 @@
 @import "screen.less";
 // =============================================================================
 
+#infoPanel {
+	margin: 8px 16px -8px;
+}
+
+#infoPanel .bell {
+	margin: 0;
+	background-image: url('/images/balcombe/bell.png');
+}
+
+#message-list {
+	h4 {
+		color: @link;
+	}
+}

@@ -64,6 +64,13 @@
 @tab-hover-background:			transparent;
 @tab-hover-color:				#FFFFFF;
 
+@infopanel-height:				24px;
+@infopanel-bellsprite:			'/images/mgs-senior/bell.png';
+@flyout-pad-height:				6px;
+@flyout-highlight:				@content-background;
+@flyout-background:				@dark;
+
+
 // Footer text
 @footer-color:					#5A5A5A;
 @footer-links:					@footer-color;
@@ -80,3 +87,9 @@
 @import "screen.less";
 // =============================================================================
 
+#infoPanel {
+	margin: 16px 16px 0 0;
+	img {
+		margin-top: -4px;
+	}
+}

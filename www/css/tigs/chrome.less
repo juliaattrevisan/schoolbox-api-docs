@@ -43,6 +43,7 @@
 @banner-links:      			@banner-color;
 @search-color:                  @banner-color;
 @banner-height:     			48px;
+@infopanel-height:				32px;
 
 // Modules
 @module-heading: 				#000000;
@@ -80,6 +81,15 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // =============================================================================
+#infoPanel {
+	height: 8px;
+	.bell {
+		background-image: url('/images/tigs/bell.png');
+	}
+}
+#message-list .messages .unread a {
+	color: @black;
+}
 
 .dashboard-subject-list{
   padding: 12px 0 0 17px;
@@ -185,13 +195,10 @@
 
   .logout{
     display: block;
-    background: url('/images/tigs/off.png') top left no-repeat;
-    width: 16px;
-    height: 16px;
+    background: url('/images/tigs/off.png') 8px 8px no-repeat;
+    width: 32px;
+    height: 32px;
     text-indent: -90000px;
-    position: relative;
-    top: -6px;
-    left: 6px;
   }
 
   #search{
@@ -217,6 +224,7 @@
 
   #tabs{
     top: 33px;
+	z-index: 1;
     margin-left: 217px;
     position: relative;
 

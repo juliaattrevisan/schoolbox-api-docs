@@ -42,6 +42,8 @@
 @banner-links:      			@banner-color;
 @banner-height:     			132px;
 @search-color:                  @white;
+@notify-color:					@banner-color;
+@infopanel-height:				32px;
 
 // Modules
 @module-heading: 				#252525;
@@ -191,9 +193,16 @@ body.login{
   #infoPanel{
     right: 379px;
     top: 26px;
+	margin-bottom: 68px;
     a{
       text-decoration: none;
     }
+	.bell {
+		background-image: url('/images/genazzano/bell.png');
+		> a {
+			color: @banner-background;
+		}
+	}
   }
 }
 

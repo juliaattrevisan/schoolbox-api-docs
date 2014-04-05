@@ -22,6 +22,7 @@
 // Dimensions
 @logo-width: 					280px;
 @logo-height: 					80px;
+@infopanel-height:				14px;
 
 // Generic colors
 @body-background: 				#FFFFFF; // Body, but not the content area
@@ -46,6 +47,7 @@
 @module-heading: 				#FFFFFF;
 @module-background: 			#00529C;
 @admin-nav:                     @tab-background;
+@notify-color:					@negative-color;
 
 // Refers to the left navigation
 @navigation-width:				161px;
@@ -62,6 +64,10 @@
 @tab-color:						#FFFFFF;
 @tab-hover-background:			@tab-background;
 @tab-hover-color:				@tab-color;
+
+
+// Menus and Messages
+@notify-text-color:				@white;
 
 // Footer text
 @footer-color:					#B2B2B2;
@@ -84,4 +90,39 @@
   color: @footer-color;
   background: @dark;
   border: 1px solid @border-color;
+}
+
+// positioning overrides for notifications
+#infoPanel {
+	margin: 14px 0 14px;
+	.bell {
+		background-image: url('/images/mggs/bell.png');
+		background-position: 4px -24px;
+		height: 24px;
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px;
+		&[data-unread="0"] {
+			background-position: 4px 0;
+		}
+		&.open {
+			background-position: 4px -48px;
+			&:after {
+				width: 0;
+				height: 0;
+				bottom: -10px;
+				right: 30%;
+				position: absolute;
+				border-left: 6px solid transparent;
+				border-right: 6px solid transparent;
+				border-bottom: 6px solid #e5edf5;
+			}
+		}
+		> a {
+			line-height: 24px;
+		}
+	}
+}
+#message-list {
+	border: solid 3px #e5edf5;
 }
