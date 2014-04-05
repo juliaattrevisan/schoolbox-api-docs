@@ -74,10 +74,10 @@ if(count($criterionCollection)) {
 
     /* Create group structure */
     foreach($criterionCollection as $crit) {
-        $citeriaList[$crit->getGrouping()][] = $crit;
+        $criteriaList[$crit->getGrouping()][] = $crit;
     }
 
-    foreach ($citeriaList as $grouping => $crits) {
+    foreach ($criteriaList as $grouping => $crits) {
         $this->setVar(array(
             'criterion_block' => '',
             'CRITGROUP_NAME'  => $grouping,
