@@ -44,6 +44,8 @@ class CriterionMapper extends Schoolbox\Mapper {
             'property'   => 'parentType',
             'type'       => self::TYPE_STRING,
         ));
+
+        $this->hasSoftDeleteDateField('deleted_at');
     }
 
     /**
