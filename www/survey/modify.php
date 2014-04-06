@@ -33,6 +33,12 @@ if (!empty($_POST)) {
     $start = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/y');
     $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/y');
 
+	/* Check for valid dates
+	 */
+	if (!$start->isValid() || !$finish->isValid()) {
+		error(15);
+	}
+
     /* Check that finish time cannot be before start time
       */
     if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
@@ -62,11 +68,7 @@ if (!empty($_POST)) {
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'survey/modify.html');
-    $this->setBlock(TEMPLATE_content, 'startHour', 'startHour_block');
-    $this->setBlock(TEMPLATE_content, 'startMinute', 'startMinute_block');
     $this->setBlock(TEMPLATE_content, 'startMeridiem', 'startMeridiem_block');
-    $this->setBlock(TEMPLATE_content, 'finishHour', 'finishHour_block');
-    $this->setBlock(TEMPLATE_content, 'finishMinute', 'finishMinute_block');
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
@@ -93,27 +95,14 @@ if (!empty($_POST)) {
      */
     $assessStartHour = $assessStartDate->getUsingFormat('h');
     $assessStartMinute = $assessStartDate->getUsingFormat('i');
-    $assessStartMeridiem = $assessStartDate->getUsingFormat('a');
+    $assessStartMeridiem = $assessStartDate->getUsingFormat('A');
 
-    for ($i = 1; $i <= 12; $i++) {
-        $this->setVar(array(
-            'START_HOUR_VALUE' => $i,
-            'START_HOUR_SELECTED' => ($i == $assessStartHour) ? 'selected=\'selected\'' : '',
-        ));
+	$this->setVar(array(
+		'START_HOUR_VALUE' => $assessStartHour,
+		'START_MINUTE_VALUE' => $assessStartMinute,
+	));
 
-        $this->parse('startHour_block', 'startHour', true);
-    }
-
-    for ($i = 0; $i <= 45; $i += 15) {
-        $this->setVar(array(
-            'START_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
-            'START_MINUTE_SELECTED' => ($i == $assessStartMinute) ? 'selected=\'selected\'' : '',
-        ));
-
-        $this->parse('startMinute_block', 'startMinute', true);
-    }
-
-    foreach (array('am', 'pm') as $meridiem) {
+	foreach (array('AM', 'PM') as $meridiem) {
         $this->setVar(array(
             'START_MERIDIEM_VALUE' => $meridiem,
             'START_MERIDIEM_SELECTED' => ($meridiem == $assessStartMeridiem) ? 'selected=\'selected\'' : '',
@@ -126,27 +115,16 @@ if (!empty($_POST)) {
      */
     $assessFinishHour = $assessFinishDate->getUsingFormat('h');
     $assessFinishMinute = $assessFinishDate->getUsingFormat('i');
-    $assessFinishMeridiem = $assessFinishDate->getUsingFormat('a');
+    $assessFinishMeridiem = $assessFinishDate->getUsingFormat('A');
 
-    for ($i = 1; $i <= 12; $i++) {
-        $this->setVar(array(
-            'FINISH_HOUR_VALUE' => $i,
-            'FINISH_HOUR_SELECTED' => ($i == $assessFinishHour) ? 'selected=\'selected\'' : '',
-        ));
+	/* Render finish times
+	 */
+	$this->setVar(array(
+		'FINISH_HOUR_VALUE' => $assessFinishHour,
+		'FINISH_MINUTE_VALUE' => $assessFinishMinute,
+	));
 
-        $this->parse('finishHour_block', 'finishHour', true);
-    }
-
-    for ($i = 0; $i <= 45; $i += 15) {
-        $this->setVar(array(
-            'FINISH_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
-            'FINISH_MINUTE_SELECTED' => ($i == $assessFinishMinute) ? 'selected=\'selected\'' : '',
-        ));
-
-        $this->parse('finishMinute_block', 'finishMinute', true);
-    }
-
-    foreach (array('am', 'pm') as $meridiem) {
+	foreach (array('AM', 'PM') as $meridiem) {
         $this->setVar(array(
             'FINISH_MERIDIEM_VALUE' => $meridiem,
             'FINISH_MERIDIEM_SELECTED' => ($meridiem == $assessFinishMeridiem) ? 'selected=\'selected\'' : '',

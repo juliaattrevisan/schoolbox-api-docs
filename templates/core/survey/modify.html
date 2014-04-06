@@ -87,24 +87,15 @@ $j(document).ready(function() {
 					<h4>Start</h4>
 					<em>The survey will only be available between the start and finish date</em>
 					<fieldset>
-					<select name="start[hour]">
-						<!-- BEGIN startHour -->
-						<option value="{START_HOUR_VALUE}" {START_HOUR_SELECTED}>{START_HOUR_VALUE}</option>
-						<!-- END startHour -->
-					</select>
-					<select name="start[minute]">
-						<!-- BEGIN startMinute -->
-						<option value="{START_MINUTE_VALUE}" {START_MINUTE_SELECTED}>{START_MINUTE_VALUE}</option>
-						<!-- END startMinute -->
-					</select>
+						<input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
 
-					<select name="start[meridiem]">
-						<!-- BEGIN startMeridiem -->
-						<option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
-						<!-- END startMeridiem -->
-					</select>
-
-					<input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
+						<input name="start[hour]" type="text" class='timeField' value="{START_HOUR_VALUE}" /> :
+						<input name="start[minute]" type="text" class='timeField' value="{START_MINUTE_VALUE}" />
+						<select name="start[meridiem]">
+							<!-- BEGIN startMeridiem -->
+							<option value="{START_MERIDIEM_VALUE}" {START_MERIDIEM_SELECTED}>{START_MERIDIEM_VALUE}</option>
+							<!-- END startMeridiem -->
+						</select>
 					</fieldset>
 				</td>
 			</tr>
@@ -113,22 +104,17 @@ $j(document).ready(function() {
 				<td>
 					<h4>Finish</h4>
 					<em>The last time this survey will be available to complete</em>
-					<select name="finish[hour]">
-						<!-- BEGIN finishHour -->
-						<option value="{FINISH_HOUR_VALUE}" {FINISH_HOUR_SELECTED}>{FINISH_HOUR_VALUE}</option>
-						<!-- END finishHour -->
-					</select>
-					<select name="finish[minute]" >
-						<!-- BEGIN finishMinute -->
-						<option value="{FINISH_MINUTE_VALUE}" {FINISH_MINUTE_SELECTED} class="required">{FINISH_MINUTE_VALUE}</option>
-						<!-- END finishMinute -->
-					</select>
-					<select name="finish[meridiem]">
-						<!-- BEGIN finishMeridiem -->
-						<option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
-						<!-- END finishMeridiem -->
-					</select>
-					<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
+					<fieldset>
+						<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
+
+						<input name="finish[hour]" type="text" class='timeField' value="{FINISH_HOUR_VALUE}" /> :
+						<input name="finish[minute]" type="text" class='timeField' value="{FINISH_MINUTE_VALUE}" />
+						<select name="finish[meridiem]">
+							<!-- BEGIN finishMeridiem -->
+							<option value="{FINISH_MERIDIEM_VALUE}" {FINISH_MERIDIEM_SELECTED}>{FINISH_MERIDIEM_VALUE}</option>
+							<!-- END finishMeridiem -->
+						</select>
+					</fieldset>
 				</td>
 			</tr>
 			<tr>
