@@ -56,14 +56,13 @@ class Subcontext_CoreContext extends BaseContext {
      */
     public function login($username, $password) {
         $this->loginAttempt($username, $password);
-        $this->waitForLink('Logout', 10000);
+        $this->waitForLink('go-msg', 10000);
     }
 
     /**
      * Attempts to log in.
      *
-     * This represents a successful login, and will throw exception on a failed
-     * login. For a login attempt, @see $this->loginAttempt()
+     * This represents any login attempt, successful or not.
      *
      * @Given /^(?:|I )try to log in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
      *
@@ -93,7 +92,7 @@ class Subcontext_CoreContext extends BaseContext {
      * @Given /^(?:|I )log out$/
      */
     public function logout() {
-        $this->getSession()->getPage()->clickLink('Logout');
+        $this->getMinkContext()->visit('/logout.php');
     }
 
     /**
