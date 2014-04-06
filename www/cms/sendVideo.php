@@ -10,7 +10,18 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-if (isset($_GET['type']) && isset($_GET['id'])) {
+$type = $_GET['type'];
+$id   = $_GET['id'];
+if (isset($_GET['hash'])) {
+	// Old URL for brownhole videos: ?hash={brownholeHash}
+	// If you get one of these, permanent redirect to the new one.
+	$params = $_GET;
+	$params['type'] = 'storage';
+	$params['id']   = $_GET['hash'];
+	unset($params['hash']);
+	SitePage::localRedir('/cms/sendVideo.php?'.http_build_query($params), false, 301);
+}
+if (isset($type) && isset($id)) {
 
 	$page = new SitePage;
 	$groupHandler = new Group;
@@ -18,7 +29,7 @@ if (isset($_GET['type']) && isset($_GET['id'])) {
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
 	try {
-		$videoFactory = new \Schoolbox\Video\Factory\Video($_GET['type'], $_GET['id']);
+		$videoFactory = new \Schoolbox\Video\Factory\Video($type, $id);
 		$video = $videoFactory->produce();
 	}
 	catch (Schoolbox\Mapper\Exception $e) {
@@ -39,7 +50,7 @@ if (isset($_GET['type']) && isset($_GET['id'])) {
 
 	$filename = $video->getVideoLocation();
 
-	$fileHandler->logAction($_GET['id'], 'access');
+	$fileHandler->logAction($id, 'access');
 
 	if(is_readable($filename) ) {
 		$filesize = @filesize($filename);

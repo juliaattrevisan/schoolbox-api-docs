@@ -795,8 +795,8 @@ class SitePage extends Page {
      * @param  $file
      * @return void
      */
-    static public function localRedir($file, $keepProcessing = false) {
-        header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file);
+    static public function localRedir($file, $keepProcessing = false, $responseCode = null) {
+        header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file, null, $responseCode);
         self::disableXssProtectionAfterForm();
         // don't quit
         if ($keepProcessing) {

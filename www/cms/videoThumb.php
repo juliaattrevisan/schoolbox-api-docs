@@ -9,14 +9,26 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
-if (isset($_GET['type']) && is_numeric($_GET['id']) && isset($_GET['size'])) {
+$type = $_GET['type'];
+$id   = $_GET['id'];
+$size = $_GET['size'];
+if (isset($_GET['hash'])) {
+	// Old URL for brownhole videos: ?hash={brownholeHash}&size={whatever}
+	// If you get one of these, permanent redirect to the new one.
+	$params = $_GET;
+	$params['type'] = 'storage';
+	$params['id']   = $_GET['hash'];
+	unset($params['hash']);
+	SitePage::localRedir('/cms/videoThumb.php?'.http_build_query($params), false, 301);
+}
+if (isset($type) && isset($id) ) {
 	$page = new SitePage;
 	$groupHandler = new Group;
 
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
-		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($_GET['type'], $_GET['id']);
+		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($type, $id);
 		$video = $thumbnailFactory->produce();
     }
     catch (Schoolbox\Mapper\Exception $e) {
@@ -24,18 +36,22 @@ if (isset($_GET['type']) && is_numeric($_GET['id']) && isset($_GET['size'])) {
         SitePage::redirectToBrokenImageOfSize(64, 64, 500);
     }
 
+    if($size == 'poster') {
+   		$filename = $video->getPosterLocation();
+           $pixels = 400;
+   	}
+   	else {
+   		$filename = $video->getThumbnailLocation();
+           $pixels = 64;
+   	}
 
-	if($_GET['size'] == 'poster') {
-		$filename = $video->getPosterLocation();
-	}
-	else {
-		$filename = $video->getThumbnailLocation();
-	}
+
 
 	if(is_readable($filename) ) {
 		$filesize = filesize($filename);
-		if ($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
-			error(41);
+		if ($filesize == FALSE) { //if we cannot find the file (something is wrong dont link to it)
+            SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+        }
 
 		header('Cache-Control: max-age=10800, private');
 		header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
@@ -45,7 +61,9 @@ if (isset($_GET['type']) && is_numeric($_GET['id']) && isset($_GET['size'])) {
 		readfile($filename);
 	}
 	else {
-		error(41);
-	}
+        SitePage::redirectToBrokenImageOfSize(64,64, 500);
 
+    }
+} else {
+    SitePage::redirectToBrokenImageOfSize(64, 64, 500);
 }
