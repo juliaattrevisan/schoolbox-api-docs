@@ -97,23 +97,51 @@ else {
 }
 $this->setVar($email);
 
-/* Ldap server check */
+/* LDAP server check */
+$ldap1 = array('LDAP_LIGHT'     => '',
+                'LDAP_STATUS'    => 'Disabled');
+$ldap2 = array('LDAP_ALT_LIGHT' => '',
+                'LDAP_ALT_STATUS'=> 'Disabled');
 if(Cfg::get('ldap_enable')) {
-    $ds=ldap_connect(Cfg::get('ldap_host'));
-    if($ds) {
-        $ldap = array('LDAP_LIGHT'    => 'on',
-                     'LDAP_STATUS'    => 'Online');
+    $tempsession = new Session;
+
+    // Check primary LDAP server bind
+    if (trim(Cfg::get('ldap_host')) != "") {
+        $ds=ldap_connect(Cfg::get('ldap_host'));
+        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+        $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user')), utf8_encode(Cfg::get('ldap_pass'))); 
+        if($ldapbind) {
+            $ldap1 = array('LDAP_LIGHT'    => 'on',
+                        'LDAP_STATUS'    => 'Online');
+        }
+        else {
+            $ldap1 = array('LDAP_LIGHT'    => '',
+                        'LDAP_STATUS'    => 'Offline');
+        }
+        unset($ds,$ldapbind);
     }
-    else {
-        $ldap = array('LDAP_LIGHT'    => '',
-                      'LDAP_STATUS'    => 'Offline');
+
+    // Check secondary LDAP server bind
+    if (trim(Cfg::get('ldap_host_alt')) != "") {
+        $ds=ldap_connect(Cfg::get('ldap_host_alt'));
+        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+        $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user_alt')), utf8_encode(Cfg::get('ldap_pass'))); 
+        if($ldapbind) {
+            $ldap2 = array('LDAP_ALT_LIGHT'    => 'on',
+                        'LDAP_ALT_STATUS'    => 'Online');
+        }
+        else {
+            $ldap2 = array('LDAP_ALT_LIGHT'    => '',
+                        'LDAP_ALT_STATUS'    => 'Offline');
+        }
+        unset($ds,$ldapbind);
     }
 }
-else {
-   $ldap = array('LDAP_LIGHT'    => '',
-                  'LDAP_STATUS'    => 'Disabled');
-}
-$this->setVar($ldap);
+$this->setVar($ldap1);
+$this->setVar($ldap2);
+unset($tempsession);
 
 /* WWW access check */
 if(in_array('nojscript', $this->arg)) {
