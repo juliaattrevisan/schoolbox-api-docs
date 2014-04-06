@@ -21,7 +21,7 @@ if (isset($_GET['hash'])) {
 	unset($params['hash']);
 	SitePage::localRedir('/cms/videoThumb.php?'.http_build_query($params), false, 301);
 }
-if (isset($type) && isset($id) && isset($size)) {
+if (isset($type) && isset($id) ) {
 	$page = new SitePage;
 	$groupHandler = new Group;
 
@@ -36,18 +36,22 @@ if (isset($type) && isset($id) && isset($size)) {
         SitePage::redirectToBrokenImageOfSize(64, 64, 500);
     }
 
+    if($size == 'poster') {
+   		$filename = $video->getPosterLocation();
+           $pixels = 400;
+   	}
+   	else {
+   		$filename = $video->getThumbnailLocation();
+           $pixels = 64;
+   	}
 
-	if($size == 'poster') {
-		$filename = $video->getPosterLocation();
-	}
-	else {
-		$filename = $video->getThumbnailLocation();
-	}
+
 
 	if(is_readable($filename) ) {
 		$filesize = filesize($filename);
-		if ($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
-			error(41);
+		if ($filesize == FALSE) { //if we cannot find the file (something is wrong dont link to it)
+            SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+        }
 
 		header('Cache-Control: max-age=10800, private');
 		header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
@@ -57,7 +61,9 @@ if (isset($type) && isset($id) && isset($size)) {
 		readfile($filename);
 	}
 	else {
-		error(41);
-	}
+        SitePage::redirectToBrokenImageOfSize(64,64, 500);
 
+    }
+} else {
+    SitePage::redirectToBrokenImageOfSize(64, 64, 500);
 }
