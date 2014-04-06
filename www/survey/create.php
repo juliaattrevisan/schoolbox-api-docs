@@ -91,10 +91,12 @@ if (!empty($_POST)) {
     /* Select default settings
      */
     $startHour = date('g', time() + 3600);
-    $startMeridiem = date('a', time() + 3600);
+    $startMinute = '00';
+    $startMeridiem = date('A', time() + 3600);
 
     $finishHour = date('g', time() + 2 * 3600);
-    $finishMeridiem = date('a', time() + 2 * 3600);
+    $finishMinute = '00';
+    $finishMeridiem = date('A', time() + 2 * 3600);
 
 	/* Render starting times
 	 */

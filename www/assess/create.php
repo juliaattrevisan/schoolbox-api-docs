@@ -124,10 +124,10 @@ else {
     $assessEndDate  = new Alaress_Date_Format(strtotime('+1 week'), 'U');
     $startHour      = date('g', time() + 3600);
 	$startMinute    = '00';
-    $startMeridiem  = date('a', time() + 3600);
+    $startMeridiem  = date('A', time() + 3600);
     $finishHour     = date('g', time() + 2 * 3600);
 	$finishMinute   = '00';
-    $finishMeridiem = date('a', time() + 2 * 3600);
+    $finishMeridiem = date('A', time() + 2 * 3600);
 
     if ($is_unit) {
         $unit_id = $matches[1];
@@ -140,9 +140,9 @@ else {
             $end->modify('00:00:00 +1 day');
             $assessEndDate  = new Alaress_Date_Format($end);
             $startHour      = $assessDate->getUsingFormat('g');
-            $startMeridiem  = $assessDate->getUsingFormat('a');
+            $startMeridiem  = $assessDate->getUsingFormat('A');
             $finishHour     = $assessEndDate->getUsingFormat('g');
-            $finishMeridiem = $assessEndDate->getUsingFormat('a');
+            $finishMeridiem = $assessEndDate->getUsingFormat('A');
         }
         catch (Schoolbox\Mapper\Exception $e) {
             error(126);
