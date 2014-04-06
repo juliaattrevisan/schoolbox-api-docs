@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "2b4cec209556d8d7e43f75e9ea9cff87",
+    "hash": "610dcb67540669839f63aedaed90824e",
     "packages": [
         {
             "name": "aura/di",
@@ -116,20 +116,24 @@
         },
         {
             "name": "aura/session",
-            "version": "dev-develop-2",
+            "version": "dev-develop-2-PHP5.3-session-status",
             "source": {
                 "type": "git",
-                "url": "https://github.com/auraphp/Aura.Session.git",
-                "reference": "eacf54f7d576cb151f6b999dd6c7312eadc0f538"
+                "url": "https://github.com/armatronic/Aura.Session.git",
+                "reference": "63f709a99665ea635f6bd9f8e929d72ecf1ac103"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/eacf54f7d576cb151f6b999dd6c7312eadc0f538",
-                "reference": "eacf54f7d576cb151f6b999dd6c7312eadc0f538",
+                "url": "https://api.github.com/repos/armatronic/Aura.Session/zipball/63f709a99665ea635f6bd9f8e929d72ecf1ac103",
+                "reference": "63f709a99665ea635f6bd9f8e929d72ecf1ac103",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.0.*",
+                "squizlabs/php_codesniffer": "1.5.*"
             },
             "suggest": {
                 "ext-mcrypt": "Mcrypt generates the next best secure CSRF tokens.",
@@ -149,7 +153,6 @@
                     "Aura\\Session\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -168,7 +171,10 @@
                 "session",
                 "sessions"
             ],
-            "time": "2014-03-15 15:16:32"
+            "support": {
+                "source": "https://github.com/armatronic/Aura.Session/tree/develop-2-PHP5.3-session-status"
+            },
+            "time": "2014-04-04 04:49:45"
         },
         {
             "name": "aura/web",
@@ -2967,6 +2973,12 @@
             "alias_normalized": "2.1.0.0",
             "version": "3.1.3.0",
             "package": "sabre/vobject"
+        },
+        {
+            "alias": "2.0.x-dev",
+            "alias_normalized": "2.0.9999999.9999999-dev",
+            "version": "dev-develop-2-PHP5.3-session-status",
+            "package": "aura/session"
         }
     ],
     "minimum-stability": "stable",
