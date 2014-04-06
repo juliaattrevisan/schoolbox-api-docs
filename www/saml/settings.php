@@ -38,4 +38,127 @@ $settings->spIssuer = 'schoolbox';
 #$settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_EMAIL_ADDRESS;
 $settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_TRANSIENT;
 
+/**
+* Checks an if an IP address is in a CIDR range or matches an individual address
+*
+* @return boolean
+*/
+function ipInCIDR ($ip, $cidr) {
+    $cidr = trim($cidr);
+
+    // Allow checking of individual IP address, not just CIDR ranges
+    if ($ip == $cidr) {
+        var_dump(true);
+        return true;
+    }
+
+    list ($network, $mask) = array_map('trim', explode ("/", $cidr));
+
+    // Fail out invalid addresses
+    if (strlen($network) == 0 || is_null($mask)) {
+        var_dump(false);
+        return false;
+    }
+
+    $ip_net = ip2long ($network);
+    $ip_mask = ~((1 << (32 - $mask)) - 1);
+
+    $ip_ip = ip2long ($ip);
+    $ip_ip_net = $ip_ip & $ip_mask;
+
+    $result = ($ip_ip_net == $ip_net);
+
+    return $result;
+}
+
+/**
+* Checks an IP address against a comma separated list of IPs/CIDR ranges
+*
+* @return boolean
+*/
+function ipInCIDRList ($ip, $cidr_list) {
+    $cidr_array = array();
+
+    if (is_string($cidr_list) && strlen(trim($cidr_list))>0) {
+        $cidr_array = array_map('trim', explode(',',$cidr_list));
+    } else if (is_array($cidr_list)) {
+        $cidr_array = array_map('trim', $cidr_list);
+    } else {
+        unset($ip,$cidr_list,$cidr_array);
+        return false;
+    }
+
+    $returnval = false;
+    foreach ($cidr_array as $cidr) {
+        if (ipInCIDR($ip, $cidr)) {
+            $returnval = true;
+        }
+    }
+    unset($ip,$cidr_list,$cidr_array);
+
+    return $returnval;
+}
+
+/**
+* Checks if the user is in the correct IP range (by the whitelist)
+* and also of a supported browser / platform that supports Kerberos Auth
+*
+* @return boolean
+*/
+use phpbrowscap\Browscap;
+function useSAMLKerberos() {
+
+    // If whitelist not in use, don't use kerberos at all
+    if (trim(Config::get('saml_krb_whitelist'))==''){
+        return false;
+    }
+
+    // Check if the user is in the IP whitelist
+    $tempsession = new Session;
+    if (!ipInCIDRList($tempsession->getIP(), Config::get('saml_krb_whitelist'))) {
+        return false;
+    }
+    unset($tempsession);
+
+    /**
+    * Check if the users platform/browser supports kerberos
+    *
+    * Acceptance matrix:
+    * via: (http://en.wikipedia.org/wiki/Integrated_Windows_Authentication#Supported_web_browsers)
+    *  - Must be Desktop/Laptop
+    *  - IE on Windows
+    *  - Chrome on Windows and MacOSX
+    *  - Safari on MacOSX
+    *  - Firefox on Windows (if enabled in the Firefox install)
+    * 
+    * Errs on the side of kerberos than non-kerberos
+    */
+    $bc = new Browscap(Config::get('stream_dir'));
+    $current_browser = $bc->getBrowser();
+    if ($current_browser->Device_Type == 'Desktop') {
+        if (substr($current_browser->Platform,0,3)=='Win' || $current_browser->Platform == 'MacOSX') {
+            switch($current_browser->Browser) {
+                case 'IE':
+                case 'Chrome':
+                    return true;
+
+                case 'Safari':
+                    if (Config::get('saml_krb_safari')) { return true; } else { return false; }
+
+                case 'Firefox':
+                    if (Config::get('saml_krb_firefox')) { return true; } else { return false; }
+
+                default:
+                    return false;
+            }
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+$settings->useKerberos = useSAMLKerberos();
+
 return $settings;

@@ -44,4 +44,10 @@ class OneLogin_Saml_Settings
      * @var string
      */
     public $requestedNameIdFormat = self::NAMEID_EMAIL_ADDRESS;
+
+    /**
+    * Specifies whether to send the AuthnContext for kerberos or default (web form)
+    * @var bool
+    */
+    public $useKerberos = false;
 }

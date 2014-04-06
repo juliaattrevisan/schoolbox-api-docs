@@ -33,7 +33,8 @@
         "react/stomp": "0.2.*@dev",
         "mtdowling/cron-expression": "1.0.*",
         "djfm/cssin": "0.1.0",
-        "html2text/html2text": "1.0.*"
+        "html2text/html2text": "1.0.*",
+        "browscap/browscap-php": "1.0.*@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
