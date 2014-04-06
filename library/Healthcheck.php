@@ -306,6 +306,24 @@ class Healthcheck {
 			)
 		);
 
+		$splist[] = array(
+			'sbGetPortraitLastUpdated',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+			)
+		);
+
+		$splist[] = array(
+			'sbGetPortraitFile',
+			array(
+				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+				array('@pSchoolNum', 1, SQLINT4, false, false, -1),
+			)
+		);
+
 		foreach($splist as $sp){
 			$result = $db->executeProcedure($sp[0],$sp[1]);
 			echo "  ".$sp[0]." : ";
