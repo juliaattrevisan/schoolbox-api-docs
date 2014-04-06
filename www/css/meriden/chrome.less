@@ -22,11 +22,11 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					160px;
-@logo-height: 					41px;
+@logo-width: 					212px;
+@logo-height: 					49px;
 
 // Generic colors
-@body-background: 				#e9e3dc; // Body, but not the content area
+@body-background: 				@content-background; // Body, but not the content area
 @content-background: 			#FFFFFF; // Used for forms
 @dark: 							#FAFAFA; // Alternate tigerstriping color
 @border-color: 					#EEEEEE; // Bordering @dark
@@ -34,37 +34,37 @@
 
 // Basic type
 @body-text: 					@black;
-@link: 							#00215b;
-@link-hover: 					#002971;
+@link: 							#0066b0;
+@link-hover: 					#0071c3;
 @secondary-text: 				@link;
 
-// Main banner 7 Search
-@banner-background: 			#00215b;
+// Main banner & Search
+@banner-background: 			#00215c;
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 @banner-height:     			72px;
-@search-color:                  @white;
+@search-color:                  @content-background;
 
 // Modules
-@module-heading: 				#000000;
-@module-background: 			#a4d7f4;
-@admin-nav:                     @tab-background;
+@module-heading: 				@banner-background;
+@module-background: 			#e4eef7;
+@admin-nav:                     @link;
 
 // Refers to the left navigation
 @navigation-width:				200px;
 @navigation-padding:			16px;
-@navigation-background:  		transparent;
-@navigation-color:  			@link;
-@navigation-links:  			@link;
+@navigation-background:  		#a6d3e6;
+@navigation-color:  			@content-background;
+@navigation-links:  			#000000;
 @navigation-hover-background: 	@link;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@body-background;
 
 // Main "Tab" Navigation
-@tab-background:				#a4d7f4;
-@tab-color:						#00215b;
-@tab-hover-background:			@banner-color;
-@tab-hover-color:				@tab-color;
+@tab-background:				#344d7d;
+@tab-color:						@content-background;
+@tab-hover-background:			@content-background;
+@tab-hover-color:				@link;
 
 // Footer text
 @footer-color:					#797979;
@@ -83,6 +83,9 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // ============================================================================
+body{
+  background: url('/images/meriden/bg.png') bottom left no-repeat;
+}
 
 #infoPanel .bell {
 	background-image: url('/images/meriden/bell.png');
@@ -92,6 +95,7 @@ body.login{
 background: @banner-background;
 
   #header {
+    background: @banner-background;
     height: @logo-height + 100px;
     .logo {
       left: 50%;
@@ -130,23 +134,74 @@ background: @banner-background;
   #footer ul li a { color: @banner-links; }
 }
 
-#header .logo{
-  left: 19px;
-  top: 15px;
+#header{
+  background: @banner-background url('/images/meriden/head-bg.png') top right no-repeat;
+  min-height: 85px;
+
+  .logo{
+    left: 15px;
+    top: 17px;
+  }
+
+  #tabs{
+    margin-left: 248px;
+    top: 13px;
+    position: relative;
+    li.navthis{ background: #fff; }
+    li a{
+      background: #344d7d;
+      background: rgba(255,255,255,0.2);
+    }
+  }
+
+  .logout{
+    display: block;
+    background: url('/images/meriden/off.png') top left no-repeat;
+    width: 16px;
+    height: 16px;
+    text-indent: -90000px;
+    position: relative;
+    top: -6px;
+    left: 6px;
+  }
+
+  #search-field{
+    padding: 2px 0 0 10px;
+    width: 246px;
+    height: 30px;
+  }
+
+  #search-button{
+    background: url("/images/meriden/search-button.png") no-repeat 1px 9px;
+    top: 0;
+    right: 0;
+    left: auto;
+  }
 }
 
-#search-field{
-  padding: 2px 0 0 10px;
-  width: 246px;
-  height: 30px;
+#nav{
+  top: 89px;
+  text-align: left;
+  left: 15px;
+  width: 218px;
+  ul, li, li a{ width: 186px; }
+  ul{
+    width: 218px;
+    ul{ left: 218px; width: 218px; }
+  }
+  h3,h4{
+    background: #00215b;
+    padding: 10px;
+    height: 16px;
+    line-height: 16px;
+  }
+  h3.my-links a{ color: @white; }
 }
 
-#search-button{
-  background: url("/images/meriden/search-button.png") no-repeat 1px 9px;
-  top: 0;
-  right: 0;
-  left: auto;
+#container {
+  margin-left: 232px;
 }
+
 /*
  * Demo Dashboards
  */
