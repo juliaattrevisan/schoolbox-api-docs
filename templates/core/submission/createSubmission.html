@@ -125,20 +125,20 @@
 
         $j.validator.addMethod('markTypeRubricCriteriaExists', function(value, element) {
             if(marktype.rubric.is(':visible')) {
-                return $j('#rubric-criteria').find('input[type="checkbox"]').length > 1;
+                return $j('#rubric-criteria').find('input[type="checkbox"]').length >= 1;
             }
             else {
                 return true;
             }
-        }, 'Please ensure at least two criteria exist');
+        }, 'Please ensure at least one criterion exists');
         $j.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
-                return $j('#rubric-criteria').find('input:checked').length > 1;
+                return $j('#rubric-criteria').find('input:checked').length >= 1;
             }
             else {
                 return true;
             }
-        }, 'Please select at least two criteria');
+        }, 'Please select at least one criterion');
 
         $j.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
@@ -500,7 +500,7 @@
     <tr id="marktype-rubric" class="marks-hide dark">
         <td>
             <h4>Rubric</h4>
-            <em>Select <i>at least two</i> criteria that are being assessed, and possible results.<br/>
+            <em>Select <i>at least one</i> criterion to be assessed, and possible results.<br/>
                 If used, descriptors should be ordered lowest to highest.
             </em>
             <!-- BEGIN existing_marks_warning -->
