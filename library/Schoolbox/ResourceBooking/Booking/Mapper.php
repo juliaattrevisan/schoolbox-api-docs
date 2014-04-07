@@ -259,4 +259,37 @@ class Mapper extends BaseMapper {
         $statement->execute();
         return $statement->fetchColumn() > 0;
     }
+
+    /**
+     * Hydrates this item along with its event and resource.
+     *
+     * @param  mixed $id
+     * @return Model
+     */
+    public function findById($id) {
+        // TODO request joins in find* methods
+        $query = "
+            SELECT
+                {$this->getColumnString('b')},
+                {$this->getJoinColumnString('resource', 'r')},
+                {$this->getJoinColumnString('event',    'e')}
+            FROM {$this->getTable()} b
+            INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
+            INNER JOIN {$this->getJoinSql('event',    'b', 'e')}
+            WHERE b.id=:bookingId
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('bookingId', $id);
+        $statement->execute();
+        $item = $this->hydrate($statement->fetch(\PDO::FETCH_ASSOC), 'b', function($mapper, $model, $row) {
+            /** @var self  $mapper */
+            /** @var Model $model */
+            return $model
+                ->setResource($mapper->hydrateJoin($row, 'resource', 'r'))
+                ->setEvent($mapper->hydrateJoin($row, 'event', 'e'))
+            ;
+        });
+        $this->throwIfDeleted($item);
+        return $item;
+    }
 }

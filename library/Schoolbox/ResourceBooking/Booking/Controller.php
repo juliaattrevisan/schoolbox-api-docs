@@ -531,7 +531,23 @@ class Controller extends Base {
      * @param int $id
      */
     public function edit($id) {
-        $booking = $this->getBookingMapper()->findById($id);
+        $item = $this->getBookingMapper()->findById($id);
+        // Set start and end date
+        $event = $item->getEvent();
+        $event->setStartDateTime(
+            new DateTime($event->getStartDate().' '.$event->getStartTime())
+        );
+        $event->setEndDateTime(
+            new DateTime($event->getEndDate().' '.$event->getEndTime())
+        );
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@resourceBooking/book.twig',
+                'data'     => array(
+                    'item' => $item,
+                ),
+            )
+        );
     }
 
     /**

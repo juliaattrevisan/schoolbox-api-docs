@@ -320,6 +320,8 @@ Scenario: Booking a moderated resource
   And   I wait for AJAX to finish
   Then  I should see approved booking at "2:00pm +1 days"
 
+#Scenario: Making a recurring booking for a resource
+
 #Scenario: Booking a resource for someone else (if I have moderator perms on item)
 
 @resource-booking @resource-booking-managed
