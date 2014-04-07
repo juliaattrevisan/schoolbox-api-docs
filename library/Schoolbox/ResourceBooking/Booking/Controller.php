@@ -32,6 +32,11 @@ class Controller extends Base {
     protected $eventMapper;
 
     /**
+     * @var Calendar\EventRecurrenceMapper
+     */
+    protected $eventRecurrenceMapper;
+
+    /**
      * Creates a booking for an item.
      */
     public function book($id) {
@@ -579,6 +584,22 @@ class Controller extends Base {
      */
     public function getEventMapper() {
         return $this->eventMapper;
+    }
+
+    /**
+     * @param  Calendar\EventRecurrenceMapper $eventRecurrenceMapper
+     * @return $this
+     */
+    public function setEventRecurrenceMapper($eventRecurrenceMapper) {
+        $this->eventRecurrenceMapper = $eventRecurrenceMapper;
+        return $this;
+    }
+
+    /**
+     * @return Calendar\EventRecurrenceMapper
+     */
+    public function getEventRecurrenceMapper() {
+        return $this->eventRecurrenceMapper;
     }
 
     /**
