@@ -41,9 +41,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	const TRIGGER_DATECHANGED = 'datechanged';
 	const TRIGGER_RENAMED     = 'renamed';
 
-	// TODO these 3 will go in their own notifiers
-//	const TRIGGER_SUBMITTED   = 'submitted';
-//	const TRIGGER_RESUBMITTED = 'resubmitted';
 //	const TRIGGER_MARKED      = 'marked';
 
 	// this should be configurable, but this will do for now
