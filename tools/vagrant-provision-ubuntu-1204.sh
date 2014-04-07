@@ -92,6 +92,10 @@ sed -i 's/*:80/*:8000/g' /etc/apache2/sites-available/schoolbox-dav.conf;
 a2ensite schoolbox-dav.conf
 puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
 
+echo "$vag Enabling Schoolbox nginx vhost";
+cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
+sed -i 's/var\/log\/nginx/vagrant/g' /etc/nginx/conf.d/nginx-vhost-schoolbox-websocket.conf;
+
 echo "$vag Set up video cronjobs"
 cp -f /vagrant/tools/cron/schoolboxdev /home/vagrant/schoolboxdemo-latest-cron
 sed -i 's/usr\/share\/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
@@ -123,6 +127,7 @@ echo "$vag Loading all demo data complete";
 echo "$vag Ensure all services are running";
 service mysql restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
+service nginx restart > /dev/null 2>&1;
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
