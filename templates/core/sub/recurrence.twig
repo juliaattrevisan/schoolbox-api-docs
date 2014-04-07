@@ -1,0 +1,9 @@
+{##
+ # Outputs an event recurrence.
+ # recurrence.freq: the recurrence frequency (daily, weekly, etc)
+ # recurrence.start, recurrence.end: Alaress_Date_Format objects that represent
+ # start and end of the recurrence
+ #}
+{{ recurrence.freq|capitalize }},
+beginning <strong>{{ recurrence.start.longDateOnly }}</strong>
+and ending <strong>{{ recurrence.end.longDateOnly }}</strong>.

@@ -185,14 +185,14 @@ $(document).ready(function() {
                 <input data-datepicker name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
             </td>
         </tr>
-        {% elseif item.event.seriesId %}
+        {% elseif recurrence %}
         <tr>
             <td class="formLabelWidth" valign="top">
                 <h4>Repeat</h4>
                 <em>This booking is part of a recurring series.</em>
             </td>
             <td>
-                {#Daily, beginning whenever and ending whenever else #}
+                {% include 'sub/recurrence.twig' with {recurrence: recurrence} %}
             </td>
         </tr>
         {% endif %}

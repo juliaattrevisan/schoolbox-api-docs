@@ -540,11 +540,17 @@ class Controller extends Base {
         $event->setEndDateTime(
             new DateTime($event->getEndDate().' '.$event->getEndTime())
         );
+        // Show event's recurrence
+        $recurrence = array();
+        if ($event->getSeriesId()) {
+            $recurrence = $this->getEventRecurrenceMapper()->getSeriesRecurrence($event);
+        }
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
-                    'item' => $item,
+                    'item'       => $item,
+                    'recurrence' => $recurrence,
                 ),
             )
         );
