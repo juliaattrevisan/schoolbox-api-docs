@@ -29,7 +29,7 @@ $j(function() {
 
     // logic for removing inputs that are currently in use
     $j('#crit-list .delete.disabled').click(function(e) {
-        if(confirm('You are about to remove a criteria that is currently in use.  Removing this criteria will make it unavailable to future assessments.  It will remain on the existing assessments.')) {
+        if(confirm('You are about to remove a criterion that is currently in use.  Removing this criterion will make it unavailable for future assessments.  It will remain visible on the existing assessments.')) {
             var self = $j(this);
             var target = self.parent('.item');
             target.remove();
