@@ -126,7 +126,7 @@ echo "$vag Loading all demo data complete";
 
 echo "$vag Run Notifications binder";
 cd /vagrant/tools/mq;
-./binder.php -v;
+./binder.php;
 
 echo "$vag Install schoolbox-scheduled";
 cp -f /vagrant/tools/mq/schoolbox-scheduled.conf /etc/init/schoolbox-scheduled.conf;
