@@ -16,7 +16,6 @@ class Synchronise_Synergetic_Donvale_Strategy_Staff extends Synchronise_Base_Str
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
-			->addHydrator(new Synchronise_Synergetic_Donvale_Hydrator_LocalEmail())
 			->addHydrator(new Synchronise_Synergetic_Donvale_Hydrator_StaffCampus())
             ->addHydrator(new Synchronise_Synergetic_Donvale_Hydrator_Group_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
