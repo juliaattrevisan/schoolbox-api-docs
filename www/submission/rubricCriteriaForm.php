@@ -51,6 +51,29 @@ foreach($criteria as $group) {
 
 $criterionMapper = CriterionMapper::getInstance();
 
+
+
+//work out the diff and delete unnecessary criteria
+$found = array_keys($data);
+
+$criterionCollection = $criterionMapper->findByColumnList(
+                                       array(
+                                           'parent_id'   => $catID,
+                                           'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                                       )
+);
+
+foreach($criterionCollection as $crit) {
+    if(!in_array($crit->getID(), $found)) {
+        try {
+            $criterionMapper->delete($criterionMapper->findByID($crit->getID()));
+        } catch (Exception $e) {
+            die('Criteria not found');
+        }
+    }
+}
+
+
 /* @var $criterionMapper CriteriaMapper */
 
 // iterate through list of provided criteria changes
@@ -76,24 +99,6 @@ foreach($data as $critID => $critData) {
     $criterionMapper->save($criteria);
 }
 
-// finally, work out the diff and delete unnecessary criteria
-$found = array_keys($data);
 
-$criterionCollection = $criterionMapper->findByColumnList(
-                                      array(
-                                          'parent_id'   => $catID,
-                                          'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                                      )
-);
-
-foreach($criterionCollection as $crit) {
-    if(!in_array($crit->getID(), $found)) {
-        try {
-            $criterionMapper->delete($criterionMapper->findByID($crit->getID()));
-        } catch (Exception $e) {
-            die('Criteria not found');
-        }
-    }
-}
 
 die('Criteria updated.');
