@@ -19,12 +19,11 @@ error_reporting(E_ALL ^ E_NOTICE);
 
 require_once "mini-bootstrap.php";
 
-$opts = getopt('dvp::c::');
+$opts = getopt('vp::c::');
 
 $verbose = isset($opts['v']);
 $port = empty($opts['p']) ? 9081 : $opts['p'];
 $conf = empty($opts['c']) ? 'socketd.conf' : $opts['c'];
-$debug = isset($opts['d']);
 
 if($verbose) {
 	echo <<<EOL
@@ -38,91 +37,65 @@ EOL;
 
 }
 
-$low = $port;
-$high = $port;
+$verboser = new \Schoolbox\Realtime\Verboser($verbose ? fopen("p$i.log", 'w') : null);
 
-$range = explode('-', $port);
+$verboser->setPort($i);
 
-if(count($range) == 2) {
-	$low = min($range);
-	$high = max($range);
+pcntl_signal(SIGCHLD, SIG_IGN);
+
+$loop = \React\EventLoop\Factory::create();
+
+// CREATE WEB SOCKET ASYNC
+Alaress\Redis::getInstance()->connect();
+$redis = Alaress\Redis::getClientInstance();
+$redis->connect();
+
+if(file_exists($conf) && is_readable($conf)) {
+	$fp = fopen($conf, 'r');
+	while($line = fgets($fp)) {
+		$xpl = explode('=',$line);
+		if(count($xpl) == 2) {
+			${$xpl[0]} = $xpl[1];
+		}
+	}
+	fclose($fp);
+	$poolstrat = new ConfiguredDispatchStrategy(
+		isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
+		isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
+		isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL,
+		isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
+		isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT
+	);
+
+	$verboser->v(sprintf("Current strat: workers [%d - %d], queueing (%dms * %d)",
+		isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
+		isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
+		isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
+		isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL
+	));
+}
+else {
+	$poolstrat = new DefaultDispatchStrategy();
+	$verboser->v("Using default strat");
 }
 
-// clear subprocess logfiles
-`rm proc*.log`;
+$pipeManager = new PipeManager($loop, $redis, $verboser, $poolstrat);
 
-for($i = $low; $i <= $high; ++$i) {
+$wss = new Ratchet\WebSocket\WsServer($pipeManager);
+$wss->disableVersion(0);
 
-	$pid = pcntl_fork();
-	if($pid > 0) {
-		continue;
-	}
-	// gotta do this, won't do it automatically
-	Database::reinitialise();
+$https = new Ratchet\Http\HttpServer($wss);
 
-	$verboser = new \Schoolbox\Realtime\Verboser($verbose ? fopen("p$i.log", 'w') : null);
+try {
+	$webSock = new React\Socket\Server($loop);
+	$webSock->listen($i, '0.0.0.0');
 
-	$verboser->v("Listening from $low to $high");
+	$webServer = new Ratchet\Server\IoServer($https, $webSock, $loop);
 
-	$verboser->setPort($i);
-
-	pcntl_signal(SIGCHLD, SIG_IGN);
-
-	$loop = \React\EventLoop\Factory::create();
-
-	// CREATE WEB SOCKET ASYNC
-	Alaress\Redis::getInstance()->connect();
-	$redis = Alaress\Redis::getClientInstance();
-	$redis->connect();
-
-	if(file_exists($conf) && is_readable($conf)) {
-		$fp = fopen($conf, 'r');
-		while($line = fgets($fp)) {
-			$xpl = explode('=',$line);
-			if(count($xpl) == 2) {
-				${$xpl[0]} = $xpl[1];
-			}
-		}
-		fclose($fp);
-		$poolstrat = new ConfiguredDispatchStrategy(
-			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
-			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
-			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL,
-			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
-			isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT
-		);
-
-		$verboser->v(sprintf("Current strat: workers [%d - %d], queueing (%dms * %d)",
-			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
-			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
-			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
-			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL
-		));
-	}
-	else {
-		$poolstrat = new DefaultDispatchStrategy();
-		$verboser->v("Using default strat");
-	}
-
-	$pipeManager = new PipeManager($loop, $redis, $verboser, $poolstrat);
-
-	$wss = new Ratchet\WebSocket\WsServer($pipeManager);
-	$wss->disableVersion(0);
-
-	$https = new Ratchet\Http\HttpServer($wss);
-
-	try {
-		$webSock = new React\Socket\Server($loop);
-		$webSock->listen($i, '0.0.0.0');
-
-		$webServer = new Ratchet\Server\IoServer($https, $webSock, $loop);
-
-		$verboser->v("Listening for incoming websockets on port $i...", '+');
-		$loop->run();
-	}
-	catch(ConnectionException $e) {
-		$verboser->v("Unable to launch: " . $e->getMessage(), '!');
-	}
-
+	$verboser->v("Listening for incoming websockets on port $i...", '+');
+	$loop->run();
+}
+catch(ConnectionException $e) {
+	$verboser->v("Unable to launch: " . $e->getMessage(), '!');
 }
 
