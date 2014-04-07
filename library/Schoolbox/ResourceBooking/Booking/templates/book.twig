@@ -11,14 +11,7 @@ $(document).ready(function() {
         buttonImage:'/images/core/calendar/calendar-click.png',
         buttonImageOnly:true,
         constrainInput:false,
-        minDate: 0,
-        beforeShow: function() {
-            // Make sure the stupid datepicker shows above everything else,
-            // because it doesn't respect any CSS datepicker setting I give it
-            setTimeout(function() {
-                $('.ui-datepicker').css('z-index', 99999999999999);
-            }, 0);
-        }
+        minDate: 0
 //        onClose:function (string) {
 //            var input = $j(this);
 //            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
@@ -28,6 +21,18 @@ $(document).ready(function() {
     })
     $('input[name="start_datetime[date]"]').syncDates({
         endDate: $('input[name="end_datetime[date]"]')
+    })
+
+    // Show/hide the repeat until input
+    $('#repeatUntilSelect').change(function () {
+        if ($(this).val() !== '') {
+            $('#repeatUntil').show();
+            $("#repeat_until").rules("add", "required");
+        }
+        else {
+            $('#repeatUntil').hide();
+            $("#repeat_until").rules("remove", "required");
+        }
     })
 
     // remote validation rules
@@ -151,10 +156,46 @@ $(document).ready(function() {
                 {% include 'sub/datetimeInput.twig' with {
                     value: item.event.endDateTime,
                     name:  'end_datetime',
-                    id:    'start_datetime'
+                    id:    'end_datetime'
                 } %}
             </td>
         </tr>
+        {% if item.event.id is empty %}
+        <tr>
+        <td class="formLabelWidth" valign="top">
+            <h4>Repeat</h4>
+            <em>The frequency with which this booking recurs, if at all.</em>
+        </td>
+        <td>
+            <select name="repeat" id="repeatUntilSelect">
+                <option value="">Single Event</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="fortnightly">Fortnightly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+        </td>
+        </tr>
+        <tr id="repeatUntil">
+            <td class="formLabelWidth" valign="top">
+                <h4>Repeat Until</h4>
+                <em>The date at which recurrence should cease.</em>
+            </td>
+            <td>
+                <input data-datepicker name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
+            </td>
+        </tr>
+        {% elseif item.event.seriesId %}
+        <tr>
+            <td class="formLabelWidth" valign="top">
+                <h4>Repeat</h4>
+                <em>This booking is part of a recurring series.</em>
+            </td>
+            <td>
+                {#Daily, beginning whenever and ending whenever else #}
+            </td>
+        </tr>
+        {% endif %}
         <tr>
             <td class="formLabelWidth"><h4>Notes</h4></td>
             <td><textarea name="notes">{{ item.event.detail }}</textarea></td>
