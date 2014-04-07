@@ -124,6 +124,10 @@ grunt --no-color watch > /vagrant/data/watch.output.txt &
 
 echo "$vag Loading all demo data complete";
 
+echo "$vag Run Notifications binder";
+cd /vagrant/tools/mq;
+./binder.php -v;
+
 echo "$vag Ensure all services are running";
 service mysql restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
