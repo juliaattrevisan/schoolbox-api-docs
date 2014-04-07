@@ -69,8 +69,8 @@ $j(document).ready(function() {
 <ul class="pad-it">
   <!-- BEGIN digestible -->
   <li>
-    Messages sent via Email Digest are collated and emailed to you {DIGEST_FREQUENCY}. They will not appear in
-    your internal messages list.
+    Messages sent via Email Digest are collated and emailed to you <strong>{DIGEST_FREQUENCY}</strong>.
+    They will not appear in your internal messages list.
   </li>
   <!-- END digestible -->
   <li>
@@ -84,32 +84,26 @@ $j(document).ready(function() {
 <table class="standardForm table">
   <!-- BEGIN namespace -->
   <tr class="ns">
-    <td>
-      <table class="table">
-        <tr>
-          <th>Receive {NAMESPACE_LABEL} messages when&hellip;</th>
-          <th>Never</th>
-          <!-- BEGIN digestible_col -->
-          <th>via Email Digest</th>
-          <!-- END digestible_col -->
-          <th>via Instant</th>
-          <th>via Instant and Email</th>
-        </tr>
-        <!-- BEGIN route -->
-        <tr class="{ROUTE_CLASS}">
-          <td>&hellip;{ROUTE_DESCR}.</td>
-          <!-- BEGIN box -->
-          <td>
-            <label>
-              <input id="{NAMESPACE_SLUG}-{KEY}-{METHOD}" type="radio" name="{NAMESPACE_SLUG}[{KEY}]" value="{METHOD}" {CHECKED} {DISABLED} />
-            </label>
-          </td>
-          <!-- END box -->
-        </tr>
-        <!-- END route -->
-      </table>
-    </td>
+    <th>Receive {NAMESPACE_LABEL} messages when&hellip;</th>
+    <th>Never</th>
+    <!-- BEGIN digestible_col -->
+    <th>via Email Digest</th>
+    <!-- END digestible_col -->
+    <th>via Instant</th>
+    <th>via Instant and Email</th>
   </tr>
+  <!-- BEGIN route -->
+  <tr class="{ROUTE_CLASS}">
+    <td>&hellip;{ROUTE_DESCR}.</td>
+    <!-- BEGIN box -->
+    <td>
+      <label>
+        <input id="{NAMESPACE_SLUG}-{KEY}-{METHOD}" type="radio" name="{NAMESPACE_SLUG}[{KEY}]" value="{METHOD}" {CHECKED} {DISABLED} />
+      </label>
+    </td>
+    <!-- END box -->
+  </tr>
+  <!-- END route -->
   <!-- END namespace -->
 </table>
   <input id="submit-btn" type="submit" value="Save Settings" class="submit-btn-plain">
