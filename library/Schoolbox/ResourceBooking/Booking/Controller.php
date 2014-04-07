@@ -11,6 +11,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 use Alaress\Web\Controller\Base;
 use DateTime;
 use Alaress_Date_Format;
+use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
 use EOTC\Calendar;
 
@@ -94,24 +95,38 @@ class Controller extends Base {
      */
     public function createBooking($id) {
         /** @var Item\Model $resource */
-        $resource = $this->getResourceMapper()->findById($id);
-        $booking  = null;
+        $resource    = $this->getResourceMapper()->findById($id);
+        $bookingList = null;
 
         // Validate this item.
         $code   = 200;
         $errors = $this->validateBookingFromPostData($resource);
         if (empty($errors)) {
-            $booking = $this->createBookingFromPostData($resource);
+            // Create bookings for each linked item.
+            $bookingList       = $this->createBookingFromPostData($resource);
             $relatedSelections = $this->getRequest()->post['related_item'] ?: array();
             if (!empty($relatedSelections)) {
                 foreach ($resource->getRelatedResourceList() as $relatedResource) {
                     if (in_array($relatedResource->getId(), $relatedSelections)) {
-                        $relatedBooking = $this->createBookingFromPostData($relatedResource);
-                        $booking->addRelatedBooking($relatedBooking);
+                        $relatedBookingList = $this->createBookingFromPostData($relatedResource);
+                        // Link each related booking to its base item.
+                        // (This iterator assumes they're created in date order)
+                        $iterator = new \MultipleIterator();
+                        $iterator->attachIterator(new \IteratorIterator($bookingList));
+                        $iterator->attachIterator(new \IteratorIterator($relatedBookingList));
+                        foreach ($iterator as $list) {
+                            /** @var Model $booking */
+                            /** @var Model $relatedBooking */
+                            list($booking, $relatedBooking) = $list;
+                            $booking->addRelatedBooking($relatedBooking);
+                        }
                     }
                 }
-                if (count($booking->getRelatedBookingList())) {
-                    $this->getBookingMapper()->saveRelatedBookings($booking);
+                // And save each booking list item.
+                foreach ($bookingList as $booking) {
+                    if (count($booking->getRelatedBookingList())) {
+                        $this->getBookingMapper()->saveRelatedBookings($booking);
+                    }
                 }
             }
         }
@@ -125,7 +140,7 @@ class Controller extends Base {
                 array(
                     'format' => 'json',
                     'data'   => array(
-                        'item'   => $booking,
+                        'item'   => $bookingList,
                         'errors' => $errors,
                     ),
                 )
@@ -214,6 +229,11 @@ class Controller extends Base {
             }
         }
 
+        // Validate for recurrences? Any recurrences should be warnings (and the
+        // booking should not be made) instead of anything else?
+
+        // Timetable-based recurrences as well?
+
         // If there's any related resources: validate for those too.
         // Ensure that the user has the right to book this page
         // (though that's an authentication issue, not a data integrity one)
@@ -245,10 +265,12 @@ class Controller extends Base {
     }
 
     /**
-     * Helper for creating a booking out of a resource item and post data.
+     * Helper for creating bookings out of a resource item and post data.
      *
      * @param  Item\Model $resource
-     * @return Model      The model that was created.
+     * @return Collection|Model[] A collection of bookings that were created.
+     *                            Only one will be created unless it was a
+     *                            recurring booking.
      */
     protected function createBookingFromPostData(Item\Model $resource) {
         // Create the booking, which in turn adds an event to the calendar.
@@ -307,27 +329,54 @@ class Controller extends Base {
         if ($endTime instanceof DateTime) {
             $event->setEndTime($endTime->format('H:i'));
         }
-
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
-
         $event->setNote("Booking: ".$resource->getName());
         $event->setDetail($this->getRequest()->post['notes']);
-        $this->getEventMapper()->save($event);
 
-        // And create a new booking with the event attached.
-        $booking = new Model();
-        $booking
-            ->setEvent($event)
-            ->setResource($resource)
-            ->setStatus(Status\Model::STATUS_PENDING);
-        ;
-        // What about the resource? If it's an open resource, confirm the
-        // booking immediately.
-        if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-            $booking->setStatus(Status\Model::STATUS_APPROVED);
+        // I've built the event, now build recurrences if required.
+        /** @var Collection|Calendar\Event[] $eventList */
+        $eventList      = new Collection();
+        $recurrenceRule = $this->getRequest()->post['repeat'];
+        switch ($recurrenceRule) {
+            case 'weekly':
+            case 'monthly':
+            case 'daily':
+                $this->getEventRecurrenceMapper()->save(
+                    $event,
+                    'series',
+                    $recurrenceRule,
+                    new Alaress_Date_Format($this->getRequest()->post['repeat_until'], 'd/m/Y'),
+                    new Alaress_Date_Format($startDate),
+                    new Alaress_Date_Format($endDate)
+                );
+                // Create a whole set of bookings based on this event.
+                $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
+                break;
+            default:
+                $this->getEventMapper()->save($event);
+                $eventList->add($event);
+                break;
         }
-        $this->getBookingMapper()->save($booking);
-        return $booking;
+
+        // Build a list of bookings to return
+        /** @var Collection|Model[] $bookingList */
+        $bookingList = new Collection();
+        foreach ($eventList as $event) {
+            $booking = new Model();
+            $booking
+                ->setEvent($event)
+                ->setResource($resource)
+                ->setStatus(Status\Model::STATUS_PENDING);
+            ;
+            // What about the resource? If it's an open resource, confirm the
+            // booking immediately.
+            if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+                $booking->setStatus(Status\Model::STATUS_APPROVED);
+            }
+            $bookingList->add($booking);
+        }
+        $this->getBookingMapper()->save($bookingList);
+        return $bookingList;
     }
 
     /**
