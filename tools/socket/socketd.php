@@ -37,9 +37,11 @@ EOL;
 
 }
 
-$verboser = new \Schoolbox\Realtime\Verboser($verbose ? fopen("p$i.log", 'w') : null);
 
-$verboser->setPort($i);
+
+$verboser = new \Schoolbox\Realtime\Verboser($verbose ? fopen("p$port.log", 'w') : null);
+
+$verboser->setPort($port);
 
 pcntl_signal(SIGCHLD, SIG_IGN);
 
@@ -88,11 +90,11 @@ $https = new Ratchet\Http\HttpServer($wss);
 
 try {
 	$webSock = new React\Socket\Server($loop);
-	$webSock->listen($i, '0.0.0.0');
+	$webSock->listen($port, '0.0.0.0');
 
 	$webServer = new Ratchet\Server\IoServer($https, $webSock, $loop);
 
-	$verboser->v("Listening for incoming websockets on port $i...", '+');
+	$verboser->v("Listening for incoming websockets on port $port...", '+');
 	$loop->run();
 }
 catch(ConnectionException $e) {
