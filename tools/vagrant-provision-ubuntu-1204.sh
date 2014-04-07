@@ -128,10 +128,16 @@ echo "$vag Run Notifications binder";
 cd /vagrant/tools/mq;
 ./binder.php -v;
 
+echo "$vag Install schoolbox-socketd";
+cp -f /vagrant/tools/socket/schoolbox-socketd.conf /etc/init/schoolbox-socketd.conf;
+sed -i 's/usr\/share\/schoolbox/vagrant/g' /etc/init/schoolbox-socketd.conf;
+sed -i 's/var\/log/vagrant\/data/g' /etc/init/schoolbox-socketd.conf;
+
 echo "$vag Ensure all services are running";
 service mysql restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
+service schoolbox-socketd restart > /dev/null 2>&1;
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
