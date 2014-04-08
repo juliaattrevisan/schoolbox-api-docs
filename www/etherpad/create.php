@@ -10,14 +10,15 @@
 
 /* TODO: Test values
  */
-$apiKey = 'as90dfuasdifjsdopaifjuhas9p';
+define('ETHERPAD_API_KEY', 'as90dfuasdifjsdopaifjuhas9p');
+
 $homepageId = 52;
 $padName = 'The Ultimate Bart';
 $defaultText = 'Spinebreaking new text';
 
 /* Create a new group pad
  */
-$client = new \EtherpadLite\Client($apiKey);
+$client = new \EtherpadLite\Client(ETHERPAD_API_KEY);
 
 /* Create a new pad, get group id
  * Create a group pad
@@ -57,12 +58,22 @@ if ($response['message'] == 'ok') {
 			$etherpadGroup->setHomepageId($homepageId);
 
 			$etherpadGroupMapper->save($etherpadGroup);
+
+			/* Add them as etherpad authors
+			 */
+			$client->createAuthorIfNotExistsFor($currentUser->getId(), $currentUser->getFullName());
 		}
 
-		/* Get pad id
+		/* Get pad id to set to private
 		 */
 		$padId = $response['data']['padID'];
 
+		/* Must pass strings to change the status - like the rest of this box
+		 */
+		$client->setPublicStatus($padId, 'false');
+
+		/* Go to edit screen for now
+		 */
 		$this->localRedir("/etherpad/edit/{$groupId}/{$_SESSION['user']->getId()}");
 	}
 }
