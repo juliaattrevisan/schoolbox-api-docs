@@ -64,19 +64,19 @@ if ($response['message'] == 'ok') {
 			$client->createAuthorIfNotExistsFor($currentUser->getId(), $currentUser->getFullName());
 		}
 
-		/* Get pad id to set to private
+		/* Get pad id to set to private and to passs it as a redirect element.
+		 * Note that padId's come in the form g.abcdefg$padName
 		 */
 		$padId = $response['data']['padID'];
 
 		/* Must pass strings to change the status - like the rest of this box
+		 * https://github.com/ether/etherpad-lite/issues/561
 		 */
 		$client->setPublicStatus($padId, 'false');
 
-		$response = $client->getPublicStatus($padId);
-
 		/* Go to edit screen for now
 		 */
-		$this->localRedir("/etherpad/edit/{$groupId}/{$padId}");
+		$this->localRedir("/etherpad/edit/{$padId}");
 	}
 	else {
 		throw new \Exception('Something strange happened when creating a new pad');

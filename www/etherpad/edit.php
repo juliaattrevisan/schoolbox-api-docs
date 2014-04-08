@@ -13,8 +13,12 @@ define('ETHERPAD_API_KEY', 'as90dfuasdifjsdopaifjuhas9p');
  */
 $authenticator = new \Etherpad\Authenticator();
 
-$groupId = $this->arg[0];
-$padId = $this->arg[1];
+/* The first arg is a composite key, containing groupId and a pad name
+ * The actual pad is this composite key
+ */
+$padId = $this->arg[0];
+list($groupId, $padName) = explode('$', $padId);
+
 
 /* If you can participate, create a session and off you go
  */
