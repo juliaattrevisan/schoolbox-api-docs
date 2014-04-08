@@ -518,11 +518,11 @@ class StudentReportCard {
 				$page->setVar('subject_crit_item_block', '');
 				$page->setVar('CRIT_GROUP_NAME', $group);
 				foreach($items as $item) {
-					$score = isset($results[$item['id']])
-						? $returnHandler->percent2letter($results[$item['id']])
+					$score = isset($results[$item->getId()])
+						? $returnHandler->percent2letter($results[$item->getId()])
 						: 'Not Assessed';
 					$page->setVar(array(
-						'CRIT_ITEM_NAME' => $item['name'],
+						'CRIT_ITEM_NAME' => $item->getName(),
 						'CRIT_ITEM_SCORE' => $score
 					));
 					$page->parse('subject_crit_item_block', 'subject_crit_item', true);
