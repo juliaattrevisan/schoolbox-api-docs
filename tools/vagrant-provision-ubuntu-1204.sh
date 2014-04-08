@@ -129,12 +129,12 @@ cd /vagrant/tools/mq;
 ./binder.php;
 
 echo "$vag Install schoolbox-scheduled";
-cp -f /vagrant/tools/mq/schoolbox-scheduled.conf /etc/init/schoolbox-scheduled.conf;
-cp -f /vagrant/tools/mq/schoolbox-scheduled.override /etc/init/schoolbox-scheduled.override;
+cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
+cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
 
 echo "$vag Install schoolbox-socketd";
-cp -f /vagrant/tools/socket/schoolbox-socketd.conf /etc/init/schoolbox-socketd.conf;
-cp -f /vagrant/tools/socket/schoolbox-socketd.override /etc/init/schoolbox-socketd.override;
+cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
+cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
 
 echo "$vag Ensure all services are running";
 service mysql restart > /dev/null 2>&1;
