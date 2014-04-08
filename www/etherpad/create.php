@@ -41,6 +41,7 @@ if ($response['message'] == 'ok') {
 
 		/* Spawn a new group of users
 		 */
+		$allUsers->add($userMapper->findByColumn('username', 'alaress')->first());
 		$allUsers->add($userMapper->findByColumn('username', 'cglenn')->first());
 		$allUsers->add($userMapper->findByColumn('username', 'asaxon')->first());
 		$allUsers->add($userMapper->findByColumn('username', 'wwhite')->first());
@@ -62,9 +63,7 @@ if ($response['message'] == 'ok') {
 		 */
 		$padId = $response['data']['padID'];
 
-		new \Alaress_Probe($client->listPads($groupId));
-
-		exit();
+		$this->localRedir("/etherpad/edit/{$groupId}/{$_SESSION['user']->getId()}");
 	}
 }
 else {
