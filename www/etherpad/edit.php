@@ -48,6 +48,13 @@ if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
 
 			$url = "http://192.168.36.10:9001/p/{$padId}";
 
+			/* Remember last updated time
+			 */
+			$padMapper = new \Etherpad\PadMapper();
+			$pad = $padMapper->findByColumn('pad_id', $padId)->first();
+			$pad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+			$padMapper->save($pad);
+
 			header("Location: {$url}");
 		}
 	}
