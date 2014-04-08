@@ -14,7 +14,6 @@ define('ETHERPAD_API_KEY', 'as90dfuasdifjsdopaifjuhas9p');
 
 $homepageId = 52;
 $padName = md5('50 cent "$"         x');
-$defaultText = 'Spinebreaking new text';
 
 /* Create a new group pad
  */
