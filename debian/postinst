@@ -38,6 +38,8 @@ case "$1" in
         /usr/share/schoolbox/tools/clean-cache-dir.sh;
         rm -f /usr/share/schoolbox/www/.htaccess;
         service apache2 restart;
+        service schoolbox-scheduled restart;
+        service schoolbox-socketd restart;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

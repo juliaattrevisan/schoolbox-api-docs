@@ -46,8 +46,8 @@ rm -rf /vagrant/data/cache;
 
 echo "$vag Creating Schoolbox conf file";
 cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
-sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
 sed -i 's/xxxxxxxx/vagrantx/g' /vagrant/www/conf/conf.php;
+sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
 
 echo "$vag Installing vendor submodules with composer";
 /vagrant/tools/composer.sh;
@@ -92,6 +92,10 @@ sed -i 's/*:80/*:8000/g' /etc/apache2/sites-available/schoolbox-dav.conf;
 a2ensite schoolbox-dav.conf
 puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
 
+echo "$vag Enabling Schoolbox nginx vhost";
+cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
+sed -i 's/var\/log\/nginx/vagrant/g' /etc/nginx/conf.d/nginx-vhost-schoolbox-websocket.conf;
+
 echo "$vag Set up video cronjobs"
 cp -f /vagrant/tools/cron/schoolboxdev /home/vagrant/schoolboxdemo-latest-cron
 sed -i 's/usr\/share\/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
@@ -120,9 +124,24 @@ grunt --no-color watch > /vagrant/data/watch.output.txt &
 
 echo "$vag Loading all demo data complete";
 
+echo "$vag Run Notifications binder";
+cd /vagrant/tools/mq;
+./binder.php;
+
+echo "$vag Install schoolbox-scheduled";
+cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
+cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
+
+echo "$vag Install schoolbox-socketd";
+cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
+cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
+
 echo "$vag Ensure all services are running";
 service mysql restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
+service nginx restart > /dev/null 2>&1;
+service schoolbox-scheduled restart > /dev/null 2>&1;
+service schoolbox-socketd restart > /dev/null 2>&1;
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
