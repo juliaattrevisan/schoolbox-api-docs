@@ -378,59 +378,41 @@ class PageMapper extends Schoolbox\Mapper {
 	/**
 	 * Find all the user's pages with a particular component on it
 	 *
-	 * @param int                  $userId
-	 * @param Component_Definition $componentDefinition
+	 * @param int                   $userId
+	 * @param \Component_Definition $componentDefinition
 	 *
 	 * @return array
 	 */
 	public function findAvailablePages($userId, $componentDefinition) {
+		// Get user's pages
+		// Get all components on page and compare against $componentDefinition
 		$pageData = array();
-		$pageIds = array();
 
-		$allComponents = \Component_InstanceMapper::getInstance()->findByDefinition(
-			'eportfolio', $componentDefinition->getId()
-		);
+		/* @var \Eportfolio\Page[] $allPages */
+		$allPages = $this->findByColumn('uid', $userId);
+		foreach ($allPages as $currentPage) {
+			$componentList = array();
 
-		/* Get a list of pages which have File List components
-		 */
-		if (is_array($allComponents) && count($allComponents)) {
-			foreach ($allComponents as $currentComponent) {
-				/* @var $currentComponent \Component_Instance */
-				$pageIds[] = $currentComponent->getIdentifier();
+			/* @var \Component_Instance[] $pageComponents */
+			$pageComponents = \Component_InstanceMapper::getInstance()->findByContext(
+				'eportfolio', $currentPage->getPageId()
+			);
+			foreach ($pageComponents as $currentComponent) {
+				if ($currentComponent->getDefinitionId() == $componentDefinition->getId()) {
+					$componentList[] = $currentComponent;
+				}
 			}
 
-			// Only get this user's pages.
-			// Eportfolio has soft delete set up, so don't need to check if a
-			// page is deleted.
-			$allPages = \Eportfolio\PageMapper::getInstance()->findByColumnList(
-				array(
-					'page_id' => $pageIds,
-					'uid'     => $userId,
-				)
-			);
-
-			/* Then associate each page with their components
+			/* Throw it all into some arbitrary array
+			 * We're going to do this the poopy way
 			 */
-			foreach ($allPages as $currentPage) {
-				/* @var $currentPage \Eportfolio\Page */
-				$componentList = array();
-
-				foreach ($allComponents as $currentComponent) {
-					if ($currentComponent->getIdentifier() == $currentPage->getPageId()) {
-						$componentList[] = $currentComponent;
-					}
-				}
-
-				/* Throw it all into some arbitrary array
-				 * We're going to do this the poopy way
-				 */
+			if (!empty($componentList)) {
 				$pageData[] = array(
 					'page' => $currentPage,
 					'componentList' => $componentList
 				);
 			}
 		}
-
 		return $pageData;
 	}
 }
