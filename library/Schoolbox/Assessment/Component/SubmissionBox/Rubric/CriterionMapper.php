@@ -93,4 +93,5 @@ class CriterionMapper extends Schoolbox\Mapper {
         }
         return $this->save($new_rubric_list);
     }
+
 }
