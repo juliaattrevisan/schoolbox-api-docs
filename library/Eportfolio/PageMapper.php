@@ -394,38 +394,40 @@ class PageMapper extends Schoolbox\Mapper {
 		/* Get a list of pages which have File List components
 		 */
 		if (is_array($allComponents) && count($allComponents)) {
-			foreach($allComponents as $currentComponent) {
+			foreach ($allComponents as $currentComponent) {
 				/* @var $currentComponent \Component_Instance */
 				$pageIds[] = $currentComponent->getIdentifier();
 			}
 
-			$allPages = \Eportfolio\PageMapper::getInstance()->findIn('page_id', $pageIds);
+			// Only get this user's pages.
+			// Eportfolio has soft delete set up, so don't need to check if a
+			// page is deleted.
+			$allPages = \Eportfolio\PageMapper::getInstance()->findByColumnList(
+				array(
+					'page_id' => $pageIds,
+					'uid'     => $userId,
+				)
+			);
 
 			/* Then associate each page with their components
 			 */
-			if ($allPages->count()) {
-				foreach ($allPages as $currentPage) {
-					/* @var $currentPage \Eportfolio\Page */
-					$componentList = array();
+			foreach ($allPages as $currentPage) {
+				/* @var $currentPage \Eportfolio\Page */
+				$componentList = array();
 
-					/* Only get this user's pages
-					 */
-					if (($currentPage->getUid() == $userId) && ($currentPage->getDeletedAt() == null)) {
-						foreach ($allComponents as $currentComponent) {
-							if ($currentComponent->getIdentifier() == $currentPage->getPageId()) {
-								$componentList[] = $currentComponent;
-							}
-						}
-
-						/* Throw it all into some arbitrary array
-						 * We're going to do this the poopy way
-						 */
-						$pageData[] = array(
-							'page' => $currentPage,
-							'componentList' => $componentList
-						);
+				foreach ($allComponents as $currentComponent) {
+					if ($currentComponent->getIdentifier() == $currentPage->getPageId()) {
+						$componentList[] = $currentComponent;
 					}
 				}
+
+				/* Throw it all into some arbitrary array
+				 * We're going to do this the poopy way
+				 */
+				$pageData[] = array(
+					'page' => $currentPage,
+					'componentList' => $componentList
+				);
 			}
 		}
 
