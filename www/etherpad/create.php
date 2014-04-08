@@ -49,8 +49,6 @@ if ($response['message'] == 'ok') {
 
 		$etherpadGroupMapper->save($etherpadGroup);
 	}
-
-	die();
 }
 else {
 	throw new \Exception('Something strange happened when creating a group id');
