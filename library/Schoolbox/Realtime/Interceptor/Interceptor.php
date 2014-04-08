@@ -137,7 +137,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 			return true;
 		}
 
-		$newLevel = $this->getReroutedLevel($user, $formatted['channel'], $formatted['level']);
+		$newLevel = $this->getReroutedLevel($user, $formatted['channel']);
 
 		switch($newLevel) {
 			// total suppression
@@ -183,31 +183,22 @@ class Interceptor implements TaskResponseHandlerInterface {
 	/**
 	 * @param User $user
 	 * @param string $channel
-	 * @param string $level
 	 * @return int
 	 */
-	protected function getReroutedLevel($user, $channel, $level) {
+	protected function getReroutedLevel($user, $channel) {
 		$levels = $this->permissionMapper->findRouteLevels($channel, $user->getRole()->getId(), $user->getId());
 
 		if(!count($levels)) {
-			// if in doubt, return the original level
-			return $level;
+			// if we got nothing back, this user isn't meant to see this message
+			return 0;
 		}
 
-		$finishLevels = array();
+		// ensure bounds checking
+		$intent = is_null($levels['out']) ? $levels['def'] : $levels['out'];
+		$intent = max($intent, $levels['min']);
+		$intent = min($intent, $levels['max']);
 
-		// in theory, $levels could have multiple entries
-		foreach($levels as $l) {
-			// ensure bounds checking
-			$intent = is_null($l['outgoing_level']) ? $l['default_level'] : $l['outgoing_level'];
-			$intent = max($intent, $l['min_level']);
-			$intent = min($intent, $l['max_level']);
-
-			$finishLevels[] = $intent;
-		}
-
-		// return the highest value found from the resultset
-		return max($finishLevels);
+		return $intent;
 	}
 
 
@@ -250,7 +241,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 		$uqf = new UserQueueFactory(new Connector());
 
 		// only perform extra dedupe checks if we're in patient (aka boot) mode
-		return $this->isPatient() ? $uqf->userHasSeen($user->getId(), $message) : false;
+		return $this->isPatient() ? $uqf->userHasSeen($user->getId(), $message) && false : false;
 	}
 
 
