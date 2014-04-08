@@ -29,20 +29,6 @@ $(document).ready(function() {
         width:400,
         modal:true,
         draggable:false,
-        buttons:[
-            {
-                text: "Only this event",
-                click: function() {
-                    $(this).trigger('confirm')
-                }
-            },
-            {
-                text: "All events in the series",
-                click: function() {
-                    $(this).trigger('confirm')
-                }
-            }
-        ],
         close: function () {
             return false;
         }
@@ -160,7 +146,7 @@ $(document).ready(function() {
                 $.each(calEvent.data.booking.buttons, function() {
                     data.actions.push(
                         $('<a class="btn float-right" />')
-                            .data('inSeries', calEvent.data.meta.seriesId)
+                            .data('seriesId', calEvent.data.meta.seriesId)
                             .addClass(this.class)
                             .attr('href', this.href)
                             .text(this.label)
@@ -211,22 +197,31 @@ $(document).ready(function() {
             c.bubble.hide()
             event.preventDefault()
             var href     = this.href
-            var callback = function() {
-                $.ajax(href).done(function() {
+            var callback = function(data) {
+                $.ajax(href, {data: data}).done(function() {
                     c.dom.fullCalendar('refetchEvents')
                 })
             }
-            var inSeries = $(this).data('inSeries')
-            if (inSeries) {
+            var seriesId = $(this).data('seriesId')
+            if (seriesId) {
                 // Remove all previous change status events, and reapply to this
                 // dialog box.
+                updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase())
                 updateSeriesDialog
+                    .dialog('option', 'buttons', [{
+                        text: "Only this event",
+                        click: function() {
+                            updateSeriesDialog.dialog('close')
+                            callback({efficacy: 'self'})
+                        }
+                    }, {
+                        text: "All events in the series",
+                        click: function() {
+                            updateSeriesDialog.dialog('close')
+                            callback({efficacy: 'series', seriesId: seriesId})
+                        }
+                    }])
                     .dialog('open')
-                    .off('confirm.changeStatus')
-                    .on('confirm.changeStatus', function() {
-                        $(this).dialog('close')
-                        callback()
-                    })
             }
             else {
                 c.bubble.hide()
@@ -356,5 +351,5 @@ $(document).ready(function() {
 
 {# Dialog for changing bookings in series #}
 <div id="dialog-bulk-update" title="This booking is part of a series">
-    Would you like to <span class="action"></span> only this booking, or all in the series?
+    Would you like to <span class="action-text"></span> only this booking, or all in the series?
 </div>
