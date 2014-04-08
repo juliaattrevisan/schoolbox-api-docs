@@ -41,8 +41,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	const TRIGGER_DATECHANGED = 'datechanged';
 	const TRIGGER_RENAMED     = 'renamed';
 
-//	const TRIGGER_MARKED      = 'marked';
-
 	// this should be configurable, but this will do for now
 	const UPCOMING_WINDOW     = 2;
 
