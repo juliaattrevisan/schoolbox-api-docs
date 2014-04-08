@@ -17,183 +17,224 @@
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript">
 
-    // provide page-wide access to the calendar object so the callbacks can actually use it
-    //var c;
+// once the DOM has loaded, punch a fancy calendar into it
+$(document).ready(function() {
 
-    // once the DOM has loaded, punch a fancy calendar into it
-    $(document).ready(function() {
-        var now = new Date();
-        var c   = new Calendar('calendar', 'calendar-bubble', {
-//            crud: {
-//                c: '/calendar/ajax/create',
-//                // r: don't need it
-//                u: '/calendar/ajax/update',
-//                d: '/calendar/ajax/delete'
-//            },
-            filter: {
-                enabled: true,
-                ajax: false,
-                // This AJAX lookup should always be a GET request
-                parentSelector: '#calendar-controls',
-                exportButtonSelector: false,
-                checkboxSelector: false,
-                applyFiltersSelector: false
+    // Dialog for use when clicking an item that is in a series
+    var updateSeriesDialog = $('#dialog-bulk-update')
+    updateSeriesDialog.dialog({
+        autoOpen:false,
+        resizable:false,
+        height:180,
+        width:400,
+        modal:true,
+        draggable:false,
+        buttons:[
+            {
+                text: "Only this event",
+                click: function() {
+                    $(this).trigger('confirm')
+                }
             },
-            fullCalendar: {
-                firstHour: 9,
-                allDaySlot: false,
-                date:  now.getDate(),
-                month: now.getMonth(),
-                year:  now.getFullYear(),
-                columnFormat: 'ddd d/M',
-                defaultView: 'month',
-                timeFormat: { month: 'h(:mm)tt' },
-                events: function(start, end, callback) {
-                    var data = [
-                        {name: 'start', value: Math.round(start.getTime()/1000)},
-                        {name: 'end',   value: Math.round(end.getTime()/1000)},
-                    ];
-                    $.ajax({
-                        data:     data.concat($('#calendar-controls').find('form').serializeArray()),
-                        dataType: 'json',
-                        url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
-                        success: function(data) {
-                            callback(data);
-                        },
-                        cache: false
-                    });
-                },
-                loading: function(isLoading) {
-                    if (isLoading === true) {
-                        $('#calendar-loading').css({
-                            top: ($j('#calendar').height() - $j('#calendar-loading').height())/2,
-                            left: ($j('#calendar').width() - $j('#calendar-loading').width())/2
-                        }).show();
+            {
+                text: "All events in the series",
+                click: function() {
+                    $(this).trigger('confirm')
+                }
+            }
+        ],
+        close: function () {
+            return false;
+        }
+    })
+
+    var now = new Date();
+    var c   = new Calendar('calendar', 'calendar-bubble', {
+        filter: {
+            enabled: true,
+            ajax: false,
+            // This AJAX lookup should always be a GET request
+            parentSelector: '#calendar-controls',
+            exportButtonSelector: false,
+            checkboxSelector: false,
+            applyFiltersSelector: false
+        },
+        fullCalendar: {
+            firstHour: 9,
+            allDaySlot: false,
+            date:  now.getDate(),
+            month: now.getMonth(),
+            year:  now.getFullYear(),
+            columnFormat: 'ddd d/M',
+            defaultView: 'month',
+            timeFormat: { month: 'h(:mm)tt' },
+            events: function(start, end, callback) {
+                var data = [
+                    {name: 'start', value: Math.round(start.getTime()/1000)},
+                    {name: 'end',   value: Math.round(end.getTime()/1000)},
+                ];
+                $.ajax({
+                    data:     data.concat($('#calendar-controls').find('form').serializeArray()),
+                    dataType: 'json',
+                    url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
+                    success: function(data) {
+                        callback(data);
+                    },
+                    cache: false
+                });
+            },
+            loading: function(isLoading) {
+                if (isLoading === true) {
+                    $('#calendar-loading').css({
+                        top: ($j('#calendar').height() - $j('#calendar-loading').height())/2,
+                        left: ($j('#calendar').width() - $j('#calendar-loading').width())/2
+                    }).show();
+                }
+                else {
+                    $('#calendar-loading').hide();
+                }
+            },
+            /**
+             * Event rendering: put the event's start and end time into data
+             */
+            eventRender: function(event, element) {
+                // formatDate has no timezone support, and ISO 8601 outputs
+                // a Z as timezone always. Fail!
+                var getTimeWithTimezone = function(date) {
+                    var offset = date.getTimezoneOffset()
+                    var sign   = '';
+                    if (offset === 0) {
+                        return 'Z'
+                    }
+                    if (offset < 0) {
+                        // < 0 actually means +xxxx
+                        sign   = '+'
+                        offset = offset * -1
                     }
                     else {
-                        $('#calendar-loading').hide();
+                        sign = '-'
                     }
-                },
-                /**
-                 * Event rendering: put the event's start and end time into data
-                 */
-                eventRender: function(event, element) {
-                    // formatDate has no timezone support, and ISO 8601 outputs
-                    // a Z as timezone always. Fail!
-                    var getTimeWithTimezone = function(date) {
-                        var offset = date.getTimezoneOffset()
-                        var sign   = '';
-                        if (offset === 0) {
-                            return 'Z'
-                        }
-                        if (offset < 0) {
-                            // < 0 actually means +xxxx
-                            sign   = '+'
-                            offset = offset * -1
-                        }
-                        else {
-                            sign = '-'
-                        }
-                        var hours = String(Math.floor(offset / 60))
-                        if (hours.length === 1) {
-                            hours = '0' + hours;
-                        }
-                        var minutes = String(offset % 60)
-                        if (minutes.length === 1) {
-                            minutes = '0' + minutes;
-                        }
-                        return $.fullCalendar.formatDate(date, "yyyy-MM-dd'T'HH:mm:ss") + sign + hours + ':' + minutes
+                    var hours = String(Math.floor(offset / 60))
+                    if (hours.length === 1) {
+                        hours = '0' + hours;
                     }
-                    // Set data as attributes, that way selectors can query them
-                    // End of event might not be defined if it's the same as
-                    // start, too.
-                    element.attr({
-                        'data-start':  getTimeWithTimezone(event.start),
-                        'data-end':    getTimeWithTimezone(event.end || event.start),
-                        'data-allday': event.allDay ? 1 : 0
-                    })
-                    return element
-                },
-                /**
-                 * When an event is clicked
-                 *
-                 * @param calEvent
-                 * @param jsEvent
-                 */
-                eventClick: function(calEvent, jsEvent) {
-
-                    // setup data to be displayed
-                    var data = $j.extend(true, {}, calEvent.data.meta)
-                    var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mmtt'
-
-                    // Note: depends on whether this item is approved, rejected or
-                    // pending.
-                    data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
-                    data.date = $.fullCalendar.formatDate(calEvent.start, format)
-                    if (calEvent.end) {
-                        data.date += " &ndash; "
-                        data.date += $.fullCalendar.formatDate(calEvent.end, format)
+                    var minutes = String(offset % 60)
+                    if (minutes.length === 1) {
+                        minutes = '0' + minutes;
                     }
-
-                    // Custom butonyes for bookings
-                    data.actions = []
-                    $.each(calEvent.data.booking.buttons, function() {
-                        data.actions.push(
-                            $('<a class="btn float-right" />')
-                                .addClass(this.class)
-                                .attr('href', this.href)
-                                .text(this.label)
-                                .prepend('<span />')
-                        )
-                    })
-                    c.bubble.display('edit', data, jsEvent, this)
-                },
-
-                /**
-                 * Event that is triggered when clicking on a calendar day or time.
-                 *
-                 * @param date
-                 * @param allDay
-                 * @param jsEvent
-                 */
-                dayClick: function(date, allDay, jsEvent) {
-                    // Bookings may not be made in the past.
-                    var dateFormat = allDay ? 'ddd d MMMM' : 'h(:mm)tt, ddd d MMMM';
-                    var eventData  = {
-                        startDate:   $.fullCalendar.formatDate(date, 'yyyy-MM-dd'),
-                        displayDate: $.fullCalendar.formatDate(date, dateFormat)
-                    }
-                    if (!allDay) {
-                        eventData.startTime = $.fullCalendar.formatDate(date, 'HH:mm')
-                    }
-                    c.bubble.display('create', eventData, jsEvent, this)
-                },
-                eventStartEditable: false
+                    return $.fullCalendar.formatDate(date, "yyyy-MM-dd'T'HH:mm:ss") + sign + hours + ':' + minutes
+                }
+                // Set data as attributes, that way selectors can query them
+                // End of event might not be defined if it's the same as
+                // start, too.
+                element.attr({
+                    'data-start':  getTimeWithTimezone(event.start),
+                    'data-end':    getTimeWithTimezone(event.end || event.start),
+                    'data-allday': event.allDay ? 1 : 0
+                })
+                return element
             },
-            x: false
-        }).init()
+            /**
+             * When an event is clicked
+             *
+             * @param calEvent
+             * @param jsEvent
+             */
+            eventClick: function(calEvent, jsEvent) {
 
-        // Event filter - reload events when the filter button is pressed.
-        $('#calendar-controls').on('click', 'a#applyFilters', function(event) {
+                // setup data to be displayed
+                var data = $j.extend(true, {}, calEvent.data.meta)
+                var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mmtt'
+
+                // Note: depends on whether this item is approved, rejected or
+                // pending.
+                data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
+                data.date = $.fullCalendar.formatDate(calEvent.start, format)
+                if (calEvent.end) {
+                    data.date += " &ndash; "
+                    data.date += $.fullCalendar.formatDate(calEvent.end, format)
+                }
+
+                // Custom butonyes for bookings
+                data.actions = []
+                $.each(calEvent.data.booking.buttons, function() {
+                    data.actions.push(
+                        $('<a class="btn float-right" />')
+                            .data('inSeries', calEvent.data.meta.seriesId)
+                            .addClass(this.class)
+                            .attr('href', this.href)
+                            .text(this.label)
+                            .prepend('<span />')
+                    )
+                })
+                c.bubble.display('edit', data, jsEvent, this)
+
+            },
+
+            /**
+             * Event that is triggered when clicking on a calendar day or time.
+             *
+             * @param date
+             * @param allDay
+             * @param jsEvent
+             */
+            dayClick: function(date, allDay, jsEvent) {
+                // Bookings may not be made in the past.
+                var dateFormat = allDay ? 'ddd d MMMM' : 'h(:mm)tt, ddd d MMMM';
+                var eventData  = {
+                    startDate:   $.fullCalendar.formatDate(date, 'yyyy-MM-dd'),
+                    displayDate: $.fullCalendar.formatDate(date, dateFormat)
+                }
+                if (!allDay) {
+                    eventData.startTime = $.fullCalendar.formatDate(date, 'HH:mm')
+                }
+                c.bubble.display('create', eventData, jsEvent, this)
+            },
+            eventStartEditable: false
+        },
+        x: false
+    }).init()
+
+    // Event filter - reload events when the filter button is pressed.
+    $('#calendar-controls').on('click', 'a#applyFilters', function(event) {
+        event.preventDefault()
+        c.dom.fullCalendar('refetchEvents')
+    })
+
+    // Approve, Reject, Cancel: all AJAX events
+    // Modify: not AJAX
+    // For any AJAX event - open a dialog if this is a series event
+    $('#calendar-bubble').find('#editEvent').on(
+        'click',
+        'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
+        function(event) {
+            c.bubble.hide()
             event.preventDefault()
-            c.dom.fullCalendar('refetchEvents')
-        })
-
-        // Approve, Reject, Cancel: all AJAX events
-        // Modify: not AJAX
-        $('#calendar-bubble').find('#editEvent').on(
-            'click',
-            'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
-            function(event) {
-                event.preventDefault()
-                c.bubble.hide()
-                $.ajax(this.href)
-                    .done(function() {
-                        c.dom.fullCalendar('refetchEvents')
+            var href     = this.href
+            var callback = function() {
+                $.ajax(href).done(function() {
+                    c.dom.fullCalendar('refetchEvents')
+                })
+            }
+            var inSeries = $(this).data('inSeries')
+            if (inSeries) {
+                // Remove all previous change status events, and reapply to this
+                // dialog box.
+                updateSeriesDialog
+                    .dialog('open')
+                    .off('confirm.changeStatus')
+                    .on('confirm.changeStatus', function() {
+                        $(this).dialog('close')
+                        callback()
                     })
             }
-        )
-    })
+            else {
+                c.bubble.hide()
+                callback()
+            }
+        }
+    )
+})
 </script>
 
 <!-- END custom_header -->
@@ -312,3 +353,8 @@
 
 <h2>Bookings - click the calendar to add a booking for that time</h2>
 <div id="calendar"></div>
+
+{# Dialog for changing bookings in series #}
+<div id="dialog-bulk-update" title="This booking is part of a series">
+    Would you like to <span class="action"></span> only this booking, or all in the series?
+</div>

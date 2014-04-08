@@ -492,6 +492,7 @@ class Controller extends Base {
                         'type'        => $currentEvent->getEventType(),
                         'author'      => $currentEvent->getAuthor()->formatName(),
                         'authorId'    => $currentEvent->getAuthor()->getId(),
+                        'seriesId'    => $currentEvent->getSeriesId(),
                     ),
                     'booking' => array(
                         'status'  => $booking->getStatus(),
