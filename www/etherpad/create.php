@@ -13,7 +13,7 @@
 define('ETHERPAD_API_KEY', 'as90dfuasdifjsdopaifjuhas9p');
 
 $homepageId = 52;
-$padName = 'The Ultimate Bart';
+$padName = md5('50 cent "$"         x');
 $defaultText = 'Spinebreaking new text';
 
 /* Create a new group pad
@@ -72,9 +72,14 @@ if ($response['message'] == 'ok') {
 		 */
 		$client->setPublicStatus($padId, 'false');
 
+		$response = $client->getPublicStatus($padId);
+
 		/* Go to edit screen for now
 		 */
-		$this->localRedir("/etherpad/edit/{$groupId}/{$_SESSION['user']->getId()}");
+		$this->localRedir("/etherpad/edit/{$groupId}/{$padId}");
+	}
+	else {
+		throw new \Exception('Something strange happened when creating a new pad');
 	}
 }
 else {
