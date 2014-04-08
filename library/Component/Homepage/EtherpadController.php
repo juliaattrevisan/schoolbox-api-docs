@@ -31,7 +31,31 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
         }
 
 	   $this->parseConfig();
-   
-        return true;
-    }
+
+	   /* Find all the groups associated with this homepage
+	    */
+	   $groupMapper = new \Etherpad\GroupMapper();
+
+	   $allGroups = $groupMapper->findByColumn('homepage_id', 52);
+
+	   $ids = array();
+
+	   /* Cheaply uniquify
+	    */
+	   foreach($allGroups as $currentGroup) {
+		   $ids[$currentGroup->getGroupId()] = '';
+	   }
+
+	   /* Find all the pads associated with this list of groups
+	    */
+	   $padMapper = new \Etherpad\PadMapper();
+
+	   $allPads = $padMapper->findByColumn('group_id', array_keys($ids));
+
+	   foreach($allPads as $currentPad) {
+		   new \Alaress_Probe($currentPad);
+	   }
+
+       return true;
+   }
 }

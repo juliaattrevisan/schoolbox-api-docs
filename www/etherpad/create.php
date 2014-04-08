@@ -9,7 +9,8 @@
  */
 
 $homepageId = 52;
-$padName = md5('50 cent "$"         x');
+$name = '50 cent "$"         x';
+$padName = md5($name);
 
 /* Create a new group pad
  */
@@ -68,6 +69,19 @@ if ($response['message'] == 'ok') {
 		 * https://github.com/ether/etherpad-lite/issues/561
 		 */
 		$client->setPublicStatus($padId, 'false');
+
+		/* Spawn a record in our own db
+		 */
+		$newPad = new \Etherpad\Pad();
+		$newPad->setName($name);
+		$newPad->setBody('');
+		$newPad->setPadId($padId);
+		$newPad->setGroupId($groupId);
+		$newPad->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+		$newPad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+		$padMapper = new \Etherpad\PadMapper();
+		$padMapper->save($newPad);
 
 		/* Go to edit screen for now
 		 */
