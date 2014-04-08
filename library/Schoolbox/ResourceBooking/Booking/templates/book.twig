@@ -126,8 +126,12 @@ $(document).ready(function() {
 <h1>Book item: {{ item.resource.name }}</h1>
 
 {# booking form #}
+{% set saveAction = item.id is empty ?
+    routeLookup('resourceBooking.createBooking', {id: item.resource.id}) :
+    routeLookup('resourceBooking.update:post',   {id: item.id})
+%}
 <form id="resource-booking-form"
-      action="{{ routeLookup('resourceBooking.createBooking', {id: item.resource.id}) }}"
+      action="{{ saveAction }}"
       method="post"
       name="form" class="clearfix"
 >
@@ -225,6 +229,7 @@ $(document).ready(function() {
            type="submit"
            value="{% if item.id %}Update Booking{% else %}Book{% endif %}"
            class="submit-btn-plain"
+           data-action="{{ saveAction }}"
     />
 
     <a id="resource-booking-cancel"
