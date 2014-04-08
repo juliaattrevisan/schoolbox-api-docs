@@ -10,6 +10,11 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 
+/**
+ * Class NotificationCollection
+ * @deprecated in favour of messaging infrastructure
+ * @package Schoolbox\Assessment\Component\SubmissionBox
+ */
 class NotificationCollection extends Collection {
 
 	public function getOfType($type) {

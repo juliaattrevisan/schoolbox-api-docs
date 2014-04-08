@@ -10,6 +10,11 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 
+/**
+ * @deprecated in favour of messaging infrastructure
+ * Class Notification
+ * @package Schoolbox\Assessment\Component\SubmissionBox
+ */
 class Notification {
 
 	const TYPE_OVERDUE  = 'overdue';

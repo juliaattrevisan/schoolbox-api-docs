@@ -73,6 +73,7 @@ class SubmissionBox implements ISoftDeletable {
 
 	/**
 	 * @var NotificationCollection
+	 * @deprecated in favour of messaging infrastructure
 	 */
 	protected $notifications;
 
@@ -163,6 +164,7 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
+	 * @deprecated in favour of messaging infrastructure
 	 * @param Notification $notification
 	 */
 	public function addNotification(Notification $notification) {
@@ -505,6 +507,7 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
+	 * @deprecated in favour of messaging infrastructure
 	 * @param  NotificationCollection $notifications
 	 * @return $this
 	 */
@@ -514,6 +517,7 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
+	 * @deprecated in favour of messaging infrastructure
 	 * @return NotificationCollection|Notification[]
 	 */
 	public function getNotifications() {
