@@ -581,6 +581,14 @@ class Controller extends Base {
         $booking = $this->getBookingMapper()->findById($id);
         $booking->setStatus(Status\Model::STATUS_APPROVED);
         $this->getBookingMapper()->save($booking);
+        // Save related items
+        $series = $this->getSeriesBookings($booking);
+        if (count($series)) {
+            foreach ($series as $relatedBooking) {
+                $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
+            }
+            $this->getBookingMapper()->save($series);
+        }
         $this->outputUpdateStatusResponse($booking);
     }
 
@@ -594,6 +602,13 @@ class Controller extends Base {
         $booking = $this->getBookingMapper()->findById($id);
         $booking->setStatus(Status\Model::STATUS_REJECTED);
         $this->getBookingMapper()->save($booking);
+        $series = $this->getSeriesBookings($booking);
+        if (count($series)) {
+            foreach ($series as $relatedBooking) {
+                $relatedBooking->setStatus(Status\Model::STATUS_REJECTED);
+            }
+            $this->getBookingMapper()->save($series);
+        }
         $this->outputUpdateStatusResponse($booking);
     }
 
@@ -613,7 +628,26 @@ class Controller extends Base {
         /** @var Model $booking */
         $booking = $this->getBookingMapper()->findById($id);
         $this->getBookingMapper()->delete($booking);
+        $series = $this->getSeriesBookings($booking);
+        if (count($series)) {
+            $this->getBookingMapper()->delete($series);
+        }
         $this->outputUpdateStatusResponse($booking);
+    }
+
+    /**
+     * Helper method for retrieving a series of bookings.
+     *
+     * @param  Model $booking
+     * @return Collection|Model[]
+     */
+    protected function getSeriesBookings(Model $booking) {
+        if ($this->getRequest()->query['efficacy'] === 'series') {
+            if ($seriesId = $booking->getEvent()->getSeriesId()) {
+                return $this->getBookingMapper()->findSeriesBookings($booking->getId(), $seriesId);
+            }
+        }
+        return new Collection();
     }
 
     /**

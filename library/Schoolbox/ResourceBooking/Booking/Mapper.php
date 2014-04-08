@@ -292,4 +292,40 @@ class Mapper extends BaseMapper {
         $this->throwIfDeleted($item);
         return $item;
     }
+
+    /**
+     * Finds all bookings for events in $seriesId, excluding booking $id.
+     *
+     * @param  int $id
+     * @param  int $seriesId
+     * @return Collection|Model[]
+     */
+    public function findSeriesBookings($id, $seriesId) {
+        // Only fetch series ID if booking $id is in series ID
+        $query = "
+            SELECT
+                {$this->getColumnString('b')},
+                {$this->getJoinColumnString('resource', 'r')},
+                {$this->getJoinColumnString('event',    'e')}
+            FROM {$this->getTable()} b
+            INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
+            INNER JOIN {$this->getJoinSql('event',    'b', 'e')}
+            WHERE e.series_id = :seriesId
+            AND   b.deleted_at IS NULL
+            AND   b.id != :id
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('id',       $id);
+        $statement->bindValue('seriesId', $seriesId);
+        $statement->execute();
+        $list = $this->hydrateList($statement, 'b', function($mapper, $model, $row) {
+            /** @var self  $mapper */
+            /** @var Model $model */
+            return $model
+                ->setResource($mapper->hydrateJoin($row, 'resource', 'r'))
+                ->setEvent($mapper->hydrateJoin($row, 'event', 'e'))
+            ;
+        });
+        return $list->filter(function($item) { return !$item->isDeleted(); });
+    }
 }
