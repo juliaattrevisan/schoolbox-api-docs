@@ -208,10 +208,12 @@ $(document).ready(function() {
         <tr>
             <td class="formLabelWidth">
                 <h4>Related Resources</h4>
+                {% if item.resource.relatedResourceList|length %}
                 <em>If you want to book any related resources, select them here.</em>
+                {% endif %}
             </td>
             <td>
-                {# Related resources #}
+                {# Related resources - not sure whether this list should be editable after save #}
                 <ul>
                 {% for relatedItem in item.resource.relatedResourceList %}
                     <li>
@@ -239,8 +241,17 @@ $(document).ready(function() {
            data-action="{{ saveAction }}"
     />
 
-    <a id="resource-booking-cancel"
+    {% if item.id %}
+        <input id="resource-booking-cancel"
+               type="submit"
+               value="Cancel Booking"
+               class="submit-btn-plain"
+               data-action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}"
+        />
+    {% endif %}
+
+    <a id="resource-booking-back"
        class="submit-btn-plain"
-       href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">Cancel</a>
+       href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">Back to list</a>
 
 </form>
