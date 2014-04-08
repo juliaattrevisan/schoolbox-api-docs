@@ -248,7 +248,7 @@ else {
     $resultSetID = -1;
     try {
         if ($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
-            $rubric      = UsageMapper::getInstance()->getRubric($submission->getId());
+            $rubric      = $rubricHandler->getRubric($submission->getId());
             $resultSetID = $submission->getRubricResultSet();
 
             if ($rubricHandler->marksAlreadyGiven($submission->getId())) {
@@ -438,7 +438,7 @@ function outputCriteria(
         $page->setVar('crit_input_block', '');
         $page->setVar(array(
             'CRIT_ID'      => $criterion->getId(),
-            'CRIT_SLUG'    => "crit[$criterion->getId()]",
+            'CRIT_SLUG'    => "crit[{$criterion->getId()}]",
             'CRIT_LABEL'   => Scrub::text($criterion->getGrouping()) . ' - ' . Scrub::text($criterion->getName()),
             'CRIT_CHECKED' => in_array($criterion->getId(), $checkedIDs) ? 'checked="checked"' : ''
         ));
