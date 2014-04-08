@@ -4,11 +4,10 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 $page = new SitePage(false);
 $newsHandler = new News;
-
 $page->setFile(TEMPLATE_body, 'feed/rss.xml');
 $page->setBlock(TEMPLATE_body, 'rss_item', 'rss_item_block');
 
-$output = array('TITLE'			=> HEADING . ' - News',
+$output = array('TITLE'		=> Cfg::get('school_name'). ' - News',
 				'DESCRIPTION'	=> 'Recent news items from the portal',
 				'DATE'			=> date('r'),
 				'LINK'			=> $page->conType() . $_SERVER['HTTP_HOST'] . '/news/',
@@ -23,9 +22,9 @@ if (is_array($newsList)) {
 	foreach ($newsList as $news) {
 		$itemDate = new Alaress_Date_Format($news['item_datetime_posted'], 'U');
 
-		$output = array('ITEM_TITLE'		=> $news['item_heading'],
-						'ITEM_DESCRIPTION'	=> "<![CDATA[" . $news['item_body'] ."]]>",
-						'ITEM_DATE'			=> $itemDate->getShort(),
+		$output = array('ITEM_TITLE'		=> Scrub::text($news['item_heading']),
+						'ITEM_DESCRIPTION'	=> Scrub::html("<![CDATA[" ."<img src=\"/storage/image.php?hash={$news['item_image']}&size=constrain200\">". $news['item_body'] ."]]>"),
+						'ITEM_DATE'			=> $itemDate->getUsingFormat(datetime::RFC822),
 						'ITEM_LINK'			=> $page->conType() . $_SERVER['HTTP_HOST'] . '/news/item/' . $news['item_id'],
 						);
 		$page->setVar($output);
