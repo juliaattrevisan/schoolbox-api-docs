@@ -84,7 +84,7 @@ class ResourceVideoMapper extends Mapper {
             SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('user')->getColumnString('u')}
 			FROM `{$this->getTable()}` vq
 			JOIN {$this->getJoinSQL('file','vq','f')}
-			JOIN {$fileMapper->getJoinSQL('user','f','u')}
+			LEFT JOIN {$fileMapper->getJoinSQL('user','f','u')}
 			WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0'
 		";
 
@@ -122,8 +122,13 @@ class ResourceVideoMapper extends Mapper {
 		foreach($statement as $row) {
 			$video = $this->hydrate($row, 'vq');
 			$video->setFile($fileMapper->hydrate($row,'f'));
-			$video->getFile()->setOwner($fileMapper->getJoinMapper('user')->hydrate($row,'u'));
 
+            if($row['u.id']){
+			    $video->getFile()->setOwner($fileMapper->getJoinMapper('user')->hydrate($row,'u'));
+            }
+            else {
+                $video->getFile()->setOwner($fileMapper->getJoinMapper('user')->getUnknownUser());
+            }
 			$videoList->add($video);
 		}
 
