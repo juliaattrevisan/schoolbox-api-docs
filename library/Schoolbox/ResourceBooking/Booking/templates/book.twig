@@ -22,18 +22,6 @@ $(document).ready(function() {
         endDate: $('input[name="end_datetime[date]"]')
     })
 
-    // Show/hide the repeat until input
-    $('#repeatUntilSelect').change(function () {
-        if ($(this).val() !== '') {
-            $('#repeatUntil').show();
-            $("#repeat_until").rules("add", "required");
-        }
-        else {
-            $('#repeatUntil').hide();
-            $("#repeat_until").rules("remove", "required");
-        }
-    })
-
     // remote validation rules
     // Have some sort of helper for creating remote validations.
     var getValidatorRemoteMethod = function(code, key) {
@@ -180,6 +168,20 @@ $(document).ready(function() {
             }
         }
     })
+
+    // Show/hide the repeat until input, depending on if a repeat is chosen.
+    form.find('#repeatUntilSelect')
+        .change(function() {
+            if ($(this).val() !== '') {
+                $('#repeatUntil').show();
+                $("#repeat_until").rules("add", "required");
+            }
+            else {
+                $('#repeatUntil').hide();
+                $("#repeat_until").rules("remove", "required");
+            }
+        })
+        .change()
 })
 </script>
 <!-- END custom_header -->
