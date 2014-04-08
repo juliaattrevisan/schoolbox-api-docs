@@ -31,6 +31,8 @@ class Module extends BaseModule {
         $router->addGet('resourceBooking.edit', $basePath.'/{id}/edit');
         $router->addPost('resourceBooking.createBooking', $basePath.'/bookItem/{id}')
                ->addValues(array('action' => 'createBooking'));
+        $router->addPost('resourceBooking.update:post', $basePath.'/{id}/update')
+               ->addValues(array('action' => 'update'));
         $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
 
         // Approving or rejecting a single booking

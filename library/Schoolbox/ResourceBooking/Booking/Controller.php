@@ -557,6 +557,20 @@ class Controller extends Base {
     }
 
     /**
+     * Stub for update method
+     *
+     * @param $id
+     */
+    public function update($id) {
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => array(),
+            )
+        );
+    }
+
+    /**
      * Marks a booking as approved.
      *
      * @param int $id The ID of the booking to approve.
