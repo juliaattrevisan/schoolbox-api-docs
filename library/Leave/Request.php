@@ -2,15 +2,12 @@
 
 class Leave_Request {
 
-    /* Host types and their presentation labels.
-      */
-    private $hostTypeMap = array(
-        '1' => 'Mother',
-        '2' => 'Father',
-        '3' => 'Guardian',
-        '4' => 'Self',
-        '5' => 'Other'
-    );
+	/**
+	 * A collection of host type instances
+	 *
+	 * @var \Schoolbox\Collection
+	 */
+	private $allHostTypes = null;
 
     /* Leave Requests confirmation types and their presentation labels
       */
@@ -49,11 +46,56 @@ class Leave_Request {
     protected $confirmedBy;
 
     /**
+	 * The type of travel
+	 *
      * @var Leave_Request_TravelType
      */
     protected $travelType;
 
-    /**
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+
+		/* Set up host types again
+		 */
+		$hostTypeMapper = new \Leave\HostTypeMapper();
+		$this->setAllHostTypes($hostTypeMapper->findAll());
+	}
+
+	/**
+	 * Get duration
+	 *
+	 * @return float
+	 */
+	public function getDuration() {
+		$duration = floor(
+			($this->getFinish()->getUnixTimestamp() - $this->getStart()->getUnixTimestamp()) / (60 * 60 * 24)
+		);
+
+		return $duration;
+	}
+
+	/**
+	 * Checks to see whether a particular date range falls within the date range of the request
+	 *
+	 * @param Alaress_Date_Format $datetimeStart
+	 * @param Alaress_Date_Format $datetimeFinish
+	 *
+	 * @return Boolean
+	 */
+	public function getOccupancy($datetimeStart, $datetimeFinish) {
+		if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp() && $this->getFinish()->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
      * @param $created
      */
     public function setCreated($created) {
@@ -389,37 +431,6 @@ class Leave_Request {
     }
 
     /**
-     * Get duration
-     *
-     * @return float
-     */
-    public function getDuration() {
-        $duration = floor(
-            ($this->getFinish()->getUnixTimestamp() - $this->getStart()->getUnixTimestamp()) / (60 * 60 * 24)
-        );
-
-        return $duration;
-    }
-
-    /**
-     * Checks to see whether a particular date range falls within the date range of the request
-     *
-     * @param Alaress_Date_Format $datetimeStart
-     * @param Alaress_Date_Format $datetimeFinish
-     *
-     * @return Boolean
-     */
-    public function getOccupancy($datetimeStart, $datetimeFinish) {
-        if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp() && $this->getFinish(
-        )->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()
-        ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Set notes
      *
      * @param $notes
@@ -453,7 +464,7 @@ class Leave_Request {
      * @return mixed
      */
     public function getHostTypeMapIndex($index) {
-        return $this->hostTypeMap[$index];
+		return $this->getAllHostTypes()->getBy('id', $index);
     }
 
     /**
@@ -525,5 +536,23 @@ class Leave_Request {
 	 */
 	public function getAuthorId() {
 		return $this->authorId;
+	}
+
+	/**
+	 * Set all host types
+	 *
+	 * @param \Schoolbox\Collection $allHostTypes
+	 */
+	private function setAllHostTypes($allHostTypes) {
+		$this->allHostTypes = $allHostTypes;
+	}
+
+	/**
+	 * Set all host types
+	 *
+	 * @return \Schoolbox\Collection
+	 */
+	public function getAllHostTypes() {
+		return $this->allHostTypes;
 	}
 }

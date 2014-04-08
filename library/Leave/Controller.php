@@ -9,9 +9,10 @@
  */
 class Leave_Controller extends Controller {
 
-    /* Unused constants which document when morning, day and night occur
-      * for Leave Reports and Catering Reports respectively
-      */
+    /**
+	 * Unused constants which document when morning, day and night occur
+     * for Leave Reports and Catering Reports respectively
+     */
     const LEAVE_THRESHOLD_MORNING = '9:59:59';
     const LEAVE_THRESHOLD_DAY = '18:59:59';
     const LEAVE_THRESHOLD_NIGHT = '21:59:59';
@@ -20,15 +21,17 @@ class Leave_Controller extends Controller {
     const CATERING_THRESHOLD_DAY = '16:59:59';
     const CATERING_THRESHOLD_NIGHT = '23:59:59';
 
-    /* Consts for days
-      */
+    /**
+	 * Consts for days
+     */
     const FRIDAY = 5;
     const SATURDAY = 6;
     const SUNDAY = 7;
 
-    /* Show leave requests over RANGE days
-      * Change
-      */
+    /**
+	 * Show leave requests over RANGE days
+     * Change
+     */
     const RANGE = 3;
 
     protected $requestMapper;
@@ -44,10 +47,11 @@ class Leave_Controller extends Controller {
      */
     protected $travelTypes;
 
-    /* Time map array
-      * A map of actual time values => presentation information
-      * used in the Leave Time/Return Time dropdowns
-      */
+    /**
+	 * Time map array
+     * A map of actual time values => presentation information
+     * used in the Leave Time/Return Time dropdowns
+     */
     private $timeMap = array(
         '00:30:00' => '12:30 AM',
         '01:00:00' => '1:00 AM',
@@ -127,7 +131,7 @@ class Leave_Controller extends Controller {
 	 * @return mixed
 	 */
 	public function preprocessPost() {
-
+	
 		/* Deal with magicsuggest sometimes giving you an array of ints,
 		 * or just an int
 		 */
@@ -136,13 +140,13 @@ class Leave_Controller extends Controller {
 		if (is_numeric($_POST['user'])) {
 			$data['userId'] = $_POST['user'];
 		}
-		else {
+ 		else {
 			$wtf = json_decode($_POST['user']);
 			$data['userId'] = $wtf[0];
 		}
 
-		return $data;
-	}
+ 		return $data;
+ 	}
 
     /**
      * Test email deployments
@@ -162,19 +166,20 @@ class Leave_Controller extends Controller {
     private function renderHostTypeDropdown($request) {
         $this->getPage()->setBlock(TEMPLATE_content, 'host_type', 'host_type_block');
 
-        /* Iterate through each option and preselect
-           */
-        foreach ($request->getHostTypeMap() as $value => $label) {
-            if ($request->getHostType() == $value) {
+		/* Iterate through each option and preselect
+		 */
+		foreach($request->getAllHostTypes() as $currentHostType) {
+            if ($request->getHostType() == $currentHostType->getId()) {
                 $selected = 'selected=\'selected\'';
-            } else {
+            }
+			else {
                 $selected = '';
             }
 
             $this->getPage()->setVar(
                 array(
-                    'HOST_TYPE_VALUE' => $value,
-                    'HOST_TYPE_LABEL' => $label,
+                    'HOST_TYPE_VALUE' => $currentHostType->getId(),
+                    'HOST_TYPE_LABEL' => $currentHostType->getName(),
                     'HOST_TYPE_SELECTED' => $selected,
                 )
             );
@@ -824,18 +829,16 @@ class Leave_Controller extends Controller {
             $previousRequestCount = 0;
 
             foreach ($requestList as $request) {
-                $this->getPage()->setVar(
-                    array(
-                        'USER_ID' => $request->getUser()->getId(),
-                        'USER_NAME' => $request->getUser()->formatName(),
-                        'USER_YEAR' => $request->getUser()->getYear(),
-                        'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
-                        'REQUEST_ID' => $request->getId(),
-                        'REQUEST_START' => $request->getStart()->getAustralian(),
-                        'REQUEST_DURATION' => $request->getDuration(),
-                        'REQUEST_HOST_TYPE' => $request->getHostType(true)
-                    )
-                );
+                $this->getPage()->setVar(array(
+					'USER_ID' => $request->getUser()->getId(),
+					'USER_NAME' => $request->getUser()->formatName(),
+					'USER_YEAR' => $request->getUser()->getYear(),
+					'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
+					'REQUEST_ID' => $request->getId(),
+					'REQUEST_START' => $request->getStart()->getAustralian(),
+					'REQUEST_DURATION' => $request->getDuration(),
+					'REQUEST_HOST_TYPE' => $request->getAllHostTypes()->getBy('id', $request->getHostType())->getName()
+				));
 
                 if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
                     $this->getPage()->setVar(
@@ -950,7 +953,7 @@ class Leave_Controller extends Controller {
                     $rowData[] = $request->getUser()->getYear();
                     $rowData[] = $request->getStart()->getAustralian();
                     $rowData[] = $request->getFinish()->getAustralian();
-                    $rowData[] = $request->getHostType(true);
+                    $rowData[] = $request->getHostTypeMapIndex($request->getHostType())->getName();
                     $rowData[] = $request->getStatus(true);
                     $rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
                     $rowData[] = $request->getAuthorisationUser()->formatName();
@@ -1026,7 +1029,7 @@ class Leave_Controller extends Controller {
                             'REQUEST_ID' => $request->getId(),
                             'REQUEST_START' => $request->getStart()->getAustralian(),
                             'REQUEST_DURATION' => $request->getDuration(),
-                            'REQUEST_HOST_TYPE' => $request->getHostType(true)
+                            'REQUEST_HOST_TYPE' => $request->getHostTypeMapIndex($request->getHostType())->getName()
                         )
                     );
 

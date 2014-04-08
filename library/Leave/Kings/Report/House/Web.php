@@ -352,6 +352,14 @@ class Leave_Kings_Report_House_Web {
 
             if (is_array($allPeople) && $totalPeople) {
                 foreach ($allPeople as $currentPerson) {
+					$hostTypes = array();
+
+					foreach($currentPerson['request_host_type'] as $currentHostType) {
+						if ($currentHostType !== null) {
+							$hostTypes[] = $currentHostType->getName();
+						}
+					}
+
                     $this->getPage()->setVar(
                         array(
                             'USER_ID' => $currentPerson['user_id'],
@@ -359,7 +367,7 @@ class Leave_Kings_Report_House_Web {
                             'USER_YEAR' => $currentPerson['user_year'],
                             'USER_BOARDING_STATUS' => $currentPerson['user_boarding_status'],
                             'REQUEST_STATUS' => implode('<hr />', $currentPerson['request_status']),
-                            'REQUEST_HOST' => implode('<hr />', $currentPerson['request_host_type']),
+							'REQUEST_HOST' => implode('<hr />', $hostTypes),
                             'REQUEST_ACTIVITY' => implode('<hr />', $currentPerson['request_description']),
                             'CLASS' => implode(' ', $currentPerson['row_css_class']),
                         )
