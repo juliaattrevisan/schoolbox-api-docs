@@ -39,7 +39,9 @@ class Alaress_Image_Processor_Freeform extends Alaress_Image_Processor_Standard 
 			 * or rammed into the constructor as an additional param, if you want
 			 * other parameterised transformation definitions.
 			 */
-			$allTransformations = $this->getTransformations()->retrieve($this->getTransformKey());
+            $allTransformations = array(array('method'=>'RotateOrientation','args'=>array('FilePath'=>$this->getFilePath())));
+
+            $allTransformations = array_merge($allTransformations, $this->getTransformations()->retrieve($this->getTransformKey()));
 
 			/* Do it
 			 */
