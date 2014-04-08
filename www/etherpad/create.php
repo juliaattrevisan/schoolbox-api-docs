@@ -12,15 +12,17 @@
  */
 $apiKey = 'as90dfuasdifjsdopaifjuhas9p';
 $homepageId = 52;
+$padName = 'The Ultimate Bart';
+$defaultText = 'Spinebreaking new text';
 
 /* Create a new group pad
  */
 $client = new \EtherpadLite\Client($apiKey);
 
 /* Create a new pad, get group id
+ * Create a group pad
  * Spawn a new group of users
  * Assign them to a group
- * Create a group pad
  */
 $groupResult = $client->createGroup();
 $response = $groupResult->getResponse();
@@ -28,26 +30,41 @@ $response = $groupResult->getResponse();
 if ($response['message'] == 'ok') {
 	$groupId = $response['data']['groupID'];
 
-	/* Spawn a new group of users
+	/* Create a group pad
 	 */
-	$userMapper = new \Schoolbox\UserMapper();
-	$allUsers = new \Schoolbox\Collection();
+	$createResult = $client->createGroupPad($groupId, $padName);
+	$response = $createResult->getResponse();
 
-	$allUsers->add($userMapper->findByColumn('username', 'cglenn')->first());
-	$allUsers->add($userMapper->findByColumn('username', 'asaxon')->first());
-	$allUsers->add($userMapper->findByColumn('username', 'wwhite')->first());
+	if ($response['message'] == 'ok') {
+		$userMapper = new \Schoolbox\UserMapper();
+		$allUsers = new \Schoolbox\Collection();
 
-	/* Assign them to a group
-	 */
-	$etherpadGroupMapper = new \Etherpad\GroupMapper();
+		/* Spawn a new group of users
+		 */
+		$allUsers->add($userMapper->findByColumn('username', 'cglenn')->first());
+		$allUsers->add($userMapper->findByColumn('username', 'asaxon')->first());
+		$allUsers->add($userMapper->findByColumn('username', 'wwhite')->first());
 
-	foreach($allUsers as $currentUser) {
-		$etherpadGroup = new \Etherpad\Group();
-		$etherpadGroup->setGroupId($groupId);
-		$etherpadGroup->setUserId($currentUser->getId());
-		$etherpadGroup->setHomepageId($homepageId);
+		/* Assign them to a group
+		 */
+		$etherpadGroupMapper = new \Etherpad\GroupMapper();
 
-		$etherpadGroupMapper->save($etherpadGroup);
+		foreach($allUsers as $currentUser) {
+			$etherpadGroup = new \Etherpad\Group();
+			$etherpadGroup->setGroupId($groupId);
+			$etherpadGroup->setUserId($currentUser->getId());
+			$etherpadGroup->setHomepageId($homepageId);
+
+			$etherpadGroupMapper->save($etherpadGroup);
+		}
+
+		/* Get pad id
+		 */
+		$padId = $response['data']['padID'];
+
+		new \Alaress_Probe($client->listPads($groupId));
+
+		exit();
 	}
 }
 else {
