@@ -8,16 +8,12 @@
  * @version     SVN: $Id$
  */
 
-/* TODO: Test values
- */
-define('ETHERPAD_API_KEY', 'as90dfuasdifjsdopaifjuhas9p');
-
 $homepageId = 52;
 $padName = md5('50 cent "$"         x');
 
 /* Create a new group pad
  */
-$client = new \EtherpadLite\Client(ETHERPAD_API_KEY);
+$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
 
 /* Create a new pad, get group id
  * Create a group pad

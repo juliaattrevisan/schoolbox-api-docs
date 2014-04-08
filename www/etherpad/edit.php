@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-define('ETHERPAD_API_KEY', 'as90dfuasdifjsdopaifjuhas9p');
 
 /* Check if the currently logged in user can participate
  */
@@ -26,7 +25,7 @@ if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
 
 	/* Find the author id
 	 */
-	$client = new \EtherpadLite\Client(ETHERPAD_API_KEY);
+	$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
 
 	$createResult = $client->createAuthorIfNotExistsFor($_SESSION['user']->getId(), $_SESSION['user']->getFullName());
 	$response = $createResult->getResponse();
