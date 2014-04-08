@@ -196,6 +196,7 @@ $(document).ready(function() {
                 <em>This booking is part of a recurring series.</em>
             </td>
             <td>
+                <input name="repeat" type="hidden" value="{{ recurrence.freq }}" />
                 {% include 'sub/recurrence.twig' with {recurrence: recurrence} %}
             </td>
         </tr>
@@ -224,6 +225,12 @@ $(document).ready(function() {
             </td>
         </tr>
     </table>
+
+    {# Inputs for editing bookings in a series #}
+    <input name="efficacy" type="hidden" value="self" />
+
+    {# Input for determining which action to run #}
+    <input name="action" type="hidden" />
 
     <input id="resource-booking-save"
            type="submit"
