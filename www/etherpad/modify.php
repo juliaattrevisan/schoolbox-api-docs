@@ -28,9 +28,14 @@ catch (\Exception $e) {
  * Loade le pahde in le olde ifrayme
  */
 if ($authenticator->canEdit($pad->getGroupId(), $_SESSION['user']->getId())) {
+	$groupMapper = new \Etherpad\GroupMapper();
+	$group = $groupMapper->findByColumn('group_id', $pad->getGroupId())->first();
+
 	$this->setFile(TEMPLATE_content, 'etherpad/modify.html');
 
 	$this->setVar(array(
+		'HOMEPAGE_ID' => $group->getHomepageId(),
+		'ETHERPAD_NAME' => $pad->getName(),
 		'ETHERPAD_URL' => "/etherpad/load/{$pad->getPadId()}"
 	));
 }
