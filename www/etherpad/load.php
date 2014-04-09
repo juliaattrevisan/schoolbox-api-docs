@@ -53,7 +53,23 @@ if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId(
 			$pad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$padMapper->save($pad);
 
-			$this->localRedir(":9001/p/{$pad->getPadId()}");
+			/* Show readonly version if locked and you haven't got write perms
+			 * Otherwise show usual editable version
+			 */
+			$groupMapper = new \Etherpad\GroupMapper();
+			$group = $groupMapper->findByColumn('group_id', $pad->getGroupId())->first();
+
+			if ($authenticator->canCreate($group->getHomepageId()) || !$pad->isLocked()) {
+				$this->localRedir(":9001/p/{$pad->getPadId()}");
+			}
+			else if ($pad->isLocked()) {
+				$readonlyResult = $client->getReadOnlyID($pad->getPadId());
+				$response = $readonlyResult->getResponse();
+
+				if ($response['message'] = 'ok') {
+					$this->localRedir(":9001/p/{$response['data']['readOnlyID']}");
+				}
+			}
 		}
 	}
 	else {
