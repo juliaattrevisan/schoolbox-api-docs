@@ -36,7 +36,7 @@ if ($authenticator->canEdit($pad->getGroupId(), $_SESSION['user']->getId())) {
 	$this->setVar(array(
 		'HOMEPAGE_ID' => $group->getHomepageId(),
 		'ETHERPAD_NAME' => $pad->getName(),
-		'ETHERPAD_URL' => "/etherpad/load/{$pad->getPadId()}"
+		'ETHERPAD_URL' => "/etherpad/load/{$pad->getId()}"
 	));
 }
 else {

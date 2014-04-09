@@ -12,15 +12,21 @@
  */
 $authenticator = new \Etherpad\Authenticator();
 
-/* The first arg is a composite key, containing groupId and a pad name
- * The actual pad is this composite key
+/* Load the pad from our db to get its groupId
+ * Error out if you can't find it
  */
-$padId = $this->arg[0];
-list($groupId, $padName) = explode('$', $padId);
+$padMapper = new \Etherpad\PadMapper();
+
+try {
+	$pad = $padMapper->findById($this->arg[0]);
+}
+catch (\Exception $e) {
+	exit();
+}
 
 /* If you can participate, create a session and off you go
  */
-if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
+if ($authenticator->canEdit($pad->getGroupId(), $_SESSION['user']->getId())) {
 
 	/* Find the author id
 	 */
@@ -34,7 +40,7 @@ if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
 	if ($response['message'] == 'ok') {
 		$etherpadSession = new \Etherpad\Session();
 
-		$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
+		$sessionResult = $client->createSession($pad->getGroupId(), $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
 		$response = $sessionResult->getResponse();
 
 		if ($response['message'] == 'ok') {
@@ -43,11 +49,11 @@ if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
 			/* Remember last updated time
 			 */
 			$padMapper = new \Etherpad\PadMapper();
-			$pad = $padMapper->findByColumn('pad_id', $padId)->first();
+			$pad = $padMapper->findByColumn('pad_id', $pad->getPadId())->first();
 			$pad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$padMapper->save($pad);
 
-			$this->localRedir(":9001/p/{$padId}");
+			$this->localRedir(":9001/p/{$pad->getPadId()}");
 		}
 	}
 	else {
