@@ -54,6 +54,12 @@ class PadMapper extends \Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
+			'column'     => 'lock',
+			'property'   => 'lock',
+			'type'       => self::TYPE_INTEGER,
+		));
+
+		$this->hasMap(array(
 			'column'     => 'created_at',
 			'property'   => 'createdAt',
 			'type'       => self::TYPE_DATETIME,

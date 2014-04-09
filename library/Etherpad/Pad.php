@@ -49,6 +49,13 @@ class Pad {
 	private $body = '';
 
 	/**
+	 * Whether this pad is locked
+	 *
+	 * @var int
+	 */
+	private $lock = 0;
+
+	/**
 	 * Created at
 	 *
 	 * @var string
@@ -73,6 +80,19 @@ class Pad {
 	 * Constructor
 	 */
 	public function __construct() {
+	}
+
+	/**
+	 * Determine whether this pad is locked or not
+	 *
+	 * @return bool
+	 */
+	public function isLocked() {
+		if ($this->getLock() == 1) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/* Getters/Setters
@@ -220,5 +240,23 @@ class Pad {
 	 */
 	public function getUpdatedAt() {
 		return $this->updatedAt;
+	}
+
+	/**
+	 * Set lock
+	 *
+	 * @param int $lock
+	 */
+	public function setLock($lock) {
+		$this->lock = $lock;
+	}
+
+	/**
+	 * Get lock
+	 *
+	 * @return int
+	 */
+	public function getLock() {
+		return $this->lock;
 	}
 }

@@ -33,8 +33,28 @@ if ($authenticator->canEdit($pad->getGroupId(), $_SESSION['user']->getId())) {
 
 	$this->setFile(TEMPLATE_content, 'etherpad/modify.html');
 
+	$this->setBlock(TEMPLATE_content, 'etherpad_lock', 'etherpad_lock_block');
+	$this->setBlock(TEMPLATE_content, 'etherpad_unlock', 'etherpad_unlock_block');
+
+	$this->setVar(array(
+		'etherpad_lock_block' => '',
+		'etherpad_unlock_block' => ''
+	));
+
+	/* Set lock/unlock butonye
+	 */
+	if ($pad->isLocked()) {
+		$this->parse('etherpad_unlock_block', 'etherpad_unlock');
+	}
+	else {
+		$this->parse('etherpad_lock_block', 'etherpad_lock');
+	}
+
+	/* The rest of the pad
+	 */
 	$this->setVar(array(
 		'HOMEPAGE_ID' => $group->getHomepageId(),
+		'ETHERPAD_PAD_ID' => $pad->getId(),
 		'ETHERPAD_NAME' => $pad->getName(),
 		'ETHERPAD_URL' => "/etherpad/load/{$pad->getId()}"
 	));
