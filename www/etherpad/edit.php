@@ -18,10 +18,6 @@ $authenticator = new \Etherpad\Authenticator();
 $padId = $this->arg[0];
 list($groupId, $padName) = explode('$', $padId);
 
-/* Number of hours for which sessions and cookies are valid
- */
-$duration = 1;
-
 /* If you can participate, create a session and off you go
  */
 if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
@@ -36,18 +32,13 @@ if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
 	/* Spawn a session and redirect to the actual edit url
 	 */
 	if ($response['message'] == 'ok') {
-		$authorId = $response['data']['authorID'];
+		$etherpadSession = new \Etherpad\Session();
 
-		$validUntil = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-		$validUntil->addHours($duration);
-
-		$sessionResult = $client->createSession($groupId, $authorId, $validUntil->getUnixTimestamp());
+		$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
 		$response = $sessionResult->getResponse();
 
 		if ($response['message'] == 'ok') {
-			$sessionId = $response['data']['sessionID'];
-
-			setcookie('sessionID', $sessionId, $_SERVER['REQUEST_TIME'] + 60*60*$duration, '/');
+			$etherpadSession->generateCookie($response['data']['sessionID']);
 
 			/* Remember last updated time
 			 */
