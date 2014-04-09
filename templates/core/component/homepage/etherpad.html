@@ -4,7 +4,14 @@
 
 	<ul class="information-list">
 		<!-- BEGIN etherpad_pad -->
-		<li><a href='/etherpad/edit/{ETHERPAD_PAD_ID}'>{ETHERPAD_NAME}</a></li>
+		<li>
+			<h4>
+				<a href='/etherpad/edit/{ETHERPAD_PAD_ID}' class="icons txt">{ETHERPAD_NAME}</a>
+			</h4>
+			<span class="actions">
+				{ETHERPAD_CREATED_AT}
+			</span>
+		</li>
 		<!-- END etherpad_pad -->
 	</ul>
 

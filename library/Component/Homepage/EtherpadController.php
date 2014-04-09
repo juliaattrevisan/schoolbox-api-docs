@@ -33,6 +33,9 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 	   $this->parseConfig();
 
 	   $this->setBlock($templateHandle, 'etherpad_pad', 'etherpad_pad_block');
+	   $this->setVar(array(
+		   'etherpad_pad_block' => ''
+	   ));
 
 	   /* Find all the groups associated with this homepage
 	    */
@@ -57,7 +60,8 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 	   foreach($allPads as $currentPad) {
 		   $this->setVar(array(
 			   'ETHERPAD_PAD_ID' => $currentPad->getPadId(),
-			   'ETHERPAD_NAME' => $currentPad->getName()
+			   'ETHERPAD_NAME' => $currentPad->getName(),
+			   'ETHERPAD_CREATED_AT' => $currentPad->getCreatedAt()->getDateOnly(),
 		   ));
 
 		   $this->parse('etherpad_pad_block', 'etherpad_pad', true);
