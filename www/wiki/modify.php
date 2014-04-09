@@ -30,7 +30,7 @@ if (is_numeric($this->arg[0])) {
 		'SLUG' => $wiki['slug'],
 		'CATEGORY_ID' => $wiki['categoryID'],
 		'HEADING' => Scrub::text($wiki['heading']),
-		'BODY' => $wiki['body'],
+		'BODY' => Scrub::text($wiki['body']),
 		'REVISION' => $wiki['latestRevision'],
 	);
 
@@ -48,8 +48,8 @@ else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		'ACTION' => 'Add',
 		'WIKI_ID' => '',
 		'CATEGORY_ID' => $this->arg[1],
-		'HEADING' => Scrub::text($wiki['heading']),
-		'BODY' => $wiki['body'],
+		'HEADING' => '',
+		'BODY' => '',
 		'REVISION' => '',
 	));
 
