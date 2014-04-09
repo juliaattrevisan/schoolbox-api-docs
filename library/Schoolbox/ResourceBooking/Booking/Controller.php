@@ -575,6 +575,32 @@ class Controller extends Base {
     }
 
     /**
+     * Changes status of booking and any related bookings, if series efficacy is
+     * set.
+     *
+     * @param Model $booking
+     * @param int   $status
+     */
+    protected function changeStatus(Model $booking, $status) {
+        $currentUser = $this->getUser();
+        $update      = function(Model $booking) use($status, $currentUser) {
+            $booking
+                ->setStatus($status)
+                ->setReviewer($currentUser)
+            ;
+        };
+        $update($booking);
+        $this->getBookingMapper()->save($booking);
+        $series = $this->getSeriesBookings($booking);
+        if (count($series)) {
+            foreach ($series as $relatedBooking) {
+                $update($relatedBooking);
+            }
+            $this->getBookingMapper()->save($series);
+        }
+    }
+
+    /**
      * Marks a booking as approved.
      *
      * @param int $id The ID of the booking to approve.
@@ -582,16 +608,7 @@ class Controller extends Base {
     public function approve($id) {
         /** @var Model $booking */
         $booking = $this->getBookingMapper()->findById($id);
-        $booking->setStatus(Status\Model::STATUS_APPROVED);
-        $this->getBookingMapper()->save($booking);
-        // Save related items
-        $series = $this->getSeriesBookings($booking);
-        if (count($series)) {
-            foreach ($series as $relatedBooking) {
-                $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
-            }
-            $this->getBookingMapper()->save($series);
-        }
+        $this->changeStatus($booking, Status\Model::STATUS_APPROVED);
         $this->outputUpdateStatusResponse($booking);
     }
 
@@ -603,15 +620,7 @@ class Controller extends Base {
     public function reject($id) {
         /** @var Model $booking */
         $booking = $this->getBookingMapper()->findById($id);
-        $booking->setStatus(Status\Model::STATUS_REJECTED);
-        $this->getBookingMapper()->save($booking);
-        $series = $this->getSeriesBookings($booking);
-        if (count($series)) {
-            foreach ($series as $relatedBooking) {
-                $relatedBooking->setStatus(Status\Model::STATUS_REJECTED);
-            }
-            $this->getBookingMapper()->save($series);
-        }
+        $this->changeStatus($booking, Status\Model::STATUS_REJECTED);
         $this->outputUpdateStatusResponse($booking);
     }
 
