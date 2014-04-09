@@ -281,20 +281,19 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // Otherwise, show a standard open/due message.
             if ($unit->isBeforeOpenDate()) {
                 $completion_status = 'Opens';
-                $rel_time          = $unit->getOpenDate();
+                $rel_time          = $unit->getRelativeOpenDate();
                 $urgency           = null;
             }
             elseif ($unit->isOpen()) {
                 $completion_status = 'Due';
-                $rel_time          = $unit->getDueDate();
+                $rel_time          = $unit->getRelativeDueDate();
             }
             else {
                 $completion_status = 'Closed';
-                $rel_time          = $unit->getDueDate();
+                $rel_time          = $unit->getRelativeDueDate();
                 $urgency           = 0;
             }
         }
-        $rel_time = new Alaress_Date_Relative($rel_time);
         $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
         $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
         $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
