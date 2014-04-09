@@ -96,7 +96,7 @@ if ($authenticator->canCreate($homepageId)) {
 
 			/* Go to edit screen for now
 			 */
-			$this->localRedir("/etherpad/modify/{$padId}");
+			$this->localRedir("/etherpad/modify/{$newPad->getId()}");
 		}
 		else {
 			throw new \Exception('Something strange happened when creating a new pad');

@@ -41,7 +41,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 	    */
 	   $groupMapper = new \Etherpad\GroupMapper();
 
-	   $allGroups = $groupMapper->findByColumn('homepage_id', 52);
+	   $allGroups = $groupMapper->findByColumn('homepage_id', $this->instance->getIdentifier());
 
 	   $ids = array();
 
@@ -59,7 +59,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
 	   foreach($allPads as $currentPad) {
 		   $this->setVar(array(
-			   'ETHERPAD_PAD_ID' => $currentPad->getPadId(),
+			   'ETHERPAD_PAD_ID' => $currentPad->getId(),
 			   'ETHERPAD_NAME' => $currentPad->getName(),
 			   'ETHERPAD_CREATED_AT' => $currentPad->getCreatedAt()->getDateOnly(),
 		   ));
