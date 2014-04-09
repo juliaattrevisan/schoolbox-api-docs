@@ -136,12 +136,12 @@ class Subscription {
 		foreach($this->messages as $msgId => $stompMessage) {
 			try {
 				if(in_array($msgId, $amqpMessageIds)) {
-					$this->pipeManager->v("Attempting ACK");
+					$this->pipeManager->v("Attempting ACK of $msgId");
 					$stompMessage->ack();
 					$success[$msgId] = true;
 				}
 				else {
-					$this->pipeManager->v("Attempting NACK");
+					$this->pipeManager->v("Attempting NACK of $msgId");
 					$stompMessage->nack();
 				}
 			}
