@@ -153,7 +153,8 @@ class ICal_Creator {
 						 * <DATE> = (string) date("Y-m-d [H:i:s][timezone/UTC offset]")
 						 */
 						$dtstart = $vevent->getProperty('dtstart');
-						$dtend = $vevent->getProperty('dtend');
+						$dtend   = $vevent->getProperty('dtend');
+						$allday  = !array_key_exists('hour', $dtstart);
 
 						/* dtstart required, one occurence, (orig. start date)
 						 */
@@ -179,10 +180,11 @@ class ICal_Creator {
 							'note' => $summary,
 							'detail' => $description,
 							'location' => $location,
-							'startTime' => $start->getDatabaseTime(),
-							'endTime' => $end->getDatabaseTime(),
+							'startTime' => $allday ? '' : $start->getDatabaseTime(),
+							'endTime' => $allday ? '' : $end->getDatabaseTime(),
 							'startDate' => $start->getDatabaseDate(),
 							'endDate' => $end->getDatabaseDate(),
+							'allday' => $allday,
 						);
 
 						if ($this->getCalendarHandler()->create($event)) {
