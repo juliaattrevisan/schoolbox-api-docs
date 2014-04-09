@@ -61,10 +61,10 @@ if (is_numeric($_GET['eventID'])) {
         'LEVEL' => '',
         'GROUP' => '',
         'ALLDAY_CHECKED' => ($event['allday'] ? 'checked="checked"' : ''),
-        'DESCRIPTION' => $event['note'],
-        'LOCATION' => $event['location'],
+        'DESCRIPTION' => Scrub::text($event['note']),
+        'LOCATION' => Scrub::text($event['location']),
         'ATTENDANCE' => $event['attendance'] ? 'checked="checked"' : '',
-        'DETAIL' => $event['detail'],
+        'DETAIL' => Scrub::text($event['detail']),
         'RETURN_TO' => parseReturnTo($_GET['returnTo'], $startDate->getUsingFormat('d-m-Y'), $event['sid']?$event['sid']:$_GET['sid'], $event['owner']),
         'PUBLISH_DATE' => $publishDate,
     );

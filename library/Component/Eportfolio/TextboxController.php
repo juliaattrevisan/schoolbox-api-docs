@@ -68,26 +68,44 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 
 		try {
 			$textBox = $this->getMapperClass()->findOneByColumn('component_instance_id', $instance_id);
-			$this->setVar('TEXTBOX_CONTENT', Scrub::html($textBox->getContent()));
+            $this->setVar('TEXTBOX_CONTENT', Scrub::html($textBox->getContent()));
+
+
+            /* If modifying this textbox */
+
+            if ($this->permission >= WRITE_ACCESS) {
+                if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $instance_id)) {
+                    $this->setVar('TEXTBOX_CONTENT', Scrub::text($textBox->getContent()));
+                    $this->parse('has_modify_form_block', 'has_modify_form');
+                }
+                else {
+                    $this->parse('output_text_block','output_text');
+                    $this->parse('modify_text_block', 'modify_text');
+                }
+            }
+            else {
+                $this->parse('output_text_block','output_text');
+            }
 		}
 		catch (Exception $e) {
 			$this->setVar('TEXTBOX_CONTENT', '');
+
+            if ($this->permission >= WRITE_ACCESS) {
+                if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $instance_id)) {
+                    $this->parse('has_modify_form_block', 'has_modify_form');
+                }
+                else {
+                    $this->parse('output_text_block','output_text');
+                    $this->parse('modify_text_block', 'modify_text');
+                }
+            }
+            else {
+                $this->parse('output_text_block','output_text');
+            }
+
 		}
 
-		/* If modifying this textbox
-		 */
-		if ($this->permission >= WRITE_ACCESS) {
-			if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $instance_id)) {
-				$this->parse('has_modify_form_block', 'has_modify_form');
-			}
-			else {
-				$this->parse('output_text_block','output_text');
-				$this->parse('modify_text_block', 'modify_text');
-			}
-		}
-		else {
-			$this->parse('output_text_block','output_text');
-		}
+
 
 		return true;
 	}

@@ -67,7 +67,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
             if ($this->sitepage->arg[1] == 'textBoxModify') {
                 $this->setVar(array(
-                    'TEXTBOX_BODY' => $textBox['body'],
+                    'TEXTBOX_BODY' => Scrub::text($textBox['body']),
                 ));
             }
             else if($this->sitepage->arg[1] == 'textBoxCreate') {

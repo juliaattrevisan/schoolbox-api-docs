@@ -93,14 +93,14 @@ if (is_numeric($this->arg[0])) {
 	}
 
 	$output = array(
-		'ACTION' => isset($post['postID']) ? 'Modify' : 'Add',
+		'ACTION' => isset($post['postID']) ? 'Modify' : 'Post',
 		'THREAD_POST' => $thread['postID'] == $post['postID'] || !isset($thread['threadID']) ? 'Thread' : 'Post',
 		'THREAD_ID' => $thread['threadID'],
 		'THREAD_TITLE' => Scrub::text($thread['title']),
 		'POST_ID' => $post['postID'],
 		'CATEGORY_ID' => $category['id'],
 		'CATEGORY' => Scrub::text($category['name']),
-		'BODY' => Scrub::html($post['body']),
+		'BODY' => Scrub::text($post['body']),
 	);
 
 	$this->setVar($output);

@@ -174,7 +174,7 @@ if (!empty($_POST)) {
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],
         'QUESTION_ID' => $question['question_id'],
-        'QUESTION' => Scrub::html($question['question']),
+        'QUESTION' => Scrub::text($question['question']),
         'MARKS' => $question['marks'],
         'DISABLED_SELECTED' => '',
     ));
