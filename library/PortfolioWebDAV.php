@@ -353,12 +353,12 @@ class PortfolioWebDAV
 
             if ($groupHandler->isStaff()) {
                 $paths = array(
-                    '/webdavstaff/' . $_SESSION['username'] . '/',
+                    '/webdav/staff/' . $_SESSION['username'] . '/',
                     '/webdavshared/'
                 );
             } else if ($groupHandler->isStudent()) {
                 $paths = array(
-                    '/webdavstudent/' . $_SESSION['username'] . '/',
+                    '/webdav/student/' . $_SESSION['username'] . '/',
                     '/webdavshared/'
                 );
             } else {
