@@ -372,45 +372,4 @@ class PageMapper extends Schoolbox\Mapper {
 		}
 		return $return;
 	}
-
-	/**
-	 * Find all the user's pages with a particular component on it
-	 *
-	 * @param int                   $userId
-	 * @param \Component_Definition $componentDefinition
-	 *
-	 * @return array
-	 */
-	public function findAvailablePages($userId, $componentDefinition) {
-		// Get user's pages
-		// Get all components on page and compare against $componentDefinition
-		$pageData = array();
-
-		/* @var \Eportfolio\Page[] $allPages */
-		$allPages = $this->findByColumn('uid', $userId);
-		foreach ($allPages as $currentPage) {
-			$componentList = array();
-
-			/* @var \Component_Instance[] $pageComponents */
-			$pageComponents = \Component_InstanceMapper::getInstance()->findByContext(
-				'eportfolio', $currentPage->getPageId()
-			);
-			foreach ($pageComponents as $currentComponent) {
-				if ($currentComponent->getDefinitionId() == $componentDefinition->getId()) {
-					$componentList[] = $currentComponent;
-				}
-			}
-
-			/* Throw it all into some arbitrary array
-			 * We're going to do this the poopy way
-			 */
-			if (!empty($componentList)) {
-				$pageData[] = array(
-					'page' => $currentPage,
-					'componentList' => $componentList
-				);
-			}
-		}
-		return $pageData;
-	}
 }
