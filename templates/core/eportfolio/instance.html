@@ -19,6 +19,7 @@
 		plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
         browser_spellcheck : true,
 		content_css : "/css/core/tiny.css",
+        media_strict : false,
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
@@ -30,13 +31,12 @@
 		pdw_toggle_on : 1,
 		pdw_toggle_toolbars : '2, 3, 4',
 		extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-    file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
+        theme_advanced_blockformats : "h3,h4,p,address,pre",
+        file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+        file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
 		file_browser_category_id : 0,
 		tabfocus_elements : ":prev,:next",
-		convert_urls : false,
-		force_br_newlines : false,
-		force_p_newlines : true
+		convert_urls : false
 	});
 </script>
 <script type="text/javascript">
