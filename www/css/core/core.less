@@ -6792,12 +6792,18 @@ p.forgotten {
     padding: 7px 16px;
     overflow: hidden;
 
-    h2 {
-        background: 0;
-        text-indent: 0;
-        margin-bottom: 16px;
-        padding: 0;
+
+    h1,h2,h3 {
+      font-size: 1.2em;
+      background: none;
+      text-indent: 0;
+      margin-bottom: 16px;
+      padding: 0;
     }
+    h4 {
+      font-weight: bold;
+    }
+
 
     ul, ol {
         margin: 0 0 16px 16px;
@@ -6814,6 +6820,27 @@ p.forgotten {
         background: none;
         border: 0 !important;
         margin: 0 !important
+    }
+
+    code {
+      padding: .15em .25em;
+      font-size: .85em;
+      line-height: inherit;
+      border-radius: 2px;
+      background-color: rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.07);
+      font-family: monospace;
+    }
+
+    pre {
+      display: block;
+      padding: .15em .25em;
+      border-radius: 2px;
+      background-color: rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.07);
+      font-family: monospace;
+      word-break: break-all;
+      word-wrap: break-word;
     }
 
     &.no-pad {
