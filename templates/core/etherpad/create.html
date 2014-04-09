@@ -1,0 +1,19 @@
+<form action="/etherpad/modifyForm" method="post">
+    <input type="hidden" name='homepageId' value="{HOMEPAGE_ID}" />
+
+	<table class="standardForm table">
+		<tr>
+			<td>
+				<h4>Pad Name</h4>
+				<em>The name of the pad</em>
+			</td>
+			<td>
+				<label>
+					<input type="text" maxlength='255' name='name' value="" />
+				</label>
+			</td>
+		</tr>
+	</table>
+
+    <input type="submit" value="Create Document" class="submit-btn-plain no-marg" />
+</form>

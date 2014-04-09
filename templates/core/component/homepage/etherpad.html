@@ -2,9 +2,11 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
 
-	<ul>
+	<ul class="information-list">
 		<!-- BEGIN etherpad_pad -->
 		<li><a href='/etherpad/edit/{ETHERPAD_PAD_ID}'>{ETHERPAD_NAME}</a></li>
 		<!-- END etherpad_pad -->
 	</ul>
+
+	<a href="/etherpad/create/{ID}" class="btn create"><span></span>Create New Document</a>
 </div>
