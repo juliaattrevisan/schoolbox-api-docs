@@ -66,7 +66,7 @@ $criterionCollection = $criterionMapper->findByColumnList(
 foreach($criterionCollection as $crit) {
     if(!in_array($crit->getID(), $found)) {
         try {
-            $criterionMapper->delete($criterionMapper->findByID($crit->getID()));
+            $criterionMapper->delete($crit);
         } catch (Exception $e) {
             die('Criteria not found');
         }
