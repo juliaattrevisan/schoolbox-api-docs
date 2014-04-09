@@ -37,6 +37,18 @@ if ($authenticator->canCreate($group->getHomepageId())) {
 		$pad->lock();
 	}
 
+	/* Save pad contents to db, just in case
+	 */
+	$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
+	$getTextResult = $client->getText($pad->getPadId());
+	$response = $getTextResult->getResponse();
+
+	if ($response['message'] == 'ok') {
+		$pad->setBody($response['data']['text']);
+	}
+
+	/* Save it!
+	 */
 	$padMapper->save($pad);
 
 	$this->localRedir("/etherpad/modify/{$pad->getId()}");
