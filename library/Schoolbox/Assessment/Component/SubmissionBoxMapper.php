@@ -187,7 +187,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 
 			'this_property'  => 'category',
-			'this_property'  => 'category',
 			'other_property' => 'id',
 		));
 		$this->hasJoin('files', array(
@@ -270,7 +269,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
 		$mime_mapper     = $file_mapper->getJoinMapper('allowedFileType');
-		$notify_mapper   = $this->getJoinMapper('notify');
+//		$notify_mapper   = $this->getJoinMapper('notify');
 		$worktype_mapper = $this->getJoinMapper('work_type');
 		$marktype_mapper = $this->getJoinMapper('mark_type');
 
@@ -301,9 +300,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		}
 
 		if ($submission_box instanceof SubmissionBox) {
-			foreach ($notify_mapper->findByColumn('box_id', $submission_box->getId()) as $notify) {
-				$submission_box->addNotification($notify);
-			}
+//			foreach ($notify_mapper->findByColumn('box_id', $submission_box->getId()) as $notify) {
+//				$submission_box->addNotification($notify);
+//			}
 
 			//
 			// Get files? (This is more evidence separate file/link mapper isn't
@@ -389,10 +388,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$this->getJoinMapper('files')->save($box_file);
 			}
 		}
-		foreach ($object->getNotifications() as $notification) {
-			$notification->setSubmissionBoxId($object->getId());
-			$this->getJoinMapper('notify')->save($notification);
-		}
+//		foreach ($object->getNotifications() as $notification) {
+//			$notification->setSubmissionBoxId($object->getId());
+//			$this->getJoinMapper('notify')->save($notification);
+//		}
 	}
 
 

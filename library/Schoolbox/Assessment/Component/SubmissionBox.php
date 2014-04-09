@@ -71,11 +71,11 @@ class SubmissionBox implements ISoftDeletable {
 	 */
 	protected $file_links;
 
-	/**
-	 * @var NotificationCollection
-	 * @deprecated in favour of messaging infrastructure
-	 */
-	protected $notifications;
+//	/**
+//	 * @var NotificationCollection
+//	 * @deprecated in favour of messaging infrastructure
+//	 */
+//	protected $notifications;
 
 	/**
 	 * @var User
@@ -143,7 +143,7 @@ class SubmissionBox implements ISoftDeletable {
 	protected $deleted;
 
 	public function __construct() {
-		$this->setNotifications(new NotificationCollection(array()));
+//		$this->setNotifications(new NotificationCollection(array()));
 		$this->setFileLinks(new SubmissionBox\FileCollection(array()));
 		$this->setCategory(new Category());
 		$this->setWorkType(new WorkType());

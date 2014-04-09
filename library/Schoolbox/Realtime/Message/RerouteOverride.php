@@ -15,7 +15,7 @@ use Schoolbox\User;
 class RerouteOverride {
 
 	/** @var User */
-	protected $userId;
+	protected $user;
 
 	/** @var string */
 	protected $routeKey;
@@ -53,17 +53,17 @@ class RerouteOverride {
 	}
 
 	/**
-	 * @param User $userId
+	 * @param User $user
 	 */
-	public function setUserId($userId) {
-		$this->userId = $userId;
+	public function setUser($user) {
+		$this->user = $user;
 	}
 
 	/**
 	 * @return User
 	 */
-	public function getUserId() {
-		return $this->userId;
+	public function getUser() {
+		return $this->user;
 	}
 
 

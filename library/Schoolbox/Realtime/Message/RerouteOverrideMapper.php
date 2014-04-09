@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Message;
 
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
 class RerouteOverrideMapper extends Mapper {
@@ -31,7 +32,7 @@ class RerouteOverrideMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'msg_route_key',
 			'property'   => 'routeKey',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_STRING,
 			'identifier' => true,
 			'join'       => 'source'
 		));
@@ -48,6 +49,26 @@ class RerouteOverrideMapper extends Mapper {
 		));
 
 		return true;
+	}
+
+
+	/**
+	 * Returns a collection of overrides that match the given route and, optionally, user ID.
+	 *
+	 * @param $route
+	 * @param int $userId
+	 * @return Collection|RerouteOverride[]
+	 */
+	public function findWhereMatching($route, $userId = 0) {
+		$coll = $this->findByColumn('user_id', array(0, $userId));
+		$regex = '`'. str_replace('*','[^\.]', $route) . '`';
+
+		$coll->filterByCallback(function($override) use ($regex) {
+			/** @var RerouteOverride $override */
+			return preg_match($regex, $override->getRouteKey());
+		});
+
+		return $coll;
 	}
 
 } 
