@@ -59,7 +59,7 @@ if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId(
 	$this->setVar(array(
 		'HOMEPAGE_ID' => $group->getHomepageId(),
 		'ETHERPAD_PAD_ID' => $pad->getId(),
-		'ETHERPAD_NAME' => $pad->getName(),
+		'ETHERPAD_NAME' => $pad->getDisplayName(),
 		'ETHERPAD_URL' => "/etherpad/load/{$pad->getId()}"
 	));
 }

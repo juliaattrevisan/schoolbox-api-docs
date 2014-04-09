@@ -109,6 +109,22 @@ class Pad {
 		$this->setLock(0);
 	}
 
+	/**
+	 * Client-facing version of the name, which includes
+	 * the lock status of the pad
+	 *
+	 * @return string
+	 */
+	public function getDisplayName() {
+		$name = $this->getName();
+
+		if ($this->isLocked()) {
+			$name .= ' (Locked)';
+		}
+
+		return $name;
+	}
+
 	/* Getters/Setters
 	 */
 
