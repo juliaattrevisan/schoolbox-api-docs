@@ -670,32 +670,56 @@ Notifications
 			}
 		}
 		.msg {
+			overflow: hidden;
 			position: relative;
 			width: 100%;
 			margin: 0;
 			&.unread {
 				a {
 					background: @flyout-highlight;
+					&.action {
+						background: @flyout-highlight;
+						&:hover {
+							background: @flyout-hover-background;
+						}
+					}
 					&.pip {
 						display: inline;
 						position: absolute;
-						width: 4px;
-						height: 4px;
+						top: 0;
+						right: 0;
+						width: 0;
+						height: 0;
 						padding: 0;
+						background-color: transparent;
+						border: none;
+						border-left: 32px solid transparent;
+						border-top: 32px solid #c7c7c7;
+						border-radius: 0;
 						margin: 0;
-						right: 6px;
-						bottom: 8px;
-						border: solid 2px @border-color;
-						border-radius: 8px;
-						background: transparent;
+						&::after {
+							display: block;
+							text-align: center;
+							font-size: 14px;
+							content: "\2713";
+							color: #777;
+							position: absolute;
+							top: -29px;
+							right: 2px;
+						}
 						&:hover {
-							background-color: @submit-btn;
-							border-color: @submit-btn;
+							border-top-color: @submit-btn;
+							&::after {
+								color: #fff;
+							}
 						}
 					}
 				}
 				b {
 					font-weight: bold;
+				}
+				span {
+					margin-right: 32px;
 				}
 			}
 			a {
@@ -730,7 +754,7 @@ Notifications
 			time {
 				position: absolute;
 				bottom: 6px;
-				right: 18px;
+				right: 8px;
 				color: @mgrey;
 				font-style: italic;
 			}
