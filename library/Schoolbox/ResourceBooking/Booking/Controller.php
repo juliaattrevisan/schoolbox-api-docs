@@ -218,10 +218,13 @@ class Controller extends Base {
             // Check conflicting bookings as well for this item.
             // Only check approved bookings. Wow, the calendar population method
             // can do exactly that!
+            // I do however want to allow a booking to start at the same time
+            // that the previous booking ended.
+            // (We may need to implement a down time between bookings.)
             $conflictingBookings = $this->getBookingMapper()->findForResource(
                 $resource->getId(),
-                $startDate->getTimestamp(),
-                $endDate->getTimestamp(),
+                $startDate->getTimestamp() + 1,
+                $endDate->getTimestamp() - 1,
                 array(Status\Model::STATUS_APPROVED)
             );
             if (count($conflictingBookings)) {
