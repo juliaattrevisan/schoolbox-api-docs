@@ -42,12 +42,16 @@ if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId(
 	));
 
 	/* Set lock/unlock butonye
+	 * Provide buttons for those with Create powers
+	 * Otherwise hide them altogether
 	 */
-	if ($pad->isLocked()) {
-		$this->parse('etherpad_unlock_block', 'etherpad_unlock');
-	}
-	else {
-		$this->parse('etherpad_lock_block', 'etherpad_lock');
+	if ($authenticator->canCreate($group->getHomepageId())) {
+		if ($pad->isLocked()) {
+			$this->parse('etherpad_unlock_block', 'etherpad_unlock');
+		}
+		else {
+			$this->parse('etherpad_lock_block', 'etherpad_lock');
+		}
 	}
 
 	/* The rest of the pad
