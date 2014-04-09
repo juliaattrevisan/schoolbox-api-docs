@@ -7,7 +7,7 @@ $j(function() {
 	});
 
 	$j('.show-section-options').click(function() {
-		$j(this).parent().siblings('.question-list').children(":first-child").slideToggle();
+		$j(this).parent().siblings('.question-list').slideToggle();
 		$j(this).toggleClass('active')
 		return false;
 	});
