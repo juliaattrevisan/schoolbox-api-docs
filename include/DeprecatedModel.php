@@ -8,6 +8,10 @@
 
 require_once(dirname(__FILE__) . '/../www/conf/conf.php');
 
+/**
+ * @deprecated
+ * Class DeprecatedModel
+ */
 class DeprecatedModel
 {
 
@@ -15,26 +19,46 @@ class DeprecatedModel
 
     var $_index;
 
-    function DeprecatedModel()
+	/**
+	 * @deprecated
+	 */
+	function DeprecatedModel()
     {
         $this->db = DeprecatedDatabase::getInstance();
     }
 
-    function getByID($id)
+	/**
+	 * @deprecated
+	 * @param $id
+	 * @return array|bool|null
+	 */
+	function getByID($id)
     {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $this->_index . "` =  " . $this->db->smartQuote($id);
         return $this->db->getRow($query);
     }
 
-    function getByField($field, $id)
+	/**
+	 * @deprecated
+	 * @param $field
+	 * @param $id
+	 * @return array|bool|null
+	 */
+	function getByField($field, $id)
     {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
         return $this->db->getRow($query);
     }
 
-    function getByArray($fieldList, $termOp = 'AND')
+	/**
+	 * @deprecated
+	 * @param $fieldList
+	 * @param string $termOp
+	 * @return array|bool
+	 */
+	function getByArray($fieldList, $termOp = 'AND')
     {
         $query = "SELECT * FROM `" . $this->_table . "` WHERE ";
 
@@ -59,7 +83,15 @@ class DeprecatedModel
         }
     }
 
-    function getAllByField($field, $id, $orderBy = "", $orderDir = "")
+	/**
+	 * @deprecated
+	 * @param $field
+	 * @param $id
+	 * @param string $orderBy
+	 * @param string $orderDir
+	 * @return array|bool
+	 */
+	function getAllByField($field, $id, $orderBy = "", $orderDir = "")
     {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
@@ -69,7 +101,12 @@ class DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function getAll($order = '')
+	/**
+	 * @deprecated
+	 * @param string $order
+	 * @return array|bool
+	 */
+	function getAll($order = '')
     {
         $query = "SELECT * FROM `" . $this->_table . "`";
         if ($order) {
@@ -79,7 +116,12 @@ class DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function getIDByName($name)
+	/**
+	 * @deprecated
+	 * @param $name
+	 * @return mixed
+	 */
+	function getIDByName($name)
     {
         $query = "SELECT `" . $this->_index . "` FROM `" . $this->_table . "` WHERE name = '$name'";
         $row = $this->db->getRow($query);
@@ -89,6 +131,7 @@ class DeprecatedModel
     /**
      * Get all the rows matching multiple key/value pairs
      *
+     * @deprecated
      * @param <type> $fields
      * @return <type>
      */
@@ -111,17 +154,32 @@ class DeprecatedModel
         return false;
     }
 
-    function update($object)
+	/**
+	 * @deprecated
+	 * @param $object
+	 * @return bool|mysqli_result|resource
+	 */
+	function update($object)
     {
         return $this->db->update($this->_table, $this->_index, $object);
     }
 
-    function delete($id)
+	/**
+	 * @deprecated
+	 * @param $id
+	 * @return bool|mysqli_result|resource
+	 */
+	function delete($id)
     {
         return $this->db->delete($this->_table, $this->_index, $id);
     }
 
-    function create($object)
+	/**
+	 * @deprecated
+	 * @param $object
+	 * @return int|string
+	 */
+	function create($object)
     {
         $this->db->insert($this->_table, $object);
         return $this->db->insertID();
