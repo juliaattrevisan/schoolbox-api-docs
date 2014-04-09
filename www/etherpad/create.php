@@ -8,8 +8,19 @@
  * @version     SVN: $Id$
  */
 
-$this->setFile(TEMPLATE_content, 'etherpad/create.html');
+/* Check that you have write permissions
+ */
+$authenticator = new \Etherpad\Authenticator();
 
-$this->setVar(array(
-	'HOMEPAGE_ID' => $this->arg[0]
-));
+if ($authenticator->canCreate($this->arg[0])) {
+	$this->setFile(TEMPLATE_content, 'etherpad/create.html');
+
+	$this->setVar(array(
+		'HOMEPAGE_ID' => $this->arg[0]
+	));
+}
+else {
+	error(19);
+}
+
+

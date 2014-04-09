@@ -20,6 +20,22 @@ class Authenticator {
 	}
 
 	/**
+	 * Determine if you can create a pad for $homepageId
+	 *
+	 * @param $homepageId
+	 * @return bool
+	 */
+	public function canCreate($homepageId) {
+		$groupHandler = new \Group();
+
+		if ($groupHandler->getPermission($homepageId) > READ_ACCESS) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine if a user is part of an authoring group
 	 *
 	 * @param $groupId
