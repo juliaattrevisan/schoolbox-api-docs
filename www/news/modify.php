@@ -39,7 +39,7 @@ if (is_numeric($this->arg[0])) {
 		'NEWS_ID' => $news['item_id'],
 		'HEADING' => $news['item_heading'],
         'NEWS_IMAGE' => $news['item_image'],
-		'BODY' => $news['item_body'],
+		'BODY' => Scrub::text($news['item_body']),
 		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
 		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
 	);

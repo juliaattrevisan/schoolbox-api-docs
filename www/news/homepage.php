@@ -31,7 +31,7 @@ if(is_numeric($this->arg[0])) {
         'ACTION'      => 'Modify',
         'NEWS_ID'     => $newsItem['id'],
         'HEADING'     => $newsItem['heading'],
-        'BODY'        => $newsItem['body'],
+        'BODY'        => Scrub::text($newsItem['body']),
         'CATEGORY_ID' => $newsItem['code'],
 		'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
 		'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
