@@ -1,6 +1,9 @@
 <?php
 
-
+/**
+ * @deprecated - did this ever work??
+ * Class Event_Attendance_ServiceController
+ */
 class Event_Attendance_ServiceController extends Controller
 {
     private $calendarHandler;
