@@ -23,7 +23,7 @@ if (is_array($newsList)) {
 		$itemDate = new Alaress_Date_Format($news['item_datetime_posted'], 'U');
 
 		$output = array('ITEM_TITLE'		=> Scrub::text($news['item_heading']),
-						'ITEM_DESCRIPTION'	=> Scrub::html("<![CDATA[" ."<img src=\"/storage/image.php?hash={$news['item_image']}&size=constrain200\">". $news['item_body'] ."]]>"),
+						'ITEM_DESCRIPTION'	=> Scrub::html("<![CDATA[" . "<img src=\"" . $page->conType() . $_SERVER['HTTP_HOST'] ."/storage/image.php?hash={$news['item_image']}&size=constrain200\">". $news['item_body'] ."]]>"),
 						'ITEM_DATE'			=> $itemDate->getUsingFormat(datetime::RFC822),
 						'ITEM_LINK'			=> $page->conType() . $_SERVER['HTTP_HOST'] . '/news/item/' . $news['item_id'],
 						);
