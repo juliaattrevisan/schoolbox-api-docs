@@ -95,6 +95,20 @@ class Pad {
 		return false;
 	}
 
+	/**
+	 * Lock this pad
+	 */
+	public function lock() {
+		$this->setLock(1);
+	}
+
+	/**
+	 * Unlock this pad
+	 */
+	public function unlock() {
+		$this->setLock(0);
+	}
+
 	/* Getters/Setters
 	 */
 
