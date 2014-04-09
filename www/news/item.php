@@ -52,7 +52,7 @@ $e = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');
 
 $output = array(
     'NEWS_ID' => $article['item_id'],
-    'NEWS_TITLE' => $article['item_heading'],
+    'NEWS_TITLE' => Scrub::text($article['item_heading']),
     'NEWS_BODY' => Scrub::html($article['item_body']),
     'NEWS_IMAGE' => $article['item_image'],
     'POSTER' => $fullname,
