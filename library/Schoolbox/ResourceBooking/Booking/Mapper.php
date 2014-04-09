@@ -168,8 +168,8 @@ class Mapper extends BaseMapper {
         // Events: any event whose start <= endWindow, or end >= startWindow
         $params = array(
             'resource'    => $resourceId,
-            'startWindow' => date('Y-m-d', $fromTimestamp),
-            'endWindow'   => date('Y-m-d', $toTimestamp),
+            'startWindow' => date('Y-m-d H:i:s', $fromTimestamp),
+            'endWindow'   => date('Y-m-d H:i:s', $toTimestamp),
         );
         $params = array_merge($params, $this->getArrayParameters($statusIds, 'status'));
         $query = "
@@ -188,8 +188,11 @@ class Mapper extends BaseMapper {
             LEFT JOIN {$this->getJoinSql('reviewer',     'b', 'r')}
             WHERE b.resource_id = :resource
             AND b.deleted_at IS NULL
-            AND NOT (e.endDate < :startWindow OR e.startDate > :endWindow)
             AND s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}
+            AND NOT (
+                CONCAT(e.endDate, ' ', e.endTime) < :startWindow
+                OR CONCAT(e.startDate, ' ', e.startTime) > :endWindow
+            )
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
