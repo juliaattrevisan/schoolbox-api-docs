@@ -26,7 +26,7 @@ catch (\Exception $e) {
 
 /* If you can participate, create a session and off you go
  */
-if ($authenticator->canEdit($pad->getGroupId(), $_SESSION['user']->getId())) {
+if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId())) {
 
 	/* Find the author id
 	 */

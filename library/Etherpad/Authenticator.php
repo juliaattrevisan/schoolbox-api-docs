@@ -42,7 +42,7 @@ class Authenticator {
 	 * @param $userId
 	 * @return bool
 	 */
-	public function canEdit($groupId, $userId) {
+	public function isParticipator($groupId, $userId) {
 		$etherpadGroupMapper = new GroupMapper();
 
 		$exists = $etherpadGroupMapper->findByColumnList(array(

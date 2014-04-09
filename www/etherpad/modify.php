@@ -27,7 +27,7 @@ catch (\Exception $e) {
 /* If you can participate, create a session and off you go
  * Loade le pahde in le olde ifrayme
  */
-if ($authenticator->canEdit($pad->getGroupId(), $_SESSION['user']->getId())) {
+if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId())) {
 	$groupMapper = new \Etherpad\GroupMapper();
 	$group = $groupMapper->findByColumn('group_id', $pad->getGroupId())->first();
 
