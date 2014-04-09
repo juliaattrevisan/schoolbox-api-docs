@@ -18,6 +18,9 @@ $authenticator = new \Etherpad\Authenticator();
 $padId = $this->arg[0];
 list($groupId, $padName) = explode('$', $padId);
 
+/* Number of hours for which sessions and cookies are valid
+ */
+$duration = 1;
 
 /* If you can participate, create a session and off you go
  */
@@ -36,7 +39,7 @@ if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
 		$authorId = $response['data']['authorID'];
 
 		$validUntil = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-		$validUntil->addHours(3);
+		$validUntil->addHours($duration);
 
 		$sessionResult = $client->createSession($groupId, $authorId, $validUntil->getUnixTimestamp());
 		$response = $sessionResult->getResponse();
@@ -44,9 +47,7 @@ if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
 		if ($response['message'] == 'ok') {
 			$sessionId = $response['data']['sessionID'];
 
-			setcookie('sessionID', $sessionId, $_SERVER['REQUEST_TIME'] + 86400, '/');
-
-			$url = "http://192.168.36.10:9001/p/{$padId}";
+			setcookie('sessionID', $sessionId, $_SERVER['REQUEST_TIME'] + 60*60*$duration, '/');
 
 			/* Remember last updated time
 			 */
@@ -55,7 +56,7 @@ if ($authenticator->canEdit($groupId, $_SESSION['user']->getId())) {
 			$pad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$padMapper->save($pad);
 
-			header("Location: {$url}");
+			$this->localRedir(":9001/p/{$padId}");
 		}
 	}
 	else {
