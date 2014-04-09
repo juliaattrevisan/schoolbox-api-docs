@@ -91,7 +91,7 @@ setupCustomise = {
                     url: setupCustomise.ajaxURL,
                     data: data,
                     success: function(data){
-                        $j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
+                        $j(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
                             setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')]);
                             $j(this).animate({opacity:1}, 300);
                             /*
