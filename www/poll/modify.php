@@ -27,18 +27,17 @@ if (is_numeric($this->arg[0])) {
         'ACTION' => 'Modify',
         'POLL_ID' => $poll['pollID'],
         'CATEGORY_ID' => $poll['categoryID'],
-        'POLL_TITLE' => $poll['title'],
-        'QUESTION' => $poll['question'],
-        'OPTION_0' => $poll['option_0'],
-        'OPTION_1' => $poll['option_1'],
-        'OPTION_2' => $poll['option_2'],
-        'OPTION_3' => $poll['option_3'],
-        'OPTION_4' => $poll['option_4'],
-        'OPTION_5' => $poll['option_5'],
-        'OPTION_6' => $poll['option_6'],
-        'OPTION_7' => $poll['option_7'],
-        'OPTION_8' => $poll['option_8'],
-        'OPTION_9' => $poll['option_9'],
+        'POLL_QUESTION' => Scrub::text($poll['question']),
+        'OPTION_0' => Scrub::text($poll['option_0']),
+        'OPTION_1' => Scrub::text($poll['option_1']),
+        'OPTION_2' => Scrub::text($poll['option_2']),
+        'OPTION_3' => Scrub::text($poll['option_3']),
+        'OPTION_4' => Scrub::text($poll['option_4']),
+        'OPTION_5' => Scrub::text($poll['option_5']),
+        'OPTION_6' => Scrub::text($poll['option_6']),
+        'OPTION_7' => Scrub::text($poll['option_7']),
+        'OPTION_8' => Scrub::text($poll['option_8']),
+        'OPTION_9' => Scrub::text($poll['option_9']),
         'CLOSE' => $closeDate->getLocalShort(),
         'FREQUENCY_ONCE_SELECTED' => '',
         'FREQUENCY_HOURLY_SELECTED' => '',
@@ -55,15 +54,14 @@ if (is_numeric($this->arg[0])) {
     }
 
     $this->setFile(TEMPLATE_content, "poll/modify.html");
-    $this->setTitle('Add Poll');
+    $this->setTitle('Create Poll');
 
     $output = array(
         'ACTION' => 'Add',
         'POLL_ID' => '',
         'CATEGORY_ID' => $this->arg[1],
         'COMPONENT_HOMEPAGE_ID' => Scrub::text($this->arg[2]),
-        'POLL_TITLE' => '',
-        'QUESTION' => '',
+        'POLL_QUESTION' => '',
         'OPTION_0' => '',
         'OPTION_1' => '',
         'OPTION_2' => '',

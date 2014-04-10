@@ -16,7 +16,7 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
     $pollHandler->placeVote($_POST['pollID'], $_POST['vote']);
 
     SitePage::localRedir("/homepage/" . $_POST['categoryID']);
-} else if ($_POST['title'] && is_numeric($_POST['categoryID'])) {
+} else if ($_POST['question'] && is_numeric($_POST['categoryID'])) {
 
     /* Check permission
      */
@@ -28,7 +28,6 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
 
     $poll = array(
         'categoryID' => $_POST['categoryID'],
-        'title' => $_POST['title'],
         'question' => $_POST['question'],
         'option_0' => $_POST['option_0'],
         'option_1' => $_POST['option_1'],
@@ -55,10 +54,14 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
     /* Select this poll in the component
      */
     $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
+    $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
+                                   array(    'module'                =>'homepage',
+                                             'identifier'            => $_POST['categoryID'],
+                                             'component_definition_id'=> $cdm->getDefinitionId()));
 
     $confI = new Component_Config();
     $confI->setConfigDefinitionId($cdm->getId());
-    $confI->setInstanceId($_POST['homepageComponentID']);
+    $confI->setInstanceId($cim->getId());
     $confI->setValue($poll['pollID']);
 
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
@@ -82,15 +85,19 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
     $current = $pollHandler->getCurrentPoll($poll['categoryID']);
 
     if ($current['pollID']) {
-        $homepageHandler = new Homepage($current['categoryID']);
+        $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
 
-        $config = serialize(
-            array(
-                'pollID' => $current['pollID']
-            )
-        );
+        $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
+                                                      array(    'module'                =>'homepage',
+                                                                'identifier'            => $poll['categoryID'],
+                                                                'component_definition_id'=> $cdm->getDefinitionId()));
+        $confI = new Component_Config();
+        $confI->setConfigDefinitionId($cdm->getId());
+        $confI->setInstanceId($cim->getId());
+        $confI->setValue($current['pollID']);
 
-        $homepageHandler->updateComponentConfig(33, $config);
+        $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
+        $componentConfigInstanceMapper->save($confI);
     }
 
     SitePage::localRedir("/homepage/" . $poll['categoryID']);
