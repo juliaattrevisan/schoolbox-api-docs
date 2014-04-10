@@ -98,7 +98,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 				'HOMEPAGE_ID' => $this->instance->getIdentifier(),
 				'ETHERPAD_PAD_ID' => $currentPad->getId(),
 				'ETHERPAD_NAME' => $currentPad->getDisplayName(),
-				'ETHERPAD_CREATED_AT' => $currentPad->getCreatedAt()->getDateOnly(),
+				'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
 			));
 
 			$this->parse('etherpad_pad_block', 'etherpad_pad', true);
