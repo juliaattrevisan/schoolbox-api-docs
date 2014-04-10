@@ -23,7 +23,7 @@ class Component_Config_Poll extends Component_Config_Abstract {
         if (is_array($pollList)) {
             foreach ($pollList as $poll) {
                 $page->setVar(array(
-                    'COMPONENT_CONFIG_POLLSELECT_NAME' 		=> Scrub::text($poll['title']),
+                    'COMPONENT_CONFIG_POLLSELECT_NAME' 		=> TextFormatter::cutString(Scrub::text($poll['question']),30),
                     'COMPONENT_CONFIG_POLLSELECT_VALUE' 	=> $poll['pollID'],
                     'COMPONENT_CONFIG_POLLSELECT_SELECTED'	=> $poll['pollID'] == $configValue ? 'selected="selected"' : '',
                 ));
