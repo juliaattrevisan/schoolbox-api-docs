@@ -5,6 +5,18 @@
 	}
 </style>
 
+<script type="text/javascript">
+	$j(function() {
+		$j('[data-deleteButton="1"]').click(function(event) {
+			event.preventDefault();
+
+			if (confirm('Are you sure you want to delete this Collab Doc?')) {
+				window.location.href = $(this).attr('href');
+			}
+		});
+	});
+</script>
+
 <h1>{ETHERPAD_NAME}</h1>
 
 <span class='header_option'>
@@ -24,5 +36,5 @@
 </div>
 
 <!-- BEGIN etherpad_delete -->
-<a href='/collabdoc/delete/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='submit-btn-plain'>Delete Collab Doc</a>
+<a href='/collabdoc/delete/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' data-deletebutton="1" class='submit-btn-plain'>Delete Collab Doc</a>
 <!-- END etherpad_delete -->
