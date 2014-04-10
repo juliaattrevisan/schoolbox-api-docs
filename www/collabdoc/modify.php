@@ -58,7 +58,7 @@ if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->get
 	/* The rest of the pad
 	 */
 	$this->setVar(array(
-		'HOMEPAGE_ID' => $pad->getHomepageId(),
+		'HOMEPAGE_ID' => $this->arg[1],
 		'ETHERPAD_PAD_ID' => $pad->getId(),
 		'ETHERPAD_NAME' => $pad->getDisplayName(),
 		'ETHERPAD_URL' => "/collabdoc/load/{$pad->getId()}"

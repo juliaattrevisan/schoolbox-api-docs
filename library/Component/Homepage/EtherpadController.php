@@ -95,6 +95,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
 		foreach ($allPads as $currentPad) {
 			$this->setVar(array(
+				'HOMEPAGE_ID' => $this->instance->getIdentifier(),
 				'ETHERPAD_PAD_ID' => $currentPad->getId(),
 				'ETHERPAD_NAME' => $currentPad->getDisplayName(),
 				'ETHERPAD_CREATED_AT' => $currentPad->getCreatedAt()->getDateOnly(),
