@@ -22,6 +22,26 @@ $component = array(
 			'default_value' => 'Collab Docs',
 			'label'         => 'Heading'
 		),
+		'size' => array(
+			'default_value' => '5',
+			'label' => 'Size'
+		),
+		'src' => array(
+			'default_value' => '',
+			'label' => 'Source'
+		),
+		'sort' => array(
+			'default_value' => 'name',
+			'label' => 'Sort By'
+		),
+		'sortdir' => array(
+			'default_value' => 'asc',
+			'label' => 'Direction'
+		),
+		'compactmode' => array(
+			'default_value' => 1,
+			'label' => 'Compact Mode'
+		),
 	)
 );
 
