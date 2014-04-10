@@ -35,6 +35,8 @@ if ($authenticator->canCreate($homepageId)) {
 	 */
 	$pad->setDeletedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 	$padMapper->save($pad);
+
+	$this->localRedir("/homepage/{$pad->getHomepageId()}");
 }
 else {
 	error(19);
