@@ -46,24 +46,26 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
         $pollHandler = new Poll();
 
+        $this->setVar('show_results_block', '');
+
         if ( $this->getConfig('poll') && is_numeric($this->getConfig('poll')) ) {
             $poll = $pollHandler->getByID($this->getConfig('poll'));
 
             if ($poll['pollID']) {
                 $this->setVar(array(
                     'POLL_ID'		=> $poll['pollID'],
-                    'POLL_TITLE'	=> Scrub::text($poll['title']),
+                    'POLL_TITLE'	=> strlen(trim($this->getConfig('componentname'))) ? $this->getConfig( 'componentname') : 'Poll',
                     'POLL_QUESTION'	=> Scrub::text($poll['question']),
                 ));
 
                 $pollData = $pollHandler->getData($poll['pollID']);
 
-                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']))  {
+                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->sitepage->arg[1] == 'pollResults' )  {
+                    /* Show poll as user has voted or the poll has closed to votes */
 
                     $this->setVar(array(
                         'POLL_HEIGHT'        => count($pollData) * 30 + 70,
                         'poll_vote_block'    => '',
-                        'show_results_block' => '',
                         'response_count'     => count($pollData)
                     ));
 
@@ -94,6 +96,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                     $this->parse('poll_chart_block', 'poll_chart');
                 }
                 else {
+                    /* User has not voted yet */
                     $this->setVar('poll_options_block', '');
 
                     if (is_array($pollData)) {
@@ -117,7 +120,6 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
                     }
                     $this->setVar('poll_chart_block', '');
-                    $this->setVar('show_results_block', '');
                     $this->parse('poll_vote_block', 'poll_vote');
                 }
 
@@ -132,7 +134,6 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
             }
             else {
-                $this->setVar('show_results_block', '');
                 $this->setVar(array(
                     'POLL_ID'		=> '',
                     'POLL_TITLE'	=> 'Poll',
