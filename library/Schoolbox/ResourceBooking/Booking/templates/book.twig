@@ -156,7 +156,6 @@ $(document).ready(function() {
         },
         submitHandler: function() {
             // Consider: one pass for validation, another pass for saving
-            // reason: I can't stop the submit from running on the
             var bookingId = form.find('input[name="id"]').val()
             var repeat    = form.find('input[name="repeat"]').val()
             if (bookingId && repeat) {
@@ -168,6 +167,13 @@ $(document).ready(function() {
             }
         }
     })
+
+    // On submission attempt: clear list of errors
+    form.find('#resource-booking-save')
+        .click(function() {
+            errors = {}
+            form.valid()
+        })
 
     // Show/hide the repeat until input, depending on if a repeat is chosen.
     form.find('#repeatUntilSelect')
