@@ -122,6 +122,7 @@ if($subject) {
 }
 else {
 	$this->setVar(array(
+		'GRAPH_IS_DISPLAYED' => 0,
 		'GRAPH_JSON' => '{}',
 		'GRAPH_COLOURS' => '{}',
 		'GRAPH_XMIN' => '0',
