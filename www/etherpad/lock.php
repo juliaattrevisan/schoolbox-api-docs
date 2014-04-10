@@ -41,10 +41,10 @@ if ($authenticator->canCreate($group->getHomepageId())) {
 	 */
 	$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
 	$getTextResult = $client->getText($pad->getPadId());
-	$response = $getTextResult->getResponse();
 
-	if ($response['message'] == 'ok') {
-		$pad->setBody($response['data']['text']);
+	if ($getTextResult->getMessage() == 'ok') {
+		$data = $getTextResult->getData();
+		$pad->setBody($data['text']);
 	}
 
 	/* Save it!

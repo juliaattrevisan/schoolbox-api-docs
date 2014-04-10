@@ -35,15 +35,16 @@ if ($authenticator->canCreate($homepageId)) {
 	$groupResult = $client->createGroup();
 	$response = $groupResult->getResponse();
 
-	if ($response['message'] == 'ok') {
-		$groupId = $response['data']['groupID'];
+	if ($groupResult->getMessage() == 'ok') {
+		$data = $groupResult->getData();
+		$groupId = $data['groupID'];
 
 		/* Create a group pad
 		 */
 		$createResult = $client->createGroupPad($groupId, $padName);
 		$response = $createResult->getResponse();
 
-		if ($response['message'] == 'ok') {
+		if ($createResult->getMessage() == 'ok') {
 			$userMapper = new \Schoolbox\UserMapper();
 			$allUsers = new \Schoolbox\Collection();
 
@@ -74,7 +75,8 @@ if ($authenticator->canCreate($homepageId)) {
 			/* Get pad id to set to private and to passs it as a redirect element.
 			 * Note that padId's come in the form g.abcdefg$padName
 			 */
-			$padId = $response['data']['padID'];
+			$data = $createResult->getData();
+			$padId = $data['padID'];
 
 			/* Must pass strings to change the status - like the rest of this box
 			 * https://github.com/ether/etherpad-lite/issues/561

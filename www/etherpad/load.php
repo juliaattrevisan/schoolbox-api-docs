@@ -37,14 +37,14 @@ if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId(
 
 	/* Spawn a session and redirect to the actual edit url
 	 */
-	if ($response['message'] == 'ok') {
+	if ($createResult->getMessage() == 'ok') {
 		$etherpadSession = new \Etherpad\Session();
 
 		$sessionResult = $client->createSession($pad->getGroupId(), $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
-		$response = $sessionResult->getResponse();
+		$data = $sessionResult->getData();
 
-		if ($response['message'] == 'ok') {
-			$etherpadSession->generateCookie($response['data']['sessionID']);
+		if ($sessionResult->getMessage() == 'ok') {
+			$etherpadSession->generateCookie($data['sessionID']);
 
 			/* Remember last updated time
 			 */
@@ -64,10 +64,10 @@ if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId(
 			}
 			else if ($pad->isLocked()) {
 				$readonlyResult = $client->getReadOnlyID($pad->getPadId());
-				$response = $readonlyResult->getResponse();
+				$data = $readonlyResult->getData();
 
-				if ($response['message'] = 'ok') {
-					$this->localRedir(":9001/p/{$response['data']['readOnlyID']}");
+				if ($response->getMessage() == 'ok') {
+					$this->localRedir(":9001/p/{$data['readOnlyID']}");
 				}
 			}
 		}
