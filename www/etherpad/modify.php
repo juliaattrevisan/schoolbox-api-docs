@@ -32,10 +32,12 @@ if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->get
 
 	$this->setBlock(TEMPLATE_content, 'etherpad_lock', 'etherpad_lock_block');
 	$this->setBlock(TEMPLATE_content, 'etherpad_unlock', 'etherpad_unlock_block');
+	$this->setBlock(TEMPLATE_content, 'etherpad_delete', 'etherpad_delete_block');
 
 	$this->setVar(array(
 		'etherpad_lock_block' => '',
-		'etherpad_unlock_block' => ''
+		'etherpad_unlock_block' => '',
+		'etherpad_delete_block' => '',
 	));
 
 	/* Set lock/unlock butonye
@@ -49,6 +51,8 @@ if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->get
 		else {
 			$this->parse('etherpad_lock_block', 'etherpad_lock');
 		}
+
+		$this->parse('etherpad_delete_block', 'etherpad_delete');
 	}
 
 	/* The rest of the pad
