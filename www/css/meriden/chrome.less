@@ -165,17 +165,26 @@ background: @banner-background;
     left: 6px;
   }
 
-  #search-field{
-    padding: 2px 0 0 10px;
-    width: 246px;
-    height: 30px;
-  }
+  #search{
+    ::-webkit-input-placeholder {color: @banner-background;}
+    :-moz-placeholder { /* Firefox 18- */color: @banner-background;}
+    ::-moz-placeholder { /* Firefox 19+ */ color: @banner-background;}
+    :-ms-input-placeholder {color: @banner-background;}
 
-  #search-button{
-    background: url("/images/meriden/search-button.png") no-repeat 1px 9px;
-    top: 0;
-    right: 0;
-    left: auto;
+    #search-field{
+      background: #fff;
+      color: @banner-background;
+      padding: 2px 0 0 10px;
+      width: 246px;
+      height: 30px;
+    }
+
+    #search-button{
+      background: url("/images/meriden/search-button.png") no-repeat 1px 9px;
+      top: 0;
+      right: 0;
+      left: auto;
+    }
   }
 }
 
