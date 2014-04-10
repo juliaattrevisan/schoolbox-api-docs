@@ -354,81 +354,22 @@ class PageMapper extends Schoolbox\Mapper {
 	 * @return array
 	 */
 	public function findPublishablePages($user_id) {
-		$definition_list = \Component_DefinitionMapper::getInstance()->findIn(
-			'class',
-			array(
-				'Component_Eportfolio_FileListController',
-				'Component_Eportfolio_ImageListController',
-			)
-		);
-		$pages = array();
-		foreach ($definition_list as $definition) {
-			$pages = array_merge($pages, $this->findAvailablePages($user_id, $definition));
-		}
-		//
-		// Currently don't care about component list, only a unique list of pages.
+		$query = "
+			SELECT DISTINCT {$this->getColumnString('p')}
+			FROM {$this->getTable()} p
+			INNER JOIN component_instance ci ON p.page_id = ci.identifier AND ci.module='eportfolio'
+			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
+			WHERE p.uid = :userId
+			AND   p.deleted_at IS NULL
+			AND   cd.class IN ('Component_Eportfolio_FileListController', 'Component_Eportfolio_ImageListController')
+		";
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->bindValue('userId', $user_id);
+		$statement->execute();
 		$return = array();
-		foreach ($pages as $page) {
-			unset($page['componentList']);
-			$return[$page['page']->getPageId()] = $page;
+		foreach ($this->hydrateList($statement, 'p') as $page) {
+			$return[$page->getPageId()] = array('page' => $page);
 		}
 		return $return;
-	}
-
-	/**
-	 * Find all the user's pages with a particular component on it
-	 *
-	 * @param int                  $userId
-	 * @param Component_Definition $componentDefinition
-	 *
-	 * @return array
-	 */
-	public function findAvailablePages($userId, $componentDefinition) {
-		$pageData = array();
-		$pageIds = array();
-
-		$allComponents = \Component_InstanceMapper::getInstance()->findByDefinition(
-			'eportfolio', $componentDefinition->getId()
-		);
-
-		/* Get a list of pages which have File List components
-		 */
-		if (is_array($allComponents) && count($allComponents)) {
-			foreach($allComponents as $currentComponent) {
-				/* @var $currentComponent \Component_Instance */
-				$pageIds[] = $currentComponent->getIdentifier();
-			}
-
-			$allPages = \Eportfolio\PageMapper::getInstance()->findIn('page_id', $pageIds);
-
-			/* Then associate each page with their components
-			 */
-			if ($allPages->count()) {
-				foreach ($allPages as $currentPage) {
-					/* @var $currentPage \Eportfolio\Page */
-					$componentList = array();
-
-					/* Only get this user's pages
-					 */
-					if (($currentPage->getUid() == $userId) && ($currentPage->getDeletedAt() == null)) {
-						foreach ($allComponents as $currentComponent) {
-							if ($currentComponent->getIdentifier() == $currentPage->getPageId()) {
-								$componentList[] = $currentComponent;
-							}
-						}
-
-						/* Throw it all into some arbitrary array
-						 * We're going to do this the poopy way
-						 */
-						$pageData[] = array(
-							'page' => $currentPage,
-							'componentList' => $componentList
-						);
-					}
-				}
-			}
-		}
-
-		return $pageData;
 	}
 }
