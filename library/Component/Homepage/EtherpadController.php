@@ -60,7 +60,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 	   foreach($allPads as $currentPad) {
 		   $this->setVar(array(
 			   'ETHERPAD_PAD_ID' => $currentPad->getId(),
-			   'ETHERPAD_NAME' => $currentPad->getName(),
+			   'ETHERPAD_NAME' => $currentPad->getDisplayName(),
 			   'ETHERPAD_CREATED_AT' => $currentPad->getCreatedAt()->getDateOnly(),
 		   ));
 
