@@ -3,41 +3,42 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage();
 $groupHandle = new Group();
-$blogHandle  = new Blog();
 
-if (isset($_POST['delete'])) {
-	$blogHandle->delete($_POST['blogID']);
-	$page->backToTheFuture(2);
+if(($permission = $groupHandle->getPermission($_POST['cid'])) < WRITE_ACCESS) {
+	error(19);
 }
-else if (!empty($_POST['heading']) ) {
-	if (($permission = $groupHandle->getPermission($_POST['cid'])) < WRITE_ACCESS) {
-		error(19);
-	}
 
-	$blog = array(
-		'heading' => $_POST['heading'],
-		'body' => $_POST['body'],
-	);
-
-	/* Update existing, check ownership
-	 */
-	if ($_POST['blogID']) {
-		if (!$blogHandle->permission($_POST['blogID'])) {
-			error(23);
-		}
-
-		$blog['id'] = $_POST['blogID'];
-		$blogHandle->update($blog);
-	}
-	/* Create new blog
-	 */
-	else {
-		$blog['cid'] = $_POST['cid'];
-		$blogHandle->create($blog);
-	}
-
-	SitePage::localRedir('/homepage/'.$_POST['cid']);
+if(is_numeric($_POST['blogID'])) {
+	$blog = \Schoolbox\Blog\BlogMapper::getInstance()->findById($_POST['blogID']);
 }
 else {
-	error(1);
+	$cat = new \Schoolbox\Resource\Category();
+	$cat->setId($_POST['cid']);
+
+	$blog = new \Schoolbox\Blog\Blog();
+	$blog
+		->setOwner($_SESSION['user'])
+		->setCategory($cat);
 }
+
+if(isset($_POST['delete'])) {
+	try {
+		\Schoolbox\Blog\BlogMapper::getInstance()->delete($blog);
+		$page->backToTheFuture(2);
+	}
+	catch(\Schoolbox\Mapper\Exception $e) {
+		// no blog by that ID exists
+		error(41);
+	}
+}
+elseif(empty($_POST['heading'])) {
+	error(2);
+}
+
+$blog
+	->setHeading($_POST['heading'])
+	->setBody($_POST['body']);
+
+\Schoolbox\Blog\BlogMapper::getInstance()->save($blog);
+
+SitePage::localRedir('/homepage/'.$_POST['cid']);
