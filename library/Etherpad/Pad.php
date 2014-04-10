@@ -9,9 +9,9 @@
  */
 
 namespace Etherpad;
+use Schoolbox\ISoftDeletable;
 
-
-class Pad {
+class Pad implements ISoftDeletable {
 
 	/**
 	 * Identifier
@@ -65,23 +65,23 @@ class Pad {
 	/**
 	 * Created at
 	 *
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
-	private $createdAt = '';
+	private $createdAt = null;
 
 	/**
 	 * Updated at
 	 *
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
-	private $updatedAt = '';
+	private $updatedAt = null;
 
 	/**
 	 * Deleted at
 	 *
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
-	private $deletedAt = '';
+	private $deletedAt = null;
 
 	/**
 	 * Constructor
@@ -130,6 +130,13 @@ class Pad {
 		}
 
 		return $name;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function isDeleted() {
+		return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
 	}
 
 	/* Getters/Setters

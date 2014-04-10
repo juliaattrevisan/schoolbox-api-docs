@@ -82,5 +82,7 @@ class PadMapper extends \Schoolbox\Mapper {
 			'property'   => 'deletedAt',
 			'type'       => self::TYPE_DATETIME,
 		));
+
+		$this->hasSoftDeleteDateField('deleted_at');
 	}
 }

@@ -26,6 +26,15 @@ $authenticator = new \Etherpad\Authenticator();
 
 if ($authenticator->canCreate($homepageId)) {
 
+	/* Delete it
+	 */
+	$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
+	$client->deletePad($pad->getPadId());
+
+	/* Soft delete it
+	 */
+	$pad->setDeletedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+	$padMapper->save($pad);
 }
 else {
 	error(19);
