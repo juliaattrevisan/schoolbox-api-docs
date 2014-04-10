@@ -10,16 +10,16 @@
 require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $component = array(
-	'name'               => 'Collaborative Documents',
+	'name'               => 'Collab Docs',
 	'module'             => 'homepage',
 	'component_category' => '2',
 	'class'              => 'Component_Homepage_EtherpadController',
-	'description'        => 'A pad in the ether',
+	'description'        => 'Create documents with simultaneous multiple authors and real-time editing',
 	'multiple'           => 'false',
 	'visible'            => 'true',
 	'config'             => array(
 		'componentname'  => array(
-			'default_value' => 'Collaborative Documents',
+			'default_value' => 'Collab Docs',
 			'label'         => 'Heading'
 		),
 	)

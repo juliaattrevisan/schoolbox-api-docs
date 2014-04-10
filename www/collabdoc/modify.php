@@ -61,7 +61,7 @@ if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->get
 		'HOMEPAGE_ID' => $pad->getHomepageId(),
 		'ETHERPAD_PAD_ID' => $pad->getId(),
 		'ETHERPAD_NAME' => $pad->getDisplayName(),
-		'ETHERPAD_URL' => "/etherpad/load/{$pad->getId()}"
+		'ETHERPAD_URL' => "/collabdoc/load/{$pad->getId()}"
 	));
 }
 else {

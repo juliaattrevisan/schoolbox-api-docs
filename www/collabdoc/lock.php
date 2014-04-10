@@ -48,7 +48,7 @@ if ($authenticator->canCreate($pad->getHomepageId())) {
 	 */
 	$padMapper->save($pad);
 
-	$this->localRedir("/etherpad/modify/{$pad->getId()}");
+	$this->localRedir("/collabdoc/modify/{$pad->getId()}");
 }
 else {
 	error(19);
