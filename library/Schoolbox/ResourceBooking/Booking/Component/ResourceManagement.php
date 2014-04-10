@@ -12,7 +12,7 @@
 namespace Schoolbox\ResourceBooking\Booking\Component;
 
 use Component_Dashboard_ControllerAbstract;
-use Schoolbox\Column\Collection;
+use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Booking;
 use Aura\Di;
 use Twig_Environment;
@@ -54,7 +54,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         return true;
     }
 
-    public function renderTemplate ($templateHandle) {
+    public function renderTemplate($templateHandle) {
 
         // Don't mess about with blocks, shove this into Twig
         if (!$this->loadTemplate($templateHandle, 'resourceManagement')) {
