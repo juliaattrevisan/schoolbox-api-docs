@@ -558,7 +558,18 @@ class External_Synergetic_User implements External_UserInterface {
 		if (empty($synergyID)) {
 			return false;
 		}
+
+        /* Temporarily switch the filesemester to the requested user */
+        $originalFileSemester = $_SESSION['FileSemester'];
+        $originalFileYear = $_SESSION['FileYear'];
+        if($synergyID != $_SESSION['sid']) {
+            $this->getCurrentSemester($synergyID);
+        }
+
 		if (!isset($_SESSION['FileSemester']) || !isset($_SESSION['FileYear'])) {
+            /* Return filesemester to original state */
+            $_SESSION['FileSemester'] = $originalFileSemester;
+            $_SESSION['FileYear'] = $originalFileYear;
 			return false;
 		}
 
@@ -616,6 +627,10 @@ class External_Synergetic_User implements External_UserInterface {
 				'campusCode' => $subject['ClassCampus']
 			);
 		}
+
+        /* Return filesemester to original state */
+        $_SESSION['FileSemester'] = $originalFileSemester;
+        $_SESSION['FileYear'] = $originalFileYear;
 
 		if (is_array($subjectList)) {
 			return $subjectList;
