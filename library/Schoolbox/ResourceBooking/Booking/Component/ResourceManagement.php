@@ -45,7 +45,11 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         $days      = max(1, $this->getConfig('days'));
         $startTime = strtotime("00:00",            $_SERVER['REQUEST_TIME']);
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
-        // Default to showing only
+
+        // Default to showing only items I have moderator permission for.
+        // We know the rules:
+        // use AuthChecker->check('resourceBooking.approve', {id: booking.id})
+        // Cache the booking, too, so I don't fetch it every single check.
         $this->bookings = $this->bookingMapper->findForTimespan(
             $startTime,
             $endTime,
@@ -77,7 +81,10 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
             'COMPONENT_CONTENT',
             $this->templateEngine->render(
                 '@resourceBooking/component/resourceManagement.twig',
-                array('bookings' => $bookings)
+                array(
+                    'bookings' => $bookings,
+                    'config'   => $this->getConfig(),
+                )
             )
         );
         return true;
