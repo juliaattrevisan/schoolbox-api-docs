@@ -108,8 +108,8 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $submission
         ->setCategory($category)
         ->setOpenDate(new Alaress_Date_Format(new DateTime('00:00:00')))
-        ->setDueDate(new Alaress_Date_Format(new DateTime('23:59:59')))
-        ->setLateDate(new Alaress_Date_Format(new DateTime('+1 day 23:59:59')))
+        ->setDueDate(new Alaress_Date_Format(new DateTime('+1 day 23:59:59')))
+        ->setLateDate(new Alaress_Date_Format(new DateTime('+2 day 23:59:59')))
         ->setWorkType(new SubmissionBox\WorkType())
         ->setMarkType(new SubmissionBox\MarkType())
         ->setMarkVisibility(Config::get('submission_access'))
