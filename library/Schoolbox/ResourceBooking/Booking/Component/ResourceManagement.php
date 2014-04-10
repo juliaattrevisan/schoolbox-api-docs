@@ -61,6 +61,14 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
             return false;
         }
 
+        $util     = new Booking\Util\EventConverter();
+        $bookings = $this->bookings->map(function($item) use($util) {
+            return array(
+                'booking' => $item,
+                'event'   => $util->convertEventToCalendarEvent($item->getEvent()),
+            );
+        });
+
         // Where do I get a Twig loader from?
         // I should get the dependency injected one, but that means getting the
         // global DI container.
@@ -69,7 +77,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
             'COMPONENT_CONTENT',
             $this->templateEngine->render(
                 '@resourceBooking/component/resourceManagement.twig',
-                array('bookings' => $this->bookings)
+                array('bookings' => $bookings)
             )
         );
         return true;

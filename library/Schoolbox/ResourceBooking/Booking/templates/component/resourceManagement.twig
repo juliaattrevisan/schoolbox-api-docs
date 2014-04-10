@@ -3,16 +3,15 @@
     <h2><a href="/calendar/full/{CALENDAR_DATE}/#week">Calendar <span>- {DATE}</span></a></h2>
     #}
     <ul class="js_happening">
-        {% for booking in bookings %}
+        {% for item in bookings %}
         <li class="{% if loop.index0 is even %}dark{% endif %} clearfix">
             <span class="eventListing">
                 <strong>
-                    {{ booking.event.startDate }} {{ booking.event.startTime }} -
-                    {{ booking.event.endDate }} {{ booking.event.endTime }}
+                    {{ item.event.eventSpan|raw }}
                 </strong>
                 <span>
-                    {{ booking.resource.category.name }} -
-                    {{ booking.resource.name }}
+                    {{ item.booking.resource.category.name }} -
+                    {{ item.booking.resource.name }}
                 </span>
             </span>
 
