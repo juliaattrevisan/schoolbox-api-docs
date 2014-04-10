@@ -24,7 +24,7 @@ catch (\Exception $e) {
  */
 $authenticator = new \Etherpad\Authenticator();
 
-if ($authenticator->canCreate($homepageId)) {
+if ($authenticator->canCreate($pad->getHomepageId())) {
 
 	/* Delete it
 	 */
@@ -36,7 +36,7 @@ if ($authenticator->canCreate($homepageId)) {
 	$pad->setDeletedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 	$padMapper->save($pad);
 
-	$this->localRedir("/homepage/{$pad->getHomepageId()}");
+	$this->localRedir("/homepage/{$this->arg[1]}");
 }
 else {
 	error(19);
