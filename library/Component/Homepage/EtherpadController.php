@@ -72,11 +72,21 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 			'etherpad_pad_block' => ''
 		));
 
+		/* Decide which homepage to stream from
+		 */
+		if (is_numeric($this->getConfig('src'))) {
+			$homepageSource = $this->getConfig('src');
+		}
+		else {
+			$homepageSource = $this->instance->getIdentifier();
+		}
+
 		/* Find all the pads associated with this list of groups
+		 * Apply all the component powers
 		 */
 		$padMapper = new \Etherpad\PadMapper();
 
-		$allPads = $padMapper->findByColumn('homepage_id', $this->instance->getIdentifier(), array(
+		$allPads = $padMapper->findByColumn('homepage_id', $homepageSource, array(
 			'order' => array(
 				$this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir')
 			),
