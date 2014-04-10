@@ -14,9 +14,18 @@
                     {{ item.booking.resource.category.name }} -
                     {{ item.booking.resource.name }}
                 </span>
+
+                {# User: requested by and for could be different. #}
                 <span>
+                {% if item.booking.event.owner.id != item.booking.event.author.id %}
+                    requested for
+                    {% include 'sub/userLink.twig' with {user: item.booking.event.owner} %}
+                    by
+                    {% include 'sub/userLink.twig' with {user: item.booking.event.author} %}
+                {% else %}
                     requested by
                     {% include 'sub/userLink.twig' with {user: item.booking.event.owner} %}
+                {% endif %}
                 </span>
 
                 {##
