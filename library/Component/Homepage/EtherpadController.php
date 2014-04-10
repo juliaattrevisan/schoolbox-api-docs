@@ -10,12 +10,46 @@
  */
 class Component_Homepage_EtherpadController extends Component_Homepage_ControllerAbstract {
 
+	/**
+	 * The sort options made available to the dropdown
+	 *
+	 * @var array
+	 */
+	protected $sortFields = array();
+
+	/**
+	 * Map human-friendly versions to db-friendly versions
+	 *
+	 * @var array
+	 */
+	private $sortMapping = array(
+		'Name' => 'name',
+		'Created' => 'created_at',
+		'Last Updated' => 'updated_at',
+	);
+
+	/**
+	 * Get sort key to be used in query, translated from human-friendly
+	 *
+	 * @param $key
+	 * @return string
+	 */
+	private function getSortKey($key) {
+		if (array_key_exists($key, $this->getSortMapping())) {
+			return $this->sortMapping[$key];
+		}
+
+		return 'name';
+	}
+
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
     public function execute() {
+		$this->setSortFields(array('Name', 'Created', 'Last Updated'));
+
         return true;
     }
 
@@ -25,35 +59,70 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 	 * @param String $templateHandle
 	 * @return bool
 	 */
-   public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'etherpad')) {
-            return false;
-        }
+	public function renderTemplate($templateHandle) {
+		if (!parent::loadTemplate($templateHandle, 'etherpad')) {
+			return false;
+		}
 
-	   $this->parseConfig();
+		$this->parseConfig();
 
-	   $this->setBlock($templateHandle, 'etherpad_pad', 'etherpad_pad_block');
+		$this->setBlock($templateHandle, 'etherpad_pad', 'etherpad_pad_block');
 
-	   $this->setVar(array(
-		   'etherpad_pad_block' => ''
-	   ));
+		$this->setVar(array(
+			'etherpad_pad_block' => ''
+		));
 
-	   /* Find all the pads associated with this list of groups
-	    */
-	   $padMapper = new \Etherpad\PadMapper();
+		/* Find all the pads associated with this list of groups
+		 */
+		$padMapper = new \Etherpad\PadMapper();
 
-	   $allPads = $padMapper->findByColumn('homepage_id', $this->instance->getIdentifier());
+		$allPads = $padMapper->findByColumn('homepage_id', $this->instance->getIdentifier(), array(
+			'order' => array(
+				$this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir')
+			),
+			'limit' => $this->getConfig('size')
+		));
 
-	   foreach($allPads as $currentPad) {
-		   $this->setVar(array(
-			   'ETHERPAD_PAD_ID' => $currentPad->getId(),
-			   'ETHERPAD_NAME' => $currentPad->getDisplayName(),
-			   'ETHERPAD_CREATED_AT' => $currentPad->getCreatedAt()->getDateOnly(),
-		   ));
+		foreach ($allPads as $currentPad) {
+			$this->setVar(array(
+				'ETHERPAD_PAD_ID' => $currentPad->getId(),
+				'ETHERPAD_NAME' => $currentPad->getDisplayName(),
+				'ETHERPAD_CREATED_AT' => $currentPad->getCreatedAt()->getDateOnly(),
+			));
 
-		   $this->parse('etherpad_pad_block', 'etherpad_pad', true);
-	   }
+			$this->parse('etherpad_pad_block', 'etherpad_pad', true);
+		}
 
-       return true;
-   }
+		return true;
+    }
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set sort fields
+	 *
+	 * @param array $sortFields
+	 */
+	protected function setSortFields($sortFields) {
+		$this->sortFields = $sortFields;
+	}
+
+	/**
+	 * Set sort mapping
+	 *
+	 * @param array $sortMapping
+	 */
+	private function setSortMapping($sortMapping) {
+		$this->sortMapping = $sortMapping;
+	}
+
+	/**
+	 * Get sort mapping
+	 *
+	 * @return array
+	 */
+	private function getSortMapping() {
+		return $this->sortMapping;
+	}
 }
