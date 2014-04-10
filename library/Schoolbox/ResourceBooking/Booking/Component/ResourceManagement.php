@@ -13,15 +13,14 @@ namespace Schoolbox\ResourceBooking\Booking\Component;
 
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\Column\Collection;
-use Schoolbox\ResourceBooking\Booking\Mapper;
+use Schoolbox\ResourceBooking\Booking;
 use Aura\Di;
-use Schoolbox\ResourceBooking\Booking\Model;
 use Twig_Environment;
 
 class ResourceManagement extends Component_Dashboard_ControllerAbstract {
 
     /**
-     * @var Mapper
+     * @var Booking\Mapper
      */
     protected $bookingMapper;
 
@@ -31,7 +30,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
     protected $templateEngine;
 
     /**
-     * @var Collection|Model[]
+     * @var Collection|Booking\Model[]
      */
     protected $bookings;
 
@@ -39,14 +38,19 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         /** @var Di\ContainerInterface $di */
         global $di;
         $this->templateEngine = $di->get('templateEngine');
-        $this->bookingMapper  = Mapper::getInstance();
+        $this->bookingMapper  = Booking\Mapper::getInstance();
 
         // Get next few days of bookings
         // Get only bookings for the current user
         $days      = max(1, $this->getConfig('days'));
         $startTime = strtotime("00:00",            $_SERVER['REQUEST_TIME']);
-        $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);;
-        $this->bookings = $this->bookingMapper->findForTimespan($startTime, $endTime);
+        $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
+        // Default to showing only
+        $this->bookings = $this->bookingMapper->findForTimespan(
+            $startTime,
+            $endTime,
+            array(Booking\Status\Model::STATUS_PENDING)
+        );
         return true;
     }
 
