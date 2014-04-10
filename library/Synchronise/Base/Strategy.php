@@ -490,6 +490,7 @@ abstract class Synchronise_Base_Strategy {
 	 */
 	public function setupUserDetails($external_user) {
 		$newUser = array();
+
 		if ($this->hasHydrator()) {
 			foreach ($this->getHydratorList() as $hydrator) {
                 try {
@@ -499,6 +500,7 @@ abstract class Synchronise_Base_Strategy {
                     return false;
                 }
 			}
+
 			return $newUser;
 		}
 		$newUser['username']             = $this->getUsernameFromUser($external_user);
