@@ -82,8 +82,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
             $this->templateEngine->render(
                 '@resourceBooking/component/resourceManagement.twig',
                 array(
-                    'bookings' => $bookings,
-                    'config'   => $this->getConfig(),
+                    'bookings'  => $bookings,
+                    'component' => $this,
                 )
             )
         );
