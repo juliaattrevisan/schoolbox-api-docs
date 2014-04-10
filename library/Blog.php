@@ -48,6 +48,7 @@ class Blog extends DeprecatedModel {
     /**
      * Get all the blogs for a category in a particular year.
      *
+     * @deprecated use \Schoolbox\Blog\BlogMapper::findByField('cid')->filterBy()
      * @param <type> $cid
      * @return <type>
      */
@@ -63,6 +64,13 @@ class Blog extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Blog\BlogMapper::findByField('cid')->filterBy()
+	 * @param $cid
+	 * @param $year
+	 * @param $month
+	 * @return array|bool
+	 */
 	public function getByYearAndMonth ($cid, $year, $month) {
 		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
@@ -78,6 +86,7 @@ class Blog extends DeprecatedModel {
 	/**
 	 * Returns a list of years and months which have blog posts
 	 *
+	 * deprecated use \Schoolbox\Blog\BlogMapper::getOccupiedDateList()
 	 * @param Integer $categoryId
 	 * @return Array|Bool
 	 */

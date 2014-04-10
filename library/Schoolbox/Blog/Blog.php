@@ -74,7 +74,7 @@ class Blog {
 
 
 	/**
-	 * @param int $owner
+	 * @param User $owner
 	 * @return self
 	 */
 	public function setOwner($owner) {
@@ -84,7 +84,7 @@ class Blog {
 
 
 	/**
-	 * @return int
+	 * @return User
 	 */
 	public function getOwner() {
 		return $this->owner;

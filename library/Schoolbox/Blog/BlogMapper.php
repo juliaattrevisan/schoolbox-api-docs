@@ -10,10 +10,18 @@
 namespace Schoolbox\Blog;
 
 
+use PDO;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Searchable;
+use Schoolbox\User;
+use Schoolbox\UserAccess;
 
-class BlogMapper extends Mapper {
+class BlogMapper extends Mapper implements Searchable {
 
+	/**
+	 * @return void
+	 */
 	protected function mapping() {
 		$this->hasTable('blog');
 		$this->hasModel('\Schoolbox\Blog');
@@ -75,7 +83,100 @@ class BlogMapper extends Mapper {
 			'other_key' => 'id'
 		));
 
+		$this->hasJoin('perms', array(
+			'mapper'    => '\Schoolbox\Permission\Access\RoleAccessMapper',
+			'this_key'  => 'cid',
+			'other_key' => 'cid'
+		));
+
+		$this->hasJoin('userAccess', array(
+			'mapper'    => '\Schoolbox\Permission\Access\UserAccessMapper',
+			'this_key'  => 'cid',
+			'other_key' => 'sid'
+		));
+
 		$this->hasSoftDeleteDateField('deleted');
 	}
 
-} 
+
+	/**
+	 * Returns a list of years and months which have blog posts
+	 *
+	 * @param int $categoryId
+	 * @return array
+	 */
+	public function getOccupiedDateList($categoryId) {
+		$stmt = $this->database->prepare("
+			SELECT YEAR(`created`) as 'year', `created`, MONTH(`created`) as 'month'
+			FROM {$this->getTable()}
+			WHERE `cid` = :cid
+			GROUP BY `year` DESC, `month` DESC
+		");
+
+		$stmt->execute(array('cid' => $categoryId));
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * Performs a search with the given parameters, and returns a Collection of the resultant set.
+	 *
+	 * @param User $user
+	 * @param string $keyword
+	 * @param int $offset
+	 * @param int $limit
+	 * @param string $sortProperty
+	 * @param string $sortDirection
+	 * @return Collection
+	 */
+	public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC') {
+
+		$sortBy = isset($this->map[$sortProperty]) ? $this->map[$sortProperty]['field'] : $this->identifier['field'];
+		$sortDir = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
+
+		$offset = (int)$offset;
+		$limit = (int)$limit;
+
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('b')},
+				{$this->getJoinMapper('user')->getColumnString('u')},
+				{$this->getJoinMapper('category')->getColumnString('c')}
+				MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
+			FROM
+				`{$this->getTable()}`
+				LEFT JOIN {$this->getJoinSql('user',     'b', 'u')}
+				LEFT JOIN {$this->getJoinSql('category', 'b', 'c')}
+				LEFT JOIN {$this->getJoinSql('perms',    'b', 'p')}
+					AND p.gid = :role_id
+					AND p.type > :min_access
+				LEFT JOIN {$this->getJoinSql('userAccess', 'b', 'a')}
+					AND a.service = :service
+					AND a.uid = :user_id
+			WHERE
+				(p.cid OR a.sid)
+				AND b.deleted IS NULL
+				AND MATCH(`heading`,`body`) AGAINST (:keyword)
+			ORDER BY $sortBy $sortDir
+			LIMIT $offset, $limit
+		");
+
+		$stmt->execute(array(
+			'keyword'    => $keyword,
+			'role_id'    => $user->getRole()->getId(),
+			'service'    => UserAccess::SERVICE_HOMEPAGE,
+			'min_access' => UserAccess::ACCESS_READ,
+			'user_id'    => $user->getId()
+		));
+
+		$collection = $this->createCollection();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			$collection->add(
+				$this->hydrate($r, 'b')
+					->setOwner($this->hydrateJoin($r, 'user', 'u'))
+					->setCategory($this->hydrateJoin($r, 'category', 'c'))
+			);
+		}
+
+	}
+}
