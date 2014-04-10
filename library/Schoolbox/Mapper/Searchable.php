@@ -11,6 +11,7 @@ namespace Schoolbox\Mapper;
 
 
 use Schoolbox\Collection;
+use Schoolbox\User;
 
 interface Searchable {
 
@@ -19,6 +20,7 @@ interface Searchable {
 	/**
 	 * Performs a search with the given parameters, and returns a Collection of the resultant set.
 	 *
+	 * @param User $user
 	 * @param string $keyword
 	 * @param int $offset
 	 * @param int $limit
@@ -26,6 +28,6 @@ interface Searchable {
 	 * @param string $sortDirection
 	 * @return Collection
 	 */
-	public function search($keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC');
+	public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC');
 
 } 
