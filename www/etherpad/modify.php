@@ -27,10 +27,7 @@ catch (\Exception $e) {
 /* If you can participate, create a session and off you go
  * Loade le pahde in le olde ifrayme
  */
-if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId())) {
-	$groupMapper = new \Etherpad\GroupMapper();
-	$group = $groupMapper->findByColumn('group_id', $pad->getGroupId())->first();
-
+if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->getId())) {
 	$this->setFile(TEMPLATE_content, 'etherpad/modify.html');
 
 	$this->setBlock(TEMPLATE_content, 'etherpad_lock', 'etherpad_lock_block');
@@ -45,7 +42,7 @@ if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId(
 	 * Provide buttons for those with Create powers
 	 * Otherwise hide them altogether
 	 */
-	if ($authenticator->canCreate($group->getHomepageId())) {
+	if ($authenticator->canCreate($pad->getHomepageId())) {
 		if ($pad->isLocked()) {
 			$this->parse('etherpad_unlock_block', 'etherpad_unlock');
 		}
@@ -57,7 +54,7 @@ if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId(
 	/* The rest of the pad
 	 */
 	$this->setVar(array(
-		'HOMEPAGE_ID' => $group->getHomepageId(),
+		'HOMEPAGE_ID' => $pad->getHomepageId(),
 		'ETHERPAD_PAD_ID' => $pad->getId(),
 		'ETHERPAD_NAME' => $pad->getDisplayName(),
 		'ETHERPAD_URL' => "/etherpad/load/{$pad->getId()}"

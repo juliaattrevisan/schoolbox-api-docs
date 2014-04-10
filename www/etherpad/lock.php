@@ -26,10 +26,7 @@ catch (\Exception $e) {
 
 /* If you are a Creator
  */
-$groupMapper = new \Etherpad\GroupMapper();
-$group = $groupMapper->findByColumn('group_id', $pad->getGroupId())->first();
-
-if ($authenticator->canCreate($group->getHomepageId())) {
+if ($authenticator->canCreate($pad->getHomepageId())) {
 	if ($pad->isLocked()) {
 		$pad->unlock();
 	}

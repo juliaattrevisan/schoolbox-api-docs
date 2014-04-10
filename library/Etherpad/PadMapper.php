@@ -42,6 +42,12 @@ class PadMapper extends \Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
+			'column'     => 'homepage_id',
+			'property'   => 'homepageId',
+			'type'       => self::TYPE_INTEGER,
+		));
+
+		$this->hasMap(array(
 			'column'     => 'name',
 			'property'   => 'name',
 			'type'       => self::TYPE_STRING,

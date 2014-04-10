@@ -35,6 +35,13 @@ class Pad {
 	private $groupId = '';
 
 	/**
+	 * Homepage id
+	 *
+	 * @var string
+	 */
+	private $homepageId = '';
+
+	/**
 	 * Actual pad name given by user
 	 *
 	 * @var string
@@ -288,5 +295,23 @@ class Pad {
 	 */
 	public function getLock() {
 		return $this->lock;
+	}
+
+	/**
+	 * Set homepage id
+	 *
+	 * @param string $homepageId
+	 */
+	public function setHomepageId($homepageId) {
+		$this->homepageId = $homepageId;
+	}
+
+	/**
+	 * Get homepage id
+	 *
+	 * @return string
+	 */
+	public function getHomepageId() {
+		return $this->homepageId;
 	}
 }

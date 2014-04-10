@@ -14,9 +14,17 @@ namespace Etherpad;
 class Authenticator {
 
 	/**
+	 * An instance of \Group
+	 *
+	 * @var \Group
+	 */
+	private $groupHandler = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
+		$this->setGroupHandler(new \Group());
 	}
 
 	/**
@@ -26,9 +34,7 @@ class Authenticator {
 	 * @return bool
 	 */
 	public function canCreate($homepageId) {
-		$groupHandler = new \Group();
-
-		if ($groupHandler->getPermission($homepageId) > READ_ACCESS) {
+		if ($this->getGroupHandler()->getPermission($homepageId) > READ_ACCESS) {
 			return true;
 		}
 
@@ -38,22 +44,35 @@ class Authenticator {
 	/**
 	 * Determine if a user is part of an authoring group
 	 *
-	 * @param $groupId
-	 * @param $userId
+	 * @param $homepageId
 	 * @return bool
 	 */
-	public function isParticipator($groupId, $userId) {
-		$etherpadGroupMapper = new GroupMapper();
-
-		$exists = $etherpadGroupMapper->findByColumnList(array(
-			'group_id' => $groupId,
-			'user_id' => $userId
-		));
-
-		if ($exists->count()) {
+	public function isParticipator($homepageId) {
+		if ($this->getGroupHandler()->getPermission($homepageId) >= READ_ACCESS) {
 			return true;
 		}
 
 		return false;
 	}
-} 
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set group handler
+	 *
+	 * @param \Group $groupHandler
+	 */
+	public function setGroupHandler($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * Get group handler
+	 *
+	 * @return \Group
+	 */
+	public function getGroupHandler() {
+		return $this->groupHandler;
+	}
+}

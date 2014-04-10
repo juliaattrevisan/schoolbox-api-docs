@@ -48,30 +48,6 @@ if ($authenticator->canCreate($homepageId)) {
 			$userMapper = new \Schoolbox\UserMapper();
 			$allUsers = new \Schoolbox\Collection();
 
-			/* Spawn a new group of users
-			 */
-			$allUsers->add($userMapper->findByColumn('username', 'alaress')->first());
-			$allUsers->add($userMapper->findByColumn('username', 'cglenn')->first());
-			$allUsers->add($userMapper->findByColumn('username', 'asaxon')->first());
-			$allUsers->add($userMapper->findByColumn('username', 'wwhite')->first());
-
-			/* Assign them to a group
-			 */
-			$etherpadGroupMapper = new \Etherpad\GroupMapper();
-
-			foreach($allUsers as $currentUser) {
-				$etherpadGroup = new \Etherpad\Group();
-				$etherpadGroup->setGroupId($groupId);
-				$etherpadGroup->setUserId($currentUser->getId());
-				$etherpadGroup->setHomepageId($homepageId);
-
-				$etherpadGroupMapper->save($etherpadGroup);
-
-				/* Add them as etherpad authors
-				 */
-				$client->createAuthorIfNotExistsFor($currentUser->getId(), $currentUser->getFullName());
-			}
-
 			/* Get pad id to set to private and to passs it as a redirect element.
 			 * Note that padId's come in the form g.abcdefg$padName
 			 */
@@ -90,6 +66,7 @@ if ($authenticator->canCreate($homepageId)) {
 			$newPad->setBody('');
 			$newPad->setPadId($padId);
 			$newPad->setGroupId($groupId);
+			$newPad->setHomepageId($homepageId);
 			$newPad->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$newPad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
@@ -111,6 +88,3 @@ if ($authenticator->canCreate($homepageId)) {
 else {
 	error(19);
 }
-
-
-

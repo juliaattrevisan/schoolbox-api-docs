@@ -26,7 +26,7 @@ catch (\Exception $e) {
 
 /* If you can participate, create a session and off you go
  */
-if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId())) {
+if ($authenticator->isParticipator($pad->getHomepageId())) {
 
 	/* Find the author id
 	 */
@@ -56,17 +56,14 @@ if ($authenticator->isParticipator($pad->getGroupId(), $_SESSION['user']->getId(
 			/* Show readonly version if locked and you haven't got write perms
 			 * Otherwise show usual editable version
 			 */
-			$groupMapper = new \Etherpad\GroupMapper();
-			$group = $groupMapper->findByColumn('group_id', $pad->getGroupId())->first();
-
-			if ($authenticator->canCreate($group->getHomepageId()) || !$pad->isLocked()) {
+			if ($authenticator->canCreate($pad->getHomepageId()) || !$pad->isLocked()) {
 				$this->localRedir(":9001/p/{$pad->getPadId()}");
 			}
 			else if ($pad->isLocked()) {
 				$readonlyResult = $client->getReadOnlyID($pad->getPadId());
 				$data = $readonlyResult->getData();
 
-				if ($response->getMessage() == 'ok') {
+				if ($readonlyResult->getMessage() == 'ok') {
 					$this->localRedir(":9001/p/{$data['readOnlyID']}");
 				}
 			}
