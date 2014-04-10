@@ -65,7 +65,6 @@ if ($authenticator->canCreate($homepageId)) {
 			$newPad->setName($name);
 			$newPad->setBody('');
 			$newPad->setPadId($padId);
-			$newPad->setGroupId($groupId);
 			$newPad->setHomepageId($homepageId);
 			$newPad->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$newPad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));

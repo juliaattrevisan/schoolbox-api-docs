@@ -28,13 +28,6 @@ class Pad implements ISoftDeletable {
 	private $padId = '';
 
 	/**
-	 * Etherpad Group ID
-	 *
-	 * @var string
-	 */
-	private $groupId = '';
-
-	/**
 	 * Homepage id
 	 *
 	 * @var string
@@ -194,24 +187,6 @@ class Pad implements ISoftDeletable {
 	 */
 	public function getDeletedAt() {
 		return $this->deletedAt;
-	}
-
-	/**
-	 * Set group id
-	 *
-	 * @param string $groupId
-	 */
-	public function setGroupId($groupId) {
-		$this->groupId = $groupId;
-	}
-
-	/**
-	 * Get group id
-	 *
-	 * @return string
-	 */
-	public function getGroupId() {
-		return $this->groupId;
 	}
 
 	/**

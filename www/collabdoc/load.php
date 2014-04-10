@@ -40,7 +40,9 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 	if ($createResult->getMessage() == 'ok') {
 		$etherpadSession = new \Etherpad\Session();
 
-		$sessionResult = $client->createSession($pad->getGroupId(), $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
+		list($groupId, $padName) = explode('$', $pad->getPadId());
+
+		$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
 		$data = $sessionResult->getData();
 
 		if ($sessionResult->getMessage() == 'ok') {
