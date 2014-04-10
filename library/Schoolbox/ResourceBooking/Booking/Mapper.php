@@ -203,8 +203,9 @@ class Mapper extends BaseMapper {
             )
         ";
         if ($resourceId) {
-            $query .= 'AND b.resource_id = :resource';
+            $query .= ' AND b.resource_id = :resource';
         }
+        $query .= ' ORDER BY e.startDate ASC, e.startTime ASC';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
