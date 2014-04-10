@@ -1,0 +1,43 @@
+<div class="listing">
+    {#
+    <h2><a href="/calendar/full/{CALENDAR_DATE}/#week">Calendar <span>- {DATE}</span></a></h2>
+    #}
+    <ul class="js_happening">
+        {% for booking in bookings %}
+        <li class="{% if loop.index0 is even %}dark{% endif %} clearfix">
+            <span class="eventListing">
+                <strong>
+                    {{ booking.event.startDate }} {{ booking.event.startTime }} -
+                    {{ booking.event.endDate }} {{ booking.event.endTime }}
+                </strong>
+                <span>
+                    {{ booking.resource.category.name }} -
+                    {{ booking.resource.name }}
+                </span>
+            </span>
+
+            {#<div class="hidden-fields clearfix">#}
+                {#<h3>{NOTE}</h3>#}
+                {#<h4>{TYPE}: {FULL_TIME}</h4>#}
+                {#<em>{LOCATION}</em>#}
+
+                {#&#123;&#35; Move this to a sub-template &#35;&#125;#}
+                {#<p class="meta">#}
+                    {#{DETAIL}#}
+                    {#<div class="created">Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a>#}
+                        {#<!-- BEGIN has_category -->#}
+                        {#in <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>#}
+                        {#<!-- END has_category -->#}
+                    {#</div>#}
+                {#</p>#}
+            {#</div>#}
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% if bookings|length == 0 %}
+    <div class="no_events">
+        <em>There are no recent upcoming bookings for you to confirm.</em>
+    </div>
+    {% endif %}
+</div>
