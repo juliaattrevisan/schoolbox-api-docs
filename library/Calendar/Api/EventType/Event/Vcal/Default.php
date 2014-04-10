@@ -62,12 +62,21 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				/** @var Sabre\VObject\Component\VEvent $currentEvent */
 				$allDay              = !$currentEvent->DTSTART->hasTime();
 				$eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
-				$eventEndTimestamp   = strtotime("{$currentEvent->DTEND}");
 
-				// According to VCAL standard: end of all day event
-				// is 12am next day
-				if ($allDay) {
-					$eventEndTimestamp -= 1;
+				// Event has no DTEND (anniversaries and reminders might not
+				// have one)
+				// Set it to same as DTSTART, I guess.
+				$eventEnd = "{$currentEvent->DTEND}";
+				if (strlen($eventEnd) > 0) {
+					$eventEndTimestamp = strtotime("{$currentEvent->DTEND}");
+					// According to VCAL standard: end of all day event
+					// is 12am next day
+					if ($allDay) {
+						$eventEndTimestamp -= 1;
+					}
+				}
+				else {
+					$eventEndTimestamp = $eventStartTimestamp;
 				}
 
 				/* Only get events that overlap the range specified
