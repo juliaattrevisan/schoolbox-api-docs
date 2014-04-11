@@ -186,10 +186,16 @@ class Notif implements LoggerInterface {
 
 			// [3a] internal application message
 			if($this->topic == self::TOPIC_APPLICATION) {
-				if(!isset($this->handlers['amqp'])) {
-					$this->handlers['amqp'] = new AMQPHandler($this->mqc, Logger::NOTICE, false);
+				try {
+					if(!isset($this->handlers['amqp'])) {
+						$this->handlers['amqp'] = new AMQPHandler($this->mqc, Logger::NOTICE, false);
+					}
+					array_push($stack, $this->handlers['amqp']->setFormatter(new CompressedFormatter()));
 				}
-				array_push($stack, $this->handlers['amqp']->setFormatter(new CompressedFormatter()));
+				catch(NotifException $e) {
+					// no connection to rabbit available. We should be able to safely ignore this
+				}
+
 			}
 
 			// [3b] sqllog (this one doesn't get stored globally)
