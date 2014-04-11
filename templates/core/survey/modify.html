@@ -127,6 +127,20 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>
+					<h4>Maximum Attempts</h4>
+					<p>
+						The maximum number of times someone can attempt this Survey.
+					</p>
+					<select name='max_attempts'>
+						<option value='0'>Unlimited</option>
+						<!-- BEGIN max_attempts -->
+						<option value='{MAX_ATTEMPTS_VALUE}' {MAX_ATTEMPTS_CHECKED}>{MAX_ATTEMPTS_VALUE}</option>
+						<!-- END max_attempts -->
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
 					<h4>Anonymous Results</h4>
 					<p>Hide usernames from results listings and exported survey results files.</p>
 					<div class="textarea-container">
