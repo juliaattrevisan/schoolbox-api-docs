@@ -10,8 +10,10 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 
+use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Serializable;
@@ -60,4 +62,15 @@ interface ModuleNotifierInterface extends Serializable {
 	 * @return NS
 	 */
 	public function getNamespace();
+
+
+	/**
+	 * Generate n messages for a category, from the perspective of casual observation.
+	 *
+	 * @param int $category
+	 * @param int $limit
+	 * @return Collection|TargetedMessage[]
+	 */
+	public function getFeed($category, $limit);
+
 }
