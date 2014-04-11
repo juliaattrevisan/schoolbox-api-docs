@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox;
+use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
@@ -1550,6 +1551,89 @@ class Mapper {
 	public function hydrateCollection($collection, $identifier = null) {
 		$identifier = $identifier ?: $this->getIdentifier();
 		return $this->findByColumn($identifier['column'], $collection->getColumnValues($identifier['property']));
+	}
+
+	/**
+	 * Attempts to hydrate the model according to the hydration map in as few queries as possible
+	 * Primitives will obviously be automatically populated; the deeper the hydration map is, the more complex the query
+	 * will be (and possibly end up negatively impacting performance instead of the intended increase)
+	 *
+	 * @experimental
+	 * @param object|Collection $collection
+	 * @param array $map
+	 * @return Collection
+	 */
+	public function hydratePropertyMap($collection, $map) {
+
+		// ideally, we perform this on a collection
+		$collection = $this->getModelAsCollection($collection);
+
+		$select = array();
+		$from   = array();
+		$props  = array();
+		$joins  = array();
+		$t = 0;
+
+		// prepare the preparation!
+		foreach($map as $property => $hydration) {
+			$mapping = $this->map->getOffset($property);
+			if(!isset($mapping['join'])) {
+				// not a join (or not a property) - can't hydrate that
+				continue;
+			}
+
+			$alias = 't'.++$t;
+
+			$joins[$alias] = $mapping['join'];
+
+//			if(is_array($hydration)) {
+//				 TODO subordinate hydrates
+//				 this would locate the appropriate mapper and recursively dig for SQL parts
+//			}
+
+			$jMapper = $this->getJoinMapper($joins[$alias]);
+
+			$select[$t] = $jMapper->getColumnString($alias);
+			$from[$t] = $this->getJoinSql($joins[$alias], 't0', $alias);
+			$props[$alias] = $property;
+		}
+
+		$selectSql = implode(',', $select);
+		$fromSql   = implode(' LEFT JOIN ', $from);
+
+		$idField = $this->identifier['column'];
+
+		$getId = $this->getGetIdentifierMethodName();
+
+		$index = array();
+
+		foreach($collection as $model) {
+			$index[$model->$getId()] = $model;
+		}
+
+		$placeholderString = $this->getArrayPlaceholders(array_keys($index));
+		$inValues = $this->getArrayParameters(array_keys($index));
+
+		// note that the only local field we're selecting is ID
+		$stmt = $this->database->prepare("
+			SELECT {$this->getColumnString('t0', array($idField))}, $selectSql
+			FROM   `{$this->getTable()}` `t0` LEFT JOIN $fromSql
+			WHERE  `t0`.`$idField` IN $placeholderString
+		");
+
+		$stmt->execute($inValues);
+
+		// let's start with the first result - 1:1 relation
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			foreach($joins as $alias => $joinName) {
+				$obj = $this->hydrateJoin($r, $joinName, $alias);
+				$setObj = $this->getSetMethodName($props[$alias]);
+				$index[$r['t0.'.$idField]]->$setObj($obj);
+			}
+
+		}
+
+		return $this->createCollection($index);
 	}
 
 	/**
