@@ -53,33 +53,31 @@ class External_Synergetic_Class implements External_ClassInterface
 
             if(strpos($code, '/') !== FALSE ) {
                 $codeArray = explode('/',$code);
-                $classQuery .= "( StudentClasses.ClassCode = '{$codeArray[1]}' AND StudentClasses.ClassCampus = '{$codeArray[0]}' ) OR ";
+                $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) OR ";
             }
             else {
-                $classQuery .= "StudentClasses.ClassCode = '$code' OR ";
+                $classQuery .= "ClassCode = '$code' OR ";
             }
         }
 
         $classQuery = substr($classQuery, 0, -3) . ')';
 
         $query = "
-		SELECT DISTINCT StudentSurname as lastname, StudentPreferred as firstname,
-                        StudentYearLevelDescription as yearlevel, StudentHouseDescription as house,
-                        StudentMedicalAlert, StudentSpecialNeedsFlag,
-                        StudentID as synergy_id, ClassCampus
-		FROM    SynergyOne.dbo.StudentClasses StudentClasses
+		SELECT          StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
+                        StudentClasses.StudentYearLevelDescription as yearlevel, StudentClasses.StudentHouseDescription as house,
+                        vStudents.StudentMedicalAlert, vStudents.StudentSpecialNeedsFlag,
+                        StudentClasses.StudentID as synergy_id, StudentClasses.ClassCampus
+		FROM    SynergyOne.dbo.vStudentClasses StudentClasses
 		JOIN SynergyOne.dbo.vStudents vStudents ON (
 			vStudents.FileYear = StudentClasses.FileYear AND
 			vStudents.FileSemester = StudentClasses.FileSemester AND
-			vStudents.ID = StudentClasses.ID)
-		WHERE 
-			StudentStatus IN ('N','NOR','NEW','RET','LV','LEA','RPT','FUL','CUR','REN','PAT', 'EXG')
-			AND $classQuery
+			vStudents.ID = StudentClasses.StudentID)
+		WHERE $classQuery
 			AND (StudentClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (StudentClasses.FileSemester='" . $_SESSION['FileSemester'] . "')
-			AND (StudentClasses.FileType != 'A' OR StudentClasses.StartDate <= getdate())
+			AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
 			AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-		ORDER BY StudentSurname, StudentPreferred";
+		ORDER BY StudentClasses.StudentSurname, StudentClasses.StudentPreferred";
 
         return $this->getDatabase()->getAll($query);
     }
