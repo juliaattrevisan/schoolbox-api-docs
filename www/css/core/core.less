@@ -11380,6 +11380,18 @@ textarea.event-detail {
 }
 
 .message-list {
+	&.time-right {
+		.event {
+			a.time {
+				float: right;
+				width: auto;
+				margin: 5px 8px 12px;
+			}
+			.body {
+				padding-left: 32px;
+			}
+		}
+	}
 	ul.events {
 		margin: 0;
 	}
@@ -11397,6 +11409,7 @@ textarea.event-detail {
 		a {
 			line-height: 16px;
 			text-decoration: none;
+			white-space: nowrap;
 			&.time {
 				font-size: 0.85em;
 				margin: 5px 8px 0 0;

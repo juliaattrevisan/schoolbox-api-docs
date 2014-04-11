@@ -2,8 +2,18 @@
     <h2>Homepage Feed</h2>
     {CONFIGURATION}
     <div class="long">
-        <ul class="activity-list listing">
-            {ACTIVITY_LIST}
+        <ul class="events message-list time-right">
+          <!-- BEGIN event -->
+          <li class="event {EVENT_DARK}">
+            <span>
+              <a href="{EVENT_HREF}" class="time">
+                <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
+              </a>
+              <img src="{EVENT_ICON}" alt="" width="24" height="24" />
+              <span class="body">{EVENT_BODY}</span>
+            </span>
+          </li>
+          <!-- END event -->
         </ul>
         <a class="btn rss" href="/homepage/rss/{ID}/{USER_TOKEN}"><span></span>RSS</a>
     </div>

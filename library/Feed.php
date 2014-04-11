@@ -7,16 +7,45 @@
 
 class Feed {
 
-    function Feed() {
-	    $this->db = DeprecatedDatabase::getInstance();
+	const SOFT_LIMIT = 50;
+
+	/** @var \Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface[] */
+	protected $mappers;
+
+	/**
+	 * @param \Schoolbox\IConfigLoader $conf
+	 */
+	function __construct($conf = null) {
+		$conf = $conf instanceof \Schoolbox\IConfigLoader ? $conf : \Schoolbox\Config\ConfigMapper::getInstance();
+
+		// you want things in your feed?
+		// write a notifier, and put it in this array
+		$this->mappers = array(
+		    new \Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
+			new \Schoolbox\Resource\Category\NewsNotifier($conf),
+	    );
     }
 
-    function getFeed($cid, $limit) {
 
-        if ($limit == 0 || $limit > 50) {
-            $limit = 50;
+	/**
+	 * @param $cid
+	 * @param $limit
+	 * @return \Schoolbox\Collection|\Schoolbox\Notif\Message\External\TargetedMessage[]
+	 */
+	function getFeed($cid, $limit) {
+        if ($limit == 0 || $limit > self::SOFT_LIMIT) {
+            $limit = self::SOFT_LIMIT;
         }
 
+		$messages = new \Schoolbox\Collection();
+		$a = $b = microtime(true) * 1000;
+		foreach($this->mappers as $map) {
+			if($map instanceof \Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface) {
+				$messages->merge($map->getFeed($cid, $limit));
+			}
+		}
+
+		return $messages->sortBy('timestamp', 'desc')->slice($limit);
 
         $files = $this->getFiles($cid, $limit);
         $links = $this->getLinks($cid, $limit);
