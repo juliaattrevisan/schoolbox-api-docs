@@ -13,6 +13,8 @@ namespace Schoolbox\Realtime\Schedule\Module;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\External\TargetedMessage;
+use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\TopicFactory;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\Source;
@@ -135,15 +137,5 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		return $this->namespace;
 	}
 
-	/**
-	 * At minimum, this method should accept the label and role for which to build a topic.
-	 * If more parameters are required in an implementation, PHP will allow you to include optional parameters to the
-	 * method signature.
-	 *
-	 * @param string $eventLabel
-	 * @param string $roleType
-	 * @return string
-	 */
-	protected abstract function buildTopic($eventLabel, $roleType);
 
 }
