@@ -103,6 +103,9 @@ echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Backup Started" >> $logfile;
 
 targetdir=$backup_dir/$DAY0;
 
+# Create facter fact directory if missing
+mkdir -p /etc/facter/facts.d >>$logfile 2>&1;
+
 # Check if script already running
 processes=`pgrep backup-cifs.sh`;
 process=`echo $processes | wc -w`;
@@ -111,6 +114,8 @@ then
 	echo -e "Error: Script already running\nReported Processses: $process\n$processes" >> $logfile;
 	echo -e "Error: Script already running\nReported Processses: $process\n$processes";
 	errorcheck=1
+else
+	echo "$package""_last_backup=inprogress" > "/etc/facter/facts.d/$package""_last_backup.txt" 2>/dev/null;
 fi
 
 # Check if smb/cifs share is mounted and attempt mount if necessary
@@ -202,17 +207,10 @@ then
 		rm -rf $backup_dir/$DAYX >> $logfile 2>&1;
 	fi
 
-	# Remove old backup logfile
-	if [ -f "$logfileprefix-$DAYX.log" ]
-	then
-		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of old backup logfile: $logfileprefix-$DAYX.log" >> $logfile;
-		rm -f "$logfileprefix-$DAYX.log" >> $logfile 2>&1;
-	fi
-
-	# Remove old backup logfiles older than 30 days
-	# this is just in case it get's missed by the above from a failed run
+	# Remove backup logfiles older than 30 days
 	for oldlogfile in `find $logfileprefix*.log -mtime +30`;
 	do
+		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of old backup logfiles" >> $logfile;
 		rm -f $oldlogfile >> $logfile 2>&1
 	done
 
@@ -225,9 +223,6 @@ if [ `grep -i "Permission denied" $logfile | wc -l` -ne 0 ];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Error: permission denied errors detected" >> $logfile;
 fi
-
-# Create facter fact directory if missing
-mkdir -p /etc/facter/facts.d >>$logfile 2>&1;
 
 # On error, email logfile and log fact
 if [ `grep -i error $logfile | wc -l` -ne 0 ];
