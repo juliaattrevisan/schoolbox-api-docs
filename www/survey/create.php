@@ -45,7 +45,7 @@ if (!empty($_POST)) {
         'availability' => 'survey',
         'anonymous_result' => $_POST['anonymous_result'],
         'notify_author' => $_POST['notify_author'],
-        'max_attempts' => 1,
+        'max_attempts' => $_POST['max_attempts'],
         'created_at' => 'NOW()',
     ));
 
@@ -54,7 +54,8 @@ if (!empty($_POST)) {
     }
 
     SitePage::localRedir('/survey/section/create/' . $assess_id);
-} else {
+}
+else {
     if (!is_numeric($this->arg[0])) {
         error(117);
     }
@@ -70,6 +71,7 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
+	$this->setBlock(TEMPLATE_content, 'max_attempts', 'max_attempts_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Assessment');
 
@@ -108,7 +110,8 @@ if (!empty($_POST)) {
     foreach (array('AM', 'PM') as $meridiem) {
         if ($meridiem == $startMeridiem) {
             $selected = 'selected=\'selected\'';
-        } else {
+        }
+		else {
             $selected = '';
         }
 
@@ -142,8 +145,19 @@ if (!empty($_POST)) {
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
     }
 
+	/* Resit amounts
+	 */
+	for ($i = 1; $i < 11; $i++) {
+		$this->setVar(array(
+			'MAX_ATTEMPTS_VALUE' => $i,
+			'MAX_ATTEMPTS_CHECKED' => '',
+		));
+
+		$this->parse('max_attempts_block', 'max_attempts', true);
+	}
+
     /* Don't display questions contents, which appears in Modify
-      */
+     */
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setVar('allQuestions_block', '');
     $this->parse('importXML_block', 'importXML');
