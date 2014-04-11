@@ -11,7 +11,9 @@ namespace Schoolbox\News;
 
 
 use Monolog\Logger;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -85,6 +87,18 @@ class ArticleNotifier extends AbstractModuleNotifier {
 			case Mapper::METHOD_DELETE:
 				$bundle->detach(self::TRIGGER_POSTED);
 		}
+	}
+
+	/**
+	 * Generate n messages for a category, from the perspective of casual observation.
+	 *
+	 * @param int $category
+	 * @param int $limit
+	 * @return Collection|TargetedMessage[]
+	 */
+	public function getFeed($category, $limit) {
+		// this class doesn't do feeds
+		return new Collection();
 	}
 
 
