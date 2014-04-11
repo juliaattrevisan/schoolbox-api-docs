@@ -11,10 +11,13 @@ namespace Schoolbox\Notif\Message;
 
 
 use Alaress\Scheduler\Trigger\TriggerInterface;
+use Schoolbox\Collection;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Message\Instance\InstanceBundle;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifException;
+use Schoolbox\User;
 use SplObjectStorage;
 
 class Messenger {
@@ -108,43 +111,78 @@ class Messenger {
 	}
 
 
+	/**
+	 * @param Notif $notif
+	 * @param TriggerInterface $trigger
+	 * @param callable $callback
+	 * @return void
+	 */
+	protected function applyInstances($notif, $trigger, $callback) {
+		if(!$this->hasMessages()) {
+			return;
+		}
+
+		foreach($this->splStore as $msg) {
+			/**
+			 * @var Message $msg
+			 * @var InstanceBundle $instanceBundle
+			 */
+			$instanceBundle = $this->splStore->offsetGet($msg);
+
+			foreach($instanceBundle->getInstances() as $instance) {
+				$messageInstance = $msg
+					->applyInstance($instance, $notif, $trigger)
+					->setTargets($instance->getTargets())
+					->setContext($instance->getContext());
+
+				// if we can filter out the user who effected this event in the first place, do so
+				if($trigger) {
+					$effector = $trigger->getEvent()->getEffector();
+					if($effector instanceof User) {
+						$messageInstance->setContext(array('user' => $effector->getId()));
+					}
+				}
+
+				call_user_func($callback, $messageInstance);
+			}
+		}
+	}
+
     /**
+     * Send all the messages contained by this Messenger through the given Notif
      *
      * @param Notif $notif
      * @param TriggerInterface $trigger
      * @return array
      */
     public function send($notif, $trigger = null) {
-        if(!$this->hasMessages()) {
-            return null;
-        }
-        $result = 0;
+		$result = 0;
 
-        foreach($this->splStore as $msg) {
-            /**
-             * @var Message $msg
-             * @var InstanceBundle $instanceBundle
-             */
-            $instanceBundle = $this->splStore->offsetGet($msg);
+		$this->applyInstances($notif, $trigger, function($instance) use (&$result) {
+			if($instance->send()) {
+				$result++;
+			}
+		});
 
-            foreach($instanceBundle->getInstances() as $instance) {
-                $messageInstance = $msg
-                    ->applyInstance($instance, $notif, $trigger)
-                    ->setTargets($instance->getTargets())
-                    ->setContext($instance->getContext());
-
-	            // if we can filter out the user who effected this event in the first place, do so
-	            if($trigger) {
-		            $messageInstance->setContext(array('user' => $trigger->getEvent()->getEffector()->getId()));
-	            }
-
-                if($messageInstance->send()) {
-                    $result++;
-                }
-            }
-        }
-
-        return $result;
+		return $result;
     }
+
+
+	/**
+	 * Extracts all contained messages into a collection
+	 *
+	 * @param Notif $notif
+	 * @param TriggerInterface $trigger
+	 * @return Collection|TargetedMessage[]
+	 */
+	public function extractAll($notif = null, $trigger = null) {
+		$c = new Collection();
+
+		$this->applyInstances($notif, $trigger, function($instance) use (&$c) {
+			$c->add($instance);
+		});
+
+		return $c;
+	}
 
 } 

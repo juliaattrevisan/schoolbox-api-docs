@@ -52,6 +52,14 @@ class Message implements Serializable {
 		return $this->body->getTokenList();
 	}
 
+	public function getIcon() {
+		return $this->icon;
+	}
+
+	public function getHref() {
+		return $this->href;
+	}
+
 	/**
 	 * Return metadata from this message
 	 *
