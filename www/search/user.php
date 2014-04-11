@@ -20,6 +20,7 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
         $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
         $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
+        $this->setBlock(TEMPLATE_content, "grades_button", "grades_button_block");
         $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
         $this->setBlock(TEMPLATE_content, "boarder_leave", "boarder_leave_block");
 		$this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
@@ -60,7 +61,6 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
         $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
         $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
-        $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
         $this->setBlock(TEMPLATE_content, "staff_synergy", "staff_synergy_block");
         $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
         $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
@@ -84,6 +84,7 @@ if (is_numeric($this->arg[0])) {
         'modify_block' => '',
         'contact_synergy_block' => '',
         'due_work_block' => '',
+        'grades_button_block' => '',
         'parent_synergy_form_block' => '',
         'parent_spouse_block' => '',
         'staff_synergy_block' => '',
@@ -218,6 +219,13 @@ if (is_numeric($this->arg[0])) {
 	                    $this->parse('due_work_block', 'due_work');
 	                }
 
+                    if($groupHandler->isParent() && Config::get('restrict_parent_grades') ) {
+                        $this->setVar('grades_button_block', '');
+                    }
+                    else {
+                        $this->parse('grades_button_block', 'grades_button');
+                    }
+                    
 	                $synInfo = $synUserHandler->getStudent($user['synergy_id']);
 
 	                if ($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {

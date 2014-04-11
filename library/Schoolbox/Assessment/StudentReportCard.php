@@ -97,7 +97,7 @@ class StudentReportCard {
 		$displayClassAverage        = \Cfg::get('display_grade_average') ? true : false;
 
 		// are parents barred from this page?
-		$restrictStudentSubmissions = \Cfg::get('restrict_student_submissions') ? true : false;
+		$restrictStudentSubmissions = \Cfg::get('restrict_parent_grades') ? true : false;
 
 		// is the grade average allowed to be shown?
 		$showOverallGrade           = \Cfg::get('show_overall_grade') ? true : false;
@@ -1001,7 +1001,7 @@ class StudentReportCard {
 
 
 			// Ensure that grades are properly ordered by date.
-			if (!(\Cfg::get('restrict_student_submissions') && $groupHandler->isParent())) {
+			if (!(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent())) {
 				$studentGrades = array_merge(
 					$returnMapper->getStudentMarks($categoryID, $this->targetUserId, array('visibility' => $visibilities)),
 					$attemptMapper->getStudentMarks($categoryID, $this->targetUserId)

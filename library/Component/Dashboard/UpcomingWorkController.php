@@ -85,7 +85,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
         // if this is a parent viewing their child's work
         if($groupHandler->isParentOfChild($this->userID)) {
             // Check if system config restrict_student_submissions is on.
-            $this->restrictedMode = Cfg::get('restrict_student_submissions');
+            $this->restrictedMode = Cfg::get('restrict_parent_grades');
         }
 
         foreach($upcoming as $item) {

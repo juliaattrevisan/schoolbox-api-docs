@@ -104,7 +104,7 @@ elseif($groupHandler->isStaff()) {
 }
 
 // P3: if you are a parent, you may only view this if the ID matches one of your children, also make sure config allows parents to view
-elseif($groupHandler->isParentOfChild($userId) && !Config::get('restrict_parent_duework_access')) {
+elseif($groupHandler->isParentOfChild($userId) && !Config::get('restrict_parent_grades')) {
 	$permission = PERMISSION_GRANTED;
 }
 
