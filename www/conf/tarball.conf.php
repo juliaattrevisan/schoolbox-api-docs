@@ -23,10 +23,4 @@ define("SQL_dsn", "mysql:host=".SQL_host.";dbname=".SQL_db);
 //Instance ID
 define('INSTANCE_ID', 'xxxxxxxx');
 
-//module config options
-define('HELPDESK_enable', false);
-define('HELPDESK_location', '/var/www/helpdesk');
-define('HELPDESK_db', 'helpdesk');
-
-
 ?>
