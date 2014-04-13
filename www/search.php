@@ -177,6 +177,7 @@ if (!empty($result['user'])) {
     $page->setFile('user_t', 'search/user.html');
     $page->setBlock('user_t', 'user', 'user_block');
     $page->setBlock('user', 'due_work', 'due_work_block');
+    $page->setBlock('user', 'grades_button', 'grades_button_block');
     $page->setBlock('user', 'timetable', 'timetable_block');
     $page->setBlock('user', 'eportfolio', 'eportfolio_block');
     $page->setBlock('user', 'modify', 'modify_block');
@@ -243,6 +244,18 @@ if (!empty($result['user'])) {
         else {
             $page->parse('due_work_block', 'due_work');
 		}
+
+        if($groupHandler->isParent() && Config::get('restrict_parent_grades') ) {
+            $this->setVar('grades_button_block', '');
+        }
+        else if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id']))) {
+            $this->setVar('grades_button_block', '');
+        }
+        else {
+            $this->parse('grades_button_block', 'grades_button');
+        }
+
+
 
         //Show student timetables to staff and parents of child
         if ($group->isStudent($user['id'])) {
