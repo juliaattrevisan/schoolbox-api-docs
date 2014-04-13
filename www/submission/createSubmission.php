@@ -453,22 +453,36 @@ function outputCriteria(
  * @param int      $value The value of the dropdown to show.
  */
 function outputVisibilityDropdown(SitePage $page, $value) {
+
+
+    $options = array(
+                array(
+                    'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
+                    'name' => 'Staff Only',
+                ),
+                array(
+                    'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
+                    'name' => 'Staff and Students',
+                ),
+                array(
+                    'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+                    'name' => 'Staff, Students and their Parents',
+                ),
+    );
+
+    /* Remove elements from list based on max setting */
+    switch(Cfg::get('submission_visibility_max')) {
+        case '0' :
+           array_pop($options);
+
+        case '1' :
+           array_pop($options);
+
+    }
+
     $page->dropDown(
         'mark_visibility_drop',
-        array(
-            array(
-                'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
-                'name' => 'Staff Only',
-            ),
-            array(
-                'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
-                'name' => 'Staff and Students',
-            ),
-            array(
-                'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
-                'name' => 'Staff, Students and their Parents',
-            ),
-        ),
+        $options,
         $value,
         'marktype',
         array(
