@@ -1,0 +1,1 @@
+UPDATE component_definition SET `name` = 'Quizzes' WHERE class LIKE 'Component_Homepage_AssessController'
