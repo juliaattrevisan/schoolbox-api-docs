@@ -38,9 +38,9 @@ CREATE TABLE `msg_route_perm`(
 ) CHARSET=utf8 COLLATE=utf8_bin;
 
 CREATE TABLE `msg_reroute_override`(
-  `user_id` INT(10) UNSIGNED NOT NULL,
-  `msg_route_key` VARCHAR(64) NOT NULL,
-  `outgoing_level` INT(10) UNSIGNED NOT NULL,
+  `user_id`        INT UNSIGNED NOT NULL,
+  `msg_route_key`  VARCHAR(64) NOT NULL,
+  `outgoing_level` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`user_id`, `msg_route_key`),
   INDEX (`user_id`)
 ) CHARSET=utf8 COLLATE=utf8_bin;
