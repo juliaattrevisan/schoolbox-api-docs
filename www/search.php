@@ -246,13 +246,13 @@ if (!empty($result['user'])) {
 		}
 
         if($groupHandler->isParent() && Config::get('restrict_parent_grades') ) {
-            $this->setVar('grades_button_block', '');
+            $page->setVar('grades_button_block', '');
         }
         else if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id']))) {
-            $this->setVar('grades_button_block', '');
+            $page->setVar('grades_button_block', '');
         }
         else {
-            $this->parse('grades_button_block', 'grades_button');
+            $page->parse('grades_button_block', 'grades_button');
         }
 
 
