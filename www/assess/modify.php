@@ -114,6 +114,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ACTION'                  => 'modify',
+        'ASSESS_ACTION'           => 'Modify Quiz',
         'ASSESS_IS_TASK'          => !empty($task_id) ? 1 : 0,
         'ASSESS_ASSESS_ID'        => $assessment->getId(),
         'ASSESS_CATEGORY_ID'      => $assessment->getCategory()->getId(),
