@@ -16,6 +16,9 @@ use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Booking;
 use Aura\Di;
 use Twig_Environment;
+use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Failure;
+use Schoolbox\UserAccess;
 
 class ResourceManagement extends Component_Dashboard_ControllerAbstract {
 
@@ -46,14 +49,44 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         $startTime = strtotime("00:00",            $_SERVER['REQUEST_TIME']);
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
 
-        // Default to showing only items I have moderator permission for.
+        // Show only items I have moderator permission for.
+        // If I am superuser or have moderate permissions, then I can moderate
+        // all items.
+        $baseManageRule = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasServicePermission(
+                UserAccess::SERVICE_RESOURCE_BOOKING,
+                UserAccess::ACCESS_FULL
+            )
+        );
+
+        $restrictedIds = array();
+        try {
+            $baseManageRule->authorize(array(), $this->user);
+        }
+        catch (Failure\Base $e) {
+            // This user isn't a moderator.
+            // Maybe they are a moderator for some items?
+            $items = $this->bookingMapper->getJoinMapper('resource')->findForModerator(
+                $this->user->getId()
+            );
+            foreach ($items as $item) {
+                $restrictedIds[] = $item->getId();
+            }
+            // If I still don't moderate any items - don't show this component
+            if (empty($restrictedIds)) {
+                return false;
+            }
+        }
+
         // We know the rules:
         // use AuthChecker->check('resourceBooking.approve', {id: booking.id})
         // Cache the booking, too, so I don't fetch it every single check.
         $this->bookings = $this->bookingMapper->findForTimespan(
             $startTime,
             $endTime,
-            array(Booking\Status\Model::STATUS_PENDING)
+            array(Booking\Status\Model::STATUS_PENDING),
+            $restrictedIds
         );
         return true;
     }

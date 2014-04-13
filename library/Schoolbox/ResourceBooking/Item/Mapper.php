@@ -345,4 +345,32 @@ class Mapper extends BaseMapper {
         return count($list) >= 1;
     }
 
+    /**
+     * Finds items for which $moderatorId is a moderator.
+     *
+     * This only fetches items that the user is a directly defined moderator -
+     * it will not fetch all items if the user has moderate access to the
+     * resource booking service.
+     *
+     * @param  int $moderatorId
+     * @return Collection|Model[]
+     */
+    public function findForModerator($moderatorId) {
+
+        $query = "
+            SELECT {$this->getColumnString('r')}
+            FROM {$this->getTable()} `r`
+            INNER JOIN {$this->getJoinSql('moderator', 'r', 'm')}
+            WHERE m.moderator_id = ?
+            AND r.deleted_at IS NULL
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array($moderatorId));
+
+        // Hydration:
+        // progress through each join that was passed.
+        /** @var Model $item */
+        return $this->hydrateList($statement, 'r');
+    }
+
 }

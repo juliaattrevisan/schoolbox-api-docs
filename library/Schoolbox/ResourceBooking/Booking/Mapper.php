@@ -138,14 +138,14 @@ class Mapper extends BaseMapper {
      *
      * @param int   $fromTimestamp
      * @param int   $toTimestamp
-     * @param int   $resourceId    Optional resource ID to filter by.
+     * @param array $resourceIds   Optional resource IDs to filter by.
      * @param array $statusIds     Status IDs of events to fetch. By default,
      *                             gets Status\Model::STATUS_PENDING and
      *                             Status\Model::STATUS_APPROVED only.
      *
      * @return Collection
      */
-    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $resourceId = null) {
+    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $resourceIds = array()) {
         // If using Aura:sql_query
 //        $this->queryFactory->newSelect()
 //            ->cols($this->getColumnArray('x'))
@@ -173,8 +173,8 @@ class Mapper extends BaseMapper {
             'startWindow' => date('Y-m-d H:i:s', $fromTimestamp),
             'endWindow'   => date('Y-m-d H:i:s', $toTimestamp),
         );
-        if ($resourceId) {
-            $params['resource'] = $resourceId;
+        if (!empty($resourceIds)) {
+            $params = array_merge($params, $this->getArrayParameters($resourceIds, 'resource'));
         }
         $params = array_merge($params, $this->getArrayParameters($statusIds, 'status'));
         $query = "
@@ -202,8 +202,8 @@ class Mapper extends BaseMapper {
                 OR CONCAT(e.startDate, ' ', e.startTime) > :endWindow
             )
         ";
-        if ($resourceId) {
-            $query .= ' AND b.resource_id = :resource';
+        if (!empty($resourceIds)) {
+            $query .= ' AND b.resource_id IN '. $this->getArrayPlaceholders($resourceIds, 'resource');
         }
         $query .= ' ORDER BY e.startDate ASC, e.startTime ASC';
         $statement = $this->getDatabase()->prepare($query);
@@ -246,7 +246,7 @@ class Mapper extends BaseMapper {
      * @return Collection
      */
     public function findForResource($resourceId, $fromTimestamp, $toTimestamp, $statusIds = array()) {
-        return $this->findForTimespan($fromTimestamp, $toTimestamp, $statusIds, $resourceId);
+        return $this->findForTimespan($fromTimestamp, $toTimestamp, $statusIds, array($resourceId));
     }
 
     /**
