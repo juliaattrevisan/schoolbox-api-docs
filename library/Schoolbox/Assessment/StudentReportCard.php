@@ -124,7 +124,7 @@ class StudentReportCard {
 		// if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
 		elseif($this->groupHandler->isParentOfChild($this->targetUserId)) {
 			$this->permissionSet = array(
-				false, false, !$restrictStudentSubmissions, false, !$restrictStudentSubmissions,
+				false, false, !$restrictStudentSubmissions, $displayClassAverage, !$restrictStudentSubmissions,
 				(!$restrictStudentSubmissions) && $showOverallGrade
 			);
 			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT + ($restrictStudentSubmissions ? 1 : 0);
@@ -470,7 +470,7 @@ class StudentReportCard {
 				'label' => 'Class',
 				'data'  => $averageSeries
 			);
-		}
+        }
 		// otherwise, remove the colour from the map (so the graph doesn't get confused)
 		else {
 			unset($colours['average']);
