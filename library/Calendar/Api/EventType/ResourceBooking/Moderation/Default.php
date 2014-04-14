@@ -74,6 +74,11 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
         $converter  = new Booking\Util\EventConverter();
         $collection = new Calendar_Event_Collection();
         foreach ($bookings as $booking) {
+            // Don't add this booking if it's my own, it will show in my
+            // resource booking event feed.
+            if ($booking->getEvent()->getOwner()->getId() == $this->getUser()->getId()) {
+                continue;
+            }
             $calendarEvent = $converter->convertEventToCalendarEvent(
                 $booking->getEvent(),
                 $booking
