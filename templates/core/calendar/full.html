@@ -116,6 +116,7 @@
                     // setup data to be displayed
                     var data = $j.extend(true, {}, calEvent.data.meta)
                     var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mmtt'
+
                     data.note = calEvent.title
                     data.date = $.fullCalendar.formatDate(calEvent.start, format)
                     if (calEvent.end != null) {
@@ -125,11 +126,12 @@
 
                     // Links to Modify Screen
                     if (calEvent.editable == true) {
+						var url = '';
 						if ((calEvent.data.custom != undefined) && (calEvent.data.custom.modifyLink != undefined) && (calEvent.data.custom.modifyLink.length)) {
-							var url = calEvent.data.custom.modifyLink;
+							url = calEvent.data.custom.modifyLink;
 						}
 						else {
-							var url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=week';
+							url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=week';
 						}
 
 						data.modifyLink = '<a class="btn modify float-right" href="' + url + '"><span></span>Modify</a>';
@@ -152,6 +154,21 @@
                     // Attend/Unattend butonye
                     else if (data.attendanceRequestButton.toString() != 'false') {
                         data.attendanceRequestButton = '<a class="btn no-icon float-right" href="#">' + calEvent.data.attendance.requestButton.toString() + '</a>'
+                    }
+
+                    // Booking butonyes (if available)
+                    data.bookingActions = []
+                    if (calEvent.data.booking && calEvent.data.booking.buttons) {
+                        $.each(calEvent.data.booking.buttons, function() {
+                            data.bookingActions.push(
+                                $('<a class="btn float-right" />')
+                                    .data('seriesId', calEvent.data.meta.seriesId)
+                                    .addClass(this.class)
+                                    .attr('href', this.href)
+                                    .text(this.label)
+                                    .prepend('<span />')
+                            )
+                        })
                     }
 
                     c.bubble.display('edit', data, jsEvent, this)
@@ -497,6 +514,8 @@
                             <span class="attendanceRequestButton"></span>
                         </dd>
                     </dl>
+                </div>
+                <div class="bookingActions">
                 </div>
             </form>
 
