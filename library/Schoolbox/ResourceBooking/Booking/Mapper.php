@@ -145,7 +145,7 @@ class Mapper extends BaseMapper {
      *                             resource_id: filters by given resource IDs
      *                             owner_id:    filters by this event owner
      *
-     * @return Collection
+     * @return Collection|Model[]
      */
     public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array()) {
         // If using Aura:sql_query
@@ -253,7 +253,7 @@ class Mapper extends BaseMapper {
      *                             gets Status\Model::STATUS_PENDING and
      *                             Status\Model::STATUS_APPROVED only.
      *
-     * @return Collection
+     * @return Collection|Model[]
      */
     public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array()) {
         return $this->findForTimespan(
@@ -274,7 +274,7 @@ class Mapper extends BaseMapper {
      *                             gets Status\Model::STATUS_PENDING and
      *                             Status\Model::STATUS_APPROVED only.
      *
-     * @return Collection
+     * @return Collection|Model[]
      */
     public function findForResource($resourceId, $fromTimestamp, $toTimestamp, $statusIds = array()) {
         return $this->findForTimespan(
