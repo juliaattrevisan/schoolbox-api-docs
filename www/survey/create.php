@@ -71,7 +71,6 @@ else {
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
-	$this->setBlock(TEMPLATE_content, 'max_attempts', 'max_attempts_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Assessment');
 
@@ -147,14 +146,9 @@ else {
 
 	/* Resit amounts
 	 */
-	for ($i = 1; $i < 11; $i++) {
-		$this->setVar(array(
-			'MAX_ATTEMPTS_VALUE' => $i,
-			'MAX_ATTEMPTS_CHECKED' => '',
-		));
-
-		$this->parse('max_attempts_block', 'max_attempts', true);
-	}
+	$this->setVar(array(
+		'MAX_ATTEMPTS_CHECKED' => '',
+	));
 
     /* Don't display questions contents, which appears in Modify
      */

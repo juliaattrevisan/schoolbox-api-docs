@@ -127,16 +127,14 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>
-					<h4>Maximum Attempts</h4>
+					<h4>Allow Multiple Submissions</h4>
 					<p>
-						The maximum number of times someone can attempt this Survey.
+						Allow participants to make more than one submission.
 					</p>
-					<select name='max_attempts'>
-						<option value='0'>Unlimited</option>
-						<!-- BEGIN max_attempts -->
-						<option value='{MAX_ATTEMPTS_VALUE}' {MAX_ATTEMPTS_CHECKED}>{MAX_ATTEMPTS_VALUE}</option>
-						<!-- END max_attempts -->
-					</select>
+					<div class="textarea-container">
+						<input type="hidden" name="max_attempts" value="1" />
+						<input type="checkbox" name="max_attempts" value="0" {MAX_ATTEMPTS_CHECKED}>Participants can make more than one submission.
+					</div>
 				</td>
 			</tr>
 			<tr>
