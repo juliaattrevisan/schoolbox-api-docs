@@ -14,19 +14,21 @@
 namespace Schoolbox\ResourceBooking\Booking\Util;
 
 use Alaress_Date_Format;
-use Calendar_Event_Type_Day;
+use Calendar_Event_Type_ResourceBooking;
 use EOTC\Calendar\Event;
+use Schoolbox\ResourceBooking\Booking;
 
 class EventConverter {
 
     /**
-     * Converts an instance of EOTC\Calendar\Event into Calendar_Event_Type_Day
+     * Converts an instance of EOTC\Calendar\Event into Calendar_Event_Type_Abstract
      *
-     * @param Event $eventItem
+     * @param Event         $eventItem
+     * @param Booking\Model $booking
      *
-     * @return Calendar_Event_Type_Day
+     * @return Calendar_Event_Type_ResourceBooking
      */
-    public function convertEventToCalendarEvent(Event $eventItem) {
+    public function convertEventToCalendarEvent(Event $eventItem, Booking\Model $booking) {
         /* Convert dates ;(
          */
         $startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
@@ -50,8 +52,11 @@ class EventConverter {
         /* Translate an \EOTC\Event type into a
          * Calendar_Event_Type_Abstract type
          */
-        $event = new Calendar_Event_Type_Day();
+        $event = new \Calendar_Event_Type_ResourceBooking();
+        $event->setBooking($booking);
 //        $event->setAuthorName($eventItem->getAuthor()->getFullname());
+        // Should be able to set owner ID too, but for now that has to be
+        // referenced from the booking object.
         $event->setAuthorName($eventItem->getAuthor()->formatName());
         $event->setAuthorId($eventItem->getAuthor()->getId());
         $event->setEventId($eventItem->getId());

@@ -12,6 +12,7 @@
 namespace Schoolbox\ResourceBooking\Booking\Component;
 
 use Component_Dashboard_ControllerAbstract;
+use Calendar_Api_EventType_ResourceBooking_Moderate_Default;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Booking;
 use Aura\Di;
@@ -49,45 +50,12 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         $startTime = strtotime("00:00",            $_SERVER['REQUEST_TIME']);
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
 
-        // Show only items I have moderator permission for.
-        // If I am superuser or have moderate permissions, then I can moderate
-        // all items.
-        $baseManageRule = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasServicePermission(
-                UserAccess::SERVICE_RESOURCE_BOOKING,
-                UserAccess::ACCESS_FULL
-            )
+        $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderate_Default(
+            $this->user, array()
         );
 
-        $restrictedIds = array();
-        try {
-            $baseManageRule->authorize(array(), $this->user);
-        }
-        catch (Failure\Base $e) {
-            // This user isn't a moderator.
-            // Maybe they are a moderator for some items?
-            $items = $this->bookingMapper->getJoinMapper('resource')->findForModerator(
-                $this->user->getId()
-            );
-            foreach ($items as $item) {
-                $restrictedIds[] = $item->getId();
-            }
-            // If I still don't moderate any items - don't show this component
-            if (empty($restrictedIds)) {
-                return false;
-            }
-        }
-
-        // We know the rules:
-        // use AuthChecker->check('resourceBooking.approve', {id: booking.id})
-        // Cache the booking, too, so I don't fetch it every single check.
-        $this->bookings = $this->bookingMapper->findForTimespan(
-            $startTime,
-            $endTime,
-            array(Booking\Status\Model::STATUS_PENDING),
-            $restrictedIds
-        );
+        // Still need to check if user actually has any bookable items.
+        $this->bookings = $bookingApi->getEvents($startTime, $endTime);
         return true;
     }
 
@@ -98,14 +66,6 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
             return false;
         }
 
-        $util     = new Booking\Util\EventConverter();
-        $bookings = $this->bookings->map(function($item) use($util) {
-            return array(
-                'booking' => $item,
-                'event'   => $util->convertEventToCalendarEvent($item->getEvent()),
-            );
-        });
-
         // Where do I get a Twig loader from?
         // I should get the dependency injected one, but that means getting the
         // global DI container.
@@ -115,7 +75,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
             $this->templateEngine->render(
                 '@resourceBooking/component/resourceManagement.twig',
                 array(
-                    'bookings'  => $bookings,
+                    'bookings'  => $this->bookings,
                     'component' => $this,
                 )
             )

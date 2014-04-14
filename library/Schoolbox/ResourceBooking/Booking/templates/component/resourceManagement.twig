@@ -7,7 +7,7 @@
                 <span class="eventListing">
                     <strong>
                         {# getEventSpan() dumps out htmlentities, so need to disable filter #}
-                        {{ item.event.eventSpan|raw }}
+                        {{ item.eventSpan|raw }}
                     </strong>
                     <span>
                         {{ item.booking.resource.category.name }} -
