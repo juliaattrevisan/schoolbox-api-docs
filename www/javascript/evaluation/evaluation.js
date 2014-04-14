@@ -94,12 +94,16 @@
 				}
 			});
 
-			$j('.evaluation-saving').html('<h2>Saved</h2>');
+			$j('.evaluation-saving').html('<p><strong>Saved</p></strong>');
 
 			/* Detect errors, prevent redirection if any were made
+			 * and hide that Saving box
 			 */
 			if (!errors) {
 				location.href = href;
+			}
+			else {
+				$('.evaluation-saving').hide();
 			}
 		}
 	}
