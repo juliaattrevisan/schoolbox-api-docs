@@ -77,6 +77,9 @@
         RewriteCond  %{REQUEST_URI} login.php$
         RewriteRule ^(.*)$ http://%{HTTP_HOST}/ [R,L]
 
+        RewriteCond %{REQUEST_URI} ^/favicon.ico$
+        RewriteRule ^(.*)$ /favicon.ico.php [L,R=301]
+
         # Force SSL
         #RewriteCond %{SERVER_PORT} !^443$
         #RewriteCond %{REQUEST_URI} ^/$ [OR]
