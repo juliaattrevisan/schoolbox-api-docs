@@ -71,11 +71,15 @@ class EventConverter {
 //        $event->setType($eventItem->getEventType()->getId());
         $event->setNote($eventItem->getNote());
         $event->setAccess($eventItem->getAccess());
-//        $event->setEventType($eventItem->getEventType()->getType());
-//        $event->setColour($eventItem->getEventType()->getColor());
+
+        // All bookings are personal events
+        $event->setType(1);
+
         $event->setDetail($eventItem->getDetail());
         $event->setLocation($eventItem->getLocation());
         $event->setAllDay($eventItem->getAllDay());
+        // Resource booking events: not editable in the conventional way
+        $event->setIsEditable(false);
 
 //        /* If you have write access to the event. Only superusers
 //         * and authors can modify an event
