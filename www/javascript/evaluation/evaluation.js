@@ -32,8 +32,7 @@
 			var href = $(this).attr('href');
 			$j(this).confirmDialog({
 				confirmEvent: function() {
-					$j.fn.evaluation.saveAll();
-					location.href = href;
+					$j.fn.evaluation.saveAll(href);
 				}
 			});
 		});
@@ -42,7 +41,7 @@
 	/**
 	 * Save each individual question
 	 */
-	$j.fn.evaluation.saveAll = function() {
+	$j.fn.evaluation.saveAll = function(href) {
 		init();
 
 		/* Allow display of saving indicator before locking browser up
@@ -63,19 +62,45 @@
 		 * Save each question form
 		 */
 		function saveForms() {
+			var errors = false;
+
 			$j('.questionForm').each(function(index, element) {
 				var id = $j(element).attr('id').replace('questionForm-', '');
 
-				var plugin = "$.fn." + $j(element).data('plugin') + ".saveOne($('#questionForm-" + id + "'))";
+				var prefix = "$.fn." + $j(element).data('plugin');
 
+				/* Run saveOne() multiple times
+				 */
+				var plugin = prefix + ".saveOne($('#questionForm-" + id + "'))";
 				var hadoken = new Function(plugin);
 				hadoken();
+
+				/* Extract validation ruleset for this particular question type
+				 */
+				var method = prefix + ".getValidationRules()";
+				var shoryuken = new Function('return ' + method);
+				var rules = shoryuken();
+
+				$j(element).validate();
+
+				/* Apply custom rules
+				 */
+				$j(element).find('textarea').rules('add', rules);
+
+				/* If any aren't valid, mark as bad
+				 */
+				if (!$j(element).valid()) {
+					errors = true;
+				}
 			});
 
 			$j('.evaluation-saving').html('<h2>Saved</h2>');
 
-			/* TODO: Redirect upon completion
+			/* Detect errors, prevent redirection if any were made
 			 */
+			if (!errors) {
+				location.href = href;
+			}
 		}
 	}
 

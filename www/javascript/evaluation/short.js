@@ -65,4 +65,11 @@
 			}
 		});
 	}
+
+	$.fn.evaluationShort.getValidationRules = function() {
+		return {
+			required: true,
+			minlength: 2
+		}
+	}
 }(jQuery));

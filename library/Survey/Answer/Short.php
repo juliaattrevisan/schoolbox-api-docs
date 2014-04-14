@@ -25,6 +25,7 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
         parent::__construct();
 
         $this->responseHandler = new Survey_Response();
+		$this->questionHandler = new Survey_Question();
     }
 
     /**
@@ -114,5 +115,52 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
 				'answer_configuration_block' => ''
 			));
 		}
+	}
+
+	/**
+	 * Resets answer tokens so a user can fill them in while actually taking
+	 * the test.
+	 *
+	 * This override allows Survey configuration options to be injected
+	 *
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function prepareResponse($page, $question_id) {
+
+		/* Set up configuration options
+		 */
+		$question = $this->questionHandler->getByID($question_id);
+		$config = json_decode($question['config']);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+		));
+
+		/* Prefill
+		 */
+		$existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+		$currentAnswer = $this->getByQuestionID($question_id);
+
+		if ($existing['response']) {
+			$page->setVar(array(
+				'QUESTION_ID' => $question_id,
+				'QUESTION_PLUGIN' => $this->plugin,
+				'ANSWER_ID' => $currentAnswer['answer_id'],
+				'ANSWER' => Scrub::text($existing['response']),
+			));
+		}
+		else {
+			$page->setVar(array(
+				'QUESTION_ID' => $question_id,
+				'QUESTION_PLUGIN' => $this->plugin,
+				'ANSWER_ID' => $currentAnswer['answer_id'],
+				'ANSWER' => '',
+			));
+		}
+
+		$page->parse('answerOption_block', 'answerOption', true);
 	}
 }
