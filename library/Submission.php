@@ -97,7 +97,7 @@ class Submission extends DeprecatedModel {
             JOIN category c ON s.category = c.id
             LEFT JOIN categoryCode cc ON cc.categoryID = c.id
             LEFT JOIN file ON s.fid = file.id
-            LEFT JOIN file_type ft ON s.type = ft.id
+            LEFT JOIN lu_submission_type ft ON s.type = ft.id
             LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
             LEFT JOIN submission_notification sn ON s.id = sn.`box_id`
             WHERE $field $conditional
@@ -211,7 +211,7 @@ class Submission extends DeprecatedModel {
 				  LEFT JOIN student_submission t ON t.box_id = s.id AND t.owner = '$userID'
 				  LEFT JOIN file ON s.fid = file.id
 				  LEFT JOIN allowedFileTypes a ON file.mime_type = a.mime
-			 	  LEFT JOIN file_type ft ON s.type = ft.id
+			 	  LEFT JOIN lu_submission_type ft ON s.type = ft.id
 				  WHERE s.category = c.id AND s.deleted = 0 AND s.late_date > NOW() AND s.owner != '$userID' AND t.id IS NULL
                   AND c.id IN (" . implode(',', $categoryList) . ")
                   AND s.task_id IS NULL
@@ -457,7 +457,7 @@ class Submission extends DeprecatedModel {
                               LEFT JOIN allowedFileTypes af ON f.mime_type = mime
                               LEFT JOIN student_submission ss ON ss.box_id = sb.id AND (ss.owner = '$userID' OR ss.owner IS NULL)
                               LEFT JOIN submission_return sr ON sr.box_id = sb.id AND (sr.owner = '$userID' OR sr.owner IS NULL)
-                              LEFT JOIN file_type ft ON sb.type = ft.id
+                              LEFT JOIN lu_submission_type ft ON sb.type = ft.id
                               WHERE
                               sb.category = '" . $categoryID . "'
                               AND sb.deleted = '0'
@@ -509,7 +509,7 @@ class Submission extends DeprecatedModel {
                 smt.slug,
                 sb.accept_submission
             FROM submission_box sb
-            LEFT JOIN file_type ft ON sb.type = ft.id
+            LEFT JOIN lu_submission_type ft ON sb.type = ft.id
             LEFT JOIN submission_mark_type smt ON sb.mark_type = smt.mark_type_id
             WHERE sb.category = '$categoryID'
 			$ownerCondA
@@ -522,8 +522,8 @@ class Submission extends DeprecatedModel {
             SELECT
                 assess.assess_id AS id,
                 assess.category_id AS category,
-                file_type.id AS type_id,
-                file_type.name AS typeName,
+                lu_submission_type.id AS type_id,
+                lu_submission_type.name AS typeName,
                 assess.user_id AS owner,
                 UNIX_TIMESTAMP(assess.start) AS open,
                 UNIX_TIMESTAMP(assess.finish) AS date,
@@ -533,7 +533,7 @@ class Submission extends DeprecatedModel {
                 assess.created_at AS created,
                 assess.availability
             FROM assess
-            LEFT JOIN file_type ON file_type.id = assess.type
+            LEFT JOIN lu_submission_type ON lu_submission_type.id = assess.type
             WHERE category_id = '$categoryID'
             AND assess.deleted_at IS NULL
             $ownerCondB
@@ -568,7 +568,7 @@ class Submission extends DeprecatedModel {
                               LEFT JOIN  file f ON sb.fid = f.id AND f.deleted = '0'
                               LEFT JOIN allowedFileTypes af ON f.mime_type = mime
                               LEFT JOIN student_submission ss ON ss.box_id = sb.id AND ss.owner = '" . $_SESSION['id'] . "'
-                              LEFT JOIN file_type ft ON sb.type = ft.id
+                              LEFT JOIN lu_submission_type ft ON sb.type = ft.id
                               WHERE sb.category = '" . $categoryID . "' AND sb.deleted = '0' AND sb.type = '" . $type . "'
                               AND sb.task_id IS NULL
                               ORDER BY sb.date DESC";
@@ -789,18 +789,18 @@ class Submission extends DeprecatedModel {
     function getActivityLog($userID, $limit = 5, $categoryList) {
         $implodedCategoryList = implode(',', $categoryList);
 
-        $query = " ( SELECT open_date activity_date, s.type, f.name typeName,s.id box_id, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f
+        $query = " ( SELECT open_date activity_date, s.type, f.name typeName,s.id box_id, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, lu_submission_type f
 					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (" . implode(
             ',', $categoryList
         ) . ") )
 					UNION
-				    ( SELECT `date`, u.type, l.name typeName, u.id box_id, u.name, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, file_type l )
+				    ( SELECT `date`, u.type, l.name typeName, u.id box_id, u.name, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, lu_submission_type l )
 					  LEFT JOIN student_submission d ON d.box_id = u.id AND d.owner = $userID
 					  WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() AND e.id IN (" . implode(
             ',', $categoryList
         ) . ") )
 					UNION
-					( SELECT `late_date`, t.type, i.name typeName, t.id box_id, t.name, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, file_type i
+					( SELECT `late_date`, t.type, i.name typeName, t.id box_id, t.name, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, lu_submission_type i
 					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() AND a.id IN (" . implode(
             ',', $categoryList
         ) . ") )
@@ -813,7 +813,7 @@ class Submission extends DeprecatedModel {
                     UNION
 				   (SELECT start AS activity_date,
                         assess.type,
-                        file_type.name AS typeName,
+                        lu_submission_type.name AS typeName,
                         assess.assess_id AS box_id,
                         assess.title AS name,
                         assess.description AS description,
@@ -822,7 +822,7 @@ class Submission extends DeprecatedModel {
                         '' AS fid,
                         'new'
                      FROM assess
-                     LEFT JOIN file_type ON file_type.id = assess.type
+                     LEFT JOIN lu_submission_type ON lu_submission_type.id = assess.type
                      LEFT JOIN category ON category.id = assess.category_id
                      WHERE start < NOW()
                      AND assess.category_id IN ($implodedCategoryList)
@@ -830,7 +830,7 @@ class Submission extends DeprecatedModel {
                     UNION
                    (SELECT finish AS activity_date,
                         assess.type,
-                        file_type.name AS typeName,
+                        lu_submission_type.name AS typeName,
                         assess.assess_id AS box_id,
                         assess.title AS name,
                         assess.description AS description,
@@ -839,7 +839,7 @@ class Submission extends DeprecatedModel {
                         '' AS fid,
                         'closed'
                      FROM assess
-                     LEFT JOIN file_type ON file_type.id = assess.type
+                     LEFT JOIN lu_submission_type ON lu_submission_type.id = assess.type
                      LEFT JOIN category ON category.id = assess.category_id
                      WHERE finish < NOW()
                      AND assess.category_id IN ($implodedCategoryList))
@@ -916,7 +916,7 @@ class Submission extends DeprecatedModel {
     }
 
     /**
-     * Get the name of a file_type by id. Used in submissions reporting
+     * Get the name of a lu_submission_type by id. Used in submissions reporting
      *
      * @param $typeId
      * @return array|bool
@@ -1271,7 +1271,7 @@ class Submission extends DeprecatedModel {
               '0' kind, sb.id, sb.name `title`, ft.name `type`, UNIX_TIMESTAMP(sb.date) AS `date`, UNIX_TIMESTAMP(sb.late_date) AS late_date,
               c.`name` subj_name, c.id subj_id, sb.accept_submission submittable, sb.multi_submission multi_submit, COUNT(ss.id) submit_count
             FROM submission_box sb
-            LEFT JOIN file_type ft ON ft.id = sb.type
+            LEFT JOIN lu_submission_type ft ON ft.id = sb.type
             LEFT JOIN category c ON c.`id` = sb.`category`
             LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID'
             WHERE c.id $conditional AND sb.deleted IS FALSE
@@ -1287,7 +1287,7 @@ class Submission extends DeprecatedModel {
               '1' kind, a.assess_id id, a.title, ft.name `type`, a.finish `date`, UNIX_TIMESTAMP(a.finish) AS `date`,
               c.`name` subj_name, c.id subj_id, a.max_attempts, COUNT(aa.attempt_id) attempt_count
             FROM assess a
-            LEFT JOIN file_type ft ON ft.id = a.`type`
+            LEFT JOIN lu_submission_type ft ON ft.id = a.`type`
             LEFT JOIN category c ON c.`id` = a.`category_id`
             LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id` AND aa.user_id = '$studentID'
             WHERE c.id $conditional
