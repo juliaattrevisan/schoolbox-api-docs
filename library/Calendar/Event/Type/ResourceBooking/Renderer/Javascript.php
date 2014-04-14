@@ -72,21 +72,41 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
             // If I'm a moderator, show confirm/reject.
             // (Use the booking controller to generate this instead, because it
             //  has access to the URL generators)
-//            $bookingButtons = array(
-//                array(
-//                    'class' => "view booking-view",
-//                    'href'  => "/resource-booking/booking/2/cancel",
-//                    'label' => "Cancel",
-//                ),
-//                array(
-//                    'class' => "delete booking-cancel",
-//                    'href'  => "/resource-booking/booking/2/cancel",
-//                    'label' => "Cancel",
-//                ),
-//            );
-//            if (!($currentEvent->getBooking()->getEvent()->getOwner()->getId() == $_SESSION['user']->getId())) {
-//
-//            }
+
+            // If I'm viewing this, then I must be able to cancel and modify.
+            $bookingId      = $currentEvent->getBooking()->getId();
+            $bookingButtons = array(
+                array(
+                    'class' => "modify booking-modify",
+                    'href'  => $this->router->generate('resourceBooking.edit', array('id' => $bookingId)),
+                    'label' => "modify",
+                ),
+                array(
+                    'class' => "delete booking-cancel",
+                    'href'  => $this->router->generate('resourceBooking.cancel', array('id' => $bookingId)),
+                    'label' => "Cancel",
+                ),
+            );
+
+            // Is someone other than the owner of the event viewing this?
+            // If so, the viewing user must be a moderator, so show the moderate
+            // options.
+            if (!($currentEvent->getBooking()->getEvent()->getOwner()->getId() == $_SESSION['user']->getId())) {
+                if (!$currentEvent->getBooking()->getStatus()->isApproved()) {
+                    $bookingButtons[] = array(
+                        'class' => 'tick booking-approve',
+                        'href'  => $this->router->generate('resourceBooking.approve', array('id' => $bookingId)),
+                        'label' => "Approve",
+                    );
+                }
+                if (!$currentEvent->getBooking()->getStatus()->isRejected()) {
+                    $bookingButtons[] = array(
+                        'class' => 'reply booking-reject',
+                        'href'  => $this->router->generate('resourceBooking.reject', array('id' => $bookingId)),
+                        'label' => "Reject",
+                    );
+                }
+            }
 
             $event = array(
                 'title' => Scrub::text($currentEvent->getNote()),
@@ -126,12 +146,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                         'level' => $currentEvent->getDerivedEventLevel(),
                         'completed' => $currentEvent->getCompleted(),
                     ),
-                    'links' => array(
-//                        'category' => array(
-//                            'id' => $categoryId,
-//                            'name' => $categoryName,
-//                        )
-                    ),
+                    'links' => $bookingButtons,
                     'styles' => array(
                         'visible' => $cssClass,
                     ),
