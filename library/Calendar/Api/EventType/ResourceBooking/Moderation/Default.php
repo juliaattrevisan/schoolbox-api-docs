@@ -12,7 +12,7 @@ use Alaress\Authorizer\Failure;
 use Schoolbox\UserAccess;
 use Schoolbox\ResourceBooking\Booking;
 
-class Calendar_Api_EventType_ResourceBooking_Moderate_Default extends Calendar_Api_EventType_Abstract {
+class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar_Api_EventType_Abstract {
 
     /**
      * Constructor

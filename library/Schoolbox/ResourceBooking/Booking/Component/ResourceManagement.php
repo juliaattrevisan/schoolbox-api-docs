@@ -12,14 +12,13 @@
 namespace Schoolbox\ResourceBooking\Booking\Component;
 
 use Component_Dashboard_ControllerAbstract;
-use Calendar_Api_EventType_ResourceBooking_Moderate_Default;
+use Calendar_Api_EventType_ResourceBooking_Moderation_Default;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Booking;
 use Aura\Di;
 use Twig_Environment;
 use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Failure;
-use Schoolbox\UserAccess;
 
 class ResourceManagement extends Component_Dashboard_ControllerAbstract {
 
@@ -50,7 +49,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         $startTime = strtotime("00:00",            $_SERVER['REQUEST_TIME']);
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
 
-        $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderate_Default(
+        $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderation_Default(
             $this->user, array()
         );
 
