@@ -9,7 +9,24 @@
  * @link       http://www.alaress.com.au/
  * @copiedFrom Steve Chan <steve.chan@alaress.com.au>
  */
+
+use Aura\Router\Router;
+
 class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
+
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * Setup: injects global router into this object, so it can use it to look
+     * up URLs relating to actions on an event.
+     */
+    protected function setup() {
+        global $di;
+        $this->router = $di->get('router');
+    }
 
     /**
      * Renders an event

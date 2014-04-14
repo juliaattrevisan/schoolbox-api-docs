@@ -28,7 +28,13 @@ abstract class Calendar_Event_Type_Renderer_Abstract {
 
 		$this->setGroupHandler(new Group(CALENDAR_SERVICE));
 		$this->setCalendarHandler(new Calendar());
+		$this->setup();
 	}
+
+	/**
+	 * Overridable setup method.
+	 */
+	protected function setup() {}
 
 	abstract public function visit($visitor);
 
