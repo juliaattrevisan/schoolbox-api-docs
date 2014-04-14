@@ -79,7 +79,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                 array(
                     'class' => "modify booking-modify",
                     'href'  => $this->router->generate('resourceBooking.edit', array('id' => $bookingId)),
-                    'label' => "modify",
+                    'label' => "Modify",
                 ),
                 array(
                     'class' => "delete booking-cancel",
@@ -146,7 +146,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                         'level' => $currentEvent->getDerivedEventLevel(),
                         'completed' => $currentEvent->getCompleted(),
                     ),
-                    'links' => $bookingButtons,
+                    'links' => array(),
                     'styles' => array(
                         'visible' => $cssClass,
                     ),
@@ -157,7 +157,8 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                         'listButton' => false,
                     ),
                     'booking' => array(
-                        'status' => $currentEvent->getBooking()->getStatus()->jsonSerialize(),
+                        'status'  => $currentEvent->getBooking()->getStatus()->jsonSerialize(),
+                        'buttons' => $bookingButtons,
                     ),
                 )
             );
