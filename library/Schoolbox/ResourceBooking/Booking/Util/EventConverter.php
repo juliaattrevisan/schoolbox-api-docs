@@ -62,6 +62,7 @@ class EventConverter {
         $event->setEventId($eventItem->getId());
         $event->setStartTime($eventItem->getStartDateTime());
         $event->setEndTime($eventItem->getEndDateTime());
+        $event->setPublishDate($eventItem->getPublishDateTime());
 //        $event->setCampusList(implode(',', $campusIds));
 
         /* EOTC Events are always of the type "EOTC" for usage
