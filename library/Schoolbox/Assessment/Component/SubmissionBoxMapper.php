@@ -221,14 +221,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 		));
 
-		//
 		// TODO add Mapper->hasCollection?
-		$this->hasJoin('notify', array(
-			'multiple'  => true,
-			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\NotificationMapper',
-			'this_key'  => 'id',
-			'other_key' => 'box_id',
-		));
 		$this->hasJoin('submission', array(
 			'multiple'  => true,
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
@@ -269,7 +262,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
 		$mime_mapper     = $file_mapper->getJoinMapper('allowedFileType');
-//		$notify_mapper   = $this->getJoinMapper('notify');
 		$worktype_mapper = $this->getJoinMapper('work_type');
 		$marktype_mapper = $this->getJoinMapper('mark_type');
 
@@ -300,10 +292,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		}
 
 		if ($submission_box instanceof SubmissionBox) {
-//			foreach ($notify_mapper->findByColumn('box_id', $submission_box->getId()) as $notify) {
-//				$submission_box->addNotification($notify);
-//			}
-
 			//
 			// Get files? (This is more evidence separate file/link mapper isn't
 			// required.)
@@ -371,7 +359,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Post-save method for submission boxes - saves new submission box files
-	 * and notifications.
 	 *
 	 * @param SubmissionBox $object
 	 * @param SubmissionBox $previous
@@ -388,10 +375,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$this->getJoinMapper('files')->save($box_file);
 			}
 		}
-//		foreach ($object->getNotifications() as $notification) {
-//			$notification->setSubmissionBoxId($object->getId());
-//			$this->getJoinMapper('notify')->save($notification);
-//		}
 	}
 
 

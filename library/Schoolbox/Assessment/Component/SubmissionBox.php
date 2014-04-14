@@ -13,8 +13,6 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\Component\SubmissionBox\File;
 use Schoolbox\Assessment\Component\SubmissionBox\FileCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\Notification;
-use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course\Task;
@@ -70,12 +68,6 @@ class SubmissionBox implements ISoftDeletable {
 	 * @var FileCollection
 	 */
 	protected $file_links;
-
-//	/**
-//	 * @var NotificationCollection
-//	 * @deprecated in favour of messaging infrastructure
-//	 */
-//	protected $notifications;
 
 	/**
 	 * @var User
@@ -143,7 +135,6 @@ class SubmissionBox implements ISoftDeletable {
 	protected $deleted;
 
 	public function __construct() {
-//		$this->setNotifications(new NotificationCollection(array()));
 		$this->setFileLinks(new SubmissionBox\FileCollection(array()));
 		$this->setCategory(new Category());
 		$this->setWorkType(new WorkType());
@@ -161,14 +152,6 @@ class SubmissionBox implements ISoftDeletable {
 		}
 
 		return false;
-	}
-
-	/**
-	 * @deprecated in favour of messaging infrastructure
-	 * @param Notification $notification
-	 */
-	public function addNotification(Notification $notification) {
-		$this->notifications->add($notification);
 	}
 
 	/**
@@ -504,24 +487,6 @@ class SubmissionBox implements ISoftDeletable {
 	 */
 	public function getRubricResultSet() {
 		return $this->rubric_result_set;
-	}
-
-	/**
-	 * @deprecated in favour of messaging infrastructure
-	 * @param  NotificationCollection $notifications
-	 * @return $this
-	 */
-	public function setNotifications($notifications) {
-		$this->notifications = $notifications;
-		return $this;
-	}
-
-	/**
-	 * @deprecated in favour of messaging infrastructure
-	 * @return NotificationCollection|Notification[]
-	 */
-	public function getNotifications() {
-		return $this->notifications;
 	}
 
 	/**
