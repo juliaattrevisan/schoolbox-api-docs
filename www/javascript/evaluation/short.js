@@ -66,10 +66,16 @@
 		});
 	}
 
+	/**
+	 * Decide what the validation rules are for this particular
+	 * question type
+	 *
+	 * @returns {{required: boolean, minlength: number}}
+	 */
 	$.fn.evaluationShort.getValidationRules = function() {
 		return {
 			required: true,
-			minlength: 2
+			minlength: 1
 		}
 	}
 }(jQuery));
