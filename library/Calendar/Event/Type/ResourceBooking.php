@@ -11,6 +11,8 @@ use Schoolbox\ResourceBooking\Booking\Model;
 
 class Calendar_Event_Type_ResourceBooking extends Calendar_Event_Type_Day {
 
+    protected $rendererClass = 'Calendar_Event_Type_ResourceBooking_Renderer_Javascript';
+
     /**
      * @var Model
      */
