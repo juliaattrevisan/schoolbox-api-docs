@@ -59,11 +59,12 @@ if (!empty($_POST)) {
         'duration' => Survey_Main::UNLIMITED_DURATION,
         'anonymous_result' => $_POST['anonymous_result'],
         'notify_author' => $_POST['notify_author'],
-        'max_attempts' => 1,
+        'max_attempts' => $_POST['max_attempts'],
     ));
 
     SitePage::localRedir('/survey/summary/' . $this->arg[0]);
-} else {
+}
+else {
 
     /* Render modify page
      */
@@ -133,8 +134,14 @@ if (!empty($_POST)) {
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
     }
 
-    /* Show this Assess' contents
-      */
+	/* Resit amounts
+	 */
+	$this->setVar(array(
+		'MAX_ATTEMPTS_CHECKED' => $assess['max_attempts'] == 0 ? 'checked="checked"' : '',
+	));
+
+    /* Show this Survey's contents
+     */
     $this->setFile('assessContentsFragment', 'survey/contents.html');
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
@@ -148,4 +155,3 @@ if (!empty($_POST)) {
      */
     $this->setVar('importXML_block', '');
 }
-

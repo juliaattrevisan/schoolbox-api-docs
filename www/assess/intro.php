@@ -67,7 +67,8 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  */
 if ($attempt) {
     $_SESSION['attempt_id'] = $attempt['attempt_id'];
-} /* Otherwise start a new attempt if there is a limit
+}
+/* Otherwise start a new attempt if there is a limit
  */
 else {
 

@@ -127,6 +127,18 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>
+					<h4>Allow Multiple Submissions</h4>
+					<p>
+						Allow participants to make more than one submission.
+					</p>
+					<div class="textarea-container">
+						<input type="hidden" name="max_attempts" value="1" />
+						<input type="checkbox" name="max_attempts" value="0" {MAX_ATTEMPTS_CHECKED}>Participants can make more than one submission.
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
 					<h4>Anonymous Results</h4>
 					<p>Hide usernames from results listings and exported survey results files.</p>
 					<div class="textarea-container">

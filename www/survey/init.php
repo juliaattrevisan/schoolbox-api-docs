@@ -94,8 +94,6 @@ else {
 	}
 	else {
 		$_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
-
-		$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 	}
 }
 
