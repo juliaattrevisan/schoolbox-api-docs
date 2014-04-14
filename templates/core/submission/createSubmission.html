@@ -639,23 +639,6 @@
         </td>
     </tr>
     <!-- END duework_timespan -->
-
-    <!-- BEGIN notification_enable -->
-    <tr>
-        <td><h4>Send Notifications</h4>
-            <em>Which email notifications should be sent to students about this due work?</em></td>
-        <td>
-            <label for="notif_upcoming">
-                <input id="notif_upcoming" name="notif_upcoming" type="checkbox" value="true"{NOTIF_UPCOMING_ENABLED}/>
-                Upcoming <i>(sent {UPCOMING_THRESHHOLD} prior to due date)</i>
-            </label>
-            <label for="notif_overdue">
-                <input id="notif_overdue" name="notif_overdue" type="checkbox" value="true"{NOTIF_OVERDUE_ENABLED}/>
-                Overdue <i>(sent {OVERDUE_THRESHHOLD} after due date)</i>
-            </label>
-        </td>
-    </tr>
-    <!-- END notification_enable -->
 </table>
 <input type="hidden" name='fileId' value="{FILEID}"/>
 <input type="hidden" name="id" value="{ID}"/></td>

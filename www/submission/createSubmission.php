@@ -22,14 +22,6 @@ $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_bl
 $this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
 
-$this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
-if(Cfg::get('due_work_notifications_enabled')) {
-    $this->parse('notification_enable_block', 'notification_enable');
-}
-else {
-    $this->setVar('notification_enable_block', '');
-}
-
 $this->setVar('category_select_block', '');
 $this->setVar('existing_marks_warning_block', '');
 $this->setVar('COURSE_CRITERIA', '');
@@ -340,16 +332,6 @@ $output = array(
     'UNIT_ID'          => $unit_id,
     'TASK_INSTANCE_ID' => $task_instance_id,
 );
-
-foreach (array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
-    $notification = $submission->getNotifications()->getOfType(strtolower($i));
-    // Notifications: enabled by default
-    $is_enabled =
-        !($submission->getId()) ||
-        ($notification instanceof SubmissionBox\Notification && $notification->getEnabled());
-    $output["NOTIF_{$i}_ENABLED"] = $is_enabled ? ' checked="checked"' : '';
-    $output["{$i}_THRESHHOLD"] = $j;
-}
 
 $this->setVar($output);
 
