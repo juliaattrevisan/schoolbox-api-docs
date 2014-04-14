@@ -79,13 +79,13 @@
 				 */
 				var method = prefix + ".getValidationRules()";
 				var shoryuken = new Function('return ' + method);
-				var rules = shoryuken();
+				var configuration = shoryuken();
 
 				$j(element).validate();
 
 				/* Apply custom rules
 				 */
-				$j(element).find('textarea').rules('add', rules);
+				$j(element).find(configuration.element).rules('add', configuration.rules);
 
 				/* If any aren't valid, mark as bad
 				 */

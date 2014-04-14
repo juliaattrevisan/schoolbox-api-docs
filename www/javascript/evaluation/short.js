@@ -70,12 +70,15 @@
 	 * Decide what the validation rules are for this particular
 	 * question type
 	 *
-	 * @returns {{required: boolean, minlength: number}}
+	 * @returns {{element: string, rules: {required: boolean, minlength: number}}}
 	 */
 	$.fn.evaluationShort.getValidationRules = function() {
 		return {
-			required: true,
-			minlength: 1
+			element: 'textarea',
+			rules: {
+				required: true,
+				minlength: 1
+			}
 		}
 	}
 }(jQuery));
