@@ -5,12 +5,32 @@
 <script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript">
-	$j(function() {
-		$j('#definition-palette').configurator({
+	$(function() {
+		$('#definition-palette').configurator({
             context: 'homepage',
             dropDownSelector: '#template-select',
             disabledMsg: 'This component can only be used once, and is already active for the template selected.'
         }).start();
+
+
+        $( "#newForm" ).dialog({
+            autoOpen: false,
+            modal: true
+        });
+
+        $('#newHomepage').click(function() {
+            $( '#newForm').dialog("open");
+        });
+
+        $( "#renameForm" ).dialog({
+            autoOpen: false,
+            modal: true
+        });
+
+        $('#renameHomepage').click(function() {
+            $( '#renameForm').dialog("open");
+        });
+
 	});
 </script>
 <!-- END custom_head-->
@@ -31,18 +51,38 @@
 
     <div id="definition-palette">
         <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
-        <select id="template-select" name="template">
+        <select id="template-select" name="template" class="float-left" style="width: 66%" >
             <!-- BEGIN template -->
             <option value="{template.id}">{template.name}</option>
             <!-- END template -->
         </select>
-        <input type="submit" class="btn" name="action" value="Delete" />
-        <input type="text" name="name" />
-        <input type="submit" class="btn" name="action" value="New" />
-        <input type="submit" class="btn" name="action" value="Rename" />
-
+        <a class="btn no-text delete" href="#" ><span></span></a>
+            <div class="clearfix"></div>
+        <a id="newHomepage" class="btn add" href="#"><span></span>New</a>
+        <a id="renameHomepage" class="btn modify" href="#"><span></span>Rename</a>
         <div class="clearfix"></div>
         </form>
+
+        <div id="newForm" title="Add new homepage template">
+            <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST" class="standard-form">
+                <label><strong>Template name<strong></strong><input type="text" name="name"/></label>
+                <input type="submit" class="submit-btn-plain" name="submit" value="Add" />
+            </form>
+        </div>
+
+        <div id="renameForm" title="Rename existing homepage template">
+            <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST" class="standard-form">
+                <label><strong>Existing Template</strong>
+                <select id="template-select" name="template" style="width:100%" >
+                    <!-- BEGIN template -->
+                    <option value="{template.id}">{template.name}</option>
+                    <!-- END template -->
+                </select></label>
+                <label><strong>New name<strong></strong><input type="text" name="name"/></label>
+                <input type="submit" class="submit-btn-plain" name="submit" value="Rename" />
+            </form>
+        </div>
+
 
         <!-- BEGIN definition -->
         <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
