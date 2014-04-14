@@ -82,9 +82,11 @@ if (is_array($typeList)) {
 			foreach($allApi as $currentEventType => $allConnectors) {
 
 				/* Render titles etc
+				 * Put a space between CamelCase names so they become Camel Case
 				 */
 				$this->setVar(array(
-					'EVENTTYPE_NAME' => $currentEventType,
+					'EVENTTYPE_LABEL' => trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType)),
+					'EVENTTYPE_NAME'  => $currentEventType,
 				));
 
 				/* Inject individual templates just like before -_-
