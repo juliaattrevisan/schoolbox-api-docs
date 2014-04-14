@@ -13,6 +13,7 @@
             counter:   '#go-msg',
             content:   '#msg-content',
             list:      '#message-list',
+            readall:   '#msg-mar',
 
             prefetch:  5,
             debug:     false,
@@ -403,6 +404,21 @@
                     }
                 }
                 return true;
+            });
+
+
+            // mark-ALL-as-read listener
+            $(settings.readall).on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var unreads = [];
+                $j(settings.content).find('li.unread').each(function() {
+                    unreads.push(this.id.substr(2));
+                });
+
+                send({ack : unreads});
+                return false;
             });
 
 

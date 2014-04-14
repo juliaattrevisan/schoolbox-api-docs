@@ -301,7 +301,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 			// deal with this yourself
 			case 'ack':
 				if($subscription = $this->subscriptionManager->getUserSubscription($userId, true)) {
-					$markAsRead = $subscription->acceptMessages($data);
+					$markAsRead = $subscription->acceptMessages($data[1]);
 					$this->sendToUser($userId, array($command => $markAsRead));
 				}
 				break;
