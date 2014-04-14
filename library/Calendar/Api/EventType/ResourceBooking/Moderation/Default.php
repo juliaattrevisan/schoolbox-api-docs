@@ -69,7 +69,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
             $startTimestamp,
             $endTimestamp,
             array(Booking\Status\Model::STATUS_PENDING),
-            $restrictedIds
+            array('resource_id' => $restrictedIds,)
         );
         $converter  = new Booking\Util\EventConverter();
         $collection = new Calendar_Event_Collection();

@@ -138,14 +138,16 @@ class Mapper extends BaseMapper {
      *
      * @param int   $fromTimestamp
      * @param int   $toTimestamp
-     * @param array $resourceIds   Optional resource IDs to filter by.
      * @param array $statusIds     Status IDs of events to fetch. By default,
      *                             gets Status\Model::STATUS_PENDING and
      *                             Status\Model::STATUS_APPROVED only.
+     * @param array $extra         Optional values to filter by.
+     *                             resource_id: filters by given resource IDs
+     *                             owner_id:    filters by this event owner
      *
      * @return Collection
      */
-    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $resourceIds = array()) {
+    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array()) {
         // If using Aura:sql_query
 //        $this->queryFactory->newSelect()
 //            ->cols($this->getColumnArray('x'))
@@ -173,8 +175,11 @@ class Mapper extends BaseMapper {
             'startWindow' => date('Y-m-d H:i:s', $fromTimestamp),
             'endWindow'   => date('Y-m-d H:i:s', $toTimestamp),
         );
-        if (!empty($resourceIds)) {
-            $params = array_merge($params, $this->getArrayParameters($resourceIds, 'resource'));
+        if (!empty($extra['resource_id'])) {
+            $params = array_merge($params, $this->getArrayParameters($extra['resource_id'], 'resource'));
+        }
+        if (!empty($extra['owner_id'])) {
+            $params = array_merge($params, $this->getArrayParameters($extra['owner_id'], 'owner'));
         }
         $params = array_merge($params, $this->getArrayParameters($statusIds, 'status'));
         $query = "
@@ -202,8 +207,13 @@ class Mapper extends BaseMapper {
                 OR CONCAT(e.startDate, ' ', e.startTime) > :endWindow
             )
         ";
-        if (!empty($resourceIds)) {
-            $query .= ' AND b.resource_id IN '. $this->getArrayPlaceholders($resourceIds, 'resource');
+        if (!empty($extra['resource_id'])) {
+            $query .= ' AND b.resource_id IN '
+                    . $this->getArrayPlaceholders($extra['resource_id'], 'resource');
+        }
+        if (!empty($extra['owner_id'])) {
+            $query .= ' AND eo.id IN '
+                    . $this->getArrayPlaceholders($extra['owner_id'], 'owner');
         }
         $query .= ' ORDER BY e.startDate ASC, e.startTime ASC';
         $statement = $this->getDatabase()->prepare($query);
@@ -234,6 +244,27 @@ class Mapper extends BaseMapper {
     }
 
     /**
+     * Retrieves all bookings for the given owner.
+     *
+     * @param int   $ownerId
+     * @param int   $fromTimestamp
+     * @param int   $toTimestamp
+     * @param array $statusIds     Status IDs of events to fetch. By default,
+     *                             gets Status\Model::STATUS_PENDING and
+     *                             Status\Model::STATUS_APPROVED only.
+     *
+     * @return Collection
+     */
+    public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array()) {
+        return $this->findForTimespan(
+            $fromTimestamp,
+            $toTimestamp,
+            $statusIds,
+            array('owner_id' => array($ownerId))
+        );
+    }
+
+    /**
      * Retrieves all bookings for the given resource.
      *
      * @param int   $resourceId
@@ -246,7 +277,12 @@ class Mapper extends BaseMapper {
      * @return Collection
      */
     public function findForResource($resourceId, $fromTimestamp, $toTimestamp, $statusIds = array()) {
-        return $this->findForTimespan($fromTimestamp, $toTimestamp, $statusIds, array($resourceId));
+        return $this->findForTimespan(
+            $fromTimestamp,
+            $toTimestamp,
+            $statusIds,
+            array('resource_id' => array($resourceId))
+        );
     }
 
     /**
