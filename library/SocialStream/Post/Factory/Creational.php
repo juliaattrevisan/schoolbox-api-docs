@@ -214,6 +214,10 @@ class Creational extends AbstractFactory {
 		}
 		/* Other files
 		 */
+        else if($resource->getMimetype()->isImage()){
+            $object = new \SocialStream_Post_Image();
+            $object->setType('image');
+        }
 		else {
 			$object = new \SocialStream_Post_Url();
 			$object->setType('url');
@@ -244,6 +248,10 @@ class Creational extends AbstractFactory {
 			$object = new \SocialStream_Post_Video();
 			$object->setType('video');
 		}
+        else if($file->getMimetype()->isImage()){
+            $object = new \SocialStream_Post_Image();
+            $object->setType('image');
+        }
 		else {
 			$object = new \SocialStream_Post_Url();
 			$object->setType('url');

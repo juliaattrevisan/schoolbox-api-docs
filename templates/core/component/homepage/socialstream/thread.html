@@ -34,6 +34,12 @@
 				</a>
 				<!-- END socialstream_post_has_thumbnail -->
 
+                <!-- BEGIN socialstream_post_has_image -->
+                <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                    <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=constrain200" />
+                </a>
+                <!-- END socialstream_post_has_image -->
+
 				<!-- BEGIN socialstream_post_has_metadata -->
 				<a href="{SOCIALSTREAM_POST_URL}" target="_blank">{SOCIALSTREAM_POST_EXTERNAL_TITLE}</a><br />
 				<span class="description">{SOCIALSTREAM_POST_EXTERNAL_BODY}</span>
@@ -100,6 +106,13 @@
 						</a>
 						<!-- END socialstream_comment_has_icon -->
 
+                        <!-- BEGIN socialstream_comment_has_image -->
+                        <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                            <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=constrain200" />
+                        </a>
+                        <!-- END socialstream_comment_has_image -->
+
+
 						<!-- BEGIN socialstream_comment_has_thumbnail -->
 						<a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
 							<img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
@@ -165,6 +178,12 @@
 									<img src="/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}" />
 								</a>
 								<!-- END socialstream_reply_has_icon -->
+
+                                <!-- BEGIN socialstream_reply_has_image -->
+                                <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                                    <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=constrain200" />
+                                </a>
+                                <!-- END socialstream_reply_has_image -->
 
 								<!-- BEGIN socialstream_reply_has_thumbnail -->
 								<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
