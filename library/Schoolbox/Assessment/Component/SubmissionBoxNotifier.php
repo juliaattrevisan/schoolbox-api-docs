@@ -16,6 +16,9 @@ use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Collection;
+use Schoolbox\Feed\Feed;
+use Schoolbox\Feed\Item;
+use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Message;
@@ -31,7 +34,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class SubmissionBoxNotifier extends AbstractModuleNotifier {
+class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 	// list of triggers that can generate notifications
 
@@ -143,13 +146,25 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * Generate n messages for a category, from the perspective of casual observation.
+	 * Returns the metadata pertaining to this source.
+	 * Useful to RSS
 	 *
-	 * @param int $category
-	 * @param int $limit
-	 * @return Collection|TargetedMessage[]
+	 * @return mixed
 	 */
-	public function getFeed($category, $limit) {
+	public function getChannelMetadata() {
+		return null;
+	}
+
+
+	/**
+	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 *
+	 * @param int $context - most likely a category ID or ignored
+	 * @param int $limit - how many messages to retrieve
+	 * @param int $offset - by default, most recent
+	 * @return Collection|Item[]
+	 */
+	public function getFeed($context, $limit = self::SOFT_LIMIT, $offset = 0) {
 		$c = new Collection();
 
 		// TODO find/make a way to limit this
@@ -159,7 +174,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		 * @var Collection|SubmissionBox[] $boxes
 		 * @return bool
 		 */
-		$boxes = $this->mapper->findByColumn('category', $category, $options);
+		$boxes = $this->mapper->findByColumn('category', $context, $options);
 
 		$boxes = $boxes->filterByCallback(function($box) {
 			/** @var $box SubmissionBox */
@@ -167,7 +182,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			return $box->getOpenDate()->getUnixTimestamp() < $time || $box->getDueDate()->getUnixTimestamp() < $time;
 		});
 
-		$boxes = $boxes->slice($limit);
+		$boxes = $boxes->slice($limit, $offset);
 
 		// ideally this would happen in situ, not after the fact
 		$this->mapper->hydratePropertyMap($boxes, array(
@@ -177,8 +192,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		));
 
 		foreach($boxes as $box) {
-			$c->merge($this->notifyStudentOpen($box, $box->getOwner())->extractAll(null, new BlankTrigger($box->getOpenDate()->getUnixTimestamp())));
-			$c->merge($this->notifyFeedClosed($box, $box->getOwner())->extractAll(null, new BlankTrigger($box->getDueDate()->getUnixTimestamp())));
+			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentOpen($box, $box->getOwner()), $box->getOpenDate()->getUnixTimestamp()));
+			$c->merge(Feed::getItemsFromMessenger($this->notifyFeedClosed($box, $box->getOwner()), $box->getDueDate()->getUnixTimestamp()));
 		}
 
 		return $c;
