@@ -18,6 +18,7 @@ else {
 	$blog = new \Schoolbox\Blog\Blog();
 	$blog
 		->setOwner($_SESSION['user'])
+		->setCreated(new Alaress_Date_Format(time(), 'U'))
 		->setCategory($cat);
 }
 

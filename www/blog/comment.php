@@ -2,8 +2,6 @@
 
 $groupHandle   = new Group();
 
-$permission = $groupHandle->getPermission($blog->getCategory()->getId());
-
 if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	try {
 		/** @var \Schoolbox\Blog\Blog $blog */
@@ -14,6 +12,8 @@ if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		exit;
 	}
 
+	$permission = $groupHandle->getPermission($blog->getCategory()->getId());
+
 	if($permission < READ_ACCESS) {
 		error(19);
 	}
@@ -22,6 +22,7 @@ if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		$comment = new \Schoolbox\Blog\Comment();
 		$comment
 			->setBlog($blog)
+			->setCreated(new Alaress_Date_Format(time(), 'U'))
 			->setOwner($_SESSION['user'])
 			->setBody($_POST['body']);
 
@@ -42,6 +43,8 @@ elseif($this->arg[0] == 'delete' && is_numeric($this->arg[1])) {
 		error(19);
 		exit;
 	}
+
+	$permission = $groupHandle->getPermission($comment->getBlog()->getCategory()->getId());
 
 	if($comment->getOwner()->getId() == $_SESSION['id'] || $permission == FULL_ACCESS) {
 		\Schoolbox\Blog\CommentMapper::getInstance()->delete($comment);
