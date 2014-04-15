@@ -25,7 +25,7 @@ class Subcontext_CalendarContext extends BaseContext {
         // Find this day on the full calendar
         $this->getSession()->executeScript(
             sprintf(
-                'jQuery(%s).fullCalendar("changeView", "month").fullCalendar("gotoDate", %s)',
+                'jQuery(%s).fullCalendar("changeView", "month").fullCalendar("gotoDate", new Date(%s))',
                 json_encode($locator),
                 json_encode($format)
             )
