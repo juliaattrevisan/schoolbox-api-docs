@@ -147,18 +147,12 @@ class Controller extends Base {
             );
         }
         else {
+            // Redirect back to previous page, or read page if not set.
+            // (let's have a better interface than backToTheFuture too)
             $this->getResponse()->redirect->afterPost(
                 $this->getRouter()->generate('resourceItem.read', array('id' => $id))
             );
         }
-
-        // Create a related booking for any related items that were chosen.
-
-        // and redirect somewhere.
-        // Was a JSON request made instead? If so return JSON with:
-        // * response code: 200=ok, 400=not ok
-        // * item: item if it was successfully created
-        // * errors: empty if there are no errors, a list of errors otherwise.
     }
 
     /**
@@ -570,11 +564,8 @@ class Controller extends Base {
             );
         }
         else {
-            $this->getResponse()->redirect->afterPost(
-                $this->getRouter()->generate(
-                    'resourceItem.read', array('id' => $booking->getResource()->getId())
-                )
-            );
+            // Is there a previous location to redirect to? if so use that.
+            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory());
         }
     }
 
