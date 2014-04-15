@@ -31,13 +31,15 @@ class CommentMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'bid',
 			'property'   => 'blog',
-			'type'       => self::TYPE_MODEL
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'blog'
 		));
 
 		$this->hasMap(array(
 			'column'     => 'owner',
 			'property'   => 'owner',
-			'type'       => self::TYPE_MODEL
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'owner'
 		));
 
 		$this->hasMap(array(

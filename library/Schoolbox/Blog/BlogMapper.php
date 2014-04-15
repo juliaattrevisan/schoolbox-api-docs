@@ -24,7 +24,8 @@ class BlogMapper extends Mapper implements Searchable {
 	 */
 	protected function mapping() {
 		$this->hasTable('blog');
-		$this->hasModel('\Schoolbox\Blog');
+		$this->hasModel('\\Schoolbox\\Blog\\Blog');
+
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
