@@ -391,135 +391,27 @@ class Controller extends Base {
         // the find method should receive:
         // Datetime objects?
         /** @var Model[] $bookings */
-        $bookings = $this->getBookingMapper()->findForResource(
-            $id,
+        $source = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+            $this->getUser(), array()
+        );
+        $source
+            ->setResourceId($id)
+            ->setStatus($this->getRequest()->query['status']);
+        $events = $source->getEvents(
             $this->getRequest()->query['start'],
-            $this->getRequest()->query['end'],
-            $this->getRequest()->query['status']
+            $this->getRequest()->query['end']
         );
 
-        // Pass bookings through a data marshaler - converts bookings to a JSON
-        // format which FullCalendar understands.
-        $output = array();
-        foreach ($bookings as $booking) {
-            $currentEvent = $booking->getEvent();
-
-            // Buttons: depend on whether user is moderator.
-            // Actions: approve/reject, view bookings for item
-            $buttons = array();
-            $class   = '';
-
-            // Modify URL
-            // TODO consider injecting $booking into auth check
-            // (so that it does not need to be fetched again)
-            $editUrl = $this->getRouteIfAuthorized(
-                'resourceBooking.edit', array('id' => $booking->getId())
-            );
-            if ($editUrl !== false) {
-                $buttons[] = array(
-                    'label' => 'Modify',
-                    'class' => 'modify booking-modify',
-                    'href'  => $editUrl,
-                );
-            }
-            $cancelUrl = $this->getRouteIfAuthorized(
-                'resourceBooking.cancel',
-                array('id' => $booking->getId())
-            );
-            if ($cancelUrl !== false) {
-                $buttons[] = array(
-                    'label' => 'Cancel',
-                    'class' => 'delete booking-cancel',
-                    'href'  => $cancelUrl,
-                );
-            }
-
-            $status = $booking->getStatus()->getId();
-            if ($status != Status\Model::STATUS_APPROVED) {
-                $approveUrl = $this->getRouteIfAuthorized(
-                    'resourceBooking.approve',
-                    array('id' => $booking->getId())
-                );
-                if ($approveUrl !== false) {
-                    $buttons[] = array(
-                        'label' => 'Approve',
-                        'class' => 'tick booking-approve',
-                        'href'  => $approveUrl,
-                    );
-                }
-            }
-            if ($status != Status\Model::STATUS_REJECTED) {
-                $rejectUrl = $this->getRouteIfAuthorized(
-                    'resourceBooking.reject',
-                    array('id' => $booking->getId())
-                );
-                if ($rejectUrl !== false) {
-                    $buttons[] = array(
-                        'label' => 'Reject',
-                        'class' => 'reply booking-reject',
-                        'href'  => $rejectUrl,
-                    );
-                }
-            }
-            switch ($booking->getStatus()->getId()) {
-                case Status\Model::STATUS_PENDING:
-                    $class = 'pending';
-                    break;
-
-                case Status\Model::STATUS_APPROVED:
-                    $class = 'approved';
-                    break;
-
-
-                case Status\Model::STATUS_REJECTED:
-                    $class = 'rejected';
-                    break;
-
-            }
-
-            $event = array(
-                'title'     => $currentEvent->getNote(),
-                'start'     => $currentEvent->getStartDate().' '.$currentEvent->getStartTime(),
-                'end'       => $currentEvent->getEndDate().' '.$currentEvent->getEndTime(),
-                'editable'  => true,
-                'allDay'    => false,
-                'color'     => $currentEvent->getColour(),
-                // Styles: should vary depending on booking
-                'className' => "$class booking",
-                'data' => array(
-                    'meta' => array(
-                        'eventId'     => $currentEvent->getId(),
-                        'detail'      => $currentEvent->getDetail(),
-                        'location'    => $currentEvent->getLocation(),
-                        'eventTypeId' => $currentEvent->getType(),
-                        'type'        => $currentEvent->getEventType(),
-                        'author'      => $currentEvent->getAuthor()->formatName(),
-                        'authorId'    => $currentEvent->getAuthor()->getId(),
-                        'seriesId'    => $currentEvent->getSeriesId(),
-                    ),
-                    'booking' => array(
-                        'status'  => $booking->getStatus(),
-                        'buttons' => $buttons,
-                    )
-                )
-            );
-            $output[] = $event;
+        // Pass event to the resource outputter, and deal with its peculiarities
+        // No you do not need a sitepage, go away
+        // TODO make Calendar_Event_Collection and Calendar_Event_Type_Abstract implement JsonSerializable
+        $renderer = new \Calendar_Event_Type_ResourceBooking_Renderer_Javascript(null);
+        ob_start();
+        foreach ($events as $event) {
+            $renderer->visit($event);
         }
-
-//        /** @var \Calendar_Event_Type_Abstract[] $eventList */
-//        $eventList = $calendar->getEvents(
-//            $this->getRequest()->query['start'],
-//            $this->getRequest()->query['end']
-//        );
-//        // Feed the beast
-//        $renderer = new \Calendar_Event_Type_Day_Renderer_Javascript(new \SitePage(false));
-//        foreach ($eventList as $event) {
-//            $event->accept($renderer);
-//        }
-//        // Render the event list as JSON.
-//        // TODO make Calendar_Event_Collection and Calendar_Event_Type_Abstract implement JsonSerializable
-////        $renderer = new \Calendar_Event_Collection_Renderer($this->getApi(), $startSequence->getUnixTimestamp(), $endSequence->getUnixTimestamp(), $this->getPage());
-////        $renderer->renderAll();
+        $output = ob_get_clean();
+        $output = json_decode('['.$output.'{}]');
 
         $this->getResponse()->content->set(
             array(
