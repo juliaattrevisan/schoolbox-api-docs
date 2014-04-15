@@ -8,7 +8,9 @@
  */
 
 namespace Schoolbox\Assessment\Component;
+use PDO;
 use Schoolbox;
+use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -626,7 +628,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$params['user_id'] = $query['user_id'];
 			}
 			foreach ($params as $key => $value) {
-				$statement->bindParam($key, intval($value), \PDO::PARAM_INT);
+				$statement->bindParam($key, intval($value), PDO::PARAM_INT);
 			}
 			$statement->execute();
 
@@ -675,10 +677,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			LIMIT :limit
 		";
 		$statement = $this->database->prepare($query);
-		$statement->bindValue('user_id', $user_id, \PDO::PARAM_INT);
-		$statement->bindValue('limit',   $limit,   \PDO::PARAM_INT);
+		$statement->bindValue('user_id', $user_id, PDO::PARAM_INT);
+		$statement->bindValue('limit',   $limit,   PDO::PARAM_INT);
 		foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
-			$statement->bindValue($param, $value, \PDO::PARAM_INT);
+			$statement->bindValue($param, $value, PDO::PARAM_INT);
 		}
 		$statement->execute();
 		$boxes = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) {
@@ -702,7 +704,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * @param User     $user     The user to filter submissions for
 	 * @param Category $category If set, restrict results to this category.
 	 *
-	 * @return \Schoolbox\Collection
+	 * @return Collection
 	 */
 	public function getSubmittable(User $user, Category $category = null) {
 		$cat_mapper = $this->getJoinMapper('category');
@@ -856,7 +858,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$stmt = $this->database->prepare($sql);
 		$stmt->execute(array('box_id' => $submission_box_id));
 
-		return $stmt->fetch(\PDO::FETCH_ASSOC);
+		return $stmt->fetch(PDO::FETCH_ASSOC);
 
 	}
 
@@ -899,6 +901,57 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 		return $progress;
 
+	}
+
+
+	/**
+	 * @param int $categoryId
+	 * @param int $limit
+	 * @param int $offset
+	 * @param int $time
+	 * @return Collection|SubmissionBox[]
+	 */
+	public function findForFeed($categoryId, $limit, $offset = 0, $time = 0) {
+		$time = date('Y-m-d H:i:s', $time ?: time());
+		$limit = (int)$limit;
+		$offset = (int)$offset;
+
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('sb')},
+				{$this->getJoinColumnString('category', 'c')},
+				{$this->getJoinColumnString('work_type', 't')},
+				{$this->getJoinColumnString('owner', 'u')}
+			FROM
+				`{$this->getTable()}` `sb`
+				LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+				LEFT JOIN {$this->getJoinSql('work_type', 'sb', 't')}
+				LEFT JOIN {$this->getJoinSql('owner', 'sb', 'u')}
+			WHERE
+				`sb`.`category` = :cat_id
+				AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )
+				AND `sb`.`deleted` IS NULL
+			ORDER BY `sb`.`open_date` DESC, `sb`.`date` DESC
+			LIMIT $offset, $limit
+		");
+
+		$stmt->execute(array(
+			'cat_id' => $categoryId,
+			'time'   => $time
+		));
+
+		$c = $this->createCollection();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			/** @var SubmissionBox $box */
+			$box = $this->hydrate($r, 'sb');
+			$box->setCategory($this->hydrateJoin($r, 'category',  'c'));
+			$box->setOwner(   $this->hydrateJoin($r, 'owner',     'u'));
+			$box->setWorkType($this->hydrateJoin($r, 'work_type', 't'));
+			$c->add($box);
+		}
+
+		return $c;
 	}
 
 }

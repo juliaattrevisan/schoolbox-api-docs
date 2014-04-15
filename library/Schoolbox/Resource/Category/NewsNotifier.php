@@ -89,31 +89,15 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @return Collection|Item[]
 	 */
 	public function getFeed($context, $limit = self::SOFT_LIMIT, $offset = 0) {
+
+		$newses = $this->mapper->findForFeed($context, $limit, $offset);
+
 		$c = new Collection();
-
-		$options = array(
-			'sort' => array(
-				'datetime_published' => 'desc'
-			),
-		);
-
-		/** @var Collection|News[] $newses */
-		$newses = $this->mapper->findByColumn('code', $context, $options)->filterByCallback(function($news) {
-			/** @var $news News */
-			return $news->getPublishDate()->getUnixTimestamp() < time();
-		})->slice($limit, $offset);
-
-		// hydrate owners across this collection
-		$this->mapper->hydratePropertyMap($newses, array(
-			'owner' => true
-		));
-
 		foreach($newses as $news) {
 			$messenger = $this->notifyStudentPublished($news, $news->getOwner());
 			$timestamp = $news->getPublishDate()->getUnixTimestamp();
 			$c->merge(Feed::getItemsFromMessenger($messenger, $timestamp));
 		}
-
 		return $c;
 	}
 
@@ -136,7 +120,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$articleId = $news->getId();
 		$heading = $news->getHeading();
 
-		$cat = $this->categoryMapper->findById($news->getCategory()->getId());
+		$cat = $news->getCategory();
 		$catId = $cat->getId();
 		$catName = $cat->getName();
 

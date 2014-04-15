@@ -165,31 +165,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	 * @return Collection|Item[]
 	 */
 	public function getFeed($context, $limit = self::SOFT_LIMIT, $offset = 0) {
+		/** @var Collection|SubmissionBox[] $boxes */
+		$boxes = $this->mapper->findForFeed($context, $limit, $offset);
+
 		$c = new Collection();
-
-		// TODO find/make a way to limit this
-		$options = array('order' => array('open_date' => 'desc', 'date' => 'desc'));
-
-		/**
-		 * @var Collection|SubmissionBox[] $boxes
-		 * @return bool
-		 */
-		$boxes = $this->mapper->findByColumn('category', $context, $options);
-
-		$boxes = $boxes->filterByCallback(function($box) {
-			/** @var $box SubmissionBox */
-			$time = time();
-			return $box->getOpenDate()->getUnixTimestamp() < $time || $box->getDueDate()->getUnixTimestamp() < $time;
-		});
-
-		$boxes = $boxes->slice($limit, $offset);
-
-		// ideally this would happen in situ, not after the fact
-		$this->mapper->hydratePropertyMap($boxes, array(
-			'category' => true,
-			'owner'    => true,
-			'workType' => true
-		));
 
 		foreach($boxes as $box) {
 			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentOpen($box, $box->getOwner()), $box->getOpenDate()->getUnixTimestamp()));

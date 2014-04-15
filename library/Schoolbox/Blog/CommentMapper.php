@@ -10,6 +10,8 @@
 namespace Schoolbox\Blog;
 
 
+use PDO;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
 class CommentMapper extends Mapper {
@@ -72,6 +74,65 @@ class CommentMapper extends Mapper {
 			'other_key' => 'id',
 		));
 
+		// fake the 2nd-depth hydration
+		$this->hasJoin('category', array(
+			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+			'this_key'  => 'cid',
+			'other_key' => 'id'
+		));
+
 		$this->hasSoftDeleteDateField('deleted');
 	}
+
+	/**
+	 * @param int $categoryId
+	 * @param int $limit
+	 * @param int $offset
+	 * @param int $time
+	 * @return Collection|Comment[]
+	 */
+	public function findForFeed($categoryId, $limit, $offset = 0, $time = 0) {
+		$time = date('Y-m-d H:i:s', $time ?: time());
+
+		$limit = (int)$limit;
+		$offset = (int)$offset;
+
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('c')},
+				{$this->getJoinColumnString('blog', 'b')},
+				{$this->getJoinColumnString('category', 'cat')},
+				{$this->getJoinColumnString('owner', 'u')}
+			FROM
+				`{$this->getTable()}` `c`
+				LEFT JOIN {$this->getJoinSql('blog',  'c', 'b')}
+				LEFT JOIN {$this->getJoinSql('category', 'b', 'cat')}
+				LEFT JOIN {$this->getJoinSql('owner', 'c', 'u')}
+			WHERE
+				`c`.`deleted` IS NULL
+				AND `b`.`deleted` IS NULL
+				AND `c`.`created` < :time
+				AND `b`.`cid` = :cat_id
+			ORDER BY `c`.`created` DESC
+			LIMIT $offset, $limit
+		");
+
+		$stmt->execute(array(
+			'time'   => $time,
+			'cat_id' => $categoryId
+		));
+
+		$c = $this->createCollection();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			/** @var Comment $comment */
+			$comment = $this->hydrate($r, 'c');
+			$comment->setBlog($this->hydrateJoin($r, 'blog', 'b'));
+			$comment->getBlog()->setCategory($this->hydrateJoin($r, 'category','cat'));
+			$comment->setOwner($this->hydrateJoin($r, 'owner', 'u'));
+			$c->add($comment);
+		}
+		return $c;
+	}
+
 }

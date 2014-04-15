@@ -138,7 +138,7 @@ class NewsMapper extends Mapper implements Searchable {
 				{$this->getJoinMapper('category')->getColumnString('c')},
 				MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
 			FROM
-				`{$this->getTable()}`
+				`{$this->getTable()}` `n`
 				LEFT JOIN {$this->getJoinSql('owner',      'n', 'u')}
 				LEFT JOIN {$this->getJoinSql('category',   'n', 'c')}
 				LEFT JOIN {$this->getJoinSql('perms',      'n', 'p')}
@@ -180,4 +180,51 @@ class NewsMapper extends Mapper implements Searchable {
 
 		return $collection;
 	}
+
+
+	/**
+	 * @param $categoryId
+	 * @param $limit
+	 * @param int $offset
+	 * @param int $time
+	 * @return Collection|News[]
+	 */
+	public function findForFeed($categoryId, $limit, $offset = 0, $time = 0) {
+		$time = date('Y-m-d H:i:s', $time ?: time());
+		$limit = (int)$limit;
+		$offset = (int)$offset;
+
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('n')},
+				{$this->getJoinColumnString('category', 'c')},
+				{$this->getJoinColumnString('owner', 'u')}
+			FROM
+				`{$this->getTable()}` `n`
+				LEFT JOIN {$this->getJoinSql('category', 'n', 'c')}
+				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u')}
+			WHERE
+				`n`.`deleted` = FALSE
+				AND `n`.`datetime_published` < :time
+				AND `n`.`code` = :cat_id
+			ORDER BY `n`.`datetime_published` DESC
+			LIMIT $offset, $limit
+		");
+
+		$stmt->execute(array(
+			'time' => $time,
+			'cat_id' => $categoryId
+		));
+
+		$c = $this->createCollection();
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			/** @var News $news */
+			$news = $this->hydrate($r, 'n');
+			$news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
+			$news->setCategory($this->hydrateJoin($r, 'category', 'c'));
+			$c->add($news);
+		}
+		return $c;
+	}
+
 }
