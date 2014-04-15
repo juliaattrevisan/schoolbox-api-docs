@@ -108,18 +108,6 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         }
     }
 
-	/**
-	 * Configure question/configure answers
-	 */
-	public function configure() {
-	}
-
-	/**
-	 * Configure question/configure answers, in xml format
-	 */
-	public function configureXml() {
-	}
-
     /**
      * Gets answers out of the answer group array.
      *

@@ -109,18 +109,6 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
     }
 
 	/**
-	 * Configure question/configure answers
-	 */
-	public function configure() {
-	}
-
-	/**
-	 * Configure question/configure answers, in xml format
-	 */
-	public function configureXml() {
-	}
-
-	/**
 	 * Assign a letter to the Other portion of possible answers
 	 * @param $allAnswers
 	 * @return string

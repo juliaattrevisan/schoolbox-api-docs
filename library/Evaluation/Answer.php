@@ -62,6 +62,18 @@ abstract class Evaluation_Answer extends DeprecatedModel
         return $this->legendHTML;
     }
 
+	/**
+	 * Configure question/configure answers
+	 */
+	public function configure() {
+	}
+
+	/**
+	 * Configure question/configure answers, in xml format
+	 */
+	public function configureXml() {
+	}
+
     /**
      * Gets the Answer record for a particular Question.
      *
