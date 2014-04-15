@@ -49,7 +49,7 @@
 		 *
 		 * http://stackoverflow.com/questions/4971062/jquery-ajax-synchronous-call-beforesend
 		 */
-		setTimeout(saveForms, 1500);
+		setTimeout(saveForms, 2500);
 
 		/**
 		 * Init - show loading div
