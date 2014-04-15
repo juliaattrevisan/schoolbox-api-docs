@@ -33,7 +33,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
     protected $templateEngine;
 
     /**
-     * @var Collection|Booking\Model[]
+     * @var array[Collection|Booking\Model[]]
      */
     protected $bookings;
 
@@ -54,7 +54,24 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         );
 
         // Still need to check if user actually has any bookable items.
-        $this->bookings = $bookingApi->getEvents($startTime, $endTime);
+        $bookings = $bookingApi->getEvents($startTime, $endTime);
+        // Group bookings by their item, and order within that list by date
+        // (They should be date-ordered already)
+        $groupedBookings = array();
+        foreach ($bookings as $booking) {
+            $itemId = $booking->getBooking()->getResource()->getId();
+            if (empty($groupedBookings[$itemId])) {
+                $groupedBookings[$itemId] = array(
+                    'resource' => $booking->getBooking()->getResource(),
+                    'bookings' => array(),
+                );
+                $groupedBookings[$itemId]['bookings'][] = $booking;
+            }
+        }
+        usort($groupedBookings, function($a, $b) {
+            return strcmp($a['resource']->getName(), $b['resource']->getName());
+        });
+        $this->bookings = $groupedBookings;
         return true;
     }
 

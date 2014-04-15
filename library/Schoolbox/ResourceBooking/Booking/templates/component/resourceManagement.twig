@@ -3,41 +3,44 @@
     <div class="listing">
         <ul>
             {% for item in bookings %}
-            <li class="{% if loop.index0 is even %}dark{% endif %} clearfix">
-                <span class="eventListing">
-                    <strong>
-                        {# getEventSpan() dumps out htmlentities, so need to disable filter #}
-                        {{ item.eventSpan|raw }}
-                    </strong>
-                    <span>
-                        {{ item.booking.resource.category.name }} -
-                        {{ item.booking.resource.name }}
-                    </span>
+                <li>
+                    <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a>
+                </li>
+                <ul>
+                    {% for booking in item.bookings %}
+                        <li class="{% if loop.index0 is even %}dark{% endif %} clearfix">
+                            <span class="eventListing">
+                                <strong>
+                                    {# getEventSpan() dumps out htmlentities, so need to disable filter #}
+                                    {{ booking.eventSpan|raw }}
+                                </strong>
 
-                    {# User: requested by and for could be different. #}
-                    <span>
-                    {% if item.booking.event.owner.id != item.booking.event.author.id %}
-                        requested for
-                        {% include 'sub/userLink.twig' with {user: item.booking.event.owner} %}
-                        by
-                        {% include 'sub/userLink.twig' with {user: item.booking.event.author} %}
-                    {% else %}
-                        requested by
-                        {% include 'sub/userLink.twig' with {user: item.booking.event.owner} %}
-                    {% endif %}
-                    </span>
+                                {# User: requested by and for could be different. #}
+                                <span>
+                                {% if booking.booking.event.owner.id != booking.booking.event.author.id %}
+                                    requested for
+                                    {% include 'sub/userLink.twig' with {user: booking.booking.event.owner} %}
+                                    by
+                                    {% include 'sub/userLink.twig' with {user: booking.booking.event.author} %}
+                                {% else %}
+                                    requested by
+                                    {% include 'sub/userLink.twig' with {user: booking.booking.event.owner} %}
+                                {% endif %}
+                                    on {{ booking.booking.createdAt.long }}
+                                </span>
 
-                    {##
-                     # Approve/reject buttons
-                     # (as long as this user has permission)
-                     # These should be AJAXy buttons?
-                     #}
-                    <a href="{{ routeLookup('resourceItem.read', {id: item.booking.resource.id}) }}">View bookings for item</a>
-                    <a href="{{ routeLookup('resourceBooking.edit', {id: item.booking.id}) }}">Edit</a>
-                    <a href="{{ routeLookup('resourceBooking.approve', {id: item.booking.id}) }}">Approve</a>
-                    <a href="{{ routeLookup('resourceBooking.reject', {id: item.booking.id}) }}">Reject</a>
-                </span>
-            </li>
+                                {##
+                                 # Approve/reject buttons
+                                 # (as long as this user has permission)
+                                 # These should be AJAXy buttons?
+                                 #}
+                                <a href="{{ routeLookup('resourceBooking.edit', {id: booking.booking.id}) }}">Edit</a>
+                                <a href="{{ routeLookup('resourceBooking.approve', {id: booking.booking.id}) }}">Approve</a>
+                                <a href="{{ routeLookup('resourceBooking.reject', {id: booking.booking.id}) }}">Reject</a>
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
             {% else %}
             <li class="dark clearfix no_events">
                 <em>There are no recent upcoming bookings for you to confirm.</em>
