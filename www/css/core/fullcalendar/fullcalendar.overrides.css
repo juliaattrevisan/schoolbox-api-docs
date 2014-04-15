@@ -30,12 +30,24 @@
 /**
  * Booking-related CSS
  */
+.fc .fc-event.booking {
+    /** Default booking color, if you don't have a event type called "Booking" **/
+    background-color: #eeeeee;
+    border-color: #eeeeee;
+}
 .fc .fc-event.booking.approved .fc-event-inner:before {
     /** Put a tick mark before confirmed bookings **/
     content: '✓';
 }
 .fc .fc-event.booking.rejected {
-    /** Cross out rejected bookings **/
     font-style: italic;
+}
+.fc .fc-event.booking.rejected .fc-event-inner:before {
+    /** Put a cross before rejected bookings **/
+    content: '✗';
+}
+.fc .fc-event.booking.cancelled {
+    /** Cancelled events - currently not shown, but put a line through them **/
     text-decoration: line-through;
+    font-style: italic;
 }
