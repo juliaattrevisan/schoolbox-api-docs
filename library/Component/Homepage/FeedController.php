@@ -25,6 +25,8 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 			array(
 				new \Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
 				new \Schoolbox\Resource\Category\NewsNotifier($conf),
+				new \Schoolbox\Blog\BlogNotifier($conf),
+				new \Schoolbox\Blog\CommentNotifier($conf)
 			),
 			$this->getContext('id'), $this->getConfig('size')
 		);
