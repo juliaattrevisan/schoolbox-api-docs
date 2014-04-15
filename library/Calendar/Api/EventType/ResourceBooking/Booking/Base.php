@@ -8,6 +8,8 @@
  */
 
 use Schoolbox\ResourceBooking\Booking;
+use Schoolbox\Mapper;
+use EOTC\Calendar\EventTypeMapper;
 
 abstract class Calendar_Api_EventType_ResourceBooking_Booking_Base extends Calendar_Api_EventType_Abstract {
 
@@ -48,8 +50,15 @@ abstract class Calendar_Api_EventType_ResourceBooking_Booking_Base extends Calen
     protected function setup() {
         $this
             ->setBookingMapper(Booking\Mapper::getInstance())
-            ->setEventConverter(new Booking\Util\EventConverter())
-        ;
+            ->setEventConverter(new Booking\Util\EventConverter());
+        try {
+            $this->getEventConverter()->setBookingEventType(
+                EventTypeMapper::getInstance()->findOneByColumn('eventType', 'Booking')
+            );
+        }
+        catch (Mapper\Exception $e) {
+            // Not found: doesn't matter, don't use it
+        }
     }
 
     /**

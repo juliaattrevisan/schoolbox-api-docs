@@ -16,9 +16,17 @@ namespace Schoolbox\ResourceBooking\Booking\Util;
 use Alaress_Date_Format;
 use Calendar_Event_Type_ResourceBooking;
 use EOTC\Calendar\Event;
+use EOTC\Calendar\EventType;
 use Schoolbox\ResourceBooking\Booking;
 
 class EventConverter {
+
+    /**
+     * The event type for bookings.
+     *
+     * @var EventType
+     */
+    protected $bookingEventType;
 
     /**
      * Converts an instance of EOTC\Calendar\Event into Calendar_Event_Type_Abstract
@@ -72,8 +80,12 @@ class EventConverter {
         $event->setNote($eventItem->getNote());
         $event->setAccess($eventItem->getAccess());
 
-        // All bookings are personal events
-        $event->setType(1);
+        // Set the event's type and color if there's a type for bookings
+        $eventType = $this->getBookingEventType();
+        if ($eventType instanceof EventType) {
+            $event->setType($eventType->getId());
+            $event->setColour($eventType->getColor());
+        }
 
         $event->setDetail($eventItem->getDetail());
         $event->setLocation($eventItem->getLocation());
@@ -94,6 +106,22 @@ class EventConverter {
 //        $event->setAttendance(0);
 //        $event->setCompleted(0);
         return $event;
+    }
+
+    /**
+     * @param  EventType $bookingEventType
+     * @return $this
+     */
+    public function setBookingEventType($bookingEventType) {
+        $this->bookingEventType = $bookingEventType;
+        return $this;
+    }
+
+    /**
+     * @return EventType
+     */
+    public function getBookingEventType() {
+        return $this->bookingEventType;
     }
 
 }
