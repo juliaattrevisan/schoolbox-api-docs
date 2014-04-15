@@ -60,7 +60,6 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         // prevents this object from rendering, so add classes later.
         $classes = array(
             $currentEvent->getDerivedEventLevel(),
-            'type' . $currentEvent->getType()
         );
 
         // Bookings might have a campus one day, currently they do not.
