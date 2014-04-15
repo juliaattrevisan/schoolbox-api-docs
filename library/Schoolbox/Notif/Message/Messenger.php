@@ -10,8 +10,10 @@
 namespace Schoolbox\Notif\Message;
 
 
+use Alaress\Scheduler\Trigger\BlankTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Collection;
+use Schoolbox\Feed\Item;
 use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Message\Instance\InstanceBundle;
@@ -112,6 +114,25 @@ class Messenger {
 
 
 	/**
+	 * @param Message $msg
+	 * @param Instance $instance
+	 * @param TriggerInterface $trigger
+	 * @param Notif $notif
+	 * @return TargetedMessage
+	 */
+	protected function applyInstance($msg, $instance, $trigger, $notif) {
+		if($trigger instanceof BlankTrigger) {
+			return new Item($msg, $instance, $trigger);
+		}
+
+		return $msg
+			->applyInstance($instance, $notif, $trigger)
+			->setTargets($instance->getTargets())
+			->setContext($instance->getContext());
+	}
+
+
+	/**
 	 * @param Notif $notif
 	 * @param TriggerInterface $trigger
 	 * @param callable $callback
@@ -130,11 +151,7 @@ class Messenger {
 			$instanceBundle = $this->splStore->offsetGet($msg);
 
 			foreach($instanceBundle->getInstances() as $instance) {
-				$messageInstance = $msg
-					->applyInstance($instance, $notif, $trigger)
-					->setTargets($instance->getTargets())
-					->setContext($instance->getContext());
-
+				$messageInstance = $this->applyInstance($msg, $instance, $trigger, $notif);
 				// if we can filter out the user who effected this event in the first place, do so
 				if($trigger) {
 					$effector = $trigger->getEvent()->getEffector();
@@ -169,13 +186,13 @@ class Messenger {
 
 
 	/**
-	 * Extracts all contained messages into a collection
+	 * Extracts all contained messages and instances into a collection of TargetedMessages
 	 *
 	 * @param Notif $notif
 	 * @param TriggerInterface $trigger
 	 * @return Collection|TargetedMessage[]
 	 */
-	public function extractAll($notif = null, $trigger = null) {
+	public function extractMessages($notif, $trigger) {
 		$c = new Collection();
 
 		$this->applyInstances($notif, $trigger, function($instance) use (&$c) {
@@ -183,6 +200,17 @@ class Messenger {
 		});
 
 		return $c;
+	}
+
+
+	/**
+	 * Extracts all contained messages and instances into a collection of Feed\Items
+	 *
+	 * @param int $timestamp
+	 * @return Collection|Item[]
+	 */
+	public function extractItems($timestamp) {
+		return $this->extractMessages(null, new BlankTrigger($timestamp));
 	}
 
 } 
