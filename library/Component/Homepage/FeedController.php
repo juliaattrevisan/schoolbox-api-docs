@@ -8,18 +8,27 @@
  */
 class Component_Homepage_FeedController extends Component_Homepage_ControllerAbstract {
 
-	/** @var \Schoolbox\Collection|\Schoolbox\Notif\Message\External\TargetedMessage[] */
-	protected $messages;
+	/** @var \Schoolbox\Collection|\Schoolbox\Feed\Item[] */
+	protected $items;
 
 	/**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
-        $feed = new Feed();
-        $this->messages = $feed->getFeed($this->getContext('id'), $this->getConfig('size'));
-    }
+	public function execute() {
+
+		$conf = \Schoolbox\Config\ConfigMapper::getInstance();
+		$feed = new \Schoolbox\Feed\Feed($conf);
+
+		$this->items = $feed->aggregate(
+			array(
+				new \Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
+				new \Schoolbox\Resource\Category\NewsNotifier($conf),
+			),
+			$this->getContext('id'), $this->getConfig('size')
+		);
+	}
 
 	/**
 	 * Renders the data into the SitePage. Presentation logic.
@@ -36,7 +45,7 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 
 		$this->setBlock($templateHandle, 'event', 'event_block');
 
-		if(!$this->messages->count()) {
+		if(!$this->items->count()) {
 			$this->setVar('event_block', '');
 			return true;
 		}
@@ -44,13 +53,13 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 		$decor = new \Schoolbox\Notif\Message\Decorator(null);
 
 		$j = 0;
-		foreach($this->messages as $msg) {
-			$decor->setMessage($msg);
-			$date = new Alaress_Date_Format($msg->getTimestamp(), 'U');
+		foreach($this->items as $item) {
+			$decor->setMessage($item);
+			$date = new Alaress_Date_Format($item->getTimestamp(), 'U');
 
 			$this->setVar(array(
-				'EVENT_HREF'     => $msg->getBody()->getHref(),
-				'EVENT_ICON'     => $msg->getBody()->getIcon(),
+				'EVENT_HREF'     => $item->getBody()->getHref(),
+				'EVENT_ICON'     => $item->getBody()->getIcon(),
 				'EVENT_TIME'     => $date->getShort(),
 				'EVENT_LONGTIME' => $date->getLong(),
 				'EVENT_BODY'     => $decor->formatHtml(),
