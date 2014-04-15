@@ -71,7 +71,6 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
         ));
     }
 
-
 	/**
 	 * Configure question/configure answer
 	 *

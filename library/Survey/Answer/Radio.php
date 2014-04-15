@@ -133,4 +133,19 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
             $page->setVar('answerOption_block', '');
         }
     }
+
+
+	/**
+	 * Configure question/configure answer
+	 *
+	 * @param $page
+	 * @param $config
+	 */
+	public function configure($page, $config) {
+		$options = json_decode($config);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+		));
+	}
 }
