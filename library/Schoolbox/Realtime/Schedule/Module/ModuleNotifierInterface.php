@@ -63,14 +63,4 @@ interface ModuleNotifierInterface extends Serializable {
 	 */
 	public function getNamespace();
 
-
-	/**
-	 * Generate n messages for a category, from the perspective of casual observation.
-	 *
-	 * @param int $category
-	 * @param int $limit
-	 * @return Collection|TargetedMessage[]
-	 */
-	public function getFeed($category, $limit);
-
 }
