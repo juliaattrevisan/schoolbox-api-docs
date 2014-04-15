@@ -7215,20 +7215,27 @@ form.context {
     line-height: 2em;
     display: none;
   }
+}
 
-  &.ctx-semesters {
+#mark-sheet{
+  float: left;
+  width: 100%;
+  form.ctx-subjects {
     select {
+      right: 28px;
     }
-    + form.ctx-subjects {
-      select {
-        width: 65%;
-        position: absolute;
-        right: 28px;
-      }
-      .elbow {
-        display: inline;
-      }
+    .elbow {
+      display: inline;
+  }
+  #mark-sheet-context{
+    float: right;
+    width: 44%;
+    #semester{ width: 75%; }
+    #enrolled-subjects{
+      width: 65%;
+      position: relative;
     }
+    .elbow{ right: 32%; }
   }
 }
 
