@@ -131,7 +131,13 @@
                     var data = $j.extend(true, {}, calEvent.data.meta)
                     var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mmtt'
 
-                    data.note = calEvent.title
+                    // Prefix booking status for bookings
+                    if (calEvent.data.booking) {
+                        data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
+                    }
+                    else {
+                        data.note = calEvent.title
+                    }
                     data.date = $.fullCalendar.formatDate(calEvent.start, format)
                     if (calEvent.end != null) {
                         data.date += " &ndash; "
