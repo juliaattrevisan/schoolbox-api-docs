@@ -26,3 +26,16 @@
 .fc-state-down, .fc-state-active {
     box-shadow: none;
 }
+
+/**
+ * Booking-related CSS
+ */
+.fc .fc-event.booking.approved .fc-event-inner:before {
+    /** Put a tick mark before confirmed bookings **/
+    content: '✓';
+}
+.fc .fc-event.booking.rejected {
+    /** Cross out rejected bookings **/
+    font-style: italic;
+    text-decoration: line-through;
+}
