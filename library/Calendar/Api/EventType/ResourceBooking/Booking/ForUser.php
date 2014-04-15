@@ -24,7 +24,8 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Ap
         $bookings = $this->getBookingMapper()->findForOwner(
             $this->getUser()->getId(),
             $startTimestamp,
-            $endTimestamp
+            $endTimestamp,
+            $this->getStatus()
         );
         $collection = new Calendar_Event_Collection();
         foreach ($bookings as $booking) {
