@@ -42,4 +42,18 @@ class Survey_Answer_TrueFalse extends Evaluation_Answer_TrueFalse {
 		$graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
 		$graph->graph();
 	}
+
+	/**
+	 * Configure question/configure answer
+	 *
+	 * @param $page
+	 * @param $config
+	 */
+	public function configure($page, $config) {
+		$options = json_decode($config);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+		));
+	}
 }
