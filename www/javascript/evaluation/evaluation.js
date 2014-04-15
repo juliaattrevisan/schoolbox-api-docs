@@ -16,9 +16,9 @@
 		$j('.evaluation-navigator').click(function(event) {
 			event.preventDefault();
 
-			$j.fn.evaluation.saveAll();
+			$j.fn.evaluation.saveAll($j(this).attr('href'));
 
-			location.href = $j(this).attr('href');
+			return false;
 		});
 
 		/* When someone finishes an assessment, loop through each question
