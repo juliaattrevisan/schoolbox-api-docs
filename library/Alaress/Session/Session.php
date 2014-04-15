@@ -1,6 +1,8 @@
 <?php
 /**
- * Overrides Aura\Session\Session to provide easy access to the logged-in user.
+ * Overrides Aura\Session\Session to provide easy access to the following:
+ * * the logged-in user
+ * * the history
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -64,6 +66,53 @@ class Session extends BaseSession {
 
         // Session timed out: don't get the user.
         return (!($lastTime + $sessionLength < $this->getRequestTime()));
+    }
+
+    /**
+     * Stores a recently visited URL in history.
+     *
+     * @see \SitePage->saveHistory()
+     *
+     * @param string $value The URL to store in history.
+     */
+    public function pushHistory($value) {
+        $session = $this->newSegment(null);
+        $history = $session->history;
+        if (empty($history)) {
+            $history = array();
+        }
+        else {
+            // Don't save history if this is the same as the most recent item in
+            // history.
+            list($mostRecent) = $history;
+            if ($value != $mostRecent) {
+                array_unshift($history, $value);
+            }
+            // 3 most recent only
+            $history = array_slice($history, 0, 3);
+        }
+        $session->history = $history;
+    }
+
+    /**
+     * Gets an URL out of history.
+     *
+     * @see \SitePage->backToTheFuture()
+     *
+     * @param  int    $level   The xth most recent item to get.
+     * @param  string $default If nothing in history, return this.
+     * @return string
+     */
+    public function getHistory($level = 1, $default = '/') {
+        $session = $this->newSegment(null);
+        $history = $session->history;
+        if (empty($history)) {
+            return $default;
+        }
+
+        // Don't go beyond the beginning of recorded history
+        $level = min(count($history), $level);
+        return ($history[$level - 1]);
     }
 
     /**
