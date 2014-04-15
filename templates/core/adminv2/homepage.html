@@ -31,6 +31,12 @@
             $( '#renameForm').dialog("open");
         });
 
+
+        $('#deleteTemplate').click(function() {
+            if(confirm('Are you sure you wish to delete this template?')) {
+                $(this).closest('form').submit();
+            }
+        });
 	});
 </script>
 <!-- END custom_head-->
@@ -51,22 +57,24 @@
 
     <div id="definition-palette">
         <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
-        <select id="template-select" name="template" class="float-left" style="width: 66%" >
+        <select id="template-select" name="template" class="float-left" style="width: 68%" >
             <!-- BEGIN template -->
             <option value="{template.id}">{template.name}</option>
             <!-- END template -->
         </select>
-        <a class="btn no-text delete" href="#" ><span></span></a>
-            <div class="clearfix"></div>
-        <a id="newHomepage" class="btn add" href="#"><span></span>New</a>
+        <input type="hidden" name="action" value="delete" />
+        <a class="btn no-text delete" href="#" id="deleteTemplate" ><span></span></a>
+
+        <div class="clearfix"></div>
+        <a id="newHomepage" class="btn add" href="#"><span></span>Create</a>
         <a id="renameHomepage" class="btn modify" href="#"><span></span>Rename</a>
         <div class="clearfix"></div>
         </form>
 
         <div id="newForm" title="Add new homepage template">
             <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST" class="standard-form">
-                <label><strong>Template name<strong></strong><input type="text" name="name"/></label>
-                <input type="submit" class="submit-btn-plain" name="submit" value="Add" />
+                <label><strong>Template name</strong></strong><input type="text" name="name" /></label>
+                <input type="submit" class="submit-btn-plain" name="action" value="Create" />
             </form>
         </div>
 
@@ -79,7 +87,7 @@
                     <!-- END template -->
                 </select></label>
                 <label><strong>New name<strong></strong><input type="text" name="name"/></label>
-                <input type="submit" class="submit-btn-plain" name="submit" value="Rename" />
+                <input type="submit" class="submit-btn-plain" name="action" value="Rename" />
             </form>
         </div>
 
