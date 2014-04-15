@@ -1,0 +1,39 @@
+<?php
+/**
+ * Event source - displays all bookings for a single user.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+use Schoolbox\ResourceBooking\Booking;
+
+class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Api_EventType_ResourceBooking_Booking_Base {
+
+    /**
+     * Get day events from this data source
+     *
+     * @param int $startTimestamp
+     * @param int $endTimestamp
+     *
+     * @return Calendar_Event_Collection
+     */
+    public function getEvents($startTimestamp, $endTimestamp) {
+        // Get all items out of booking mapper that I am the owner of.
+        $bookings = $this->getBookingMapper()->findForOwner(
+            $this->getUser()->getId(),
+            $startTimestamp,
+            $endTimestamp
+        );
+        $collection = new Calendar_Event_Collection();
+        foreach ($bookings as $booking) {
+            $calendarEvent = $this->getEventConverter()->convertEventToCalendarEvent(
+                $booking->getEvent(), $booking
+            );
+            $calendarEvent->setConnectorId($this->getConnectorId());
+            $collection->add($calendarEvent);
+        }
+        return $collection;
+    }
+}
