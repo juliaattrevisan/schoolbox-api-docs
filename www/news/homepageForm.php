@@ -24,6 +24,7 @@ if(is_numeric($_POST['id'])) {
 else {
 	$news = new Schoolbox\Resource\Category\News();
 	$news->setOwner($_SESSION['user']);
+	$news->setPostDate(new Alaress_Date_Format(time(), 'U'));
 }
 
 // check user is owner
