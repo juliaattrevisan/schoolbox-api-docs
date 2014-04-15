@@ -118,6 +118,18 @@ $(document).ready(function() {
                     'data-end':    getTimeWithTimezone(event.end || event.start),
                     'data-allday': event.allDay ? 1 : 0
                 })
+
+                // Add booking styles
+                element.addClass('booking');
+                if (event.data.booking.status.isRejected) {
+                    element.addClass('rejected');
+                }
+                if (event.data.booking.status.isApproved) {
+                    element.addClass('approved');
+                }
+                if (event.data.booking.status.isPending) {
+                    element.addClass('pending');
+                }
                 return element
             },
             /**

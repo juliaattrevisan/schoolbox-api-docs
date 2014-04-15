@@ -103,6 +103,20 @@
                     }
 
 					$j(jsEvent).addClass(calEvent.data.styles.visible);
+
+                    // Add booking styles
+                    if (calEvent.data.booking) {
+                        jsEvent.addClass('booking');
+                        if (calEvent.data.booking.status.isRejected) {
+                            jsEvent.addClass('rejected');
+                        }
+                        if (calEvent.data.booking.status.isApproved) {
+                            jsEvent.addClass('approved');
+                        }
+                        if (calEvent.data.booking.status.isPending) {
+                            jsEvent.addClass('pending');
+                        }
+                    }
                 },
 
                 /**

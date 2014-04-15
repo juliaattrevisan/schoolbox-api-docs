@@ -56,11 +56,13 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         $end   = $currentEvent->getEndTime()->getDatabaseDate()
                . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
 
+        // Putting any class other than "personal", "group" or "type{whatever}"
+        // prevents this object from rendering, so add classes later.
         $classes = array(
-            'booking',
             $currentEvent->getDerivedEventLevel(),
             'type' . $currentEvent->getType()
         );
+
         // Bookings might have a campus one day, currently they do not.
 //        $campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
 //        foreach ($campus_list as &$campus) {
@@ -70,25 +72,6 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
 //        if (!empty($campus_list)) {
 //            $classes[] = implode(' ', $campus_list);
 //        }
-
-        // Add class for if this booking is rejected, pending, or approved.
-        $status = $currentEvent->getBooking()->getStatus()->getId();
-        switch ($status) {
-            case Booking\Status\Model::STATUS_PENDING:
-                $classes[] = 'pending';
-                break;
-
-            case Booking\Status\Model::STATUS_APPROVED:
-                $classes[] = 'approved';
-                break;
-
-            case Booking\Status\Model::STATUS_REJECTED:
-                $classes[] = 'rejected';
-                break;
-
-            default:
-                break;
-        }
 
         // Show booking butonyes I have permission to view
         $bookingId      = $currentEvent->getBooking()->getId();
@@ -119,6 +102,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         }
 
         // Approve butonye (if not already approved)
+        $status = $currentEvent->getBooking()->getStatus()->getId();
         if ($status != Booking\Status\Model::STATUS_APPROVED) {
             $approveUrl = $this->getRouteIfAuthorized(
                 'resourceBooking.approve', array('id' => $bookingId)
