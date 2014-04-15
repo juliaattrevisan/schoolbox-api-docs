@@ -11,6 +11,8 @@
  */
 
 use Aura\Router\Router;
+use Alaress\Authorizer\Authorizer;
+use Schoolbox\ResourceBooking\Booking;
 
 class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
 
@@ -20,12 +22,18 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
     protected $router;
 
     /**
+     * @var Authorizer
+     */
+    protected $authorizer;
+
+    /**
      * Setup: injects global router into this object, so it can use it to look
      * up URLs relating to actions on an event.
      */
     protected function setup() {
         global $di;
-        $this->router = $di->get('router');
+        $this->router     = $di->get('router');
+        $this->authorizer = $di->get('authorizer');
     }
 
     /**
@@ -34,8 +42,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
      * @param Calendar_Event_Type_ResourceBooking $currentEvent
      */
     public function visit($currentEvent) {
-        /* Future events are visible to superusers, event owners, group members with write access
-         */
+        // Future events are visible to superusers, event owners, group members with write access
         if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
             $cssClass = 'translucent';
         }
@@ -43,65 +50,98 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
             $cssClass = '';
         }
 
-        /* Congeal all that stuff
-         * Resource bookings are never all day events.
-         */
+        // Resource bookings are never all day events.
         $start = $currentEvent->getStartTime()->getDatabaseDate()
                . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
         $end   = $currentEvent->getEndTime()->getDatabaseDate()
                . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
 
-        //
-        // Add campus list to list of classes
         $classes = array(
+            'booking',
             $currentEvent->getDerivedEventLevel(),
             'type' . $currentEvent->getType()
         );
-        $campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
-        foreach ($campus_list as &$campus) {
-            $campus = 'campus'.trim($campus);
-        }
-        unset($campus);
-        if (!empty($campus_list)) {
-            $classes[] = implode(' ', $campus_list);
+        // Bookings might have a campus one day, currently they do not.
+//        $campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
+//        foreach ($campus_list as &$campus) {
+//            $campus = 'campus'.trim($campus);
+//        }
+//        unset($campus);
+//        if (!empty($campus_list)) {
+//            $classes[] = implode(' ', $campus_list);
+//        }
+
+        // Add class for if this booking is rejected, pending, or approved.
+        $status = $currentEvent->getBooking()->getStatus()->getId();
+        switch ($status) {
+            case Booking\Status\Model::STATUS_PENDING:
+                $classes[] = 'pending';
+                break;
+
+            case Booking\Status\Model::STATUS_APPROVED:
+                $classes[] = 'approved';
+                break;
+
+            case Booking\Status\Model::STATUS_REJECTED:
+                $classes[] = 'rejected';
+                break;
+
+            default:
+                break;
         }
 
-        // If I'm the owner of this event, show view/cancel
-        // If I'm a moderator, show confirm/reject.
-        // (Use the booking controller to generate this instead, because it
-        //  has access to the URL generators)
-
-        // If I'm viewing this, then I must be able to cancel and modify.
+        // Show booking butonyes I have permission to view
         $bookingId      = $currentEvent->getBooking()->getId();
-        $bookingButtons = array(
-            array(
-                'class' => "modify booking-modify",
-                'href'  => $this->router->generate('resourceBooking.edit', array('id' => $bookingId)),
-                'label' => "Modify",
-            ),
-            array(
-                'class' => "delete booking-cancel",
-                'href'  => $this->router->generate('resourceBooking.cancel', array('id' => $bookingId)),
-                'label' => "Cancel",
-            ),
-        );
+        $bookingButtons = array();
 
-        // Is someone other than the owner of the event viewing this?
-        // If so, the viewing user must be a moderator, so show the moderate
-        // options.
-        if (!($currentEvent->getBooking()->getEvent()->getOwner()->getId() == $_SESSION['user']->getId())) {
-            if (!$currentEvent->getBooking()->getStatus()->isApproved()) {
+        // Modify butonye
+        $editUrl = $this->getRouteIfAuthorized(
+            'resourceBooking.edit', array('id' => $bookingId)
+        );
+        if ($editUrl !== false) {
+            $bookingButtons[] = array(
+                'label' => 'Modify',
+                'class' => 'modify booking-modify',
+                'href'  => $editUrl,
+            );
+        }
+
+        // Cancel butonye
+        $cancelUrl = $this->getRouteIfAuthorized(
+            'resourceBooking.cancel', array('id' => $bookingId)
+        );
+        if ($cancelUrl !== false) {
+            $bookingButtons[] = array(
+                'label' => 'Cancel',
+                'class' => 'delete booking-cancel',
+                'href'  => $cancelUrl,
+            );
+        }
+
+        // Approve butonye (if not already approved)
+        if ($status != Booking\Status\Model::STATUS_APPROVED) {
+            $approveUrl = $this->getRouteIfAuthorized(
+                'resourceBooking.approve', array('id' => $bookingId)
+            );
+            if ($approveUrl !== false) {
                 $bookingButtons[] = array(
+                    'label' => 'Approve',
                     'class' => 'tick booking-approve',
-                    'href'  => $this->router->generate('resourceBooking.approve', array('id' => $bookingId)),
-                    'label' => "Approve",
+                    'href'  => $approveUrl,
                 );
             }
-            if (!$currentEvent->getBooking()->getStatus()->isRejected()) {
+        }
+
+        // Rejected butonye (if not already rejected)
+        if ($status != Booking\Status\Model::STATUS_REJECTED) {
+            $rejectUrl = $this->getRouteIfAuthorized(
+                'resourceBooking.reject', array('id' => $bookingId)
+            );
+            if ($rejectUrl !== false) {
                 $bookingButtons[] = array(
+                    'label' => 'Reject',
                     'class' => 'reply booking-reject',
-                    'href'  => $this->router->generate('resourceBooking.reject', array('id' => $bookingId)),
-                    'label' => "Reject",
+                    'href'  => $rejectUrl,
                 );
             }
         }
@@ -184,4 +224,19 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
 //
 //        return true;
 //    }
+
+    /**
+     * Helper function - gets whether access to a route is allowed.
+     *
+     * @param string $name
+     * @param array  $params
+     *
+     * @return bool|string False if not authorized, a URL if it is.
+     */
+    public function getRouteIfAuthorized($name, array $params = array()) {
+        if ($this->authorizer->isPathAuthorizedForUser($name, $params, $_SESSION['user'])) {
+            return $this->router->generate($name, $params);
+        }
+        return false;
+    }
 }
