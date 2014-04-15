@@ -501,7 +501,7 @@ class Controller extends Base {
         /** @var Model $booking */
         $booking = $this->getBookingMapper()->findById($id);
         $this->changeStatus($booking, Status\Model::STATUS_APPROVED);
-        $this->outputUpdateStatusResponse($booking);
+        $this->setUpdateStatusResponse($booking);
     }
 
     /**
@@ -513,7 +513,7 @@ class Controller extends Base {
         /** @var Model $booking */
         $booking = $this->getBookingMapper()->findById($id);
         $this->changeStatus($booking, Status\Model::STATUS_REJECTED);
-        $this->outputUpdateStatusResponse($booking);
+        $this->setUpdateStatusResponse($booking);
     }
 
     /**
@@ -536,7 +536,7 @@ class Controller extends Base {
         if (count($series)) {
             $this->getBookingMapper()->delete($series);
         }
-        $this->outputUpdateStatusResponse($booking);
+        $this->setUpdateStatusResponse($booking);
     }
 
     /**
@@ -559,7 +559,7 @@ class Controller extends Base {
      *
      * @param Model $booking
      */
-    protected function outputUpdateStatusResponse(Model $booking) {
+    protected function setUpdateStatusResponse(Model $booking) {
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set(
