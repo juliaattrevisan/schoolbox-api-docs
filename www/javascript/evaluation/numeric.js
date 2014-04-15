@@ -95,4 +95,20 @@
 			}
 		});
 	}
+
+	/**
+	 * Decide what the validation rules are for this particular
+	 * question type
+	 *
+	 * @returns {{element: string, rules: {required: boolean, minlength: number}}}
+	 */
+	$.fn.evaluationNumeric.getValidationRules = function() {
+		return {
+			element: 'input[name=answer]',
+			rules: {
+				required: true,
+				minlength: 1
+			}
+		}
+	}
 }(jQuery));

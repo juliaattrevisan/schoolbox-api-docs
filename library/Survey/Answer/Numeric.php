@@ -66,4 +66,18 @@ class Survey_Answer_Numeric extends Evaluation_Answer_Numeric
             'RESPONSE_ID' => $existing['response_id'],
         ));
     }
+
+	/**
+	 * Configure question/configure answer
+	 *
+	 * @param $page
+	 * @param $config
+	 */
+	public function configure($page, $config) {
+		$options = json_decode($config);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+		));
+	}
 }
