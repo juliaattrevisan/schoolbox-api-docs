@@ -42,13 +42,13 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
      * @param Calendar_Event_Type_ResourceBooking $currentEvent
      */
     public function visit($currentEvent) {
-        // Future events are visible to superusers, event owners, group members with write access
-        if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
-            $cssClass = 'translucent';
-        }
-        else {
-            $cssClass = '';
-        }
+//        // Future events are visible to superusers, event owners, group members with write access
+//        if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
+//            $cssClass = 'translucent';
+//        }
+//        else {
+//            $cssClass = '';
+//        }
 
         // Resource bookings are never all day events.
         $start = $currentEvent->getStartTime()->getDatabaseDate()
@@ -186,7 +186,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                 ),
                 'links' => array(),
                 'styles' => array(
-                    'visible' => $cssClass,
+                    'visible' => '',
                 ),
                 'attendance' => array(
                     'icon' => false,
