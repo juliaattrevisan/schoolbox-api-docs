@@ -61,7 +61,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         $classes = array(
             $currentEvent->getDerivedEventLevel(),
         );
-        if (($eventType = $currentEvent->getType())) {
+        if (($eventType = $currentEvent->getType()) > 0) {
             $classes[] = 'type' . $eventType;
         }
 
