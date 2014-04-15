@@ -96,7 +96,8 @@
 			rules: {
 				required: true,
 				minlength: 1
-			}
+			},
+			errorContainer: '[data-evaluationerrors="1"]'
 		}
 	}
 }(jQuery));

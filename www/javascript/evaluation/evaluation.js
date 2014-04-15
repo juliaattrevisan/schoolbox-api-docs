@@ -49,7 +49,7 @@
 		 *
 		 * http://stackoverflow.com/questions/4971062/jquery-ajax-synchronous-call-beforesend
 		 */
-		setTimeout(saveForms, 2500);
+		setTimeout(saveForms, 1500);
 
 		/**
 		 * Init - show loading div
@@ -81,7 +81,18 @@
 				var shoryuken = new Function('return ' + method);
 				var configuration = shoryuken();
 
-				$j(element).validate();
+				/* If a custom error location is desired
+				 */
+				if (configuration.errorContainer != undefined) {
+					$j(element).validate({
+						errorPlacement: function(error, inputElement) {
+							$(element).find(configuration.errorContainer).html(error);
+						}
+					});
+				}
+				else {
+					$j(element).validate();
+				}
 
 				/* Apply custom rules
 				 */
