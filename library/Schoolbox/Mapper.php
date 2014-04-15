@@ -1568,6 +1568,10 @@ class Mapper {
 		// ideally, we perform this on a collection
 		$collection = $this->getModelAsCollection($collection);
 
+		if(!$collection->count()) {
+			return $collection;
+		}
+
 		$select = array();
 		$from   = array();
 		$props  = array();
