@@ -10187,9 +10187,9 @@ ul.activity-list li,
 	a {
 		padding: 4px 5px 4px 10px;
 		background: @dark;
-		border: 1px solid @border-color;
+		border: 1px solid @lgrey;
 		position: relative;
-		margin-right: -6px;
+		margin-right: -7px;
 		line-height: 26px;
 		white-space: nowrap;
 		&:before, &:after {
@@ -10198,18 +10198,12 @@ ul.activity-list li,
 			.absolute(-1px, auto, auto, -12px);
 			border: 10px solid transparent;
 			border-width: 13px 6px;
-			border-left-color: @border-color;
+			border-left-color: @lgrey;
 			z-index: 1;
 		}
 		&:after {
 			border-left-color: @dark;
 			right: -11px;
-		}
-		&:hover {
-			color: @tab-color;
-			background: @tab-background;
-			border-color: @tab-background;
-			&:before, &:after { border-left-color: @tab-background; }
 		}
 	}
 	.last a {
