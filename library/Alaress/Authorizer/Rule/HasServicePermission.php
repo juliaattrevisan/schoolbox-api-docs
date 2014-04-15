@@ -40,11 +40,14 @@ class HasServicePermission implements IAuthorizationRule {
         if ($user instanceof User) {
             // Check this user's permissions against this item's service and
             // access level.
-            foreach ($user->getAccessList() as $access) {
-                if ($access->getService() == $this->service
-                    && $access->getAccessLevel() >= $this->accessLevel
-                ) {
-                    return true;
+            $accessList = $user->getAccessList();
+            if (!empty($accessList)) {
+                foreach ($accessList as $access) {
+                    if ($access->getService() == $this->service
+                        && $access->getAccessLevel() >= $this->accessLevel
+                    ) {
+                        return true;
+                    }
                 }
             }
         }
