@@ -12,7 +12,7 @@ $factory = new Survey_Factory();
 $assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $groupHandler = new Group();
-new \Alaress_Probe($_POST);
+
 /* If a question was submitted
  */
 if (!empty($_POST)) {
