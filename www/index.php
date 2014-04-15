@@ -17,6 +17,8 @@ if ($route instanceof Aura\Router\Route) {
     // public method named $route->params[action].
     /** @var \Alaress\Web\Controller\Base $controller */
     $controller = $di->get('controller:'.$route->params['controller']);
+    /** @var \Alaress\Session\Session $session */
+    $session = $di->get('session');
 
     /** @var \Aura\Web\Response $response */
     $response = null;
@@ -27,10 +29,8 @@ if ($route instanceof Aura\Router\Route) {
         // TODO Inject user getter into authorizer, and use it to determine:
         // * if user is there
         // * if user session is timed out or not
-        /** @var \Alaress\Session\Session $session */
         /** @var \Schoolbox\User $user */
-        $session = $di->get('session');
-        $user    = $session->getAuthUser();
+        $user = $session->getAuthUser();
         if ($session->isAuthSessionAlive()) {
             $session->updateLastTime();
         }
@@ -87,6 +87,14 @@ if ($route instanceof Aura\Router\Route) {
     $output = $di->get("webOutput:$format");
     $output->setResponse($response);
     $output->output();
+
+    // Post-processing: if this is a HTML request and not a redirect,
+    // store this request in history.
+    $isXhr    = $controller->getRequest()->isXhr();
+    $redirect = $controller->getResponse()->headers->get('location');
+    if (!($isXhr || $redirect)) {
+        $session->pushHistory($_SERVER['REQUEST_URI']);
+    }
     exit;
 }
 
