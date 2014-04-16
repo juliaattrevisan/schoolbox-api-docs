@@ -4,6 +4,10 @@
         <ul>
             {% for item in bookingsByResource %}
                 <li>
+                    {# Show image for item if it's there #}
+                    {% if item.resource.image.hash %}
+                        <img src="/storage/image.php?size=square32&amp;hash={{ item.resource.image.hash|e('url') }}" />
+                    {% endif %}
                     <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a>
                 </li>
                 <ul>
