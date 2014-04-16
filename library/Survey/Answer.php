@@ -21,7 +21,7 @@ class Survey_Answer extends Evaluation_Answer {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new Survey_Response();
+        $this->setResponseHandler(new Survey_Response());
     }
 }
 

@@ -17,7 +17,7 @@ class Assess_Answer_Exact extends Evaluation_Answer_Exact {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new Assess_Response();
+        $this->setResponseHandler(new Assess_Response());
     }
 
 	/**
@@ -42,6 +42,6 @@ class Assess_Answer_Exact extends Evaluation_Answer_Exact {
 			'mark' => $totalMarks,
 		);
 
-		$this->responseHandler->update($marks);
+		$this->getResponseHandler()->update($marks);
 	}
 }

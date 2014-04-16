@@ -19,7 +19,7 @@ class Assess_Answer_Match extends Evaluation_Answer_Match
     {
         parent::__construct();
 
-        $this->responseHandler = new Assess_Response();
+        $this->setResponseHandler(new Assess_Response());
     }
 
     /**
@@ -52,6 +52,6 @@ class Assess_Answer_Match extends Evaluation_Answer_Match
             'mark' => $totalMarks,
         );
 
-        $this->responseHandler->update($marks);
+        $this->getResponseHandler()->update($marks);
     }
 }

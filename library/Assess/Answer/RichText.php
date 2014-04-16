@@ -17,7 +17,7 @@ class Assess_Answer_RichText extends Evaluation_Answer_RichText {
 	public function __construct() {
 		parent::__construct();
 
-		$this->responseHandler = new Assess_Response();
+		$this->setResponseHandler(new Assess_Response());
 	}
 
 	/**

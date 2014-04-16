@@ -21,6 +21,6 @@ class Assess_Answer extends Evaluation_Answer {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new Assess_Response();
+        $this->setResponseHandler(new Assess_Response());
     }
 }

@@ -17,16 +17,13 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
       */
     protected $useLongAnswers = true;
 
-    /**
-     * Get an instance of a responseHandler upon instantiation
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->responseHandler = new Survey_Response();
-		$this->questionHandler = new Survey_Question();
-    }
+	/**
+	 * Setup
+	 */
+	protected function setup() {
+		$this->setResponseHandler(new Survey_Response());
+		$this->setQuestionHandler(new Survey_Question());
+	}
 
     /**
      * Graph the results for this answer type
@@ -54,7 +51,7 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
      */
     public function reviewResponse($page, $question_id)
     {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
 

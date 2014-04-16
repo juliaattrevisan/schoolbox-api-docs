@@ -103,7 +103,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 		 */
 		$this->configureResponse($page, $question_id);
 
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
@@ -240,7 +240,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
      */
     public function exportResponseToCSV($attempt_id, $question_id)
     {
-        $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
 
@@ -286,7 +286,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
      */
     public function exportResponseToArray($attempt_id, $question_id)
     {
-        $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
 
@@ -303,7 +303,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 	 */
 	public function reviewResponse($page, $question_id)
 	{
-		$existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+		$existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
 		$currentAnswer = $this->getByQuestionID($question_id);
 
@@ -390,7 +390,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 	 * @param $currentQuestion
 	 */
 	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
-		$existing = $this->responseHandler->isResponseExists($attemptId, $currentQuestion['question_id']);
+		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
 		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 

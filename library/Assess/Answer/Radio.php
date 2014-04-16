@@ -17,7 +17,7 @@ class Assess_Answer_Radio extends Evaluation_Answer_Radio {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new Assess_Response();
+        $this->setResponseHandler(new Assess_Response());
     }
 
 	/**
@@ -75,6 +75,6 @@ class Assess_Answer_Radio extends Evaluation_Answer_Radio {
             'mark' => $total,
         );
 
-        $this->responseHandler->update($marks);
+        $this->getResponseHandler()->update($marks);
     }
 }

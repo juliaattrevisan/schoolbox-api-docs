@@ -17,7 +17,7 @@ class Assess_Answer_Numeric extends Evaluation_Answer_Numeric {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new Assess_Response();
+        $this->setResponseHandler(new Assess_Response());
     }
 
 	/**
@@ -42,6 +42,6 @@ class Assess_Answer_Numeric extends Evaluation_Answer_Numeric {
 			'mark' => $total,
 		);
 
-		$this->responseHandler->update($marks);
+		$this->getResponseHandler()->update($marks);
     }
 }

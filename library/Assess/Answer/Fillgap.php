@@ -19,7 +19,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap
     {
         parent::__construct();
 
-        $this->responseHandler = new Assess_Response();
+        $this->setResponseHandler(new Assess_Response());
     }
 
     /**
@@ -64,6 +64,6 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap
             'mark' => $totalMarks,
         );
 
-        $this->responseHandler->update($marks);
+        $this->getResponseHandler()->update($marks);
     }
 }

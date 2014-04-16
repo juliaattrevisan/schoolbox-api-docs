@@ -17,14 +17,12 @@ class Survey_Answer_Multi extends Evaluation_Answer_Multi {
 	protected $useLongAnswers = true;
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Setup
 	 */
-    public function __construct() {
-        parent::__construct();
-
-        $this->responseHandler = new Survey_Response();
-		$this->questionHandler = new Survey_Question();
-    }
+	protected function setup() {
+		$this->setResponseHandler(new Survey_Response());
+		$this->setQuestionHandler(new Survey_Question());
+	}
 
 	/**
 	 * Graph the results for this answer type

@@ -17,8 +17,8 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new Assess_Response();
-		$this->questionHandler = new Assess_Question();
+        $this->setResponseHandler(new Assess_Response());
+		$this->setQuestionHandler(new Assess_Question());
     }
 
     /**
@@ -75,7 +75,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
             'mark' => $total,
         );
 
-        $this->responseHandler->update($marks);
+        $this->getResponseHandler()->update($marks);
     }
 
     /**
@@ -104,7 +104,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
      * @return void
      */
     public function reviewResponse($page, $question_id) {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
             $existingAnswer = unserialize($existing['response']);

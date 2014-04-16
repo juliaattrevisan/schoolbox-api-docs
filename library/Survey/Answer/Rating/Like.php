@@ -22,14 +22,12 @@ class Survey_Answer_Rating_Like extends Evaluation_Answer_Rating_Like {
 	protected $useLongAnswers = true;
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Setup
 	 */
-    public function __construct() {
-        parent::__construct();
-
-        $this->responseHandler = new Survey_Response();
-		$this->questionHandler = new Survey_Question();
-    }
+	protected function setup() {
+		$this->setResponseHandler(new Survey_Response());
+		$this->setQuestionHandler(new Survey_Question());
+	}
 
 	/**
 	 * Graph the results for this answer type
