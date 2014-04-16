@@ -11,7 +11,7 @@ use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\Mapper;
 use EOTC\Calendar\EventTypeMapper;
 
-abstract class Calendar_Api_EventType_ResourceBooking_Booking_Base extends Calendar_Api_EventType_Abstract {
+abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_EventType_Abstract {
 
     /**
      * Statuses to filter out

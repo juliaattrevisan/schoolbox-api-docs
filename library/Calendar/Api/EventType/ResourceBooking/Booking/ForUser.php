@@ -9,7 +9,7 @@
 
 use Schoolbox\ResourceBooking\Booking;
 
-class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Api_EventType_ResourceBooking_Booking_Base {
+class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Api_EventType_ResourceBooking_Base {
 
     /**
      * Get day events from this data source

@@ -9,7 +9,7 @@
 
 use Schoolbox\ResourceBooking\Booking;
 
-class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Api_EventType_ResourceBooking_Booking_Base {
+class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Api_EventType_ResourceBooking_Base {
 
     /**
      * The ID of the resource to fetch.
