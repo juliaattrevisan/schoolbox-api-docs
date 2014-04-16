@@ -61,6 +61,15 @@ for ($i=0; $i < count($stack); $i++) {
 			$submission = $submissionMapper->findById($this->arg[2]);
 
 			if ($submission) {
+
+				/* Apply mime type
+				 */
+				$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
+				$mime = $mimetypeMapper->getByFilename($submission->getFilename());
+				$submission->setMimetype($mime);
+
+				/* Stack it
+				 */
 				$currentStudent['submission'] = $submission;
 			}
 		}
@@ -112,6 +121,7 @@ $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
 /* Render injectable views
  */
+//$currentStudent['submission']
 $templateFactory = new \Crocodoc\Renderer\Factory($this, $currentStudent['submission'], $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
