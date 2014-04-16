@@ -97,6 +97,8 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$msgr = new Messenger();
 
 		$wikiId       = $wiki->getId();
+		$wikiName     = $wiki->getLatestRevision()->getHeading();
+		$wikiSlug     = $wiki->getSlug();
 
 		$authorId     = $author->getId();
 		$authorName   = $author->formatName();
@@ -118,7 +120,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$msgr->broadcastToCategory($categoryId, $msg, "wiki.$wikiId.created", Logger::INFO, array(
 			'author'  => array($authorName, "/search/user/$authorId"),
-			'title'   => $wiki->getLatestRevision()->getHeading(),
+			'title'   => array($wikiName, "/wiki/$categoryId/$wikiSlug"),
 			'catname' => array($categoryName, "/homepage/$categoryId")
 		), array(
 			'roletype' => $roleType

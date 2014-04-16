@@ -96,6 +96,8 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 		$msgr = new Messenger();
 
 		$revisionId   = $revision->getId();
+		$revisionName = $revision->getHeading();
+		$revisionSlug = $revision->getWiki()->getSlug();
 
 		$authorId     = $author->getId();
 		$authorName   = $author->formatName();
@@ -116,7 +118,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 
 		$msgr->broadcastToCategory($categoryId, $msg, "wiki.$revisionId.created", Logger::INFO, array(
 			'author'  => array($authorName, "/search/user/$authorId"),
-			'title'   => $revision->getHeading(),
+			'title'   => array($revisionName, "/wiki/$categoryId/$revisionSlug"),
 			'catname' => array($categoryName, "/homepage/$categoryId")
 		), array(
 			'roletype' => $roleType
