@@ -16,11 +16,9 @@ class Survey_Answer extends Evaluation_Answer {
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Setup
 	 */
-    public function __construct() {
-        parent::__construct();
-
+    protected function setup() {
         $this->setResponseHandler(new Survey_Response());
     }
 }
