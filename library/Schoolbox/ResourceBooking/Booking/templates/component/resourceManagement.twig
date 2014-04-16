@@ -1,6 +1,11 @@
 <div class="box clearfix" id="component{{ component.instance.id }}">
     <style type="text/css">
-        /** Provisional styles **/
+        /**
+         * Provisional styles
+         * IE9 doesn't support flex, and other browsers support it only with prefixes?
+         * Anyway it works in IE10, and the buttons are down the bottom or something
+         * in IE9.
+         */
         #component{{ component.instance.id }} .listing .resource h3 {
             float: none;
             display: inline-block;
@@ -73,9 +78,12 @@
                                     </span>
                                 </div>
                                 <div class="booking-controls">
-                                    <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}">Edit</a>
+                                    {# approve/reject selector #}
                                     <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}">Approve</a>
                                     <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}">Reject</a>
+                                    <a class="btn no-text modify" href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}" title="Modify Booking">
+                                        <span></span>
+                                    </a>
                                 </div>
                             </li>
                         {% endfor %}
