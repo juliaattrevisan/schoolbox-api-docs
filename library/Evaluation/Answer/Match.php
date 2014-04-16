@@ -147,7 +147,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
                 /* Shuffle until they are totally different
                  */
-				while ($originalRight === $right) {
+                $x = 0;
+				while ($originalRight === $right && $x++ < 10) {
 					shuffle($right);
 				}
 			}

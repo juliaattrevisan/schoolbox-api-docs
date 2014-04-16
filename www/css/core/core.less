@@ -3905,25 +3905,39 @@ ul.section-options a.drop-arrow {
     cursor: move;
 }
 
+.evaluation-answer li{
+  display: table;
+  vertical-align: middle;
+  width: 100%;
+}
+
+.evaluation-answer li:before,
+.evaluation-answer li:after{
+  content: none;
+}
+
+.evaluation-answer li strong {
+    display: table-cell;
+    vertical-align: middle;
+}
+
 .evaluation-content.take-test ul li.left-answer strong {
     padding: 5px;
     font-weight: normal;
-    display: block;
     border: 1px solid @std-grey;
+    height: 65px;
     width: 67%;
     background: @white;
 }
 
 .evaluation-content.take-test ul li.left-answer .arrow {
     text-transform: uppercase;
-    padding-top: 13px;
     font-weight: bold;
-    width: 28%;
+    width: 30%;
     position: absolute;
     float: none;
-    top: 0;
+    top: 30px;
     right: 0;
-    height: 80%;
 }
 
 .evaluation-content.take-test ul li.left-answer .arrow span {
@@ -3932,10 +3946,10 @@ ul.section-options a.drop-arrow {
 
 .evaluation-content.take-test ul li.right-answer strong {
     border: 1px solid @lgrey;
-    display: block;
     font-weight: normal;
     background: lighten(@neutral-color, @lighten-value) url(/images/core/tablesorter/sort.gif) left center no-repeat;
     padding: 5px 5px 5px 21px;
+    height: 65px;
 }
 
 .evaluation-content.take-test .option {
