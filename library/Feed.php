@@ -412,7 +412,13 @@ class Feed {
 
     }
 
-    function getWiki($cid, $limit) {
+	/**
+	 * @deprecated use \Schoolbox\Wiki\WikiNotifier::getFeed()
+	 * @param $cid
+	 * @param $limit
+	 * @return array
+	 */
+	function getWiki($cid, $limit) {
 
         $where = $this->getFilterFromCategoryId($cid);
 
@@ -455,6 +461,7 @@ class Feed {
     /**
      * Get a list of new blog entries to push into the feed.
      *
+     * @deprecated use \Schoolbox\Blog\BlogNotifier::getFeed()
      * @param  $cid
      * @param  $limit
      * @return
@@ -503,6 +510,7 @@ class Feed {
     /**
      * Get a list of new blog comments to push into the feed.
      *
+     * @deprecated use \Schoolbox\Blog\CommentNotifier::getFeed()
      * @param  $cid
      * @param  $limit
      * @return
