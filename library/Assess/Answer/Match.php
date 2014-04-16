@@ -12,17 +12,14 @@
 class Assess_Answer_Match extends Evaluation_Answer_Match
 {
 
-    /**
-     * Get an instance of a responseHandler upon instantiation
-     */
-    public function __construct()
-    {
-        parent::__construct();
+	/**
+	 * Setup
+	 */
+	protected function setup() {
+		$this->setResponseHandler(new Assess_Response());
+	}
 
-        $this->setResponseHandler(new Assess_Response());
-    }
-
-    /**
+	/**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      *

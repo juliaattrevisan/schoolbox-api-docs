@@ -11,17 +11,15 @@
  */
 class Assess_Answer_Multi extends Evaluation_Answer_Multi {
 
-    /**
-     * Get an instance of a responseHandler upon instantiation
-     */
-    public function __construct() {
-        parent::__construct();
-
-        $this->setResponseHandler(new Assess_Response());
+	/**
+	 * Setup
+	 */
+	protected function setup() {
+		$this->setResponseHandler(new Assess_Response());
 		$this->setQuestionHandler(new Assess_Question());
-    }
+	}
 
-    /**
+	/**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      *

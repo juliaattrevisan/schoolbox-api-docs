@@ -12,11 +12,9 @@
 class Assess_Answer_RichText extends Evaluation_Answer_RichText {
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Setup
 	 */
-	public function __construct() {
-		parent::__construct();
-
+	protected function setup() {
 		$this->setResponseHandler(new Assess_Response());
 	}
 

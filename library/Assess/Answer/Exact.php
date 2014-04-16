@@ -12,13 +12,11 @@
 class Assess_Answer_Exact extends Evaluation_Answer_Exact {
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Setup
 	 */
-    public function __construct() {
-        parent::__construct();
-
-        $this->setResponseHandler(new Assess_Response());
-    }
+	protected function setup() {
+		$this->setResponseHandler(new Assess_Response());
+	}
 
 	/**
 	 * Automatically marks a response. Customised to be applicable to the way in
