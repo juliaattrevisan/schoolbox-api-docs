@@ -18,75 +18,79 @@
          * Anyway it works in IE10, and the buttons are down the bottom or something
          * in IE9.
          */
-        #component{{ component.instance.id }} .listing .resource h3 {
+        #component{{ component.instance.id }} {
+            overflow: visible;
+        }
+        #component{{ component.instance.id }} .resource h3 {
             float: none;
             display: inline-block;
         }
-        #component{{ component.instance.id }} .listing .resource.no-image h3 {
+        #component{{ component.instance.id }} .resource.no-image h3 {
             margin-left: 32px;
         }
-        #component{{ component.instance.id }} .listing .resource .resource-image {
+        #component{{ component.instance.id }} .resource .resource-image {
             display: inline-block;
         }
-        #component{{ component.instance.id }} .listing .booking-details {
+        #component{{ component.instance.id }} .booking-details {
             display: flex;
             justify-content: space-between;
         }
-        #component{{ component.instance.id }} .listing .booking-event {
+        #component{{ component.instance.id }} .booking-event {
             display: inline-flex;
         }
-        #component{{ component.instance.id }} .listing .booking-event .portrait {
+        #component{{ component.instance.id }} .booking-event .portrait {
             float:left;
             padding-right: 1em;
         }
-        #component{{ component.instance.id }} .listing .booking-event .event-timespan {
+        #component{{ component.instance.id }} .booking-event .event-timespan {
             display: block;
             font-weight: bold;
         }
-        #component{{ component.instance.id }} .listing .booking-event .event-data {
+        #component{{ component.instance.id }} .booking-event .event-data {
             display: block;
         }
-        #component{{ component.instance.id }} .listing .booking-controls {
+        #component{{ component.instance.id }} .booking-controls {
             display: inline-flex;
         }
+        {##component{{ component.instance.id }} .selectize-dropdown {#}
+            {#z-index: 1000;#}
+        {#}#}
     </style>
     <h2>{{ component.getConfig('componentname') }}</h2>
-    <div class="listing">
-        <ul>
-            {% for item in bookingsByResource %}
-                <li class="resource {% if item.resource.image.hash is empty %}no-image{% endif %}">
-                    {# Show image for item if it's there, otherwise some empty image? #}
-                    {% if item.resource.image.hash %}
-                        <img class="resource-image" src="/storage/image.php?size=square32&amp;hash={{ item.resource.image.hash|e('url') }}" />
-                    {% endif %}
-                    <h3>
-                        <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a>
-                    </h3>
-                    <ul>
-                        {% for event in item.bookingEvents %}
-                            <li class="{% if loop.index0 is even %}dark{% endif %} booking-details">
+    <ul>
+        {% for item in bookingsByResource %}
+            <li class="resource {% if item.resource.image.hash is empty %}no-image{% endif %}">
+                {# Show image for item if it's there, otherwise some empty image? #}
+                {% if item.resource.image.hash %}
+                    <img class="resource-image" src="/storage/image.php?size=square32&amp;hash={{ item.resource.image.hash|e('url') }}" />
+                {% endif %}
+                <h3>
+                    <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a>
+                </h3>
+                <ul>
+                    {% for event in item.bookingEvents %}
+                        <li class="{% if loop.index0 is even %}dark{% endif %} booking-details">
 
-                                <div class="booking-event">
-                                    {# Show event's owner #}
-                                    <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                        <img class="portrait" src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square32" />
-                                    </a>
+                            <div class="booking-event">
+                                {# Show event's owner #}
+                                <a href="/search/user/{{ event.booking.event.owner.id }}">
+                                    <img class="portrait" src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square32" />
+                                </a>
 
-                                    <span class="event-data">
-                                        <span class="event-timespan">{{ event.eventSpan|raw }}</span>
-                                        <span class="event-ownership">
-                                            {% if event.booking.event.owner.id != event.booking.event.author.id %}
-                                                requested for
-                                                <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                                by
-                                                <a href="/search/user/{{ event.booking.event.author.id }}">{{ event.booking.event.author.formatName }}</a>
-                                                {% include 'sub/userLink.twig' with {user: event.booking.event.author} %}
-                                            {% else %}
-                                                requested by
-                                                <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                            {% endif %}
-                                            on {{ event.booking.createdAt.long }}
-                                        </span>
+                                <span class="event-data">
+                                    <span class="event-timespan">{{ event.eventSpan|raw }}</span>
+                                    <span class="event-ownership">
+                                        {% if event.booking.event.owner.id != event.booking.event.author.id %}
+                                            requested for
+                                            <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                                            by
+                                            <a href="/search/user/{{ event.booking.event.author.id }}">{{ event.booking.event.author.formatName }}</a>
+                                            {% include 'sub/userLink.twig' with {user: event.booking.event.author} %}
+                                        {% else %}
+                                            requested by
+                                            <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                                        {% endif %}
+                                        on {{ event.booking.createdAt.long }}
                                     </span>
                                 </span>
                             </div>
@@ -113,7 +117,10 @@
                     {% endfor %}
                 </ul>
             </li>
-            {% endfor %}
-        </ul>
-    </div>
+        {% else %}
+        <li class="dark clearfix no_events">
+            <em>There are no recent upcoming bookings for you to confirm.</em>
+        </li>
+        {% endfor %}
+    </ul>
 </div>
