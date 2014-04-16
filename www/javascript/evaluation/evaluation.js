@@ -94,7 +94,8 @@
 					$j(element).validate();
 				}
 
-				/* Apply custom rules
+				/* Apply custom rules if validation is required, in accordance with
+				 * http://jquery.bassistance.de/validate/demo/
 				 */
 				$j(element).find(configuration.element).rules('add', configuration.rules);
 

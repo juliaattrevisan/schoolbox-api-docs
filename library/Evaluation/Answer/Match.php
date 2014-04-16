@@ -113,9 +113,13 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id)
-    {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+    public function prepareResponse($page, $question_id) {
+
+		/* Optional configuration hook
+		 */
+		$this->configureResponse($page, $question_id);
+
+		$existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         /* Define special blocks to handle this special answerOptions scenario,
          * because we have two columns to parse per iteration.

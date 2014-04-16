@@ -28,6 +28,7 @@ class Survey_Answer_Rating_Important extends Evaluation_Answer_Rating_Important 
         parent::__construct();
 
         $this->responseHandler = new Survey_Response();
+		$this->questionHandler = new Survey_Question();
     }
 
 	/**
@@ -53,6 +54,21 @@ class Survey_Answer_Rating_Important extends Evaluation_Answer_Rating_Important 
 
 		$page->setVar(array(
 			'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+		));
+	}
+
+	/**
+	 * Configure mandatoryness and other settings for this response
+	 *
+	 * @param $page
+	 * @param $question_id
+	 */
+	protected function configureResponse($page, $question_id) {
+		$question = $this->questionHandler->getByID($question_id);
+		$config = json_decode($question['config']);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
 		));
 	}
 }

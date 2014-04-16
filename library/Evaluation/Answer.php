@@ -74,6 +74,12 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	public function configureXml() {
 	}
 
+	/**
+	 * Hook method
+	 */
+	protected function configureResponse($page, $question_id) {
+	}
+
     /**
      * Gets the Answer record for a particular Question.
      *

@@ -117,7 +117,12 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @return void
      */
     public function prepareResponse($page, $question_id) {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+		/* Optional configuration hook
+		 */
+		$this->configureResponse($page, $question_id);
+
+		$existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
 
