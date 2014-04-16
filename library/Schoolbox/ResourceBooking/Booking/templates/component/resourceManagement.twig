@@ -1,4 +1,16 @@
 <div class="box clearfix" id="component{{ component.instance.id }}">
+    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+    <script type="text/javascript">
+        (function($) {
+            $(function(){
+                $('select[data-selectize]').selectize({
+                    maxItems: 1
+                });
+            });
+        })(jQuery);
+    </script>
+    <link rel="stylesheet" type="text/css" href="/javascript/components/selectize/dist/css/selectize.css" />
+    <link rel="stylesheet" type="text/css" href="/javascript/components/selectize/dist/css/selectize.default.css" />
     <style type="text/css">
         /**
          * Provisional styles
@@ -76,22 +88,30 @@
                                             on {{ event.booking.createdAt.long }}
                                         </span>
                                     </span>
-                                </div>
-                                <div class="booking-controls">
-                                    {# approve/reject selector #}
-                                    <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}">Approve</a>
-                                    <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}">Reject</a>
-                                    <a class="btn no-text modify" href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}" title="Modify Booking">
-                                        <span></span>
-                                    </a>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            {% else %}
-            <li class="dark clearfix no_events">
-                <em>There are no recent upcoming bookings for you to confirm.</em>
+                                </span>
+                            </div>
+                            <div class="booking-controls">
+                                {##
+                                 # approve/reject selector
+                                 # Add a HTMLized select box
+                                 #}
+                                <select data-selectize name="status">
+                                    <option value="2" {% if event.booking.status.approved %}selected{% endif %}>Approved</option>
+                                    <option value="1" {% if event.booking.status.pending %}selected{% endif %}>Pending Approval</option>
+                                    <option value="3" {% if event.booking.status.rejected %}selected{% endif %}>Rejected</option>
+                                </select>
+
+                                {#
+                                <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}">Approve</a>
+                                <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}">Reject</a>
+                                #}
+                                <a class="btn no-text modify" href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}" title="Modify Booking">
+                                    <span></span>
+                                </a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
             </li>
             {% endfor %}
         </ul>
