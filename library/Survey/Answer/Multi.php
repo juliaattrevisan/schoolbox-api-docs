@@ -47,7 +47,7 @@ class Survey_Answer_Multi extends Evaluation_Answer_Multi {
 	}
 
 	/**
-	 * Configure question/configure answer
+	 * Configure question/configure answer during creation/modification
 	 *
 	 * @param $page
 	 * @param $config

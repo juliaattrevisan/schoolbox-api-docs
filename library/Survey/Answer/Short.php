@@ -83,7 +83,7 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
 	}
 
 	/**
-	 * Configure question/configure answer
+	 * Configure question/configure answer during creation/modification
 	 *
 	 * @param $page
 	 * @param $config

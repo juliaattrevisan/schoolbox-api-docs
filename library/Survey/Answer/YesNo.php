@@ -42,7 +42,7 @@ class Survey_Answer_YesNo extends Evaluation_Answer_YesNo {
 	}
 
 	/**
-	 * Configure question/configure answer
+	 * Configure question/configure answer during creation/modification
 	 *
 	 * @param $page
 	 * @param $config

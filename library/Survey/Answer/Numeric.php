@@ -67,7 +67,7 @@ class Survey_Answer_Numeric extends Evaluation_Answer_Numeric
     }
 
 	/**
-	 * Configure question/configure answer
+	 * Configure question/configure answer during creation/modification
 	 *
 	 * @param $page
 	 * @param $config

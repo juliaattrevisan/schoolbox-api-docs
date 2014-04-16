@@ -43,7 +43,7 @@ class Survey_Answer_TrueFalse extends Evaluation_Answer_TrueFalse {
 	}
 
 	/**
-	 * Configure question/configure answer
+	 * Configure question/configure answer during creation/modification
 	 *
 	 * @param $page
 	 * @param $config

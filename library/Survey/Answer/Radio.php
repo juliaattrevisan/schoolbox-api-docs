@@ -133,7 +133,7 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
     }
 
 	/**
-	 * Configure question/configure answer
+	 * Configure question/configure answer during creation/modification
 	 *
 	 * @param $page
 	 * @param $config

@@ -42,7 +42,7 @@ class Survey_Answer_Rating_Agree extends Evaluation_Answer_Rating_Agree {
 	}
 
 	/**
-	 * Configure question/configure answer
+	 * Configure question/configure answer during creation/modification
 	 *
 	 * @param $page
 	 * @param $config
