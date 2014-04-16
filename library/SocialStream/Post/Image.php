@@ -10,19 +10,6 @@
 
 class SocialStream_Post_Image extends SocialStream_Post_Abstract {
 
-	/**
-	 * Determine whether this should display an icon or something
-	 * via the image transform
-	 * 
-	 * @return bool
-	 */
-	private function determineIcon() {
-		if (preg_match('#^icon:(.*)#', $this->getThumbnail(), $matches)) {
-			return $matches;
-		}
-
-		return false;
-	}
 
 	/**
 	 * Determine whether a thumbnail was successfully found
@@ -50,13 +37,9 @@ class SocialStream_Post_Image extends SocialStream_Post_Abstract {
 		 * Display a mime icon
 		 * Otherwise display thumbnail via image transform
 		 */
-		$matches = $this->determineIcon();
         $returnValue = false;
 
 		if ($context == 'post') {
-
-
-
 	        if ($this->hasThumbnail()) {
 				$page->parse('socialstream_post_has_image_block', 'socialstream_post_has_image',false);
 				$returnValue = true;
