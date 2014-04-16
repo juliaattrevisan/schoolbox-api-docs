@@ -147,7 +147,7 @@ class EdumateTask {
 		$this->setSetDate($row['SET_DATE']);
 		$this->setDueDate($row['DUE_DATE']);
 		$this->setCloseDate($row['CLOSE_DATE']);
-		$this->setAcceptSubmissions($row['ACCEPT_SUBMISSIONS']);
+		//$this->setAcceptSubmissions($row['ACCEPT_SUBMISSIONS']);
 		$this->setMarkType($row['MARK_TYPE']);
 		$this->setMarkVisibility($row['MARK_VISIBILITY']);
 		$this->setWeighting($row['WEIGHTING']);
