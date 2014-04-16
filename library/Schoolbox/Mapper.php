@@ -1136,7 +1136,7 @@ class Mapper {
                         $previous ? $this->diff($model, $previous) : null
                     );
 
-                    $this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
+//                    $this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
 
 				}
 

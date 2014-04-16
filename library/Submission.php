@@ -1376,6 +1376,32 @@ class Submission extends DeprecatedModel {
             return $last;
         });
 
-        return $studentList;
+		/* Convert those to standardised user objects
+		 */
+		$userMapper = new \Schoolbox\UserMapper();
+
+		$allStudents = new \Schoolbox\Collection();
+
+		/* External sources won't provide a uid value, so find a user by
+		 * using the external id instead
+		 */
+		foreach($studentList as $currentStudent) {
+			try {
+				if (isset($currentStudent['uid'])) {
+					$user = $userMapper->findById($currentStudent['uid']);
+				}
+				else {
+					$user = $userMapper->findByColumn('synergy_id', $currentStudent['synergy_id'])->first();
+				}
+
+				$allStudents->add($user);
+			}
+			/* Ignore unfound users
+			 */
+			catch (\Exception $e) {
+			}
+		}
+
+        return $allStudents;
     }
 }
