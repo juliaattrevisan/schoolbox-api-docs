@@ -121,7 +121,7 @@
 
 	/**
 	 * Decide what the validation rules are for this particular
-	 * question type. Otionally specify errorContainer if you want
+	 * question type. Optionally specify errorContainer if you want
 	 * the validation messages to appear in a special location,
 	 * otherwise leave it undefined for default behaviour
 	 *
