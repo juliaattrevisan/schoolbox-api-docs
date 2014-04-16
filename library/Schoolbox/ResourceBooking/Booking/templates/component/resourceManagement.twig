@@ -2,31 +2,31 @@
     <h2>{{ component.getConfig('componentname') }}</h2>
     <div class="listing">
         <ul>
-            {% for item in bookings %}
+            {% for item in bookingsByResource %}
                 <li>
                     <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a>
                 </li>
                 <ul>
-                    {% for booking in item.bookings %}
+                    {% for event in item.bookingEvents %}
                         <li class="{% if loop.index0 is even %}dark{% endif %} clearfix">
                             <span class="eventListing">
                                 <strong>
                                     {# getEventSpan() dumps out htmlentities, so need to disable filter #}
-                                    {{ booking.eventSpan|raw }}
+                                    {{ event.eventSpan|raw }}
                                 </strong>
 
                                 {# User: requested by and for could be different. #}
                                 <span>
-                                {% if booking.booking.event.owner.id != booking.booking.event.author.id %}
+                                {% if event.booking.event.owner.id != event.booking.event.author.id %}
                                     requested for
-                                    {% include 'sub/userLink.twig' with {user: booking.booking.event.owner} %}
+                                    {% include 'sub/userLink.twig' with {user: event.booking.event.owner} %}
                                     by
-                                    {% include 'sub/userLink.twig' with {user: booking.booking.event.author} %}
+                                    {% include 'sub/userLink.twig' with {user: event.booking.event.author} %}
                                 {% else %}
                                     requested by
-                                    {% include 'sub/userLink.twig' with {user: booking.booking.event.owner} %}
+                                    {% include 'sub/userLink.twig' with {user: event.booking.event.owner} %}
                                 {% endif %}
-                                    on {{ booking.booking.createdAt.long }}
+                                    on {{ event.booking.createdAt.long }}
                                 </span>
 
                                 {##
@@ -34,9 +34,9 @@
                                  # (as long as this user has permission)
                                  # These should be AJAXy buttons?
                                  #}
-                                <a href="{{ routeLookup('resourceBooking.edit', {id: booking.booking.id}) }}">Edit</a>
-                                <a href="{{ routeLookup('resourceBooking.approve', {id: booking.booking.id}) }}">Approve</a>
-                                <a href="{{ routeLookup('resourceBooking.reject', {id: booking.booking.id}) }}">Reject</a>
+                                <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}">Edit</a>
+                                <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}">Approve</a>
+                                <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}">Reject</a>
                             </span>
                         </li>
                     {% endfor %}

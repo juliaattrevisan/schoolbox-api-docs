@@ -58,19 +58,19 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         if (!$bookingApi->getUserCanModerate()) {
             return false;
         }
-        $bookings = $bookingApi->getEvents($startTime, $endTime);
+        $bookingEvents = $bookingApi->getEvents($startTime, $endTime);
 
         // Group bookings by their item, and order within that list by date
         // (They should be date-ordered already)
         $groupedBookings = array();
-        foreach ($bookings as $booking) {
-            $itemId = $booking->getBooking()->getResource()->getId();
+        foreach ($bookingEvents as $event) {
+            $itemId = $event->getBooking()->getResource()->getId();
             if (empty($groupedBookings[$itemId])) {
                 $groupedBookings[$itemId] = array(
-                    'resource' => $booking->getBooking()->getResource(),
-                    'bookings' => array(),
+                    'resource'      => $event->getBooking()->getResource(),
+                    'bookingEvents' => array(),
                 );
-                $groupedBookings[$itemId]['bookings'][] = $booking;
+                $groupedBookings[$itemId]['bookingEvents'][] = $event;
             }
         }
         usort($groupedBookings, function($a, $b) {
@@ -96,8 +96,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
             $this->templateEngine->render(
                 '@resourceBooking/component/resourceManagement.twig',
                 array(
-                    'bookings'  => $this->bookings,
-                    'component' => $this,
+                    'bookingsByResource' => $this->bookings,
+                    'component'          => $this,
                 )
             )
         );
