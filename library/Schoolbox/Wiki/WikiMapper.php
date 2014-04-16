@@ -59,13 +59,13 @@ class WikiMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'deleted',
 			'property'   => 'deleted',
-			'type'       => self::TYPE_BOOLEAN
+			'type'       => self::TYPE_BOOL_ENUM
 		));
 
 		$this->hasMap(array(
 			'column'     => 'locked',
 			'property'   => 'locked',
-			'type'       => self::TYPE_BOOLEAN
+			'type'       => self::TYPE_BOOL_ENUM
 		));
 
 		$this->hasJoin('category', array(
@@ -99,11 +99,13 @@ class WikiMapper extends Mapper {
 			SELECT
 				{$this->getColumnString('w')},
 				{$this->getJoinColumnString('category', 'c')},
-				{$this->getJoinColumnString('revision', 'r')}
+				{$this->getJoinColumnString('revision', 'r')},
+				{$this->getJoinMapper('revision')->getJoinColumnString('user', 'u')}
 			FROM
 				`{$this->getTable()}` `w`
 				LEFT JOIN {$this->getJoinSql('category', 'w', 'c')}
 				LEFT JOIN {$this->getJoinSql('revision', 'w', 'r')}
+				LEFT JOIN {$this->getJoinMapper('revision')->getJoinSql('user', 'r', 'u')}
 			WHERE
 				`c`.`id` = :cat_id
 				AND `w`.`created` < :time
@@ -123,9 +125,11 @@ class WikiMapper extends Mapper {
 			$wiki = $this->hydrate($r, 'w');
 			$wiki->setCategory($this->hydrateJoin($r, 'category', 'c'));
 			$wiki->setLatestRevision($this->hydrateJoin($r, 'revision', 'r'));
+			$wiki->getLatestRevision()->setUser($this->getJoinMapper('revision')->hydrateJoin($r, 'user', 'u'));
 			$c->add($wiki);
 		}
 		return $c;
 	}
+
 
 } 

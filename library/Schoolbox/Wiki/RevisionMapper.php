@@ -63,13 +63,13 @@ class RevisionMapper extends Mapper {
 		));
 
 		$this->hasJoin('user', array(
-			'mapper'    => '\\Schoolbox\\User',
+			'mapper'    => '\\Schoolbox\\UserMapper',
 			'this_key'  => 'userID',
 			'other_key' => 'id'
 		));
 
 		$this->hasJoin('wiki', array(
-			'mapper'    => '\\Schoolbox\\Wiki\\Wiki',
+			'mapper'    => '\\Schoolbox\\Wiki\\WikiMapper',
 			'this_key'  => 'wikiID',
 			'other_key' => 'wikiID'
 		));
@@ -122,6 +122,45 @@ class RevisionMapper extends Mapper {
 			$c->add($revision);
 		}
 		return $c;
+	}
+
+
+	/**
+	 * Figure out if there are any empty links - these are assumed to be stubs.
+	 * If a title attribute is provided, use that as the stub wiki heading
+	 *
+	 * @param string $body
+	 * @return string
+	 */
+	public function createStubLinks($body) {
+		preg_match_all('/<a title="([^"]*)">/', $body, $matches);
+
+		if(!count($matches[1])) {
+			return $body;
+		}
+		$pattern = array();
+		$replace = array();
+
+		foreach($matches[1] as $i => $match) {
+
+			// Try using title attribute as a heading, otherwise ignore creation of empty stubs
+			if(!strlen(trim($match))) {
+				continue;
+			}
+
+			// Generate a slug for a new article that won't exist
+			$url = new \Url(trim($match));
+			$slug = $url->getSlug();
+
+			$pattern[] = $matches[0][$i];
+			$replace[] = "<a href='/wiki/{$body['categoryID']}/{$slug}'>";
+		}
+
+		// Perform replacements if required
+		if (count($pattern)) {
+			$body = str_replace($pattern, $replace, $body);
+		}
+		return $body;
 	}
 
 }
