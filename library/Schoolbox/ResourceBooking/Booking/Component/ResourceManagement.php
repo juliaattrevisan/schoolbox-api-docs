@@ -54,7 +54,12 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         );
 
         // Still need to check if user actually has any bookable items.
+        // If they don't, then don't display this component.
+        if (!$bookingApi->getUserCanModerate()) {
+            return false;
+        }
         $bookings = $bookingApi->getEvents($startTime, $endTime);
+
         // Group bookings by their item, and order within that list by date
         // (They should be date-ordered already)
         $groupedBookings = array();
