@@ -18,6 +18,7 @@ use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Role;
@@ -39,6 +40,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->blogMapper = BlogMapper::getInstance();
+		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_BLOG);
 	}
 
 	/**

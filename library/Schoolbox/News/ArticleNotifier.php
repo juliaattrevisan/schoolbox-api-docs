@@ -55,7 +55,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->roleMapper = RoleMapper::getInstance();
-		$this->namespace = NSMapper::getInstance()->findByColumn('slug', 'news')->first();
+		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_NEWS);
 	}
 
 
