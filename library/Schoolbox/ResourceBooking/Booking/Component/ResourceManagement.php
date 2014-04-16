@@ -51,6 +51,13 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderation_Default(
             $this->user, array()
         );
+        $bookingApi->setStatus(
+            array(
+                Booking\Status\Model::STATUS_APPROVED,
+                Booking\Status\Model::STATUS_PENDING,
+                Booking\Status\Model::STATUS_REJECTED,
+            )
+        );
 
         // Still need to check if user actually has any bookable items.
         // If they don't, then don't display this component.

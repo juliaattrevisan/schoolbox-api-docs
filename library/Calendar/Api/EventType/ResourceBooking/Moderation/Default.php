@@ -106,7 +106,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
         $bookings = $this->getBookingMapper()->findForTimespan(
             $startTimestamp,
             $endTimestamp,
-            array(Booking\Status\Model::STATUS_PENDING),
+            $this->getStatus(),
             $params
         );
         $converter  = new Booking\Util\EventConverter();
