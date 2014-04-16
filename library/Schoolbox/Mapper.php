@@ -26,6 +26,11 @@ class Mapper {
 	const TYPE_BOOLEAN = 5;
 
 	/**
+	 * Represents an almost-boolean data type: enum('true','false') in the database
+	 */
+	const TYPE_BOOL_ENUM = 6;
+
+	/**
 	 * Represents the SQL NULL data type.
 	 */
 	const TYPE_NULL = 0;
