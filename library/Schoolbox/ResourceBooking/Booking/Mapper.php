@@ -191,7 +191,8 @@ class Mapper extends BaseMapper {
                 {$this->getJoinColumnString('status',            's')},
                 {$this->getJoinColumnString('reviewer',          'r')},
                 {$this->getJoinColumnString('resource',          'i')},
-                {$this->getJoinColumnString('resource.category', 'ic')}
+                {$this->getJoinColumnString('resource.category', 'ic')},
+                {$this->getJoinColumnString('resource.image',    'im')}
             FROM {$this->getTable()} `b`
             LEFT JOIN {$this->getJoinSql('event',             'b', 'e')}
             LEFT JOIN {$this->getJoinSql('event.owner',       'e', 'eo')}
@@ -200,6 +201,7 @@ class Mapper extends BaseMapper {
             LEFT JOIN {$this->getJoinSql('reviewer',          'b', 'r')}
             LEFT JOIN {$this->getJoinSql('resource',          'b', 'i')}
             LEFT JOIN {$this->getJoinSql('resource.category', 'i', 'ic')}
+            LEFT JOIN {$this->getJoinSql('resource.image',    'i', 'im')}
             WHERE b.deleted_at IS NULL
             AND   s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}
             AND NOT (
@@ -237,6 +239,7 @@ class Mapper extends BaseMapper {
                 $model->setReviewer($mapper->hydrateJoin($row, 'reviewer', 'r'));
                 $resource = $mapper->hydrateJoin($row, 'resource', 'i', false);
                 $resource->setCategory($mapper->hydrateJoin($row, 'resource.category', 'ic'));
+                $resource->setImage($mapper->hydrateJoin($row, 'resource.image', 'im'));
                 $model->setResource($resource);
                 return $model;
             }

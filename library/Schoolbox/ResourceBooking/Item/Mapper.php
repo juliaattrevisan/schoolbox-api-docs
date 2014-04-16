@@ -45,7 +45,7 @@ class Mapper extends BaseMapper {
                 'join'     => 'image',
                 'join_def' => array(
                     'mapper'    => '\\Schoolbox\\StorageMapper',
-                    'other_key' => 'id',
+                    'other_key' => 'storage_id',
                 )
             )
         );
