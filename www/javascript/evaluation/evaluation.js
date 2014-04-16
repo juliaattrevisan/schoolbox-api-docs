@@ -81,28 +81,39 @@
 				var shoryuken = new Function('return ' + method);
 				var configuration = shoryuken();
 
-				/* If a custom error location is desired
+				/* If configuration exists for this question type, apply settings
+				 * otherwise ignore it
 				 */
-				if (configuration.errorContainer != undefined) {
-					$j(element).validate({
-						errorPlacement: function(error, inputElement) {
-							$(element).find(configuration.errorContainer).html(error);
+				if (configuration != undefined) {
+
+					/* If the question is mandatory, apply validation requirements
+					 */
+					if ($(element).find('span[data-mandatory="required"]').length) {
+
+						/* If a custom error location is desired
+						 */
+						if (configuration.errorContainer != undefined) {
+							$j(element).validate({
+								errorPlacement: function(error, inputElement) {
+									$(element).find(configuration.errorContainer).html(error);
+								}
+							});
 						}
-					});
-				}
-				else {
-					$j(element).validate();
-				}
+						else {
+							$j(element).validate();
+						}
 
-				/* Apply custom rules if validation is required, in accordance with
-				 * http://jquery.bassistance.de/validate/demo/
-				 */
-				$j(element).find(configuration.element).rules('add', configuration.rules);
+						/* Apply custom rules if validation is required, in accordance with
+						 * http://jquery.bassistance.de/validate/demo/
+						 */
+						$j(element).find(configuration.element).rules('add', configuration.rules);
 
-				/* If any aren't valid, mark as bad
-				 */
-				if (!$j(element).valid()) {
-					errors = true;
+						/* If any aren't valid, mark as bad
+						 */
+						if (!$j(element).valid()) {
+							errors = true;
+						}
+					}
 				}
 			});
 
