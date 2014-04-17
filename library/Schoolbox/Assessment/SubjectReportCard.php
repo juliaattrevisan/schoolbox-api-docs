@@ -140,6 +140,11 @@ class SubjectReportCard {
 			$returnMapper = new ReturnedWorkMapper();
 			$assessMapper = new AttemptMapper();
 
+			/* Visibilities
+			 */
+			$quizVisibilityMapper = new \Assess\VisibilityMapper();
+			$quizVisibilities = $quizVisibilityMapper->getVisibilityArray($this->user);
+
 			// retrieve subject grades.
 			// Ensure that grades are properly ordered by date.
 			$studentGrades = array_merge(
@@ -150,7 +155,8 @@ class SubjectReportCard {
 				)),
 				$assessMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
 					'year'     => $this->targetYear,
-					'semester' => $this->targetSemester
+					'semester' => $this->targetSemester,
+					'visibility' => $quizVisibilities,
 				))
 			);
 			$studentGrades = array_filter(

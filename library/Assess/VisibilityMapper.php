@@ -45,37 +45,25 @@ class VisibilityMapper extends \Schoolbox\Mapper {
 	 * Note that the assess_visibility table has been made synonymous with the
 	 * consts defined in SubmissionBox (zero-based) and thus won't autoincrement
 	 *
-	 * @param $assess
 	 * @param \Schoolbox\User $user
 	 * @return array
 	 */
-	public function getVisibilityArray($assess, \Schoolbox\User $user) {
+	public function getVisibilityArray(\Schoolbox\User $user) {
+		$groupHandler = new \Group();
+
 		$visibilities = array();
 
-		/* Staff and students
-		 */
-		switch ($assess['visibility']) {
-
-			/* Staff, Students
-			 */
-			case 1:
-				$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
-				$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
-				break;
-
-			/* Staff, Students, Parents
-			 */
-			case 2:
-				$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
-				$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
-				$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT;
-				break;
-
-			/* Staff only
-			 */
-			default:
-				$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
-				break;
+		if ($groupHandler->isStaff()) {
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+		}
+		else if ($groupHandler->isStudent()) {
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+		}
+		else if ($groupHandler->isParentOfChild($user->getId())) {
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
 		}
 
 		return $visibilities;

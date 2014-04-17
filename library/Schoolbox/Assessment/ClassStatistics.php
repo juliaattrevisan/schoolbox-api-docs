@@ -62,7 +62,7 @@ class ClassStatistics {
 	 * @param int $year
 	 * @param int $semester
 	 */
-	public function __construct(Category $category, $year = 0, $semester = 0) {
+	public function __construct($category, $year = 0, $semester = 0) {
 		$this->category = $category;
 
 		// compile the due work, assessments, marks returned, et al
