@@ -216,9 +216,8 @@ class Interval implements JsonSerializable {
     /**
      * Creates a DateInterval instance out of this object.
      *
-     * You might want this when checking across DST changes, because this object
-     *
-     * DateInterval object interprets days as a
+     * You might want this when adjusting an existing date object, because this
+     * object doesn't understand how to convert between daylight saving changes.
      *
      * @return DateInterval
      */
