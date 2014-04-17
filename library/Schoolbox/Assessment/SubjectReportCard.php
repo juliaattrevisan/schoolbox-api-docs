@@ -78,7 +78,7 @@ class SubjectReportCard {
 		$this->category = $catMap->findById($categoryId);
 		$this->user = $uMap->findById($userId);
 
-		$this->_fullClassHistory = new ClassStatistics($this->getCategory(), $year, $semester);
+		$this->_fullClassHistory = new ClassStatistics($this->getCategory(), $year, $semester, $this->user);
 	}
 
 
