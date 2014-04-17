@@ -2445,28 +2445,24 @@ input.timeField {
             .btn-icon(1);
         }
     }
-
     &.weather span {
         .btn-icon(2);
     }
     &.weather:hover span {
         .btn-icon(3);
     }
-
     &.up-arrow span {
         .btn-icon(4);
     }
     &.up-arrow:hover span {
         .btn-icon(5);
     }
-
     &.update span {
         .btn-icon(6);
     }
     &.update:hover span {
         .btn-icon(7);
     }
-
     &.email span {
         .btn-icon(8);
     }
@@ -2586,6 +2582,18 @@ input.timeField {
     }
     &.print:hover span {
         .btn-icon(47);
+    }
+    &.filter span {
+      .btn-icon(54);
+    }
+    &.filter:hover span {
+      .btn-icon(55);
+    }
+    &.export span {
+      .btn-icon(74);
+    }
+    &.export:hover span {
+      .btn-icon(75);
     }
     &.submit {
         .submit-btn-plain();
@@ -5160,50 +5168,30 @@ CALENDAR
 
     .filter-change {
         margin-top: 4px;
+        padding: 0 8px;
         height: 22px;
         line-height: 22px;
-        padding: 0 9px 0 38px;
-        color: @dgrey;
+        color: @link;
         display: inline-block;
         text-decoration: none;
-        background: @content-background;
+        background: @dark;
         border: 1px solid @lgrey;
         position: relative;
         margin-left: 6px;
+        .border-radius(0px);
+
         span {
             position: absolute;
             top: 4px;
-            left: 12px;
+            left: 7px;
             height: 14px;
             width: 12px;
         }
         &.current, &:hover {
-            background: @white;
-        }
-        &.day {
-            span {
-                background: url(/images/core/calendar/calendar-day.png) no-repeat;
-            }
-        }
-        &.day.current span,
-        &.day:hover span {
-            background: url(/images/core/calendar/calendar-day.png) 0 -14px no-repeat;
-        }
-        &.week {
-            span {
-                background: url(/images/core/calendar/calendar-week.png) no-repeat;
-            }
-        }
-        &.week.current span,
-        &.week:hover span {
-            background: url(/images/core/calendar/calendar-week.png) 0 -14px no-repeat;
-        }
-        &.month span {
-            background: url(/images/core/calendar/calendar-month.png) no-repeat;
-        }
-        &.month.current span,
-        &.month:hover span {
-            background: url(/images/core/calendar/calendar-month.png) 0 -14px no-repeat;
+            color: @tab-color;
+            background: @admin-nav;
+            border-color: @admin-nav;
+            text-decoration: underline;
         }
         &.list span {
             background: url(/images/core/icons/btn-icons.png) no-repeat;
@@ -5215,23 +5203,24 @@ CALENDAR
         }
     }
     .filters {
-        z-index: 5000;
-        position: relative;
-        background: lighten(@highlight-color,@lighten-value) url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
-        padding: 0 12px 0 39px;
-        color: @dgrey;
-        &:hover {
-            background: lighten(@neutral-color,@lighten-value) url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
+        float: none;
+        span{
+          .btn-icon(54);
         }
-        &.active {
-            background-color: lighten(@neutral-color,@lighten-value);
-        }
+      &:hover span{
+        .btn-icon(55);
+      }
     }
-    .export {
+    .export,
+    .filters {
         z-index: 5000;
         position: relative;
-        padding: 0 12px 0 39px;
-        color: @dgrey;
+        padding: 0 8px 0 27px;
+        &:hover {
+            text-decoration: underline;
+            border: 1px solid @lgrey;
+            background: @dark;
+        }
         &.active {
             background-color: lighten(@neutral-color,@lighten-value);
         }
@@ -5240,10 +5229,30 @@ CALENDAR
         position: relative;
         z-index: 10;
     }
+    .fc-button-next{
+        span{
+          background: url(/images/core/icons/btn-icons.png) no-repeat;
+          .btn-icon(28);
+          text-indent: -9000px;
+        }
+        &:hover span{
+          .btn-icon(29);
+        }
+    }
+    .fc-button-prev{
+        span{
+          background: url(/images/core/icons/btn-icons.png) no-repeat;
+          .btn-icon(38);
+          text-indent: -9000px;
+        }
+        &:hover span{
+          background-position: 0 -545px;
+        }
+    }
     .ui-datepicker-trigger {
         cursor: pointer;
         display: block;
-        margin: 4px auto 4px;
+        padding: 4px 5px;
         &:hover {
             cursor: pointer;
         }
@@ -7322,9 +7331,6 @@ form.context {
     }
     .file-input {
 		float: none;
-  //      float: right;
-//        width: 70%; //      .btn                      { width: 112px; }
-
     }
 	.button-set {
 		text-align: right;
@@ -9683,12 +9689,18 @@ table img { max-width: none; }
             z-index: 4;
             margin: 5px 3px;
             &.fc-state-hover {
-                color: @black;
+                color: @white;
             }
             &.fc-button-today {
                 color: @black;
                 &.fc-state-disabled {
                     color: @dgrey;
+                    &:hover{
+                      color: @dgrey;
+                      background: @dark;
+                      border: 1px solid @lgrey;
+                      text-decoration: none;
+                    }
                 }
             }
         }
@@ -9710,16 +9722,22 @@ table img { max-width: none; }
                         border-bottom-width: 0;
                     }
                 }
-                span {
-                    display: none;
-                }
             }
         }
         .fc-header-left {
             padding-left: 3px;
             width: 135px;
             .filter-change {
-                padding: 0 5px;
+                padding: 0 15px;
+            }
+            .fc-button-next,
+            .fc-button-prev{
+              padding: 0 14px;
+              &:hover{
+                text-decoration: none;
+                border: 1px solid @lgrey;
+                background: @dark;
+              }
             }
         }
         .fc-header-center {
@@ -9731,9 +9749,6 @@ table img { max-width: none; }
         .fc-header-right {
 			width: auto;
             padding-right: 3px;
-            .filter-change {
-
-            }
         }
 
     }
@@ -9755,7 +9770,7 @@ table img { max-width: none; }
 
 // filter list styles
 #content .link-case .filter-drop {
-    top: 34px;
+    top: 80px;
     right: 0px;
     .filter-list {
         background: rgba(255, 255, 255, 0.9);

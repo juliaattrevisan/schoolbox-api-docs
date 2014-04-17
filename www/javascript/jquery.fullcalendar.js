@@ -56,8 +56,8 @@ function Calendar(id, bubbleId, opts) {
                 right: 'month,agendaWeek,agendaDay'
             },
             buttonText: {
-                prev:     '&nbsp;&#x25C0;&nbsp;', // ◀
-                next:     '&nbsp;&#x25B6;&nbsp;', // ▶
+                prev:     '', // ◀
+                next:     '', // ▶
                 prevYear: '&nbsp;&laquo;&nbsp;',  // <<
                 nextYear: '&nbsp;&raquo;&nbsp;',  // >>
                 today:    'today',
@@ -255,7 +255,7 @@ Calendar.prototype.init = function() {
             baseButton.clone()
                 .html('filters')
                 .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-                .addClass('fc-button-filter fc-corner-left fc-corner-right')
+                .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
                 .attr('id','fc-button-filter')
         );
         headerRight.append(
