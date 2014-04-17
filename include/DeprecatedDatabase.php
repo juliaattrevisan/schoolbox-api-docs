@@ -483,12 +483,7 @@ function dbSmartQuote($value) {
 	 * @return string
 	 */
 	public function serialize() {
-		return serialize(array(
-			$this->host,
-			$this->user,
-			$this->passwd,
-			$this->debug
-		));
+		return null;
 	}
 
 	/**
@@ -498,7 +493,6 @@ function dbSmartQuote($value) {
 	 * @return void
 	 */
 	public function unserialize($serialized) {
-		list($this->host, $this->user, $this->passwd, $this->debug) = unserialize($serialized);
-		$this->reconnect();
+		$this->DeprecatedDatabase();
 	}
 }

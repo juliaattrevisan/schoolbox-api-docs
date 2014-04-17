@@ -9,6 +9,8 @@
  *
  */
 
+use Alaress\DebugBar\Instance as DebugBar;
+
 class Database implements Serializable {
     /**
      * An instance of database
@@ -325,9 +327,7 @@ class Database implements Serializable {
 	 * @return string
 	 */
 	public function serialize() {
-		return serialize(array(
-			$this->dsn, $this->username, $this->password, $this->options)
-		);
+		return null;
 	}
 
 	/**
@@ -337,7 +337,6 @@ class Database implements Serializable {
 	 * @return void
 	 */
 	public function unserialize($serialized) {
-		list($this->dsn, $this->username, $this->password, $this->options) = unserialize($serialized);
-		$this->reconnect();
+		$this->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => DebugBar::isEnabled()));
 	}
 }
