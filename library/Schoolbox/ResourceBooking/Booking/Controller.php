@@ -154,12 +154,15 @@ class Controller extends Base {
     }
 
     /**
-     * Attempts to validate the creation of a booking from post data.
+     * Attempts to validate the creation or update of a booking from post data.
      *
      * @param  Item\Model $resource
+     * @param  Model      $existingBooking If provided, this is the booking that
+     *                                     is being updated.
+     *                                     Leave it out of conflict checks.
      * @return array
      */
-    protected function validateBookingFromPostData(Item\Model $resource) {
+    protected function validateBookingFromPostData(Item\Model $resource, Model $existingBooking = null) {
         // Check:
         // Beginning and end of booking are valid datetime
         $errors    = array();
@@ -219,8 +222,35 @@ class Controller extends Base {
                 $endDate->getTimestamp() - 1,
                 array(Status\Model::STATUS_APPROVED)
             );
+            // If updating a booking - Remove the item being updated from the
+            // check (because it's being moved)
+            if ($existingBooking instanceof Model) {
+                $existingId = $existingBooking->getId();
+                $conflictingBookings = $conflictingBookings->filter(
+                    function($item) use($existingId) {
+                        return $item->getId() != $existingId;
+                    }
+                );
+            }
             if (count($conflictingBookings)) {
                 $errors['start_datetime'][] = 'conflict';
+            }
+        }
+
+        // If updating a booking and its timespan hasn't changed:
+        // unset all timespan related errors.
+        // This allows someone to change its notes.
+        if ($existingBooking instanceof Model) {
+            $existingStart = new DateTime(
+                $existingBooking->getEvent()->getStartDate().' '.
+                $existingBooking->getEvent()->getStartTime()
+            );
+            $existingEnd = new DateTime(
+                $existingBooking->getEvent()->getEndDate().' '.
+                $existingBooking->getEvent()->getEndTime()
+            );
+            if ($startDate == $existingStart && $endDate == $existingEnd) {
+                unset($errors['start_datetime'], $errors['end_datetime']);
             }
         }
 
