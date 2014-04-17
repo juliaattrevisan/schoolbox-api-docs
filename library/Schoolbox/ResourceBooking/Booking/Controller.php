@@ -570,7 +570,6 @@ class Controller extends Base {
             }
 
             // Update bookings for linked items too. Eek!
-
 //            $this->getBookingMapper()->findSeriesBookings($id, $item->getEvent()->getSeriesId());
 
             // If the time changes for a series event, then I don't know what to
@@ -579,7 +578,6 @@ class Controller extends Base {
             // a series, if I ask it to - even events in the past.
 
             // Do the same for all its related bookings too.
-            $code = 400;
         }
         else {
             $code = 400;
