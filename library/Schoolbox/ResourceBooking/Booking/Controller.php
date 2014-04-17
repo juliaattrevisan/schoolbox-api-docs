@@ -710,13 +710,16 @@ class Controller extends Base {
     }
 
     /**
-     * Helper method for retrieving a series of bookings.
+     * Helper method for retrieving a series of bookings, if series booking is
+     * enabled.
      *
      * @param  Model $booking
      * @return Collection|Model[]
      */
     protected function getSeriesBookings(Model $booking) {
-        if ($this->getRequest()->query['efficacy'] === 'series') {
+        if ($this->getRequest()->query['efficacy'] === 'series'
+            || $this->getRequest()->post['efficacy'] === 'series'
+        ) {
             if ($seriesId = $booking->getEvent()->getSeriesId()) {
                 return $this->getBookingMapper()->findSeriesBookings($booking->getId(), $seriesId);
             }
