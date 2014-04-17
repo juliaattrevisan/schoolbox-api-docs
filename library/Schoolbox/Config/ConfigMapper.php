@@ -11,15 +11,19 @@ namespace Schoolbox\Config;
 
 
 use Schoolbox\Column\Factory as ColumnFactory;
-use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\MappingCollection;
 
 class ConfigMapper extends Mapper implements IConfigLoader {
 
+	/** @var array */
 	protected $cache = array();
 
+
+	/**
+	 * Build the Mapper
+	 */
 	public function __construct() {
 		$this->database = \Database::getInstance();
 		$this->map = new MappingCollection();
@@ -30,6 +34,9 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 	}
 
 
+	/**
+	 * @return void
+	 */
 	protected function mapping() {
 		$this->hasTable('config');
 		$this->hasModel('\\Schoolbox\\Config\\Config');
@@ -56,6 +63,12 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 	}
 
 
+	/**
+	 * Get a config variable
+	 *
+	 * @param string $var
+	 * @return mixed
+	 */
 	public function get($var) {
 		if(!isset($this->cache[$var])) {
 			$coll = $this->findByColumn('name', $var);
