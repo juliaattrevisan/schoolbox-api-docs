@@ -445,6 +445,20 @@ class Controller extends Base {
     }
 
     /**
+     * Currently event datetimes aren't loaded - this method does that.
+     *
+     * @param Calendar\Event $event
+     */
+    protected function loadDateTimesIntoEvent(Calendar\Event $event) {
+        $event->setStartDateTime(
+            new DateTime($event->getStartDate().' '.$event->getStartTime())
+        );
+        $event->setEndDateTime(
+            new DateTime($event->getEndDate().' '.$event->getEndTime())
+        );
+    }
+
+    /**
      * Stub for edit action.
      *
      * @param int $id
@@ -453,12 +467,13 @@ class Controller extends Base {
         $item = $this->getBookingMapper()->findById($id);
         // Set start and end date
         $event = $item->getEvent();
-        $event->setStartDateTime(
-            new DateTime($event->getStartDate().' '.$event->getStartTime())
-        );
-        $event->setEndDateTime(
-            new DateTime($event->getEndDate().' '.$event->getEndTime())
-        );
+        $this->loadDateTimesIntoEvent($event);
+//        $event->setStartDateTime(
+//            new DateTime($event->getStartDate().' '.$event->getStartTime())
+//        );
+//        $event->setEndDateTime(
+//            new DateTime($event->getEndDate().' '.$event->getEndTime())
+//        );
         // Show event's recurrence
         $recurrence = array();
         if ($event->getSeriesId()) {
