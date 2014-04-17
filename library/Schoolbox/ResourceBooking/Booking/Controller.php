@@ -149,9 +149,7 @@ class Controller extends Base {
         else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
-            $this->getResponse()->redirect->afterPost(
-                $this->getRouter()->generate('resourceItem.read', array('id' => $id))
-            );
+            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory());
         }
     }
 
