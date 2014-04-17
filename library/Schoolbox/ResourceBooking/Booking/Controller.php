@@ -496,12 +496,132 @@ class Controller extends Base {
      * @param $id
      */
     public function update($id) {
-        $this->getResponse()->content->set(
-            array(
-                'format' => 'json',
-                'data'   => array(),
-            )
-        );
+        $item  = $this->getBookingMapper()->findById($id);
+        $event = $item->getEvent();
+        $this->loadDateTimesIntoEvent($event);
+
+        // Perform validation, but leave this booking out of calculations.
+        $errors = $this->validateBookingFromPostData($item->getResource(), $item);
+
+        $code = 200;
+        if (empty($errors)) {
+
+            $startDate = $this->getDateFromForm('start_datetime');
+            $endDate   = $this->getDateFromForm('end_datetime');
+
+            // Have the date and time changed?
+            // If so, set the date and time for each event, and invalidate
+            // each event.
+            $startDelta = \Alaress\Date\Interval::createFromDateTimeDifference(
+                $item->getEvent()->getStartDateTime(), $startDate
+            );
+            $endDelta = \Alaress\Date\Interval::createFromDateTimeDifference(
+                $item->getEvent()->getEndDateTime(), $endDate
+            );
+            $isTimeChanged = ($startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0);
+
+            // Adjust the current item
+            if ($isTimeChanged) {
+                $item->setStatus(Status\Model::STATUS_PENDING);
+                $newStart = $event->getStartDateTime()->add($startDelta->getAsDateInterval());
+                $event->setStartDateTime($newStart);
+                $event->setStartDate($newStart->format('Y-m-d'));
+                $event->setStartTime($newStart->format('H:i:s'));
+                $newEnd = $event->getEndDateTime()->add($endDelta->getAsDateInterval());
+                $event->setEndDate($newEnd->format('Y-m-d'));
+                $event->setEndTime($newEnd->format('H:i:s'));
+            }
+            $event->setDetail($this->getRequest()->post['notes']);
+            $this->getBookingMapper()->save($item);
+            $this->getEventMapper()->save($event);
+
+            // Has the time changed? If so:
+            // * If this is a single item, just set status back to pending.
+            // * If this is a series booking, the rule is much more complicated.
+            //   Probably best to take each booking in the series, and adjust
+            //   its time by whatever the difference is between each.
+            $series = $this->getSeriesBookings($item);
+            $eventSeries = array();
+            if (count($series)) {
+                // update all of these, too
+                foreach ($series as $seriesBooking) {
+                    $seriesEvent = $seriesBooking->getEvent();
+                    $this->loadDateTimesIntoEvent($seriesEvent);
+                    // Don't adjust any items that have already started.
+                    // It's too late for that!
+                    if ($seriesEvent->getStartDateTime() < new DateTime()) {
+                        continue;
+                    }
+                    if ($isTimeChanged) {
+                        $seriesBooking->setStatus(Status\Model::STATUS_PENDING);
+                        $newStart = $seriesEvent->getStartDateTime()->add($startDelta->getAsDateInterval());
+                        $seriesEvent->setStartDateTime($newStart);
+                        $seriesEvent->setStartDate($newStart->format('Y-m-d'));
+                        $seriesEvent->setStartTime($newStart->format('H:i:s'));
+                        $newEnd = $seriesEvent->getEndDateTime()->add($endDelta->getAsDateInterval());
+                        $seriesEvent->setEndDate($newEnd->format('Y-m-d'));
+                        $seriesEvent->setEndTime($newEnd->format('H:i:s'));
+                    }
+                    $seriesEvent->setDetail($this->getRequest()->post['notes']);
+                    $eventSeries[] = $seriesEvent;
+                }
+                $this->getBookingMapper()->save($series);
+                $this->getEventMapper()->save($eventSeries);
+            }
+
+            // Update bookings for linked items too. Eek!
+
+//            $this->getBookingMapper()->findSeriesBookings($id, $item->getEvent()->getSeriesId());
+
+            // If the time changes for a series event, then I don't know what to
+            // do. It might be best to delete and recreate the whole series.
+            // The current calendar event system updates time for all events in
+            // a series, if I ask it to - even events in the past.
+
+            // Do the same for all its related bookings too.
+            $code = 400;
+        }
+        else {
+            $code = 400;
+        }
+
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->setCode($code);
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => array(
+                        'item'   => $item,
+                        'errors' => $errors,
+                    ),
+                )
+            );
+        }
+        else {
+            // Redirect back to previous page, or read page if not set.
+            // (let's have a better interface than backToTheFuture too)
+            // Consider storing redirect URL in form or GET?
+            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
+        }
+    }
+
+    /**
+     * Attempts to update a booking based on its fields.
+     *
+     * @param Model $booking
+     */
+    protected function updateBookingFromPostData(Model $booking) {
+        $event = $booking->getEvent();
+
+        $startDate = $this->getDateFromForm('start_datetime');
+        $endDate   = $this->getDateFromForm('end_datetime');
+        $event->setStartDate($startDate->format('Y-m-d'));
+        $event->setStartTime($startDate->format('H:i:s'));
+        $event->setEndDate($endDate->format('Y-m-d'));
+        $event->setEndTime($endDate->format('H:i:s'));
+        $event->setDetail($this->getRequest()->post['notes']);
+
+        // Has this booking's events changed?
     }
 
     /**
