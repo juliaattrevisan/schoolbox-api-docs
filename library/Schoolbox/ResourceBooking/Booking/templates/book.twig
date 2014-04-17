@@ -83,7 +83,6 @@ $(document).ready(function() {
     $().add(updateDialog).add(cancelDialog).dialog({
         autoOpen:false,
         resizable:false,
-        height:180,
         width:400,
         modal:true,
         draggable:false,
@@ -160,7 +159,12 @@ $(document).ready(function() {
             var repeat    = form.find('input[name="repeat"]').val()
             if (bookingId && repeat) {
                 // Show a different dialog for deletes
-                updateDialog.dialog('open')
+                if (form.data('action') === 'cancel') {
+                    cancelDialog.dialog('open')
+                }
+                else {
+                    updateDialog.dialog('open')
+                }
             }
             else {
                 callback()
@@ -173,6 +177,15 @@ $(document).ready(function() {
         .click(function() {
             errors = {}
             form.valid()
+        })
+        .click(function() {
+            // Record that I clicked Save
+            form.data('action', 'save')
+        })
+    form.find('#resource-booking-cancel')
+        .click(function() {
+            // Record that I clicked Cancel
+            form.data('action', 'cancel')
         })
 
     // Show/hide the repeat until input, depending on if a repeat is chosen.
@@ -326,10 +339,31 @@ $(document).ready(function() {
 </form>
 
 {# Booking for bulk events #}
-<div id="dialog-bulk-cancel" title="This booking is part of a series">
+<div id="dialog-bulk-cancel" title="This booking is part of a series" class="wysiwyg">
     Would you like to cancel only this booking, or all in the series?
+    <ul>
+        <li>
+            Bookings in this series that have already occured will not be
+            retrospectively cancelled.
+        </li>
+    </ul>
 </div>
 
-<div id="dialog-bulk-update" title="This booking is part of a series">
-    Would you like to update only this booking, or all in the series? If any bookings in the series have been modified, the changes will be overridden.
+<div id="dialog-bulk-update" title="This booking is part of a series" class="wysiwyg">
+    Would you like to update only this booking, or all in the series? If you
+    update all bookings in the series:
+    <ul>
+        <li>
+            The start and end time of the other bookings in the series will be
+            adjusted by the amount you adjusted this booking.
+        </li>
+        <li>
+            Any approved bookings whose start or end time have changed will need
+            to be approved again.
+        </li>
+        <li>
+            Bookings in this series that have already occured will not be
+            retrospectively changed.
+        </li>
+    </ul>
 </div>
