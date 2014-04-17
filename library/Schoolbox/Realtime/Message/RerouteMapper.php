@@ -22,16 +22,21 @@ class RerouteMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'user_id',
 			'property'   => 'user',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
 			'identifier' => true,
 			'join'       => 'user'
 		));
 		$this->hasMap(array(
 			'column'     => 'msg_source_id',
 			'property'   => 'source',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
 			'identifier' => true,
 			'join'       => 'source'
+		));
+		$this->hasMap(array(
+			'column'     => 'outgoing_level',
+			'property'   => 'outgoingLevel',
+			'type'       => self::TYPE_INTEGER,
 		));
 		$this->hasJoin('source', array(
 			'mapper'     => '\\Schoolbox\\Realtime\\Message\\SourceMapper',

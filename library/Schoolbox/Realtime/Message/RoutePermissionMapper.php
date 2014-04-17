@@ -11,12 +11,14 @@ namespace Schoolbox\Realtime\Message;
 
 
 use DatabaseStatement;
+use PDO;
+use PDOStatement;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 
 class RoutePermissionMapper extends Mapper {
 
-	/** @var DatabaseStatement[] */
+	/** @var PDOStatement[] */
 	protected $prepared = array();
 
 	protected function mapping() {
@@ -73,6 +75,7 @@ class RoutePermissionMapper extends Mapper {
 	}
 
 	public function findRouteLevels($topic, $roleId, $userId = 0) {
+		// find the routing levels that match this role and user
 		$stmt = $this->prepare("
 			SELECT
 				ns.slug, src.key,
@@ -90,14 +93,78 @@ class RoutePermissionMapper extends Mapper {
 		));
 
 		$result = array();
-		$topic = explode('.', $topic);
+		$topicParts = explode('.', $topic);
 
-		while($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+		// iterate across, looking for one that matches the topic that we've been provided
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$test = array($r['slug'], $r['key']);
-			if(!count(array_diff($test, $topic))) {
-				$result[] = $r;
+
+			if(!count(array_diff($test, $topicParts))) {
+				$result = array(
+					'min' => $r['min_level'],
+					'def' => $r['default_level'],
+					'out' => $r['outgoing_level'],
+					'max' => $r['max_level'],
+				);
+				break;
 			}
 		}
+
+		// this message does not apply to this user/role
+		if(!count($result)) {
+			return $result;
+		}
+
+		// find overrides where
+		$stmt = $this->prepare("
+			SELECT user_id, msg_route_key, outgoing_level
+			FROM msg_reroute_override override
+			WHERE user_id IN (0, :user_id)
+		");
+
+		$stmt->execute(array(
+			'user_id' => $userId
+		));
+
+		$precedence = array();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			// no multiword (hash) support
+			$regex = '`' . str_replace('*','([^\.]+)', $r['msg_route_key']) . '`';
+
+			if(preg_match($regex, $topic, $matches, PREG_OFFSET_CAPTURE)) {
+				// literal leftness, wildcard rightness, applied level
+
+				$leftness = $matches[0][1];
+				$rightness = $matches[1][1] ?: PHP_INT_MAX;
+
+				$precedence[$r['user_id']][$leftness][$rightness] = $r['outgoing_level'];
+			}
+
+		}
+
+		if(!count($precedence)) {
+			return $result;
+		}
+
+
+		/*
+		 * Override precedence is:
+		 *   1. specific to the user > global
+		 *   2. how far left the literal first matches
+		 *   3. how far right the wildcard matches
+		 */
+
+		// take highest userId
+		$a = $precedence[max(array_keys($precedence))];
+
+		// lowest leftness
+		$b = $a[min(array_keys($a))];
+
+		// highest rightness
+		$c = $b[max(array_keys($b))];
+
+		$result['out'] = $c;
 
 		return $result;
 
@@ -107,7 +174,7 @@ class RoutePermissionMapper extends Mapper {
 	 * Transparently cache prepared statements rather than creating new ones
 	 *
 	 * @param $queryString
-	 * @return DatabaseStatement
+	 * @return PDOStatement
 	 */
 	public function prepare($queryString) {
 		$hash = sha1($queryString);

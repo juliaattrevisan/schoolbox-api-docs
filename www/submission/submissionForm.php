@@ -30,7 +30,6 @@ $page = new SitePage();
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
@@ -170,21 +169,6 @@ $submission->setRubricResultSet($resultSetID ?: 0);
 $submission->setMaxMark($markMax);
 $submission->setMarkVisibility($_POST['mark_visibility']);
 $submission->setWeight(max(intval($_POST['weight']), 0));
-
-// append the notification data to be parsed in
-foreach(array('overdue', 'upcoming', 'returned') as $i) {
-    $notification     = $submission->getNotifications()->getOfType($i);
-    $new_notification = false;
-    if (!$notification instanceof Notification) {
-        $notification     = new Notification();
-        $new_notification = true;
-    }
-    $notification->setType($i);
-    $notification->setEnabled(isset($_POST['notif_'.$i]));
-    if ($new_notification) {
-        $submission->addNotification($notification);
-    }
-}
 
 // create new
 try {
