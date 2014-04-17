@@ -529,6 +529,8 @@ class Controller extends Base {
                 }
             }
             $event->setDetail($this->getRequest()->post['notes']);
+            $event->setRoleCollection(new \Schoolbox\Collection());
+            $event->setCampusCollection(new \Schoolbox\Collection());
             $this->getBookingMapper()->save($item);
             $this->getEventMapper()->save($event);
 
@@ -563,6 +565,8 @@ class Controller extends Base {
                         }
                     }
                     $seriesEvent->setDetail($this->getRequest()->post['notes']);
+                    $seriesEvent->setRoleCollection(new \Schoolbox\Collection());
+                    $seriesEvent->setCampusCollection(new \Schoolbox\Collection());
                     $eventSeries[] = $seriesEvent;
                 }
                 $this->getBookingMapper()->save($series);
