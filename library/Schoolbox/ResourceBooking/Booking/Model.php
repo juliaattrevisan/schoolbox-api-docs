@@ -223,6 +223,21 @@ class Model implements ISoftDeletable /*, JsonSerializable */{
     }
 
     /**
+     * Does this resource booking have a related booking for the given resource?
+     *
+     * @param  int $resourceId
+     * @return bool
+     */
+    public function hasRelatedBookingForResource($resourceId) {
+        foreach ($this->getRelatedBookingList() as $booking) {
+            if ($booking->getResource()->getId() == $resourceId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Is this object deleted?
      *
      * @return bool

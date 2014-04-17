@@ -299,7 +299,12 @@ $(document).ready(function() {
                 <ul>
                 {% for relatedItem in item.resource.relatedResourceList %}
                     <li>
-                        <input id="related-item-{{ relatedItem.id }}" type="checkbox" name="related_item[]" value="{{ relatedItem.id }}" />
+                        <input id="related-item-{{ relatedItem.id }}"
+                               type="checkbox"
+                               name="related_item[]"
+                               value="{{ relatedItem.id }}"
+                               {% if item.hasRelatedBookingForResource(relatedItem.id) %}checked{% endif %}
+                        />
                         <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
                     </li>
                 {% else %}

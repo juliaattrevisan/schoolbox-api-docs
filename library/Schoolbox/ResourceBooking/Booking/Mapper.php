@@ -337,7 +337,7 @@ class Mapper extends BaseMapper {
     /**
      * Hydrates this item along with its event and resource.
      *
-     * @param  mixed $id
+     * @param  int $id
      * @return Model
      */
     public function findById($id) {
@@ -365,6 +365,37 @@ class Mapper extends BaseMapper {
         });
         $this->throwIfDeleted($item);
         return $item;
+    }
+
+    /**
+     * Gets related bookings for this resource
+     *
+     * @param  int $id
+     * @return Collection|Model[]
+     */
+    public function findRelatedBookings($id) {
+        $query = "
+            SELECT
+                {$this->getColumnString('b')},
+                {$this->getJoinColumnString('resource', 'r')},
+                {$this->getJoinColumnString('event',    'e')}
+            FROM {$this->getTable()} b
+            INNER JOIN {$this->getJoinSql('related_booking', 'b', 'rb')}
+            INNER JOIN {$this->getJoinSql('resource',        'b', 'r')}
+            INNER JOIN {$this->getJoinSql('event',           'b', 'e')}
+            WHERE rb.extra_resource_booking_id=:bookingId
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('bookingId', $id);
+        $statement->execute();
+        return $this->hydrateList($statement, 'b', function($mapper, $model, $row) {
+            /** @var self  $mapper */
+            /** @var Model $model */
+            return $model
+                ->setResource($mapper->hydrateJoin($row, 'resource', 'r'))
+                ->setEvent($mapper->hydrateJoin($row, 'event', 'e'))
+            ;
+        });
     }
 
     /**

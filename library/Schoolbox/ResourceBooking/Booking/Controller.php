@@ -465,6 +465,7 @@ class Controller extends Base {
      */
     public function edit($id) {
         $item = $this->getBookingMapper()->findById($id);
+        $item->setRelatedBookingList($this->getBookingMapper()->findRelatedBookings($item->getId()));
         // Set start and end date
         $event = $item->getEvent();
         $this->loadDateTimesIntoEvent($event);
@@ -490,7 +491,8 @@ class Controller extends Base {
      * @param $id
      */
     public function update($id) {
-        $item  = $this->getBookingMapper()->findById($id);
+        $item = $this->getBookingMapper()->findById($id);
+        $item->setRelatedBookingList($this->getBookingMapper()->findRelatedBookings($item->getId()));
         $event = $item->getEvent();
         $this->loadDateTimesIntoEvent($event);
 
@@ -574,7 +576,7 @@ class Controller extends Base {
             }
 
             // Update related bookings too.
-            // If an item was in the list but isn't now, add bookings for it
+            // If an item was in the list but isn't now, remove bookings for it
             // If it wasn't and is, add it.
             // (It should be enough to add/remove from linked bookings)
 //            $this->getBookingMapper()->findSeriesBookings($id, $item->getEvent()->getSeriesId());
