@@ -3437,6 +3437,161 @@ ADMINV2/MESSAGES
 }
 
 /*--------------------------------------------------------------
+ADMINV2/MESSAGES
+--------------------------------------------------------------*/
+.namespaces {
+	label, li {
+		display: inline;
+	}
+	li > ul {
+		margin: 0 0 16px 32px;
+	}
+	label {
+		margin: 2px 0;
+		input[type=text] {
+			width: auto;
+			display: inline;
+			font-size: 1em;
+			padding: 3px;
+		}
+	}
+	h3 {
+		font-size: 1.25em;
+		font-weight: bold;
+		background: none;
+		color: #000;
+		margin: 0 0 8px 0;
+	}
+	form {
+		line-height: 28px;
+	}
+	table {
+		margin: 0 0 16px 0;
+		&.roles {
+			tr td {
+				padding: 0 8px;
+			}
+			tr th {
+				padding: 8px;
+			}
+		}
+		tr.role > td {
+			vertical-align: middle;
+		}
+	}
+	div.indent {
+		margin-left: 36px;
+		font-family: monospace;
+		font-size: 10px;
+		input {
+			font-family: monospace;
+		}
+	}
+	ul.ticks {
+		margin: 0;
+		> li {
+			width: 24%;
+			overflow: hidden;
+			display: inline-block;
+			height: 1.5em;
+			text-align: center;
+		}
+	}
+	a.exp {
+		color: @dgrey;
+		display: inline-block;
+		width: 24px;
+		height: 24px;
+		border: solid 1px @mgrey;
+		line-height: 24px;
+		text-align: center;
+		padding: 0 1px 0 0;
+		background: @lgrey;
+		position: relative;
+		top: 10px;
+		&:hover {
+			text-decoration: none;
+			color: @link;
+			border-color: @link;
+		}
+	}
+	.standardForm {
+		padding: 8px 0 1px;
+	}
+	.source {
+		> form {
+			margin: 0 24px 0 0;
+		}
+		form {
+			h4 {
+				font-size: 1em;
+				font-weight: bold;
+				margin: 0 0 8px 0;
+				padding: 0;
+				span {
+					padding-left: 8px;
+				}
+				em {
+					display: block;
+					font-size: 12px;
+					font-weight: normal;
+					margin: -3px 32px 0 42px;
+					line-height: 18px;
+				}
+			}
+		}
+	}
+	.perms {
+		width: 300px;
+		&.disabled * {
+			opacity: 0;
+		}
+		div {
+			border-bottom: solid 1px #eee;
+			&.slide {
+				margin: 0 36px;
+				&.default {
+					background: transparent;
+					border: none;
+					a.ui-slider-handle {
+						border-color: transparent;
+						background: transparent;
+						width: 0;
+						height: 0;
+						border-left: 10px solid transparent;
+						border-right: 10px solid transparent;
+						border-top: 10px solid @negative-color;
+						position: relative;
+						top: 12px;
+						z-index: 3;
+					}
+				}
+			}
+			&:last-child {
+				border-bottom: none;
+			}
+		}
+		span {
+			width: 50px;
+			display: inline-block;
+		}
+		* {
+			transition: opacity 0.1s;
+		}
+	}
+	.role {
+		th, td {
+			padding: 3px 24px;
+		}
+	}
+
+}
+
+
+
+
+
+/*--------------------------------------------------------------
 HOMEPAGE TEMPLATES
 --------------------------------------------------------------*/
 

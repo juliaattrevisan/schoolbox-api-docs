@@ -59,16 +59,48 @@ $this->setBlock('namespace', 'route', 'route_block');
 $this->setBlock('route', 'box', 'box_block');
 
 // digest
-if($digestFreq = $user->getRole()->getDigestSchedule()) {
+$digestFreq = $user->getRole()->getDigestSchedule();
+
+try {
+	$cron = \Cron\CronExpression::factory($digestFreq);
 	$digest = true;
-	$fq = $digestFreq == Role::DIGEST_DAILY ? 'daily' : 'weekly';
+
+	// parse out a human-readable form of the cron
+	$test = array(
+		0 => 'Sundays',
+		1 => 'Mondays',
+		2 => 'Tuesdays',
+		3 => 'Wednesdays',
+		4 => 'Thursdays',
+		5 => 'Fridays',
+		6 => 'Saturdays'
+	);
+	$days = explode(',', $cron->getExpression(\Cron\CronExpression::WEEKDAY));
+
+	// no diff: every day
+	if(!array_diff(array_keys($test), $days)) {
+		$fq = "every day";
+	}
+	// matches middle 5: weekdays
+	elseif(!array_diff(array_slice(array_keys($test), 1, 5), $days)) {
+		$fq = "on weekdays";
+	}
+	else {
+		$fq = 'on ' . implode(', ', array_intersect_key($test, $days));
+		$fq = substr_replace($fq, ' &amp;', strrpos($fq, ','), 1);
+	}
+
+	$fq .= sprintf(' at %s', date('g:ia', strtotime(
+			$cron->getExpression(\Cron\CronExpression::HOUR) . ":" .
+			$cron->getExpression(\Cron\CronExpression::MINUTE)
+		))
+	);
 
 	$this->setVar('DIGEST_FREQUENCY', $fq);
 	$this->parse('digestible_block','digestible');
 	$this->parse('digestible_col_block','digestible_col');
 }
-// no digest
-else {
+catch(InvalidArgumentException $e) {
 	$digest = false;
 	$this->setVar(array(
 		'digestible_block' => '',

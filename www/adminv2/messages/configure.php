@@ -125,6 +125,9 @@ if(!$groupHandler->isSuperuser()) {
 $editable = isset($this->arg[0]) && $this->arg[0] == 'edit';
 
 $this->setFile(TEMPLATE_content, '/adminv2/messages/configure.html');
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'messages');
+$this->setTitle('Admin - Messages');
 
 $db = Database::getInstance();
 
