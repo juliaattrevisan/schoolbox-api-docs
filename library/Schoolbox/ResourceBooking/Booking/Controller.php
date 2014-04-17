@@ -511,6 +511,18 @@ class Controller extends Base {
     }
 
     /**
+     * Marks a booking as pending.
+     *
+     * @param int $id The ID of the booking to set pending.
+     */
+    public function setPending($id) {
+        /** @var Model $booking */
+        $booking = $this->getBookingMapper()->findById($id);
+        $this->changeStatus($booking, Status\Model::STATUS_PENDING);
+        $this->setUpdateStatusResponse($booking);
+    }
+
+    /**
      * Cancels a booking.
      *
      * For now, it does this by deleting the booking, but could later do this by

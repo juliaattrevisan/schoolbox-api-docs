@@ -36,9 +36,10 @@ class Module extends BaseModule {
         $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
 
         // Approving or rejecting a single booking
-        $router->add('resourceBooking.approve', $basePath.'/{id}/approve');
-        $router->add('resourceBooking.reject',  $basePath.'/{id}/reject');
-        $router->add('resourceBooking.cancel',  $basePath.'/{id}/cancel');
+        $router->add('resourceBooking.approve',    $basePath.'/{id}/approve');
+        $router->add('resourceBooking.reject',     $basePath.'/{id}/reject');
+        $router->add('resourceBooking.setPending', $basePath.'/{id}/setPending');
+        $router->add('resourceBooking.cancel',     $basePath.'/{id}/cancel');
     }
 
     /**
