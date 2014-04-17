@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\ConfigLoader;
@@ -89,17 +90,12 @@ class ReturnedWork {
 	protected $config_loader;
 
 	/**
-	 * @var MimetypeMapper
-	 */
-	protected $mimetype_loader;
-
-	/**
 	 * Creates object and sets up related objects.
 	 */
 	public function __construct() {
 		$this->setSubmissionBox(new SubmissionBox());
 		$this->setOwner(new User());
-		$this->setConfigLoader(new ConfigLoader());
+		$this->setConfigLoader(ConfigMapper::getInstance());
 	}
 
 	/**

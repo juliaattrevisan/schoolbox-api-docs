@@ -9,7 +9,9 @@
  *
  */
 
-class Database {
+use Alaress\DebugBar\Instance as DebugBar;
+
+class Database implements Serializable {
     /**
      * An instance of database
      *
@@ -318,4 +320,23 @@ class Database {
     private function error(PDOException $exception) {
         die("Database Error: {$exception->getMessage()}");
     }
+
+	/**
+	 * String representation of object
+	 *
+	 * @return string
+	 */
+	public function serialize() {
+		return null;
+	}
+
+	/**
+	 * Constructs the object
+	 *
+	 * @param string $serialized
+	 * @return void
+	 */
+	public function unserialize($serialized) {
+		$this->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => DebugBar::isEnabled()));
+	}
 }
