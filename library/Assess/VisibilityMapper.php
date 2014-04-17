@@ -53,7 +53,7 @@ class VisibilityMapper extends \Schoolbox\Mapper {
 
 		$visibilities = array();
 
-		if ($groupHandler->isStaff()) {
+		if ($groupHandler->isSuperuser() || $groupHandler->isStaff()) {
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;

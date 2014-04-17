@@ -111,7 +111,7 @@ class StudentReportCard {
 
 		// if superuser, all permissions enabled
 		elseif($this->groupHandler->isSuperuser($this->viewingUserId)) {
-			$this->permissionSet = array(true,true,true,true,true);
+			$this->permissionSet = array(true,true,true,true,true,true);
 			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
 		}
 
