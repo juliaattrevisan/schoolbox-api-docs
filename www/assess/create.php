@@ -43,6 +43,7 @@ if (!empty($_POST)) {
         ->setMaxAttempts($_POST['max_attempts'])
         ->setWeight($_POST['weight'])
         ->setAvailability('assess')
+		->setVisibilityId($_POST['visibility_id'])
     ;
 
     // Is this a task? If so, just set the start and finish to now.
@@ -165,6 +166,7 @@ else {
     $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
+	$this->setBlock(TEMPLATE_content,  'assess_visibility', 'assess_visibility_block');
 
     $this->setTitle('Manage Assessment');
 
@@ -252,6 +254,21 @@ else {
         'DURATION_HOUR_VALUE' => 0,
         'DURATION_MINUTE_VALUE' => 0,
     ));
+
+	/* Visibility dropdown
+	 */
+	$visibilityMapper = new \Assess\VisibilityMapper();
+	$allVisibilities = $visibilityMapper->findAll();
+
+	foreach($allVisibilities as $currentVisibility) {
+		$this->setVar(array(
+			'ASSESS_VISIBILITY_ID' => $currentVisibility->getId(),
+			'ASSESS_VISIBILITY_NAME' => $currentVisibility->getName(),
+			'ASSESS_VISIBILITY_CHECKED' => '',
+		));
+
+		$this->parse('assess_visibility_block', 'assess_visibility', true);
+	}
 
     /* Don't display questions contents, which appears in Modify
      */

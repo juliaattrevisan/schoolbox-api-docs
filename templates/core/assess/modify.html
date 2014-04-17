@@ -187,18 +187,27 @@ $j(document).ready(function() {
                     </label>
 				</td>
 			</tr>
+            <tr>
+                <td>
+                    <h4>Visibility</h4>
+                    <p>
+                        Control who can view marks for this Online Assessment.
+                    </p>
+                    <select name='visibility_id'>
+                        <!-- BEGIN assess_visibility -->
+                        <option value='{ASSESS_VISIBILITY_ID}' {ASSESS_VISIBILITY_CHECKED}>{ASSESS_VISIBILITY_NAME}</option>
+                        <!-- END assess_visibility -->
+                    </select>
+                </td>
+            </tr>
       <!-- BEGIN mark_weight -->
       <tr>
         <td>
-
-
+          <h4>Weight</h4>
+          <em>The weighting of this Online Assessment (default is 100).</em>
           <label>
-              <strong>Weight</strong>
-              <em>The weighting of this quiz (default is 100).</em>
             <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
-
           </label>
-
         </td>
       </tr>
       <!-- END mark_weight -->

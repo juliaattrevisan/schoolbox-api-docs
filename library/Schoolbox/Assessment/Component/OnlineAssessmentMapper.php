@@ -110,6 +110,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_BOOLEAN,
 		));
 		$this->hasMap(array(
+			'column'     => 'visibility_id',
+			'property'   => 'visibilityId',
+			'type'       => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
 			'column'     => 'created_at',
 			'property'   => 'created',
 			'type'       => self::TYPE_DATETIME,
@@ -120,8 +125,6 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'property'   => 'deleted',
 			'type'       => self::TYPE_DATETIME,
 		));
-
-
 		$this->hasJoin('category', array(
 			'mapper'    => 'Schoolbox\\Resource\\CategoryMapper',
 			'this_key'  => 'category_id',
