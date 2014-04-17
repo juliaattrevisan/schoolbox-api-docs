@@ -468,12 +468,6 @@ class Controller extends Base {
         // Set start and end date
         $event = $item->getEvent();
         $this->loadDateTimesIntoEvent($event);
-//        $event->setStartDateTime(
-//            new DateTime($event->getStartDate().' '.$event->getStartTime())
-//        );
-//        $event->setEndDateTime(
-//            new DateTime($event->getEndDate().' '.$event->getEndTime())
-//        );
         // Show event's recurrence
         $recurrence = array();
         if ($event->getSeriesId()) {
@@ -530,6 +524,9 @@ class Controller extends Base {
                 $newEnd = $event->getEndDateTime()->add($endDelta->getAsDateInterval());
                 $event->setEndDate($newEnd->format('Y-m-d'));
                 $event->setEndTime($newEnd->format('H:i:s'));
+                if ($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+                    $item->setStatus(Status\Model::STATUS_APPROVED);
+                }
             }
             $event->setDetail($this->getRequest()->post['notes']);
             $this->getBookingMapper()->save($item);
@@ -561,6 +558,9 @@ class Controller extends Base {
                         $newEnd = $seriesEvent->getEndDateTime()->add($endDelta->getAsDateInterval());
                         $seriesEvent->setEndDate($newEnd->format('Y-m-d'));
                         $seriesEvent->setEndTime($newEnd->format('H:i:s'));
+                        if ($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+                            $item->setStatus(Status\Model::STATUS_APPROVED);
+                        }
                     }
                     $seriesEvent->setDetail($this->getRequest()->post['notes']);
                     $eventSeries[] = $seriesEvent;
@@ -569,15 +569,11 @@ class Controller extends Base {
                 $this->getEventMapper()->save($eventSeries);
             }
 
-            // Update bookings for linked items too. Eek!
+            // Update related bookings too.
+            // If an item was in the list but isn't now, add bookings for it
+            // If it wasn't and is, add it.
+            // (It should be enough to add/remove from linked bookings)
 //            $this->getBookingMapper()->findSeriesBookings($id, $item->getEvent()->getSeriesId());
-
-            // If the time changes for a series event, then I don't know what to
-            // do. It might be best to delete and recreate the whole series.
-            // The current calendar event system updates time for all events in
-            // a series, if I ask it to - even events in the past.
-
-            // Do the same for all its related bookings too.
         }
         else {
             $code = 400;
