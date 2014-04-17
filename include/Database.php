@@ -9,7 +9,7 @@
  *
  */
 
-class Database {
+class Database implements Serializable {
     /**
      * An instance of database
      *
@@ -318,4 +318,26 @@ class Database {
     private function error(PDOException $exception) {
         die("Database Error: {$exception->getMessage()}");
     }
+
+	/**
+	 * String representation of object
+	 *
+	 * @return string
+	 */
+	public function serialize() {
+		return serialize(array(
+			$this->dsn, $this->username, $this->password, $this->options)
+		);
+	}
+
+	/**
+	 * Constructs the object
+	 *
+	 * @param string $serialized
+	 * @return void
+	 */
+	public function unserialize($serialized) {
+		list($this->dsn, $this->username, $this->password, $this->options) = unserialize($serialized);
+		$this->reconnect();
+	}
 }

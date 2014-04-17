@@ -13,7 +13,7 @@
 
 use Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector;
 
-class DeprecatedDatabase
+class DeprecatedDatabase implements Serializable
 {
 
     /**
@@ -477,4 +477,28 @@ function dbSmartQuote($value) {
 }
 
 
+	/**
+	 * String representation of object
+	 *
+	 * @return string
+	 */
+	public function serialize() {
+		return serialize(array(
+			$this->host,
+			$this->user,
+			$this->passwd,
+			$this->debug
+		));
+	}
+
+	/**
+	 * Constructs the object
+	 *
+	 * @param string $serialized
+	 * @return void
+	 */
+	public function unserialize($serialized) {
+		list($this->host, $this->user, $this->passwd, $this->debug) = unserialize($serialized);
+		$this->reconnect();
+	}
 }
