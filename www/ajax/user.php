@@ -9,7 +9,7 @@ $emailObj = new Email();
 
 $result = $suggestions = $data = $return = array();
 
-$keyword = $_POST['query'];
+$keyword = $_GET['query'];
 $groupID = $_GET['groupID'];
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strlen($groupID)) {
