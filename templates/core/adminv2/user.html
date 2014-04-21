@@ -1,26 +1,51 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
-<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 $j(function() {
 
-    $j('#modify').userSelector({
-        plugin: {
-            data:'/ajax/user.php?groupID=0',
-            width: 200
+    $j('#modify').selectize({
+        maxItems: 1,
+        create: false,
+        persist: false,
+        searchField: 'name',
+        labelField: 'name',
+        valueField: 'id',
+        load: function(query, callback) {
+            if (!query.length) {
+                callback();
+            }
+            $.ajax({
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: 0, query: query},
+                dataType: 'json'
+            })
+            .done(function(result) {
+                callback(result)
+            })
+            .fail(function() {
+                callback()
+            })
         },
-        formElement: $j('#user-to-mod')
-    })
-    .data('magicsuggest').on('selectionchange', function(event, combo, selection) {
-        if (selection.length) {
+        onItemAdd: function(val) {
+            $j('#user-to-mod').val(val)
             $j('#modify-user-button').removeClass('disabled').focus();
-        }
-        else {
+        },
+        onItemRemove: function() {
+            $j('#user-to-mod').val('')
             $j('#modify-user-button').addClass('disabled');
+        },
+        onInitialize: function() {
+            this.clear();
+            this.addOption({name: 'Scott Berryhill', id: 15})
+            this.refreshOptions(false)
+            this.setActiveItem(this.getOption(15));
         }
-    });
+    })
 
     var openModifyScreen = function(event) {
         event.preventDefault();
