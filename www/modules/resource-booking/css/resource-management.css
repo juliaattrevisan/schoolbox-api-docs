@@ -1,8 +1,5 @@
 /**
- * Provisional styles
- * IE9 doesn't support flex, and other browsers support it only with prefixes?
- * Anyway it works in IE10, and the buttons are down the bottom or something
- * in IE9.
+ * Styles for the resource management booking component.
  */
 .component-resource-management {
     overflow: visible;
@@ -84,4 +81,20 @@
 .component-resource-management .status-selector:hover .status-buttons,
 .component-resource-management .status-buttons:hover {
     display: block;
+}
+
+/** IE9 styles using inline-block instead of flexbox. Looks okay. **/
+html.lt-ie10 .component-resource-management .booking-controls {
+    display: inline-block;
+    float: right;
+}
+html.lt-ie10 .component-resource-management .booking-event {
+    display: inline-block;
+}
+html.lt-ie10 .component-resource-management .status-selector {
+    display: inline-block;
+}
+html.lt-ie10 .component-resource-management .status-buttons .status-option .status-label,
+html.lt-ie10 .component-resource-management .status-buttons .status-option .btn {
+    display: inline-block;
 }
