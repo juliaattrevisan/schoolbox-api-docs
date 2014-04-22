@@ -36,6 +36,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
         $link->setHidden($_POST['hidden']?true:false);
+        $link->setModified(new DateTime('now'));
 
     }
     else {
@@ -84,7 +85,6 @@ else {
         try{
             $link = LinkMapper::getInstance()->findById($_POST['move']);
 
-
             if ($groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS) {
                 $result = "Insufficient permssions";
             }
@@ -93,6 +93,7 @@ else {
             }
             else {
                 $link->setFolder($_POST['categoryID']);
+                $link->setModified(new DateTime('now'));
                 LinkMapper::getInstance()->save($link);
                 $result = "success";
             }

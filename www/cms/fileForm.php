@@ -46,6 +46,7 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
         $currentFile->setDescription($_POST['description']);
         $currentFile->setComment($_POST['comment']);
         $currentFile->setHidden($_POST['hidden']?true:false);
+        $currentFile->setModified(new DateTime('now'));
 
 
 
@@ -193,6 +194,8 @@ elseif ( is_numeric($_POST['move']) && is_numeric($_POST['categoryID']) ) {
         }
         else {
             $file->setFolder($_POST['categoryID']);
+            $file->setModified(new DateTime('now'));
+
             FileMapper::getInstance()->save($file);
             $result = "success";
         }
