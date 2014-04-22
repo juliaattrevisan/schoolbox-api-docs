@@ -1,21 +1,24 @@
 <?php
 
+use Schoolbox\Resource\FileMapper;
+use Schoolbox\Resource\CategoryMapper;
+
 
 $groupHandler = new Group;
+
 
 if(is_numeric($this->arg[0])) {
 
 	/* Modify existing file */
-
-	$fileHandler = new File;
-
-	$file = $fileHandler->getByID($this->arg[0]);
-
-	if (!is_array($file)) {
+    try{
+        $file = FileMapper::getInstance()->findById($this->arg[0]);
+        $folder = CategoryMapper::getInstance()->findById($file->getFolder());
+    }
+    catch (Exception $e) {
 		error(41);
 	}
 
-	if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS) {
+	if ($groupHandler->getPermission($file->getFolder()) < WRITE_ACCESS) {
 		error(6);
 	}
 
@@ -31,13 +34,13 @@ if(is_numeric($this->arg[0])) {
 	//$this->setVar('browse_block', '');
 	$output = array(
 		'ACTION' => 'Modify',
-		'FILE_ID' => $file['id'],
-		'DESCRIPTION' => Scrub::text($file['description']),
-		'COMMENT' => Scrub::text($file['comment']),
-		'HIDDEN_SELECTED' => $file['hidden'] > 0 ? 'checked="checked"' : '',
+		'FILE_ID' => $file->getId(),
+		'DESCRIPTION' => Scrub::text($file->getDescription()),
+		'COMMENT' => Scrub::text($file->getComment()),
+		'HIDDEN_SELECTED' => $file->getHidden() > 0 ? 'checked="checked"' : '',
 		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
-		'CATEGORY_ID' => $file['cid'],
-		'CATEGORY_NAME' => Scrub::text($file['categoryName']),
+		'CATEGORY_ID' => $file->getFolder(),
+		'CATEGORY_NAME' => Scrub::text($folder->getName()),
 		'DUE_DAY' => '',
 		'DUE_MONTH' => '',
 		'DUE_YEAR' => '',
@@ -93,10 +96,10 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$this->setTitle('Add File');
 	$this->setTab('resources');
 
-	$categoryHandler = new Category;
-	$category = $categoryHandler->getByID($this->arg[1]);
-
-	if (!is_array($category)) {
+    try{
+        $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
+    }
+    catch (Exception $e) {
 		error(13);
 	}
 
@@ -111,8 +114,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		'COMMENT' => '',
 		'HIDDEN_SELECTED' => (Cfg::get('file_default_to_hidden') ? 'checked="checked"' : ''),
 		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
-		'CATEGORY_NAME' => Scrub::text($category['name']),
-		'CATEGORY_ID' => $category['id'],
+		'CATEGORY_NAME' => Scrub::text($folder->getName()),
+		'CATEGORY_ID' => $folder->getId(),
 		'DUE_DAY' => is_numeric($this->arg[2]) ? $this->arg[2] : '',
 		'DUE_MONTH' => is_numeric($this->arg[3]) ? $this->arg[3] : '',
 		'DUE_YEAR' => is_numeric($this->arg[4]) ? $this->arg[4] : '',
@@ -190,10 +193,10 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	$this->setTitle('Upload Multiple Files');
 	$this->setTab('resources');
 
-	$categoryHandler = new Category;
-	$category = $categoryHandler->getByID($this->arg[1]);
-
-	if (!is_array($category)) {
+    try{
+        $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
+    }
+    catch (Exception $e) {
 		error(13);
 	}
 
@@ -202,8 +205,8 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	}
 
 	$output = array(
-        'CATEGORY_NAME'		=> Scrub::text($category['name']),
-        'CATEGORY_ID'		=> $category['id'],
+        'CATEGORY_NAME'		=> Scrub::text($folder->getName()),
+        'CATEGORY_ID'		=> $folder->getId(),
         'FILE_max_upload'	=> Cfg::get('file_upload_count'),
         'HIDDEN_SELECTED'	=> (Cfg::get('file_default_to_hidden') ? 'checked="checked"' : ''),
         'SESSION_NAME'		=> session_name(),
