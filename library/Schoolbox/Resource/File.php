@@ -27,7 +27,13 @@ class File implements ISoftDeletable {
 	 */
 	protected $filename;
 
-	/**
+    /**
+     * Location of file prior to creation
+     * @var string
+     */
+    protected $tempFileLocation;
+
+    /**
 	 * @var string
 	 */
 	protected $mimeType;
@@ -289,4 +295,22 @@ class File implements ISoftDeletable {
 	public function isDeleted() {
 		return $this->getDeleted();
 	}
+
+    /**
+     * Use this function to set the location of the file when creating a new file record
+     * @param mixed $tempFileLocation
+     */
+    public function setTempFileLocation($tempFileLocation)
+    {
+        $this->tempFileLocation = $tempFileLocation;
+    }
+
+    /**
+     * This function only exists to move the uploaded file into the correct location on save
+     * @return mixed
+     */
+    public function getTempFileLocation()
+    {
+        return $this->tempFileLocation;
+    }
 }
