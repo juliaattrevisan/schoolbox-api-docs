@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\ResourceBooking\Booking;
+use Alaress\Date\Interval;
 use Alaress\Web\Controller\Base;
 use DateTime;
 use Alaress_Date_Format;
@@ -492,9 +493,6 @@ class Controller extends Base {
      */
     public function update($id) {
         $item = $this->getBookingMapper()->findById($id);
-        $item->setRelatedBookingList($this->getBookingMapper()->findRelatedBookings($item->getId()));
-        $event = $item->getEvent();
-        $this->loadDateTimesIntoEvent($event);
 
         // Perform validation, but leave this booking out of calculations.
         $errors = $this->validateBookingFromPostData($item->getResource(), $item);
@@ -502,47 +500,30 @@ class Controller extends Base {
         $code = 200;
         if (empty($errors)) {
 
-            $startDate = $this->getDateFromForm('start_datetime');
-            $endDate   = $this->getDateFromForm('end_datetime');
-
             // Have the date and time changed?
             // If so, set the date and time for each event, and invalidate
             // each event.
+            $this->loadDateTimesIntoEvent($item->getEvent());
+            $startDate  = $this->getDateFromForm('start_datetime');
+            $endDate    = $this->getDateFromForm('end_datetime');
             $startDelta = \Alaress\Date\Interval::createFromDateTimeDifference(
                 $item->getEvent()->getStartDateTime(), $startDate
             );
             $endDelta = \Alaress\Date\Interval::createFromDateTimeDifference(
                 $item->getEvent()->getEndDateTime(), $endDate
             );
-            $isTimeChanged = ($startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0);
 
-            // Adjust the current item
-            if ($isTimeChanged) {
-                $item->setStatus(Status\Model::STATUS_PENDING);
-                $newStart = $event->getStartDateTime()->add($startDelta->getAsDateInterval());
-                $event->setStartDateTime($newStart);
-                $event->setStartDate($newStart->format('Y-m-d'));
-                $event->setStartTime($newStart->format('H:i:s'));
-                $newEnd = $event->getEndDateTime()->add($endDelta->getAsDateInterval());
-                $event->setEndDate($newEnd->format('Y-m-d'));
-                $event->setEndTime($newEnd->format('H:i:s'));
-                if ($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-                    $item->setStatus(Status\Model::STATUS_APPROVED);
-                }
-            }
-            $event->setDetail($this->getRequest()->post['notes']);
-            $event->setRoleCollection(new \Schoolbox\Collection());
-            $event->setCampusCollection(new \Schoolbox\Collection());
-            $this->getBookingMapper()->save($item);
-            $this->getEventMapper()->save($event);
+            // Update this item.
+            $this->updateBookingFromPostData($item, $startDelta, $endDelta);
 
             // Has the time changed? If so:
             // * If this is a single item, just set status back to pending.
             // * If this is a series booking, the rule is much more complicated.
             //   Probably best to take each booking in the series, and adjust
             //   its time by whatever the difference is between each.
+
+            // Update all of the items in the series.
             $series = $this->getSeriesBookings($item);
-            $eventSeries = array();
             if (count($series)) {
                 // update all of these, too
                 foreach ($series as $seriesBooking) {
@@ -553,33 +534,14 @@ class Controller extends Base {
                     if ($seriesEvent->getStartDateTime() < new DateTime()) {
                         continue;
                     }
-                    if ($isTimeChanged) {
-                        $seriesBooking->setStatus(Status\Model::STATUS_PENDING);
-                        $newStart = $seriesEvent->getStartDateTime()->add($startDelta->getAsDateInterval());
-                        $seriesEvent->setStartDateTime($newStart);
-                        $seriesEvent->setStartDate($newStart->format('Y-m-d'));
-                        $seriesEvent->setStartTime($newStart->format('H:i:s'));
-                        $newEnd = $seriesEvent->getEndDateTime()->add($endDelta->getAsDateInterval());
-                        $seriesEvent->setEndDate($newEnd->format('Y-m-d'));
-                        $seriesEvent->setEndTime($newEnd->format('H:i:s'));
-                        if ($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-                            $item->setStatus(Status\Model::STATUS_APPROVED);
-                        }
-                    }
-                    $seriesEvent->setDetail($this->getRequest()->post['notes']);
-                    $seriesEvent->setRoleCollection(new \Schoolbox\Collection());
-                    $seriesEvent->setCampusCollection(new \Schoolbox\Collection());
-                    $eventSeries[] = $seriesEvent;
+                    $this->updateBookingFromPostData($seriesBooking, $startDelta, $endDelta);
                 }
-                $this->getBookingMapper()->save($series);
-                $this->getEventMapper()->save($eventSeries);
             }
 
             // Update related bookings too.
             // If an item was in the list but isn't now, remove bookings for it
             // If it wasn't and is, add it.
             // (It should be enough to add/remove from linked bookings)
-//            $this->getBookingMapper()->findSeriesBookings($id, $item->getEvent()->getSeriesId());
         }
         else {
             $code = 400;
@@ -606,22 +568,92 @@ class Controller extends Base {
     }
 
     /**
-     * Attempts to update a booking based on its fields.
+     * Attempts to update a booking based on what was passed through post data.
      *
-     * @param Model $booking
+     * @param Model    $item
+     * @param Interval $startDelta
+     * @param Interval $endDelta
      */
-    protected function updateBookingFromPostData(Model $booking) {
-        $event = $booking->getEvent();
+    protected function updateBookingFromPostData(
+        Model $item,
+        Interval $startDelta,
+        Interval $endDelta
+    ) {
+        $this->updateBookingFieldsFromPostData($item, $startDelta, $endDelta);
 
-        $startDate = $this->getDateFromForm('start_datetime');
-        $endDate   = $this->getDateFromForm('end_datetime');
-        $event->setStartDate($startDate->format('Y-m-d'));
-        $event->setStartTime($startDate->format('H:i:s'));
-        $event->setEndDate($endDate->format('Y-m-d'));
-        $event->setEndTime($endDate->format('H:i:s'));
+        // Add related bookings for items for ones that weren't selected.
+        // Preserve any related bookings for items that are selected
+        // Remove any related bookings for items that aren't.
+        $relatedEventList     = new Collection();
+        $relatedBookingList   = new Collection();
+        $unrelatedBookingList = new Collection();
+        $relatedSelections    = $this->getRequest()->post['related_item'] ?: array();
+        foreach ($this->getBookingMapper()->findRelatedBookings($item->getId()) as $relatedBooking) {
+            if (in_array($relatedBooking->getResource()->getId(), $relatedSelections)) {
+                $relatedBooking->addRelatedBooking($item);
+                $relatedBookingList->add(
+                    $this->updateBookingFieldsFromPostData(
+                        $relatedBooking,
+                        $startDelta,
+                        $endDelta
+                    )
+                );
+                $relatedEventList->add($relatedBooking->getEvent());
+            }
+            else {
+                $unrelatedBookingList->add($relatedBooking);
+            }
+        }
+        $item->setRelatedBookingList($relatedBookingList);
+
+        // Apply the changes to the related booking as well.
+        $this->getEventMapper()->save($item->getEvent());
+        $this->getBookingMapper()->save($item);
+
+        // Save each of the related items and their events
+        $this->getEventMapper()->save($relatedEventList);
+        $this->getBookingMapper()->save($relatedBookingList);
+        $this->getBookingMapper()->delete($unrelatedBookingList);
+    }
+
+    /**
+     * Attempts to update a booking based on what was passed through post data.
+     *
+     * @param  Model    $item
+     * @param  Interval $startDelta
+     * @param  Interval $endDelta
+     * @return Model
+     */
+    protected function updateBookingFieldsFromPostData(
+        Model $item,
+        Interval $startDelta,
+        Interval $endDelta
+    ) {
+        $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
+
+        $event = $item->getEvent();
+        $this->loadDateTimesIntoEvent($event);
+
+        // Adjust the current item.
+        if ($isTimeChanged) {
+            $item->setStatus(Status\Model::STATUS_PENDING);
+            $newStart = $event->getStartDateTime()->add($startDelta->getAsDateInterval());
+            $event->setStartDateTime($newStart);
+            $event->setStartDate($newStart->format('Y-m-d'));
+            $event->setStartTime($newStart->format('H:i:s'));
+            $newEnd = $event->getEndDateTime()->add($endDelta->getAsDateInterval());
+            $event->setEndDate($newEnd->format('Y-m-d'));
+            $event->setEndTime($newEnd->format('H:i:s'));
+            if ($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+                $item->setStatus(Status\Model::STATUS_APPROVED);
+            }
+        }
         $event->setDetail($this->getRequest()->post['notes']);
-
-        // Has this booking's events changed?
+        // Clear the role and campus collection
+        $event->setRoleCollection(new Collection());
+        $event->setCampusCollection(new Collection());
+        $item->setEvent($event);
+        return $item;
     }
 
     /**
