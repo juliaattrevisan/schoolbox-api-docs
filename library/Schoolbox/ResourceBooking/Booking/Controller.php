@@ -622,9 +622,14 @@ class Controller extends Base {
         $relatedEventList     = new Collection();
         $relatedBookingList   = new Collection();
         $unrelatedBookingList = new Collection();
+        $updatedSelections    = array();
         $relatedSelections    = $this->getRequest()->post['related_item'] ?: array();
         foreach ($this->getBookingMapper()->findRelatedBookings($item->getId()) as $relatedBooking) {
-            if (in_array($relatedBooking->getResource()->getId(), $relatedSelections)) {
+            $relatedResourceId = $relatedBooking->getResource()->getId();
+            if (in_array($relatedResourceId, $relatedSelections)) {
+                // Is the resource still selected?
+                // Make sure it's preserved.
+                $updatedSelections[] = $relatedResourceId;
                 $relatedBooking->addRelatedBooking($item);
                 $relatedBookingList->add(
                     $this->updateBookingFieldsFromPostData(
@@ -636,7 +641,34 @@ class Controller extends Base {
                 $relatedEventList->add($relatedBooking->getEvent());
             }
             else {
+                // Remove from the list if it isn't.
                 $unrelatedBookingList->add($relatedBooking);
+            }
+        }
+
+        // Add any items that weren't selected, but now are?
+        // Add them to the list.
+        $insertedSelections = array_diff($relatedSelections, $updatedSelections);
+        if (!empty($insertedSelections)) {
+            $resource = $this->getResourceMapper()->findById($item->getResource()->getId());
+            foreach ($resource->getRelatedResourceList() as $relatedResource) {
+                if (in_array($relatedResource->getId(), $insertedSelections)) {
+                    // Clone $item for this event, creating a series if needed.
+                    $newEvent = $this->getEventFromPostData(
+                        $relatedResource,
+                        $item->getEvent()->getStartDateTime(),
+                        $item->getEvent()->getEndDateTime(),
+                        $item->getEvent()->getDetail()
+                    );
+                    $this->getEventMapper()->save($newEvent);
+                    $newBooking = $this->getBookingFromEvent($relatedResource, $newEvent);
+
+                    // Associate this new booking back to the original
+                    $newBooking->addRelatedBooking($item);
+                    $this->getBookingMapper()->save($newBooking);
+
+                    $relatedBookingList->add($newBooking);
+                }
             }
         }
         $item->setRelatedBookingList($relatedBookingList);
