@@ -570,7 +570,7 @@ class Mapper {
 		$this->database->beginTransaction();
 
 		foreach ($collection as $model) {
-			$statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierProperty));
+			$statement->bindValue(':identifierValue', $this->getModelProperty($model, $identifierProperty));
 
 			if (!$statement->execute()) {
 
@@ -1094,7 +1094,7 @@ class Mapper {
 						WHERE `{$joinSchema['this_key']}` = :this_key
 					");
 
-					$deleteRelationStatement->bindParam(':this_key', $thisKey);
+					$deleteRelationStatement->bindValue(':this_key', $thisKey);
 
 					if(!$deleteRelationStatement->execute()) {
 						$this->database->rollBack();
@@ -1681,7 +1681,7 @@ class Mapper {
 			//
 			// Timestamp fields will never be bound.
 			if (!(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
-				$statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName));
+				$statement->bindValue(":$columnName", $this->getModelProperty($model, $propertyName));
 			}
 		}
 	}
