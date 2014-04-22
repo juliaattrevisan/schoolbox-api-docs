@@ -1670,7 +1670,7 @@ class Mapper {
 				// if column is empty, ensure a join is specified, and that it is a multijoin
 				$join_name = isset($map['join']) ? $map['join'] : '';
 				if(isset($this->joins[$join_name]['multi'])) {
-					return;
+					continue;
 				}
 				// if the join doesn't exist, or not multijoin, failhard
 				throw new Exception("Column must be declared if no multijoin set for it: ".json_encode($map));
