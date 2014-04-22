@@ -306,5 +306,3 @@ else if($this->arg[0] == 'multicat') {
 else {
 	error(2);
 }
-
-?>
