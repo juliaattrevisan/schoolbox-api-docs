@@ -1,21 +1,49 @@
 #!/bin/bash
-cd ~;
-mkdir build-dir-`date -I`;
-cd build-dir-`date -I`;
-cp -fr ~/debian .;
-cp -fr ~/schoolbox-epl.conf .;
-cp -fR ../schoolbox-epl.logrotate .;
-wget -c https://github.com/ether/etherpad-lite/archive/1.3.0.tar.gz;
-tar xzf 1.3.0.tar.gz;
-cd etherpad-lite-1.3.0/src;
+# Etherpad Lite for Schoolbox Build Script
+# Description:
+#       Builds Etherpad Lite as schoolbox-epl along with required plugins
+#
+# @author      Sam Bailey <sam.bailey@alaress.com.au>
+# @copyright   2014 Alaress Pty Ltd
+# @link        http://www.alaress.com.au
+#
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*};
+
+eplver='1.3.0';
+
+# Create directories for completing the build
+builddir="/tmp/build-dir-`date -I`";
+rm -fR $builddir;
+mkdir $builddir;
+cd $builddir;
+
+# Retrieve Etherpad Lite source
+wget -c https://github.com/ether/etherpad-lite/archive/$eplver.tar.gz;
+tar xzf $eplver.tar.gz;
+
+# Install dependencies and plugins
+cd $builddir/etherpad-lite-$eplver/src;
 npm install;
 npm install redis;
-cd ../;
-cp -fR ../schoolbox-epl.conf .;
-cp -fR ../schoolbox-epl.logrotate schoolbox-epl;
-cd ../;
-tar czf schoolbox-epl_1.3.0.orig.tar.gz etherpad-lite-1.3.0;
-cd etherpad-lite-1.3.0;
-cp -fR ../debian .;
-#copy in patches (logrotate, upstart)
+
+# Add in upstart init script and logrotate
+cd $builddir/etherpad-lite-$eplver;
+cp -fR $fullpath/schoolbox-epl.conf .;
+cp -fR $fullpath/schoolbox-epl.logrotate schoolbox-epl;
+cd $builddir;
+
+# Retar everything for the build process
+tar czf schoolbox-epl_$eplver.orig.tar.gz etherpad-lite-$eplver;
+
+# Copy deb build details to be ready for build
+cd etherpad-lite-$eplver;
+cp -fR $fullpath/debian .;
+
+# Build!
 debuild -i -I -us -uc;
+
+echo "Build Directory: $builddir";
+ls -lh $builddir/;
+echo "";
+echo "Build Completed";
