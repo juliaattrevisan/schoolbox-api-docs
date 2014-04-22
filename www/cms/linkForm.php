@@ -1,9 +1,14 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use \Schoolbox\Resource\LinkMapper;
+use \Schoolbox\Resource\Link;
+
+
 $page = new SitePage();
-$linkHandler = new Link();
 $groupHandler = new Group();
+
+
 
 if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
 	$url = new Url($_REQUEST['url']);
@@ -12,115 +17,118 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
 		error(139);
 	}
 
-	$link = array(
-		'url' => $_POST['url'],
-		'description' => $_POST['description'],
-		'comment' => $_POST['comment'],
-		'hidden' => $_POST['hidden'],
-	);
+    if (is_numeric($_POST['linkID'])) {
 
-	if (is_numeric($_POST['linkID'])) {
+   		/* Modify existing link
+   		 */
+        try{
+            $link = LinkMapper::getInstance()->findById($_POST['linkID']);
 
-		/* Modify existing link
-		 */
+            if ($groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS) {
+          			error(6);
+            }
+        }
+        catch (Exception $e) {
+            error(2);
+        }
 
-		/* Double check permission on link
-		 */
-		$currentLink = $linkHandler->getById($_POST['linkID']);
-		if (!is_array($currentLink)) {
-			error(2);
-		}
-		if ($groupHandler->getPermission($currentLink['cid']) < WRITE_ACCESS) {
-			error(6);
-		}
+        $link->setUrl($_POST['url']);
+        $link->setDescription($_POST['description']);
+        $link->setComment($_POST['comment']);
+        $link->setHidden($_POST['hidden']?true:false);
 
-		$link['id'] = $_POST['linkID'];
-		$linkHandler->update($link);
+    }
+    else {
+        $link = LinkMapper::getInstance()->createModel();
+        $link->setOwner($_SESSION['id']);
 
-		$page->backToTheFuture(2);
-	}
-	else {
-		/* Add link
-		 */
-		$link['owner'] = $_SESSION['id'];
+        $link->setUrl($_POST['url']);
+        $link->setDescription($_POST['description']);
+        $link->setComment($_POST['comment']);
+        $link->setHidden($_POST['hidden']?true:false);
 
-		/* Add to multiple locations
-		 */
-		if (is_array($_POST['category'])) {
-			foreach ($_POST['category'] as $cat) {
 
-				if ($groupHandler->getPermission($cat) < WRITE_ACCESS) {
-					error(6);
-				}
+        // Add to multiple locations
+        if (is_array($_POST['category'])) {
+            $linkCollection = LinkMapper::getInstance()->createCollection();
+            foreach ($_POST['category'] as $cat) {
 
-				$link['category'] = $cat;
-				$linkHandler->create($link);
-			}
+                if ($groupHandler->getPermission($cat) < WRITE_ACCESS) {
+                    error(6);
+                }
 
-			/* multi link only accessible through link
-			 */
-			$page->backToTheFuture(3);
-		}
-		else {
-			if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS) {
-				error(6);
-			}
+                $linkDest = clone $link;
+                $linkDest->setFolder($cat);
+                $linkCollection->add($linkDest);
+            }
+            $link=$linkCollection;
+        }
+        else {
+            if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS) {
+                error(6);
+            }
 
-			$link['category'] = $_POST['category'];
-			$linkHandler->create($link);
-		}
+            $link->setFolder($_POST['category']);
+        }
+    }
 
-		$page->backToTheFuture(2);
-	}
+
+    LinkMapper::getInstance()->save($link);
+
+	$page->backToTheFuture(2);
 }
 else {
 	if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
-
-		$result = "success";
-
 		/* Move link from one category to another, after checking permission on both from and to categories
 		 */
-		if (!$link = $linkHandler->getByID($_POST['move'])) {
-			$result = "Link not found";
-		}
+        try{
+            LinkMapper::getInstance()->findById($_POST['move']);
 
-		if ($groupHandler->getPermission($link['cid']) < WRITE_ACCESS) {
-			$result = "Insufficient permssions";
-		}
 
-		if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
-			$result = "Insufficient permssions";
-		}
-
-		$linkHandler->update(array('id' => $_POST['move'], 'category' => $_POST['categoryID']));
+            if ($groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS) {
+                $result = "Insufficient permssions";
+            }
+            else if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
+                $result = "Insufficient permssions";
+            }
+            else {
+                $link->setFolder($_POST['categoryID']);
+                LinkMapper::getInstance()->save($link);
+                $result = "success";
+            }
+        }
+        catch (Exception $e) {
+            $result = "Link not found";
+        }
 
 		header("Content-type: application/json");
 		print json_encode(array(
 			'result' => $result
 		));
 	}
-	else {
-		if ($_GET['delete']) {
-			if (!$link = $linkHandler->getByID($_GET['delete'])) {
-				error(2);
-			}
+	else if ($_GET['delete']) {
+        try{
+            $link = LinkMapper::getInstance()->findById($_GET['delete']);
 
-			if ($groupHandler->getPermission($link['cid']) < WRITE_ACCESS) {
-				error(6);
-			}
+            if ( $groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS ) {
+                error(6);
+            }
 
-			$linkHandler->delete($_GET['delete']);
+            LinkMapper::getInstance()->delete($link);
+        }
+        catch (Exception $e) {
+            error(2);
+        }
 
-			if ($_GET['redirect'] == '') {
-				$page->backToTheFuture(1);
-			}
-			else {
-				SitePage::localRedir($_GET['redirect']);
-			}
-		}
-		else {
-			error(2);
-		}
-	}
+        if ($_GET['redirect'] == '') {
+            $page->backToTheFuture(1);
+        }
+        else {
+            SitePage::localRedir($_GET['redirect']);
+        }
+    }
+    else {
+        error(2);
+    }
 }
 
