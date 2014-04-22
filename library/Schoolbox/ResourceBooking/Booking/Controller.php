@@ -329,33 +329,6 @@ class Controller extends Base {
         $event->setStartTime($startDate->format('H:i:s'));
         $event->setEndDate($endDate->format('Y-m-d'));
         $event->setEndTime($endDate->format('H:i:s'));
-
-        // Convert time inputs to datetimes.
-        // TODO check if this is even needed!
-//        $startTime = DateTime::createFromFormat(
-//            'g:iA',
-//            sprintf(
-//                '%02d:%02d%s',
-//                $this->getRequest()->post['start_datetime']['hour'],
-//                $this->getRequest()->post['start_datetime']['minute'],
-//                $this->getRequest()->post['start_datetime']['meridien']
-//            )
-//        );
-//        if ($startTime instanceof DateTime) {
-//            $event->setStartTime($startTime->format('H:i'));
-//        }
-//        $endTime = DateTime::createFromFormat(
-//            'g:iA',
-//            sprintf(
-//                '%02d:%02d%s',
-//                $this->getRequest()->post['end_datetime']['hour'],
-//                $this->getRequest()->post['end_datetime']['minute'],
-//                $this->getRequest()->post['end_datetime']['meridien']
-//            )
-//        );
-//        if ($endTime instanceof DateTime) {
-//            $event->setEndTime($endTime->format('H:i'));
-//        }
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
         $event->setNote("Booking: ".$resource->getName());
         $event->setDetail($this->getRequest()->post['notes']);
