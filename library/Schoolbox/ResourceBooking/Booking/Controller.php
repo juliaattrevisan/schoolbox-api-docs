@@ -291,14 +291,22 @@ class Controller extends Base {
     }
 
     /**
-     * Helper for creating bookings out of a resource item and post data.
+     * Helper for creating events for resource bookings.
+     *
+     * Creates an event based on the resource, start and end date and notes.
      *
      * @param  Item\Model $resource
-     * @return Collection|Model[] A collection of bookings that were created.
-     *                            Only one will be created unless it was a
-     *                            recurring booking.
+     * @param  DateTime   $startDate
+     * @param  DateTime   $endDate
+     * @param  string     $notes
+     * @return Calendar\Event
      */
-    protected function createBookingFromPostData(Item\Model $resource) {
+    protected function getEventFromPostData(
+        Item\Model $resource,
+        DateTime $startDate,
+        DateTime $endDate,
+        $notes
+    ) {
         // Create the booking, which in turn adds an event to the calendar.
         // This action saves a connected event.
         /** @var Calendar\Event $event */
@@ -317,63 +325,117 @@ class Controller extends Base {
         $event->setSid($this->getUser()->getId());
         $event->setAccess(Calendar\EventMapper::ACCESS_PERSONAL);
         // Currently role and campus must be set to empty collections.
-        $event->setRoleCollection(new \Schoolbox\Collection());
-        $event->setCampusCollection(new \Schoolbox\Collection());
+        $event->setRoleCollection(new Collection());
+        $event->setCampusCollection(new Collection());
 
         // Currently I can't setStartDateTime() and have that propogate to
         // startDate and startTime.
-        // Event doesn't currently take Alaress_Date_Format objects either.
-        $startDate = $this->getDateFromForm('start_datetime');
-        $endDate   = $this->getDateFromForm('end_datetime');
+        $event->setStartDateTime($startDate);
         $event->setStartDate($startDate->format('Y-m-d'));
         $event->setStartTime($startDate->format('H:i:s'));
+        $event->setEndDateTime($endDate);
         $event->setEndDate($endDate->format('Y-m-d'));
         $event->setEndTime($endDate->format('H:i:s'));
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
         $event->setNote("Booking: ".$resource->getName());
-        $event->setDetail($this->getRequest()->post['notes']);
+        $event->setDetail($notes);
+        return $event;
+    }
 
-        // I've built the event, now build recurrences if required.
+    /**
+     * Creates events from the given recurrence rule (if there is one).
+     * If there isn't one, it just creates the event.
+     *
+     * @param  Calendar\Event $event
+     * @param  string         $recurrenceRule
+     * @param  DateTime       $repeatUntil
+     * @return Collection|Calendar\Event[] The events that were created.
+     */
+    protected function createEventsFromRecurrence(
+        Calendar\Event $event,
+        $recurrenceRule,
+        $repeatUntil
+    ) {
         /** @var Collection|Calendar\Event[] $eventList */
-        $eventList      = new Collection();
-        $recurrenceRule = $this->getRequest()->post['repeat'];
+        $eventList = new Collection();
         switch ($recurrenceRule) {
             case 'weekly':
             case 'monthly':
             case 'daily':
-                $this->getEventRecurrenceMapper()->save(
-                    $event,
-                    'series',
-                    $recurrenceRule,
-                    new Alaress_Date_Format($this->getRequest()->post['repeat_until'], 'd/m/Y'),
-                    new Alaress_Date_Format($startDate),
-                    new Alaress_Date_Format($endDate)
-                );
-                // Create a whole set of bookings based on this event.
-                $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
+                if ($repeatUntil instanceof DateTime) {
+                    $this->getEventRecurrenceMapper()->save(
+                        $event,
+                        'series',
+                        $recurrenceRule,
+                        new Alaress_Date_Format($repeatUntil),
+                        new Alaress_Date_Format($event->getStartDateTime()),
+                        new Alaress_Date_Format($event->getEndDateTime())
+                    );
+                    // Create a whole set of bookings based on this event.
+                    $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
+                }
                 break;
             default:
                 $this->getEventMapper()->save($event);
                 $eventList->add($event);
                 break;
         }
+        return $eventList;
+    }
+
+    /**
+     * Helper for getting a booking from an event.
+     *
+     * @param  Item\Model     $resource
+     * @param  Calendar\Event $event
+     * @return Model
+     */
+    protected function getBookingFromEvent(Item\Model $resource, Calendar\Event $event) {
+        $booking = new Model();
+        $booking
+            ->setEvent($event)
+            ->setResource($resource)
+            ->setStatus(Status\Model::STATUS_PENDING);
+        ;
+        // What about the resource? If it's an open resource, confirm the
+        // booking immediately.
+        if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+            $booking->setStatus(Status\Model::STATUS_APPROVED);
+        }
+        return $booking;
+    }
+
+    /**
+     * Helper for creating bookings out of a resource item and post data.
+     *
+     * @param  Item\Model $resource
+     * @return Collection|Model[] A collection of bookings that were created.
+     *                            Only one will be created unless it was a
+     *                            recurring booking.
+     */
+    protected function createBookingFromPostData(Item\Model $resource) {
+        // Create the booking, which in turn adds an event to the calendar.
+        // This action saves a connected event.
+        $event = $this->getEventFromPostData(
+            $resource,
+            $this->getDateFromForm('start_datetime'),
+            $this->getDateFromForm('end_datetime'),
+            $this->getRequest()->post['notes']
+        );
+
+        // I've built the event, now build recurrences if required.
+        /** @var Collection|Calendar\Event[] $eventList */
+        $eventList = $this->createEventsFromRecurrence(
+            $event,
+            $this->getRequest()->post['repeat'],
+            DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until'])
+        );
 
         // Build a list of bookings to return
         /** @var Collection|Model[] $bookingList */
         $bookingList = new Collection();
         foreach ($eventList as $event) {
-            $booking = new Model();
-            $booking
-                ->setEvent($event)
-                ->setResource($resource)
-                ->setStatus(Status\Model::STATUS_PENDING);
-            ;
-            // What about the resource? If it's an open resource, confirm the
-            // booking immediately.
-            if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-                $booking->setStatus(Status\Model::STATUS_APPROVED);
-            }
-            $bookingList->add($booking);
+            $bookingList->add($this->getBookingFromEvent($resource, $event));
         }
         $this->getBookingMapper()->save($bookingList);
         return $bookingList;
