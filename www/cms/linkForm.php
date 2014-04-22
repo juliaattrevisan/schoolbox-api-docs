@@ -82,7 +82,7 @@ else {
 		/* Move link from one category to another, after checking permission on both from and to categories
 		 */
         try{
-            LinkMapper::getInstance()->findById($_POST['move']);
+            $link = LinkMapper::getInstance()->findById($_POST['move']);
 
 
             if ($groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS) {
