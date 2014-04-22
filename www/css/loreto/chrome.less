@@ -250,10 +250,120 @@ body{
 }
 
 body.login{
-  #header .logo {
-    left: 34px;
-    top: 5px;
+  background: transparent;
+
+  #container{
+    box-shadow: none;
   }
+
+  #header{
+    height: 144px;
+
+    .logo {
+      left: 34px;
+      top: 50px;
+      width: 225px;
+      height: 79px;
+      img{
+        width: 225px;
+        height: 79px;
+      }
+    }
+    #keywords{
+      background: url('/images/loreto/keywords.jpg') top left repeat-x;
+      width: 100%;
+      height: 40px;
+    }
+  }
+
+  #login-bg {
+    background: url('/images/loreto/login-bg.jpg') center center no-repeat;
+    background-size: cover;
+    float: left;
+    width: 50%;
+    text-align: center;
+    position: fixed;
+    left: 0px;
+    top: 70px;
+    z-index: -1;
+    height: 100%;
+    margin-top: 74px;
+  }
+
+  #content {
+    float: left;
+    width: 42%;
+    min-width: 400px;
+    height: 100%;
+    position: fixed;
+    right: 0;
+    left: auto;
+    top: 35%;
+    padding: 0 4%;
+    .error{ max-width: 453px; color: @link; margin: 25px 0; }
+
+    #loginForm{
+      max-width: 453px;
+
+      label{
+        display: block;
+        text-indent: -9000px;
+        height: 40px;
+      }
+      label[for=username]{
+        background: url('/images/loreto/username.png') center left no-repeat;
+      }
+      label[for=password]{
+        background: url('/images/loreto/password.png') center left no-repeat;
+      }
+      input{
+        border: 1px solid @black;
+        padding: 8px;
+        height: 26px;
+        width: 320px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+      }
+      .submit-btn-plain{
+        background: url('/images/loreto/login-btn.png') top left no-repeat;
+        border: none;
+        display: block;
+        height: 40px;
+        width: 104px;
+        float: right;
+        margin-right: 0;
+        text-indent: -9000px;
+        &:hover{ background: url('/images/loreto/login-btn.png') bottom left no-repeat; }
+      }
+    }
+  }
+
+  #footer{
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: 100%;
+    position: fixed;
+    text-align: center;
+
+    ul{ float: none; color: @black;
+      li, a{ color: @black; }
+    }
+  }
+}
+
+@media screen and (max-width: 1080px){
+
+  body.login #content {
+    top: 24%;
+
+    #loginForm .submit-btn-plain{
+      float: left;
+      margin-right: 15px;
+    }
+  }
+
 }
 
 /*
