@@ -7,6 +7,12 @@
  * @version     SVN: $Id$
  */
 
+
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+
+
 // this is a script and not to be SitePage'd
 if(isset($this)) {
     error(4);
@@ -43,76 +49,56 @@ foreach($criteria as $group) {
     }
 }
 
+$criterionMapper = CriterionMapper::getInstance();
 
-// get pre-existing criteria details
-$rubricHandler = new DueWork_Rubric_Handler();
-$dbcriteria = $rubricHandler->getAvailableCriteria($catID, 'category', true);
 
-// create a list of criteria that we cannot permit changes to
-$locked = array();
-$existing = array();
-if(count($dbcriteria)) {
-    foreach($dbcriteria as $groupname => $groupitems) {
-        foreach($groupitems as $id => $details) {
-            if($details['count']) {
-                $locked[] = $id;
-            }
-            $existing[] = $id;
+
+//work out the diff and delete unnecessary criteria
+$found = array_keys($data);
+
+$criterionCollection = $criterionMapper->findByColumnList(
+                                       array(
+                                           'parent_id'   => $catID,
+                                           'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                                       )
+);
+
+foreach($criterionCollection as $crit) {
+    if(!in_array($crit->getID(), $found)) {
+        try {
+            $criterionMapper->delete($crit);
+        } catch (Exception $e) {
+            die('Criteria not found');
         }
     }
 }
 
-// to be refactored
-$db = Database::getInstance();
 
-$stmt['insert'] = $db->prepare("
-    INSERT INTO rubric_criterion
-      (`grouping`, `name`, `parent_id`)
-    VALUES
-      (:group, :name, :pid)
-");
-$stmt['update'] = $db->prepare("
-    UPDATE rubric_criterion
-    SET
-      `grouping` = :group,
-      `name` = :name
-    WHERE id = :cid
-");
-$stmt['delete'] = $db->prepare("
-    DELETE FROM rubric_criterion
-    WHERE id = :cid
-");
-
+/* @var $criterionMapper CriteriaMapper */
 
 // iterate through list of provided criteria changes
 foreach($data as $critID => $critData) {
+    try {
+        $criteria = $criterionMapper->findByID($critID);
+        $criteria->setGrouping($critData['group']);
+        $criteria->setName($critData['name']);
 
-    // don't edit locked criteria
-    if(in_array($critID, $locked)) {
-        continue; // possibly throw an error of some kind
+        //Do not edit criteria that are in use
+        $usage = UsageMapper::getInstance()->findByColumnList(array('criterion_id' => $critID));
+        if(count($usage)) {
+            continue; // possibly throw an error of some kind
+        }
+    }
+    catch(Exception $e) {
+        $criteria = new Criterion();
+        $criteria->setParentId($catID);
+        $criteria->setGrouping($critData['group']);
+        $criteria->setName($critData['name']);
     }
 
-    if(in_array($critID, $existing)) {
-        // perform update
-        $exec = array_merge($critData, array('cid' => $critID));
-        $method = 'update';
-    }
-    else {
-        // perform insert
-        $exec = array_merge($critData, array('pid' => $catID));
-        $method = 'insert';
-    }
-
-    $stmt[$method]->execute($exec);
-
+    $criterionMapper->save($criteria);
 }
 
-// finally, work out the diff and delete unnecessary criteria
-$found = array_keys($data);
-foreach($existing as $eID) {
-    if(!(in_array($eID, $found) || in_array($eID, $locked))) {
-        $stmt['delete']->execute(array('cid' => $eID));
-    }
-}
+
 
 die('Criteria updated.');

@@ -6,6 +6,12 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+
+
+
 class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract {
 
     /**
@@ -28,8 +34,15 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
      */
     public function execute() {
         $this->group_handler  = new Group();
-        $this->rubric_handler = new DueWork_Rubric_Handler();
-        $this->criteria       = $this->rubric_handler->getAvailableCriteria($this->getContext('id'), 'category', true);
+
+        // get rubric details
+        $this->criteria = CriterionMapper::getInstance()->findByColumnList(
+                                              array(
+                                                  'parent_id'   => $this->getContext('id'),
+                                                  'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                                              ),
+                                              array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
+        );
     }
 
     /**
@@ -52,12 +65,19 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         $this->setBlock('rubric_criterion', 'rubric_descriptor', 'rubric_descriptor_block');
         $this->setVar('rubric_criterion_block', '');
         $i = 0;
-        foreach ($this->criteria as $criterion_name => $criterion_descriptors) {
-            $this->setVar('CRITERION_NAME', Scrub::text($criterion_name));
+
+        /* Create group structure */
+        foreach($this->criteria as $crit) {
+            $criteriaList[$crit->getGrouping()][] = $crit;
+        }
+
+
+        foreach ($criteriaList as $criterion_group => $criterions) {
+            $this->setVar('CRITERION_GROUP', Scrub::text($criterion_group));
             $this->setVar('DARK', ($i++%2 === 1 ? 'dark' : ''));
             $this->setVar('rubric_descriptor_block', '');
-            foreach ($criterion_descriptors as $descriptor) {
-                $this->setVar('DESCRIPTOR_NAME', $descriptor['name']);
+            foreach ($criterions as $crit) {
+                $this->setVar('CRITERION_NAME', Scrub::text($crit->getName()));
                 $this->parse('rubric_descriptor_block', 'rubric_descriptor', true);
             }
             $this->parse('rubric_criterion_block', 'rubric_criterion', true);

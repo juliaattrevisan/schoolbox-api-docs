@@ -7,6 +7,12 @@
  * @version     SVN: $Id$
  */
 
+
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Resource\CategoryMapper;
+
 // not in SitePage context, redirect to equivalent
 if(!isset($this)) {
     require_once('../../include/SitePage.php');
@@ -42,49 +48,65 @@ $this->setBlock('criterion', 'criterion_enabled', 'criterion_enabled_block');
 
 
 // get category details
-$catHandler = new Category();
-$category = $catHandler->getByID($catID);
+$category = CategoryMapper::getInstance()->findById($catID);
 
 $this->setVar(array(
-    'CATEGORY_ID' => $category['id'],
-    'CATEGORY_NAME' => $category['name']
+    'CATEGORY_ID' => $category->getId(),
+    'CATEGORY_NAME' => Scrub::text($category->getName()),
 ));
 
 // get rubric details
-$rubricHandler = new DueWork_Rubric_Handler();
-$criteria = $rubricHandler->getAvailableCriteria($catID, 'category', true);
+$criterionCollection = CriterionMapper::getInstance()->findByColumnList(
+                                               array(
+                                                     'parent_id'   => $catID,
+                                                     'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                                               ),
+                                               array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
+);
+
 
 // for now, we're not supporting inheritence
 $this->setVar('allow_cascade_block', '');
 
 $this->setVar('criterion_group_block', '');
 $topID = 0;
-if(count($criteria)) {
-    foreach ($criteria as $grouping => $crits) {
+if(count($criterionCollection)) {
+
+    /* Create group structure */
+    foreach($criterionCollection as $crit) {
+        $criteriaList[$crit->getGrouping()][] = $crit;
+    }
+
+    foreach ($criteriaList as $grouping => $crits) {
         $this->setVar(array(
             'criterion_block' => '',
             'CRITGROUP_NAME'  => $grouping,
             'CRITGROUP_DISABLED' => ''
         ));
-        foreach($crits as $critID => $crit) {
-            $topID = max($topID, $critID);
+        foreach($crits as $crit) {
+            /* @var $crit Criterion */
+            $topID = max($topID, $crit->getID());
             $this->setVar(array(
-                'CRITERION_ID'   => $critID,
-                'CRITERION_NAME' => $crit['name'],
+                'CRITERION_ID'   => $crit->getID(),
+                'CRITERION_NAME' => $crit->getName(),
             ));
-            if($crit['count']) {
-                $usage = sprintf("%s assessment%s", $crit['count'], $crit['count'] == 1 ? '' : 's');
-                $this->setVar(array(
-                    'CRITERION_USAGE' => $usage,
-                    'criterion_enabled_block' => '',
-                    'CRITGROUP_DISABLED' => ' disabled="disabled"'
-                ));
-                $this->parse('criterion_disabled_block','criterion_disabled');
+
+            $usage = UsageMapper::getInstance()->findByColumnList(array('criterion_id' => $crit->getID()));
+            $usageCount = count($usage);
+            if($usageCount > 0) {
+                $this->setVar('CRITERION_USAGE', $usageCount);
+                $this->setVar('criterion_enabled_block', '');
+                $this->parse('criterion_disabled_block', 'criterion_disabled');
+
+
             }
             else {
                 $this->setVar('criterion_disabled_block', '');
                 $this->parse('criterion_enabled_block', 'criterion_enabled');
             }
+
+
+
             $this->parse('criterion_block', 'criterion', true);
         }
         $this->parse('criterion_group_block', 'criterion_group', true);

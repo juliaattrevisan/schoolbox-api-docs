@@ -1,0 +1,1 @@
+ALTER TABLE `rubric_criterion` ADD COLUMN `deleted_at` DATETIME NULL AFTER `parent_type`;

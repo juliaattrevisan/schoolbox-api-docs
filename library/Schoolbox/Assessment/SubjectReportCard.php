@@ -11,6 +11,8 @@ namespace Schoolbox\Assessment;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
@@ -220,9 +222,21 @@ class SubjectReportCard {
 	public function getCriteria() {
 		if(!is_array($this->_criteria)) {
 			// populate cache
-			$rubricHandler = new \DueWork_Rubric_Handler();
-			$this->_criteria = $rubricHandler->getAvailableCriteria($this->category->getId());
+            // get rubric details
+            $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
+                                                  array(
+                                                      'parent_id'   => $this->category->getId(),
+                                                      'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                                                  ),
+                                                      array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
+            );
 		}
+
+        /* Create group structure */
+        foreach($criterionCollection as $crit) {
+            $this->_criteria[$crit->getGrouping()][] = $crit;
+        }
+
 		return $this->_criteria;
 	}
 

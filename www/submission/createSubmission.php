@@ -33,6 +33,9 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
@@ -386,9 +389,14 @@ function outputCriteria(
 
     // Output this all as part of a single template, and inject into the block.
 
-    $rubricHandler = new DueWork_Rubric_Handler();
-
-    $crits = $rubricHandler->getAvailableCriteria($catID);
+    // get rubric details
+    $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
+                                          array(
+                                              'parent_id'   => $catID,
+                                              'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                                          ),
+                                              array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
+    );
 
     $page->setVar(
         array(
@@ -407,33 +415,32 @@ function outputCriteria(
     }
 
     $page->setVar('criterion_block', '');
-    foreach ($crits as $group => $elements) {
-        foreach ($elements as $id => $elem) {
-            $page->setVar('crit_input_block', '');
-            $page->setVar(array(
-                'CRIT_ID'      => $id,
-                'CRIT_SLUG'    => "crit[$id]",
-                'CRIT_LABEL'   => "$group - {$elem['name']}",
-                'CRIT_CHECKED' => in_array($id, $checkedIDs) ? 'checked="checked"' : ''
-            ));
+    foreach ($criterionCollection as $criterion) {
+        /* @var $criterion Criterion */
+        $page->setVar('crit_input_block', '');
+        $page->setVar(array(
+            'CRIT_ID'      => $criterion->getId(),
+            'CRIT_SLUG'    => "crit[{$criterion->getId()}]",
+            'CRIT_LABEL'   => Scrub::text($criterion->getGrouping()) . ' - ' . Scrub::text($criterion->getName()),
+            'CRIT_CHECKED' => in_array($criterion->getId(), $checkedIDs) ? 'checked="checked"' : ''
+        ));
 
-            if (is_array($descriptors[$id])) {
-                foreach ($descriptors[$id] as $descriptor) {
-                    $page->setVar(array(
-                        'CRIT_INPUT_VALUE' => $descriptor->getDescription()
-                    ));
-                    $page->parse('crit_input_block','crit_input', true);
-                }
+        if (is_array($descriptors[$criterion->getId()])) {
+            foreach ($descriptors[$criterion->getId()] as $descriptor) {
+                $page->setVar(array(
+                    'CRIT_INPUT_VALUE' => $descriptor->getDescription()
+                ));
+                $page->parse('crit_input_block','crit_input', true);
             }
-            // disply blank inputs, they weren't used
-            else {
-                for ($i = 0; $i < $descriptorCount; ++$i) {
-                    $page->setVar('CRIT_INPUT_VALUE', '');
-                    $page->parse('crit_input_block','crit_input', true);
-                }
-            }
-            $page->parse('criterion_block','criterion', true);
         }
+        // disply blank inputs, they weren't used
+        else {
+            for ($i = 0; $i < $descriptorCount; ++$i) {
+                $page->setVar('CRIT_INPUT_VALUE', '');
+                $page->parse('crit_input_block','crit_input', true);
+            }
+        }
+        $page->parse('criterion_block','criterion', true);
     }
     $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
     $page->parse($handle, 'rubricTpl', true);
