@@ -103,32 +103,28 @@ class Controller extends Base {
         $code   = 200;
         $errors = $this->validateBookingFromPostData($resource);
         if (empty($errors)) {
-            // Create bookings for each linked item.
-            $bookingList       = $this->createBookingFromPostData($resource);
+            // Create the booking (or series of bookings) for the base item.
+            $bookingList = $this->createBookingFromPostData($resource);
+
+            // Create the related bookings:
+            // one for each combination of related item and booking in series.
             $relatedSelections = $this->getRequest()->post['related_item'] ?: array();
             if (!empty($relatedSelections)) {
+                $relatedBookingList = new Collection();
                 foreach ($resource->getRelatedResourceList() as $relatedResource) {
                     if (in_array($relatedResource->getId(), $relatedSelections)) {
-                        $relatedBookingList = $this->createBookingFromPostData($relatedResource);
-                        // Link each related booking to its base item.
-                        // (This iterator assumes they're created in date order)
-                        $iterator = new \MultipleIterator();
-                        $iterator->attachIterator(new \IteratorIterator($bookingList));
-                        $iterator->attachIterator(new \IteratorIterator($relatedBookingList));
-                        foreach ($iterator as $list) {
-                            /** @var Model $booking */
-                            /** @var Model $relatedBooking */
-                            list($booking, $relatedBooking) = $list;
-                            $booking->addRelatedBooking($relatedBooking);
+                        foreach ($bookingList as $booking) {
+                            // Related bookings share same event as base booking.
+                            $relatedBooking = $this->getBookingFromEvent(
+                                $relatedResource,
+                                $booking->getEvent()
+                            );
+                            $relatedBooking->addRelatedBooking($booking);
+                            $relatedBookingList->add($relatedBooking);
                         }
                     }
                 }
-                // And save each booking list item.
-                foreach ($bookingList as $booking) {
-                    if (count($booking->getRelatedBookingList())) {
-                        $this->getBookingMapper()->saveRelatedBookings($booking);
-                    }
-                }
+                $this->getBookingMapper()->save($relatedBookingList);
             }
         }
         else {
