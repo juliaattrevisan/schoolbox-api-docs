@@ -1,7 +1,7 @@
 <?php
 
-use Schoolbox\Resource\FileMapper;
-use Schoolbox\Resource\CategoryMapper;
+use \Schoolbox\Resource\FileMapper;
+use \Schoolbox\Resource\CategoryMapper;
 
 
 $groupHandler = new Group;

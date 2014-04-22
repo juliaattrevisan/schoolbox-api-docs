@@ -1,8 +1,8 @@
 <?php
 require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
 
-use Schoolbox\Resource\FileMapper;
-use Schoolbox\Resource\File;
+use \Schoolbox\Resource\FileMapper;
+use \Schoolbox\Resource\File;
 
 /* Force session usage due to flash uploader
  * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
@@ -181,7 +181,6 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
 }
 /* Move file from one category to another */
 elseif ( is_numeric($_POST['move']) && is_numeric($_POST['categoryID']) ) {
-    $result = "success";
 
     try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
@@ -189,14 +188,14 @@ elseif ( is_numeric($_POST['move']) && is_numeric($_POST['categoryID']) ) {
         if ( $groupHandler->getPermission($file->getFolder()) < WRITE_ACCESS ) {
             $result = "Insufficient permssions";
         }
-
-        if ( $groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS ) {
+        else if ( $groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS ) {
             $result = "Insufficient permssions";
         }
-
-        $file->setFolder($_POST['categoryID']);
-
-        FileMapper::getInstance()->save($file);
+        else {
+            $file->setFolder($_POST['categoryID']);
+            FileMapper::getInstance()->save($file);
+            $result = "success";
+        }
     }
     catch (Exception $e) {
             $result = "File not found";
