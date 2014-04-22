@@ -128,6 +128,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'type',
 			'other_key' => 'eventTypeID',
 		));
+		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
 	/**
@@ -209,25 +210,6 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(":eventId", $event->getId());
 		$statement->execute();
-	}
-
-	/**
-	 * Augmentation
-	 *
-	 * @param $event
-	 * @return array|void
-	 */
-	public function save($event) {
-
-		/* Call super -_-
-		 */
-		parent::save($event);
-
-		/* Deal with this uniquely for now - maybe these should be part of the
-		 * event model, but then you need to manufacture mappers, relations and
-		 * hydration methods for these two optional bits
-		 */
-		$this->postSave($event);
 	}
 
 	/**
