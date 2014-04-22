@@ -151,8 +151,10 @@
 
                 // set the counter
 
-                $(self).attr('data-unread', unreadTotal).children(settings.counter).html(unreadTotal ? unreadTotal : '');
+                dom.attr('data-unread', unreadTotal).children(settings.counter).html(unreadTotal ? unreadTotal : '');
 
+                clearInterval(ii);
+                ii = setInterval(updateRelativeTimes, 9000);
             }
 
             /**
@@ -355,39 +357,14 @@
             var messages = {};
             var attemptReconnect = true;
             var domTimeout;
+            var ii;
 
 
-            // open/close listener
+            // whenever the flyout is about to open, update relative times so they appear correctly
             $(settings.counter).on('click', function(e) {
                 e.preventDefault();
-                e.stopPropagation();
-
-                var ii;
-
-                // if it's *about* to be opened, set the relative times so they don't "flash"
-                if($(self).hasClass('open')) {
-                    clearInterval(ii);
-                }
-                else {
-                    updateRelativeTimes();
-                    ii = setInterval(updateRelativeTimes, 9000);
-                }
-
-                $(self).toggleClass('open');
-
-                var fn = function(e) {
-                    // if we clicked on the list, do nothing except reattach the listener
-                    if($(e.target).closest(settings.list).length == 1) {
-                        $('html').one('click', fn);
-                    }
-                    else {
-                        $(self).removeClass('open');
-                        clearInterval(ii);
-                    }
-                };
-                $('html').one('click', fn);
+                updateRelativeTimes();
             });
-
 
             // mark-as-read listener
             $(settings.list).on('click', 'a', function(e) {

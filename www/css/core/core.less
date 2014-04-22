@@ -543,26 +543,48 @@ Notifications
 	z-index: 3;
 	height: @infopanel-height;
     float: right;
-    > li {
+    > li { // top level navs elements in infopanel
         float: left;
+		position: relative;
         margin-left: 8px;
 		color:@banner-color;
 		min-width: 32px;
 		height: @infopanel-height;
 		line-height: @infopanel-height;
-        &.first a {
-            margin-right: 10px
+		&.open {
+			&:after {
+				content: " ";
+				background: @flyout-background;
+				display: block;
+				width: 32px;
+				height: @flyout-pad-height;
+				position: absolute;
+				bottom: -1 * @flyout-pad-height;
+				right: 0px;
+				z-index: 61;
+			}
+			.flyout-menu {
+				display: block;
+				z-index: 60;
+			}
+		}
+		&.first > a {
+			margin-right: 39px;
+			white-space: nowrap;
+			img {
+				margin-left: 10px;
+			}
         }
+		> a {
+			color: @banner-links;
+			//		text-decoration: none;
+		}
     }
-	a {
-		color: @banner-links;
-		text-decoration: none;
-	}
 	img {
 		position: absolute;
 		overflow: hidden;
 	}
-
+	// styles specific to the messages dropdown
 	.bell {
 		height: @infopanel-height;
 		padding: 0;
@@ -571,7 +593,6 @@ Notifications
 		background-position: 0 (-32 - ((32 - @infopanel-height) / 2));
 		background-repeat: no-repeat;
 		transition: background-color 0.1s;
-		position: relative;
 		&[data-unread="0"] {
 			background-position: 0 (0 - ((32 - @infopanel-height) / 2));
 			background-color: transparent;
@@ -583,23 +604,8 @@ Notifications
 		&.open {
 			background-color: @flyout-background;
 			background-position: 0 (-64 - ((32 - @infopanel-height) / 2));
-			&:after {
-				content: " ";
-				background: @flyout-background;
-				display: block;
-				width: 100%;
-				height: @flyout-pad-height;
-				position: absolute;
-				bottom: -1 * @flyout-pad-height;
-				right: 0px;
-				z-index: 61;
-			}
 			> a {
 				color: @banner-background;
-			}
-			#message-list {
-				display: block;
-				z-index: 60;
 			}
 		}
 		> a {
@@ -619,9 +625,29 @@ Notifications
 			padding: 0;
 		}
 	}
+	// styles specific to the account menu dropdown
+	.user {
+		li {
+			&:last-child a {
+				border-bottom: none;
+			}
+			a {
+				padding: 8px;
+				display: block;
+				border-bottom: solid 1px @border-color;
+				color: @flyout-color;
+				text-decoration: none;
+				&:hover {
+					text-decoration: underline;
+					background: @flyout-hover-background;
+					color: @flyout-hover-color;
+				}
+			}
+		}
+	}
 }
 
-#message-list {
+.flyout-menu {
 	.shadow-14();
 	line-height: 1.3em;
 	display: none;
@@ -639,7 +665,7 @@ Notifications
 		color: @flyout-header-color;
 		padding: 8px 0 4px 8px;
 		a {
-			color: #0066bb;
+			color: @link;
 			font-weight: normal;
 			position: absolute;
 			right: 0;
