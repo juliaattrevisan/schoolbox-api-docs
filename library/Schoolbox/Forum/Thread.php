@@ -9,9 +9,9 @@
  */
 
 namespace Schoolbox\Forum;
+use Schoolbox\ISoftDeletable;
 
-class Thread
-{
+class Thread implements ISoftDeletable {
 
     /** @var int */
     protected $threadID;
@@ -28,16 +28,19 @@ class Thread
     /** @var \Alaress_Date_Format */
     protected $date;
 
-    /** @var bool */
-    protected $deleted;
+    /** @var string */
+    protected $deleted = 'false';
 
-    /** @var bool */
-    protected $locked;
+    /** @var string */
+    protected $locked = 'false';
 
     /** @var int */
-    protected $views;
+    protected $views = 0;
 
-    /** @var object */
+    /** @var Post */
+    protected $firstPost;
+
+    /** @var Post */
     protected $lastPost;
 
     /** @var \Alaress_Date_Format */
@@ -46,8 +49,6 @@ class Thread
     /** @var object */
     protected $lastPostUser;
 
-    /** @var string */
-    protected $lastPostUserName;
 
     /**
      * @param int $threadID
@@ -140,7 +141,7 @@ class Thread
 
 
     /**
-     * @param bool $deleted
+     * @param string $deleted
      * @return self
      */
     public function setDeleted($deleted) {
@@ -150,7 +151,7 @@ class Thread
 
 
     /**
-     * @return bool
+     * @return string
      */
     public function getDeleted() {
         return $this->deleted;
@@ -158,7 +159,7 @@ class Thread
 
 
     /**
-     * @param bool $locked
+     * @param string $locked
      * @return self
      */
     public function setLocked($locked) {
@@ -168,7 +169,7 @@ class Thread
 
 
     /**
-     * @return bool
+     * @return string
      */
     public function getLocked() {
         return $this->locked;
@@ -191,6 +192,25 @@ class Thread
     public function getViews() {
         return $this->views;
     }
+
+    /**
+     * @param \Schoolbox\Forum\Post $firstPost
+     */
+    public function setFirstPost($firstPost)
+    {
+        $this->firstPost = $firstPost;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\Forum\Post
+     */
+    public function getFirstPost()
+    {
+        return $this->firstPost;
+    }
+
+
 
 
     /**
@@ -246,22 +266,20 @@ class Thread
         return $this->lastPostUser;
     }
 
-
     /**
-     * @param string $lastPostUser
-     * @return self
+     * Is this object deleted?
+     * @return bool
      */
-    public function setLastPostUserName($lastPostUserName) {
-        $this->lastPostUserName = $lastPostUserName;
-        return $this;
+    public function isDeleted(){
+        return ($this->getDeleted() == 'true');
     }
 
-
     /**
-     * @return string
+     * Is this object locked?
+     * @return bool
      */
-    public function getLastPostUserName() {
-        return $this->lastPostUserName;
+    public function isLocked(){
+        return ($this->getLocked() == 'true');
     }
 
 }

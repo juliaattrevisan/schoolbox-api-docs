@@ -31,8 +31,9 @@ class PostMapper extends Mapper {
 
         $this->hasMap(array(
                 'column'     => 'userID',
-                'property'   => 'userID',
-                'type'       => self::TYPE_INTEGER
+                'property'   => 'owner',
+                'type'       => self::TYPE_MODEL,
+                'join'       => 'owner',
             ));
 
         $this->hasMap(array(
@@ -51,10 +52,9 @@ class PostMapper extends Mapper {
         $this->hasMap(array(
                 'column'     => 'deleted',
                 'property'   => 'deleted',
-                'type'       => self::TYPE_BOOLEAN
+                'type'       => self::TYPE_STRING
             ));
-        $this->hasSoftDeleteBooleanField('deleted');
-
+        $this->hasSoftDeleteField('deleted', 'true','false');
 
         $this->hasMap(array(
                 'column'     => 'modified',
@@ -66,8 +66,39 @@ class PostMapper extends Mapper {
         $this->hasMap(array(
                 'column'     => 'censored',
                 'property'   => 'censored',
-                'type'       => self::TYPE_BOOLEAN
+                'type'       => self::TYPE_STRING
             ));
 
+        $this->hasJoin('owner', array(
+                'mapper'    => '\\Schoolbox\\UserMapper',
+                'this_key'  => 'userID',
+                'other_key' => 'id',
+        ));
+
     }
+
+    public function findById($id) {
+        $query=
+            "SELECT
+                {$this->getColumnString('post')},
+                {$this->getJoinColumnString('owner', 'owner')}
+            FROM {$this->getTable()} AS post
+            LEFT JOIN {$this->getJoinSql('owner', 'post', 'owner')}
+			WHERE post.postID=? ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array($id));
+
+        if (($row = $statement->fetch()) !== false) {
+            $post = $this->hydrate($row, 'post');
+            $post->setOwner($this->hydrateJoin($row, 'owner', 'owner'));
+            $this->throwIfDeleted($post);
+            return $post;
+        }
+        else {
+            throw new Mapper\Exception('Instance of object not found');
+        }
+
+    }
+
 }

@@ -41,8 +41,8 @@ class Forum extends DeprecatedModel {
     }
 
     function getThreadList($categoryID, $index = 0, $limit = 0) {
-        $query = "SELECT t.*, u2.synergy_id last_post_user_synid, u.id userID, u.title userTitle,
-                    u.firstname userFirstname, u.lastname userLastname, u.synergy_id userSynID,
+        $query = "SELECT t.*,u.id userID, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, u.synergy_id userSynID,
+                      u2.title last_post_title, u2.firstname last_post_firstname, u2.lastname last_post_surname, u2.synergy_id last_post_external_id,
                     COUNT(DISTINCT p.postID) - 1 replies
                   FROM forumThread t
 				  LEFT JOIN `user` u ON u.id = t.userID
@@ -164,6 +164,9 @@ class Forum extends DeprecatedModel {
         return $this->update($data);
     }
 
+    /**
+     * @deprecated
+     */
     function createPost($data) {
         $data['date'] = 'NOW()';
         $this->db->insert($this->_postTable, $data);
@@ -187,6 +190,9 @@ class Forum extends DeprecatedModel {
         return $data['postID'];
     }
 
+    /**
+     * @deprecated
+     */
     function updatePost($data) {
         $data['modified'] = 'NOW()';
 

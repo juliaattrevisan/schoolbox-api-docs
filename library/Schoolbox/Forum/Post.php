@@ -9,9 +9,10 @@
  */
 
 namespace Schoolbox\Forum;
+use Schoolbox\ISoftDeletable;
 
 
-class Post {
+class Post implements ISoftDeletable {
 
     /** @var int */
     protected $postID;
@@ -19,8 +20,8 @@ class Post {
     /** @var int */
     protected $threadID;
 
-    /** @var int */
-    protected $userID;
+    /** @var \Schoolbox\User */
+    protected $owner;
 
     /** @var \Alaress_Date_Format */
     protected $date;
@@ -28,14 +29,14 @@ class Post {
     /** @var string */
     protected $body;
 
-    /** @var bool */
-    protected $deleted;
+    /** @var string */
+    protected $deleted = 'false';
 
     /** @var \Alaress_Date_Format */
     protected $modified;
 
-    /** @var bool */
-    protected $censored;
+    /** @var string */
+    protected $censored = 'false';
 
 
     /**
@@ -78,8 +79,8 @@ class Post {
      * @param int $userID
      * @return self
      */
-    public function setUserID($userID) {
-        $this->userID = $userID;
+    public function setOwner($owner) {
+        $this->owner = $owner;
         return $this;
     }
 
@@ -87,8 +88,8 @@ class Post {
     /**
      * @return int
      */
-    public function getUserID() {
-        return $this->userID;
+    public function getOwner() {
+        return $this->owner;
     }
 
 
@@ -129,7 +130,7 @@ class Post {
 
 
     /**
-     * @param bool $deleted
+     * @param string $deleted
      * @return self
      */
     public function setDeleted($deleted) {
@@ -139,7 +140,7 @@ class Post {
 
 
     /**
-     * @return bool
+     * @return string
      */
     public function getDeleted() {
         return $this->deleted;
@@ -165,7 +166,7 @@ class Post {
 
 
     /**
-     * @param bool $censored
+     * @param string $censored
      * @return self
      */
     public function setCensored($censored) {
@@ -175,10 +176,17 @@ class Post {
 
 
     /**
-     * @return bool
+     * @return string
      */
     public function getCensored() {
         return $this->censored;
     }
 
+    /**
+     * Is this object deleted?
+     * @return bool
+     */
+    public function isDeleted(){
+        return ($this->getDeleted() == 'true');
+    }
 }

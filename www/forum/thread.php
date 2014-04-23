@@ -179,7 +179,7 @@ if (is_array($postList)) {
 
 		// edited time
 		$this->setVar('modified_block', '');
-		if ($post['modified'] > 0) {
+		if ($post['modified'] > 0 && $post['modified'] != $post['date']) {
 			$this->parse('modified_block', 'modified');
 		}
 

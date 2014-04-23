@@ -52,14 +52,14 @@ class ThreadMapper extends Mapper {
         $this->hasMap(array(
                 'column'     => 'deleted',
                 'property'   => 'deleted',
-                'type'       => self::TYPE_BOOLEAN
+                'type'       => self::TYPE_STRING
             ));
-        $this->hasSoftDeleteBooleanField('deleted');
+        $this->hasSoftDeleteField('deleted', 'true','false');
 
         $this->hasMap(array(
                 'column'     => 'locked',
                 'property'   => 'locked',
-                'type'       => self::TYPE_BOOLEAN
+                'type'       => self::TYPE_STRING
             ));
 
         $this->hasMap(array(
@@ -71,7 +71,7 @@ class ThreadMapper extends Mapper {
         $this->hasMap(array(
                 'column'     => 'last_post_id',
                 'property'   => 'lastPost',
-                'type'       => self::TYPE_MODEL
+                'type'       => self::TYPE_INTEGER
             ));
 
         $this->hasMap(array(
@@ -83,13 +83,36 @@ class ThreadMapper extends Mapper {
         $this->hasMap(array(
                 'column'     => 'last_post_user_id',
                 'property'   => 'lastPostUser',
-                'type'       => self::TYPE_MODEL
+                'type'       => self::TYPE_INTEGER
             ));
 
-        $this->hasMap(array(
-                'column'     => 'last_post_user',
-                'property'   => 'lastPostUserName',
-                'type'       => self::TYPE_STRING
-            ));
+    }
+
+    public function findById($id) {
+
+        $post_mapper = PostMapper::getInstance();
+
+        $query=
+            "SELECT
+                {$this->getColumnString('thread')},
+                {$post_mapper->getColumnString('firstPost')}
+            FROM {$this->getTable()} AS thread
+            JOIN forumPost firstPost ON thread.threadID = firstPost.threadID
+			WHERE thread.threadID = ?
+			ORDER BY firstPost.date ASC LIMIT 1 ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array($id));
+
+        if (($row = $statement->fetch()) !== false) {
+            $post = $this->hydrate($row, 'thread');
+            $post->setFirstPost($post_mapper->hydrate($row,'firstPost'));
+            $this->throwIfDeleted($post);
+            return $post;
+        }
+        else {
+            throw new Mapper\Exception('Instance of object not found');
+        }
+
     }
 }
