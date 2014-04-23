@@ -425,6 +425,20 @@
             return false
         })
 
+        // Dialog for use when clicking an item that is in a series
+        var updateSeriesDialog = $('#dialog-booking-bulk-update')
+        updateSeriesDialog.dialog({
+            autoOpen:false,
+            resizable:false,
+            height:180,
+            width:400,
+            modal:true,
+            draggable:false,
+            close: function () {
+                return false;
+            }
+        })
+
         //
         // Form listener for exporter - brings up a dialog box that offers a URL
         // to click.
@@ -440,6 +454,47 @@
                 modal: true
             });
         });
+
+        // Copypasted code for updating booking in series
+        $('#calendar-bubble').find('#editEvent').on(
+            'click',
+            'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
+            function(event) {
+                c.bubble.hide()
+                event.preventDefault()
+                var href     = this.href
+                var callback = function(data) {
+                    $.ajax(href, {data: data}).done(function() {
+                        c.dom.fullCalendar('refetchEvents')
+                    })
+                }
+                var seriesId = $(this).data('seriesId')
+                if (seriesId) {
+                    // Remove all previous change status events, and reapply to this
+                    // dialog box.
+                    updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase())
+                    updateSeriesDialog
+                        .dialog('option', 'buttons', [{
+                            text: "Only this booking",
+                            click: function() {
+                                updateSeriesDialog.dialog('close')
+                                callback({efficacy: 'self'})
+                            }
+                        }, {
+                            text: "All bookings in the series",
+                            click: function() {
+                                updateSeriesDialog.dialog('close')
+                                callback({efficacy: 'series', seriesId: seriesId})
+                            }
+                        }])
+                        .dialog('open')
+                }
+                else {
+                    c.bubble.hide()
+                    callback()
+                }
+            }
+        )
 
         // if a checkbox on the calendar is interacted, ajax
         c.dom.on('change', 'input[type=checkbox]', function(e) {
@@ -651,4 +706,8 @@
 		Use the following URL as the source for your feed.
 	</div>
 	<textarea readonly id="calendar-export-dialog-url"></textarea>
+</div>
+
+<div id="dialog-booking-bulk-update" title="This booking is part of a series">
+    Would you like to <span class="action-text"></span> only this booking, or all in the series?
 </div>
