@@ -209,10 +209,20 @@ class SitePage extends Page {
             'DEBUGBAR'      => $debug_bar_body,
             'DEBUGBAR_HEAD' => $debug_bar_head,
             'WEBSOCKET_HOST' => $_SERVER['HTTP_HOST'] ?: parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST),
-            'WEBSOCKET_PORT' => Cfg::get('websocket_port') ?: (empty($_SERVER['HTTPS']) ? 8080 : 8081),
-            'WEBSOCKET_PATH' => Cfg::get('websocket_path') ? '/' . Cfg::get('websocket_path') : '',
+            'WEBSOCKET_PATH' => Cfg::get('websocket_path') ? Cfg::get('websocket_path') : '/',
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
+
+        if(empty($_SERVER['HTTPS'])) {
+            $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port')
+                ? Cfg::get('websocket_port')
+                : 8080;
+            }
+        else {
+            $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port_ssl')
+                ? Cfg::get('websocket_port')
+                : 8081;
+        }
 
         $this->setVar($templateVar);
 
