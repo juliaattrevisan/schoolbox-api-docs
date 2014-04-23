@@ -647,28 +647,23 @@ class Controller extends Base {
             }
         }
 
-        // Add any items that weren't selected, but now are?
+        // Are there any items that weren't selected, but now are?
         // Add them to the list.
         $insertedSelections = array_diff($relatedSelections, $updatedSelections);
         if (!empty($insertedSelections)) {
-            $resource = $this->getResourceMapper()->findById($item->getResource()->getId());
+            $insertedBookingList = new Collection();
+            $resource            = $this->getResourceMapper()->findById($item->getResource()->getId());
             foreach ($resource->getRelatedResourceList() as $relatedResource) {
                 if (in_array($relatedResource->getId(), $insertedSelections)) {
-                    // Clone $item for this event, creating a series if needed.
-                    $newEvent = $this->getEventFromPostData(
+                    // New related booking: uses same event as base booking
+                    $relatedBooking = $this->getBookingFromEvent(
                         $relatedResource,
-                        $item->getEvent()->getStartDateTime(),
-                        $item->getEvent()->getEndDateTime(),
-                        $item->getEvent()->getDetail()
+                        $item->getEvent()
                     );
-                    $this->getEventMapper()->save($newEvent);
-                    $newBooking = $this->getBookingFromEvent($relatedResource, $newEvent);
-
-                    // Associate this new booking back to the original
-                    $newBooking->addRelatedBooking($item);
-                    $this->getBookingMapper()->save($newBooking);
-
-                    $relatedBookingList->add($newBooking);
+                    $relatedBooking->addRelatedBooking($item);
+                    $item->addRelatedBooking($relatedBooking);
+//                    $insertedBookingList->add($relatedBooking);
+                    $relatedBookingList->add($relatedBooking);
                 }
             }
         }
