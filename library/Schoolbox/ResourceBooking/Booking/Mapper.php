@@ -339,6 +339,7 @@ class Mapper extends BaseMapper {
      *
      * @param  int $id
      * @return Model
+     * @throws BaseMapper\Exception if item doesn't exist
      */
     public function findById($id) {
         // TODO request joins in find* methods
@@ -355,16 +356,19 @@ class Mapper extends BaseMapper {
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('bookingId', $id);
         $statement->execute();
-        $item = $this->hydrate($statement->fetch(\PDO::FETCH_ASSOC), 'b', function($mapper, $model, $row) {
-            /** @var self  $mapper */
-            /** @var Model $model */
-            return $model
-                ->setResource($mapper->hydrateJoin($row, 'resource', 'r'))
-                ->setEvent($mapper->hydrateJoin($row, 'event', 'e'))
-            ;
-        });
-        $this->throwIfDeleted($item);
-        return $item;
+        foreach ($statement as $row) {
+            $model = $this->hydrate($row, 'b', function($mapper, $model, $row) {
+                /** @var self  $mapper */
+                /** @var Model $model */
+                return $model
+                    ->setResource($mapper->hydrateJoin($row, 'resource', 'r'))
+                    ->setEvent($mapper->hydrateJoin($row, 'event', 'e'))
+                ;
+            });
+            $this->throwIfDeleted($model);
+            return $model;
+        }
+        throw new BaseMapper\Exception('Instance of object not found');
     }
 
     /**
