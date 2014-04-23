@@ -191,9 +191,9 @@
 			/* Go back and find the nearest selectable
 			 */
 			if (index > -1) {
-				var isFound = false;
+				var isFinished = false;
 
-				for (var i = index-1; (i >= 0) && (isFound == false); i--) {
+				for (var i = index-1; (i >= 0) && !isFinished; i--) {
 					if (config.markedElements[i].selectable == true) {
 
 						/* Construct link
@@ -208,7 +208,7 @@
 
 						/* Jump out
 						 */
-						isFound = true;
+						isFinished = true;
 					}
 				}
 			}
