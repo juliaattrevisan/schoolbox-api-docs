@@ -178,6 +178,7 @@
 		 * yet submitted anything
 		 */
 		function renderPrevious() {
+			var isFinished = false;
 			var index = -1;
 
 			/* Find the current element
@@ -188,11 +189,10 @@
 				}
 			}
 
-			/* Go back and find the nearest selectable
+			/* Go back and find the nearest selectable if any
+			 * might exist (skip if markedElements is empty)
 			 */
 			if (index > -1) {
-				var isFinished = false;
-
 				for (var i = index-1; (i >= 0) && !isFinished; i--) {
 					if (config.markedElements[i].selectable == true) {
 
