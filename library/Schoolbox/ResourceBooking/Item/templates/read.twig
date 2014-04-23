@@ -211,13 +211,13 @@ $(document).ready(function() {
                 updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase())
                 updateSeriesDialog
                     .dialog('option', 'buttons', [{
-                        text: "Only this event",
+                        text: "Only this booking",
                         click: function() {
                             updateSeriesDialog.dialog('close')
                             callback({efficacy: 'self'})
                         }
                     }, {
-                        text: "All events in the series",
+                        text: "All bookings in the series",
                         click: function() {
                             updateSeriesDialog.dialog('close')
                             callback({efficacy: 'series', seriesId: seriesId})
