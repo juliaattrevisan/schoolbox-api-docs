@@ -99,10 +99,6 @@
 		 */
 		var config = init(options, this);
 
-		/* Mark which people can be selected
-		 */
-		config.markedElements = markSelectableElements();
-
 		/* Render controls
 		 */
 		renderPrevious();
@@ -142,6 +138,11 @@
 			merged.direct = jQuery.parseJSON(merged.direct);
 			merged.currentId = parseInt(merged.currentId);
 
+			/* Do some preprocessing first by indicating which people
+			 * can be selected from the dropdown
+			 */
+			merged.items = markSelectableElements(merged.items, merged.disabled);
+
 			return merged;
 		}
 
@@ -150,15 +151,15 @@
 		 *
 		 * @returns {Array}
 		 */
-		function markSelectableElements() {
+		function markSelectableElements(items, disabledItems) {
 			var selectableElements = [];
 
 			/* Filter out everyone who has not submitted
 			 */
-			for (var i = 0; i < config.items.length; i++) {
-				var updatedObject = config.items[i];
+			for (var i = 0; i < items.length; i++) {
+				var updatedObject = items[i];
 
-				if (jQuery.inArray(updatedObject.navigation.id, config.disabled) < 0) {
+				if (jQuery.inArray(updatedObject.navigation.id, disabledItems) < 0) {
 					updatedObject.selectable = true;
 				}
 				else {
@@ -184,8 +185,8 @@
 
 			/* Find the current element
 			 */
-			for (var i = 0; i < config.markedElements.length; i++) {
-				if (config.currentId == config.markedElements[i].navigation.id) {
+			for (var i = 0; i < config.items.length; i++) {
+				if (config.currentId == config.items[i].navigation.id) {
 					index = i;
 
 					/* Construct link
@@ -207,8 +208,8 @@
 
 				/* Mark previous
 				 */
-				if (config.markedElements[i].selectable == true) {
-					previous = config.markedElements[i];
+				if (config.items[i].selectable == true) {
+					previous = config.items[i];
 				}
 			}
 		}
@@ -265,19 +266,19 @@
 
 			/* Find the current element
 			 */
-			for (var i = 0; (i < config.markedElements.length) && !isFinished; i++) {
+			for (var i = 0; (i < config.items.length) && !isFinished; i++) {
 
 				/* Decide whether to use the next selectable element
 				 */
-				if (config.currentId == config.markedElements[i].navigation.id) {
+				if (config.currentId == config.items[i].navigation.id) {
 					useNext = true;
 				}
-				else if (useNext && config.markedElements[i].selectable == true) {
+				else if (useNext && config.items[i].selectable == true) {
 
 					/* Construct link
 					 */
-					var value = config.markedElements[i].navigation.value;
-					var label = config.markedElements[i].navigation.label;
+					var value = config.items[i].navigation.value;
+					var label = config.items[i].navigation.label;
 
 					var option = '<a class="next-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&rsaquo;</a>';
 
