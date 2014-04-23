@@ -67,7 +67,81 @@ function Calendar(id, bubbleId, opts) {
             },
             date: null,
             month: null,
-            year: null
+            year: null,
+
+            /**
+             * Generic action for when an event is clicked
+             * @param calEvent
+             * @param jsEvent
+             * @param view
+             */
+            eventClick: function(calEvent, jsEvent, view) {
+
+                // setup data to be displayed
+                var data = $j.extend(true, {}, calEvent.data.meta)
+                var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mmtt'
+
+                // Prefix booking status for bookings
+                if (calEvent.data.booking) {
+                    data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
+                }
+                else {
+                    data.note = calEvent.title
+                }
+                data.date = $.fullCalendar.formatDate(calEvent.start, format)
+                if (calEvent.end != null) {
+                    data.date += " &ndash; "
+                    data.date += $.fullCalendar.formatDate(calEvent.end, format)
+                }
+
+                // Links to Modify Screen
+                if (calEvent.editable == true) {
+                    var url = '';
+                    if ((calEvent.data.custom != undefined) && (calEvent.data.custom.modifyLink != undefined) && (calEvent.data.custom.modifyLink.length)) {
+                        url = calEvent.data.custom.modifyLink;
+                    }
+                    else {
+                        url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=week';
+                    }
+
+                    data.modifyLink = '<a class="btn modify float-right" href="' + url + '"><span></span>Modify</a>';
+                }
+                else {
+                    data.modifyLink = '';
+                }
+
+
+                $j.each(calEvent.data.attendance, function(k, v) {
+                    data['attendance' + k.capitalise()] = v
+                })
+
+                // Attendance List butonye
+                if (data.attendanceListButton.toString() == 'true') {
+                    data.attendanceIcon = "This event can be attended."
+                    data.attendanceListButton = '<a class="btn float-right" href="/calendar/attendance/list/'
+                        + calEvent.data.meta.eventId + '"><span></span>Attendance List</a>'
+                }
+                // Attend/Unattend butonye
+                else if (data.attendanceRequestButton.toString() != 'false') {
+                    data.attendanceRequestButton = '<a class="btn no-icon float-right" href="#">' + calEvent.data.attendance.requestButton.toString() + '</a>'
+                }
+
+                // Booking butonyes (if available)
+                data.bookingActions = []
+                if (calEvent.data.booking && calEvent.data.booking.buttons) {
+                    $.each(calEvent.data.booking.buttons, function() {
+                        data.bookingActions.push(
+                            $('<a class="btn float-right" />')
+                                .data('seriesId', calEvent.data.meta.seriesId)
+                                .addClass(this.class)
+                                .attr('href', this.href)
+                                .text(this.label)
+                                .prepend('<span />')
+                        )
+                    })
+                }
+                self.bubble.display('edit', data, jsEvent, this)
+            }
         },
         datepicker: {
             dateFormat: 'dd-mm-yy',

@@ -122,42 +122,6 @@ $(document).ready(function() {
                 }
                 return element
             },
-            /**
-             * When an event is clicked
-             *
-             * @param calEvent
-             * @param jsEvent
-             */
-            eventClick: function(calEvent, jsEvent) {
-
-                // setup data to be displayed
-                var data = $j.extend(true, {}, calEvent.data.meta)
-                var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mmtt'
-
-                // Note: depends on whether this item is approved, rejected or
-                // pending.
-                data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
-                data.date = $.fullCalendar.formatDate(calEvent.start, format)
-                if (calEvent.end) {
-                    data.date += " &ndash; "
-                    data.date += $.fullCalendar.formatDate(calEvent.end, format)
-                }
-
-                // Custom butonyes for bookings
-                data.actions = []
-                $.each(calEvent.data.booking.buttons, function() {
-                    data.actions.push(
-                        $('<a class="btn float-right" />')
-                            .data('seriesId', calEvent.data.meta.seriesId)
-                            .addClass(this.class)
-                            .attr('href', this.href)
-                            .text(this.label)
-                            .prepend('<span />')
-                    )
-                })
-                c.bubble.display('edit', data, jsEvent, this)
-
-            },
 
             /**
              * Event that is triggered when clicking on a calendar day or time.
@@ -290,7 +254,7 @@ $(document).ready(function() {
                 {# In this case, item ID is preset #}
                 {% if isRouteAuthorized('resourceBooking.book', {id: item.id}) %}
                     Create booking for: <span class="displayDate"></span>
-                    <div class="actions">
+                    <div class="bookingActions">
                         <input class="btn float-right modify no-icon" type="submit" value="Continue" />
                     </div>
                 {% else %}
@@ -307,7 +271,22 @@ $(document).ready(function() {
                     <dd><p class="detail wysiwyg"></p></dd>
                     <dd class="post-by">Requested by <a class="author" href="#"></a></dd>
                 </dl>
+                <div class="attendance">
+                    <dl>
+                        <dd><p class="attendanceIcon"></p></dd>
+                        <dd class="rm"><p class="attendanceStatus"></p></dd>
+                    </dl>
+                </div>
                 <div class="actions">
+                    <dl>
+                        <dd>
+                            <span class="modifyLink"></span>
+                            <span class="attendanceListButton"></span>
+                            <span class="attendanceRequestButton"></span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="bookingActions">
                 </div>
             </form>
         </div>
