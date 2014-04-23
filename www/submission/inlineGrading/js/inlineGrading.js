@@ -139,18 +139,56 @@
 		}
 
 		/**
+		 * Find all the people who can be selected
+		 *
+		 * @returns {Array}
+		 */
+		function findSelectableElements() {
+			var selectableElements = new Array();
+
+			/* Filter out everyone who has not submitted
+			 */
+			for (i=0; i < config.items.length; i++) {
+				if (jQuery.inArray(config.items[i].navigation.id, config.disabled) < 0) {
+					selectableElements.push(config.items[i].navigation.id);
+				}
+			}
+
+			return selectableElements;
+		}
+
+		/**
 		 * Render previous link
+		 *
+		 * This is a function of the disabled people, who have not
+		 * yet submitted anything
 		 */
 		function renderPrevious() {
-			if (config.direct.previous !== null) {
-				var label = config.direct.previous.navigation.label;
-				var value = config.direct.previous.navigation.value;
+			var selectableElements = findSelectableElements();
 
-				var option = '<a class="previous-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&lsaquo;</a>';
+			/* If there is only one selectable element,
+			 * previous should just go away
+			 *
+			 * Otherwise find the element prior to the current
+			 */
+			if (selectableElements.length > 1) {
+				var index = jQuery.inArray(config.currentId, selectableElements);
 
-				config.element.append(option);
-				config.previousItemCallback();
+				console.log(index);
 			}
+
+
+			console.log(selectableElements);
+//
+//			if (config.direct.previous !== null) {
+//				var label = config.direct.previous.navigation.label;
+//				var value = config.direct.previous.navigation.value;
+//
+//				var option = '<a class="previous-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&lsaquo;</a>';
+//
+//				config.element.append(option);
+//				config.previousItemCallback();
+//			}
 		}
 
 		/**
@@ -195,17 +233,20 @@
 
 		/**
 		 * Render next link
+		 *
+		 * This is a function of the disabled people, who have not
+		 * yet submitted anything
 		 */
 		function renderNext() {
-			if (config.direct.next !== null) {
-				var label = config.direct.next.navigation.label;
-				var value = config.direct.next.navigation.value;
-
-				var option = '<a class="next-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&rsaquo;</a>';
-
-				config.element.append(option);
-				config.nextItemCallback();
-			}
+//			if (config.direct.next !== null) {
+//				var label = config.direct.next.navigation.label;
+//				var value = config.direct.next.navigation.value;
+//
+//				var option = '<a class="next-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&rsaquo;</a>';
+//
+//				config.element.append(option);
+//				config.nextItemCallback();
+//			}
 		}
 	}
 }(jQuery));
