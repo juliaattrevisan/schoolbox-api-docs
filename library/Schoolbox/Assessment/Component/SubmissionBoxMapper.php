@@ -163,6 +163,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(
+			'column'     => 'skip_unsubmitted',
+			'property'   => 'skipUnsubmitted',
+			'type'       => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
 			'column'     => 'deleted',
 			'property'   => 'deleted',
 			'type'       => self::TYPE_BOOLEAN,
@@ -186,6 +191,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'this_key'  => 'category',
 			'other_key' => 'id',
 
+			'this_property'  => 'category',
 			'this_property'  => 'category',
 			'other_property' => 'id',
 		));
@@ -221,7 +227,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 		));
 
+		//
 		// TODO add Mapper->hasCollection?
+		$this->hasJoin('notify', array(
+			'multiple'  => true,
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\NotificationMapper',
+			'this_key'  => 'id',
+			'other_key' => 'box_id',
+		));
 		$this->hasJoin('submission', array(
 			'multiple'  => true,
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
@@ -262,6 +275,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
 		$mime_mapper     = $file_mapper->getJoinMapper('allowedFileType');
+		$notify_mapper   = $this->getJoinMapper('notify');
 		$worktype_mapper = $this->getJoinMapper('work_type');
 		$marktype_mapper = $this->getJoinMapper('mark_type');
 
@@ -269,10 +283,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			SELECT
 				{$this->getColumnString('sb')},
 				{$worktype_mapper->getColumnString('wt')},
-				{$marktype_mapper->getColumnString('mt')}
+				{$marktype_mapper->getColumnString('mt')},
+				{$this->getJoinColumnString('category', 'cat')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
+			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
 			WHERE sb.id=?
 		";
 		$statement = $this->database->prepare($query);
@@ -284,14 +300,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$submission_box = $this->hydrate($row, 'sb');
 			$submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
 			$submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
-			$submission_box->setCategory(
-				$this->getJoinMapper('category')->findById(
-					$submission_box->getCategory()->getId()
-				)
-			);
+            $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
 		}
 
 		if ($submission_box instanceof SubmissionBox) {
+			foreach ($notify_mapper->findByColumn('box_id', $submission_box->getId()) as $notify) {
+				$submission_box->addNotification($notify);
+			}
+
 			//
 			// Get files? (This is more evidence separate file/link mapper isn't
 			// required.)
@@ -359,21 +375,26 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Post-save method for submission boxes - saves new submission box files
+	 * and notifications.
 	 *
 	 * @param SubmissionBox $object
-	 * @param SubmissionBox $previous
+	 * @param bool          $is_new Is this a new item that is being created?
 	 *
 	 * @return void
 	 */
-	public function postSave(SubmissionBox $object, $previous = null) {
+	public function postSave(SubmissionBox $object, $is_new = false) {
 		foreach ($object->getFileLinks() as $box_file) {
 			if ($box_file->hasFile()) {
-				if (!$previous) {
+				if ($is_new) {
 					$box_file->setId(null);
 				}
 				$box_file->setSubmissionBoxId($object->getId());
 				$this->getJoinMapper('files')->save($box_file);
 			}
+		}
+		foreach ($object->getNotifications() as $notification) {
+			$notification->setSubmissionBoxId($object->getId());
+			$this->getJoinMapper('notify')->save($notification);
 		}
 	}
 

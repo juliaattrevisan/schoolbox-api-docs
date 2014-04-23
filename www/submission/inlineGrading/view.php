@@ -166,3 +166,15 @@ $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL' => $nextUrl
 ));
 
+/* Skip Unsubmitted checkbox
+ */
+if ($submissionBox->getSkipUnsubmitted()) {
+	$this->setVar(array(
+		'SKIP_UNSUBMITTED_CHECKED' => 'checked="checked"'
+	));
+}
+else {
+	$this->setVar(array(
+		'SKIP_UNSUBMITTED_CHECKED' => ''
+	));
+}
