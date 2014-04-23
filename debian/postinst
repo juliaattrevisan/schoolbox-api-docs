@@ -36,10 +36,10 @@ case "$1" in
         /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox;
         /usr/share/schoolbox/tools/update-sql.sh;
         /usr/share/schoolbox/tools/clean-cache-dir.sh;
-        rm -f /usr/share/schoolbox/www/.htaccess;
         service apache2 restart;
         service schoolbox-scheduled restart;
         service schoolbox-socketd restart;
+        service schoolbox-digestd restart;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
