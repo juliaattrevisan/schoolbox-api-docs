@@ -1,0 +1,184 @@
+<?php
+
+/**
+ * Model for forum posts.
+ *
+ * @author    James Leckie <jleckie@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Forum;
+
+
+class Post {
+
+    /** @var int */
+    protected $postID;
+
+    /** @var int */
+    protected $threadID;
+
+    /** @var int */
+    protected $userID;
+
+    /** @var \Alaress_Date_Format */
+    protected $date;
+
+    /** @var string */
+    protected $body;
+
+    /** @var bool */
+    protected $deleted;
+
+    /** @var \Alaress_Date_Format */
+    protected $modified;
+
+    /** @var bool */
+    protected $censored;
+
+
+    /**
+     * @param int $postID
+     * @return self
+     */
+    public function setPostID($postID) {
+        $this->postID = $postID;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getPostID() {
+        return $this->postID;
+    }
+
+
+    /**
+     * @param int $threadID
+     * @return self
+     */
+    public function setThreadID($threadID) {
+        $this->threadID = $threadID;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getThreadID() {
+        return $this->threadID;
+    }
+
+
+    /**
+     * @param int $userID
+     * @return self
+     */
+    public function setUserID($userID) {
+        $this->userID = $userID;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUserID() {
+        return $this->userID;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $date
+     * @return self
+     */
+    public function setDate($date) {
+        $this->date = $date;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDate() {
+        return $this->date;
+    }
+
+
+    /**
+     * @param string $body
+     * @return self
+     */
+    public function setBody($body) {
+        $this->body = $body;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getBody() {
+        return $this->body;
+    }
+
+
+    /**
+     * @param bool $deleted
+     * @return self
+     */
+    public function setDeleted($deleted) {
+        $this->deleted = $deleted;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getDeleted() {
+        return $this->deleted;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $modified
+     * @return self
+     */
+    public function setModified($modified) {
+        $this->modified = $modified;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getModified() {
+        return $this->modified;
+    }
+
+
+    /**
+     * @param bool $censored
+     * @return self
+     */
+    public function setCensored($censored) {
+        $this->censored = $censored;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getCensored() {
+        return $this->censored;
+    }
+
+}
