@@ -134,6 +134,7 @@
 			merged.items = jQuery.parseJSON(merged.items);
 			merged.disabled = jQuery.parseJSON(merged.disabled);
 			merged.direct = jQuery.parseJSON(merged.direct);
+			merged.currentId = parseInt(merged.currentId);
 
 			return merged;
 		}
@@ -148,13 +149,28 @@
 
 			/* Filter out everyone who has not submitted
 			 */
-			for (i=0; i < config.items.length; i++) {
+			for (var i = 0; i < config.items.length; i++) {
 				if (jQuery.inArray(config.items[i].navigation.id, config.disabled) < 0) {
-					selectableElements.push(config.items[i].navigation.id);
+					selectableElements.push(config.items[i].navigation);
 				}
 			}
 
 			return selectableElements;
+		}
+
+		/**
+		 * Find the selectable ids from selectableElements
+		 *
+		 * @param selectableElements
+		 */
+		function findSelectableIds(selectableElements) {
+			var selectableIds = [];
+
+			for (var i = 0; i < selectableElements.length; i++) {
+				selectableIds.push(selectableElements[i].id);
+			}
+
+			return selectableIds;
 		}
 
 		/**
@@ -164,7 +180,11 @@
 		 * yet submitted anything
 		 */
 		function renderPrevious() {
+
+			/* Direct 1:1 correspondence
+			 */
 			var selectableElements = findSelectableElements();
+			var selectableIds = findSelectableIds(selectableElements);
 
 			/* If there is only one selectable element,
 			 * previous should just go away
@@ -172,23 +192,24 @@
 			 * Otherwise find the element prior to the current
 			 */
 			if (selectableElements.length > 1) {
-				var index = jQuery.inArray(config.currentId, selectableElements);
+				var index = $.inArray(config.currentId, selectableIds);
 
-				console.log(index);
+				/* Not at the start of the list
+				 */
+				if (index > 0) {
+					var previous = selectableElements[index-1];
+
+					/* Construct link
+					 */
+					var value = previous.value;
+					var label = previous.label;
+
+					var option = '<a class="previous-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&lsaquo;</a>';
+
+					config.element.append(option);
+					config.previousItemCallback();
+				}
 			}
-
-
-			console.log(selectableElements);
-//
-//			if (config.direct.previous !== null) {
-//				var label = config.direct.previous.navigation.label;
-//				var value = config.direct.previous.navigation.value;
-//
-//				var option = '<a class="previous-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&lsaquo;</a>';
-//
-//				config.element.append(option);
-//				config.previousItemCallback();
-//			}
 		}
 
 		/**
@@ -238,15 +259,36 @@
 		 * yet submitted anything
 		 */
 		function renderNext() {
-//			if (config.direct.next !== null) {
-//				var label = config.direct.next.navigation.label;
-//				var value = config.direct.next.navigation.value;
-//
-//				var option = '<a class="next-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&rsaquo;</a>';
-//
-//				config.element.append(option);
-//				config.nextItemCallback();
-//			}
+
+			/* Direct 1:1 correspondence
+			 */
+			var selectableElements = findSelectableElements();
+			var selectableIds = findSelectableIds(selectableElements);
+
+			/* If there is only one selectable element,
+			 * previous should just go away
+			 *
+			 * Otherwise find the element prior to the current
+			 */
+			if (selectableElements.length > 1) {
+				var index = $.inArray(config.currentId, selectableIds);
+
+				/* Not at the end of the list
+				 */
+				if (index < selectableElements.length-1) {
+					var next = selectableElements[index+1];
+
+					/* Construct link
+					 */
+					var value = next.value;
+					var label = next.label;
+
+					var option = '<a class="next-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&rsaquo;</a>';
+
+					config.element.append(option);
+					config.nextItemCallback();
+				}
+			}
 		}
 	}
 }(jQuery));
