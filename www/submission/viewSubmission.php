@@ -23,6 +23,12 @@ $submissionHandler->logPageView(3, $submissionBoxId);
 $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 
+/* Add category codes
+ */
+$categoryCodeMapper = new \Schoolbox\Resource\CategoryCodeMapper();
+$categoryCode = $categoryCodeMapper->findForCategory($submissionBox->getCategory()->getId());
+$submissionBox->getCategory()->setCodes($categoryCode);
+
 $studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
 
 $dueWorkDetail = new DueWork_Detail($submissionBox->getId());
