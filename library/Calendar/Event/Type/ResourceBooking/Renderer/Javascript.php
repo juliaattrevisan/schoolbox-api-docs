@@ -169,6 +169,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                     'authorId' => $currentEvent->getAuthorId(),
                     'level' => $currentEvent->getDerivedEventLevel(),
                     'completed' => $currentEvent->getCompleted(),
+                    'seriesId' => $currentEvent->getBooking()->getEvent()->getSeriesId(),
                 ),
                 'links' => array(),
                 'styles' => array(
