@@ -115,6 +115,7 @@
 			var defaults = {
 				element: element,
 				items: [],
+				disabled: [],
 				currentId: 0,
 
 				/* Callbacks
@@ -131,6 +132,7 @@
 
 			var merged = $j.extend(defaults, derived, options);
 			merged.items = jQuery.parseJSON(merged.items);
+			merged.disabled = jQuery.parseJSON(merged.disabled);
 			merged.direct = jQuery.parseJSON(merged.direct);
 
 			return merged;
@@ -169,8 +171,19 @@
 					var selected = 'selected="selected"';
 				}
 
-				var option = '<option value="'+ value +'"'+ selected +'>'+ label +'</option>';
+				/* Disable dropdown elements for those who haven't
+				 * submitted (optional)
+				 */
+				var disabled = '';
 
+				if (jQuery.inArray(config.items[i].navigation.id, config.disabled) > -1) {
+					disabled = 'disabled';
+				}
+
+				var option = '<option ' + disabled + ' value="'+ value +'"'+ selected +'>'+ label +'</option>';
+
+				/* Stack up
+				 */
 				allOptions += option;
 			}
 
