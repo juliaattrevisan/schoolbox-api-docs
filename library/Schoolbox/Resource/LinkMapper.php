@@ -1,11 +1,8 @@
 <?php
 /**
- * Mapper for files in the resource browser.
+ * Mapper for links in the resource browser and homepages.
  *
- * Differs from Schoolbox\File in that files of this type display in the
- * resource browser, files in Schoolbox\File don't.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @author    James Leckie <jleckie@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
