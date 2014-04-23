@@ -130,7 +130,6 @@ class Mapper extends BaseMapper {
 //                ),
             )
         );
-        $this->registerCallback('postSave', array($this, 'saveRelatedBookings'));
     }
 
     /**
@@ -286,30 +285,6 @@ class Mapper extends BaseMapper {
             $statusIds,
             array('resource_id' => array($resourceId))
         );
-    }
-
-    /**
-     * Post-save callback - ensures that related bookings are saved after the
-     * item is saved.
-     */
-    public function saveRelatedBookings(Model $object) {
-        // Add save of related items
-        $mapper  = $this->getJoinMapper('related_booking');
-        $oldList = $mapper->findByColumn('resource_booking_id', $object->getId());
-        $newList = new Collection();
-        foreach ($object->getRelatedBookingList() as $related) {
-            $joinObject = new RelatedBooking\Model();
-            $joinObject->setRelatedBooking($related)->setBooking($object);
-            $newList->add($joinObject);
-        }
-
-        // Save all newList items that aren't in oldList
-        // Delete all vice versa
-        $diffMethod = function($a, $b) {
-            return $a->getRelatedBooking()->getId() == $b->getRelatedBooking()->getId();
-        };
-        $mapper->save($newList->diff($oldList, $diffMethod));
-        $mapper->delete($oldList->diff($newList, $diffMethod));
     }
 
     /**
