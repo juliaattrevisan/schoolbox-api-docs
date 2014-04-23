@@ -206,6 +206,6 @@ if ($submissionBox->getSkipUnsubmitted()) {
 else {
 	$this->setVar(array(
 		'SKIP_UNSUBMITTED_CHECKED' => '',
-		'INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED' => '',
+		'INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED' => json_encode(array()),
 	));
 }
