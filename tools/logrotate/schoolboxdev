@@ -26,3 +26,10 @@
         rotate 2
         compress
 }
+
+/var/log/schoolboxdev/digestd*.log /var/log/schoolboxdev/scheduled*.log /var/log/schoolboxdev/socketd*.log {
+        weekly
+        missingok
+        rotate 4
+        compress
+}
