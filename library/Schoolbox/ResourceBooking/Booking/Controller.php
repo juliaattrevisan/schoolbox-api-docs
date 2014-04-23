@@ -656,17 +656,20 @@ class Controller extends Base {
             $resource            = $this->getResourceMapper()->findById($item->getResource()->getId());
             foreach ($resource->getRelatedResourceList() as $relatedResource) {
                 if (in_array($relatedResource->getId(), $insertedSelections)) {
-                    // New related booking: uses same event as base booking
+                    // New related booking: uses same event as base booking.
                     $relatedBooking = $this->getBookingFromEvent(
                         $relatedResource,
                         $item->getEvent()
                     );
+                    // Ensure that the base and related booking are related.
                     $relatedBooking->addRelatedBooking($item);
                     $item->addRelatedBooking($relatedBooking);
-//                    $insertedBookingList->add($relatedBooking);
+                    $insertedBookingList->add($relatedBooking);
                     $relatedBookingList->add($relatedBooking);
                 }
             }
+            // Save the inserted bookings.
+            $this->getBookingMapper()->save($insertedBookingList);
         }
         $item->setRelatedBookingList($relatedBookingList);
 
