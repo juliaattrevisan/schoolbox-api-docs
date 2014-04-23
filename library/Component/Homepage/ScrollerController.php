@@ -73,15 +73,14 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         // Make sure there a config option
         $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 200;
 
-        $this->setVar(
-            array(
-                'COMPONENT_ALIGN' => $this->getConfig('align'),
-                'COMPONENT_PIXEL' => $pixel,
-                'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
-                    'timing'
-                ) * 1000 : '2000',
-            )
-        );
+        $this->setVar(array(
+			'COMPONENT_ALIGN' => $this->getConfig('align'),
+			'COMPONENT_PIXEL' => $pixel,
+			'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
+				'timing'
+			) * 1000 : '2000',
+			'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide')
+		));
 
         // Set up component name
         $this->setVar(

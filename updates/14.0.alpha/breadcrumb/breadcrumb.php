@@ -16,9 +16,17 @@ $definition = array(
     'class'              => 'Component_Homepage_BreadcrumbController',
     'description'        => 'Display links to pages located above this page in the resource browser',
     'multiple'           => 'false',
-    'config'             => array('componentname' => array('default_value' => 'Breadcrumbs', 'label' => 'Heading'),
-                                  'src'           => array('default_value' => '', 'label' => 'Source'),
-                                 ),
+    'config'             =>
+		array('componentname' =>
+			array(
+				'default_value' => 'Breadcrumbs',
+				'label' => 'Heading'
+			),
+			'src' => array(
+				'default_value' => '',
+				'label' => 'Source'
+			),
+		),
 );
 
 Component_DefinitionMapper::getInstance()->create($definition);
