@@ -12,6 +12,7 @@
 
 namespace Schoolbox\External;
 use Schoolbox;
+use Schoolbox\User;
 
 class UserRelationMapper extends Schoolbox\External\Mapper {
 
@@ -56,4 +57,20 @@ class UserRelationMapper extends Schoolbox\External\Mapper {
         );
     }
 
+    /**
+     * Clears all relation entries for a user.
+     *
+     * @param User $user
+     *
+     * @return int
+     */
+    public function deleteForUser(User $user) {
+        $query = "
+            DELETE FROM `{$this->getTable()}`
+            WHERE `user_id` = :id OR `relation_id` = :id
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute(array('id' => $user->getId()));
+        return $statement->rowCount();
+    }
 }
