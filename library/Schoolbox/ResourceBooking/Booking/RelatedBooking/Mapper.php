@@ -92,7 +92,7 @@ class Mapper extends BaseMapper {
     public function postDelete(Model $object) {
         $query = "
             DELETE FROM {$this->getTable()}
-            WHERE resource_booking_id=:bookingId AND extra_booking_resource_id=:relatedBookingId
+            WHERE resource_booking_id=:bookingId AND extra_resource_booking_id=:relatedBookingId
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue(
@@ -101,7 +101,7 @@ class Mapper extends BaseMapper {
             \PDO::PARAM_INT
         );
         $statement->bindValue(
-            'extrabookingId',
+            'relatedBookingId',
             intval($object->getBooking()->getId()),
             \PDO::PARAM_INT
         );
