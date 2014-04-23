@@ -98,10 +98,16 @@
         text-indent: -9000px;
         width: 32px;
         height: 32px;
+        top: -14px;
+        position: relative;
         &:hover{ background: url('/images/loreto/logout.png') bottom left no-repeat; }
     }
     #search{
         #search-field{
+          line-height: 16px;
+          padding: 6px;
+          width: 245px;
+          height: 19px;
           background: #fff;
           -webkit-border-radius: 3px;
           -moz-border-radius: 3px;
@@ -110,7 +116,11 @@
           -moz-box-shadow:    inset 0px 2px 5px 0px rgba(0, 0, 0, 0.2);
           box-shadow:         inset 0px 2px 5px 0px rgba(0, 0, 0, 0.2);
         }
-        #search-button{ background: url("/images/loreto/search-button.png") no-repeat 0px 8px; }
+        #search-button{
+          background: url("/images/loreto/search-button.png") no-repeat 0px 8px;
+          left: auto;
+          right: 0;
+        }
     }
 
     #tabs{
@@ -244,6 +254,14 @@ body{
         background: -ms-linear-gradient(top,  #a3daff 0%,#92c7ea 100%); /* IE10+ */
         background: linear-gradient(to bottom,  #a3daff 0%,#92c7ea 100%); /* W3C */
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3daff', endColorstr='#92c7ea',GradientType=0 ); /* IE6-8 */
+      }
+    }
+
+    .admin-nav{
+      li a{ color: @link; }
+      .current{
+        background: @link;
+        color: @white;
       }
     }
   }
