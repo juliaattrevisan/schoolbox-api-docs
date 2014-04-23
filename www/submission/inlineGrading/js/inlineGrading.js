@@ -179,6 +179,7 @@
 		 */
 		function renderPrevious() {
 			var isFinished = false;
+			var previous = false;
 			var index = -1;
 
 			/* Find the current element
@@ -186,20 +187,12 @@
 			for (var i = 0; i < config.markedElements.length; i++) {
 				if (config.currentId == config.markedElements[i].navigation.id) {
 					index = i;
-				}
-			}
 
-			/* Go back and find the nearest selectable if any
-			 * might exist (skip if markedElements is empty)
-			 */
-			if (index > -1) {
-				for (var i = index-1; (i >= 0) && !isFinished; i--) {
-					if (config.markedElements[i].selectable == true) {
-
-						/* Construct link
-						 */
-						var value = config.markedElements[i].navigation.value;
-						var label = config.markedElements[i].navigation.label;
+					/* Construct link
+					 */
+					if (previous) {
+						var value = previous.navigation.value;
+						var label = previous.navigation.label;
 
 						var option = '<a class="previous-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&lsaquo;</a>';
 
@@ -210,6 +203,12 @@
 						 */
 						isFinished = true;
 					}
+				}
+
+				/* Mark previous
+				 */
+				if (config.markedElements[i].selectable == true) {
+					previous = config.markedElements[i];
 				}
 			}
 		}
