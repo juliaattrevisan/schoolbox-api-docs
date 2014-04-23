@@ -353,16 +353,19 @@ class Mapper extends BaseMapper {
      * @return Collection|Model[]
      */
     public function findRelatedBookings($id) {
+        // Related bookings: all items that share the same event ID,
+        // but are not the same booking
         $query = "
             SELECT
                 {$this->getColumnString('b')},
                 {$this->getJoinColumnString('resource', 'r')},
                 {$this->getJoinColumnString('event',    'e')}
             FROM {$this->getTable()} b
-            INNER JOIN {$this->getJoinSql('related_booking', 'b', 'rb')}
-            INNER JOIN {$this->getJoinSql('resource',        'b', 'r')}
-            INNER JOIN {$this->getJoinSql('event',           'b', 'e')}
-            WHERE rb.extra_resource_booking_id=:bookingId
+            INNER JOIN {$this->getTable()} rb
+                ON b.event_id = rb.event_id AND b.id != rb.id AND rb.id = :bookingId
+            INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
+            INNER JOIN {$this->getJoinSql('event',    'b', 'e')}
+            WHERE b.deleted_at IS NULL AND b.id != :bookingId
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('bookingId', $id);
