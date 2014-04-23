@@ -381,13 +381,25 @@ class Mapper extends BaseMapper {
     }
 
     /**
-     * Finds all bookings for events in $seriesId, excluding booking $id.
+     * Finds all series bookings for resource booking $id, excluding booking $id.
+     *
+     * This only finds items that are for the same item that $booking is.
      *
      * @param  int $id
      * @param  int $seriesId
      * @return Collection|Model[]
      */
     public function findSeriesBookings($id, $seriesId) {
+        $resourceStatement = $this->getDatabase()->prepare(
+            "SELECT resource_id FROM {$this->getTable()} WHERE id=?"
+        );
+        $resourceStatement->execute(array($id));
+        $resourceId = $resourceStatement->fetchColumn();
+        if ($resourceId === false) {
+            return new Collection();
+        }
+
+
         // Only fetch series ID if booking $id is in series ID
         $query = "
             SELECT
@@ -400,10 +412,12 @@ class Mapper extends BaseMapper {
             WHERE e.series_id = :seriesId
             AND   b.deleted_at IS NULL
             AND   b.id != :id
+            AND   b.resource_id = :resourceId
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('id',       $id);
-        $statement->bindValue('seriesId', $seriesId);
+        $statement->bindValue('id',         $id);
+        $statement->bindValue('seriesId',   $seriesId);
+        $statement->bindValue('resourceId', $resourceId);
         $statement->execute();
         $list = $this->hydrateList($statement, 'b', function($mapper, $model, $row) {
             /** @var self  $mapper */
@@ -413,6 +427,6 @@ class Mapper extends BaseMapper {
                 ->setEvent($mapper->hydrateJoin($row, 'event', 'e'))
             ;
         });
-        return $list->filter(function($item) { return !$item->isDeleted(); });
+        return $list;
     }
 }
