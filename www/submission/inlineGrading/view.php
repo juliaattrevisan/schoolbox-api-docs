@@ -166,43 +166,48 @@ $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL' => $nextUrl
 ));
 
-/* Remember everyone who hasn't submitted
- */
-$noSubmissions = new \Schoolbox\Collection();
-
-/* Find all the submissions to this submission box
- */
-$allSubmissions = $submissionMapper->findByColumn('box_id', $submissionBox->getId());
-
-/* Get a unique list of users who submitted to this box
- */
-$ids = array();
-
-foreach($allSubmissions as $currentSubmission) {
-	$ids[$currentSubmission->getOwner()->getId()] = '';
-}
-
-$ids = array_keys($ids);
-
-/* Find all the people from the hybrid list who didn't exist in $ids
- */
-$noSubmissions = array();
-
-foreach($stack as $currentStudent) {
-	if (!in_array($currentStudent['uid'], $ids)) {
-		$noSubmissions[] = $currentStudent['uid'];
-	}
-}
-
 /* Skip Unsubmitted checkbox
  * Find out who should be skipped and pass them to the js
  */
 if ($submissionBox->getSkipUnsubmitted()) {
+
+	/* Remember everyone who hasn't submitted
+	 */
+	$noSubmissions = array();
+
+	/* Find all the submissions to this submission box
+	 */
+	$allSubmissions = $submissionMapper->findByColumn('box_id', $submissionBox->getId());
+
+	/* Get a unique list of users who submitted to this box
+	 */
+	$ids = array();
+
+	foreach($allSubmissions as $currentSubmission) {
+		$ids[$currentSubmission->getOwner()->getId()] = '';
+	}
+
+	$ids = array_keys($ids);
+
+	/* Find all the people from the hybrid list who didn't exist in $ids
+	 */
+	if (count($ids)) {
+		foreach($stack as $currentStudent) {
+			if (!in_array($currentStudent['uid'], $ids)) {
+				$noSubmissions[] = $currentStudent['uid'];
+			}
+		}
+	}
+
+	/* Parse block
+	 */
 	$this->setVar(array(
 		'SKIP_UNSUBMITTED_CHECKED' => 'checked="checked"',
 		'INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED' => json_encode($noSubmissions),
 	));
 }
+/* Otherwise nobody is disabled
+ */
 else {
 	$this->setVar(array(
 		'SKIP_UNSUBMITTED_CHECKED' => '',
