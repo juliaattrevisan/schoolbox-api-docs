@@ -214,14 +214,10 @@ class SitePage extends Page {
         );
 
         if(empty($_SERVER['HTTPS'])) {
-            $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port')
-                ? Cfg::get('websocket_port')
-                : 8080;
-            }
+            $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port') ?: 8080;
+        }
         else {
-            $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port_ssl')
-                ? Cfg::get('websocket_port')
-                : 8081;
+            $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port_ssl') ?: 8081;
         }
 
         $this->setVar($templateVar);
