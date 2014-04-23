@@ -66,7 +66,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 				$data = $readonlyResult->getData();
 
 				if ($readonlyResult->getMessage() == 'ok') {
-					$this->localRedir(":9001/p/{$data['readOnlyID']}");
+					$this->localRedir(":" . Cfg::get('etherpad_port') . "/p/{$data['readOnlyID']}");
 				}
 			}
 		}
