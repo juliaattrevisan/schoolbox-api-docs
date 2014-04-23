@@ -631,6 +631,7 @@ class Controller extends Base {
                 // Make sure it's preserved.
                 $updatedSelections[] = $relatedResourceId;
                 $relatedBooking->addRelatedBooking($item);
+                $item->addRelatedBooking($relatedBooking);
                 $relatedBookingList->add(
                     $this->updateBookingFieldsFromPostData(
                         $relatedBooking,
