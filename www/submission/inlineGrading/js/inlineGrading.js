@@ -141,7 +141,7 @@
 			/* Do some preprocessing first by indicating which people
 			 * can be selected from the dropdown
 			 */
-			merged.items = markSelectableElements(merged.items, merged.disabled);
+			merged.items = setSelectableElements(merged.items, merged.disabled);
 
 			return merged;
 		}
@@ -151,7 +151,7 @@
 		 *
 		 * @returns {Array}
 		 */
-		function markSelectableElements(items, disabledItems) {
+		function setSelectableElements(items, disabledItems) {
 			var selectableElements = [];
 
 			/* Filter out everyone who has not submitted
