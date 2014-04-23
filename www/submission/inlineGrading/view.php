@@ -31,18 +31,22 @@ $processed = array();
 $stack = array();
 
 foreach ($studentList as $currentStudent) {
-	if (!in_array($currentStudent['uid'], $processed)) {
-		$processed[] = $currentStudent['uid'];
+	if (!in_array($currentStudent->getId(), $processed)) {
+		$processed[] = $currentStudent->getId();
 
 		/* Augment navigation data
 		 */
-		$currentStudent['navigation'] = array(
-			'id' => $currentStudent['uid'],
-			'label' => $currentStudent['lastname'] . ', ' . $currentStudent['firstname'],
-			'value' => '/submission/inlineGrading/view/' . $submissionBoxId . '/' . $currentStudent['uid']
+		$augmented = array(
+			'currentStudent' => $currentStudent,
+			'submission' => null,
+			'navigation' => array(
+				'id' => $currentStudent->getId(),
+				'label' => $currentStudent->getLastname() . ', ' . $currentStudent->getFirstname(),
+				'value' => '/submission/inlineGrading/view/' . $submissionBoxId . '/' . $currentStudent->getId()
+			),
 		);
 
-		$stack[] = $currentStudent;
+		$stack[] = $augmented;
 	}
 }
 
@@ -51,9 +55,9 @@ foreach ($studentList as $currentStudent) {
 $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 
 for ($i=0; $i < count($stack); $i++) {
-	$currentStudent = $stack[$i];
+	$currentAugmented = $stack[$i];
 
-	if ($currentStudent['uid'] == $this->arg[1]) {
+	if ($currentAugmented['currentStudent']->getId() == $this->arg[1]) {
 
 		/* Load a specific submission for this box/person
 		 */
@@ -74,12 +78,12 @@ for ($i=0; $i < count($stack); $i++) {
 			}
 		}
 		else {
-			$collection = $submissionMapper->getHistory($currentStudent['uid'], $submissionBoxId);
+			$collection = $submissionMapper->getHistory($currentAugmented['currentStudent']->getId(), $submissionBoxId);
 
 			/* Get the latest submission, if one exists
 			 */
 			if ($collection->count()) {
-				$currentStudent['submission'] = $collection->first()->getSubmission();
+				$currentAugmented['submission'] = $collection->first()->getSubmission();
 			}
 		}
 
@@ -100,8 +104,8 @@ for ($i=0; $i < count($stack); $i++) {
 $userMapper = new \Schoolbox\UserMapper();
 $user = $userMapper->findById($this->arg[1]);
 
-if ($currentStudent['submission'] != null) {
-	$submissionId = $currentStudent['submission']->getId();
+if ($currentAugmented['submission'] != null) {
+	$submissionId = $currentAugmented['submission']->getId();
 }
 
 /* Data for the navigation selector
@@ -111,7 +115,7 @@ $navigationItems = json_encode($stack);
 $navigationElements = array(
 	'boxId' => $submissionBox->getId(),
 	'previous' => $previousStudent,
-	'current' => $currentStudent,
+	'current' => $currentAugmented['currentStudent'],
 	'next' => $nextStudent,
 );
 
@@ -121,15 +125,17 @@ $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
 /* Render injectable views
  */
-//$currentStudent['submission']
-$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentStudent['submission'], $navigationElements);
+$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentAugmented['submission'], $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
 /* Assign marks
  */
+$oneStudent = new \Schoolbox\Collection();
+$oneStudent->add($currentAugmented['currentStudent']);
+
 $dueWorkDetail = new DueWork_Detail($submissionBoxId);
-$dueWorkDetail->processStudents(array($currentStudent));
+$dueWorkDetail->processStudents($oneStudent);
 $dueWorkDetail->renderDetails($this);
 
 /* Rubric's Cube
@@ -152,7 +158,7 @@ $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
 	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox->getId(),
 	'INLINE_GRADING_SUBMISSION_BOX_NAME' => $submissionBox->getName(),
-	'INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentStudent['uid'],
+	'INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentAugmented['currentStudent']->getId(),
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
 	'INLINE_GRADING_STUDENT_FULL_NAME' => $user->getFullName(),

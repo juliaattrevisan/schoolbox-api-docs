@@ -60,7 +60,7 @@ class DueWork_Detail {
         return $this->sitepageData;
     }
 
-    public function processStudents(array $students) {
+    public function processStudents(\Schoolbox\Collection $students) {
         if (!count($students)) {
             return;
         }
@@ -70,25 +70,8 @@ class DueWork_Detail {
 
             // accepts submissions
             if ($this->getSubmissionType() != self::ACCEPT_NONE) {
-                $submissions = false;
-
-                // search by internal id
-                if ($user['uid']) {
-                    $insertion['user'] = $this->userHandler->getByID($user['uid']);
-                    $submissions = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user['uid']);
-                } // try the synergetic id
-                elseif ($user['synergy_id']) {
-                    $insertion['user'] = $this->userHandler->getBySynergy($user['synergy_id']);
-                    $user['uid'] = $insertion['user']['uid'];
-                    $submissions = $this->submissionStudentHandler->getBySynergyID(
-                        $this->dueWork['id'], $user['synergy_id']
-                    );
-                }
-
-                // if the user doesn't exist in schoolbox, we don't want to see them (since we can't operate on them)
-                if (!isset($insertion['user']['uid'])) {
-                    continue;
-                }
+				$insertion['user']['instance'] = $user;
+				$submissions = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user->getId());
 
                 // an empty array is preferred to false
                 if (!$submissions) {
@@ -128,28 +111,18 @@ class DueWork_Detail {
 
             } // does not accept submissions
             else {
+				$insertion['user']['instance'] = $user;
                 $insertion['user']['status'] = '';
                 $insertion['user']['class'] = '';
-
-                if ($user['uid']) {
-                    $insertion['user'] = $this->userHandler->getByID($user['uid']);
-                } // try the synergetic id
-                elseif ($user['synergy_id']) {
-                    $insertion['user'] = $this->userHandler->getBySynergy($user['synergy_id']);
-                    $user['uid'] = $insertion['user']['uid'];
-                } // ignore this user
-                else {
-                    continue;
-                }
             }
 
             // get student's mark, if there is one
-            $insertion['mark'] = $this->marksheet->retrieveMark($user['uid'], $this->dueWork['id']);
+            $insertion['mark'] = $this->marksheet->retrieveMark($user->getId(), $this->dueWork['id']);
 
-            $returns = $this->submissionReturnHandler->getByUser($user['uid'], $this->dueWork['id']);
+            $returns = $this->submissionReturnHandler->getByUser($user->getId(), $this->dueWork['id']);
             $insertion['return'] = is_array($returns) ? $returns[0] : array();
 
-            $this->sitepageData[$user['uid']] = $insertion;
+            $this->sitepageData[$user->getId()] = $insertion;
         }
     }
 
@@ -221,20 +194,16 @@ class DueWork_Detail {
             // output the student row
             $page->setVar(
                 array(
-                    'OWNER_ID' => $record['user']['uid'],
-                    'OWNER_NAME' => $this->userHandler->formatName($record['user'], '{lastname}, {firstname}', true),
-                    'OWNER_ESCAPED' => addslashes(
-                        $this->userHandler->formatName($record['user'], '{firstname} {lastname}')
-                    ),
+                    'OWNER_ID' => $record['user']['instance']->getId(),
+                    'OWNER_NAME' => $record['user']['instance']->formatName('{lastname}, {firstname}'),
+                    'OWNER_ESCAPED' => addslashes($record['user']['instance']->formatName('{firstname} {lastname}')),
                     'OWNER_STATUS' => $record['user']['status'],
                     'OWNER_CLASS' => $record['user']['class'],
-                    'OWNER_IMG' => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['synergy_id'])
+                    'OWNER_IMG' => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['instance']->getexternalId())
                 )
             );
 
-            $this->renderMarking(
-                $page, 'OWNER_MARKING', $record['user']['uid'] . $this->dueWork['id'], $record['mark']
-            );
+            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->dueWork['id'], $record['mark']);
 
             //
             // Reset the contents of the submission row block, so that each student starts with a fresh row
