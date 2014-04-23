@@ -64,6 +64,7 @@ then
 		then
 			sed -i "s/schoolbox/schoolboxdev/g" debian/*
 			sed -i "s/schoolboxdev.com.au/schoolbox.com.au/g" debian/*
+			sed -i "s/schoolboxdev-epl/schoolbox-epl/g" debian/*
 			for i in `ls -1 debian/schoolbox*`;
 			do
 				mv $i `echo $i | sed "s/schoolbox/schoolboxdev/g"`;
