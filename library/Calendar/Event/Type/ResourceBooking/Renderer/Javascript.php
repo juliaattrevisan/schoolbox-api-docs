@@ -133,7 +133,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         }
 
         $event = array(
-            'title' => Scrub::text($currentEvent->getNote()),
+            'title' => Scrub::text('Booking: '.$currentEvent->getBooking()->getResource()->getName()),
             'start' => "$start",
             'end' => "$end",
 
