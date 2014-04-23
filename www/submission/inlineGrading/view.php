@@ -198,9 +198,9 @@ if ($submissionBox->getSkipUnsubmitted()) {
 	/* Find all the people from the hybrid list who didn't exist in $ids
 	 */
 	if (count($ids)) {
-		foreach($stack as $currentStudent) {
-			if (!in_array($currentStudent['uid'], $ids)) {
-				$noSubmissions[] = $currentStudent['uid'];
+		foreach($stack as $current) {
+			if (!in_array($current['currentStudent']->getId(), $ids)) {
+				$noSubmissions[] = $current['currentStudent']->getId();
 			}
 		}
 	}
