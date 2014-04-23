@@ -27,7 +27,7 @@
         <input type="hidden" name="homepage" value="" />
         <span data-resource_text></span>
         <p class="interact add_buttons">
-            <a href="#" class="btn float-right up-arrow" data-interaction="homepage_selector">
+            <a href="#" class="btn float-right folder" data-interaction="homepage_selector">
                 <span></span>Select Source
             </a>
         </p>
@@ -76,7 +76,7 @@
                         <input type="hidden" name="id"        value="{UNIT_ID}" />
                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                         <button type="submit" class="btn delete" data-interaction="delete_confirm"><span></span> Yes</button>
-                        <a href="#" class="btn go-to delete-reject" data-interaction="delete_reject"><span></span> No</a>
+                        <a href="#" class="btn cross delete-reject" data-interaction="delete_reject"><span></span> No</a>
                     </form>
                 </div>
 
@@ -165,7 +165,7 @@
                                 <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                                 <input type="hidden" name="unit_id"   value="{UNIT_ID}"/>
                                 <button type="submit" class="btn delete" data-interaction="delete_confirm"><span></span> Yes</button>
-                                <a href="#" class="btn go-to delete-reject" data-interaction="delete_reject"><span></span> No</a>
+                                <a href="#" class="btn cross delete-reject" data-interaction="delete_reject"><span></span> No</a>
                             </form>
                         </div>
                         <!-- END unit_task_delete_form -->
@@ -179,7 +179,7 @@
                     <!-- END unit_report_actions -->
                     <!-- BEGIN unit_add_task_actions -->
                     <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="btn up-arrow" data-form_class="for_due_work"><span></span>Post Due Work</a>
-                    <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="btn create" data-form_class="for_assessment"><span></span>Create Quiz</a>
+                    <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="btn list" data-form_class="for_assessment"><span></span>Create Quiz</a>
                     <a href="/task/createInstance/{UNIT_ID}" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
                     <!-- END unit_add_task_actions -->
                 </p>
