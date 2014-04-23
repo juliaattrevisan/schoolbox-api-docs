@@ -543,9 +543,10 @@ class Controller extends Base {
             $endDelta = \Alaress\Date\Interval::createFromDateTimeDifference(
                 $item->getEvent()->getEndDateTime(), $endDate
             );
+            $notes = $this->getRequest()->post['notes'];
 
             // Update this item.
-            $this->updateBookingFromPostData($item, $startDelta, $endDelta);
+            $this->updateBookingFromPostData($item, $startDelta, $endDelta, $notes);
 
             // Has the time changed? If so:
             // * If this is a single item, just set status back to pending.
@@ -565,7 +566,7 @@ class Controller extends Base {
                     if ($seriesEvent->getStartDateTime() < new DateTime()) {
                         continue;
                     }
-                    $this->updateBookingFromPostData($seriesBooking, $startDelta, $endDelta);
+                    $this->updateBookingFromPostData($seriesBooking, $startDelta, $endDelta, $notes);
                 }
             }
 
@@ -604,17 +605,20 @@ class Controller extends Base {
      * @param Model    $item
      * @param Interval $startDelta
      * @param Interval $endDelta
+     * @param string   $notes
      */
     protected function updateBookingFromPostData(
         Model $item,
         Interval $startDelta,
-        Interval $endDelta
+        Interval $endDelta,
+        $notes
     ) {
-        $this->updateBookingFieldsFromPostData($item, $startDelta, $endDelta);
+        $this->updateBookingFieldsFromPostData($item, $startDelta, $endDelta, $notes);
 
-        // Add related bookings for items for ones that weren't selected.
-        // Preserve any related bookings for items that are selected
-        // Remove any related bookings for items that aren't.
+        // Related bookings:
+        // Item wasn't selected and is now: add booking and relation
+        // Item was selected and isn't anymore: cancel booking and remove relation
+        // Item was selected and still is: preserve booking relation
         $relatedEventList     = new Collection();
         $relatedBookingList   = new Collection();
         $unrelatedBookingList = new Collection();
@@ -631,7 +635,8 @@ class Controller extends Base {
                     $this->updateBookingFieldsFromPostData(
                         $relatedBooking,
                         $startDelta,
-                        $endDelta
+                        $endDelta,
+                        $notes
                     )
                 );
                 $relatedEventList->add($relatedBooking->getEvent());
@@ -685,12 +690,14 @@ class Controller extends Base {
      * @param  Model    $item
      * @param  Interval $startDelta
      * @param  Interval $endDelta
+     * @param  string   $notes
      * @return Model
      */
     protected function updateBookingFieldsFromPostData(
         Model $item,
         Interval $startDelta,
-        Interval $endDelta
+        Interval $endDelta,
+        $notes
     ) {
         $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
 
@@ -711,7 +718,7 @@ class Controller extends Base {
                 $item->setStatus(Status\Model::STATUS_APPROVED);
             }
         }
-        $event->setDetail($this->getRequest()->post['notes']);
+        $event->setDetail($notes);
         // Clear the role and campus collection
         $event->setRoleCollection(new Collection());
         $event->setCampusCollection(new Collection());
