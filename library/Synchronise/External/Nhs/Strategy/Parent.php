@@ -83,17 +83,37 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
     }
 
     /**
-     * Doesn't do anything, but always returns 1 so that executePostCreateUpdate
-     * runs.
+     * For a user which contains both contact and spouse: return nothing for
+     * first name, and "$surname Family" for surname.
      *
-     * @param  array $newUser
-     * @return int
+     * For a user which doesn't: fall back to standard implementation.
+     *
+     * @param  array  $currentUser
+     * @return string
      */
-    protected function executeCreateUpdate($newUser) {
-        return 1;
+    public function getFirstNameFromUser($currentUser) {
+        if (!empty($currentUser['StudentContactSpouseName'])) {
+            return '';
+        }
+        return parent::getFirstNameFromUser($currentUser);
     }
 
+    /**
+     * @see $this->getFirstNameFromUser()
+     *
+     * @param  array  $currentUser
+     * @return string
+     */
+    public function getLastNameFromUser($currentUser) {
+        if (!empty($currentUser['StudentContactSpouseName'])) {
+            return $currentUser['StudentContactSurname'] . ' Family';
+        }
+        return $currentUser['StudentContactSurname'];
+    }
 
+    /**
+     * Create parent accounts, user relations and user profiles.
+     */
     public function createIfExists() {
         $this->verbose_filter->intro();
 
