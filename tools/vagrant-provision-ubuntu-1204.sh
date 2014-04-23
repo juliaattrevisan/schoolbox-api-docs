@@ -136,7 +136,7 @@ echo "$vag Install schoolbox-socketd";
 cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
 cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
 
-echo "$vag Install schoolbox-socketd";
+echo "$vag Install schoolbox-digestd";
 cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
 cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
 
