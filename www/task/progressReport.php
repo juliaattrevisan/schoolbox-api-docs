@@ -242,7 +242,7 @@ foreach ($task_list as $task) {
     );
     if (!empty($box_id)) {
         $detail = new DueWork_Detail($box_id);
-        $detail->processStudents($student_list);
+        $detail->processStudents($userCollection);
         $student_submission_list[$box_id] = $detail->getSitepageData();
         $this->parse('subheader_unit_task_submission_link_block', 'subheader_unit_task_submission_link');
     }
