@@ -620,31 +620,28 @@ class Controller extends Base {
         // Item was selected and isn't anymore: cancel booking and remove relation
         // Item was selected and still is: preserve booking relation
         $relatedEventList     = new Collection();
-        $relatedBookingList   = new Collection();
-        $unrelatedBookingList = new Collection();
+        $insertedBookingList  = new Collection();
+        $deletedBookingList   = new Collection();
         $updatedSelections    = array();
         $relatedSelections    = $this->getRequest()->post['related_item'] ?: array();
-        foreach ($this->getBookingMapper()->findRelatedBookings($item->getId()) as $relatedBooking) {
+        $relatedBookingList   = $this->getBookingMapper()->findRelatedBookings($item->getId());
+        foreach ($relatedBookingList as $relatedBooking) {
             $relatedResourceId = $relatedBooking->getResource()->getId();
             if (in_array($relatedResourceId, $relatedSelections)) {
                 // Is the resource still selected?
-                // Make sure it's preserved.
+                // Make sure it's preserved, and the event is updated.
                 $updatedSelections[] = $relatedResourceId;
-                $relatedBooking->addRelatedBooking($item);
-                $item->addRelatedBooking($relatedBooking);
-                $relatedBookingList->add(
-                    $this->updateBookingFieldsFromPostData(
-                        $relatedBooking,
-                        $startDelta,
-                        $endDelta,
-                        $notes
-                    )
+                $relatedBooking = $this->updateBookingFieldsFromPostData(
+                    $relatedBooking,
+                    $startDelta,
+                    $endDelta,
+                    $notes
                 );
                 $relatedEventList->add($relatedBooking->getEvent());
             }
             else {
                 // Remove from the list if it isn't.
-                $unrelatedBookingList->add($relatedBooking);
+                $deletedBookingList->add($relatedBooking);
             }
         }
 
@@ -652,8 +649,7 @@ class Controller extends Base {
         // Add them to the list.
         $insertedSelections = array_diff($relatedSelections, $updatedSelections);
         if (!empty($insertedSelections)) {
-            $insertedBookingList = new Collection();
-            $resource            = $this->getResourceMapper()->findById($item->getResource()->getId());
+            $resource = $this->getResourceMapper()->findById($item->getResource()->getId());
             foreach ($resource->getRelatedResourceList() as $relatedResource) {
                 if (in_array($relatedResource->getId(), $insertedSelections)) {
                     // New related booking: uses same event as base booking.
@@ -662,16 +658,12 @@ class Controller extends Base {
                         $item->getEvent()
                     );
                     // Ensure that the base and related booking are related.
-                    $relatedBooking->addRelatedBooking($item);
-                    $item->addRelatedBooking($relatedBooking);
                     $insertedBookingList->add($relatedBooking);
-                    $relatedBookingList->add($relatedBooking);
                 }
             }
             // Save the inserted bookings.
             $this->getBookingMapper()->save($insertedBookingList);
         }
-        $item->setRelatedBookingList($relatedBookingList);
 
         // Apply the changes to the related booking as well.
         $this->getEventMapper()->save($item->getEvent());
@@ -679,8 +671,8 @@ class Controller extends Base {
 
         // Save each of the related items and their events
         $this->getEventMapper()->save($relatedEventList);
-        $this->getBookingMapper()->save($relatedBookingList);
-        $this->getBookingMapper()->delete($unrelatedBookingList);
+        $this->getBookingMapper()->save($insertedBookingList);
+        $this->getBookingMapper()->delete($deletedBookingList);
     }
 
     /**
