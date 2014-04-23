@@ -99,6 +99,12 @@
 		 */
 		var config = init(options, this);
 
+		/* Mark which people can be selected
+		 */
+		config.markedElements = markSelectableElements();
+
+		/* Render controls
+		 */
 		renderPrevious();
 		renderSelect();
 		renderNext();
@@ -140,37 +146,29 @@
 		}
 
 		/**
-		 * Find all the people who can be selected
+		 * Mark all the people who can be selected
 		 *
 		 * @returns {Array}
 		 */
-		function findSelectableElements() {
-			var selectableElements = new Array();
+		function markSelectableElements() {
+			var selectableElements = [];
 
 			/* Filter out everyone who has not submitted
 			 */
 			for (var i = 0; i < config.items.length; i++) {
-				if (jQuery.inArray(config.items[i].navigation.id, config.disabled) < 0) {
-					selectableElements.push(config.items[i].navigation);
+				var updatedObject = config.items[i];
+
+				if (jQuery.inArray(updatedObject.navigation.id, config.disabled) < 0) {
+					updatedObject.selectable = true;
 				}
+				else {
+					updatedObject.selectable = false;
+				}
+
+				selectableElements.push(updatedObject);
 			}
 
 			return selectableElements;
-		}
-
-		/**
-		 * Find the selectable ids from selectableElements
-		 *
-		 * @param selectableElements
-		 */
-		function findSelectableIds(selectableElements) {
-			var selectableIds = [];
-
-			for (var i = 0; i < selectableElements.length; i++) {
-				selectableIds.push(selectableElements[i].id);
-			}
-
-			return selectableIds;
 		}
 
 		/**
@@ -180,34 +178,38 @@
 		 * yet submitted anything
 		 */
 		function renderPrevious() {
+			var index = -1;
 
-			/* Direct 1:1 correspondence
+			/* Find the current element
 			 */
-			var selectableElements = findSelectableElements();
-			var selectableIds = findSelectableIds(selectableElements);
+			for (var i = 0; i < config.markedElements.length; i++) {
+				if (config.currentId == config.markedElements[i].navigation.id) {
+					index = i;
+				}
+			}
 
-			/* If there is only one selectable element,
-			 * previous should just go away
-			 *
-			 * Otherwise find the element prior to the current
+			/* Go back and find the nearest selectable
 			 */
-			if (selectableElements.length > 1) {
-				var index = $.inArray(config.currentId, selectableIds);
+			if (index > -1) {
+				var isFound = false;
 
-				/* Not at the start of the list
-				 */
-				if (index > 0) {
-					var previous = selectableElements[index-1];
+				for (var i = index-1; (i >= 0) && (isFound == false); i--) {
+					if (config.markedElements[i].selectable == true) {
 
-					/* Construct link
-					 */
-					var value = previous.value;
-					var label = previous.label;
+						/* Construct link
+						 */
+						var value = config.markedElements[i].navigation.value;
+						var label = config.markedElements[i].navigation.label;
 
-					var option = '<a class="previous-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&lsaquo;</a>';
+						var option = '<a class="previous-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&lsaquo;</a>';
 
-					config.element.append(option);
-					config.previousItemCallback();
+						config.element.append(option);
+						config.previousItemCallback();
+
+						/* Jump out
+						 */
+						isFound = true;
+					}
 				}
 			}
 		}
@@ -259,34 +261,33 @@
 		 * yet submitted anything
 		 */
 		function renderNext() {
+			var isFinished = false;
+			var useNext = false;
 
-			/* Direct 1:1 correspondence
+			/* Find the current element
 			 */
-			var selectableElements = findSelectableElements();
-			var selectableIds = findSelectableIds(selectableElements);
+			for (var i = 0; (i < config.markedElements.length) && !isFinished; i++) {
 
-			/* If there is only one selectable element,
-			 * previous should just go away
-			 *
-			 * Otherwise find the element prior to the current
-			 */
-			if (selectableElements.length > 1) {
-				var index = $.inArray(config.currentId, selectableIds);
-
-				/* Not at the end of the list
+				/* Decide whether to use the next selectable element
 				 */
-				if (index < selectableElements.length-1) {
-					var next = selectableElements[index+1];
+				if (config.currentId == config.markedElements[i].navigation.id) {
+					useNext = true;
+				}
+				else if (useNext && config.markedElements[i].selectable == true) {
 
 					/* Construct link
 					 */
-					var value = next.value;
-					var label = next.label;
+					var value = config.markedElements[i].navigation.value;
+					var label = config.markedElements[i].navigation.label;
 
 					var option = '<a class="next-item" href="'+ value +'" alt="'+ label +'" title="'+ label+'">&rsaquo;</a>';
 
 					config.element.append(option);
 					config.nextItemCallback();
+
+					/* Jump out
+					 */
+					isFinished = true;
 				}
 			}
 		}
