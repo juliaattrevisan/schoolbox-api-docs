@@ -568,22 +568,6 @@ class External_Maze_User implements External_UserInterface {
 		return $this->getHelper()->getCurrentSemester($externalUserId);
 	}
 
-	public function samuel($externalUserId) {
-		$query = "
-			SELECT
-				ST.FIRST_NAME,
-				ST.SURNAME,
-				KGC.ROLL_GROUP AS ClassCode,
-				KGC.DESCRIPTION AS name
-			FROM ST
-			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
-		";
-
-		$everything = $this->getDb()->getAll($query);
-
-		new \Alaress_Probe($everything);
-	}
-
 	/**
 	 * Get a list of subjects for a particular user
 	 *
