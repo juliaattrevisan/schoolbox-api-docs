@@ -78,9 +78,16 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract {
 		 */
 		echo "{}]";
 
+		// Save page that is being viewed into history.
+		// Problem with storing start of sequence:
+		// month view often starts at a day in the previous month.
+		// Therefore, consider setting as midpoint between two dates, or the
+		// first of the actual month being shown.
 		$page = new SitePage(false);
-		$page->saveHistory('/calendar/full/' . $startSequence->getUsingFormat('d-m-Y'));
+		$midSequence = new Alaress_Date_Format((intval($_GET['start']) + intval($_GET['end'])) / 2, 'U');
 
+		// Also store the current user in the history
+		$page->saveHistory('/calendar/full/' . $midSequence->getUsingFormat('d-m-Y') . '/' . $this->getUser()->getId());
 		exit();
 	}
 }
