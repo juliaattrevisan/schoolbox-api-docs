@@ -114,9 +114,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                             $i++;
                         }
 
-                        if ($pollHandler->hasResults($poll['pollID'])) {
-                            $this->parse('show_results_block', 'show_results');
-                        }
+                        $this->parse('show_results_block', 'show_results');
 
                     }
                     $this->setVar('poll_chart_block', '');
