@@ -16,8 +16,8 @@ class Display extends AbstractFactory {
 	 *
 	 * @param $url
 	 */
-	public function __construct($url) {
-		$this->setUrl(trim($url));
+	public function __construct($type) {
+		$this->setUrl(trim($type));
 	}
 
 	/**
@@ -28,49 +28,14 @@ class Display extends AbstractFactory {
 	 */
 	public function produce($data = null) {
 
-		/* If a url was provided, determine what kind it was
-		 */
-		if (strlen($this->getUrl())) {
+        $type = $this->getUrl();
 
-			/* Figure out if it's a video
-			 */
-			foreach ($this->getVideoSites() as $currentPattern) {
-				if (preg_match($currentPattern, $this->getUrl())) {
-
-					/* If it was a Resource url, find out whether it was
-					 * actually a video or not -_-
-					 */
-					$urlDetection = new \SocialStream\UrlDetection($this->getUrl());
-
-					if ($urlDetection->isResourceUrl()) {
-						$fileMapper = new \Schoolbox\Resource\FileMapper();
-						$file = $fileMapper->findById($urlDetection->getId());
-
-						if ($file->getMimeType()->isVideo()) {
-							$object = new \SocialStream_Post_Video();
-							$object->setType('video');
-
-							return $object;
-						}
-					}
-					/* All other non-Resource urls
-					 */
-					else {
-						$object = new \SocialStream_Post_Video();
-						$object->setType('video');
-
-						return $object;
-					}
-				}
-			}
-
-			/* Alternatively it's just a link to the internet
-			 */
-			$object = new \SocialStream_Post_Url();
-			$object->setType('url');
-
-			return $object;
-		}
+        $objectName = '\SocialStream_Post_'.ucwords($type);
+        if(class_exists($objectName)) {
+            $object = new $objectName();
+            $object->setType($type);
+            return $object;
+        }
 
 		/* If it was not a video, link to the internet, then assume it's
 		 * just a plain old text message

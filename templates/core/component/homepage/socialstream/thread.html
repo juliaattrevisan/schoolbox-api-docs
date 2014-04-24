@@ -16,7 +16,6 @@
 				<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square32" />
 				{SOCIALSTREAM_POST_USER_FULLNAME}
 			</a>
-			Posted {SOCIALSTREAM_POST_CREATED_AT}
 		</p>
 		<div class="body">
 			{SOCIALSTREAM_POST_BODY}
@@ -34,6 +33,12 @@
 					<img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
 				</a>
 				<!-- END socialstream_post_has_thumbnail -->
+
+                <!-- BEGIN socialstream_post_has_image -->
+                <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                    <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=constrain200" />
+                </a>
+                <!-- END socialstream_post_has_image -->
 
 				<!-- BEGIN socialstream_post_has_metadata -->
 				<a href="{SOCIALSTREAM_POST_URL}" target="_blank">{SOCIALSTREAM_POST_EXTERNAL_TITLE}</a><br />
@@ -63,7 +68,10 @@
 
 			</div>
 			<!-- END socialstream_post_has_attachment -->
-
+            <p class="meta">
+                Posted {SOCIALSTREAM_POST_CREATED_AT} |
+                <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_POST_POST_ID}" title="Add Reply"><span>Reply</span></a>
+            </p>
 		</div>
 
 		<ul>
@@ -84,7 +92,6 @@
 						<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" />
 						{SOCIALSTREAM_COMMENT_USER_FULLNAME}
 					</a>
-					Posted {SOCIALSTREAM_COMMENT_CREATED_AT}
 				</p>
 
 				<div class="body">
@@ -98,6 +105,13 @@
 							<img src="/images/mime/60x60/{SOCIALSTREAM_COMMENT_ICON}" />
 						</a>
 						<!-- END socialstream_comment_has_icon -->
+
+                        <!-- BEGIN socialstream_comment_has_image -->
+                        <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                            <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=constrain200" />
+                        </a>
+                        <!-- END socialstream_comment_has_image -->
+
 
 						<!-- BEGIN socialstream_comment_has_thumbnail -->
 						<a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
@@ -131,6 +145,10 @@
 						<span class="description">{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</span>
 						<!-- END socialstream_comment_has_metadata -->
 					</div>
+                    <p class="meta">
+                        Posted {SOCIALSTREAM_COMMENT_CREATED_AT} |
+                        <a href="#" class="addPostLink" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" title="Add Reply"><span>Reply</span></a>
+                    </p>
 					<!-- END socialstream_comment_has_attachment -->
 				</div>
 
@@ -148,7 +166,6 @@
 								<img height="32" width="32" src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" />
 								{SOCIALSTREAM_REPLY_USER_FULLNAME}
 							</a>
-							Posted {SOCIALSTREAM_REPLY_CREATED_AT}
 						</p>
 
 						<div class="body">
@@ -161,6 +178,12 @@
 									<img src="/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}" />
 								</a>
 								<!-- END socialstream_reply_has_icon -->
+
+                                <!-- BEGIN socialstream_reply_has_image -->
+                                <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                                    <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=constrain200" />
+                                </a>
+                                <!-- END socialstream_reply_has_image -->
 
 								<!-- BEGIN socialstream_reply_has_thumbnail -->
 								<a class="thumb" href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
@@ -194,6 +217,9 @@
 								<span class="description">{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</span>
 								<!-- END socialstream_reply_has_metadata -->
 							</div>
+                            <p class="meta">
+                                Posted {SOCIALSTREAM_REPLY_CREATED_AT}
+                            </p>
 							<!-- END socialstream_reply_has_attachment -->
 						</div>
 					</li>

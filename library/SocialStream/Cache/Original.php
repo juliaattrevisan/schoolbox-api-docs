@@ -112,11 +112,10 @@ class Original extends \Alaress_Cache_Abstract {
 	}
 
 	/**
-	 * Alias for getResult() so it can be used in a more meaningful context
-	 * outside of this class
+	 * Has thumbnail is either when file has successfully downloaded or the cache file already exists
 	 */
 	public function hasThumbnail() {
-		return $this->getResult();
+		return $this->getResult() || is_readable($this->getCachedFile());
 	}
 
 	/* Getters/Setters

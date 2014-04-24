@@ -31,7 +31,7 @@ class FileType extends DeprecatedModel {
 	 * @return string
 	 */
 	public function getExtension() {
-		return substr(strrchr($this->getPath(), '.'), 1);
+		return strtolower(substr(strrchr($this->getPath(), '.'), 1));
 	}
 
 	/**

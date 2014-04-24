@@ -166,7 +166,6 @@ class Creational extends AbstractFactory {
 				$this->populate($data);
 			}
 		}
-
 		return $this->getProduct();
 	}
 
@@ -187,6 +186,19 @@ class Creational extends AbstractFactory {
 				return;
 			}
 		}
+
+        /* Check if we have been given a URL to an image */
+        if($filename = pathinfo(parse_url($this->getUrl(),PHP_URL_PATH),PATHINFO_BASENAME)) {
+            try {
+                $file = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($filename);
+                if($file->isImage()) {
+                    $object = new \SocialStream_Post_Image();
+                    $object->setType('image');
+                    $this->setProduct($object);
+                    return;
+                }
+            } catch (\Exception $e) { }
+        }
 
 		/* Alternatively it's just a link to the internet
 		 */
@@ -214,6 +226,10 @@ class Creational extends AbstractFactory {
 		}
 		/* Other files
 		 */
+        else if($resource->getMimetype()->isImage()){
+            $object = new \SocialStream_Post_Image();
+            $object->setType('image');
+        }
 		else {
 			$object = new \SocialStream_Post_Url();
 			$object->setType('url');
@@ -244,6 +260,10 @@ class Creational extends AbstractFactory {
 			$object = new \SocialStream_Post_Video();
 			$object->setType('video');
 		}
+        else if($file->getMimetype()->isImage()){
+            $object = new \SocialStream_Post_Image();
+            $object->setType('image');
+        }
 		else {
 			$object = new \SocialStream_Post_Url();
 			$object->setType('url');
@@ -337,6 +357,7 @@ class Creational extends AbstractFactory {
 				/* Thumbnail metadata was found, but thumbnail itself
 				 * isn't there (broken link)
 				 */
+
 				if (!$cache->hasThumbnail()) {
 					$this->getProduct()->setThumbnail('');
 				}
