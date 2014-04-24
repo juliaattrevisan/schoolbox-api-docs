@@ -188,7 +188,8 @@ if (!empty($_POST)) {
 	/* Visibility dropdown
 	 */
 	$this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
-	$this->outputVisibilityDropdown($assessment->getVisibilityId());
+	$widgets = new \Schoolbox\Assessment\Widgets();
+	$widgets->outputVisibilityDropdown($this, $assessment->getVisibilityId());
 	$this->parse('marktype_block', 'marktype');
 
 	/* Show this Assess' contents

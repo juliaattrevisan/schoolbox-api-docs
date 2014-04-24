@@ -257,7 +257,8 @@ else {
 	/* Visibility dropdown
 	 */
 	$this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
-	$this->outputVisibilityDropdown(\Config::get('submission_access'));
+	$widgets = new \Schoolbox\Assessment\Widgets();
+	$widgets->outputVisibilityDropdown($this, \Config::get('submission_access'));
 	$this->parse('marktype_block', 'marktype');
 
     /* Don't display questions contents, which appears in Modify

@@ -217,7 +217,8 @@ $this->dropDown('type_drop', $work_types, $work_type, TEMPLATE_content, array(
 ));
 
 // Output mark visibility
-$this->outputVisibilityDropdown($submission->getMarkVisibility());
+$widgets = new \Schoolbox\Assessment\Widgets();
+$widgets->outputVisibilityDropdown($this, $submission->getMarkVisibility());
 
 // Output marktype drop down
 // (If it's an old style free mark, then output nothing)
