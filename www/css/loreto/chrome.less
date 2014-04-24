@@ -66,6 +66,9 @@
 @tab-hover-background:		    @tab-color;
 @tab-hover-color:				@link;
 
+// Infopanel
+@notify-open-text-color:		@link;
+
 // Footer text
 @footer-color:					#797979;
 @footer-links:					@footer-color;
@@ -82,6 +85,21 @@
 // =============================================================================
 // 4. Any overrides for styles can be specified below
 // =============================================================================
+
+#infoPanel {
+	.bell {
+		background-image: url('/images/loreto/bell.png');
+		border-radius: 3px;
+		&.open {
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+	}
+	#message-list {
+		border-radius: 3px;
+		border-top-right-radius: 0;
+	}
+}
 
 #header{
     background:
