@@ -74,9 +74,9 @@ class Factory {
 		if ($this->getSubmission() === null) {
 			return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
-		/* Crocodoc-friendly file types
+		/* Crocodoc-friendly file types (only if Crocodoc is active with an api token)
 		 */
-		else if (in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
+		else if (strlen(\Cfg::get('crocodoc_api_token')) && in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
 			return new Strategy\Crocodoc($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		/* Other special presentation methods for inline viewing of media
