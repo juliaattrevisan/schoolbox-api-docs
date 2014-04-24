@@ -2584,11 +2584,83 @@ input.timeField {
     &.print:hover span {
         .btn-icon(47);
     }
-    &.filter span {
+    &.rss span {
+      .btn-icon(48);
+    }
+    &.rss:hover span {
+      .btn-icon(49);
+    }
+    &.cog span {
+      .btn-icon(50);
+    }
+    &.cog:hover span {
+      .btn-icon(51);
+    }
+    &.line-graph span {
+      .btn-icon(52);
+    }
+    &.line-graph:hover span {
+      .btn-icon(53);
+    }
+    &.list span {
       .btn-icon(54);
     }
-    &.filter:hover span {
+    &.list:hover span {
       .btn-icon(55);
+    }
+    &.dl span {
+      .btn-icon(56);
+    }
+    &.dl:hover span {
+      .btn-icon(57);
+    }
+    &.links span {
+      .btn-icon(58);
+    }
+    &.links:hover span {
+      .btn-icon(59);
+    }
+    &.star span {
+      .btn-icon(60);
+    }
+    &.star:hover span {
+      .btn-icon(61);
+    }
+    &.bed span {
+      .btn-icon(62);
+    }
+    &.bed:hover span {
+      .btn-icon(63);
+    }
+    &.folder span {
+      .btn-icon(64);
+    }
+    &.folder:hover span {
+      .btn-icon(65);
+    }
+    &.calendar span {
+      .btn-icon(66);
+    }
+    &.calendar:hover span {
+      .btn-icon(67);
+    }
+    &.cross span {
+      .btn-icon(68);
+    }
+    &.cross:hover span {
+      .btn-icon(69);
+    }
+    &.docs span {
+      .btn-icon(70);
+    }
+    &.docs:hover span {
+      .btn-icon(71);
+    }
+    &.clock span {
+      .btn-icon(72);
+    }
+    &.clock:hover span {
+      .btn-icon(73);
     }
     &.export span {
       .btn-icon(74);
@@ -5292,9 +5364,6 @@ CALENDAR
         padding: 0 8px;
         color: @black;
         font-weight: normal;
-        &:hover {
-            background-color: @white;
-        }
     }
     .float-left {
         width: 26%;
@@ -5316,19 +5385,32 @@ CALENDAR
         text-indent: -9999em;
         font-size: 1px;
         padding: 0;
-        background-color: @content-background;
+        background-color: @dark;
         margin-left: 6px;
         margin-top: 5px;
         border: 1px solid @lgrey;
     }
-    .back, .forward {
+    .back strong, .forward strong {
         text-indent: -99999em;
+        display: block;
+        height: 13px;
+        top: 5px;
+        position: relative;
+        left: 4px;
     }
-    .back {
-        background: @alternate-background url(/images/core/calendar/cal-left.png) no-repeat 50% 50%;
+    .back strong{
+        background: url(/images/core/icons/btn-icons.png) no-repeat;
+        .btn-icon(38);
+        &:hover{
+          background-position: 0 -545px;
+        }
     }
-    .forward {
-        background: @alternate-background url(/images/core/calendar/cal-right.png) no-repeat 50% 50%;
+    .forward strong{
+        background: url(/images/core/icons/btn-icons.png) no-repeat;
+        .btn-icon(28);
+        &:hover{
+          .btn-icon(29);
+        }
     }
     .datepicker-box {
         float: left;
@@ -5418,8 +5500,8 @@ CALENDAR
           text-indent: -9000px;
         }
         &:hover span{
-          background-position: 0 -545px;
-        }
+           background-position: 0 -545px;
+         }
     }
     .ui-datepicker-trigger {
         cursor: pointer;

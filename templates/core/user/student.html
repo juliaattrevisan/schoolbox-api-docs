@@ -76,11 +76,11 @@
             <!-- END medical -->
             <p class="school-info">
                 <!-- BEGIN timetable_link -->
-                <a href="/timetable/{ID}" class="btn report float-left"><span></span>Timetable</a>
+                <a href="/timetable/{ID}" class="btn clock float-left"><span></span>Timetable</a>
                 <!-- END timetable_link -->
 
                 <!-- BEGIN due_work -->
-                <a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"><span></span>Due Work</a>
+                <a href="/submission/dueWork/0/{ID}" class="btn dl float-left"><span></span>Due Work</a>
                 <!-- END due_work -->
 
                 <!-- BEGIN grades_button -->
@@ -92,7 +92,7 @@
                 <!-- END eportfolio -->
 
                 <!-- BEGIN boarder_leave -->
-                <a href="/modules/leave/student/{ID}" class="btn eportfolio float-left"><span></span>Boarder Leave History</a>
+                <a href="/modules/leave/student/{ID}" class="btn bed float-left"><span></span>Boarder Leave History</a>
                 <!-- END boarder_leave -->
 
 				<!-- BEGIN user_calendar -->
@@ -142,7 +142,7 @@
         <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
             <input type="hidden" name="replyto" value="{REPLYTO}"/>
             <input type="hidden" name="bcc" value="{EMAILALL}"/>
-            <a href="#" class="btn submit-this float-right up-arrow "><span></span>Email All</a>
+            <a href="#" class="btn submit-this float-right email "><span></span>Email All</a>
         </form>
         <!-- END subject_mail -->
         <!-- END subject -->
