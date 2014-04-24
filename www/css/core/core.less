@@ -391,21 +391,43 @@ h2 {
     th {
         text-align: left;
         font-weight: bold;
-        &.sortable:not(.sorter-false) {
-            background: url('/images/core/tablesorter/sort.gif') no-repeat 0 center;
-            padding: 7px 16px 7px 20px;
-            &.descending {
-                background: url('/images/core/tablesorter/sort-descending.gif') no-repeat 0 12.5px;
-            }
-            &.ascending {
-                background: url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 16.5px;
-            }
-        }
     }
     tr {
         border-bottom: 1px solid @border-color;
     }
 }
+
+
+table.ruler {
+  width: 100%;
+  margin-bottom: 10px;
+
+  th {
+    text-align: left;
+    font-weight: bold;
+    background: @dark;
+    padding: 0;
+    &.sortable:not(.sorter-false) {
+      background: @dark url('/images/core/tablesorter/sort.gif') no-repeat 0 center;
+      padding: 7px 16px 7px 20px;
+      cursor: pointer;
+      &.descending {
+        background: @body-background url('/images/core/tablesorter/sort-descending.gif') no-repeat 0 12.5px;
+      }
+      &.ascending {
+        background: @body-background url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 16.5px;
+      }
+    }
+  }
+  tr {
+    border-bottom: 1px solid @border-color;
+  }
+  tr:nth-child(even) td{ background: @dark; }
+  tr:hover td{background: lighten(@highlight-color,@lighten-value); }
+
+}
+
+
 /*--------------------------------------------------------------
 Notifications
 --------------------------------------------------------------*/
@@ -7233,17 +7255,6 @@ p.forgotten {
     font-weight: bold;
 }
 
-table.ruler {
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-table.ruler thead td {
-    padding: 0;
-}
-
-
-
 
 /* SUBJECT COMPLETION GRAPH*/
 .barchart {
@@ -7335,10 +7346,6 @@ li.bars {
     font-size: 14px;
     display: block;
     padding-top: 4px;
-}
-
-table.subjectList {
-    width: 100%;
 }
 
 /* SUBMISSION MARK TABLE */
@@ -9147,14 +9154,6 @@ img.mimetype {
     height: 16px;
     background: url('/images/famicons/arrow_out.png') no-repeat;
     margin: 3px 3px 3px 5px;
-}
-
-/* submission/allDueWork */
-.allduework table.subjectList {
-    width: 100%;
-    th, td {
-        width: 20%;
-    }
 }
 
 .pick-semester {
