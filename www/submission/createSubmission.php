@@ -470,7 +470,8 @@ function outputVisibilityDropdown(SitePage $page, $value) {
                 ),
     );
 
-    /* Remove elements from list based on max setting */
+    /* Remove elements from list based on max setting
+       Note this cascades popping elements as it goes, so case 0 pops 2, case 1 pops 1, case 3 pops 0*/
     switch(Cfg::get('submission_visibility_max')) {
         case '0' :
            array_pop($options);
