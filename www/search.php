@@ -178,7 +178,6 @@ if (!empty($result['user'])) {
     $page->setBlock('user_t', 'user', 'user_block');
     $page->setBlock('user', 'due_work', 'due_work_block');
     $page->setBlock('user', 'timetable', 'timetable_block');
-    $page->setBlock('user', 'helpdesk', 'helpdesk_block');
     $page->setBlock('user', 'eportfolio', 'eportfolio_block');
     $page->setBlock('user', 'modify', 'modify_block');
     $page->setBlock('user', 'boarder_leave', 'boarder_leave_block');
@@ -229,7 +228,6 @@ if (!empty($result['user'])) {
             'USER_SEARCH_GROUP' => $user['group_name'],
         ));
 
-        $page->setVar('helpdesk_block');
         $page->setVar('timetable_block');
         $page->setVar('eportfolio_block');
         $page->setVar('boarder_leave_block');
@@ -258,8 +256,6 @@ if (!empty($result['user'])) {
                     $page->setVar('timetable_block', '');
                 }
 
-                if (HELPDESK_enable)
-                    $page->parse('helpdesk_block', 'helpdesk');
             }
             if (Cfg::get('boarder_leave_enabled') == '1') {
                 if ($group->isStaff() AND $user['residential_house_id']) {
@@ -267,7 +263,6 @@ if (!empty($result['user'])) {
                 }
             }
         } else {
-            $page->setVar('helpdesk_block');
             //Show staff timetables to other staff
             if ($group->isStaff() && $group->isStaff($user['id']))
                 $page->parse('timetable_block', 'timetable');

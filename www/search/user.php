@@ -20,7 +20,6 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
         $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
         $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
-        $this->setBlock(TEMPLATE_content, "helpdesk", "helpdesk_block");
         $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
         $this->setBlock(TEMPLATE_content, "boarder_leave", "boarder_leave_block");
 		$this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
@@ -85,7 +84,6 @@ if (is_numeric($this->arg[0])) {
         'modify_block' => '',
         'contact_synergy_block' => '',
         'due_work_block' => '',
-        'helpdesk_block' => '',
         'parent_synergy_form_block' => '',
         'parent_spouse_block' => '',
         'staff_synergy_block' => '',
@@ -218,12 +216,6 @@ if (is_numeric($this->arg[0])) {
 					}
 					else {
 	                    $this->parse('due_work_block', 'due_work');
-	                }
-
-	                if (HELPDESK_enable == true) {
-	                    $this->parse('helpdesk_block', 'helpdesk');
-	                } else {
-	                    $this->setVar('helpdesk_block', '');
 	                }
 
 	                $synInfo = $synUserHandler->getStudent($user['synergy_id']);
