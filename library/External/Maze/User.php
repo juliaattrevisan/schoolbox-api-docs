@@ -576,9 +576,32 @@ class External_Maze_User implements External_UserInterface {
 	 * @return array|bool
 	 */
 	public function getSubjectList($externalUserId, $userId) {
-		$ttPeriod = $this->getHelper()->getCurrentTTPeriod();
-
 		if ($this->getGroup()->isStudent($userId)) {
+
+			/* Get roll groups
+			 */
+			$query = "
+				SELECT
+					ST.FIRST_NAME,
+					ST.SURNAME,
+					KGC.ROLL_GROUP AS ClassCode,
+					'' AS ClassNumber,
+					'' AS classType,
+					'' AS ClassCampus,
+					KGC.DESCRIPTION AS name
+				FROM ST
+				LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
+				WHERE ST.STKEY = '{$externalUserId}'
+			";
+
+			$part1 = $this->getDb()->getAll($query);
+
+			if (!$part1) {
+				$part1 = array();
+			}
+
+			/* Get regular classes
+			 */
 			$query = "
 				SELECT
 					STMA.MKEY AS ClassCode,
@@ -589,10 +612,37 @@ class External_Maze_User implements External_UserInterface {
 				FROM STMA
 				LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 				WHERE SKEY = '{$externalUserId}'
-				AND TTPERIOD = '{$ttPeriod}'
+				AND STMA.TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
 			";
+
+			$part2 = $this->getDb()->getAll($query);
+
+			if (!$part2) {
+				$part2 = array();
+			}
+
+			$allSubjects = array_merge($part1, $part2);
 		}
 		else if ($this->getGroup()->isStaff($userId)) {
+			$query = "
+				SELECT
+					KGC.ROLL_GROUP AS ClassCode,
+					'' AS ClassNumber,
+					'' AS classType,
+					'' AS ClassCampus,
+					KGC.DESCRIPTION AS name
+				FROM KGC
+				WHERE TEACHER = '{$externalUserId}'
+				OR TEACHERB = '{$externalUserId}'
+				OR TEACHERC = '{$externalUserId}'
+			";
+
+			$part1 = $this->getDb()->getAll($query);
+
+			if (!$part1) {
+				$part1 = array();
+			}
+
 			$query = "
 				SELECT
 					TTTG.SUBJ AS ClassCode,
@@ -606,17 +656,34 @@ class External_Maze_User implements External_UserInterface {
 				WHERE (T1TEACH = '{$externalUserId}' OR T2TEACH = '{$externalUserId}')
 				AND TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
 			";
+
+			$part2 = $this->getDb()->getAll($query);
+
+			if (!$part2) {
+				$part2 = array();
+			}
+
+			$allSubjects = array_merge($part1, $part2);
 		}
 
-		$allSubjects = $this->getDb()->getAll($query);
+		/* Return structure
+		 */
 		$subjectList = array();
 
 		/* Format it in a schoolbox-friendly way
 		 */
 		if (is_array($allSubjects) && count($allSubjects)) {
 			foreach($allSubjects as $currentSubject) {
+
+				if (strlen($currentSubject['ClassNumber'])) {
+					$classCode = $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']);
+				}
+				else {
+					$classCode = $currentSubject['ClassCode'];
+				}
+
 				$subjectList[] = array(
-					'code' => $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']),
+					'code' => $classCode,
 					'name' => $currentSubject['name'],
 					'classType' => $currentSubject['classType'],
 					'campusCode' => $currentSubject['ClassCampus']
