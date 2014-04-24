@@ -642,7 +642,7 @@ if ($user['eportfolio_enabled'] && (isset($recent_submission) || isset($recent_r
 			'PUBLISH_ID'      => $submission->getId(),
 			'PUBLISH_USER_ID' => $user['uid'],
 			'PUBLISH_ACTION'  => 'publish',
-			'PUBLISH_BUTTON'  => 'Publish Work'
+			'PUBLISH_BUTTON'  => 'Publish to ePortfolio'
 		));
 	}
 	else {
@@ -651,7 +651,7 @@ if ($user['eportfolio_enabled'] && (isset($recent_submission) || isset($recent_r
 			'PUBLISH_ID'      => $existingShowcasedItem->first()->getId(),
 			'PUBLISH_USER_ID' => $user['uid'],
 			'PUBLISH_ACTION'  => 'unpublish',
-			'PUBLISH_BUTTON'  => 'Unpublish Work'
+			'PUBLISH_BUTTON'  => 'Remove from ePortfolio'
 		));
 	}
 
