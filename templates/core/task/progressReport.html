@@ -56,7 +56,7 @@
                                 element.addClass('incomplete').attr('title', 'Incomplete - click to update')
                                 break;
                             case 2: // pending
-                                element.addClass('pending').attr('title', 'Pending - click to update')
+                                element.addClass('pending').attr('title', 'Self Assess - click to update')
                                 break;
                             case 3: // complete
                                 element.addClass('complete').attr('title', 'Complete - click to update')
@@ -147,7 +147,7 @@
                         <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
                         <input type="hidden" name="current_status" value="{STUDENT_UNIT_TASK_STATUS}" />
                         <a href="#"
-                           class="btn ticks {STUDENT_UNIT_TASK_STATUS_CLASS} no-text"
+                           class="ticks {STUDENT_UNIT_TASK_STATUS_CLASS}"
                            title="{STUDENT_UNIT_TASK_STATUS_TEXT} - click to update"
                            data-interaction="update_progress"
                         ><span></span></a>
