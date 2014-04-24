@@ -225,7 +225,7 @@ if (!empty($subList) && is_array($subList)) {
                 'OPENDATE' => $sub['accept_submission'] ? $openString : '',
                 'DUEDATE' => $closeString,
                 'MARKED' => (int)$totals['marked'],
-                'TOTAL' => $totals['total'],
+                'TOTAL' => $sub['accept_submission'] ? $totals['total'] : 'N/A',
                 'ON_OFF' => ++$i % 2 ? 'dark' : '',
             ));
 
