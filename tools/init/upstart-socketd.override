@@ -1,5 +1,5 @@
 # Overrides for Vagrant running of schoolbox-scheduled
 env SBHOME=/vagrant/tools/socket
 env SBLOGS=/vagrant/data
-env SBSKVERBOSITY=' -v'
+env SBVERBOSITY=' -v'
 pre-start exec sleep 5

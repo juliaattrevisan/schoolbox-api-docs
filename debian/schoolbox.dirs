@@ -1,1 +1,2 @@
 var/lib/schoolbox
+var/log/schoolbox

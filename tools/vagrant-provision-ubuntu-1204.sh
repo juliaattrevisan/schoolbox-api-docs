@@ -136,12 +136,17 @@ echo "$vag Install schoolbox-socketd";
 cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
 cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
 
+echo "$vag Install schoolbox-digestd";
+cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
+cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
+
 echo "$vag Ensure all services are running";
 service mysql restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
-service schoolbox-scheduled restart > /dev/null 2>&1;
-service schoolbox-socketd restart > /dev/null 2>&1;
+service schoolbox-scheduled restart > /dev/null 2>/dev/null &
+service schoolbox-socketd restart > /dev/null 2>/dev/null &
+service schoolbox-digestd restart > /dev/null 2>/dev/null &
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
