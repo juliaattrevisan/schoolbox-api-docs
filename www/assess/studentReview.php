@@ -58,11 +58,27 @@ if (!$attempt) {
  * Allow staff access
  * Allow parent of child access
  */
-
 if (!$attemptHandler->isOwner($this->arg[2])
     && !$groupHandler->isStaff()
     && !($groupHandler->isParentOfChild($attempt['user_id']) && !Config::get('restrict_parent_duework_access'))) {
     error(129);
+}
+
+/* Check visibility
+ */
+$quizVisibilityMapper = new \Assess\VisibilityMapper();
+$quizVisibility = $quizVisibilityMapper->findById($assess['visibility_id']);
+
+/* Mostly do nothing
+ */
+if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
+}
+else if ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+}
+else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+}
+else {
+	error(129);
 }
 
 /* Find out which attempt was made

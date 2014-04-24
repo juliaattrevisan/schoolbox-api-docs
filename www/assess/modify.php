@@ -48,6 +48,7 @@ if (!empty($_POST)) {
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
         ->setWeight($_POST['weight'])
+		->setVisibilityId($_POST['visibility_id'])
     ;
 
     // Is this a task? If so, just set the start and finish to now.
@@ -94,6 +95,7 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
 	$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+	$this->setBlock(TEMPLATE_content,  'assess_visibility', 'assess_visibility_block');
     $this->setTitle('Manage Assessment');
 
     $this->setVar('question_block', '');
@@ -184,8 +186,23 @@ if (!empty($_POST)) {
         $this->parse('max_attempts_block', 'max_attempts', true);
     }
 
-    /* Show this Assess' contents
-     */
+	/* Visibility dropdown
+	 */
+	$visibilityMapper = new \Assess\VisibilityMapper();
+	$allVisibilities = $visibilityMapper->findAll();
+
+	foreach($allVisibilities as $currentVisibility) {
+		$this->setVar(array(
+			'ASSESS_VISIBILITY_ID' => $currentVisibility->getId(),
+			'ASSESS_VISIBILITY_NAME' => $currentVisibility->getName(),
+			'ASSESS_VISIBILITY_CHECKED' => $currentVisibility->getId() == $assessment->getVisibilityId() ? 'selected="selected"' : '',
+		));
+
+		$this->parse('assess_visibility_block', 'assess_visibility', true);
+	}
+
+	/* Show this Assess' contents
+	 */
     $this->setFile('assessContentsFragment', 'assess/contents.html');
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');

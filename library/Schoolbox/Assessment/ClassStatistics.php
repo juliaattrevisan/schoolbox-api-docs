@@ -58,11 +58,14 @@ class ClassStatistics {
 	protected $attemptMapper;
 
 	/**
+	 * Constructor
+	 *
 	 * @param Category $category
 	 * @param int $year
 	 * @param int $semester
+	 * @param \Schoolbox\User $user
 	 */
-	public function __construct(Category $category, $year = 0, $semester = 0) {
+	public function __construct($category, $year = 0, $semester = 0, \Schoolbox\User $user) {
 		$this->category = $category;
 
 		// compile the due work, assessments, marks returned, et al
@@ -100,10 +103,17 @@ class ClassStatistics {
 			}
 		}
 
+		/* Visibility
+		 * Exclude hidden quizzes from the Assessments cube
+		 */
+		$quizVisibilityMapper = new \Assess\VisibilityMapper();
+		$quizVisibilities = $quizVisibilityMapper->getVisibilityArray($user);
+
 		// retrieve ALL the online assessments (not surveys) for this category
 		$assessCollection = $this->assessMapper->findByColumnList(array(
 			'category_id' => $this->getCategory()->getId(),
-			'availability' => 'assess'
+			'availability' => 'assess',
+			'visibility_id' => $quizVisibilities
 		));
 		foreach($assessCollection as $assess) {
 			$this->addWork($assess);

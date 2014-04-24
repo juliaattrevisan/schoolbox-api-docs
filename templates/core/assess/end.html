@@ -12,20 +12,21 @@
 </p>
 <!-- END alreadyEnded -->
 
+<!-- BEGIN has_marks -->
 <p>
 	{ATTEMPT_NUM_MARKED_QUESTIONS}/{ATTEMPT_NUM_QUESTIONS} question(s) of your quiz have been marked.<br />
 	You received {ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)
 </p>
+<p>
+	<strong>This mark is unconfirmed and may change following teacher review.</strong>
+</p>
+<!-- END has_marks -->
 
 <!-- BEGIN unmarkedRemaining -->
 <p>
 	There are {ATTEMPT_NUM_UNMARKED_QUESTIONS} questions remaining to be marked, worth {ATTEMPT_VALUE_UNMARKED_QUESTIONS} marks.
 </p>
 <!-- END unmarkedRemaining -->
-
-<p>
-	<strong>This mark is unconfirmed and may change following teacher review.</strong>
-</p>
 
 <p class="clearfix">
 	<a class="btn tick float-left" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to the homepage</a>
