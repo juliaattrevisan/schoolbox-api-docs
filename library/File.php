@@ -140,6 +140,12 @@ class File extends DeprecatedModel {
 	    $notif->info("CRUD", $logEntry);
     }
 
+    /**
+     * @deprecate
+     * @param $data
+     * @param string $file
+     * @return int|string
+     */
     function create ($data, $file = '') {
 
         $allowedFileHandler = new AllowedFile();
@@ -194,6 +200,12 @@ class File extends DeprecatedModel {
         return $fileID;
     }
 
+    /**
+     * @deprecate
+     * @param $data
+     * @param string $file
+     * @return bool|mysqli_result|resource|void
+     */
     function update ($data, $file = '') {
         $allowedFileHandler = new AllowedFile();
 
@@ -229,6 +241,12 @@ class File extends DeprecatedModel {
         $this->logAction($data[$this->_index], 'modify');
     }
 
+    /**
+     * @deprecate
+     * @param $id
+     * @param bool $clean
+     * @return bool|mysqli_result|resource|void
+     */
     function delete ($id, $clean = false) {
 
         if ( $clean ) {

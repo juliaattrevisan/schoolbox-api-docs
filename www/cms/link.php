@@ -2,17 +2,23 @@
 
 $groupHandler = new Group;
 
+use \Schoolbox\Resource\LinkMapper;
+use \Schoolbox\Resource\CategoryMapper;
+
 if(is_numeric($this->arg[0])) {
 
 	$linkHandler = new Link;
 
-	/* Modify existing link */
-	$link = $linkHandler->getByID($this->arg[0]);
-	if(!is_array($link))
-		error(41);
+    try{
+        $link = LinkMapper::getInstance()->findById($this->arg[0]);
+        $folder = CategoryMapper::getInstance()->findById($link->getFolder());
+    }
+    catch (Exception $e) {
+        error(41);
+    }
 
 	/* Check permissions to submit */
-	if($groupHandler->getPermission($link['category']) < WRITE_ACCESS )
+	if($groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS )
 		error(6);
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-link.html');
@@ -21,19 +27,24 @@ if(is_numeric($this->arg[0])) {
 	$this->setTab('resources');
 
 	$output = array('ACTION'			=> 'Modify',
-					'LINK_ID'			=> $link['id'],
-					'URL'				=> $link['url'],
-					'DESCRIPTION'		=> Scrub::text($link['description']),
-					'COMMENT'			=> Scrub::text($link['comment']),
-					'CATEGORY_NAME'		=> Scrub::text($link['categoryName']),
-					'CATEGORY_ID'		=> $link['cid'],
-					'HIDDEN_SELECTED'	=> 	$link['hidden'] > 0 ? 'checked="checked"' : '',
+					'LINK_ID'			=> $link->getId(),
+					'URL'				=> $link->getUrl(),
+					'DESCRIPTION'		=> Scrub::text($link->getDescription()),
+					'COMMENT'			=> Scrub::text($link->getComment()),
+					'CATEGORY_NAME'		=> Scrub::text($folder->getName()),
+					'CATEGORY_ID'		=> $link->getFolder(),
+					'HIDDEN_SELECTED'	=> $link->getHidden() > 0 ? 'checked="checked"' : '',
 					);
 	$this->setVar($output);
 
 
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-	$categoryHandler = new Category;
+    try{
+        $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
+    }
+    catch (Exception $e) {
+		error(13);
+	}
 
 	/* Add new link to system */
 	$this->setFile(TEMPLATE_content, 'cms/modify-link.html');
@@ -42,13 +53,9 @@ if(is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'delete_button','delete_button_block');
     $this->setVar('delete_button_block','');
 
-	/* Check folder exists */
-	$category = $categoryHandler->getByID($this->arg[1]);
-	if(!is_array($category))
-		error(13);
 
 	/* Check permissions to submit */
-	if($groupHandler->getPermission($category['id']) < WRITE_ACCESS )
+	if($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS )
 		error(6);
 
 	$output = array('ACTION'			=> 'Post',
@@ -57,8 +64,8 @@ if(is_numeric($this->arg[0])) {
 					'DESCRIPTION'		=> '',
 					'COMMENT'			=> '',
 					'HIDDEN_SELECTED'	=> '',
-					'CATEGORY_NAME'		=> Scrub::text($category['name']),
-					'CATEGORY_ID'		=> $category['id'],
+					'CATEGORY_NAME'		=> Scrub::text($folder->getName()),
+					'CATEGORY_ID'		=> $folder->getId(),
 					);
 	$this->setVar($output);
 
@@ -100,5 +107,3 @@ else if($this->arg[0] == 'multicat') {
 else {
 	error(2);
 }
-
-?>

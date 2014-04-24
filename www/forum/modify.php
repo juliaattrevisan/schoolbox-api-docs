@@ -1,10 +1,14 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use \Schoolbox\Resource\CategoryMapper;
+use \Schoolbox\Forum\PostMapper;
+use \Schoolbox\Forum\ThreadMapper;
+
+
+
 $forumHandler = new Forum();
-$categoryHandler = new Category();
 $groupHandler = new Group();
-$userHandler = new User();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'thread_link', 'thread_link_block');
@@ -18,90 +22,119 @@ if (is_numeric($this->arg[0])) {
 
 	/* Category exists
 	 */
-	$category = $categoryHandler->getByID($this->arg[0]);
+    try {
+        $folder = CategoryMapper::getInstance()->findById($this->arg[0]);
+    }
+    catch (Exception $e) {
+        error(2);
+    }
 
-	if (!isset($category['id'])) {
-		error(2);
-	}
 
 	/* Forum exists
 	 */
-	if (!$forumHandler->hasForum($category['id'])) {
-		SitePage::localRedir('/homepage/' . $category['id']);
+	if (!$forumHandler->hasForum($folder->getId())) {
+		SitePage::localRedir('/homepage/' . $folder->getId());
 	}
 
 	/* Check permissions
 	 */
-	if ($groupHandler->getPermission($category['id']) < READ_ACCESS) {
+	if ($groupHandler->getPermission($folder->getId()) < READ_ACCESS) {
 		error(19);
 	}
-	if ($groupHandler->hasChildAccessOnly($category['id'])) {
+	if ($groupHandler->hasChildAccessOnly($folder->getId())) {
 		error(19);
 	}
 
-	$this->setTitle(Scrub::text($category['name'] . ' Forum'));
+	$this->setTitle(Scrub::text($folder->getName() . ' Forum'));
+
+    $output = array(
+        'THREAD_ID' => '',
+        'THREAD_TITLE' => '',
+        'POST_ID' => '',
+        'CATEGORY_ID' => $folder->getId(),
+        'CATEGORY' => Scrub::text($folder->getName()),
+        'BODY' => '',
+    );
 
 	/* Edit post
 	 */
 	if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
-		$post = $forumHandler->getPost($this->arg[2]);
 
-		if (!isset($post['postID'])) {
-			error(2);
-		}
+        try{
+            $post = PostMapper::getInstance()->findById($this->arg[2]);
+            $thread = ThreadMapper::getInstance()->findById($post->getThreadId());
+        }
+        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            //There is cases where you need to edit deleted stuff so letting this go through..
+        }
+        catch (Exception $e) {
+            error(2);
+        }
 
 		/* Check user owns post
 		 */
-		if ($post['userID'] != $_SESSION['id'] && $groupHandler->getPermission($category['id']) < FULL_ACCESS) {
+		if ($post->getOwner()->getId() != $_SESSION['id'] && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
 			error(19);
 		}
-
-		$thread = $forumHandler->getThread($post['threadID']);
 
 		/* check locked
 		 */
-		if ($thread['locked'] == 'true' && $groupHandler->getPermission($category['id']) < FULL_ACCESS) {
+		if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
 			error(19);
 		}
 
-		if ($thread['postID'] == $post['postID']) {
+		if ($thread->getFirstPost()->getPostId() == $post->getPostId()) {
 			$this->parse('title_block', 'title');
 		}
 
-		$this->parse('thread_link_block', 'thread_link');
+        $output['ACTION'] = 'Modify';
+        $output['THREAD_POST'] = 'Post';
+        $output['THREAD_ID'] = $thread->getThreadId();
+        $output['POST_ID'] = $post->getPostId();
+        $output['BODY'] = Scrub::text($post->getBody());
+
+
+            $this->parse('thread_link_block', 'thread_link');
 	}
 	/* Add new reply
 	 */
 	else if (is_numeric($this->arg[1])) {
-		$thread = $forumHandler->getThread($this->arg[1]);
 
-		if (!isset($thread['threadID'])) {
-			error(2);
-		}
+        try {
+            $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
+        }
+        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            //There is cases where you need to edit deleted stuff so letting this go through..
+        }
+        catch (Exception $e) {
+            error(2);
+        }
 
 		/* Check locked
 		 */
-		if ($thread['locked'] == 'true' && $groupHandler->getPermission($category['id']) < FULL_ACCESS) {
+		if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
 			error(19);
 		}
+
+
+        $output['ACTION'] = 'Post';
+        $output['THREAD_POST'] ='Reply';
+        $output['THREAD_ID'] = $thread->getThreadId();
+        $output['THREAD_TITLE'] = Scrub::text($thread->getTitle());
+
+
 
 		$this->parse('thread_link_block', 'thread_link');
 	}
 	else {
+
+        $output['ACTION'] = 'Post';
+        $output['THREAD_POST'] =  'Thread';
+
 		$this->parse('title_block', 'title');
 		$this->setVar('thread_link_block', '');
 	}
 
-	$output = array(
-		'ACTION' => isset($post['postID']) ? 'Modify' : 'Post',
-		'THREAD_POST' => $thread['postID'] == $post['postID'] || !isset($thread['threadID']) ? 'Thread' : 'Post',
-		'THREAD_ID' => $thread['threadID'],
-		'THREAD_TITLE' => Scrub::text($thread['title']),
-		'POST_ID' => $post['postID'],
-		'CATEGORY_ID' => $category['id'],
-		'CATEGORY' => Scrub::text($category['name']),
-		'BODY' => Scrub::text($post['body']),
-	);
 
 	$this->setVar($output);
 
@@ -111,28 +144,25 @@ if (is_numeric($this->arg[0])) {
 
 	$quotePostID = $this->arg[3];
 
-	if (!is_numeric($quotePostID)) {
-		$quotePostID = $thread['postID'];
+	if (!is_numeric($quotePostID) && $this->arg[1]) {
+        //Gets the oldest post to use as a thread reply
+        $quotePostID = $thread->getFirstPost()->getPostID();
 	}
 
 	if (is_numeric($quotePostID) && $quotePostID > 0) {
-		$quote = $forumHandler->getPost($quotePostID);
 
-		if (isset($quote['postID'])) {
-			$user = array(
-				'title' => $quote['userTitle'],
-				'firstname' => $quote['userFirstname'],
-				'lastname' => $quote['userLastname'],
-			);
+        try{
+            $quote = PostMapper::getInstance()->findById($quotePostID);
+            $output = array(
+                'QUOTE_USER' => $quote->getOwner()->formatName($user),
+                'QUOTE_BODY' => Scrub::html($quote->getBody()),
+            );
 
-			$output = array(
-				'QUOTE_USER' => $userHandler->formatName($user),
-				'QUOTE_BODY' => Scrub::html($quote['body']),
-			);
+            $this->setVar($output);
+            $this->parse('quote_block', 'quote', true);
 
-			$this->setVar($output);
-			$this->parse('quote_block', 'quote', true);
-		}
+        }
+        catch (Exception $e) { }
 	}
 }
 else {

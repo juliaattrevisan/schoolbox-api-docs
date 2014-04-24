@@ -15,6 +15,8 @@ use Schoolbox;
 use Schoolbox\Mapper;
 use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
 
 class FileMapper extends Mapper {
 
@@ -131,6 +133,10 @@ class FileMapper extends Mapper {
                 'other_key' => 'mime',
             ));
 
+
+        $this->registerCallback('preSave', array($this, 'preSave'));
+        $this->registerCallback('postSave', array($this, 'postSave'));
+
 	}
 
     /**
@@ -216,6 +222,76 @@ class FileMapper extends Mapper {
 		return $existing;
 	}
 
+
+    /**
+     * Checks file can be saved and it passes all the required checks
+     * @param File $file
+     * @param null $previous
+     * @throws \Schoolbox\File\Exception
+     */
+    protected function preSave(File $file) {
+        // check if file exists
+        if (is_file($file->getTempFileLocation()) && is_readable($file->getTempFileLocation())) {
+            // Check if file attached if valid (mime and size)
+            try {
+                $file->setMimeType( MimetypeMapper::getInstance()->getByFilename($file->getFilename()) );
+
+                /** @var Mimetype $mimetype */
+                if ($file->getFilesize() > $file->getMimeType()->getMaxFileSize()) {
+                    throw new Schoolbox\File\Exception('File is too large', Schoolbox\File\Exception::CODE_FILE_TOO_LARGE);
+                }
+            } catch (Exception $e) {
+                throw new Schoolbox\File\Exception('File type not permitted', Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND);
+            }
+            
+            // check if we can save the file
+            if (!is_writable($this->getSaveLocation())) {
+                throw new Schoolbox\File\Exception('Cannot save file', Schoolbox\File\Exception::CODE_CANNOT_WRITE);
+            }
+        }
+    }
+
+    /**
+     * Save the file to the correct location
+     * Setup video processing
+     *
+     * @param File $file
+     * @param null $previous
+     * @throws \Schoolbox\File\Exception
+     */
+    protected function postSave(File $file ) {
+        // copy file into location
+        if( is_readable($file->getTempFileLocation())) {
+
+            $filename = $this->getSaveLocation() . $file->getId() . '.dat';
+            @unlink($filename);
+
+            if (!copy($file->getTempFileLocation(), $filename)) {
+                throw new Schoolbox\File\Exception('Cannot save file', Schoolbox\File\Exception::CODE_CANNOT_WRITE);
+            }
+            // If video add to video processing queue */
+            if ($file->getMimeType()->isVideo()) {
+                $mapper = new Schoolbox\Video\QueueMapper();
+                $videoQ = new Schoolbox\Video\Queue();
+                $videoQ->setFileID($file->getId());
+                $videoQ->setStatus(Schoolbox\Video\QueueMapper::STATUS_PENDING);
+                $videoQ->setType(Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS);
+
+                $mapper->save($videoQ);
+            }
+        }
+
+        // TODO: log action MD?
+    }
+
+
+    /**
+     * Returns the location where files should be saved
+     * @return string
+     */
+    private function getSaveLocation() {
+        return \Config::get('file_dir') . '/';
+    }
 
 
 }

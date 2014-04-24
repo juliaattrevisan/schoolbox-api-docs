@@ -16,4 +16,8 @@ class Exception extends \Exception {
 	// User error codes
 	const CODE_MIMETYPE_NOT_FOUND = 1;
 	const CODE_FILE_TOO_LARGE     = 2;
+
+    // System error codes
+    const CODE_CANNOT_WRITE = 3;
+    const CODE_CANNOT_READ = 4;
 }

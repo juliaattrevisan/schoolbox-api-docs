@@ -132,6 +132,12 @@ if (is_array($threadList)) {
 			'lastname' => $thread['userLastname'],
 		);
 
+        $last_post_user = array(
+            'title' => $thread['last_post_title'],
+            'firstname' => $thread['last_post_firstname'],
+            'lastname' => $thread['last_post_surname'],
+        );
+
 		$threadTime = new Alaress_Date_Relative($thread['date']);
 		$threadLastPostTime = new Alaress_Date_Relative($thread['last_post_date']);
 
@@ -144,9 +150,9 @@ if (is_array($threadList)) {
 			'THREAD_TIME' => $threadTime->setPrefix('')->getRelativeTime(),
 			'THREAD_LAST_POST_TIME' => $threadLastPostTime->setPrefix('')->getRelativeTime(),
 			'THREAD_LAST_POST_ID' => $thread['last_post_id'],
-			'THREAD_LAST_POST_USER_EXTERNAL_ID' => $thread['last_post_user_synid'],
+			'THREAD_LAST_POST_USER_EXTERNAL_ID' => $thread['last_post_external_id'],
 			'THREAD_LAST_POST_USER_ID' => $thread['last_post_user_id'],
-			'THREAD_LAST_POST_USER' => Scrub::text($thread['last_post_user']),
+			'THREAD_LAST_POST_USER' => Scrub::text($userHandler->formatName($last_post_user)),
 			'THREAD_REPLIES' => $thread['replies'],
 			'THREAD_VIEWS' => $thread['views'],
 			'THREAD_LAST_PAGE' => ceil((($thread['replies'] + 1) / FORUM_POSTS_PER_PAGE)),
