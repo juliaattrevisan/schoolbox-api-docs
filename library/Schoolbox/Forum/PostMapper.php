@@ -15,7 +15,7 @@ class PostMapper extends Mapper {
 
     protected function mapping() {
         $this->hasTable('forumPost');
-        $this->hasModel('\Schoolbox\Forum\Post');
+        $this->hasModel('\\Schoolbox\\Forum\\Post');
         $this->hasMap(array(
                 'column'     => 'postID',
                 'property'   => 'postID',

@@ -15,7 +15,7 @@ class ThreadMapper extends Mapper {
 
     protected function mapping() {
         $this->hasTable('forumThread');
-        $this->hasModel('\Schoolbox\Forum\Thread');
+        $this->hasModel('\\Schoolbox\\Forum\\Thread');
         $this->hasMap(array(
                 'column'     => 'threadID',
                 'property'   => 'threadID',
