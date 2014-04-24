@@ -33,8 +33,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $this->setBlock("student_block", "subject_block", "subject_item");
 		$this->setBlock('student_block', 'eportfolio', 'eportfolio_block');
 		$this->setBlock('student_block', 'due_work', 'due_work_block');
+        $this->setBlock('student_block', 'grades_button', 'grades_button_block');
 
-		$groupHandler = new Group();
+
+        $groupHandler = new Group();
 		$isParent = $groupHandler->isParent();
 
         $i = 0;
@@ -69,6 +71,15 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 				else {
 					$this->parse('due_work_block', 'due_work');
 				}
+
+                if($isParent && Config::get('restrict_parent_grades') ) {
+                    $this->setVar('grades_button_block', '');
+                }
+                else {
+                    $this->parse('grades_button_block', 'grades_button');
+                }
+
+
 
 				/* ePortfolio link
 				 */

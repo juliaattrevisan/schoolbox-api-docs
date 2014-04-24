@@ -395,11 +395,13 @@ if (count($submission_history)) {
                 }
             }
             else {
-                if ($history['HISTORY_COMMENT']) {
-                    $this->parse('history_marked_hascomment_block', 'history_marked_hascomment');
+                if (!(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent())) {
+                    if ($history['HISTORY_COMMENT']) {
+                        $this->parse('history_marked_hascomment_block', 'history_marked_hascomment');
+                    }
+                    $this->parse('history_marked_block', 'history_marked');
+                    $this->parse('work_grade_block', 'work_grade');
                 }
-                $this->parse('history_marked_block', 'history_marked');
-                $this->parse('work_grade_block', 'work_grade');
             }
 
             /* Remember the most recent returned work, because we need it
@@ -576,8 +578,7 @@ if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
 /* Detect returned work
  */
 
-if (isset($recent_return)) {
-
+if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent())) {
     // get filetype details
 	$return = $recent_return->getReturnedWork();
     $ext   = pathinfo($return->getFilename(), PATHINFO_EXTENSION);

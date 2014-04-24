@@ -97,7 +97,7 @@ class StudentReportCard {
 		$displayClassAverage        = \Cfg::get('display_grade_average') ? true : false;
 
 		// are parents barred from this page?
-		$restrictStudentSubmissions = \Cfg::get('restrict_student_submissions') ? true : false;
+		$restrictStudentSubmissions = \Cfg::get('restrict_parent_grades') ? true : false;
 
 		// is the grade average allowed to be shown?
 		$showOverallGrade           = \Cfg::get('show_overall_grade') ? true : false;
@@ -124,7 +124,7 @@ class StudentReportCard {
 		// if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
 		elseif($this->groupHandler->isParentOfChild($this->targetUserId)) {
 			$this->permissionSet = array(
-				false, false, !$restrictStudentSubmissions, false, !$restrictStudentSubmissions,
+				false, false, !$restrictStudentSubmissions, $displayClassAverage, !$restrictStudentSubmissions,
 				(!$restrictStudentSubmissions) && $showOverallGrade
 			);
 			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT + ($restrictStudentSubmissions ? 1 : 0);
@@ -470,7 +470,7 @@ class StudentReportCard {
 				'label' => 'Class',
 				'data'  => $averageSeries
 			);
-		}
+        }
 		// otherwise, remove the colour from the map (so the graph doesn't get confused)
 		else {
 			unset($colours['average']);
@@ -1001,7 +1001,7 @@ class StudentReportCard {
 
 
 			// Ensure that grades are properly ordered by date.
-			if (!(\Cfg::get('restrict_student_submissions') && $groupHandler->isParent())) {
+			if (!(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent())) {
 				$studentGrades = array_merge(
 					$returnMapper->getStudentMarks($categoryID, $this->targetUserId, array('visibility' => $visibilities)),
 					$attemptMapper->getStudentMarks($categoryID, $this->targetUserId)

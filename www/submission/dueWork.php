@@ -289,7 +289,9 @@ $synClass = new External_Class;
 
 $return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 $assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper();
-$restrict_submissions = Cfg::get('restrict_student_submissions') && $groupHandler->isParent();
+
+$restrict_grades = Cfg::get('restrict_parent_grades') && $groupHandler->isParent();
+
 
 foreach ($categoryList as $category) {
     $categoryID = $category['id'];
@@ -334,7 +336,7 @@ foreach ($categoryList as $category) {
     //
     // retrieve subject grades.
     // Ensure that grades are properly ordered by date.
-    if (!$restrict_submissions) {
+    if (!$restrict_grades) {
         $studentGrades = array_merge(
             $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
             $assess_mapper->getStudentMarks($category['id'], $userID)
@@ -348,7 +350,7 @@ foreach ($categoryList as $category) {
 
     $gradeAvg    = -1;
     $grade_count = count($studentGrades);
-    $show_grades = Cfg::get('show_overall_grade');
+    $show_grades = Cfg::get('show_overall_grade') && !$restrict_grades;
     $trendDir = '';
     $trendAmt = '';
     if ($show_grades) {
@@ -432,7 +434,7 @@ foreach ($categoryList as $category) {
 
 $feedItems = array();
 
-foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restrict_submissions) as $activity) {
+foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restrict_grades) as $activity) {
     $mark = null;
     $numericMark = null;
 
@@ -484,7 +486,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
             break;
 
         case 'returned':
-            if (!$restrict_submissions) {
+            if (!$restrict_grades) {
                 //
                 // Showing returned work:
                 // Always show a link back to submission history
