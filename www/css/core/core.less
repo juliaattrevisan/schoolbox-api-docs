@@ -5364,9 +5364,6 @@ CALENDAR
         padding: 0 8px;
         color: @black;
         font-weight: normal;
-        &:hover {
-            background-color: @white;
-        }
     }
     .float-left {
         width: 26%;
@@ -5388,19 +5385,32 @@ CALENDAR
         text-indent: -9999em;
         font-size: 1px;
         padding: 0;
-        background-color: @content-background;
+        background-color: @dark;
         margin-left: 6px;
         margin-top: 5px;
         border: 1px solid @lgrey;
     }
-    .back, .forward {
+    .back strong, .forward strong {
         text-indent: -99999em;
+        display: block;
+        height: 13px;
+        top: 5px;
+        position: relative;
+        left: 4px;
     }
-    .back {
-        background: @alternate-background url(/images/core/calendar/cal-left.png) no-repeat 50% 50%;
+    .back strong{
+        background: url(/images/core/icons/btn-icons.png) no-repeat;
+        .btn-icon(38);
+        &:hover{
+          background-position: 0 -545px;
+        }
     }
-    .forward {
-        background: @alternate-background url(/images/core/calendar/cal-right.png) no-repeat 50% 50%;
+    .forward strong{
+        background: url(/images/core/icons/btn-icons.png) no-repeat;
+        .btn-icon(28);
+        &:hover{
+          .btn-icon(29);
+        }
     }
     .datepicker-box {
         float: left;
@@ -5490,8 +5500,8 @@ CALENDAR
           text-indent: -9000px;
         }
         &:hover span{
-          background-position: 0 -545px;
-        }
+           background-position: 0 -545px;
+         }
     }
     .ui-datepicker-trigger {
         cursor: pointer;
