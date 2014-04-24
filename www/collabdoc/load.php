@@ -55,24 +55,15 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 			$pad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$padMapper->save($pad);
 
-			/* Work out which ports to use
-			 */
-			if(SitePage::conType()=='http://') {
-				$port = Cfg::get('websocket_port') ?: 8080;
-			}
-			else {
-				$port = Cfg::get('websocket_port_ssl') ?: 8081;
-			}
-
 			if ($authenticator->canCreate($pad->getHomepageId()) || !$pad->isLocked()) {
-				$this->localRedir(':' . $port . "/pad/p/{$pad->getPadId()}?showChat=false");
+				$this->localRedir(':' . $this->getWebsocketPort() . "/pad/p/{$pad->getPadId()}?showChat=false");
 			}
 			else if ($pad->isLocked()) {
 				$readonlyResult = $client->getReadOnlyID($pad->getPadId());
 				$data = $readonlyResult->getData();
 
 				if ($readonlyResult->getMessage() == 'ok') {
-					$this->localRedir(":" . $port . "/pad/p/{$data['readOnlyID']}?showChat=false");
+					$this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showChat=false");
 				}
 			}
 		}
