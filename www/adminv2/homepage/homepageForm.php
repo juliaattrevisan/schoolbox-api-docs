@@ -43,7 +43,7 @@ switch($action) {
             return;
         }
         // no break: going through
-    case 'new':
+    case 'create':
         if(!(isset($_POST['name'])) || !($name = $_POST['name'])) {
             error(2);
             return;
