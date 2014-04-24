@@ -470,7 +470,7 @@ class SitePage extends Page {
         $this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
         $this->setVar('wm_tab', '');
 
-        if(Cfg::get('mail_enable') && $_SESSION['webmail'] ) {
+        if($_SESSION['webmail'] ) {
             $location = ''; //Webmail location
 
             switch ($this->site) {
