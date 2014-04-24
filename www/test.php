@@ -11,6 +11,8 @@
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
 $externalUser = new External_Maze_User();
-$output = $externalUser->getStudent(1);
+$output = array();
+$output[] = $externalUser->samuel('BOGABRO');
+
 
 new \Alaress_Probe($output);
