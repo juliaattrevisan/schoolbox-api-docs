@@ -95,7 +95,6 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
 	$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
-	$this->setBlock(TEMPLATE_content,  'assess_visibility', 'assess_visibility_block');
     $this->setTitle('Manage Assessment');
 
     $this->setVar('question_block', '');
@@ -188,18 +187,9 @@ if (!empty($_POST)) {
 
 	/* Visibility dropdown
 	 */
-	$visibilityMapper = new \Assess\VisibilityMapper();
-	$allVisibilities = $visibilityMapper->findAll();
-
-	foreach($allVisibilities as $currentVisibility) {
-		$this->setVar(array(
-			'ASSESS_VISIBILITY_ID' => $currentVisibility->getId(),
-			'ASSESS_VISIBILITY_NAME' => $currentVisibility->getName(),
-			'ASSESS_VISIBILITY_CHECKED' => $currentVisibility->getId() == $assessment->getVisibilityId() ? 'selected="selected"' : '',
-		));
-
-		$this->parse('assess_visibility_block', 'assess_visibility', true);
-	}
+	$this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
+	$this->outputVisibilityDropdown($assessment->getVisibilityId());
+	$this->parse('marktype_block', 'marktype');
 
 	/* Show this Assess' contents
 	 */

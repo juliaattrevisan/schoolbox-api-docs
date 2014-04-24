@@ -193,11 +193,13 @@ $j(document).ready(function() {
                     <p>
                         Control who can view marks for this Online Assessment.
                     </p>
-                    <select name='visibility_id'>
-                        <!-- BEGIN assess_visibility -->
-                        <option value='{ASSESS_VISIBILITY_ID}' {ASSESS_VISIBILITY_CHECKED}>{ASSESS_VISIBILITY_NAME}</option>
-                        <!-- END assess_visibility -->
-                    </select>
+					<!-- BEGIN marktype -->
+					<select name="visibility_id" class="formfield" id="marktype">
+						<!-- BEGIN mark_visibility_drop -->
+						<option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
+						<!-- END mark_visibility_drop -->
+					</select>
+					<!-- END marktype -->
                 </td>
             </tr>
       <!-- BEGIN mark_weight -->

@@ -166,7 +166,6 @@ else {
     $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
-	$this->setBlock(TEMPLATE_content,  'assess_visibility', 'assess_visibility_block');
 
     $this->setTitle('Manage Assessment');
 
@@ -257,18 +256,9 @@ else {
 
 	/* Visibility dropdown
 	 */
-	$visibilityMapper = new \Assess\VisibilityMapper();
-	$allVisibilities = $visibilityMapper->findAll();
-
-	foreach($allVisibilities as $currentVisibility) {
-		$this->setVar(array(
-			'ASSESS_VISIBILITY_ID' => $currentVisibility->getId(),
-			'ASSESS_VISIBILITY_NAME' => $currentVisibility->getName(),
-			'ASSESS_VISIBILITY_CHECKED' => '',
-		));
-
-		$this->parse('assess_visibility_block', 'assess_visibility', true);
-	}
+	$this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
+	$this->outputVisibilityDropdown(\Config::get('submission_access'));
+	$this->parse('marktype_block', 'marktype');
 
     /* Don't display questions contents, which appears in Modify
      */
