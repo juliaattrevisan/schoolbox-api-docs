@@ -80,12 +80,17 @@
 @import "screen.less";
 // =============================================================================
 
-#infoPanel .bell {
-	background-image: url('/images/donvale/bell.png');
-	border-radius: 3px;
-	&.open {
-		border-bottom-left-radius: 0;
-		border-bottom-right-radius: 0;
+#infoPanel {
+	> li.first > a {
+		margin-right: 0;
+	}
+	.bell {
+		background-image: url('/images/donvale/bell.png');
+		border-radius: 3px;
+		&.open {
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+		}
 	}
 }
 #message-list {

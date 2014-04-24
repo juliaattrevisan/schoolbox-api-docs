@@ -543,46 +543,15 @@ Notifications
 	z-index: 3;
 	height: @infopanel-height;
     float: right;
-    > li {
+    > li { // top level navs elements in infopanel
         float: left;
+		position: relative;
         margin-left: 8px;
 		color:@banner-color;
 		min-width: 32px;
 		height: @infopanel-height;
 		line-height: @infopanel-height;
-        &.first a {
-            margin-right: 10px
-        }
-    }
-	a {
-		color: @banner-links;
-		text-decoration: none;
-	}
-	img {
-		position: absolute;
-		overflow: hidden;
-	}
-
-	.bell {
-		height: @infopanel-height;
-		padding: 0;
-		background-color: @notify-color;
-		background-image: url(@infopanel-bellsprite);
-		background-position: 0 (-32 - ((32 - @infopanel-height) / 2));
-		background-repeat: no-repeat;
-		transition: background-color 0.1s;
-		position: relative;
-		&[data-unread="0"] {
-			background-position: 0 (0 - ((32 - @infopanel-height) / 2));
-			background-color: transparent;
-			> a {
-				width: 4px;
-				opacity: 0;
-			}
-		}
 		&.open {
-			background-color: @flyout-background;
-			background-position: 0 (-64 - ((32 - @infopanel-height) / 2));
 			&:after {
 				content: " ";
 				background: @flyout-background;
@@ -594,12 +563,54 @@ Notifications
 				right: 0px;
 				z-index: 61;
 			}
-			> a {
-				color: @banner-background;
-			}
-			#message-list {
+			.flyout-menu {
 				display: block;
 				z-index: 60;
+			}
+		}
+		&.first {
+			&.avatar > a {
+				margin-right: 39px;
+			}
+			> a {
+				margin-right: 8px;
+				white-space: nowrap;
+				img {
+					margin-left: 10px;
+				}
+			}
+		}
+		> a {
+			color: @banner-links;
+			//		text-decoration: none;
+		}
+    }
+	img {
+		position: absolute;
+		overflow: hidden;
+	}
+	// styles specific to the messages dropdown
+	.bell {
+		height: @infopanel-height;
+		padding: 0;
+		background-color: @notify-color;
+		background-image: url(@infopanel-bellsprite);
+		background-position: 0 (-32 - ((32 - @infopanel-height) / 2));
+		background-repeat: no-repeat;
+		transition: background-color 0.1s;
+		&[data-unread="0"] {
+			background-position: 0 (0 - ((32 - @infopanel-height) / 2));
+			background-color: transparent;
+			> a {
+				width: 4px;
+				opacity: 0;
+			}
+		}
+		&.open {
+			background-color: @flyout-background;
+			background-position: 0 (-64 - ((32 - @infopanel-height) / 2));
+			> a {
+				color: @notify-open-text-color;
 			}
 		}
 		> a {
@@ -619,9 +630,32 @@ Notifications
 			padding: 0;
 		}
 	}
+	// styles specific to the account menu dropdown
+	.user {
+		&.open:after {
+			width: 32px;
+		}
+		li {
+			&:last-child a {
+				border-bottom: none;
+			}
+			a {
+				padding: 5px 30px 5px 10px;
+				display: block;
+				border-bottom: solid 1px @border-color;
+				color: @flyout-color;
+				text-decoration: none;
+				&:hover {
+					text-decoration: underline;
+					background: @flyout-hover-background;
+					color: @flyout-hover-color;
+				}
+			}
+		}
+	}
 }
 
-#message-list {
+.flyout-menu {
 	.shadow-14();
 	line-height: 1.3em;
 	display: none;
@@ -633,13 +667,13 @@ Notifications
 	right: -16px;
 	top: @infopanel-height + @flyout-pad-height;
 	padding-left: 0;
-	min-width: 300px;
+//	min-width: 300px;
 	h4 {
 		font-weight: bold;
 		color: @flyout-header-color;
 		padding: 8px 0 4px 8px;
 		a {
-			color: #0066bb;
+			color: @link;
 			font-weight: normal;
 			position: absolute;
 			right: 0;
@@ -654,13 +688,16 @@ Notifications
 	}
 	.messages {
 		padding: 0;
+		&.header {
+			width: 100%;
+		}
 		&.footer {
 			position: relative;
 			width: 100%;
+			min-width: 300px;
 			margin: 0;
 			a {
 				display: block;
-				width: 100%;
 				padding: 8px;
 				text-decoration: none;
 				color: @flyout-color;
