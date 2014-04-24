@@ -102,7 +102,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     // 2: "task", "unit:$unit_id" or an integer (in which case it's a file ID)
     // 3: work type, if provided
     $category_id = $this->arg[1];
-    $title       = 'Post Due Box';
+    $title       = 'Post Due Work';
     $heading     = 'Post';
     $category    = CategoryMapper::getInstance()->findById($category_id);
     $submission
