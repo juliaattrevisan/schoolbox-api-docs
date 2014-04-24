@@ -64,19 +64,30 @@ $j(document).ready(function() {
 			description: "Please enter a description"
 		}
     });
+
+    /* Create dialog for importing XML survey */
+    $( "#importForm" ).dialog({
+        autoOpen: false,
+        modal: true
+    });
+
+    $('#import').click(function() {
+        $( '#importForm').dialog("open");
+    });
+
 });
 </script>
 <!-- END custom_head -->
-<h1>{ASSESS_TITLE}</h1>
+<h1>{ASSESS_ACTION}</h1>
 <div class="evaluation-content">
-	<h2>Create and modify your survey</h2>
+	<h2>Initial Details</h2>
 	<form name="create" action="/survey/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
 		<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
 		<table class="standardForm table" width="100%">
 			<tr>
 				<td class="formLabelWidth">
-					<h4>Title</h4>
 					<label>
+                    <strong>Title</strong>
 						<input name="title" type="text" size="35" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
 					</label>
 				</td>
@@ -84,8 +95,7 @@ $j(document).ready(function() {
 			<tr>
 				<!-- Available from this time -->
 				<td>
-					<h4>Start</h4>
-					<em>The survey will only be available between the start and finish date</em>
+					<strong>Start</strong>
 					<fieldset>
 						<input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
 
@@ -102,8 +112,7 @@ $j(document).ready(function() {
 			<tr>
 				<!-- Available until this time -->
 				<td>
-					<h4>Finish</h4>
-					<em>The last time this survey will be available to complete</em>
+					<strong>Finish</strong>
 					<fieldset>
 						<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
 
@@ -119,7 +128,7 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>
-					<h4>Description</h4>
+					<strong>Description</strong>
 					<div class="textarea-container">
 						<textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
 					</div>
@@ -127,51 +136,34 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>
-					<h4>Allow Multiple Submissions</h4>
-					<p>
-						Allow participants to make more than one submission.
-					</p>
+                    <strong>Options</strong>
 					<div class="textarea-container">
 						<input type="hidden" name="max_attempts" value="1" />
-						<input type="checkbox" name="max_attempts" value="0" {MAX_ATTEMPTS_CHECKED}>Participants can make more than one submission.
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<h4>Anonymous Results</h4>
-					<p>Hide usernames from results listings and exported survey results files.</p>
-					<div class="textarea-container">
-						<input name="anonymous_result" type="checkbox" value="1" {ASSESS_ANONYMOUS_RESULT_CHECKED}/> Results will be anonymous
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<h4>Notification</h4>
-					<p>Send an email notification to the survey's author whenever someone completes an attempt.</p>
-					<div class="textarea-container">
-						<input name="notify_author" type="checkbox" value="1" {ASSESS_NOTIFY_AUTHOR_CHECKED}/> Turn on notifications
-					</div>
+						<input type="checkbox" name="max_attempts" value="0" {MAX_ATTEMPTS_CHECKED}>Participants can submit multiple responses.<br />
+                        <input name="anonymous_result" type="checkbox" value="1" {ASSESS_ANONYMOUS_RESULT_CHECKED}/>Hide names from results and exported files.<br />
+                        <input name="notify_author" type="checkbox" value="1" {ASSESS_NOTIFY_AUTHOR_CHECKED}/> Notify survey creator via email when a survey is completed<br />
+                    </div>
 				</td>
 			</tr>
 		</table>
 		<label class="clearfix">
 			<input type="submit" value="Continue" class="submit-btn-plain no-marg" />
 		</label>
+        <!-- BEGIN importXML -->
+        <a href="#importForm"  id="import">Import from XML file</a>
+        <!-- END importXML -->
 	</form>
 
-	<!-- BEGIN importXML -->
-	<h2>Import an assessment from an XML file</h2>
-	<form action="/survey/import/xml/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
-		<label>
-			<input name="importXML" type="file" />
-		</label>
-		<label class="clearfix">
-			<input type="submit" value="Import from XML file"  class="submit-btn-plain no-marg"/>
-		</label>
-	</form>
-	<!-- END importXML -->
+    <div id="importForm" class="hide" title="Import survey from an XML file">
+        <form action="/survey/import/xml/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
+            <label>
+                <input name="importXML" type="file" />
+            </label>
+            <label class="clearfix">
+                <input type="submit" value="Import from XML file"  class="submit-btn-plain no-marg"/>
+            </label>
+        </form>
+    </div>
 
 </div>
 <div class="evaluation-menu">

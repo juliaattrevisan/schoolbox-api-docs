@@ -172,6 +172,7 @@ else {
 
     $this->setVar(array(
         'ACTION'             => 'create',
+        'ASSESS_ACTION'      => 'Create Quiz',
         'ASSESS_IS_TASK'     => $is_task ? 1 : 0,
         'ASSESS_ASSESS_ID'   => '',
         'ASSESS_CATEGORY_ID' => $category_id,
@@ -239,7 +240,7 @@ else {
     for ($i = 1; $i < 11; $i++) {
         $this->setVar(array(
             'MAX_ATTEMPTS_VALUE' => $i,
-            'MAX_ATTEMPTS_CHECKED' => '',
+            'MAX_ATTEMPTS_CHECKED' => $i==1 ? 'selected="selected"':'',
         ));
 
         $this->parse('max_attempts_block', 'max_attempts', true);

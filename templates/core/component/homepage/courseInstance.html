@@ -70,7 +70,7 @@
 
                 <div class="hide clear form_container" data-interaction="delete_unit_container">
                     <p class="notice">Are you sure you wish to delete this unit?</p>
-                    <p class="notice">All tasks within the unit will be deleted, as will any linked due work items and online assessments.</p>
+                    <p class="notice">All tasks within the unit will be deleted, as will any linked due work and quizzes.</p>
                     <form action="/course/modifyForm.php" method="post" class="delete_form" data-form_type="delete_unit">
                         <input type="hidden" name="action"    value="delete" />
                         <input type="hidden" name="id"        value="{UNIT_ID}" />
@@ -158,7 +158,7 @@
                         <!-- BEGIN unit_task_delete_form -->
                         <div class="hide clear form_container" data-interaction="delete_task_container">
                             <p class="notice">Are you sure you wish to delete this task?</p>
-                            <p class="notice">Any linked due work items and online assessments will be deleted, as will all student's completion of this task.</p>
+                            <p class="notice">Any linked due work items and quizzes will be deleted, as will all student's completion of this task.</p>
                             <form action="/task/saveInstanceForm.php" method="post" class="delete_form" data-form_type="delete_task">
                                 <input type="hidden" name="action"    value="delete" />
                                 <input type="hidden" name="id"        value="{UNIT_TASK_ID}" />
@@ -175,11 +175,11 @@
 
                 <p class="interact clear add_buttons">
                     <!-- BEGIN unit_report_actions -->
-                    <a href="/task/progressReport/{ID}/{UNIT_ID}" class="btn modify"><span></span>Task Progress Report</a>
+                    <a href="/task/progressReport/{ID}/{UNIT_ID}" class="btn modify"><span></span>Progress Report</a>
                     <!-- END unit_report_actions -->
                     <!-- BEGIN unit_add_task_actions -->
-                    <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="btn up-arrow" data-form_class="for_due_work"><span></span>Add Due Work</a>
-                    <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="btn create" data-form_class="for_assessment"><span></span>Add Assessment</a>
+                    <a href="/submission/createSubmission/new/{ID}/unit:{UNIT_ID}" class="btn up-arrow" data-form_class="for_due_work"><span></span>Post Due Work</a>
+                    <a href="/assess/create/{ID}/unit:{UNIT_ID}" class="btn create" data-form_class="for_assessment"><span></span>Create Quiz</a>
                     <a href="/task/createInstance/{UNIT_ID}" class="btn tick" data-form_class="for_task"><span></span>Add Task</a>
                     <!-- END unit_add_task_actions -->
                 </p>

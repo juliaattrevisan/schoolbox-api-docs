@@ -21,6 +21,7 @@ tinyMCE.init({
 	pdw_toggle_on : 1,
 	pdw_toggle_toolbars : '2, 3, 4',
 	extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+    theme_advanced_blockformats : "h3,h4,p,address,pre",
 	file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
 	file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
 	file_browser_category_id : '{ASSESS_CATEGORY_ID}',
@@ -82,12 +83,22 @@ $j(document).ready(function() {
       weight: "Please add a numeric weight"
 		}
 	});
+
+    /* Create dialog for importing XML assess */
+    $( "#importForm" ).dialog({
+        autoOpen: false,
+        modal: true
+    });
+
+    $('#import').click(function() {
+        $( '#importForm').dialog("open");
+    });
 });
 </script>
 <!-- END custom_head -->
-<h1>Assessment - {ASSESS_TITLE}</h1>
+<h1>{ASSESS_ACTION}</h1>
 <div class="evaluation-content">
-	<h2>Create and modify your assessment</h2>
+	<h2>Initial Details</h2>
 	<form name="create" action="/assess/{ACTION}/{ASSESS_ASSESS_ID}" id="createAssess" method="post">
 		<input name="category_id" type="hidden" value="{ASSESS_CATEGORY_ID}" />
         <input name="is_task" type="hidden" value="{ASSESS_IS_TASK}" />
@@ -95,20 +106,17 @@ $j(document).ready(function() {
 		<table class="standardForm table" width="100%">
 			<tr>
 				<td class="formLabelWidth">
-					<h4>Title</h4>
-					<em>The name of the test</em>
-					<label>
-						<input name="title" type="text" size="35" maxlength="100" value="{ASSESS_TITLE}" id="title"/>
-					</label>
-				</td>
+                    <label>
+					<strong>Title</strong>
+                    <input name="title" type="text" maxlength="100" value="{ASSESS_TITLE}" id="title"/></label>
+                </td>
 			</tr>
 
 			<!-- BEGIN assess_timespan -->
 			<tr>
 				<!-- Available from this time -->
 				<td>
-					<h4>Start</h4>
-					<em>Test opens at this time</em>
+					<strong>Start</strong>
 					<fieldset>
 						<input name="start[date]" id="start_date" type="text" size="15" maxlength="30" value="{ASSESS_START_DATE}" />
 
@@ -125,8 +133,7 @@ $j(document).ready(function() {
 			<tr>
 				<!-- Available until this time -->
 				<td>
-					<h4>Finish</h4>
-					<em>Test closes at this time</em>
+					<strong>Finish</strong>
 					<fieldset>
 						<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
 
@@ -144,8 +151,8 @@ $j(document).ready(function() {
 
 			<tr>
 				<td>
-					<h4>Duration</h4>
-					<em>To set a test duration, tick the box and fill out a time.</em>
+					<strong>Duration</strong>
+					<em>To set a quiz duration, tick the box and fill out a time.</em>
 					<label class="float-left">
 						<input type="hidden" name="durationSelected" value="0" />
 						<input type="checkbox" name='durationSelected' class="float-left show-duration" value='1' {ASSESS_DURATION_CHECKED} />
@@ -158,46 +165,54 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>
-					<h4>Description</h4>
+					<strong>Description</strong>
 					<div class="textarea-container">
-						<textarea id='description' name="description">{ASSESS_DESCRIPTION}</textarea>
+						<textarea id='description' name="description" style="width: 100%;">{ASSESS_DESCRIPTION}</textarea>
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<h4>Maximum Attempts</h4>
-					<p>
-						The maximum number of times someone can attempt this Online Assessment.
-					</p>
+                    <label>
+					<strong>Maximum Attempts</strong>
+					<em>
+						The maximum number of times someone can attempt this quiz.
+					</em>
 					<select name='max_attempts'>
 						<option value='0'>Unlimited</option>
 						<!-- BEGIN max_attempts -->
 						<option value='{MAX_ATTEMPTS_VALUE}' {MAX_ATTEMPTS_CHECKED}>{MAX_ATTEMPTS_VALUE}</option>
 						<!-- END max_attempts -->
 					</select>
+                    </label>
 				</td>
 			</tr>
       <!-- BEGIN mark_weight -->
       <tr>
         <td>
-          <h4>Weight</h4>
-          <em>The weighting of this Online Assessment (default is 100).</em>
+
+
           <label>
+              <strong>Weight</strong>
+              <em>The weighting of this quiz (default is 100).</em>
             <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
+
           </label>
+
         </td>
       </tr>
       <!-- END mark_weight -->
 		</table>
 		<label class="clearfix">
 			<input type="submit" value="Continue" class="submit-btn-plain no-marg" />
-		</label>
-	</form>
+        </label>
+        <!-- BEGIN importXML -->
+        <a href="#importForm"  id="import">Import from XML file</a>
+        <!-- END importXML -->
+    </form>
 
-	<!-- BEGIN importXML -->
-	<h2>Import an assessment from an XML file</h2>
-	<form action="/assess/import/xml/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
+    <div id="importForm" class="hide" title="Import quiz from an XML file">
+    <form action="/assess/import/xml/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
 		<input type='hidden' name="is_task" value="{ASSESS_IS_TASK}" />
 		<input name="unit_id" type="hidden" value="{ASSESS_UNIT_ID}" />
 		<label>
@@ -207,7 +222,7 @@ $j(document).ready(function() {
 			<input type="submit" value="Import from XML file"  class="submit-btn-plain no-marg"/>
 		</label>
 	</form>
-	<!-- END importXML -->
+    </div>
 </div>
 <div class="evaluation-menu">
 	<!-- BEGIN allQuestions -->
