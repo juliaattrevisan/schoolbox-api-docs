@@ -304,7 +304,7 @@ class Task implements ISoftDeletable {
             case self::TYPE_DUE_WORK:
                 return 'Due Work';
             case self::TYPE_ONLINE_ASSESS:
-                return 'Online Assessment';
+                return 'Quiz';
             default:
                 break;
         }

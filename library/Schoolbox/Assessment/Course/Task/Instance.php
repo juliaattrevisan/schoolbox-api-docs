@@ -353,7 +353,7 @@ class Instance implements ISoftDeletable {
             case Task::TYPE_DUE_WORK:
                 return 'Due Work';
             case Task::TYPE_ONLINE_ASSESS:
-                return 'Online Assessment';
+                return 'Quiz';
             default:
                 break;
         }
