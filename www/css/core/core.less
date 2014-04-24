@@ -556,7 +556,7 @@ Notifications
 				content: " ";
 				background: @flyout-background;
 				display: block;
-				width: 32px;
+				width: 100%;
 				height: @flyout-pad-height;
 				position: absolute;
 				bottom: -1 * @flyout-pad-height;
@@ -568,13 +568,18 @@ Notifications
 				z-index: 60;
 			}
 		}
-		&.first > a {
-			margin-right: 39px;
-			white-space: nowrap;
-			img {
-				margin-left: 10px;
+		&.first {
+			&.avatar > a {
+				margin-right: 39px;
 			}
-        }
+			> a {
+				margin-right: 8px;
+				white-space: nowrap;
+				img {
+					margin-left: 10px;
+				}
+			}
+		}
 		> a {
 			color: @banner-links;
 			//		text-decoration: none;
@@ -605,7 +610,7 @@ Notifications
 			background-color: @flyout-background;
 			background-position: 0 (-64 - ((32 - @infopanel-height) / 2));
 			> a {
-				color: @banner-background;
+				color: @notify-open-text-color;
 			}
 		}
 		> a {
@@ -627,6 +632,9 @@ Notifications
 	}
 	// styles specific to the account menu dropdown
 	.user {
+		&.open:after {
+			width: 32px;
+		}
 		li {
 			&:last-child a {
 				border-bottom: none;
@@ -680,6 +688,9 @@ Notifications
 	}
 	.messages {
 		padding: 0;
+		&.header {
+			width: 100%;
+		}
 		&.footer {
 			position: relative;
 			width: 100%;
@@ -687,7 +698,6 @@ Notifications
 			margin: 0;
 			a {
 				display: block;
-				width: 100%;
 				padding: 8px;
 				text-decoration: none;
 				color: @flyout-color;
