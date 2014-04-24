@@ -43,59 +43,6 @@ class clean {
 		print "Submission system last visit records cleaned<br>";
 	}
 
-    function cleanCalendar() {
-        $query = "DELETE FROM event WHERE access = xce3";
-        $this->db->query($query);
-    }
-
-    /**
-     * @deprecated 2012-08-17
-     */
-    function cleanSubmissionBoxes()
-	{
-        error(9, 'This function has been deprecated. Submission boxes are now archived, not deleted.');
-
-//		//unlink all student submissions
-//		$query = "SELECT id FROM student_submission";
-//		$this->db->query($query);
-//
-//		while( $sub = $this->db->getNextArray() )
-//		{
-//			if(!@unlink(Cfg::get('submission_dir')."/".$sub['id'].".dat"))
-//				print "Failed to delete ".Cfg::get('submission_dir')."/".$sub['id'].".dat<br>";
-//		}
-//
-//		$query = "DELETE FROM student_submission";
-//		$this->db->query($query);
-//		print "Deleted all student submissions<br>";
-//
-//		$query = "DELETE FROM submission_box";
-//		$this->db->query($query);
-//		print "Deleted all submission boxes<br>";
-
-	}
-
-    /**
-     * @deprecated
-     */
-    function cleanReturnedWork()
-	{
-        error(9, 'This function has been deprecated. Submission boxes are now archived, not deleted.');
-
-//		$query = "SELECT id FROM submission_return";
-//		$this->db->query($query);
-//
-//		while( $ret = $this->db->getNextArray() )
-//		{
-//			if(!@unlink(Cfg::get('returns_dir')."/".$ret['id'].".dat"))
-//				print "Failed to delete ".Cfg::get('returns_dir')."/".$ret['id'].".dat<br>";
-//		}
-//
-//		$query = "DELETE FROM submission_return";
-//		$this->db->query($query);
-//		print "Deleted all returned items<br>";
-
-	}
 
 	function cleanNews()
 	{
@@ -123,7 +70,7 @@ class clean {
 
 		while($file = $this->db->getNextArray()) {
 			if(!@unlink(Cfg::get('file_dir')."/".$file['id'].".dat"))
-			print "Failed to delete ".Cfg::get('file_dir')."/".$file['id'].".dat<br>";
+			print "Unable to find ".Cfg::get('file_dir')."/".$file['id'].".dat<br>";
 		}
 
 		$query = "DELETE FROM file WHERE deleted = '1'";
@@ -168,8 +115,6 @@ class clean {
 
 		//student submissions
 		foreach(glob(Cfg::get('submission_dir').'/*.dat') as $file) {
-		print $file;
-		continue;
 			preg_match('/.*\/([0-9]+).dat/', $file, $matches);
 			if($matches[1]) {
 				$query = "SELECT id FROM student_submission WHERE id = '{$matches[1]}'";
@@ -200,25 +145,61 @@ class clean {
 
 	}
 
-	function rollStudents() {
-		$groupHandler = new Group();
+	function cleanImages() {
 
-		$query = "UPDATE user SET year = year + 1 WHERE group_id IN(".implode(',', $groupHandler->getStudentGroupTypeIds()).") AND year IS NOT NULL";
-		$this->db->query($query);
-		print "Updated ".$this->db->affectedRows()." student year levels<br>";
-	}
-
-	function cleanThumbnails() {
-
+        /* Delete SBFS Image Cache */
 		foreach(glob(Cfg::get('thumbnail_dir').'/*.jpg') as $file) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
 		}
+
+        /* Delete MyFiles Image Cache */
+        foreach(glob(Cfg::get('myfiles_cache_dir').'/*.jpg') as $file) {
+            print "Deleting $file<br>";
+            if(!@unlink($file))
+                print "Failed to delete $file<br>";
+        }
+
+        /* Delete Portrait Cache */
+        foreach(glob(Cfg::get('stream_dir').'/portrait/*.jpg') as $file) {
+            print "Deleting $file<br>";
+            if(!@unlink($file))
+                print "Failed to delete $file<br>";
+        }
+
+        /* Delete social stream images */
+        foreach(glob(Cfg::get('stream_dir') . '/socialstream/thumbnails/*.jpg') as $file) {
+            print "Deleting $file<br>";
+            if(!@unlink($file))
+                print "Failed to delete $file<br>";
+        }
+
+        foreach(glob(Cfg::get('stream_dir') . '/socialstream/socialstream_thumbnail_*') as $file) {
+            print "Deleting $file<br>";
+            if(!@unlink($file))
+                print "Failed to delete $file<br>";
+        }
+
+        /* Delete storage images */
+        foreach(glob(Cfg::get('stream_dir').'/storage/*.jpg') as $file) {
+            print "Deleting $file<br>";
+            if(!@unlink($file))
+                print "Failed to delete $file<br>";
+        }
+
 	}
+
+    function cleanStream() {
+        /* Clean downloaded stream files (twitter, rss, weather) */
+        foreach(glob(Cfg::get('stream_dir').'/*.txt') as $file) {
+            print "Deleting $file<br>";
+            if(!@unlink($file))
+                print "Failed to delete $file<br>";
+        }
+    }
 	
 	function cleanZip() {
-
 		foreach(glob(Cfg::get('zip_dir').'/*') as $file) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
@@ -233,15 +214,14 @@ if(count($this->arg)) {
     foreach($this->arg as $arg) {
         switch($arg) {
             case 'news':     $clean->cleanNews(); break;
-            case 'calendar': $clean->cleanCalendar(); break;
             case 'subnews':  $clean->cleanSubNews(); break;
             case 'file':     $clean->cleanDeletedFiles(); break;
             case 'loginlog': $clean->cleanLoginLog(); break;
             case 'log':      $clean->cleanLogs(); break;
-            case 'rolluser': $clean->rollStudents(); break;
             case 'fileclean': $clean->cleanFileSystem(); break;
-            case 'thumbnail': $clean->cleanThumbnails(); break;
+            case 'image': $clean->cleanImages(); break;
             case 'zip':      $clean->cleanZip(); break;
+            case 'stream':      $clean->cleanStream(); break;
             default: $this->localRedir('/adminv2/cleanup');
         }
     }
