@@ -67,7 +67,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     // Args:
     // 1: submission box ID
     $submission_id    = $this->arg[1];
-    $title            = 'Modify Submission Box';
+    $title            = 'Modify Due Work';
     $heading          = 'Modify';
 
 	try {
@@ -97,8 +97,8 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     // 2: "task", "unit:$unit_id" or an integer (in which case it's a file ID)
     // 3: work type, if provided
     $category_id = $this->arg[1];
-    $title       = 'Create Submission Box';
-    $heading     = 'Create';
+    $title       = 'Post Due Work';
+    $heading     = 'Post';
     $category    = CategoryMapper::getInstance()->findById($category_id);
     $submission
         ->setCategory($category)
