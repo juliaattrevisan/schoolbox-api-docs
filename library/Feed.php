@@ -202,10 +202,10 @@ class Feed {
                 'date' => $row['start'],
                 'type' => 'onlineassessment',
                 'message' => $userHandler->formatName($row)
-                    . ' opened the online assessment '
+                    . ' opened the quiz '
                     . Scrub::text( $row['heading']),
                 'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row)
-                    . '</a> opened the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">'
+                    . '</a> opened the quiz <a href="/assess/intro/' . $row['assess_id'] . '">'
                     . Scrub::text($row['heading']) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name' => $userHandler->formatName($row),
@@ -214,7 +214,7 @@ class Feed {
                 'user_id' => $row['uid'],
                 'link'    => '/assess/intro/' . $row['assess_id'],
                 'name'    => $row['heading'],
-                'action'  => 'opened the online assessment',
+                'action'  => 'opened the quiz',
             );
         }
 

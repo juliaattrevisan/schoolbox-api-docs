@@ -101,7 +101,7 @@ class DueWork_All {
 
         // both returned nothing, so just output a single 'not found'
         if(!($dueSuccess || $assessSuccess)) {
-            $this->page->setVar('subject_block', 'No due work nor online assessments found.');
+            $this->page->setVar('subject_block', 'No due work or quizzes found.');
             $this->page->setVar('allAssess_block', '');
         }
         // output no due work found
@@ -110,7 +110,7 @@ class DueWork_All {
         }
         // output no assessments found
         elseif(!$assessSuccess) {
-            $this->page->setVar('allAssess_block', 'No online assessments found.');
+            $this->page->setVar('allAssess_block', 'No quizzes found.');
         }
     }
 
