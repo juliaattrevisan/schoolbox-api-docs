@@ -62,7 +62,35 @@ class External_Maze_Class implements External_ClassInterface {
 			AND TTPERIOD = '{$ttPeriod}'
 		";
 
-		$allStudents = $this->getDb()->getAll($query);
+		$part1 = $this->getDb()->getAll($query);
+
+		if (!$part1) {
+			$part1 = array();
+		}
+
+		$query = "
+			SELECT
+				ST.STKEY AS ID,
+				ST.FIRST_NAME AS Firstname,
+				ST.SURNAME AS Surname,
+				REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS YearLevel,
+				KGH.DESCRIPTION AS House,
+				MEDICAL AS MedicalAlert,
+				'' AS SpecialNeedsFlag,
+				'' AS ClassCampus
+			FROM ST
+			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
+			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
+			WHERE KGC.ROLL_GROUP = '{$classCode}'
+		";
+
+		$part2 = $this->getDb()->getAll($query);
+
+		if (!$part2) {
+			$part2 = array();
+		}
+
+		$allStudents = array_merge($part1, $part2);
 
 		$studentList = array();
 
@@ -102,7 +130,10 @@ class External_Maze_Class implements External_ClassInterface {
 		$ingredients = $this->getHelper()->degenerateClassCode($classCode);
 
 		$query = "
-			SELECT T1TEACH, T2TEACH
+			SELECT
+				T1TEACH,
+				T2TEACH,
+				'' AS T3TEACH
 			FROM TT
 			LEFT JOIN TTTG ON TT.TTKEY = TTTG.GKEY
 			WHERE TT.TTPERIOD = '{$ttPeriod}'
@@ -110,7 +141,28 @@ class External_Maze_Class implements External_ClassInterface {
 			AND CLASS = '{$ingredients['ClassNumber']}'
 		";
 
-		$allTeachers = $this->getDb()->getAll($query);
+		$part1 = $this->getDb()->getAll($query);
+
+		if (!$part1) {
+			$part1 = array();
+		}
+
+		$query = "
+			SELECT
+				TEACHER AS T1TEACH,
+				TEACHERB AS T2TEACH,
+				TEACHERC AS T3TEACH
+			FROM KGC
+			WHERE KGC.ROLL_GROUP = '{$classCode}'
+		";
+
+		$part2 = $this->getDb()->getAll($query);
+
+		if (!$part2) {
+			$part2 = array();
+		}
+
+		$allTeachers = array_merge($part1, $part2);
 
 		/* Uniqueify everything
 		 */
@@ -120,6 +172,7 @@ class External_Maze_Class implements External_ClassInterface {
 			foreach($allTeachers as $currentTeacher) {
 				$teacherKeys[$currentTeacher['T1TEACH']] = '';
 				$teacherKeys[$currentTeacher['T2TEACH']] = '';
+				$teacherKeys[$currentTeacher['T3TEACH']] = '';
 			}
 		}
 
