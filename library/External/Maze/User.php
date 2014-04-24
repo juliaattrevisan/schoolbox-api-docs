@@ -612,6 +612,7 @@ class External_Maze_User implements External_UserInterface {
 				FROM STMA
 				LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 				WHERE SKEY = '{$externalUserId}'
+				AND STMA.TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
 			";
 
 			$part2 = $this->getDb()->getAll($query);
