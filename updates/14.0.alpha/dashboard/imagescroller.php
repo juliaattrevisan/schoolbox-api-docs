@@ -19,31 +19,33 @@ $definition = array(
 	'config'             => array(
 		'componentname' => array(
 			'default_value' => 'Image Slideshow',
-			'label'         => 'Heading',
+			'label' => 'Heading',
 		),
 		'align' => array(
 			'default_value' => 'left',
-			'label'         => 'Align',
+			'label' => 'Align',
 		),
 		'captionState' => array(
 			'default_value' => 'Active',
-			'label'         => 'Captions',
+			'label' => 'Captions',
 		),
 		'pixel' => array(
 			'default_value' => '200',
-			'label'         => 'Max width/height',
+			'label' => 'Max width/height',
 		),
 		'src' => array(
 			'default_value' => '200',
-			'label'         => 'Source',
+			'label' => 'Source',
 		),
 		'timing' => array(
 			'default_value' => '2',
-			'label'         => 'Timing',
+			'label' => 'Timing',
+		),
+		'compactMode' => array(
+			'default_value' => 1,
+			'label' => 'Hide header',
 		),
 	),
 );
-
-// Timing
 
 Component_DefinitionMapper::getInstance()->create($definition);
