@@ -696,7 +696,7 @@ class Submission extends DeprecatedModel {
     }
 
     function getTypes() {
-        $query = "SELECT * FROM file_type";
+        $query = "SELECT * FROM lu_submission_type";
         return $this->db->getAll($query);
     }
 
@@ -777,7 +777,7 @@ class Submission extends DeprecatedModel {
      * @return <type>
      */
     function getTypesExcept($vals) {
-        $query = "SELECT * FROM file_type";
+        $query = "SELECT * FROM lu_submission_type";
 
         if (is_array($vals) && count($vals)) {
             $query .= " WHERE id NOT IN (" . implode(',', $vals) . ")";
@@ -924,7 +924,7 @@ class Submission extends DeprecatedModel {
     public function getType($typeId) {
         $query = "
 			SELECT name
-			FROM file_type
+			FROM lu_submission_type
 			WHERE id = '$typeId'
 		";
 
