@@ -13,7 +13,7 @@ use Schoolbox;
 class WorkTypeMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
-		$this->hasTable('file_type');
+		$this->hasTable('lu_submission_type');
 		$this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\WorkType');
 		$this->hasMap(array(
 			'column'     => 'id',
