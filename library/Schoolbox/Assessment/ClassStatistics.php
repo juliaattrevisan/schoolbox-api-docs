@@ -106,8 +106,8 @@ class ClassStatistics {
 		/* Visibility
 		 * Exclude hidden quizzes from the Assessments cube
 		 */
-		$quizVisibilityMapper = new \Assess\VisibilityMapper();
-		$quizVisibilities = $quizVisibilityMapper->getVisibilityArray($user);
+		$quizVisibility = new \Assess\Visibility();
+		$quizVisibilities = $quizVisibility->getVisibilityArray($user);
 
 		// retrieve ALL the online assessments (not surveys) for this category
 		$assessCollection = $this->assessMapper->findByColumnList(array(

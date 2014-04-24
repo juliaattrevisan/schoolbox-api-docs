@@ -32,6 +32,39 @@ class Visibility {
 	}
 
 	/**
+	 * Get a list of visibility consts
+	 *
+	 * This can prevent Quiz marks from appearing in Report Cards, from being
+	 * shown to the participant at the end, etc
+	 *
+	 * Note that the assess_visibility table has been made synonymous with the
+	 * consts defined in SubmissionBox (zero-based) and thus won't autoincrement
+	 *
+	 * @param \Schoolbox\User $user
+	 * @return array
+	 */
+	public function getVisibilityArray(\Schoolbox\User $user) {
+		$groupHandler = new \Group();
+
+		$visibilities = array();
+
+		if ($groupHandler->isSuperuser() || $groupHandler->isStaff()) {
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+		}
+		else if ($groupHandler->isStudent()) {
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+		}
+		else if ($groupHandler->isParentOfChild($user->getId())) {
+			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+		}
+
+		return $visibilities;
+	}
+
+	/**
 	 * Is this Quiz mark visible to staff only
 	 *
 	 * @return bool

@@ -142,8 +142,8 @@ class SubjectReportCard {
 
 			/* Visibilities
 			 */
-			$quizVisibilityMapper = new \Assess\VisibilityMapper();
-			$quizVisibilities = $quizVisibilityMapper->getVisibilityArray($this->user);
+			$quizVisibility = new \Assess\Visibility();
+			$quizVisibilities = $quizVisibility->getVisibilityArray($this->user);
 
 			// retrieve subject grades.
 			// Ensure that grades are properly ordered by date.

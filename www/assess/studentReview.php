@@ -66,8 +66,8 @@ if (!$attemptHandler->isOwner($this->arg[2])
 
 /* Check visibility
  */
-$quizVisibilityMapper = new \Assess\VisibilityMapper();
-$quizVisibility = $quizVisibilityMapper->findById($assess['visibility_id']);
+$quizVisibility = new \Assess\Visibility();
+$quizVisibility->setId($assess['visibility_id']);
 
 /* Mostly do nothing
  */
