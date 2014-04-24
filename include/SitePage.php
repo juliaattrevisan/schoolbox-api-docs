@@ -213,7 +213,7 @@ class SitePage extends Page {
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
 
-        if(empty($_SERVER['HTTPS'])) {
+        if(SitePage::conType()=='http://') {
             $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port') ?: 8080;
         }
         else {
