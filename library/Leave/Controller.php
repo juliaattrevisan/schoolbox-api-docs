@@ -841,12 +841,6 @@ class Leave_Controller extends Controller {
 				));
 
                 if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
-                    $this->getPage()->setVar(
-                        array(
-                            'CLASS' => $pendingRequestCount % 2 ? '' : 'dark',
-                        )
-                    );
-
                     $this->getPage()->parse('pending_request_block', 'pending_request', true);
 
                     $pendingRequestCount++;
@@ -858,7 +852,6 @@ class Leave_Controller extends Controller {
                             ),
                             'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
                             'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
-                            'CLASS' => $previousRequestCount % 2 ? '' : 'dark',
                         )
                     );
 
@@ -1034,12 +1027,6 @@ class Leave_Controller extends Controller {
                     );
 
                     if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
-                        $this->getPage()->setVar(
-                            array(
-                                'CLASS' => $pendingRequestCount % 2 ? '' : 'dark',
-                            )
-                        );
-
                         $this->getPage()->parse('pending_request_block', 'pending_request', true);
 
                         $pendingRequestCount++;
@@ -1052,7 +1039,6 @@ class Leave_Controller extends Controller {
                                 )->getAustralian(),
                                 'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
                                 'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
-                                'CLASS' => $previousRequestCount % 2 ? '' : 'dark',
                             )
                         );
 
