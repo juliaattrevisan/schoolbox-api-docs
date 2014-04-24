@@ -17,7 +17,7 @@
 </script>
 <!-- END custom_head -->
 
-<h1>{DUEWORK_DESCRIPTION}</h1>
+<h1>{CATEGORY_NAME}: {DUEWORK_DESCRIPTION}</h1>
 <span class="header_option">
     <!-- BEGIN download_btn -->
     <a href="/submission/downloadAll.php?id={BOX_ID}" class="btn download"><span></span>Download All</a>
@@ -25,10 +25,16 @@
     <!-- BEGIN modify_btn -->
     <a href="/submission/createSubmission/modify/{BOX_ID}" class="btn modify"><span></span>Modify</a>
     <!-- END modify_btn -->
-	<a href="/submission/listSubmission" class="btn go-back"><span></span>Return to List</a>
     {DUEWORK_ARCHIVED}
 </span>
-<p>{DUEWORK_TYPE} due on <b>{DUEWORK_DUEDATE}</b></p>
+<p>{DUEWORK_TYPE} - Due: {DUEWORK_DUEDATE}</p>
+<div class="listing">
+    <ul class="breadcrumb">
+        <li><a href="/submission/listSubmission" >Submissions</a></li>
+        <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CATEGORY_ID}" >{CATEGORY_NAME}</a></li>
+        <li class="last"><a href="#">{DUEWORK_DESCRIPTION}</a></li>
+    </ul>
+</div>
 <div class="view-submission">
     <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" id="returnWorkForm">
         <table class="table">

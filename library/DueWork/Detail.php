@@ -163,14 +163,15 @@ class DueWork_Detail {
 
         $page->setVar(
             array(
-                'DUEWORK_DESCRIPTION' => Scrub::text($this->dueWork['categoryName']) . " - " . Scrub::text(
-                    $this->dueWork['name']
-                ),
-                'DUEWORK_TYPE' => $this->dueWork['typeName'],
-                'DUEWORK_DUEDATE' => $closeString,
-                'CATEGORY_ID' => $this->dueWork['cid'],
-                'BOX_ID' => $this->dueWork['id'],
-                'SITE_ROOT' => $page->conType() . $_SERVER['HTTP_HOST'],
+                'DUEWORK_DESCRIPTION'   => Scrub::text($this->dueWork['name']),
+                'DUEWORK_YEAR'          => date('Y', strtotime($this->dueWork['date'])),
+                'DUEWORK_SEMESTER'      => DueWork_All::getSemester($this->dueWork['date']),
+                'CATEGORY_NAME'         => Scrub::text($this->dueWork['categoryName']),
+                'DUEWORK_TYPE'          => $this->dueWork['typeName'],
+                'DUEWORK_DUEDATE'       => $closeString,
+                'CATEGORY_ID'           => $this->dueWork['cid'],
+                'BOX_ID'                => $this->dueWork['id'],
+                'SITE_ROOT'             => $page->conType() . $_SERVER['HTTP_HOST'],
             )
         );
 
