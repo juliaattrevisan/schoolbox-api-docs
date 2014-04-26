@@ -161,7 +161,7 @@ if ($numUnmarkedQuestions) {
 /* Visibility
  */
 $visibility = new \Assess\Visibility();
-$visibility->setId($assess['visibility_id']);
+$visibility->setId($assess['mark_visibility']);
 
 if ($visibility->isStaff() && $groupHandler->isStaff()) {
 	$this->parse('has_marks_block', 'has_marks');

@@ -190,11 +190,9 @@ $j(document).ready(function() {
             <tr>
                 <td>
                     <h4>Visibility</h4>
-                    <p>
-                        Control who can view marks for this Online Assessment.
-                    </p>
+                    <em>Control who can view marks for this quiz.</em>
 					<!-- BEGIN marktype -->
-					<select name="visibility_id" class="formfield" id="marktype">
+					<select name="mark_visibility" class="formfield" id="marktype">
 						<!-- BEGIN mark_visibility_drop -->
 						<option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
 						<!-- END mark_visibility_drop -->
@@ -206,7 +204,7 @@ $j(document).ready(function() {
       <tr>
         <td>
           <h4>Weight</h4>
-          <em>The weighting of this Online Assessment (default is 100).</em>
+          <em>Control the weight of this quiz towards the students overall grade average (default is 100).</em>
           <label>
             <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
           </label>

@@ -113,7 +113,7 @@ class ClassStatistics {
 		$assessCollection = $this->assessMapper->findByColumnList(array(
 			'category_id' => $this->getCategory()->getId(),
 			'availability' => 'assess',
-			'visibility_id' => $quizVisibilities
+			'mark_visibility' => $quizVisibilities
 		));
 		foreach($assessCollection as $assess) {
 			$this->addWork($assess);

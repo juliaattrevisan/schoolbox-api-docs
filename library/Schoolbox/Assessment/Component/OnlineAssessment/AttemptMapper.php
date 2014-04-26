@@ -120,7 +120,7 @@ class AttemptMapper extends Mapper {
 		}
 		if (!empty($extra_params['visibility'])) {
 			$params = array_merge($params,  $this->getArrayParameters($extra_params['visibility'], 'vis'));
-			$filters[] = 'a.visibility_id IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
+			$filters[] = 'a.mark_visibility IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
 		}
 
 		$filters = implode(' AND ', $filters);

@@ -48,7 +48,7 @@ if (!empty($_POST)) {
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
         ->setWeight($_POST['weight'])
-		->setMarkVisibility($_POST['visibility_id'])
+		->setMarkVisibility($_POST['mark_visibility'])
     ;
 
     // Is this a task? If so, just set the start and finish to now.

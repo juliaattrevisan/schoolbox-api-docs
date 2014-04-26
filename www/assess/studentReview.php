@@ -67,7 +67,7 @@ if (!$attemptHandler->isOwner($this->arg[2])
 /* Check visibility
  */
 $quizVisibility = new \Assess\Visibility();
-$quizVisibility->setId($assess['visibility_id']);
+$quizVisibility->setId($assess['mark_visibility']);
 
 /* Mostly do nothing
  */
