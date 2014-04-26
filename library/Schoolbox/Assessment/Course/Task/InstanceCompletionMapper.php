@@ -74,8 +74,7 @@ class InstanceCompletionMapper extends Mapper {
     /**
      * Sets this task instance as having been completed by the student.
      *
-     * If the task instance requires confirmation, then it's marked off as that,
-     * otherwise it's marked off as complete.
+     * Only tasks set to self assessment may be marked as completed by the student
      *
      * @param int $task_instance_id
      * @param int $student_id
@@ -97,21 +96,18 @@ class InstanceCompletionMapper extends Mapper {
             return array();
         }
 
+
         // Get the related task instance (should it have been passed?) for the
         // completion status to set.
-        $task_instance = $this->getJoinMapper('task_instance')->findById($task_instance_id);
+        //$task_instance = $this->getJoinMapper('task_instance')->findById($task_instance_id);
+
         $model = new InstanceCompletion();
         $model
             ->setTaskInstance($task_instance_id)
             ->setStudent($student_id)
             ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
-            ->setCompletionStatus(
-                $task_instance->getRequiresConfirmation() ?
-                    InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
-                    InstanceCompletion::COMPLETION_STATUS_COMPLETE
-            )
+            ->setCompletionStatus(InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION)
         ;
-
         return $this->save($model);
     }
 
