@@ -63,6 +63,7 @@ if (!empty($_POST)) {
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
         'ASSESS_TITLE' => Scrub::text($assess['title']),
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => '',
         'SEQUENCE' => $sectionHandler->getNextSequence($this->arg[0])
     ));

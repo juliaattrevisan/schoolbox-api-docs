@@ -84,6 +84,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $this->arg[0],
         'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
         'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),

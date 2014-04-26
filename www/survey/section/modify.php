@@ -73,7 +73,8 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
+        'ASSESS_TITLE' => Scrub::text($survey['title']),
+        'ASSESS_CATEGORY_ID' => $survey['category_id'],
         'SECTION_ID' => $section['section_id'],
         'TITLE' => Scrub::text($section['title']),
         'DESCRIPTION' => Scrub::Text($section['description']),
