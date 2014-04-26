@@ -338,11 +338,11 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 switch ($completion_item->getCompletionStatus()) {
                     case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
                         $unit_task_class  = 'complete';
-                        $unit_task_status = 'Complete';
+                        $unit_task_status = 'Approved';
                         break;
                     case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
                         $unit_task_class  = 'pending';
-                        $unit_task_status = 'Pending';
+                        $unit_task_status = 'Completed';
                         break;
                     case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
                     default:
