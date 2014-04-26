@@ -110,8 +110,8 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_BOOLEAN,
 		));
 		$this->hasMap(array(
-			'column'     => 'visibility_id',
-			'property'   => 'visibilityId',
+			'column'     => 'mark_visibility',
+            'property'   => 'markVisibility',
 			'type'       => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(

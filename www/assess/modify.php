@@ -48,7 +48,7 @@ if (!empty($_POST)) {
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
         ->setWeight($_POST['weight'])
-		->setVisibilityId($_POST['visibility_id'])
+		->setMarkVisibility($_POST['visibility_id'])
     ;
 
     // Is this a task? If so, just set the start and finish to now.
@@ -189,7 +189,7 @@ if (!empty($_POST)) {
 	 */
 	$this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 	$widgets = new \Schoolbox\Assessment\Widgets();
-	$widgets->outputVisibilityDropdown($this, $assessment->getVisibilityId());
+	$widgets->outputVisibilityDropdown($this, $assessment->getMarkVisibility());
 	$this->parse('marktype_block', 'marktype');
 
 	/* Show this Assess' contents
