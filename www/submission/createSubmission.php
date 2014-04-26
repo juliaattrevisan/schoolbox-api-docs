@@ -217,7 +217,8 @@ $this->dropDown('type_drop', $work_types, $work_type, TEMPLATE_content, array(
 ));
 
 // Output mark visibility
-outputVisibilityDropdown($this, $submission->getMarkVisibility());
+$widgets = new \Schoolbox\Assessment\Widgets();
+$widgets->outputVisibilityDropdown($this, $submission->getMarkVisibility());
 
 // Output marktype drop down
 // (If it's an old style free mark, then output nothing)
@@ -446,49 +447,3 @@ function outputCriteria(
     $page->parse($handle, 'rubricTpl', true);
 }
 
-/**
- * Outputs the visibility dropdown for this page.
- *
- * @param SitePage $page
- * @param int      $value The value of the dropdown to show.
- */
-function outputVisibilityDropdown(SitePage $page, $value) {
-
-
-    $options = array(
-                array(
-                    'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
-                    'name' => 'Staff Only',
-                ),
-                array(
-                    'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
-                    'name' => 'Staff and Students',
-                ),
-                array(
-                    'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
-                    'name' => 'Staff, Students and their Parents',
-                ),
-    );
-
-    /* Remove elements from list based on max setting
-       Note this cascades popping elements as it goes, so case 0 pops 2, case 1 pops 1, case 3 pops 0*/
-    switch(Cfg::get('submission_visibility_max')) {
-        case '0' :
-           array_pop($options);
-
-        case '1' :
-           array_pop($options);
-
-    }
-
-    $page->dropDown(
-        'mark_visibility_drop',
-        $options,
-        $value,
-        'marktype',
-        array(
-            'name' => 'MARK_VISIBILITY_TEXT',
-            'id'   => 'MARK_VISIBILITY_VALUE'
-        )
-    );
-}

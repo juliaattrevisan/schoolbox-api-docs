@@ -213,6 +213,7 @@ class Marksheet {
 				$stats = $mapper->getStatistics($work['id']);
 				$object = $mapper->findById($work['id']);
 				$weight = $object->getWeight();
+                $visibility = $object->getMarkVisibility();
 
 				$progress = $mapper->getProgress($work['id']);
 
@@ -249,7 +250,8 @@ class Marksheet {
 				$statData[$isOA][$work['id']] = array_merge(
 					array(
 						'avg' => $classAvg,
-						'weight' => $weight
+						'weight' => $weight,
+                        'visible' => $visibility,
 					),
 					$stats,
 					$progress
@@ -497,7 +499,7 @@ class Marksheet {
 		$page->setVar('work_header_block', '');
 
 		// stats that can be edited inline
-		$writeable = array('weight');
+		$writeable = array('weight', 'visibility');
 
 		// transpose the data to output by row, not column, and output row headers while we're here
 		$transposed = array();

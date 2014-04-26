@@ -43,6 +43,7 @@ if (!empty($_POST)) {
         ->setMaxAttempts($_POST['max_attempts'])
         ->setWeight($_POST['weight'])
         ->setAvailability('assess')
+		->setMarkVisibility($_POST['mark_visibility'])
     ;
 
     // Is this a task? If so, just set the start and finish to now.
@@ -252,6 +253,13 @@ else {
         'DURATION_HOUR_VALUE' => 0,
         'DURATION_MINUTE_VALUE' => 0,
     ));
+
+	/* Visibility dropdown
+	 */
+	$this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
+	$widgets = new \Schoolbox\Assessment\Widgets();
+	$widgets->outputVisibilityDropdown($this, \Config::get('submission_access'));
+	$this->parse('marktype_block', 'marktype');
 
     /* Don't display questions contents, which appears in Modify
      */

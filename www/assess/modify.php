@@ -48,6 +48,7 @@ if (!empty($_POST)) {
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
         ->setWeight($_POST['weight'])
+		->setMarkVisibility($_POST['mark_visibility'])
     ;
 
     // Is this a task? If so, just set the start and finish to now.
@@ -184,8 +185,15 @@ if (!empty($_POST)) {
         $this->parse('max_attempts_block', 'max_attempts', true);
     }
 
-    /* Show this Assess' contents
-     */
+	/* Visibility dropdown
+	 */
+	$this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
+	$widgets = new \Schoolbox\Assessment\Widgets();
+	$widgets->outputVisibilityDropdown($this, $assessment->getMarkVisibility());
+	$this->parse('marktype_block', 'marktype');
+
+	/* Show this Assess' contents
+	 */
     $this->setFile('assessContentsFragment', 'assess/contents.html');
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');

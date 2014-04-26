@@ -115,6 +115,11 @@ class OnlineAssessment implements ISoftDeletable {
 	 */
 	protected $deleted;
 
+    /**
+     * @var int
+     */
+    protected $mark_visibility = 0;
+
 	/**
 	 * @param  boolean $anonymous_result
 	 *
@@ -427,4 +432,19 @@ class OnlineAssessment implements ISoftDeletable {
 		return $this;
 	}
 
+    /**
+     * @param  int $mark_visibility
+     * @return $this
+     */
+    public function setMarkVisibility($mark_visibility) {
+        $this->mark_visibility = $mark_visibility;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMarkVisibility() {
+        return $this->mark_visibility;
+    }
 }

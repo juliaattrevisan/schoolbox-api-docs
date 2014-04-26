@@ -1117,5 +1117,4 @@ class SitePage extends Page {
         }
         return false;
     }
-
 }

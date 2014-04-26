@@ -187,18 +187,27 @@ $j(document).ready(function() {
                     </label>
 				</td>
 			</tr>
+            <tr>
+                <td>
+                    <h4>Visibility</h4>
+                    <em>Control who can view marks for this quiz.</em>
+					<!-- BEGIN marktype -->
+					<select name="mark_visibility" class="formfield" id="marktype">
+						<!-- BEGIN mark_visibility_drop -->
+						<option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
+						<!-- END mark_visibility_drop -->
+					</select>
+					<!-- END marktype -->
+                </td>
+            </tr>
       <!-- BEGIN mark_weight -->
       <tr>
         <td>
-
-
+          <h4>Weight</h4>
+          <em>Control the weight of this quiz towards the students overall grade average (default is 100).</em>
           <label>
-              <strong>Weight</strong>
-              <em>The weighting of this quiz (default is 100).</em>
             <input name="weight" type="text" size="3" maxlength="3" value="{ASSESS_WEIGHT}" id="weight"/>
-
           </label>
-
         </td>
       </tr>
       <!-- END mark_weight -->

@@ -54,6 +54,7 @@ $this->setFile(TEMPLATE_content, 'assess/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setBlock(TEMPLATE_content, 'unmarkedRemaining', 'unmarkedRemaining_block');
+$this->setBlock(TEMPLATE_content, 'has_marks', 'has_marks_block');
 
 $this->setTitle('Assessment: ' . $assess['title']);
 
@@ -155,6 +156,26 @@ if ($numUnmarkedQuestions) {
     $this->parse('unmarkedRemaining_block', 'unmarkedRemaining');
 } else {
     $this->setVar('unmarkedRemaining_block', '');
+}
+
+/* Visibility
+ */
+$visibility = new \Assess\Visibility();
+$visibility->setId($assess['mark_visibility']);
+
+if ($visibility->isStaff() && $groupHandler->isStaff()) {
+	$this->parse('has_marks_block', 'has_marks');
+}
+else if ($visibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+	$this->parse('has_marks_block', 'has_marks');
+}
+else if ($visibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+	$this->parse('has_marks_block', 'has_marks');
+}
+else {
+	$this->setVar(array(
+		'has_marks_block' => ''
+	));
 }
 
 /* Clear attempt
