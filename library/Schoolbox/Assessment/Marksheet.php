@@ -551,8 +551,9 @@ class Marksheet {
 				$value  = $boxes[$workId];
 				$page->setVar(array(
 					'WORK_NS_ID' => str_replace('-', '][', $workId), // so it appears as the name attribute properly
-                    'WORK_ID' => $workId,
-					'WORK_STAT_VALUE' => is_numeric($value) ? (float) round($value, 3) : $value // truncate to 3 decimals, then strip extraneous 0s
+                    'WORK_ID' => $item['id'],
+					'WORK_STAT_VALUE' => is_numeric($value) ? (float) round($value, 3) : $value, // truncate to 3 decimals, then strip extraneous 0s
+                    'ASSESS_MODIFY_URL' => $item['object'] instanceof OnlineAssessment ? '/assess/modify/'.$item['id'] :  '/submission/submissionForm.php?id='.$item['id'],
 				));
 
 				if($name == 'weight') {
