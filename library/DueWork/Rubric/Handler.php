@@ -474,9 +474,10 @@ class DueWork_Rubric_Handler {
                 VALUES (:cid, :sbid, :val, :descr)
                 ON DUPLICATE KEY UPDATE `description` = :descr, `valid` = 1
             ");
+
             if($rubric->getCriteriaCount() && $rubric->getResultCount()) {
                 foreach($rubric->getCriteriaIndices() as $i) {
-                    foreach($rubric->getResultIndices() as $j) {
+                    foreach($rubric->getResultIndices($i) as $j) {
                         $subst = array(
                             'cid'   => $i,
                             'sbid'  => $submissionBoxID,

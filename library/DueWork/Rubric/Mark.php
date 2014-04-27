@@ -15,10 +15,9 @@ class DueWork_Rubric_Mark {
         $this->rubric = $rubric;
 
         // set up markset
-        $results = $rubric->getResultIndices();
         $criteria = $rubric->getCriteriaIndices();
 
-        if(count($criteria) && count($results)) {
+        if(count($criteria)) {
             foreach($criteria as $x) {
                 $this->unsetMark($x);
             }
@@ -26,10 +25,7 @@ class DueWork_Rubric_Mark {
     }
 
     public function setMark($criterionID, $value) {
-        // value must be between 0 and count($results)
-        $count = $this->rubric->getResultCount();
-
-        if($value >= 0 && $value < $count && $this->isValidCriterionID($criterionID)) {
+        if($value >= 0 && $this->isValidCriterionID($criterionID)) {
             $this->markArray[$criterionID] = $value;
         }
     }
@@ -83,7 +79,7 @@ class DueWork_Rubric_Mark {
 
             // data replication for the sake of consistency
             if($this->rubric instanceof DueWork_Rubric_ResultSetRubric) {
-                foreach($this->rubric->getResultIndices() as $i) {
+                foreach($this->rubric->getResultIndices(null) as $i) {
                     $obj['criteria'][$cID]['results'][$i] = $this->rubric->getResult($cID, $i)->getLabel();
                 }
             }
@@ -91,7 +87,7 @@ class DueWork_Rubric_Mark {
 
         if($this->rubric instanceof DueWork_Rubric_DescriptorRubric) {
             foreach($this->rubric->getCriteriaIndices() as $i) {
-                foreach($this->rubric->getResultIndices() as $j) {
+                foreach($this->rubric->getResultIndices($i) as $j) {
                     $obj['criteria'][$i]['results'][$j] = $this->rubric->getResult($i, $j)->getDescription();
                 }
             }
