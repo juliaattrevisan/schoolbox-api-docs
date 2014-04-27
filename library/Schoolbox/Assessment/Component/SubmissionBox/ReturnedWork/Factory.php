@@ -223,9 +223,9 @@ class Factory {
 			$return_time = $returnedWork->getReturned();
 			$window_ago  = new \Alaress_Date_Format(time() - $this->getUpdateWindow(), 'U');
 
-			/* Use the existing returned work record - it was created a short time ago
+			/* Use the existing returned work record - it was created a short time ago or the marks are not yet visible
 			 */
-			if ($return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()) {
+			if ($this->getSubmissionBox()->getMarkVisibility() < 1 || $return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()) {
 				$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			}
 			/* Spawn a new returned work record, so pump in a returned date
