@@ -507,7 +507,8 @@ class Submission extends DeprecatedModel {
                 sb.description,
                 sb.created,
                 smt.slug,
-                sb.accept_submission
+                sb.accept_submission,
+                sb.mark_visibility
             FROM submission_box sb
             LEFT JOIN lu_submission_type ft ON sb.type = ft.id
             LEFT JOIN submission_mark_type smt ON sb.mark_type = smt.mark_type_id
@@ -531,7 +532,8 @@ class Submission extends DeprecatedModel {
                 assess.title AS name,
                 assess.description AS description,
                 assess.created_at AS created,
-                assess.availability
+                assess.availability,
+                assess.mark_visibility
             FROM assess
             LEFT JOIN lu_submission_type ON lu_submission_type.id = assess.type
             WHERE category_id = '$categoryID'
@@ -608,7 +610,8 @@ class Submission extends DeprecatedModel {
                     submission_box.name,
                     submission_box.description,
                     submission_box.accept_submission,
-                    submission_box.category catid
+                    submission_box.category catid,
+                    submission_box.mark_visibility
                 FROM submission_box
                 WHERE submission_box.owner = '$userID'
                 AND submission_box.deleted = '0'
@@ -622,7 +625,8 @@ class Submission extends DeprecatedModel {
                     assess.title,
                     assess.description,
                     true AS accept_submission,
-                    assess.category_id AS catid
+                    assess.category_id AS catid,
+                    assess.mark_visibility
                 FROM assess
                 WHERE assess.deleted_at IS NULL
                 AND assess.task_id IS NULL

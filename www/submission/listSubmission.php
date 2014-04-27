@@ -114,10 +114,6 @@ foreach($subjectList as $subject) {
     }
 }
 
-
-
-
-
 $attemptHandler = new Assess_Attempt();
 $groupHandler = new Group();
 
@@ -193,6 +189,8 @@ if (!empty($subList) && is_array($subList)) {
                 'ASSESS_FINISH' => $closeString,
                 'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($sub['id']),
                 'ASSESS_REVIEWED' => $attemptHandler->numReviewed($sub['id']),
+                'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
+                'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility'])
             ));
 
             $this->setVar('normalSubmission_block', '');
@@ -225,7 +223,8 @@ if (!empty($subList) && is_array($subList)) {
                 'DUEDATE' => $closeString,
                 'MARKED' => (int)$totals['marked'],
                 'TOTAL' => $sub['accept_submission'] ? $totals['total'] : 'N/A',
-                'ON_OFF' => ++$i % 2 ? 'dark' : '',
+                'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
+                'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility']),
             ));
 
             $this->setVar('onlineAssessment_block', '');
