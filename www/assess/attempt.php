@@ -72,13 +72,6 @@ if ($assessHandler->isOwner($this->arg[0])) {
 }
 */
 
-/* Redirect back to the start if you've reached the end, or had
- * your attempt_id cleared from the session
- */
-if (!is_numeric($_SESSION['attempt_id'])) {
-	SitePage::localRedir('/assess/intro/' . $assess['assess_id']);
-}
-
 /* Check if you have completed an assessment already
  *
  * Set up Attempt vars
@@ -94,6 +87,21 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  */
 if ($attempt) {
     $_SESSION['attempt_id'] = $attempt['attempt_id'];
+}
+
+/* Redirect back to the homepage if you've reached the end, or had
+ * your attempt_id cleared from the session
+ *
+ * This has to come after the $attempt check, otherwise SB-4199 happens.
+ * You can log out, lose your attempt_id in the session, intend to resume
+ * after logging back in, only to be redirected back to the homepage because
+ * we haven't yet checked for a resumable attempt
+ *
+ * This should only redirect you back to the homepage if you have no resumable
+ * attempts waiting for you to complete and you don't have an attempt_id
+ */
+if (!is_numeric($_SESSION['attempt_id'])) {
+	SitePage::localRedir('/assess/intro/' . $assess['assess_id']);
 }
 
 /* Check if Attempt ran out of time
