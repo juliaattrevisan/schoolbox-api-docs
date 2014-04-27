@@ -429,7 +429,8 @@ function outputCriteria(
         if (is_array($descriptors[$criterion->getId()])) {
             foreach ($descriptors[$criterion->getId()] as $descriptor) {
                 $page->setVar(array(
-                    'CRIT_INPUT_VALUE' => $descriptor->getDescription()
+                    'CRIT_INPUT_VALUE' => $descriptor->getDescription(),
+                    'CRIT_INPUT_WEIGHT' => $descriptor->getValue()
                 ));
                 $page->parse('crit_input_block','crit_input', true);
             }
@@ -438,6 +439,7 @@ function outputCriteria(
         else {
             for ($i = 0; $i < $descriptorCount; ++$i) {
                 $page->setVar('CRIT_INPUT_VALUE', '');
+                $page->setVar('CRIT_INPUT_WEIGHT', $i);
                 $page->parse('crit_input_block','crit_input', true);
             }
         }
