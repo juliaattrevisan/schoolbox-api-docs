@@ -86,12 +86,12 @@ class DueWork_Rubric_Lightbox {
                 'RUBRIC_CRIT_ID' => $data['criteria'][$i]['id']
             ));
 
-            for($j = 0; $j < count($data['criteria'][0]['results']); ++$j) {
+            foreach($data['criteria'][$i]['results'] as $value => $descriptor) {
                 $page->setVar(array(
-                    'RUBRIC_CRIT_RATING_LABEL' => $data['criteria'][$i]['results'][$j],
-                    'RUBRIC_CRIT_RATING_VALUE' => $j,
+                    'RUBRIC_CRIT_RATING_LABEL' => $descriptor,
+                    'RUBRIC_CRIT_RATING_VALUE' => $value,
                     'RUBRIC_CRIT_RATING_CLASS' => 'lol',
-                    'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $j ? 'checked="checked"' : '',
+                    'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $value ? 'checked="checked"' : '',
                 ));
                 $page->parse('rubric_crit_rating_block', 'rubric_crit_rating', true);
             }
