@@ -48,10 +48,6 @@ $j(function() {
 		$j.post('/adminv2/userForm.php', data);
 	});
 
-	$j('table tr.alternate-rows:nth-child(even), table.ruler tr:nth-child(even)').each(function() {
-		$j(this).addClass('dark');
-	})
-
     $j('h3 span').each(function() {
         $j(this).qtip({
             content: 'Edit the user\'s details.',
@@ -426,7 +422,7 @@ $j(function() {
 		</thead>
 		<tbody>
 			<!-- BEGIN user_group -->
-			<tr class="alternate-rows">
+			<tr>
 				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
 				<td>
@@ -442,8 +438,9 @@ $j(function() {
 				</td>
 			</tr>
 			<!-- END user_group -->
-			<tr>
-				<td colspan="4"><h4 style="margin-top:16px;">Add</h4>
+            </tbody>
+        </table>
+            <h4 style="margin-top:16px;">Add</h4>
 					<form action="/adminv2/userForm.php" method="post" class="clearfix" id="groupAdd">
 						<fieldset>
 							<input type="hidden" name="groupSubmit" />
@@ -463,15 +460,12 @@ $j(function() {
 							<input type="submit" class="submit-btn-plain" value="Add">
 						</label>
 					</form>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+
 </div>
 <div class="level clearfix">
 	<h3 id="permissions">Permissions</h3>
 	<h4>Manage</h4>
-	<table class="alternate-rows table">
+	<table class="table">
 		<colgroup>
 			<col width="10%" />
 			<col width="20%" />
@@ -488,7 +482,7 @@ $j(function() {
 		</thead>
 		<tbody>
 			<!-- BEGIN user_calendar -->
-			<tr class="alternate-rows">
+			<tr>
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>Calendar</td>
 				<td>
@@ -514,7 +508,7 @@ $j(function() {
 			</tr>
 			<!-- END user_calendar --> 
 			<!-- BEGIN user_news -->
-			<tr class="alternate-rows">
+			<tr>
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>News</td>
 				<td>
@@ -540,7 +534,7 @@ $j(function() {
 			</tr>
 			<!-- END user_news --> 
 			<!-- BEGIN user_cms -->
-			<tr class="alternate-rows">
+			<tr>
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>CMS</td>
 				<td></td>
@@ -558,7 +552,7 @@ $j(function() {
 			</tr>
 			<!-- END user_cms -->
             <!-- BEGIN user_housemaster -->
-                <tr class="alternate-rows">
+                <tr>
                     <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
                     <td>Housemaster</td>
                     <td></td>
@@ -575,13 +569,13 @@ $j(function() {
                     </td>
                 </tr>
             <!-- END user_housemaster -->
-			<tr class="ignore">
-				<td colspan="4">
+			</tbody>
+            </table>
 					<h4 style="margin-top:16px;">Add</h4>
 					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
 							<input type="hidden" name="addService" />
 							<input type="hidden" value="{USERID}" name="uid">
-						<table cellpadding="0" cellspacing="0" class="table">
+						<table cellpadding="0" cellspacing="0" >
 						<colgroup>
 							<col width="10%" />
 							<col width="20%" />
@@ -636,16 +630,11 @@ $j(function() {
 						</tr>
 						</table>
 					</form>
-				</td>
-			</tr>
-		</tbody>
-	</table>
 </div>
 <div class="level last clearfix">
     <h3>Recent Activity Logs</h3>
     <div class="split-container forty">
         <div class="split">
-
             <h4>Logins <a class="btn in-heading-absolute" href="/adminv2/reports/login/user={USERNAME}"><span></span>See All</a></h4>
             <table class="ruler table">
 				<tbody>

@@ -20,18 +20,11 @@ $j(function(){
 <div id="list-submission-context">
   {CONTEXT_SELECTOR}
 </div>
-<div class="indent">
-        <!-- BEGIN category_listing -->
+<!-- BEGIN category_listing -->
+<div class="box">
+    <h2><a href="/homepage/{CATEGORY_ID}">{CATEGORY}</a> ({STUDENTS} Students)</h2>
     <table class="ruler table">
     <thead>
-            <tr>
-                <td colspan="9"><h2><a href="/homepage/{CATEGORY_ID}">{CATEGORY}</a> ({STUDENTS} Students)</h2>
-                    <span class="header_option in-h2">
-                        <a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="btn line-graph"><span></span>Progress Report</a>
-                        <a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="btn modify"><span></span>Class Mark Sheet</a>
-                    </span>
-                </td>
-            <tr>
             <tr>
                 <th>Assignment Title</th>
                 <th>Type</th>
@@ -39,14 +32,12 @@ $j(function(){
                 <th>Due Date</th>
                 <th class="center">Submitted</th>
                 <th class="center">Returned</th>
-				<th class="center">View</th>
-				<th class="center">Modify</th>
-                <th class="center">Delete</th>
+				<th class="center">Actions</th>
             </tr>
         </thead>
         <tbody>
             <!-- BEGIN submission_listing -->
-            <tr class="{ON_OFF}">
+            <tr>
                 <!-- BEGIN normalSubmission -->
                 <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
                 <td>{TYPE}</td>
@@ -68,13 +59,14 @@ $j(function(){
                 </td>
                 <td class="center">{TOTAL}</td>
                 <td class="center">{MARKED}</td>
-				<td class="center"><a href="/submission/viewSubmission/{ID}">View</a></td>
                     <!-- BEGIN readonly_duework -->
-                <td class="center">-</td><td class="center">-</td>
+                <td class="center"></td>
                     <!-- END readonly_duework -->
                     <!-- BEGIN writable_duework -->
-                <td class="center"><a href="/submission/createSubmission/modify/{ID}">Modify</a></td>
-                <td class="center"><a href="/submission/submissionForm.php?deleteBox={ID}" onclick='return(confirm("Remove {JAVAASSDESC}?"));'>Delete</a></td>
+                <td class="center">
+                <a href="/submission/createSubmission/modify/{ID}" class="btn modify no-text float-left" title="Modify"><span></span></a>
+                <a href="/submission/submissionForm.php?deleteBox={ID}" class="btn delete no-text float-left"  title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'><span></span></a>
+                </td>
                     <!-- END writable_duework -->
                 <!-- END normalSubmission -->
                 <!-- BEGIN onlineAssessment -->
@@ -84,18 +76,23 @@ $j(function(){
                 <td>{ASSESS_FINISH}</td>
                 <td class="center">{ASSESS_ATTEMPTS}</td>
                 <td class="center">{ASSESS_REVIEWED}</td>
-                <td class="center"><a href="/assess/results/{ASSESS_ASSESS_ID}">View</a></td>
                     <!-- BEGIN readonly_assess -->
-                <td class="center">-</td><td class="center">-</td>
+                <td class="center"></td>
                     <!-- END readonly_assess -->
                     <!-- BEGIN writable_assess -->
-                <td class="center"><a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a></td>
-                <td class="center"><a href="/assess/delete/{ASSESS_ASSESS_ID}" onclick='return(confirm("Remove {JAVAASSDESC}?"));'>Delete</a></td>
+                <td class="center">
+                    <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify no-text float-left" title="Modify"><span></span></a>
+                    <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="btn delete no-text float-left" title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'><span></span></a>
+                </td>
                   <!-- END writable_assess -->
                 <!-- END onlineAssessment -->
             </tr>
             <!-- END submission_listing -->
         </tbody>
     </table>
-    <!-- END category_listing -->
+    <a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="btn line-graph"><span></span>Progress Report</a>
+    <a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="btn modify"><span></span>Class Mark Sheet</a>
+    <a href="/assess/create/{CID}/" class="btn add"><span></span>Create Quiz</a>
+    <a href="/submission/createSubmission/new/{CID}/" class="btn add" ><span></span>Post Due Work</a>
 </div>
+<!-- END category_listing -->

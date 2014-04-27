@@ -193,7 +193,6 @@ if (!empty($subList) && is_array($subList)) {
                 'ASSESS_FINISH' => $closeString,
                 'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($sub['id']),
                 'ASSESS_REVIEWED' => $attemptHandler->numReviewed($sub['id']),
-                'ON_OFF' => ++$i % 2 ? 'dark' : '',
             ));
 
             $this->setVar('normalSubmission_block', '');
@@ -225,7 +224,7 @@ if (!empty($subList) && is_array($subList)) {
                 'OPENDATE' => $sub['accept_submission'] ? $openString : '',
                 'DUEDATE' => $closeString,
                 'MARKED' => (int)$totals['marked'],
-                'TOTAL' => $totals['total'],
+                'TOTAL' => $sub['accept_submission'] ? $totals['total'] : 'N/A',
                 'ON_OFF' => ++$i % 2 ? 'dark' : '',
             ));
 
