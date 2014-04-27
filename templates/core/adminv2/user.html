@@ -7,7 +7,7 @@
 <script type="text/javascript">
 $j(function() {
 
-    $j('#modify').selectize({
+    $j('#modify').val('').selectize({
         maxItems: 1,
         create: false,
         persist: false,
@@ -41,9 +41,9 @@ $j(function() {
         },
         onInitialize: function() {
             this.clear();
+            this.clearOptions();
             this.addOption({name: 'Scott Berryhill', id: 15})
             this.refreshOptions(false)
-            this.setActiveItem(this.getOption(15));
         }
     })
 
