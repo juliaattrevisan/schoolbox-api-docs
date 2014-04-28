@@ -406,19 +406,19 @@ table.ruler {
     text-align: left;
     font-weight: bold;
     background: @dark;
-    padding: 0;
+    padding: 0 !important;
+    .tablesorter-header-inner{ padding: 7px 7px 7px 18px; }
     &.sortable:not(.sorter-false) {
       background: @dark url('/images/core/tablesorter/sort.gif') no-repeat 0 center;
       border-right: 1px solid @body-background;
-      padding: 7px 16px 7px 20px;
       cursor: pointer;
-      &.descending {
+      &:hover{ background: url('/images/core/tablesorter/sort.gif') no-repeat 0 center; }
+      &.descending .tablesorter-header-inner{
         background: @body-background url('/images/core/tablesorter/sort-descending.gif') no-repeat 0 12.5px;
       }
-      &.ascending {
+      &.ascending .tablesorter-header-inner{
         background: @body-background url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 16.5px;
       }
-      &:hover{ text-decoration: underline; }
     }
     &:last-child{ padding: 7px 16px 7px 9px; }
   }
