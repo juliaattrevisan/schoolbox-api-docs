@@ -2,50 +2,29 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
 <link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 $j(function() {
 
-    $j('#modify').val('').selectize({
-        maxItems: 1,
-        create: false,
-        persist: false,
-        searchField: 'name',
-        labelField: 'name',
-        valueField: 'id',
-        load: function(query, callback) {
-            if (!query.length) {
-                callback();
-            }
-            $.ajax({
+    $j('#modify')
+        .selectizeSelector({
+            ajax: {
                 url:      '/ajax/user.php',
                 type:     'GET',
-                data:     {groupID: 0, query: query},
+                data:     {groupID: 0},
                 dataType: 'json'
-            })
-            .done(function(result) {
-                callback(result)
-            })
-            .fail(function() {
-                callback()
-            })
-        },
-        onItemAdd: function(val) {
-            $j('#user-to-mod').val(val)
+            }
+        })
+        .on('selectize.item_add', function(event, value) {
+            $j('#user-to-mod').val(value)
             $j('#modify-user-button').removeClass('disabled').focus();
-        },
-        onItemRemove: function() {
+        })
+        .on('selectize.item_remove', function() {
             $j('#user-to-mod').val('')
             $j('#modify-user-button').addClass('disabled');
-        },
-        onInitialize: function() {
-            this.clear();
-            this.clearOptions();
-            // this.addOption({name: 'name', id: 0})
-            this.refreshOptions(false)
-        }
-    })
+        })
 
     var openModifyScreen = function(event) {
         event.preventDefault();
