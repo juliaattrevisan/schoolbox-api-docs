@@ -1,18 +1,28 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
-<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 
 $j(function() {
-    $j('#name').userSelector({
-        plugin: {
-            data:'/ajax/user.php?groupID=0',
-            width: 200
-        },
-        formElement: $j('#userid')
-    })
+    $j('#name')
+        .selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: 0},
+                dataType: 'json'
+            }
+        })
+        .on('selectize.item_add', function(event, value) {
+            $j('#userid').val(value)
+        })
+        .on('selectize.item_remove', function() {
+            $j('#userid').val('')
+        })
 
     $j('h3 span').each(function() {
         var activeContent = $j(this).siblings('em').html();
