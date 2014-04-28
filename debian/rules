@@ -58,7 +58,7 @@ override_dh_install:
 	# Install submodules using composer
 	tools/composer.sh --no-dev
 	# Install grunt
-	tools/grunt.sh
+	npm install -g grunt-cli
 	# Build and install CSS and JS using grunt/bower
 	tools/pkg-build-css-js.sh
 	# Cleanup live vs dev files and information
