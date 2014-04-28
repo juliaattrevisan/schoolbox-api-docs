@@ -20,8 +20,14 @@ if ($authenticator->canCreate($homepageId)) {
 	/* Make life a bit easier for Etherpad by using a hashed version
 	 * of the name, rather than let it get urlencoded in some strange
 	 * way by Etherpad itself
+	 *
+	 * Use an INSTANCE_ID value as a prefix, to help prevent namespace
+	 * collisions when generating $padName values (in case someone else
+	 * uses the same name as you - etherpad services are shared between
+	 * the live and dev environments, so we use INSTANCE_ID to keep 'em
+	 * separated to some extent)
 	 */
-	$padName = md5($name);
+	$padName = md5(INSTANCE_ID . '_' . $name);
 
 	/* Create a new group pad
 	 */
@@ -48,7 +54,7 @@ if ($authenticator->canCreate($homepageId)) {
 			$userMapper = new \Schoolbox\UserMapper();
 			$allUsers = new \Schoolbox\Collection();
 
-			/* Get pad id to set to private and to passs it as a redirect element.
+			/* Get pad id to set to private and to pass it as a redirect element.
 			 * Note that padId's come in the form g.abcdefg$padName
 			 */
 			$data = $createResult->getData();
