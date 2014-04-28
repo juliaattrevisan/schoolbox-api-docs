@@ -2,8 +2,7 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
 <link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
-<!--<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>-->
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
@@ -33,35 +32,16 @@ $j(document).ready(function() {
 
     }).change();
 
-    $j('#addUser').val('').selectize({
-        create: false,
-        persist: false,
-        searchField: 'name',
-        labelField: 'name',
-        valueField: 'id',
-        load: function(query, callback) {
-            if (!query.length) {
-                callback();
-            }
-            $.ajax({
+    $j('#addUser')
+        .selectizeSelector({
+            multiple: true,
+            ajax: {
                 url:      '/ajax/user.php',
                 type:     'GET',
-                data:     {groupID: 0, query: query},
+                data:     {groupID: 0},
                 dataType: 'json'
-            })
-            .done(function(result) {
-                callback(result)
-            })
-            .fail(function() {
-                callback()
-            })
-        },
-        onInitialize: function() {
-            this.clear();
-            this.clearOptions();
-            this.refreshOptions(false)
-        }
-    })
+            }
+        })
 
 	$j('#type_form input').each(function () {
 		$j(this).click(function () {
