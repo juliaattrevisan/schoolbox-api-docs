@@ -409,6 +409,7 @@ table.ruler {
     padding: 0;
     &.sortable:not(.sorter-false) {
       background: @dark url('/images/core/tablesorter/sort.gif') no-repeat 0 center;
+      border-right: 1px solid @body-background;
       padding: 7px 16px 7px 20px;
       cursor: pointer;
       &.descending {
@@ -417,10 +418,25 @@ table.ruler {
       &.ascending {
         background: @body-background url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 16.5px;
       }
+      &:hover{ text-decoration: underline; }
     }
+    &:last-child{ padding: 7px 16px 7px 9px; }
   }
   tr {
     border-bottom: 1px solid @border-color;
+    td{
+      .btn{
+        .transition(all 0.2s);
+        opacity: 0.3;
+        background-color: transparent;
+        border-color: transparent;
+      }
+    }
+  }
+  tr:hover > td .btn {
+    opacity: 1;
+    border-color: @lgrey;
+    background: @dark;
   }
   tr:nth-child(even) td{ background: @dark; }
   tr:hover td{background: lighten(@highlight-color,@lighten-value); }
