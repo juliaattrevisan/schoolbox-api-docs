@@ -16,6 +16,7 @@
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*}
 instdir=`readlink -f $fullpath/../`;
+PATH="$PATH:$instdir/node_modules/.bin";
 
 # Installing NPM dependencies
 npm install;
