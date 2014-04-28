@@ -10,19 +10,23 @@ $j(document).ready(function () {
 
 
     $j('#to').val('').selectize({
+        hideSelected: true,
+        createOnBlur: true,
         persist: false,
         searchField: 'name',
         labelField: 'name',
         valueField: 'id',
+        create: function(input) {
+            var freeEntry = {};
+            freeEntry[this.settings.valueField]  = input;
+            freeEntry[this.settings.searchField] = input;
+            return freeEntry;
+        },
         load: function(query, callback) {
             if (!query.length) {
                 callback();
                 return;
             }
-            var freeEntry = {};
-            freeEntry[this.settings.valueField]  = query;
-            freeEntry[this.settings.searchField] = query;
-            callback([freeEntry])
             $.ajax({
                 url:      '/ajax/user.php',
                 type:     'GET',
@@ -48,19 +52,23 @@ $j(document).ready(function () {
         }
     })
     $j('#cc').val('').selectize({
+        hideSelected: true,
+        createOnBlur: true,
         persist: false,
         searchField: 'name',
         labelField: 'name',
         valueField: 'id',
+        create: function(input) {
+            var freeEntry = {};
+            freeEntry[this.settings.valueField]  = input;
+            freeEntry[this.settings.searchField] = input;
+            return freeEntry;
+        },
         load: function(query, callback) {
             if (!query.length) {
                 callback();
                 return;
             }
-            var freeEntry = {};
-            freeEntry[this.settings.valueField]  = query;
-            freeEntry[this.settings.searchField] = query;
-            callback([freeEntry])
             $.ajax({
                 url:      '/ajax/user.php',
                 type:     'GET',
@@ -82,19 +90,23 @@ $j(document).ready(function () {
         }
     })
     $j('#bcc').val('').selectize({
+        hideSelected: true,
+        createOnBlur: true,
         persist: false,
         searchField: 'name',
         labelField: 'name',
         valueField: 'id',
+        create: function(input) {
+            var freeEntry = {};
+            freeEntry[this.settings.valueField]  = input;
+            freeEntry[this.settings.searchField] = input;
+            return freeEntry;
+        },
         load: function(query, callback) {
             if (!query.length) {
                 callback();
                 return;
             }
-            var freeEntry = {};
-            freeEntry[this.settings.valueField]  = query;
-            freeEntry[this.settings.searchField] = query;
-            callback([freeEntry])
             $.ajax({
                 url:      '/ajax/user.php',
                 type:     'GET',
@@ -166,16 +178,16 @@ function verify()
   <table class="table">
     <tr>
       <td class="formLabelWidth"><h4>To:</h4></td>
-	  <td><select name="to" id="to" size="90" multiple></select></td>
+	  <td><input name="to" id="to" size="90" /></td>
     </tr>
     <tr>
       <td><h4>CC:</h4></td>
-	  <td><select name="cc" id="cc" size="90" multiple></select></td>
+	  <td><input name="cc" id="cc" size="90" /></td>
     </tr>
     <tr>
       <td><h4>BCC:</h4>
 	  </td>
-	  <td><select name="bcc" id="bcc" size="90" multiple></select></td>
+	  <td><input name="bcc" id="bcc" size="90" /></td>
     </tr>
     <tr>
       <td><h4>Subject:</h4>
