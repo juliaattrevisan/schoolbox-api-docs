@@ -1,6 +1,6 @@
-# SchoolboxDev Cron Jobs
+# Schoolboxdev Cron Jobs
 # Description:
-#	Lists all automatically install cron jobs for schoolbox
+#	Lists all automatically install cron jobs for schoolboxdev
 #	Deployed for running by cron into /etc/cron.d/
 # Usage:
 #	Automatically run by cron from /etc/cron.d/
@@ -13,11 +13,14 @@
 MAILTO="support@schoolbox.com.au"
 
 # Video Processing
-*/30 * * * *     www-data    php /usr/share/schoolboxdev/tools/video/video-scanner.php >/dev/null 2>&1
-*/5 * * * *    www-data    php /usr/share/schoolboxdev/tools/video/processor.php >/dev/null 2>&1
+*/30 * * * *	www-data	php /usr/share/schoolboxdev/tools/video/video-scanner.php >/dev/null 2>&1
+*/5 * * * *	www-data	php /usr/share/schoolboxdev/tools/video/processor.php >/dev/null 2>&1
 
 # Cleanup cache  files (minify,zip,stream) (once a month)
-0 1 1 * *       root    php /usr/share/schoolboxdev/tools/clean-cache-dir.sh >/dev/null 2>&1
+0 1 1 * *	root	php /usr/share/schoolboxdev/tools/clean-cache-dir.sh >/dev/null 2>&1
 
 # Plagscan callback - every hour
-0 * * * *    root    php /usr/share/schoolboxdev/tools/plagscan/scan.php >> /var/log/schoolboxdev-plagscan.log 2>&1
+0 * * * *	root	php /usr/share/schoolboxdev/tools/plagscan/scan.php >> /var/log/schoolboxdev/plagscan.log 2>&1
+
+# Run notifications binder nightly
+0 21 * * *	root	php /usr/share/schoolboxdev/tools/mq/binder.php -v >> /var/log/schoolboxdev/binder.log 2>&1

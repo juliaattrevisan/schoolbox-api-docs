@@ -6,21 +6,14 @@
 	delaycompress
 }
 
-/var/log/schoolbox-duework*.log {
-	weekly
+/var/log/schoolbox/binder*.log {
+	daily
 	missingok
-	rotate 4
+	rotate 7
 	compress
 }
 
-/var/log/schoolbox-digest*.log {
-	weekly
-	missingok
-	rotate 4
-	compress
-}
-
-/var/log/schoolbox-plagscan*.log {
+/var/log/schoolbox/plagscan*.log {
 	monthly
 	missingok
 	rotate 2
@@ -28,8 +21,8 @@
 }
 
 /var/log/schoolbox/digestd*.log /var/log/schoolbox/scheduled*.log /var/log/schoolbox/socketd*.log {
-        weekly
-        missingok
-        rotate 4
-        compress
+	weekly
+	missingok
+	rotate 4
+	compress
 }

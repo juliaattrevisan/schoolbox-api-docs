@@ -12,7 +12,7 @@ if(posix_getuid() !== 0) {
 	die("[!] Try sudo.\n");
 }
 
-require_once('../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $opts = getopt('vd');
 
