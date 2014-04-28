@@ -16,17 +16,8 @@ MAILTO="support@schoolbox.com.au"
 */30 * * * *     www-data    php /usr/share/schoolboxdev/tools/video/video-scanner.php >/dev/null 2>&1
 */5 * * * *    www-data    php /usr/share/schoolboxdev/tools/video/processor.php >/dev/null 2>&1
 
-# Due Work Notifications
-# -- Not to be run for dev other can spam emails to users during testing
-#*/15 * * * *    root    php /usr/share/schoolboxdev/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolboxdev-duework.log 2>&1
-
 # Cleanup cache  files (minify,zip,stream) (once a month)
 0 1 1 * *       root    php /usr/share/schoolboxdev/tools/clean-cache-dir.sh >/dev/null 2>&1
-
-# Digest notifications
-# -- also not to be run for dev
-#00 06 * * 1-5 root    php /usr/share/schoolboxdev/tools/digest/daily.php  >> /var/log/schoolboxdev-digest-daily.log 2>&1
-#00 11 * * 5   root    php /usr/share/schoolboxdev/tools/digest/weekly.php >> /var/log/schoolboxdev-digest-weekly.log 2>&1
 
 # Plagscan callback - every hour
 0 * * * *    root    php /usr/share/schoolboxdev/tools/plagscan/scan.php >> /var/log/schoolboxdev-plagscan.log 2>&1
