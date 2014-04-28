@@ -82,7 +82,7 @@
 					<td>{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
 					<td><img src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/></td>
 					<td>
-						{SUBMISSION_FILENAME}
+						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">{SUBMISSION_FILENAME}</a>
 						<!-- BEGIN plag_enabled -->
 						<span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
 						<!-- END plag_enabled -->
