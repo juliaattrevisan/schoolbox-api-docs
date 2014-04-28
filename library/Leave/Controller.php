@@ -126,29 +126,6 @@ class Leave_Controller extends Controller {
     }
 
 	/**
-	 * Fix values in POST array due to magicsuggest
-	 *
-	 * @return mixed
-	 */
-	public function preprocessPost() {
-	
-		/* Deal with magicsuggest sometimes giving you an array of ints,
-		 * or just an int
-		 */
-		$data = $_POST;
-
-		if (is_numeric($_POST['user'])) {
-			$data['userId'] = $_POST['user'];
-		}
- 		else {
-			$wtf = json_decode($_POST['user']);
-			$data['userId'] = $wtf[0];
-		}
-
- 		return $data;
- 	}
-
-    /**
      * Test email deployments
      */
     public function executeEmailTest() {
