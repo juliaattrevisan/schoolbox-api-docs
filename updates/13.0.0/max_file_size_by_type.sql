@@ -1,1 +1,0 @@
-alter table allowedFileTypes add max_file_size INT NOT NULL DEFAULT 0;
