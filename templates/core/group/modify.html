@@ -1,6 +1,9 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
-<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
+<!--<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>-->
+<!--<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>-->
 <script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
@@ -30,12 +33,34 @@ $j(document).ready(function() {
 
     }).change();
 
-    $j('#addUser').userSelector({
-        plugin: {
-            data:'/ajax/user.php?groupID=0',
-            width: 275
+    $j('#addUser').val('').selectize({
+        create: false,
+        persist: false,
+        searchField: 'name',
+        labelField: 'name',
+        valueField: 'id',
+        load: function(query, callback) {
+            if (!query.length) {
+                callback();
+            }
+            $.ajax({
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: 0, query: query},
+                dataType: 'json'
+            })
+            .done(function(result) {
+                callback(result)
+            })
+            .fail(function() {
+                callback()
+            })
         },
-        multiple: true
+        onInitialize: function() {
+            this.clear();
+            this.clearOptions();
+            this.refreshOptions(false)
+        }
     })
 
 	$j('#type_form input').each(function () {
@@ -74,7 +99,7 @@ $j(document).ready(function() {
 				</td>
 			<td>
 				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
-					<input id="addUser" name="userID" type="text" size="30" />
+                    <select id="addUser" name="userID[]" multiple></select>
 					<input type="submit" value="Add Users" class="submit-btn-plain" />
 				</form>
 
