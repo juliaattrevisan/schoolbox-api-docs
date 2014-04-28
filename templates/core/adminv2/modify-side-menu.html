@@ -1,6 +1,4 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
-<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
@@ -30,14 +28,6 @@
                 }
             });
 
-        $j('#url').userSelector({
-            plugin: {
-                data:'/ajax/findCategory.php',
-                allowFreeEntries: true
-            },
-            formElement: $j('#form input[name=url]')
-        });
-
         /*
          * Modal for URL homepage selection
          * */
@@ -60,14 +50,6 @@
                 }
             );
         });
-        $j('#url').change(function(event, extra) {
-            if (extra && extra.from === 'resourceBrowser') {
-                var suggest = $j('#url').data('magicSuggest');
-                var value   = this.value
-                suggest.clear(true)
-                suggest.addToSelection({id: value, name: extra.name + ' - ' + value})
-            }
-        })
 
 		//greenerising the checkboxes if they're ticked.
 		$j(':checkbox').each(function () {
