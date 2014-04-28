@@ -2,135 +2,30 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
 <link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
-<!--<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>-->
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
 $j(document).ready(function () {
-
-
-    $j('#to').val('').selectize({
-        hideSelected: true,
-        createOnBlur: true,
-        persist: false,
-        searchField: 'name',
-        labelField: 'name',
-        valueField: 'id',
-        create: function(input) {
-            var freeEntry = {};
-            freeEntry[this.settings.valueField]  = input;
-            freeEntry[this.settings.searchField] = input;
-            return freeEntry;
+    var options = {
+        ajax: {
+            url:      '/ajax/user.php',
+            type:     'GET',
+            data:     {groupID: 0, email: 1},
+            dataType: 'json'
         },
-        load: function(query, callback) {
-            if (!query.length) {
-                callback();
-                return;
+        multiple: true,
+        selectize: {
+            create: function(input) {
+                var freeEntry = {};
+                freeEntry[this.settings.valueField]  = input;
+                freeEntry[this.settings.searchField] = input;
+                return freeEntry;
             }
-            $.ajax({
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: 0, email: 1, query: query},
-                dataType: 'json'
-            })
-            .done(function(result) {
-                callback(result)
-            })
-            .fail(function() {
-                callback()
-            })
-        },
-        onInitialize: function() {
-            var self = this
-            self.clear();
-            self.clearOptions();
-            $j.each({REPLYTO}, function(i,v) {
-                self.addOption(v)
-                self.addItem(v.id)
-            });
-            self.refreshOptions(false);
         }
-    })
-    $j('#cc').val('').selectize({
-        hideSelected: true,
-        createOnBlur: true,
-        persist: false,
-        searchField: 'name',
-        labelField: 'name',
-        valueField: 'id',
-        create: function(input) {
-            var freeEntry = {};
-            freeEntry[this.settings.valueField]  = input;
-            freeEntry[this.settings.searchField] = input;
-            return freeEntry;
-        },
-        load: function(query, callback) {
-            if (!query.length) {
-                callback();
-                return;
-            }
-            $.ajax({
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: 0, email: 1, query: query},
-                dataType: 'json'
-            })
-            .done(function(result) {
-                callback(result)
-            })
-            .fail(function() {
-                callback()
-            })
-        },
-        onInitialize: function() {
-            var self = this
-            self.clear();
-            self.clearOptions();
-            self.refreshOptions(false);
-        }
-    })
-    $j('#bcc').val('').selectize({
-        hideSelected: true,
-        createOnBlur: true,
-        persist: false,
-        searchField: 'name',
-        labelField: 'name',
-        valueField: 'id',
-        create: function(input) {
-            var freeEntry = {};
-            freeEntry[this.settings.valueField]  = input;
-            freeEntry[this.settings.searchField] = input;
-            return freeEntry;
-        },
-        load: function(query, callback) {
-            if (!query.length) {
-                callback();
-                return;
-            }
-            $.ajax({
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: 0, email: 1, query: query},
-                dataType: 'json'
-            })
-            .done(function(result) {
-                callback(result)
-            })
-            .fail(function() {
-                callback()
-            })
-        },
-        onInitialize: function() {
-            var self = this
-            self.clear();
-            self.clearOptions();
-            $j.each({BCC}, function(i,v) {
-                self.addOption(v)
-                self.addItem(v.id)
-            });
-            self.refreshOptions(false);
-        }
-    })
+    }
+    $j('#to').selectizeSelector($j.extend({}, options, {value: {REPLYTO}}))
+    $j('#cc').selectizeSelector(options)
+    $j('#bcc').selectizeSelector($j.extend({}, options, {value: {BCC}}))
 });
 
 tinyMCE.init({
