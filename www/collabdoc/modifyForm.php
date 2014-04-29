@@ -39,7 +39,6 @@ if ($authenticator->canCreate($homepageId)) {
 	 * Assign them to a group
 	 */
 	$groupResult = $client->createGroup();
-	$response = $groupResult->getResponse();
 
 	if ($groupResult->getMessage() == 'ok') {
 		$data = $groupResult->getData();
@@ -48,7 +47,6 @@ if ($authenticator->canCreate($homepageId)) {
 		/* Create a group pad
 		 */
 		$createResult = $client->createGroupPad($groupId, $padName);
-		$response = $createResult->getResponse();
 
 		if ($createResult->getMessage() == 'ok') {
 			$userMapper = new \Schoolbox\UserMapper();

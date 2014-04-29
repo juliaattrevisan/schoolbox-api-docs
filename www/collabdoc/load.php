@@ -45,6 +45,24 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 		$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
 		$data = $sessionResult->getData();
 
+		/* When the groupId is nonexistent in Etherpad
+		 *
+		 * That happens when we have the pad in our local db but someone purges
+		 * epl's memory or redis. Reincarnate the pad in epl/redis and spawn a
+		 * new attempt at getting the sessionResult
+		 */
+		if ($sessionResult->getMessage() != 'ok') {
+			$respawn = new \Etherpad\Lovecraft();
+			$pad = $respawn->respawn($pad);
+
+			list($groupId, $padName) = explode('$', $pad->getPadId());
+
+			$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
+			$data = $sessionResult->getData();
+		}
+
+		/* Otherwise continue as normal
+		 */
 		if ($sessionResult->getMessage() == 'ok') {
 			$etherpadSession->generateCookie($data['sessionID']);
 
@@ -66,6 +84,9 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 					$this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showChat=false");
 				}
 			}
+		}
+		else {
+			throw new \Exception("Couldn't start session.");
 		}
 	}
 	else {
