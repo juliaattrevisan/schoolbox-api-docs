@@ -170,11 +170,16 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	 * @param int $offset - by default, most recent
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
+		$c = new Collection();
+
+		// if parents aren't allowed to see due work, return an empty collection
+		if($roletype == Role::PARENT && !$this->conf->get('restrict_parent_duework_access')) {
+			return $c;
+		}
+
 		/** @var Collection|SubmissionBox[] $boxes */
 		$boxes = $this->mapper->findForFeed($context, $limit, $offset);
-
-		$c = new Collection();
 
 		foreach($boxes as $box) {
 			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentOpen($box, $box->getOwner()), $box->getOpenDate()->getUnixTimestamp()));

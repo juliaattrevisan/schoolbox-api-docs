@@ -68,14 +68,14 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param int $offset - by default, most recent
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
 		/** @var Wiki[]|Collection $wikis */
 		$wikis = $this->mapper->findForFeed($context, $limit, $offset);
 
 		$c = new Collection();
 		foreach($wikis as $wiki) {
 			$c->merge(Feed::getItemsFromMessenger(
-				$this->notifyStudentCreated($wiki, $wiki->getLatestRevision()->getUser()),
+				$this->notifyCreated($roletype, $wiki, $wiki->getLatestRevision()->getUser()),
 				$wiki->getCreated()->getUnixTimestamp()
 			));
 		}
