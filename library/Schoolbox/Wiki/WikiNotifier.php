@@ -28,6 +28,15 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 	const TRIGGER_CREATED = 'created';
 
+
+	/**
+	 * @return string
+	 */
+	protected function getSlug() {
+		return NSMapper::NS_WIKI;
+	}
+
+
 	/**
 	 * Instantiate all your dependencies within yourself.
 	 *
@@ -35,7 +44,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_WIKI);
+		// noop
 	}
 
 	/**

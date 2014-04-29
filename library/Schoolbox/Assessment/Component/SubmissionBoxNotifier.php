@@ -83,7 +83,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 		$this->_DEPRECATED_USER_HANDLER = new \User();
 		$this->_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
-		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_DUEWORK);
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getSlug() {
+		return NSMapper::NS_DUEWORK;
 	}
 
 

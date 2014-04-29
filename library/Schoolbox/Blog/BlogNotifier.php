@@ -35,8 +35,16 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_BLOG);
+		// noop
 	}
+
+	/**
+	 * @return string
+	 */
+	protected function getSlug() {
+		return NSMapper::NS_BLOG;
+	}
+
 
 	/**
 	 * @param TriggerBundle $bundle

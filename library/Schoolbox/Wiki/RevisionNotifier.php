@@ -35,8 +35,16 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_WIKI);
+		// noop
 	}
+
+	/**
+	 * @return string
+	 */
+	protected function getSlug() {
+		return NSMapper::NS_WIKI;
+	}
+
 
 	/**
 	 * @param TriggerBundle $bundle

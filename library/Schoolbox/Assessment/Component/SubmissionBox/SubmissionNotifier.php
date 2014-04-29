@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -46,17 +47,12 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * At minimum, this method should accept the label and role for which to build a topic.
-	 * If more parameters are required in an implementation, PHP will allow you to include optional parameters to the
-	 * method signature.
-	 *
-	 * @param string $eventLabel
-	 * @param string $roleType
 	 * @return string
 	 */
-	protected function buildTopic($eventLabel, $roleType) {
-		// deprecated, noop
+	protected function getSlug() {
+		return NSMapper::NS_DUEWORK;
 	}
+
 
 	/**
 	 * Instantiate all your dependencies within yourself.

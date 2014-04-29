@@ -89,18 +89,6 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		}
 	}
 
-	/**
-	 * Generate n messages for a category, from the perspective of casual observation.
-	 *
-	 * @param int $category
-	 * @param int $limit
-	 * @return Collection|TargetedMessage[]
-	 */
-	public function getFeed($category, $limit) {
-		// this class doesn't do feeds
-		return new Collection();
-	}
-
 
 	/**
 	 * Notify a group type that news has been posted
