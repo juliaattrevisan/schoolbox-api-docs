@@ -14,6 +14,7 @@
 			currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
 			direct: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT}',
 			items: '{INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS}',
+			disabled: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED}',
 
 			/* Callback methods
 			 */
@@ -40,6 +41,20 @@
 </span>
 
 <div class="dropdown-navigator"></div>
+
+<form action="/submission/inlineGrading/configForm.php" method="post">
+	<input type="hidden" name='boxId' value="{BOX_ID}" />
+	<input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
+
+	<label>
+		<input type="hidden" name="skipUnsubmitted" value="0" />
+		<input type="checkbox" name="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' /> Skip Unsubmitted
+	</label>
+
+	<input type="submit" class="submit-btn-plain" value="Update" />
+</form>
+
+<div class="clearfix"></div>
 
 <div id="inline-grading-error-container">
 	<strong>There were errors downloading document for inline grading:</strong>
