@@ -65,7 +65,7 @@ class Controller extends Base {
      */
     public function search() {
         $excludedId = $this->getRequest()->query['thisId'];
-        $search     = trim($this->getRequest()->post['query']);
+        $search     = trim($this->getRequest()->query['query']);
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
