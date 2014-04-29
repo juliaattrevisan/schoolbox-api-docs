@@ -1117,7 +1117,7 @@ class Mapper {
 	/**
 	 * @brief Saves an object to the database. Updates or inserts
 	 * @param $object
-	 * @return array<int>
+	 * @return array<int>|bool
 	 */
 	public function save($object) {
 		$collection = $this->getModelAsCollection($object);

@@ -10,6 +10,8 @@
 namespace Schoolbox\Resource;
 
 
+use Schoolbox\User;
+
 class Link {
 	/**
 	 * @var int

@@ -92,7 +92,7 @@ class CategoryMapper extends Mapper {
 	 * Get a list of categorys which belong to a particular parent
 	 *
 	 * @param $id
-	 * @return Category
+	 * @return Collection|Category[]
 	 * @throws \Schoolbox\Mapper\Exception
 	 */
 	public function findByParent($id) {
