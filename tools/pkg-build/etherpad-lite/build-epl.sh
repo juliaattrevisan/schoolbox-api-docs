@@ -10,7 +10,7 @@
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
-eplver='1.3.0';
+eplver='1.4.0';
 
 # Create directories for completing the build
 builddir="/tmp/build-dir-`date -I`";

@@ -10,7 +10,7 @@ set -e
 
 case "$1" in
     install|upgrade)
-        useradd -M schoolboxepl 2>/dev/null;
+        useradd -M schoolboxepl 2>/dev/null || true;
     ;;
 
     abort-upgrade)
