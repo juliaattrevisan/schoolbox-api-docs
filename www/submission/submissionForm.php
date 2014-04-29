@@ -85,6 +85,7 @@ $acceptSubmissions = !empty($_POST['accept_submission']);
 $multiSubmissions = !empty($_POST['multi_submission']);
 
 $descriptors = $_POST['des'];
+$values = $_POST['value'];
 $criteria = $_POST['crit'];
 $useDescriptors = $resultSetID == 0;
 
@@ -147,10 +148,10 @@ elseif($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
 
     if($useDescriptors) {
         $specification = array();
-        foreach($descriptors as $critID => $values) {
+        foreach($descriptors as $critID => $desc) {
             if($criteria[$critID]) {
-                foreach($values as $k => $v) {
-                    $specification[$critID][$k] = new DueWork_Rubric_Descriptor($v, $k);
+                foreach($desc as $k => $v) {
+                    $specification[$critID][$k] = new DueWork_Rubric_Descriptor($v, $values[$critID][$k]);
                 }
             }
         }

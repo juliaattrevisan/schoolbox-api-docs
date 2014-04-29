@@ -39,9 +39,9 @@ class DueWork_Rubric_DescriptorRubric extends DueWork_Rubric_Abstract {
         return count($this->descriptors[$keys[0]]);
     }
 
-    public function getResultIndices() {
+    public function getResultIndices($criterion) {
         $keys = array_keys($this->descriptors);
-        return array_keys($this->descriptors[$keys[0]]);
+        return array_keys($this->descriptors[$criterion]);
     }
 
     public function getResults($criterionID = 0) {

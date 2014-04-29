@@ -146,11 +146,11 @@ s	 */
 					'RUBRIC_CRIT_ID' => $data['criteria'][$i]['id']
 				));
 
-				for($j = 0; $j < count($data['criteria'][0]['results']); ++$j) {
+				foreach($data['criteria'][$i]['results'] as $value => $descriptor) {
 					$this->getPage()->setVar(array(
-						'RUBRIC_CRIT_RATING_LABEL' => $data['criteria'][$i]['results'][$j],
-						'RUBRIC_CRIT_RATING_VALUE' => $j,
-						'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $j ? 'checked="checked"' : '',
+						'RUBRIC_CRIT_RATING_LABEL' => $descriptor,
+						'RUBRIC_CRIT_RATING_VALUE' => $value,
+						'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $value ? 'checked="checked"' : '',
 
 						/* Render a group value so all the criterion labels are tied to the
 						 * criteria themselves on the frontend, regardless of html structure
@@ -169,7 +169,7 @@ s	 */
 
 			for($i = 0; $i < count($data['criteria']); ++$i) {
 				$sum += $data['criteria'][$i]['value'];
-				$max += count($data['criteria'][0]['results']) - 1;
+				$max += max(array_keys($data['criteria'][$i]['results']));
 			}
 
 			$this->getPage()->setVar(array(

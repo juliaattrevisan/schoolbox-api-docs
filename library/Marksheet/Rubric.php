@@ -28,7 +28,8 @@ class Marksheet_Rubric extends Marksheet_Abstract {
             $mark += $i;
         }
 
-        $max = $subbox->getMaxMark();
+        $max = $this->getRubricHandler()->getRubricMaxScore($subbox->getId());
+
         $normalised = (($mark / $max) * 100);
 
         // validation: must be inside bounds

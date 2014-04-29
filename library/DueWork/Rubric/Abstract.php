@@ -44,7 +44,7 @@ abstract class DueWork_Rubric_Abstract {
 
     public abstract function getResultCount();
 
-    public abstract function getResultIndices();
+    public abstract function getResultIndices($criterion);
 
     /**
      * @abstract

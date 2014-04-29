@@ -271,26 +271,28 @@ class Factory {
 	private function processReturnedWork() {
 		$returnedWork = $this->retrieveReturnedWorkRecord();
 
-		/* Empty mark (not zero) - treat as null
-		 */
-		if ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
-			$returnedWork->setMark(null);
-			$returnedWork->setNormalizedMark(null);
-		}
+
 		/* A string mark was submitted (Absent, Not Submitted, etc)
 		 */
-		elseif (isset($errors[$this->getMark()])) {
+		if (isset($errors[$this->getMark()])) {
 			$returnedWork->setMark($errors[$this->getMark()]->getDisplayAs());
 			$returnedWork->setNormalisedMark($errors[$this->getMark()]->getNormaliseAs());
 		}
 		/* If it's a rubric, it normalises in a special way
 		 */
 		else if ($this->getSubmissionBox()->isRubric()) {
+
 			$normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getRubric(), $this->getSubmissionBox());
 
-			$returnedWork->setMark($this->getMark());
+			$returnedWork->setMark($normalisedMarkArray['mark']);
 			$returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
+
 		}
+        /* Empty mark (not zero) - treat as null*/
+        else if ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
+            $returnedWork->setMark(null);
+            $returnedWork->setNormalizedMark(null);
+        }
 		/* Just do it in the normal way
 		 */
 		else {

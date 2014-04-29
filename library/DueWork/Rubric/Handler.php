@@ -474,9 +474,10 @@ class DueWork_Rubric_Handler {
                 VALUES (:cid, :sbid, :val, :descr)
                 ON DUPLICATE KEY UPDATE `description` = :descr, `valid` = 1
             ");
+
             if($rubric->getCriteriaCount() && $rubric->getResultCount()) {
                 foreach($rubric->getCriteriaIndices() as $i) {
-                    foreach($rubric->getResultIndices() as $j) {
+                    foreach($rubric->getResultIndices($i) as $j) {
                         $subst = array(
                             'cid'   => $i,
                             'sbid'  => $submissionBoxID,
@@ -538,21 +539,39 @@ class DueWork_Rubric_Handler {
 
 
     public function getRubricMaxScore($submissionBoxID) {
-        $stmt = $this->db->prepare("
-            SELECT d.value d_value, r.value r_value
+
+        $max = 0;
+
+        /* if descriptor */
+        $stmt = $this->db->prepare("SELECT MAX(d.value)
             FROM submission_box sb
             LEFT JOIN `rubric_usage` u ON sb.id = u.`submission_box_id`
             LEFT JOIN rubric_criterion c ON c.id = u.`criterion_id`
             LEFT JOIN rubric_descriptor d ON d.`submission_box_id` = sb.id AND d.`criterion_id` = c.id AND sb.`rubric_result_set` = 0
-            LEFT JOIN rubric_result r ON r.`resultset_id` = sb.`rubric_result_set` AND sb.`rubric_result_set` > 0
-            WHERE (d.valid = 1 OR sb.rubric_result_set > 0)
-            AND (d.value > 0 OR r.value > 0)
-            AND sb.id = :sbid
-            ORDER BY d.value DESC, r.value DESC
-        ");
-
+            WHERE d.valid = 1 AND sb.id = :sbid
+            GROUP BY (c.id)");
         $stmt->execute(array('sbid' => $submissionBoxID));
-        return $stmt->rowCount();
+        foreach($stmt as $result) {
+            $max += $result[0];
+        }
+
+        if($max > 0) {
+            return $max;
+        }
+        else {
+            /* attempt result set max */
+            $stmt = $this->db->prepare("
+                SELECT r.value r_value
+                FROM submission_box sb
+                LEFT JOIN `rubric_usage` u ON sb.id = u.`submission_box_id`
+                LEFT JOIN rubric_result r ON r.`resultset_id` = sb.`rubric_result_set` AND sb.`rubric_result_set` > 0
+                WHERE sb.rubric_result_set > 0 AND r.value > 0 AND sb.id = :sbid
+                ORDER BY r.value DESC
+            ");
+
+            $stmt->execute(array('sbid' => $submissionBoxID));
+            return $stmt->rowCount();
+        }
     }
 
 }

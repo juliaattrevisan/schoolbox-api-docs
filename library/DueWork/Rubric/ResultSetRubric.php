@@ -19,7 +19,7 @@ class DueWork_Rubric_ResultSetRubric extends DueWork_Rubric_Abstract {
         return count($this->resultSet->getResults());
     }
 
-    public function getResultIndices() {
+    public function getResultIndices($criterion) {
         return array_keys($this->resultSet->getResults());
     }
 

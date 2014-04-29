@@ -292,10 +292,10 @@
                         newItem = last.clone(true);
 
                         // clear the descriptor value
-                        newItem.find('input').val('');
-                        insertList += newItem.outerHTML();
+                        newItem.find('textarea').val('');
+                        newItem.find('input').val( parseInt(newItem.find('input').val()) + (i+1) );
+                        $j(this).append( newItem );
                     }
-                    $j(this).append(insertList);
                 }
             });
         });
@@ -501,7 +501,7 @@
         <td>
             <h4>Rubric</h4>
             <em>Select <i>at least one</i> criterion to be assessed, and possible results.<br/>
-                If used, descriptors should be ordered lowest to highest.
+               By default descriptors are ordered lowest to highest, you may rearrange if you wish.
             </em>
             <!-- BEGIN existing_marks_warning -->
             <div class="warning"><b>Warning:</b> you have already marked some students' work.
