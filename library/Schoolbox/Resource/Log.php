@@ -30,6 +30,8 @@ class Log {
 	/** @var User */
 	protected $user;
 
+	/** @var \Alaress_Date_Format */
+	protected $timestamp;
 
 	/**
 	 * @param int $id
@@ -154,4 +156,19 @@ class Log {
 	}
 
 
-} 
+	/**
+	 * @param \Alaress_Date_Format $timestamp
+	 */
+	public function setTimestamp($timestamp) {
+		$this->timestamp = $timestamp;
+	}
+
+
+	/**
+	 * @return \Alaress_Date_Format
+	 */
+	public function getTimestamp() {
+		return $this->timestamp;
+	}
+
+}

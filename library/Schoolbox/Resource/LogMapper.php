@@ -10,6 +10,9 @@
 namespace Schoolbox\Resource;
 
 
+use PDO;
+use Schoolbox\Assessment\Component\SubmissionBox\FileMapper;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
 class LogMapper extends Mapper {
@@ -76,8 +79,93 @@ class LogMapper extends Mapper {
 			'other_key' => 'id'
 		));
 
+		// unmapped joins
+
+		$this->hasJoin('link', array(
+			'mapper'    => '\\Schoolbox\\Resource\\LinkMapper',
+			'this_key'  => 'objectId',
+			'other_key' => 'id'
+		));
+
+		$this->hasJoin('file', array(
+			'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
+			'this_key'  => 'objectId',
+			'other_key' => 'id'
+		));
+
+		$this->hasJoin('cat', array(
+			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+			'this_key'  => 'objectId',
+			'other_key' => 'id'
+		));
+
 	}
 
+	/**
+	 * Return a collection of log items appropriate for aggregation
+	 *
+	 * @param int $context
+	 * @param int $limit
+	 * @param int $offset
+	 * @param string $filter
+	 * @param int $time
+	 * @return Collection|Log[]
+	 */
+	public function findForFeed($context, $limit, $offset = 0, $filter = '', $time = 0) {
+		$time = date('Y-m-d H:i:s', $time ?: time());
+		$limit = (int)$limit;
+		$offset = (int)$offset;
 
+		$joins = array(
+			self::KIND_LINK   => "
+				LEFT JOIN {$this->getJoinSql('link', 'log', 'l')}
+				AND object = 'link'
+				AND l.category = :ctxt
+			",
+			self::KIND_FILE   => "
+				LEFT JOIN {$this->getJoinSql('file', 'log', 'f')}
+				AND object = 'file'
+				AND f.category = :ctxt
+			",
+			self::KIND_FOLDER => "
+				LEFT JOIN {$this->getJoinSql('cat',  'log', 'c')}
+				AND object = 'folder'
+				AND c.parent = :ctxt
+			",
+		);
+
+		$selects = array(
+			self::KIND_LINK => $this->getJoinMapper('link')->getColumnString('l'),
+			self::KIND_FILE => $this->getJoinMapper('file')->getColumnString('f'),
+			self::KIND_FOLDER => $this->getJoinMapper('cat')->getColumnString('c'),
+		);
+
+		// are we filtering? or just grabbing all the things?
+		$selectSql = $filter ? implode(', ', $selects) : $selects[$filter];
+		$joinSql = $filter ? implode(' ', $joins) : $joins[$filter];
+
+		$stmt = $this->database->prepare("
+			SELECT $selectSql
+			FROM `{$this->getTable()}` `log`
+				$joinSql
+			WHERE log.time <= :time
+			ORDER BY log.time
+			LIMIT $offset, $limit
+		");
+
+		$stmt->execute(array(
+			'ctxt' => $context,
+			'time' => $time
+		));
+
+		$collection = new Collection();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			/** @var Log $log */
+			$collection->add($this->hydrate($r, 'log'));
+		}
+
+		return $collection;
+	}
 
 } 
