@@ -3,14 +3,15 @@
 (function($) {
     $.fn.flyout = function(options) {
         var settings = $.extend({
-            attr: 'data-menu'
+            attr: 'data-menu',
+            element: 'li'
         }, options);
 
         return this.each(function() {
             var btn = $(this);
             var html = $('html');
             var menuref = '#' + btn.attr(settings.attr);
-            var list = btn.parent('li');
+            var list = btn.parent(settings.element);
 
             var fn = function(event) {
                 // if we clicked somewhere on the menu, just reattach the listener
@@ -26,7 +27,6 @@
             // attach the listener
             btn.on('click', function(e) {
                 e.preventDefault();
-
                 // is already open
                 if(list.hasClass('open')) {
                     // we've clicked on the button, which is already open - the html listener should close it for us.....

@@ -7,14 +7,21 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $is_task = !empty($_POST['is_task']);
 if (is_numeric($_POST['id']) && ($is_task || $_POST['due_date']) && is_numeric($_POST['category'])) {
     $action = 'update';
+    $submissionBoxID = $_POST['id'];
 }
 // no ID, create a new DueWork
 elseif (($is_task || $_POST['due_date']) && is_numeric($_POST['category'])) {
     $action = 'create';
+    $submissionBoxID = 0;
 }
 // deletion flagged, delete existing DueWork
 elseif (isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
     $action = 'delete';
+    $submissionBoxID = $_GET['deleteBox'];
+}
+elseif (isset($_GET['id']) && isset($_GET['mark_visibility'])) {
+    $action = 'visibility';
+    $submissionBoxID = $_GET['id'];
 }
 // data was POSTed, but nothing received: file upload size exceeded
 elseif (upload_failed()) {
@@ -36,16 +43,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 $mapper = new SubmissionBoxMapper();
-
-if($action == 'delete') {
-    $mapper->delete($mapper->findById($_GET['deleteBox']));
-    $page->localRedir("/submission/listSubmission/");
-}
-
-// CREATE OR UPDATE
-
 // localise important variables
-$submissionBoxID = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
 $submission = !empty($submissionBoxID) ? $mapper->findById($submissionBoxID) : new SubmissionBox();
 $groupHandler = new Group();
 //
@@ -57,6 +55,27 @@ if (empty($check_id)) {
 if (empty($check_id) || $groupHandler->getPermission($check_id) < WRITE_ACCESS) {
     error(19);
 }
+
+
+
+if($action == 'delete') {
+    $mapper->delete($mapper->findById($_GET['deleteBox']));
+    $page->localRedir("/submission/listSubmission/");
+}
+else if($action == 'visibility') {
+    /* This is used for an ajax update request of just the visibility */
+    try{
+        $subBox = $mapper->findById($submissionBoxID);
+        $subBox->setMarkVisibility($_GET['mark_visibility']);
+        $mapper->save($subBox);
+        print 'success';
+    } catch (Exception $e) {
+        print 'failure';
+    }
+    exit;
+}
+
+// CREATE OR UPDATE
 
 $categoryID = $_POST['category'];
 $markTypeID = $_POST['marktype'];

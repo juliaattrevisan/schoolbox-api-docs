@@ -48,6 +48,17 @@
 		  <!-- BEGIN stat_editable -->
       <input type="text" maxlength="3" length="3" name="{WORK_STAT_CLASS}[{WORK_NS_ID}]" value="{WORK_STAT_VALUE}" />
 		  <!-- END stat_editable -->
+        <!-- BEGIN stat_visible -->
+        <a href="#" data-menu="visibility_menu_{WORK_ID}">
+        <div class="visibility-drop">
+        <span class="visibility-btn visibility_{WORK_STAT_VALUE}"></span><span class="down-arrow"></span>
+        </div></a>
+        <ul id="visibility_menu_{WORK_ID}" class="flyout-menu">
+            <li><a href="{ASSESS_MODIFY_URL}&mark_visibility=0" rel="flyout-option">Staff Only</a></li>
+            <li><a href="{ASSESS_MODIFY_URL}&mark_visibility=1" rel="flyout-option">Staff and Students</a></li>
+            <li><a href="{ASSESS_MODIFY_URL}&mark_visibility=2" rel="flyout-option">Staff, Students and Parents</a></li>
+        </ul>
+        <!-- END stat_visible -->
       <!-- BEGIN stat_readonly -->
       {WORK_STAT_VALUE}
     <!-- END stat_readonly -->
@@ -93,6 +104,9 @@
         else {
             $j(this).html('&#x25B2;');
             $j('.sub-table-row').show();
+
+            $j('.sub-table-row').find('a[data-menu]').flyout({element : 'td'});
+
         }
     });
 
@@ -142,7 +156,17 @@
         setTimeout(function() { self.removeClass('ajax-response fail') }, 2000);
       }
     });
+  });
 
-  })
+    $j('a[href][rel=flyout-option]').click(function(event){
+        event.preventDefault();
+        var self = $j(this);
+        var href = $j(this).attr('href');
+        var visibility = href.substr(href.length-1);
+        $j.ajax({url: href}).done(function(data) {
+            self.closest('td').find('span.visibility-btn').removeClass('visibility_0 visibility_1 visibility_2').addClass('visibility_'+visibility);
+            self.closest('td').removeClass('open');
+        });
+    });
 </script>
 <!-- END CUSTOM_JAVASCRIPT -->

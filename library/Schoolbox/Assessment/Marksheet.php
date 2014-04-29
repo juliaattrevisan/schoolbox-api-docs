@@ -251,7 +251,7 @@ class Marksheet {
 					array(
 						'avg' => $classAvg,
 						'weight' => $weight,
-                        'visible' => $visibility,
+                        'visibility' => $visibility,
 					),
 					$stats,
 					$progress
@@ -481,7 +481,8 @@ class Marksheet {
 		$page->setBlock(TEMPLATE_content, 'stat', 'stat_block');
 		$page->setBlock('stat', 'stat_item', 'stat_item_block');
 		$page->setBlock('stat_item', 'stat_editable', 'stat_editable_block');
-		$page->setBlock('stat_item', 'stat_readonly', 'stat_readonly_block');
+        $page->setBlock('stat_item', 'stat_visible', 'stat_visible_block');
+        $page->setBlock('stat_item', 'stat_readonly', 'stat_readonly_block');
 
 		$page->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
 		$page->setBlock('student_row', 'student_work', 'student_work_block');
@@ -497,9 +498,6 @@ class Marksheet {
 		);
 
 		$page->setVar('work_header_block', '');
-
-		// stats that can be edited inline
-		$writeable = array('weight', 'visibility');
 
 		// transpose the data to output by row, not column, and output row headers while we're here
 		$transposed = array();
@@ -553,16 +551,25 @@ class Marksheet {
 				$value  = $boxes[$workId];
 				$page->setVar(array(
 					'WORK_NS_ID' => str_replace('-', '][', $workId), // so it appears as the name attribute properly
-					'WORK_STAT_VALUE' => is_numeric($value) ? (float) round($value, 3) : $value // truncate to 3 decimals, then strip extraneous 0s
+                    'WORK_ID' => $item['id'],
+					'WORK_STAT_VALUE' => is_numeric($value) ? (float) round($value, 3) : $value, // truncate to 3 decimals, then strip extraneous 0s
+                    'ASSESS_MODIFY_URL' => $item['object'] instanceof OnlineAssessment ? '/assess/modify/'.$item['id'] :  '/submission/submissionForm.php?id='.$item['id'],
 				));
 
-				if(in_array($name, $writeable)) {
+				if($name == 'weight') {
 					$page->parse('stat_editable_block', 'stat_editable');
-					$page->setVar('stat_readonly_block', '');
+                    $page->setVar('stat_visible_block', '');
+                    $page->setVar('stat_readonly_block', '');
 				}
+                else if($name == 'visibility') {
+                    $page->parse('stat_visible_block', 'stat_visible');
+                    $page->setVar('stat_editable_block', '');
+                    $page->setVar('stat_readonly_block', '');
+                }
 				else {
 					$page->parse('stat_readonly_block', 'stat_readonly');
 					$page->setVar('stat_editable_block', '');
+                    $page->setVar('stat_visible_block', '');
 				}
 
 				$page->parse('stat_item_block', 'stat_item', true);

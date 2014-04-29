@@ -8938,6 +8938,7 @@ td.name {
 #returnWorkForm {
     .mark-input {
         text-align: right;
+        width: 85px;
         font-size: 12px;
     }
     select {
@@ -9053,19 +9054,69 @@ td.name {
     }
 }
 
-/*.mark-sheet {
-    tr {
-        td.mark-average {
-            background: darken(@dark,@darken-value / 4);
-        }
-        &.dark td.mark-average {
-            background: darken(@dark,@darken-value / 2);
-        }
-        th, td {
-            padding: 7px 16px 7px 0;
-        }
+div.visibility-drop {
+  border-width: 1px;
+  border-color: @lgrey;
+  border-type: solid;
+  background-color: @white;
+  height: 16px;
+  padding-bottom: 2px;
+  padding-top: 4px;
+  margin-top: -4px;
+  margin-bottom: -4px;
+}
+
+span.visibility-btn {
+  display: block;
+  float:left;
+  top: 4px;
+  left: 8px;
+  height: 14px;
+  width: 20px;
+  background: url(/images/core/assess/visibility.png) no-repeat;
+}
+&span.visibility_0 { /*Staff*/
+  .btn-icon(0);
+}
+&span.visibility_1  { /*Students*/
+  .btn-icon(1);
+}
+&span.visibility_2  { /*Parents*/
+  .btn-icon(2);
+}
+
+.down-arrow {
+  display:block;
+  border-color: @dgrey transparent;
+  border-style: solid;
+  border-width: 5px 5px 0px 5px;
+  height: 0px;
+  width: 0px;
+  margin-left: 35px;
+  margin-top: 4px;
+}
+
+td.open ul.flyout-menu {
+  display:block;
+  right:inherit;
+  top:inherit;
+  margin-top: 5px;
+  margin-left: -1px;
+
+  li {
+    text-align: left;
+    a {
+      padding: 5px 30px 5px 10px;
+      display: block;
+      border-bottom: solid 1px #eeeeee;
+      color: #000000;
+      text-decoration: none;
     }
-}*/
+  }
+  li:hover {
+    background-color: lighten(@highlight-color,@lighten-value);
+  }
+}
 
 /* submission/listSubmission */
 #list-submission-context {
@@ -9620,14 +9671,6 @@ div.colours p {
         color: @negative-color;
     }
 }
-
-/*.mark-sheet.assessments {
-    thead {
-        :first-child {
-            border: none;
-        }
-    }
-}*/
 
 #assess {
     .table td a {
@@ -10924,9 +10967,6 @@ form.comment-form label {
 	a {
 		display: block;
 		font-weight: bold;
-	}
-	span {
-		float: right;
 	}
 	.author {
 

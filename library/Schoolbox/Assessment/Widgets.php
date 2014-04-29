@@ -15,6 +15,7 @@ namespace Schoolbox\Assessment;
 
 class Widgets {
 
+
 	/**
 	 * Outputs the visibility dropdown for this page.
 	 *
@@ -22,23 +23,11 @@ class Widgets {
 	 * @param $value The value of the dropdown to show.
 	 */
 	public function outputVisibilityDropdown(\SitePage $page, $value) {
-		$options = array(
-			array(
-				'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE,
-				'name' => 'Staff Only',
-			),
-			array(
-				'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT,
-				'name' => 'Staff and Students',
-			),
-			array(
-				'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
-				'name' => 'Staff, Students and their Parents',
-			),
-		);
 
 		/* Remove elements from list based on max setting
 		   Note this cascades popping elements as it goes, so case 0 pops 2, case 1 pops 1, case 3 pops 0*/
+        $options = self::getOptions();
+
 		switch(\Cfg::get('submission_visibility_max')) {
 			case '0' :
 				array_pop($options);
@@ -50,7 +39,7 @@ class Widgets {
 
 		$page->dropDown(
 			'mark_visibility_drop',
-			$options,
+            $options,
 			$value,
 			'marktype',
 			array(
@@ -59,4 +48,32 @@ class Widgets {
 			)
 		);
 	}
+
+    static public function getOptions() {
+        $options = array(
+            array(
+                'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE,
+                'name' => 'Staff Only',
+            ),
+            array(
+                'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT,
+                'name' => 'Staff and Students',
+            ),
+            array(
+                'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+                'name' => 'Staff, Students and their Parents',
+            ),
+        );
+        return $options;
+    }
+
+    static public function getName($id) {
+        $options = self::getOptions();
+
+        foreach($options as $vis) {
+            if($vis['id'] == $id) {
+                return $vis['name'];
+            }
+        }
+    }
 }

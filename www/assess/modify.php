@@ -84,7 +84,20 @@ if (!empty($_POST)) {
         Task\InstanceMapper::getInstance()->save($task_instance);
     }
     SitePage::localRedir('/assess/summary/' . $this->arg[0]);
-} else {
+}
+else if(is_numeric($_GET['mark_visibility'])) {
+    /* This is used for an ajax update request of just the visibility */
+    try {
+        $assessment = OnlineAssessmentMapper::getInstance()->findById($this->arg[0]);
+        $assessment->setMarkVisibility($_GET['mark_visibility']);
+        OnlineAssessmentMapper::getInstance()->save($assessment);
+        print "success";
+    } catch (Exception $e) {
+        print "failure";
+    }
+    exit;
+}
+else {
 
     /* Render modify page
      */
