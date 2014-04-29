@@ -55,6 +55,13 @@ override_dh_install:
 	cp -a --parents library/Schoolbox/Mobile $(CURDIR)/mobile
 	rm -fR library/Schoolbox/Mobile
 	## End Mobile Module
+	## Resource Module
+	mkdir -pv $(CURDIR)/resource
+	cp -a --parents sql/modules/resource $(CURDIR)/resource
+	rm -fR sql/modules/resource
+	cp -a --parents library/Schoolbox/ResourceBooking $(CURDIR)/resource
+	rm -fR library/Schoolbox/ResourceBooking
+	## End Resource Module
 	# Install submodules using composer
 	tools/composer.sh --no-dev
 	# Install grunt

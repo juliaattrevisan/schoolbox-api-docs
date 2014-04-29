@@ -12,3 +12,4 @@ tools /usr/share/schoolbox
 updates /usr/share/schoolbox
 www /usr/share/schoolbox
 vendor /usr/share/schoolbox
+conf /usr/share/schoolbox
