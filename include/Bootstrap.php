@@ -29,6 +29,9 @@ set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include
 require_once dirname(__FILE__) . '/Autoloader.php';
 Autoloader::initialise();
 
+// Set up the dependency injector
+require_once __DIR__.'/Bootstrap/Dependencies.php';
+
 //
 // Set up the debug bar, and add listeners for various parts of the debug bar
 // (database calls, XHProf)

@@ -1,0 +1,336 @@
+<!-- BEGIN custom_header -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+
+<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
+<script type="text/javascript">
+
+// once the DOM has loaded, punch a fancy calendar into it
+$(document).ready(function() {
+
+    // Dialog for use when clicking an item that is in a series
+    var updateSeriesDialog = $('#dialog-bulk-update')
+    updateSeriesDialog.dialog({
+        autoOpen:false,
+        resizable:false,
+        height:180,
+        width:400,
+        modal:true,
+        draggable:false,
+        close: function () {
+            return false;
+        }
+    })
+
+    var now = new Date();
+    var c   = new Calendar('calendar', 'calendar-bubble', {
+        filter: {
+            enabled: true,
+            ajax: false,
+            // This AJAX lookup should always be a GET request
+            parentSelector: '#calendar-controls',
+            exportButtonSelector: false,
+            checkboxSelector: false,
+            applyFiltersSelector: false
+        },
+        fullCalendar: {
+            firstHour: 9,
+            allDaySlot: false,
+            date:  now.getDate(),
+            month: now.getMonth(),
+            year:  now.getFullYear(),
+            columnFormat: 'ddd d/M',
+            defaultView: 'month',
+            timeFormat: { month: 'h(:mm)tt' },
+            events: function(start, end, callback) {
+                var data = [
+                    {name: 'start', value: Math.round(start.getTime()/1000)},
+                    {name: 'end',   value: Math.round(end.getTime()/1000)},
+                ];
+                $.ajax({
+                    data:     data.concat($('#calendar-controls').find('form').serializeArray()),
+                    dataType: 'json',
+                    url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
+                    success: function(data) {
+                        callback(data);
+                    },
+                    cache: false
+                });
+            },
+            loading: function(isLoading) {
+                if (isLoading === true) {
+                    $('#calendar-loading').css({
+                        top: ($j('#calendar').height() - $j('#calendar-loading').height())/2,
+                        left: ($j('#calendar').width() - $j('#calendar-loading').width())/2
+                    }).show();
+                }
+                else {
+                    $('#calendar-loading').hide();
+                }
+            },
+            /**
+             * Event rendering: put the event's start and end time into data
+             */
+            eventRender: function(event, element) {
+                // formatDate has no timezone support, and ISO 8601 outputs
+                // a Z as timezone always. Fail!
+                var getTimeWithTimezone = function(date) {
+                    var offset = date.getTimezoneOffset()
+                    var sign   = '';
+                    if (offset === 0) {
+                        return 'Z'
+                    }
+                    if (offset < 0) {
+                        // < 0 actually means +xxxx
+                        sign   = '+'
+                        offset = offset * -1
+                    }
+                    else {
+                        sign = '-'
+                    }
+                    var hours = String(Math.floor(offset / 60))
+                    if (hours.length === 1) {
+                        hours = '0' + hours;
+                    }
+                    var minutes = String(offset % 60)
+                    if (minutes.length === 1) {
+                        minutes = '0' + minutes;
+                    }
+                    return $.fullCalendar.formatDate(date, "yyyy-MM-dd'T'HH:mm:ss") + sign + hours + ':' + minutes
+                }
+                // Set data as attributes, that way selectors can query them
+                // End of event might not be defined if it's the same as
+                // start, too.
+                element.attr({
+                    'data-start':  getTimeWithTimezone(event.start),
+                    'data-end':    getTimeWithTimezone(event.end || event.start),
+                    'data-allday': event.allDay ? 1 : 0
+                })
+
+                // Add booking styles
+                element.addClass('booking');
+                if (event.data.booking.status.isRejected) {
+                    element.addClass('rejected');
+                }
+                if (event.data.booking.status.isApproved) {
+                    element.addClass('approved');
+                }
+                if (event.data.booking.status.isPending) {
+                    element.addClass('pending');
+                }
+                return element
+            },
+
+            /**
+             * Event that is triggered when clicking on a calendar day or time.
+             *
+             * @param date
+             * @param allDay
+             * @param jsEvent
+             */
+            dayClick: function(date, allDay, jsEvent) {
+                // Bookings may not be made in the past.
+                var dateFormat = allDay ? 'ddd d MMMM' : 'h(:mm)tt, ddd d MMMM';
+                var eventData  = {
+                    startDate:   $.fullCalendar.formatDate(date, 'yyyy-MM-dd'),
+                    displayDate: $.fullCalendar.formatDate(date, dateFormat)
+                }
+                if (!allDay) {
+                    eventData.startTime = $.fullCalendar.formatDate(date, 'HH:mm')
+                }
+                c.bubble.display('create', eventData, jsEvent, this)
+            },
+            eventStartEditable: false
+        },
+        x: false
+    }).init()
+
+    // Event filter - reload events when the filter button is pressed.
+    $('#calendar-controls').on('click', 'a#applyFilters', function(event) {
+        event.preventDefault()
+        c.dom.fullCalendar('refetchEvents')
+    })
+
+    // Approve, Reject, Cancel: all AJAX events
+    // Modify: not AJAX
+    // For any AJAX event - open a dialog if this is a series event
+    $('#calendar-bubble').find('#editEvent').on(
+        'click',
+        'a.btn.booking-approve, a.btn.booking-reject, a.btn.booking-cancel',
+        function(event) {
+            c.bubble.hide()
+            event.preventDefault()
+            var href     = this.href
+            var callback = function(data) {
+                $.ajax(href, {data: data}).done(function() {
+                    c.dom.fullCalendar('refetchEvents')
+                })
+            }
+            var seriesId = $(this).data('seriesId')
+            if (seriesId) {
+                // Remove all previous change status events, and reapply to this
+                // dialog box.
+                updateSeriesDialog.find('.action-text').text($(this).text().toLowerCase())
+                updateSeriesDialog
+                    .dialog('option', 'buttons', [{
+                        text: "Only this booking",
+                        click: function() {
+                            updateSeriesDialog.dialog('close')
+                            callback({efficacy: 'self'})
+                        }
+                    }, {
+                        text: "All bookings in the series",
+                        click: function() {
+                            updateSeriesDialog.dialog('close')
+                            callback({efficacy: 'series', seriesId: seriesId})
+                        }
+                    }])
+                    .dialog('open')
+            }
+            else {
+                c.bubble.hide()
+                callback()
+            }
+        }
+    )
+})
+</script>
+
+<!-- END custom_header -->
+
+
+<h1>Resource - {{ item.name }}</h1>
+
+<p class="description">
+    {% if item.image.hash %}
+        <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
+    {% endif %}
+    {{ item.description|e|nl2br }}
+</p>
+
+<p class="category">
+    Category: <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
+</p>
+
+{# Resource manager: could be set in the edit form, or the default resource manager #}
+<p class="management">
+    Resource moderated by:
+    <ul>
+        {% if defaultModeratorList is empty and item.moderatorList is empty %}
+            <li>Nobody</li>
+        {% else %}
+            {% for moderator in defaultModeratorList %}
+                <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
+            {% endfor %}
+            {% for moderator in item.moderatorList %}
+                <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+</p>
+
+<h2>Rules</h2>
+{% include '@resourceItem/sub/rules.twig' with {item: item} %}
+
+<div id="calendar-loading">
+    <p><strong>Loading events...</strong></p>
+</div>
+
+{# Forms for calendar bubbles #}
+<div id="calendar-bubble" class="cal-bubble">
+    <div class="middle">
+        <div class="close">&times;</div>
+        <div class="js-data clearfix">
+            {##
+             # Create Event Form
+             # calendar adds a form listener, which I don't want.
+             # If this resource is managed and I'm not a moderator: I can't book
+             #}
+            <form id="createEvent" data-no-calendar-listener="" method="get" action="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">
+                <input type="hidden" name="startDate" />
+                <input type="hidden" name="startTime" />
+                {# In this case, item ID is preset #}
+                {% if isRouteAuthorized('resourceBooking.book', {id: item.id}) %}
+                    Create booking for: <span class="displayDate"></span>
+                    <div class="bookingActions">
+                        <input class="btn float-right modify no-icon" type="submit" value="Continue" />
+                    </div>
+                {% else %}
+                    This resource may only be booked by a resource moderator.
+                {% endif %}
+            </form>
+
+            <form id="editEvent">
+                <input type="hidden" name="eventId" />
+                <dl>
+                    <dd><h3 class="note"></h3></dd>
+                    <dd><h4><span class="date"></span></h4></dd>
+                    <dd><p class="location"></p></dd>
+                    <dd><p class="detail wysiwyg"></p></dd>
+                    <dd class="post-by">Requested by <a class="author" href="#"></a></dd>
+                </dl>
+                <div class="attendance">
+                    <dl>
+                        <dd><p class="attendanceIcon"></p></dd>
+                        <dd class="rm"><p class="attendanceStatus"></p></dd>
+                    </dl>
+                </div>
+                <div class="actions">
+                    <dl>
+                        <dd>
+                            <span class="modifyLink"></span>
+                            <span class="attendanceListButton"></span>
+                            <span class="attendanceRequestButton"></span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="bookingActions">
+                </div>
+            </form>
+        </div>
+        <div class="bottom"><strong></strong></div>
+    </div>
+</div>
+
+{##
+ # Calendar controls
+ # Add the popup event
+ #}
+<div id="calendar-controls" class="calendar-controls no-height clearfix">
+    <div class="link-case">
+        <div class="filter-drop clearfix">
+            <div class="filter-list">
+                <form class="clearfix">
+                    <div class="filter-cat groups clearfix"><span class="filter-title">Status</span>
+                        <label title="Pending">
+                            <input type="checkbox" name="status[]" value="1" class="checkbox" checked />
+                            Pending
+                        </label>
+                        <label title="Approved">
+                            <input type="checkbox" name="status[]" value="2" class="checkbox" checked />
+                            Approved
+                        </label>
+                        <label title="Rejected">
+                            <input type="checkbox" name="status[]" value="3" class="checkbox"/>
+                            Rejected
+                        </label>
+                    </div>
+                </form>
+                <p class="clearfix">
+                    <a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
+                </p>
+                <!--/filter-drop-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2>Bookings - click the calendar to add a booking for that time</h2>
+<div id="calendar"></div>
+
+{# Dialog for changing bookings in series #}
+<div id="dialog-bulk-update" title="This booking is part of a series">
+    Would you like to <span class="action-text"></span> only this booking, or all in the series?
+</div>

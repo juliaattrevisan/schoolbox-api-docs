@@ -1,0 +1,49 @@
+<div class="clearfix">
+    <h1>Resource List</h1>
+    <ul class="resource-list">
+        {% for item in list %}
+        <li class="resource">
+            {#
+            Is there some more semantically correct way of saying that this is a
+            resource, apart from adding classes?
+            #}
+            <span class="resource-name">{{ item.name }}</span>
+            <a class="resource-read-link" id="resource-read-{{item.id}}" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">View</a>
+            {% if isRouteAuthorized('resourceBooking.book', {id: item.id}) %}
+                <a class="resource-book-link" id="resource-book-{{item.id}}" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">Book</a>
+            {% endif %}
+            {% if isRouteAuthorized('resourceItem.edit', {id: item.id}) %}
+                <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">Edit</a>
+            {% endif %}
+        </li>
+        {% else %}
+        <li>There are no resources in the system.</li>
+        {% endfor %}
+    </ul>
+    {# New item: only if I have the permission to do this #}
+    {% if isRouteAuthorized('resourceItem.add') %}
+        <a id="resource-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceItem.add') }}">Add New</a>
+    {% endif %}
+</div>
+
+<div class="clearfix">
+    <h1>Search</h1>
+    <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
+        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
+        <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
+    </form>
+</div>
+
+<div class="clearfix">
+    <h1>Filter by Category</h1>
+    <ul class="resourcecategory-list">
+        <li class="resourcecategory">
+            <a href="{{ routeLookup('resourceItem.browse') }}">All Categories</a>
+        </li>
+        {% for item in categoryList %}
+            <li class="resourcecategory">
+                {% include '@resourceItem/sub/searchLink.twig' %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>

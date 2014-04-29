@@ -56,25 +56,45 @@ class Subcontext_CoreContext extends BaseContext {
      */
     public function login($username, $password) {
         $this->loginAttempt($username, $password);
-        $this->waitForLink('Logout', 10000);
+        $this->waitForLink('go-msg', 10000);
     }
 
     /**
      * Attempts to log in.
      *
-     * This represents a successful login, and will throw exception on a failed
-     * login. For a login attempt, @see $this->loginAttempt()
+     * This represents any login attempt, successful or not.
      *
      * @Given /^(?:|I )try to log in as "(?P<username>[^"]*)" with password "(?P<password>[^"]*)"$/
      *
      * @param string $username
      * @param string $password
+     * @throws Exception if either username or password input aren't found
      */
     public function loginAttempt($username, $password) {
+        // Logout first
+        $this->logout();
         $page = $this->getSession()->getPage();
-        $page->findById('username')->setValue($username);
-        $page->findById('password')->setValue($password);
+        $usernameInput = $page->findById('username');
+        if (!($usernameInput instanceof Element\NodeElement)) {
+            throw new Exception('Username input not found - is user already logged in?');
+        }
+        $passwordInput = $page->findById('password');
+        if (!($passwordInput instanceof Element\NodeElement)) {
+            throw new Exception('Password input not found - is user already logged in?');
+        }
+        $usernameInput->setValue($username);
+        $passwordInput->setValue($password);
         $page->find('css', 'input.login')->press();
+    }
+
+    /**
+     * Clicks a logout link.
+     *
+     * @Given /^(?:|I am) logged out$/
+     * @Given /^(?:|I )log out$/
+     */
+    public function logout() {
+        $this->getMinkContext()->visit('/logout.php');
     }
 
     /**
@@ -442,5 +462,25 @@ class Subcontext_CoreContext extends BaseContext {
         if (strpos($actual_title->getText(), $title) === 0) {
             throw new Exception('Title did not match');
         }
+    }
+
+    /**
+     * Triggers press of the Enter key. Commonly used for form submission,
+     * especially on search forms.
+     *
+     * @When /^(?:|I )press Enter$/
+     */
+    public function pressEnterKey() {
+        $this->getSession()->executeScript("jQuery(':focus').trigger(jQuery.Event('keypress', {which: 9}));");
+    }
+
+    /**
+     * Clicks something. I can't believe this doesn't exist in the Mink context!
+     *
+     * @When /^(?:|I )click "(?P<link>[^"]*)"$/
+     */
+    public function clickLink($link) {
+        $node = $this->getSession()->getPage()->find('css', $link);
+        $node->click();
     }
 }

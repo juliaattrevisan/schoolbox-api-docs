@@ -21,6 +21,7 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'user_news', 'user_news_block');
 	$this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
     $this->setBlock(TEMPLATE_content, 'user_housemaster', 'user_housemaster_block');
+    $this->setBlock(TEMPLATE_content, 'user_resource_booking', 'user_resource_booking_block');
 
     // include the admin navigation
     $nav = new AdminV2_Nav();
@@ -30,7 +31,8 @@ if(is_numeric($this->arg[0])) {
 		'user_calendar_block' => '',
 		'user_news_block' => '',
 		'user_cms_block'=> '',
-        'user_housemaster_block'=> ''
+        'user_housemaster_block'=> '',
+        'user_resource_booking_block'=> '',
 	));
 
     /* Modify existing user
@@ -184,19 +186,33 @@ if(is_numeric($this->arg[0])) {
 
 					/* Calendar
 					 */
-					case 2: $this->parse('user_calendar_block', 'user_calendar', true); break;
+					case CALENDAR_SERVICE:
+						$this->parse('user_calendar_block', 'user_calendar', true);
+						break;
 
 					/* News
 					 */
-					case 3: $this->parse('user_news_block', 'user_news', true); break;
+					case NEWS_SERVICE:
+						$this->parse('user_news_block', 'user_news', true);
+						break;
 
 					/* CMS
 					 */
-                    case 5: $this->parse('user_cms_block', 'user_cms', true); break;
+					case CMS_SERVICE:
+						$this->parse('user_cms_block', 'user_cms', true);
+						break;
 
-                    /* Housemaster
+					/* Housemaster
 					 */
-                    case 6: $this->parse('user_housemaster_block', 'user_housemaster', true); break;
+					case HOUSEMASTER_SERVICE:
+						$this->parse('user_housemaster_block', 'user_housemaster', true);
+						break;
+
+					/* Resource Booking
+					 */
+					case RESOURCE_BOOKING_SERVICE:
+						$this->parse('user_resource_booking_block', 'user_resource_booking', true);
+						break;
 				}
 
 				/* Clear child blocks after parsing out parent

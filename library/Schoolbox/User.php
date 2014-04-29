@@ -10,8 +10,9 @@
 
 namespace Schoolbox;
 
+use JsonSerializable;
 
-class User {
+class User implements JsonSerializable {
 
     private $id;
     private $title;
@@ -40,6 +41,9 @@ private $enabled;               //Bool
 
 	/** @var Collection */
 	protected $parent_collection;
+
+    /** @var Collection|UserAccess[] */
+    protected $accessList;
 
     //User config options
     private $localEmail;  //Controls if user has local domain email username@domain
@@ -397,6 +401,22 @@ private $enabled;               //Bool
     }
 
     /**
+     * @param  Collection|UserAccess[] $accessList
+     * @return $this
+     */
+    public function setAccessList($accessList) {
+        $this->accessList = $accessList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserAccess[]
+     */
+    public function getAccessList() {
+        return $this->accessList;
+    }
+
+    /**
      * @return \Schoolbox\IConfigLoader
      */
     public function getConfigLoader() {
@@ -539,4 +559,20 @@ private $enabled;               //Bool
 	public function getEmailRecipients() {
 		return $this->emailRecipients;
 	}
+
+	/**
+	 * Specify data which should be serialized to JSON
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize() {
+		return array(
+			'id'        => $this->getId(),
+			'title'     => $this->getTitle(),
+			'firstname' => $this->getFirstname(),
+			'lastname'  => $this->getLastname(),
+		);
+	}
+
+
 }

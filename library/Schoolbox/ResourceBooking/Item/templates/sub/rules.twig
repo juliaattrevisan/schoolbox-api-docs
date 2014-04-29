@@ -1,0 +1,35 @@
+{# Booking rules for a resource. #}
+<ul>
+    {% if item.minLeadTime.minuteTotal %}
+        <li>
+            Must be booked at least
+            {% include 'sub/interval.twig' with {interval: item.minLeadTime} %}
+            in advance.
+        </li>
+    {% endif %}
+
+    {% if item.minReservationTime.minuteTotal %}
+        <li>
+            Must be booked for at least
+            {% include 'sub/interval.twig' with {interval: item.minReservationTime} %}.
+        </li>
+    {% endif %}
+
+    {% if item.maxReservationTime.minuteTotal %}
+        <li>
+            May not be booked for more than
+            {% include 'sub/interval.twig' with {interval: item.maxReservationTime} %}.
+        </li>
+    {% endif %}
+
+    {# Booking moderation status #}
+    {% if item.moderationType.open %}
+        <li>This item may be booked by anybody, and the booking will be automatically confirmed.</li>
+    {% endif %}
+    {% if item.moderationType.moderated %}
+        <li>This item may be booked by anybody, but the booking must be confirmed by a moderator.</li>
+    {% endif %}
+    {% if item.moderationType.managed %}
+        <li>This item may only be booked by its moderators.</li>
+    {% endif %}
+</ul>

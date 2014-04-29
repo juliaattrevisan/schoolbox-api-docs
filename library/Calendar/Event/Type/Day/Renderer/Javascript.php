@@ -19,18 +19,9 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
     private $taskTypeId = -1;
 
     /**
-     * Stinky Call Super style -_-
-     *
-     * @param $page
+     * Sets up the type of event that is considered tasks.
      */
-    public function __construct($page) {
-
-        /* Forgive me, for I have sinned
-         */
-        parent::__construct($page);
-
-        /* Determine which event type is the Task one
-         */
+    protected function setup() {
         $this->detectTaskTypeId();
     }
 

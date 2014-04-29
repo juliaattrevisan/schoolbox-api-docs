@@ -1,0 +1,315 @@
+<?php
+/**
+ * Controller for resource items.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\ResourceBooking\Item;
+use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
+use Schoolbox\User;
+use Schoolbox\UserAccess;
+use Schoolbox\UserMapper;
+use Schoolbox\StorageMapper;
+
+class Controller extends Base {
+
+    /**
+     * @var Mapper
+     */
+    protected $mapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * Browses the list of items.
+     */
+    public function browse() {
+
+        // Get the list of categories
+        $query  = array();
+        $catId  = $this->getRequest()->query['category'];
+        $search = trim($this->getRequest()->query['search']);
+        if (strlen($search) > 0) {
+            $list = $this->getMapper()->search($search);
+        }
+        else {
+            if ($catId) {
+                $query['resource_category_id'] = $catId;
+            }
+            $list = $this->getMapper()->findByColumnList($query);
+        }
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@resourceItem/browse.twig',
+                'data'     => array(
+                    'list'         => $list,
+                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'search'       => $search,
+                ),
+            )
+        );
+    }
+
+    /**
+     * JSON search for resources
+     *
+     * @todo remove and integrate into browse() once BelgianSuggest is gone
+     */
+    public function search() {
+        $excludedId = $this->getRequest()->query['thisId'];
+        $search     = trim($this->getRequest()->post['query']);
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $this->getMapper()->search($search)
+                    ->filter(function($item) use($excludedId) {
+                        return $item->getId() != $excludedId;
+                    })
+                    ->map(function($item) {
+                        return array(
+                            'id'   => $item->getId(),
+                            'name' => $item->getName(),
+                        );
+                    }),
+            )
+        );
+    }
+
+    /**
+     * Display form for adding another category
+     */
+    public function add() {
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@resourceItem/edit.twig',
+                'data'     => array(
+                    'item'            => new Model(),
+                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
+                    'moderatorList'   => array(),
+                    'relatedItemList' => array(),
+                ),
+            )
+        );
+    }
+
+    /**
+     * Views an existing category
+     *
+     * @param int $id
+     */
+    public function read($id) {
+        // Loading default moderators:
+        //
+        $item = $this->getMapper()->findById($id);
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@resourceItem/read.twig',
+                'data'     => array(
+                    'item'                 => $item,
+                    'defaultModeratorList' => $this->getUserMapper()->findByAccess(
+                        UserAccess::SERVICE_RESOURCE_BOOKING,
+                        UserAccess::ACCESS_FULL
+                    ),
+                ),
+            )
+        );
+    }
+
+    /**
+     * Display form for editing a category
+     *
+     * @param int $id
+     */
+    public function edit($id) {
+        // findById() ought to hydrate users as well.
+        /** @var Model $item */
+        $item = $this->getMapper()->findById($id);
+
+        // Build list of moderators and related items (for BelgianSuggest)
+        $moderatorList = array();
+        foreach ($item->getModeratorList() as $moderator) {
+            $moderatorList[] = array(
+                'id'   => $moderator->getId(),
+                'name' => $moderator->formatName(),
+            );
+        }
+        $relatedItemList = array();
+        foreach ($item->getRelatedResourceList() as $relatedItem) {
+            $relatedItemList[] = array(
+                'id'   => $relatedItem->getId(),
+                'name' => $relatedItem->getName(),
+            );
+        }
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@resourceItem/edit.twig',
+                'data'     => array(
+                    'item'            => $item,
+                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
+                    'moderatorList'   => $moderatorList,
+                    'relatedItemList' => $relatedItemList,
+                ),
+            )
+        );
+    }
+
+    /**
+     * Backend for adding a new category
+     */
+    public function create() {
+        $model = new Model();
+        $this->updateItemWithFormValues(
+            $model,
+            $this->getRequest()->post,
+            $this->getRequest()->files
+        );
+        $this->getMapper()->save($model);
+        // Return something.
+        // If this is a JSON request, output a result - maybe if this is a
+        // HTML request, redirect somewhere.
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate('resourceItem.browse', array())
+        );
+    }
+
+    /**
+     * Backend for updating an existing category
+     *
+     * @param int $id
+     */
+    public function update($id) {
+        $model = $this->getMapper()->findById($id);
+        $this->updateItemWithFormValues(
+            $model,
+            $this->getRequest()->post,
+            $this->getRequest()->files
+        );
+        $this->getMapper()->save($model);
+        // Return something.
+        // If this is a JSON request, output a result - maybe if this is a
+        // HTML request, redirect somewhere.
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate('resourceItem.browse', array())
+        );
+    }
+
+    /**
+     * Deletes an item
+     *
+     * @param int $id
+     */
+    public function delete($id) {
+        $item = $this->getMapper()->findById($id);
+        $this->getMapper()->delete($item);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate('resourceItem.browse', array())
+        );
+    }
+
+    /**
+     * Updates fields in the model with values from the form.
+     *
+     * @param Model $model The resource to update
+     * @param array $post  Data from $_POST
+     * @param array $files Data from $_FILES
+     */
+    protected function updateItemWithFormValues(Model $model, $post, $files) {
+        $model
+            ->setName($post['name'])
+            ->setDescription($post['description'])
+            ->setCategory($post['resource_category_id'])
+            ->setModerationType($post['resource_moderation_type_id'])
+            ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time']))
+            ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
+            ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
+        ;
+        if (($upload = $files['image']) && empty($upload['error'])) {
+            // Rectumize the file that was uploaded
+            $image = StorageMapper::getInstance()->upload(
+                $upload['name'], $upload['tmp_name'], $this->getUser()->getId()
+            );
+            $model->setImage($image);
+        }
+        else {
+            $model->setImage($post['image'] ?: null);
+        }
+
+        // Clear and create the moderator list
+        $model->setModeratorList(new Collection());
+        // because of BelgianSuggest I have to check if this is even an array!
+        if (is_array($post['moderator_id'])) {
+            foreach ($post['moderator_id'] as $moderator_id) {
+                $user = new User();
+                $user->setId($moderator_id);
+                $model->addModerator($user);
+            }
+        }
+        $model->setRelatedResourceList(new Collection());
+        if (is_array($post['related_resource_id'])) {
+            foreach ($post['related_resource_id'] as $related_resource_id) {
+                $resource = new Model();
+                $resource->setId($related_resource_id);
+                $model->addRelatedResource($resource);
+            }
+        }
+
+    }
+
+    /**
+     * Retrieves a date interval from form data
+     *
+     * @param  array $formPart An array containing "day", "hour" and "minute"
+     *                         keys.
+     * @return \DateInterval
+     * @throws \Exception if the date interval object can't be created.
+     */
+    protected function getDateIntervalFromForm($formPart) {
+        return new \DateInterval(
+            sprintf('PT%dH%dM', ($formPart['day'] * 24 + $formPart['hour']), $formPart['minute'])
+        );
+    }
+
+    /**
+     * @param  Mapper $mapper
+     * @return $this
+     */
+    public function setMapper($mapper) {
+        $this->mapper = $mapper;
+        return $this;
+    }
+
+    /**
+     * @return Mapper
+     */
+    public function getMapper() {
+        return $this->mapper;
+    }
+
+    /**
+     * @param  UserMapper $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+}

@@ -11,8 +11,9 @@ namespace Schoolbox;
 use Schoolbox;
 use ArrayIterator;
 use ICollection;
+use JsonSerializable;
 
-class Collection implements \ICollection {
+class Collection implements ICollection, JsonSerializable {
 
 	protected $stack = array();
 	protected $position = 0;
@@ -369,6 +370,72 @@ class Collection implements \ICollection {
 	}
 
 	/**
+	 * Returns a new collection containing items that are in $this, but not in
+	 * $otherCollection.
+	 *
+	 * @param  Collection $otherCollection
+	 * @param  callable   $diffMethod The callback method to use for deciding
+	 *                                whether two items are the same.
+	 *                                Defaults to == comparison.
+	 * @return Collection
+	 */
+	public function diff(Collection $otherCollection, $diffMethod = null) {
+		$diff = new Collection();
+
+		if (!is_callable($diffMethod)) {
+			$diffMethod = function($a, $b) {
+				return $a == $b;
+			};
+		}
+
+		foreach ($this as $item) {
+			$inCollection = false;
+			foreach ($otherCollection as $otherItem) {
+				if (call_user_func($diffMethod, $item, $otherItem)) {
+					$inCollection = true;
+					break;
+				}
+			}
+			if (!$inCollection) {
+				$diff->add($item);
+			}
+		}
+		return $diff;
+	}
+
+	/**
+	 * Applies a callabale to all items in this collection, and returns a new
+	 * collection with the result.
+	 *
+	 * @param  callback   $callback
+	 * @return Collection
+	 */
+	public function map($callback) {
+		$return = new Collection();
+		foreach ($this as $key => $item) {
+			$return->offsetSet($key, call_user_func($callback, $item));
+		}
+		return $return;
+	}
+
+	/**
+	 * Filters out items that don't match $callbale, and returns a new
+	 * collection with the result.
+	 *
+	 * @param  callback   $callback
+	 * @return Collection
+	 */
+	public function filter($callback) {
+		$return = new Collection();
+		foreach ($this as $key => $item) {
+			if (call_user_func($callback, $item)) {
+				$return->offsetSet($key, $item);
+			}
+		}
+		return $return;
+	}
+
+	/**
 	 * Groups all results by a field value.
 	 *
 	 * @param  string $field The field to search by.
@@ -446,6 +513,16 @@ class Collection implements \ICollection {
 			}
 		}
 		return new Collection($result);
+	}
+
+	/**
+	 * Specify data which should be serialized to JSON. Currently, attempts to
+	 * serialize all items within the stack.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize() {
+		return $this->getStack();
 	}
 
 }

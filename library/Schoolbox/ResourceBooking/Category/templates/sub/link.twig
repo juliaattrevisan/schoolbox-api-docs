@@ -1,0 +1,5 @@
+{% if isRouteAuthorized('resourceCategory.edit', {id: item.id}) %}
+    <a id="resourcecategory-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceCategory.edit', {id: item.id}) }}">{{ item.name }}</a>
+{% else %}
+    {{ item.name }}
+{% endif %}

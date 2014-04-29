@@ -1,0 +1,9 @@
+<ul class="resourcecategory-list">
+    {% for item in list %}
+        <li class="resourcecategory">
+            {{ include(linkTemplate|default('@resourceCategory/sub/link.twig')) }}
+        </li>
+    {% else %}
+        <li>There are no resource categories in the system.</li>
+    {% endfor %}
+</ul>

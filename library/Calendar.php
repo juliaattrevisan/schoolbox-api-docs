@@ -708,7 +708,8 @@ class Calendar extends DeprecatedModel {
 			$filter_query = " AND ($filter_query)";
 		}
 
-        //get single events for the day
+        // get single events for the day
+        // Don't get events for resources, get them separately.
         $query = "
 			SELECT DISTINCT event.id, owner,
 				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
@@ -726,8 +727,10 @@ class Calendar extends DeprecatedModel {
 			LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
+			LEFT JOIN resource_booking ON event.id = resource_booking.event_id
 			WHERE
-				(
+				resource_booking.id IS NULL
+				AND (
 					(access = ".self::ACCESS_PERSONAL." AND owner = '{$user->getId()}')
 					$groupQuery
 					OR (access = ".self::ACCESS_CAMPUS." AND $campusQuery $groupChunk OR owner = '{$user->getId()}')

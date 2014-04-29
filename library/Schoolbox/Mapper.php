@@ -48,6 +48,7 @@ class Mapper {
 	const TYPE_DATE       = 11;
 	const TYPE_TIME       = 12;
 	const TYPE_TIMESTAMP  = 13;
+	const TYPE_TIMESPAN   = 14;
 	const TYPE_DECIMAL    = 20;
 	const TYPE_SERIALIZED = 30;
 	const TYPE_MODEL      = 40;
@@ -414,6 +415,10 @@ class Mapper {
 	 *             a hydration strategy that isn't covered by `type`, use this.
 	 * * join:     Required and only used for TYPE_MODEL - defines which join
 	 *             mapper should be used to hydrate an instance of this model for.
+	 * * join_def: if 'join' is supplied, this can be used instead of defining
+	 *             join in hasJoin().
+	 *             If 'this_key' is not set here, then it defaults to the value
+	 *             for 'column'.
 	 * * identifier: if true, this map is the primary key for this table, and is
 	 *               used by mapper's getById method
 	 * created_timestamp: if true, this column is updated with the current time
@@ -435,6 +440,13 @@ class Mapper {
 			$this->identifier = $map;
 		}
 		$this->map->setOffset($map['property'], $map);
+		// Has a join definition been defined? If so create the join.
+		if (isset($map['join']) && isset($map['join_def'])) {
+			if (!isset($map['join_def']['this_key'])) {
+				$map['join_def']['this_key'] = $map['column'];
+			}
+			$this->hasJoin($map['join'], $map['join_def']);
+		}
 		return true;
 	}
 
@@ -558,7 +570,7 @@ class Mapper {
 		$this->database->beginTransaction();
 
 		foreach ($collection as $model) {
-			$statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierProperty));
+			$statement->bindValue(':identifierValue', $this->getModelProperty($model, $identifierProperty));
 
 			if (!$statement->execute()) {
 
@@ -922,7 +934,7 @@ class Mapper {
 
 		// Retrieve a list of column values for the join for $object
 		// (the column: whatever the key is in this model.)
-		$join_identifier = $this->joins[$join];
+		$join_identifier = $this->getJoinDefinition($join);
 		$mapping         = $this->map->getOffsetByColumn($join_identifier['this_key']);
 		$key_value_list  = $this->getModelAsCollection($object)->getColumnValues($mapping['property']);
 
@@ -954,7 +966,7 @@ class Mapper {
 		$joined_model_list = $this->findJoinedModelList($join, $collection, $options);
 
 		$join_mapper     = $this->getJoinMapper($join);
-		$join_identifier = $this->joins[$join];
+		$join_identifier = $this->getJoinDefinition($join);
 		$this_mapping    = $this->getMap()->getOffsetByColumn($join_identifier['this_key']);
 		$other_mapping   = $join_mapper->getMap()->getOffsetByColumn($join_identifier['other_key']);
 
@@ -1082,7 +1094,7 @@ class Mapper {
 						WHERE `{$joinSchema['this_key']}` = :this_key
 					");
 
-					$deleteRelationStatement->bindParam(':this_key', $thisKey);
+					$deleteRelationStatement->bindValue(':this_key', $thisKey);
 
 					if(!$deleteRelationStatement->execute()) {
 						$this->database->rollBack();
@@ -1226,13 +1238,42 @@ class Mapper {
 	 *                     extra:     any extra conditions on the join
 	 *
 	 * @return bool
+	 * @throws Mapper\DefinitionException if $name contains a . symbol.
+	 *         Reason: getJoinMapper() can drill down into joined models, and .
+	 *         is the separator.
 	 */
-	protected function hasJoin($name, $join) {
-		if (!is_array($join)) {
-			return false;
+	protected function hasJoin($name, array $join) {
+		if (strpos($name, '.') !== false) {
+			throw new Mapper\DefinitionException("Join name \"$name\" may not contain . characters");
 		}
 		$this->joins[$name] = $join;
 		return true;
+	}
+
+	/**
+	 * Retrieves the definition that this join was set up with.
+	 *
+	 * @param string $name The identifier for this join.
+	 *                     Definitions can be retrieved on mappers joined to
+	 *                     this one by separating names with . characters.
+	 *
+	 * @return Mapper
+	 * @throws Mapper\DefinitionException if join $name isn't on this mapper
+	 */
+	protected function getJoinDefinition($name) {
+		$parts    = explode('.', $name, 2);
+		$basename = array_shift($parts);
+
+		if (!array_key_exists($basename, $this->joins)) {
+			throw new Mapper\DefinitionException("Join \"$basename\" does not exist on class \"".get_called_class()."\"");
+		}
+
+		if (empty($parts)) {
+			return $this->joins[$basename];
+		}
+		else {
+			return $this->getJoinMapper($basename)->getJoinDefinition(array_shift($parts));
+		}
 	}
 
 	/**
@@ -1241,16 +1282,28 @@ class Mapper {
 	 * @param string $name The identifier for this join.
 	 *
 	 * @return Mapper
+	 * @throws Mapper\DefinitionException if join $name isn't on this mapper
 	 */
 	public function getJoinMapper($name) {
-		if (!array_key_exists($name, $this->joins)) {
-			return false;
+		$parts    = explode('.', $name, 2);
+		$basename = array_shift($parts);
+		if (!array_key_exists($basename, $this->joins)) {
+			throw new Mapper\DefinitionException("Join \"$basename\" does not exist on class \"".get_called_class()."\"");
 		}
-		$mapper = $this->joins[$name]['mapper'];
-		if (!($mapper instanceof Mapper) && class_exists($mapper)) {
-			return call_user_func(array($mapper, 'getInstance'));
+		$mapperClass = $this->joins[$basename]['mapper'];
+		if (!($mapperClass instanceof Mapper) && class_exists($mapperClass)) {
+			$mapper = call_user_func(array($mapperClass, 'getInstance'));
 		}
-		return $this->joins[$name]['mapper'];
+		else {
+			$mapper = $this->joins[$basename]['mapper'];
+		}
+
+		if (empty($parts)) {
+			return $mapper;
+		}
+		else {
+			return $mapper->getJoinMapper(array_shift($parts));
+		}
 	}
 
 	/**
@@ -1263,13 +1316,10 @@ class Mapper {
 	 *                            join, defaults to other mapper's table name.
 	 *
 	 * @return string
+	 * @throws Mapper\DefinitionException if join $name isn't on this mapper
 	 */
 	public function getJoinSql($name, $this_alias = '', $other_alias = '') {
-		if (!array_key_exists($name, $this->joins)) {
-			return false;
-		}
-		$join = $this->joins[$name];
-
+		$join         = $this->getJoinDefinition($name);
 		$this_table   = $this->getTable();
 		$other_mapper = $this->getJoinMapper($name);
 		$other_table  = $other_mapper->getTable();
@@ -1620,7 +1670,7 @@ class Mapper {
 				// if column is empty, ensure a join is specified, and that it is a multijoin
 				$join_name = isset($map['join']) ? $map['join'] : '';
 				if(isset($this->joins[$join_name]['multi'])) {
-					return;
+					continue;
 				}
 				// if the join doesn't exist, or not multijoin, failhard
 				throw new Exception("Column must be declared if no multijoin set for it: ".json_encode($map));
@@ -1631,7 +1681,7 @@ class Mapper {
 			//
 			// Timestamp fields will never be bound.
 			if (!(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
-				$statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName));
+				$statement->bindValue(":$columnName", $this->getModelProperty($model, $propertyName));
 			}
 		}
 	}

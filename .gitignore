@@ -19,4 +19,4 @@ vendor/
 www/javascript/components/
 node_modules/
 test/behavior/screenshots/*.png
-
+test/behavior/screenshots/*.html

@@ -130,7 +130,7 @@ $j(function() {
 
 		/* Exclusions
 		 */
-		if ($j(this).val() == 5 || $j(this).val() == 6) {
+		if ([5,6,7].indexOf(Number($j(this).val())) >= 0) {
 			$j('#serviceCloneForm').find('select[name=sid]').hide();
 		}
 		else {
@@ -465,7 +465,7 @@ $j(function() {
 <div class="level clearfix">
 	<h3 id="permissions">Permissions</h3>
 	<h4>Manage</h4>
-	<table class="table">
+	<table class="table" id="permissions-list">
 		<colgroup>
 			<col width="10%" />
 			<col width="20%" />
@@ -482,7 +482,7 @@ $j(function() {
 		</thead>
 		<tbody>
 			<!-- BEGIN user_calendar -->
-			<tr>
+			<tr class="permissions-calendar">
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>Calendar</td>
 				<td>
@@ -500,15 +500,15 @@ $j(function() {
 						<input type="hidden" name="sid" value="{SID}" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
 
-						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
+						<label><input type="radio" name="type" value="1" {READ_CHECKED} />Read</label>
+						<label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Write</label>
+						<label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
 					</form>
 				</td>
 			</tr>
 			<!-- END user_calendar --> 
 			<!-- BEGIN user_news -->
-			<tr>
+			<tr class="permissions-news">
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>News</td>
 				<td>
@@ -526,15 +526,15 @@ $j(function() {
 						<input type="hidden" name="sid" value="{SID}" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
 
-						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
+						<label><input type="radio" name="type" value="1" {READ_CHECKED} />Read</label>
+						<label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Write</label>
+						<label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
 					</form>
 				</td>
 			</tr>
 			<!-- END user_news --> 
 			<!-- BEGIN user_cms -->
-			<tr>
+			<tr class="permissions-cms">
 				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
 				<td>CMS</td>
 				<td></td>
@@ -544,15 +544,15 @@ $j(function() {
 						<input type="hidden" name="sid" value="0" />
 						<input type="hidden" name="service" value="{SERVICE_ID}" />
 
-						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
+						<label><input type="radio" name="type" value="1" {READ_CHECKED} />Read</label>
+						<label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Write</label>
+						<label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
 					</form>
 				</td>
 			</tr>
 			<!-- END user_cms -->
-            <!-- BEGIN user_housemaster -->
-                <tr>
+			<!-- BEGIN user_housemaster -->
+                <tr class="permissions-housemaster">
                     <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
                     <td>Housemaster</td>
                     <td></td>
@@ -562,13 +562,31 @@ $j(function() {
                             <input type="hidden" name="sid" value="0" />
                             <input type="hidden" name="service" value="{SERVICE_ID}" />
 
-                            <input type="radio" name="type" value="1" {READ_CHECKED} />No
-                            <input type="radio" name="type" value="2" {WRITE_CHECKED} />Yes
-                            <input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate
+                            <label><input type="radio" name="type" value="1" {READ_CHECKED} />No</label>
+                            <label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Yes</label>
+                            <label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
                         </form>
                     </td>
                 </tr>
             <!-- END user_housemaster -->
+            <!-- BEGIN user_resource_booking -->
+            <tr class="permissions-resource-booking">
+                <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+                <td>Resource Booking</td>
+                <td></td>
+                <td>
+                    <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                        <input type="hidden" name="uid" value="{USERID}" />
+                        <input type="hidden" name="sid" value="0" />
+                        <input type="hidden" name="service" value="{SERVICE_ID}" />
+
+                        <label><input type="radio" name="type" value="1" {READ_CHECKED} />No</label>
+                        <label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Yes</label>
+                        <label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
+                    </form>
+                </td>
+            </tr>
+            <!-- END user_resource_booking -->
 			</tbody>
             </table>
 					<h4 style="margin-top:16px;">Add</h4>
@@ -597,6 +615,7 @@ $j(function() {
 								<option value="3">News</option>
 								<option value="5">CMS</option>
                                 <option value="6">Housemaster</option>
+                                <option value="7">Resource Booking</option>
 							</select>
 						</label>
 						</td>
@@ -613,10 +632,9 @@ $j(function() {
 						</label>
 						</td>
 						<td>
-	
-							<input type="radio" name="type" value="1" checked="checked" />Read
-							<input type="radio" name="type" value="2" />Write
-							<input type="radio" name="type" value="3" />Moderate
+							<label><input type="radio" name="type" value="1" checked="checked" />Read</label>
+							<label><input type="radio" name="type" value="2" />Write</label>
+							<label><input type="radio" name="type" value="3" />Moderate</label>
 						</td>
 						</tr>
 						<tr>

@@ -67,15 +67,106 @@ function Calendar(id, bubbleId, opts) {
             },
             date: null,
             month: null,
-            year: null
+            year: null,
+
+            /**
+             * Generic action for when an event is clicked
+             * @param calEvent
+             * @param jsEvent
+             * @param view
+             */
+            eventClick: function(calEvent, jsEvent, view) {
+
+                // setup data to be displayed
+                var data = $j.extend(true, {}, calEvent.data.meta)
+                var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mmtt'
+
+                // Prefix booking status for bookings
+                if (calEvent.data.booking) {
+                    data.note = '('+calEvent.data.booking.status.name+') '+calEvent.title
+                }
+                else {
+                    data.note = calEvent.title
+                }
+                data.date = $.fullCalendar.formatDate(calEvent.start, format)
+                if (calEvent.end != null) {
+                    data.date += " &ndash; "
+                    data.date += $.fullCalendar.formatDate(calEvent.end, format)
+                }
+
+                // Links to Modify Screen
+                if (calEvent.editable == true) {
+                    var url = '';
+                    if ((calEvent.data.custom != undefined) && (calEvent.data.custom.modifyLink != undefined) && (calEvent.data.custom.modifyLink.length)) {
+                        url = calEvent.data.custom.modifyLink;
+                    }
+                    else {
+                        url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=week';
+                    }
+
+                    data.modifyLink = '<a class="btn modify float-right" href="' + url + '"><span></span>Modify</a>';
+                }
+                else {
+                    data.modifyLink = '';
+                }
+
+
+                $j.each(calEvent.data.attendance, function(k, v) {
+                    data['attendance' + k.capitalise()] = v
+                })
+
+                // Attendance List butonye
+                if (data.attendanceListButton.toString() == 'true') {
+                    data.attendanceIcon = "This event can be attended."
+                    data.attendanceListButton = '<a class="btn float-right" href="/calendar/attendance/list/'
+                        + calEvent.data.meta.eventId + '"><span></span>Attendance List</a>'
+                }
+                // Attend/Unattend butonye
+                else if (data.attendanceRequestButton.toString() != 'false') {
+                    data.attendanceRequestButton = '<a class="btn no-icon float-right" href="#">' + calEvent.data.attendance.requestButton.toString() + '</a>'
+                }
+
+                // Booking butonyes (if available)
+                data.bookingActions = []
+                if (calEvent.data.booking && calEvent.data.booking.buttons) {
+                    $.each(calEvent.data.booking.buttons, function() {
+                        data.bookingActions.push(
+                            $('<a class="btn float-right" />')
+                                .data('seriesId', calEvent.data.meta.seriesId)
+                                .addClass(this.class)
+                                .attr('href', this.href)
+                                .text(this.label)
+                                .prepend('<span />')
+                        )
+                    })
+                }
+                self.bubble.display('edit', data, jsEvent, this)
+            }
         },
-        datepickerIcon: "/images/core/calendar/calendar-click.png",
+        datepicker: {
+            dateFormat: 'dd-mm-yy',
+            onSelect: function(dateText, inst) {
+                // Use fullcalendar to load events instead of redirecting to a new page.
+                self.dom.fullCalendar('gotoDate', inst.currentYear, inst.currentMonth, inst.currentDay)
+            },
+            beforeShow: function() {
+                // Make sure the stupid datepicker shows above everything else
+                setTimeout(function() {
+                    $('.ui-datepicker').css('z-index', 99999999999999);
+                }, 0);
+            },
+            showOn: 'button',
+            buttonImage: "/images/core/calendar/calendar-click.png",
+            buttonImageOnly: true,
+            showAnim: 'slideDown'
+        },
         x: true
     }
     this.filters = {
 
         interaction: function(cal) {
 
+            // Only set up interactions that actually exist.
             var calendarButtons = $j(cal.options.filter.btnSelector)
             var exportButtons   = $j(cal.options.filter.exportButtonSelector)
 
@@ -92,37 +183,44 @@ function Calendar(id, bubbleId, opts) {
                 return false
             })
 
-            //
-            // Show the export filter
-            cal.dom.delegate(cal.options.filter.exportButtonSelector, 'click', function() {
-                cal.bubble.hide()
-                calendarControls.find(cal.options.filter.boxSelector).hide()
-                exportControls.find(cal.options.filter.boxSelector).toggle()
-                calendarButtons.removeClass('engaged')
-                exportButtons.toggleClass('engaged')
-                return false
-            })
+            // Show the export filter, if it exists
+            if (cal.options.filter.exportButtonSelector) {
+                cal.dom.delegate(cal.options.filter.exportButtonSelector, 'click', function() {
+                    cal.bubble.hide()
+                    calendarControls.find(cal.options.filter.boxSelector).hide()
+                    exportControls.find(cal.options.filter.boxSelector).toggle()
+                    calendarButtons.removeClass('engaged')
+                    exportButtons.toggleClass('engaged')
+                    return false
+                })
+            }
 
-            // run the filter checker to show and hide the items
-            calendarControls.delegate(cal.options.filter.checkboxSelector, 'click', function() {
-                cal.filters.organise(cal, ["campus", "groups"])
-            })
+            // run the filter checker to show and hide the items, if it exists
+            if (cal.options.filter.checkboxSelector) {
+                calendarControls.delegate(cal.options.filter.checkboxSelector, 'click', function() {
+                    cal.filters.organise(cal, ["campus", "groups"])
+                })
+            }
 
-            calendarControls.delegate(cal.options.filter.applyFiltersSelector, 'click', function() {
-                cal.filters.organise(cal, ["campus", "groups"])
-                calendarControls.find(cal.options.filter.boxSelector).hide()
-                $j(cal.options.filter.btnSelector).removeClass('engaged')
-                return false
-            })
+            if (cal.options.filter.applyFiltersSelector) {
+                calendarControls.delegate(cal.options.filter.applyFiltersSelector, 'click', function() {
+                    cal.filters.organise(cal, ["campus", "groups"])
+                    calendarControls.find(cal.options.filter.boxSelector).hide()
+                    $j(cal.options.filter.btnSelector).removeClass('engaged')
+                    return false
+                })
+            }
 
             $j('body').click(function() {
                 $j(cal.options.filter.boxSelector).hide()
                 $j(cal.options.filter.btnSelector).removeClass('engaged')
             })
 
-            calendarControls.add(exportControls).delegate(cal.options.filter.boxSelector, 'click', function(e) {
-                e.stopPropagation()
-            })
+            if (cal.options.filter.boxSelector) {
+                calendarControls.add(exportControls).delegate(cal.options.filter.boxSelector, 'click', function(e) {
+                    e.stopPropagation()
+                })
+            }
 
             cal.filters.organise(cal, ["campus", "groups"])
         },
@@ -215,7 +313,7 @@ function Calendar(id, bubbleId, opts) {
             }
 
             // only send data to the server if we actually need to
-            if(performAjax) {
+            if(performAjax && cal.options.filter.ajax) {
                 var view = cal.dom.fullCalendar('getView').name
                 cal.post(cal.options.filter.ajax, {fList : flist, view: view}, null, false)
             }
@@ -225,6 +323,7 @@ function Calendar(id, bubbleId, opts) {
     // preserve the filter and fullCalendar specs
     var filter = $j.extend({}, this.options.filter, opts.filter)
     var fullCalendar = $j.extend({}, this.options.fullCalendar, opts.fullCalendar)
+    var datepicker   = $j.extend({}, this.options.datepicker,   opts.datepicker)
 
     // perform the merge
     $j.extend(this.options,opts)
@@ -232,6 +331,7 @@ function Calendar(id, bubbleId, opts) {
     // rewrite the preserved submerge back into the options
     this.options.filter = filter
     this.options.fullCalendar = fullCalendar
+    this.options.datepicker   = datepicker
 
     if(this.options.filter.enabled) {
         this.filters.interaction(this)
@@ -248,98 +348,93 @@ Calendar.prototype.init = function() {
     this.dom.fullCalendar(this.options.fullCalendar)
 
     if(this.options.filter.enabled) {
-        // mash the filters in
+        // mash the filters in (if they're enabled)
         var headerRight = this.dom.find('td.fc-header-right');
         var baseButton  = headerRight.children('.fc-button').first();
-        headerRight.prepend(
-            baseButton.clone()
-                .html('filters')
-                .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-                .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
-                .attr('id','fc-button-filter')
-        );
-        headerRight.append(
-            baseButton.clone()
-                .html('export')
-                .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-                .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
-                .attr('id','fc-button-export')
-        );
-
-        // and now make all the buttons on the header look the way they're meant to
-        var header = this.dom.children('.fc-header')
-        header.addClass('calendar-controls')
-        header.find('span.fc-button').each(function() {
-            var self = $j(this)
-            var text = self.html()
-            self.addClass('filter-change '+text).html('<span></span>'+text)
-        })
-
-        // mash in the datepicker
-        var headerCenter = this.dom.find('td.fc-header-center')
-        headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
-
+        if (this.options.filter.btnSelector) {
+            headerRight.prepend(
+                baseButton.clone()
+                    .html('filters')
+                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
+                    .attr('id','fc-button-filter')
+            );
+        }
+        if (this.options.filter.exportButtonSelector) {
+            headerRight.append(
+                baseButton.clone()
+                    .html('export')
+                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                    .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
+                    .attr('id','fc-button-export')
+            );
+        }
     }
+    // and now make all the buttons on the header look the way they're meant to
+    var header = this.dom.children('.fc-header')
+    header.addClass('calendar-controls')
+    header.find('span.fc-button').each(function() {
+        var self = $j(this)
+        var text = self.html()
+        self.addClass('filter-change '+text).html('<span></span>'+text)
+    })
+
+    // mash in the datepicker
+    var headerCenter = this.dom.find('td.fc-header-center')
+    headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
 
 
     // Event creation form listeners
     $j.each(this.getForms(), function(k, v) {
+        if (typeof this.data('no-calendar-listener') === 'undefined') {
+            if(k.slice(0, 6) == 'create') {
+                this.submit(function(event) {
+                    event.preventDefault();
+                    var data = $j(this).serialize()
 
-        if(k.slice(0, 6) == 'create') {
-            this.submit(function() {
-                var data = $j(this).serialize()
+                    c.ccreate(data, function(responseText) {
+                        if (responseText.length) {
+                            var responseData = new Function('return ' + responseText)
+                            var newEvent = responseData()
 
-                c.ccreate(data, function(responseText) {
-                    if (responseText.length) {
-                        var responseData = new Function('return ' + responseText)
-                        var newEvent = responseData()
-
-                        c.dom.fullCalendar('renderEvent', newEvent)
-                    }
+                            c.dom.fullCalendar('renderEvent', newEvent)
+                        }
+                    })
+                    c.clearForms()
+                    c.bubble.hide()
                 })
-                c.clearForms()
-                c.bubble.hide()
-                return false
-            })
-        }
-        else {
-            this.submit(function() {
-                var data = $j(this).serialize()
+            }
+            else {
+                this.submit(function(event) {
+                    event.preventDefault();
+                    var data = $j(this).serialize()
 
-                c.cupdate(data, function(responseText) {
-                    if (responseText.length) {
-                        var responseData = new Function('return ' + responseText)
-                        var newEvent = responseData()
+                    c.cupdate(data, function(responseText) {
+                        if (responseText.length) {
+                            var responseData = new Function('return ' + responseText)
+                            var newEvent = responseData()
 
-                        c.dom.fullCalendar('renderEvent', newEvent)
-                    }
+                            c.dom.fullCalendar('renderEvent', newEvent)
+                        }
+                    })
+                    c.bubble.hide()
                 })
-                c.bubble.hide()
-                return false
-            })
+            }
         }
     })
 
-	var self = this;
-	
-    $j('#datepicker').datepicker({
-        dateFormat: 'dd-mm-yy',
-        onSelect: function(dateText, inst) {
-            var url = location.pathname.match(/^[^0-9]+/g).toString().replace(/\/*$/g, '') + '/' + dateText;
-
-			/* Append user id
-			 */
-			url += '/' + self.options.userId;
-
-            window.open(url, "_self");
-        },
-        defaultDate: $j.datepicker.parseDate("dd-mm-yy", c.options.fullCalendar.date + '-' +
-            (parseInt(c.options.fullCalendar.month) + 1) + '-' + c.options.fullCalendar.year),
-        showOn: 'button',
-        buttonImage: c.options.datepickerIcon,
-        buttonImageOnly: true,
-        showAnim: 'slideDown'
-    });
+    // Allow datepicker options to be set in options, too.
+    // (Get default date out of full calendar.)
+    $j('#datepicker').datepicker(c.options.datepicker);
+    $j('#datepicker').datepicker(
+        'setDate',
+        $j.datepicker.parseDate(
+            "dd-mm-yy",
+            c.options.fullCalendar.date + '-'
+            + (parseInt(c.options.fullCalendar.month) + 1)
+            + '-' + c.options.fullCalendar.year
+        )
+    )
 
     return this
 }
@@ -661,16 +756,7 @@ function calendarDate(datetime) {
  * @return {String}
  */
 function calendarDateOnly(datetime) {
-    var S, p = datetime.toString().split(/[ :]/)
-
-    if(p[2] == 11 || p[2] == 12 || p[2] == 13) { S = 'th'; }
-    else { var i = p[2].charAt(p[2].length - 1)
-        if(i == 1) { S = 'st' }
-        else if(i == 2) { S = 'nd' }
-        else if(i == 3) { S = 'rd' }
-        else { S = 'th' }
-    }
-    return p[0] + ', ' + parseInt(p[2], 10) + S + ' ' + p[1]
+    return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
 }
 
 /**
@@ -679,21 +765,5 @@ function calendarDateOnly(datetime) {
  * @return {String}
  */
 function calendarTime(datetime) {
-    var hours   = datetime.getHours();
-    var meridian = '';
-    if (hours <= 12) {
-        meridian = 'am';
-        if (hours === 0) {
-            hours = 12;
-        }
-    }
-    else {
-        hours   -= 12;
-        meridian = 'pm';
-    }
-    var minutes = datetime.getMinutes().toString();
-    if (minutes.length === 1) {
-        minutes = '0'+minutes;
-    }
-    return (hours.toString() + ':' + minutes + meridian);
+    return $j.fullCalendar.formatDate(datetime, 'h:mmtt')
 }

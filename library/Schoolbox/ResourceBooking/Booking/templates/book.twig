@@ -1,0 +1,374 @@
+<!-- BEGIN custom_header -->
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    // Datepickers
+    $('input[data-datepicker]').datepicker({
+        dateFormat:'dd/mm/yy',
+        showOn:'both',
+        buttonImage:'/images/core/calendar/calendar-click.png',
+        buttonImageOnly:true,
+        constrainInput:false,
+        minDate: 0
+//        onClose:function (string) {
+//            var input = $j(this);
+//            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+//                input.val(data.time);
+//            })
+//        }
+    })
+    $('input[name="start_datetime[date]"]').syncDates({
+        endDate: $('input[name="end_datetime[date]"]')
+    })
+
+    // remote validation rules
+    // Have some sort of helper for creating remote validations.
+    var getValidatorRemoteMethod = function(code, key) {
+        return function(value, element) {
+            return (errors[key || element.name] || []).indexOf(code) < 0;
+        }
+    }
+
+    // Remote rules for start date
+    // Some of these should be made into local rules.
+    $.validator.addMethod(
+        'remote.invalidStart',
+        getValidatorRemoteMethod('invalid', 'start_datetime'),
+        'Please enter a valid date.'
+    )
+    $.validator.addMethod(
+        'remote.conflict',
+        getValidatorRemoteMethod('conflict', 'start_datetime'),
+        'This item has already been booked for this time.'
+    )
+    $.validator.addMethod(
+        'remote.tooEarly',
+        getValidatorRemoteMethod('too_early', 'start_datetime'),
+        'This item must be booked at least ' + {{ include('sub/interval.twig', {interval: item.resource.minLeadTime})|json_encode|raw }} + ' in advance.'
+    )
+
+    // Remote rules for end date
+    $.validator.addMethod(
+        'remote.invalidEnd',
+        getValidatorRemoteMethod('invalid', 'end_datetime'),
+        'Please enter a valid date.'
+    )
+    $.validator.addMethod(
+        'remote.beforeStart',
+        getValidatorRemoteMethod('before_start', 'end_datetime'),
+        'The booking start time must be before the end time.'
+    )
+    $.validator.addMethod(
+        'remote.tooShort',
+        getValidatorRemoteMethod('too_short', 'end_datetime'),
+        'This item must be booked for at least ' + {{ include('sub/interval.twig', {interval: item.resource.minReservationTime})|json_encode|raw }} + '.'
+    )
+    $.validator.addMethod(
+        'remote.tooLong',
+        getValidatorRemoteMethod('too_long', 'end_datetime'),
+        'This item may not be booked for more than ' + {{ include('sub/interval.twig', {interval: item.resource.maxReservationTime})|json_encode|raw }} + '.'
+    )
+
+    // Set up errors, dialog boxes, form
+    var errors = {}
+    var form   = $('form#resource-booking-form')
+
+    // Input for efficacy of update for series bookings (update all, or this only)
+    var efficacyInput = form.find('input[name="efficacy"]')
+
+    // Set up dialog boxes for cancel and update
+    var updateDialog = $('#dialog-bulk-update')
+    var cancelDialog = $('#dialog-bulk-cancel')
+    $().add(updateDialog).add(cancelDialog).dialog({
+        autoOpen:false,
+        resizable:false,
+        width:400,
+        modal:true,
+        draggable:false,
+        buttons:[
+            {
+                text: "Only this event",
+                click: function() {
+                    efficacyInput.val('self')
+                    $(this).trigger('confirm')
+                }
+            },
+            {
+                text: "All events in the series",
+                click: function() {
+                    efficacyInput.val('series')
+                    $(this).trigger('confirm')
+                }
+            }
+        ],
+        close:function () {
+            return false;
+        }
+    }).on('confirm', function() {
+        $(this).dialog('close')
+        callback()
+    })
+
+    // Callback for form validation and save in one step
+    var callback = function() {
+        var ajaxParams = {
+            url:      form.attr('action'),
+            type:     form.attr('method'),
+            data:     form.serializeArray(),
+            dataType: 'json'
+        }
+        var ajaxDone = function() {
+            // Go back to bookings list for this item
+            window.location.href = $('#resource-booking-back').attr('href')
+        }
+        var ajaxFail = function(jqXHR) {
+            errors = jqXHR.responseJSON.errors
+            form.valid()
+        }
+        $.ajax(ajaxParams).done(ajaxDone).fail(ajaxFail)
+    }
+
+    // Submit resource booking form via AJAX
+    form.validate({
+        rules: {
+            'start_datetime[date]': {
+                'remote.invalidStart': true,
+                'remote.tooEarly': true,
+                'remote.conflict': true
+            },
+            'end_datetime[date]': {
+                'remote.invalidEnd': true,
+                'remote.beforeStart': true,
+                'remote.tooShort': true,
+                'remote.tooLong': true
+            }
+        },
+        errorPlacement: function(label, element) {
+            var name = element.attr('name')
+            if (name == 'start_datetime[date]' || name == 'end_datetime[date]') {
+                element.closest('td').append(label);
+            }
+            else {
+                label.insertAfter(element);
+            }
+        },
+        submitHandler: function() {
+            // Consider: one pass for validation, another pass for saving
+            var bookingId = form.find('input[name="id"]').val()
+            var repeat    = form.find('input[name="repeat"]').val()
+            if (bookingId && repeat) {
+                // Show a different dialog for deletes
+                if (form.data('action') === 'cancel') {
+                    cancelDialog.dialog('open')
+                }
+                else {
+                    updateDialog.dialog('open')
+                }
+            }
+            else {
+                callback()
+            }
+        }
+    })
+
+    // On submission attempt: clear list of errors
+    form.find('#resource-booking-save')
+        .click(function() {
+            errors = {}
+            form.valid()
+        })
+        .click(function() {
+            // Record that I clicked Save
+            form.data('action', 'save')
+        })
+    form.find('#resource-booking-cancel')
+        .click(function() {
+            // Record that I clicked Cancel
+            form.data('action', 'cancel')
+        })
+
+    // Show/hide the repeat until input, depending on if a repeat is chosen.
+    form.find('#repeatUntilSelect')
+        .change(function() {
+            if ($(this).val() !== '') {
+                $('#repeatUntil').show();
+                $("#repeat_until").rules("add", "required");
+            }
+            else {
+                $('#repeatUntil').hide();
+                $("#repeat_until").rules("remove", "required");
+            }
+        })
+        .change()
+})
+</script>
+<!-- END custom_header -->
+
+<h1>{% if item.id is empty %}Book Item{% else %}Update Booking{% endif %}: {{ item.resource.name }}</h1>
+
+{# booking form #}
+{% set saveAction = item.id is empty ?
+    routeLookup('resourceBooking.createBooking', {id: item.resource.id}) :
+    routeLookup('resourceBooking.update:post',   {id: item.id})
+%}
+<form id="resource-booking-form"
+      action="{{ saveAction }}"
+      method="post"
+      name="form" class="clearfix"
+>
+    <input type="hidden" name="id" value="{{ item.id }}"/>
+    <table class="standardForm table">
+        <tr>
+            <td class="formLabelWidth"><h4>Rules</h4></td>
+            <td>
+                {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Begin</h4></td>
+            <td>
+                {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
+                {% include 'sub/datetimeInput.twig' with {
+                    value: item.event.startDateTime,
+                    name:  'start_datetime',
+                    id:    'start_datetime'
+                } %}
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>End</h4></td>
+            <td>
+                {% include 'sub/datetimeInput.twig' with {
+                    value: item.event.endDateTime,
+                    name:  'end_datetime',
+                    id:    'end_datetime'
+                } %}
+            </td>
+        </tr>
+        {% if item.event.id is empty %}
+        <tr>
+        <td class="formLabelWidth" valign="top">
+            <h4>Repeat</h4>
+            <em>The frequency with which this booking recurs, if at all.</em>
+        </td>
+        <td>
+            <select name="repeat" id="repeatUntilSelect">
+                <option value="">Single Booking</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="fortnightly">Fortnightly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+        </td>
+        </tr>
+        <tr id="repeatUntil">
+            <td class="formLabelWidth" valign="top">
+                <h4>Repeat Until</h4>
+                <em>The date at which recurrence should cease.</em>
+            </td>
+            <td>
+                <input data-datepicker name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
+            </td>
+        </tr>
+        {% elseif recurrence %}
+        <tr>
+            <td class="formLabelWidth" valign="top">
+                <h4>Repeat</h4>
+                <em>This booking is part of a recurring series.</em>
+            </td>
+            <td>
+                <input name="repeat" type="hidden" value="{{ recurrence.freq }}" />
+                {% include 'sub/recurrence.twig' with {recurrence: recurrence} %}
+            </td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td class="formLabelWidth"><h4>Notes</h4></td>
+            <td><textarea name="notes">{{ item.event.detail }}</textarea></td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Related Resources</h4>
+                {% if item.resource.relatedResourceList|length %}
+                <em>If you want to book any related resources, select them here.</em>
+                {% endif %}
+            </td>
+            <td>
+                {# Related resources - not sure whether this list should be editable after save #}
+                <ul>
+                {% for relatedItem in item.resource.relatedResourceList %}
+                    <li>
+                        <input id="related-item-{{ relatedItem.id }}"
+                               type="checkbox"
+                               name="related_item[]"
+                               value="{{ relatedItem.id }}"
+                               {% if item.hasRelatedBookingForResource(relatedItem.id) %}checked{% endif %}
+                        />
+                        <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
+                    </li>
+                {% else %}
+                    <li>This resource has no related resources.</li>
+                {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    {# Inputs for editing bookings in a series #}
+    <input name="efficacy" type="hidden" value="self" />
+
+    {# Input for determining which action to run #}
+    <input name="action" type="hidden" />
+
+    <input id="resource-booking-save"
+           type="submit"
+           value="{% if item.id %}Update Booking{% else %}Book{% endif %}"
+           class="submit-btn-plain"
+           data-action="{{ saveAction }}"
+    />
+
+    {% if item.id %}
+        <input id="resource-booking-cancel"
+               type="submit"
+               value="Cancel Booking"
+               class="submit-btn-plain"
+               data-action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}"
+        />
+    {% endif %}
+
+    <a id="resource-booking-back"
+       class="submit-btn-plain"
+       href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">Back to list</a>
+
+</form>
+
+{# Booking for bulk events #}
+<div id="dialog-bulk-cancel" title="This booking is part of a series" class="wysiwyg">
+    Would you like to cancel only this booking, or all in the series?
+    <ul>
+        <li>
+            Bookings in this series that have already occured will not be
+            retrospectively cancelled.
+        </li>
+    </ul>
+</div>
+
+<div id="dialog-bulk-update" title="This booking is part of a series" class="wysiwyg">
+    Would you like to update only this booking, or all in the series? If you
+    update all bookings in the series:
+    <ul>
+        <li>
+            The start and end time of the other bookings in the series will be
+            adjusted by the amount you adjusted this booking.
+        </li>
+        <li>
+            Any approved bookings whose start or end time have changed will need
+            to be approved again.
+        </li>
+        <li>
+            Bookings in this series that have already occured will not be
+            retrospectively changed.
+        </li>
+    </ul>
+</div>

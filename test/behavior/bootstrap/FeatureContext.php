@@ -10,19 +10,34 @@ class FeatureContext extends BaseContext {
 
     /**
      * Initializes context.
-     * Every scenario gets it's own context object.
+     * Every scenario gets its own context object.
      *
      * @param array $parameters context parameters (set them up through behat.yml)
      */
     public function __construct(array $parameters) {
-        //
-        // Reset the database and filesystem back to a well-known state
         $this->useContext('mink', new MinkContext($parameters));
         $this->useContext('core', new Subcontext_CoreContext($parameters));
         $this->useContext('component', new Subcontext_ComponentContext($parameters));
         $this->useContext('course_builder', new Subcontext_CourseBuilderContext($parameters));
         $this->useContext('assessment', new Subcontext_AssessmentContext($parameters));
         $this->useContext('confirm', new Subcontext_ConfirmContext($parameters));
+        $this->useContext('autocomplete', new Subcontext_AutocompleteContext($parameters));
+        $this->useContext('resource_booking', new Subcontext_ResourceBookingContext($parameters));
+        $this->useContext('datepicker', new Subcontext_DatepickerContext($parameters));
+        $this->useContext('calendar', new Subcontext_CalendarContext($parameters));
+    }
+
+    /**
+     * Ensures user is logged out before scenario starts.
+     *
+     * @BeforeScenario
+     */
+    public function logout(Behat\Behat\Event\ScenarioEvent $event) {
+        // Session may not be initialised yet, so silently swallow
+        try {
+            $this->getSession()->visit('/logout.php');
+        }
+        catch (Exception $e) {}
     }
 
     /**
@@ -35,17 +50,38 @@ class FeatureContext extends BaseContext {
     }
 
     /**
-     * Attempts to take a screenshot of the error if the test failed.
+     * Takes a screenshot and content dump of the error if the test failed.
+     *
+     * Now ignores UndefinedException and PendingException, as these aren't
+     * raised by errors in test cases.
      *
      * @AfterStep
      */
     public function takeScreenshotOnFailure(Behat\Behat\Event\StepEvent $event) {
         if ($event->hasException()) {
-            // Assume screenshot is a PNG
-            file_put_contents(
-                dirname(__DIR__).'/screenshots/' . date('YmdHis') . '.png',
-                $this->getSession()->getDriver()->getScreenshot()
-            );
+            if (!in_array(
+                get_class($event->getException()),
+                array(
+                    'Behat\Behat\Exception\UndefinedException',
+                    'Behat\Behat\Exception\PendingException',
+                )
+            )) {
+                $baseName = sprintf(
+                    '%s/screenshots/%s-%s',
+                    dirname(__DIR__),
+                    date('YmdHis'),
+                    trim(preg_replace('/\\W+/', '_', strtolower($event->getStep()->getText())), '_')
+                );
+                // Assume screenshot is a PNG
+                file_put_contents(
+                    $baseName.'.png',
+                    $this->getSession()->getDriver()->getScreenshot()
+                );
+                file_put_contents(
+                    $baseName.'.html',
+                    $this->getSession()->getDriver()->getContent()
+                );
+            }
         }
     }
 }

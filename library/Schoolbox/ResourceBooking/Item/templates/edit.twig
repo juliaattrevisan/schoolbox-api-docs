@@ -1,0 +1,164 @@
+{# I need some way of adding custom_head #}
+<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript">
+    (function($){
+        $(function(){
+
+            // Hijack save form to allow delete
+            var form = $('#resource-form');
+            form.on('click', '#resource-delete', function(event) {
+                event.preventDefault();
+                form.attr('action', $(this).data('action')).submit();
+            })
+
+            // Add magicsuggest for user selection and selector for related items
+            form.find('input[name="moderator_id"]').userSelector({
+                plugin: {
+                    data:'/ajax/user.php?groupID=0',
+                    width: 200
+                },
+                multiple: true,
+                value: {{ moderatorList|json_encode|raw }}
+            })
+            form.find('input[name="related_resource_id"]').userSelector({
+                plugin: {
+                    data: {{ (routeLookup('resourceItem.search', {id: item.id, format:'.json'}) ~ "?thisId=" ~ item.id) | json_encode|raw }},
+                    width: 200
+                },
+                multiple: true,
+                value: {{ relatedItemList|json_encode|raw }}
+            })
+
+            form.find('input[type="file"].prettify').prettyFileInput({
+                additionalButtonClasses: 'no-marg float-left',
+                buttonActiveClass: 'tick',
+                defaultText: '<span></span>Choose file',
+                defaultFileSelectedText: '<span></span>File selected'
+            });
+
+        })
+    })(jQuery);
+</script>
+
+<h1>Resource - {% if item.id %}Edit{% else %}Add New{% endif %}</h1>
+
+<form id="resource-form"
+    action="{% if item.id %}{{ routeLookup('resourceItem.update:post', {id: item.id}) }}{% else %}{{ routeLookup('resourceItem.create') }}{% endif %}"
+    method="post"
+    name="form" class="clearfix"
+    enctype="multipart/form-data"
+>
+    <input type="hidden" name="id" value="{{ item.id }}"/>
+    <table class="standardForm table">
+        <tr>
+            <td class="formLabelWidth"><h4>Name</h4></td>
+            <td><input class="required" name="name" type="text" value="{{ item.name }}" size="30"/></td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Category</h4></td>
+            <td>
+                <select name="resource_category_id">
+                    <option>-- select --</option>
+                    {% for category in categoryList %}
+                        <option {{ category.id == item.category.id ? 'selected' : '' }}
+                                value="{{ category.id|e('html_attr') }}"
+                                label="{{ category.name|e('html_attr') }}"
+                        >{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Moderation</h4></td>
+            <td>
+                <select name="resource_moderation_type_id">
+                    {% for moderation in moderationList %}
+                        <option {{ moderation.id == item.moderationType.id ? 'selected' : '' }}
+                                value="{{ moderation.id|e('html_attr') }}"
+                                label="{{ moderation.name|e('html_attr') }}"
+                        >{{ moderation.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Moderators</h4></td>
+            <td>
+                <input name="moderator_id" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Related Resources</h4></td>
+            <td>
+                <input name="related_resource_id" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Description</h4></td>
+            <td><textarea name="description">{{ item.name }}</textarea></td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth"><h4>Image</h4></td>
+            <td>
+                {% if item.image.hash %}
+                    <input type="hidden" name="image" value="{{ item.image.id }}">
+                    <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
+                    <label><input type="checkbox" name="image" value="" /> Delete Image</label>
+                    or <input type="file" name="image" class="prettify">
+                {% else %}
+                    <input type="file" name="image" class="prettify">
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Minimum Lead Time</h4>
+                <em>Somebody reserving this item must give this period of notice before their reservation.</em>
+            </td>
+            <td>
+                <input class="interval-input" value="{{ item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"    placeholder="days"> days,
+                <input class="interval-input" value="{{ item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]"   placeholder="hours"> hours,
+                <input class="interval-input" value="{{ item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" placeholder="minutes"> minutes
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Minimum Reservation Time</h4>
+                <em>This item must be reserved for at least this period of time.</em>
+            </td>
+            <td>
+                <input class="interval-input" value="{{ item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"    placeholder="days"> days,
+                <input class="interval-input" value="{{ item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]"   placeholder="hours"> hours,
+                <input class="interval-input" value="{{ item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" placeholder="minutes"> minutes
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Maximum Reservation Time</h4>
+                <em>This item cannot be reserved for longer than this period.</em>
+            </td>
+            <td>
+                <input class="interval-input" value="{{ item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]"    placeholder="days"> days,
+                <input class="interval-input" value="{{ item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]"   placeholder="hours"> hours,
+                <input class="interval-input" value="{{ item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" placeholder="minutes"> minutes
+            </td>
+        </tr>
+    </table>
+
+    <input id="resource-save"
+           type="submit"
+           value="{% if item.id %}Update{% else %}Create{% endif %}"
+           class="submit-btn-plain"
+    />
+
+    {% if item.id and isRouteAuthorized('resourceItem.delete:post', {id: item.id}) %}
+    <input id="resource-delete"
+           type="submit"
+           value="Delete"
+           class="submit-btn-plain"
+           data-action="{{ routeLookup('resourceItem.delete:post', {id: item.id}) }}"
+    />
+    {% endif %}
+</form>
