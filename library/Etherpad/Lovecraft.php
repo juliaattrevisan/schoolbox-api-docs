@@ -24,6 +24,7 @@ class Lovecraft {
 	 * Constructor
 	 */
 	public function __construct() {
+
 	}
 
 	/**
@@ -41,7 +42,7 @@ class Lovecraft {
 		 */
 		$authenticator = new \Etherpad\Authenticator();
 
-		if ($authenticator->canCreate($this->getHomepageId())) {
+		if ($authenticator->canCreate($pad->getHomepageId())) {
 
 			/* Make life a bit easier for Etherpad by using a hashed version
 			 * of the name, rather than let it get urlencoded in some strange
@@ -57,7 +58,7 @@ class Lovecraft {
 
 			/* Create a new group pad
 			 */
-			$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
+			$client = new \EtherpadLite\Client(\Cfg::get('etherpad_api_token'));
 
 			/* Create a new pad, get group id
 			 * Create a group pad
@@ -91,7 +92,7 @@ class Lovecraft {
 					/* Store the local db's body text into the newly-spawned
 					 * etherpad/redis instance
 					 */
-					$client->setText($padId, $pad->getBody());
+					var_dump($client->setHTML($padId, $pad->getBody()));
 
 					return $this->getPad();
 				}
