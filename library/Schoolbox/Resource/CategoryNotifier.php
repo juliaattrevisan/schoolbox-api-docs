@@ -10,6 +10,8 @@
 namespace Schoolbox\Resource;
 
 
+use Schoolbox\Collection;
+use Schoolbox\Feed\Item;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -23,6 +25,20 @@ class CategoryNotifier extends ResourceNotifier {
 	const TRIGGER_MOVED   = 'moved';
 	const TRIGGER_CREATED = 'created';
 	const TRIGGER_DELETED = 'deleted';
+
+
+	/**
+	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 *
+	 * @param int $context - most likely a category ID or ignored
+	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
+	 * @param int $limit - how many messages to retrieve
+	 * @param int $offset - by default, most recent
+	 * @return Collection|Item[]
+	 */
+	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
+		return $this->getFeedInternal($context, $roletype, $limit, $offset, LogMapper::KIND_FOLDER);
+	}
 
 
 	/**

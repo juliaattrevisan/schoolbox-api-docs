@@ -40,7 +40,13 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->blogMapper = BlogMapper::getInstance();
-		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_BLOG);
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getSlug() {
+		return NSMapper::NS_BLOG;
 	}
 
 	/**
@@ -64,19 +70,20 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	/**
 	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context - most likely a category ID or ignored
-	 * @param int $limit - how many messages to retrieve
-	 * @param int $offset - by default, most recent
+	 * @param int $context     - most likely a category ID or ignored
+	 * @param string $roleType - the roletype of the user for whom this feed is being generated
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roleType, $limit = self::SOFT_LIMIT, $offset = 0) {
 
 		/** @var Collection|Comment[] $comments */
 		$comments = $this->mapper->findForFeed($context, $limit, $offset);
 
 		$c = new Collection();
 		foreach($comments as $comment) {
-			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentCommented($comment, $comment->getOwner()), $comment->getCreated()->getUnixTimestamp()));
+			$c->merge(Feed::getItemsFromMessenger($this->notifyCommented($roleType, $comment, $comment->getOwner()), $comment->getCreated()->getUnixTimestamp()));
 		}
 		return $c;
 	}
@@ -95,16 +102,15 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	/* ASYNC NOTIFICATION METHODS */
 
 	/**
+	 * @param string $roletype
 	 * @param Comment $comment
 	 * @param User $author
-	 * @param array $diff
 	 * @return Messenger
 	 */
-	public function notifyStudentCommented($comment, $author, $diff = array()) {
+	protected function notifyCommented($roletype, $comment, $author) {
 		$msgr = new Messenger();
 
-
-		$commentId       = $comment->getId();
+		$commentId    = $comment->getId();
 
 		$authorId     = $author->getId();
 		$authorName   = $author->formatName();
@@ -112,7 +118,6 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 
 		$categoryId   = $comment->getBlog()->getCategory()->getId();
 		$categoryName = $comment->getBlog()->getCategory()->getName();
-
 
 		$msg = new Message(
 			':author commented on :title in :catname',
@@ -129,10 +134,29 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 			'title'   => $comment->getBlog()->getHeading(),
 			'catname' => array($categoryName, "/homepage/$categoryId")
 		), array(
-			'roletype' => Role::STUDENT
+			'roletype' => $roletype
 		));
 
 		return $msgr;
+	}
+
+	/**
+	 * @param Comment $comment
+	 * @param User $author
+	 * @return Messenger
+	 */
+	protected function notifyFollowed($roletype, $comment, $author) {
+
+	}
+
+	/**
+	 * @param Comment $comment
+	 * @param User $author
+	 * @param array $diff
+	 * @return Messenger
+	 */
+	public function notifyStudentCommented($comment, $author, $diff = array()) {
+		return $this->notifyCommented(Role::STUDENT, $comment, $author);
 	}
 
 
@@ -143,9 +167,18 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	 * @return Messenger
 	 */
 	public function notifyStaffCommented($comment, $author, $diff = array()) {
-		$msgr = new Messenger();
-		return $msgr;
+		return $this->notifyCommented(Role::STAFF, $comment, $author);
+	}
 
+
+	/**
+	 * @param Comment $comment
+	 * @param User $author
+	 * @param array $diff
+	 * @return Messenger
+	 */
+	public function notifyParentCommented($comment, $author, $diff = array()) {
+		return $this->notifyCommented(Role::PARENT, $comment, $author);
 	}
 
 

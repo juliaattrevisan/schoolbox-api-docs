@@ -144,30 +144,39 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
 	 * @param int $limit       - how many messages to retrieve
 	 * @param int $offset      - by default, most recent
+	 * @param string $filter   - optionally limit to a particular kind of resource
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
-		$logs = LogMapper::getInstance()->findForFeed($context, $limit, $offset);
+	protected function getFeedInternal($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0, $filter) {
+		$logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset);
 
 		$c = new Collection();
 
 		foreach($logs as $log) {
-			$resource = $log->getObject();
-			$stamp = $log->getTimestamp()->getUnixTimestamp();
-			$user = $log->getUser();
 
-			switch($log->getAction()) {
-				case LogMapper::ACTION_CREATE:
-					$c->merge(Feed::getItemsFromMessenger($this->notifyCreated($roletype, $resource, $user), $stamp));
-					break;
-				case LogMapper::ACTION_UPDATE:
-					$c->merge(Feed::getItemsFromMessenger($this->notifyUpdated($roletype, $resource, $user), $stamp));
-					break;
-				case LogMapper::ACTION_DELETE:
-					$c->merge(Feed::getItemsFromMessenger($this->notifyDeleted($roletype, $resource, $user), $stamp));
-					break;
+			try {
+				$resource = $log->getObject();
+				$stamp = $log->getTimestamp()->getUnixTimestamp();
+				$user = $log->getUser();
+
+				switch($log->getAction()) {
+					case LogMapper::ACTION_CREATE:
+						$c->merge(Feed::getItemsFromMessenger($this->notifyCreated($roletype, $resource, $user), $stamp));
+						break;
+					case LogMapper::ACTION_UPDATE:
+						$c->merge(Feed::getItemsFromMessenger($this->notifyUpdated($roletype, $resource, $user), $stamp));
+						break;
+					case LogMapper::ACTION_DELETE:
+						$c->merge(Feed::getItemsFromMessenger($this->notifyDeleted($roletype, $resource, $user), $stamp));
+						break;
+				}
 			}
+			catch(Mapper\Exception $e) {
+				// mute failures where things were logged about resources that no longer exist
+			}
+
 		}
+		return $c;
 	}
 
 

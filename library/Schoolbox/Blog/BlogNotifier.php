@@ -63,18 +63,20 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	/**
 	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context - most likely a category ID or ignored
-	 * @param int $limit - how many messages to retrieve
-	 * @param int $offset - by default, most recent
+	 * @param int $context     - most likely a category ID or ignored
+	 * @param string $roleType - the roletype of the user for whom this feed is being generated
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roleType, $limit = self::SOFT_LIMIT, $offset = 0) {
 
+		/** @var Blog[]|Collection $blogs */
 		$blogs = $this->mapper->findForFeed($context, $limit, $offset);
 
 		$c = new Collection();
 		foreach($blogs as $blog) {
-			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentPosted($blog, $blog->getOwner()), $blog->getCreated()->getUnixTimestamp()));
+			$c->merge(Feed::getItemsFromMessenger($this->notifyPosted($roleType, $blog, $blog->getOwner()), $blog->getCreated()->getUnixTimestamp()));
 		}
 		return $c;
 	}

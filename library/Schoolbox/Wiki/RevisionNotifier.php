@@ -62,12 +62,13 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	/**
 	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context - most likely a category ID or ignored
-	 * @param int $limit - how many messages to retrieve
-	 * @param int $offset - by default, most recent
+	 * @param int $context     - most likely a category ID or ignored
+	 * @param string $roleType - the roletype of the user for whom this feed is being generated
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roleType, $limit = self::SOFT_LIMIT, $offset = 0) {
 		/** @var Revision[]|Collection $revisions */
 		$revisions = $this->mapper->findForFeed($context, $limit, $offset);
 
