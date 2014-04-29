@@ -51,7 +51,17 @@
                     var self = this
                     self.clear();
                     self.clearOptions();
-                    $j.each(settings.value, function(i,v) {
+                    $.each(settings.value, function(i,v) {
+                        // Is settings.value a list of text values, instead of a
+                        // list of objects? (Happens on the email form page,
+                        // where a list of email addresses is passed.)
+                        // Create an object out of the text value.
+                        if (!$.isPlainObject(v)) {
+                            var vValue = v
+                            v = {}
+                            v[self.settings.labelField] = vValue
+                            v[self.settings.valueField] = vValue
+                        }
                         self.addOption(v)
                         self.addItem(v[self.settings.valueField])
                     });
