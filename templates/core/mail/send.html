@@ -15,6 +15,7 @@ $j(document).ready(function () {
         },
         multiple: true,
         selectize: {
+            plugins: ['remove_button', 'restore_on_backspace'],
             create: function(input) {
                 var freeEntry = {};
                 freeEntry[this.settings.valueField]  = input;
