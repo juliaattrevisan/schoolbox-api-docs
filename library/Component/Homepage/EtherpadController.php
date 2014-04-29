@@ -67,9 +67,11 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 		$this->parseConfig();
 
 		$this->setBlock($templateHandle, 'etherpad_pad', 'etherpad_pad_block');
+		$this->setBlock($templateHandle, 'etherpad_has_create', 'etherpad_has_create_block');
 
 		$this->setVar(array(
-			'etherpad_pad_block' => ''
+			'etherpad_pad_block' => '',
+			'etherpad_has_create_block' => '',
 		));
 
 		/* Decide which homepage to stream from
@@ -102,6 +104,14 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 			));
 
 			$this->parse('etherpad_pad_block', 'etherpad_pad', true);
+		}
+
+		/* Only provide Create Document button to those with write access
+		 */
+		$authenticator = new \Etherpad\Authenticator();
+
+		if ($authenticator->canCreate($homepageSource)) {
+			$this->parse('etherpad_has_create_block', 'etherpad_has_create');
 		}
 
 		return true;
