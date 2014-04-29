@@ -1,5 +1,4 @@
 -- Clear out existing tables
-DROP TABLE IF EXISTS `resource_booking_relation`;
 DROP TABLE IF EXISTS `resource_booking`;
 DROP TABLE IF EXISTS `lu_resource_booking_status`;
 
@@ -44,21 +43,5 @@ CREATE TABLE `resource_booking` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- Relations between resource bookings
-CREATE TABLE `resource_booking_relation` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `resource_booking_id` int NOT NULL,
-  `extra_resource_booking_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `resource_booking_relation_resource_booking_id` (`resource_booking_id`),
-  CONSTRAINT `resource_booking_relation_resource_booking_id`
-  FOREIGN KEY (`resource_booking_id`)
-  REFERENCES `resource_booking` (`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  KEY `resource_booking_relation_extra_resource_booking_id` (`extra_resource_booking_id`),
-  CONSTRAINT `resource_booking_relation_extra_resource_booking_id`
-  FOREIGN KEY (`extra_resource_booking_id`)
-  REFERENCES `resource_booking` (`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  UNIQUE KEY (`resource_booking_id`, `extra_resource_booking_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+-- Relations between resource bookings:
+-- No longer used, the booking's event ID is used to determine relation now.
