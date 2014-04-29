@@ -197,7 +197,7 @@ class Lovecraft {
 					/* Store the local db's body text into the newly-spawned
 					 * etherpad/redis instance
 					 */
-					var_dump($client->setHTML($padId, $pad->getBody()));
+					$client->setHTML($padId, '<!DOCTYPE html><html><head></head><body>'.$pad->getBody().'</body></html>');
 
 					return $this->getPad();
 				}

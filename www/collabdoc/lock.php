@@ -37,11 +37,11 @@ if ($authenticator->canCreate($pad->getHomepageId())) {
 	/* Save pad contents to db, just in case
 	 */
 	$client = new \EtherpadLite\Client(Cfg::get('etherpad_api_token'));
-	$getTextResult = $client->getText($pad->getPadId());
+	$getTextResult = $client->getHTML($pad->getPadId());
 
 	if ($getTextResult->getMessage() == 'ok') {
 		$data = $getTextResult->getData();
-		$pad->setBody($data['text']);
+		$pad->setBody($data['html']);
 	}
 
 	/* Save it!
