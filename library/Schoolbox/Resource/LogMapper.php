@@ -11,7 +11,6 @@ namespace Schoolbox\Resource;
 
 
 use PDO;
-use Schoolbox\Assessment\Component\SubmissionBox\FileMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
@@ -63,13 +62,14 @@ class LogMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'user',
 			'property'   => 'user',
-			'type'       => self::TYPE_MODEL
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'user'
 		));
 
 		$this->hasMap(array(
 			'column'            => 'time',
 			'property'          => 'timestamp',
-			'type'              => self::TYPE_TIMESTAMP,
+			'type'              => self::TYPE_DATETIME,
 			'created_timestamp' => true
 		));
 
@@ -111,7 +111,7 @@ class LogMapper extends Mapper {
 	 * @param int $time
 	 * @return Collection|Log[]
 	 */
-	public function findForFeed($context, $limit, $offset = 0, $filter = '', $time = 0) {
+	public function findForFeed($context, $filter, $limit, $offset = 0, $time = 0) {
 		$time = date('Y-m-d H:i:s', $time ?: time());
 		$limit = (int)$limit;
 		$offset = (int)$offset;
@@ -140,16 +140,28 @@ class LogMapper extends Mapper {
 			self::KIND_FOLDER => $this->getJoinMapper('cat')->getColumnString('c'),
 		);
 
+		$wheres = array(
+			self::KIND_LINK   => "object = 'link'   AND l.id IS NOT NULL",
+			self::KIND_FILE   => "object = 'file'   AND f.id IS NOT NULL",
+			self::KIND_FOLDER => "object = 'folder' AND c.id IS NOT NULL",
+		);
+
 		// are we filtering? or just grabbing all the things?
-		$selectSql = $filter ? implode(', ', $selects) : $selects[$filter];
-		$joinSql = $filter ? implode(' ', $joins) : $joins[$filter];
+		$selectSql = $selects[$filter];
+		$joinSql = $joins[$filter];
+		$whereSql = $wheres[$filter];
 
 		$stmt = $this->database->prepare("
-			SELECT $selectSql
+			SELECT
+				{$this->getColumnString('log')},
+				{$this->getJoinColumnString('user', 'u')},
+				$selectSql
 			FROM `{$this->getTable()}` `log`
+				LEFT JOIN {$this->getJoinSql('user', 'log', 'u')}
 				$joinSql
 			WHERE log.time <= :time
-			ORDER BY log.time
+			AND $whereSql
+			ORDER BY log.time DESC
 			LIMIT $offset, $limit
 		");
 
@@ -162,7 +174,7 @@ class LogMapper extends Mapper {
 
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			/** @var Log $log */
-			$collection->add($this->hydrate($r, 'log'));
+			$collection->add($this->hydrate($r, 'log')->setUser($this->hydrateJoin($r, 'user', 'u')));
 		}
 
 		return $collection;

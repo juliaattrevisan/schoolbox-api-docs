@@ -10,7 +10,6 @@
 namespace Schoolbox\Resource;
 
 
-use Schoolbox\Assessment\Component\SubmissionBox\FileMapper;
 use Schoolbox\User;
 
 class Log {
