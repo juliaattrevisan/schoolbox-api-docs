@@ -109,6 +109,7 @@ class Lovecraft {
 					$newPad->setBody('');
 					$newPad->setPadId($padId);
 					$newPad->setHomepageId($homepageId);
+					$newPad->setEnvironment(INSTANCE_ID);
 					$newPad->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 					$newPad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 

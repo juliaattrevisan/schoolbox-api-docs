@@ -42,6 +42,12 @@ class PadMapper extends \Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
+			'column'     => 'environment',
+			'property'   => 'environment',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
 			'column'     => 'name',
 			'property'   => 'name',
 			'type'       => self::TYPE_STRING,

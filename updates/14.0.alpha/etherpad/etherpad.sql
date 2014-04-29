@@ -14,3 +14,7 @@ ALTER TABLE `etherpad_pad` ADD COLUMN `lock` TINYINT(1) DEFAULT 0 NULL COMMENT '
 /* Migrate from old Etherpad Groups table
  */
 ALTER TABLE `etherpad_pad` ADD COLUMN `homepage_id` INT(11) NULL COMMENT 'The homepage this pad started in' AFTER `pad_id`;
+
+/* Add environment field
+ */
+ALTER TABLE `etherpad_pad` ADD COLUMN `environment` VARCHAR(255) NULL AFTER `pad_id`;

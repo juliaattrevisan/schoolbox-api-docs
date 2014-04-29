@@ -35,6 +35,13 @@ class Pad implements ISoftDeletable {
 	private $homepageId = '';
 
 	/**
+	 * The place where this pad was first created
+	 *
+	 * @var string
+	 */
+	private $environment = '';
+
+	/**
 	 * Actual pad name given by user
 	 *
 	 * @var string
@@ -130,6 +137,19 @@ class Pad implements ISoftDeletable {
 	 */
 	public function isDeleted() {
 		return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
+	}
+
+	/**
+	 * Was this pad first spawned in the environment indicated by INSTANCE_ID
+	 *
+	 * @return bool
+	 */
+	public function isExistsInCurrentEnvironment() {
+		if ($this->getEnvironment() == INSTANCE_ID) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/* Getters/Setters
@@ -295,5 +315,23 @@ class Pad implements ISoftDeletable {
 	 */
 	public function getHomepageId() {
 		return $this->homepageId;
+	}
+
+	/**
+	 * Set environment
+	 *
+	 * @param string $environment
+	 */
+	public function setEnvironment($environment) {
+		$this->environment = $environment;
+	}
+
+	/**
+	 * Get environment
+	 *
+	 * @return string
+	 */
+	public function getEnvironment() {
+		return $this->environment;
 	}
 }
