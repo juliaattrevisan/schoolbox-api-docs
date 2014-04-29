@@ -80,7 +80,7 @@ $di->set(
         function() use($di) {
             $config      = $di->get('config');
             $chainLoader = new Twig_Loader_Chain();
-            $baseLoader  = new Twig_Loader_Filesystem();
+            $baseLoader  = new Twig_Loader_Filesystem(array());
             // Paths: prefer templates/{site_location} over templates/core
             $baseLoader->addPath($config->get('siteRoot').'/templates/'.$config->get('site_location'));
             $baseLoader->addPath($config->get('siteRoot').'/templates/core');
