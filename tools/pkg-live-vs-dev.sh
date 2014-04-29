@@ -33,12 +33,18 @@ else
 	if [ "$1" == 'schoolboxdev' ];
 	then
 		cronjob='schoolbox';
-		sed -i 's/schoolbox/schoolboxdev/g' $fullpath/tools/init/*.conf;
-		sed -i 's/Schoolbox/Schoolbox\ Dev/g' $fullpath/tools/init/*.conf;
+		sed -i 's/schoolbox/schoolboxdev/g' $fullpath/init/*.conf;
+		sed -i 's/Schoolbox/Schoolbox\ Dev/g' $fullpath/init/*.conf;
 	else
 		helpmsg;
 	fi
 fi
+
+mv -f $fullpath/init/upstart-scheduled.conf $fullpath/init/$1-scheduled.conf;
+mv -f $fullpath/init/upstart-socketd.conf $fullpath/init/$1-socketd.conf;
+mv -f $fullpath/init/upstart-digestd.conf $fullpath/init/$1-digestd.conf;
+mv -f $fullpath/init/$1-upstart-socketd.override $fullpath/init/$1-socketd.override;
+rm -vf `$fullpath/init/$cronjob-upstart-socketd.override`;
 
 rm -vf `readlink -f $fullpath/cron/$cronjob`;
 rm -vf `readlink -f $fullpath/logrotate/$cronjob`;
