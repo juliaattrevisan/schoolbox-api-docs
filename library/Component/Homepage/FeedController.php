@@ -28,9 +28,12 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 				new \Schoolbox\Blog\BlogNotifier($conf),
 				new \Schoolbox\Blog\CommentNotifier($conf),
 				new \Schoolbox\Wiki\WikiNotifier($conf),
-				new \Schoolbox\Wiki\RevisionNotifier($conf)
+				new \Schoolbox\Wiki\RevisionNotifier($conf),
+				new \Schoolbox\Resource\CategoryNotifier($conf),
+				new \Schoolbox\Resource\FileNotifier($conf),
+				new \Schoolbox\Resource\LinkNotifier($conf)
 			),
-			$this->getContext('id'), $this->getConfig('size')
+			$this->getContext('id'), $_SESSION['user']->getRole()->getType(), $this->getConfig('size')
 		);
 	}
 
