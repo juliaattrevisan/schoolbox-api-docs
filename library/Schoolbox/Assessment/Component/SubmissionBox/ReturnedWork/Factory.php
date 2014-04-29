@@ -11,6 +11,8 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
 
+use Schoolbox\Assessment\Component\SubmissionBox;
+
 class Factory {
 
 	/**
@@ -225,7 +227,9 @@ class Factory {
 
 			/* Use the existing returned work record - it was created a short time ago or the marks are not yet visible
 			 */
-			if ($this->getSubmissionBox()->getMarkVisibility() < 1 || $return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()) {
+			if ($this->getSubmissionBox()->getMarkVisibility() == SubmissionBox::MARK_VISIBILITY_PRIVATE
+				|| $return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp())
+			{
 				$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			}
 			/* Spawn a new returned work record, so pump in a returned date
