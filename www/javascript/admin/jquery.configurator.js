@@ -26,7 +26,7 @@ $j.fn.configurator = function(opts) {
 
 
     this.help = function() {
-        $j('h3 span').each(function() {
+        $j('h2 span').each(function() {
             var activeContent = $j(this).siblings('em').html();
             $j(this).qtip({
                 content: activeContent,

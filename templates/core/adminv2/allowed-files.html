@@ -11,7 +11,7 @@
             $j.fn.qtip.defaults,
             {
                 style: {
-                    classes: 'qtip-green qtip-shadow qtip-rounded',
+                    classes: 'qtip-green qtip-shadow',
                     tip: { corner: false }
                 },
                 position: {
@@ -137,7 +137,7 @@
     <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
     <!-- END admin_nav_item -->
 </ul>
-<div class="admin-contents">
+<div class="admin-contents clearfix">
     <h2>Allowed Files</h2>
 
     <form id="newAllowedFile" method="post" action="/adminv2/allowed-fileForm.php">

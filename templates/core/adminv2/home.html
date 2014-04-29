@@ -89,25 +89,10 @@ $j(function() {
 </ul>
 <div class="admin-contents clearfix">
 	<h2>Home</h2>
-        <!--
-	<div class="level green"> <a href="#" class="dismiss">Dismiss all</a>
-		<h3 class="iconify exclamation">Notifications</h3>
-		<ul class="notifications">
-			<li><strong>Today</strong><em>3pm</em>
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eros sapien, sollicitudin quis rutrum pharetra, fringilla in ipsum. Sed faucibus aliquet enim.</p>
-				<a href="#" class="remove"></a></li>
-			<li><strong>Yesterday</strong><em>11:18am</em>
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eros sapien.</p>
-				<a href="#" class="remove"></a></li>
-			<li><strong>11/3/2011</strong><em>4:04pm</em>
-				<p>Mauris eros sapien, sollicitudin quis rutrum pharetra, fringilla in ipsum. Sed faucibus aliquet enim sed rhoncus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eros sapien, sollicitudin quis rutrum pharetra, fringilla in ipsum.</p>
-				<a href="#" class="remove"></a></li>
-		</ul>
-	</div> -->
 	<div class="one-third clearfix">
 		<div class="level">
 			<h3 class="iconify stats">Server stats</h3>
-			<h4>Storage <span>{DISK_USED}/{DISK_TOTAL}</span></h4>
+			<h3>Storage <span class="no-bg">{DISK_USED}/{DISK_TOTAL}</span></h3>
 			<div class="clearfix">
 				<div class="bar-container">
 					<div class="bar">
@@ -117,7 +102,7 @@ $j(function() {
 				</div>
 			</div>
 			<!-- BEGIN memory -->
-			<h4>Memory <span>{MEMORY_USED}/{MEMORY_TOTAL}</span></h4>
+			<h3>Memory <span class="no-bg">{MEMORY_USED}/{MEMORY_TOTAL}</span></h3>
 			<div class="clearfix">
 				<div class="bar-container">
 					<div class="bar">
@@ -127,7 +112,7 @@ $j(function() {
 				</div>
 			</div>
 			<!-- END memory -->
-			<h4 style="margin-top:8px">Status of services</h4>
+			<h3>Status of services</h3>
 			<ul class="server-statuses" >
 				<li id="db-light" class="{EXTERNAL_DB_LIGHT} clearfix"><strong>{EXTERNAL_DB}</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
 				<li id="email-light" class="{EMAIL_LIGHT} clearfix"><strong>Email </strong><em><span></span></em><span>{EMAIL_STATUS}</span></li>
@@ -136,7 +121,7 @@ $j(function() {
 				<li id="www-light" class="{WWW_LIGHT} clearfix"><strong>WWW </strong><em><span></span></em><span>{WWW_STATUS}</span></li>
 			</ul>
             <div class="loading"></div>
-            <h4 style="margin-top:8px">Role statistics</h4>
+            <h3>Role statistics</h3>
 			    <table cellpadding="0" cellspacing="0" class="logged-in table" id="group-summary">
                     <colgroup>
                         <col width="50%" />

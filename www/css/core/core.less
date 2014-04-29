@@ -2933,55 +2933,43 @@ ADMIN BODY
     min-height: 1px;
     clear: both;
     background: @content-background;
-    padding: 16px;
     position: relative;
+    h1,h2,h3,
+    .allowed-files thead th{
+      span {
+        background: darken(@alternate-background,@darken-value);
+        font-weight: normal;
+        font-size: 14px;
+        padding: 0 4px;
+        margin: 0 8px;
+        &:hover {
+          cursor: help;
+        }
+      }
+      .no-bg{ background: transparent; }
+      em {
+        display: none;
+      }
+      &.iconify {
+        line-height: 14px;
+        padding: 11px 0 7px 42px;
+        background: url(/images/core/admin/icons.png) no-repeat;
+        &.exclamation {
+          background-position: 0 -33px;
+        }
+        &.stats {
+          background-position: 0 -66px;
+        }
+      }
+      strong {
+        font-weight: normal;
+        padding: 2px 4px;
+      }
+    }
     h2 {
-        background: none;
-        text-indent: 0;
-        padding: 0;
-        font-size: 18px;
-        color: @black;
-        span {
-            font-size: 12px;
-            display: block;
-            line-height: 10px
-        }
-        strong {
-            font-weight: normal;
-            padding: 2px 4px;
-        }
+        margin: 8px 0 15px 0;
     }
     h3 {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 16px;
-        color: @black;
-        span {
-            background: darken(@alternate-background, @darken-value);
-            font-weight: normal;
-            font-size: 14px;
-            padding: 0 4px;
-            margin: 0 8px;
-            &:hover {
-                cursor: help;
-            }
-        }
-        em {
-            display: none;
-        }
-        &.iconify {
-            line-height: 14px;
-            padding: 11px 0 7px 42px;
-            background: url(/images/core/admin/icons.png) no-repeat;
-            &.exclamation {
-                background-position: 0 -33px;
-            }
-            &.stats {
-                background-position: 0 -66px;
-            }
-        }
-    }
-    h4 {
         border-bottom: 1px solid @alternate-background;
         font-size: 14px;
         font-weight: bold;
@@ -2989,7 +2977,7 @@ ADMIN BODY
         padding-bottom: 5px;
         line-height: 28px;
         span {
-            font-weight: normal;
+          font-weight: normal;
         }
     }
     .level {
@@ -3344,7 +3332,8 @@ ADMIN BODY
 			margin: -8px 0 0 0;
 		}
 		span.help {
-			background: darken(@alternate-background, @darken-value);
+			background: darken(@alternate-background,@darken-value);
+            color: @black;
 			font-weight: normal;
 			font-size: 14px;
 			padding: 0 4px;
@@ -8526,9 +8515,11 @@ h4 a.hidden {
 }
 
 .rubric .warning span,
+.admin-contents h2 span,
 .admin-contents h3 span,
 .admin-form label span.help,
-.submission td span.alert {
+.submission td span.alert,
+.allowed-files thead th span{
     .rounded-corners(100%)
 }
 
