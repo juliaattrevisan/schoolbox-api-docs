@@ -62,6 +62,7 @@ mkdir /var/lib/vagrant -p > /dev/null;
 /vagrant/tools/update-sql.sh;
 rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -R /var/lib/vagrant > /dev/null;
+rm -f /vagrant/www/conf/pre*conf.php;
 
 echo "$vag Generating data dir sql fixes";
 cp -f /home/vagrant/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
