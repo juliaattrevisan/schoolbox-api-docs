@@ -67,7 +67,7 @@ class SideNav extends SubjectListAbstract {
 						}
 						$this->getPage()->setVar(array(
 							'SUBJECT_NAME' => \Scrub::text($name),
-							'SUBJECT_URL' =>  "/homepage/{$currentSubject['subject']['code']}",
+							'SUBJECT_URL' =>  "/homepage/code/{$currentSubject['subject']['code']}",
 						));
 
 						$this->getPage()->parse('msubject_item_block', 'msubject_item', true);
