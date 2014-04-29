@@ -73,9 +73,10 @@ class Subcontext_ResourceBookingContext extends BaseContext {
         $this
             ->getMainContext()->getSubcontext('calendar')
             ->clickDate('#calendar', $timeString);
+        $this->saveScreenshot();
         $this
             ->getSession()->getPage()
-            ->find('css', "#createEvent .actions input.btn[value=\"Continue\"]")
+            ->find('css', "#createEvent .bookingActions input.btn[value=\"Continue\"]")
             ->click();
     }
 
@@ -96,7 +97,7 @@ class Subcontext_ResourceBookingContext extends BaseContext {
             ->clickDate('#calendar', $timeString);
         $button = $this
             ->getSession()->getPage()
-            ->find('css', "#createEvent .actions input.btn[value=\"Continue\"]");
+            ->find('css', "#createEvent .bookingActions input.btn[value=\"Continue\"]");
         if ($button instanceof Element\NodeElement) {
             throw new Exception('User was able to book resource');
         }
@@ -139,7 +140,7 @@ class Subcontext_ResourceBookingContext extends BaseContext {
     public function getActionButton($timeString, $action = null) {
         $booking = $this->getBooking($timeString);
         $booking->click();
-        $button = $this->getSession()->getPage()->find('css', "#calendar-bubble .actions a.btn.booking-$action");
+        $button = $this->getSession()->getPage()->find('css', "#calendar-bubble .bookingActions a.btn.booking-$action");
         if ($button instanceof Element\NodeElement) {
             return $button;
         }
