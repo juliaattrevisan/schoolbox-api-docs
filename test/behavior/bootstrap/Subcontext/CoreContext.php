@@ -71,6 +71,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @throws Exception if either username or password input aren't found
      */
     public function loginAttempt($username, $password) {
+        // Logout first
+        $this->logout();
         $page = $this->getSession()->getPage();
         $usernameInput = $page->findById('username');
         if (!($usernameInput instanceof Element\NodeElement)) {
