@@ -114,6 +114,11 @@ echo "$vag Building CSS and JS";
 echo "$vag Starting watcher for changes to CSS files";
 grunt --no-color watch > /vagrant/data/watch.output.txt &
 
+echo "$vag Enabling modules";
+/vagrant/tools/module.sh enable mobile;
+/vagrant/tools/module.sh enable leave;
+/vagrant/tools/module.sh enable resource;
+
 echo "$vag Loading all demo data complete";
 
 echo "$vag Run Notifications binder";
