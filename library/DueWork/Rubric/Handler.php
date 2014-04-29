@@ -566,7 +566,7 @@ class DueWork_Rubric_Handler {
                 LEFT JOIN `rubric_usage` u ON sb.id = u.`submission_box_id`
                 LEFT JOIN rubric_result r ON r.`resultset_id` = sb.`rubric_result_set` AND sb.`rubric_result_set` > 0
                 WHERE sb.rubric_result_set > 0 AND r.value > 0 AND sb.id = :sbid
-                ORDER BY d.value DESC, r.value DESC
+                ORDER BY r.value DESC
             ");
 
             $stmt->execute(array('sbid' => $submissionBoxID));
