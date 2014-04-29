@@ -40,11 +40,12 @@ class Feed {
 	 *
 	 * @param SourceInterface[] $sources
 	 * @param int $context
+	 * @param string $roleType
 	 * @param int $limit
 	 * @param int $offset
 	 * @return Collection|Item[]
 	 */
-	public function aggregate($sources, $context, $limit = SourceInterface::SOFT_LIMIT, $offset = 0) {
+	public function aggregate($sources, $context, $roleType, $limit = SourceInterface::SOFT_LIMIT, $offset = 0) {
 		if ($limit <= 0 || $limit > SourceInterface::SOFT_LIMIT) {
 			$limit = SourceInterface::SOFT_LIMIT;
 		}
@@ -58,7 +59,7 @@ class Feed {
 				 * the most up-to-date data. As such, there is an inherent (unavoidable?) performance hit, since
 				 * the maximum number of items that might be retrieved can be up to count($sources) times the $limit
 				 */
-				$messages->merge($channel->getFeed($context, $limit, $offset));
+				$messages->merge($channel->getFeed($context, $roleType, $limit, $offset));
 			}
 		}
 
