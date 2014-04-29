@@ -150,6 +150,7 @@ class FileMapper extends Mapper {
 
         $file = false;
 
+	    /** @var MimetypeMapper $mimeTypeMapper */
         $mimeTypeMapper = $this->getJoinMapper('allowedFileType');
 
         $query = "
@@ -256,10 +257,10 @@ class FileMapper extends Mapper {
      * Setup video processing
      *
      * @param File $file
-     * @param null $previous
+     * @param object $previous
      * @throws \Schoolbox\File\Exception
      */
-    protected function postSave(File $file ) {
+    protected function postSave(File $file, $previous = null) {
         // copy file into location
         if( is_readable($file->getTempFileLocation())) {
 
