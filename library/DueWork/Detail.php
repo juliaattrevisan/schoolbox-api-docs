@@ -226,8 +226,14 @@ class DueWork_Detail {
                         $afterMark = '';
                     }
 
-                    $class = ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp(
-                    )) ? self::CLASS_LATE : '';
+					if ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp()) {
+						$class = self::CLASS_LATE;
+						$submissionTimeDescription = 'Submitted Late';
+					}
+					else {
+						$class = '';
+						$submissionTimeDescription = 'Submitted On TIme';
+					}
 
                     // needing to do this just to get the icon associated with an extension is slightly ridiculous
                     if ($submission['is_online_submission']) {
@@ -259,6 +265,7 @@ class DueWork_Detail {
                             'SUBMISSION_TIME' => $submission['date'],
                             'SUBMISSION_FILENAME' => $submission['realname'],
                             'SUBMISSION_CLASS' => $class,
+							'SUBMISSION_TIME_DESCRIPTION' => $submissionTimeDescription,
                             'SUBMISSION_AFTER_MARK' => $afterMark,
                             'SUBMISSION_PLAG_SCORE' => sprintf("%d%%", $submission['score']),
                             'SUBMISSION_PLAG_CLASS' => $plagClass,

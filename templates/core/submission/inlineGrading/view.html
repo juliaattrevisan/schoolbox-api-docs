@@ -76,7 +76,7 @@
 
 		<div class="clearfix"></div>
 
-		<h2>Assign marks ({OWNER_STATUS})</h2>
+		<h2>Assign marks</h2>
 
 		<!-- BEGIN student_row -->
 		<div class="inline-grading-marking">
@@ -85,19 +85,20 @@
 
 		<table class="table inline-grading-submission-list">
 			<colgroup>
-				<col width="160px"/>
 				<col width="30px" />
 				<col/>
-				<col width="105px"/>
+				<col width="105px" />
 			</colgroup>
 			<thead></thead>
 			<tbody>
 				<!-- BEGIN submission_row -->
 				<tr>
-					<td>{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
 					<td><img src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/></td>
 					<td>
-						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">{SUBMISSION_FILENAME}</a>
+						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">{SUBMISSION_FILENAME}</a><br />
+						{SUBMISSION_TIME} {SUBMISSION_AFTER_MARK}<br />
+						{SUBMISSION_TIME_DESCRIPTION}
+
 						<!-- BEGIN plag_enabled -->
 						<span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
 						<!-- END plag_enabled -->
