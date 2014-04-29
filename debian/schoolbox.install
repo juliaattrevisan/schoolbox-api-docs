@@ -5,6 +5,7 @@ tools/logrotate/* /etc/logrotate.d
 tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf
 tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf
 tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf
+tools/init/schoolbox-upstart-socketd.override /etc/init/schoolbox-socketd.override
 dav /usr/share/schoolbox
 include /usr/share/schoolbox
 library /usr/share/schoolbox
