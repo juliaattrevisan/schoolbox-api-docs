@@ -52,7 +52,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 		 * new attempt at getting the sessionResult
 		 */
 		if ($sessionResult->getMessage() != 'ok') {
-			$respawn = new \Etherpad\Lovecraft();
+			$respawn = new \Etherpad\Lovecraft($this);
 			$pad = $respawn->respawn($pad);
 
 			list($groupId, $padName) = explode('$', $pad->getPadId());
