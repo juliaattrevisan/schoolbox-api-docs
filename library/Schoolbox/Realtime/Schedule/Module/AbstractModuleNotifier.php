@@ -13,10 +13,9 @@ namespace Schoolbox\Realtime\Schedule\Module;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\External\TargetedMessage;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\TopicFactory;
 use Schoolbox\Realtime\Message\NS;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Realtime\Schedule\ScheduleException;
@@ -68,6 +67,8 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		}
 
 		$this->mapper = $m;
+
+		$this->namespace = NSMapper::getInstance()->findOneBySlug($this->getSlug());
 	}
 
 
@@ -136,6 +137,11 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	public function getNamespace() {
 		return $this->namespace;
 	}
+
+	/**
+	 * @return string
+	 */
+	protected abstract function getSlug();
 
 
 }
