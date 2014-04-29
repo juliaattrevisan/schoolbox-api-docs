@@ -63,10 +63,12 @@ if (is_numeric($this->arg[0])) {
 
 	if (is_array($userList)) {
         // set the advanced options to be shown by default since there is information in there
-        $this->setVar(array('SHOW_ADVANCED' => ' style="display: table-row;"',
-                            'OPAC_ADVANCED' => ' style="opacity: 1;"',
-                            'ADV_OFF'       => ' style="display:none"',
-                            'ADV_ON'        => ''));
+        $this->setVar(array(
+            'SHOW_ADVANCED' => ' style="display: table-row;"',
+            'OPAC_ADVANCED' => ' style="opacity: 1;"',
+            'ADV_OFF'       => ' style="display:none"',
+            'ADV_ON'        => '',
+        ));
 
         $userOut = array();
 		foreach ($userList as $user) {
@@ -74,25 +76,19 @@ if (is_numeric($this->arg[0])) {
                 'id'   => intval($user['id']),
                 'name' => $userHandler->formatName($user),
             );
-//			$userOut = array(
-//				'USER_ID' => $user['id'],
-//				'USER_NAME' => $userHandler->formatName($user),
-//			);
-//
-//			$this->setVar($userOut);
-//			$this->parse('current_users_block', 'current_users', true);
 		}
         $this->setVar('USER_LIST', json_encode($userOut));
 	}
 	else
 	{
         // no data in advanced options, hide them by default
-        $this->setVar(array('SHOW_ADVANCED' => '',
-                            'OPAC_ADVANCED' => '',
-                            'ADV_OFF'       => '',
-                            'ADV_ON'        => ' style="display:none"'));
-//		$this->setVar('current_users_block', '');
-        $this->setVar('USER_LIST', '[]');
+        $this->setVar(array(
+            'SHOW_ADVANCED' => '',
+            'OPAC_ADVANCED' => '',
+            'ADV_OFF'       => '',
+            'ADV_ON'        => ' style="display:none"',
+            'USER_LIST'     => '[]',
+        ));
 	}
 
 	$this->dropDown('topic_list', $newsHandler->getTopicList(), $news['item_topic_id'], TEMPLATE_content, array(
@@ -154,8 +150,11 @@ else {
 
 
     // set the advanced options to be hidden by default since there can't be any data in there
-    $this->setVar(array('SHOW_ADVANCED' => '',
-                        'OPAC_ADVANCED' => '',
-                        'ADV_OFF'       => '',
-                        'ADV_ON'        => ' style="display:none"'));
+    $this->setVar(array(
+        'SHOW_ADVANCED' => '',
+        'OPAC_ADVANCED' => '',
+        'ADV_OFF'       => '',
+        'ADV_ON'        => ' style="display:none"',
+        'USER_LIST'     => '[]',
+    ));
 }
