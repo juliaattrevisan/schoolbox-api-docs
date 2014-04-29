@@ -24,6 +24,10 @@ catch (\Exception $e) {
 	exit();
 }
 
+/* Check whether this pad record exists from a different environment
+ * e.g. copied pads from live environment to dev environment
+ */
+
 /* If you can participate, create a session and off you go
  */
 if ($authenticator->isParticipator($pad->getHomepageId())) {
