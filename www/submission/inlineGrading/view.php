@@ -74,7 +74,7 @@ for ($i=0; $i < count($stack); $i++) {
 
 				/* Stack it
 				 */
-				$currentStudent['submission'] = $submission;
+				$currentAugmented['submission'] = $submission;
 			}
 		}
 		else {
