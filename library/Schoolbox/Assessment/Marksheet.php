@@ -614,7 +614,7 @@ class Marksheet {
 							'WORK_TITLE' => $item['object']->getTitle(),
 							'WORK_ID'    => $item['object']->getId(),
 							'WORK_PATH'  => '/assess/results',
-							'WORK_TYPE'  => $item['object']->getWorkType()->getName()
+							'WORK_TYPE'  => 'Quiz'
 						));
 					}
 					elseif($item['object'] instanceof SubmissionBox) {

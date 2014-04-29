@@ -522,8 +522,8 @@ class Submission extends DeprecatedModel {
             SELECT
                 assess.assess_id AS id,
                 assess.category_id AS category,
-                lu_submission_type.id AS type_id,
-                lu_submission_type.name AS typeName,
+                11 AS type_id,
+                'Quiz' AS typeName,
                 assess.user_id AS owner,
                 UNIX_TIMESTAMP(assess.start) AS open,
                 UNIX_TIMESTAMP(assess.finish) AS date,
@@ -533,7 +533,6 @@ class Submission extends DeprecatedModel {
                 assess.created_at AS created,
                 assess.availability
             FROM assess
-            LEFT JOIN lu_submission_type ON lu_submission_type.id = assess.type
             WHERE category_id = '$categoryID'
             AND assess.deleted_at IS NULL
             $ownerCondB
