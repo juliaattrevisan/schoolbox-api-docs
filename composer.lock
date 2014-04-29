@@ -3,10 +3,10 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "d4035323f9cd80343aa1872147bdfeb8",
-    "hash": "ce56607f1e3d07d90155aabd494bd733",
+    "hash": "ac32ab140fca730079f52e5e3fc6a244",
     "packages": [
         {
+<<<<<<< HEAD
             "name": "aura/di",
             "version": "dev-develop-2",
             "source": {
@@ -210,10 +210,37 @@
                 "psr-4": {
                     "Aura\\Web\\": "src/",
                     "Aura\\Web\\_Config\\": "config/"
+=======
+            "name": "0x46616c6b/etherpad-lite-client",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/0x46616c6b/etherpad-lite-client.git",
+                "reference": "fa2f0fd185097bed6b371c2422c705d6a5d6f258"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/0x46616c6b/etherpad-lite-client/zipball/fa2f0fd185097bed6b371c2422c705d6a5d6f258",
+                "reference": "fa2f0fd185097bed6b371c2422c705d6a5d6f258",
+                "shasum": ""
+            },
+            "require": {
+                "guzzle/guzzle": "~3.7",
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*@stable"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "EtherpadLite": "src/"
+>>>>>>> 7e04be8... fix composer issoes [SB-3586]
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
+<<<<<<< HEAD
                 "BSD-2-Clause"
             ],
             "authors": [
@@ -229,6 +256,18 @@
                 "response"
             ],
             "time": "2014-04-01 20:12:34"
+=======
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Louis Miller",
+                    "email": "louis@systemli.org"
+                }
+            ],
+            "description": "PHP Client for Etherpad Lite",
+            "time": "2014-03-10 07:38:59"
+>>>>>>> 7e04be8... fix composer issoes [SB-3586]
         },
         {
             "name": "browscap/browscap-php",
@@ -387,46 +426,6 @@
             "time": "2012-05-30 15:01:08"
         },
         {
-            "name": "0x46616c6b/etherpad-lite-client",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/0x46616c6b/etherpad-lite-client.git",
-                "reference": "fa2f0fd185097bed6b371c2422c705d6a5d6f258"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/0x46616c6b/etherpad-lite-client/zipball/fa2f0fd185097bed6b371c2422c705d6a5d6f258",
-                "reference": "fa2f0fd185097bed6b371c2422c705d6a5d6f258",
-                "shasum": ""
-            },
-            "require": {
-                "guzzle/guzzle": "~3.7",
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "*@stable"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "EtherpadLite": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Louis Miller",
-                    "email": "louis@systemli.org"
-                }
-            ],
-            "description": "PHP Client for Etherpad Lite",
-            "time": "2014-03-10 07:38:59"
-        },
-        {
             "name": "ezyang/htmlpurifier",
             "version": "v4.5.0",
             "source": {
@@ -472,215 +471,17 @@
             "time": "2013-02-18 00:04:08"
         },
         {
-            "name": "guzzle/common",
-            "version": "v3.7.4",
-            "target-dir": "Guzzle/Common",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/common.git",
-                "reference": "5126e268446c7e7df961b89128d71878e0652432"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/common/zipball/5126e268446c7e7df961b89128d71878e0652432",
-                "reference": "5126e268446c7e7df961b89128d71878e0652432",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2",
-                "symfony/event-dispatcher": ">=2.1"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.7-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Guzzle\\Common": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Common libraries used by Guzzle",
-            "homepage": "http://guzzlephp.org/",
-            "keywords": [
-                "collection",
-                "common",
-                "event",
-                "exception"
-            ],
-            "time": "2013-10-02 20:47:00"
-        },
-        {
-            "name": "guzzle/http",
-            "version": "v3.7.4",
-            "target-dir": "Guzzle/Http",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/http.git",
-                "reference": "3420035adcf312d62a2e64f3e6b3e3e590121786"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/http/zipball/3420035adcf312d62a2e64f3e6b3e3e590121786",
-                "reference": "3420035adcf312d62a2e64f3e6b3e3e590121786",
-                "shasum": ""
-            },
-            "require": {
-                "guzzle/common": "self.version",
-                "guzzle/parser": "self.version",
-                "guzzle/stream": "self.version",
-                "php": ">=5.3.2"
-            },
-            "suggest": {
-                "ext-curl": "*"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.7-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Guzzle\\Http": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
-                }
-            ],
-            "description": "HTTP libraries used by Guzzle",
-            "homepage": "http://guzzlephp.org/",
-            "keywords": [
-                "Guzzle",
-                "client",
-                "curl",
-                "http",
-                "http client"
-            ],
-            "time": "2013-09-20 22:05:53"
-        },
-        {
-            "name": "guzzle/parser",
-            "version": "v3.7.4",
-            "target-dir": "Guzzle/Parser",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/parser.git",
-                "reference": "a25c2ddda1c52fb69a4ee56eb530b13ddd9573c2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/parser/zipball/a25c2ddda1c52fb69a4ee56eb530b13ddd9573c2",
-                "reference": "a25c2ddda1c52fb69a4ee56eb530b13ddd9573c2",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.7-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Guzzle\\Parser": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Interchangeable parsers used by Guzzle",
-            "homepage": "http://guzzlephp.org/",
-            "keywords": [
-                "URI Template",
-                "cookie",
-                "http",
-                "message",
-                "url"
-            ],
-            "time": "2013-07-11 22:46:03"
-        },
-        {
-            "name": "guzzle/stream",
-            "version": "v3.7.4",
-            "target-dir": "Guzzle/Stream",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/stream.git",
-                "reference": "a86111d9ac7db31d65a053c825869409fe8fc83f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/stream/zipball/a86111d9ac7db31d65a053c825869409fe8fc83f",
-                "reference": "a86111d9ac7db31d65a053c825869409fe8fc83f",
-                "shasum": ""
-            },
-            "require": {
-                "guzzle/common": "self.version",
-                "php": ">=5.3.2"
-            },
-            "suggest": {
-                "guzzle/http": "To convert Guzzle request objects to PHP streams"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.7-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Guzzle\\Stream": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
-                }
-            ],
-            "description": "Guzzle stream wrapper component",
-            "homepage": "http://guzzlephp.org/",
-            "keywords": [
-                "Guzzle",
-                "component",
-                "stream"
-            ],
-            "time": "2013-07-30 22:07:23"
-        },
-        {
             "name": "guzzle/guzzle",
-            "version": "v3.8.1",
+            "version": "v3.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "4de0618a01b34aa1c8c33a3f13f396dcd3882eba"
+                "reference": "b170b028c6bb5799640e46c8803015b0f9a45ed9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/4de0618a01b34aa1c8c33a3f13f396dcd3882eba",
-                "reference": "4de0618a01b34aa1c8c33a3f13f396dcd3882eba",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/b170b028c6bb5799640e46c8803015b0f9a45ed9",
+                "reference": "b170b028c6bb5799640e46c8803015b0f9a45ed9",
                 "shasum": ""
             },
             "require": {
@@ -718,19 +519,19 @@
                 "phpunit/phpunit": "3.7.*",
                 "psr/log": "1.0.*",
                 "symfony/class-loader": "*",
-                "zendframework/zend-cache": "<2.3",
-                "zendframework/zend-log": "<2.3"
+                "zendframework/zend-cache": "2.0.*",
+                "zendframework/zend-log": "2.0.*"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.8-dev"
+                    "dev-master": "3.7-dev"
                 }
             },
             "autoload": {
                 "psr-0": {
-                    "Guzzle": "src/",
-                    "Guzzle\\Tests": "tests/"
+                    "Guzzle\\Tests": "tests/",
+                    "Guzzle": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -759,7 +560,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2014-01-28 22:29:15"
+            "time": "2013-10-02 20:47:00"
         },
         {
             "name": "html2text/html2text",
@@ -1646,66 +1447,21 @@
             "time": "2014-02-11 13:52:09"
         },
         {
-            "name": "symfony/event-dispatcher",
-            "version": "v2.4.1",
-            "target-dir": "Symfony/Component/EventDispatcher",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/EventDispatcher.git",
-                "reference": "e3ba42f6a70554ed05749e61b829550f6ac33601"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/e3ba42f6a70554ed05749e61b829550f6ac33601",
-                "reference": "e3ba42f6a70554ed05749e61b829550f6ac33601",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "symfony/dependency-injection": "~2.0"
-            },
-            "suggest": {
-                "symfony/dependency-injection": "",
-                "symfony/http-kernel": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.4-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\EventDispatcher\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony EventDispatcher Component",
-            "homepage": "http://symfony.com",
-            "time": "2013-12-28 08:12:03"
-        },
-        {
             "name": "twig/twig",
             "version": "v1.15.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Twig.git",
+<<<<<<< HEAD
 
+=======
+                "reference": "27f3428b08c7f656d6824359a9d9dee3f5fce31b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fabpot/Twig/zipball/27f3428b08c7f656d6824359a9d9dee3f5fce31b",
+                "reference": "27f3428b08c7f656d6824359a9d9dee3f5fce31b",
+>>>>>>> 7e04be8... fix composer issoes [SB-3586]
                 "shasum": ""
             },
             "require": {
@@ -1729,10 +1485,13 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
                 },
                 {
                     "name": "Armin Ronacher",
+<<<<<<< HEAD
 <<<<<<< HEAD
                     "email": "armin.ronacher@active-4.com",
                     "role": "Project Founder"
@@ -1744,6 +1503,10 @@
 =======
                     "email": "armin.ronacher@active-4.com"
 >>>>>>> fe40d29... Add Etherpad capability [SB-3586]
+=======
+                    "email": "armin.ronacher@active-4.com",
+                    "role": "Project Founder"
+>>>>>>> 7e04be8... fix composer issoes [SB-3586]
                 }
             ],
             "description": "Twig, the flexible, fast, and secure template language for PHP",
@@ -2397,6 +2160,7 @@
         },
         {
             "name": "phpunit/phpunit",
+<<<<<<< HEAD
             "version": "4.0.14",
             "source": {
                 "type": "git",
@@ -2407,6 +2171,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a80b77d92a6c7723d77c6728b4ae37e92a65ac1d",
                 "reference": "a80b77d92a6c7723d77c6728b4ae37e92a65ac1d",
+=======
+            "version": "3.7.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/phpunit.git",
+                "reference": "83f9537e46346f75ed6925441ac259453213c7cc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/83f9537e46346f75ed6925441ac259453213c7cc",
+                "reference": "83f9537e46346f75ed6925441ac259453213c7cc",
+>>>>>>> 7e04be8... fix composer issoes [SB-3586]
                 "shasum": ""
             },
             "require": {
@@ -2468,7 +2244,11 @@
                 "testing",
                 "xunit"
             ],
+<<<<<<< HEAD
             "time": "2014-03-28 11:10:03"
+=======
+            "time": "2014-04-21 06:25:54"
+>>>>>>> 7e04be8... fix composer issoes [SB-3586]
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -3170,12 +2950,15 @@
         "shareworks/xml-security": 20,
         "react/stomp": 20,
         "browscap/browscap-php": 20,
+<<<<<<< HEAD
         "aura/di": 20,
         "aura/router": 20,
         "aura/web": 20,
         "aura/session": 20
         "browscap/browscap-php": 20
         "shareworks/xml-security": 20,
+=======
+>>>>>>> 7e04be8... fix composer issoes [SB-3586]
         "0x46616c6b/etherpad-lite-client": 20
     },
     "platform": [
