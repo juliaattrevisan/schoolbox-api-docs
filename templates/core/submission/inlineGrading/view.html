@@ -99,7 +99,7 @@
 
 		<div class="clearfix"></div>
 
-		<h2>Assign marks</h2>
+		<h2>Grade</h2>
 
 		<!-- BEGIN student_row -->
 		<div class="inline-grading-marking">
@@ -115,7 +115,7 @@
 			<thead></thead>
 			<tbody>
 				<!-- BEGIN submission_row -->
-				<tr>
+				<tr class="{SUBMISSION_SELECTED}">
 					<td><img src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/></td>
 					<td>
 						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">{SUBMISSION_FILENAME}</a><br />
@@ -131,7 +131,7 @@
 						<!-- BEGIN delete_action -->
 						<a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn no-text delete" title="Delete submission"><span></span></a>
 						<!-- END delete_action -->
-						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="btn no-text goto" title="Mark"><span></span></a>
+						<a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" class="btn no-text goto" title="View Submission"><span></span></a>
 					</td>
 				</tr>
 				<!-- END submission_row -->

@@ -1,19 +1,18 @@
-<h2>Upload File</h2>
-<p>
-	Upload the marked submission.
-</p>
+<h2>Return Work</h2>
+<div style="padding:16px">
+<p>Select and upload a file to return to the student.</p>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$j('.prettify').prettyFileInput({
 			inputHolderClass:'file-input not-static',
 			buttonClass:'btn up-arrow',
-			defaultText:'<span></span>Select marked work',
+			defaultText:'<span></span>Choose File',
 			defaultFileSelectedText:'<span></span>'
 		});
 	});
 </script>
-
 <input type="file" name="file" class="prettify"/>
-
 <div class="clearfix"></div>
+</div>
+

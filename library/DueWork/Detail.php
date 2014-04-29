@@ -232,7 +232,7 @@ class DueWork_Detail {
 					}
 					else {
 						$class = '';
-						$submissionTimeDescription = 'Submitted On TIme';
+						$submissionTimeDescription = 'Submitted On Time';
 					}
 
                     // needing to do this just to get the icon associated with an extension is slightly ridiculous
@@ -273,6 +273,7 @@ class DueWork_Detail {
                             'SUBMISSION_EXPANDABLE' => $this->getSubmissionType() == self::ACCEPT_MULTI
                                 ? 'hide expandable'
                                 : '',
+                            'SUBMISSION_SELECTED'   => $page->arg[2] == $submission['id']?'highlight':'',
                             'SUBMISSION_MIMEICON' => $icon
                         )
                     );

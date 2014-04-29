@@ -7576,15 +7576,49 @@ form.context {
 	tr {
 		td {
 			padding: 4px 0px;
+            word-break: break-word;
+            .no-text{
+                .transition(all 0.2s);
+                opacity: 0.3;
+                background-color: transparent;
+                border-color: transparent;
+            }
 		}
-	}
+    }
+    tr:hover > td .no-text {
+      opacity: 1;
+      border-color: @lgrey;
+      background: @dark;
+    }
+    tr.highlight {
+      background-color: lighten(@highlight-color,@lighten-value);
+    }
 }
 
 .inline-grading-marking {
+
+    padding-top: 7px;
+
+    .twolines {
+      visibility: hidden;
+      display: block;
+      font-size: 0;
+      content: " ";
+      clear: both;
+      height: 0;
+    }
+
 	textarea {
 		width: 100%;
-		height: 40px;
+		height: 6em;
+        margin-top: 6px;
+        margin-bottom: 6px;
 	}
+
+    input {
+      margin-bottom: 6px;
+    }
+
 }
 
 
@@ -7619,6 +7653,12 @@ form.context {
                     	height: 40px;
                         min-width: 200px;
                         float: right;
+                    }
+                    strong {
+                      display:none;
+                    }
+                    .twolines {
+                      display:none;
                     }
                 }
                 input, select {
@@ -8732,7 +8772,7 @@ ul.submission-list {
         .time { display: block; }
         .name { color: @body-text; }
         &:hover {
-            background-color: lighten(@positive-color,@lighten-value)
+            background-color: lighten(@highlight-color,@lighten-value)
         }
     }
     img {
