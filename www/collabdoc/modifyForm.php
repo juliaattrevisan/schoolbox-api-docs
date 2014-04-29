@@ -11,7 +11,7 @@
 $homepageId = $_POST['homepageId'];
 $name = $_POST['name'];
 
-$spawn = new \Etherpad\Lovecraft($this);
+$spawn = new \Etherpad\Spawnpoint($this);
 $newPad = $spawn->spawn($name, $homepageId);
 
 /* Go to edit screen for now

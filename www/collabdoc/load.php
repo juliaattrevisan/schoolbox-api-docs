@@ -38,7 +38,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 		$pad->setEnvironment(INSTANCE_ID);
 		$padMapper->save($pad);
 
-		$respawn = new \Etherpad\Lovecraft($this);
+		$respawn = new \Etherpad\Spawnpoint($this);
 		$pad = $respawn->respawn($pad);
 	}
 
@@ -66,7 +66,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 		 * new attempt at getting the sessionResult
 		 */
 		if ($sessionResult->getMessage() != 'ok') {
-			$respawn = new \Etherpad\Lovecraft($this);
+			$respawn = new \Etherpad\Spawnpoint($this);
 			$pad = $respawn->respawn($pad);
 
 			list($groupId, $padName) = explode('$', $pad->getPadId());

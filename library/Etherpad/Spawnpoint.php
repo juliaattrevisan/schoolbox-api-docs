@@ -1,6 +1,6 @@
 <?php
 /**
- * Lovecraft
+ * Spawnpoint
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,7 +11,7 @@
 namespace Etherpad;
 
 
-class Lovecraft {
+class Spawnpoint {
 
 	/**
 	 * The pad to respawn, from the local db
