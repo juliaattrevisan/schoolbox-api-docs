@@ -94,7 +94,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 				$data = $readonlyResult->getData();
 
 				if ($readonlyResult->getMessage() == 'ok') {
-					$this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showChat=false");
+					$this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showChat=false&showControls=false");
 				}
 			}
 		}

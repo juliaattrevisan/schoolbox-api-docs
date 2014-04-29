@@ -147,7 +147,9 @@ class Spawnpoint {
 		 */
 		$authenticator = new \Etherpad\Authenticator();
 
-		if ($authenticator->canCreate($pad->getHomepageId())) {
+		/* All people with read access can respawn a document
+		 */
+		if ($authenticator->isParticipator($pad->getHomepageId())) {
 
 			/* Make life a bit easier for Etherpad by using a hashed version
 			 * of the name, rather than let it get urlencoded in some strange
