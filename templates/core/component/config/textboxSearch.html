@@ -1,14 +1,27 @@
-<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript">
-
     $j(function () {
-        $j('#textbox_search{COMPONENT_TEXTBOX_ID}').userSelector({
-            plugin: {
-                data:'/ajax/textbox.php',
-                width:275
+        $j('#textbox_search{COMPONENT_TEXTBOX_ID}').selectizeSelector({
+            ajax: {
+                url:      '/ajax/textbox.php',
+                type:     'GET',
+                data:     {},
+                dataType: 'json'
             },
-            formElement: $j('#textboxSearch{COMPONENT_TEXTBOX_ID}')
-        });
+            value: {
+                id:   $j("#textboxSearch{COMPONENT_TEXTBOX_ID}").val(),
+                name: $j("#textbox_search{COMPONENT_TEXTBOX_ID}").val()
+            }
+        })
+        .on('selectize.item_add', function(event, value) {
+            $j('#textboxSearch{COMPONENT_TEXTBOX_ID}').val(value)
+        })
+        .on('selectize.item_remove', function() {
+            $j('#textboxSearch{COMPONENT_TEXTBOX_ID}').val('')
+        })
     });
 </script>
 

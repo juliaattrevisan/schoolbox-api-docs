@@ -1,20 +1,32 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
-<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
 $j(document).ready(function () {
     var options = {
-        plugin: {
-            data:'/ajax/user.php?groupID=0&email=1',
-            allowFreeEntries: true
+        ajax: {
+            url:      '/ajax/user.php',
+            type:     'GET',
+            data:     {groupID: 0, email: 1},
+            dataType: 'json'
         },
-        onePerLine: false,
-        multiple: true
+        multiple: true,
+        selectize: {
+            plugins: ['remove_button', 'restore_on_backspace'],
+            create: function(input) {
+                var freeEntry = {};
+                freeEntry[this.settings.valueField]  = input;
+                freeEntry[this.settings.searchField] = input;
+                return freeEntry;
+            }
+        }
     }
-    var to  = $j('#to').userSelector($j.extend({}, options, {value: {REPLYTO}}))
-    var cc  = $j('#cc').userSelector(options)
-    var bcc = $j('#bcc').userSelector($j.extend({}, options, {value: {BCC}}))
+    $j('#to').selectizeSelector($j.extend({}, options, {value: {REPLYTO}}))
+    $j('#cc').selectizeSelector(options)
+    $j('#bcc').selectizeSelector($j.extend({}, options, {value: {BCC}}))
 });
 
 tinyMCE.init({
@@ -62,16 +74,16 @@ function verify()
   <table class="table">
     <tr>
       <td class="formLabelWidth"><h4>To:</h4></td>
-	  <td><input type="text" name="to" id="to" size="90" value="" /></td>
+	  <td><input name="to" id="to" size="90" /></td>
     </tr>
     <tr>
       <td><h4>CC:</h4></td>
-	  <td><input type="text" name="cc" id="cc" size="90" /></td>
+	  <td><input name="cc" id="cc" size="90" /></td>
     </tr>
     <tr>
       <td><h4>BCC:</h4>
 	  </td>
-	  <td><input type="text" name="bcc" id="bcc" size="90" value="" /></td>
+	  <td><input name="bcc" id="bcc" size="90" /></td>
     </tr>
     <tr>
       <td><h4>Subject:</h4>

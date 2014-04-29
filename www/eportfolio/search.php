@@ -10,7 +10,7 @@
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $return = array();
-if (isset($_POST['query']) && strlen($_POST['query']) && isset($_GET['groupID']) && strlen($_GET['groupID'])) {
+if (isset($_GET['query']) && strlen($_GET['query']) && isset($_GET['groupID']) && strlen($_GET['groupID'])) {
     $groupIds = $_GET['groupID'];
 
     /* Allow for multiple groups search via autocompletes
@@ -24,7 +24,7 @@ if (isset($_POST['query']) && strlen($_POST['query']) && isset($_GET['groupID'])
 
     $userMapper = new Schoolbox\UserMapper();
 
-    $allStudents = $userMapper->findByNameAndGroup($_POST['query'], $groupIdArray);
+    $allStudents = $userMapper->findByNameAndGroup($_GET['query'], $groupIdArray);
 
     if ($allStudents->count()) {
         foreach($allStudents as $currentStudent) {

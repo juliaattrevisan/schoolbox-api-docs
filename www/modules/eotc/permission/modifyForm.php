@@ -19,19 +19,7 @@ if (!$_SESSION['user']->isSuperuser()) {
 $userMapper = new \Schoolbox\UserMapper();
 
 try {
-	/* -_- magicsuggest sends this back at you in json_encoded format
-	 * or as an int - i.e. there are two formats:
-	 *
-	 * [151]
-	 * 151
-	 */
-	if (is_numeric($_POST['staff'])) {
-		$user = $userMapper->findById($_POST['staff']);
-	}
-	else {
-		$wtf = json_decode($_POST['staff']);
-		$user = $userMapper->findById($wtf[0]);
-	}
+	$user = $userMapper->findById($_POST['staff']);
 }
 catch (\Exception $e) {
 	error(31);

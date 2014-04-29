@@ -134,27 +134,22 @@
 
 </script>
 
-<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
-<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type='text/javascript'>
     $j(function() {
-        var selector = $j('#addIndividualPermission')
-        selector.userSelector({
-            plugin: {
-                data:  '/eportfolio/search.php?groupID={STUDENT_GROUP_IDS}',
-                width: 275
-            },
+        $j('#addIndividualPermission').selectizeSelector({
             multiple: true,
-            value: {USER_LIST}
-        });
-        // Resize the individual permission selector when the permissions page
-        // gets switched to (otherwise, it's zero)
-        $j('#tabs-homepage').on('tabsactivate', function(event, ui) {
-            if (ui.newPanel.is('#tabs-4')) {
-                var suggest = selector.data('magicSuggest')
-                suggest.container.height(suggest.selectionContainer.height())
+            value: {USER_LIST},
+            ajax: {
+                url:      '/eportfolio/search.php',
+                type:     'GET',
+                data:     {groupID: '{STUDENT_GROUP_IDS}'},
+                dataType: 'json'
             }
-        });
+        })
     });
 </script>
 <!-- END custom_head -->
@@ -468,7 +463,7 @@
 						</td>
 						<td>
 							<p>
-								<input id='addIndividualPermission' type='text' value='' />
+								<select id='addIndividualPermission' name="individual_permission[]" multiple></select>
 							</p>
 						</td>
 					</tr>

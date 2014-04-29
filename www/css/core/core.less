@@ -1,8 +1,6 @@
 @import (less) url("../../javascript/components/jquery.ui/dist/jquery-ui.css");
 @import (inline) url("../../javascript/components/magnific-popup/dist/magnific-popup.css");
-@import (inline) url("../../javascript/components/magicsuggest/src/magicsuggest-1.3.1.css");
 @import url("jquery-ui.customisation.less");
-@import url("magicsuggest.customisation.less");
 @import (inline) url("magnific-popup.customisation.css");
 
 
@@ -11150,24 +11148,6 @@ th.rotate {
 			.gradient(lighten(@positive-color,@lighten-value * 2),lighten(@positive-color,@lighten-value));
 		}
 	}
-}
-
-// Overrides for MagicSuggest settings
-// Remove the padding for the trigger if it's hidden. (why the plugin doesn't do this I don't know)
-.ms-ctn.no-trigger {
-    .ms-sel-ctn {
-        padding-right: 0;
-    }
-}
-// This option shows each selection on a new line.
-.ms-ctn.one-per-line {
-    input, .ms-sel-item {
-        clear: both;
-    }
-}
-// Make sure that highlighted text shows inline at all times (instead of as a block)
-.ms-res-ctn .ms-res-item em {
-    display: inline;
 }
 
 textarea.event-detail {

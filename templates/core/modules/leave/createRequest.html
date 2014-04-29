@@ -1,5 +1,8 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript">
 $j(function() {
 
@@ -32,26 +35,25 @@ $j(function() {
 		}
 	});
 
-	<!-- BEGIN student_autocomplete_javascript -->
-    var options = {
-        data:'/ajax/user.php?groupID={STUDENT_GROUP_IDS}',
-        allowFreeEntries: false,
-        hideTrigger: true,
-        minChars: 2,
-        width: 200,
-        maxSelection: 1,
-		name: 'user'
-    }
-    var ms = $j('#user').magicSuggest(options)
-    $j(ms).on('selectionchange', function(event, combo, selection) {
-        if (selection.length) {
-            $j('#userID').val(selection[0].id);
-        }
-        else {
-            $j('#userID').val('');
-        }
-    });
-	<!-- END student_autocomplete_javascript -->
+	//<!-- BEGIN student_autocomplete_javascript -->
+
+	$j('#user')
+		.selectizeSelector({
+			ajax: {
+				url:      '/ajax/user.php',
+				type:     'GET',
+				data:     {groupID: "{STUDENT_GROUP_IDS}"},
+				dataType: 'json'
+			}
+		})
+		.on('selectize.item_add', function(event, value) {
+			$j('#userId').val(value)
+		})
+		.on('selectize.item_remove', function() {
+			$j('#userId').val('')
+		})
+
+	//<!-- END student_autocomplete_javascript -->
 
 	/**
 	 * LeaveRequest

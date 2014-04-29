@@ -1,26 +1,30 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/magicsuggest/src/magicsuggest-1.3.1.js"></script>
-<script type="text/javascript" src="/javascript/jquery.userSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 $j(function() {
 
-    $j('#modify').userSelector({
-        plugin: {
-            data:'/ajax/user.php?groupID=0',
-            width: 200
-        },
-        formElement: $j('#user-to-mod')
-    })
-    .data('magicsuggest').on('selectionchange', function(event, combo, selection) {
-        if (selection.length) {
+    $j('#modify')
+        .selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: 0},
+                dataType: 'json'
+            }
+        })
+        .on('selectize.item_add', function(event, value) {
+            $j('#user-to-mod').val(value)
             $j('#modify-user-button').removeClass('disabled').focus();
-        }
-        else {
+        })
+        .on('selectize.item_remove', function() {
+            $j('#user-to-mod').val('')
             $j('#modify-user-button').addClass('disabled');
-        }
-    });
+        })
 
     var openModifyScreen = function(event) {
         event.preventDefault();
@@ -61,10 +65,10 @@ $j(function() {
 		<div class="half">
 			<div class="level green clearfix">
 				<h4>Modify User</h4>
-				<form id="modify-user" action="" method="post" class="float-left clearfix">
+				<form id="modify-user" action="" method="post" class="clearfix">
 					<input type="text" id="modify">
 					<input type="hidden" id="user-to-mod">
-					<a id="modify-user-button" class="btn modify float-left next-to-input disabled" href="#"><span></span>Modify</a>
+					<a id="modify-user-button" class="btn modify next-to-input disabled" href="#"><span></span>Modify</a>
 				</form>
 				<a class="btn add center-it" href="/adminv2/modify-user/"><span></span>Add User</a>
 			</div>

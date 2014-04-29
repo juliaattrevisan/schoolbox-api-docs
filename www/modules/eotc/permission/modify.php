@@ -23,6 +23,10 @@ $this->setVar(array(
 	'permission_block' => ''
 ));
 
+// Set staff group IDs into the magicsuggest.
+$groupHandler = new Group();
+$this->setVar('STAFF_GROUP_TYPE_IDS', implode(';', $groupHandler->getStaffGroupTypeIds()));
+
 /* Edit existing permissions for someone
  */
 $userMapper = new \Schoolbox\UserMapper();

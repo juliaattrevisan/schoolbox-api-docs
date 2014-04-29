@@ -91,16 +91,13 @@ try {
                     }
                 } else {
                     if ($method == 'processCreate') {
-						$data = $leaveController->preprocessPost();
-                        $leaveController->processCreateRequest($data);
+                        $leaveController->processCreateRequest($_POST);
                     } else {
                         if ($method == 'processModify') {
-							$data = $leaveController->preprocessPost();
-                            $leaveController->processModifyRequest($data);
+                            $leaveController->processModifyRequest($_POST);
                         } else {
                             if ($method == 'processModifyList') {
-								$data = $leaveController->preprocessPost();
-                                $leaveController->processModifyRequestList($data);
+                                $leaveController->processModifyRequestList($_POST);
                             } else {
                                 if ($method == 'test') {
                                     $leaveController->executeEmailTest();
