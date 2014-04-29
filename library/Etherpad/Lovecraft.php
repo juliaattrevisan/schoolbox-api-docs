@@ -50,6 +50,7 @@ class Lovecraft {
 	 *
 	 * @param $name
 	 * @param $homepageId
+	 * @return \Etherpad\Pad
 	 * @throws \Exception
 	 */
 	public function spawn($name, $homepageId) {
@@ -116,9 +117,7 @@ class Lovecraft {
 					$padMapper = new \Etherpad\PadMapper();
 					$padMapper->save($newPad);
 
-					/* Go to edit screen for now
-					 */
-					$this->getPage()->localRedir("/collabdoc/modify/{$newPad->getId()}/{$homepageId}");
+					return $newPad;
 				}
 				else {
 					throw new \Exception('Something strange happened when creating a new pad');

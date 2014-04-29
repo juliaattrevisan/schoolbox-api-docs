@@ -24,13 +24,23 @@ catch (\Exception $e) {
 	exit();
 }
 
-/* Check whether this pad record exists from a different environment
- * e.g. copied pads from live environment to dev environment
- */
-
 /* If you can participate, create a session and off you go
  */
 if ($authenticator->isParticipator($pad->getHomepageId())) {
+
+	/* Check whether this pad record exists from a different environment
+	 * e.g. copied pads from live environment to dev environment
+	 *
+	 * Update the environment value so it's in the current environment
+	 * then continue on as normal
+	 */
+	if (!$pad->isExistsInCurrentEnvironment()) {
+		$pad->setEnvironment(INSTANCE_ID);
+		$padMapper->save($pad);
+
+		$respawn = new \Etherpad\Lovecraft($this);
+		$pad = $respawn->respawn($pad);
+	}
 
 	/* Find the author id
 	 */
@@ -72,7 +82,6 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 
 			/* Remember last updated time
 			 */
-			$padMapper = new \Etherpad\PadMapper();
 			$pad = $padMapper->findByColumn('pad_id', $pad->getPadId())->first();
 			$pad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 			$padMapper->save($pad);
