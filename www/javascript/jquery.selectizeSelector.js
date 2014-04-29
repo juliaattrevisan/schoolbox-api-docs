@@ -21,6 +21,7 @@
                 dataType: 'json'
             },
             selectize: {
+                plugins: ['remove_button'],
                 create: false,
                 hideSelected: true,
                 createOnBlur: true,
