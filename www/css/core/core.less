@@ -7599,13 +7599,21 @@ form.context {
 
     padding-top: 7px;
 
-    .twolines {
+    .twolines { /* clear fix to put comment box on second line */
       visibility: hidden;
       display: block;
       font-size: 0;
       content: " ";
       clear: both;
       height: 0;
+    }
+
+    .rubric-edit { /* hide rubric marking options */
+      display: none !important;
+    }
+
+    #rubricmark { /* hide rubric marking options */
+      display: none;
     }
 
 	textarea {
