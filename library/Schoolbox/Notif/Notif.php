@@ -320,6 +320,13 @@ class Notif implements LoggerInterface {
 		return $this->log($level, $message, $context);
 	}
 
+
+	/**
+	 * @param mixed $level
+	 * @param string $message
+	 * @param array $context
+	 * @return bool
+	 */
 	public function log($level, $message, array $context = array()) {
 		$log = new Logger($this->topic, $this->getHandlers());
 		try {
@@ -336,7 +343,7 @@ class Notif implements LoggerInterface {
 	 *
 	 * @param $message
 	 * @param array $context
-	 * @return mixed
+	 * @return bool
 	 */
 	public function debug($message, array $context = array()) {
 		return $this->log(Logger::DEBUG, $message, $context);
@@ -347,7 +354,7 @@ class Notif implements LoggerInterface {
 	 *
 	 * @param $message
 	 * @param array $context
-	 * @return mixed
+	 * @return bool
 	 */
 	public function info($message, array $context = array()) {
 		return $this->log(Logger::INFO, $message, $context);
@@ -358,7 +365,7 @@ class Notif implements LoggerInterface {
 	 *
 	 * @param $message
 	 * @param array $context
-	 * @return mixed
+	 * @return bool
 	 */
 	public function notice($message, array $context = array()) {
 		return $this->log(Logger::NOTICE, $message, $context);
@@ -370,7 +377,7 @@ class Notif implements LoggerInterface {
 	 *
 	 * @param $message
 	 * @param array $context
-	 * @return mixed
+	 * @return bool
 	 */
 	public function warning($message, array $context = array()) {
 		return $this->log(Logger::WARNING, $message, $context);
@@ -381,7 +388,7 @@ class Notif implements LoggerInterface {
 	 *
 	 * @param $message
 	 * @param array $context
-	 * @return mixed
+	 * @return bool
 	 */
 	public function error($message, array $context = array()) {
 		return $this->log(Logger::ERROR, $message, $context);
@@ -393,7 +400,7 @@ class Notif implements LoggerInterface {
 	 *
 	 * @param $message
 	 * @param array $context
-	 * @return mixed
+	 * @return bool
 	 */
 	public function critical($message, array $context = array()) {
 		return $this->log(Logger::CRITICAL, $message, $context);
@@ -405,7 +412,7 @@ class Notif implements LoggerInterface {
 	 *
 	 * @param $message
 	 * @param array $context
-	 * @return mixed
+	 * @return bool
 	 */
 	public function alert($message, array $context = array()) {
 		return $this->log(Logger::ALERT, $message, $context);
@@ -416,7 +423,7 @@ class Notif implements LoggerInterface {
 	 *
 	 * @param $message
 	 * @param array $context
-	 * @return mixed
+	 * @return bool
 	 */
 	public function emergency($message, array $context = array()) {
 		return $this->log(Logger::EMERGENCY, $message, $context);
