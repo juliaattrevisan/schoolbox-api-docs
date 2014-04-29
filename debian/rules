@@ -61,6 +61,12 @@ override_dh_install:
 	rm -fR sql/modules/resource
 	cp -a --parents library/Schoolbox/ResourceBooking $(CURDIR)/resource
 	rm -fR library/Schoolbox/ResourceBooking
+	cp -a --parents library/Calendar/Api/EventType/ResourceBooking $(CURDIR)/resource
+	rm -fR library/Calendar/Api/EventType/ResourceBooking
+	cp -a --parents library/Calendar/Event/Type/ResourceBooking.php $(CURDIR)/resource
+	rm -fR library/Calendar/Event/Type/ResourceBooking.php
+	cp -a --parents library/Calendar/Event/Type/ResourceBooking $(CURDIR)/resource
+	rm -fR library/Calendar/Event/Type/ResourceBooking
 	## End Resource Module
 	# Install submodules using composer
 	tools/composer.sh --no-dev
