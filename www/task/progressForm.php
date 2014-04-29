@@ -60,7 +60,7 @@ if (!$permissionDenied) {
     elseif (isset($_POST['current_status'])) {
         switch ($_POST['current_status']) {
             case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
-                $newStatus = Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION;
+                $newStatus = Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE;
                 break;
             case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
                 $newStatus = Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE;

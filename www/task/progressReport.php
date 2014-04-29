@@ -271,9 +271,9 @@ foreach ($task_list as $task) {
 $this->parse('subheader_unit_block', 'subheader_unit', true);
 
 $status_list = array(
-    Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE => 'Incomplete',
-    Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => 'Pending',
-    Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE => 'Complete',
+    Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE => array('text'=>'Incomplete','class'=>'incomplete'),
+    Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION => array('text'=>'Self Assessed','class'=>'pending'),
+    Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE => array('text'=>'Complete','class'=>'complete'),
 );
 
 // The students
@@ -376,8 +376,8 @@ foreach ($student_list as $student) {
         else {
             $this->setVar(
                 array(
-                    'STUDENT_UNIT_TASK_STATUS_TEXT'  => $status_list[$student_status],
-                    'STUDENT_UNIT_TASK_STATUS_CLASS' => strtolower($status_list[$student_status]),
+                    'STUDENT_UNIT_TASK_STATUS_TEXT'  => $status_list[$student_status]['text'],
+                    'STUDENT_UNIT_TASK_STATUS_CLASS' => $status_list[$student_status]['class'],
                     'STUDENT_UNIT_TASK_STATUS'       => $student_status,
                 )
             );
