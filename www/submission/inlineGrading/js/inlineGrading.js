@@ -146,7 +146,7 @@
 			/* Do some preprocessing first by indicating which people
 			 * can be selected from the dropdown
 			 */
-			merged.items = setSelectableElements(merged.items, merged.disabled);
+			merged.items = setSelectableElements(merged.useDisabled, merged.items, merged.disabled);
 
 			return merged;
 		}
@@ -156,7 +156,7 @@
 		 *
 		 * @returns {Array}
 		 */
-		function setSelectableElements(items, disabledItems) {
+		function setSelectableElements(useDisabled, items, disabledItems) {
 			var selectableElements = [];
 
 			/* Filter out everyone who has not submitted
@@ -164,11 +164,16 @@
 			for (var i = 0; i < items.length; i++) {
 				var updatedObject = items[i];
 
-				if (jQuery.inArray(updatedObject.navigation.id, disabledItems) < 0) {
-					updatedObject.selectable = true;
+				if (useDisabled == true) {
+					if (jQuery.inArray(updatedObject.navigation.id, disabledItems) < 0) {
+						updatedObject.selectable = true;
+					}
+					else {
+						updatedObject.selectable = false;
+					}
 				}
 				else {
-					updatedObject.selectable = false;
+					updatedObject.selectable = true;
 				}
 
 				selectableElements.push(updatedObject);
@@ -192,6 +197,7 @@
 			 */
 			for (var i = 0; i < config.items.length; i++) {
 				if (config.currentId == config.items[i].navigation.id) {
+
 					index = i;
 
 					/* Construct link
