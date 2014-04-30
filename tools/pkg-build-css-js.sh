@@ -1,0 +1,31 @@
+#!/bin/bash
+# Builds all CSS and Javascript for provisioning and packaging
+# Description
+#       Installs dependencies for CSS and JS build process
+#       Builds all JS and CSS
+#
+# Usage:
+#       pkg-build-css-js.sh
+#
+# @author      Sam Bailey <sam.bailey@alaress.com.au>
+# @copyright   2014 Alaress Pty Ltd
+# @link        http://www.alaress.com.au
+#
+#
+
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*}
+instdir=`readlink -f $fullpath/../`;
+PATH="$PATH:$instdir/node_modules/.bin";
+
+# Installing NPM dependencies
+npm install;
+
+# Installing and building Bower submodules
+grunt bower build.deps;
+
+# Building JS files via UglifyJS
+grunt build.js;
+
+# Building CSS files via LessCSS
+grunt build.css;

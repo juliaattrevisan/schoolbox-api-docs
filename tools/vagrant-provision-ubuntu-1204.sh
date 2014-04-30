@@ -62,6 +62,7 @@ mkdir /var/lib/vagrant -p > /dev/null;
 /vagrant/tools/update-sql.sh;
 rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -R /var/lib/vagrant > /dev/null;
+rm -f /vagrant/www/conf/pre*conf.php;
 
 echo "$vag Generating data dir sql fixes";
 cp -f /home/vagrant/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
@@ -107,20 +108,16 @@ cp -f /home/vagrant/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 echo "$vag Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
-echo "$vag Installing NPM dependencies";
-npm install
-
-echo "$vag Installing and building Bower submodules";
-grunt bower build.deps
-
-echo "$vag Building JS files via UglifyJS";
-grunt build.js
-
-echo "$vag Building CSS files via LessCSS";
-grunt build.css
+echo "$vag Building CSS and JS";
+/vagrant/tools/pkg-build-css-js.sh;
 
 echo "$vag Starting watcher for changes to CSS files";
 grunt --no-color watch > /vagrant/data/watch.output.txt &
+
+echo "$vag Enabling modules";
+/vagrant/tools/module.sh enable mobile;
+/vagrant/tools/module.sh enable leave;
+/vagrant/tools/module.sh enable resource;
 
 echo "$vag Loading all demo data complete";
 

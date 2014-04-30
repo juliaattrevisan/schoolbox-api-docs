@@ -12,13 +12,13 @@ INSERT INTO `config`(
 )
 VALUES (
   'resource_booking_enabled',
-  '1',
+  '0',
   'Enable Resource Booking Module',
   'Is the resource booking system enabled?',
   3, -- boolean
   '',
   11, -- modules
   'false',
-  'true',
+  'false',
   'false'
 );

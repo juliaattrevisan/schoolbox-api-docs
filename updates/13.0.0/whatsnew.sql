@@ -1,1 +1,0 @@
-UPDATE `component_definition` SET `name` = 'What\'s New' WHERE `name` = 'Activity';

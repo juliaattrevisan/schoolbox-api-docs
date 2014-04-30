@@ -1,1 +1,0 @@
-ALTER TABLE `submission_box` CHANGE `description` `description` TEXT CHARSET utf8 COLLATE utf8_general_ci NOT NULL;

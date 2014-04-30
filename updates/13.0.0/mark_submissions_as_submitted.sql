@@ -1,1 +1,0 @@
-INSERT INTO `submission_errors` (`code`, `display_as`) VALUES ('S', 'Submitted');

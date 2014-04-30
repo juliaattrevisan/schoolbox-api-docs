@@ -1,1 +1,0 @@
-ALTER TABLE `rubric_criterion` CHANGE `name` `name` VARCHAR(250)

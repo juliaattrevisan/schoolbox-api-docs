@@ -2,9 +2,7 @@
 www/conf/* /etc/schoolbox/examples
 tools/cron/* /etc/cron.d
 tools/logrotate/* /etc/logrotate.d
-tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf
-tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf
-tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf
+tools/init/* /etc/init
 dav /usr/share/schoolbox
 include /usr/share/schoolbox
 library /usr/share/schoolbox
@@ -14,3 +12,4 @@ tools /usr/share/schoolbox
 updates /usr/share/schoolbox
 www /usr/share/schoolbox
 vendor /usr/share/schoolbox
+conf /usr/share/schoolbox

@@ -55,24 +55,43 @@ override_dh_install:
 	cp -a --parents library/Schoolbox/Mobile $(CURDIR)/mobile
 	rm -fR library/Schoolbox/Mobile
 	## End Mobile Module
+	## Resource Module
+	mkdir -pv $(CURDIR)/resource
+	cp -a --parents sql/modules/resource $(CURDIR)/resource
+	rm -fR sql/modules/resource
+	cp -a --parents library/Schoolbox/ResourceBooking $(CURDIR)/resource
+	rm -fR library/Schoolbox/ResourceBooking
+	cp -a --parents library/Calendar/Api/EventType/ResourceBooking $(CURDIR)/resource
+	rm -fR library/Calendar/Api/EventType/ResourceBooking
+	cp -a --parents library/Calendar/Event/Type/ResourceBooking.php $(CURDIR)/resource
+	rm -fR library/Calendar/Event/Type/ResourceBooking.php
+	cp -a --parents library/Calendar/Event/Type/ResourceBooking $(CURDIR)/resource
+	rm -fR library/Calendar/Event/Type/ResourceBooking
+	## End Resource Module
 	# Install submodules using composer
 	tools/composer.sh --no-dev
-	# Install JS modules using bower
-	tools/bower.sh
+	# Install grunt
+	npm install grunt-cli
+	# Build and install CSS and JS using grunt/bower
+	tools/pkg-build-css-js.sh
 	# Cleanup live vs dev files and information
 	tools/pkg-live-vs-dev.sh schoolbox
 	# Remove non-deployable files and folders
+	rm -fR behat.yml
+	rm -fR bower.json
+	rm -fR composer.*
+	rm -fR Gruntfile.js
+	rm -fR node_modules
+	rm -fR package.json
 	rm -fR phpunit.xml
 	rm -fR README.md
+	rm -fR *.log
 	rm -fR test
-	rm -fR Vagrantfile
 	rm -fR tools/vagrant*
 	rm -fR tools/pkg-*
-	rm -fR composer*
-	rm -fR tools/major-updater.sh
-	rm -fR tools/minor-updater.sh
 	rm -fR tools/composer*
 	rm -fR www/test
+	rm -fR Vagrantfile
 	# Start install
 	dh_install
 	# Auto build the sql update scripts
@@ -82,7 +101,7 @@ override_dh_install:
 	# Remove moved files
 	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
 	# Build css files from less
-	debian/schoolbox/usr/share/schoolbox/tools/build-less-css.sh -v
+	#debian/schoolbox/usr/share/schoolbox/tools/build-less-css.sh -v
 
 override_dh_fixperms:
 	dh_fixperms -X var/lib/schoolbox
