@@ -179,6 +179,11 @@ if (!empty($subList) && is_array($subList)) {
             $closeString = $closeADF->getUsingFormat($formatDateTime);
         }
 
+        $this->setVar(array(
+            'ASSESS_START_TIMESTAMP' => $openADF->getUnixTimestamp(),
+            'ASSESS_FINISH_TIMESTAMP' => $closeADF->getUnixTimestamp(),
+        ));
+
         if (($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) /*&& ($sub['availability'] == 'assess')*/) {
             $this->setVar(array(
                 'ASSESS_ASSESS_ID' => $sub['id'],
@@ -226,6 +231,11 @@ if (!empty($subList) && is_array($subList)) {
                 'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
                 'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility']),
             ));
+
+            // Don't include in start sorts if it doesn't accept submissions
+            if (!$sub['accept_submission']) {
+                $this->setVar('ASSESS_START_TIMESTAMP', 0);
+            }
 
             $this->setVar('onlineAssessment_block', '');
 
