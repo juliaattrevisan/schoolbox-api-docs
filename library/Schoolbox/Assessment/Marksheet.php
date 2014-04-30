@@ -143,6 +143,7 @@ class Marksheet {
 		$this->year = $year;
 		$this->semester = $semester;
 
+		/** @var Collection|User[] $studentCollection */
 		$studentCollection = new Collection();
 
 		// Get students from the external DB, and put into student collection
@@ -191,6 +192,19 @@ class Marksheet {
 			$extIds[] = $studentData['uid'];
 		}
 		$studentCollection->merge($this->userMapper->findByColumn('id', $extIds));
+
+		// Remove duplicates from $studentCollection
+		$newCollection = new Collection();
+		$addedIds      = array();
+		foreach ($studentCollection as $student) {
+			$studentId = $student->getId();
+			if (!array_key_exists($studentId, $addedIds)) {
+				$newCollection->add($student);
+				$addedIds[$studentId] = true;
+			}
+		}
+		$studentCollection = $newCollection;
+		unset($newCollection);
 
 		if(is_array($workList)) {
 			$statData = array();
