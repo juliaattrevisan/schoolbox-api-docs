@@ -27,6 +27,7 @@
  *******/
 
 (function($) {
+    "use strict";
     $.fn.prettyFileInput = function(options) {
         var defaults = {
             inputHolderClass: 'file-input',
@@ -39,30 +40,52 @@
             callback: false
 
         };
-        var options = $.extend(defaults, options);
+        options = $.extend({}, defaults, options);
 
         return this.each(function() {
 
             var obj = $(this);
 
-            obj.wrap('<span class="' + options.inputHolderClass + '"></span>');
-            obj.after('<span class="' + options.buttonClass + ' ' + options.additionalButtonClasses + '">' + options.defaultText + '</span>');
+            // Whenever the button is redrawn - trigger this event.
+            // It resizes the file input to match the size of its container.
+            obj.on('redraw.prettyFileInput', function() {
+                var element   = $(this)
+                var container = element.parent()
+                element
+                    .width(container.width())
+                    .height(container.height())
+            })
 
-            obj.bind('change focus click', function() {
+            obj.wrap(
+                $('<span />')
+                    .addClass(options.inputHolderClass)
+            );
+            obj.after(
+                $('<span />')
+                    .addClass(options.buttonClass + ' ' + options.additionalButtonClasses)
+                    .html(options.defaultText)
+            );
+            obj.trigger('redraw.prettyFileInput')
 
-                $val = obj.val();
+            obj.bind('change.prettyFileInput focus.prettyFileInput click.prettyFileInput', function() {
 
-                valArray = $val.split('\\');
-                newVal = valArray[valArray.length - 1];
-                $button = obj.siblings('.' + options.buttonClass.replace(' ', '.') + '');
-                $fakeHolder = obj.siblings('.' + options.fakeFileHolderClass + '');
+                var $val = obj.val();
+
+                var valArray = $val.split('\\');
+                var newVal = valArray[valArray.length - 1];
+                var $button = obj.siblings('.' + options.buttonClass.replace(' ', '.') + '');
+                var $fakeHolder = obj.siblings('.' + options.fakeFileHolderClass + '');
 
                 if (newVal !== '') {
                     $button.addClass(options.buttonActiveClass).html(options.defaultFileSelectedText);
                 }
 
                 if ($fakeHolder.length === 0) {
-                    obj.parent().append('<span class="'+options.fakeFileHolderClass+'">' + newVal + '</span>');
+                    obj.parent().append(
+                        $('<span />')
+                            .addClass(options.fakeFileHolderClass)
+                            .text(newVal)
+                    )
                 } else {
                     $fakeHolder.text(newVal);
                 }
@@ -77,6 +100,8 @@
                     f(this);
                 }
 
+                // The button has changed: redraw the element.
+                obj.trigger('redraw.prettyFileInput')
             });
         });
     };
