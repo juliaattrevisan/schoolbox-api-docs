@@ -40,6 +40,19 @@ class SitePage extends Page {
 
         return $contype;
     }
+    
+    /**
+    * Get websocket port
+    * 
+    * @return int
+    */
+    public function getWebsocketPort() {
+        if ($this->conType() == 'https://') {
+            return Cfg::get('websocket_port_ssl') ?: 8081;
+        }
+
+        return Cfg::get('websocket_port') ?: 8080;
+    }
 
     function loadContent($pageFile, $execute = true) {
         $this->pageName = $pageFile;
@@ -210,15 +223,9 @@ class SitePage extends Page {
             'DEBUGBAR_HEAD' => $debug_bar_head,
             'WEBSOCKET_HOST' => $_SERVER['HTTP_HOST'] ?: parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST),
             'WEBSOCKET_PATH' => Cfg::get('websocket_path') ? Cfg::get('websocket_path') : '/',
+            'WEBSOCKET_PORT' => $this->getWebsocketPort(),
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
-
-        if(empty($_SERVER['HTTPS'])) {
-            $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port') ?: 8080;
-        }
-        else {
-            $templateVar['WEBSOCKET_PORT'] = Cfg::get('websocket_port_ssl') ?: 8081;
-        }
 
         $this->setVar($templateVar);
 
