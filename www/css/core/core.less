@@ -2098,7 +2098,7 @@ Notifications
         input[type=text] {
             border: solid 1px @std-grey;
             padding: 2px;
-            width: 99%;
+            width: auto;
         }
 
         form div {
@@ -2975,7 +2975,7 @@ ADMIN BODY
         font-weight: bold;
         margin-top: 8px;
         padding-bottom: 5px;
-        line-height: 28px;
+        line-height: 24px;
         span {
           font-weight: normal;
         }
@@ -2984,7 +2984,7 @@ ADMIN BODY
         padding: 16px;
         background: @alternate-background;
         border: 1px solid darken(@alternate-background,@darken-value);
-        margin-bottom: 16px;
+        margin-bottom: 8px;
         position: relative;
         min-height: 1px;
         .dark td {
@@ -3029,7 +3029,7 @@ ADMIN BODY
     .half {
         width: 49%;
         float: left;
-        margin-right: 2%;
+        margin-right: 1%;
 
     }
     .two-thirds {
@@ -3282,9 +3282,6 @@ ADMIN BODY
 	.textarea {
 		min-height: 32px;
 	}
-	tr.add-new td {
-		background: @alternate-background;
-	}
 }
 
 .allowed-files, .row, .row form {
@@ -3309,11 +3306,11 @@ ADMIN BODY
 }
 
 .settings-nav-holder {
-    width: 16%;
+    width: 20%;
 }
 
 .admin-contents .settings {
-    width: 84%;
+    width: 80%;
 }
 
 .admin-contents .settings input[type=text] {
@@ -3452,10 +3449,10 @@ ADMIN BODY
 }
 
 .calendar-connector {
-	font-size: 18px;
+	font-size: 13px;
 	font-weight: bold;
 	height: 49px;
-	line-height: 49px;
+	line-height: 52px;
 	padding-left: 60px;
 	background: url('/images/core/icons/datasource-vcal.png') no-repeat left center;
 	&.Schoolbox { background-image: url('/images/core/icons/datasource-schoolbox.png'); }
@@ -3738,7 +3735,7 @@ HOMEPAGE TEMPLATES
     -o-transition: background-color 0.3s linear;
     transition: background-color 0.3s linear;
 
-    text-align: center;
+    text-align: left;
     margin: 0 8px 8px 8px;
     border-color: @std-grey;
     border-style: dashed;
@@ -3856,7 +3853,7 @@ HOMEPAGE TEMPLATES
         }
         form {
             line-height: 25px;
-            text-align: right;
+            text-align: left;
         }
         .submit-btn {
             clear: both;
@@ -3880,7 +3877,7 @@ HOMEPAGE TEMPLATES
         text-align: right;
     }
     .component input[type=text] {
-        width: auto;
+        width: 215px;
         border: solid 1px @std-grey;
         padding: 2px;
     }
