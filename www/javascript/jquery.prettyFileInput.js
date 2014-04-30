@@ -46,26 +46,25 @@
 
             var obj = $(this);
 
-            // Whenever the button is redrawn - trigger this event.
-            // It resizes the file input to match the size of its container.
-            obj.on('redraw.prettyFileInput', function() {
-                var element   = $(this)
-                var container = element.parent()
-                element
-                    .width(container.width())
-                    .height(container.height())
-            })
-
             obj.wrap(
                 $('<span />')
                     .addClass(options.inputHolderClass)
+                    .on('click', function() {
+                        // Trigger the click event on the DOM element directly,
+                        // because it doesn't work when I trigger it via jQuery.
+                        // Works in everything I've tested
+                        obj[0].click();
+                    })
             );
             obj.after(
                 $('<span />')
                     .addClass(options.buttonClass + ' ' + options.additionalButtonClasses)
                     .html(options.defaultText)
             );
-            obj.trigger('redraw.prettyFileInput')
+
+            // Shrink the file input to nothingness without actually hiding it,
+            // so that click events can still be triggered.
+            obj.width(0).height(0);
 
             obj.bind('change.prettyFileInput focus.prettyFileInput click.prettyFileInput', function() {
 
@@ -100,8 +99,6 @@
                     f(this);
                 }
 
-                // The button has changed: redraw the element.
-                obj.trigger('redraw.prettyFileInput')
             });
         });
     };
