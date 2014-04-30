@@ -68,6 +68,13 @@
 					nextItemCallback: function() {
 					}
 				});
+
+				console.log('foxy');
+				// Why don't I have a class for this?
+				$('.dropdown-navigator').addClass('ajax-updated');
+				setTimeout(function() {
+					$('.dropdown-navigator').removeClass('ajax-updated');
+				}, 1000)
 			});
 		});
 	});
@@ -87,8 +94,8 @@
         <li class="last"><a href="#">{INLINE_GRADING_STUDENT_FULL_NAME}</a></li>
     </ul>
 </div>
-<div class="dropdown-navigator" style="float:left"></div>
-<div style="float:left">
+<div class="dropdown-navigator float-left"></div>
+<div class='float-left'>
     <form action="/submission/inlineGrading/configForm.php" method="post">
         <input type="hidden" name='boxId' value="{BOX_ID}" />
         <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
