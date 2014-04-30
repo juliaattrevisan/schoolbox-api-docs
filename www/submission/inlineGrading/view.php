@@ -154,7 +154,7 @@ $rubricsRenderer->render()->parseBlock();
  * getting kicked out - then you can review the marks in a 'horizontal' manner
  */
 if (is_array($nextStudent)) {
-	$nextUrl = '/submission/inlineGrading/view/' . $submissionBox->getId() . '/' . $nextStudent['uid'];
+	$nextUrl = '/submission/inlineGrading/view/' . $submissionBox->getId() . '/' . $nextStudent['currentStudent']->getId();
 }
 else {
 	$nextUrl = '/submission/viewSubmission/' . $submissionBox->getId();
