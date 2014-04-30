@@ -126,9 +126,10 @@ class SideMenu extends DeprecatedModel {
         $query = "
             SELECT id FROM sideMenu
             WHERE parent = %d
+            AND id != %d
             ORDER BY sequence, txt
         ";
-        $list = $this->db->getAll(sprintf($query, $parentId));
+        $list = $this->db->getAll(sprintf($query, $parentId, $id));
         if (empty($list)) {
             return false;
         }
@@ -136,7 +137,7 @@ class SideMenu extends DeprecatedModel {
             $this->moveItemBefore($id, $list[0]['id']);
         }
         else {
-            $key = $position;
+            $key = $position - 1;
             if (!array_key_exists($key, $list)) {
                 return false;
             }
