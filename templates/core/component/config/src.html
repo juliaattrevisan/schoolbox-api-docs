@@ -33,6 +33,16 @@
                 },
                 function() {
                     $j('#resource-browser').dialog('open');
+
+					/* auto scroll to open branch */
+					var selectedNode = $('#tree tr.selected');
+
+					if (selectedNode.length) {
+						$j("#category-window").scrollTo($j('#'+ selectedNode.attr('id')), 200);
+					}
+					else {
+						$j("#category-window").scrollTo($j("#node-0"), 200);
+					}
                 }
             );
             return false;

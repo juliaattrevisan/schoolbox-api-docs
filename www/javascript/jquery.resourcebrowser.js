@@ -73,9 +73,6 @@ $j(function() {
 
     $j("div.loading").hide();
 
-    /* auto scroll to open branch */
-    $j("#category-window div.scroller").scrollTo($j("#node-0"), 200);
-
     $j('#category-window, #file-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-50);
 
     $j(window).resize(function() {
