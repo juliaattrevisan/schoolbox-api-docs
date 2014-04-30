@@ -99,6 +99,10 @@
 		 */
 		var config = init(options, this);
 
+		/* Empty out the div
+		 */
+		config.element.html('');
+
 		/* Render controls
 		 */
 		renderPrevious();
@@ -119,6 +123,7 @@
 				items: [],
 				disabled: [],
 				currentId: 0,
+				useDisabled: true,
 
 				/* Callbacks
 				 */
@@ -237,8 +242,12 @@
 				 */
 				var disabled = '';
 
-				if (jQuery.inArray(config.items[i].navigation.id, config.disabled) > -1) {
-					disabled = 'disabled';
+				/* Only disable items when this flag is enabled
+				 */
+				if (config.useDisabled == true) {
+					if (jQuery.inArray(config.items[i].navigation.id, config.disabled) > -1) {
+						disabled = 'disabled';
+					}
 				}
 
 				var option = '<option ' + disabled + ' value="'+ value +'"'+ selected +'>'+ label +'</option>';

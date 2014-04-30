@@ -32,23 +32,44 @@
 
 		$('.combobox').combobox({COMBO_OPTIONS});
 
-        $('#skipUnsubmitted').click( function(event) {
-           var form = $(this).closest('form');
-           form.submit(function(event) {
-               alert('blah');
-               $(this).ajax({
-                   type: form.attr('method'),
-                   url: form.attr('action'),
-                   data: form.serialize(),
-                   success: function (data) {
-                       alert('ok');
-                   }
-               });
+		/* Asynchronous update
+		 * Rerun plugin
+		 */
+		$('#skipUnsubmitted').change(function(event) {
+			var form = $(this).closest('form');
+			var url = form.attr('action');
+			var data = form.serialize();
 
-               event.preventDefault();
-           });
+			/* Hook in Skip Unsubmitted box
+			 */
+			var useDisabled = false;
 
-        });
+			if ($(this).is(':checked')) {
+				useDisabled = true;
+			}
+
+			$.post(url, data, function(responseText) {
+				$('.dropdown-navigator').inlineGradingNavigator({
+					currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
+					direct: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT}',
+					items: '{INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS}',
+					disabled: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED}',
+					useDisabled: useDisabled,
+
+					/* Callback methods
+					 */
+					selectItemCallback: function() {
+						$('.context-select').change(function() {
+							window.location.href = $(this).val();
+						});
+					},
+					previousItemCallback: function() {
+					},
+					nextItemCallback: function() {
+					}
+				});
+			});
+		});
 	});
 </script>
 <!-- END custom_head -->
@@ -71,13 +92,15 @@
     <form action="/submission/inlineGrading/configForm.php" method="post">
         <input type="hidden" name='boxId' value="{BOX_ID}" />
         <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
-        <input type="hidden" name="skipUnsubmitted" value="0" />
-        <label for="skipUnsubmitted"><input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' /> <strong>Skip Unsubmitted</strong></label>
+		<input type="hidden" name="skipUnsubmitted" value="0" />
+		<label for="skipUnsubmitted">
+			<input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
+			<strong>Skip Unsubmitted</strong>
+		</label>
     </form>
 </div>
 
-
-        <div class="clearfix"></div>
+<div class="clearfix"></div>
 
 <div id="inline-grading-error-container">
 	<strong>There were errors downloading document for inline grading:</strong>
