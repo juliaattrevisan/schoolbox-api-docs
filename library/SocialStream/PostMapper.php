@@ -120,7 +120,7 @@ class PostMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 		));
 
-		parent::mapping();
+		$this->hasSoftDeleteDateField('deleted_at');
 	}
 
 	/**

@@ -8,7 +8,9 @@
  * @version     SVN: $Id$
  */
 
-abstract class SocialStream_Post_Abstract {
+use Schoolbox\ISoftDeletable;
+
+abstract class SocialStream_Post_Abstract implements ISoftDeletable {
 
 	/**
 	 * Primary key
@@ -424,5 +426,14 @@ abstract class SocialStream_Post_Abstract {
 	 */
 	public function getExternalTitle() {
 		return $this->externalTitle;
+	}
+
+	/**
+	 * Is this deleted?
+	 *
+	 * @return bool
+	 */
+	public function isDeleted() {
+		return $this->getDeletedAt() instanceof Alaress_Date_Format;
 	}
 }
