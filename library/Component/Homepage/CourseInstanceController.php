@@ -36,7 +36,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     /**
      * @var bool
      */
-    protected $is_student;
+    protected $readOnly;
 
     /**
      * {@inheritdoc}
@@ -48,14 +48,10 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         // Read-only access?
         // Show nothing if course isn't selected
-        if (!$this->getConfig('courseHomepage')
-            && $group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS
-        ) {
+        $this->readOnly = $group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS;
+        if ($this->readOnly && !$this->getConfig('courseHomepage')) {
             return false;
         }
-
-        // Should check on user's permissions for this row instead
-        $this->is_student = $group_handler->isStudent();
 
         // Build student list
         $classStudentIdList = array();
@@ -112,7 +108,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             array()
         );
         $this_student_id = null;
-        if ($this->is_student) {
+        if ($this->readOnly) {
             $this_student_id = $_SESSION['id'];
         }
         $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findLatestForList(
@@ -217,7 +213,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // and change message accordingly.
         $is_completed         = false;
         $completion_date_list = array();
-        if ($this->is_student) {
+        if ($this->readOnly) {
             $is_completed = true;
             foreach ($unit->getTasks() as $task) {
                 $completion = $grouped_list[$task->getId()][$_SESSION['id']];
@@ -256,7 +252,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_add_task_actions_block' => '',
             )
         );
-        if (!$this->is_student) {
+        if (!$this->readOnly) {
             $this->parse('unit_delete_block', 'unit_delete');
             $this->parse('unit_modify_block', 'unit_modify');
             $this->parse('unit_report_actions_block', 'unit_report_actions');
@@ -310,7 +306,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // Output list of tasks within units, only if the task is open
         $display_task_list =
             $unit->getTasks()->count() > 0 &&
-            ($unit->isOpen() || $unit->isAfterDueDate() || !$this->is_student)
+            ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly)
         ;
         if ($display_task_list) {
             $this->parse('unit_expand_block', 'unit_expand');
@@ -339,7 +335,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // Output whether this item is complete.
         $unit_task_class  = '';
         $unit_task_status = '';
-        if ($this->is_student) {
+        if ($this->readOnly) {
             $unit_task_class = 'incomplete';
             $completion_item = $completion_list[$_SESSION['id']];
             if ($completion_item instanceof Task\InstanceCompletion) {
@@ -408,7 +404,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         // Teacher sees the number of students that have completed
         // this task, nobody else does.
-        if ($this->is_student) {
+        if ($this->readOnly) {
             if ($unit_task_status) {
                 $this->parse('unit_task_completion_block', 'unit_task_completion');
             }
