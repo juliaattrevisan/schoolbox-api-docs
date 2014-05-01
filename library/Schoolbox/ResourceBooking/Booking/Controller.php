@@ -15,6 +15,8 @@ use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
 use EOTC\Calendar;
+use External_Timetable;
+use Schoolbox\CampusMapper;
 
 class Controller extends Base {
 
@@ -37,6 +39,16 @@ class Controller extends Base {
      * @var Calendar\EventRecurrenceMapper
      */
     protected $eventRecurrenceMapper;
+
+    /**
+     * @var External_Timetable
+     */
+    protected $externalTimetableHandler;
+
+    /**
+     * @var CampusMapper
+     */
+    protected $campusMapper;
 
     /**
      * Creates a booking for an item.
@@ -79,12 +91,124 @@ class Controller extends Base {
                 $item->getEvent()->setEndDateTime($endDate);
             }
         }
+
+        // Load campus and timetable selectors
+        $campusList   = $this->campusMapper->getAvailableCampusesForUser($this->getUser());
+        $periodList   = array();
+        $dayCountList = array();
+        foreach ($campusList as $campus) {
+            $campusId  = $campus->getId();
+            $timetable = $this->externalTimetableHandler->getTimetableDefinition($campusId);
+            // Somehow parse $timetable into a list of names, start and end, and
+            // the next day they occur.
+            $dayCountList[$campusId] = $timetable['dayCount'];
+            foreach ($timetable['desc'] as $i => $name) {
+                $periodList[$campusId][] = array(
+                    'desc'  => $name,
+                    'start' => $timetable['start'][$i],
+                    'end'   => $timetable['end'][$i],
+                );
+            }
+
+            // Day number builder
+//            $currentDay = $this->externalTimetableHandler->getDayNumber($campusId);
+
+            // Keep asking until all days are filled.
+            // Alternately, have some sort of AJAX call that gets the next date
+            // for a timetable.
+//            $startDay = new DateTime();
+//            var_dump($timetable);
+
+        }
+//        var_dump($timetableList);
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
                     'item' => $item,
+                    'campusList' => $campusList,
+                    'periodList' => $periodList,
+                    'dayCount'   => $dayCountList,
                 ),
+            )
+        );
+    }
+
+    /**
+     * Action for finding the next date for a timetable day.
+     *
+     * Query parameters:
+     * * campus:    the ID of the campus to get timetable day for
+     * * day:       the day number to get
+     * * startDate: If provided, finds the next occurrence after this date.
+     *              Defaults to current date.
+     */
+    public function getNextDateForTimetableDay() {
+        $requestedCampus    = $this->request->query['campus'];
+        $requestedDayNumber = $this->request->query['day'];
+        $requestedStartDate = $this->request->query['startDate'];
+
+        // Try to create a datetime out of the requested start date, if there
+        // was one.
+        $code  = 200;
+        $error = '';
+        $thisDate = new DateTime();
+        if (!empty($requestedStartDate)) {
+            try {
+                $thisDate = new DateTime($requestedStartDate);
+            }
+            catch (\Exception $e) {
+                $code  = 400;
+                $error = 'Invalid format for start date';
+            }
+        }
+
+        // Check campus exists
+        try {
+            $this->campusMapper->findById($requestedCampus);
+        }
+        catch (\Exception $e) {
+            $code  = 400;
+            $error = 'Invalid campus requested';
+        }
+
+        if (!$error) {
+            $isFound = false;
+            if ($requestedDayNumber > 0) {
+                // Start at today, and get number of days
+                // Try for a month, that's long enough.
+                $i = 0;
+                while ($i++ < 30) {
+                    $thisDayNumber = $this->externalTimetableHandler->getDayNumber(
+                        $requestedCampus,
+                        $thisDate->getTimestamp()
+                    );
+                    if ($thisDayNumber == $requestedDayNumber) {
+                        $isFound = true;
+                        break;
+                    }
+                    $thisDate = $thisDate->modify('+1 day');
+                }
+            }
+            if (!$isFound) {
+                $code  = 400;
+                $error = 'No date found for requested timetable day';
+            }
+        }
+
+        $data = array();
+        if ($error) {
+            $data['error'] = $error;
+        }
+        else {
+            $data['date'] = $thisDate->format('Y-m-d');
+        }
+        $this->response->status->setCode($code);
+        $this->response->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $data,
             )
         );
     }
@@ -903,6 +1027,38 @@ class Controller extends Base {
      */
     public function getResourceMapper() {
         return $this->resourceMapper;
+    }
+
+    /**
+     * @param  External_Timetable $externalTimetableHandler
+     * @return $this
+     */
+    public function setExternalTimetableHandler($externalTimetableHandler) {
+        $this->externalTimetableHandler = $externalTimetableHandler;
+        return $this;
+    }
+
+    /**
+     * @return External_Timetable
+     */
+    public function getExternalTimetableHandler() {
+        return $this->externalTimetableHandler;
+    }
+
+    /**
+     * @param  CampusMapper $campusMapper
+     * @return $this
+     */
+    public function setCampusMapper($campusMapper) {
+        $this->campusMapper = $campusMapper;
+        return $this;
+    }
+
+    /**
+     * @return CampusMapper
+     */
+    public function getCampusMapper() {
+        return $this->campusMapper;
     }
 
 }
