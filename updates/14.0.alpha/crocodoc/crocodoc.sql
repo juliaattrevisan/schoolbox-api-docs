@@ -12,4 +12,4 @@ ALTER TABLE `video_queue` CHANGE `type` `type` ENUM('sbfs','storage','submission
 
 /* Shove api token into config table
  */
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('crocodoc_api_token', 'D4t65GknNUXFev8HJlTWpf2V', 'Crocodoc API Token', 'Crocodoc API token for inline grading. Used to download and annotate submissions.', '1', '3', 'true');
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('crocodoc_api_token', 'D4t65GknNUXFev8HJlTWpf2V', 'Crocodoc API Token', 'Crocodoc API token for inline grading. Used to download and annotate submissions.', '1', '10', 'true');
