@@ -462,6 +462,11 @@ fi
 
 # Restore the DB
 echo -e "\nStarting restore of the database";
+## Drop resource booking tables in a specific order due to foreign keys
+for table in `echo "resource_moderator resource_relation resource_booking lu_resource_booking_status resource lu_resource_moderation_type resource_category"`;
+do
+	mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "DROP TABLE IF EXISTS \`$table\`";
+done;
 ## Drop all existing database tables
 for table in `mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SHOW TABLES"`;
 do
