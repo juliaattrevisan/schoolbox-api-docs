@@ -46,6 +46,14 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $group_handler = new Group();
         $code = $this->getContext('code');
 
+        // Read-only access?
+        // Show nothing if course isn't selected
+        if (!$this->getConfig('courseHomepage')
+            && $group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS
+        ) {
+            return false;
+        }
+
         // Should check on user's permissions for this row instead
         $this->is_student = $group_handler->isStudent();
 
