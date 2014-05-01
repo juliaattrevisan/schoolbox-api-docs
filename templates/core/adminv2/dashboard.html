@@ -3,6 +3,8 @@
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript">
     $j(function() {
         $j('#definition-palette').configurator().start();
@@ -34,11 +36,11 @@
         <!-- BEGIN definition -->
         <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
         <!-- END definition -->
-
     </div>
 
     <div id="dashboard-layout" class="clearfix">
         <!-- BEGIN layout --><!-- END layout -->
     </div>
-
 </div>
+
+<div id="resource-browser" class="hide"></div>
