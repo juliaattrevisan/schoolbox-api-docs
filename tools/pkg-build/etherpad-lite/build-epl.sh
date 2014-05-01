@@ -27,6 +27,9 @@ cd $builddir/etherpad-lite-$eplver/src;
 npm install;
 npm install redis;
 
+# Install disable chat plugin
+npm install ep_disableChat;
+
 # Add in upstart init script and logrotate
 cd $builddir/etherpad-lite-$eplver;
 cp -fR $fullpath/schoolbox-epl.conf .;
