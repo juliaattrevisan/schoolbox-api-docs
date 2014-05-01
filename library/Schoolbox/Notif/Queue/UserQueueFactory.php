@@ -319,7 +319,7 @@ class UserQueueFactory {
 			return -1;
 		}
 
-		$allBindings = `rabbitmqctl list_bindings destination_name routing_key`;
+		$allBindings = `/usr/sbin/rabbitmqctl list_bindings destination_name routing_key`;
 
 		if(!$allBindings) {
 			return 0;
