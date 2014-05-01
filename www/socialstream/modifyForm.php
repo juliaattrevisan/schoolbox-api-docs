@@ -33,8 +33,7 @@ if (is_numeric($_GET['delete'])) {
 	$authenticator = new Authenticator($post, new \Component_Instance(), $currentUser);
 
 	if ($authenticator->canDelete()) {
-		$post->setDeletedAt($now);
-		$postMapper->save($post);
+		$postMapper->delete($post);
 
 		/* This is for top-level posts
 		 */
@@ -50,10 +49,7 @@ if (is_numeric($_GET['delete'])) {
 
 		/* Softdelete the entire thread for the specified post
 		 */
-		foreach ($allPosts as $currentPost) {
-			$currentPost->setDeletedAt($now);
-			$postMapper->save($currentPost);
-		}
+		$postMapper->delete($allPosts);
 
 		$page->backToTheFuture(1);
 	}
