@@ -232,6 +232,7 @@ $(document).ready(function() {
             </td>
             <td>
                 {# Simplest option: optgroups #}
+                {# Add some way of selecting next/previous occurence #}
                 <select name="timetable">
                     <option>-- select --</option>
                     {% for campus in campusList %}
@@ -252,35 +253,6 @@ $(document).ready(function() {
                         </optgroup>
                     {% endfor %}
                 </select>
-                {#<select name="timetable_campus">#}
-                    {#<option>-- select campus --</option>#}
-                    {#{% for campus in campusList %}#}
-                        {#&#123;&#35; Add campus, timetable and period to event? &#35;&#125;#}
-                        {#<option {{ campus.id == item.event.campus.id ? 'selected' : '' }}#}
-                                {#value="{{ campus.id|e('html_attr') }}"#}
-                                {#label="{{ campus.name|e('html_attr') }}"#}
-                                {#>{{ campus.name }}</option>#}
-                    {#{% endfor %}#}
-                {#</select>#}
-
-                {#<select name="timetable_day">#}
-                    {#&#123;&#35; Updates when selecting campus? &#35;&#125;#}
-                    {#<option>-- select day --</option>#}
-                    {#{% for day in 1..dayCount %}#}
-                        {#<option value="{{ day|e('html_attr') }}"#}
-                                {#label="Day {{ day|e('html_attr') }}"#}
-                                {#>Day {{ day }}</option>#}
-                    {#{% endfor %}#}
-                {#</select>#}
-
-                {#<select name="timetable_period">#}
-                    {#<option>-- select period --</option>#}
-                    {#{% for period in periodList %}#}
-                        {#<option value="{{ loop.index }}"#}
-                                {#label="{{ period.desc|e('html_attr') }}"#}
-                                {#>{{ period.desc }}</option>#}
-                    {#{% endfor %}#}
-                {#</select>#}
             </td>
         </tr>
         <tr>
