@@ -180,7 +180,7 @@ then
 	mkdir -p $targetdir >> $logfile 2>&1;
 
 	# Backup SQL
-	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of SQL" >> $logfile;
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of MySQL DB" >> $logfile;
 	mysqldump --allow-keywords -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
 	if [ $? -ne 0 ];
 	then
@@ -191,6 +191,10 @@ then
 		fi
 		
 	fi
+
+	# Backup redis db
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of Redis DB" >> $logfile;
+	gzip -c /var/lib/redis/dump.rdb > $targetdir/redis-$DAY0.rdb.gz 2>> $logfile;
 
 	# Backup etc directory
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of /etc" >> $logfile;
