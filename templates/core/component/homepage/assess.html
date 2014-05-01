@@ -14,8 +14,13 @@
 				<!-- END teacherLink -->
 
 				<!-- BEGIN studentLink -->
-				<a class="btn no-text tick" href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}/{ASSESS_ATTEMPT_ID}" title="Review Results"><span></span></a>
+				<a class="btn no-text tick" href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}/{ASSESS_ATTEMPT_ID}" title="Review results"><span></span></a>
 				<!-- END studentLink -->
+
+				<!-- BEGIN has_previous_attempts -->
+				<a class="btn no-text list" href="/assess/attempts/{ASSESS_ASSESS_ID}/{ASSESS_RESPONDENT_ID}" title="See previous attempts"><span></span></a>
+				<!-- END has_previous_attempts -->
+
 			</span>
 
         	<!-- BEGIN assessLink -->
@@ -33,8 +38,6 @@
 			<!-- BEGIN assessDue -->
 			<p class="meta">Due {ASSESS_FINISH_DATE}</p>
 			<!-- END assessDue -->
-
-
 
 			<div class="wysiwyg summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>
 
