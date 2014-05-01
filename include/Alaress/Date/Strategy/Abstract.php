@@ -54,7 +54,11 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 		// DateTime object must be reset each time this is called, because
 		// otherwise the old DateTime is used when calling getUsingFormat().
 		$this->setDateTimeObject(null);
-		if ($dateTime instanceof DateTime) {
+		if (!isset($dateTime)) {
+			// Nothing set? set it to now
+			$this->setDateTimeObject(new DateTime());
+		}
+		elseif ($dateTime instanceof DateTime) {
 			$this->setDateTimeObject($dateTime);
 		}
 		elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
