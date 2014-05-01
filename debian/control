@@ -65,3 +65,9 @@ Architecture: all
 Depends: schoolbox, ${misc:Depends}
 Description: Resource Booking module for the Schoolbox LMS
  Resource Booking module for the Schoolbox LMS
+
+Package: schoolbox-eotc
+Architecture: all
+Depends: schoolbox, ${misc:Depends}
+Description: EOTC module for the Schoolbox LMS
+ Education Outside The Classroom (EOTC) module for the Schoolbox LMS
