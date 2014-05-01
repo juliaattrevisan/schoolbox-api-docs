@@ -87,14 +87,14 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 			$padMapper->save($pad);
 
 			if ($authenticator->canCreate($pad->getHomepageId()) || !$pad->isLocked()) {
-				$this->localRedir(':' . $this->getWebsocketPort() . "/pad/p/{$pad->getPadId()}?showChat=false");
+				$this->localRedir(':' . $this->getWebsocketPort() . "/pad/p/{$pad->getPadId()}");
 			}
 			else if ($pad->isLocked()) {
 				$readonlyResult = $client->getReadOnlyID($pad->getPadId());
 				$data = $readonlyResult->getData();
 
 				if ($readonlyResult->getMessage() == 'ok') {
-					$this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showChat=false&showControls=false");
+					$this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showControls=false");
 				}
 			}
 		}
