@@ -226,6 +226,64 @@ $(document).ready(function() {
             </td>
         </tr>
         <tr>
+            <td class="formLabelWidth">
+                <h4>Timetable</h4>
+                <em>You may select a timetable period to book this item for here.</em>
+            </td>
+            <td>
+                {# Simplest option: optgroups #}
+                <select name="timetable">
+                    <option>-- select --</option>
+                    {% for campus in campusList %}
+                        <optgroup label="Campus: {{ campus.name }}">
+                            {% for day in 1..dayCount[campus.id] %}
+                                {% for period in periodList[campus.id] %}
+                                    <option value="{{ campus.id|e('html_attr') }}_{{ day|e('html_attr') }}_{{ loop.index|e('html_attr') }}"
+                                            data-campus="{{ campus.id|e('html_attr') }}"
+                                            data-day="{{ day|e('html_attr') }}"
+                                            data-period="{{ loop.index|e('html_attr') }}"
+                                            data-periodStart="{{ period.start|e('html_attr') }}"
+                                            data-periodEnd="{{ period.end|e('html_attr') }}"
+                                            label="Day {{ day|e('html_attr') }}: {{ period.desc|e('html_attr') }}"
+                                    >Day {{ day }}: {{ period.desc }}</option>
+                                {% endfor %}
+                                <option disabled>---</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endfor %}
+                </select>
+                {#<select name="timetable_campus">#}
+                    {#<option>-- select campus --</option>#}
+                    {#{% for campus in campusList %}#}
+                        {#&#123;&#35; Add campus, timetable and period to event? &#35;&#125;#}
+                        {#<option {{ campus.id == item.event.campus.id ? 'selected' : '' }}#}
+                                {#value="{{ campus.id|e('html_attr') }}"#}
+                                {#label="{{ campus.name|e('html_attr') }}"#}
+                                {#>{{ campus.name }}</option>#}
+                    {#{% endfor %}#}
+                {#</select>#}
+
+                {#<select name="timetable_day">#}
+                    {#&#123;&#35; Updates when selecting campus? &#35;&#125;#}
+                    {#<option>-- select day --</option>#}
+                    {#{% for day in 1..dayCount %}#}
+                        {#<option value="{{ day|e('html_attr') }}"#}
+                                {#label="Day {{ day|e('html_attr') }}"#}
+                                {#>Day {{ day }}</option>#}
+                    {#{% endfor %}#}
+                {#</select>#}
+
+                {#<select name="timetable_period">#}
+                    {#<option>-- select period --</option>#}
+                    {#{% for period in periodList %}#}
+                        {#<option value="{{ loop.index }}"#}
+                                {#label="{{ period.desc|e('html_attr') }}"#}
+                                {#>{{ period.desc }}</option>#}
+                    {#{% endfor %}#}
+                {#</select>#}
+            </td>
+        </tr>
+        <tr>
             <td class="formLabelWidth"><h4>Begin</h4></td>
             <td>
                 {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
