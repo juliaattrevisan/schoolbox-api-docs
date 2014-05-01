@@ -35,8 +35,10 @@ class Module extends BaseModule {
                ->addValues(array('action' => 'update'));
         $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
 
-        // JSON route for getting next day
-        $router->add('resourceBooking.getNextDateForTimetableDay', $basePath.'/getNextDateForTimetableDay')
+        // JSON route for getting next/previous day
+        $router->add('resourceBooking.nextDateForTimetableDay', $basePath.'/nextDateForTimetableDay')
+               ->addValues(array('format' => '.json'));
+        $router->add('resourceBooking.previousDateForTimetableDay', $basePath.'/previousDateForTimetableDay')
                ->addValues(array('format' => '.json'));
 
         // Approving or rejecting a single booking

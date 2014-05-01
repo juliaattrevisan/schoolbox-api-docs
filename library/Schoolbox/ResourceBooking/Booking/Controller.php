@@ -109,18 +109,7 @@ class Controller extends Base {
                     'end'   => $timetable['end'][$i],
                 );
             }
-
-            // Day number builder
-//            $currentDay = $this->externalTimetableHandler->getDayNumber($campusId);
-
-            // Keep asking until all days are filled.
-            // Alternately, have some sort of AJAX call that gets the next date
-            // for a timetable.
-//            $startDay = new DateTime();
-//            var_dump($timetable);
-
         }
-//        var_dump($timetableList);
 
         $this->getResponse()->content->set(
             array(
@@ -139,24 +128,59 @@ class Controller extends Base {
      * Action for finding the next date for a timetable day.
      *
      * Query parameters:
-     * * campus:    the ID of the campus to get timetable day for
-     * * day:       the day number to get
-     * * startDate: If provided, finds the next occurrence after this date.
-     *              Defaults to current date.
+     * * campus: the ID of the campus to get timetable day for
+     * * day:    the day number to get
+     * * date:   If provided, finds the next occurrence after this date.
+     *           Defaults to current date.
      */
-    public function getNextDateForTimetableDay() {
-        $requestedCampus    = $this->request->query['campus'];
-        $requestedDayNumber = $this->request->query['day'];
-        $requestedStartDate = $this->request->query['startDate'];
+    public function nextDateForTimetableDay() {
+        $this->getTimetableDay(
+            $this->request->query['campus'],
+            $this->request->query['day'],
+            $this->request->query['date'],
+            false
+        );
+    }
 
+    /**
+     * Action for finding the previous date for a timetable day.
+     *
+     * Query parameters:
+     * * campus: the ID of the campus to get timetable day for
+     * * day:    the day number to get
+     * * date:   If provided, finds the previous occurrence before this date.
+     *           Defaults to current date.
+     */
+    public function previousDateForTimetableDay() {
+        $this->getTimetableDay(
+            $this->request->query['campus'],
+            $this->request->query['day'],
+            $this->request->query['date'],
+            true
+        );
+    }
+
+    /**
+     * Outputs a response for getting the next or previous occurence of a
+     * timetable day.
+     *
+     * @param int  $campus    The campus to get the date for
+     * @param int  $dayNumber The day number to get the date for
+     * @param int  $date      If provided, find next/previous occurrence after
+     *                        this date. Defaults to current date.
+     * @param bool $previous  If true, get occurrence before $date - otherwise,
+     *                        get occurrence on or after $date.
+     *
+     */
+    protected function getTimetableDay($campus, $dayNumber, $date = null, $previous = false) {
         // Try to create a datetime out of the requested start date, if there
         // was one.
-        $code  = 200;
-        $error = '';
+        $code     = 200;
+        $error    = '';
         $thisDate = new DateTime();
-        if (!empty($requestedStartDate)) {
+        if (!empty($date)) {
             try {
-                $thisDate = new DateTime($requestedStartDate);
+                $thisDate = new DateTime($date);
             }
             catch (\Exception $e) {
                 $code  = 400;
@@ -164,9 +188,14 @@ class Controller extends Base {
             }
         }
 
+        // Checking previous occurence? Start one day before
+        if ($previous) {
+            $thisDate = $thisDate->modify('-1 day');
+        }
+
         // Check campus exists
         try {
-            $this->campusMapper->findById($requestedCampus);
+            $this->campusMapper->findById($campus);
         }
         catch (\Exception $e) {
             $code  = 400;
@@ -175,20 +204,22 @@ class Controller extends Base {
 
         if (!$error) {
             $isFound = false;
-            if ($requestedDayNumber > 0) {
+            if ($dayNumber > 0) {
                 // Start at today, and get number of days
                 // Try for a month, that's long enough.
                 $i = 0;
                 while ($i++ < 30) {
                     $thisDayNumber = $this->externalTimetableHandler->getDayNumber(
-                        $requestedCampus,
+                        $campus,
                         $thisDate->getTimestamp()
                     );
-                    if ($thisDayNumber == $requestedDayNumber) {
+                    if ($thisDayNumber == $dayNumber) {
                         $isFound = true;
                         break;
                     }
-                    $thisDate = $thisDate->modify('+1 day');
+                    $thisDate = $thisDate->modify(
+                        $previous ? '-1 day' : '+1 day'
+                    );
                 }
             }
             if (!$isFound) {
