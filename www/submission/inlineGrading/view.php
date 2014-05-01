@@ -90,6 +90,7 @@ for ($i=0; $i < count($stack); $i++) {
 			 */
 			if ($collection->count()) {
 				$currentAugmented['submission'] = $collection->first()->getSubmission();
+                $this->arg[2] = $collection->first()->getSubmission()->getId();
 			}
 		}
 

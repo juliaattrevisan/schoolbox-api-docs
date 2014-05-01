@@ -51,4 +51,7 @@ if ($groupHandler->getPermission($submissionBox->getCategory()->getId()) < WRITE
 $submissionBox->setSkipUnsubmitted($_POST['skipUnsubmitted']);
 $submissionBoxMapper->save($submissionBox);
 
-$page->localRedir("/submission/inlineGrading/view/{$submissionBox->getId()}/{$user->getId()}");
+/* TODO: echo json_encoded object for ui feedback
+ */
+
+exit();

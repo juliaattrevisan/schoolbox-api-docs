@@ -42,7 +42,7 @@ class Download extends Base {
 		$this->getPage()->setVar(array(
 			'MOST_RECENT_SUBMISSION_FILE_ID' => $this->getSubmission()->getId(),
 			'MOST_RECENT_SUBMISSION_FILE_NAME' => $this->getSubmission()->getFilename(),
-			'MOST_RECENT_SUBMISSION_FILE_SIZE' => $this->getSubmission()->getFilesize(),
+			'MOST_RECENT_SUBMISSION_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getSubmission()->getFilesize()),
 			'MOST_RECENT_SUBMISSION_FILE_THUMB' => $this->getSubmission()->getMimeType()->getIconFile(),
 			'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
 		));
