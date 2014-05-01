@@ -505,6 +505,10 @@ fi
 echo "";
 $instdir/tools/update-sql.sh;
 
+## Run Notifications Binder so RabbitMQ has all the latest bindings for the new data
+echo -e "\nRunning Notifications Binder";
+php $instdir/tools/mq/binder.php -v 2>/dev/null;
+
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {
 	tempsqltitle=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe  "SELECT value FROM config WHERE name='title'" 2>/dev/null`;
@@ -537,7 +541,26 @@ else
 	echo -e " - OK";
 fi
 
+# Restart schoolbox services
+echo -e "\nRestarting Schoolbox Services";
+if [ "$package" = 'schoolboxdev' ];
+then
+	/usr/sbin/service schoolboxdev-digestd restart >/dev/null 2>&1;
+	/usr/sbin/service schoolboxdev-scheduled restart >/dev/null 2>&1;
+	/usr/sbin/service schoolboxdev-socketd restart >/dev/null 2>&1;
+else
+	/usr/sbin/service schoolbox-digestd restart >/dev/null 2>&1;
+	/usr/sbin/service schoolbox-scheduled restart >/dev/null 2>&1;
+	/usr/sbin/service schoolbox-socketd restart >/dev/null 2>&1;
+fi
+
 # Cleanup
 umount $backup_dir 2>/dev/null;
+
+echo -e "\nManual Task Reminders:";
+echo -e "* check websocket ports in the config table";
+echo -e "* recheck the title in the config table";
+echo -e "* set the correct site_hostname and site_domain in the config table";
+echo "";
 
 exit;
