@@ -12,7 +12,7 @@
 				<th>Student</th>
 				<th>Start</th>
 				<th>Finish</th>
-				<th>Review</th>
+				<th>Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -21,7 +21,12 @@
 				<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</a></td>
 				<td>{ATTEMPT_START}</td>
 				<td>{ATTEMPT_FINISH}</td>
-				<td><a href='/survey/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}'>Review</a></td>
+				<!-- BEGIN attempt_review -->
+				<td><a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}'>Review</a></td>
+				<!-- END attempt_review -->
+				<!-- BEGIN attempt_resume -->
+				<td><a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}'>Resume</a></td>
+				<!-- END attempt_resume -->
 			</tr>
 			<!-- END attempt -->
 		</tbody>

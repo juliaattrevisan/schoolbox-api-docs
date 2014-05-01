@@ -36,6 +36,8 @@ if ($groupHandler->isStudent() && ($_SESSION['user']->getId() != $this->arg[1]))
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+$this->setBlock('attempt', 'attempt_review', 'attempt_review_block');
+$this->setBlock('attempt', 'attempt_resume', 'attempt_resume_block');
 
 /* Generic details
  */
@@ -66,9 +68,25 @@ if (is_array($allAttempts) && count($allAttempts)) {
         if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
             $finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
             $finishDateValue = $finishDate->getShort();
+
+			/* Parse review link
+			 */
+			$this->setVar(array(
+				'attempt_resume_block' => ''
+			));
+
+			$this->parse('attempt_review_block', 'attempt_review');
         }
 		else {
             $finishDateValue = 'Unfinished';
+
+			/* Parse resume link
+			 */
+			$this->setVar(array(
+				'attempt_review_block' => ''
+			));
+
+			$this->parse('attempt_resume_block', 'attempt_resume');
         }
 
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
@@ -89,6 +107,9 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         /* Clear children after parsing out the parent
 		 */
-        $this->setVar('respondent_name_block', '');
+		$this->setVar(array(
+			'respondent_name_block' => '',
+			'attempt_resume_block' => ''
+		));
     }
 }
