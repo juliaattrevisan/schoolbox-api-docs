@@ -137,7 +137,16 @@ echo "$vag Install schoolbox-digestd";
 cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
 cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
 
+echo "$vag Ensure schoolbox-epl is of the required version";
+eplver='1.4.0-3';
+if [ "`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`" != "$eplver" ];
+then
+	apt-get update >/dev/null 2>&1;
+	apt-get -y install schoolbox-epl=1.4.0-3;
+fi
+
 echo "$vag Ensure all services are running";
+service schoolbox-epl restart > /dev/null 2>&1;
 service mysql restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
