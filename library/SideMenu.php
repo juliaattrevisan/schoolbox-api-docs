@@ -126,17 +126,22 @@ class SideMenu extends DeprecatedModel {
         $query = "
             SELECT id FROM sideMenu
             WHERE parent = %d
+            AND id != %d
             ORDER BY sequence, txt
         ";
-        $list = $this->db->getAll(sprintf($query, $parentId));
+        $list = $this->db->getAll(sprintf($query, $parentId, $id));
         if (empty($list)) {
-            return false;
+            // Make $id the sole child of $parentId
+            $this->moveItemLast($id, $parentId);
+            return true;
         }
         if ($position === 0) {
+            // Move $id to start of parent's list
             $this->moveItemBefore($id, $list[0]['id']);
         }
         else {
-            $key = $position;
+            // Move $id to position $key of parent's list
+            $key = $position - 1;
             if (!array_key_exists($key, $list)) {
                 return false;
             }
