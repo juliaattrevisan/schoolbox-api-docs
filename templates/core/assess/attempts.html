@@ -5,27 +5,25 @@
     <a href="/survey/results/{SURVEY_ID}" class="btn go-back"><span></span>Back to Survey Results</a>
 </div>
 
-<div class="evaluation-question-section">
-	<form action='/survey/deleteAttempt' method='post'>
-		<table class="table">
+<form action='/survey/deleteAttempt' method='post'>
+	<table class="table ruler">
+		<thead>
 			<tr>
 				<th>Student</th>
 				<th>Start</th>
 				<th>Finish</th>
 				<th>Review</th>
-				<th>Action</th>
 			</tr>
+		</thead>
+		<tbody>
 			<!-- BEGIN attempt -->
-			<tr class='{ON_OFF}'>
+			<tr>
 				<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</a></td>
 				<td>{ATTEMPT_START}</td>
 				<td>{ATTEMPT_FINISH}</td>
 				<td><a href='/survey/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}'>Review</a></td>
-				<td><input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'></td>
 			</tr>
 			<!-- END attempt -->
-		</table>
-
-		<input class='submit-btn-plain' type='submit' value='Delete selected' />
-	</form>
-</div>
+		</tbody>
+	</table>
+</form>
