@@ -46,7 +46,7 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 
 		$email->setVar(array(
 			'LEAVE_USER_NAME' => $this->getRequest()->getUser()->formatName(),
-			'LEAVE_AUTHOR_NAME' => $this->getRequest()->getAuthorId()->formatName(),
+			'LEAVE_AUTHOR_NAME' => $this->getRequest()->getAuthor()->formatName(),
 			'LEAVE_STATUS' => $this->getRequest()->getStatus(true),
 			'LEAVE_START' => $this->getRequest()->getStart()->getLong(),
 			'LEAVE_FINISH' => $this->getRequest()->getFinish()->getLong(),

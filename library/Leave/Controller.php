@@ -410,7 +410,7 @@ class Leave_Controller extends Controller {
 			   */
 			$userId = $data['userId'];
 			$request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
-			$request->setAuthorId($_SESSION['user']);
+			$request->setAuthor($_SESSION['user']);
 			$request->setStart($start->getDatabase());
 			$request->setFinish($finish->getDatabase());
 			$request->setHostType($data['request']['hostType']);
@@ -506,7 +506,7 @@ class Leave_Controller extends Controller {
                 array(
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
-					'AUTHOR_NAME' => $request->getAuthorId()->formatName(),
+					'AUTHOR_NAME' => $request->getAuthor()->formatName(),
 					'USER_NAME' => $user->formatName(),
                     'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
@@ -595,7 +595,7 @@ class Leave_Controller extends Controller {
                 array(
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
-                    'USER_NAME' => $request->getAuthorId()->formatName(),
+                    'USER_NAME' => $request->getAuthor()->formatName(),
                     'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
                     'USER_HOUSE' => $house->getHouse(),
