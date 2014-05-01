@@ -437,9 +437,22 @@ table.ruler {
   }
   tr:nth-child(even) td{ background: @dark; }
   tr:hover td{background: lighten(@highlight-color,@lighten-value); }
-
 }
 
+table.ruler-fix {
+	width: 100%;
+	margin-bottom: 10px;
+	padding: 0 0 0 16px !important;
+
+	th {
+		text-align: left;
+		font-weight: bold;
+		background: @dark;
+	}
+
+	tr:nth-child(even) td{ background: @dark; }
+	tr:hover td{background: lighten(@highlight-color,@lighten-value); }
+}
 
 /*--------------------------------------------------------------
 Notifications
