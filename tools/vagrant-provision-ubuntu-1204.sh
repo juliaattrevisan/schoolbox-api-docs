@@ -142,7 +142,7 @@ eplver='1.4.0-3';
 if [ "`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`" != "$eplver" ];
 then
 	apt-get update >/dev/null 2>&1;
-	apt-get -y install schoolbox-epl=1.4.0-3;
+	apt-get -y install schoolbox-epl;
 fi
 
 echo "$vag Ensure all services are running";
