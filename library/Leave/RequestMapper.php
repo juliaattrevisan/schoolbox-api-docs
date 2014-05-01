@@ -38,7 +38,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$this->hasMap(
 			array(
 				'column' => 'author_id',
-				'property' => 'authorId',
+				'property' => 'author',
 				'type' => self::TYPE_MODEL,
 				'join' => 'author',
 			)
