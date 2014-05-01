@@ -138,14 +138,6 @@ class Session
 
         $result = false;
 
-        $username = trim($username);
-        $password = trim($password);
-
-        if (get_magic_quotes_gpc()) {
-            $username = stripslashes($username);
-            $password = stripslashes($password);
-        }
-
         if (empty($username) || empty($password)) {
             throw new Exception_Schoolbox_AccessDenied();
         }
