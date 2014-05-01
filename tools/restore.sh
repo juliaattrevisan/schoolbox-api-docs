@@ -529,10 +529,6 @@ if [ `which apache2 | wc -l` -ne 0 ];
 then
 	/usr/sbin/service apache2 restart >/dev/null 2>&1;
 fi
-if [ `which httpd | wc -l` -ne 0 ];
-then
-	/usr/sbin/service httpd restart >/dev/null 2>&1;
-fi
 if [ $? -ne 0 ];
 then
 	errmsg="An error occured restarting apache";
