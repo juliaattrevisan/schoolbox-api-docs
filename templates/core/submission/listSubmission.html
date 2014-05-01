@@ -2,12 +2,26 @@
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
 $j(function(){
+    $j.tablesorter.addParser({
+        id: 'dataDate',
+        is: function() { return false },
+        format: function(value, table, cell) {
+            return $j(cell).data('timestamp')
+        },
+        type: 'numeric'
+    })
     $j(".ruler").tablesorter({
         cssHeader: 'sortable',
         cssAsc: 'ascending',
         cssDesc: 'descending',
         headers: {
+            // Open Date
+            2: { sorter: 'dataDate' },
+            // Due Date
+            3: { sorter: 'dataDate' },
+            // Visibility
             6: { sorter: false},
+            // Actions
             7: { sorter: false}
         }
     });
@@ -40,7 +54,7 @@ $j(function(){
                 <!-- BEGIN normalSubmission -->
                 <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
                 <td>{TYPE}</td>
-                <td>
+                <td data-timestamp="{ASSESS_START_TIMESTAMP}">
                     <!-- BEGIN writable_open -->
                     {OPENDATE}
                     <!-- END writable_open -->
@@ -48,7 +62,7 @@ $j(function(){
                     {OPENDATE}
                     <!-- END readonly_open -->
                 </td>
-                <td>
+                <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">
                     <!-- BEGIN writable_close -->
                     {DUEDATE}
                     <!-- END writable_close -->
@@ -74,8 +88,8 @@ $j(function(){
                 <!-- BEGIN onlineAssessment -->
                 <td><a href="/assess/results/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></td>
                 <td>{ASSESS_TYPE}</td>
-                <td>{ASSESS_START}</td>
-                <td>{ASSESS_FINISH}</td>
+                <td data-timestamp="{ASSESS_START_TIMESTAMP}">{ASSESS_START}</td>
+                <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">{ASSESS_FINISH}</td>
                 <td class="center">{ASSESS_ATTEMPTS}</td>
                 <td class="center">{ASSESS_REVIEWED}</td>
                 <td class="center"><span class="visibility-btn visibility_{ASSESS_VISIBILITY_ID}" title="{ASSESS_VISIBILITY}"></span></td>
