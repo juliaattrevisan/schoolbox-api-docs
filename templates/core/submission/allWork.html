@@ -231,12 +231,19 @@
 
 		  <div class="listing">
 			  <table class="upcoming-work table">
+				  <colgroup>
+					  <col />
+					  <col />
+					  <col />
+					  <col width="33%"/>
+					  <col width="100"/>
+				  </colgroup>
 				  <thead>
-				  <th>Title</th>
-				  <th>Grade</th>
-				  <th>Date</th>
-				  <th>Comments</th>
-				  <th></th>
+					  <th>Title</th>
+					  <th>Grade</th>
+					  <th>Date</th>
+					  <th>Comments</th>
+					  <th>Actions</th>
 				  </thead>
 				  <tbody>
 				  <!-- BEGIN work -->
@@ -253,9 +260,9 @@
 						  <span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span> on {WORK_TIME}
 					  </td>
 					  <td>{WORK_COMMENT}</td>
-					  <td class="text-align-right">
+					  <td>
 						  <!-- BEGIN work_actionable -->
-						  <a href="/{WORK_BTN_HREF}" class="btn {WORK_BTN_ICON}" alt="{WORK_BTN_LABEL}" title="{WORK_BTN_LABEL}"><span></span></a>
+						  <a href="/{WORK_BTN_HREF}" class="btn no-text {WORK_BTN_ICON} float-left" alt="{WORK_BTN_LABEL}" title="{WORK_BTN_LABEL}"><span></span></a>
 						  <!-- END work_actionable -->
 						  <!-- BEGIN work_publishable -->
 
