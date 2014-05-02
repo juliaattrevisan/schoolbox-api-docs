@@ -1639,27 +1639,6 @@ Notifications
 		max-width: 64px;
 	}
 
-	// Actions are the buttons to interact with the list item, such as edit, delete
-	.actions {
-		position: relative;
-		z-index: 1;
-		float: right;
-		// Put all buttons on the one row
-		.btn {
-			background-color: transparent;
-			border-color: transparent;
-			opacity: 0.3;
-			.transition(all 0.2s);
-			float: none;
-			display: inline-block;
-		}
-	}
-	// Obsfucate buttons unless hovering over the line
-	li:hover > .actions .btn {
-		border-color: @lgrey;
-		background: @dark;
-		opacity: 1;
-	}
 	// Because LI has padding, we can remove it from wysiwyg. Add spacing from meta
 	.wysiwyg {
 		padding: 0;
@@ -1692,8 +1671,30 @@ Notifications
 	}
 }
 
+// Actions are the buttons to interact with the list item, such as edit, delete
+.actions {
+	position: relative;
+	z-index: 1;
+	float: right;
+	// Put all buttons on the one row
+	.btn {
+		background-color: transparent;
+		border-color: transparent;
+		opacity: 0.3;
+		.transition(all 0.2s);
+		float: none;
+		display: inline-block;
+	}
+}
 
-
+// Obsfucate buttons unless hovering over the line
+td:hover > .actions .btn,
+li:hover > .actions .btn
+{
+	border-color: @lgrey;
+	background: @dark;
+	opacity: 1;
+}
 
 /*--------------------------------------------------------------
  PROFILES

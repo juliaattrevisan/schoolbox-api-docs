@@ -148,207 +148,215 @@
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.time.js"></script>
 <!-- END custom_head -->
 <div id="all-work">
-  <h1>Grades &ndash; {RC_TITLE}</h1>
-  <div id="context">
-    <div id="student">
-      <a class="bar large button" href="/search/user/{WORK_USER_ID}">
-        <img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64">
-        <span class="name">{WORK_USER_NAME}</span>
-        <span class="group">{WORK_USER_BYLINE} Student</span>
-      </a>
-    </div>
-    <div id="enrolment">
-      <form id="semesters">
-        <a class="sem-back" href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
-        <select id="semester">
-          <!-- BEGIN semester_option -->
-          <option value="{SEMESTER_SLUG}" {SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
-          <!-- END semester_option -->
-        </select>
-        <a class="sem-fwd" href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
-      </form>
-      <form id="subjects" action="/submission/allWork/" method="get">
-        <span class="elbow">&#9492;</span>
-        <select id="enrolled-subjects">
-          <option disabled="disabled" selected="selected">Select a subject</option>
-          <!-- BEGIN subject_selector -->
-          <option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}" value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}" {ENR_SUBJ_SELECTED}>
-          {ENR_SUBJ_NAME}
-          </option>
-          <!-- END subject_selector -->
-        </select>
-      </form>
-    </div>
-  </div>
+	<h1>Grades &ndash; {RC_TITLE}</h1>
 
+	<div id="context">
+		<div id="student">
+			<a class="bar large button" href="/search/user/{WORK_USER_ID}">
+				<img src="/portrait.php?userId={WORK_USER_EXT_ID}&amp;size=square64">
+				<span class="name">{WORK_USER_NAME}</span>
+				<span class="group">{WORK_USER_BYLINE} Student</span>
+			</a>
+		</div>
+		<div id="enrolment">
+			<form id="semesters">
+				<a class="sem-back" href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
+				<select id="semester">
+					<!-- BEGIN semester_option -->
+					<option value="{SEMESTER_SLUG}"
+					{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
+					<!-- END semester_option -->
+				</select>
+				<a class="sem-fwd" href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
+			</form>
+			<form id="subjects" action="/submission/allWork/" method="get">
+				<span class="elbow">&#9492;</span>
+				<select id="enrolled-subjects">
+					<option disabled="disabled" selected="selected">Select a subject</option>
+					<!-- BEGIN subject_selector -->
+					<option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}"
+							value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}"
+					{ENR_SUBJ_SELECTED}>
+					{ENR_SUBJ_NAME}
+					</option>
+					<!-- END subject_selector -->
+				</select>
+			</form>
+		</div>
+	</div>
 
-  <div id="subject-main">
-    <!-- BEGIN subject -->
-    <div class="current-grade-avg gradient-{SUBJ_GRADEIENT} gradient-{SUBJ_GRADEIENT}-bg clearfix">
-    <ul class="subject-teachers">
-      <!-- BEGIN subject_teacher -->
-      <li>
-        <a class="bar button" href="/search/user/{SUBJ_TCH_ID}">
-          <img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square32">
-          <span class="name">{SUBJ_TCH_NAME}</span>
-          <span class="group">Teacher</span>
-        </a>
-      </li>
-      <!-- END subject_teacher -->
-    </ul>
-      <!-- BEGIN grade_average -->
-      <span>Current Grade Average:</span>
-      <span class="grade">{SUBJ_GRADE_AVG}</span>
-      <span class="trend">{SUBJ_GRADE_TREND}</span>
-      <!-- END grade_average -->
-    </div>
+	<div id="subject-main">
+		<!-- BEGIN subject -->
+		<div class="current-grade-avg gradient-{SUBJ_GRADEIENT} gradient-{SUBJ_GRADEIENT}-bg clearfix">
+			<ul class="subject-teachers">
+				<!-- BEGIN subject_teacher -->
+				<li>
+					<a class="bar button" href="/search/user/{SUBJ_TCH_ID}">
+						<img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square32">
+						<span class="name">{SUBJ_TCH_NAME}</span>
+						<span class="group">Teacher</span>
+					</a>
+				</li>
+				<!-- END subject_teacher -->
+			</ul>
+			<!-- BEGIN grade_average -->
+			<span>Current Grade Average:</span>
+			<span class="grade">{SUBJ_GRADE_AVG}</span>
+			<span class="trend">{SUBJ_GRADE_TREND}</span>
+			<!-- END grade_average -->
+		</div>
 
-    <div id="subject-graph">&nbsp;</div>
+		<div id="subject-graph">&nbsp;</div>
 
-    <!-- BEGIN subject_crit -->
-    <div class="subject-criteria">
-      <h2>Criteria</h2>
-      <ul>
-        <!-- BEGIN subject_crit_group -->
-        <li class="crit-group">
-          <span>{CRIT_GROUP_NAME}</span>
-          <ul>
-            <!-- BEGIN subject_crit_item -->
-            <li class="crit-item">
-              <span class="name">{CRIT_ITEM_NAME}</span>
-              <span class="score">{CRIT_ITEM_SCORE}</span>
-            </li>
-            <!-- END subject_crit_item -->
-          </ul>
-        </li>
-        <!-- END subject_crit_group -->
-      </ul>
-    </div>
-    <!-- END subject_crit -->
+		<!-- BEGIN subject_crit -->
+		<div class="subject-criteria">
+			<h2>Criteria</h2>
+			<ul>
+				<!-- BEGIN subject_crit_group -->
+				<li class="crit-group">
+					<span>{CRIT_GROUP_NAME}</span>
+					<ul>
+						<!-- BEGIN subject_crit_item -->
+						<li class="crit-item">
+							<span class="name">{CRIT_ITEM_NAME}</span>
+							<span class="score">{CRIT_ITEM_SCORE}</span>
+						</li>
+						<!-- END subject_crit_item -->
+					</ul>
+				</li>
+				<!-- END subject_crit_group -->
+			</ul>
+		</div>
+		<!-- END subject_crit -->
 
-	  <div class="subject-assessments">
-		  <h2>Assessments<a href="/eportfolio/{WORK_USER_ID}/showcase" class="btn"><span></span>View Showcase</a></h2>
+		<div class="subject-assessments">
+			<h2>Assessments<a href="/eportfolio/{WORK_USER_ID}/showcase" class="btn"><span></span>View Showcase</a></h2>
 
-		  <div class="listing">
-			  <table class="upcoming-work table">
-				  <colgroup>
-					  <col />
-					  <col />
-					  <col />
-					  <col width="33%"/>
-					  <col width="100"/>
-				  </colgroup>
-				  <thead>
-					  <th>Title</th>
-					  <th>Grade</th>
-					  <th>Date</th>
-					  <th>Comments</th>
-					  <th>Actions</th>
-				  </thead>
-				  <tbody>
-				  <!-- BEGIN work -->
-				  <tr class="{ON_OFF}">
-					  <td>
-						  <a class="title" href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">{WORK_TITLE}</a>
-						  <br/>
-						  <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
-					  </td>
-					  <td class="grade">
-						  <span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
-					  </td>
-					  <td>
-						  <span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span> on {WORK_TIME}
-					  </td>
-					  <td>{WORK_COMMENT}</td>
-					  <td>
-						  <!-- BEGIN work_actionable -->
-						  <a href="/{WORK_BTN_HREF}" class="btn no-text {WORK_BTN_ICON} float-left" alt="{WORK_BTN_LABEL}" title="{WORK_BTN_LABEL}"><span></span></a>
-						  <!-- END work_actionable -->
-						  <!-- BEGIN work_publishable -->
+			<div class="listing">
+				<table class="upcoming-work table ruler-fix">
+					<colgroup>
+						<col/>
+						<col/>
+						<col/>
+						<col width="33%"/>
+						<col width="100"/>
+					</colgroup>
+					<thead>
+					<th>Title</th>
+					<th>Grade</th>
+					<th>Date</th>
+					<th>Comments</th>
+					<th>Actions</th>
+					</thead>
+					<tbody>
+					<!-- BEGIN work -->
+					<tr class="{ON_OFF}">
+						<td>
+							<a class="title" href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">{WORK_TITLE}</a>
+							<br/>
+							<a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
+						</td>
+						<td class="grade">
+							<span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
+						</td>
+						<td>
+							<span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span> on {WORK_TIME}
+						</td>
+						<td>{WORK_COMMENT}</td>
+						<td>
+							<span class="actions">
+								<!-- BEGIN work_actionable -->
+								<a href="/{WORK_BTN_HREF}" class="btn no-text {WORK_BTN_ICON} float-left" alt="{WORK_BTN_LABEL}" title="{WORK_BTN_LABEL}"><span></span></a>
+								<!-- END work_actionable -->
+							</span>
 
-						  <form action='/eportfolio/showcase/modifyForm.php' method='post'>
-							  <input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}'/>
-							  <input type='hidden' name='userId' value='{WORK_USER_ID}'/>
-							  <input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}'/>
-							  <input type='submit' class="btn no-icon" value='{WORK_PUBLISH_BTN_LABEL}'/>
-						  </form>
+							<!-- BEGIN work_publishable -->
+							<form action='/eportfolio/showcase/modifyForm.php' method='post'>
+								<input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}'/>
+								<input type='hidden' name='userId' value='{WORK_USER_ID}'/>
+								<input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}'/>
+								<input type='submit' class="btn no-icon" value='{WORK_PUBLISH_BTN_LABEL}'/>
+							</form>
+							<!-- <a href="/{WORK_PUBLISH_HREF}{WORK_ID}" class="btn {WORK_PUBLISH_BTN_ICON}"><span></span> {WORK_PUBLISH_BTN_LABEL}</a> -->
+							<!-- END work_publishable -->
+						</td>
+					</tr>
+					<!-- END work -->
+					</tbody>
+				</table>
+			</div>
+		</div>
 
-						  <!-- <a href="/{WORK_PUBLISH_HREF}{WORK_ID}" class="btn {WORK_PUBLISH_BTN_ICON}"><span></span> {WORK_PUBLISH_BTN_LABEL}</a> -->
-						  <!-- END work_publishable -->
-					  </td>
-				  </tr>
-				  <!-- END work -->
-				  </tbody>
-			  </table>
-		  </div>
-	  </div>
+		<!-- BEGIN subject_comments -->
+		<div class="subject-comments">
+			<h2>Comments</h2>
 
-    <!-- BEGIN subject_comments -->
-    <div class="subject-comments">
-      <h2>Comments</h2>
-      <div class="listing">
-        <table class="comments table" id="comment-table">
-          <colgroup>
-            <col width="1%" />
-            <col width="10%" />
-            <col width="80%" />
-            <col width="9%" />
-          </colgroup>
-          <tbody>
-            <!-- BEGIN create_comment -->
-            <tr>
-              <td><img class="thumb" src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square32"></td>
-              <td>
-                <span class="name">{SESSION_USER_NAME}</span>
-                <span class="group">{SESSION_USER_BYLINE}</span>
-              </td>
-              <td colspan="2">
-                <form id="create-comment" class="comment-form" action="/submission/commentForm.php" method="post">
-                  <input type="hidden" name="year" value="{WORK_YEAR}" />
-                  <input type="hidden" name="semester" value="{WORK_SEMESTER}" />
-                  <input type="hidden" name="studentId" value="{WORK_USER_ID}" />
-                  <input type="hidden" name="categoryId" value="{SUBJ_ID}" />
-                  <textarea name="comment"></textarea>
-                  <div>
-                    <span>Visible to: </span>
-                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
-                    <label for="vis-student">Student</label>
-                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
-                    <label for="vis-parent">Parent</label>
-                    <a class="submit-this btn up-arrow"><span></span>Post</a>
-                  </div>
-                </form>
-              </td>
-            </tr>
-            <!-- END create_comment -->
-            <!-- BEGIN comment -->
-            <tr data-id="{COMMENT_ID}">
-              <td><img class="thumb" src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square32"></td>
-              <td>
-                <span class="name">{COMMENT_USER_NAME}</span>
-                <span class="group">{COMMENT_USER_BYLINE}</span>
-                <span class="group" title="{COMMENT_DATETIME}">{COMMENT_DATE}</span>
-              </td>
-              <td><p>{COMMENT_BODY}</p></td>
-              <td class="actions">
-                <span class="visibility student {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
-                <span class="visibility parent {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
-                <!-- BEGIN comment_modify -->
-                <a class="btn delete no-text" title="Delete"><span></span></a>
-                <a class="btn modify no-text" title="Modify"><span></span></a>
-                <!-- END comment_modify -->
-              </td>
-            </tr>
-            <!-- END comment -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- END subject_comments -->
+			<div class="listing">
+				<table class="comments table" id="comment-table">
+					<colgroup>
+						<col width="1%"/>
+						<col width="10%"/>
+						<col width="80%"/>
+						<col width="9%"/>
+					</colgroup>
+					<tbody>
+					<!-- BEGIN create_comment -->
+					<tr>
+						<td><img class="thumb" src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square32"></td>
+						<td>
+							<span class="name">{SESSION_USER_NAME}</span>
+							<span class="group">{SESSION_USER_BYLINE}</span>
+						</td>
+						<td colspan="2">
+							<form id="create-comment" class="comment-form" action="/submission/commentForm.php"
+								  method="post">
+								<input type="hidden" name="year" value="{WORK_YEAR}"/>
+								<input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
+								<input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
+								<input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
+								<textarea name="comment"></textarea>
 
-    <!-- END subject -->
-  </div>
+								<div>
+									<span>Visible to: </span>
+									<input id="vis-student" type="checkbox" name="visibility[student]" value="1"
+									{COMMENT_VIS_STUDENT_CHECKED} />
+									<label for="vis-student">Student</label>
+									<input id="vis-parent" type="checkbox" name="visibility[parent]" value="1"
+									{COMMENT_VIS_PARENT_CHECKED} />
+									<label for="vis-parent">Parent</label>
+									<a class="submit-this btn up-arrow"><span></span>Post</a>
+								</div>
+							</form>
+						</td>
+					</tr>
+					<!-- END create_comment -->
+					<!-- BEGIN comment -->
+					<tr data-id="{COMMENT_ID}">
+						<td><img class="thumb" src="/portrait.php?userId={COMMENT_USER_EXTID}&amp;size=square32"></td>
+						<td>
+							<span class="name">{COMMENT_USER_NAME}</span>
+							<span class="group">{COMMENT_USER_BYLINE}</span>
+							<span class="group" title="{COMMENT_DATETIME}">{COMMENT_DATE}</span>
+						</td>
+						<td><p>{COMMENT_BODY}</p></td>
+						<td class="actions">
+							<span class="visibility student {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
+							<span class="visibility parent {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
+							<!-- BEGIN comment_modify -->
+							<a class="btn delete no-text" title="Delete"><span></span></a>
+							<a class="btn modify no-text" title="Modify"><span></span></a>
+							<!-- END comment_modify -->
+						</td>
+					</tr>
+					<!-- END comment -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<!-- END subject_comments -->
 
+		<!-- END subject -->
+	</div>
 </div>
 
 <script type="text/javascript">
