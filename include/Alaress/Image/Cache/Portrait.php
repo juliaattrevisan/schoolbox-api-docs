@@ -108,6 +108,23 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
     }
 
     /**
+     * Purges transformations that are older than the portrait in $portraitPath.
+     */
+    public function purgeOldTransformations() {
+        $portraitPath = $this->filename;
+        if (!empty($portraitPath)) {
+            $portraitAge = filemtime($portraitPath);
+            $pathinfo    = pathinfo($portraitPath);
+            $pattern     = $this->cacheLocation . '/' . $pathinfo['filename'] . '-*.dat';
+            foreach (glob($pattern) as $cacheFile) {
+                if (filemtime($cacheFile) < $portraitAge) {
+                    unlink($cacheFile);
+                }
+            }
+        }
+    }
+
+    /**
      * Determine whether a portrait can be seen or not
      *
      * @return bool
