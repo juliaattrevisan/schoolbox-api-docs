@@ -19,13 +19,11 @@ class Assess_Answer_Short extends Evaluation_Answer_Short {
 	protected $pluginReview = 'evaluationShortReview';
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Setup
 	 */
-    public function __construct() {
-        parent::__construct();
-
-        $this->responseHandler = new Assess_Response();
-    }
+	protected function setup() {
+		$this->setResponseHandler(new Assess_Response());
+	}
 
 	/**
 	 * Automatically marks a response. Customised to be applicable to the way in

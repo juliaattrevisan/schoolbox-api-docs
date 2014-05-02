@@ -16,9 +16,9 @@
 		$j('.evaluation-navigator').click(function(event) {
 			event.preventDefault();
 
-			$j.fn.evaluation.saveAll();
+			$j.fn.evaluation.saveAll($j(this).attr('href'));
 
-			location.href = $j(this).attr('href');
+			return false;
 		});
 
 		/* When someone finishes an assessment, loop through each question
@@ -32,8 +32,7 @@
 			var href = $(this).attr('href');
 			$j(this).confirmDialog({
 				confirmEvent: function() {
-					$j.fn.evaluation.saveAll();
-					location.href = href;
+					$j.fn.evaluation.saveAll(href);
 				}
 			});
 		});
@@ -42,7 +41,7 @@
 	/**
 	 * Save each individual question
 	 */
-	$j.fn.evaluation.saveAll = function() {
+	$j.fn.evaluation.saveAll = function(href) {
 		init();
 
 		/* Allow display of saving indicator before locking browser up
@@ -63,19 +62,72 @@
 		 * Save each question form
 		 */
 		function saveForms() {
+			var errors = false;
+
 			$j('.questionForm').each(function(index, element) {
 				var id = $j(element).attr('id').replace('questionForm-', '');
 
-				var plugin = "$.fn." + $j(element).data('plugin') + ".saveOne($('#questionForm-" + id + "'))";
+				var prefix = "$.fn." + $j(element).data('plugin');
 
+				/* Run saveOne() multiple times
+				 */
+				var plugin = prefix + ".saveOne($('#questionForm-" + id + "'))";
 				var hadoken = new Function(plugin);
 				hadoken();
+
+				/* Extract validation ruleset for this particular question type
+				 */
+				var method = prefix + ".getValidationRules()";
+				var shoryuken = new Function('return ' + method);
+				var configuration = shoryuken();
+
+				/* If configuration exists for this question type, apply settings
+				 * otherwise ignore it
+				 */
+				if (configuration != undefined) {
+
+					/* If the question is mandatory, apply validation requirements
+					 */
+					if ($(element).find('span[data-mandatory="required"]').length) {
+
+						/* If a custom error location is desired
+						 */
+						if (configuration.errorContainer != undefined) {
+							$j(element).validate({
+								errorPlacement: function(error, inputElement) {
+									$(element).find(configuration.errorContainer).html(error);
+								}
+							});
+						}
+						else {
+							$j(element).validate();
+						}
+
+						/* Apply custom rules if validation is required, in accordance with
+						 * http://jquery.bassistance.de/validate/demo/
+						 */
+						$j(element).find(configuration.element).rules('add', configuration.rules);
+
+						/* If any aren't valid, mark as bad
+						 */
+						if (!$j(element).valid()) {
+							errors = true;
+						}
+					}
+				}
 			});
 
-			$j('.evaluation-saving').html('<h2>Saved</h2>');
+			$j('.evaluation-saving').html('<p><strong>Saved</p></strong>');
 
-			/* TODO: Redirect upon completion
+			/* Detect errors, prevent redirection if any were made
+			 * and hide that Saving box
 			 */
+			if (!errors) {
+				location.href = href;
+			}
+			else {
+				$('.evaluation-saving').hide();
+			}
 		}
 	}
 

@@ -11,17 +11,15 @@
  */
 class Assess_Answer_Multi extends Evaluation_Answer_Multi {
 
-    /**
-     * Get an instance of a responseHandler upon instantiation
-     */
-    public function __construct() {
-        parent::__construct();
+	/**
+	 * Setup
+	 */
+	protected function setup() {
+		$this->setResponseHandler(new Assess_Response());
+		$this->setQuestionHandler(new Assess_Question());
+	}
 
-        $this->responseHandler = new Assess_Response();
-		$this->questionHandler = new Assess_Question();
-    }
-
-    /**
+	/**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      *
@@ -75,7 +73,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
             'mark' => $total,
         );
 
-        $this->responseHandler->update($marks);
+        $this->getResponseHandler()->update($marks);
     }
 
     /**
@@ -104,7 +102,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
      * @return void
      */
     public function reviewResponse($page, $question_id) {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
             $existingAnswer = unserialize($existing['response']);

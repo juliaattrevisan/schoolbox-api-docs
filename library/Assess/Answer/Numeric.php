@@ -12,13 +12,11 @@
 class Assess_Answer_Numeric extends Evaluation_Answer_Numeric {
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Setup
 	 */
-    public function __construct() {
-        parent::__construct();
-
-        $this->responseHandler = new Assess_Response();
-    }
+	protected function setup() {
+		$this->setResponseHandler(new Assess_Response());
+	}
 
 	/**
 	 * Automatically marks a response. Customised to be applicable to the way in
@@ -42,6 +40,6 @@ class Assess_Answer_Numeric extends Evaluation_Answer_Numeric {
 			'mark' => $total,
 		);
 
-		$this->responseHandler->update($marks);
+		$this->getResponseHandler()->update($marks);
     }
 }

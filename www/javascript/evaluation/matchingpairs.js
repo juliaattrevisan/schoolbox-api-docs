@@ -72,4 +72,15 @@
 			}
 		});
 	}
+
+	/**
+	 * Decide what the validation rules are for this particular
+	 * question type. Optionally specify errorContainer if you want
+	 * the validation messages to appear in a special location,
+	 * otherwise leave it undefined for default behaviour
+	 *
+	 * @returns {{element: string, rules: {required: boolean, minlength: number}, errorContainer: string}}
+	 */
+	$.fn.evaluationMultipleChoice.getValidationRules = function() {
+	}
 }(jQuery));

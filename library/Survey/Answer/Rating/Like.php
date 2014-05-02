@@ -22,13 +22,12 @@ class Survey_Answer_Rating_Like extends Evaluation_Answer_Rating_Like {
 	protected $useLongAnswers = true;
 
 	/**
-	 * Get an instance of a responseHandler upon instantiation
+	 * Setup
 	 */
-    public function __construct() {
-        parent::__construct();
-
-        $this->responseHandler = new Survey_Response();
-    }
+	protected function setup() {
+		$this->setResponseHandler(new Survey_Response());
+		$this->setQuestionHandler(new Survey_Question());
+	}
 
 	/**
 	 * Graph the results for this answer type
@@ -40,5 +39,34 @@ class Survey_Answer_Rating_Like extends Evaluation_Answer_Rating_Like {
 	public function graphResults($page, $currentQuestion) {
 		$graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
 		$graph->graph();
+	}
+
+	/**
+	 * Configure question/configure answer during creation/modification
+	 *
+	 * @param $page
+	 * @param $config
+	 */
+	public function configure($page, $config) {
+		$options = json_decode($config);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+		));
+	}
+
+	/**
+	 * Configure mandatoryness and other settings for this response
+	 *
+	 * @param $page
+	 * @param $question_id
+	 */
+	protected function configureResponse($page, $question_id) {
+		$question = $this->questionHandler->getByID($question_id);
+		$config = json_decode($question['config']);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+		));
 	}
 }

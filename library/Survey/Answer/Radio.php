@@ -22,15 +22,13 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
       */
     protected $useLongAnswers = true;
 
-    /**
-     * Get an instance of a responseHandler upon instantiation
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->responseHandler = new Survey_Response();
-    }
+	/**
+	 * Setup
+	 */
+	protected function setup() {
+		$this->setResponseHandler(new Survey_Response());
+		$this->setQuestionHandler(new Survey_Question());
+	}
 
     /**
      * Graph the results for this answer type
@@ -55,7 +53,7 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
      */
     public function reviewResponse($page, $question_id)
     {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
             $existingAnswer = unserialize($existing['response']);
@@ -133,4 +131,33 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
             $page->setVar('answerOption_block', '');
         }
     }
+
+	/**
+	 * Configure question/configure answer during creation/modification
+	 *
+	 * @param $page
+	 * @param $config
+	 */
+	public function configure($page, $config) {
+		$options = json_decode($config);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+		));
+	}
+
+	/**
+	 * Configure mandatoryness and other settings for this response
+	 *
+	 * @param $page
+	 * @param $question_id
+	 */
+	protected function configureResponse($page, $question_id) {
+		$question = $this->questionHandler->getByID($question_id);
+		$config = json_decode($question['config']);
+
+		$page->setVar(array(
+			'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+		));
+	}
 }

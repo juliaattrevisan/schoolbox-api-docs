@@ -1,4 +1,3 @@
-<script type="text/javascript" src="/javascript/jquery.form.2.43.js"></script>
 <script type="text/javascript">
     $j(document).ready(function () {
 
@@ -52,7 +51,8 @@
                             sequence:theForm.find('input[name=sequence]').val(),
                             type_id:theForm.find('input[name=type_id]').val(),
                             marks:theForm.find('input[name=marks]').val(),
-                            allAnswers:JSON.stringify(answerCollection)
+                            allAnswers:JSON.stringify(answerCollection),
+							configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
                         };
 
                         console.log(data);

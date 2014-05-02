@@ -179,14 +179,17 @@ if ($allQuestions) {
          */
         $this->setVar('answerOption_block', '');
 
-        $this->setVar(
-            array(
-                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-                'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-                'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
-                'QUESTION_MARKS' => $currentQuestion['marks'],
-            )
-        );
+		/* Load question configuration to detect Mandatoryness
+		 */
+		$configuration = json_decode($currentQuestion['config']);
+
+        $this->setVar(array(
+			'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+			'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
+			'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
+			'QUESTION_MARKS' => $currentQuestion['marks'],
+			'QUESTION_MANDATORY' => $configuration->mandatory ? 'Required' : ''
+		));
 
         /* Load individual answers
          */

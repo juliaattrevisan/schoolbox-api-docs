@@ -50,7 +50,7 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
 	 * @return void
 	 */
 	public function reviewResponse($page, $question_id) {
-		$existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+		$existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
 		$currentAnswer = $this->getByQuestionID($question_id);
 
@@ -91,7 +91,7 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
 	 * @return void
 	 */
 	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
-		$existing = $this->responseHandler->isResponseExists($attemptId, $currentQuestion['question_id']);
+		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
 		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 

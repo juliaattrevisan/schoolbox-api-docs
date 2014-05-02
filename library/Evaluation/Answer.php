@@ -14,8 +14,6 @@ abstract class Evaluation_Answer extends DeprecatedModel
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
 
-    public $responseHandler = null;
-
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
     /* Whether or not to include HTML formatting when exporting CSV results
@@ -30,6 +28,20 @@ abstract class Evaluation_Answer extends DeprecatedModel
      */
     protected $useLongAnswers = false;
 
+	/**
+	 * An instance of Assess/Survey ResponseHandler
+	 *
+	 * @var null
+	 */
+	protected $responseHandler = null;
+
+	/**
+	 * An instance of Assess/Survey QuestionHandler
+	 *
+	 * @var null
+	 */
+	protected $questionHandler = null;
+
     /**
      * Constructor.
      *
@@ -38,7 +50,15 @@ abstract class Evaluation_Answer extends DeprecatedModel
     public function __construct()
     {
         parent::DeprecatedModel();
+
+		$this->setup();
     }
+
+	/**
+	 * Hook method
+	 */
+	protected function setup() {
+	}
 
     /**
      * Sets legendHTML
@@ -61,6 +81,24 @@ abstract class Evaluation_Answer extends DeprecatedModel
     {
         return $this->legendHTML;
     }
+
+	/**
+	 * Configure question/configure answers
+	 */
+	public function configure() {
+	}
+
+	/**
+	 * Configure question/configure answers, in xml format
+	 */
+	public function configureXml() {
+	}
+
+	/**
+	 * Hook method
+	 */
+	protected function configureResponse($page, $question_id) {
+	}
 
     /**
      * Gets the Answer record for a particular Question.
@@ -117,17 +155,17 @@ abstract class Evaluation_Answer extends DeprecatedModel
         /* If they have already responded to this question in this attempt,
          * then update existing row; otherwise create a new one
          */
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
         $response_id = $existing['response_id'];
 
         if (is_numeric($response_id)) {
             $response['response_id'] = $response_id;
 
-            if ($this->responseHandler->update($response)) {
+            if ($this->getResponseHandler()->update($response)) {
                 $result['response_id'] = $response_id;
             }
         } else {
-            $result['response_id'] = $this->responseHandler->create($response);
+            $result['response_id'] = $this->getResponseHandler()->create($response);
         }
 
         /* Compile resultant object: contains the question_id which was just
@@ -153,7 +191,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
             'mark' => $data['reviewedMarks'],
         );
 
-        if ($this->responseHandler->update($reviewedResponse)) {
+        if ($this->getResponseHandler()->update($reviewedResponse)) {
             return $reviewedResponse;
         }
 
@@ -191,5 +229,41 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	 */
 	public function getPluginReview() {
 		return $this->pluginReview;
+	}
+
+	/**
+	 * Set question handler
+	 *
+	 * @param null $questionHandler
+	 */
+	protected function setQuestionHandler($questionHandler) {
+		$this->questionHandler = $questionHandler;
+	}
+
+	/**
+	 * Get question handler
+	 *
+	 * @return null
+	 */
+	protected function getQuestionHandler() {
+		return $this->questionHandler;
+	}
+
+	/**
+	 * Set response handler
+	 *
+	 * @param null $responseHandler
+	 */
+	protected function setResponseHandler($responseHandler) {
+		$this->responseHandler = $responseHandler;
+	}
+
+	/**
+	 * Get response handler
+	 *
+	 * @return null
+	 */
+	protected function getResponseHandler() {
+		return $this->responseHandler;
 	}
 }

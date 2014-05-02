@@ -125,9 +125,13 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id)
-    {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+    public function prepareResponse($page, $question_id) {
+
+		/* Optional configuration hook
+		 */
+		$this->configureResponse($page, $question_id);
+
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
 
@@ -311,7 +315,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
      */
     public function exportResponseToCSV($attempt_id, $question_id)
     {
-        $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
 
@@ -390,7 +394,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
      */
     public function exportResponseToArray($attempt_id, $question_id)
     {
-        $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
 
@@ -407,7 +411,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
      */
     public function reviewResponse($page, $question_id)
     {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
             $existingAnswer = unserialize($existing['response']);

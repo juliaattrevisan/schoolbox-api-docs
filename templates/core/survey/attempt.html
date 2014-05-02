@@ -42,7 +42,10 @@
 	<!-- BEGIN question -->
 	<form id='questionForm-{QUESTION_QUESTION_ID}' data-plugin='{QUESTION_PLUGIN}' action="/survey/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
 		<div class="wysiwyg no-pad clearfix">
-			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}</h3>
+			<h3><strong>Q{QUESTION_SEQUENCE}) {QUESTION_MANDATORY}</strong> {QUESTION_QUESTION}</h3>
+
+			<!-- error messages for radio/checkbox questions -->
+			<div data-evaluationerrors="1"></div>
 		</div>
 		<div class="evaluation-answer clearfix">
 			<!-- BEGIN answerInputs -->
@@ -50,6 +53,10 @@
 		</div>
 	</form>
 	<!-- END question -->
+
+	<div class='evaluation-saving'>
+		<p><strong>Saving progress...</strong></p>
+	</div>
 
 	<p class="clearfix text-align-right">
 		<!-- BEGIN endAssess -->
@@ -80,7 +87,6 @@
 						<em>{SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE}</em>% Complete
 					</div>
 				</div>
-
 			</div>
 		</div>
 		<!-- END sectionPercentageComplete -->
