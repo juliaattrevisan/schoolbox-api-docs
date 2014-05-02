@@ -112,8 +112,12 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
+		$userMapper = new \Schoolbox\UserMapper();
+		$user = $userMapper->findById($currentAttempt['user_id']);
+
         $this->setVar(array(
             'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
+			'ATTEMPT_USER_EXTERNAL_ID' => $user->getExternalId(),
             'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
             'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
             'ATTEMPT_START' => $startDate->getShort(),

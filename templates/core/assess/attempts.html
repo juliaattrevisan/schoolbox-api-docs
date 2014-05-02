@@ -1,4 +1,4 @@
-<h1>{SURVEY_NAME}</h1>
+<h1>Attempts for {SURVEY_NAME}</h1>
 
 <div class="header_option clearfix">
 	<!--<a href="/homepage/{CID}" class="btn go-back"><span></span>Back to Homepage</a>-->
@@ -24,7 +24,12 @@
 		<tbody>
 			<!-- BEGIN attempt -->
 			<tr>
-				<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</a></td>
+				<td>
+					<a href='/search/user/{ATTEMPT_USER_ID}'>
+						<img src="/portrait.php?userId={ATTEMPT_USER_EXTERNAL_ID}&amp;size=square32">
+						<span class="name">{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</span>
+					</a>
+				</td>
 				<td>{ATTEMPT_START}</td>
 				<td>{ATTEMPT_FINISH}</td>
 				<td>
