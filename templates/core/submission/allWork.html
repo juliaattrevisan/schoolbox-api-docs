@@ -226,54 +226,55 @@
     </div>
     <!-- END subject_crit -->
 
-    <div class="subject-assessments">
-      <h2>Assessments<a href="/eportfolio/{WORK_USER_ID}/showcase" class="btn"><span></span>View Showcase</a></h2>
-      <div class="listing">
-        <table class="upcoming-work table">
-          <thead>
-            <th>Title</th>
-            <th>Grade</th>
-            <th>Date</th>
-            <th>Comments</th>
-            <th></th>
-          </thead>
-          <tbody>
-          <!-- BEGIN work -->
-          <tr class="{ON_OFF}">
-            <td>
-              <a class="title" href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">{WORK_TITLE}</a>
-              <br />
-              <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
-            </td>
-            <td class="grade">
-              <span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
-            </td>
-            <td>
-              <span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span> on {WORK_TIME}
-            </td>
-            <td>{WORK_COMMENT}</td>
-            <td class="text-align-right">
-              <!-- BEGIN work_actionable -->
-              <a href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}" class="btn {WORK_BTN_ICON}"><span></span> {WORK_BTN_LABEL}</a>
-              <!-- END work_actionable -->
-              <!-- BEGIN work_publishable -->
+	  <div class="subject-assessments">
+		  <h2>Assessments<a href="/eportfolio/{WORK_USER_ID}/showcase" class="btn"><span></span>View Showcase</a></h2>
 
-              <form action='/eportfolio/showcase/modifyForm.php' method='post'>
-                <input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}' />
-                <input type='hidden' name='userId' value='{WORK_USER_ID}' />
-                <input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}' />
-                <input type='submit' class="btn no-icon" value='{WORK_PUBLISH_BTN_LABEL}' />
-              </form>
+		  <div class="listing">
+			  <table class="upcoming-work table">
+				  <thead>
+				  <th>Title</th>
+				  <th>Grade</th>
+				  <th>Date</th>
+				  <th>Comments</th>
+				  <th></th>
+				  </thead>
+				  <tbody>
+				  <!-- BEGIN work -->
+				  <tr class="{ON_OFF}">
+					  <td>
+						  <a class="title" href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">{WORK_TITLE}</a>
+						  <br/>
+						  <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
+					  </td>
+					  <td class="grade">
+						  <span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
+					  </td>
+					  <td>
+						  <span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span> on {WORK_TIME}
+					  </td>
+					  <td>{WORK_COMMENT}</td>
+					  <td class="text-align-right">
+						  <!-- BEGIN work_actionable -->
+						  <a href="/{WORK_BTN_HREF}" class="btn {WORK_BTN_ICON}"><span></span>{WORK_BTN_LABEL}</a>
+						  <!-- END work_actionable -->
+						  <!-- BEGIN work_publishable -->
 
-              <!-- <a href="/{WORK_PUBLISH_HREF}{WORK_ID}" class="btn {WORK_PUBLISH_BTN_ICON}"><span></span> {WORK_PUBLISH_BTN_LABEL}</a> -->
-              <!-- END work_publishable -->
-            </td>
-          </tr>
-          <!-- END work -->
-          </tbody>
-        </table>
-      </div>
-    </div>
+						  <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+							  <input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}'/>
+							  <input type='hidden' name='userId' value='{WORK_USER_ID}'/>
+							  <input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}'/>
+							  <input type='submit' class="btn no-icon" value='{WORK_PUBLISH_BTN_LABEL}'/>
+						  </form>
+
+						  <!-- <a href="/{WORK_PUBLISH_HREF}{WORK_ID}" class="btn {WORK_PUBLISH_BTN_ICON}"><span></span> {WORK_PUBLISH_BTN_LABEL}</a> -->
+						  <!-- END work_publishable -->
+					  </td>
+				  </tr>
+				  <!-- END work -->
+				  </tbody>
+			  </table>
+		  </div>
+	  </div>
 
     <!-- BEGIN subject_comments -->
     <div class="subject-comments">
