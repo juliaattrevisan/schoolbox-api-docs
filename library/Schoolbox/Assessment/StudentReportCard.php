@@ -799,7 +799,9 @@ class StudentReportCard {
         }
         else {
             // is closed: offer no action
-			$output['buttons'][] = $buttonSeePreviousAttempts;
+			if($marks['attempts'] > 0) {
+				$output['buttons'][] = $buttonSeePreviousAttempts;
+			}
 
 			if ($marks) {
 				$output['buttons'][] = $buttonStudentReview;
