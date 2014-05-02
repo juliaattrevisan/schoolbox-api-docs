@@ -72,15 +72,7 @@ if(is_numeric($this->arg[0])) {
 			$this->setVar('my_files_block', '');
 		}
 	}
-
-	/* Parse show_my_files only if WebDAV is disabled
-	 */
-	if (!Cfg::get('webdav_enable')) {
-		$this->parse('show_my_files_block', 'show_my_files');
-	}
-	else {
-		$this->setVar('show_my_files_block', '');
-	}
+	$this->parse('show_my_files_block', 'show_my_files');
 }
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -175,15 +167,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	}
 
 	$this->parse('optgroup_block', 'optgroup', true);
-
-	/* Parse show_my_files only if WebDAV is disabled
-	 */
-	if (!Cfg::get('webdav_enable')) {
-		$this->parse('show_my_files_block', 'show_my_files');
-	}
-	else {
-		$this->setVar('show_my_files_block', '');
-	}
+	$this->parse('show_my_files_block', 'show_my_files');
 }
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	/* Upload multiple files at once */
