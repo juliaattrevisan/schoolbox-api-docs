@@ -206,7 +206,7 @@ if(in_array('nojscript', $this->arg)) {
 $query = "(SELECT `date` occurred, login, ip, title, firstname, lastname FROM login_log LEFT JOIN `user` ON `user`.`username`=login_log.username ORDER BY DATE DESC LIMIT 0,40)
 UNION
 (SELECT `time` occurred, `action`, object, title, firstname, lastname FROM cmsLog JOIN `user` ON `user`.id=`user` ORDER BY `time` DESC LIMIT 0,40)
-ORDER BY occurred DESC LIMIT 0,20";
+ORDER BY occurred DESC LIMIT 0,30";
 $recentLog = $this->db->getAll($query);
 
 

@@ -313,7 +313,6 @@ h1 {
 h2 {
     background: @module-background;
     margin: 0;
-    font-size: 12px;
     min-height: 32px;
     line-height: 32px;
     padding: 0 16px;
@@ -2936,7 +2935,7 @@ ADMIN BODY
     position: relative;
     h1,h2,h3,
     .allowed-files thead th{
-      span {
+      span.question {
         background: darken(@alternate-background,@darken-value);
         font-weight: normal;
         font-size: 14px;
@@ -2983,7 +2982,7 @@ ADMIN BODY
     .level {
         padding: 16px;
         background: @alternate-background;
-        border: 1px solid darken(@alternate-background,@darken-value);
+        border: 1px solid @std-grey;
         margin-bottom: 8px;
         position: relative;
         min-height: 1px;
@@ -3033,7 +3032,7 @@ ADMIN BODY
 
     }
     .two-thirds {
-        width: 66%;
+        width: 67%;
         float: left;
 		&.no-margin {
 			width: 67%;
@@ -3737,14 +3736,15 @@ HOMEPAGE TEMPLATES
 
     text-align: left;
     margin: 0 8px 8px 8px;
-    border-color: @std-grey;
+    border-color: darken(@lgrey, @darken-value);
     border-style: dashed;
+    border-width: 2px;
     background: @lgrey ;
-    color: @dgrey;
+    color: @black;
     min-height: 30px; // line-height: 30px;
     text-shadow: 0px 1px 1px @white;
     font-size: 16px;
-    padding: 7px 8px;
+    padding: 7px 16px;
     position: relative;
     opacity: 0.8; // background: @lgrey  url(/images/famicons/arrow_in.png) no-repeat 50% 8px;
     line-height: 58px;
@@ -3758,14 +3758,14 @@ HOMEPAGE TEMPLATES
     display: block;
     line-height: 20px;
     text-align: center;
-    color: @mgrey;
+    color: @black;
     font-weight: bold;
-    font-size: 12px;
     background-color: @white;
     text-shadow: none;
     right: @right;
     &:hover {
         background: @black;
+        color: @white;
         text-decoration: none;
     }
 }
@@ -3783,7 +3783,7 @@ HOMEPAGE TEMPLATES
         border: 1px solid @link;
         font-size: 14px;
         font-weight: bold;
-        background: @neutral-color url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
+        background: @module-background url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
         &.disabled {
             background: @lgrey;
             border-color: @std-grey;
@@ -3836,9 +3836,11 @@ HOMEPAGE TEMPLATES
         }
         .delete-this {
 			.manage-button(13px);
+            font-size: 22px;
         }
         .config-this {
 			.manage-button(38px);
+            font-size: 12px;
         }
     }
     .editPanel {
@@ -8512,8 +8514,8 @@ h4 a.hidden {
 }
 
 .rubric .warning span,
-.admin-contents h2 span,
-.admin-contents h3 span,
+.admin-contents h2 span.question,
+.admin-contents h3 span.question,
 .admin-form label span.help,
 .submission td span.alert,
 .allowed-files thead th span{

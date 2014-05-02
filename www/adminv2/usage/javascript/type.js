@@ -42,7 +42,7 @@
 
 					/* Remove loader
 					 */
-					config.element.removeClass('loader');
+					config.element.html('');
 
 					/* Only manufacture a pie if there is data
 					 */
@@ -85,14 +85,14 @@
 				}
 			});
 
-			config.element.prepend('<h2>' + config.title + '</h2>');
+			config.element.prepend('<h3>' + config.title + '</h3>');
 		}
 
 		/**
 		 * This is used when there is no data
 		 */
 		function noPie() {
-			config.element.html('<h2>' + config.title + '</h2><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h3>' + config.title + '</h3><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));

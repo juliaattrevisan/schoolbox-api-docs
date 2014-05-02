@@ -203,8 +203,8 @@
 		 */
 		function makeTable(datasets) {
 			var html = '\
-				<h2>{TITLE}</h2>\
-				<table>\
+				<h3>{TITLE}</h3>\
+				<table class="table ruler">\
 					<thead>\
 						{THEAD}\
 					</thead>\
@@ -235,7 +235,7 @@
 		 * This is used when there is no data
 		 */
 		function noTable() {
-			config.element.html('<h2>' + config.title + '</h2><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h3>' + config.title + '</h3><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));

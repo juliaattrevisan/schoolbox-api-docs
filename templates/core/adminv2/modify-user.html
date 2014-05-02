@@ -48,7 +48,7 @@ $j(function() {
 		$j.post('/adminv2/userForm.php', data);
 	});
 
-    $j('h3 span').each(function() {
+    $j('h3 span.question').each(function() {
         $j(this).qtip({
             content: 'Edit the user\'s details.',
             style: {
@@ -273,7 +273,7 @@ $j(function() {
     <!-- END admin_nav_item -->
 </ul>
 <div class="admin-contents clearfix">
-<h2><span class="no-bg"><a href="/adminv2/user">&laquo; Back to users</a></span>Modify user: <strong>{FULLNAME}</strong></h2>
+<h2>{FULLNAME}</h2>
 <form method="POST" action="/adminv2/userForm.php" class="modify-form" clear="clearfix">
 	<input type="hidden" name="login" value="{USERNAME}" />
 	<a href="#" class="btn no-icon user {ASSUME_CLASS}">{ASSUME_PROMPT}</a>

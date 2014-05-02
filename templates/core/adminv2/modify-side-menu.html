@@ -94,13 +94,14 @@
 <div class="admin-contents clearfix">
     <h2>{ACTION} Side Menu Item</h2>
 
-    <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form" class="standardForm">
+    <div class="level">
+    <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form">
         <table class="table">
             <tbody>
             <tr>
                 <td class="formLabelWidth" width="250">
 
-                    <h2>Name</h2>
+                    <h3>Name</h3>
                     <em>This is the text that will be displayed on the menu</em>
                 </td>
                 <td>
@@ -111,7 +112,7 @@
             </tr>
             <tr>
                 <td width="250">
-                    <h2>URL</h2>
+                    <h3>URL</h3>
 
                     <em>Either enter in a URL or use the browse button to link to folders created in the resource
                         system</em>
@@ -133,7 +134,7 @@
             </tr>
             <tr>
                 <td width="250">
-                    <h2>Windows</h2>
+                    <h3>Windows</h3>
                     <em>Generally links to offsite resources would be set to a new window, while local resources would
                         stay in the existing window.</em>
                 </td>
@@ -161,7 +162,7 @@
             <!-- END parent_select -->
             <tr>
                 <td width="250">
-                    <h2>Campus Access</h2>
+                    <h3>Campus Access</h3>
                     <em>Select the campuses that should be able to view
                         this link. Note that this link will only be viewable
                         by people in both the campuses and roles selected</em>
@@ -181,7 +182,7 @@
             </tr>
             <tr>
                 <td>
-                    <h2>Role Access</h2>
+                    <h3>Role Access</h3>
                 </td>
                 <td>
 					<div class="clearfix checkboxes">
@@ -212,4 +213,5 @@
             </tbody>
         </table>
     </form>
+    </div>
 </div>

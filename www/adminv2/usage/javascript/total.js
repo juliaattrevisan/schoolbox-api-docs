@@ -55,8 +55,8 @@
 
 					var html = '\
 						<div>\
-							<h2>{TITLE}</h2>\
-							<p>\
+							<h3>{TITLE}</h3>\
+							<p class="amount">\
 								{USED} / {TOTAL}\
 							</p>\
 							{BAR}\
@@ -122,8 +122,8 @@
 
 					var html = '\
 						<div>\
-							<h2>{TITLE}</h2>\
-							<p>\
+							<h3>{TITLE}</h3>\
+							<p class="amount">\
 								{USED}\
 							</p>\
 						</div>\
