@@ -6,13 +6,19 @@
 </div>
 
 <form action='/survey/deleteAttempt' method='post'>
-	<table class="table  ruler-fix">
+	<table class="table ruler-fix">
+		<colgroup>
+			<col />
+			<col />
+			<col />
+			<col width="150"/>
+		</colgroup>
 		<thead>
 			<tr>
 				<th>Student</th>
 				<th>Start</th>
 				<th>Finish</th>
-				<th>Action</th>
+				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -22,12 +28,14 @@
 				<td>{ATTEMPT_START}</td>
 				<td>{ATTEMPT_FINISH}</td>
 				<td>
-					<!-- BEGIN attempt_review -->
-					<a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}'>Review</a>
-					<!-- END attempt_review -->
-					<!-- BEGIN attempt_resume -->
-					<a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}'>Resume</a>
-					<!-- END attempt_resume -->
+					<span class="float-left actions">
+						<!-- BEGIN attempt_review -->
+						<a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="btn no-text statistics float-left" alt="Review" title="Review"><span></span></a>
+						<!-- END attempt_review -->
+						<!-- BEGIN attempt_resume -->
+						<a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}' class="btn no-text go-to float-left" alt="Resume" title="Resume"><span></span></a>
+						<!-- END attempt_resume -->
+					</span>
 				</td>
 			</tr>
 			<!-- END attempt -->

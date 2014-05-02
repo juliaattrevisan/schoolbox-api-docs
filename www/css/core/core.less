@@ -1687,6 +1687,14 @@ Notifications
 	}
 }
 
+/* span.actions inside a td should be floated left always, as this typically represents
+ * action buttons in the rightmost-column
+ */
+td .actions {
+	min-width: 125px;
+	float: left;
+}
+
 // Obsfucate buttons unless hovering over the line
 td:hover > .actions .btn,
 li:hover > .actions .btn
