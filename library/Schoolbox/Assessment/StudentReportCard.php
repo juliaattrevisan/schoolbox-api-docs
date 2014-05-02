@@ -568,7 +568,9 @@ class StudentReportCard {
 				$existingShowcasedItem = null;
 
 				if($object instanceof SubmissionBox) {
-					$page->setVar($this->outputDueWorkRow($object, $marks));
+					$rowData = $this->outputDueWorkRow($object, $marks);
+
+					$page->setVar($rowData);
 
 					/* Hide related buttons if eportfolio is not enabled
 					 */
@@ -670,6 +672,19 @@ class StudentReportCard {
 			'WORK_TIME'    => $due->getDateOnly(),
 			'WORK_URGENCY' => $urgency,
 			'WORK_HREF'    => 'submission/submissionHistory/',
+			'buttons' => array()
+		);
+
+		$buttonResubmit = array(
+			'WORK_BTN_HREF' => 'submission/submissionHistory/' . $box->getId() . '/' . $this->targetUserId,
+			'WORK_BTN_ICON' => 'up-arrow',
+			'WORK_BTN_LABEL' => 'Resubmit'
+		);
+
+		$buttonSubmit = array(
+			'WORK_BTN_HREF' => 'submission/submissionHistory/' . $box->getId() . '/' . $this->targetUserId,
+			'WORK_BTN_ICON' => 'up-arrow',
+			'WORK_BTN_LABEL' => 'Submit'
 		);
 
         // marks have been returned
@@ -685,8 +700,6 @@ class StudentReportCard {
 
 		// if the viewing user does not have permission to submit, blank out the actions
 		if(!$this->checkPermission(self::CAN_SUBMIT)) {
-			$output['WORK_BTN_ICON']  = '';
-			$output['WORK_BTN_LABEL'] = '';
 		}
         // is the box still open?
         elseif($box->getLateDate()->getUnixTimestamp() > time()) {
@@ -699,25 +712,19 @@ class StudentReportCard {
                 // is this multisubmit?
                 if($box->getAcceptMultiple()) {
                     // is multi: offer REsubmission
-                    $output['WORK_BTN_ICON']  = 'up-arrow';
-                    $output['WORK_BTN_LABEL'] = 'Resubmit';
+					$output['buttons'][] = $buttonResubmit;
                 }
                 else {
                     // is single-submit: offer no action
-                    $output['WORK_BTN_ICON']  = '';
-                    $output['WORK_BTN_LABEL'] = '';
                 }
             }
             else {
                 // work not submitted: offer submission
-                $output['WORK_BTN_ICON']  = 'up-arrow';
-                $output['WORK_BTN_LABEL'] = 'Submit';
+				$output['buttons'][] = $buttonSubmit;
             }
         }
         else {
             // cannot submit: offer no action
-            $output['WORK_BTN_ICON']  = '';
-            $output['WORK_BTN_LABEL'] = '';
         }
 
 		return $output;
