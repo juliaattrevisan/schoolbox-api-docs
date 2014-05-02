@@ -7,7 +7,8 @@
             course_homepage: '',
             session_name:    '',
             session_id:      '',
-            import_base_url: ''
+            import_base_url: '',
+            readonly:        false
         };
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
@@ -289,10 +290,13 @@
         }
 
         var initTaskList = function() {
+            if (settings.readonly) {
+                return;
+            }
             var task_list = component.find('.task-list');
             task_list.sortable({
-				placeholder: "sortable-placeholder",
-				forcePlaceholderSize: true
+                placeholder: "sortable-placeholder",
+                forcePlaceholderSize: true
             });
             task_list.bind('sortstop', function(event, ui) {
                 // Calculate ordering of all items
