@@ -113,9 +113,9 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
     public function purgeOldTransformations() {
         $portraitPath = $this->filename;
         if (!empty($portraitPath)) {
-            $portraitAge = filemtime($portraitPath);
-            $pathinfo    = pathinfo($portraitPath);
-            $pattern     = $this->cacheLocation . '/' . $pathinfo['filename'] . '-*.dat';
+            $portraitAge  = filemtime($portraitPath);
+            $portraitFile = pathinfo($portraitPath, PATHINFO_FILENAME);
+            $pattern      = $this->cacheLocation . '/' . $portraitFile . '-*.dat';
             foreach (glob($pattern) as $cacheFile) {
                 if (filemtime($cacheFile) < $portraitAge) {
                     unlink($cacheFile);
