@@ -560,9 +560,17 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 
         /* Temporarily switch the filesemester to the requested user */
-        $originalFileSemester = $_SESSION['FileSemester'];
-        $originalFileYear = $_SESSION['FileYear'];
-        if($synergyID != $_SESSION['sid']) {
+        if(isset($_SESSION['sid']) && isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear'])) {
+            $originalFileSemester = $_SESSION['FileSemester'];
+            $originalFileYear = $_SESSION['FileYear'];
+            /* If no synergy set in session or requested ID is not current user setup the current semester */
+            if($synergyID != $_SESSION['sid']) {
+                $this->getCurrentSemester($synergyID);
+            }
+        }
+        else {
+            $originalFileSemester = null;
+            $originalFileYear = null;
             $this->getCurrentSemester($synergyID);
         }
 
