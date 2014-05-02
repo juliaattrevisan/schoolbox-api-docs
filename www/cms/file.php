@@ -48,31 +48,7 @@ if(is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
 
-	$myFolderHandler = new MyFolder;
-	$myFileHandler = new MyFile;
-
-	$folderTree = $myFolderHandler->getFolderTree();
-	if (is_array($folderTree)) {
-		foreach ($folderTree as $folder) {
-			$output = array('MYFOLDER_NAME'	=> trim($folder['name']),
-					'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
-					);
-			$this->setVar($output);
-			$fileList = $myFileHandler->getAllInFolder($folder['id']);
-			if (is_array($fileList)) {
-				foreach ($fileList as $fileOut) {
-					$output = array('MYFILE_ID'		=> $fileOut['id'],
-									'MYFILE_NAME'	=> $fileOut['description'],
-									);
-					$this->setVar($output);
-					$this->parse('my_files_block', 'my_files', true);
-				}
-			}
-			$this->parse('optgroup_block', 'optgroup', true);
-			$this->setVar('my_files_block', '');
-		}
-	}
-	$this->parse('show_my_files_block', 'show_my_files');
+    outputMyFileSelector($this);
 }
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -115,59 +91,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	$this->setVar($output);
 
-
-	$myFolderHandler = new MyFolder;
-	$myFileHandler = new MyFile;
-
-	$folderTree = $myFolderHandler->getFolderTree();
-
-	if (is_array($folderTree)) {
-		foreach ($folderTree as $folder) {
-			$output = array(
-                'MYFOLDER_NAME'	=> trim($folder['name']),
-                'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
-            );
-			$this->setVar($output);
-			$fileList = $myFileHandler->getAllInFolder($folder['id']);
-			$this->setVar('my_files_block', '');
-			if (is_array($fileList)) {
-				foreach ($fileList as $file) {
-					$output = array(
-                        'MYFILE_ID'		=> $file['id'],
-                        'MYFILE_NAME'	=> $file['description'],
-                    );
-					$this->setVar($output);
-					$this->parse('my_files_block', 'my_files', true);
-				}
-			}
-			$this->parse('optgroup_block', 'optgroup', true);
-		}
-	}
-
-	$this->setVar('my_files_block', '');
-
-	/* Check for files in the root
-	 */
-	$fileList = $myFileHandler->getAllInFolder(0);
-
-	if (is_array($fileList)) {
-		$this->setVar(array(
-			'MYFOLDER_NAME' => 'Root'
-		));
-
-		foreach ($fileList as $file) {
-			$output = array(
-				'MYFILE_ID' => $file['id'],
-				'MYFILE_NAME' => $file['description'],
-			);
-
-			$this->setVar($output);
-			$this->parse('my_files_block', 'my_files', true);
-		}
-	}
-
-	$this->parse('optgroup_block', 'optgroup', true);
-	$this->parse('show_my_files_block', 'show_my_files');
+    outputMyFileSelector($this);
 }
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	/* Upload multiple files at once */
@@ -289,4 +213,66 @@ else if($this->arg[0] == 'multicat') {
 }
 else {
 	error(2);
+}
+
+/**
+ * Stupid output method for stupid file selector.
+ *
+ * Factored out of duplicate code for add/edit file.
+ *
+ * @param Sitepage $sitepage The Sitepage to spam blocks into
+ */
+function outputMyFileSelector($sitepage) {
+    $myFolderHandler = new MyFolder;
+    $myFileHandler   = new MyFile;
+
+    $folderTree = $myFolderHandler->getFolderTree();
+    if (is_array($folderTree)) {
+        foreach ($folderTree as $folder) {
+            $output = array(
+                'MYFOLDER_NAME' => trim($folder['name']),
+                'MYFOLDER_LEFT' => number_format($folder['depth'] * 14, 0),
+            );
+            $sitepage->setVar($output);
+            $fileList = $myFileHandler->getAllInFolder($folder['id']);
+            if (is_array($fileList)) {
+                foreach ($fileList as $fileOut) {
+                    $output = array(
+                        'MYFILE_ID'   => $fileOut['id'],
+                        'MYFILE_NAME' => $fileOut['description'],
+                    );
+                    $sitepage->setVar($output);
+                    $sitepage->parse('my_files_block', 'my_files', true);
+                }
+            }
+            $sitepage->parse('optgroup_block', 'optgroup', true);
+            $sitepage->setVar('my_files_block', '');
+        }
+    }
+    $sitepage->setVar('my_files_block', '');
+
+    /* Check for files in the root
+     */
+    $fileList = $myFileHandler->getAllInFolder(0);
+
+    if (is_array($fileList)) {
+        $sitepage->setVar(
+            array(
+                'MYFOLDER_NAME' => 'Root'
+            )
+        );
+
+        foreach ($fileList as $file) {
+            $output = array(
+                'MYFILE_ID'   => $file['id'],
+                'MYFILE_NAME' => $file['description'],
+            );
+
+            $sitepage->setVar($output);
+            $sitepage->parse('my_files_block', 'my_files', true);
+        }
+    }
+
+    $sitepage->parse('optgroup_block', 'optgroup', true);
+    $sitepage->parse('show_my_files_block', 'show_my_files');
 }
