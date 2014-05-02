@@ -770,12 +770,15 @@ class StudentReportCard {
 
                 // does the student have attempts left?
                 if($oa->getMaxAttempts() == 0 || $oa->getMaxAttempts() > $marks['attempts']) {
-                    // attempts remaining: offer REsit action
-					$output['buttons'][] = $buttonSeePreviousAttempts;
 
+					/* Offer review for a previous attempt
+					 * Offer list of previous attempts
+					 */
 					if ($marks) {
 						$output['buttons'][] = $buttonStudentReview;
 					}
+
+					$output['buttons'][] = $buttonSeePreviousAttempts;
                 }
                 else {
                     // no attempts remaining: offer no action
