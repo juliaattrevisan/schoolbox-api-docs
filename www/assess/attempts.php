@@ -71,11 +71,32 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
 			/* Parse review link
 			 */
-			$this->setVar(array(
-				'attempt_resume_block' => ''
-			));
+			/* Check visibility
+			  */
+			$quizVisibility = new \Assess\Visibility();
+			$quizVisibility->setId($assess['mark_visibility']);
 
-			$this->parse('attempt_review_block', 'attempt_review');
+			/* Mostly do nothing
+			 */
+			$canReview = false;
+
+			if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
+				$canReview = true;
+			}
+			else if ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+				$canReview = true;
+			}
+			else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+				$canReview = true;
+			}
+
+			if ($canReview) {
+				$this->setVar(array(
+					'attempt_resume_block' => ''
+				));
+
+				$this->parse('attempt_review_block', 'attempt_review');
+			}
         }
 		else {
             $finishDateValue = 'Unfinished';
