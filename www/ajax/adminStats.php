@@ -39,7 +39,7 @@ if(isset($_POST['module'])) {
 
         case 'service_www':
             $context = \Proxy\Server::getInstance()->getContext();
-		    if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
+		    if(@file_get_contents('http://deb.alaress.com.au/testfile.txt', null, $context)) {
                 $output[] = array('WWW_LIGHT'  => 'on',
                                   'WWW_STATUS' => 'Available'
                 );
