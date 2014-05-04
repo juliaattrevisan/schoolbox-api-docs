@@ -6,9 +6,10 @@
 	$(function() {
 		$j('.prettify').prettyFileInput({
 			inputHolderClass:'file-input not-static',
-			buttonClass:'btn up-arrow',
+            additionalButtonClasses: 'no-marg float-left',
+            buttonActiveClass:'tick',
 			defaultText:'<span></span>Choose File',
-			defaultFileSelectedText:'<span></span>'
+			defaultFileSelectedText:'<span></span>File selected'
 		});
 	});
 </script>
