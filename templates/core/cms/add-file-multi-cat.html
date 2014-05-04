@@ -79,19 +79,21 @@ $j(function() {
 					<input type="file" name="file"  id="browse" class="prettify" />
 					<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
 				</label>
-				<br />
-				<strong>Select from your existing files</strong><br />
 
-				<select name='myfile' id="myfile" >
-					<option value=''></option>
-					<!-- BEGIN optgroup -->
-					<optgroup label="&gt; {MYFOLDER_NAME}" style="padding-left: {MYFOLDER_LEFT}px;">
-						<!-- BEGIN my_files -->
-						<option value="{MYFILE_ID}" style="padding-left: 14px;">{MYFILE_NAME}</option>
-						<!-- END my_files -->
-					</optgroup>
-					<!-- END optgroup -->
-				</select>
+                <!-- BEGIN show_my_files -->
+                <br />
+                <strong>Copy from My Files</strong><br />
+                <select name='myfile' id="myfile">
+                    <option value=''></option>
+                    <!-- BEGIN optgroup -->
+                    <optgroup label="&gt; {MYFOLDER_NAME}"  style="padding-left: {MYFOLDER_LEFT}px;">
+                        <!-- BEGIN my_files -->
+                        <option value="{MYFILE_ID}" style="padding-left: 14px;">{MYFILE_NAME}</option>
+                        <!-- END my_files -->
+                    </optgroup>
+                    <!-- END optgroup -->
+                </select>
+                <!-- END show_my_files -->
 			</td>
 		</tr>
 		<!-- END browse -->
