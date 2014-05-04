@@ -462,6 +462,11 @@ fi
 
 # Restore the DB
 echo -e "\nStarting restore of the database";
+## Drop resource booking tables in a specific order due to foreign keys
+for table in `echo "resource_moderator resource_relation resource_booking lu_resource_booking_status resource lu_resource_moderation_type resource_category"`;
+do
+	mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "DROP TABLE IF EXISTS \`$table\`";
+done;
 ## Drop all existing database tables
 for table in `mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SHOW TABLES"`;
 do
@@ -505,6 +510,10 @@ fi
 echo "";
 $instdir/tools/update-sql.sh;
 
+## Run Notifications Binder so RabbitMQ has all the latest bindings for the new data
+echo -e "\nRunning Notifications Binder";
+php $instdir/tools/mq/binder.php -v 2>/dev/null;
+
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {
 	tempsqltitle=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe  "SELECT value FROM config WHERE name='title'" 2>/dev/null`;
@@ -529,10 +538,6 @@ if [ `which apache2 | wc -l` -ne 0 ];
 then
 	/usr/sbin/service apache2 restart >/dev/null 2>&1;
 fi
-if [ `which httpd | wc -l` -ne 0 ];
-then
-	/usr/sbin/service httpd restart >/dev/null 2>&1;
-fi
 if [ $? -ne 0 ];
 then
 	errmsg="An error occured restarting apache";
@@ -541,7 +546,26 @@ else
 	echo -e " - OK";
 fi
 
+# Restart schoolbox services
+echo -e "\nRestarting Schoolbox Services";
+if [ "$package" = 'schoolboxdev' ];
+then
+	/usr/sbin/service schoolboxdev-digestd restart >/dev/null 2>&1;
+	/usr/sbin/service schoolboxdev-scheduled restart >/dev/null 2>&1;
+	/usr/sbin/service schoolboxdev-socketd restart >/dev/null 2>&1;
+else
+	/usr/sbin/service schoolbox-digestd restart >/dev/null 2>&1;
+	/usr/sbin/service schoolbox-scheduled restart >/dev/null 2>&1;
+	/usr/sbin/service schoolbox-socketd restart >/dev/null 2>&1;
+fi
+
 # Cleanup
 umount $backup_dir 2>/dev/null;
+
+echo -e "\nManual Task Reminders:";
+echo -e "* check websocket ports in the config table";
+echo -e "* recheck the title in the config table";
+echo -e "* set the correct site_hostname and site_domain in the config table";
+echo "";
 
 exit;
