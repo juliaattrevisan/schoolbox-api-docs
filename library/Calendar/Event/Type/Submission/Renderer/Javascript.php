@@ -84,6 +84,8 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 				 */
 				'color' => $currentEvent->getColour(),
 
+				'className' => array('group'.$categoryId,),
+
 				/* Extra data that the Event Object doesn't directly support
 				 */
 				'data' => array(
