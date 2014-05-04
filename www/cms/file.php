@@ -48,39 +48,7 @@ if(is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
 
-	$myFolderHandler = new MyFolder;
-	$myFileHandler = new MyFile;
-
-	$folderTree = $myFolderHandler->getFolderTree();
-	if (is_array($folderTree)) {
-		foreach ($folderTree as $folder) {
-			$output = array('MYFOLDER_NAME'	=> trim($folder['name']),
-					'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
-					);
-			$this->setVar($output);
-			$fileList = $myFileHandler->getAllInFolder($folder['id']);
-			if (is_array($fileList)) {
-				foreach ($fileList as $fileOut) {
-					$output = array('MYFILE_ID'		=> $fileOut['id'],
-									'MYFILE_NAME'	=> $fileOut['description'],
-									);
-					$this->setVar($output);
-					$this->parse('my_files_block', 'my_files', true);
-				}
-			}
-			$this->parse('optgroup_block', 'optgroup', true);
-			$this->setVar('my_files_block', '');
-		}
-	}
-
-	/* Parse show_my_files only if WebDAV is disabled
-	 */
-	if (!Cfg::get('webdav_enable')) {
-		$this->parse('show_my_files_block', 'show_my_files');
-	}
-	else {
-		$this->setVar('show_my_files_block', '');
-	}
+    outputMyFileSelector($this);
 }
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
@@ -103,7 +71,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		error(13);
 	}
 
-	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS) {
+	if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS) {
 		error(6);
 	}
 
@@ -123,67 +91,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	$this->setVar($output);
 
-
-	$myFolderHandler = new MyFolder;
-	$myFileHandler = new MyFile;
-
-	$folderTree = $myFolderHandler->getFolderTree();
-
-	if (is_array($folderTree)) {
-		foreach ($folderTree as $folder) {
-			$output = array(
-                'MYFOLDER_NAME'	=> trim($folder['name']),
-                'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
-            );
-			$this->setVar($output);
-			$fileList = $myFileHandler->getAllInFolder($folder['id']);
-			$this->setVar('my_files_block', '');
-			if (is_array($fileList)) {
-				foreach ($fileList as $file) {
-					$output = array(
-                        'MYFILE_ID'		=> $file['id'],
-                        'MYFILE_NAME'	=> $file['description'],
-                    );
-					$this->setVar($output);
-					$this->parse('my_files_block', 'my_files', true);
-				}
-			}
-			$this->parse('optgroup_block', 'optgroup', true);
-		}
-	}
-
-	$this->setVar('my_files_block', '');
-
-	/* Check for files in the root
-	 */
-	$fileList = $myFileHandler->getAllInFolder(0);
-
-	if (is_array($fileList)) {
-		$this->setVar(array(
-			'MYFOLDER_NAME' => 'Root'
-		));
-
-		foreach ($fileList as $file) {
-			$output = array(
-				'MYFILE_ID' => $file['id'],
-				'MYFILE_NAME' => $file['description'],
-			);
-
-			$this->setVar($output);
-			$this->parse('my_files_block', 'my_files', true);
-		}
-	}
-
-	$this->parse('optgroup_block', 'optgroup', true);
-
-	/* Parse show_my_files only if WebDAV is disabled
-	 */
-	if (!Cfg::get('webdav_enable')) {
-		$this->parse('show_my_files_block', 'show_my_files');
-	}
-	else {
-		$this->setVar('show_my_files_block', '');
-	}
+    outputMyFileSelector($this);
 }
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	/* Upload multiple files at once */
@@ -200,7 +108,7 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 		error(13);
 	}
 
-	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS) {
+	if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS) {
 		error(6);
 	}
 
@@ -233,9 +141,10 @@ else if($this->arg[0] == 'multicat') {
 	/* Upload a file to multiple categories */
 
 	$this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
-	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
-	$this->setBlock('optgroup', 'my_files', 'my_files_block');
-	$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
+    $this->setBlock(TEMPLATE_content, 'show_my_files', 'show_my_files_block');
+    $this->setBlock('show_my_files', 'optgroup', 'optgroup_block');
+    $this->setBlock('optgroup', 'my_files', 'my_files_block');
+    $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 	$this->setBlock(TEMPLATE_content, 'no_categories', 'no_categories_block');
 
 	$this->setTitle('Upload a File to Multiple Locations');
@@ -269,40 +178,70 @@ else if($this->arg[0] == 'multicat') {
 		error(154);
 	}
 
-	$myFolderHandler = new MyFolder;
-	$myFileHandler = new MyFile;
-
-	$folderTree = $myFolderHandler->getFolderTree();
-
-	if (is_array($folderTree)) {
-		foreach ($folderTree as $folder) {
-			$output = array(
-				'MYFOLDER_NAME'	=> trim($folder['name']),
-				'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
-			);
-
-			$this->setVar($output);
-
-			$fileList = $myFileHandler->getAllInFolder($folder['id']);
-
-			if (is_array($fileList)) {
-				foreach ($fileList as $file) {
-					$output = array(
-						'MYFILE_ID' => $file['id'],
-						'MYFILE_NAME' => $file['description'],
-					);
-
-					$this->setVar($output);
-
-					$this->parse('my_files_block', 'my_files', true);
-				}
-			}
-
-			$this->parse('optgroup_block', 'optgroup', true);
-			$this->setVar('my_files_block', '');
-		}
-	}
+    outputMyFileSelector($this);
 }
 else {
 	error(2);
+}
+
+/**
+ * Stupid output method for stupid file selector.
+ *
+ * Factored out of duplicate code for add/edit file.
+ *
+ * @param Sitepage $sitepage The Sitepage to spam blocks into
+ */
+function outputMyFileSelector($sitepage) {
+    $myFolderHandler = new MyFolder;
+    $myFileHandler   = new MyFile;
+
+    /* Check for files in the root
+    */
+    $fileList = $myFileHandler->getAllInFolder(0);
+
+    if (is_array($fileList)) {
+        $sitepage->setVar(
+                 array(
+                     'MYFOLDER_NAME' => 'Top'
+                 )
+        );
+
+        foreach ($fileList as $file) {
+            $output = array(
+                'MYFILE_ID'   => $file['id'],
+                'MYFILE_NAME' => $file['description'],
+            );
+
+            $sitepage->setVar($output);
+            $sitepage->parse('my_files_block', 'my_files', true);
+        }
+    }
+    $sitepage->parse('optgroup_block', 'optgroup', true);
+    $sitepage->setVar('my_files_block', '');
+
+    $folderTree = $myFolderHandler->getFolderTree();
+    if (is_array($folderTree)) {
+        foreach ($folderTree as $folder) {
+            $output = array(
+                'MYFOLDER_NAME' => trim($folder['name']),
+                'MYFOLDER_LEFT' => number_format($folder['depth'] * 14, 0),
+            );
+            $sitepage->setVar($output);
+            $fileList = $myFileHandler->getAllInFolder($folder['id']);
+            if (is_array($fileList)) {
+                foreach ($fileList as $fileOut) {
+                    $output = array(
+                        'MYFILE_ID'   => $fileOut['id'],
+                        'MYFILE_NAME' => $fileOut['description'],
+                    );
+                    $sitepage->setVar($output);
+                    $sitepage->parse('my_files_block', 'my_files', true);
+                }
+            }
+            $sitepage->parse('optgroup_block', 'optgroup', true);
+            $sitepage->setVar('my_files_block', '');
+        }
+    }
+
+    $sitepage->parse('show_my_files_block', 'show_my_files');
 }

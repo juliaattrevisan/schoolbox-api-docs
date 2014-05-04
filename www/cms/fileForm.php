@@ -110,44 +110,39 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
             $file->setTempFileLocation(Cfg::get('myfile_dir') . '/' . $privFile['id'] . '.dat');
             $file->setFilename($privFile['realname']);
             $file->setFilesize($privFile['filesize']);
-
-
         }
-
-        if ( $_FILES['file']['name'] ) {
-
+        elseif ( $_FILES['file']['name'] ) {
             $file->setTempFileLocation($_FILES['file']['tmp_name']);
             $file->setFilename($_FILES['file']['name']);
             $file->setFilesize(filesize($_FILES['file']['tmp_name']));
+        }
 
+        /* Add to multiple locations */
+        if ( is_array($_POST['category']) ) {
 
-            /* Add to multiple locations */
-            if ( is_array($_POST['category']) ) {
+            $fileCollection = FileMapper::getInstance()->createCollection();
+            /** @var Schoolbox\Collection $fileCollection */
 
-                $fileCollection = FileMapper::getInstance()->createCollection();
-                /** @var Collection $fileCollection */
+            foreach ( $_POST['category'] as $cat ) {
 
-                foreach ( $_POST['category'] as $cat ) {
-
-                    if ( $groupHandler->getPermission($cat) < WRITE_ACCESS ) {
-                        error(6);
-                    }
-
-                    $fileDest = clone $file;
-                    $fileDest->setFolder($cat);
-                    $fileCollection->add($fileDest);
-                }
-
-                $file = $fileCollection;
-            }
-            else {
-                /* Added to a single folder */
-                if ( $groupHandler->getPermission($_POST['category']) < WRITE_ACCESS ) {
+                if ( $groupHandler->getPermission($cat) < WRITE_ACCESS ) {
                     error(6);
                 }
 
-                $file->setFolder($_POST['category']);
+                $fileDest = clone $file;
+                $fileDest->setFolder($cat);
+                $fileCollection->add($fileDest);
             }
+
+            $file = $fileCollection;
+        }
+        else {
+            /* Added to a single folder */
+            if ( $groupHandler->getPermission($_POST['category']) < WRITE_ACCESS ) {
+                error(6);
+            }
+
+            $file->setFolder($_POST['category']);
         }
 
         try {
