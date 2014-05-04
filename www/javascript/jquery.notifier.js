@@ -17,7 +17,9 @@
 
             prefetch:  5,
             debug:     false,
-            domwait:   1000
+            domwait:   1000,
+            transport: 'socket',
+            timeout:   5000
         }, options);
 
         // cast boolean from potential string
@@ -27,10 +29,11 @@
 
             // detect websocket support
             var support = "MozWebSocket" in window ? 'MozWebSocket' : ("WebSocket" in window ? 'WebSocket' : null);
-            if (support == null) {
-                // TODO fallback to flash or polling
-                if(settings.debug) { console.error('Websockets are not supported'); }
-                return;
+            if (support == null || settings.transport == 'poll') {
+                // falling back to long poll
+                support = "LongPoll";
+                window["LongPoll"] = LongPoll;
+                if(settings.debug) { console.warn('Websockets are not supported, falling back to polling'); }
             }
 
             /**
@@ -50,7 +53,7 @@
             function pollReconnect() {
                 if(attemptReconnect) {
                     if(settings.debug) { console.log('Polling for connection'); }
-                    setTimeout(establishConnection, 2000);
+                    setTimeout(establishConnection, settings.timeout);
                 }
             }
 
@@ -424,4 +427,55 @@
             establishConnection();
         });
     }
+
+    function LongPoll() {
+        this.i = 15000;
+        // perform first check, then every 15 seconds thereafter
+        this.check.apply(this);
+        this.ii = setInterval(this.check.bind(this), this.i);
+    }
+
+    LongPoll.prototype = {
+
+        check     : function() {
+            var self = this;
+            // request an update
+            $.ajax({
+                accepts  : 'application/json',
+                async    : true,
+                type     : 'GET',
+                url      : '/ajax/messages.php',
+                dataType : 'json',
+                complete : function(xhr, status) {
+                    self.onmessage({ data : xhr.responseText });
+                }
+            });
+        },
+
+        send      : function(data) {
+            var self = this;
+            // send an ack
+            $.ajax({
+                accept   : 'application/json',
+                async    : true,
+                type     : 'POST',
+                url      : '/ajax/messages.php',
+                dataType : 'json',
+                data     : {data : data},
+                complete : function(xhr, status) {
+                    self.onmessage({ data : xhr.responseText });
+                }
+            });
+        },
+
+        close     : function(e) {
+            clearInterval(this.ii);
+        },
+
+        // stubs to be overridden
+        onmessage : function(e) {},
+        onopen    : function(e) {},
+        onclose   : function(e) {}
+    };
+
 } (jQuery));
