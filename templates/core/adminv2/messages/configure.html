@@ -21,11 +21,11 @@
         <form method="post" action="/adminv2/messages/configure.php">
           <!-- BEGIN source_editable --><!-- END source_editable -->
           <!-- BEGIN source_readonly -->
-          <h4>
+          <h3>
             <a class="exp darr" href="#">&#9660;</a>
             <span class="label">"Send a message when {SOURCE_DESCRIPTION}."</span>
             <em class="summary">&nbsp;</em>
-          </h4>
+          </h3>
           <!-- END source_readonly -->
           <!-- BEGIN existing_source -->
         </form>
@@ -117,7 +117,7 @@
     sources.each(function() {
       var source = $j(this);
 
-      var summary = source.find('h4 em.summary');
+      var summary = source.find('h3 em.summary');
       var table = source.find('table.roles');
       var inputs = table.find('input[type=hidden][data-perm=default]');
 

@@ -29,7 +29,7 @@ $j(function() {
         $j(this).qtip({
             content: activeContent,
             style: {
-                classes: 'qtip-green qtip-shadow qtip-rounded'
+                classes: 'qtip-green qtip-shadow'
             },
             position: {
                 my: 'bottom left',
@@ -47,7 +47,7 @@ $j(function() {
     <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
     <!-- END admin_nav_item -->
 </ul>
-<div class="admin-contents ">
+<div class="admin-contents clearfix">
 	<h2>Calendar</h2>
 	<div class="settings-nav-holder">
 		<ul class="admin-nav vertical">
@@ -62,10 +62,10 @@ $j(function() {
 			<form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm" class="clearfix">
 				<div class="clearfix">
 					<div class="one-third">
-						<h3>Bulk<span>?</span><em>The file that contains the calendar information can either be a CSV file
+						<h3>Bulk<span class="question">?</span><em>The file that contains the calendar information can either be a CSV file
                             matching the format in the template below,
                             <strong>or</strong> a Microsoft Outlook ICS file</em></h3>
-                        <h4>CSV template</h4>
+                        <h3>CSV template</h3>
 						<p class="clearfix">
 							<a href="/adminv2/csv/calendarBulkAdd.csv" class="btn report float-left" ><span></span>Download</a>
 						</p>
@@ -77,7 +77,7 @@ $j(function() {
 						</ol>
 						<br />
 
-						<h4>Microsoft Outlook ICS</h4>
+						<h3>Microsoft Outlook ICS</h3>
 						<ol>
 							<li>In Outlook, click calendar in the bottom left</li>
 							<li>Go to File, Save As</li>
@@ -90,11 +90,11 @@ $j(function() {
 						</ol>
 						<br />
 
-						<h4>Upload new calendar entries (CSV or ICS)</h4>
+						<h3>Upload new calendar entries (CSV or ICS)</h3>
 						<input type="file" name="bulkadd" />
 					</div>
 					<div class="one-third">
-						<h3>Campus<span>?</span><em>Select the campus' which will be able to view these events</em></h3>
+						<h3>Campus<span class="question">?</span><em>Select the campus' which will be able to view these events</em></h3>
 						<!-- BEGIN campus_check_list -->
 						<label>
 							<input type="checkbox" name="campusList[]" value="{CAMPUSID}" />
@@ -103,7 +103,7 @@ $j(function() {
 						<!-- END campus_check_list -->
 					</div>
 					<div class="one-third last clearfix">
-						<h3>Roles<span>?</span><em>Select the roles which will be able to view these events</em></h3>
+						<h3>Roles<span class="question">?</span><em>Select the roles which will be able to view these events</em></h3>
 						<!-- BEGIN user_group_check_list -->
 						<label>
 							<input type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
@@ -114,7 +114,7 @@ $j(function() {
 				</div>
 				<div class="one-third clearfix"><br />
 					<br />
-					<h3>Calendar Owner<span>?</span><em>Type in the name of the owner of the calendar. The field is optional, if empty the current user will be used. </em></h3>
+					<h3>Calendar Owner<span class="question">?</span><em>Type in the name of the owner of the calendar. The field is optional, if empty the current user will be used. </em></h3>
 					<label><input name="name" id="name" type="text"  /></label>
 					<input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
 				</div>

@@ -1,8 +1,17 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
 $j(function () {
+
+    $j(function() {
+        $j('#definition-palette').configurator().start();
+    });
+
     $j("#side-menu")
         .on('ready.jstree', function(event, jstree) {
             jstree.instance.open_node(jstree.instance.get_node('node_0'));
@@ -48,10 +57,13 @@ $j(function () {
     <!-- END admin_nav_item -->
 </ul>
 <div class="admin-contents clearfix">
-	<h2>Side Menu</h2>
-	<p>Drag and drop the menu items to reorder the core left navigation side menu.</p>
-  	<p class="clearfix"><a class="btn add float-left" href="/adminv2/modify-side-menu/"><span></span>Add New</a></p>
-	<div id="side-menu">
-	{MENU_TREE}
-	</div>
+	<h2>Side Menu<span class="question">?</span>
+    <em>Drag and drop the menu items to reorder the core left navigation side menu.</em>
+    </h2>
+    <div class="level clearfix">
+        <p class="clearfix"><a class="btn add float-left" href="/adminv2/modify-side-menu/"><span></span>Add New</a></p>
+        <div id="side-menu">
+        {MENU_TREE}
+        </div>
+    </div>
 </div>

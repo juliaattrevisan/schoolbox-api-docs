@@ -75,7 +75,7 @@
 
 			/* Bar graph everything
 			 */
-			var output = '<h2>{TITLE}</h2>';
+			var output = '<h3>{TITLE}</h3>';
 
 			/* Find the total amount
 			 */
@@ -121,7 +121,7 @@
 		 * This is used when there is no data
 		 */
 		function noBars() {
-			config.element.html('<h2>' + config.title + '</h2><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h3>' + config.title + '</h3><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));

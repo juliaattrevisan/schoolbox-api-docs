@@ -48,11 +48,11 @@ $j(function() {
 		$j.post('/adminv2/userForm.php', data);
 	});
 
-    $j('h3 span').each(function() {
+    $j('h3 span.question').each(function() {
         $j(this).qtip({
             content: 'Edit the user\'s details.',
             style: {
-                classes: 'qtip-green qtip-shadow qtip-rounded'
+                classes: 'qtip-green qtip-shadow'
             },
             position: {
                 my: 'bottom left',
@@ -273,7 +273,7 @@ $j(function() {
     <!-- END admin_nav_item -->
 </ul>
 <div class="admin-contents clearfix">
-<h2><span><a href="/adminv2/user">&laquo; Back to users</a></span>Modify user: <strong>{FULLNAME}</strong></h2>
+<h2>{FULLNAME}</h2>
 <form method="POST" action="/adminv2/userForm.php" class="modify-form" clear="clearfix">
 	<input type="hidden" name="login" value="{USERNAME}" />
 	<a href="#" class="btn no-icon user {ASSUME_CLASS}">{ASSUME_PROMPT}</a>
@@ -406,7 +406,7 @@ $j(function() {
 </div>
 <div class="level clearfix">
 	<h3>Groups</h3>
-	<h4>Manage</h4>
+	<h3>Manage</h3>
 	<table class="table">
 		<colgroup>
 			<col width="10%" />
@@ -440,7 +440,7 @@ $j(function() {
 			<!-- END user_group -->
             </tbody>
         </table>
-            <h4 style="margin-top:16px;">Add</h4>
+            <h3 style="margin-top:16px;">Add</h3>
 					<form action="/adminv2/userForm.php" method="post" class="clearfix" id="groupAdd">
 						<fieldset>
 							<input type="hidden" name="groupSubmit" />
@@ -464,7 +464,7 @@ $j(function() {
 </div>
 <div class="level clearfix">
 	<h3 id="permissions">Permissions</h3>
-	<h4>Manage</h4>
+	<h3>Manage</h3>
 	<table class="table" id="permissions-list">
 		<colgroup>
 			<col width="10%" />
@@ -589,7 +589,7 @@ $j(function() {
             <!-- END user_resource_booking -->
 			</tbody>
             </table>
-					<h4 style="margin-top:16px;">Add</h4>
+					<h3 style="margin-top:16px;">Add</h3>
 					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
 							<input type="hidden" name="addService" />
 							<input type="hidden" value="{USERID}" name="uid">
@@ -653,7 +653,7 @@ $j(function() {
     <h3>Recent Activity Logs</h3>
     <div class="split-container forty">
         <div class="split">
-            <h4>Logins <a class="btn in-heading-absolute" href="/adminv2/reports/login/user={USERNAME}"><span></span>See All</a></h4>
+            <h3>Logins <a class="btn in-heading-absolute" href="/adminv2/reports/login/user={USERNAME}"><span></span>See All</a></h3>
             <table class="ruler table">
 				<tbody>
 					<tr>
@@ -674,7 +674,7 @@ $j(function() {
 	</div>
 	<div class="split-container sixty">
 		<div class="split last">
-			<h4>Activity <a class="btn in-heading-absolute" href="/adminv2/reports/activity/user={USERNAME}"><span></span>See All</a></h4>
+			<h3>Activity <a class="btn in-heading-absolute" href="/adminv2/reports/activity/user={USERNAME}"><span></span>See All</a></h3>
 			<table class="ruler table">
 				<tbody>
 					<tr>

@@ -42,7 +42,8 @@
 
 					/* Remove loader
 					 */
-					config.element.removeClass('loader');
+					config.element.html('<div style="height:450px"></div>');
+                    config.element.removeClass('loader');
 
 					/* Only manufacture a pie if there is data
 					 */
@@ -62,37 +63,35 @@
 		 * @param datasets
 		 */
 		function makePie(datasets) {
-			config.element.css('height', '500px');
-
-			$j.plot(config.element, datasets, {
+			$j.plot(config.element.find('div'), datasets, {
 				series: {
 					pie: {
 						show: true,
+                        innerRadius: 0.4,
 						label: {
 							show: true,
-							radius: 1,
+							radius: 0.55,
 							formatter: function(label, series) {
 								return '<div style="font-size:11px; text-align:center; padding:2px; color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
 							},
-							background: {
-								opacity: 0.8
-							}
+                            threshold: 0.05
+
 						}
 					}
 				},
 				legend: {
-					show: false
+					show: true
 				}
 			});
 
-			config.element.prepend('<h2>' + config.title + '</h2>');
+			config.element.prepend('<h3>' + config.title + '</h3>');
 		}
 
 		/**
 		 * This is used when there is no data
 		 */
 		function noPie() {
-			config.element.html('<h2>' + config.title + '</h2><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h3>' + config.title + '</h3><p><strong>This user has no files.</strong></p>');
 		}
 	}
 }(jQuery));

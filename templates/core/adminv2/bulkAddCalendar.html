@@ -8,7 +8,7 @@ $j(function() {
         $j(this).qtip({
             content: activeContent,
             style: {
-                classes: 'qtip-green qtip-shadow qtip-rounded',
+                classes: 'qtip-green qtip-shadow',
                 tip: { corner: false }
             },
             position: {
@@ -27,16 +27,16 @@ $j(function() {
     <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
     <!-- END admin_nav_item -->
 </ul>
-<div class="admin-contents">
+<div class="admin-contents clearfix">
 	<h3>Bulk Add Calendar Events</h3>
 
 	<div class="level">
 		<table class="bulk-users table">
 			<thead>
 				<tr>
-					<td><h3>Event Detail<em>The name of the category, indicated from reading the rows in the CSV file.</em><span>?</span></h3></td>
-					<td><h3>Action<em>The function schoolbox has attempted to complete.</em><span>?</span></h3></td>
-					<td><h3>Response<em>Schoolbox's feedback after attempting to complete the requested function.</em><span>?</span></h3></td>
+					<td><h3>Event Detail<em>The name of the category, indicated from reading the rows in the CSV file.</em><span class="question">?</span></h3></td>
+					<td><h3>Action<em>The function schoolbox has attempted to complete.</em><span class="question">?</span></h3></td>
+					<td><h3>Response<em>Schoolbox's feedback after attempting to complete the requested function.</em><span class="question">?</span></h3></td>
 				</tr>
 			</thead>
 			<tbody>

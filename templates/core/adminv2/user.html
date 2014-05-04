@@ -35,11 +35,11 @@ $j(function() {
     $j('#modify-user-button').click(openModifyScreen);
     $j('#modify-user').submit(openModifyScreen);
 
-    $j('h3 span').each(function() {
+    $j('h2 span').each(function() {
         $j(this).qtip({
             content: 'If you are wanting to deal with large lists at once, use this section.',
             style: {
-                classes: 'qtip-green qtip-shadow qtip-rounded'
+                classes: 'qtip-green qtip-shadow'
             },
             position: {
                 my: 'bottom left',
@@ -59,82 +59,79 @@ $j(function() {
     <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
     <!-- END admin_nav_item -->
 </ul>
-<div class="admin-contents">
-	<h2>Users</h2>
-	<div class="clearfix">
-		<div class="half">
+<div class="admin-contents clearfix">
+	<div class="half clearfix">
+        <h2>Users</h2>
 			<div class="level green clearfix">
-				<h4>Modify User</h4>
-				<form id="modify-user" action="" method="post" class="clearfix">
+				<h3>Modify User</h3>
+				<form id="modify-user" action="" method="post" class="float-left clearfix">
 					<input type="text" id="modify">
 					<input type="hidden" id="user-to-mod">
-					<a id="modify-user-button" class="btn modify next-to-input disabled" href="#"><span></span>Modify</a>
-				</form>
-				<a class="btn add center-it" href="/adminv2/modify-user/"><span></span>Add User</a>
-			</div>
-		</div>
-		<div class="half last">
-			<div class="level">
-				<h4>Superusers</h4>
-				<table cellpadding="0" cellspacing="0" class="logged-in table">
-					<colgroup>
-					<col width="40%" />
-					<col width="40%" />
-					<col width="20%" />
-					</colgroup>
-					<thead>
-						<tr>
-							<th scope="col">Name</th>
-							<th scope="col">Last Login</th>
-							<th scope="col">Modify</th>
-						</tr>
-					</thead>
-					<tbody>
-						<!-- BEGIN superusers -->
-						<tr>
-							<td>{SUPERUSER_NAME}</td>
-							<td>{SUPERUSER_LOGIN}</td>
-							<td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
-						</tr>
-						<!-- END superusers -->
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-	<h3>Bulk Options<span class="question">?</span></h3>
-	<div class="level last clearfix">
-		<div class="split-container">
-			<div class="split">
-				<h3>Add Users</h3>
-				<p>Provide a file containing a list of users in the following CSV format. (username, title, firstname, lastname, synergetic, role, campus, campus secondary, campus tertiary, year, password, webmail, alt. email) </p>
-				<p class="clearfix">
-					<a href="/adminv2/csv/userBulkAdd.csv" class="btn report float-left" ><span></span>Download Template</a>
-				</p>
-
-				<h4>Upload bulk users CSV</h4>
-				<form id="add-users" action="/adminv2/bulkAdd" method="post" enctype="multipart/form-data">
-					<input name="bulkadd" type="file">
-					<a class="btn add float-left submit-this" href="#"><span></span>Add users</a>
-				</form>
-			</div>
-		</div>
-		<div class="split-container ">
-			<div class="split last clearfix">
-				<h3>Remove Users</h3>
-				<p>Provide a file containing a list of usernames or School DB IDs.</p>
-				<p class="clearfix">
-					<a href="/adminv2/csv/userBulkRemove.csv" class="btn report float-left" ><span></span>Download Template</a>
-				</p>
-
-				<h4>Upload bulk remove users CSV</h4>
-				<form id="add-users" action="/adminv2/bulkRemove" method="post" enctype="multipart/form-data">
-					<input name="bulkremove" type="file">
-					<a class="btn delete float-left submit-this" href="#"><span></span>Remove Users</a>
+					<a id="modify-user-button" class="submit-btn-plain float-right modify next-to-input disabled" href="#"><span></span>Modify</a>
 				</form>
 			</div>
 
-		</div>
+            <div class="level green clearfix">
+                <h3>Add User</h3>
+                <a class="btn add center-it float-left" href="/adminv2/modify-user/"><span></span>Add User</a>
+            </div>
 
+            <div class="level">
+                <h3>Superusers</h3>
+                <table cellpadding="0" cellspacing="0" class="table ruler">
+                    <colgroup>
+                        <col width="40%" />
+                        <col width="40%" />
+                        <col width="20%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Last Login</th>
+                        <th scope="col">Modify</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN superusers -->
+                    <tr>
+                        <td>{SUPERUSER_NAME}</td>
+                        <td>{SUPERUSER_LOGIN}</td>
+                        <td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
+                    </tr>
+                    <!-- END superusers -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+	<div class="half last">
+        <h2>Bulk Options<span class="question">?</span></h2>
+        <div class="level clearfix">
+            <h3>Add Users</h3>
+            <p>Provide a file containing a list of users in the following CSV format. (username, title, firstname, lastname, synergetic, role, campus, campus secondary, campus tertiary, year, password, webmail, alt. email) </p>
+            <p class="clearfix">
+                <a href="/adminv2/csv/userBulkAdd.csv" class="btn download float-left" ><span></span>Download Template</a>
+            </p>
+
+            <h3>Upload bulk users CSV</h3>
+            <form id="add-users" action="/adminv2/bulkAdd" method="post" enctype="multipart/form-data">
+                <input name="bulkadd" type="file">
+                <a class="submit-btn-plain float-right submit-this" href="#"><span></span>Add users</a>
+            </form>
+        </div>
+
+        <div class="level clearfix">
+            <h3>Remove Users</h3>
+            <p>Provide a file containing a list of usernames or School DB IDs.</p>
+            <p class="clearfix">
+                <a href="/adminv2/csv/userBulkRemove.csv" class="btn download float-left" ><span></span>Download Template</a>
+            </p>
+
+            <h3>Upload bulk remove users CSV</h3>
+            <form id="add-users" action="/adminv2/bulkRemove" method="post" enctype="multipart/form-data">
+                <input name="bulkremove" type="file">
+                <a class="submit-btn-plain delete float-right submit-this" href="#"><span></span>Remove Users</a>
+            </form>
+        </div>
 	</div>
 </div>
