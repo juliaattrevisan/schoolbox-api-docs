@@ -3170,7 +3170,6 @@ ADMIN BODY
 }
 
 .level table {
-    width: 100%;
 	td, th {
 		padding: 0 8px 0 0;
 		&.colours-buttons {
@@ -3327,11 +3326,11 @@ ADMIN BODY
 		&.error {
 			margin: -8px 0 0 0;
 		}
-		span.help {
+		span.question {
 			background: darken(@alternate-background,@darken-value);
             color: @black;
 			font-weight: normal;
-			font-size: 14px;
+			font-size: 12px;
 			padding: 0 4px;
 			cursor: help;
 			margin: 0 8px;
@@ -3738,7 +3737,7 @@ HOMEPAGE TEMPLATES
     margin: 0 8px 8px 8px;
     border-color: darken(@lgrey, @darken-value);
     border-style: dashed;
-    border-width: 2px;
+    border-width: 1px;
     background: @lgrey ;
     color: @black;
     min-height: 30px; // line-height: 30px;
@@ -8516,7 +8515,7 @@ h4 a.hidden {
 .rubric .warning span,
 .admin-contents h2 span.question,
 .admin-contents h3 span.question,
-.admin-form label span.help,
+.admin-form label span.question,
 .submission td span.alert,
 .allowed-files thead th span{
     .rounded-corners(100%)
