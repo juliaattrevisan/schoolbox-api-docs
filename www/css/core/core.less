@@ -2931,7 +2931,6 @@ ADMIN BODY
 .admin-contents {
     min-height: 1px;
     clear: both;
-    background: @content-background;
     position: relative;
     h1,h2,h3,
     .allowed-files thead th{
@@ -3152,22 +3151,6 @@ ADMIN BODY
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-}
-
-.jstree-schoolbox span.file,
-.jstree-schoolbox a,
-.jstree-schoolbox .jstree-leaf a {
-    background: lighten(@neutral-color, @lighten-value) !important;
-	&.active {
-		background: @highlight-color !important;
-	}
-}
-
-.jstree-schoolbox .jstree-open > a {
-	background: @positive-color !important;
-	&.active {
-		background: @highlight-color !important;
-	}
 }
 
 .level table {
@@ -11171,6 +11154,22 @@ textarea.event-detail {
 }
 
 // Style for new JSTree theme
+.jstree-schoolbox span.file,
+.jstree-schoolbox a,
+.jstree-schoolbox .jstree-leaf a {
+  background: lighten(@neutral-color, @lighten-value) !important;
+  &.active {
+    background: @highlight-color !important;
+  }
+}
+
+.jstree-schoolbox .jstree-open > a {
+  background: @positive-color !important;
+  &.active {
+    background: @highlight-color !important;
+  }
+}
+
 .jstree-default.jstree-default-schoolbox {
     li {
         min-height:34px;
@@ -11180,9 +11179,6 @@ textarea.event-detail {
     }
     a, span.file{
         background:#e2f3ff;
-        border-radius:4px;
-        -moz-border-radius:4px;
-        -webkit-border-radius:4px;
         padding:0 28px;
         line-height:28px;
         margin-top:3px;
