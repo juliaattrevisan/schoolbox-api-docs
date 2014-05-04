@@ -233,6 +233,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         $this->setVar(
             array(
+                'UNIT_READONLY'            => ($this->readOnly ? 'true' : 'false'),
                 'UNIT_ID'                  => Scrub::text($unit->getId()),
                 'UNIT_HOMEPAGE_ID'         => Scrub::text($unit->getUnitCategory()->getId()),
                 'UNIT_NAME'                => Scrub::text($unit->getTitle()),
