@@ -6,7 +6,7 @@
 </div>
 
 <form action='/survey/deleteAttempt' method='post'>
-	<table class="table ruler-fix">
+	<table class="table ruler">
 		<colgroup>
 			<col />
 			<col />
@@ -33,7 +33,7 @@
 				<td>{ATTEMPT_START}</td>
 				<td>{ATTEMPT_FINISH}</td>
 				<td>
-					<span class="float-left actions">
+					<span class="actions one-button">
 						<!-- BEGIN attempt_review -->
 						<a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="btn no-text statistics float-left" alt="Review" title="Review"><span></span></a>
 						<!-- END attempt_review -->
