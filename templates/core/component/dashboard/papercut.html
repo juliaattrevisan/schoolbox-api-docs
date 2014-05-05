@@ -30,25 +30,20 @@
 		</table>
 	</div>
 
-	<script type="text/javascript" src="http://localhost:9191/content/widgets/widgets.js"></script>
+	<script type="text/javascript" src="/javascript/widgets.js"></script>
 	<script type="text/javascript">
 		var pcUsername = '{PAPERCUT_USERNAME}';
 		var pcServerURL = '{PAPERCUT_SERVER}';
 
 		pcGetUserDetails();
 
-		document.getElementById('userName').innerHTML = pcUsername;
-
 		if (pcUserDetails.balanceFormatted != undefined) {
 			document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
-			document.getElementById('userRestricted').innerHTML = pcUserDetails.restricted;
 			document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
 			document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
 			document.getElementById('userCO2').innerHTML = pcUserDetails.environmentalImpact.gramsCO2Formatted;
 			document.getElementById('userTrees').innerHTML = pcUserDetails.environmentalImpact.treesFormatted;
-			document.getElementById('userBulbHours').innerHTML = pcUserDetails.environmentalImpact.bulbHoursFormatted;
 			document.getElementById('userSinceDate').innerHTML = pcUserDetails.printStats.sinceDateFormatted;
 		}
 	</script>
-
 </div>
