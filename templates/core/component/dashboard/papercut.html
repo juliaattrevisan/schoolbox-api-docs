@@ -30,20 +30,21 @@
 		</table>
 	</div>
 
-	<script type="text/javascript" src="/javascript/widgets.js"></script>
 	<script type="text/javascript">
 		var pcUsername = '{PAPERCUT_USERNAME}';
 		var pcServerURL = '{PAPERCUT_SERVER}';
 
-		pcGetUserDetails();
+		var url = '{PAPERCUT_SERVER}/rpc/api/web/user/' + pcUsername + '/details.js';
 
-		if (pcUserDetails.balanceFormatted != undefined) {
-			document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
-			document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
-			document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
-			document.getElementById('userCO2').innerHTML = pcUserDetails.environmentalImpact.gramsCO2Formatted;
-			document.getElementById('userTrees').innerHTML = pcUserDetails.environmentalImpact.treesFormatted;
-			document.getElementById('userSinceDate').innerHTML = pcUserDetails.printStats.sinceDateFormatted;
-		}
+		$j.getScript(url, function(script, textStatus, jqXHR) {
+			if (pcUserDetails.balanceFormatted != undefined) {
+				document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
+				document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
+				document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
+				document.getElementById('userCO2').innerHTML = pcUserDetails.environmentalImpact.gramsCO2Formatted;
+				document.getElementById('userTrees').innerHTML = pcUserDetails.environmentalImpact.treesFormatted;
+				document.getElementById('userSinceDate').innerHTML = pcUserDetails.printStats.sinceDateFormatted;
+			}
+		});
 	</script>
 </div>
