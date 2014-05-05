@@ -9,24 +9,22 @@
 
 require_once __DIR__ . '/../../../include/Bootstrap.php';
 
-if (\Cfg::get('site_location') == 'bialik') {
-	$definition = array(
-		'name' => 'Papercut',
-		'module' => 'dashboard',
-		'class' => 'Component_Dashboard_PapercutController',
-		'description' => 'Papercut',
-		'multiple' => 'false',
-		'config' => array(
-			'componentname' => array(
-				'default_value' => 'Papercut',
-				'label' => 'Heading'
-			),
-			'url' => array(
-				'default_value' => 'Papercut url',
-				'label' => 'Server Address'
-			),
-		)
-	);
+$definition = array(
+	'name' => 'Papercut',
+	'module' => 'dashboard',
+	'class' => 'Component_Dashboard_PapercutController',
+	'description' => 'Papercut',
+	'multiple' => 'false',
+	'config' => array(
+		'componentname' => array(
+			'default_value' => 'Papercut',
+			'label' => 'Heading'
+		),
+		'url' => array(
+			'default_value' => '',
+			'label' => 'Server Address'
+		),
+	)
+);
 
-	Component_DefinitionMapper::getInstance()->create($definition);
-}
+Component_DefinitionMapper::getInstance()->create($definition);
