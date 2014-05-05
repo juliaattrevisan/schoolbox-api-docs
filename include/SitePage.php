@@ -903,8 +903,13 @@ class SitePage extends Page {
             $parts = parse_url($_SERVER['REQUEST_URI']);
             // Redirect to base path, with current URI in page param, if not
             // currently on the base path.
-            if (!$page && $parts['path'] != '/login/' && $parts['path'] != '/') {
-                $this->localRedir('/login/?page='.urlencode($_SERVER['REQUEST_URI']));
+            if (!$page && $parts['path'] != '/login/') {
+                if ($parts['path'] != '/' ) {
+                     $this->localRedir('/login/?page='.urlencode($_SERVER['REQUEST_URI']));
+                }
+                else {
+                     $this->localRedir('/login/');
+                }
             }
             else {
                 $error = isset($_GET['page']) ?
