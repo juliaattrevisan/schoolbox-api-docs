@@ -724,14 +724,17 @@ class Marksheet {
 				$header[] = $item['object']->getName();
 				$header[] = '';
 				$header[] = '';
+				$header[] = '';
 				$subheader[] = 'Normalised Grade';
 				$subheader[] = 'Grade';
+				$subheader[] = 'Total';
 				$subheader[] = 'Comment';
 			}
 			else {
 				$header[] = '';
 				$header[] = '';
 				$header[] = '';
+				$subheader[] = '';
 				$subheader[] = '';
 				$subheader[] = '';
 				$subheader[] = '';
@@ -750,10 +753,43 @@ class Marksheet {
 			);
 			foreach ($this->displayOrder as $item) {
 				$mark = $row['marks'][$item['isOA']][$item['id']];
+
 				if (!($item['object'] instanceof OnlineAssessment)) {
 					$output[] = $mark['norm_mark'];
 				}
-				$output[] = $mark['mark'];
+
+				/* Total available marks in achieved/available format
+				 */
+				if (strstr($mark['mark'], ' / ')) {
+					list($actual, $available) = explode(' / ', $mark['mark']);
+
+					$output[] = $actual;
+					$output[] = $available;
+				}
+				else {
+					/* A mark value is provided
+					 */
+					if ($mark['mark'] != '') {
+						$output[] = $mark['mark'];
+
+						/* Quiz doesn't have getMaxMark() and are represented as
+						 * achieved/available anyway
+						 */
+						if ($item['object'] instanceof OnlineAssessment) {
+							$output[] = '';
+						}
+						else {
+							$output[] = $item['object']->getMaxMark();
+						}
+					}
+					/* No mark provided
+					 */
+					else {
+						$output[] = '';
+						$output[] = '';
+					}
+				}
+
 				$output[] = $mark['comment'];
 			}
 			fputcsv($fp, $output);
