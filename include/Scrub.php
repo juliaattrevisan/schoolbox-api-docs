@@ -41,6 +41,20 @@ class Scrub {
     }
 
     /**
+     * Scrubs text for XML output.
+     *
+     * @param  $text
+     * @return string
+     */
+    static public function xml($text) {
+        //
+        // Don't think ENT_IGNORE is a problem here.
+        // This is used to escape output as text or as an attribute - HTML tags
+        // are escaped regardless.
+        return htmlspecialchars($text, ENT_QUOTES);
+    }
+
+    /**
      * Turns html into plaintext.
      * Note: output will be quite unpredictable if used on input that contains tables or copious formatting.
      * @static
